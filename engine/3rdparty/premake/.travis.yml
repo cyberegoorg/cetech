@@ -1,0 +1,7 @@
+os:
+  - linux
+
+script:
+ - make -f Bootstrap.mak $TRAVIS_OS_NAME
+ - bin/release/premake5 test
+

@@ -1,0 +1,66 @@
+--------------------
+  5.0 (in progress)
+--------------------
+
+See https://github.com/premake/premake-core/wiki/What's-New-in-5.0
+for the complete list of changes from the Premake 4.x series.
+
+Since 5.0-alpha2:
+
+* New: CodeLite support
+* New: D language support
+* New: MonoDevelop support
+* New API: buildlog()
+* New API: callingconvention() (Tim Wharton)
+* New API: os.writefile_ifnotequal()
+* New API: sysincludedirs()
+* New API: syslibdirs()
+* New: toolset() can now specify a version number
+* New: Default values and categories for command line options
+* New: Add bootstrapping script for Git repository (Tim Wharton)
+* Fix: Modules are now loaded correctly in all situations (Damien Courtois)
+* Fix: Make Visual Studio debug commands absolute (amc522)
+* Fix: Allow tokens in vpaths()
+* Fix: Silence xcopy output from {COPY} command token (StiX)
+* Fix: Remove ".." sequences in path.join()
+* Fix: Allow CC and CXX overrides from command line (Tim Wharton)
+* Fix: Enable solution level filtering on system values
+* Fix: Make configuration flag mapping order deterministic
+* Fix: Map "Win32" to x86 architecture for Visual Studio
+* Fix: Correct formatting for Visual Studio rule paths
+* Fix: Make project APIs consistently lowercase
+* Fix: Disable SSE/SSE2 flags for Visual Studio 64-bit builds
+* Fix: io.open() now creates directory append ("a") mode
+
+Since 5.0-alpha1:
+
+* Many new debugger APIs
+* New API: endian()
+* New API: fpu()
+* New API: gccprefix()
+* New API: pic()
+* New API: runtime() (Tom van Dijck)
+* New API: undefines()
+* New API: disablewarnings(), enablewarnings(), fatalwarnings()
+* Added Visual Studio 2015 support (Tom van Dijck)
+* filter() now accepts field value aliases in the conditions
+* Fixed _ACTION and _OPTIONS filter prefixes
+* Main application logic can now be extended by modules
+* Action arguments (_ARGS) are now keyed by both index and value
+* Configuration baking and validation now skipped for execute only actions
+* os.findlib() now accepts paths to search as argument
+* Visual Studio .user files are now only generated if not empty
+* Xcode4 exporter is now available
+* Modules may now be loaded on demand where feasible
+* os.outputof() now returns command exit code as second value
+* Added AVX2 to vectorextensions()
+* Checks to prevent self-linking (Mark Chandler)
+* Added path.replaceextension() (M Skibbe)
+* Made clean functions overridable
+* Migrated x32/x64 to x86/x86_64
+* Added new debugger selection APIs
+* Fixed handling of ../ sequences in path.normalize() (Tom van Dijck)
+* Added table.tostring() (Tom van Dijck)
+* Added .editorconfig file
+* Added string.sha1() (Tom van Dijck)
+* Added verbosef() and --verbose flag (Tom van Dijck)

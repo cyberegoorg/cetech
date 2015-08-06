@@ -1,0 +1,16 @@
+.build
+doc/doxygen/*
+
+*.kdev4
+
+# SDL2
+3rdparty/SDL2/include/SDL_config.h
+3rdparty/SDL2/build
+3rdparty/SDL2/Makefile
+3rdparty/SDL2/Makefile.rules
+3rdparty/SDL2/config.log
+3rdparty/SDL2/config.status
+3rdparty/SDL2/libtool
+3rdparty/SDL2/sdl2-config
+3rdparty/SDL2/sdl2.pc
+
