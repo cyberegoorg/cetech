@@ -1,3 +1,4 @@
+// based on bitsquid foundation
 #include "memory.h"
 
 #include <stdlib.h>

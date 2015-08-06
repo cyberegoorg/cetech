@@ -1,0 +1,4 @@
+syntax: glob
+*.o
+unit_test
+foundation

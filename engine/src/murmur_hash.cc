@@ -1,3 +1,4 @@
+// based on bitsquid foundation
 #include "murmur_hash.h"
 
 namespace cetech1

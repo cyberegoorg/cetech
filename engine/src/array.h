@@ -1,3 +1,4 @@
+// based on bitsquid foundation
 #pragma once
 
 #include "container_types.h"
