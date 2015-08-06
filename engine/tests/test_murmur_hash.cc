@@ -1,7 +1,8 @@
+#include <string.h>
+
 #include "catch.hpp"
 
-#include <string.h>
-#include "murmur_hash.h"
+#include "runtime/murmur_hash.h"
 
 SCENARIO( "Murmur hash", "[murmur]" ) {
     GIVEN( "String to hash" ) {

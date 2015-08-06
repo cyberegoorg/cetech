@@ -44,7 +44,11 @@ function toolchain(build_dir)
         defines {"NDEBUG"}
 
     filter "system:linux"
-        buildoptions {"-std=c++11", "-fPIC", "-msse2"}
+        buildoptions {"-std=c++0x", "-fPIC", "-msse2"}
+	
+	links {
+	    "m",
+	}
 
     filter {"system:linux", "platforms:x32"}
         targetdir (build_dir .. "linux32" .. "/bin")
@@ -67,10 +71,6 @@ project "tech1"
     kind "ConsoleApp"
     language "C++"
 
-    links {
-        "m",
-    }
-
     files {
         ROOT_DIR .. "src/**.cc",
         ROOT_DIR .. "src/**.h",
@@ -85,10 +85,6 @@ project "tech1_test"
     kind "ConsoleApp"
     language "C++"
 
-    links {
-        "m",
-    }
-
     files {
         ROOT_DIR .. "src/**.cc",
         ROOT_DIR .. "src/**.h",
@@ -98,7 +94,7 @@ project "tech1_test"
     }
 
     excludes {
-             ROOT_DIR .. "src/main.cc",
+             ROOT_DIR .. "src/runtime/main.cc",
     }
 
     filter "Debug"
