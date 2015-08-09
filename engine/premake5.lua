@@ -29,12 +29,13 @@ function toolchain(build_dir)
       ROOT_DIR .. "src"
     }
   
-    linkoptions {
-	  THIRD_PARTY_LIB .. "libSDL2.a"
+    libdirs {
+      THIRD_PARTY_LIB
     }
-      
+    
     filter "Debug"
-        defines {"DEBUG"}
+        defines {"DEBUG", "CETECH1_DEBUG"}
+	
         flags {"Symbols"}
         targetsuffix '_debug'
         optimize "Off"
@@ -44,7 +45,7 @@ function toolchain(build_dir)
         defines {"NDEBUG"}
 
     filter "system:linux"
-        buildoptions {"-std=c++0x", "-fPIC", "-msse2"}
+        buildoptions {"-std=c++11", "-fPIC", "-msse2"}
 	
 	links {
 	    "m",
@@ -67,8 +68,8 @@ solution "cyberego.org tech1"
 
     toolchain (BUILD_DIR)
 --------------------------------------------------------------------------------
-project "tech1"
-    kind "ConsoleApp"
+project "tech1_static"
+    kind "StaticLib"
     language "C++"
 
     files {
@@ -76,28 +77,41 @@ project "tech1"
         ROOT_DIR .. "src/**.h",
     }
 
-    filter "Debug"
-        defines {"CETECH1_DEBUG"}
+    links {
+      "SDL2"
+    }
+    
+    excludes {
+      ROOT_DIR .. "src/runtime/main.cc",
+    }
 
     filter {}
 --------------------------------------------------------------------------------
 project "tech1_test"
     kind "ConsoleApp"
     language "C++"
-
+    
+    links {
+      'tech1_static'
+    }
+    
     files {
-        ROOT_DIR .. "src/**.cc",
-        ROOT_DIR .. "src/**.h",
-
         ROOT_DIR .. "tests/**.cc",
         ROOT_DIR .. "tests/**.h",
     }
 
-    excludes {
-             ROOT_DIR .. "src/runtime/main.cc",
+    filter {}
+--------------------------------------------------------------------------------
+project "tech1"
+    kind "ConsoleApp"
+    language "C++"
+
+    files {
+        ROOT_DIR .. "src/runtime/main.cc",
     }
 
-    filter "Debug"
-        defines {"CETECH1_DEBUG"}
+    links {
+      'tech1_static'
+    }
 
     filter {}
