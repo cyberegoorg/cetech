@@ -3,6 +3,7 @@
 #include "types.h"
 #include "memory_types.h"
 #include "memory.h"
+#include "container_types.h"
 
 namespace cetech1 {
     struct Entity {

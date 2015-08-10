@@ -106,7 +106,7 @@ project "tech1"
     language "C++"
 
     files {
-        ROOT_DIR .. "src/runtime/main.cc",
+        ROOT_DIR .. "src/runtime/*.cc",
     }
 
     links {
