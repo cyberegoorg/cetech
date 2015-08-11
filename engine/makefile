@@ -23,7 +23,7 @@ else
 endif
 
 ROOT_DIR := $(shell dirname $(realpath $(lastword $(MAKEFILE_LIST))))
-PREMAKE5 := $(ROOT_DIR)/3rdparty/build/bin/$(OS)$(ARCH)/premake5
+PREMAKE5 := $(ROOT_DIR)/../3rdparty/.build/bin/$(OS)$(ARCH)/premake5
 #########
 
 #########
