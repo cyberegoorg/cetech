@@ -4,5 +4,5 @@ os:
   - linux
 
 script:
- - make test-$TRAVIS_OS_NAME-debug
+ - make -C ./engine/ test-$TRAVIS_OS_NAME-debug
 
