@@ -1,0 +1,8 @@
+language: cpp
+
+os:
+  - linux
+
+script:
+ - make test-$TRAVIS_OS_NAME-debug
+
