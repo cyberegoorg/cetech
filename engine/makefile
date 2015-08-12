@@ -86,7 +86,7 @@ linux-debug32:  .build/projects/gmake
 .PHONY: linux-release32
 linux-release32: .build/projects/gmake
 	+${MAKE} -C .build/projects/gmake config=release_x32
-	
+
 .PHONY: linux-debug64
 linux-debug64: .build/projects/gmake
 	+${MAKE} -C .build/projects/gmake config=debug_x64
@@ -111,3 +111,18 @@ test-linux-debug-travis: linux-debug
 test-linux-release-travis: linux-release
 	.build/linux${ARCH}/bin/tech1_test
 #########
+
+
+.build/projects/vs2010:
+	$(PREMAKE5) --file=premake5.lua vs2010
+
+.build/projects/vs2012:
+	$(PREMAKE5) --file=premake5.lua vs2012
+
+.build/projects/vs2013:
+	$(PREMAKE5) --file=premake5.lua vs2013
+vs2013: .build/projects/vs2013 ;
+
+.build/projects/vs2015:
+	$(PREMAKE5) --file=premake5.lua vs2015
+vs2015: .build/projects/vs2015 ;

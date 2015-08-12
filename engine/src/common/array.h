@@ -198,7 +198,7 @@ namespace cetech1 {
 
             T* new_data = 0;
             if (new_capacity > 0) {
-                new_data = (T*)a._allocator->allocate(sizeof(T) * new_capacity, alignof(T));
+                new_data = (T*)a._allocator->allocate(sizeof(T) * new_capacity, __alignof(T));
                 memcpy(new_data, a._data, sizeof(T) * a._size);
             }
 
