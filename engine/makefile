@@ -105,9 +105,9 @@ test-linux-release: linux-release
 
 .PHONY: test-linux-debug-travis
 test-linux-debug-travis: linux-debug
-	.build/linux${ARCH}/bin/tech1_test_debug -d
+	.build/linux${ARCH}/bin/tech1_test_debug -d yes
 
 .PHONY: test-linux-release-travis
 test-linux-release-travis: linux-release
-	.build/linux${ARCH}/bin/tech1_test -d
+	.build/linux${ARCH}/bin/tech1_test -d yes
 #########
