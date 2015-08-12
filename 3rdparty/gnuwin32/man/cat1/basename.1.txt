@@ -1,0 +1,46 @@
+BASENAME(1)              User Commands              BASENAME(1)
+
+
+
+
+
+NAME
+       basename - strip directory and suffix from filenames
+
+SYNOPSIS
+       basename NAME [SUFFIX]
+       basename OPTION
+
+DESCRIPTION
+       Print   NAME   with  any  leading  directory  components
+       removed.  If specified, also remove a trailing SUFFIX.
+
+       --help display this help and exit
+
+       --version
+              output version information and exit
+
+AUTHOR
+       Written by FIXME unknown.
+
+REPORTING BUGS
+       Report bugs to <bug-coreutils@gnu.org>.
+
+COPYRIGHT
+       Copyright (C) 2004 Free Software Foundation, Inc.
+       This is free software; see the source for copying condi-
+       tions.  There is NO warranty; not even for MERCHANTABIL-
+       ITY or FITNESS FOR A PARTICULAR PURPOSE.
+
+SEE ALSO
+       The full documentation for basename is maintained  as  a
+       Texinfo  manual.   If the info and basename programs are
+       properly installed at your site, the command
+
+              info basename
+
+       should give you access to the complete manual.
+
+
+
+basename 5.3.0           November 2004              BASENAME(1)

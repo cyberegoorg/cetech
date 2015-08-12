@@ -1,0 +1,241 @@
+split(P)                                               split(P)
+
+
+
+
+
+NAME
+       split - split files into pieces
+
+SYNOPSIS
+       split [-l line_count][-a suffix_length][file[name]]
+
+       split -b n[k|m][-a suffix_length][file[name]]
+
+
+DESCRIPTION
+       The split utility shall read an input file and write one
+       or more output files. The default size  of  each  output
+       file  shall  be 1000 lines. The size of the output files
+       can be  modified  by  specification  of  the  -b  or  -l
+       options. Each output file shall be created with a unique
+       suffix.  The  suffix  shall  consist  of  exactly   suf-
+       fix_length  lowercase letters from the POSIX locale. The
+       letters of the suffix shall be used as if  they  were  a
+       base-26  digit  system, with the first suffix to be cre-
+       ated consisting of all 'a' characters, the second with a
+       'b'  replacing the last 'a' , and so on, until a name of
+       all 'z' characters is created. By default, the names  of
+       the  output files shall be 'x' , followed by a two-char-
+       acter suffix from the character set as described  above,
+       starting  with  "aa" , "ab" , "ac" , and so on, and con-
+       tinuing until the suffix "zz" , for  a  maximum  of  676
+       files.
+
+       If  the  number  of  files  required exceeds the maximum
+       allowed by the suffix length  provided,  such  that  the
+       last  allowable  file would be larger than the requested
+       size, the split utility shall fail  after  creating  the
+       last  file  with  a valid suffix; split shall not delete
+       the files it created with valid suffixes.  If  the  file
+       limit  is not exceeded, the last file created shall con-
+       tain the remainder of the input file, and may be smaller
+       than the requested size.
+
+OPTIONS
+       The  split utility shall conform to the Base Definitions
+       volume of IEEE Std 1003.1-2001,  Section  12.2,  Utility
+       Syntax Guidelines.
+
+       The following options shall be supported:
+
+       -a  suffix_length
+
+              Use suffix_length letters to form the suffix por-
+              tion of the filenames of the split file. If -a is
+              not specified, the default suffix length shall be
+              two. If the sum of the name operand and the  suf-
+              fix_length  option-argument  would create a file-
+              name exceeding {NAME_MAX} bytes, an  error  shall
+              result;  split  shall exit with a diagnostic mes-
+              sage and no files shall be created.
+
+       -b  n  Split a file into pieces n bytes in size.
+
+       -b  nk Split a file into pieces n*1024 bytes in size.
+
+       -b  nm Split a file into pieces n*1048576 bytes in size.
+
+       -l  line_count
+              Specify  the  number  of  lines in each resulting
+              file  piece.  The  line_count  argument   is   an
+              unsigned decimal integer. The default is 1000. If
+              the input does not end with a <newline>, the par-
+              tial  line  shall  be included in the last output
+              file.
+
+
+OPERANDS
+       The following operands shall be supported:
+
+       file   The pathname of the ordinary file to be split. If
+              no input file is given or file is '-' , the stan-
+              dard input shall be used.
+
+       name   The prefix to be  used  for  each  of  the  files
+              resulting  from  the  split operation. If no name
+              argument is given, 'x' shall be used as the  pre-
+              fix  of  the output files. The combined length of
+              the basename of prefix and  suffix_length  cannot
+              exceed {NAME_MAX} bytes. See the OPTIONS section.
+
+
+STDIN
+       See the INPUT FILES section.
+
+INPUT FILES
+       Any file can be used as input.
+
+ENVIRONMENT VARIABLES
+       The following environment  variables  shall  affect  the
+       execution of split:
+
+       LANG   Provide a default value for the internationaliza-
+              tion variables that are unset or null.  (See  the
+              Base  Definitions volume of IEEE Std 1003.1-2001,
+              Section 8.2, Internationalization  Variables  for
+              the  precedence of internationalization variables
+              used to determine  the  values  of  locale  cate-
+              gories.)
+
+       LC_ALL If  set to a non-empty string value, override the
+              values  of  all  the  other  internationalization
+              variables.
+
+       LC_CTYPE
+              Determine  the  locale  for the interpretation of
+              sequences of bytes of  text  data  as  characters
+              (for  example,  single-byte  as opposed to multi-
+              byte characters in arguments and input files).
+
+       LC_MESSAGES
+              Determine the  locale  that  should  be  used  to
+              affect the format and contents of diagnostic mes-
+              sages written to standard error.
+
+       NLSPATH
+              Determine the location of  message  catalogs  for
+              the processing of LC_MESSAGES .
+
+
+ASYNCHRONOUS EVENTS
+       Default.
+
+STDOUT
+       Not used.
+
+STDERR
+       The  standard  error  shall  be used only for diagnostic
+       messages.
+
+OUTPUT FILES
+       The output files contain portions of the original  input
+       file; otherwise, unchanged.
+
+EXTENDED DESCRIPTION
+       None.
+
+EXIT STATUS
+       The following exit values shall be returned:
+
+        0     Successful completion.
+
+       >0     An error occurred.
+
+
+CONSEQUENCES OF ERRORS
+       Default.
+
+       The following sections are informative.
+
+APPLICATION USAGE
+       None.
+
+EXAMPLES
+       In  the  following examples foo is a text file that con-
+       tains 5000 lines.
+
+       Create five files, xaa, xab, xac, xad, and xae:
+
+
+              split foo
+
+       Create five files, but the suffixed portion of the  cre-
+       ated  files consists of three letters, xaaa, xaab, xaac,
+       xaad, and xaae:
+
+
+              split -a 3 foo
+
+       Create three files with four-letter suffixes and a  sup-
+       plied prefix, bar_aaaa, bar_aaab, and bar_aaac:
+
+
+              split -a 4 -l 2000 foo bar_
+
+       Create as many files as are necessary to contain at most
+       20*1024 bytes, each with the default prefix of x  and  a
+       five-letter suffix:
+
+
+              split -a 5 -b 20k foo
+
+RATIONALE
+       The  -b  option  was  added  to  provide a mechanism for
+       splitting files other than by lines. While most uses  of
+       the  -b option are for transmitting files over networks,
+       some believed it would have additional uses.
+
+       The -a option was added to overcome  the  limitation  of
+       being able to create only 676 files.
+
+       Consideration  was given to deleting this utility, using
+       the rationale that the functionality  provided  by  this
+       utility  is available via the csplit utility (see csplit
+       ). Upon reconsideration  of  the  purpose  of  the  User
+       Portability  Extension,  it  was  decided to retain both
+       this utility and the csplit utility  because  users  use
+       both utilities and have historical expectations of their
+       behavior. Furthermore, the splitting on byte  boundaries
+       in  split  cannot  be  duplicated  with  the  historical
+       csplit.
+
+       The text " split shall not delete the files  it  created
+       with  valid  suffixes"  would  normally  be assumed, but
+       since the related utility,  csplit,  does  delete  files
+       under  some  circumstances,  the  historical behavior of
+       split is made explicit to avoid misinterpretation.
+
+FUTURE DIRECTIONS
+       None.
+
+SEE ALSO
+       csplit
+
+COPYRIGHT
+       Portions of this text are reprinted  and  reproduced  in
+       electronic  form  from  IEEE  Std  1003.1, 2003 Edition,
+       Standard for Information Technology -- Portable  Operat-
+       ing System Interface (POSIX), The Open Group Base Speci-
+       fications Issue 6, Copyright (C) 2001-2003 by the Insti-
+       tute  of  Electrical  and Electronics Engineers, Inc and
+       The Open Group. In the event of any discrepancy  between
+       this  version  and  the original IEEE and The Open Group
+       Standard, the original IEEE and The Open Group  Standard
+       is  the  referee  document. The original Standard can be
+       obtained        online        at        http://www.open-
+       group.org/unix/online.html .
+
+
+
+POSIX                         2003                     split(P)

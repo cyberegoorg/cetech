@@ -1,0 +1,55 @@
+TEE(1)                   User Commands                   TEE(1)
+
+
+
+
+
+NAME
+       tee  -  read  from  standard input and write to standard
+       output and files
+
+SYNOPSIS
+       tee [OPTION]... [FILE]...
+
+DESCRIPTION
+       Copy standard input to each FILE, and also  to  standard
+       output.
+
+       -a, --append
+              append to the given FILEs, do not overwrite
+
+       -i, --ignore-interrupts
+              ignore interrupt signals
+
+       --help display this help and exit
+
+       --version
+              output version information and exit
+
+       If a FILE is -, copy again to standard output.
+
+AUTHOR
+       Written  by  Mike Parker, Richard M. Stallman, and David
+       MacKenzie.
+
+REPORTING BUGS
+       Report bugs to <bug-coreutils@gnu.org>.
+
+COPYRIGHT
+       Copyright (C) 2004 Free Software Foundation, Inc.
+       This is free software; see the source for copying condi-
+       tions.  There is NO warranty; not even for MERCHANTABIL-
+       ITY or FITNESS FOR A PARTICULAR PURPOSE.
+
+SEE ALSO
+       The full documentation for tee is maintained as  a  Tex-
+       info  manual.  If the info and tee programs are properly
+       installed at your site, the command
+
+              info tee
+
+       should give you access to the complete manual.
+
+
+
+tee 5.3.0                November 2004                   TEE(1)

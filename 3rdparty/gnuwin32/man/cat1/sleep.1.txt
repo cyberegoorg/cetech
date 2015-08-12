@@ -1,0 +1,49 @@
+SLEEP(1)                 User Commands                 SLEEP(1)
+
+
+
+
+
+NAME
+       sleep - delay for a specified amount of time
+
+SYNOPSIS
+       sleep NUMBER[SUFFIX]...
+       sleep OPTION
+
+DESCRIPTION
+       Pause for NUMBER seconds.  SUFFIX may be `s' for seconds
+       (the default), `m' for minutes, `h' for hours or `d' for
+       days.   Unlike  most implementations that require NUMBER
+       be an integer, here NUMBER may be an arbitrary  floating
+       point number.
+
+       --help display this help and exit
+
+       --version
+              output version information and exit
+
+AUTHOR
+       Written by Jim Meyering and Paul Eggert.
+
+REPORTING BUGS
+       Report bugs to <bug-coreutils@gnu.org>.
+
+COPYRIGHT
+       Copyright (C) 2004 Free Software Foundation, Inc.
+       This is free software; see the source for copying condi-
+       tions.  There is NO warranty; not even for MERCHANTABIL-
+       ITY or FITNESS FOR A PARTICULAR PURPOSE.
+
+SEE ALSO
+       The full documentation for sleep is maintained as a Tex-
+       info manual.  If the info and sleep programs  are  prop-
+       erly installed at your site, the command
+
+              info sleep
+
+       should give you access to the complete manual.
+
+
+
+sleep 5.3.0              November 2004                 SLEEP(1)

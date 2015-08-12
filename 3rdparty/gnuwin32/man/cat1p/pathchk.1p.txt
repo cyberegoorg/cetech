@@ -1,0 +1,328 @@
+pathchk(P)                                           pathchk(P)
+
+
+
+
+
+NAME
+       pathchk - check pathnames
+
+SYNOPSIS
+       pathchk [-p] pathname...
+
+DESCRIPTION
+       The  pathchk  utility shall check that one or more path-
+       names are valid (that is, they could be used  to  access
+       or create a file without causing syntax errors) and por-
+       table (that is, no filename  truncation  results).  More
+       extensive  portability  checks  are  provided  by the -p
+       option.
+
+       By default, the pathchk utility shall check each  compo-
+       nent  of  each  pathname operand based on the underlying
+       file system. A diagnostic  shall  be  written  for  each
+       pathname operand that:
+
+              Is  longer  than  {PATH_MAX}  bytes (see Pathname
+              Variable Values in the Base Definitions volume of
+              IEEE Std 1003.1-2001,  Chapter 13, Headers, <lim-
+              its.h>)
+
+              Contains any  component  longer  than  {NAME_MAX}
+              bytes in its containing directory
+
+              Contains any component in a directory that is not
+              searchable
+
+              Contains any character in any component  that  is
+              not valid in its containing directory
+
+       The  format  of the diagnostic message is not specified,
+       but shall indicate the error  detected  and  the  corre-
+       sponding pathname operand.
+
+       It  shall not be considered an error if one or more com-
+       ponents of a pathname operand do not exist as long as  a
+       file matching the pathname specified by the missing com-
+       ponents could be created that does not  violate  any  of
+       the checks specified above.
+
+OPTIONS
+       The  pathchk  utility  shall conform to the Base Defini-
+       tions  volume  of  IEEE Std 1003.1-2001,  Section  12.2,
+       Utility Syntax Guidelines.
+
+       The following option shall be supported:
+
+       -p     Instead  of performing checks based on the under-
+              lying file system, write a  diagnostic  for  each
+              pathname operand that:
+
+              Is longer than {_POSIX_PATH_MAX} bytes (see Mini-
+              mum Values in  the  Base  Definitions  volume  of
+              IEEE Std 1003.1-2001,  Chapter 13, Headers, <lim-
+              its.h>)
+
+              Contains    any     component     longer     than
+              {_POSIX_NAME_MAX} bytes
+
+              Contains  any  character in any component that is
+              not in the portable filename character set
+
+
+OPERANDS
+       The following operand shall be supported:
+
+       pathname
+              A pathname to be checked.
+
+
+STDIN
+       Not used.
+
+INPUT FILES
+       None.
+
+ENVIRONMENT VARIABLES
+       The following environment  variables  shall  affect  the
+       execution of pathchk:
+
+       LANG   Provide a default value for the internationaliza-
+              tion variables that are unset or null.  (See  the
+              Base  Definitions volume of IEEE Std 1003.1-2001,
+              Section 8.2, Internationalization  Variables  for
+              the  precedence of internationalization variables
+              used to determine  the  values  of  locale  cate-
+              gories.)
+
+       LC_ALL If  set to a non-empty string value, override the
+              values  of  all  the  other  internationalization
+              variables.
+
+       LC_CTYPE
+              Determine  the  locale  for the interpretation of
+              sequences of bytes of  text  data  as  characters
+              (for  example,  single-byte  as opposed to multi-
+              byte characters in arguments).
+
+       LC_MESSAGES
+              Determine the  locale  that  should  be  used  to
+              affect the format and contents of diagnostic mes-
+              sages written to standard error.
+
+       NLSPATH
+              Determine the location of  message  catalogs  for
+              the processing of LC_MESSAGES .
+
+
+ASYNCHRONOUS EVENTS
+       Default.
+
+STDOUT
+       Not used.
+
+STDERR
+       The  standard  error  shall  be used only for diagnostic
+       messages.
+
+OUTPUT FILES
+       None.
+
+EXTENDED DESCRIPTION
+       None.
+
+EXIT STATUS
+       The following exit values shall be returned:
+
+        0     All pathname operands passed all of the checks.
+
+       >0     An error occurred.
+
+
+CONSEQUENCES OF ERRORS
+       Default.
+
+       The following sections are informative.
+
+APPLICATION USAGE
+       The test utility can be  used  to  determine  whether  a
+       given pathname names an existing file; it does not, how-
+       ever, give any indication of whether or not  any  compo-
+       nent  of the pathname was truncated in a directory where
+       the  _POSIX_NO_TRUNC  feature  is  not  in  effect.  The
+       pathchk  utility  does  not check for file existence; it
+       performs checks to determine  whether  a  pathname  does
+       exist  or  could  be  created with no pathname component
+       truncation.
+
+       The noclobber option in the shell (see the  set  special
+       built-in)  can  be  used to atomically create a file. As
+       with all file creation semantics in  the  System  Inter-
+       faces  volume  of  IEEE Std 1003.1-2001,  it  guarantees
+       atomic creation, but still depends  on  applications  to
+       agree  on  conventions and cooperate on the use of files
+       after they have been created.
+
+EXAMPLES
+       To verify that all pathnames in an imported data  inter-
+       change  archive  are  legitimate  and unambiguous on the
+       current system:
+
+
+              pax -f archive | sed -e '/ == .*/s///' | xargs pathchk
+              if [ $? -eq 0 ]
+              then
+                  pax -r -f archive
+              else
+                  echo Investigate problems before importing files.
+                  exit 1
+              fi
+
+       To verify that all files in the current directory  hier-
+       archy  could  be  moved  to any system conforming to the
+       System Interfaces volume  of  IEEE Std 1003.1-2001  that
+       also supports the pax utility:
+
+
+              find . -print | xargs pathchk -p
+              if [ $? -eq 0 ]
+              then
+                  pax -w -f archive .
+              else
+                  echo Portable archive cannot be created.
+                  exit 1
+              fi
+
+       To verify that a user-supplied pathname names a readable
+       file and that the application can create a file  extend-
+       ing  the given path without truncation and without over-
+       writing any existing file:
+
+
+              case $- in
+                  *C*)    reset="";;
+                  *)      reset="set +C"
+                          set -C;;
+              esac
+              test -r "$path" && pathchk "$path.out" &&
+                  rm "$path.out" > "$path.out"
+              if [ $? -ne 0 ]; then
+                  printf "%s: %s not found or %s.out fails \
+              creation checks.\n" $0 "$path" "$path"
+                  $reset    # Reset the noclobber option in case a trap
+                            # on EXIT depends on it.
+                  exit 1
+              fi
+              $reset
+              PROCESSING < "$path" > "$path.out"
+
+       The following assumptions are made in this example:
+
+       PROCESSING represents the  code  that  is  used  by  the
+       application  to  use  $path  once  it  is  verified that
+       $path.out works as intended.
+
+       The state of the noclobber option is unknown  when  this
+       code  is  invoked and should be set on exit to the state
+       it was in when this code was invoked. (The  reset  vari-
+       able  is  used  in  this  example to restore the initial
+       state.)
+
+       Note the usage of:
+
+
+              rm "$path.out" > "$path.out"
+       <ol type="a">
+
+       The pathchk command has already verified, at this point,
+       that $path.out is not truncated.
+
+       With  the  noclobber option set, the shell verifies that
+       $path.out does not already exist before invoking rm.
+
+       If the shell succeeded in creating $path.out, rm removes
+       it  so that the application can create the file again in
+       the PROCESSING step.
+
+       If the PROCESSING step wants the file to  exist  already
+       when it is invoked, the:
+
+
+              rm "$path.out" > "$path.out"
+
+       should be replaced with:
+
+
+              > "$path.out"
+
+       which  verifies that the file did not already exist, but
+       leaves $path.out in place for use by PROCESSING.
+
+RATIONALE
+       The pathchk utility was  new  for  the  ISO POSIX-2:1993
+       standard.   It, along with the set -C( noclobber) option
+       added to the shell, replaces the mktemp, validfnam,  and
+       create  utilities  that appeared in early proposals. All
+       of these utilities were attempts to solve several common
+       problems:
+
+              Verify  the validity (for several different defi-
+              nitions of "valid") of a pathname supplied  by  a
+              user,  generated  by  an application, or imported
+              from an external source.
+
+              Atomically create a file.
+
+              Perform various string handling functions to gen-
+              erate a temporary filename.
+
+       The  create utility, included in an early proposal, pro-
+       vided  checking  and  atomic  creation   in   a   single
+       invocation  of  the utility; these are orthogonal issues
+       and need not be grouped into a single utility. Note that
+       the  noclobber  option also provides a way of creating a
+       lock for process synchronization; since it  provides  an
+       atomic create, there is no race between a test for exis-
+       tence and the following creation if it did not exist.
+
+       Having a function like tmpnam() in the ISO C standard is
+       important  in  many high-level languages. The shell pro-
+       gramming language, however, has built-in string  manipu-
+       lation facilities, making it very easy to construct tem-
+       porary filenames. The names needed obviously  depend  on
+       the  application,  but  are frequently of a form similar
+       to:
+
+
+              $TMPDIR/application_abbreviation$$.suffix
+
+       In cases where there is likely to be  contention  for  a
+       given  suffix,  a  simple shell for or while loop can be
+       used with the shell noclobber option to  create  a  file
+       without risk of collisions, as long as applications try-
+       ing to use the same filename name space are  cooperating
+       on the use of files after they have been created.
+
+FUTURE DIRECTIONS
+       None.
+
+SEE ALSO
+       Redirection , set , test
+
+COPYRIGHT
+       Portions  of  this  text are reprinted and reproduced in
+       electronic form from  IEEE  Std  1003.1,  2003  Edition,
+       Standard  for Information Technology -- Portable Operat-
+       ing System Interface (POSIX), The Open Group Base Speci-
+       fications Issue 6, Copyright (C) 2001-2003 by the Insti-
+       tute of Electrical and Electronics  Engineers,  Inc  and
+       The  Open Group. In the event of any discrepancy between
+       this version and the original IEEE and  The  Open  Group
+       Standard,  the original IEEE and The Open Group Standard
+       is the referee document. The original  Standard  can  be
+       obtained        online        at        http://www.open-
+       group.org/unix/online.html .
+
+
+
+POSIX                         2003                   pathchk(P)

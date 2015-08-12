@@ -1,0 +1,44 @@
+SYNC(1)                  User Commands                  SYNC(1)
+
+
+
+
+
+NAME
+       sync - flush file system buffers
+
+SYNOPSIS
+       sync [OPTION]
+
+DESCRIPTION
+       Force changed blocks to disk, update the super block.
+
+       --help display this help and exit
+
+       --version
+              output version information and exit
+
+AUTHOR
+       Written by Jim Meyering.
+
+REPORTING BUGS
+       Report bugs to <bug-coreutils@gnu.org>.
+
+COPYRIGHT
+       Copyright (C) 2004 Free Software Foundation, Inc.
+       This is free software; see the source for copying condi-
+       tions.  There is NO warranty; not even for MERCHANTABIL-
+       ITY or FITNESS FOR A PARTICULAR PURPOSE.
+
+SEE ALSO
+       The  full documentation for sync is maintained as a Tex-
+       info manual.  If the info and sync programs are properly
+       installed at your site, the command
+
+              info sync
+
+       should give you access to the complete manual.
+
+
+
+sync (coreutils) 5.3.0   November 2004                  SYNC(1)

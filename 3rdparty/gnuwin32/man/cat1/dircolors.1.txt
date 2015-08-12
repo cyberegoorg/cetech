@@ -1,0 +1,60 @@
+DIRCOLORS(1)             User Commands             DIRCOLORS(1)
+
+
+
+
+
+NAME
+       dircolors - color setup for ls
+
+SYNOPSIS
+       dircolors [OPTION]... [FILE]
+
+DESCRIPTION
+       Output  commands  to set the LS_COLORS environment vari-
+       able.
+
+   Determine format of output:
+       -b, --sh, --bourne-shell
+              output Bourne shell code to set LS_COLORS
+
+       -c, --csh, --c-shell
+              output C shell code to set LS_COLORS
+
+       -p, --print-database
+              output defaults
+
+       --help display this help and exit
+
+       --version
+              output version information and exit
+
+       If FILE is specified, read it to determine which  colors
+       to  use for which file types and extensions.  Otherwise,
+       a precompiled database is used.  For details on the for-
+       mat of these files, run `dircolors --print-database'.
+
+AUTHOR
+       Written by H. Peter Anvin.
+
+REPORTING BUGS
+       Report bugs to <bug-coreutils@gnu.org>.
+
+COPYRIGHT
+       Copyright (C) 2004 Free Software Foundation, Inc.
+       This is free software; see the source for copying condi-
+       tions.  There is NO warranty; not even for MERCHANTABIL-
+       ITY or FITNESS FOR A PARTICULAR PURPOSE.
+
+SEE ALSO
+       The  full documentation for dircolors is maintained as a
+       Texinfo manual.  If the info and dircolors programs  are
+       properly installed at your site, the command
+
+              info dircolors
+
+       should give you access to the complete manual.
+
+
+
+dircolors 5.3.0          November 2004             DIRCOLORS(1)

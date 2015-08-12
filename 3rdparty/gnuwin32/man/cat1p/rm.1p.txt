@@ -1,0 +1,340 @@
+rm(P)                                                     rm(P)
+
+
+
+
+
+NAME
+       rm - remove directory entries
+
+SYNOPSIS
+       rm [-fiRr] file...
+
+DESCRIPTION
+       The  rm  utility shall remove the directory entry speci-
+       fied by each file argument.
+
+       If either of the files dot or dot-dot are  specified  as
+       the  basename  portion of an operand (that is, the final
+       pathname component), rm shall write a diagnostic message
+       to  standard  error  and do nothing more with such oper-
+       ands.
+
+       For each file the following steps shall be taken:
+
+       If the file does not exist: <ol type="a">
+
+       If the -f option is not  specified,  rm  shall  write  a
+       diagnostic message to standard error.
+
+       Go on to any remaining files.
+
+       If  file is of type directory, the following steps shall
+       be taken: <ol type="a">
+
+       If neither the -R option nor the -r option is specified,
+       rm  shall  write a diagnostic message to standard error,
+       do nothing more with file, and go on  to  any  remaining
+       files.
+
+       If  the  -f option is not specified, and either the per-
+       missions of file do not permit writing and the  standard
+       input  is  a  terminal or the -i option is specified, rm
+       shall write a prompt to standard error and read  a  line
+       from the standard input. If the response is not affirma-
+       tive, rm shall do nothing more with the current file and
+       go on to any remaining files.
+
+       For each entry contained in file, other than dot or dot-
+       dot, the four steps listed here (1 to 4) shall be  taken
+       with  the  entry  as  if  it were a file operand. The rm
+       utility shall not traverse directories by following sym-
+       bolic links into other parts of the hierarchy, but shall
+       remove the links themselves.
+
+       If the -i option is specified, rm shall write  a  prompt
+       to  standard  error  and  read  a line from the standard
+       input.  If the response is not affirmative, rm shall  do
+       nothing  more  with  the  current file, and go on to any
+       remaining files.
+
+       If file is not of type directory, the -f option  is  not
+       specified,  and  either  the  permissions of file do not
+       permit writing and the standard input is a  terminal  or
+       the  -i  option is specified, rm shall write a prompt to
+       the standard error and read a  line  from  the  standard
+       input.  If  the response is not affirmative, rm shall do
+       nothing more with the current file  and  go  on  to  any
+       remaining files.
+
+       If  the  current  file  is a directory, rm shall perform
+       actions equivalent to the rmdir()  function  defined  in
+       the  System  Interfaces  volume  of IEEE Std 1003.1-2001
+       called with a pathname of the current file used  as  the
+       path  argument.  If the current file is not a directory,
+       rm shall perform  actions  equivalent  to  the  unlink()
+       function  defined  in  the  System  Interfaces volume of
+       IEEE Std 1003.1-2001 called with a pathname of the  cur-
+       rent file used as the path argument.
+
+       If  this fails for any reason, rm shall write a diagnos-
+       tic message to standard error, do nothing more with  the
+       current file, and go on to any remaining files.
+
+       The  rm  utility  shall  be able to descend to arbitrary
+       depths in a file hierarchy, and shall not  fail  due  to
+       path  length limitations (unless an operand specified by
+       the user exceeds system limitations).
+
+OPTIONS
+       The rm utility shall conform  to  the  Base  Definitions
+       volume  of  IEEE Std 1003.1-2001,  Section 12.2, Utility
+       Syntax Guidelines.
+
+       The following options shall be supported:
+
+       -f     Do not prompt  for  confirmation.  Do  not  write
+              diagnostic  messages or modify the exit status in
+              the case of nonexistent operands.   Any  previous
+              occurrences of the -i option shall be ignored.
+
+       -i     Prompt  for confirmation as described previously.
+              Any previous occurrences of the -f  option  shall
+              be ignored.
+
+       -R     Remove file hierarchies. See the DESCRIPTION.
+
+       -r     Equivalent to -R.
+
+
+OPERANDS
+       The following operand shall be supported:
+
+       file   A pathname of a directory entry to be removed.
+
+
+STDIN
+       The  standard  input shall be used to read an input line
+       in response to each prompt specified in the STDOUT  sec-
+       tion. Otherwise, the standard input shall not be used.
+
+INPUT FILES
+       None.
+
+ENVIRONMENT VARIABLES
+       The  following  environment  variables  shall affect the
+       execution of rm:
+
+       LANG   Provide a default value for the internationaliza-
+              tion  variables  that are unset or null. (See the
+              Base Definitions volume of  IEEE Std 1003.1-2001,
+              Section  8.2,  Internationalization Variables for
+              the precedence of internationalization  variables
+              used  to  determine  the  values  of locale cate-
+              gories.)
+
+       LC_ALL If set to a non-empty string value, override  the
+              values  of  all  the  other  internationalization
+              variables.
+
+       LC_COLLATE
+
+              Determine the locale for the behavior of  ranges,
+              equivalence  classes, and multi-character collat-
+              ing elements used in the extended regular expres-
+              sion  defined  for  the yesexpr locale keyword in
+              the LC_MESSAGES category.
+
+       LC_CTYPE
+              Determine the locale for  the  interpretation  of
+              sequences  of  bytes  of  text data as characters
+              (for example, single-byte as  opposed  to  multi-
+              byte characters in arguments) and the behavior of
+              character classes within regular expressions used
+              in  the  extended  regular expression defined for
+              the yesexpr locale  keyword  in  the  LC_MESSAGES
+              category.
+
+       LC_MESSAGES
+              Determine the locale for the processing of affir-
+              mative responses that should be  used  to  affect
+              the  format  and  contents of diagnostic messages
+              written to standard error.
+
+       NLSPATH
+              Determine the location of  message  catalogs  for
+              the processing of LC_MESSAGES .
+
+
+ASYNCHRONOUS EVENTS
+       Default.
+
+STDOUT
+       Not used.
+
+STDERR
+       Prompts  shall  be  written  to standard error under the
+       conditions specified in the DESCRIPTION and OPTIONS sec-
+       tions.  The prompts shall contain the file pathname, but
+       their format  is  otherwise  unspecified.  The  standard
+       error also shall be used for diagnostic messages.
+
+OUTPUT FILES
+       None.
+
+EXTENDED DESCRIPTION
+       None.
+
+EXIT STATUS
+       The following exit values shall be returned:
+
+        0     All  of  the named directory entries for which rm
+              performed actions equivalent to  the  rmdir()  or
+              unlink() functions were removed.
+
+       >0     An error occurred.
+
+
+CONSEQUENCES OF ERRORS
+       Default.
+
+       The following sections are informative.
+
+APPLICATION USAGE
+       The  rm utility is forbidden to remove the names dot and
+       dot-dot in order to avoid the consequences  of  inadver-
+       tently doing something like:
+
+
+              rm -r .*
+
+       Some  implementations  do  not permit the removal of the
+       last link to an executable binary  file  that  is  being
+       executed; see the [EBUSY] error in the unlink() function
+       defined   in   the   System   Interfaces    volume    of
+       IEEE Std 1003.1-2001.  Thus,  the rm utility can fail to
+       remove such files.
+
+       The -i option causes rm to prompt and read the  standard
+       input  even if the standard input is not a terminal, but
+       in the absence of -i the mode prompting is not done when
+       the standard input is not a terminal.
+
+EXAMPLES
+       The following command:
+
+
+              rm a.out core
+
+       removes the directory entries: a.out and core.
+
+       The following command:
+
+
+              rm -Rf junk
+
+       removes the directory junk and all its contents, without
+       prompting.
+
+RATIONALE
+       For absolute clarity, paragraphs (2b)  and  (3)  in  the
+       DESCRIPTION of rm describing the behavior when prompting
+       for confirmation, should be interpreted in the following
+       manner:
+
+
+              if ((NOT f_option) AND
+                  ((not_writable AND input_is_terminal) OR i_option))
+
+       The  exact format of the interactive prompts is unspeci-
+       fied. Only the general nature of the contents of prompts
+       are  specified  because  implementations may desire more
+       descriptive prompts than those used on historical imple-
+       mentations.  Therefore,  an application not using the -f
+       option, or using the -i option, relies on the system  to
+       provide the most suitable dialog directly with the user,
+       based on the behavior specified.
+
+       The -r option is historical practice on all  known  sys-
+       tems.  The synonym -R option is provided for consistency
+       with   the   other   utilities   in   this   volume   of
+       IEEE Std 1003.1-2001  that  provide  options  requesting
+       recursive descent through the file hierarchy.
+
+       The behavior of the -f option in historical versions  of
+       rm is inconsistent. In general, along with "forcing" the
+       unlink  without  prompting  for  permission,  it  always
+       causes diagnostic messages to be suppressed and the exit
+       status to be unmodified  for  nonexistent  operands  and
+       files  that  cannot  be unlinked. In some versions, how-
+       ever, the -f option suppresses usage messages and system
+       errors  as well. Suppressing such messages is not a ser-
+       vice to either shell scripts or users.
+
+       It is less clear that  error  messages  regarding  files
+       that  cannot be unlinked (removed) should be suppressed.
+       Although this is historical  practice,  this  volume  of
+       IEEE Std 1003.1-2001  does  not  permit the -f option to
+       suppress such messages.
+
+       When given the -r and -i options, historical versions of
+       rm prompt the user twice for each directory, once before
+       removing its contents and once before actually  attempt-
+       ing  to  delete  the directory entry that names it. This
+       allows the user to "prune" the file hierarchy walk. His-
+       torical  versions  of  rm were inconsistent in that some
+       did not do the former prompt for  directories  named  on
+       the command line and others had obscure prompting behav-
+       ior when the -i option was specified and the permissions
+       of  the file did not permit writing. The POSIX Shell and
+       Utilities rm differs little from historic practice,  but
+       does require that prompts be consistent. Historical ver-
+       sions of rm were also inconsistent in that prompts  were
+       done  to  both  standard output and standard error. This
+       volume of IEEE Std 1003.1-2001 requires that prompts  be
+       done  to standard error, for consistency with cp and mv,
+       and to allow historical extensions to rm that provide an
+       option to list deleted files on standard output.
+
+       The  rm  utility  is  required  to  descend to arbitrary
+       depths so that any file hierarchy may be  deleted.  This
+       means,  for  example, that the rm utility cannot run out
+       of file descriptors during its descent (that is, if  the
+       number  of  file  descriptors  is  limited, rm cannot be
+       implemented in the historical  fashion  where  one  file
+       descriptor is used per directory level). Also, rm is not
+       permitted to fail because of path  length  restrictions,
+       unless  an  operand specified by the user is longer than
+       {PATH_MAX}.
+
+       The rm utility removes symbolic  links  themselves,  not
+       the  files they refer to, as a consequence of the depen-
+       dence on the unlink() functionality,  per  the  DESCRIP-
+       TION.  When removing hierarchies with -r or -R, the pro-
+       hibition on following symbolic  links  has  to  be  made
+       explicit.
+
+FUTURE DIRECTIONS
+       None.
+
+SEE ALSO
+       rmdir()    ,    the    System   Interfaces   volume   of
+       IEEE Std 1003.1-2001, remove(), rmdir(), unlink()
+
+COPYRIGHT
+       Portions of this text are reprinted  and  reproduced  in
+       electronic  form  from  IEEE  Std  1003.1, 2003 Edition,
+       Standard for Information Technology -- Portable  Operat-
+       ing System Interface (POSIX), The Open Group Base Speci-
+       fications Issue 6, Copyright (C) 2001-2003 by the Insti-
+       tute  of  Electrical  and Electronics Engineers, Inc and
+       The Open Group. In the event of any discrepancy  between
+       this  version  and  the original IEEE and The Open Group
+       Standard, the original IEEE and The Open Group  Standard
+       is  the  referee  document. The original Standard can be
+       obtained        online        at        http://www.open-
+       group.org/unix/online.html .
+
+
+
+POSIX                         2003                        rm(P)

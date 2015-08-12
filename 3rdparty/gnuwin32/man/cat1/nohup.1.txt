@@ -1,0 +1,46 @@
+NOHUP(1)                 User Commands                 NOHUP(1)
+
+
+
+
+
+NAME
+       nohup  - run a command immune to hangups, with output to
+       a non-tty
+
+SYNOPSIS
+       nohup COMMAND [ARG]...
+       nohup OPTION
+
+DESCRIPTION
+       Run COMMAND, ignoring hangup signals.
+
+       --help display this help and exit
+
+       --version
+              output version information and exit
+
+AUTHOR
+       Written by Jim Meyering.
+
+REPORTING BUGS
+       Report bugs to <bug-coreutils@gnu.org>.
+
+COPYRIGHT
+       Copyright (C) 2004 Free Software Foundation, Inc.
+       This is free software; see the source for copying condi-
+       tions.  There is NO warranty; not even for MERCHANTABIL-
+       ITY or FITNESS FOR A PARTICULAR PURPOSE.
+
+SEE ALSO
+       The full documentation for nohup is maintained as a Tex-
+       info  manual.   If the info and nohup programs are prop-
+       erly installed at your site, the command
+
+              info nohup
+
+       should give you access to the complete manual.
+
+
+
+nohup 5.3.0              November 2004                 NOHUP(1)

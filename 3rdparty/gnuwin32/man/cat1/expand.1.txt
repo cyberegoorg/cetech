@@ -1,0 +1,61 @@
+EXPAND(1)                User Commands                EXPAND(1)
+
+
+
+
+
+NAME
+       expand - convert tabs to spaces
+
+SYNOPSIS
+       expand [OPTION]... [FILE]...
+
+DESCRIPTION
+       Convert tabs in each FILE to spaces, writing to standard
+       output.  With no FILE, or when FILE is -, read  standard
+       input.
+
+       Mandatory  arguments  to  long options are mandatory for
+       short options too.
+
+       -i, --initial
+              do not convert tabs after non blanks
+
+       -t, --tabs=NUMBER
+              have tabs NUMBER characters apart, not 8
+
+       -t, --tabs=LIST
+              use comma separated list of  explicit  tab  posi-
+              tions
+
+       --help display this help and exit
+
+       --version
+              output version information and exit
+
+AUTHOR
+       Written by David MacKenzie.
+
+REPORTING BUGS
+       Report bugs to <bug-coreutils@gnu.org>.
+
+COPYRIGHT
+       Copyright (C) 2004 Free Software Foundation, Inc.
+       This is free software; see the source for copying condi-
+       tions.  There is NO warranty; not even for MERCHANTABIL-
+       ITY or FITNESS FOR A PARTICULAR PURPOSE.
+
+SEE ALSO
+       unexpand(1)
+
+       The  full  documentation  for  expand is maintained as a
+       Texinfo manual.  If the info  and  expand  programs  are
+       properly installed at your site, the command
+
+              info expand
+
+       should give you access to the complete manual.
+
+
+
+expand 5.3.0             November 2004                EXPAND(1)

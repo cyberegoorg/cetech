@@ -1,0 +1,70 @@
+SHA1SUM(1)               User Commands               SHA1SUM(1)
+
+
+
+
+
+NAME
+       sha1sum - compute and check SHA1 message digest
+
+SYNOPSIS
+       sha1sum [OPTION] [FILE]...
+       sha1sum [OPTION] --check [FILE]
+
+DESCRIPTION
+       Print  or check SHA1 (160-bit) checksums.  With no FILE,
+       or when FILE is -, read standard input.
+
+       -b, --binary
+              read files in binary mode  (default  on  DOS/Win-
+              dows)
+
+       -c, --check
+              check SHA1 sums against given list
+
+       -t, --text
+              read files in text mode (default)
+
+   The  following  two  options  are useful only when verifying
+       checksums:
+       --status
+              don't output anything, status code shows success
+
+       -w, --warn
+              warn about improperly formated checksum lines
+
+       --help display this help and exit
+
+       --version
+              output version information and exit
+
+       The sums are computed as described in FIPS-180-1.   When
+       checking,  the  input  should be a former output of this
+       program.  The default mode  is  to  print  a  line  with
+       checksum, a character indicating type (`*' for binary, `
+       ' for text), and name for each FILE.
+
+AUTHOR
+       Written by Ulrich Drepper and Scott Miller.
+
+REPORTING BUGS
+       Report bugs to <bug-coreutils@gnu.org>.
+
+COPYRIGHT
+       Copyright (C) 2004 Free Software Foundation, Inc.
+       This is free software; see the source for copying condi-
+       tions.  There is NO warranty; not even for MERCHANTABIL-
+       ITY or FITNESS FOR A PARTICULAR PURPOSE.
+
+SEE ALSO
+       The full documentation for sha1sum is  maintained  as  a
+       Texinfo  manual.   If  the info and sha1sum programs are
+       properly installed at your site, the command
+
+              info sha1sum
+
+       should give you access to the complete manual.
+
+
+
+sha1sum 5.3.0            November 2004               SHA1SUM(1)

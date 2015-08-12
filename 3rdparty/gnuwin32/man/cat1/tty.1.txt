@@ -1,0 +1,49 @@
+TTY(1)                   User Commands                   TTY(1)
+
+
+
+
+
+NAME
+       tty  -  print the file name of the terminal connected to
+       standard input
+
+SYNOPSIS
+       tty [OPTION]...
+
+DESCRIPTION
+       Print the file name of the terminal connected  to  stan-
+       dard input.
+
+       -s, --silent, --quiet
+              print nothing, only return an exit status
+
+       --help display this help and exit
+
+       --version
+              output version information and exit
+
+AUTHOR
+       Written by David MacKenzie.
+
+REPORTING BUGS
+       Report bugs to <bug-coreutils@gnu.org>.
+
+COPYRIGHT
+       Copyright (C) 2004 Free Software Foundation, Inc.
+       This is free software; see the source for copying condi-
+       tions.  There is NO warranty; not even for MERCHANTABIL-
+       ITY or FITNESS FOR A PARTICULAR PURPOSE.
+
+SEE ALSO
+       The  full  documentation for tty is maintained as a Tex-
+       info manual.  If the info and tty programs are  properly
+       installed at your site, the command
+
+              info tty
+
+       should give you access to the complete manual.
+
+
+
+tty 5.3.0                November 2004                   TTY(1)

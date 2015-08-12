@@ -1,0 +1,105 @@
+PTX(1)                   User Commands                   PTX(1)
+
+
+
+
+
+NAME
+       ptx - produce a permuted index of file contents
+
+SYNOPSIS
+       ptx [OPTION]... [INPUT]...   (without -G)
+       ptx -G [OPTION]... [INPUT [OUTPUT]]
+
+DESCRIPTION
+       Output a permuted index, including context, of the words
+       in the input files.
+
+       Mandatory arguments to long options  are  mandatory  for
+       short options too.
+
+       -A, --auto-reference
+              output automatically generated references
+
+       -C, --copyright
+              display Copyright and copying conditions
+
+       -G, --traditional
+              behave more like System V `ptx'
+
+       -F, --flag-truncation=STRING
+              use STRING for flagging line truncations
+
+       -M, --macro-name=STRING
+              macro name to use instead of `xx'
+
+       -O, --format=roff
+              generate output as roff directives
+
+       -R, --right-side-refs
+              put references at right, not counted in -w
+
+       -S, --sentence-regexp=REGEXP
+              for end of lines or end of sentences
+
+       -T, --format=tex
+              generate output as TeX directives
+
+       -W, --word-regexp=REGEXP
+              use REGEXP to match each keyword
+
+       -b, --break-file=FILE
+              word break characters in this FILE
+
+       -f, --ignore-case
+              fold lower case to upper case for sorting
+
+       -g, --gap-size=NUMBER
+              gap size in columns between output fields
+
+       -i, --ignore-file=FILE
+              read ignore word list from FILE
+
+       -o, --only-file=FILE
+              read only word list from this FILE
+
+       -r, --references
+              first field of each line is a reference
+
+       -t, --typeset-mode               - not implemented -
+
+       -w, --width=NUMBER
+              output width in columns, reference excluded
+
+       --help display this help and exit
+
+       --version
+              output version information and exit
+
+       With  no FILE or if FILE is -, read Standard Input.  `-F
+       /' by default.
+
+AUTHOR
+       Written by F. Pinard.
+
+REPORTING BUGS
+       Report bugs to <bug-coreutils@gnu.org>.
+
+COPYRIGHT
+       Copyright (C) 2004 Free Software Foundation, Inc.
+       This is free software; see the source for copying condi-
+       tions.  There is NO warranty; not even for MERCHANTABIL-
+       ITY or FITNESS FOR A PARTICULAR PURPOSE.
+
+SEE ALSO
+       The full documentation for ptx is maintained as  a  Tex-
+       info  manual.  If the info and ptx programs are properly
+       installed at your site, the command
+
+              info ptx
+
+       should give you access to the complete manual.
+
+
+
+ptx 5.3.0                November 2004                   PTX(1)

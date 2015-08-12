@@ -1,0 +1,203 @@
+dirname(P)                                           dirname(P)
+
+
+
+
+
+NAME
+       dirname - return the directory portion of a pathname
+
+SYNOPSIS
+       dirname string
+
+DESCRIPTION
+       The  string  operand  shall be treated as a pathname, as
+       defined   in   the   Base    Definitions    volume    of
+       IEEE Std 1003.1-2001,   Section   3.266,  Pathname.  The
+       string string shall be converted  to  the  name  of  the
+       directory  containing  the filename corresponding to the
+       last pathname component in  string,  performing  actions
+       equivalent to the following steps in order:
+
+       If string is //, skip steps 2 to 5.
+
+       If  string consists entirely of slash characters, string
+       shall be set to a single slash character. In this  case,
+       skip steps 3 to 8.
+
+       If  there  are  any trailing slash characters in string,
+       they shall be removed.
+
+       If there are no slash characters  remaining  in  string,
+       string  shall  be  set  to a single period character. In
+       this case, skip steps 5 to 8.
+
+       If  there  are  any  trailing  non-slash  characters  in
+       string, they shall be removed.
+
+       If  the  remaining  string  is //, it is implementation-
+       defined whether steps 7 and 8 are skipped or  processed.
+
+       If  there  are  any trailing slash characters in string,
+       they shall be removed.
+
+       If the remaining string is empty, string shall be set to
+       a single slash character.
+
+       The  resulting  string shall be written to standard out-
+       put.
+
+OPTIONS
+       None.
+
+OPERANDS
+       The following operand shall be supported:
+
+       string A string.
+
+
+STDIN
+       Not used.
+
+INPUT FILES
+       None.
+
+ENVIRONMENT VARIABLES
+       The following environment  variables  shall  affect  the
+       execution of dirname:
+
+       LANG   Provide a default value for the internationaliza-
+              tion variables that are unset or null.  (See  the
+              Base  Definitions volume of IEEE Std 1003.1-2001,
+              Section 8.2, Internationalization  Variables  for
+              the  precedence of internationalization variables
+              used to determine  the  values  of  locale  cate-
+              gories.)
+
+       LC_ALL If  set to a non-empty string value, override the
+              values  of  all  the  other  internationalization
+              variables.
+
+       LC_CTYPE
+              Determine  the  locale  for the interpretation of
+              sequences of bytes of  text  data  as  characters
+              (for  example,  single-byte  as opposed to multi-
+              byte characters in arguments).
+
+       LC_MESSAGES
+              Determine the  locale  that  should  be  used  to
+              affect the format and contents of diagnostic mes-
+              sages written to standard error.
+
+       NLSPATH
+              Determine the location of  message  catalogs  for
+              the processing of LC_MESSAGES .
+
+
+ASYNCHRONOUS EVENTS
+       Default.
+
+STDOUT
+       The  dirname  utility shall write a line to the standard
+       output in the following format:
+
+
+              "%s\n", <resulting string>
+
+STDERR
+       The standard error shall be  used  only  for  diagnostic
+       messages.
+
+OUTPUT FILES
+       None.
+
+EXTENDED DESCRIPTION
+       None.
+
+EXIT STATUS
+       The following exit values shall be returned:
+
+        0     Successful completion.
+
+       >0     An error occurred.
+
+
+CONSEQUENCES OF ERRORS
+       Default.
+
+       The following sections are informative.
+
+APPLICATION USAGE
+       The  definition  of  pathname  specifies implementation-
+       defined behavior for pathnames starting with  two  slash
+       characters.  Therefore, applications shall not arbitrar-
+       ily add slashes to the beginning of  a  pathname  unless
+       they  can ensure that there are more or less than two or
+       are prepared to  deal  with  the  implementation-defined
+       consequences.
+
+EXAMPLES
+       Command              Results
+       dirname /            /
+       dirname //           / or //
+       dirname /a/b/        /a
+       dirname //a//b//     //a
+       dirname              Unspecified
+       dirname a            . ($? = 0)
+       dirname ""           . ($? = 0)
+       dirname /a           /
+       dirname /a/b         /a
+       dirname a/b          a
+
+RATIONALE
+       The  dirname  utility  originated  in System III. It has
+       evolved through the System V releases to a version  that
+       matches  the  requirements specified in this description
+       in System V Release 3.  4.3 BSD and earlier versions did
+       not include dirname.
+
+       The  behaviors of basename and dirname in this volume of
+       IEEE Std 1003.1-2001 have been coordinated so that  when
+       string is a valid pathname:
+
+
+              $(basename "string")
+
+       would be a valid filename for the file in the directory:
+
+
+              $(dirname "string")
+
+       This would not work for the versions of these  utilities
+       in early proposals due to the way processing of trailing
+       slashes was specified. Consideration was given to  leav-
+       ing   processing  unspecified  if  there  were  trailing
+       slashes, but this cannot be done; the  Base  Definitions
+       volume  of IEEE Std 1003.1-2001, Section 3.266, Pathname
+       allows trailing slashes. The basename and dirname utili-
+       ties  have  to specify consistent handling for all valid
+       pathnames.
+
+FUTURE DIRECTIONS
+       None.
+
+SEE ALSO
+       basename() , Parameters and Variables
+
+COPYRIGHT
+       Portions of this text are reprinted  and  reproduced  in
+       electronic  form  from  IEEE  Std  1003.1, 2003 Edition,
+       Standard for Information Technology -- Portable  Operat-
+       ing System Interface (POSIX), The Open Group Base Speci-
+       fications Issue 6, Copyright (C) 2001-2003 by the Insti-
+       tute  of  Electrical  and Electronics Engineers, Inc and
+       The Open Group. In the event of any discrepancy  between
+       this  version  and  the original IEEE and The Open Group
+       Standard, the original IEEE and The Open Group  Standard
+       is  the  referee  document. The original Standard can be
+       obtained        online        at        http://www.open-
+       group.org/unix/online.html .
+
+
+
+POSIX                         2003                   dirname(P)

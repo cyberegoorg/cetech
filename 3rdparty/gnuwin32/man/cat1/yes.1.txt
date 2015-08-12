@@ -1,0 +1,46 @@
+YES(1)                   User Commands                   YES(1)
+
+
+
+
+
+NAME
+       yes - output a string repeatedly until killed
+
+SYNOPSIS
+       yes [STRING]...
+       yes OPTION
+
+DESCRIPTION
+       Repeatedly  output  a line with all specified STRING(s),
+       or `y'.
+
+       --help display this help and exit
+
+       --version
+              output version information and exit
+
+AUTHOR
+       Written by David MacKenzie.
+
+REPORTING BUGS
+       Report bugs to <bug-coreutils@gnu.org>.
+
+COPYRIGHT
+       Copyright (C) 2004 Free Software Foundation, Inc.
+       This is free software; see the source for copying condi-
+       tions.  There is NO warranty; not even for MERCHANTABIL-
+       ITY or FITNESS FOR A PARTICULAR PURPOSE.
+
+SEE ALSO
+       The full documentation for yes is maintained as  a  Tex-
+       info  manual.  If the info and yes programs are properly
+       installed at your site, the command
+
+              info yes
+
+       should give you access to the complete manual.
+
+
+
+yes 5.3.0                December 2004                   YES(1)

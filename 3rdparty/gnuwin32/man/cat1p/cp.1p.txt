@@ -1,0 +1,625 @@
+cp(P)                                                     cp(P)
+
+
+
+
+
+NAME
+       cp - copy files
+
+SYNOPSIS
+       cp [-fip] source_file target_file
+
+       cp [-fip] source_file ... target
+
+       cp -R [-H | -L | -P][-fip] source_file ... target
+
+       cp -r [-H | -L | -P][-fip] source_file ... target
+
+
+DESCRIPTION
+       The first synopsis form is denoted by two operands, nei-
+       ther of which are existing files of type directory.  The
+       cp  utility  shall copy the contents of source_file (or,
+       if source_file is a file of type symbolic link, the con-
+       tents of the file referenced by source_file) to the des-
+       tination path named by target_file.
+
+       The second synopsis form is denoted by two or more oper-
+       ands  where  the  -R or -r options are not specified and
+       the first synopsis form is not applicable. It  shall  be
+       an error if any source_file is a file of type directory,
+       if target does not exist, or if target is a  file  of  a
+       type   defined   by  the  System  Interfaces  volume  of
+       IEEE Std 1003.1-2001, but is not a file of  type  direc-
+       tory.  The  cp  utility  shall copy the contents of each
+       source_file (or, if source_file is a file of  type  sym-
+       bolic  link,  the  contents  of  the  file referenced by
+       source_file) to the destination path named by  the  con-
+       catenation  of  target,  a slash character, and the last
+       component of source_file.
+
+       The third and fourth synopsis forms are denoted  by  two
+       or  more  operands where the -R or -r options are speci-
+       fied.  The cp utility shall copy each file in  the  file
+       hierarchy  rooted  in  each source_file to a destination
+       path named as follows:
+
+              If target exists and is a file of type directory,
+              the  name  of  the corresponding destination path
+              for each file in the file hierarchy shall be  the
+              concatenation  of  target, a slash character, and
+              the pathname of the file relative to  the  direc-
+              tory containing source_file.
+
+              If  target  does  not  exist and two operands are
+              specified, the name of the corresponding destina-
+              tion  path  for  source_file shall be target; the
+              name of the corresponding  destination  path  for
+              all  other  files  in the file hierarchy shall be
+              the concatenation of target, a  slash  character,
+              and   the   pathname  of  the  file  relative  to
+              source_file.
+
+       It shall be an error if target does not exist  and  more
+       than two operands are specified, or if target exists and
+       is a file of a type defined  by  the  System  Interfaces
+       volume  of  IEEE Std 1003.1-2001,  but  is not a file of
+       type directory.
+
+       In the following description, the term dest_file  refers
+       to  the  file  named  by  the destination path. The term
+       source_file refers to the file  that  is  being  copied,
+       whether  specified  as  an  operand  or a file in a file
+       hierarchy  rooted   in   a   source_file   operand.   If
+       source_file is a file of type symbolic link:
+
+              If  neither the -R nor -r options were specified,
+              cp shall take actions based on the type and  con-
+              tents  of  the  file  referenced  by the symbolic
+              link, and not by the symbolic link itself.
+
+              If the -R option was specified:
+
+                     If none of the options -H, -L, nor -P were
+                     specified,  it is unspecified which of -H,
+                     -L, or -P will be used as a default.
+
+                     If the -H option was specified,  cp  shall
+                     take  actions  based  on the type and con-
+                     tents of the file referenced by  any  sym-
+                     bolic  link specified as a source_file op-
+                     erand.
+
+                     If the -L option was specified,  cp  shall
+                     take  actions  based  on the type and con-
+                     tents of the file referenced by  any  sym-
+                     bolic  link specified as a source_file op-
+                     erand or any  symbolic  links  encountered
+                     during traversal of a file hierarchy.
+
+                     If  the  -P option was specified, cp shall
+                     copy any  symbolic  link  specified  as  a
+                     source_file operand and any symbolic links
+                     encountered during  traversal  of  a  file
+                     hierarchy,  and  shall not follow any sym-
+                     bolic links.
+
+              If the -r option was specified, the  behavior  is
+              implementation-defined.
+
+       For  each  source_file,  the  following  steps  shall be
+       taken:
+
+       If source_file references the same file as dest_file, cp
+       may  write  a  diagnostic  message to standard error; it
+       shall do nothing more with source_file and shall  go  on
+       to any remaining files.
+
+       If source_file is of type directory, the following steps
+       shall be taken: <ol type="a">
+
+       If neither the -R or -r options were specified, cp shall
+       write a diagnostic message to standard error, do nothing
+       more with source_file, and go on to any remaining files.
+
+       If  source_file  was  not  specified  as  an operand and
+       source_file is dot or dot-dot, cp shall do nothing  more
+       with source_file and go on to any remaining files.
+
+       If  dest_file exists and it is a file type not specified
+       by the System Interfaces volume of IEEE Std 1003.1-2001,
+       the behavior is implementation-defined.
+
+       If  dest_file exists and it is not of type directory, cp
+       shall write a diagnostic message to standard  error,  do
+       nothing   more  with  source_file  or  any  files  below
+       source_file in the file hierarchy,  and  go  on  to  any
+       remaining files.
+
+       If  the  directory dest_file does not exist, it shall be
+       created with file permission bits set to the same  value
+       as  those  of source_file, modified by the file creation
+       mask of the user if the -p option was not specified, and
+       then   bitwise-inclusively   OR'ed   with   S_IRWXU.  If
+       dest_file cannot be created, cp shall write a diagnostic
+       message   to   standard  error,  do  nothing  more  with
+       source_file, and go on to any  remaining  files.  It  is
+       unspecified  if  cp  attempts  to copy files in the file
+       hierarchy rooted in source_file.
+
+       The files in the directory source_file shall  be  copied
+       to  the directory dest_file, taking the four steps (1 to
+       4) listed here with the files as source_files.
+
+       If dest_file was created, its file permission bits shall
+       be  changed  (if  necessary)  to be the same as those of
+       source_file, modified by the file creation mask  of  the
+       user if the -p option was not specified.
+
+       The  cp  utility  shall do nothing more with source_file
+       and go on to any remaining files.
+
+       If source_file is of type regular  file,  the  following
+       steps shall be taken: <ol type="a">
+
+       If dest_file exists, the following steps shall be taken:
+       <ol type="i">
+
+       If the -i option is in  effect,  the  cp  utility  shall
+       write  a  prompt  to  the standard error and read a line
+       from the standard input. If the response is not affirma-
+       tive,  cp  shall do nothing more with source_file and go
+       on to any remaining files.
+
+       A file descriptor for dest_file  shall  be  obtained  by
+       performing  actions  equivalent  to  the open() function
+       defined   in   the   System   Interfaces    volume    of
+       IEEE Std 1003.1-2001  called using dest_file as the path
+       argument, and the bitwise-inclusive OR of  O_WRONLY  and
+       O_TRUNC as the oflag argument.
+
+       If the attempt to obtain a file descriptor fails and the
+       -f option is in effect, cp shall attempt to  remove  the
+       file  by  performing  actions equivalent to the unlink()
+       function defined in  the  System  Interfaces  volume  of
+       IEEE Std 1003.1-2001  called using dest_file as the path
+       argument. If this attempt succeeds,  cp  shall  continue
+       with step 3b.
+
+       If  dest_file does not exist, a file descriptor shall be
+       obtained by performing actions equivalent to the  open()
+       function  defined  in  the  System  Interfaces volume of
+       IEEE Std 1003.1-2001 called using dest_file as the  path
+       argument,  and  the bitwise-inclusive OR of O_WRONLY and
+       O_CREAT as the oflag argument. The file permission  bits
+       of source_file shall be the mode argument.
+
+       If  the  attempt  to  obtain a file descriptor fails, cp
+       shall write a diagnostic message to standard  error,  do
+       nothing  more with source_file, and go on to any remain-
+       ing files.
+
+       The contents of source_file shall be written to the file
+       descriptor.   Any write errors shall cause cp to write a
+       diagnostic message to standard  error  and  continue  to
+       step 3e.
+
+       The file descriptor shall be closed.
+
+       The  cp  utility shall do nothing more with source_file.
+       If a write error occurred in step 3d, it is  unspecified
+       if  cp  continues  with any remaining files. If no write
+       error occurred in step 3d, cp shall go on to any remain-
+       ing files.
+
+       Otherwise,  the  following  steps  shall  be  taken: <ol
+       type="a">
+
+       If the -r option was specified, the behavior  is  imple-
+       mentation-defined.
+
+       If  the  -R  option  was  specified, the following steps
+       shall be taken: <ol type="i">
+
+       The dest_file shall be created with the same  file  type
+       as source_file.
+
+       If  source_file is a file of type FIFO, the file permis-
+       sion bits shall be the same  as  those  of  source_file,
+       modified by the file creation mask of the user if the -p
+       option was not specified.  Otherwise,  the  permissions,
+       owner  ID, and group ID of dest_file are implementation-
+       defined.
+
+       If this creation fails for any reason, cp shall write  a
+       diagnostic  message  to  standard error, do nothing more
+       with source_file, and go on to any remaining files.
+
+       If source_file is a file  of  type  symbolic  link,  the
+       pathname contained in dest_file shall be the same as the
+       pathname contained in source_file.
+
+       If this fails for any reason, cp shall write a  diagnos-
+       tic  message  to  standard  error,  do nothing more with
+       source_file, and go on to any remaining files.
+
+       If the implementation provides additional  or  alternate
+       access control mechanisms (see the Base Definitions vol-
+       ume of IEEE Std 1003.1-2001, Section  4.4,  File  Access
+       Permissions),  their effect on copies of files is imple-
+       mentation-defined.
+
+OPTIONS
+       The cp utility shall conform  to  the  Base  Definitions
+       volume  of  IEEE Std 1003.1-2001,  Section 12.2, Utility
+       Syntax Guidelines.
+
+       The following options shall be supported:
+
+       -f     If a file descriptor for a destination file  can-
+              not  be  obtained,  as described in step 3.a.ii.,
+              attempt to unlink the destination file  and  pro-
+              ceed.
+
+       -H     Take  actions  based  on the type and contents of
+              the file referenced by any symbolic  link  speci-
+              fied as a source_file operand.
+
+       -i     Write  a  prompt to standard error before copying
+              to any existing destination file. If the response
+              from  the standard input is affirmative, the copy
+              shall be attempted; otherwise, it shall not.
+
+       -L     Take actions based on the type  and  contents  of
+              the  file  referenced by any symbolic link speci-
+              fied as a source_file  operand  or  any  symbolic
+              links  encountered  during  traversal  of  a file
+              hierarchy.
+
+       -P     Take actions on any symbolic link specified as  a
+              source_file  operand or any symbolic link encoun-
+              tered during traversal of a file hierarchy.
+
+       -p     Duplicate the following characteristics  of  each
+              source  file  in  the  corresponding  destination
+              file:
+
+       The time of last data  modification  and  time  of  last
+       access.  If  this  duplication  fails for any reason, cp
+       shall write a diagnostic message to standard error.
+
+       The user ID and group ID. If this duplication fails  for
+       any  reason, it is unspecified whether cp writes a diag-
+       nostic message to standard error.
+
+       The file permission bits and  the  S_ISUID  and  S_ISGID
+       bits.  Other, implementation-defined, bits may be dupli-
+       cated as well. If this duplication fails for any reason,
+       cp shall write a diagnostic message to standard error.
+
+       If the user ID or the group ID cannot be duplicated, the
+       file  permission  bits  S_ISUID  and  S_ISGID  shall  be
+       cleared.  If  these  bits are present in the source file
+       but are not duplicated in the destination  file,  it  is
+       unspecified  whether  cp  writes a diagnostic message to
+       standard error.
+
+       The order in which  the  preceding  characteristics  are
+       duplicated  is  unspecified.  The dest_file shall not be
+       deleted if these characteristics cannot be preserved.
+
+       -R     Copy file hierarchies.
+
+       -r     Copy file hierarchies. The treatment  of  special
+              files is implementation-defined.
+
+
+       Specifying  more  than  one  of  the  mutually-exclusive
+       options -H, -L, and -P shall not be considered an error.
+       The  last  option specified shall determine the behavior
+       of the utility.
+
+OPERANDS
+       The following operands shall be supported:
+
+       source_file
+              A pathname of a file to be copied.
+
+       target_file
+              A pathname of an existing  or  nonexistent  file,
+              used for the output when a single file is copied.
+
+       target A pathname of a directory to contain  the  copied
+              files.
+
+
+STDIN
+       The  standard  input shall be used to read an input line
+       in response to each prompt specified in the STDERR  sec-
+       tion. Otherwise, the standard input shall not be used.
+
+INPUT FILES
+       The input files specified as operands may be of any file
+       type.
+
+ENVIRONMENT VARIABLES
+       The following environment  variables  shall  affect  the
+       execution of cp:
+
+       LANG   Provide     a     default     value    for    the
+              internationalization variables that are unset  or
+              null.   (See   the  Base  Definitions  volume  of
+              IEEE Std 1003.1-2001, Section 8.2, International-
+              ization  Variables for the precedence of interna-
+              tionalization variables  used  to  determine  the
+              values of locale categories.)
+
+       LC_ALL If  set to a non-empty string value, override the
+              values  of  all  the  other  internationalization
+              variables.
+
+       LC_COLLATE
+
+              Determine  the locale for the behavior of ranges,
+              equivalence classes, and multi-character  collat-
+              ing elements used in the extended regular expres-
+              sion defined for the yesexpr  locale  keyword  in
+              the LC_MESSAGES category.
+
+       LC_CTYPE
+              Determine  the  locale  for the interpretation of
+              sequences of bytes of  text  data  as  characters
+              (for  example,  single-byte  as opposed to multi-
+              byte characters in arguments and input files) and
+              the  behavior  of  character  classes used in the
+              extended  regular  expression  defined  for   the
+              yesexpr  locale  keyword in the LC_MESSAGES cate-
+              gory.
+
+       LC_MESSAGES
+              Determine the locale for the processing of affir-
+              mative  responses  that  should be used to affect
+              the format and contents  of  diagnostic  messages
+              written to standard error.
+
+       NLSPATH
+              Determine  the  location  of message catalogs for
+              the processing of LC_MESSAGES .
+
+
+ASYNCHRONOUS EVENTS
+       Default.
+
+STDOUT
+       Not used.
+
+STDERR
+       A prompt shall be written to standard  error  under  the
+       conditions  specified  in  the  DESCRIPTION section. The
+       prompt shall contain the destination pathname,  but  its
+       format  is  otherwise unspecified.  Otherwise, the stan-
+       dard error shall be used only for diagnostic messages.
+
+OUTPUT FILES
+       The output files may be of any type.
+
+EXTENDED DESCRIPTION
+       None.
+
+EXIT STATUS
+       The following exit values shall be returned:
+
+        0     All files were copied successfully.
+
+       >0     An error occurred.
+
+
+CONSEQUENCES OF ERRORS
+       If cp is prematurely terminated by a  signal  or  error,
+       files  or  file hierarchies may be only partially copied
+       and files and directories may have incorrect permissions
+       or access and modification times.
+
+       The following sections are informative.
+
+APPLICATION USAGE
+       The  difference between -R and -r is in the treatment by
+       cp of file types other than regular and directory.   The
+       original  -r flag, for historic reasons, does not handle
+       special files any differently from  regular  files,  but
+       always  reads the file and copies its contents. This has
+       obvious problems in the presence of special file  types;
+       for  example, character devices, FIFOs, and sockets. The
+       -R option is intended to recreate the file hierarchy and
+       the  -r  option  supports  historical  practice.  It was
+       anticipated that a future  version  of  this  volume  of
+       IEEE Std 1003.1-2001  would deprecate the -r option, and
+       for that reason, there has been no attempt  to  fix  its
+       behavior with respect to FIFOs or other file types where
+       copying the file is clearly wrong. However, some  imple-
+       mentations  support -r with the same abilities as the -R
+       defined  in  this  volume  of  IEEE Std 1003.1-2001.  To
+       accommodate  them  as  well  as systems that do not, the
+       differences  between  -r  and  -R  are   implementation-
+       defined. Implementations may make them identical. The -r
+       option is marked obsolescent.
+
+       The set-user-ID and  set-group-ID  bits  are  explicitly
+       cleared when files are created. This is to prevent users
+       from creating programs  that  are  set-user-ID  or  set-
+       group-ID to them when copying files or to make set-user-
+       ID or set-group-ID files accessible  to  new  groups  of
+       users.  For  example,  if  a file is set-user-ID and the
+       copy has a different group ID than  the  source,  a  new
+       group  of  users has execute permission to a set-user-ID
+       program than did previously.  In particular, this  is  a
+       problem for superusers copying users' trees.
+
+EXAMPLES
+       None.
+
+RATIONALE
+       The -i option exists on BSD systems, giving applications
+       and users a way to  avoid  accidentally  removing  files
+       when  copying.  Although  the  4.3  BSD version does not
+       prompt if the standard input  is  not  a  terminal,  the
+       standard  developers decided that use of -i is a request
+       for interaction, so when the  destination  path  exists,
+       the utility takes instructions from whatever responds on
+       standard input.
+
+       The exact format of the interactive prompts is  unspeci-
+       fied. Only the general nature of the contents of prompts
+       are specified because implementations  may  desire  more
+       descriptive prompts than those used on historical imple-
+       mentations.  Therefore,  an  application  using  the  -i
+       option relies on the system to provide the most suitable
+       dialog directly with the user,  based  on  the  behavior
+       specified.
+
+       The  -p  option  is  historical practice on BSD systems,
+       duplicating the time of last data modification and  time
+       of  last  access.  This  volume  of IEEE Std 1003.1-2001
+       extends it to preserve the user and group IDs,  as  well
+       as  the  file  permissions. This requirement has obvious
+       problems in that the directories  are  almost  certainly
+       modified    after   being   copied.   This   volume   of
+       IEEE Std 1003.1-2001  requires  that  the   modification
+       times  be  preserved.  The  statement  that the order in
+       which the characteristics are duplicated is  unspecified
+       is  to  permit  implementations  to  provide the maximum
+       amount of security for the user. Implementations  should
+       take  into  account the obvious security issues involved
+       in setting the owner, group, and mode in the wrong order
+       or  creating files with an owner, group, or mode differ-
+       ent from the final value.
+
+       It is unspecified whether cp writes diagnostic  messages
+       when  the  user  and  group IDs cannot be set due to the
+       widespread practice of users using -p to duplicate  some
+       portion  of the file characteristics, indifferent to the
+       duplication of others.   Historic  implementations  only
+       write  diagnostic messages on errors other than [EPERM].
+
+       The -r option is historical practice  on  BSD  and  BSD-
+       derived  systems, copying file hierarchies as opposed to
+       single files.  This functionality  is  used  heavily  in
+       historical  applications,  and  its  loss would signifi-
+       cantly decrease consensus. The -R option was added as  a
+       close synonym to the -r option, selected for consistency
+       with   all   other   options   in   this    volume    of
+       IEEE Std 1003.1-2001   that   do   recursive   directory
+       descent.
+
+       When a failure occurs during the copying of a file hier-
+       archy,  cp is required to attempt to copy files that are
+       on the same level in the hierarchy  or  above  the  file
+       where  the  failure  occurred.   It is unspecified if cp
+       shall attempt to copy files below  the  file  where  the
+       failure occurred (which cannot succeed in any case).
+
+       Permissions,  owners, and groups of created special file
+       types have been  deliberately  left  as  implementation-
+       defined.  This  is  to  allow systems to satisfy special
+       requirements (for  example,  allowing  users  to  create
+       character  special  devices,  but  requiring  them to be
+       owned by a certain group). In general,  it  is  strongly
+       suggested  that the permissions, owner, and group be the
+       same as if the user had run the historical mknod, ln, or
+       other  utility  to  create the file. It is also probable
+       that additional privileges are required to create block,
+       character,  or other implementation-defined special file
+       types.
+
+       Additionally, the -p option explicitly requires that all
+       set-user-ID and set-group-ID permissions be discarded if
+       any of the owner or group IDs cannot be set. This is  to
+       keep  users  from  unintentionally  giving  away special
+       privilege when copying programs.
+
+       When creating regular files, historical versions  of  cp
+       use  the mode of the source file as modified by the file
+       mode creation mask. Other choices would have been to use
+       the  mode  of the source file unmodified by the creation
+       mask or to use the same mode as would be given to a  new
+       file created by the user (plus the execution bits of the
+       source file) and then modify it by the  file  mode  cre-
+       ation  mask.  In  the  absence  of  any strong reason to
+       change historic practice, it was in large part retained.
+
+       When creating directories, historical versions of cp use
+       the mode of the source directory, plus read, write,  and
+       search  bits for the owner, as modified by the file mode
+       creation mask. This is done so that cp  can  copy  trees
+       where  the  user has read permission, but the owner does
+       not. A side effect is that if  the  file  creation  mask
+       denies  the  owner permissions, cp fails. Also, once the
+       copy is done, historical versions of cp set the  permis-
+       sions  on  the  created  directory to be the same as the
+       source directory, unmodified by the file creation  mask.
+
+       This  behavior  has  been  modified so that cp is always
+       able to create the contents of the directory, regardless
+       of  the  file creation mask. After the copy is done, the
+       permissions are set to be the same as the source  direc-
+       tory, as modified by the file creation mask. This latter
+       change from historical behavior is to prevent users from
+       accidentally   creating   directories  with  permissions
+       beyond those they would normally set and for consistency
+       with the behavior of cp in creating files.
+
+       It  is not a requirement that cp detect attempts to copy
+       a file to itself; however, implementations are  strongly
+       encouraged  to  do  so.  Historical implementations have
+       detected the attempt in most cases.
+
+       There are two methods of copying subtrees in this volume
+       of  IEEE Std 1003.1-2001.  The other method is described
+       as part of the pax utility (see pax ). Both methods  are
+       historical  practice. The cp utility provides a simpler,
+       more intuitive interface, while pax offers a finer gran-
+       ularity of control. Each provides additional functional-
+       ity to the other; in particular, pax maintains the hard-
+       link  structure  of the hierarchy, while cp does not. It
+       is the intention of the  standard  developers  that  the
+       results  be  similar  (using appropriate option combina-
+       tions in both utilities). The results are  not  required
+       to  be  identical;  there  seemed  insufficient  gain to
+       applications to balance the  difficulty  of  implementa-
+       tions  having  to  guarantee  that  the results would be
+       exactly identical.
+
+       The wording allowing cp to copy a directory to implemen-
+       tation-defined  file  types  not specified by the System
+       Interfaces volume of IEEE Std 1003.1-2001 is provided so
+       that  implementations  supporting symbolic links are not
+       required to prohibit  copying  directories  to  symbolic
+       links.  Other extensions to the System Interfaces volume
+       of IEEE Std 1003.1-2001 file types may need to use  this
+       loophole as well.
+
+FUTURE DIRECTIONS
+       The -r option may be removed; use -R instead.
+
+SEE ALSO
+       mv  ,  find , ln , pax , the System Interfaces volume of
+       IEEE Std 1003.1-2001, open(), unlink()
+
+COPYRIGHT
+       Portions of this text are reprinted  and  reproduced  in
+       electronic  form  from  IEEE  Std  1003.1, 2003 Edition,
+       Standard for Information Technology -- Portable  Operat-
+       ing System Interface (POSIX), The Open Group Base Speci-
+       fications Issue 6, Copyright (C) 2001-2003 by the Insti-
+       tute  of  Electrical  and Electronics Engineers, Inc and
+       The Open Group. In the event of any discrepancy  between
+       this  version  and  the original IEEE and The Open Group
+       Standard, the original IEEE and The Open Group  Standard
+       is  the  referee  document. The original Standard can be
+       obtained        online        at        http://www.open-
+       group.org/unix/online.html .
+
+
+
+POSIX                         2003                        cp(P)

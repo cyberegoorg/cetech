@@ -1,0 +1,268 @@
+nice(P)                                                 nice(P)
+
+
+
+
+
+NAME
+       nice - invoke a utility with an altered nice value
+
+SYNOPSIS
+       nice [-n increment] utility [argument...]
+
+DESCRIPTION
+       The nice utility shall invoke a utility, requesting that
+       it be run with a different nice value (see the Base Def-
+       initions  volume of IEEE Std 1003.1-2001, Section 3.239,
+       Nice Value). With no options and only if  the  user  has
+       appropriate  privileges,  the  executed utility shall be
+       run with a  nice  value  that  is  some  implementation-
+       defined quantity less than or equal to the nice value of
+       the current process. If the user lacks appropriate priv-
+       ileges to affect the nice value in the requested manner,
+       the nice utility shall not affect  the  nice  value;  in
+       this  case, a warning message may be written to standard
+       error, but this shall  not  prevent  the  invocation  of
+       utility or affect the exit status.
+
+OPTIONS
+       The  nice  utility shall conform to the Base Definitions
+       volume of IEEE Std 1003.1-2001,  Section  12.2,  Utility
+       Syntax Guidelines.
+
+       The following option is supported:
+
+       -n  increment
+              A  positive  or  negative  decimal  integer which
+              shall have the same effect on  the  execution  of
+              the  utility  as  if  the  utility had called the
+              nice() function with the  numeric  value  of  the
+              increment option-argument.
+
+
+OPERANDS
+       The following operands shall be supported:
+
+       utility
+              The  name  of a utility that is to be invoked. If
+              the utility operand  names  any  of  the  special
+              built-in  utilities in Special Built-In Utilities
+              , the results are undefined.
+
+       argument
+              Any string to be supplied  as  an  argument  when
+              invoking  the  utility named by the utility oper-
+              and.
+
+
+STDIN
+       Not used.
+
+INPUT FILES
+       None.
+
+ENVIRONMENT VARIABLES
+       The following environment  variables  shall  affect  the
+       execution of nice:
+
+       LANG   Provide a default value for the internationaliza-
+              tion variables that are unset or null.  (See  the
+              Base  Definitions volume of IEEE Std 1003.1-2001,
+              Section 8.2, Internationalization  Variables  for
+              the  precedence of internationalization variables
+              used to determine  the  values  of  locale  cate-
+              gories.)
+
+       LC_ALL If  set to a non-empty string value, override the
+              values  of  all  the  other  internationalization
+              variables.
+
+       LC_CTYPE
+              Determine  the  locale  for the interpretation of
+              sequences of bytes of  text  data  as  characters
+              (for  example,  single-byte  as opposed to multi-
+              byte characters in arguments).
+
+       LC_MESSAGES
+              Determine the  locale  that  should  be  used  to
+              affect the format and contents of diagnostic mes-
+              sages written to standard error.
+
+       NLSPATH
+              Determine the location of  message  catalogs  for
+              the processing of LC_MESSAGES .
+
+       PATH   Determine  the  search  path  used  to locate the
+              utility to be invoked.  See the Base  Definitions
+              volume  of IEEE Std 1003.1-2001, Chapter 8, Envi-
+              ronment Variables.
+
+
+ASYNCHRONOUS EVENTS
+       Default.
+
+STDOUT
+       Not used.
+
+STDERR
+       The standard error shall be  used  only  for  diagnostic
+       messages.
+
+OUTPUT FILES
+       None.
+
+EXTENDED DESCRIPTION
+       None.
+
+EXIT STATUS
+       If  utility is invoked, the exit status of nice shall be
+       the exit status of utility; otherwise, the nice  utility
+       shall exit with one of the following values:
+
+       1-125  An error occurred in the nice utility.
+
+         126  The  utility  specified  by utility was found but
+              could not be invoked.
+
+         127  The utility specified by  utility  could  not  be
+              found.
+
+
+CONSEQUENCES OF ERRORS
+       Default.
+
+       The following sections are informative.
+
+APPLICATION USAGE
+       The only guaranteed portable uses of this utility are:
+
+       nice utility
+
+              Run utility with the default lower nice value.
+
+       nice  -n  <positive integer> utility
+
+              Run utility with a lower nice value.
+
+
+       On  some implementations they have no discernible effect
+       on the invoked utility  and  on  some  others  they  are
+       exactly equivalent.
+
+       Historical  systems have frequently supported the <posi-
+       tive integer> up to 20. Since there is no error  penalty
+       associated  with  guessing  a  number  that is too high,
+       users without access to the system conformance  document
+       (to see what limits are actually in place) could use the
+       historical 1 to 20 range or attempt to  use  very  large
+       numbers if the job should be truly low priority.
+
+       The  nice  value of a process can be displayed using the
+       command:
+
+
+              ps -o nice
+
+       The command, env, nice, nohup, time, and xargs utilities
+       have  been  specified  to  use exit code 127 if an error
+       occurs so that applications can distinguish "failure  to
+       find  a  utility"  from  "invoked utility exited with an
+       error indication". The value 127 was chosen  because  it
+       is  not commonly used for other meanings; most utilities
+       use small values for "normal error conditions"  and  the
+       values above 128 can be confused with termination due to
+       receipt of a signal. The value 126 was chosen in a simi-
+       lar  manner to indicate that the utility could be found,
+       but not invoked. Some scripts produce  meaningful  error
+       messages differentiating the 126 and 127 cases. The dis-
+       tinction between exit codes 126  and  127  is  based  on
+       KornShell  practice  that  uses 127 when all attempts to
+       exec the utility fail with [ENOENT], and uses  126  when
+       any attempt to exec the utility fails for any other rea-
+       son.
+
+EXAMPLES
+       None.
+
+RATIONALE
+       Due to the text about the limits of the nice value being
+       implementation-defined, nice is not actually required to
+       change the nice value of the executed command; the  lim-
+       its  could  be zero differences from the system default,
+       although the implementor is required  to  document  this
+       fact in the conformance document.
+
+       The  4.3  BSD  version  of  nice  does not check whether
+       increment is a valid decimal integer. The  command  nice
+       -x  utility,  for  example, would be treated the same as
+       the command nice --1 utility. If the user does not  have
+       appropriate  privileges,  this  results in a "permission
+       denied" error. This is considered a bug.
+
+       When a user without appropriate privileges gives a nega-
+       tive increment, System V treats it like the command nice
+       -0 utility, while 4.3 BSD writes a  "permission  denied"
+       message  and  does not run the utility. Neither was con-
+       sidered clearly  superior,  so  the  behavior  was  left
+       unspecified.
+
+       The  C  shell  has a built-in version of nice that has a
+       different interface  from  the  one  described  in  this
+       volume of IEEE Std 1003.1-2001.
+
+       The  term  "utility"  is used, rather than "command", to
+       highlight the fact that shell compound  commands,  pipe-
+       lines, and so on, cannot be used. Special built-ins also
+       cannot be used. However, "utility" includes user  appli-
+       cation  programs  and  shell scripts, not just utilities
+       defined in this volume of IEEE Std 1003.1-2001.
+
+       Historical implementations of nice provide a nice  value
+       range  of 40 or 41 discrete steps, with the default nice
+       value being the midpoint of that range. By default, they
+       lower the nice value of the executed utility by 10.
+
+       Some  historical documentation states that the increment
+       value must be within a fixed range. This is  misleading;
+       the  valid increment values on any invocation are deter-
+       mined by the current process nice value,  which  is  not
+       always the default.
+
+       The  definition of nice value is not intended to suggest
+       that all processes in a system have priorities that  are
+       comparable.   Scheduling  policy  extensions such as the
+       realtime priorities in the System Interfaces  volume  of
+       IEEE Std 1003.1-2001  make the notion of a single under-
+       lying priority for all scheduling policies  problematic.
+       Some implementations may implement the nice-related fea-
+       tures to affect all processes on the system,  others  to
+       affect  just the general time-sharing activities implied
+       by this volume of IEEE Std 1003.1-2001, and  others  may
+       have  no effect at all. Because of the use of "implemen-
+       tation-defined" in nice and  renice,  a  wide  range  of
+       implementation strategies are possible.
+
+FUTURE DIRECTIONS
+       None.
+
+SEE ALSO
+       Shell  Command Language , renice , the System Interfaces
+       volume of IEEE Std 1003.1-2001, nice()
+
+COPYRIGHT
+       Portions of this text are reprinted  and  reproduced  in
+       electronic  form  from  IEEE  Std  1003.1, 2003 Edition,
+       Standard for Information Technology -- Portable  Operat-
+       ing System Interface (POSIX), The Open Group Base Speci-
+       fications Issue 6, Copyright (C) 2001-2003 by the Insti-
+       tute  of  Electrical  and Electronics Engineers, Inc and
+       The Open Group. In the event of any discrepancy  between
+       this  version  and  the original IEEE and The Open Group
+       Standard, the original IEEE and The Open Group  Standard
+       is  the  referee  document. The original Standard can be
+       obtained        online        at        http://www.open-
+       group.org/unix/online.html .
+
+
+
+POSIX                         2003                      nice(P)

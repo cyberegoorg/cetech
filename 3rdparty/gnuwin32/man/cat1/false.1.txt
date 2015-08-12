@@ -1,0 +1,47 @@
+FALSE(1)                 User Commands                 FALSE(1)
+
+
+
+
+
+NAME
+       false - do nothing, unsuccessfully
+
+SYNOPSIS
+       false [ignored command line arguments]
+       false OPTION
+
+DESCRIPTION
+       Exit with a status code indicating failure.
+
+       These option names may not be abbreviated.
+
+       --help display this help and exit
+
+       --version
+              output version information and exit
+
+AUTHOR
+       Written by Jim Meyering.
+
+REPORTING BUGS
+       Report bugs to <bug-coreutils@gnu.org>.
+
+COPYRIGHT
+       Copyright (C) 2004 Free Software Foundation, Inc.
+       This is free software; see the source for copying condi-
+       tions.  There is NO warranty; not even for MERCHANTABIL-
+       ITY or FITNESS FOR A PARTICULAR PURPOSE.
+
+SEE ALSO
+       The full documentation for false is maintained as a Tex-
+       info manual.  If the info and false programs  are  prop-
+       erly installed at your site, the command
+
+              info false
+
+       should give you access to the complete manual.
+
+
+
+false 5.3.0              November 2004                 FALSE(1)

@@ -1,0 +1,49 @@
+CHROOT(1)                User Commands                CHROOT(1)
+
+
+
+
+
+NAME
+       chroot  -  run command or interactive shell with special
+       root directory
+
+SYNOPSIS
+       chroot NEWROOT [COMMAND...]
+       chroot OPTION
+
+DESCRIPTION
+       Run COMMAND with root directory set to NEWROOT.
+
+       --help display this help and exit
+
+       --version
+              output version information and exit
+
+       If no command is given, run  ``${SHELL}  -i''  (default:
+       /bin/sh).
+
+AUTHOR
+       Written by Roland McGrath.
+
+REPORTING BUGS
+       Report bugs to <bug-coreutils@gnu.org>.
+
+COPYRIGHT
+       Copyright (C) 2004 Free Software Foundation, Inc.
+       This is free software; see the source for copying condi-
+       tions.  There is NO warranty; not even for MERCHANTABIL-
+       ITY or FITNESS FOR A PARTICULAR PURPOSE.
+
+SEE ALSO
+       The  full  documentation  for  chroot is maintained as a
+       Texinfo manual.  If the info  and  chroot  programs  are
+       properly installed at your site, the command
+
+              info chroot
+
+       should give you access to the complete manual.
+
+
+
+chroot 5.3.0             November 2004                CHROOT(1)

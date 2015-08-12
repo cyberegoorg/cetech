@@ -1,0 +1,266 @@
+uniq(P)                                                 uniq(P)
+
+
+
+
+
+NAME
+       uniq - report or filter out repeated lines in a file
+
+SYNOPSIS
+       uniq  [-c|-d|-u][-f  fields][-s  char][input_file  [out-
+       put_file]]
+
+DESCRIPTION
+       The uniq utility shall  read  an  input  file  comparing
+       adjacent lines, and write one copy of each input line on
+       the  output.   The  second  and  succeeding  copies   of
+       repeated adjacent input lines shall not be written.
+
+       Repeated  lines  in  the  input shall not be detected if
+       they are not adjacent.
+
+OPTIONS
+       The uniq utility shall conform to the  Base  Definitions
+       volume  of  IEEE Std 1003.1-2001,  Section 12.2, Utility
+       Syntax Guidelines.
+
+       The following options shall be supported:
+
+       -c     Precede each output line with a count of the num-
+              ber of times the line occurred in the input.
+
+       -d     Suppress  the  writing  of  lines  that  are  not
+              repeated in the input.
+
+       -f  fields
+              Ignore the first fields fields on each input line
+              when  doing  comparisons, where fields is a posi-
+              tive decimal integer.  A  field  is  the  maximal
+              string matched by the basic regular expression:
+
+
+              [[:blank:]]*[^[:blank:]]*
+
+       If the fields option-argument specifies more fields than
+       appear on an input line, a null string shall be used for
+       comparison.
+
+       -s  chars
+              Ignore the first chars characters when doing com-
+              parisons, where chars shall be a positive decimal
+              integer.  If specified in conjunction with the -f
+              option, the  first  chars  characters  after  the
+              first  fields  fields  shall  be  ignored. If the
+              chars option-argument specifies  more  characters
+              than remain on an input line, a null string shall
+              be used for comparison.
+
+       -u     Suppress the writing of lines that  are  repeated
+              in the input.
+
+
+OPERANDS
+       The following operands shall be supported:
+
+       input_file
+              A  pathname  of the input file. If the input_file
+              operand is not specified, or if the input_file is
+              '-' , the standard input shall be used.
+
+       output_file
+              A pathname of the output file. If the output_file
+              operand is not  specified,  the  standard  output
+              shall be used. The results are unspecified if the
+              file named by output_file is the  file  named  by
+              input_file.
+
+
+STDIN
+       The  standard  input shall be used only if no input_file
+       operand is specified or if input_file is '-' .  See  the
+       INPUT FILES section.
+
+INPUT FILES
+       The input file shall be a text file.
+
+ENVIRONMENT VARIABLES
+       The  following  environment  variables  shall affect the
+       execution of uniq:
+
+       LANG   Provide a default value for the internationaliza-
+              tion  variables  that are unset or null. (See the
+              Base Definitions volume of  IEEE Std 1003.1-2001,
+              Section  8.2,  Internationalization Variables for
+              the precedence of internationalization  variables
+              used  to  determine  the  values  of locale cate-
+              gories.)
+
+       LC_ALL If set to a non-empty string value, override  the
+              values  of  all  the  other  internationalization
+              variables.
+
+       LC_COLLATE
+
+              Determine the locale for ordering rules.
+
+       LC_CTYPE
+              Determine the locale for  the  interpretation  of
+              sequences  of  bytes  of  text data as characters
+              (for example, single-byte as  opposed  to  multi-
+              byte characters in arguments and input files) and
+              which characters constitute a <blank> in the cur-
+              rent locale.
+
+       LC_MESSAGES
+              Determine  the  locale  that  should  be  used to
+              affect the format and contents of diagnostic mes-
+              sages written to standard error.
+
+       NLSPATH
+              Determine  the  location  of message catalogs for
+              the processing of LC_MESSAGES .
+
+
+ASYNCHRONOUS EVENTS
+       Default.
+
+STDOUT
+       The standard output shall be used only if no output_file
+       operand is specified. See the OUTPUT FILES section.
+
+STDERR
+       The  standard  error  shall  be used only for diagnostic
+       messages.
+
+OUTPUT FILES
+       If the -c option is specified, the output file shall  be
+       empty or each line shall be of the form:
+
+
+              "%d %s", <number of duplicates>, <line>
+
+       otherwise,  the  output file shall be empty or each line
+       shall be of the form:
+
+
+              "%s", <line>
+
+EXTENDED DESCRIPTION
+       None.
+
+EXIT STATUS
+       The following exit values shall be returned:
+
+        0     The utility executed successfully.
+
+       >0     An error occurred.
+
+
+CONSEQUENCES OF ERRORS
+       Default.
+
+       The following sections are informative.
+
+APPLICATION USAGE
+       The sort utility can be used to cause repeated lines  to
+       be adjacent in the input file.
+
+EXAMPLES
+       The  following  input  file  data (but flushed left) was
+       used for a test series on uniq:
+
+
+              #01 foo0 bar0 foo1 bar1
+              #02 bar0 foo1 bar1 foo1
+              #03 foo0 bar0 foo1 bar1
+              #04
+              #05 foo0 bar0 foo1 bar1
+              #06 foo0 bar0 foo1 bar1
+              #07 bar0 foo1 bar1 foo0
+
+       What follows is a series of test invocations of the uniq
+       utility  that  use a mixture of uniq options against the
+       input file data. These tests verify the meaning of adja-
+       cent.   The  uniq  utility  views  the  input  data as a
+       sequence of strings delimited by '\n' . Accordingly, for
+       the  fieldsth  member  of  the sequence, uniq interprets
+       unique or repeated adjacent lines strictly  relative  to
+       the fields+1th member.
+
+       This  first example tests the line counting option, com-
+       paring each line of the input file  data  starting  from
+       the second field:
+
+
+              uniq -c -f 1 uniq_0I.t
+                  1 #01 foo0 bar0 foo1 bar1
+                  1 #02 bar0 foo1 bar1 foo0
+                  1 #03 foo0 bar0 foo1 bar1
+                  1 #04
+                  2 #05 foo0 bar0 foo1 bar1
+                  1 #07 bar0 foo1 bar1 foo0
+
+       The  number  '2'  ,  prefixing the fifth line of output,
+       signifies that the  uniq  utility  detected  a  pair  of
+       repeated  lines.  Given the input data, this can only be
+       true when uniq is run using the -f 1 option (which shall
+       cause  uniq  to  ignore  the  first  field on each input
+       line).
+
+       The second example tests the option to  suppress  unique
+       lines, comparing each line of the input file data start-
+       ing from the second field:
+
+
+              uniq -d -f 1 uniq_0I.t
+              #05 foo0 bar0 foo1 bar1
+
+       This test suppresses repeated lines, comparing each line
+       of the input file data starting from the second field:
+
+
+              uniq -u -f 1 uniq_0I.t
+              #01 foo0 bar0 foo1 bar1
+              #02 bar0 foo1 bar1 foo1
+              #03 foo0 bar0 foo1 bar1
+              #04
+              #07 bar0 foo1 bar1 foo0
+
+       This suppresses unique lines, comparing each line of the
+       input file data starting from the third character:
+
+
+              uniq -d -s 2 uniq_0I.t
+
+       In the last example, the uniq  utility  found  no  input
+       matching the above criteria.
+
+RATIONALE
+       Some historical implementations have limited lines to be
+       1080 bytes in length, which does not  meet  the  implied
+       {LINE_MAX} limit.
+
+FUTURE DIRECTIONS
+       None.
+
+SEE ALSO
+       comm , sort
+
+COPYRIGHT
+       Portions  of  this  text are reprinted and reproduced in
+       electronic form from  IEEE  Std  1003.1,  2003  Edition,
+       Standard  for Information Technology -- Portable Operat-
+       ing System Interface (POSIX), The Open Group Base Speci-
+       fications Issue 6, Copyright (C) 2001-2003 by the Insti-
+       tute of Electrical and Electronics  Engineers,  Inc  and
+       The  Open Group. In the event of any discrepancy between
+       this version and the original IEEE and  The  Open  Group
+       Standard,  the original IEEE and The Open Group Standard
+       is the referee document. The original  Standard  can  be
+       obtained        online        at        http://www.open-
+       group.org/unix/online.html .
+
+
+
+POSIX                         2003                      uniq(P)

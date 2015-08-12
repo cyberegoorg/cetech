@@ -1,0 +1,98 @@
+WHO(1)                   User Commands                   WHO(1)
+
+
+
+
+
+NAME
+       who - show who is logged on
+
+SYNOPSIS
+       who [OPTION]... [ FILE | ARG1 ARG2 ]
+
+DESCRIPTION
+       -a, --all
+              same as -b -d --login -p -r -t -T -u
+
+       -b, --boot
+              time of last system boot
+
+       -d, --dead
+              print dead processes
+
+       -H, --heading
+              print line of column headings
+
+       -i, --idle
+              add  idle time as HOURS:MINUTES, . or old (depre-
+              cated, use -u)
+
+       -l, --login
+              print system login processes
+
+       --lookup
+              attempt to canonicalize hostnames via DNS
+
+       -m     only hostname and user associated with stdin
+
+       -p, --process
+              print active processes spawned by init
+
+       -q, --count
+              all login names and number of users logged on
+
+       -r, --runlevel
+              print current runlevel
+
+       -s, --short
+              print only name, line, and time (default)
+
+       -t, --time
+              print last system clock change
+
+       -T, -w, --mesg
+              add user's message status as +, - or ?
+
+       -u, --users
+              list users logged in
+
+       --message
+              same as -T
+
+       --writable
+              same as -T
+
+       --help display this help and exit
+
+       --version
+              output version information and exit
+
+       If   FILE   is   not   specified,   use   /var/run/utmp.
+       /var/log/wtmp as FILE is common.  If ARG1 ARG2 given, -m
+       presumed: `am i' or `mom likes' are usual.
+
+AUTHOR
+       Written  by  Joseph  Arceneaux,  David  MacKenzie,   and
+       Michael Stone.
+
+REPORTING BUGS
+       Report bugs to <bug-coreutils@gnu.org>.
+
+COPYRIGHT
+       Copyright (C) 2004 Free Software Foundation, Inc.
+       This is free software; see the source for copying condi-
+       tions.  There is NO warranty; not even for MERCHANTABIL-
+       ITY or FITNESS FOR A PARTICULAR PURPOSE.
+
+SEE ALSO
+       The  full  documentation for who is maintained as a Tex-
+       info manual.  If the info and who programs are  properly
+       installed at your site, the command
+
+              info who
+
+       should give you access to the complete manual.
+
+
+
+who 5.3.0                November 2004                   WHO(1)

@@ -1,0 +1,265 @@
+ln(P)                                                     ln(P)
+
+
+
+
+
+NAME
+       ln - link files
+
+SYNOPSIS
+       ln [-fs] source_file target_file
+
+       ln [-fs] source_file ... target_dir
+
+
+DESCRIPTION
+       In  the first synopsis form, the ln utility shall create
+       a new directory entry (link)  at  the  destination  path
+       specified  by  the target_file operand. If the -s option
+       is specified, a symbolic link shall be created  for  the
+       file  specified  by  the source_file operand. This first
+       synopsis form shall be assumed when  the  final  operand
+       does  not  name  an existing directory; if more than two
+       operands are specified and the final is not an  existing
+       directory, an error shall result.
+
+       In the second synopsis form, the ln utility shall create
+       a new directory entry (link), or if  the  -s  option  is
+       specified  a symbolic link, for each file specified by a
+       source_file operand, at a destination path in the exist-
+       ing directory named by target_dir.
+
+       If the last operand specifies an existing file of a type
+       not  specified  by  the  System  Interfaces  volume   of
+       IEEE Std 1003.1-2001,  the  behavior  is implementation-
+       defined.
+
+       The corresponding destination path for each  source_file
+       shall be the concatenation of the target directory path-
+       name, a slash character, and the last pathname component
+       of  the  source_file.  The second synopsis form shall be
+       assumed when the final operand names an existing  direc-
+       tory.
+
+       For each source_file:
+
+       If the destination path exists: <ol type="a">
+
+       If  the  -f  option  is  not specified, ln shall write a
+       diagnostic message to standard error,  do  nothing  more
+       with the current source_file, and go on to any remaining
+       source_files.
+
+       Actions shall be performed equivalent  to  the  unlink()
+       function  defined  in  the  System  Interfaces volume of
+       IEEE Std 1003.1-2001, called using  destination  as  the
+       path  argument.  If  this fails for any reason, ln shall
+       write a diagnostic message to standard error, do nothing
+       more  with  the  current  source_file,  and go on to any
+       remaining source_files.
+
+       If the -s option is specified, ln shall  create  a  sym-
+       bolic  link named by the destination path and containing
+       as its pathname source_file. The  ln  utility  shall  do
+       nothing  more  with  source_file  and shall go on to any
+       remaining files.
+
+       If source_file is a symbolic link, actions shall be per-
+       formed  equivalent  to  the  link()  function  using the
+       object that source_file references as the path1 argument
+       and  the  destination path as the path2 argument. The ln
+       utility shall do nothing more with source_file and shall
+       go on to any remaining files.
+
+       Actions  shall  be  performed  equivalent  to the link()
+       function defined in  the  System  Interfaces  volume  of
+       IEEE Std 1003.1-2001  using  source_file  as  the  path1
+       argument, and the destination path as  the  path2  argu-
+       ment.
+
+OPTIONS
+       The  ln  utility  shall  conform to the Base Definitions
+       volume of IEEE Std 1003.1-2001,  Section  12.2,  Utility
+       Syntax Guidelines.
+
+       The following option shall be supported:
+
+       -f     Force   existing   destination  pathnames  to  be
+              removed to allow the link.
+
+       -s     Create symbolic links instead of hard links.
+
+
+OPERANDS
+       The following operands shall be supported:
+
+       source_file
+              A pathname of a file to  be  linked.  If  the  -s
+              option  is specified, no restrictions on the type
+              of file or on its existence shall be made. If the
+              -s  option  is not specified, whether a directory
+              can be linked is implementation-defined.
+
+       target_file
+              The pathname of the new  directory  entry  to  be
+              created.
+
+       target_dir
+              A  pathname of an existing directory in which the
+              new directory entries are created.
+
+
+STDIN
+       Not used.
+
+INPUT FILES
+       None.
+
+ENVIRONMENT VARIABLES
+       The following environment  variables  shall  affect  the
+       execution of ln:
+
+       LANG   Provide a default value for the internationaliza-
+              tion variables that are unset or null.  (See  the
+              Base  Definitions volume of IEEE Std 1003.1-2001,
+              Section 8.2, Internationalization  Variables  for
+              the  precedence of internationalization variables
+              used to determine  the  values  of  locale  cate-
+              gories.)
+
+       LC_ALL If  set to a non-empty string value, override the
+              values  of  all  the  other  internationalization
+              variables.
+
+       LC_CTYPE
+              Determine  the  locale  for the interpretation of
+              sequences of bytes of  text  data  as  characters
+              (for  example,  single-byte  as opposed to multi-
+              byte characters in arguments).
+
+       LC_MESSAGES
+              Determine the  locale  that  should  be  used  to
+              affect the format and contents of diagnostic mes-
+              sages written to standard error.
+
+       NLSPATH
+              Determine the location of  message  catalogs  for
+              the processing of LC_MESSAGES .
+
+
+ASYNCHRONOUS EVENTS
+       Default.
+
+STDOUT
+       Not used.
+
+STDERR
+       The  standard  error  shall  be used only for diagnostic
+       messages.
+
+OUTPUT FILES
+       None.
+
+EXTENDED DESCRIPTION
+       None.
+
+EXIT STATUS
+       The following exit values shall be returned:
+
+        0     All the specified files were linked successfully.
+
+       >0     An error occurred.
+
+
+CONSEQUENCES OF ERRORS
+       Default.
+
+       The following sections are informative.
+
+APPLICATION USAGE
+       None.
+
+EXAMPLES
+       None.
+
+RATIONALE
+       Some  historic  versions of ln (including the one speci-
+       fied by the SVID) unlink the  destination  file,  if  it
+       exists, by default. If the mode does not permit writing,
+       these versions prompt for confirmation before attempting
+       the  unlink.  In  these versions the -f option causes ln
+       not to attempt to prompt for confirmation.
+
+       This allows ln to succeed in  creating  links  when  the
+       target  file  already exists, even if the file itself is
+       not writable (although the  directory  must  be).  Early
+       proposals specified this functionality.
+
+       This  volume  of IEEE Std 1003.1-2001 does not allow the
+       ln utility  to  unlink  existing  destination  paths  by
+       default for the following reasons:
+
+              The ln utility has historically been used to pro-
+              vide locking for shell applications, a usage that
+              is incompatible with ln unlinking the destination
+              path by default. There was no corresponding tech-
+              nical advantage to adding this functionality.
+
+              This functionality gave ln the ability to destroy
+              the link structure of files,  which  changes  the
+              historical behavior of ln.
+
+              This  functionality  is  easily replicated with a
+              combination of rm and ln.
+
+              It is not historical practice  in  many  systems;
+              BSD  and  BSD-derived systems do not support this
+              behavior. Unfortunately,  whichever  behavior  is
+              selected  can cause scripts written expecting the
+              other behavior to fail.
+
+              It is preferable that ln perform in the same man-
+              ner as the link() function, which does not permit
+              the target to exist already.
+
+       This  volume  of  IEEE Std 1003.1-2001  retains  the  -f
+       option to provide support for shell scripts depending on
+       the SVID semantics. It seems likely that  shell  scripts
+       would not be written to handle prompting by ln and would
+       therefore have specified the -f option.
+
+       The -f option is an undocumented feature of many histor-
+       ical  versions  of  the  ln utility, allowing linking to
+       directories. These versions require modification.
+
+       Early proposals of this volume  of  IEEE Std 1003.1-2001
+       also  required  a  -i  option, which behaved like the -i
+       options in cp and mv, prompting for confirmation  before
+       unlinking  existing files. This was not historical prac-
+       tice for the ln utility and has been omitted.
+
+FUTURE DIRECTIONS
+       None.
+
+SEE ALSO
+       chmod() , find , pax , rm , the System Interfaces volume
+       of IEEE Std 1003.1-2001, link(), unlink()
+
+COPYRIGHT
+       Portions  of  this  text are reprinted and reproduced in
+       electronic form from  IEEE  Std  1003.1,  2003  Edition,
+       Standard  for Information Technology -- Portable Operat-
+       ing System Interface (POSIX), The Open Group Base Speci-
+       fications Issue 6, Copyright (C) 2001-2003 by the Insti-
+       tute of Electrical and Electronics  Engineers,  Inc  and
+       The  Open Group. In the event of any discrepancy between
+       this version and the original IEEE and  The  Open  Group
+       Standard,  the original IEEE and The Open Group Standard
+       is the referee document. The original  Standard  can  be
+       obtained        online        at        http://www.open-
+       group.org/unix/online.html .
+
+
+
+POSIX                         2003                        ln(P)

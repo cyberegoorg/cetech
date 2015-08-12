@@ -1,0 +1,79 @@
+ECHO(1)                  User Commands                  ECHO(1)
+
+
+
+
+
+NAME
+       echo - display a line of text
+
+SYNOPSIS
+       echo [OPTION]... [STRING]...
+
+DESCRIPTION
+       NOTE:  your shell may have its own version of echo which
+       will supersede the version described here. Please  refer
+       to  your  shell's  documentation  for  details about the
+       options it supports.
+
+       Echo the STRING(s) to standard output.
+
+       -n     do not output the trailing newline
+
+       -e     enable interpretation of backslash escapes
+
+       -E     disable  interpretation  of   backslash   escapes
+              (default)
+
+       --help display this help and exit
+
+       --version
+              output version information and exit
+
+       If  -e  is in effect, the following sequences are recog-
+       nized:
+
+       \0NNN  the character whose ASCII code is NNN (octal)
+
+       \\     backslash
+
+       \a     alert (BEL)
+
+       \b     backspace
+
+       \c     suppress trailing newline
+
+       \f     form feed
+
+       \n     new line
+
+       \r     carriage return
+
+       \t     horizontal tab
+
+       \v     vertical tab
+
+AUTHOR
+       Written by FIXME unknown.
+
+REPORTING BUGS
+       Report bugs to <bug-coreutils@gnu.org>.
+
+COPYRIGHT
+       Copyright (C) 2004 Free Software Foundation, Inc.
+       This is free software; see the source for copying condi-
+       tions.  There is NO warranty; not even for MERCHANTABIL-
+       ITY or FITNESS FOR A PARTICULAR PURPOSE.
+
+SEE ALSO
+       The full documentation for echo is maintained as a  Tex-
+       info manual.  If the info and echo programs are properly
+       installed at your site, the command
+
+              info echo
+
+       should give you access to the complete manual.
+
+
+
+echo 5.3.0               November 2004                  ECHO(1)

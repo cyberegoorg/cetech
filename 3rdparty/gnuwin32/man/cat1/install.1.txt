@@ -1,0 +1,114 @@
+INSTALL(1)               User Commands               INSTALL(1)
+
+
+
+
+
+NAME
+       install - copy files and set attributes
+
+SYNOPSIS
+       install [OPTION]... [-T] SOURCE DEST
+       install [OPTION]... SOURCE... DIRECTORY
+       install [OPTION]... -t DIRECTORY SOURCE...
+       install [OPTION]... -d DIRECTORY...
+
+DESCRIPTION
+       In  the first three forms, copy SOURCE to DEST or multi-
+       ple SOURCE(s) to the existing DIRECTORY,  while  setting
+       permission modes and owner/group.  In the 4th form, cre-
+       ate all components of the given DIRECTORY(ies).
+
+       Mandatory arguments to long options  are  mandatory  for
+       short options too.
+
+       --backup[=CONTROL] make a backup of each existing desti-
+              nation file
+
+       -b     like --backup but does not accept an argument
+
+       -c     (ignored)
+
+       -d, --directory
+              treat all arguments as  directory  names;  create
+              all components of the specified directories
+
+       -D     create  all leading components of DEST except the
+              last, then copy SOURCE to DEST
+
+       -g, --group=GROUP
+              set group ownership, instead of process'  current
+              group
+
+       -m, --mode=MODE
+              set  permission  mode  (as  in chmod), instead of
+              rwxr-xr-x
+
+       -o, --owner=OWNER
+              set ownership (super-user only)
+
+       -p, --preserve-timestamps
+              apply access/modification times of  SOURCE  files
+              to corresponding destination files
+
+       -s, --strip
+              strip symbol tables
+
+       -S, --suffix=SUFFIX override the usual backup suffix
+
+       -t, --target-directory=DIRECTORY
+              copy all SOURCE arguments into DIRECTORY
+
+       -T, --no-target-directory
+              treat DEST as a normal file
+
+       -v, --verbose
+              print the name of each directory as it is created
+
+       --help display this help and exit
+
+       --version
+              output version information and exit
+
+       The backup suffix is `~', unless set  with  --suffix  or
+       SIMPLE_BACKUP_SUFFIX.  The version control method may be
+       selected via the --backup option  or  through  the  VER-
+       SION_CONTROL environment variable.  Here are the values:
+
+       none, off
+              never make backups (even if --backup is given)
+
+       numbered, t
+              make numbered backups
+
+       existing, nil
+              numbered if numbered backups exist, simple other-
+              wise
+
+       simple, never
+              always make simple backups
+
+AUTHOR
+       Written by David MacKenzie.
+
+REPORTING BUGS
+       Report bugs to <bug-coreutils@gnu.org>.
+
+COPYRIGHT
+       Copyright (C) 2004 Free Software Foundation, Inc.
+       This is free software; see the source for copying condi-
+       tions.  There is NO warranty; not even for MERCHANTABIL-
+       ITY or FITNESS FOR A PARTICULAR PURPOSE.
+
+SEE ALSO
+       The  full  documentation  for install is maintained as a
+       Texinfo manual.  If the info and  install  programs  are
+       properly installed at your site, the command
+
+              info install
+
+       should give you access to the complete manual.
+
+
+
+install 5.3.0            November 2004               INSTALL(1)

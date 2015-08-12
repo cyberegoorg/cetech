@@ -1,0 +1,45 @@
+PRINTENV(1)              User Commands              PRINTENV(1)
+
+
+
+
+
+NAME
+       printenv - print all or part of environment
+
+SYNOPSIS
+       printenv [VARIABLE]...
+       printenv OPTION
+
+DESCRIPTION
+       If no environment VARIABLE specified, print them all.
+
+       --help display this help and exit
+
+       --version
+              output version information and exit
+
+AUTHOR
+       Written by David MacKenzie and Richard Mlynarik.
+
+REPORTING BUGS
+       Report bugs to <bug-coreutils@gnu.org>.
+
+COPYRIGHT
+       Copyright (C) 2004 Free Software Foundation, Inc.
+       This is free software; see the source for copying condi-
+       tions.  There is NO warranty; not even for MERCHANTABIL-
+       ITY or FITNESS FOR A PARTICULAR PURPOSE.
+
+SEE ALSO
+       The  full  documentation for printenv is maintained as a
+       Texinfo manual.  If the info and printenv  programs  are
+       properly installed at your site, the command
+
+              info printenv
+
+       should give you access to the complete manual.
+
+
+
+printenv 5.3.0           November 2004              PRINTENV(1)

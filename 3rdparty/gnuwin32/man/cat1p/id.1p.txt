@@ -1,0 +1,279 @@
+id(P)                                                     id(P)
+
+
+
+
+
+NAME
+       id - return user identity
+
+SYNOPSIS
+       id [user]
+
+       id -G[-n] [user]
+
+       id -g[-nr] [user]
+
+       id -u[-nr] [user]
+
+
+DESCRIPTION
+       If  no  user  operand  is provided, the id utility shall
+       write the user and group IDs and the corresponding  user
+       and group names of the invoking process to standard out-
+       put. If the effective and real IDs do  not  match,  both
+       shall  be  written.  If multiple groups are supported by
+       the  underlying   system   (see   the   description   of
+       {NGROUPS_MAX}   in   the  System  Interfaces  volume  of
+       IEEE Std 1003.1-2001), the supplementary group  affilia-
+       tions of the invoking process shall also be written.
+
+       If  a  user  operand is provided and the process has the
+       appropriate privileges, the user and group  IDs  of  the
+       selected  user shall be written. In this case, effective
+       IDs shall be assumed to be identical to real IDs. If the
+       selected  user has more than one allowable group member-
+       ship listed in the group database, these shall be  writ-
+       ten  in  the  same  manner  as  the supplementary groups
+       described in the preceding paragraph.
+
+OPTIONS
+       The id utility shall conform  to  the  Base  Definitions
+       volume  of  IEEE Std 1003.1-2001,  Section 12.2, Utility
+       Syntax Guidelines.
+
+       The following options shall be supported:
+
+       -G     Output all different group IDs (effective,  real,
+              and  supplementary) only, using the format "%u\n"
+              . If there is more than one distinct group affil-
+              iation,  output  each such affiliation, using the
+              format " %u" , before the <newline> is output.
+
+       -g     Output only the effective  group  ID,  using  the
+              format "%u\n" .
+
+       -n     Output the name in the format "%s" instead of the
+              numeric ID using the format "%u" .
+
+       -r     Output the real ID instead of the effective ID.
+
+       -u     Output only the effective user ID, using the for-
+              mat "%u\n" .
+
+
+OPERANDS
+       The following operand shall be supported:
+
+       user   The  login  name  for  which information is to be
+              written.
+
+
+STDIN
+       Not used.
+
+INPUT FILES
+       None.
+
+ENVIRONMENT VARIABLES
+       The following environment  variables  shall  affect  the
+       execution of id:
+
+       LANG   Provide a default value for the internationaliza-
+              tion variables that are unset or null.  (See  the
+              Base  Definitions volume of IEEE Std 1003.1-2001,
+              Section 8.2, Internationalization  Variables  for
+              the  precedence of internationalization variables
+              used to determine  the  values  of  locale  cate-
+              gories.)
+
+       LC_ALL If  set to a non-empty string value, override the
+              values  of  all  the  other  internationalization
+              variables.
+
+       LC_CTYPE
+              Determine  the  locale  for the interpretation of
+              sequences of bytes of  text  data  as  characters
+              (for  example,  single-byte  as opposed to multi-
+              byte characters in arguments).
+
+       LC_MESSAGES
+              Determine the  locale  that  should  be  used  to
+              affect the format and contents of diagnostic mes-
+              sages written to standard error  and  informative
+              messages written to standard output.
+
+       NLSPATH
+              Determine  the  location  of message catalogs for
+              the processing of LC_MESSAGES .
+
+
+ASYNCHRONOUS EVENTS
+       Default.
+
+STDOUT
+       The following formats shall be used when the LC_MESSAGES
+       locale  category  specifies  the  POSIX locale. In other
+       locales, the strings uid, gid, euid,  egid,  and  groups
+       may  be  replaced  with  more appropriate strings corre-
+       sponding to the locale.
+
+
+              "uid=%u(%s) gid=%u(%s)\n", <real user ID>, <user-name>,
+                  <real group ID>, <group-name>
+
+       If the effective and real user IDs  do  not  match,  the
+       following  shall be inserted immediately before the '\n'
+       character in the previous format:
+
+
+              " euid=%u(%s)"
+
+       with the following arguments added at  the  end  of  the
+       argument list:
+
+
+              <effective user ID>, <effective user-name>
+
+       If  the  effective  and real group IDs do not match, the
+       following shall be inserted  directly  before  the  '\n'
+       character  in  the format string (and after any addition
+       resulting from the  effective  and  real  user  IDs  not
+       matching):
+
+
+              " egid=%u(%s)"
+
+       with  the  following  arguments  added at the end of the
+       argument list:
+
+
+              <effective group-ID>, <effective group name>
+
+       If the process has supplementary group  affiliations  or
+       the  selected  user  is  allowed  to  belong to multiple
+       groups, the first shall be  added  directly  before  the
+       <newline> in the format string:
+
+
+              " groups=%u(%s)"
+
+       with  the  following  arguments  added at the end of the
+       argument list:
+
+
+              <supplementary group ID>, <supplementary group name>
+
+       and the necessary number of the  following  added  after
+       that for any remaining supplementary group IDs:
+
+
+              ",%u(%s)"
+
+       and  the  necessary  number  of  the following arguments
+       added at the end of the argument list:
+
+
+              <supplementary group ID>, <supplementary group name>
+
+       If any of the user ID,  group  ID,  effective  user  ID,
+       effective  group ID, or supplementary/multiple group IDs
+       cannot be mapped by the system into  printable  user  or
+       group  names, the corresponding "(%s)" and name argument
+       shall be omitted from the corresponding format string.
+
+       When any of the options are specified, the output format
+       shall be as described in the OPTIONS section.
+
+STDERR
+       The  standard  error  shall  be used only for diagnostic
+       messages.
+
+OUTPUT FILES
+       None.
+
+EXTENDED DESCRIPTION
+       None.
+
+EXIT STATUS
+       The following exit values shall be returned:
+
+        0     Successful completion.
+
+       >0     An error occurred.
+
+
+CONSEQUENCES OF ERRORS
+       Default.
+
+       The following sections are informative.
+
+APPLICATION USAGE
+       Output produced by the -G option and by the default case
+       could  potentially  produce  very  long lines on systems
+       that support large numbers of supplementary groups.  (On
+       systems with user and group IDs that are 32-bit integers
+       and with group names with a maximum of 8 bytes per name,
+       93 supplementary groups plus distinct effective and real
+       group and user  IDs  could  theoretically  overflow  the
+       2048-byte {LINE_MAX} text file line limit on the default
+       output case.  It  would  take  about  186  supplementary
+       groups  to  overflow the 2048-byte barrier using id -G).
+       This is not expected to be a problem in practice, but in
+       cases  where  it  is a concern, applications should con-
+       sider using fold -s before postprocessing the output  of
+       id.
+
+EXAMPLES
+       None.
+
+RATIONALE
+       The  functionality  provided by the 4 BSD groups utility
+       can be simulated using:
+
+
+              id -Gn [ user ]
+
+       The 4 BSD command groups was considered, but it was  not
+       included because it did not provide the functionality of
+       the id utility of the SVID. Also, it was thought that it
+       would  be  easier to modify id to provide the additional
+       functionality necessary to systems with multiple  groups
+       than to invent another command.
+
+       The  options  -u,  -g, -n, and -r were added to ease the
+       use of id  with  shell  commands  substitution.  Without
+       these  options  it is necessary to use some preprocessor
+       such as sed to select the desired piece of  information.
+       Since output such as that produced by:
+
+
+              id -u -n
+
+       is  frequently  wanted,  it  seemed desirable to add the
+       options.
+
+FUTURE DIRECTIONS
+       None.
+
+SEE ALSO
+       fold , logname , who , the System Interfaces  volume  of
+       IEEE Std 1003.1-2001, getgid(), getgroups(), getuid()
+
+COPYRIGHT
+       Portions  of  this  text are reprinted and reproduced in
+       electronic form from  IEEE  Std  1003.1,  2003  Edition,
+       Standard  for Information Technology -- Portable Operat-
+       ing System Interface (POSIX), The Open Group Base Speci-
+       fications Issue 6, Copyright (C) 2001-2003 by the Insti-
+       tute of Electrical and Electronics  Engineers,  Inc  and
+       The  Open Group. In the event of any discrepancy between
+       this version and the original IEEE and  The  Open  Group
+       Standard,  the original IEEE and The Open Group Standard
+       is the referee document. The original  Standard  can  be
+       obtained        online        at        http://www.open-
+       group.org/unix/online.html .
+
+
+
+POSIX                         2003                        id(P)

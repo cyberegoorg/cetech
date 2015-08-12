@@ -1,0 +1,51 @@
+SUM(1)                   User Commands                   SUM(1)
+
+
+
+
+
+NAME
+       sum - checksum and count the blocks in a file
+
+SYNOPSIS
+       sum [OPTION]... [FILE]...
+
+DESCRIPTION
+       Print checksum and block counts for each FILE.
+
+       -r     defeat -s, use BSD sum algorithm, use 1K blocks
+
+       -s, --sysv
+              use System V sum algorithm, use 512 bytes blocks
+
+       --help display this help and exit
+
+       --version
+              output version information and exit
+
+       With no FILE, or when FILE is -, read standard input.
+
+AUTHOR
+       Written by Kayvan Aghaiepour and David MacKenzie.
+
+REPORTING BUGS
+       Report bugs to <bug-coreutils@gnu.org>.
+
+COPYRIGHT
+       Copyright (C) 2004 Free Software Foundation, Inc.
+       This is free software; see the source for copying condi-
+       tions.  There is NO warranty; not even for MERCHANTABIL-
+       ITY or FITNESS FOR A PARTICULAR PURPOSE.
+
+SEE ALSO
+       The  full  documentation for sum is maintained as a Tex-
+       info manual.  If the info and sum programs are  properly
+       installed at your site, the command
+
+              info sum
+
+       should give you access to the complete manual.
+
+
+
+sum 5.3.0                November 2004                   SUM(1)

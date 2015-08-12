@@ -1,0 +1,116 @@
+SHRED(1)                 User Commands                 SHRED(1)
+
+
+
+
+
+NAME
+       shred  -  overwrite  a  file  to  hide its contents, and
+       optionally delete it
+
+SYNOPSIS
+       shred [OPTIONS] FILE [...]
+
+DESCRIPTION
+       Overwrite the specified FILE(s) repeatedly, in order  to
+       make  it harder for even very expensive hardware probing
+       to recover the data.
+
+       Mandatory arguments to long options  are  mandatory  for
+       short options too.
+
+       -f, --force
+              change permissions to allow writing if necessary
+
+       -n, --iterations=N
+              Overwrite N times instead of the default (25)
+
+       -s, --size=N
+              shred  this  many  bytes  (suffixes  like K, M, G
+              accepted)
+
+       -u, --remove
+              truncate and remove file after overwriting
+
+       -v, --verbose
+              show progress
+
+       -x, --exact
+              do not round file  sizes  up  to  the  next  full
+              block;
+
+              this is the default for non-regular files
+
+       -z, --zero
+              add  a  final overwrite with zeros to hide shred-
+              ding
+
+       --help display this help and exit
+
+       --version
+              output version information and exit
+
+       If FILE is -, shred standard output.
+
+       Delete FILE(s)  if  --remove  (-u)  is  specified.   The
+       default  is not to remove the files because it is common
+       to operate on device  files  like  /dev/hda,  and  those
+       files  usually should not be removed.  When operating on
+       regular files, most people use the --remove option.
+
+       CAUTION: Note that shred  relies  on  a  very  important
+       assumption:  that  the  file  system  overwrites data in
+       place.  This is the traditional way to  do  things,  but
+       many  modern  file  system  designs  do not satisfy this
+       assumption.  The following are examples of file  systems
+       on which shred is not effective:
+
+       *  log-structured  or  journaled  file  systems, such as
+       those supplied with
+
+              AIX and Solaris (and JFS,  ReiserFS,  XFS,  Ext3,
+              etc.)
+
+       *  file  systems  that write redundant data and carry on
+       even if some writes
+
+              fail, such as RAID-based file systems
+
+       * file systems that  make  snapshots,  such  as  Network
+       Appliance's NFS server
+
+       *  file  systems that cache in temporary locations, such
+       as NFS
+
+              version 3 clients
+
+       * compressed file systems
+
+       In addition, file system backups and remote mirrors  may
+       contain  copies  of the file that cannot be removed, and
+       that will allow a shredded file to be recovered later.
+
+AUTHOR
+       Written by Colin Plumb.
+
+REPORTING BUGS
+       Report bugs to <bug-coreutils@gnu.org>.
+
+COPYRIGHT
+       Copyright (C) 2005 Free Software Foundation, Inc.
+       This is free software; see the source for copying condi-
+       tions.  There is NO warranty; not even for MERCHANTABIL-
+       ITY or FITNESS FOR A PARTICULAR PURPOSE.
+
+SEE ALSO
+       The full documentation for shred is maintained as a Tex-
+       info  manual.   If the info and shred programs are prop-
+       erly installed at your site, the command
+
+              info shred
+
+       should give you access to the complete manual.
+
+
+
+shred 5.3.0               January 2005                 SHRED(1)

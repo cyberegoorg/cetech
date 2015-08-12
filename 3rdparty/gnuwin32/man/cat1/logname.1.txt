@@ -1,0 +1,44 @@
+LOGNAME(1)               User Commands               LOGNAME(1)
+
+
+
+
+
+NAME
+       logname - print user's login name
+
+SYNOPSIS
+       logname [OPTION]
+
+DESCRIPTION
+       Print the name of the current user.
+
+       --help display this help and exit
+
+       --version
+              output version information and exit
+
+AUTHOR
+       Written by FIXME: unknown.
+
+REPORTING BUGS
+       Report bugs to <bug-coreutils@gnu.org>.
+
+COPYRIGHT
+       Copyright (C) 2004 Free Software Foundation, Inc.
+       This is free software; see the source for copying condi-
+       tions.  There is NO warranty; not even for MERCHANTABIL-
+       ITY or FITNESS FOR A PARTICULAR PURPOSE.
+
+SEE ALSO
+       The  full  documentation  for logname is maintained as a
+       Texinfo manual.  If the info and  logname  programs  are
+       properly installed at your site, the command
+
+              info logname
+
+       should give you access to the complete manual.
+
+
+
+logname 5.3.0            November 2004               LOGNAME(1)

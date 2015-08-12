@@ -1,0 +1,113 @@
+DF(1)                    User Commands                    DF(1)
+
+
+
+
+
+NAME
+       df - report file system disk space usage
+
+SYNOPSIS
+       df [OPTION]... [FILE]...
+
+DESCRIPTION
+       This  manual  page  documents the GNU version of df.  df
+       displays the amount of disk space available on the  file
+       system  containing  each file name argument.  If no file
+       name is given, the  space  available  on  all  currently
+       mounted  file  systems is shown.  Disk space is shown in
+       1K blocks by default, unless  the  environment  variable
+       POSIXLY_CORRECT  is  set,  in which case 512-byte blocks
+       are used.
+
+       If an argument is the  absolute  file  name  of  a  disk
+       device  node  containing a mounted file system, df shows
+       the space available on that file system rather  than  on
+       the  file  system  containing  the device node (which is
+       always the root file system).  This version of df cannot
+       show  the  space  available  on  unmounted file systems,
+       because on most kinds of systems doing so requires  very
+       nonportable  intimate  knowledge  of  file system struc-
+       tures.
+
+OPTIONS
+       Show information about the file  system  on  which  each
+       FILE resides, or all file systems by default.
+
+       Mandatory  arguments  to  long options are mandatory for
+       short options too.
+
+       -a, --all
+              include file systems having 0 blocks
+
+       -B, --block-size=SIZE use SIZE-byte blocks
+
+       -h, --human-readable
+              print sizes in human readable  format  (e.g.,  1K
+              234M 2G)
+
+       -H, --si
+              likewise, but use powers of 1000 not 1024
+
+       -i, --inodes
+              list inode information instead of block usage
+
+       -k     like --block-size=1K
+
+       -l, --local
+              limit listing to local file systems
+
+       --no-sync
+              do  not  invoke  sync  before  getting usage info
+              (default)
+
+       -P, --portability
+              use the POSIX output format
+
+       --sync invoke sync before getting usage info
+
+       -t, --type=TYPE
+              limit listing to file systems of type TYPE
+
+       -T, --print-type
+              print file system type
+
+       -x, --exclude-type=TYPE
+              limit listing to file systems not of type TYPE
+
+       -v     (ignored)
+
+       --help display this help and exit
+
+       --version
+              output version information and exit
+
+       SIZE may be (or may be an  integer  optionally  followed
+       by)  one  of following: kB 1000, K 1024, MB 1000*1000, M
+       1024*1024, and so on for G, T, P, E, Z, Y.
+
+AUTHOR
+       Written by Torbjorn Granlund, David MacKenzie, and  Paul
+       Eggert.
+
+REPORTING BUGS
+       Report bugs to <bug-coreutils@gnu.org>.
+
+COPYRIGHT
+       Copyright (C) 2004 Free Software Foundation, Inc.
+       This is free software; see the source for copying condi-
+       tions.  There is NO warranty; not even for MERCHANTABIL-
+       ITY or FITNESS FOR A PARTICULAR PURPOSE.
+
+SEE ALSO
+       The full documentation for df is maintained as a Texinfo
+       manual.  If  the  info  and  df  programs  are  properly
+       installed at your site, the command
+
+              info df
+
+       should give you access to the complete manual.
+
+
+
+df 5.3.0                 November 2004                    DF(1)

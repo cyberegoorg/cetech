@@ -1,0 +1,46 @@
+HOSTNAME(1)              User Commands              HOSTNAME(1)
+
+
+
+
+
+NAME
+       hostname  -  set  or  print the name of the current host
+       system
+
+SYNOPSIS
+       hostname [NAME]
+       hostname OPTION
+
+DESCRIPTION
+       Print or set the hostname of the current system.
+
+       --help display this help and exit
+
+       --version
+              output version information and exit
+
+AUTHOR
+       Written by Jim Meyering.
+
+REPORTING BUGS
+       Report bugs to <bug-coreutils@gnu.org>.
+
+COPYRIGHT
+       Copyright (C) 2004 Free Software Foundation, Inc.
+       This is free software; see the source for copying condi-
+       tions.  There is NO warranty; not even for MERCHANTABIL-
+       ITY or FITNESS FOR A PARTICULAR PURPOSE.
+
+SEE ALSO
+       The full documentation for hostname is maintained  as  a
+       Texinfo  manual.   If the info and hostname programs are
+       properly installed at your site, the command
+
+              info hostname
+
+       should give you access to the complete manual.
+
+
+
+hostname 5.3.0           November 2004              HOSTNAME(1)

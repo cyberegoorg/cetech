@@ -1,0 +1,175 @@
+mkfifo(P)                                             mkfifo(P)
+
+
+
+
+
+NAME
+       mkfifo - make FIFO special files
+
+SYNOPSIS
+       mkfifo [-m mode] file...
+
+DESCRIPTION
+       The  mkfifo  utility shall create the FIFO special files
+       specified by the operands, in the order specified.
+
+       For each file operand, the mkfifo utility shall  perform
+       actions  equivalent  to the mkfifo() function defined in
+       the System Interfaces  volume  of  IEEE Std 1003.1-2001,
+       called with the following arguments:
+
+       The file operand is used as the path argument.
+
+       The  value  of  the  bitwise-inclusive  OR  of  S_IRUSR,
+       S_IWUSR, S_IRGRP, S_IWGRP, S_IROTH, and S_IWOTH is  used
+       as  the  mode  argument. (If the -m option is specified,
+       the value of the mkfifo() mode argument is  unspecified,
+       but  the  FIFO  shall  at  no time have permissions less
+       restrictive than the -m mode option-argument.)
+
+OPTIONS
+       The mkfifo utility shall conform to the Base Definitions
+       volume  of  IEEE Std 1003.1-2001,  Section 12.2, Utility
+       Syntax Guidelines.
+
+       The following option shall be supported:
+
+       -m  mode
+              Set the file permission bits of the newly-created
+              FIFO  to  the  specified  mode  value.  The  mode
+              option-argument shall be the same as the mode op-
+              erand  defined for the chmod utility. In the sym-
+              bolic_mode strings, the op characters '+' and '-'
+              shall  be interpreted relative to an assumed ini-
+              tial mode of a= rw.
+
+
+OPERANDS
+       The following operand shall be supported:
+
+       file   A pathname of the FIFO special file  to  be  cre-
+              ated.
+
+
+STDIN
+       Not used.
+
+INPUT FILES
+       None.
+
+ENVIRONMENT VARIABLES
+       The  following  environment  variables  shall affect the
+       execution of mkfifo:
+
+       LANG   Provide a default value for the internationaliza-
+              tion  variables  that are unset or null. (See the
+              Base Definitions volume of  IEEE Std 1003.1-2001,
+              Section  8.2,  Internationalization Variables for
+              the precedence of internationalization  variables
+              used   to   determine   the   values   of  locale
+              categories.)
+
+       LC_ALL If set to a non-empty string value, override  the
+              values  of  all  the  other  internationalization
+              variables.
+
+       LC_CTYPE
+              Determine the locale for  the  interpretation  of
+              sequences  of  bytes  of  text data as characters
+              (for example, single-byte as  opposed  to  multi-
+              byte characters in arguments).
+
+       LC_MESSAGES
+              Determine  the  locale  that  should  be  used to
+              affect the format and contents of diagnostic mes-
+              sages written to standard error.
+
+       NLSPATH
+              Determine  the  location  of message catalogs for
+              the processing of LC_MESSAGES .
+
+
+ASYNCHRONOUS EVENTS
+       Default.
+
+STDOUT
+       Not used.
+
+STDERR
+       The standard error shall be  used  only  for  diagnostic
+       messages.
+
+OUTPUT FILES
+       None.
+
+EXTENDED DESCRIPTION
+       None.
+
+EXIT STATUS
+       The following exit values shall be returned:
+
+        0     All the specified FIFO special files were created
+              successfully.
+
+       >0     An error occurred.
+
+
+CONSEQUENCES OF ERRORS
+       Default.
+
+       The following sections are informative.
+
+APPLICATION USAGE
+       None.
+
+EXAMPLES
+       None.
+
+RATIONALE
+       This utility was added to permit shell  applications  to
+       create FIFO special files.
+
+       The  -m  option  was added to control the file mode, for
+       consistency with the similar functionality  provided  by
+       the mkdir utility.
+
+       Early  proposals  included  a  -p  option similar to the
+       mkdir -p option that  created  intermediate  directories
+       leading up to the FIFO specified by the final component.
+       This was removed because it is not commonly  needed  and
+       is not common practice with similar utilities.
+
+       The  functionality  of mkfifo is described substantially
+       through a reference to the mkfifo() function in the Sys-
+       tem Interfaces volume of IEEE Std 1003.1-2001. For exam-
+       ple, by default, the mode of the FIFO file  is  affected
+       by  the  file  mode creation mask in accordance with the
+       specified behavior of the  mkfifo()  function.  In  this
+       way,  there  is  less duplication of effort required for
+       describing details of the file creation.
+
+FUTURE DIRECTIONS
+       None.
+
+SEE ALSO
+       chmod() , umask() ,  the  System  Interfaces  volume  of
+       IEEE Std 1003.1-2001, mkfifo()
+
+COPYRIGHT
+       Portions  of  this  text are reprinted and reproduced in
+       electronic form from  IEEE  Std  1003.1,  2003  Edition,
+       Standard  for Information Technology -- Portable Operat-
+       ing System Interface (POSIX), The Open Group Base Speci-
+       fications Issue 6, Copyright (C) 2001-2003 by the Insti-
+       tute of Electrical and Electronics  Engineers,  Inc  and
+       The  Open Group. In the event of any discrepancy between
+       this version and the original IEEE and  The  Open  Group
+       Standard,  the original IEEE and The Open Group Standard
+       is the referee document. The original  Standard  can  be
+       obtained        online        at        http://www.open-
+       group.org/unix/online.html .
+
+
+
+POSIX                         2003                    mkfifo(P)

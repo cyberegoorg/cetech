@@ -1,0 +1,200 @@
+unexpand(P)                                         unexpand(P)
+
+
+
+
+
+NAME
+       unexpand - convert spaces to tabs
+
+SYNOPSIS
+       unexpand      [     -a|     -t     tablist][file...]<img
+       src="../images/opt-end.gif"  alt="[Option   End]"   bor-
+       der="0">
+
+DESCRIPTION
+       The  unexpand utility shall copy files or standard input
+       to standard output, converting <blank>s at the beginning
+       of  each line into the maximum number of <tab>s followed
+       by the minimum number of <space>s  needed  to  fill  the
+       same  column  positions  originally filled by the trans-
+       lated <blank>s. By default, tabstops  shall  be  set  at
+       every eighth column position.  Each <backspace> shall be
+       copied to the output, and shall cause the  column  posi-
+       tion  count  for tab calculations to be decremented; the
+       count shall never be decremented to a  value  less  than
+       one.
+
+OPTIONS
+       The  unexpand  utility shall conform to the Base Defini-
+       tions  volume  of  IEEE Std 1003.1-2001,  Section  12.2,
+       Utility Syntax Guidelines.
+
+       The following options shall be supported:
+
+       -a     In addition to translating <blank>s at the begin-
+              ning of each line, translate all sequences of two
+              or more <blank>s immediately preceding a tab stop
+              to the maximum number of <tab>s followed  by  the
+              minimum  number  of  <space>s  needed to fill the
+              same column positions originally  filled  by  the
+              translated <blank>s.
+
+       -t  tablist
+              Specify  the  tab  stops.  The  application shall
+              ensure that the tablist option-argument is a sin-
+              gle argument consisting of a single positive dec-
+              imal integer or multiple positive  decimal  inte-
+              gers, separated by <blank>s or commas, in ascend-
+              ing order.  If a single  number  is  given,  tabs
+              shall  be  set  tablist  column  positions  apart
+              instead of the default 8. If multiple numbers are
+              given,  the  tabs  shall be set at those specific
+              column positions.
+
+       The application shall ensure that each tab-stop position
+       N  is  an  integer value greater than zero, and the list
+       shall be in strictly ascending order. This is  taken  to
+       mean  that,  from the start of a line of output, tabbing
+       to position N shall cause the next character  output  to
+       be  in  the  ( N+1)th column position on that line. When
+       the -t option is not specified, the default shall be the
+       equivalent  of  specifying -t 8 (except for the interac-
+       tion with -a, described below).
+
+       No <space>-to- <tab> conversions shall occur for charac-
+       ters  at positions beyond the last of those specified in
+       a multiple tab-stop list.
+
+       When -t is specified, the presence or absence of the  -a
+       option shall be ignored; conversion shall not be limited
+       to the processing of leading <blank>s.
+
+
+OPERANDS
+       The following operand shall be supported:
+
+       file   A pathname of a text file to be used as input.
+
+
+STDIN
+       See the INPUT FILES section.
+
+INPUT FILES
+       The input files shall be text files.
+
+ENVIRONMENT VARIABLES
+       The following environment  variables  shall  affect  the
+       execution of unexpand:
+
+       LANG   Provide a default value for the internationaliza-
+              tion variables that are unset or null.  (See  the
+              Base  Definitions volume of IEEE Std 1003.1-2001,
+              Section 8.2, Internationalization  Variables  for
+              the  precedence of internationalization variables
+              used to determine  the  values  of  locale  cate-
+              gories.)
+
+       LC_ALL If  set to a non-empty string value, override the
+              values  of  all  the  other  internationalization
+              variables.
+
+       LC_CTYPE
+              Determine  the  locale  for the interpretation of
+              sequences of bytes of  text  data  as  characters
+              (for  example,  single-byte  as opposed to multi-
+              byte characters in arguments  and  input  files),
+              the  processing  of  <tab>s and <space>s, and for
+              the determination of the width  in  column  posi-
+              tions  each  character  would occupy on an output
+              device.
+
+       LC_MESSAGES
+              Determine the  locale  that  should  be  used  to
+              affect the format and contents of diagnostic mes-
+              sages written to standard error.
+
+       NLSPATH
+              Determine the location of  message  catalogs  for
+              the processing of LC_MESSAGES .
+
+
+ASYNCHRONOUS EVENTS
+       Default.
+
+STDOUT
+       The  standard  output  shall  be equivalent to the input
+       files with the specified <space>-to- <tab>  conversions.
+
+STDERR
+       The  standard  error  shall  be used only for diagnostic
+       messages.
+
+OUTPUT FILES
+       None.
+
+EXTENDED DESCRIPTION
+       None.
+
+EXIT STATUS
+       The following exit values shall be returned:
+
+        0     Successful completion.
+
+       >0     An error occurred.
+
+
+CONSEQUENCES OF ERRORS
+       Default.
+
+       The following sections are informative.
+
+APPLICATION USAGE
+       One non-intuitive aspect of unexpand is its  restriction
+       to  leading  spaces when neither -a nor -t is specified.
+       Users who always want to convert all spaces  in  a  file
+       can  easily alias unexpand to use the -a or -t 8 option.
+
+EXAMPLES
+       None.
+
+RATIONALE
+       On several occasions, consideration was given to  adding
+       a -t option to the unexpand utility to complement the -t
+       in expand (see expand ). The historical intent of  unex-
+       pand  was to translate multiple <blank>s into tab stops,
+       where tab stops were a multiple of  eight  column  posi-
+       tions on most UNIX systems. An early proposal omitted -t
+       because it seemed outside the scope of the  User  Porta-
+       bility  Utilities option; it was not described in any of
+       the base  documents.   However,  hard-coding  tab  stops
+       every  eight  columns  was not suitable for the interna-
+       tional community and  broke  historical  precedents  for
+       some  vendors  in  the  FORTRAN  community,  so  -t  was
+       restored in conjunction with the list of valid extension
+       categories  considered by the standard developers. Thus,
+       unexpand is now the logical converse of expand.
+
+FUTURE DIRECTIONS
+       None.
+
+SEE ALSO
+       expand , tabs
+
+COPYRIGHT
+       Portions of this text are reprinted  and  reproduced  in
+       electronic  form  from  IEEE  Std  1003.1, 2003 Edition,
+       Standard for Information Technology -- Portable  Operat-
+       ing System Interface (POSIX), The Open Group Base Speci-
+       fications Issue 6, Copyright (C) 2001-2003 by the Insti-
+       tute  of  Electrical  and Electronics Engineers, Inc and
+       The Open Group. In the event of any discrepancy  between
+       this  version  and  the original IEEE and The Open Group
+       Standard, the original IEEE and The Open Group  Standard
+       is  the  referee  document. The original Standard can be
+       obtained        online        at        http://www.open-
+       group.org/unix/online.html .
+
+
+
+POSIX                         2003                  unexpand(P)

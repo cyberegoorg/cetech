@@ -1,0 +1,152 @@
+tty(P)                                                   tty(P)
+
+
+
+
+
+NAME
+       tty - return user's terminal name
+
+SYNOPSIS
+       tty
+
+DESCRIPTION
+       The  tty  utility shall write to the standard output the
+       name of the terminal that is open as standard input. The
+       name that is used shall be equivalent to the string that
+       would be returned by the ttyname() function  defined  in
+       the System Interfaces volume of IEEE Std 1003.1-2001.
+
+OPTIONS
+       The  tty  utility  shall conform to the Base Definitions
+       volume of IEEE Std 1003.1-2001,  Section  12.2,  Utility
+       Syntax Guidelines.
+
+OPERANDS
+       None.
+
+STDIN
+       While  no  input  is  read from standard input, standard
+       input shall be examined to determine whether or  not  it
+       is  a terminal, and, if so, to determine the name of the
+       terminal.
+
+INPUT FILES
+       None.
+
+ENVIRONMENT VARIABLES
+       The following environment  variables  shall  affect  the
+       execution of tty:
+
+       LANG   Provide a default value for the internationaliza-
+              tion variables that are unset or null.  (See  the
+              Base  Definitions volume of IEEE Std 1003.1-2001,
+              Section 8.2, Internationalization  Variables  for
+              the  precedence of internationalization variables
+              used to determine  the  values  of  locale  cate-
+              gories.)
+
+       LC_ALL If  set to a non-empty string value, override the
+              values  of  all  the  other  internationalization
+              variables.
+
+       LC_CTYPE
+              Determine  the  locale  for the interpretation of
+              sequences of bytes of  text  data  as  characters
+              (for  example,  single-byte  as opposed to multi-
+              byte characters in arguments).
+
+       LC_MESSAGES
+              Determine the  locale  that  should  be  used  to
+              affect the format and contents of diagnostic mes-
+              sages written to standard error  and  informative
+              messages written to standard output.
+
+       NLSPATH
+              Determine  the  location  of message catalogs for
+              the processing of LC_MESSAGES .
+
+
+ASYNCHRONOUS EVENTS
+       Default.
+
+STDOUT
+       If standard input is a terminal device,  a  pathname  of
+       the  terminal  as  specified  by  the ttyname() function
+       defined   in   the   System   Interfaces    volume    of
+       IEEE Std 1003.1-2001  shall  be written in the following
+       format:
+
+
+              "%s\n", <terminal name>
+
+       Otherwise, a message shall be  written  indicating  that
+       standard  input  is  not connected to a terminal. In the
+       POSIX locale, the tty utility shall use the format:
+
+
+              "not a tty\n"
+
+STDERR
+       The standard error shall be  used  only  for  diagnostic
+       messages.
+
+OUTPUT FILES
+       None.
+
+EXTENDED DESCRIPTION
+       None.
+
+EXIT STATUS
+       The following exit values shall be returned:
+
+        0     Standard input is a terminal.
+
+        1     Standard input is not a terminal.
+
+       >1     An error occurred.
+
+
+CONSEQUENCES OF ERRORS
+       Default.
+
+       The following sections are informative.
+
+APPLICATION USAGE
+       This utility checks the status of the file open as stan-
+       dard input against that of an implementation-defined set
+       of  files. It is possible that no match can be found, or
+       that the match found need not be the same file  as  that
+       which  was  opened for standard input (although they are
+       the same device).
+
+EXAMPLES
+       None.
+
+RATIONALE
+       None.
+
+FUTURE DIRECTIONS
+       None.
+
+SEE ALSO
+       The System Interfaces  volume  of  IEEE Std 1003.1-2001,
+       isatty(), ttyname()
+
+COPYRIGHT
+       Portions  of  this  text are reprinted and reproduced in
+       electronic form from  IEEE  Std  1003.1,  2003  Edition,
+       Standard  for Information Technology -- Portable Operat-
+       ing  System  Interface  (POSIX),  The  Open  Group  Base
+       Specifications  Issue  6, Copyright (C) 2001-2003 by the
+       Institute of Electrical and Electronics  Engineers,  Inc
+       and  The  Open  Group.  In  the event of any discrepancy
+       between this version and the original IEEE and The  Open
+       Group  Standard,  the  original  IEEE and The Open Group
+       Standard is the referee document. The original  Standard
+       can    be    obtained    online    at   http://www.open-
+       group.org/unix/online.html .
+
+
+
+POSIX                         2003                       tty(P)

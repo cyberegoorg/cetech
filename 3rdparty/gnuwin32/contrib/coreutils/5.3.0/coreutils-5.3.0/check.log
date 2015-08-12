@@ -1,0 +1,3311 @@
+Making check in lib
+make[1]: Entering directory `/cygdrive/k/Sysutils/coreutils/5.3.0/coreutils-5.3.0/lib'
+./t-fpending > /dev/null
+
+This application has requested the Runtime to terminate it in an unusual way.
+Please contact the application's support team for more information.
+make[1]: [unit-test] Fout 3 (genegeerd)
+make  check-am
+make[2]: Entering directory `/cygdrive/k/Sysutils/coreutils/5.3.0/coreutils-5.3.0/lib'
+make[2]: Niets te doen voor `check-am'.
+make[2]: Leaving directory `/cygdrive/k/Sysutils/coreutils/5.3.0/coreutils-5.3.0/lib'
+make[1]: Leaving directory `/cygdrive/k/Sysutils/coreutils/5.3.0/coreutils-5.3.0/lib'
+Making check in src
+make[1]: Entering directory `/cygdrive/k/Sysutils/coreutils/5.3.0/coreutils-5.3.0/src'
+rm -rf progs-readme progs-makefile
+echo [.exe chgrp.exe chown.exe chmod.exe cp.exe dd.exe dircolors.exe du.exe ginstall.exe link.exe ln.exe dir.exe vdir.exe ls.exe mkdir.exe mkfifo.exe mknod.exe mv.exe nohup.exe readlink.exe rm.exe rmdir.exe shred.exe stat.exe sync.exe touch.exe unlink.exe cat.exe cksum.exe comm.exe csplit.exe cut.exe expand.exe fmt.exe fold.exe head.exe join.exe md5sum.exe nl.exe od.exe paste.exe pr.exe ptx.exe sha1sum.exe sort.exe split.exe sum.exe tac.exe tail.exe tr.exe tsort.exe unexpand.exe uniq.exe wc.exe basename.exe date.exe dirname.exe echo.exe env.exe expr.exe factor.exe false.exe hostname.exe id.exe kill.exe logname.exe pathchk.exe printenv.exe printf.exe pwd.exe seq.exe sleep.exe tee.exe test.exe true.exe tty.exe whoami.exe yes.exe uname.exe chroot.exe hostid.exe nice.exe pinky.exe users.exe who.exe uptime.exe stty.exe df.exe groups chroot.exe df.exe hostid.exe nice.exe pinky.exe stty.exe su.exe uname.exe uptime.exe users.exe who.exe \
+  | tr -s ' ' '\n' | LC_ALL=C sort -u > progs-makefile && \
+sed -n '/^The programs .* are:/,/^[a-zA-Z]/p' ../../coreutils-5.3.0-src/README \
+  | sed -n '/^   */s///p' | tr -s ' ' '\n' > progs-readme
+diff progs-makefile progs-readme && rm -rf progs-readme progs-makefile
+1,28c1,28
+< [.exe
+< basename.exe
+< cat.exe
+< chgrp.exe
+< chmod.exe
+< chown.exe
+< chroot.exe
+< cksum.exe
+< comm.exe
+< cp.exe
+< csplit.exe
+< cut.exe
+< date.exe
+< dd.exe
+< df.exe
+< dir.exe
+< dircolors.exe
+< dirname.exe
+< du.exe
+< echo.exe
+< env.exe
+< expand.exe
+< expr.exe
+< factor.exe
+< false.exe
+< fmt.exe
+< fold.exe
+< ginstall.exe
+---
+> [
+> basename
+> cat
+> chgrp
+> chmod
+> chown
+> chroot
+> cksum
+> comm
+> cp
+> csplit
+> cut
+> date
+> dd
+> df
+> dir
+> dircolors
+> dirname
+> du
+> echo
+> env
+> expand
+> expr
+> factor
+> false
+> fmt
+> fold
+> ginstall
+30,91c30,90
+< head.exe
+< hostid.exe
+< hostname.exe
+< id.exe
+< join.exe
+< kill.exe
+< link.exe
+< ln.exe
+< logname.exe
+< ls.exe
+< md5sum.exe
+< mkdir.exe
+< mkfifo.exe
+< mknod.exe
+< mv.exe
+< nice.exe
+< nl.exe
+< nohup.exe
+< od.exe
+< paste.exe
+< pathchk.exe
+< pinky.exe
+< pr.exe
+< printenv.exe
+< printf.exe
+< ptx.exe
+< pwd.exe
+< readlink.exe
+< rm.exe
+< rmdir.exe
+< seq.exe
+< sha1sum.exe
+< shred.exe
+< sleep.exe
+< sort.exe
+< split.exe
+< stat.exe
+< stty.exe
+< su.exe
+< sum.exe
+< sync.exe
+< tac.exe
+< tail.exe
+< tee.exe
+< test.exe
+< touch.exe
+< tr.exe
+< true.exe
+< tsort.exe
+< tty.exe
+< uname.exe
+< unexpand.exe
+< uniq.exe
+< unlink.exe
+< uptime.exe
+< users.exe
+< vdir.exe
+< wc.exe
+< who.exe
+< who.exe
+< whoami.exe
+< yes.exe
+---
+> head
+> hostid
+> hostname
+> id
+> join
+> kill
+> link
+> ln
+> logname
+> ls
+> md5sum
+> mkdir
+> mkfifo
+> mknod
+> mv
+> nice
+> nl
+> nohup
+> od
+> paste
+> pathchk
+> pinky
+> pr
+> printenv
+> printf
+> ptx
+> pwd
+> readlink
+> rm
+> rmdir
+> seq
+> sha1sum
+> shred
+> sleep
+> sort
+> split
+> stat
+> stty
+> su
+> sum
+> sync
+> tac
+> tail
+> tee
+> test
+> touch
+> tr
+> true
+> tsort
+> tty
+> uname
+> unexpand
+> uniq
+> unlink
+> uptime
+> users
+> vdir
+> wc
+> who
+> whoami
+> yes
+make[1]: [check-README] Fout 1 (genegeerd)
+cd ../../coreutils-5.3.0-src/src; grep '^# *define  *S_IS' lbracket.c [.rc basename.c cat.c chgrp.rc chgrp.c chown-core.c chgrp-res.rc  chmod.c chown.rc chown.c chown-core.c chown-res.rc  chroot.c cksum.c comm.c cp.rc cp.c copy.c cp-hash.c cp-res.rc  csplit.c cut.c date.c dd.c df.c dir.rc ls.c ls-dir.c dir-res.rc  dircolors.c dirname.c du.c echo.c env.c expand.c expr.c factor.c false.c fmt.c fold.c ginstall.rc install.c copy.c cp-hash.c ginstall-res.rc  head.c hostid.c hostname.c id.c join.c kill.c link.c ln.c logname.c ls.rc ls.c ls-ls.c ls-res.rc  md5sum.rc md5sum.c md5.c md5sum-res.rc  mkdir.c mkfifo.c mknod.c mv.rc mv.c copy.c cp-hash.c remove.c mv-res.rc  nice.c nl.c nohup.c od.c paste.c pathchk.c pinky.c pr.c printenv.c printf.c ptx.c pwd.c readlink.c rm.rc rm.c remove.c rm-res.rc  rmdir.c seq.c setuidgid.c sha1sum.rc md5sum.c sha1sum.c sha1sum-res.rc  shred.c sleep.c sort.c split.c stat.c stty.c su.c sum.c sync.c tac.c tail.c tee.c test.c touch.c tr.c true.c tsort.c tty.c uname.c unexpand.c uniq.c unlink.c uptime.c users.c vdir.rc ls.c ls-vdir.c vdir-res.rc  wc.c who.c whoami.c yes.c && exit 1 || :
+grep: [.rc: No such file or directory
+grep: chgrp.rc: No such file or directory
+grep: chgrp-res.rc: No such file or directory
+grep: chown.rc: No such file or directory
+grep: chown-res.rc: No such file or directory
+grep: cp.rc: No such file or directory
+grep: cp-res.rc: No such file or directory
+grep: dir.rc: No such file or directory
+grep: dir-res.rc: No such file or directory
+grep: ginstall.rc: No such file or directory
+grep: ginstall-res.rc: No such file or directory
+grep: ls.rc: No such file or directory
+grep: ls-res.rc: No such file or directory
+grep: md5sum.rc: No such file or directory
+grep: md5sum-res.rc: No such file or directory
+grep: mv.rc: No such file or directory
+grep: mv-res.rc: No such file or directory
+grep: rm.rc: No such file or directory
+grep: rm-res.rc: No such file or directory
+grep: sha1sum.rc: No such file or directory
+grep: sha1sum-res.rc: No such file or directory
+grep: vdir.rc: No such file or directory
+grep: vdir-res.rc: No such file or directory
+cd ../../coreutils-5.3.0-src/src; grep st_blocks lbracket.c [.rc basename.c cat.c chgrp.rc chgrp.c chown-core.c chgrp-res.rc  chmod.c chown.rc chown.c chown-core.c chown-res.rc  chroot.c cksum.c comm.c cp.rc cp.c copy.c cp-hash.c cp-res.rc  csplit.c cut.c date.c dd.c df.c dir.rc ls.c ls-dir.c dir-res.rc  dircolors.c dirname.c du.c echo.c env.c expand.c expr.c factor.c false.c fmt.c fold.c ginstall.rc install.c copy.c cp-hash.c ginstall-res.rc  head.c hostid.c hostname.c id.c join.c kill.c link.c ln.c logname.c ls.rc ls.c ls-ls.c ls-res.rc  md5sum.rc md5sum.c md5.c md5sum-res.rc  mkdir.c mkfifo.c mknod.c mv.rc mv.c copy.c cp-hash.c remove.c mv-res.rc  nice.c nl.c nohup.c od.c paste.c pathchk.c pinky.c pr.c printenv.c printf.c ptx.c pwd.c readlink.c rm.rc rm.c remove.c rm-res.rc  rmdir.c seq.c setuidgid.c sha1sum.rc md5sum.c sha1sum.c sha1sum-res.rc  shred.c sleep.c sort.c split.c stat.c stty.c su.c sum.c sync.c tac.c tail.c tee.c test.c touch.c tr.c true.c tsort.c tty.c uname.c unexpand.c uniq.c unlink.c uptime.c users.c vdir.rc ls.c ls-vdir.c vdir-res.rc  wc.c who.c whoami.c yes.c && exit 1 || :
+grep: [.rc: No such file or directory
+grep: chgrp.rc: No such file or directory
+grep: chgrp-res.rc: No such file or directory
+grep: chown.rc: No such file or directory
+grep: chown-res.rc: No such file or directory
+grep: cp.rc: No such file or directory
+grep: cp-res.rc: No such file or directory
+grep: dir.rc: No such file or directory
+grep: dir-res.rc: No such file or directory
+grep: ginstall.rc: No such file or directory
+grep: ginstall-res.rc: No such file or directory
+grep: ls.rc: No such file or directory
+grep: ls-res.rc: No such file or directory
+grep: md5sum.rc: No such file or directory
+grep: md5sum-res.rc: No such file or directory
+grep: mv.rc: No such file or directory
+grep: mv-res.rc: No such file or directory
+grep: rm.rc: No such file or directory
+grep: rm-res.rc: No such file or directory
+grep: sha1sum.rc: No such file or directory
+grep: sha1sum-res.rc: No such file or directory
+grep: vdir.rc: No such file or directory
+grep: vdir-res.rc: No such file or directory
+cd ../../coreutils-5.3.0-src/src; grep '^# *define .*defined' lbracket.c [.rc basename.c cat.c chgrp.rc chgrp.c chown-core.c chgrp-res.rc  chmod.c chown.rc chown.c chown-core.c chown-res.rc  chroot.c cksum.c comm.c cp.rc cp.c copy.c cp-hash.c cp-res.rc  csplit.c cut.c date.c dd.c df.c dir.rc ls.c ls-dir.c dir-res.rc  dircolors.c dirname.c du.c echo.c env.c expand.c expr.c factor.c false.c fmt.c fold.c ginstall.rc install.c copy.c cp-hash.c ginstall-res.rc  head.c hostid.c hostname.c id.c join.c kill.c link.c ln.c logname.c ls.rc ls.c ls-ls.c ls-res.rc  md5sum.rc md5sum.c md5.c md5sum-res.rc  mkdir.c mkfifo.c mknod.c mv.rc mv.c copy.c cp-hash.c remove.c mv-res.rc  nice.c nl.c nohup.c od.c paste.c pathchk.c pinky.c pr.c printenv.c printf.c ptx.c pwd.c readlink.c rm.rc rm.c remove.c rm-res.rc  rmdir.c seq.c setuidgid.c sha1sum.rc md5sum.c sha1sum.c sha1sum-res.rc  shred.c sleep.c sort.c split.c stat.c stty.c su.c sum.c sync.c tac.c tail.c tee.c test.c touch.c tr.c true.c tsort.c tty.c uname.c unexpand.c uniq.c unlink.c uptime.c users.c vdir.rc ls.c ls-vdir.c vdir-res.rc  wc.c who.c whoami.c yes.c && exit 1 || :
+grep: [.rc: No such file or directory
+grep: chgrp.rc: No such file or directory
+grep: chgrp-res.rc: No such file or directory
+grep: chown.rc: No such file or directory
+grep: chown-res.rc: No such file or directory
+grep: cp.rc: No such file or directory
+grep: cp-res.rc: No such file or directory
+grep: dir.rc: No such file or directory
+grep: dir-res.rc: No such file or directory
+grep: ginstall.rc: No such file or directory
+grep: ginstall-res.rc: No such file or directory
+grep: ls.rc: No such file or directory
+grep: ls-res.rc: No such file or directory
+grep: md5sum.rc: No such file or directory
+grep: md5sum-res.rc: No such file or directory
+grep: mv.rc: No such file or directory
+grep: mv-res.rc: No such file or directory
+grep: rm.rc: No such file or directory
+grep: rm-res.rc: No such file or directory
+grep: sha1sum.rc: No such file or directory
+grep: sha1sum-res.rc: No such file or directory
+grep: vdir.rc: No such file or directory
+grep: vdir-res.rc: No such file or directory
+rm -f authors-actual authors-dotdot
+for i in `ls [.exe chgrp.exe chown.exe chmod.exe cp.exe dd.exe dircolors.exe du.exe ginstall.exe link.exe ln.exe dir.exe vdir.exe ls.exe mkdir.exe mkfifo.exe mknod.exe mv.exe nohup.exe readlink.exe rm.exe rmdir.exe shred.exe stat.exe sync.exe touch.exe unlink.exe cat.exe cksum.exe comm.exe csplit.exe cut.exe expand.exe fmt.exe fold.exe head.exe join.exe md5sum.exe nl.exe od.exe paste.exe pr.exe ptx.exe sha1sum.exe sort.exe split.exe sum.exe tac.exe tail.exe tr.exe tsort.exe unexpand.exe uniq.exe wc.exe basename.exe date.exe dirname.exe echo.exe env.exe expr.exe factor.exe false.exe hostname.exe id.exe kill.exe logname.exe pathchk.exe printenv.exe printf.exe pwd.exe seq.exe sleep.exe tee.exe test.exe true.exe tty.exe whoami.exe yes.exe uname.exe chroot.exe hostid.exe nice.exe pinky.exe users.exe who.exe uptime.exe stty.exe df.exe groups chroot.exe df.exe hostid.exe nice.exe pinky.exe stty.exe su.exe uname.exe uptime.exe users.exe who.exe | LC_ALL=C sort -u`; do \
+  test "$i" = '[' && continue;			\
+  exe=$i;					\
+  if test "$i" = install; then			\
+    exe=ginstall;				\
+  elif test "$i" = test; then			\
+    exe='[';					\
+  fi;						\
+  ./$exe --version				\
+    |sed -n '/Written by /{ s//'"$i"': /; s/,* and /, /; s/\.$//; p; }'; \
+done > authors-actual
+sed -n '/:/p' ../../coreutils-5.3.0-src/AUTHORS > authors-dotdot
+diff authors-actual authors-dotdot && rm -f authors-actual authors-dotdot
+1,28c1,27
+< [.exe: Kevin Braunsdorf, Matthew Bradburn
+< basename.exe: FIXME unknown
+< cat.exe: Torbjorn Granlund, Richard M. Stallman
+< chgrp.exe: David MacKenzie, Jim Meyering
+< chmod.exe: David MacKenzie, Jim Meyering
+< chown.exe: David MacKenzie, Jim Meyering
+< chroot.exe: Roland McGrath
+< cksum.exe: Q. Frank Xia
+< comm.exe: Richard Stallman, David MacKenzie
+< cp.exe: Torbjorn Granlund, David MacKenzie, Jim Meyering
+< csplit.exe: Stuart Kemp, David MacKenzie
+< cut.exe: David Ihnat, David MacKenzie, Jim Meyering
+< date.exe: David MacKenzie
+< dd.exe: Paul Rubin, David MacKenzie, Stuart Kemp
+< df.exe: Torbjorn Granlund, David MacKenzie, Paul Eggert
+< dir.exe: Richard Stallman, David MacKenzie
+< dircolors.exe: H. Peter Anvin
+< dirname.exe: David MacKenzie, Jim Meyering
+< du.exe: Torbjorn Granlund, David MacKenzie, Paul Eggert, Jim Meyering
+< echo.exe: FIXME unknown
+< env.exe: Richard Mlynarik, David MacKenzie
+< expand.exe: David MacKenzie
+< expr.exe: Mike Parker
+< factor.exe: Paul Rubin
+< false.exe: Jim Meyering
+< fmt.exe: Ross Paterson
+< fold.exe: David MacKenzie
+< ginstall.exe: David MacKenzie
+---
+> basename: FIXME unknown
+> cat: Torbjorn Granlund, Richard M. Stallman
+> chgrp: David MacKenzie, Jim Meyering
+> chmod: David MacKenzie, Jim Meyering
+> chown: David MacKenzie, Jim Meyering
+> chroot: Roland McGrath
+> cksum: Q. Frank Xia
+> comm: Richard Stallman, David MacKenzie
+> cp: Torbjorn Granlund, David MacKenzie, Jim Meyering
+> csplit: Stuart Kemp, David MacKenzie
+> cut: David Ihnat, David MacKenzie, Jim Meyering
+> date: David MacKenzie
+> dd: Paul Rubin, David MacKenzie, Stuart Kemp
+> df: Torbjorn Granlund, David MacKenzie, Paul Eggert
+> dir: Richard Stallman, David MacKenzie
+> dircolors: H. Peter Anvin
+> dirname: David MacKenzie, Jim Meyering
+> du: Torbjorn Granlund, David MacKenzie, Paul Eggert, Jim Meyering
+> echo: FIXME unknown
+> env: Richard Mlynarik, David MacKenzie
+> expand: David MacKenzie
+> expr: Mike Parker
+> factor: Paul Rubin
+> false: Jim Meyering
+> fmt: Ross Paterson
+> fold: David MacKenzie
+> ginstall: David MacKenzie
+30,89c29,89
+< head.exe: David MacKenzie, Jim Meyering
+< hostid.exe: Jim Meyering
+< hostname.exe: Jim Meyering
+< id.exe: Arnold Robbins, David MacKenzie
+< join.exe: Mike Haertel
+< kill.exe: Paul Eggert
+< link.exe: Michael Stone
+< ln.exe: Mike Parker, David MacKenzie
+< logname.exe: FIXME: unknown
+< ls.exe: Richard Stallman, David MacKenzie
+< md5sum.exe: Ulrich Drepper, Scott Miller
+< mkdir.exe: David MacKenzie
+< mkfifo.exe: David MacKenzie
+< mknod.exe: David MacKenzie
+< mv.exe: Mike Parker, David MacKenzie, Jim Meyering
+< nice.exe: David MacKenzie
+< nl.exe: Scott Bartram, David MacKenzie
+< nohup.exe: Jim Meyering
+< od.exe: Jim Meyering
+< paste.exe: David M. Ihnat, David MacKenzie
+< pathchk.exe: Paul Eggert, David MacKenzie, Jim Meyering
+< pinky.exe: Joseph Arceneaux, David MacKenzie, Kaveh Ghazi
+< pr.exe: Pete TerMaat, Roland Huebner
+< printenv.exe: David MacKenzie, Richard Mlynarik
+< printf.exe: David MacKenzie
+< ptx.exe: F. Pinard
+< pwd.exe: Jim Meyering
+< readlink.exe: Dmitry V. Levin
+< rm.exe: Paul Rubin, David MacKenzie, Richard Stallman, Jim Meyering
+< rmdir.exe: David MacKenzie
+< seq.exe: Ulrich Drepper
+< sha1sum.exe: Ulrich Drepper, Scott Miller
+< shred.exe: Colin Plumb
+< sleep.exe: Jim Meyering, Paul Eggert
+< sort.exe: Mike Haertel, Paul Eggert
+< split.exe: Torbjorn Granlund, Richard M. Stallman
+< stat.exe: Michael Meskes
+< stty.exe: David MacKenzie
+< su.exe: David MacKenzie
+< sum.exe: Kayvan Aghaiepour, David MacKenzie
+< sync.exe: Jim Meyering
+< tac.exe: Jay Lepreau, David MacKenzie
+< tail.exe: Paul Rubin, David MacKenzie, Ian Lance Taylor, Jim Meyering
+< tee.exe: Mike Parker, Richard M. Stallman, David MacKenzie
+< touch.exe: Paul Rubin, Arnold Robbins, Jim Kingdon, David MacKenzie, Randy Smith
+< tr.exe: Jim Meyering
+< true.exe: Jim Meyering
+< tsort.exe: Mark Kettenis
+< tty.exe: David MacKenzie
+< uname.exe: David MacKenzie
+< unexpand.exe: David MacKenzie
+< uniq.exe: Richard Stallman, David MacKenzie
+< unlink.exe: Michael Stone
+< uptime.exe: Joseph Arceneaux, David MacKenzie, Kaveh Ghazi
+< users.exe: Joseph Arceneaux, David MacKenzie
+< vdir.exe: Richard Stallman, David MacKenzie
+< wc.exe: Paul Rubin, David MacKenzie
+< who.exe: Joseph Arceneaux, David MacKenzie, Michael Stone
+< whoami.exe: Richard Mlynarik
+< yes.exe: David MacKenzie
+---
+> head: David MacKenzie, Jim Meyering
+> hostid: Jim Meyering
+> hostname: Jim Meyering
+> id: Arnold Robbins, David MacKenzie
+> join: Mike Haertel
+> kill: Paul Eggert
+> link: Michael Stone
+> ln: Mike Parker, David MacKenzie
+> logname: FIXME: unknown
+> ls: Richard Stallman, David MacKenzie
+> md5sum: Ulrich Drepper, Scott Miller
+> mkdir: David MacKenzie
+> mkfifo: David MacKenzie
+> mknod: David MacKenzie
+> mv: Mike Parker, David MacKenzie, Jim Meyering
+> nice: David MacKenzie
+> nl: Scott Bartram, David MacKenzie
+> nohup: Jim Meyering
+> od: Jim Meyering
+> paste: David M. Ihnat, David MacKenzie
+> pathchk: Paul Eggert, David MacKenzie, Jim Meyering
+> pinky: Joseph Arceneaux, David MacKenzie, Kaveh Ghazi
+> pr: Pete TerMaat, Roland Huebner
+> printenv: David MacKenzie, Richard Mlynarik
+> printf: David MacKenzie
+> ptx: F. Pinard
+> pwd: Jim Meyering
+> readlink: Dmitry V. Levin
+> rm: Paul Rubin, David MacKenzie, Richard Stallman, Jim Meyering
+> rmdir: David MacKenzie
+> seq: Ulrich Drepper
+> sha1sum: Ulrich Drepper, Scott Miller
+> shred: Colin Plumb
+> sleep: Jim Meyering, Paul Eggert
+> sort: Mike Haertel, Paul Eggert
+> split: Torbjorn Granlund, Richard M. Stallman
+> stat: Michael Meskes
+> stty: David MacKenzie
+> su: David MacKenzie
+> sum: Kayvan Aghaiepour, David MacKenzie
+> sync: Jim Meyering
+> tac: Jay Lepreau, David MacKenzie
+> tail: Paul Rubin, David MacKenzie, Ian Lance Taylor, Jim Meyering
+> tee: Mike Parker, Richard M. Stallman, David MacKenzie
+> test: Kevin Braunsdorf, Matthew Bradburn
+> touch: Paul Rubin, Arnold Robbins, Jim Kingdon, David MacKenzie, Randy Smith
+> tr: Jim Meyering
+> true: Jim Meyering
+> tsort: Mark Kettenis
+> tty: David MacKenzie
+> uname: David MacKenzie
+> unexpand: David MacKenzie
+> uniq: Richard Stallman, David MacKenzie
+> unlink: Michael Stone
+> uptime: Joseph Arceneaux, David MacKenzie, Kaveh Ghazi
+> users: Joseph Arceneaux, David MacKenzie
+> vdir: Richard Stallman, David MacKenzie
+> wc: Paul Rubin, David MacKenzie
+> who: Joseph Arceneaux, David MacKenzie, Michael Stone
+> whoami: Richard Mlynarik
+> yes: David MacKenzie
+make[1]: [check-AUTHORS] Fout 1 (genegeerd)
+make  check-am
+make[2]: Entering directory `/cygdrive/k/Sysutils/coreutils/5.3.0/coreutils-5.3.0/src'
+make[2]: Niets te doen voor `check-am'.
+make[2]: Leaving directory `/cygdrive/k/Sysutils/coreutils/5.3.0/coreutils-5.3.0/src'
+make[1]: Leaving directory `/cygdrive/k/Sysutils/coreutils/5.3.0/coreutils-5.3.0/src'
+Making check in doc
+make[1]: Entering directory `/cygdrive/k/Sysutils/coreutils/5.3.0/coreutils-5.3.0/doc'
+fail=0; \
+grep timezone ../../coreutils-5.3.0-src/doc/*.texi && fail=1; \
+grep -E '(^|[^A-Za-z0-9_])IO([^A-Za-z0-9_]|$)' ../../coreutils-5.3.0-src/doc/*.texi && fail=1; \
+grep non-zero ../../coreutils-5.3.0-src/doc/*.texi && fail=1; \
+grep '@url{' ../../coreutils-5.3.0-src/doc/*.texi && fail=1; \
+grep -E '(^|[^A-Za-z0-9_])NUL([^A-Za-z0-9_]|$)' ../../coreutils-5.3.0-src/doc/*.texi && fail=1; \
+grep '\$@"' ../../coreutils-5.3.0-src/doc/*.texi && fail=1; \
+grep -n '[^[:punct:]]@footnote' ../../coreutils-5.3.0-src/doc/*.texi && fail=1; \
+grep -n filename ../../coreutils-5.3.0-src/doc/*.texi|grep -vE 'setfilename|{filename}' \
+  && fail=1; \
+perl -e 1 2> /dev/null && { perl -ne \
+  '/\bPOSIX\b/ && !/\@acronym{POSIX}/ && !/^\* / || /{posix}/ and print,exit 1' \
+  ../../coreutils-5.3.0-src/doc/*.texi 2> /dev/null || fail=1; }; \
+grep -iwE 'builtins?' ../../coreutils-5.3.0-src/doc/*.texi && fail=1; \
+exit $fail
+make[1]: Leaving directory `/cygdrive/k/Sysutils/coreutils/5.3.0/coreutils-5.3.0/doc'
+Making check in man
+make[1]: Entering directory `/cygdrive/k/Sysutils/coreutils/5.3.0/coreutils-5.3.0/man'
+make  check-local
+make[2]: Entering directory `/cygdrive/k/Sysutils/coreutils/5.3.0/coreutils-5.3.0/man'
+PATH=../src:$PATH; export PATH;		\
+t=ls-files.$$;						\
+(cd ../../coreutils-5.3.0-src/man && ls -1 *.x) | sed 's/\.x$//' | LC_ALL=C sort > $t;\
+echo basename.1 cat.1 chgrp.1 chmod.1 chown.1 chroot.1 cksum.1 comm.1 cp.1 csplit.1 cut.1 date.1 dd.1 df.1 dir.1 dircolors.1 dirname.1 du.1 echo.1 env.1 expand.1 expr.1 factor.1 false.1 fmt.1 fold.1 groups.1 head.1 hostid.1 hostname.1 id.1 install.1 join.1 kill.1 link.1 ln.1 logname.1 ls.1 md5sum.1 mkdir.1 mkfifo.1 mknod.1 mv.1 nice.1 nl.1 nohup.1 od.1 paste.1 pathchk.1 pinky.1 pr.1 printenv.1 printf.1 ptx.1 pwd.1 readlink.1 rm.1 rmdir.1 seq.1 sha1sum.1 shred.1 sleep.1 sort.1 split.1 stat.1 stty.1 su.1 sum.1 sync.1 tac.1 tail.1 tee.1 test.1 touch.1 tr.1 true.1 tsort.1 tty.1 uname.1 unexpand.1 uniq.1 unlink.1 uptime.1 users.1 vdir.1 wc.1 who.1 whoami.1 yes.1 | tr -s ' ' '\n' | sed 's/\.1$//'	\
+  | LC_ALL=C sort | diff - $t || { rm $t; exit 1; };		\
+rm $t
+1,89c1,89
+< basename
+< cat
+< chgrp
+< chmod
+< chown
+< chroot
+< cksum
+< comm
+< cp
+< csplit
+< cut
+< date
+< dd
+< df
+< dir
+< dircolors
+< dirname
+< du
+< echo
+< env
+< expand
+< expr
+< factor
+< false
+< fmt
+< fold
+< groups
+< head
+< hostid
+< hostname
+< id
+< install
+< join
+< kill
+< link
+< ln
+< logname
+< ls
+< md5sum
+< mkdir
+< mkfifo
+< mknod
+< mv
+< nice
+< nl
+< nohup
+< od
+< paste
+< pathchk
+< pinky
+< pr
+< printenv
+< printf
+< ptx
+< pwd
+< readlink
+< rm
+< rmdir
+< seq
+< sha1sum
+< shred
+< sleep
+< sort
+< split
+< stat
+< stty
+< su
+< sum
+< sync
+< tac
+< tail
+< tee
+< test
+< touch
+< tr
+< true
+< tsort
+< tty
+< uname
+< unexpand
+< uniq
+< unlink
+< uptime
+< users
+< vdir
+< wc
+< who
+< whoami
+< yes
+---
+> basename
+> cat
+> chgrp
+> chmod
+> chown
+> chroot
+> cksum
+> comm
+> cp
+> csplit
+> cut
+> date
+> dd
+> df
+> dir
+> dircolors
+> dirname
+> du
+> echo
+> env
+> expand
+> expr
+> factor
+> false
+> fmt
+> fold
+> groups
+> head
+> hostid
+> hostname
+> id
+> install
+> join
+> kill
+> link
+> ln
+> logname
+> ls
+> md5sum
+> mkdir
+> mkfifo
+> mknod
+> mv
+> nice
+> nl
+> nohup
+> od
+> paste
+> pathchk
+> pinky
+> pr
+> printenv
+> printf
+> ptx
+> pwd
+> readlink
+> rm
+> rmdir
+> seq
+> sha1sum
+> shred
+> sleep
+> sort
+> split
+> stat
+> stty
+> su
+> sum
+> sync
+> tac
+> tail
+> tee
+> test
+> touch
+> tr
+> true
+> tsort
+> tty
+> uname
+> unexpand
+> uniq
+> unlink
+> uptime
+> users
+> vdir
+> wc
+> who
+> whoami
+> yes
+make[2]: [check-x-vs-1] Fout 1 (genegeerd)
+status=0;					\
+for p in dummy `(cd ../src && MAKEFLAGS= make -s all_programs.list) | grep -v '\['`; do		\
+  test $p = dummy && continue;			\
+  test $p = ginstall && p=install || : ;	\
+  test -f ../../coreutils-5.3.0-src/man/$p.x			\
+    || { echo missing $p.x 1>&2; status=1; };	\
+done;						\
+exit $status
+missing basename.exe.x
+missing cat.exe.x
+missing chgrp.exe.x
+missing chmod.exe.x
+missing chown.exe.x
+missing chroot.exe.x
+missing chroot.exe.x
+missing cksum.exe.x
+missing comm.exe.x
+missing cp.exe.x
+missing csplit.exe.x
+missing cut.exe.x
+missing date.exe.x
+missing dd.exe.x
+missing df.exe.x
+missing df.exe.x
+missing dir.exe.x
+missing dircolors.exe.x
+missing dirname.exe.x
+missing du.exe.x
+missing echo.exe.x
+missing env.exe.x
+missing expand.exe.x
+missing expr.exe.x
+missing factor.exe.x
+missing false.exe.x
+missing fmt.exe.x
+missing fold.exe.x
+missing ginstall.exe.x
+missing head.exe.x
+missing hostid.exe.x
+missing hostid.exe.x
+missing hostname.exe.x
+missing id.exe.x
+missing join.exe.x
+missing kill.exe.x
+missing link.exe.x
+missing ln.exe.x
+missing logname.exe.x
+missing ls.exe.x
+missing md5sum.exe.x
+missing mkdir.exe.x
+missing mkfifo.exe.x
+missing mknod.exe.x
+missing mv.exe.x
+missing nice.exe.x
+missing nice.exe.x
+missing nl.exe.x
+missing nohup.exe.x
+missing od.exe.x
+missing paste.exe.x
+missing pathchk.exe.x
+missing pinky.exe.x
+missing pinky.exe.x
+missing pr.exe.x
+missing printenv.exe.x
+missing printf.exe.x
+missing ptx.exe.x
+missing pwd.exe.x
+missing readlink.exe.x
+missing rm.exe.x
+missing rmdir.exe.x
+missing seq.exe.x
+missing sha1sum.exe.x
+missing shred.exe.x
+missing sleep.exe.x
+missing sort.exe.x
+missing split.exe.x
+missing stat.exe.x
+missing stty.exe.x
+missing stty.exe.x
+missing su.exe.x
+missing sum.exe.x
+missing sync.exe.x
+missing tac.exe.x
+missing tail.exe.x
+missing tee.exe.x
+missing test.exe.x
+missing touch.exe.x
+missing tr.exe.x
+missing true.exe.x
+missing tsort.exe.x
+missing tty.exe.x
+missing uname.exe.x
+missing uname.exe.x
+missing unexpand.exe.x
+missing uniq.exe.x
+missing unlink.exe.x
+missing uptime.exe.x
+missing uptime.exe.x
+missing users.exe.x
+missing users.exe.x
+missing vdir.exe.x
+missing wc.exe.x
+missing who.exe.x
+missing who.exe.x
+missing whoami.exe.x
+missing yes.exe.x
+make[2]: [check-programs-vs-x] Fout 1 (genegeerd)
+make[2]: Leaving directory `/cygdrive/k/Sysutils/coreutils/5.3.0/coreutils-5.3.0/man'
+make[1]: Leaving directory `/cygdrive/k/Sysutils/coreutils/5.3.0/coreutils-5.3.0/man'
+Making check in po
+make[1]: Entering directory `/cygdrive/k/Sysutils/coreutils/5.3.0/coreutils-5.3.0/po'
+make[1]: Niets te doen voor `check'.
+make[1]: Leaving directory `/cygdrive/k/Sysutils/coreutils/5.3.0/coreutils-5.3.0/po'
+Making check in tests
+make[1]: Entering directory `/cygdrive/k/Sysutils/coreutils/5.3.0/coreutils-5.3.0/tests'
+../src/printenv POSIXLY_CORRECT >/dev/null \
+  && sed s/%%/POSIXLY_CORRECT/ ../../coreutils-5.3.0-src/tests/.env-warn || :
+test "${CDPATH+set}" = set \
+  && sed s/%%/CDPATH/ ../../coreutils-5.3.0-src/tests/.env-warn || :
+***********************************************************
+NOTICE: Some tests may be run only as root.
+  Do `make check-root' as `root' to run these tests.
+***********************************************************
+Making check in basename
+make[2]: Entering directory `/cygdrive/k/Sysutils/coreutils/5.3.0/coreutils-5.3.0/tests/basename'
+make  check-TESTS
+make[3]: Entering directory `/cygdrive/k/Sysutils/coreutils/5.3.0/coreutils-5.3.0/tests/basename'
+-: test fail-1: stderr mismatch, comparing fail-1.E (actual) and fail-1.1 (expected)
+*** fail-1.E	Wed Apr 20 21:24:15 2005
+--- fail-1.1	Wed Apr 20 21:24:15 2005
+***************
+*** 1,2 ****
+! k:\Sysutils\coreutils\5.3.0\coreutils-5.3.0\src\basename.exe: missing operand
+! Try `k:\Sysutils\coreutils\5.3.0\coreutils-5.3.0\src\basename.exe --help' for more information.
+--- 1,2 ----
+! basename: missing operand
+! Try `basename --help' for more information.
+-: test fail-2: stderr mismatch, comparing fail-2.E (actual) and fail-2.1 (expected)
+*** fail-2.E	Wed Apr 20 21:24:15 2005
+--- fail-2.1	Wed Apr 20 21:24:15 2005
+***************
+*** 1,2 ****
+! k:\Sysutils\coreutils\5.3.0\coreutils-5.3.0\src\basename.exe: extra operand `c'
+! Try `k:\Sysutils\coreutils\5.3.0\coreutils-5.3.0\src\basename.exe --help' for more information.
+--- 1,2 ----
+! basename: extra operand `c'
+! Try `basename --help' for more information.
+-: test a: stdout mismatch, comparing a.O (actual) and a.1 (expected)
+-: test b: stdout mismatch, comparing b.O (actual) and b.1 (expected)
+-: test c: stdout mismatch, comparing c.O (actual) and c.1 (expected)
+-: test d: stdout mismatch, comparing d.O (actual) and d.1 (expected)
+-: test e: stdout mismatch, comparing e.O (actual) and e.1 (expected)
+-: test f: stdout mismatch, comparing f.O (actual) and f.1 (expected)
+-: test g: stdout mismatch, comparing g.O (actual) and g.1 (expected)
+-: test h: stdout mismatch, comparing h.O (actual) and h.1 (expected)
+-: test i: stdout mismatch, comparing i.O (actual) and i.1 (expected)
+-: test 1: stdout mismatch, comparing 1.O (actual) and 1.1 (expected)
+-: test 2: stdout mismatch, comparing 2.O (actual) and 2.1 (expected)
+-: test 3: stdout mismatch, comparing 3.O (actual) and 3.1 (expected)
+-: test 4: stdout mismatch, comparing 4.O (actual) and 4.1 (expected)
+-: test 5: stdout mismatch, comparing 5.O (actual) and 5.1 (expected)
+FAIL: basic
+======================================
+1 of 1 tests failed
+Please report to bug-coreutils@gnu.org
+======================================
+make[3]: [check-TESTS] Fout 1 (genegeerd)
+make[3]: Leaving directory `/cygdrive/k/Sysutils/coreutils/5.3.0/coreutils-5.3.0/tests/basename'
+make[2]: Leaving directory `/cygdrive/k/Sysutils/coreutils/5.3.0/coreutils-5.3.0/tests/basename'
+Making check in chgrp
+make[2]: Entering directory `/cygdrive/k/Sysutils/coreutils/5.3.0/coreutils-5.3.0/tests/chgrp'
+make  check-TESTS
+make[3]: Entering directory `/cygdrive/k/Sysutils/coreutils/5.3.0/coreutils-5.3.0/tests/chgrp'
+../../../coreutils-5.3.0-src/tests/chgrp/no-x: this test requires that you be a member of more than one group,
+but running `id -nG' either failed or found just one.  If you really
+are a member of at least two group, then rerun this test with FETISH_GROUPS
+set in your environment to the space-separated list of names.  E.g.,
+
+  env FETISH_GROUPS='users cdrom' make check
+
+SKIP: no-x
+../../../coreutils-5.3.0-src/tests/chgrp/posix-H: this test requires that you be a member of more than one group,
+but running `id -nG' either failed or found just one.  If you really
+are a member of at least two group, then rerun this test with FETISH_GROUPS
+set in your environment to the space-separated list of names.  E.g.,
+
+  env FETISH_GROUPS='users cdrom' make check
+
+SKIP: posix-H
+../../../coreutils-5.3.0-src/tests/chgrp/basic: this test requires that you be a member of more than one group,
+but running `id -nG' either failed or found just one.  If you really
+are a member of at least two group, then rerun this test with FETISH_GROUPS
+set in your environment to the space-separated list of names.  E.g.,
+
+  env FETISH_GROUPS='users cdrom' make check
+
+SKIP: basic
+../../../coreutils-5.3.0-src/tests/chgrp/deref: this test requires that you be a member of more than one group,
+but running `id -nG' either failed or found just one.  If you really
+are a member of at least two group, then rerun this test with FETISH_GROUPS
+set in your environment to the space-separated list of names.  E.g.,
+
+  env FETISH_GROUPS='users cdrom' make check
+
+SKIP: deref
+../../../coreutils-5.3.0-src/tests/chgrp/recurse: this test requires that you be a member of more than one group,
+but running `id -nG' either failed or found just one.  If you really
+are a member of at least two group, then rerun this test with FETISH_GROUPS
+set in your environment to the space-separated list of names.  E.g.,
+
+  env FETISH_GROUPS='users cdrom' make check
+
+SKIP: recurse
+======================
+All 0 tests passed
+(5 tests were not run)
+======================
+make[3]: Leaving directory `/cygdrive/k/Sysutils/coreutils/5.3.0/coreutils-5.3.0/tests/chgrp'
+make[2]: Leaving directory `/cygdrive/k/Sysutils/coreutils/5.3.0/coreutils-5.3.0/tests/chgrp'
+Making check in chmod
+make[2]: Entering directory `/cygdrive/k/Sysutils/coreutils/5.3.0/coreutils-5.3.0/tests/chmod'
+make  check-TESTS
+make[3]: Entering directory `/cygdrive/k/Sysutils/coreutils/5.3.0/coreutils-5.3.0/tests/chmod'
+../../../coreutils-5.3.0-src/tests/chmod/no-x: The specified NON_ROOT_USERNAME (nobody)
+../../../coreutils-5.3.0-src/tests/chmod/no-x: is invalid because its UID is 0.
+FAIL: no-x
+FAIL: equals
+-r--r--r--  1 KZLG 0 0 2005-04-20 21:24 f
+FAIL: equal-x
+../../../coreutils-5.3.0-src/tests/chmod/c-option: Since it looks like you're running this test in a directory with
+the setgid bit set, we're skipping this test.
+SKIP: c-option
+../../../coreutils-5.3.0-src/tests/chmod/setgid: Since it looks like you're running this test in a directory with
+the setgid bit set, we're skipping this test.
+SKIP: setgid
+PASS: usage
+======================================
+3 of 4 tests failed
+(2 tests were not run)
+Please report to bug-coreutils@gnu.org
+======================================
+make[3]: [check-TESTS] Fout 1 (genegeerd)
+make[3]: Leaving directory `/cygdrive/k/Sysutils/coreutils/5.3.0/coreutils-5.3.0/tests/chmod'
+make[2]: Leaving directory `/cygdrive/k/Sysutils/coreutils/5.3.0/coreutils-5.3.0/tests/chmod'
+Making check in chown
+make[2]: Entering directory `/cygdrive/k/Sysutils/coreutils/5.3.0/coreutils-5.3.0/tests/chown'
+make  check-TESTS
+make[3]: Entering directory `/cygdrive/k/Sysutils/coreutils/5.3.0/coreutils-5.3.0/tests/chown'
+../../../coreutils-5.3.0-src/tests/chown/basic: The specified NON_ROOT_USERNAME (nobody)
+../../../coreutils-5.3.0-src/tests/chown/basic: is invalid because its UID is 0.
+FAIL: basic
+k:\Sysutils\coreutils\5.3.0\coreutils-5.3.0\src\ls.exe: dangle: No such file or directory
+out exp verschillen: byte 1, regel 1
+1,2c1
+< k:\Sysutils\coreutils\5.3.0\coreutils-5.3.0\src\chown.exe
+< Try `k:\Sysutils\coreutils\5.3.0\coreutils-5.3.0\src\chown.exe --help' for more information.
+---
+> chown: changing ownership of `dangle'
+FAIL: deref
+k:\Sysutils\coreutils\5.3.0\coreutils-5.3.0\src\id.exe: cannot find name for group ID 0
+../../../coreutils-5.3.0-src/tests/chown/separator: failure in testing framework
+FAIL: separator
+======================================
+3 of 3 tests failed
+Please report to bug-coreutils@gnu.org
+======================================
+make[3]: [check-TESTS] Fout 1 (genegeerd)
+make[3]: Leaving directory `/cygdrive/k/Sysutils/coreutils/5.3.0/coreutils-5.3.0/tests/chown'
+make[2]: Leaving directory `/cygdrive/k/Sysutils/coreutils/5.3.0/coreutils-5.3.0/tests/chown'
+Making check in cp
+make[2]: Entering directory `/cygdrive/k/Sysutils/coreutils/5.3.0/coreutils-5.3.0/tests/cp'
+make  check-TESTS
+make[3]: Entering directory `/cygdrive/k/Sysutils/coreutils/5.3.0/coreutils-5.3.0/tests/cp'
+PASS: preserve-2
+k:\Sysutils\coreutils\5.3.0\coreutils-5.3.0\src\ls.exe: bar: No such file or directory
+FAIL: r-vs-symlink
+k:\Sysutils\coreutils\5.3.0\coreutils-5.3.0\src\cp.exe: cannot stat `b': No such file or directory
+k:\Sysutils\coreutils\5.3.0\coreutils-5.3.0\src\ls.exe: c/b: No such file or directory
+k:\Sysutils\coreutils\5.3.0\coreutils-5.3.0\src\ls.exe: c/b: No such file or directory
+FAIL: link-preserve
+PASS: backup-1
+FAIL: no-deref-link1
+FAIL: no-deref-link2
+FAIL: no-deref-link3
+out2 exp differ: char 1, line 1
+FAIL: backup-is-src
+*** expected-3044	Wed Apr 20 21:25:17 2005
+--- actual-3044	Wed Apr 20 21:25:17 2005
+***************
+*** 1,83 ****
+! 1 [cp: `foo' and `symlink' are the same file] (foo symlink -> foo)
+! 1 -d [cp: `foo' and `symlink' are the same file] (foo symlink -> foo)
+! 1 -f [cp: `foo' and `symlink' are the same file] (foo symlink -> foo)
+! 1 -df [cp: `foo' and `symlink' are the same file] (foo symlink -> foo)
+! 0 --rem (foo symlink)
+! 0 -b (foo symlink symlink.~1~ -> foo)
+! 0 -bd (foo symlink symlink.~1~ -> foo)
+! 0 -bf (foo symlink symlink.~1~ -> foo)
+! 0 -bdf (foo symlink symlink.~1~ -> foo)
+! 0 -l (foo symlink -> foo)
+! 0 -dl (foo symlink -> foo)
+! 0 -fl (foo symlink -> foo)
+! 0 -dfl (foo symlink)
+! 0 -bl (foo symlink -> foo)
+! 0 -bdl (foo symlink symlink.~1~ -> foo)
+! 0 -bfl (foo symlink -> foo)
+! 0 -bdfl (foo symlink symlink.~1~ -> foo)
+  
+! 1 [cp: `symlink' and `foo' are the same file] (foo symlink -> foo)
+! 1 -d [cp: `symlink' and `foo' are the same file] (foo symlink -> foo)
+! 1 -f [cp: `symlink' and `foo' are the same file] (foo symlink -> foo)
+! 1 -df [cp: `symlink' and `foo' are the same file] (foo symlink -> foo)
+! 1 --rem [cp: `symlink' and `foo' are the same file] (foo symlink -> foo)
+! 1 -b [cp: `symlink' and `foo' are the same file] (foo symlink -> foo)
+! 0 -bd (foo -> foo foo.~1~ symlink -> foo) symlink-loop symlink-loop
+! 1 -bf [cp: `symlink' and `foo' are the same file] (foo symlink -> foo)
+! 0 -bdf (foo -> foo foo.~1~ symlink -> foo) symlink-loop symlink-loop
+! 0 -l (foo symlink -> foo)
+! 0 -dl (foo symlink -> foo)
+! 0 -fl (foo symlink -> foo)
+! 0 -bl (foo symlink -> foo)
+! 0 -bfl (foo symlink -> foo)
+  
+! 1 [cp: `foo' and `foo' are the same file] (foo)
+! 1 -d [cp: `foo' and `foo' are the same file] (foo)
+! 1 -f [cp: `foo' and `foo' are the same file] (foo)
+! 1 -df [cp: `foo' and `foo' are the same file] (foo)
+! 1 --rem [cp: `foo' and `foo' are the same file] (foo)
+! 1 -b [cp: `foo' and `foo' are the same file] (foo)
+! 1 -bd [cp: `foo' and `foo' are the same file] (foo)
+! 0 -bf (foo foo.~1~)
+! 0 -bdf (foo foo.~1~)
+! 0 -l (foo)
+! 0 -dl (foo)
+! 0 -fl (foo)
+! 0 -dfl (foo)
+! 0 -bl (foo)
+! 0 -bdl (foo)
+! 0 -bfl (foo foo.~1~)
+! 0 -bdfl (foo foo.~1~)
+  
+! 1 [cp: `sl1' and `sl2' are the same file] (foo sl1 -> foo sl2 -> foo)
+! 0 -d (foo sl1 -> foo sl2 -> foo)
+! 1 -f [cp: `sl1' and `sl2' are the same file] (foo sl1 -> foo sl2 -> foo)
+! 0 -df (foo sl1 -> foo sl2 -> foo)
+! 0 --rem (foo sl1 -> foo sl2)
+! 0 -b (foo sl1 -> foo sl2 sl2.~1~ -> foo)
+! 0 -bd (foo sl1 -> foo sl2 -> foo sl2.~1~ -> foo)
+! 0 -bf (foo sl1 -> foo sl2 sl2.~1~ -> foo)
+! 0 -bdf (foo sl1 -> foo sl2 -> foo sl2.~1~ -> foo)
+! 0 -l (foo sl1 -> foo sl2 -> foo)
+! 0 -fl (foo sl1 -> foo sl2 -> foo)
+! 0 -bl (foo sl1 -> foo sl2 -> foo)
+! 0 -bfl (foo sl1 -> foo sl2 -> foo)
+  
+! 1 [cp: `foo' and `hardlink' are the same file] (foo hardlink)
+! 1 -d [cp: `foo' and `hardlink' are the same file] (foo hardlink)
+! 1 -f [cp: `foo' and `hardlink' are the same file] (foo hardlink)
+! 1 -df [cp: `foo' and `hardlink' are the same file] (foo hardlink)
+! 0 --rem (foo hardlink)
+! 0 -b (foo hardlink hardlink.~1~)
+! 0 -bd (foo hardlink hardlink.~1~)
+! 0 -bf (foo hardlink hardlink.~1~)
+! 0 -bdf (foo hardlink hardlink.~1~)
+! 0 -l (foo hardlink)
+! 0 -dl (foo hardlink)
+! 0 -fl (foo hardlink)
+! 0 -dfl (foo hardlink)
+! 0 -bl (foo hardlink)
+! 0 -bdl (foo hardlink)
+! 0 -bfl (foo hardlink)
+! 0 -bdfl (foo hardlink)
+  
+--- 1,84 ----
+! 0 (foo symlink -> K:/Sysutils/coreutils/5.3.0/coreutils-5.3.0/tests/cp/same-file.tmp/3044/dir/foo)
+! 0 -d (foo symlink -> K:/Sysutils/coreutils/5.3.0/coreutils-5.3.0/tests/cp/same-file.tmp/3044/dir/foo)
+! 0 -f (foo symlink -> K:/Sysutils/coreutils/5.3.0/coreutils-5.3.0/tests/cp/same-file.tmp/3044/dir/foo)
+! 0 -df (foo symlink -> K:/Sysutils/coreutils/5.3.0/coreutils-5.3.0/tests/cp/same-file.tmp/3044/dir/foo)
+! 0 --rem (foo symlink -> K:/Sysutils/coreutils/5.3.0/coreutils-5.3.0/tests/cp/same-file.tmp/3044/dir/foo)
+! 0 -b (foo symlink -> K:/Sysutils/coreutils/5.3.0/coreutils-5.3.0/tests/cp/same-file.tmp/3044/dir/foo)
+! 0 -bd (foo symlink -> K:/Sysutils/coreutils/5.3.0/coreutils-5.3.0/tests/cp/same-file.tmp/3044/dir/foo)
+! 0 -bf (foo symlink -> K:/Sysutils/coreutils/5.3.0/coreutils-5.3.0/tests/cp/same-file.tmp/3044/dir/foo)
+! 0 -bdf (foo symlink -> K:/Sysutils/coreutils/5.3.0/coreutils-5.3.0/tests/cp/same-file.tmp/3044/dir/foo)
+! 0 -l (foo symlink -> K:/Sysutils/coreutils/5.3.0/coreutils-5.3.0/tests/cp/same-file.tmp/3044/dir/foo)
+! 0 -dl (foo symlink -> K:/Sysutils/coreutils/5.3.0/coreutils-5.3.0/tests/cp/same-file.tmp/3044/dir/foo)
+! 0 -fl (foo symlink -> K:/Sysutils/coreutils/5.3.0/coreutils-5.3.0/tests/cp/same-file.tmp/3044/dir/foo)
+! 0 -dfl (foo symlink -> K:/Sysutils/coreutils/5.3.0/coreutils-5.3.0/tests/cp/same-file.tmp/3044/dir/foo)
+! 0 -bl (foo symlink -> K:/Sysutils/coreutils/5.3.0/coreutils-5.3.0/tests/cp/same-file.tmp/3044/dir/foo)
+! 0 -bdl (foo symlink -> K:/Sysutils/coreutils/5.3.0/coreutils-5.3.0/tests/cp/same-file.tmp/3044/dir/foo)
+! 0 -bfl (foo symlink -> K:/Sysutils/coreutils/5.3.0/coreutils-5.3.0/tests/cp/same-file.tmp/3044/dir/foo)
+! 0 -bdfl (foo symlink -> K:/Sysutils/coreutils/5.3.0/coreutils-5.3.0/tests/cp/same-file.tmp/3044/dir/foo)
+  
+! 1 [cp:\Sysutils\coreutils\5.3.0\coreutils-5.3.0\src\cp.exe: cannot stat `symlink': No such file or directory] (foo -> K:/Sysutils/coreutils/5.3.0/coreutils-5.3.0/tests/cp/same-file.tmp/3044/dir/foo) symlink-loop
+! 1 -d [cp:\Sysutils\coreutils\5.3.0\coreutils-5.3.0\src\cp.exe: cannot stat `symlink': No such file or directory] (foo -> K:/Sysutils/coreutils/5.3.0/coreutils-5.3.0/tests/cp/same-file.tmp/3044/dir/foo) symlink-loop
+! 1 -f [cp:\Sysutils\coreutils\5.3.0\coreutils-5.3.0\src\cp.exe: cannot stat `symlink': No such file or directory] (foo -> K:/Sysutils/coreutils/5.3.0/coreutils-5.3.0/tests/cp/same-file.tmp/3044/dir/foo) symlink-loop
+! 1 -df [cp:\Sysutils\coreutils\5.3.0\coreutils-5.3.0\src\cp.exe: cannot stat `symlink': No such file or directory] (foo -> K:/Sysutils/coreutils/5.3.0/coreutils-5.3.0/tests/cp/same-file.tmp/3044/dir/foo) symlink-loop
+! 1 --rem [cp:\Sysutils\coreutils\5.3.0\coreutils-5.3.0\src\cp.exe: cannot stat `symlink': No such file or directory] (foo -> K:/Sysutils/coreutils/5.3.0/coreutils-5.3.0/tests/cp/same-file.tmp/3044/dir/foo) symlink-loop
+! 1 -b [cp:\Sysutils\coreutils\5.3.0\coreutils-5.3.0\src\cp.exe: cannot stat `symlink': No such file or directory] (foo -> K:/Sysutils/coreutils/5.3.0/coreutils-5.3.0/tests/cp/same-file.tmp/3044/dir/foo) symlink-loop
+! 1 -bd [cp:\Sysutils\coreutils\5.3.0\coreutils-5.3.0\src\cp.exe: cannot stat `symlink': No such file or directory] (foo -> K:/Sysutils/coreutils/5.3.0/coreutils-5.3.0/tests/cp/same-file.tmp/3044/dir/foo) symlink-loop
+! 1 -bf [cp:\Sysutils\coreutils\5.3.0\coreutils-5.3.0\src\cp.exe: cannot stat `symlink': No such file or directory] (foo -> K:/Sysutils/coreutils/5.3.0/coreutils-5.3.0/tests/cp/same-file.tmp/3044/dir/foo) symlink-loop
+! 1 -bdf [cp:\Sysutils\coreutils\5.3.0\coreutils-5.3.0\src\cp.exe: cannot stat `symlink': No such file or directory] (foo -> K:/Sysutils/coreutils/5.3.0/coreutils-5.3.0/tests/cp/same-file.tmp/3044/dir/foo) symlink-loop
+! 1 -l [cp:\Sysutils\coreutils\5.3.0\coreutils-5.3.0\src\cp.exe: cannot stat `symlink': No such file or directory] (foo -> K:/Sysutils/coreutils/5.3.0/coreutils-5.3.0/tests/cp/same-file.tmp/3044/dir/foo) symlink-loop
+! 1 -dl [cp:\Sysutils\coreutils\5.3.0\coreutils-5.3.0\src\cp.exe: cannot stat `symlink': No such file or directory] (foo -> K:/Sysutils/coreutils/5.3.0/coreutils-5.3.0/tests/cp/same-file.tmp/3044/dir/foo) symlink-loop
+! 1 -fl [cp:\Sysutils\coreutils\5.3.0\coreutils-5.3.0\src\cp.exe: cannot stat `symlink': No such file or directory] (foo -> K:/Sysutils/coreutils/5.3.0/coreutils-5.3.0/tests/cp/same-file.tmp/3044/dir/foo) symlink-loop
+! 1 -bl [cp:\Sysutils\coreutils\5.3.0\coreutils-5.3.0\src\cp.exe: cannot stat `symlink': No such file or directory] (foo -> K:/Sysutils/coreutils/5.3.0/coreutils-5.3.0/tests/cp/same-file.tmp/3044/dir/foo) symlink-loop
+! 1 -bfl [cp:\Sysutils\coreutils\5.3.0\coreutils-5.3.0\src\cp.exe: cannot stat `symlink': No such file or directory] (foo -> K:/Sysutils/coreutils/5.3.0/coreutils-5.3.0/tests/cp/same-file.tmp/3044/dir/foo) symlink-loop
+  
+! 1 [cp:\Sysutils\coreutils\5.3.0\coreutils-5.3.0\src\cp.exe: `foo' and `foo' are the same file] (foo)
+! 1 -d [cp:\Sysutils\coreutils\5.3.0\coreutils-5.3.0\src\cp.exe: `foo' and `foo' are the same file] (foo)
+! 1 -f [cp:\Sysutils\coreutils\5.3.0\coreutils-5.3.0\src\cp.exe: `foo' and `foo' are the same file] (foo)
+! 1 -df [cp:\Sysutils\coreutils\5.3.0\coreutils-5.3.0\src\cp.exe: `foo' and `foo' are the same file] (foo)
+! 1 --rem [cp:\Sysutils\coreutils\5.3.0\coreutils-5.3.0\src\cp.exe: `foo' and `foo' are the same file] (foo)
+! 1 -b [cp:\Sysutils\coreutils\5.3.0\coreutils-5.3.0\src\cp.exe: `foo' and `foo' are the same file] (foo)
+! 1 -bd [cp:\Sysutils\coreutils\5.3.0\coreutils-5.3.0\src\cp.exe: `foo' and `foo' are the same file] (foo)
+! 0 -bf (foo foo.~1~)
+! 0 -bdf (foo foo.~1~)
+! 0 -l (foo)
+! 0 -dl (foo)
+! 0 -fl (foo)
+! 0 -dfl (foo)
+! 0 -bl (foo)
+! 0 -bdl (foo)
+! 0 -bfl (foo foo.~1~)
+! 0 -bdfl (foo foo.~1~)
+  
+! 1 [cp:\Sysutils\coreutils\5.3.0\coreutils-5.3.0\src\cp.exe: cannot stat `sl1': No such file or directory] (foo -> K:/Sysutils/coreutils/5.3.0/coreutils-5.3.0/tests/cp/same-file.tmp/3044/dir/foo -> K:/Sysutils/coreutils/5.3.0/coreutils-5.3.0/tests/cp/same-file.tmp/3044/dir/foo) symlink-loop symlink-loop
+! 1 -d [cp:\Sysutils\coreutils\5.3.0\coreutils-5.3.0\src\cp.exe: cannot stat `sl1': No such file or directory] (foo -> K:/Sysutils/coreutils/5.3.0/coreutils-5.3.0/tests/cp/same-file.tmp/3044/dir/foo -> K:/Sysutils/coreutils/5.3.0/coreutils-5.3.0/tests/cp/same-file.tmp/3044/dir/foo) symlink-loop symlink-loop
+! 1 -f [cp:\Sysutils\coreutils\5.3.0\coreutils-5.3.0\src\cp.exe: cannot stat `sl1': No such file or directory] (foo -> K:/Sysutils/coreutils/5.3.0/coreutils-5.3.0/tests/cp/same-file.tmp/3044/dir/foo -> K:/Sysutils/coreutils/5.3.0/coreutils-5.3.0/tests/cp/same-file.tmp/3044/dir/foo) symlink-loop symlink-loop
+! 1 -df [cp:\Sysutils\coreutils\5.3.0\coreutils-5.3.0\src\cp.exe: cannot stat `sl1': No such file or directory] (foo -> K:/Sysutils/coreutils/5.3.0/coreutils-5.3.0/tests/cp/same-file.tmp/3044/dir/foo -> K:/Sysutils/coreutils/5.3.0/coreutils-5.3.0/tests/cp/same-file.tmp/3044/dir/foo) symlink-loop symlink-loop
+! 1 --rem [cp:\Sysutils\coreutils\5.3.0\coreutils-5.3.0\src\cp.exe: cannot stat `sl1': No such file or directory] (foo -> K:/Sysutils/coreutils/5.3.0/coreutils-5.3.0/tests/cp/same-file.tmp/3044/dir/foo -> K:/Sysutils/coreutils/5.3.0/coreutils-5.3.0/tests/cp/same-file.tmp/3044/dir/foo) symlink-loop symlink-loop
+! 1 -b [cp:\Sysutils\coreutils\5.3.0\coreutils-5.3.0\src\cp.exe: cannot stat `sl1': No such file or directory] (foo -> K:/Sysutils/coreutils/5.3.0/coreutils-5.3.0/tests/cp/same-file.tmp/3044/dir/foo -> K:/Sysutils/coreutils/5.3.0/coreutils-5.3.0/tests/cp/same-file.tmp/3044/dir/foo) symlink-loop symlink-loop
+! 1 -bd [cp:\Sysutils\coreutils\5.3.0\coreutils-5.3.0\src\cp.exe: cannot stat `sl1': No such file or directory] (foo -> K:/Sysutils/coreutils/5.3.0/coreutils-5.3.0/tests/cp/same-file.tmp/3044/dir/foo -> K:/Sysutils/coreutils/5.3.0/coreutils-5.3.0/tests/cp/same-file.tmp/3044/dir/foo) symlink-loop symlink-loop
+! 1 -bf [cp:\Sysutils\coreutils\5.3.0\coreutils-5.3.0\src\cp.exe: cannot stat `sl1': No such file or directory] (foo -> K:/Sysutils/coreutils/5.3.0/coreutils-5.3.0/tests/cp/same-file.tmp/3044/dir/foo -> K:/Sysutils/coreutils/5.3.0/coreutils-5.3.0/tests/cp/same-file.tmp/3044/dir/foo) symlink-loop symlink-loop
+! 1 -bdf [cp:\Sysutils\coreutils\5.3.0\coreutils-5.3.0\src\cp.exe: cannot stat `sl1': No such file or directory] (foo -> K:/Sysutils/coreutils/5.3.0/coreutils-5.3.0/tests/cp/same-file.tmp/3044/dir/foo -> K:/Sysutils/coreutils/5.3.0/coreutils-5.3.0/tests/cp/same-file.tmp/3044/dir/foo) symlink-loop symlink-loop
+! 1 -l [cp:\Sysutils\coreutils\5.3.0\coreutils-5.3.0\src\cp.exe: cannot stat `sl1': No such file or directory] (foo -> K:/Sysutils/coreutils/5.3.0/coreutils-5.3.0/tests/cp/same-file.tmp/3044/dir/foo -> K:/Sysutils/coreutils/5.3.0/coreutils-5.3.0/tests/cp/same-file.tmp/3044/dir/foo) symlink-loop symlink-loop
+! 1 -fl [cp:\Sysutils\coreutils\5.3.0\coreutils-5.3.0\src\cp.exe: cannot stat `sl1': No such file or directory] (foo -> K:/Sysutils/coreutils/5.3.0/coreutils-5.3.0/tests/cp/same-file.tmp/3044/dir/foo -> K:/Sysutils/coreutils/5.3.0/coreutils-5.3.0/tests/cp/same-file.tmp/3044/dir/foo) symlink-loop symlink-loop
+! 1 -bl [cp:\Sysutils\coreutils\5.3.0\coreutils-5.3.0\src\cp.exe: cannot stat `sl1': No such file or directory] (foo -> K:/Sysutils/coreutils/5.3.0/coreutils-5.3.0/tests/cp/same-file.tmp/3044/dir/foo -> K:/Sysutils/coreutils/5.3.0/coreutils-5.3.0/tests/cp/same-file.tmp/3044/dir/foo) symlink-loop symlink-loop
+! 1 -bfl [cp:\Sysutils\coreutils\5.3.0\coreutils-5.3.0\src\cp.exe: cannot stat `sl1': No such file or directory] (foo -> K:/Sysutils/coreutils/5.3.0/coreutils-5.3.0/tests/cp/same-file.tmp/3044/dir/foo -> K:/Sysutils/coreutils/5.3.0/coreutils-5.3.0/tests/cp/same-file.tmp/3044/dir/foo) symlink-loop symlink-loop
+  
+! 1 [cp:\Sysutils\coreutils\5.3.0\coreutils-5.3.0\src\cp.exe: `foo' and `hardlink' are the same file] (foo hardlink)
+! 1 -d [cp:\Sysutils\coreutils\5.3.0\coreutils-5.3.0\src\cp.exe: `foo' and `hardlink' are the same file] (foo hardlink)
+! 1 -f [cp:\Sysutils\coreutils\5.3.0\coreutils-5.3.0\src\cp.exe: `foo' and `hardlink' are the same file] (foo hardlink)
+! 1 -df [cp:\Sysutils\coreutils\5.3.0\coreutils-5.3.0\src\cp.exe: `foo' and `hardlink' are the same file] (foo hardlink)
+! 0 --rem (foo hardlink)
+! 0 -b (foo hardlink hardlink.~1~)
+! 0 -bd (foo hardlink hardlink.~1~)
+! 0 -bf (foo hardlink hardlink.~1~)
+! 0 -bdf (foo hardlink hardlink.~1~)
+! 0 -l (foo hardlink)
+! 0 -dl (foo hardlink)
+! 0 -fl (foo hardlink)
+! 0 -dfl (foo hardlink)
+! 0 -bl (foo hardlink)
+! 0 -bdl (foo hardlink)
+! 0 -bfl (foo hardlink)
+! 0 -bdfl (foo hardlink)
+  
++ expected-3044 actual-3044 differ: char 1, line 1
+FAIL: same-file
+k:\Sysutils\coreutils\5.3.0\coreutils-5.3.0\src\rm.exe: cannot remove `y.~?~': Invalid argument
+k:\Sysutils\coreutils\5.3.0\coreutils-5.3.0\src\rm.exe: cannot remove `y.~?~': Invalid argument
+k:\Sysutils\coreutils\5.3.0\coreutils-5.3.0\src\rm.exe: cannot remove `y.~?~': Invalid argument
+k:\Sysutils\coreutils\5.3.0\coreutils-5.3.0\src\rm.exe: cannot remove `y.~?~': Invalid argument
+k:\Sysutils\coreutils\5.3.0\coreutils-5.3.0\src\rm.exe: cannot remove `y.~?~': Invalid argument
+k:\Sysutils\coreutils\5.3.0\coreutils-5.3.0\src\rm.exe: cannot remove `y.~?~': Invalid argument
+k:\Sysutils\coreutils\5.3.0\coreutils-5.3.0\src\rm.exe: cannot remove `y.~?~': Invalid argument
+k:\Sysutils\coreutils\5.3.0\coreutils-5.3.0\src\rm.exe: cannot remove `y.~?~': Invalid argument
+k:\Sysutils\coreutils\5.3.0\coreutils-5.3.0\src\rm.exe: cannot remove `y.~?~': Invalid argument
+k:\Sysutils\coreutils\5.3.0\coreutils-5.3.0\src\rm.exe: cannot remove `y.~?~': Invalid argument
+k:\Sysutils\coreutils\5.3.0\coreutils-5.3.0\src\rm.exe: cannot remove `y.~?~': Invalid argument
+k:\Sysutils\coreutils\5.3.0\coreutils-5.3.0\src\rm.exe: cannot remove `y.~?~': Invalid argument
+k:\Sysutils\coreutils\5.3.0\coreutils-5.3.0\src\rm.exe: cannot remove `y.~?~': Invalid argument
+k:\Sysutils\coreutils\5.3.0\coreutils-5.3.0\src\rm.exe: cannot remove `y.~?~': Invalid argument
+k:\Sysutils\coreutils\5.3.0\coreutils-5.3.0\src\rm.exe: cannot remove `y.~?~': Invalid argument
+k:\Sysutils\coreutils\5.3.0\coreutils-5.3.0\src\rm.exe: cannot remove `y.~?~': Invalid argument
+k:\Sysutils\coreutils\5.3.0\coreutils-5.3.0\src\rm.exe: cannot remove `y.~?~': Invalid argument
+k:\Sysutils\coreutils\5.3.0\coreutils-5.3.0\src\rm.exe: cannot remove `y.~?~': Invalid argument
+k:\Sysutils\coreutils\5.3.0\coreutils-5.3.0\src\rm.exe: cannot remove `y.~?~': Invalid argument
+k:\Sysutils\coreutils\5.3.0\coreutils-5.3.0\src\rm.exe: cannot remove `y.~?~': Invalid argument
+k:\Sysutils\coreutils\5.3.0\coreutils-5.3.0\src\rm.exe: cannot remove `y.~?~': Invalid argument
+k:\Sysutils\coreutils\5.3.0\coreutils-5.3.0\src\rm.exe: cannot remove `y.~?~': Invalid argument
+k:\Sysutils\coreutils\5.3.0\coreutils-5.3.0\src\rm.exe: cannot remove `y.~?~': Invalid argument
+k:\Sysutils\coreutils\5.3.0\coreutils-5.3.0\src\rm.exe: cannot remove `y.~?~': Invalid argument
+k:\Sysutils\coreutils\5.3.0\coreutils-5.3.0\src\rm.exe: cannot remove `y.~?~': Invalid argument
+k:\Sysutils\coreutils\5.3.0\coreutils-5.3.0\src\rm.exe: cannot remove `y.~?~': Invalid argument
+k:\Sysutils\coreutils\5.3.0\coreutils-5.3.0\src\rm.exe: cannot remove `y.~?~': Invalid argument
+k:\Sysutils\coreutils\5.3.0\coreutils-5.3.0\src\rm.exe: cannot remove `y.~?~': Invalid argument
+k:\Sysutils\coreutils\5.3.0\coreutils-5.3.0\src\rm.exe: cannot remove `y.~?~': Invalid argument
+k:\Sysutils\coreutils\5.3.0\coreutils-5.3.0\src\rm.exe: cannot remove `y.~?~': Invalid argument
+k:\Sysutils\coreutils\5.3.0\coreutils-5.3.0\src\rm.exe: cannot remove `y.~?~': Invalid argument
+k:\Sysutils\coreutils\5.3.0\coreutils-5.3.0\src\rm.exe: cannot remove `y.~?~': Invalid argument
+k:\Sysutils\coreutils\5.3.0\coreutils-5.3.0\src\rm.exe: cannot remove `y.~?~': Invalid argument
+k:\Sysutils\coreutils\5.3.0\coreutils-5.3.0\src\rm.exe: cannot remove `y.~?~': Invalid argument
+k:\Sysutils\coreutils\5.3.0\coreutils-5.3.0\src\rm.exe: cannot remove `y.~?~': Invalid argument
+k:\Sysutils\coreutils\5.3.0\coreutils-5.3.0\src\rm.exe: cannot remove `y.~?~': Invalid argument
+k:\Sysutils\coreutils\5.3.0\coreutils-5.3.0\src\rm.exe: cannot remove `y.~?~': Invalid argument
+k:\Sysutils\coreutils\5.3.0\coreutils-5.3.0\src\rm.exe: cannot remove `y.~?~': Invalid argument
+k:\Sysutils\coreutils\5.3.0\coreutils-5.3.0\src\rm.exe: cannot remove `y.~?~': Invalid argument
+k:\Sysutils\coreutils\5.3.0\coreutils-5.3.0\src\rm.exe: cannot remove `y.~?~': Invalid argument
+*** expected	Wed Apr 20 21:25:29 2005
+--- actual	Wed Apr 20 21:25:29 2005
+***************
+*** 78,80 ****
+--- 78,81 ----
+  x y y~ y.~1~ nil: y y.~1~ y.~2~ y~
+  x y y~ y.~1~ simple: y y.~1~ y~
+  x y y~ y.~1~ never: y y.~1~ y~
++ expected actual differ: char 1002, line 41
+FAIL: cp-mv-backup
+k:\Sysutils\coreutils\5.3.0\coreutils-5.3.0\src\cp.exe: cannot stat `symlink/': No such file or directory
+k:\Sysutils\coreutils\5.3.0\coreutils-5.3.0\src\ls.exe: s: No such file or directory
+!::='::\'
+!K:='K:\Sysutils\coreutils\5.3.0\coreutils-5.3.0'
+ALLUSERSPROFILE='C:\Documents and Settings\All Users'
+APPDATA='C:\Documents and Settings\KZLG\Application Data'
+BASEDIR='E:\PROGRA~1\NTDDK'
+BASH=/usr/bin/sh
+BASH_VERSINFO=([0]="2" [1]="05b" [2]="0" [3]="1" [4]="release" [5]="i686-pc-cygwin")
+BASH_VERSION='2.05b.0(1)-release'
+CHARSET=UTF-8
+CLASSPATH='"E:\Program Files\Java\j2re1.4.2_03\lib\ext\QTJava.zip"'
+CLIENTNAME=Console
+COMMONPROGRAMFILES='C:\Program Files\Common Files'
+COMPUTERNAME=GAMMA
+COMSPEC='C:\WINDOWS\system32\cmd.exe'
+CONFIG_SITE=k:/config.site
+CVS_RSH=ssh.exe
+CYGWIN=codepage:oem
+DDKDRIVE=E:
+DIRSTACK=()
+DISPLAY=localhost:0
+DVLDIR='k:\'
+EDITOR=E:/PROGRA~1/oxedit/oxedit.EXE
+EUID=400
+FP_NO_HOST_CHECK=NO
+GCCVERSION=3.3.1
+GROUPS=()
+HOME=/cygdrive/f/kzlg
+HOMEDRIVE=f:
+HOMEPATH='\kzlg'
+HOSTNAME=gamma
+HOSTTYPE=i686
+IFS=' 	
+'
+INTERIX_ROOT=/dev/fs/H/SFU/
+INTERIX_ROOT_WIN='H:\SFU\'
+J2D_D3D=false
+LANG=
+LANGUAGE=
+LC_ALL=
+LC_COLLATE=
+LC_CTYPE=
+LC_MESSAGES=
+LC_NUMERIC=
+LC_TIME=
+LD_LIBRARY_PATH=/usr/lib:/usr/X11R6/lib
+LESS=-isnMCd
+LESSBINFMT='*n-'
+LESSCHARDEF=8bcccbcc18b95.33b33b.
+LESSCHARSET=latin1
+LN_S='ln -s'
+LOGONSERVER='\\GAMMA'
+MACHTYPE=i686-pc-cygwin
+MAILCHECK=0
+MAKE=make
+MAKEFLAGS=' --unix -wki'
+MAKELEVEL=4
+MAKE_MODE=UNIX
+MFLAGS='- --unix -wki'
+MINGWDIR='h:\mingw\3.3.1'
+NTRESKIT='E:\Program Files\NTrksupport'
+NUMBER_OF_PROCESSORS=1
+OLDPWD=/cygdrive/k/Sysutils/coreutils/5.3.0/coreutils-5.3.0/tests/cp
+OPENNT_ROOT=/dev/fs/H/SFU/
+OPTERR=1
+OPTIND=1
+OS=Windows_NT
+OSTYPE=cygwin
+PATH='/cygdrive/k/Sysutils/coreutils/5.3.0/coreutils-5.3.0/tests/cp/../../src:/cygdrive/h/mingw/3.3.1/bin:/usr/bin:/usr/local/bin:/cygdrive/e/util:/cygdrive/e/program files/gnuwin32/bin:/cygdrive/h/mingw/3.3.1/bin:/cygdrive/h/tex/bin/win32:/usr/bin:/cygdrive/c/WINDOWS/system32:/cygdrive/c/WINDOWS:/cygdrive/c/WINDOWS/System32/Wbem:/cygdrive/h/SFU/common/:.'
+PATHEXT='.COM;.EXE;.BAT;.CMD;.VBS;.VBE;.JS;.JSE;.WSF;.WSH;.tcl;.py;.pyc;.pyo;.pyw;.pys'
+PIPESTATUS=([0]="0")
+POPFILE_ROOT='e:\progra~1\popfile'
+POPFILE_USER='e:\progra~1\popfile'
+POSIXLY_CORRECT=y
+PPID=2140
+PROCESSOR_ARCHITECTURE=x86
+PROCESSOR_IDENTIFIER='x86 Family 15 Model 2 Stepping 7, GenuineIntel'
+PROCESSOR_LEVEL=15
+PROCESSOR_REVISION=0207
+PROGRAMFILES='C:\Program Files'
+PROMPT='$P$G'
+PS4='+ '
+PWD=/cygdrive/k/Sysutils/coreutils/5.3.0/coreutils-5.3.0/tests/cp/symlink-slash.tmp/2104
+PWDIR=-is
+QTJAVA='"E:\Program Files\Java\j2re1.4.2_03\lib\ext\QTJava.zip"'
+SESSIONNAME=Console
+SFUDIR='H:\SFU\'
+SFUDIR_INTERIX=/dev/fs/H/SFU/
+SHELL=/bin/sh
+SHELLOPTS=braceexpand:hashall:interactive-comments:posix
+SHLVL=7
+SYSTEMDRIVE=C:
+SYSTEMROOT='C:\WINDOWS'
+TEMP=/cygdrive/m/temp
+TERM=ansi
+TEXDIR='h:\tex'
+TEXMFCNF='h:\tex\texmf-var\web2c'
+TEXMFTEMP='E:\Program Files\TeXLive\temp'
+TMAKEPATH='e:\program files\QT\tmake\lib\win32-msvc'
+TMP=/cygdrive/m/temp
+TMPDIR=/cygdrive/m/temp
+TZ=CET-1CES,M3.5.0/2,M10.5.0/2
+UID=400
+USERDOMAIN=GAMMA
+USERNAME=KZLG
+USERPROFILE='C:\Documents and Settings\KZLG'
+VCTOOLKITINSTALLDIR='E:\Program Files\Microsoft Visual C++ Toolkit 2003\'
+WINDIR='C:\WINDOWS'
+XAPPLRESDIR=/usr/X11R6/lib/X11/app-defaults
+XCMSDB=/usr/X11R6/lib/X11/Xcms.txt
+XKEYSYMDB=/usr/X11R6/lib/X11/XKeysymDB
+XNLSPATH=/usr/X11R6/lib/X11/locale
+_=
+as_unset=unset
+envvar_check_failed=0
+fail=1
+framework_failure=0
+i=LC_TIME
+pwd=/cygdrive/k/Sysutils/coreutils/5.3.0/coreutils-5.3.0/tests/cp
+srcdir=../../../coreutils-5.3.0-src/tests/cp
+t0=symlink-slash.tmp
+tmp=symlink-slash.tmp/2104
+var=VERSION_CONTROL
+vars='
+  BLOCKSIZE
+  BLOCK_SIZE
+  DF_BLOCK_SIZE
+  DU_BLOCK_SIZE
+  LS_BLOCK_SIZE
+  SIMPLE_BACKUP_SUFFIX
+  VERSION_CONTROL
+'
+FAIL: symlink-slash
+k:\Sysutils\coreutils\5.3.0\coreutils-5.3.0\src\cp.exe: cannot stat `a': No such file or directory
+k:\Sysutils\coreutils\5.3.0\coreutils-5.3.0\src\cp.exe: cannot stat `c': No such file or directory
+FAIL: slink-2-slink
+../../../coreutils-5.3.0-src/tests/cp/fail-perm: The specified NON_ROOT_USERNAME (nobody)
+../../../coreutils-5.3.0-src/tests/cp/fail-perm: is invalid because its UID is 0.
+FAIL: fail-perm
+PASS: dir-slash
+../../../coreutils-5.3.0-src/tests/cp/perm: This test is relatively expensive, so it is disabled by default.
+To run it anyway, rerun make check with the RUN_EXPENSIVE_TESTS
+environment variable set to yes.  E.g.,
+
+  env RUN_EXPENSIVE_TESTS=yes make check
+
+SKIP: perm
+k:\Sysutils\coreutils\5.3.0\coreutils-5.3.0\src\cp.exe: cannot stat `slink': No such file or directory
+FAIL: cp-HL
+../../../coreutils-5.3.0-src/tests/cp/special-bits: The specified NON_ROOT_USERNAME (nobody)
+../../../coreutils-5.3.0-src/tests/cp/special-bits: is invalid because its UID is 0.
+FAIL: special-bits
+PASS: link
+PASS: dir-rm-dest
+../../../coreutils-5.3.0-src/tests/cp/cp-parents: Since it looks like you're running this test in a directory with
+the setgid bit set, we're skipping this test.
+SKIP: cp-parents
+PASS: deref-slink
+PASS: dir-vs-file
+out exp differ: char 1, line 1
+1c1
+< k:\Sysutils\coreutils\5.3.0\coreutils-5.3.0\src\cp.exe: cannot copy a directory, `dir', into itself, `dir/dir'
+---
+> cp: cannot copy a directory, `dir', into itself, `dir/dir'
+FAIL: into-self
+======================================
+14 of 21 tests failed
+(2 tests were not run)
+Please report to bug-coreutils@gnu.org
+======================================
+make[3]: [check-TESTS] Fout 1 (genegeerd)
+make[3]: Leaving directory `/cygdrive/k/Sysutils/coreutils/5.3.0/coreutils-5.3.0/tests/cp'
+make[2]: Leaving directory `/cygdrive/k/Sysutils/coreutils/5.3.0/coreutils-5.3.0/tests/cp'
+Making check in cut
+make[2]: Entering directory `/cygdrive/k/Sysutils/coreutils/5.3.0/coreutils-5.3.0/tests/cut'
+make  check-TESTS
+make[3]: Entering directory `/cygdrive/k/Sysutils/coreutils/5.3.0/coreutils-5.3.0/tests/cut'
+Files nul-odelim.O and ../../../coreutils-5.3.0-src/tests/cut/nul-odelim.X differ
+Files nul-odelim.O and ../../../coreutils-5.3.0-src/tests/cut/nul-odelim.X differ
+Files nul-odelim.O and ../../../coreutils-5.3.0-src/tests/cut/nul-odelim.X differ
+*** 8bit-delim.O	Wed Apr 20 21:25:57 2005
+--- ../../../coreutils-5.3.0-src/tests/cut/8bit-delim.X	Wed Jun  2 13:41:10 2004
+***************
+*** 1 ****
+! a璪璫
+--- 1 ----
+! b_c
+*** 8bit-delim.O	Wed Apr 20 21:25:57 2005
+--- ../../../coreutils-5.3.0-src/tests/cut/8bit-delim.X	Wed Jun  2 13:41:10 2004
+***************
+*** 1 ****
+! a璪璫
+--- 1 ----
+! b_c
+*** 8bit-delim.O	Wed Apr 20 21:25:58 2005
+--- ../../../coreutils-5.3.0-src/tests/cut/8bit-delim.X	Wed Jun  2 13:41:10 2004
+***************
+*** 1 ****
+! a璪璫
+--- 1 ----
+! b_c
+FAIL: cut-tests
+======================================
+1 of 1 tests failed
+Please report to bug-coreutils@gnu.org
+======================================
+make[3]: [check-TESTS] Fout 1 (genegeerd)
+make[3]: Leaving directory `/cygdrive/k/Sysutils/coreutils/5.3.0/coreutils-5.3.0/tests/cut'
+make[2]: Leaving directory `/cygdrive/k/Sysutils/coreutils/5.3.0/coreutils-5.3.0/tests/cut'
+Making check in date
+make[2]: Entering directory `/cygdrive/k/Sysutils/coreutils/5.3.0/coreutils-5.3.0/tests/date'
+make  check-TESTS
+make[3]: Entering directory `/cygdrive/k/Sysutils/coreutils/5.3.0/coreutils-5.3.0/tests/date'
+*** 1.O	Wed Apr 20 21:26:06 2005
+--- ../../../coreutils-5.3.0-src/tests/date/1.X	Mon May 31 20:04:52 2004
+***************
+*** 1 ****
+! % zo zondag jan januari
+--- 1 ----
+! % Sun Sunday Jan January
+*** 3.O	Wed Apr 20 21:26:06 2005
+--- ../../../coreutils-5.3.0-src/tests/date/3.X	Mon May 31 20:04:52 2004
+***************
+*** 1 ****
+! 19_01/19/97_19__08
+--- 1 ----
+! 19_01/19/97_19_Jan_08
+*** 5.O	Wed Apr 20 21:26:06 2005
+--- ../../../coreutils-5.3.0-src/tests/date/5.X	Mon May 31 20:04:52 2004
+***************
+*** 1,2 ****
+  17_
+! _vm_
+--- 1,2 ----
+  17_
+! _AM_08:17:48 AM
+*** 8.O	Wed Apr 20 21:26:07 2005
+--- ../../../coreutils-5.3.0-src/tests/date/8.X	Mon May 31 20:04:52 2004
+***************
+*** 1 ****
+! 19-1-1997_8:17:48 vm_97_1997
+--- 1 ----
+! 01/19/97_08:17:48_97_1997
+FAIL: date-tests
+======================================
+1 of 1 tests failed
+Please report to bug-coreutils@gnu.org
+======================================
+make[3]: [check-TESTS] Fout 1 (genegeerd)
+make[3]: Leaving directory `/cygdrive/k/Sysutils/coreutils/5.3.0/coreutils-5.3.0/tests/date'
+make[2]: Leaving directory `/cygdrive/k/Sysutils/coreutils/5.3.0/coreutils-5.3.0/tests/date'
+Making check in dd
+make[2]: Entering directory `/cygdrive/k/Sysutils/coreutils/5.3.0/coreutils-5.3.0/tests/dd'
+make  check-TESTS
+make[3]: Entering directory `/cygdrive/k/Sysutils/coreutils/5.3.0/coreutils-5.3.0/tests/dd'
+PASS: misc
+PASS: not-rewound
+-: test skip-seek-1: stderr mismatch, comparing skip-seek-1.E (actual) and skip-seek-1.4 (expected)
+-: test skip-seek-2: stderr mismatch, comparing skip-seek-2.E (actual) and skip-seek-2.4 (expected)
+-: test skip-seek-3: stderr mismatch, comparing skip-seek-3.E (actual) and skip-seek-3.4 (expected)
+-: test skip-seek-3: mismatch, comparing skip-seek-3.2 (actual) and skip-seek-3.5 (expected)
+Files skip-seek-3.2 and skip-seek-3.5 differ
+-: test block-sync-1: stderr mismatch, comparing block-sync-1.E (actual) and block-sync-1.3 (expected)
+FAIL: skip-seek
+PASS: skip-seek2
+3+1 records in
+0+1 records out
+18 bytes (18 B) copied, 0 seconds, Infinity B/s
+out exp verschillen: byte 5, regel 1
+FAIL: unblock-sync
+======================================
+2 of 5 tests failed
+Please report to bug-coreutils@gnu.org
+======================================
+make[3]: [check-TESTS] Fout 1 (genegeerd)
+make[3]: Leaving directory `/cygdrive/k/Sysutils/coreutils/5.3.0/coreutils-5.3.0/tests/dd'
+make[2]: Leaving directory `/cygdrive/k/Sysutils/coreutils/5.3.0/coreutils-5.3.0/tests/dd'
+Making check in dircolors
+make[2]: Entering directory `/cygdrive/k/Sysutils/coreutils/5.3.0/coreutils-5.3.0/tests/dircolors'
+make  check-TESTS
+make[3]: Entering directory `/cygdrive/k/Sysutils/coreutils/5.3.0/coreutils-5.3.0/tests/dircolors'
+-: test a: stderr mismatch, comparing a.E (actual) and a.1 (expected)
+*** a.E	Wed Apr 20 21:26:21 2005
+--- a.1	Wed Apr 20 21:26:21 2005
+***************
+*** 1 ****
+! k:\Sysutils\coreutils\5.3.0\coreutils-5.3.0\src\dircolors.exe: k:1: invalid line;  missing second token
+--- 1 ----
+! dircolors: k:1: invalid line;  missing second token
+FAIL: simple
+======================================
+1 of 1 tests failed
+Please report to bug-coreutils@gnu.org
+======================================
+make[3]: [check-TESTS] Fout 1 (genegeerd)
+make[3]: Leaving directory `/cygdrive/k/Sysutils/coreutils/5.3.0/coreutils-5.3.0/tests/dircolors'
+make[2]: Leaving directory `/cygdrive/k/Sysutils/coreutils/5.3.0/coreutils-5.3.0/tests/dircolors'
+Making check in du
+make[2]: Entering directory `/cygdrive/k/Sysutils/coreutils/5.3.0/coreutils-5.3.0/tests/du'
+make  check-TESTS
+make[3]: Entering directory `/cygdrive/k/Sysutils/coreutils/5.3.0/coreutils-5.3.0/tests/du'
+-: test f-extra-arg: stderr mismatch, comparing f-extra-arg.E (actual) and f-extra-arg.2 (expected)
+*** f-extra-arg.E	Wed Apr 20 21:26:22 2005
+--- f-extra-arg.2	Wed Apr 20 21:26:22 2005
+***************
+*** 1,3 ****
+! k:\Sysutils\coreutils\5.3.0\coreutils-5.3.0\src\du.exe: extra operand `no-such'
+  File operands cannot be combined with --files0-from.
+! Try `k:\Sysutils\coreutils\5.3.0\coreutils-5.3.0\src\du.exe --help' for more information.
+--- 1,3 ----
+! du: extra operand `no-such'
+  File operands cannot be combined with --files0-from.
+! Try `du --help' for more information.
+-: test missing: stderr mismatch, comparing missing.E (actual) and missing.1 (expected)
+*** missing.E	Wed Apr 20 21:26:23 2005
+--- missing.1	Wed Apr 20 21:26:22 2005
+***************
+*** 1 ****
+! k:\Sysutils\coreutils\5.3.0\coreutils-5.3.0\src\du.exe: cannot open `missing' for reading: No such file or directory
+--- 1 ----
+! du: cannot open `missing' for reading: No such file or directory
+-: test empty-nonreg failed: exit status mismatch:  expected 0, got 1
+-: test nul-1: stderr mismatch, comparing nul-1.E (actual) and nul-1.2 (expected)
+*** nul-1.E	Wed Apr 20 21:26:23 2005
+--- nul-1.2	Wed Apr 20 21:26:23 2005
+***************
+*** 1 ****
+! k:\Sysutils\coreutils\5.3.0\coreutils-5.3.0\src\du.exe: -:1: invalid zero-length file name
+--- 1 ----
+! du: -:1: invalid zero-length file name
+-: test nul-2: stderr mismatch, comparing nul-2.E (actual) and nul-2.2 (expected)
+*** nul-2.E	Wed Apr 20 21:26:23 2005
+--- nul-2.2	Wed Apr 20 21:26:23 2005
+***************
+*** 1,2 ****
+! k:\Sysutils\coreutils\5.3.0\coreutils-5.3.0\src\du.exe: -:1: invalid zero-length file name
+! k:\Sysutils\coreutils\5.3.0\coreutils-5.3.0\src\du.exe: -:2: invalid zero-length file name
+--- 1,2 ----
+! du: -:1: invalid zero-length file name
+! du: -:2: invalid zero-length file name
+-: test 1: stdout mismatch, comparing 1.O (actual) and 1.1 (expected)
+-: test 1a: stdout mismatch, comparing 1a.O (actual) and 1a.1 (expected)
+-: test 2: stdout mismatch, comparing 2.O (actual) and 2.1 (expected)
+-: test 2a: stdout mismatch, comparing 2a.O (actual) and 2a.1 (expected)
+-: test zero-len: stdout mismatch, comparing zero-len.O (actual) and zero-len.1 (expected)
+-: test zero-len: stderr mismatch, comparing zero-len.E (actual) and zero-len.2 (expected)
+*** zero-len.E	Wed Apr 20 21:26:24 2005
+--- zero-len.2	Wed Apr 20 21:26:24 2005
+***************
+*** 1 ****
+! k:\Sysutils\coreutils\5.3.0\coreutils-5.3.0\src\du.exe: -:1: invalid zero-length file name
+--- 1 ----
+! du: -:1: invalid zero-length file name
+FAIL: files0-from
+../../../coreutils-5.3.0-src/tests/du/inaccessible-cwd: The specified NON_ROOT_USERNAME (nobody)
+../../../coreutils-5.3.0-src/tests/du/inaccessible-cwd: is invalid because its UID is 0.
+FAIL: inaccessible-cwd
+k:\Sysutils\coreutils\5.3.0\coreutils-5.3.0\src\seq.exe: write error: Invalid argument
+k:\Sysutils\coreutils\5.3.0\coreutils-5.3.0\src\du.exe: cannot access `slink': No such file or directory
+k:\Sysutils\coreutils\5.3.0\coreutils-5.3.0\src\du.exe: cannot access `slink/': No such file or directory
+k:\Sysutils\coreutils\5.3.0\coreutils-5.3.0\src\du.exe: cannot access `slink-to-64k': No such file or directory
+cmp: einde-bestand op out
+0a1,5
+> slink/a
+> slink
+> slink/a
+> slink/
+> 64	slink-to-64k
+FAIL: deref-args
+PASS: slash
+../../../coreutils-5.3.0-src/tests/du/fd-leak: This test is relatively expensive, so it is disabled by default.
+To run it anyway, rerun make check with the RUN_EXPENSIVE_TESTS
+environment variable set to yes.  E.g.,
+
+  env RUN_EXPENSIVE_TESTS=yes make check
+
+SKIP: fd-leak
+PASS: hard-link
+../../../coreutils-5.3.0-src/tests/du/8gb: skipping this test, since this file system doesn't support
+../../../coreutils-5.3.0-src/tests/du/8gb: sparse files and this test requires a file with an apparent
+../../../coreutils-5.3.0-src/tests/du/8gb: size of 8GB
+SKIP: 8gb
+../../../coreutils-5.3.0-src/tests/du/basic: different block count/size, so skipping this test
+SKIP: basic
+PASS: restore-wd
+PASS: exclude
+../../../coreutils-5.3.0-src/tests/du/no-x: The specified NON_ROOT_USERNAME (nobody)
+../../../coreutils-5.3.0-src/tests/du/no-x: is invalid because its UID is 0.
+FAIL: no-x
+k:\Sysutils\coreutils\5.3.0\coreutils-5.3.0\src\du.exe: cannot access `slink': No such file or directory
+cmp: einde-bestand op out
+0a1
+> slink
+FAIL: no-deref
+k:\Sysutils\coreutils\5.3.0\coreutils-5.3.0\src\du.exe: cannot access `slink/': No such file or directory
+k:\Sysutils\coreutils\5.3.0\coreutils-5.3.0\src\du.exe: cannot access `slink': No such file or directory
+out exp verschillen: byte 1, regel 1
+0a1,3
+> slink/1/2
+> slink/1
+> slink/
+1a5,7
+> slink/1/2
+> slink/1
+> slink
+FAIL: trailing-slash
+FAIL: deref
+PASS: two-args
+k:\Sysutils\coreutils\5.3.0\coreutils-5.3.0\src\du.exe: cannot access `1': No such file or directory
+k:\Sysutils\coreutils\5.3.0\coreutils-5.3.0\src\du.exe: cannot access `15': No such file or directory
+k:\Sysutils\coreutils\5.3.0\coreutils-5.3.0\src\du.exe: cannot access `16': No such file or directory
+k:\Sysutils\coreutils\5.3.0\coreutils-5.3.0\src\du.exe: cannot access `31': No such file or directory
+k:\Sysutils\coreutils\5.3.0\coreutils-5.3.0\src\du.exe: cannot access `32': No such file or directory
+k:\Sysutils\coreutils\5.3.0\coreutils-5.3.0\src\du.exe: cannot access `59': No such file or directory
+k:\Sysutils\coreutils\5.3.0\coreutils-5.3.0\src\du.exe: cannot access `60': No such file or directory
+k:\Sysutils\coreutils\5.3.0\coreutils-5.3.0\src\du.exe: cannot access `63': No such file or directory
+k:\Sysutils\coreutils\5.3.0\coreutils-5.3.0\src\du.exe: cannot access `64': No such file or directory
+k:\Sysutils\coreutils\5.3.0\coreutils-5.3.0\src\du.exe: cannot access `127': No such file or directory
+k:\Sysutils\coreutils\5.3.0\coreutils-5.3.0\src\du.exe: cannot access `128': No such file or directory
+FAIL: slink
+======================================
+8 of 13 tests failed
+(3 tests were not run)
+Please report to bug-coreutils@gnu.org
+======================================
+make[3]: [check-TESTS] Fout 1 (genegeerd)
+make[3]: Leaving directory `/cygdrive/k/Sysutils/coreutils/5.3.0/coreutils-5.3.0/tests/du'
+make[2]: Leaving directory `/cygdrive/k/Sysutils/coreutils/5.3.0/coreutils-5.3.0/tests/du'
+Making check in expr
+make[2]: Entering directory `/cygdrive/k/Sysutils/coreutils/5.3.0/coreutils-5.3.0/tests/expr'
+make  check-TESTS
+make[3]: Entering directory `/cygdrive/k/Sysutils/coreutils/5.3.0/coreutils-5.3.0/tests/expr'
+-: test a: stdout mismatch, comparing a.O (actual) and a.1 (expected)
+-: test b: stdout mismatch, comparing b.O (actual) and b.1 (expected)
+-: test c failed: exit status mismatch:  expected 0, got 2
+-: test d: stdout mismatch, comparing d.O (actual) and d.1 (expected)
+-: test e: stdout mismatch, comparing e.O (actual) and e.1 (expected)
+-: test paren1: stdout mismatch, comparing paren1.O (actual) and paren1.1 (expected)
+-: test paren2: stdout mismatch, comparing paren2.O (actual) and paren2.1 (expected)
+-: test paren3: stdout mismatch, comparing paren3.O (actual) and paren3.1 (expected)
+-: test paren4: stdout mismatch, comparing paren4.O (actual) and paren4.1 (expected)
+-: test paren5: stdout mismatch, comparing paren5.O (actual) and paren5.1 (expected)
+-: test 0bang: stdout mismatch, comparing 0bang.O (actual) and 0bang.1 (expected)
+-: test 00: stdout mismatch, comparing 00.O (actual) and 00.1 (expected)
+-: test minus0: stdout mismatch, comparing minus0.O (actual) and minus0.1 (expected)
+-: test andand: stdout mismatch, comparing andand.O (actual) and andand.1 (expected)
+-: test oror: stdout mismatch, comparing oror.O (actual) and oror.1 (expected)
+-: test orempty: stdout mismatch, comparing orempty.O (actual) and orempty.1 (expected)
+-: test minus2: stdout mismatch, comparing minus2.O (actual) and minus2.1 (expected)
+-: test fail-a: stderr mismatch, comparing fail-a.E (actual) and fail-a.1 (expected)
+*** fail-a.E	Wed Apr 20 21:26:45 2005
+--- fail-a.1	Wed Apr 20 21:26:45 2005
+***************
+*** 1 ****
+! k:\Sysutils\coreutils\5.3.0\coreutils-5.3.0\src\expr.exe: non-numeric argument
+--- 1 ----
+! expr: non-numeric argument
+-: test fail-b: stderr mismatch, comparing fail-b.E (actual) and fail-b.1 (expected)
+*** fail-b.E	Wed Apr 20 21:26:45 2005
+--- fail-b.1	Wed Apr 20 21:26:45 2005
+***************
+*** 1 ****
+! k:\Sysutils\coreutils\5.3.0\coreutils-5.3.0\src\expr.exe: syntax error
+--- 1 ----
+! expr: syntax error
+-: test fail-c: stderr mismatch, comparing fail-c.E (actual) and fail-c.1 (expected)
+*** fail-c.E	Wed Apr 20 21:26:45 2005
+--- fail-c.1	Wed Apr 20 21:26:45 2005
+***************
+*** 1,2 ****
+! k:\Sysutils\coreutils\5.3.0\coreutils-5.3.0\src\expr.exe: missing operand
+! Try `k:\Sysutils\coreutils\5.3.0\coreutils-5.3.0\src\expr.exe --help' for more information.
+--- 1,2 ----
+! expr: missing operand
+! Try `expr --help' for more information.
+FAIL: basic
+======================================
+1 of 1 tests failed
+Please report to bug-coreutils@gnu.org
+======================================
+make[3]: [check-TESTS] Fout 1 (genegeerd)
+make[3]: Leaving directory `/cygdrive/k/Sysutils/coreutils/5.3.0/coreutils-5.3.0/tests/expr'
+make[2]: Leaving directory `/cygdrive/k/Sysutils/coreutils/5.3.0/coreutils-5.3.0/tests/expr'
+Making check in factor
+make[2]: Entering directory `/cygdrive/k/Sysutils/coreutils/5.3.0/coreutils-5.3.0/tests/factor'
+make  check-TESTS
+make[3]: Entering directory `/cygdrive/k/Sysutils/coreutils/5.3.0/coreutils-5.3.0/tests/factor'
+-: test 1: stdout mismatch, comparing 1.O (actual) and 1.1 (expected)
+-: test 1a: stdout mismatch, comparing 1a.O (actual) and 1a.1 (expected)
+-: test 2: stdout mismatch, comparing 2.O (actual) and 2.1 (expected)
+-: test 3: stdout mismatch, comparing 3.O (actual) and 3.1 (expected)
+-: test 4: stdout mismatch, comparing 4.O (actual) and 4.1 (expected)
+-: test a: stdout mismatch, comparing a.O (actual) and a.1 (expected)
+-: test b: stdout mismatch, comparing b.O (actual) and b.1 (expected)
+-: test c: stdout mismatch, comparing c.O (actual) and c.1 (expected)
+-: test d: stdout mismatch, comparing d.O (actual) and d.1 (expected)
+-: test e: stdout mismatch, comparing e.O (actual) and e.1 (expected)
+-: test f: stdout mismatch, comparing f.O (actual) and f.1 (expected)
+-: test g: stdout mismatch, comparing g.O (actual) and g.1 (expected)
+-: test h: stdout mismatch, comparing h.O (actual) and h.1 (expected)
+-: test i: stdout mismatch, comparing i.O (actual) and i.1 (expected)
+-: test j: stdout mismatch, comparing j.O (actual) and j.1 (expected)
+-: test k: stdout mismatch, comparing k.O (actual) and k.1 (expected)
+-: test l: stdout mismatch, comparing l.O (actual) and l.1 (expected)
+-: test m: stdout mismatch, comparing m.O (actual) and m.1 (expected)
+-: test n: stdout mismatch, comparing n.O (actual) and n.1 (expected)
+-: test o: stdout mismatch, comparing o.O (actual) and o.1 (expected)
+-: test p: stdout mismatch, comparing p.O (actual) and p.1 (expected)
+-: test q: stdout mismatch, comparing q.O (actual) and q.1 (expected)
+-: test s: stdout mismatch, comparing s.O (actual) and s.1 (expected)
+-: test t: stdout mismatch, comparing t.O (actual) and t.1 (expected)
+-: test u: stdout mismatch, comparing u.O (actual) and u.1 (expected)
+-: test v: stdout mismatch, comparing v.O (actual) and v.1 (expected)
+-: test w: stdout mismatch, comparing w.O (actual) and w.1 (expected)
+-: test x: stdout mismatch, comparing x.O (actual) and x.1 (expected)
+-: test y: stdout mismatch, comparing y.O (actual) and y.1 (expected)
+-: test z: stderr mismatch, comparing z.E (actual) and z.1 (expected)
+*** z.E	Wed Apr 20 21:26:51 2005
+--- z.1	Wed Apr 20 21:26:51 2005
+***************
+*** 1,2 ****
+! k:\Sysutils\coreutils\5.3.0\coreutils-5.3.0\src\factor.exe: invalid option -- 1
+! Try `k:\Sysutils\coreutils\5.3.0\coreutils-5.3.0\src\factor.exe --help' for more information.
+--- 1,2 ----
+! factor: invalid option -- 1
+! Try `factor --help' for more information.
+FAIL: basic
+======================================
+1 of 1 tests failed
+Please report to bug-coreutils@gnu.org
+======================================
+make[3]: [check-TESTS] Fout 1 (genegeerd)
+make[3]: Leaving directory `/cygdrive/k/Sysutils/coreutils/5.3.0/coreutils-5.3.0/tests/factor'
+make[2]: Leaving directory `/cygdrive/k/Sysutils/coreutils/5.3.0/coreutils-5.3.0/tests/factor'
+Making check in fmt
+make[2]: Entering directory `/cygdrive/k/Sysutils/coreutils/5.3.0/coreutils-5.3.0/tests/fmt'
+make  check-TESTS
+make[3]: Entering directory `/cygdrive/k/Sysutils/coreutils/5.3.0/coreutils-5.3.0/tests/fmt'
+-: test 8-bit-pfx: stdout mismatch, comparing 8-bit-pfx.O (actual) and 8-bit-pfx.2 (expected)
+*** 8-bit-pfx.O	Wed Apr 20 21:26:52 2005
+--- 8-bit-pfx.2	Wed Apr 20 21:26:52 2005
+***************
+*** 1,2 ****
+! 莽a
+! 莽b
+--- 1 ----
+! 莽a b
+-: test wide-1: stderr mismatch, comparing wide-1.E (actual) and wide-1.1 (expected)
+*** wide-1.E	Wed Apr 20 21:26:52 2005
+--- wide-1.1	Wed Apr 20 21:26:52 2005
+***************
+*** 1 ****
+! k:\Sysutils\coreutils\5.3.0\coreutils-5.3.0\src\fmt.exe: invalid width: `32768'
+--- 1 ----
+! fmt: invalid width: `32768'
+-: test wide-2: stderr mismatch, comparing wide-2.E (actual) and wide-2.1 (expected)
+*** wide-2.E	Wed Apr 20 21:26:53 2005
+--- wide-2.1	Wed Apr 20 21:26:53 2005
+***************
+*** 1 ****
+! k:\Sysutils\coreutils\5.3.0\coreutils-5.3.0\src\fmt.exe: invalid width: `2147483647'
+--- 1 ----
+! fmt: invalid width: `2147483647'
+-: test bad-suffix: stderr mismatch, comparing bad-suffix.E (actual) and bad-suffix.2 (expected)
+*** bad-suffix.E	Wed Apr 20 21:26:53 2005
+--- bad-suffix.2	Wed Apr 20 21:26:53 2005
+***************
+*** 1 ****
+! k:\Sysutils\coreutils\5.3.0\coreutils-5.3.0\src\fmt.exe: invalid width: `72x'
+--- 1 ----
+! fmt: invalid width: `72x'
+-: test no-file: stderr mismatch, comparing no-file.E (actual) and no-file.1 (expected)
+*** no-file.E	Wed Apr 20 21:26:53 2005
+--- no-file.1	Wed Apr 20 21:26:53 2005
+***************
+*** 1 ****
+! k:\Sysutils\coreutils\5.3.0\coreutils-5.3.0\src\fmt.exe: cannot open `no-such-file' for reading: No such file or directory
+--- 1 ----
+! fmt: cannot open `no-such-file' for reading: No such file or directory
+-: test obs-1: stderr mismatch, comparing obs-1.E (actual) and obs-1.1 (expected)
+*** obs-1.E	Wed Apr 20 21:26:53 2005
+--- obs-1.1	Wed Apr 20 21:26:53 2005
+***************
+*** 1,3 ****
+! k:\Sysutils\coreutils\5.3.0\coreutils-5.3.0\src\fmt.exe: invalid option -- 7; -WIDTH is recognized only when it is the first
+  option; use -w N instead
+! Try `k:\Sysutils\coreutils\5.3.0\coreutils-5.3.0\src\fmt.exe --help' for more information.
+--- 1,3 ----
+! fmt: invalid option -- 7; -WIDTH is recognized only when it is the first
+  option; use -w N instead
+! Try `fmt --help' for more information.
+FAIL: basic
+k:\Sysutils\coreutils\5.3.0\coreutils-5.3.0\src\yes.exe: standard output
+k:\Sysutils\coreutils\5.3.0\coreutils-5.3.0\src\yes.exe: write error
+out exp verschillen: byte 2, regel 1
+1,43c1,30
+<   y y y y y y y y y y y y y y y y y y y y y y y
+<  y y y y y y y y y y y y y y y y y y y y y y y y
+<   y y y y y y y y y y y y y y y y y y y y y y y
+<  y y y y y y y y y y y y y y y y y y y y y y y y
+<   y y y y y y y y y y y y y y y y y y y y y y y
+<  y y y y y y y y y y y y y y y y y y y y y y y y
+<   y y y y y y y y y y y y y y y y y y y y y y y
+<  y y y y y y y y y y y y y y y y y y y y y y y y
+<   y y y y y y y y y y y y y y y y y y y y y y y
+<  y y y y y y y y y y y y y y y y y y y y y y y y
+<   y y y y y y y y y y y y y y y y y y y y y y y
+<  y y y y y y y y y y y y y y y y y y y y y y y y
+<  y y y y y y y y y y y y y y y y y y y y y y y y
+<  y y y y y y y y y y y y y y y y y y y y y y y y
+<  y y y y y y y y y y y y y y y y y y y y y y y y
+<  y y y y y y y y y y y y y y y y y y y y y y y y
+<  y y y y y y y y y y y y y y y y y y y y y y y y
+<  y y y y y y y y y y y y y y y y y y y y y y y y
+<  y y y y y y y y y y y y y y y y y y y y y y y y
+<  y y y y y y y y y y y y y y y y y y y y y y y y
+<  y y y y y y y y y y y y y y y y y y y y y y y y
+<  y y y y y y y y y y y y y y y y y y y y y y y y
+<  y y y y y y y y y y y y y y y y y y y y y y y y
+<  y y y y y y y y y y y y y y y y y y y y y y y y
+<  y y y y y y y y y y y y y y y y y y y y y y y y
+<  y y y y y y y y y y y y y y y y y y y y y y y y
+<  y y y y y y y y y y y y y y y y y y y y y y y y
+<  y y y y y y y y y y y y y y y y y y y y y y y y
+<  y y y y y y y y y y y y y y y y y y y y y y y y
+<  y y y y y y y y y y y y y y y y y y y y y y y y
+<   y y y y y y y y y y y y y y y y y y y y y y y
+<  y y y y y y y y y y y y y y y y y y y y y y y y
+<   y y y y y y y y y y y y y y y y y y y y y y y
+<  y y y y y y y y y y y y y y y y y y y y y y y y
+<   y y y y y y y y y y y y y y y y y y y y y y y
+<  y y y y y y y y y y y y y y y y y y y y y y y y
+<   y y y y y y y y y y y y y y y y y y y y y y y
+<  y y y y y y y y y y y y y y y y y y y y y y y y
+<   y y y y y y y y y y y y y y y y y y y y y y y
+<  y y y y y y y y y y y y y y y y y y y y y y y y
+<   y y y y y y y y y y y y y y y y y y y y y y y
+<   y y y y y y y y y y y y y y y y y y y y y y y
+<   y y y y
+---
+>   y y y y y y y y y y y y y y y y y y y y y y y y y y y y y y y y y y
+>   y y y y y y y y y y y y y y y y y y y y y y y y y y y y y y y y y y
+>   y y y y y y y y y y y y y y y y y y y y y y y y y y y y y y y y y y
+>   y y y y y y y y y y y y y y y y y y y y y y y y y y y y y y y y y y
+>   y y y y y y y y y y y y y y y y y y y y y y y y y y y y y y y y y y
+>   y y y y y y y y y y y y y y y y y y y y y y y y y y y y y y y y y y
+>   y y y y y y y y y y y y y y y y y y y y y y y y y y y y y y y y y y
+>   y y y y y y y y y y y y y y y y y y y y y y y y y y y y y y y y y y
+>   y y y y y y y y y y y y y y y y y y y y y y y y y y y y y y y y y y
+>   y y y y y y y y y y y y y y y y y y y y y y y y y y y y y y y y y y
+>   y y y y y y y y y y y y y y y y y y y y y y y y y y y y y y y y y y
+>   y y y y y y y y y y y y y y y y y y y y y y y y y y y y y y y y y y
+>   y y y y y y y y y y y y y y y y y y y y y y y y y y y y y y y y y y
+>   y y y y y y y y y y y y y y y y y y y y y y y y y y y y y y y y y y
+>   y y y y y y y y y y y y y y y y y y y y y y y y y y y y y y y y y y
+>   y y y y y y y y y y y y y y y y y y y y y y y y y y y y y y y y y y
+>   y y y y y y y y y y y y y y y y y y y y y y y y y y y y y y y y y y
+>   y y y y y y y y y y y y y y y y y y y y y y y y y y y y y y y y y y
+>   y y y y y y y y y y y y y y y y y y y y y y y y y y y y y y y y y y y
+>   y y y y y y y y y y y y y y y y y y y y y y y y y y y y y y y y y y y
+>   y y y y y y y y y y y y y y y y y y y y y y y y y y y y y y y y y y y
+>   y y y y y y y y y y y y y y y y y y y y y y y y y y y y y y y y y y y
+>   y y y y y y y y y y y y y y y y y y y y y y y y y y y y y y y y y y y
+>   y y y y y y y y y y y y y y y y y y y y y y y y y y y y y y y y y y y
+>   y y y y y y y y y y y y y y y y y y y y y y y y y y y y y y y y y y y
+>   y y y y y y y y y y y y y y y y y y y y y y y y y y y y y y y y y y y
+>   y y y y y y y y y y y y y y y y y y y y y y y y y y y y y y y y y y y
+>   y y y y y y y y y y y y y y y y y y y y y y y y y y y y y y y y y y y
+>   y y y y y y y y y y y y y y y y y y y y y y y y y y y y y y y y y y y
+>   y y
+FAIL: long-line
+======================================
+2 of 2 tests failed
+Please report to bug-coreutils@gnu.org
+======================================
+make[3]: [check-TESTS] Fout 1 (genegeerd)
+make[3]: Leaving directory `/cygdrive/k/Sysutils/coreutils/5.3.0/coreutils-5.3.0/tests/fmt'
+make[2]: Leaving directory `/cygdrive/k/Sysutils/coreutils/5.3.0/coreutils-5.3.0/tests/fmt'
+Making check in head
+make[2]: Entering directory `/cygdrive/k/Sysutils/coreutils/5.3.0/coreutils-5.3.0/tests/head'
+make  check-TESTS
+make[3]: Entering directory `/cygdrive/k/Sysutils/coreutils/5.3.0/coreutils-5.3.0/tests/head'
+PASS: head-tests
+==================
+All 1 tests passed
+==================
+make[3]: Leaving directory `/cygdrive/k/Sysutils/coreutils/5.3.0/coreutils-5.3.0/tests/head'
+make[2]: Leaving directory `/cygdrive/k/Sysutils/coreutils/5.3.0/coreutils-5.3.0/tests/head'
+Making check in install
+make[2]: Entering directory `/cygdrive/k/Sysutils/coreutils/5.3.0/coreutils-5.3.0/tests/install'
+make  check-TESTS
+make[3]: Entering directory `/cygdrive/k/Sysutils/coreutils/5.3.0/coreutils-5.3.0/tests/install'
+k:\Sysutils\coreutils\5.3.0\coreutils-5.3.0\src\ginstall.exe: cannot stat `/cygdrive/k/Sysutils/coreutils/5.3.0/coreutils-5.3.0/tests/install/../../src/ginstall': No such file or directory
+PASS: trap
+k:\Sysutils\coreutils\5.3.0\coreutils-5.3.0\src\cp.exe: cannot stat `../../../src/dd': No such file or directory
+k:\Sysutils\coreutils\5.3.0\coreutils-5.3.0\src\cp.exe: cannot stat `dd': No such file or directory
+h:\mingw\3.3.1\bin\strip.exe: dd2: No such file or directory
+../../../coreutils-5.3.0-src/tests/install/basic-1: WARNING!!!
+Your strip command doesn't seem to work, so skipping
+the test of install's --strip option.
+SKIP: basic-1
+PASS: create-leading
+======================
+All 2 tests passed
+(1 tests were not run)
+======================
+make[3]: Leaving directory `/cygdrive/k/Sysutils/coreutils/5.3.0/coreutils-5.3.0/tests/install'
+make[2]: Leaving directory `/cygdrive/k/Sysutils/coreutils/5.3.0/coreutils-5.3.0/tests/install'
+Making check in join
+make[2]: Entering directory `/cygdrive/k/Sysutils/coreutils/5.3.0/coreutils-5.3.0/tests/join'
+make  check-TESTS
+make[3]: Entering directory `/cygdrive/k/Sysutils/coreutils/5.3.0/coreutils-5.3.0/tests/join'
+*** 8-bit-t.O	Wed Apr 20 21:27:18 2005
+--- ../../../coreutils-5.3.0-src/tests/join/8-bit-t.X	Mon May 31 20:05:08 2004
+***************
+*** 0 ****
+--- 1,2 ----
++ a񗉲�
++ b񗉲�
+FAIL: join-tests
+======================================
+1 of 1 tests failed
+Please report to bug-coreutils@gnu.org
+======================================
+make[3]: [check-TESTS] Fout 1 (genegeerd)
+make[3]: Leaving directory `/cygdrive/k/Sysutils/coreutils/5.3.0/coreutils-5.3.0/tests/join'
+make[2]: Leaving directory `/cygdrive/k/Sysutils/coreutils/5.3.0/coreutils-5.3.0/tests/join'
+Making check in ln
+make[2]: Entering directory `/cygdrive/k/Sysutils/coreutils/5.3.0/coreutils-5.3.0/tests/ln'
+make  check-TESTS
+make[3]: Entering directory `/cygdrive/k/Sysutils/coreutils/5.3.0/coreutils-5.3.0/tests/ln'
+PASS: target-1
+FAIL: sf-1
+k:\Sysutils\coreutils\5.3.0\coreutils-5.3.0\src\rm.exe: cannot remove `tln-symlink': No such file or directory
+k:\Sysutils\coreutils\5.3.0\coreutils-5.3.0\src\ls.exe: hard-to-sym: No such file or directory
+../../../coreutils-5.3.0-src/tests/ln/misc: line 113: test: =: unary operator expected
+failure in testing framework
+FAIL: misc
+PASS: backup-1
+======================================
+2 of 4 tests failed
+Please report to bug-coreutils@gnu.org
+======================================
+make[3]: [check-TESTS] Fout 1 (genegeerd)
+make[3]: Leaving directory `/cygdrive/k/Sysutils/coreutils/5.3.0/coreutils-5.3.0/tests/ln'
+make[2]: Leaving directory `/cygdrive/k/Sysutils/coreutils/5.3.0/coreutils-5.3.0/tests/ln'
+Making check in ls
+make[2]: Entering directory `/cygdrive/k/Sysutils/coreutils/5.3.0/coreutils-5.3.0/tests/ls'
+make  check-TESTS
+make[3]: Entering directory `/cygdrive/k/Sysutils/coreutils/5.3.0/coreutils-5.3.0/tests/ls'
+k:\Sysutils\coreutils\5.3.0\coreutils-5.3.0\src\ls.exe: slink: No such file or directory
+k:\Sysutils\coreutils\5.3.0\coreutils-5.3.0\src\ls.exe: slink: No such file or directory
+k:\Sysutils\coreutils\5.3.0\coreutils-5.3.0\src\ls.exe: slink: No such file or directory
+FAIL: inode
+k:\Sysutils\coreutils\5.3.0\coreutils-5.3.0\src\ls.exe: dangle: No such file or directory
+out exp verschillen: byte 1, regel 1
+1,3c1,4
+< k:\Sysutils\coreutils\5.3.0\coreutils-5.3.0\src\ls.exe: slink-to-dir: No such file or directory
+< k:\Sysutils\coreutils\5.3.0\coreutils-5.3.0\src\ls.exe: slink-to-dir: No such file or directory
+< k:\Sysutils\coreutils\5.3.0\coreutils-5.3.0\src\ls.exe: slink-to-dir: No such file or directory
+---
+> dangle
+> sub
+> sub
+> sub
+FAIL: dangle
+k:\Sysutils\coreutils\5.3.0\coreutils-5.3.0\src\mkfifo.exe: cannot create fifo `fifo'
+out exp differ: char 17, line 2
+2c2,3
+< executable
+---
+> executable*
+> fifo|
+4,6c5,7
+< slink-dangle.lnk@
+< slink-dir.lnk@
+< slink-reg.lnk@
+---
+> slink-dangle@
+> slink-dir@
+> slink-reg@
+out2 exp2 differ: char 19, line 3
+2a3
+> fifo|
+4,6c5,7
+< slink-dangle.lnk@
+< slink-dir.lnk@
+< slink-reg.lnk@
+---
+> slink-dangle@
+> slink-dir@
+> slink-reg@
+FAIL: file-type
+PASS: recursive
+PASS: dired
+PASS: infloop
+PASS: rt-1
+A basic test of touch -a has just failed, so the subsequent
+tests in this file will not be run.
+
+In the output below, the date of last access for `a' should
+have been 1998-01-14 11:00.
+-rw-rw-rw-  1 KZLG 0 0 2005-04-20 19:27:35.531250000 +0000 a
+SKIP: time-1
+k:\Sysutils\coreutils\5.3.0\coreutils-5.3.0\src\ls.exe: symlink/: No such file or directory
+!::='::\'
+!K:='K:\Sysutils\coreutils\5.3.0\coreutils-5.3.0'
+ALLUSERSPROFILE='C:\Documents and Settings\All Users'
+APPDATA='C:\Documents and Settings\KZLG\Application Data'
+BASEDIR='E:\PROGRA~1\NTDDK'
+BASH=/usr/bin/sh
+BASH_VERSINFO=([0]="2" [1]="05b" [2]="0" [3]="1" [4]="release" [5]="i686-pc-cygwin")
+BASH_VERSION='2.05b.0(1)-release'
+CHARSET=UTF-8
+CLASSPATH='"E:\Program Files\Java\j2re1.4.2_03\lib\ext\QTJava.zip"'
+CLIENTNAME=Console
+COMMONPROGRAMFILES='C:\Program Files\Common Files'
+COMPUTERNAME=GAMMA
+COMSPEC='C:\WINDOWS\system32\cmd.exe'
+CONFIG_SITE=k:/config.site
+CVS_RSH=ssh.exe
+CYGWIN=codepage:oem
+DDKDRIVE=E:
+DIRSTACK=()
+DISPLAY=localhost:0
+DVLDIR='k:\'
+EDITOR=E:/PROGRA~1/oxedit/oxedit.EXE
+EUID=400
+FP_NO_HOST_CHECK=NO
+GCCVERSION=3.3.1
+GROUPS=()
+HOME=/cygdrive/f/kzlg
+HOMEDRIVE=f:
+HOMEPATH='\kzlg'
+HOSTNAME=gamma
+HOSTTYPE=i686
+IFS=' 	
+'
+INTERIX_ROOT=/dev/fs/H/SFU/
+INTERIX_ROOT_WIN='H:\SFU\'
+J2D_D3D=false
+LANG=
+LANGUAGE=
+LC_ALL=
+LC_COLLATE=
+LC_CTYPE=
+LC_MESSAGES=
+LC_NUMERIC=
+LC_TIME=
+LD_LIBRARY_PATH=/usr/lib:/usr/X11R6/lib
+LESS=-isnMCd
+LESSBINFMT='*n-'
+LESSCHARDEF=8bcccbcc18b95.33b33b.
+LESSCHARSET=latin1
+LN_S='ln -s'
+LOGONSERVER='\\GAMMA'
+MACHTYPE=i686-pc-cygwin
+MAILCHECK=0
+MAKEFLAGS=' --unix -wki'
+MAKELEVEL=4
+MAKE_MODE=UNIX
+MFLAGS='- --unix -wki'
+MINGWDIR='h:\mingw\3.3.1'
+NTRESKIT='E:\Program Files\NTrksupport'
+NUMBER_OF_PROCESSORS=1
+OLDPWD=/cygdrive/k/Sysutils/coreutils/5.3.0/coreutils-5.3.0/tests/ls
+OPENNT_ROOT=/dev/fs/H/SFU/
+OPTERR=1
+OPTIND=1
+OS=Windows_NT
+OSTYPE=cygwin
+PATH='/cygdrive/k/Sysutils/coreutils/5.3.0/coreutils-5.3.0/tests/ls/../../src:/cygdrive/h/mingw/3.3.1/bin:/usr/bin:/usr/local/bin:/cygdrive/e/util:/cygdrive/e/program files/gnuwin32/bin:/cygdrive/h/mingw/3.3.1/bin:/cygdrive/h/tex/bin/win32:/usr/bin:/cygdrive/c/WINDOWS/system32:/cygdrive/c/WINDOWS:/cygdrive/c/WINDOWS/System32/Wbem:/cygdrive/h/SFU/common/:.'
+PATHEXT='.COM;.EXE;.BAT;.CMD;.VBS;.VBE;.JS;.JSE;.WSF;.WSH;.tcl;.py;.pyc;.pyo;.pyw;.pys'
+PIPESTATUS=([0]="0")
+POPFILE_ROOT='e:\progra~1\popfile'
+POPFILE_USER='e:\progra~1\popfile'
+POSIXLY_CORRECT=y
+PPID=1844
+PROCESSOR_ARCHITECTURE=x86
+PROCESSOR_IDENTIFIER='x86 Family 15 Model 2 Stepping 7, GenuineIntel'
+PROCESSOR_LEVEL=15
+PROCESSOR_REVISION=0207
+PROG=ls
+PROGRAMFILES='C:\Program Files'
+PROMPT='$P$G'
+PS4='+ '
+PWD=/cygdrive/k/Sysutils/coreutils/5.3.0/coreutils-5.3.0/tests/ls/t-ls.396
+PWDIR=-is
+QTJAVA='"E:\Program Files\Java\j2re1.4.2_03\lib\ext\QTJava.zip"'
+SESSIONNAME=Console
+SFUDIR='H:\SFU\'
+SFUDIR_INTERIX=/dev/fs/H/SFU/
+SHELL=/bin/sh
+SHELLOPTS=braceexpand:hashall:interactive-comments:posix
+SHLVL=7
+SYSTEMDRIVE=C:
+SYSTEMROOT='C:\WINDOWS'
+TEMP=/cygdrive/m/temp
+TERM=ansi
+TEXDIR='h:\tex'
+TEXMFCNF='h:\tex\texmf-var\web2c'
+TEXMFTEMP='E:\Program Files\TeXLive\temp'
+TMAKEPATH='e:\program files\QT\tmake\lib\win32-msvc'
+TMP=/cygdrive/m/temp
+TMPDIR=/cygdrive/m/temp
+TZ=CET-1CES,M3.5.0/2,M10.5.0/2
+UID=400
+USERDOMAIN=GAMMA
+USERNAME=KZLG
+USERPROFILE='C:\Documents and Settings\KZLG'
+VCTOOLKITINSTALLDIR='E:\Program Files\Microsoft Visual C++ Toolkit 2003\'
+WINDIR='C:\WINDOWS'
+XAPPLRESDIR=/usr/X11R6/lib/X11/app-defaults
+XCMSDB=/usr/X11R6/lib/X11/Xcms.txt
+XKEYSYMDB=/usr/X11R6/lib/X11/XKeysymDB
+XNLSPATH=/usr/X11R6/lib/X11/locale
+_=
+as_unset=unset
+envvar_check_failed=0
+fail=0
+framework_failure=0
+i=LC_TIME
+srcdir=../../../coreutils-5.3.0-src/tests/ls
+tmp=t-ls.396
+top_srcdir=../../../coreutils-5.3.0-src
+var=VERSION_CONTROL
+vars='
+  BLOCKSIZE
+  BLOCK_SIZE
+  DF_BLOCK_SIZE
+  DU_BLOCK_SIZE
+  LS_BLOCK_SIZE
+  SIMPLE_BACKUP_SUFFIX
+  VERSION_CONTROL
+'
+FAIL: symlink-slash
+k:\Sysutils\coreutils\5.3.0\coreutils-5.3.0\src\ls.exe: link: No such file or directory
+failure in testing framework
+FAIL: follow-slink
+out exp verschillen: byte 23, regel 4
+4c4
+< symlink.lnk
+---
+> symlink
+out exp verschillen: byte 27, regel 5
+5c5
+< symlink.lnk
+---
+> symlink
+FAIL: no-arg
+PASS: m-option
+======================================
+6 of 11 tests failed
+(1 tests were not run)
+Please report to bug-coreutils@gnu.org
+======================================
+make[3]: [check-TESTS] Fout 1 (genegeerd)
+make[3]: Leaving directory `/cygdrive/k/Sysutils/coreutils/5.3.0/coreutils-5.3.0/tests/ls'
+make[2]: Leaving directory `/cygdrive/k/Sysutils/coreutils/5.3.0/coreutils-5.3.0/tests/ls'
+Making check in ls-2
+make[2]: Entering directory `/cygdrive/k/Sysutils/coreutils/5.3.0/coreutils-5.3.0/tests/ls-2'
+make  check-TESTS
+make[3]: Entering directory `/cygdrive/k/Sysutils/coreutils/5.3.0/coreutils-5.3.0/tests/ls-2'
+PATH=/cygdrive/k/Sysutils/coreutils/5.3.0/coreutils-5.3.0/tests/ls-2/../../src:/cygdrive/h/mingw/3.3.1/bin:/usr/bin:/usr/local/bin:/cygdrive/e/util:/cygdrive/e/program files/gnuwin32/bin:/cygdrive/h/mingw/3.3.1/bin:/cygdrive/h/tex/bin/win32:/usr/bin:/cygdrive/c/WINDOWS/system32:/cygdrive/c/WINDOWS:/cygdrive/c/WINDOWS/System32/Wbem:/cygdrive/h/SFU/common/:.
+-: q: No such file or directory
+FAIL: tests
+======================================
+1 of 1 tests failed
+Please report to bug-coreutils@gnu.org
+======================================
+make[3]: [check-TESTS] Fout 1 (genegeerd)
+make[3]: Leaving directory `/cygdrive/k/Sysutils/coreutils/5.3.0/coreutils-5.3.0/tests/ls-2'
+make[2]: Leaving directory `/cygdrive/k/Sysutils/coreutils/5.3.0/coreutils-5.3.0/tests/ls-2'
+Making check in md5sum
+make[2]: Entering directory `/cygdrive/k/Sysutils/coreutils/5.3.0/coreutils-5.3.0/tests/md5sum'
+make  check-TESTS
+make[3]: Entering directory `/cygdrive/k/Sysutils/coreutils/5.3.0/coreutils-5.3.0/tests/md5sum'
+-: test 1: stdout mismatch, comparing 1.O (actual) and 1.1 (expected)
+-: test 2: stdout mismatch, comparing 2.O (actual) and 2.1 (expected)
+-: test 3: stdout mismatch, comparing 3.O (actual) and 3.1 (expected)
+-: test 4: stdout mismatch, comparing 4.O (actual) and 4.1 (expected)
+-: test 5: stdout mismatch, comparing 5.O (actual) and 5.1 (expected)
+-: test 6: stdout mismatch, comparing 6.O (actual) and 6.1 (expected)
+-: test 7: stdout mismatch, comparing 7.O (actual) and 7.1 (expected)
+-: test backslash: stdout mismatch, comparing backslash.O (actual) and backslash.1 (expected)
+-: test check-1: stdout mismatch, comparing check-1.O (actual) and check-1.1 (expected)
+-: test check-bsd: stderr mismatch, comparing check-bsd.E (actual) and check-bsd.1 (expected)
+*** check-bsd.E	Wed Apr 20 21:27:42 2005
+--- check-bsd.1	Wed Apr 20 21:27:41 2005
+***************
+*** 1 ****
+! k:\Sysutils\coreutils\5.3.0\coreutils-5.3.0\src\md5sum.exe: f.sha1: no properly formatted MD5 checksum lines found
+--- 1 ----
+! md5sum: f.sha1: no properly formatted MD5 checksum lines found
+-: test check-bsd2: stdout mismatch, comparing check-bsd2.O (actual) and check-bsd2.1 (expected)
+FAIL: basic-1
+k:\Sysutils\coreutils\5.3.0\coreutils-5.3.0\src\rm.exe: cannot remove `a\nb': Invalid argument
+../../../coreutils-5.3.0-src/tests/md5sum/newline-1: can't create newline-containing file name, so can't run this test
+SKIP: newline-1
+======================================
+1 of 1 tests failed
+(1 tests were not run)
+Please report to bug-coreutils@gnu.org
+======================================
+make[3]: [check-TESTS] Fout 1 (genegeerd)
+make[3]: Leaving directory `/cygdrive/k/Sysutils/coreutils/5.3.0/coreutils-5.3.0/tests/md5sum'
+make[2]: Leaving directory `/cygdrive/k/Sysutils/coreutils/5.3.0/coreutils-5.3.0/tests/md5sum'
+Making check in misc
+make[2]: Entering directory `/cygdrive/k/Sysutils/coreutils/5.3.0/coreutils-5.3.0/tests/misc'
+make  check-TESTS
+make[3]: Entering directory `/cygdrive/k/Sysutils/coreutils/5.3.0/coreutils-5.3.0/tests/misc'
+../../../coreutils-5.3.0-src/tests/misc/tac-continue: FULL_PARTITION_TMPDIR not defined; skipping this test
+SKIP: tac-continue
+PASS: close-stdout
+pwd: at depth 5: File name too long
+../../../coreutils-5.3.0-src/tests/misc/pwd: line 1: cd: k:\Sysutils\coreutils\5.3.0\coreutils-5.3.0\tests\misc: No such file or directory
+k:\Sysutils\coreutils\5.3.0\coreutils-5.3.0\src\chmod.exe: cannot access `pwd.tmp': No such file or directory
+FAIL: pwd
+PASS: date-sec
+-: test no-nl-1: stdout mismatch, comparing no-nl-1.O (actual) and no-nl-1.3 (expected)
+-: test no-nl-2: stdout mismatch, comparing no-nl-2.O (actual) and no-nl-2.3 (expected)
+-: test no-nl-3: stdout mismatch, comparing no-nl-3.O (actual) and no-nl-3.3 (expected)
+-: test no-nl-4: stdout mismatch, comparing no-nl-4.O (actual) and no-nl-4.3 (expected)
+-: test no-nla1: stdout mismatch, comparing no-nla1.O (actual) and no-nla1.3 (expected)
+-: test no-nla2: stdout mismatch, comparing no-nla2.O (actual) and no-nla2.3 (expected)
+-: test no-nla3: stdout mismatch, comparing no-nla3.O (actual) and no-nla3.3 (expected)
+-: test no-nla4: stdout mismatch, comparing no-nla4.O (actual) and no-nla4.3 (expected)
+FAIL: paste-no-nl
+PASS: stat-fmt
+PASS: expand
+-: test s1: stdout mismatch, comparing s1.O (actual) and s1.2 (expected)
+-: test s2: stdout mismatch, comparing s2.O (actual) and s2.2 (expected)
+-: test s3: stdout mismatch, comparing s3.O (actual) and s3.2 (expected)
+-: test s4: stdout mismatch, comparing s4.O (actual) and s4.2 (expected)
+FAIL: fold
+
+cmp: EOF on err
+1d0
+< stderr
+FAIL: nohup
+PASS: head-elide-tail
+FAIL: split-fail
+PASS: false
+tty-eof: this script requires Perl's Expect package >=1.11
+SKIP: tty-eof
+PASS: printf-hex
+out exp verschillen: byte 66, regel 7
+7,8c7,8
+<      1^Ia^M$
+<        ^M$
+---
+>      1^Ia$
+>        $
+FAIL: nl
+PASS: split-l
+PASS: printf
+cmp: einde-bestand op exp
+28d27
+< creating file `xbb'
+FAIL: split-a
+PASS: head-pos
+-: test m1: stdout mismatch, comparing m1.O (actual) and m1.1 (expected)
+FAIL: sort
+PASS: head-c
+err experr differ: char 1, line 1
+1c1
+< k:\Sysutils\coreutils\5.3.0\coreutils-5.3.0\src\csplit.exe: warning: line number `1' is the same as preceding line number
+---
+> csplit: warning: line number `1' is the same as preceding line number
+err experr differ: char 1, line 1
+1,4c1,4
+< k:\Sysutils\coreutils\5.3.0\coreutils-5.3.0\src\csplit.exe: 0: line number must be greater than zero
+< k:\Sysutils\coreutils\5.3.0\coreutils-5.3.0\src\csplit.exe: line number `1' is smaller than preceding line number, 2
+< k:\Sysutils\coreutils\5.3.0\coreutils-5.3.0\src\csplit.exe: warning: line number `3' is the same as preceding line number
+< k:\Sysutils\coreutils\5.3.0\coreutils-5.3.0\src\csplit.exe: `3': line number out of range
+---
+> csplit: 0: line number must be greater than zero
+> csplit: line number `1' is smaller than preceding line number, 2
+> csplit: warning: line number `3' is the same as preceding line number
+> csplit: `3': line number out of range
+FAIL: csplit
+k:\Sysutils\coreutils\5.3.0\coreutils-5.3.0\src\nice.exe: cannot get priority: Function not implemented
+../../../coreutils-5.3.0-src/tests/misc/nice: this test must be run at nice level 0
+SKIP: nice
+../../../coreutils-5.3.0-src/tests/misc/pathchk1: The specified NON_ROOT_USERNAME (nobody)
+../../../coreutils-5.3.0-src/tests/misc/pathchk1: is invalid because its UID is 0.
+FAIL: pathchk1
+======================================
+10 of 21 tests failed
+(3 tests were not run)
+Please report to bug-coreutils@gnu.org
+======================================
+make[3]: [check-TESTS] Fout 1 (genegeerd)
+make[3]: Leaving directory `/cygdrive/k/Sysutils/coreutils/5.3.0/coreutils-5.3.0/tests/misc'
+make[2]: Leaving directory `/cygdrive/k/Sysutils/coreutils/5.3.0/coreutils-5.3.0/tests/misc'
+Making check in mkdir
+make[2]: Entering directory `/cygdrive/k/Sysutils/coreutils/5.3.0/coreutils-5.3.0/tests/mkdir'
+make  check-TESTS
+make[3]: Entering directory `/cygdrive/k/Sysutils/coreutils/5.3.0/coreutils-5.3.0/tests/mkdir'
+FAIL: p-1
+PASS: p-2
+FAIL: special-1
+../../../coreutils-5.3.0-src/tests/mkdir/perm: Since it looks like you're running this test in a directory with
+the setgid bit set, we're skipping this test.
+SKIP: perm
+../../../coreutils-5.3.0-src/tests/mkdir/parents: Since it looks like you're running this test in a directory with
+the setgid bit set, we're skipping this test.
+SKIP: parents
+PASS: t-slash
+======================================
+2 of 4 tests failed
+(2 tests were not run)
+Please report to bug-coreutils@gnu.org
+======================================
+make[3]: [check-TESTS] Fout 1 (genegeerd)
+make[3]: Leaving directory `/cygdrive/k/Sysutils/coreutils/5.3.0/coreutils-5.3.0/tests/mkdir'
+make[2]: Leaving directory `/cygdrive/k/Sysutils/coreutils/5.3.0/coreutils-5.3.0/tests/mkdir'
+Making check in mv
+make[2]: Entering directory `/cygdrive/k/Sysutils/coreutils/5.3.0/coreutils-5.3.0/tests/mv'
+make  check-TESTS
+make[3]: Entering directory `/cygdrive/k/Sysutils/coreutils/5.3.0/coreutils-5.3.0/tests/mv'
+../../../coreutils-5.3.0-src/tests/mv/leak-fd: This test is relatively expensive, so it is disabled by default.
+To run it anyway, rerun make check with the RUN_EXPENSIVE_TESTS
+environment variable set to yes.  E.g.,
+
+  env RUN_EXPENSIVE_TESTS=yes make check
+
+SKIP: leak-fd
+k:\Sysutils\coreutils\5.3.0\coreutils-5.3.0\src\df.exe: `/cygdrive/m/temp': No such file or directory
+k:\Sysutils\coreutils\5.3.0\coreutils-5.3.0\src\df.exe: `/var/tmp': No such file or directory
+k:\Sysutils\coreutils\5.3.0\coreutils-5.3.0\src\df.exe: `/usr/tmp': No such file or directory
+k:\Sysutils\coreutils\5.3.0\coreutils-5.3.0\src\df.exe: `/cygdrive/f/kzlg': No such file or directory
+**************************************
+This test requires a writable directory on a different
+disk partition, and I couldn't find one.  I tried these:
+  /cygdrive/m/temp /tmp /var/tmp /usr/tmp /cygdrive/f/kzlg
+Set your environment variable CANDIDATE_TMP_DIRS to make
+this test use a different list.
+**************************************
+k:\Sysutils\coreutils\5.3.0\coreutils-5.3.0\src\chmod.exe: cannot access `part-hardlink.tmp': No such file or directory
+SKIP: part-hardlink
+PASS: hard-4
+../../../coreutils-5.3.0-src/tests/mv/hard-3: The specified NON_ROOT_USERNAME (nobody)
+../../../coreutils-5.3.0-src/tests/mv/hard-3: is invalid because its UID is 0.
+FAIL: hard-3
+../../../coreutils-5.3.0-src/tests/mv/hard-2: The specified NON_ROOT_USERNAME (nobody)
+../../../coreutils-5.3.0-src/tests/mv/hard-2: is invalid because its UID is 0.
+FAIL: hard-2
+../../../coreutils-5.3.0-src/tests/mv/perm-1: The specified NON_ROOT_USERNAME (nobody)
+../../../coreutils-5.3.0-src/tests/mv/perm-1: is invalid because its UID is 0.
+FAIL: perm-1
+PASS: i-link-no
+k:\Sysutils\coreutils\5.3.0\coreutils-5.3.0\src\df.exe: `/cygdrive/m/temp': No such file or directory
+k:\Sysutils\coreutils\5.3.0\coreutils-5.3.0\src\df.exe: `/var/tmp': No such file or directory
+k:\Sysutils\coreutils\5.3.0\coreutils-5.3.0\src\df.exe: `/usr/tmp': No such file or directory
+k:\Sysutils\coreutils\5.3.0\coreutils-5.3.0\src\df.exe: `/cygdrive/f/kzlg': No such file or directory
+**************************************
+This test requires a writable directory on a different
+disk partition, and I couldn't find one.  I tried these:
+  /cygdrive/m/temp /tmp /var/tmp /usr/tmp /cygdrive/f/kzlg
+Set your environment variable CANDIDATE_TMP_DIRS to make
+this test use a different list.
+**************************************
+../../../coreutils-5.3.0-src/tests/mv/part-fail: The specified NON_ROOT_USERNAME (nobody)
+../../../coreutils-5.3.0-src/tests/mv/part-fail: is invalid because its UID is 0.
+FAIL: part-fail
+../../../coreutils-5.3.0-src/tests/mv/dup-source: The specified NON_ROOT_USERNAME (nobody)
+../../../coreutils-5.3.0-src/tests/mv/dup-source: is invalid because its UID is 0.
+FAIL: dup-source
+../../../coreutils-5.3.0-src/tests/mv/childproof: The specified NON_ROOT_USERNAME (nobody)
+../../../coreutils-5.3.0-src/tests/mv/childproof: is invalid because its UID is 0.
+FAIL: childproof
+PASS: i-4
+PASS: update
+../../../coreutils-5.3.0-src/tests/mv/i-2: The specified NON_ROOT_USERNAME (nobody)
+../../../coreutils-5.3.0-src/tests/mv/i-2: is invalid because its UID is 0.
+FAIL: i-2
+k:\Sysutils\coreutils\5.3.0\coreutils-5.3.0\src\df.exe: `/cygdrive/m/temp': No such file or directory
+k:\Sysutils\coreutils\5.3.0\coreutils-5.3.0\src\df.exe: `/var/tmp': No such file or directory
+k:\Sysutils\coreutils\5.3.0\coreutils-5.3.0\src\df.exe: `/usr/tmp': No such file or directory
+k:\Sysutils\coreutils\5.3.0\coreutils-5.3.0\src\df.exe: `/cygdrive/f/kzlg': No such file or directory
+**************************************
+This test requires a writable directory on a different
+disk partition, and I couldn't find one.  I tried these:
+  /cygdrive/m/temp /tmp /var/tmp /usr/tmp /cygdrive/f/kzlg
+Set your environment variable CANDIDATE_TMP_DIRS to make
+this test use a different list.
+**************************************
+SKIP: mv-special-1
+out2 exp differ: char 1, line 1
+FAIL: into-self
+k:\Sysutils\coreutils\5.3.0\coreutils-5.3.0\src\df.exe: `/cygdrive/m/temp': No such file or directory
+k:\Sysutils\coreutils\5.3.0\coreutils-5.3.0\src\df.exe: `/var/tmp': No such file or directory
+k:\Sysutils\coreutils\5.3.0\coreutils-5.3.0\src\df.exe: `/usr/tmp': No such file or directory
+k:\Sysutils\coreutils\5.3.0\coreutils-5.3.0\src\df.exe: `/cygdrive/f/kzlg': No such file or directory
+**************************************
+This test requires a writable directory on a different
+disk partition, and I couldn't find one.  I tried these:
+  /cygdrive/m/temp /tmp /var/tmp /usr/tmp /cygdrive/f/kzlg
+Set your environment variable CANDIDATE_TMP_DIRS to make
+this test use a different list.
+**************************************
+SKIP: into-self-2
+out2 exp differ: char 1, line 1
+FAIL: into-self-3
+FAIL: into-self-4
+k:\Sysutils\coreutils\5.3.0\coreutils-5.3.0\src\df.exe: `/cygdrive/m/temp': No such file or directory
+k:\Sysutils\coreutils\5.3.0\coreutils-5.3.0\src\df.exe: `/var/tmp': No such file or directory
+k:\Sysutils\coreutils\5.3.0\coreutils-5.3.0\src\df.exe: `/usr/tmp': No such file or directory
+k:\Sysutils\coreutils\5.3.0\coreutils-5.3.0\src\df.exe: `/cygdrive/f/kzlg': No such file or directory
+**************************************
+This test requires a writable directory on a different
+disk partition, and I couldn't find one.  I tried these:
+  /cygdrive/m/temp /tmp /var/tmp /usr/tmp /cygdrive/f/kzlg
+Set your environment variable CANDIDATE_TMP_DIRS to make
+this test use a different list.
+**************************************
+SKIP: backup-is-src
+-: test a: stderr mismatch, comparing a.E (actual) and a.2 (expected)
+*** a.E	Wed Apr 20 21:29:18 2005
+--- a.2	Wed Apr 20 21:29:18 2005
+***************
+*** 1 ****
+! k:\Sysutils\coreutils\5.3.0\coreutils-5.3.0\src\mv.exe: overwrite `dst'? 
+\ No newline at end of file
+--- 1 ----
+! mv: overwrite `dst'? 
+\ No newline at end of file
+FAIL: i-1
+k:\Sysutils\coreutils\5.3.0\coreutils-5.3.0\src\df.exe: `/cygdrive/m/temp': No such file or directory
+k:\Sysutils\coreutils\5.3.0\coreutils-5.3.0\src\df.exe: `/var/tmp': No such file or directory
+k:\Sysutils\coreutils\5.3.0\coreutils-5.3.0\src\df.exe: `/usr/tmp': No such file or directory
+k:\Sysutils\coreutils\5.3.0\coreutils-5.3.0\src\df.exe: `/cygdrive/f/kzlg': No such file or directory
+**************************************
+This test requires a writable directory on a different
+disk partition, and I couldn't find one.  I tried these:
+  /cygdrive/m/temp /tmp /var/tmp /usr/tmp /cygdrive/f/kzlg
+Set your environment variable CANDIDATE_TMP_DIRS to make
+this test use a different list.
+**************************************
+SKIP: hard-link-1
+out exp differ: char 1, line 1
+FAIL: force
+k:\Sysutils\coreutils\5.3.0\coreutils-5.3.0\src\df.exe: `/cygdrive/m/temp': No such file or directory
+k:\Sysutils\coreutils\5.3.0\coreutils-5.3.0\src\df.exe: `/var/tmp': No such file or directory
+k:\Sysutils\coreutils\5.3.0\coreutils-5.3.0\src\df.exe: `/usr/tmp': No such file or directory
+k:\Sysutils\coreutils\5.3.0\coreutils-5.3.0\src\df.exe: `/cygdrive/f/kzlg': No such file or directory
+**************************************
+This test requires a writable directory on a different
+disk partition, and I couldn't find one.  I tried these:
+  /cygdrive/m/temp /tmp /var/tmp /usr/tmp /cygdrive/f/kzlg
+Set your environment variable CANDIDATE_TMP_DIRS to make
+this test use a different list.
+**************************************
+SKIP: partition-perm
+k:\Sysutils\coreutils\5.3.0\coreutils-5.3.0\src\df.exe: `/cygdrive/m/temp': No such file or directory
+k:\Sysutils\coreutils\5.3.0\coreutils-5.3.0\src\df.exe: `/var/tmp': No such file or directory
+k:\Sysutils\coreutils\5.3.0\coreutils-5.3.0\src\df.exe: `/usr/tmp': No such file or directory
+k:\Sysutils\coreutils\5.3.0\coreutils-5.3.0\src\df.exe: `/cygdrive/f/kzlg': No such file or directory
+**************************************
+This test requires a writable directory on a different
+disk partition, and I couldn't find one.  I tried these:
+  /cygdrive/m/temp /tmp /var/tmp /usr/tmp /cygdrive/f/kzlg
+Set your environment variable CANDIDATE_TMP_DIRS to make
+this test use a different list.
+**************************************
+SKIP: to-symlink
+PASS: dir-file
+out exp differ: char 1, line 1
+FAIL: diag
+k:\Sysutils\coreutils\5.3.0\coreutils-5.3.0\src\df.exe: `/cygdrive/m/temp': No such file or directory
+k:\Sysutils\coreutils\5.3.0\coreutils-5.3.0\src\df.exe: `/var/tmp': No such file or directory
+k:\Sysutils\coreutils\5.3.0\coreutils-5.3.0\src\df.exe: `/usr/tmp': No such file or directory
+k:\Sysutils\coreutils\5.3.0\coreutils-5.3.0\src\df.exe: `/cygdrive/f/kzlg': No such file or directory
+**************************************
+This test requires a writable directory on a different
+disk partition, and I couldn't find one.  I tried these:
+  /cygdrive/m/temp /tmp /var/tmp /usr/tmp /cygdrive/f/kzlg
+Set your environment variable CANDIDATE_TMP_DIRS to make
+this test use a different list.
+**************************************
+SKIP: part-symlink
+k:\Sysutils\coreutils\5.3.0\coreutils-5.3.0\src\df.exe: `/cygdrive/m/temp': No such file or directory
+k:\Sysutils\coreutils\5.3.0\coreutils-5.3.0\src\df.exe: `/var/tmp': No such file or directory
+k:\Sysutils\coreutils\5.3.0\coreutils-5.3.0\src\df.exe: `/usr/tmp': No such file or directory
+k:\Sysutils\coreutils\5.3.0\coreutils-5.3.0\src\df.exe: `/cygdrive/f/kzlg': No such file or directory
+**************************************
+This test requires a writable directory on a different
+disk partition, and I couldn't find one.  I tried these:
+  /cygdrive/m/temp /tmp /var/tmp /usr/tmp /cygdrive/f/kzlg
+Set your environment variable CANDIDATE_TMP_DIRS to make
+this test use a different list.
+**************************************
+k:\Sysutils\coreutils\5.3.0\coreutils-5.3.0\src\chmod.exe: cannot access `part-rename.tmp': No such file or directory
+SKIP: part-rename
+PASS: trailing-slash
+======================================
+13 of 19 tests failed
+(10 tests were not run)
+Please report to bug-coreutils@gnu.org
+======================================
+make[3]: [check-TESTS] Fout 1 (genegeerd)
+make[3]: Leaving directory `/cygdrive/k/Sysutils/coreutils/5.3.0/coreutils-5.3.0/tests/mv'
+make[2]: Leaving directory `/cygdrive/k/Sysutils/coreutils/5.3.0/coreutils-5.3.0/tests/mv'
+Making check in od
+make[2]: Entering directory `/cygdrive/k/Sysutils/coreutils/5.3.0/coreutils-5.3.0/tests/od'
+make  check-TESTS
+make[3]: Entering directory `/cygdrive/k/Sysutils/coreutils/5.3.0/coreutils-5.3.0/tests/od'
+out exp verschillen: byte 18, regel 2
+2c2
+<    e   f   g
+---
+>    d   e   f
+FAIL: od-N
+out exp verschillen: byte 1, regel 1
+1,10c1
+< 
+< 0
+< 00
+< 00
+< 00
+< 00
+< 00
+< 00
+< 00
+< d
+---
+> 0d
+FAIL: x8
+======================================
+2 of 2 tests failed
+Please report to bug-coreutils@gnu.org
+======================================
+make[3]: [check-TESTS] Fout 1 (genegeerd)
+make[3]: Leaving directory `/cygdrive/k/Sysutils/coreutils/5.3.0/coreutils-5.3.0/tests/od'
+make[2]: Leaving directory `/cygdrive/k/Sysutils/coreutils/5.3.0/coreutils-5.3.0/tests/od'
+Making check in pr
+make[2]: Entering directory `/cygdrive/k/Sysutils/coreutils/5.3.0/coreutils-5.3.0/tests/pr'
+make  check-TESTS
+make[3]: Entering directory `/cygdrive/k/Sysutils/coreutils/5.3.0/coreutils-5.3.0/tests/pr'
+FAIL: pr-tests
+======================================
+1 of 1 tests failed
+Please report to bug-coreutils@gnu.org
+======================================
+make[3]: [check-TESTS] Fout 1 (genegeerd)
+make[3]: Leaving directory `/cygdrive/k/Sysutils/coreutils/5.3.0/coreutils-5.3.0/tests/pr'
+make[2]: Leaving directory `/cygdrive/k/Sysutils/coreutils/5.3.0/coreutils-5.3.0/tests/pr'
+Making check in readlink
+make[2]: Entering directory `/cygdrive/k/Sysutils/coreutils/5.3.0/coreutils-5.3.0/tests/readlink'
+make  check-TESTS
+make[3]: Entering directory `/cygdrive/k/Sysutils/coreutils/5.3.0/coreutils-5.3.0/tests/readlink'
+FAIL: rl-1
+FAIL: can-e
+FAIL: can-f
+FAIL: can-m
+======================================
+4 of 4 tests failed
+Please report to bug-coreutils@gnu.org
+======================================
+make[3]: [check-TESTS] Fout 1 (genegeerd)
+make[3]: Leaving directory `/cygdrive/k/Sysutils/coreutils/5.3.0/coreutils-5.3.0/tests/readlink'
+make[2]: Leaving directory `/cygdrive/k/Sysutils/coreutils/5.3.0/coreutils-5.3.0/tests/readlink'
+Making check in rm
+make[2]: Entering directory `/cygdrive/k/Sysutils/coreutils/5.3.0/coreutils-5.3.0/tests/rm'
+make  check-TESTS
+make[3]: Entering directory `/cygdrive/k/Sysutils/coreutils/5.3.0/coreutils-5.3.0/tests/rm'
+PASS: dot-rel
+../../../coreutils-5.3.0-src/tests/rm/inaccessible: The specified NON_ROOT_USERNAME (nobody)
+../../../coreutils-5.3.0-src/tests/rm/inaccessible: is invalid because its UID is 0.
+FAIL: inaccessible
+../../../coreutils-5.3.0-src/tests/rm/unread3: The specified NON_ROOT_USERNAME (nobody)
+../../../coreutils-5.3.0-src/tests/rm/unread3: is invalid because its UID is 0.
+FAIL: unread3
+../../../coreutils-5.3.0-src/tests/rm/no-give-up: The specified NON_ROOT_USERNAME (nobody)
+../../../coreutils-5.3.0-src/tests/rm/no-give-up: is invalid because its UID is 0.
+FAIL: no-give-up
+out exp differ: char 1, line 1
+1c1
+< k:\Sysutils\coreutils\5.3.0\coreutils-5.3.0\src\rm.exe: cannot remove `unwritable-dir': Is a directory
+---
+> rm: cannot remove `unwritable-dir': Is a directory
+FAIL: dir-no-w
+../../../coreutils-5.3.0-src/tests/rm/fail-2eperm: The specified NON_ROOT_USERNAME (nobody)
+../../../coreutils-5.3.0-src/tests/rm/fail-2eperm: is invalid because its UID is 0.
+FAIL: fail-2eperm
+../../../coreutils-5.3.0-src/tests/rm/cycle: The specified NON_ROOT_USERNAME (nobody)
+../../../coreutils-5.3.0-src/tests/rm/cycle: is invalid because its UID is 0.
+FAIL: cycle
+PASS: i-no-r
+../../../coreutils-5.3.0-src/tests/rm/fail-eperm: The specified NON_ROOT_USERNAME (nobody)
+../../../coreutils-5.3.0-src/tests/rm/fail-eperm: is invalid because its UID is 0.
+FAIL: fail-eperm
+k:\Sysutils\coreutils\5.3.0\coreutils-5.3.0\src\rm.exe: cannot remove `dangle': No such file or directory
+k:\Sysutils\coreutils\5.3.0\coreutils-5.3.0\src\rm.exe: cannot remove `symlink': No such file or directory
+PASS: dangling-symlink
+../../../coreutils-5.3.0-src/tests/rm/rm1: The specified NON_ROOT_USERNAME (nobody)
+../../../coreutils-5.3.0-src/tests/rm/rm1: is invalid because its UID is 0.
+FAIL: rm1
+../../../coreutils-5.3.0-src/tests/rm/rm2: The specified NON_ROOT_USERNAME (nobody)
+../../../coreutils-5.3.0-src/tests/rm/rm2: is invalid because its UID is 0.
+FAIL: rm2
+../../../coreutils-5.3.0-src/tests/rm/rm3: The specified NON_ROOT_USERNAME (nobody)
+../../../coreutils-5.3.0-src/tests/rm/rm3: is invalid because its UID is 0.
+FAIL: rm3
+../../../coreutils-5.3.0-src/tests/rm/rm4: The specified NON_ROOT_USERNAME (nobody)
+../../../coreutils-5.3.0-src/tests/rm/rm4: is invalid because its UID is 0.
+FAIL: rm4
+../../../coreutils-5.3.0-src/tests/rm/rm5: The specified NON_ROOT_USERNAME (nobody)
+../../../coreutils-5.3.0-src/tests/rm/rm5: is invalid because its UID is 0.
+FAIL: rm5
+../../../coreutils-5.3.0-src/tests/rm/unread2: The specified NON_ROOT_USERNAME (nobody)
+../../../coreutils-5.3.0-src/tests/rm/unread2: is invalid because its UID is 0.
+FAIL: unread2
+PASS: r-1
+PASS: r-2
+PASS: r-3
+PASS: i-1
+PASS: ir-1
+PASS: f-1
+PASS: sunos-1
+k:\Sysutils\coreutils\5.3.0\coreutils-5.3.0\src\mkdir.exe: cannot create directory `deep-1.tmp/2228/k/k/k/k/k/k/k/k/k/k/k/k/k/k/k/k/k/k/k/k/k/k/k/k/k/k/k/k/k/k/k/k/k/k/k/k/k/k/k/k/k/k/k/k/k/k/k/k/k/k/k/k/k/k/k/k/k/k/k/k/k/k/k/k/k/k/k/k/k/k/k/k/k/k/k/k/k/k/k/k/k/k/k/k/k/k/k/k/k/k': No such file or directory
+FAIL: deep-1
+../../../coreutils-5.3.0-src/tests/rm/hash: This test is relatively expensive, so it is disabled by default.
+To run it anyway, rerun make check with the RUN_EXPENSIVE_TESTS
+environment variable set to yes.  E.g.,
+
+  env RUN_EXPENSIVE_TESTS=yes make check
+
+SKIP: hash
+../../../coreutils-5.3.0-src/tests/rm/isatty: The specified NON_ROOT_USERNAME (nobody)
+../../../coreutils-5.3.0-src/tests/rm/isatty: is invalid because its UID is 0.
+FAIL: isatty
+======================================
+15 of 25 tests failed
+(1 tests were not run)
+Please report to bug-coreutils@gnu.org
+======================================
+make[3]: [check-TESTS] Fout 1 (genegeerd)
+make[3]: Leaving directory `/cygdrive/k/Sysutils/coreutils/5.3.0/coreutils-5.3.0/tests/rm'
+make[2]: Leaving directory `/cygdrive/k/Sysutils/coreutils/5.3.0/coreutils-5.3.0/tests/rm'
+Making check in rmdir
+make[2]: Entering directory `/cygdrive/k/Sysutils/coreutils/5.3.0/coreutils-5.3.0/tests/rmdir'
+make  check-TESTS
+make[3]: Entering directory `/cygdrive/k/Sysutils/coreutils/5.3.0/coreutils-5.3.0/tests/rmdir'
+../../../coreutils-5.3.0-src/tests/rmdir/fail-perm: The specified NON_ROOT_USERNAME (nobody)
+../../../coreutils-5.3.0-src/tests/rmdir/fail-perm: is invalid because its UID is 0.
+FAIL: fail-perm
+PASS: ignore
+PASS: t-slash
+======================================
+1 of 3 tests failed
+Please report to bug-coreutils@gnu.org
+======================================
+make[3]: [check-TESTS] Fout 1 (genegeerd)
+make[3]: Leaving directory `/cygdrive/k/Sysutils/coreutils/5.3.0/coreutils-5.3.0/tests/rmdir'
+make[2]: Leaving directory `/cygdrive/k/Sysutils/coreutils/5.3.0/coreutils-5.3.0/tests/rmdir'
+Making check in seq
+make[2]: Entering directory `/cygdrive/k/Sysutils/coreutils/5.3.0/coreutils-5.3.0/tests/seq'
+make  check-TESTS
+make[3]: Entering directory `/cygdrive/k/Sysutils/coreutils/5.3.0/coreutils-5.3.0/tests/seq'
+-: test onearg-1: stdout mismatch, comparing onearg-1.O (actual) and onearg-1.1 (expected)
+-: test neg-1: stdout mismatch, comparing neg-1.O (actual) and neg-1.1 (expected)
+-: test neg-2 failed: exit status mismatch:  expected 0, got 1
+-: test neg-3: stdout mismatch, comparing neg-3.O (actual) and neg-3.1 (expected)
+-: test neg-4: stdout mismatch, comparing neg-4.O (actual) and neg-4.1 (expected)
+-: test eq-wid-1: stdout mismatch, comparing eq-wid-1.O (actual) and eq-wid-1.1 (expected)
+-: test eq-wid-2 failed: exit status mismatch:  expected 0, got 1
+-: test fmt-1: stdout mismatch, comparing fmt-1.O (actual) and fmt-1.1 (expected)
+*** fmt-1.O	Wed Apr 20 21:31:03 2005
+--- fmt-1.1	Wed Apr 20 21:31:03 2005
+***************
+*** 1,2 ****
+! 1,5
+! 2,0
+--- 1,2 ----
+! 1.5
+! 2.0
+-: test fmt-2: stdout mismatch, comparing fmt-2.O (actual) and fmt-2.1 (expected)
+*** fmt-2.O	Wed Apr 20 21:31:03 2005
+--- fmt-2.1	Wed Apr 20 21:31:03 2005
+***************
+*** 1,2 ****
+! 1,5
+! 2,0
+--- 1,2 ----
+! 1.5
+! 2.0
+-: test fmt-3: stdout mismatch, comparing fmt-3.O (actual) and fmt-3.1 (expected)
+*** fmt-3.O	Wed Apr 20 21:31:03 2005
+--- fmt-3.1	Wed Apr 20 21:31:03 2005
+***************
+*** 1,2 ****
+! 1,5
+! 2,0
+--- 1,2 ----
+! 1.5
+! 2.0
+-: test fmt-4: stdout mismatch, comparing fmt-4.O (actual) and fmt-4.1 (expected)
+-: test fmt-5: stdout mismatch, comparing fmt-5.O (actual) and fmt-5.1 (expected)
+-: test fmt-6: stdout mismatch, comparing fmt-6.O (actual) and fmt-6.1 (expected)
+-: test fmt-7: stdout mismatch, comparing fmt-7.O (actual) and fmt-7.1 (expected)
+-: test fmt-8: stdout mismatch, comparing fmt-8.O (actual) and fmt-8.1 (expected)
+-: test fmt-9: stdout mismatch, comparing fmt-9.O (actual) and fmt-9.1 (expected)
+-: test fmt-a: stdout mismatch, comparing fmt-a.O (actual) and fmt-a.1 (expected)
+FAIL: basic
+======================================
+1 of 1 tests failed
+Please report to bug-coreutils@gnu.org
+======================================
+make[3]: [check-TESTS] Fout 1 (genegeerd)
+make[3]: Leaving directory `/cygdrive/k/Sysutils/coreutils/5.3.0/coreutils-5.3.0/tests/seq'
+make[2]: Leaving directory `/cygdrive/k/Sysutils/coreutils/5.3.0/coreutils-5.3.0/tests/seq'
+Making check in sha1sum
+make[2]: Entering directory `/cygdrive/k/Sysutils/coreutils/5.3.0/coreutils-5.3.0/tests/sha1sum'
+make  check-TESTS
+make[3]: Entering directory `/cygdrive/k/Sysutils/coreutils/5.3.0/coreutils-5.3.0/tests/sha1sum'
+-: test s1: stdout mismatch, comparing s1.O (actual) and s1.1 (expected)
+-: test s2: stdout mismatch, comparing s2.O (actual) and s2.1 (expected)
+-: test s3: stdout mismatch, comparing s3.O (actual) and s3.1 (expected)
+-: test s4: stdout mismatch, comparing s4.O (actual) and s4.1 (expected)
+-: test s5: stdout mismatch, comparing s5.O (actual) and s5.1 (expected)
+-: test s6: stdout mismatch, comparing s6.O (actual) and s6.1 (expected)
+-: test s7: stdout mismatch, comparing s7.O (actual) and s7.1 (expected)
+-: test bs-sha: stdout mismatch, comparing bs-sha.O (actual) and bs-sha.1 (expected)
+-: test check-bsd: stderr mismatch, comparing check-bsd.E (actual) and check-bsd.1 (expected)
+*** check-bsd.E	Wed Apr 20 21:31:07 2005
+--- check-bsd.1	Wed Apr 20 21:31:07 2005
+***************
+*** 1 ****
+! k:\Sysutils\coreutils\5.3.0\coreutils-5.3.0\src\sha1sum.exe: f.md5: no properly formatted SHA1 checksum lines found
+--- 1 ----
+! sha1sum: f.md5: no properly formatted SHA1 checksum lines found
+-: test check-bsd2: stdout mismatch, comparing check-bsd2.O (actual) and check-bsd2.1 (expected)
+FAIL: basic-1
+-: test 1: stdout mismatch, comparing 1.O (actual) and 1.1 (expected)
+-: test 2: stdout mismatch, comparing 2.O (actual) and 2.1 (expected)
+-: test 3: stdout mismatch, comparing 3.O (actual) and 3.1 (expected)
+-: test 4: stdout mismatch, comparing 4.O (actual) and 4.1 (expected)
+-: test 5: stdout mismatch, comparing 5.O (actual) and 5.1 (expected)
+-: test 6: stdout mismatch, comparing 6.O (actual) and 6.1 (expected)
+-: test 7: stdout mismatch, comparing 7.O (actual) and 7.1 (expected)
+-: test 8: stdout mismatch, comparing 8.O (actual) and 8.1 (expected)
+-: test 9: stdout mismatch, comparing 9.O (actual) and 9.1 (expected)
+-: test 10: stdout mismatch, comparing 10.O (actual) and 10.1 (expected)
+-: test 11: stdout mismatch, comparing 11.O (actual) and 11.1 (expected)
+-: test 12: stdout mismatch, comparing 12.O (actual) and 12.1 (expected)
+-: test 13: stdout mismatch, comparing 13.O (actual) and 13.1 (expected)
+-: test 14: stdout mismatch, comparing 14.O (actual) and 14.1 (expected)
+-: test 15: stdout mismatch, comparing 15.O (actual) and 15.1 (expected)
+-: test 16: stdout mismatch, comparing 16.O (actual) and 16.1 (expected)
+-: test 17: stdout mismatch, comparing 17.O (actual) and 17.1 (expected)
+-: test 18: stdout mismatch, comparing 18.O (actual) and 18.1 (expected)
+-: test 19: stdout mismatch, comparing 19.O (actual) and 19.1 (expected)
+-: test 20: stdout mismatch, comparing 20.O (actual) and 20.1 (expected)
+-: test 21: stdout mismatch, comparing 21.O (actual) and 21.1 (expected)
+-: test 22: stdout mismatch, comparing 22.O (actual) and 22.1 (expected)
+-: test 23: stdout mismatch, comparing 23.O (actual) and 23.1 (expected)
+-: test 24: stdout mismatch, comparing 24.O (actual) and 24.1 (expected)
+-: test 25: stdout mismatch, comparing 25.O (actual) and 25.1 (expected)
+-: test 26: stdout mismatch, comparing 26.O (actual) and 26.1 (expected)
+-: test 27: stdout mismatch, comparing 27.O (actual) and 27.1 (expected)
+-: test 28: stdout mismatch, comparing 28.O (actual) and 28.1 (expected)
+-: test 29: stdout mismatch, comparing 29.O (actual) and 29.1 (expected)
+-: test 30: stdout mismatch, comparing 30.O (actual) and 30.1 (expected)
+-: test 31: stdout mismatch, comparing 31.O (actual) and 31.1 (expected)
+-: test 32: stdout mismatch, comparing 32.O (actual) and 32.1 (expected)
+-: test 33: stdout mismatch, comparing 33.O (actual) and 33.1 (expected)
+-: test 34: stdout mismatch, comparing 34.O (actual) and 34.1 (expected)
+-: test 35: stdout mismatch, comparing 35.O (actual) and 35.1 (expected)
+-: test 36: stdout mismatch, comparing 36.O (actual) and 36.1 (expected)
+-: test 37: stdout mismatch, comparing 37.O (actual) and 37.1 (expected)
+-: test 38: stdout mismatch, comparing 38.O (actual) and 38.1 (expected)
+-: test 39: stdout mismatch, comparing 39.O (actual) and 39.1 (expected)
+-: test 40: stdout mismatch, comparing 40.O (actual) and 40.1 (expected)
+-: test 41: stdout mismatch, comparing 41.O (actual) and 41.1 (expected)
+-: test 42: stdout mismatch, comparing 42.O (actual) and 42.1 (expected)
+-: test 43: stdout mismatch, comparing 43.O (actual) and 43.1 (expected)
+-: test 44: stdout mismatch, comparing 44.O (actual) and 44.1 (expected)
+-: test 45: stdout mismatch, comparing 45.O (actual) and 45.1 (expected)
+-: test 46: stdout mismatch, comparing 46.O (actual) and 46.1 (expected)
+-: test 47: stdout mismatch, comparing 47.O (actual) and 47.1 (expected)
+-: test 48: stdout mismatch, comparing 48.O (actual) and 48.1 (expected)
+-: test 49: stdout mismatch, comparing 49.O (actual) and 49.1 (expected)
+-: test 50: stdout mismatch, comparing 50.O (actual) and 50.1 (expected)
+-: test 51: stdout mismatch, comparing 51.O (actual) and 51.1 (expected)
+-: test 52: stdout mismatch, comparing 52.O (actual) and 52.1 (expected)
+-: test 53: stdout mismatch, comparing 53.O (actual) and 53.1 (expected)
+-: test 54: stdout mismatch, comparing 54.O (actual) and 54.1 (expected)
+-: test 55: stdout mismatch, comparing 55.O (actual) and 55.1 (expected)
+-: test 56: stdout mismatch, comparing 56.O (actual) and 56.1 (expected)
+-: test 57: stdout mismatch, comparing 57.O (actual) and 57.1 (expected)
+-: test 58: stdout mismatch, comparing 58.O (actual) and 58.1 (expected)
+-: test 59: stdout mismatch, comparing 59.O (actual) and 59.1 (expected)
+-: test 60: stdout mismatch, comparing 60.O (actual) and 60.1 (expected)
+-: test 61: stdout mismatch, comparing 61.O (actual) and 61.1 (expected)
+-: test 62: stdout mismatch, comparing 62.O (actual) and 62.1 (expected)
+-: test 63: stdout mismatch, comparing 63.O (actual) and 63.1 (expected)
+-: test 64: stdout mismatch, comparing 64.O (actual) and 64.1 (expected)
+-: test 65: stdout mismatch, comparing 65.O (actual) and 65.1 (expected)
+-: test 66: stdout mismatch, comparing 66.O (actual) and 66.1 (expected)
+-: test 67: stdout mismatch, comparing 67.O (actual) and 67.1 (expected)
+-: test 68: stdout mismatch, comparing 68.O (actual) and 68.1 (expected)
+-: test 69: stdout mismatch, comparing 69.O (actual) and 69.1 (expected)
+-: test 70: stdout mismatch, comparing 70.O (actual) and 70.1 (expected)
+-: test 71: stdout mismatch, comparing 71.O (actual) and 71.1 (expected)
+-: test 72: stdout mismatch, comparing 72.O (actual) and 72.1 (expected)
+-: test 73: stdout mismatch, comparing 73.O (actual) and 73.1 (expected)
+-: test 74: stdout mismatch, comparing 74.O (actual) and 74.1 (expected)
+-: test 75: stdout mismatch, comparing 75.O (actual) and 75.1 (expected)
+-: test 76: stdout mismatch, comparing 76.O (actual) and 76.1 (expected)
+-: test 77: stdout mismatch, comparing 77.O (actual) and 77.1 (expected)
+-: test 78: stdout mismatch, comparing 78.O (actual) and 78.1 (expected)
+-: test 79: stdout mismatch, comparing 79.O (actual) and 79.1 (expected)
+-: test 80: stdout mismatch, comparing 80.O (actual) and 80.1 (expected)
+-: test 81: stdout mismatch, comparing 81.O (actual) and 81.1 (expected)
+-: test 82: stdout mismatch, comparing 82.O (actual) and 82.1 (expected)
+-: test 83: stdout mismatch, comparing 83.O (actual) and 83.1 (expected)
+-: test 84: stdout mismatch, comparing 84.O (actual) and 84.1 (expected)
+-: test 85: stdout mismatch, comparing 85.O (actual) and 85.1 (expected)
+-: test 86: stdout mismatch, comparing 86.O (actual) and 86.1 (expected)
+-: test 87: stdout mismatch, comparing 87.O (actual) and 87.1 (expected)
+-: test 88: stdout mismatch, comparing 88.O (actual) and 88.1 (expected)
+-: test 89: stdout mismatch, comparing 89.O (actual) and 89.1 (expected)
+-: test 90: stdout mismatch, comparing 90.O (actual) and 90.1 (expected)
+-: test 91: stdout mismatch, comparing 91.O (actual) and 91.1 (expected)
+-: test 92: stdout mismatch, comparing 92.O (actual) and 92.1 (expected)
+-: test 93: stdout mismatch, comparing 93.O (actual) and 93.1 (expected)
+-: test 94: stdout mismatch, comparing 94.O (actual) and 94.1 (expected)
+-: test 95: stdout mismatch, comparing 95.O (actual) and 95.1 (expected)
+-: test 96: stdout mismatch, comparing 96.O (actual) and 96.1 (expected)
+-: test 97: stdout mismatch, comparing 97.O (actual) and 97.1 (expected)
+-: test 98: stdout mismatch, comparing 98.O (actual) and 98.1 (expected)
+-: test 99: stdout mismatch, comparing 99.O (actual) and 99.1 (expected)
+-: test 100: stdout mismatch, comparing 100.O (actual) and 100.1 (expected)
+-: test 101: stdout mismatch, comparing 101.O (actual) and 101.1 (expected)
+-: test 102: stdout mismatch, comparing 102.O (actual) and 102.1 (expected)
+-: test 103: stdout mismatch, comparing 103.O (actual) and 103.1 (expected)
+-: test 104: stdout mismatch, comparing 104.O (actual) and 104.1 (expected)
+-: test 105: stdout mismatch, comparing 105.O (actual) and 105.1 (expected)
+-: test 106: stdout mismatch, comparing 106.O (actual) and 106.1 (expected)
+-: test 107: stdout mismatch, comparing 107.O (actual) and 107.1 (expected)
+-: test 108: stdout mismatch, comparing 108.O (actual) and 108.1 (expected)
+-: test 109: stdout mismatch, comparing 109.O (actual) and 109.1 (expected)
+-: test 110: stdout mismatch, comparing 110.O (actual) and 110.1 (expected)
+-: test 111: stdout mismatch, comparing 111.O (actual) and 111.1 (expected)
+-: test 112: stdout mismatch, comparing 112.O (actual) and 112.1 (expected)
+-: test 113: stdout mismatch, comparing 113.O (actual) and 113.1 (expected)
+-: test 114: stdout mismatch, comparing 114.O (actual) and 114.1 (expected)
+-: test 115: stdout mismatch, comparing 115.O (actual) and 115.1 (expected)
+-: test 116: stdout mismatch, comparing 116.O (actual) and 116.1 (expected)
+-: test 117: stdout mismatch, comparing 117.O (actual) and 117.1 (expected)
+-: test 118: stdout mismatch, comparing 118.O (actual) and 118.1 (expected)
+-: test 119: stdout mismatch, comparing 119.O (actual) and 119.1 (expected)
+-: test 120: stdout mismatch, comparing 120.O (actual) and 120.1 (expected)
+-: test 121: stdout mismatch, comparing 121.O (actual) and 121.1 (expected)
+-: test 122: stdout mismatch, comparing 122.O (actual) and 122.1 (expected)
+-: test 123: stdout mismatch, comparing 123.O (actual) and 123.1 (expected)
+-: test 124: stdout mismatch, comparing 124.O (actual) and 124.1 (expected)
+-: test 125: stdout mismatch, comparing 125.O (actual) and 125.1 (expected)
+-: test 126: stdout mismatch, comparing 126.O (actual) and 126.1 (expected)
+-: test 127: stdout mismatch, comparing 127.O (actual) and 127.1 (expected)
+-: test 128: stdout mismatch, comparing 128.O (actual) and 128.1 (expected)
+-: test 129: stdout mismatch, comparing 129.O (actual) and 129.1 (expected)
+-: test 130: stdout mismatch, comparing 130.O (actual) and 130.1 (expected)
+-: test 131: stdout mismatch, comparing 131.O (actual) and 131.1 (expected)
+-: test 132: stdout mismatch, comparing 132.O (actual) and 132.1 (expected)
+-: test 133: stdout mismatch, comparing 133.O (actual) and 133.1 (expected)
+-: test 134: stdout mismatch, comparing 134.O (actual) and 134.1 (expected)
+-: test 135: stdout mismatch, comparing 135.O (actual) and 135.1 (expected)
+-: test 136: stdout mismatch, comparing 136.O (actual) and 136.1 (expected)
+-: test 137: stdout mismatch, comparing 137.O (actual) and 137.1 (expected)
+-: test 138: stdout mismatch, comparing 138.O (actual) and 138.1 (expected)
+-: test 139: stdout mismatch, comparing 139.O (actual) and 139.1 (expected)
+-: test 140: stdout mismatch, comparing 140.O (actual) and 140.1 (expected)
+-: test 141: stdout mismatch, comparing 141.O (actual) and 141.1 (expected)
+-: test 142: stdout mismatch, comparing 142.O (actual) and 142.1 (expected)
+-: test 143: stdout mismatch, comparing 143.O (actual) and 143.1 (expected)
+-: test 144: stdout mismatch, comparing 144.O (actual) and 144.1 (expected)
+-: test 145: stdout mismatch, comparing 145.O (actual) and 145.1 (expected)
+-: test 146: stdout mismatch, comparing 146.O (actual) and 146.1 (expected)
+-: test 147: stdout mismatch, comparing 147.O (actual) and 147.1 (expected)
+-: test 148: stdout mismatch, comparing 148.O (actual) and 148.1 (expected)
+-: test 149: stdout mismatch, comparing 149.O (actual) and 149.1 (expected)
+-: test 150: stdout mismatch, comparing 150.O (actual) and 150.1 (expected)
+-: test 151: stdout mismatch, comparing 151.O (actual) and 151.1 (expected)
+-: test 152: stdout mismatch, comparing 152.O (actual) and 152.1 (expected)
+-: test 153: stdout mismatch, comparing 153.O (actual) and 153.1 (expected)
+-: test 154: stdout mismatch, comparing 154.O (actual) and 154.1 (expected)
+-: test 155: stdout mismatch, comparing 155.O (actual) and 155.1 (expected)
+-: test 156: stdout mismatch, comparing 156.O (actual) and 156.1 (expected)
+-: test 157: stdout mismatch, comparing 157.O (actual) and 157.1 (expected)
+-: test 158: stdout mismatch, comparing 158.O (actual) and 158.1 (expected)
+-: test 159: stdout mismatch, comparing 159.O (actual) and 159.1 (expected)
+-: test 160: stdout mismatch, comparing 160.O (actual) and 160.1 (expected)
+-: test 161: stdout mismatch, comparing 161.O (actual) and 161.1 (expected)
+-: test 162: stdout mismatch, comparing 162.O (actual) and 162.1 (expected)
+-: test 163: stdout mismatch, comparing 163.O (actual) and 163.1 (expected)
+-: test 164: stdout mismatch, comparing 164.O (actual) and 164.1 (expected)
+-: test 165: stdout mismatch, comparing 165.O (actual) and 165.1 (expected)
+-: test 166: stdout mismatch, comparing 166.O (actual) and 166.1 (expected)
+-: test 167: stdout mismatch, comparing 167.O (actual) and 167.1 (expected)
+-: test 168: stdout mismatch, comparing 168.O (actual) and 168.1 (expected)
+-: test 169: stdout mismatch, comparing 169.O (actual) and 169.1 (expected)
+-: test 170: stdout mismatch, comparing 170.O (actual) and 170.1 (expected)
+-: test 171: stdout mismatch, comparing 171.O (actual) and 171.1 (expected)
+-: test 172: stdout mismatch, comparing 172.O (actual) and 172.1 (expected)
+-: test 173: stdout mismatch, comparing 173.O (actual) and 173.1 (expected)
+-: test 174: stdout mismatch, comparing 174.O (actual) and 174.1 (expected)
+-: test 175: stdout mismatch, comparing 175.O (actual) and 175.1 (expected)
+-: test 176: stdout mismatch, comparing 176.O (actual) and 176.1 (expected)
+-: test 177: stdout mismatch, comparing 177.O (actual) and 177.1 (expected)
+-: test 178: stdout mismatch, comparing 178.O (actual) and 178.1 (expected)
+-: test 179: stdout mismatch, comparing 179.O (actual) and 179.1 (expected)
+-: test 180: stdout mismatch, comparing 180.O (actual) and 180.1 (expected)
+-: test 181: stdout mismatch, comparing 181.O (actual) and 181.1 (expected)
+-: test 182: stdout mismatch, comparing 182.O (actual) and 182.1 (expected)
+-: test 183: stdout mismatch, comparing 183.O (actual) and 183.1 (expected)
+-: test 184: stdout mismatch, comparing 184.O (actual) and 184.1 (expected)
+-: test 185: stdout mismatch, comparing 185.O (actual) and 185.1 (expected)
+-: test 186: stdout mismatch, comparing 186.O (actual) and 186.1 (expected)
+-: test 187: stdout mismatch, comparing 187.O (actual) and 187.1 (expected)
+-: test 188: stdout mismatch, comparing 188.O (actual) and 188.1 (expected)
+-: test 189: stdout mismatch, comparing 189.O (actual) and 189.1 (expected)
+-: test 190: stdout mismatch, comparing 190.O (actual) and 190.1 (expected)
+-: test 191: stdout mismatch, comparing 191.O (actual) and 191.1 (expected)
+-: test 192: stdout mismatch, comparing 192.O (actual) and 192.1 (expected)
+-: test 193: stdout mismatch, comparing 193.O (actual) and 193.1 (expected)
+-: test 194: stdout mismatch, comparing 194.O (actual) and 194.1 (expected)
+-: test 195: stdout mismatch, comparing 195.O (actual) and 195.1 (expected)
+-: test 196: stdout mismatch, comparing 196.O (actual) and 196.1 (expected)
+-: test 197: stdout mismatch, comparing 197.O (actual) and 197.1 (expected)
+-: test 198: stdout mismatch, comparing 198.O (actual) and 198.1 (expected)
+-: test 199: stdout mismatch, comparing 199.O (actual) and 199.1 (expected)
+-: test 200: stdout mismatch, comparing 200.O (actual) and 200.1 (expected)
+-: test 201: stdout mismatch, comparing 201.O (actual) and 201.1 (expected)
+-: test 202: stdout mismatch, comparing 202.O (actual) and 202.1 (expected)
+-: test 203: stdout mismatch, comparing 203.O (actual) and 203.1 (expected)
+-: test 204: stdout mismatch, comparing 204.O (actual) and 204.1 (expected)
+-: test 205: stdout mismatch, comparing 205.O (actual) and 205.1 (expected)
+-: test 206: stdout mismatch, comparing 206.O (actual) and 206.1 (expected)
+-: test 207: stdout mismatch, comparing 207.O (actual) and 207.1 (expected)
+-: test 208: stdout mismatch, comparing 208.O (actual) and 208.1 (expected)
+-: test 209: stdout mismatch, comparing 209.O (actual) and 209.1 (expected)
+-: test 210: stdout mismatch, comparing 210.O (actual) and 210.1 (expected)
+-: test 211: stdout mismatch, comparing 211.O (actual) and 211.1 (expected)
+-: test 212: stdout mismatch, comparing 212.O (actual) and 212.1 (expected)
+-: test 213: stdout mismatch, comparing 213.O (actual) and 213.1 (expected)
+-: test 214: stdout mismatch, comparing 214.O (actual) and 214.1 (expected)
+-: test 215: stdout mismatch, comparing 215.O (actual) and 215.1 (expected)
+-: test 216: stdout mismatch, comparing 216.O (actual) and 216.1 (expected)
+-: test 217: stdout mismatch, comparing 217.O (actual) and 217.1 (expected)
+-: test 218: stdout mismatch, comparing 218.O (actual) and 218.1 (expected)
+-: test 219: stdout mismatch, comparing 219.O (actual) and 219.1 (expected)
+-: test 220: stdout mismatch, comparing 220.O (actual) and 220.1 (expected)
+-: test 221: stdout mismatch, comparing 221.O (actual) and 221.1 (expected)
+-: test 222: stdout mismatch, comparing 222.O (actual) and 222.1 (expected)
+-: test 223: stdout mismatch, comparing 223.O (actual) and 223.1 (expected)
+-: test 224: stdout mismatch, comparing 224.O (actual) and 224.1 (expected)
+-: test 225: stdout mismatch, comparing 225.O (actual) and 225.1 (expected)
+-: test 226: stdout mismatch, comparing 226.O (actual) and 226.1 (expected)
+-: test 227: stdout mismatch, comparing 227.O (actual) and 227.1 (expected)
+-: test 228: stdout mismatch, comparing 228.O (actual) and 228.1 (expected)
+-: test 229: stdout mismatch, comparing 229.O (actual) and 229.1 (expected)
+FAIL: sample-vec
+======================================
+2 of 2 tests failed
+Please report to bug-coreutils@gnu.org
+======================================
+make[3]: [check-TESTS] Fout 1 (genegeerd)
+make[3]: Leaving directory `/cygdrive/k/Sysutils/coreutils/5.3.0/coreutils-5.3.0/tests/sha1sum'
+make[2]: Leaving directory `/cygdrive/k/Sysutils/coreutils/5.3.0/coreutils-5.3.0/tests/sha1sum'
+Making check in shred
+make[2]: Entering directory `/cygdrive/k/Sysutils/coreutils/5.3.0/coreutils-5.3.0/tests/shred'
+make  check-TESTS
+make[3]: Entering directory `/cygdrive/k/Sysutils/coreutils/5.3.0/coreutils-5.3.0/tests/shred'
+../../../coreutils-5.3.0-src/tests/shred/remove: The specified NON_ROOT_USERNAME (nobody)
+../../../coreutils-5.3.0-src/tests/shred/remove: is invalid because its UID is 0.
+FAIL: remove
+PASS: exact
+======================================
+1 of 2 tests failed
+Please report to bug-coreutils@gnu.org
+======================================
+make[3]: [check-TESTS] Fout 1 (genegeerd)
+make[3]: Leaving directory `/cygdrive/k/Sysutils/coreutils/5.3.0/coreutils-5.3.0/tests/shred'
+make[2]: Leaving directory `/cygdrive/k/Sysutils/coreutils/5.3.0/coreutils-5.3.0/tests/shred'
+Making check in sort
+make[2]: Entering directory `/cygdrive/k/Sysutils/coreutils/5.3.0/coreutils-5.3.0/tests/sort'
+make  check-TESTS
+make[3]: Entering directory `/cygdrive/k/Sysutils/coreutils/5.3.0/coreutils-5.3.0/tests/sort'
+*** n11b.O	Wed Apr 20 21:31:53 2005
+--- ../../../coreutils-5.3.0-src/tests/sort/n11b.X	Sun Sep 12 11:41:35 2004
+***************
+*** 1,2 ****
+- .01a
+  .010
+--- 1,2 ----
+  .010
++ .01a
+*** 11a.O	Wed Apr 20 21:32:01 2005
+--- ../../../coreutils-5.3.0-src/tests/sort/11a.X	Sun Sep 12 11:41:35 2004
+***************
+*** 1,2 ****
+- a :b
+  a	:a
+--- 1,2 ----
+  a	:a
++ a :b
+*** 11b.O	Wed Apr 20 21:32:01 2005
+--- ../../../coreutils-5.3.0-src/tests/sort/11b.X	Sun Sep 12 11:41:35 2004
+***************
+*** 1,2 ****
+- a :b
+  a	:a
+--- 1,2 ----
+  a	:a
++ a :b
+*** 16a.O	Wed Apr 20 21:32:03 2005
+--- ../../../coreutils-5.3.0-src/tests/sort/16a.X	Sun Sep 12 11:41:35 2004
+***************
+*** 1,6 ****
+  's-Gravenhage
+- 茅minence
+- 眉berhaupt
+- a毛roclub
+  Aag
+  aagtappels
+--- 1,6 ----
+  's-Gravenhage
+  Aag
+  aagtappels
++ a毛roclub
++ 茅minence
++ 眉berhaupt
+*** 21a.O	Wed Apr 20 21:32:05 2005
+--- ../../../coreutils-5.3.0-src/tests/sort/21a.X	Sun Sep 12 11:41:35 2004
+***************
+*** 1,3 ****
+  _
+  a
+- A
+--- 1,3 ----
++ A
+  _
+  a
+*** 21b.O	Wed Apr 20 21:32:05 2005
+--- ../../../coreutils-5.3.0-src/tests/sort/21b.X	Sun Sep 12 11:41:35 2004
+***************
+*** 1,3 ****
+- _
+- a
+  A
+--- 1,3 ----
+  A
++ a
++ _
+*** 21c.O	Wed Apr 20 21:32:05 2005
+--- ../../../coreutils-5.3.0-src/tests/sort/21c.X	Sun Sep 12 11:41:35 2004
+***************
+*** 1,3 ****
+- _
+- a
+  A
+--- 1,3 ----
+  A
++ a
++ _
+*** 21d.O	Wed Apr 20 21:32:05 2005
+--- ../../../coreutils-5.3.0-src/tests/sort/21d.X	Sun Sep 12 11:41:35 2004
+***************
+*** 1,3 ****
+- _
+- a
+  A
+--- 1,3 ----
+  A
++ a
++ _
+*** 21e.O	Wed Apr 20 21:32:05 2005
+--- ../../../coreutils-5.3.0-src/tests/sort/21e.X	Sun Sep 12 11:41:35 2004
+***************
+*** 1,3 ****
+- _
+- a
+  A
+--- 1,3 ----
+  A
++ a
++ _
+*** 21f.O	Wed Apr 20 21:32:06 2005
+--- ../../../coreutils-5.3.0-src/tests/sort/21f.X	Sun Sep 12 11:41:35 2004
+***************
+*** 1,3 ****
+- _
+  A
+  a
+--- 1,3 ----
+  A
+  a
++ _
+*** 21g.O	Wed Apr 20 21:32:06 2005
+--- ../../../coreutils-5.3.0-src/tests/sort/21g.X	Sun Sep 12 11:41:35 2004
+***************
+*** 1,2 ****
+- _
+  a
+--- 1,2 ----
+  a
++ _
+Files nul-nls.O and ../../../coreutils-5.3.0-src/tests/sort/nul-nls.X differ
+Files nul-tab.O and ../../../coreutils-5.3.0-src/tests/sort/nul-tab.X differ
+FAIL: sort-tests
+======================================
+1 of 1 tests failed
+Please report to bug-coreutils@gnu.org
+======================================
+make[3]: [check-TESTS] Fout 1 (genegeerd)
+make[3]: Leaving directory `/cygdrive/k/Sysutils/coreutils/5.3.0/coreutils-5.3.0/tests/sort'
+make[2]: Leaving directory `/cygdrive/k/Sysutils/coreutils/5.3.0/coreutils-5.3.0/tests/sort'
+Making check in stty
+make[2]: Entering directory `/cygdrive/k/Sysutils/coreutils/5.3.0/coreutils-5.3.0/tests/stty'
+make  check-TESTS
+make[3]: Entering directory `/cygdrive/k/Sysutils/coreutils/5.3.0/coreutils-5.3.0/tests/stty'
+../../../coreutils-5.3.0-src/tests/stty/row-col-1: This test must have a controlling input `terminal',
+  so it may not be run via `batch', `at', or `rsh'.
+  On some systems, it may not even be run in the background.
+SKIP: row-col-1
+../../../coreutils-5.3.0-src/tests/stty/basic-1: This test must have a controlling input `terminal',
+  so it may not be run via `batch', `at', or `rsh'.
+  On some systems, it may not even be run in the background.
+SKIP: basic-1
+======================
+All 0 tests passed
+(2 tests were not run)
+======================
+make[3]: Leaving directory `/cygdrive/k/Sysutils/coreutils/5.3.0/coreutils-5.3.0/tests/stty'
+make[2]: Leaving directory `/cygdrive/k/Sysutils/coreutils/5.3.0/coreutils-5.3.0/tests/stty'
+Making check in sum
+make[2]: Entering directory `/cygdrive/k/Sysutils/coreutils/5.3.0/coreutils-5.3.0/tests/sum'
+make  check-TESTS
+make[3]: Entering directory `/cygdrive/k/Sysutils/coreutils/5.3.0/coreutils-5.3.0/tests/sum'
+-: test 1: stdout mismatch, comparing 1.O (actual) and 1.1 (expected)
+-: test 2: stdout mismatch, comparing 2.O (actual) and 2.1 (expected)
+-: test 3: stdout mismatch, comparing 3.O (actual) and 3.1 (expected)
+-: test 4: stdout mismatch, comparing 4.O (actual) and 4.1 (expected)
+-: test 5: stdout mismatch, comparing 5.O (actual) and 5.1 (expected)
+-: test 6: stdout mismatch, comparing 6.O (actual) and 6.1 (expected)
+-: test 7: stdout mismatch, comparing 7.O (actual) and 7.1 (expected)
+-: test a-r-1k: stdout mismatch, comparing a-r-1k.O (actual) and a-r-1k.1 (expected)
+-: test a-s-1k: stdout mismatch, comparing a-s-1k.O (actual) and a-s-1k.1 (expected)
+-: test b-r-2k: stdout mismatch, comparing b-r-2k.O (actual) and b-r-2k.1 (expected)
+-: test b-s-2k: stdout mismatch, comparing b-s-2k.O (actual) and b-s-2k.1 (expected)
+-: test 1s: stdout mismatch, comparing 1s.O (actual) and 1s.1 (expected)
+-: test 2s: stdout mismatch, comparing 2s.O (actual) and 2s.1 (expected)
+-: test 3s: stdout mismatch, comparing 3s.O (actual) and 3s.1 (expected)
+-: test 4s: stdout mismatch, comparing 4s.O (actual) and 4s.1 (expected)
+-: test 5s: stdout mismatch, comparing 5s.O (actual) and 5s.1 (expected)
+-: test 6s: stdout mismatch, comparing 6s.O (actual) and 6s.1 (expected)
+-: test 7s: stdout mismatch, comparing 7s.O (actual) and 7s.1 (expected)
+FAIL: basic-1
+PASS: sysv
+======================================
+1 of 2 tests failed
+Please report to bug-coreutils@gnu.org
+======================================
+make[3]: [check-TESTS] Fout 1 (genegeerd)
+make[3]: Leaving directory `/cygdrive/k/Sysutils/coreutils/5.3.0/coreutils-5.3.0/tests/sum'
+make[2]: Leaving directory `/cygdrive/k/Sysutils/coreutils/5.3.0/coreutils-5.3.0/tests/sum'
+Making check in tac
+make[2]: Entering directory `/cygdrive/k/Sysutils/coreutils/5.3.0/coreutils-5.3.0/tests/tac'
+make  check-TESTS
+make[3]: Entering directory `/cygdrive/k/Sysutils/coreutils/5.3.0/coreutils-5.3.0/tests/tac'
+PASS: tac-tests
+==================
+All 1 tests passed
+==================
+make[3]: Leaving directory `/cygdrive/k/Sysutils/coreutils/5.3.0/coreutils-5.3.0/tests/tac'
+make[2]: Leaving directory `/cygdrive/k/Sysutils/coreutils/5.3.0/coreutils-5.3.0/tests/tac'
+Making check in tail
+make[2]: Entering directory `/cygdrive/k/Sysutils/coreutils/5.3.0/coreutils-5.3.0/tests/tail'
+make  check-TESTS
+make[3]: Entering directory `/cygdrive/k/Sysutils/coreutils/5.3.0/coreutils-5.3.0/tests/tail'
+FAIL: tail-tests
+======================================
+1 of 1 tests failed
+Please report to bug-coreutils@gnu.org
+======================================
+make[3]: [check-TESTS] Fout 1 (genegeerd)
+make[3]: Leaving directory `/cygdrive/k/Sysutils/coreutils/5.3.0/coreutils-5.3.0/tests/tail'
+make[2]: Leaving directory `/cygdrive/k/Sysutils/coreutils/5.3.0/coreutils-5.3.0/tests/tail'
+Making check in tail-2
+make[2]: Entering directory `/cygdrive/k/Sysutils/coreutils/5.3.0/coreutils-5.3.0/tests/tail-2'
+make  check-TESTS
+make[3]: Entering directory `/cygdrive/k/Sysutils/coreutils/5.3.0/coreutils-5.3.0/tests/tail-2'
+k:\Sysutils\coreutils\5.3.0\coreutils-5.3.0\src\sleep.exe: cannot read realtime clock: Invalid argument
+[1]+  Terminated              sleep 2
+k:\Sysutils\coreutils\5.3.0\coreutils-5.3.0\src\tail.exe: empty: Bad file descriptor
+k:\Sysutils\coreutils\5.3.0\coreutils-5.3.0\src\tail.exe: no files remaining
+k:\Sysutils\coreutils\5.3.0\coreutils-5.3.0\src\sleep.exe: cannot read realtime clock: Invalid argument
+sed: kan /proc/3588/status niet lezen: No such file or directory
+../../../coreutils-5.3.0-src/tests/tail-2/tail-n0f: process in unexpected state:
+../../../coreutils-5.3.0-src/tests/tail-2/tail-n0f: line 53: kill: (3588) - No such process
+k:\Sysutils\coreutils\5.3.0\coreutils-5.3.0\src\tail.exe: empty: Bad file descriptor
+k:\Sysutils\coreutils\5.3.0\coreutils-5.3.0\src\tail.exe: no files remaining
+k:\Sysutils\coreutils\5.3.0\coreutils-5.3.0\src\sleep.exe: cannot read realtime clock: Invalid argument
+sed: kan /proc/3316/status niet lezen: No such file or directory
+../../../coreutils-5.3.0-src/tests/tail-2/tail-n0f: process in unexpected state:
+../../../coreutils-5.3.0-src/tests/tail-2/tail-n0f: line 53: kill: (3316) - No such process
+k:\Sysutils\coreutils\5.3.0\coreutils-5.3.0\src\tail.exe: nonempty: Bad file descriptor
+k:\Sysutils\coreutils\5.3.0\coreutils-5.3.0\src\tail.exe: no files remaining
+k:\Sysutils\coreutils\5.3.0\coreutils-5.3.0\src\sleep.exe: cannot read realtime clock: Invalid argument
+sed: kan /proc/3428/status niet lezen: No such file or directory
+../../../coreutils-5.3.0-src/tests/tail-2/tail-n0f: process in unexpected state:
+../../../coreutils-5.3.0-src/tests/tail-2/tail-n0f: line 53: kill: (3428) - No such process
+k:\Sysutils\coreutils\5.3.0\coreutils-5.3.0\src\tail.exe: nonempty: Bad file descriptor
+k:\Sysutils\coreutils\5.3.0\coreutils-5.3.0\src\tail.exe: no files remaining
+k:\Sysutils\coreutils\5.3.0\coreutils-5.3.0\src\sleep.exe: cannot read realtime clock: Invalid argument
+sed: kan /proc/3632/status niet lezen: No such file or directory
+../../../coreutils-5.3.0-src/tests/tail-2/tail-n0f: process in unexpected state:
+../../../coreutils-5.3.0-src/tests/tail-2/tail-n0f: line 53: kill: (3632) - No such process
+FAIL: tail-n0f
+../../../coreutils-5.3.0-src/tests/tail-2/big-4gb: This test is relatively expensive, so it is disabled by default.
+To run it anyway, rerun make check with the RUN_EXPENSIVE_TESTS
+environment variable set to yes.  E.g.,
+
+  env RUN_EXPENSIVE_TESTS=yes make check
+
+SKIP: big-4gb
+PASS: proc-ksyms
+PASS: start-middle
+sleeping for 7 seconds...
+../../../coreutils-5.3.0-src/tests/tail-2/assert: line 32: kill: (3548) - No such process
+==> a <==
+
+==> foo <==
+k:\Sysutils\coreutils\5.3.0\coreutils-5.3.0\src\tail.exe: a: Bad file descriptor
+k:\Sysutils\coreutils\5.3.0\coreutils-5.3.0\src\tail.exe: foo: Bad file descriptor
+k:\Sysutils\coreutils\5.3.0\coreutils-5.3.0\src\tail.exe: no files remaining
+FAIL: assert
+sleeping for 7 seconds...
+../../../coreutils-5.3.0-src/tests/tail-2/assert-2: line 30: kill: (2836) - No such process
+==> a <==
+k:\Sysutils\coreutils\5.3.0\coreutils-5.3.0\src\tail.exe: cannot open `foo' for reading: No such file or directory
+k:\Sysutils\coreutils\5.3.0\coreutils-5.3.0\src\tail.exe: a: Bad file descriptor
+k:\Sysutils\coreutils\5.3.0\coreutils-5.3.0\src\tail.exe: no files remaining
+FAIL: assert-2
+======================================
+3 of 5 tests failed
+(1 tests were not run)
+Please report to bug-coreutils@gnu.org
+======================================
+make[3]: [check-TESTS] Fout 1 (genegeerd)
+make[3]: Leaving directory `/cygdrive/k/Sysutils/coreutils/5.3.0/coreutils-5.3.0/tests/tail-2'
+make[2]: Leaving directory `/cygdrive/k/Sysutils/coreutils/5.3.0/coreutils-5.3.0/tests/tail-2'
+Making check in test
+make[2]: Entering directory `/cygdrive/k/Sysutils/coreutils/5.3.0/coreutils-5.3.0/tests/test'
+make  check-TESTS
+make[3]: Entering directory `/cygdrive/k/Sysutils/coreutils/5.3.0/coreutils-5.3.0/tests/test'
+PASS: test-tests
+==================
+All 1 tests passed
+==================
+make[3]: Leaving directory `/cygdrive/k/Sysutils/coreutils/5.3.0/coreutils-5.3.0/tests/test'
+make[2]: Leaving directory `/cygdrive/k/Sysutils/coreutils/5.3.0/coreutils-5.3.0/tests/test'
+Making check in touch
+make[2]: Entering directory `/cygdrive/k/Sysutils/coreutils/5.3.0/coreutils-5.3.0/tests/touch'
+make  check-TESTS
+make[3]: Entering directory `/cygdrive/k/Sysutils/coreutils/5.3.0/coreutils-5.3.0/tests/touch'
+PASS: relative
+../../../coreutils-5.3.0-src/tests/touch/not-owner: The specified NON_ROOT_USERNAME (nobody)
+../../../coreutils-5.3.0-src/tests/touch/not-owner: is invalid because its UID is 0.
+FAIL: not-owner
+PASS: no-create-missing
+../../../coreutils-5.3.0-src/tests/touch/fail-diag: The specified NON_ROOT_USERNAME (nobody)
+../../../coreutils-5.3.0-src/tests/touch/fail-diag: is invalid because its UID is 0.
+FAIL: fail-diag
+PASS: dir-1
+FAIL: dangling-symlink
+sleeping for 2 seconds...
+sleeping for 2 seconds...
+PASS: empty-file
+k:\Sysutils\coreutils\5.3.0\coreutils-5.3.0\src\mkfifo.exe: cannot create fifo `fifo-3588'
+********************************************
+NOTICE: unable to create test prerequisites
+********************************************
+SKIP: fifo
+sleeping for 2 seconds...
+PASS: no-rights
+PASS: obsolescent
+======================================
+3 of 9 tests failed
+(1 tests were not run)
+Please report to bug-coreutils@gnu.org
+======================================
+make[3]: [check-TESTS] Fout 1 (genegeerd)
+make[3]: Leaving directory `/cygdrive/k/Sysutils/coreutils/5.3.0/coreutils-5.3.0/tests/touch'
+make[2]: Leaving directory `/cygdrive/k/Sysutils/coreutils/5.3.0/coreutils-5.3.0/tests/touch'
+Making check in tr
+make[2]: Entering directory `/cygdrive/k/Sysutils/coreutils/5.3.0/coreutils-5.3.0/tests/tr'
+make  check-TESTS
+make[3]: Entering directory `/cygdrive/k/Sysutils/coreutils/5.3.0/coreutils-5.3.0/tests/tr'
+PASS: tr-tests
+==================
+All 1 tests passed
+==================
+make[3]: Leaving directory `/cygdrive/k/Sysutils/coreutils/5.3.0/coreutils-5.3.0/tests/tr'
+make[2]: *** Geen regel voor aanmaken doel `repeat-Compl.I', nodig voor `check'.
+make[2]: *** Geen regel voor aanmaken doel `repeat-Compl.X', nodig voor `check'.
+make[2]: Doel `check' niet opnieuw gemaakt vanwege fouten.
+make[2]: Leaving directory `/cygdrive/k/Sysutils/coreutils/5.3.0/coreutils-5.3.0/tests/tr'
+make[1]: [check-recursive] Fout 1 (genegeerd)
+make[1]: Leaving directory `/cygdrive/k/Sysutils/coreutils/5.3.0/coreutils-5.3.0/tests'
+make[1]: Entering directory `/cygdrive/k/Sysutils/coreutils/5.3.0/coreutils-5.3.0'
+make[1]: Niets te doen voor `check-am'.
+make[1]: Leaving directory `/cygdrive/k/Sysutils/coreutils/5.3.0/coreutils-5.3.0'

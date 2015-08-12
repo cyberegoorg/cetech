@@ -1,0 +1,253 @@
+tail(P)                                                 tail(P)
+
+
+
+
+
+NAME
+       tail - copy the last part of a file
+
+SYNOPSIS
+       tail [-f][ -c number| -n number][file]
+
+DESCRIPTION
+       The  tail utility shall copy its input file to the stan-
+       dard output beginning at a designated place.
+
+       Copying shall begin at the point in the  file  indicated
+       by  the -c number or -n number options. The option-argu-
+       ment number shall be counted in units of lines or bytes,
+       according  to  the options -n and -c. Both line and byte
+       counts start from 1.
+
+       Tails relative to the end of the file may be saved in an
+       internal buffer, and thus may be limited in length. Such
+       a buffer, if any, shall be no smaller than {LINE_MAX}*10
+       bytes.
+
+OPTIONS
+       The  tail  utility shall conform to the Base Definitions
+       volume of IEEE Std 1003.1-2001,  Section  12.2,  Utility
+       Syntax Guidelines.
+
+       The following options shall be supported:
+
+       -c  number
+              The  application  shall  ensure  that  the number
+              option-argument is a decimal integer  whose  sign
+              affects  the  location  in  the file, measured in
+              bytes, to begin the copying:
+   Sign     Copying Starts
+   +        Relative to the beginning of the file.
+   -        Relative to the end of the file.
+   none     Relative to the end of the file.
+
+       The origin for counting shall be 1; that is, -c +1  rep-
+       resents the first byte of the file, -c -1 the last.
+
+       -f     If  the  input  file  is a regular file or if the
+              file operand specifies a FIFO, do  not  terminate
+              after  the  last  line of the input file has been
+              copied, but read and copy further bytes from  the
+              input file when they become available. If no file
+              operand is specified  and  standard  input  is  a
+              pipe,  the  -f  option  shall  be ignored. If the
+              input file is not a FIFO, pipe, or regular  file,
+              it  is  unspecified  whether or not the -f option
+              shall be ignored.
+
+       -n  number
+              This option shall be  equivalent  to  -c  number,
+              except the starting location in the file shall be
+              measured in lines instead of  bytes.  The  origin
+              for  counting  shall  be 1; that is, -n +1 repre-
+              sents the first line of the file, -n -1 the last.
+
+
+       If  neither  -c  nor  -n  is  specified,  -n 10 shall be
+       assumed.
+
+OPERANDS
+       The following operand shall be supported:
+
+       file   A pathname of an input file. If no file  operands
+              are  specified, the standard input shall be used.
+
+
+STDIN
+       The standard input shall be used only if no  file  oper-
+       ands are specified. See the INPUT FILES section.
+
+INPUT FILES
+       If  the  -c option is specified, the input file can con-
+       tain arbitrary data; otherwise, the input file shall  be
+       a text file.
+
+ENVIRONMENT VARIABLES
+       The  following  environment  variables  shall affect the
+       execution of tail:
+
+       LANG   Provide a default value for the internationaliza-
+              tion  variables  that are unset or null. (See the
+              Base Definitions volume of  IEEE Std 1003.1-2001,
+              Section  8.2,  Internationalization Variables for
+              the precedence of internationalization  variables
+              used  to  determine  the  values  of locale cate-
+              gories.)
+
+       LC_ALL If set to a non-empty string value, override  the
+              values  of  all  the  other  internationalization
+              variables.
+
+       LC_CTYPE
+              Determine the locale for  the  interpretation  of
+              sequences  of  bytes  of  text data as characters
+              (for example, single-byte as  opposed  to  multi-
+              byte characters in arguments and input files).
+
+       LC_MESSAGES
+              Determine  the  locale  that  should  be  used to
+              affect the format and contents of diagnostic mes-
+              sages written to standard error.
+
+       NLSPATH
+              Determine  the  location  of message catalogs for
+              the processing of LC_MESSAGES .
+
+
+ASYNCHRONOUS EVENTS
+       Default.
+
+STDOUT
+       The designated portion of the input file shall be  writ-
+       ten to standard output.
+
+STDERR
+       The  standard  error  shall  be used only for diagnostic
+       messages.
+
+OUTPUT FILES
+       None.
+
+EXTENDED DESCRIPTION
+       None.
+
+EXIT STATUS
+       The following exit values shall be returned:
+
+        0     Successful completion.
+
+       >0     An error occurred.
+
+
+CONSEQUENCES OF ERRORS
+       Default.
+
+       The following sections are informative.
+
+APPLICATION USAGE
+       The -c option should be used with caution when the input
+       is  a text file containing multi-byte characters; it may
+       produce output that does not start on a character bound-
+       ary.
+
+       Although  the  input  file  to tail can be any type, the
+       results might not be what  would  be  expected  on  some
+       character  special  device  files  or  on file types not
+       described   by   the   System   Interfaces   volume   of
+       IEEE Std 1003.1-2001.     Since     this    volume    of
+       IEEE Std 1003.1-2001 does not  specify  the  block  size
+       used  when  doing  input,  tail need not read all of the
+       data from devices that only perform block transfers.
+
+EXAMPLES
+       The -f option can be used to monitor  the  growth  of  a
+       file  that  is  being written by some other process. For
+       example, the command:
+
+
+              tail -f fred
+
+       prints the last ten lines of the file fred, followed  by
+       any  lines  that  are  appended to fred between the time
+       tail is initiated and killed. As  another  example,  the
+       command:
+
+
+              tail -f -c 15 fred
+
+       prints  the  last 15 bytes of the file fred, followed by
+       any bytes that are appended to  fred  between  the  time
+       tail is initiated and killed.
+
+RATIONALE
+       This version of tail was created to allow conformance to
+       the Utility Syntax Guidelines. The historical -b  option
+       was  omitted  because  of the general non-portability of
+       block-sized units of text. The  -c  option  historically
+       meant     "characters",     but     this    volume    of
+       IEEE Std 1003.1-2001 indicates that  it  means  "bytes".
+       This  was  selected  to allow reasonable implementations
+       when multi-byte characters  are  possible;  it  was  not
+       named -b to avoid confusion with the historical -b.
+
+       The origin of counting both lines and bytes is 1, match-
+       ing all widespread historical implementations.
+
+       The restriction on the internal buffer is  a  compromise
+       between  the  historical System V implementation of 4096
+       bytes and the BSD 32768 bytes.
+
+       The -f option has been implemented as a loop that sleeps
+       for  1  second  and copies any bytes that are available.
+       This is sufficient, but if  more  efficient  methods  of
+       determining  when  new data are available are developed,
+       implementations are encouraged to use them.
+
+       Historical documentation indicates that tail ignores the
+       -f  option if the input file is a pipe (pipe and FIFO on
+       systems that support FIFOs). On BSD-based systems,  this
+       has  been true; on System V-based systems, this was true
+       when input was taken from standard input, but it did not
+       ignore the -f flag if a FIFO was named as the file oper-
+       and. Since the -f option is not useful on pipes and  all
+       historical  implementations ignore -f if no file operand
+       is specified and standard input is a pipe,  this  volume
+       of IEEE Std 1003.1-2001 requires this behavior. However,
+       since the -f option is useful on a FIFO, this volume  of
+       IEEE Std 1003.1-2001  also  requires  that  if  standard
+       input is a FIFO or a FIFO is named, the -f option  shall
+       not  be  ignored.  Although historical behavior does not
+       ignore the -f option  for  other  file  types,  this  is
+       unspecified  so  that  implementations  are  allowed  to
+       ignore the -f option if it is known that the file cannot
+       be extended.
+
+       This  was  changed to the current form based on comments
+       noting that -c was almost never used without  specifying
+       a  number and that there was no need to specify -l if -n
+       number was given.
+
+FUTURE DIRECTIONS
+       None.
+
+SEE ALSO
+       head
+
+COPYRIGHT
+       Portions of this text are reprinted  and  reproduced  in
+       electronic  form  from  IEEE  Std  1003.1, 2003 Edition,
+       Standard for Information Technology -- Portable  Operat-
+       ing System Interface (POSIX), The Open Group Base Speci-
+       fications Issue 6, Copyright (C) 2001-2003 by the Insti-
+       tute  of  Electrical  and Electronics Engineers, Inc and
+       The Open Group. In the event of any discrepancy  between
+       this  version  and  the original IEEE and The Open Group
+       Standard, the original IEEE and The Open Group  Standard
+       is  the  referee  document. The original Standard can be
+       obtained        online        at        http://www.open-
+       group.org/unix/online.html .
+
+
+
+POSIX                         2003                      tail(P)

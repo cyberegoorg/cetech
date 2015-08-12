@@ -1,0 +1,66 @@
+KILL(1)                  User Commands                  KILL(1)
+
+
+
+
+
+NAME
+       kill - send signals to processes, or list signals
+
+SYNOPSIS
+       kill [-s SIGNAL | -SIGNAL] PID...
+       kill -l [SIGNAL]...
+       kill -t [SIGNAL]...
+
+DESCRIPTION
+       Send signals to processes, or list signals.
+
+       Mandatory  arguments  to  long options are mandatory for
+       short options too.
+
+       -s, --signal=SIGNAL, -SIGNAL
+
+              specify the name or number of the  signal  to  be
+              sent
+
+       -l, --list
+              list   signal  names,  or  convert  signal  names
+              to/from numbers
+
+       -t, --table
+              print a table of signal information
+
+       --help display this help and exit
+
+       --version
+              output version information and exit
+
+       SIGNAL may be a signal name like `HUP', or a signal num-
+       ber  like `1', or an exit status of a process terminated
+       by a signal.  PID is an integer; if negative it  identi-
+       fies a process group.
+
+AUTHOR
+       Written by Paul Eggert.
+
+REPORTING BUGS
+       Report bugs to <bug-coreutils@gnu.org>.
+
+COPYRIGHT
+       Copyright (C) 2004 Free Software Foundation, Inc.
+       This is free software; see the source for copying condi-
+       tions.  There is NO warranty; not even for MERCHANTABIL-
+       ITY or FITNESS FOR A PARTICULAR PURPOSE.
+
+SEE ALSO
+       The  full documentation for kill is maintained as a Tex-
+       info manual.  If the info and kill programs are properly
+       installed at your site, the command
+
+              info kill
+
+       should give you access to the complete manual.
+
+
+
+kill 5.3.0               November 2004                  KILL(1)

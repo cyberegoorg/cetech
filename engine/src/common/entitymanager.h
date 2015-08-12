@@ -43,9 +43,9 @@ namespace cetech1 {
         }
 
         inline Entity make_entity(uint32_t idx, uint32_t gen) {
-            return {
-                       .id = ((idx) << (ENTITY_INDEX_BIT_COUNT)) | (gen)
-            };
+            Entity ent;
+            ent.id = (((idx) << (ENTITY_INDEX_BIT_COUNT)) | (gen));
+            return ent;
         }
     }
 

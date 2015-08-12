@@ -1,0 +1,93 @@
+RM(1)                    User Commands                    RM(1)
+
+
+
+
+
+NAME
+       rm - remove files or directories
+
+SYNOPSIS
+       rm [OPTION]... FILE...
+
+DESCRIPTION
+       This  manual  page  documents the GNU version of rm.  rm
+       removes each specified file.  By default,  it  does  not
+       remove directories.
+
+       If  a  file  is unwritable, the standard input is a tty,
+       and the -f or --force option is not  given,  rm  prompts
+       the  user  for  whether  to  remove  the  file.   If the
+       response is not affirmative, the file is skipped.
+
+OPTIONS
+       Remove (unlink) the FILE(s).
+
+       -d, --directory
+              unlink FILE, even if it is a non-empty  directory
+              (super-user only; this works only if your system
+
+              supports `unlink' for nonempty directories)
+
+       -f, --force
+              ignore nonexistent files, never prompt
+
+       -i, --interactive
+              prompt before any removal
+
+       --no-preserve-root  do  not  treat  `/'  specially  (the
+              default)
+
+       --preserve-root
+              fail to operate recursively on `/'
+
+       -r, -R, --recursive
+              remove the contents of directories recursively
+
+       -v, --verbose
+              explain what is being done
+
+       --help display this help and exit
+
+       --version
+              output version information and exit
+
+       To remove a file whose name starts with a `-', for exam-
+       ple `-foo', use one of these commands:
+
+              rm -- -foo
+
+              rm ./-foo
+
+       Note  that if you use rm to remove a file, it is usually
+       possible to recover the contents of that file.   If  you
+       want more assurance that the contents are truly unrecov-
+       erable, consider using shred.
+
+AUTHOR
+       Written by Paul Rubin, David MacKenzie,  Richard  Stall-
+       man, and Jim Meyering.
+
+REPORTING BUGS
+       Report bugs to <bug-coreutils@gnu.org>.
+
+COPYRIGHT
+       Copyright (C) 2004 Free Software Foundation, Inc.
+       This is free software; see the source for copying condi-
+       tions.  There is NO warranty; not even for MERCHANTABIL-
+       ITY or FITNESS FOR A PARTICULAR PURPOSE.
+
+SEE ALSO
+       chattr(1), shred(1)
+
+       The full documentation for rm is maintained as a Texinfo
+       manual.  If  the  info  and  rm  programs  are  properly
+       installed at your site, the command
+
+              info rm
+
+       should give you access to the complete manual.
+
+
+
+rm 5.3.0                 November 2004                    RM(1)

@@ -1,0 +1,648 @@
+test(P)                                                 test(P)
+
+
+
+
+
+NAME
+       test - evaluate expression
+
+SYNOPSIS
+       test [expression]
+
+       [ [expression] ]
+
+
+DESCRIPTION
+       The test utility shall evaluate the expression and indi-
+       cate the result of the evaluation by its exit status. An
+       exit status of zero indicates that the expression evalu-
+       ated as true and an exit status of 1 indicates that  the
+       expression evaluated as false.
+
+       In  the  second  form  of  the  utility, which uses "[]"
+       rather than test, the application shall ensure that  the
+       square brackets are separate arguments.
+
+OPTIONS
+       The  test  utility shall not recognize the "--" argument
+       in the manner specified by guideline 10 in the Base Def-
+       initions  volume  of IEEE Std 1003.1-2001, Section 12.2,
+       Utility Syntax Guidelines.
+
+       No options shall be supported.
+
+OPERANDS
+       The application shall ensure that all operators and ele-
+       ments  of  primaries are presented as separate arguments
+       to the test utility.
+
+       The following primaries can be used to construct expres-
+       sion:
+
+       -b  file
+              True  if file exists and is a block special file.
+
+       -c  file
+              True if file exists and is  a  character  special
+              file.
+
+       -d  file
+              True if file exists and is a directory.
+
+       -e  file
+              True if file exists.
+
+       -f  file
+              True if file exists and is a regular file.
+
+       -g  file
+              True  if file exists and its set-group-ID flag is
+              set.
+
+       -h  file
+              True if file exists and is a symbolic link.
+
+       -L  file
+              True if file exists and is a symbolic link.
+
+       -n  string
+              True if the length of string is non-zero.
+
+       -p  file
+              True if file is a FIFO.
+
+       -r  file
+              True if file exists and is readable.  True  shall
+              indicate  that  permission to read from file will
+              be granted, as defined in File Read,  Write,  and
+              Creation .
+
+       -S  file
+              True if file exists and is a socket.
+
+       -s  file
+              True  if  file exists and has a size greater than
+              zero.
+
+       -t  file_descriptor
+
+              True if the file whose file descriptor number  is
+              file_descriptor  is open and is associated with a
+              terminal.
+
+       -u  file
+              True if file exists and its set-user-ID  flag  is
+              set.
+
+       -w  file
+              True  if  file exists and is writable. True shall
+              indicate that permission to write from file  will
+              be  granted,  as defined in File Read, Write, and
+              Creation .
+
+       -x  file
+              True if file exists and is executable. True shall
+              indicate  that permission to execute file will be
+              granted, as defined in File Read, Write, and Cre-
+              ation  . If file is a directory, true shall indi-
+              cate that  permission  to  search  file  will  be
+              granted.
+
+       -z  string
+              True if the length of string string is zero.
+
+       string True if the string string is not the null string.
+
+       s1 =  s2
+              True if the strings s1 and s2 are identical.
+
+       s1 !=  s2
+              True if the strings s1 and s2 are not  identical.
+
+       n1 -eq  n2
+              True  if the integers n1 and n2 are algebraically
+              equal.
+
+       n1 -ne  n2
+              True if the integers n1 and n2 are not  algebrai-
+              cally equal.
+
+       n1 -gt  n2
+              True  if  the integer n1 is algebraically greater
+              than the integer n2.
+
+       n1 -ge  n2
+              True if the integer n1 is  algebraically  greater
+              than or equal to the integer n2.
+
+       n1 -lt  n2
+              True if the integer n1 is algebraically less than
+              the integer n2.
+
+       n1 -le  n2
+              True if the integer n1 is algebraically less than
+              or equal to the integer n2.
+
+       expression1 -a  expression2
+
+              True  if  both  expression1  and  expression2 are
+              true. The -a binary primary is left  associative.
+              It has a higher precedence than -o.
+
+       expression1 -o  expression2
+
+              True  if  either  expression1  or  expression2 is
+              true. The -o binary primary is left  associative.
+
+
+       With the exception of the -h file and -L file primaries,
+       if a file argument is a symbolic link, test shall evalu-
+       ate  the  expression  by resolving the symbolic link and
+       using the file referenced by the link.
+
+       These primaries can be combined with the following oper-
+       ators:
+
+       !  expression
+              True if expression is false.
+
+       (  expression  )
+              True  if  expression is true. The parentheses can
+              be used to alter the normal precedence and  asso-
+              ciativity.
+
+
+       The primaries with two elements of the form:
+
+
+              -primary_operator primary_operand
+
+       are  known  as unary primaries. The primaries with three
+       elements in either of the two forms:
+
+
+              primary_operand -primary_operator primary_operand
+
+
+              primary_operand primary_operator primary_operand
+
+       are known as binary  primaries.  Additional  implementa-
+       tion-defined operators and primary_operators may be pro-
+       vided by implementations. They shall be of  the  form  -
+       operator  where the first character of operator is not a
+       digit.
+
+       The algorithm for  determining  the  precedence  of  the
+       operators  and  the return value that shall be generated
+       is based on the number of arguments presented  to  test.
+       (However, when using the "[...]" form, the right-bracket
+       final argument shall not be counted in this  algorithm.)
+
+       In  the following list, $1, $2, $3, and $4 represent the
+       arguments presented to test:
+
+       0 arguments:
+              Exit false (1).
+
+       1 argument:
+              Exit true (0) if $1 is not null; otherwise,  exit
+              false.
+
+       2 arguments:
+
+              If  $1 is '!' , exit true if $2 is null, false if
+              $2 is not null.
+
+              If $1 is a unary primary, exit true if the  unary
+              test is true, false if the unary test is false.
+
+              Otherwise, produce unspecified results.
+
+       3 arguments:
+
+              If  $2  is  a  binary primary, perform the binary
+              test of $1 and $3.
+
+              If $1 is '!' , negate the two-argument test of $2
+              and $3.
+
+              If  $1  is  '(' and $3 is ')' , perform the unary
+              test of $2.
+
+              Otherwise, produce unspecified results.
+
+       4 arguments:
+
+              If $1 is '!' , negate the three-argument test  of
+              $2, $3, and $4.
+
+              If  $1  is  '('  and $4 is ')' , perform the two-
+              argument test of $2 and $3.
+
+              Otherwise, the results are unspecified.
+
+       >4 arguments:
+              The results are unspecified.
+
+       On XSI-conformant systems, combinations of primaries and
+       operators  shall  be  evaluated using the precedence and
+       associativity rules described previously.  In  addition,
+       the  string  comparison  binary  primaries  '=' and "!="
+       shall have a higher precedence than any unary primary.
+
+
+STDIN
+       Not used.
+
+INPUT FILES
+       None.
+
+ENVIRONMENT VARIABLES
+       The following environment  variables  shall  affect  the
+       execution of test:
+
+       LANG   Provide a default value for the internationaliza-
+              tion variables that are unset or null.  (See  the
+              Base  Definitions volume of IEEE Std 1003.1-2001,
+              Section 8.2, Internationalization  Variables  for
+              the  precedence of internationalization variables
+              used to determine  the  values  of  locale  cate-
+              gories.)
+
+       LC_ALL If  set to a non-empty string value, override the
+              values  of  all  the  other  internationalization
+              variables.
+
+       LC_CTYPE
+              Determine  the  locale  for the interpretation of
+              sequences of bytes of  text  data  as  characters
+              (for  example,  single-byte  as opposed to multi-
+              byte characters in arguments).
+
+       LC_MESSAGES
+              Determine the  locale  that  should  be  used  to
+              affect the format and contents of diagnostic mes-
+              sages written to standard error.
+
+       NLSPATH
+              Determine the location of  message  catalogs  for
+              the processing of LC_MESSAGES .
+
+
+ASYNCHRONOUS EVENTS
+       Default.
+
+STDOUT
+       Not used.
+
+STDERR
+       The  standard  error  shall  be used only for diagnostic
+       messages.
+
+OUTPUT FILES
+       None.
+
+EXTENDED DESCRIPTION
+       None.
+
+EXIT STATUS
+       The following exit values shall be returned:
+
+        0     expression evaluated to true.
+
+        1     expression evaluated to false or  expression  was
+              missing.
+
+       >1     An error occurred.
+
+
+CONSEQUENCES OF ERRORS
+       Default.
+
+       The following sections are informative.
+
+APPLICATION USAGE
+       Scripts  should  be  careful when dealing with user-sup-
+       plied input that could be confused  with  primaries  and
+       operators.  Unless  the application writer knows all the
+       cases that produce  input  to  the  script,  invocations
+       like:
+
+
+              test "$1" -a "$2"
+
+       should be written as:
+
+
+              test "$1" && test "$2"
+
+       to  avoid  problems if a user supplied values such as $1
+       set to '!'  and $2 set to the null string. That  is,  in
+       cases where maximal portability is of concern, replace:
+
+
+              test expr1 -a expr2
+
+       with:
+
+
+              test expr1 && test expr2
+
+       and replace:
+
+
+              test expr1 -o expr2
+
+       with:
+
+
+              test expr1 || test expr2
+
+       but note that, in test, -a has higher precedence than -o
+       while "&&" and "||" have equal precedence in the  shell.
+
+       Parentheses  or  braces can be used in the shell command
+       language to effect grouping.
+
+       Parentheses must be escaped when using sh; for example:
+
+
+              test \( expr1 -a expr2 \) -o expr3
+
+       This command is not always portable outside  XSI-confor-
+       mant systems.  The following form can be used instead:
+
+
+              ( test expr1 && test expr2 ) || test expr3
+
+       The two commands:
+
+
+              test "$1"
+              test ! "$1"
+
+       could  not  be used reliably on some historical systems.
+       Unexpected results would occur if such a string  expres-
+       sion were used and $1 expanded to '!' , '(' , or a known
+       unary primary.  Better constructs are:
+
+
+              test -n "$1"
+              test -z "$1"
+       respectively.
+
+       Historical systems have also been unreliable  given  the
+       common construct:
+
+
+              test "$response" = "expected string"
+
+       One of the following is a more reliable form:
+
+
+              test "X$response" = "Xexpected string"
+              test "expected string" = "$response"
+
+       Note  that  the second form assumes that expected string
+       could  not  be  confused  with  any  unary  primary.  If
+       expected  string  starts  with '-' , '(' , '!' , or even
+       '=' , the first form should be used instead.  Using  the
+       preceding  rules  without the XSI marked extensions, any
+       of the three comparison forms  is  reliable,  given  any
+       input.   (However,  note  that the strings are quoted in
+       all cases.)
+
+       Because the string comparison binary primaries, '='  and
+       "!="  ,  have a higher precedence than any unary primary
+       in the greater than 4 argument case, unexpected  results
+       can  occur  if  arguments are not properly prepared. For
+       example, in:
+
+
+              test -d $1 -o -d $2
+
+       If $1 evaluates to a possible directory name  of  '='  ,
+       the  first  three arguments are considered a string com-
+       parison, which shall cause a syntax error when the  sec-
+       ond  -d is encountered.  One of the following forms pre-
+       vents this; the second is preferred:
+
+
+              test \( -d "$1" \) -o \( -d "$2" \)
+              test -d "$1" || test -d "$2"
+
+       Also in the greater than 4 argument case:
+
+
+              test "$1" = "bat" -a "$2" = "ball"
+
+       syntax errors occur if $1 evaluates to '(' or '!' .  One
+       of  the following forms prevents this; the third is pre-
+       ferred:
+
+
+              test "X$1" = "Xbat" -a "X$2" = "Xball"
+              test "$1" = "bat" && test "$2" = "ball"
+              test "X$1" = "Xbat" && test "X$2" = "Xball"
+
+EXAMPLES
+       Exit if there are not two or three arguments (two varia-
+       tions):
+
+
+              if [ $# -ne 2 -a $# -ne 3 ]; then exit 1; fi
+              if [ $# -lt 2 -o $# -gt 3 ]; then exit 1; fi
+
+       Perform a mkdir if a directory does not exist:
+
+
+              test ! -d tempdir && mkdir tempdir
+
+       Wait for a file to become non-readable:
+
+
+              while test -r thefile
+              do
+                  sleep 30
+              done
+              echo '"thefile" is no longer readable'
+
+       Perform  a  command  if  the  argument  is  one of three
+       strings (two variations):
+
+
+              if [ "$1" = "pear" ] || [ "$1" = "grape" ] || [ "$1" = "apple" ]
+              then
+                  command
+              fi
+
+
+              case "$1" in
+                  pear|grape|apple) command ;;
+              esac
+
+RATIONALE
+       The  KornShell-derived   conditional   command   (double
+       bracket  [[]])  was  removed from the shell command lan-
+       guage description in an early proposal. Objections  were
+       raised  that the real problem is misuse of the test com-
+       mand ( [), and putting it into the shell  is  the  wrong
+       way  to  fix  the problem. Instead, proper documentation
+       and a new shell reserved word ( !) are sufficient.
+
+       Tests that require multiple test operations can be  done
+       at  the  shell level using individual invocations of the
+       test command and shell logicals, rather than  using  the
+       error-prone -o flag of test.
+
+       XSI-conformant systems support more than four arguments.
+
+       XSI-conformant systems support  the  combining  of  pri-
+       maries with the following constructs:
+
+       expression1 -a expression2
+
+              True  if  both  expression1  and  expression2 are
+              true.
+
+       expression1 -o expression2
+
+              True if at least one of expression1  and  expres-
+              sion2 are true.
+
+       ( expression )
+
+              True if expression is true.
+
+
+       In  evaluating  these more complex combined expressions,
+       the following precedence rules are used:
+
+              The unary primaries have higher  precedence  than
+              the algebraic binary primaries.
+
+              The  unary  primaries  have lower precedence than
+              the string binary primaries.
+
+              The unary and binary primaries have higher prece-
+              dence than the unary string primary.
+
+              The  ! operator has higher precedence than the -a
+              operator, and the -a operator has  higher  prece-
+              dence than the -o operator.
+
+              The -a and -o operators are left associative.
+
+              The  parentheses  can be used to alter the normal
+              precedence and associativity.
+
+       The BSD and System V versions of -f are  not  the  same.
+       The BSD definition was:
+
+       -f  file
+              True if file exists and is not a directory.
+
+
+       The SVID version (true if the file exists and is a regu-
+       lar   file)   was   chosen   for    this    volume    of
+       IEEE Std 1003.1-2001  because its use is consistent with
+       the -b, -c, -d, and -p operands ( file exists and  is  a
+       specific file type).
+
+       The -e primary, possessing similar functionality to that
+       provided by the C shell, was added because  it  provides
+       the  only  way  for a shell script to find out if a file
+       exists without trying to open the file. Since  implemen-
+       tations are allowed to add additional file types, a por-
+       table script cannot use:
+
+
+              test -b foo -o -c foo -o -d foo -o -f foo -o -p foo
+
+       to find out if foo is an existing  file.  On  historical
+       BSD systems, the existence of a file could be determined
+       by:
+
+
+              test -f foo -o -d foo
+
+       but there was no easy way to determine that an  existing
+       file  was  a  regular  file.  An early proposal used the
+       KornShell -a primary (with the same meaning),  but  this
+       was  changed to -e because there were concerns about the
+       high probability of humans confusing the -a primary with
+       the -a binary operator.
+
+       The  following  options were not included in this volume
+       of IEEE Std 1003.1-2001, although they are  provided  by
+       some  implementations. These operands should not be used
+       by new implementations for other purposes:
+
+       -k  file
+              True if file exists and its sticky bit is set.
+
+       -C  file
+              True if file is a contiguous file.
+
+       -V  file
+              True if file is a version file.
+
+
+       The following option was not  included  because  it  was
+       undocumented  in  most implementations, has been removed
+       from some implementations (including System V), and  the
+       functionality  is  provided  by the shell (see Parameter
+       Expansion .
+
+       -l  string
+              The length of the string string.
+
+
+       The -b, -c, -g, -p, -u, and -x operands are derived from
+       the  SVID;  historical BSD does not provide them. The -k
+       operand is derived from System V;  historical  BSD  does
+       not provide it.
+
+       On  historical  BSD  systems,  test  -w directory always
+       returned false because test tried to open the  directory
+       for writing, which always fails.
+
+       Some  additional  primaries  newly  invented or from the
+       KornShell appeared in an early proposal as part  of  the
+       conditional  command  (  [[]]):  s1 > s2, s1 < s2, str =
+       pattern, str != pattern, f1 -nt f2, f1 -ot  f2,  and  f1
+       -ef  f2.  They  were  not  carried forward into the test
+       utility when the conditional command  was  removed  from
+       the  shell  because  they  have not been included in the
+       test utility built into  historical  implementations  of
+       the sh utility.
+
+       The -t file_descriptor primary is shown with a mandatory
+       argument because the grammar is ambiguous if it  can  be
+       omitted.  Historical  implementations have allowed it to
+       be omitted, providing a default of 1.
+
+FUTURE DIRECTIONS
+       None.
+
+SEE ALSO
+       File Read, Write, and Creation , find
+
+COPYRIGHT
+       Portions of this text are reprinted  and  reproduced  in
+       electronic  form  from  IEEE  Std  1003.1, 2003 Edition,
+       Standard for Information Technology -- Portable  Operat-
+       ing System Interface (POSIX), The Open Group Base Speci-
+       fications Issue 6, Copyright (C) 2001-2003 by the Insti-
+       tute  of  Electrical  and Electronics Engineers, Inc and
+       The Open Group. In the event of any discrepancy  between
+       this  version  and  the original IEEE and The Open Group
+       Standard, the original IEEE and The Open Group  Standard
+       is  the  referee  document. The original Standard can be
+       obtained        online        at        http://www.open-
+       group.org/unix/online.html .
+
+
+
+POSIX                         2003                      test(P)

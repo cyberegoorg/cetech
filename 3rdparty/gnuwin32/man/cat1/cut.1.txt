@@ -1,0 +1,95 @@
+CUT(1)                   User Commands                   CUT(1)
+
+
+
+
+
+NAME
+       cut - remove sections from each line of files
+
+SYNOPSIS
+       cut [OPTION]... [FILE]...
+
+DESCRIPTION
+       Print selected parts of lines from each FILE to standard
+       output.
+
+       Mandatory arguments to long options  are  mandatory  for
+       short options too.
+
+       -b, --bytes=LIST
+              select only these bytes
+
+       -c, --characters=LIST
+              select only these characters
+
+       -d, --delimiter=DELIM
+              use DELIM instead of TAB for field delimiter
+
+       -f, --fields=LIST
+              select  only  these  fields;  also print any line
+              that contains no delimiter character, unless  the
+              -s option is specified
+
+       -n     (ignored)
+
+       --complement
+              complement  the set of selected bytes, characters
+              or fields.
+
+       -s, --only-delimited
+              do not print lines not containing delimiters
+
+       --output-delimiter=STRING
+              use STRING as the output delimiter the default is
+              to use the input delimiter
+
+       --help display this help and exit
+
+       --version
+              output version information and exit
+
+       Use  one,  and  only  one of -b, -c or -f.  Each LIST is
+       made up of one range, or many ranges separated  by  com-
+       mas.   Selected  input is written in the same order that
+       it is read, and is written exactly once.  Each range  is
+       one of:
+
+       N      N'th byte, character or field, counted from 1
+
+       N-     from  N'th  byte,  character  or field, to end of
+              line
+
+       N-M    from N'th to M'th (included) byte,  character  or
+              field
+
+       -M     from  first to M'th (included) byte, character or
+              field
+
+       With no FILE, or when FILE is -, read standard input.
+
+AUTHOR
+       Written by David Ihnat, David MacKenzie, and Jim  Meyer-
+       ing.
+
+REPORTING BUGS
+       Report bugs to <bug-coreutils@gnu.org>.
+
+COPYRIGHT
+       Copyright (C) 2004 Free Software Foundation, Inc.
+       This is free software; see the source for copying condi-
+       tions.  There is NO warranty; not even for MERCHANTABIL-
+       ITY or FITNESS FOR A PARTICULAR PURPOSE.
+
+SEE ALSO
+       The  full  documentation for cut is maintained as a Tex-
+       info manual.  If the info and cut programs are  properly
+       installed at your site, the command
+
+              info cut
+
+       should give you access to the complete manual.
+
+
+
+cut 5.3.0                December 2004                   CUT(1)

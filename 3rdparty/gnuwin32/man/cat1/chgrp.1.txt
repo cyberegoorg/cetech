@@ -1,0 +1,91 @@
+CHGRP(1)                 User Commands                 CHGRP(1)
+
+
+
+
+
+NAME
+       chgrp - change group ownership
+
+SYNOPSIS
+       chgrp [OPTION]... GROUP FILE...
+       chgrp [OPTION]... --reference=RFILE FILE...
+
+DESCRIPTION
+       Change  the  group of each FILE to GROUP.  With --refer-
+       ence, change the group of each FILE to that of RFILE.
+
+       -c, --changes
+              like verbose but report only  when  a  change  is
+              made
+
+       --dereference
+              affect the referent of each symbolic link, rather
+              than  the  symbolic  link  itself  (this  is  the
+              default)
+
+       -h, --no-dereference
+              affect  each  symbolic link instead of any refer-
+              enced file  (useful  only  on  systems  that  can
+              change the ownership of a symlink)
+
+       --no-preserve-root  do  not  treat  `/'  specially  (the
+              default)
+
+       --preserve-root
+              fail to operate recursively on `/'
+
+       -f, --silent, --quiet
+              suppress most error messages
+
+       --reference=RFILE
+              use RFILE's  group  rather  than  the  specifying
+              GROUP value
+
+       -R, --recursive
+              operate on files and directories recursively
+
+       -v, --verbose
+              output a diagnostic for every file processed
+
+       The  following  options  modify  how a hierarchy is tra-
+       versed when the -R option is also  specified.   If  more
+       than  one is specified, only the final one takes effect.
+
+       -H     if a command line argument is a symbolic link  to
+              a directory, traverse it
+
+       -L     traverse  every  symbolic  link  to  a  directory
+              encountered
+
+       -P     do not traverse any symbolic links (default)
+
+       --help display this help and exit
+
+       --version
+              output version information and exit
+
+AUTHOR
+       Written by David MacKenzie and Jim Meyering.
+
+REPORTING BUGS
+       Report bugs to <bug-coreutils@gnu.org>.
+
+COPYRIGHT
+       Copyright (C) 2004 Free Software Foundation, Inc.
+       This is free software; see the source for copying condi-
+       tions.  There is NO warranty; not even for MERCHANTABIL-
+       ITY or FITNESS FOR A PARTICULAR PURPOSE.
+
+SEE ALSO
+       The full documentation for chgrp is maintained as a Tex-
+       info  manual.   If the info and chgrp programs are prop-
+       erly installed at your site, the command
+
+              info chgrp
+
+       should give you access to the complete manual.
+
+
+
+chgrp 5.3.0              November 2004                 CHGRP(1)

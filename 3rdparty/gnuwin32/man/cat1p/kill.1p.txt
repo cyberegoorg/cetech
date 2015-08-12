@@ -1,0 +1,365 @@
+kill(P)                                                 kill(P)
+
+
+
+
+
+NAME
+       kill - terminate or signal processes
+
+SYNOPSIS
+       kill -s signal_name pid ...
+
+       kill -l [exit_status]
+
+
+
+       kill [-signal_name] pid ...
+
+       kill [-signal_number] pid ...
+
+
+DESCRIPTION
+       The  kill  utility shall send a signal to the process or
+       processes specified by each pid operand.
+
+       For each pid operand, the  kill  utility  shall  perform
+       actions equivalent to the kill() function defined in the
+       System Interfaces volume of IEEE Std 1003.1-2001  called
+       with the following arguments:
+
+              The value of the pid operand shall be used as the
+              pid argument.
+
+              The sig argument is the value specified by the -s
+              option,  -  signal_number  option,  or the - sig-
+              nal_name option, or by SIGTERM, if none of  these
+              options is specified.
+
+OPTIONS
+       The  kill  utility shall conform to the Base Definitions
+       volume of IEEE Std 1003.1-2001,  Section  12.2,  Utility
+       Syntax Guidelines,  except that in the last two SYNOPSIS
+       forms, the - signal_number and - signal_name options are
+       usually more than a single character.
+
+       The following options shall be supported:
+
+       -l     (The letter ell.) Write all values of signal_name
+              supported by the implementation, if no operand is
+              given.  If an exit_status operand is given and it
+              is a value of the '?'   shell  special  parameter
+              (see  Special Parameters and wait() ) correspond-
+              ing to a process that was terminated by a signal,
+              the  signal_name corresponding to the signal that
+              terminated the process shall be written.   If  an
+              exit_status  operand  is  given  and  it  is  the
+              unsigned decimal integer value of a  signal  num-
+              ber,  the signal_name (the symbolic constant name
+              without the SIG prefix defined in the Base  Defi-
+              nitions  volume  of  IEEE Std 1003.1-2001) corre-
+              sponding to that signal shall be written.  Other-
+              wise, the results are unspecified.
+
+       -s  signal_name
+
+              Specify the signal to send, using one of the sym-
+              bolic names defined  in  the  <signal.h>  header.
+              Values  of  signal_name  shall be recognized in a
+              case-independent fashion, without the SIG prefix.
+              In   addition,  the  symbolic  name  0  shall  be
+              recognized, representing the signal  value  zero.
+              The corresponding signal shall be sent instead of
+              SIGTERM.
+
+       -signal_name
+
+              Equivalent to -s signal_name.
+
+       -signal_number
+
+              Specify  a  non-negative  decimal  integer,  sig-
+              nal_number,  representing  the  signal to be used
+              instead of SIGTERM, as the sig  argument  in  the
+              effective  call  to  kill().  The  correspondence
+              between integer values and the sig value used  is
+              shown in the following table.
+
+       The  effects  of specifying any signal_number other than
+       those listed in the table are undefined.
+
+
+         signal_number     sig Value
+         0                 0
+         1                 SIGHUP
+         2                 SIGINT
+         3                 SIGQUIT
+         6                 SIGABRT
+         9                 SIGKILL
+         14                SIGALRM
+         15                SIGTERM
+
+       If the first argument is a negative integer, it shall be
+       interpreted  as a - signal_number option, not as a nega-
+       tive pid operand specifying a process group.
+
+OPERANDS
+       The following operands shall be supported:
+
+       pid    One of the following:
+
+       A decimal integer specifying a process or process  group
+       to  be  signaled.   The process or processes selected by
+       positive, negative, and zero values of the  pid  operand
+       shall  be  as  described  for  the  kill()  function. If
+       process number 0 is specified, all processes in the cur-
+       rent process group shall be signaled. For the effects of
+       negative pid numbers, see the kill() function defined in
+       the System Interfaces volume of IEEE Std 1003.1-2001. If
+       the first pid operand is negative, it should be preceded
+       by  "--" to keep it from being interpreted as an option.
+
+       A job control job ID (see the Base Definitions volume of
+       IEEE Std 1003.1-2001, Section 3.203, Job Control Job ID)
+       that identifies a background process group  to  be  sig-
+       naled.  The  job  control  job ID notation is applicable
+       only for invocations of kill in the current shell execu-
+       tion environment; see Shell Execution Environment .
+
+       exit_status
+              A  decimal  integer specifying a signal number or
+              the exit status of a process terminated by a sig-
+              nal.
+
+
+STDIN
+       Not used.
+
+INPUT FILES
+       None.
+
+ENVIRONMENT VARIABLES
+       The  following  environment  variables  shall affect the
+       execution of kill:
+
+       LANG   Provide a default value for the internationaliza-
+              tion  variables  that are unset or null. (See the
+              Base Definitions volume of  IEEE Std 1003.1-2001,
+              Section  8.2,  Internationalization Variables for
+              the precedence of internationalization  variables
+              used  to  determine  the  values  of locale cate-
+              gories.)
+
+       LC_ALL If set to a non-empty string value, override  the
+              values  of  all  the  other  internationalization
+              variables.
+
+       LC_CTYPE
+              Determine the locale for  the  interpretation  of
+              sequences  of  bytes  of  text data as characters
+              (for example, single-byte as  opposed  to  multi-
+              byte characters in arguments).
+
+       LC_MESSAGES
+              Determine  the  locale  that  should  be  used to
+              affect the format and contents of diagnostic mes-
+              sages written to standard error.
+
+       NLSPATH
+              Determine  the  location  of message catalogs for
+              the processing of LC_MESSAGES .
+
+
+ASYNCHRONOUS EVENTS
+       Default.
+
+STDOUT
+       When the -l option is not specified, the standard output
+       shall not be used.
+
+       When  the  -l  option is specified, the symbolic name of
+       each signal shall be written in the following format:
+
+
+              "%s%c", <signal_name>, <separator>
+
+       where the <signal_name> is in uppercase, without the SIG
+       prefix,  and the <separator> shall be either a <newline>
+       or a <space>. For the last signal  written,  <separator>
+       shall be a <newline>.
+
+       When  both  the  -l  option  and exit_status operand are
+       specified, the symbolic name of the corresponding signal
+       shall be written in the following format:
+
+
+              "%s\n", <signal_name>
+
+STDERR
+       The  standard  error  shall  be used only for diagnostic
+       messages.
+
+OUTPUT FILES
+       None.
+
+EXTENDED DESCRIPTION
+       None.
+
+EXIT STATUS
+       The following exit values shall be returned:
+
+        0     At least one matching process was found for  each
+              pid  operand,  and  the specified signal was suc-
+              cessfully processed for  at  least  one  matching
+              process.
+
+       >0     An error occurred.
+
+
+CONSEQUENCES OF ERRORS
+       Default.
+
+       The following sections are informative.
+
+APPLICATION USAGE
+       Process numbers can be found by using ps.
+
+       The  job control job ID notation is not required to work
+       as expected when kill is operating in  its  own  utility
+       execution  environment. In either of the following exam-
+       ples:
+
+
+              nohup kill %1 &
+              system("kill %1");
+
+       the kill operates in a different  environment  and  does
+       not share the shell's understanding of job numbers.
+
+EXAMPLES
+       Any of the commands:
+
+
+              kill -9 100 -165
+              kill -s kill 100 -165
+              kill -s KILL 100 -165
+
+       sends the SIGKILL signal to the process whose process ID
+       is 100 and to all processes whose process  group  ID  is
+       165, assuming the sending process has permission to send
+       that signal to the specified processes,  and  that  they
+       exist.
+
+       The System Interfaces volume of IEEE Std 1003.1-2001 and
+       this volume of IEEE Std 1003.1-2001 do not require  spe-
+       cific  signal  numbers  for any signal_names. Even the -
+       signal_number   option   provides   symbolic   (although
+       numeric)  names  for signals. If a process is terminated
+       by a signal, its exit status indicates the  signal  that
+       killed  it,  but the exact values are not specified. The
+       kill -l option, however, can be used to map decimal sig-
+       nal  numbers  and  exit status values into the name of a
+       signal. The following example reports the  status  of  a
+       terminated job:
+
+
+              job
+              stat=$?
+              if [ $stat -eq 0 ]
+              then
+                  echo job completed successfully.
+              elif [ $stat -gt 128 ]
+              then
+                  echo job terminated by signal SIG$(kill -l $stat).
+              else
+                  echo job terminated with error code $stat.
+              fi
+
+       To send the default signal to a process group (say 123),
+       an application should use a command similar  to  one  of
+       the following:
+
+
+              kill -TERM -123
+              kill -- -123
+
+RATIONALE
+       The  -l  option originated from the C shell, and is also
+       implemented in the KornShell. The  C  shell  output  can
+       consist  of  multiple  output  lines  because the signal
+       names do not always fit on a single line on some  termi-
+       nal  screens.  The  KornShell  output  also included the
+       implementation-defined signal numbers and was considered
+       by  the  standard  developers  to  be  too difficult for
+       scripts to parse conveniently. The specified output for-
+       mat is intended not only to accommodate the historical C
+       shell output, but also to permit an entirely vertical or
+       entirely horizontal listing on systems for which this is
+       appropriate.
+
+       An early proposal invented the name SIGNULL  as  a  sig-
+       nal_name  for  signal  0  (used by the System Interfaces
+       volume of IEEE Std 1003.1-2001 to test for the existence
+       of  a  process  without  sending it a signal). Since the
+       signal_name 0 can be used in  this  case  unambiguously,
+       SIGNULL has been removed.
+
+       An early proposal also required symbolic signal_names to
+       be recognized with or without the SIG prefix. Historical
+       versions of kill have not written the SIG prefix for the
+       -l option and have not recognized the SIG prefix on sig-
+       nal_names.  Since  neither  applications portability nor
+       ease-of-use would be improved by requiring  this  exten-
+       sion, it is no longer required.
+
+       To  avoid  an  ambiguity  of  an initial negative number
+       argument specifying either a signal number or a  process
+       group,  IEEE Std 1003.1-2001  mandates that it is always
+       considered the former by  implementations  that  support
+       the  XSI option. It also requires that conforming appli-
+       cations always use the "--" options terminator  argument
+       when  specifying  a  process  group, unless an option is
+       also specified.
+
+       The -s option was added  in  response  to  international
+       interest  in  providing some form of kill that meets the
+       Utility Syntax Guidelines.
+
+       The job control job ID notation is not required to  work
+       as  expected  when  kill is operating in its own utility
+       execution environment. In either of the following  exam-
+       ples:
+
+
+              nohup kill %1 &
+              system("kill %1");
+
+       the  kill  operates  in a different environment and does
+       not understand how the shell has managed  its  job  num-
+       bers.
+
+FUTURE DIRECTIONS
+       None.
+
+SEE ALSO
+       Shell Command Language , ps , wait() , the System Inter-
+       faces volume of IEEE Std 1003.1-2001, kill(),  the  Base
+       Definitions volume of IEEE Std 1003.1-2001, <signal.h>
+
+COPYRIGHT
+       Portions  of  this  text are reprinted and reproduced in
+       electronic form from  IEEE  Std  1003.1,  2003  Edition,
+       Standard  for Information Technology -- Portable Operat-
+       ing System Interface (POSIX), The Open Group Base Speci-
+       fications Issue 6, Copyright (C) 2001-2003 by the Insti-
+       tute of Electrical and Electronics  Engineers,  Inc  and
+       The  Open Group. In the event of any discrepancy between
+       this version and the original IEEE and  The  Open  Group
+       Standard,  the original IEEE and The Open Group Standard
+       is the referee document. The original  Standard  can  be
+       obtained        online        at        http://www.open-
+       group.org/unix/online.html .
+
+
+
+POSIX                         2003                      kill(P)

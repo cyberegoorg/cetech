@@ -1,0 +1,269 @@
+nl(P)                                                     nl(P)
+
+
+
+
+
+NAME
+       nl - line numbering filter
+
+SYNOPSIS
+       nl [-p][-b type][-d delim][-f type][-h type][-i incr][-l
+       num][-n format]
+               [-s sep][-v startnum][-w width][file]
+
+DESCRIPTION
+       The nl utility shall read lines from the named  file  or
+       the  standard input if no file is named and shall repro-
+       duce the lines to standard output. Lines shall  be  num-
+       bered  on the left. Additional functionality may be pro-
+       vided in accordance with the command options in  effect.
+
+       The nl utility views the text it reads in terms of logi-
+       cal pages.  Line numbering shall be reset at  the  start
+       of  each  logical  page.  A  logical  page consists of a
+       header, a body, and a footer section. Empty sections are
+       valid.  Different  line  numbering  options are indepen-
+       dently available for header, body, and footer (for exam-
+       ple,  no numbering of header and footer lines while num-
+       bering blank lines only in the body).
+
+       The starts of logical page sections shall be signaled by
+       input  lines containing nothing but the following delim-
+       iter characters:
+             Line       Start of
+             \:\:\:     Header
+             \:\:       Body
+             \:         Footer
+
+       Unless otherwise specified, nl  shall  assume  the  text
+       being read is in a single logical page body.
+
+OPTIONS
+       The  nl  utility  shall  conform to the Base Definitions
+       volume of IEEE Std 1003.1-2001,  Section  12.2,  Utility
+       Syntax Guidelines.  Only one file can be named.
+
+       The following options shall be supported:
+
+       -b  type
+              Specify  which  logical  page body lines shall be
+              numbered. Recognized types and their meaning are:
+
+       a      Number all lines.
+
+       t      Number only non-empty lines.
+
+       n      No line numbering.
+
+       pstring
+              Number  only lines that contain the basic regular
+              expression specified in string.
+
+
+       The default type for logical page body shall be t  (text
+       lines numbered).
+
+       -d  delim
+              Specify  the  delimiter  characters that indicate
+              the start of a logical page section. These can be
+              changed  from  the default characters "\:" to two
+              user-specified characters. If only one  character
+              is entered, the second character shall remain the
+              default character ':' .
+
+       -f  type
+              Specify the same as b type except for footer. The
+              default  for  logical  page footer shall be n (no
+              lines numbered).
+
+       -h  type
+              Specify the same as b type except for header. The
+              default  type  for logical page header shall be n
+              (no lines numbered).
+
+       -i  incr
+              Specify the increment value used to number  logi-
+              cal page lines. The default shall be 1.
+
+       -l  num
+              Specify  the  number of blank lines to be consid-
+              ered as one. For example, -l 2  results  in  only
+              the second adjacent blank line being numbered (if
+              the appropriate -h a, -b a,  or  -f a  option  is
+              set). The default shall be 1.
+
+       -n  format
+              Specify  the  line  numbering  format. Recognized
+              values are: ln,  left  justified,  leading  zeros
+              suppressed;  rn,  right  justified, leading zeros
+              suppressed; rz, right  justified,  leading  zeros
+              kept.  The default format shall be rn (right jus-
+              tified).
+
+       -p     Specify that numbering should not be restarted at
+              logical page delimiters.
+
+       -s  sep
+              Specify  the  characters  used  in separating the
+              line number and the corresponding text line.  The
+              default sep shall be a <tab>.
+
+       -v  startnum
+              Specify  the initial value used to number logical
+              page lines. The default shall be 1.
+
+       -w  width
+              Specify the number of characters to be  used  for
+              the line number. The default width shall be 6.
+
+
+OPERANDS
+       The following operand shall be supported:
+
+       file   A pathname of a text file to be line-numbered.
+
+
+STDIN
+       The  standard  input  is  a text file that is used if no
+       file operand is given.
+
+INPUT FILES
+       The input file named by the file operand is a text file.
+
+ENVIRONMENT VARIABLES
+       The  following  environment  variables  shall affect the
+       execution of nl:
+
+       LANG   Provide a default value for the internationaliza-
+              tion  variables  that are unset or null. (See the
+              Base Definitions volume of  IEEE Std 1003.1-2001,
+              Section  8.2,  Internationalization Variables for
+              the precedence of internationalization  variables
+              used  to  determine  the  values  of locale cate-
+              gories.)
+
+       LC_ALL If set to a non-empty string value, override  the
+              values  of  all  the  other  internationalization
+              variables.
+
+       LC_COLLATE
+
+              Determine the locale for the behavior of  ranges,
+              equivalence  classes, and multi-character collat-
+              ing elements within regular expressions.
+
+       LC_CTYPE
+              Determine the locale for  the  interpretation  of
+              sequences  of  bytes  of  text data as characters
+              (for example, single-byte as  opposed  to  multi-
+              byte  characters  in  arguments and input files),
+              the behavior of character classes within  regular
+              expressions,  and  for  deciding which characters
+              are in character class graph (for the -b t, -f t,
+              and -h t options).
+
+       LC_MESSAGES
+              Determine  the  locale  that  should  be  used to
+              affect the format and contents of diagnostic mes-
+              sages written to standard error.
+
+       NLSPATH
+              Determine  the  location  of message catalogs for
+              the processing of LC_MESSAGES .
+
+
+ASYNCHRONOUS EVENTS
+       Default.
+
+STDOUT
+       The standard output shall be a text file in the  follow-
+       ing format:
+
+
+              "%s%s%s", <line number>, <separator>, <input line>
+
+       where <line number> is one of the following numeric for-
+       mats:
+
+       %6d    When the rn format is used (the default; see -n).
+
+       %06d   When the rz format is used.
+
+       %-6d   When the ln format is used.
+
+       <empty>
+              When line numbers are suppressed for a portion of
+              the page; the <separator> is also suppressed.
+
+
+       In the preceding list,  the  number  6  is  the  default
+       width; the -w option can change this value.
+
+STDERR
+       The  standard  error  shall  be used only for diagnostic
+       messages.
+
+OUTPUT FILES
+       None.
+
+EXTENDED DESCRIPTION
+       None.
+
+EXIT STATUS
+       The following exit values shall be returned:
+
+        0     Successful completion.
+
+       >0     An error occurred.
+
+
+CONSEQUENCES OF ERRORS
+       Default.
+
+       The following sections are informative.
+
+APPLICATION USAGE
+       In using the -d delim option, care should  be  taken  to
+       escape  characters that have special meaning to the com-
+       mand interpreter.
+
+EXAMPLES
+       The command:
+
+
+              nl -v 10 -i 10 -d \!+ file1
+
+       numbers file1 starting at line number 10 with an  incre-
+       ment  of  10.  The logical page delimiter is "!+" . Note
+       that the '!' has to be escaped when using csh as a  com-
+       mand  interpreter  because  of  its history substitution
+       syntax. For ksh and sh the escape is not necessary,  but
+       does not do any harm.
+
+RATIONALE
+       None.
+
+FUTURE DIRECTIONS
+       None.
+
+SEE ALSO
+       pr
+
+COPYRIGHT
+       Portions  of  this  text are reprinted and reproduced in
+       electronic form from  IEEE  Std  1003.1,  2003  Edition,
+       Standard  for Information Technology -- Portable Operat-
+       ing System Interface (POSIX), The Open Group Base Speci-
+       fications Issue 6, Copyright (C) 2001-2003 by the Insti-
+       tute of Electrical and Electronics  Engineers,  Inc  and
+       The  Open Group. In the event of any discrepancy between
+       this version and the original IEEE and  The  Open  Group
+       Standard,  the original IEEE and The Open Group Standard
+       is the referee document. The original  Standard  can  be
+       obtained        online        at        http://www.open-
+       group.org/unix/online.html .
+
+
+
+POSIX                         2003                        nl(P)

@@ -1,0 +1,44 @@
+GROUPS(1)                User Commands                GROUPS(1)
+
+
+
+
+
+NAME
+       groups - print the groups a user is in
+
+SYNOPSIS
+       groups [OPTION]... [USERNAME]...
+
+DESCRIPTION
+       --help display this help and exit
+
+       --version
+              output version information and exit
+
+       Same as id -Gn.  If no USERNAME, use current process.
+
+AUTHOR
+       Written by David MacKenzie.
+
+REPORTING BUGS
+       Report bugs to <bug-coreutils@gnu.org>.
+
+COPYRIGHT
+       Copyright (C) 2004 Free Software Foundation, Inc.
+       This is free software; see the source for copying condi-
+       tions.  There is NO warranty; not even for MERCHANTABIL-
+       ITY or FITNESS FOR A PARTICULAR PURPOSE.
+
+SEE ALSO
+       The  full  documentation  for  groups is maintained as a
+       Texinfo manual.  If the info  and  groups  programs  are
+       properly installed at your site, the command
+
+              info groups
+
+       should give you access to the complete manual.
+
+
+
+groups 5.3.0             November 2004                GROUPS(1)

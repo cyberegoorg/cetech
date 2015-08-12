@@ -1,0 +1,64 @@
+SU(1)                    User Commands                    SU(1)
+
+
+
+
+
+NAME
+       su - run a shell with substitute user and group IDs
+
+SYNOPSIS
+       su [OPTION]... [-] [USER [ARG]...]
+
+DESCRIPTION
+       Change  the  effective  user  id and group id to that of
+       USER.
+
+       -, -l, --login
+              make the shell a login shell
+
+       -c, --commmand=COMMAND
+              pass a single COMMAND to the shell with -c
+
+       -f, --fast
+              pass -f to the shell (for csh or tcsh)
+
+       -m, --preserve-environment
+              do not reset environment variables
+
+       -p     same as -m
+
+       -s, --shell=SHELL
+              run SHELL if /etc/shells allows it
+
+       --help display this help and exit
+
+       --version
+              output version information and exit
+
+       A mere - implies -l.   If USER not given, assume root.
+
+AUTHOR
+       Written by David MacKenzie.
+
+REPORTING BUGS
+       Report bugs to <bug-coreutils@gnu.org>.
+
+COPYRIGHT
+       Copyright (C) 2004 Free Software Foundation, Inc.
+       This is free software; see the source for copying condi-
+       tions.  There is NO warranty; not even for MERCHANTABIL-
+       ITY or FITNESS FOR A PARTICULAR PURPOSE.
+
+SEE ALSO
+       The full documentation for su is maintained as a Texinfo
+       manual.   If  the  info  and  su  programs  are properly
+       installed at your site, the command
+
+              info su
+
+       should give you access to the complete manual.
+
+
+
+su 5.3.0                 November 2004                    SU(1)

@@ -1,0 +1,71 @@
+SPLIT(1)                 User Commands                 SPLIT(1)
+
+
+
+
+
+NAME
+       split - split a file into pieces
+
+SYNOPSIS
+       split [OPTION] [INPUT [PREFIX]]
+
+DESCRIPTION
+       Output fixed-size pieces of INPUT to PREFIXaa, PREFIXab,
+       ...; default PREFIX is `x'.   With  no  INPUT,  or  when
+       INPUT is -, read standard input.
+
+       Mandatory  arguments  to  long options are mandatory for
+       short options too.
+
+       -a, --suffix-length=N
+              use suffixes of length N (default 2)
+
+       -b, --bytes=SIZE
+              put SIZE bytes per output file
+
+       -C, --line-bytes=SIZE
+              put at most SIZE bytes of lines per output file
+
+       -d, --numeric-suffixes
+              use numeric suffixes instead of alphabetic
+
+       -l, --lines=NUMBER
+              put NUMBER lines per output file
+
+       --verbose
+              print a diagnostic to standard error just  before
+              each output file is opened
+
+       --help display this help and exit
+
+       --version
+              output version information and exit
+
+       SIZE  may have a multiplier suffix: b for 512, k for 1K,
+       m for 1 Meg.
+
+AUTHOR
+       Written by Torbjorn Granlund and Richard M. Stallman.
+
+REPORTING BUGS
+       Report bugs to <bug-coreutils@gnu.org>.
+
+COPYRIGHT
+       Copyright (C) 2004 Free Software Foundation, Inc.
+       This is free software; see the source for copying condi-
+       tions.  There is NO warranty; not even for MERCHANTABIL-
+       ITY or FITNESS FOR A PARTICULAR PURPOSE.
+
+SEE ALSO
+       The full documentation for split is maintained as a Tex-
+       info  manual.   If the info and split programs are prop-
+       erly installed at your site, the command
+
+              info split
+
+       should give you access to the complete manual.
+
+
+
+split 5.3.0              December 2004                 SPLIT(1)

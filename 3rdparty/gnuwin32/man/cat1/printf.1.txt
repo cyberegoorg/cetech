@@ -1,0 +1,96 @@
+PRINTF(1)                User Commands                PRINTF(1)
+
+
+
+
+
+NAME
+       printf - format and print data
+
+SYNOPSIS
+       printf FORMAT [ARGUMENT]...
+       printf OPTION
+
+DESCRIPTION
+       NOTE:  your  shell  may  have  its own version of printf
+       which will supersede the version described here.  Please
+       refer  to  your  shell's documentation for details about
+       the options it supports.
+
+       Print ARGUMENT(s) according to FORMAT.
+
+       --help display this help and exit
+
+       --version
+              output version information and exit
+
+       FORMAT controls the output as in C printf.   Interpreted
+       sequences are:
+
+       \"     double quote
+
+       \NNN   character with octal value NNN (1 to 3 digits)
+
+       \\     backslash
+
+       \a     alert (BEL)
+
+       \b     backspace
+
+       \c     produce no further output
+
+       \f     form feed
+
+       \n     new line
+
+       \r     carriage return
+
+       \t     horizontal tab
+
+       \v     vertical tab
+
+       \xHH   byte with hexadecimal value HH (1 to 2 digits)
+
+       \uHHHH Unicode  (ISO/IEC 10646) character with hex value
+              HHHH (4 digits)
+
+       \UHHHHHHHH
+              Unicode character with hex value HHHHHHHH (8 dig-
+              its)
+
+       %%     a single %
+
+       %b     ARGUMENT  as  a  string  with  `\' escapes inter-
+              preted,
+
+              except that octal escapes are of the form  \0  or
+              \0NNN
+
+       and  all  C  format  specifications  ending  with one of
+       diouxXfeEgGcs, with ARGUMENTs converted to  proper  type
+       first.  Variable widths are handled.
+
+AUTHOR
+       Written by David MacKenzie.
+
+REPORTING BUGS
+       Report bugs to <bug-coreutils@gnu.org>.
+
+COPYRIGHT
+       Copyright (C) 2004 Free Software Foundation, Inc.
+       This is free software; see the source for copying condi-
+       tions.  There is NO warranty; not even for MERCHANTABIL-
+       ITY or FITNESS FOR A PARTICULAR PURPOSE.
+
+SEE ALSO
+       The  full  documentation  for  printf is maintained as a
+       Texinfo manual.  If the info  and  printf  programs  are
+       properly installed at your site, the command
+
+              info printf
+
+       should give you access to the complete manual.
+
+
+
+printf 5.3.0             November 2004                PRINTF(1)

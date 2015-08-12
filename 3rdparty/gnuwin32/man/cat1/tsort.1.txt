@@ -1,0 +1,46 @@
+TSORT(1)                 User Commands                 TSORT(1)
+
+
+
+
+
+NAME
+       tsort - perform topological sort
+
+SYNOPSIS
+       tsort [OPTION] [FILE]
+
+DESCRIPTION
+       Write  totally  ordered list consistent with the partial
+       ordering in FILE.  With no FILE, or when FILE is -, read
+       standard input.
+
+       --help display this help and exit
+
+       --version
+              output version information and exit
+
+AUTHOR
+       Written by Mark Kettenis.
+
+REPORTING BUGS
+       Report bugs to <bug-coreutils@gnu.org>.
+
+COPYRIGHT
+       Copyright (C) 2004 Free Software Foundation, Inc.
+       This is free software; see the source for copying condi-
+       tions.  There is NO warranty; not even for MERCHANTABIL-
+       ITY or FITNESS FOR A PARTICULAR PURPOSE.
+
+SEE ALSO
+       The full documentation for tsort is maintained as a Tex-
+       info manual.  If the info and tsort programs  are  prop-
+       erly installed at your site, the command
+
+              info tsort
+
+       should give you access to the complete manual.
+
+
+
+tsort (coreutils) 5.3.0  November 2004                 TSORT(1)

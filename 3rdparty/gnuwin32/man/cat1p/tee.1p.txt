@@ -1,0 +1,177 @@
+tee(P)                                                   tee(P)
+
+
+
+
+
+NAME
+       tee - duplicate standard input
+
+SYNOPSIS
+       tee [-ai][file...]
+
+DESCRIPTION
+       The  tee  utility  shall copy standard input to standard
+       output, making a copy in zero or  more  files.  The  tee
+       utility shall not buffer output.
+
+       If the -a option is not specified, output files shall be
+       written (see File Read, Write, and Creation .
+
+OPTIONS
+       The tee utility shall conform to  the  Base  Definitions
+       volume  of  IEEE Std 1003.1-2001,  Section 12.2, Utility
+       Syntax Guidelines.
+
+       The following options shall be supported:
+
+       -a     Append the output to the files.
+
+       -i     Ignore the SIGINT signal.
+
+
+OPERANDS
+       The following operands shall be supported:
+
+       file   A pathname of an output file.  Processing  of  at
+              least 13 file operands shall be supported.
+
+
+STDIN
+       The standard input can be of any type.
+
+INPUT FILES
+       None.
+
+ENVIRONMENT VARIABLES
+       The  following  environment  variables  shall affect the
+       execution of tee:
+
+       LANG   Provide a default value for the internationaliza-
+              tion  variables  that are unset or null. (See the
+              Base Definitions volume of  IEEE Std 1003.1-2001,
+              Section  8.2,  Internationalization Variables for
+              the precedence of internationalization  variables
+              used  to  determine  the  values  of locale cate-
+              gories.)
+
+       LC_ALL If set to a non-empty string value, override  the
+              values  of  all  the  other  internationalization
+              variables.
+
+       LC_CTYPE
+              Determine the locale for  the  interpretation  of
+              sequences  of  bytes  of  text data as characters
+              (for example, single-byte as  opposed  to  multi-
+              byte characters in arguments).
+
+       LC_MESSAGES
+              Determine  the  locale  that  should  be  used to
+              affect the  format  and  contents  of  diagnostic
+              messages written to standard error.
+
+       NLSPATH
+              Determine  the  location  of message catalogs for
+              the processing of LC_MESSAGES .
+
+
+ASYNCHRONOUS EVENTS
+       Default, except that if the  -i  option  was  specified,
+       SIGINT shall be ignored.
+
+STDOUT
+       The  standard  output  shall  be  a copy of the standard
+       input.
+
+STDERR
+       The standard error shall be  used  only  for  diagnostic
+       messages.
+
+OUTPUT FILES
+       If  any  file operands are specified, the standard input
+       shall be copied to each named file.
+
+EXTENDED DESCRIPTION
+       None.
+
+EXIT STATUS
+       The following exit values shall be returned:
+
+        0     The standard input was successfully copied to all
+              output files.
+
+       >0     An error occurred.
+
+
+CONSEQUENCES OF ERRORS
+       If  a  write  to  any  successfully  opened file operand
+       fails, writes to other successfully opened file operands
+       and  standard output shall continue, but the exit status
+       shall be non-zero.  Otherwise, the default actions spec-
+       ified in Utility Description Defaults apply.
+
+       The following sections are informative.
+
+APPLICATION USAGE
+       The tee utility is usually used in a pipeline, to make a
+       copy of the output of some utility.
+
+       The file operand is technically optional, but tee is  no
+       more useful than cat when none is specified.
+
+EXAMPLES
+       Save  an  unsorted  intermediate  form  of the data in a
+       pipeline:
+
+
+              ... | tee unsorted | sort > sorted
+
+RATIONALE
+       The buffering requirement means that tee is not  allowed
+       to  use  ISO C  standard fully buffered or line-buffered
+       writes. It does not mean that tee has to do 1-byte reads
+       followed by 1-byte writes.
+
+       It should be noted that early versions of BSD ignore any
+       invalid options and accept a single '-' as  an  alterna-
+       tive  to -i. They also print a message if unable to open
+       a file:
+
+
+              "tee: cannot access %s\n", <pathname>
+
+       Historical implementations ignore write errors. This  is
+       explicitly    not    permitted   by   this   volume   of
+       IEEE Std 1003.1-2001.
+
+       Some historical implementations use O_APPEND  when  pro-
+       viding  append  mode; others use the lseek() function to
+       seek to the end-of-file after opening the  file  without
+       O_APPEND.  This  volume of IEEE Std 1003.1-2001 requires
+       functionality equivalent to  using  O_APPEND;  see  File
+       Read, Write, and Creation .
+
+FUTURE DIRECTIONS
+       None.
+
+SEE ALSO
+       Introduction  ,  cat  ,  the System Interfaces volume of
+       IEEE Std 1003.1-2001, lseek()
+
+COPYRIGHT
+       Portions of this text are reprinted  and  reproduced  in
+       electronic  form  from  IEEE  Std  1003.1, 2003 Edition,
+       Standard for Information Technology -- Portable  Operat-
+       ing System Interface (POSIX), The Open Group Base Speci-
+       fications Issue 6, Copyright (C) 2001-2003 by the Insti-
+       tute  of  Electrical  and Electronics Engineers, Inc and
+       The Open Group. In the event of any discrepancy  between
+       this  version  and  the original IEEE and The Open Group
+       Standard, the original IEEE and The Open Group  Standard
+       is  the  referee  document. The original Standard can be
+       obtained        online        at        http://www.open-
+       group.org/unix/online.html .
+
+
+
+POSIX                         2003                       tee(P)

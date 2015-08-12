@@ -1,0 +1,248 @@
+cat(P)                                                   cat(P)
+
+
+
+
+
+NAME
+       cat - concatenate and print files
+
+SYNOPSIS
+       cat [-u][file ...]
+
+DESCRIPTION
+       The  cat  utility shall read files in sequence and shall
+       write their contents to the standard output in the  same
+       sequence.
+
+OPTIONS
+       The  cat  utility  shall conform to the Base Definitions
+       volume of IEEE Std 1003.1-2001,  Section  12.2,  Utility
+       Syntax Guidelines.
+
+       The following option shall be supported:
+
+       -u     Write  bytes  from the input file to the standard
+              output without delay as each is read.
+
+
+OPERANDS
+       The following operand shall be supported:
+
+       file   A pathname of an input file. If no file  operands
+              are  specified, the standard input shall be used.
+              If a file is '-' , the  cat  utility  shall  read
+              from  the  standard  input  at  that point in the
+              sequence. The cat utility  shall  not  close  and
+              reopen  standard  input  when it is referenced in
+              this way, but shall accept  multiple  occurrences
+              of '-' as a file operand.
+
+
+STDIN
+       The  standard  input shall be used only if no file oper-
+       ands are specified, or if a file operand is '-'  .   See
+       the INPUT FILES section.
+
+INPUT FILES
+       The input files can be any file type.
+
+ENVIRONMENT VARIABLES
+       The  following  environment  variables  shall affect the
+       execution of cat:
+
+       LANG   Provide a default value for the internationaliza-
+              tion  variables  that are unset or null. (See the
+              Base Definitions volume of  IEEE Std 1003.1-2001,
+              Section  8.2,  Internationalization Variables for
+              the precedence of internationalization  variables
+              used  to  determine  the  values  of locale cate-
+              gories.)
+
+       LC_ALL If set to a non-empty string value, override  the
+              values  of  all  the  other  internationalization
+              variables.
+
+       LC_CTYPE
+              Determine the locale for  the  interpretation  of
+              sequences  of  bytes  of  text data as characters
+              (for example, single-byte as  opposed  to  multi-
+              byte characters in arguments).
+
+       LC_MESSAGES
+              Determine  the  locale  that  should  be  used to
+              affect the format and contents of diagnostic mes-
+              sages written to standard error.
+
+       NLSPATH
+              Determine  the  location  of message catalogs for
+              the processing of LC_MESSAGES .
+
+
+ASYNCHRONOUS EVENTS
+       Default.
+
+STDOUT
+       The standard output shall contain the sequence of  bytes
+       read from the input files. Nothing else shall be written
+       to the standard output.
+
+STDERR
+       The standard error shall be  used  only  for  diagnostic
+       messages.
+
+OUTPUT FILES
+       None.
+
+EXTENDED DESCRIPTION
+       None.
+
+EXIT STATUS
+       The following exit values shall be returned:
+
+        0     All input files were output successfully.
+
+       >0     An error occurred.
+
+
+CONSEQUENCES OF ERRORS
+       Default.
+
+       The following sections are informative.
+
+APPLICATION USAGE
+       The  -u  option  has  value  in prototyping non-blocking
+       reads from FIFOs. The intent is to support the following
+       sequence:
+
+
+              mkfifo foo
+              cat -u foo > /dev/tty13 &
+              cat -u > foo
+
+       It  is  unspecified whether standard output is or is not
+       buffered in the  default  case.  This  is  sometimes  of
+       interest  when standard output is associated with a ter-
+       minal, since buffering may delay the output.  The  pres-
+       ence  of the -u option guarantees that unbuffered I/O is
+       available. It is implementation-defined whether the  cat
+       utility  buffers  output  if the -u option is not speci-
+       fied. Traditionally, the -u option is implemented  using
+       the  equivalent of the setvbuf() function defined in the
+       System Interfaces volume of IEEE Std 1003.1-2001.
+
+EXAMPLES
+       The following command:
+
+
+              cat myfile
+
+       writes the contents  of  the  file  myfile  to  standard
+       output.
+
+       The following command:
+
+
+              cat doc1 doc2 > doc.all
+
+       concatenates  the  files  doc1  and  doc2 and writes the
+       result to doc.all.
+
+       Because of the shell language mechanism used to  perform
+       output redirection, a command such as this:
+
+
+              cat doc doc.end > doc
+
+       causes the original data in doc to be lost.
+
+       The command:
+
+
+              cat start - middle - end > file
+
+       when  standard  input  is a terminal, gets two arbitrary
+       pieces of input from the terminal with a single  invoca-
+       tion of cat.  Note, however, that if standard input is a
+       regular file, this would be equivalent to the command:
+
+
+              cat start - middle /dev/null end > file
+
+       because the entire contents of the file  would  be  con-
+       sumed by cat the first time '-' was used as a file oper-
+       and and an end-of-file condition would be detected imme-
+       diately when '-' was referenced the second time.
+
+RATIONALE
+       Historical  versions  of  the  cat  utility  include the
+       options -e, -t, and -v, which permit the ends of  lines,
+       <tab>s,  and  invisible  characters, respectively, to be
+       rendered visible in the output. The standard  developers
+       omitted  these  options  because they provide too fine a
+       degree of control over what is made visible, and similar
+       output can be obtained using a command such as:
+
+
+              sed -n -e 's/$/$/' -e l pathname
+
+       The -s option was omitted because it corresponds to dif-
+       ferent functions in BSD and System V-based systems.  The
+       BSD -s option to squeeze blank lines can be accomplished
+       by the shell script shown in the following example:
+
+
+              sed -n '
+              # Write non-empty lines.
+              /./   {
+                    p
+                    d
+                    }
+              # Write a single empty line, then look for more empty lines.
+              /^$/  p
+              # Get next line, discard the held <newline> (empty line),
+              # and look for more empty lines.
+              :Empty
+              /^$/  {
+                    N
+                    s/.//
+                    b Empty
+                    }
+              # Write the non-empty line before going back to search
+              # for the first in a set of empty lines.
+                    p
+
+       The System V -s option to silence error messages can  be
+       accomplished  by  redirecting  the  standard error. Note
+       that the BSD documentation for cat uses the term  "blank
+       line"  to  mean  the  same as the POSIX "empty line'': a
+       line consisting only of a <newline>.
+
+       The BSD -n option was omitted because similar  function-
+       ality can be obtained from the -n option of the pr util-
+       ity.
+
+FUTURE DIRECTIONS
+       None.
+
+SEE ALSO
+       more    ,    the    System    Interfaces    volume    of
+       IEEE Std 1003.1-2001, setvbuf()
+
+COPYRIGHT
+       Portions  of  this  text are reprinted and reproduced in
+       electronic form from  IEEE  Std  1003.1,  2003  Edition,
+       Standard  for Information Technology -- Portable Operat-
+       ing System Interface (POSIX), The Open Group Base Speci-
+       fications Issue 6, Copyright (C) 2001-2003 by the Insti-
+       tute of Electrical and Electronics  Engineers,  Inc  and
+       The  Open Group. In the event of any discrepancy between
+       this version and the original IEEE and  The  Open  Group
+       Standard,  the original IEEE and The Open Group Standard
+       is the referee document. The original  Standard  can  be
+       obtained        online        at        http://www.open-
+       group.org/unix/online.html .
+
+
+
+POSIX                         2003                       cat(P)

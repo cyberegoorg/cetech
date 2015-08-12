@@ -1,0 +1,49 @@
+UPTIME(1)                User Commands                UPTIME(1)
+
+
+
+
+
+NAME
+       uptime - tell how long the system has been running
+
+SYNOPSIS
+       uptime [OPTION]... [ FILE ]
+
+DESCRIPTION
+       Print  the  current  time, the length of time the system
+       has been up, the number of users on the system, and  the
+       average number of jobs in the run queue over the last 1,
+       5 and  15  minutes.   If  FILE  is  not  specified,  use
+       /var/run/utmp.  /var/log/wtmp as FILE is common.
+
+       --help display this help and exit
+
+       --version
+              output version information and exit
+
+AUTHOR
+       Written  by Joseph Arceneaux, David MacKenzie, and Kaveh
+       Ghazi.
+
+REPORTING BUGS
+       Report bugs to <bug-coreutils@gnu.org>.
+
+COPYRIGHT
+       Copyright (C) 2004 Free Software Foundation, Inc.
+       This is free software; see the source for copying condi-
+       tions.  There is NO warranty; not even for MERCHANTABIL-
+       ITY or FITNESS FOR A PARTICULAR PURPOSE.
+
+SEE ALSO
+       The full documentation for uptime  is  maintained  as  a
+       Texinfo  manual.   If  the  info and uptime programs are
+       properly installed at your site, the command
+
+              info uptime
+
+       should give you access to the complete manual.
+
+
+
+uptime 5.3.0             November 2004                UPTIME(1)

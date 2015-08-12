@@ -1,0 +1,46 @@
+UNLINK(1)                User Commands                UNLINK(1)
+
+
+
+
+
+NAME
+       unlink  -  call the unlink function to remove the speci-
+       fied file
+
+SYNOPSIS
+       unlink FILE
+       unlink OPTION
+
+DESCRIPTION
+       Call the unlink function to remove the specified FILE.
+
+       --help display this help and exit
+
+       --version
+              output version information and exit
+
+AUTHOR
+       Written by Michael Stone.
+
+REPORTING BUGS
+       Report bugs to <bug-coreutils@gnu.org>.
+
+COPYRIGHT
+       Copyright (C) 2004 Free Software Foundation, Inc.
+       This is free software; see the source for copying condi-
+       tions.  There is NO warranty; not even for MERCHANTABIL-
+       ITY or FITNESS FOR A PARTICULAR PURPOSE.
+
+SEE ALSO
+       The full documentation for unlink  is  maintained  as  a
+       Texinfo  manual.   If  the  info and unlink programs are
+       properly installed at your site, the command
+
+              info unlink
+
+       should give you access to the complete manual.
+
+
+
+unlink 5.3.0             November 2004                UNLINK(1)

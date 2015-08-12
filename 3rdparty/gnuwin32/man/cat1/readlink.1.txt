@@ -1,0 +1,70 @@
+READLINK(1)              User Commands              READLINK(1)
+
+
+
+
+
+NAME
+       readlink - display value of a symbolic link
+
+SYNOPSIS
+       readlink [OPTION]... FILE
+
+DESCRIPTION
+       Display value of a symbolic link on standard output.
+
+       -f, --canonicalize
+              canonicalize  by following every symlink in every
+              component of the given path recursively; all  but
+              the last path component must exist
+
+       -e, --canonicalize-existing
+              canonicalize  by following every symlink in every
+              component of the given path recursively, all path
+              components must exist
+
+       -m, --canonicalize-missing
+              canonicalize  by following every symlink in every
+              component of the given path recursively,  without
+              requirements on components existence
+
+       -n, --no-newline
+              do not output the trailing newline
+
+       -q, --quiet,
+
+       -s, --silent
+              suppress most error messages
+
+       -v, --verbose
+              report error messages
+
+       --help display this help and exit
+
+       --version
+              output version information and exit
+
+AUTHOR
+       Written by Dmitry V. Levin.
+
+REPORTING BUGS
+       Report bugs to <bug-coreutils@gnu.org>.
+
+COPYRIGHT
+       Copyright (C) 2004 Free Software Foundation, Inc.
+       This is free software; see the source for copying condi-
+       tions.  There is NO warranty; not even for MERCHANTABIL-
+       ITY or FITNESS FOR A PARTICULAR PURPOSE.
+
+SEE ALSO
+       The  full  documentation for readlink is maintained as a
+       Texinfo manual.  If the info and readlink  programs  are
+       properly installed at your site, the command
+
+              info readlink
+
+       should give you access to the complete manual.
+
+
+
+readlink 5.3.0           November 2004              READLINK(1)

@@ -1,0 +1,104 @@
+2004-12-14  Jim Meyering  <jim@meyering.net>
+
+	* LINGUAS: Add Bulgarian (bg).
+
+2004-11-28  Jim Meyering  <jim@meyering.net>
+
+	* POTFILES.in: Add lib/openat.c.
+
+2004-10-11  Jim Meyering  <jim@meyering.net>
+
+	* fr.po: Fix two typos reported in http://bugs.debian.org/275924
+
+2004-09-22  Jim Meyering  <jim@meyering.net>
+
+	* POTFILES.in: Remove lib/xmalloc.c.
+	Add lib/xalloc-die.c.
+
+2004-06-26  Jim Meyering  <jim@meyering.net>
+
+	* LINGUAS: Add Basque (eu).
+
+2004-04-16  Jim Meyering  <jim@meyering.net>
+
+	* fr.po: Correct typo in the french rendition of date's --help output:
+	s/%r/%R/.  Patch by Nicolas Boulenguez.
+
+2004-03-02  Jim Meyering  <jim@meyering.net>
+
+	* LINGUAS: Add Afrikaans (af)
+
+2004-01-13  Jim Meyering  <jim@meyering.net>
+
+	* POTFILES.in: Replace src/sys2.h with src/system.h.
+
+2004-01-12  Jim Meyering  <jim@meyering.net>
+
+	* Makefile.in.in: Update from gettext-0.13.1.
+
+2003-11-09  Jim Meyering  <jim@meyering.net>
+
+	* POTFILES.in: Add lib/root-dev-ino.h.
+
+2003-10-17  Jim Meyering  <jim@meyering.net>
+
+	* POTFILES.in: Add lib/xfts.c.
+
+2003-09-22  Jim Meyering  <jim@meyering.net>
+
+	* Makevars (XGETTEXT_OPTIONS): Add --from-code=UTF-8 to accommodate the
+	non-ASCII comment to translators in ptx.c regarding the author's name.
+
+2003-08-27  Jim Meyering  <jim@meyering.net>
+
+	* Makefile.in.in: Update from gettext-0.12.2.
+
+2003-08-19  Jim Meyering  <jim@meyering.net>
+
+	* Makevars (MSGID_BUGS_ADDRESS): Define.
+
+2003-08-12  Jim Meyering  <jim@meyering.net>
+
+	* LINGUAS: Add Irish (ga).
+
+2003-07-11  Jim Meyering  <jim@meyering.net>
+
+	* POTFILES.in: Add src/nohup.c and src/setuidgid.c.
+
+2003-03-18  Jim Meyering  <jim@meyering.net>
+
+	* POTFILES.in: Remove lib/c-stack.c.
+
+2003-02-16  Jim Meyering  <jim@meyering.net>
+
+	* LINGUAS: Add Finnish (fi).
+
+2003-01-11  Jim Meyering  <jim@meyering.net>
+
+	* POTFILES.in: Add src/readlink.c.
+
+2002-11-21  Jim Meyering  <jim@meyering.net>
+
+	* LINGUAS: Add ms (Malay).
+
+2002-11-14  Jim Meyering  <jim@meyering.net>
+
+	* POTFILES.in: Remove lib/long-options.c and lib/same.c.
+	Although each defines `_', neither actually used it.
+
+2002-11-09  Jim Meyering  <jim@meyering.net>
+
+	* Makevars (EXTRA_LOCALE_CATEGORIES): Add LC_TIME.
+	Patch by Tim Waugh for Red Hat bug #73669.
+
+2002-09-25  gettextize  <bug-gnu-gettext@gnu.org>
+
+	* Makefile.in.in: Upgrade to gettext-0.11.5.
+
+2002-09-16  Jim Meyering  <jim@meyering.net>
+
+	* LINGUAS: Add be (Belarusian).
+
+2002-09-02  Jim Meyering  <jim@meyering.net>
+
+	* LINGUAS: Add lg (Luganda).

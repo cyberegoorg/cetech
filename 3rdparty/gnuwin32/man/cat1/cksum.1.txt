@@ -1,0 +1,45 @@
+CKSUM(1)                 User Commands                 CKSUM(1)
+
+
+
+
+
+NAME
+       cksum - checksum and count the bytes in a file
+
+SYNOPSIS
+       cksum [FILE]...
+       cksum [OPTION]
+
+DESCRIPTION
+       Print CRC checksum and byte counts of each FILE.
+
+       --help display this help and exit
+
+       --version
+              output version information and exit
+
+AUTHOR
+       Written by Q. Frank Xia.
+
+REPORTING BUGS
+       Report bugs to <bug-coreutils@gnu.org>.
+
+COPYRIGHT
+       Copyright (C) 2004 Free Software Foundation, Inc.
+       This is free software; see the source for copying condi-
+       tions.  There is NO warranty; not even for MERCHANTABIL-
+       ITY or FITNESS FOR A PARTICULAR PURPOSE.
+
+SEE ALSO
+       The full documentation for cksum is maintained as a Tex-
+       info manual.  If the info and cksum programs  are  prop-
+       erly installed at your site, the command
+
+              info cksum
+
+       should give you access to the complete manual.
+
+
+
+cksum (coreutils) 5.3.0  November 2004                 CKSUM(1)

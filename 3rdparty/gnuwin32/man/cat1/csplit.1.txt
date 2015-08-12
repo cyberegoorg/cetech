@@ -1,0 +1,90 @@
+CSPLIT(1)                User Commands                CSPLIT(1)
+
+
+
+
+
+NAME
+       csplit  -  split a file into sections determined by con-
+       text lines
+
+SYNOPSIS
+       csplit [OPTION]... FILE PATTERN...
+
+DESCRIPTION
+       Output pieces of FILE separated by PATTERN(s)  to  files
+       `xx01',  `xx02',  ...,  and  output  byte counts of each
+       piece to standard output.
+
+       Mandatory arguments to long options  are  mandatory  for
+       short options too.
+
+       -b, --suffix-format=FORMAT use sprintf FORMAT instead of
+              %02d
+
+       -f, --prefix=PREFIX
+              use PREFIX instead of `xx'
+
+       -k, --keep-files
+              do not remove output files on errors
+
+       -n, --digits=DIGITS
+              use specified number of digits instead of 2
+
+       -s, --quiet, --silent
+              do not print counts of output file sizes
+
+       -z, --elide-empty-files
+              remove empty output files
+
+       --help display this help and exit
+
+       --version
+              output version information and exit
+
+       Read standard input if FILE is -.  Each PATTERN may be:
+
+       INTEGER
+              copy up to but not including specified line  num-
+              ber
+
+       /REGEXP/[OFFSET]
+              copy up to but not including a matching line
+
+       %REGEXP%[OFFSET]
+              skip to, but not including a matching line
+
+       {INTEGER}
+              repeat  the  previous pattern specified number of
+              times
+
+       {*}    repeat the previous pattern as many times as pos-
+              sible
+
+       A  line  OFFSET  is  a required `+' or `-' followed by a
+       positive integer.
+
+AUTHOR
+       Written by Stuart Kemp and David MacKenzie.
+
+REPORTING BUGS
+       Report bugs to <bug-coreutils@gnu.org>.
+
+COPYRIGHT
+       Copyright (C) 2004 Free Software Foundation, Inc.
+       This is free software; see the source for copying condi-
+       tions.  There is NO warranty; not even for MERCHANTABIL-
+       ITY or FITNESS FOR A PARTICULAR PURPOSE.
+
+SEE ALSO
+       The full documentation for csplit  is  maintained  as  a
+       Texinfo  manual.   If  the  info and csplit programs are
+       properly installed at your site, the command
+
+              info csplit
+
+       should give you access to the complete manual.
+
+
+
+csplit 5.3.0             December 2004                CSPLIT(1)

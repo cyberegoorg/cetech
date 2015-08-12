@@ -1,0 +1,47 @@
+TRUE(1)                  User Commands                  TRUE(1)
+
+
+
+
+
+NAME
+       true - do nothing, successfully
+
+SYNOPSIS
+       true [ignored command line arguments]
+       true OPTION
+
+DESCRIPTION
+       Exit with a status code indicating success.
+
+       These option names may not be abbreviated.
+
+       --help display this help and exit
+
+       --version
+              output version information and exit
+
+AUTHOR
+       Written by Jim Meyering.
+
+REPORTING BUGS
+       Report bugs to <bug-coreutils@gnu.org>.
+
+COPYRIGHT
+       Copyright (C) 2004 Free Software Foundation, Inc.
+       This is free software; see the source for copying condi-
+       tions.  There is NO warranty; not even for MERCHANTABIL-
+       ITY or FITNESS FOR A PARTICULAR PURPOSE.
+
+SEE ALSO
+       The  full documentation for true is maintained as a Tex-
+       info manual.  If the info and true programs are properly
+       installed at your site, the command
+
+              info true
+
+       should give you access to the complete manual.
+
+
+
+true 5.3.0               November 2004                  TRUE(1)

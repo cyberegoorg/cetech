@@ -1,0 +1,48 @@
+PATHCHK(1)               User Commands               PATHCHK(1)
+
+
+
+
+
+NAME
+       pathchk - check whether file names are valid or portable
+
+SYNOPSIS
+       pathchk [OPTION]... NAME...
+
+DESCRIPTION
+       Diagnose unportable constructs in NAME.
+
+       -p, --portability
+              check for all POSIX systems, not only this one
+
+       --help display this help and exit
+
+       --version
+              output version information and exit
+
+AUTHOR
+       Written by Paul Eggert, David MacKenzie, and Jim  Meyer-
+       ing.
+
+REPORTING BUGS
+       Report bugs to <bug-coreutils@gnu.org>.
+
+COPYRIGHT
+       Copyright (C) 2004 Free Software Foundation, Inc.
+       This is free software; see the source for copying condi-
+       tions.  There is NO warranty; not even for MERCHANTABIL-
+       ITY or FITNESS FOR A PARTICULAR PURPOSE.
+
+SEE ALSO
+       The  full  documentation  for pathchk is maintained as a
+       Texinfo manual.  If the info and  pathchk  programs  are
+       properly installed at your site, the command
+
+              info pathchk
+
+       should give you access to the complete manual.
+
+
+
+pathchk 5.3.0            November 2004               PATHCHK(1)

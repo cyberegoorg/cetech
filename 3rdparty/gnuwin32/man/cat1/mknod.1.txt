@@ -1,0 +1,63 @@
+MKNOD(1)                 User Commands                 MKNOD(1)
+
+
+
+
+
+NAME
+       mknod - make block or character special files
+
+SYNOPSIS
+       mknod [OPTION]... NAME TYPE [MAJOR MINOR]
+
+DESCRIPTION
+       Create the special file NAME of the given TYPE.
+
+       Mandatory  arguments  to  long options are mandatory for
+       short options too.
+
+       -m, --mode=MODE
+              set permission mode (as in  chmod),  not  a=rw  -
+              umask
+
+       --help display this help and exit
+
+       --version
+              output version information and exit
+
+       Both  MAJOR  and MINOR must be specified when TYPE is b,
+       c, or u, and they must be omitted when TYPE  is  p.   If
+       MAJOR  or  MINOR begins with 0x or 0X, it is interpreted
+       as hexadecimal; otherwise,  if  it  begins  with  0,  as
+       octal; otherwise, as decimal.  TYPE may be:
+
+       b      create a block (buffered) special file
+
+       c, u   create a character (unbuffered) special file
+
+       p      create a FIFO
+
+AUTHOR
+       Written by David MacKenzie.
+
+REPORTING BUGS
+       Report bugs to <bug-coreutils@gnu.org>.
+
+COPYRIGHT
+       Copyright (C) 2004 Free Software Foundation, Inc.
+       This is free software; see the source for copying condi-
+       tions.  There is NO warranty; not even for MERCHANTABIL-
+       ITY or FITNESS FOR A PARTICULAR PURPOSE.
+
+SEE ALSO
+       The full documentation for mknod is maintained as a Tex-
+       info manual.  If the info and mknod programs  are  prop-
+       erly installed at your site, the command
+
+              info mknod
+
+       should give you access to the complete manual.
+
+
+
+mknod 5.3.0              November 2004                 MKNOD(1)

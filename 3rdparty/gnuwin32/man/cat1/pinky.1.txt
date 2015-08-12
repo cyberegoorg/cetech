@@ -1,0 +1,68 @@
+PINKY(1)                 User Commands                 PINKY(1)
+
+
+
+
+
+NAME
+       pinky - lightweight finger
+
+SYNOPSIS
+       pinky [OPTION]... [USER]...
+
+DESCRIPTION
+       -l     produce  long  format  output  for  the specified
+              USERs
+
+       -b     omit the user's home directory and shell in  long
+              format
+
+       -h     omit the user's project file in long format
+
+       -p     omit the user's plan file in long format
+
+       -s     do short format output, this is the default
+
+       -f     omit the line of column headings in short format
+
+       -w     omit the user's full name in short format
+
+       -i     omit  the  user's  full  name  and remote host in
+              short format
+
+       -q     omit the user's full name, remote host  and  idle
+              time in short format
+
+       --help display this help and exit
+
+       --version
+              output version information and exit
+
+       A lightweight `finger' program;  print user information.
+       The utmp file will be /var/run/utmp.
+
+AUTHOR
+       Written by Joseph Arceneaux, David MacKenzie, and  Kaveh
+       Ghazi.
+
+REPORTING BUGS
+       Report bugs to <bug-coreutils@gnu.org>.
+
+COPYRIGHT
+       Copyright (C) 2004 Free Software Foundation, Inc.
+       This is free software; see the source for copying condi-
+       tions.  There is NO warranty; not even for MERCHANTABIL-
+       ITY or FITNESS FOR A PARTICULAR PURPOSE.
+
+SEE ALSO
+       The full documentation for pinky is maintained as a Tex-
+       info manual.  If the info and pinky programs  are  prop-
+       erly installed at your site, the command
+
+              info pinky
+
+       should give you access to the complete manual.
+
+
+
+pinky 5.3.0              November 2004                 PINKY(1)

@@ -1,0 +1,200 @@
+uname(P)                                               uname(P)
+
+
+
+
+
+NAME
+       uname - return system name
+
+SYNOPSIS
+       uname [-snrvma]
+
+DESCRIPTION
+       By  default, the uname utility shall write the operating
+       system name to standard output. When options are  speci-
+       fied, symbols representing one or more system character-
+       istics shall be written to the standard output. The for-
+       mat  and  contents  of  the  symbols are implementation-
+       defined. On systems conforming to the System  Interfaces
+       volume  of  IEEE Std 1003.1-2001,  the  symbols  written
+       shall be those supported  by  the  uname()  function  as
+       defined    in    the   System   Interfaces   volume   of
+       IEEE Std 1003.1-2001.
+
+OPTIONS
+       The uname utility shall conform to the Base  Definitions
+       volume  of  IEEE Std 1003.1-2001,  Section 12.2, Utility
+       Syntax Guidelines.
+
+       The following options shall be supported:
+
+       -a     Behave as though all of the options  -mnrsv  were
+              specified.
+
+       -m     Write  the name of the hardware type on which the
+              system is running to standard output.
+
+       -n     Write the name of this node within an implementa-
+              tion-defined communications network.
+
+       -r     Write  the current release level of the operating
+              system implementation.
+
+       -s     Write the name of the implementation of the oper-
+              ating system.
+
+       -v     Write  the  current version level of this release
+              of the operating system implementation.
+
+
+       If no options are specified,  the  uname  utility  shall
+       write the operating system name, as if the -s option had
+       been specified.
+
+OPERANDS
+       None.
+
+STDIN
+       Not used.
+
+INPUT FILES
+       None.
+
+ENVIRONMENT VARIABLES
+       The following environment  variables  shall  affect  the
+       execution of uname:
+
+       LANG   Provide a default value for the internationaliza-
+              tion variables that are unset or null.  (See  the
+              Base  Definitions volume of IEEE Std 1003.1-2001,
+              Section 8.2, Internationalization  Variables  for
+              the  precedence of internationalization variables
+              used to determine  the  values  of  locale  cate-
+              gories.)
+
+       LC_ALL If  set to a non-empty string value, override the
+              values  of  all  the  other  internationalization
+              variables.
+
+       LC_CTYPE
+              Determine  the  locale  for the interpretation of
+              sequences of bytes of  text  data  as  characters
+              (for  example,  single-byte  as opposed to multi-
+              byte characters in arguments).
+
+       LC_MESSAGES
+              Determine the  locale  that  should  be  used  to
+              affect the format and contents of diagnostic mes-
+              sages written to standard error.
+
+       NLSPATH
+              Determine the location of  message  catalogs  for
+              the processing of LC_MESSAGES .
+
+
+ASYNCHRONOUS EVENTS
+       Default.
+
+STDOUT
+       By  default,  the  output  shall be a single line of the
+       following form:
+
+
+              "%s\n", <sysname>
+
+       If the -a option is specified, the  output  shall  be  a
+       single line of the following form:
+
+
+              "%s %s %s %s %s\n", <sysname>, <nodename>, <release>,
+                  <version>, <machine>
+
+       Additional  implementation-defined  symbols may be writ-
+       ten; all such symbols shall be written at the end of the
+       line of output before the <newline>.
+
+       If  options  are  specified to select different combina-
+       tions of the symbols, only those symbols shall be  writ-
+       ten,  in  the  order shown above for the -a option. If a
+       symbol is not selected for  writing,  its  corresponding
+       trailing <blank>s also shall not be written.
+
+STDERR
+       The  standard  error  shall  be used only for diagnostic
+       messages.
+
+OUTPUT FILES
+       None.
+
+EXTENDED DESCRIPTION
+       None.
+
+EXIT STATUS
+       The following exit values shall be returned:
+
+        0     The requested information was successfully  writ-
+              ten.
+
+       >0     An error occurred.
+
+
+CONSEQUENCES OF ERRORS
+       Default.
+
+       The following sections are informative.
+
+APPLICATION USAGE
+       Note  that  any  of  the  symbols could include embedded
+       <space>s, which may affect parsing algorithms if  multi-
+       ple options are selected for output.
+
+       The  node  name is typically a name that the system uses
+       to  identify  itself  for   inter-system   communication
+       addressing.
+
+EXAMPLES
+       The following command:
+
+
+              uname -sr
+
+       writes the operating system name and release level, sep-
+       arated by one or more <blank>s.
+
+RATIONALE
+       It was  suggested  that  this  utility  cannot  be  used
+       portably  since the format of the symbols is implementa-
+       tion-defined.  The  POSIX.1  working  group  could   not
+       achieve  consensus  on  defining  these  formats  in the
+       underlying uname() function, and there was  no  expecta-
+       tion  that  this volume of IEEE Std 1003.1-2001 would be
+       any more successful. Some applications  may  still  find
+       this  historical utility of value. For example, the sym-
+       bols could be used for system log entries or for compar-
+       ison with operator or user input.
+
+FUTURE DIRECTIONS
+       None.
+
+SEE ALSO
+       The  System  Interfaces  volume of IEEE Std 1003.1-2001,
+       uname()
+
+COPYRIGHT
+       Portions of this text are reprinted  and  reproduced  in
+       electronic  form  from  IEEE  Std  1003.1, 2003 Edition,
+       Standard for Information Technology -- Portable  Operat-
+       ing System Interface (POSIX), The Open Group Base Speci-
+       fications Issue 6, Copyright (C) 2001-2003 by the Insti-
+       tute  of  Electrical  and Electronics Engineers, Inc and
+       The Open Group. In the event of any discrepancy  between
+       this  version  and  the original IEEE and The Open Group
+       Standard, the original IEEE and The Open Group  Standard
+       is  the  referee  document. The original Standard can be
+       obtained        online        at        http://www.open-
+       group.org/unix/online.html .
+
+
+
+POSIX                         2003                     uname(P)

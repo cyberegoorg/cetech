@@ -1,0 +1,47 @@
+DIRNAME(1)               User Commands               DIRNAME(1)
+
+
+
+
+
+NAME
+       dirname - strip non-directory suffix from file name
+
+SYNOPSIS
+       dirname NAME
+       dirname OPTION
+
+DESCRIPTION
+       Print NAME with its trailing /component removed; if NAME
+       contains no /'s, output `.' (meaning the current  direc-
+       tory).
+
+       --help display this help and exit
+
+       --version
+              output version information and exit
+
+AUTHOR
+       Written by David MacKenzie and Jim Meyering.
+
+REPORTING BUGS
+       Report bugs to <bug-coreutils@gnu.org>.
+
+COPYRIGHT
+       Copyright (C) 2004 Free Software Foundation, Inc.
+       This is free software; see the source for copying condi-
+       tions.  There is NO warranty; not even for MERCHANTABIL-
+       ITY or FITNESS FOR A PARTICULAR PURPOSE.
+
+SEE ALSO
+       The  full  documentation  for dirname is maintained as a
+       Texinfo manual.  If the info and  dirname  programs  are
+       properly installed at your site, the command
+
+              info dirname
+
+       should give you access to the complete manual.
+
+
+
+dirname 5.3.0            November 2004               DIRNAME(1)

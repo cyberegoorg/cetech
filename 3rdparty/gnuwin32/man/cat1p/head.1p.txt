@@ -1,0 +1,178 @@
+head(P)                                                 head(P)
+
+
+
+
+
+NAME
+       head - copy the first part of files
+
+SYNOPSIS
+       head [-n number][file...]
+
+DESCRIPTION
+       The head utility shall copy its input files to the stan-
+       dard output, ending the output for each file at a desig-
+       nated point.
+
+       Copying  shall end at the point in each input file indi-
+       cated by the -n number option. The option-argument  num-
+       ber shall be counted in units of lines.
+
+OPTIONS
+       The  head  utility shall conform to the Base Definitions
+       volume of IEEE Std 1003.1-2001,  Section  12.2,  Utility
+       Syntax Guidelines.
+
+       The following option shall be supported:
+
+       -n  number
+              The  first  number lines of each input file shall
+              be copied to  standard  output.  The  application
+              shall ensure that the number option-argument is a
+              positive decimal integer.
+
+
+       When a file contains less than number lines, it shall be
+       copied  to  standard  output in its entirety. This shall
+       not be an error.
+
+       If no options are specified, head shall act as if -n  10
+       had been specified.
+
+OPERANDS
+       The following operand shall be supported:
+
+       file   A  pathname of an input file. If no file operands
+              are specified, the standard input shall be  used.
+
+
+STDIN
+       The  standard  input shall be used only if no file oper-
+       ands are specified. See the INPUT FILES section.
+
+INPUT FILES
+       Input files shall be text files, but the line length  is
+       not restricted to {LINE_MAX} bytes.
+
+ENVIRONMENT VARIABLES
+       The  following  environment  variables  shall affect the
+       execution of head:
+
+       LANG   Provide a default value for the internationaliza-
+              tion  variables  that are unset or null. (See the
+              Base Definitions volume of  IEEE Std 1003.1-2001,
+              Section  8.2,  Internationalization Variables for
+              the precedence of internationalization  variables
+              used  to  determine  the  values  of locale cate-
+              gories.)
+
+       LC_ALL If set to a non-empty string value, override  the
+              values  of  all  the  other  internationalization
+              variables.
+
+       LC_CTYPE
+              Determine the locale for  the  interpretation  of
+              sequences  of  bytes  of  text data as characters
+              (for example, single-byte as  opposed  to  multi-
+              byte characters in arguments and input files).
+
+       LC_MESSAGES
+              Determine  the  locale  that  should  be  used to
+              affect the format and contents of diagnostic mes-
+              sages written to standard error.
+
+       NLSPATH
+              Determine  the  location  of message catalogs for
+              the processing of LC_MESSAGES .
+
+
+ASYNCHRONOUS EVENTS
+       Default.
+
+STDOUT
+       The standard output shall contain designated portions of
+       the input files.
+
+       If multiple file operands are specified, head shall pre-
+       cede the output for each with the header:
+
+
+              "\n==> %s <==\n", <pathname>
+
+       except that the first header written shall  not  include
+       the initial <newline>.
+
+STDERR
+       The  standard  error  shall  be used only for diagnostic
+       messages.
+
+OUTPUT FILES
+       None.
+
+EXTENDED DESCRIPTION
+       None.
+
+EXIT STATUS
+       The following exit values shall be returned:
+
+        0     Successful completion.
+
+       >0     An error occurred.
+
+
+CONSEQUENCES OF ERRORS
+       Default.
+
+       The following sections are informative.
+
+APPLICATION USAGE
+       The obsolescent - number form is withdrawn in this  ver-
+       sion.  Applications should use the -n number option.
+
+EXAMPLES
+       To  write the first ten lines of all files (except those
+       with a leading period) in the directory:
+
+
+              head *
+
+RATIONALE
+       Although it is possible to simulate head  with  sed  10q
+       for  a single file, the standard developers decided that
+       the popularity of head on historical  BSD  systems  war-
+       ranted its inclusion alongside tail.
+
+       This standard version of head follows the Utility Syntax
+       Guidelines.  The -n option was added to this new  inter-
+       face  so  that  head  and  tail  would be more logically
+       related.
+
+       There is no -c option (as there is in tail)  because  it
+       is  not  historical practice and because other utilities
+       in this volume of IEEE Std 1003.1-2001  provide  similar
+       functionality.
+
+FUTURE DIRECTIONS
+       None.
+
+SEE ALSO
+       sed , tail
+
+COPYRIGHT
+       Portions  of  this  text are reprinted and reproduced in
+       electronic form from  IEEE  Std  1003.1,  2003  Edition,
+       Standard  for Information Technology -- Portable Operat-
+       ing System Interface (POSIX), The Open Group Base Speci-
+       fications Issue 6, Copyright (C) 2001-2003 by the Insti-
+       tute of Electrical and Electronics  Engineers,  Inc  and
+       The  Open Group. In the event of any discrepancy between
+       this version and the original IEEE and  The  Open  Group
+       Standard,  the original IEEE and The Open Group Standard
+       is the referee document. The original  Standard  can  be
+       obtained        online        at        http://www.open-
+       group.org/unix/online.html .
+
+
+
+POSIX                         2003                      head(P)

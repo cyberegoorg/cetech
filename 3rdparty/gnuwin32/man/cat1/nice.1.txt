@@ -1,0 +1,50 @@
+NICE(1)                  User Commands                  NICE(1)
+
+
+
+
+
+NAME
+       nice - run a program with modified scheduling priority
+
+SYNOPSIS
+       nice [OPTION] [COMMAND [ARG]...]
+
+DESCRIPTION
+       Run  COMMAND  with an adjusted nice value, which affects
+       the scheduling priority.  With  no  COMMAND,  print  the
+       current  nice  value.   Nice values range from -20 (most
+       favorable scheduling) to 19 (least favorable).
+
+       -n, --adjustment=N
+              add integer N to the nice value (default 10)
+
+       --help display this help and exit
+
+       --version
+              output version information and exit
+
+AUTHOR
+       Written by David MacKenzie.
+
+REPORTING BUGS
+       Report bugs to <bug-coreutils@gnu.org>.
+
+COPYRIGHT
+       Copyright (C) 2004 Free Software Foundation, Inc.
+       This is free software; see the source for copying condi-
+       tions.  There is NO warranty; not even for MERCHANTABIL-
+       ITY or FITNESS FOR A PARTICULAR PURPOSE.
+
+SEE ALSO
+       The full documentation for nice is maintained as a  Tex-
+       info manual.  If the info and nice programs are properly
+       installed at your site, the command
+
+              info nice
+
+       should give you access to the complete manual.
+
+
+
+nice 5.3.0               November 2004                  NICE(1)

@@ -1,0 +1,72 @@
+UNAME(1)                 User Commands                 UNAME(1)
+
+
+
+
+
+NAME
+       uname - print system information
+
+SYNOPSIS
+       uname [OPTION]...
+
+DESCRIPTION
+       Print  certain system information.  With no OPTION, same
+       as -s.
+
+       -a, --all
+              print all information, in the following order:
+
+       -s, --kernel-name
+              print the kernel name
+
+       -n, --nodename
+              print the network node hostname
+
+       -r, --kernel-release
+              print the kernel release
+
+       -v, --kernel-version
+              print the kernel version
+
+       -m, --machine
+              print the machine hardware name
+
+       -p, --processor
+              print the processor type
+
+       -i, --hardware-platform
+              print the hardware platform
+
+       -o, --operating-system
+              print the operating system
+
+       --help display this help and exit
+
+       --version
+              output version information and exit
+
+AUTHOR
+       Written by David MacKenzie.
+
+REPORTING BUGS
+       Report bugs to <bug-coreutils@gnu.org>.
+
+COPYRIGHT
+       Copyright (C) 2004 Free Software Foundation, Inc.
+       This is free software; see the source for copying condi-
+       tions.  There is NO warranty; not even for MERCHANTABIL-
+       ITY or FITNESS FOR A PARTICULAR PURPOSE.
+
+SEE ALSO
+       The full documentation for uname is maintained as a Tex-
+       info  manual.   If the info and uname programs are prop-
+       erly installed at your site, the command
+
+              info uname
+
+       should give you access to the complete manual.
+
+
+
+uname 5.3.0              November 2004                 UNAME(1)

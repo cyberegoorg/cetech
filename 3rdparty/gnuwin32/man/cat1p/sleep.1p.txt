@@ -1,0 +1,171 @@
+sleep(P)                                               sleep(P)
+
+
+
+
+
+NAME
+       sleep - suspend execution for an interval
+
+SYNOPSIS
+       sleep time
+
+DESCRIPTION
+       The  sleep  utility shall suspend execution for at least
+       the integral number of seconds specified by the time op-
+       erand.
+
+OPTIONS
+       None.
+
+OPERANDS
+       The following operand shall be supported:
+
+       time   A  non-negative  decimal  integer  specifying the
+              number of seconds for which to suspend execution.
+
+
+STDIN
+       Not used.
+
+INPUT FILES
+       None.
+
+ENVIRONMENT VARIABLES
+       The  following  environment  variables  shall affect the
+       execution of sleep:
+
+       LANG   Provide a default value for the internationaliza-
+              tion  variables  that are unset or null. (See the
+              Base Definitions volume of  IEEE Std 1003.1-2001,
+              Section  8.2,  Internationalization Variables for
+              the precedence of internationalization  variables
+              used  to  determine  the  values  of locale cate-
+              gories.)
+
+       LC_ALL If set to a non-empty string value, override  the
+              values  of  all  the  other  internationalization
+              variables.
+
+       LC_CTYPE
+              Determine the locale for  the  interpretation  of
+              sequences  of  bytes  of  text data as characters
+              (for example, single-byte as  opposed  to  multi-
+              byte characters in arguments).
+
+       LC_MESSAGES
+              Determine  the  locale  that  should  be  used to
+              affect the format and contents of diagnostic mes-
+              sages written to standard error.
+
+       NLSPATH
+              Determine  the  location  of message catalogs for
+              the processing of LC_MESSAGES .
+
+
+ASYNCHRONOUS EVENTS
+       If the sleep utility receives a SIGALRM signal,  one  of
+       the following actions shall be taken:
+
+       Terminate normally with a zero exit status.
+
+       Effectively ignore the signal.
+
+       Provide  the  default  behavior for signals described in
+       the ASYNCHRONOUS EVENTS section of  Utility  Description
+       Defaults  .  This  could include terminating with a non-
+       zero exit status.
+
+       The sleep utility shall take the standard action for all
+       other signals.
+
+STDOUT
+       Not used.
+
+STDERR
+       The  standard  error  shall  be used only for diagnostic
+       messages.
+
+OUTPUT FILES
+       None.
+
+EXTENDED DESCRIPTION
+       None.
+
+EXIT STATUS
+       The following exit values shall be returned:
+
+        0     The execution was successfully suspended  for  at
+              least  time  seconds,  or  a  SIGALRM  signal was
+              received. See the ASYNCHRONOUS EVENTS section.
+
+       >0     An error occurred.
+
+
+CONSEQUENCES OF ERRORS
+       Default.
+
+       The following sections are informative.
+
+APPLICATION USAGE
+       None.
+
+EXAMPLES
+       The sleep utility can be used to execute a command after
+       a certain amount of time, as in:
+
+
+              (sleep 105; command) &
+
+       or to execute a command every so often, as in:
+
+
+              while true
+              do
+                  command    sleep 37
+              done
+
+RATIONALE
+       The  exit  status  is  allowed  to be zero when sleep is
+       interrupted by the SIGALRM signal because most implemen-
+       tations of this utility rely on the arrival of that sig-
+       nal to notify them that the requested finishing time has
+       been  successfully  attained.  Such implementations thus
+       do not distinguish this situation  from  the  successful
+       completion  case.  Other  implementations are allowed to
+       catch  the  signal  and  go  back  to  sleep  until  the
+       requested  time  expires or to provide the normal signal
+       termination procedures.
+
+       As with all other utilities that take integral  operands
+       and do not specify subranges of allowed values, sleep is
+       required by this volume of IEEE Std 1003.1-2001 to  deal
+       with time requests of up to 2147483647 seconds. This may
+       mean that some implementations  have  to  make  multiple
+       calls to the delay mechanism of the underlying operating
+       system if its argument range is less than this.
+
+FUTURE DIRECTIONS
+       None.
+
+SEE ALSO
+       wait    ,    the    System    Interfaces    volume    of
+       IEEE Std 1003.1-2001, alarm(), sleep()
+
+COPYRIGHT
+       Portions  of  this  text are reprinted and reproduced in
+       electronic form from  IEEE  Std  1003.1,  2003  Edition,
+       Standard  for Information Technology -- Portable Operat-
+       ing System Interface (POSIX), The Open Group Base Speci-
+       fications Issue 6, Copyright (C) 2001-2003 by the Insti-
+       tute of Electrical and Electronics  Engineers,  Inc  and
+       The  Open Group. In the event of any discrepancy between
+       this version and the original IEEE and  The  Open  Group
+       Standard,  the original IEEE and The Open Group Standard
+       is the referee document. The original  Standard  can  be
+       obtained        online        at        http://www.open-
+       group.org/unix/online.html .
+
+
+
+POSIX                         2003                     sleep(P)

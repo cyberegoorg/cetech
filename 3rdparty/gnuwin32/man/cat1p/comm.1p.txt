@@ -1,0 +1,231 @@
+comm(P)                                                 comm(P)
+
+
+
+
+
+NAME
+       comm - select or reject lines common to two files
+
+SYNOPSIS
+       comm [-123] file1 file2
+
+DESCRIPTION
+       The  comm  utility  shall  read  file1  and file2, which
+       should be ordered in the current collating sequence, and
+       produce  three  text  columns  as  output: lines only in
+       file1, lines only in file2, and lines in both files.
+
+       If the lines in both files are not ordered according  to
+       the  collating  sequence  of  the  current  locale,  the
+       results are unspecified.
+
+OPTIONS
+       The comm utility shall conform to the  Base  Definitions
+       volume  of  IEEE Std 1003.1-2001,  Section 12.2, Utility
+       Syntax Guidelines.
+
+       The following options shall be supported:
+
+       -1     Suppress the output column  of  lines  unique  to
+              file1.
+
+       -2     Suppress  the  output  column  of lines unique to
+              file2.
+
+       -3     Suppress the output column of lines duplicated in
+              file1 and file2.
+
+
+OPERANDS
+       The following operands shall be supported:
+
+       file1  A  pathname  of the first file to be compared. If
+              file1 is '-' , the standard input shall be  used.
+
+       file2  A  pathname of the second file to be compared. If
+              file2 is '-' , the standard input shall be  used.
+
+
+       If  both  file1  and file2 refer to standard input or to
+       the same FIFO special, block special, or character  spe-
+       cial file, the results are undefined.
+
+STDIN
+       The  standard  input  shall  be  used only if one of the
+       file1 or file2 operands refers to  standard  input.  See
+       the INPUT FILES section.
+
+INPUT FILES
+       The input files shall be text files.
+
+ENVIRONMENT VARIABLES
+       The  following  environment  variables  shall affect the
+       execution of comm:
+
+       LANG   Provide a default value for the internationaliza-
+              tion  variables  that are unset or null. (See the
+              Base Definitions volume of  IEEE Std 1003.1-2001,
+              Section  8.2,  Internationalization Variables for
+              the precedence of internationalization  variables
+              used  to  determine  the  values  of locale cate-
+              gories.)
+
+       LC_ALL If set to a non-empty string value, override  the
+              values  of  all  the  other  internationalization
+              variables.
+
+       LC_COLLATE
+
+              Determine the locale for the  collating  sequence
+              comm  expects  to  have  been used when the input
+              files were sorted.
+
+       LC_CTYPE
+              Determine the locale for  the  interpretation  of
+              sequences  of  bytes  of  text data as characters
+              (for example, single-byte as  opposed  to  multi-
+              byte characters in arguments and input files).
+
+       LC_MESSAGES
+              Determine  the  locale  that  should  be  used to
+              affect the format and contents of diagnostic mes-
+              sages written to standard error.
+
+       NLSPATH
+              Determine  the  location  of message catalogs for
+              the processing of LC_MESSAGES .
+
+
+ASYNCHRONOUS EVENTS
+       Default.
+
+STDOUT
+       The comm utility shall produce output depending  on  the
+       options  selected. If the -1, -2, and -3 options are all
+       selected, comm shall write nothing to standard output.
+
+       If the -1 option is not selected, lines  contained  only
+       in file1 shall be written using the format:
+
+
+              "%s\n", <line in file1>
+
+       If  the  -2 option is not selected, lines contained only
+       in file2 are written using the format:
+
+
+              "%s%s\n", <lead>, <line in file2>
+
+       where the string <lead> is as follows:
+
+       <tab>  The -1 option is not selected.
+
+       null string
+              The -1 option is selected.
+
+
+       If the -3 option is not  selected,  lines  contained  in
+       both files shall be written using the format:
+
+
+              "%s%s\n", <lead>, <line in both>
+
+       where the string <lead> is as follows:
+
+       <tab><tab>
+              Neither the -1 nor the -2 option is selected.
+
+       <tab>  Exactly one of the -1 and -2 options is selected.
+
+       null string
+              Both the -1 and -2 options are selected.
+
+
+       If the input files were ordered according to the collat-
+       ing  sequence  of  the current locale, the lines written
+       shall be in  the  collating  sequence  of  the  original
+       lines.
+
+STDERR
+       The  standard  error  shall  be used only for diagnostic
+       messages.
+
+OUTPUT FILES
+       None.
+
+EXTENDED DESCRIPTION
+       None.
+
+EXIT STATUS
+       The following exit values shall be returned:
+
+        0     All input files were successfully output as spec-
+              ified.
+
+       >0     An error occurred.
+
+
+CONSEQUENCES OF ERRORS
+       Default.
+
+       The following sections are informative.
+
+APPLICATION USAGE
+       If  the input files are not properly presorted, the out-
+       put of comm might not be useful.
+
+EXAMPLES
+       If a file named xcu contains a sorted list of the utili-
+       ties  in  this  volume  of  IEEE Std 1003.1-2001, a file
+       named xpg3 contains a sorted list of the utilities spec-
+       ified  in  the  X/Open Portability Guide, Issue 3, and a
+       file named svid89 contains a sorted list of  the  utili-
+       ties in the System V Interface Definition Third Edition:
+
+
+              comm -23 xcu xpg3 | comm -23 - svid89
+
+       would print a  list  of  utilities  in  this  volume  of
+       IEEE Std 1003.1-2001  not  specified  by  either  of the
+       other documents:
+
+
+              comm -12 xcu xpg3 | comm -12 - svid89
+
+       would print a list of utilities specified by  all  three
+       documents, and:
+
+
+              comm -12 xpg3 svid89 | comm -23 - xcu
+
+       would  print  a list of utilities specified by both XPG3
+       and the SVID,  but  not  specified  in  this  volume  of
+       IEEE Std 1003.1-2001.
+
+RATIONALE
+       None.
+
+FUTURE DIRECTIONS
+       None.
+
+SEE ALSO
+       cmp , diff , sort , uniq
+
+COPYRIGHT
+       Portions  of  this  text are reprinted and reproduced in
+       electronic form from  IEEE  Std  1003.1,  2003  Edition,
+       Standard  for Information Technology -- Portable Operat-
+       ing System Interface (POSIX), The Open Group Base Speci-
+       fications Issue 6, Copyright (C) 2001-2003 by the Insti-
+       tute of Electrical and Electronics  Engineers,  Inc  and
+       The  Open Group. In the event of any discrepancy between
+       this version and the original IEEE and  The  Open  Group
+       Standard,  the original IEEE and The Open Group Standard
+       is the referee document. The original  Standard  can  be
+       obtained        online        at        http://www.open-
+       group.org/unix/online.html .
+
+
+
+POSIX                         2003                      comm(P)
