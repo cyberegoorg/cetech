@@ -17,7 +17,7 @@ SCENARIO( "Array can store items", "[array]" ) {
             cetech1::array::push_back(a, 3);
 
             THEN( "size changed" ) {
-                REQUIRE( cetech1::array::size(a) == 3 );
+                REQUIRE( cetech1::array::size(a) == 2 );
             }
 
             AND_THEN("item at index 0 is first pushed") {
