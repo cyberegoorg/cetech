@@ -102,4 +102,12 @@ test-linux-debug: linux-debug
 .PHONY: test-linux-release
 test-linux-release: linux-release
 	.build/linux${ARCH}/bin/tech1_test -b -r compact
+
+.PHONY: test-linux-debug-travis
+test-linux-debug-travis: linux-debug
+	.build/linux${ARCH}/bin/tech1_test_debug
+
+.PHONY: test-linux-release-travis
+test-linux-release-travis: linux-release
+	.build/linux${ARCH}/bin/tech1_test
 #########
