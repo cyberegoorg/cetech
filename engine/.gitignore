@@ -1,7 +1,7 @@
 .build
 doc/doxygen/*
 
-*.kdev4
+*.kdev*
 
 # SDL2
 3rdparty/SDL2/include/SDL_config.h
