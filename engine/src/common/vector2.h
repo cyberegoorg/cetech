@@ -5,12 +5,24 @@
 
 namespace cetech1 {
     namespace vector2 {
-        inline float len_sq(const Vector2& v1);
+        static const Vector2 ZERO = {0.0f, 0.0f};
+        static const Vector2 UNIT = {1.0f, 1.0f};
+        
+        static const Vector2 UP = {0.0f, 1.0f};
+        static const Vector2 DOWN = {0.0f, -1.0f};
+        static const Vector2 RIGHT = {1.0f, 0.0f};
+        static const Vector2 LEFT = {-1.0f, 0.0f};
+    }
+    
+    namespace vector2 {
         inline float len(const Vector2& v1);
+        inline float len_sq(const Vector2& v1);
         inline float len_inv(const Vector2& v1);
 
         inline Vector2 normalized(const Vector2& v1);
+        
         inline float dot(const Vector2& v1, const Vector2& v2);
+        inline float cross(const Vector2& v1, const Vector2& v2);
     }
 
     inline Vector2 operator+ (const Vector2& v1, const Vector2& v2);
@@ -26,13 +38,17 @@ namespace cetech1 {
         inline float dot(const Vector2& v1, const Vector2& v2) {
             return (v1.x * v2.x) + (v1.y * v2.y);
         }
-
-        inline float len_sq(const Vector2& v1) {
-            return dot(v1, v1);
+        
+        inline float cross(const Vector2& v1, const Vector2& v2){
+            return (v1.x * v2.y) - (v1.y * v2.x);
         }
 
         inline float len(const Vector2& v1) {
-            return math::sqrt(len_sq(v1));
+            return math::fast_sqrt(len_sq(v1));
+        }
+        
+        inline float len_sq(const Vector2& v1) {
+            return dot(v1, v1);
         }
 
         inline float len_inv(const Vector2& v1){

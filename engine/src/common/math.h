@@ -17,8 +17,14 @@ namespace cetech1 {
         inline float fabs(float f) ;
         inline bool fcmp(const float f1, const float f2, float epsilon = FLOAT_SMALL_NUMBER);
 
-        inline float sqrt(const float number);
+        inline float fast_sqrt(const float number);
         inline float inv_sqrt(const float number);
+        
+        inline float deg2rad(float deg);
+        inline float rad2deg(float rad);
+        
+        inline float fast_sin(float angle);
+        inline void fast_sincos(float angle, float& sin, float& cos);
     }
 
     namespace math {
@@ -32,8 +38,13 @@ namespace cetech1 {
         }
 
 
-        inline float sqrt(const float number) {
-          return std::sqrt(number); // TODO: fast
+        inline float fast_sqrt(const float number) {
+            unsigned int i = *(unsigned int*) &number; 
+            // adjust bias
+            i  += 127 << 23;
+            // approximation of square root
+            i >>= 1; 
+            return *(float*) &i;
         }
 
         inline float inv_sqrt(const float number) {
@@ -50,6 +61,34 @@ namespace cetech1 {
           // y  = y * ( threehalfs - ( x2 * y * y ) ); // 2nd iteration, this can be removed
 
           return y;
+        }
+        
+        inline float deg2rad(float deg) {
+            static const float to_rad = 3.14159265358979323846f / 180.0f;
+            return deg * to_rad;
+        }
+        
+        inline float rad2deg(float rad) {
+            static const float to_deg = 180.0f / 3.14159265358979323846f;
+            return rad * to_deg;
+        }
+        
+        inline float fast_sin(float angle) {
+            angle = deg2rad(angle);
+            
+            if(PI < angle) {
+                angle = angle-int((angle+PI)*INV_PI)*HALF_PI;
+            }
+            else if(angle < -PI) {
+                angle = angle-int((angle-PI)*INV_PI)*HALF_PI;
+            }
+            
+            return angle*(1 - angle*angle*(0.16666667f - angle*angle*(0.00833333f - angle*angle*(0.0001984f - angle*angle*0.0000027f))));
+        }
+        
+        inline void fast_sincos(float angle, float& sin, float& cos) {
+            sin = fast_sin(angle);
+            cos = fast_sqrt(1-sin*sin);
         }
     }
 }

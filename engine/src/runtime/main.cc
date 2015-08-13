@@ -1,5 +1,6 @@
 #include "common/memory.h"
 #include "common/math_types.h"
+#include "common/math.h"
 #include "common/types.h"
 #include "common/array.h"
 #include "common/hash.h"
@@ -60,6 +61,12 @@ void run() {
 
     Entity e3 = entity_manager::create(em);
     printf("[idx: %u, gen: %u]\n", entity::idx(e3), entity::gen(e3));
+    
+    float sin1, cos1;
+    sin1 = cos1 = 0; 
+    cetech1::math::fast_sincos(21, sin1, cos1);
+   
+    printf("%f, %f == %f, %f\n", sin(cetech1::math::deg2rad(21)), cos(cetech1::math::deg2rad(21)), sin1, cos1);
 }
 
 void shutdown() {

@@ -15,15 +15,6 @@
   #define ENTITY_GENERATION_BIT_COUNT 8
 #endif
 
-/* TODO: compile-time 2^ENTITY_INDEX_BIT_COUNT */
-#if !defined(MAX_ENTITIES)
-  #define MAX_ENTITIES 4194304
-#endif
-
-#if !defined(MAX_ENTITY_NAME_LEN)
-  #define MAX_ENTITY_NAME_LEN 64
-#endif
-
 #define MINIMUM_FREE_INDEXS 1024
 #define FREE_INDEX_COUNT (_entity_system.free_indices_last + 1)
 #define GENERATIONS_COUNT (_entity_system.generation_last + 1)
@@ -43,8 +34,7 @@ namespace cetech1 {
         }
 
         inline Entity make_entity(uint32_t idx, uint32_t gen) {
-            Entity ent;
-            ent.id = (((idx) << (ENTITY_INDEX_BIT_COUNT)) | (gen));
+            Entity ent = {((idx) << (ENTITY_INDEX_BIT_COUNT)) | (gen)};
             return ent;
         }
     }
