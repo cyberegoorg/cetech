@@ -76,8 +76,8 @@ SCENARIO( "Vector len", "[vector2]" ) {
         WHEN( "len(v1)" ) {
             float len = cetech1::vector2::len(v1);
 
-            THEN( "Len is 2.23607f" ) {
-                REQUIRE( cetech1::math::fcmp(len, 2.23607f));
+            THEN( "Len is 2.25" ) {
+                REQUIRE( cetech1::math::fcmp(len, 2.25f));
             }
         }
 

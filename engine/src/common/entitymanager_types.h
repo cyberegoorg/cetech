@@ -9,7 +9,7 @@ namespace cetech1 {
     struct Entity {
         uint32_t id;
     };
-
+    
     struct EntityManager {
         Array < unsigned char > _generation;
         Queue < uint32_t > _free_idx;
