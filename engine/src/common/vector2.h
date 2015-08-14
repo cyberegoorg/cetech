@@ -31,6 +31,8 @@ namespace cetech1 {
         static const Vector2 LEFT = {-1.0f, 0.0f};
     }
 
+    /*! Vector2 functions.
+     */
     namespace vector2 {
         /*! Make Vector2
          * \param x X

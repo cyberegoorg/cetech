@@ -16,20 +16,50 @@
 
 namespace cetech1 {
     namespace math {
-        template<class T> FORCE_INLINE T max( const T a, const T b);
-        template<class T> FORCE_INLINE T min( const T a, const T b);
-        template<class T> FORCE_INLINE T clamp( const T a, const T max, const T min);
+        /*! Return greater of two numbers.
+	 * \param a First number.
+	 * \param b Second number.
+	 * \return greater of two numbers.
+	 */
+	template<class T>
+        FORCE_INLINE T max( const T a, const T b);
 
-        template<class T> FORCE_INLINE T abs( const T a);
+        /*! Return smaller of two numbers.
+	 * \param a First number.
+	 * \param b Second number.
+	 * \return smaller of two numbers.
+	 */
+	template<class T>
+	FORCE_INLINE T min( const T a, const T b);
 
+        /*! Clamps a value between a minimum and maximum value.
+	 * \param a First number.
+	 * \param b Second number.
+	 * \return Value between a minimum and maximum.
+	 */
+	template<class T>
+        FORCE_INLINE T clamp( const T a, const T max, const T min);
+
+        /*! Return absolute value.
+	 * \param a Number.
+	 * \return Absolute value
+	 */
+        template<class T> FORCE_INLINE T
+        abs( const T a);
+
+	/*! Compare two floats.
+	 * \param f1 Float 1.
+	 * \param f2 Float 2.
+	 * \param epsilon Epsilon.
+	 */
         FORCE_INLINE bool fcmp(const float f1, const float f2, float epsilon = FLOAT_SMALL_NUMBER);
 
 
+	FORCE_INLINE float square(float x);
         FORCE_INLINE float fast_sqrt(const float number);
         FORCE_INLINE float inv_sqrt(const float number);
-        FORCE_INLINE float square(float x);
 
-        FORCE_INLINE float deg2rad(float deg);
+	FORCE_INLINE float deg2rad(float deg);
         FORCE_INLINE float rad2deg(float rad);
 
         FORCE_INLINE float fast_sin(float angle_deg);
@@ -37,6 +67,7 @@ namespace cetech1 {
 
         FORCE_INLINE float float_select(const float a, const float ge_zero, const float lt_zero);
     }
+
 
     namespace math {
         template<class T>
