@@ -39,7 +39,7 @@ namespace {
         }
     }
 
-    class MallocAllocator: public Allocator {
+    class MallocAllocator : public Allocator {
 public:
         MallocAllocator() : _total_allocated(0) {}
 

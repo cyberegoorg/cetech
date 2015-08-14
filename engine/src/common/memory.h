@@ -5,8 +5,8 @@
 
 namespace cetech1 {
 
-    /*! Abstract allocator.
-     */
+/*! Abstract allocator.
+ */
     class Allocator {
 public:
         static const uint32_t DEFAULT_ALIGN = 4;              //!< Default align.
@@ -51,30 +51,30 @@ private:
     };
 
     namespace memory_globals {
-        /*! Init global memory.
-         */
+/*! Init global memory.
+ */
         void init();
 
-        /*! Shutdown global memory.
-         */
+/*! Shutdown global memory.
+ */
         void shutdown();
 
-        /*! Get default allocator.
-         * \return Default allocator.
-         */
+/*! Get default allocator.
+ * \return Default allocator.
+ */
         Allocator& default_allocator();
     }
 
     namespace memory {
-        /*! Allign pointer.
-         * \param p Pointer.
-         * \param align Align.
-         * \return Alligned pointer.
-         */
+/*! Allign pointer.
+ * \param p Pointer.
+ * \param align Align.
+ * \return Alligned pointer.
+ */
         inline void* align_forward(void* p, uint32_t align);
 
-        /*!
-         */
+/*!
+ */
         inline void* pointer_add(void* p, uint32_t bytes);
         inline const void* pointer_add(const void* p, uint32_t bytes);
 

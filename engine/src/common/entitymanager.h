@@ -47,7 +47,7 @@ namespace cetech1 {
                 idx = em._free_idx[0];
                 queue::pop_front(em._free_idx);
             } else {
-                array::push_back < unsigned char > (em._generation, 0);
+                array::push_back<unsigned char> (em._generation, 0);
                 idx = array::size(em._generation) - 1;
             }
 

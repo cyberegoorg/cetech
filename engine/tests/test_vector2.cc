@@ -39,8 +39,8 @@ SCENARIO( "Basic vector operation", "[vector2]" ) {
             cetech1::Vector2 v3 = v1 / v2;
 
             THEN( "final vector is [0.33333f, 5.0f]" ) {
-                REQUIRE( cetech1::math::fcmp(v3.x, 0.33333f) );
-                REQUIRE( cetech1::math::fcmp(v3.y, 0.5f) );
+                REQUIRE( cetech1::math::fcmp(v3.x, 0.33333f));
+                REQUIRE( cetech1::math::fcmp(v3.y, 0.5f));
             }
         }
     }
@@ -93,7 +93,7 @@ SCENARIO( "Vector len", "[vector2]" ) {
             float len = cetech1::vector2::len_inv(v1);
 
             THEN( "Len is 5.0f" ) {
-                REQUIRE( cetech1::math::fcmp(len, 0.44714f) );
+                REQUIRE( cetech1::math::fcmp(len, 0.44714f));
             }
         }
 
@@ -109,7 +109,7 @@ SCENARIO( "Normalized", "[vector2]" ) {
             const float len = cetech1::vector2::len(v_norm);
 
             THEN( "len(normalized(1)) == 1.0f" ) {
-                REQUIRE( cetech1::math::fcmp(len, 1.0f, 0.01f) ); // TODO: check compare
+                REQUIRE( cetech1::math::fcmp(len, 1.0f, 0.01f));  // TODO: check compare
             }
         }
     }

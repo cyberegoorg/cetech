@@ -16,7 +16,7 @@ end
 
 function toolchain(build_dir)
   dispatch_third_party_path()
-  
+
     location (build_dir .. "projects/" .. _ACTION)
 
     floatingpoint "Fast"
@@ -27,14 +27,14 @@ function toolchain(build_dir)
       THIRD_PARTY_INCLUDE_ARCH_DEP,
       ROOT_DIR .. "src"
     }
-  
+
     libdirs {
       THIRD_PARTY_LIB
     }
-    
+
     filter "Debug"
         defines {"DEBUG", "CETECH1_DEBUG"}
-	
+
         flags {"Symbols"}
         targetsuffix '_debug'
         optimize "Off"
@@ -44,8 +44,10 @@ function toolchain(build_dir)
         defines {"NDEBUG"}
 
     filter "system:linux"
+        defines {'CETECH1_LINUX'}
+
         buildoptions {"-std=c++11", "-fPIC", "-msse2"}
-	
+
 	links {
 	    "m",
 	}
@@ -57,6 +59,9 @@ function toolchain(build_dir)
     filter {"system:linux", "platforms:x64"}
         targetdir (build_dir .. "linux64" .. "/bin")
         objdir (build_dir .. "linux64" .. "/obj")
+
+    filter "system:windows"
+        defines {'CETECH1_WINDOWS'}
 
     filter {}
 end
@@ -79,7 +84,7 @@ project "tech1_static"
     links {
       "SDL2"
     }
-    
+
     excludes {
       ROOT_DIR .. "src/runtime/main.cc",
     }
@@ -89,11 +94,11 @@ project "tech1_static"
 project "tech1_test"
     kind "ConsoleApp"
     language "C++"
-    
+
     links {
       'tech1_static'
     }
-    
+
     files {
         ROOT_DIR .. "tests/**.cc",
         ROOT_DIR .. "tests/**.h",
