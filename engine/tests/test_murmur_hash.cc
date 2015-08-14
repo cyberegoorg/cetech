@@ -6,7 +6,7 @@
 
 SCENARIO( "Murmur hash", "[murmur]" ) {
     GIVEN( "String to hash" ) {
-        const char * string_to_hash = "hash me";
+        const char* string_to_hash = "hash me";
 
         WHEN( "when seed is 22" ) {
             uint64_t hash = cetech1::murmur_hash_64(string_to_hash, strlen(string_to_hash), 22);

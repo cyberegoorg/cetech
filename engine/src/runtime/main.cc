@@ -19,7 +19,7 @@ using namespace rapidjson;
 
 void init() {
     memory_globals::init();
-    
+
     const char* json = "{\"project\":\"rapidjson\",\"stars\":10}";
     Document d;
     d.Parse(json);
@@ -42,13 +42,13 @@ void run() {
 
     EntityManager em;
 
-    Array < int > array1(a);
-    array::push_back < int > (array1, 1);
-    array::push_back < int > (array1, 2);
-    array::push_back < int > (array1, 3);
+    Array<int> array1(a);
+    array::push_back<int> (array1, 1);
+    array::push_back<int> (array1, 2);
+    array::push_back<int> (array1, 3);
 
     for (auto it = array::begin(array1); it != array::end(array1); ++it) {
-	std::cout << *it << std::endl;
+        std::cout << *it << std::endl;
     }
 
     Entity e1 = entity_manager::create(em);
@@ -61,22 +61,22 @@ void run() {
 
     Entity e3 = entity_manager::create(em);
     printf("[idx: %u, gen: %u]\n", entity::idx(e3), entity::gen(e3));
-    
+
     float sin1, cos1;
-    sin1 = cos1 = 0; 
+    sin1 = cos1 = 0;
     cetech1::math::fast_sincos(21, sin1, cos1);
-   
+
     printf("%f, %f == %f, %f\n", sin(cetech1::math::deg2rad(21)), cos(cetech1::math::deg2rad(21)), sin1, cos1);
 }
 
 void shutdown() {
-  memory_globals::shutdown();
+    memory_globals::shutdown();
 }
 
 int main(int argc, char** argv) {
-  init();
-  run();
-  shutdown();
-  
-  return 0; // TODO: error check
+    init();
+    run();
+    shutdown();
+
+    return 0; // TODO: error check
 }
