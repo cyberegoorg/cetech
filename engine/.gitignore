@@ -2,6 +2,7 @@
 doc/doxygen/*
 
 *.kdev*
+*.kate-swp
 
 # SDL2
 3rdparty/SDL2/include/SDL_config.h
