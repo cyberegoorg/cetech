@@ -3,8 +3,7 @@
 #include "common/memory/memory.h"
 #include "common/math/vector2.h"
 
-#define REQUIRE_ALMOST(a, b) REQUIRE(cetech1::math::almost_equal((a), (b)))
-#define REQUIRE_ALMOST3(a, b, e) REQUIRE(cetech1::math::almost_equal((a), (b), (e)))
+#include "utils.h"
 
 TEST_CASE( "Vector2 operation", "[vector2]" ) {
     cetech1::Vector2 v1 = {1.0f, 2.0f};

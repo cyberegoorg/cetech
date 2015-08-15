@@ -99,6 +99,10 @@ project "tech1_test"
       'tech1_static'
     }
 
+    includedirs {
+      ROOT_DIR .. "tests"
+    }
+    
     files {
         ROOT_DIR .. "tests/**.cc",
         ROOT_DIR .. "tests/**.h",
