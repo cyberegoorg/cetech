@@ -3,129 +3,136 @@
 #include "common/memory/memory.h"
 #include "common/math/vector2.h"
 
-SCENARIO( "Basic vector operation", "[vector2]" ) {
-    GIVEN( "Two vector" ) {
+#define REQUIRE_ALMOST(a, b) REQUIRE(cetech1::math::almost_equal((a), (b)))
+#define REQUIRE_ALMOST3(a, b, e) REQUIRE(cetech1::math::almost_equal((a), (b), (e)))
+
+TEST_CASE( "Vector2 operation", "[vector2]" ) {
         cetech1::Vector2 v1 = {1.0f, 2.0f};
         cetech1::Vector2 v2 = {3.0f, 4.0f};
-
-        WHEN( "v1 + v2" ) {
+	float scalar = 2.0f;
+  
+        SECTION( "v1 + v2" ) {
             cetech1::Vector2 v3 = v1 + v2;
-
-            THEN( "final vector is [4.0f, 6.0f]" ) {
-                REQUIRE( v3.x == 4.0f );
-                REQUIRE( v3.y == 6.0f );
-            }
+	    
+	    REQUIRE( v3.x == 4.0f );
+            REQUIRE( v3.y == 6.0f );
         }
 
-        WHEN( "v1 - v2" ) {
+        SECTION( "v1 - v2" ) {
             cetech1::Vector2 v3 = v1 - v2;
 
-            THEN( "final vector is [-2.0f, 2.0f]" ) {
                 REQUIRE( v3.x == -2.0f );
                 REQUIRE( v3.y == -2.0f );
-            }
         }
 
-        WHEN( "v1 * v2" ) {
+        SECTION( "v1 * v2" ) {
             cetech1::Vector2 v3 = v1 * v2;
 
-            THEN( "final vector is [3.0f, 8.0f]" ) {
                 REQUIRE( v3.x == 3.0f );
                 REQUIRE( v3.y == 8.0f );
-            }
         }
 
-        WHEN( "v1 / v2" ) {
+        SECTION( "v1 / v2" ) {
             cetech1::Vector2 v3 = v1 / v2;
 
-            THEN( "final vector is [0.33333f, 5.0f]" ) {
-                REQUIRE( cetech1::math::almost_equal(v3.x, 0.33333f));
-                REQUIRE( cetech1::math::almost_equal(v3.y, 0.5f));
-            }
+                REQUIRE_ALMOST( v3.x, 0.33333f);
+                REQUIRE_ALMOST( v3.y, 0.5f);
         }
-    }
-
-    GIVEN( "Vector and scalar" ) {
-        cetech1::Vector2 v1 = {1.0f, 2.0f};
-        float scalar = 2.0f;
-
-        WHEN( "v1 * scalar" ) {
+        
+        SECTION( "v1 * scalar" ) {
             cetech1::Vector2 v2 = v1 * scalar;
 
-            THEN( "(v1 * scalar) == [2.0f, 4.0f]" ) {
                 REQUIRE( v2.x == 2.0f );
                 REQUIRE( v2.y == 4.0f );
-            }
         }
 
-        WHEN( "v1 / scalar" ) {
+        SECTION( "v1 / scalar" ) {
             cetech1::Vector2 v2 = v1 / scalar;
 
-            THEN( "(v1 / scalar) == [0.5f, 1.0f]" ) {
                 REQUIRE( v2.x == 0.5f );
                 REQUIRE( v2.y == 1.0f );
-            }
         }
-    }
-}
-
-SCENARIO( "Vector len", "[vector2]" ) {
-    GIVEN( "Vector [1.0f, 2.0f]" ) {
-        cetech1::Vector2 v1 = {1.0f, 2.0f};
-
-        WHEN( "len(v1)" ) {
+        
+        SECTION( "len(v1)" ) {
             float len = cetech1::vector2::len(v1);
 
-            THEN( "Len is 2.25" ) {
-                REQUIRE( cetech1::math::almost_equal(len, 2.25f));
-            }
+                REQUIRE_ALMOST( len, 2.2357);
         }
 
-        WHEN( "len_sq(v1)" ) {
+        SECTION( "len_sq(v1)" ) {
             float len = cetech1::vector2::len_sq(v1);
 
-            THEN( "Len is 5.0f" ) {
                 REQUIRE( len == 5.0f );
-            }
         }
 
-        WHEN( "len_inv(v1)" ) {
+        SECTION( "len_inv(v1)" ) {
             float len = cetech1::vector2::len_inv(v1);
 
-            THEN( "Len is 5.0f" ) {
-                REQUIRE( cetech1::math::almost_equal(len, 0.44714f));
-            }
+                REQUIRE_ALMOST( len, 0.44714f);
         }
-
-    }
-}
-
-SCENARIO( "Normalized", "[vector2]" ) {
-    GIVEN( "Vector" ) {
-        cetech1::Vector2 v1 = {1.0f, 0.0f};
-
-        WHEN( "normalized(1)" ) {
+        
+        SECTION( "normalized(v1)" ) {
             cetech1::Vector2 v_norm = cetech1::vector2::normalized(v1);
             const float len = cetech1::vector2::len(v_norm);
 
-            THEN( "len(normalized(1)) == 1.0f" ) {
-                REQUIRE( cetech1::math::almost_equal(len, 1.0f, 0.01f));  // TODO: check compare
-            }
+                REQUIRE_ALMOST3( len, 1.0f, 0.01f);  // TODO: check compare
         }
-    }
-}
-
-SCENARIO( "Dot product", "[vector2]" ) {
-    GIVEN( "Two vector" ) {
-        cetech1::Vector2 v1 = {1.0f, 2.0f};
-        cetech1::Vector2 v2 = {3.0f, 4.0f};
-
-        WHEN( "v1 . v2" ) {
+        
+        SECTION( "dot(v1, v2)" ) {
             float dot = cetech1::vector2::dot(v1, v2);
 
-            THEN( "Dot product is 11.0f" ) {
                 REQUIRE( dot == 11.0f );
-            }
         }
-    }
+        
+        
+        SECTION( "cross(v1, v2)" ) {
+            float cross = cetech1::vector2::cross(v1, v2);
+
+                REQUIRE( cross == -2.0f );
+        }
+        
+        SECTION( "distance(v1, v2)" ) {
+            float distance = cetech1::vector2::distance(v1, v2);
+
+                REQUIRE_ALMOST( distance, 2.82772f );
+        }
+        
+        SECTION( "distance_sq(v1, v2)" ) {
+            float distance_sq = cetech1::vector2::distance_sq(v1, v2);
+
+                REQUIRE( distance_sq == 8.0f );
+        }
+        
+        SECTION( "rotated(UP, 90)" ) {
+          cetech1::Vector2 rotated = cetech1::vector2::rotated(cetech1::vector2::UP, 90);
+
+	  REQUIRE_ALMOST( rotated.x, cetech1::vector2::LEFT.x );
+	  REQUIRE_ALMOST( rotated.y, cetech1::vector2::LEFT.y );
+        }
+        
+        SECTION( "min(v1)" ) {
+          float min = cetech1::vector2::min(v1);
+
+	  REQUIRE_ALMOST(min, 1.0f);
+        }
+        
+        
+        SECTION( "max(v1)" ) {
+          float max = cetech1::vector2::max(v1);
+
+	  REQUIRE_ALMOST( max, 2.0f );
+        }
+        
+        SECTION( "abs_max(DOWN)" ) {
+          float abs_max = cetech1::vector2::abs_max(cetech1::vector2::DOWN);
+
+	  REQUIRE_ALMOST( abs_max, 1.0f);
+        }
+        
+        SECTION( "sign_vector(DOWN)" ) {
+          cetech1::Vector2 sign = cetech1::vector2::sign_vector(cetech1::vector2::DOWN);
+
+	  REQUIRE_ALMOST( sign.x, 1.0f);
+	  REQUIRE_ALMOST( sign.y, -1.0f);
+        }
 }
