@@ -111,12 +111,16 @@ namespace cetech1 {
         }
 
         FORCE_INLINE float fast_sqrt(const float number) {
-            unsigned int i = *(unsigned int*) &number;
-            // adjust bias
-            i += 127 << 23;
-            // approximation of square root
-            i >>= 1;
-            return *(float*) &i;
+	    const float xhalf = 0.5f*number;
+	  
+	    union{
+	      float x;
+	      int i;
+	    } u;
+	    
+	    u.x = number;
+	    u.i = 0x5f3759df  - (u.i >> 1);  // gives initial guess y0
+	    return number*u.x*(1.5f - xhalf*u.x*u.x);// Newton step, repeating increases accuracy 
         }
 
         FORCE_INLINE float inv_sqrt(const float number) {
