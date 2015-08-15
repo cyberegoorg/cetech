@@ -1,11 +1,11 @@
 #pragma once
 
 #include "entitymanager_types.h"
-#include "memory_types.h"
+#include "common/memory/memory_types.h"
 
-#include "types.h"
-#include "memory.h"
-#include "queue.h"
+#include "common/types.h"
+#include "common/memory/memory.h"
+#include "common/container/queue.h"
 
 #if !defined(ENTITY_INDEX_BIT_COUNT)
   #define ENTITY_INDEX_BIT_COUNT 22

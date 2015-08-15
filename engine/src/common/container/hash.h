@@ -1,8 +1,8 @@
 // based on bitsquid foundation
 #pragma once
 
-#include "array.h"
-#include "container_types.h"
+#include "common/container/array.h"
+#include "common/container/container_types.h"
 
 namespace cetech1 {
 

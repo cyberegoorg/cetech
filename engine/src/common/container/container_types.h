@@ -1,8 +1,8 @@
 // based on bitsquid foundation
 #pragma once
 
-#include "types.h"
-#include "memory_types.h"
+#include "common/types.h"
+#include "common/memory/memory_types.h"
 
 namespace cetech1 {
 

@@ -1,10 +1,10 @@
-#include "common/memory.h"
-#include "common/math_types.h"
-#include "common/math.h"
+#include "common/memory/memory.h"
+#include "common/math/math_types.h"
+#include "common/math/math.h"
 #include "common/types.h"
-#include "common/array.h"
-#include "common/hash.h"
-#include "common/entitymanager.h"
+#include "common/container/array.h"
+#include "common/container/hash.h"
+#include "common/ecs/entitymanager.h"
 
 #include <iostream>
 
