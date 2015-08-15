@@ -3,7 +3,7 @@
 #include "common/memory/memory.h"
 #include "common/math/vector3.h"
 
-#include "utils.h"
+#include "test_utils.h"
 
 TEST_CASE( "Vector3 operation", "[vector3]" ) {
     cetech1::Vector3 v1 = {1.0f, 2.0f, 3.0f};
