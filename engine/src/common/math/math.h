@@ -6,17 +6,17 @@
 
 namespace cetech1 {
     namespace math {
-	/*! PI
-	 */
+        /*! PI
+         */
         constexpr float PI = 3.1415926535897932f;
-	
-	/*! 1/PI
-	 */
-	constexpr float INV_PI = 0.31830988618f;
-        
-	/*! PI/2
-	 */
-	constexpr float HALF_PI = 1.57079632679f;
+
+        /*! 1/PI
+         */
+        constexpr float INV_PI = 0.31830988618f;
+
+        /*! PI/2
+         */
+        constexpr float HALF_PI = 1.57079632679f;
 
         constexpr float DOUBLE_SMALL_NUMBER = 1.e-8f;
         constexpr float FLOAT_SMALL_NUMBER = 1.e-4f;
@@ -111,16 +111,16 @@ namespace cetech1 {
         }
 
         FORCE_INLINE float fast_sqrt(const float number) {
-	    const float xhalf = 0.5f*number;
-	  
-	    union{
-	      float x;
-	      int i;
-	    } u;
-	    
-	    u.x = number;
-	    u.i = 0x5f3759df  - (u.i >> 1);  // gives initial guess y0
-	    return number*u.x*(1.5f - xhalf*u.x*u.x);// Newton step, repeating increases accuracy 
+            const float xhalf = 0.5f * number;
+
+            union {
+                float x;
+                int i;
+            } u;
+
+            u.x = number;
+            u.i = 0x5f3759df - (u.i >> 1);                    // gives initial guess y0
+            return number * u.x * (1.5f - xhalf * u.x * u.x); // Newton step, repeating increases accuracy
         }
 
         FORCE_INLINE float inv_sqrt(const float number) {
