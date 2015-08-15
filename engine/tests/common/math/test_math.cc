@@ -3,7 +3,7 @@
 #include "common/memory/memory.h"
 #include "common/math/math.h"
 
-#include "utils.h"
+#include "test_utils.h"
 
 TEST_CASE( "Math operation", "[math]" ) {
     SECTION( "max()" ) {
