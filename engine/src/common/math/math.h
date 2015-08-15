@@ -43,12 +43,13 @@ namespace cetech1 {
         FORCE_INLINE T min( const T a, const T b);
 
         /*! Clamps a value between a minimum and maximum value.
-         * \param a First number.
-         * \param b Second number.
+         * \param a Value.
+         * \param min Down range.
+         * \param max Upper range.
          * \return Value between a minimum and maximum.
          */
         template < class T >
-        FORCE_INLINE T clamp( const T a, const T max, const T min);
+        FORCE_INLINE T clamp( const T a, const T min, const T max);
 
         /*! Return absolute value.
          * \param a Number.
@@ -102,7 +103,7 @@ namespace cetech1 {
         }
 
         template < class T >
-        FORCE_INLINE T clamp( const T a, const T max, const T min) {
+        FORCE_INLINE T clamp( const T a, const T min, const T max) {
             return (a < min ? min : (a < max ? a : max));
         }
 
