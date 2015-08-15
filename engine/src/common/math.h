@@ -4,62 +4,72 @@
 
 #include "types.h"
 
-#define PI (3.1415926535897932f)
-#define INV_PI  (0.31830988618f)
-#define HALF_PI (1.57079632679f)
-
-#define DOUBLE_SMALL_NUMBER (1.e-8f)
-#define FLOAT_SMALL_NUMBER  (1.e-4f)
-#define BIG_NUMBER          (3.4e+38f)
-#define EULERS_NUMBER       (2.71828182845904523536f)
-#define MAX_FLT (3.402823466e+38f)
-
 namespace cetech1 {
     namespace math {
-        /*! Return greater of two numbers.
-	 * \param a First number.
-	 * \param b Second number.
-	 * \return greater of two numbers.
+	/*! PI
 	 */
-	template<class T>
+        constexpr float PI = 3.1415926535897932f;
+	
+	/*! 1/PI
+	 */
+	constexpr float INV_PI = 0.31830988618f;
+        
+	/*! PI/2
+	 */
+	constexpr float HALF_PI = 1.57079632679f;
+
+        constexpr float DOUBLE_SMALL_NUMBER = 1.e-8f;
+        constexpr float FLOAT_SMALL_NUMBER = 1.e-4f;
+        constexpr float BIG_NUMBER = .4e+38f;
+        constexpr float EULERS_NUMBER = 2.71828182845904523536f;
+        constexpr float MAX_FLT = 3.402823466e+38f;
+    }
+
+    namespace math {
+        /*! Return greater of two numbers.
+         * \param a First number.
+         * \param b Second number.
+         * \return greater of two numbers.
+         */
+        template < class T >
         FORCE_INLINE T max( const T a, const T b);
 
         /*! Return smaller of two numbers.
-	 * \param a First number.
-	 * \param b Second number.
-	 * \return smaller of two numbers.
-	 */
-	template<class T>
-	FORCE_INLINE T min( const T a, const T b);
+         * \param a First number.
+         * \param b Second number.
+         * \return smaller of two numbers.
+         */
+        template < class T >
+        FORCE_INLINE T min( const T a, const T b);
 
         /*! Clamps a value between a minimum and maximum value.
-	 * \param a First number.
-	 * \param b Second number.
-	 * \return Value between a minimum and maximum.
-	 */
-	template<class T>
+         * \param a First number.
+         * \param b Second number.
+         * \return Value between a minimum and maximum.
+         */
+        template < class T >
         FORCE_INLINE T clamp( const T a, const T max, const T min);
 
         /*! Return absolute value.
-	 * \param a Number.
-	 * \return Absolute value
-	 */
-        template<class T> FORCE_INLINE T
+         * \param a Number.
+         * \return Absolute value
+         */
+        template < class T > FORCE_INLINE T
         abs( const T a);
 
-	/*! Compare two floats.
-	 * \param f1 Float 1.
-	 * \param f2 Float 2.
-	 * \param epsilon Epsilon.
-	 */
-        FORCE_INLINE bool fcmp(const float f1, const float f2, float epsilon = FLOAT_SMALL_NUMBER);
+        /*! Compare two floats.
+         * \param f1 Float 1.
+         * \param f2 Float 2.
+         * \param epsilon Epsilon.
+         */
+        FORCE_INLINE bool almost_equal(const float f1, const float f2, float epsilon = FLOAT_SMALL_NUMBER);
 
 
-	FORCE_INLINE float square(float x);
+        FORCE_INLINE float square(float x);
         FORCE_INLINE float fast_sqrt(const float number);
         FORCE_INLINE float inv_sqrt(const float number);
 
-	FORCE_INLINE float deg2rad(float deg);
+        FORCE_INLINE float deg2rad(float deg);
         FORCE_INLINE float rad2deg(float rad);
 
         FORCE_INLINE float fast_sin(float angle_deg);
@@ -70,33 +80,33 @@ namespace cetech1 {
 
 
     namespace math {
-        template<class T>
+        template < class T >
         FORCE_INLINE T max( const T a, const T b) {
             return (a >= b) ? a : b;
         }
 
-        template<class T>
+        template < class T >
         FORCE_INLINE T min( const T a, const T b) {
             return (a <= b) ? a : b;
         }
 
-        template<class T>
+        template < class T >
         FORCE_INLINE T abs( const T a) {
             return (a >= 0) ? a : -a;
         }
 
-        template<>
+        template < >
         FORCE_INLINE float abs( const float a) {
             const int y = (int&)a & 0x7FFFFFFF;
             return (float&)y;
         }
 
-        template<class T>
+        template < class T >
         FORCE_INLINE T clamp( const T a, const T max, const T min) {
             return (a < min ? min : (a < max ? a : max));
         }
 
-        FORCE_INLINE bool fcmp(const float f1, const float f2, float epsilon) {
+        FORCE_INLINE bool almost_equal(const float f1, const float f2, float epsilon) {
             return abs(f1 - f2) < epsilon;
         }
 

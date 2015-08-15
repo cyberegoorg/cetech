@@ -30,7 +30,7 @@ void init() {
 
     // 3. Stringify the DOM
     StringBuffer buffer;
-    Writer<StringBuffer> writer(buffer);
+    Writer < StringBuffer > writer(buffer);
     d.Accept(writer);
 
     // Output {"project":"rapidjson","stars":11}
@@ -42,10 +42,10 @@ void run() {
 
     EntityManager em;
 
-    Array<int> array1(a);
-    array::push_back<int> (array1, 1);
-    array::push_back<int> (array1, 2);
-    array::push_back<int> (array1, 3);
+    Array < int > array1(a);
+    array::push_back < int > (array1, 1);
+    array::push_back < int > (array1, 2);
+    array::push_back < int > (array1, 3);
 
     for (auto it = array::begin(array1); it != array::end(array1); ++it) {
         std::cout << *it << std::endl;

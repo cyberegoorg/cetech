@@ -8,7 +8,7 @@ namespace cetech1 {
 
 /*! Array container.
  */
-    template<typename T> struct Array {
+    template < typename T > struct Array {
         /*! Create array.
          * \param a Allocator.
          */
@@ -46,7 +46,7 @@ namespace cetech1 {
 
 /*! Hash map.
  */
-    template<typename T> struct Hash {
+    template < typename T > struct Hash {
         /*! Create hash map
          * \param a Allocator
          */
@@ -64,14 +64,14 @@ namespace cetech1 {
             T value;       //!< Entry value.
         };
 
-        Array<uint32_t> _hash;    //!< Key hash -> Data index.
-        Array<Entry> _data;       //!< Data.
+        Array < uint32_t > _hash;    //!< Key hash -> Data index.
+        Array < Entry > _data;       //!< Data.
     };
 
 /*!
  * A double-ended queue/ring buffer.
  */
-    template<typename T> struct Queue {
+    template < typename T > struct Queue {
         /*! Create queue
          * \param a Allocator
          */
@@ -80,7 +80,7 @@ namespace cetech1 {
         T& operator[] (uint32_t i);
         const T& operator[] (uint32_t i) const;
 
-        Array<T> _data;         //!< Data
+        Array < T > _data;      //!< Data
         uint32_t _size;         //!< Size
         uint32_t _offset;       //!< Offset
     };
