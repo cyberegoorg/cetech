@@ -1,9 +1,8 @@
 #pragma once
 
-#include "types.h"
-#include "memory_types.h"
-#include "memory.h"
-#include "container_types.h"
+#include "common/types.h"
+#include "common/memory/memory.h"
+#include "common/container/container_types.h"
 
 namespace cetech1 {
     struct Entity {

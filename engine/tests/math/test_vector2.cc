@@ -1,7 +1,7 @@
 #include "catch.hpp"
 
-#include "common/memory.h"
-#include "common/vector2.h"
+#include "common/memory/memory.h"
+#include "common/math/vector2.h"
 
 SCENARIO( "Basic vector operation", "[vector2]" ) {
     GIVEN( "Two vector" ) {

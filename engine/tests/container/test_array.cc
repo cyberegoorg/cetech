@@ -1,7 +1,7 @@
 #include "catch.hpp"
 
-#include "common/memory.h"
-#include "common/array.h"
+#include "common/memory/memory.h"
+#include "common/container/array.h"
 
 SCENARIO( "Array can store items", "[array]" ) {
     cetech1::memory_globals::init();
