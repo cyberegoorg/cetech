@@ -29,7 +29,7 @@ namespace cetech1 {
         /*! Backward vector [0.0f, 0.0f, -1.0f]
          */
         static const Vector3 BACKWARDS = {0.0f, 0.0f, -1.0f};
-	
+
         /*! Right vector [1.0f, 0.0f, 0.0f]
          */
         static const Vector3 RIGHT = {1.0f, 0.0f, 0.0f};
@@ -45,7 +45,7 @@ namespace cetech1 {
         /*! Make Vector3
          * \param x X
          * \param y Y
-	 * \param z z
+         * \param z z
          * \return New vector
          */
         FORCE_INLINE Vector3 make_vector3(float x, float y, float z);
@@ -221,10 +221,10 @@ namespace cetech1 {
 
         FORCE_INLINE Vector3 cross(const Vector3& v1, const Vector3& v2) {
             return make_vector3(
-		   (v1.y * v2.z) - (v1.z * v2.y),
-		   (v1.z * v2.x) - (v1.x * v2.z),
-		   (v1.x * v2.y) - (v1.y * v2.x)
-		   );
+                (v1.y * v2.z) - (v1.z * v2.y),
+                (v1.z * v2.x) - (v1.x * v2.z),
+                (v1.x * v2.y) - (v1.y * v2.x)
+                );
         }
 
         FORCE_INLINE float distance_sq(const Vector3& v1, const Vector3& v2) {
@@ -251,7 +251,7 @@ namespace cetech1 {
             return make_vector3(
                 math::float_select(v1.x, 1.0f, -1.0f),
                 math::float_select(v1.y, 1.0f, -1.0f),
-		math::float_select(v1.z, 1.0f, -1.0f)
+                math::float_select(v1.z, 1.0f, -1.0f)
                 );
         }
     }
@@ -260,7 +260,7 @@ namespace cetech1 {
         return vector3::make_vector3(
             -v1.x,
             -v1.y,
-	    -v1.z
+            -v1.z
             );
     }
 
@@ -284,7 +284,7 @@ namespace cetech1 {
         return vector3::make_vector3(
             v1.x * v2.x,
             v1.y * v2.y,
-	    v1.z * v2.z
+            v1.z * v2.z
             );
     }
 
@@ -292,7 +292,7 @@ namespace cetech1 {
         return vector3::make_vector3(
             v1.x / v2.x,
             v1.y / v2.y,
-	    v1.z / v2.z
+            v1.z / v2.z
             );
     }
 
