@@ -15,7 +15,7 @@ TEST_CASE( "Vector3 operation", "[vector3]" ) {
 
         REQUIRE( v3.x == 5.0f );
         REQUIRE( v3.y == 7.0f );
-	REQUIRE( v3.z == 9.0f );
+        REQUIRE( v3.z == 9.0f );
     }
 
     SECTION( "v1 - v2" ) {
@@ -23,7 +23,7 @@ TEST_CASE( "Vector3 operation", "[vector3]" ) {
 
         REQUIRE( v3.x == -3.0f );
         REQUIRE( v3.y == -3.0f );
-	REQUIRE( v3.z == -3.0f );
+        REQUIRE( v3.z == -3.0f );
     }
 
     SECTION( "v1 * v2" ) {
@@ -31,7 +31,7 @@ TEST_CASE( "Vector3 operation", "[vector3]" ) {
 
         REQUIRE( v3.x == 4.0f );
         REQUIRE( v3.y == 10.0f );
-	REQUIRE( v3.z == 18.0f );
+        REQUIRE( v3.z == 18.0f );
     }
 
     SECTION( "v1 / v2" ) {
@@ -39,7 +39,7 @@ TEST_CASE( "Vector3 operation", "[vector3]" ) {
 
         REQUIRE_ALMOST( v3.x, 0.25f);
         REQUIRE_ALMOST( v3.y, 0.4f);
-	REQUIRE_ALMOST( v3.z, 0.5f);
+        REQUIRE_ALMOST( v3.z, 0.5f);
     }
 
     SECTION( "v1 * scalar" ) {
@@ -89,7 +89,7 @@ TEST_CASE( "Vector3 operation", "[vector3]" ) {
 
 
     SECTION( "cross(v1, v2)" ) {
-	// TODO: !!!
+        // TODO: !!!
         //float cross = cetech1::vector3::cross(v1, v2);
 
         //REQUIRE( cross == -2.0f );
