@@ -1,6 +1,7 @@
 // based on bitsquid foundation
 #pragma once
 
+#include <cstring>
 #include "common/types.h"
 
 namespace cetech1 {
@@ -51,35 +52,35 @@ private:
     };
 
     namespace memory_globals {
-/*! Init global memory.
- */
+	/*! Init global memory.
+	*/
         void init();
 
-/*! Shutdown global memory.
- */
+	/*! Shutdown global memory.
+	*/
         void shutdown();
 
-/*! Get default allocator.
- * \return Default allocator.
- */
+	/*! Get default allocator.
+	* \return Default allocator.
+	*/
         Allocator& default_allocator();
     }
 
     namespace memory {
-/*! Allign pointer.
- * \param p Pointer.
- * \param align Align.
- * \return Alligned pointer.
- */
+      /*! Allign pointer.
+      * \param p Pointer.
+      * \param align Align.
+      * \return Alligned pointer.
+      */
         inline void* align_forward(void* p, uint32_t align);
 
-/*!
- */
-        inline void* pointer_add(void* p, uint32_t bytes);
+	inline void* pointer_add(void* p, uint32_t bytes);
         inline const void* pointer_add(const void* p, uint32_t bytes);
 
         inline void* pointer_sub(void* p, uint32_t bytes);
         inline const void* pointer_sub(const void* p, uint32_t bytes);
+	
+	inline void* memcpy(void * dst, const void * src, uint32_t bytes);
     }
 
     inline void* memory::align_forward(void* p, uint32_t align) {
@@ -107,5 +108,9 @@ private:
 
     inline const void* memory::pointer_sub(const void* p, uint32_t bytes) {
         return (const void*)((const char*)p - bytes);
+    }
+    
+    inline void* memory::memcpy(void * dst, const void * src, uint32_t bytes) {
+      return std::memcpy(dst, src, bytes);
     }
 }
