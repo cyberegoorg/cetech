@@ -13,7 +13,7 @@ namespace cetech1 {
  * \param key Key
  * \return True if key exist in hash.
  */
-        template<typename T> bool has(const Hash<T>& h, uint64_t key);
+        template < typename T > bool has(const Hash < T >& h, uint64_t key);
 
 /*! Get value stored for the key or return default if key does not exist.
  * \param h Hash
@@ -21,7 +21,7 @@ namespace cetech1 {
  * \param deffault Default value
  * \return Value or default
  */
-        template<typename T> const T& get(const Hash<T>& h, uint64_t key, const T& deffault);
+        template < typename T > const T& get(const Hash < T >& h, uint64_t key, const T& deffault);
 
 
 /*! Set value for the key.
@@ -29,13 +29,13 @@ namespace cetech1 {
  * \param key Key
  * \param value Value
  */
-        template<typename T> void set(Hash<T>& h, uint64_t key, const T& value);
+        template < typename T > void set(Hash < T >& h, uint64_t key, const T& value);
 
 /*! Remove key from hash if exist.
  * \param h Hash
  * \param key Key
  */
-        template<typename T> void remove(Hash<T>& h, uint64_t key);
+        template < typename T > void remove(Hash < T >& h, uint64_t key);
 
 
 /*! Resize hash lookup table to the specified size.
@@ -43,25 +43,25 @@ namespace cetech1 {
  * \param h Hash.
  * \param size Size.
  */
-        template<typename T> void reserve(Hash<T>& h, uint32_t size);
+        template < typename T > void reserve(Hash < T >& h, uint32_t size);
 
 /*! Remove all elements.
  * \param h Hash.
  */
-        template<typename T> void clear(Hash<T>& h);
+        template < typename T > void clear(Hash < T >& h);
 
 
 /*! Return pointer to the first entry.
  * \param h Hash.
  * \return Pointer to first entry.
  */
-        template<typename T> const typename Hash<T> ::Entry* begin(const Hash<T> &h);
+        template < typename T > const typename Hash < T > ::Entry * begin(const Hash < T > &h);
 
 /*! Return pointer to the last entry.
  * \param h Hash.
  * \return Pointer to last entry.
  */
-        template<typename T> const typename Hash<T> ::Entry* end(const Hash<T> &h);
+        template < typename T > const typename Hash < T > ::Entry * end(const Hash < T > &h);
     }
 
     namespace multi_hash {
@@ -70,7 +70,7 @@ namespace cetech1 {
  * \param key Key.
  * \return Pointer to entry or NULL if key does not exist.
  */
-        template<typename T> const typename Hash<T> ::Entry* find_first(const Hash<T> &h, uint64_t key);
+        template < typename T > const typename Hash < T > ::Entry * find_first(const Hash < T > &h, uint64_t key);
 
 
 /*! Find next entry with same key as e.
@@ -78,41 +78,41 @@ namespace cetech1 {
  * \param e Entry pointer.
  * \return Pointer to next entry or NULL.
  */
-        template<typename T> const typename Hash<T> ::Entry* find_next(const Hash<T> &h,
-                                                                       const typename Hash<T> ::Entry * e);
+        template < typename T > const typename Hash < T > ::Entry * find_next(const Hash < T > &h,
+                                                                              const typename Hash < T > ::Entry * e);
 
 /*! Returns the number of entries with the key.
  * \param h Hash.
  * \param key Key
  * \return Number of entries.
  */
-        template<typename T> uint32_t count(const Hash<T>& h, uint64_t key);
+        template < typename T > uint32_t count(const Hash < T >& h, uint64_t key);
 
 /*! Returns all the entries with the specified key.
  * \param h Hash.
  * \param key Key.
  * \param items Reference to result array.
  */
-        template<typename T> void get(const Hash<T>& h, uint64_t key, Array<T>& items);
+        template < typename T > void get(const Hash < T >& h, uint64_t key, Array < T >& items);
 
 /*! Inserts the value as an aditional value for the key.
  * \param h Hash.
  * \param key Key.
  * \param value Value.
  */
-        template<typename T> void insert(Hash<T>& h, uint64_t key, const T& value);
+        template < typename T > void insert(Hash < T >& h, uint64_t key, const T& value);
 
 /*! Removes the specified entry.
  * \param h Hash
  * \param e Entry pointer
  */
-        template<typename T> void remove(Hash<T>& h, const typename Hash<T> ::Entry* e);
+        template < typename T > void remove(Hash < T >& h, const typename Hash < T > ::Entry* e);
 
 /*! Removes all entrise with the specified key.
  * \param h Hash
  * \param key Key
  */
-        template<typename T> void remove_all(Hash<T>& h, uint64_t key);
+        template < typename T > void remove_all(Hash < T >& h, uint64_t key);
     }
 
     namespace hash_internal {
@@ -124,8 +124,8 @@ namespace cetech1 {
             uint32_t data_i;    //!< Data index.
         };
 
-        template<typename T> uint32_t add_entry(Hash<T>& h, uint64_t key) {
-            typename Hash<T> ::Entry e = {.key = key, .next = END_OF_LIST};
+        template < typename T > uint32_t add_entry(Hash < T >& h, uint64_t key) {
+            typename Hash < T > ::Entry e = {.key = key, .next = END_OF_LIST};
 
             const uint32_t ei = array::size(h._data);
             array::push_back(h._data, e);
@@ -133,7 +133,7 @@ namespace cetech1 {
             return ei;
         }
 
-        template<typename T> void erase(Hash<T>& h, const FindResult& fr) {
+        template < typename T > void erase(Hash < T >& h, const FindResult& fr) {
             if (fr.data_prev == END_OF_LIST) {
                 h._hash[fr.hash_i] = h._data[fr.data_i].next;
             } else {
@@ -155,7 +155,7 @@ namespace cetech1 {
             }
         }
 
-        template<typename T> FindResult find(const Hash<T>& h, uint64_t key) {
+        template < typename T > FindResult find(const Hash < T >& h, uint64_t key) {
             FindResult fr = {END_OF_LIST};
 
             if (array::size(h._hash) == 0) {
@@ -176,7 +176,7 @@ namespace cetech1 {
             return fr;
         }
 
-        template<typename T> FindResult find(const Hash<T>& h, const typename Hash<T> ::Entry* e) {
+        template < typename T > FindResult find(const Hash < T >& h, const typename Hash < T > ::Entry* e) {
             FindResult fr = {END_OF_LIST};
 
             if (array::size(h._hash) == 0) {
@@ -197,11 +197,11 @@ namespace cetech1 {
             return fr;
         }
 
-        template<typename T> uint32_t find_or_fail(const Hash<T>& h, uint64_t key) {
+        template < typename T > uint32_t find_or_fail(const Hash < T >& h, uint64_t key) {
             return find(h, key).data_i;
         }
 
-        template<typename T> uint32_t find_or_make(Hash<T>& h, uint64_t key) {
+        template < typename T > uint32_t find_or_make(Hash < T >& h, uint64_t key) {
             const FindResult fr = find(h, key);
             if (fr.data_i != END_OF_LIST) {
                 return fr.data_i;
@@ -217,7 +217,7 @@ namespace cetech1 {
             return i;
         }
 
-        template<typename T> uint32_t make(Hash<T>& h, uint64_t key) {
+        template < typename T > uint32_t make(Hash < T >& h, uint64_t key) {
             const FindResult fr = find(h, key);
             const uint32_t i = add_entry(h, key);
 
@@ -231,15 +231,15 @@ namespace cetech1 {
             return i;
         }
 
-        template<typename T> void find_and_erase(Hash<T>& h, uint64_t key) {
+        template < typename T > void find_and_erase(Hash < T >& h, uint64_t key) {
             const FindResult fr = find(h, key);
             if (fr.data_i != END_OF_LIST) {
                 erase(h, fr);
             }
         }
 
-        template<typename T> void rehash(Hash<T>& h, uint32_t new_size) {
-            Hash<T> nh(* h._hash._allocator);
+        template < typename T > void rehash(Hash < T >& h, uint32_t new_size) {
+            Hash < T > nh(*h._hash._allocator);
             array::resize(nh._hash, new_size);
             array::reserve(nh._data, array::size(h._data));
             for (uint32_t i = 0; i < new_size; ++i) {
@@ -247,23 +247,23 @@ namespace cetech1 {
             }
 
             for (uint32_t i = 0; i < array::size(h._data); ++i) {
-                const typename Hash<T> ::Entry& e = h._data[i];
+                const typename Hash < T > ::Entry& e = h._data[i];
                 multi_hash::insert(nh, e.key, e.value);
             }
 
-            Hash<T> empty(* h._hash._allocator);
-            h.~Hash<T> ();
-            memcpy(&h, &nh, sizeof(Hash<T>));
-            memcpy(&nh, &empty, sizeof(Hash<T>));
+            Hash < T > empty(*h._hash._allocator);
+            h.~Hash < T > ();
+            memcpy(&h, &nh, sizeof(Hash < T >));
+            memcpy(&nh, &empty, sizeof(Hash < T >));
         }
 
-        template<typename T> bool full(const Hash<T>& h) {
+        template < typename T > bool full(const Hash < T >& h) {
             const float max_load_factor = 0.7f;
 
             return array::size(h._data) >= array::size(h._hash) * max_load_factor;
         }
 
-        template<typename T> void grow(Hash<T>& h) {
+        template < typename T > void grow(Hash < T >& h) {
             const uint32_t new_size = array::size(h._data) * 2 + 10;
 
             rehash(h, new_size);
@@ -271,16 +271,16 @@ namespace cetech1 {
     }
 
     namespace hash {
-        template<typename T> bool has(const Hash<T>& h, uint64_t key) {
+        template < typename T > bool has(const Hash < T >& h, uint64_t key) {
             return hash_internal::find_or_fail(h, key) != hash_internal::END_OF_LIST;
         }
 
-        template<typename T> const T& get(const Hash<T>& h, uint64_t key, const T& deffault) {
+        template < typename T > const T& get(const Hash < T >& h, uint64_t key, const T& deffault) {
             const uint32_t i = hash_internal::find_or_fail(h, key);
             return i == hash_internal::END_OF_LIST ? deffault : h._data[i].value;
         }
 
-        template<typename T> void set(Hash<T>& h, uint64_t key, const T& value) {
+        template < typename T > void set(Hash < T >& h, uint64_t key, const T& value) {
             if (array::size(h._hash) == 0) {
                 hash_internal::grow(h);
             }
@@ -293,40 +293,40 @@ namespace cetech1 {
             }
         }
 
-        template<typename T> void remove(Hash<T>& h, uint64_t key) {
+        template < typename T > void remove(Hash < T >& h, uint64_t key) {
             hash_internal::find_and_erase(h, key);
         }
 
-        template<typename T> void reserve(Hash<T>& h, uint32_t size) {
+        template < typename T > void reserve(Hash < T >& h, uint32_t size) {
             hash_internal::rehash(h, size);
         }
 
-        template<typename T> void clear(Hash<T>& h) {
+        template < typename T > void clear(Hash < T >& h) {
             array::clear(h._data);
             array::clear(h._hash);
         }
 
-        template<typename T> const typename Hash<T> ::Entry* begin(const Hash<T> &h)
+        template < typename T > const typename Hash < T > ::Entry * begin(const Hash < T > &h)
         {
             return array::begin(h._data);
         }
 
-        template<typename T> const typename Hash<T> ::Entry* end(const Hash<T> &h)
+        template < typename T > const typename Hash < T > ::Entry * end(const Hash < T > &h)
         {
             return array::end(h._data);
         }
     }
 
     namespace multi_hash {
-        template<typename T> const typename Hash<T> ::Entry* find_first(const Hash<T> &h, uint64_t key)
+        template < typename T > const typename Hash < T > ::Entry * find_first(const Hash < T > &h, uint64_t key)
         {
             const uint32_t i = hash_internal::find_or_fail(h, key);
 
             return i == hash_internal::END_OF_LIST ? 0 : &h._data[i];
         }
 
-        template<typename T> const typename Hash<T> ::Entry* find_next(const Hash<T> &h,
-                                                                       const typename Hash<T> ::Entry * e)
+        template < typename T > const typename Hash < T > ::Entry * find_next(const Hash < T > &h,
+                                                                              const typename Hash < T > ::Entry * e)
         {
             uint32_t i = e->next;
             while (i != hash_internal::END_OF_LIST) {
@@ -340,9 +340,9 @@ namespace cetech1 {
             return 0;
         }
 
-        template<typename T> uint32_t count(const Hash<T>& h, uint64_t key) {
+        template < typename T > uint32_t count(const Hash < T >& h, uint64_t key) {
             uint32_t i = 0;
-            const typename Hash<T> ::Entry* e = find_first(h, key);
+            const typename Hash < T > ::Entry* e = find_first(h, key);
             while (e) {
                 ++i;
                 e = find_next(h, e);
@@ -351,15 +351,15 @@ namespace cetech1 {
             return i;
         }
 
-        template<typename T> void get(const Hash<T>& h, uint64_t key, Array<T>& items) {
-            const typename Hash<T> ::Entry* e = find_first(h, key);
+        template < typename T > void get(const Hash < T >& h, uint64_t key, Array < T >& items) {
+            const typename Hash < T > ::Entry* e = find_first(h, key);
             while (e) {
                 array::push_back(items, e->value);
                 e = find_next(h, e);
             }
         }
 
-        template<typename T> void insert(Hash<T>& h, uint64_t key, const T& value) {
+        template < typename T > void insert(Hash < T >& h, uint64_t key, const T& value) {
             if (array::size(h._hash) == 0) {
                 hash_internal::grow(h);
             }
@@ -372,7 +372,7 @@ namespace cetech1 {
             }
         }
 
-        template<typename T> void remove(Hash<T>& h, const typename Hash<T> ::Entry* e) {
+        template < typename T > void remove(Hash < T >& h, const typename Hash < T > ::Entry* e) {
             const hash_internal::FindResult fr = hash_internal::find(h, e);
 
             if (fr.data_i != hash_internal::END_OF_LIST) {
@@ -380,7 +380,7 @@ namespace cetech1 {
             }
         }
 
-        template<typename T> void remove_all(Hash<T>& h, uint64_t key) {
+        template < typename T > void remove_all(Hash < T >& h, uint64_t key) {
             while (hash::has(h, key)) {
                 hash::remove(h, key);
             }
@@ -388,5 +388,5 @@ namespace cetech1 {
     }
 
 
-    template<typename T> Hash<T> ::Hash(Allocator& a) : _hash(a), _data(a) {}
+    template < typename T > Hash < T > ::Hash(Allocator & a) : _hash(a), _data(a) {}
 }

@@ -7,7 +7,7 @@ SCENARIO( "Array can store items", "[array]" ) {
     cetech1::memory_globals::init();
 
     GIVEN( "A empty array" ) {
-        cetech1::Array<int> a(cetech1::memory_globals::default_allocator());
+        cetech1::Array < int > a(cetech1::memory_globals::default_allocator());
 
         REQUIRE( cetech1::array::size(a) == 0 );
 
@@ -42,7 +42,7 @@ SCENARIO( "Array can be sized and resized", "[array]" ) {
     cetech1::memory_globals::init();
 
     GIVEN( "A array with some items" ) {
-        cetech1::Array<int> a(cetech1::memory_globals::default_allocator());
+        cetech1::Array < int > a(cetech1::memory_globals::default_allocator());
 
         cetech1::array::push_back(a, 0);
         cetech1::array::push_back(a, 1);
