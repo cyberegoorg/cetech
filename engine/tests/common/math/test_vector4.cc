@@ -75,7 +75,7 @@ TEST_CASE( "Vector4 operation", "[vector4]" ) {
     SECTION( "len_inv(v1)" ) {
         float len = cetech1::vector4::len_inv(v1);
 
-        REQUIRE_ALMOST( len, 0.18242f);
+        REQUIRE_ALMOST3( len, 0.18242f, 0.001f);
     }
 
     SECTION( "normalized(v1)" ) {
