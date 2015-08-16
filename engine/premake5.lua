@@ -99,6 +99,10 @@ project "tech1_test"
       'tech1_static'
     }
 
+    defines {
+      'CETECH1_SIMD_FPU'
+    }
+    
     includedirs {
       ROOT_DIR .. "tests"
     }
@@ -114,6 +118,10 @@ project "tech1"
     kind "ConsoleApp"
     language "C++"
 
+    defines {
+      'CETECH1_SIMD_FPU'
+    }
+    
     files {
         ROOT_DIR .. "src/runtime/*.cc",
     }

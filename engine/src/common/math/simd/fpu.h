@@ -125,5 +125,16 @@ namespace cetech1 {
     FORCE_INLINE void store1(const SimdVector& v1, void *dst) {
       memory::memcpy(dst, v1.v, 4);
     }
+    
+    FORCE_INLINE void quat_mult(const void* q1, const void* q2, void* dst) {
+	const float* q1f = (const float*)q1;
+	const float* q2f = (const float*)q2;
+	float* dstf = (float*)dst;
+    
+	dstf[0] = q1f[0]*q2f[0] - q1f[1]*q2f[1] - q1f[2]*q2f[2] - q1f[3]*q2f[3];
+	dstf[1] = q1f[0]*q2f[1] + q1f[1]*q2f[0] + q1f[2]*q2f[3] - q1f[3]*q2f[2];
+	dstf[2] = q1f[0]*q2f[2] - q1f[1]*q2f[3] + q1f[2]*q2f[0] + q1f[3]*q2f[1];
+	dstf[3] = q1f[0]*q2f[3] + q1f[1]*q2f[2] - q1f[2]*q2f[1] + q1f[3]*q2f[0];
+    }
   }
 };

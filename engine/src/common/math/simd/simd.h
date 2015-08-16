@@ -1,18 +1,12 @@
 #pragma once
 
-#include "common/math/simd/simd_types.h"
+#include "simd_types.h"
 
 #ifdef CETECH1_SIMD_FPU
   #include "fpu.h"
 #endif
 
 namespace cetech1 {
-  namespace simd {
-    static const SimdVector ZERO = make_simd_vector(0.0f, 0.0f, 0.0f, 0.0f);
-    static const SimdVector ONE = make_simd_vector(1.0f, 1.0f, 1.0f, 1.0f);
-    static const SimdVector MINUS_ONE = make_simd_vector(-1.0f, -1.0f, -1.0f, -1.0f);
-  }
-  
   namespace simd {
     FORCE_INLINE SimdVector make_simd_vector(float x, float y, float z, float w);
     
@@ -35,5 +29,13 @@ namespace cetech1 {
     FORCE_INLINE void store(const SimdVector& v1, void *dst);
     FORCE_INLINE void store3(const SimdVector& v1, void *dst);
     FORCE_INLINE void store1(const SimdVector& v1, void *dst);
+    
+    FORCE_INLINE void quat_mult(const void* q1, const void* q2, void* dst);
+  }
+  
+  namespace simd {
+    static const SimdVector ZERO = make_simd_vector(0.0f, 0.0f, 0.0f, 0.0f);
+    static const SimdVector ONE = make_simd_vector(1.0f, 1.0f, 1.0f, 1.0f);
+    static const SimdVector MINUS_ONE = make_simd_vector(-1.0f, -1.0f, -1.0f, -1.0f);
   }
 }
