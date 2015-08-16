@@ -67,14 +67,13 @@ TEST_CASE( "Vector2 operation", "[vector2]" ) {
     SECTION( "len_inv(v1)" ) {
         float len = cetech1::vector2::len_inv(v1);
 
-        REQUIRE_ALMOST( len, 0.44714f);
+        REQUIRE_ALMOST3( len, 0.447f, 0.001f);
     }
 
     SECTION( "normalized(v1)" ) {
         cetech1::Vector2 v_norm = cetech1::vector2::normalized(v1);
-        const float len = cetech1::vector2::len(v_norm);
-
-        REQUIRE_ALMOST3( len, 1.0f, 0.01f); // TODO: check compare
+	
+        REQUIRE( cetech1::vector2::is_normalized(v_norm)); // TODO: check compare
     }
 
     SECTION( "dot(v1, v2)" ) {

@@ -77,7 +77,8 @@ namespace cetech1 {
          */
         FORCE_INLINE Vector4 normalized(const Vector4& v1);
 
-
+	FORCE_INLINE bool is_normalized(const Vector4& v1);
+	
         /*! Dot product.
          * \param v1 Vector 1.
          * \param v2 Vector 2.
@@ -201,6 +202,10 @@ namespace cetech1 {
             return v1 * len_inv(v1);
         }
 
+	FORCE_INLINE bool is_normalized(const Vector4& v1) {
+	  return math::abs(1.0f - len_sq(v1)) < 0.001f;
+	}
+        
         FORCE_INLINE float dot(const Vector4& v1, const Vector4& v2) {
             return (v1.x * v2.x) + (v1.y * v2.y) + (v1.z * v2.z)+ (v1.w * v2.w);
         }
