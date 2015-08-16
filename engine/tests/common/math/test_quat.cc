@@ -16,7 +16,7 @@ TEST_CASE( "Quat operation", "[quat]" ) {
         REQUIRE( q3.x == 6.0f );
         REQUIRE( q3.y == 8.0f );
         REQUIRE( q3.z == 10.0f );
-	REQUIRE( q3.w == 12.0f );
+        REQUIRE( q3.w == 12.0f );
     }
 
     SECTION( "q1 - q2" ) {
@@ -25,7 +25,7 @@ TEST_CASE( "Quat operation", "[quat]" ) {
         REQUIRE( q3.x == -4.0f );
         REQUIRE( q3.y == -4.0f );
         REQUIRE( q3.z == -4.0f );
-	REQUIRE( q3.w == -4.0f );
+        REQUIRE( q3.w == -4.0f );
     }
 
     SECTION( "q1 * scalar" ) {
@@ -41,26 +41,26 @@ TEST_CASE( "Quat operation", "[quat]" ) {
         REQUIRE( q3.x == -60.0f );
         REQUIRE( q3.y == 12.0f );
         REQUIRE( q3.z == 30.0f );
-	REQUIRE( q3.w == 24.0f );
+        REQUIRE( q3.w == 24.0f );
     }
 
     SECTION( "q1 * v1" ) {
-	cetech1::Quat q = cetech1::quat::from_axis_angle({0.0f, 0.0f, 1.0f}, 90.0f);
-	cetech1::Vector3 v1 = {1.0f, 0.0f, 0.0f};
+        cetech1::Quat q = cetech1::quat::from_axis_angle({0.0f, 0.0f, 1.0f}, 90.0f);
+        cetech1::Vector3 v1 = {1.0f, 0.0f, 0.0f};
         cetech1::Vector3 v2 = q * v1;
-	
-	REQUIRE( v2.x == Approx(0.0f).epsilon(0.001f));
+
+        REQUIRE( v2.x == Approx(0.0f).epsilon(0.001f));
         REQUIRE( v2.y == Approx(1.0f).epsilon(0.001f));
         REQUIRE( v2.z == Approx(0.0f).epsilon(0.001f));
-	
-	cetech1::Quat qq = (-q);
-	cetech1::Vector3 v3 = qq * v2;
-	
-	REQUIRE( v3.x == Approx(1.0f).epsilon(0.001f));
+
+        cetech1::Quat qq = (-q);
+        cetech1::Vector3 v3 = qq * v2;
+
+        REQUIRE( v3.x == Approx(1.0f).epsilon(0.001f));
         REQUIRE( v3.y == Approx(0.0f).epsilon(0.001f));
         REQUIRE( v3.z == Approx(0.0f).epsilon(0.001f));
     }
-    
+
     SECTION( "q1 / scalar" ) {
         cetech1::Quat q2 = q1 / scalar;
 

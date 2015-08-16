@@ -46,7 +46,7 @@ namespace cetech1 {
          * \param x X
          * \param y Y
          * \param z Z
-	 * \param w W
+         * \param w W
          * \return New vector
          */
         FORCE_INLINE Vector4 make_vector4(float x, float y, float z, float w);
@@ -77,8 +77,8 @@ namespace cetech1 {
          */
         FORCE_INLINE Vector4 normalized(const Vector4& v1);
 
-	FORCE_INLINE bool is_normalized(const Vector4& v1);
-	
+        FORCE_INLINE bool is_normalized(const Vector4& v1);
+
         /*! Dot product.
          * \param v1 Vector 1.
          * \param v2 Vector 2.
@@ -202,19 +202,19 @@ namespace cetech1 {
             return v1 * len_inv(v1);
         }
 
-	FORCE_INLINE bool is_normalized(const Vector4& v1) {
-	  return math::abs(1.0f - len_sq(v1)) < 0.001f;
-	}
-        
+        FORCE_INLINE bool is_normalized(const Vector4& v1) {
+            return math::abs(1.0f - len_sq(v1)) < 0.001f;
+        }
+
         FORCE_INLINE float dot(const Vector4& v1, const Vector4& v2) {
-            return (v1.x * v2.x) + (v1.y * v2.y) + (v1.z * v2.z)+ (v1.w * v2.w);
+            return (v1.x * v2.x) + (v1.y * v2.y) + (v1.z * v2.z) + (v1.w * v2.w);
         }
 
 //         FORCE_INLINE Vector4 cross(const Vector4& v1, const Vector4& v2) {
-// 	  (void)v1;
-// 	  (void)v2;
-// 	  // TODO: !!!
-// 	  //             return make_vector4(
+//        (void)v1;
+//        (void)v2;
+//        // TODO: !!!
+//        //             return make_vector4(
 // //                 (v1.y * v2.z) - (v1.z * v2.y),
 // //                 (v1.z * v2.x) - (v1.x * v2.z),
 // //                 (v1.x * v2.y) - (v1.y * v2.x),
@@ -222,7 +222,8 @@ namespace cetech1 {
 //         }
 
         FORCE_INLINE float distance_sq(const Vector4& v1, const Vector4& v2) {
-            return math::square(v2.x - v1.x) + math::square(v2.y - v1.y) + math::square(v2.z - v1.z) + math::square(v2.w - v1.w);
+            return math::square(v2.x - v1.x) + math::square(v2.y - v1.y) + math::square(v2.z - v1.z) + math::square(
+                v2.w - v1.w);
         }
 
         FORCE_INLINE float distance(const Vector4& v1, const Vector4& v2) {
@@ -246,7 +247,7 @@ namespace cetech1 {
                 math::float_select(v1.x, 1.0f, -1.0f),
                 math::float_select(v1.y, 1.0f, -1.0f),
                 math::float_select(v1.z, 1.0f, -1.0f),
-		math::float_select(v1.w, 1.0f, -1.0f)
+                math::float_select(v1.w, 1.0f, -1.0f)
                 );
         }
     }
@@ -256,7 +257,7 @@ namespace cetech1 {
             -v1.x,
             -v1.y,
             -v1.z,
-	    -v1.w
+            -v1.w
             );
     }
 
@@ -265,7 +266,7 @@ namespace cetech1 {
             v1.x + v2.x,
             v1.y + v2.y,
             v1.z + v2.z,
-	    v1.w + v2.w
+            v1.w + v2.w
             );
     }
 
@@ -274,7 +275,7 @@ namespace cetech1 {
             v1.x - v2.x,
             v1.y - v2.y,
             v1.z - v2.z,
-	    v1.w - v2.w
+            v1.w - v2.w
             );
     }
 
@@ -283,7 +284,7 @@ namespace cetech1 {
             v1.x * v2.x,
             v1.y * v2.y,
             v1.z * v2.z,
-	    v1.w * v2.w
+            v1.w * v2.w
             );
     }
 
@@ -292,7 +293,7 @@ namespace cetech1 {
             v1.x / v2.x,
             v1.y / v2.y,
             v1.z / v2.z,
-	    v1.w / v2.w
+            v1.w / v2.w
             );
     }
 
@@ -312,7 +313,7 @@ namespace cetech1 {
             v1.x * inv_s,
             v1.y * inv_s,
             v1.z * inv_s,
-	    v1.w * inv_s
+            v1.w * inv_s
             );
     }
 }

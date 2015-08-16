@@ -125,11 +125,11 @@ namespace cetech1 {
         }
 
         FORCE_INLINE float inv_sqrt(const float number) {
-	    return 1.0f / fast_sqrt(number);
+            return 1.0f / fast_sqrt(number);
 //             long i;
 //             float x2, y;
 //             const float threehalfs = 1.5F;
-// 
+//
 //             x2 = number * 0.5F;
 //             y = number;
 //             i = *(long*) &y;           // evil floating point bit level hacking
@@ -137,7 +137,7 @@ namespace cetech1 {
 //             y = *(float*) &i;
 //             y = y * (threehalfs - (x2 * y * y));    // 1st iteration
 //             //y  = y * ( threehalfs - ( x2 * y * y ) ); // 2nd iteration, this can be removed
-// 
+//
 //             return y;
         }
 
@@ -171,8 +171,8 @@ namespace cetech1 {
         }
 
         FORCE_INLINE void fast_sincos(float angle_deg, float& sin, float& cos) {
-	  sin = fast_sin(angle_deg);
-	  cos = fast_sqrt(1 - sin * sin);
+            sin = fast_sin(angle_deg);
+            cos = fast_sqrt(1 - sin * sin);
         }
 
         FORCE_INLINE float float_select(const float a, const float ge_zero, const float lt_zero) {
