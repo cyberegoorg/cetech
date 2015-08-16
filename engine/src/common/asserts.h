@@ -86,20 +86,17 @@ namespace cetech1 {
     FORCE_INLINE void ce_noop() {}
 
     FORCE_INLINE void ce_assert(const char* condition_str, const char* file, int line, const char* fce) {
-        printf("ASSERT: \'%s\' in %s:%i:%s().", condition_str,
-               SHORT_FILE(file), line, fce);
-
+        std::fprintf(stderr, "ASSERT: \'%s\' in %s:%i:%s().", condition_str, SHORT_FILE(file), line, fce);
         abort();
     }
 
     FORCE_INLINE void ce_assert_msg(const char* where, const char* what, const char* file, int line, const char* fce) {
-        printf("ASSERT:\'%s\': \"%s\" %s:%i:%s().", where, what,
-               SHORT_FILE(file), line, fce);
+        std::fprintf(stderr, "ASSERT:\'%s\': \"%s\" %s:%i:%s().", where, what, SHORT_FILE(file), line, fce);
         abort();
     }
 
     FORCE_INLINE void ce_check_ptr(const char* file, int line) {
-        printf("CHECK POINTER: in file %s on line %i is invalid pointer.", SHORT_FILE(file), line);
+        std::fprintf(stderr, "CHECK POINTER: in file %s on line %i is invalid pointer.", SHORT_FILE(file), line);
         abort();
     }
 }
