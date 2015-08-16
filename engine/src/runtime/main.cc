@@ -1,6 +1,7 @@
 #include "common/memory/memory.h"
 #include "common/math/math_types.h"
 #include "common/math/math.h"
+#include "common/math/quat.h"
 #include "common/types.h"
 #include "common/container/array.h"
 #include "common/container/hash.h"
