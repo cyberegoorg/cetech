@@ -72,7 +72,7 @@ TEST_CASE( "Vector2 operation", "[vector2]" ) {
 
     SECTION( "normalized(v1)" ) {
         cetech1::Vector2 v_norm = cetech1::vector2::normalized(v1);
-	
+
         REQUIRE( cetech1::vector2::is_normalized(v_norm)); // TODO: check compare
     }
 

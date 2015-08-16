@@ -16,7 +16,7 @@ TEST_CASE( "Vector4 operation", "[vector4]" ) {
         REQUIRE( v3.x == 6.0f );
         REQUIRE( v3.y == 8.0f );
         REQUIRE( v3.z == 10.0f );
-	REQUIRE( v3.w == 12.0f );
+        REQUIRE( v3.w == 12.0f );
     }
 
     SECTION( "v1 - v2" ) {
@@ -25,7 +25,7 @@ TEST_CASE( "Vector4 operation", "[vector4]" ) {
         REQUIRE( v3.x == -4.0f );
         REQUIRE( v3.y == -4.0f );
         REQUIRE( v3.z == -4.0f );
-	REQUIRE( v3.w == -4.0f );
+        REQUIRE( v3.w == -4.0f );
     }
 
     SECTION( "v1 * v2" ) {
@@ -34,7 +34,7 @@ TEST_CASE( "Vector4 operation", "[vector4]" ) {
         REQUIRE( v3.x == 5.0f );
         REQUIRE( v3.y == 12.0f );
         REQUIRE( v3.z == 21.0f );
-	REQUIRE( v3.w == 32.0f );
+        REQUIRE( v3.w == 32.0f );
     }
 
     SECTION( "v1 / v2" ) {
