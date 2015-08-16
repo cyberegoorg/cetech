@@ -60,6 +60,14 @@ function toolchain(build_dir)
         targetdir (build_dir .. "linux64" .. "/bin")
         objdir (build_dir .. "linux64" .. "/obj")
 
+    filter {"system:windows", "platforms:x32"}
+        targetdir (build_dir .. "windows32" .. "/bin")
+        objdir (build_dir .. "windows32" .. "/obj")
+
+    filter {"system:windows", "platforms:x64"}
+        targetdir (build_dir .. "windows64" .. "/bin")
+        objdir (build_dir .. "windows64" .. "/obj")
+
     filter "system:windows"
         defines {'CETECH1_WINDOWS'}
 
@@ -102,11 +110,11 @@ project "tech1_test"
     defines {
       'CETECH1_SIMD_FPU'
     }
-    
+
     includedirs {
       ROOT_DIR .. "tests"
     }
-    
+
     files {
         ROOT_DIR .. "tests/**.cc",
         ROOT_DIR .. "tests/**.h",
@@ -121,7 +129,7 @@ project "tech1"
     defines {
       'CETECH1_SIMD_FPU'
     }
-    
+
     files {
         ROOT_DIR .. "src/runtime/*.cc",
     }
