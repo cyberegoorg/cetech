@@ -76,6 +76,10 @@ namespace cetech1 {
          */
         FORCE_INLINE Vector3 normalized(const Vector3& v1);
 
+        /*! Is vector normalized?
+         * \param v1 Vector.
+         * \return True if vector is normalized.
+         */
         FORCE_INLINE bool is_normalized(const Vector3& v1);
 
         /*! Dot product.

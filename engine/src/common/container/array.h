@@ -8,6 +8,9 @@
 #include <string.h>
 
 namespace cetech1 {
+  
+    /*! Array.
+     */
     namespace array {
 
 /*! Get array size.
