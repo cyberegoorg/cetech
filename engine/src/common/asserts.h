@@ -3,15 +3,17 @@
 #include <cstdio>
 #include <cstdlib>
 
+#include "platform/platform.h"
+
 /*!
  * Check ptr macro.
  * \param ptr Pointer.
  */
 #ifdef CETECH1_DEBUG
   #define CE_CHECK_PTR(ptr) \
-    if (!ptr) cetech1::ce_check_ptr(__FILE__, __LINE__)
+     do { if (!ptr) cetech1::ce_check_ptr(__FILE__, __LINE__); } while(0)
 #else
-  #define CE_CHECK_PTR(ptr)
+  #define CE_CHECK_PTR(ptr) do {} while (0)
 #endif
 
 /*!
@@ -25,7 +27,7 @@
                                                                        __PRETTY_FUNCTION__) : cetech1::ce_noop(); \
 } while (0)
 #else
-  #define CE_ASSERT(condition)
+  #define CE_ASSERT(condition) do {} while (0)
 #endif
 
 /*!
