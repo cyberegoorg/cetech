@@ -14,7 +14,7 @@ namespace {
         uint32_t size;
     };
 
-    inline void* data_pointer(Header* header, uint32_t align) {
+    inline void* data_pointer(Header* header, const uint32_t align) {
         CE_CHECK_PTR(header);
 
         void* p = header + 1;
@@ -34,7 +34,7 @@ namespace {
         return (Header*)p - 1;
     }
 
-    inline void fill(Header* header, void* data, uint32_t size) {
+    inline void fill(Header* header, void* data, const uint32_t size) {
         header->size = size;
         uint32_t* p = (uint32_t*)(header + 1);
 
@@ -51,7 +51,7 @@ namespace {
                 CE_ASSERT(_total_allocated == 0);
             }
 
-            virtual void* allocate(uint32_t size, uint32_t align) {
+            virtual void* allocate(const uint32_t size, const uint32_t align) {
                 const uint32_t ts = size_with_padding(size, align);
                 Header* h = (Header*)malloc(ts);
                 void* p = data_pointer(h, align);
@@ -82,7 +82,7 @@ namespace {
         private:
             uint32_t _total_allocated;
 
-            static inline uint32_t size_with_padding(uint32_t size, uint32_t align) {
+            static inline uint32_t size_with_padding(const uint32_t size,const  uint32_t align) {
                 return size + align + sizeof(Header);
             }
     };

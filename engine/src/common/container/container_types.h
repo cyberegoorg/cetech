@@ -30,11 +30,11 @@ namespace cetech1 {
 
         /*! Item accessor.
          */
-        T& operator[] (uint32_t i);
+        T& operator[] (const uint32_t i);
 
         /*! Item const accessor.
          */
-        const T& operator[] (uint32_t i) const;
+        const T& operator[] (const uint32_t i) const;
 
 
         Allocator* _allocator; //!< Pointer to allocator.
@@ -77,8 +77,8 @@ namespace cetech1 {
          */
         Queue(Allocator & a);
 
-        T& operator[] (uint32_t i);
-        const T& operator[] (uint32_t i) const;
+        T& operator[] (const uint32_t i);
+        const T& operator[] (const uint32_t i) const;
 
         Array < T > _data;      //!< Data
         uint32_t _size;         //!< Size

@@ -86,7 +86,7 @@ namespace cetech1 {
          * \param a Array.
          * \param new_size New size.
          */
-        template < typename T > void resize(Array < T >& a, uint32_t new_size);
+        template < typename T > void resize(Array < T >& a, const uint32_t new_size);
 
         /*! Remove all items from array.
          * \param a Array.
@@ -97,19 +97,19 @@ namespace cetech1 {
          * \param a Array.
          * \param new_capacity New capacity.
          */
-        template < typename T > void set_capacity(Array < T >& a, uint32_t new_capacity);
+        template < typename T > void set_capacity(Array < T >& a, const uint32_t new_capacity);
 
         /*! Reserve capacity.
          * \param a Array.
          * \param new_capacity New capacity.
          */
-        template < typename T > void reserve(Array < T >& a, uint32_t new_capacity);
+        template < typename T > void reserve(Array < T >& a, const uint32_t new_capacity);
 
         /*! Grow array using geometric grow facor.
          * \param a Array.
          * \param min_capacity Minimal capacity.
          */
-        template < typename T > void grow(Array < T >& a, uint32_t min_capacity = 0);
+        template < typename T > void grow(Array < T >& a, const uint32_t min_capacity = 0);
 
         /*! Trim array.
          * \param a Array.
@@ -177,7 +177,7 @@ namespace cetech1 {
         }
 
 
-        template < typename T > inline void resize(Array < T >& a, uint32_t new_size) {
+        template < typename T > inline void resize(Array < T >& a, const uint32_t new_size) {
             if (new_size > a._capacity) {
                 grow(a, new_size);
             }
@@ -190,7 +190,7 @@ namespace cetech1 {
         }
 
 
-        template < typename T > inline void set_capacity(Array < T >& a, uint32_t new_capacity) {
+        template < typename T > inline void set_capacity(Array < T >& a, const uint32_t new_capacity) {
             if (new_capacity == a._capacity) {
                 return;
             }
@@ -212,13 +212,13 @@ namespace cetech1 {
 
 
 
-        template < typename T > inline void reserve(Array < T >& a, uint32_t new_capacity) {
+        template < typename T > inline void reserve(Array < T >& a, const uint32_t new_capacity) {
             if (new_capacity > a._capacity) {
                 set_capacity(a, new_capacity);
             }
         }
 
-        template < typename T > inline void grow(Array < T >& a, uint32_t min_capacity) {
+        template < typename T > inline void grow(Array < T >& a, const uint32_t min_capacity) {
             uint32_t new_capacity = a._capacity * 2 + 8;
 
             if (new_capacity < min_capacity) {
@@ -276,12 +276,12 @@ namespace cetech1 {
     }
 
     template < typename T >
-    inline T &Array < T > ::operator[] (uint32_t i) {
+    inline T &Array < T > ::operator[] (const uint32_t i) {
         return _data[i];
     }
 
     template < typename T >
-    inline const T &Array < T > ::operator[] (uint32_t i) const {
+    inline const T &Array < T > ::operator[] (const uint32_t i) const {
         return _data[i];
     }
 }

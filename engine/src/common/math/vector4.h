@@ -49,7 +49,7 @@ namespace cetech1 {
          * \param w W
          * \return New vector
          */
-        FORCE_INLINE Vector4 make_vector4(float x, float y, float z, float w);
+        FORCE_INLINE Vector4 make_vector4(const float x, const float y, const float z, const float w);
 
 
         /*! Vector len
@@ -184,7 +184,7 @@ namespace cetech1 {
 
 
     namespace vector4 {
-        FORCE_INLINE Vector4 make_vector4(float x, float y, float z, float w) {
+        FORCE_INLINE Vector4 make_vector4(const float x, const float y, const float z, const float w) {
             return {
                        x, y, z, w
             };

@@ -23,7 +23,7 @@ namespace cetech1 {
          * \param q Queue.
          * \param size Size.
          */
-        template < typename T > void reserve(Queue < T >& q, uint32_t size);
+        template < typename T > void reserve(Queue < T >& q, uint32_t const size);
 
 
         /*! Pushes the item to the end of the queue.
@@ -55,14 +55,14 @@ namespace cetech1 {
          * \param q Queue.
          * \param n Number of items to pop.
          */
-        template < typename T > void consume(Queue < T >& q, uint32_t n);
+        template < typename T > void consume(Queue < T >& q, const uint32_t n);
 
         /*! Pushes n items to the back of the queue.
          * \param q Queue.
          * \param items Array of items.
          * \param n Number of items.
          */
-        template < typename T > void push(Queue < T >& q, const T* items, uint32_t n);
+        template < typename T > void push(Queue < T >& q, const T* items, const uint32_t n);
 
         /*! Returns the begin and end of the continuous chunk of elements at
          * the start of the queue. (Note that this chunk does not necessarily
@@ -80,7 +80,7 @@ namespace cetech1 {
 
     namespace queue_internal {
         // Can only be used to increase the capacity.
-        template < typename T > void increase_capacity(Queue < T >& q, uint32_t new_capacity) {
+        template < typename T > void increase_capacity(Queue < T >& q, const uint32_t new_capacity) {
             uint32_t end = array::size(q._data);
             array::resize(q._data, new_capacity);
             if (q._offset + q._size > end) {
@@ -91,7 +91,7 @@ namespace cetech1 {
             }
         }
 
-        template < typename T > void grow(Queue < T >& q, uint32_t min_capacity = 0) {
+        template < typename T > void grow(Queue < T >& q, const uint32_t min_capacity = 0) {
             uint32_t new_capacity = array::size(q._data) * 2 + 8;
             if (new_capacity < min_capacity) {
                 new_capacity = min_capacity;
@@ -110,7 +110,7 @@ namespace cetech1 {
             return array::size(q._data) - q._size;
         }
 
-        template < typename T > void reserve(Queue < T >& q, uint32_t size) {
+        template < typename T > void reserve(Queue < T >& q, const uint32_t size) {
             if (size > q._size) {
                 queue_internal::increase_capacity(q, size);
             }
@@ -143,12 +143,12 @@ namespace cetech1 {
             --q._size;
         }
 
-        template < typename T > inline void consume(Queue < T >& q, uint32_t n) {
+        template < typename T > inline void consume(Queue < T >& q, const uint32_t n) {
             q._offset = (q._offset + n) % array::size(q._data);
             q._size -= n;
         }
 
-        template < typename T > void push(Queue < T >& q, const T* items, uint32_t n) {
+        template < typename T > void push(Queue < T >& q, const T* items, const uint32_t n) {
             if (space(q) < n) {
                 queue_internal::grow(q, size(q) + n);
             }
@@ -187,11 +187,11 @@ namespace cetech1 {
     template < typename T > inline Queue < T > ::Queue(Allocator & allocator) : _data(allocator), _size(0),
                                                                                 _offset(0) {}
 
-    template < typename T > inline T &Queue < T > ::operator [] (uint32_t i) {
+    template < typename T > inline T &Queue < T > ::operator [] (const uint32_t i) {
         return _data[(i + _offset) % array::size(_data)];
     }
 
-    template < typename T > inline const T &Queue < T > ::operator [] (uint32_t i) const {
+    template < typename T > inline const T &Queue < T > ::operator [] (const uint32_t i) const {
         return _data[(i + _offset) % array::size(_data)];
     }
 }

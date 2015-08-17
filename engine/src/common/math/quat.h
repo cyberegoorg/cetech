@@ -18,14 +18,14 @@ namespace cetech1 {
          * \param w W
          * \return New vector
          */
-        FORCE_INLINE Quat make_quat(float x, float y, float z, float w);
+        FORCE_INLINE Quat make_quat(const float x, const float y, const float z, const float w);
 
         /*! Make Quat from axis and angle.
          * \param axis Axis
          * \param angle_deg Angle in degy Y
          * \return New quaternion
          */
-        FORCE_INLINE Quat from_axis_angle(const Vector3& axis, float angle_deg);
+        FORCE_INLINE Quat from_axis_angle(const Vector3& axis, const float angle_deg);
 
 
         /*! Quaternion len
@@ -112,17 +112,17 @@ namespace cetech1 {
 
 
     namespace quat {
-        FORCE_INLINE Quat make_quat(float x, float y, float z, float w) {
+        FORCE_INLINE Quat make_quat(const float x, const float y, const float z, const float w) {
             return {
                        x, y, z, w
             };
         }
 
-        FORCE_INLINE Quat from_axis_angle(const Vector3& axis, float angle_deg) {
-            angle_deg *= 0.5;
+        FORCE_INLINE Quat from_axis_angle(const Vector3& axis, const float angle_deg) {
+            const float angle_deg_half = angle_deg * 0.5;
             float sin, cos;
 
-            math::fast_sincos(angle_deg, sin, cos);
+            math::fast_sincos(angle_deg_half, sin, cos);
 
             Quat res = make_quat(
                 sin * axis.x,

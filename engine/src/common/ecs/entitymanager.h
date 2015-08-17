@@ -33,7 +33,7 @@ namespace cetech1 {
             return ent.id & ENTITY_GENERATION_MASK;
         }
 
-        inline Entity make_entity(uint32_t idx, uint32_t gen) {
+        inline Entity make_entity(const uint32_t idx, const uint32_t gen) {
             Entity ent = {((idx) << (ENTITY_INDEX_BIT_COUNT)) | (gen)};
             return ent;
         }
@@ -54,14 +54,14 @@ namespace cetech1 {
             return entity::make_entity(idx, em._generation[idx]);
         }
 
-        void destroy(EntityManager& em, Entity e) {
+        void destroy(EntityManager& em, const Entity e) {
             const auto idx = entity::idx(e);
 
             ++em._generation[idx];
             queue::push_back(em._free_idx, idx);
         }
 
-        bool alive(const EntityManager& em, Entity e) {
+        bool alive(const EntityManager& em, const Entity e) {
             return em._generation[entity::idx(e)] == entity::gen(e);
         }
     }
