@@ -8,12 +8,12 @@
 
 namespace cetech1 {
     namespace simd {
-        FORCE_INLINE SimdVector make_simd_vector(float x, float y, float z, float w) {
+        FORCE_INLINE SimdVector make_simd_vector(const float x, const float y, const float z, const float w) {
             SimdVector ret = {{x, y, z, w}};
             return ret;
         }
 
-        FORCE_INLINE float get_element(const SimdVector& v1, uint32_t idx) {
+        FORCE_INLINE float get_element(const SimdVector& v1, const uint32_t idx) {
             return v1.v[idx];
         }
 

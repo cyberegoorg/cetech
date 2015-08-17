@@ -39,7 +39,7 @@ namespace cetech1 {
          * \param y Y
          * \return New vector
          */
-        FORCE_INLINE Vector2 make_vector2(float x, float y);
+        FORCE_INLINE Vector2 make_vector2(const float x, const float y);
 
 
         /*! Vector len
@@ -189,7 +189,7 @@ namespace cetech1 {
 
 
     namespace vector2 {
-        FORCE_INLINE Vector2 make_vector2(float x, float y) {
+        FORCE_INLINE Vector2 make_vector2(const float x, const float y) {
             return {
                        x, y
             };

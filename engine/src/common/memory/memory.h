@@ -25,7 +25,7 @@ namespace cetech1 {
              * \param align align.
              * \return Pointer to new memory.
              */
-            virtual void* allocate(uint32_t size, uint32_t align = DEFAULT_ALIGN) = 0;
+            virtual void* allocate(const uint32_t size, const uint32_t align = DEFAULT_ALIGN) = 0;
 
             /*! Deallocate memory.
              * \param p Pointer to memory.
@@ -74,18 +74,18 @@ namespace cetech1 {
          * \param align Align.
          * \return Alligned pointer.
          */
-        FORCE_INLINE void* align_forward(void* p, uint32_t align);
+        FORCE_INLINE void* align_forward(void* p, const uint32_t align);
 
-        FORCE_INLINE void* pointer_add(void* p, uint32_t bytes);
-        FORCE_INLINE const void* pointer_add(const void* p, uint32_t bytes);
+        FORCE_INLINE void* pointer_add(void* p, const uint32_t bytes);
+        FORCE_INLINE const void* pointer_add(const void* p, const uint32_t bytes);
 
-        FORCE_INLINE void* pointer_sub(void* p, uint32_t bytes);
-        FORCE_INLINE const void* pointer_sub(const void* p, uint32_t bytes);
+        FORCE_INLINE void* pointer_sub(void* p, const uint32_t bytes);
+        FORCE_INLINE const void* pointer_sub(const void* p, const uint32_t bytes);
 
-        FORCE_INLINE void* memcpy(void* dst, const void* src, uint32_t bytes);
+        FORCE_INLINE void* memcpy(void* dst, const void* src, const uint32_t bytes);
     }
 
-    FORCE_INLINE void* memory::align_forward(void* p, uint32_t align) {
+    FORCE_INLINE void* memory::align_forward(void* p, const uint32_t align) {
         uintptr_t pi = uintptr_t(p);
         const uint32_t mod = pi % align;
 
@@ -96,30 +96,30 @@ namespace cetech1 {
         return (void*)pi;
     }
 
-    FORCE_INLINE void* memory::pointer_add(void* p, uint32_t bytes) {
+    FORCE_INLINE void* memory::pointer_add(void* p, const uint32_t bytes) {
         CE_CHECK_PTR(p);
 
         return (void*)((char*)p + bytes);
     }
 
-    FORCE_INLINE const void* memory::pointer_add(const void* p, uint32_t bytes) {
+    FORCE_INLINE const void* memory::pointer_add(const void* p, const uint32_t bytes) {
         CE_CHECK_PTR(p);
 
         return (const void*)((const char*)p + bytes);
     }
 
-    FORCE_INLINE void* memory::pointer_sub(void* p, uint32_t bytes) {
+    FORCE_INLINE void* memory::pointer_sub(void* p, const uint32_t bytes) {
         CE_CHECK_PTR(p);
 
         return (void*)((char*)p - bytes);
     }
 
-    FORCE_INLINE const void* memory::pointer_sub(const void* p, uint32_t bytes) {
+    FORCE_INLINE const void* memory::pointer_sub(const void* p, const uint32_t bytes) {
         CE_CHECK_PTR(p);
         return (const void*)((const char*)p - bytes);
     }
 
-    FORCE_INLINE void* memory::memcpy(void* dst, const void* src, uint32_t bytes) {
+    FORCE_INLINE void* memory::memcpy(void* dst, const void* src, const uint32_t bytes) {
         CE_CHECK_PTR(dst);
         CE_CHECK_PTR(src);
         return std::memcpy(dst, src, bytes);

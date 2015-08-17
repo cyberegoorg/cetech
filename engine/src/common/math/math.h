@@ -69,14 +69,14 @@ namespace cetech1 {
          * \param f2 Float 2.
          * \param epsilon Epsilon.
          */
-        FORCE_INLINE bool almost_equal(const float f1, const float f2, float epsilon = FLOAT_SMALL_NUMBER);
+        FORCE_INLINE bool almost_equal(const float f1, const float f2, const float epsilon = FLOAT_SMALL_NUMBER);
 
 
         /*! X * X
          * \param x
          * \return x * x
          */
-        FORCE_INLINE float square(float x);
+        FORCE_INLINE float square(const float x);
 
         /*! Fast version of sqrt.
          * \param number Number.
@@ -94,26 +94,26 @@ namespace cetech1 {
          * \param deg Deg.
          * \return Rad.
          */
-        FORCE_INLINE float deg2rad(float deg);
+        FORCE_INLINE float deg2rad(const float deg);
 
         /*! Rad to Deg.
          * \param rad Deg.
          * \return Deg.
          */
-        FORCE_INLINE float rad2deg(float rad);
+        FORCE_INLINE float rad2deg(const float rad);
 
         /*! Fast version of sin.
          * \param angle_deg Angle in deg.
          * \return sin
          */
-        FORCE_INLINE float fast_sin(float angle_deg);
+        FORCE_INLINE float fast_sin(const float angle_deg);
 
         /*! Fast version of sin, cos.
          * \param angle_deg Angle in deg.
          * \param sin Sin.
          * \param cos Cos.
          */
-        FORCE_INLINE void fast_sincos(float angle_deg, float& sin, float& cos);
+        FORCE_INLINE void fast_sincos(const float angle_deg, float& sin, float& cos);
 
         /*! Return value based on value a. (  )
          * \param a Input value.
@@ -186,21 +186,21 @@ namespace cetech1 {
             //             return y;
         }
 
-        FORCE_INLINE float square(float x) {
+        FORCE_INLINE float square(const float x) {
             return x * x;
         }
 
-        FORCE_INLINE float deg2rad(float deg) {
+        FORCE_INLINE float deg2rad(const float deg) {
             static const float to_rad = 3.14159265358979323846f / 180.0f;
             return deg * to_rad;
         }
 
-        FORCE_INLINE float rad2deg(float rad) {
+        FORCE_INLINE float rad2deg(const float rad) {
             static const float to_deg = 180.0f / 3.14159265358979323846f;
             return rad * to_deg;
         }
 
-        FORCE_INLINE float fast_sin(float angle_deg) {
+        FORCE_INLINE float fast_sin(const float angle_deg) {
             float angle_rad = deg2rad(angle_deg);
 
             if (PI < angle_rad) {
@@ -215,7 +215,7 @@ namespace cetech1 {
                      (0.00833333f - angle_rad * angle_rad * (0.0001984f - angle_rad * angle_rad * 0.0000027f))));
         }
 
-        FORCE_INLINE void fast_sincos(float angle_deg, float& sin, float& cos) {
+        FORCE_INLINE void fast_sincos(const float angle_deg, float& sin, float& cos) {
             sin = fast_sin(angle_deg);
             cos = fast_sqrt(1 - sin * sin);
         }

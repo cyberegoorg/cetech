@@ -19,13 +19,13 @@ namespace cetech1 {
          * \param z Z.
          * \param w W.
          */
-        FORCE_INLINE SimdVector make_simd_vector(float x, float y, float z, float w);
+        FORCE_INLINE SimdVector make_simd_vector(const float x, const float y, const float z, const float w);
 
         /*! Get elment from vector.
          * \param v1 Vector.
          * \param idx Element index 0, 1, 2, 3
          */
-        FORCE_INLINE float get_element(const SimdVector& v1, uint32_t idx);
+        FORCE_INLINE float get_element(const SimdVector& v1, const uint32_t idx);
 
         /*! V1 + V2
          * \param v1 Vector 1.
