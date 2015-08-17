@@ -15,16 +15,16 @@ namespace {
     };
 
     inline void* data_pointer(Header* header, uint32_t align) {
-	CE_CHECK_PTR(header);
-	
+        CE_CHECK_PTR(header);
+
         void* p = header + 1;
 
         return memory::align_forward(p, align);
     }
 
     inline Header* header(void* data) {
-	CE_CHECK_PTR(data);
-      
+        CE_CHECK_PTR(data);
+
         uint32_t* p = (uint32_t*)data;
 
         while (p[-1] == HEADER_PAD_VALUE) {
@@ -48,7 +48,7 @@ namespace {
             MallocAllocator() : _total_allocated(0) {}
 
             ~MallocAllocator() {
-		CE_ASSERT(_total_allocated == 0);
+                CE_ASSERT(_total_allocated == 0);
             }
 
             virtual void* allocate(uint32_t size, uint32_t align) {
@@ -71,7 +71,7 @@ namespace {
             }
 
             virtual uint32_t allocated_size(void* p) {
-	      CE_CHECK_PTR(p);
+                CE_CHECK_PTR(p);
                 return header(p)->size;
             }
 

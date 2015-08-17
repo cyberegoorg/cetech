@@ -12,7 +12,7 @@ namespace cetech1 {
         const uint64_t* end = data + (len / 8);
 
         while (data != end) {
-                        #ifdef PLATFORM_BIG_ENDIAN
+#ifdef PLATFORM_BIG_ENDIAN
             uint64 k = *data++;
             char* p = (char*)&k;
             char c;
@@ -20,9 +20,9 @@ namespace cetech1 {
             c = p[1]; p[1] = p[6]; p[6] = c;
             c = p[2]; p[2] = p[5]; p[5] = c;
             c = p[3]; p[3] = p[4]; p[4] = c;
-                        #else
+#else
             uint64_t k = *data++;
-                        #endif
+#endif
 
             k *= m;
             k ^= k >> r;
@@ -34,8 +34,7 @@ namespace cetech1 {
 
         const unsigned char* data2 = (const unsigned char*)data;
 
-        switch (len & 7)
-        {
+        switch (len & 7) {
         case 7: h ^= uint64_t(data2[6]) << 48;
         case 6: h ^= uint64_t(data2[5]) << 40;
         case 5: h ^= uint64_t(data2[4]) << 32;

@@ -2,7 +2,9 @@
 
 #include "simd_types.h"
 
-#ifdef CETECH1_SIMD_FPU
+#ifdef CETECH1_SIMD_SSE
+  #include "sse.h"
+#else
   #include "fpu.h"
 #endif
 
@@ -108,8 +110,8 @@ namespace cetech1 {
         FORCE_INLINE void store1(const SimdVector& v1, void* dst);
 
         /*! Quaternion multiplication.
-           *\param q1 Quaternion data.
-           *\param q2 Quaternion data.
+         * \param q1 Quaternion data.
+         * \param q2 Quaternion data.
          * \param dst Destination.
          */
         FORCE_INLINE void quat_mult(const void* q1, const void* q2, void* dst);
