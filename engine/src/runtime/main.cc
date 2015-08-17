@@ -2,6 +2,7 @@
 #include "common/math/math_types.h"
 #include "common/math/math.h"
 #include "common/math/quat.h"
+#include "common/math/simd/simd.h"
 #include "common/types.h"
 #include "common/container/array.h"
 #include "common/container/hash.h"
@@ -67,6 +68,8 @@ void run() {
     sin1 = cos1 = 0;
     cetech1::math::fast_sincos(21, sin1, cos1);
 
+    cetech1::memory::memcpy(nullptr, nullptr, 0);
+    
     printf("%f, %f == %f, %f\n", sin(cetech1::math::deg2rad(21)), cos(cetech1::math::deg2rad(21)), sin1, cos1);
 }
 

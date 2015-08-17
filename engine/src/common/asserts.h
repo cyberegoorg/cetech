@@ -9,7 +9,7 @@
  * Check ptr macro.
  * \param ptr Pointer.
  */
-#ifdef CETECH1_DEBUG
+#ifdef CETECH_DEBUG
   #define CE_CHECK_PTR(ptr) \
     do { if (!ptr) { cetech1::ce_check_ptr(__FILE__, __LINE__); } } while (0)
 #else
@@ -20,7 +20,7 @@
  * Assert macro.
  * \param condition Asset condition.
  */
-#ifdef CETECH1_DEBUG
+#ifdef CETECH_DEBUG
   #define CE_ASSERT(condition) do { !(condition) ? cetech1::ce_assert( #condition, \
                                                                        __FILE__, \
                                                                        __LINE__, \
@@ -33,12 +33,11 @@
 /*!
  * Assert macro with message.
  * \param condition Asset condition.
- * \param where Where did it happend.
- * \param what What happend?
+ * \param msg Message.
  */
-#ifdef CETECH1_DEBUG
-  #define CE_ASSERT_MSG(condition, where, what) do { !(condition) ? cetech1::ce_assert_msg(where, \
-                                                                                           what, \
+#ifdef CETECH_DEBUG
+  #define CE_ASSERT_MSG(condition, msg) do { !(condition) ? cetech1::ce_assert_msg(msg, \
+                                                                                            #condition,\
                                                                                            __FILE__, \
                                                                                            __LINE__, \
                                                                                            __PRETTY_FUNCTION__) : \
@@ -106,7 +105,7 @@ namespace cetech1 {
     }
 
     FORCE_INLINE void ce_check_ptr(const char* file, const int line) {
-        std::fprintf(stderr, "CHECK POINTER: in file %s on line %i is invalid pointer.", SHORT_FILE(file), line);
+        std::fprintf(stderr, "ASSERT(CHECK POINTER): in file %s on line %i is invalid pointer.", SHORT_FILE(file), line);
         abort();
     }
 }

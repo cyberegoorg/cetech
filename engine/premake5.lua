@@ -1,27 +1,37 @@
+--------------------------------------------------------------------------------
 ROOT_DIR = (path.getabsolute(".") .. "/")
 BUILD_DIR = ROOT_DIR .. ".build/"
 
+ARCH = os.is64bit() and '64' or '32'
+OS_ARCH = _OS .. ARCH
+OS_ARCH_DIR = _OS ..'/' .. ARCH
+
 THIRD_PARTY_BUILD = "../3rdparty/.build/"
-THIRD_PARTY_LIB = THIRD_PARTY_BUILD .."lib/"
+THIRD_PARTY_LIB = THIRD_PARTY_BUILD .."lib/"..OS_ARCH_DIR
 THIRD_PARTY_INCLUDE = THIRD_PARTY_BUILD .. "include/"
-THIRD_PARTY_INCLUDE_ARCH_DEP = THIRD_PARTY_INCLUDE
+THIRD_PARTY_INCLUDE_ARCH_DEP = THIRD_PARTY_INCLUDE..OS_ARCH_DIR
+--------------------------------------------------------------------------------
+newoption {
+  trigger = 'simd',
+  value = "Implementation",
+  description = "Chose a simd implementation",
+  allowed = {
+    {'fpu', "Generic implementation using FPU."}
+  }
+}
+--------------------------------------------------------------------------------
+solution "cyberego.org tech1"
+    configurations {"Debug", "Release"}
+    platforms {"native", "x32", "x64"}
 
-function dispatch_third_party_path()
-  local arch = os.is64bit() and '64/' or '32/'
-  local os_arch = _OS .. arch
+    location (BUILD_DIR .. "projects/" .. _ACTION)
 
-  THIRD_PARTY_LIB = THIRD_PARTY_LIB .. os_arch
-  THIRD_PARTY_INCLUDE_ARCH_DEP =  THIRD_PARTY_INCLUDE_ARCH_DEP .. os_arch
-end
-
-function toolchain(build_dir)
-  dispatch_third_party_path()
-
-    location (build_dir .. "projects/" .. _ACTION)
+    targetdir (BUILD_DIR .. OS_ARCH .. "/bin")
+    objdir (BUILD_DIR .. OS_ARCH .. "/obj")
 
     floatingpoint "Fast"
     warnings "Extra"
-
+    
     includedirs {
       THIRD_PARTY_INCLUDE,
       THIRD_PARTY_INCLUDE_ARCH_DEP,
@@ -32,8 +42,18 @@ function toolchain(build_dir)
       THIRD_PARTY_LIB
     }
 
+    -- SIMD options
+    filter "options:simd=fpu"
+      defines {
+	'CETECH_SIMD_FPU'
+      }
+    
     filter "Debug"
-        defines {"DEBUG", "CETECH1_DEBUG"}
+        defines {
+	  "DEBUG",
+	  "CETECH_DEBUG",
+	  "CETECH_FORCE_INLINE_OFF",
+	}
 
         flags {"Symbols"}
         targetsuffix '_debug'
@@ -41,10 +61,12 @@ function toolchain(build_dir)
 
     filter "Release"
         optimize "Full"
-        defines {"NDEBUG"}
+        defines {
+	  "NDEBUG",
+	}
 
     filter "system:linux"
-        defines {'CETECH1_LINUX'}
+        defines {'CETECH_LINUX'}
 
         buildoptions {"-std=c++11", "-fPIC", "-msse2"}
 
@@ -52,33 +74,10 @@ function toolchain(build_dir)
 	    "m",
 	}
 
-    filter {"system:linux", "platforms:x32"}
-        targetdir (build_dir .. "linux32" .. "/bin")
-        objdir (build_dir .. "linux32" .. "/obj")
-
-    filter {"system:linux", "platforms:x64"}
-        targetdir (build_dir .. "linux64" .. "/bin")
-        objdir (build_dir .. "linux64" .. "/obj")
-
-    filter {"system:windows", "platforms:x32"}
-        targetdir (build_dir .. "windows32" .. "/bin")
-        objdir (build_dir .. "windows32" .. "/obj")
-
-    filter {"system:windows", "platforms:x64"}
-        targetdir (build_dir .. "windows64" .. "/bin")
-        objdir (build_dir .. "windows64" .. "/obj")
-
     filter "system:windows"
-        defines {'CETECH1_WINDOWS'}
+        defines {'CETECH_WINDOWS'}
 
     filter {}
-end
---------------------------------------------------------------------------------
-solution "cyberego.org tech1"
-    configurations {"Debug", "Release"}
-    platforms {"native", "x32", "x64"}
-
-    toolchain (BUILD_DIR)
 --------------------------------------------------------------------------------
 project "tech1_static"
     kind "StaticLib"
@@ -107,10 +106,6 @@ project "tech1_test"
       'tech1_static'
     }
 
-    defines {
-      'CETECH1_SIMD_FPU'
-    }
-
     includedirs {
       ROOT_DIR .. "tests"
     }
@@ -125,10 +120,6 @@ project "tech1_test"
 project "tech1"
     kind "ConsoleApp"
     language "C++"
-
-    defines {
-      'CETECH1_SIMD_FPU'
-    }
 
     files {
         ROOT_DIR .. "src/runtime/*.cc",

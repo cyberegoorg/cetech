@@ -148,7 +148,7 @@ namespace cetech1 {
             q._size -= n;
         }
 
-        template < typename T > void push(Queue < T >& q, const T* items, const uint32_t n) {
+        template < typename T > void push(Queue < T >& q, const T* items, uint32_t n) {
             if (space(q) < n) {
                 queue_internal::grow(q, size(q) + n);
             }
@@ -160,11 +160,11 @@ namespace cetech1 {
                 to_insert = size - insert;
             }
 
-            memcpy(array::begin(q._data) + insert, items, to_insert * sizeof(T));
+            memory::memcpy(array::begin(q._data) + insert, items, to_insert * sizeof(T));
             q._size += to_insert;
             items += to_insert;
             n -= to_insert;
-            memcpy(array::begin(q._data), items, n * sizeof(T));
+            memory::memcpy(array::begin(q._data), items, n * sizeof(T));
             q._size += n;
         }
 

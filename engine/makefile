@@ -32,8 +32,12 @@ PREMAKE5 := $(ROOT_DIR)/../3rdparty/.build/bin/$(OS)$(ARCH)/premake5
 .PHONY: analyze
 analyze:
 	@echo Analyze...
-	cppcheck --template=gcc -I ./3rdparty/include/ --enable=all --inconclusive --std=posix ./src/
+	cppcheck --template=gcc -I ../3rdparty/.build/include/ --enable=all --inconclusive --std=posix ./src/
 
+.PHONY: scan-build
+scan-build: clean
+	scan-build -analyze-headers make -C ${ROOT_DIR} -j 4 test-linux-debug
+	
 .PHONY: uncrustify
 uncrustify:
 	@echo Uncrustify...
@@ -67,8 +71,10 @@ clean-doc:
 #########
 # Linux #
 #########
+LINUX_SIMD = fpu
+
 .build/projects/gmake:
-	$(PREMAKE5) --file=premake5.lua gmake
+	$(PREMAKE5) --file=premake5.lua --simd=$(LINUX_SIMD) gmake
 
 .PHONY: linux-all
 linux-all: linux-debug32 linux-release32 linux-debug64 linux-release64
@@ -81,11 +87,11 @@ linux-release: linux-release${ARCH}
 
 .PHONY: linux-debug32
 linux-debug32:  .build/projects/gmake
-	+${MAKE} -C .build/projects/gmake config=debug_x32
+	+${MAKE} -C .build/projects/gmake config=debug_x32 
 
 .PHONY: linux-release32
 linux-release32: .build/projects/gmake
-	+${MAKE} -C .build/projects/gmake config=release_x32
+	+${MAKE} -C .build/projects/gmake config=release_x32 
 
 .PHONY: linux-debug64
 linux-debug64: .build/projects/gmake
@@ -115,11 +121,13 @@ test-linux-release-travis: linux-release
 #################
 # Visual studio #
 #################
+WINDOWS_SIMD = fpu
+
 .build/projects/vs2013:
-	$(PREMAKE5) --file=premake5.lua vs2013
+	$(PREMAKE5) --file=premake5.lua --simd=$(WINDOWS_SIMD) vs2013
 
 .build/projects/vs2015:
-	$(PREMAKE5) --file=premake5.lua vs2015
+	$(PREMAKE5) --file=premake5.lua --simd=$(WINDOWS_SIMD) vs2015
 
 vs2013: .build/projects/vs2013
 vs2015: .build/projects/vs2015
