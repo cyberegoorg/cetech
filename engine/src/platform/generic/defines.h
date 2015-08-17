@@ -1,5 +1,5 @@
 #pragma once
 
-#if defined(CETECH_FORCE_INLINE_OFF)
-  #define FORCE_INLINE inline
+#if defined(CETECH_CE_INLINE_OFF)
+  #define CE_INLINE inline
 #endif

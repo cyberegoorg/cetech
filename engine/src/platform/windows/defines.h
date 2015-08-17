@@ -1,5 +1,5 @@
 #pragma once
 
-#if !defined(FORCE_INLINE)
-  #define FORCE_INLINE __forceinline
+#if !defined(CE_INLINE)
+  #define CE_INLINE __forceinline
 #endif

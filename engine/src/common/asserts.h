@@ -52,7 +52,7 @@ namespace cetech1 {
     /*!
      * No operation fce.
      */
-    FORCE_INLINE void ce_noop();
+    CE_INLINE void ce_noop();
 
     /*!
      * This fce print assert message.
@@ -62,7 +62,7 @@ namespace cetech1 {
      * \param line Line.
      * \param fce Fce name.
      */
-    FORCE_INLINE void ce_assert(const char* condition_str, const char* file, const int line, const char* fce);
+    CE_INLINE void ce_assert(const char* condition_str, const char* file, const int line, const char* fce);
 
     /*!
      * This fce print assert message.
@@ -73,7 +73,7 @@ namespace cetech1 {
      * \param line Line.
      * \param fce Fce name.
      */
-    FORCE_INLINE void ce_assert_msg(const char* where,
+    CE_INLINE void ce_assert_msg(const char* where,
                                     const char* what,
                                     const char* file,
                                     const int line,
@@ -84,18 +84,18 @@ namespace cetech1 {
      * \param file File.
      * \param line Line.
      */
-    FORCE_INLINE void ce_check_ptr(const char* file, const int line);
+    CE_INLINE void ce_check_ptr(const char* file, const int line);
 }
 
 namespace cetech1 {
-    FORCE_INLINE void ce_noop() {}
+    CE_INLINE void ce_noop() {}
 
-    FORCE_INLINE void ce_assert(const char* condition_str, const char* file, const int line, const char* fce) {
+    CE_INLINE void ce_assert(const char* condition_str, const char* file, const int line, const char* fce) {
         std::fprintf(stderr, "ASSERT: \'%s\' in %s:%i:%s().", condition_str, SHORT_FILE(file), line, fce);
         abort();
     }
 
-    FORCE_INLINE void ce_assert_msg(const char* where,
+    CE_INLINE void ce_assert_msg(const char* where,
                                     const char* what,
                                     const char* file,
                                     const int line,
@@ -104,7 +104,7 @@ namespace cetech1 {
         abort();
     }
 
-    FORCE_INLINE void ce_check_ptr(const char* file, const int line) {
+    CE_INLINE void ce_check_ptr(const char* file, const int line) {
         std::fprintf(stderr, "ASSERT(CHECK POINTER): in file %s on line %i is invalid pointer.", SHORT_FILE(file), line);
         abort();
     }

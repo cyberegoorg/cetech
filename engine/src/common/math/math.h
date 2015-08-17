@@ -38,7 +38,7 @@ namespace cetech1 {
          * \return greater of two numbers.
          */
         template < class T >
-        FORCE_INLINE T max( const T a, const T b);
+        CE_INLINE T max( const T a, const T b);
 
         /*! Return smaller of two numbers.
          * \param a First number.
@@ -46,7 +46,7 @@ namespace cetech1 {
          * \return smaller of two numbers.
          */
         template < class T >
-        FORCE_INLINE T min( const T a, const T b);
+        CE_INLINE T min( const T a, const T b);
 
         /*! Clamps a value between a minimum and maximum value.
          * \param a Value.
@@ -55,13 +55,13 @@ namespace cetech1 {
          * \return Value between a minimum and maximum.
          */
         template < class T >
-        FORCE_INLINE T clamp( const T a, const T min, const T max);
+        CE_INLINE T clamp( const T a, const T min, const T max);
 
         /*! Return absolute value.
          * \param a Number.
          * \return Absolute value
          */
-        template < class T > FORCE_INLINE T
+        template < class T > T
         abs( const T a);
 
         /*! Compare two floats.
@@ -69,51 +69,51 @@ namespace cetech1 {
          * \param f2 Float 2.
          * \param epsilon Epsilon.
          */
-        FORCE_INLINE bool almost_equal(const float f1, const float f2, const float epsilon = FLOAT_SMALL_NUMBER);
+        CE_INLINE bool almost_equal(const float f1, const float f2, const float epsilon = FLOAT_SMALL_NUMBER);
 
 
         /*! X * X
          * \param x
          * \return x * x
          */
-        FORCE_INLINE float square(const float x);
+        CE_INLINE float square(const float x);
 
         /*! Fast version of sqrt.
          * \param number Number.
          * \return sqrt.
          */
-        FORCE_INLINE float fast_sqrt(const float number);
+        CE_INLINE float fast_sqrt(const float number);
 
         /*! Fast version of invert sqrt.
          * \param number Number.
          * \return invert sqrt.
          */
-        FORCE_INLINE float inv_sqrt(const float number);
+        CE_INLINE float inv_sqrt(const float number);
 
         /*! Deg to Rad.
          * \param deg Deg.
          * \return Rad.
          */
-        FORCE_INLINE float deg2rad(const float deg);
+        CE_INLINE float deg2rad(const float deg);
 
         /*! Rad to Deg.
          * \param rad Deg.
          * \return Deg.
          */
-        FORCE_INLINE float rad2deg(const float rad);
+        CE_INLINE float rad2deg(const float rad);
 
         /*! Fast version of sin.
          * \param angle_deg Angle in deg.
          * \return sin
          */
-        FORCE_INLINE float fast_sin(const float angle_deg);
+        CE_INLINE float fast_sin(const float angle_deg);
 
         /*! Fast version of sin, cos.
          * \param angle_deg Angle in deg.
          * \param sin Sin.
          * \param cos Cos.
          */
-        FORCE_INLINE void fast_sincos(const float angle_deg, float& sin, float& cos);
+        CE_INLINE void fast_sincos(const float angle_deg, float& sin, float& cos);
 
         /*! Return value based on value a. (  )
          * \param a Input value.
@@ -121,42 +121,42 @@ namespace cetech1 {
          * \param lt_zero Value for a <= 0.0f.
          * \return a >= 0.0f ? ge_zero : lt_zero
          */
-        FORCE_INLINE float float_select(const float a, const float ge_zero, const float lt_zero);
+        CE_INLINE float float_select(const float a, const float ge_zero, const float lt_zero);
     }
 
 
     namespace math {
         template < class T >
-        FORCE_INLINE T max( const T a, const T b) {
+         T max( const T a, const T b) {
             return (a >= b) ? a : b;
         }
 
         template < class T >
-        FORCE_INLINE T min( const T a, const T b) {
+         T min( const T a, const T b) {
             return (a <= b) ? a : b;
         }
 
         template < class T >
-        FORCE_INLINE T abs( const T a) {
+         T abs( const T a) {
             return (a >= 0) ? a : -a;
         }
 
         template < >
-        FORCE_INLINE float abs( const float a) {
+         CE_INLINE float abs( const float a) {
             const int y = (int&)a & 0x7FFFFFFF;
             return (float&)y;
         }
 
         template < class T >
-        FORCE_INLINE T clamp( const T a, const T min, const T max) {
+         T clamp( const T a, const T min, const T max) {
             return (a < min ? min : (a < max ? a : max));
         }
 
-        FORCE_INLINE bool almost_equal(const float f1, const float f2, float epsilon) {
+         bool almost_equal(const float f1, const float f2, float epsilon) {
             return abs(f1 - f2) < epsilon;
         }
 
-        FORCE_INLINE float fast_sqrt(const float number) {
+         float fast_sqrt(const float number) {
             const float xhalf = 0.5f * number;
 
             union {
@@ -169,7 +169,7 @@ namespace cetech1 {
             return number * u.x * (1.5f - xhalf * u.x * u.x); // Newton step, repeating increases accuracy
         }
 
-        FORCE_INLINE float inv_sqrt(const float number) {
+         float inv_sqrt(const float number) {
             return 1.0f / fast_sqrt(number);
             //             long i;
             //             float x2, y;
@@ -186,21 +186,21 @@ namespace cetech1 {
             //             return y;
         }
 
-        FORCE_INLINE float square(const float x) {
+         float square(const float x) {
             return x * x;
         }
 
-        FORCE_INLINE float deg2rad(const float deg) {
+         float deg2rad(const float deg) {
             static const float to_rad = 3.14159265358979323846f / 180.0f;
             return deg * to_rad;
         }
 
-        FORCE_INLINE float rad2deg(const float rad) {
+         float rad2deg(const float rad) {
             static const float to_deg = 180.0f / 3.14159265358979323846f;
             return rad * to_deg;
         }
 
-        FORCE_INLINE float fast_sin(const float angle_deg) {
+         float fast_sin(const float angle_deg) {
             float angle_rad = deg2rad(angle_deg);
 
             if (PI < angle_rad) {
@@ -215,12 +215,12 @@ namespace cetech1 {
                      (0.00833333f - angle_rad * angle_rad * (0.0001984f - angle_rad * angle_rad * 0.0000027f))));
         }
 
-        FORCE_INLINE void fast_sincos(const float angle_deg, float& sin, float& cos) {
+         void fast_sincos(const float angle_deg, float& sin, float& cos) {
             sin = fast_sin(angle_deg);
             cos = fast_sqrt(1 - sin * sin);
         }
 
-        FORCE_INLINE float float_select(const float a, const float ge_zero, const float lt_zero) {
+         float float_select(const float a, const float ge_zero, const float lt_zero) {
             return a >= 0.0f ? ge_zero : lt_zero;
         }
     }
