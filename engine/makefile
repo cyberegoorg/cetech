@@ -32,7 +32,7 @@ PREMAKE5 := $(ROOT_DIR)/../3rdparty/.build/bin/$(OS)$(ARCH)/premake5
 .PHONY: analyze
 analyze:
 	@echo Analyze...
-	cppcheck --template=gcc -I ../3rdparty/.build/include/ --enable=all --inconclusive --std=posix ./src/
+	cppcheck --template=gcc --enable=all --inconclusive --std=posix ./src/
 
 .PHONY: scan-build
 scan-build: clean
@@ -116,6 +116,8 @@ test-linux-debug-travis: linux-debug
 .PHONY: test-linux-release-travis
 test-linux-release-travis: linux-release
 	.build/linux${ARCH}/bin/tech1_test -d yes
+	
+test-linux-travis: test-linux-debug-travis test-linux-release-travis
 #########
 
 #################

@@ -10,5 +10,5 @@ before_script:
   - sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-4.8 90
 
 script:
- - make -j 2 -C ./engine/ test-$TRAVIS_OS_NAME-debug-travis
+ - make -j 2 -C ./engine/ test-$TRAVIS_OS_NAME-travis
 

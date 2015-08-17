@@ -53,7 +53,7 @@ namespace {
 
             virtual void* allocate(const uint32_t size, const uint32_t align) {
                 const uint32_t ts = size_with_padding(size, align);
-                Header* h = (Header*)malloc(ts);
+                Header* h = (Header*)memory::malloc(ts);
                 void* p = data_pointer(h, align);
                 fill(h, p, ts);
                 _total_allocated += ts;

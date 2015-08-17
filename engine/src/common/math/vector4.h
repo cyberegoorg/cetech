@@ -49,93 +49,93 @@ namespace cetech1 {
          * \param w W
          * \return New vector
          */
-        FORCE_INLINE Vector4 make_vector4(const float x, const float y, const float z, const float w);
+        CE_INLINE Vector4 make_vector4(const float x, const float y, const float z, const float w);
 
 
         /*! Vector len
          * \param v1 Vector.
          * \return Vector len.
          */
-        FORCE_INLINE float len(const Vector4& v1);
+        CE_INLINE float len(const Vector4& v1);
 
         /*! Vector squared len.
          * \param v1 Vector.
          * \return Vector squared len.
          */
-        FORCE_INLINE float len_sq(const Vector4& v1);
+        CE_INLINE float len_sq(const Vector4& v1);
 
         /*! Vector 1/len
          * \param v1 Vector.
          * \return Vector 1/len.
          */
-        FORCE_INLINE float len_inv(const Vector4& v1);
+        CE_INLINE float len_inv(const Vector4& v1);
 
 
         /*! Return normalized vector.
          * \param v1 Vector.
          * \return Normalized vector.
          */
-        FORCE_INLINE Vector4 normalized(const Vector4& v1);
+        CE_INLINE Vector4 normalized(const Vector4& v1);
 
         /*! Is vector normalized?
          * \param v1 Vector.
          * \return True if vector is normalized.
          */
-        FORCE_INLINE bool is_normalized(const Vector4& v1);
+        CE_INLINE bool is_normalized(const Vector4& v1);
 
         /*! Dot product.
          * \param v1 Vector 1.
          * \param v2 Vector 2.
          * \return Dot product.
          */
-        FORCE_INLINE float dot(const Vector4& v1, const Vector4& v2);
+        CE_INLINE float dot(const Vector4& v1, const Vector4& v2);
 
         /*! Squared distance between two point.
          * \param v1 Point 1.
          * \param v2 Point 2.
          * \return Squared distace.
          */
-        FORCE_INLINE float distance_sq(const Vector4& v1, const Vector4& v2);
+        CE_INLINE float distance_sq(const Vector4& v1, const Vector4& v2);
 
         /*! Distance between two point.
          * \param v1 Point 1.
          * \param v2 Point 2.
          * \return Distace.
          */
-        FORCE_INLINE float distance(const Vector4& v1, const Vector4& v2);
+        CE_INLINE float distance(const Vector4& v1, const Vector4& v2);
 
 
         /*! Get minimal value from vector element.
          * \param v1 Vector.
          * \return Minimal value from vector element.
          */
-        FORCE_INLINE float min(const Vector4& v1);
+        CE_INLINE float min(const Vector4& v1);
 
         /*! Get maximum value from vector element.
          * \param v1 Vector.
          * \return Maximum value from vector element.
          */
-        FORCE_INLINE float max(const Vector4& v1);
+        CE_INLINE float max(const Vector4& v1);
 
         /*! Get maximum absolute value from vector element.
          * \param v1 Vector.
          * \return Absolute maximum value from vector element.
          */
-        FORCE_INLINE float abs_max(const Vector4& v1);
+        CE_INLINE float abs_max(const Vector4& v1);
 
         /*! Get sign vector.
          * if element is positive return 1.0f else -1.0f.
          * \param v1 Vector.
          * \return Sign vector.
          */
-        FORCE_INLINE Vector4 sign_vector(const Vector4& v1);
+        CE_INLINE Vector4 sign_vector(const Vector4& v1);
     }
 
     /*! Return negativ vector.
      * \param v1 Vector.
      * \return -v1
      */
-    FORCE_INLINE Vector4 operator - (const Vector4 &v1);
+    CE_INLINE Vector4 operator - (const Vector4 &v1);
 
 
     /*! V1 + V2
@@ -143,28 +143,28 @@ namespace cetech1 {
      * \param v2 Vector4.
      * \return V1 + V2.
      */
-    FORCE_INLINE Vector4 operator + (const Vector4 &v1, const Vector4 &v2);
+    CE_INLINE Vector4 operator + (const Vector4 &v1, const Vector4 &v2);
 
     /*! V1 - V2
      * \param v1 Vector1.
      * \param v2 Vector4.
      * \return V1 - V2.
      */
-    FORCE_INLINE Vector4 operator - (const Vector4 &v1, const Vector4 &v2);
+    CE_INLINE Vector4 operator - (const Vector4 &v1, const Vector4 &v2);
 
     /*! V1 * V2 [x1 * x2, y1 * y2, z1 * z2]
      * \param v1 Vector1.
      * \param v2 Vector4.
      * \return [x1*x2, y1 * y2, z1 * z2]
      */
-    FORCE_INLINE Vector4 operator* (const Vector4 &v1, const Vector4 &v2);
+    CE_INLINE Vector4 operator* (const Vector4 &v1, const Vector4 &v2);
 
     /*! V1 / V2 [x1 / x2, y1 / y2, z1 / z2]
      * \param v1 Vector1.
      * \param v2 Vector4.
      * \return [x1 / x2, y1 / y2, z1 / z2]
      */
-    FORCE_INLINE Vector4 operator / (const Vector4 &v1, const Vector4 &v2);
+    CE_INLINE Vector4 operator / (const Vector4 &v1, const Vector4 &v2);
 
 
     /*! V1 * scalar
@@ -172,49 +172,49 @@ namespace cetech1 {
      * \param s ScalarVector4.
      * \return V1 * scalar
      */
-    FORCE_INLINE Vector4 operator* (const Vector4 &v1, const float s);
+    CE_INLINE Vector4 operator* (const Vector4 &v1, const float s);
 
     /*! V1 / scalar
      * \param v1 Vector1.
      * \param s ScalarVector4.
      * \return V1 / scalar
      */
-    FORCE_INLINE Vector4 operator / (const Vector4 &v1, const float s);
+    CE_INLINE Vector4 operator / (const Vector4 &v1, const float s);
 
 
 
     namespace vector4 {
-        FORCE_INLINE Vector4 make_vector4(const float x, const float y, const float z, const float w) {
+         Vector4 make_vector4(const float x, const float y, const float z, const float w) {
             return {
                        x, y, z, w
             };
         }
 
-        FORCE_INLINE float len(const Vector4& v1) {
+         float len(const Vector4& v1) {
             return math::fast_sqrt(len_sq(v1));
         }
 
-        FORCE_INLINE float len_sq(const Vector4& v1) {
+         float len_sq(const Vector4& v1) {
             return dot(v1, v1);
         }
 
-        FORCE_INLINE float len_inv(const Vector4& v1) {
+         float len_inv(const Vector4& v1) {
             return math::inv_sqrt(len_sq(v1));
         }
 
-        FORCE_INLINE Vector4 normalized(const Vector4& v1) {
+         Vector4 normalized(const Vector4& v1) {
             return v1 * len_inv(v1);
         }
 
-        FORCE_INLINE bool is_normalized(const Vector4& v1) {
+         bool is_normalized(const Vector4& v1) {
             return math::abs(1.0f - len_sq(v1)) < 0.001f;
         }
 
-        FORCE_INLINE float dot(const Vector4& v1, const Vector4& v2) {
+         float dot(const Vector4& v1, const Vector4& v2) {
             return (v1.x * v2.x) + (v1.y * v2.y) + (v1.z * v2.z) + (v1.w * v2.w);
         }
 
-        //         FORCE_INLINE Vector4 cross(const Vector4& v1, const Vector4& v2) {
+        //          Vector4 cross(const Vector4& v1, const Vector4& v2) {
         //        (void)v1;
         //        (void)v2;
         //        // TODO: !!!
@@ -225,28 +225,28 @@ namespace cetech1 {
         // //                 );
         //         }
 
-        FORCE_INLINE float distance_sq(const Vector4& v1, const Vector4& v2) {
+         float distance_sq(const Vector4& v1, const Vector4& v2) {
             return math::square(v2.x - v1.x) + math::square(v2.y - v1.y) + math::square(v2.z - v1.z) + math::square(
                 v2.w - v1.w);
         }
 
-        FORCE_INLINE float distance(const Vector4& v1, const Vector4& v2) {
+         float distance(const Vector4& v1, const Vector4& v2) {
             return math::fast_sqrt(distance_sq(v1, v2));
         }
 
-        FORCE_INLINE float min(const Vector4& v1) {
+         float min(const Vector4& v1) {
             return math::min(math::min(math::min(v1.x, v1.y), v1.z), v1.w);
         }
 
-        FORCE_INLINE float max(const Vector4& v1) {
+         float max(const Vector4& v1) {
             return math::max(math::max(math::max(v1.x, v1.y), v1.z), v1.w);
         }
 
-        FORCE_INLINE float abs_max(const Vector4& v1) {
+         float abs_max(const Vector4& v1) {
             return math::max(math::max(math::max(math::abs(v1.x), math::abs(v1.y)), math::abs(v1.z)), math::abs(v1.w));
         }
 
-        FORCE_INLINE Vector4 sign_vector(const Vector4& v1) {
+         Vector4 sign_vector(const Vector4& v1) {
             return make_vector4(
                 math::float_select(v1.x, 1.0f, -1.0f),
                 math::float_select(v1.y, 1.0f, -1.0f),
@@ -256,7 +256,7 @@ namespace cetech1 {
         }
     }
 
-    FORCE_INLINE Vector4 operator - (const Vector4 &v1) {
+     Vector4 operator - (const Vector4 &v1) {
         return vector4::make_vector4(
             -v1.x,
             -v1.y,
@@ -265,7 +265,7 @@ namespace cetech1 {
             );
     }
 
-    FORCE_INLINE Vector4 operator + (const Vector4 &v1, const Vector4 &v2) {
+     Vector4 operator + (const Vector4 &v1, const Vector4 &v2) {
         return vector4::make_vector4(
             v1.x + v2.x,
             v1.y + v2.y,
@@ -274,7 +274,7 @@ namespace cetech1 {
             );
     }
 
-    FORCE_INLINE Vector4 operator - (const Vector4 &v1, const Vector4 &v2) {
+     Vector4 operator - (const Vector4 &v1, const Vector4 &v2) {
         return vector4::make_vector4(
             v1.x - v2.x,
             v1.y - v2.y,
@@ -283,7 +283,7 @@ namespace cetech1 {
             );
     }
 
-    FORCE_INLINE Vector4 operator* (const Vector4 &v1, const Vector4 &v2) {
+     Vector4 operator* (const Vector4 &v1, const Vector4 &v2) {
         return vector4::make_vector4(
             v1.x * v2.x,
             v1.y * v2.y,
@@ -292,7 +292,7 @@ namespace cetech1 {
             );
     }
 
-    FORCE_INLINE Vector4 operator / (const Vector4 &v1, const Vector4 &v2) {
+     Vector4 operator / (const Vector4 &v1, const Vector4 &v2) {
         return vector4::make_vector4(
             v1.x / v2.x,
             v1.y / v2.y,
@@ -301,7 +301,7 @@ namespace cetech1 {
             );
     }
 
-    FORCE_INLINE Vector4 operator* (const Vector4 &v1, const float s) {
+     Vector4 operator* (const Vector4 &v1, const float s) {
         return vector4::make_vector4(
             v1.x * s,
             v1.y * s,
@@ -310,7 +310,7 @@ namespace cetech1 {
             );
     }
 
-    FORCE_INLINE Vector4 operator / (const Vector4 &v1, const float s) {
+     Vector4 operator / (const Vector4 &v1, const float s) {
         const float inv_s = 1 / s;
 
         return vector4::make_vector4(

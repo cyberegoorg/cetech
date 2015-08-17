@@ -52,7 +52,7 @@ solution "cyberego.org tech1"
         defines {
 	  "DEBUG",
 	  "CETECH_DEBUG",
-	  "CETECH_FORCE_INLINE_OFF",
+	  "CETECH_CE_INLINE_OFF",
 	}
 
         flags {"Symbols"}

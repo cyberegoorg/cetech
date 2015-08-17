@@ -1,5 +1,5 @@
 #pragma once
 
-#if !defined(FORCE_INLINE)
-  #define FORCE_INLINE inline __attribute__ ((always_inline))
+#if !defined(CE_INLINE)
+  #define CE_INLINE inline __attribute__ ((always_inline))
 #endif
