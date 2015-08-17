@@ -59,11 +59,11 @@ TEST_CASE( "Math operation", "[math]" ) {
         REQUIRE_ALMOST3( root, 2.0f, 0.01f); // TODO: fast_sqrt... numerical error =(
     }
 
-//     SECTION( "inv_sqrt()" ) {
-//      float inv_root = cetech1::math::inv_sqrt(4.0f);
-//
-//      REQUIRE_ALMOST3( inv_root, 0.5f, 0.01f); // TODO: inv_sqrt... numerical error =(
-//     }
+    //     SECTION( "inv_sqrt()" ) {
+    //      float inv_root = cetech1::math::inv_sqrt(4.0f);
+    //
+    //      REQUIRE_ALMOST3( inv_root, 0.5f, 0.01f); // TODO: inv_sqrt... numerical error =(
+    //     }
 
     SECTION( "deg2rad()" ) {
         float rad = cetech1::math::deg2rad(90);

@@ -214,16 +214,16 @@ namespace cetech1 {
             return (v1.x * v2.x) + (v1.y * v2.y) + (v1.z * v2.z) + (v1.w * v2.w);
         }
 
-//         FORCE_INLINE Vector4 cross(const Vector4& v1, const Vector4& v2) {
-//        (void)v1;
-//        (void)v2;
-//        // TODO: !!!
-//        //             return make_vector4(
-// //                 (v1.y * v2.z) - (v1.z * v2.y),
-// //                 (v1.z * v2.x) - (v1.x * v2.z),
-// //                 (v1.x * v2.y) - (v1.y * v2.x),
-// //                 );
-//         }
+        //         FORCE_INLINE Vector4 cross(const Vector4& v1, const Vector4& v2) {
+        //        (void)v1;
+        //        (void)v2;
+        //        // TODO: !!!
+        //        //             return make_vector4(
+        // //                 (v1.y * v2.z) - (v1.z * v2.y),
+        // //                 (v1.z * v2.x) - (v1.x * v2.z),
+        // //                 (v1.x * v2.y) - (v1.y * v2.x),
+        // //                 );
+        //         }
 
         FORCE_INLINE float distance_sq(const Vector4& v1, const Vector4& v2) {
             return math::square(v2.x - v1.x) + math::square(v2.y - v1.y) + math::square(v2.z - v1.z) + math::square(

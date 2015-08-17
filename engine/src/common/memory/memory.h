@@ -6,50 +6,50 @@
 
 namespace cetech1 {
 
-/*! Abstract allocator.
- */
+    /*! Abstract allocator.
+     */
     class Allocator {
-    public:
-	    static const uint32_t DEFAULT_ALIGN = 4;              //!< Default align.
-	    static const uint32_t SIZE_NOT_TRACKED = 0xffffffffu; //!< Size not tracked
+        public:
+            static const uint32_t DEFAULT_ALIGN = 4;              //!< Default align.
+            static const uint32_t SIZE_NOT_TRACKED = 0xffffffffu; //!< Size not tracked
 
-    public:
-	    Allocator() {};
-	    virtual ~Allocator() {};
+        public:
+            Allocator() {};
+            virtual ~Allocator() {};
 
-    public:
-	    /*! Allocate memory.
-	    * \param size Alloc size.
-	    * \param align align.
-	    * \return Pointer to new memory.
-	    */
-	    virtual void* allocate(uint32_t size, uint32_t align = DEFAULT_ALIGN) = 0;
+        public:
+            /*! Allocate memory.
+             * \param size Alloc size.
+             * \param align align.
+             * \return Pointer to new memory.
+             */
+            virtual void* allocate(uint32_t size, uint32_t align = DEFAULT_ALIGN) = 0;
 
-	    /*! Deallocate memory.
-	    * \param p Pointer to memory.
-	    */
-	    virtual void deallocate(void* p) = 0;
+            /*! Deallocate memory.
+             * \param p Pointer to memory.
+             */
+            virtual void deallocate(void* p) = 0;
 
-    public:
-	    /*! Get allocated size of memory.
-	    * \param p Pointer to memory.
-	    * \return Allocated size or SIZE_NOT_TRACKED if allocator does not track size.
-	    */
-	    virtual uint32_t allocated_size(void* p) = 0;
+        public:
+            /*! Get allocated size of memory.
+             * \param p Pointer to memory.
+             * \return Allocated size or SIZE_NOT_TRACKED if allocator does not track size.
+             */
+            virtual uint32_t allocated_size(void* p) = 0;
 
-	    /*! Total allocated memory.
-	    * \return Total allocated memory or SIZE_NOT_TRACKED if allocator does not track size.
-	    */
-	    virtual uint32_t total_allocated() = 0;
+            /*! Total allocated memory.
+             * \return Total allocated memory or SIZE_NOT_TRACKED if allocator does not track size.
+             */
+            virtual uint32_t total_allocated() = 0;
 
-    private:
-	    Allocator(const Allocator &other) {
-		(void)other;
-	    };
-	    Allocator& operator = (const Allocator &other) {
-		(void)other; return *this;
-	    };
-	};
+        private:
+            Allocator(const Allocator &other) {
+                (void)other;
+            };
+            Allocator& operator = (const Allocator &other) {
+                (void)other; return *this;
+            };
+    };
 
     namespace memory_globals {
         /*! Init global memory.

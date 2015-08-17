@@ -87,7 +87,7 @@ namespace cetech1 {
      * \return Q1 * Q2.
      */
     FORCE_INLINE Quat operator* (const Quat &q1, const Quat &q2);
-    
+
     /*! Q1 * V1
      * \param q1 Quaternion.
      * \param v1 VectorQuaternion.

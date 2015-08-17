@@ -5,7 +5,7 @@
 #include "../types.h"
 
 namespace cetech1 {
-  
+
     /*! Math
      */
     namespace math {
@@ -21,10 +21,10 @@ namespace cetech1 {
          */
         constexpr float HALF_PI = 1.57079632679f;
 
-	/*! e
+        /*! e
          */
-	constexpr float EULERS_NUMBER = 2.71828182845904523536f;
-	
+        constexpr float EULERS_NUMBER = 2.71828182845904523536f;
+
         constexpr float DOUBLE_SMALL_NUMBER = 1.e-8f;
         constexpr float FLOAT_SMALL_NUMBER = 1.e-4f;
         constexpr float BIG_NUMBER = .4e+38f;
@@ -71,56 +71,56 @@ namespace cetech1 {
          */
         FORCE_INLINE bool almost_equal(const float f1, const float f2, float epsilon = FLOAT_SMALL_NUMBER);
 
-	
-	/*! X * X
-	 * \param x
-	 * \return x * x
-	 */
+
+        /*! X * X
+         * \param x
+         * \return x * x
+         */
         FORCE_INLINE float square(float x);
-	
-	/*! Fast version of sqrt.
-	 * \param number Number.
-	 * \return sqrt.
-	 */
+
+        /*! Fast version of sqrt.
+         * \param number Number.
+         * \return sqrt.
+         */
         FORCE_INLINE float fast_sqrt(const float number);
-	
-	/*! Fast version of invert sqrt.
-	 * \param number Number.
-	 * \return invert sqrt.
-	 */
+
+        /*! Fast version of invert sqrt.
+         * \param number Number.
+         * \return invert sqrt.
+         */
         FORCE_INLINE float inv_sqrt(const float number);
 
-	/*! Deg to Rad.
-	 * \param deg Deg.
-	 * \return Rad.
-	 */
+        /*! Deg to Rad.
+         * \param deg Deg.
+         * \return Rad.
+         */
         FORCE_INLINE float deg2rad(float deg);
-	
-	/*! Rad to Deg.
-	 * \param rad Deg.
-	 * \return Deg.
-	 */
+
+        /*! Rad to Deg.
+         * \param rad Deg.
+         * \return Deg.
+         */
         FORCE_INLINE float rad2deg(float rad);
 
-	/*! Fast version of sin.
-	 * \param angle_deg Angle in deg.
-	 * \return sin
-	 */
+        /*! Fast version of sin.
+         * \param angle_deg Angle in deg.
+         * \return sin
+         */
         FORCE_INLINE float fast_sin(float angle_deg);
-	
-	/*! Fast version of sin, cos.
-	 * \param angle_deg Angle in deg.
-	 * \param sin Sin.
-	 * \param cos Cos.
-	 */
+
+        /*! Fast version of sin, cos.
+         * \param angle_deg Angle in deg.
+         * \param sin Sin.
+         * \param cos Cos.
+         */
         FORCE_INLINE void fast_sincos(float angle_deg, float& sin, float& cos);
 
-	/*! Return value based on value a. (  )
-	 * \param a Input value.
-	 * \param ge_zero Value for a >= 0.0f.
-	 * \param lt_zero Value for a <= 0.0f.
-	 * \return a >= 0.0f ? ge_zero : lt_zero
-	 */
+        /*! Return value based on value a. (  )
+         * \param a Input value.
+         * \param ge_zero Value for a >= 0.0f.
+         * \param lt_zero Value for a <= 0.0f.
+         * \return a >= 0.0f ? ge_zero : lt_zero
+         */
         FORCE_INLINE float float_select(const float a, const float ge_zero, const float lt_zero);
     }
 
@@ -171,19 +171,19 @@ namespace cetech1 {
 
         FORCE_INLINE float inv_sqrt(const float number) {
             return 1.0f / fast_sqrt(number);
-//             long i;
-//             float x2, y;
-//             const float threehalfs = 1.5F;
-//
-//             x2 = number * 0.5F;
-//             y = number;
-//             i = *(long*) &y;           // evil floating point bit level hacking
-//             i = 0x5f3759df - (i >> 1); // what the fuck?
-//             y = *(float*) &i;
-//             y = y * (threehalfs - (x2 * y * y));    // 1st iteration
-//             //y  = y * ( threehalfs - ( x2 * y * y ) ); // 2nd iteration, this can be removed
-//
-//             return y;
+            //             long i;
+            //             float x2, y;
+            //             const float threehalfs = 1.5F;
+            //
+            //             x2 = number * 0.5F;
+            //             y = number;
+            //             i = *(long*) &y;           // evil floating point bit level hacking
+            //             i = 0x5f3759df - (i >> 1); // what the fuck?
+            //             y = *(float*) &i;
+            //             y = y * (threehalfs - (x2 * y * y));    // 1st iteration
+            //             //y  = y * ( threehalfs - ( x2 * y * y ) ); // 2nd iteration, this can be removed
+            //
+            //             return y;
         }
 
         FORCE_INLINE float square(float x) {
