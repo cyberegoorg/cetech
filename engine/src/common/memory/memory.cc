@@ -82,7 +82,7 @@ namespace {
         private:
             uint32_t _total_allocated;
 
-            static inline uint32_t size_with_padding(const uint32_t size,const  uint32_t align) {
+            static inline uint32_t size_with_padding(const uint32_t size, const uint32_t align) {
                 return size + align + sizeof(Header);
             }
     };
