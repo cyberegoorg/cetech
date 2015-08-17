@@ -7,7 +7,7 @@
 namespace cetech1 {
 
     /*! Array container.
-    */
+     */
     template < typename T > struct Array {
         /*! Create array.
          * \param a Allocator.
@@ -44,8 +44,8 @@ namespace cetech1 {
     };
 
 
-/*! Hash map.
- */
+    /*! Hash map.
+     */
     template < typename T > struct Hash {
         /*! Create hash map
          * \param a Allocator
@@ -68,9 +68,9 @@ namespace cetech1 {
         Array < Entry > _data;       //!< Data.
     };
 
-/*!
- * A double-ended queue/ring buffer.
- */
+    /*!
+     * A double-ended queue/ring buffer.
+     */
     template < typename T > struct Queue {
         /*! Create queue
          * \param a Allocator

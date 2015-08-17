@@ -40,46 +40,46 @@ namespace {
     }
 
     class MallocAllocator : public Allocator {
-public:
-        MallocAllocator() : _total_allocated(0) {}
+        public:
+            MallocAllocator() : _total_allocated(0) {}
 
-        ~MallocAllocator() {
-            assert(_total_allocated == 0);
-        }
-
-        virtual void* allocate(uint32_t size, uint32_t align) {
-            const uint32_t ts = size_with_padding(size, align);
-            Header* h = (Header*)malloc(ts);
-            void* p = data_pointer(h, align);
-            fill(h, p, ts);
-            _total_allocated += ts;
-            return p;
-        }
-
-        virtual void deallocate(void* p) {
-            if (!p) {
-                return;
+            ~MallocAllocator() {
+                assert(_total_allocated == 0);
             }
 
-            Header* h = header(p);
-            _total_allocated -= h->size;
-            free(h);
-        }
+            virtual void* allocate(uint32_t size, uint32_t align) {
+                const uint32_t ts = size_with_padding(size, align);
+                Header* h = (Header*)malloc(ts);
+                void* p = data_pointer(h, align);
+                fill(h, p, ts);
+                _total_allocated += ts;
+                return p;
+            }
 
-        virtual uint32_t allocated_size(void* p) {
-            return header(p)->size;
-        }
+            virtual void deallocate(void* p) {
+                if (!p) {
+                    return;
+                }
 
-        virtual uint32_t total_allocated() {
-            return _total_allocated;
-        }
+                Header* h = header(p);
+                _total_allocated -= h->size;
+                free(h);
+            }
 
-private:
-        uint32_t _total_allocated;
+            virtual uint32_t allocated_size(void* p) {
+                return header(p)->size;
+            }
 
-        static inline uint32_t size_with_padding(uint32_t size, uint32_t align) {
-            return size + align + sizeof(Header);
-        }
+            virtual uint32_t total_allocated() {
+                return _total_allocated;
+            }
+
+        private:
+            uint32_t _total_allocated;
+
+            static inline uint32_t size_with_padding(uint32_t size, uint32_t align) {
+                return size + align + sizeof(Header);
+            }
     };
 
 

@@ -8,123 +8,123 @@
 #include <string.h>
 
 namespace cetech1 {
-  
+
     /*! Array.
      */
     namespace array {
 
-/*! Get array size.
- * \param a Array.
- * \return Size.
- */
+        /*! Get array size.
+         * \param a Array.
+         * \return Size.
+         */
         template < typename T > uint32_t size(const Array < T >& a);
 
-/*! Has array any item?
- * \param a Array.
- * \return True if array is not empty.
- */
+        /*! Has array any item?
+         * \param a Array.
+         * \return True if array is not empty.
+         */
         template < typename T > bool any(const Array < T >& a);
 
-/*! Is array empty.
- * \param a Array.
- * \return True if array is empty.
- */
+        /*! Is array empty.
+         * \param a Array.
+         * \return True if array is empty.
+         */
         template < typename T > bool empty(const Array < T >& a);
 
 
-/*! Return pointer to array begin.
- * \param a Array.
- * \return Pointer to begin.
- */
+        /*! Return pointer to array begin.
+         * \param a Array.
+         * \return Pointer to begin.
+         */
         template < typename T > T* begin(Array < T >& a);
 
-/*! Return const pointer to array begin.
- * \param a Array.
- * \return Pointer to begin.
- */
+        /*! Return const pointer to array begin.
+         * \param a Array.
+         * \return Pointer to begin.
+         */
         template < typename T > const T* begin(const Array < T >& a);
 
-/*! Return pointer to array end.
- * \param a Array.
- * \return Pointer to end.
- */
+        /*! Return pointer to array end.
+         * \param a Array.
+         * \return Pointer to end.
+         */
         template < typename T > T* end(Array < T >& a);
 
-/*! Return const pointer to array end.
- * \param a Array.
- * \return Pointer to end.
- */
+        /*! Return const pointer to array end.
+         * \param a Array.
+         * \return Pointer to end.
+         */
         template < typename T > const T* end(const Array < T >& a);
 
 
-/*! Return first item.
- * \param a Array.
- * \return First item.
- */
+        /*! Return first item.
+         * \param a Array.
+         * \return First item.
+         */
         template < typename T > T& front(Array < T >& a);
 
-/*! Return const first item.
- * \param a Array.
- * \return First item.
- */
+        /*! Return const first item.
+         * \param a Array.
+         * \return First item.
+         */
         template < typename T > const T& front(const Array < T >& a);
 
-/*! Return last item.
- * \param a Array.
- * \return Last item.
- */
+        /*! Return last item.
+         * \param a Array.
+         * \return Last item.
+         */
         template < typename T > T& back(Array < T >& a);
 
-/*! Return const last item.
- * \param a Array.
- * \return Last item.
- */
+        /*! Return const last item.
+         * \param a Array.
+         * \return Last item.
+         */
         template < typename T > const T& back(const Array < T >& a);
 
 
-/*! Resize array.
- * \param a Array.
- * \param new_size New size.
- */
+        /*! Resize array.
+         * \param a Array.
+         * \param new_size New size.
+         */
         template < typename T > void resize(Array < T >& a, uint32_t new_size);
 
-/*! Remove all items from array.
- * \param a Array.
- */
+        /*! Remove all items from array.
+         * \param a Array.
+         */
         template < typename T > void clear(Array < T >& a);
 
-/*! Realloc array to specified capacity.
- * \param a Array.
- * \param new_capacity New capacity.
- */
+        /*! Realloc array to specified capacity.
+         * \param a Array.
+         * \param new_capacity New capacity.
+         */
         template < typename T > void set_capacity(Array < T >& a, uint32_t new_capacity);
 
-/*! Reserve capacity.
- * \param a Array.
- * \param new_capacity New capacity.
- */
+        /*! Reserve capacity.
+         * \param a Array.
+         * \param new_capacity New capacity.
+         */
         template < typename T > void reserve(Array < T >& a, uint32_t new_capacity);
 
-/*! Grow array using geometric grow facor.
- * \param a Array.
- * \param min_capacity Minimal capacity.
- */
+        /*! Grow array using geometric grow facor.
+         * \param a Array.
+         * \param min_capacity Minimal capacity.
+         */
         template < typename T > void grow(Array < T >& a, uint32_t min_capacity = 0);
 
-/*! Trim array.
- * \param a Array.
- */
+        /*! Trim array.
+         * \param a Array.
+         */
         template < typename T > void trim(Array < T >& a);
 
-/*! Push item back.
- * \param a Array.
- * \param item Item.
- */
+        /*! Push item back.
+         * \param a Array.
+         * \param item Item.
+         */
         template < typename T > void push_back(Array < T >& a, const T& item);
 
-/*! Pop back item.
- * \param a Array.
- */
+        /*! Pop back item.
+         * \param a Array.
+         */
         template < typename T > void pop_back(Array < T >& a);
     }
 
