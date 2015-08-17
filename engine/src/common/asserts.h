@@ -11,7 +11,7 @@
  */
 #ifdef CETECH1_DEBUG
   #define CE_CHECK_PTR(ptr) \
-     do { if (!ptr) cetech1::ce_check_ptr(__FILE__, __LINE__); } while(0)
+    do { if (!ptr) { cetech1::ce_check_ptr(__FILE__, __LINE__); } } while (0)
 #else
   #define CE_CHECK_PTR(ptr) do {} while (0)
 #endif

@@ -80,8 +80,8 @@ namespace cetech1 {
         }
 
         FORCE_INLINE SimdVector load(const void* src) {
-	    CE_CHECK_PTR(src);
-	  
+            CE_CHECK_PTR(src);
+
             return make_simd_vector(
                 ((const float*) src)[0],
                 ((const float*) src)[1],
@@ -92,8 +92,8 @@ namespace cetech1 {
 
         FORCE_INLINE SimdVector load3(const void* src) {
             CE_CHECK_PTR(src);
-	    
-	    return make_simd_vector(
+
+            return make_simd_vector(
                 ((const float*) src)[0],
                 ((const float*) src)[1],
                 ((const float*) src)[2],
@@ -103,8 +103,8 @@ namespace cetech1 {
 
         FORCE_INLINE SimdVector load3_w0(const void* src) {
             CE_CHECK_PTR(src);
-	  
-	  return make_simd_vector(
+
+            return make_simd_vector(
                 ((const float*) src)[0],
                 ((const float*) src)[1],
                 ((const float*) src)[2],
@@ -113,8 +113,8 @@ namespace cetech1 {
         }
 
         FORCE_INLINE SimdVector load3_w1(const void* src) {
-	  CE_CHECK_PTR(src);
-	  
+            CE_CHECK_PTR(src);
+
             return make_simd_vector(
                 ((const float*) src)[0],
                 ((const float*) src)[1],
@@ -124,28 +124,28 @@ namespace cetech1 {
         }
 
         FORCE_INLINE void store(const SimdVector& v1, void* dst) {
-	    CE_CHECK_PTR(dst);
-	    
+            CE_CHECK_PTR(dst);
+
             memory::memcpy(dst, v1.v, 16);
         }
-        
+
         FORCE_INLINE void store3(const SimdVector& v1, void* dst) {
-	    CE_CHECK_PTR(dst);
-	    
+            CE_CHECK_PTR(dst);
+
             memory::memcpy(dst, v1.v, 12);
         }
 
         FORCE_INLINE void store1(const SimdVector& v1, void* dst) {
-	    CE_CHECK_PTR(dst);
-	    
+            CE_CHECK_PTR(dst);
+
             memory::memcpy(dst, v1.v, 4);
         }
 
         FORCE_INLINE void quat_mult(const void* q1, const void* q2, void* dst) {
-	    CE_CHECK_PTR(q1);
-	    CE_CHECK_PTR(q2);
-	    CE_CHECK_PTR(dst);
-	  
+            CE_CHECK_PTR(q1);
+            CE_CHECK_PTR(q2);
+            CE_CHECK_PTR(dst);
+
             const float* q1f = (const float*)q1;
             const float* q2f = (const float*)q2;
             float* dstf = (float*)dst;
