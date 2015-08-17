@@ -1,9 +1,9 @@
 #pragma once
 
-#ifdef CETECH1_LINUX
+#include "generic/defines.h"
+
+#ifdef CETECH_LINUX
     #include "linux/defines.h"
-#elif CETECH1_WINDOWS
+#elif CETECH_WINDOWS
     #include "windows/defines.h"
-#else
-    #include "generic/defines.h"
 #endif

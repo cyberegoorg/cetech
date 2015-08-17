@@ -2,10 +2,12 @@
 #pragma once
 
 #include "container_types.h"
+#include <common/memory/memory.h>
 #include "memory.h"
 
 #include <memory.h>
 #include <string.h>
+#include <type_traits>
 
 namespace cetech1 {
 
@@ -202,7 +204,7 @@ namespace cetech1 {
             T* new_data = 0;
             if (new_capacity > 0) {
                 new_data = (T*)a._allocator->allocate(sizeof(T) * new_capacity, __alignof(T));
-                memcpy(new_data, a._data, sizeof(T) * a._size);
+                memory::memcpy(new_data, a._data, sizeof(T) * a._size);
             }
 
             a._allocator->deallocate(a._data);
@@ -235,6 +237,8 @@ namespace cetech1 {
 
 
         template < typename T > inline void push_back(Array < T >& a, const T& item) {
+	    CE_ASSERT(std::is_pod<T>());
+	    
             if (a._size + 1 > a._capacity) {
                 grow(a);
             }
@@ -257,7 +261,7 @@ namespace cetech1 {
         const uint32_t n = other._size;
         array::set_capacity(*this, n);
 
-        memcpy(_data, other._data, sizeof(T) * n);
+        memory::memcpy(_data, other._data, sizeof(T) * n);
 
         _size = n;
     }
@@ -271,7 +275,7 @@ namespace cetech1 {
     inline Array < T >& Array < T > ::operator = (const Array &other) {
         const uint32_t n = other._size;
         array::resize(*this, n);
-        memcpy(_data, other._data, sizeof(T) * n);
+        memory::memcpy(_data, other._data, sizeof(T) * n);
         return *this;
     }
 

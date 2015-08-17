@@ -2,10 +2,10 @@
 
 #include "simd_types.h"
 
-#ifdef CETECH1_SIMD_SSE
-  #include "sse.h"
-#else
+#if defined(CETECH_SIMD_FPU)
   #include "fpu.h"
+#elif defined(CETECH_SIMD_SSE)
+  #include "sse.h"
 #endif
 
 namespace cetech1 {

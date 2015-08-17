@@ -6,8 +6,8 @@
 #include "test_utils.h"
 
 TEST_CASE( "SIMD: FPU", "[simd]" ) {
-    cetech1::SimdVector v1 = {1.0f, 2.0f, 3.0f, 4.0f};
-    cetech1::SimdVector v2 = {5.0f, 6.0f, 7.0f, 8.0f};
+    cetech1::SimdVector v1 = SIMD_VECTOR(1.0f, 2.0f, 3.0f, 4.0f);
+    cetech1::SimdVector v2 = SIMD_VECTOR(5.0f, 6.0f, 7.0f, 8.0f);
 
     SECTION( "v1 + v2" ) {
         cetech1::SimdVector v3 = cetech1::simd::add(v1, v2);

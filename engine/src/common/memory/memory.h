@@ -104,13 +104,11 @@ namespace cetech1 {
 
     FORCE_INLINE const void* memory::pointer_add(const void* p, const uint32_t bytes) {
         CE_CHECK_PTR(p);
-
         return (const void*)((const char*)p + bytes);
     }
 
     FORCE_INLINE void* memory::pointer_sub(void* p, const uint32_t bytes) {
         CE_CHECK_PTR(p);
-
         return (void*)((char*)p - bytes);
     }
 
@@ -121,7 +119,6 @@ namespace cetech1 {
 
     FORCE_INLINE void* memory::memcpy(void* dst, const void* src, const uint32_t bytes) {
         CE_CHECK_PTR(dst);
-        CE_CHECK_PTR(src);
         return std::memcpy(dst, src, bytes);
     }
 }

@@ -255,8 +255,8 @@ namespace cetech1 {
 
             Hash < T > empty(*h._hash._allocator);
             h.~Hash < T > ();
-            memcpy(&h, &nh, sizeof(Hash < T >));
-            memcpy(&nh, &empty, sizeof(Hash < T >));
+            memory::memcpy(&h, &nh, sizeof(Hash < T >));
+            memory::memcpy(&nh, &empty, sizeof(Hash < T >));
         }
 
         template < typename T > bool full(const Hash < T >& h) {
