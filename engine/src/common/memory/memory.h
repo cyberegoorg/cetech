@@ -2,6 +2,8 @@
 #pragma once
 
 #include <cstring>
+
+#include "common/asserts.h"
 #include "common/types.h"
 
 namespace cetech1 {
@@ -95,22 +97,31 @@ namespace cetech1 {
     }
 
     inline void* memory::pointer_add(void* p, uint32_t bytes) {
+	CE_CHECK_PTR(p);
+      
         return (void*)((char*)p + bytes);
     }
 
     inline const void* memory::pointer_add(const void* p, uint32_t bytes) {
+      CE_CHECK_PTR(p);
+      
         return (const void*)((const char*)p + bytes);
     }
 
     inline void* memory::pointer_sub(void* p, uint32_t bytes) {
+      CE_CHECK_PTR(p);
+      
         return (void*)((char*)p - bytes);
     }
 
     inline const void* memory::pointer_sub(const void* p, uint32_t bytes) {
+      CE_CHECK_PTR(p);
         return (const void*)((const char*)p - bytes);
     }
 
     inline void* memory::memcpy(void* dst, const void* src, uint32_t bytes) {
+      CE_CHECK_PTR(dst);
+      CE_CHECK_PTR(src);
         return std::memcpy(dst, src, bytes);
     }
 }
