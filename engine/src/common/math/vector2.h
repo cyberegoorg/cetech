@@ -35,6 +35,9 @@ namespace cetech1 {
      */
     namespace vector2 {
         /*! Make Vector2
+	 * ~~~~~~~~~~~~~~~
+	 * Vector2 v = make_vector2(1.0f, 2.0f); // v = [1.0f, 2.0f]
+	 * ~~~~~~~~~~~~~~~
          * \param x X
          * \param y Y
          * \return New vector
@@ -43,12 +46,18 @@ namespace cetech1 {
 
 
         /*! Vector len
+	 * ~~~~~~~~~~~~~~~
+	 * const float len = len({1.0f, 0.0f}); // len == 1
+	 * ~~~~~~~~~~~~~~~
          * \param v1 Vector.
          * \return Vector len.
          */
         CE_INLINE float len(const Vector2& v1);
 
         /*! Vector squared len.
+	 * ~~~~~~~~~~~~~~~
+	 * const float len_sq = len_sq({2.0f, 0.0f}); // len_sq == 4
+	 * ~~~~~~~~~~~~~~~
          * \param v1 Vector.
          * \return Vector squared len.
          */
@@ -62,6 +71,9 @@ namespace cetech1 {
 
 
         /*! Return normalized vector.
+	 * ~~~~~~~~~~~~~~~
+	 * const Vector2 v = normalized({2.0f, 0.0f}); // is_normalized(v) == true
+	 * ~~~~~~~~~~~~~~~
          * \param v1 Vector.
          * \return Normalized vector.
          */
@@ -165,6 +177,7 @@ namespace cetech1 {
     CE_INLINE Vector2 operator* (const Vector2 &v1, const Vector2 &v2);
 
     /*! V1 / V2 [x1 / x2, y1 / y2]
+     * 
      * \param v1 Vector1.
      * \param v2 Vector2.
      * \return [x1 / x2, y1 / y2]
@@ -204,7 +217,7 @@ namespace cetech1 {
         }
 
         float len_inv(const Vector2& v1) {
-            return math::inv_sqrt(len_sq(v1));
+            return math::fast_inv_sqrt(len_sq(v1));
         }
 
         Vector2 normalized(const Vector2& v1) {

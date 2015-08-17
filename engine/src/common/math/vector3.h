@@ -213,7 +213,7 @@ namespace cetech1 {
         }
 
          float len_inv(const Vector3& v1) {
-            return math::inv_sqrt(len_sq(v1));
+            return math::fast_inv_sqrt(len_sq(v1));
         }
 
          Vector3 normalized(const Vector3& v1) {
