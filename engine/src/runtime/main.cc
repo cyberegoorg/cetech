@@ -2,6 +2,7 @@
 #include "common/math/math_types.h"
 #include "common/math/math.h"
 #include "common/math/quat.h"
+#include "common/math/vector2.h"
 #include "common/math/simd/simd.h"
 #include "common/types.h"
 #include "common/container/array.h"
@@ -37,6 +38,10 @@ void init() {
 
     // Output {"project":"rapidjson","stars":11}
     std::cout << buffer.GetString() << std::endl;
+    
+    const cetech1::Vector2 v = cetech1::vector2::normalized({2.0f, 0.0f});
+    
+    std::cout << "len: " << cetech1::vector2::len(v) << ", " << cetech1::vector2::is_normalized(v) << std::endl;
 }
 
 void run() {

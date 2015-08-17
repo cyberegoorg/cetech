@@ -49,18 +49,19 @@ solution "cyberego.org tech1"
       }
     
     filter "Debug"
+        flags {"Symbols"}
+        targetsuffix '_debug'
+        optimize "Off"
+    
         defines {
 	  "DEBUG",
 	  "CETECH_DEBUG",
 	  "CETECH_CE_INLINE_OFF",
 	}
 
-        flags {"Symbols"}
-        targetsuffix '_debug'
-        optimize "Off"
-
     filter "Release"
         optimize "Full"
+
         defines {
 	  "NDEBUG",
 	}

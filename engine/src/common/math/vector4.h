@@ -199,7 +199,7 @@ namespace cetech1 {
         }
 
          float len_inv(const Vector4& v1) {
-            return math::inv_sqrt(len_sq(v1));
+            return math::fast_inv_sqrt(len_sq(v1));
         }
 
          Vector4 normalized(const Vector4& v1) {

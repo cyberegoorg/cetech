@@ -65,7 +65,7 @@ clean-tilda:
 .PHONY: clean-doc
 clean-doc:
 	@echo Cleaning doc
-	-@rm -rf ./docs/html
+	-@rm -rf ./doc/doxygen/html
 #########
 
 #########

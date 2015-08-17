@@ -85,10 +85,11 @@ namespace cetech1 {
         CE_INLINE float fast_sqrt(const float number);
 
         /*! Fast version of invert sqrt.
+	 * Bassed on quake3 inv_sqrt bu constant is change to 0x5f375a86.
          * \param number Number.
          * \return invert sqrt.
          */
-        CE_INLINE float inv_sqrt(const float number);
+        CE_INLINE float fast_inv_sqrt(const float number);
 
         /*! Deg to Rad.
          * \param deg Deg.
@@ -157,33 +158,36 @@ namespace cetech1 {
         }
 
          float fast_sqrt(const float number) {
-            const float xhalf = 0.5f * number;
+	   //return std::sqrt(number);
+	    union
+	    {
+		int tmp;
+		float f;
+	    } u;
 
-            union {
-                float x;
-                int i;
-            } u;
+	    u.tmp = 0;
+	    float xhalf = 0.5f * number;
+	    u.f = number;
+	    u.tmp = 0x5f375a86 - (u.tmp >> 1);
+	    u.f = u.f * (1.5f - xhalf * u.f * u.f);
+	    return u.f * number;
+	}
 
-            u.x = number;
-            u.i = 0x5f3759df - (u.i >> 1);                    // gives initial guess y0
-            return number * u.x * (1.5f - xhalf * u.x * u.x); // Newton step, repeating increases accuracy
-        }
+         float fast_inv_sqrt(const float number) {
+            //return 1.0f / fast_sqrt(number);
+            long i;
+            float x2, y;
+            const float threehalfs = 1.5F;
 
-         float inv_sqrt(const float number) {
-            return 1.0f / fast_sqrt(number);
-            //             long i;
-            //             float x2, y;
-            //             const float threehalfs = 1.5F;
-            //
-            //             x2 = number * 0.5F;
-            //             y = number;
-            //             i = *(long*) &y;           // evil floating point bit level hacking
-            //             i = 0x5f3759df - (i >> 1); // what the fuck?
-            //             y = *(float*) &i;
-            //             y = y * (threehalfs - (x2 * y * y));    // 1st iteration
-            //             //y  = y * ( threehalfs - ( x2 * y * y ) ); // 2nd iteration, this can be removed
-            //
-            //             return y;
+            x2 = number * 0.5F;
+            y = number;
+            i = *(long*) &y;           // evil floating point bit level hacking
+            i = 0x5f375a86 - (i >> 1); // what the fuck?
+            y = *(float*) &i;
+            y = y * (threehalfs - (x2 * y * y));    // 1st iteration
+            y = y * ( threehalfs - ( x2 * y * y ) ); // 2nd iteration, this can be removed
+
+            return y;
         }
 
          float square(const float x) {

@@ -143,7 +143,7 @@ namespace cetech1 {
         }
 
         CE_INLINE float len_inv(const Quat& q1) {
-            return math::inv_sqrt(len_sq(q1));
+            return math::fast_inv_sqrt(len_sq(q1));
         }
 
         CE_INLINE Quat normalized(const Quat& q1) {

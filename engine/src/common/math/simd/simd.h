@@ -18,6 +18,7 @@ namespace cetech1 {
          * \param y Y.
          * \param z Z.
          * \param w W.
+	 * \example
          */
         CE_INLINE SimdVector make_simd_vector(const float x, const float y, const float z, const float w);
 
