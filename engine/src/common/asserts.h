@@ -74,7 +74,11 @@ namespace cetech1 {
      * \param line Line.
      * \param fce Fce name.
      */
-    FORCE_INLINE void ce_assert_msg(const char* where, const char* what, const char* file, const int line, const char* fce);
+    FORCE_INLINE void ce_assert_msg(const char* where,
+                                    const char* what,
+                                    const char* file,
+                                    const int line,
+                                    const char* fce);
 
     /*!
      * Print check_ptr message.
@@ -92,7 +96,11 @@ namespace cetech1 {
         abort();
     }
 
-    FORCE_INLINE void ce_assert_msg(const char* where, const char* what, const char* file, const int line, const char* fce) {
+    FORCE_INLINE void ce_assert_msg(const char* where,
+                                    const char* what,
+                                    const char* file,
+                                    const int line,
+                                    const char* fce) {
         std::fprintf(stderr, "ASSERT:\'%s\': \"%s\" %s:%i:%s().", where, what, SHORT_FILE(file), line, fce);
         abort();
     }

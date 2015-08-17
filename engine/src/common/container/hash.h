@@ -37,7 +37,7 @@ namespace cetech1 {
          * \param h Hash
          * \param key Key
          */
-        template < typename T > void remove(Hash < T >& h,const  uint64_t key);
+        template < typename T > void remove(Hash < T >& h, const uint64_t key);
 
 
         /*! Resize hash lookup table to the specified size.
@@ -45,7 +45,7 @@ namespace cetech1 {
          * \param h Hash.
          * \param size Size.
          */
-        template < typename T > void reserve(Hash < T >& h,const  uint32_t size);
+        template < typename T > void reserve(Hash < T >& h, const uint32_t size);
 
         /*! Remove all elements.
          * \param h Hash.
