@@ -20,7 +20,13 @@ namespace cetech1 {
          */
         FORCE_INLINE Quat make_quat(float x, float y, float z, float w);
 
+        /*! Make Quat from axis and angle.
+         * \param axis Axis
+         * \param angle_deg Angle in degy Y
+         * \return New quaternion
+         */
         FORCE_INLINE Quat from_axis_angle(const Vector3& axis, float angle_deg);
+
 
         /*! Quaternion len
          * \param q1 Quaternion.
@@ -47,6 +53,10 @@ namespace cetech1 {
          */
         FORCE_INLINE Quat normalized(const Quat& q1);
 
+        /*! Is quaternion normalized?
+         * \param q1 Quaternion.
+         * \return True if quaternion is normalized.
+         */
         FORCE_INLINE bool is_normalized(const Quat& q1);
     }
 
@@ -71,7 +81,18 @@ namespace cetech1 {
      */
     FORCE_INLINE Quat operator - (const Quat &q1, const Quat &q2);
 
+    /*! Q1 * Q2
+     * \param q1 Quaternion.
+     * \param q2 Quaternion.
+     * \return Q1 * Q2.
+     */
     FORCE_INLINE Quat operator* (const Quat &q1, const Quat &q2);
+    
+    /*! Q1 * V1
+     * \param q1 Quaternion.
+     * \param v1 VectorQuaternion.
+     * \return Transformed vector.
+     */
     FORCE_INLINE Vector3 operator* (const Quat &q1, const Vector3 &v1);
 
     /*! V1 * scalar

@@ -3,6 +3,9 @@
 #include "array.h"
 
 namespace cetech1 {
+    
+    /*! Queue.
+     */
     namespace queue {
 /*! Returns the number of items in the queue.
  * \param q Queue

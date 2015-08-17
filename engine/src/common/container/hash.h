@@ -6,6 +6,8 @@
 
 namespace cetech1 {
 
+    /*! Hash map.
+     */
     namespace hash {
 
 /*! Exist key in hash

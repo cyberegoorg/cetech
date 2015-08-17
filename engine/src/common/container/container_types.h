@@ -6,8 +6,8 @@
 
 namespace cetech1 {
 
-/*! Array container.
- */
+    /*! Array container.
+    */
     template < typename T > struct Array {
         /*! Create array.
          * \param a Allocator.
