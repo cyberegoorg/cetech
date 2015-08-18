@@ -155,5 +155,59 @@ namespace cetech1 {
             dstf[2] = q1f[0] * q2f[2] - q1f[1] * q2f[3] + q1f[2] * q2f[0] + q1f[3] * q2f[1];
             dstf[3] = q1f[0] * q2f[3] + q1f[1] * q2f[2] - q1f[2] * q2f[1] + q1f[3] * q2f[0];
         }
+
+        #define mi(i, j, s) (((i) * (s)) + (j))
+        #define mi3(i, j) mi(i, j, 3)
+        #define mi4(i, j) mi(i, j, 4)
+
+        CE_INLINE void mat33_mult(const void* m1, const void* m2, void* dst) {
+            CE_CHECK_PTR(m1);
+            CE_CHECK_PTR(m2);
+            CE_CHECK_PTR(dst);
+
+            const float* m1f = (const float*)m1;
+            const float* m2f = (const float*)m2;
+            float* dstf = (float*)dst;
+
+            float sum;
+            for (int32_t i = 0; i < 3; ++i) {
+                for (int32_t j = 0; j < 3; ++j) {
+                    sum = 0;
+
+                    for (int32_t k = 0; k < 3; ++k) {
+                        sum += m1f[mi3(i, k)] * m2f[mi3(k, j)];
+                    }
+
+                    dstf[mi3(i, j)] = sum;
+                }
+            }
+        }
+
+        CE_INLINE void mat44_mult(const void* m1, const void* m2, void* dst) {
+            CE_CHECK_PTR(m1);
+            CE_CHECK_PTR(m2);
+            CE_CHECK_PTR(dst);
+
+            const float* m1f = (const float*)m1;
+            const float* m2f = (const float*)m2;
+            float* dstf = (float*)dst;
+
+            float sum;
+            for (int32_t i = 0; i < 4; ++i) {
+                for (int32_t j = 0; j < 4; ++j) {
+                    sum = 0;
+
+                    for (int32_t k = 0; k < 4; ++k) {
+                        sum += m1f[mi3(i, k)] * m2f[mi3(k, j)];
+                    }
+
+                    dstf[mi3(i, j)] = sum;
+                }
+            }
+        }
+
+        #undef mi
+        #undef mi3
+        #undef mi4
     }
 };

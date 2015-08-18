@@ -237,8 +237,8 @@ namespace cetech1 {
 
 
         template < typename T > inline void push_back(Array < T >& a, const T& item) {
-	    CE_ASSERT(std::is_pod<T>());
-	    
+            CE_ASSERT(std::is_pod < T > ());
+
             if (a._size + 1 > a._capacity) {
                 grow(a);
             }

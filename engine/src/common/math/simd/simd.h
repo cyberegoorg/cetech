@@ -18,7 +18,7 @@ namespace cetech1 {
          * \param y Y.
          * \param z Z.
          * \param w W.
-	 * \example
+         * \example
          */
         CE_INLINE SimdVector make_simd_vector(const float x, const float y, const float z, const float w);
 
@@ -116,6 +116,9 @@ namespace cetech1 {
          * \param dst Destination.
          */
         CE_INLINE void quat_mult(const void* q1, const void* q2, void* dst);
+
+        CE_INLINE void mat33_mult(const void* m1, const void* m2, void* dst);
+        CE_INLINE void mat44_mult(const void* m1, const void* m2, void* dst);
     }
 
     namespace simd {
