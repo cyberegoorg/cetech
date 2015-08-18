@@ -198,37 +198,37 @@ namespace cetech1 {
 
 
     namespace vector3 {
-         Vector3 make_vector3(const float x, const float y, const float z) {
+        Vector3 make_vector3(const float x, const float y, const float z) {
             return {
                        x, y, z
             };
         }
 
-         float len(const Vector3& v1) {
+        float len(const Vector3& v1) {
             return math::fast_sqrt(len_sq(v1));
         }
 
-         float len_sq(const Vector3& v1) {
+        float len_sq(const Vector3& v1) {
             return dot(v1, v1);
         }
 
-         float len_inv(const Vector3& v1) {
+        float len_inv(const Vector3& v1) {
             return math::fast_inv_sqrt(len_sq(v1));
         }
 
-         Vector3 normalized(const Vector3& v1) {
+        Vector3 normalized(const Vector3& v1) {
             return v1 * len_inv(v1);
         }
 
-         bool is_normalized(const Vector3& v1) {
+        bool is_normalized(const Vector3& v1) {
             return math::abs(1.0f - len_sq(v1)) < 0.001f;
         }
 
-         float dot(const Vector3& v1, const Vector3& v2) {
+        float dot(const Vector3& v1, const Vector3& v2) {
             return (v1.x * v2.x) + (v1.y * v2.y) + (v1.z * v2.z);
         }
 
-         Vector3 cross(const Vector3& v1, const Vector3& v2) {
+        Vector3 cross(const Vector3& v1, const Vector3& v2) {
             return make_vector3(
                 (v1.y * v2.z) - (v1.z * v2.y),
                 (v1.z * v2.x) - (v1.x * v2.z),
@@ -236,27 +236,27 @@ namespace cetech1 {
                 );
         }
 
-         float distance_sq(const Vector3& v1, const Vector3& v2) {
+        float distance_sq(const Vector3& v1, const Vector3& v2) {
             return math::square(v2.x - v1.x) + math::square(v2.y - v1.y) + math::square(v2.z - v1.z);
         }
 
-         float distance(const Vector3& v1, const Vector3& v2) {
+        float distance(const Vector3& v1, const Vector3& v2) {
             return math::fast_sqrt(distance_sq(v1, v2));
         }
 
-         float min(const Vector3& v1) {
+        float min(const Vector3& v1) {
             return math::min(math::min(v1.x, v1.y), v1.z);
         }
 
-         float max(const Vector3& v1) {
+        float max(const Vector3& v1) {
             return math::max(math::max(v1.x, v1.y), v1.z);
         }
 
-         float abs_max(const Vector3& v1) {
+        float abs_max(const Vector3& v1) {
             return math::max(math::max(math::abs(v1.x), math::abs(v1.y)), math::abs(v1.z));
         }
 
-         Vector3 sign_vector(const Vector3& v1) {
+        Vector3 sign_vector(const Vector3& v1) {
             return make_vector3(
                 math::float_select(v1.x, 1.0f, -1.0f),
                 math::float_select(v1.y, 1.0f, -1.0f),
@@ -265,7 +265,7 @@ namespace cetech1 {
         }
     }
 
-     Vector3 operator - (const Vector3 &v1) {
+    Vector3 operator - (const Vector3 &v1) {
         return vector3::make_vector3(
             -v1.x,
             -v1.y,
@@ -273,7 +273,7 @@ namespace cetech1 {
             );
     }
 
-     Vector3 operator + (const Vector3 &v1, const Vector3 &v2) {
+    Vector3 operator + (const Vector3 &v1, const Vector3 &v2) {
         return vector3::make_vector3(
             v1.x + v2.x,
             v1.y + v2.y,
@@ -281,7 +281,7 @@ namespace cetech1 {
             );
     }
 
-     Vector3 operator - (const Vector3 &v1, const Vector3 &v2) {
+    Vector3 operator - (const Vector3 &v1, const Vector3 &v2) {
         return vector3::make_vector3(
             v1.x - v2.x,
             v1.y - v2.y,
@@ -289,7 +289,7 @@ namespace cetech1 {
             );
     }
 
-     Vector3 operator* (const Vector3 &v1, const Vector3 &v2) {
+    Vector3 operator* (const Vector3 &v1, const Vector3 &v2) {
         return vector3::make_vector3(
             v1.x * v2.x,
             v1.y * v2.y,
@@ -297,7 +297,7 @@ namespace cetech1 {
             );
     }
 
-     Vector3 operator / (const Vector3 &v1, const Vector3 &v2) {
+    Vector3 operator / (const Vector3 &v1, const Vector3 &v2) {
         return vector3::make_vector3(
             v1.x / v2.x,
             v1.y / v2.y,
@@ -305,7 +305,7 @@ namespace cetech1 {
             );
     }
 
-     Vector3 operator* (const Vector3 &v1, const float s) {
+    Vector3 operator* (const Vector3 &v1, const float s) {
         return vector3::make_vector3(
             v1.x * s,
             v1.y * s,
@@ -313,7 +313,7 @@ namespace cetech1 {
             );
     }
 
-     Vector3 operator / (const Vector3 &v1, const float s) {
+    Vector3 operator / (const Vector3 &v1, const float s) {
         const float inv_s = 1 / s;
 
         return vector3::make_vector3(

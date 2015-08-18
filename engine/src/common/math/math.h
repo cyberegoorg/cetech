@@ -85,7 +85,7 @@ namespace cetech1 {
         CE_INLINE float fast_sqrt(const float number);
 
         /*! Fast version of invert sqrt.
-	 * Bassed on quake3 inv_sqrt bu constant is change to 0x5f375a86.
+         * Bassed on quake3 inv_sqrt bu constant is change to 0x5f375a86.
          * \param number Number.
          * \return invert sqrt.
          */
@@ -128,83 +128,76 @@ namespace cetech1 {
 
     namespace math {
         template < class T >
-         T max( const T a, const T b) {
+        T max( const T a, const T b) {
             return (a >= b) ? a : b;
         }
 
         template < class T >
-         T min( const T a, const T b) {
+        T min( const T a, const T b) {
             return (a <= b) ? a : b;
         }
 
         template < class T >
-         T abs( const T a) {
+        T abs( const T a) {
             return (a >= 0) ? a : -a;
         }
 
         template < >
-         CE_INLINE float abs( const float a) {
+        CE_INLINE float abs( const float a) {
             const int y = (int&)a & 0x7FFFFFFF;
             return (float&)y;
         }
 
         template < class T >
-         T clamp( const T a, const T min, const T max) {
+        T clamp( const T a, const T min, const T max) {
             return (a < min ? min : (a < max ? a : max));
         }
 
-         bool almost_equal(const float f1, const float f2, float epsilon) {
+        bool almost_equal(const float f1, const float f2, float epsilon) {
             return abs(f1 - f2) < epsilon;
         }
 
-         float fast_sqrt(const float number) {
-	   //return std::sqrt(number);
-	    union
-	    {
-		int tmp;
-		float f;
-	    } u;
-
-	    u.tmp = 0;
-	    float xhalf = 0.5f * number;
-	    u.f = number;
-	    u.tmp = 0x5f375a86 - (u.tmp >> 1);
-	    u.f = u.f * (1.5f - xhalf * u.f * u.f);
-	    return u.f * number;
-	}
-
-         float fast_inv_sqrt(const float number) {
-            //return 1.0f / fast_sqrt(number);
-            long i;
-            float x2, y;
-            const float threehalfs = 1.5F;
-
-            x2 = number * 0.5F;
-            y = number;
-            i = *(long*) &y;           // evil floating point bit level hacking
-            i = 0x5f375a86 - (i >> 1); // what the fuck?
-            y = *(float*) &i;
-            y = y * (threehalfs - (x2 * y * y));    // 1st iteration
-            y = y * ( threehalfs - ( x2 * y * y ) ); // 2nd iteration, this can be removed
-
-            return y;
+        float fast_sqrt(const float number) {
+            return fast_inv_sqrt(number) * number;
         }
 
-         float square(const float x) {
+        float fast_inv_sqrt(const float number) {
+            const float fuconstant = 0x5f375a86;
+            const float three_halfs = 1.5f;
+            const float number_half = number * 0.5f;
+
+
+            union {
+                float f;
+                long l;
+            } fl;
+
+            fl.l = 0;
+            fl.f = number;
+
+            fl.l = fuconstant - (fl.l >> 1); // what the fuck?
+
+            fl.f = fl.f * (three_halfs - (number_half * fl.f * fl.f)); // 1st iteration
+            fl.f = fl.f * (three_halfs - (number_half * fl.f * fl.f)); // 2nd iteration
+
+            return fl.f;
+        }
+
+        float square(const float x) {
             return x * x;
         }
 
-         float deg2rad(const float deg) {
-            static const float to_rad = 3.14159265358979323846f / 180.0f;
+        float deg2rad(const float deg) {
+            static const float to_rad = PI / 180.0f;
             return deg * to_rad;
         }
 
-         float rad2deg(const float rad) {
-            static const float to_deg = 180.0f / 3.14159265358979323846f;
+        float rad2deg(const float rad) {
+            static const float to_deg = 180.0f / PI;
             return rad * to_deg;
         }
 
-         float fast_sin(const float angle_deg) {
+        float fast_sin(const float angle_deg) {
             float angle_rad = deg2rad(angle_deg);
 
             if (PI < angle_rad) {
@@ -219,12 +212,12 @@ namespace cetech1 {
                      (0.00833333f - angle_rad * angle_rad * (0.0001984f - angle_rad * angle_rad * 0.0000027f))));
         }
 
-         void fast_sincos(const float angle_deg, float& sin, float& cos) {
+        void fast_sincos(const float angle_deg, float& sin, float& cos) {
             sin = fast_sin(angle_deg);
             cos = fast_sqrt(1 - sin * sin);
         }
 
-         float float_select(const float a, const float ge_zero, const float lt_zero) {
+        float float_select(const float a, const float ge_zero, const float lt_zero) {
             return a >= 0.0f ? ge_zero : lt_zero;
         }
     }

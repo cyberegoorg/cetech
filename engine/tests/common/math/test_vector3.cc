@@ -59,7 +59,7 @@ TEST_CASE( "Vector3 operation", "[vector3]" ) {
     SECTION( "len(v1)" ) {
         float len = cetech1::vector3::len(v1);
 
-        REQUIRE_ALMOST( len, 3.741f);
+        REQUIRE_ALMOST3( len, 3.74f, 0.01f);
     }
 
     SECTION( "len_sq(v1)" ) {
@@ -98,7 +98,7 @@ TEST_CASE( "Vector3 operation", "[vector3]" ) {
     SECTION( "distance(v1, v2)" ) {
         float distance = cetech1::vector3::distance(v1, v2);
 
-        REQUIRE_ALMOST( distance, 5.18815f );
+        REQUIRE_ALMOST3( distance, 5.18f, 0.01f);
     }
 
     SECTION( "distance_sq(v1, v2)" ) {

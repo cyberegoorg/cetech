@@ -3,6 +3,7 @@
 #include "common/math/math.h"
 #include "common/math/quat.h"
 #include "common/math/vector2.h"
+#include "common/math/matrix33.h"
 #include "common/math/simd/simd.h"
 #include "common/types.h"
 #include "common/container/array.h"
@@ -38,10 +39,17 @@ void init() {
 
     // Output {"project":"rapidjson","stars":11}
     std::cout << buffer.GetString() << std::endl;
-    
+
     const cetech1::Vector2 v = cetech1::vector2::normalized({2.0f, 0.0f});
-    
+
     std::cout << "len: " << cetech1::vector2::len(v) << ", " << cetech1::vector2::is_normalized(v) << std::endl;
+
+    cetech1::Matrix33 m1 = cetech1::matrix33::IDENTITY;
+    cetech1::Matrix33 m2 = cetech1::matrix33::IDENTITY;
+
+    cetech1::Matrix33 m3 = m1 * m2;
+
+    printf("sqrt: %f, ivn_sqrt: %f\n", cetech1::math::fast_sqrt(4), cetech1::math::fast_inv_sqrt(4));
 }
 
 void run() {
@@ -74,7 +82,7 @@ void run() {
     cetech1::math::fast_sincos(21, sin1, cos1);
 
     cetech1::memory::malloc(0);
-    
+
     printf("%f, %f == %f, %f\n", sin(cetech1::math::deg2rad(21)), cos(cetech1::math::deg2rad(21)), sin1, cos1);
 }
 

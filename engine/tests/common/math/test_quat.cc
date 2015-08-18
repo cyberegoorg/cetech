@@ -71,7 +71,7 @@ TEST_CASE( "Quat operation", "[quat]" ) {
     SECTION( "len(q1)" ) {
         float len = cetech1::quat::len(q1);
 
-        REQUIRE_ALMOST( len, 5.47265f);
+        REQUIRE_ALMOST3( len, 5.47f, 0.01f);
     }
 
     SECTION( "len_sq(q1)" ) {
