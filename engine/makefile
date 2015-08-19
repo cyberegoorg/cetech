@@ -72,10 +72,10 @@ clean-doc:
 # Linux #
 #########
 LINUX_SIMD = fpu
-LINUX_PLATFORM = sdl2
+LINUX_RUNTIME = sdl2
 
 .build/projects/gmake:
-	$(PREMAKE5) --file=premake5.lua --simd=$(LINUX_SIMD) --platform=$(LINUX_PLATFORM) gmake
+	$(PREMAKE5) --file=premake5.lua --simd=$(LINUX_SIMD) --runtime=$(LINUX_RUNTIME) gmake
 
 .PHONY: linux-all
 linux-all: linux-debug32 linux-release32 linux-debug64 linux-release64
@@ -123,13 +123,13 @@ test-linux-release-travis: linux-release
 # Visual studio #
 #################
 WINDOWS_SIMD = fpu
-WINDOWS_PLATFORM = sdl2
+WINDOWS_RUNTIME = sdl2
 
 .build/projects/vs2013:
-	$(PREMAKE5) --file=premake5.lua --simd=$(WINDOWS_SIMD) --platform=$(WINDOWS_PLATFORM) vs2013
+	$(PREMAKE5) --file=premake5.lua --simd=$(WINDOWS_SIMD) --runtime=$(WINDOWS_PLATFORM) vs2013
 
 .build/projects/vs2015:
-	$(PREMAKE5) --file=premake5.lua --simd=$(WINDOWS_SIMD) --platform=$(WINDOWS_PLATFORM) vs2015
+	$(PREMAKE5) --file=premake5.lua --simd=$(WINDOWS_SIMD) --runtime=$(WINDOWS_PLATFORM) vs2015
 
 vs2013: .build/projects/vs2013
 vs2015: .build/projects/vs2015

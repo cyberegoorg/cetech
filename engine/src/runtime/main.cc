@@ -9,6 +9,7 @@
 #include "common/container/array.h"
 #include "common/container/hash.h"
 #include "common/ecs/entitymanager.h"
+#include "runtime/runtime.h"
 
 #include <iostream>
 
@@ -23,8 +24,10 @@ using namespace rapidjson;
 
 void init() {
     memory_globals::init();
-    platform::init();
-    
+    runtime::init();    
+}
+
+void run() {
     const char* json = "{\"project\":\"rapidjson\",\"stars\":10}";
     Document d;
     d.Parse(json);
@@ -53,42 +56,8 @@ void init() {
     printf("sqrt: %f, ivn_sqrt: %f\n", cetech1::math::fast_sqrt(4), cetech1::math::fast_inv_sqrt(4));
 }
 
-void run() {
-    Allocator& a = memory_globals::default_allocator();
-
-    EntityManager em;
-
-    Array < int > array1(a);
-    array::push_back < int > (array1, 1);
-    array::push_back < int > (array1, 2);
-    array::push_back < int > (array1, 3);
-
-    for (auto it = array::begin(array1); it != array::end(array1); ++it) {
-        std::cout << *it << std::endl;
-    }
-
-    Entity e1 = entity_manager::create(em);
-    printf("[idx: %u, gen: %u]\n", entity::idx(e1), entity::gen(e1));
-
-    entity_manager::destroy(em, e1);
-
-    Entity e2 = entity_manager::create(em);
-    printf("[idx: %u, gen: %u]\n", entity::idx(e2), entity::gen(e2));
-
-    Entity e3 = entity_manager::create(em);
-    printf("[idx: %u, gen: %u]\n", entity::idx(e3), entity::gen(e3));
-
-    float sin1, cos1;
-    sin1 = cos1 = 0;
-    cetech1::math::fast_sincos(21, sin1, cos1);
-
-    cetech1::memory::malloc(0);
-
-    printf("%f, %f == %f, %f\n", sin(cetech1::math::deg2rad(21)), cos(cetech1::math::deg2rad(21)), sin1, cos1);
-}
-
 void shutdown() {
-    platform::shutdown();
+    runtime::shutdown();
     memory_globals::shutdown();
 }
 

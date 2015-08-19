@@ -5,7 +5,7 @@
 #include "common/asserts.h"
 
 namespace cetech1 {
-    namespace platform {
+    namespace runtime {
         void init() {
             CE_ASSERT(SDL_Init(SDL_INIT_VIDEO) < 0);
         }

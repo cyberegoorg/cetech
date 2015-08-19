@@ -23,9 +23,9 @@ newoption {
 }
 
 newoption {
-  trigger = 'platform',
-  value = "Lib",
-  description = "Base platform lib",
+  trigger = 'runtime',
+  value = "Runtime",
+  description = "Runtime",
   allowed = {
     {'sdl2', "SDL2"}
   }
@@ -59,13 +59,13 @@ solution "cyberego.org tech1"
 	'CETECH_SIMD_FPU'
       }
 
-    -- PLATFORM options
-    filter "options:platform=sdl2"
+    -- Runtime options
+    filter "options:runtime=sdl2"
       defines {
-        'CETECH_PLATFORM_SDL2'
+        'CETECH_RUNTIME_SDL2'
       }
       
-    filter ("system:linux","options:platform=sdl2")
+    filter ("system:linux","options:runtime=sdl2")
       links {
           'SDL2',
           'dl',
