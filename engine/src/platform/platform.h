@@ -1,9 +1,12 @@
 #pragma once
 
-#include "generic/defines.h"
+namespace cetech1 {
+    namespace platform {
+        inline void init();
+        inline void shutdown();
+    }
+}
 
-#ifdef CETECH_LINUX
-    #include "linux/defines.h"
-#elif CETECH_WINDOWS
-    #include "windows/defines.h"
+#ifdef CETECH_PLATFORM_SDL2
+    #include "sdl2/platform.h"
 #endif

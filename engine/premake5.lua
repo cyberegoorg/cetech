@@ -7,9 +7,11 @@ OS_ARCH = _OS .. ARCH
 OS_ARCH_DIR = _OS ..'/' .. ARCH
 
 THIRD_PARTY_BUILD = "../3rdparty/.build/"
-THIRD_PARTY_LIB = THIRD_PARTY_BUILD .."lib/"..OS_ARCH_DIR
+THIRD_PARTY_LIB = THIRD_PARTY_BUILD .."lib/" .. OS_ARCH
 THIRD_PARTY_INCLUDE = THIRD_PARTY_BUILD .. "include/"
-THIRD_PARTY_INCLUDE_ARCH_DEP = THIRD_PARTY_INCLUDE..OS_ARCH_DIR
+THIRD_PARTY_INCLUDE_ARCH_DEP = THIRD_PARTY_INCLUDE .. OS_ARCH
+
+print(THIRD_PARTY_INCLUDE_ARCH_DEP)
 --------------------------------------------------------------------------------
 newoption {
   trigger = 'simd',
@@ -17,6 +19,15 @@ newoption {
   description = "Chose a simd implementation",
   allowed = {
     {'fpu', "Generic implementation using FPU."}
+  }
+}
+
+newoption {
+  trigger = 'platform',
+  value = "Lib",
+  description = "Base platform lib",
+  allowed = {
+    {'sdl2', "SDL2"}
   }
 }
 --------------------------------------------------------------------------------
@@ -47,7 +58,21 @@ solution "cyberego.org tech1"
       defines {
 	'CETECH_SIMD_FPU'
       }
+
+    -- PLATFORM options
+    filter "options:platform=sdl2"
+      defines {
+        'CETECH_PLATFORM_SDL2'
+      }
+      
+    filter ("system:linux","options:platform=sdl2")
+      links {
+          'SDL2',
+          'dl',
+          'pthread'
+      }
     
+      
     filter "Debug"
         flags {"Symbols"}
         targetsuffix '_debug'
@@ -74,6 +99,7 @@ solution "cyberego.org tech1"
 	links {
 	    "m",
 	}
+    
 
     filter "system:windows"
         defines {'CETECH_WINDOWS'}

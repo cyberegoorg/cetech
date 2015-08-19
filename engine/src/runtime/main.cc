@@ -23,7 +23,8 @@ using namespace rapidjson;
 
 void init() {
     memory_globals::init();
-
+    platform::init();
+    
     const char* json = "{\"project\":\"rapidjson\",\"stars\":10}";
     Document d;
     d.Parse(json);
@@ -87,6 +88,7 @@ void run() {
 }
 
 void shutdown() {
+    platform::shutdown();
     memory_globals::shutdown();
 }
 
