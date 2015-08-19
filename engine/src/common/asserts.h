@@ -2,8 +2,9 @@
 
 #include <cstdio>
 #include <cstdlib>
+#include <cstring>
 
-#include "platform/platform.h"
+#include "platform/defines.h"
 
 /*!
  * Check ptr macro.
@@ -91,7 +92,7 @@ namespace cetech1 {
     CE_INLINE void ce_noop() {}
 
     CE_INLINE void ce_assert(const char* condition_str, const char* file, const int line, const char* fce) {
-        std::fprintf(stderr, "ASSERT: \'%s\' in %s:%i:%s().", condition_str, SHORT_FILE(file), line, fce);
+        std::fprintf(stderr, "ASSERT: \'%s\' in %s:%i:%s.\n", condition_str, SHORT_FILE(file), line, fce);
         abort();
     }
 
@@ -100,12 +101,12 @@ namespace cetech1 {
                                  const char* file,
                                  const int line,
                                  const char* fce) {
-        std::fprintf(stderr, "ASSERT:\'%s\': \"%s\" %s:%i:%s().", where, what, SHORT_FILE(file), line, fce);
+        std::fprintf(stderr, "ASSERT:\'%s\': \"%s\" %s:%i:%s.\n", where, what, SHORT_FILE(file), line, fce);
         abort();
     }
 
     CE_INLINE void ce_check_ptr(const char* file, const int line) {
-        std::fprintf(stderr, "ASSERT(CHECK POINTER): in file %s on line %i is invalid pointer.", SHORT_FILE(file),
+        std::fprintf(stderr, "ASSERT(CHECK POINTER): in file %s on line %i is invalid pointer.\n", SHORT_FILE(file),
                      line);
         abort();
     }
