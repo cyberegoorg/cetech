@@ -1,5 +1,6 @@
 #pragma once
 
+#include "common/math/math_types.h"
 #include "runtime_types.h"
 
 namespace cetech1 {
@@ -43,9 +44,19 @@ namespace cetech1 {
             const char* button_name(const uint32_t button_index);
 
             bool button_state(const uint32_t button_index);
-
             bool button_pressed(const uint32_t button_index);
             bool button_released(const uint32_t button_index);
+        };
+	
+        namespace mouse {
+            uint32_t button_index(const char* scancode);
+            const char* button_name(const uint32_t button_index);
+
+            bool button_state(const uint32_t button_index);
+            bool button_pressed(const uint32_t button_index);
+            bool button_released(const uint32_t button_index);
+
+	    Vector2 axis();
         };
     }
 }

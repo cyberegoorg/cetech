@@ -28,9 +28,17 @@ void frame_end() {
     runtime::frame_end();
 }
 
+void frame_body() {
+    if( runtime::mouse::button_state(runtime::mouse::button_index("left"))) {
+	Vector2 m = runtime::mouse::axis();
+	printf("%f, %f\n", m.x, m.y);
+    }
+}
+
 void run() {
     while (1) {
         frame_start();
+	frame_body();
         frame_end();
     }
 }
