@@ -9,14 +9,14 @@
 
 namespace cetech1 {
     namespace quat {
-	static const Quat ZERO = {0.0f, 0.0f, 0.0f, 0.0f};
-	static const Quat IDENTITY = {0.0f, 0.0f, 0.0f, 1.0f};
-	
-	static const Quat I = {1.0f, 0.0f, 0.0f, 0.0f};
-	static const Quat J = {0.0f, 1.0f, 0.0f, 0.0f};
-	static const Quat K = {0.0f, 0.0f, 1.0f, 0.0f};
+        static const Quat ZERO = {0.0f, 0.0f, 0.0f, 0.0f};
+        static const Quat IDENTITY = {0.0f, 0.0f, 0.0f, 1.0f};
+
+        static const Quat I = {1.0f, 0.0f, 0.0f, 0.0f};
+        static const Quat J = {0.0f, 1.0f, 0.0f, 0.0f};
+        static const Quat K = {0.0f, 0.0f, 1.0f, 0.0f};
     }
-  
+
     /*! Quat functions.
      */
     namespace quat {
