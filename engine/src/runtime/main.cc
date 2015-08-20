@@ -24,10 +24,32 @@ using namespace rapidjson;
 
 void init() {
     memory_globals::init();
-    runtime::init();    
+    runtime::init();
+
+    Window w = runtime::window::make_window(
+        "aaa",
+        runtime::window::WINDOWPOS_CENTERED, runtime::window::WINDOWPOS_CENTERED,
+        800, 600,
+        runtime::window::WINDOW_NOFLAG
+        );
+
+    //runtime::window::destroy_window(w);
+}
+
+void frame_start() {
+    runtime::frame_start();
+}
+
+void frame_end() {
+    runtime::frame_end();
 }
 
 void run() {
+    while (1) {
+        frame_start();
+        frame_end();
+    }
+
     const char* json = "{\"project\":\"rapidjson\",\"stars\":10}";
     Document d;
     d.Parse(json);
