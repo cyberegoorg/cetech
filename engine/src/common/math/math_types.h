@@ -35,6 +35,6 @@ namespace cetech1 {
     /*! Matrix 4x4
      */
     struct Matrix44 {
-        Vector3 x, y, z, t;
+        Vector4 x, y, z, t;
     };
 }
