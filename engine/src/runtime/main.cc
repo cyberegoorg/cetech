@@ -4,6 +4,7 @@
 #include "common/math/quat.h"
 #include "common/math/vector2.h"
 #include "common/math/matrix33.h"
+#include "common/math/matrix44.h"
 #include "common/math/simd/simd.h"
 #include "common/types.h"
 #include "common/container/array.h"
