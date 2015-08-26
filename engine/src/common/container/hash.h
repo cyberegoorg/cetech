@@ -4,7 +4,7 @@
 #include "common/container/array.h"
 #include "common/container/container_types.h"
 
-namespace cetech1 {
+namespace cetech {
 
     /*! Hash map.
      */

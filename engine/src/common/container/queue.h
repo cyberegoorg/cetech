@@ -4,7 +4,7 @@
 #include "container_types.h"
 #include "array.h"
 
-namespace cetech1 {
+namespace cetech {
 
     /*! Queue.
      */

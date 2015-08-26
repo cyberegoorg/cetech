@@ -9,7 +9,7 @@
 #include <string.h>
 #include <type_traits>
 
-namespace cetech1 {
+namespace cetech {
 
     /*! Array.
      */

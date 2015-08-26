@@ -4,7 +4,7 @@
 #include "common/types.h"
 #include "common/memory/memory_types.h"
 
-namespace cetech1 {
+namespace cetech {
 
     /*! Array container.
      */

@@ -3,7 +3,7 @@
 #include "common/math/math_types.h"
 #include "runtime_types.h"
 
-namespace cetech1 {
+namespace cetech {
     namespace runtime {
         void init();
         void shutdown();

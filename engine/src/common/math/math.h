@@ -4,7 +4,7 @@
 
 #include "../types.h"
 
-namespace cetech1 {
+namespace cetech {
 
     /*! Math
      */

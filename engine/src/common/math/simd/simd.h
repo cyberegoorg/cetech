@@ -8,7 +8,7 @@
   #include "sse.h"
 #endif
 
-namespace cetech1 {
+namespace cetech {
 
     /*! SIMD procesor.
      */
