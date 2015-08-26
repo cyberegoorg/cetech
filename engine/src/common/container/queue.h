@@ -1,3 +1,5 @@
+#pragma once
+
 // based on bitsquid foundation
 #include "container_types.h"
 #include "array.h"

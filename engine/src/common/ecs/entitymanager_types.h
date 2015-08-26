@@ -13,7 +13,7 @@ namespace cetech1 {
         Array < unsigned char > _generation;
         Queue < uint32_t > _free_idx;
 
-        EntityManager() : _generation(memory_globals::default_allocator()), _free_idx(
-                              memory_globals::default_allocator()) {};
+        EntityManager() : _generation(memory_globals::default_allocator()),
+                          _free_idx(memory_globals::default_allocator()) {};
     };
 }
