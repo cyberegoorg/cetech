@@ -12,7 +12,7 @@
  */
 #ifdef CETECH_DEBUG
   #define CE_CHECK_PTR(ptr) \
-    do { if (!ptr) { cetech1::ce_check_ptr(__FILE__, __LINE__); } } while (0)
+    do { if (!ptr) { cetech::ce_check_ptr(__FILE__, __LINE__); } } while (0)
 #else
   #define CE_CHECK_PTR(ptr) do {} while (0)
 #endif
@@ -22,10 +22,10 @@
  * \param condition Asset condition.
  */
 #ifdef CETECH_DEBUG
-  #define CE_ASSERT(condition) do { !(condition) ? cetech1::ce_assert( #condition, \
+  #define CE_ASSERT(condition) do { !(condition) ? cetech::ce_assert( #condition, \
                                                                        __FILE__, \
                                                                        __LINE__, \
-                                                                       __PRETTY_FUNCTION__) : cetech1::ce_noop(); \
+                                                                       __PRETTY_FUNCTION__) : cetech::ce_noop(); \
 } while (0)
 #else
   #define CE_ASSERT(condition) do {} while (0)
@@ -37,19 +37,19 @@
  * \param msg Message.
  */
 #ifdef CETECH_DEBUG
-  #define CE_ASSERT_MSG(condition, msg) do { !(condition) ? cetech1::ce_assert_msg(msg, \
+  #define CE_ASSERT_MSG(condition, msg) do { !(condition) ? cetech::ce_assert_msg(msg, \
                                                                                    #condition, \
                                                                                    __FILE__, \
                                                                                    __LINE__, \
                                                                                    __PRETTY_FUNCTION__) : \
-                                             cetech1::ce_noop(); } while (0)
+                                             cetech::ce_noop(); } while (0)
 #else
   #define CE_ASSERT_MSG(condition, where, what) do {} while (0)
 #endif
 
 #define SHORT_FILE(filename) (strrchr(filename, '/') ? strrchr(filename, '/') + 1 : filename)
 
-namespace cetech1 {
+namespace cetech {
     /*!
      * No operation fce.
      */
@@ -88,7 +88,7 @@ namespace cetech1 {
     CE_INLINE void ce_check_ptr(const char* file, const int line);
 }
 
-namespace cetech1 {
+namespace cetech {
     CE_INLINE void ce_noop() {}
 
     CE_INLINE void ce_assert(const char* condition_str, const char* file, const int line, const char* fce) {

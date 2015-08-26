@@ -1,7 +1,7 @@
 // based on bitsquid foundation
 #pragma once
 
-namespace cetech1 {
+namespace cetech {
     /*! 2D Vector.
      */
     struct Vector2 {

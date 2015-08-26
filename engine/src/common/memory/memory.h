@@ -6,7 +6,7 @@
 #include "common/asserts.h"
 #include "common/types.h"
 
-namespace cetech1 {
+namespace cetech {
 
     /*! Abstract allocator.
      */

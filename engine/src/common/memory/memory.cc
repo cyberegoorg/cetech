@@ -6,7 +6,7 @@
 #include <new>
 
 namespace {
-    using namespace cetech1;
+    using namespace cetech;
 
     const uint32_t HEADER_PAD_VALUE = 0xffffffffu;
 
@@ -100,7 +100,7 @@ namespace {
     MemoryGlobals _memory_globals;
 }
 
-namespace cetech1 {
+namespace cetech {
     namespace memory_globals {
         void init() {
             char* p = _memory_globals.buffer;

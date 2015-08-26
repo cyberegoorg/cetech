@@ -1,7 +1,7 @@
 // based on bitsquid foundation
 #include "murmur_hash.h"
 
-namespace cetech1 {
+namespace cetech {
     uint64_t murmur_hash_64(const void* key, const uint32_t len, const uint64_t seed) {
         static const uint64_t m = 0xc6a4a7935bd1e995ULL;
         static const uint32_t r = 47;

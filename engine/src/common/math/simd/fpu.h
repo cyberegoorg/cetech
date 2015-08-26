@@ -6,7 +6,7 @@
 
 #include "fpu_types.h"
 
-namespace cetech1 {
+namespace cetech {
     namespace simd {
         CE_INLINE SimdVector make_simd_vector(const float x, const float y, const float z, const float w) {
             SimdVector ret = {{x, y, z, w}};

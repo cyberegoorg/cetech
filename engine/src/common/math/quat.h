@@ -7,7 +7,7 @@
 #include "vector3.h"
 #include "simd/simd.h"
 
-namespace cetech1 {
+namespace cetech {
     namespace quat {
         static const Quat ZERO = {0.0f, 0.0f, 0.0f, 0.0f};
         static const Quat IDENTITY = {0.0f, 0.0f, 0.0f, 1.0f};

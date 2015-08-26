@@ -9,7 +9,7 @@
 #include "common/memory/memory.h"
 #include "common/container/queue.h"
 
-namespace cetech1 {   
+namespace cetech {   
     namespace entity_manager_internal {
         typename handler::Handler<uint32_t,uint32_t, unsigned char,22,8,1024> entity_handler;
     }

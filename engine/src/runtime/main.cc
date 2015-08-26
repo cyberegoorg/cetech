@@ -18,7 +18,7 @@
 #include "rapidjson/writer.h"
 #include "rapidjson/stringbuffer.h"
 
-using namespace cetech1;
+using namespace cetech;
 using namespace rapidjson;
 
 void frame_start() {

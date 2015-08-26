@@ -3,7 +3,7 @@
 #include "math_types.h"
 #include "math.h"
 
-namespace cetech1 {
+namespace cetech {
     namespace vector2 {
         /*! Zero vector [0.0f, 0.0f]
          */

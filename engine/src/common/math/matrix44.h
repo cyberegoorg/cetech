@@ -4,7 +4,7 @@
 #include "math.h"
 #include "simd/simd.h"
 
-namespace cetech1 {
+namespace cetech {
     namespace matrix44 {
         /*! Identity matrix.
          */

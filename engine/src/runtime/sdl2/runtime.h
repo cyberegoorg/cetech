@@ -7,22 +7,22 @@
 #include "common/math/vector2.h"
 #include "runtime/runtime.h"
 
-namespace cetech1 {
+namespace cetech {
     namespace runtime {
-        namespace keyboard_internal {
-	    static uint8_t KeyboardStates[512] = { 0 };
-	    static uint8_t KeyboardStatesLast[512] = { 0 };
-	}
+        namespace  {
+            static uint8_t KeyboardStates[512] = { 0 };
+            static uint8_t KeyboardStatesLast[512] = { 0 };
+        }
 
-	namespace mouse_internal {
-	    static Vector2 MouseAxis = vector2::ZERO;
-	    static uint32_t MouseButtonState = 0;
-	    static uint32_t MouseButtonStateLast = 0;
-	    
-	    static uint64_t left_btn_hash = 0;
-	    static uint64_t middle_btn_hash = 0;
-	    static uint64_t right_btn_hash = 0;
-	}
+        namespace mouse_internal {
+            static Vector2 MouseAxis = vector2::ZERO;
+            static uint32_t MouseButtonState = 0;
+            static uint32_t MouseButtonStateLast = 0;
+            
+            static uint64_t left_btn_hash = 0;
+            static uint64_t middle_btn_hash = 0;
+            static uint64_t right_btn_hash = 0;
+        }
 	
         void init() {
             CE_ASSERT(SDL_Init(SDL_INIT_VIDEO) == 0);
@@ -48,7 +48,7 @@ namespace cetech1 {
             }
 	    
 	    /*Keyboard*/
-            memcpy(keyboard_internal::KeyboardStates, SDL_GetKeyboardState(NULL), 512);
+            memcpy(KeyboardStates, SDL_GetKeyboardState(NULL), 512);
 
 	    /*Mouse*/
 	    int32_t x, y;
@@ -58,7 +58,7 @@ namespace cetech1 {
         }
 
         void frame_end() {
-            memcpy(keyboard_internal::KeyboardStatesLast, keyboard_internal::KeyboardStates, 512);
+            memcpy(KeyboardStatesLast, KeyboardStates, 512);
 	    mouse_internal::MouseButtonStateLast = mouse_internal::MouseButtonState;
         }
     }
@@ -131,22 +131,23 @@ namespace cetech1 {
             }
 
             bool button_state(const uint32_t button_index) {
-                return keyboard_internal::KeyboardStates[button_index];
+                return KeyboardStates[button_index];
             }
 
             bool button_pressed(const uint32_t button_index) {
-                return !keyboard_internal::KeyboardStatesLast[button_index] && keyboard_internal::KeyboardStates[button_index];
+                return !KeyboardStatesLast[button_index] && KeyboardStates[button_index];
             }
 
             bool button_released(const uint32_t button_index) {
-                return keyboard_internal::KeyboardStatesLast[button_index] && !keyboard_internal::KeyboardStates[button_index];
+                return KeyboardStatesLast[button_index] && !KeyboardStates[button_index];
             }
         };
 	
 
         namespace mouse {
             uint32_t button_index(const char* scancode) {
-		const uint64_t h = murmur_hash_64(scancode, strlen(scancode), 22);
+		uint64_t h = murmur_hash_64(scancode, strlen(scancode), 22);
+		
 		if (h == mouse_internal::left_btn_hash)
 		    return SDL_BUTTON_LMASK;
 		else if (h == mouse_internal::middle_btn_hash)
@@ -158,19 +159,14 @@ namespace cetech1 {
 	    }
 
             const char* button_name(const uint32_t button_index) {
-		switch(button_index) {
-		    case SDL_BUTTON_LMASK:
+		if (button_index == SDL_BUTTON_LMASK)
 			return "left";
-			
-		    case SDL_BUTTON_MMASK:
+		else if (button_index == SDL_BUTTON_MMASK)
 			return "middle";
-			
-		    case SDL_BUTTON_RMASK:
+		else if (button_index == SDL_BUTTON_RMASK)
 			return "right";
-		    
-		    default:
-			return "";
-		}
+
+		return "";
 	    }
 
             bool button_state(const uint32_t button_index) {
@@ -192,3 +188,4 @@ namespace cetech1 {
 	
     }
 }
+

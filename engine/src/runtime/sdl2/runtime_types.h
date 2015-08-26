@@ -2,7 +2,7 @@
 
 struct SDL_Window;
 
-namespace cetech1 {
+namespace cetech {
     struct Window {
         SDL_Window* wnd;
     };

@@ -4,7 +4,7 @@
 #include "common/memory/memory.h"
 #include "common/container/container_types.h"
 
-namespace cetech1 {
+namespace cetech {
     struct Entity {
         uint32_t id;
     };

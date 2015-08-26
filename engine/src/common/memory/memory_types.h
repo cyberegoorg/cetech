@@ -1,6 +1,6 @@
 // based on bitsquid foundation
 #pragma once
 
-namespace cetech1 {
+namespace cetech {
     class Allocator;
 }
