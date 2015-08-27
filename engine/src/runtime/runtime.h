@@ -47,7 +47,7 @@ namespace cetech {
             bool button_pressed(const uint32_t button_index);
             bool button_released(const uint32_t button_index);
         };
-	
+
         namespace mouse {
             uint32_t button_index(const char* scancode);
             const char* button_name(const uint32_t button_index);
@@ -56,7 +56,7 @@ namespace cetech {
             bool button_pressed(const uint32_t button_index);
             bool button_released(const uint32_t button_index);
 
-	    Vector2 axis();
+            Vector2 axis();
         };
     }
 }

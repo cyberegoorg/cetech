@@ -11,12 +11,14 @@
 
 namespace cetech {
     namespace entity_manager_internal {
-        typename handler::HandlerManager<uint32_t,uint32_t, unsigned char,22,8,1024> entity_handler_manager;
+        typename handler::HandlerManager < uint32_t, uint32_t, unsigned char, 22, 8, 1024 > entity_handler_manager;
     }
 
     namespace entity_manager {
         Entity create(EntityManager& em) {
-            return {entity_manager_internal::entity_handler_manager.create(em._free_idx, em._generation)};
+            return {
+                       entity_manager_internal::entity_handler_manager.create(em._free_idx, em._generation)
+            };
         }
 
         void destroy(EntityManager& em, const Entity e) {
