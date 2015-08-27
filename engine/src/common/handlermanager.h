@@ -6,7 +6,10 @@
 namespace cetech {
     namespace handler{
         template<typename handler_type, typename free_idx_type, typename gen_type, int index_bit_count, int gen_bit_count, int min_free_indexs>
-        struct Handler {
+        struct HandlerManager {
+	    typedef handler_type HandlerType;
+	
+	    
             static handler_type idx(const handler_type handler) {
                 return handler >> index_bit_count;
             }
@@ -39,7 +42,7 @@ namespace cetech {
                 ++generation[id];
                 queue::push_back(free_idx, id);
             }
-            
+
             static bool alive(handler_type handler, const Array<gen_type> &generation) {
                 return generation[idx(handler)] == gen(handler);
             }
