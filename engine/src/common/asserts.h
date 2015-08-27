@@ -23,9 +23,9 @@
  */
 #ifdef CETECH_DEBUG
   #define CE_ASSERT(condition) do { !(condition) ? cetech::ce_assert( #condition, \
-                                                                       __FILE__, \
-                                                                       __LINE__, \
-                                                                       __PRETTY_FUNCTION__) : cetech::ce_noop(); \
+                                                                      __FILE__, \
+                                                                      __LINE__, \
+                                                                      __PRETTY_FUNCTION__) : cetech::ce_noop(); \
 } while (0)
 #else
   #define CE_ASSERT(condition) do {} while (0)
@@ -38,10 +38,10 @@
  */
 #ifdef CETECH_DEBUG
   #define CE_ASSERT_MSG(condition, msg) do { !(condition) ? cetech::ce_assert_msg(msg, \
-                                                                                   #condition, \
-                                                                                   __FILE__, \
-                                                                                   __LINE__, \
-                                                                                   __PRETTY_FUNCTION__) : \
+                                                                                  #condition, \
+                                                                                  __FILE__, \
+                                                                                  __LINE__, \
+                                                                                  __PRETTY_FUNCTION__) : \
                                              cetech::ce_noop(); } while (0)
 #else
   #define CE_ASSERT_MSG(condition, where, what) do {} while (0)
