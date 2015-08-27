@@ -16,6 +16,10 @@ SCENARIO( "Handler manager can create/destroy handler", "[handlermanager]" ) {
         HandlerManager::HandlerType h1 = HandlerManager::create(free_idx, generation);
         HandlerManager::HandlerType h2 = HandlerManager::create(free_idx, generation);
 
+	REQUIRE( HandlerManager::IndexBitCount == 22 );
+	REQUIRE( HandlerManager::GenBitCount == 8 );
+	REQUIRE( HandlerManager::MinFreeIndex == 1024 );
+	
         WHEN( "Create some handler" ) {
             THEN("Two handlers has diffrent id") {
                 REQUIRE( h1 != h2 );

@@ -5,11 +5,24 @@
 
 namespace cetech {
     namespace handler {
-        template < typename handler_type, typename free_idx_type, typename gen_type, int index_bit_count,
-        int gen_bit_count, int min_free_indexs >
+        template <
+        typename handler_type,
+        typename free_idx_type,
+        typename gen_type,
+        int index_bit_count,
+        int gen_bit_count,
+        int min_free_indexs
+        >
         struct HandlerManager {
             typedef handler_type HandlerType;
-
+	    typedef free_idx_type FreeIdxType;
+	    typedef gen_type GentTyp;
+	    
+	    enum {
+		IndexBitCount = index_bit_count,
+		GenBitCount = gen_bit_count,
+		MinFreeIndex = min_free_indexs
+	    };
 
             static handler_type idx(const handler_type handler) {
                 return handler >> index_bit_count;
