@@ -15,14 +15,14 @@ namespace cetech {
         >
         struct HandlerManager {
             typedef handler_type HandlerType;
-	    typedef free_idx_type FreeIdxType;
-	    typedef gen_type GentTyp;
-	    
-	    enum {
-		IndexBitCount = index_bit_count,
-		GenBitCount = gen_bit_count,
-		MinFreeIndex = min_free_indexs
-	    };
+            typedef free_idx_type FreeIdxType;
+            typedef gen_type GentTyp;
+
+            enum {
+                IndexBitCount = index_bit_count,
+                GenBitCount = gen_bit_count,
+                MinFreeIndex = min_free_indexs
+            };
 
             static handler_type idx(const handler_type handler) {
                 return handler >> index_bit_count;

@@ -3,6 +3,7 @@
 #include "math_types.h"
 #include "math.h"
 #include "simd/simd.h"
+#include "vector3.h"
 
 namespace cetech {
     namespace matrix33 {
@@ -24,9 +25,11 @@ namespace cetech {
          * \return New rotation matrix
          */
         CE_INLINE Matrix33 from_axis_angle(const Vector3& axis, const float angle_deg);
+
     }
 
     CE_INLINE Matrix33 operator* (const Matrix33 &m1, const Matrix33 &m2);
+    CE_INLINE Vector3 operator* (const Matrix33 &m1, const Vector3 &v1);
 
 
     namespace matrix33 {
@@ -57,6 +60,14 @@ namespace cetech {
         Matrix33 res;
         simd::mat33_mult(&m1, &m2, &res);
         return res;
+    }
+
+    Vector3 operator* (const Matrix33 &m1, const Vector3 &v1) {
+        return vector3::make_vector3(
+            vector3::dot(m1.x, v1),
+            vector3::dot(m1.y, v1),
+            vector3::dot(m1.z, v1)
+            );
     }
 
 }
