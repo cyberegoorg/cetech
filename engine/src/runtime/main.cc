@@ -48,12 +48,20 @@ void init() {
     memory_globals::init();
     runtime::init();
 
-    Window w = runtime::window::make_window(
-        "aaa",
-        runtime::window::WINDOWPOS_CENTERED, runtime::window::WINDOWPOS_CENTERED,
-        800, 600,
-        runtime::window::WINDOW_NOFLAG
-        );
+    //     Window w = runtime::window::make_window(
+    //         "aaa",
+    //         runtime::window::WINDOWPOS_CENTERED, runtime::window::WINDOWPOS_CENTERED,
+    //         800, 600,
+    //         runtime::window::WINDOW_NOFLAG
+    //         );
+
+    Matrix44 m1 = matrix44::IDENTITY;
+
+    float det = matrix44::determinant(m1);
+
+    printf("det: %f\n", det);
+
+
 }
 
 void shutdown() {
