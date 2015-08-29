@@ -7,6 +7,7 @@
 #include "common/math/matrix44.h"
 #include "common/math/simd/simd.h"
 #include "common/types.h"
+#include "common/log.h"
 #include "common/container/array.h"
 #include "common/container/hash.h"
 #include "common/ecs/entitymanager.h"
@@ -60,8 +61,9 @@ void init() {
     float det = matrix44::determinant(m1);
 
     printf("det: %f\n", det);
-
-
+    
+    
+    log::info("main", "sadasdsad");
 }
 
 void shutdown() {
