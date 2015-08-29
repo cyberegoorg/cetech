@@ -2,14 +2,77 @@
 
 #include "SDL2/SDL.h"
 
+#include "common/log.h"
 #include "common/asserts.h"
 #include "common/murmur_hash.h"
 #include "common/math/vector2.h"
 #include "runtime/runtime.h"
 
-namespace cetech {
+namespace cetech {   
     namespace runtime {
-        namespace  {
+        namespace log_internal {
+            void sdl_log_output_function(void* userdata, int category, SDL_LogPriority priority, const char* message) {
+                const char *where = nullptr;
+                
+                switch(category){
+                    case SDL_LOG_CATEGORY_APPLICATION:
+                        where = "sdl.app";
+                        break;
+                        
+                    case SDL_LOG_CATEGORY_ERROR:
+                        where = "sdl.error";
+                        break;
+                        
+                    case SDL_LOG_CATEGORY_SYSTEM:
+                        where = "sdl.system";
+                        break;
+                        
+                    case SDL_LOG_CATEGORY_AUDIO:
+                        where = "sdl.audio";
+                        break;
+                        
+                    case SDL_LOG_CATEGORY_VIDEO:
+                        where = "sdl.video";
+                        break;
+                        
+                    case SDL_LOG_CATEGORY_RENDER:
+                        where = "sdl.render";
+                        break;
+                        
+                    case SDL_LOG_CATEGORY_INPUT:
+                        where = "sdl.input";
+                        break;
+                }
+                
+                switch(priority){
+                    case SDL_LOG_PRIORITY_VERBOSE:
+                        log::info(where, "%s", message);
+                        break;
+                        
+                    case SDL_LOG_PRIORITY_DEBUG:
+                        log::debug(where, "%s", message);
+                        break;
+                        
+                    case SDL_LOG_PRIORITY_INFO:
+                        log::info(where, "%s", message);
+                        break;
+                        
+                    case SDL_LOG_PRIORITY_WARN:
+                        log::warning(where, "%s", message);
+                        break;
+                        
+                    case SDL_LOG_PRIORITY_ERROR:
+                        log::error(where, "%s", message);
+                        break;
+                        
+                    case SDL_LOG_PRIORITY_CRITICAL:
+                        log::error(where, "%s", message);
+                        break;
+                }
+            }
+        }
+
+        namespace keyboard_internal {
             static uint8_t KeyboardStates[512] = { 0 };
             static uint8_t KeyboardStatesLast[512] = { 0 };
         }
@@ -25,8 +88,13 @@ namespace cetech {
         }
 
         void init() {
+            SDL_LogSetOutputFunction(&log_internal::sdl_log_output_function, nullptr);
+            SDL_LogSetAllPriority(SDL_LOG_PRIORITY_INFO);
+            
             CE_ASSERT(SDL_Init(SDL_INIT_VIDEO) == 0);
-
+            
+            SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "dsadasdsd");
+            
             mouse_internal::left_btn_hash = murmur_hash_64("left", strlen("left"), 22);
             mouse_internal::middle_btn_hash = murmur_hash_64("middle", strlen("middle"), 22);
             mouse_internal::right_btn_hash = murmur_hash_64("right", strlen("right"), 22);
@@ -48,7 +116,7 @@ namespace cetech {
             }
 
             /*Keyboard*/
-            memcpy(KeyboardStates, SDL_GetKeyboardState(NULL), 512);
+            memcpy(keyboard_internal::KeyboardStates, SDL_GetKeyboardState(NULL), 512);
 
             /*Mouse*/
             int32_t x, y;
@@ -58,11 +126,11 @@ namespace cetech {
         }
 
         void frame_end() {
-            memcpy(KeyboardStatesLast, KeyboardStates, 512);
+            memcpy(keyboard_internal::KeyboardStatesLast, keyboard_internal::KeyboardStates, 512);
             mouse_internal::MouseButtonStateLast = mouse_internal::MouseButtonState;
         }
     }
-
+    
     namespace runtime {
         namespace window_internal {
             CE_INLINE uint32_t sdl_pos(const uint32_t pos) {
@@ -131,15 +199,15 @@ namespace cetech {
             }
 
             bool button_state(const uint32_t button_index) {
-                return KeyboardStates[button_index];
+                return keyboard_internal::KeyboardStates[button_index];
             }
 
             bool button_pressed(const uint32_t button_index) {
-                return !KeyboardStatesLast[button_index] && KeyboardStates[button_index];
+                return !keyboard_internal::KeyboardStatesLast[button_index] && keyboard_internal::KeyboardStates[button_index];
             }
 
             bool button_released(const uint32_t button_index) {
-                return KeyboardStatesLast[button_index] && !KeyboardStates[button_index];
+                return keyboard_internal::KeyboardStatesLast[button_index] && !keyboard_internal::KeyboardStates[button_index];
             }
         };
 

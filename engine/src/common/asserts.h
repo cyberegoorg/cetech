@@ -5,6 +5,7 @@
 #include <cstring>
 
 #include "platform/defines.h"
+#include "platform/defines.h"
 
 /*!
  * Check ptr macro.
