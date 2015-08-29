@@ -127,7 +127,9 @@ namespace cetech {
         };
 
         template < typename T > uint32_t add_entry(Hash < T >& h, const uint64_t key) {
-            typename Hash < T > ::Entry e = {.key = key, .next = END_OF_LIST};
+            typename Hash < T > ::Entry e;
+            e.key = key;
+            e.next = END_OF_LIST;
 
             const uint32_t ei = array::size(h._data);
             array::push_back(h._data, e);
@@ -158,7 +160,10 @@ namespace cetech {
         }
 
         template < typename T > FindResult find(const Hash < T >& h, const uint64_t key) {
-            FindResult fr = {END_OF_LIST};
+            FindResult fr;
+            fr.data_i = END_OF_LIST;
+            fr.data_prev = END_OF_LIST;
+            fr.hash_i = END_OF_LIST;
 
             if (array::size(h._hash) == 0) {
                 return fr;
