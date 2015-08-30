@@ -10,8 +10,14 @@
 #include "common/log.h"
 #include "common/container/array.h"
 #include "common/container/hash.h"
+#include "common/container/queue.h"
 #include "common/ecs/entitymanager.h"
 #include "runtime/runtime.h"
+
+#include "common/resource_manager.h"
+#include "common/package_manager.h"
+
+#include "resources/package.h"
 
 #include <iostream>
 
@@ -21,6 +27,7 @@
 
 using namespace cetech;
 using namespace rapidjson;
+
 
 void frame_start() {
     runtime::frame_start();
@@ -48,6 +55,19 @@ void run() {
 void init() {
     memory_globals::init();
     runtime::init();
+    resource_manager_globals::init();
+    package_manager_globals::init();
+
+    uint64_t type_h = murmur_hash_64("package", strlen("package"), 22);
+    uint64_t name_h = murmur_hash_64("main", strlen("main"), 22);
+    
+    resource_manager::register_loader_clb(type_h, &resource_package::loader);
+    resource_manager::register_compiler_clb(type_h, &resource_package::compiler);
+
+    resource_manager::compile("main.package");
+    resource_manager::load(type_h, name_h);
+    
+    package_manager::load(name_h);
 
     //     Window w = runtime::window::make_window(
     //         "aaa",
@@ -61,14 +81,13 @@ void init() {
     float det = matrix44::determinant(m1);
 
     printf("det: %f\n", det);
-    
-    
-    log::info("main", "sadasdsad");
 }
 
 void shutdown() {
     runtime::shutdown();
     memory_globals::shutdown();
+    resource_manager_globals::shutdown();
+    package_manager_globals::shutdown();
 }
 
 int main(int argc, char** argv) {

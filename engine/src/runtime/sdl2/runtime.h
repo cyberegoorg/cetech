@@ -8,66 +8,69 @@
 #include "common/math/vector2.h"
 #include "runtime/runtime.h"
 
-namespace cetech {   
+namespace cetech {
     namespace runtime {
         namespace log_internal {
-            void sdl_log_output_function(void* userdata, int category, SDL_LogPriority priority, const char* message) {
-                const char *where = nullptr;
-                
-                switch(category){
-                    case SDL_LOG_CATEGORY_APPLICATION:
-                        where = "sdl.app";
-                        break;
-                        
-                    case SDL_LOG_CATEGORY_ERROR:
-                        where = "sdl.error";
-                        break;
-                        
-                    case SDL_LOG_CATEGORY_SYSTEM:
-                        where = "sdl.system";
-                        break;
-                        
-                    case SDL_LOG_CATEGORY_AUDIO:
-                        where = "sdl.audio";
-                        break;
-                        
-                    case SDL_LOG_CATEGORY_VIDEO:
-                        where = "sdl.video";
-                        break;
-                        
-                    case SDL_LOG_CATEGORY_RENDER:
-                        where = "sdl.render";
-                        break;
-                        
-                    case SDL_LOG_CATEGORY_INPUT:
-                        where = "sdl.input";
-                        break;
+            CE_INLINE void sdl_log_output_function(void* userdata,
+                                                   int category,
+                                                   SDL_LogPriority priority,
+                                                   const char* message) {
+                const char* where = nullptr;
+
+                switch (category) {
+                case SDL_LOG_CATEGORY_APPLICATION:
+                    where = "sdl.app";
+                    break;
+
+                case SDL_LOG_CATEGORY_ERROR:
+                    where = "sdl.error";
+                    break;
+
+                case SDL_LOG_CATEGORY_SYSTEM:
+                    where = "sdl.system";
+                    break;
+
+                case SDL_LOG_CATEGORY_AUDIO:
+                    where = "sdl.audio";
+                    break;
+
+                case SDL_LOG_CATEGORY_VIDEO:
+                    where = "sdl.video";
+                    break;
+
+                case SDL_LOG_CATEGORY_RENDER:
+                    where = "sdl.render";
+                    break;
+
+                case SDL_LOG_CATEGORY_INPUT:
+                    where = "sdl.input";
+                    break;
                 }
-                
-                switch(priority){
-                    case SDL_LOG_PRIORITY_VERBOSE:
-                        log::info(where, "%s", message);
-                        break;
-                        
-                    case SDL_LOG_PRIORITY_DEBUG:
-                        log::debug(where, "%s", message);
-                        break;
-                        
-                    case SDL_LOG_PRIORITY_INFO:
-                        log::info(where, "%s", message);
-                        break;
-                        
-                    case SDL_LOG_PRIORITY_WARN:
-                        log::warning(where, "%s", message);
-                        break;
-                        
-                    case SDL_LOG_PRIORITY_ERROR:
-                        log::error(where, "%s", message);
-                        break;
-                        
-                    case SDL_LOG_PRIORITY_CRITICAL:
-                        log::error(where, "%s", message);
-                        break;
+
+                switch (priority) {
+                case SDL_LOG_PRIORITY_VERBOSE:
+                    log::info(where, "%s", message);
+                    break;
+
+                case SDL_LOG_PRIORITY_DEBUG:
+                    log::debug(where, "%s", message);
+                    break;
+
+                case SDL_LOG_PRIORITY_INFO:
+                    log::info(where, "%s", message);
+                    break;
+
+                case SDL_LOG_PRIORITY_WARN:
+                    log::warning(where, "%s", message);
+                    break;
+
+                case SDL_LOG_PRIORITY_ERROR:
+                    log::error(where, "%s", message);
+                    break;
+
+                case SDL_LOG_PRIORITY_CRITICAL:
+                    log::error(where, "%s", message);
+                    break;
                 }
             }
         }
@@ -90,11 +93,11 @@ namespace cetech {
         void init() {
             SDL_LogSetOutputFunction(&log_internal::sdl_log_output_function, nullptr);
             SDL_LogSetAllPriority(SDL_LOG_PRIORITY_INFO);
-            
+
             CE_ASSERT(SDL_Init(SDL_INIT_VIDEO) == 0);
-            
+
             SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "dsadasdsd");
-            
+
             mouse_internal::left_btn_hash = murmur_hash_64("left", strlen("left"), 22);
             mouse_internal::middle_btn_hash = murmur_hash_64("middle", strlen("middle"), 22);
             mouse_internal::right_btn_hash = murmur_hash_64("right", strlen("right"), 22);
@@ -130,7 +133,7 @@ namespace cetech {
             mouse_internal::MouseButtonStateLast = mouse_internal::MouseButtonState;
         }
     }
-    
+
     namespace runtime {
         namespace window_internal {
             CE_INLINE uint32_t sdl_pos(const uint32_t pos) {
@@ -203,11 +206,13 @@ namespace cetech {
             }
 
             bool button_pressed(const uint32_t button_index) {
-                return !keyboard_internal::KeyboardStatesLast[button_index] && keyboard_internal::KeyboardStates[button_index];
+                return !keyboard_internal::KeyboardStatesLast[button_index] &&
+                       keyboard_internal::KeyboardStates[button_index];
             }
 
             bool button_released(const uint32_t button_index) {
-                return keyboard_internal::KeyboardStatesLast[button_index] && !keyboard_internal::KeyboardStates[button_index];
+                return keyboard_internal::KeyboardStatesLast[button_index] &&
+                       !keyboard_internal::KeyboardStates[button_index];
             }
         };
 
@@ -257,6 +262,69 @@ namespace cetech {
                 return mouse_internal::MouseAxis;
             }
         };
+
+        namespace file {
+            File from_file(const char* path, const char* mode) {
+                SDL_RWops* rwops = SDL_RWFromFile(path, mode);
+
+                if (!rwops) {
+                    log::warning("sys", "Open file %s: %s", path, SDL_GetError());
+                }
+
+                return (struct File) {
+                           rwops
+                };
+            }
+
+            int close(const File& f) {
+                return SDL_RWclose(f.ops);
+            }
+
+            size_t read(const File& f, void* ptr, size_t size, size_t maxnum) {
+                return SDL_RWread(f.ops, ptr, size, maxnum);
+            }
+
+            size_t write(const File& f, const void* ptr, size_t size, size_t num) {
+                return SDL_RWwrite(f.ops, ptr, size, num);
+            }
+            
+            int64_t seek(const File& f, int64_t offset, SeekWhence whence) {
+                int wh = 0;
+                
+                switch(whence) {
+                    case SW_SEEK_SET:
+                        wh = RW_SEEK_SET;
+                        break;
+                        
+                    case SW_SEEK_CUR:
+                        wh = RW_SEEK_CUR;
+                        break;
+                        
+                    case SW_SEEK_END:
+                        wh = RW_SEEK_END;
+                        break;
+                }
+                
+                return SDL_RWseek(f.ops, offset, wh);
+            }
+
+            int64_t tell(const File& f) {
+                return SDL_RWtell(f.ops);
+            }
+            
+
+            size_t size(const File& f) {
+                size_t size;
+
+                seek(f, 0, SW_SEEK_END);
+                
+                size = tell(f);
+                
+                seek(f, 0, SW_SEEK_SET);
+
+                return size;
+            }
+        }
 
     }
 }

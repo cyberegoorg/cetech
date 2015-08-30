@@ -5,7 +5,7 @@
 #include <cstring>
 
 #include "platform/defines.h"
-#include "platform/defines.h"
+#include "common/log.h"
 
 /*!
  * Check ptr macro.
@@ -64,7 +64,10 @@ namespace cetech {
      * \param line Line.
      * \param fce Fce name.
      */
-    CE_INLINE void ce_assert(const char* condition_str, const char* file, const int line, const char* fce);
+    CE_INLINE void ce_assert(const char* condition_str,
+                             const char* file,
+                             const int line,
+                             const char* fce);
 
     /*!
      * This fce print assert message.
@@ -92,8 +95,11 @@ namespace cetech {
 namespace cetech {
     CE_INLINE void ce_noop() {}
 
-    CE_INLINE void ce_assert(const char* condition_str, const char* file, const int line, const char* fce) {
-        std::fprintf(stderr, "ASSERT: \'%s\' in %s:%i:%s.\n", condition_str, SHORT_FILE(file), line, fce);
+    CE_INLINE void ce_assert(const char* condition_str,
+                             const char* file,
+                             const int line,
+                             const char* fce) {
+        log::error("assert", "\'%s\' in %s:%i:%s.", condition_str, SHORT_FILE(file), line, fce);
         abort();
     }
 
@@ -102,13 +108,13 @@ namespace cetech {
                                  const char* file,
                                  const int line,
                                  const char* fce) {
-        std::fprintf(stderr, "ASSERT:\'%s\': \"%s\" %s:%i:%s.\n", where, what, SHORT_FILE(file), line, fce);
+        log::error("assert", "\'%s\': \"%s\" %s:%i:%s.", where, what, SHORT_FILE(file), line, fce);
         abort();
     }
 
     CE_INLINE void ce_check_ptr(const char* file, const int line) {
-        std::fprintf(stderr, "ASSERT(CHECK POINTER): in file %s on line %i is invalid pointer.\n", SHORT_FILE(file),
-                     line);
+        log::error("assert.check_ptr", "in file %s on line %i is invalid pointer.", SHORT_FILE(file),
+                   line);
         abort();
     }
 }
