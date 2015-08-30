@@ -193,6 +193,8 @@ namespace cetech {
 
 
         template < typename T > inline void set_capacity(Array < T >& a, const uint32_t new_capacity) {
+            CE_CHECK_PTR(a._allocator);
+
             if (new_capacity == a._capacity) {
                 return;
             }

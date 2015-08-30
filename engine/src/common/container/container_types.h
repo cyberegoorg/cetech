@@ -54,7 +54,7 @@ namespace cetech {
 
         /*! Destroy hash map
          */
-        ~Hash();
+        //~Hash();
 
         /*! Hash map entry.
          */

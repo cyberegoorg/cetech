@@ -53,6 +53,8 @@ namespace cetech {
             };
     };
 
+
+
     namespace memory_globals {
         /*! Init global memory.
          */
@@ -67,6 +69,13 @@ namespace cetech {
          */
         Allocator& default_allocator();
     }
+
+    /* Creates a new object of type T using the allocator a to allocate the memory. */
+    #define MAKE_NEW(a, T, ...)             (new((a).allocate(sizeof(T), alignof(T))) T(__VA_ARGS__))
+
+    /*! Frees an object allocated with MAKE_NEW. */
+    #define MAKE_DELETE(a, T, p)    do {if (p) {(p)->~T(); a.deallocate(p); }} while (0)
+
 
     namespace memory {
         /*! Allign pointer.
