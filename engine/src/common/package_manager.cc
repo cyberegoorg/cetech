@@ -8,6 +8,8 @@
 #include "runtime/runtime.h"
 #include "common/murmur_hash.h"
 
+#include "resources/package.h"
+
 #include <new>
 #include <cstdio>
 
@@ -36,24 +38,15 @@ namespace cetech {
 
 
     namespace package_manager {
-        struct PackageResourceHeader {
-            uint64_t count;
-        };
-        
-        struct PackageResourceItem {
-            uint64_t type;
-            uint64_t name;
-        };
-        
         void load(uint64_t name) {
             const void* res = resource_manager::get(package_manager_globals::pm->type_hash, name);
             
-            PackageResourceHeader *header = (PackageResourceHeader*)res;
-            PackageResourceItem *items =(PackageResourceItem*)( res + sizeof(PackageResourceHeader));
+            resource_package::Header *header = (resource_package::Header*)res;
+            resource_package::Item *items =(resource_package::Item*)( res + sizeof(resource_package::Header));
             
             const uint64_t count = header->count;
             for(uint64_t i = 0; i < count; ++i) {
-                PackageResourceItem &item = items[i];
+                resource_package::Item &item = items[i];
                 resource_manager::load(item.type, item.name);
             }
         }

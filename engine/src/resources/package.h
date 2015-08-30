@@ -10,6 +10,15 @@
 
 namespace cetech {
     namespace resource_package {
+        struct Header {
+            uint64_t count;
+        };
+        
+        struct Item{
+            uint64_t type;
+            uint64_t name;
+        };
+        
         static void compiler(File& in, File& out);
         static void* loader(File& f, Allocator& a);
     }
@@ -24,21 +33,24 @@ namespace cetech {
             rapidjson::Document document;
             document.Parse(tmp);
             
-            uint64_t resource_count = 0;
+            Header header = {0};
+            Item item = {0};
+            
             for (rapidjson::Value::ConstMemberIterator itr = document.MemberBegin(); itr != document.MemberEnd(); ++itr) {
                 const rapidjson::Value& ar = itr->value;
                 CE_ASSERT(ar.IsArray());
                 for (rapidjson::SizeType i = 0; i < ar.Size(); ++i) {
-                    ++resource_count;
+                    ++header.count;
                 }
             }
             
-            runtime::file::write(out, &resource_count, sizeof(uint64_t), 1);
+             
+            runtime::file::write(out, &header, sizeof(Header), 1);
             
             uint64_t type_h = 0;
             uint64_t name_h = 0;
             for (rapidjson::Value::ConstMemberIterator itr = document.MemberBegin(); itr != document.MemberEnd(); ++itr) {
-                type_h = murmur_hash_64(itr->name.GetString(), strlen(itr->name.GetString()), 22);
+                item.type = murmur_hash_64(itr->name.GetString(), strlen(itr->name.GetString()), 22);
                 
                 const rapidjson::Value& ar = itr->value;
                 
@@ -47,10 +59,9 @@ namespace cetech {
                     const rapidjson::Value &v = ar[i];
                     CE_ASSERT(v.IsString());
                     
-                    name_h = murmur_hash_64(v.GetString(), strlen(v.GetString()), 22);
-                    
-                    runtime::file::write(out, &type_h, sizeof(uint64_t), 1);
-                    runtime::file::write(out, &name_h, sizeof(uint64_t), 1);
+                    item.name = murmur_hash_64(v.GetString(), strlen(v.GetString()), 22);
+
+                    runtime::file::write(out, &item, sizeof(Item), 1);
                 }
             }
         }
