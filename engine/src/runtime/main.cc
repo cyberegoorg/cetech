@@ -14,8 +14,8 @@
 #include "common/ecs/entitymanager.h"
 #include "runtime/runtime.h"
 
-#include "common/resource_manager.h"
-#include "common/package_manager.h"
+#include "common/resource/resource_manager.h"
+#include "common/resource/package_manager.h"
 
 #include "resources/package.h"
 
