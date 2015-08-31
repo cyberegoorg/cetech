@@ -13,5 +13,6 @@ namespace cetech {
 
     namespace package_manager {
         void load(uint64_t name);
+        void unload(uint64_t name);
     }
 }

@@ -21,6 +21,7 @@ namespace cetech {
         
         static void compiler(File& in, File& out);
         static void* loader(File& f, Allocator& a);
+        static void unloader(Allocator& a, void* data);
     }
 
     namespace resource_package {
@@ -73,6 +74,10 @@ namespace cetech {
             runtime::file::read(f, mem, sizeof(char), f_sz);
             
             return mem;
+        }
+        
+        void unloader(Allocator& a, void* data) {
+            a.deallocate(data);
         }
     }
 }

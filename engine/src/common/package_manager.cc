@@ -50,5 +50,18 @@ namespace cetech {
                 resource_manager::load(item.type, item.name);
             }
         }
+        
+        void unload(uint64_t name) {
+            const void* res = resource_manager::get(package_manager_globals::pm->type_hash, name);
+            
+            resource_package::Header *header = (resource_package::Header*)res;
+            resource_package::Item *items =(resource_package::Item*)( res + sizeof(resource_package::Header));
+            
+            const uint64_t count = header->count;
+            for(uint64_t i = 0; i < count; ++i) {
+                resource_package::Item &item = items[i];
+                resource_manager::unload(item.type, item.name);
+            }
+        }
     }
 }
