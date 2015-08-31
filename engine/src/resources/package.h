@@ -1,5 +1,6 @@
 #pragma once
 
+#include "common/stringid_types.h"
 #include "common/memory/memory.h"
 #include "runtime/runtime.h"
 #include "common/murmur_hash.h"
@@ -15,8 +16,8 @@ namespace cetech {
         };
 
         struct Item {
-            uint64_t type;
-            uint64_t name;
+            StringId64_t type;
+            StringId64_t name;
         };
 
         static void compiler(File& in, File& out);
@@ -48,8 +49,6 @@ namespace cetech {
 
             runtime::file::write(out, &header, sizeof(Header), 1);
 
-            uint64_t type_h = 0;
-            uint64_t name_h = 0;
             for (rapidjson::Value::ConstMemberIterator itr = document.MemberBegin(); itr != document.MemberEnd();
                  ++itr) {
                 item.type = murmur_hash_64(itr->name.GetString(), strlen(itr->name.GetString()), 22);

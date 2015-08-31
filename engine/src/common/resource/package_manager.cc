@@ -16,7 +16,7 @@
 namespace cetech {
 
     struct PackageManager {
-        uint64_t type_hash;
+        StringId64_t type_hash;
 
         PackageManager() {
             type_hash = murmur_hash_64("package", strlen("package"), 22);
@@ -38,7 +38,7 @@ namespace cetech {
 
 
     namespace package_manager {
-        void load(uint64_t name) {
+        void load(StringId64_t name) {
             const void* res = resource_manager::get(package_manager_globals::pm->type_hash, name);
 
             resource_package::Header* header = (resource_package::Header*)res;
@@ -51,7 +51,7 @@ namespace cetech {
             }
         }
 
-        void unload(uint64_t name) {
+        void unload(StringId64_t name) {
             const void* res = resource_manager::get(package_manager_globals::pm->type_hash, name);
 
             resource_package::Header* header = (resource_package::Header*)res;
@@ -64,7 +64,7 @@ namespace cetech {
             }
         }
 
-        bool is_loaded(uint64_t name) {
+        bool is_loaded(StringId64_t name) {
             const void* res = resource_manager::get(package_manager_globals::pm->type_hash, name);
 
             resource_package::Header* header = (resource_package::Header*)res;
@@ -80,6 +80,10 @@ namespace cetech {
             }
 
             return true;
+        }
+        
+        void flush(StringId64_t name) {
+            while(!is_loaded(name)){}
         }
     }
 }

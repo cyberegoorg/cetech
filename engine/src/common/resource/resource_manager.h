@@ -2,6 +2,7 @@
 
 #include <cinttypes>
 
+#include "common/stringid_types.h"
 #include "common/memory/memory_types.h"
 #include "runtime/runtime_types.h"
 
@@ -16,16 +17,16 @@ namespace cetech {
         typedef void* (* resource_loader_clb_t)(File&, Allocator&);
         typedef void (* resource_unloader_clb_t)(Allocator&, void*);
 
-        void register_compiler(uint64_t type, resource_compiler_clb_t clb);
-        void register_loader(uint64_t type, resource_loader_clb_t clb);
-        void register_unloader(uint64_t type, resource_unloader_clb_t clb);
+        void register_compiler(StringId64_t type, resource_compiler_clb_t clb);
+        void register_loader(StringId64_t type, resource_loader_clb_t clb);
+        void register_unloader(StringId64_t type, resource_unloader_clb_t clb);
 
         void compile(const char* filename);
 
-        void load(uint64_t type, uint64_t name);
-        void unload(uint64_t type, uint64_t name);
+        void load(StringId64_t type, StringId64_t name);
+        void unload(StringId64_t type, StringId64_t name);
 
-        bool can_get(uint64_t type, uint64_t name);
-        const void* get(uint64_t type, uint64_t name);
+        bool can_get(StringId64_t type, StringId64_t name);
+        const void* get(StringId64_t type, StringId64_t name);
     }
 }
