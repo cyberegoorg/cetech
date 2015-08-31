@@ -223,7 +223,7 @@ namespace cetech {
                 h._hash[last.hash_i] = fr.data_i;
             }
         }
-        
+
         template < typename T > uint32_t make(Hash < T >& h, const uint64_t key) {
             const FindResult fr = find(h, key);
             const uint32_t i = add_entry(h, key);

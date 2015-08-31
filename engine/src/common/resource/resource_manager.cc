@@ -67,7 +67,7 @@ namespace cetech {
 
             char input_filename[512] = {0};
             std::sprintf(input_filename, "./data/src/%s", filename);
-            
+
             File f_in, f_out;
 
             f_in = runtime::file::from_file(input_filename, "rb");
@@ -89,7 +89,7 @@ namespace cetech {
 
         void load(uint64_t type, uint64_t name) {
             log::debug("resource_manager", "Loading resource. Type:" "%" PRIx64 " Name: " "%" PRIx64, type, name);
-            
+
             resource_loader_clb_t clb = hash::get < resource_loader_clb_t >
                                         (resource_manager_globals::rm->_load_clb_map, type, nullptr);
 
@@ -115,19 +115,19 @@ namespace cetech {
 
         void unload(uint64_t type, uint64_t name) {
             resource_unloader_clb_t clb = hash::get < resource_unloader_clb_t >
-                                        (resource_manager_globals::rm->_unload_clb_map, type, nullptr);
+                                          (resource_manager_globals::rm->_unload_clb_map, type, nullptr);
 
             if (clb == nullptr) {
                 log::error("resource_manager", "Resource type " "%" PRIx64 " not register unloader.", type);
                 return;
             }
-            
+
             void* data = (void*) get(type, name);
             clb(memory_globals::default_allocator(), data);
 
             hash::remove(resource_manager_globals::rm->_data_map, type ^ name);
         }
-        
+
         bool can_get(uint64_t type, uint64_t name) {
             return hash::has(resource_manager_globals::rm->_data_map, type ^ name);
         }
@@ -143,7 +143,7 @@ namespace cetech {
         void register_loader(uint64_t type, resource_loader_clb_t clb) {
             hash::set(resource_manager_globals::rm->_load_clb_map, type, clb);
         }
-        
+
         void register_unloader(uint64_t type, resource_unloader_clb_t clb) {
             hash::set(resource_manager_globals::rm->_unload_clb_map, type, clb);
         }

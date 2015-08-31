@@ -67,7 +67,7 @@ void init() {
 
     resource_manager::compile("main.package");
     resource_manager::load(type_h, name_h);
-    
+
     package_manager::load(name_h);
 
     //     Window w = runtime::window::make_window(
