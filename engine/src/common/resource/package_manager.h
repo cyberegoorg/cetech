@@ -2,6 +2,7 @@
 
 #include <cinttypes>
 
+#include "common/stringid_types.h"
 #include "common/memory/memory_types.h"
 #include "runtime/runtime_types.h"
 
@@ -12,9 +13,10 @@ namespace cetech {
     }
 
     namespace package_manager {
-        void load(uint64_t name);
-        void unload(uint64_t name);
+        void load(StringId64_t name);
+        void unload(StringId64_t name);
 
-        bool is_loaded(uint64_t name);
+        bool is_loaded(StringId64_t name);
+        void flush(StringId64_t name);
     }
 }

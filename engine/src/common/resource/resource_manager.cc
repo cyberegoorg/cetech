@@ -18,17 +18,17 @@ namespace cetech {
         Hash < resource_manager::resource_unloader_clb_t > _unload_clb_map;
         Hash < resource_manager::resource_compiler_clb_t > _compile_clb_map;
 
-        ResourceManager() : _data_map(memory_globals::default_allocator()),
-                            _load_clb_map(memory_globals::default_allocator()),
-                            _unload_clb_map(memory_globals::default_allocator()),
-                            _compile_clb_map(memory_globals::default_allocator()) {}
+        ResourceManager(Allocator & allocator) : _data_map(allocator),
+                                                 _load_clb_map(allocator),
+                                                 _unload_clb_map(allocator),
+                                                 _compile_clb_map(allocator) {}
     };
 
     namespace resource_manager_globals {
         static ResourceManager* rm = nullptr;
 
         void init() {
-            rm = MAKE_NEW(memory_globals::default_allocator(), ResourceManager);
+            rm = MAKE_NEW(memory_globals::default_allocator(), ResourceManager, memory_globals::default_allocator());
         }
 
         void shutdown() {
@@ -87,7 +87,7 @@ namespace cetech {
             runtime::file::close(f_out);
         }
 
-        void load(uint64_t type, uint64_t name) {
+        void load(StringId64_t type, StringId64_t name) {
             log::debug("resource_manager", "Loading resource. Type:" "%" PRIx64 " Name: " "%" PRIx64, type, name);
 
             resource_loader_clb_t clb = hash::get < resource_loader_clb_t >
@@ -113,7 +113,7 @@ namespace cetech {
             hash::set(resource_manager_globals::rm->_data_map, type ^ name, data);
         }
 
-        void unload(uint64_t type, uint64_t name) {
+        void unload(StringId64_t type, StringId64_t name) {
             resource_unloader_clb_t clb = hash::get < resource_unloader_clb_t >
                                           (resource_manager_globals::rm->_unload_clb_map, type, nullptr);
 
@@ -128,23 +128,23 @@ namespace cetech {
             hash::remove(resource_manager_globals::rm->_data_map, type ^ name);
         }
 
-        bool can_get(uint64_t type, uint64_t name) {
+        bool can_get(StringId64_t type, StringId64_t name) {
             return hash::has(resource_manager_globals::rm->_data_map, type ^ name);
         }
 
-        const void* get(uint64_t type, uint64_t name) {
+        const void* get(StringId64_t type, StringId64_t name) {
             return hash::get < void* > (resource_manager_globals::rm->_data_map, type ^ name, nullptr);
         }
 
-        void register_compiler(uint64_t type, resource_compiler_clb_t clb) {
+        void register_compiler(StringId64_t type, resource_compiler_clb_t clb) {
             hash::set(resource_manager_globals::rm->_compile_clb_map, type, clb);
         }
 
-        void register_loader(uint64_t type, resource_loader_clb_t clb) {
+        void register_loader(StringId64_t type, resource_loader_clb_t clb) {
             hash::set(resource_manager_globals::rm->_load_clb_map, type, clb);
         }
 
-        void register_unloader(uint64_t type, resource_unloader_clb_t clb) {
+        void register_unloader(StringId64_t type, resource_unloader_clb_t clb) {
             hash::set(resource_manager_globals::rm->_unload_clb_map, type, clb);
         }
     }
