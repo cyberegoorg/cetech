@@ -60,9 +60,10 @@ void init() {
 
     uint64_t type_h = murmur_hash_64("package", strlen("package"), 22);
     uint64_t name_h = murmur_hash_64("main", strlen("main"), 22);
-    
-    resource_manager::register_loader_clb(type_h, &resource_package::loader);
-    resource_manager::register_compiler_clb(type_h, &resource_package::compiler);
+
+    resource_manager::register_unloader(type_h, &resource_package::unloader);
+    resource_manager::register_loader(type_h, &resource_package::loader);
+    resource_manager::register_compiler(type_h, &resource_package::compiler);
 
     resource_manager::compile("main.package");
     resource_manager::load(type_h, name_h);

@@ -14,10 +14,12 @@ namespace cetech {
         Hash < void* > _data_map;
 
         Hash < resource_manager::resource_loader_clb_t > _load_clb_map;
+        Hash < resource_manager::resource_unloader_clb_t > _unload_clb_map;
         Hash < resource_manager::resource_compiler_clb_t > _compile_clb_map;
 
         ResourceManager() : _data_map(memory_globals::default_allocator()),
                             _load_clb_map(memory_globals::default_allocator()),
+                            _unload_clb_map(memory_globals::default_allocator()),
                             _compile_clb_map(memory_globals::default_allocator()) {}
     };
 
@@ -85,6 +87,8 @@ namespace cetech {
         }
 
         void load(uint64_t type, uint64_t name) {
+            log::debug("resource_manager", "Loading resource. Type:" "%" PRIx64 " Name: " "%" PRIx64, type, name);
+            
             resource_loader_clb_t clb = hash::get < resource_loader_clb_t >
                                         (resource_manager_globals::rm->_load_clb_map, type, nullptr);
 
@@ -108,6 +112,21 @@ namespace cetech {
             hash::set(resource_manager_globals::rm->_data_map, type ^ name, data);
         }
 
+        void unload(uint64_t type, uint64_t name) {
+            resource_unloader_clb_t clb = hash::get < resource_unloader_clb_t >
+                                        (resource_manager_globals::rm->_unload_clb_map, type, nullptr);
+
+            if (clb == nullptr) {
+                log::error("resource_manager", "Resource type " "%" PRIx64 " not register unloader.", type);
+                return;
+            }
+            
+            void* data = (void*) get(type, name);
+            clb(memory_globals::default_allocator(), data);
+
+            hash::remove(resource_manager_globals::rm->_data_map, type ^ name);
+        }
+        
         bool can_get(uint64_t type, uint64_t name) {
             return hash::has(resource_manager_globals::rm->_data_map, type ^ name);
         }
@@ -116,12 +135,16 @@ namespace cetech {
             return hash::get < void* > (resource_manager_globals::rm->_data_map, type ^ name, nullptr);
         }
 
-        void register_compiler_clb(uint64_t type, resource_compiler_clb_t clb) {
+        void register_compiler(uint64_t type, resource_compiler_clb_t clb) {
             hash::set(resource_manager_globals::rm->_compile_clb_map, type, clb);
         }
 
-        void register_loader_clb(uint64_t type, resource_loader_clb_t clb) {
+        void register_loader(uint64_t type, resource_loader_clb_t clb) {
             hash::set(resource_manager_globals::rm->_load_clb_map, type, clb);
+        }
+        
+        void register_unloader(uint64_t type, resource_unloader_clb_t clb) {
+            hash::set(resource_manager_globals::rm->_unload_clb_map, type, clb);
         }
     }
 }

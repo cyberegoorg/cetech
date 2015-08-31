@@ -12,16 +12,20 @@ namespace cetech {
     }
 
     namespace resource_manager {
-        typedef void (* resource_compiler_clb_t)(File&, File&);
+        typedef void  (* resource_compiler_clb_t)(File&, File&);
         typedef void* (* resource_loader_clb_t)(File&, Allocator&);
+        typedef void  (* resource_unloader_clb_t)(Allocator&, void*);
 
+        void register_compiler(uint64_t type, resource_compiler_clb_t clb);
+        void register_loader(uint64_t type, resource_loader_clb_t clb);
+        void register_unloader(uint64_t type, resource_unloader_clb_t clb);
+        
+        void compile(const char* filename);
+        
         void load(uint64_t type, uint64_t name);
+        void unload(uint64_t type, uint64_t name);
+        
         bool can_get(uint64_t type, uint64_t name);
         const void* get(uint64_t type, uint64_t name);
-
-        void compile(const char* filename);
-
-        void register_compiler_clb(uint64_t type, resource_compiler_clb_t clb);
-        void register_loader_clb(uint64_t type, resource_loader_clb_t clb);
     }
 }
