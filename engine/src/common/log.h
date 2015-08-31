@@ -34,10 +34,10 @@ namespace cetech {
             LOG_DEBUG,      //<! Debug
         };
 
-        CE_INLINE void info(const char* where, const char* format, ...);
-        CE_INLINE void warning(const char* where, const char* format, ...);
-        CE_INLINE void error(const char* where, const char* format, ...);
-        CE_INLINE void debug(const char* where, const char* format, ...);
+        static void info(const char* where, const char* format, ...);
+        static void warning(const char* where, const char* format, ...);
+        static void error(const char* where, const char* format, ...);
+        static void debug(const char* where, const char* format, ...);
     }
 
     namespace log_internal {
