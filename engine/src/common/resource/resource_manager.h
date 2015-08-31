@@ -13,9 +13,9 @@ namespace cetech {
     }
 
     namespace resource_manager {
-        typedef void (* resource_compiler_clb_t)(File&, File&);
+        typedef void  (* resource_compiler_clb_t)(File&, File&);
         typedef void* (* resource_loader_clb_t)(File&, Allocator&);
-        typedef void (* resource_unloader_clb_t)(Allocator&, void*);
+        typedef void  (* resource_unloader_clb_t)(Allocator&, void*);
 
         void register_compiler(StringId64_t type, resource_compiler_clb_t clb);
         void register_loader(StringId64_t type, resource_loader_clb_t clb);

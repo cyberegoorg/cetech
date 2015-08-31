@@ -9,8 +9,10 @@
 #include <new>
 #include <cstdio>
 
-namespace cetech {
+static char SourceDir[] = "./data/src/";
+static char BuildDir[] = "./data/build/";
 
+namespace cetech {
     struct ResourceManager {
         Hash < void* > _data_map;
 
@@ -39,23 +41,33 @@ namespace cetech {
 
 
     namespace resource_manager {
-        CE_INLINE void calc_hash(const char* path, uint64_t& type, uint64_t& name) {
+        CE_INLINE void calc_hash(const char* path, StringId64_t& type, StringId64_t& name) {
             const char* t = strrchr(path, '.');
             CE_CHECK_PTR(t);
 
             const uint32_t sz = t - path;
-
             t = t + 1;
 
             const uint32_t len = strlen(t);
 
             type = murmur_hash_64(t, len, 22);
             name = murmur_hash_64(path, sz, 22);
-
-
-            printf("type: " "%" PRIx64 ", " "%" PRIx64 "\n", type, name);
         }
 
+        CE_INLINE void make_full_path(char* buffer, const char* base_path, const char* filename) {
+            std::sprintf(buffer, "%s%s", base_path, filename);
+        }
+       
+        CE_INLINE void resource_id_to_str(char* buffer, const StringId64_t& type, const StringId64_t& name) {
+            std::sprintf(buffer, "%" PRIx64 "%" PRIx64, type, name);
+        }
+
+        CE_INLINE void make_resource_full_path(char* buffer, const char* base_path, const StringId64_t& type, const StringId64_t& name) {
+            char resource_srt[32+1] = {0};
+            resource_id_to_str(resource_srt, type, name);
+            make_full_path(buffer, base_path, resource_srt);
+        }
+        
         void compile(const char* filename) {
             uint64_t type = 0;
             uint64_t name = 0;
@@ -63,13 +75,12 @@ namespace cetech {
 
 
             char output_filename[512] = {0};
-            std::sprintf(output_filename, "./data/build/" "%" PRIx64 "%" PRIx64, type, name);
+            make_resource_full_path(output_filename, BuildDir, type, name);
 
             char input_filename[512] = {0};
-            std::sprintf(input_filename, "./data/src/%s", filename);
+            make_full_path(input_filename, SourceDir, filename);
 
             File f_in, f_out;
-
             f_in = runtime::file::from_file(input_filename, "rb");
             f_out = runtime::file::from_file(output_filename, "wb");
 
@@ -88,7 +99,7 @@ namespace cetech {
         }
 
         void load(StringId64_t type, StringId64_t name) {
-            log::debug("resource_manager", "Loading resource. Type:" "%" PRIx64 " Name: " "%" PRIx64, type, name);
+            log::debug("resource_manager", "Loading resource (""%" PRIx64 ", " "%" PRIx64 ").", type, name);
 
             resource_loader_clb_t clb = hash::get < resource_loader_clb_t >
                                         (resource_manager_globals::rm->_load_clb_map, type, nullptr);
@@ -99,7 +110,7 @@ namespace cetech {
             }
 
             char filename[512] = {0};
-            std::sprintf(filename, "./data/build/" "%" PRIx64 "%" PRIx64, type, name);
+            make_resource_full_path(filename, BuildDir, type, name);
 
             File f = runtime::file::from_file(filename, "r");
 
