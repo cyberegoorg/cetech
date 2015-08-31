@@ -78,13 +78,13 @@ namespace cetech {
 
         void debug(const char* where, const char* format, ...) {
             #ifdef DEBUG
-                va_list args;
-                va_start(args, format);
-                log_internal::log_vprntf(LOG_DEBUG, where, format, args);
-                va_end(args);
+            va_list args;
+            va_start(args, format);
+            log_internal::log_vprntf(LOG_DEBUG, where, format, args);
+            va_end(args);
             #else
-                //CE_UNUSED_PARAM(where);
-                //CE_UNUSED_PARAM(format);
+            //CE_UNUSED_PARAM(where);
+            //CE_UNUSED_PARAM(format);
             #endif
         }
     }

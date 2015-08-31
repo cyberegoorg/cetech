@@ -17,7 +17,7 @@ namespace cetech {
 
     struct PackageManager {
         uint64_t type_hash;
-        
+
         PackageManager() {
             type_hash = murmur_hash_64("package", strlen("package"), 22);
         }
@@ -40,45 +40,45 @@ namespace cetech {
     namespace package_manager {
         void load(uint64_t name) {
             const void* res = resource_manager::get(package_manager_globals::pm->type_hash, name);
-            
-            resource_package::Header *header = (resource_package::Header*)res;
-            resource_package::Item *items =(resource_package::Item*)( res + sizeof(resource_package::Header));
-            
+
+            resource_package::Header* header = (resource_package::Header*)res;
+            resource_package::Item* items = (resource_package::Item*)(res + sizeof(resource_package::Header));
+
             const uint64_t count = header->count;
-            for(uint64_t i = 0; i < count; ++i) {
-                resource_package::Item &item = items[i];
+            for (uint64_t i = 0; i < count; ++i) {
+                resource_package::Item& item = items[i];
                 resource_manager::load(item.type, item.name);
             }
         }
 
         void unload(uint64_t name) {
             const void* res = resource_manager::get(package_manager_globals::pm->type_hash, name);
-            
-            resource_package::Header *header = (resource_package::Header*)res;
-            resource_package::Item *items =(resource_package::Item*)( res + sizeof(resource_package::Header));
-            
+
+            resource_package::Header* header = (resource_package::Header*)res;
+            resource_package::Item* items = (resource_package::Item*)(res + sizeof(resource_package::Header));
+
             const uint64_t count = header->count;
-            for(uint64_t i = 0; i < count; ++i) {
-                resource_package::Item &item = items[i];
+            for (uint64_t i = 0; i < count; ++i) {
+                resource_package::Item& item = items[i];
                 resource_manager::unload(item.type, item.name);
             }
         }
-        
+
         bool is_loaded(uint64_t name) {
             const void* res = resource_manager::get(package_manager_globals::pm->type_hash, name);
-            
-            resource_package::Header *header = (resource_package::Header*)res;
-            resource_package::Item *items =(resource_package::Item*)( res + sizeof(resource_package::Header));
-            
+
+            resource_package::Header* header = (resource_package::Header*)res;
+            resource_package::Item* items = (resource_package::Item*)(res + sizeof(resource_package::Header));
+
             const uint64_t count = header->count;
-            for(uint64_t i = 0; i < count; ++i) {
-                resource_package::Item &item = items[i];
-                
-                if( !resource_manager::can_get(item.type, item.name) ) {
+            for (uint64_t i = 0; i < count; ++i) {
+                resource_package::Item& item = items[i];
+
+                if (!resource_manager::can_get(item.type, item.name)) {
                     return false;
                 }
             }
-            
+
             return true;
         }
     }
