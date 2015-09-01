@@ -114,11 +114,16 @@ namespace cetech {
             make_resource_full_path(filename, cvars::rm_build_dir.value_str, type, name);
 
             File f = runtime::file::from_file(filename, "r");
-
+            
+            if(runtime::file::is_null(f)) {
+                log::error("resource_manager", "Could not open resouce (" "%" PRIx64 ", " "%" PRIx64 ").", type, name);
+                return;
+            }
+            
             void* data = clb(f, memory_globals::default_allocator());
 
             if (data == nullptr) {
-                log::error("resource_manager", "Could not load resouce.");
+                log::error("resource_manager", "Could not load resouce (" "%" PRIx64 ", " "%" PRIx64 ").", type, name);
                 return;
             }
 

@@ -274,6 +274,10 @@ namespace cetech {
                 return (struct File) {rwops};
             }
 
+            bool is_null(const File& f) {
+                return f.ops == nullptr;
+            }
+            
             int close(const File& f) {
                 return SDL_RWclose(f.ops);
             }

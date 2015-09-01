@@ -44,7 +44,12 @@ namespace cetech {
 
         void load(StringId64_t name) {
             const void* res = resource_manager::get(package_manager_globals::pm->type_hash, name);
-
+            
+            if( res == nullptr ) {
+                log::error("package_manager", "Could not get resource for package " "%" PRIx64, name);
+                return;
+            }
+            
             resource_package::Header* header = (resource_package::Header*)res;
             resource_package::Item* items = (resource_package::Item*)(res + sizeof(resource_package::Header));
 
@@ -58,6 +63,11 @@ namespace cetech {
         void unload(StringId64_t name) {
             const void* res = resource_manager::get(package_manager_globals::pm->type_hash, name);
 
+            if( res == nullptr ) {
+                log::error("package_manager", "Could not get resource for package " "%" PRIx64, name);
+                return;
+            }
+            
             resource_package::Header* header = (resource_package::Header*)res;
             resource_package::Item* items = (resource_package::Item*)(res + sizeof(resource_package::Header));
 
@@ -70,7 +80,12 @@ namespace cetech {
 
         bool is_loaded(StringId64_t name) {
             const void* res = resource_manager::get(package_manager_globals::pm->type_hash, name);
-
+            
+            if( res == nullptr ) {
+                log::error("package_manager", "Could not get resource for package " "%" PRIx64, name);
+                return false;
+            }
+            
             resource_package::Header* header = (resource_package::Header*)res;
             resource_package::Item* items = (resource_package::Item*)(res + sizeof(resource_package::Header));
 
