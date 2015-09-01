@@ -22,6 +22,10 @@
 
 #include "common/stringid_types.h"
 
+#include "common/cvar.h"
+
+#include "common/cvars.h"
+
 #include <iostream>
 
 #include "rapidjson/document.h"
@@ -31,96 +35,9 @@
 using namespace cetech;
 using namespace rapidjson;
 
-namespace cetech {
-    struct CVar;
-    static CVar *_head = nullptr;
-    
-    struct CVar {        
-        char name[512];
-        char desc[1024];
-        StringId64_t hash;
-        
-        CVar *_next;
-        
-        enum CVarType {
-            CVAR_INT = 1,
-            CVAR_UINT,
-            CVAR_FLOAT,
-            CVAR_STR,
-        } type;
-        
-        union {
-            const char* str;
-            float f;
-            int i;
-        };
-        
-        union {
-            float f_max;
-            int i_max;
-        };
-        
-        union {
-            float f_min;
-            int i_min;
-        };
-        
-        CVar(const char* name, const char *desc, CVarType type): _next(nullptr), type(type) {
-            strncpy(this->name, name, 512);
-            strncpy(this->desc, desc, 1024);
-            
-            hash = murmur_hash_64(name, strlen(name), 22);
-            
-            f_max = 0.0f;
-            f_min = 0.0f;
-            
-            if( _head == nullptr ) {
-                _head = this;
-            } else {
-                _next = _head;
-                _head = this;
-            }
-        }
-        
-        CVar(const char* name, const char *desc, float value, float min = 0.0f, float max = 0.0f): CVar(name, desc, CVAR_FLOAT) {
-            f_min = min;
-            f_max = max;
-            f = value;
-        }
-    };
-    
-    namespace cvar {
-        void dump_all() {
-            CVar *it = _head;
-            
-            uint32_t pos = 0;
-            
-            while(it != nullptr) {
-                
-                switch(it->type) {
-                    case CVar::CVAR_INT:
-                        log::info("CVar.dump", "[%u] name: %s  value: %i  desc: %s", pos, it->name, it->i, it->desc);
-                        break;
-
-                    case CVar::CVAR_FLOAT:
-                        log::info("CVar.dump", "[%u] name: %s  value: %f  desc: %s", pos, it->name, it->f, it->desc);
-                        break;
-                        
-                    case CVar::CVAR_STR:
-                        log::info("CVar.dump", "[%u] name: %s  value: \"%s\"  desc: %s", pos, it->name, it->str, it->desc);
-                        break;
-                }
-                
-                ++pos;
-                it = it->_next;
-            }
-        }
-    }
-}
-
-CVar cvar1("name", "desc", 1.0f);
-CVar cvar2("name1", "desc", 2.0f);
-CVar cvar3("name2", "desc", 3.0f);
+CVar cvar1("name float", "desc", 1.0f, 0.0f, 5.0f);
+CVar cvar2("name int", "desc", 1, 0, 5);
+CVar cvar3("name str", "desc", "ssssssss");
 
 void frame_start() {
     runtime::frame_start();
@@ -163,8 +80,11 @@ void init() {
 
     package_manager::load(name_h);
 
+    cvar::set(cvar1, 6.0f);
+    cvar::set(cvar2, 6);
+
     cvar::dump_all();
-    
+
     //     Window w = runtime::window::make_window(
     //         "aaa",
     //         runtime::window::WINDOWPOS_CENTERED, runtime::window::WINDOWPOS_CENTERED,

@@ -81,9 +81,9 @@ namespace cetech {
 
             return true;
         }
-        
+
         void flush(StringId64_t name) {
-            while(!is_loaded(name)){}
+            while (!is_loaded(name)) {}
         }
     }
 }
