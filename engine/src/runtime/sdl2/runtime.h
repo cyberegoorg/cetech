@@ -268,12 +268,10 @@ namespace cetech {
                 SDL_RWops* rwops = SDL_RWFromFile(path, mode);
 
                 if (!rwops) {
-                    log::warning("sys", "Open file %s: %s", path, SDL_GetError());
+                    log::warning("sys", "Open file error: %s", path, SDL_GetError());
                 }
 
-                return (struct File) {
-                           rwops
-                };
+                return (struct File) {rwops};
             }
 
             int close(const File& f) {
