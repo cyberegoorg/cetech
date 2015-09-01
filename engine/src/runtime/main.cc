@@ -63,8 +63,20 @@ void run() {
     }
 }
 
+void join_build_dir(char* buffer, size_t max_len, const char* basename) {
+    memset(buffer, 0, max_len);
+    
+    size_t len = strlen(cvars::rm_build_dir.value_str);
+    memcpy(buffer, cvars::rm_build_dir.value_str, len);
+    
+    strcpy(buffer+len, basename);
+}
+
 void load_config_json() {
-    File f = runtime::file::from_file("./data/build/config.json", "rb");
+    char config_path[1024] = {0};
+    join_build_dir(config_path, 1024, "config.json");
+    
+    File f = runtime::file::from_file(config_path, "rb");
     const uint64_t f_sz = runtime::file::size(f);
     void* mem = memory_globals::default_allocator().allocate(f_sz + 1);
     memset(mem, 0, f_sz + 1);
@@ -76,6 +88,8 @@ void load_config_json() {
     cvar::load_from_json(document);
 
     memory_globals::default_allocator().deallocate(mem);
+    
+    runtime::file::close(f);
 }
 
 void make_path(char* buffer, size_t max_size, const char* path) {
@@ -105,13 +119,13 @@ void parse_command_line() {
     }
 }
 
-void init_boot() {
+void init_boot() {    
     uint64_t boot_pkg_name_h = murmur_hash_64(cvars::boot_pkg.value_str, strlen(cvars::boot_pkg.value_str), 22);
-    uint64_t boot_script_name_h =
-        murmur_hash_64(cvars::boot_script.value_str, strlen(cvars::boot_script.value_str), 22);
-
     resource_manager::load(package_manager::type_name(), boot_pkg_name_h);
     package_manager::load(boot_pkg_name_h);
+
+    uint64_t boot_script_name_h =
+    murmur_hash_64(cvars::boot_script.value_str, strlen(cvars::boot_script.value_str), 22);
 }
 
 void init() {
@@ -132,6 +146,8 @@ void init() {
     if(command_line::has_argument("compile", 'c')) {
         resource_manager::compile(cvars::boot_pkg.value_str);
     }
+    
+    init_boot();
     
     cvar::dump_all();
 
