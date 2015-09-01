@@ -23,6 +23,7 @@
 #include "common/stringid_types.h"
 
 #include "common/cvar.h"
+#include "common/command_line.h"
 
 #include "common/cvars.h"
 
@@ -35,9 +36,9 @@
 using namespace cetech;
 using namespace rapidjson;
 
-CVar cvar1("name float", "desc", 1.0f, 0.0f, 5.0f);
-CVar cvar2("name int", "desc", 1, 0, 5);
-CVar cvar3("name str", "desc", "ssssssss");
+CVar cvar1("vfloat", "desc", 1.0f, 0.0f, 5.0f);
+CVar cvar2("vint", "desc", 1, 0, 5);
+CVar cvar3("vstr", "desc", "ssssssss");
 
 void frame_start() {
     runtime::frame_start();
@@ -62,27 +63,76 @@ void run() {
     }
 }
 
+void load_config_json() {
+    File f = runtime::file::from_file("./data/build/config.json", "rb");
+    const uint64_t f_sz = runtime::file::size(f);
+    void* mem = memory_globals::default_allocator().allocate(f_sz + 1);
+    memset(mem, 0, f_sz + 1);
+
+    runtime::file::read(f, mem, sizeof(char), f_sz);
+
+    rapidjson::Document document;
+    document.Parse((const char*)mem);
+    cvar::load_from_json(document);
+
+    memory_globals::default_allocator().deallocate(mem);
+}
+
+void make_path(char* buffer, size_t max_size, const char* path) {
+    memset(buffer, 0, max_size);
+    strcpy(buffer, path);
+    
+    const size_t len = strlen(buffer);
+    if( buffer[len - 1] != '/') {
+        buffer[len] = '/';
+    }
+}
+
+void parse_command_line() {
+    char buffer[1024] = {0};
+    
+    const char* source_dir = command_line::get_parameter("source-dir", 'i');
+    const char* build_dir = command_line::get_parameter("build-dir", 'd');
+    
+    if(source_dir) {
+        make_path(buffer, 1024, source_dir);
+        cvar_internal::force_set(cvars::rm_source_dir, buffer);
+    }
+    
+    if(build_dir) {
+        make_path(buffer, 1024, build_dir);
+        cvar_internal::force_set(cvars::rm_build_dir, buffer);
+    }
+}
+
+void init_boot() {
+    uint64_t boot_pkg_name_h = murmur_hash_64(cvars::boot_pkg.value_str, strlen(cvars::boot_pkg.value_str), 22);
+    uint64_t boot_script_name_h =
+        murmur_hash_64(cvars::boot_script.value_str, strlen(cvars::boot_script.value_str), 22);
+
+    resource_manager::load(package_manager::type_name(), boot_pkg_name_h);
+    package_manager::load(boot_pkg_name_h);
+}
+
 void init() {
     memory_globals::init();
+    
+    parse_command_line();
+    
     runtime::init();
     resource_manager_globals::init();
     package_manager_globals::init();
 
-    uint64_t type_h = murmur_hash_64("package", strlen("package"), 22);
-    uint64_t name_h = murmur_hash_64("main", strlen("main"), 22);
+    load_config_json();
 
-    resource_manager::register_unloader(type_h, &resource_package::unloader);
-    resource_manager::register_loader(type_h, &resource_package::loader);
-    resource_manager::register_compiler(type_h, &resource_package::compiler);
+    resource_manager::register_unloader(package_manager::type_name(), &resource_package::unloader);
+    resource_manager::register_loader(package_manager::type_name(), &resource_package::loader);
+    resource_manager::register_compiler(package_manager::type_name(), &resource_package::compiler);
 
-    resource_manager::compile("main.package");
-    resource_manager::load(type_h, name_h);
-
-    package_manager::load(name_h);
-
-    cvar::set(cvar1, 6.0f);
-    cvar::set(cvar2, 6);
-
+    if(command_line::has_argument("compile", 'c')) {
+        resource_manager::compile(cvars::boot_pkg.value_str);
+    }
+    
     cvar::dump_all();
 
     //     Window w = runtime::window::make_window(
@@ -106,7 +156,9 @@ void shutdown() {
     package_manager_globals::shutdown();
 }
 
-int main(int argc, char** argv) {
+int main(int argc, const char** argv) {
+    command_line::set_args(argc, argv);
+    
     init();
     run();
     shutdown();

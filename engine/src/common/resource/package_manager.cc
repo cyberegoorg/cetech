@@ -38,6 +38,10 @@ namespace cetech {
 
 
     namespace package_manager {
+        StringId64_t type_name() {
+            return package_manager_globals::pm->type_hash;
+        }
+
         void load(StringId64_t name) {
             const void* res = resource_manager::get(package_manager_globals::pm->type_hash, name);
 
