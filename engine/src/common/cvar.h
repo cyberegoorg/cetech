@@ -3,6 +3,8 @@
 #include <cstring>
 #include <cstdlib>
 
+#include "rapidjson/document.h"
+
 #include "common/asserts.h"
 #include "common/cvar_types.h"
 #include "common/murmur_hash.h"
@@ -11,14 +13,16 @@
 
 namespace cetech {
     static CVar* _head = nullptr;
-    
+
     namespace cvar {
         CE_INLINE void set(CVar& cv, float value);
         CE_INLINE void set(CVar& cv, int value);
         CE_INLINE void set(CVar& cv, const char* str);
 
         CE_INLINE CVar* find(const char* name);
-        
+
+        CE_INLINE void load_from_json(const rapidjson::Document& document);
+
         CE_INLINE void dump_all();
     }
 
@@ -154,24 +158,68 @@ namespace cetech {
 
         CVar* find(const char* name) {
             const StringId64_t name_id = murmur_hash_64(name, strlen(name), 22);
-            
+
             CVar* it = _head;
             while (it != nullptr) {
-                if( it->hash != name_id) {
+                if (it->hash != name_id) {
                     it = it->_next;
                     continue;
                 }
-                
-                if(0 != strcmp(name, it->name)){
+
+                if (0 != strcmp(name, it->name)) {
                     continue;
                 }
-                
+
                 return it;
             }
-            
+
             return nullptr;
         }
-        
+
+        void load_from_json(const rapidjson::Document& document) {
+            const rapidjson::Value& ar = document["cvars"];
+
+            for (rapidjson::Value::ConstMemberIterator itr = ar.MemberBegin(); itr != ar.MemberEnd(); ++itr) {
+                const rapidjson::Value& name = itr->name;
+                const rapidjson::Value& value = itr->value;
+
+                CVar* cvar = cvar::find(name.GetString());
+
+                if (cvar == nullptr) {
+                    log::error("cvar", "Undefined cvar \"%s\"", name.GetString());
+                    continue;
+                }
+
+                /* INT */
+                if (value.IsInt()) {
+                    if (cvar->type != CVar::CVAR_INT) {
+                        log::error("cvar", "Invalid type for cvar \"%s\".", name.GetString());
+                        continue;
+                    }
+
+                    set(*cvar, value.GetInt());
+
+                    /* FLOAT */
+                } else if (value.IsDouble()) {
+                    if (cvar->type != CVar::CVAR_FLOAT) {
+                        log::error("cvar", "Invalid type for cvar \"%s\".", name.GetString());
+                        continue;
+                    }
+
+                    set(*cvar, (float)value.GetDouble());
+
+                    /* STR */
+                } else if (value.IsString()) {
+                    if (cvar->type != CVar::CVAR_STR) {
+                        log::error("cvar", "Invalid type for cvar \"%s\".", name.GetString());
+                        continue;
+                    }
+
+                    set(*cvar, value.GetString());
+                }
+            }
+        }
+
         void dump_all() {
             CVar* it = _head;
 

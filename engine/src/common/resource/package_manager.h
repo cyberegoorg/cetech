@@ -13,6 +13,8 @@ namespace cetech {
     }
 
     namespace package_manager {
+        StringId64_t type_name();
+
         void load(StringId64_t name);
         void unload(StringId64_t name);
 
