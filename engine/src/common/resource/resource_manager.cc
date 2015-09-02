@@ -84,6 +84,12 @@ namespace cetech {
 
             File f_in, f_out;
             f_in = runtime::file::from_file(input_filename, "rb");
+            if( runtime::file::is_null(f_in)) {
+                log::error("resource_manager", "Could not open source file \"%s\"", input_filename);
+                
+                return;
+            };
+            
             f_out = runtime::file::from_file(output_filename, "wb");
 
             resource_compiler_clb_t clb = hash::get < resource_compiler_clb_t >
@@ -101,7 +107,7 @@ namespace cetech {
         }
 
         void load(StringId64_t type, StringId64_t name) {
-            log::debug("resource_manager", "Loading resource (" "%" PRIx64 ", " "%" PRIx64 ").", type, name);
+            log::info("resource_manager", "Loading resource (" "%" PRIx64 ", " "%" PRIx64 ").", type, name);
 
             resource_loader_clb_t clb = hash::get < resource_loader_clb_t >
                                         (resource_manager_globals::rm->_load_clb_map, type, nullptr);
