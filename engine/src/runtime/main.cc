@@ -65,17 +65,17 @@ void run() {
 
 void join_build_dir(char* buffer, size_t max_len, const char* basename) {
     memset(buffer, 0, max_len);
-    
+
     size_t len = strlen(cvars::rm_build_dir.value_str);
     memcpy(buffer, cvars::rm_build_dir.value_str, len);
-    
-    strcpy(buffer+len, basename);
+
+    strcpy(buffer + len, basename);
 }
 
 void load_config_json() {
     char config_path[1024] = {0};
     join_build_dir(config_path, 1024, "config.json");
-    
+
     File f = runtime::file::from_file(config_path, "rb");
     const uint64_t f_sz = runtime::file::size(f);
     void* mem = memory_globals::default_allocator().allocate(f_sz + 1);
@@ -88,51 +88,65 @@ void load_config_json() {
     cvar::load_from_json(document);
 
     memory_globals::default_allocator().deallocate(mem);
-    
+
     runtime::file::close(f);
 }
 
 void make_path(char* buffer, size_t max_size, const char* path) {
     memset(buffer, 0, max_size);
     strcpy(buffer, path);
-    
+
     const size_t len = strlen(buffer);
-    if( buffer[len - 1] != '/') {
+    if (buffer[len - 1] != '/') {
         buffer[len] = '/';
     }
 }
 
 void parse_command_line() {
     char buffer[1024] = {0};
-    
+
     const char* source_dir = command_line::get_parameter("source-dir", 'i');
     const char* build_dir = command_line::get_parameter("build-dir", 'd');
-    
-    if(source_dir) {
+
+    if (source_dir) {
         make_path(buffer, 1024, source_dir);
         cvar_internal::force_set(cvars::rm_source_dir, buffer);
     }
-    
-    if(build_dir) {
+
+    if (build_dir) {
         make_path(buffer, 1024, build_dir);
         cvar_internal::force_set(cvars::rm_build_dir, buffer);
     }
 }
 
-void init_boot() {    
+void init_boot() {
     uint64_t boot_pkg_name_h = murmur_hash_64(cvars::boot_pkg.value_str, strlen(cvars::boot_pkg.value_str), 22);
     resource_manager::load(package_manager::type_name(), boot_pkg_name_h);
     package_manager::load(boot_pkg_name_h);
 
     uint64_t boot_script_name_h =
-    murmur_hash_64(cvars::boot_script.value_str, strlen(cvars::boot_script.value_str), 22);
+        murmur_hash_64(cvars::boot_script.value_str, strlen(cvars::boot_script.value_str), 22);
+}
+
+void compile_all_resource() {
+    char* files[4096] = {0};
+    uint32_t files_count = 0;
+    const size_t source_dir_len = strlen(cvars::rm_source_dir.value_str);
+    
+    runtime::dir::listdir(cvars::rm_source_dir.value_str, "", files, &files_count);
+    
+    for ( uint32_t i = 0; i < files_count; ++i) {
+        const char *path_base = files[i] + source_dir_len;        /* Base path */
+
+        resource_manager::compile(path_base);
+    }
 }
 
 void init() {
     memory_globals::init();
-    
+
     parse_command_line();
-    
+
     runtime::init();
     resource_manager_globals::init();
     package_manager_globals::init();
@@ -143,12 +157,12 @@ void init() {
     resource_manager::register_loader(package_manager::type_name(), &resource_package::loader);
     resource_manager::register_compiler(package_manager::type_name(), &resource_package::compiler);
 
-    if(command_line::has_argument("compile", 'c')) {
-        resource_manager::compile(cvars::boot_pkg.value_str);
+    if (command_line::has_argument("compile", 'c')) {
+        compile_all_resource();
     }
-    
+
     init_boot();
-    
+
     cvar::dump_all();
 
     //     Window w = runtime::window::make_window(
@@ -174,7 +188,7 @@ void shutdown() {
 
 int main(int argc, const char** argv) {
     command_line::set_args(argc, argv);
-    
+
     init();
     run();
     shutdown();

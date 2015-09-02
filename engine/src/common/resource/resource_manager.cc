@@ -74,6 +74,7 @@ namespace cetech {
             uint64_t name = 0;
             calc_hash(filename, type, name);
 
+            log::info("resource_manager", "Compile \"%s\" => (" "%" PRIx64 ", " "%" PRIx64 ").", filename, type, name);
 
             char output_filename[512] = {0};
             make_resource_full_path(output_filename, cvars::rm_build_dir.value_str, type, name);
@@ -114,12 +115,12 @@ namespace cetech {
             make_resource_full_path(filename, cvars::rm_build_dir.value_str, type, name);
 
             File f = runtime::file::from_file(filename, "r");
-            
-            if(runtime::file::is_null(f)) {
+
+            if (runtime::file::is_null(f)) {
                 log::error("resource_manager", "Could not open resouce (" "%" PRIx64 ", " "%" PRIx64 ").", type, name);
                 return;
             }
-            
+
             void* data = clb(f, memory_globals::default_allocator());
 
             if (data == nullptr) {

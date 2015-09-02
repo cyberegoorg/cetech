@@ -1,5 +1,10 @@
 #pragma once
 
+#include <dirent.h>
+#include <time.h>
+#include <errno.h>
+#include <sys/stat.h>
+
 #include "SDL2/SDL.h"
 
 #include "common/log.h"
@@ -271,13 +276,15 @@ namespace cetech {
                     log::warning("sys", "Open file error: %s", path, SDL_GetError());
                 }
 
-                return (struct File) {rwops};
+                return (struct File) {
+                           rwops
+                };
             }
 
             bool is_null(const File& f) {
                 return f.ops == nullptr;
             }
-            
+
             int close(const File& f) {
                 return SDL_RWclose(f.ops);
             }
@@ -328,6 +335,100 @@ namespace cetech {
             }
         }
 
+        namespace dir {
+            bool mkdir(const char* path) {
+                struct stat st;
+                int mode = 0775;
+
+                if (stat(path, &st) != 0) {
+                    if (::mkdir(path, mode) != 0 && errno != EEXIST) {
+                        return false;
+                    }
+                } else if (!S_ISDIR(st.st_mode)) {
+                    errno = ENOTDIR;
+                    return false;
+                }
+
+                return true;
+            }
+
+            bool mkpath(const char* path) {
+                char* pp;
+                char* sp;
+                bool status = true;
+                char* copypath = strdup(path);
+
+                pp = copypath;
+                while (status == true && (sp = strchr(pp, '/')) != 0) {
+                    if (sp != pp) {
+                        *sp = '\0';
+                        status = mkdir(copypath);
+                        *sp = '/';
+                    }
+
+                    pp = sp + 1;
+                }
+
+                if (status == true) {
+                    status = mkdir(path);
+                }
+
+                free(copypath);
+                return status;
+            }
+
+            void listdir(const char* name, const char* ignore_dir, char** files, uint32_t* file_count) {
+                DIR* dir;
+                struct dirent* entry;
+
+                if (!(dir = opendir(name))) {
+                    return;
+                }
+
+                if (!(entry = readdir(dir))) {
+                    return;
+                }
+
+                do {
+                    if (entry->d_type == 4) {
+                        if (strcmp(entry->d_name,
+                                   ".") == 0 ||
+                            strcmp(entry->d_name, "..") == 0 || strcmp(entry->d_name, ignore_dir) == 0) {
+                            continue;
+                        }
+
+                        char path[1024];
+                        int len = 0;
+
+                        if (name[strlen(name) - 1] != '/') {
+                            len = snprintf(path, sizeof(path) - 1, "%s/%s/", name, entry->d_name);
+                        } else {
+                            len = snprintf(path, sizeof(path) - 1, "%s%s", name, entry->d_name);
+                        }
+
+                        path[len] = '\0';
+
+                        listdir(path, ignore_dir, files, file_count);
+                    } else {
+                        uint32_t size = strlen(name) + strlen(entry->d_name) + 2;
+                        char* path = (char*)malloc(sizeof(char) * size);
+
+                        snprintf(path, size - 1, "%s%s", name, entry->d_name);
+
+                        files[*file_count] = path;
+                        ++(*file_count);
+                    }
+                } while ((entry = readdir(dir)));
+
+                closedir(dir);
+            }
+
+            void listdir_free(char** files, uint32_t file_count) {
+                for (uint32_t i = 0; i < file_count; ++i) {
+                    free(files[i]);
+                }
+            }
+        }
     }
 }
 

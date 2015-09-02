@@ -1,5 +1,6 @@
 .build
 doc/doxygen/*
+data/build/
 
 *.kdev*
 *.kate-swp
