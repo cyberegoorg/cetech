@@ -403,7 +403,7 @@ namespace cetech {
                         if (name[strlen(name) - 1] != '/') {
                             len = snprintf(path, sizeof(path) - 1, "%s/%s/", name, entry->d_name);
                         } else {
-                            len = snprintf(path, sizeof(path) - 1, "%s%s", name, entry->d_name);
+                            len = snprintf(path, sizeof(path) - 1, "%s%s/", name, entry->d_name);
                         }
 
                         path[len] = '\0';

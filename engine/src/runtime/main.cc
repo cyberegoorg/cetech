@@ -19,6 +19,7 @@
 
 
 #include "resources/package.h"
+#include "resources/lua.h"
 
 #include "common/stringid_types.h"
 
@@ -120,12 +121,13 @@ void parse_command_line() {
 }
 
 void init_boot() {
-    uint64_t boot_pkg_name_h = murmur_hash_64(cvars::boot_pkg.value_str, strlen(cvars::boot_pkg.value_str), 22);
+    StringId64_t boot_pkg_name_h = murmur_hash_64(cvars::boot_pkg.value_str, strlen(cvars::boot_pkg.value_str), 22);
+    StringId64_t boot_script_name_h =
+        murmur_hash_64(cvars::boot_script.value_str, strlen(cvars::boot_script.value_str), 22);
+
     resource_manager::load(package_manager::type_name(), boot_pkg_name_h);
     package_manager::load(boot_pkg_name_h);
 
-    uint64_t boot_script_name_h =
-        murmur_hash_64(cvars::boot_script.value_str, strlen(cvars::boot_script.value_str), 22);
 }
 
 void compile_all_resource() {
@@ -157,6 +159,12 @@ void init() {
     resource_manager::register_loader(package_manager::type_name(), &resource_package::loader);
     resource_manager::register_compiler(package_manager::type_name(), &resource_package::compiler);
 
+    StringId64_t lua_h = murmur_hash_64("lua", 3, 22);
+
+    resource_manager::register_unloader(lua_h, &resource_lua::unloader);
+    resource_manager::register_loader(lua_h, &resource_lua::loader);
+    resource_manager::register_compiler(lua_h, &resource_lua::compiler);
+    
     if (command_line::has_argument("compile", 'c')) {
         compile_all_resource();
     }
