@@ -84,12 +84,14 @@ namespace cetech {
 
             File f_in, f_out;
             f_in = runtime::file::from_file(input_filename, "rb");
-            if( runtime::file::is_null(f_in)) {
+            if (runtime::file::is_null(f_in)) {
                 log::error("resource_manager", "Could not open source file \"%s\"", input_filename);
-                
+
                 return;
-            };
-            
+            }
+
+            ;
+
             f_out = runtime::file::from_file(output_filename, "wb");
 
             resource_compiler_clb_t clb = hash::get < resource_compiler_clb_t >

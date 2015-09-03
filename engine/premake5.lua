@@ -53,6 +53,10 @@ solution "cyberego.org tech1"
       THIRD_PARTY_LIB
     }
 
+    links {
+        "luajit"
+    }
+    
     -- SIMD options
     filter "options:simd=fpu"
       defines {
@@ -71,8 +75,7 @@ solution "cyberego.org tech1"
           'dl',
           'pthread'
       }
-    
-      
+     
     filter "Debug"
         flags {"Symbols"}
         targetsuffix '_debug'
@@ -116,7 +119,7 @@ project "tech1_static"
     }
 
     links {
-      "SDL2"
+      "SDL2",
     }
 
     excludes {

@@ -26,6 +26,10 @@
 #include "common/cvar.h"
 #include "common/command_line.h"
 
+#include "common/lua_env.h"
+
+#include "resources/lua.h"
+
 #include "common/cvars.h"
 
 #include <iostream>
@@ -127,18 +131,22 @@ void init_boot() {
 
     resource_manager::load(package_manager::type_name(), boot_pkg_name_h);
     package_manager::load(boot_pkg_name_h);
-
+    
+    StringId64_t lua_hash = murmur_hash_64("lua", 3, 22);
+    
+    const resource_lua::Resource* res_lua = (const resource_lua::Resource*)resource_manager::get(lua_hash, boot_script_name_h);
+    lua_enviroment::execute_resource(lua_enviroment_globals::global_env(), res_lua);
 }
 
 void compile_all_resource() {
     char* files[4096] = {0};
     uint32_t files_count = 0;
     const size_t source_dir_len = strlen(cvars::rm_source_dir.value_str);
-    
+
     runtime::dir::listdir(cvars::rm_source_dir.value_str, "", files, &files_count);
-    
-    for ( uint32_t i = 0; i < files_count; ++i) {
-        const char *path_base = files[i] + source_dir_len;        /* Base path */
+
+    for (uint32_t i = 0; i < files_count; ++i) {
+        const char* path_base = files[i] + source_dir_len;        /* Base path */
 
         resource_manager::compile(path_base);
     }
@@ -159,12 +167,13 @@ void init() {
     resource_manager::register_loader(package_manager::type_name(), &resource_package::loader);
     resource_manager::register_compiler(package_manager::type_name(), &resource_package::compiler);
 
-    StringId64_t lua_h = murmur_hash_64("lua", 3, 22);
-
-    resource_manager::register_unloader(lua_h, &resource_lua::unloader);
-    resource_manager::register_loader(lua_h, &resource_lua::loader);
-    resource_manager::register_compiler(lua_h, &resource_lua::compiler);
     
+    StringId64_t lua_hash = murmur_hash_64("lua", 3, 22);
+
+    resource_manager::register_unloader(lua_hash, &resource_lua::unloader);
+    resource_manager::register_loader(lua_hash, &resource_lua::loader);
+    resource_manager::register_compiler(lua_hash, &resource_lua::compiler);
+
     if (command_line::has_argument("compile", 'c')) {
         compile_all_resource();
     }
