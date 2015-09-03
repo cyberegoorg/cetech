@@ -1,5 +1,5 @@
-print('load')
+require "lua/foo"
 
-function foo()
-    print("foo")
-end
+foo()
+
+print('load')
