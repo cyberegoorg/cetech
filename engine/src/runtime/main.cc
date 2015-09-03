@@ -131,10 +131,11 @@ void init_boot() {
 
     resource_manager::load(package_manager::type_name(), boot_pkg_name_h);
     package_manager::load(boot_pkg_name_h);
-    
+
     StringId64_t lua_hash = murmur_hash_64("lua", 3, 22);
-    
-    const resource_lua::Resource* res_lua = (const resource_lua::Resource*)resource_manager::get(lua_hash, boot_script_name_h);
+
+    const resource_lua::Resource* res_lua = (const resource_lua::Resource*)resource_manager::get(lua_hash,
+                                                                                                 boot_script_name_h);
     lua_enviroment::execute_resource(lua_enviroment_globals::global_env(), res_lua);
 }
 
@@ -167,7 +168,7 @@ void init() {
     resource_manager::register_loader(package_manager::type_name(), &resource_package::loader);
     resource_manager::register_compiler(package_manager::type_name(), &resource_package::compiler);
 
-    
+
     StringId64_t lua_hash = murmur_hash_64("lua", 3, 22);
 
     resource_manager::register_unloader(lua_hash, &resource_lua::unloader);
