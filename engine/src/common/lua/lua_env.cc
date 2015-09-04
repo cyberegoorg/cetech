@@ -1,10 +1,10 @@
 #include <cstring>
 
 #include "common/asserts.h"
-#include "common/lua_env.h"
+#include "common/lua/lua_env.h"
 #include "common/log.h"
 #include "common/murmur_hash.h"
-#include "resource/resource_manager.h"
+#include "common/resource/resource_manager.h"
 
 namespace cetech {
     namespace lua_enviroment_globals {

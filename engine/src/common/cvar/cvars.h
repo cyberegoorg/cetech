@@ -1,6 +1,6 @@
 #pragma once
 
-#include "common/cvar.h"
+#include "common/cvar/cvar.h"
 
 namespace cetech {
     namespace cvars {

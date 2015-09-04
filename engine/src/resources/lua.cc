@@ -1,5 +1,3 @@
-#pragma once
-
 #include "resources/lua.h"
 
 #include "common/stringid_types.h"
