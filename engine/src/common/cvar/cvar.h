@@ -6,7 +6,7 @@
 #include "rapidjson/document.h"
 
 #include "common/asserts.h"
-#include "common/cvar_types.h"
+#include "common/cvar/cvar_types.h"
 #include "common/murmur_hash.h"
 #include "common/log.h"
 #include "common/stringid_types.h"

@@ -23,14 +23,14 @@
 
 #include "common/stringid_types.h"
 
-#include "common/cvar.h"
+#include "common/cvar/cvar.h"
 #include "common/command_line.h"
 
-#include "common/lua_env.h"
+#include "common/lua/lua_env.h"
 
 #include "resources/lua.h"
 
-#include "common/cvars.h"
+#include "common/cvar/cvars.h"
 
 #include <iostream>
 
