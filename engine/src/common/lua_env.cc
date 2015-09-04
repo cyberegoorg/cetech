@@ -1,4 +1,9 @@
+#include <cstring>
+
+#include "common/asserts.h"
 #include "common/lua_env.h"
+#include "common/log.h"
+#include "common/murmur_hash.h"
 #include "resource/resource_manager.h"
 
 namespace cetech {
@@ -47,12 +52,11 @@ namespace cetech {
         }
 
         static int require(lua_State* L) {
-            StringId64_t lua_hash = murmur_hash_64("lua", 3, 22);
-
             const char* name = lua_tostring( L, 1);
             StringId64_t name_hash = murmur_hash_64(name, strlen(name), 22);
 
-            const resource_lua::Resource* res = (resource_lua::Resource*)resource_manager::get(lua_hash, name_hash);
+            const resource_lua::Resource* res = (resource_lua::Resource*)resource_manager::get(
+                resource_lua::type_hash(), name_hash);
 
             if (res == nullptr) {
                 return 0;

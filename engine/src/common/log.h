@@ -3,6 +3,8 @@
 #include <cstdio>
 #include <cstdarg>
 
+#include "platform/defines.h"
+
 #define LOG_FORMAT "[%s][%s] %s"
 
 #define COLOR_RED  "\x1B[31m"

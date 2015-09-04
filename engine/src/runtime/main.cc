@@ -159,6 +159,10 @@ void init() {
     parse_command_line();
 
     runtime::init();
+
+    resource_package::init();
+    resource_lua::init();
+
     resource_manager_globals::init();
     package_manager_globals::init();
 
@@ -169,11 +173,9 @@ void init() {
     resource_manager::register_compiler(package_manager::type_name(), &resource_package::compiler);
 
 
-    StringId64_t lua_hash = murmur_hash_64("lua", 3, 22);
-
-    resource_manager::register_unloader(lua_hash, &resource_lua::unloader);
-    resource_manager::register_loader(lua_hash, &resource_lua::loader);
-    resource_manager::register_compiler(lua_hash, &resource_lua::compiler);
+    resource_manager::register_unloader(resource_lua::type_hash(), &resource_lua::unloader);
+    resource_manager::register_loader(resource_lua::type_hash(), &resource_lua::loader);
+    resource_manager::register_compiler(resource_lua::type_hash(), &resource_lua::compiler);
 
     if (command_line::has_argument("compile", 'c')) {
         compile_all_resource();
