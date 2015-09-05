@@ -41,10 +41,6 @@
 using namespace cetech;
 using namespace rapidjson;
 
-CVar cvar1("vfloat", "desc", 1.0f, 0.0f, 5.0f);
-CVar cvar2("vint", "desc", 1, 0, 5);
-CVar cvar3("vstr", "desc", "ssssssss");
-
 void frame_start() {
     runtime::frame_start();
 }
@@ -147,7 +143,7 @@ void compile_all_resource() {
     runtime::dir::listdir(cvars::rm_source_dir.value_str, "", files, &files_count);
 
     for (uint32_t i = 0; i < files_count; ++i) {
-        const char* path_base = files[i] + source_dir_len;        /* Base path */
+        const char* path_base = files[i] + source_dir_len; /* Base path */
 
         resource_manager::compile(path_base);
     }
@@ -172,7 +168,6 @@ void init() {
     resource_manager::register_loader(package_manager::type_name(), &resource_package::loader);
     resource_manager::register_compiler(package_manager::type_name(), &resource_package::compiler);
 
-
     resource_manager::register_unloader(resource_lua::type_hash(), &resource_lua::unloader);
     resource_manager::register_loader(resource_lua::type_hash(), &resource_lua::loader);
     resource_manager::register_compiler(resource_lua::type_hash(), &resource_lua::compiler);
@@ -191,12 +186,6 @@ void init() {
     //         800, 600,
     //         runtime::window::WINDOW_NOFLAG
     //         );
-
-    Matrix44 m1 = matrix44::IDENTITY;
-
-    float det = matrix44::determinant(m1);
-
-    printf("det: %f\n", det);
 }
 
 void shutdown() {
