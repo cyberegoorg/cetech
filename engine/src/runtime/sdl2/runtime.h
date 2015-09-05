@@ -7,6 +7,7 @@
 
 #include "SDL2/SDL.h"
 
+#include "common/macros.h"
 #include "common/log/log.h"
 #include "common/debug/asserts.h"
 #include "common/crypto/murmur_hash.h"
@@ -20,8 +21,9 @@ namespace cetech {
                                                    int category,
                                                    SDL_LogPriority priority,
                                                    const char* message) {
+                CE_UNUSED(userdata);
                 const char* where = nullptr;
-
+                
                 switch (category) {
                 case SDL_LOG_CATEGORY_APPLICATION:
                     where = "sdl.app";
@@ -75,6 +77,9 @@ namespace cetech {
 
                 case SDL_LOG_PRIORITY_CRITICAL:
                     log::error(where, "%s", message);
+                    break;
+                
+                default:
                     break;
                 }
             }
