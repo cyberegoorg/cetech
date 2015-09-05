@@ -30,7 +30,7 @@
 
 #include "resources/lua.h"
 
-#include "common/cvar/cvars.h"
+#include "cvars/cvars.h"
 
 #include <iostream>
 
@@ -50,10 +50,6 @@ void frame_end() {
 }
 
 void frame_body() {
-    if (runtime::mouse::button_state(runtime::mouse::button_index("left"))) {
-        Vector2 m = runtime::mouse::axis();
-        printf("%f, %f\n", m.x, m.y);
-    }
 }
 
 void run() {

@@ -83,8 +83,8 @@ namespace cetech {
         namespace dir {
             CE_INLINE bool mkdir(const char* path);
             CE_INLINE bool mkpath(const char* path);
-            CE_INLINE void listdir(const char* name, const char* ignore_dir, char** files, uint32_t* file_count);
-            CE_INLINE void listdir_free(char** files, uint32_t file_count);
+            static void listdir(const char* name, const char* ignore_dir, char** files, uint32_t* file_count);
+            static void listdir_free(char** files, uint32_t file_count);
         }
     }
 }
