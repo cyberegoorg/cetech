@@ -1,7 +1,7 @@
 // based on bitsquid foundation
 #pragma once
 
-#include "types.h"
+#include "common/types.h"
 
 namespace cetech {
     /*! Implementation of the 64 bit MurmurHash2 function http://murmurhash.googlepages.com/.

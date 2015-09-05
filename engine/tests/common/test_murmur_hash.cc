@@ -2,7 +2,7 @@
 
 #include "catch.hpp"
 
-#include "common/murmur_hash.h"
+#include "common/crypto/murmur_hash.h"
 
 SCENARIO( "Murmur hash", "[murmur]" ) {
     GIVEN( "String to hash" ) {

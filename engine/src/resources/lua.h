@@ -1,7 +1,7 @@
 #pragma once
 
 #include "runtime/runtime_types.h"
-#include "common/stringid_types.h"
+#include "common/string/stringid_types.h"
 #include "common/memory/memory_types.h"
 
 namespace cetech {

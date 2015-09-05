@@ -1,9 +1,9 @@
 #include <cstring>
 
-#include "common/asserts.h"
+#include "common/debug/asserts.h"
 #include "common/lua/lua_env.h"
-#include "common/log.h"
-#include "common/murmur_hash.h"
+#include "common/log/log.h"
+#include "common/crypto/murmur_hash.h"
 #include "common/resource/resource_manager.h"
 
 namespace cetech {

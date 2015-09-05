@@ -7,7 +7,7 @@
 #include "common/math/matrix44.h"
 #include "common/math/simd/simd.h"
 #include "common/types.h"
-#include "common/log.h"
+#include "common/log/log.h"
 #include "common/container/array.h"
 #include "common/container/hash.h"
 #include "common/container/queue.h"
@@ -21,10 +21,10 @@
 #include "resources/package.h"
 #include "resources/lua.h"
 
-#include "common/stringid_types.h"
+#include "common/string/stringid_types.h"
 
 #include "common/cvar/cvar.h"
-#include "common/command_line.h"
+#include "common/command_line/command_line.h"
 
 #include "common/lua/lua_env.h"
 
