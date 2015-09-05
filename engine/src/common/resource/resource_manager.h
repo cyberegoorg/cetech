@@ -2,7 +2,7 @@
 
 #include <cinttypes>
 
-#include "common/stringid_types.h"
+#include "common/string/stringid_types.h"
 #include "common/memory/memory_types.h"
 #include "runtime/runtime_types.h"
 

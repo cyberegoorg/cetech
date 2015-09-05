@@ -5,7 +5,7 @@
 #include <cstring>
 
 #include "platform/defines.h"
-#include "common/log.h"
+#include "common/log/log.h"
 
 /*!
  * Check ptr macro.

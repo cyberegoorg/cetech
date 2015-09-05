@@ -1,9 +1,9 @@
 #include "resources/package.h"
 
-#include "common/stringid_types.h"
+#include "common/string/stringid_types.h"
 #include "common/memory/memory.h"
 #include "runtime/runtime.h"
-#include "common/murmur_hash.h"
+#include "common/crypto/murmur_hash.h"
 
 #include "rapidjson/document.h"
 #include "rapidjson/writer.h"

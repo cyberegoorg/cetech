@@ -7,9 +7,9 @@
 
 #include "SDL2/SDL.h"
 
-#include "common/log.h"
-#include "common/asserts.h"
-#include "common/murmur_hash.h"
+#include "common/log/log.h"
+#include "common/debug/asserts.h"
+#include "common/crypto/murmur_hash.h"
 #include "common/math/vector2.h"
 #include "runtime/runtime.h"
 

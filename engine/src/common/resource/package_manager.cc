@@ -4,7 +4,7 @@
 #include "common/container/queue.h"
 #include "common/container/hash.h"
 #include "common/memory/memory.h"
-#include "common/murmur_hash.h"
+#include "common/crypto/murmur_hash.h"
 
 #include "runtime/runtime.h"
 
