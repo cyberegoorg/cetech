@@ -31,7 +31,7 @@ namespace cetech {
             document.Parse(tmp);
 
             Header header = {0};
-            Item item = {0};
+            Item item = {0, 0};
 
             for (rapidjson::Value::ConstMemberIterator itr = document.MemberBegin(); itr != document.MemberEnd();
                  ++itr) {
