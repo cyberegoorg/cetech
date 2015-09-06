@@ -34,6 +34,8 @@
 
 #include <iostream>
 
+#include "enet/enet.h"
+
 #include "rapidjson/document.h"
 #include "rapidjson/writer.h"
 #include "rapidjson/stringbuffer.h"
@@ -145,6 +147,25 @@ void compile_all_resource() {
     }
 }
 
+struct ResourceRegistration {
+    StringId64_t type;
+
+    resource_manager::resource_compiler_clb_t compiler;
+    resource_manager::resource_loader_clb_t loader;
+    resource_manager::resource_unloader_clb_t unloader;
+};
+
+void register_resources(const ResourceRegistration* regs) {
+    const ResourceRegistration *it = regs;
+    
+    while( it->type != 0 ) {
+        resource_manager::register_unloader(it->type, it->unloader);
+        resource_manager::register_loader(it->type, it->loader);
+        resource_manager::register_compiler(it->type, it->compiler);
+        ++it;
+    }
+}
+
 void init() {
     memory_globals::init();
 
@@ -160,13 +181,12 @@ void init() {
 
     load_config_json();
 
-    resource_manager::register_unloader(package_manager::type_name(), &resource_package::unloader);
-    resource_manager::register_loader(package_manager::type_name(), &resource_package::loader);
-    resource_manager::register_compiler(package_manager::type_name(), &resource_package::compiler);
-
-    resource_manager::register_unloader(resource_lua::type_hash(), &resource_lua::unloader);
-    resource_manager::register_loader(resource_lua::type_hash(), &resource_lua::loader);
-    resource_manager::register_compiler(resource_lua::type_hash(), &resource_lua::compiler);
+    ResourceRegistration resource_regs[] = {
+        {resource_package::type_hash(), &resource_package::compiler, &resource_package::loader, &resource_package::unloader},
+        {resource_lua::type_hash(), &resource_lua::compiler, &resource_lua::loader, &resource_lua::unloader},
+        {0, nullptr, nullptr, nullptr}
+    };
+    register_resources(resource_regs);
 
     if (command_line::has_argument("compile", 'c')) {
         compile_all_resource();

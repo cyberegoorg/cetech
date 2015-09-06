@@ -3,7 +3,7 @@
 #include "common/string/stringid_types.h"
 #include "common/memory/memory.h"
 #include "runtime/runtime.h"
-#include "common/crypto/murmur_hash.h"
+#include "common/string/stringid.h"
 
 #include "rapidjson/document.h"
 #include "rapidjson/writer.h"
@@ -13,7 +13,7 @@ namespace cetech {
     namespace resource_package {
         static StringId64_t _type_hash;
         void init() {
-            _type_hash = murmur_hash_64("package", 7, 22);
+            _type_hash = stringid64::from_cstring("package");
         }
 
         StringId64_t type_hash() {

@@ -87,7 +87,7 @@ namespace cetech {
             }
 
             resource_package::Header* header = (resource_package::Header*)res;
-            resource_package::Item* items = (resource_package::Item*)(res + sizeof(resource_package::Header));
+            resource_package::Item* items = (resource_package::Item*)(header + 1);
 
             const uint64_t count = header->count;
             for (uint64_t i = 0; i < count; ++i) {
