@@ -54,7 +54,8 @@ solution "cyberego.org tech1"
     }
 
     links {
-        "luajit"
+        "luajit",
+        "enet"
     }
     
     -- SIMD options

@@ -3,6 +3,8 @@
 #include "common/container/queue.h"
 #include "common/container/hash.h"
 #include "common/memory/memory.h"
+#include "common/string/stringid.h"
+
 #include "cvars/cvars.h"
 
 #include "runtime/runtime.h"
@@ -48,8 +50,8 @@ namespace cetech {
 
             const uint32_t len = strlen(t);
 
-            type = murmur_hash_64(t, len, 22);
-            name = murmur_hash_64(path, sz, 22);
+            type = stringid64::from_cstring_len(t, len);
+            name = stringid64::from_cstring_len(path, sz);
         }
 
         CE_INLINE void make_full_path(char* buffer, const char* base_path, const char* filename) {
