@@ -11,7 +11,7 @@ namespace cetech {
 
     namespace lua_enviroment {
         void execute_resource(const LuaEnviroment& env, const resource_lua::Resource* res);
-
+        void execute_string(const LuaEnviroment& env, const char *str);
     }
 
 }

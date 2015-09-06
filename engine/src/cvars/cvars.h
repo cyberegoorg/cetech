@@ -11,5 +11,6 @@ namespace cetech {
         extern CVar boot_pkg;
         extern CVar boot_script;
 
+        extern CVar console_server_port;
     }
 }

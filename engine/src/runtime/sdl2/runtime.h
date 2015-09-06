@@ -23,7 +23,7 @@ namespace cetech {
                                                    const char* message) {
                 CE_UNUSED(userdata);
                 const char* where = nullptr;
-                
+
                 switch (category) {
                 case SDL_LOG_CATEGORY_APPLICATION:
                     where = "sdl.app";
@@ -78,7 +78,7 @@ namespace cetech {
                 case SDL_LOG_PRIORITY_CRITICAL:
                     log::error(where, "%s", message);
                     break;
-                
+
                 default:
                     break;
                 }

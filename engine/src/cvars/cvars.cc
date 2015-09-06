@@ -7,5 +7,7 @@ namespace cetech {
 
         CVar boot_pkg("boot.pkg", "Boot package", "boot", CVar::FLAG_CONST);
         CVar boot_script("boot.script", "Boot script", "lua/boot", CVar::FLAG_CONST);
+
+        CVar console_server_port("console_server.port", "Console server port.", 2222, CVar::FLAG_CONST);
     }
 }
