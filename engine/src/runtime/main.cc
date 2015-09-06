@@ -114,7 +114,7 @@ namespace cetech {
             FD_SET(_cs->server_socket, &(_cs->socket_set));
         }
 
-        void parse_packet(const char* packet, const uint32_t size){
+        void parse_packet(uint32_t client, const char* packet, const uint32_t size){
             log::info("client_server", "Client msg: %s", packet);
             
             rapidjson::Document document;
@@ -138,6 +138,9 @@ namespace cetech {
             
             rapidjson::Document document_out;
             cmd(document, document_out);
+            
+            if( document_out.IsObject() ) {
+            }
         }
         
         void tick() {
@@ -175,7 +178,7 @@ namespace cetech {
                         } else {
                             buffer[lenght] = 0;
                             
-                            parse_packet(buffer, lenght);
+                            parse_packet(i, buffer, lenght);
                         }
                     }
                 }
