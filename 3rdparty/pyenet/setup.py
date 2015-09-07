@@ -7,7 +7,7 @@ import sys
 
 source_files = ["enet.pyx"]
 
-_enet_files = glob.glob("enet/*.c")
+_enet_files = glob.glob("../enet/*.c")
 
 if not _enet_files:
     print("You need to download and extract the enet 1.3 source to enet/")
@@ -36,7 +36,7 @@ ext_modules = [
         "enet",
         extra_compile_args=["-O3"],
         sources=source_files,
-        include_dirs=["enet/include/"],
+        include_dirs=["../enet/include/"],
         define_macros=define_macros,
         libraries=libraries)]
 
