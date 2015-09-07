@@ -11,6 +11,8 @@
 #include "rapidjson/stringbuffer.h"
 #include "rapidjson/error/en.h"
 
+#include "enet/enet.h"
+
 #include <cstdlib>
 #include <sys/socket.h>
 #include <netinet/in.h>
@@ -21,12 +23,13 @@
 namespace cetech {
     namespace console_server_globals {
         struct ConsoleServer {
-            int server_socket;
-            int socket_max;
-            fd_set socket_set;
+            ENetSocket server_socket;
+            ENetSocketSet socket_set;
 
-            Array < int > client_socket;
-            Array < sockaddr_in > client_addr;
+            int socket_max;
+
+            Array < ENetSocket > client_socket;
+            Array < ENetAddress > client_addr;
             
             Hash<command_clb_t> cmds;
 
@@ -44,37 +47,36 @@ namespace cetech {
         void init() {
             _cs = MAKE_NEW(memory_globals::default_allocator(), ConsoleServer, memory_globals::default_allocator());
 
-            if ((_cs->server_socket = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP)) == -1) {
+            if ((_cs->server_socket = enet_socket_create(ENET_SOCKET_TYPE_STREAM)) == ENET_SOCKET_NULL) {
                 log::error("console_server", "Could not create socket");
                 return;
             }
 
-            
-            const int oldFlag = fcntl(_cs->server_socket, F_GETFL, 0);
-            if (fcntl(_cs->server_socket, F_SETFL, oldFlag | O_NONBLOCK) == -1) {
+
+            const int oldFlag = enet_socket_get_option(_cs->server_socket, F_GETFL, 0);
+            if (enet_socket_set_option(_cs->server_socket, ENET_SOCKOPT_NONBLOCK, 1)) {
                 log::error("console_server", "Could not set nonblocking mode");
                 return;
             }
-            
-            sockaddr_in socket_addr;
-            socket_addr.sin_family = AF_INET;
-            socket_addr.sin_port = htons(cvars::console_server_port.value_i);
-            socket_addr.sin_addr.s_addr = INADDR_ANY;
 
-            if (bind(_cs->server_socket, (sockaddr*)&socket_addr, sizeof(socket_addr)) == -1) {
+            ENetAddress addr;
+            addr.host = ENET_HOST_ANY;
+            addr.port = cvars::console_server_port.value_i;
+            
+            if (enet_socket_bind(_cs->server_socket, &addr) == -1) {
                 log::error("console_server", "Could not bind socket");
                 return;
             }
 
-            if (listen(_cs->server_socket, 10) == -1) {
+            if (enet_socket_listen(_cs->server_socket, 10) == -1) {
                 log::error("console_server", "Could not listen.");
                 return;
             }
 
             _cs->socket_max = _cs->server_socket;
             
-            FD_ZERO(&(_cs->socket_set));
-            FD_SET(_cs->server_socket, &(_cs->socket_set));
+            ENET_SOCKETSET_EMPTY(_cs->socket_set);
+            ENET_SOCKETSET_ADD(_cs->socket_set, _cs->server_socket);
         }
 
         void shutdown() {
@@ -113,19 +115,17 @@ namespace cetech {
         }
         
         void tick() {
-            if (select(_cs->socket_max + 1, &(_cs->socket_set), NULL, NULL, NULL) != 0) {
-                if (FD_ISSET(_cs->server_socket, &(_cs->socket_set))) {
+            if (enet_socketset_select(_cs->socket_max + 1, &(_cs->socket_set), NULL, 0) != 0) {
+                if (ENET_SOCKETSET_CHECK(_cs->socket_set, _cs->server_socket)) {
                     const uint32_t client_id = array::size(_cs->client_socket);
-
-                    sockaddr_in client_ifo;
-                    socklen_t addrlen = sizeof(client_ifo);
-
-                    int cl_socket = accept(_cs->server_socket, (sockaddr*)&client_ifo, &addrlen);
+                    
+                    ENetAddress addr;
+                    ENetSocket cl_socket = enet_socket_accept(_cs->server_socket, &addr);
 
                     log::info("console_server", "Client connected.");
                     
                     array::push_back(_cs->client_socket, cl_socket);
-                    array::push_back(_cs->client_addr, client_ifo);
+                    array::push_back(_cs->client_addr, addr);
                 }
 
                 const uint32_t client_len = array::size(_cs->client_socket);
@@ -134,11 +134,16 @@ namespace cetech {
                         continue;
                     }
                     
-                    if (FD_ISSET(_cs->client_socket[i], &(_cs->socket_set))) {
+                    if (ENET_SOCKETSET_CHECK(_cs->socket_set, _cs->client_socket[i])) {
                         char buffer[4096] = {0};
+                        
+                        ENetBuffer ebuffer;
+                        ebuffer.data = buffer;
+                        ebuffer.dataLength = 4096; 
+
                         int lenght = 0;
 
-                        if ((lenght = recv(_cs->client_socket[i], (void*)buffer, 4096 - 1, 0)) <= 0) {
+                        if ((lenght = enet_socket_receive(_cs->client_socket[i], (void*)buffer, 4096 - 1, 0)) <= 0) {
                             close(_cs->client_socket[i]);
                             log::info("console_server", "Client disconnected.");
 
@@ -152,8 +157,8 @@ namespace cetech {
                     }
                 }
 
-                FD_ZERO(&(_cs->socket_set));
-                FD_SET(_cs->server_socket, &(_cs->socket_set));
+                ENET_SOCKETSET_EMPTY(_cs->socket_set);
+                ENET_SOCKETSET_ADD(_cs->socket_set, _cs->server_socket);
                 for (uint32_t i = 0; i < client_len; ++i) {
                     if(_cs->client_socket[i] == 0 ) {
                         continue;
@@ -163,7 +168,7 @@ namespace cetech {
                          _cs->socket_max = _cs->client_socket[i];
                     }
                     
-                    FD_SET(_cs->client_socket[i], &(_cs->socket_set));
+                    ENET_SOCKETSET_ADD(_cs->socket_set, _cs->client_socket[i]);
                 }
 
                 if( _cs->socket_max < _cs->server_socket ) {
