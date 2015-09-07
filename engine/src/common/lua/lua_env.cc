@@ -51,7 +51,7 @@ namespace cetech {
             }
         }
 
-        void execute_string(lua_State* _state, const char *str) {
+        void execute_string(lua_State* _state, const char* str) {
             //lua_pushcfunction(_state, error_handler);
 
             if (luaL_dostring(_state, str)) {
@@ -60,7 +60,7 @@ namespace cetech {
                 log::error("lua", "%s", last_error);
             }
         }
-        
+
         static int require(lua_State* L) {
             const char* name = lua_tostring( L, 1);
             StringId64_t name_hash = murmur_hash_64(name, strlen(name), 22);
@@ -108,8 +108,8 @@ namespace cetech {
         void execute_resource(const LuaEnviroment& env, const resource_lua::Resource* res) {
             internal::execute_resource(env._state, res);
         }
-        
-        void execute_string(const LuaEnviroment& env, const char *str) {
+
+        void execute_string(const LuaEnviroment& env, const char* str) {
             internal::execute_string(env._state, str);
         }
     }

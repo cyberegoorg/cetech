@@ -218,7 +218,7 @@ void init() {
 void shutdown() {
     package_manager_globals::shutdown();
     resource_manager_globals::shutdown();
-    
+
     console_server_globals::shutdown();
     runtime::shutdown();
     memory_globals::shutdown();
