@@ -80,8 +80,3 @@ class ConsoleProxy(threading.Thread):
 
         self.peer.send(0, packet)
         self.host.flush()
-
-
-cp = ConsoleProxy("localhost", 2222)
-cp.start()
-cp.send_command("lua.execute", script="print(\"fofofofofofofo\")")
