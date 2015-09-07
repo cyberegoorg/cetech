@@ -1,4 +1,5 @@
 {
     "cvars": {
+        "console_port": 2222
     }
 }
