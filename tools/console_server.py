@@ -1,7 +1,6 @@
 import socket
 import json
 
-
 class ConsoleServerAPI(object):
     def __init__(self):
         self._socket = None
@@ -25,8 +24,10 @@ class ConsoleServerAPI(object):
         self._socket.send(str.encode(json.dumps(msg)))
         
         self._msg_id += 1
-
+    
+    def tick():
+        pass
 
 api = ConsoleServerAPI()
 api.connect('localhost', 2222)
-api.send_cmd("lua.execute", script="print('command from net'); ff")
+api.send_cmd("lua.execute", script="print('command from net');)
