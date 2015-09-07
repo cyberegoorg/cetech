@@ -26,7 +26,8 @@ namespace cetech {
             ENetSocket server_socket;
             ENetSocketSet socket_set;
 
-            int socket_max;
+            ENetAddress server_addr;
+            ENetSocket socket_max;
 
             Array < ENetSocket > client_socket;
             Array < ENetAddress > client_addr;
@@ -53,17 +54,15 @@ namespace cetech {
             }
 
 
-            const int oldFlag = enet_socket_get_option(_cs->server_socket, F_GETFL, 0);
             if (enet_socket_set_option(_cs->server_socket, ENET_SOCKOPT_NONBLOCK, 1)) {
                 log::error("console_server", "Could not set nonblocking mode");
                 return;
             }
 
-            ENetAddress addr;
-            addr.host = ENET_HOST_ANY;
-            addr.port = cvars::console_server_port.value_i;
+            _cs->server_addr.host = ENET_HOST_ANY;
+            _cs->server_addr.port = cvars::console_server_port.value_i;
             
-            if (enet_socket_bind(_cs->server_socket, &addr) == -1) {
+            if (enet_socket_bind(_cs->server_socket, &(_cs->server_addr)) == -1) {
                 log::error("console_server", "Could not bind socket");
                 return;
             }
@@ -115,7 +114,8 @@ namespace cetech {
         }
         
         void tick() {
-            if (enet_socketset_select(_cs->socket_max + 1, &(_cs->socket_set), NULL, 0) != 0) {
+            if (select(_cs->socket_max + 1, &(_cs->socket_set), NULL, NULL, NULL) != 0) {
+                log::info("console_server", "data");
                 if (ENET_SOCKETSET_CHECK(_cs->socket_set, _cs->server_socket)) {
                     const uint32_t client_id = array::size(_cs->client_socket);
                     
@@ -139,11 +139,11 @@ namespace cetech {
                         
                         ENetBuffer ebuffer;
                         ebuffer.data = buffer;
-                        ebuffer.dataLength = 4096; 
+                        ebuffer.dataLength = 4096 - 1; 
 
                         int lenght = 0;
 
-                        if ((lenght = enet_socket_receive(_cs->client_socket[i], (void*)buffer, 4096 - 1, 0)) <= 0) {
+                        if ((lenght = enet_socket_receive(_cs->client_socket[i], &(_cs->server_addr), &ebuffer, 1)) <= 0) {
                             close(_cs->client_socket[i]);
                             log::info("console_server", "Client disconnected.");
 
@@ -151,7 +151,6 @@ namespace cetech {
 
                         } else {
                             buffer[lenght] = 0;
-                            
                             parse_packet(i, buffer, lenght);
                         }
                     }

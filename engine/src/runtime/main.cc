@@ -51,7 +51,6 @@ void cmd_lua_execute(const rapidjson::Document& in, rapidjson::Document& out) {
 void frame_start() {
     runtime::frame_start();
     console_server_globals::tick();
-    console_server_globals::register_command("lua.execute", &cmd_lua_execute);
 }
 
 void frame_end() {
@@ -190,6 +189,7 @@ void init() {
     load_config_json();
 
     console_server_globals::init();
+    console_server_globals::register_command("lua.execute", &cmd_lua_execute);
 
     ResourceRegistration resource_regs[] = {
         {resource_package::type_hash(), & resource_package::compiler, & resource_package::loader,
