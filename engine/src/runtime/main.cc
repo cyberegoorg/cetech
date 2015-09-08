@@ -179,7 +179,10 @@ void init() {
     memory_globals::init();
     log::init();
     log::register_handler(&log_handlers::stdout_handler);
-
+    
+//     FILE* log_file = fopen("cetechlog.txt", "wb");
+//     log::register_handler(&log_handlers::file_handler, log_file);
+    
     parse_command_line();
 
     runtime::init();
