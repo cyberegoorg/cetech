@@ -209,7 +209,9 @@ void init() {
 
     console_server_globals::init();
     console_server_globals::register_command("lua.execute", &cmd_lua_execute);
-
+    
+    log::register_handler(&log_handlers::console_server_handler);
+    
     register_resources();
 
     if (command_line::has_argument("compile", 'c')) {
