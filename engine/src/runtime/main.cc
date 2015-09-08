@@ -164,8 +164,20 @@ struct ResourceRegistration {
     resource_manager::resource_unloader_clb_t unloader;
 };
 
-void register_resources(const ResourceRegistration* regs) {
-    const ResourceRegistration* it = regs;
+void register_resources() {
+    static ResourceRegistration resource_regs[] = {
+        /* package */
+        {resource_package::type_hash(), & resource_package::compiler, & resource_package::loader,
+         & resource_package::unloader},
+
+        /* lua */
+        {resource_lua::type_hash(), & resource_lua::compiler, & resource_lua::loader, & resource_lua::unloader},
+
+        /* LAST */
+        {0, nullptr, nullptr, nullptr}
+    };
+    
+    const ResourceRegistration* it = resource_regs;
 
     while (it->type != 0) {
         resource_manager::register_unloader(it->type, it->unloader);
@@ -198,18 +210,7 @@ void init() {
     console_server_globals::init();
     console_server_globals::register_command("lua.execute", &cmd_lua_execute);
 
-    ResourceRegistration resource_regs[] = {
-        /* package */
-        {resource_package::type_hash(), & resource_package::compiler, & resource_package::loader,
-         & resource_package::unloader},
-
-        /* lua */
-        {resource_lua::type_hash(), & resource_lua::compiler, & resource_lua::loader, & resource_lua::unloader},
-
-        /* LAST */
-        {0, nullptr, nullptr, nullptr}
-    };
-    register_resources(resource_regs);
+    register_resources();
 
     if (command_line::has_argument("compile", 'c')) {
         compile_all_resource();
