@@ -3,9 +3,6 @@
 #include <cstdio>
 #include <cstdarg>
 
-#include "platform/defines.h"
-
-
 namespace cetech {
     namespace log {
         enum ELogLevel {
@@ -14,6 +11,12 @@ namespace cetech {
             LOG_ERROR,      //<! Error
             LOG_DEBUG,      //<! Debug
         };
+        typedef void (* handler_t)(const log::ELogLevel, const char*, const char*);
+
+        void init();
+        void shutdown();
+
+        void register_handler(handler_t handler);
 
         void info(const char* where, const char* format, ...);
         void warning(const char* where, const char* format, ...);

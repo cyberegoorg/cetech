@@ -27,6 +27,8 @@
 #include "common/cvar/cvar.h"
 #include "common/command_line/command_line.h"
 
+#include "common/log/handlers.h"
+
 #include "common/lua/lua_env.h"
 
 #include "resources/lua.h"
@@ -175,6 +177,8 @@ void register_resources(const ResourceRegistration* regs) {
 
 void init() {
     memory_globals::init();
+    log::init();
+    log::register_handler(&log_handlers::stdout_handler);
 
     parse_command_line();
 
@@ -192,9 +196,14 @@ void init() {
     console_server_globals::register_command("lua.execute", &cmd_lua_execute);
 
     ResourceRegistration resource_regs[] = {
+        /* package */
         {resource_package::type_hash(), & resource_package::compiler, & resource_package::loader,
          & resource_package::unloader},
+
+        /* lua */
         {resource_lua::type_hash(), & resource_lua::compiler, & resource_lua::loader, & resource_lua::unloader},
+
+        /* LAST */
         {0, nullptr, nullptr, nullptr}
     };
     register_resources(resource_regs);
