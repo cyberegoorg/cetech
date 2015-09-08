@@ -16,8 +16,9 @@ class ConsoleProxy(threading.Thread):
         self.disconnecting = False
 
         self.on_log = None
-        self.on_perf_timers = None
-        self.on_lua_return = None
+
+    def register_on_log_handler(self, on_log):
+        self.on_log = on_log
 
     def disconnect(self):
         self.disconnecting = True
@@ -51,20 +52,13 @@ class ConsoleProxy(threading.Thread):
             self.connect = False
 
         elif event.type == enet.EVENT_TYPE_RECEIVE:
-            data = json.loads(event.packet.data.decode("utf-8"))
+            message = json.loads(event.packet.data.decode("utf-8"))
+            type = message["type"]
+            data = message["data"]
 
-            if data["type"] == 'log':
+            if type == 'log':
                 if self.on_log:
                     self.on_log(data["level"], data["where"], data['msg'])
-
-            elif data["type"] == 'perf_timers':
-                if self.on_perf_timers:
-                    self.on_perf_timers(data["timers"])
-
-                    # elif data["type"] == 'lua_return':
-                    #     if self.on_lua_return:
-                    #         print(data)
-                    #         self.on_lua_return(data['return'])
 
     def send_command(self, cmd_name, **kwargs):
         if not self.connect:

@@ -25,7 +25,7 @@ class Main(ModuleBase):
         self.parse_setting()
 
         self.api = ConsoleAPI('localhost', self.console_port)
-        #self.api.register_on_log_handler(self.on_log)
+        self.api.register_on_log_handler(self.on_log)
         #self.api.register_on_lua_return(self.on_lua_return)
 
         GLib.idle_add(self.api.tick)

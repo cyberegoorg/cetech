@@ -209,15 +209,7 @@
           </packing>
         </child>
         <child>
-          <object class="GtkTextView" id="textview1">
-            <property name="visible">True</property>
-            <property name="can_focus">True</property>
-          </object>
-          <packing>
-            <property name="expand">True</property>
-            <property name="fill">True</property>
-            <property name="position">4</property>
-          </packing>
+          <placeholder/>
         </child>
       </object>
     </child>
