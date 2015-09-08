@@ -10,8 +10,9 @@ namespace cetech {
     namespace {
         struct Logger {
             Array < log::handler_t > handlers;
+            Array < void* > handlers_data;
 
-            Logger(Allocator & allocator) : handlers(allocator) {}
+            Logger(Allocator & allocator) : handlers(allocator), handlers_data(allocator) {}
         };
 
         Logger* _logger;
@@ -19,12 +20,12 @@ namespace cetech {
 
     namespace log_internal {
         void vlog(const log::ELogLevel level, const char* where, const char* format, va_list va) {
-            char msg[4096];       //!< Final msg.
+            char msg[4096]; //!< Final msg.
             vsnprintf(msg, 4096, format, va);
 
             const uint32_t handlers_count = array::size(_logger->handlers);
             for (uint32_t i = 0; i < handlers_count; ++i) {
-                _logger->handlers[i](level, where, msg);
+                _logger->handlers[i](level, where, msg, _logger->handlers_data[i]);
             }
         }
     }
@@ -39,8 +40,9 @@ namespace cetech {
             _logger = nullptr;
         }
 
-        void register_handler(handler_t handler) {
+        void register_handler(handler_t handler, void* data) {
             array::push_back(_logger->handlers, handler);
+            array::push_back(_logger->handlers_data, data);
         }
 
         void info(const char* where, const char* format, ...) {
