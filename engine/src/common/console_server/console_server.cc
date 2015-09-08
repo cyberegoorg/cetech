@@ -95,9 +95,9 @@ namespace cetech {
 
         void tick() {
             ENetEvent Event;
-            
+
             while (enet_host_service(_cs->server_host, &Event, 0) > 0) {
-                
+
                 switch (Event.type) {
                 case ENET_EVENT_TYPE_CONNECT:
                     log::info("console_server", "Client connected.");
@@ -110,7 +110,7 @@ namespace cetech {
                 case ENET_EVENT_TYPE_RECEIVE: {
                     char buff[4096] = {0};
                     strncpy(buff, (char*)Event.packet->data, Event.packet->dataLength);
-                    parse_packet(0, buff,  Event.packet->dataLength);
+                    parse_packet(0, buff, Event.packet->dataLength);
                     enet_packet_destroy(Event.packet);
                     break;
                 }

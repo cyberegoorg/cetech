@@ -1,49 +1,53 @@
 #include <cstdio>
-#include <cstdarg>
 
-#include "common/log/log.h"
 #include "platform/defines.h"
 
-#define LOG_FORMAT "[%s][%s] %s"
-
-#define COLOR_RED  "\x1B[31m"
-#define COLOR_GREEN  "\x1B[32m"
-#define COLOR_YELLOW  "\x1B[33m"
-#define COLOR_BLUE  "\x1B[34m"
-#define COLOR_RESET "\033[0m"
-
-#ifdef CETECH_COLORED_LOG
-  #define COLORED_TEXT(color, text) color text COLOR_RESET
-#else
-  #define COLORED_TEXT(color, text) text
-#endif
-
-static const char* level_to_str[] = { "I", "W", "E", "D" };
-static const char* level_format[] = {
-    COLORED_TEXT(COLOR_BLUE, LOG_FORMAT) "\n",          /* INFO    */
-    COLORED_TEXT(COLOR_YELLOW, LOG_FORMAT) "\n",        /* WARNING */
-    COLORED_TEXT(COLOR_RED, LOG_FORMAT) "\n",           /* ERROR   */
-    COLORED_TEXT(COLOR_GREEN, LOG_FORMAT) "\n"          /* DEBUG   */
-};
+#include "common/log/log.h"
+#include "common/memory/memory.h"
+#include "common/container/array.h"
 
 namespace cetech {
-    namespace log_internal {
-        CE_INLINE void log_vprntf(const log::ELogLevel level, const char* where, const char* format, va_list va) {
-            char msg[1024];         //!< Final msg.
+    namespace {
+        struct Logger {
+            Array < log::handler_t > handlers;
 
-            vsnprintf(msg, 1024, format, va);
-            flockfile(stdout);
-            fprintf(stdout, level_format[level], level_to_str[level], where, msg);
-            funlockfile(stdout);
+            Logger(Allocator & allocator) : handlers(allocator) {}
+        };
+
+        Logger* _logger;
+    }
+
+    namespace log_internal {
+        void vlog(const log::ELogLevel level, const char* where, const char* format, va_list va) {
+            char msg[4096];       //!< Final msg.
+            vsnprintf(msg, 4096, format, va);
+
+            const uint32_t handlers_count = array::size(_logger->handlers);
+            for (uint32_t i = 0; i < handlers_count; ++i) {
+                _logger->handlers[i](level, where, msg);
+            }
         }
     }
 
     namespace log {
+        void init() {
+            _logger = new Logger(memory_globals::default_allocator());//MAKE_NEW(memory_globals::default_allocator(), Logger, memory_globals::default_allocator());
+        }
+
+        void shutdown() {
+            delete _logger;//MAKE_DELETE(memory_globals::default_allocator(), Logger, _logger);
+            _logger = nullptr;
+        }
+
+        void register_handler(handler_t handler) {
+            array::push_back(_logger->handlers, handler);
+        }
+
         void info(const char* where, const char* format, ...) {
             va_list args;
 
             va_start(args, format);
-            log_internal::log_vprntf(LOG_INFO, where, format, args);
+            log_internal::vlog(LOG_INFO, where, format, args);
             va_end(args);
         }
 
@@ -51,7 +55,7 @@ namespace cetech {
             va_list args;
 
             va_start(args, format);
-            log_internal::log_vprntf(LOG_WARNING, where, format, args);
+            log_internal::vlog(LOG_WARNING, where, format, args);
             va_end(args);
         }
 
@@ -59,7 +63,7 @@ namespace cetech {
             va_list args;
 
             va_start(args, format);
-            log_internal::log_vprntf(LOG_ERROR, where, format, args);
+            log_internal::vlog(LOG_ERROR, where, format, args);
             va_end(args);
         }
 
@@ -67,7 +71,7 @@ namespace cetech {
             #ifdef DEBUG
             va_list args;
             va_start(args, format);
-            log_internal::log_vprntf(LOG_DEBUG, where, format, args);
+            log_internal::vlog(LOG_DEBUG, where, format, args);
             va_end(args);
             #else
             //CE_UNUSED_PARAM(where);
