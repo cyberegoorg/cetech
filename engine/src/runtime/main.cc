@@ -176,7 +176,7 @@ void register_resources() {
         /* LAST */
         {0, nullptr, nullptr, nullptr}
     };
-    
+
     const ResourceRegistration* it = resource_regs;
 
     while (it->type != 0) {
@@ -191,10 +191,10 @@ void init() {
     memory_globals::init();
     log::init();
     log::register_handler(&log_handlers::stdout_handler);
-    
-//     FILE* log_file = fopen("cetechlog.txt", "wb");
-//     log::register_handler(&log_handlers::file_handler, log_file);
-    
+
+    //     FILE* log_file = fopen("cetechlog.txt", "wb");
+    //     log::register_handler(&log_handlers::file_handler, log_file);
+
     parse_command_line();
 
     runtime::init();

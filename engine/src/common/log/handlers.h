@@ -32,26 +32,26 @@ namespace cetech {
         static void stdout_handler(const log::ELogLevel level, const char* where, const char* msg, void* data) {
             FILE* out;
 
-            switch(level) {
-                case log::LOG_ERROR:
-                    out = stdout;
-                    break;
-                    
-                default:
-                    out = stderr;
-                    break;
+            switch (level) {
+            case log::LOG_ERROR:
+                out = stdout;
+                break;
+
+            default:
+                out = stderr;
+                break;
             }
-            
+
             flockfile(out);
             fprintf(out, level_format[level], level_to_str[level], where, msg);
             funlockfile(out);
         }
-        
+
         static void file_handler(const log::ELogLevel level, const char* where, const char* msg, void* data) {
             FILE* out = (FILE*)(data);
-            
+
             flockfile(out);
-            fprintf(out, LOG_FORMAT"\n", level_to_str[level], where, msg);
+            fprintf(out, LOG_FORMAT "\n", level_to_str[level], where, msg);
             fflush(out);
             funlockfile(out);
         }
