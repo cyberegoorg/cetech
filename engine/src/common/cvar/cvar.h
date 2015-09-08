@@ -182,7 +182,7 @@ namespace cetech {
             for (rapidjson::Value::ConstMemberIterator itr = ar.MemberBegin(); itr != ar.MemberEnd(); ++itr) {
                 const rapidjson::Value& name = itr->name;
                 const rapidjson::Value& value = itr->value;
-
+                
                 CVar* cvar = cvar::find(name.GetString());
 
                 if (cvar == nullptr) {

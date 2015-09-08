@@ -9,7 +9,7 @@
 namespace cetech {
     struct CVar {
         char name[512];
-        char desc[1024];
+        char desc[2048];
         StringId64_t hash;
 
         CVar* _next;
