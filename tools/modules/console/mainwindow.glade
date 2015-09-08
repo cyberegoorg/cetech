@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- Generated with glade 3.18.3 -->
 <interface>
-  <requires lib="gtk+" version="3.8"/>
+  <requires lib="gtk+" version="3.10"/>
   <object class="GtkImage" id="ExecuteIcon">
     <property name="visible">True</property>
     <property name="can_focus">False</property>
@@ -13,6 +13,7 @@
       <column type="gchararray"/>
     </columns>
   </object>
+  <object class="GtkTextBuffer" id="console_textbuffer"/>
   <object class="GtkListStore" id="logstore">
     <columns>
       <!-- column-name level -->
@@ -79,12 +80,13 @@
             <property name="can_focus">True</property>
             <property name="shadow_type">in</property>
             <child>
-              <object class="GtkTreeView" id="log_entry_tree">
+              <object class="GtkTreeView" id="S">
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
                 <property name="model">logstore</property>
-                <property name="reorderable">True</property>
+                <property name="headers_clickable">False</property>
                 <property name="search_column">0</property>
+                <property name="enable_grid_lines">horizontal</property>
                 <child internal-child="selection">
                   <object class="GtkTreeSelection" id="treeview-selection1"/>
                 </child>
@@ -137,26 +139,18 @@
           <object class="GtkScrolledWindow" id="scrolledwindow1">
             <property name="visible">True</property>
             <property name="can_focus">True</property>
+            <property name="window_placement">bottom-left</property>
             <property name="shadow_type">in</property>
             <child>
-              <object class="GtkTreeView" id="treeview2">
+              <object class="GtkTextView" id="console_textview">
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
-                <property name="model">commandlinestore</property>
-                <child internal-child="selection">
-                  <object class="GtkTreeSelection" id="treeview-selection2"/>
-                </child>
-                <child>
-                  <object class="GtkTreeViewColumn" id="treeviewcolumn1">
-                    <property name="title" translatable="yes">column</property>
-                    <child>
-                      <object class="GtkCellRendererText" id="cellrenderertext4"/>
-                      <attributes>
-                        <attribute name="text">0</attribute>
-                      </attributes>
-                    </child>
-                  </object>
-                </child>
+                <property name="editable">False</property>
+                <property name="left_margin">6</property>
+                <property name="cursor_visible">False</property>
+                <property name="buffer">console_textbuffer</property>
+                <property name="accepts_tab">False</property>
+                <property name="monospace">True</property>
               </object>
             </child>
           </object>
@@ -207,9 +201,6 @@
             <property name="fill">False</property>
             <property name="position">3</property>
           </packing>
-        </child>
-        <child>
-          <placeholder/>
         </child>
       </object>
     </child>

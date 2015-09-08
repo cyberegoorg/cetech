@@ -79,6 +79,7 @@
                       <object class="GtkEntry" id="project_dir_edit">
                         <property name="visible">True</property>
                         <property name="can_focus">True</property>
+                        <property name="text" translatable="yes">../engine/data/build</property>
                       </object>
                       <packing>
                         <property name="expand">True</property>
