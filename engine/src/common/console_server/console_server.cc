@@ -20,7 +20,7 @@ namespace cetech {
             ENetAddress server_addr;
             ENetHost* server_host;
 
-            Array < ENetPeer > client_peer;
+            Array < ENetPeer* > client_peer;
             Queue < int > peer_free_queue;
 
             Hash < command_clb_t > cmds;
@@ -99,13 +99,32 @@ namespace cetech {
             while (enet_host_service(_cs->server_host, &Event, 0) > 0) {
 
                 switch (Event.type) {
-                case ENET_EVENT_TYPE_CONNECT:
-                    log::info("console_server", "Client connected.");
+                case ENET_EVENT_TYPE_CONNECT: {
+                    int64_t cid = 0;
+                    
+                    if( queue::size(_cs->peer_free_queue) > 0 ) {
+                        cid = _cs->peer_free_queue[0] + 1;
+                        queue::pop_front(_cs->peer_free_queue);
+                    } else {
+                        array::push_back(_cs->client_peer, Event.peer);
+                        cid = array::size(_cs->client_peer);
+                    }
+                    
+                    Event.peer->data = (void*)cid;
+                    log::info("console_server", "Client connected. %d", cid);
                     break;
+                }
 
-                case ENET_EVENT_TYPE_DISCONNECT:
-                    log::info("console_server", "Client disconnected.");
+                case ENET_EVENT_TYPE_DISCONNECT: {
+                    int64_t cid = (int64_t)(Event.peer->data);
+                    
+                    _cs->client_peer[cid-1] = nullptr;
+                    queue::push_back(_cs->peer_free_queue, (int)(cid-1));
+                    
+                    log::info("console_server", "Client %d disconnected.", cid);
                     break;
+                }
+
 
                 case ENET_EVENT_TYPE_RECEIVE: {
                     char buff[4096] = {0};
