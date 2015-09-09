@@ -1,6 +1,6 @@
 from PyQt5.QtWidgets import QFrame
 
-from console.ui.consolewidget import Ui_ConsoleWidget
+from shared.ui.consolewidget import Ui_ConsoleWidget
 
 
 class ConsoleWidget(QFrame, Ui_ConsoleWidget):
