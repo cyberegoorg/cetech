@@ -7,22 +7,11 @@ from PyQt5.QtWidgets import QMainWindow, QTreeWidgetItem, QStyle
 from cetech.api import ConsoleAPI
 from shared.consolewidget import ConsoleWidget
 from console.ui.mainwindow import Ui_MainWindow
+from shared.logwidget import LogWidget
 
 
 class MainWindow(QMainWindow, Ui_MainWindow):
-    LOG_COLOR = {
-        'I': QColor("blue"),
-        'W': QColor("yellow"),
-        'D': QColor("green"),
-        'E': QColor("red"),
-    }
 
-    LOG_ICON = {
-        'I': QStyle.SP_MessageBoxInformation,
-        'W': QStyle.SP_MessageBoxWarning,
-        'D': QStyle.SP_MessageBoxQuestion,
-        'E': QStyle.SP_MessageBoxCritical,
-    }
 
     def __init__(self):
         super(MainWindow, self).__init__()
@@ -41,10 +30,12 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.console_address = self.args.console_address
 
         self.api = ConsoleAPI(self.console_address, self.console_port)
-        self.api.register_on_log_handler(self.add_log)
 
         self.console_widget = ConsoleWidget(self.api)
         self.console_dock_widget.setWidget(self.console_widget)
+
+        self.log_widget = LogWidget(self.api)
+        self.log_dock_widget.setWidget(self.log_widget)
 
         self.console_api_timer = QTimer()
         self.console_api_timer.timeout.connect(self.api.tick)
@@ -62,9 +53,3 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
         super(MainWindow, self).closeEvent(evnt)
 
-    def add_log(self, level, where, message):
-        item = QTreeWidgetItem([level, where, message])
-
-        item.setIcon(0, self.style().standardIcon(self.LOG_ICON[level]))
-
-        self.LogWidget.addTopLevelItem(item)
