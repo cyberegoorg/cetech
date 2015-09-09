@@ -9,5 +9,5 @@ class QtConsoleAPI(ConsoleAPI):
         self.timer = QTimer()
         self.timer.timeout.connect(self.tick)
 
-    def start(self, period):
+    def start_tick(self, period):
         self.timer.start(period)

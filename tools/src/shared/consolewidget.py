@@ -1,3 +1,5 @@
+from PyQt5.QtGui import QTextCursor
+
 from PyQt5.QtWidgets import QFrame
 
 from shared.ui.consolewidget import Ui_ConsoleWidget
@@ -17,6 +19,7 @@ class ConsoleWidget(QFrame, Ui_ConsoleWidget):
 
         self.api = api
         self.api.register_on_log_handler(self.add_log)
+
 
     def add_log(self, level, where, message):
         if 'lua' in where:
