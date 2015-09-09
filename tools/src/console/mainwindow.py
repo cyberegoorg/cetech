@@ -24,13 +24,6 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         'E': QStyle.SP_MessageBoxCritical,
     }
 
-    LOG_COLOR_TAG = {
-        'I': "%s",
-        'W': "<span style='color: yellow;'> %s</span>",
-        'D': "%s",
-        'E': "<span style='color: red;'> %s</span>",
-    }
-
     def __init__(self):
         super(MainWindow, self).__init__()
         self.setupUi(self)
