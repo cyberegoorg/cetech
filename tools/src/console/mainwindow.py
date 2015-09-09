@@ -38,7 +38,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.log_widget = LogWidget(self.api)
         self.log_dock_widget.setWidget(self.log_widget)
 
-        self.api.start(10)
+        self.api.start_tick(10)
 
     def closeEvent(self, evnt):
         self.api.disconnect()
