@@ -25,6 +25,13 @@
      <height>21</height>
     </rect>
    </property>
+   <widget class="QMenu" name="menu_File">
+    <property name="title">
+     <string>&amp;File</string>
+    </property>
+    <addaction name="action_Quit"/>
+   </widget>
+   <addaction name="menu_File"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
   <widget class="QDockWidget" name="log_dock">
@@ -73,7 +80,7 @@
     </layout>
    </widget>
   </widget>
-  <widget class="QDockWidget" name="dockWidget_2">
+  <widget class="QDockWidget" name="console_dock_widget">
    <property name="windowTitle">
     <string>&amp;Console</string>
    </property>
@@ -81,31 +88,32 @@
     <number>4</number>
    </attribute>
    <widget class="QWidget" name="dockWidgetContents_3">
-    <layout class="QVBoxLayout" name="verticalLayout_2">
-     <item>
-      <widget class="QTextEdit" name="command_log_textedit"/>
-     </item>
-     <item>
-      <widget class="QLineEdit" name="command_lineedit"/>
-     </item>
-    </layout>
+    <layout class="QVBoxLayout" name="verticalLayout_2"/>
    </widget>
   </widget>
+  <action name="action_Quit">
+   <property name="text">
+    <string>&amp;Quit</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+Q</string>
+   </property>
+  </action>
  </widget>
  <resources/>
  <connections>
   <connection>
-   <sender>command_lineedit</sender>
-   <signal>returnPressed()</signal>
+   <sender>action_Quit</sender>
+   <signal>triggered()</signal>
    <receiver>MainWindow</receiver>
-   <slot>send_command()</slot>
+   <slot>close()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>325</x>
-     <y>59</y>
+     <x>-1</x>
+     <y>-1</y>
     </hint>
     <hint type="destinationlabel">
-     <x>325</x>
+     <x>424</x>
      <y>239</y>
     </hint>
    </hints>
