@@ -24,7 +24,11 @@
     <widget class="QTextEdit" name="command_log_textedit"/>
    </item>
    <item>
-    <widget class="QLineEdit" name="command_lineedit"/>
+    <widget class="QLineEdit" name="command_lineedit">
+     <property name="toolTip">
+      <string/>
+     </property>
+    </widget>
    </item>
   </layout>
  </widget>

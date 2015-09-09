@@ -1,10 +1,11 @@
 import argparse
+
 from PyQt5.QtCore import QTimer
 from PyQt5.QtGui import QColor
 from PyQt5.QtWidgets import QMainWindow, QTreeWidgetItem, QStyle
 
 from cetech.api import ConsoleAPI
-from console.consolewidget import ConsoleWidget
+from shared.consolewidget import ConsoleWidget
 from console.ui.mainwindow import Ui_MainWindow
 
 

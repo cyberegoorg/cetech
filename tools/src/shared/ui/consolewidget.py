@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file 'src/console/ui/consolewidget.ui'
+# Form implementation generated from reading ui file 'src/shared/ui/consolewidget.ui'
 #
 # Created by: PyQt5 UI code generator 5.5
 #
@@ -20,6 +20,7 @@ class Ui_ConsoleWidget(object):
         self.command_log_textedit.setObjectName("command_log_textedit")
         self.verticalLayout.addWidget(self.command_log_textedit)
         self.command_lineedit = QtWidgets.QLineEdit(ConsoleWidget)
+        self.command_lineedit.setToolTip("")
         self.command_lineedit.setObjectName("command_lineedit")
         self.verticalLayout.addWidget(self.command_lineedit)
 
