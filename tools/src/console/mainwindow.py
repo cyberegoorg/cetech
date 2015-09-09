@@ -5,6 +5,7 @@ from PyQt5.QtGui import QColor
 from PyQt5.QtWidgets import QMainWindow, QTreeWidgetItem, QStyle
 
 from cetech.api import ConsoleAPI
+from cetech.qtapi import QtConsoleAPI
 from shared.consolewidget import ConsoleWidget
 from console.ui.mainwindow import Ui_MainWindow
 from shared.logwidget import LogWidget
@@ -29,7 +30,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.console_port = self.args.console_port
         self.console_address = self.args.console_address
 
-        self.api = ConsoleAPI(self.console_address, self.console_port)
+        self.api = QtConsoleAPI(self.console_address, self.console_port)
 
         self.console_widget = ConsoleWidget(self.api)
         self.console_dock_widget.setWidget(self.console_widget)
@@ -37,9 +38,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.log_widget = LogWidget(self.api)
         self.log_dock_widget.setWidget(self.log_widget)
 
-        self.console_api_timer = QTimer()
-        self.console_api_timer.timeout.connect(self.api.tick)
-        self.console_api_timer.start(10)
+        self.api.start(10)
 
     def closeEvent(self, evnt):
         self.api.disconnect()
