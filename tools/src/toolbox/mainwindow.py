@@ -1,6 +1,6 @@
 from PyQt5.QtWidgets import QMainWindow, QFileDialog
 
-from .ui.mainwindow import Ui_MainWindow
+from toolbox.ui.mainwindow import Ui_MainWindow
 
 
 class MainWindow(QMainWindow, Ui_MainWindow):

@@ -27,19 +27,23 @@ class ConsoleProxy(threading.Thread):
         while not self.disconnecting:
             self._tick()
 
+        self._safe_disconnect()
+
+    def _safe_disconnect(self):
         if self.connect:
             self.peer.disconnect(0)
             while True:
                 event = self.host.service(0)
                 if event.type == enet.EVENT_TYPE_DISCONNECT:
+                    self.connect = False
+                    self.disconnecting = False
                     break
 
     def tick(self):
         if not self.disconnecting:
             self._tick()
         else:
-            self.peer.disconnect(0)
-            self.host.service(0)
+            self._safe_disconnect()
 
         return True
 
