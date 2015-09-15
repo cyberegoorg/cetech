@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>398</width>
-    <height>298</height>
+    <width>631</width>
+    <height>410</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -74,6 +74,11 @@
     </widget>
    </item>
   </layout>
+  <action name="actionOpen_file">
+   <property name="text">
+    <string>open file</string>
+   </property>
+  </action>
  </widget>
  <customwidgets>
   <customwidget>

@@ -64,6 +64,14 @@ void frame_body() {
 }
 
 void run() {
+    if(command_line_globals::has_argument("--wait", 'w')) {
+        log::info("main", "Wating for clients.");
+        while(!console_server_globals::has_clients()) {
+            console_server_globals::tick();
+        }
+        log::debug("main", "Client connected.");
+    }
+    
     while (1) {
         frame_start();
         frame_body();
