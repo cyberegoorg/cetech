@@ -106,8 +106,6 @@ namespace cetech {
 
             CE_ASSERT(SDL_Init(SDL_INIT_VIDEO) == 0);
 
-            SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "dsadasdsd");
-
             mouse_internal::left_btn_hash = murmur_hash_64("left", strlen("left"), 22);
             mouse_internal::middle_btn_hash = murmur_hash_64("middle", strlen("middle"), 22);
             mouse_internal::right_btn_hash = murmur_hash_64("right", strlen("right"), 22);

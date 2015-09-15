@@ -145,7 +145,7 @@ void init_boot() {
 void compile_all_resource() {
     char* files[4096] = {0};
     uint32_t files_count = 0;
-    const size_t source_dir_len = strlen(cvars::rm_source_dir.value_str);
+    const size_t source_dir_len = cvars::rm_source_dir.str_len;
 
     runtime::dir::listdir(cvars::rm_source_dir.value_str, "", files, &files_count);
 

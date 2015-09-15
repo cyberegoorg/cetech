@@ -1,5 +1,6 @@
-require "lua/foo"
+local log = require "lua/cetech/log"
 
-foo()
-
-print('load')
+log.info("dd", "dsadsad")
+log.warn("dd", "dsadsad")
+log.error("dd", "dsadsad")
+log.debug("dd", "dsadsad")

@@ -8,6 +8,7 @@
 #include "rapidjson/document.h"
 #include "rapidjson/writer.h"
 #include "rapidjson/stringbuffer.h"
+#include "rapidjson/error/en.h"
 
 namespace cetech {
     namespace resource_package {
@@ -29,6 +30,12 @@ namespace cetech {
 
             rapidjson::Document document;
             document.Parse(tmp);
+            
+            if (document.HasParseError()) {
+                log::error("resource_package.compiler", "Parse error: %s", GetParseError_En(
+                               document.GetParseError()), document.GetErrorOffset());
+                return;
+            }
 
             Header header = {0};
             Item item = {0, 0};

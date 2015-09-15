@@ -35,6 +35,8 @@ namespace cetech {
         union {
             float f_max;
             int i_max;
+
+            int str_len;
         };
 
         union {

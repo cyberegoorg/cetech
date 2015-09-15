@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>850</width>
-    <height>479</height>
+    <width>848</width>
+    <height>477</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -21,7 +21,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>850</width>
+     <width>848</width>
      <height>21</height>
     </rect>
    </property>
@@ -35,6 +35,9 @@
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
   <widget class="QDockWidget" name="log_dock_widget">
+   <property name="features">
+    <set>QDockWidget::AllDockWidgetFeatures</set>
+   </property>
    <property name="windowTitle">
     <string>Log</string>
    </property>
@@ -46,6 +49,9 @@
    </widget>
   </widget>
   <widget class="QDockWidget" name="console_dock_widget">
+   <property name="features">
+    <set>QDockWidget::AllDockWidgetFeatures</set>
+   </property>
    <property name="windowTitle">
     <string>&amp;Console</string>
    </property>
