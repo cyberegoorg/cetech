@@ -28,8 +28,6 @@ class REPLWidget(QFrame, Ui_ReplWidget):
             self.api.lua_execute(text)
             #self.command_log_textedit.append("> %s" % text)
 
-        #self.command_lineedit.setText("")
-
     def open_file(self):
         filename, _ =  QFileDialog.getOpenFileName(self, "Open .cpp file", QDir.currentPath(), "Lua (*.lua)")
 
