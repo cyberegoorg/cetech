@@ -40,22 +40,23 @@ namespace cetech {
         bool has_clients() {
             return array::size(_cs->client_peer) != 0;
         }
-        
-        void send_message(const char *type, rapidjson::Value& data) {
+
+        void send_message(const char* type, rapidjson::Value& data) {
             rapidjson::Document message;
             message.SetObject();
-           
-            message.AddMember("type", rapidjson::Value(type, strlen(type), message.GetAllocator()), message.GetAllocator());
+
+            message.AddMember("type", rapidjson::Value(type, strlen(type),
+                                                       message.GetAllocator()), message.GetAllocator());
             message.AddMember("data", data, message.GetAllocator());
-            
+
             rapidjson::StringBuffer buffer;
-            rapidjson::Writer<rapidjson::StringBuffer> writer(buffer);
+            rapidjson::Writer < rapidjson::StringBuffer > writer(buffer);
             message.Accept(writer);
-            
-            ENetPacket *p = enet_packet_create(buffer.GetString(), buffer.GetSize() , ENET_PACKET_FLAG_RELIABLE);
+
+            ENetPacket* p = enet_packet_create(buffer.GetString(), buffer.GetSize(), ENET_PACKET_FLAG_RELIABLE);
             enet_host_broadcast(_cs->server_host, 0, p);
         }
-        
+
         void init() {
             _cs = MAKE_NEW(memory_globals::default_allocator(), ConsoleServer, memory_globals::default_allocator());
 
