@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>848</width>
-    <height>477</height>
+    <width>846</width>
+    <height>475</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -21,7 +21,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>848</width>
+     <width>846</width>
      <height>21</height>
     </rect>
    </property>
@@ -61,6 +61,15 @@
    <widget class="QWidget" name="dockWidgetContents_3">
     <layout class="QVBoxLayout" name="verticalLayout_2"/>
    </widget>
+  </widget>
+  <widget class="QDockWidget" name="repl_dock_widget">
+   <property name="windowTitle">
+    <string>&amp;REPL</string>
+   </property>
+   <attribute name="dockWidgetArea">
+    <number>4</number>
+   </attribute>
+   <widget class="QWidget" name="dockWidgetContents_2"/>
   </widget>
   <action name="action_Quit">
    <property name="text">
