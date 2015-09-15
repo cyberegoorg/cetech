@@ -33,7 +33,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.console_widget = ConsoleWidget(self.api)
         self.console_dock_widget.setWidget(self.console_widget)
 
-        self.log_widget = LogWidget(self.api)
+        self.log_widget = LogWidget(self.api, ingore_where='lua\.*.*')
         self.log_dock_widget.setWidget(self.log_widget)
 
         self.repl_widget = REPLWidget(self.api)
