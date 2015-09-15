@@ -9,8 +9,8 @@ namespace cetech {
         void register_command(const char* name, const command_clb_t clb);
 
         bool has_clients();
-        
-        void send_message(const char *type, rapidjson::Value& data);
+
+        void send_message(const char* type, rapidjson::Value& data);
 
         void init();
         void shutdown();

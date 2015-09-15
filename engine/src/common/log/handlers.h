@@ -64,17 +64,17 @@ namespace cetech {
         }
 
         static void console_server_handler(const log::ELogLevel level, const char* where, const char* msg, void* data) {
-            if( !console_server_globals::has_clients() ) {
+            if (!console_server_globals::has_clients()) {
                 return;
             }
 
             rapidjson::Document json_data;
             json_data.SetObject();
-            
+
             json_data.AddMember("level", rapidjson::Value(level_to_str[level], 1), json_data.GetAllocator());
             json_data.AddMember("where", rapidjson::Value(where, strlen(where)), json_data.GetAllocator());
             json_data.AddMember("msg", rapidjson::Value(msg, strlen(msg)), json_data.GetAllocator());
-            
+
             console_server_globals::send_message("log", json_data);
 
         }
