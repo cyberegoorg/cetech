@@ -98,6 +98,10 @@ solution "cyberego.org tech1"
     filter "system:linux"
         defines {'CETECH_LINUX'}
 
+        linkoptions {
+          "-rdynamic",
+        }
+
         buildoptions {"-std=c++11", "-fPIC", "-msse2"}
 
 	links {
@@ -124,7 +128,7 @@ project "tech1_static"
     }
 
     excludes {
-      ROOT_DIR .. "src/runtime/main.cc",
+      ROOT_DIR .. "src/runtime/**.cc",
     }
 
     filter {}
@@ -153,7 +157,7 @@ project "tech1"
     language "C++"
 
     files {
-        ROOT_DIR .. "src/runtime/*.cc",
+        ROOT_DIR .. "src/runtime/**.cc",
     }
 
     links {

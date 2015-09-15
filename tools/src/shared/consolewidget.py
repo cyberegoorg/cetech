@@ -1,5 +1,3 @@
-from PyQt5.QtGui import QTextCursor
-
 from PyQt5.QtWidgets import QFrame
 
 from shared.ui.consolewidget import Ui_ConsoleWidget

@@ -1,6 +1,10 @@
 {
   "lua" : [
-    "lua/boot",
-    "lua/foo"
+    "lua/cetech/log",
+    "lua/boot"
+  ],
+  
+  "package" : [
+    "cetech/cetech"
   ]
 }

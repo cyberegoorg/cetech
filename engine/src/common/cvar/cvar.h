@@ -12,7 +12,7 @@
 #include "common/string/stringid_types.h"
 
 namespace cetech {
-    static CVar* _head = nullptr;
+    extern CVar* _head;
 
     namespace cvar {
         CE_INLINE void set(CVar& cv, float value);
@@ -122,6 +122,7 @@ namespace cetech {
             }
 
             cv.value_str = strdup(str);
+            cv.str_len = strlen(str);
         }
     }
 
@@ -197,7 +198,7 @@ namespace cetech {
                         continue;
                     }
 
-                    set(*cvar, value.GetInt());
+                    cvar_internal::force_set(*cvar, value.GetInt());
 
                     /* FLOAT */
                 } else if (value.IsDouble()) {
@@ -206,7 +207,7 @@ namespace cetech {
                         continue;
                     }
 
-                    set(*cvar, (float)value.GetDouble());
+                    cvar_internal::force_set(*cvar, (float)value.GetDouble());
 
                     /* STR */
                 } else if (value.IsString()) {
@@ -215,7 +216,7 @@ namespace cetech {
                         continue;
                     }
 
-                    set(*cvar, value.GetString());
+                    cvar_internal::force_set(*cvar, value.GetString());
                 }
             }
         }
