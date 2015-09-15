@@ -113,8 +113,8 @@ void make_path(char* buffer, size_t max_size, const char* path) {
 void parse_command_line() {
     char buffer[1024] = {0};
 
-    const char* source_dir = command_line::get_parameter("source-dir", 'i');
-    const char* build_dir = command_line::get_parameter("build-dir", 'd');
+    const char* source_dir = command_line_globals::get_parameter("source-dir", 'i');
+    const char* build_dir = command_line_globals::get_parameter("build-dir", 'd');
 
     if (source_dir) {
         make_path(buffer, 1024, source_dir);
@@ -214,7 +214,7 @@ void init() {
 
     register_resources();
 
-    if (command_line::has_argument("compile", 'c')) {
+    if (command_line_globals::has_argument("compile", 'c')) {
         compile_all_resource();
     }
 
@@ -240,7 +240,7 @@ void shutdown() {
 }
 
 int main(int argc, const char** argv) {
-    command_line::set_args(argc, argv);
+    command_line_globals::set_args(argc, argv);
 
     init();
     run();
