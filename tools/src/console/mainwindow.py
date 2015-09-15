@@ -1,15 +1,13 @@
 import argparse
 
-from PyQt5.QtCore import QTimer
-from PyQt5.QtGui import QColor
-from PyQt5.QtWidgets import QMainWindow, QTreeWidgetItem, QStyle
+from PyQt5.QtWidgets import QMainWindow
 
-from cetech.api import ConsoleAPI
 from cetech.qtapi import QtConsoleAPI
-from shared.consolewidget import ConsoleWidget
 from console.ui.mainwindow import Ui_MainWindow
-from shared.logwidget import LogWidget
 
+from shared.logwidget import LogWidget
+from shared.consolewidget import ConsoleWidget
+from shared.replwidget import REPLWidget
 
 class MainWindow(QMainWindow, Ui_MainWindow):
 
@@ -37,6 +35,9 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
         self.log_widget = LogWidget(self.api)
         self.log_dock_widget.setWidget(self.log_widget)
+
+        self.repl_widget = REPLWidget(self.api)
+        self.repl_dock_widget.setWidget(self.repl_widget)
 
         self.api.start_tick(10)
 
