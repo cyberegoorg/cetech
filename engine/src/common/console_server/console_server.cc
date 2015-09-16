@@ -80,16 +80,11 @@ namespace cetech {
             if(!has_clients()) {
                 return;
             }
-            
+
             rapidjson::StringBuffer buffer;
             rapidjson::Writer < rapidjson::StringBuffer > writer(buffer);
             _cs->frame_events.Accept(writer);
 
-            
-            if(!_cs->frame_events["events"].Empty()) {
-                printf("aaa: %s\n", buffer.GetString());
-            }
-            
             ENetPacket* p = enet_packet_create(buffer.GetString(), buffer.GetSize(), ENET_PACKET_FLAG_RELIABLE);
             enet_host_broadcast(_cs->server_host, 0, p);
             enet_host_flush(_cs->server_host);
