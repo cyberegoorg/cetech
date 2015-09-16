@@ -16,12 +16,11 @@ class ConsoleWidget(QFrame, Ui_ConsoleWidget):
         self.setupUi(self)
 
         self.api = api
-        self.api.register_on_log_handler(self.add_log)
+        self.api.register_handler('log', self.add_log)
 
-
-    def add_log(self, level, where, message):
+    def add_log(self, time, level, where, msg):
         if 'lua' in where:
-            self.command_log_textedit.append(self.LOG_COLOR_TAG[level] % message)
+            self.command_log_textedit.append(self.LOG_COLOR_TAG[level] % msg)
 
     def send_command(self):
         text = self.command_lineedit.text()
