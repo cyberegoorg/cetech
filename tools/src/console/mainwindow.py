@@ -1,4 +1,5 @@
 import argparse
+from PyQt5.QtCore import QThread
 
 from PyQt5.QtWidgets import QMainWindow
 
@@ -39,7 +40,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.repl_widget = REPLWidget(self.api)
         self.repl_dock_widget.setWidget(self.repl_widget)
 
-        self.api.start_tick(10)
+        self.api.start(QThread.NormalPriority)
 
     def closeEvent(self, evnt):
         self.api.disconnect()
