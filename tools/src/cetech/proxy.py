@@ -7,10 +7,10 @@ class ConsoleProxy(threading.Thread):
     def __init__(self, address, port):
         super(ConsoleProxy, self).__init__()
 
-        host = enet.Host(None, 1, 1, 0, 0)
+        host = enet.Host(None, 1, 10, 0, 0)
         self.address = enet.Address(address, port)
         self.host = host
-        self.peer = self.host.connect(self.address, 0)
+        self.peer = self.host.connect(self.address, 10)
 
         self.connect = False
         self.disconnecting = False
@@ -38,7 +38,11 @@ class ConsoleProxy(threading.Thread):
         if self.connect:
             self.peer.disconnect(0)
             while True:
-                event = self.host.service(0)
+                try:
+                    event = self.host.service(1)
+                except Exception:
+                    break
+
                 if event.type == enet.EVENT_TYPE_DISCONNECT:
                     self.connect = False
                     self.disconnecting = False
@@ -52,8 +56,23 @@ class ConsoleProxy(threading.Thread):
 
         return True
 
+    def _parse_frame(self, message):
+        if 'events' in message:
+            events = message['events']
+
+            for event in events:
+                type = event["type"]
+                data = event["data"]
+
+                self._call_handler(type, data)
+
     def _tick(self):
-        event = self.host.service(0)
+        try:
+            event = self.host.service(1)
+        except Exception:
+            return
+            pass
+
         if event.type == enet.EVENT_TYPE_CONNECT:
             self.connect = True
 
@@ -61,15 +80,9 @@ class ConsoleProxy(threading.Thread):
             self.connect = False
 
         elif event.type == enet.EVENT_TYPE_RECEIVE:
-            message = json.loads(event.packet.data.decode("utf-8"))
-            type = message["type"]
-            data = message["data"]
-
-            self._call_handler(type, data)
-
-            if type == 'log':
-                for on_log in self.on_log:
-                    on_log(data["level"], data["where"], data['msg'])
+            s = event.packet.data.decode("utf-8")
+            message = json.loads(s)
+            self._parse_frame(message)
 
     def _call_handler(self, type, data):
         if type not in self.handlers:

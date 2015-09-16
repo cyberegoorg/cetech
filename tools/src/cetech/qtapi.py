@@ -11,3 +11,4 @@ class QtConsoleAPI(ConsoleAPI):
 
     def start_tick(self, period):
         self.timer.start(period)
+

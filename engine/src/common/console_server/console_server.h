@@ -14,6 +14,9 @@ namespace cetech {
          */
         void shutdown();
 
+        void frame_start();
+        void frame_end();
+        
         /*! Execute console server operation.
          */
         void tick();
@@ -34,5 +37,11 @@ namespace cetech {
          * \param data Message data.
          */
         void send_message(const char* type, rapidjson::Value& data);
+        
+        /*! Add frame event.
+         * \param type Message type.
+         * \param data Message data.
+         */
+        void add_frame_event(const char* type, rapidjson::Value& data);
     }
 }

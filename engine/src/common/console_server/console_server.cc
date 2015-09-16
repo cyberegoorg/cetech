@@ -25,6 +25,8 @@ namespace cetech {
 
             Hash < command_clb_t > cmds;
 
+            rapidjson::Document frame_events;
+            
             ConsoleServer(Allocator & allocator) : client_peer(allocator), peer_free_queue(allocator),
                                                    cmds(allocator) {}
         };
@@ -57,12 +59,46 @@ namespace cetech {
             enet_host_broadcast(_cs->server_host, 0, p);
         }
 
+        void add_frame_event(const char* type, rapidjson::Value& data) {
+            rapidjson::Value message(rapidjson::kObjectType);
+            message.SetObject();
+            
+            message.AddMember("type", rapidjson::Value(type, strlen(type),
+                                                       _cs->frame_events.GetAllocator()), _cs->frame_events.GetAllocator());
+            message.AddMember("data", data, _cs->frame_events.GetAllocator());
+
+            _cs->frame_events["events"].PushBack(message.Move(), _cs->frame_events.GetAllocator());
+        }
+
+        void frame_start(){
+             _cs->frame_events["events"].Clear();
+        }
+        
+        void frame_end() {
+            if(!has_clients()) {
+                return;
+            }
+            
+            rapidjson::StringBuffer buffer;
+            rapidjson::Writer < rapidjson::StringBuffer > writer(buffer);
+            _cs->frame_events.Accept(writer);
+
+            ENetPacket* p = enet_packet_create(buffer.GetString(), buffer.GetSize(), ENET_PACKET_FLAG_RELIABLE);
+//             const char *m = "{}";
+//             ENetPacket* p = enet_packet_create(m, 2, ENET_PACKET_FLAG_RELIABLE);
+            enet_host_broadcast(_cs->server_host, 0, p);
+            //enet_host_flush(_cs->server_host);
+        }
+        
         void init() {
             _cs = MAKE_NEW(memory_globals::default_allocator(), ConsoleServer, memory_globals::default_allocator());
 
             _cs->server_addr.host = ENET_HOST_ANY;
             _cs->server_addr.port = cvars::console_server_port.value_i;
             _cs->server_host = enet_host_create(&_cs->server_addr, 32, 10, 0, 0);
+            
+            _cs->frame_events.SetObject();
+            _cs->frame_events.AddMember("events", rapidjson::Value(rapidjson::kArrayType), _cs->frame_events.GetAllocator());
         }
 
         void shutdown() {
@@ -150,7 +186,7 @@ namespace cetech {
                     char buff[4096] = {0};
                     strncpy(buff, (char*)Event.packet->data, Event.packet->dataLength);
                     parse_packet(0, buff, Event.packet->dataLength);
-                    enet_packet_destroy(Event.packet);
+                    //enet_packet_destroy(Event.packet);
                     break;
                 }
 
