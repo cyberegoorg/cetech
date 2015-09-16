@@ -76,7 +76,7 @@ namespace cetech {
             json_data.AddMember("where", rapidjson::Value(where, strlen(where)), json_data.GetAllocator());
             json_data.AddMember("msg", rapidjson::Value(msg, strlen(msg)), json_data.GetAllocator());
 
-            console_server_globals::send_message("log", json_data);
+            console_server_globals::add_frame_event("log", json_data);
 
         }
     }

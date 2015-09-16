@@ -52,10 +52,12 @@ void cmd_lua_execute(const rapidjson::Document& in, rapidjson::Document& out) {
 
 void frame_start() {
     runtime::frame_start();
+    console_server_globals::frame_start();
     console_server_globals::tick();
 }
 
 void frame_end() {
+    console_server_globals::frame_end();
     runtime::frame_end();
 }
 
