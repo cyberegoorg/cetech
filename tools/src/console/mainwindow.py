@@ -40,7 +40,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.repl_widget = REPLWidget(self.api)
         self.repl_dock_widget.setWidget(self.repl_widget)
 
-        self.api.start(QThread.NormalPriority)
+        self.api.start(QThread.LowPriority)
 
     def closeEvent(self, evnt):
         self.api.disconnect()
