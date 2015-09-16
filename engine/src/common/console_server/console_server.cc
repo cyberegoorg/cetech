@@ -61,17 +61,19 @@ namespace cetech {
 
         void add_frame_event(const char* type, rapidjson::Value& data) {
             rapidjson::Value message(rapidjson::kObjectType);
+            rapidjson::Value tmp_data(data, _cs->frame_events.GetAllocator());
+            
             message.SetObject();
             
             message.AddMember("type", rapidjson::Value(type, strlen(type),
-                                                       _cs->frame_events.GetAllocator()), _cs->frame_events.GetAllocator());
-            message.AddMember("data", data, _cs->frame_events.GetAllocator());
+                                                       _cs->frame_events.GetAllocator()).Move(), _cs->frame_events.GetAllocator());
+            message.AddMember("data", tmp_data.Move(), _cs->frame_events.GetAllocator());
 
-            _cs->frame_events["events"].PushBack(message.Move(), _cs->frame_events.GetAllocator());
+            _cs->frame_events["events"].PushBack(message, _cs->frame_events.GetAllocator());
         }
 
         void frame_start(){
-             _cs->frame_events["events"].Clear();
+            _cs->frame_events["events"].Clear();
         }
         
         void frame_end() {
@@ -83,11 +85,14 @@ namespace cetech {
             rapidjson::Writer < rapidjson::StringBuffer > writer(buffer);
             _cs->frame_events.Accept(writer);
 
+            
+            if(!_cs->frame_events["events"].Empty()) {
+                printf("aaa: %s\n", buffer.GetString());
+            }
+            
             ENetPacket* p = enet_packet_create(buffer.GetString(), buffer.GetSize(), ENET_PACKET_FLAG_RELIABLE);
-//             const char *m = "{}";
-//             ENetPacket* p = enet_packet_create(m, 2, ENET_PACKET_FLAG_RELIABLE);
             enet_host_broadcast(_cs->server_host, 0, p);
-            //enet_host_flush(_cs->server_host);
+            enet_host_flush(_cs->server_host);
         }
         
         void init() {
@@ -128,7 +133,7 @@ namespace cetech {
         }
 
         void parse_packet(uint32_t client, const char* packet, const uint32_t size) {
-            log::debug("client_server", "Client msg: %s", packet);
+            //log::debug("client_server", "Client msg: %s", packet);
 
             rapidjson::Document document;
             if (!validate_packet(document, packet, size)) {
