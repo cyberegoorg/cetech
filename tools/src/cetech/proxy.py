@@ -1,6 +1,5 @@
 import enet
 import json
-import threading
 
 
 class ConsoleProxy(object):
@@ -28,7 +27,7 @@ class ConsoleProxy(object):
     def disconnect(self):
         self.disconnecting = True
 
-    def run(self):
+    def run_loop(self):
         while not self.disconnecting:
             self._tick()
 
@@ -39,14 +38,6 @@ class ConsoleProxy(object):
             self.peer.disconnect_now()
             self.connect = False
             self.disconnecting = False
-            # while True:
-            #     try:
-            #         event = self.host.service(1)
-            #     except Exception:
-            #         break
-            #
-            #     if event.type == enet.EVENT_TYPE_DISCONNECT:
-            #        break
 
     def tick(self):
         if not self.disconnecting:
@@ -69,7 +60,7 @@ class ConsoleProxy(object):
     def _tick(self):
         try:
             event = self.host.service(0)
-        except Exception:
+        except IOError:
             return
 
         if event.type == enet.EVENT_TYPE_CONNECT:
