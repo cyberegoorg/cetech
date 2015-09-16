@@ -3,7 +3,7 @@ import json
 import threading
 
 
-class ConsoleProxy(threading.Thread):
+class ConsoleProxy(object):
     def __init__(self, address, port):
         super(ConsoleProxy, self).__init__()
 
@@ -36,17 +36,17 @@ class ConsoleProxy(threading.Thread):
 
     def _safe_disconnect(self):
         if self.connect:
-            self.peer.disconnect(0)
-            while True:
-                try:
-                    event = self.host.service(1)
-                except Exception:
-                    break
-
-                if event.type == enet.EVENT_TYPE_DISCONNECT:
-                    self.connect = False
-                    self.disconnecting = False
-                    break
+            self.peer.disconnect_now()
+            self.connect = False
+            self.disconnecting = False
+            # while True:
+            #     try:
+            #         event = self.host.service(1)
+            #     except Exception:
+            #         break
+            #
+            #     if event.type == enet.EVENT_TYPE_DISCONNECT:
+            #        break
 
     def tick(self):
         if not self.disconnecting:
@@ -68,10 +68,9 @@ class ConsoleProxy(threading.Thread):
 
     def _tick(self):
         try:
-            event = self.host.service(1)
+            event = self.host.service(0)
         except Exception:
             return
-            pass
 
         if event.type == enet.EVENT_TYPE_CONNECT:
             self.connect = True

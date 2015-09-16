@@ -20,8 +20,7 @@ source_files.extend(_enet_files)
 define_macros = [('HAS_POLL', None),
                  ('HAS_FCNTL', None),
                  ('HAS_MSGHDR_FLAGS', None),
-                 ('HAS_SOCKLEN_T', None),
-                 ('ENET_DEBUG', None) ]
+                 ('HAS_SOCKLEN_T', None)]
 
 libraries = []
 
