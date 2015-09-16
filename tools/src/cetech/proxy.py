@@ -1,5 +1,6 @@
 import enet
 import json
+from time import sleep
 
 
 class ConsoleProxy(object):

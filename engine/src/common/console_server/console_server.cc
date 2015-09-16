@@ -89,14 +89,14 @@ namespace cetech {
             enet_host_broadcast(_cs->server_host, 0, p);
             enet_host_flush(_cs->server_host);
         }
-        
+
         void init() {
             _cs = MAKE_NEW(memory_globals::default_allocator(), ConsoleServer, memory_globals::default_allocator());
 
             _cs->server_addr.host = ENET_HOST_ANY;
             _cs->server_addr.port = cvars::console_server_port.value_i;
             _cs->server_host = enet_host_create(&_cs->server_addr, 32, 10, 0, 0);
-            
+
             _cs->frame_events.SetObject();
             _cs->frame_events.AddMember("events", rapidjson::Value(rapidjson::kArrayType), _cs->frame_events.GetAllocator());
         }
