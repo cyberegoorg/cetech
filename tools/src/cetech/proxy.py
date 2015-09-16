@@ -15,10 +15,15 @@ class ConsoleProxy(threading.Thread):
         self.connect = False
         self.disconnecting = False
 
+        self.handlers = {}
+
         self.on_log = []
 
-    def register_on_log_handler(self, on_log):
-        self.on_log.append(on_log)
+    def register_handler(self, type, handler):
+        if type not in self.handlers:
+            self.handlers[type] = []
+
+        self.handlers[type].append(handler)
 
     def disconnect(self):
         self.disconnecting = True
@@ -60,9 +65,19 @@ class ConsoleProxy(threading.Thread):
             type = message["type"]
             data = message["data"]
 
+            self._call_handler(type, data)
+
             if type == 'log':
                 for on_log in self.on_log:
                     on_log(data["level"], data["where"], data['msg'])
+
+    def _call_handler(self, type, data):
+        if type not in self.handlers:
+            return
+
+        handlers = self.handlers[type]
+        for h in handlers:
+            h(**data)
 
     def send_command(self, cmd_name, **kwargs):
         if not self.connect:

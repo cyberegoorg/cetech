@@ -1,7 +1,8 @@
+import re
 from PyQt5.QtGui import QColor
 from PyQt5.QtWidgets import QFrame, QStyle, QTreeWidgetItem
-import re
 
+from cetech.proxy import ConsoleProxy
 from shared.ui.logwidget import Ui_LogWidget
 
 
@@ -20,30 +21,31 @@ class LogWidget(QFrame, Ui_LogWidget):
         'E': QStyle.SP_MessageBoxCritical,
     }
 
-    def __init__(self, api, ingore_where=None):
+    def __init__(self, api: ConsoleProxy, ignore_where=None):
         super(LogWidget, self).__init__()
         self.setupUi(self)
 
-        if ingore_where is None:
-            ingore_where = ''
+        self.ignore_where = None
+        if ignore_where is None:
+            ignore_where = ''
 
-        self.set_ingore_where(ingore_where)
+        self.set_ignore_where(ignore_where)
 
         self.api = api
-        self.api.register_on_log_handler(self.add_log)
+        self.api.register_handler('log', self.add_log)
 
-    def set_ingore_where(self, pattern):
-        self.ingore_where = re.compile(pattern)
+    def set_ignore_where(self, pattern):
+        self.ignore_where = re.compile(pattern)
 
-    def _disabled(self, name):
-        m = self.ingore_where.match(name)
+    def _is_ignored(self, name):
+        m = self.ignore_where.match(name)
         return m is not None
 
-    def add_log(self, level, where, message):
-        if self._disabled(where):
+    def add_log(self, time, level, where, msg):
+        if self._is_ignored(where):
             return
 
-        item = QTreeWidgetItem([level, where, message])
+        item = QTreeWidgetItem([level, where, msg])
 
         item.setIcon(0, self.style().standardIcon(self.LOG_ICON[level]))
 
