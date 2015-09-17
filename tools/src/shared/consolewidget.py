@@ -1,3 +1,4 @@
+from PyQt5.QtGui import QTextCursor
 from PyQt5.QtWidgets import QFrame
 
 from shared.ui.consolewidget import Ui_ConsoleWidget
@@ -6,9 +7,9 @@ from shared.ui.consolewidget import Ui_ConsoleWidget
 class ConsoleWidget(QFrame, Ui_ConsoleWidget):
     LOG_COLOR_TAG = {
         'I': "%s",
-        'W': "<span style='color: yellow;'> %s</span>",
+        'W': "%s",#"<span style='color: yellow;'>%s</span>",
         'D': "%s",
-        'E': "<span style='color: red;'> %s</span>",
+        'E': "%s",#"<span style='color: red;'>%s</span>",
     }
 
     def __init__(self, api):
@@ -20,13 +21,21 @@ class ConsoleWidget(QFrame, Ui_ConsoleWidget):
 
     def add_log(self, time, level, where, msg):
         if 'lua' in where:
-            self.command_log_textedit.append(self.LOG_COLOR_TAG[level] % msg)
+            self._add_line(self.LOG_COLOR_TAG[level] % msg)
+
+    def _add_line(self, line):
+        self.command_log_textedit.append(line)
+
+        c =  self.command_log_textedit.textCursor()
+        c.movePosition(QTextCursor.End)
+        self.command_log_textedit.setTextCursor(c)
+        self.command_log_textedit.ensureCursorVisible()
 
     def send_command(self):
         text = self.command_lineedit.text()
 
         if len(text) > 0:
             self.api.lua_execute(text)
-            self.command_log_textedit.append("> %s" % text)
+            self._add_line("> %s" % text)
 
         self.command_lineedit.setText("")

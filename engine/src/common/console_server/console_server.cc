@@ -24,9 +24,7 @@ namespace cetech {
             Queue < int > peer_free_queue;
 
             Hash < command_clb_t > cmds;
-
-            rapidjson::Document frame_events;
-            
+           
             ConsoleServer(Allocator & allocator) : client_peer(allocator), peer_free_queue(allocator),
                                                    cmds(allocator) {}
         };
@@ -43,51 +41,13 @@ namespace cetech {
             return array::size(_cs->client_peer) != 0;
         }
 
-        void send_message(const char* type, rapidjson::Value& data) {
-            rapidjson::Document message;
-            message.SetObject();
-
-            message.AddMember("type", rapidjson::Value(type, strlen(type),
-                                                       message.GetAllocator()), message.GetAllocator());
-            message.AddMember("data", data, message.GetAllocator());
-
+        void send_json_document(const rapidjson::Document& document) {
             rapidjson::StringBuffer buffer;
             rapidjson::Writer < rapidjson::StringBuffer > writer(buffer);
-            message.Accept(writer);
+            document.Accept(writer);
 
             ENetPacket* p = enet_packet_create(buffer.GetString(), buffer.GetSize(), ENET_PACKET_FLAG_RELIABLE);
             enet_host_broadcast(_cs->server_host, 0, p);
-        }
-
-        void add_frame_event(const char* type, rapidjson::Value& data) {
-            rapidjson::Value message(rapidjson::kObjectType);
-            rapidjson::Value tmp_data(data, _cs->frame_events.GetAllocator());
-            
-            message.SetObject();
-            
-            message.AddMember("type", rapidjson::Value(type, strlen(type),
-                                                       _cs->frame_events.GetAllocator()).Move(), _cs->frame_events.GetAllocator());
-            message.AddMember("data", tmp_data.Move(), _cs->frame_events.GetAllocator());
-
-            _cs->frame_events["events"].PushBack(message, _cs->frame_events.GetAllocator());
-        }
-
-        void frame_start(){
-            _cs->frame_events["events"].Clear();
-        }
-        
-        void frame_end() {
-            if(!has_clients()) {
-                return;
-            }
-
-            rapidjson::StringBuffer buffer;
-            rapidjson::Writer < rapidjson::StringBuffer > writer(buffer);
-            _cs->frame_events.Accept(writer);
-
-            ENetPacket* p = enet_packet_create(buffer.GetString(), buffer.GetSize(), ENET_PACKET_FLAG_RELIABLE);
-            enet_host_broadcast(_cs->server_host, 0, p);
-            enet_host_flush(_cs->server_host);
         }
 
         void init() {
@@ -96,9 +56,6 @@ namespace cetech {
             _cs->server_addr.host = ENET_HOST_ANY;
             _cs->server_addr.port = cvars::console_server_port.value_i;
             _cs->server_host = enet_host_create(&_cs->server_addr, 32, 10, 0, 0);
-
-            _cs->frame_events.SetObject();
-            _cs->frame_events.AddMember("events", rapidjson::Value(rapidjson::kArrayType), _cs->frame_events.GetAllocator());
         }
 
         void shutdown() {

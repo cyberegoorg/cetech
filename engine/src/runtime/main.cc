@@ -45,23 +45,159 @@
 using namespace cetech;
 using namespace rapidjson;
 
+static uint64_t frame_id = 0;
+
+namespace cetech {
+    namespace frame_events {
+        enum EventType {
+            EVENT_NONE = 0,
+            EVENT_BEGIN_FRAME = 1,
+            EVENT_END_FRAME = 2,
+        };
+        
+        struct BeginFrameRecords {
+            uint32_t time;
+        };
+
+        struct EndFrameRecords {
+            uint32_t time;
+        };
+        
+        struct Header {
+            uint32_t type;
+            uint32_t frame_id;
+            uint32_t size;
+            char data;
+        };
+    }
+    
+    namespace frame_events_globals {
+        
+        enum {BUFFER_SIZE = 64*1024};
+        
+        static char events_buffer[BUFFER_SIZE] = {0};
+        static uint32_t events_buffer_count;
+        
+        void add_events(char* events, uint32_t size) {
+            memcpy(events_buffer, events, size);
+            events_buffer_count += size;
+        };
+        
+        void clean_events() {
+            memset(events_buffer, 0, BUFFER_SIZE);
+            events_buffer_count = 0;
+        }
+                
+        frame_events::Header* header(char* event) {
+            return (frame_events::Header*)event;
+        }
+        
+        char* data(char* event) {
+            return &(header(event)->data);
+        }
+
+        char* next(char* event) {
+            const uint32_t sz = header(event)->size;
+            
+            if((event + sz + sizeof(frame_events::Header)) >=  (events_buffer + events_buffer_count)) {
+                return nullptr;
+            }
+            
+            return event + sz + sizeof(frame_events::Header);
+        }
+        
+        void add_begin_frame() {
+            char* p = events_buffer + events_buffer_count;
+            
+            frame_events::Header* h = (frame_events::Header*)p;
+            h->type = frame_events::EVENT_BEGIN_FRAME;
+            h->size = sizeof(frame_events::BeginFrameRecords);
+            h->frame_id = frame_id;
+            
+            frame_events::BeginFrameRecords *e = (frame_events::BeginFrameRecords*)data(p);
+            e->time = runtime::get_ticks();
+            
+            events_buffer_count += sizeof(frame_events::Header) + sizeof(frame_events::BeginFrameRecords);
+        }
+        
+        void add_end_frame() {
+            char* p = events_buffer + events_buffer_count;
+
+            frame_events::Header* h = (frame_events::Header*)p;
+            h->type = frame_events::EVENT_END_FRAME;
+            h->size = sizeof(frame_events::EndFrameRecords);
+            h->frame_id = frame_id;
+            
+            frame_events::EndFrameRecords *e = (frame_events::EndFrameRecords*)data(p);
+            e->time = runtime::get_ticks();
+            
+            events_buffer_count += sizeof(frame_events::Header) + sizeof(frame_events::EndFrameRecords);
+        }
+        
+        const char* type_to_str(frame_events::EventType typee) {
+            static const char* t[] = { "NONE", "EVENT_BEGIN_FRAME", "EVENT_END_FRAME" };
+            return t[typee];
+        }
+        
+        void send_buffer() {
+            if( !console_server_globals::has_clients() || !events_buffer_count) {
+                return;
+            }
+
+            char* event = events_buffer;
+            while(event) {
+                const char* type_str = type_to_str((frame_events::EventType)header(event)->type);
+                
+                rapidjson::Document json_data;
+                json_data.SetObject();
+                
+                json_data.AddMember("type", "debug_event", json_data.GetAllocator());
+                json_data.AddMember("frameid", header(event)->frame_id, json_data.GetAllocator());
+
+                json_data.AddMember("etype", rapidjson::Value(type_str, strlen(type_str)), json_data.GetAllocator());
+                switch(header(event)->type) {
+                    case cetech::frame_events::EVENT_BEGIN_FRAME: {
+                        frame_events::BeginFrameRecords *e = (frame_events::BeginFrameRecords*)data(event);
+                        json_data.AddMember("time", e->time, json_data.GetAllocator());
+                        break;
+                    }
+                    
+                    case cetech::frame_events::EVENT_END_FRAME: {
+                        frame_events::EndFrameRecords *e = (frame_events::EndFrameRecords*)data(event);
+                        json_data.AddMember("time", e->time, json_data.GetAllocator());
+                        break;
+                    }
+                }
+                
+                console_server_globals::send_json_document(json_data);
+                event = next(event);
+            };
+        }
+    };
+};
+
 
 void cmd_lua_execute(const rapidjson::Document& in, rapidjson::Document& out) {
     lua_enviroment::execute_string(lua_enviroment_globals::global_env(), in["args"]["script"].GetString());
 }
 
 void frame_start() {
+    frame_events_globals::add_begin_frame();
     runtime::frame_start();
-    console_server_globals::frame_start();
     console_server_globals::tick();
 }
 
 void frame_end() {
-    console_server_globals::frame_end();
     runtime::frame_end();
+    frame_events_globals::add_end_frame();
+    frame_events_globals::send_buffer();
+    frame_events_globals::clean_events();
+    
+    ++frame_id;
 }
 
 void frame_body() {
+    sleep(1);
     //log::info("frame", "frame");
 }
 
