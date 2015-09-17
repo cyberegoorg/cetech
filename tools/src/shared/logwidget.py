@@ -45,8 +45,11 @@ class LogWidget(QFrame, Ui_LogWidget):
         if self._is_ignored(where):
             return
 
-        item = QTreeWidgetItem([level, where, msg])
+        item = QTreeWidgetItem(['', where, msg])
 
         item.setIcon(0, self.style().standardIcon(self.LOG_ICON[level]))
 
         self.log_tree_widget.addTopLevelItem(item)
+
+        sb = self.log_tree_widget.verticalScrollBar()
+        sb.setValue(sb.maximum())

@@ -32,11 +32,10 @@ namespace cetech {
          */
         bool has_clients();
         
-        /*! Send message.
-         * \param type Message type.
-         * \param data Message data.
+        /*! Send JSON document.
+         * \param document Json document.
          */
-        void send_message(const char* type, rapidjson::Value& data);
+        void send_json_document(const rapidjson::Document& document);
         
         /*! Add frame event.
          * \param type Message type.

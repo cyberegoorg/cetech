@@ -31,6 +31,7 @@ class ConsoleProxy(object):
     def run_loop(self):
         while not self.disconnecting:
             self._tick()
+            #sleep(10.0*0.00001)
 
         self._safe_disconnect()
 
@@ -48,15 +49,9 @@ class ConsoleProxy(object):
 
         return True
 
-    def _parse_frame(self, message):
-        if 'events' in message:
-            events = message['events']
-
-            for event in events:
-                type = event["type"]
-                data = event["data"]
-
-                self._call_handler(type, data)
+    def _parse_message(self, message):
+        print(message)
+        self._call_handler(**message)
 
     def _tick(self):
         try:
@@ -73,15 +68,15 @@ class ConsoleProxy(object):
         elif event.type == enet.EVENT_TYPE_RECEIVE:
             s = event.packet.data.decode("utf-8")
             message = json.loads(s)
-            self._parse_frame(message)
+            self._parse_message(message)
 
-    def _call_handler(self, type, data):
+    def _call_handler(self, type, **kwargs):
         if type not in self.handlers:
             return
 
         handlers = self.handlers[type]
         for h in handlers:
-            h(**data)
+            h(**kwargs)
 
     def send_command(self, cmd_name, **kwargs):
         if not self.connect:
