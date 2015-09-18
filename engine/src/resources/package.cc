@@ -30,7 +30,7 @@ namespace cetech {
 
             rapidjson::Document document;
             document.Parse(tmp);
-            
+
             if (document.HasParseError()) {
                 log::error("resource_package.compiler", "Parse error: %s", GetParseError_En(
                                document.GetParseError()), document.GetErrorOffset());

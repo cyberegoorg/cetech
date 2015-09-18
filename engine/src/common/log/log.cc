@@ -23,7 +23,7 @@ namespace cetech {
         void vlog(const log::ELogLevel level, const char* where, const char* format, va_list va) {
             char msg[4096]; //!< Final msg.
             vsnprintf(msg, 4096, format, va);
-            
+
             time_t tm = std::time(NULL);
             const uint32_t handlers_count = array::size(_logger->handlers);
             for (uint32_t i = 0; i < handlers_count; ++i) {
@@ -50,7 +50,7 @@ namespace cetech {
         void info(const char* where, const char* format, va_list va) {
             log_internal::vlog(LOG_INFO, where, format, va);
         }
-        
+
         void info(const char* where, const char* format, ...) {
             va_list args;
 
@@ -62,7 +62,7 @@ namespace cetech {
         void warning(const char* where, const char* format, va_list va) {
             log_internal::vlog(LOG_WARNING, where, format, va);
         }
-        
+
         void warning(const char* where, const char* format, ...) {
             va_list args;
 
@@ -71,11 +71,11 @@ namespace cetech {
             va_end(args);
         }
 
-        
+
         void error(const char* where, const char* format, va_list va) {
             log_internal::vlog(LOG_ERROR, where, format, va);
         }
-        
+
         void error(const char* where, const char* format, ...) {
             va_list args;
 
@@ -86,14 +86,14 @@ namespace cetech {
 
         void debug(const char* where, const char* format, va_list va) {
             #ifdef DEBUG
-                log_internal::vlog(LOG_DEBUG, where, format, va);
+            log_internal::vlog(LOG_DEBUG, where, format, va);
             #else
-                //CE_UNUSED_PARAM(where);
-                //CE_UNUSED_PARAM(format);
+            //CE_UNUSED_PARAM(where);
+            //CE_UNUSED_PARAM(format);
             #endif
         }
 
-        
+
         void debug(const char* where, const char* format, ...) {
             #ifdef DEBUG
             va_list args;

@@ -24,7 +24,7 @@ namespace cetech {
             Queue < int > peer_free_queue;
 
             Hash < command_clb_t > cmds;
-           
+
             ConsoleServer(Allocator & allocator) : client_peer(allocator), peer_free_queue(allocator),
                                                    cmds(allocator) {}
         };

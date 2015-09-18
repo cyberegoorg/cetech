@@ -140,8 +140,8 @@ namespace cetech {
             memcpy(keyboard_internal::KeyboardStatesLast, keyboard_internal::KeyboardStates, 512);
             mouse_internal::MouseButtonStateLast = mouse_internal::MouseButtonState;
         }
-        
-        
+
+
         CE_INLINE uint32_t get_ticks() {
             return SDL_GetTicks();
         }

@@ -13,11 +13,15 @@ class RecordEventWidget(QFrame, Ui_RecordEventsWidget):
         self.api.register_handler('debug_event', self.debug_event)
 
     def debug_event(self, etype, **kwargs):
+        print(kwargs)
+
         if etype not in ('EVENT_RECORD_FLOAT',):
             return
 
-        name = kwargs['name'];
+
+        name = kwargs['name']
         value = kwargs['value']
+
         items = self.record_treewidget.findItems(name, Qt.MatchExactly)
 
         if not len(items):
@@ -26,3 +30,4 @@ class RecordEventWidget(QFrame, Ui_RecordEventsWidget):
             self.record_treewidget.addTopLevelItem(item)
         else:
             items[0].setText(1, str(value))
+
