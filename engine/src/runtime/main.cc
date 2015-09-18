@@ -48,48 +48,97 @@ using namespace rapidjson;
 static uint64_t frame_id = 0;
 
 namespace cetech {
-    namespace frame_events {
+    namespace debug_events {
         enum EventType {
             EVENT_NONE = 0,
             EVENT_BEGIN_FRAME = 1,
             EVENT_END_FRAME = 2,
-        };
-        
-        struct BeginFrameRecords {
-            uint32_t time;
+            EVENT_RECORD_FLOAT = 3,
         };
 
-        struct EndFrameRecords {
-            uint32_t time;
-        };
-        
         struct Header {
             uint32_t type;
             uint32_t frame_id;
             uint32_t size;
             char data;
         };
-    }
-    
-    namespace frame_events_globals {
-        
-        enum {BUFFER_SIZE = 64*1024};
-        
-        static char events_buffer[BUFFER_SIZE] = {0};
-        static uint32_t events_buffer_count;
-        
-        void add_events(char* events, uint32_t size) {
-            memcpy(events_buffer, events, size);
-            events_buffer_count += size;
+
+        struct BeginFrameEvent {
+            uint32_t time;
+        };
+
+        struct EndFrameEvent {
+            uint32_t time;
+        };
+
+        struct RecordFloatEvent {
+            const char* name;
+            float value;
         };
         
+        void beginframe_to_json(const char* event, rapidjson::Document& document) {
+            debug_events::BeginFrameEvent *e = (debug_events::BeginFrameEvent*)event;
+            document.AddMember("time", e->time, document.GetAllocator());
+        }
+        
+        void endframe_to_json(const char* event, rapidjson::Document& document) {
+            debug_events::EndFrameEvent *e = (debug_events::EndFrameEvent*)event;
+            document.AddMember("time", e->time, document.GetAllocator());
+        }
+        
+        void recordfloat_to_json(const char* event, rapidjson::Document& document) {
+            debug_events::RecordFloatEvent *e = (debug_events::RecordFloatEvent*)event;
+            
+            document.AddMember("name", rapidjson::Value(e->name, strlen(e->name)), document.GetAllocator());
+            document.AddMember("value", e->value, document.GetAllocator());
+        }
+    }
+
+    namespace debug_events_globals {
+        typedef void (*to_json_fce_t)(const char*, rapidjson::Document&);
+
+        struct DebugEvents {
+            enum {BUFFER_SIZE = 64*1024};
+
+            char events_buffer[BUFFER_SIZE] = {0};
+            uint32_t events_buffer_count;
+
+            Hash<to_json_fce_t> to_json;
+            
+            DebugEvents(Allocator& allocator): to_json(allocator){
+            }
+        };
+        
+        static DebugEvents* _de = nullptr;
+
+        void register_to_json(debug_events::EventType type, to_json_fce_t fce) {
+            hash::set(_de->to_json, type, fce);
+        }
+        
+        void init() {
+            _de = MAKE_NEW(memory_globals::default_allocator(), DebugEvents, memory_globals::default_allocator());
+            
+            register_to_json(debug_events::EVENT_BEGIN_FRAME, debug_events::beginframe_to_json);
+            register_to_json(debug_events::EVENT_END_FRAME, debug_events::endframe_to_json);
+            register_to_json(debug_events::EVENT_RECORD_FLOAT, debug_events::recordfloat_to_json);
+        }
+
+        void shutdown() {
+            MAKE_DELETE(memory_globals::default_allocator(), DebugEvents, _de);
+        }
+
+        void add_events(char* events, uint32_t size) {
+            memcpy(_de->events_buffer, events, size);
+            _de->events_buffer_count += size;
+        };
+
         void clean_events() {
-            memset(events_buffer, 0, BUFFER_SIZE);
-            events_buffer_count = 0;
+            memset(_de->events_buffer, 0, DebugEvents::BUFFER_SIZE);
+            _de->events_buffer_count = 0;
         }
                 
-        frame_events::Header* header(char* event) {
-            return (frame_events::Header*)event;
+        debug_events::Header* header(char* event) {
+            return (debug_events::Header*)event;
         }
         
         char* data(char* event) {
@@ -99,54 +148,74 @@ namespace cetech {
         char* next(char* event) {
             const uint32_t sz = header(event)->size;
             
-            if((event + sz + sizeof(frame_events::Header)) >=  (events_buffer + events_buffer_count)) {
+            if((event + sz + sizeof(debug_events::Header)) >=  (_de->events_buffer + _de->events_buffer_count)) {
                 return nullptr;
             }
             
-            return event + sz + sizeof(frame_events::Header);
+            return event + sz + sizeof(debug_events::Header);
         }
         
         void add_begin_frame() {
-            char* p = events_buffer + events_buffer_count;
+            char* p = _de->events_buffer + _de->events_buffer_count;
             
-            frame_events::Header* h = (frame_events::Header*)p;
-            h->type = frame_events::EVENT_BEGIN_FRAME;
-            h->size = sizeof(frame_events::BeginFrameRecords);
+            debug_events::Header* h = (debug_events::Header*)p;
+            h->type = debug_events::EVENT_BEGIN_FRAME;
+            h->size = sizeof(debug_events::BeginFrameEvent);
             h->frame_id = frame_id;
             
-            frame_events::BeginFrameRecords *e = (frame_events::BeginFrameRecords*)data(p);
+            debug_events::BeginFrameEvent *e = (debug_events::BeginFrameEvent*)data(p);
             e->time = runtime::get_ticks();
             
-            events_buffer_count += sizeof(frame_events::Header) + sizeof(frame_events::BeginFrameRecords);
+            _de->events_buffer_count += sizeof(debug_events::Header) + sizeof(debug_events::BeginFrameEvent);
         }
         
         void add_end_frame() {
-            char* p = events_buffer + events_buffer_count;
+            char* p = _de->events_buffer + _de->events_buffer_count;
 
-            frame_events::Header* h = (frame_events::Header*)p;
-            h->type = frame_events::EVENT_END_FRAME;
-            h->size = sizeof(frame_events::EndFrameRecords);
+            debug_events::Header* h = (debug_events::Header*)p;
+            h->type = debug_events::EVENT_END_FRAME;
+            h->size = sizeof(debug_events::EndFrameEvent);
             h->frame_id = frame_id;
             
-            frame_events::EndFrameRecords *e = (frame_events::EndFrameRecords*)data(p);
+            debug_events::EndFrameEvent *e = (debug_events::EndFrameEvent*)data(p);
             e->time = runtime::get_ticks();
             
-            events_buffer_count += sizeof(frame_events::Header) + sizeof(frame_events::EndFrameRecords);
+            _de->events_buffer_count += sizeof(debug_events::Header) + sizeof(debug_events::EndFrameEvent);
+        }
+
+        void add_record_float(const char* name, const float value) {
+            char* p = _de->events_buffer + _de->events_buffer_count;
+
+            debug_events::Header* h = (debug_events::Header*)p;
+            h->type = debug_events::EVENT_RECORD_FLOAT;
+            h->size = sizeof(debug_events::RecordFloatEvent);
+            h->frame_id = frame_id;
+            
+            debug_events::RecordFloatEvent *e = (debug_events::RecordFloatEvent*)data(p);
+            e->name = strdup(name);
+            e->value = value;
+            
+            _de->events_buffer_count += sizeof(debug_events::Header) + sizeof(debug_events::RecordFloatEvent);
         }
         
-        const char* type_to_str(frame_events::EventType typee) {
-            static const char* t[] = { "NONE", "EVENT_BEGIN_FRAME", "EVENT_END_FRAME" };
+        const char* type_to_str(debug_events::EventType typee) {
+            static const char* t[] = {
+                "NONE",
+                "EVENT_BEGIN_FRAME",
+                "EVENT_END_FRAME",
+                "EVENT_RECORD_FLOAT"
+            };
             return t[typee];
         }
-        
+
         void send_buffer() {
-            if( !console_server_globals::has_clients() || !events_buffer_count) {
+            if( !console_server_globals::has_clients() || !_de->events_buffer_count) {
                 return;
             }
 
-            char* event = events_buffer;
+            char* event = _de->events_buffer;
             while(event) {
-                const char* type_str = type_to_str((frame_events::EventType)header(event)->type);
+                const char* type_str = type_to_str((debug_events::EventType)header(event)->type);
                 
                 rapidjson::Document json_data;
                 json_data.SetObject();
@@ -155,18 +224,10 @@ namespace cetech {
                 json_data.AddMember("frameid", header(event)->frame_id, json_data.GetAllocator());
 
                 json_data.AddMember("etype", rapidjson::Value(type_str, strlen(type_str)), json_data.GetAllocator());
-                switch(header(event)->type) {
-                    case cetech::frame_events::EVENT_BEGIN_FRAME: {
-                        frame_events::BeginFrameRecords *e = (frame_events::BeginFrameRecords*)data(event);
-                        json_data.AddMember("time", e->time, json_data.GetAllocator());
-                        break;
-                    }
-                    
-                    case cetech::frame_events::EVENT_END_FRAME: {
-                        frame_events::EndFrameRecords *e = (frame_events::EndFrameRecords*)data(event);
-                        json_data.AddMember("time", e->time, json_data.GetAllocator());
-                        break;
-                    }
+                
+                to_json_fce_t to_json_fce = hash::get<to_json_fce_t>(_de->to_json, header(event)->type, nullptr);
+                if(to_json_fce) {
+                    to_json_fce(data(event), json_data);
                 }
                 
                 console_server_globals::send_json_document(json_data);
@@ -182,22 +243,24 @@ void cmd_lua_execute(const rapidjson::Document& in, rapidjson::Document& out) {
 }
 
 void frame_start() {
-    frame_events_globals::add_begin_frame();
+    debug_events_globals::add_begin_frame();
     runtime::frame_start();
     console_server_globals::tick();
+    
+    debug_events_globals::add_record_float("randomfloat", random());
 }
 
 void frame_end() {
     runtime::frame_end();
-    frame_events_globals::add_end_frame();
-    frame_events_globals::send_buffer();
-    frame_events_globals::clean_events();
+    debug_events_globals::add_end_frame();
+    debug_events_globals::send_buffer();
+    debug_events_globals::clean_events();
     
     ++frame_id;
 }
 
 void frame_body() {
-    sleep(1);
+    usleep(5*1000);
     //log::info("frame", "frame");
 }
 
@@ -338,6 +401,7 @@ void init() {
     log::init();
     log::register_handler(&log_handlers::stdout_handler);
 
+    debug_events_globals::init();
     //     FILE* log_file = fopen("cetechlog.txt", "wb");
     //     log::register_handler(&log_handlers::file_handler, log_file);
 
@@ -380,6 +444,7 @@ void shutdown() {
     package_manager_globals::shutdown();
     resource_manager_globals::shutdown();
 
+    debug_events_globals::shutdown();
     console_server_globals::shutdown();
     runtime::shutdown();
     memory_globals::shutdown();
