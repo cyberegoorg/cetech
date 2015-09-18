@@ -13,8 +13,6 @@ class RecordEventWidget(QFrame, Ui_RecordEventsWidget):
         self.api.register_handler('debug_event', self.debug_event)
 
     def debug_event(self, etype, **kwargs):
-        print(kwargs)
-
         if etype not in ('EVENT_RECORD_FLOAT',):
             return
 

@@ -4,8 +4,10 @@ from time import sleep
 
 
 class ConsoleProxy(object):
-    def __init__(self, address, port):
+    def __init__(self, address, port, service_sleep):
         super(ConsoleProxy, self).__init__()
+
+        self.service_sleep = service_sleep
 
         host = enet.Host(None, 1, 10, 0, 0)
         self.address = enet.Address(address, port)
@@ -31,7 +33,6 @@ class ConsoleProxy(object):
     def run_loop(self):
         while not self.disconnecting:
             self._tick()
-            #sleep(10.0*0.00001)
 
         self._safe_disconnect()
 
@@ -53,10 +54,8 @@ class ConsoleProxy(object):
         self._call_handler(**message)
 
     def _tick(self):
-        try:
-            event = self.host.service(0)
-        except IOError:
-            return
+        event = self.host.service(0)
+        if event.type == enet.EVENT_TYPE_NONE: self.service_sleep()
 
         if event.type == enet.EVENT_TYPE_CONNECT:
             self.connect = True
