@@ -82,6 +82,6 @@ namespace cetech {
     }
 
     EventStream::EventStream ( Allocator& allocator )  : stream(allocator) {
-        array::reserve(stream, 1024);
+        //array::reserve(stream, 1024);
     }
 };
