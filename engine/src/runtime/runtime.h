@@ -10,7 +10,7 @@ namespace cetech {
 
         CE_INLINE void frame_start();
         CE_INLINE void frame_end();
-        
+
         CE_INLINE uint32_t get_ticks();
     }
 

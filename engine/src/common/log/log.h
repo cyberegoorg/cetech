@@ -21,13 +21,13 @@ namespace cetech {
 
         void info(const char* where, const char* format, va_list va);
         void info(const char* where, const char* format, ...);
-        
+
         void warning(const char* where, const char* format, va_list va);
         void warning(const char* where, const char* format, ...);
-        
+
         void error(const char* where, const char* format, va_list va);
         void error(const char* where, const char* format, ...);
-        
+
         void debug(const char* where, const char* format, va_list va);
         void debug(const char* where, const char* format, ...);
     }
