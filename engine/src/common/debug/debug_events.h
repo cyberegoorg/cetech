@@ -102,7 +102,7 @@ namespace cetech {
         debug_events::Header* header(char* event) {
             return (debug_events::Header*)event;
         }
-        
+
         char* data(char* event) {
             return &(header(event)->data);
         }
