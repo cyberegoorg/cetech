@@ -19,14 +19,12 @@ class REPLWidget(QFrame, Ui_ReplWidget):
     def add_log(self, level, where, message):
         if 'lua' in where:
             pass
-            #self.command_log_textedit.append(self.LOG_COLOR_TAG[level] % message)
 
     def send_commands(self):
         text = self.repl_edit.text()
 
         if len(text) > 0:
             self.api.lua_execute(text)
-            #self.command_log_textedit.append("> %s" % text)
 
     def open_file(self):
         filename, _ =  QFileDialog.getOpenFileName(self, "Open .cpp file", QDir.currentPath(), "Lua (*.lua)")

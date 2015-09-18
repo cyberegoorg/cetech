@@ -87,7 +87,7 @@ namespace cetech {
             }
 
             event_it event = eventstream::first(_de->stream);
-            while (event < eventstream::end(_de->stream)) {
+            while (event != eventstream::end(_de->stream)) {
                 const char* type_str = hash::get < const char* >
                                        (_de->type_to_string, (debug_events::EventType)eventstream::header(_de->stream, event)->type,
                                         "NONE");

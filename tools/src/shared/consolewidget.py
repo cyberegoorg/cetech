@@ -7,9 +7,9 @@ from shared.ui.consolewidget import Ui_ConsoleWidget
 class ConsoleWidget(QFrame, Ui_ConsoleWidget):
     LOG_COLOR_TAG = {
         'I': "%s",
-        'W': "%s",#"<span style='color: yellow;'>%s</span>",
+        'W': "<span style='color: yellow;'> %s </span>",
         'D': "%s",
-        'E': "%s",#"<span style='color: red;'>%s</span>",
+        'E': "<span style='color: red;'> %s </span>",
     }
 
     def __init__(self, api):
@@ -36,6 +36,6 @@ class ConsoleWidget(QFrame, Ui_ConsoleWidget):
 
         if len(text) > 0:
             self.api.lua_execute(text)
-            self._add_line("> %s" % text)
+            self._add_line("<span style='color: black;'> > %s </span>" % text)
 
         self.command_lineedit.setText("")
