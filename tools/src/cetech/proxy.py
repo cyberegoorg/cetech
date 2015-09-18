@@ -50,7 +50,6 @@ class ConsoleProxy(object):
         return True
 
     def _parse_message(self, message):
-        print(message)
         self._call_handler(**message)
 
     def _tick(self):

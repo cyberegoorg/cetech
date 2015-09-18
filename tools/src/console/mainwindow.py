@@ -10,6 +10,8 @@ from shared.logwidget import LogWidget
 from shared.consolewidget import ConsoleWidget
 from shared.replwidget import REPLWidget
 
+from shared.recordeventwidget import RecordEventWidget
+
 class MainWindow(QMainWindow, Ui_MainWindow):
 
 
@@ -39,6 +41,9 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
         self.repl_widget = REPLWidget(self.api)
         self.repl_dock_widget.setWidget(self.repl_widget)
+
+        self.recordevent_widget = RecordEventWidget(self.api)
+        self.recordevent_dock_widget.setWidget(self.recordevent_widget)
 
         self.api.start(QThread.LowPriority)
 
