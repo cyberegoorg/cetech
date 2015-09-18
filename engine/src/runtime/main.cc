@@ -14,6 +14,8 @@
 #include "common/ecs/entitymanager.h"
 #include "runtime/runtime.h"
 
+#include "common/debug/debug_events.h"
+
 #include "common/resource/resource_manager.h"
 #include "common/resource/package_manager.h"
 
@@ -47,212 +49,23 @@ using namespace rapidjson;
 
 static uint64_t frame_id = 0;
 
-namespace cetech {
-    namespace debug_events {
-        enum EventType {
-            EVENT_NONE = 0,
-            EVENT_BEGIN_FRAME = 1,
-            EVENT_END_FRAME = 2,
-            EVENT_RECORD_FLOAT = 3,
-        };
-
-        struct Header {
-            uint32_t type;
-            uint32_t frame_id;
-            uint32_t size;
-            char data;
-        };
-
-        struct BeginFrameEvent {
-            uint32_t time;
-        };
-
-        struct EndFrameEvent {
-            uint32_t time;
-        };
-
-        struct RecordFloatEvent {
-            const char* name;
-            float value;
-        };
-        
-        void beginframe_to_json(const char* event, rapidjson::Document& document) {
-            debug_events::BeginFrameEvent *e = (debug_events::BeginFrameEvent*)event;
-            document.AddMember("time", e->time, document.GetAllocator());
-        }
-        
-        void endframe_to_json(const char* event, rapidjson::Document& document) {
-            debug_events::EndFrameEvent *e = (debug_events::EndFrameEvent*)event;
-            document.AddMember("time", e->time, document.GetAllocator());
-        }
-        
-        void recordfloat_to_json(const char* event, rapidjson::Document& document) {
-            debug_events::RecordFloatEvent *e = (debug_events::RecordFloatEvent*)event;
-            
-            document.AddMember("name", rapidjson::Value(e->name, strlen(e->name)), document.GetAllocator());
-            document.AddMember("value", e->value, document.GetAllocator());
-        }
-    }
-
-    namespace debug_events_globals {
-        typedef void (*to_json_fce_t)(const char*, rapidjson::Document&);
-
-        struct DebugEvents {
-            enum {BUFFER_SIZE = 64*1024};
-
-            char events_buffer[BUFFER_SIZE] = {0};
-            uint32_t events_buffer_count;
-
-            Hash<to_json_fce_t> to_json;
-            
-            DebugEvents(Allocator& allocator): to_json(allocator){
-            }
-        };
-        
-        static DebugEvents* _de = nullptr;
-
-        void register_to_json(debug_events::EventType type, to_json_fce_t fce) {
-            hash::set(_de->to_json, type, fce);
-        }
-        
-        void init() {
-            _de = MAKE_NEW(memory_globals::default_allocator(), DebugEvents, memory_globals::default_allocator());
-            
-            register_to_json(debug_events::EVENT_BEGIN_FRAME, debug_events::beginframe_to_json);
-            register_to_json(debug_events::EVENT_END_FRAME, debug_events::endframe_to_json);
-            register_to_json(debug_events::EVENT_RECORD_FLOAT, debug_events::recordfloat_to_json);
-        }
-
-        void shutdown() {
-            MAKE_DELETE(memory_globals::default_allocator(), DebugEvents, _de);
-        }
-
-        void add_events(char* events, uint32_t size) {
-            memcpy(_de->events_buffer, events, size);
-            _de->events_buffer_count += size;
-        };
-
-        void clean_events() {
-            memset(_de->events_buffer, 0, DebugEvents::BUFFER_SIZE);
-            _de->events_buffer_count = 0;
-        }
-                
-        debug_events::Header* header(char* event) {
-            return (debug_events::Header*)event;
-        }
-        
-        char* data(char* event) {
-            return &(header(event)->data);
-        }
-
-        char* next(char* event) {
-            const uint32_t sz = header(event)->size;
-            
-            if((event + sz + sizeof(debug_events::Header)) >=  (_de->events_buffer + _de->events_buffer_count)) {
-                return nullptr;
-            }
-            
-            return event + sz + sizeof(debug_events::Header);
-        }
-        
-        void add_begin_frame() {
-            char* p = _de->events_buffer + _de->events_buffer_count;
-            
-            debug_events::Header* h = (debug_events::Header*)p;
-            h->type = debug_events::EVENT_BEGIN_FRAME;
-            h->size = sizeof(debug_events::BeginFrameEvent);
-            h->frame_id = frame_id;
-            
-            debug_events::BeginFrameEvent *e = (debug_events::BeginFrameEvent*)data(p);
-            e->time = runtime::get_ticks();
-            
-            _de->events_buffer_count += sizeof(debug_events::Header) + sizeof(debug_events::BeginFrameEvent);
-        }
-        
-        void add_end_frame() {
-            char* p = _de->events_buffer + _de->events_buffer_count;
-
-            debug_events::Header* h = (debug_events::Header*)p;
-            h->type = debug_events::EVENT_END_FRAME;
-            h->size = sizeof(debug_events::EndFrameEvent);
-            h->frame_id = frame_id;
-            
-            debug_events::EndFrameEvent *e = (debug_events::EndFrameEvent*)data(p);
-            e->time = runtime::get_ticks();
-            
-            _de->events_buffer_count += sizeof(debug_events::Header) + sizeof(debug_events::EndFrameEvent);
-        }
-
-        void add_record_float(const char* name, const float value) {
-            char* p = _de->events_buffer + _de->events_buffer_count;
-
-            debug_events::Header* h = (debug_events::Header*)p;
-            h->type = debug_events::EVENT_RECORD_FLOAT;
-            h->size = sizeof(debug_events::RecordFloatEvent);
-            h->frame_id = frame_id;
-            
-            debug_events::RecordFloatEvent *e = (debug_events::RecordFloatEvent*)data(p);
-            e->name = strdup(name);
-            e->value = value;
-            
-            _de->events_buffer_count += sizeof(debug_events::Header) + sizeof(debug_events::RecordFloatEvent);
-        }
-        
-        const char* type_to_str(debug_events::EventType typee) {
-            static const char* t[] = {
-                "NONE",
-                "EVENT_BEGIN_FRAME",
-                "EVENT_END_FRAME",
-                "EVENT_RECORD_FLOAT"
-            };
-            return t[typee];
-        }
-
-        void send_buffer() {
-            if( !console_server_globals::has_clients() || !_de->events_buffer_count) {
-                return;
-            }
-
-            char* event = _de->events_buffer;
-            while(event) {
-                const char* type_str = type_to_str((debug_events::EventType)header(event)->type);
-                
-                rapidjson::Document json_data;
-                json_data.SetObject();
-                
-                json_data.AddMember("type", "debug_event", json_data.GetAllocator());
-                json_data.AddMember("frameid", header(event)->frame_id, json_data.GetAllocator());
-
-                json_data.AddMember("etype", rapidjson::Value(type_str, strlen(type_str)), json_data.GetAllocator());
-                
-                to_json_fce_t to_json_fce = hash::get<to_json_fce_t>(_de->to_json, header(event)->type, nullptr);
-                if(to_json_fce) {
-                    to_json_fce(data(event), json_data);
-                }
-                
-                console_server_globals::send_json_document(json_data);
-                event = next(event);
-            };
-        }
-    };
-};
-
-
 void cmd_lua_execute(const rapidjson::Document& in, rapidjson::Document& out) {
     lua_enviroment::execute_string(lua_enviroment_globals::global_env(), in["args"]["script"].GetString());
 }
 
 void frame_start() {
-    debug_events_globals::add_begin_frame();
+    debug_events_local::add_begin_frame();
     runtime::frame_start();
     console_server_globals::tick();
-    
-    debug_events_globals::add_record_float("randomfloat", random());
+
+    debug_events_local::add_record_float("frame", frame_id);
 }
 
 void frame_end() {
     runtime::frame_end();
-    debug_events_globals::add_end_frame();
+    debug_events_local::add_end_frame();
+    debug_events_local::flush_to_global();
+    
     debug_events_globals::send_buffer();
     debug_events_globals::clean_events();
     

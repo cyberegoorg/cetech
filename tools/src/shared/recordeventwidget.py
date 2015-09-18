@@ -3,6 +3,7 @@ from PyQt5.QtWidgets import QFrame, QTreeWidgetItem
 
 from shared.ui.recordeventswidget import Ui_RecordEventsWidget
 
+
 class RecordEventWidget(QFrame, Ui_RecordEventsWidget):
     def __init__(self, api):
         super(RecordEventWidget, self).__init__()
@@ -16,12 +17,12 @@ class RecordEventWidget(QFrame, Ui_RecordEventsWidget):
             return
 
         name = kwargs['name'];
-        value = str(kwargs['value'])
+        value = kwargs['value']
         items = self.record_treewidget.findItems(name, Qt.MatchExactly)
 
         if not len(items):
-            item = QTreeWidgetItem([name, value])
+            item = QTreeWidgetItem([name, str(value)])
 
             self.record_treewidget.addTopLevelItem(item)
         else:
-            items[0].setText(1, value)
+            items[0].setText(1, str(value))

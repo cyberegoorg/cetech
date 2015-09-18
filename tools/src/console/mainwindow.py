@@ -45,6 +45,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.recordevent_widget = RecordEventWidget(self.api)
         self.recordevent_dock_widget.setWidget(self.recordevent_widget)
 
+
         self.api.start(QThread.LowPriority)
 
     def closeEvent(self, evnt):
