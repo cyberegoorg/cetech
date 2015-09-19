@@ -14,6 +14,7 @@
 #include "common/math/vector2.h"
 #include "runtime/runtime.h"
 
+
 namespace cetech {
     namespace runtime {
         namespace log_internal {
@@ -437,6 +438,35 @@ namespace cetech {
                 }
             }
         }
+
+        namespace thread {
+            Thread create_thread(thread_fce_t fce, const char* name, void* data) {
+                return (Thread) {
+                           SDL_CreateThread(fce, name, data)
+                };
+            }
+
+            void kill(Thread thread) {
+                SDL_DetachThread(thread.t);
+            }
+
+            uint32_t get_id(Thread thread) {
+                return SDL_GetThreadID(thread.t);
+            }
+
+            uint32_t id() {
+                return SDL_ThreadID();
+            }
+
+            void spin_lock(Spinlock* lock) {
+                SDL_AtomicLock(&lock->l);
+            }
+
+            void spin_unlock(Spinlock* lock) {
+                SDL_AtomicUnlock(&lock->l);
+            }
+        }
     }
+
 }
 

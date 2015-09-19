@@ -1,7 +1,7 @@
 #pragma once
 
 #include "common/math/math_types.h"
-#include "runtime_types.h"
+#include "runtime/runtime_types.h"
 
 namespace cetech {
     namespace runtime {
@@ -87,6 +87,47 @@ namespace cetech {
             CE_INLINE bool mkpath(const char* path);
             static void listdir(const char* name, const char* ignore_dir, char** files, uint32_t* file_count);
             static void listdir_free(char** files, uint32_t file_count);
+        }
+
+        namespace thread {
+            /*!
+             * Create thread.
+             * \param fce Thread fce.
+             * \param name Thread name.
+             * \param data Thread data.
+             */
+            CE_INLINE Thread create_thread(thread_fce_t fce, const char* name, void* data);
+
+            /*!
+             * Kill thread.
+             * \param thread Thread.
+             */
+            CE_INLINE void kill(Thread thread);
+
+            /*!
+             * Get id for thread.
+             * \param thread Thread.
+             * \return thread id.
+             */
+            CE_INLINE uint32_t get_id(Thread thread);
+
+            /*!
+             * Get actual thread id.
+             * \return thread id.
+             */
+            CE_INLINE uint32_t id();
+
+            /*!
+             * Spin lock.
+             * \param lock Spin.
+             */
+            CE_INLINE void spin_lock(Spinlock* lock);
+
+            /*!
+             * Spin unlock.
+             * \param lock Spin.
+             */
+            CE_INLINE void spin_unlock(Spinlock* lock);
         }
     }
 }
