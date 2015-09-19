@@ -1,7 +1,9 @@
 #pragma once
 
+#include "runtime/runtime_types.h"
 #include "common/memory/memory_types.h"
 #include "common/container/container_types.h"
+
 
 namespace cetech {
     typedef char event_t;
@@ -15,7 +17,8 @@ namespace cetech {
 
     struct EventStream {
         Array < event_t > stream;
-
+        Spinlock lock;
+        
         EventStream(Allocator & allocator);
     };
 }

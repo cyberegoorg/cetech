@@ -25,7 +25,7 @@ namespace cetech {
         CE_INLINE void add_events(EventStream& stream, event_t* events, uint32_t size);
     }
 
-    
+
     namespace eventstream {
         void clear(EventStream& stream) {
             array::clear(stream.stream);
@@ -47,11 +47,11 @@ namespace cetech {
         event_it end(EventStream& stream) {
             return array::size(stream.stream);
         }
-        
+
         bool empty(EventStream& stream) {
             return array::empty(stream.stream);
         }
-        
+
         event_it next(EventStream& stream, event_it event) {
             const uint32_t sz = header(stream, event)->size;
             event_it n = event + sizeof(EventStreamHeader) + sz;
@@ -63,15 +63,16 @@ namespace cetech {
         T* prepare_new(EventStream& stream, uint32_t type) {
             event_it it = end(stream);
             array::resize(stream.stream, array::size(stream.stream) + sizeof(EventStreamHeader) + sizeof(T));
-            
-            char *p = array::begin(stream.stream) + it;
-            
+
+            char* p = array::begin(stream.stream) + it;
+
             EventStreamHeader* h = (EventStreamHeader*)p;
             h->type = type;
             h->size = sizeof(T);
 
             return (T*)(&(h->data));
         }
+
 
         void add_events(EventStream& stream, event_t* events, uint32_t size) {
             event_t* first = array::end(stream.stream);
@@ -81,6 +82,5 @@ namespace cetech {
         };
     }
 
-    EventStream::EventStream ( Allocator& allocator )  : stream(allocator) {
-    }
+    EventStream::EventStream ( Allocator& allocator )  : stream(allocator) {}
 };
