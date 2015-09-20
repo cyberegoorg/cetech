@@ -56,7 +56,7 @@ void cmd_lua_execute(const rapidjson::Document& in, rapidjson::Document& out) {
 static uint32_t last_frame_ticks = 0;
 static float dt = 0.0f;
 void frame_start() {
-    develop_eventstream_globals::add_begin_frame();
+    develop_globals::push_begin_frame();
 
     uint32_t now_ticks = runtime::get_ticks();
     dt = (now_ticks - last_frame_ticks) * 0.001f;
@@ -64,8 +64,8 @@ void frame_start() {
 
     //printf("%f\n", dt);
 
-    develop_eventstream_globals::add_record_float("engine.delta_time", dt);
-    develop_eventstream_globals::add_record_float("engine.frame_rate", 1.0f / dt);
+    develop_globals::push_record_float("engine.delta_time", dt);
+    develop_globals::push_record_float("engine.frame_rate", 1.0f / dt);
 
     runtime::frame_start();
     console_server_globals::tick();
@@ -75,9 +75,10 @@ void frame_start() {
 
 void frame_end() {
     runtime::frame_end();
-    develop_eventstream_globals::add_end_frame();
-    develop_eventstream_globals::send_buffer();
-    develop_eventstream_globals::clear();
+    develop_globals::push_end_frame();
+    develop_globals::flush_stream_buffer();
+    develop_globals::send_buffer();
+    develop_globals::clear();
     ++frame_id;
 }
 
@@ -225,7 +226,7 @@ void init() {
     log::init();
     log::register_handler(&log_handlers::stdout_handler);
 
-    develop_eventstream_globals::init();
+    develop_globals::init();
 
     //     FILE* log_file = fopen("cetechlog.txt", "wb");
     //     log::register_handler(&log_handlers::file_handler, log_file);
@@ -269,7 +270,7 @@ void shutdown() {
     package_manager_globals::shutdown();
     resource_manager_globals::shutdown();
 
-    develop_eventstream_globals::shutdown();
+    develop_globals::shutdown();
     console_server_globals::shutdown();
     runtime::shutdown();
     memory_globals::shutdown();
