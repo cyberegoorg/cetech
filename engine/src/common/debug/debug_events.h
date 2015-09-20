@@ -58,10 +58,10 @@ namespace cetech {
 
         thread_local static char _stream_buffer[64 * 1024] = {0};
         thread_local static uint32_t _stream_buffer_count = 0;
-        
+
         struct DebugEvents {
             EventStream stream;
-        
+
             Hash < to_json_fce_t > to_json;
             Hash < const char* > type_to_string;
 
@@ -101,7 +101,7 @@ namespace cetech {
         template < typename T >
         void push(uint32_t type, const T& event) {
             const uint32_t sz = sizeof(EventStreamHeader) + sizeof(T);
-            
+
             if ((_stream_buffer_count + sz) >= 64 * 1024) {
                 flush_stream_buffer();
             }
@@ -117,15 +117,15 @@ namespace cetech {
             *(T*)(p + sizeof(EventStreamHeader)) = event;
         }
 
-        
+
         void send_buffer() {
             if (!console_server_globals::has_clients() || eventstream::empty(_de->stream)) {
                 return;
             }
 
             for (event_it event = 0; event < eventstream::size(_de->stream); ) {
-                EventStreamHeader *header = (EventStreamHeader*)&_de->stream.stream[event];
-                
+                EventStreamHeader* header = (EventStreamHeader*)&_de->stream.stream[event];
+
                 const char* type_str = hash::get < const char* >
                                        (_de->type_to_string,
                                         (develop_events::EventType)header->type,
@@ -140,11 +140,11 @@ namespace cetech {
                 to_json_fce_t to_json_fce = hash::get < to_json_fce_t >
                                             (_de->to_json, header->type, nullptr);
                 if (to_json_fce) {
-                    to_json_fce( ((char*)header) + sizeof(EventStreamHeader), json_data);
+                    to_json_fce(((char*)header) + sizeof(EventStreamHeader), json_data);
                 }
 
                 console_server_globals::send_json_document(json_data);
-                
+
                 event += sizeof(EventStreamHeader) + header->size;
             }
         }
@@ -160,7 +160,7 @@ namespace cetech {
         }
 
         void push_record_float(const char* name, const float value) {
-            develop_events::RecordFloatEvent event = { .name= strdup(name), .value = value};
+            develop_events::RecordFloatEvent event = { .name = strdup(name), .value = value};
             push(develop_events::EVENT_RECORD_FLOAT, event);
         }
     }
