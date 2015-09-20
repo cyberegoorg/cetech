@@ -30,15 +30,15 @@ namespace cetech {
         uint32_t size(EventStream& stream) {
             return array::size(stream.stream);
         }
-        
+
         void write(EventStream& stream, uint32_t type, const void* events, uint32_t size ) {
             EventStreamHeader header = {.type = type, .size = size};
-            
+
             array::push( stream.stream, (char*)&header, sizeof(EventStreamHeader));
             array::push( stream.stream, (char*)events, (size_t) size);
         }
 
-        template<typename T>
+        template < typename T >
         void write(EventStream& stream, uint32_t type, T event ) {
             write(stream, type, &event, sizeof(T));
         }
@@ -48,6 +48,5 @@ namespace cetech {
         }
     }
 
-    EventStream::EventStream ( Allocator& allocator)  : stream(allocator) {
-    }
+    EventStream::EventStream ( Allocator& allocator)  : stream(allocator) {}
 };

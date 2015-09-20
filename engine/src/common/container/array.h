@@ -241,7 +241,7 @@ namespace cetech {
 
         template < typename T > void push(Array < T >& a, const T* items, uint32_t count) {
             CE_ASSERT(std::is_pod < T > ());
-            
+
             if (a._capacity <= a._size + count) {
                 grow(a, a._size + count);
             }

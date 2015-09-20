@@ -15,7 +15,7 @@ namespace cetech {
 
     struct EventStream {
         Array < char > stream;
-        
+
         EventStream(Allocator & allocator);
     };
 }
