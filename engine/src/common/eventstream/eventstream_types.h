@@ -18,7 +18,7 @@ namespace cetech {
     struct EventStream {
         Array < event_t > stream;
         Spinlock lock;
-        
-        EventStream(Allocator & allocator);
+
+        EventStream(Allocator & allocator, const uint32_t init_size = 64 * 1024);
     };
 }

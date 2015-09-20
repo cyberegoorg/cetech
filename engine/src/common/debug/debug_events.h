@@ -10,9 +10,15 @@ namespace cetech {
     namespace develop_events {
         enum EventType {
             EVENT_NONE = 0,
+
             EVENT_BEGIN_FRAME = 1,
             EVENT_END_FRAME = 2,
+
             EVENT_RECORD_FLOAT = 3,
+
+            EVENT_MEMORY_ALLOC = 4,
+            EVENT_MEMORY_FREE = 5,
+
             EVENT_COUNT
         };
 
@@ -30,28 +36,31 @@ namespace cetech {
         };
 
         void beginframe_to_json(const char* event, rapidjson::Document& document) {
-            develop_events::BeginFrameEvent* e = (develop_events::BeginFrameEvent*)event;
+            BeginFrameEvent* e = (BeginFrameEvent*)event;
             document.AddMember("time", e->time, document.GetAllocator());
         }
 
         void endframe_to_json(const char* event, rapidjson::Document& document) {
-            develop_events::EndFrameEvent* e = (develop_events::EndFrameEvent*)event;
+            EndFrameEvent* e = (EndFrameEvent*)event;
             document.AddMember("time", e->time, document.GetAllocator());
         }
 
         void recordfloat_to_json(const char* event, rapidjson::Document& document) {
-            develop_events::RecordFloatEvent* e = (develop_events::RecordFloatEvent*)event;
+            RecordFloatEvent* e = (RecordFloatEvent*)event;
 
             document.AddMember("name", rapidjson::Value(e->name, strlen(e->name)), document.GetAllocator());
             document.AddMember("value", e->value, document.GetAllocator());
         }
     }
 
+
+
     namespace develop_eventstream_globals {
         typedef void (* to_json_fce_t)(const char*, rapidjson::Document&);
 
         struct DebugEvents {
             EventStream stream;
+
             Hash < to_json_fce_t > to_json;
             Hash < const char* > type_to_string;
 
@@ -87,8 +96,8 @@ namespace cetech {
                 return;
             }
 
-            event_it event = eventstream::first(_de->stream);
-            while (event != eventstream::end(_de->stream)) {
+            for (event_it event = eventstream::first(_de->stream); eventstream::is_valid(_de->stream, event);
+                 event = eventstream::next(_de->stream, event)) {
                 const char* type_str = hash::get < const char* >
                                        (_de->type_to_string,
                                         (develop_events::EventType)eventstream::header(_de->stream, event)->type,
@@ -103,33 +112,65 @@ namespace cetech {
                 to_json_fce_t to_json_fce = hash::get < to_json_fce_t >
                                             (_de->to_json, eventstream::header(_de->stream, event)->type, nullptr);
                 if (to_json_fce) {
-                    to_json_fce(eventstream::data < char > (_de->stream, event), json_data);
+                    to_json_fce(eventstream::data_ptr < char > (_de->stream, event), json_data);
                 }
 
                 console_server_globals::send_json_document(json_data);
-                event = eventstream::next(_de->stream, event);
             }
         }
 
+        thread_local static char _stream_buffer[64 * 1024] = {0};
+        thread_local static uint32_t _stream_buffer_count = 0;
+
+        void flush_stream_buffer(EventStream& stream, char* buffer, uint32_t& buffer_count) {
+            eventstream::add_events(stream, buffer, buffer_count);
+            buffer_count = 0;
+        }
+
+
+        template < typename T >
+        T* prepare_new(EventStream& stream, char* buffer, uint32_t& buffer_count, uint32_t type) {
+            const uint32_t sz = sizeof(EventStreamHeader) + sizeof(T);
+            if ((buffer_count + sz) >= 64 * 1024) {
+                flush_stream_buffer(stream, buffer, buffer_count);
+            }
+
+            char* p = buffer + buffer_count;
+
+            EventStreamHeader* h = (EventStreamHeader*)p;
+            h->type = type;
+            h->size = sizeof(T);
+
+            buffer_count += sz;
+
+            return (T*)(&(h->data));
+        }
+
+
         void add_begin_frame() {
-            develop_events::BeginFrameEvent* e = eventstream::prepare_new < develop_events::BeginFrameEvent >
-                                                 (_de->stream, develop_events::EVENT_BEGIN_FRAME);
+            develop_events::BeginFrameEvent* e = prepare_new < develop_events::BeginFrameEvent >
+                                                 (_de->stream, _stream_buffer, _stream_buffer_count,
+                                                  develop_events::EVENT_BEGIN_FRAME);
             e->time = runtime::get_ticks();
         }
 
         void add_end_frame() {
-            develop_events::EndFrameEvent* e = eventstream::prepare_new < develop_events::EndFrameEvent >
-                                               (_de->stream, develop_events::EVENT_END_FRAME);
+            develop_events::EndFrameEvent* e = prepare_new < develop_events::EndFrameEvent >
+                                               (_de->stream, _stream_buffer, _stream_buffer_count,
+                                                develop_events::EVENT_END_FRAME);
             e->time = runtime::get_ticks();
         }
 
         void add_record_float(const char* name, const float value) {
-            develop_events::RecordFloatEvent* e = eventstream::prepare_new < develop_events::RecordFloatEvent >
-                                                  (_de->stream, develop_events::EVENT_RECORD_FLOAT);
+            develop_events::RecordFloatEvent* e = prepare_new < develop_events::RecordFloatEvent >
+                                                  (_de->stream, _stream_buffer, _stream_buffer_count,
+                                                   develop_events::EVENT_RECORD_FLOAT);
 
-            e->name = strdup(name);
+            e->name = strdup(name); // TODO: LEAK; idea: symbol based,
             e->value = value;
         }
+
     }
+
 
 };
