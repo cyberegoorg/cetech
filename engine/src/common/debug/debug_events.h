@@ -100,7 +100,7 @@ namespace cetech {
 
         template < typename T >
         void push(uint32_t type, const T& event) {
-            const uint32_t sz = sizeof(EventStreamHeader) + sizeof(T);
+            const uint32_t sz = sizeof(eventstream::Header) + sizeof(T);
 
             if ((_stream_buffer_count + sz) >= 64 * 1024) {
                 flush_stream_buffer();
@@ -108,13 +108,13 @@ namespace cetech {
 
             char* p = _stream_buffer + _stream_buffer_count;
 
-            EventStreamHeader* h = (EventStreamHeader*)p;
+            eventstream::Header* h = (eventstream::Header*)p;
             h->type = type;
             h->size = sizeof(T);
 
             _stream_buffer_count += sz;
 
-            *(T*)(p + sizeof(EventStreamHeader)) = event;
+            *(T*)(p + sizeof(eventstream::Header)) = event;
         }
 
 
@@ -122,9 +122,12 @@ namespace cetech {
             if (!console_server_globals::has_clients() || eventstream::empty(_de->stream)) {
                 return;
             }
-
-            for (event_it event = 0; event < eventstream::size(_de->stream); ) {
-                EventStreamHeader* header = (EventStreamHeader*)&_de->stream.stream[event];
+            
+            
+            eventstream::event_it it = 0;
+            while(eventstream::valid(_de->stream, it)) {
+                
+                eventstream::Header* header = eventstream::header(_de->stream, it);
 
                 const char* type_str = hash::get < const char* >
                                        (_de->type_to_string,
@@ -140,12 +143,12 @@ namespace cetech {
                 to_json_fce_t to_json_fce = hash::get < to_json_fce_t >
                                             (_de->to_json, header->type, nullptr);
                 if (to_json_fce) {
-                    to_json_fce(((char*)header) + sizeof(EventStreamHeader), json_data);
+                    to_json_fce(eventstream::event<void*>(_de->stream, it) , json_data);
                 }
 
                 console_server_globals::send_json_document(json_data);
-
-                event += sizeof(EventStreamHeader) + header->size;
+                
+                it = eventstream::next(_de->stream, it);
             }
         }
 
