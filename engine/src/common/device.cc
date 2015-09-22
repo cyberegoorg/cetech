@@ -78,7 +78,8 @@ namespace cetech {
         }
 
         void init_boot() {
-            StringId64_t boot_pkg_name_h = murmur_hash_64(cvars::boot_pkg.value_str, strlen(cvars::boot_pkg.value_str), 22);
+            StringId64_t boot_pkg_name_h = murmur_hash_64(cvars::boot_pkg.value_str, strlen(
+                                                              cvars::boot_pkg.value_str), 22);
             StringId64_t boot_script_name_h =
                 murmur_hash_64(cvars::boot_script.value_str, strlen(cvars::boot_script.value_str), 22);
 
@@ -87,8 +88,9 @@ namespace cetech {
 
             StringId64_t lua_hash = murmur_hash_64("lua", 3, 22);
 
-            const resource_lua::Resource* res_lua = (const resource_lua::Resource*)device_globals::device().resource_manager()->get(lua_hash,
-                                                                                                        boot_script_name_h);
+            const resource_lua::Resource* res_lua =
+                (const resource_lua::Resource*)device_globals::device().resource_manager()->get(lua_hash,
+                                                                                                boot_script_name_h);
             lua_enviroment::execute_resource(lua_enviroment_globals::global_env(), res_lua);
         }
 
@@ -118,7 +120,7 @@ namespace cetech {
             static ResourceRegistration resource_regs[] = {
                 /* package */
                 {resource_package::type_hash(), & resource_package::compiler, & resource_package::loader,
-                & resource_package::unloader},
+                 & resource_package::unloader},
 
                 /* lua */
                 {resource_lua::type_hash(), & resource_lua::compiler, & resource_lua::loader, & resource_lua::unloader},
@@ -140,18 +142,20 @@ namespace cetech {
 
     class DeviceImplementation : public Device {
         public:
-            DeviceImplementation(){
+            DeviceImplementation() {}
+
+            virtual ~DeviceImplementation() {};
+
+            virtual float get_delta_time() {
+                return this->delta_time;
             }
-            
-            virtual ~DeviceImplementation() {
-            };
-            
-            virtual float get_delta_time(){ return this->delta_time; }
-            virtual uint32_t get_frame_id(){ return this->frame_id; }
+            virtual uint32_t get_frame_id() {
+                return this->frame_id;
+            }
 
             virtual void init(int argc, const char** argv) {
                 command_line_globals::set_args(argc, argv);
-                
+
                 log::init();
                 log::register_handler(&log_handlers::stdout_handler);
 
@@ -162,7 +166,7 @@ namespace cetech {
 
                 resource_package::init();
                 resource_lua::init();
-                
+
                 resource_manager_ = ResourceManager::make(memory_globals::default_allocator());
                 //resource_manager_globals::init();
                 package_manager_globals::init();
@@ -184,10 +188,10 @@ namespace cetech {
 
                 this->last_frame_ticks = runtime::get_ticks();
             }
-            
+
             virtual void shutdown() {
                 package_manager_globals::shutdown();
-                
+
                 ResourceManager::destroy(memory_globals::default_allocator(), resource_manager_);
 
                 develop_globals::shutdown();
@@ -195,7 +199,7 @@ namespace cetech {
                 runtime::shutdown();
                 memory_globals::shutdown();
             }
-        
+
             virtual void run() {
                 if (command_line_globals::has_argument("--wait", 'w')) {
                     log::info("main", "Wating for clients.");
@@ -221,9 +225,9 @@ namespace cetech {
                     runtime::frame_start();
                     console_server_globals::tick();
                     //
-                    
+
                     usleep(3 * 1000);
-                    
+
                     //
                     runtime::frame_end();
                     develop_globals::push_end_frame();
@@ -233,21 +237,21 @@ namespace cetech {
                     ++(this->frame_id);
                 }
             }
-        
+
             virtual ResourceManager* resource_manager() {
                 return this->resource_manager_;
             }
-        
+
         public:
             uint32_t frame_id;
             uint32_t last_frame_ticks;
             float delta_time;
-            
+
             ResourceManager* resource_manager_;
     };
 
     namespace device_globals {
-        static Device *_device = nullptr;
+        static Device* _device = nullptr;
 
         void init() {
             memory_globals::init();
@@ -258,10 +262,10 @@ namespace cetech {
         void shutdown() {
             MAKE_DELETE(memory_globals::default_allocator(), Device, _device);
             _device = nullptr;
-            
+
             memory_globals::shutdown();
         }
-        
+
         Device& device() {
             return *_device;
         }
