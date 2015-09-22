@@ -12,10 +12,7 @@
 
 namespace cetech {
     namespace resource_package {
-        static StringId64_t _type_hash;
-        void init() {
-            _type_hash = stringid64::from_cstring("package");
-        }
+        static const StringId64_t _type_hash = stringid64::from_cstring("package");;
 
         StringId64_t type_hash() {
             return _type_hash;

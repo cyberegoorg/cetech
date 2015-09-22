@@ -1,7 +1,10 @@
-#include "common/device.h"
+#include "common/memory/memory.h"
+#include "device.h"
 
 using namespace cetech;
 int main(int argc, const char** argv) {
+
+    memory_globals::init();
     device_globals::init();
 
     Device& d = device_globals::device();
@@ -11,6 +14,7 @@ int main(int argc, const char** argv) {
     d.shutdown();
 
     device_globals::shutdown();
+    memory_globals::shutdown();
 
     return 0; // TODO: error check
 }

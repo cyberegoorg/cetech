@@ -12,11 +12,7 @@
 
 namespace cetech {
     namespace resource_lua {
-        static StringId64_t _type_hash;
-
-        void init() {
-            _type_hash = stringid64::from_cstring("lua");
-        }
+        static StringId64_t _type_hash = stringid64::from_cstring("lua");
 
         StringId64_t type_hash() {
             return _type_hash;

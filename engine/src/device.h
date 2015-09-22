@@ -1,6 +1,8 @@
 #pragma once
 
-#include "common/resource/resource_manager.h"
+#include "resource_manager.h"
+#include "package_manager.h"
+#include "develop_manager.h"
 
 #include <inttypes.h>
 
@@ -16,7 +18,12 @@ namespace cetech {
             virtual void shutdown() = 0;
             virtual void run() = 0;
 
-            virtual ResourceManager* resource_manager() = 0;
+            virtual ResourceManager& resource_manager() = 0;
+            virtual PackageManager& package_manager() = 0;
+            virtual DevelopManager& develop_manager() = 0;
+
+            static Device* make(Allocator& alocator);
+            static void destroy(Allocator& alocator, Device* rm);
     };
 
     namespace device_globals {
