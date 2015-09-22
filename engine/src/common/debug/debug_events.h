@@ -128,11 +128,10 @@ namespace cetech {
             if (!console_server_globals::has_clients() || eventstream::empty(_de->stream)) {
                 return;
             }
-            
-            
+
             eventstream::event_it it = 0;
-            while(eventstream::valid(_de->stream, it)) {
-                
+            while (eventstream::valid(_de->stream, it)) {
+
                 eventstream::Header* header = eventstream::header(_de->stream, it);
 
                 const char* type_str = hash::get < const char* >
@@ -149,11 +148,11 @@ namespace cetech {
                 to_json_fce_t to_json_fce = hash::get < to_json_fce_t >
                                             (_de->to_json, header->type, nullptr);
                 if (to_json_fce) {
-                    to_json_fce(eventstream::event<void*>(_de->stream, it) , json_data);
+                    to_json_fce(eventstream::event < void* > (_de->stream, it), json_data);
                 }
 
                 console_server_globals::send_json_document(json_data);
-                
+
                 it = eventstream::next(_de->stream, it);
             }
         }
@@ -163,7 +162,7 @@ namespace cetech {
                 .get_frame_id = device_globals::device().get_frame_id(),
                 .time = runtime::get_ticks()
             };
-            
+
             push(develop_events::EVENT_BEGIN_FRAME, event);
         }
 
@@ -172,7 +171,7 @@ namespace cetech {
                 .get_frame_id = device_globals::device().get_frame_id(),
                 .time = runtime::get_ticks()
             };
-            
+
             push(develop_events::EVENT_END_FRAME, event);
         }
 

@@ -5,7 +5,7 @@ int main(int argc, const char** argv) {
     device_globals::init();
 
     Device& d = device_globals::device();
-    
+
     d.init(argc, argv);
     d.run();
     d.shutdown();

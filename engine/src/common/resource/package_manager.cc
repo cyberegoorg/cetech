@@ -44,7 +44,8 @@ namespace cetech {
         }
 
         void load(StringId64_t name) {
-            const void* res = device_globals::device().resource_manager()->get(package_manager_globals::pm->type_hash, name);
+            const void* res = device_globals::device().resource_manager()->get(package_manager_globals::pm->type_hash,
+                                                                               name);
 
             if (res == nullptr) {
                 log::error("package_manager", "Could not get resource for package " "%" PRIx64, name);
@@ -62,7 +63,8 @@ namespace cetech {
         }
 
         void unload(StringId64_t name) {
-            const void* res = device_globals::device().resource_manager()->get(package_manager_globals::pm->type_hash, name);
+            const void* res = device_globals::device().resource_manager()->get(package_manager_globals::pm->type_hash,
+                                                                               name);
 
             if (res == nullptr) {
                 log::error("package_manager", "Could not get resource for package " "%" PRIx64, name);
@@ -80,7 +82,8 @@ namespace cetech {
         }
 
         bool is_loaded(StringId64_t name) {
-            const void* res = device_globals::device().resource_manager()->get(package_manager_globals::pm->type_hash, name);
+            const void* res = device_globals::device().resource_manager()->get(package_manager_globals::pm->type_hash,
+                                                                               name);
 
             if (res == nullptr) {
                 log::error("package_manager", "Could not get resource for package " "%" PRIx64, name);
