@@ -17,7 +17,10 @@
 namespace cetech {
     namespace runtime {
         namespace log_internal {
-            static void sdl_log_output_function(void* userdata, int category, SDL_LogPriority priority, const char* message) {
+            static void sdl_log_output_function(void* userdata,
+                                                int category,
+                                                SDL_LogPriority priority,
+                                                const char* message) {
                 CE_UNUSED(userdata);
                 const char* where = nullptr;
 

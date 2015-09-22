@@ -10,7 +10,6 @@ namespace cetech {
             uint32_t type;
         };
 
-        void init();
         StringId64_t type_hash();
 
         void compiler(File& in, File& out);

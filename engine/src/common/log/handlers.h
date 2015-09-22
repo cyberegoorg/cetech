@@ -39,11 +39,11 @@ namespace cetech {
     namespace log_handlers_internal {
         char* time_to_utc_str(std::tm* gmtm) {
             char* time_str = std::asctime(gmtm);
-            time_str[strlen(time_str)-1] = '\0';
+            time_str[strlen(time_str) - 1] = '\0';
             return time_str;
         }
     };
-    
+
     namespace log_handlers {
         static void stdout_handler(const log::ELogLevel level,
                                    const time_t time,
@@ -62,7 +62,7 @@ namespace cetech {
                 break;
             }
 
-            std::tm *gmtm = std::gmtime(&time);
+            std::tm* gmtm = std::gmtime(&time);
             char* time_str = log_handlers_internal::time_to_utc_str(gmtm);
 
             flockfile(out);
@@ -77,9 +77,9 @@ namespace cetech {
                                  void* data) {
             FILE* out = (FILE*)(data);
 
-            std::tm *gmtm = std::gmtime(&time);
+            std::tm* gmtm = std::gmtime(&time);
             char* time_str = log_handlers_internal::time_to_utc_str(gmtm);
-            
+
             flockfile(out);
             fprintf(out, LOG_FORMAT "\n", time_str, level_to_str[level], where, msg);
             fflush(out);
@@ -95,9 +95,9 @@ namespace cetech {
                 return;
             }
 
-            std::tm *gmtm = std::gmtime(&time);
+            std::tm* gmtm = std::gmtime(&time);
             char* time_str = log_handlers_internal::time_to_utc_str(gmtm);
-            
+
             rapidjson::Document json_data;
             json_data.SetObject();
 
