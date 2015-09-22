@@ -5,8 +5,6 @@
 #include <errno.h>
 #include <sys/stat.h>
 
-#include "SDL2/SDL.h"
-
 #include "common/macros.h"
 #include "common/log/log.h"
 #include "common/debug/asserts.h"
@@ -14,14 +12,12 @@
 #include "common/math/vector2.h"
 #include "runtime/runtime.h"
 
+#include "SDL2/SDL.h"
 
 namespace cetech {
     namespace runtime {
         namespace log_internal {
-            CE_INLINE void sdl_log_output_function(void* userdata,
-                                                   int category,
-                                                   SDL_LogPriority priority,
-                                                   const char* message) {
+            static void sdl_log_output_function(void* userdata, int category, SDL_LogPriority priority, const char* message) {
                 CE_UNUSED(userdata);
                 const char* where = nullptr;
 
