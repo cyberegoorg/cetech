@@ -47,6 +47,24 @@
 using namespace cetech;
 using namespace rapidjson;
 
+namespace cetech {
+    namespace task_manager {
+        /*!
+         * Task worker fce.
+         */
+        typedef void (*TaskWorkFce_t)(void*);
+
+        /*!
+        * Task worker callback.
+        */
+        struct TaskWorkCallback {
+                TaskWorkFce_t fce;      //!< Worker fce.
+                uint8_t data[12];       //!< Worker data.
+        };
+        
+    }
+}
+
 static uint64_t frame_id = 0;
 
 void cmd_lua_execute(const rapidjson::Document& in, rapidjson::Document& out) {

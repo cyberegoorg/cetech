@@ -2,6 +2,7 @@
 
 #include <cstdio>
 #include <cstdarg>
+#include <ctime>
 
 #include "common/log/log.h"
 #include "common/console_server/console_server.h"
@@ -12,7 +13,7 @@
 
 
 
-#define LOG_FORMAT "[%u][%s][%s] %s"
+#define LOG_FORMAT "[%s][%s][%s] %s"
 
 #define COLOR_RED  "\x1B[31m"
 #define COLOR_GREEN  "\x1B[32m"
@@ -35,6 +36,14 @@ static const char* level_format[] = {
 };
 
 namespace cetech {
+    namespace log_handlers_internal {
+        char* time_to_utc_str(std::tm* gmtm) {
+            char* time_str = std::asctime(gmtm);
+            time_str[strlen(time_str)-1] = '\0';
+            return time_str;
+        }
+    };
+    
     namespace log_handlers {
         static void stdout_handler(const log::ELogLevel level,
                                    const time_t time,
@@ -53,8 +62,11 @@ namespace cetech {
                 break;
             }
 
+            std::tm *gmtm = std::gmtime(&time);
+            char* time_str = log_handlers_internal::time_to_utc_str(gmtm);
+
             flockfile(out);
-            fprintf(out, level_format[level], time, level_to_str[level], where, msg);
+            fprintf(out, level_format[level], time_str, level_to_str[level], where, msg);
             funlockfile(out);
         }
 
@@ -65,8 +77,11 @@ namespace cetech {
                                  void* data) {
             FILE* out = (FILE*)(data);
 
+            std::tm *gmtm = std::gmtime(&time);
+            char* time_str = log_handlers_internal::time_to_utc_str(gmtm);
+            
             flockfile(out);
-            fprintf(out, LOG_FORMAT "\n", time, level_to_str[level], where, msg);
+            fprintf(out, LOG_FORMAT "\n", time_str, level_to_str[level], where, msg);
             fflush(out);
             funlockfile(out);
         }
@@ -80,12 +95,15 @@ namespace cetech {
                 return;
             }
 
+            std::tm *gmtm = std::gmtime(&time);
+            char* time_str = log_handlers_internal::time_to_utc_str(gmtm);
+            
             rapidjson::Document json_data;
             json_data.SetObject();
 
             json_data.AddMember("type", "log", json_data.GetAllocator());
 
-            json_data.AddMember("time", rapidjson::Value(time), json_data.GetAllocator());
+            json_data.AddMember("time", rapidjson::Value(time_str, strlen(time_str)), json_data.GetAllocator());
             json_data.AddMember("level", rapidjson::Value(level_to_str[level], 1), json_data.GetAllocator());
             json_data.AddMember("where", rapidjson::Value(where, strlen(where)), json_data.GetAllocator());
             json_data.AddMember("msg", rapidjson::Value(msg, strlen(msg)), json_data.GetAllocator());
