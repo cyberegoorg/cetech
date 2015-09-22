@@ -84,4 +84,10 @@ namespace cetech {
         uint32_t _size;         //!< Size
         uint32_t _offset;       //!< Offset
     };
+
+    struct EventStream {
+        EventStream(Allocator & allocator);
+        
+        Array < char > stream;
+    };
 }
