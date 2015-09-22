@@ -3,12 +3,12 @@
 using namespace cetech;
 int main(int argc, const char** argv) {
     device_globals::init();
-    
+
     Device& d = device_globals::device();
     
-    device::init(d, argc, argv);
-    device::run(d);
-    device::shutdown(d);
+    d.init(argc, argv);
+    d.run();
+    d.shutdown();
 
     device_globals::shutdown();
 

@@ -15,12 +15,12 @@ namespace cetech {
         CE_INLINE bool empty(EventStream& stream);
         CE_INLINE uint32_t size(EventStream& stream);
 
-        Header* header(EventStream& stream, const event_it it);
+        CE_INLINE Header* header(EventStream& stream, const event_it it);
         template < typename T >
         T* event(EventStream& stream, const event_it it);
 
-        bool valid(EventStream& stream, const event_it it);
-        event_it next(EventStream& stream, const event_it it);
+        CE_INLINE bool valid(EventStream& stream, const event_it it);
+        CE_INLINE event_it next(EventStream& stream, const event_it it);
         
         CE_INLINE void write(EventStream& stream, uint32_t type, const void* events, uint32_t size );
         template < typename T >
@@ -75,5 +75,5 @@ namespace cetech {
         }
     }
 
-    EventStream::EventStream ( Allocator& allocator)  : stream(allocator) {}
+    CE_INLINE EventStream::EventStream ( Allocator& allocator)  : stream(allocator) {}
 };
