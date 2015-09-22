@@ -1,13 +1,6 @@
 #pragma once
 
-#include "common/memory/memory.h"
-#include "common/container/hash.h"
-#include "common/console_server/console_server.h"
-#include "common/eventstream/eventstream_types.h"
-#include <runtime/runtime.h>
-
-#include "rapidjson/document.h"
-
+#include "common/container/array.h"
 
 namespace cetech {
     namespace eventstream {

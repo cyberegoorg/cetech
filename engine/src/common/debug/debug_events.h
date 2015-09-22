@@ -3,7 +3,7 @@
 #include "common/memory/memory.h"
 #include "common/container/hash.h"
 #include "common/console_server/console_server.h"
-#include "common/eventstream/eventstream.h"
+#include "common/container/eventstream.h"
 #include "rapidjson/document.h"
 
 namespace cetech {
