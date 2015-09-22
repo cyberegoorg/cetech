@@ -4,6 +4,9 @@
 #include "common/container/hash.h"
 #include "common/console_server/console_server.h"
 #include "common/container/eventstream.h"
+#include "common/device.h"
+#include "runtime/runtime.h"
+
 #include "rapidjson/document.h"
 
 namespace cetech {
@@ -23,14 +26,17 @@ namespace cetech {
         };
 
         struct BeginFrameEvent {
+            //uint32_t frame_id;
             uint32_t time;
         };
 
         struct EndFrameEvent {
+            //uint32_t frame_id;
             uint32_t time;
         };
 
         struct RecordFloatEvent {
+            //uint32_t frame_id;
             const char* name;
             float value;
         };
@@ -153,17 +159,29 @@ namespace cetech {
         }
 
         void push_begin_frame() {
-            develop_events::BeginFrameEvent event = {.time = runtime::get_ticks()};
+            develop_events::BeginFrameEvent event = {
+                //.frame_id = device_globals::device().frame_id,
+                .time = runtime::get_ticks()
+            };
+            
             push(develop_events::EVENT_BEGIN_FRAME, event);
         }
 
         void push_end_frame() {
-            develop_events::EndFrameEvent event = {.time = runtime::get_ticks()};
+            develop_events::EndFrameEvent event = {
+                //.frame_id = device_globals::device().frame_id,
+                .time = runtime::get_ticks()
+            };
+            
             push(develop_events::EVENT_END_FRAME, event);
         }
 
         void push_record_float(const char* name, const float value) {
-            develop_events::RecordFloatEvent event = { .name = strdup(name), .value = value};
+            develop_events::RecordFloatEvent event = {
+                //.frame_id = device_globals::device().frame_id,
+                .name = strdup(name),
+                .value = value
+            };
             push(develop_events::EVENT_RECORD_FLOAT, event);
         }
     }
