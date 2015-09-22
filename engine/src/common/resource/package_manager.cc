@@ -5,6 +5,7 @@
 #include "common/container/hash.h"
 #include "common/memory/memory.h"
 #include "common/crypto/murmur_hash.h"
+#include "common/device.h"
 
 #include "runtime/runtime.h"
 
@@ -43,7 +44,8 @@ namespace cetech {
         }
 
         void load(StringId64_t name) {
-            const void* res = resource_manager::get(package_manager_globals::pm->type_hash, name);
+            const void* res = device_globals::device().resource_manager()->get(package_manager_globals::pm->type_hash,
+                                                                               name);
 
             if (res == nullptr) {
                 log::error("package_manager", "Could not get resource for package " "%" PRIx64, name);
@@ -56,12 +58,13 @@ namespace cetech {
             const uint64_t count = header->count;
             for (uint64_t i = 0; i < count; ++i) {
                 resource_package::Item& item = items[i];
-                resource_manager::load(item.type, item.name);
+                device_globals::device().resource_manager()->load(item.type, item.name);
             }
         }
 
         void unload(StringId64_t name) {
-            const void* res = resource_manager::get(package_manager_globals::pm->type_hash, name);
+            const void* res = device_globals::device().resource_manager()->get(package_manager_globals::pm->type_hash,
+                                                                               name);
 
             if (res == nullptr) {
                 log::error("package_manager", "Could not get resource for package " "%" PRIx64, name);
@@ -74,12 +77,13 @@ namespace cetech {
             const uint64_t count = header->count;
             for (uint64_t i = 0; i < count; ++i) {
                 resource_package::Item& item = items[i];
-                resource_manager::unload(item.type, item.name);
+                device_globals::device().resource_manager()->unload(item.type, item.name);
             }
         }
 
         bool is_loaded(StringId64_t name) {
-            const void* res = resource_manager::get(package_manager_globals::pm->type_hash, name);
+            const void* res = device_globals::device().resource_manager()->get(package_manager_globals::pm->type_hash,
+                                                                               name);
 
             if (res == nullptr) {
                 log::error("package_manager", "Could not get resource for package " "%" PRIx64, name);
@@ -93,7 +97,7 @@ namespace cetech {
             for (uint64_t i = 0; i < count; ++i) {
                 resource_package::Item& item = items[i];
 
-                if (!resource_manager::can_get(item.type, item.name)) {
+                if (!device_globals::device().resource_manager()->can_get(item.type, item.name)) {
                     return false;
                 }
             }
