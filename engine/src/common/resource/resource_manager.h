@@ -7,26 +7,27 @@
 #include "runtime/runtime_types.h"
 
 namespace cetech {
-    namespace resource_manager_globals {
-        void init();
-        void shutdown();
-    }
+    class ResourceManager {
+        public:
+            typedef void (* resource_compiler_clb_t)(File&, File&);
+            typedef void* (* resource_loader_clb_t)(File&, Allocator&);
+            typedef void (* resource_unloader_clb_t)(Allocator&, void*);
+            
+            virtual ~ResourceManager(){}
 
-    namespace resource_manager {
-        typedef void (* resource_compiler_clb_t)(File&, File&);
-        typedef void* (* resource_loader_clb_t)(File&, Allocator&);
-        typedef void (* resource_unloader_clb_t)(Allocator&, void*);
+            virtual void register_compiler(StringId64_t type, resource_compiler_clb_t clb) = 0;
+            virtual void register_loader(StringId64_t type, resource_loader_clb_t clb) = 0;
+            virtual void register_unloader(StringId64_t type, resource_unloader_clb_t clb) = 0;
 
-        void register_compiler(StringId64_t type, resource_compiler_clb_t clb);
-        void register_loader(StringId64_t type, resource_loader_clb_t clb);
-        void register_unloader(StringId64_t type, resource_unloader_clb_t clb);
+            virtual void compile(const char* filename) = 0;
 
-        void compile(const char* filename);
+            virtual void load(StringId64_t type, StringId64_t name) = 0;
+            virtual void unload(StringId64_t type, StringId64_t name) = 0;
 
-        void load(StringId64_t type, StringId64_t name);
-        void unload(StringId64_t type, StringId64_t name);
-
-        bool can_get(StringId64_t type, StringId64_t name);
-        const void* get(StringId64_t type, StringId64_t name);
-    }
+            virtual bool can_get(StringId64_t type, StringId64_t name) = 0;
+            virtual const void* get(StringId64_t type, StringId64_t name) = 0;
+            
+            static ResourceManager* make(Allocator& alocator);
+            static void destroy(Allocator& alocator, ResourceManager *rm);
+    };
 }

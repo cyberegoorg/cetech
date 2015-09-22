@@ -5,6 +5,7 @@
 #include "common/log/log.h"
 #include "common/crypto/murmur_hash.h"
 #include "common/resource/resource_manager.h"
+#include "common/device.h"
 
 namespace cetech {
     namespace lua_enviroment_globals {
@@ -65,7 +66,7 @@ namespace cetech {
             const char* name = lua_tostring( L, 1);
             StringId64_t name_hash = murmur_hash_64(name, strlen(name), 22);
 
-            const resource_lua::Resource* res = (resource_lua::Resource*)resource_manager::get(
+            const resource_lua::Resource* res = (resource_lua::Resource*) device_globals::device().resource_manager()->get(
                 resource_lua::type_hash(), name_hash);
 
             if (res == nullptr) {

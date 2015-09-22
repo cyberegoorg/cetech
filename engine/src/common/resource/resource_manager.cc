@@ -13,34 +13,7 @@
 #include <cstdio>
 
 namespace cetech {
-    struct ResourceManager {
-        Hash < void* > _data_map;
-
-        Hash < resource_manager::resource_loader_clb_t > _load_clb_map;
-        Hash < resource_manager::resource_unloader_clb_t > _unload_clb_map;
-        Hash < resource_manager::resource_compiler_clb_t > _compile_clb_map;
-
-        ResourceManager(Allocator & allocator) : _data_map(allocator),
-                                                 _load_clb_map(allocator),
-                                                 _unload_clb_map(allocator),
-                                                 _compile_clb_map(allocator) {}
-    };
-
-    namespace resource_manager_globals {
-        static ResourceManager* rm = nullptr;
-
-        void init() {
-            rm = MAKE_NEW(memory_globals::default_allocator(), ResourceManager, memory_globals::default_allocator());
-        }
-
-        void shutdown() {
-            MAKE_DELETE(memory_globals::default_allocator(), ResourceManager, rm);
-            rm = nullptr;
-        }
-    }
-
-
-    namespace resource_manager {
+    namespace resource_manager_internal {
         CE_INLINE void calc_hash(const char* path, StringId64_t& type, StringId64_t& name) {
             const char* t = strrchr(path, '.');
             CE_CHECK_PTR(t);
@@ -70,19 +43,27 @@ namespace cetech {
             resource_id_to_str(resource_srt, type, name);
             make_full_path(buffer, base_path, resource_srt);
         }
+    }
 
-        void compile(const char* filename) {
+    class ResourceManagerImplementation : public ResourceManager {
+        public:
+            ResourceManagerImplementation(Allocator & allocator) : _data_map(allocator),
+                                                    _load_clb_map(allocator),
+                                                    _unload_clb_map(allocator),
+                                                    _compile_clb_map(allocator) {}
+
+        virtual void compile(const char* filename) {
             uint64_t type = 0;
             uint64_t name = 0;
-            calc_hash(filename, type, name);
+            resource_manager_internal::calc_hash(filename, type, name);
 
             log::info("resource_manager", "Compile \"%s\" => (" "%" PRIx64 ", " "%" PRIx64 ").", filename, type, name);
 
             char output_filename[512] = {0};
-            make_resource_full_path(output_filename, cvars::rm_build_dir.value_str, type, name);
+            resource_manager_internal::make_resource_full_path(output_filename, cvars::rm_build_dir.value_str, type, name);
 
             char input_filename[512] = {0};
-            make_full_path(input_filename, cvars::rm_source_dir.value_str, filename);
+            resource_manager_internal::make_full_path(input_filename, cvars::rm_source_dir.value_str, filename);
 
             File f_in, f_out;
             f_in = runtime::file::from_file(input_filename, "rb");
@@ -92,12 +73,11 @@ namespace cetech {
                 return;
             }
 
-            ;
 
             f_out = runtime::file::from_file(output_filename, "wb");
 
             resource_compiler_clb_t clb = hash::get < resource_compiler_clb_t >
-                                          (resource_manager_globals::rm->_compile_clb_map, type, nullptr);
+                                          (this->_compile_clb_map, type, nullptr);
 
             if (clb == nullptr) {
                 log::error("resource_manager", "Resource type " "%" PRIx64 " not register compiler.", type);
@@ -110,11 +90,11 @@ namespace cetech {
             runtime::file::close(f_out);
         }
 
-        void load(StringId64_t type, StringId64_t name) {
+        virtual  void load(StringId64_t type, StringId64_t name) {
             log::info("resource_manager", "Loading resource (" "%" PRIx64 ", " "%" PRIx64 ").", type, name);
 
             resource_loader_clb_t clb = hash::get < resource_loader_clb_t >
-                                        (resource_manager_globals::rm->_load_clb_map, type, nullptr);
+                                        (this->_load_clb_map, type, nullptr);
 
             if (clb == nullptr) {
                 log::error("resource_manager", "Resource type " "%" PRIx64 " not register loader.", type);
@@ -122,7 +102,7 @@ namespace cetech {
             }
 
             char filename[512] = {0};
-            make_resource_full_path(filename, cvars::rm_build_dir.value_str, type, name);
+            resource_manager_internal::make_resource_full_path(filename, cvars::rm_build_dir.value_str, type, name);
 
             File f = runtime::file::from_file(filename, "r");
 
@@ -138,12 +118,12 @@ namespace cetech {
                 return;
             }
 
-            hash::set(resource_manager_globals::rm->_data_map, type ^ name, data);
+            hash::set(this->_data_map, type ^ name, data);
         }
 
-        void unload(StringId64_t type, StringId64_t name) {
+        virtual void unload(StringId64_t type, StringId64_t name) {
             resource_unloader_clb_t clb = hash::get < resource_unloader_clb_t >
-                                          (resource_manager_globals::rm->_unload_clb_map, type, nullptr);
+                                          (this->_unload_clb_map, type, nullptr);
 
             if (clb == nullptr) {
                 log::error("resource_manager", "Resource type " "%" PRIx64 " not register unloader.", type);
@@ -153,27 +133,42 @@ namespace cetech {
             void* data = (void*) get(type, name);
             clb(memory_globals::default_allocator(), data);
 
-            hash::remove(resource_manager_globals::rm->_data_map, type ^ name);
+            hash::remove(this->_data_map, type ^ name);
         }
 
-        bool can_get(StringId64_t type, StringId64_t name) {
-            return hash::has(resource_manager_globals::rm->_data_map, type ^ name);
+        virtual bool can_get(StringId64_t type, StringId64_t name) {
+            return hash::has(this->_data_map, type ^ name);
         }
 
-        const void* get(StringId64_t type, StringId64_t name) {
-            return hash::get < void* > (resource_manager_globals::rm->_data_map, type ^ name, nullptr);
+        virtual const void* get(StringId64_t type, StringId64_t name) {
+            return hash::get < void* > (this->_data_map, type ^ name, nullptr);
         }
 
-        void register_compiler(StringId64_t type, resource_compiler_clb_t clb) {
-            hash::set(resource_manager_globals::rm->_compile_clb_map, type, clb);
+        virtual void register_compiler(StringId64_t type, resource_compiler_clb_t clb) {
+            hash::set(this->_compile_clb_map, type, clb);
         }
 
-        void register_loader(StringId64_t type, resource_loader_clb_t clb) {
-            hash::set(resource_manager_globals::rm->_load_clb_map, type, clb);
+        virtual void register_loader(StringId64_t type, resource_loader_clb_t clb) {
+            hash::set(this->_load_clb_map, type, clb);
         }
 
-        void register_unloader(StringId64_t type, resource_unloader_clb_t clb) {
-            hash::set(resource_manager_globals::rm->_unload_clb_map, type, clb);
+        virtual void register_unloader(StringId64_t type, resource_unloader_clb_t clb) {
+            hash::set(this->_unload_clb_map, type, clb);
         }
+
+        public:
+            Hash < void* > _data_map;
+
+            Hash < resource_loader_clb_t > _load_clb_map;
+            Hash < resource_unloader_clb_t > _unload_clb_map;
+            Hash < resource_compiler_clb_t > _compile_clb_map;
+    };
+    
+    ResourceManager* ResourceManager::make(Allocator& alocator) {
+        return MAKE_NEW(alocator, ResourceManagerImplementation, alocator);
+    }
+
+    void ResourceManager::destroy(Allocator& alocator, ResourceManager *rm) {
+        MAKE_DELETE(memory_globals::default_allocator(), ResourceManager, rm);
     }
 }

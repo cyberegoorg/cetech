@@ -26,17 +26,17 @@ namespace cetech {
         };
 
         struct BeginFrameEvent {
-            //uint32_t frame_id;
+            uint32_t get_frame_id;
             uint32_t time;
         };
 
         struct EndFrameEvent {
-            //uint32_t frame_id;
+            uint32_t get_frame_id;
             uint32_t time;
         };
 
         struct RecordFloatEvent {
-            //uint32_t frame_id;
+            uint32_t get_frame_id;
             const char* name;
             float value;
         };
@@ -160,7 +160,7 @@ namespace cetech {
 
         void push_begin_frame() {
             develop_events::BeginFrameEvent event = {
-                //.frame_id = device_globals::device().frame_id,
+                .get_frame_id = device_globals::device().get_frame_id(),
                 .time = runtime::get_ticks()
             };
             
@@ -169,7 +169,7 @@ namespace cetech {
 
         void push_end_frame() {
             develop_events::EndFrameEvent event = {
-                //.frame_id = device_globals::device().frame_id,
+                .get_frame_id = device_globals::device().get_frame_id(),
                 .time = runtime::get_ticks()
             };
             
@@ -178,7 +178,7 @@ namespace cetech {
 
         void push_record_float(const char* name, const float value) {
             develop_events::RecordFloatEvent event = {
-                //.frame_id = device_globals::device().frame_id,
+                .get_frame_id = device_globals::device().get_frame_id(),
                 .name = strdup(name),
                 .value = value
             };
