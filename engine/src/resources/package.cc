@@ -34,17 +34,16 @@ namespace cetech {
                                document.GetParseError()), document.GetErrorOffset());
                 return;
             }
-            
 
             Header header = {document.MemberCount()};
             runtime::file::write(out, &header, sizeof(Header), 1);
 
             /* Prepare arrays structs */
-            Array<TypeHeader> typesheader(memory_globals::default_allocator());// TODO: TEMP ALLOCATOR
-            Array<StringId64_t> names(memory_globals::default_allocator());// TODO: TEMP ALLOCATOR
-            
+            Array < TypeHeader > typesheader(memory_globals::default_allocator()); // TODO: TEMP ALLOCATOR
+            Array < StringId64_t > names(memory_globals::default_allocator());     // TODO: TEMP ALLOCATOR
+
             uint32_t names_offset = sizeof(Header) + (sizeof(TypeHeader) * header.count);
-            
+
             for (rapidjson::Value::ConstMemberIterator itr = document.MemberBegin(); itr != document.MemberEnd();
                  ++itr) {
                 const rapidjson::Value& ar = itr->value;

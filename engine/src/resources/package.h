@@ -10,11 +10,15 @@
 #include "rapidjson/stringbuffer.h"
 
 namespace cetech {
+
+    /* Format.
+     * [header][type_header1, type_header1, ....][name11, name12, ...][name21, name22, ...]
+     */
     namespace resource_package {
         struct Header {
             uint64_t count;
         };
-        
+
         struct TypeHeader {
             StringId64_t type;
             uint64_t count;
