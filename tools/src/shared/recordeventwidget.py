@@ -22,7 +22,7 @@ class RecordEventWidget(QFrame, Ui_RecordEventsWidget):
 
         items = self.record_treewidget.findItems(name, Qt.MatchExactly)
 
-        if not len(items):
+        if  not len(items):
             item = QTreeWidgetItem([name, str(value)])
 
             self.record_treewidget.addTopLevelItem(item)

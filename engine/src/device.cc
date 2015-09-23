@@ -2,6 +2,8 @@
 
 #include <unistd.h>
 
+#include <csignal>
+
 #include "common/memory/memory.h"
 #include "common/command_line/command_line.h"
 #include "lua/lua_enviroment.h"
@@ -15,9 +17,49 @@
 #include "cvars/cvars.h"
 #include "runtime/runtime.h"
 
+extern "C" {
+static void posix_signal_handler(int sig)
+{
+        printf("sadsadsadsad\n");
+        fflush(stdout);
+        switch (sig) {
+        
+        case SIGKILL:
+        case SIGINT:
+                //device_globals::device().quit();
+                break;
+
+        default:
+                break;
+        }
+}
+
+        struct sigaction sigIntHandler;
+        void posix_init()
+        {
+            printf("posix_init\n");
+
+            struct sigaction new_action, old_action;
+            
+            new_action.sa_handler = posix_signal_handler;
+            sigemptyset(&new_action.sa_mask);
+            //sigaddset(&sigIntHandler.sa_mask, SIGTERM);
+            new_action.sa_flags = 0;
+
+        sigaction (SIGINT, NULL, &old_action);
+        if (old_action.sa_handler != SIG_IGN)
+            sigaction (SIGINT, &new_action, NULL);
+        }
+}
+
 namespace cetech {
     class DeviceImplementation : public Device {
         friend class Device;
+        
+        struct {
+            char run: 1;
+            char pause: 1;
+        } flags;
 
         uint32_t frame_id;
         uint32_t last_frame_ticks;
@@ -35,12 +77,14 @@ namespace cetech {
         virtual uint32_t get_frame_id() const {
             return this->frame_id;
         }
-
+        
         virtual void init(int argc, const char** argv) {
             command_line_globals::set_args(argc, argv);
 
             log::init();
             log::register_handler(&log_handlers::stdout_handler);
+
+            posix_init();
 
             develop_manager_ = DevelopManager::make(memory_globals::default_allocator());
             parse_command_line();
@@ -77,7 +121,6 @@ namespace cetech {
             LuaEnviroment::destroy(memory_globals::default_allocator(), lua_eviroment_);
 
             runtime::shutdown();
-            //memory_globals::shutdown();
         }
 
         virtual void run() {
@@ -89,9 +132,10 @@ namespace cetech {
 
                 log::debug("main", "Client connected.");
             }
-
+            
+            flags.run = 1;
             float dt = 0.0f;
-            while (1) {
+            while (flags.run) {
                 develop_manager_->push_begin_frame();
 
                 uint32_t now_ticks = runtime::get_ticks();
@@ -115,8 +159,15 @@ namespace cetech {
                 develop_manager_->clear();
                 ++(this->frame_id);
             }
+            
+            log::info("main", "Bye Bye");
         }
 
+        virtual void quit() {
+            flags.run = 0;
+            log::info("main", "Bye Bye!!!");
+        }
+        
         virtual ResourceManager& resource_manager() {
             return *(this->resource_manager_);
         }
@@ -136,7 +187,7 @@ namespace cetech {
         virtual LuaEnviroment& lua_enviroment() {
             return *(this->lua_eviroment_);
         }
-
+        
         CE_INLINE void register_resources() {
             struct ResourceRegistration {
                 StringId64_t type;
