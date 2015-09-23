@@ -3,8 +3,8 @@
 #include "math_types.h"
 #include "math.h"
 #include "simd/simd.h"
-#include "vector3.inl"
-#include "vector4.inl"
+#include "vector3.inl.h"
+#include "vector4.inl.h"
 
 namespace cetech {
     namespace matrix44 {

@@ -2,7 +2,7 @@
 
 #include "common/string/stringid_types.h"
 #include "common/memory/memory.h"
-#include "common/string/stringid.h"
+#include "common/string/stringid.inl.h"
 
 #include "runtime/runtime.h"
 

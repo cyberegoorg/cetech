@@ -1,7 +1,7 @@
 #include "catch.hpp"
 
 #include "common/memory/memory.h"
-#include "common/math/quat.inl"
+#include "common/math/quat.inl.h"
 
 #include "test_utils.h"
 

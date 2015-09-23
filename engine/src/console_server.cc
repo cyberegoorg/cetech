@@ -1,10 +1,10 @@
-#include "common/console_server/console_server.h"
+#include "console_server.h"
 
 #include "common/memory/memory.h"
-#include "common/container/array.inl"
-#include "common/container/hash.inl"
-#include "common/container/queue.inl"
-#include "common/string/stringid.h"
+#include "common/container/array.inl.h"
+#include "common/container/hash.inl.h"
+#include "common/container/queue.inl.h"
+#include "common/string/stringid.inl.h"
 #include "cvars/cvars.h"
 
 

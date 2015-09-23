@@ -3,7 +3,7 @@
 #include "common/string/stringid_types.h"
 #include "common/memory/memory.h"
 #include "runtime/runtime.h"
-#include "common/string/stringid.h"
+#include "common/string/stringid.inl.h"
 
 #include "rapidjson/document.h"
 #include "rapidjson/writer.h"

@@ -9,7 +9,7 @@
 #include "common/log/log.h"
 #include "common/asserts.h"
 #include "common/crypto/murmur_hash.h"
-#include "common/math/vector2.inl"
+#include "common/math/vector2.inl.h"
 #include "runtime/runtime.h"
 
 #include "SDL2/SDL.h"

@@ -5,7 +5,7 @@
 #include <ctime>
 
 #include "common/log/log.h"
-#include "common/console_server/console_server.h"
+#include "console_server.h"
 #include <device.h>
 
 #include "rapidjson/rapidjson.h"
