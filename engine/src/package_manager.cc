@@ -28,7 +28,7 @@ namespace cetech {
 
             resource_package::Header* header = (resource_package::Header*)res;
             resource_package::TypeHeader* type_header = (resource_package::TypeHeader*)(header + 1);
-            
+
             ResourceManager& rm = device_globals::device().resource_manager();
             const uint64_t types_count = header->count;
             for (uint64_t i = 0; i < types_count; ++i) {
@@ -70,10 +70,9 @@ namespace cetech {
                 return false;
             }
 
-
             resource_package::Header* header = (resource_package::Header*)res;
             resource_package::TypeHeader* type_header = (resource_package::TypeHeader*)(header + 1);
-            
+
             const uint64_t types_count = header->count;
             for (uint64_t i = 0; i < types_count; ++i) {
                 uint32_t count = type_header[i].count;

@@ -72,9 +72,9 @@ namespace cetech {
 
         virtual void load(StringId64_t type, const StringId64_t* names, const uint32_t count) {
             StringId64_t name = 0;
-            for( uint32_t i = 0; i < count; ++i ) {
+            for (uint32_t i = 0; i < count; ++i) {
                 name = names[i];
-                
+
                 log::info("resource_manager", "Loading resource (" "%" PRIx64 ", " "%" PRIx64 ").", type, name);
 
                 resource_loader_clb_t clb = hash::get < resource_loader_clb_t >
@@ -92,9 +92,9 @@ namespace cetech {
 
                 if (runtime::file::is_null(f)) {
                     log::error("resource_manager",
-                            "Could not open resouce (" "%" PRIx64 ", " "%" PRIx64 ").",
-                            type,
-                            name);
+                               "Could not open resouce (" "%" PRIx64 ", " "%" PRIx64 ").",
+                               type,
+                               name);
                     return;
                 }
 
@@ -102,9 +102,9 @@ namespace cetech {
 
                 if (data == nullptr) {
                     log::error("resource_manager",
-                            "Could not load resouce (" "%" PRIx64 ", " "%" PRIx64 ").",
-                            type,
-                            name);
+                               "Could not load resouce (" "%" PRIx64 ", " "%" PRIx64 ").",
+                               type,
+                               name);
                     return;
                 }
 
@@ -114,11 +114,11 @@ namespace cetech {
 
         virtual void unload(StringId64_t type, const StringId64_t* names, const uint32_t count) {
             StringId64_t name = 0;
-            for( uint32_t i = 0; i < count; ++i ) {
+            for (uint32_t i = 0; i < count; ++i) {
                 name = names[i];
-                
+
                 resource_unloader_clb_t clb = hash::get < resource_unloader_clb_t >
-                                            (this->_unload_clb_map, type, nullptr);
+                                              (this->_unload_clb_map, type, nullptr);
 
                 if (clb == nullptr) {
                     log::error("resource_manager", "Resource type " "%" PRIx64 " not register unloader.", type);
@@ -134,14 +134,14 @@ namespace cetech {
 
         virtual bool can_get(StringId64_t type, StringId64_t* names, const uint32_t count) {
             StringId64_t name = 0;
-            for( uint32_t i = 0; i < count; ++i) {
+            for (uint32_t i = 0; i < count; ++i) {
                 name = names[i];
-                
-                if(!hash::has(this->_data_map, type ^ name)) {
+
+                if (!hash::has(this->_data_map, type ^ name)) {
                     return false;
                 }
             }
-            
+
             return true;
         }
 
