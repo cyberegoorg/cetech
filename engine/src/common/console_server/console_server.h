@@ -1,46 +1,37 @@
 #pragma once
 
+#include "common/memory/memory_types.h"
+
 #include "rapidjson/document.h"
 
 namespace cetech {
-    namespace console_server_globals {
+    class ConsoleServer {
+    public:
         typedef void (* command_clb_t)(const rapidjson::Document&, rapidjson::Document&);
 
-        /*! Init.
-         */
-        void init();
-
-        /*! Shutdown.
-         */
-        void shutdown();
-
-        void frame_start();
-        void frame_end();
+        virtual ~ConsoleServer(){};
 
         /*! Execute console server operation.
          */
-        void tick();
+        virtual void tick() = 0;
 
         /*! Register command.
          * \param name Name
          * \param clb Callback.
          */
-        void register_command(const char* name, const command_clb_t clb);
+        virtual void register_command(const char* name, const command_clb_t clb) = 0;
 
         /*! Has console server any client?
          * \return True if has else return false./
          */
-        bool has_clients();
+        virtual bool has_clients() = 0;
 
         /*! Send JSON document.
          * \param document Json document.
          */
-        void send_json_document(const rapidjson::Document& document);
-
-        /*! Add frame event.
-         * \param type Message type.
-         * \param data Message data.
-         */
-        void add_frame_event(const char* type, rapidjson::Value& data);
-    }
+        virtual void send_json_document(const rapidjson::Document& document) = 0;
+        
+        static ConsoleServer* make(Allocator& alocator);
+        static void destroy(Allocator& alocator, ConsoleServer* cs);
+    };
 }

@@ -75,9 +75,11 @@ namespace cetech {
         }
 
         virtual void send_buffer() {
+            ConsoleServer& cs = device_globals::device().console_server();
+            
             flush_stream_buffer();
-
-            if (!console_server_globals::has_clients() || eventstream::empty(this->stream)) {
+            
+            if (!cs.has_clients() || eventstream::empty(this->stream)) {
                 return;
             }
 
@@ -103,7 +105,7 @@ namespace cetech {
                     to_json_fce(eventstream::event < void* > (this->stream, it), json_data);
                 }
 
-                console_server_globals::send_json_document(json_data);
+                cs.send_json_document(json_data);
 
                 it = eventstream::next(this->stream, it);
             }

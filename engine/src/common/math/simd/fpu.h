@@ -1,6 +1,6 @@
 #pragma once
 
-#include "common/debug/asserts.h"
+#include "common/asserts.h"
 #include "common/math/math.h"
 #include "common/memory/memory.h"
 
