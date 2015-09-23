@@ -1,9 +1,10 @@
 #include "develop_manager.h"
 
 #include "common/memory/memory.h"
-#include "common/container/hash.h"
+#include "common/container/hash.inl"
+#include "common/container/eventstream.inl"
 #include "common/console_server/console_server.h"
-#include "common/container/eventstream.h"
+
 #include "device.h"
 #include "runtime/runtime.h"
 

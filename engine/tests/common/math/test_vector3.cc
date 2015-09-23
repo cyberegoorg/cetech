@@ -1,7 +1,7 @@
 #include "catch.hpp"
 
 #include "common/memory/memory.h"
-#include "common/math/vector3.h"
+#include "common/math/vector3.inl"
 
 #include "test_utils.h"
 

@@ -1,7 +1,7 @@
 #pragma once
 
-#include "common/container/queue.h"
-#include "common/container/array.h"
+#include "common/container/queue.inl"
+#include "common/container/array.inl"
 
 namespace cetech {
     namespace handler {

@@ -7,7 +7,7 @@
 #include "common/handler/handler_manager.h"
 
 #include "common/memory/memory.h"
-#include "common/container/queue.h"
+#include "common/container/queue.inl"
 
 namespace cetech {
     namespace entity_manager_internal {
