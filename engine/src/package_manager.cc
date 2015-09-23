@@ -76,13 +76,12 @@ namespace cetech {
             
             const uint64_t types_count = header->count;
             for (uint64_t i = 0; i < types_count; ++i) {
+                uint32_t count = type_header[i].count;
                 StringId64_t type = type_header[i].type;
                 StringId64_t* names = (StringId64_t*)(res + type_header[i].offset);
-                
-                for (uint64_t ii = 0; ii < type_header[i].count; ++ii) {
-                    if (!device_globals::device().resource_manager().can_get(type, names[ii])) {
-                        return false;
-                    }
+
+                if (!device_globals::device().resource_manager().can_get(type, names, count)) {
+                    return false;
                 }
             }
 

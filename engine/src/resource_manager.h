@@ -24,7 +24,7 @@ namespace cetech {
             virtual void load(StringId64_t type, const StringId64_t* names, const uint32_t count) = 0;
             virtual void unload(StringId64_t type, const StringId64_t* names, const uint32_t count) = 0;
 
-            virtual bool can_get(StringId64_t type, StringId64_t name) = 0;
+            virtual bool can_get(StringId64_t type, StringId64_t* names, const uint32_t count) = 0;
             virtual const void* get(StringId64_t type, StringId64_t name) = 0;
 
             static ResourceManager* make(Allocator& alocator);
