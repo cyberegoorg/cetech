@@ -7,7 +7,7 @@
 
 #include "common/asserts.h"
 #include "common/cvar/cvar_types.h"
-#include "common/crypto/murmur_hash.h"
+#include "common/crypto/murmur_hash.inl.h"
 #include "common/log/log.h"
 #include "common/string/stringid_types.h"
 

@@ -3,8 +3,8 @@
 #include <unistd.h>
 
 #include "common/memory/memory.h"
-#include "common/lua/lua_env.h"
 #include "common/command_line/command_line.h"
+#include "lua/lua_enviroment.h"
 #include "resource_manager.h"
 #include "package_manager.h"
 #include "common/log/handlers.h"
@@ -22,11 +22,12 @@ namespace cetech {
         uint32_t frame_id;
         uint32_t last_frame_ticks;
         float delta_time;
+        
         ResourceManager* resource_manager_;
         PackageManager* package_manager_;
         DevelopManager* develop_manager_;
         ConsoleServer* console_server_;
-
+        LuaEnviroment* lua_eviroment_;
 
         virtual float get_delta_time() const {
             return this->delta_time;
@@ -49,7 +50,8 @@ namespace cetech {
             resource_manager_ = ResourceManager::make(memory_globals::default_allocator());
             package_manager_ = PackageManager::make(memory_globals::default_allocator());
             console_server_ = ConsoleServer::make(memory_globals::default_allocator());
-
+            lua_eviroment_ = LuaEnviroment::make(memory_globals::default_allocator());
+            
             load_config_json();
 
             console_server_->register_command("lua.execute", &cmd_lua_execute);
@@ -72,7 +74,8 @@ namespace cetech {
             ResourceManager::destroy(memory_globals::default_allocator(), resource_manager_);
             DevelopManager::destroy(memory_globals::default_allocator(), develop_manager_);
             ConsoleServer::destroy(memory_globals::default_allocator(), console_server_);
-
+            LuaEnviroment::destroy(memory_globals::default_allocator(), lua_eviroment_);
+            
             runtime::shutdown();
             //memory_globals::shutdown();
         }
@@ -130,6 +133,10 @@ namespace cetech {
             return *(this->console_server_);
         }
 
+        virtual LuaEnviroment& lua_enviroment() {
+            return *(this->lua_eviroment_);
+        }
+        
         CE_INLINE void register_resources() {
             struct ResourceRegistration {
                 StringId64_t type;
@@ -161,7 +168,7 @@ namespace cetech {
         }
 
         static void cmd_lua_execute(const rapidjson::Document& in, rapidjson::Document& out) {
-            lua_enviroment::execute_string(lua_enviroment_globals::global_env(), in["args"]["script"].GetString());
+            device_globals::device().lua_enviroment().execute_string(in["args"]["script"].GetString());
         }
 
         void join_build_dir(char* buffer, size_t max_len, const char* basename) {
@@ -233,7 +240,7 @@ namespace cetech {
 
             const resource_lua::Resource* res_lua = (const resource_lua::Resource*)resource_manager_->get(lua_hash,
                                                                                                           boot_script_name_h);
-            lua_enviroment::execute_resource(lua_enviroment_globals::global_env(), res_lua);
+            lua_eviroment_->execute_resource(res_lua);
         }
 
         void compile_all_resource() {

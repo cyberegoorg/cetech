@@ -8,7 +8,7 @@
 #include "common/macros.h"
 #include "common/log/log.h"
 #include "common/asserts.h"
-#include "common/crypto/murmur_hash.h"
+#include "common/crypto/murmur_hash.inl.h"
 #include "common/math/vector2.inl.h"
 #include "runtime/runtime.h"
 

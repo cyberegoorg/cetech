@@ -2,7 +2,7 @@
 
 #include "common/asserts.h"
 #include "common/string/stringid_types.h"
-#include "common/crypto/murmur_hash.h"
+#include "common/crypto/murmur_hash.inl.h"
 
 namespace cetech {
     namespace stringid64 {
