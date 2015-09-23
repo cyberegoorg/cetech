@@ -1,7 +1,7 @@
 #include "catch.hpp"
 
 #include "common/memory/memory.h"
-#include "common/math/matrix44.inl"
+#include "common/math/matrix44.inl.h"
 
 #include "test_utils.h"
 

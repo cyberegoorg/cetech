@@ -1,7 +1,7 @@
 #include "catch.hpp"
 
 #include "common/memory/memory.h"
-#include "common/math/matrix33.inl"
+#include "common/math/matrix33.inl.h"
 
 #include "test_utils.h"
 

@@ -5,7 +5,7 @@
 
 #include "common/log/log.h"
 #include "common/memory/memory.h"
-#include "common/container/array.inl"
+#include "common/container/array.inl.h"
 
 namespace cetech {
     namespace {

@@ -4,7 +4,7 @@
 
 #include "math_types.h"
 #include "math.h"
-#include "vector3.inl"
+#include "vector3.inl.h"
 #include "simd/simd.h"
 
 namespace cetech {

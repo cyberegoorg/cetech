@@ -3,7 +3,7 @@
 #include "resource_manager.h"
 #include "package_manager.h"
 #include "develop_manager.h"
-#include "common/console_server/console_server.h"
+#include "console_server.h"
 
 #include <inttypes.h>
 

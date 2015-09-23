@@ -1,9 +1,9 @@
 #pragma once
 
 #include "math_types.h"
-#include "math.inl"
+#include "math.inl.h"
 #include "simd/simd.h"
-#include "vector3.inl"
+#include "vector3.inl.h"
 
 namespace cetech {
     namespace matrix33 {

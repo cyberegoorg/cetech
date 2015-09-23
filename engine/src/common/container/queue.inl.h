@@ -2,7 +2,7 @@
 
 // based on bitsquid foundation
 #include "container_types.h"
-#include "array.inl"
+#include "array.inl.h"
 
 namespace cetech {
 

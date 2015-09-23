@@ -1,7 +1,7 @@
 #pragma once
 
 #include "math_types.h"
-#include "math.inl"
+#include "math.inl.h"
 
 namespace cetech {
     namespace vector3 {
