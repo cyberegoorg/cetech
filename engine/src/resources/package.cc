@@ -1,5 +1,6 @@
 #include "resources/package.h"
 
+#include "common/container/array.inl.h"
 #include "common/string/stringid_types.h"
 #include "common/memory/memory.h"
 #include "runtime/runtime.h"
@@ -33,37 +34,43 @@ namespace cetech {
                                document.GetParseError()), document.GetErrorOffset());
                 return;
             }
+            
 
-            Header header = {0};
-            Item item = {0, 0};
-
-            for (rapidjson::Value::ConstMemberIterator itr = document.MemberBegin(); itr != document.MemberEnd();
-                 ++itr) {
-                const rapidjson::Value& ar = itr->value;
-                CE_ASSERT(ar.IsArray());
-                for (rapidjson::SizeType i = 0; i < ar.Size(); ++i) {
-                    ++header.count;
-                }
-            }
-
+            Header header = {document.MemberCount()};
             runtime::file::write(out, &header, sizeof(Header), 1);
 
+            /* Prepare arrays structs */
+            Array<TypeHeader> typesheader(memory_globals::default_allocator());// TODO: TEMP ALLOCATOR
+            Array<StringId64_t> names(memory_globals::default_allocator());// TODO: TEMP ALLOCATOR
+            
+            uint32_t names_offset = sizeof(Header) + (sizeof(TypeHeader) * header.count);
+            
             for (rapidjson::Value::ConstMemberIterator itr = document.MemberBegin(); itr != document.MemberEnd();
                  ++itr) {
-                item.type = murmur_hash_64(itr->name.GetString(), strlen(itr->name.GetString()), 22);
-
                 const rapidjson::Value& ar = itr->value;
-
                 CE_ASSERT(ar.IsArray());
+
+                TypeHeader type_header = {
+                    .type = murmur_hash_64(itr->name.GetString(), strlen(itr->name.GetString()), 22),
+                    .count = ar.Size(),
+                    .offset = names_offset
+                };
+
+                names_offset += sizeof(StringId64_t) * ar.Size();
+
+                array::push_back(typesheader, type_header);
+
                 for (rapidjson::SizeType i = 0; i < ar.Size(); ++i) {
                     const rapidjson::Value& v = ar[i];
                     CE_ASSERT(v.IsString());
 
-                    item.name = murmur_hash_64(v.GetString(), strlen(v.GetString()), 22);
-
-                    runtime::file::write(out, &item, sizeof(Item), 1);
+                    array::push_back(names, murmur_hash_64(v.GetString(), strlen(v.GetString()), 22));
                 }
             }
+
+            /* Write types and names */
+            runtime::file::write(out, array::begin(typesheader), sizeof(TypeHeader), array::size(typesheader));
+            runtime::file::write(out, array::begin(names), sizeof(StringId64_t), array::size(names));
         }
 
         void* loader (File& f, Allocator& a) {

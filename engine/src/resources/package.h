@@ -14,10 +14,11 @@ namespace cetech {
         struct Header {
             uint64_t count;
         };
-
-        struct Item {
+        
+        struct TypeHeader {
             StringId64_t type;
-            StringId64_t name;
+            uint64_t count;
+            uint64_t offset;
         };
 
         StringId64_t type_hash();

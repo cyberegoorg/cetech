@@ -70,56 +70,66 @@ namespace cetech {
             runtime::file::close(f_out);
         }
 
-        virtual void load(StringId64_t type, StringId64_t name) {
-            log::info("resource_manager", "Loading resource (" "%" PRIx64 ", " "%" PRIx64 ").", type, name);
+        virtual void load(StringId64_t type, const StringId64_t* names, const uint32_t count) {
+            StringId64_t name = 0;
+            for( uint32_t i = 0; i < count; ++i ) {
+                name = names[i];
+                
+                log::info("resource_manager", "Loading resource (" "%" PRIx64 ", " "%" PRIx64 ").", type, name);
 
-            resource_loader_clb_t clb = hash::get < resource_loader_clb_t >
-                                        (this->_load_clb_map, type, nullptr);
+                resource_loader_clb_t clb = hash::get < resource_loader_clb_t >
+                                            (this->_load_clb_map, type, nullptr);
 
-            if (clb == nullptr) {
-                log::error("resource_manager", "Resource type " "%" PRIx64 " not register loader.", type);
-                return;
+                if (clb == nullptr) {
+                    log::error("resource_manager", "Resource type " "%" PRIx64 " not register loader.", type);
+                    return;
+                }
+
+                char filename[512] = {0};
+                make_resource_full_path(filename, cvars::rm_build_dir.value_str, type, name);
+
+                File f = runtime::file::from_file(filename, "r");
+
+                if (runtime::file::is_null(f)) {
+                    log::error("resource_manager",
+                            "Could not open resouce (" "%" PRIx64 ", " "%" PRIx64 ").",
+                            type,
+                            name);
+                    return;
+                }
+
+                void* data = clb(f, memory_globals::default_allocator());
+
+                if (data == nullptr) {
+                    log::error("resource_manager",
+                            "Could not load resouce (" "%" PRIx64 ", " "%" PRIx64 ").",
+                            type,
+                            name);
+                    return;
+                }
+
+                hash::set(this->_data_map, type ^ name, data);
             }
-
-            char filename[512] = {0};
-            make_resource_full_path(filename, cvars::rm_build_dir.value_str, type, name);
-
-            File f = runtime::file::from_file(filename, "r");
-
-            if (runtime::file::is_null(f)) {
-                log::error("resource_manager",
-                           "Could not open resouce (" "%" PRIx64 ", " "%" PRIx64 ").",
-                           type,
-                           name);
-                return;
-            }
-
-            void* data = clb(f, memory_globals::default_allocator());
-
-            if (data == nullptr) {
-                log::error("resource_manager",
-                           "Could not load resouce (" "%" PRIx64 ", " "%" PRIx64 ").",
-                           type,
-                           name);
-                return;
-            }
-
-            hash::set(this->_data_map, type ^ name, data);
         }
 
-        virtual void unload(StringId64_t type, StringId64_t name) {
-            resource_unloader_clb_t clb = hash::get < resource_unloader_clb_t >
-                                          (this->_unload_clb_map, type, nullptr);
+        virtual void unload(StringId64_t type, const StringId64_t* names, const uint32_t count) {
+            StringId64_t name = 0;
+            for( uint32_t i = 0; i < count; ++i ) {
+                name = names[i];
+                
+                resource_unloader_clb_t clb = hash::get < resource_unloader_clb_t >
+                                            (this->_unload_clb_map, type, nullptr);
 
-            if (clb == nullptr) {
-                log::error("resource_manager", "Resource type " "%" PRIx64 " not register unloader.", type);
-                return;
+                if (clb == nullptr) {
+                    log::error("resource_manager", "Resource type " "%" PRIx64 " not register unloader.", type);
+                    return;
+                }
+
+                void* data = (void*) get(type, name);
+                clb(memory_globals::default_allocator(), data);
+
+                hash::remove(this->_data_map, type ^ name);
             }
-
-            void* data = (void*) get(type, name);
-            clb(memory_globals::default_allocator(), data);
-
-            hash::remove(this->_data_map, type ^ name);
         }
 
         virtual bool can_get(StringId64_t type, StringId64_t name) {

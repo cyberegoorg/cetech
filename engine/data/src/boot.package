@@ -2,9 +2,5 @@
   "lua" : [
     "lua/cetech/log",
     "lua/boot"
-  ],
-  
-  "package" : [
-    "cetech/cetech"
   ]
 }

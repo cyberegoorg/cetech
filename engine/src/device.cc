@@ -226,7 +226,7 @@ namespace cetech {
             StringId64_t boot_script_name_h =
                 murmur_hash_64(cvars::boot_script.value_str, strlen(cvars::boot_script.value_str), 22);
 
-            resource_manager_->load(resource_package::type_hash(), boot_pkg_name_h);
+            resource_manager_->load(resource_package::type_hash(), &boot_pkg_name_h, 1);
             package_manager_->load(boot_pkg_name_h);
 
             StringId64_t lua_hash = murmur_hash_64("lua", 3, 22);
