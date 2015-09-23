@@ -1,6 +1,6 @@
 #pragma once
 
-#include "common/debug/asserts.h"
+#include "common/asserts.h"
 
 #include "math_types.h"
 #include "math.h"

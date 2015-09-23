@@ -1,6 +1,6 @@
 #pragma once
 
-#include "common/debug/asserts.h"
+#include "common/asserts.h"
 #include "common/string/stringid_types.h"
 #include "common/crypto/murmur_hash.h"
 

@@ -6,6 +6,7 @@
 
 #include "common/log/log.h"
 #include "common/console_server/console_server.h"
+#include <device.h>
 
 #include "rapidjson/rapidjson.h"
 #include "rapidjson/document.h"
@@ -91,7 +92,10 @@ namespace cetech {
                                            const char* where,
                                            const char* msg,
                                            void* data) {
-            if (!console_server_globals::has_clients()) {
+            
+            ConsoleServer& cs = device_globals::device().console_server();
+            
+            if (!cs.has_clients()) {
                 return;
             }
 
@@ -108,8 +112,7 @@ namespace cetech {
             json_data.AddMember("where", rapidjson::Value(where, strlen(where)), json_data.GetAllocator());
             json_data.AddMember("msg", rapidjson::Value(msg, strlen(msg)), json_data.GetAllocator());
 
-            console_server_globals::send_json_document(json_data);
-
+            cs.send_json_document(json_data);
         }
     }
 }

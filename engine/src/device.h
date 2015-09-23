@@ -3,6 +3,7 @@
 #include "resource_manager.h"
 #include "package_manager.h"
 #include "develop_manager.h"
+#include "common/console_server/console_server.h"
 
 #include <inttypes.h>
 
@@ -21,6 +22,7 @@ namespace cetech {
             virtual ResourceManager& resource_manager() = 0;
             virtual PackageManager& package_manager() = 0;
             virtual DevelopManager& develop_manager() = 0;
+            virtual ConsoleServer& console_server() = 0;
 
             static Device* make(Allocator& alocator);
             static void destroy(Allocator& alocator, Device* rm);

@@ -25,6 +25,7 @@ namespace cetech {
         ResourceManager* resource_manager_;
         PackageManager* package_manager_;
         DevelopManager* develop_manager_;
+        ConsoleServer* console_server_;
 
 
         virtual float get_delta_time() {
@@ -45,14 +46,13 @@ namespace cetech {
 
             runtime::init();
 
-
             resource_manager_ = ResourceManager::make(memory_globals::default_allocator());
             package_manager_ = PackageManager::make(memory_globals::default_allocator());
-
+            console_server_ = ConsoleServer::make(memory_globals::default_allocator());
+            
             load_config_json();
 
-            console_server_globals::init();
-            console_server_globals::register_command("lua.execute", &cmd_lua_execute);
+            console_server_->register_command("lua.execute", &cmd_lua_execute);
 
             log::register_handler(&log_handlers::console_server_handler);
 
@@ -71,17 +71,17 @@ namespace cetech {
             PackageManager::destroy(memory_globals::default_allocator(), package_manager_);
             ResourceManager::destroy(memory_globals::default_allocator(), resource_manager_);
             DevelopManager::destroy(memory_globals::default_allocator(), develop_manager_);
+            ConsoleServer::destroy(memory_globals::default_allocator(), console_server_);
 
-            console_server_globals::shutdown();
             runtime::shutdown();
-            memory_globals::shutdown();
+            //memory_globals::shutdown();
         }
 
         virtual void run() {
             if (command_line_globals::has_argument("--wait", 'w')) {
                 log::info("main", "Wating for clients.");
-                while (!console_server_globals::has_clients()) {
-                    console_server_globals::tick();
+                while (!console_server_->has_clients()) {
+                    console_server_->tick();
                 }
 
                 log::debug("main", "Client connected.");
@@ -100,7 +100,7 @@ namespace cetech {
                 develop_manager_->push_record_float("engine.frame_rate", 1.0f / dt);
 
                 runtime::frame_start();
-                console_server_globals::tick();
+                console_server_->tick();
                 //
 
                 usleep(3 * 1000);
@@ -126,6 +126,10 @@ namespace cetech {
             return *(this->develop_manager_);
         }
 
+        virtual ConsoleServer& console_server() {
+            return *(this->console_server_);
+        }
+        
         CE_INLINE void register_resources() {
             struct ResourceRegistration {
                 StringId64_t type;

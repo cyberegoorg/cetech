@@ -1,6 +1,6 @@
 #include <cstring>
 
-#include "common/debug/asserts.h"
+#include "common/asserts.h"
 #include "common/lua/lua_env.h"
 #include "common/log/log.h"
 #include "common/crypto/murmur_hash.h"
