@@ -27,7 +27,7 @@ namespace cetech {
         Hash < command_clb_t > cmds;
 
         ConsoleServerImplementation(Allocator & allocator) : client_peer(allocator), peer_free_queue(allocator),
-                                                cmds(allocator) {
+                                                             cmds(allocator) {
             server_addr.host = ENET_HOST_ANY;
             server_addr.port = cvars::console_server_port.value_i;
             server_host = enet_host_create(&server_addr, 32, 10, 0, 0);
@@ -142,10 +142,10 @@ namespace cetech {
         }
     };
 
-    ConsoleServer* ConsoleServer::make(Allocator& alocator){
+    ConsoleServer* ConsoleServer::make(Allocator& alocator) {
         return MAKE_NEW(alocator, ConsoleServerImplementation, alocator);
     }
-    
+
     void ConsoleServer::destroy(Allocator& alocator, ConsoleServer* cs) {
         MAKE_DELETE(memory_globals::default_allocator(), ConsoleServer, cs);
     }

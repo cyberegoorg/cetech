@@ -77,9 +77,9 @@ namespace cetech {
 
         virtual void send_buffer() {
             ConsoleServer& cs = device_globals::device().console_server();
-            
+
             flush_stream_buffer();
-            
+
             if (!cs.has_clients() || eventstream::empty(this->stream)) {
                 return;
             }
