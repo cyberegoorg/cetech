@@ -132,8 +132,17 @@ namespace cetech {
             }
         }
 
-        virtual bool can_get(StringId64_t type, StringId64_t name) {
-            return hash::has(this->_data_map, type ^ name);
+        virtual bool can_get(StringId64_t type, StringId64_t* names, const uint32_t count) {
+            StringId64_t name = 0;
+            for( uint32_t i = 0; i < count; ++i) {
+                name = names[i];
+                
+                if(!hash::has(this->_data_map, type ^ name)) {
+                    return false;
+                }
+            }
+            
+            return true;
         }
 
         virtual const void* get(StringId64_t type, StringId64_t name) {
