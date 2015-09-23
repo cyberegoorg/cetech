@@ -27,12 +27,16 @@ namespace cetech {
             }
 
             resource_package::Header* header = (resource_package::Header*)res;
-            resource_package::Item* items = (resource_package::Item*)(header + 1);
+            resource_package::TypeHeader* type_header = (resource_package::TypeHeader*)(header + 1);
+            
+            ResourceManager& rm = device_globals::device().resource_manager();
+            const uint64_t types_count = header->count;
+            for (uint64_t i = 0; i < types_count; ++i) {
+                uint32_t count = type_header[i].count;
+                StringId64_t type = type_header[i].type;
+                StringId64_t* names = (StringId64_t*)(res + type_header[i].offset);
 
-            const uint64_t count = header->count;
-            for (uint64_t i = 0; i < count; ++i) {
-                resource_package::Item& item = items[i];
-                device_globals::device().resource_manager().load(item.type, item.name);
+                rm.load(type, names, count);
             }
         }
 
@@ -45,12 +49,16 @@ namespace cetech {
             }
 
             resource_package::Header* header = (resource_package::Header*)res;
-            resource_package::Item* items = (resource_package::Item*)(header + 1);
+            resource_package::TypeHeader* type_header = (resource_package::TypeHeader*)(header + 1);
 
-            const uint64_t count = header->count;
-            for (uint64_t i = 0; i < count; ++i) {
-                resource_package::Item& item = items[i];
-                device_globals::device().resource_manager().unload(item.type, item.name);
+            ResourceManager& rm = device_globals::device().resource_manager();
+            const uint64_t types_count = header->count;
+            for (uint64_t i = 0; i < types_count; ++i) {
+                uint32_t count = type_header[i].count;
+                StringId64_t type = type_header[i].type;
+                StringId64_t* names = (StringId64_t*)(res + type_header[i].offset);
+
+                rm.unload(type, names, count);
             }
         }
 
@@ -62,15 +70,19 @@ namespace cetech {
                 return false;
             }
 
+
             resource_package::Header* header = (resource_package::Header*)res;
-            resource_package::Item* items = (resource_package::Item*)(header + 1);
-
-            const uint64_t count = header->count;
-            for (uint64_t i = 0; i < count; ++i) {
-                resource_package::Item& item = items[i];
-
-                if (!device_globals::device().resource_manager().can_get(item.type, item.name)) {
-                    return false;
+            resource_package::TypeHeader* type_header = (resource_package::TypeHeader*)(header + 1);
+            
+            const uint64_t types_count = header->count;
+            for (uint64_t i = 0; i < types_count; ++i) {
+                StringId64_t type = type_header[i].type;
+                StringId64_t* names = (StringId64_t*)(res + type_header[i].offset);
+                
+                for (uint64_t ii = 0; ii < type_header[i].count; ++ii) {
+                    if (!device_globals::device().resource_manager().can_get(type, names[ii])) {
+                        return false;
+                    }
                 }
             }
 
