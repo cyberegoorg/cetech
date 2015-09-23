@@ -1,7 +1,14 @@
 // based on bitsquid foundation
-#include "murmur_hash.h"
+#pragma once
+
+#include "platform/defines.h"
+#include "common/types.h"
 
 namespace cetech {
+    /*! Implementation of the 64 bit MurmurHash2 function http://murmurhash.googlepages.com/.
+     */
+    CE_INLINE uint64_t murmur_hash_64(const void* key, const uint32_t len, const uint64_t seed);
+
     uint64_t murmur_hash_64(const void* key, const uint32_t len, const uint64_t seed) {
         static const uint64_t m = 0xc6a4a7935bd1e995ULL;
         static const uint32_t r = 47;

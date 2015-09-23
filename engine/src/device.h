@@ -4,6 +4,7 @@
 #include "package_manager.h"
 #include "develop_manager.h"
 #include "console_server.h"
+#include "lua/lua_enviroment.h"
 
 #include <inttypes.h>
 
@@ -23,6 +24,7 @@ namespace cetech {
             virtual PackageManager& package_manager() = 0;
             virtual DevelopManager& develop_manager() = 0;
             virtual ConsoleServer& console_server() = 0;
+            virtual LuaEnviroment& lua_enviroment() = 0;
 
             static Device* make(Allocator& alocator);
             static void destroy(Allocator& alocator, Device* rm);

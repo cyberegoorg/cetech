@@ -3,7 +3,7 @@
 #include "common/string/stringid_types.h"
 #include "common/memory/memory.h"
 #include "runtime/runtime.h"
-#include "common/crypto/murmur_hash.h"
+#include "common/crypto/murmur_hash.inl.h"
 
 #include "rapidjson/document.h"
 #include "rapidjson/writer.h"

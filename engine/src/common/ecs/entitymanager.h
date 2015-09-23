@@ -13,6 +13,13 @@ namespace cetech {
     namespace entity_manager_internal {
         typename handler::HandlerManager < uint32_t, uint32_t, unsigned char, 22, 8, 1024 > entity_handler_manager;
     }
+    
+    namespace entity_manager {
+        CE_INLINE Entity create(EntityManager& em);
+        CE_INLINE void destroy(EntityManager& em, const Entity e);
+
+        CE_INLINE bool alive(const EntityManager& em, const Entity e);
+    }
 
     namespace entity_manager {
         Entity create(EntityManager& em) {
