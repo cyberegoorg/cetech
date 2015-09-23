@@ -1,6 +1,6 @@
 #pragma once
 
-#include "common/container/array.h"
+#include "common/container/array.inl"
 
 namespace cetech {
     namespace eventstream {

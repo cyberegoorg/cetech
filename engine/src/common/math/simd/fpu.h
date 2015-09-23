@@ -1,7 +1,7 @@
 #pragma once
 
 #include "common/asserts.h"
-#include "common/math/math.h"
+#include "common/math/math.inl"
 #include "common/memory/memory.h"
 
 #include "fpu_types.h"

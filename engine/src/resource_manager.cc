@@ -1,7 +1,7 @@
 #include "resource_manager.h"
 #include "common/container/container_types.h"
-#include "common/container/queue.h"
-#include "common/container/hash.h"
+#include "common/container/queue.inl"
+#include "common/container/hash.inl"
 #include "common/memory/memory.h"
 #include "common/string/stringid.h"
 
