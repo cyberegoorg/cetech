@@ -5,12 +5,12 @@
 #include "common/memory/memory.h"
 #include "common/command_line/command_line.h"
 #include "lua/lua_enviroment.h"
-#include "resource_manager.h"
-#include "package_manager.h"
+#include "resource/resource_manager.h"
+#include "package/package_manager.h"
 #include "common/log/handlers.h"
-#include "develop_manager.h"
+#include "develop/develop_manager.h"
 
-#include "resources/package.h"
+#include "package/package_resource.h"
 
 #include "cvars/cvars.h"
 #include "runtime/runtime.h"
@@ -22,7 +22,7 @@ namespace cetech {
         uint32_t frame_id;
         uint32_t last_frame_ticks;
         float delta_time;
-        
+
         ResourceManager* resource_manager_;
         PackageManager* package_manager_;
         DevelopManager* develop_manager_;
@@ -51,7 +51,7 @@ namespace cetech {
             package_manager_ = PackageManager::make(memory_globals::default_allocator());
             console_server_ = ConsoleServer::make(memory_globals::default_allocator());
             lua_eviroment_ = LuaEnviroment::make(memory_globals::default_allocator());
-            
+
             load_config_json();
 
             console_server_->register_command("lua.execute", &cmd_lua_execute);
@@ -75,7 +75,7 @@ namespace cetech {
             DevelopManager::destroy(memory_globals::default_allocator(), develop_manager_);
             ConsoleServer::destroy(memory_globals::default_allocator(), console_server_);
             LuaEnviroment::destroy(memory_globals::default_allocator(), lua_eviroment_);
-            
+
             runtime::shutdown();
             //memory_globals::shutdown();
         }
@@ -136,7 +136,7 @@ namespace cetech {
         virtual LuaEnviroment& lua_enviroment() {
             return *(this->lua_eviroment_);
         }
-        
+
         CE_INLINE void register_resources() {
             struct ResourceRegistration {
                 StringId64_t type;

@@ -1,4 +1,4 @@
-#include "resources/lua.h"
+#include "lua/lua_resource.h"
 
 #include "common/string/stringid_types.h"
 #include "common/memory/memory.h"

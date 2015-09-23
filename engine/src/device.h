@@ -1,9 +1,9 @@
 #pragma once
 
-#include "resource_manager.h"
-#include "package_manager.h"
-#include "develop_manager.h"
-#include "console_server.h"
+#include "resource/resource_manager.h"
+#include "package/package_manager.h"
+#include "develop/develop_manager.h"
+#include "develop/console_server.h"
 #include "lua/lua_enviroment.h"
 
 #include <inttypes.h>

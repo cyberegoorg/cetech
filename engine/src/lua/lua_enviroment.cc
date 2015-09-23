@@ -6,15 +6,15 @@
 #include "lua/lua_enviroment.h"
 #include "common/log/log.h"
 #include "common/crypto/murmur_hash.inl.h"
-#include "resource_manager.h"
+#include "resource/resource_manager.h"
 #include "device.h"
 
 namespace cetech {
     class LuaEnviromentImlementation : public LuaEnviroment {
         friend class LuaEnviroment;
-        
+
         lua_State* _state;
-        
+
         LuaEnviromentImlementation() {
             _state = luaL_newstate();
             CE_CHECK_PTR(_state);
@@ -77,7 +77,7 @@ namespace cetech {
             luaL_loadstring(L, resource_lua::get_source(res));
             return 1;
         }
-        
+
     };
 
     LuaEnviroment* LuaEnviroment::make(Allocator& alocator) {
@@ -87,32 +87,32 @@ namespace cetech {
     void LuaEnviroment::destroy(Allocator& alocator, LuaEnviroment* cs) {
         MAKE_DELETE(memory_globals::default_allocator(), LuaEnviroment, cs);
     }
-    
-//     namespace internal {
-//         static int error_handler(lua_State* L) {
-//             lua_getfield( L, LUA_GLOBALSINDEX, "debug");
-//             if (!lua_istable( L, -1)) {
-//                 lua_pop( L, 1);
-//                 return 0;
-//             }
-// 
-//             lua_getfield( L, -1, "traceback");
-//             if (!lua_isfunction( L, -1)) {
-//                 lua_pop( L, 2);
-//                 return 0;
-//             }
-// 
-//             lua_pushvalue( L, 1);
-//             lua_pushinteger( L, 2);
-//             lua_call( L, 2, 1);
-// 
-//             log::error("lua", lua_tostring( L, -1));
-// 
-//             lua_pop( L, 1);
-//             lua_pop( L, 1);
-// 
-//             return 0;
-//         }
-// 
-//     }
+
+    //     namespace internal {
+    //         static int error_handler(lua_State* L) {
+    //             lua_getfield( L, LUA_GLOBALSINDEX, "debug");
+    //             if (!lua_istable( L, -1)) {
+    //                 lua_pop( L, 1);
+    //                 return 0;
+    //             }
+    //
+    //             lua_getfield( L, -1, "traceback");
+    //             if (!lua_isfunction( L, -1)) {
+    //                 lua_pop( L, 2);
+    //                 return 0;
+    //             }
+    //
+    //             lua_pushvalue( L, 1);
+    //             lua_pushinteger( L, 2);
+    //             lua_call( L, 2, 1);
+    //
+    //             log::error("lua", lua_tostring( L, -1));
+    //
+    //             lua_pop( L, 1);
+    //             lua_pop( L, 1);
+    //
+    //             return 0;
+    //         }
+    //
+    //     }
 }

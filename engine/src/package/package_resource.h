@@ -10,7 +10,7 @@
 #include "rapidjson/stringbuffer.h"
 
 namespace cetech {
-    /* 
+    /*
      * Format.
      * [Header][TypeHeader1, TypeHeader2, ....][name11, name12, ...][name21, name22, ...]
      */
