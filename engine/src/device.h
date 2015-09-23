@@ -12,8 +12,8 @@ namespace cetech {
         public:
             virtual ~Device() {};
 
-            virtual uint32_t get_frame_id() = 0;
-            virtual float get_delta_time() = 0;
+            virtual uint32_t get_frame_id() const = 0;
+            virtual float get_delta_time() const = 0;
 
             virtual void init(int argc, const char** argv) = 0;
             virtual void shutdown() = 0;

@@ -28,10 +28,10 @@ namespace cetech {
         ConsoleServer* console_server_;
 
 
-        virtual float get_delta_time() {
+        virtual float get_delta_time() const {
             return this->delta_time;
         }
-        virtual uint32_t get_frame_id() {
+        virtual uint32_t get_frame_id() const {
             return this->frame_id;
         }
 
