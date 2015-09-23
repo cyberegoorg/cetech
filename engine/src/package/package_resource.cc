@@ -1,4 +1,4 @@
-#include "resources/package.h"
+#include "package/package_resource.h"
 
 #include "common/container/array.inl.h"
 #include "common/string/stringid_types.h"

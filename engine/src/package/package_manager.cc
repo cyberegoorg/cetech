@@ -1,5 +1,5 @@
 #include "package_manager.h"
-#include "resource_manager.h"
+#include "resource/resource_manager.h"
 #include "common/container/container_types.h"
 #include "common/container/queue.inl.h"
 #include "common/container/hash.inl.h"
@@ -9,7 +9,7 @@
 
 #include "runtime/runtime.h"
 
-#include "resources/package.h"
+#include "package/package_resource.h"
 
 #include <new>
 #include <cstdio>
