@@ -49,7 +49,7 @@ namespace cetech {
             resource_manager_ = ResourceManager::make(memory_globals::default_allocator());
             package_manager_ = PackageManager::make(memory_globals::default_allocator());
             console_server_ = ConsoleServer::make(memory_globals::default_allocator());
-            
+
             load_config_json();
 
             console_server_->register_command("lua.execute", &cmd_lua_execute);
@@ -129,7 +129,7 @@ namespace cetech {
         virtual ConsoleServer& console_server() {
             return *(this->console_server_);
         }
-        
+
         CE_INLINE void register_resources() {
             struct ResourceRegistration {
                 StringId64_t type;

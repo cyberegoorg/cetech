@@ -92,9 +92,9 @@ namespace cetech {
                                            const char* where,
                                            const char* msg,
                                            void* data) {
-            
+
             ConsoleServer& cs = device_globals::device().console_server();
-            
+
             if (!cs.has_clients()) {
                 return;
             }
