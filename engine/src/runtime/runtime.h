@@ -1,5 +1,6 @@
 #pragma once
 
+#include "common/container/container_types.h"
 #include "common/math/math_types.h"
 #include "runtime/runtime_types.h"
 
@@ -85,8 +86,9 @@ namespace cetech {
         namespace dir {
             CE_INLINE bool mkdir(const char* path);
             CE_INLINE bool mkpath(const char* path);
-            static void listdir(const char* name, const char* ignore_dir, char** files, uint32_t* file_count);
-            static void listdir_free(char** files, uint32_t file_count);
+
+            static void listdir(const char* name, const char* ignore_dir, Array < char* >& files);
+            static void listdir_free(Array < char* >& files);
         }
 
         namespace thread {
