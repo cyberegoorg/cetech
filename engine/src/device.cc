@@ -72,14 +72,14 @@ namespace cetech {
         LuaEnviroment* _lua_eviroment;
         FileSystem* _filesystem;
 
-        virtual float get_delta_time() const {
+        virtual float get_delta_time() const final {
             return this->_delta_time;
         }
-        virtual uint32_t get_frame_id() const {
+        virtual uint32_t get_frame_id() const final {
             return this->_frame_id;
         }
 
-        virtual void init(int argc, const char** argv) {
+        virtual void init(int argc, const char** argv) final {
             command_line_globals::set_args(argc, argv);
 
             log::init();
@@ -116,7 +116,7 @@ namespace cetech {
             this->_last_frame_ticks = runtime::get_ticks();
         }
 
-        virtual void shutdown() {
+        virtual void shutdown() final {
             PackageManager::destroy(memory_globals::default_allocator(), _package_manager);
             ResourceManager::destroy(memory_globals::default_allocator(), _resource_manager);
             DevelopManager::destroy(memory_globals::default_allocator(), _develop_manager);
@@ -126,7 +126,7 @@ namespace cetech {
             runtime::shutdown();
         }
 
-        virtual void run() {
+        virtual void run() final {
             if (command_line_globals::has_argument("--wait", 'w')) {
                 log::info("main", "Wating for clients.");
                 while (!_console_server->has_clients()) {
@@ -156,7 +156,7 @@ namespace cetech {
                 usleep(3 * 1000);
                 
                 if(!_flags.pause) {
-                    //game update(dt)
+                    //app.update(dt)
                 }
                 
                 //
@@ -170,28 +170,38 @@ namespace cetech {
             log::info("main", "Bye Bye");
         }
 
-        virtual void quit() {
+        virtual void quit() final {
             _flags.run = 0;
             log::info("main", "Bye Bye!!!");
         }
 
-        virtual ResourceManager& resource_manager() {
+        virtual ResourceManager& resource_manager() final {
+            CE_CHECK_PTR(this->_resource_manager);
+            
             return *(this->_resource_manager);
         }
 
-        virtual PackageManager& package_manager() {
+        virtual PackageManager& package_manager() final {
+            CE_CHECK_PTR(this->_resource_manager);
+            
             return *(this->_package_manager);
         }
 
-        virtual DevelopManager& develop_manager() {
+        virtual DevelopManager& develop_manager() final {
+            CE_CHECK_PTR(this->_resource_manager);
+            
             return *(this->_develop_manager);
         }
 
-        virtual ConsoleServer& console_server() {
+        virtual ConsoleServer& console_server() final {
+            CE_CHECK_PTR(this->_resource_manager);
+            
             return *(this->_console_server);
         }
 
-        virtual LuaEnviroment& lua_enviroment() {
+        virtual LuaEnviroment& lua_enviroment() final {
+            CE_CHECK_PTR(this->_resource_manager);
+            
             return *(this->_lua_eviroment);
         }
 
