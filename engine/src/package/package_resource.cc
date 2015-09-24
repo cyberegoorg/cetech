@@ -20,11 +20,11 @@ namespace cetech {
         }
 
 
-        void compiler(File& in, File& out) {
-            size_t sz_in = runtime::file::size(in);
+        void compiler(File* in, File* out) {
+            size_t sz_in = in->size();
 
             char tmp[4096] = {0};
-            runtime::file::read(in, tmp, sz_in, 4096);
+            in->read(tmp, sz_in);
 
             rapidjson::Document document;
             document.Parse(tmp);
@@ -36,7 +36,7 @@ namespace cetech {
             }
 
             Header header = {document.MemberCount()};
-            runtime::file::write(out, &header, sizeof(Header), 1);
+            out->write(&header, sizeof(Header));
 
             /* Prepare arrays structs */
             Array < TypeHeader > typesheader(memory_globals::default_allocator()); // TODO: TEMP ALLOCATOR
@@ -68,15 +68,15 @@ namespace cetech {
             }
 
             /* Write types and names */
-            runtime::file::write(out, array::begin(typesheader), sizeof(TypeHeader), array::size(typesheader));
-            runtime::file::write(out, array::begin(names), sizeof(StringId64_t), array::size(names));
+            out->write(array::begin(typesheader), sizeof(TypeHeader) * array::size(typesheader));
+            out->write(array::begin(names), sizeof(StringId64_t) * array::size(names));
         }
 
-        void* loader (File& f, Allocator& a) {
-            const uint64_t f_sz = runtime::file::size(f);
+        void* loader (File* f, Allocator& a) {
+            const uint64_t f_sz = f->size();
 
             void* mem = a.allocate(f_sz);
-            runtime::file::read(f, mem, sizeof(char), f_sz);
+            f->read(mem, f_sz);
 
             return mem;
         }

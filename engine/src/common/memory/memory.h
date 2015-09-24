@@ -2,6 +2,7 @@
 #pragma once
 
 #include <cstring>
+#include <new>
 
 #include "common/asserts.h"
 #include "common/types.h"

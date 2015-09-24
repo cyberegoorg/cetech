@@ -62,11 +62,11 @@ namespace cetech {
             register_type(EVENT_RECORD_FLOAT, "EVENT_RECORD_FLOAT", recordfloat_to_json);
         }
 
-        virtual void clear() {
+        virtual void clear() final {
             eventstream::clear(stream);
         }
 
-        virtual EventStream& event_stream() {
+        virtual EventStream& event_stream() final {
             return stream;
         }
 
@@ -75,7 +75,7 @@ namespace cetech {
             hash::set(this->type_to_string, type, type_str);
         }
 
-        virtual void send_buffer() {
+        virtual void send_buffer() final {
             ConsoleServer& cs = device_globals::device().console_server();
 
             flush_stream_buffer();
@@ -112,7 +112,7 @@ namespace cetech {
             }
         }
 
-        virtual void push_begin_frame() {
+        virtual void push_begin_frame() final {
             BeginFrameEvent event = {
                 .get_frame_id = device_globals::device().get_frame_id(),
                 .time = runtime::get_ticks()
@@ -121,7 +121,7 @@ namespace cetech {
             push(EVENT_BEGIN_FRAME, event);
         }
 
-        virtual void push_end_frame() {
+        virtual void push_end_frame() final {
             EndFrameEvent event = {
                 .get_frame_id = device_globals::device().get_frame_id(),
                 .time = runtime::get_ticks()
@@ -130,7 +130,7 @@ namespace cetech {
             push(EVENT_END_FRAME, event);
         }
 
-        virtual void push_record_float(const char* name, const float value) {
+        virtual void push_record_float(const char* name, const float value) final {
             RecordFloatEvent event = {
                 .get_frame_id = device_globals::device().get_frame_id(),
                 .name = strdup(name),

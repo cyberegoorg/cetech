@@ -19,25 +19,25 @@ namespace cetech {
         }
 
 
-        void compiler(File& in, File& out) {
-            size_t sz_in = runtime::file::size(in);
+        void compiler(File* in, File* out) {
+            size_t sz_in = in->size();
 
             char tmp[4096] = {0};
-            runtime::file::read(in, tmp, sz_in, 4096);
+            in->read(tmp, sz_in);
 
             Resource r;
             r.type = 1;
 
-            runtime::file::write(out, &r, sizeof(Resource), 1);
-
-            runtime::file::write(out, tmp, sz_in, 1);
+            out->write(&r, sizeof(Resource));
+            out->write(tmp, sz_in);
         }
 
-        void* loader (File& f, Allocator& a) {
-            const uint64_t f_sz = runtime::file::size(f);
+        void* loader (File* f, Allocator& a) {
+            const uint64_t f_sz = f->size();
 
             void* mem = a.allocate(f_sz + 1);
-            runtime::file::read(f, mem, sizeof(char), f_sz);
+            f->read(mem, f_sz);
+
             ((char*)mem)[f_sz] = '\0';
 
             return mem;

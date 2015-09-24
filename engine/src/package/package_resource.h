@@ -4,6 +4,7 @@
 #include "common/memory/memory.h"
 #include "runtime/runtime.h"
 #include "common/crypto/murmur_hash.inl.h"
+#include "filesystem/file.h"
 
 #include "rapidjson/document.h"
 #include "rapidjson/writer.h"
@@ -27,8 +28,8 @@ namespace cetech {
 
         StringId64_t type_hash();
 
-        void compiler(File& in, File& out);
-        void* loader(File& f, Allocator& a);
+        void compiler(File* in, File* out);
+        void* loader(File* f, Allocator& a);
         void unloader(Allocator& a, void* data);
     }
 }

@@ -3,7 +3,6 @@
 
 #include <stdlib.h>
 #include <assert.h>
-#include <new>
 
 namespace {
     using namespace cetech;
