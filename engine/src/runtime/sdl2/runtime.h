@@ -8,6 +8,7 @@
 #include "common/macros.h"
 #include "common/log/log.h"
 #include "common/asserts.h"
+#include "common/container/array.inl.h"
 #include "common/crypto/murmur_hash.inl.h"
 #include "common/math/vector2.inl.h"
 #include "runtime/runtime.h"
@@ -385,7 +386,7 @@ namespace cetech {
                 return status;
             }
 
-            void listdir(const char* name, const char* ignore_dir, char** files, uint32_t* file_count) {
+            void listdir(const char* name, const char* ignore_dir, Array < char* >& files) {
                 DIR* dir;
                 struct dirent* entry;
 
@@ -416,23 +417,22 @@ namespace cetech {
 
                         path[len] = '\0';
 
-                        listdir(path, ignore_dir, files, file_count);
+                        listdir(path, ignore_dir, files);
                     } else {
                         uint32_t size = strlen(name) + strlen(entry->d_name) + 2;
                         char* path = (char*)malloc(sizeof(char) * size);
 
                         snprintf(path, size - 1, "%s%s", name, entry->d_name);
 
-                        files[*file_count] = path;
-                        ++(*file_count);
+                        array::push_back(files, path);
                     }
                 } while ((entry = readdir(dir)));
 
                 closedir(dir);
             }
 
-            void listdir_free(char** files, uint32_t file_count) {
-                for (uint32_t i = 0; i < file_count; ++i) {
+            void listdir_free(Array < char* >& files) {
+                for (uint32_t i = 0; i < array::size(files); ++i) {
                     free(files[i]);
                 }
             }

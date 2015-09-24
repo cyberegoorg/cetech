@@ -34,11 +34,11 @@ namespace cetech {
 
     namespace log {
         void init() {
-            _logger = new Logger(memory_globals::default_allocator());//MAKE_NEW(memory_globals::default_allocator(), Logger, memory_globals::default_allocator());
+            _logger = MAKE_NEW(memory_globals::default_allocator(), Logger, memory_globals::default_allocator());
         }
 
         void shutdown() {
-            delete _logger;//MAKE_DELETE(memory_globals::default_allocator(), Logger, _logger);
+            MAKE_DELETE(memory_globals::default_allocator(), Logger, _logger);
             _logger = nullptr;
         }
 
