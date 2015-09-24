@@ -1,5 +1,6 @@
 #pragma once
 
+#include "common/container/container_types.h"
 #include "filesystem/file.h"
 
 namespace cetech {
@@ -16,6 +17,9 @@ namespace cetech {
 
             virtual void create_directory(const char* path) = 0;
             virtual void delete_directory(const char* path) = 0;
+
+            // TODO: free files string, fce or new type with destructor?
+            virtual void list_directory(const char* path, Array < char* >& files) = 0;
 
             virtual void create_file(const char* path) = 0;
             virtual void delete_file(const char* path) = 0;

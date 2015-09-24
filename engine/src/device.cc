@@ -316,20 +316,10 @@ namespace cetech {
             }
 
             void compile_all_resource() {
-                Array < char* > files(memory_globals::default_allocator());
-
-                const size_t source_dir_len = cvars::rm_source_dir.str_len;
-
-                runtime::dir::listdir(cvars::rm_source_dir.value_str, "", files);
-
                 FileSystem* source_fs = disk_filesystem::make(
                     memory_globals::default_allocator(), cvars::rm_source_dir.value_str);
 
-                for (uint32_t i = 0; i < array::size(files); ++i) {
-                    const char* path_base = files[i] + source_dir_len; /* Base path */
-
-                    _resource_manager->compile(path_base, source_fs);
-                }
+                _resource_manager->compile(source_fs);
 
                 disk_filesystem::destroy(memory_globals::default_allocator(), source_fs);
             }

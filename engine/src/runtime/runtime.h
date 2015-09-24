@@ -87,7 +87,7 @@ namespace cetech {
             CE_INLINE bool mkdir(const char* path);
             CE_INLINE bool mkpath(const char* path);
 
-            static void listdir(const char* name, const char* ignore_dir, Array < char* >& files);
+            static void listdir(const char* name, Array < char* >& files);
             static void listdir_free(Array < char* >& files);
         }
 

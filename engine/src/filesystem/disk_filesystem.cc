@@ -105,6 +105,10 @@ namespace cetech {
             virtual void delete_directory(const char* path) final {/*TODO:*/
             };
 
+            virtual void list_directory ( const char* path, cetech::Array < char* >& files ) final {
+                runtime::dir::listdir(path, files);
+            }
+
             virtual void create_file(const char* path)  final {/*TODO:*/
             };
 
