@@ -59,24 +59,24 @@ namespace cetech {
         struct {
             char run : 1;
             char pause : 1;
-        } flags;
+        } _flags;
 
-        uint32_t frame_id;
-        uint32_t last_frame_ticks;
-        float delta_time;
+        uint32_t _frame_id;
+        uint32_t _last_frame_ticks;
+        float _delta_time;
 
-        ResourceManager* resource_manager_;
-        PackageManager* package_manager_;
-        DevelopManager* develop_manager_;
-        ConsoleServer* console_server_;
-        LuaEnviroment* lua_eviroment_;
-        FileSystem* filesystem_;
+        ResourceManager* _resource_manager;
+        PackageManager* _package_manager;
+        DevelopManager* _develop_manager;
+        ConsoleServer* _console_server;
+        LuaEnviroment* _lua_eviroment;
+        FileSystem* _filesystem;
 
         virtual float get_delta_time() const {
-            return this->delta_time;
+            return this->_delta_time;
         }
         virtual uint32_t get_frame_id() const {
-            return this->frame_id;
+            return this->_frame_id;
         }
 
         virtual void init(int argc, const char** argv) {
@@ -87,21 +87,21 @@ namespace cetech {
 
             posix_init();
 
-            develop_manager_ = DevelopManager::make(memory_globals::default_allocator());
+            _develop_manager = DevelopManager::make(memory_globals::default_allocator());
             parse_command_line();
 
             runtime::init();
 
-            filesystem_ = disk_filesystem::make(memory_globals::default_allocator(), cvars::rm_build_dir.value_str);
+            _filesystem = disk_filesystem::make(memory_globals::default_allocator(), cvars::rm_build_dir.value_str);
             load_config_json();
 
-            resource_manager_ = ResourceManager::make(memory_globals::default_allocator(), filesystem_);
-            package_manager_ = PackageManager::make(memory_globals::default_allocator());
-            console_server_ = ConsoleServer::make(memory_globals::default_allocator());
-            lua_eviroment_ = LuaEnviroment::make(memory_globals::default_allocator());
+            _resource_manager = ResourceManager::make(memory_globals::default_allocator(), _filesystem);
+            _package_manager = PackageManager::make(memory_globals::default_allocator());
+            _console_server = ConsoleServer::make(memory_globals::default_allocator());
+            _lua_eviroment = LuaEnviroment::make(memory_globals::default_allocator());
 
 
-            console_server_->register_command("lua.execute", &cmd_lua_execute);
+            _console_server->register_command("lua.execute", &cmd_lua_execute);
 
             log::register_handler(&log_handlers::console_server_handler);
 
@@ -113,15 +113,15 @@ namespace cetech {
 
             init_boot();
 
-            this->last_frame_ticks = runtime::get_ticks();
+            this->_last_frame_ticks = runtime::get_ticks();
         }
 
         virtual void shutdown() {
-            PackageManager::destroy(memory_globals::default_allocator(), package_manager_);
-            ResourceManager::destroy(memory_globals::default_allocator(), resource_manager_);
-            DevelopManager::destroy(memory_globals::default_allocator(), develop_manager_);
-            ConsoleServer::destroy(memory_globals::default_allocator(), console_server_);
-            LuaEnviroment::destroy(memory_globals::default_allocator(), lua_eviroment_);
+            PackageManager::destroy(memory_globals::default_allocator(), _package_manager);
+            ResourceManager::destroy(memory_globals::default_allocator(), _resource_manager);
+            DevelopManager::destroy(memory_globals::default_allocator(), _develop_manager);
+            ConsoleServer::destroy(memory_globals::default_allocator(), _console_server);
+            LuaEnviroment::destroy(memory_globals::default_allocator(), _lua_eviroment);
 
             runtime::shutdown();
         }
@@ -129,66 +129,70 @@ namespace cetech {
         virtual void run() {
             if (command_line_globals::has_argument("--wait", 'w')) {
                 log::info("main", "Wating for clients.");
-                while (!console_server_->has_clients()) {
-                    console_server_->tick();
+                while (!_console_server->has_clients()) {
+                    _console_server->tick();
                 }
 
                 log::debug("main", "Client connected.");
             }
 
-            flags.run = 1;
+            _flags.run = 1;
             float dt = 0.0f;
-            while (flags.run) {
-                develop_manager_->push_begin_frame();
+            while (_flags.run) {
+                _develop_manager->push_begin_frame();
 
                 uint32_t now_ticks = runtime::get_ticks();
-                dt = (now_ticks - this->last_frame_ticks) * 0.001f;
-                this->delta_time = dt;
-                this->last_frame_ticks = now_ticks;
+                dt = (now_ticks - this->_last_frame_ticks) * 0.001f;
+                this->_delta_time = dt;
+                this->_last_frame_ticks = now_ticks;
 
-                develop_manager_->push_record_float("engine.delta_time", dt);
-                develop_manager_->push_record_float("engine.frame_rate", 1.0f / dt);
+                _develop_manager->push_record_float("engine.delta_time", dt);
+                _develop_manager->push_record_float("engine.frame_rate", 1.0f / dt);
 
                 runtime::frame_start();
-                console_server_->tick();
+                _console_server->tick();
                 //
 
                 usleep(3 * 1000);
-
+                
+                if(!_flags.pause) {
+                    //game update(dt)
+                }
+                
                 //
                 runtime::frame_end();
-                develop_manager_->push_end_frame();
-                develop_manager_->send_buffer();
-                develop_manager_->clear();
-                ++(this->frame_id);
+                _develop_manager->push_end_frame();
+                _develop_manager->send_buffer();
+                _develop_manager->clear();
+                ++(this->_frame_id);
             }
 
             log::info("main", "Bye Bye");
         }
 
         virtual void quit() {
-            flags.run = 0;
+            _flags.run = 0;
             log::info("main", "Bye Bye!!!");
         }
 
         virtual ResourceManager& resource_manager() {
-            return *(this->resource_manager_);
+            return *(this->_resource_manager);
         }
 
         virtual PackageManager& package_manager() {
-            return *(this->package_manager_);
+            return *(this->_package_manager);
         }
 
         virtual DevelopManager& develop_manager() {
-            return *(this->develop_manager_);
+            return *(this->_develop_manager);
         }
 
         virtual ConsoleServer& console_server() {
-            return *(this->console_server_);
+            return *(this->_console_server);
         }
 
         virtual LuaEnviroment& lua_enviroment() {
-            return *(this->lua_eviroment_);
+            return *(this->_lua_eviroment);
         }
 
         CE_INLINE void register_resources() {
@@ -214,9 +218,9 @@ namespace cetech {
 
             const ResourceRegistration* it = resource_regs;
             while (it->type != 0) {
-                resource_manager_->register_unloader(it->type, it->unloader);
-                resource_manager_->register_loader(it->type, it->loader);
-                resource_manager_->register_compiler(it->type, it->compiler);
+                _resource_manager->register_unloader(it->type, it->unloader);
+                _resource_manager->register_loader(it->type, it->loader);
+                _resource_manager->register_compiler(it->type, it->compiler);
                 ++it;
             }
         }
@@ -235,7 +239,7 @@ namespace cetech {
         }
 
         void load_config_json() {
-            File* f = filesystem_->open("config.json", File::READ);
+            File* f = _filesystem->open("config.json", File::READ);
 
             const uint64_t f_sz = f->size();
             void* mem = memory_globals::default_allocator().allocate(f_sz + 1);
@@ -243,7 +247,7 @@ namespace cetech {
 
             f->read(mem, f_sz);
 
-            filesystem_->close(f);
+            _filesystem->close(f);
 
             rapidjson::Document document;
             document.Parse((const char*)mem);
@@ -285,14 +289,14 @@ namespace cetech {
             StringId64_t boot_script_name_h =
                 murmur_hash_64(cvars::boot_script.value_str, strlen(cvars::boot_script.value_str), 22);
 
-            resource_manager_->load(resource_package::type_hash(), &boot_pkg_name_h, 1);
-            package_manager_->load(boot_pkg_name_h);
+            _resource_manager->load(resource_package::type_hash(), &boot_pkg_name_h, 1);
+            _package_manager->load(boot_pkg_name_h);
 
             StringId64_t lua_hash = murmur_hash_64("lua", 3, 22);
 
-            const resource_lua::Resource* res_lua = (const resource_lua::Resource*)resource_manager_->get(lua_hash,
+            const resource_lua::Resource* res_lua = (const resource_lua::Resource*)_resource_manager->get(lua_hash,
                                                                                                           boot_script_name_h);
-            lua_eviroment_->execute_resource(res_lua);
+            _lua_eviroment->execute_resource(res_lua);
         }
 
         void compile_all_resource() {
@@ -308,7 +312,7 @@ namespace cetech {
             for (uint32_t i = 0; i < files_count; ++i) {
                 const char* path_base = files[i] + source_dir_len; /* Base path */
 
-                resource_manager_->compile(path_base, source_fs);
+                _resource_manager->compile(path_base, source_fs);
             }
 
             disk_filesystem::destroy(memory_globals::default_allocator(), source_fs);

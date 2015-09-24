@@ -89,19 +89,21 @@ namespace cetech {
                 MAKE_DELETE(_allocator, File, file);
             };
 
-            virtual bool exists(const char* path) final {};
+            virtual bool exists(const char* path) final {/*TODO:*/};
 
-            virtual bool is_directory(const char* path) final {};
+            virtual bool is_directory(const char* path) final {/*TODO:*/};
 
-            virtual bool is_file(const char* path)  final {};
+            virtual bool is_file(const char* path)  final {/*TODO:*/};
 
-            virtual void create_directory(const char* path)  final {};
+            virtual void create_directory(const char* path)  final {
+                runtime::dir::mkpath(path);
+            };
 
-            virtual void delete_directory(const char* path) final {};
+            virtual void delete_directory(const char* path) final {/*TODO:*/};
 
-            virtual void create_file(const char* path)  final {};
+            virtual void create_file(const char* path)  final {/*TODO:*/};
 
-            virtual void delete_file(const char* path)  final {};
+            virtual void delete_file(const char* path)  final {/*TODO:*/};
 
             void absolute_path(char* buffer, const char* path) {
                 std::sprintf(buffer, "%s%s", _root_path, path);
