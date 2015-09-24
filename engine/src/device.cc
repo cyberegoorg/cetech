@@ -11,6 +11,7 @@
 #include "package/package_manager.h"
 #include "common/log/handlers.h"
 #include "develop/develop_manager.h"
+#include "filesystem/disk_filesystem.h"
 
 #include "package/package_resource.h"
 
@@ -18,47 +19,46 @@
 #include "runtime/runtime.h"
 
 extern "C" {
-static void posix_signal_handler(int sig)
-{
-        printf("sadsadsadsad\n");
-        fflush(stdout);
-        switch (sig) {
-        
-        case SIGKILL:
-        case SIGINT:
-                //device_globals::device().quit();
-                break;
+static void posix_signal_handler(int sig) {
+    printf("sadsadsadsad\n");
+    fflush(stdout);
+    switch (sig) {
 
-        default:
-                break;
-        }
+    case SIGKILL:
+    case SIGINT:
+        //device_globals::device().quit();
+        break;
+
+    default:
+        break;
+    }
 }
 
-        struct sigaction sigIntHandler;
-        void posix_init()
-        {
-            printf("posix_init\n");
+struct sigaction sigIntHandler;
+void posix_init() {
+    printf("posix_init\n");
 
-            struct sigaction new_action, old_action;
-            
-            new_action.sa_handler = posix_signal_handler;
-            sigemptyset(&new_action.sa_mask);
-            //sigaddset(&sigIntHandler.sa_mask, SIGTERM);
-            new_action.sa_flags = 0;
+    struct sigaction new_action, old_action;
 
-        sigaction (SIGINT, NULL, &old_action);
-        if (old_action.sa_handler != SIG_IGN)
-            sigaction (SIGINT, &new_action, NULL);
-        }
+    new_action.sa_handler = posix_signal_handler;
+    sigemptyset(&new_action.sa_mask);
+    //sigaddset(&sigIntHandler.sa_mask, SIGTERM);
+    new_action.sa_flags = 0;
+
+    sigaction(SIGINT, NULL, &old_action);
+    if (old_action.sa_handler != SIG_IGN) {
+        sigaction(SIGINT, &new_action, NULL);
+    }
+}
 }
 
 namespace cetech {
     class DeviceImplementation : public Device {
         friend class Device;
-        
+
         struct {
-            char run: 1;
-            char pause: 1;
+            char run : 1;
+            char pause : 1;
         } flags;
 
         uint32_t frame_id;
@@ -70,6 +70,7 @@ namespace cetech {
         DevelopManager* develop_manager_;
         ConsoleServer* console_server_;
         LuaEnviroment* lua_eviroment_;
+        FileSystem* filesystem_;
 
         virtual float get_delta_time() const {
             return this->delta_time;
@@ -77,7 +78,7 @@ namespace cetech {
         virtual uint32_t get_frame_id() const {
             return this->frame_id;
         }
-        
+
         virtual void init(int argc, const char** argv) {
             command_line_globals::set_args(argc, argv);
 
@@ -91,12 +92,14 @@ namespace cetech {
 
             runtime::init();
 
-            resource_manager_ = ResourceManager::make(memory_globals::default_allocator());
+            filesystem_ = disk_filesystem::make(memory_globals::default_allocator(), cvars::rm_build_dir.value_str);
+            load_config_json();
+
+            resource_manager_ = ResourceManager::make(memory_globals::default_allocator(), filesystem_);
             package_manager_ = PackageManager::make(memory_globals::default_allocator());
             console_server_ = ConsoleServer::make(memory_globals::default_allocator());
             lua_eviroment_ = LuaEnviroment::make(memory_globals::default_allocator());
 
-            load_config_json();
 
             console_server_->register_command("lua.execute", &cmd_lua_execute);
 
@@ -132,7 +135,7 @@ namespace cetech {
 
                 log::debug("main", "Client connected.");
             }
-            
+
             flags.run = 1;
             float dt = 0.0f;
             while (flags.run) {
@@ -159,7 +162,7 @@ namespace cetech {
                 develop_manager_->clear();
                 ++(this->frame_id);
             }
-            
+
             log::info("main", "Bye Bye");
         }
 
@@ -167,7 +170,7 @@ namespace cetech {
             flags.run = 0;
             log::info("main", "Bye Bye!!!");
         }
-        
+
         virtual ResourceManager& resource_manager() {
             return *(this->resource_manager_);
         }
@@ -187,7 +190,7 @@ namespace cetech {
         virtual LuaEnviroment& lua_enviroment() {
             return *(this->lua_eviroment_);
         }
-        
+
         CE_INLINE void register_resources() {
             struct ResourceRegistration {
                 StringId64_t type;
@@ -232,23 +235,21 @@ namespace cetech {
         }
 
         void load_config_json() {
-            char config_path[1024] = {0};
-            join_build_dir(config_path, 1024, "config.json");
+            File* f = filesystem_->open("config.json", File::READ);
 
-            File f = runtime::file::from_file(config_path, "rb");
-            const uint64_t f_sz = runtime::file::size(f);
+            const uint64_t f_sz = f->size();
             void* mem = memory_globals::default_allocator().allocate(f_sz + 1);
             memset(mem, 0, f_sz + 1);
 
-            runtime::file::read(f, mem, sizeof(char), f_sz);
+            f->read(mem, f_sz);
+
+            filesystem_->close(f);
 
             rapidjson::Document document;
             document.Parse((const char*)mem);
             cvar::load_from_json(document);
 
             memory_globals::default_allocator().deallocate(mem);
-
-            runtime::file::close(f);
         }
 
         void make_path(char* buffer, size_t max_size, const char* path) {
@@ -301,11 +302,16 @@ namespace cetech {
 
             runtime::dir::listdir(cvars::rm_source_dir.value_str, "", files, &files_count);
 
+            FileSystem* source_fs = disk_filesystem::make(
+                memory_globals::default_allocator(), cvars::rm_source_dir.value_str);
+
             for (uint32_t i = 0; i < files_count; ++i) {
                 const char* path_base = files[i] + source_dir_len; /* Base path */
 
-                resource_manager_->compile(path_base);
+                resource_manager_->compile(path_base, source_fs);
             }
+
+            disk_filesystem::destroy(memory_globals::default_allocator(), source_fs);
         }
     };
 

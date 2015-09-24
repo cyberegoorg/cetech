@@ -38,11 +38,11 @@ namespace cetech {
             lua_pop(_state, 1);
         }
 
-        virtual ~LuaEnviromentImlementation() {
+        virtual ~LuaEnviromentImlementation() final {
             lua_close(_state);
         }
 
-        virtual void execute_resource(const resource_lua::Resource* res) {
+        virtual void execute_resource(const resource_lua::Resource* res) final {
             //lua_pushcfunction(_state, error_handler);
 
             if (luaL_dostring(_state, resource_lua::get_source(res))) {
@@ -52,7 +52,7 @@ namespace cetech {
             }
         }
 
-        virtual void execute_string(const char* str) {
+        virtual void execute_string(const char* str) final {
             //lua_pushcfunction(_state, error_handler);
 
             if (luaL_dostring(_state, str)) {

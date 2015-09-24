@@ -13,25 +13,26 @@
 #include <cstdio>
 
 namespace cetech {
-    class ResourceManagerImplementation : public ResourceManager {
+    class ResourceManagerImplementation final : public ResourceManager {
         friend class ResourceManager;
+
+        FileSystem* _fs;
 
         Hash < void* > _data_map;
         Hash < uint32_t > _data_refcount_map;
-        
+
         Hash < resource_loader_clb_t > _load_clb_map;
         Hash < resource_unloader_clb_t > _unload_clb_map;
         Hash < resource_compiler_clb_t > _compile_clb_map;
 
-        ResourceManagerImplementation(Allocator & allocator) : _data_map(allocator),
-                                                               _data_refcount_map(allocator),
-                                                               _load_clb_map(allocator),
-                                                               _unload_clb_map(allocator),
-                                                               _compile_clb_map(allocator) {}
+        ResourceManagerImplementation(FileSystem * fs, Allocator & allocator) : _fs(fs), _data_map(allocator),
+                                                                                _data_refcount_map(allocator),
+                                                                                _load_clb_map(allocator),
+                                                                                _unload_clb_map(allocator),
+                                                                                _compile_clb_map(allocator) {}
 
-        virtual void compile(const char* filename) {
-            uint64_t type = 0;
-            uint64_t name = 0;
+        virtual void compile(const char* filename, FileSystem* source_fs) final {
+            uint64_t name, type = 0;
             calc_hash(filename, type, name);
 
             log::info("resource_manager",
@@ -41,41 +42,35 @@ namespace cetech {
                       name);
 
             char output_filename[512] = {0};
-            make_resource_full_path(output_filename,
-                                    cvars::rm_build_dir.value_str,
-                                    type,
-                                    name);
+            resource_id_to_str(output_filename, type, name);
 
-            char input_filename[512] = {0};
-            make_full_path(input_filename, cvars::rm_source_dir.value_str, filename);
-
-            File f_in, f_out;
-            f_in = runtime::file::from_file(input_filename, "rb");
-            if (runtime::file::is_null(f_in)) {
-                log::error("resource_manager", "Could not open source file \"%s\"", input_filename);
-
+            File* f_in;
+            File* f_out;
+            f_in = source_fs->open(filename, File::READ);
+            if (!f_in->is_valid()) {
+                log::error("resource_manager", "Could not open source file \"%s\"", filename);
                 return;
             }
 
-            f_out = runtime::file::from_file(output_filename, "wb");
+            f_out = _fs->open(output_filename, File::WRITE);
 
             resource_compiler_clb_t clb = hash::get < resource_compiler_clb_t >
                                           (this->_compile_clb_map, type, nullptr);
 
             if (clb == nullptr) {
                 log::error("resource_manager", "Resource type " "%" PRIx64 " not register compiler.", type);
-                return;
+                goto close;
             }
 
             clb(f_in, f_out);
-
-            runtime::file::close(f_in);
-            runtime::file::close(f_out);
+close:
+            source_fs->close(f_in);
+            _fs->close(f_out);
         }
 
-        virtual void load(StringId64_t type, const StringId64_t* names, const uint32_t count) {
+        virtual void load(StringId64_t type, const StringId64_t* names, const uint32_t count) final {
             StringId64_t name = 0;
-            
+
             resource_loader_clb_t clb = hash::get < resource_loader_clb_t >
                                         (this->_load_clb_map, type, nullptr);
 
@@ -89,12 +84,12 @@ namespace cetech {
 
                 log::info("resource_manager", "Loading resource (" "%" PRIx64 ", " "%" PRIx64 ").", type, name);
 
-                char filename[512] = {0};
-                make_resource_full_path(filename, cvars::rm_build_dir.value_str, type, name);
+                char resource_srt[32 + 1] = {0};
+                resource_id_to_str(resource_srt, type, name);
 
-                File f = runtime::file::from_file(filename, "r");
+                File* f = _fs->open(resource_srt, File::READ);
 
-                if (runtime::file::is_null(f)) {
+                if (!f->is_valid()) {
                     log::error("resource_manager",
                                "Could not open resouce (" "%" PRIx64 ", " "%" PRIx64 ").",
                                type,
@@ -109,29 +104,31 @@ namespace cetech {
                                "Could not load resouce (" "%" PRIx64 ", " "%" PRIx64 ").",
                                type,
                                name);
-                    continue;
+                    goto close;
                 }
 
                 hash::set(this->_data_map, type ^ name, data);
                 inc_reference(type, name);
+close:
+                _fs->close(f);
             }
         }
 
-       
-        virtual void unload(StringId64_t type, const StringId64_t* names, const uint32_t count) {
+
+        virtual void unload(StringId64_t type, const StringId64_t* names, const uint32_t count) final {
             resource_unloader_clb_t clb = hash::get < resource_unloader_clb_t >
-                                            (this->_unload_clb_map, type, nullptr);
-            
+                                          (this->_unload_clb_map, type, nullptr);
+
             if (clb == nullptr) {
                 log::error("resource_manager", "Resource type " "%" PRIx64 " not register unloader.", type);
                 return;
             }
-            
+
             StringId64_t name = 0;
             for (uint32_t i = 0; i < count; ++i) {
                 name = names[i];
-                
-                if( !dec_reference(type, name) ) {
+
+                if (!dec_reference(type, name)) {
                     continue;
                 }
 
@@ -142,7 +139,7 @@ namespace cetech {
             }
         }
 
-        virtual bool can_get(StringId64_t type, StringId64_t* names, const uint32_t count) {
+        virtual bool can_get(StringId64_t type, StringId64_t* names, const uint32_t count) final {
             StringId64_t name = 0;
             for (uint32_t i = 0; i < count; ++i) {
                 name = names[i];
@@ -155,37 +152,37 @@ namespace cetech {
             return true;
         }
 
-        virtual const void* get(StringId64_t type, StringId64_t name) {
+        virtual const void* get(StringId64_t type, StringId64_t name) final {
             return hash::get < void* > (this->_data_map, type ^ name, nullptr);
         }
 
-        virtual void register_compiler(StringId64_t type, resource_compiler_clb_t clb) {
+        virtual void register_compiler(StringId64_t type, resource_compiler_clb_t clb) final {
             hash::set(this->_compile_clb_map, type, clb);
         }
 
-        virtual void register_loader(StringId64_t type, resource_loader_clb_t clb) {
+        virtual void register_loader(StringId64_t type, resource_loader_clb_t clb) final {
             hash::set(this->_load_clb_map, type, clb);
         }
 
-        virtual void register_unloader(StringId64_t type, resource_unloader_clb_t clb) {
+        virtual void register_unloader(StringId64_t type, resource_unloader_clb_t clb) final {
             hash::set(this->_unload_clb_map, type, clb);
         }
 
         CE_INLINE void inc_reference(StringId64_t type, const StringId64_t name) {
-            const uint32_t counter = hash::get<uint32_t>(_data_refcount_map, type ^ name, 0) + 1;
-            
-            log::debug("resource_manager",  "Inc reference for" "%" PRIx64 " counter == %d ", type^name, counter);
-            
+            const uint32_t counter = hash::get < uint32_t > (_data_refcount_map, type ^ name, 0) + 1;
+
+            log::debug("resource_manager", "Inc reference for" "%" PRIx64 " counter == %d ", type ^ name, counter);
+
             hash::set(_data_refcount_map, type ^ name, counter);
         }
-        
+
         CE_INLINE bool dec_reference(StringId64_t type, const StringId64_t name) {
-            const uint32_t counter = hash::get<uint32_t>(_data_refcount_map, type ^ name, 1) - 1;
-            
-            log::debug("resource_manager",  "Dec reference for" "%" PRIx64 " counter == %d ", type^name, counter);
-            
+            const uint32_t counter = hash::get < uint32_t > (_data_refcount_map, type ^ name, 1) - 1;
+
+            log::debug("resource_manager", "Dec reference for" "%" PRIx64 " counter == %d ", type ^ name, counter);
+
             hash::set(_data_refcount_map, type ^ name, counter);
-            
+
             return counter == 0;
         }
 
@@ -202,26 +199,13 @@ namespace cetech {
             name = stringid64::from_cstring_len(path, sz);
         }
 
-        CE_INLINE void make_full_path(char* buffer, const char* base_path, const char* filename) {
-            std::sprintf(buffer, "%s%s", base_path, filename);
-        }
-
         CE_INLINE void resource_id_to_str(char* buffer, const StringId64_t& type, const StringId64_t& name) {
             std::sprintf(buffer, "%" PRIx64 "%" PRIx64, type, name);
         }
-
-        CE_INLINE void make_resource_full_path(char* buffer,
-                                               const char* base_path,
-                                               const StringId64_t& type,
-                                               const StringId64_t& name) {
-            char resource_srt[32 + 1] = {0};
-            resource_id_to_str(resource_srt, type, name);
-            make_full_path(buffer, base_path, resource_srt);
-        }
     };
 
-    ResourceManager* ResourceManager::make(Allocator& alocator) {
-        return MAKE_NEW(alocator, ResourceManagerImplementation, alocator);
+    ResourceManager* ResourceManager::make(Allocator& alocator, FileSystem* fs) {
+        return MAKE_NEW(alocator, ResourceManagerImplementation, fs, alocator);
     }
 
     void ResourceManager::destroy(Allocator& alocator, ResourceManager* rm) {

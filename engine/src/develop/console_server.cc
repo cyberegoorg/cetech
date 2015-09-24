@@ -33,19 +33,19 @@ namespace cetech {
             server_host = enet_host_create(&server_addr, 32, 10, 0, 0);
         }
 
-        virtual ~ConsoleServerImplementation() {
+        virtual ~ConsoleServerImplementation() final {
             enet_host_destroy(server_host);
         }
 
-        virtual void register_command(const char* name, const command_clb_t clb) {
+        virtual void register_command(const char* name, const command_clb_t clb) final {
             hash::set(this->cmds, stringid64::from_cstring(name), clb);
         }
 
-        virtual bool has_clients() {
+        virtual bool has_clients() final {
             return array::size(this->client_peer) != 0;
         }
 
-        virtual void send_json_document(const rapidjson::Document& document) {
+        virtual void send_json_document(const rapidjson::Document& document) final {
             rapidjson::StringBuffer buffer;
             rapidjson::Writer < rapidjson::StringBuffer > writer(buffer);
             document.Accept(writer);
@@ -54,7 +54,7 @@ namespace cetech {
             enet_host_broadcast(server_host, 0, p);
         }
 
-        virtual void tick() {
+        virtual void tick() final {
             ENetEvent Event;
 
             while (enet_host_service(this->server_host, &Event, 0) > 0) {

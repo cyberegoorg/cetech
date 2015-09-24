@@ -18,7 +18,7 @@ namespace cetech {
     class PackageManagerImplementation : public PackageManager {
         friend class PackageManager;
 
-        virtual void load(StringId64_t name) {
+        virtual void load(StringId64_t name) final {
             const void* res = device_globals::device().resource_manager().get(resource_package::type_hash(), name);
 
             if (res == nullptr) {
@@ -40,7 +40,7 @@ namespace cetech {
             }
         }
 
-        virtual void unload(StringId64_t name) {
+        virtual void unload(StringId64_t name) final {
             const void* res = device_globals::device().resource_manager().get(resource_package::type_hash(), name);
 
             if (res == nullptr) {
@@ -62,7 +62,7 @@ namespace cetech {
             }
         }
 
-        virtual bool is_loaded(StringId64_t name) {
+        virtual bool is_loaded(StringId64_t name) final {
             const void* res = device_globals::device().resource_manager().get(resource_package::type_hash(), name);
 
             if (res == nullptr) {
@@ -87,7 +87,7 @@ namespace cetech {
             return true;
         }
 
-        virtual void flush(StringId64_t name) {
+        virtual void flush(StringId64_t name) final {
             while (!is_loaded(name)) {}
         }
     };
