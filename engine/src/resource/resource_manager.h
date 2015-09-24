@@ -21,7 +21,7 @@ namespace cetech {
             virtual void register_loader(StringId64_t type, resource_loader_clb_t clb) = 0;
             virtual void register_unloader(StringId64_t type, resource_unloader_clb_t clb) = 0;
 
-            virtual void compile(const char* filename, FileSystem* source_fs) = 0;
+            virtual void compile(FileSystem* source_fs) = 0;
 
             virtual void load(StringId64_t type, const StringId64_t* names, const uint32_t count) = 0;
             virtual void unload(StringId64_t type, const StringId64_t* names, const uint32_t count) = 0;

@@ -31,41 +31,52 @@ namespace cetech {
                                                                                 _unload_clb_map(allocator),
                                                                                 _compile_clb_map(allocator) {}
 
-        virtual void compile(const char* filename, FileSystem* source_fs) final {
-            uint64_t name, type = 0;
-            calc_hash(filename, type, name);
+        virtual void compile(FileSystem* source_fs) final {
+            Array < char* > files(memory_globals::default_allocator());
+            source_fs->list_directory(cvars::rm_source_dir.value_str, files);
 
-            log::info("resource_manager",
-                      "Compile \"%s\" => (" "%" PRIx64 ", " "%" PRIx64 ").",
-                      filename,
-                      type,
-                      name);
+            const size_t source_dir_len = cvars::rm_source_dir.str_len;
 
-            char output_filename[512] = {0};
-            resource_id_to_str(output_filename, type, name);
 
-            File* f_in;
-            File* f_out;
-            f_in = source_fs->open(filename, File::READ);
-            if (!f_in->is_valid()) {
-                log::error("resource_manager", "Could not open source file \"%s\"", filename);
-                return;
-            }
+            for (uint32_t i = 0; i < array::size(files); ++i) {
+                const char* filename = files[i] + source_dir_len; /* Base path */
 
-            f_out = _fs->open(output_filename, File::WRITE);
 
-            resource_compiler_clb_t clb = hash::get < resource_compiler_clb_t >
-                                          (this->_compile_clb_map, type, nullptr);
+                uint64_t name, type = 0;
+                calc_hash(filename, type, name);
 
-            if (clb == nullptr) {
-                log::error("resource_manager", "Resource type " "%" PRIx64 " not register compiler.", type);
-                goto close;
-            }
+                log::info("resource_manager",
+                          "Compile \"%s\" => (" "%" PRIx64 ", " "%" PRIx64 ").",
+                          filename,
+                          type,
+                          name);
 
-            clb(f_in, f_out);
+                char output_filename[512] = {0};
+                resource_id_to_str(output_filename, type, name);
+
+                File* f_in;
+                File* f_out;
+                f_in = source_fs->open(filename, File::READ);
+                if (!f_in->is_valid()) {
+                    log::error("resource_manager", "Could not open source file \"%s\"", filename);
+                    return;
+                }
+
+                f_out = _fs->open(output_filename, File::WRITE);
+
+                resource_compiler_clb_t clb = hash::get < resource_compiler_clb_t >
+                                              (this->_compile_clb_map, type, nullptr);
+
+                if (clb == nullptr) {
+                    log::error("resource_manager", "Resource type " "%" PRIx64 " not register compiler.", type);
+                    goto close;
+                }
+
+                clb(f_in, f_out);
 close:
-            source_fs->close(f_in);
-            _fs->close(f_out);
+                source_fs->close(f_in);
+                _fs->close(f_out);
+            }
         }
 
         virtual void load(StringId64_t type, const StringId64_t* names, const uint32_t count) final {

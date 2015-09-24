@@ -386,7 +386,7 @@ namespace cetech {
                 return status;
             }
 
-            void listdir(const char* name, const char* ignore_dir, Array < char* >& files) {
+            void listdir(const char* name, Array < char* >& files) {
                 DIR* dir;
                 struct dirent* entry;
 
@@ -400,9 +400,7 @@ namespace cetech {
 
                 do {
                     if (entry->d_type == 4) {
-                        if (strcmp(entry->d_name,
-                                   ".") == 0 ||
-                            strcmp(entry->d_name, "..") == 0 || strcmp(entry->d_name, ignore_dir) == 0) {
+                        if (strcmp(entry->d_name, ".") == 0 || strcmp(entry->d_name, "..") == 0) {
                             continue;
                         }
 
@@ -417,7 +415,7 @@ namespace cetech {
 
                         path[len] = '\0';
 
-                        listdir(path, ignore_dir, files);
+                        listdir(path, files);
                     } else {
                         uint32_t size = strlen(name) + strlen(entry->d_name) + 2;
                         char* path = (char*)malloc(sizeof(char) * size);
