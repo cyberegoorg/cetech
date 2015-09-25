@@ -1,6 +1,13 @@
-local log = require "lua/cetech/log"
+require "lua/game"
 
-log.info("dd", "dsadsad")
-log.warn("dd", "dsadsad")
-log.error("dd", "dsadsad")
-log.debug("dd", "dsadsad")
+function init()
+  Game:init()
+end
+
+function update(dt)
+  Game:update(dt)
+end
+
+function shutdown()
+  Game:shutdown()
+end

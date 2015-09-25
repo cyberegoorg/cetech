@@ -5,7 +5,7 @@ Device
 > Return frame id.
 
 **get_delta_time ()**: float
->Return delta atime.
+> Return delta time.
 
 **quit** ()
 > Quit application.

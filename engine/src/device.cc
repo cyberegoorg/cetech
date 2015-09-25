@@ -10,6 +10,7 @@
 
 #include "lua/lua_enviroment.h"
 #include "lua/lua_device.h"
+#include "lua/lua_keyboard.h"
 
 #include "resource/resource_manager.h"
 #include "package/package_manager.h"
@@ -115,6 +116,7 @@ namespace cetech {
                 register_resources();
 
                 lua_device::load_libs(*_lua_eviroment);
+                lua_keyboard::load_libs(*_lua_eviroment);
 
                 if (command_line_globals::has_argument("compile", 'c')) {
                     compile_all_resource();
@@ -123,9 +125,13 @@ namespace cetech {
                 init_boot();
 
                 this->_last_frame_ticks = runtime::get_ticks();
+                
+                _lua_eviroment->call_global("init", "");
             }
 
             virtual void shutdown() final {
+                _lua_eviroment->call_global("shutdown", "");
+                
                 PackageManager::destroy(memory_globals::default_allocator(), _package_manager);
                 ResourceManager::destroy(memory_globals::default_allocator(), _resource_manager);
                 DevelopManager::destroy(memory_globals::default_allocator(), _develop_manager);
@@ -166,7 +172,7 @@ namespace cetech {
                     usleep(3 * 1000);
 
                     if (!_flags.pause) {
-                        //app.update(dt)
+                        _lua_eviroment->call_global("update", "f", (double)dt);
                     }
 
                     //
