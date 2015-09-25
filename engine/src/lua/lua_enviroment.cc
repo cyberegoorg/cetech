@@ -95,35 +95,38 @@ namespace cetech {
 
         virtual void call_global(const char* func, const char* args, ...) final {
             LuaStack stack(_state);
-
-            va_list vl;
-            va_start(vl, args);
+            uint32_t argc = 0;
 
             //lua_pushcfunction(L, error_handler);
             lua_getglobal(_state, func);
-            
-            uint32_t argc = 0;
-            const char *it = args;
-            while( *it != '\0' ) {
-                switch(*it) {
-                    case 'i':
-                        stack.push_int32(va_arg(vl, int32_t));
-                        break;
-                        
-                    case 'u':
-                        stack.push_uint32(va_arg(vl, uint32_t));
-                        break;
-                        
-                    case 'f':
-                        stack.push_float(va_arg(vl, double));
-                        break;
-                }
-                
-                ++argc;
-                ++it;
-            }
 
-            va_end(vl);
+            if(args != nullptr ) {
+                va_list vl;
+                va_start(vl, args);
+                
+                const char *it = args;
+                while( *it != '\0' ) {
+                    switch(*it) {
+                        case 'i':
+                            stack.push_int32(va_arg(vl, int32_t));
+                            break;
+                            
+                        case 'u':
+                            stack.push_uint32(va_arg(vl, uint32_t));
+                            break;
+                            
+                        case 'f':
+                            stack.push_float(va_arg(vl, double));
+                            break;
+                    }
+                    
+                    ++argc;
+                    ++it;
+                }
+
+                va_end(vl);
+            }
+            
             lua_pcall(_state, argc, 0, -argc - 2);
             lua_pop(_state, -1);
         }

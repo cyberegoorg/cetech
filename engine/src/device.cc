@@ -126,11 +126,11 @@ namespace cetech {
 
                 this->_last_frame_ticks = runtime::get_ticks();
                 
-                _lua_eviroment->call_global("init", "");
+                _lua_eviroment->call_global("init");
             }
 
             virtual void shutdown() final {
-                _lua_eviroment->call_global("shutdown", "");
+                _lua_eviroment->call_global("shutdown");
                 
                 PackageManager::destroy(memory_globals::default_allocator(), _package_manager);
                 ResourceManager::destroy(memory_globals::default_allocator(), _resource_manager);
@@ -162,6 +162,7 @@ namespace cetech {
                     this->_delta_time = dt;
                     this->_last_frame_ticks = now_ticks;
 
+                    _develop_manager->push_record_float("engine.frame_id", _frame_id);
                     _develop_manager->push_record_float("engine.delta_time", dt);
                     _develop_manager->push_record_float("engine.frame_rate", 1.0f / dt);
 
@@ -170,9 +171,8 @@ namespace cetech {
                     //
 
                     usleep(3 * 1000);
-
                     if (!_flags.pause) {
-                        _lua_eviroment->call_global("update", "f", (double)dt);
+                        _lua_eviroment->call_global("update", "f", dt);
                     }
 
                     //
@@ -188,7 +188,6 @@ namespace cetech {
 
             virtual void quit() final {
                 _flags.run = 0;
-                log::info("main", "Bye Bye!!!");
             }
 
             virtual ResourceManager& resource_manager() final {
