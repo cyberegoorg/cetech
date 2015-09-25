@@ -14,7 +14,7 @@ Log.error = ffi.C.lua_log_error
 Log.debug = ffi.C.lua_log_debug
 
 print = function (frmt, ...)
-    Log.info("lua.print", "%s", string.format(frmt, ...))
+    Log.info("lua.print", "%s", string.format(to_string(frmt), ...))
 end
 
 return Log
