@@ -2,8 +2,10 @@
 
 #include "luajit/lua.hpp"
 
-#include "common/asserts.h"
 #include "lua/lua_enviroment.h"
+#include "lua/lua_stack.h"
+
+#include "common/asserts.h"
 #include "common/log/log.h"
 #include "common/crypto/murmur_hash.inl.h"
 #include "resource/resource_manager.h"
@@ -91,6 +93,41 @@ namespace cetech {
             lua_pop(this->_state, -1);
         }
 
+        virtual void call_global(const char* func, const char* args, ...) final {
+            LuaStack stack(_state);
+
+            va_list vl;
+            va_start(vl, args);
+
+            //lua_pushcfunction(L, error_handler);
+            lua_getglobal(_state, func);
+            
+            uint32_t argc = 0;
+            const char *it = args;
+            while( *it != '\0' ) {
+                switch(*it) {
+                    case 'i':
+                        stack.push_int32(va_arg(vl, int32_t));
+                        break;
+                        
+                    case 'u':
+                        stack.push_uint32(va_arg(vl, uint32_t));
+                        break;
+                        
+                    case 'f':
+                        stack.push_float(va_arg(vl, double));
+                        break;
+                }
+                
+                ++argc;
+                ++it;
+            }
+
+            va_end(vl);
+            lua_pcall(_state, argc, 0, -argc - 2);
+            lua_pop(_state, -1);
+        }
+        
         static int require(lua_State* L) {
             const char* name = lua_tostring( L, 1);
             StringId64_t name_hash = murmur_hash_64(name, strlen(name), 22);

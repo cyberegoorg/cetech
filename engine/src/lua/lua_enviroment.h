@@ -14,6 +14,8 @@ namespace cetech {
             virtual void set_module_function(const char* module, const char* name, const lua_CFunction func) = 0;
             virtual void set_module_constructor(const char* module, const lua_CFunction func) = 0;
 
+            virtual void call_global(const char* func, const char* args, ...) = 0;
+            
             static LuaEnviroment* make(Allocator& alocator);
             static void destroy(Allocator& alocator, LuaEnviroment* le);
     };

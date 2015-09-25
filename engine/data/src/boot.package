@@ -1,6 +1,7 @@
 {
   "lua" : [
     "lua/cetech/log",
-    "lua/boot"
+    "lua/boot",
+    "lua/game"
   ]
 }
