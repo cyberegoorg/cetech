@@ -1,4 +1,7 @@
+#include <cstdio>
+
 #include "resource_manager.h"
+
 #include "common/container/container_types.h"
 #include "common/container/queue.inl.h"
 #include "common/container/hash.inl.h"
@@ -6,11 +9,7 @@
 #include "common/string/stringid.inl.h"
 
 #include "cvars/cvars.h"
-
 #include "runtime/runtime.h"
-
-#include <new>
-#include <cstdio>
 
 namespace cetech {
     class ResourceManagerImplementation final : public ResourceManager {
@@ -36,9 +35,9 @@ namespace cetech {
             source_fs->list_directory(cvars::rm_source_dir.value_str, files);
 
             const size_t source_dir_len = cvars::rm_source_dir.str_len;
-
-
-            for (uint32_t i = 0; i < array::size(files); ++i) {
+            
+            const uint32_t files_count = array::size(files);
+            for (uint32_t i = 0; i < files_count; ++i) {
                 const char* filename = files[i] + source_dir_len; /* Base path */
 
 

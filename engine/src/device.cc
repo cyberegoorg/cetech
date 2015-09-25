@@ -127,7 +127,8 @@ namespace cetech {
                 DevelopManager::destroy(memory_globals::default_allocator(), _develop_manager);
                 ConsoleServer::destroy(memory_globals::default_allocator(), _console_server);
                 LuaEnviroment::destroy(memory_globals::default_allocator(), _lua_eviroment);
-
+                disk_filesystem::destroy(memory_globals::default_allocator(), _filesystem);
+                
                 runtime::shutdown();
             }
 
@@ -221,7 +222,7 @@ namespace cetech {
 
                 static ResourceRegistration resource_regs[] = {
                     /* package */
-                    {resource_package::type_hash(), & resource_package::compiler, & resource_package::loader,
+                    {resource_package::type_hash(), &resource_package::compiler, &resource_package::loader,
                      & resource_package::unloader},
 
                     /* lua */
@@ -243,15 +244,6 @@ namespace cetech {
 
             static void cmd_lua_execute(const rapidjson::Document& in, rapidjson::Document& out) {
                 device_globals::device().lua_enviroment().execute_string(in["args"]["script"].GetString());
-            }
-
-            void join_build_dir(char* buffer, size_t max_len, const char* basename) {
-                memset(buffer, 0, max_len);
-
-                size_t len = strlen(cvars::rm_build_dir.value_str);
-                memcpy(buffer, cvars::rm_build_dir.value_str, len);
-
-                strcpy(buffer + len, basename);
             }
 
             void load_config_json() {
@@ -308,9 +300,7 @@ namespace cetech {
                 _resource_manager->load(resource_package::type_hash(), &boot_pkg_name_h, 1);
                 _package_manager->load(boot_pkg_name_h);
 
-                StringId64_t lua_hash = murmur_hash_64("lua", 3, 22);
-
-                const resource_lua::Resource* res_lua = (const resource_lua::Resource*)_resource_manager->get(lua_hash,
+                const resource_lua::Resource* res_lua = (const resource_lua::Resource*)_resource_manager->get(resource_lua::type_hash(),
                                                                                                               boot_script_name_h);
                 _lua_eviroment->execute_resource(res_lua);
             }
