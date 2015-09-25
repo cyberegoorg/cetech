@@ -62,6 +62,35 @@ namespace cetech {
             }
         }
 
+        virtual void set_module_function(const char* module, const char* name, const lua_CFunction func) final {
+            luaL_newmetatable(this->_state, module);
+            luaL_Reg entry[2];
+
+            entry[0].name = name;
+            entry[0].func = func;
+            entry[1].name = NULL;
+            entry[1].func = NULL;
+
+            luaL_register(this->_state, NULL, entry);
+            lua_setglobal(this->_state, module);
+            lua_pop(this->_state, -1);
+        }
+
+        virtual void set_module_constructor(const char* module, const lua_CFunction func) final {
+            lua_createtable(this->_state, 0, 1);
+            lua_pushstring(this->_state, "__call");
+            lua_pushcfunction(this->_state, func);
+
+            lua_settable(this->_state, 1);
+
+            lua_getglobal(this->_state, module);
+            lua_pushvalue(this->_state, -2);
+
+            lua_setmetatable(this->_state, -2);
+
+            lua_pop(this->_state, -1);
+        }
+
         static int require(lua_State* L) {
             const char* name = lua_tostring( L, 1);
             StringId64_t name_hash = murmur_hash_64(name, strlen(name), 22);

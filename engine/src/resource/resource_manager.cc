@@ -35,7 +35,7 @@ namespace cetech {
             source_fs->list_directory(cvars::rm_source_dir.value_str, files);
 
             const size_t source_dir_len = cvars::rm_source_dir.str_len;
-            
+
             const uint32_t files_count = array::size(files);
             for (uint32_t i = 0; i < files_count; ++i) {
                 const char* filename = files[i] + source_dir_len; /* Base path */

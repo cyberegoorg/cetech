@@ -9,6 +9,8 @@
 #include "common/container/array.inl.h"
 
 #include "lua/lua_enviroment.h"
+#include "lua/lua_device.h"
+
 #include "resource/resource_manager.h"
 #include "package/package_manager.h"
 #include "develop/develop_manager.h"
@@ -112,6 +114,8 @@ namespace cetech {
 
                 register_resources();
 
+                lua_device::load_libs(*_lua_eviroment);
+
                 if (command_line_globals::has_argument("compile", 'c')) {
                     compile_all_resource();
                 }
@@ -128,7 +132,7 @@ namespace cetech {
                 ConsoleServer::destroy(memory_globals::default_allocator(), _console_server);
                 LuaEnviroment::destroy(memory_globals::default_allocator(), _lua_eviroment);
                 disk_filesystem::destroy(memory_globals::default_allocator(), _filesystem);
-                
+
                 runtime::shutdown();
             }
 
@@ -222,7 +226,7 @@ namespace cetech {
 
                 static ResourceRegistration resource_regs[] = {
                     /* package */
-                    {resource_package::type_hash(), &resource_package::compiler, &resource_package::loader,
+                    {resource_package::type_hash(), & resource_package::compiler, & resource_package::loader,
                      & resource_package::unloader},
 
                     /* lua */
@@ -300,8 +304,9 @@ namespace cetech {
                 _resource_manager->load(resource_package::type_hash(), &boot_pkg_name_h, 1);
                 _package_manager->load(boot_pkg_name_h);
 
-                const resource_lua::Resource* res_lua = (const resource_lua::Resource*)_resource_manager->get(resource_lua::type_hash(),
-                                                                                                              boot_script_name_h);
+                const resource_lua::Resource* res_lua = (const resource_lua::Resource*)_resource_manager->get(
+                    resource_lua::type_hash(),
+                    boot_script_name_h);
                 _lua_eviroment->execute_resource(res_lua);
             }
 
