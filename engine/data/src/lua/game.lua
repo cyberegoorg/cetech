@@ -4,6 +4,7 @@ Game = Game or {}
 
 function Game:init()
     log.info("boot.lua", "init")
+    
     log.info("boot.lua", "info")
     log.warn("boot.lua", "warn")
     log.error("boot.lua", "error")
@@ -11,7 +12,7 @@ function Game:init()
 end
 
 function Game:shutdown()
-
+    log.info("boot.lua", "shutdown")
 end
 
 function Game:update(dt)
