@@ -8,7 +8,7 @@ namespace cetech {
         public:
             virtual ~FileSystem() {};
 
-            virtual File* open(const char* path, File::OpenType mode) = 0;
+            virtual File* open(const char* path, File::OpenMode mode) = 0;
             virtual void close(File* file) = 0;
 
             virtual bool exists(const char* path) = 0;

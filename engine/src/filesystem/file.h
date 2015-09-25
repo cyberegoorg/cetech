@@ -5,7 +5,7 @@
 namespace cetech {
     class File {
         public:
-            enum OpenType {
+            enum OpenMode {
                 READ = 1,
                 WRITE = 2
             };

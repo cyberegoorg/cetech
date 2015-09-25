@@ -12,7 +12,7 @@ namespace cetech {
         public:
             runtime::File _file;
 
-            DiskFile(const char* path, File::OpenType mode) {
+            DiskFile(const char* path, File::OpenMode mode) {
                 _file = runtime::file::from_file(path, mode == File::WRITE ? "w" : "r");
             }
 
@@ -78,7 +78,7 @@ namespace cetech {
                 }
             }
 
-            virtual File* open(const char* path, File::OpenType mode) final {
+            virtual File* open(const char* path, File::OpenMode mode) final {
                 char abs_path[2048] = {0};
                 absolute_path(abs_path, path);
 
