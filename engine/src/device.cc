@@ -286,8 +286,8 @@ namespace cetech {
             void parse_command_line() {
                 char buffer[1024] = {0};
 
-                const char* source_dir = command_line_globals::get_parameter("source-dir", 'i');
-                const char* build_dir = command_line_globals::get_parameter("build-dir", 'd');
+                const char* source_dir = command_line_globals::get_parameter("source-dir", 's');
+                const char* build_dir = command_line_globals::get_parameter("build-dir", 'b');
 
                 if (source_dir) {
                     make_path(buffer, 1024, source_dir);
