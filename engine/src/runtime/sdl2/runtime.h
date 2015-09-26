@@ -11,80 +11,81 @@
 #include "common/container/array.inl.h"
 #include "common/crypto/murmur_hash.inl.h"
 #include "common/math/vector2.inl.h"
+#include "device.h"
 #include "runtime/runtime.h"
 
 #include "SDL2/SDL.h"
 
 namespace cetech {
     namespace runtime {
-        namespace log_internal {
-            static void sdl_log_output_function(void* userdata,
-                                                int category,
-                                                SDL_LogPriority priority,
-                                                const char* message) {
-                CE_UNUSED(userdata);
-                const char* where = nullptr;
-
-                switch (category) {
-                case SDL_LOG_CATEGORY_APPLICATION:
-                    where = "sdl.app";
-                    break;
-
-                case SDL_LOG_CATEGORY_ERROR:
-                    where = "sdl.error";
-                    break;
-
-                case SDL_LOG_CATEGORY_SYSTEM:
-                    where = "sdl.system";
-                    break;
-
-                case SDL_LOG_CATEGORY_AUDIO:
-                    where = "sdl.audio";
-                    break;
-
-                case SDL_LOG_CATEGORY_VIDEO:
-                    where = "sdl.video";
-                    break;
-
-                case SDL_LOG_CATEGORY_RENDER:
-                    where = "sdl.render";
-                    break;
-
-                case SDL_LOG_CATEGORY_INPUT:
-                    where = "sdl.input";
-                    break;
-                }
-
-                switch (priority) {
-                case SDL_LOG_PRIORITY_VERBOSE:
-                    log::info(where, "%s", message);
-                    break;
-
-                case SDL_LOG_PRIORITY_DEBUG:
-                    log::debug(where, "%s", message);
-                    break;
-
-                case SDL_LOG_PRIORITY_INFO:
-                    log::info(where, "%s", message);
-                    break;
-
-                case SDL_LOG_PRIORITY_WARN:
-                    log::warning(where, "%s", message);
-                    break;
-
-                case SDL_LOG_PRIORITY_ERROR:
-                    log::error(where, "%s", message);
-                    break;
-
-                case SDL_LOG_PRIORITY_CRITICAL:
-                    log::error(where, "%s", message);
-                    break;
-
-                default:
-                    break;
-                }
-            }
-        }
+//        namespace log_internal {
+//             static void sdl_log_output_function(void* userdata,
+//                                                 int category,
+//                                                 SDL_LogPriority priority,
+//                                                 const char* message) {
+//                 CE_UNUSED(userdata);
+//                 const char* where = nullptr;
+// 
+//                 switch (category) {
+//                 case SDL_LOG_CATEGORY_APPLICATION:
+//                     where = "sdl.app";
+//                     break;
+// 
+//                 case SDL_LOG_CATEGORY_ERROR:
+//                     where = "sdl.error";
+//                     break;
+// 
+//                 case SDL_LOG_CATEGORY_SYSTEM:
+//                     where = "sdl.system";
+//                     break;
+// 
+//                 case SDL_LOG_CATEGORY_AUDIO:
+//                     where = "sdl.audio";
+//                     break;
+// 
+//                 case SDL_LOG_CATEGORY_VIDEO:
+//                     where = "sdl.video";
+//                     break;
+// 
+//                 case SDL_LOG_CATEGORY_RENDER:
+//                     where = "sdl.render";
+//                     break;
+// 
+//                 case SDL_LOG_CATEGORY_INPUT:
+//                     where = "sdl.input";
+//                     break;
+//                 }
+// 
+//                 switch (priority) {
+//                 case SDL_LOG_PRIORITY_VERBOSE:
+//                     log::info(where, "%s", message);
+//                     break;
+// 
+//                 case SDL_LOG_PRIORITY_DEBUG:
+//                     log::debug(where, "%s", message);
+//                     break;
+// 
+//                 case SDL_LOG_PRIORITY_INFO:
+//                     log::info(where, "%s", message);
+//                     break;
+// 
+//                 case SDL_LOG_PRIORITY_WARN:
+//                     log::warning(where, "%s", message);
+//                     break;
+// 
+//                 case SDL_LOG_PRIORITY_ERROR:
+//                     log::error(where, "%s", message);
+//                     break;
+// 
+//                 case SDL_LOG_PRIORITY_CRITICAL:
+//                     log::error(where, "%s", message);
+//                     break;
+// 
+//                 default:
+//                     break;
+//                 }
+//             }
+//         }
 
         namespace keyboard_internal {
             static uint8_t KeyboardStates[512] = { 0 };
@@ -102,8 +103,8 @@ namespace cetech {
         }
 
         void init() {
-            SDL_LogSetOutputFunction(&log_internal::sdl_log_output_function, nullptr);
-            SDL_LogSetAllPriority(SDL_LOG_PRIORITY_INFO);
+//             SDL_LogSetOutputFunction(&log_internal::sdl_log_output_function, nullptr);
+//             SDL_LogSetAllPriority(SDL_LOG_PRIORITY_INFO);
 
             CE_ASSERT(SDL_Init(SDL_INIT_VIDEO) == 0);
 
@@ -122,7 +123,7 @@ namespace cetech {
             while (SDL_PollEvent(&e) > 0) {
                 switch (e.type) {
                 case SDL_QUIT:
-                    exit(0);
+                    device_globals::device().quit();
                     break;
                 }
             }

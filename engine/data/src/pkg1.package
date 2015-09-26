@@ -3,9 +3,5 @@
     "lua/cetech/log",
     "lua/boot",
     "lua/game"
-  ],
-  
-  "package": [
-    "pkg1"
   ]
 }
