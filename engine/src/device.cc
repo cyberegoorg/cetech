@@ -11,6 +11,7 @@
 #include "lua/lua_enviroment.h"
 #include "lua/lua_device.h"
 #include "lua/lua_keyboard.h"
+#include "lua/lua_package.h"
 
 #include "resource/resource_manager.h"
 #include "package/package_manager.h"
@@ -117,6 +118,7 @@ namespace cetech {
 
                 lua_device::load_libs(*_lua_eviroment);
                 lua_keyboard::load_libs(*_lua_eviroment);
+                lua_package::load_libs(*_lua_eviroment);
 
                 if (command_line_globals::has_argument("compile", 'c')) {
                     compile_all_resource();
@@ -125,6 +127,14 @@ namespace cetech {
                 init_boot();
 
                 this->_last_frame_ticks = runtime::get_ticks();
+                
+
+                runtime::Window w = runtime::window::make_window(
+                    "aaa",
+                    runtime::window::WINDOWPOS_CENTERED, runtime::window::WINDOWPOS_CENTERED,
+                    800, 600,
+                    runtime::window::WINDOW_NOFLAG
+                    );
                 
                 _lua_eviroment->call_global("init");
             }
@@ -174,7 +184,7 @@ namespace cetech {
                     if (!_flags.pause) {
                         _lua_eviroment->call_global("update", "f", dt);
                     }
-
+   
                     //
                     runtime::frame_end();
                     _develop_manager->push_end_frame();

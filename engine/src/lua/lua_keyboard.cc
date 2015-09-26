@@ -8,7 +8,8 @@ namespace cetech {
         LuaStack stack(L);
         
         const char* scancode = stack.get_string(1);
-        stack.push_uint32(runtime::keyboard::button_index(scancode));
+        const uint32_t index = runtime::keyboard::button_index(scancode);
+        stack.push_uint32(index);
         return 1;
     }
 
@@ -51,8 +52,8 @@ namespace cetech {
             env.set_module_function(module_name, "button_index", keyboard_button_index);
             env.set_module_function(module_name, "button_name", keyboard_button_name);
             env.set_module_function(module_name, "button_state", keyboard_button_state);
-            env.set_module_function(module_name, "button_pressed", keyboard_button_pressed);
-            env.set_module_function(module_name, "button_released", keyboard_button_released);
+            env.set_module_function(module_name, "pressed", keyboard_button_pressed);
+            env.set_module_function(module_name, "released", keyboard_button_released);
         }
     }
 }

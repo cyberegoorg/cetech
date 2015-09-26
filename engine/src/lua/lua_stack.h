@@ -1,6 +1,7 @@
 #pragma once
 
 #include "luajit/lua.hpp"
+#include "common/string/stringid_types.h"
 
 namespace cetech {
     class LuaStack {
@@ -57,6 +58,20 @@ namespace cetech {
                 lua_pushstring(_L, s);
             }
 
+            void push_string64id(const StringId64_t string_id) {
+                union {
+                    StringId64_t lh;
+                    struct {
+                        uint32_t l;
+                        uint32_t h;
+                    };
+                } lh;
+                lh.lh = string_id;
+                
+                push_uint32(lh.h);
+                push_uint32(lh.l);
+            }
+            
 
             bool get_bool(int i) {
                 return lua_toboolean(_L, i) == 1;
@@ -74,6 +89,20 @@ namespace cetech {
                 return lua_tostring(_L, i);
             }
 
+            StringId64_t get_string64id(int i) {
+                union {
+                    StringId64_t lh;
+                    struct {
+                        uint32_t l;
+                        uint32_t h;
+                    };
+                } lh;
+                
+                lh.l = get_int(1);
+                lh.h = get_int(2);
+                
+                return lh.lh;
+            }
 
             lua_State* _L;
     };
