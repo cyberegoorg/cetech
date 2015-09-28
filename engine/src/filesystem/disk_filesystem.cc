@@ -5,43 +5,43 @@
 
 #include "common/memory/memory.h"
 
-#include "runtime/runtime.h"
+#include "os/os.h"
 
 namespace cetech {
     class DiskFile : public File {
         public:
-            runtime::File _file;
+            os::File _file;
 
             DiskFile(const char* path, File::OpenMode mode) {
-                _file = runtime::file::from_file(path, mode == File::WRITE ? "w" : "r");
+                _file = os::file::from_file(path, mode == File::WRITE ? "w" : "r");
             }
 
             virtual ~DiskFile() {
-                runtime::file::close(_file);
+                os::file::close(_file);
             }
 
             virtual bool is_valid() {
-                return !runtime::file::is_null(_file);
+                return !os::file::is_null(_file);
             }
 
             virtual void seek(size_t position) final {
-                runtime::file::seek(_file, position, runtime::file::SW_SEEK_SET);
+                os::file::seek(_file, position, os::file::SW_SEEK_SET);
             };
 
             virtual void seek_to_end() final {
-                runtime::file::seek(_file, 0, runtime::file::SW_SEEK_END);
+                os::file::seek(_file, 0, os::file::SW_SEEK_END);
             };
 
             virtual void skip(size_t bytes) final {
-                runtime::file::seek(_file, bytes, runtime::file::SW_SEEK_CUR);
+                os::file::seek(_file, bytes, os::file::SW_SEEK_CUR);
             };
 
             virtual void read(void* buffer, size_t size) final {
-                runtime::file::read(_file, buffer, sizeof(char), size);
+                os::file::read(_file, buffer, sizeof(char), size);
             };
 
             virtual void write(const void* buffer, size_t size)  final {
-                runtime::file::write(_file, buffer, sizeof(char), size);
+                os::file::write(_file, buffer, sizeof(char), size);
             };
 
             virtual void flush() final {};
@@ -60,7 +60,7 @@ namespace cetech {
             };
 
             virtual size_t position() final {
-                return runtime::file::tell(_file);
+                return os::file::tell(_file);
             };
     };
 
@@ -99,14 +99,14 @@ namespace cetech {
             };
 
             virtual void create_directory(const char* path)  final {
-                runtime::dir::mkpath(path);
+                os::dir::mkpath(path);
             };
 
             virtual void delete_directory(const char* path) final {/*TODO:*/
             };
 
             virtual void list_directory ( const char* path, cetech::Array < char* >& files ) final {
-                runtime::dir::listdir(path, files);
+                os::dir::listdir(path, files);
             }
 
             virtual void create_file(const char* path)  final {/*TODO:*/

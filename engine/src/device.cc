@@ -20,7 +20,7 @@
 #include "package/package_resource.h"
 
 #include "cvars/cvars.h"
-#include "runtime/runtime.h"
+#include "os/os.h"
 
 extern "C" {
 static void posix_signal_handler(int sig) {
@@ -99,7 +99,7 @@ namespace cetech {
                 _develop_manager = DevelopManager::make(memory_globals::default_allocator());
                 parse_command_line();
 
-                runtime::init();
+                os::init();
 
                 _filesystem = disk_filesystem::make(memory_globals::default_allocator(), cvars::rm_build_dir.value_str);
                 load_config_json();
@@ -126,14 +126,14 @@ namespace cetech {
 
                 init_boot();
 
-                this->_last_frame_ticks = runtime::get_ticks();
+                this->_last_frame_ticks = os::get_ticks();
                 
 
-                runtime::Window w = runtime::window::make_window(
+                os::Window w = os::window::make_window(
                     "aaa",
-                    runtime::window::WINDOWPOS_CENTERED, runtime::window::WINDOWPOS_CENTERED,
+                    os::window::WINDOWPOS_CENTERED, os::window::WINDOWPOS_CENTERED,
                     800, 600,
-                    runtime::window::WINDOW_NOFLAG
+                    os::window::WINDOW_NOFLAG
                     );
                 
                 _lua_eviroment->call_global("init");
@@ -149,7 +149,7 @@ namespace cetech {
                 LuaEnviroment::destroy(memory_globals::default_allocator(), _lua_eviroment);
                 disk_filesystem::destroy(memory_globals::default_allocator(), _filesystem);
 
-                runtime::shutdown();
+                os::shutdown();
             }
 
             virtual void run() final {
@@ -167,7 +167,7 @@ namespace cetech {
                 while (_flags.run) {
                     _develop_manager->push_begin_frame();
 
-                    uint32_t now_ticks = runtime::get_ticks();
+                    uint32_t now_ticks = os::get_ticks();
                     dt = (now_ticks - this->_last_frame_ticks) * 0.001f;
                     this->_delta_time = dt;
                     this->_last_frame_ticks = now_ticks;
@@ -176,7 +176,7 @@ namespace cetech {
                     _develop_manager->push_record_float("engine.delta_time", dt);
                     _develop_manager->push_record_float("engine.frame_rate", 1.0f / dt);
 
-                    runtime::frame_start();
+                    os::frame_start();
                     _console_server->tick();
                     //
 
@@ -186,7 +186,7 @@ namespace cetech {
                     }
    
                     //
-                    runtime::frame_end();
+                    os::frame_end();
                     _develop_manager->push_end_frame();
                     _develop_manager->send_buffer();
                     _develop_manager->clear();

@@ -28,11 +28,9 @@ namespace cetech {
                 return lua_isnumber(_L, i) == 1;
             }
 
-
             int value_type(int i) {
                 return lua_type(_L, i);
             }
-
 
             void push_nil() {
                 lua_pushnil(_L);
@@ -70,30 +68,30 @@ namespace cetech {
 
                 lua_newtable(_L);
                 
-                lua_pushinteger(_L,lh.h);
+                push_uint32(lh.h);
                 lua_rawseti(_L,-2, 1);
-                lua_pushinteger(_L,lh.l);
+                push_uint32(lh.l);
                 lua_rawseti(_L,-2, 2);
             }
             
 
-            bool get_bool(int i) {
+            bool to_bool(int i) {
                 return lua_toboolean(_L, i) == 1;
             }
 
-            int get_int(int i) {
+            int to_int(int i) {
                 return lua_tointeger(_L, i);
             }
 
-            float get_float(int i) {
+            float to_float(int i) {
                 return (float) lua_tonumber(_L, i);
             }
 
-            const char* get_string(int i) {
+            const char* to_string(int i) {
                 return lua_tostring(_L, i);
             }
 
-            StringId64_t get_string64id(int i) {
+            StringId64_t to_string64id(int i) {
                 union {
                     StringId64_t lh;
                     struct {
@@ -104,10 +102,10 @@ namespace cetech {
                 
                 
                 lua_rawgeti(_L, i, 1);
-                lh.h = get_int(-1);
+                lh.h = to_int(-1);
                 
                 lua_rawgeti(_L, i, 2);
-                lh.l = get_int(-1);
+                lh.l = to_int(-1);
                 
                 return lh.lh;
             }

@@ -7,7 +7,7 @@
 #include "common/crypto/murmur_hash.inl.h"
 #include "device.h"
 
-#include "runtime/runtime.h"
+#include "os/os.h"
 
 #include "package/package_resource.h"
 

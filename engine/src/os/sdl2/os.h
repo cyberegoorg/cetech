@@ -12,12 +12,12 @@
 #include "common/crypto/murmur_hash.inl.h"
 #include "common/math/vector2.inl.h"
 #include "device.h"
-#include "runtime/runtime.h"
+#include "os/os.h"
 
 #include "SDL2/SDL.h"
 
 namespace cetech {
-    namespace runtime {
+    namespace os {
 //        namespace log_internal {
 //             static void sdl_log_output_function(void* userdata,
 //                                                 int category,
@@ -149,7 +149,7 @@ namespace cetech {
         }
     }
 
-    namespace runtime {
+    namespace os {
         namespace window_internal {
             CE_INLINE uint32_t sdl_pos(const uint32_t pos) {
                 switch (pos) {
