@@ -14,7 +14,7 @@ namespace cetech {
         StringId64_t package_id = stringid64::from_cstring(name);
         
         stack.push_string64id(package_id);
-        return 2;
+        return 1;
     }
 
     

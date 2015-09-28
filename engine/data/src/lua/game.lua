@@ -3,7 +3,6 @@ local log = require "lua/cetech/log"
 Game = Game or {}
 
 local pkg1 = Package.create("pkg1")
-
 function Game:init()
     log.info("boot.lua", "init")
     
@@ -12,6 +11,9 @@ function Game:init()
     log.error("boot.lua", "error")
     log.debug("boot.lua", "debug")
 
+    print(#pkg1)
+    print(pkg1[1])
+    print(pkg1[2])
     Package.load(pkg1)
 end
 
