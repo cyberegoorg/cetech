@@ -4,10 +4,10 @@
 
 #include "common/container/container_types.h"
 #include "common/math/math_types.h"
-#include "runtime/runtime_types.h"
+#include "os/os_types.h"
 
 namespace cetech {
-    namespace runtime {
+    namespace os {
         CE_INLINE void init();
         CE_INLINE void shutdown();
 
@@ -17,7 +17,7 @@ namespace cetech {
         CE_INLINE uint32_t get_ticks();
     }
 
-    namespace runtime {
+    namespace os {
         namespace window {
             enum WindowFlags {
                 WINDOW_NOFLAG = 0,
@@ -89,8 +89,8 @@ namespace cetech {
             CE_INLINE bool mkdir(const char* path);
             CE_INLINE bool mkpath(const char* path);
 
-            static void listdir(const char* name, Array < char* >& files);
-            static void listdir_free(Array < char* >& files);
+            CE_INLINE void listdir(const char* name, Array < char* >& files);
+            CE_INLINE void listdir_free(Array < char* >& files);
         }
 
         namespace thread {
@@ -137,5 +137,5 @@ namespace cetech {
 }
 
 #ifdef CETECH_RUNTIME_SDL2
-    #include "runtime/sdl2/runtime.h"
+    #include "os/sdl2/os.h"
 #endif

@@ -2,7 +2,7 @@
 
 #include "common/string/stringid_types.h"
 #include "common/memory/memory.h"
-#include "runtime/runtime.h"
+#include "os/os.h"
 #include "common/crypto/murmur_hash.inl.h"
 #include "filesystem/file.h"
 

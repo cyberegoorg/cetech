@@ -4,7 +4,7 @@
 #include "common/memory/memory.h"
 #include "common/string/stringid.inl.h"
 
-#include "runtime/runtime.h"
+#include "os/os.h"
 
 #include "rapidjson/document.h"
 #include "rapidjson/writer.h"

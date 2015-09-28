@@ -128,7 +128,7 @@ project "tech1_static"
     }
 
     excludes {
-      ROOT_DIR .. "src/runtime/**.cc",
+      ROOT_DIR .. "src/os/**.cc",
     }
 
     filter {}
@@ -157,7 +157,7 @@ project "tech1"
     language "C++"
 
     files {
-        ROOT_DIR .. "src/runtime/**.cc",
+        ROOT_DIR .. "src/os/**.cc",
     }
 
     links {

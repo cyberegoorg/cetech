@@ -1,6 +1,6 @@
 #pragma once
 
-#include "runtime/runtime_types.h"
+#include "os/os_types.h"
 #include "common/string/stringid_types.h"
 #include "common/memory/memory_types.h"
 #include "filesystem/file.h"

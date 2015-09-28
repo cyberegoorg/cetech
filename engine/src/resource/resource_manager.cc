@@ -9,7 +9,7 @@
 #include "common/string/stringid.inl.h"
 
 #include "cvars/cvars.h"
-#include "runtime/runtime.h"
+#include "os/os.h"
 
 namespace cetech {
     class ResourceManagerImplementation final : public ResourceManager {

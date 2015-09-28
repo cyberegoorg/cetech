@@ -6,7 +6,7 @@
 #include "console_server.h"
 
 #include "device.h"
-#include "runtime/runtime.h"
+#include "os/os.h"
 
 #include "rapidjson/document.h"
 
@@ -115,7 +115,7 @@ namespace cetech {
         virtual void push_begin_frame() final {
             BeginFrameEvent event = {
                 .get_frame_id = device_globals::device().get_frame_id(),
-                .time = runtime::get_ticks()
+                .time = os::get_ticks()
             };
 
             push(EVENT_BEGIN_FRAME, event);
@@ -124,7 +124,7 @@ namespace cetech {
         virtual void push_end_frame() final {
             EndFrameEvent event = {
                 .get_frame_id = device_globals::device().get_frame_id(),
-                .time = runtime::get_ticks()
+                .time = os::get_ticks()
             };
 
             push(EVENT_END_FRAME, event);

@@ -6,7 +6,7 @@
 
 #include "common/string/stringid_types.h"
 #include "common/memory/memory_types.h"
-#include "runtime/runtime_types.h"
+#include "os/os_types.h"
 
 namespace cetech {
     class ResourceManager {
