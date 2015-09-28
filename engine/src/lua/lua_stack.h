@@ -67,9 +67,13 @@ namespace cetech {
                     };
                 } lh;
                 lh.lh = string_id;
+
+                lua_newtable(_L);
                 
-                push_uint32(lh.h);
-                push_uint32(lh.l);
+                lua_pushinteger(_L,lh.h);
+                lua_rawseti(_L,-2, 1);
+                lua_pushinteger(_L,lh.l);
+                lua_rawseti(_L,-2, 2);
             }
             
 
@@ -98,8 +102,12 @@ namespace cetech {
                     };
                 } lh;
                 
-                lh.l = get_int(1);
-                lh.h = get_int(2);
+                
+                lua_rawgeti(_L, i, 1);
+                lh.h = get_int(-1);
+                
+                lua_rawgeti(_L, i, 2);
+                lh.l = get_int(-1);
                 
                 return lh.lh;
             }
