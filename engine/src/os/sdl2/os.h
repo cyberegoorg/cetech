@@ -437,6 +437,12 @@ namespace cetech {
             }
         }
 
+        namespace cpu {
+            uint32_t core_count() {
+                return SDL_GetCPUCount();
+            }
+        }
+
         namespace thread {
             Thread create_thread(thread_fce_t fce, const char* name, void* data) {
                 return (Thread) {
@@ -456,12 +462,12 @@ namespace cetech {
                 return SDL_ThreadID();
             }
 
-            void spin_lock(Spinlock* lock) {
-                SDL_AtomicLock(&lock->l);
+            void spin_lock(Spinlock &lock) {
+                SDL_AtomicLock(&(lock.l));
             }
 
-            void spin_unlock(Spinlock* lock) {
-                SDL_AtomicUnlock(&lock->l);
+            void spin_unlock(Spinlock &lock) {
+                SDL_AtomicUnlock(&(lock.l));
             }
         }
     }

@@ -4,6 +4,7 @@ Game = Game or {}
 
 local pkg1 = Package.create("pkg1")
 local quit_btn = Keyboard.button_index 'q'
+
 function Game:init()
     log.info("boot.lua", "init")
     
@@ -14,8 +15,6 @@ function Game:init()
 
     Package.load(pkg1)
     Package.unload(pkg1)
-
-    print(quit_btn)
 end
 
 function Game:shutdown()

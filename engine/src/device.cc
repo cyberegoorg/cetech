@@ -58,16 +58,6 @@ void posix_init() {
 }
 
 namespace cetech {
-    class TaskManager {
-        public:
-            typedef uint32_t TaskID;
-            
-            virtual ~TaskManager() {};
-            
-    };
-}
-
-namespace cetech {
     class DeviceImplementation : public Device {
         public:
             friend class Device;
@@ -81,6 +71,7 @@ namespace cetech {
             uint32_t _last_frame_ticks;
             float _delta_time;
 
+            TaskManager* _task_manager;
             ResourceManager* _resource_manager;
             PackageManager* _package_manager;
             DevelopManager* _develop_manager;
@@ -102,7 +93,6 @@ namespace cetech {
             virtual void init(int argc, const char** argv) final {
                 command_line_globals::set_args(argc, argv);
 
-                log::init();
                 log::register_handler(&log_handlers::stdout_handler);
 
                 posix_init();
@@ -115,6 +105,7 @@ namespace cetech {
                 _filesystem = disk_filesystem::make(memory_globals::default_allocator(), cvars::rm_build_dir.value_str);
                 load_config_json();
 
+                _task_manager = TaskManager::make(memory_globals::default_allocator());
                 _resource_manager = ResourceManager::make(memory_globals::default_allocator(), _filesystem);
                 _package_manager = PackageManager::make(memory_globals::default_allocator());
                 _console_server = ConsoleServer::make(memory_globals::default_allocator());
@@ -156,6 +147,7 @@ namespace cetech {
                 PackageManager::destroy(memory_globals::default_allocator(), _package_manager);
                 ResourceManager::destroy(memory_globals::default_allocator(), _resource_manager);
                 DevelopManager::destroy(memory_globals::default_allocator(), _develop_manager);
+                TaskManager::destroy(memory_globals::default_allocator(), _task_manager);
                 ConsoleServer::destroy(memory_globals::default_allocator(), _console_server);
                 LuaEnviroment::destroy(memory_globals::default_allocator(), _lua_eviroment);
                 disk_filesystem::destroy(memory_globals::default_allocator(), _filesystem);
@@ -163,6 +155,11 @@ namespace cetech {
                 os::shutdown();
             }
 
+            static void console_server_tick(void* data) {
+                DeviceImplementation* d = (DeviceImplementation*) data;
+                d->_console_server->tick();
+            }
+            
             virtual void run() final {
                 if (command_line_globals::has_argument("--wait", 'w')) {
                     log::info("main", "Wating for clients.");
@@ -176,7 +173,9 @@ namespace cetech {
                 _flags.run = 1;
                 float dt = 0.0f;
                 while (_flags.run) {
-                    _develop_manager->push_begin_frame();
+                    TaskManager::TaskID console_server =  _task_manager->add_begin(console_server_tick, this, 0, NULL_TASK, NULL_TASK);
+                    
+                    _task_manager->add_end(&console_server, 1);
 
                     uint32_t now_ticks = os::get_ticks();
                     dt = (now_ticks - this->_last_frame_ticks) * 0.001f;
@@ -188,7 +187,7 @@ namespace cetech {
                     _develop_manager->push_record_float("engine.frame_rate", 1.0f / dt);
 
                     os::frame_start();
-                    _console_server->tick();
+                    //_console_server->tick();
                     //
 
                     usleep(3 * 1000);
@@ -202,6 +201,8 @@ namespace cetech {
                     _develop_manager->send_buffer();
                     _develop_manager->clear();
                     ++(this->_frame_id);
+                    
+                    _task_manager->wait(console_server);
                 }
 
                 log::info("main", "Bye Bye");
@@ -209,6 +210,12 @@ namespace cetech {
 
             virtual void quit() final {
                 _flags.run = 0;
+            }
+
+            virtual TaskManager& task_manager() final {
+                CE_CHECK_PTR(this->_task_manager);
+
+                return *(this->_task_manager);
             }
 
             virtual ResourceManager& resource_manager() final {
