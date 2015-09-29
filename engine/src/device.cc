@@ -127,7 +127,7 @@ namespace cetech {
                 init_boot();
 
                 this->_last_frame_ticks = os::get_ticks();
-                
+
 
                 os::Window w = os::window::make_window(
                     "aaa",
@@ -135,13 +135,13 @@ namespace cetech {
                     800, 600,
                     os::window::WINDOW_NOFLAG
                     );
-                
+
                 _lua_eviroment->call_global("init");
             }
 
             virtual void shutdown() final {
                 _lua_eviroment->call_global("shutdown");
-                
+
                 PackageManager::destroy(memory_globals::default_allocator(), _package_manager);
                 ResourceManager::destroy(memory_globals::default_allocator(), _resource_manager);
                 DevelopManager::destroy(memory_globals::default_allocator(), _develop_manager);
@@ -184,7 +184,7 @@ namespace cetech {
                     if (!_flags.pause) {
                         _lua_eviroment->call_global("update", "f", dt);
                     }
-   
+
                     //
                     os::frame_end();
                     _develop_manager->push_end_frame();

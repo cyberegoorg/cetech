@@ -6,7 +6,7 @@
 namespace cetech {
     static int keyboard_button_index(lua_State* L) {
         LuaStack stack(L);
-        
+
         const char* scancode = stack.to_string(1);
         const uint32_t index = os::keyboard::button_index(scancode);
         stack.push_uint32(index);
@@ -15,7 +15,7 @@ namespace cetech {
 
     static int keyboard_button_name(lua_State* L) {
         LuaStack stack(L);
-        
+
         uint32_t index = stack.to_int(1);
         stack.push_string(os::keyboard::button_name(index));
         return 1;
@@ -23,7 +23,7 @@ namespace cetech {
 
     static int keyboard_button_state(lua_State* L) {
         LuaStack stack(L);
-        
+
         uint32_t index = stack.to_int(1);
         stack.push_bool(os::keyboard::button_state(index));
         return 1;
@@ -31,7 +31,7 @@ namespace cetech {
 
     static int keyboard_button_pressed(lua_State* L) {
         LuaStack stack(L);
-        
+
         uint32_t index = stack.to_int(1);
         stack.push_bool(os::keyboard::button_pressed(index));
         return 1;
@@ -39,7 +39,7 @@ namespace cetech {
 
     static int keyboard_button_released(lua_State* L) {
         LuaStack stack(L);
-        
+
         uint32_t index = stack.to_int(1);
         stack.push_bool(os::keyboard::button_released(index));
         return 1;
