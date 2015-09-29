@@ -67,13 +67,13 @@ namespace cetech {
                 lh.lh = string_id;
 
                 lua_newtable(_L);
-                
+
                 push_uint32(lh.h);
-                lua_rawseti(_L,-2, 1);
+                lua_rawseti(_L, -2, 1);
                 push_uint32(lh.l);
-                lua_rawseti(_L,-2, 2);
+                lua_rawseti(_L, -2, 2);
             }
-            
+
 
             bool to_bool(int i) {
                 return lua_toboolean(_L, i) == 1;
@@ -99,14 +99,14 @@ namespace cetech {
                         uint32_t h;
                     };
                 } lh;
-                
-                
+
+
                 lua_rawgeti(_L, i, 1);
                 lh.h = to_int(-1);
-                
+
                 lua_rawgeti(_L, i, 2);
                 lh.l = to_int(-1);
-                
+
                 return lh.lh;
             }
 

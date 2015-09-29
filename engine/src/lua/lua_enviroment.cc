@@ -100,37 +100,37 @@ namespace cetech {
             //lua_pushcfunction(L, error_handler);
             lua_getglobal(_state, func);
 
-            if(args != nullptr ) {
+            if (args != nullptr) {
                 va_list vl;
                 va_start(vl, args);
-                
-                const char *it = args;
-                while( *it != '\0' ) {
-                    switch(*it) {
-                        case 'i':
-                            stack.push_int32(va_arg(vl, int32_t));
-                            break;
-                            
-                        case 'u':
-                            stack.push_uint32(va_arg(vl, uint32_t));
-                            break;
-                            
-                        case 'f':
-                            stack.push_float(va_arg(vl, double));
-                            break;
+
+                const char* it = args;
+                while (*it != '\0') {
+                    switch (*it) {
+                    case 'i':
+                        stack.push_int32(va_arg(vl, int32_t));
+                        break;
+
+                    case 'u':
+                        stack.push_uint32(va_arg(vl, uint32_t));
+                        break;
+
+                    case 'f':
+                        stack.push_float(va_arg(vl, double));
+                        break;
                     }
-                    
+
                     ++argc;
                     ++it;
                 }
 
                 va_end(vl);
             }
-            
+
             lua_pcall(_state, argc, 0, -argc - 2);
             lua_pop(_state, -1);
         }
-        
+
         static int require(lua_State* L) {
             const char* name = lua_tostring( L, 1);
             StringId64_t name_hash = murmur_hash_64(name, strlen(name), 22);
