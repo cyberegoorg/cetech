@@ -13,7 +13,8 @@ function Game:init()
     log.debug("boot.lua", "debug")
 
     Package.load(pkg1)
-    
+    Package.unload(pkg1)
+
     print(quit_btn)
 end
 
