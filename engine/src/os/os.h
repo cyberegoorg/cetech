@@ -93,6 +93,14 @@ namespace cetech {
             CE_INLINE void listdir_free(Array < char* >& files);
         }
 
+        namespace cpu {
+            /*!
+             * Get cpu core count.
+             * \return Core count.
+             */
+            CE_INLINE uint32_t core_count();
+        }
+
         namespace thread {
             /*!
              * Create thread.
@@ -125,13 +133,13 @@ namespace cetech {
              * Spin lock.
              * \param lock Spin.
              */
-            CE_INLINE void spin_lock(Spinlock* lock);
+            CE_INLINE void spin_lock(Spinlock &lock);
 
             /*!
              * Spin unlock.
              * \param lock Spin.
              */
-            CE_INLINE void spin_unlock(Spinlock* lock);
+            CE_INLINE void spin_unlock(Spinlock &lock);
         }
     }
 }

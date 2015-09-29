@@ -5,6 +5,7 @@ using namespace cetech;
 int main(int argc, const char** argv) {
 
     memory_globals::init();
+    log::init();
     device_globals::init();
 
     Device& d = device_globals::device();
@@ -15,6 +16,7 @@ int main(int argc, const char** argv) {
 
     device_globals::shutdown();
     memory_globals::shutdown();
+    log::shutdown();
 
     return 0; // TODO: error check
 }
