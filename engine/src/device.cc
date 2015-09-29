@@ -7,6 +7,7 @@
 #include "common/command_line/command_line.h"
 #include "common/log/handlers.h"
 #include "common/container/array.inl.h"
+#include "common/string/stringid.inl.h"
 
 #include "lua/lua_enviroment.h"
 #include "lua/lua_device.h"
@@ -283,7 +284,7 @@ namespace cetech {
                 memory_globals::default_allocator().deallocate(mem);
             }
 
-            void make_path(char* buffer, size_t max_size, const char* path) {
+            static void make_path(char* buffer, size_t max_size, const char* path) {
                 memset(buffer, 0, max_size);
                 strcpy(buffer, path);
 
@@ -311,20 +312,24 @@ namespace cetech {
             }
 
             void init_boot() {
-                StringId64_t boot_pkg_name_h = murmur_hash_64(cvars::boot_pkg.value_str, strlen(
-                                                                  cvars::boot_pkg.value_str), 22);
-                StringId64_t boot_script_name_h =
-                    murmur_hash_64(cvars::boot_script.value_str, strlen(cvars::boot_script.value_str), 22);
+                StringId64_t boot_pkg_name_h = stringid64::from_cstring_len(cvars::boot_pkg.value_str,
+                                                                            cvars::boot_pkg.str_len);
+                StringId64_t boot_script_name_h = stringid64::from_cstring_len(cvars::boot_script.value_str,
+                                                                               cvars::boot_script.str_len);
 
+                // Load boot package
                 _resource_manager->load(resource_package::type_hash(), &boot_pkg_name_h, 1);
                 _package_manager->load(boot_pkg_name_h);
+                _package_manager->flush(boot_pkg_name_h);
 
-                const resource_lua::Resource* res_lua = (const resource_lua::Resource*)_resource_manager->get(
-                    resource_lua::type_hash(),
-                    boot_script_name_h);
+                // Execute boot script
+                const resource_lua::Resource* res_lua;
+                res_lua = (const resource_lua::Resource*) _resource_manager->get(
+                    resource_lua::type_hash(), boot_script_name_h);
                 _lua_eviroment->execute_resource(res_lua);
             }
 
+            // TODO: remove from device to other class.
             void compile_all_resource() {
                 FileSystem* source_fs = disk_filesystem::make(
                     memory_globals::default_allocator(), cvars::rm_source_dir.value_str);
