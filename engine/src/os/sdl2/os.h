@@ -462,11 +462,11 @@ namespace cetech {
                 return SDL_ThreadID();
             }
 
-            void spin_lock(Spinlock &lock) {
+            void spin_lock(Spinlock& lock) {
                 SDL_AtomicLock(&(lock.l));
             }
 
-            void spin_unlock(Spinlock &lock) {
+            void spin_unlock(Spinlock& lock) {
                 SDL_AtomicUnlock(&(lock.l));
             }
         }
