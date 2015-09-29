@@ -21,7 +21,7 @@ namespace cetech {
             virtual void shutdown() = 0;
             virtual void run() = 0;
             virtual void quit() = 0;
-            
+
             virtual TaskManager& task_manager() = 0;
             virtual ResourceManager& resource_manager() = 0;
             virtual PackageManager& package_manager() = 0;

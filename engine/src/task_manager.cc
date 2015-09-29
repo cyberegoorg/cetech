@@ -22,7 +22,7 @@ namespace cetech {
                 TaskWorkFce_t fce;    //!< Worker fce.
                 void* data;           //!< Worker data.
             };
-            
+
             struct Task {
                 TaskID id;                  //!< Task id
                 TaskID depend;              //!< Task depend
@@ -50,14 +50,15 @@ namespace cetech {
             Array < os::Thread > _workers;
 
 
-            TaskManagerImplementation(Allocator & allocator) : _last_id(0), _task_count(0), _open_task_count(0), _workers(allocator) {
-                memset(_task_queue, 0, sizeof(uint32_t)*MAX_TASK);
-                memset(_open_task, 0, sizeof(uint32_t)*MAX_TASK);
-                memset(_task_pool, 0, sizeof(Task)*MAX_TASK);
-                
+            TaskManagerImplementation(Allocator & allocator) : _last_id(0), _task_count(0), _open_task_count(0),
+                                                               _workers(allocator) {
+                memset(_task_queue, 0, sizeof(uint32_t) * MAX_TASK);
+                memset(_open_task, 0, sizeof(uint32_t) * MAX_TASK);
+                memset(_task_pool, 0, sizeof(Task) * MAX_TASK);
+
                 uint32_t core_count = os::cpu::core_count();
 
-                const uint32_t main_threads_count = 2;
+                static const uint32_t main_threads_count = 1;
                 const uint32_t worker_count = core_count - main_threads_count;
 
                 log::info("task", "Core count: %u", core_count);
@@ -79,17 +80,21 @@ namespace cetech {
                 }
             };
 
-            
-            
-            virtual TaskID add_begin(const TaskWorkFce_t fce, void* data, const uint32_t priority, const TaskID depend, const TaskID parent) final {
+
+
+            virtual TaskID add_begin(const TaskWorkFce_t fce,
+                                     void* data,
+                                     const uint32_t priority,
+                                     const TaskID depend,
+                                     const TaskID parent) final {
                 TaskWorkCallback callback = { fce, data };
-                
+
                 os::thread::spin_lock(_lock);
 
                 const uint32_t id = ++this->_last_id;
 
                 uint32_t task = _new_task_from_pool();
-                
+
                 /* First? */
                 if (this->_task_count == 0) {
                     Task t;
@@ -135,10 +140,11 @@ namespace cetech {
                 ++this->_open_task_count;
                 ++this->_task_count;
 
-                 os::thread::spin_unlock(_lock);;
+                os::thread::spin_unlock(_lock);
                 return (TaskID) {
                            id
                 };
+
             }
 
             virtual TaskID add_empty_begin(const uint32_t priority, const TaskID depend, const TaskID parent) final {
@@ -146,7 +152,7 @@ namespace cetech {
             }
 
             virtual void add_end(const TaskID* tasks, const uint32_t count) final {
-                 os::thread::spin_lock(_lock);
+                os::thread::spin_lock(_lock);
 
                 for (uint32_t i = 0; i < MAX_TASK; ++i) {
                     for (uint32_t j = 0; j < count; ++j) {
@@ -159,13 +165,13 @@ namespace cetech {
                     }
                 }
 
-                 os::thread::spin_unlock(_lock);
+                os::thread::spin_unlock(_lock);
             }
-            
+
             virtual void wait(const TaskID id) final {
-                while ( /*app_is_run() &&*/ (array::size(_workers) > 0) && !task_is_done(id)) {
+                while (/*app_is_run() &&*/ (array::size(_workers) > 0) && !task_is_done(id)) {
                     Task t = task_pop_new_work();
-                    
+
                     if (t.id.i == 0) {
                         continue;
                     }
@@ -177,11 +183,10 @@ namespace cetech {
                     _mark_task_job_done(t.id);
                 }
             }
-            
+
             /*! NOP task.
              */
-            static void _task_nop(void*) {
-            }
+            static void _task_nop(void*) {}
 
             /*! Get new task idx from pool.
              * \return Task idx.
@@ -243,7 +248,7 @@ namespace cetech {
                     break;
                 }
 
-                // os::thread::spin_unlock(_lock);;
+                // os::thread::spin_unlock(_lock);
             }
 
             /*! Is task done?
@@ -287,17 +292,17 @@ namespace cetech {
             uint8_t task_is_done(TaskID id) {
                 // os::thread::spin_lock(_lock);
                 uint8_t is_done = _is_task_done(id);
-                // os::thread::spin_unlock(_lock);;
+                // os::thread::spin_unlock(_lock);
                 return is_done;
             }
 
 
 
             Task task_pop_new_work() {
-                 os::thread::spin_lock(_lock);
+                os::thread::spin_lock(_lock);
 
                 if (this->_task_count < 1) {
-                     os::thread::spin_unlock(_lock);;
+                    os::thread::spin_unlock(_lock);
                     return (Task)TASK_INITIALIZER;
                 }
 
@@ -320,12 +325,12 @@ namespace cetech {
 
                     --this->_task_count;
                     CE_ASSERT(this->_task_count != 4294967295);
-                    
-                     os::thread::spin_unlock(_lock);;
+
+                    os::thread::spin_unlock(_lock);
                     return t;
                 }
 
-                 os::thread::spin_unlock(_lock);;
+                os::thread::spin_unlock(_lock);
                 return (Task)TASK_INITIALIZER;
             }
 
@@ -334,7 +339,7 @@ namespace cetech {
 
                 while (1) {
                     Task t = tm->task_pop_new_work();
-                    
+
                     if (t.id.i == 0) {
                         continue;
                     }

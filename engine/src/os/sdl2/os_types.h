@@ -20,9 +20,8 @@ namespace cetech {
 
         struct Spinlock {
             SDL_SpinLock l;
-            
-            Spinlock(): l(0) {
-            }
+
+            Spinlock() : l(0) {}
         };
     }
 }

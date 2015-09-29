@@ -159,7 +159,7 @@ namespace cetech {
                 DeviceImplementation* d = (DeviceImplementation*) data;
                 d->_console_server->tick();
             }
-            
+
             virtual void run() final {
                 if (command_line_globals::has_argument("--wait", 'w')) {
                     log::info("main", "Wating for clients.");
@@ -173,10 +173,6 @@ namespace cetech {
                 _flags.run = 1;
                 float dt = 0.0f;
                 while (_flags.run) {
-                    TaskManager::TaskID console_server =  _task_manager->add_begin(console_server_tick, this, 0, NULL_TASK, NULL_TASK);
-                    
-                    _task_manager->add_end(&console_server, 1);
-
                     uint32_t now_ticks = os::get_ticks();
                     dt = (now_ticks - this->_last_frame_ticks) * 0.001f;
                     this->_delta_time = dt;
@@ -190,6 +186,18 @@ namespace cetech {
                     //_console_server->tick();
                     //
 
+                    TaskManager::TaskID frame_task = _task_manager->add_empty_begin(0);
+                    TaskManager::TaskID console_server_task = _task_manager->add_begin(
+                        console_server_tick, this, 0,
+                        NULL_TASK, frame_task
+                        );
+
+                    const TaskManager::TaskID task_end[] = {
+                        frame_task,
+                        console_server_task,
+                    };
+                    _task_manager->add_end(task_end, (sizeof(task_end) / sizeof(TaskManager::TaskID)));
+                    
                     usleep(3 * 1000);
                     if (!_flags.pause) {
                         _lua_eviroment->call_global("update", "f", dt);
@@ -201,8 +209,8 @@ namespace cetech {
                     _develop_manager->send_buffer();
                     _develop_manager->clear();
                     ++(this->_frame_id);
-                    
-                    _task_manager->wait(console_server);
+
+                    _task_manager->wait(frame_task);
                 }
 
                 log::info("main", "Bye Bye");
