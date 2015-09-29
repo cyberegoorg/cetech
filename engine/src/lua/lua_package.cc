@@ -27,6 +27,14 @@ namespace cetech {
         return 0;
     }
 
+    static int package_unload(lua_State* L) {
+        LuaStack stack(L);
+
+        StringId64_t package_id = stack.to_string64id(1);
+        device_globals::device().package_manager().unload(package_id);
+
+        return 0;
+    }
 
     static int package_is_loaded(lua_State* L) {
         LuaStack stack(L);
@@ -50,6 +58,7 @@ namespace cetech {
         void load_libs(LuaEnviroment& env) {
             env.set_module_function(module_name, "create", package_create);
             env.set_module_function(module_name, "load", package_load);
+            env.set_module_function(module_name, "unload", package_unload);
             env.set_module_function(module_name, "is_loaded", package_is_loaded);
             env.set_module_function(module_name, "flush", package_flush);
         }

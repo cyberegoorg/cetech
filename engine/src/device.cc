@@ -58,6 +58,16 @@ void posix_init() {
 }
 
 namespace cetech {
+    class TaskManager {
+        public:
+            typedef uint32_t TaskID;
+            
+            virtual ~TaskManager() {};
+            
+    };
+}
+
+namespace cetech {
     class DeviceImplementation : public Device {
         public:
             friend class Device;
