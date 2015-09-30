@@ -92,7 +92,7 @@ namespace cetech {
                 }
                 
                 
-                /* Compile Task Pool, reduce alloc free, ringbuffer? */
+                // TODO: Compile Task Pool, reduce alloc free, ringbuffer?
                 CompileTask* ct = MAKE_NEW(memory_globals::default_allocator(), CompileTask);
                 ct->source_fs = source_fs;
                 ct->out_fs = _fs;
