@@ -37,17 +37,16 @@ namespace cetech {
 
             char* filename;
             uint64_t name, type;
+            
             resource_compiler_clb_t clb;
         };
 
         static void compile_task(void* data) {
             CompileTask* ct = (CompileTask*)data;
-
-            char* filename = ct->filename;
-
+            
             log::info("resource_manager",
                       "Compile \"%s\" => (" "%" PRIx64 ", " "%" PRIx64 ").",
-                      filename,
+                      ct->filename,
                       ct->type,
                       ct->name);
 
@@ -55,14 +54,13 @@ namespace cetech {
             resource_id_to_str(output_filename, ct->type, ct->name);
 
             File* f_in;
-            File* f_out;
-            f_in = ct->source_fs->open(filename, File::READ);
+            f_in = ct->source_fs->open(ct->filename, File::READ);
             if (!f_in->is_valid()) {
-                log::error("resource_manager", "Could not open source file \"%s\"", filename);
+                log::error("resource_manager", "Could not open source file \"%s\"", ct->filename);
                 return;
             }
 
-            f_out = ct->out_fs->open(output_filename, File::WRITE);
+            File* f_out = ct->out_fs->open(output_filename, File::WRITE);
 
             ct->clb(f_in, f_out);
 
@@ -74,14 +72,13 @@ namespace cetech {
             Array < char* > files(memory_globals::default_allocator());
             source_fs->list_directory(cvars::rm_source_dir.value_str, files);
 
-            const size_t source_dir_len = cvars::rm_source_dir.str_len;
 
             TaskManager& tm = device_globals::device().task_manager();
             TaskManager::TaskID top_compile_task = tm.add_empty_begin(0);
 
             const uint32_t files_count = array::size(files);
             for (uint32_t i = 0; i < files_count; ++i) {
-                const char* filename = files[i] + source_dir_len; /* Base path */
+                const char* filename = files[i] + cvars::rm_source_dir.str_len; /* Base path */
 
                 uint64_t name, type = 0;
                 calc_hash(filename, type, name);
@@ -93,7 +90,9 @@ namespace cetech {
                     log::error("resource_manager", "Resource type " "%" PRIx64 " not register compiler.", type);
                     continue;
                 }
-
+                
+                
+                /* Compile Task Pool, reduce alloc free, ringbuffer? */
                 CompileTask* ct = MAKE_NEW(memory_globals::default_allocator(), CompileTask);
                 ct->source_fs = source_fs;
                 ct->out_fs = _fs;
