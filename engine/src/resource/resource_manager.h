@@ -24,7 +24,9 @@ namespace cetech {
 
             virtual TaskManager::TaskID compile(FileSystem* source_fs) = 0;
 
-            virtual void load(StringId64_t type, const StringId64_t* names, const uint32_t count) = 0;
+            virtual void load(void** loaded_data, StringId64_t type, const StringId64_t* names, const uint32_t count) = 0;
+            virtual void add_loaded(void** loaded_data, StringId64_t type, const StringId64_t* names, const uint32_t count) = 0;
+            
             virtual void unload(StringId64_t type, const StringId64_t* names, const uint32_t count) = 0;
 
             virtual bool can_get(StringId64_t type, StringId64_t* names, const uint32_t count) = 0;

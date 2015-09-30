@@ -13,6 +13,7 @@
 
 namespace cetech {
     class ResourceManagerImplementation final : public ResourceManager {
+    public:
         friend class ResourceManager;
 
         FileSystem* _fs;
@@ -24,6 +25,8 @@ namespace cetech {
         Hash < resource_unloader_clb_t > _unload_clb_map;
         Hash < resource_compiler_clb_t > _compile_clb_map;
 
+        os::Spinlock add_lock;
+        
         ResourceManagerImplementation(FileSystem * fs, Allocator & allocator) : _fs(fs), _data_map(allocator),
                                                                                 _data_refcount_map(allocator),
                                                                                 _load_clb_map(allocator),
@@ -66,6 +69,8 @@ namespace cetech {
 
             ct->source_fs->close(f_in);
             ct->out_fs->close(f_out);
+            
+            //MAKE_DELETE(memory_globals::default_allocator(), CompileTask, data);
         }
 
         virtual TaskManager::TaskID compile(FileSystem* source_fs) final {
@@ -111,7 +116,7 @@ namespace cetech {
             return top_compile_task;
         }
 
-        virtual void load(StringId64_t type, const StringId64_t* names, const uint32_t count) final {
+        virtual void load(void** loaded_data, StringId64_t type, const StringId64_t* names, const uint32_t count) final {
             StringId64_t name = 0;
 
             resource_loader_clb_t clb = hash::get < resource_loader_clb_t >
@@ -137,6 +142,7 @@ namespace cetech {
                                "Could not open resouce (" "%" PRIx64 ", " "%" PRIx64 ").",
                                type,
                                name);
+                    loaded_data[i] = nullptr;
                     continue;
                 }
 
@@ -147,16 +153,25 @@ namespace cetech {
                                "Could not load resouce (" "%" PRIx64 ", " "%" PRIx64 ").",
                                type,
                                name);
-                    goto close;
                 }
 
-                hash::set(this->_data_map, type ^ name, data);
-                inc_reference(type, name);
+                loaded_data[i] = data;
 close:
                 _fs->close(f);
             }
         }
+        
+        virtual void add_loaded(void** loaded_data, StringId64_t type, const StringId64_t* names, const uint32_t count) final {
+            os::thread::spin_lock(add_lock);
+            for (uint32_t i = 0; i < count; ++i) {
+                const StringId64_t name = names[i];
 
+                hash::set(this->_data_map, type ^ name, loaded_data[i]);
+                inc_reference(type, name);
+            }
+            os::thread::spin_unlock(add_lock);
+        };
+        
 
         virtual void unload(StringId64_t type, const StringId64_t* names, const uint32_t count) final {
             resource_unloader_clb_t clb = hash::get < resource_unloader_clb_t >
@@ -188,6 +203,7 @@ close:
                 name = names[i];
 
                 if (!hash::has(this->_data_map, type ^ name)) {
+                    os::thread::spin_unlock(add_lock);
                     return false;
                 }
             }
@@ -214,7 +230,7 @@ close:
         CE_INLINE void inc_reference(StringId64_t type, const StringId64_t name) {
             const uint32_t counter = hash::get < uint32_t > (_data_refcount_map, type ^ name, 0) + 1;
 
-            log::debug("resource_manager", "Inc reference for" "%" PRIx64 " counter == %d ", type ^ name, counter);
+            log::debug("resource_manager", "Inc reference for (%" PRIx64 ", %" PRIx64 ") counter == %d ", type,  name, counter);
 
             hash::set(_data_refcount_map, type ^ name, counter);
         }
@@ -222,7 +238,7 @@ close:
         CE_INLINE bool dec_reference(StringId64_t type, const StringId64_t name) {
             const uint32_t counter = hash::get < uint32_t > (_data_refcount_map, type ^ name, 1) - 1;
 
-            log::debug("resource_manager", "Dec reference for" "%" PRIx64 " counter == %d ", type ^ name, counter);
+            log::debug("resource_manager", "Dec reference for  (%" PRIx64 ", %" PRIx64 ") counter == %d ", type, name, counter);
 
             hash::set(_data_refcount_map, type ^ name, counter);
 

@@ -14,7 +14,6 @@ function Game:init()
     log.debug("boot.lua", "debug")
 
     Package.load(pkg1)
-    Package.unload(pkg1)
 end
 
 function Game:shutdown()
@@ -25,5 +24,11 @@ function Game:update(dt)
     if Keyboard.pressed(quit_btn) then
         print("q")
         Device.quit()
+    end
+    
+    
+    if Package.is_loaded(pkg1) then
+        print("unload")
+        Package.unload(pkg1)
     end
 end
