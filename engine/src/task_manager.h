@@ -10,11 +10,11 @@
 namespace cetech {
     class TaskManager {
         public:
+            typedef void (* TaskWorkFce_t)(void*);
+
             struct TaskID {
                 uint32_t i;
             };
-
-            typedef void (* TaskWorkFce_t)(void*);
 
             virtual ~TaskManager() {};
 
@@ -23,9 +23,11 @@ namespace cetech {
                                      const uint32_t priority,
                                      const TaskID depend = NULL_TASK,
                                      const TaskID parent = NULL_TASK) = 0;
+
             virtual TaskID add_empty_begin(const uint32_t priority,
                                            const TaskID depend = NULL_TASK,
                                            const TaskID parent = NULL_TASK) = 0;
+
             virtual void add_end(const TaskID* tasks, const uint32_t count) = 0;
 
             virtual void wait(const TaskID id) = 0;

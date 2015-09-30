@@ -227,7 +227,7 @@ namespace cetech {
              * \param id Task id.
              */
             void _mark_task_job_done(TaskID id) {
-                // os::thread::spin_lock(_lock);
+                os::thread::spin_lock(_lock);
 
                 for (uint32_t i = 0; i < this->_open_task_count; ++i) {
                     Task* t = &this->_task_pool[this->_open_task[i]];
@@ -248,7 +248,7 @@ namespace cetech {
                     break;
                 }
 
-                // os::thread::spin_unlock(_lock);
+                os::thread::spin_unlock(_lock);
             }
 
             /*! Is task done?

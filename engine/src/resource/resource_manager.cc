@@ -30,52 +30,86 @@ namespace cetech {
                                                                                 _unload_clb_map(allocator),
                                                                                 _compile_clb_map(allocator) {}
 
-        virtual void compile(FileSystem* source_fs) final {
+
+        struct CompileTask {
+            FileSystem* source_fs;
+            FileSystem* out_fs;
+
+            char* filename;
+            uint64_t name, type;
+            resource_compiler_clb_t clb;
+        };
+
+        static void compile_task(void* data) {
+            CompileTask* ct = (CompileTask*)data;
+
+            char* filename = ct->filename;
+
+            log::info("resource_manager",
+                      "Compile \"%s\" => (" "%" PRIx64 ", " "%" PRIx64 ").",
+                      filename,
+                      ct->type,
+                      ct->name);
+
+            char output_filename[512] = {0};
+            resource_id_to_str(output_filename, ct->type, ct->name);
+
+            File* f_in;
+            File* f_out;
+            f_in = ct->source_fs->open(filename, File::READ);
+            if (!f_in->is_valid()) {
+                log::error("resource_manager", "Could not open source file \"%s\"", filename);
+                return;
+            }
+
+            f_out = ct->out_fs->open(output_filename, File::WRITE);
+
+            ct->clb(f_in, f_out);
+
+            ct->source_fs->close(f_in);
+            ct->out_fs->close(f_out);
+        }
+
+        virtual TaskManager::TaskID compile(FileSystem* source_fs) final {
             Array < char* > files(memory_globals::default_allocator());
             source_fs->list_directory(cvars::rm_source_dir.value_str, files);
 
             const size_t source_dir_len = cvars::rm_source_dir.str_len;
 
+            TaskManager& tm = device_globals::device().task_manager();
+            TaskManager::TaskID top_compile_task = tm.add_empty_begin(0);
+
             const uint32_t files_count = array::size(files);
             for (uint32_t i = 0; i < files_count; ++i) {
                 const char* filename = files[i] + source_dir_len; /* Base path */
 
-
                 uint64_t name, type = 0;
                 calc_hash(filename, type, name);
-
-                log::info("resource_manager",
-                          "Compile \"%s\" => (" "%" PRIx64 ", " "%" PRIx64 ").",
-                          filename,
-                          type,
-                          name);
-
-                char output_filename[512] = {0};
-                resource_id_to_str(output_filename, type, name);
-
-                File* f_in;
-                File* f_out;
-                f_in = source_fs->open(filename, File::READ);
-                if (!f_in->is_valid()) {
-                    log::error("resource_manager", "Could not open source file \"%s\"", filename);
-                    return;
-                }
-
-                f_out = _fs->open(output_filename, File::WRITE);
 
                 resource_compiler_clb_t clb = hash::get < resource_compiler_clb_t >
                                               (this->_compile_clb_map, type, nullptr);
 
                 if (clb == nullptr) {
                     log::error("resource_manager", "Resource type " "%" PRIx64 " not register compiler.", type);
-                    goto close;
+                    continue;
                 }
 
-                clb(f_in, f_out);
-close:
-                source_fs->close(f_in);
-                _fs->close(f_out);
+                CompileTask* ct = MAKE_NEW(memory_globals::default_allocator(), CompileTask);
+                ct->source_fs = source_fs;
+                ct->out_fs = _fs;
+                ct->filename = strdup(filename);
+                ct->name = name;
+                ct->type = type;
+                ct->clb = clb;
+
+                TaskManager::TaskID tid = tm.add_begin(compile_task, ct, 0, NULL_TASK, top_compile_task);
+                tm.add_end(&tid, 1);
             }
+
+            os::dir::listdir_free(files);
+
+            tm.add_end(&top_compile_task, 1);
+            return top_compile_task;
         }
 
         virtual void load(StringId64_t type, const StringId64_t* names, const uint32_t count) final {
@@ -196,7 +230,7 @@ close:
             return counter == 0;
         }
 
-        CE_INLINE void calc_hash(const char* path, StringId64_t& type, StringId64_t& name) {
+        static CE_INLINE void calc_hash(const char* path, StringId64_t& type, StringId64_t& name) {
             const char* t = strrchr(path, '.');
             CE_CHECK_PTR(t);
 
@@ -209,7 +243,7 @@ close:
             name = stringid64::from_cstring_len(path, sz);
         }
 
-        CE_INLINE void resource_id_to_str(char* buffer, const StringId64_t& type, const StringId64_t& name) {
+        static CE_INLINE void resource_id_to_str(char* buffer, const StringId64_t& type, const StringId64_t& name) {
             std::sprintf(buffer, "%" PRIx64 "%" PRIx64, type, name);
         }
     };
