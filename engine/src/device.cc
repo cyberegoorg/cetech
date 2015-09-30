@@ -196,7 +196,7 @@ namespace cetech {
                         frame_task,
                         console_server_task,
                     };
-                    _task_manager->add_end(task_end, (sizeof(task_end) / sizeof(TaskManager::TaskID)));
+                    _task_manager->add_end(task_end, sizeof(task_end) / sizeof(TaskManager::TaskID));
 
                     usleep(3 * 1000);
                     if (!_flags.pause) {
@@ -343,7 +343,11 @@ namespace cetech {
                                                                                cvars::boot_script.str_len);
 
                 // Load boot package
-                _resource_manager->load(resource_package::type_hash(), &boot_pkg_name_h, 1);
+                
+                void* package_data[1];
+                _resource_manager->load(package_data, resource_package::type_hash(), &boot_pkg_name_h, 1);
+                _resource_manager->add_loaded(package_data, resource_package::type_hash(), &boot_pkg_name_h, 1);
+                
                 _package_manager->load(boot_pkg_name_h);
                 _package_manager->flush(boot_pkg_name_h);
 
