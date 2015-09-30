@@ -197,7 +197,7 @@ namespace cetech {
                         console_server_task,
                     };
                     _task_manager->add_end(task_end, (sizeof(task_end) / sizeof(TaskManager::TaskID)));
-                    
+
                     usleep(3 * 1000);
                     if (!_flags.pause) {
                         _lua_eviroment->call_global("update", "f", dt);
@@ -359,7 +359,8 @@ namespace cetech {
                 FileSystem* source_fs = disk_filesystem::make(
                     memory_globals::default_allocator(), cvars::rm_source_dir.value_str);
 
-                _resource_manager->compile(source_fs);
+                TaskManager::TaskID compile_tid = _resource_manager->compile(source_fs);
+                _task_manager->wait(compile_tid);
 
                 disk_filesystem::destroy(memory_globals::default_allocator(), source_fs);
             }
