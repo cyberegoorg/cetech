@@ -1,4 +1,3 @@
-#include "lua/lua_enviroment.h"
 #include "lua/lua_stack.h"
 
 #include "os/os.h"
