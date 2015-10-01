@@ -5,6 +5,14 @@
 #include "lua/lua_enviroment.h"
 #include "lua/lua_stack.h"
 
+#include "lua/api/lua_mouse.h"
+#include "lua/api/lua_device.h"
+#include "lua/api/lua_keyboard.h"
+#include "lua/api/lua_package.h"
+#include "lua/api/lua_vector2.h"
+#include "lua/api/lua_vector3.h"
+
+
 #include "common/asserts.h"
 #include "common/log/log.h"
 #include "common/math/vector2.inl.h"
@@ -55,6 +63,16 @@ namespace cetech {
 
             create_Vector2_mt();
             create_Vector3_mt();
+
+            lua_device::load_libs(*this);
+            lua_keyboard::load_libs(*this);
+            lua_mouse::load_libs(*this);
+            
+            lua_package::load_libs(*this);
+            
+            lua_vector2::load_libs(*this);
+            lua_vector3::load_libs(*this);
+
         }
 
         virtual ~LuaEnviromentImlementation() final {

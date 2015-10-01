@@ -10,11 +10,6 @@
 #include "common/string/stringid.inl.h"
 
 #include "lua/lua_enviroment.h"
-#include "lua/lua_device.h"
-#include "lua/lua_keyboard.h"
-#include "lua/lua_package.h"
-#include "lua/lua_vector2.h"
-#include "lua/lua_vector3.h"
 
 #include "resource/resource_manager.h"
 #include "package/package_manager.h"
@@ -119,12 +114,6 @@ namespace cetech {
                 log::register_handler(&log_handlers::console_server_handler);
 
                 register_resources();
-
-                lua_device::load_libs(*_lua_eviroment);
-                lua_keyboard::load_libs(*_lua_eviroment);
-                lua_package::load_libs(*_lua_eviroment);
-                lua_vector2::load_libs(*_lua_eviroment);
-                lua_vector3::load_libs(*_lua_eviroment);
 
                 if (command_line_globals::has_argument("compile", 'c')) {
                     compile_all_resource();

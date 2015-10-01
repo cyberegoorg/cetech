@@ -1,0 +1,60 @@
+#include "lua/lua_enviroment.h"
+#include "lua/lua_stack.h"
+
+#include "os/os.h"
+
+namespace cetech {
+
+    static int mouse_button_index(lua_State* L) {
+        LuaStack stack(L);
+
+        const char* scancode = stack.to_string(1);
+        const uint32_t index = os::mouse::button_index(scancode);
+        stack.push_uint32(index);
+        return 1;
+    }
+
+    static int mouse_button_name(lua_State* L) {
+        LuaStack stack(L);
+
+        uint32_t index = stack.to_int(1);
+        stack.push_string(os::mouse::button_name(index));
+        return 1;
+    }
+
+    static int mouse_button_state(lua_State* L) {
+        LuaStack stack(L);
+
+        uint32_t index = stack.to_int(1);
+        stack.push_bool(os::mouse::button_state(index));
+        return 1;
+    }
+
+    static int mouse_button_pressed(lua_State* L) {
+        LuaStack stack(L);
+
+        uint32_t index = stack.to_int(1);
+        stack.push_bool(os::mouse::button_pressed(index));
+        return 1;
+    }
+
+    static int mouse_button_released(lua_State* L) {
+        LuaStack stack(L);
+
+        uint32_t index = stack.to_int(1);
+        stack.push_bool(os::mouse::button_released(index));
+        return 1;
+    }
+
+    namespace lua_mouse {
+        static const char* module_name = "Mouse";
+
+        void load_libs(LuaEnviroment& env) {
+            env.set_module_function(module_name, "button_index", mouse_button_index);
+            env.set_module_function(module_name, "button_name", mouse_button_name);
+            env.set_module_function(module_name, "button_state", mouse_button_state);
+            env.set_module_function(module_name, "pressed", mouse_button_pressed);
+            env.set_module_function(module_name, "released", mouse_button_released);
+        }
+    }
+}
