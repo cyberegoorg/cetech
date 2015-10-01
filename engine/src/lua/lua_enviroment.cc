@@ -7,6 +7,7 @@
 
 #include "common/asserts.h"
 #include "common/log/log.h"
+#include "common/math/vector2.inl.h"
 #include "common/math/vector3.inl.h"
 #include "common/crypto/murmur_hash.inl.h"
 
@@ -18,10 +19,14 @@ namespace cetech {
         friend class LuaEnviroment;
 
         enum {
-            MAX_TEMP_VECTOR3 = 512,
+            MAX_TEMP_VECTOR2 = 1024,
+            MAX_TEMP_VECTOR3 = 1024,
         };
 
         lua_State* _state;
+
+        Vector2 _temp_vector2_buffer[MAX_TEMP_VECTOR2];
+        Uint32 _temp_vector2_used;
 
         Vector3 _temp_vector3_buffer[MAX_TEMP_VECTOR3];
         Uint32 _temp_vector3_used;
@@ -48,6 +53,7 @@ namespace cetech {
             lua_rawset(_state, -3);
             lua_pop(_state, 1);
 
+            create_Vector2_mt();
             create_Vector3_mt();
         }
 
@@ -143,9 +149,114 @@ namespace cetech {
         }
 
         virtual void clean_temp() final {
+            _temp_vector2_used = 0;
             _temp_vector3_used = 0;
         }
 
+        // Vector2
+        virtual Vector2& new_tmp_vector2() final {
+            CE_ASSERT( _temp_vector2_used < MAX_TEMP_VECTOR2 );
+            return _temp_vector2_buffer[_temp_vector2_used++];
+        }
+
+        static int Vector2_add(lua_State* L) {
+            LuaStack stack(L);
+            const Vector2& a = stack.to_vector2(1);
+            const Vector2& b = stack.to_vector2(2);
+            stack.push_vector2(a + b);
+            return 1;
+        }
+        static int Vector2_sub(lua_State* L) {
+            LuaStack stack(L);
+            const Vector2& a = stack.to_vector2(1);
+            const Vector2& b = stack.to_vector2(2);
+            stack.push_vector2(a - b);
+            return 1;
+        }
+        static int Vector2_mul(lua_State* L) {
+            LuaStack stack(L);
+            const Vector2& a = stack.to_vector2(1);
+            const float b = stack.to_float(2);
+            stack.push_vector2(a * b);
+            return 1;
+        }
+        static int Vector2_div(lua_State* L) {
+            LuaStack stack(L);
+            const Vector2& a = stack.to_vector2(1);
+            const float b = stack.to_float(2);
+            stack.push_vector2(a / b);
+            return 1;
+        }
+        static int Vector2_unm(lua_State* L) {
+            LuaStack stack(L);
+            stack.push_vector2(-stack.to_vector2(1));
+            return 1;
+        }
+        static int Vector2_index(lua_State* L) {
+            LuaStack stack(L);
+            Vector2& v = stack.to_vector2(1);
+            const char* s = stack.to_string(2);
+            switch (s[0])
+            {
+            case 'x': stack.push_float(v.x); return 1;
+            case 'y': stack.push_float(v.y); return 1;
+            default: log::error("lua", "Vector2 bad index '%s'", s[0]); break;
+            }
+
+            return 0;
+        }
+        static int Vector2_newindex(lua_State* L) {
+            LuaStack stack(L);
+            Vector2& v = stack.to_vector2(1);
+            const char* s = stack.to_string(2);
+            const float value = stack.to_float(3);
+
+            switch (s[0])
+            {
+            case 'x': v.x = value; break;
+            case 'y': v.y = value; break;
+            default: log::error("lua", "Vector2 bad index '%s'", s[0]); break;
+            }
+
+            return 0;
+        }
+
+        void create_Vector2_mt() {
+            luaL_newmetatable(_state, "Vector2_mt");
+
+            lua_pushstring(_state, "__add");
+            lua_pushcfunction(_state, Vector2_add);
+            lua_settable(_state, 1);
+
+            lua_pushstring(_state, "__sub");
+            lua_pushcfunction(_state, Vector2_sub);
+            lua_settable(_state, 1);
+
+            lua_pushstring(_state, "__mul");
+            lua_pushcfunction(_state, Vector2_mul);
+            lua_settable(_state, 1);
+
+            lua_pushstring(_state, "__div");
+            lua_pushcfunction(_state, Vector2_div);
+            lua_settable(_state, 1);
+
+            lua_pushstring(_state, "__unm");
+            lua_pushcfunction(_state, Vector2_unm);
+            lua_settable(_state, 1);
+
+            lua_pushstring(_state, "__index");
+            lua_pushcfunction(_state, Vector2_index);
+            lua_settable(_state, 1);
+
+            lua_pushstring(_state, "__newindex");
+            lua_pushcfunction(_state, Vector2_newindex);
+            lua_settable(_state, 1);
+
+            lua_pop(_state, 1);
+        }
+        // -- Vector2
+
+        // Vector3
         virtual Vector3& new_tmp_vector3() {
             CE_ASSERT( _temp_vector3_used < MAX_TEMP_VECTOR3 );
             return _temp_vector3_buffer[_temp_vector3_used++];
@@ -248,6 +359,7 @@ namespace cetech {
 
             lua_pop(_state, 1);
         }
+        // -- Vector3
 
         static int require(lua_State* L) {
             const char* name = lua_tostring( L, 1);
@@ -266,9 +378,6 @@ namespace cetech {
         }
 
     };
-
-
-
 
     LuaEnviroment* LuaEnviroment::make(Allocator& alocator) {
         return MAKE_NEW(alocator, LuaEnviromentImlementation);
