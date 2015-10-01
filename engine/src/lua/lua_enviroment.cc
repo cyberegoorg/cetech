@@ -67,9 +67,9 @@ namespace cetech {
             lua_device::load_libs(*this);
             lua_keyboard::load_libs(*this);
             lua_mouse::load_libs(*this);
-            
+
             lua_package::load_libs(*this);
-            
+
             lua_vector2::load_libs(*this);
             lua_vector3::load_libs(*this);
 

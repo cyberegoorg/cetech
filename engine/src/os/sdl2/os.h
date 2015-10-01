@@ -133,6 +133,8 @@ namespace cetech {
 
             /*Mouse*/
             int32_t x, y;
+            x = y = 0;
+
             mouse_internal::MouseButtonState = SDL_GetMouseState(&x, &y);
             mouse_internal::MouseAxis.x = x;
             mouse_internal::MouseAxis.y = y;
