@@ -20,15 +20,12 @@
 #include "cvars/cvars.h"
 #include "os/os.h"
 
-extern "C" {
 static void posix_signal_handler(int sig) {
-    printf("sadsadsadsad\n");
-    fflush(stdout);
     switch (sig) {
 
     case SIGKILL:
     case SIGINT:
-        //device_globals::device().quit();
+        cetech::device_globals::device().quit();
         break;
 
     default:
@@ -38,8 +35,6 @@ static void posix_signal_handler(int sig) {
 
 struct sigaction sigIntHandler;
 void posix_init() {
-    printf("posix_init\n");
-
     struct sigaction new_action, old_action;
 
     new_action.sa_handler = posix_signal_handler;
@@ -51,7 +46,6 @@ void posix_init() {
     if (old_action.sa_handler != SIG_IGN) {
         sigaction(SIGINT, &new_action, NULL);
     }
-}
 }
 
 namespace cetech {
@@ -87,6 +81,8 @@ namespace cetech {
                 return this->_frame_id;
             }
 
+            
+            os::Window main_window;
             virtual void init(int argc, const char** argv) final {
                 command_line_globals::set_args(argc, argv);
 
@@ -123,14 +119,6 @@ namespace cetech {
 
                 this->_last_frame_ticks = os::get_ticks();
 
-
-                os::Window w = os::window::make_window(
-                    "aaa",
-                    os::window::WINDOWPOS_CENTERED, os::window::WINDOWPOS_CENTERED,
-                    800, 600,
-                    os::window::WINDOW_NOFLAG
-                    );
-
                 _lua_eviroment->call_global("init");
             }
 
@@ -163,6 +151,13 @@ namespace cetech {
                     log::debug("main", "Client connected.");
                 }
 
+                main_window = os::window::make_window(
+                    "aaa",
+                    os::window::WINDOWPOS_CENTERED, os::window::WINDOWPOS_CENTERED,
+                    800, 600,
+                    os::window::WINDOW_NOFLAG
+                    );
+                
                 _flags.run = 1;
                 float dt = 0.0f;
                 while (_flags.run) {

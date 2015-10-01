@@ -106,7 +106,7 @@ namespace cetech {
             //             SDL_LogSetOutputFunction(&log_internal::sdl_log_output_function, nullptr);
             //             SDL_LogSetAllPriority(SDL_LOG_PRIORITY_INFO);
 
-            CE_ASSERT(SDL_Init(SDL_INIT_VIDEO) == 0);
+            CE_ASSERT(SDL_Init(SDL_INIT_EVERYTHING) == 0);
 
             mouse_internal::left_btn_hash = murmur_hash_64("left", strlen("left"), 22);
             mouse_internal::middle_btn_hash = murmur_hash_64("middle", strlen("middle"), 22);
@@ -192,6 +192,10 @@ namespace cetech {
                     width, height,
                     window_internal::sdl_flags(flags)
                     );
+
+                if(res.wnd == nullptr ) {
+                    log::error("sys", "Could not create window: %s", SDL_GetError());
+                }
 
                 return res;
             }
