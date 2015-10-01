@@ -21,6 +21,9 @@ function Game:shutdown()
 end
 
 function Game:update(dt)
+    local m_axis = Mouse.axis()
+    --print("%f, %f", m_axis.x, m_axis.y)
+    
     if Keyboard.pressed(quit_btn) then
         print("q")
         Device.quit()

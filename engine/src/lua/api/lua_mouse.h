@@ -46,6 +46,14 @@ namespace cetech {
         return 1;
     }
 
+    static int mouse_axis(lua_State* L) {
+        LuaStack stack(L);
+
+        //uint32_t index = stack.to_int(1);
+        stack.push_vector2(os::mouse::axis());
+        return 1;
+    }
+    
     namespace lua_mouse {
         static const char* module_name = "Mouse";
 
@@ -55,6 +63,7 @@ namespace cetech {
             env.set_module_function(module_name, "button_state", mouse_button_state);
             env.set_module_function(module_name, "pressed", mouse_button_pressed);
             env.set_module_function(module_name, "released", mouse_button_released);
+            env.set_module_function(module_name, "axis", mouse_axis);
         }
     }
 }
