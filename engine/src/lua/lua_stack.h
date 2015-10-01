@@ -2,6 +2,8 @@
 
 #include "luajit/lua.hpp"
 #include "common/string/stringid_types.h"
+#include "common/math/math_types.h"
+#include <device.h>
 
 namespace cetech {
     class LuaStack {
@@ -74,6 +76,14 @@ namespace cetech {
                 lua_rawseti(_L, -2, 2);
             }
 
+            void push_vector3(const Vector3& v) {
+                Vector3& tmp_v = device_globals::device().lua_enviroment().new_tmp_vector3();
+                tmp_v = v;
+
+                lua_pushlightuserdata(_L, &tmp_v);
+                luaL_getmetatable(_L, "Vector3_mt");
+                lua_setmetatable(_L, -2);
+            }
 
             bool to_bool(int i) {
                 return lua_toboolean(_L, i) == 1;
@@ -108,6 +118,11 @@ namespace cetech {
                 lh.l = to_int(-1);
 
                 return lh.lh;
+            }
+
+            Vector3& to_vector3(int i) {
+                void* v = lua_touserdata(_L, i);
+                return *(Vector3*)v;
             }
 
             lua_State* _L;

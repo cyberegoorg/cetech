@@ -199,9 +199,7 @@ namespace cetech {
 
     namespace vector3 {
         Vector3 make_vector3(const float x, const float y, const float z) {
-            return {
-                       x, y, z
-            };
+            return {x, y, z};
         }
 
         float len(const Vector3& v1) {
