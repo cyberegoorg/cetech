@@ -34,12 +34,12 @@ namespace cetech {
         lua_State* _state;
 
         Vector2 _temp_vector2_buffer[MAX_TEMP_VECTOR2];
-        Uint32 _temp_vector2_used;
+        uint32_t _temp_vector2_used;
 
         Vector3 _temp_vector3_buffer[MAX_TEMP_VECTOR3];
-        Uint32 _temp_vector3_used;
+        uint32_t _temp_vector3_used;
 
-        LuaEnviromentImlementation() : _temp_vector3_used(0) {
+        LuaEnviromentImlementation() : _temp_vector2_used(0), _temp_vector3_used(0) {
             _state = luaL_newstate();
             CE_CHECK_PTR(_state);
 
