@@ -13,6 +13,7 @@
 #include "lua/lua_device.h"
 #include "lua/lua_keyboard.h"
 #include "lua/lua_package.h"
+#include "lua/lua_vector3.h"
 
 #include "resource/resource_manager.h"
 #include "package/package_manager.h"
@@ -121,6 +122,7 @@ namespace cetech {
                 lua_device::load_libs(*_lua_eviroment);
                 lua_keyboard::load_libs(*_lua_eviroment);
                 lua_package::load_libs(*_lua_eviroment);
+                lua_vector3::load_libs(*_lua_eviroment);
 
                 if (command_line_globals::has_argument("compile", 'c')) {
                     compile_all_resource();
@@ -201,6 +203,7 @@ namespace cetech {
                     usleep(3 * 1000);
                     if (!_flags.pause) {
                         _lua_eviroment->call_global("update", "f", dt);
+                        _lua_eviroment->clean_temp();
                     }
 
                     //
@@ -343,11 +346,11 @@ namespace cetech {
                                                                                cvars::boot_script.str_len);
 
                 // Load boot package
-                
+
                 void* package_data[1];
                 _resource_manager->load(package_data, resource_package::type_hash(), &boot_pkg_name_h, 1);
                 _resource_manager->add_loaded(package_data, resource_package::type_hash(), &boot_pkg_name_h, 1);
-                
+
                 _package_manager->load(boot_pkg_name_h);
                 _package_manager->flush(boot_pkg_name_h);
 

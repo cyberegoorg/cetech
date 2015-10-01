@@ -1,5 +1,7 @@
 #pragma once
 
+#include "common/math/math_types.h"
+
 #include "luajit/lua.hpp"
 #include "lua_resource.h"
 
@@ -15,6 +17,9 @@ namespace cetech {
             virtual void set_module_constructor(const char* module, const lua_CFunction func) = 0;
 
             virtual void call_global(const char* func, const char* args = nullptr, ...) = 0;
+
+            virtual void clean_temp() = 0;
+            virtual Vector3& new_tmp_vector3() = 0;
 
             static LuaEnviroment* make(Allocator& alocator);
             static void destroy(Allocator& alocator, LuaEnviroment* le);
