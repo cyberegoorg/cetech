@@ -76,6 +76,15 @@ namespace cetech {
                 lua_rawseti(_L, -2, 2);
             }
 
+            void push_vector2(const Vector2& v) {
+                Vector2& tmp_v = device_globals::device().lua_enviroment().new_tmp_vector2();
+                tmp_v = v;
+
+                lua_pushlightuserdata(_L, &tmp_v);
+                luaL_getmetatable(_L, "Vector2_mt");
+                lua_setmetatable(_L, -2);
+            }
+
             void push_vector3(const Vector3& v) {
                 Vector3& tmp_v = device_globals::device().lua_enviroment().new_tmp_vector3();
                 tmp_v = v;
@@ -118,6 +127,11 @@ namespace cetech {
                 lh.l = to_int(-1);
 
                 return lh.lh;
+            }
+
+            Vector2& to_vector2(int i) {
+                void* v = lua_touserdata(_L, i);
+                return *(Vector2*)v;
             }
 
             Vector3& to_vector3(int i) {

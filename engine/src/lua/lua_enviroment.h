@@ -19,6 +19,7 @@ namespace cetech {
             virtual void call_global(const char* func, const char* args = nullptr, ...) = 0;
 
             virtual void clean_temp() = 0;
+            virtual Vector2& new_tmp_vector2() = 0;
             virtual Vector3& new_tmp_vector3() = 0;
 
             static LuaEnviroment* make(Allocator& alocator);
