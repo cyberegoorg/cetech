@@ -22,6 +22,7 @@ namespace cetech {
             enum WindowFlags {
                 WINDOW_NOFLAG = 0,
                 WINDOW_FULLSCREEN = 1,
+                
             };
 
             enum WindowPos {
