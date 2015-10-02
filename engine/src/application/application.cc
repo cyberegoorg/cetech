@@ -101,8 +101,6 @@ namespace cetech {
 
                 os::init();
 
-                thread::init();
-                keyboard::init();
                 mouse::init();
 
                 _filesystem = disk_filesystem::make(memory_globals::default_allocator(), cvars::rm_build_dir.value_str);
@@ -145,9 +143,7 @@ namespace cetech {
                 LuaEnviroment::destroy(memory_globals::default_allocator(), _lua_eviroment);
                 disk_filesystem::destroy(memory_globals::default_allocator(), _filesystem);
 
-                keyboard::shutdown();
                 mouse::shutdown();
-                thread::shutdown();
 
                 os::shutdown();
             }
@@ -186,7 +182,6 @@ namespace cetech {
                     _develop_manager->push_record_float("engine.frame_rate", 1.0f / dt);
 
                     os::frame_start();
-                    thread::frame_start();
                     keyboard::frame_start();
                     mouse::frame_start();
                     //_console_server->tick();
@@ -215,7 +210,6 @@ namespace cetech {
 
                     keyboard::frame_end();
                     mouse::frame_end();
-                    thread::frame_end();
 
                     _develop_manager->push_end_frame();
                     _develop_manager->send_buffer();

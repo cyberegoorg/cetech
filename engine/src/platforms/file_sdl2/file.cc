@@ -18,15 +18,6 @@
 
 namespace cetech {
     namespace file {
-
-        void init() {}
-
-        void shutdown() {}
-
-        void frame_start() {}
-
-        void frame_end() {}
-
         File from_file(const char* path, const char* mode) {
             SDL_RWops* rwops = SDL_RWFromFile(path, mode);
 

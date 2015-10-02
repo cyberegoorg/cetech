@@ -21,10 +21,6 @@ namespace cetech {
     }
 
     namespace keyboard {
-
-        void init() {}
-        void shutdown() {}
-
         void frame_start() {
             /*Keyboard*/
             memcpy(keyboard_internal::KeyboardStates, SDL_GetKeyboardState(NULL), 512);
