@@ -14,8 +14,8 @@
 #include "rapidjson/encodings.h"
 
 
-
-#define LOG_FORMAT "[%s][%s][%s] %s"
+#define LOG_FORMAT_NO_TIME "[%s][%s] %s"
+#define LOG_FORMAT  "[%s]" LOG_FORMAT_NO_TIME
 
 #define COLOR_RED  "\x1B[31m"
 #define COLOR_GREEN  "\x1B[32m"
@@ -31,10 +31,10 @@
 
 static const char* level_to_str[] = { "I", "W", "E", "D" };
 static const char* level_format[] = {
-    COLORED_TEXT(COLOR_BLUE, LOG_FORMAT) "\n",          /* INFO    */
-    COLORED_TEXT(COLOR_YELLOW, LOG_FORMAT) "\n",        /* WARNING */
-    COLORED_TEXT(COLOR_RED, LOG_FORMAT) "\n",           /* ERROR   */
-    COLORED_TEXT(COLOR_GREEN, LOG_FORMAT) "\n"          /* DEBUG   */
+    COLORED_TEXT(COLOR_BLUE, LOG_FORMAT_NO_TIME) "\n",          /* INFO    */
+    COLORED_TEXT(COLOR_YELLOW, LOG_FORMAT_NO_TIME) "\n",        /* WARNING */
+    COLORED_TEXT(COLOR_RED, LOG_FORMAT_NO_TIME) "\n",           /* ERROR   */
+    COLORED_TEXT(COLOR_GREEN, LOG_FORMAT_NO_TIME) "\n"          /* DEBUG   */
 };
 
 namespace cetech {
@@ -68,7 +68,7 @@ namespace cetech {
             char* time_str = log_handlers_internal::time_to_utc_str(gmtm);
 
             flockfile(out);
-            fprintf(out, level_format[level], time_str, level_to_str[level], where, msg);
+            fprintf(out, level_format[level], level_to_str[level], where, msg);
             funlockfile(out);
         }
 
