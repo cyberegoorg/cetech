@@ -11,11 +11,14 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 class Ui_LogWidget(object):
     def setupUi(self, LogWidget):
         LogWidget.setObjectName("LogWidget")
-        LogWidget.resize(398, 298)
+        LogWidget.resize(733, 298)
         LogWidget.setFrameShape(QtWidgets.QFrame.StyledPanel)
         LogWidget.setFrameShadow(QtWidgets.QFrame.Raised)
         self.verticalLayout = QtWidgets.QVBoxLayout(LogWidget)
         self.verticalLayout.setObjectName("verticalLayout")
+        self.horizontalLayout = QtWidgets.QHBoxLayout()
+        self.horizontalLayout.setObjectName("horizontalLayout")
+        self.verticalLayout.addLayout(self.horizontalLayout)
         self.log_tree_widget = QtWidgets.QTreeWidget(LogWidget)
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Preferred)
         sizePolicy.setHorizontalStretch(0)
@@ -25,7 +28,6 @@ class Ui_LogWidget(object):
         self.log_tree_widget.setRootIsDecorated(False)
         self.log_tree_widget.setObjectName("log_tree_widget")
         self.log_tree_widget.header().setDefaultSectionSize(100)
-        self.log_tree_widget.header().setSortIndicatorShown(False)
         self.verticalLayout.addWidget(self.log_tree_widget)
 
         self.retranslateUi(LogWidget)
@@ -34,7 +36,8 @@ class Ui_LogWidget(object):
     def retranslateUi(self, LogWidget):
         _translate = QtCore.QCoreApplication.translate
         LogWidget.setWindowTitle(_translate("LogWidget", "Frame"))
-        self.log_tree_widget.headerItem().setText(0, _translate("LogWidget", "Level"))
-        self.log_tree_widget.headerItem().setText(1, _translate("LogWidget", "Where"))
-        self.log_tree_widget.headerItem().setText(2, _translate("LogWidget", "Message"))
+        self.log_tree_widget.headerItem().setText(0, _translate("LogWidget", "Time"))
+        self.log_tree_widget.headerItem().setText(1, _translate("LogWidget", "Level"))
+        self.log_tree_widget.headerItem().setText(2, _translate("LogWidget", "Where"))
+        self.log_tree_widget.headerItem().setText(3, _translate("LogWidget", "Message"))
 
