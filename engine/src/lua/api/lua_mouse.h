@@ -53,7 +53,7 @@ namespace cetech {
         stack.push_vector2(os::mouse::axis());
         return 1;
     }
-    
+
     namespace lua_mouse {
         static const char* module_name = "Mouse";
 

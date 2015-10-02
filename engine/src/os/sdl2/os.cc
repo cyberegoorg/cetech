@@ -1,5 +1,3 @@
-#pragma once
-
 #include <dirent.h>
 #include <time.h>
 #include <errno.h>
@@ -88,18 +86,18 @@ namespace cetech {
         //         }
 
         namespace keyboard_internal {
-            static uint8_t KeyboardStates[512] = { 0 };
-            static uint8_t KeyboardStatesLast[512] = { 0 };
+            static uint8_t KeyboardStates[512];
+            static uint8_t KeyboardStatesLast[512];
         }
 
         namespace mouse_internal {
-            static Vector2 MouseAxis = vector2::ZERO;
-            static uint32_t MouseButtonState = 0;
-            static uint32_t MouseButtonStateLast = 0;
+            static Vector2 MouseAxis;
+            static uint32_t MouseButtonState;
+            static uint32_t MouseButtonStateLast;
 
-            static uint64_t left_btn_hash = 0;
-            static uint64_t middle_btn_hash = 0;
-            static uint64_t right_btn_hash = 0;
+            static uint64_t left_btn_hash;
+            static uint64_t middle_btn_hash;
+            static uint64_t right_btn_hash;
         }
 
         void init() {
@@ -134,9 +132,9 @@ namespace cetech {
             /*Mouse*/
             int32_t x, y;
             x = y = 0;
-	    
+
             mouse_internal::MouseButtonState = SDL_GetMouseState(&x, &y);
-		    
+
             mouse_internal::MouseAxis.x = x;
             mouse_internal::MouseAxis.y = y;
         }
@@ -147,14 +145,14 @@ namespace cetech {
         }
 
 
-        CE_INLINE uint32_t get_ticks() {
+        uint32_t get_ticks() {
             return SDL_GetTicks();
         }
     }
 
     namespace os {
         namespace window_internal {
-            CE_INLINE uint32_t sdl_pos(const uint32_t pos) {
+            uint32_t sdl_pos(const uint32_t pos) {
                 switch (pos) {
                 case window::WINDOWPOS_CENTERED:
                     return SDL_WINDOWPOS_CENTERED;
@@ -167,7 +165,7 @@ namespace cetech {
                 }
             }
 
-            CE_INLINE uint32_t sdl_flags(const window::WindowFlags flags) {
+            uint32_t sdl_flags(const window::WindowFlags flags) {
                 uint32_t sdl_flags = 0;
 
                 if (flags & window::WINDOW_FULLSCREEN) {
@@ -194,7 +192,7 @@ namespace cetech {
                     window_internal::sdl_flags(flags)
                     );
 
-                if(res.wnd == nullptr ) {
+                if (res.wnd == nullptr) {
                     log::error("sys", "Could not create window: %s", SDL_GetError());
                 }
 

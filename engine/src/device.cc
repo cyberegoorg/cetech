@@ -81,7 +81,7 @@ namespace cetech {
                 return this->_frame_id;
             }
 
-            
+
             os::Window main_window;
             virtual void init(int argc, const char** argv) final {
                 command_line_globals::set_args(argc, argv);
@@ -157,7 +157,7 @@ namespace cetech {
                     800, 600,
                     os::window::WINDOW_NOFLAG
                     );
-                
+
                 _flags.run = 1;
                 float dt = 0.0f;
                 while (_flags.run) {
