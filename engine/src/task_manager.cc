@@ -5,7 +5,8 @@
 
 #include "application.h"
 
-#include "os/os.h"
+#include "platforms/cpu/cpu.h"
+#include "platforms/thread/thread.h"
 
 #define TASK_INITIALIZER { { 0 }, { 0 }, { 0 }, 0, 0, { 0, 0 } }
 
@@ -37,7 +38,7 @@ namespace cetech {
                 MAX_TASK = 512
             };
 
-            os::Spinlock _lock;               //!< Spinlock
+            Spinlock _lock;               //!< Spinlock
 
             uint32_t _last_id;                //!< Last id
             uint32_t _task_count;             //!< Task count
@@ -47,7 +48,7 @@ namespace cetech {
             uint32_t _open_task[MAX_TASK];    //!< Open task
             Task _task_pool[MAX_TASK];        //!< Task pool
 
-            Array < os::Thread > _workers;
+            Array < Thread > _workers;
 
 
             TaskManagerImplementation(Allocator & allocator) : _last_id(0), _task_count(0), _open_task_count(0),
@@ -56,7 +57,7 @@ namespace cetech {
                 memset(_open_task, 0, sizeof(uint32_t) * MAX_TASK);
                 memset(_task_pool, 0, sizeof(Task) * MAX_TASK);
 
-                uint32_t core_count = os::cpu::core_count();
+                uint32_t core_count = cpu::core_count();
 
                 static const uint32_t main_threads_count = 1;
                 const uint32_t worker_count = core_count - main_threads_count;
@@ -68,7 +69,7 @@ namespace cetech {
                 if (worker_count > 0) {
                     for (uint32_t i = 0; i < worker_count; ++i) {
                         log::debug("task", "Creating worker %u.", i);
-                        array::push_back(_workers, os::thread::create_thread(task_worker, "Worker", this));
+                        array::push_back(_workers, thread::create_thread(task_worker, "Worker", this));
                     }
                 }
             }
@@ -76,7 +77,7 @@ namespace cetech {
             virtual ~TaskManagerImplementation() {
                 for (uint32_t i = 0; i < array::size(_workers); ++i) {
                     log::debug("task", "Killing worker%u.", i);
-                    os::thread::kill(_workers[i]);
+                    thread::kill(_workers[i]);
                 }
             };
 
@@ -89,7 +90,7 @@ namespace cetech {
                                      const TaskID parent) final {
                 TaskWorkCallback callback = { fce, data };
 
-                os::thread::spin_lock(_lock);
+                thread::spin_lock(_lock);
 
                 const uint32_t id = ++this->_last_id;
 
@@ -140,7 +141,7 @@ namespace cetech {
                 ++this->_open_task_count;
                 ++this->_task_count;
 
-                os::thread::spin_unlock(_lock);
+                thread::spin_unlock(_lock);
                 return (TaskID) {
                            id
                 };
@@ -152,7 +153,7 @@ namespace cetech {
             }
 
             virtual void add_end(const TaskID* tasks, const uint32_t count) final {
-                os::thread::spin_lock(_lock);
+                thread::spin_lock(_lock);
 
                 for (uint32_t i = 0; i < MAX_TASK; ++i) {
                     for (uint32_t j = 0; j < count; ++j) {
@@ -165,7 +166,7 @@ namespace cetech {
                     }
                 }
 
-                os::thread::spin_unlock(_lock);
+                thread::spin_unlock(_lock);
             }
 
             virtual void wait(const TaskID id) final {
@@ -227,7 +228,7 @@ namespace cetech {
              * \param id Task id.
              */
             void _mark_task_job_done(TaskID id) {
-                os::thread::spin_lock(_lock);
+                thread::spin_lock(_lock);
 
                 for (uint32_t i = 0; i < this->_open_task_count; ++i) {
                     Task* t = &this->_task_pool[this->_open_task[i]];
@@ -248,7 +249,7 @@ namespace cetech {
                     break;
                 }
 
-                os::thread::spin_unlock(_lock);
+                thread::spin_unlock(_lock);
             }
 
             /*! Is task done?
@@ -276,10 +277,10 @@ namespace cetech {
             }
 
             uint32_t task_get_worker_id() {
-                uint32_t id = os::thread::id();
+                uint32_t id = thread::id();
 
                 for (uint8_t i = 0; i < array::size(this->_workers); ++i) {
-                    if (os::thread::get_id(this->_workers[i]) != id) {
+                    if (thread::get_id(this->_workers[i]) != id) {
                         continue;
                     }
 
@@ -290,19 +291,19 @@ namespace cetech {
             }
 
             uint8_t task_is_done(TaskID id) {
-                // os::thread::spin_lock(_lock);
+                // thread::spin_lock(_lock);
                 uint8_t is_done = _is_task_done(id);
-                // os::thread::spin_unlock(_lock);
+                // thread::spin_unlock(_lock);
                 return is_done;
             }
 
 
 
             Task task_pop_new_work() {
-                os::thread::spin_lock(_lock);
+                thread::spin_lock(_lock);
 
                 if (this->_task_count < 1) {
-                    os::thread::spin_unlock(_lock);
+                    thread::spin_unlock(_lock);
                     return (Task)TASK_INITIALIZER;
                 }
 
@@ -326,11 +327,11 @@ namespace cetech {
                     --this->_task_count;
                     CE_ASSERT(this->_task_count != 4294967295);
 
-                    os::thread::spin_unlock(_lock);
+                    thread::spin_unlock(_lock);
                     return t;
                 }
 
-                os::thread::spin_unlock(_lock);
+                thread::spin_unlock(_lock);
                 return (Task)TASK_INITIALIZER;
             }
 

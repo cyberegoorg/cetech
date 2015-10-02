@@ -5,43 +5,44 @@
 
 #include "common/memory/memory.h"
 
-#include "os/os.h"
+#include "platforms/dir/dir.h"
+#include "platforms/file/file.h"
 
 namespace cetech {
-    class DiskFile : public File {
+    class DiskFile : public FSFile {
         public:
-            os::File _file;
+            File _file;
 
-            DiskFile(const char* path, File::OpenMode mode) {
-                _file = os::file::from_file(path, mode == File::WRITE ? "w" : "r");
+            DiskFile(const char* path, FSFile::OpenMode mode) {
+                _file = file::from_file(path, mode == FSFile::WRITE ? "w" : "r");
             }
 
             virtual ~DiskFile() {
-                os::file::close(_file);
+                file::close(_file);
             }
 
             virtual bool is_valid() {
-                return !os::file::is_null(_file);
+                return !file::is_null(_file);
             }
 
             virtual void seek(size_t position) final {
-                os::file::seek(_file, position, os::file::SW_SEEK_SET);
+                file::seek(_file, position, file::SW_SEEK_SET);
             };
 
             virtual void seek_to_end() final {
-                os::file::seek(_file, 0, os::file::SW_SEEK_END);
+                file::seek(_file, 0, file::SW_SEEK_END);
             };
 
             virtual void skip(size_t bytes) final {
-                os::file::seek(_file, bytes, os::file::SW_SEEK_CUR);
+                file::seek(_file, bytes, file::SW_SEEK_CUR);
             };
 
             virtual void read(void* buffer, size_t size) final {
-                os::file::read(_file, buffer, sizeof(char), size);
+                file::read(_file, buffer, sizeof(char), size);
             };
 
             virtual void write(const void* buffer, size_t size)  final {
-                os::file::write(_file, buffer, sizeof(char), size);
+                file::write(_file, buffer, sizeof(char), size);
             };
 
             virtual void flush() final {};
@@ -60,7 +61,7 @@ namespace cetech {
             };
 
             virtual size_t position() final {
-                return os::file::tell(_file);
+                return file::tell(_file);
             };
     };
 
@@ -78,15 +79,15 @@ namespace cetech {
                 }
             }
 
-            virtual File* open(const char* path, File::OpenMode mode) final {
+            virtual FSFile* open(const char* path, FSFile::OpenMode mode) final {
                 char abs_path[2048] = {0};
                 absolute_path(abs_path, path);
 
                 return MAKE_NEW(_allocator, DiskFile, abs_path, mode);
             }
 
-            virtual void close(File* file) final {
-                MAKE_DELETE(_allocator, File, file);
+            virtual void close(FSFile* file) final {
+                MAKE_DELETE(_allocator, FSFile, file);
             };
 
             virtual bool exists(const char* path) final {/*TODO:*/
@@ -99,14 +100,14 @@ namespace cetech {
             };
 
             virtual void create_directory(const char* path)  final {
-                os::dir::mkpath(path);
+                dir::mkpath(path);
             };
 
             virtual void delete_directory(const char* path) final {/*TODO:*/
             };
 
             virtual void list_directory ( const char* path, cetech::Array < char* >& files ) final {
-                os::dir::listdir(path, files);
+                dir::listdir(path, files);
             }
 
             virtual void create_file(const char* path)  final {/*TODO:*/

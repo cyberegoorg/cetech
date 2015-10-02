@@ -10,7 +10,8 @@
 #include "common/string/stringid.inl.h"
 
 #include "cvars/cvars.h"
-#include "os/os.h"
+#include "platforms/dir/dir.h"
+#include "platforms/thread/thread.h"
 
 namespace cetech {
     class ResourceManagerImplementation final : public ResourceManager {
@@ -26,7 +27,7 @@ namespace cetech {
             Hash < resource_unloader_clb_t > _unload_clb_map;
             Hash < resource_compiler_clb_t > _compile_clb_map;
 
-            os::Spinlock add_lock;
+            Spinlock add_lock;
 
             ResourceManagerImplementation(FileSystem * fs, Allocator & allocator) : _fs(fs), _data_map(allocator),
                                                                                     _data_refcount_map(allocator),
@@ -57,14 +58,14 @@ namespace cetech {
                 char output_filename[512] = {0};
                 resource_id_to_str(output_filename, ct->type, ct->name);
 
-                File* f_in;
-                f_in = ct->source_fs->open(ct->filename, File::READ);
+                FSFile* f_in;
+                f_in = ct->source_fs->open(ct->filename, FSFile::READ);
                 if (!f_in->is_valid()) {
                     log::error("resource_manager", "Could not open source file \"%s\"", ct->filename);
                     return;
                 }
 
-                File* f_out = ct->out_fs->open(output_filename, File::WRITE);
+                FSFile* f_out = ct->out_fs->open(output_filename, FSFile::WRITE);
 
                 ct->clb(f_in, f_out);
 
@@ -110,7 +111,7 @@ namespace cetech {
                     tm.add_end(&tid, 1);
                 }
 
-                os::dir::listdir_free(files);
+                dir::listdir_free(files);
 
                 tm.add_end(&top_compile_task, 1);
                 return top_compile_task;
@@ -136,7 +137,7 @@ namespace cetech {
                     char resource_srt[32 + 1] = {0};
                     resource_id_to_str(resource_srt, type, name);
 
-                    File* f = _fs->open(resource_srt, File::READ);
+                    FSFile* f = _fs->open(resource_srt, FSFile::READ);
 
                     if (!f->is_valid()) {
                         log::error("resource_manager",
@@ -166,7 +167,7 @@ close:
                                     StringId64_t type,
                                     const StringId64_t* names,
                                     const uint32_t count) final {
-                os::thread::spin_lock(add_lock);
+                thread::spin_lock(add_lock);
                 for (uint32_t i = 0; i < count; ++i) {
                     const StringId64_t name = names[i];
 
@@ -174,7 +175,7 @@ close:
                     inc_reference(type, name);
                 }
 
-                os::thread::spin_unlock(add_lock);
+                thread::spin_unlock(add_lock);
             };
 
 
@@ -208,7 +209,7 @@ close:
                     name = names[i];
 
                     if (!hash::has(this->_data_map, type ^ name)) {
-                        os::thread::spin_unlock(add_lock);
+                        thread::spin_unlock(add_lock);
                         return false;
                     }
                 }

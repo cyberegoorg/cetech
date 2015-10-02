@@ -28,8 +28,8 @@ namespace cetech {
 
         StringId64_t type_hash();
 
-        void compiler(File* in, File* out);
-        void* loader(File* f, Allocator& a);
+        void compiler(FSFile* in, FSFile* out);
+        void* loader(FSFile* f, Allocator& a);
         void unloader(Allocator& a, void* data);
     }
 }

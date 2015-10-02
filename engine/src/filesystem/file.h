@@ -3,14 +3,14 @@
 #include <cstring>
 
 namespace cetech {
-    class File {
+    class FSFile {
         public:
             enum OpenMode {
                 READ = 1,
                 WRITE = 2
             };
 
-            virtual ~File() {};
+            virtual ~FSFile() {};
 
             virtual bool is_valid() = 0;
 
