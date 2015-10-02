@@ -169,7 +169,7 @@ namespace cetech {
             }
 
             virtual void wait(const TaskID id) final {
-                while (/*app_is_run() &&*/ (array::size(_workers) > 0) && !task_is_done(id)) {
+                while (application_globals::device().is_run() && (array::size(_workers) > 0) && !task_is_done(id)) {
                     Task t = task_pop_new_work();
 
                     if (t.id.i == 0) {
@@ -337,7 +337,7 @@ namespace cetech {
             static int task_worker(void* data) {
                 TaskManagerImplementation* tm = (TaskManagerImplementation*) data;
 
-                while (1) {
+                while (application_globals::device().is_run()) {
                     Task t = tm->task_pop_new_work();
 
                     if (t.id.i == 0) {

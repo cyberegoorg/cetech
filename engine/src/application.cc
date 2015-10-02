@@ -98,6 +98,8 @@ namespace cetech {
                 _filesystem = disk_filesystem::make(memory_globals::default_allocator(), cvars::rm_build_dir.value_str);
                 load_config_json();
 
+		_flags.run = 1;
+		
                 _task_manager = TaskManager::make(memory_globals::default_allocator());
                 _resource_manager = ResourceManager::make(memory_globals::default_allocator(), _filesystem);
                 _package_manager = PackageManager::make(memory_globals::default_allocator());
@@ -158,7 +160,6 @@ namespace cetech {
                     os::window::WINDOW_NOFLAG
                     );
 
-                _flags.run = 1;
                 float dt = 0.0f;
                 while (_flags.run) {
                     uint32_t now_ticks = os::get_ticks();
@@ -208,6 +209,10 @@ namespace cetech {
             virtual void quit() final {
                 _flags.run = 0;
             }
+
+            virtual bool is_run() final {
+	      return _flags.run != 0;
+	    }
 
             virtual TaskManager& task_manager() final {
                 CE_CHECK_PTR(this->_task_manager);
