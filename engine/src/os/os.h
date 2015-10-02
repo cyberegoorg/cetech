@@ -1,6 +1,6 @@
 #pragma once
 
-#include "platform/defines.h"
+#include "common/platform/defines.h"
 
 #include "common/container/container_types.h"
 #include "common/math/math_types.h"

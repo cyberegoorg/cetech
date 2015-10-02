@@ -1,4 +1,4 @@
 #pragma once
 
 #include <stdint.h>
-#include "../platform/platform.h"
+#include "common/platform/platform.h"

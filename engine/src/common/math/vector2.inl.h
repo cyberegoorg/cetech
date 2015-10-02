@@ -1,6 +1,6 @@
 #pragma once
 
-#include "platform/defines.h"
+#include "common/platform/defines.h"
 
 #include "math_types.h"
 #include "math.inl.h"

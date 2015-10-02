@@ -3,7 +3,7 @@
 #include <cstring>
 #include <cstdlib>
 
-#include "platform/defines.h"
+#include "common/platform/defines.h"
 #include "common/string/stringid_types.h"
 
 namespace cetech {
