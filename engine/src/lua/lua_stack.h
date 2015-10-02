@@ -3,7 +3,7 @@
 #include "luajit/lua.hpp"
 #include "common/string/stringid_types.h"
 #include "common/math/math_types.h"
-#include <device.h>
+#include <application.h>
 
 namespace cetech {
     class LuaStack {
@@ -77,7 +77,7 @@ namespace cetech {
             }
 
             void push_vector2(const Vector2& v) {
-                Vector2& tmp_v = device_globals::device().lua_enviroment().new_tmp_vector2();
+                Vector2& tmp_v = application_globals::device().lua_enviroment().new_tmp_vector2();
                 tmp_v = v;
 
                 lua_pushlightuserdata(_L, &tmp_v);
@@ -86,7 +86,7 @@ namespace cetech {
             }
 
             void push_vector3(const Vector3& v) {
-                Vector3& tmp_v = device_globals::device().lua_enviroment().new_tmp_vector3();
+                Vector3& tmp_v = application_globals::device().lua_enviroment().new_tmp_vector3();
                 tmp_v = v;
 
                 lua_pushlightuserdata(_L, &tmp_v);

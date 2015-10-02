@@ -26,7 +26,7 @@ function Game:update(dt)
     
     if Keyboard.pressed(quit_btn) then
         print("q")
-        Device.quit()
+        Application.quit()
     end
     
     

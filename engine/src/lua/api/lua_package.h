@@ -3,7 +3,7 @@
 
 #include "os/os.h"
 #include "common/string/stringid.inl.h"
-#include "device.h"
+#include "application.h"
 
 namespace cetech {
 
@@ -22,7 +22,7 @@ namespace cetech {
         LuaStack stack(L);
 
         StringId64_t package_id = stack.to_string64id(1);
-        device_globals::device().package_manager().load(package_id);
+        application_globals::device().package_manager().load(package_id);
 
         return 0;
     }
@@ -31,7 +31,7 @@ namespace cetech {
         LuaStack stack(L);
 
         StringId64_t package_id = stack.to_string64id(1);
-        device_globals::device().package_manager().unload(package_id);
+        application_globals::device().package_manager().unload(package_id);
 
         return 0;
     }
@@ -40,7 +40,7 @@ namespace cetech {
         LuaStack stack(L);
 
         StringId64_t package_id = stack.to_string64id(1);
-        stack.push_bool(device_globals::device().package_manager().is_loaded(package_id));
+        stack.push_bool(application_globals::device().package_manager().is_loaded(package_id));
         return 1;
     }
 
@@ -48,7 +48,7 @@ namespace cetech {
         LuaStack stack(L);
 
         StringId64_t package_id = stack.to_string64id(1);
-        device_globals::device().package_manager().flush(package_id);
+        application_globals::device().package_manager().flush(package_id);
         return 0;
     }
 

@@ -6,7 +6,7 @@
 
 #include "common/log/log.h"
 #include "develop/console_server.h"
-#include <device.h>
+#include <application.h>
 #include <os/os.h>
 
 #include "rapidjson/rapidjson.h"
@@ -94,7 +94,7 @@ namespace cetech {
                                            const char* msg,
                                            void* data) {
 
-            ConsoleServer& cs = device_globals::device().console_server();
+            ConsoleServer& cs = application_globals::device().console_server();
 
             if (!cs.has_clients()) {
                 return;

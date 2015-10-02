@@ -1,0 +1,42 @@
+#pragma once
+
+#include "task_manager.h"
+#include "resource/resource_manager.h"
+#include "package/package_manager.h"
+#include "develop/develop_manager.h"
+#include "develop/console_server.h"
+#include "lua/lua_enviroment.h"
+
+#include <inttypes.h>
+
+namespace cetech {
+    class Application {
+        public:
+            virtual ~Application() {};
+
+            virtual uint32_t get_frame_id() const = 0;
+            virtual float get_delta_time() const = 0;
+
+            virtual void init(int argc, const char** argv) = 0;
+            virtual void shutdown() = 0;
+            virtual void run() = 0;
+            virtual void quit() = 0;
+
+            virtual TaskManager& task_manager() = 0;
+            virtual ResourceManager& resource_manager() = 0;
+            virtual PackageManager& package_manager() = 0;
+            virtual DevelopManager& develop_manager() = 0;
+            virtual ConsoleServer& console_server() = 0;
+            virtual LuaEnviroment& lua_enviroment() = 0;
+
+            static Application* make(Allocator& alocator);
+            static void destroy(Allocator& alocator, Application* rm);
+    };
+
+    namespace application_globals {
+        void init();
+        void shutdown();
+
+        Application& device();
+    }
+}

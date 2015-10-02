@@ -9,7 +9,7 @@
 #include "common/container/array.inl.h"
 #include "common/crypto/murmur_hash.inl.h"
 #include "common/math/vector2.inl.h"
-#include "device.h"
+#include "application.h"
 #include "os/os.h"
 
 #include "SDL2/SDL.h"
@@ -121,7 +121,7 @@ namespace cetech {
             while (SDL_PollEvent(&e) > 0) {
                 switch (e.type) {
                 case SDL_QUIT:
-                    device_globals::device().quit();
+                    application_globals::device().quit();
                     break;
                 }
             }

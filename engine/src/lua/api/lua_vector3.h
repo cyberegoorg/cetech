@@ -2,7 +2,7 @@
 #include "lua/lua_stack.h"
 #include "common/math/vector3.inl.h"
 
-#include "device.h"
+#include "application.h"
 
 namespace cetech {
     static int vector3_zero(lua_State* L) {
