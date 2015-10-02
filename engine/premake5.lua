@@ -32,7 +32,7 @@ newoption {
 }
 --------------------------------------------------------------------------------
 solution "cyberego.org tech1"
-    configurations {"Debug", "Release"}
+    configurations {"Debug", "Develop", "Release"}
     platforms {"native", "x32", "x64"}
 
     location (BUILD_DIR .. "projects/" .. _ACTION)
@@ -88,6 +88,15 @@ solution "cyberego.org tech1"
 	  "CETECH_CE_INLINE_OFF",
 	}
 
+    filter "Develop"
+        targetsuffix '_develop'
+        optimize "Full"
+    
+        defines {
+	  "NDEBUG",
+	  "CETECH_DEVELOP",
+	}
+	
     filter "Release"
         optimize "Full"
 
