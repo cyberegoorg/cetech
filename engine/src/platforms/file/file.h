@@ -9,15 +9,6 @@
 
 namespace cetech {
     namespace file {
-
-        void init();
-        void shutdown();
-
-        void frame_start();
-        void frame_end();
-
-        uint32_t get_ticks();
-
         enum SeekWhence {
             SW_SEEK_SET = 1,
             SW_SEEK_CUR,

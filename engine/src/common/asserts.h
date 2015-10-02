@@ -4,7 +4,7 @@
 #include <cstdlib>
 #include <cstring>
 
-#include "platform/defines.h"
+#include "common/platform/defines.h"
 #include "common/log/log.h"
 
 /*!
@@ -99,7 +99,7 @@ namespace cetech {
                              const char* file,
                              const int line,
                              const char* fce) {
-        fprintf(stderr, "assert: \'%s\' in %s:%i:%s. \n", condition_str, SHORT_FILE(file), line, fce);
+        fprintf(stderr, "[A] \'%s\' in %s:%i:%s. \n", condition_str, SHORT_FILE(file), line, fce);
         abort();
     }
 
@@ -108,12 +108,12 @@ namespace cetech {
                                  const char* file,
                                  const int line,
                                  const char* fce) {
-        fprintf(stderr, "assert: \'%s\': \"%s\" %s:%i:%s. \n", where, what, SHORT_FILE(file), line, fce);
+        fprintf(stderr, "[A] \'%s\': \"%s\" %s:%i:%s. \n", where, what, SHORT_FILE(file), line, fce);
         abort();
     }
 
     CE_INLINE void ce_check_ptr(const char* file, const int line) {
-        fprintf(stderr, "assert.check_ptr: in file %s on line %i is invalid pointer. \n", SHORT_FILE(file),
+        fprintf(stderr, "[A][check_ptr] in file %s on line %i is invalid pointer. \n", SHORT_FILE(file),
                 line);
         abort();
     }

@@ -17,12 +17,6 @@
 
 namespace cetech {
     namespace thread {
-        void init() {};
-        void shutdown() {};
-
-        void frame_start() {};
-        void frame_end() {};
-
         Thread create_thread(thread_fce_t fce, const char* name, void* data) {
             return (Thread) {
                        SDL_CreateThread(fce, name, data)

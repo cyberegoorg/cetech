@@ -9,13 +9,6 @@
 namespace cetech {
 
     namespace thread {
-        void init();
-        void shutdown();
-
-        void frame_start();
-        void frame_end();
-
-
         /*!
          * Create thread.
          * \param fce Thread fce.
