@@ -3,15 +3,6 @@
 #include "SDL2/SDL.h"
 
 namespace cetech {
-    namespace os {
-        struct Window {
-            SDL_Window* wnd;
-        };
-
-        struct File {
-            SDL_RWops* ops;
-        };
-
         typedef int (* thread_fce_t) (void* data);
 
         struct Thread {
@@ -23,5 +14,4 @@ namespace cetech {
 
             Spinlock() : l(0) {}
         };
-    }
 }

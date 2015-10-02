@@ -7,13 +7,12 @@
 
 #include "common/string/stringid_types.h"
 #include "common/memory/memory_types.h"
-#include "os/os_types.h"
 
 namespace cetech {
     class ResourceManager {
         public:
-            typedef void (* resource_compiler_clb_t)(File*, File*);
-            typedef void* (* resource_loader_clb_t)(File*, Allocator&);
+            typedef void (* resource_compiler_clb_t)(FSFile*, FSFile*);
+            typedef void* (* resource_loader_clb_t)(FSFile*, Allocator&);
             typedef void (* resource_unloader_clb_t)(Allocator&, void*);
 
             virtual ~ResourceManager() {}

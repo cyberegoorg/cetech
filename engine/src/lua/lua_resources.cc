@@ -19,7 +19,7 @@ namespace cetech {
         }
 
 
-        void compiler(File* in, File* out) {
+        void compiler(FSFile* in, FSFile* out) {
             size_t sz_in = in->size();
 
             char tmp[4096] = {0};
@@ -32,7 +32,7 @@ namespace cetech {
             out->write(tmp, sz_in);
         }
 
-        void* loader (File* f, Allocator& a) {
+        void* loader (FSFile* f, Allocator& a) {
             const uint64_t f_sz = f->size();
 
             void* mem = a.allocate(f_sz + 1);

@@ -17,6 +17,11 @@
 #include "filesystem/disk_filesystem.h"
 #include "package/package_resource.h"
 
+#include "platforms/input/keyboard.h"
+#include "platforms/input/mouse.h"
+#include "platforms/thread/thread.h"
+#include "platforms/window/window.h"
+
 #include "cvars/cvars.h"
 #include "os/os.h"
 
@@ -82,7 +87,7 @@ namespace cetech {
             }
 
 
-            os::Window main_window;
+            Window main_window;
             virtual void init(int argc, const char** argv) final {
                 command_line_globals::set_args(argc, argv);
 
@@ -94,6 +99,10 @@ namespace cetech {
                 parse_command_line();
 
                 os::init();
+
+		thread::init();
+		keyboard::init();
+		mouse::init();
 
                 _filesystem = disk_filesystem::make(memory_globals::default_allocator(), cvars::rm_build_dir.value_str);
                 load_config_json();
@@ -134,6 +143,10 @@ namespace cetech {
                 ConsoleServer::destroy(memory_globals::default_allocator(), _console_server);
                 LuaEnviroment::destroy(memory_globals::default_allocator(), _lua_eviroment);
                 disk_filesystem::destroy(memory_globals::default_allocator(), _filesystem);
+		
+		keyboard::shutdown();
+		mouse::shutdown();
+		thread::shutdown();
 
                 os::shutdown();
             }
@@ -153,11 +166,11 @@ namespace cetech {
                     log::debug("main", "Client connected.");
                 }
 
-                main_window = os::window::make_window(
+                main_window = window::make_window(
                     "aaa",
-                    os::window::WINDOWPOS_CENTERED, os::window::WINDOWPOS_CENTERED,
+                    window::WINDOWPOS_CENTERED, window::WINDOWPOS_CENTERED,
                     800, 600,
-                    os::window::WINDOW_NOFLAG
+                    window::WINDOW_NOFLAG
                     );
 
                 float dt = 0.0f;
@@ -172,6 +185,9 @@ namespace cetech {
                     _develop_manager->push_record_float("engine.frame_rate", 1.0f / dt);
 
                     os::frame_start();
+		    thread::frame_start();
+		    keyboard::frame_start();
+		    mouse::frame_start();
                     //_console_server->tick();
                     //
 
@@ -195,6 +211,11 @@ namespace cetech {
 
                     //
                     os::frame_end();
+
+		    keyboard::frame_end();
+		    mouse::frame_end();
+		    thread::frame_end();
+
                     _develop_manager->push_end_frame();
                     _develop_manager->send_buffer();
                     _develop_manager->clear();
@@ -286,7 +307,7 @@ namespace cetech {
             }
 
             void load_config_json() {
-                File* f = _filesystem->open("config.json", File::READ);
+                FSFile* f = _filesystem->open("config.json", FSFile::READ);
 
                 const uint64_t f_sz = f->size();
                 void* mem = memory_globals::default_allocator().allocate(f_sz + 1);

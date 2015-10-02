@@ -70,6 +70,10 @@ solution "cyberego.org tech1"
         'CETECH_RUNTIME_SDL2'
       }
       
+      files {
+	  ROOT_DIR .. "src/platforms/*_sdl2/**",
+      }
+
     filter ("system:linux","options:runtime=sdl2")
       links {
           'SDL2',
@@ -116,6 +120,10 @@ solution "cyberego.org tech1"
 	links {
 	    "m",
 	}
+	
+	files {
+	  ROOT_DIR .. "src/platforms/*_linux/**",
+	}
     
 
     filter "system:windows"
@@ -137,7 +145,7 @@ project "tech1_static"
     }
 
     excludes {
-      ROOT_DIR .. "src/os/**.cc",
+      ROOT_DIR .. "src/platforms/*_*/**",
     }
 
     filter {}
