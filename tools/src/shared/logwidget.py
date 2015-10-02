@@ -1,4 +1,6 @@
 import re
+
+from PyQt5.QtCore import QDateTime
 from PyQt5.QtGui import QColor
 from PyQt5.QtWidgets import QFrame, QStyle, QTreeWidgetItem
 
@@ -34,6 +36,8 @@ class LogWidget(QFrame, Ui_LogWidget):
         self.api = api
         self.api.register_handler('log', self.add_log)
 
+        self.log_tree_widget.header().setStretchLastSection(True)
+
     def set_ignore_where(self, pattern):
         self.ignore_where = re.compile(pattern)
 
@@ -45,9 +49,11 @@ class LogWidget(QFrame, Ui_LogWidget):
         if self._is_ignored(where):
             return
 
-        item = QTreeWidgetItem(['', where, msg])
+        dt_s = QDateTime.fromTime_t(time).toString("hh:mm:ss.zzz")
 
-        item.setIcon(0, self.style().standardIcon(self.LOG_ICON[level]))
+        item = QTreeWidgetItem([dt_s, '', where, msg])
+
+        item.setIcon(1, self.style().standardIcon(self.LOG_ICON[level]))
 
         self.log_tree_widget.addTopLevelItem(item)
 

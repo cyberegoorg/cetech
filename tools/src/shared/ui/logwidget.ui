@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>398</width>
+    <width>733</width>
     <height>298</height>
    </rect>
   </property>
@@ -21,6 +21,9 @@
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
+    <layout class="QHBoxLayout" name="horizontalLayout"/>
+   </item>
+   <item>
     <widget class="QTreeWidget" name="log_tree_widget">
      <property name="sizePolicy">
       <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
@@ -34,9 +37,11 @@
      <attribute name="headerDefaultSectionSize">
       <number>100</number>
      </attribute>
-     <attribute name="headerShowSortIndicator" stdset="0">
-      <bool>false</bool>
-     </attribute>
+     <column>
+      <property name="text">
+       <string>Time</string>
+      </property>
+     </column>
      <column>
       <property name="text">
        <string>Level</string>
