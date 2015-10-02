@@ -79,7 +79,7 @@ namespace cetech {
                 source_fs->list_directory(cvars::rm_source_dir.value_str, files);
 
 
-                TaskManager& tm = application_globals::device().task_manager();
+                TaskManager& tm = application_globals::app().task_manager();
                 TaskManager::TaskID top_compile_task = tm.add_empty_begin(0);
 
                 const uint32_t files_count = array::size(files);

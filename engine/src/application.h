@@ -39,6 +39,6 @@ namespace cetech {
         void init();
         void shutdown();
 
-        Application& device();
+        Application& app();
     }
 }

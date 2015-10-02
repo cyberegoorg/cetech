@@ -25,7 +25,7 @@ static void posix_signal_handler(int sig) {
 
     case SIGKILL:
     case SIGINT:
-        cetech::application_globals::device().quit();
+        cetech::application_globals::app().quit();
         break;
 
     default:
@@ -282,7 +282,7 @@ namespace cetech {
             }
 
             static void cmd_lua_execute(const rapidjson::Document& in, rapidjson::Document& out) {
-                application_globals::device().lua_enviroment().execute_string(in["args"]["script"].GetString());
+                application_globals::app().lua_enviroment().execute_string(in["args"]["script"].GetString());
             }
 
             void load_config_json() {
@@ -395,7 +395,7 @@ namespace cetech {
             _device = nullptr;
         }
 
-        Application& device() {
+        Application& app() {
             return *_device;
         }
     }

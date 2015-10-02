@@ -94,7 +94,7 @@ namespace cetech {
                                            const char* msg,
                                            void* data) {
 
-            ConsoleServer& cs = application_globals::device().console_server();
+            ConsoleServer& cs = application_globals::app().console_server();
 
             if (!cs.has_clients()) {
                 return;
