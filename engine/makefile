@@ -83,21 +83,32 @@ linux-all: linux-debug32 linux-release32 linux-debug64 linux-release64
 .PHONY: linux-debug
 linux-debug: linux-debug${ARCH}
 
+.PHONY: linux-develop
+linux-develop: linux-develop${ARCH}
+
 .PHONY: linux-release
 linux-release: linux-release${ARCH}
 
 .PHONY: linux-debug32
 linux-debug32:  .build/projects/gmake
-	+${MAKE} -C .build/projects/gmake config=debug_x32 
+	+${MAKE} -C .build/projects/gmake config=debug_x32
 
+.PHONY: linux-develop32
+linux-develop32:  .build/projects/gmake
+	+${MAKE} -C .build/projects/gmake config=develop_x32
+	
 .PHONY: linux-release32
 linux-release32: .build/projects/gmake
-	+${MAKE} -C .build/projects/gmake config=release_x32 
+	+${MAKE} -C .build/projects/gmake config=release_x32
 
 .PHONY: linux-debug64
 linux-debug64: .build/projects/gmake
 	+${MAKE} -C .build/projects/gmake config=debug_x64
 
+.PHONY: linux-develop64
+linux-develop64:  .build/projects/gmake
+	+${MAKE} -C .build/projects/gmake config=develop_x64
+	
 .PHONY: linux-release64
 linux-release64: .build/projects/gmake
 	+${MAKE} -C .build/projects/gmake config=release_x64
