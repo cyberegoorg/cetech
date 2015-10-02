@@ -15,8 +15,10 @@ int main(int argc, const char** argv) {
     d.shutdown();
 
     device_globals::shutdown();
-    memory_globals::shutdown();
     log::shutdown();
+
+    memory_globals::shutdown();
+
 
     return 0; // TODO: error check
 }

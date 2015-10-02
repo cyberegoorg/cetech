@@ -7,6 +7,7 @@
 #include "common/string/stringid.inl.h"
 #include "cvars/cvars.h"
 
+#include "common/log/handlers.h"
 
 #include "rapidjson/writer.h"
 #include "rapidjson/stringbuffer.h"
@@ -31,10 +32,13 @@ namespace cetech {
             server_addr.host = ENET_HOST_ANY;
             server_addr.port = cvars::console_server_port.value_i;
             server_host = enet_host_create(&server_addr, 32, 10, 0, 0);
+
+            log::register_handler(&log_handlers::console_server_handler);
         }
 
         virtual ~ConsoleServerImplementation() final {
             enet_host_destroy(server_host);
+            log::unregister_handler(&log_handlers::console_server_handler);
         }
 
         virtual void register_command(const char* name, const command_clb_t clb) final {
