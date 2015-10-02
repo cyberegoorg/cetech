@@ -51,7 +51,7 @@ namespace cetech {
             }
 
             virtual void load(StringId64_t name) final {
-                const void* res = application_globals::device().resource_manager().get(resource_package::type_hash(), name);
+                const void* res = application_globals::app().resource_manager().get(resource_package::type_hash(), name);
 
                 if (res == nullptr) {
                     log::error("package_manager", "Could not get resource for package " "%" PRIx64, name);
@@ -61,8 +61,8 @@ namespace cetech {
                 resource_package::Header* header = (resource_package::Header*)res;
                 resource_package::TypeHeader* type_header = (resource_package::TypeHeader*)(header + 1);
 
-                ResourceManager& rm = application_globals::device().resource_manager();
-                TaskManager& tm = application_globals::device().task_manager();
+                ResourceManager& rm = application_globals::app().resource_manager();
+                TaskManager& tm = application_globals::app().task_manager();
 
                 const uint64_t types_count = header->count;
                 for (uint64_t i = 0; i < types_count; ++i) {
@@ -82,7 +82,7 @@ namespace cetech {
             }
 
             virtual void unload(StringId64_t name) final {
-                const void* res = application_globals::device().resource_manager().get(resource_package::type_hash(), name);
+                const void* res = application_globals::app().resource_manager().get(resource_package::type_hash(), name);
 
                 if (res == nullptr) {
                     log::error("package_manager", "Could not get resource for package " "%" PRIx64, name);
@@ -92,7 +92,7 @@ namespace cetech {
                 resource_package::Header* header = (resource_package::Header*)res;
                 resource_package::TypeHeader* type_header = (resource_package::TypeHeader*)(header + 1);
 
-                ResourceManager& rm = application_globals::device().resource_manager();
+                ResourceManager& rm = application_globals::app().resource_manager();
                 const uint64_t types_count = header->count;
                 for (uint64_t i = 0; i < types_count; ++i) {
                     uint32_t count = type_header[i].count;
@@ -104,7 +104,7 @@ namespace cetech {
             }
 
             virtual bool is_loaded(StringId64_t name) final {
-                const void* res = application_globals::device().resource_manager().get(resource_package::type_hash(), name);
+                const void* res = application_globals::app().resource_manager().get(resource_package::type_hash(), name);
 
                 if (res == nullptr) {
                     log::error("package_manager", "Could not get resource for package " "%" PRIx64, name);
@@ -120,7 +120,7 @@ namespace cetech {
                     StringId64_t type = type_header[i].type;
                     StringId64_t* names = (StringId64_t*)(res + type_header[i].offset);
 
-                    if (!application_globals::device().resource_manager().can_get(type, names, count)) {
+                    if (!application_globals::app().resource_manager().can_get(type, names, count)) {
                         return false;
                     }
                 }

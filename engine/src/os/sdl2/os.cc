@@ -121,7 +121,7 @@ namespace cetech {
             while (SDL_PollEvent(&e) > 0) {
                 switch (e.type) {
                 case SDL_QUIT:
-                    application_globals::device().quit();
+                    application_globals::app().quit();
                     break;
                 }
             }

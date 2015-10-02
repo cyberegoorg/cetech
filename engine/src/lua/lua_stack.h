@@ -77,7 +77,7 @@ namespace cetech {
             }
 
             void push_vector2(const Vector2& v) {
-                Vector2& tmp_v = application_globals::device().lua_enviroment().new_tmp_vector2();
+                Vector2& tmp_v = application_globals::app().lua_enviroment().new_tmp_vector2();
                 tmp_v = v;
 
                 lua_pushlightuserdata(_L, &tmp_v);
@@ -86,7 +86,7 @@ namespace cetech {
             }
 
             void push_vector3(const Vector3& v) {
-                Vector3& tmp_v = application_globals::device().lua_enviroment().new_tmp_vector3();
+                Vector3& tmp_v = application_globals::app().lua_enviroment().new_tmp_vector3();
                 tmp_v = v;
 
                 lua_pushlightuserdata(_L, &tmp_v);

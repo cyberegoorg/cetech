@@ -8,7 +8,7 @@ int main(int argc, const char** argv) {
     log::init();
 
     application_globals::init();
-    Application& d = application_globals::device();
+    Application& d = application_globals::app();
 
     d.init(argc, argv);
     d.run();

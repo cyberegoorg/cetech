@@ -5,17 +5,17 @@
 
 namespace cetech {
     static int application_quit(lua_State* L) {
-        application_globals::device().quit();
+        application_globals::app().quit();
         return 0;
     }
 
     static int application_get_frame_id(lua_State* L) {
-        LuaStack(L).push_uint32(application_globals::device().get_frame_id());
+        LuaStack(L).push_uint32(application_globals::app().get_frame_id());
         return 1;
     }
 
     static int application_get_delta_time(lua_State* L) {
-        LuaStack(L).push_uint32(application_globals::device().get_delta_time());
+        LuaStack(L).push_uint32(application_globals::app().get_delta_time());
         return 1;
     }
 

@@ -76,7 +76,7 @@ namespace cetech {
         }
 
         virtual void send_buffer() final {
-            ConsoleServer& cs = application_globals::device().console_server();
+            ConsoleServer& cs = application_globals::app().console_server();
 
             flush_stream_buffer();
 
@@ -114,7 +114,7 @@ namespace cetech {
 
         virtual void push_begin_frame() final {
             BeginFrameEvent event = {
-                .get_frame_id = application_globals::device().get_frame_id(),
+                .get_frame_id = application_globals::app().get_frame_id(),
                 .time = os::get_ticks()
             };
 
@@ -123,7 +123,7 @@ namespace cetech {
 
         virtual void push_end_frame() final {
             EndFrameEvent event = {
-                .get_frame_id = application_globals::device().get_frame_id(),
+                .get_frame_id = application_globals::app().get_frame_id(),
                 .time = os::get_ticks()
             };
 
@@ -132,7 +132,7 @@ namespace cetech {
 
         virtual void push_record_float(const char* name, const float value) final {
             RecordFloatEvent event = {
-                .get_frame_id = application_globals::device().get_frame_id(),
+                .get_frame_id = application_globals::app().get_frame_id(),
                 .name = strdup(name),
                 .value = value
             };
@@ -181,7 +181,7 @@ namespace cetech {
 
         void flush_stream_buffer() {
             eventstream::write(
-                application_globals::device().develop_manager().event_stream(), _stream_buffer, _stream_buffer_count);
+                application_globals::app().develop_manager().event_stream(), _stream_buffer, _stream_buffer_count);
             _stream_buffer_count = 0;
         }
     };
