@@ -1,7 +1,7 @@
 // based on bitsquid foundation
 #pragma once
 
-#include "platform/defines.h"
+#include "common/platform/defines.h"
 #include "common/types.h"
 
 namespace cetech {

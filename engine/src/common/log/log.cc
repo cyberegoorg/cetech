@@ -1,7 +1,7 @@
 #include <cstdio>
 #include <ctime>
 
-#include "platform/defines.h"
+#include "common/platform/defines.h"
 
 #include "common/log/log.h"
 #include "common/memory/memory.h"
