@@ -39,7 +39,7 @@ static const char* level_format[] = {
 
 namespace cetech {
     namespace log_handlers_internal {
-        char* time_to_utc_str(std::tm* gmtm) {
+        static char* time_to_utc_str(std::tm* gmtm) {
             char* time_str = std::asctime(gmtm);
             time_str[strlen(time_str) - 1] = '\0';
             return time_str;

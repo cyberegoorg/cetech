@@ -18,6 +18,7 @@ namespace cetech {
         void shutdown();
 
         void register_handler(handler_t handler, void* data = nullptr);
+        void unregister_handler(handler_t handler);
 
         void info(const char* where, const char* format, va_list va);
         void info(const char* where, const char* format, ...);

@@ -107,8 +107,6 @@ namespace cetech {
 
                 _console_server->register_command("lua.execute", &cmd_lua_execute);
 
-                log::register_handler(&log_handlers::console_server_handler);
-
                 register_resources();
 
                 if (command_line_globals::has_argument("compile", 'c')) {
@@ -124,6 +122,8 @@ namespace cetech {
 
             virtual void shutdown() final {
                 _lua_eviroment->call_global("shutdown");
+
+                shutdown_boot();
 
                 PackageManager::destroy(memory_globals::default_allocator(), _package_manager);
                 ResourceManager::destroy(memory_globals::default_allocator(), _resource_manager);
@@ -345,6 +345,17 @@ namespace cetech {
                 res_lua = (const resource_lua::Resource*) _resource_manager->get(
                     resource_lua::type_hash(), boot_script_name_h);
                 _lua_eviroment->execute_resource(res_lua);
+            }
+
+            void shutdown_boot() {
+                StringId64_t boot_pkg_name_h = stringid64::from_cstring_len(cvars::boot_pkg.value_str,
+                                                                            cvars::boot_pkg.str_len);
+                StringId64_t boot_script_name_h = stringid64::from_cstring_len(cvars::boot_script.value_str,
+                                                                               cvars::boot_script.str_len);
+
+                _package_manager->unload(boot_pkg_name_h);
+                _resource_manager->unload(resource_package::type_hash(), &boot_pkg_name_h, 1);
+
             }
 
             // TODO: remove from device to other class.

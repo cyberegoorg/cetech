@@ -27,6 +27,10 @@ namespace cetech {
             time_t tm = std::time(NULL);
             const uint32_t handlers_count = array::size(_logger->handlers);
             for (uint32_t i = 0; i < handlers_count; ++i) {
+                if (_logger->handlers[i] == nullptr) {
+                    continue;
+                }
+
                 _logger->handlers[i](level, tm, where, msg, _logger->handlers_data[i]);
             }
         }
@@ -45,6 +49,16 @@ namespace cetech {
         void register_handler(handler_t handler, void* data) {
             array::push_back(_logger->handlers, handler);
             array::push_back(_logger->handlers_data, data);
+        }
+
+        void unregister_handler(handler_t handler) {
+            for (uint32_t i = 0; i < array::size(_logger->handlers); ++i) {
+                if (_logger->handlers[i] != handler) {
+                    continue;
+                }
+
+                _logger->handlers[i] = nullptr;
+            }
         }
 
         void info(const char* where, const char* format, va_list va) {
