@@ -6,8 +6,8 @@ int main(int argc, const char** argv) {
 
     memory_globals::init();
     log::init();
-    device_globals::init();
 
+    device_globals::init();
     Device& d = device_globals::device();
 
     d.init(argc, argv);
@@ -15,8 +15,8 @@ int main(int argc, const char** argv) {
     d.shutdown();
 
     device_globals::shutdown();
-    log::shutdown();
 
+    log::shutdown();
     memory_globals::shutdown();
 
 
