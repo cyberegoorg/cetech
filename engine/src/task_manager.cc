@@ -3,7 +3,7 @@
 #include "common/memory/memory.h"
 #include "common/container/array.inl.h"
 
-#include "device.h"
+#include "application.h"
 
 #include "os/os.h"
 

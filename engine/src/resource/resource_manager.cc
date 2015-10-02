@@ -1,7 +1,7 @@
 #include <cstdio>
 
 #include "resource_manager.h"
-#include "device.h"
+#include "application.h"
 
 #include "common/container/container_types.h"
 #include "common/container/queue.inl.h"
@@ -79,7 +79,7 @@ namespace cetech {
                 source_fs->list_directory(cvars::rm_source_dir.value_str, files);
 
 
-                TaskManager& tm = device_globals::device().task_manager();
+                TaskManager& tm = application_globals::device().task_manager();
                 TaskManager::TaskID top_compile_task = tm.add_empty_begin(0);
 
                 const uint32_t files_count = array::size(files);

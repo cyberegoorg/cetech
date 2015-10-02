@@ -1,5 +1,5 @@
-Device
-======
+Application
+===========
 
 **get_frame_id** (): int
 > Return frame id.

@@ -6,7 +6,7 @@
 #include "lua/lua_stack.h"
 
 #include "lua/api/lua_mouse.h"
-#include "lua/api/lua_device.h"
+#include "lua/api/lua_application.h"
 #include "lua/api/lua_keyboard.h"
 #include "lua/api/lua_package.h"
 #include "lua/api/lua_vector2.h"
@@ -20,7 +20,7 @@
 #include "common/crypto/murmur_hash.inl.h"
 
 #include "resource/resource_manager.h"
-#include "device.h"
+#include "application.h"
 
 namespace cetech {
     class LuaEnviromentImlementation : public LuaEnviroment {
@@ -64,7 +64,7 @@ namespace cetech {
             create_Vector2_mt();
             create_Vector3_mt();
 
-            lua_device::load_libs(*this);
+            lua_application::load_libs(*this);
             lua_keyboard::load_libs(*this);
             lua_mouse::load_libs(*this);
 
@@ -384,7 +384,7 @@ namespace cetech {
             StringId64_t name_hash = murmur_hash_64(name, strlen(name), 22);
 
             const resource_lua::Resource* res =
-                (resource_lua::Resource*) device_globals::device().resource_manager().get(
+                (resource_lua::Resource*) application_globals::device().resource_manager().get(
                     resource_lua::type_hash(), name_hash);
 
             if (res == nullptr) {
