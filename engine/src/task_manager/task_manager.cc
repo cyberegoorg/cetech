@@ -3,7 +3,7 @@
 #include "common/memory/memory.h"
 #include "common/container/array.inl.h"
 
-#include "application.h"
+#include "application/application.h"
 
 #include "platforms/cpu/cpu.h"
 #include "platforms/thread/thread.h"

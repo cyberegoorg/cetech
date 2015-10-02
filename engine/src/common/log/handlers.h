@@ -6,7 +6,7 @@
 
 #include "common/log/log.h"
 #include "develop/console_server.h"
-#include <application.h>
+#include "application/application.h"
 #include <os/os.h>
 
 #include "rapidjson/rapidjson.h"

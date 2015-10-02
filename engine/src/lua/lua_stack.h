@@ -3,7 +3,7 @@
 #include "luajit/lua.hpp"
 #include "common/string/stringid_types.h"
 #include "common/math/math_types.h"
-#include <application.h>
+#include "application/application.h"
 
 namespace cetech {
     class LuaStack {

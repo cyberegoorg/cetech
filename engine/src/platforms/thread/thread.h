@@ -8,51 +8,51 @@
 
 namespace cetech {
 
-        namespace thread {
+    namespace thread {
         void init();
         void shutdown();
 
         void frame_start();
         void frame_end();
 
-	  
-            /*!
-             * Create thread.
-             * \param fce Thread fce.
-             * \param name Thread name.
-             * \param data Thread data.
-             */
-            Thread create_thread(thread_fce_t fce, const char* name, void* data);
 
-            /*!
-             * Kill thread.
-             * \param thread Thread.
-             */
-            void kill(Thread thread);
+        /*!
+         * Create thread.
+         * \param fce Thread fce.
+         * \param name Thread name.
+         * \param data Thread data.
+         */
+        Thread create_thread(thread_fce_t fce, const char* name, void* data);
 
-            /*!
-             * Get id for thread.
-             * \param thread Thread.
-             * \return thread id.
-             */
-            uint32_t get_id(Thread thread);
+        /*!
+         * Kill thread.
+         * \param thread Thread.
+         */
+        void kill(Thread thread);
 
-            /*!
-             * Get actual thread id.
-             * \return thread id.
-             */
-            uint32_t id();
+        /*!
+         * Get id for thread.
+         * \param thread Thread.
+         * \return thread id.
+         */
+        uint32_t get_id(Thread thread);
 
-            /*!
-             * Spin lock.
-             * \param lock Spin.
-             */
-            void spin_lock(Spinlock& lock);
+        /*!
+         * Get actual thread id.
+         * \return thread id.
+         */
+        uint32_t id();
 
-            /*!
-             * Spin unlock.
-             * \param lock Spin.
-             */
-            void spin_unlock(Spinlock& lock);
-        }
+        /*!
+         * Spin lock.
+         * \param lock Spin.
+         */
+        void spin_lock(Spinlock& lock);
+
+        /*!
+         * Spin unlock.
+         * \param lock Spin.
+         */
+        void spin_unlock(Spinlock& lock);
+    }
 }

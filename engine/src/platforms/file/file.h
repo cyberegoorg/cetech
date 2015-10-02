@@ -8,8 +8,8 @@
 #include "platforms/file/file_types.h"
 
 namespace cetech {
-        namespace file {
-	  
+    namespace file {
+
         void init();
         void shutdown();
 
@@ -17,24 +17,24 @@ namespace cetech {
         void frame_end();
 
         uint32_t get_ticks();
-	
-            enum SeekWhence {
-                SW_SEEK_SET = 1,
-                SW_SEEK_CUR,
-                SW_SEEK_END
-            };
 
-            File from_file(const char* path, const char* mode);
+        enum SeekWhence {
+            SW_SEEK_SET = 1,
+            SW_SEEK_CUR,
+            SW_SEEK_END
+        };
 
-            bool is_null(const File& f);
+        File from_file(const char* path, const char* mode);
 
-            int close(const File& f);
-            size_t read(const File& f, void* ptr, size_t size, size_t maxnum);
-            size_t write(const File& f, const void* ptr, size_t size, size_t num);
+        bool is_null(const File& f);
 
-            int64_t seek(const File& f, int64_t offset, SeekWhence whence);
-            int64_t tell(const File& f);
+        int close(const File& f);
+        size_t read(const File& f, void* ptr, size_t size, size_t maxnum);
+        size_t write(const File& f, const void* ptr, size_t size, size_t num);
 
-            size_t size(const File& f);
-        }
+        int64_t seek(const File& f, int64_t offset, SeekWhence whence);
+        int64_t tell(const File& f);
+
+        size_t size(const File& f);
+    }
 }

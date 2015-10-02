@@ -1,7 +1,7 @@
 #include <cstdio>
 
 #include "resource_manager.h"
-#include "application.h"
+#include "application/application.h"
 
 #include "common/container/container_types.h"
 #include "common/container/queue.inl.h"

@@ -5,7 +5,7 @@
 #include "common/container/hash.inl.h"
 #include "common/memory/memory.h"
 #include "common/crypto/murmur_hash.inl.h"
-#include "application.h"
+#include "application/application.h"
 
 #include "os/os.h"
 
@@ -51,7 +51,8 @@ namespace cetech {
             }
 
             virtual void load(StringId64_t name) final {
-                const void* res = application_globals::app().resource_manager().get(resource_package::type_hash(), name);
+                const void* res =
+                    application_globals::app().resource_manager().get(resource_package::type_hash(), name);
 
                 if (res == nullptr) {
                     log::error("package_manager", "Could not get resource for package " "%" PRIx64, name);
@@ -82,7 +83,8 @@ namespace cetech {
             }
 
             virtual void unload(StringId64_t name) final {
-                const void* res = application_globals::app().resource_manager().get(resource_package::type_hash(), name);
+                const void* res =
+                    application_globals::app().resource_manager().get(resource_package::type_hash(), name);
 
                 if (res == nullptr) {
                     log::error("package_manager", "Could not get resource for package " "%" PRIx64, name);
@@ -104,7 +106,8 @@ namespace cetech {
             }
 
             virtual bool is_loaded(StringId64_t name) final {
-                const void* res = application_globals::app().resource_manager().get(resource_package::type_hash(), name);
+                const void* res =
+                    application_globals::app().resource_manager().get(resource_package::type_hash(), name);
 
                 if (res == nullptr) {
                     log::error("package_manager", "Could not get resource for package " "%" PRIx64, name);
