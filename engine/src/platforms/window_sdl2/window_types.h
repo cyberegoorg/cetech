@@ -3,7 +3,7 @@
 #include "SDL2/SDL.h"
 
 namespace cetech {
-        struct Window {
-            SDL_Window* wnd;
-        };
+    struct Window {
+        SDL_Window* wnd;
+    };
 }

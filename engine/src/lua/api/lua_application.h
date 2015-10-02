@@ -1,7 +1,7 @@
 #include "lua/lua_enviroment.h"
 #include "lua/lua_stack.h"
 
-#include "application.h"
+#include "application/application.h"
 
 namespace cetech {
     static int application_quit(lua_State* L) {

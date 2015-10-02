@@ -2,7 +2,7 @@
 #include "lua/lua_stack.h"
 #include "common/math/vector2.inl.h"
 
-#include "application.h"
+#include "application/application.h"
 
 namespace cetech {
     static int vector2_zero(lua_State* L) {

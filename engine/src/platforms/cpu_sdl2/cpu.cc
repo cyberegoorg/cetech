@@ -6,10 +6,10 @@
 #include "SDL2/SDL.h"
 
 namespace cetech {
-        namespace cpu {
-            uint32_t core_count() {
-                return SDL_GetCPUCount();
-            }
+    namespace cpu {
+        uint32_t core_count() {
+            return SDL_GetCPUCount();
         }
+    }
 }
 

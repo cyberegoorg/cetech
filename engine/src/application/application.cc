@@ -76,8 +76,9 @@ namespace cetech {
             FileSystem* _filesystem;
 
             ApplicationImplementation() : _frame_id(0), _last_frame_ticks(0), _delta_time(0),
-                                     _resource_manager(nullptr), _package_manager(nullptr), _develop_manager(nullptr),
-                                     _console_server(nullptr), _lua_eviroment(nullptr), _filesystem(nullptr) {}
+                                          _resource_manager(nullptr), _package_manager(nullptr), _develop_manager(
+                                              nullptr),
+                                          _console_server(nullptr), _lua_eviroment(nullptr), _filesystem(nullptr) {}
 
             virtual float get_delta_time() const final {
                 return this->_delta_time;
@@ -100,15 +101,15 @@ namespace cetech {
 
                 os::init();
 
-		thread::init();
-		keyboard::init();
-		mouse::init();
+                thread::init();
+                keyboard::init();
+                mouse::init();
 
                 _filesystem = disk_filesystem::make(memory_globals::default_allocator(), cvars::rm_build_dir.value_str);
                 load_config_json();
 
-		_flags.run = 1;
-		
+                _flags.run = 1;
+
                 _task_manager = TaskManager::make(memory_globals::default_allocator());
                 _resource_manager = ResourceManager::make(memory_globals::default_allocator(), _filesystem);
                 _package_manager = PackageManager::make(memory_globals::default_allocator());
@@ -143,10 +144,10 @@ namespace cetech {
                 ConsoleServer::destroy(memory_globals::default_allocator(), _console_server);
                 LuaEnviroment::destroy(memory_globals::default_allocator(), _lua_eviroment);
                 disk_filesystem::destroy(memory_globals::default_allocator(), _filesystem);
-		
-		keyboard::shutdown();
-		mouse::shutdown();
-		thread::shutdown();
+
+                keyboard::shutdown();
+                mouse::shutdown();
+                thread::shutdown();
 
                 os::shutdown();
             }
@@ -185,9 +186,9 @@ namespace cetech {
                     _develop_manager->push_record_float("engine.frame_rate", 1.0f / dt);
 
                     os::frame_start();
-		    thread::frame_start();
-		    keyboard::frame_start();
-		    mouse::frame_start();
+                    thread::frame_start();
+                    keyboard::frame_start();
+                    mouse::frame_start();
                     //_console_server->tick();
                     //
 
@@ -212,9 +213,9 @@ namespace cetech {
                     //
                     os::frame_end();
 
-		    keyboard::frame_end();
-		    mouse::frame_end();
-		    thread::frame_end();
+                    keyboard::frame_end();
+                    mouse::frame_end();
+                    thread::frame_end();
 
                     _develop_manager->push_end_frame();
                     _develop_manager->send_buffer();
@@ -232,8 +233,8 @@ namespace cetech {
             }
 
             virtual bool is_run() final {
-	      return _flags.run != 0;
-	    }
+                return _flags.run != 0;
+            }
 
             virtual TaskManager& task_manager() final {
                 CE_CHECK_PTR(this->_task_manager);

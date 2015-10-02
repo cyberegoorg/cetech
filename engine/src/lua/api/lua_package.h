@@ -3,7 +3,7 @@
 
 #include "os/os.h"
 #include "common/string/stringid.inl.h"
-#include "application.h"
+#include "application/application.h"
 
 namespace cetech {
 

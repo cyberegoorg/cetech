@@ -9,7 +9,7 @@
 #include "common/container/array.inl.h"
 #include "common/crypto/murmur_hash.inl.h"
 #include "common/math/vector2.inl.h"
-#include "application.h"
+#include "application/application.h"
 #include "os/os.h"
 
 #include "SDL2/SDL.h"
@@ -18,7 +18,7 @@ namespace cetech {
     namespace os {
         void init() {
             CE_ASSERT(SDL_Init(SDL_INIT_EVERYTHING) == 0);
-	}
+        }
 
         void shutdown() {
             SDL_Quit();
@@ -36,8 +36,7 @@ namespace cetech {
             }
         }
 
-        void frame_end() {
-        }
+        void frame_end() {}
 
 
         uint32_t get_ticks() {

@@ -20,7 +20,7 @@
 #include "common/crypto/murmur_hash.inl.h"
 
 #include "resource/resource_manager.h"
-#include "application.h"
+#include "application/application.h"
 
 namespace cetech {
     class LuaEnviromentImlementation : public LuaEnviroment {

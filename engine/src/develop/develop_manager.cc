@@ -5,7 +5,7 @@
 #include "common/container/eventstream.inl.h"
 #include "console_server.h"
 
-#include "application.h"
+#include "application/application.h"
 #include "os/os.h"
 
 #include "rapidjson/document.h"
