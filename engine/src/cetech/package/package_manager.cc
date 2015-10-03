@@ -140,12 +140,12 @@ namespace cetech {
                 }
             }
 
-	    virtual void load_boot_package() final {
+            virtual void load_boot_package() final {
                 StringId64_t boot_pkg_name_h = stringid64::from_cstringn(cvars::boot_pkg.value_str,
-                                                                            cvars::boot_pkg.str_len);
+                                                                         cvars::boot_pkg.str_len);
 
-		ResourceManager& rm = application_globals::app().resource_manager();
-		
+                ResourceManager& rm = application_globals::app().resource_manager();
+
                 // Load boot package
                 void* package_data[1];
                 rm.load(package_data, resource_package::type_hash(), &boot_pkg_name_h, 1);
@@ -153,30 +153,30 @@ namespace cetech {
 
                 load(boot_pkg_name_h);
                 flush(boot_pkg_name_h);
-		
-		void* res = package_data[0];
-		resource_package::Header* header = (resource_package::Header*)res;
+
+                void* res = package_data[0];
+                resource_package::Header* header = (resource_package::Header*)res;
                 resource_package::TypeHeader* type_header = (resource_package::TypeHeader*)(header + 1);
 
                 const uint64_t types_count = header->count;
                 for (uint64_t i = 0; i < types_count; ++i) {
                     StringId64_t type = type_header[i].type;
 
-		    if(type != resource_package::type_hash()) {
-		      continue;
-		    }
+                    if (type != resource_package::type_hash()) {
+                        continue;
+                    }
 
                     uint32_t count = type_header[i].count;
-		    StringId64_t* names = (StringId64_t*)(res + type_header[i].offset);
+                    StringId64_t* names = (StringId64_t*)(res + type_header[i].offset);
 
-		    for( uint32_t j = 0; j < count; ++j) {
-		      load(names[j]);
-		      flush(names[j]);
-		    }
+                    for (uint32_t j = 0; j < count; ++j) {
+                        load(names[j]);
+                        flush(names[j]);
+                    }
 
-		    break;
-		}
-      }
+                    break;
+                }
+            }
     };
 
     PackageManager* PackageManager::make(Allocator& alocator) {
