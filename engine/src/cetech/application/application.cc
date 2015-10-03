@@ -104,11 +104,11 @@ namespace cetech {
 
                 mouse::init();
 
-		char build_path[4096] = {0};
-		strcat(build_path, cvars::rm_build_dir.value_str);
-		//strcat(build_path, "/");
-		strcat(build_path, cvars::compiler_platform.value_str);
-		
+                char build_path[4096] = {0};
+                strcat(build_path, cvars::rm_build_dir.value_str);
+                //strcat(build_path, "/");
+                strcat(build_path, cvars::compiler_platform.value_str);
+
                 _filesystem = disk_filesystem::make(memory_globals::default_allocator(), build_path);
 
                 _flags.run = 1;
@@ -127,7 +127,8 @@ namespace cetech {
                 if (command_line_globals::has_argument("compile", 'c')) {
                     compile_all_resource();
                 }
-		load_config_json();
+
+                load_config_json();
 
                 init_boot();
 
@@ -353,10 +354,11 @@ namespace cetech {
             }
 
             void init_boot() {
-		_package_manager->load_boot_package();
+                _package_manager->load_boot_package();
 
-		// Execute boot script
-		StringId64_t boot_script_name_h = stringid64::from_cstringn(cvars::boot_script.value_str,cvars::boot_script.str_len);
+                // Execute boot script
+                StringId64_t boot_script_name_h = stringid64::from_cstringn(cvars::boot_script.value_str,
+                                                                            cvars::boot_script.str_len);
 
                 const resource_lua::Resource* res_lua;
                 res_lua = (const resource_lua::Resource*) _resource_manager->get(
@@ -366,9 +368,9 @@ namespace cetech {
 
             void shutdown_boot() {
                 StringId64_t boot_pkg_name_h = stringid64::from_cstringn(cvars::boot_pkg.value_str,
-                                                                            cvars::boot_pkg.str_len);
+                                                                         cvars::boot_pkg.str_len);
                 StringId64_t boot_script_name_h = stringid64::from_cstringn(cvars::boot_script.value_str,
-                                                                               cvars::boot_script.str_len);
+                                                                            cvars::boot_script.str_len);
 
                 _package_manager->unload(boot_pkg_name_h);
                 _resource_manager->unload(resource_package::type_hash(), &boot_pkg_name_h, 1);
@@ -382,23 +384,23 @@ namespace cetech {
 
                 FileSystem* core_fs = disk_filesystem::make(
                     memory_globals::default_allocator(), cvars::compiler_core_path.value_str);
-		
-		dir::mkpath(_filesystem->root_dir());
-		
-		FSFile* src_config = source_fs->open("config.json", FSFile::READ);
-		FSFile* out_config = _filesystem->open("config.json", FSFile::WRITE);
-		
-		size_t size = src_config->size();
-		char data[size+1] = {0};
-		src_config->read(data, size);
-		source_fs->close(src_config);
 
-		out_config->write(data, size + 1);
-		_filesystem->close(out_config);
+                dir::mkpath(_filesystem->root_dir());
+
+                FSFile* src_config = source_fs->open("config.json", FSFile::READ);
+                FSFile* out_config = _filesystem->open("config.json", FSFile::WRITE);
+
+                size_t size = src_config->size();
+                char data[size + 1] = {0};
+                src_config->read(data, size);
+                source_fs->close(src_config);
+
+                out_config->write(data, size + 1);
+                _filesystem->close(out_config);
 
                 TaskManager::TaskID compile_tid = _resource_manager->compile(source_fs);
                 _task_manager->wait(compile_tid);
-		
+
                 compile_tid = _resource_manager->compile(core_fs);
                 _task_manager->wait(compile_tid);
 
