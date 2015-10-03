@@ -272,8 +272,8 @@ close:
 
                 const uint32_t len = strlen(t);
 
-                type = stringid64::from_cstring_len(t, len);
-                name = stringid64::from_cstring_len(path, sz);
+                type = stringid64::from_cstringn(t, len);
+                name = stringid64::from_cstringn(path, sz);
             }
 
             static CE_INLINE void resource_id_to_str(char* buffer, const StringId64_t& type, const StringId64_t& name) {

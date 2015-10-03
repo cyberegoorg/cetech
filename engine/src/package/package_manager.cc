@@ -141,7 +141,7 @@ namespace cetech {
             }
 
 	    virtual void load_boot_package() final {
-                StringId64_t boot_pkg_name_h = stringid64::from_cstring_len(cvars::boot_pkg.value_str,
+                StringId64_t boot_pkg_name_h = stringid64::from_cstringn(cvars::boot_pkg.value_str,
                                                                             cvars::boot_pkg.str_len);
 
 		ResourceManager& rm = application_globals::app().resource_manager();

@@ -353,12 +353,11 @@ namespace cetech {
             }
 
             void init_boot() {
-		StringId64_t boot_script_name_h = stringid64::from_cstring_len(cvars::boot_script.value_str,
-								  cvars::boot_script.str_len);
-		
 		_package_manager->load_boot_package();
 
-                // Execute boot script
+		// Execute boot script
+		StringId64_t boot_script_name_h = stringid64::from_cstringn(cvars::boot_script.value_str,cvars::boot_script.str_len);
+
                 const resource_lua::Resource* res_lua;
                 res_lua = (const resource_lua::Resource*) _resource_manager->get(
                     resource_lua::type_hash(), boot_script_name_h);
@@ -366,9 +365,9 @@ namespace cetech {
             }
 
             void shutdown_boot() {
-                StringId64_t boot_pkg_name_h = stringid64::from_cstring_len(cvars::boot_pkg.value_str,
+                StringId64_t boot_pkg_name_h = stringid64::from_cstringn(cvars::boot_pkg.value_str,
                                                                             cvars::boot_pkg.str_len);
-                StringId64_t boot_script_name_h = stringid64::from_cstring_len(cvars::boot_script.value_str,
+                StringId64_t boot_script_name_h = stringid64::from_cstringn(cvars::boot_script.value_str,
                                                                                cvars::boot_script.str_len);
 
                 _package_manager->unload(boot_pkg_name_h);
