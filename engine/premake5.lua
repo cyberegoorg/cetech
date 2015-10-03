@@ -109,7 +109,10 @@ solution "cyberego.org tech1"
 	}
 
     filter "system:linux"
-        defines {'CETECH_LINUX'}
+        defines {
+	  'CETECH_PLATFORM=linux',
+	  'CETECH_LINUX'
+	}
 
         linkoptions {
           "-rdynamic",

@@ -99,6 +99,10 @@ namespace cetech {
             virtual bool is_file(const char* path)  final {/*TODO:*/
             };
 
+	    virtual const char* root_dir() final {
+	      return _root_path;
+	    };
+	    
             virtual void create_directory(const char* path)  final {
                 dir::mkpath(path);
             };

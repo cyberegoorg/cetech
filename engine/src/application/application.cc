@@ -21,6 +21,7 @@
 #include "platforms/input/mouse.h"
 #include "platforms/thread/thread.h"
 #include "platforms/window/window.h"
+#include <platforms/dir/dir.h>
 
 #include "cvars/cvars.h"
 #include "os/os.h"
@@ -103,8 +104,12 @@ namespace cetech {
 
                 mouse::init();
 
-                _filesystem = disk_filesystem::make(memory_globals::default_allocator(), cvars::rm_build_dir.value_str);
-                load_config_json();
+		char build_path[4096] = {0};
+		strcat(build_path, cvars::rm_build_dir.value_str);
+		//strcat(build_path, "/");
+		strcat(build_path, cvars::compiler_platform.value_str);
+		
+                _filesystem = disk_filesystem::make(memory_globals::default_allocator(), build_path);
 
                 _flags.run = 1;
 
@@ -122,6 +127,7 @@ namespace cetech {
                 if (command_line_globals::has_argument("compile", 'c')) {
                     compile_all_resource();
                 }
+		load_config_json();
 
                 init_boot();
 
@@ -384,6 +390,19 @@ namespace cetech {
                 FileSystem* source_fs = disk_filesystem::make(
                     memory_globals::default_allocator(), cvars::rm_source_dir.value_str);
 
+		dir::mkpath(_filesystem->root_dir());
+		
+		FSFile* src_config = source_fs->open("config.json", FSFile::READ);
+		FSFile* out_config = _filesystem->open("config.json", FSFile::WRITE);
+		
+		size_t size = src_config->size();
+		char data[size+1] = {0};
+		src_config->read(data, size);
+		source_fs->close(src_config);
+
+		out_config->write(data, size + 1);
+		_filesystem->close(out_config);
+		
                 TaskManager::TaskID compile_tid = _resource_manager->compile(source_fs);
                 _task_manager->wait(compile_tid);
 
