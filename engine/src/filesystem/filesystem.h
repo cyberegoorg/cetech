@@ -15,6 +15,8 @@ namespace cetech {
             virtual bool is_directory(const char* path) = 0;
             virtual bool is_file(const char* path) = 0;
 
+	    virtual const char* root_dir() = 0;
+	    
             virtual void create_directory(const char* path) = 0;
             virtual void delete_directory(const char* path) = 0;
 

@@ -82,11 +82,15 @@ namespace cetech {
 
                 TaskManager& tm = application_globals::app().task_manager();
                 TaskManager::TaskID top_compile_task = tm.add_empty_begin(0);
-
+		
                 const uint32_t files_count = array::size(files);
                 for (uint32_t i = 0; i < files_count; ++i) {
                     const char* filename = files[i] + cvars::rm_source_dir.str_len; /* Base path */
-
+		    
+		    if(!strcmp(filename, "config.json")) {
+		      continue;
+		    }
+		    
                     uint64_t name, type = 0;
                     calc_hash(filename, type, name);
 
