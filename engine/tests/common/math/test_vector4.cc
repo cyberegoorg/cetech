@@ -1,7 +1,7 @@
 #include "catch.hpp"
 
-#include "common/memory/memory.h"
-#include "common/math/vector4.inl.h"
+#include "celib/memory/memory.h"
+#include "celib/math/vector4.inl.h"
 
 #include "test_utils.h"
 

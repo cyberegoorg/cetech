@@ -125,7 +125,7 @@ solution "cyberego.org tech1"
 	}
 	
 	files {
-	  ROOT_DIR .. "src/platforms/*_linux/**",
+	  ROOT_DIR .. "src/cetech/platforms/*_linux/**",
 	}
     
 
@@ -134,31 +134,31 @@ solution "cyberego.org tech1"
 
     filter {}
 --------------------------------------------------------------------------------
-project "tech1_static"
+project "celib_static"
     kind "StaticLib"
     language "C++"
 
+    excludes {
+      ROOT_DIR .. "src/**",
+    }
+    
     files {
-        ROOT_DIR .. "src/**.cc",
-        ROOT_DIR .. "src/**.h",
+        ROOT_DIR .. "src/celib/**.cc",
+        ROOT_DIR .. "src/celib/**.h",
     }
 
     links {
       "SDL2",
     }
 
-    excludes {
-      ROOT_DIR .. "src/platforms/*_*/**",
-    }
-
     filter {}
 --------------------------------------------------------------------------------
-project "tech1_test"
+project "cetech1_test"
     kind "ConsoleApp"
     language "C++"
 
     links {
-      'tech1_static'
+      'celib_static'
     }
 
     includedirs {
@@ -176,12 +176,16 @@ project "tech1"
     kind "ConsoleApp"
     language "C++"
 
+    excludes {
+      ROOT_DIR .. "src/celib/**",
+    }
+    
     files {
-        ROOT_DIR .. "src/os/**.cc",
+	ROOT_DIR .. "src/cetech/**.cc",
     }
 
     links {
-      'tech1_static'
+      'celib_static'
     }
 
     filter {}

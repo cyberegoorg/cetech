@@ -115,19 +115,19 @@ linux-release64: .build/projects/gmake
 
 .PHONY: test-linux-debug
 test-linux-debug: linux-debug
-	.build/linux${ARCH}/bin/tech1_test_debug -b -r compact
+	.build/linux${ARCH}/bin/cetech1_test_debug -b -r compact
 
 .PHONY: test-linux-release
 test-linux-release: linux-release
-	.build/linux${ARCH}/bin/tech1_test -b -r compact
+	.build/linux${ARCH}/bin/cetech1_test -b -r compact
 
 .PHONY: test-linux-debug-travis
 test-linux-debug-travis: linux-debug
-	.build/linux${ARCH}/bin/tech1_test_debug -d yes
+	.build/linux${ARCH}/bin/cetech1_test_debug -d yes
 
 .PHONY: test-linux-release-travis
 test-linux-release-travis: linux-release
-	.build/linux${ARCH}/bin/tech1_test -d yes
+	.build/linux${ARCH}/bin/cetech1_test -d yes
 #########
 
 #################
