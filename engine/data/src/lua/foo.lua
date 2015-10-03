@@ -1,3 +1,3 @@
-local log = require "lua/cetech/log"
+local log = require "cetech/log"
 
 Foo = Foo or {}

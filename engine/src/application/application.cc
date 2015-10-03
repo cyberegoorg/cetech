@@ -353,19 +353,10 @@ namespace cetech {
             }
 
             void init_boot() {
-                StringId64_t boot_pkg_name_h = stringid64::from_cstring_len(cvars::boot_pkg.value_str,
-                                                                            cvars::boot_pkg.str_len);
-                StringId64_t boot_script_name_h = stringid64::from_cstring_len(cvars::boot_script.value_str,
-                                                                               cvars::boot_script.str_len);
-
-                // Load boot package
-
-                void* package_data[1];
-                _resource_manager->load(package_data, resource_package::type_hash(), &boot_pkg_name_h, 1);
-                _resource_manager->add_loaded(package_data, resource_package::type_hash(), &boot_pkg_name_h, 1);
-
-                _package_manager->load(boot_pkg_name_h);
-                _package_manager->flush(boot_pkg_name_h);
+		StringId64_t boot_script_name_h = stringid64::from_cstring_len(cvars::boot_script.value_str,
+								  cvars::boot_script.str_len);
+		
+		_package_manager->load_boot_package();
 
                 // Execute boot script
                 const resource_lua::Resource* res_lua;
@@ -390,6 +381,9 @@ namespace cetech {
                 FileSystem* source_fs = disk_filesystem::make(
                     memory_globals::default_allocator(), cvars::rm_source_dir.value_str);
 
+                FileSystem* core_fs = disk_filesystem::make(
+                    memory_globals::default_allocator(), cvars::compiler_core_path.value_str);
+		
 		dir::mkpath(_filesystem->root_dir());
 		
 		FSFile* src_config = source_fs->open("config.json", FSFile::READ);
@@ -402,8 +396,11 @@ namespace cetech {
 
 		out_config->write(data, size + 1);
 		_filesystem->close(out_config);
-		
+
                 TaskManager::TaskID compile_tid = _resource_manager->compile(source_fs);
+                _task_manager->wait(compile_tid);
+		
+                compile_tid = _resource_manager->compile(core_fs);
                 _task_manager->wait(compile_tid);
 
                 disk_filesystem::destroy(memory_globals::default_allocator(), source_fs);

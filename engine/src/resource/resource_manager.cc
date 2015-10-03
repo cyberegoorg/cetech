@@ -77,7 +77,7 @@ namespace cetech {
 
             virtual TaskManager::TaskID compile(FileSystem* source_fs) final {
                 Array < char* > files(memory_globals::default_allocator());
-                source_fs->list_directory(cvars::rm_source_dir.value_str, files);
+                source_fs->list_directory(source_fs->root_dir(), files);
 
 
                 TaskManager& tm = application_globals::app().task_manager();
@@ -85,7 +85,7 @@ namespace cetech {
 		
                 const uint32_t files_count = array::size(files);
                 for (uint32_t i = 0; i < files_count; ++i) {
-                    const char* filename = files[i] + cvars::rm_source_dir.str_len; /* Base path */
+                    const char* filename = files[i] + strlen(source_fs->root_dir()); /* Base path */
 		    
 		    if(!strcmp(filename, "config.json")) {
 		      continue;

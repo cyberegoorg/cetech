@@ -14,5 +14,6 @@ namespace cetech {
         extern CVar console_server_port;
 	
 	extern CVar compiler_platform;
+	extern CVar compiler_core_path;
     }
 }

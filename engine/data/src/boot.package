@@ -1,11 +1,11 @@
 {
   "lua" : [
-    "lua/cetech/log",
     "lua/boot",
     "lua/game"
   ],
   
   "package": [
+    "core",
     "pkg1"
   ]
 }
