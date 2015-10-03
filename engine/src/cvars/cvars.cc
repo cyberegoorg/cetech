@@ -14,5 +14,6 @@ namespace cetech {
         CVar console_server_port("console_server.port", "Console server port.", 2222, CVar::FLAG_CONST);
 	
 	CVar compiler_platform("compiler.platform", "Compiler platform", xstr(CETECH_PLATFORM), CVar::FLAG_CONST);
+	CVar compiler_core_path("compiler.core_path", "Compiler core path", "./core/", CVar::FLAG_CONST);
     }
 }

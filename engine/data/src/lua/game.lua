@@ -1,4 +1,4 @@
-local log = require "lua/cetech/log"
+local log = require "cetech/log"
 
 Game = Game or {}
 
