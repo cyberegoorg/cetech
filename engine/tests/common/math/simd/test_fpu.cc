@@ -1,7 +1,7 @@
 #include "catch.hpp"
 
-#include "common/memory/memory.h"
-#include "common/math/simd/fpu.h"
+#include "celib/memory/memory.h"
+#include "celib/math/simd/fpu.h"
 
 #include "test_utils.h"
 

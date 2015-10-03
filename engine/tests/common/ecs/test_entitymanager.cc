@@ -1,6 +1,6 @@
 #include "catch.hpp"
 
-#include "common/ecs/entitymanager.h"
+#include "celib/ecs/entitymanager.h"
 
 SCENARIO( "Entity manager can create/destroy entity", "[entity]" ) {
     cetech::memory_globals::init();
