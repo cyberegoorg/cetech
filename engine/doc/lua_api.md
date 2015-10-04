@@ -11,6 +11,25 @@ Application
 > Quit application.
 
 
+Package
+=======
+
+**create** (package_name) : stringid64
+> Create package
+
+**load** (package_id)
+> Load package
+
+**unload** (package_id)
+> Unload pacakge
+
+**is_loaded** (package_id)
+> Is package loaded
+
+**flush** (package_id)
+> Wait for package
+
+
 Keyboard
 ========
 
@@ -28,6 +47,7 @@ Keyboard
 
 **released** (button_index) : bool
 > Is button released in this frame?
+
 
 Mouse
 =====
