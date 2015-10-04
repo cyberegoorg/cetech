@@ -101,12 +101,10 @@ namespace cetech {
                 parse_command_line();
 
                 os::init();
-
                 mouse::init();
 
                 char build_path[4096] = {0};
                 strcat(build_path, cvars::rm_build_dir.value_str);
-                //strcat(build_path, "/");
                 strcat(build_path, cvars::compiler_platform.value_str);
 
                 _filesystem = disk_filesystem::make(memory_globals::default_allocator(), build_path);
@@ -150,8 +148,6 @@ namespace cetech {
                 LuaEnviroment::destroy(memory_globals::default_allocator(), _lua_eviroment);
                 disk_filesystem::destroy(memory_globals::default_allocator(), _filesystem);
 
-                mouse::shutdown();
-
                 os::shutdown();
             }
 
@@ -178,8 +174,9 @@ namespace cetech {
                     );
 
                 float dt = 0.0f;
+		uint32_t now_ticks = 0;
                 while (_flags.run) {
-                    uint32_t now_ticks = os::get_ticks();
+                    now_ticks = os::get_ticks();
                     dt = (now_ticks - this->_last_frame_ticks) * 0.001f;
                     this->_delta_time = dt;
                     this->_last_frame_ticks = now_ticks;
@@ -191,8 +188,6 @@ namespace cetech {
                     os::frame_start();
                     keyboard::frame_start();
                     mouse::frame_start();
-                    //_console_server->tick();
-                    //
 
                     TaskManager::TaskID frame_task = _task_manager->add_empty_begin(0);
                     TaskManager::TaskID console_server_task = _task_manager->add_begin(
@@ -273,7 +268,7 @@ namespace cetech {
                 return *(this->_lua_eviroment);
             }
 
-            CE_INLINE void register_resources() {
+            void register_resources() {
                 struct ResourceRegistration {
                     StringId64_t type;
 
@@ -417,19 +412,19 @@ namespace cetech {
     }
 
     namespace application_globals {
-        static Application* _device = nullptr;
+        static Application* _application = nullptr;
 
         void init() {
-            _device = Application::make(memory_globals::default_allocator());
+            _application = Application::make(memory_globals::default_allocator());
         }
 
         void shutdown() {
-            Application::destroy(memory_globals::default_allocator(), _device);
-            _device = nullptr;
+            Application::destroy(memory_globals::default_allocator(), _application);
+            _application = nullptr;
         }
 
         Application& app() {
-            return *_device;
+            return *_application;
         }
     }
 }

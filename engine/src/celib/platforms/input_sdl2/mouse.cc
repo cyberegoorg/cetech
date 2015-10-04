@@ -27,9 +27,6 @@ namespace cetech {
 
 
     namespace mouse {
-
-        void shutdown() {}
-
         void init() {
             mouse_internal::left_btn_hash = murmur_hash_64("left", strlen("left"), 22);
             mouse_internal::middle_btn_hash = murmur_hash_64("middle", strlen("middle"), 22);
