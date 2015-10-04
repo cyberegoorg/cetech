@@ -128,6 +128,15 @@ namespace cetech {
 
                 load_config_json();
 
+                if (command_line_globals::has_argument("wait", 'w')) {
+                    log::info("main", "Wating for clients.");
+                    while (!_console_server->has_clients()) {
+                        _console_server->tick();
+                    }
+
+                    log::debug("main", "Client connected.");
+                }
+		
                 init_boot();
 
                 this->_last_frame_ticks = os::get_ticks();
@@ -157,22 +166,15 @@ namespace cetech {
             }
 
             virtual void run() final {
-                if (command_line_globals::has_argument("--wait", 'w')) {
-                    log::info("main", "Wating for clients.");
-                    while (!_console_server->has_clients()) {
-                        _console_server->tick();
-                    }
-
-                    log::debug("main", "Client connected.");
-                }
-
-                main_window = window::make_window(
-                    "aaa",
-                    window::WINDOWPOS_CENTERED, window::WINDOWPOS_CENTERED,
-                    800, 600,
-                    window::WINDOW_NOFLAG
-                    );
-
+		if (!command_line_globals::has_argument("daemon", '-d')) {
+		  main_window = window::make_window(
+		      "aaa",
+		      window::WINDOWPOS_CENTERED, window::WINDOWPOS_CENTERED,
+		      800, 600,
+		      window::WINDOW_NOFLAG
+		      );
+		}
+		
                 float dt = 0.0f;
 		uint32_t now_ticks = 0;
                 while (_flags.run) {
@@ -336,6 +338,7 @@ namespace cetech {
 
                 const char* source_dir = command_line_globals::get_parameter("source-dir", 's');
                 const char* build_dir = command_line_globals::get_parameter("build-dir", 'b');
+		const char* port = command_line_globals::get_parameter("port", 'p');
 
                 if (source_dir) {
                     make_path(buffer, 1024, source_dir);
@@ -345,6 +348,12 @@ namespace cetech {
                 if (build_dir) {
                     make_path(buffer, 1024, build_dir);
                     cvar_internal::force_set(cvars::rm_build_dir, buffer);
+                }
+                
+                if (port) {
+		    int p = 0;
+		    sscanf(port, "%d",&p);
+                    cvar_internal::force_set(cvars::console_server_port, p);
                 }
             }
 
