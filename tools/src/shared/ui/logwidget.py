@@ -11,7 +11,7 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 class Ui_LogWidget(object):
     def setupUi(self, LogWidget):
         LogWidget.setObjectName("LogWidget")
-        LogWidget.resize(733, 298)
+        LogWidget.resize(1103, 276)
         LogWidget.setFrameShape(QtWidgets.QFrame.StyledPanel)
         LogWidget.setFrameShadow(QtWidgets.QFrame.Raised)
         self.verticalLayout = QtWidgets.QVBoxLayout(LogWidget)

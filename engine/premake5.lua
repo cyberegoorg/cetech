@@ -89,6 +89,7 @@ solution "cyberego.org tech1"
         defines {
 	  "DEBUG",
 	  "CETECH_DEBUG",
+	  "CETECH_DEVELOP",
 	  "CETECH_CE_INLINE_OFF",
 	}
 
@@ -172,7 +173,7 @@ project "cetech1_test"
 
     filter {}
 --------------------------------------------------------------------------------
-project "tech1"
+project "cetech1"
     kind "ConsoleApp"
     language "C++"
 
