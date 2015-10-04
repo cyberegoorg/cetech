@@ -29,3 +29,23 @@ Keyboard
 **released** (button_index) : bool
 > Is button released in this frame?
 
+Mouse
+=====
+
+**button_index** (button_name) : int
+> Return button index
+
+**button_name** (button_index) : string
+> Return button name
+
+**button_state** (button_index) : bool
+> Return button state 
+
+**pressed** (button_index) : bool
+> Is button pressed in this frame?
+
+**released** (button_index) : bool
+> Is button released in this frame?
+
+**axis** (button_index) : Vector2
+> Return mouse position.
