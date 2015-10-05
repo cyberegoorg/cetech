@@ -30,8 +30,11 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
         self.api = QtConsoleAPI(self.console_address, self.console_port)
 
-        self.log_widget = LogWidget(self.api, ignore_where='lua\.*.*')
+        self.log_dock_widget = QDockWidget(self)
+        self.log_dock_widget.hide()
+        self.log_widget = LogWidget(self.api)
         self.log_dock_widget.setWidget(self.log_widget)
+        self.addDockWidget(Qt.BottomDockWidgetArea, self.log_dock_widget)
 
         self.assetb_widget = AssetBrowser()
         self.assetb_dock_widget = QDockWidget(self)
@@ -41,7 +44,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.assetb_dock_widget.setWidget(self.assetb_widget)
         self.addDockWidget(Qt.LeftDockWidgetArea, self.assetb_dock_widget)
 
-        self.lua_editor_widget = LuaEditor(project_manager=self.project)
+        self.lua_editor_widget = LuaEditor(project_manager=self.project, api=self.api)
         self.lua_editor_dock_widget = QDockWidget(self)
         self.lua_editor_dock_widget.setWindowTitle("Lua editor")
         self.lua_editor_dock_widget.hide()
@@ -58,15 +61,22 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             self.lua_editor_dock_widget.focusWidget()
 
     def open_project(self):
-        self.project.open_project_dialog(self)
+        if not self.project.open_project_dialog(self):
+            return
 
         self.project.run_cetech(compile=True, daemon=True)
         self.api.start(QThread.LowPriority)
 
         self.assetb_widget.open_project(self.project.project_dir)
         self.assetb_dock_widget.show()
+        self.log_dock_widget.show()
 
     def open_lua_editor(self):
+        p = self.project.spawned_process[0]
+
+        print(bytearray(p.readAllStandardError()).decode())
+        print(bytearray(p.readAllStandardOutput()).decode())
+
         self.lua_editor_dock_widget.show()
 
     def closeEvent(self, evnt):

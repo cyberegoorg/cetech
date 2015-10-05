@@ -1,19 +1,22 @@
 import os
 
 from PyQt5 import Qsci
-from PyQt5.QtCore import QTextCodec, QFile, QDir, QFileInfo, QByteArray
+from PyQt5.QtCore import QTextCodec, QFile, QDir, QFileInfo
 from PyQt5.QtGui import QColor
 from PyQt5.QtWidgets import QMainWindow, QFileDialog, QMessageBox
+
+from cetech.api import ConsoleAPI
 from playground.projectmanager import ProjectManager
 from shared.ui.luaeditorwindow import Ui_MainWindow
 
 
 class LuaEditor(QMainWindow, Ui_MainWindow):
-    def __init__(self, project_manager: ProjectManager):
+    def __init__(self, project_manager: ProjectManager, api: ConsoleAPI):
         super(LuaEditor, self).__init__()
         self.setupUi(self)
 
         self.project_manager = project_manager
+        self.api = api
 
     def open_file(self, filename):
         if not QFile.exists(filename):
@@ -43,6 +46,10 @@ class LuaEditor(QMainWindow, Ui_MainWindow):
                 return i
 
         return None
+
+    def send_current(self):
+        sci = self.main_tabs.widget(self.main_tabs.currentIndex())
+        self.api.lua_execute(sci.text())
 
     def open_new_file(self):
         # TODO: Untitled + id (Untitled1, Untitled2, ... )

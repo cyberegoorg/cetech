@@ -122,10 +122,6 @@ namespace cetech {
 
                 register_resources();
 
-                if (command_line_globals::has_argument("compile", 'c')) {
-                    compile_all_resource();
-                }
-
                 load_config_json();
 
                 if (command_line_globals::has_argument("wait", 'w')) {
@@ -135,6 +131,10 @@ namespace cetech {
                     }
 
                     log::debug("main", "Client connected.");
+                }
+
+                if (command_line_globals::has_argument("compile", 'c')) {
+                    compile_all_resource();
                 }
 		
                 init_boot();
