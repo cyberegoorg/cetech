@@ -35,6 +35,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
         self.assetb_widget = AssetBrowser()
         self.assetb_dock_widget = QDockWidget(self)
+        self.assetb_dock_widget.hide()
         self.assetb_dock_widget.setWindowTitle("Asset browser")
         self.assetb_dock_widget.setFeatures(QDockWidget.AllDockWidgetFeatures)
         self.assetb_dock_widget.setWidget(self.assetb_widget)
@@ -63,6 +64,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.api.start(QThread.LowPriority)
 
         self.assetb_widget.open_project(self.project.project_dir)
+        self.assetb_dock_widget.show()
 
     def open_lua_editor(self):
         self.lua_editor_dock_widget.show()
