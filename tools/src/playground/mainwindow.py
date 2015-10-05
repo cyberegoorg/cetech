@@ -1,13 +1,12 @@
 import argparse
-
 from PyQt5.QtCore import QThread, Qt
 from PyQt5.QtWidgets import QMainWindow, QDockWidget
 from cetech.qtapi import QtConsoleAPI
 from playground.projectmanager import ProjectManager
 from playground.ui.mainwindow import Ui_MainWindow
+from shared.assetbrowser import AssetBrowser
 from shared.logwidget import LogWidget
 from shared.luaeditor import LuaEditor
-from shared.replwidget import REPLWidget
 
 
 class MainWindow(QMainWindow, Ui_MainWindow):
@@ -34,12 +33,12 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.log_widget = LogWidget(self.api, ignore_where='lua\.*.*')
         self.log_dock_widget.setWidget(self.log_widget)
 
-        self.repl_widget = REPLWidget(self.api)
-        self.repl_dock_widget = QDockWidget(self)
-        self.repl_dock_widget.hide()
-        self.repl_dock_widget.setFeatures(QDockWidget.AllDockWidgetFeatures)
-        self.repl_dock_widget.setWidget(self.repl_widget)
-        self.addDockWidget(Qt.TopDockWidgetArea, self.repl_dock_widget)
+        self.assetb_widget = AssetBrowser()
+        self.assetb_dock_widget = QDockWidget(self)
+        self.assetb_dock_widget.setWindowTitle("Asset browser")
+        self.assetb_dock_widget.setFeatures(QDockWidget.AllDockWidgetFeatures)
+        self.assetb_dock_widget.setWidget(self.assetb_widget)
+        self.addDockWidget(Qt.LeftDockWidgetArea, self.assetb_dock_widget)
 
         self.lua_editor_widget = LuaEditor(project_manager=self.project)
         self.lua_editor_dock_widget = QDockWidget(self)
@@ -49,6 +48,13 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.lua_editor_dock_widget.setWidget(self.lua_editor_widget)
         self.addDockWidget(Qt.TopDockWidgetArea, self.lua_editor_dock_widget)
 
+        self.assetb_widget.asset_clicked.connect(self.open_asset)
+
+    def open_asset(self, path, ext):
+        if ext == 'lua':
+            self.lua_editor_widget.open_file(path)
+            self.lua_editor_dock_widget.show()
+            self.lua_editor_dock_widget.focusWidget()
 
     def open_project(self):
         self.project.open_project_dialog(self)
@@ -56,8 +62,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.project.run_cetech(compile=True, daemon=True)
         self.api.start(QThread.LowPriority)
 
-    def open_repl(self):
-        self.repl_dock_widget.show()
+        self.assetb_widget.open_project(self.project.project_dir)
 
     def open_lua_editor(self):
         self.lua_editor_dock_widget.show()
