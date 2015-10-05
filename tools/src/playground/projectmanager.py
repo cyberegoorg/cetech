@@ -19,6 +19,9 @@ class ProjectManager(object):
         self.spawned_process = []
 
     def open_project(self, project_dir):
+        if project_dir == '':
+            return False
+
         if self.is_project_opened():
             self.close_project()
 
@@ -27,7 +30,7 @@ class ProjectManager(object):
 
         self.project_dir = project_dir
 
-        return False
+        return True
 
     def close_project(self):
         self.project_dir = None
@@ -62,7 +65,6 @@ class ProjectManager(object):
             args.append("--daemon")
 
         cmd = '../../engine/.build/linux64/bin/cetech1_debug %s' % ' '.join(args)
-        print(cmd)
 
         process = QProcess()
         process.start(cmd)

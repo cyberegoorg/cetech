@@ -28,10 +28,8 @@ class LogWidget(QFrame, Ui_LogWidget):
         self.setupUi(self)
 
         self.ignore_where = None
-        if ignore_where is None:
-            ignore_where = ''
-
-        self.set_ignore_where(ignore_where)
+        if ignore_where is not None:
+            self.set_ignore_where(ignore_where)
 
         self.api = api
         self.api.register_handler('log', self.add_log)
@@ -42,6 +40,9 @@ class LogWidget(QFrame, Ui_LogWidget):
         self.ignore_where = re.compile(pattern)
 
     def _is_ignored(self, name):
+        if not self.ignore_where:
+            return False
+
         m = self.ignore_where.match(name)
         return m is not None
 

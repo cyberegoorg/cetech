@@ -57,6 +57,8 @@
    <addaction name="actionSave_as"/>
    <addaction name="actionSave_all"/>
    <addaction name="separator"/>
+   <addaction name="actionSendCurent"/>
+   <addaction name="separator"/>
   </widget>
   <action name="actionQuit">
    <property name="text">
@@ -104,6 +106,17 @@
    </property>
    <property name="text">
     <string>Save all</string>
+   </property>
+  </action>
+  <action name="actionSendCurent">
+   <property name="icon">
+    <iconset theme="system-run"/>
+   </property>
+   <property name="text">
+    <string>Send current</string>
+   </property>
+   <property name="toolTip">
+    <string>Send current text to engine</string>
    </property>
   </action>
  </widget>
@@ -205,6 +218,22 @@
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>actionSendCurent</sender>
+   <signal>triggered()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>send_current()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>399</x>
+     <y>299</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
  <slots>
   <slot>open_file_dialog()</slot>
@@ -213,5 +242,6 @@
   <slot>save_current()</slot>
   <slot>open_new_file()</slot>
   <slot>save_all()</slot>
+  <slot>send_current()</slot>
  </slots>
 </ui>
