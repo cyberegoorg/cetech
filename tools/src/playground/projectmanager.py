@@ -62,6 +62,7 @@ class ProjectManager(object):
             args.append("--daemon")
 
         cmd = '../../engine/.build/linux64/bin/cetech1_debug %s' % ' '.join(args)
+        print(cmd)
 
         process = QProcess()
         process.start(cmd)

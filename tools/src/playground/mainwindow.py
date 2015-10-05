@@ -27,6 +27,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.console_port = self.args.console_port
         self.console_address = self.args.console_address
 
+        self.project = ProjectManager()
+
         self.api = QtConsoleAPI(self.console_address, self.console_port)
 
         self.log_widget = LogWidget(self.api, ignore_where='lua\.*.*')
@@ -39,7 +41,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.repl_dock_widget.setWidget(self.repl_widget)
         self.addDockWidget(Qt.TopDockWidgetArea, self.repl_dock_widget)
 
-        self.lua_editor_widget = LuaEditor()
+        self.lua_editor_widget = LuaEditor(project_manager=self.project)
         self.lua_editor_dock_widget = QDockWidget(self)
         self.lua_editor_dock_widget.setWindowTitle("Lua editor")
         self.lua_editor_dock_widget.hide()
@@ -47,7 +49,6 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.lua_editor_dock_widget.setWidget(self.lua_editor_widget)
         self.addDockWidget(Qt.TopDockWidgetArea, self.lua_editor_dock_widget)
 
-        self.project = ProjectManager()
 
     def open_project(self):
         self.project.open_project_dialog(self)
