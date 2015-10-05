@@ -27,7 +27,7 @@
    </property>
    <widget class="QMenu" name="menu_File">
     <property name="title">
-     <string>&amp;File</string>
+     <string>F&amp;ile</string>
     </property>
     <addaction name="actionOpen_project"/>
     <addaction name="separator"/>
@@ -35,9 +35,8 @@
    </widget>
    <widget class="QMenu" name="menuTools">
     <property name="title">
-     <string>Tools</string>
+     <string>&amp;Tools</string>
     </property>
-    <addaction name="actionREPL"/>
     <addaction name="actionLua_editor"/>
    </widget>
    <addaction name="menu_File"/>
@@ -49,7 +48,7 @@
     <set>QDockWidget::AllDockWidgetFeatures</set>
    </property>
    <property name="windowTitle">
-    <string>Log</string>
+    <string>&amp;Log</string>
    </property>
    <attribute name="dockWidgetArea">
     <number>8</number>
@@ -73,12 +72,12 @@
   </action>
   <action name="actionREPL">
    <property name="text">
-    <string>REPL</string>
+    <string>&amp;REPL</string>
    </property>
   </action>
   <action name="actionLua_editor">
    <property name="text">
-    <string>Lua editor</string>
+    <string>&amp;Lua editor</string>
    </property>
   </action>
  </widget>
@@ -117,22 +116,6 @@
    </hints>
   </connection>
   <connection>
-   <sender>actionREPL</sender>
-   <signal>triggered()</signal>
-   <receiver>MainWindow</receiver>
-   <slot>open_repl()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>-1</x>
-     <y>-1</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>421</x>
-     <y>236</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
    <sender>actionLua_editor</sender>
    <signal>triggered()</signal>
    <receiver>MainWindow</receiver>
@@ -152,7 +135,6 @@
  <slots>
   <slot>open_project()</slot>
   <slot>send_command()</slot>
-  <slot>open_repl()</slot>
   <slot>open_lua_editor()</slot>
  </slots>
 </ui>
