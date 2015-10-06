@@ -1,6 +1,6 @@
 import os
 
-from PyQt5.QtCore import QDir, pyqtSignal, QFileInfo
+from PyQt5.QtCore import QDir, pyqtSignal, QFileInfo, QFile
 from PyQt5.QtWidgets import QMainWindow, QFileSystemModel
 from shared.ui.assetbrowser import Ui_MainWindow
 
@@ -20,6 +20,7 @@ class AssetBrowser(QMainWindow, Ui_MainWindow):
         self.treeView.hideColumn(3)
 
         self.file_model = QFileSystemModel()
+        self.file_model.setFilter(QDir.NoDotAndDotDot | QDir.Files)
         self.listView.setModel(self.file_model)
 
     def open_project(self, project_dir):
@@ -38,9 +39,6 @@ class AssetBrowser(QMainWindow, Ui_MainWindow):
 
     def file_doubleclicked(self, idx):
         fileinfo = self.file_model.fileInfo(idx)
-
-        if fileinfo.isDir():
-            return
 
         path = fileinfo.absoluteFilePath()
         ext = fileinfo.suffix()
