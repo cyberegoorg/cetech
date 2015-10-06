@@ -35,7 +35,7 @@ namespace cetech {
             virtual bool can_get(StringId64_t type, StringId64_t* names, const uint32_t count) = 0;
             virtual const void* get(StringId64_t type, StringId64_t name) = 0;
 
-            static ResourceManager* make(Allocator& alocator, FileSystem* fs);
-            static void destroy(Allocator& alocator, ResourceManager* rm);
+            static ResourceManager* make(Allocator& allocator, FileSystem* fs);
+            static void destroy(Allocator& allocator, ResourceManager* rm);
     };
 }

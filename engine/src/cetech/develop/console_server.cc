@@ -146,11 +146,11 @@ namespace cetech {
         }
     };
 
-    ConsoleServer* ConsoleServer::make(Allocator& alocator) {
-        return MAKE_NEW(alocator, ConsoleServerImplementation, alocator);
+    ConsoleServer* ConsoleServer::make(Allocator& allocator) {
+        return MAKE_NEW(allocator, ConsoleServerImplementation, allocator);
     }
 
-    void ConsoleServer::destroy(Allocator& alocator, ConsoleServer* cs) {
+    void ConsoleServer::destroy(Allocator& allocator, ConsoleServer* cs) {
         MAKE_DELETE(memory_globals::default_allocator(), ConsoleServer, cs);
     }
 }

@@ -397,11 +397,11 @@ namespace cetech {
 
     };
 
-    LuaEnviroment* LuaEnviroment::make(Allocator& alocator) {
-        return MAKE_NEW(alocator, LuaEnviromentImlementation);
+    LuaEnviroment* LuaEnviroment::make(Allocator& allocator) {
+        return MAKE_NEW(allocator, LuaEnviromentImlementation);
     }
 
-    void LuaEnviroment::destroy(Allocator& alocator, LuaEnviroment* cs) {
+    void LuaEnviroment::destroy(Allocator& allocator, LuaEnviroment* cs) {
         MAKE_DELETE(memory_globals::default_allocator(), LuaEnviroment, cs);
     }
 

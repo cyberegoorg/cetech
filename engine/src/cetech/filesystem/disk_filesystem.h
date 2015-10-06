@@ -6,7 +6,7 @@ namespace cetech {
     class FileSystem;
 
     namespace disk_filesystem {
-        FileSystem* make(Allocator& alocator, const char* root_path);
-        void destroy(Allocator& alocator, FileSystem* fs);
+        FileSystem* make(Allocator& allocator, const char* root_path);
+        void destroy(Allocator& allocator, FileSystem* fs);
     }
 }

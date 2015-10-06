@@ -32,7 +32,7 @@ namespace cetech {
 
             virtual void wait(const TaskID id) = 0;
 
-            static TaskManager* make(Allocator& alocator);
-            static void destroy(Allocator& alocator, TaskManager* tm);
+            static TaskManager* make(Allocator& allocator);
+            static void destroy(Allocator& allocator, TaskManager* tm);
     };
 }

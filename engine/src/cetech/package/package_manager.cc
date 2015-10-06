@@ -179,11 +179,11 @@ namespace cetech {
             }
     };
 
-    PackageManager* PackageManager::make(Allocator& alocator) {
-        return MAKE_NEW(alocator, PackageManagerImplementation);
+    PackageManager* PackageManager::make(Allocator& allocator) {
+        return MAKE_NEW(allocator, PackageManagerImplementation);
     }
 
-    void PackageManager::destroy(Allocator& alocator, PackageManager* pm) {
+    void PackageManager::destroy(Allocator& allocator, PackageManager* pm) {
         MAKE_DELETE(memory_globals::default_allocator(), PackageManager, pm);
     }
 }

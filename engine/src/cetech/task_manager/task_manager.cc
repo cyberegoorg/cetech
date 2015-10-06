@@ -356,11 +356,11 @@ namespace cetech {
             }
     };
 
-    TaskManager* TaskManager::make(Allocator& alocator) {
-        return MAKE_NEW(alocator, TaskManagerImplementation, alocator);
+    TaskManager* TaskManager::make(Allocator& allocator) {
+        return MAKE_NEW(allocator, TaskManagerImplementation, allocator);
     }
 
-    void TaskManager::destroy(Allocator& alocator, TaskManager* rm) {
+    void TaskManager::destroy(Allocator& allocator, TaskManager* rm) {
         MAKE_DELETE(memory_globals::default_allocator(), TaskManager, rm);
     }
 }

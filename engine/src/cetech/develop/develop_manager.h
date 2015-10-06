@@ -16,7 +16,7 @@ namespace cetech {
             virtual void push_end_frame() = 0;
             virtual void push_record_float(const char* name, const float value) = 0;
 
-            static DevelopManager* make(Allocator& alocator);
-            static void destroy(Allocator& alocator, DevelopManager* dm);
+            static DevelopManager* make(Allocator& allocator);
+            static void destroy(Allocator& allocator, DevelopManager* dm);
     };
 }

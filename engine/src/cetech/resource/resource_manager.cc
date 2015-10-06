@@ -281,11 +281,11 @@ close:
             }
     };
 
-    ResourceManager* ResourceManager::make(Allocator& alocator, FileSystem* fs) {
-        return MAKE_NEW(alocator, ResourceManagerImplementation, fs, alocator);
+    ResourceManager* ResourceManager::make(Allocator& allocator, FileSystem* fs) {
+        return MAKE_NEW(allocator, ResourceManagerImplementation, fs, allocator);
     }
 
-    void ResourceManager::destroy(Allocator& alocator, ResourceManager* rm) {
+    void ResourceManager::destroy(Allocator& allocator, ResourceManager* rm) {
         MAKE_DELETE(memory_globals::default_allocator(), ResourceManager, rm);
     }
 }

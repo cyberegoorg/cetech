@@ -18,7 +18,7 @@ namespace cetech {
 
             virtual void load_boot_package() = 0;
 
-            static PackageManager* make(Allocator& alocator);
-            static void destroy(Allocator& alocator, PackageManager* pm);
+            static PackageManager* make(Allocator& allocator);
+            static void destroy(Allocator& allocator, PackageManager* pm);
     };
 }

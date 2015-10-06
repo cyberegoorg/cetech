@@ -126,12 +126,12 @@ namespace cetech {
     };
 
     namespace disk_filesystem {
-        FileSystem* make(Allocator& alocator, const char* root_path) {
-            return MAKE_NEW(alocator, DiskFileSystem, root_path, alocator);
+        FileSystem* make(Allocator& allocator, const char* root_path) {
+            return MAKE_NEW(allocator, DiskFileSystem, root_path, allocator);
         }
 
-        void destroy(Allocator& alocator, FileSystem* fs) {
-            MAKE_DELETE(alocator, FileSystem, fs);
+        void destroy(Allocator& allocator, FileSystem* fs) {
+            MAKE_DELETE(allocator, FileSystem, fs);
         }
     }
 }

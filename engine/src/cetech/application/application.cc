@@ -59,22 +59,24 @@ namespace cetech {
         public:
             friend class Application;
 
-            struct {
-                char run : 1;
-                char pause : 1;
-            } _flags;
-
-            uint32_t _frame_id;
-            uint32_t _last_frame_ticks;
-            float _delta_time;
-
-            TaskManager* _task_manager;
+	    TaskManager* _task_manager;
             ResourceManager* _resource_manager;
             PackageManager* _package_manager;
             DevelopManager* _develop_manager;
             ConsoleServer* _console_server;
             LuaEnviroment* _lua_eviroment;
             FileSystem* _filesystem;
+
+	    uint32_t _frame_id;
+            uint32_t _last_frame_ticks;
+
+            float _delta_time;
+
+	    struct {
+                char run : 1;
+                char pause : 1;
+            } _flags;
+
 
             ApplicationImplementation() : _frame_id(0), _last_frame_ticks(0), _delta_time(0),
                                           _resource_manager(nullptr), _package_manager(nullptr), _develop_manager(
