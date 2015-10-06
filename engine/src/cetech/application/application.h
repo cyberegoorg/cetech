@@ -31,8 +31,8 @@ namespace cetech {
             virtual ConsoleServer& console_server() = 0;
             virtual LuaEnviroment& lua_enviroment() = 0;
 
-            static Application* make(Allocator& alocator);
-            static void destroy(Allocator& alocator, Application* rm);
+            static Application* make(Allocator& allocator);
+            static void destroy(Allocator& allocator, Application* rm);
     };
 
     namespace application_globals {

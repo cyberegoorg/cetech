@@ -414,11 +414,11 @@ namespace cetech {
             }
     };
 
-    Application* Application::make(Allocator& alocator) {
-        return MAKE_NEW(alocator, ApplicationImplementation);
+    Application* Application::make(Allocator& allocator) {
+        return MAKE_NEW(allocator, ApplicationImplementation);
     }
 
-    void Application::destroy(Allocator& alocator, Application* rm) {
+    void Application::destroy(Allocator& allocator, Application* rm) {
         MAKE_DELETE(memory_globals::default_allocator(), Application, rm);
     }
 
