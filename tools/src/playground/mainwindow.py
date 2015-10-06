@@ -1,6 +1,6 @@
 import argparse
 from PyQt5.QtCore import QThread, Qt
-from PyQt5.QtWidgets import QMainWindow, QDockWidget
+from PyQt5.QtWidgets import QMainWindow, QDockWidget, QTabWidget
 from cetech.qtapi import QtConsoleAPI
 from playground.projectmanager import ProjectManager
 from playground.ui.mainwindow import Ui_MainWindow
@@ -30,8 +30,11 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
         self.api = QtConsoleAPI(self.console_address, self.console_port)
 
+        self.setTabPosition(Qt.AllDockWidgetAreas, QTabWidget.North)
+
         self.log_dock_widget = QDockWidget(self)
         self.log_dock_widget.hide()
+        self.log_dock_widget.setWindowTitle("Log")
         self.log_widget = LogWidget(self.api)
         self.log_dock_widget.setWidget(self.log_widget)
         self.addDockWidget(Qt.BottomDockWidgetArea, self.log_dock_widget)
@@ -52,7 +55,11 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.lua_editor_dock_widget.setWidget(self.lua_editor_widget)
         self.addDockWidget(Qt.TopDockWidgetArea, self.lua_editor_dock_widget)
 
+        self.tabifyDockWidget(self.assetb_dock_widget, self.log_dock_widget)
+
         self.assetb_widget.asset_clicked.connect(self.open_asset)
+
+
 
     def open_asset(self, path, ext):
         if ext == 'lua':

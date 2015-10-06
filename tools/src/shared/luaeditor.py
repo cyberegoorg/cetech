@@ -118,6 +118,26 @@ class LuaEditor(QMainWindow, Ui_MainWindow):
         sci = self.main_tabs.widget(tab_index)
         return sci.isModified()
 
+    def undo(self):
+        sci = self.main_tabs.widget(self.main_tabs.currentIndex())
+        sci.undo()
+
+    def redo(self):
+        sci = self.main_tabs.widget(self.main_tabs.currentIndex())
+        sci.redo()
+
+    def copy(self):
+        sci = self.main_tabs.widget(self.main_tabs.currentIndex())
+        sci.copy()
+
+    def cut(self):
+        sci = self.main_tabs.widget(self.main_tabs.currentIndex())
+        sci.cut()
+
+    def paste(self):
+        sci = self.main_tabs.widget(self.main_tabs.currentIndex())
+        sci.paste()
+
     def save_file(self, tab_index):
         if self.get_editor_filename(tab_index) == "":
             self.open_save_dialog()
