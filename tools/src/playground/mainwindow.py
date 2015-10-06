@@ -59,8 +59,6 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
         self.assetb_widget.asset_clicked.connect(self.open_asset)
 
-
-
     def open_asset(self, path, ext):
         if ext == 'lua':
             self.lua_editor_widget.open_file(path)

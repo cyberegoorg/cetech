@@ -44,7 +44,7 @@ class ProjectManager(object):
 
     def killall_process(self):
         for p in self.spawned_process:
-            p.kill()
+            p.terminate()
 
     def run_cetech(self, compile=False, wait=True, daemon=False, port=None):
         args = [

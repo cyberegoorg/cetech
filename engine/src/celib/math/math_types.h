@@ -16,7 +16,7 @@ namespace cetech {
 
     /*! 4D Vector.
      */
-    struct Vector4 {
+    struct alignas(16) Vector4  {
         float x, y, z, w;
     };
 

@@ -168,7 +168,7 @@ namespace cetech {
             }
 
             virtual void run() final {
-		if (!command_line_globals::has_argument("daemon", '-d')) {
+		if (!command_line_globals::has_argument("daemon", 'd')) {
 		  main_window = window::make_window(
 		      "aaa",
 		      window::WINDOWPOS_CENTERED, window::WINDOWPOS_CENTERED,
