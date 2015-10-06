@@ -47,6 +47,13 @@ class LuaEditor(QMainWindow, Ui_MainWindow):
 
         return None
 
+    def close_all(self):
+        while self.tab_close_request(0):
+            pass
+
+    def close_curent(self):
+        self.tab_close_request(self.main_tabs.currentIndex())
+
     def send_current(self):
         sci = self.main_tabs.widget(self.main_tabs.currentIndex())
         self.api.lua_execute(sci.text())
@@ -86,13 +93,19 @@ class LuaEditor(QMainWindow, Ui_MainWindow):
 
     def tab_close_request(self, tab_index):
         filename = self.get_editor_name(tab_index)
+        if filename == '':
+            return False
 
         if self.is_editor_modified(tab_index):
             res = QMessageBox.question(self, "File is modified", "File '%s' is modified" % filename, QMessageBox.Save | QMessageBox.Discard | QMessageBox.Cancel)
             if res == QMessageBox.Save:
                 self.save_file(tab_index)
 
+            elif res == QMessageBox.Cancel:
+                return False
+
         self.main_tabs.removeTab(tab_index)
+        return True
 
     def get_editor_filename(self, tab_index):
         sci = self.main_tabs.widget(tab_index)
