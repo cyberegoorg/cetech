@@ -36,8 +36,8 @@ namespace cetech {
     };
 
     struct RecordFloatEvent {
-        uint32_t get_frame_id;
         const char* name;
+	uint32_t get_frame_id;
         float value;
     };
 
@@ -132,8 +132,8 @@ namespace cetech {
 
         virtual void push_record_float(const char* name, const float value) final {
             RecordFloatEvent event = {
-                .get_frame_id = application_globals::app().get_frame_id(),
                 .name = strdup(name),
+		.get_frame_id = application_globals::app().get_frame_id(),
                 .value = value
             };
             push(EVENT_RECORD_FLOAT, event);
@@ -187,11 +187,11 @@ namespace cetech {
     };
 
 
-    DevelopManager* DevelopManager::make(Allocator& alocator) {
-        return MAKE_NEW(alocator, DevelopManagerImplementation, alocator);
+    DevelopManager* DevelopManager::make(Allocator& allocator) {
+        return MAKE_NEW(allocator, DevelopManagerImplementation, allocator);
     }
 
-    void DevelopManager::destroy(Allocator& alocator, DevelopManager* dm) {
+    void DevelopManager::destroy(Allocator& allocator, DevelopManager* dm) {
         MAKE_DELETE(memory_globals::default_allocator(), DevelopManager, dm);
     }
 }

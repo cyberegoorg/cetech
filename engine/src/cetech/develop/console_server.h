@@ -31,7 +31,7 @@ namespace cetech {
              */
             virtual void send_json_document(const rapidjson::Document& document) = 0;
 
-            static ConsoleServer* make(Allocator& alocator);
-            static void destroy(Allocator& alocator, ConsoleServer* cs);
+            static ConsoleServer* make(Allocator& allocator);
+            static void destroy(Allocator& allocator, ConsoleServer* cs);
     };
 }

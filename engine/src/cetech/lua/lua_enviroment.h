@@ -22,7 +22,7 @@ namespace cetech {
             virtual Vector2& new_tmp_vector2() = 0;
             virtual Vector3& new_tmp_vector3() = 0;
 
-            static LuaEnviroment* make(Allocator& alocator);
-            static void destroy(Allocator& alocator, LuaEnviroment* le);
+            static LuaEnviroment* make(Allocator& allocator);
+            static void destroy(Allocator& allocator, LuaEnviroment* le);
     };
 }
