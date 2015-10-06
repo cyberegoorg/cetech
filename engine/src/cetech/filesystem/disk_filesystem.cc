@@ -70,7 +70,7 @@ namespace cetech {
             char _root_path[1024];
             Allocator& _allocator;
 
-            DiskFileSystem(const char* root_path, Allocator & allocator) : _root_path({0}), _allocator(allocator) {
+            DiskFileSystem(const char* root_path, Allocator & allocator) : _allocator(allocator) {
                 strcpy(_root_path, root_path);
 
                 const size_t len = strlen(_root_path);
@@ -90,13 +90,13 @@ namespace cetech {
                 MAKE_DELETE(_allocator, FSFile, file);
             };
 
-            virtual bool exists(const char* path) final {/*TODO:*/
+            virtual bool exists(const char* path) final {/*TODO: #43*/
             };
 
-            virtual bool is_directory(const char* path) final {/*TODO:*/
+            virtual bool is_directory(const char* path) final {/*TODO: #43*/
             };
 
-            virtual bool is_file(const char* path)  final {/*TODO:*/
+            virtual bool is_file(const char* path)  final {/*TODO: #43*/
             };
 
             virtual const char* root_dir() final {
@@ -107,17 +107,17 @@ namespace cetech {
                 dir::mkpath(path);
             };
 
-            virtual void delete_directory(const char* path) final {/*TODO:*/
+            virtual void delete_directory(const char* path) final {/*TODO: #43*/
             };
 
             virtual void list_directory ( const char* path, cetech::Array < char* >& files ) final {
                 dir::listdir(path, files);
             }
 
-            virtual void create_file(const char* path)  final {/*TODO:*/
+            virtual void create_file(const char* path)  final {/*TODO: #43*/
             };
 
-            virtual void delete_file(const char* path)  final {/*TODO:*/
+            virtual void delete_file(const char* path)  final {/*TODO: #43*/
             };
 
             void absolute_path(char* buffer, const char* path) {
