@@ -14,6 +14,8 @@ class AssetBrowser(QMainWindow, Ui_MainWindow):
 
         self.dir_model = QFileSystemModel()
         self.dir_model.setFilter(QDir.NoDotAndDotDot | QDir.AllDirs)
+        self.dir_model.setReadOnly(False)
+
         self.treeView.setModel(self.dir_model)
         self.treeView.hideColumn(1)
         self.treeView.hideColumn(2)
@@ -21,6 +23,8 @@ class AssetBrowser(QMainWindow, Ui_MainWindow):
 
         self.file_model = QFileSystemModel()
         self.file_model.setFilter(QDir.NoDotAndDotDot | QDir.Files)
+        self.file_model.setReadOnly(False)
+
         self.listView.setModel(self.file_model)
 
     def open_project(self, project_dir):
