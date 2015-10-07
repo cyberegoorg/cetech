@@ -6,7 +6,7 @@ from playground.projectmanager import ProjectManager
 from playground.ui.mainwindow import Ui_MainWindow
 from shared.assetbrowser import AssetBrowser
 from shared.logwidget import LogWidget
-from shared.luaeditor import LuaEditor
+from shared.scripteditor import ScriptEditor
 
 
 class MainWindow(QMainWindow, Ui_MainWindow):
@@ -47,23 +47,23 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.assetb_dock_widget.setWidget(self.assetb_widget)
         self.addDockWidget(Qt.LeftDockWidgetArea, self.assetb_dock_widget)
 
-        self.lua_editor_widget = LuaEditor(project_manager=self.project, api=self.api)
-        self.lua_editor_dock_widget = QDockWidget(self)
-        self.lua_editor_dock_widget.setWindowTitle("Lua editor")
-        self.lua_editor_dock_widget.hide()
-        self.lua_editor_dock_widget.setFeatures(QDockWidget.AllDockWidgetFeatures)
-        self.lua_editor_dock_widget.setWidget(self.lua_editor_widget)
-        self.addDockWidget(Qt.TopDockWidgetArea, self.lua_editor_dock_widget)
+        self.script_editor_widget = ScriptEditor(project_manager=self.project, api=self.api)
+        self.script_editor_dock_widget = QDockWidget(self)
+        self.script_editor_dock_widget.setWindowTitle("Script editor")
+        self.script_editor_dock_widget.hide()
+        self.script_editor_dock_widget.setFeatures(QDockWidget.AllDockWidgetFeatures)
+        self.script_editor_dock_widget.setWidget(self.script_editor_widget)
+        self.addDockWidget(Qt.TopDockWidgetArea, self.script_editor_dock_widget)
 
         self.tabifyDockWidget(self.assetb_dock_widget, self.log_dock_widget)
 
         self.assetb_widget.asset_clicked.connect(self.open_asset)
 
     def open_asset(self, path, ext):
-        if ext == 'lua':
-            self.lua_editor_widget.open_file(path)
-            self.lua_editor_dock_widget.show()
-            self.lua_editor_dock_widget.focusWidget()
+        if self.script_editor_widget.support_ext(ext):
+            self.script_editor_widget.open_file(path)
+            self.script_editor_dock_widget.show()
+            self.script_editor_dock_widget.focusWidget()
 
     def open_project(self):
         if not self.project.open_project_dialog(self):
@@ -76,13 +76,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.assetb_dock_widget.show()
         self.log_dock_widget.show()
 
-    def open_lua_editor(self):
-        p = self.project.spawned_process[0]
-
-        print(bytearray(p.readAllStandardError()).decode())
-        print(bytearray(p.readAllStandardOutput()).decode())
-
-        self.lua_editor_dock_widget.show()
+    def open_script_editor(self):
+        self.script_editor_dock_widget.show()
 
     def closeEvent(self, evnt):
         self.api.disconnect()

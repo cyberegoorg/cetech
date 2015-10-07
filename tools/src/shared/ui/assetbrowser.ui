@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>800</width>
-    <height>235</height>
+    <width>820</width>
+    <height>348</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -16,7 +16,7 @@
   <widget class="QWidget" name="centralwidget">
    <layout class="QHBoxLayout" name="horizontalLayout">
     <item>
-     <widget class="QTreeView" name="treeView">
+     <widget class="QTreeView" name="dir_view">
       <property name="sizePolicy">
        <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
         <horstretch>0</horstretch>
@@ -26,7 +26,7 @@
      </widget>
     </item>
     <item>
-     <widget class="QListView" name="listView">
+     <widget class="QListView" name="file_view">
       <property name="viewMode">
        <enum>QListView::IconMode</enum>
       </property>
@@ -34,22 +34,11 @@
     </item>
    </layout>
   </widget>
-  <widget class="QMenuBar" name="menubar">
-   <property name="geometry">
-    <rect>
-     <x>0</x>
-     <y>0</y>
-     <width>800</width>
-     <height>20</height>
-    </rect>
-   </property>
-  </widget>
-  <widget class="QStatusBar" name="statusbar"/>
  </widget>
  <resources/>
  <connections>
   <connection>
-   <sender>treeView</sender>
+   <sender>dir_view</sender>
    <signal>clicked(QModelIndex)</signal>
    <receiver>MainWindow</receiver>
    <slot>dir_clicked(QModelIndex)</slot>
@@ -65,7 +54,7 @@
    </hints>
   </connection>
   <connection>
-   <sender>listView</sender>
+   <sender>file_view</sender>
    <signal>doubleClicked(QModelIndex)</signal>
    <receiver>MainWindow</receiver>
    <slot>file_doubleclicked(QModelIndex)</slot>

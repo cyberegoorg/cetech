@@ -30,7 +30,7 @@
    </property>
    <widget class="QMenu" name="menu_File">
     <property name="title">
-     <string>F&amp;ile</string>
+     <string>&amp;File</string>
     </property>
     <addaction name="actionOpen_project"/>
     <addaction name="separator"/>
@@ -38,7 +38,7 @@
    </widget>
    <widget class="QMenu" name="menuTools">
     <property name="title">
-     <string>&amp;Tools</string>
+     <string>Win&amp;dows</string>
     </property>
     <addaction name="actionLua_editor"/>
    </widget>
@@ -59,14 +59,9 @@
     <string>&amp;Open project</string>
    </property>
   </action>
-  <action name="actionREPL">
-   <property name="text">
-    <string>&amp;REPL</string>
-   </property>
-  </action>
   <action name="actionLua_editor">
    <property name="text">
-    <string>&amp;Lua editor</string>
+    <string>&amp;Script editor</string>
    </property>
   </action>
  </widget>
@@ -108,7 +103,7 @@
    <sender>actionLua_editor</sender>
    <signal>triggered()</signal>
    <receiver>MainWindow</receiver>
-   <slot>open_lua_editor()</slot>
+   <slot>open_script_editor()</slot>
    <hints>
     <hint type="sourcelabel">
      <x>-1</x>
@@ -124,6 +119,6 @@
  <slots>
   <slot>open_project()</slot>
   <slot>send_command()</slot>
-  <slot>open_lua_editor()</slot>
+  <slot>open_script_editor()</slot>
  </slots>
 </ui>
