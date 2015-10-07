@@ -5,7 +5,7 @@ from PyQt5.QtGui import QColor
 from PyQt5.QtWidgets import QMainWindow, QFileDialog, QMessageBox
 from cetech.api import ConsoleAPI
 from playground.projectmanager import ProjectManager
-from shared.ui.luaeditorwindow import Ui_MainWindow
+from playground.ui.luaeditorwindow import Ui_MainWindow
 
 
 class ScriptEditor(QMainWindow, Ui_MainWindow):
