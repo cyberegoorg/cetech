@@ -1,12 +1,14 @@
 import argparse
+
 from PyQt5.QtCore import QThread, Qt
 from PyQt5.QtWidgets import QMainWindow, QDockWidget, QTabWidget
+from playground.logwidget import LogWidget
+from playground.scripteditor import ScriptEditor
+
 from cetech.qtapi import QtConsoleAPI
+from playground.assetbrowser import AssetBrowser
 from playground.projectmanager import ProjectManager
 from playground.ui.mainwindow import Ui_MainWindow
-from shared.assetbrowser import AssetBrowser
-from shared.logwidget import LogWidget
-from shared.scripteditor import ScriptEditor
 
 
 class MainWindow(QMainWindow, Ui_MainWindow):
