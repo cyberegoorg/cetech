@@ -70,7 +70,7 @@ namespace cetech {
             char _root_path[1024];
             Allocator& _allocator;
 
-            DiskFileSystem(const char* root_path, Allocator & allocator) : _allocator(allocator) {
+            DiskFileSystem(const char* root_path, Allocator & allocator) : _root_path({0}),_allocator(allocator) {
                 strcpy(_root_path, root_path);
 
                 const size_t len = strlen(_root_path);
