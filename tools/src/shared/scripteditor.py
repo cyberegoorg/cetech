@@ -1,27 +1,32 @@
 import os
-
 from PyQt5 import Qsci
 from PyQt5.QtCore import QTextCodec, QFile, QDir, QFileInfo
 from PyQt5.QtGui import QColor
 from PyQt5.QtWidgets import QMainWindow, QFileDialog, QMessageBox
-
 from cetech.api import ConsoleAPI
 from playground.projectmanager import ProjectManager
 from shared.ui.luaeditorwindow import Ui_MainWindow
 
 
-class LuaEditor(QMainWindow, Ui_MainWindow):
+class ScriptEditor(QMainWindow, Ui_MainWindow):
+    SUPPORTED_EXT = ('lua', 'package', 'json')
+    FILES_FILTER = "Lua (*.lua); Package (*.package); JSON (*.json)"
+
     def __init__(self, project_manager: ProjectManager, api: ConsoleAPI):
-        super(LuaEditor, self).__init__()
+        super(ScriptEditor, self).__init__()
         self.setupUi(self)
 
         self.project_manager = project_manager
         self.api = api
 
+    def support_ext(self, ext):
+        return ext in self.SUPPORTED_EXT
+
     def open_file(self, filename):
         if not QFile.exists(filename):
             return
 
+        # is file open?
         idx = self.find_tab_by_filename(filename)
         if idx is not None:
             self.main_tabs.setCurrentIndex(idx)
@@ -91,13 +96,17 @@ class LuaEditor(QMainWindow, Ui_MainWindow):
 
         sci.setProperty("filename", filename)
 
+        file_info = QFileInfo(out_file)
+        self.main_tabs.setTabText(tab_index, file_info.fileName())
+
     def tab_close_request(self, tab_index):
         filename = self.get_editor_name(tab_index)
         if filename == '':
             return False
 
         if self.is_editor_modified(tab_index):
-            res = QMessageBox.question(self, "File is modified", "File '%s' is modified" % filename, QMessageBox.Save | QMessageBox.Discard | QMessageBox.Cancel)
+            res = QMessageBox.question(self, "File is modified", "File '%s' is modified" % filename,
+                                       QMessageBox.Save | QMessageBox.Discard | QMessageBox.Cancel)
             if res == QMessageBox.Save:
                 self.save_file(tab_index)
 
@@ -156,10 +165,10 @@ class LuaEditor(QMainWindow, Ui_MainWindow):
     def open_file_dialog(self):
         filename, _ = QFileDialog.getOpenFileName(
             self,
-            "Open lua file",
+            "Open file",
             QDir.currentPath() if self.project_manager.project_dir is None else os.path.join(
                 self.project_manager.project_dir, 'src'),
-            "Lua (*.lua)"
+            self.FILES_FILTER
         )
         self.open_file(filename)
 
@@ -174,7 +183,7 @@ class LuaEditor(QMainWindow, Ui_MainWindow):
             "Save file",
             QDir.currentPath() if self.project_manager.project_dir is None else os.path.join(
                 self.project_manager.project_dir, 'src'),
-            "Lua (*.lua)"
+            self.FILES_FILTER
         )
 
         self.save_as(idx, filename)
