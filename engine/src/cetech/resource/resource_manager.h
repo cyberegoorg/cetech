@@ -8,6 +8,8 @@
 #include "celib/string/stringid_types.h"
 #include "celib/memory/memory_types.h"
 
+#include "rapidjson/document.h"
+
 namespace cetech {
     class ResourceManager {
         public:
@@ -21,7 +23,7 @@ namespace cetech {
             virtual void register_loader(StringId64_t type, resource_loader_clb_t clb) = 0;
             virtual void register_unloader(StringId64_t type, resource_unloader_clb_t clb) = 0;
 
-            virtual TaskManager::TaskID compile(FileSystem* source_fs) = 0;
+            virtual TaskManager::TaskID compile(FileSystem* source_fs, rapidjson::Document& debug_index) = 0;
 
             virtual void load(void** loaded_data, StringId64_t type, const StringId64_t* names,
                               const uint32_t count) = 0;
