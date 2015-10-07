@@ -26,6 +26,8 @@
 #include "cetech/cvars/cvars.h"
 #include "cetech/os/os.h"
 
+#include "rapidjson/prettywriter.h"
+
 static void posix_signal_handler(int sig) {
     switch (sig) {
 
@@ -385,6 +387,9 @@ namespace cetech {
 
             // TODO: remove from device to other class.
             void compile_all_resource() {
+		rapidjson::Document debug_index;
+		debug_index.SetObject();
+
                 FileSystem* source_fs = disk_filesystem::make(
                     memory_globals::default_allocator(), cvars::rm_source_dir.value_str);
 
@@ -404,13 +409,22 @@ namespace cetech {
                 out_config->write(data, size + 1);
                 _filesystem->close(out_config);
 
-                TaskManager::TaskID compile_tid = _resource_manager->compile(source_fs);
+                TaskManager::TaskID compile_tid = _resource_manager->compile(source_fs, debug_index);
                 _task_manager->wait(compile_tid);
 
-                compile_tid = _resource_manager->compile(core_fs);
+                compile_tid = _resource_manager->compile(core_fs, debug_index);
                 _task_manager->wait(compile_tid);
 
+		rapidjson::StringBuffer buffer;
+		rapidjson::PrettyWriter < rapidjson::StringBuffer > writer(buffer);
+		debug_index.Accept(writer);
+
+		FSFile* debug_index_file = _filesystem->open("debug_index.json", FSFile::WRITE);
+		debug_index_file->write(buffer.GetString(), buffer.GetSize());
+		_filesystem->close(debug_index_file);
+		
                 disk_filesystem::destroy(memory_globals::default_allocator(), source_fs);
+		disk_filesystem::destroy(memory_globals::default_allocator(), core_fs);
             }
     };
 

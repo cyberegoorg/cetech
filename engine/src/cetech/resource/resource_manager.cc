@@ -13,6 +13,9 @@
 #include "celib/platforms/dir/dir.h"
 #include "celib/platforms/thread/thread.h"
 
+#include "rapidjson/prettywriter.h"
+#include "rapidjson/memorybuffer.h"
+
 namespace cetech {
     class ResourceManagerImplementation final : public ResourceManager {
         public:
@@ -75,15 +78,16 @@ namespace cetech {
                 //MAKE_DELETE(memory_globals::default_allocator(), CompileTask, data);
             }
 
-            virtual TaskManager::TaskID compile(FileSystem* source_fs) final {
+            virtual TaskManager::TaskID compile(FileSystem* source_fs, rapidjson::Document& debug_index) final {
                 Array < char* > files(memory_globals::default_allocator());
                 source_fs->list_directory(source_fs->root_dir(), files);
-
 
                 TaskManager& tm = application_globals::app().task_manager();
                 TaskManager::TaskID top_compile_task = tm.add_empty_begin(0);
 
                 const uint32_t files_count = array::size(files);
+
+		char resource_id_str[64] = {0};
                 for (uint32_t i = 0; i < files_count; ++i) {
                     const char* filename = files[i] + strlen(source_fs->root_dir()); /* Base path */
 
@@ -102,7 +106,11 @@ namespace cetech {
                         continue;
                     }
 
-                    // TODO: Compile Task Pool, reduce alloc free, ringbuffer?
+		    resource_id_to_str(resource_id_str, type, name);
+		    debug_index.AddMember(rapidjson::Value(resource_id_str, strlen(resource_id_str), debug_index.GetAllocator()), rapidjson::Value(filename, strlen(filename), debug_index.GetAllocator()), debug_index.GetAllocator());
+		    resource_id_str[0] = '\0';
+
+		    // TODO: Compile Task Pool, reduce alloc free, ringbuffer?
                     CompileTask* ct = MAKE_NEW(memory_globals::default_allocator(), CompileTask);
                     ct->source_fs = source_fs;
                     ct->out_fs = _fs;
