@@ -35,9 +35,10 @@ namespace cetech {
         }
 
         int close(const File& f) {
-	    if(is_null(f)) {
-	      return 1;
-	    }
+            if (is_null(f)) {
+                return 1;
+            }
+
             return SDL_RWclose(f.ops);
         }
 
