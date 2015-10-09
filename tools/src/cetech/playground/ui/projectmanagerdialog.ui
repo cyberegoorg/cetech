@@ -38,7 +38,9 @@
                <string>Add exisiting</string>
               </property>
               <property name="icon">
-               <iconset theme="folder-new"/>
+               <iconset theme="folder-new">
+                <normaloff/>
+               </iconset>
               </property>
              </widget>
             </item>
@@ -48,7 +50,9 @@
                <string>Remove</string>
               </property>
               <property name="icon">
-               <iconset theme="edit-delete"/>
+               <iconset theme="edit-delete">
+                <normaloff/>
+               </iconset>
               </property>
              </widget>
             </item>
@@ -121,7 +125,7 @@
   </connection>
   <connection>
    <sender>projects_list</sender>
-   <signal>itemClicked(QListWidgetItem*)</signal>
+   <signal>itemDoubleClicked(QListWidgetItem*)</signal>
    <receiver>Dialog</receiver>
    <slot>project_list_dclicked(QListWidgetItem*)</slot>
    <hints>

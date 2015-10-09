@@ -1,11 +1,14 @@
 import os
+
 from PyQt5 import Qsci
 from PyQt5.QtCore import QTextCodec, QFile, QDir, QFileInfo
 from PyQt5.QtGui import QColor
+
 from PyQt5.QtWidgets import QMainWindow, QFileDialog, QMessageBox
-from cetech.api import ConsoleAPI
-from playground.cetechproject import CetechProject
-from playground.ui.luaeditorwindow import Ui_MainWindow
+
+from cetech.shared.api import ConsoleAPI
+from cetech.playground.cetechproject import CetechProject
+from cetech.playground.ui.luaeditorwindow import Ui_MainWindow
 
 
 class ScriptEditor(QMainWindow, Ui_MainWindow):
