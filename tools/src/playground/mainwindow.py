@@ -67,9 +67,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             self.script_editor_dock_widget.show()
             self.script_editor_dock_widget.focusWidget()
 
-    def open_project(self):
-        if not self.project.open_project_dialog(self):
-            return
+    def open_project(self, name, dir):
+        self.project.open_project(name, dir)
 
         self.project.run_cetech(compile=True, daemon=True)
         self.api.start(QThread.LowPriority)

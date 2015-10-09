@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Cybereg{o.o}rg tech playground</string>
+   <string>CETech1 - plaground</string>
   </property>
   <property name="dockOptions">
    <set>QMainWindow::AllowNestedDocks|QMainWindow::AllowTabbedDocks|QMainWindow::AnimatedDocks</set>
@@ -32,7 +32,6 @@
     <property name="title">
      <string>&amp;File</string>
     </property>
-    <addaction name="actionOpen_project"/>
     <addaction name="separator"/>
     <addaction name="action_Quit"/>
    </widget>
@@ -80,22 +79,6 @@
     <hint type="destinationlabel">
      <x>424</x>
      <y>239</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>actionOpen_project</sender>
-   <signal>triggered()</signal>
-   <receiver>MainWindow</receiver>
-   <slot>open_project()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>-1</x>
-     <y>-1</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>421</x>
-     <y>236</y>
     </hint>
    </hints>
   </connection>

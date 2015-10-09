@@ -5,6 +5,11 @@ from PyQt5.QtWidgets import QFileDialog, QMessageBox
 def validate_project(project_dir):
     selected_dir = QDir(project_dir)
 
+    if not selected_dir.exists():
+        QMessageBox.critical(None, 'Dir does not  exist', 'Dir does not  exist',
+                             QMessageBox.Yes, QMessageBox.Yes)
+        return False
+
     if not selected_dir.exists('src/config.json'):
         QMessageBox.critical(None, 'Project validation error', 'Project dir does not contain src/config.json',
                              QMessageBox.Yes, QMessageBox.Yes)
@@ -18,8 +23,11 @@ class CetechProject(object):
         self.project_dir = None
         self.spawned_process = []
 
-    def open_project(self, project_dir):
+    def open_project(self, name, project_dir):
         if project_dir == '':
+            return False
+
+        if name == '':
             return False
 
         if self.is_project_opened():
@@ -29,6 +37,7 @@ class CetechProject(object):
             return False
 
         self.project_dir = project_dir
+        self.name = name
 
         return True
 
