@@ -1,4 +1,4 @@
-from cetech.proxy import ConsoleProxy
+from cetech.shared.proxy import ConsoleProxy
 
 
 class ConsoleAPI(ConsoleProxy):

@@ -3,8 +3,8 @@ from PyQt5.QtCore import QSettings
 from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QListWidgetItem, QDialog
 
-from playground.addexistingdialog import AddExistItemDialog
-from playground.ui.projectmanagerdialog import Ui_Dialog
+from cetech.playground.addexistingdialog import AddExistItemDialog
+from cetech.playground.ui.projectmanagerdialog import Ui_Dialog
 
 
 class ProjectManagerDialog(QDialog, Ui_Dialog):

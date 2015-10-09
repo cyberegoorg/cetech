@@ -1,7 +1,9 @@
 import sys
+
 from PyQt5.QtWidgets import QApplication
-from playground.mainwindow import MainWindow
-from playground.projectmanagerdialog import ProjectManagerDialog
+
+from cetech.playground.mainwindow import MainWindow
+from cetech.playground.projectmanagerdialog import ProjectManagerDialog
 
 app = QApplication(sys.argv)
 app.setOrganizationName('cyberegoorg')

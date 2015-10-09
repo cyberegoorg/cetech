@@ -30,11 +30,13 @@ namespace cetech {
             Hash < resource_unloader_clb_t > _unload_clb_map;
 
             Spinlock add_lock;
+	    bool autoreload;
 
             ResourceManagerImplementation(FileSystem * fs, Allocator & allocator) : _fs(fs), _data_map(allocator),
                                                                                     _data_refcount_map(allocator),
                                                                                     _load_clb_map(allocator),
-                                                                                    _unload_clb_map(allocator) {}
+                                                                                    _unload_clb_map(allocator),
+                                                                                    autoreload(true) {}
 
             virtual void load(void** loaded_data, StringId64_t type, const StringId64_t* names,
                               const uint32_t count) final {
@@ -137,6 +139,11 @@ close:
             }
 
             virtual const void* get(StringId64_t type, StringId64_t name) final {
+		if
+		if(!can_get(type, &name, 1)) {
+		  
+		}
+	      
                 return hash::get < void* > (this->_data_map, type ^ name, nullptr);
             }
 

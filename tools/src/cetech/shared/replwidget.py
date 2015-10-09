@@ -2,7 +2,7 @@ from PyQt5.QtCore import QDir, QFile, QTextCodec
 from PyQt5.QtWidgets import QFrame, QFileDialog
 from PyQt5 import Qsci
 
-from shared.ui.replwidget import Ui_ReplWidget
+from cetech.shared.ui.replwidget import Ui_ReplWidget
 
 
 class REPLWidget(QFrame, Ui_ReplWidget):
