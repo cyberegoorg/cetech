@@ -13,7 +13,7 @@ def validate_project(project_dir):
     return True
 
 
-class ProjectManager(object):
+class CetechProject(object):
     def __init__(self):
         self.project_dir = None
         self.spawned_process = []
