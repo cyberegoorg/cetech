@@ -116,23 +116,24 @@ namespace cetech {
                     resource_id_to_str(resource_id_str, type, name);
 
                     time_t source_mt = source_fs->file_mtime(filename);
-
+		    bool need_compile = true;
                     if (build_index.HasMember(resource_id_str)) {
                         time_t build_mt = build_index[resource_id_str].GetInt();
                         if (source_mt == build_mt) {
-                            continue;
+                            need_compile = false;
                         } else {
                             build_index[resource_id_str].SetInt(source_mt);
                         }
                     } else {
                         build_index.AddMember(
-                            rapidjson::Value(resource_id_str, strlen(resource_id_str), debug_index.GetAllocator()),
-                            rapidjson::Value(source_mt), debug_index.GetAllocator()
+                            rapidjson::Value(resource_id_str, strlen(resource_id_str), build_index.GetAllocator()),
+                            rapidjson::Value(source_mt), build_index.GetAllocator()
                             );
                     }
 
                     resource_compiler_clb_t clb = hash::get < resource_compiler_clb_t >
                                                   (this->_compile_clb_map, type, nullptr);
+
 
                     if (clb == nullptr) {
                         log::warning("resource_compiler", "Resource type " "%" PRIx64 " not register compiler.", type);
@@ -147,6 +148,10 @@ namespace cetech {
 
                     resource_id_str[0] = '\0';
 
+		    if(!need_compile){
+		      continue;
+		    }
+                    
                     // TODO: Compile Task Pool, reduce alloc free, ringbuffer?
                     CompileTask* ct = MAKE_NEW(memory_globals::default_allocator(), CompileTask);
                     ct->source_fs = source_fs;
@@ -185,11 +190,11 @@ namespace cetech {
                 FSFile* out_config = _build_fs->open("config.json", FSFile::WRITE);
 
                 size_t size = src_config->size();
-                char data[size + 1] = {0};
+                char data[size] = {0};
                 src_config->read(data, size);
                 source_fs->close(src_config);
 
-                out_config->write(data, size + 1);
+                out_config->write(data, size);
                 _build_fs->close(out_config);
             }
 
