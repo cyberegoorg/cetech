@@ -13,17 +13,13 @@
 namespace cetech {
     class ResourceManager {
         public:
-            typedef void (* resource_compiler_clb_t)(FSFile*, FSFile*);
             typedef void* (* resource_loader_clb_t)(FSFile*, Allocator&);
             typedef void (* resource_unloader_clb_t)(Allocator&, void*);
 
             virtual ~ResourceManager() {}
 
-            virtual void register_compiler(StringId64_t type, resource_compiler_clb_t clb) = 0;
             virtual void register_loader(StringId64_t type, resource_loader_clb_t clb) = 0;
             virtual void register_unloader(StringId64_t type, resource_unloader_clb_t clb) = 0;
-
-            virtual TaskManager::TaskID compile(FileSystem* source_fs, rapidjson::Document& debug_index) = 0;
 
             virtual void load(void** loaded_data, StringId64_t type, const StringId64_t* names,
                               const uint32_t count) = 0;

@@ -9,12 +9,12 @@ int main(int argc, const char** argv) {
 
     application_globals::init();
     Application& d = application_globals::app();
-    
+
     d.init(argc, argv);
 
     log::info("Sdasd", "v3 a: %d s: %d", alignof(cetech::Vector3), sizeof(cetech::Vector3));
     log::info("Sdasd", "v4 a: %d s: %d", alignof(cetech::Vector4), sizeof(cetech::Vector4));
-    
+
     d.run();
     d.shutdown();
 

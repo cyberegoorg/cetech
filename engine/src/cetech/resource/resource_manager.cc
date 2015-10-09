@@ -28,106 +28,13 @@ namespace cetech {
 
             Hash < resource_loader_clb_t > _load_clb_map;
             Hash < resource_unloader_clb_t > _unload_clb_map;
-            Hash < resource_compiler_clb_t > _compile_clb_map;
 
             Spinlock add_lock;
 
             ResourceManagerImplementation(FileSystem * fs, Allocator & allocator) : _fs(fs), _data_map(allocator),
                                                                                     _data_refcount_map(allocator),
                                                                                     _load_clb_map(allocator),
-                                                                                    _unload_clb_map(allocator),
-                                                                                    _compile_clb_map(allocator) {}
-
-
-            struct CompileTask {
-                FileSystem* source_fs;
-                FileSystem* out_fs;
-
-                char* filename;
-                uint64_t name, type;
-
-                resource_compiler_clb_t clb;
-            };
-
-            static void compile_task(void* data) {
-                CompileTask* ct = (CompileTask*)data;
-
-                log::info("resource_manager",
-                          "Compile \"%s\" => (" "%" PRIx64 ", " "%" PRIx64 ").",
-                          ct->filename,
-                          ct->type,
-                          ct->name);
-
-                char output_filename[512] = {0};
-                resource_id_to_str(output_filename, ct->type, ct->name);
-
-                FSFile* f_in;
-                f_in = ct->source_fs->open(ct->filename, FSFile::READ);
-                if (!f_in->is_valid()) {
-                    log::error("resource_manager", "Could not open source file \"%s\"", ct->filename);
-                    return;
-                }
-
-                FSFile* f_out = ct->out_fs->open(output_filename, FSFile::WRITE);
-
-                ct->clb(f_in, f_out);
-
-                ct->source_fs->close(f_in);
-                ct->out_fs->close(f_out);
-
-                //MAKE_DELETE(memory_globals::default_allocator(), CompileTask, data);
-            }
-
-            virtual TaskManager::TaskID compile(FileSystem* source_fs, rapidjson::Document& debug_index) final {
-                Array < char* > files(memory_globals::default_allocator());
-                source_fs->list_directory(source_fs->root_dir(), files);
-
-                TaskManager& tm = application_globals::app().task_manager();
-                TaskManager::TaskID top_compile_task = tm.add_empty_begin(0);
-
-                const uint32_t files_count = array::size(files);
-
-		char resource_id_str[64] = {0};
-                for (uint32_t i = 0; i < files_count; ++i) {
-                    const char* filename = files[i] + strlen(source_fs->root_dir()); /* Base path */
-
-                    if (!strcmp(filename, "config.json")) {
-                        continue;
-                    }
-
-                    uint64_t name, type = 0;
-                    calc_hash(filename, type, name);
-
-                    resource_compiler_clb_t clb = hash::get < resource_compiler_clb_t >
-                                                  (this->_compile_clb_map, type, nullptr);
-
-                    if (clb == nullptr) {
-                        log::error("resource_manager", "Resource type " "%" PRIx64 " not register compiler.", type);
-                        continue;
-                    }
-
-		    resource_id_to_str(resource_id_str, type, name);
-		    debug_index.AddMember(rapidjson::Value(resource_id_str, strlen(resource_id_str), debug_index.GetAllocator()), rapidjson::Value(filename, strlen(filename), debug_index.GetAllocator()), debug_index.GetAllocator());
-		    resource_id_str[0] = '\0';
-
-		    // TODO: Compile Task Pool, reduce alloc free, ringbuffer?
-                    CompileTask* ct = MAKE_NEW(memory_globals::default_allocator(), CompileTask);
-                    ct->source_fs = source_fs;
-                    ct->out_fs = _fs;
-                    ct->filename = strdup(filename);
-                    ct->name = name;
-                    ct->type = type;
-                    ct->clb = clb;
-
-                    TaskManager::TaskID tid = tm.add_begin(compile_task, ct, 0, NULL_TASK, top_compile_task);
-                    tm.add_end(&tid, 1);
-                }
-
-                dir::listdir_free(files);
-
-                tm.add_end(&top_compile_task, 1);
-                return top_compile_task;
-            }
+                                                                                    _unload_clb_map(allocator) {}
 
             virtual void load(void** loaded_data, StringId64_t type, const StringId64_t* names,
                               const uint32_t count) final {
@@ -231,10 +138,6 @@ close:
 
             virtual const void* get(StringId64_t type, StringId64_t name) final {
                 return hash::get < void* > (this->_data_map, type ^ name, nullptr);
-            }
-
-            virtual void register_compiler(StringId64_t type, resource_compiler_clb_t clb) final {
-                hash::set(this->_compile_clb_map, type, clb);
             }
 
             virtual void register_loader(StringId64_t type, resource_loader_clb_t clb) final {

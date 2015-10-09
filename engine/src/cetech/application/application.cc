@@ -12,6 +12,7 @@
 #include "cetech/lua/lua_enviroment.h"
 
 #include "cetech/resource/resource_manager.h"
+#include "cetech/resource/resource_compiler.h"
 #include "cetech/package/package_manager.h"
 #include "cetech/develop/develop_manager.h"
 #include "cetech/filesystem/disk_filesystem.h"
@@ -61,20 +62,21 @@ namespace cetech {
         public:
             friend class Application;
 
-	    TaskManager* _task_manager;
+            TaskManager* _task_manager;
             ResourceManager* _resource_manager;
+            ResourceCompiler* _resource_compiler;
             PackageManager* _package_manager;
             DevelopManager* _develop_manager;
             ConsoleServer* _console_server;
             LuaEnviroment* _lua_eviroment;
             FileSystem* _filesystem;
 
-	    uint32_t _frame_id;
+            uint32_t _frame_id;
             uint32_t _last_frame_ticks;
 
             float _delta_time;
 
-	    struct {
+            struct {
                 char run : 1;
                 char pause : 1;
             } _flags;
@@ -117,6 +119,7 @@ namespace cetech {
 
                 _task_manager = TaskManager::make(memory_globals::default_allocator());
                 _resource_manager = ResourceManager::make(memory_globals::default_allocator(), _filesystem);
+                _resource_compiler = ResourceCompiler::make(memory_globals::default_allocator(), _filesystem);
                 _package_manager = PackageManager::make(memory_globals::default_allocator());
                 _console_server = ConsoleServer::make(memory_globals::default_allocator());
                 _lua_eviroment = LuaEnviroment::make(memory_globals::default_allocator());
@@ -125,6 +128,10 @@ namespace cetech {
                 _console_server->register_command("lua.execute", &cmd_lua_execute);
 
                 register_resources();
+
+                if (command_line_globals::has_argument("compile", 'c')) {
+                    _resource_compiler->compile_all_resource();
+                }
 
                 load_config_json();
 
@@ -137,10 +144,6 @@ namespace cetech {
                     log::debug("main", "Client connected.");
                 }
 
-                if (command_line_globals::has_argument("compile", 'c')) {
-                    compile_all_resource();
-                }
-		
                 init_boot();
 
                 this->_last_frame_ticks = os::get_ticks();
@@ -170,17 +173,17 @@ namespace cetech {
             }
 
             virtual void run() final {
-		if (!command_line_globals::has_argument("daemon", 'd')) {
-		  main_window = window::make_window(
-		      "aaa",
-		      window::WINDOWPOS_CENTERED, window::WINDOWPOS_CENTERED,
-		      800, 600,
-		      window::WINDOW_NOFLAG
-		      );
-		}
-		
+                if (!command_line_globals::has_argument("daemon", 'd')) {
+                    main_window = window::make_window(
+                        "aaa",
+                        window::WINDOWPOS_CENTERED, window::WINDOWPOS_CENTERED,
+                        800, 600,
+                        window::WINDOW_NOFLAG
+                        );
+                }
+
                 float dt = 0.0f;
-		uint32_t now_ticks = 0;
+                uint32_t now_ticks = 0;
                 while (_flags.run) {
                     now_ticks = os::get_ticks();
                     dt = (now_ticks - this->_last_frame_ticks) * 0.001f;
@@ -278,7 +281,7 @@ namespace cetech {
                 struct ResourceRegistration {
                     StringId64_t type;
 
-                    ResourceManager::resource_compiler_clb_t compiler;
+                    ResourceCompiler::resource_compiler_clb_t compiler;
                     ResourceManager::resource_loader_clb_t loader;
                     ResourceManager::resource_unloader_clb_t unloader;
                 };
@@ -300,7 +303,7 @@ namespace cetech {
                 while (it->type != 0) {
                     _resource_manager->register_unloader(it->type, it->unloader);
                     _resource_manager->register_loader(it->type, it->loader);
-                    _resource_manager->register_compiler(it->type, it->compiler);
+                    _resource_compiler->register_compiler(it->type, it->compiler);
                     ++it;
                 }
             }
@@ -342,7 +345,7 @@ namespace cetech {
 
                 const char* source_dir = command_line_globals::get_parameter("source-dir", 's');
                 const char* build_dir = command_line_globals::get_parameter("build-dir", 'b');
-		const char* port = command_line_globals::get_parameter("port", 'p');
+                const char* port = command_line_globals::get_parameter("port", 'p');
 
                 if (source_dir) {
                     make_path(buffer, 1024, source_dir);
@@ -353,10 +356,10 @@ namespace cetech {
                     make_path(buffer, 1024, build_dir);
                     cvar_internal::force_set(cvars::rm_build_dir, buffer);
                 }
-                
+
                 if (port) {
-		    int p = 0;
-		    sscanf(port, "%d",&p);
+                    int p = 0;
+                    sscanf(port, "%d", &p);
                     cvar_internal::force_set(cvars::console_server_port, p);
                 }
             }
@@ -383,48 +386,6 @@ namespace cetech {
                 _package_manager->unload(boot_pkg_name_h);
                 _resource_manager->unload(resource_package::type_hash(), &boot_pkg_name_h, 1);
 
-            }
-
-            // TODO: remove from device to other class.
-            void compile_all_resource() {
-		rapidjson::Document debug_index;
-		debug_index.SetObject();
-
-                FileSystem* source_fs = disk_filesystem::make(
-                    memory_globals::default_allocator(), cvars::rm_source_dir.value_str);
-
-                FileSystem* core_fs = disk_filesystem::make(
-                    memory_globals::default_allocator(), cvars::compiler_core_path.value_str);
-
-                dir::mkpath(_filesystem->root_dir());
-
-                FSFile* src_config = source_fs->open("config.json", FSFile::READ);
-                FSFile* out_config = _filesystem->open("config.json", FSFile::WRITE);
-
-                size_t size = src_config->size();
-                char data[size + 1] = {0};
-                src_config->read(data, size);
-                source_fs->close(src_config);
-
-                out_config->write(data, size + 1);
-                _filesystem->close(out_config);
-
-                TaskManager::TaskID compile_tid = _resource_manager->compile(source_fs, debug_index);
-                _task_manager->wait(compile_tid);
-
-                compile_tid = _resource_manager->compile(core_fs, debug_index);
-                _task_manager->wait(compile_tid);
-
-		rapidjson::StringBuffer buffer;
-		rapidjson::PrettyWriter < rapidjson::StringBuffer > writer(buffer);
-		debug_index.Accept(writer);
-
-		FSFile* debug_index_file = _filesystem->open("debug_index.json", FSFile::WRITE);
-		debug_index_file->write(buffer.GetString(), buffer.GetSize());
-		_filesystem->close(debug_index_file);
-		
-                disk_filesystem::destroy(memory_globals::default_allocator(), source_fs);
-		disk_filesystem::destroy(memory_globals::default_allocator(), core_fs);
             }
     };
 

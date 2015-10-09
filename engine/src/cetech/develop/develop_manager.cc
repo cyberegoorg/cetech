@@ -37,7 +37,7 @@ namespace cetech {
 
     struct RecordFloatEvent {
         const char* name;
-	uint32_t get_frame_id;
+        uint32_t get_frame_id;
         float value;
     };
 
@@ -133,7 +133,7 @@ namespace cetech {
         virtual void push_record_float(const char* name, const float value) final {
             RecordFloatEvent event = {
                 .name = strdup(name),
-		.get_frame_id = application_globals::app().get_frame_id(),
+                .get_frame_id = application_globals::app().get_frame_id(),
                 .value = value
             };
             push(EVENT_RECORD_FLOAT, event);
