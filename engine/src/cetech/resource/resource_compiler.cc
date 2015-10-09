@@ -16,8 +16,26 @@
 
 #include "rapidjson/prettywriter.h"
 #include "rapidjson/memorybuffer.h"
+#include "rapidjson/error/en.h"
 
 namespace cetech {
+    CE_INLINE void calc_hash(const char* path, StringId64_t& type, StringId64_t& name) {
+        const char* t = strrchr(path, '.');
+        CE_CHECK_PTR(t);
+
+        const uint32_t sz = t - path;
+        t = t + 1;
+
+        const uint32_t len = strlen(t);
+
+        type = stringid64::from_cstringn(t, len);
+        name = stringid64::from_cstringn(path, sz);
+    }
+
+    CE_INLINE void resource_id_to_str(char* buffer, const StringId64_t& type, const StringId64_t& name) {
+        std::sprintf(buffer, "%" PRIx64 "%" PRIx64, type, name);
+    }
+
     class ResourceCompilerImplementation final : public ResourceCompiler {
         public:
             friend class ResourceCompiler;
@@ -42,7 +60,7 @@ namespace cetech {
             static void compile_task(void* data) {
                 CompileTask* ct = (CompileTask*)data;
 
-                log::info("resource_manager",
+                log::info("resource_compiler",
                           "Compile \"%s\" => (" "%" PRIx64 ", " "%" PRIx64 ").",
                           ct->filename,
                           ct->type,
@@ -54,7 +72,7 @@ namespace cetech {
                 FSFile* f_in;
                 f_in = ct->source_fs->open(ct->filename, FSFile::READ);
                 if (!f_in->is_valid()) {
-                    log::error("resource_manager", "Could not open source file \"%s\"", ct->filename);
+                    log::error("resource_compiler", "Could not open source file \"%s\"", ct->filename);
                     return;
                 }
 
@@ -65,10 +83,18 @@ namespace cetech {
                 ct->source_fs->close(f_in);
                 ct->out_fs->close(f_out);
 
+                log::info("resource_compiler",
+                          "Compiled \"%s\" => (" "%" PRIx64 ", " "%" PRIx64 ").",
+                          ct->filename,
+                          ct->type,
+                          ct->name);
+
                 //MAKE_DELETE(memory_globals::default_allocator(), CompileTask, data);
             }
 
-            TaskManager::TaskID compile(FileSystem* source_fs, rapidjson::Document& debug_index) {
+            TaskManager::TaskID compile(FileSystem* source_fs,
+                                        rapidjson::Document& debug_index,
+                                        rapidjson::Document& build_index) {
                 Array < char* > files(memory_globals::default_allocator());
                 source_fs->list_directory(source_fs->root_dir(), files);
 
@@ -87,21 +113,38 @@ namespace cetech {
 
                     uint64_t name, type = 0;
                     calc_hash(filename, type, name);
+		    resource_id_to_str(resource_id_str, type, name);
+
+                    time_t source_mt = source_fs->file_mtime(filename);
+		    
+		    if(build_index.HasMember(resource_id_str)) {
+		      time_t build_mt = build_index[resource_id_str].GetInt();
+		      if(source_mt == build_mt) {
+			continue;
+		      } else {
+			build_index[resource_id_str].SetInt(source_mt);
+		      }
+		    } else {
+		      build_index.AddMember(
+			  rapidjson::Value(resource_id_str, strlen(resource_id_str), debug_index.GetAllocator()),
+			  rapidjson::Value(source_mt), debug_index.GetAllocator()
+			  );
+		    }
 
                     resource_compiler_clb_t clb = hash::get < resource_compiler_clb_t >
                                                   (this->_compile_clb_map, type, nullptr);
 
                     if (clb == nullptr) {
-                        log::error("resource_manager", "Resource type " "%" PRIx64 " not register compiler.", type);
+                        log::warning("resource_compiler", "Resource type " "%" PRIx64 " not register compiler.", type);
                         continue;
                     }
 
-                    resource_id_to_str(resource_id_str, type, name);
-                    debug_index.AddMember(rapidjson::Value(resource_id_str, strlen(resource_id_str),
-                                                           debug_index.GetAllocator()),
-                                          rapidjson::Value(filename, strlen(filename),
-                                                           debug_index.
-                                                           GetAllocator()), debug_index.GetAllocator());
+                    debug_index.AddMember(
+                        rapidjson::Value(resource_id_str, strlen(resource_id_str), debug_index.GetAllocator()),
+                        rapidjson::Value(filename, strlen(filename),
+                                         debug_index.GetAllocator()), debug_index.GetAllocator()
+                        );
+
                     resource_id_str[0] = '\0';
 
                     // TODO: Compile Task Pool, reduce alloc free, ringbuffer?
@@ -127,20 +170,17 @@ namespace cetech {
                 hash::set(this->_compile_clb_map, type, clb);
             }
 
-            virtual void compile_all_resource() final {
-                TaskManager& tm = application_globals::app().task_manager();
+            void save_json(const char* filename, const rapidjson::Document& document) {
+                rapidjson::StringBuffer buffer;
+                rapidjson::PrettyWriter < rapidjson::StringBuffer > writer(buffer);
+                document.Accept(writer);
 
-                rapidjson::Document debug_index;
-                debug_index.SetObject();
+                FSFile* debug_index_file = _build_fs->open(filename, FSFile::WRITE);
+                debug_index_file->write(buffer.GetString(), buffer.GetSize());
+                _build_fs->close(debug_index_file);
+            }
 
-                FileSystem* source_fs = disk_filesystem::make(
-                    memory_globals::default_allocator(), cvars::rm_source_dir.value_str);
-
-                FileSystem* core_fs = disk_filesystem::make(
-                    memory_globals::default_allocator(), cvars::compiler_core_path.value_str);
-
-                dir::mkpath(_build_fs->root_dir());
-
+            void build_config_json(FileSystem* source_fs, FileSystem* build_fs) {
                 FSFile* src_config = source_fs->open("config.json", FSFile::READ);
                 FSFile* out_config = _build_fs->open("config.json", FSFile::WRITE);
 
@@ -151,40 +191,59 @@ namespace cetech {
 
                 out_config->write(data, size + 1);
                 _build_fs->close(out_config);
+            }
 
-                TaskManager::TaskID compile_tid = compile(source_fs, debug_index);
+            void load_debug_index(rapidjson::Document &build_index) {
+	      FSFile* build_index_file = _build_fs->open("build_index.json", FSFile::READ);
+
+	      if(!build_index_file->is_valid()) {
+		_build_fs->close(build_index_file);
+		build_index.SetObject();
+		return;
+	      }
+
+	      size_t size = build_index_file->size();
+	      char data[size + 1] = {0};
+	      build_index_file->read(data, size);
+
+	      build_index.Parse(data);
+	      if (build_index.HasParseError()) {
+		  log::error("resouce_compiler", "debug_index.json parse error: %s", GetParseError_En(
+				build_index.GetParseError()), build_index.GetErrorOffset());
+	      }
+	      _build_fs->close(build_index_file);
+	    }
+            
+            virtual void compile_all_resource() final {
+                TaskManager& tm = application_globals::app().task_manager();
+
+                FileSystem* source_fs = disk_filesystem::make(
+                    memory_globals::default_allocator(), cvars::rm_source_dir.value_str);
+
+                FileSystem* core_fs = disk_filesystem::make(
+                    memory_globals::default_allocator(), cvars::compiler_core_path.value_str);
+
+                rapidjson::Document debug_index;
+                debug_index.SetObject();
+
+                rapidjson::Document build_index;
+		load_debug_index(build_index);
+
+                dir::mkpath(_build_fs->root_dir());
+
+                build_config_json(source_fs, _build_fs);
+
+                TaskManager::TaskID compile_tid = compile(source_fs, debug_index, build_index);
                 tm.wait(compile_tid);
 
-                compile_tid = compile(core_fs, debug_index);
+                compile_tid = compile(core_fs, debug_index, build_index);
                 tm.wait(compile_tid);
 
-                rapidjson::StringBuffer buffer;
-                rapidjson::PrettyWriter < rapidjson::StringBuffer > writer(buffer);
-                debug_index.Accept(writer);
-
-                FSFile* debug_index_file = _build_fs->open("debug_index.json", FSFile::WRITE);
-                debug_index_file->write(buffer.GetString(), buffer.GetSize());
-                _build_fs->close(debug_index_file);
+                save_json("debug_index.json", debug_index);
+                save_json("build_index.json", build_index);
 
                 disk_filesystem::destroy(memory_globals::default_allocator(), source_fs);
                 disk_filesystem::destroy(memory_globals::default_allocator(), core_fs);
-            }
-
-            static CE_INLINE void calc_hash(const char* path, StringId64_t& type, StringId64_t& name) {
-                const char* t = strrchr(path, '.');
-                CE_CHECK_PTR(t);
-
-                const uint32_t sz = t - path;
-                t = t + 1;
-
-                const uint32_t len = strlen(t);
-
-                type = stringid64::from_cstringn(t, len);
-                name = stringid64::from_cstringn(path, sz);
-            }
-
-            static CE_INLINE void resource_id_to_str(char* buffer, const StringId64_t& type, const StringId64_t& name) {
-                std::sprintf(buffer, "%" PRIx64 "%" PRIx64, type, name);
             }
     };
 

@@ -108,13 +108,13 @@ namespace cetech {
         bool validate_packet(rapidjson::Document& document, const char* packet, const uint32_t size) {
             document.Parse(packet);
 
-            /* Name */
             if (document.HasParseError()) {
                 log::error("console_server", "Packet parse error: %s", GetParseError_En(
                                document.GetParseError()), document.GetErrorOffset());
                 return false;
             }
 
+	    /* Name */
             if (!document.HasMember("name")) {
                 log::error("console_server", "Packet require key \"name\"");
                 return false;
