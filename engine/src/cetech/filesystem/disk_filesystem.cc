@@ -120,6 +120,12 @@ namespace cetech {
             virtual void delete_file(const char* path)  final {/*TODO: #43*/
             };
 
+            virtual time_t file_mtime(const char* path) final {
+                char abs_path[2048] = {0};
+                absolute_path(abs_path, path);
+                return file::mtime(abs_path);
+            }
+
             void absolute_path(char* buffer, const char* path) {
                 std::sprintf(buffer, "%s%s", _root_path, path);
             }

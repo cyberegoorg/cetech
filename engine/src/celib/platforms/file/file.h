@@ -27,5 +27,7 @@ namespace cetech {
         int64_t tell(const File& f);
 
         size_t size(const File& f);
+
+        time_t mtime(const char* path);
     }
 }

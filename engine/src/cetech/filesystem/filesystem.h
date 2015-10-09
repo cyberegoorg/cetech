@@ -3,6 +3,9 @@
 #include "celib/container/container_types.h"
 #include "cetech/filesystem/file.h"
 
+
+#include <ctime>
+
 namespace cetech {
     class FileSystem {
         public:
@@ -25,5 +28,7 @@ namespace cetech {
 
             virtual void create_file(const char* path) = 0;
             virtual void delete_file(const char* path) = 0;
+
+            virtual time_t file_mtime(const char* path) = 0;
     };
 }
