@@ -4,7 +4,7 @@ from PyQt5.QtCore import QTextCodec, QFile, QDir, QFileInfo
 from PyQt5.QtGui import QColor
 from PyQt5.QtWidgets import QMainWindow, QFileDialog, QMessageBox
 from cetech.api import ConsoleAPI
-from playground.projectmanager import ProjectManager
+from playground.cetechproject import CetechProject
 from playground.ui.luaeditorwindow import Ui_MainWindow
 
 
@@ -12,7 +12,7 @@ class ScriptEditor(QMainWindow, Ui_MainWindow):
     SUPPORTED_EXT = ('lua', 'package', 'json')
     FILES_FILTER = "Lua (*.lua); Package (*.package); JSON (*.json)"
 
-    def __init__(self, project_manager: ProjectManager, api: ConsoleAPI):
+    def __init__(self, project_manager: CetechProject, api: ConsoleAPI):
         super(ScriptEditor, self).__init__()
         self.setupUi(self)
 

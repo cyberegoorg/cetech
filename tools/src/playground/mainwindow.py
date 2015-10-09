@@ -7,7 +7,7 @@ from playground.scripteditor import ScriptEditor
 
 from cetech.qtapi import QtConsoleAPI
 from playground.assetbrowser import AssetBrowser
-from playground.projectmanager import ProjectManager
+from playground.cetechproject import CetechProject
 from playground.ui.mainwindow import Ui_MainWindow
 
 
@@ -28,7 +28,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.console_port = self.args.console_port
         self.console_address = self.args.console_address
 
-        self.project = ProjectManager()
+        self.project = CetechProject()
 
         self.api = QtConsoleAPI(self.console_address, self.console_port)
 
