@@ -113,23 +113,23 @@ namespace cetech {
 
                     uint64_t name, type = 0;
                     calc_hash(filename, type, name);
-		    resource_id_to_str(resource_id_str, type, name);
+                    resource_id_to_str(resource_id_str, type, name);
 
                     time_t source_mt = source_fs->file_mtime(filename);
-		    
-		    if(build_index.HasMember(resource_id_str)) {
-		      time_t build_mt = build_index[resource_id_str].GetInt();
-		      if(source_mt == build_mt) {
-			continue;
-		      } else {
-			build_index[resource_id_str].SetInt(source_mt);
-		      }
-		    } else {
-		      build_index.AddMember(
-			  rapidjson::Value(resource_id_str, strlen(resource_id_str), debug_index.GetAllocator()),
-			  rapidjson::Value(source_mt), debug_index.GetAllocator()
-			  );
-		    }
+
+                    if (build_index.HasMember(resource_id_str)) {
+                        time_t build_mt = build_index[resource_id_str].GetInt();
+                        if (source_mt == build_mt) {
+                            continue;
+                        } else {
+                            build_index[resource_id_str].SetInt(source_mt);
+                        }
+                    } else {
+                        build_index.AddMember(
+                            rapidjson::Value(resource_id_str, strlen(resource_id_str), debug_index.GetAllocator()),
+                            rapidjson::Value(source_mt), debug_index.GetAllocator()
+                            );
+                    }
 
                     resource_compiler_clb_t clb = hash::get < resource_compiler_clb_t >
                                                   (this->_compile_clb_map, type, nullptr);
@@ -193,27 +193,28 @@ namespace cetech {
                 _build_fs->close(out_config);
             }
 
-            void load_debug_index(rapidjson::Document &build_index) {
-	      FSFile* build_index_file = _build_fs->open("build_index.json", FSFile::READ);
+            void load_debug_index(rapidjson::Document& build_index) {
+                FSFile* build_index_file = _build_fs->open("build_index.json", FSFile::READ);
 
-	      if(!build_index_file->is_valid()) {
-		_build_fs->close(build_index_file);
-		build_index.SetObject();
-		return;
-	      }
+                if (!build_index_file->is_valid()) {
+                    _build_fs->close(build_index_file);
+                    build_index.SetObject();
+                    return;
+                }
 
-	      size_t size = build_index_file->size();
-	      char data[size + 1] = {0};
-	      build_index_file->read(data, size);
+                size_t size = build_index_file->size();
+                char data[size + 1] = {0};
+                build_index_file->read(data, size);
 
-	      build_index.Parse(data);
-	      if (build_index.HasParseError()) {
-		  log::error("resouce_compiler", "debug_index.json parse error: %s", GetParseError_En(
-				build_index.GetParseError()), build_index.GetErrorOffset());
-	      }
-	      _build_fs->close(build_index_file);
-	    }
-            
+                build_index.Parse(data);
+                if (build_index.HasParseError()) {
+                    log::error("resouce_compiler", "debug_index.json parse error: %s", GetParseError_En(
+                                   build_index.GetParseError()), build_index.GetErrorOffset());
+                }
+
+                _build_fs->close(build_index_file);
+            }
+
             virtual void compile_all_resource() final {
                 TaskManager& tm = application_globals::app().task_manager();
 
@@ -227,7 +228,7 @@ namespace cetech {
                 debug_index.SetObject();
 
                 rapidjson::Document build_index;
-		load_debug_index(build_index);
+                load_debug_index(build_index);
 
                 dir::mkpath(_build_fs->root_dir());
 

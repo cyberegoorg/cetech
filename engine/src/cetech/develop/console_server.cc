@@ -114,7 +114,7 @@ namespace cetech {
                 return false;
             }
 
-	    /* Name */
+            /* Name */
             if (!document.HasMember("name")) {
                 log::error("console_server", "Packet require key \"name\"");
                 return false;
