@@ -61,6 +61,10 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
         self.assetb_widget.asset_clicked.connect(self.open_asset)
 
+        self.file_watch = QFileSystemWatcher(self)
+        self.file_watch.fileChanged.connect(self.file_changed)
+        self.file_watch.directoryChanged.connect(self.dir_changed)
+
     def open_asset(self, path, ext):
         if self.script_editor_widget.support_ext(ext):
             self.script_editor_widget.open_file(path)
@@ -80,18 +84,24 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.watch_project_dir();
 
     def watch_project_dir(self):
+        files = self.file_watch.files()
+        directories = self.file_watch.directories()
+
+        if len(files):
+            self.file_watch.removePaths(files)
+
+        if len(directories):
+            self.file_watch.removePaths(directories)
+
         files = []
         it = QDirIterator(self.project.source_dir, QDirIterator.Subdirectories)
         while it.hasNext():
             files.append(it.next())
 
-        self.file_watch = QFileSystemWatcher(self)
         self.file_watch.addPaths(files)
-        self.file_watch.fileChanged.connect(self.file_changed)
-        self.file_watch.directoryChanged.connect(self.dir_changed)
 
     def file_changed(self, path):
-        self.api.lua_execute("Application.compile_all()")
+        self.api.compile_all()
 
     def dir_changed(self, path):
         self.watch_project_dir()

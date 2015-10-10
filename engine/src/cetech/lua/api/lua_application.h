@@ -19,11 +19,6 @@ namespace cetech {
         return 1;
     }
 
-    static int application_compile_all(lua_State* L) {
-        application_globals::app().resource_compiler().compile_all_resource();
-        return 0;
-    }
-
     namespace lua_application {
         static const char* module_name = "Application";
 
@@ -31,8 +26,6 @@ namespace cetech {
             env.set_module_function(module_name, "quit", application_quit);
             env.set_module_function(module_name, "get_frame_id", application_get_frame_id);
             env.set_module_function(module_name, "get_delta_time", application_get_delta_time);
-	    
-	    env.set_module_function(module_name, "compile_all", application_compile_all);
         }
     }
 }

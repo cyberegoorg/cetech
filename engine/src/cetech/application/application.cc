@@ -126,6 +126,7 @@ namespace cetech {
 
 
                 _console_server->register_command("lua.execute", &cmd_lua_execute);
+		_console_server->register_command("resource_compiler.compile_all", &cmd_compile_all);
 
                 register_resources();
 
@@ -320,6 +321,10 @@ namespace cetech {
 
             static void cmd_lua_execute(const rapidjson::Document& in, rapidjson::Document& out) {
                 application_globals::app().lua_enviroment().execute_string(in["args"]["script"].GetString());
+            }
+
+            static void cmd_compile_all(const rapidjson::Document& in, rapidjson::Document& out) {
+                application_globals::app().resource_compiler().compile_all_resource();
             }
 
             void load_config_json() {
