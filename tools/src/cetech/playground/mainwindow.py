@@ -74,7 +74,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
     def open_project(self, name, dir):
         self.project.open_project(name, dir)
 
-        self.project.run_cetech(compile=True, continu=True, daemon=True)
+        self.project.run_cetech(build_type=CetechProject.BUILD_DEBUG, compile=True, continu=True, daemon=True)
         self.api.start(QThread.LowPriority)
 
         self.assetb_widget.open_project(self.project.project_dir)
