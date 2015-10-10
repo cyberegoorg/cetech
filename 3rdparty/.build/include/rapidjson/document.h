@@ -2071,7 +2071,7 @@ private:
 };
 
 //! GenericDocument with UTF8 encoding
-typedef GenericDocument<UTF8<> > Document;
+typedef GenericDocument<UTF8<>> Document;
 
 // defined here due to the dependency on GenericDocument
 template <typename Encoding, typename Allocator>

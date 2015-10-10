@@ -139,6 +139,53 @@ namespace cetech {
                 return *(Vector3*)v;
             }
 
+            void to_json(int i, rapidjson::Document& document, rapidjson::Value& root) {
+		lua_pushnil(_L);
+                while (lua_next(_L, i) != 0) {
+                    const char* key = lua_tostring(_L, -2);
+		    rapidjson::Value rapid_key(key, strlen(key), document.GetAllocator());
+
+		    int type = lua_type(_L, -1);
+
+		    switch (type) {
+                    case LUA_TNUMBER: {
+			  uint32_t number = lua_tonumber(_L,-1);
+			  root.AddMember(rapid_key, number, document.GetAllocator());
+			}
+                        break;
+                    case LUA_TSTRING: {
+			const char* str = lua_tostring(_L,-1);
+			root.AddMember(rapid_key, rapidjson::Value(str, strlen(str), document.GetAllocator()), document.GetAllocator());
+			}
+                        break;
+                    case LUA_TBOOLEAN: {
+			bool b = lua_toboolean(_L,-1);
+			root.AddMember(rapid_key, rapidjson::Value(b), document.GetAllocator());
+			}
+                        break;
+                    case LUA_TNIL:{
+			root.AddMember(rapid_key, rapidjson::Value(rapidjson::kNullType), document.GetAllocator());
+			}
+                        break;
+			
+                    case LUA_TTABLE:{
+			rapidjson::Value v(rapidjson::kObjectType);
+			to_json(lua_gettop(_L), document, v);
+			root.AddMember(rapid_key, v, document.GetAllocator());
+		    }
+                        break;
+			
+		    case LUA_TFUNCTION: {
+			const char* str = lua_typename(_L,-1);
+			root.AddMember(rapid_key, "function", document.GetAllocator());
+			}
+			
+                    }
+
+                    lua_pop(_L, 1);
+                }
+            }
+
             lua_State* _L;
     };
 }
