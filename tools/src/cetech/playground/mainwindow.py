@@ -1,6 +1,6 @@
 import argparse
 
-from PyQt5.QtCore import QThread, Qt
+from PyQt5.QtCore import QThread, Qt, QFileSystemWatcher, QDirIterator
 from PyQt5.QtWidgets import QMainWindow, QDockWidget, QTabWidget
 
 from cetech.playground.logwidget import LogWidget
@@ -70,12 +70,31 @@ class MainWindow(QMainWindow, Ui_MainWindow):
     def open_project(self, name, dir):
         self.project.open_project(name, dir)
 
-        self.project.run_cetech(compile=True, daemon=True)
+        self.project.run_cetech(compile=True, continu=True, daemon=True)
         self.api.start(QThread.LowPriority)
 
         self.assetb_widget.open_project(self.project.project_dir)
         self.assetb_dock_widget.show()
         self.log_dock_widget.show()
+
+        self.watch_project_dir();
+
+    def watch_project_dir(self):
+        files = []
+        it = QDirIterator(self.project.source_dir, QDirIterator.Subdirectories)
+        while it.hasNext():
+            files.append(it.next())
+
+        self.file_watch = QFileSystemWatcher(self)
+        self.file_watch.addPaths(files)
+        self.file_watch.fileChanged.connect(self.file_changed)
+        self.file_watch.directoryChanged.connect(self.dir_changed)
+
+    def file_changed(self, path):
+        self.api.lua_execute("Application.compile_all()")
+
+    def dir_changed(self, path):
+        self.watch_project_dir()
 
     def open_script_editor(self):
         self.script_editor_dock_widget.show()
@@ -92,4 +111,4 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
         self.statusbar.showMessage("Disconnected")
 
-        super(MainWindow, self).closeEvent(evnt)
+        evnt.accept()

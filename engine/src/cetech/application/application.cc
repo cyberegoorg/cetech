@@ -131,6 +131,10 @@ namespace cetech {
 
                 if (command_line_globals::has_argument("compile", 'c')) {
                     _resource_compiler->compile_all_resource();
+
+		    if(!command_line_globals::has_argument("continue")) {
+		      return quit();
+		    }
                 }
 
                 load_config_json();
@@ -251,6 +255,12 @@ namespace cetech {
                 CE_CHECK_PTR(this->_resource_manager);
 
                 return *(this->_resource_manager);
+            }
+
+            virtual ResourceCompiler& resource_compiler() final {
+                CE_CHECK_PTR(this->_resource_compiler);
+
+                return *(this->_resource_compiler);
             }
 
             virtual PackageManager& package_manager() final {

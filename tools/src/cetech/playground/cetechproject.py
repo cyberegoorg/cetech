@@ -1,3 +1,4 @@
+import os
 from PyQt5.QtCore import QDir, QProcess
 from PyQt5.QtWidgets import QFileDialog, QMessageBox
 
@@ -41,6 +42,14 @@ class CetechProject(object):
 
         return True
 
+    @property
+    def source_dir(self):
+        return os.path.join(self.project_dir, "src")
+
+    @property
+    def build_dir(self):
+        return os.path.join(self.project_dir, "build")
+
     def close_project(self):
         self.project_dir = None
 
@@ -55,14 +64,17 @@ class CetechProject(object):
         for p in self.spawned_process:
             p.terminate()
 
-    def run_cetech(self, compile=False, wait=True, daemon=False, port=None):
+    def run_cetech(self, compile=False, continu=False, wait=True, daemon=False, port=None):
         args = [
-            "-s %s/src/" % self.project_dir,
-            "-b %s/build/" % self.project_dir,
+            "-s %s" % self.source_dir,
+            "-b %s" % self.build_dir,
         ]
 
         if compile:
             args.append("-c")
+
+        if continu:
+            args.append("--continue")
 
         if wait:
             args.append("-w")

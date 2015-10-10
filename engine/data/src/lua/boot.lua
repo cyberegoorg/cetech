@@ -1,11 +1,11 @@
 require "lua/game"
-
+ 
 function init()
   Game:init()
 end
 
-function update(dt)
-  Game:update(dt)
+function update(dt) 
+  Game:update(dt) 
 end
 
 function shutdown()

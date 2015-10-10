@@ -2,10 +2,10 @@
   "lua" : [
     "lua/boot",
     "lua/game"
-  ],
-  
+  ], 
+
   "package": [
     "core",
     "pkg1"
-  ]
+  ] 
 }

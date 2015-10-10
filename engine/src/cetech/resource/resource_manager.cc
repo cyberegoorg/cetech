@@ -138,10 +138,19 @@ close:
                 return true;
             }
 
+            void load_now(StringId64_t type, StringId64_t* names, const uint32_t count) {
+                Array < void* > loaded_data(memory_globals::default_allocator());
+                array::reserve(loaded_data, count);
+
+                load(array::begin(loaded_data), type, names, count);
+                add_loaded(array::begin(loaded_data), type, names, count);
+	    }
+            
             virtual const void* get(StringId64_t type, StringId64_t name) final {
-		if
-		if(!can_get(type, &name, 1)) {
-		  
+		if(autoreload) {
+		  if(!can_get(type, &name, 1)) {
+		    load_now(type, &name, 1);
+		  }
 		}
 	      
                 return hash::get < void* > (this->_data_map, type ^ name, nullptr);
