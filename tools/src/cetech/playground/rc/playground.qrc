@@ -1,0 +1,5 @@
+<RCC>
+    <qresource prefix="/">
+        <file alias="code-function">icons/code-function.png</file>
+    </qresource>
+</RCC>

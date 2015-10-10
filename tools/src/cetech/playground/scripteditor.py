@@ -2,9 +2,9 @@ import os
 
 from PyQt5 import Qsci
 from PyQt5.QtCore import QTextCodec, QFile, QDir, QFileInfo
-from PyQt5.QtGui import QColor
+from PyQt5.QtGui import QColor, QPixmap, QIcon, QKeySequence
 
-from PyQt5.QtWidgets import QMainWindow, QFileDialog, QMessageBox
+from PyQt5.QtWidgets import QMainWindow, QFileDialog, QMessageBox, QShortcut
 
 from cetech.shared.api import ConsoleAPI
 from cetech.playground.cetechproject import CetechProject
@@ -21,6 +21,20 @@ class ScriptEditor(QMainWindow, Ui_MainWindow):
 
         self.project_manager = project_manager
         self.api = api
+
+        self.lexer = Qsci.QsciLexerLua()
+        self.lua_api = Qsci.QsciAPIs(self.lexer)
+        self.lua_api.prepare()
+        self.lexer.setAPIs(self.lua_api)
+
+        self.api.register_handler('autocomplete_list', self.update_autocomplete)
+
+    def update_autocomplete(self, list):
+        self.lua_api.clear()
+        for v in list.values():
+            self.lua_api.add("%s?1" % v)
+
+        self.lua_api.prepare()
 
     def support_ext(self, ext):
         return ext in self.SUPPORTED_EXT
@@ -48,6 +62,8 @@ class ScriptEditor(QMainWindow, Ui_MainWindow):
         sci.setModified(False)
         sci.setProperty("filename", filename)
 
+        self.api.autocomplete_list()
+
     def find_tab_by_filename(self, filename):
         for i in range(self.main_tabs.count()):
             if filename == self.get_editor_filename(i):
@@ -73,11 +89,17 @@ class ScriptEditor(QMainWindow, Ui_MainWindow):
 
     def create_new_editor(self, name):
         sci = Qsci.QsciScintilla(self)
-        lexer = Qsci.QsciLexerLua()
-        sci.setLexer(lexer)
+        sci.setLexer(self.lexer)
 
         sci.setCaretLineVisible(True)
         sci.setCaretLineBackgroundColor(QColor("gray"))
+
+        sci.setAutoCompletionThreshold(1)
+        sci.setAutoCompletionSource(Qsci.QsciScintilla.AcsAll)
+        sci.setAutoCompletionFillupsEnabled(True)
+        sci.setAutoCompletionShowSingle(True)
+
+        sci.registerImage(1, QPixmap(":code-function"))
 
         idx = self.main_tabs.addTab(sci, name)
         self.main_tabs.setCurrentIndex(idx)
@@ -125,6 +147,12 @@ class ScriptEditor(QMainWindow, Ui_MainWindow):
 
     def get_editor_name(self, tab_index):
         return self.main_tabs.tabText(tab_index)
+
+    def get_editor(self, tab_index):
+        """
+        :rtype: Qsci.QsciScintilla
+        """
+        return self.main_tabs.widget(tab_index)
 
     def is_editor_modified(self, tab_index):
         sci = self.main_tabs.widget(tab_index)
