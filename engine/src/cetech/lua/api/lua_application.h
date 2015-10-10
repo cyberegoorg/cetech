@@ -19,6 +19,15 @@ namespace cetech {
         return 1;
     }
 
+    static int application_console_send(lua_State* L) {
+	rapidjson::Document d;
+        LuaStack(L).to_json(1, d, d);
+	
+	application_globals::app().console_server().send_json_document(d);
+	
+        return 0;
+    }
+    
     namespace lua_application {
         static const char* module_name = "Application";
 
@@ -26,6 +35,7 @@ namespace cetech {
             env.set_module_function(module_name, "quit", application_quit);
             env.set_module_function(module_name, "get_frame_id", application_get_frame_id);
             env.set_module_function(module_name, "get_delta_time", application_get_delta_time);
+	    env.set_module_function(module_name, "console_send", application_console_send);
         }
     }
 }
