@@ -116,7 +116,7 @@ namespace cetech {
                     resource_id_to_str(resource_id_str, type, name);
 
                     time_t source_mt = source_fs->file_mtime(filename);
-		    bool need_compile = true;
+                    bool need_compile = true;
                     if (build_index.HasMember(resource_id_str)) {
                         time_t build_mt = build_index[resource_id_str].GetInt();
                         if (source_mt == build_mt) {
@@ -148,10 +148,10 @@ namespace cetech {
 
                     resource_id_str[0] = '\0';
 
-		    if(!need_compile){
-		      continue;
-		    }
-                    
+                    if (!need_compile) {
+                        continue;
+                    }
+
                     // TODO: Compile Task Pool, reduce alloc free, ringbuffer?
                     CompileTask* ct = MAKE_NEW(memory_globals::default_allocator(), CompileTask);
                     ct->source_fs = source_fs;
