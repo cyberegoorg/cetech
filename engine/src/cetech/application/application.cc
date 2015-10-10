@@ -126,16 +126,16 @@ namespace cetech {
 
 
                 _console_server->register_command("lua.execute", &cmd_lua_execute);
-		_console_server->register_command("resource_compiler.compile_all", &cmd_compile_all);
+                _console_server->register_command("resource_compiler.compile_all", &cmd_compile_all);
 
                 register_resources();
 
                 if (command_line_globals::has_argument("compile", 'c')) {
                     _resource_compiler->compile_all_resource();
 
-		    if(!command_line_globals::has_argument("continue")) {
-		      return quit();
-		    }
+                    if (!command_line_globals::has_argument("continue")) {
+                        return quit();
+                    }
                 }
 
                 load_config_json();
