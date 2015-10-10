@@ -20,6 +20,10 @@ def validate_project(project_dir):
 
 
 class CetechProject(object):
+    BUILD_DEBUG = 'cetech1_debug'
+    BUILD_DEVELOP = 'cetech1_develop'
+    BUILD_RELEASE = 'cetech1'
+
     def __init__(self):
         self.project_dir = None
         self.spawned_process = []
@@ -64,7 +68,10 @@ class CetechProject(object):
         for p in self.spawned_process:
             p.terminate()
 
-    def run_cetech(self, compile=False, continu=False, wait=True, daemon=False, port=None):
+    def exec_cmd(self, build_type, *args):
+        return '../../engine/.build/linux64/bin/%s %s' % (build_type, ' '.join(args))
+
+    def run_cetech(self, build_type, compile=False, continu=False, wait=True, daemon=False, port=None):
         args = [
             "-s %s" % self.source_dir,
             "-b %s" % self.build_dir,
@@ -85,7 +92,7 @@ class CetechProject(object):
         if daemon:
             args.append("--daemon")
 
-        cmd = '../../engine/.build/linux64/bin/cetech1_debug %s' % ' '.join(args)
+        cmd = self.exec_cmd(build_type, *args)
 
         process = QProcess()
         process.start(cmd)
