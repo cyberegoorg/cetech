@@ -12,7 +12,7 @@ function Game:init()
     log.warn("boot.lua", "warn")
     log.error("boot.lua", "error")
     log.debug("boot.lua", "debug")
-
+    
     Package.load(pkg1)
 end
 
