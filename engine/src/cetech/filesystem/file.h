@@ -24,7 +24,7 @@ namespace cetech {
             virtual void flush() = 0;
 
             virtual bool end_of_file() = 0;
-
+	    
             virtual size_t size() = 0;
             virtual size_t position() = 0;
     };

@@ -20,7 +20,7 @@ namespace cetech {
         }
 
 
-        void compiler(FSFile* in, FSFile* out) {
+        void compiler(const char* filename, FSFile* in, FSFile* out) {
             size_t sz_in = in->size();
 
             char tmp[4096] = {0};

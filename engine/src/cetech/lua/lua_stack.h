@@ -110,6 +110,10 @@ namespace cetech {
                 return lua_tostring(_L, i);
             }
 
+            const char* to_string(int i, size_t *len) {
+                return lua_tolstring(_L, i, len);
+            }
+            
             StringId64_t to_string64id(int i) {
                 union {
                     StringId64_t lh;
@@ -185,6 +189,18 @@ namespace cetech {
                     lua_pop(_L, 1);
                 }
             }
+
+	    void load_string(const char* string) {
+	      luaL_loadstring(_L, string);
+	    }
+
+	    void execute_string(const char *string) {
+	      if (luaL_dostring(_L, string)) {
+		  const char* last_error = lua_tostring(_L, -1);
+		  lua_pop(_L, 1);
+		  log::error("lua", "%s", last_error);
+	      }
+	    }
 
             lua_State* _L;
     };
