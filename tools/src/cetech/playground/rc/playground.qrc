@@ -1,5 +1,6 @@
 <RCC>
     <qresource prefix="/">
         <file alias="code-function">icons/code-function.png</file>
+        <file alias="code-table">namespace.png</file>
     </qresource>
 </RCC>
