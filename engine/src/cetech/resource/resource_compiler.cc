@@ -78,7 +78,7 @@ namespace cetech {
 
                 FSFile* f_out = ct->out_fs->open(output_filename, FSFile::WRITE);
 
-                ct->clb(f_in, f_out);
+                ct->clb(ct->filename, f_in, f_out);
 
                 ct->source_fs->close(f_in);
                 ct->out_fs->close(f_out);

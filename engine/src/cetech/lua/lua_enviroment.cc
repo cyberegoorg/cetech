@@ -83,8 +83,10 @@ namespace cetech {
 
         virtual void execute_resource(const resource_lua::Resource* res) final {
             //lua_pushcfunction(_state, error_handler);
+	    
+	    luaL_loadbuffer(_state, resource_lua::get_source(res), res->size, "<unknown>");
 
-            if (luaL_dostring(_state, resource_lua::get_source(res))) {
+            if (lua_pcall(_state, 0, 0, 0)) {
                 const char* last_error = lua_tostring(_state, -1);
                 lua_pop(_state, 1);
                 log::error("lua", "%s", last_error);
@@ -393,7 +395,8 @@ namespace cetech {
                 return 0;
             }
 
-            luaL_loadstring(L, resource_lua::get_source(res));
+	    luaL_loadbuffer(L, resource_lua::get_source(res), res->size, "<unknown>");
+
             return 1;
         }
 
