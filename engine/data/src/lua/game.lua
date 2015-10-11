@@ -31,7 +31,7 @@ function Game:update(dt)
 
     
     if Package.is_loaded(pkg1) then
-        print("unload")c
+        print("unload")
         Package.unload(pkg1)
     end
 end

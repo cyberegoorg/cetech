@@ -12,6 +12,7 @@ function shutdown()
   Game:shutdown()
 end
 
+-- TODO: move to core
 function autocomplite_list()
     local t = {}
 
@@ -31,5 +32,3 @@ function autocomplite_list()
         list = t
     })
 end
-
---dsadsadas cx zx,,zx. 

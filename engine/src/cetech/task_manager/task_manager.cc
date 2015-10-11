@@ -11,7 +11,7 @@
 #define TASK_INITIALIZER { { 0 }, { 0 }, { 0 }, 0, 0, { 0, 0 } }
 
 namespace cetech {
-    //TODO: REWRITE !!!
+    //TODO: REWRITE !!! #62
     class TaskManagerImplementation : public TaskManager {
         public:
             friend class TaskManager;
