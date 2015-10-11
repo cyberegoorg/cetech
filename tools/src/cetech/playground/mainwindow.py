@@ -65,6 +65,10 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.file_watch.fileChanged.connect(self.file_changed)
         self.file_watch.directoryChanged.connect(self.dir_changed)
 
+        self.build_file_watch = QFileSystemWatcher(self)
+        self.build_file_watch.fileChanged.connect(self.build_file_changed)
+        self.build_file_watch.directoryChanged.connect(self.build_dir_changed)
+
     def open_asset(self, path, ext):
         if self.script_editor_widget.support_ext(ext):
             self.script_editor_widget.open_file(path)
@@ -93,6 +97,15 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         if len(directories):
             self.file_watch.removePaths(directories)
 
+        files = self.build_file_watch.files()
+        directories = self.build_file_watch.directories()
+
+        if len(files):
+            self.build_file_watch.removePaths(files)
+
+        if len(directories):
+            self.build_file_watch.removePaths(directories)
+
         files = []
         it = QDirIterator(self.project.source_dir, QDirIterator.Subdirectories)
         while it.hasNext():
@@ -100,11 +113,24 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
         self.file_watch.addPaths(files)
 
+        files = []
+        it = QDirIterator(self.project.build_dir, QDirIterator.Subdirectories)
+        while it.hasNext():
+            files.append(it.next())
+
+        self.build_file_watch.addPaths(files)
+
     def file_changed(self, path):
         self.api.compile_all()
 
     def dir_changed(self, path):
         self.watch_project_dir()
+
+    def build_file_changed(self, path):
+        self.api.autocomplete_list()
+
+    def build_dir_changed(self, path):
+        pass
 
     def open_script_editor(self):
         self.script_editor_dock_widget.show()

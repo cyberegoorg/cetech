@@ -29,10 +29,28 @@ class ScriptEditor(QMainWindow, Ui_MainWindow):
 
         self.api.register_handler('autocomplete_list', self.update_autocomplete)
 
+        self.autocomplete_shortcut = QShortcut(QKeySequence("Ctrl+Space"), self)
+        self.autocomplete_shortcut.activated.connect(self.autocomplete)
+
+        self.TYPE_ICONS = {
+            0: QPixmap(":code-function"),
+            1: QPixmap(":code-table"),
+        }
+
+    TYPE_TO_ICON_ID = {
+        "function": 0,
+        "table": 1
+    }
+
+    def autocomplete(self):
+        self.get_editor(self.main_tabs.currentIndex()).autoCompleteFromAll()
+
     def update_autocomplete(self, list):
         self.lua_api.clear()
-        for v in list.values():
-            self.lua_api.add("%s?1" % v)
+        for k, v in list.items():
+            icon_id = self.TYPE_TO_ICON_ID.get(v, None)
+            if icon_id is not None:
+                self.lua_api.add("%s?%s" % (k, icon_id))
 
         self.lua_api.prepare()
 
@@ -95,11 +113,12 @@ class ScriptEditor(QMainWindow, Ui_MainWindow):
         sci.setCaretLineBackgroundColor(QColor("gray"))
 
         sci.setAutoCompletionThreshold(1)
-        sci.setAutoCompletionSource(Qsci.QsciScintilla.AcsAll)
+        sci.setAutoCompletionSource(Qsci.QsciScintilla.AcsAPIs)
         sci.setAutoCompletionFillupsEnabled(True)
         sci.setAutoCompletionShowSingle(True)
 
-        sci.registerImage(1, QPixmap(":code-function"))
+        for id, img in self.TYPE_ICONS.items():
+            sci.registerImage(id, img)
 
         idx = self.main_tabs.addTab(sci, name)
         self.main_tabs.setCurrentIndex(idx)
