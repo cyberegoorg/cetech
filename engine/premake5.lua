@@ -53,11 +53,6 @@ solution "cyberego.org tech1"
       THIRD_PARTY_LIB
     }
 
-    links {
-        "luajit",
-        "enet"
-    }
-    
     -- SIMD options
     filter "options:simd=fpu"
       defines {
@@ -70,13 +65,6 @@ solution "cyberego.org tech1"
         'CETECH_RUNTIME_SDL2'
       }
 
-    filter ("system:linux","options:runtime=sdl2")
-      links {
-          'SDL2',
-          'dl',
-          'pthread'
-      }
-     
     filter "Debug"
         flags {"Symbols"}
         targetsuffix '_debug'
@@ -120,7 +108,6 @@ solution "cyberego.org tech1"
 	links {
 	    "m",
 	}
-    
 
     filter "system:windows"
         defines {'CETECH_WINDOWS'}
@@ -144,10 +131,6 @@ project "celib_static"
       files {
 	  ROOT_DIR .. "src/celib/platform_sdl/*.cc",
 	  ROOT_DIR .. "src/celib/platform_sdl/*.h",
-      }
-
-      links {
-	"SDL2",
       }
 
     filter {}
@@ -183,8 +166,19 @@ project "cetech1"
 	ROOT_DIR .. "src/cetech/**.cc",
     }
 
+
+  filter ("system:linux","options:runtime=sdl2")
     links {
-      'celib_static'
+	'SDL2',
+	'dl',
+	'pthread'
+    }
+    
+    links {
+      'celib_static',
+      
+      "luajit",
+      "enet"
     }
 
     filter {}
