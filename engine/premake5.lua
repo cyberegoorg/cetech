@@ -87,6 +87,7 @@ solution "cyberego.org tech1"
 	}
 	
     filter "Release"
+	targetsuffix '_release'
         optimize "Full"
 
         defines {
