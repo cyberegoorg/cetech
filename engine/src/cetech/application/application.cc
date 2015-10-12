@@ -201,7 +201,7 @@ namespace cetech {
 
                     os::frame_start();
                     keyboard::frame_start();
-                    mouse::frame_start();
+                    mouse::retrive_state();
 
                     TaskManager::TaskID frame_task = _task_manager->add_empty_begin(0);
                     TaskManager::TaskID console_server_task = _task_manager->add_begin(
@@ -225,7 +225,7 @@ namespace cetech {
                     os::frame_end();
 
                     keyboard::frame_end();
-                    mouse::frame_end();
+                    mouse::swap_states();
 
                     _develop_manager->push_end_frame();
                     _develop_manager->send_buffer();
