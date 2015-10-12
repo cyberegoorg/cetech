@@ -65,7 +65,7 @@ namespace cetech {
             }
 
             std::tm* gmtm = std::gmtime(&time);
-            char* time_str = log_handlers_internal::time_to_utc_str(gmtm);
+            //char* time_str = log_handlers_internal::time_to_utc_str(gmtm);
 
             flockfile(out);
             fprintf(out, level_format[level], level_to_str[level], where, msg);

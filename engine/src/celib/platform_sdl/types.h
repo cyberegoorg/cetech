@@ -18,4 +18,8 @@ namespace cetech {
 
         Spinlock() : l(0) {}
     };
+    
+    struct Window {
+        SDL_Window* wnd;
+    };
 }
