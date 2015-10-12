@@ -1,4 +1,5 @@
 import os
+import platform
 from PyQt5.QtCore import QDir, QProcess
 from PyQt5.QtWidgets import QFileDialog, QMessageBox
 
@@ -20,9 +21,9 @@ def validate_project(project_dir):
 
 
 class CetechProject(object):
-    BUILD_DEBUG = 'cetech1_debug'
-    BUILD_DEVELOP = 'cetech1_develop'
-    BUILD_RELEASE = 'cetech1'
+    BUILD_DEBUG = 'debug'
+    BUILD_DEVELOP = 'develop'
+    BUILD_RELEASE = 'release'
 
     def __init__(self):
         self.project_dir = None
@@ -68,8 +69,13 @@ class CetechProject(object):
         for p in self.spawned_process:
             p.terminate()
 
-    def exec_cmd(self, build_type, *args):
-        return '../../engine/.build/linux64/bin/%s %s' % (build_type, ' '.join(args))
+    def get_executable_path(self, build_type):
+        engine_bin_path = '../../engine/.build/'
+        platform_dir = "%s%s" % (platform.system().lower(), platform.architecture()[0][0:2])
+
+        exec_name = "cetech1_%s" % build_type
+
+        return os.path.join(engine_bin_path, platform_dir, 'bin', exec_name)
 
     def run_cetech(self, build_type, compile=False, continu=False, wait=True, daemon=False, port=None):
         args = [
@@ -92,7 +98,7 @@ class CetechProject(object):
         if daemon:
             args.append("--daemon")
 
-        cmd = self.exec_cmd(build_type, *args)
+        cmd = "%s %s" % (self.get_executable_path(build_type), ' '.join(args))
 
         process = QProcess()
         process.start(cmd)
