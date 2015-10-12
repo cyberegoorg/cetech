@@ -33,7 +33,7 @@ namespace cetech {
             mouse_internal::right_btn_hash = murmur_hash_64("right", strlen("right"), 22);
         }
 
-        void frame_start() {
+        void retrive_state() {
             /*Mouse*/
             int32_t x, y;
             x = y = 0;
@@ -44,7 +44,7 @@ namespace cetech {
             mouse_internal::MouseAxis.y = y;
         }
 
-        void frame_end() {
+        void swap_states() {
             mouse_internal::MouseButtonStateLast = mouse_internal::MouseButtonState;
         }
 

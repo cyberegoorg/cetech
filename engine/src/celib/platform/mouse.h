@@ -7,8 +7,8 @@
 namespace cetech {
     namespace mouse {
         void init();
-        void frame_start();
-        void frame_end();
+        void retrive_state();
+        void swap_states();
         //void shutdown();
 
         uint32_t button_index(const char* scancode);
