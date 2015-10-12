@@ -4,7 +4,7 @@
 
 #include "celib/container/container_types.h"
 #include "celib/math/math_types.h"
-#include "celib/platforms/thread/thread_types.h"
+#include "celib/platform/thread_types.h"
 
 namespace cetech {
 

@@ -18,11 +18,11 @@
 #include "cetech/filesystem/disk_filesystem.h"
 #include "cetech/package/package_resource.h"
 
-#include "celib/platforms/input/keyboard.h"
-#include "celib/platforms/input/mouse.h"
-#include "celib/platforms/thread/thread.h"
-#include "celib/platforms/window/window.h"
-#include "celib/platforms/dir/dir.h"
+#include "celib/platform/keyboard.h"
+#include "celib/platform/mouse.h"
+#include "celib/platform/thread.h"
+#include "celib/platform/window.h"
+#include "celib/platform/dir.h"
 
 #include "cetech/cvars/cvars.h"
 #include "cetech/os/os.h"

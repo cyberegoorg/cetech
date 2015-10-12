@@ -4,7 +4,7 @@
 
 #include "celib/container/container_types.h"
 #include "celib/math/math_types.h"
-#include "celib/platforms/window/window_types.h"
+#include "celib/platform/window_types.h"
 
 namespace cetech {
     namespace window {

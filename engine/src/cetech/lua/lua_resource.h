@@ -8,7 +8,7 @@ namespace cetech {
     namespace resource_lua {
         struct Resource {
             uint32_t type;
-	    uint32_t size;
+            uint32_t size;
         };
 
         StringId64_t type_hash();

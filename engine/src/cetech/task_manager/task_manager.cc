@@ -5,8 +5,8 @@
 
 #include "cetech/application/application.h"
 
-#include "celib/platforms/cpu/cpu.h"
-#include "celib/platforms/thread/thread.h"
+#include "celib/platform/cpu.h"
+#include "celib/platform/thread.h"
 
 #define TASK_INITIALIZER { { 0 }, { 0 }, { 0 }, 0, 0, { 0, 0 } }
 
