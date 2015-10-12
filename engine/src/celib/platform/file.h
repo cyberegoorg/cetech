@@ -5,7 +5,7 @@
 #include "celib/container/container_types.h"
 #include "celib/math/math_types.h"
 
-#include "celib/platform/file_types.h"
+#include "celib/platform/types.h"
 
 namespace cetech {
     namespace file {
