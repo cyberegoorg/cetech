@@ -110,10 +110,10 @@ namespace cetech {
                 return lua_tostring(_L, i);
             }
 
-            const char* to_string(int i, size_t *len) {
+            const char* to_string(int i, size_t* len) {
                 return lua_tolstring(_L, i, len);
             }
-            
+
             StringId64_t to_string64id(int i) {
                 union {
                     StringId64_t lh;
@@ -144,63 +144,64 @@ namespace cetech {
             }
 
             void to_json(int i, rapidjson::Document& document, rapidjson::Value& root) {
-		lua_pushnil(_L);
+                lua_pushnil(_L);
                 while (lua_next(_L, i) != 0) {
                     const char* key = lua_tostring(_L, -2);
-		    rapidjson::Value rapid_key(key, strlen(key), document.GetAllocator());
+                    rapidjson::Value rapid_key(key, strlen(key), document.GetAllocator());
 
-		    int type = lua_type(_L, -1);
+                    int type = lua_type(_L, -1);
 
-		    switch (type) {
+                    switch (type) {
                     case LUA_TNUMBER: {
-			  uint32_t number = lua_tonumber(_L,-1);
-			  root.AddMember(rapid_key, number, document.GetAllocator());
-			}
-                        break;
+                        uint32_t number = lua_tonumber(_L, -1);
+                        root.AddMember(rapid_key, number, document.GetAllocator());
+                    }
+                    break;
                     case LUA_TSTRING: {
-			const char* str = lua_tostring(_L,-1);
-			root.AddMember(rapid_key, rapidjson::Value(str, strlen(str), document.GetAllocator()), document.GetAllocator());
-			}
-                        break;
+                        const char* str = lua_tostring(_L, -1);
+                        root.AddMember(rapid_key, rapidjson::Value(str, strlen(str),
+                                                                   document.GetAllocator()), document.GetAllocator());
+                    }
+                    break;
                     case LUA_TBOOLEAN: {
-			bool b = lua_toboolean(_L,-1);
-			root.AddMember(rapid_key, rapidjson::Value(b), document.GetAllocator());
-			}
-                        break;
-                    case LUA_TNIL:{
-			root.AddMember(rapid_key, rapidjson::Value(rapidjson::kNullType), document.GetAllocator());
-			}
-                        break;
-			
-                    case LUA_TTABLE:{
-			rapidjson::Value v(rapidjson::kObjectType);
-			to_json(lua_gettop(_L), document, v);
-			root.AddMember(rapid_key, v, document.GetAllocator());
-		    }
-                        break;
-			
-		    case LUA_TFUNCTION: {
-			const char* str = lua_typename(_L,-1);
-			root.AddMember(rapid_key, "function", document.GetAllocator());
-			}
-			
+                        bool b = lua_toboolean(_L, -1);
+                        root.AddMember(rapid_key, rapidjson::Value(b), document.GetAllocator());
+                    }
+                    break;
+                    case LUA_TNIL: {
+                        root.AddMember(rapid_key, rapidjson::Value(rapidjson::kNullType), document.GetAllocator());
+                    }
+                    break;
+
+                    case LUA_TTABLE: {
+                        rapidjson::Value v(rapidjson::kObjectType);
+                        to_json(lua_gettop(_L), document, v);
+                        root.AddMember(rapid_key, v, document.GetAllocator());
+                    }
+                    break;
+
+                    case LUA_TFUNCTION: {
+                        const char* str = lua_typename(_L, -1);
+                        root.AddMember(rapid_key, "function", document.GetAllocator());
+                    }
+
                     }
 
                     lua_pop(_L, 1);
                 }
             }
 
-	    void load_string(const char* string) {
-	      luaL_loadstring(_L, string);
-	    }
+            void load_string(const char* string) {
+                luaL_loadstring(_L, string);
+            }
 
-	    void execute_string(const char *string) {
-	      if (luaL_dostring(_L, string)) {
-		  const char* last_error = lua_tostring(_L, -1);
-		  lua_pop(_L, 1);
-		  log::error("lua", "%s", last_error);
-	      }
-	    }
+            void execute_string(const char* string) {
+                if (luaL_dostring(_L, string)) {
+                    const char* last_error = lua_tostring(_L, -1);
+                    lua_pop(_L, 1);
+                    log::error("lua", "%s", last_error);
+                }
+            }
 
             lua_State* _L;
     };

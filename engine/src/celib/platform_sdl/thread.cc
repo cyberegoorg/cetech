@@ -11,7 +11,7 @@
 #include "celib/math/vector2.inl.h"
 #include "cetech/application/application.h"
 
-#include "celib/platforms/thread_sdl2/types.h"
+#include "celib/platform_sdl/types.h"
 
 #include "SDL2/SDL.h"
 

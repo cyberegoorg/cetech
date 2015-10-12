@@ -10,8 +10,8 @@
 #include "celib/string/stringid.inl.h"
 
 #include "cetech/cvars/cvars.h"
-#include "celib/platforms/dir/dir.h"
-#include "celib/platforms/thread/thread.h"
+#include "celib/platform/dir.h"
+#include "celib/platform/thread.h"
 
 #include "rapidjson/prettywriter.h"
 #include "rapidjson/memorybuffer.h"

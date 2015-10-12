@@ -1,6 +1,6 @@
-#include <dirent.h>
+#include "celib/platform/file.h"
+
 #include <time.h>
-#include <errno.h>
 #include <sys/stat.h>
 
 #include "celib/macros.h"
@@ -11,13 +11,19 @@
 #include "celib/math/vector2.inl.h"
 #include "cetech/application/application.h"
 
-#include "celib/platforms/file/file.h"
-#include "celib/platforms/file_sdl2/file_types.h"
+#include "celib/platform_sdl/file_types.h"
 
 #include "SDL2/SDL.h"
 
 namespace cetech {
+
     namespace file {
+        time_t mtime(const char* path) {
+            struct stat st;
+            stat(path, &st);
+            return st.st_mtime;
+        }
+
         File from_file(const char* path, const char* mode) {
             SDL_RWops* rwops = SDL_RWFromFile(path, mode);
 
@@ -86,6 +92,6 @@ namespace cetech {
 
             return size;
         }
+
     }
 }
-

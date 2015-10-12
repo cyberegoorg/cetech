@@ -25,50 +25,50 @@ namespace cetech {
             size_t sz_in = in->size();
             char tmp[4096] = {0};
             in->read(tmp, sz_in);
-	    
-	    
-	    // TODO: lua + LuaStack?, inline lua? 
-	    lua_State* state = luaL_newstate();
-	    luaL_openlibs(state);
-            CE_CHECK_PTR(state);
-	    LuaStack s(state);
-	    s.execute_string(
-	      "function compile(what, filename,  strip)\n"
-	      " local s, err = loadstring(what, filename)\n"
-	      " if s ~= nil then\n"
-	      "   return string.dump(s, strip), nil\n"
-	      " end\n"
-	      " return nil, err\n"
-	      "end"
-	    );
 
-	    lua_getglobal(state, "compile");
-	    s.push_string(tmp);
-	    s.push_string(filename);
+
+            // TODO: lua + LuaStack?, inline lua?
+            lua_State* state = luaL_newstate();
+            luaL_openlibs(state);
+            CE_CHECK_PTR(state);
+            LuaStack s(state);
+            s.execute_string(
+                "function compile(what, filename,  strip)\n"
+                " local s, err = loadstring(what, filename)\n"
+                " if s ~= nil then\n"
+                "   return string.dump(s, strip), nil\n"
+                " end\n"
+                " return nil, err\n"
+                "end"
+                );
+
+            lua_getglobal(state, "compile");
+            s.push_string(tmp);
+            s.push_string(filename);
 #if defined(CETECH_DEBUG)
-	    s.push_bool(false);
+            s.push_bool(false);
 #else
-	    s.push_bool(true);
+            s.push_bool(true);
 #endif
 
-	    lua_pcall(state, 3, 2, 0);
-	    if(lua_isnil(state, 1)) {
-	      const char* err = s.to_string(2);
-	      log::error("lua_resource.compiler", "%s", err);
+            lua_pcall(state, 3, 2, 0);
+            if (lua_isnil(state, 1)) {
+                const char* err = s.to_string(2);
+                log::error("lua_resource.compiler", "%s", err);
 
-	    } else {
-	      size_t bc_len = 0;
-	      const char* bc = s.to_string(1, &bc_len);
+            } else {
+                size_t bc_len = 0;
+                const char* bc = s.to_string(1, &bc_len);
 
-	      Resource r;
-	      r.type = 1;
-	      r.size = bc_len;
+                Resource r;
+                r.type = 1;
+                r.size = bc_len;
 
-	      out->write(&r, sizeof(Resource));
-	      out->write(bc, bc_len);
-	    }
+                out->write(&r, sizeof(Resource));
+                out->write(bc, bc_len);
+            }
 
-	    lua_close(state);
+            lua_close(state);
         }
 
         void* loader (FSFile* f, Allocator& a) {

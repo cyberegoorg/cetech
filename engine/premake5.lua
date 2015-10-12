@@ -69,10 +69,6 @@ solution "cyberego.org tech1"
       defines {
         'CETECH_RUNTIME_SDL2'
       }
-      
-      files {
-	  ROOT_DIR .. "src/platforms/*_sdl2/**",
-      }
 
     filter ("system:linux","options:runtime=sdl2")
       links {
@@ -124,10 +120,6 @@ solution "cyberego.org tech1"
 	links {
 	    "m",
 	}
-	
-	files {
-	  ROOT_DIR .. "src/cetech/platforms/*_linux/**",
-	}
     
 
     filter "system:windows"
@@ -139,18 +131,24 @@ project "celib_static"
     kind "StaticLib"
     language "C++"
 
-    excludes {
-      ROOT_DIR .. "src/**",
-    }
-    
     files {
         ROOT_DIR .. "src/celib/**.cc",
         ROOT_DIR .. "src/celib/**.h",
     }
 
-    links {
-      "SDL2",
-    }
+--     excludes {
+--       ROOT_DIR .. "src/celib/platform_*/**",
+--     }
+
+    filter "options:runtime=sdl2"
+      files {
+	  ROOT_DIR .. "src/platform_sdl2/*.cc",
+	  ROOT_DIR .. "src/platform_sdl2/*.h",
+      }
+
+      links {
+	"SDL2",
+      }
 
     filter {}
 --------------------------------------------------------------------------------
@@ -180,7 +178,7 @@ project "cetech1"
     excludes {
       ROOT_DIR .. "src/celib/**",
     }
-    
+
     files {
 	ROOT_DIR .. "src/cetech/**.cc",
     }

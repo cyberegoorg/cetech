@@ -7,8 +7,8 @@
 #include "celib/container/hash.inl.h"
 #include "celib/memory/memory.h"
 #include "celib/string/stringid.inl.h"
-#include "celib/platforms/dir/dir.h"
-#include "celib/platforms/thread/thread.h"
+#include "celib/platform/dir.h"
+#include "celib/platform/thread.h"
 
 #include "cetech/application/application.h"
 #include "cetech/cvars/cvars.h"
