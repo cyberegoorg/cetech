@@ -136,14 +136,14 @@ project "celib_static"
         ROOT_DIR .. "src/celib/**.h",
     }
 
---     excludes {
---       ROOT_DIR .. "src/celib/platform_*/**",
---     }
+    removefiles {
+      ROOT_DIR .. "src/celib/platform_*/**",
+    }
 
     filter "options:runtime=sdl2"
       files {
-	  ROOT_DIR .. "src/platform_sdl2/*.cc",
-	  ROOT_DIR .. "src/platform_sdl2/*.h",
+	  ROOT_DIR .. "src/celib/platform_sdl/*.cc",
+	  ROOT_DIR .. "src/celib/platform_sdl/*.h",
       }
 
       links {
