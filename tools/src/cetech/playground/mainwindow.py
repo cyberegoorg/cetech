@@ -15,7 +15,7 @@ from cetech.playground.ui.mainwindow import Ui_MainWindow
 class CetechWidget(QWidget):
     def __init__(self, parent, api: ConsoleProxy):
         self.api = api
-        super(CetechWidget, self).__init__(parent)
+        super(CetechWidget, self).__init__(parent, Qt.ForeignWindow)
 
     def resizeEvent(self, event):
         size = event.size()
