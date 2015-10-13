@@ -17,6 +17,7 @@
 #include "cetech/develop/develop_manager.h"
 #include "cetech/filesystem/disk_filesystem.h"
 #include "cetech/package/package_resource.h"
+#include "cetech/renderer/renderer.h"
 
 #include "celib/platform/keyboard.h"
 #include "celib/platform/mouse.h"
@@ -70,6 +71,7 @@ namespace cetech {
             ConsoleServer* _console_server;
             LuaEnviroment* _lua_eviroment;
             FileSystem* _filesystem;
+            Renderer* _renderer;
 
             uint32_t _frame_id;
             uint32_t _last_frame_ticks;
@@ -85,7 +87,8 @@ namespace cetech {
             ApplicationImplementation() : _frame_id(0), _last_frame_ticks(0), _delta_time(0),
                                           _resource_manager(nullptr), _package_manager(nullptr), _develop_manager(
                                               nullptr),
-                                          _console_server(nullptr), _lua_eviroment(nullptr), _filesystem(nullptr) {}
+                                          _console_server(nullptr), _lua_eviroment(nullptr), _filesystem(nullptr),
+                                          _renderer(nullptr) {}
 
             virtual float get_delta_time() const final {
                 return this->_delta_time;
@@ -123,6 +126,7 @@ namespace cetech {
                 _package_manager = PackageManager::make(memory_globals::default_allocator());
                 _console_server = ConsoleServer::make(memory_globals::default_allocator());
                 _lua_eviroment = LuaEnviroment::make(memory_globals::default_allocator());
+                _renderer = Renderer::make(memory_globals::default_allocator());
 
 
                 _console_server->register_command("lua.execute", &cmd_lua_execute);
@@ -167,6 +171,7 @@ namespace cetech {
                 TaskManager::destroy(memory_globals::default_allocator(), _task_manager);
                 ConsoleServer::destroy(memory_globals::default_allocator(), _console_server);
                 LuaEnviroment::destroy(memory_globals::default_allocator(), _lua_eviroment);
+                Renderer::destroy(memory_globals::default_allocator(), _renderer);
                 disk_filesystem::destroy(memory_globals::default_allocator(), _filesystem);
 
                 os::shutdown();
@@ -182,9 +187,11 @@ namespace cetech {
                     main_window = window::make_window(
                         "aaa",
                         window::WINDOWPOS_CENTERED, window::WINDOWPOS_CENTERED,
-                        800, 600,
+                        cvars::screen_width.value_i, cvars::screen_height.value_i,
                         window::WINDOW_NOFLAG
                         );
+
+                    _renderer->init(main_window);
                 }
 
                 float dt = 0.0f;
@@ -202,6 +209,8 @@ namespace cetech {
                     os::frame_start();
                     keyboard::frame_start();
                     mouse::retrive_state();
+
+                    _renderer->begin_frame();
 
                     TaskManager::TaskID frame_task = _task_manager->add_empty_begin(0);
                     TaskManager::TaskID console_server_task = _task_manager->add_begin(
@@ -233,6 +242,9 @@ namespace cetech {
                     ++(this->_frame_id);
 
                     _task_manager->wait(frame_task);
+
+                    _renderer->end_frame();
+                    window::update(main_window);
                 }
 
                 log::info("main", "Bye Bye");

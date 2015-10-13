@@ -30,5 +30,7 @@ namespace cetech {
 
         void set_title(const Window& w, const char* title);
         const char* get_title(const Window& w);
+
+        void update(const Window& w);
     }
 }

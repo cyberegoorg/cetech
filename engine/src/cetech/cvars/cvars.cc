@@ -15,5 +15,8 @@ namespace cetech {
 
         CVar compiler_platform("compiler.platform", "Compiler platform", xstr(CETECH_PLATFORM), CVar::FLAG_CONST);
         CVar compiler_core_path("compiler.core_path", "Compiler core path", "./core/", CVar::FLAG_CONST);
+
+        CVar screen_width("screen.width", "Screen width", 800);
+        CVar screen_height("screen.height", "Screen height", 600);
     }
 }

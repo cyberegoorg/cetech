@@ -75,6 +75,11 @@ namespace cetech {
         const char* get_title(const Window& w) {
             return SDL_GetWindowTitle(w.wnd);
         }
+
+        void update(const Window& w) {
+            SDL_UpdateWindowSurface(w.wnd);
+        }
+
     }
 }
 
