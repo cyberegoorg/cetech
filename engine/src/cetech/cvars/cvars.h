@@ -15,5 +15,8 @@ namespace cetech {
 
         extern CVar compiler_platform;
         extern CVar compiler_core_path;
+
+        extern CVar screen_width;
+        extern CVar screen_height;
     }
 }

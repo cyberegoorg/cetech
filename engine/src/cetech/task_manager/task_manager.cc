@@ -59,7 +59,7 @@ namespace cetech {
 
                 uint32_t core_count = cpu::core_count();
 
-                static const uint32_t main_threads_count = 1;
+                static const uint32_t main_threads_count = 1 + 1;
                 const uint32_t worker_count = core_count - main_threads_count;
 
                 log::info("task", "Core count: %u", core_count);

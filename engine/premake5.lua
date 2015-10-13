@@ -179,7 +179,10 @@ project "cetech1"
       'celib_static',
       
       "luajit",
-      "enet"
+      "enet",
+      "bgfxDebug",
+      "GL",
+      "X11"
     }
 
     filter {}
