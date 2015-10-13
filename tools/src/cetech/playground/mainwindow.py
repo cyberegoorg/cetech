@@ -1,7 +1,7 @@
 import argparse
 
 from PyQt5.QtCore import QThread, Qt, QFileSystemWatcher, QDirIterator
-from PyQt5.QtWidgets import QMainWindow, QDockWidget, QTabWidget
+from PyQt5.QtWidgets import QMainWindow, QDockWidget, QTabWidget, QOpenGLWidget, QWidget
 
 from cetech.playground.logwidget import LogWidget
 from cetech.playground.scripteditor import ScriptEditor
@@ -57,6 +57,12 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.script_editor_dock_widget.setWidget(self.script_editor_widget)
         self.addDockWidget(Qt.TopDockWidgetArea, self.script_editor_dock_widget)
 
+        self.ogl_dock = QDockWidget(self)
+        self.ogl_dock.hide()
+        self.ogl_widget = QWidget(self)
+        self.ogl_dock.setWidget(self.ogl_widget)
+        self.addDockWidget(Qt.TopDockWidgetArea, self.ogl_dock)
+
         self.tabifyDockWidget(self.assetb_dock_widget, self.log_dock_widget)
 
         self.assetb_widget.asset_clicked.connect(self.open_asset)
@@ -78,14 +84,16 @@ class MainWindow(QMainWindow, Ui_MainWindow):
     def open_project(self, name, dir):
         self.project.open_project(name, dir)
 
-        self.project.run_cetech(build_type=CetechProject.BUILD_DEBUG, compile=True, continu=True, daemon=True)
+        #self.project.run_cetech(build_type=CetechProject.BUILD_DEBUG, compile=True, continu=True, daemon=True)
+        self.project.run_cetech(build_type=CetechProject.BUILD_DEBUG, compile=True, continu=True, wid=self.ogl_widget.winId())
         self.api.start(QThread.LowPriority)
 
         self.assetb_widget.open_project(self.project.project_dir)
         self.assetb_dock_widget.show()
         self.log_dock_widget.show()
+        self.ogl_dock.show()
 
-        self.watch_project_dir();
+        self.watch_project_dir()
 
     def watch_project_dir(self):
         files = self.file_watch.files()

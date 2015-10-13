@@ -191,14 +191,23 @@ namespace cetech {
 
             virtual void run() final {
                 if (!_flags.daemon_mod) {
+		  if (command_line_globals::has_argument("wid")) {
+		    char *ptr;
+		    long wid;
+
+		    wid = strtol(command_line_globals::get_parameter("wid"), &ptr, 10);
+		    main_window = window::make_from((void*)wid);
+		    
+		  } else {
                     main_window = window::make_window(
                         "aaa",
                         window::WINDOWPOS_CENTERED, window::WINDOWPOS_CENTERED,
                         cvars::screen_width.value_i, cvars::screen_height.value_i,
                         window::WINDOW_NOFLAG
                         );
-
-                    _renderer->init(main_window);
+		  }
+		  
+		  _renderer->init(main_window);
                 }
 
                 float dt = 0.0f;

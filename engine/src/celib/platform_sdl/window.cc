@@ -64,6 +64,19 @@ namespace cetech {
             return res;
         }
 
+	Window make_from(void* hndl) {
+	  Window res;
+	  
+	  res.wnd = SDL_CreateWindowFrom(hndl);
+
+	  if (res.wnd == nullptr) {
+	      log::error("sys", "Could not create window: %s", SDL_GetError());
+	  }
+	  
+	  return res;
+	}
+
+        
         void destroy_window(const Window& w) {
             SDL_DestroyWindow(w.wnd);
         }
