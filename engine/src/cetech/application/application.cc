@@ -228,7 +228,7 @@ namespace cetech {
                 uint32_t now_ticks = 0;
                 while (_flags.run) {
 		    if( need_resize ) {
-		      window::resize(main_window, resize_w, resize_h);
+		      //window::resize(main_window, resize_w, resize_h);
 		      _renderer->resize(resize_w, resize_h);
 		      log::info("app", "resize: %d, %d", resize_w, resize_h);
 		      need_resize = false;
