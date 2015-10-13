@@ -81,6 +81,7 @@ namespace cetech {
             struct {
                 char run : 1;
                 char pause : 1;
+                char daemon_mod: 1;
             } _flags;
 
 
@@ -88,7 +89,9 @@ namespace cetech {
                                           _resource_manager(nullptr), _package_manager(nullptr), _develop_manager(
                                               nullptr),
                                           _console_server(nullptr), _lua_eviroment(nullptr), _filesystem(nullptr),
-                                          _renderer(nullptr) {}
+                                          _renderer(nullptr) {
+					    _flags = {0};
+					  }
 
             virtual float get_delta_time() const final {
                 return this->_delta_time;
@@ -102,6 +105,10 @@ namespace cetech {
             virtual void init(int argc, const char** argv) final {
                 command_line_globals::set_args(argc, argv);
 
+		if (command_line_globals::has_argument("daemon", 'd')) {
+		  _flags.daemon_mod = 1;
+		}
+		
                 log::register_handler(&log_handlers::stdout_handler);
 
                 posix_init();
@@ -183,7 +190,7 @@ namespace cetech {
             }
 
             virtual void run() final {
-                if (!command_line_globals::has_argument("daemon", 'd')) {
+                if (!_flags.daemon_mod) {
                     main_window = window::make_window(
                         "aaa",
                         window::WINDOWPOS_CENTERED, window::WINDOWPOS_CENTERED,
@@ -210,7 +217,9 @@ namespace cetech {
                     keyboard::frame_start();
                     mouse::retrive_state();
 
-                    _renderer->begin_frame();
+		    if (!_flags.daemon_mod) {
+		      _renderer->begin_frame();
+		    }
 
                     TaskManager::TaskID frame_task = _task_manager->add_empty_begin(0);
                     TaskManager::TaskID console_server_task = _task_manager->add_begin(
@@ -243,8 +252,10 @@ namespace cetech {
 
                     _task_manager->wait(frame_task);
 
-                    _renderer->end_frame();
-                    window::update(main_window);
+		    if (!_flags.daemon_mod) {
+		      _renderer->end_frame();
+		      window::update(main_window);
+		    }
                 }
 
                 log::info("main", "Bye Bye");
