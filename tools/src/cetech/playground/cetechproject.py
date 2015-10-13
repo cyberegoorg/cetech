@@ -77,7 +77,7 @@ class CetechProject(object):
 
         return os.path.join(engine_bin_path, platform_dir, 'bin', exec_name)
 
-    def run_cetech(self, build_type, compile=False, continu=False, wait=True, daemon=False, port=None):
+    def run_cetech(self, build_type, compile=False, continu=False, wait=True, daemon=False, port=None, wid=None):
         args = [
             "-s %s" % self.source_dir,
             "-b %s" % self.build_dir,
@@ -98,6 +98,10 @@ class CetechProject(object):
         if daemon:
             args.append("--daemon")
 
+        if wid:
+            args.append("--wid %s"% int(wid))
+
+        print(args)
         cmd = "%s %s" % (self.get_executable_path(build_type), ' '.join(args))
 
         process = QProcess()
