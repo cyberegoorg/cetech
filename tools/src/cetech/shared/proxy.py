@@ -14,7 +14,7 @@ class ConsoleProxy(object):
         self.host = host
         self.peer = self.host.connect(self.address, 10)
 
-        self.connect = False
+        self.connected = False
         self.disconnecting = False
 
         self.handlers = {}
@@ -37,9 +37,9 @@ class ConsoleProxy(object):
         self._safe_disconnect()
 
     def _safe_disconnect(self):
-        if self.connect:
+        if self.connected:
             self.peer.disconnect_now()
-            self.connect = False
+            self.connected = False
             self.disconnecting = False
 
     def tick(self):
@@ -58,10 +58,10 @@ class ConsoleProxy(object):
         if event.type == enet.EVENT_TYPE_NONE: self.service_sleep()
 
         if event.type == enet.EVENT_TYPE_CONNECT:
-            self.connect = True
+            self.connected = True
 
         elif event.type == enet.EVENT_TYPE_DISCONNECT:
-            self.connect = False
+            self.connected = False
 
         elif event.type == enet.EVENT_TYPE_RECEIVE:
             s = event.packet.data.decode("utf-8")
@@ -77,7 +77,7 @@ class ConsoleProxy(object):
             h(**kwargs)
 
     def send_command(self, cmd_name, **kwargs):
-        if not self.connect:
+        if not self.connected:
             return
 
         command_json = {

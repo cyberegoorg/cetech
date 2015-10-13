@@ -6,6 +6,7 @@
 #include "cetech/package/package_manager.h"
 #include "cetech/develop/develop_manager.h"
 #include "cetech/develop/console_server.h"
+#include "cetech/renderer/renderer.h"
 #include "cetech/lua/lua_enviroment.h"
 
 #include <inttypes.h>
@@ -23,6 +24,8 @@ namespace cetech {
             virtual void run() = 0;
             virtual void quit() = 0;
 
+	    virtual void resize(uint32_t w, uint32_t h) = 0;
+	    
             virtual bool is_run() = 0;
 
             virtual TaskManager& task_manager() = 0;
@@ -32,6 +35,8 @@ namespace cetech {
             virtual DevelopManager& develop_manager() = 0;
             virtual ConsoleServer& console_server() = 0;
             virtual LuaEnviroment& lua_enviroment() = 0;
+	    virtual Renderer& renderer() = 0;
+
 
             static Application* make(Allocator& allocator);
             static void destroy(Allocator& allocator, Application* rm);

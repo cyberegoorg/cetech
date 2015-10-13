@@ -29,6 +29,14 @@ namespace cetech {
         return 0;
     }
 
+    static int application_resize(lua_State* L) {
+        LuaStack s(L);
+
+        application_globals::app().resize(s.to_int(1), s.to_int(2));
+
+        return 0;
+    }
+    
     namespace lua_application {
         static const char* module_name = "Application";
 
@@ -36,7 +44,9 @@ namespace cetech {
             env.set_module_function(module_name, "quit", application_quit);
             env.set_module_function(module_name, "get_frame_id", application_get_frame_id);
             env.set_module_function(module_name, "get_delta_time", application_get_delta_time);
-            env.set_module_function(module_name, "console_send", application_console_send);
+
+	    env.set_module_function(module_name, "console_send", application_console_send);
+	    env.set_module_function(module_name, "resize", application_resize);
         }
     }
 }

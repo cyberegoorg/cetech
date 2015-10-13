@@ -11,3 +11,5 @@ class ConsoleAPI(ConsoleProxy):
     def autocomplete_list(self):
         self.lua_execute('autocomplite_list()')
 
+    def resize(self, w, h):
+        self.lua_execute('Application.resize(%s, %s)' % (w, h))
