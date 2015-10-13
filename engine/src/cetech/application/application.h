@@ -23,8 +23,6 @@ namespace cetech {
             virtual void shutdown() = 0;
             virtual void run() = 0;
             virtual void quit() = 0;
-
-	    virtual void resize(uint32_t w, uint32_t h) = 0;
 	    
             virtual bool is_run() = 0;
 

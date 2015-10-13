@@ -7,6 +7,7 @@
 #include "bgfx/bgfxplatform.h"
 #include "bgfx/bgfxdefines.h"
 
+// TODO: rewrite, 
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_syswm.h>
 uint8_t sdlSetWindow(SDL_Window* _window) {
@@ -35,8 +36,14 @@ namespace cetech {
             friend class Renderer;
 
             uint32_t frame_id;
+	    bool need_resize;
+	    uint32_t resize_w, resize_h;
 
-            RendererImplementation() : frame_id(0) {}
+            RendererImplementation() : frame_id(0) {
+				      need_resize = false;
+			      resize_h = 0;
+			      resize_w = 0;
+	    }
 
             virtual ~RendererImplementation() final {
                 bgfx::shutdown();
@@ -51,14 +58,19 @@ namespace cetech {
 
 
 	    virtual void resize(uint32_t w, uint32_t h) final {
-	      bgfx::reset(w, h, 0);
-              bgfx::setViewRect(0, 0, 0, w, h);
-	      bgfx::submit(0, BGFX_INVALID_HANDLE);
+	      need_resize = true;
+	      resize_w = w;
+	      resize_h = h;
 	    }
 
             virtual void begin_frame() final {
-                bgfx::setDebug(BGFX_DEBUG_STATS | BGFX_DEBUG_TEXT);
+		if( need_resize ) {
+		  bgfx::reset(resize_w, resize_h, 0);
+		  bgfx::setViewRect(0, 0, 0, resize_w, resize_h);
+		  need_resize = false;
+		}
 
+                bgfx::setDebug(BGFX_DEBUG_STATS | BGFX_DEBUG_TEXT);
 		bgfx::setViewClear(
                     0
                     , BGFX_CLEAR_COLOR | BGFX_CLEAR_DEPTH

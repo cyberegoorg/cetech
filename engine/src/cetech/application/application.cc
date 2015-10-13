@@ -84,18 +84,13 @@ namespace cetech {
                 char daemon_mod: 1;
             } _flags;
 
-	    bool need_resize;
-	    uint32_t resize_w, resize_h;
-
             ApplicationImplementation() : _frame_id(0), _last_frame_ticks(0), _delta_time(0),
                                           _resource_manager(nullptr), _package_manager(nullptr), _develop_manager(
                                               nullptr),
                                           _console_server(nullptr), _lua_eviroment(nullptr), _filesystem(nullptr),
                                           _renderer(nullptr) {
 					    _flags = {0};
-					    need_resize = false;
-					    resize_h = 0;
-					    resize_w = 0;
+
 					  }
 
             virtual float get_delta_time() const final {
@@ -194,15 +189,6 @@ namespace cetech {
                 d->_console_server->tick();
             }
 
-
-	    virtual void resize(uint32_t w, uint32_t h) final {
-	      //window::resize(main_window, w, h);
-	      //log::info("app", "resize %dx%d", w, h);
-	      need_resize = true;
-	      resize_w = w;
-	      resize_h = h;
-	    }
-
             virtual void run() final {
                 if (!_flags.daemon_mod) {
 		  if (command_line_globals::has_argument("wid")) {
@@ -227,12 +213,7 @@ namespace cetech {
                 float dt = 0.0f;
                 uint32_t now_ticks = 0;
                 while (_flags.run) {
-		    if( need_resize ) {
-		      //window::resize(main_window, resize_w, resize_h);
-		      _renderer->resize(resize_w, resize_h);
-		      log::info("app", "resize: %d, %d", resize_w, resize_h);
-		      need_resize = false;
-		    }
+
 		  
                     now_ticks = os::get_ticks();
                     dt = (now_ticks - this->_last_frame_ticks) * 0.001f;
