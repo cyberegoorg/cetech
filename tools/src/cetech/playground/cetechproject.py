@@ -66,8 +66,14 @@ class CetechProject(object):
         return self.open_project(project_dir)
 
     def killall_process(self):
+        self.dump()
         for p in self.spawned_process:
             p.terminate()
+
+    def dump(self):
+        for p in self.spawned_process:
+            out, err = bytearray(p.readAllStandardOutput()).decode(), bytearray(p.readAllStandardError()).decode()
+            print("out:\n%s\n err:\n%s\n" % (out, err))
 
     def get_executable_path(self, build_type):
         engine_bin_path = '../../engine/.build/'
@@ -99,7 +105,7 @@ class CetechProject(object):
             args.append("--daemon")
 
         if wid:
-            args.append("--wid %s"% int(wid))
+            args.append("--wid %s" % int(wid))
 
         print(args)
         cmd = "%s %s" % (self.get_executable_path(build_type), ' '.join(args))

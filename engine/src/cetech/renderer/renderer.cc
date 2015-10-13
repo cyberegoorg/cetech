@@ -47,15 +47,18 @@ namespace cetech {
 
                 bgfx::init(bgfx::RendererType::OpenGL, NULL, NULL);
                 bgfx::reset(cvars::screen_width.value_i, cvars::screen_height.value_i, 0);
-
-                bgfx::setViewClear(
+		bgfx::setViewClear(
                     0
                     , BGFX_CLEAR_COLOR | BGFX_CLEAR_DEPTH
-                    , 0x303030ff
+                    , 0x66CCFFff
                     , 1.0f
                     , 0);
             };
 
+
+	    virtual void resize(uint32_t w, uint32_t h) final {
+	      bgfx::reset(w, h, 0);
+	    }
 
             virtual void begin_frame() final {
                 bgfx::submit(0, BGFX_INVALID_HANDLE);

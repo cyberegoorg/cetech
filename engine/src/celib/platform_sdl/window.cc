@@ -93,6 +93,11 @@ namespace cetech {
             SDL_UpdateWindowSurface(w.wnd);
         }
 
+	void resize(const Window& w, uint32_t width, uint32_t height) {
+	  SDL_SetWindowSize(w.wnd, width, height);
+	}
+
+        
     }
 }
 

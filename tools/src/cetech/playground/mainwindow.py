@@ -5,10 +5,25 @@ from PyQt5.QtWidgets import QMainWindow, QDockWidget, QTabWidget, QOpenGLWidget,
 
 from cetech.playground.logwidget import LogWidget
 from cetech.playground.scripteditor import ScriptEditor
+from cetech.shared.proxy import ConsoleProxy
 from cetech.shared.qtapi import QtConsoleAPI
 from cetech.playground.assetbrowser import AssetBrowser
 from cetech.playground.cetechproject import CetechProject
 from cetech.playground.ui.mainwindow import Ui_MainWindow
+
+
+class CetechWidget(QWidget):
+    def __init__(self, parent, api: ConsoleProxy):
+        self.api = api
+        super(CetechWidget, self).__init__(parent)
+
+    def resizeEvent(self, event):
+        size = event.size()
+
+        if self.api.connected:
+            self.api.resize(size.width(), size.height())
+
+        event.accept()
 
 
 class MainWindow(QMainWindow, Ui_MainWindow):
@@ -59,7 +74,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
         self.ogl_dock = QDockWidget(self)
         self.ogl_dock.hide()
-        self.ogl_widget = QWidget(self)
+        self.ogl_widget = CetechWidget(self, self.api)
         self.ogl_dock.setWidget(self.ogl_widget)
         self.addDockWidget(Qt.TopDockWidgetArea, self.ogl_dock)
 
@@ -84,8 +99,9 @@ class MainWindow(QMainWindow, Ui_MainWindow):
     def open_project(self, name, dir):
         self.project.open_project(name, dir)
 
-        #self.project.run_cetech(build_type=CetechProject.BUILD_DEBUG, compile=True, continu=True, daemon=True)
-        self.project.run_cetech(build_type=CetechProject.BUILD_DEBUG, compile=True, continu=True, wid=self.ogl_widget.winId())
+        # self.project.run_cetech(build_type=CetechProject.BUILD_DEBUG, compile=True, continu=True, daemon=True)
+        self.project.run_cetech(build_type=CetechProject.BUILD_DEBUG, compile=True, continu=True,
+                                wid=self.ogl_widget.winId())
         self.api.start(QThread.LowPriority)
 
         self.assetb_widget.open_project(self.project.project_dir)
@@ -150,7 +166,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
         self.statusbar.showMessage("Disconnecting ...")
 
-        while self.api.connect:
+        while self.api.connected:
             self.api.tick()
 
         self.statusbar.showMessage("Disconnected")
