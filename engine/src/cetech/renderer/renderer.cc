@@ -46,25 +46,26 @@ namespace cetech {
                 sdlSetWindow(window.wnd);
 
                 bgfx::init(bgfx::RendererType::OpenGL, NULL, NULL);
-                bgfx::reset(cvars::screen_width.value_i, cvars::screen_height.value_i, 0);
+                resize(cvars::screen_width.value_i, cvars::screen_height.value_i);
+            };
+
+
+	    virtual void resize(uint32_t w, uint32_t h) final {
+	      bgfx::reset(w, h, 0);
+              bgfx::setViewRect(0, 0, 0, w, h);
+	      bgfx::submit(0, BGFX_INVALID_HANDLE);
+	    }
+
+            virtual void begin_frame() final {
+                bgfx::setDebug(BGFX_DEBUG_STATS | BGFX_DEBUG_TEXT);
+
 		bgfx::setViewClear(
                     0
                     , BGFX_CLEAR_COLOR | BGFX_CLEAR_DEPTH
                     , 0x66CCFFff
                     , 1.0f
                     , 0);
-            };
-
-
-	    virtual void resize(uint32_t w, uint32_t h) final {
-	      bgfx::reset(w, h, 0);
-	    }
-
-            virtual void begin_frame() final {
-                bgfx::submit(0, BGFX_INVALID_HANDLE);
-
-                bgfx::setDebug(BGFX_DEBUG_STATS | BGFX_DEBUG_TEXT);
-                bgfx::setViewRect(0, 0, 0, cvars::screen_width.value_i, cvars::screen_height.value_i);
+		
                 bgfx::dbgTextClear(0, 0);
                 bgfx::dbgTextPrintf(0, 2, 0x6f, "Description: Initialization and debug text.");
 
