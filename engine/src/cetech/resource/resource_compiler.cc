@@ -190,7 +190,8 @@ namespace cetech {
                 FSFile* out_config = _build_fs->open("config.json", FSFile::WRITE);
 
                 size_t size = src_config->size();
-                char data[size] = {0};
+                char data[size];
+                memset(data, 0, size);
                 src_config->read(data, size);
                 source_fs->close(src_config);
 
@@ -208,7 +209,8 @@ namespace cetech {
                 }
 
                 size_t size = build_index_file->size();
-                char data[size + 1] = {0};
+                char data[size + 1];
+                memset(data, 0, size+1);
                 build_index_file->read(data, size);
 
                 build_index.Parse(data);
