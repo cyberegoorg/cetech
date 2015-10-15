@@ -4,7 +4,7 @@ from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QListWidgetItem, QDialog
 
 from cetech.playground.addexistingdialog import AddExistItemDialog
-from cetech.playground.ui.projectmanagerdialog import Ui_Dialog
+from cetech.playground.qt.ui.projectmanagerdialog import Ui_Dialog
 
 
 class ProjectManagerDialog(QDialog, Ui_Dialog):

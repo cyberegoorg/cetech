@@ -4,8 +4,8 @@ from PyQt5.QtCore import QDateTime
 from PyQt5.QtGui import QColor
 from PyQt5.QtWidgets import QFrame, QStyle, QTreeWidgetItem
 
-from cetech.shared.proxy import ConsoleProxy
-from cetech.playground.ui.logwidget import Ui_LogWidget
+from cetech.engine.proxy import ConsoleProxy
+from cetech.playground.qt.ui.logwidget import Ui_LogWidget
 
 
 class LogWidget(QFrame, Ui_LogWidget):

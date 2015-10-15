@@ -4,7 +4,7 @@ from PyQt5.QtWidgets import QApplication
 
 from cetech.playground.mainwindow import MainWindow
 from cetech.playground.projectmanagerdialog import ProjectManagerDialog
-from cetech.playground.rc.playground import qInitResources
+from cetech.playground.qt.rc.playground import qInitResources
 
 qInitResources()
 

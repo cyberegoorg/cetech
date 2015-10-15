@@ -1,15 +1,15 @@
 import argparse
 
 from PyQt5.QtCore import QThread, Qt, QFileSystemWatcher, QDirIterator
-from PyQt5.QtWidgets import QMainWindow, QDockWidget, QTabWidget, QOpenGLWidget, QWidget
+from PyQt5.QtWidgets import QMainWindow, QDockWidget, QTabWidget, QWidget
 
 from cetech.playground.logwidget import LogWidget
 from cetech.playground.scripteditor import ScriptEditor
-from cetech.shared.proxy import ConsoleProxy
-from cetech.shared.qtapi import QtConsoleAPI
+from cetech.engine.proxy import ConsoleProxy
+from cetech.playground.engine.qtapi import QtConsoleAPI
 from cetech.playground.assetbrowser import AssetBrowser
 from cetech.playground.cetechproject import CetechProject
-from cetech.playground.ui.mainwindow import Ui_MainWindow
+from cetech.playground.qt.ui.mainwindow import Ui_MainWindow
 
 
 class CetechWidget(QWidget):
