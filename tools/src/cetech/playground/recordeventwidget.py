@@ -16,16 +16,14 @@ class RecordEventWidget(QFrame, Ui_RecordEventsWidget):
         if etype not in ('EVENT_RECORD_FLOAT',):
             return
 
-
         name = kwargs['name']
         value = kwargs['value']
 
         items = self.record_treewidget.findItems(name, Qt.MatchExactly)
 
-        if  not len(items):
+        if not len(items):
             item = QTreeWidgetItem([name, str(value)])
 
             self.record_treewidget.addTopLevelItem(item)
         else:
             items[0].setText(1, str(value))
-
