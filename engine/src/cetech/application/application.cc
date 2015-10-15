@@ -138,6 +138,7 @@ namespace cetech {
 
                 _console_server->register_command("lua.execute", &cmd_lua_execute);
                 _console_server->register_command("resource_compiler.compile_all", &cmd_compile_all);
+		_console_server->register_command("renderer.resize", cmd_renderer_resize);
 
                 register_resources();
 
@@ -366,6 +367,12 @@ namespace cetech {
             static void cmd_compile_all(const rapidjson::Document& in, rapidjson::Document& out) {
                 application_globals::app().resource_compiler().compile_all_resource();
             }
+
+            static void cmd_renderer_resize(const rapidjson::Document& in, rapidjson::Document& out) {
+	      const uint32_t width = in["args"]["width"].GetInt();
+	      const uint32_t height = in["args"]["height"].GetInt();
+	      application_globals::app().renderer().resize(width, height);
+	    }
 
             void load_config_json() {
                 FSFile* f = _filesystem->open("config.json", FSFile::READ);
