@@ -36,7 +36,7 @@ namespace cetech {
 
         return 0;
     }
-    
+
     namespace lua_application {
         static const char* module_name = "Application";
 

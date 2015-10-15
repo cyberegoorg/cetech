@@ -56,7 +56,6 @@ namespace cetech {
                 resize(cvars::screen_width.value_i, cvars::screen_height.value_i);
             };
 
-
 	    virtual void resize(uint32_t w, uint32_t h) final {
 	      need_resize = true;
 	      resize_w = w;
@@ -65,6 +64,9 @@ namespace cetech {
 
             virtual void begin_frame() final {
 		if( need_resize ) {
+		  cvar::set(cvars::screen_width, (int)resize_w);
+		  cvar::set(cvars::screen_height, (int)resize_h);
+	      
 		  bgfx::reset(resize_w, resize_h, 0);
 		  bgfx::setViewRect(0, 0, 0, resize_w, resize_h);
 		  need_resize = false;
