@@ -1,29 +1,17 @@
 import argparse
 
 from PyQt5.QtCore import QThread, Qt, QFileSystemWatcher, QDirIterator
-from PyQt5.QtWidgets import QMainWindow, QDockWidget, QTabWidget, QWidget
+from PyQt5.QtWidgets import QMainWindow, QDockWidget, QTabWidget
+
+from cetech.playground.qt.ui.mainwindow import Ui_MainWindow
 
 from cetech.playground.logwidget import LogWidget
 from cetech.playground.scripteditor import ScriptEditor
-from cetech.engine.proxy import ConsoleProxy
 from cetech.playground.engine.qtapi import QtConsoleAPI
-from cetech.playground.assetbrowser import AssetBrowser
 from cetech.playground.engine.cetechproject import CetechProject
-from cetech.playground.qt.ui.mainwindow import Ui_MainWindow
-
-
-class CetechWidget(QWidget):
-    def __init__(self, parent, api: ConsoleProxy):
-        self.api = api
-        super(CetechWidget, self).__init__(parent, Qt.ForeignWindow)
-
-    def resizeEvent(self, event):
-        size = event.size()
-
-        if self.api.connected:
-            self.api.resize(size.width(), size.height())
-
-        event.accept()
+from cetech.playground.assetbrowser import AssetBrowser
+from cetech.playground.engine.cetechwidget import CetechWidget
+from cetech.playground.recordeventwidget import RecordEventWidget
 
 
 class MainWindow(QMainWindow, Ui_MainWindow):
@@ -71,6 +59,14 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.script_editor_dock_widget.setFeatures(QDockWidget.AllDockWidgetFeatures)
         self.script_editor_dock_widget.setWidget(self.script_editor_widget)
         self.addDockWidget(Qt.TopDockWidgetArea, self.script_editor_dock_widget)
+
+        self.recorded_event_widget = RecordEventWidget(api=self.api)
+        self.recorded_event_dock_widget = QDockWidget(self)
+        self.recorded_event_dock_widget.setWindowTitle("Recorded events")
+        self.recorded_event_dock_widget.hide()
+        self.recorded_event_dock_widget.setFeatures(QDockWidget.AllDockWidgetFeatures)
+        self.recorded_event_dock_widget.setWidget(self.recorded_event_widget)
+        self.addDockWidget(Qt.RightDockWidgetArea, self.recorded_event_dock_widget)
 
         self.ogl_dock = QDockWidget(self)
         self.ogl_dock.hide()
@@ -158,6 +154,9 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
     def open_script_editor(self):
         self.script_editor_dock_widget.show()
+
+    def open_recorded_events(self):
+        self.recorded_event_dock_widget.show()
 
     def closeEvent(self, evnt):
         self.api.disconnect()

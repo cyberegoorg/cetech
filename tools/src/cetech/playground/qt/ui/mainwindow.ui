@@ -39,7 +39,14 @@
     <property name="title">
      <string>Win&amp;dows</string>
     </property>
+    <widget class="QMenu" name="menuDebug">
+     <property name="title">
+      <string>Debug</string>
+     </property>
+     <addaction name="actionRecorded_events"/>
+    </widget>
     <addaction name="actionLua_editor"/>
+    <addaction name="menuDebug"/>
    </widget>
    <addaction name="menu_File"/>
    <addaction name="menuTools"/>
@@ -61,6 +68,11 @@
   <action name="actionLua_editor">
    <property name="text">
     <string>&amp;Script editor</string>
+   </property>
+  </action>
+  <action name="actionRecorded_events">
+   <property name="text">
+    <string>Recorded events</string>
    </property>
   </action>
  </widget>
@@ -98,10 +110,27 @@
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>actionRecorded_events</sender>
+   <signal>triggered()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>open_recorded_events()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>366</x>
+     <y>285</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
  <slots>
   <slot>open_project()</slot>
   <slot>send_command()</slot>
   <slot>open_script_editor()</slot>
+  <slot>open_recorded_events()</slot>
  </slots>
 </ui>
