@@ -3,7 +3,7 @@ import os
 from PyQt5.QtCore import QDir, pyqtSignal
 from PyQt5.QtWidgets import QMainWindow, QFileSystemModel
 
-from cetech.playground.ui.assetbrowser import Ui_MainWindow
+from cetech.playground.qt.ui.assetbrowser import Ui_MainWindow
 
 
 class AssetBrowser(QMainWindow, Ui_MainWindow):

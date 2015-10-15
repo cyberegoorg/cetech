@@ -1,6 +1,6 @@
 from PyQt5.QtCore import QThread
 
-from cetech.shared.api import ConsoleAPI
+from cetech.engine.api import ConsoleAPI
 
 
 class QtConsoleAPI(ConsoleAPI, QThread):
