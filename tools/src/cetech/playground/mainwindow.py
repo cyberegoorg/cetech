@@ -8,7 +8,7 @@ from cetech.playground.scripteditor import ScriptEditor
 from cetech.engine.proxy import ConsoleProxy
 from cetech.playground.engine.qtapi import QtConsoleAPI
 from cetech.playground.assetbrowser import AssetBrowser
-from cetech.playground.cetechproject import CetechProject
+from cetech.playground.engine.cetechproject import CetechProject
 from cetech.playground.qt.ui.mainwindow import Ui_MainWindow
 
 
