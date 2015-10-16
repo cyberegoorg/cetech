@@ -5,6 +5,7 @@
 #include <ctime>
 
 #include "celib/log/log.h"
+#include "celib/macros.h"
 #include "cetech/develop/console_server.h"
 #include "cetech/application/application.h"
 #include "cetech/os/os.h"
@@ -52,6 +53,9 @@ namespace cetech {
                                    const char* where,
                                    const char* msg,
                                    void* data) {
+	    CE_UNUSED(time);
+	    CE_UNUSED(data);
+	  
             FILE* out;
 
             switch (level) {
@@ -63,9 +67,6 @@ namespace cetech {
                 out = stderr;
                 break;
             }
-
-            std::tm* gmtm = std::gmtime(&time);
-            //char* time_str = log_handlers_internal::time_to_utc_str(gmtm);
 
             flockfile(out);
             fprintf(out, level_format[level], level_to_str[level], where, msg);
@@ -94,14 +95,13 @@ namespace cetech {
                                            const char* msg,
                                            void* data) {
 
+	    CE_UNUSED(data);
+	  
             ConsoleServer& cs = application_globals::app().console_server();
 
             if (!cs.has_clients()) {
                 return;
             }
-
-            std::tm* gmtm = std::gmtime(&time);
-            char* time_str = log_handlers_internal::time_to_utc_str(gmtm);
 
             rapidjson::Document json_data;
             json_data.SetObject();

@@ -1,3 +1,5 @@
+#include "celib/macros.h"
+
 #include "cetech/lua/lua_enviroment.h"
 #include "cetech/lua/lua_stack.h"
 
@@ -12,6 +14,6 @@ namespace cetech {
     namespace lua_utils {
         static const char* module_name = "Utils";
 
-        void load_libs(LuaEnviroment& env) {}
+        void load_libs(LuaEnviroment& env) {CE_UNUSED(env);}
     }
 }

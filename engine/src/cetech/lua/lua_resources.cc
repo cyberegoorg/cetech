@@ -71,10 +71,10 @@ namespace cetech {
             lua_close(state);
         }
 
-        void* loader (FSFile* f, Allocator& a) {
+        char* loader (FSFile* f, Allocator& a) {
             const uint64_t f_sz = f->size();
 
-            void* mem = a.allocate(f_sz);
+            char* mem = (char*)a.allocate(f_sz);
             f->read(mem, f_sz);
 
             return mem;

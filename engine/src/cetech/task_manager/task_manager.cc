@@ -355,6 +355,6 @@ namespace cetech {
     }
 
     void TaskManager::destroy(Allocator& allocator, TaskManager* rm) {
-        MAKE_DELETE(memory_globals::default_allocator(), TaskManager, rm);
+        MAKE_DELETE(allocator, TaskManager, rm);
     }
 }

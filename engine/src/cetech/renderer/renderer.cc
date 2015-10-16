@@ -52,7 +52,7 @@ namespace cetech {
             virtual void init(Window window) final {
                 sdlSetWindow(window.wnd);
 
-                bgfx::init(bgfx::RendererType::OpenGL, NULL, NULL);
+                bgfx::init(bgfx::RendererType::OpenGL);
                 resize(cvars::screen_width.value_i, cvars::screen_height.value_i);
             };
 
@@ -96,6 +96,6 @@ namespace cetech {
     }
 
     void Renderer::destroy(Allocator& allocator, Renderer* pm) {
-        MAKE_DELETE(memory_globals::default_allocator(), Renderer, pm);
+        MAKE_DELETE(allocator, Renderer, pm);
     }
 }

@@ -23,7 +23,7 @@ namespace cetech {
 
             FileSystem* _fs;
 
-            Hash < void* > _data_map;
+            Hash < char* > _data_map;
             Hash < uint32_t > _data_refcount_map;
 
             Hash < resource_loader_clb_t > _load_clb_map;
@@ -38,7 +38,7 @@ namespace cetech {
                                                                                     _unload_clb_map(allocator),
                                                                                     autoreload(true) {}
 
-            virtual void load(void** loaded_data, StringId64_t type, const StringId64_t* names,
+            virtual void load(char** loaded_data, StringId64_t type, const StringId64_t* names,
                               const uint32_t count) final {
                 StringId64_t name = 0;
 
@@ -66,10 +66,11 @@ namespace cetech {
                                    type,
                                    name);
                         loaded_data[i] = nullptr;
+			_fs->close(f);
                         continue;
                     }
 
-                    void* data = clb(f, memory_globals::default_allocator());
+                    char* data = clb(f, memory_globals::default_allocator());
 
                     if (data == nullptr) {
                         log::error("resource_manager",
@@ -79,12 +80,12 @@ namespace cetech {
                     }
 
                     loaded_data[i] = data;
-close:
+
                     _fs->close(f);
                 }
             }
 
-            virtual void add_loaded(void** loaded_data,
+            virtual void add_loaded(char** loaded_data,
                                     StringId64_t type,
                                     const StringId64_t* names,
                                     const uint32_t count) final {
@@ -139,21 +140,21 @@ close:
             }
 
             void load_now(StringId64_t type, StringId64_t* names, const uint32_t count) {
-                Array < void* > loaded_data(memory_globals::default_allocator());
+                Array < char* > loaded_data(memory_globals::default_allocator());
                 array::reserve(loaded_data, count);
 
                 load(array::begin(loaded_data), type, names, count);
                 add_loaded(array::begin(loaded_data), type, names, count);
             }
 
-            virtual const void* get(StringId64_t type, StringId64_t name) final {
+            virtual const char* get(StringId64_t type, StringId64_t name) final {
                 if (autoreload) {
                     if (!can_get(type, &name, 1)) {
                         load_now(type, &name, 1);
                     }
                 }
 
-                return hash::get < void* > (this->_data_map, type ^ name, nullptr);
+                return hash::get < char* > (this->_data_map, type ^ name, nullptr);
             }
 
             virtual void register_loader(StringId64_t type, resource_loader_clb_t clb) final {
@@ -213,6 +214,6 @@ close:
     }
 
     void ResourceManager::destroy(Allocator& allocator, ResourceManager* rm) {
-        MAKE_DELETE(memory_globals::default_allocator(), ResourceManager, rm);
+        MAKE_DELETE(allocator, ResourceManager, rm);
     }
 }

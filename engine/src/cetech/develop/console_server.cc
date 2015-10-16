@@ -106,6 +106,8 @@ namespace cetech {
         }
 
         bool validate_packet(rapidjson::Document& document, const char* packet, const uint32_t size) {
+	    CE_UNUSED(size);
+	  
             document.Parse(packet);
 
             if (document.HasParseError()) {
@@ -124,8 +126,8 @@ namespace cetech {
         }
 
         void parse_packet(uint32_t client, const char* packet, const uint32_t size) {
-            //log::debug("client_server", "Client msg: %s", packet);
-
+	    CE_UNUSED(client);
+	  
             rapidjson::Document document;
             if (!validate_packet(document, packet, size)) {
                 return;
@@ -151,6 +153,6 @@ namespace cetech {
     }
 
     void ConsoleServer::destroy(Allocator& allocator, ConsoleServer* cs) {
-        MAKE_DELETE(memory_globals::default_allocator(), ConsoleServer, cs);
+        MAKE_DELETE(allocator, ConsoleServer, cs);
     }
 }

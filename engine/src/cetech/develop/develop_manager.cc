@@ -192,6 +192,6 @@ namespace cetech {
     }
 
     void DevelopManager::destroy(Allocator& allocator, DevelopManager* dm) {
-        MAKE_DELETE(memory_globals::default_allocator(), DevelopManager, dm);
+        MAKE_DELETE(allocator, DevelopManager, dm);
     }
 }

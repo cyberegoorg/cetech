@@ -3,6 +3,7 @@
 #include "celib/container/array.inl.h"
 #include "celib/string/stringid_types.h"
 #include "celib/memory/memory.h"
+#include "celib/macros.h"
 #include "cetech/os/os.h"
 #include "celib/string/stringid.inl.h"
 
@@ -21,6 +22,8 @@ namespace cetech {
 
 
         void compiler(const char* filename, FSFile* in, FSFile* out) {
+	    CE_UNUSED(filename);
+	  
             size_t sz_in = in->size();
 
             char tmp[4096] = {0};
@@ -72,10 +75,10 @@ namespace cetech {
             out->write(array::begin(names), sizeof(StringId64_t) * array::size(names));
         }
 
-        void* loader (FSFile* f, Allocator& a) {
+        char* loader (FSFile* f, Allocator& a) {
             const uint64_t f_sz = f->size();
 
-            void* mem = a.allocate(f_sz);
+            char* mem = (char*) a.allocate(f_sz);
             f->read(mem, f_sz);
 
             return mem;

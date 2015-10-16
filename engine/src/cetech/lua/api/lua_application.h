@@ -1,3 +1,5 @@
+#include "celib/macros.h"
+
 #include "cetech/lua/lua_enviroment.h"
 #include "cetech/lua/lua_stack.h"
 
@@ -5,6 +7,8 @@
 
 namespace cetech {
     static int application_quit(lua_State* L) {
+	CE_UNUSED(L);
+	
         application_globals::app().quit();
         return 0;
     }
