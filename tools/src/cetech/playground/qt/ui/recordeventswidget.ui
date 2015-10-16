@@ -24,12 +24,12 @@
     <widget class="QTreeWidget" name="record_treewidget">
      <column>
       <property name="text">
-       <string>name</string>
+       <string>Name</string>
       </property>
      </column>
      <column>
       <property name="text">
-       <string>value</string>
+       <string>Value</string>
       </property>
      </column>
     </widget>

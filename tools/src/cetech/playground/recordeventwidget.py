@@ -1,7 +1,7 @@
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QFrame, QTreeWidgetItem
 
-from cetech.shared.ui.recordeventswidget import Ui_RecordEventsWidget
+from cetech.playground.qt.ui.recordeventswidget import Ui_RecordEventsWidget
 
 
 class RecordEventWidget(QFrame, Ui_RecordEventsWidget):
