@@ -164,25 +164,34 @@ project "cetech1"
     }
 
     files {
-	ROOT_DIR .. "src/cetech/**.cc",
+	    ROOT_DIR .. "src/cetech/**.cc",
     }
 
+    filter "Release or Develop"
+        links {
+            "bgfxRelease",
+        }
 
-  filter ("system:linux","options:runtime=sdl2")
+    filter "Debug"
+        links {
+          "bgfxDebug",
+        }
+
+
+   filter ("system:linux","options:runtime=sdl2")
     links {
 	'SDL2',
 	'dl',
-	'pthread'
+	'pthread',
+	"GL",
+	"X11"
     }
-    
+
     links {
       'celib_static',
-      
+
       "luajit",
       "enet",
-      "bgfxDebug",
-      "GL",
-      "X11"
     }
 
     filter {}

@@ -230,7 +230,7 @@ namespace cetech {
 
                 FileSystem* core_fs = disk_filesystem::make(
                     memory_globals::default_allocator(), cvars::compiler_core_path.value_str);
-
+		
                 rapidjson::Document debug_index;
                 debug_index.SetObject();
 

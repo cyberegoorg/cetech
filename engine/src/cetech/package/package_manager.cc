@@ -135,8 +135,9 @@ namespace cetech {
             }
 
             virtual void flush(StringId64_t name) final {
-                while (!is_loaded(name)) {
-                    // TODO: Do some job for task manager #63
+	      TaskManager &tm = application_globals::app().task_manager();
+	      while (!is_loaded(name)) {
+		    tm.do_work();
                 }
             }
 

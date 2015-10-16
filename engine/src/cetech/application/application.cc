@@ -407,6 +407,7 @@ namespace cetech {
 
                 const char* source_dir = command_line_globals::get_parameter("source-dir", 's');
                 const char* build_dir = command_line_globals::get_parameter("build-dir", 'b');
+		const char* core_dir = command_line_globals::get_parameter("core-dir");
                 const char* port = command_line_globals::get_parameter("port", 'p');
 
                 if (source_dir) {
@@ -419,6 +420,11 @@ namespace cetech {
                     cvar_internal::force_set(cvars::rm_build_dir, buffer);
                 }
 
+                if (core_dir) {
+                    make_path(buffer, 1024, core_dir);
+                    cvar_internal::force_set(cvars::compiler_core_path, buffer);
+                }
+                
                 if (port) {
                     int p = 0;
                     sscanf(port, "%d", &p);

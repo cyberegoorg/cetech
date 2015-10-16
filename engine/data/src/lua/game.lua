@@ -1,4 +1,4 @@
-local log = require "cetech/log"
+local log = require "core/cetech/log"
 
 Game = Game or {}
 
@@ -13,7 +13,7 @@ function Game:init()
     log.error("boot.lua", "error")
     log.debug("boot.lua", "debug")
     
-    Package.load(pkg1)
+--     Package.load(pkg1)
 end
 
 function Game:shutdown()
@@ -30,8 +30,8 @@ function Game:update(dt)
     end
 
     
-    if Package.is_loaded(pkg1) then
-        print("unload")
-        Package.unload(pkg1)
-    end
+--     if Package.is_loaded(pkg1) then
+--         print("unload")
+--         Package.unload(pkg1)
+--     end
 end
