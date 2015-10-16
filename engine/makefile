@@ -103,7 +103,7 @@ linux-release32: .build/projects/gmake
 
 .PHONY: linux-debug64
 linux-debug64: .build/projects/gmake
-	+env CXX=clang++ ${MAKE} -C .build/projects/gmake config=debug_x64
+	+${MAKE} -C .build/projects/gmake config=debug_x64
 
 .PHONY: linux-develop64
 linux-develop64:  .build/projects/gmake

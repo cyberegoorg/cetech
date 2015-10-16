@@ -12,6 +12,7 @@
 #include "cetech/lua/api/lua_vector2.h"
 #include "cetech/lua/api/lua_vector3.h"
 #include "cetech/lua/api/lua_utils.h"
+#include "cetech/lua/api/lua_log.h"
 
 
 #include "celib/asserts.h"
@@ -75,6 +76,7 @@ namespace cetech {
             lua_vector3::load_libs(*this);
 
             lua_utils::load_libs(*this);
+	    lua_log::load_libs(*this);
         }
 
         virtual ~LuaEnviromentImlementation() final {

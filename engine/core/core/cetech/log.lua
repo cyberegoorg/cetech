@@ -1,19 +1,20 @@
-local ffi = require("ffi")
+function Log.info(where, frmt, ...)
+    Log._info(where, string.format(tostring(frmt), ...))
+end
 
-ffi.cdef[[
-    void lua_log_info(const char* where, const char* format, ...);
-    void lua_log_warning(const char* where, const char* format, ...);
-    void lua_log_error(const char* where, const char* format, ...);
-    void lua_log_debug(const char* where, const char* format, ...);
-]]
+function Log.warn(where, frmt, ...)
+    Log._warning(where, string.format(tostring(frmt), ...))
+end
 
-Log = Log or {}
-Log.info = ffi.C.lua_log_info
-Log.warn = ffi.C.lua_log_warning
-Log.error = ffi.C.lua_log_error
-Log.debug = ffi.C.lua_log_debug
+function Log.error(where, frmt, ...)
+    Log._error(where, string.format(tostring(frmt), ...))
+end
 
-print = function (frmt, ...)
+function Log.debug(where, frmt, ...)
+    Log._debug(where, string.format(tostring(frmt), ...))
+end
+
+function print(frmt, ...)
     Log.info("lua.print", "%s", string.format(tostring(frmt), ...))
 end
 
