@@ -75,7 +75,7 @@ LINUX_SIMD = fpu
 LINUX_RUNTIME = sdl2
 
 .build/projects/gmake:
-	$(PREMAKE5) --file=premake5.lua --simd=$(LINUX_SIMD) --runtime=$(LINUX_RUNTIME) gmake
+	$(PREMAKE5) --file=premake5.lua --cc=clang --simd=$(LINUX_SIMD) --runtime=$(LINUX_RUNTIME) gmake
 
 .PHONY: linux-all
 linux-all: linux-debug32 linux-release32 linux-debug64 linux-release64
@@ -103,7 +103,7 @@ linux-release32: .build/projects/gmake
 
 .PHONY: linux-debug64
 linux-debug64: .build/projects/gmake
-	+${MAKE} -C .build/projects/gmake config=debug_x64
+	+env CXX=clang++ ${MAKE} -C .build/projects/gmake config=debug_x64
 
 .PHONY: linux-develop64
 linux-develop64:  .build/projects/gmake

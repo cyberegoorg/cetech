@@ -4,6 +4,7 @@
 #include "cetech/filesystem/filesystem.h"
 
 #include "celib/memory/memory.h"
+#include "celib/macros.h"
 
 #include "celib/platform/dir.h"
 #include "celib/platform/file.h"
@@ -70,8 +71,9 @@ namespace cetech {
             char _root_path[1024];
             Allocator& _allocator;
 
-            DiskFileSystem(const char* root_path, Allocator & allocator) : _root_path({0}), _allocator(allocator) {
-                strcpy(_root_path, root_path);
+            DiskFileSystem(const char* root_path, Allocator & allocator) : _allocator(allocator) {
+		memset(_root_path, 0, sizeof(_root_path));
+		strcpy(_root_path, root_path);
 
                 const size_t len = strlen(_root_path);
                 if (_root_path[len - 1] != '/') {
@@ -91,12 +93,18 @@ namespace cetech {
             };
 
             virtual bool exists(const char* path) final {/*TODO: #43*/
+	      CE_UNUSED(path);
+	      return false;
             };
 
             virtual bool is_directory(const char* path) final {/*TODO: #43*/
+	      CE_UNUSED(path);
+	      return false;
             };
 
             virtual bool is_file(const char* path)  final {/*TODO: #43*/
+	      CE_UNUSED(path);
+	      return false;
             };
 
             virtual const char* root_dir() final {
@@ -108,6 +116,7 @@ namespace cetech {
             };
 
             virtual void delete_directory(const char* path) final {/*TODO: #43*/
+	      CE_UNUSED(path);
             };
 
             virtual void list_directory ( const char* path, cetech::Array < char* >& files ) final {
@@ -115,9 +124,11 @@ namespace cetech {
             }
 
             virtual void create_file(const char* path)  final {/*TODO: #43*/
+	      CE_UNUSED(path);
             };
 
             virtual void delete_file(const char* path)  final {/*TODO: #43*/
+	      CE_UNUSED(path);
             };
 
             virtual time_t file_mtime(const char* path) final {

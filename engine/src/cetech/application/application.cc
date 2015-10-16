@@ -84,12 +84,12 @@ namespace cetech {
                 char daemon_mod: 1;
             } _flags;
 
-            ApplicationImplementation() : _frame_id(0), _last_frame_ticks(0), _delta_time(0),
-                                          _resource_manager(nullptr), _package_manager(nullptr), _develop_manager(
+            ApplicationImplementation() : _resource_manager(nullptr), _package_manager(nullptr), _develop_manager(
                                               nullptr),
                                           _console_server(nullptr), _lua_eviroment(nullptr), _filesystem(nullptr),
-                                          _renderer(nullptr) {
-					    _flags = {0};
+                                          _renderer(nullptr),
+                                          _frame_id(0), _last_frame_ticks(0), _delta_time(0){
+					    _flags = {0, 0, 0};
 
 					  }
 
@@ -361,14 +361,18 @@ namespace cetech {
             }
 
             static void cmd_lua_execute(const rapidjson::Document& in, rapidjson::Document& out) {
+		CE_UNUSED(out);
                 application_globals::app().lua_enviroment().execute_string(in["args"]["script"].GetString());
             }
 
             static void cmd_compile_all(const rapidjson::Document& in, rapidjson::Document& out) {
+		CE_UNUSED(in);
+		CE_UNUSED(out);
                 application_globals::app().resource_compiler().compile_all_resource();
             }
 
             static void cmd_renderer_resize(const rapidjson::Document& in, rapidjson::Document& out) {
+	      CE_UNUSED(out);
 	      const uint32_t width = in["args"]["width"].GetInt();
 	      const uint32_t height = in["args"]["height"].GetInt();
 	      application_globals::app().renderer().resize(width, height);
@@ -448,8 +452,6 @@ namespace cetech {
             void shutdown_boot() {
                 StringId64_t boot_pkg_name_h = stringid64::from_cstringn(cvars::boot_pkg.value_str,
                                                                          cvars::boot_pkg.str_len);
-                StringId64_t boot_script_name_h = stringid64::from_cstringn(cvars::boot_script.value_str,
-                                                                            cvars::boot_script.str_len);
 
                 _package_manager->unload(boot_pkg_name_h);
                 _resource_manager->unload(resource_package::type_hash(), &boot_pkg_name_h, 1);
@@ -462,7 +464,7 @@ namespace cetech {
     }
 
     void Application::destroy(Allocator& allocator, Application* rm) {
-        MAKE_DELETE(memory_globals::default_allocator(), Application, rm);
+        MAKE_DELETE(allocator, Application, rm);
     }
 
     namespace application_globals {

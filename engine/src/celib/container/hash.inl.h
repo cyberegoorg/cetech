@@ -162,7 +162,7 @@ namespace cetech {
         }
 
         template < typename T > FindResult find(const Hash < T >& h, const typename Hash < T > ::Entry* e) {
-            FindResult fr = {END_OF_LIST};
+            FindResult fr = {END_OF_LIST, END_OF_LIST, END_OF_LIST};
 
             if (array::size(h._hash) == 0) {
                 return fr;

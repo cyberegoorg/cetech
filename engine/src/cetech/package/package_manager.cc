@@ -45,7 +45,7 @@ namespace cetech {
 
                 PackageLoaderTask* pkg_loader = (PackageLoaderTask*) data;
 
-                Array < void* > loaded_data(memory_globals::default_allocator());
+                Array < char* > loaded_data(memory_globals::default_allocator());
                 array::reserve(loaded_data, pkg_loader->count);
 
                 pkg_loader->rm->load(array::begin(loaded_data), pkg_loader->type, pkg_loader->names, pkg_loader->count);
@@ -54,7 +54,7 @@ namespace cetech {
             }
 
             virtual void load(StringId64_t name) final {
-                const void* res =
+                const char* res =
                     application_globals::app().resource_manager().get(resource_package::type_hash(), name);
 
                 if (res == nullptr) {
@@ -86,7 +86,7 @@ namespace cetech {
             }
 
             virtual void unload(StringId64_t name) final {
-                const void* res =
+                const char* res =
                     application_globals::app().resource_manager().get(resource_package::type_hash(), name);
 
                 if (res == nullptr) {
@@ -109,7 +109,7 @@ namespace cetech {
             }
 
             virtual bool is_loaded(StringId64_t name) final {
-                const void* res =
+                const char* res =
                     application_globals::app().resource_manager().get(resource_package::type_hash(), name);
 
                 if (res == nullptr) {
@@ -148,14 +148,14 @@ namespace cetech {
                 ResourceManager& rm = application_globals::app().resource_manager();
 
                 // Load boot package
-                void* package_data[1];
+                char* package_data[1];
                 rm.load(package_data, resource_package::type_hash(), &boot_pkg_name_h, 1);
                 rm.add_loaded(package_data, resource_package::type_hash(), &boot_pkg_name_h, 1);
 
                 load(boot_pkg_name_h);
                 flush(boot_pkg_name_h);
 
-                void* res = package_data[0];
+                char* res = package_data[0];
                 resource_package::Header* header = (resource_package::Header*)res;
                 resource_package::TypeHeader* type_header = (resource_package::TypeHeader*)(header + 1);
 
@@ -185,6 +185,6 @@ namespace cetech {
     }
 
     void PackageManager::destroy(Allocator& allocator, PackageManager* pm) {
-        MAKE_DELETE(memory_globals::default_allocator(), PackageManager, pm);
+        MAKE_DELETE(allocator, PackageManager, pm);
     }
 }

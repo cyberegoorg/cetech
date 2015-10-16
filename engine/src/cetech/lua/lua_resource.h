@@ -14,7 +14,7 @@ namespace cetech {
         StringId64_t type_hash();
 
         void compiler(const char* filename, FSFile* in, FSFile* out);
-        void* loader(FSFile* f, Allocator& a);
+        char* loader(FSFile* f, Allocator& a);
         void unloader(Allocator& a, void* data);
 
         const char* get_source(const Resource* rs);

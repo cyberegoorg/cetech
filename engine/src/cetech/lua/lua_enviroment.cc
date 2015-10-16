@@ -407,7 +407,7 @@ namespace cetech {
     }
 
     void LuaEnviroment::destroy(Allocator& allocator, LuaEnviroment* cs) {
-        MAKE_DELETE(memory_globals::default_allocator(), LuaEnviroment, cs);
+        MAKE_DELETE(allocator, LuaEnviroment, cs);
     }
 
     //     namespace internal {

@@ -15,8 +15,8 @@ namespace cetech {
         };
 
         enum WindowPos {
-            WINDOWPOS_CENTERED = -1,
-            WINDOWPOS_UNDEFINED = -2
+            WINDOWPOS_CENTERED = 1,
+            WINDOWPOS_UNDEFINED = 2
         };
 
         Window make_window(const char* title,

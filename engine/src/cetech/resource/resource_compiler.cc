@@ -187,7 +187,7 @@ namespace cetech {
 
             void build_config_json(FileSystem* source_fs, FileSystem* build_fs) {
                 FSFile* src_config = source_fs->open("config.json", FSFile::READ);
-                FSFile* out_config = _build_fs->open("config.json", FSFile::WRITE);
+                FSFile* out_config = build_fs->open("config.json", FSFile::WRITE);
 
                 size_t size = src_config->size();
                 char data[size];
@@ -196,7 +196,7 @@ namespace cetech {
                 source_fs->close(src_config);
 
                 out_config->write(data, size);
-                _build_fs->close(out_config);
+                build_fs->close(out_config);
             }
 
             void load_debug_index(rapidjson::Document& build_index) {
@@ -260,6 +260,6 @@ namespace cetech {
     }
 
     void ResourceCompiler::destroy(Allocator& allocator, ResourceCompiler* rm) {
-        MAKE_DELETE(memory_globals::default_allocator(), ResourceCompiler, rm);
+        MAKE_DELETE(allocator, ResourceCompiler, rm);
     }
 }

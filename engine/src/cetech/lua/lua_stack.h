@@ -181,7 +181,7 @@ namespace cetech {
                     break;
 
                     case LUA_TFUNCTION: {
-                        const char* str = lua_typename(_L, -1);
+                        //const char* str = lua_typename(_L, -1);
                         root.AddMember(rapid_key, "function", document.GetAllocator());
                     }
 
