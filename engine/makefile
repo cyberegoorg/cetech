@@ -37,7 +37,7 @@ analyze:
 .PHONY: scan-build
 scan-build: clean
 	scan-build -analyze-headers make -C ${ROOT_DIR} -j 4 test-linux-debug
-	
+
 .PHONY: uncrustify
 uncrustify:
 	@echo Uncrustify...
