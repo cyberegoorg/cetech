@@ -1,5 +1,5 @@
 {
   "lua" : [
-    "cetech/log"
+    "core/cetech/log"
   ]
 }

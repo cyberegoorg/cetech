@@ -169,19 +169,23 @@ namespace cetech {
                 thread::spin_unlock(_lock);
             }
 
+            virtual void do_work() final{
+	      Task t = task_pop_new_work();
+
+	      if (t.id.i == 0) {
+		  return;
+	      }
+
+	      CE_ASSERT(t.clb.fce != NULL);
+
+	      t.clb.fce(t.clb.data);
+
+	      _mark_task_job_done(t.id);
+	    }
+            
             virtual void wait(const TaskID id) final {
                 while (application_globals::app().is_run() && (array::size(_workers) > 0) && !task_is_done(id)) {
-                    Task t = task_pop_new_work();
-
-                    if (t.id.i == 0) {
-                        continue;
-                    }
-
-                    CE_ASSERT(t.clb.fce != NULL);
-
-                    t.clb.fce(t.clb.data);
-
-                    _mark_task_job_done(t.id);
+		  do_work();
                 }
             }
 
@@ -339,17 +343,7 @@ namespace cetech {
                 TaskManagerImplementation* tm = (TaskManagerImplementation*) data;
 
                 while (application_globals::app().is_run()) {
-                    Task t = tm->task_pop_new_work();
-
-                    if (t.id.i == 0) {
-                        continue;
-                    }
-
-                    CE_ASSERT(t.clb.fce != NULL);
-
-                    t.clb.fce(t.clb.data);
-
-                    tm->_mark_task_job_done(t.id);
+		  tm->do_work();
                 }
 
                 return 0;
