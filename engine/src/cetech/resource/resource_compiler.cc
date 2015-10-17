@@ -210,7 +210,7 @@ namespace cetech {
 
                 size_t size = build_index_file->size();
                 char data[size + 1];
-                memset(data, 0, size+1);
+                memset(data, 0, size + 1);
                 build_index_file->read(data, size);
 
                 build_index.Parse(data);
@@ -230,7 +230,7 @@ namespace cetech {
 
                 FileSystem* core_fs = disk_filesystem::make(
                     memory_globals::default_allocator(), cvars::compiler_core_path.value_str);
-		
+
                 rapidjson::Document debug_index;
                 debug_index.SetObject();
 

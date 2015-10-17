@@ -1,3 +1,3 @@
 #pragma once
 
-#define CE_UNUSED(x) ((void)(x))
+#define CE_UNUSED(x) do { (void)(x); } while (0)

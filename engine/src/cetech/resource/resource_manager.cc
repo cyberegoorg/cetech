@@ -66,7 +66,7 @@ namespace cetech {
                                    type,
                                    name);
                         loaded_data[i] = nullptr;
-			_fs->close(f);
+                        _fs->close(f);
                         continue;
                     }
 

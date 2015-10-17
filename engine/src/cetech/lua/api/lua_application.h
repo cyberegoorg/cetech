@@ -7,8 +7,8 @@
 
 namespace cetech {
     static int application_quit(lua_State* L) {
-	CE_UNUSED(L);
-	
+        CE_UNUSED(L);
+
         application_globals::app().quit();
         return 0;
     }
@@ -49,8 +49,8 @@ namespace cetech {
             env.set_module_function(module_name, "get_frame_id", application_get_frame_id);
             env.set_module_function(module_name, "get_delta_time", application_get_delta_time);
 
-	    env.set_module_function(module_name, "console_send", application_console_send);
-	    env.set_module_function(module_name, "resize", application_resize);
+            env.set_module_function(module_name, "console_send", application_console_send);
+            env.set_module_function(module_name, "resize", application_resize);
         }
     }
 }

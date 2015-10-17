@@ -106,8 +106,8 @@ namespace cetech {
         }
 
         bool validate_packet(rapidjson::Document& document, const char* packet, const uint32_t size) {
-	    CE_UNUSED(size);
-	  
+            CE_UNUSED(size);
+
             document.Parse(packet);
 
             if (document.HasParseError()) {
@@ -126,8 +126,8 @@ namespace cetech {
         }
 
         void parse_packet(uint32_t client, const char* packet, const uint32_t size) {
-	    CE_UNUSED(client);
-	  
+            CE_UNUSED(client);
+
             rapidjson::Document document;
             if (!validate_packet(document, packet, size)) {
                 return;

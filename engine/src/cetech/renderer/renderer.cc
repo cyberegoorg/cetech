@@ -7,7 +7,7 @@
 #include "bgfx/bgfxplatform.h"
 #include "bgfx/bgfxdefines.h"
 
-// TODO: rewrite, 
+// TODO: rewrite,
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_syswm.h>
 uint8_t sdlSetWindow(SDL_Window* _window) {
@@ -36,14 +36,14 @@ namespace cetech {
             friend class Renderer;
 
             uint32_t frame_id;
-	    bool need_resize;
-	    uint32_t resize_w, resize_h;
+            bool need_resize;
+            uint32_t resize_w, resize_h;
 
             RendererImplementation() : frame_id(0) {
-				      need_resize = false;
-			      resize_h = 0;
-			      resize_w = 0;
-	    }
+                need_resize = false;
+                resize_h = 0;
+                resize_w = 0;
+            }
 
             virtual ~RendererImplementation() final {
                 bgfx::shutdown();
@@ -56,30 +56,30 @@ namespace cetech {
                 resize(cvars::screen_width.value_i, cvars::screen_height.value_i);
             };
 
-	    virtual void resize(uint32_t w, uint32_t h) final {
-	      need_resize = true;
-	      resize_w = w;
-	      resize_h = h;
-	    }
+            virtual void resize(uint32_t w, uint32_t h) final {
+                need_resize = true;
+                resize_w = w;
+                resize_h = h;
+            }
 
             virtual void begin_frame() final {
-		if( need_resize ) {
-		  cvar::set(cvars::screen_width, (int)resize_w);
-		  cvar::set(cvars::screen_height, (int)resize_h);
-	      
-		  bgfx::reset(resize_w, resize_h, 0);
-		  bgfx::setViewRect(0, 0, 0, resize_w, resize_h);
-		  need_resize = false;
-		}
+                if (need_resize) {
+                    cvar::set(cvars::screen_width, (int)resize_w);
+                    cvar::set(cvars::screen_height, (int)resize_h);
+
+                    bgfx::reset(resize_w, resize_h, 0);
+                    bgfx::setViewRect(0, 0, 0, resize_w, resize_h);
+                    need_resize = false;
+                }
 
                 bgfx::setDebug(BGFX_DEBUG_STATS | BGFX_DEBUG_TEXT);
-		bgfx::setViewClear(
+                bgfx::setViewClear(
                     0
                     , BGFX_CLEAR_COLOR | BGFX_CLEAR_DEPTH
                     , 0x66CCFFff
                     , 1.0f
                     , 0);
-		
+
                 bgfx::dbgTextClear(0, 0);
                 bgfx::dbgTextPrintf(0, 2, 0x6f, "Description: Initialization and debug text.");
 

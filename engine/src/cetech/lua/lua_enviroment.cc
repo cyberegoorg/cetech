@@ -76,7 +76,7 @@ namespace cetech {
             lua_vector3::load_libs(*this);
 
             lua_utils::load_libs(*this);
-	    lua_log::load_libs(*this);
+            lua_log::load_libs(*this);
         }
 
         virtual ~LuaEnviromentImlementation() final {
