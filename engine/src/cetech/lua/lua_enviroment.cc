@@ -397,7 +397,7 @@ namespace cetech {
                 return 0;
             }
 
-            luaL_loadbuffer(L, resource_lua::get_source(res), res->size, "<unknown>");
+            luaL_loadbuffer(L, resource_lua::get_source(res), res->size, name);
 
             return 1;
         }
