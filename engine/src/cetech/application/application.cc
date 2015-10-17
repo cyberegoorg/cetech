@@ -81,17 +81,17 @@ namespace cetech {
             struct {
                 char run : 1;
                 char pause : 1;
-                char daemon_mod: 1;
+                char daemon_mod : 1;
             } _flags;
 
-            ApplicationImplementation() : _resource_manager(nullptr), _package_manager(nullptr), _develop_manager(
-                                              nullptr),
-                                          _console_server(nullptr), _lua_eviroment(nullptr), _filesystem(nullptr),
+            ApplicationImplementation() : _resource_manager(nullptr), _package_manager(nullptr),
+                                          _develop_manager(nullptr), _console_server(nullptr),
+                                          _lua_eviroment(nullptr), _filesystem(nullptr),
                                           _renderer(nullptr),
-                                          _frame_id(0), _last_frame_ticks(0), _delta_time(0){
-					    _flags = {0, 0, 0};
+                                          _frame_id(0), _last_frame_ticks(0), _delta_time(0) {
+                _flags = {0, 0, 0};
 
-					  }
+            }
 
             virtual float get_delta_time() const final {
                 return this->_delta_time;
@@ -105,10 +105,10 @@ namespace cetech {
             virtual void init(int argc, const char** argv) final {
                 command_line_globals::set_args(argc, argv);
 
-		if (command_line_globals::has_argument("daemon", 'd')) {
-		  _flags.daemon_mod = 1;
-		}
-		
+                if (command_line_globals::has_argument("daemon", 'd')) {
+                    _flags.daemon_mod = 1;
+                }
+
                 log::register_handler(&log_handlers::stdout_handler);
 
                 posix_init();
@@ -138,7 +138,7 @@ namespace cetech {
 
                 _console_server->register_command("lua.execute", &cmd_lua_execute);
                 _console_server->register_command("resource_compiler.compile_all", &cmd_compile_all);
-		_console_server->register_command("renderer.resize", cmd_renderer_resize);
+                _console_server->register_command("renderer.resize", cmd_renderer_resize);
 
                 register_resources();
 
@@ -192,30 +192,30 @@ namespace cetech {
 
             virtual void run() final {
                 if (!_flags.daemon_mod) {
-		  if (command_line_globals::has_argument("wid")) {
-		    char *ptr;
-		    long wid;
+                    if (command_line_globals::has_argument("wid")) {
+                        char* ptr;
+                        long wid;
 
-		    wid = strtol(command_line_globals::get_parameter("wid"), &ptr, 10);
-		    main_window = window::make_from((void*)wid);
+                        wid = strtol(command_line_globals::get_parameter("wid"), &ptr, 10);
+                        main_window = window::make_from((void*)wid);
 
-		  } else {
-                    main_window = window::make_window(
-                        "cetech runtime",
-                        window::WINDOWPOS_CENTERED, window::WINDOWPOS_CENTERED,
-                        cvars::screen_width.value_i, cvars::screen_height.value_i,
-                        window::WINDOW_NOFLAG
-                        );
-		  }
-		  
-		  _renderer->init(main_window);
+                    } else {
+                        main_window = window::make_window(
+                            "cetech runtime",
+                            window::WINDOWPOS_CENTERED, window::WINDOWPOS_CENTERED,
+                            cvars::screen_width.value_i, cvars::screen_height.value_i,
+                            window::WINDOW_NOFLAG
+                            );
+                    }
+
+                    _renderer->init(main_window);
                 }
 
                 float dt = 0.0f;
                 uint32_t now_ticks = 0;
                 while (_flags.run) {
 
-		  
+
                     now_ticks = os::get_ticks();
                     dt = (now_ticks - this->_last_frame_ticks) * 0.001f;
                     this->_delta_time = dt;
@@ -229,9 +229,9 @@ namespace cetech {
                     keyboard::frame_start();
                     mouse::retrive_state();
 
-		    if (!_flags.daemon_mod) {
-		      _renderer->begin_frame();
-		    }
+                    if (!_flags.daemon_mod) {
+                        _renderer->begin_frame();
+                    }
 
                     TaskManager::TaskID frame_task = _task_manager->add_empty_begin(0);
                     TaskManager::TaskID console_server_task = _task_manager->add_begin(
@@ -264,10 +264,10 @@ namespace cetech {
 
                     _task_manager->wait(frame_task);
 
-		    if (!_flags.daemon_mod) {
-		      _renderer->end_frame();
-		      window::update(main_window);
-		    }
+                    if (!_flags.daemon_mod) {
+                        _renderer->end_frame();
+                        window::update(main_window);
+                    }
                 }
 
                 log::info("main", "Bye Bye");
@@ -361,22 +361,22 @@ namespace cetech {
             }
 
             static void cmd_lua_execute(const rapidjson::Document& in, rapidjson::Document& out) {
-		CE_UNUSED(out);
+                CE_UNUSED(out);
                 application_globals::app().lua_enviroment().execute_string(in["args"]["script"].GetString());
             }
 
             static void cmd_compile_all(const rapidjson::Document& in, rapidjson::Document& out) {
-		CE_UNUSED(in);
-		CE_UNUSED(out);
+                CE_UNUSED(in);
+                CE_UNUSED(out);
                 application_globals::app().resource_compiler().compile_all_resource();
             }
 
             static void cmd_renderer_resize(const rapidjson::Document& in, rapidjson::Document& out) {
-	      CE_UNUSED(out);
-	      const uint32_t width = in["args"]["width"].GetInt();
-	      const uint32_t height = in["args"]["height"].GetInt();
-	      application_globals::app().renderer().resize(width, height);
-	    }
+                CE_UNUSED(out);
+                const uint32_t width = in["args"]["width"].GetInt();
+                const uint32_t height = in["args"]["height"].GetInt();
+                application_globals::app().renderer().resize(width, height);
+            }
 
             void load_config_json() {
                 FSFile* f = _filesystem->open("config.json", FSFile::READ);
@@ -411,7 +411,7 @@ namespace cetech {
 
                 const char* source_dir = command_line_globals::get_parameter("source-dir", 's');
                 const char* build_dir = command_line_globals::get_parameter("build-dir", 'b');
-		const char* core_dir = command_line_globals::get_parameter("core-dir");
+                const char* core_dir = command_line_globals::get_parameter("core-dir");
                 const char* port = command_line_globals::get_parameter("port", 'p');
 
                 if (source_dir) {
@@ -428,7 +428,7 @@ namespace cetech {
                     make_path(buffer, 1024, core_dir);
                     cvar_internal::force_set(cvars::compiler_core_path, buffer);
                 }
-                
+
                 if (port) {
                     int p = 0;
                     sscanf(port, "%d", &p);
@@ -456,6 +456,10 @@ namespace cetech {
                 _package_manager->unload(boot_pkg_name_h);
                 _resource_manager->unload(resource_package::type_hash(), &boot_pkg_name_h, 1);
 
+            }
+
+            virtual Platform platform() final {
+                return PLATFORM_LINUX;
             }
     };
 

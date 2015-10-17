@@ -15,7 +15,7 @@ namespace cetech {
 
             virtual void begin_frame() = 0;
             virtual void end_frame() = 0;
-	    virtual void resize(uint32_t w, uint32_t h) = 0;
+            virtual void resize(uint32_t w, uint32_t h) = 0;
 
             static Renderer* make(Allocator& allocator);
             static void destroy(Allocator& allocator, Renderer* pm);

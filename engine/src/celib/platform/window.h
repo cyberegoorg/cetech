@@ -26,7 +26,7 @@ namespace cetech {
                            const int32_t height,
                            WindowFlags flags);
 
-	Window make_from(void* hndl);
+        Window make_from(void* hndl);
 
         void destroy_window(const Window& w);
 
@@ -34,7 +34,7 @@ namespace cetech {
         const char* get_title(const Window& w);
 
         void update(const Window& w);
-	
-	void resize(const Window& w, uint32_t width, uint32_t height);
+
+        void resize(const Window& w, uint32_t width, uint32_t height);
     }
 }

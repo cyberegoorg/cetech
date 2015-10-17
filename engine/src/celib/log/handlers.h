@@ -53,9 +53,9 @@ namespace cetech {
                                    const char* where,
                                    const char* msg,
                                    void* data) {
-	    CE_UNUSED(time);
-	    CE_UNUSED(data);
-	  
+            CE_UNUSED(time);
+            CE_UNUSED(data);
+
             FILE* out;
 
             switch (level) {
@@ -95,8 +95,8 @@ namespace cetech {
                                            const char* msg,
                                            void* data) {
 
-	    CE_UNUSED(data);
-	  
+            CE_UNUSED(data);
+
             ConsoleServer& cs = application_globals::app().console_server();
 
             if (!cs.has_clients()) {

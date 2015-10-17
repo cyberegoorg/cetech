@@ -34,10 +34,10 @@ namespace cetech {
                 case SDL_QUIT:
                     application_globals::app().quit();
                     break;
-		    
-		case SDL_WINDOWEVENT_SIZE_CHANGED:
-		    log::info("sdl2", "Window size changed to %dx%d", e.window.data1, e.window.data2);
-		    break;
+
+                case SDL_WINDOWEVENT_SIZE_CHANGED:
+                    log::info("sdl2", "Window size changed to %dx%d", e.window.data1, e.window.data2);
+                    break;
 
                 }
             }

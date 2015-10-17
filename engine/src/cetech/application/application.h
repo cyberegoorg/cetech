@@ -14,6 +14,13 @@
 namespace cetech {
     class Application {
         public:
+            enum Platform {
+                PLATFORM_NONE = 0,
+                PLATFORM_LINUX,
+                PLATFORM_WINDOWS,
+            };
+
+        public:
             virtual ~Application() {};
 
             virtual uint32_t get_frame_id() const = 0;
@@ -33,8 +40,9 @@ namespace cetech {
             virtual DevelopManager& develop_manager() = 0;
             virtual ConsoleServer& console_server() = 0;
             virtual LuaEnviroment& lua_enviroment() = 0;
-	    virtual Renderer& renderer() = 0;
+            virtual Renderer& renderer() = 0;
 
+            virtual Platform platform() = 0;
 
             static Application* make(Allocator& allocator);
             static void destroy(Allocator& allocator, Application* rm);
