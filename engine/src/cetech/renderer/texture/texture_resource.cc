@@ -1,4 +1,4 @@
-#include "cetech/texture/texture_resource.h"
+#include "cetech/renderer/texture/texture_resource.h"
 
 #include "celib/container/array.inl.h"
 #include "celib/string/stringid_types.h"
@@ -13,7 +13,7 @@
 #include "rapidjson/error/en.h"
 
 #include "soil/SOIL.h"
-#include "cetech/texture/image_DXT.h"
+#include "cetech/renderer/texture/image_DXT.h"
 #include <cetech/cvars/cvars.h>
 
 namespace cetech {

@@ -12,7 +12,7 @@
 #include "bgfx/bgfxdefines.h"
 
 #include "cetech/application/application.h"
-#include "cetech/texture/texture_resource.h"
+#include "cetech/renderer/texture/texture_resource.h"
 #include "celib/string/stringid.inl.h"
 
 // TODO: rewrite,
