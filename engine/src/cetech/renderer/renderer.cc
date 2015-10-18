@@ -31,7 +31,7 @@ uint8_t sdlSetWindow(SDL_Window* _window) {
 }
 
 namespace cetech {
-    class RendererImplementation : public Renderer {
+    struct Renderer::Implementation {
         public:
             friend class Renderer;
 
@@ -39,30 +39,30 @@ namespace cetech {
             bool need_resize;
             uint32_t resize_w, resize_h;
 
-            RendererImplementation() : frame_id(0) {
+            Implementation() : frame_id(0) {
                 need_resize = false;
                 resize_h = 0;
                 resize_w = 0;
             }
 
-            virtual ~RendererImplementation() final {
+            ~Implementation()  {
                 bgfx::shutdown();
             }
 
-            virtual void init(Window window) final {
+            void init(Window window)  {
                 sdlSetWindow(window.wnd);
 
                 bgfx::init(bgfx::RendererType::OpenGL);
                 resize(cvars::screen_width.value_i, cvars::screen_height.value_i);
             };
 
-            virtual void resize(uint32_t w, uint32_t h) final {
+            void resize(uint32_t w, uint32_t h)  {
                 need_resize = true;
                 resize_w = w;
                 resize_h = h;
             }
 
-            virtual void begin_frame() final {
+            void begin_frame()  {
                 if (need_resize) {
                     cvar::set(cvars::screen_width, (int)resize_w);
                     cvar::set(cvars::screen_height, (int)resize_h);
@@ -86,13 +86,36 @@ namespace cetech {
                 bgfx::submit(0, BGFX_INVALID_HANDLE);
             }
 
-            virtual void end_frame() final {
+            void end_frame()  {
                 frame_id = bgfx::frame();
             }
     };
 
+    Renderer::Renderer(Allocator& allocator): _allocator(allocator), _impl(MAKE_NEW(_allocator, Implementation)) {
+    }
+
+    Renderer::~Renderer() {
+        MAKE_DELETE(_allocator, Implementation, _impl);
+    }
+
+    void Renderer::init(Window window) {
+        _impl->init(window);
+    }
+
+    void Renderer::begin_frame(){
+        _impl->begin_frame();
+    }
+    
+    void Renderer::end_frame(){
+        _impl->end_frame();
+    }
+    
+    void Renderer::resize(uint32_t w, uint32_t h) {
+        _impl->resize(w, h);
+    }
+
     Renderer* Renderer::make(Allocator& allocator) {
-        return MAKE_NEW(allocator, RendererImplementation);
+        return MAKE_NEW(allocator, Renderer, allocator);
     }
 
     void Renderer::destroy(Allocator& allocator, Renderer* pm) {
