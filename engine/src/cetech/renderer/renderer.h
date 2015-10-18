@@ -7,13 +7,30 @@
 #include "celib/platform/types.h"
 
 namespace cetech {
+    struct RenderType {
+        enum Enum {
+            Null = 0,
+
+            Direct3D9,
+            Direct3D11,
+            Direct3D12,
+            Metal,
+            OpenGLES,
+            OpenGL,
+            Vulkan,
+
+            Count
+        };
+    };
+
     struct Renderer {
         struct Implementation;
 
-        Renderer(Allocator& allocator);
+        Renderer(Allocator & allocator);
         ~Renderer();
 
-        void init(Window window);
+        void init(Window window, RenderType::Enum render_type);
+        void shutdown();
 
         void begin_frame();
         void end_frame();

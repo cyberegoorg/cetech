@@ -80,6 +80,9 @@ namespace cetech {
             return mem;
         }
 
+        void online(void* data) {}
+        void offline(void* data){}
+        
         void unloader(Allocator& a, void* data) {
             a.deallocate(data);
         }

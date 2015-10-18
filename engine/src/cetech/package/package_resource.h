@@ -30,6 +30,8 @@ namespace cetech {
 
         void compiler(const char* filename, FSFile* in, FSFile* out);
         char* loader(FSFile* f, Allocator& a);
+        void online(void* data);
+        void offline(void* data);
         void unloader(Allocator& a, void* data);
     }
 }
