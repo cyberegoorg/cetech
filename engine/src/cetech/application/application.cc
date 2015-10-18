@@ -28,6 +28,8 @@
 #include "cetech/cvars/cvars.h"
 #include "cetech/os/os.h"
 
+#include "cetech/texture/texture_resource.h"
+
 #include "rapidjson/prettywriter.h"
 
 static void posix_signal_handler(int sig) {
@@ -161,6 +163,26 @@ namespace cetech {
                     log::debug("main", "Client connected.");
                 }
 
+                if (!_flags.daemon_mod) {
+                    if (command_line_globals::has_argument("wid")) {
+                        char* ptr;
+                        long wid;
+
+                        wid = strtol(command_line_globals::get_parameter("wid"), &ptr, 10);
+                        main_window = window::make_from((void*)wid);
+
+                    } else {
+                        main_window = window::make_window(
+                            "cetech runtime",
+                            window::WINDOWPOS_CENTERED, window::WINDOWPOS_CENTERED,
+                            cvars::screen_width.value_i, cvars::screen_height.value_i,
+                            window::WINDOW_NOFLAG
+                            );
+                    }
+
+                    _renderer->init(main_window, RenderType::RenderType::OpenGL);
+                }
+                
                 init_boot();
 
                 this->_last_frame_ticks = os::get_ticks();
@@ -172,7 +194,9 @@ namespace cetech {
                 _lua_eviroment->call_global("shutdown");
 
                 shutdown_boot();
-
+                
+                _renderer->shutdown();
+                
                 PackageManager::destroy(memory_globals::default_allocator(), _package_manager);
                 ResourceManager::destroy(memory_globals::default_allocator(), _resource_manager);
                 DevelopManager::destroy(memory_globals::default_allocator(), _develop_manager);
@@ -191,26 +215,6 @@ namespace cetech {
             }
 
             virtual void run() final {
-                if (!_flags.daemon_mod) {
-                    if (command_line_globals::has_argument("wid")) {
-                        char* ptr;
-                        long wid;
-
-                        wid = strtol(command_line_globals::get_parameter("wid"), &ptr, 10);
-                        main_window = window::make_from((void*)wid);
-
-                    } else {
-                        main_window = window::make_window(
-                            "cetech runtime",
-                            window::WINDOWPOS_CENTERED, window::WINDOWPOS_CENTERED,
-                            cvars::screen_width.value_i, cvars::screen_height.value_i,
-                            window::WINDOW_NOFLAG
-                            );
-                    }
-
-                    _renderer->init(main_window);
-                }
-
                 float dt = 0.0f;
                 uint32_t now_ticks = 0;
                 while (_flags.run) {
@@ -335,26 +339,34 @@ namespace cetech {
 
                     ResourceCompiler::resource_compiler_clb_t compiler;
                     ResourceManager::resource_loader_clb_t loader;
+                    ResourceManager::resource_online_clb_t online;
+                    ResourceManager::resource_offline_clb_t offline;
                     ResourceManager::resource_unloader_clb_t unloader;
                 };
 
                 static ResourceRegistration resource_regs[] = {
                     /* package */
-                    {resource_package::type_hash(), & resource_package::compiler, & resource_package::loader,
+                    {resource_package::type_hash(), & resource_package::compiler, & resource_package::loader, & resource_package::online, & resource_package::offline,
                      & resource_package::unloader},
 
                     /* lua */
-                    {resource_lua::type_hash(), & resource_lua::compiler, & resource_lua::loader,
+                    {resource_lua::type_hash(), & resource_lua::compiler, & resource_lua::loader, & resource_lua::online, & resource_lua::offline,
                      & resource_lua::unloader},
 
+                    /* texture */
+                    {resource_texture::type_hash(), & resource_texture::compiler, & resource_texture::loader, & resource_texture::online, & resource_texture::offline,
+                     & resource_texture::unloader},
+                     
                     /* LAST */
-                    {0, nullptr, nullptr, nullptr}
+                    {0, nullptr, nullptr, nullptr, nullptr, nullptr}
                 };
 
                 const ResourceRegistration* it = resource_regs;
                 while (it->type != 0) {
                     _resource_manager->register_unloader(it->type, it->unloader);
                     _resource_manager->register_loader(it->type, it->loader);
+                    _resource_manager->register_online(it->type, it->online);
+                    _resource_manager->register_offline(it->type, it->offline);
                     _resource_compiler->register_compiler(it->type, it->compiler);
                     ++it;
                 }

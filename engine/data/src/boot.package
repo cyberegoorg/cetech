@@ -4,6 +4,11 @@
     "lua/game"
   ], 
 
+  "texture" : [
+    "content/texture1"
+  ],
+
+  
   "package": [
     "core",
     "pkg1"

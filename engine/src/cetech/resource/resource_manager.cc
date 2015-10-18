@@ -28,6 +28,8 @@ namespace cetech {
 
             Hash < resource_loader_clb_t > _load_clb_map;
             Hash < resource_unloader_clb_t > _unload_clb_map;
+            Hash < resource_online_clb_t > _online_clb_map;
+            Hash < resource_offline_clb_t > _offline_clb_map;
 
             Spinlock add_lock;
             bool autoreload;
@@ -36,6 +38,8 @@ namespace cetech {
                                                                                     _data_refcount_map(allocator),
                                                                                     _load_clb_map(allocator),
                                                                                     _unload_clb_map(allocator),
+                                                                                    _online_clb_map(allocator),
+                                                                                    _offline_clb_map(allocator),
                                                                                     autoreload(true) {}
 
             virtual void load(char** loaded_data, StringId64_t type, const StringId64_t* names,
@@ -95,6 +99,16 @@ namespace cetech {
 
                     hash::set(this->_data_map, type ^ name, loaded_data[i]);
                     inc_reference(type, name);
+                    
+                    resource_online_clb_t online_clb = hash::get < resource_online_clb_t >
+                                                (this->_online_clb_map, type, nullptr);
+
+                    if (online_clb == nullptr) {
+                        log::error("resource_manager", "Resource type " "%" PRIx64 " not register online.", type);
+                        return;
+                    }
+                    
+                    online_clb(loaded_data[i]);
                 }
 
                 thread::spin_unlock(add_lock);
@@ -165,6 +179,14 @@ namespace cetech {
                 hash::set(this->_unload_clb_map, type, clb);
             }
 
+            virtual void register_online(StringId64_t type, resource_online_clb_t clb) final {
+                hash::set(this->_online_clb_map, type, clb);
+            };
+
+            virtual void register_offline(StringId64_t type, resource_offline_clb_t clb) final {
+                hash::set(this->_offline_clb_map, type, clb);
+            };
+            
             CE_INLINE void inc_reference(StringId64_t type, const StringId64_t name) {
                 const uint32_t counter = hash::get < uint32_t > (_data_refcount_map, type ^ name, 0) + 1;
 
