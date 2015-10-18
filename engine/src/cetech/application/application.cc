@@ -28,7 +28,7 @@
 #include "cetech/cvars/cvars.h"
 #include "cetech/os/os.h"
 
-#include "cetech/texture/texture_resource.h"
+#include "cetech/renderer/texture/texture_resource.h"
 
 #include "rapidjson/prettywriter.h"
 
