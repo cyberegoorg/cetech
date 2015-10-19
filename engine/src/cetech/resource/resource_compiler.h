@@ -17,10 +17,13 @@ namespace cetech {
                                                                                              resource_file) {}
 
         bool resource_to_json(rapidjson::Document& document);
+        
+        bool add_dependency(const char* path);
 
         FileSystem* src_fs;
         FileSystem* build_fs;
         FSFile* resource_file;
+        rapidjson::Document *dependency_index;
     };
 
     class ResourceCompiler {

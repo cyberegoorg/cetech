@@ -32,6 +32,75 @@ namespace cetech {
         StringId64_t type;
     };
 
+    struct BuildDB {
+        BuildDB(const char* db_path){
+            sqlite3_open(db_path, &db);
+            sqlite3_busy_timeout(db, 1000);
+            create_db();
+        };
+
+        ~BuildDB(){
+            sqlite3_close(db);
+        };
+
+        void set_file(const char* filename, time_t mtime) {
+            char *sql = sqlite3_mprintf("INSERT OR REPLACE INTO files VALUES(NULL, '%q', %d)", filename, mtime);
+            
+            char *err_msg = 0;
+            int rc = sqlite3_exec(db, sql, 0, 0, &err_msg);
+            if( rc != SQLITE_OK ){
+                log::error("BuildDB", "SQL error (%d): %s", rc, err_msg);
+                sqlite3_free(err_msg);
+            }
+            sqlite3_free(sql);
+        }
+
+        static int get_mtime_clb(void *arg, int argc, char **argv, char **colName) { 
+            time_t *mtime = (time_t*)arg;
+            *mtime = atol(argv[0]);
+            return 0;
+        }
+        
+        time_t get_mtime(const char* filename) {
+            
+            char *sql = sqlite3_mprintf("SELECT mtime FROM files WHERE filename = '%q'", filename);
+
+            time_t mtime = 0;
+            
+            char *err_msg = 0;
+            int rc = sqlite3_exec(db, sql, get_mtime_clb, &mtime, &err_msg);
+
+            if( rc != SQLITE_OK ){
+                log::error("BuildDB", "SQL error (%d): %s", rc, err_msg);
+                sqlite3_free(err_msg);
+                return 0;
+            }
+            sqlite3_free(sql);
+            
+            return mtime;
+        }
+        
+        void create_db() {
+            char *err_msg = 0;
+            int  rc;
+            
+            /* Create SQL statement */
+            const char* sql = "CREATE TABLE IF NOT EXISTS files ("
+                    "id       INTEGER PRIMARY KEY  AUTOINCREMENT NOT NULL,"
+                    "filename TEXT    UNIQUE                 NOT NULL,"
+                    "mtime    INTEGER                        NOT NULL"
+                    ");";
+
+            rc = sqlite3_exec(db, sql, nullptr, 0, &err_msg);
+            if( rc != SQLITE_OK ){
+                log::error("BuildDB", "SQL error (%d): %s", rc, err_msg);
+                sqlite3_free(err_msg);
+            }
+        }
+
+        sqlite3 *db;
+    };
+    
     enum {
         TASK_POOL_SIZE = 4096
     };
@@ -106,32 +175,14 @@ namespace cetech {
                     return;
                 }
 
-                FSFile* f_out = ct->out_fs->open(output_filename, FSFile::WRITE);
 
-                sqlite3 *db;
-                char *zErrMsg = 0;
-                int  rc;
                 char db_path[512] = {0};
                 sprintf(db_path, "%s%s", ct->out_fs->root_dir(), "build.db");
-                sqlite3_open(db_path, &db);
+                BuildDB bdb(db_path);
+                printf("sss, %d\n", bdb.get_mtime(ct->filename));
+                bdb.set_file(ct->filename, ct->source_fs->file_mtime(ct->filename));
 
-                /* Create SQL statement */
-                const char* sql = "CREATE TABLE COMPANY("  \
-                        "ID INT PRIMARY KEY     NOT NULL," \
-                        "NAME           TEXT    NOT NULL," \
-                        "AGE            INT     NOT NULL," \
-                        "ADDRESS        CHAR(50)," \
-                        "SALARY         REAL );";
-
-                /* Execute SQL statement */
-                rc = sqlite3_exec(db, sql, NULL , 0, &zErrMsg);
-                if( rc != SQLITE_OK ){
-                    fprintf(stderr, "SQL error: %s\n", zErrMsg);
-                    sqlite3_free(zErrMsg);
-                }else{
-                    fprintf(stdout, "Table created successfully\n");
-                }
-                sqlite3_close(db);
+                FSFile* f_out = ct->out_fs->open(output_filename, FSFile::WRITE);
 
                 Compilator comp(ct->source_fs, ct->out_fs, f_in);
 
@@ -148,7 +199,7 @@ namespace cetech {
 
                 //MAKE_DELETE(memory_globals::default_allocator(), CompileTask, data);
                 
-                sqlite3_close(db);
+                //sqlite3_close(db);
             }
 
             TaskManager::TaskID compile(FileSystem* source_fs,
@@ -163,12 +214,6 @@ namespace cetech {
 
                 const uint32_t files_count = array::size(files);
 
-                sqlite3 *db;
-                char db_path[512] = {0};
-                sprintf(db_path, "%s%s", _build_fs->root_dir(), "build.db");
-
-                sqlite3_open(db_path, &db);
-                sqlite3_close(db);
 
                 char resource_id_str[64] = {0};
                 for (uint32_t i = 0; i < files_count; ++i) {
@@ -216,7 +261,7 @@ namespace cetech {
                     resource_id_str[0] = '\0';
 
                     if (!need_compile) {
-                        continue;
+                        //continue;
                     }
 
                     CompileTask& ct = new_compile_task();
