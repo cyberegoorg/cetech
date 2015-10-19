@@ -172,7 +172,8 @@ project "cetech1"
 
       "luajit",
       "enet",
-      "SOIL"
+      "SOIL",
+      "sqlite3"
     }
     
     filter "Release or Develop"

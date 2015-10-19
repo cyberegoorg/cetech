@@ -9,6 +9,7 @@
 #include "celib/string/stringid.inl.h"
 #include "celib/platform/dir.h"
 #include "celib/platform/thread.h"
+#include "celib/sqlite/sqlite3.h"
 
 #include "cetech/application/application.h"
 #include "cetech/cvars/cvars.h"
@@ -27,8 +28,8 @@ namespace cetech {
         rapidjson::Document* dependency_index;
 
         char* filename;
-        uint64_t name;
-        uint64_t type;
+        StringId64_t name;
+        StringId64_t type;
     };
 
     enum {
@@ -107,6 +108,31 @@ namespace cetech {
 
                 FSFile* f_out = ct->out_fs->open(output_filename, FSFile::WRITE);
 
+                sqlite3 *db;
+                char *zErrMsg = 0;
+                int  rc;
+                char db_path[512] = {0};
+                sprintf(db_path, "%s%s", ct->out_fs->root_dir(), "build.db");
+                sqlite3_open(db_path, &db);
+
+                /* Create SQL statement */
+                const char* sql = "CREATE TABLE COMPANY("  \
+                        "ID INT PRIMARY KEY     NOT NULL," \
+                        "NAME           TEXT    NOT NULL," \
+                        "AGE            INT     NOT NULL," \
+                        "ADDRESS        CHAR(50)," \
+                        "SALARY         REAL );";
+
+                /* Execute SQL statement */
+                rc = sqlite3_exec(db, sql, NULL , 0, &zErrMsg);
+                if( rc != SQLITE_OK ){
+                    fprintf(stderr, "SQL error: %s\n", zErrMsg);
+                    sqlite3_free(zErrMsg);
+                }else{
+                    fprintf(stdout, "Table created successfully\n");
+                }
+                sqlite3_close(db);
+
                 Compilator comp(ct->source_fs, ct->out_fs, f_in);
 
                 ct->clb(ct->filename, f_in, f_out, comp);
@@ -121,6 +147,8 @@ namespace cetech {
                           ct->name);
 
                 //MAKE_DELETE(memory_globals::default_allocator(), CompileTask, data);
+                
+                sqlite3_close(db);
             }
 
             TaskManager::TaskID compile(FileSystem* source_fs,
@@ -134,6 +162,13 @@ namespace cetech {
                 TaskManager::TaskID top_compile_task = tm.add_empty_begin(0);
 
                 const uint32_t files_count = array::size(files);
+
+                sqlite3 *db;
+                char db_path[512] = {0};
+                sprintf(db_path, "%s%s", _build_fs->root_dir(), "build.db");
+
+                sqlite3_open(db_path, &db);
+                sqlite3_close(db);
 
                 char resource_id_str[64] = {0};
                 for (uint32_t i = 0; i < files_count; ++i) {
@@ -184,7 +219,6 @@ namespace cetech {
                         continue;
                     }
 
-                    // TODO: Compile Task Pool, reduce alloc free, ringbuffer? #61
                     CompileTask& ct = new_compile_task();
                     ct.source_fs = source_fs;
                     ct.out_fs = _build_fs;
