@@ -40,7 +40,7 @@ solution "cyberego.org tech1"
     targetdir (BUILD_DIR .. OS_ARCH .. "/bin")
     objdir (BUILD_DIR .. OS_ARCH .. "/obj")
 
-    floatingpoint "Fast"
+    -- SQLITE3: floatingpoint "Fast"
     warnings "Extra"
     
     includedirs {
@@ -119,8 +119,13 @@ project "celib_static"
     kind "StaticLib"
     language "C++"
 
+    defines {
+        'DTHREADSAFE=1'
+    }
+
     files {
         ROOT_DIR .. "src/celib/**.cc",
+        ROOT_DIR .. "src/celib/**.c",
         ROOT_DIR .. "src/celib/**.h",
     }
 
