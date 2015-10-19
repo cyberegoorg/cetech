@@ -182,7 +182,7 @@ namespace cetech {
 
                     _renderer->init(main_window, RenderType::RenderType::OpenGL);
                 }
-                
+
                 init_boot();
 
                 this->_last_frame_ticks = os::get_ticks();
@@ -194,9 +194,9 @@ namespace cetech {
                 _lua_eviroment->call_global("shutdown");
 
                 shutdown_boot();
-                
+
                 _renderer->shutdown();
-                
+
                 PackageManager::destroy(memory_globals::default_allocator(), _package_manager);
                 ResourceManager::destroy(memory_globals::default_allocator(), _resource_manager);
                 DevelopManager::destroy(memory_globals::default_allocator(), _develop_manager);
@@ -346,17 +346,20 @@ namespace cetech {
 
                 static ResourceRegistration resource_regs[] = {
                     /* package */
-                    {resource_package::type_hash(), & resource_package::compiler, & resource_package::loader, & resource_package::online, & resource_package::offline,
+                    {resource_package::type_hash(), & resource_package::compiler, & resource_package::loader,
+                     & resource_package::online, & resource_package::offline,
                      & resource_package::unloader},
 
                     /* lua */
-                    {resource_lua::type_hash(), & resource_lua::compiler, & resource_lua::loader, & resource_lua::online, & resource_lua::offline,
+                    {resource_lua::type_hash(), & resource_lua::compiler, & resource_lua::loader,
+                     & resource_lua::online, & resource_lua::offline,
                      & resource_lua::unloader},
 
                     /* texture */
-                    {resource_texture::type_hash(), & resource_texture::compiler, & resource_texture::loader, & resource_texture::online, & resource_texture::offline,
+                    {resource_texture::type_hash(), & resource_texture::compiler, & resource_texture::loader,
+                     & resource_texture::online, & resource_texture::offline,
                      & resource_texture::unloader},
-                     
+
                     /* LAST */
                     {0, nullptr, nullptr, nullptr, nullptr, nullptr}
                 };

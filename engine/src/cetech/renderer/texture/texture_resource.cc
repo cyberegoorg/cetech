@@ -21,7 +21,7 @@ namespace cetech {
         struct Header {
             uint32_t size;
         };
-        
+
         static const StringId64_t _type_hash = stringid64::from_cstring("texture");
 
         StringId64_t type_hash() {
@@ -29,43 +29,35 @@ namespace cetech {
         }
 
 
-        void compiler(const char* filename, FSFile* in, FSFile* out) {
+        void compiler(const char* filename, FSFile* in, FSFile* out, Compilator& compilator) {
             CE_UNUSED(filename);
 
-            size_t sz_in = in->size();
-
-            char tmp[4096] = {0};
-            in->read(tmp, sz_in);
-
             rapidjson::Document document;
-            document.Parse(tmp);
-
-            if (document.HasParseError()) {
-                log::error("resource_package.compiler", "Parse error: %s", GetParseError_En(
-                               document.GetParseError()), document.GetErrorOffset());
+            if (!compilator.resource_to_json(document)) {
                 return;
             }
 
             const char* input = document["input"].GetString();
-            
+
             char full_input_path[1024] = {0};
             std::sprintf(full_input_path, "%s%s", cvars::rm_source_dir.value_str, input);
-            
+
             unsigned char* data;
             unsigned char* dds_data;
             int w, h, ch, dds_size;
-            
+
             data = dds_data = 0;
             w = h = ch = 0;
 
             log::debug("texture.compiler", "input file %s", full_input_path);
             data = SOIL_load_image(full_input_path, &w, &h, &ch, SOIL_LOAD_AUTO);
-            if(!data) {
+            if (!data) {
                 log::error("texture.compiler", "soil loda fail");
                 return;
             }
+
             dds_data = convert_image_to_DXT5(data, w, h, ch, &dds_size);
-            
+
 
             Header header = {dds_size};
             out->write(&header, sizeof(Header));
@@ -82,9 +74,9 @@ namespace cetech {
             f->read(mem->data, header.size);
 
             Resource* res = (Resource*) a.allocate(f_sz);
-            
+
             res->mem = mem;
-            
+
             return (char*)res;
         }
 
@@ -92,10 +84,9 @@ namespace cetech {
             Resource* res = (Resource*) data;
             res->handle = bgfx::createTexture(res->mem);
         }
-        
-        void offline(void* data) {
-        }
-        
+
+        void offline(void* data) {}
+
         void unloader(Allocator& a, void* data) {
             a.deallocate(data);
         }

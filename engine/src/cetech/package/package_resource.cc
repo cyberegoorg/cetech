@@ -21,20 +21,11 @@ namespace cetech {
         }
 
 
-        void compiler(const char* filename, FSFile* in, FSFile* out) {
+        void compiler(const char* filename, FSFile* in, FSFile* out, Compilator& compilator) {
             CE_UNUSED(filename);
 
-            size_t sz_in = in->size();
-
-            char tmp[4096] = {0};
-            in->read(tmp, sz_in);
-
             rapidjson::Document document;
-            document.Parse(tmp);
-
-            if (document.HasParseError()) {
-                log::error("resource_package.compiler", "Parse error: %s", GetParseError_En(
-                               document.GetParseError()), document.GetErrorOffset());
+            if (!compilator.resource_to_json(document)) {
                 return;
             }
 
@@ -76,8 +67,8 @@ namespace cetech {
         }
 
         void online(void* data) {}
-        void offline(void* data){}
-        
+        void offline(void* data) {}
+
         char* loader (FSFile* f, Allocator& a) {
             const uint64_t f_sz = f->size();
 

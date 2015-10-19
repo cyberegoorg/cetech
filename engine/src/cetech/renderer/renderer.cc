@@ -139,7 +139,7 @@ namespace cetech {
         _impl->shutdown();
     }
 
-    
+
     void Renderer::begin_frame() {
         _impl->begin_frame();
     }
