@@ -6,6 +6,8 @@
 #include "celib/crypto/murmur_hash.inl.h"
 #include "cetech/filesystem/file.h"
 
+#include "cetech/resource/resource_compiler.h"
+
 #include "rapidjson/document.h"
 #include "rapidjson/writer.h"
 #include "rapidjson/stringbuffer.h"
@@ -28,7 +30,7 @@ namespace cetech {
 
         StringId64_t type_hash();
 
-        void compiler(const char* filename, FSFile* in, FSFile* out);
+        void compiler(const char* filename, FSFile* in, FSFile* out, Compilator& compilator);
         char* loader(FSFile* f, Allocator& a);
         void online(void* data);
         void offline(void* data);

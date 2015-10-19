@@ -21,7 +21,7 @@ namespace cetech {
         }
 
 
-        void compiler(const char* filename, FSFile* in, FSFile* out) {
+        void compiler(const char* filename, FSFile* in, FSFile* out, Compilator& compilator) {
             size_t sz_in = in->size();
             char tmp[4096] = {0};
             in->read(tmp, sz_in);
@@ -81,8 +81,8 @@ namespace cetech {
         }
 
         void online(void* data) {}
-        void offline(void* data){}
-        
+        void offline(void* data) {}
+
         void unloader(Allocator& a, void* data) {
             a.deallocate(data);
         }

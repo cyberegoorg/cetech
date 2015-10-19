@@ -3,6 +3,7 @@
 #include "celib/string/stringid_types.h"
 #include "celib/memory/memory_types.h"
 #include "cetech/filesystem/file.h"
+#include "cetech/resource/resource_compiler.h"
 
 namespace cetech {
     namespace resource_lua {
@@ -13,7 +14,7 @@ namespace cetech {
 
         StringId64_t type_hash();
 
-        void compiler(const char* filename, FSFile* in, FSFile* out);
+        void compiler(const char* filename, FSFile* in, FSFile* out, Compilator& compilator);
         char* loader(FSFile* f, Allocator& a);
         void online(void* data);
         void offline(void* data);

@@ -99,15 +99,15 @@ namespace cetech {
 
                     hash::set(this->_data_map, type ^ name, loaded_data[i]);
                     inc_reference(type, name);
-                    
+
                     resource_online_clb_t online_clb = hash::get < resource_online_clb_t >
-                                                (this->_online_clb_map, type, nullptr);
+                                                       (this->_online_clb_map, type, nullptr);
 
                     if (online_clb == nullptr) {
                         log::error("resource_manager", "Resource type " "%" PRIx64 " not register online.", type);
                         return;
                     }
-                    
+
                     online_clb(loaded_data[i]);
                 }
 
@@ -186,7 +186,7 @@ namespace cetech {
             virtual void register_offline(StringId64_t type, resource_offline_clb_t clb) final {
                 hash::set(this->_offline_clb_map, type, clb);
             };
-            
+
             CE_INLINE void inc_reference(StringId64_t type, const StringId64_t name) {
                 const uint32_t counter = hash::get < uint32_t > (_data_refcount_map, type ^ name, 0) + 1;
 

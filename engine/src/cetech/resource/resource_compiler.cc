@@ -19,6 +19,45 @@
 #include "rapidjson/error/en.h"
 
 namespace cetech {
+    struct CompileTask {
+        ResourceCompiler::resource_compiler_clb_t clb;
+        FileSystem* source_fs;
+        FileSystem* out_fs;
+
+        rapidjson::Document* dependency_index;
+
+        char* filename;
+        uint64_t name;
+        uint64_t type;
+    };
+
+    enum {
+        TASK_POOL_SIZE = 4096
+    };
+
+    static CompileTask compile_task_pool[TASK_POOL_SIZE];
+    static uint32_t compile_task_pool_idx;
+
+    CE_INLINE CompileTask& new_compile_task() {
+        return compile_task_pool[(compile_task_pool_idx++) % TASK_POOL_SIZE];
+    };
+
+    bool Compilator::resource_to_json(rapidjson::Document& document) {
+        /* parse resouce json */
+        size_t sz_in = resource_file->size();
+        char tmp[4096] = {0};
+        resource_file->read(tmp, sz_in);
+
+        document.Parse(tmp);
+        if (document.HasParseError()) {
+            log::error("resource_package.compiler", "Parse error: %s", GetParseError_En(
+                           document.GetParseError()), document.GetErrorOffset());
+            return false;
+        }
+
+        return true;
+    }
+
     CE_INLINE void calc_hash(const char* path, StringId64_t& type, StringId64_t& name) {
         const char* t = strrchr(path, '.');
         CE_CHECK_PTR(t);
@@ -39,16 +78,6 @@ namespace cetech {
     class ResourceCompilerImplementation final : public ResourceCompiler {
         public:
             friend class ResourceCompiler;
-
-            struct CompileTask {
-                FileSystem* source_fs;
-                FileSystem* out_fs;
-
-                char* filename;
-                uint64_t name, type;
-
-                resource_compiler_clb_t clb;
-            };
 
             FileSystem* _build_fs;
             Hash < resource_compiler_clb_t > _compile_clb_map;
@@ -78,7 +107,9 @@ namespace cetech {
 
                 FSFile* f_out = ct->out_fs->open(output_filename, FSFile::WRITE);
 
-                ct->clb(ct->filename, f_in, f_out);
+                Compilator comp(ct->source_fs, ct->out_fs, f_in);
+
+                ct->clb(ct->filename, f_in, f_out, comp);
 
                 ct->source_fs->close(f_in);
                 ct->out_fs->close(f_out);
@@ -94,7 +125,8 @@ namespace cetech {
 
             TaskManager::TaskID compile(FileSystem* source_fs,
                                         rapidjson::Document& debug_index,
-                                        rapidjson::Document& build_index) {
+                                        rapidjson::Document& build_index,
+                                        rapidjson::Document& dependency_index) {
                 Array < char* > files(memory_globals::default_allocator());
                 source_fs->list_directory(source_fs->root_dir(), files);
 
@@ -153,15 +185,16 @@ namespace cetech {
                     }
 
                     // TODO: Compile Task Pool, reduce alloc free, ringbuffer? #61
-                    CompileTask* ct = MAKE_NEW(memory_globals::default_allocator(), CompileTask);
-                    ct->source_fs = source_fs;
-                    ct->out_fs = _build_fs;
-                    ct->filename = strdup(filename);
-                    ct->name = name;
-                    ct->type = type;
-                    ct->clb = clb;
+                    CompileTask& ct = new_compile_task();
+                    ct.source_fs = source_fs;
+                    ct.out_fs = _build_fs;
+                    ct.filename = strdup(filename);
+                    ct.name = name;
+                    ct.type = type;
+                    ct.clb = clb;
+                    ct.dependency_index = &dependency_index;
 
-                    TaskManager::TaskID tid = tm.add_begin(compile_task, ct, 0, NULL_TASK, top_compile_task);
+                    TaskManager::TaskID tid = tm.add_begin(compile_task, &ct, 0, NULL_TASK, top_compile_task);
                     tm.add_end(&tid, 1);
                 }
 
@@ -234,6 +267,9 @@ namespace cetech {
                 rapidjson::Document debug_index;
                 debug_index.SetObject();
 
+                rapidjson::Document dependency_index;
+                dependency_index.SetObject();
+
                 rapidjson::Document build_index;
                 load_debug_index(build_index);
 
@@ -241,14 +277,15 @@ namespace cetech {
 
                 build_config_json(source_fs, _build_fs);
 
-                TaskManager::TaskID compile_tid = compile(source_fs, debug_index, build_index);
+                TaskManager::TaskID compile_tid = compile(source_fs, debug_index, build_index, dependency_index);
                 tm.wait(compile_tid);
 
-                compile_tid = compile(core_fs, debug_index, build_index);
+                compile_tid = compile(core_fs, debug_index, build_index, dependency_index);
                 tm.wait(compile_tid);
 
                 save_json("debug_index.json", debug_index);
                 save_json("build_index.json", build_index);
+                save_json("dependency_index.json", dependency_index);
 
                 disk_filesystem::destroy(memory_globals::default_allocator(), source_fs);
                 disk_filesystem::destroy(memory_globals::default_allocator(), core_fs);

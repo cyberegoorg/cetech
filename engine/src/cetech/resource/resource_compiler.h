@@ -11,9 +11,21 @@
 #include "rapidjson/document.h"
 
 namespace cetech {
+    struct Compilator {
+        Compilator(FileSystem * src_fs, FileSystem * build_fs, FSFile * resource_file) : src_fs(src_fs), build_fs(
+                                                                                             build_fs), resource_file(
+                                                                                             resource_file) {}
+
+        bool resource_to_json(rapidjson::Document& document);
+
+        FileSystem* src_fs;
+        FileSystem* build_fs;
+        FSFile* resource_file;
+    };
+
     class ResourceCompiler {
         public:
-            typedef void (* resource_compiler_clb_t)(const char*, FSFile*, FSFile*);
+            typedef void (* resource_compiler_clb_t)(const char*, FSFile*, FSFile*, Compilator&);
 
             virtual ~ResourceCompiler() {}
 
