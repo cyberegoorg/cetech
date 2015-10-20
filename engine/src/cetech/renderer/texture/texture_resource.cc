@@ -38,6 +38,7 @@ namespace cetech {
             }
 
             const char* input = document["input"].GetString();
+            compilator.add_dependency(input);
 
             char full_input_path[1024] = {0};
             std::sprintf(full_input_path, "%s%s", cvars::rm_source_dir.value_str, input);

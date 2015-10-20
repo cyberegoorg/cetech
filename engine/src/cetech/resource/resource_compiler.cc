@@ -35,67 +35,115 @@ namespace cetech {
     struct BuildDB {
         BuildDB(const char* db_path){
             sqlite3_open(db_path, &db);
-            sqlite3_busy_timeout(db, 1000);
-            create_db();
+            sqlite3_busy_timeout(db, 10); // TODO: non blocking
         };
 
         ~BuildDB(){
             sqlite3_close(db);
         };
 
+        bool _exec(const char* sql,  int (*callback)(void*,int,char**,char**) ,  void * data) {
+            char * err_msg = 0;
+            bool   run = true;
+            int    rc = 0;
+
+            do {
+                rc = sqlite3_exec(db, sql, callback, data, &err_msg);
+
+                switch(rc) {
+                    case SQLITE_BUSY:
+                        continue;
+
+                    case SQLITE_OK:
+                        return true;
+
+                    default:
+                        log::error("BuildDB", "SQL error (%d): %s", rc, err_msg);
+                        sqlite3_free(err_msg);
+                        return false;
+                }
+            } while(run);
+        }
+
+
         void set_file(const char* filename, time_t mtime) {
-            char *sql = sqlite3_mprintf("INSERT OR REPLACE INTO files VALUES(NULL, '%q', %d)", filename, mtime);
-            
-            char *err_msg = 0;
-            int rc = sqlite3_exec(db, sql, 0, 0, &err_msg);
-            if( rc != SQLITE_OK ){
-                log::error("BuildDB", "SQL error (%d): %s", rc, err_msg);
-                sqlite3_free(err_msg);
-            }
+            char *sql = sqlite3_mprintf("INSERT OR REPLACE INTO files VALUES(NULL, '%q', %d);\n", filename, mtime);
+
+            _exec(sql, 0, 0);
             sqlite3_free(sql);
         }
 
-        static int get_mtime_clb(void *arg, int argc, char **argv, char **colName) { 
-            time_t *mtime = (time_t*)arg;
-            *mtime = atol(argv[0]);
-            return 0;
-        }
-        
-        time_t get_mtime(const char* filename) {
-            
-            char *sql = sqlite3_mprintf("SELECT mtime FROM files WHERE filename = '%q'", filename);
+        void set_file_depend(const char* filename, const char* depend_on) {
+            char *sql = sqlite3_mprintf("INSERT INTO file_dependency (filename, depend_on) SELECT '%q', '%q' WHERE NOT EXISTS(SELECT 1 FROM file_dependency WHERE filename = '%q' AND depend_on = '%q')", filename, depend_on, filename, depend_on);
 
-            time_t mtime = 0;
-            
-            char *err_msg = 0;
-            int rc = sqlite3_exec(db, sql, get_mtime_clb, &mtime, &err_msg);
+            _exec(sql, 0, 0);
 
-            if( rc != SQLITE_OK ){
-                log::error("BuildDB", "SQL error (%d): %s", rc, err_msg);
-                sqlite3_free(err_msg);
-                return 0;
-            }
             sqlite3_free(sql);
-            
-            return mtime;
+        }
+
+        bool need_compile(const char* filename, FileSystem* source_fs) {
+            char *sql = sqlite3_mprintf(
+                "SELECT\n"
+                "    file_dependency.depend_on, files.mtime\n"
+                "FROM\n"
+                "    file_dependency\n"
+                "JOIN\n"
+                "    files on files.filename == file_dependency.depend_on\n"
+                "WHERE\n"
+                "    file_dependency.filename = '%q'\n", filename);
+
+
+            sqlite3_stmt *stmt;
+            sqlite3_prepare_v2(db, sql, -1, &stmt, NULL);
+
+            int rc = 0;
+            bool compile = true;
+            while ( (rc = sqlite3_step(stmt)) == SQLITE_ROW) {
+                compile = false;
+                
+                time_t actual_mtime = source_fs->file_mtime((const char*)sqlite3_column_text(stmt, 0));
+                time_t last_mtime = sqlite3_column_int64(stmt, 1);
+
+                if( actual_mtime != last_mtime ) {
+                    compile = true;
+                    break;
+                }
+            }
+
+            sqlite3_free(sql);
+            sqlite3_finalize(stmt);
+
+            return compile;
         }
         
-        void create_db() {
+        bool init_db() {
             char *err_msg = 0;
             int  rc;
-            
-            /* Create SQL statement */
-            const char* sql = "CREATE TABLE IF NOT EXISTS files ("
-                    "id       INTEGER PRIMARY KEY  AUTOINCREMENT NOT NULL,"
-                    "filename TEXT    UNIQUE                 NOT NULL,"
-                    "mtime    INTEGER                        NOT NULL"
-                    ");";
+            const char* sql;
 
-            rc = sqlite3_exec(db, sql, nullptr, 0, &err_msg);
-            if( rc != SQLITE_OK ){
-                log::error("BuildDB", "SQL error (%d): %s", rc, err_msg);
-                sqlite3_free(err_msg);
+            // Create files table
+            sql = "CREATE TABLE IF NOT EXISTS files ("
+                  "id       INTEGER PRIMARY KEY    AUTOINCREMENT    NOT NULL,"
+                  "filename TEXT    UNIQUE                          NOT NULL,"
+                  "mtime    INTEGER                                 NOT NULL"
+                  ");";
+
+            if(!_exec(sql, 0, 0)) {
+                return false;
             }
+
+            // Create file_dependency table
+            sql = "CREATE TABLE IF NOT EXISTS file_dependency ("
+                  "id        INTEGER PRIMARY KEY    AUTOINCREMENT    NOT NULL,"
+                  "filename  TEXT                                    NOT NULL,"
+                  "depend_on TEXT                                    NOT NULL"
+                  ");";
+
+            if(!_exec(sql, 0, 0)) {
+                return false;
+            }
+            
+            return true;
         }
 
         sqlite3 *db;
@@ -128,6 +176,12 @@ namespace cetech {
         return true;
     }
 
+    bool Compilator::add_dependency(const char* path) {
+        bdb->set_file(path, src_fs->file_mtime(path));
+        bdb->set_file_depend(filename, path);
+    }
+
+
     CE_INLINE void calc_hash(const char* path, StringId64_t& type, StringId64_t& name) {
         const char* t = strrchr(path, '.');
         CE_CHECK_PTR(t);
@@ -159,6 +213,15 @@ namespace cetech {
             static void compile_task(void* data) {
                 CompileTask* ct = (CompileTask*)data;
 
+                char db_path[512] = {0};
+                sprintf(db_path, "%s%s", ct->out_fs->root_dir(), "build.db");
+                BuildDB bdb(db_path);
+                bdb.init_db();
+
+                if(!bdb.need_compile(ct->filename, ct->source_fs)) {
+                    return;
+                }
+                
                 log::info("resource_compiler",
                           "Compile \"%s\" => (" "%" PRIx64 ", " "%" PRIx64 ").",
                           ct->filename,
@@ -174,17 +237,15 @@ namespace cetech {
                     log::error("resource_compiler", "Could not open source file \"%s\"", ct->filename);
                     return;
                 }
-
-
-                char db_path[512] = {0};
-                sprintf(db_path, "%s%s", ct->out_fs->root_dir(), "build.db");
-                BuildDB bdb(db_path);
-                printf("sss, %d\n", bdb.get_mtime(ct->filename));
+                
                 bdb.set_file(ct->filename, ct->source_fs->file_mtime(ct->filename));
-
+                bdb.set_file_depend(ct->filename, ct->filename);
+                
                 FSFile* f_out = ct->out_fs->open(output_filename, FSFile::WRITE);
 
                 Compilator comp(ct->source_fs, ct->out_fs, f_in);
+                comp.bdb = &bdb;
+                comp.filename = ct->filename;
 
                 ct->clb(ct->filename, f_in, f_out, comp);
 
@@ -227,22 +288,6 @@ namespace cetech {
                     calc_hash(filename, type, name);
                     resource_id_to_str(resource_id_str, type, name);
 
-                    time_t source_mt = source_fs->file_mtime(filename);
-                    bool need_compile = true;
-                    if (build_index.HasMember(resource_id_str)) {
-                        time_t build_mt = build_index[resource_id_str].GetInt();
-                        if (source_mt == build_mt) {
-                            need_compile = false;
-                        } else {
-                            build_index[resource_id_str].SetInt(source_mt);
-                        }
-                    } else {
-                        build_index.AddMember(
-                            rapidjson::Value(resource_id_str, strlen(resource_id_str), build_index.GetAllocator()),
-                            rapidjson::Value(source_mt), build_index.GetAllocator()
-                            );
-                    }
-
                     resource_compiler_clb_t clb = hash::get < resource_compiler_clb_t >
                                                   (this->_compile_clb_map, type, nullptr);
 
@@ -259,10 +304,6 @@ namespace cetech {
                         );
 
                     resource_id_str[0] = '\0';
-
-                    if (!need_compile) {
-                        //continue;
-                    }
 
                     CompileTask& ct = new_compile_task();
                     ct.source_fs = source_fs;
