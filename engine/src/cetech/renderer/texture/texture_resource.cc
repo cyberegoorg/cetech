@@ -29,7 +29,7 @@ namespace cetech {
         }
 
 
-        void compiler(const char* filename, FSFile* in, FSFile* out, Compilator& compilator) {
+        void compiler(const char* filename, FSFile* in, FSFile* out, CompilatorAPI& compilator) {
             CE_UNUSED(filename);
 
             rapidjson::Document document;

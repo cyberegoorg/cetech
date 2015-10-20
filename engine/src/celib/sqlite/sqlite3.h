@@ -8308,7 +8308,7 @@ struct Fts5ExtensionApi {
 **       xToken(pCtx, 0, "first",                  5,  6, 11);
 **       xToken(pCtx, FTS5_TOKEN_COLOCATED, "1st", 3,  6, 11);
 **       xToken(pCtx, 0, "place",                  5, 12, 17);
-****</codeblock>
+******</codeblock>
 **
 **   It is an error to specify the FTS5_TOKEN_COLOCATED flag the first time
 **   xToken() is called. Multiple synonyms may be specified for a single token
