@@ -11,7 +11,9 @@
 #include "rapidjson/document.h"
 
 namespace cetech {
+    struct BuildDB;
     struct Compilator {
+
         Compilator(FileSystem * src_fs, FileSystem * build_fs, FSFile * resource_file) : src_fs(src_fs), build_fs(
                                                                                              build_fs), resource_file(
                                                                                              resource_file) {}
@@ -23,7 +25,9 @@ namespace cetech {
         FileSystem* src_fs;
         FileSystem* build_fs;
         FSFile* resource_file;
+        const char* filename;
         rapidjson::Document *dependency_index;
+        BuildDB *bdb;
     };
 
     class ResourceCompiler {
