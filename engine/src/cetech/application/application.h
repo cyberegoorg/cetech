@@ -1,9 +1,9 @@
 #pragma once
 
 #include "cetech/task_manager/task_manager.h"
-#include "cetech/resource/resource_manager.h"
-#include "cetech/resource/resource_compiler.h"
-#include "cetech/package/package_manager.h"
+#include "cetech/resource_manager/resource_manager.h"
+#include "cetech/resource_compiler/resource_compiler.h"
+#include "cetech/package_manager/package_manager.h"
 #include "cetech/develop/develop_manager.h"
 #include "cetech/develop/console_server.h"
 #include "cetech/renderer/renderer.h"

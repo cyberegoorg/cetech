@@ -6,7 +6,7 @@
 #include "celib/crypto/murmur_hash.inl.h"
 #include "cetech/filesystem/file.h"
 
-#include "cetech/resource/resource_compiler.h"
+#include "cetech/resource_compiler/resource_compiler.h"
 
 #include "rapidjson/document.h"
 #include "rapidjson/writer.h"

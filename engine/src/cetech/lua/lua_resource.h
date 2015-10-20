@@ -3,7 +3,7 @@
 #include "celib/string/stringid_types.h"
 #include "celib/memory/memory_types.h"
 #include "cetech/filesystem/file.h"
-#include "cetech/resource/resource_compiler.h"
+#include "cetech/resource_compiler/resource_compiler.h"
 
 namespace cetech {
     namespace resource_lua {

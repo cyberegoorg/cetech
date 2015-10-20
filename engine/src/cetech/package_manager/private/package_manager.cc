@@ -1,4 +1,4 @@
-#include "cetech/resource/resource_manager.h"
+#include "cetech/resource_manager/resource_manager.h"
 #include "celib/container/container_types.h"
 #include "celib/container/queue.inl.h"
 #include "celib/container/hash.inl.h"
@@ -8,8 +8,8 @@
 
 #include "cetech/os/os.h"
 
-#include "cetech/package/package_manager.h"
-#include "cetech/package/package_resource.h"
+#include "cetech/package_manager/package_manager.h"
+#include "cetech/package_manager/package_resource.h"
 
 #include "cetech/cvars/cvars.h"
 #include "celib/string/stringid.inl.h"
