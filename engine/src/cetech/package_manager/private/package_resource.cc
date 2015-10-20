@@ -1,4 +1,4 @@
-#include "cetech/package/package_resource.h"
+#include "cetech/package_manager/package_resource.h"
 
 #include "celib/container/array.inl.h"
 #include "celib/string/stringid_types.h"

@@ -1,6 +1,6 @@
 #include <cstdio>
 
-#include "cetech/resource/resource_manager.h"
+#include "cetech/resource_manager/resource_manager.h"
 #include "cetech/application/application.h"
 
 #include "celib/container/container_types.h"

@@ -21,7 +21,7 @@
 #include "celib/math/vector3.inl.h"
 #include "celib/crypto/murmur_hash.inl.h"
 
-#include "cetech/resource/resource_manager.h"
+#include "cetech/resource_manager/resource_manager.h"
 #include "cetech/application/application.h"
 
 namespace cetech {

@@ -1,9 +1,7 @@
 #include <cstdio>
 
-#include "cetech/resource/resource_manager.h"
-
-
-#include "cetech/resource/private/builddb.h"
+#include "cetech/resource_manager/resource_manager.h"
+#include "cetech/resource_compiler/private/builddb.h"
 
 #include "celib/container/container_types.h"
 #include "celib/container/queue.inl.h"
@@ -12,7 +10,7 @@
 #include "celib/string/stringid.inl.h"
 #include "celib/platform/dir.h"
 #include "celib/platform/thread.h"
-#include "celib/sqlite/sqlite3.h"
+#include "sqlite/sqlite3.h"
 
 #include "cetech/application/application.h"
 #include "cetech/cvars/cvars.h"
