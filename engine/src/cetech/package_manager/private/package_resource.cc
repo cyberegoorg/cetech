@@ -30,7 +30,7 @@ namespace cetech {
             }
 
             Header header = {document.MemberCount()};
-            out->write(&header, sizeof(Header));
+            compilator.write_to_build(&header, sizeof(Header));
 
             /* Prepare arrays structs */
             Array < TypeHeader > typesheader(memory_globals::default_allocator()); // TODO: TEMP ALLOCATOR
@@ -62,8 +62,8 @@ namespace cetech {
             }
 
             /* Write types and names */
-            out->write(array::begin(typesheader), sizeof(TypeHeader) * array::size(typesheader));
-            out->write(array::begin(names), sizeof(StringId64_t) * array::size(names));
+            compilator.write_to_build(array::begin(typesheader), sizeof(TypeHeader) * array::size(typesheader));
+            compilator.write_to_build(array::begin(names), sizeof(StringId64_t) * array::size(names));
         }
 
         void online(void* data) {}
