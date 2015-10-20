@@ -29,7 +29,7 @@ namespace cetech {
 
     class ResourceCompiler {
         public:
-            typedef void (* resource_compiler_clb_t)(const char*, FSFile*, FSFile*, CompilatorAPI&);
+            typedef void (* resource_compiler_clb_t)(const char*, CompilatorAPI&);
 
             virtual ~ResourceCompiler() {}
 

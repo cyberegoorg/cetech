@@ -21,7 +21,7 @@ namespace cetech {
         }
 
 
-        void compiler(const char* filename, FSFile* in, FSFile* out, CompilatorAPI& compilator) {
+        void compiler(const char* filename, CompilatorAPI& compilator) {
             char tmp[compilator.resource_file_size() + 1] = {0};
             compilator.read_resource_file(tmp);
 

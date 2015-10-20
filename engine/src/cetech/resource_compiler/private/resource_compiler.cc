@@ -176,7 +176,7 @@ namespace cetech {
 
                 CompilatorAPI comp(ct->source_fs, ct->out_fs, source_file, build_file);
 
-                ct->clb(ct->filename, source_file, build_file, comp);
+                ct->clb(ct->filename, comp);
 
 
                 char db_path[512] = {0};
