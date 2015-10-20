@@ -21,11 +21,9 @@ namespace cetech {
         }
 
 
-        void compiler(const char* filename, FSFile* in, FSFile* out, Compilator& compilator) {
-            size_t sz_in = in->size();
-            char tmp[4096] = {0};
-            in->read(tmp, sz_in);
-
+        void compiler(const char* filename, FSFile* in, FSFile* out, CompilatorAPI& compilator) {
+            char tmp[compilator.resource_file_size() + 1] = {0};
+            compilator.read_resource_file(tmp);
 
             // TODO: lua + LuaStack?, inline lua?
             lua_State* state = luaL_newstate();
@@ -64,8 +62,8 @@ namespace cetech {
                 r.type = 1;
                 r.size = bc_len;
 
-                out->write(&r, sizeof(Resource));
-                out->write(bc, bc_len);
+                compilator.write_to_build(&r, sizeof(Resource));
+                compilator.write_to_build(bc, bc_len);
             }
 
             lua_close(state);
