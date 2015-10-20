@@ -30,8 +30,7 @@ namespace cetech {
         const char* filename;
 
         Implementation(FileSystem * src_fs, FileSystem * build_fs, FSFile * resource_file,
-                       FSFile * build_file) : src_fs(src_fs), build_fs(
-                                                  build_fs),
+                       FSFile * build_file) : src_fs(src_fs), build_fs(build_fs),
                                               resource_file(resource_file), build_file(build_file) {
             char db_path[512] = {0};
             sprintf(db_path, "%s%s", build_fs->root_dir(), "build.db");
@@ -107,7 +106,7 @@ namespace cetech {
     struct CompileTask {
         ResourceCompiler::resource_compiler_clb_t clb;
         FileSystem* source_fs;
-        FileSystem* out_fs;
+        FileSystem* build_fs;
 
         char* filename;
         StringId64_t name;
@@ -172,22 +171,22 @@ namespace cetech {
                     return;
                 }
 
-                FSFile* build_file = ct->out_fs->open(output_filename, FSFile::WRITE);
+                FSFile* build_file = ct->build_fs->open(output_filename, FSFile::WRITE);
 
-                CompilatorAPI comp(ct->source_fs, ct->out_fs, source_file, build_file);
+                CompilatorAPI comp(ct->source_fs, ct->build_fs, source_file, build_file);
 
                 ct->clb(ct->filename, comp);
 
 
                 char db_path[512] = {0};
-                sprintf(db_path, "%s%s", ct->out_fs->root_dir(), "build.db");
+                sprintf(db_path, "%s%s", ct->build_fs->root_dir(), "build.db");
                 BuildDB bdb;
                 bdb.open(db_path);
                 bdb.set_file(ct->filename, ct->source_fs->file_mtime(ct->filename));
                 bdb.set_file_depend(ct->filename, ct->filename);
 
                 ct->source_fs->close(source_file);
-                ct->out_fs->close(build_file);
+                ct->build_fs->close(build_file);
 
                 log::info("resource_compiler",
                           "Compiled \"%s\" => (" "%" PRIx64 ", " "%" PRIx64 ").",
@@ -249,8 +248,8 @@ namespace cetech {
 
                     CompileTask& ct = new_compile_task();
                     ct.source_fs = source_fs;
-                    ct.out_fs = _build_fs;
-                    ct.filename = strdup(filename);
+                    ct.build_fs = _build_fs;
+                    ct.filename = strdup(filename); // TODO: LEAK!!!
                     ct.name = name;
                     ct.type = type;
                     ct.clb = clb;
