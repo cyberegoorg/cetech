@@ -14,7 +14,6 @@ namespace cetech {
 
         void open(const char* db_path) {
             sqlite3_open(db_path, &db);
-            sqlite3_busy_timeout(db, 10); // TODO: non blocking
         }
 
         void close() {
