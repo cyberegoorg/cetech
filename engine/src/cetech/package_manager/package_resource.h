@@ -30,7 +30,7 @@ namespace cetech {
 
         StringId64_t type_hash();
 
-        void compiler(const char* filename, CompilatorAPI& compilator);
+        void compile(const char* filename, CompilatorAPI& compilator);
         char* loader(FSFile* f, Allocator& a);
         void online(void* data);
         void offline(void* data);

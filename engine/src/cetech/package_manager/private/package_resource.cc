@@ -21,7 +21,7 @@ namespace cetech {
         }
 
 
-        void compiler(const char* filename, CompilatorAPI& compilator) {
+        void compile(const char* filename, CompilatorAPI& compilator) {
             CE_UNUSED(filename);
 
             rapidjson::Document document;

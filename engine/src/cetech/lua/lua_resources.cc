@@ -21,7 +21,7 @@ namespace cetech {
         }
 
 
-        void compiler(const char* filename, CompilatorAPI& compilator) {
+        void compile(const char* filename, CompilatorAPI& compilator) {
             char tmp[compilator.resource_file_size() + 1] = {0};
             compilator.read_resource_file(tmp);
 

@@ -346,17 +346,17 @@ namespace cetech {
 
                 static ResourceRegistration resource_regs[] = {
                     /* package */
-                    {resource_package::type_hash(), & resource_package::compiler, & resource_package::loader,
+                    {resource_package::type_hash(), & resource_package::compile, & resource_package::loader,
                      & resource_package::online, & resource_package::offline,
                      & resource_package::unloader},
 
                     /* lua */
-                    {resource_lua::type_hash(), & resource_lua::compiler, & resource_lua::loader,
+                    {resource_lua::type_hash(), & resource_lua::compile, & resource_lua::loader,
                      & resource_lua::online, & resource_lua::offline,
                      & resource_lua::unloader},
 
                     /* texture */
-                    {resource_texture::type_hash(), & resource_texture::compiler, & resource_texture::loader,
+                    {resource_texture::type_hash(), & resource_texture::compile, & resource_texture::loader,
                      & resource_texture::online, & resource_texture::offline,
                      & resource_texture::unloader},
 
