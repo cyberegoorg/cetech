@@ -50,7 +50,6 @@ namespace cetech {
             data = dds_data = 0;
             w = h = ch = 0;
 
-            log::debug("texture.compiler", "input file %s", full_input_path);
             data = SOIL_load_image(full_input_path, &w, &h, &ch, SOIL_LOAD_AUTO);
             if (!data) {
                 log::error("texture.compiler", "soil loda fail");
@@ -61,8 +60,8 @@ namespace cetech {
 
 
             Header header = {dds_size};
-            out->write(&header, sizeof(Header));
-            out->write(dds_data, dds_size);
+            compilator.write_to_build(&header, sizeof(Header));
+            compilator.write_to_build(dds_data, dds_size);
         }
 
         char* loader (FSFile* f, Allocator& a) {
