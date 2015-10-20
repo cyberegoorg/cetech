@@ -33,48 +33,53 @@ namespace cetech {
     };
 
     struct BuildDB {
-        BuildDB(const char* db_path){
+        BuildDB(const char* db_path) {
             sqlite3_open(db_path, &db);
             sqlite3_busy_timeout(db, 10); // TODO: non blocking
         };
 
-        ~BuildDB(){
+        ~BuildDB() {
             sqlite3_close(db);
         };
 
-        bool _exec(const char* sql,  int (*callback)(void*,int,char**,char**) ,  void * data) {
-            char * err_msg = 0;
-            bool   run = true;
-            int    rc = 0;
+        bool _exec(const char* sql, int (* callback)(void*, int, char**, char**), void* data) {
+            char* err_msg = 0;
+            bool run = true;
+            int rc = 0;
 
             do {
                 rc = sqlite3_exec(db, sql, callback, data, &err_msg);
 
-                switch(rc) {
-                    case SQLITE_BUSY:
-                        continue;
+                switch (rc) {
+                case SQLITE_BUSY:
+                    continue;
 
-                    case SQLITE_OK:
-                        return true;
+                case SQLITE_OK:
+                    return true;
 
-                    default:
-                        log::error("BuildDB", "SQL error (%d): %s", rc, err_msg);
-                        sqlite3_free(err_msg);
-                        return false;
+                default:
+                    log::error("BuildDB", "SQL error (%d): %s", rc, err_msg);
+                    sqlite3_free(err_msg);
+                    return false;
                 }
-            } while(run);
+            } while (run);
         }
 
 
         void set_file(const char* filename, time_t mtime) {
-            char *sql = sqlite3_mprintf("INSERT OR REPLACE INTO files VALUES(NULL, '%q', %d);\n", filename, mtime);
+            char* sql = sqlite3_mprintf("INSERT OR REPLACE INTO files VALUES(NULL, '%q', %d);\n", filename, mtime);
 
             _exec(sql, 0, 0);
             sqlite3_free(sql);
         }
 
         void set_file_depend(const char* filename, const char* depend_on) {
-            char *sql = sqlite3_mprintf("INSERT INTO file_dependency (filename, depend_on) SELECT '%q', '%q' WHERE NOT EXISTS(SELECT 1 FROM file_dependency WHERE filename = '%q' AND depend_on = '%q')", filename, depend_on, filename, depend_on);
+            char* sql = sqlite3_mprintf(
+                "INSERT INTO file_dependency (filename, depend_on) SELECT '%q', '%q' WHERE NOT EXISTS(SELECT 1 FROM file_dependency WHERE filename = '%q' AND depend_on = '%q')",
+                filename,
+                depend_on,
+                filename,
+                depend_on);
 
             _exec(sql, 0, 0);
 
@@ -82,7 +87,7 @@ namespace cetech {
         }
 
         bool need_compile(const char* filename, FileSystem* source_fs) {
-            char *sql = sqlite3_mprintf(
+            char* sql = sqlite3_mprintf(
                 "SELECT\n"
                 "    file_dependency.depend_on, files.mtime\n"
                 "FROM\n"
@@ -93,18 +98,18 @@ namespace cetech {
                 "    file_dependency.filename = '%q'\n", filename);
 
 
-            sqlite3_stmt *stmt;
+            sqlite3_stmt* stmt;
             sqlite3_prepare_v2(db, sql, -1, &stmt, NULL);
 
             int rc = 0;
             bool compile = true;
-            while ( (rc = sqlite3_step(stmt)) == SQLITE_ROW) {
+            while ((rc = sqlite3_step(stmt)) == SQLITE_ROW) {
                 compile = false;
-                
+
                 time_t actual_mtime = source_fs->file_mtime((const char*)sqlite3_column_text(stmt, 0));
                 time_t last_mtime = sqlite3_column_int64(stmt, 1);
 
-                if( actual_mtime != last_mtime ) {
+                if (actual_mtime != last_mtime) {
                     compile = true;
                     break;
                 }
@@ -115,10 +120,10 @@ namespace cetech {
 
             return compile;
         }
-        
+
         bool init_db() {
-            char *err_msg = 0;
-            int  rc;
+            char* err_msg = 0;
+            int rc;
             const char* sql;
 
             // Create files table
@@ -128,7 +133,7 @@ namespace cetech {
                   "mtime    INTEGER                                 NOT NULL"
                   ");";
 
-            if(!_exec(sql, 0, 0)) {
+            if (!_exec(sql, 0, 0)) {
                 return false;
             }
 
@@ -139,16 +144,16 @@ namespace cetech {
                   "depend_on TEXT                                    NOT NULL"
                   ");";
 
-            if(!_exec(sql, 0, 0)) {
+            if (!_exec(sql, 0, 0)) {
                 return false;
             }
-            
+
             return true;
         }
 
-        sqlite3 *db;
+        sqlite3* db;
     };
-    
+
     enum {
         TASK_POOL_SIZE = 4096
     };
@@ -218,10 +223,10 @@ namespace cetech {
                 BuildDB bdb(db_path);
                 bdb.init_db();
 
-                if(!bdb.need_compile(ct->filename, ct->source_fs)) {
+                if (!bdb.need_compile(ct->filename, ct->source_fs)) {
                     return;
                 }
-                
+
                 log::info("resource_compiler",
                           "Compile \"%s\" => (" "%" PRIx64 ", " "%" PRIx64 ").",
                           ct->filename,
@@ -237,10 +242,10 @@ namespace cetech {
                     log::error("resource_compiler", "Could not open source file \"%s\"", ct->filename);
                     return;
                 }
-                
+
                 bdb.set_file(ct->filename, ct->source_fs->file_mtime(ct->filename));
                 bdb.set_file_depend(ct->filename, ct->filename);
-                
+
                 FSFile* f_out = ct->out_fs->open(output_filename, FSFile::WRITE);
 
                 Compilator comp(ct->source_fs, ct->out_fs, f_in);
@@ -259,7 +264,7 @@ namespace cetech {
                           ct->name);
 
                 //MAKE_DELETE(memory_globals::default_allocator(), CompileTask, data);
-                
+
                 //sqlite3_close(db);
             }
 
