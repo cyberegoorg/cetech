@@ -29,12 +29,13 @@ namespace cetech {
         FSFile* build_file;
         const char* filename;
 
-        Implementation(FileSystem * src_fs, FileSystem * build_fs, FSFile * resource_file,
+        Implementation(const char* filename, FileSystem * src_fs, FileSystem * build_fs, FSFile * resource_file,
                        FSFile * build_file) : src_fs(src_fs), build_fs(build_fs),
-                                              resource_file(resource_file), build_file(build_file) {
+                                              resource_file(resource_file), build_file(build_file), filename(filename) {
             char db_path[512] = {0};
             sprintf(db_path, "%s%s", build_fs->root_dir(), "build.db");
             bdb.open(db_path);
+
         }
 
         bool resource_to_json(rapidjson::Document& document) {
@@ -74,8 +75,12 @@ namespace cetech {
 
     };
 
-    CompilatorAPI::CompilatorAPI(FileSystem* src_fs, FileSystem* build_fs, FSFile* resource_file, FSFile* build_file) {
-        _impl = new CompilatorAPI::Implementation(src_fs, build_fs, resource_file, build_file);
+    CompilatorAPI::CompilatorAPI(const char* filename,
+                                 FileSystem* src_fs,
+                                 FileSystem* build_fs,
+                                 FSFile* resource_file,
+                                 FSFile* build_file) {
+        _impl = new CompilatorAPI::Implementation(filename, src_fs, build_fs, resource_file, build_file);
     }
 
     CompilatorAPI::~CompilatorAPI() {
@@ -147,10 +152,10 @@ namespace cetech {
 
             FileSystem* _build_fs;
             Hash < resource_compiler_clb_t > _compile_clb_map;
+            BuildDB bdb;
 
             ResourceCompilerImplementation(FileSystem * build_fs, Allocator & allocator) : _build_fs(build_fs),
                                                                                            _compile_clb_map(allocator) {}
-
 
             static void compile_task(void* data) {
                 CompileTask* ct = (CompileTask*)data;
@@ -173,17 +178,19 @@ namespace cetech {
 
                 FSFile* build_file = ct->build_fs->open(output_filename, FSFile::WRITE);
 
-                CompilatorAPI comp(ct->source_fs, ct->build_fs, source_file, build_file);
+                CompilatorAPI comp(ct->filename, ct->source_fs, ct->build_fs, source_file, build_file);
 
                 ct->clb(ct->filename, comp);
 
 
                 char db_path[512] = {0};
                 sprintf(db_path, "%s%s", ct->build_fs->root_dir(), "build.db");
+
                 BuildDB bdb;
                 bdb.open(db_path);
                 bdb.set_file(ct->filename, ct->source_fs->file_mtime(ct->filename));
                 bdb.set_file_depend(ct->filename, ct->filename);
+                bdb.close();
 
                 ct->source_fs->close(source_file);
                 ct->build_fs->close(build_file);
@@ -236,11 +243,6 @@ namespace cetech {
                         );
 
                     resource_id_str[0] = '\0';
-
-                    char db_path[512] = {0};
-                    sprintf(db_path, "%s%s", _build_fs->root_dir(), "build.db");
-                    BuildDB bdb;
-                    bdb.open(db_path);
 
                     if (!bdb.need_compile(filename, source_fs)) {
                         continue;
@@ -318,12 +320,10 @@ namespace cetech {
             virtual void compile_all_resource() final {
                 dir::mkpath(_build_fs->root_dir());
 
-                BuildDB bdb;
                 char db_path[512] = {0};
                 sprintf(db_path, "%s%s", _build_fs->root_dir(), "build.db");
                 bdb.open(db_path);
                 bdb.init_db();
-                bdb.close();
 
                 TaskManager& tm = application_globals::app().task_manager();
 
