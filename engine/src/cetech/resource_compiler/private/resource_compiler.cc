@@ -195,12 +195,7 @@ namespace cetech {
                 ct->source_fs->close(source_file);
                 ct->build_fs->close(build_file);
 
-                log::info("resource_compiler",
-                          "Compiled \"%s\" => (" "%" PRIx64 ", " "%" PRIx64 ").",
-                          ct->filename,
-                          ct->type,
-                          ct->name);
-
+                log::info("resource_compiler", "Compiled \"%s\".", ct->filename );
             }
 
             TaskManager::TaskID compile(FileSystem* source_fs,
