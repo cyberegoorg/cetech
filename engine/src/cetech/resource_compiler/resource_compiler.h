@@ -12,7 +12,11 @@
 
 namespace cetech {
     struct CompilatorAPI {
-        CompilatorAPI(FileSystem * src_fs, FileSystem * build_fs, FSFile * resource_file, FSFile * build_file);
+        CompilatorAPI(const char* filename,
+                      FileSystem * src_fs,
+                      FileSystem * build_fs,
+                      FSFile * resource_file,
+                      FSFile * build_file);
         ~CompilatorAPI();
 
         bool resource_to_json(rapidjson::Document& document);
