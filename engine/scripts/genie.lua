@@ -91,8 +91,6 @@ solution "cyberego.org tech1"
 project "celib_static"
     kind "StaticLib"
     language "C++"
-    
-
 
     defines {
         'DTHREADSAFE=1'
@@ -173,13 +171,13 @@ project "cetech1"
             "bgfxRelease",
         }
 
-   configuration ("linux*")
-    links {
-	'SDL2',
-	'dl',
-	'pthread',
-	"GL",
-	"X11"
-    }
+    configuration ("linux*")
+        links {
+            'SDL2',
+            'dl',
+            'pthread',
+            "GL",
+            "X11"
+        }
 
-    configuration {}
+    strip()

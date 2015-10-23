@@ -108,7 +108,7 @@ namespace cetech {
 
             json_data.AddMember("type", "log", json_data.GetAllocator());
 
-            json_data.AddMember("time", rapidjson::Value(time), json_data.GetAllocator());
+            json_data.AddMember("time", rapidjson::Value((int64_t)time), json_data.GetAllocator());
             json_data.AddMember("level", rapidjson::Value(level_to_str[level], 1), json_data.GetAllocator());
             json_data.AddMember("where", rapidjson::Value(where, strlen(where)), json_data.GetAllocator());
             json_data.AddMember("msg", rapidjson::Value(msg, strlen(msg)), json_data.GetAllocator());
