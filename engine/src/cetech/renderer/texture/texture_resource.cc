@@ -59,7 +59,9 @@ namespace cetech {
             dds_data = convert_image_to_DXT5(data, w, h, ch, &dds_size);
 
 
-            Header header = {dds_size};
+            Header header;
+            header.size = dds_size;
+            
             compilator.write_to_build(&header, sizeof(Header));
             compilator.write_to_build(dds_data, dds_size);
         }
