@@ -769,7 +769,10 @@ function toolchain(_buildDir, _libDir)
 			"-Wunused-value",
 			"-Wundef",
 		}
-
+		buildoptions_cpp {
+			"-std=c++0x",
+		}
+                
 	configuration { "freebsd" }
 		targetdir (path.join(_buildDir, "freebsd/bin"))
 		objdir (path.join(_buildDir, "freebsd/obj"))
