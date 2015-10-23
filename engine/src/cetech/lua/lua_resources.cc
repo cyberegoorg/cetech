@@ -4,6 +4,7 @@
 
 #include "celib/string/stringid_types.h"
 #include "celib/memory/memory.h"
+#include "celib/macros.h"
 #include "celib/string/stringid.inl.h"
 
 #include "cetech/os/os.h"
@@ -22,7 +23,9 @@ namespace cetech {
 
 
         void compile(const char* filename, CompilatorAPI& compilator) {
-            char tmp[compilator.resource_file_size() + 1] = {0};
+            char tmp[compilator.resource_file_size() + 1];
+	    memset(tmp, 0, compilator.resource_file_size() + 1);
+
             compilator.read_resource_file(tmp);
 
             // TODO: lua + LuaStack?, inline lua?
@@ -78,8 +81,8 @@ namespace cetech {
             return mem;
         }
 
-        void online(void* data) {}
-        void offline(void* data) {}
+        void online(void* data) {CE_UNUSED(data);}
+        void offline(void* data) {CE_UNUSED(data);}
 
         void unloader(Allocator& a, void* data) {
             a.deallocate(data);

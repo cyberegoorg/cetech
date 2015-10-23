@@ -1,5 +1,6 @@
 #include <cstdio>
 
+
 #include "cetech/resource_manager/resource_manager.h"
 #include "cetech/resource_compiler/private/builddb.h"
 
@@ -40,7 +41,9 @@ namespace cetech {
 
         bool resource_to_json(rapidjson::Document& document) {
             /* parse resouce json */
-            char tmp[resource_file->size() + 1] = {0};
+            char tmp[resource_file->size() + 1];
+            memset(tmp, 0, resource_file->size()+1);
+
             read_resource_file(tmp);
 
             document.Parse(tmp);
