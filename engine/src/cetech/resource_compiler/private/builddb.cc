@@ -57,10 +57,10 @@ namespace cetech {
             do {
                 rc = sqlite3_step(_stmt);
                 switch (rc) {
-                 case SQLITE_LOCKED:
-                     sqlite3_reset(_stmt);
-                     run = true;
-                     continue;
+                case SQLITE_LOCKED:
+                    sqlite3_reset(_stmt);
+                    run = true;
+                    continue;
 
                 case SQLITE_BUSY:
                     run = true;
@@ -91,7 +91,10 @@ namespace cetech {
     };
 
     void BuildDB::open(const char* db_path) {
-        sqlite3_open_v2(db_path, &_db, SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE | SQLITE_OPEN_SHAREDCACHE | SQLITE_OPEN_NOMUTEX, NULL );
+        sqlite3_open_v2(db_path,
+                        &_db,
+                        SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE | SQLITE_OPEN_SHAREDCACHE | SQLITE_OPEN_NOMUTEX,
+                        NULL );
     }
 
     void BuildDB::close() {
@@ -146,10 +149,10 @@ namespace cetech {
 
         {
             SQLiteSTMT query(_db, "CREATE TABLE IF NOT EXISTS files (\n"
-                                     "id       INTEGER PRIMARY KEY    AUTOINCREMENT    NOT NULL,\n"
-                                     "filename TEXT    UNIQUE                          NOT NULL,\n"
-                                     "mtime    INTEGER                                 NOT NULL\n"
-                                     ");");
+                             "id       INTEGER PRIMARY KEY    AUTOINCREMENT    NOT NULL,\n"
+                             "filename TEXT    UNIQUE                          NOT NULL,\n"
+                             "mtime    INTEGER                                 NOT NULL\n"
+                             ");");
 
             if (query.step() != SQLITE_DONE) {
                 return false;
@@ -159,10 +162,10 @@ namespace cetech {
         {
             // Create file_dependency table
             SQLiteSTMT query(_db, "CREATE TABLE IF NOT EXISTS file_dependency (\n"
-                                     "id        INTEGER PRIMARY KEY    AUTOINCREMENT    NOT NULL,\n"
-                                     "filename  TEXT                                    NOT NULL,\n"
-                                     "depend_on TEXT                                    NOT NULL\n"
-                                     ");");
+                             "id        INTEGER PRIMARY KEY    AUTOINCREMENT    NOT NULL,\n"
+                             "filename  TEXT                                    NOT NULL,\n"
+                             "depend_on TEXT                                    NOT NULL\n"
+                             ");");
 
             if (query.step() != SQLITE_DONE) {
                 return false;

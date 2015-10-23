@@ -41,7 +41,7 @@ solution "cyberego.org tech1"
     objdir (BUILD_DIR .. OS_ARCH .. "/obj")
 
     -- SQLITE3: floatingpoint "Fast"
-    warnings "Extra"
+    --warnings "Extra"
     
     includedirs {
       THIRD_PARTY_INCLUDE,

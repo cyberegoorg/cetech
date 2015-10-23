@@ -34,9 +34,13 @@ analyze:
 	@echo Analyze...
 	cppcheck --template=gcc --enable=all --inconclusive --std=posix ./src/
 
-.PHONY: scan-build
-scan-build: clean
-	scan-build -analyze-headers make -C ${ROOT_DIR} -j 4 test-linux-debug
+.PHONY: scan-build32
+scan-build32:
+	scan-build -analyze-headers make -C ${ROOT_DIR} -j 4 test-linux-debug64
+	
+.PHONY: scan-build64
+scan-build64:
+	scan-build -analyze-headers make -C ${ROOT_DIR} -j 4 test-linux-debug64
 
 .PHONY: uncrustify
 uncrustify:
@@ -74,74 +78,13 @@ clean-doc:
 LINUX_SIMD = fpu
 LINUX_RUNTIME = sdl2
 
-.build/projects/gmake:
-	$(PREMAKE5) --file=premake5.lua --cc=clang --simd=$(LINUX_SIMD) --runtime=$(LINUX_RUNTIME) gmake
+include scripts/linux.mk
 
-.PHONY: linux-all
-linux-all: linux-debug32 linux-release32 linux-debug64 linux-release64
-
-.PHONY: linux-debug
-linux-debug: linux-debug${ARCH}
-
-.PHONY: linux-develop
-linux-develop: linux-develop${ARCH}
-
-.PHONY: linux-release
-linux-release: linux-release${ARCH}
-
-.PHONY: linux-debug32
-linux-debug32:  .build/projects/gmake
-	+${MAKE} -C .build/projects/gmake config=debug_x32
-
-.PHONY: linux-develop32
-linux-develop32:  .build/projects/gmake
-	+${MAKE} -C .build/projects/gmake config=develop_x32
-	
-.PHONY: linux-release32
-linux-release32: .build/projects/gmake
-	+${MAKE} -C .build/projects/gmake config=release_x32
-
-.PHONY: linux-debug64
-linux-debug64: .build/projects/gmake
-	+${MAKE} -C .build/projects/gmake config=debug_x64
-
-.PHONY: linux-develop64
-linux-develop64:  .build/projects/gmake
-	+${MAKE} -C .build/projects/gmake config=develop_x64
-	
-.PHONY: linux-release64
-linux-release64: .build/projects/gmake
-	+${MAKE} -C .build/projects/gmake config=release_x64
-
-.PHONY: test-linux-debug
-test-linux-debug: linux-debug
-	.build/linux${ARCH}/bin/cetech1_test_debug -b -r compact
-
-.PHONY: test-linux-release
-test-linux-release: linux-release
-	.build/linux${ARCH}/bin/cetech1_test -b -r compact
-
-.PHONY: test-linux-debug-travis
-test-linux-debug-travis: linux-debug
-	.build/linux${ARCH}/bin/cetech1_test_debug -d yes
-
-.PHONY: test-linux-release-travis
-test-linux-release-travis: linux-release
-	.build/linux${ARCH}/bin/cetech1_test -d yes
-#########
-
-#################
-# Visual studio #
-#################
+###########
+# Windows #
+###########
 WINDOWS_SIMD = fpu
 WINDOWS_RUNTIME = sdl2
 
-.build/projects/vs2013:
-	$(PREMAKE5) --file=premake5.lua --simd=$(WINDOWS_SIMD) --runtime=$(WINDOWS_PLATFORM) vs2013
-
-.build/projects/vs2015:
-	$(PREMAKE5) --file=premake5.lua --simd=$(WINDOWS_SIMD) --runtime=$(WINDOWS_PLATFORM) vs2015
-
-vs2013: .build/projects/vs2013
-vs2015: .build/projects/vs2015
-#################
+include scripts/windows.mk
+###########

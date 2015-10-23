@@ -24,7 +24,7 @@ namespace cetech {
 
         void compile(const char* filename, CompilatorAPI& compilator) {
             char tmp[compilator.resource_file_size() + 1];
-	    memset(tmp, 0, compilator.resource_file_size() + 1);
+            memset(tmp, 0, compilator.resource_file_size() + 1);
 
             compilator.read_resource_file(tmp);
 
@@ -81,8 +81,12 @@ namespace cetech {
             return mem;
         }
 
-        void online(void* data) {CE_UNUSED(data);}
-        void offline(void* data) {CE_UNUSED(data);}
+        void online(void* data) {
+            CE_UNUSED(data);
+        }
+        void offline(void* data) {
+            CE_UNUSED(data);
+        }
 
         void unloader(Allocator& a, void* data) {
             a.deallocate(data);
