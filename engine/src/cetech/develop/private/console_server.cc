@@ -1,5 +1,6 @@
 #include "cetech/develop/console_server.h"
 
+#include "celib/macros.h"
 #include "celib/memory/memory.h"
 #include "celib/container/array.inl.h"
 #include "celib/container/hash.inl.h"
@@ -7,7 +8,10 @@
 #include "celib/string/stringid.inl.h"
 #include "cetech/cvars/cvars.h"
 
-#include "celib/log/handlers.h"
+#include "cetech/application/application.h"
+
+
+#include "cetech/log_system/handlers.h"
 
 #include "rapidjson/writer.h"
 #include "rapidjson/stringbuffer.h"
@@ -16,6 +20,36 @@
 #include "enet/enet.h"
 
 namespace cetech {
+    
+        void console_server_handler(const LogLevel::Enum level,
+                                    const time_t time,
+                                    const char* where,
+                                    const char* msg,
+                                    void* data) {
+
+            static const char* level_to_str[] = { "I", "W", "E", "D" };
+
+            CE_UNUSED(data);
+
+            ConsoleServer& cs = application_globals::app().console_server();
+
+            if (!cs.has_clients()) {
+                return;
+            }
+
+            rapidjson::Document json_data;
+            json_data.SetObject();
+
+            json_data.AddMember("type", "log", json_data.GetAllocator());
+
+            json_data.AddMember("time", rapidjson::Value((int64_t)time), json_data.GetAllocator());
+            json_data.AddMember("level", rapidjson::Value(level_to_str[level], 1), json_data.GetAllocator());
+            json_data.AddMember("where", rapidjson::Value(where, strlen(where)), json_data.GetAllocator());
+            json_data.AddMember("msg", rapidjson::Value(msg, strlen(msg)), json_data.GetAllocator());
+
+            cs.send_json_document(json_data);
+        }
+
     class ConsoleServerImplementation : public ConsoleServer {
         friend class ConsoleServer;
 
@@ -33,12 +67,12 @@ namespace cetech {
             server_addr.port = cvars::console_server_port.value_i;
             server_host = enet_host_create(&server_addr, 32, 10, 0, 0);
 
-            log::register_handler(&log_handlers::console_server_handler);
+            log_globals::log().register_handler(&console_server_handler);
         }
 
         virtual ~ConsoleServerImplementation() final {
             enet_host_destroy(server_host);
-            log::unregister_handler(&log_handlers::console_server_handler);
+            log_globals::log().unregister_handler(&console_server_handler);
         }
 
         virtual void register_command(const char* name, const command_clb_t clb) final {
@@ -76,7 +110,7 @@ namespace cetech {
                     }
 
                     Event.peer->data = (void*)cid;
-                    log::info("console_server", "Client connected. %d", cid);
+                    log_globals::log().info("console_server", "Client connected. %d", cid);
                     break;
                 }
 
@@ -86,7 +120,7 @@ namespace cetech {
                     this->client_peer[cid - 1] = nullptr;
                     queue::push_back(this->peer_free_queue, (int)(cid - 1));
 
-                    log::info("console_server", "Client %d disconnected.", cid);
+                    log_globals::log().info("console_server", "Client %d disconnected.", cid);
                     break;
                 }
 
@@ -111,14 +145,14 @@ namespace cetech {
             document.Parse(packet);
 
             if (document.HasParseError()) {
-                log::error("console_server", "Packet parse error: %s", GetParseError_En(
-                               document.GetParseError()), document.GetErrorOffset());
+                log_globals::log().error("console_server", "Packet parse error: %s", GetParseError_En(
+                                             document.GetParseError()), document.GetErrorOffset());
                 return false;
             }
 
             /* Name */
             if (!document.HasMember("name")) {
-                log::error("console_server", "Packet require key \"name\"");
+                log_globals::log().error("console_server", "Packet require key \"name\"");
                 return false;
             }
 
@@ -137,7 +171,7 @@ namespace cetech {
             command_clb_t cmd = hash::get < command_clb_t >
                                 (this->cmds, stringid64::from_cstring(document["name"].GetString()), nullptr);
             if (cmd == nullptr) {
-                log::error("console_server", "Command \"%s\" not found.", document["name"].GetString());
+                log_globals::log().error("console_server", "Command \"%s\" not found.", document["name"].GetString());
                 return;
             }
 

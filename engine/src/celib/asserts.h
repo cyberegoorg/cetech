@@ -5,7 +5,6 @@
 #include <cstring>
 
 #include "celib/defines.h"
-#include "celib/log/log.h"
 
 /*!
  * Check ptr macro.

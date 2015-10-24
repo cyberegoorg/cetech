@@ -4,7 +4,7 @@
 #include <sys/stat.h>
 
 #include "celib/macros.h"
-#include "celib/log/log.h"
+#include "cetech/log_system/log_system.h"
 #include "celib/asserts.h"
 #include "celib/container/array.inl.h"
 #include "celib/crypto/murmur_hash.inl.h"

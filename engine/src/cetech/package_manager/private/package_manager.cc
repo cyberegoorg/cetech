@@ -41,7 +41,7 @@ namespace cetech {
             friend class PackageManager;
 
             static void package_loader_task(void* data) {
-                log::debug("package_manager.loader.task", "Loading package");
+                log_globals::log().debug("package_manager.loader.task", "Loading package");
 
                 PackageLoaderTask* pkg_loader = (PackageLoaderTask*) data;
 
@@ -58,7 +58,7 @@ namespace cetech {
                     application_globals::app().resource_manager().get(resource_package::type_hash(), name);
 
                 if (res == nullptr) {
-                    log::error("package_manager", "Could not get resource for package " "%" PRIx64, name);
+                    log_globals::log().error("package_manager", "Could not get resource for package " "%" PRIx64, name);
                     return;
                 }
 
@@ -90,7 +90,7 @@ namespace cetech {
                     application_globals::app().resource_manager().get(resource_package::type_hash(), name);
 
                 if (res == nullptr) {
-                    log::error("package_manager", "Could not get resource for package " "%" PRIx64, name);
+                    log_globals::log().error("package_manager", "Could not get resource for package " "%" PRIx64, name);
                     return;
                 }
 
@@ -113,7 +113,7 @@ namespace cetech {
                     application_globals::app().resource_manager().get(resource_package::type_hash(), name);
 
                 if (res == nullptr) {
-                    //log::error("package_manager", "Could not get resource for package " "%" PRIx64, name);
+                    //log_globals::log().error("package_manager", "Could not get resource for package " "%" PRIx64, name);
                     return false;
                 }
 

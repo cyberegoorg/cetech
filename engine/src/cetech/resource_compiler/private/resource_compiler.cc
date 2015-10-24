@@ -48,8 +48,8 @@ namespace cetech {
 
             document.Parse(tmp);
             if (document.HasParseError()) {
-                log::error("resource_package.compiler", "Parse error: %s", GetParseError_En(
-                               document.GetParseError()), document.GetErrorOffset());
+                log_globals::log().error("resource_package.compiler", "Parse error: %s", GetParseError_En(
+                                             document.GetParseError()), document.GetErrorOffset());
                 return false;
             }
 
@@ -163,11 +163,11 @@ namespace cetech {
             static void compile_task(void* data) {
                 CompileTask* ct = (CompileTask*)data;
 
-                log::info("resource_compiler",
-                          "Compile \"%s\" => (" "%" PRIx64 ", " "%" PRIx64 ").",
-                          ct->filename,
-                          ct->type,
-                          ct->name);
+                log_globals::log().info("resource_compiler",
+                                        "Compile \"%s\" => (" "%" PRIx64 ", " "%" PRIx64 ").",
+                                        ct->filename,
+                                        ct->type,
+                                        ct->name);
 
                 char output_filename[512] = {0};
                 resource_id_to_str(output_filename, ct->type, ct->name);
@@ -175,7 +175,7 @@ namespace cetech {
                 FSFile* source_file;
                 source_file = ct->source_fs->open(ct->filename, FSFile::READ);
                 if (!source_file->is_valid()) {
-                    log::error("resource_compiler", "Could not open source file \"%s\"", ct->filename);
+                    log_globals::log().error("resource_compiler", "Could not open source file \"%s\"", ct->filename);
                     return;
                 }
 
@@ -198,7 +198,7 @@ namespace cetech {
                 ct->source_fs->close(source_file);
                 ct->build_fs->close(build_file);
 
-                log::info("resource_compiler", "Compiled \"%s\".", ct->filename );
+                log_globals::log().info("resource_compiler", "Compiled \"%s\".", ct->filename );
             }
 
             TaskManager::TaskID compile(FileSystem* source_fs,
@@ -230,7 +230,9 @@ namespace cetech {
 
 
                     if (clb == nullptr) {
-                        log::warning("resource_compiler", "Resource type " "%" PRIx64 " not register compiler.", type);
+                        log_globals::log().warning("resource_compiler",
+                                                   "Resource type " "%" PRIx64 " not register compiler.",
+                                                   type);
                         continue;
                     }
 
@@ -308,8 +310,8 @@ namespace cetech {
 
                 build_index.Parse(data);
                 if (build_index.HasParseError()) {
-                    log::error("resouce_compiler", "debug_index.json parse error: %s", GetParseError_En(
-                                   build_index.GetParseError()), build_index.GetErrorOffset());
+                    log_globals::log().error("resouce_compiler", "debug_index.json parse error: %s", GetParseError_En(
+                                                 build_index.GetParseError()), build_index.GetErrorOffset());
                 }
 
                 _build_fs->close(build_index_file);

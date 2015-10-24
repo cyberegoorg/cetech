@@ -4,7 +4,7 @@
 #include <sys/stat.h>
 
 #include "celib/macros.h"
-#include "celib/log/log.h"
+#include "cetech/log_system/log_system.h"
 #include "celib/asserts.h"
 #include "celib/container/array.inl.h"
 #include "celib/crypto/murmur_hash.inl.h"
@@ -28,7 +28,7 @@ namespace cetech {
             SDL_RWops* rwops = SDL_RWFromFile(path, mode);
 
             if (!rwops) {
-                log::warning("sys", "Open file error: %s", path, SDL_GetError());
+                log_globals::log().warning("sys", "Open file error: %s", path, SDL_GetError());
             }
 
             return (struct File) {

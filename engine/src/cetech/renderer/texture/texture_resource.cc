@@ -52,7 +52,7 @@ namespace cetech {
 
             data = SOIL_load_image(full_input_path, &w, &h, &ch, SOIL_LOAD_AUTO);
             if (!data) {
-                log::error("texture.compiler", "soil loda fail");
+                log_globals::log().error("texture.compiler", "soil loda fail");
                 return;
             }
 
@@ -61,7 +61,7 @@ namespace cetech {
 
             Header header;
             header.size = dds_size;
-            
+
             compilator.write_to_build(&header, sizeof(Header));
             compilator.write_to_build(dds_data, dds_size);
         }

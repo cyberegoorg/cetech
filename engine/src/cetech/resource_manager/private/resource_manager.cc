@@ -50,14 +50,19 @@ namespace cetech {
                                             (this->_load_clb_map, type, nullptr);
 
                 if (clb == nullptr) {
-                    log::error("resource_manager", "Resource type " "%" PRIx64 " not register loader.", type);
+                    log_globals::log().error("resource_manager",
+                                             "Resource type " "%" PRIx64 " not register loader.",
+                                             type);
                     return;
                 }
 
                 for (uint32_t i = 0; i < count; ++i) {
                     name = names[i];
 
-                    log::info("resource_manager", "Loading resource (" "%" PRIx64 ", " "%" PRIx64 ").", type, name);
+                    log_globals::log().info("resource_manager",
+                                            "Loading resource (" "%" PRIx64 ", " "%" PRIx64 ").",
+                                            type,
+                                            name);
 
                     char resource_srt[32 + 1] = {0};
                     resource_id_to_str(resource_srt, type, name);
@@ -65,10 +70,10 @@ namespace cetech {
                     FSFile* f = _fs->open(resource_srt, FSFile::READ);
 
                     if (!f->is_valid()) {
-                        log::error("resource_manager",
-                                   "Could not open resouce (" "%" PRIx64 ", " "%" PRIx64 ").",
-                                   type,
-                                   name);
+                        log_globals::log().error("resource_manager",
+                                                 "Could not open resouce (" "%" PRIx64 ", " "%" PRIx64 ").",
+                                                 type,
+                                                 name);
                         loaded_data[i] = nullptr;
                         _fs->close(f);
                         continue;
@@ -77,10 +82,10 @@ namespace cetech {
                     char* data = clb(f, memory_globals::default_allocator());
 
                     if (data == nullptr) {
-                        log::error("resource_manager",
-                                   "Could not load resouce (" "%" PRIx64 ", " "%" PRIx64 ").",
-                                   type,
-                                   name);
+                        log_globals::log().error("resource_manager",
+                                                 "Could not load resouce (" "%" PRIx64 ", " "%" PRIx64 ").",
+                                                 type,
+                                                 name);
                     }
 
                     loaded_data[i] = data;
@@ -104,7 +109,9 @@ namespace cetech {
                                                        (this->_online_clb_map, type, nullptr);
 
                     if (online_clb == nullptr) {
-                        log::error("resource_manager", "Resource type " "%" PRIx64 " not register online.", type);
+                        log_globals::log().error("resource_manager",
+                                                 "Resource type " "%" PRIx64 " not register online.",
+                                                 type);
                         return;
                     }
 
@@ -120,7 +127,9 @@ namespace cetech {
                                               (this->_unload_clb_map, type, nullptr);
 
                 if (clb == nullptr) {
-                    log::error("resource_manager", "Resource type " "%" PRIx64 " not register unloader.", type);
+                    log_globals::log().error("resource_manager",
+                                             "Resource type " "%" PRIx64 " not register unloader.",
+                                             type);
                     return;
                 }
 
@@ -190,11 +199,11 @@ namespace cetech {
             CE_INLINE void inc_reference(StringId64_t type, const StringId64_t name) {
                 const uint32_t counter = hash::get < uint32_t > (_data_refcount_map, type ^ name, 0) + 1;
 
-                log::debug("resource_manager",
-                           "Inc reference for (%" PRIx64 ", %" PRIx64 ") counter == %d ",
-                           type,
-                           name,
-                           counter);
+                log_globals::log().debug("resource_manager",
+                                         "Inc reference for (%" PRIx64 ", %" PRIx64 ") counter == %d ",
+                                         type,
+                                         name,
+                                         counter);
 
                 hash::set(_data_refcount_map, type ^ name, counter);
             }
@@ -202,11 +211,11 @@ namespace cetech {
             CE_INLINE bool dec_reference(StringId64_t type, const StringId64_t name) {
                 const uint32_t counter = hash::get < uint32_t > (_data_refcount_map, type ^ name, 1) - 1;
 
-                log::debug("resource_manager",
-                           "Dec reference for  (%" PRIx64 ", %" PRIx64 ") counter == %d ",
-                           type,
-                           name,
-                           counter);
+                log_globals::log().debug("resource_manager",
+                                         "Dec reference for  (%" PRIx64 ", %" PRIx64 ") counter == %d ",
+                                         type,
+                                         name,
+                                         counter);
 
                 hash::set(_data_refcount_map, type ^ name, counter);
 
