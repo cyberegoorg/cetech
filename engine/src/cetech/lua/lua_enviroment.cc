@@ -390,7 +390,7 @@ namespace cetech {
             StringId64_t name_hash = murmur_hash_64(name, strlen(name), 22);
 
             const resource_lua::Resource* res =
-                (resource_lua::Resource*) application_globals::app().resource_manager().get(
+                (resource_lua::Resource*) resource_manager::get(
                     resource_lua::type_hash(), name_hash);
 
             if (res == nullptr) {

@@ -21,8 +21,6 @@ namespace cetech {
         StringId64_t type;
         StringId64_t* names;
         uint32_t count;
-
-        ResourceManager* rm;
     };
 
     enum {
@@ -48,14 +46,14 @@ namespace cetech {
                 Array < char* > loaded_data(memory_globals::default_allocator());
                 array::reserve(loaded_data, pkg_loader->count);
 
-                pkg_loader->rm->load(array::begin(loaded_data), pkg_loader->type, pkg_loader->names, pkg_loader->count);
-                pkg_loader->rm->add_loaded(array::begin(
-                                               loaded_data), pkg_loader->type, pkg_loader->names, pkg_loader->count);
+                resource_manager::load(array::begin(loaded_data), pkg_loader->type, pkg_loader->names,
+                                       pkg_loader->count);
+                resource_manager::add_loaded(array::begin(
+                                                 loaded_data), pkg_loader->type, pkg_loader->names, pkg_loader->count);
             }
 
             virtual void load(StringId64_t name) final {
-                const char* res =
-                    application_globals::app().resource_manager().get(resource_package::type_hash(), name);
+                const char* res = resource_manager::get(resource_package::type_hash(), name);
 
                 if (res == nullptr) {
                     log_globals::log().error("package_manager", "Could not get resource for package " "%" PRIx64, name);
@@ -65,7 +63,6 @@ namespace cetech {
                 resource_package::Header* header = (resource_package::Header*)res;
                 resource_package::TypeHeader* type_header = (resource_package::TypeHeader*)(header + 1);
 
-                ResourceManager& rm = application_globals::app().resource_manager();
                 TaskManager& tm = application_globals::app().task_manager();
 
                 const uint64_t types_count = header->count;
@@ -78,7 +75,6 @@ namespace cetech {
                     pkg_task.count = count;
                     pkg_task.names = names;
                     pkg_task.type = type;
-                    pkg_task.rm = &rm;
 
                     TaskManager::TaskID tid = tm.add_begin(package_loader_task, &pkg_task, 0, NULL_TASK, NULL_TASK);
                     tm.add_end(&tid, 1);
@@ -86,8 +82,7 @@ namespace cetech {
             }
 
             virtual void unload(StringId64_t name) final {
-                const char* res =
-                    application_globals::app().resource_manager().get(resource_package::type_hash(), name);
+                const char* res = resource_manager::get(resource_package::type_hash(), name);
 
                 if (res == nullptr) {
                     log_globals::log().error("package_manager", "Could not get resource for package " "%" PRIx64, name);
@@ -97,20 +92,19 @@ namespace cetech {
                 resource_package::Header* header = (resource_package::Header*)res;
                 resource_package::TypeHeader* type_header = (resource_package::TypeHeader*)(header + 1);
 
-                ResourceManager& rm = application_globals::app().resource_manager();
                 const uint64_t types_count = header->count;
                 for (uint64_t i = 0; i < types_count; ++i) {
                     uint32_t count = type_header[i].count;
                     StringId64_t type = type_header[i].type;
                     StringId64_t* names = (StringId64_t*)(res + type_header[i].offset);
 
-                    rm.unload(type, names, count);
+                    resource_manager::unload(type, names, count);
                 }
             }
 
             virtual bool is_loaded(StringId64_t name) final {
                 const char* res =
-                    application_globals::app().resource_manager().get(resource_package::type_hash(), name);
+                    resource_manager::get(resource_package::type_hash(), name);
 
                 if (res == nullptr) {
                     //log_globals::log().error("package_manager", "Could not get resource for package " "%" PRIx64, name);
@@ -126,7 +120,7 @@ namespace cetech {
                     StringId64_t type = type_header[i].type;
                     StringId64_t* names = (StringId64_t*)(res + type_header[i].offset);
 
-                    if (!application_globals::app().resource_manager().can_get(type, names, count)) {
+                    if (!resource_manager::can_get(type, names, count)) {
                         return false;
                     }
                 }
@@ -145,12 +139,10 @@ namespace cetech {
                 StringId64_t boot_pkg_name_h = stringid64::from_cstringn(cvars::boot_pkg.value_str,
                                                                          cvars::boot_pkg.str_len);
 
-                ResourceManager& rm = application_globals::app().resource_manager();
-
                 // Load boot package
                 char* package_data[1];
-                rm.load(package_data, resource_package::type_hash(), &boot_pkg_name_h, 1);
-                rm.add_loaded(package_data, resource_package::type_hash(), &boot_pkg_name_h, 1);
+                resource_manager::load(package_data, resource_package::type_hash(), &boot_pkg_name_h, 1);
+                resource_manager::add_loaded(package_data, resource_package::type_hash(), &boot_pkg_name_h, 1);
 
                 load(boot_pkg_name_h);
                 flush(boot_pkg_name_h);
