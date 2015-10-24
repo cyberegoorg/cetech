@@ -66,7 +66,6 @@ namespace cetech {
         public:
             friend class Application;
 
-            DevelopManager* _develop_manager;
             ConsoleServer* _console_server;
             LuaEnviroment* _lua_eviroment;
             FileSystem* _filesystem;
@@ -82,7 +81,7 @@ namespace cetech {
                 char daemon_mod : 1;
             } _flags;
 
-            ApplicationImplementation() : _develop_manager(nullptr), _console_server(nullptr),
+            ApplicationImplementation() : _console_server(nullptr),
                                           _lua_eviroment(nullptr), _filesystem(nullptr),
                                           _frame_id(0), _last_frame_ticks(0), _delta_time(0) {
                 _flags = {0, 0, 0};
@@ -109,7 +108,7 @@ namespace cetech {
 
                 posix_init();
 
-                _develop_manager = DevelopManager::make(memory_globals::default_allocator());
+                develop_manager_globals::init();
                 parse_command_line();
 
                 os::init();
@@ -197,7 +196,7 @@ namespace cetech {
                 package_manager_globals::shutdown();
                 resource_manager_globals::shutdown();
 
-                DevelopManager::destroy(memory_globals::default_allocator(), _develop_manager);
+                develop_manager_globals::shutdown();
                 task_manager_globals::shutdown();
                 ConsoleServer::destroy(memory_globals::default_allocator(), _console_server);
                 LuaEnviroment::destroy(memory_globals::default_allocator(), _lua_eviroment);
@@ -223,9 +222,10 @@ namespace cetech {
                     this->_delta_time = dt;
                     this->_last_frame_ticks = now_ticks;
 
-                    _develop_manager->push_record_float("engine.frame_id", _frame_id);
-                    _develop_manager->push_record_float("engine.delta_time", dt);
-                    _develop_manager->push_record_float("engine.frame_rate", 1.0f / dt);
+
+                    develop_manager::push_record_float("engine.frame_id", _frame_id);
+                    develop_manager::push_record_float("engine.delta_time", dt);
+                    develop_manager::push_record_float("engine.frame_rate", 1.0f / dt);
 
                     os::frame_start();
                     keyboard::frame_start();
@@ -260,9 +260,10 @@ namespace cetech {
                     keyboard::frame_end();
                     mouse::swap_states();
 
-                    _develop_manager->push_end_frame();
-                    _develop_manager->send_buffer();
-                    _develop_manager->clear();
+                    develop_manager::push_end_frame();
+                    develop_manager::send_buffer();
+                    develop_manager::clear();
+
                     ++(this->_frame_id);
 
                     task_manager::wait(frame_task); // TODO
@@ -284,11 +285,6 @@ namespace cetech {
                 return _flags.run != 0;
             }
 
-            virtual DevelopManager& develop_manager() final {
-                CE_CHECK_PTR(this->_develop_manager);
-
-                return *(this->_develop_manager);
-            }
 
             virtual ConsoleServer& console_server() final {
                 CE_CHECK_PTR(this->_console_server);

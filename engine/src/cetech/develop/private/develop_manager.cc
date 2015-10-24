@@ -10,86 +10,88 @@
 #include "rapidjson/document.h"
 
 namespace cetech {
-    enum EventType {
-        EVENT_NONE = 0,
-
-        EVENT_BEGIN_FRAME = 1,
-        EVENT_END_FRAME = 2,
-
-        EVENT_RECORD_FLOAT = 3,
-
-        EVENT_MEMORY_ALLOC = 4,
-        EVENT_MEMORY_FREE = 5,
-
-        EVENT_COUNT
-    };
-
-    struct BeginFrameEvent {
-        uint32_t get_frame_id;
-        uint32_t time;
-    };
-
-    struct EndFrameEvent {
-        uint32_t get_frame_id;
-        uint32_t time;
-    };
-
-    struct RecordFloatEvent {
-        const char* name;
-        uint32_t get_frame_id;
-        float value;
-    };
-
-    static thread_local char _stream_buffer[64 * 1024];
-    static thread_local uint32_t _stream_buffer_count;
-
-    class DevelopManagerImplementation : public DevelopManager {
-        friend class DevelopManager;
+    namespace {
+        using namespace develop_manager;
 
         typedef void (* to_json_fce_t)(const void*, rapidjson::Document&);
 
-        EventStream stream;
+        static thread_local char _stream_buffer[64 * 1024];
+        static thread_local uint32_t _stream_buffer_count;
 
-        Hash < to_json_fce_t > to_json;
-        Hash < const char* > type_to_string;
+        struct DevelopManagerData {
+            EventStream stream;
+            Hash < to_json_fce_t > to_json;
+            Hash < const char* > type_to_string;
+
+            DevelopManagerData(Allocator & allocator) : stream(allocator), to_json(allocator),
+                                                        type_to_string(allocator) {}
+        };
+
+        struct Globals {
+            static const int MEMORY = sizeof(DevelopManagerData);
+            char buffer[MEMORY];
+
+            DevelopManagerData* data;
+
+            Globals() : data(0) {}
+        } _globals;
 
 
-        DevelopManagerImplementation(Allocator & allocator) : stream(allocator), to_json(allocator), type_to_string(
-                                                                  allocator) {
-            register_type(EVENT_BEGIN_FRAME, "EVENT_BEGIN_FRAME", beginframe_to_json);
-            register_type(EVENT_END_FRAME, "EVENT_END_FRAME", endframe_to_json);
-            register_type(EVENT_RECORD_FLOAT, "EVENT_RECORD_FLOAT", recordfloat_to_json);
+        void flush_stream_buffer() {
+            eventstream::write(develop_manager::event_stream(), _stream_buffer, _stream_buffer_count);
+            _stream_buffer_count = 0;
         }
 
-        virtual void clear() final {
-            eventstream::clear(stream);
+        template < typename T >
+        void push(uint32_t type, const T& event) {
+            const uint32_t sz = sizeof(eventstream::Header) + sizeof(T);
+
+            if ((_stream_buffer_count + sz) >= 64 * 1024) {
+                flush_stream_buffer();
+            }
+
+            char* p = _stream_buffer + _stream_buffer_count;
+
+            eventstream::Header* h = (eventstream::Header*)p;
+            h->type = type;
+            h->size = sizeof(T);
+
+            _stream_buffer_count += sz;
+
+            *(T*)(p + sizeof(eventstream::Header)) = event;
+        }
+    }
+
+    namespace develop_manager {
+        void clear() {
+            eventstream::clear(_globals.data->stream);
         }
 
-        virtual EventStream& event_stream() final {
-            return stream;
+        EventStream& event_stream() {
+            return _globals.data->stream;
         }
 
         void register_type(EventType type, const char* type_str, to_json_fce_t fce) {
-            hash::set(this->to_json, type, fce);
-            hash::set(this->type_to_string, type, type_str);
+            hash::set(_globals.data->to_json, type, fce);
+            hash::set(_globals.data->type_to_string, type, type_str);
         }
 
-        virtual void send_buffer() final {
+        void send_buffer() {
             ConsoleServer& cs = application_globals::app().console_server();
 
             flush_stream_buffer();
 
-            if (!cs.has_clients() || eventstream::empty(this->stream)) {
+            if (!cs.has_clients() || eventstream::empty(_globals.data->stream)) {
                 return;
             }
 
             eventstream::event_it it = 0;
-            while (eventstream::valid(this->stream, it)) {
+            while (eventstream::valid(_globals.data->stream, it)) {
 
-                eventstream::Header* header = eventstream::header(this->stream, it);
+                eventstream::Header* header = eventstream::header(_globals.data->stream, it);
 
                 const char* type_str = hash::get < const char* >
-                                       (this->type_to_string,
+                                       (_globals.data->type_to_string,
                                         (EventType)header->type,
                                         "NONE");
 
@@ -100,18 +102,18 @@ namespace cetech {
                 json_data.AddMember("etype", rapidjson::Value(type_str, strlen(type_str)), json_data.GetAllocator());
 
                 to_json_fce_t to_json_fce = hash::get < to_json_fce_t >
-                                            (this->to_json, header->type, nullptr);
+                                            (_globals.data->to_json, header->type, nullptr);
                 if (to_json_fce) {
-                    to_json_fce(eventstream::event < void* > (this->stream, it), json_data);
+                    to_json_fce(eventstream::event < void* > (_globals.data->stream, it), json_data);
                 }
 
                 cs.send_json_document(json_data);
 
-                it = eventstream::next(this->stream, it);
+                it = eventstream::next(_globals.data->stream, it);
             }
         }
 
-        virtual void push_begin_frame() final {
+        void push_begin_frame() {
             BeginFrameEvent event = {
                 .get_frame_id = application_globals::app().get_frame_id(),
                 .time = os::get_ticks()
@@ -120,7 +122,7 @@ namespace cetech {
             push(EVENT_BEGIN_FRAME, event);
         }
 
-        virtual void push_end_frame() final {
+        void push_end_frame() {
             EndFrameEvent event = {
                 .get_frame_id = application_globals::app().get_frame_id(),
                 .time = os::get_ticks()
@@ -129,7 +131,7 @@ namespace cetech {
             push(EVENT_END_FRAME, event);
         }
 
-        virtual void push_record_float(const char* name, const float value) final {
+        void push_record_float(const char* name, const float value) {
             RecordFloatEvent event = {
                 .name = strdup(name),
                 .get_frame_id = application_globals::app().get_frame_id(),
@@ -157,40 +159,22 @@ namespace cetech {
             document.AddMember("value", e->value, document.GetAllocator());
         }
 
-        template < typename T >
-        void push(uint32_t type, const T& event) {
-            const uint32_t sz = sizeof(eventstream::Header) + sizeof(T);
 
-            if ((_stream_buffer_count + sz) >= 64 * 1024) {
-                flush_stream_buffer();
-            }
-
-            char* p = _stream_buffer + _stream_buffer_count;
-
-            eventstream::Header* h = (eventstream::Header*)p;
-            h->type = type;
-            h->size = sizeof(T);
-
-            _stream_buffer_count += sz;
-
-            *(T*)(p + sizeof(eventstream::Header)) = event;
-        }
-
-
-
-        void flush_stream_buffer() {
-            eventstream::write(
-                application_globals::app().develop_manager().event_stream(), _stream_buffer, _stream_buffer_count);
-            _stream_buffer_count = 0;
-        }
-    };
-
-
-    DevelopManager* DevelopManager::make(Allocator& allocator) {
-        return MAKE_NEW(allocator, DevelopManagerImplementation, allocator);
     }
 
-    void DevelopManager::destroy(Allocator& allocator, DevelopManager* dm) {
-        MAKE_DELETE(allocator, DevelopManager, dm);
+    namespace develop_manager_globals {
+        void init() {
+            char* p = _globals.buffer;
+            _globals.data = new(p) DevelopManagerData(memory_globals::default_allocator());
+
+            register_type(EVENT_BEGIN_FRAME, "EVENT_BEGIN_FRAME", beginframe_to_json);
+            register_type(EVENT_END_FRAME, "EVENT_END_FRAME", endframe_to_json);
+            register_type(EVENT_RECORD_FLOAT, "EVENT_RECORD_FLOAT", recordfloat_to_json);
+        }
+
+        void shutdown() {
+            _globals = Globals();
+        }
     }
+
 }
