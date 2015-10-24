@@ -5,33 +5,34 @@
 #include "rapidjson/document.h"
 
 namespace cetech {
-    class ConsoleServer {
-        public:
-            typedef void (* command_clb_t)(const rapidjson::Document&, rapidjson::Document&);
+    namespace console_server {
+        typedef void (* command_clb_t)(const rapidjson::Document&, rapidjson::Document&);
+        
+        void init();
+        
+        /*! Execute console server operation.
+            */
+         void tick();
 
-            virtual ~ConsoleServer() {};
+        /*! Register command.
+            * \param name Name
+            * \param clb Callback.
+            */
+         void register_command(const char* name, const command_clb_t clb);
 
-            /*! Execute console server operation.
-             */
-            virtual void tick() = 0;
+        /*! Has console server any client?
+            * \return True if has else return false./
+            */
+         bool has_clients();
 
-            /*! Register command.
-             * \param name Name
-             * \param clb Callback.
-             */
-            virtual void register_command(const char* name, const command_clb_t clb) = 0;
+        /*! Send JSON document.
+            * \param document Json document.
+            */
+         void send_json_document(const rapidjson::Document& document);
+    }
 
-            /*! Has console server any client?
-             * \return True if has else return false./
-             */
-            virtual bool has_clients() = 0;
-
-            /*! Send JSON document.
-             * \param document Json document.
-             */
-            virtual void send_json_document(const rapidjson::Document& document) = 0;
-
-            static ConsoleServer* make(Allocator& allocator);
-            static void destroy(Allocator& allocator, ConsoleServer* cs);
-    };
+    namespace console_server_globals {
+        void init();
+        void shutdown();
+    }
 }
