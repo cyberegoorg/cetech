@@ -77,8 +77,6 @@ namespace cetech {
             resource_package::Header* header = (resource_package::Header*)res;
             resource_package::TypeHeader* type_header = (resource_package::TypeHeader*)(header + 1);
 
-            TaskManager& tm = application_globals::app().task_manager();
-
             const uint64_t types_count = header->count;
             for (uint64_t i = 0; i < types_count; ++i) {
                 uint32_t count = type_header[i].count;
@@ -90,8 +88,12 @@ namespace cetech {
                 pkg_task.names = names;
                 pkg_task.type = type;
 
-                TaskManager::TaskID tid = tm.add_begin(package_loader_task, &pkg_task, 0, NULL_TASK, NULL_TASK);
-                tm.add_end(&tid, 1);
+                task_manager::TaskID tid = task_manager::add_begin(package_loader_task,
+                                                                   &pkg_task,
+                                                                   0,
+                                                                   NULL_TASK,
+                                                                   NULL_TASK);
+                task_manager::add_end(&tid, 1);
             }
         }
 
@@ -143,9 +145,8 @@ namespace cetech {
         }
 
         void flush(StringId64_t name) {
-            TaskManager& tm = application_globals::app().task_manager();
             while (!is_loaded(name)) {
-                tm.do_work();
+                task_manager::do_work();
             }
         }
 

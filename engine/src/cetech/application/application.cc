@@ -66,7 +66,6 @@ namespace cetech {
         public:
             friend class Application;
 
-            TaskManager* _task_manager;
             DevelopManager* _develop_manager;
             ConsoleServer* _console_server;
             LuaEnviroment* _lua_eviroment;
@@ -126,7 +125,8 @@ namespace cetech {
 
                 _flags.run = 1;
 
-                _task_manager = TaskManager::make(memory_globals::default_allocator());
+                task_manager_globals::init();
+
                 resource_manager_globals::init(_filesystem);
                 resource_compiler_globals::init();
 
@@ -200,7 +200,7 @@ namespace cetech {
                 resource_manager_globals::shutdown();
 
                 DevelopManager::destroy(memory_globals::default_allocator(), _develop_manager);
-                TaskManager::destroy(memory_globals::default_allocator(), _task_manager);
+                task_manager_globals::shutdown();
                 ConsoleServer::destroy(memory_globals::default_allocator(), _console_server);
                 LuaEnviroment::destroy(memory_globals::default_allocator(), _lua_eviroment);
                 Renderer::destroy(memory_globals::default_allocator(), _renderer);
@@ -238,17 +238,18 @@ namespace cetech {
                         _renderer->begin_frame();
                     }
 
-                    TaskManager::TaskID frame_task = _task_manager->add_empty_begin(0);
-                    TaskManager::TaskID console_server_task = _task_manager->add_begin(
+                    task_manager::TaskID frame_task = task_manager::add_empty_begin(0);
+                    task_manager::TaskID console_server_task = task_manager::add_begin(
                         console_server_tick, this, 0,
                         NULL_TASK, frame_task
                         );
 
-                    const TaskManager::TaskID task_end[] = {
+                    const task_manager::TaskID task_end[] = {
                         frame_task,
                         console_server_task,
                     };
-                    _task_manager->add_end(task_end, sizeof(task_end) / sizeof(TaskManager::TaskID));
+
+                    task_manager::add_end(task_end, sizeof(task_end) / sizeof(task_manager::TaskID));
 
                     usleep(3 * 1000);
                     if (!_flags.pause) {
@@ -267,7 +268,7 @@ namespace cetech {
                     _develop_manager->clear();
                     ++(this->_frame_id);
 
-                    _task_manager->wait(frame_task);
+                    task_manager::wait(frame_task); // TODO
 
                     if (!_flags.daemon_mod) {
                         _renderer->end_frame();
@@ -284,12 +285,6 @@ namespace cetech {
 
             virtual bool is_run() final {
                 return _flags.run != 0;
-            }
-
-            virtual TaskManager& task_manager() final {
-                CE_CHECK_PTR(this->_task_manager);
-
-                return *(this->_task_manager);
             }
 
             virtual DevelopManager& develop_manager() final {

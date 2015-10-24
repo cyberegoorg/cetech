@@ -121,14 +121,13 @@ namespace cetech {
             log_globals::log().info("resource_compiler", "Compiled \"%s\".", ct->filename );
         }
 
-        TaskManager::TaskID compile(FileSystem* source_fs, FileSystem* build_fs,
-                                    rapidjson::Document& debug_index) {
+        task_manager::TaskID compile(FileSystem* source_fs, FileSystem* build_fs,
+                                     rapidjson::Document& debug_index) {
 
             Array < char* > files(memory_globals::default_allocator());
             source_fs->list_directory(source_fs->root_dir(), files);
 
-            TaskManager& tm = application_globals::app().task_manager();
-            TaskManager::TaskID top_compile_task = tm.add_empty_begin(0);
+            task_manager::TaskID top_compile_task = task_manager::add_empty_begin(0);
 
             const uint32_t files_count = array::size(files);
 
@@ -182,13 +181,13 @@ namespace cetech {
                 ct.type = type;
                 ct.clb = clb;
 
-                TaskManager::TaskID tid = tm.add_begin(compile_task, &ct, 0, NULL_TASK, top_compile_task);
-                tm.add_end(&tid, 1);
+                task_manager::TaskID tid = task_manager::add_begin(compile_task, &ct, 0, NULL_TASK, top_compile_task);
+                task_manager::add_end(&tid, 1);
             }
 
             dir::listdir_free(files);
 
-            tm.add_end(&top_compile_task, 1);
+            task_manager::add_end(&top_compile_task, 1);
             return top_compile_task;
         }
 
@@ -255,8 +254,6 @@ namespace cetech {
             bdb.open(db_path);
             bdb.init_db();
 
-            TaskManager& tm = application_globals::app().task_manager();
-
             FileSystem* source_fs = disk_filesystem::make(
                 memory_globals::default_allocator(), cvars::rm_source_dir.value_str);
 
@@ -268,11 +265,11 @@ namespace cetech {
 
             build_config_json(source_fs, build_fs);
 
-            TaskManager::TaskID compile_tid = compile(source_fs, build_fs, debug_index);
-            tm.wait(compile_tid);
+            task_manager::TaskID compile_tid = compile(source_fs, build_fs, debug_index);
+            task_manager::wait(compile_tid);
 
             compile_tid = compile(core_fs, build_fs, debug_index);
-            tm.wait(compile_tid);
+            task_manager::wait(compile_tid);
 
             save_json(build_fs, "debug_index.json", debug_index);
 

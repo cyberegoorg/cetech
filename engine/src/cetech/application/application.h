@@ -33,7 +33,6 @@ namespace cetech {
 
             virtual bool is_run() = 0;
 
-            virtual TaskManager& task_manager() = 0;
             virtual DevelopManager& develop_manager() = 0;
             virtual ConsoleServer& console_server() = 0;
             virtual LuaEnviroment& lua_enviroment() = 0;
