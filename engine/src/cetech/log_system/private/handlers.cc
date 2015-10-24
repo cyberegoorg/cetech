@@ -1,10 +1,8 @@
-#pragma once
-
 #include <cstdio>
 #include <cstdarg>
 #include <ctime>
 
-#include "celib/log/log.h"
+#include "cetech/log_system/log_system.h"
 #include "celib/macros.h"
 #include "cetech/develop/console_server.h"
 #include "cetech/application/application.h"
@@ -39,7 +37,7 @@ static const char* level_format[] = {
 };
 
 namespace cetech {
-    namespace log_handlers_internal {
+    namespace {
         static char* time_to_utc_str(std::tm* gmtm) {
             char* time_str = std::asctime(gmtm);
             time_str[strlen(time_str) - 1] = '\0';
@@ -48,18 +46,18 @@ namespace cetech {
     };
 
     namespace log_handlers {
-        static void stdout_handler(const log::ELogLevel level,
-                                   const time_t time,
-                                   const char* where,
-                                   const char* msg,
-                                   void* data) {
+        void stdout_handler(const LogLevel::Enum level,
+                            const time_t time,
+                            const char* where,
+                            const char* msg,
+                            void* data) {
             CE_UNUSED(time);
             CE_UNUSED(data);
 
             FILE* out;
 
             switch (level) {
-            case log::LOG_ERROR:
+            case LogLevel::LOG_ERROR:
                 out = stdout;
                 break;
 
@@ -73,47 +71,20 @@ namespace cetech {
             funlockfile(out);
         }
 
-        static void file_handler(const log::ELogLevel level,
-                                 const time_t time,
-                                 const char* where,
-                                 const char* msg,
-                                 void* data) {
+        void file_handler(const LogLevel::Enum level,
+                          const time_t time,
+                          const char* where,
+                          const char* msg,
+                          void* data) {
             FILE* out = (FILE*)(data);
 
             std::tm* gmtm = std::gmtime(&time);
-            char* time_str = log_handlers_internal::time_to_utc_str(gmtm);
+            char* time_str = time_to_utc_str(gmtm);
 
             flockfile(out);
             fprintf(out, LOG_FORMAT "\n", time_str, level_to_str[level], where, msg);
             fflush(out);
             funlockfile(out);
-        }
-
-        static void console_server_handler(const log::ELogLevel level,
-                                           const time_t time,
-                                           const char* where,
-                                           const char* msg,
-                                           void* data) {
-
-            CE_UNUSED(data);
-
-            ConsoleServer& cs = application_globals::app().console_server();
-
-            if (!cs.has_clients()) {
-                return;
-            }
-
-            rapidjson::Document json_data;
-            json_data.SetObject();
-
-            json_data.AddMember("type", "log", json_data.GetAllocator());
-
-            json_data.AddMember("time", rapidjson::Value((int64_t)time), json_data.GetAllocator());
-            json_data.AddMember("level", rapidjson::Value(level_to_str[level], 1), json_data.GetAllocator());
-            json_data.AddMember("where", rapidjson::Value(where, strlen(where)), json_data.GetAllocator());
-            json_data.AddMember("msg", rapidjson::Value(msg, strlen(msg)), json_data.GetAllocator());
-
-            cs.send_json_document(json_data);
         }
     }
 }

@@ -4,7 +4,7 @@
 #include <sys/stat.h>
 
 #include "celib/macros.h"
-#include "celib/log/log.h"
+#include "cetech/log_system/log_system.h"
 #include "celib/asserts.h"
 #include "celib/container/array.inl.h"
 #include "celib/crypto/murmur_hash.inl.h"
@@ -36,7 +36,7 @@ namespace cetech {
                     break;
 
                 case SDL_WINDOWEVENT_SIZE_CHANGED:
-                    log::info("sdl2", "Window size changed to %dx%d", e.window.data1, e.window.data2);
+                    log_globals::log().info("sdl2", "Window size changed to %dx%d", e.window.data1, e.window.data2);
                     break;
 
                 }

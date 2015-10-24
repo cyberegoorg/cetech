@@ -21,9 +21,9 @@ def validate_project(project_dir):
 
 
 class CetechProject(object):
-    BUILD_DEBUG = 'debug'
-    BUILD_DEVELOP = 'develop'
-    BUILD_RELEASE = 'release'
+    BUILD_DEBUG = 'Debug'
+    BUILD_DEVELOP = 'Develop'
+    BUILD_RELEASE = 'Release'
 
     def __init__(self):
         self.project_dir = None
@@ -77,9 +77,9 @@ class CetechProject(object):
 
     def get_executable_path(self, build_type):
         engine_bin_path = '../../engine/.build/'
-        platform_dir = "%s%s" % (platform.system().lower(), platform.architecture()[0][0:2])
+        platform_dir = "%s%s_clang" % (platform.system().lower(), platform.architecture()[0][0:2])
 
-        exec_name = "cetech1_%s" % build_type
+        exec_name = "cetech1%s" % build_type
 
         return os.path.join(engine_bin_path, platform_dir, 'bin', exec_name)
 

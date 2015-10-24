@@ -55,7 +55,7 @@ namespace cetech {
             lua_pcall(state, 3, 2, 0);
             if (lua_isnil(state, 1)) {
                 const char* err = s.to_string(2);
-                log::error("lua_resource.compiler", "%s", err);
+                log_globals::log().error("lua_resource.compiler", "%s", err);
 
             } else {
                 size_t bc_len = 0;

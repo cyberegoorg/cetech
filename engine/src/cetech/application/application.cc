@@ -3,9 +3,10 @@
 #include <unistd.h>
 #include <csignal>
 
+#include "celib/macros.h"
 #include "celib/memory/memory.h"
 #include "celib/command_line/command_line.h"
-#include "celib/log/handlers.h"
+#include "cetech/log_system/handlers.h"
 #include "celib/container/array.inl.h"
 #include "celib/string/stringid.inl.h"
 
@@ -111,7 +112,7 @@ namespace cetech {
                     _flags.daemon_mod = 1;
                 }
 
-                log::register_handler(&log_handlers::stdout_handler);
+                log_globals::log().register_handler(&log_handlers::stdout_handler);
 
                 posix_init();
 
@@ -155,12 +156,12 @@ namespace cetech {
                 load_config_json();
 
                 if (command_line_globals::has_argument("wait", 'w')) {
-                    log::info("main", "Wating for clients.");
+                    log_globals::log().info("main", "Wating for clients.");
                     while (!_console_server->has_clients()) {
                         _console_server->tick();
                     }
 
-                    log::debug("main", "Client connected.");
+                    log_globals::log().debug("main", "Client connected.");
                 }
 
                 if (!_flags.daemon_mod) {
@@ -274,7 +275,7 @@ namespace cetech {
                     }
                 }
 
-                log::info("main", "Bye Bye");
+                log_globals::log().info("main", "Bye Bye");
             }
 
             virtual void quit() final {

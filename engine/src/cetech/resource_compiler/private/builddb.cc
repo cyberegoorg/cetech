@@ -2,7 +2,7 @@
 
 #include "cetech/resource_compiler/private/builddb.h"
 
-#include "celib/log/log.h"
+#include "cetech/log_system/log_system.h"
 #include "celib/defines.h"
 
 #include "sqlite/sqlite3.h"
@@ -72,7 +72,8 @@ namespace cetech {
                     break;
 
                 default:
-                    log::error("BuildDB", "SQL error '%s' (%d): %s", sqlite3_sql(_stmt), rc, sqlite3_errmsg(_db));
+                    log_globals::log().error("BuildDB", "SQL error '%s' (%d): %s", sqlite3_sql(
+                                                 _stmt), rc, sqlite3_errmsg(_db));
                     run = false;
                     break;
                 }

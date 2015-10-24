@@ -4,7 +4,7 @@
 #include <sys/stat.h>
 
 #include "celib/macros.h"
-#include "celib/log/log.h"
+#include "cetech/log_system/log_system.h"
 #include "celib/asserts.h"
 #include "celib/container/array.inl.h"
 #include "celib/crypto/murmur_hash.inl.h"
@@ -58,7 +58,7 @@ namespace cetech {
                 );
 
             if (res.wnd == nullptr) {
-                log::error("sys", "Could not create window: %s", SDL_GetError());
+                log_globals::log().error("sys", "Could not create window: %s", SDL_GetError());
             }
 
             return res;
@@ -70,7 +70,7 @@ namespace cetech {
             res.wnd = SDL_CreateWindowFrom(hndl);
 
             if (res.wnd == nullptr) {
-                log::error("sys", "Could not create window: %s", SDL_GetError());
+                log_globals::log().error("sys", "Could not create window: %s", SDL_GetError());
             }
 
             return res;

@@ -3,7 +3,9 @@
 #include "luajit/lua.hpp"
 #include "celib/string/stringid_types.h"
 #include "celib/math/math_types.h"
+
 #include "cetech/application/application.h"
+#include "cetech/log_system/log_system.h"
 
 namespace cetech {
     class LuaStack {
@@ -199,7 +201,7 @@ namespace cetech {
                 if (luaL_dostring(_L, string)) {
                     const char* last_error = lua_tostring(_L, -1);
                     lua_pop(_L, 1);
-                    log::error("lua", "%s", last_error);
+                    log_globals::log().error("lua", "%s", last_error);
                 }
             }
 

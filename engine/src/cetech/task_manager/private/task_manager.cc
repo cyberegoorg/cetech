@@ -2,11 +2,11 @@
 
 #include "celib/memory/memory.h"
 #include "celib/container/array.inl.h"
-
-#include "cetech/application/application.h"
-
 #include "celib/platform/cpu.h"
 #include "celib/platform/thread.h"
+
+#include "cetech/application/application.h"
+#include "cetech/log_system/log_system.h"
 
 #define TASK_INITIALIZER { { 0 }, { 0 }, { 0 }, 0, 0, { 0, 0 } }
 
@@ -62,13 +62,13 @@ namespace cetech {
                 static const uint32_t main_threads_count = 1 + 1;
                 const uint32_t worker_count = core_count - main_threads_count;
 
-                log::info("task", "Core count: %u", core_count);
-                log::info("task", "Main thread count: %u", main_threads_count);
-                log::info("task", "Worker count: %u", worker_count);
+                log_globals::log().info("task", "Core count: %u", core_count);
+                log_globals::log().info("task", "Main thread count: %u", main_threads_count);
+                log_globals::log().info("task", "Worker count: %u", worker_count);
 
                 if (worker_count > 0) {
                     for (uint32_t i = 0; i < worker_count; ++i) {
-                        log::debug("task", "Creating worker %u.", i);
+                        log_globals::log().debug("task", "Creating worker %u.", i);
                         array::push_back(_workers, thread::create_thread(task_worker, "Worker", this));
                     }
                 }
@@ -76,7 +76,7 @@ namespace cetech {
 
             virtual ~TaskManagerImplementation() {
                 for (uint32_t i = 0; i < array::size(_workers); ++i) {
-                    log::debug("task", "Killing worker%u.", i);
+                    log_globals::log().debug("task", "Killing worker%u.", i);
                     thread::kill(_workers[i]);
                 }
             };
@@ -206,7 +206,7 @@ namespace cetech {
                 }
 
                 /* TODO =( */
-                log::error("task", "Pool overflow");
+                log_globals::log().error("task", "Pool overflow");
                 abort();
             }
 

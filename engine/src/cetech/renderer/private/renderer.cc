@@ -40,8 +40,6 @@ uint8_t sdlSetWindow(SDL_Window* _window) {
 
 namespace cetech {
     struct Renderer::Implementation {
-        friend class Renderer;
-
         uint32_t frame_id;
         uint32_t resize_w;
         uint32_t resize_h;
