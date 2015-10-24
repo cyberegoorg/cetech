@@ -20,7 +20,7 @@ namespace cetech {
         void register_online(StringId64_t type, resource_online_clb_t clb);
         void register_offline(StringId64_t type, resource_offline_clb_t clb);
 
-        void load(char** loaded_data, StringId64_t type, const StringId64_t* names,const uint32_t count);
+        void load(char** loaded_data, StringId64_t type, const StringId64_t* names, const uint32_t count);
         void add_loaded(char** loaded_data,
                         StringId64_t type,
                         const StringId64_t* names,

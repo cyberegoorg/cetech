@@ -67,7 +67,6 @@ namespace cetech {
             friend class Application;
 
             TaskManager* _task_manager;
-            PackageManager* _package_manager;
             DevelopManager* _develop_manager;
             ConsoleServer* _console_server;
             LuaEnviroment* _lua_eviroment;
@@ -85,8 +84,7 @@ namespace cetech {
                 char daemon_mod : 1;
             } _flags;
 
-            ApplicationImplementation() : _package_manager(nullptr),
-                                          _develop_manager(nullptr), _console_server(nullptr),
+            ApplicationImplementation() : _develop_manager(nullptr), _console_server(nullptr),
                                           _lua_eviroment(nullptr), _filesystem(nullptr),
                                           _renderer(nullptr),
                                           _frame_id(0), _last_frame_ticks(0), _delta_time(0) {
@@ -132,7 +130,8 @@ namespace cetech {
                 resource_manager_globals::init(_filesystem);
                 resource_compiler_globals::init();
 
-                _package_manager = PackageManager::make(memory_globals::default_allocator());
+                package_manager_globals::init();
+
                 _console_server = ConsoleServer::make(memory_globals::default_allocator());
                 _lua_eviroment = LuaEnviroment::make(memory_globals::default_allocator());
                 _renderer = Renderer::make(memory_globals::default_allocator());
@@ -197,8 +196,7 @@ namespace cetech {
 
                 _renderer->shutdown();
 
-                PackageManager::destroy(memory_globals::default_allocator(), _package_manager);
-
+                package_manager_globals::shutdown();
                 resource_manager_globals::shutdown();
 
                 DevelopManager::destroy(memory_globals::default_allocator(), _develop_manager);
@@ -292,12 +290,6 @@ namespace cetech {
                 CE_CHECK_PTR(this->_task_manager);
 
                 return *(this->_task_manager);
-            }
-
-            virtual PackageManager& package_manager() final {
-                CE_CHECK_PTR(this->_package_manager);
-
-                return *(this->_package_manager);
             }
 
             virtual DevelopManager& develop_manager() final {
@@ -444,7 +436,7 @@ namespace cetech {
             }
 
             void init_boot() {
-                _package_manager->load_boot_package();
+                package_manager::load_boot_package();
 
                 // Execute boot script
                 StringId64_t boot_script_name_h = stringid64::from_cstringn(cvars::boot_script.value_str,
@@ -460,7 +452,7 @@ namespace cetech {
                 StringId64_t boot_pkg_name_h = stringid64::from_cstringn(cvars::boot_pkg.value_str,
                                                                          cvars::boot_pkg.str_len);
 
-                _package_manager->unload(boot_pkg_name_h);
+                package_manager::unload(boot_pkg_name_h);
                 resource_manager::unload(resource_package::type_hash(), &boot_pkg_name_h, 1);
 
             }
