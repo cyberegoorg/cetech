@@ -36,7 +36,6 @@ namespace cetech {
             virtual DevelopManager& develop_manager() = 0;
             virtual ConsoleServer& console_server() = 0;
             virtual LuaEnviroment& lua_enviroment() = 0;
-            virtual Renderer& renderer() = 0;
 
             virtual Platform platform() = 0;
 

@@ -39,11 +39,25 @@ uint8_t sdlSetWindow(SDL_Window* _window) {
 }
 
 namespace cetech {
-    struct Renderer::Implementation {
-        uint32_t frame_id;
-        uint32_t resize_w;
-        uint32_t resize_h;
-        bool need_resize;
+    namespace {
+        using namespace renderer;
+        struct RendererData {
+            uint32_t frame_id;
+            uint32_t resize_w;
+            uint32_t resize_h;
+            bool need_resize;
+
+            RendererData() : frame_id(0), resize_w(0), resize_h(0), need_resize(1) {}
+        };
+
+        struct Globals {
+            static const int MEMORY = sizeof(RendererData);
+            char buffer[MEMORY];
+
+            RendererData* data;
+
+            Globals() : data(0) {}
+        } _globals;
 
         CE_INLINE bgfx::RendererType::Enum _bgfx_render_type(RenderType::Enum render_type) {
             switch (render_type) {
@@ -72,35 +86,35 @@ namespace cetech {
                 return bgfx::RendererType::Null;
             }
         }
+    }
 
+    namespace renderer {
         void init(Window window, RenderType::Enum render_type) {
-            memset(this, 0, sizeof(Renderer::Implementation));
-
             sdlSetWindow(window.wnd);
 
             bgfx::init(_bgfx_render_type(render_type));
             resize(cvars::screen_width.value_i, cvars::screen_height.value_i);
         };
 
-
-        void shutdown() {
-            bgfx::shutdown();
-        }
-
         void resize(uint32_t w, uint32_t h) {
-            need_resize = true;
-            resize_w = w;
-            resize_h = h;
+            RendererData* data = _globals.data;
+
+            data->need_resize = true;
+            data->resize_w = w;
+            data->resize_h = h;
         }
 
         void begin_frame() {
-            if (need_resize) {
-                cvar::set(cvars::screen_width, (int)resize_w);
-                cvar::set(cvars::screen_height, (int)resize_h);
+            RendererData* data = _globals.data;
 
-                bgfx::reset(resize_w, resize_h, 0);
-                bgfx::setViewRect(0, 0, 0, resize_w, resize_h);
-                need_resize = false;
+
+            if (data->need_resize) {
+                cvar::set(cvars::screen_width, (int)data->resize_w);
+                cvar::set(cvars::screen_height, (int)data->resize_h);
+
+                bgfx::reset(data->resize_w, data->resize_h, 0);
+                bgfx::setViewRect(0, 0, 0, data->resize_w, data->resize_h);
+                data->need_resize = false;
             }
 
             bgfx::setDebug(BGFX_DEBUG_STATS | BGFX_DEBUG_TEXT);
@@ -119,42 +133,20 @@ namespace cetech {
         }
 
         void end_frame() {
-            frame_id = bgfx::frame();
+            RendererData* data = _globals.data;
+            data->frame_id = bgfx::frame();
         }
-    };
-
-    Renderer::Renderer(Allocator& allocator) : _allocator(allocator), _impl(MAKE_NEW(_allocator, Implementation)) {}
-
-    Renderer::~Renderer() {
-        MAKE_DELETE(_allocator, Implementation, _impl);
     }
 
-    void Renderer::init(Window window, RenderType::Enum render_type) {
-        _impl->init(window, render_type);
-    }
+    namespace renderer_globals {
+        void init() {
+            char* p = _globals.buffer;
+            _globals.data = new(p) RendererData();
+        }
 
-    void Renderer::shutdown() {
-        _impl->shutdown();
-    }
-
-
-    void Renderer::begin_frame() {
-        _impl->begin_frame();
-    }
-
-    void Renderer::end_frame() {
-        _impl->end_frame();
-    }
-
-    void Renderer::resize(uint32_t w, uint32_t h) {
-        _impl->resize(w, h);
-    }
-
-    Renderer* Renderer::make(Allocator& allocator) {
-        return MAKE_NEW(allocator, Renderer, allocator);
-    }
-
-    void Renderer::destroy(Allocator& allocator, Renderer* pm) {
-        MAKE_DELETE(allocator, Renderer, pm);
+        void shutdown() {
+            _globals = Globals();
+            bgfx::shutdown();
+        }
     }
 }
