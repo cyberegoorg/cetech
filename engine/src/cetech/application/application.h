@@ -35,7 +35,6 @@ namespace cetech {
 
             virtual TaskManager& task_manager() = 0;
             virtual ResourceManager& resource_manager() = 0;
-            virtual ResourceCompiler& resource_compiler() = 0;
             virtual PackageManager& package_manager() = 0;
             virtual DevelopManager& develop_manager() = 0;
             virtual ConsoleServer& console_server() = 0;

@@ -20,35 +20,35 @@
 #include "enet/enet.h"
 
 namespace cetech {
-    
-        void console_server_handler(const LogLevel::Enum level,
-                                    const time_t time,
-                                    const char* where,
-                                    const char* msg,
-                                    void* data) {
 
-            static const char* level_to_str[] = { "I", "W", "E", "D" };
+    void console_server_handler(const LogLevel::Enum level,
+                                const time_t time,
+                                const char* where,
+                                const char* msg,
+                                void* data) {
 
-            CE_UNUSED(data);
+        static const char* level_to_str[] = { "I", "W", "E", "D" };
 
-            ConsoleServer& cs = application_globals::app().console_server();
+        CE_UNUSED(data);
 
-            if (!cs.has_clients()) {
-                return;
-            }
+        ConsoleServer& cs = application_globals::app().console_server();
 
-            rapidjson::Document json_data;
-            json_data.SetObject();
-
-            json_data.AddMember("type", "log", json_data.GetAllocator());
-
-            json_data.AddMember("time", rapidjson::Value((int64_t)time), json_data.GetAllocator());
-            json_data.AddMember("level", rapidjson::Value(level_to_str[level], 1), json_data.GetAllocator());
-            json_data.AddMember("where", rapidjson::Value(where, strlen(where)), json_data.GetAllocator());
-            json_data.AddMember("msg", rapidjson::Value(msg, strlen(msg)), json_data.GetAllocator());
-
-            cs.send_json_document(json_data);
+        if (!cs.has_clients()) {
+            return;
         }
+
+        rapidjson::Document json_data;
+        json_data.SetObject();
+
+        json_data.AddMember("type", "log", json_data.GetAllocator());
+
+        json_data.AddMember("time", rapidjson::Value((int64_t)time), json_data.GetAllocator());
+        json_data.AddMember("level", rapidjson::Value(level_to_str[level], 1), json_data.GetAllocator());
+        json_data.AddMember("where", rapidjson::Value(where, strlen(where)), json_data.GetAllocator());
+        json_data.AddMember("msg", rapidjson::Value(msg, strlen(msg)), json_data.GetAllocator());
+
+        cs.send_json_document(json_data);
+    }
 
     class ConsoleServerImplementation : public ConsoleServer {
         friend class ConsoleServer;

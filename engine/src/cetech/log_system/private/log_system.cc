@@ -59,7 +59,7 @@ namespace cetech {
     void LogSystem::info(const char* where, const char* format, va_list va) {
         _impl->vlog(LogLevel::LOG_INFO, where, format, va);
     }
-    
+
     void LogSystem::info(const char* where, const char* format, ...) {
         va_list args;
 
