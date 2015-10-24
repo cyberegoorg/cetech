@@ -35,11 +35,11 @@ namespace cetech {
             StringId64_t name;
             StringId64_t type;
         };
-        
+
         enum {
             TASK_POOL_SIZE = 4096
         };
-        
+
         struct ResouceCompilerData {
             ResouceCompilerData(Allocator & allocator) : _compile_clb_map(allocator) {}
 
@@ -134,12 +134,12 @@ namespace cetech {
 
 
             char resource_id_str[64] = {0};
-            
+
             char db_path[512] = {0};
             sprintf(db_path, "%s%s", build_fs->root_dir(), "build.db");
             BuildDB bdb;
             bdb.open(db_path);
-            
+
             for (uint32_t i = 0; i < files_count; ++i) {
                 const char* filename = files[i] + strlen(source_fs->root_dir());         /* Base path */
 
@@ -241,7 +241,7 @@ namespace cetech {
         }
     }
 
-    namespace resource_compiler{
+    namespace resource_compiler {
         void register_compiler(StringId64_t type, resource_compiler_clb_t clb) {
             hash::set(_globals.data->_compile_clb_map, type, clb);
         }

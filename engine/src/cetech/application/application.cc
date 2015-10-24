@@ -67,7 +67,6 @@ namespace cetech {
             friend class Application;
 
             TaskManager* _task_manager;
-            ResourceManager* _resource_manager;
             PackageManager* _package_manager;
             DevelopManager* _develop_manager;
             ConsoleServer* _console_server;
@@ -86,7 +85,7 @@ namespace cetech {
                 char daemon_mod : 1;
             } _flags;
 
-            ApplicationImplementation() : _resource_manager(nullptr), _package_manager(nullptr),
+            ApplicationImplementation() : _package_manager(nullptr),
                                           _develop_manager(nullptr), _console_server(nullptr),
                                           _lua_eviroment(nullptr), _filesystem(nullptr),
                                           _renderer(nullptr),
@@ -130,8 +129,7 @@ namespace cetech {
                 _flags.run = 1;
 
                 _task_manager = TaskManager::make(memory_globals::default_allocator());
-                _resource_manager = ResourceManager::make(memory_globals::default_allocator(), _filesystem);
-
+                resource_manager_globals::init(_filesystem);
                 resource_compiler_globals::init();
 
                 _package_manager = PackageManager::make(memory_globals::default_allocator());
@@ -200,7 +198,9 @@ namespace cetech {
                 _renderer->shutdown();
 
                 PackageManager::destroy(memory_globals::default_allocator(), _package_manager);
-                ResourceManager::destroy(memory_globals::default_allocator(), _resource_manager);
+
+                resource_manager_globals::shutdown();
+
                 DevelopManager::destroy(memory_globals::default_allocator(), _develop_manager);
                 TaskManager::destroy(memory_globals::default_allocator(), _task_manager);
                 ConsoleServer::destroy(memory_globals::default_allocator(), _console_server);
@@ -294,12 +294,6 @@ namespace cetech {
                 return *(this->_task_manager);
             }
 
-            virtual ResourceManager& resource_manager() final {
-                CE_CHECK_PTR(this->_resource_manager);
-
-                return *(this->_resource_manager);
-            }
-
             virtual PackageManager& package_manager() final {
                 CE_CHECK_PTR(this->_package_manager);
 
@@ -335,10 +329,10 @@ namespace cetech {
                     StringId64_t type;
 
                     resource_compiler::resource_compiler_clb_t compiler;
-                    ResourceManager::resource_loader_clb_t loader;
-                    ResourceManager::resource_online_clb_t online;
-                    ResourceManager::resource_offline_clb_t offline;
-                    ResourceManager::resource_unloader_clb_t unloader;
+                    resource_manager::resource_loader_clb_t loader;
+                    resource_manager::resource_online_clb_t online;
+                    resource_manager::resource_offline_clb_t offline;
+                    resource_manager::resource_unloader_clb_t unloader;
                 };
 
                 static ResourceRegistration resource_regs[] = {
@@ -363,10 +357,10 @@ namespace cetech {
 
                 const ResourceRegistration* it = resource_regs;
                 while (it->type != 0) {
-                    _resource_manager->register_unloader(it->type, it->unloader);
-                    _resource_manager->register_loader(it->type, it->loader);
-                    _resource_manager->register_online(it->type, it->online);
-                    _resource_manager->register_offline(it->type, it->offline);
+                    resource_manager::register_unloader(it->type, it->unloader);
+                    resource_manager::register_loader(it->type, it->loader);
+                    resource_manager::register_online(it->type, it->online);
+                    resource_manager::register_offline(it->type, it->offline);
                     resource_compiler::register_compiler(it->type, it->compiler);
                     ++it;
                 }
@@ -457,7 +451,7 @@ namespace cetech {
                                                                             cvars::boot_script.str_len);
 
                 const resource_lua::Resource* res_lua;
-                res_lua = (const resource_lua::Resource*) _resource_manager->get(
+                res_lua = (const resource_lua::Resource*) resource_manager::get(
                     resource_lua::type_hash(), boot_script_name_h);
                 _lua_eviroment->execute_resource(res_lua);
             }
@@ -467,7 +461,7 @@ namespace cetech {
                                                                          cvars::boot_pkg.str_len);
 
                 _package_manager->unload(boot_pkg_name_h);
-                _resource_manager->unload(resource_package::type_hash(), &boot_pkg_name_h, 1);
+                resource_manager::unload(resource_package::type_hash(), &boot_pkg_name_h, 1);
 
             }
 
