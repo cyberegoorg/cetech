@@ -68,7 +68,6 @@ namespace cetech {
 
             TaskManager* _task_manager;
             ResourceManager* _resource_manager;
-            ResourceCompiler* _resource_compiler;
             PackageManager* _package_manager;
             DevelopManager* _develop_manager;
             ConsoleServer* _console_server;
@@ -132,7 +131,9 @@ namespace cetech {
 
                 _task_manager = TaskManager::make(memory_globals::default_allocator());
                 _resource_manager = ResourceManager::make(memory_globals::default_allocator(), _filesystem);
-                _resource_compiler = ResourceCompiler::make(memory_globals::default_allocator(), _filesystem);
+
+                resource_compiler_globals::init();
+
                 _package_manager = PackageManager::make(memory_globals::default_allocator());
                 _console_server = ConsoleServer::make(memory_globals::default_allocator());
                 _lua_eviroment = LuaEnviroment::make(memory_globals::default_allocator());
@@ -146,7 +147,7 @@ namespace cetech {
                 register_resources();
 
                 if (command_line_globals::has_argument("compile", 'c')) {
-                    _resource_compiler->compile_all_resource();
+                    resource_compiler::compile_all(_filesystem);
 
                     if (!command_line_globals::has_argument("continue")) {
                         return quit();
@@ -205,6 +206,7 @@ namespace cetech {
                 ConsoleServer::destroy(memory_globals::default_allocator(), _console_server);
                 LuaEnviroment::destroy(memory_globals::default_allocator(), _lua_eviroment);
                 Renderer::destroy(memory_globals::default_allocator(), _renderer);
+                resource_compiler_globals::shutdown();
                 disk_filesystem::destroy(memory_globals::default_allocator(), _filesystem);
 
                 os::shutdown();
@@ -298,12 +300,6 @@ namespace cetech {
                 return *(this->_resource_manager);
             }
 
-            virtual ResourceCompiler& resource_compiler() final {
-                CE_CHECK_PTR(this->_resource_compiler);
-
-                return *(this->_resource_compiler);
-            }
-
             virtual PackageManager& package_manager() final {
                 CE_CHECK_PTR(this->_package_manager);
 
@@ -338,7 +334,7 @@ namespace cetech {
                 struct ResourceRegistration {
                     StringId64_t type;
 
-                    ResourceCompiler::resource_compiler_clb_t compiler;
+                    resource_compiler::resource_compiler_clb_t compiler;
                     ResourceManager::resource_loader_clb_t loader;
                     ResourceManager::resource_online_clb_t online;
                     ResourceManager::resource_offline_clb_t offline;
@@ -371,7 +367,7 @@ namespace cetech {
                     _resource_manager->register_loader(it->type, it->loader);
                     _resource_manager->register_online(it->type, it->online);
                     _resource_manager->register_offline(it->type, it->offline);
-                    _resource_compiler->register_compiler(it->type, it->compiler);
+                    resource_compiler::register_compiler(it->type, it->compiler);
                     ++it;
                 }
             }
@@ -384,7 +380,8 @@ namespace cetech {
             static void cmd_compile_all(const rapidjson::Document& in, rapidjson::Document& out) {
                 CE_UNUSED(in);
                 CE_UNUSED(out);
-                application_globals::app().resource_compiler().compile_all_resource();
+                //resource_compiler::compile_all_resource();
+                //application_globals::app().resource_compiler().compile_all_resource();
             }
 
             static void cmd_renderer_resize(const rapidjson::Document& in, rapidjson::Document& out) {
