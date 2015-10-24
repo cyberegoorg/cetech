@@ -3,6 +3,7 @@
 #include "cetech/application/application.h"
 
 using namespace cetech;
+
 int main(int argc, const char** argv) {
 
     memory_globals::init();
@@ -13,10 +14,8 @@ int main(int argc, const char** argv) {
 
     d.init(argc, argv);
 
-    //     log_globals::log().info("Sdasd", "v3 a: %d s: %d", alignof(cetech::Vector3), sizeof(cetech::Vector3));
-    //     log_globals::log().info("Sdasd", "v4 a: %d s: %d", alignof(cetech::Vector4), sizeof(cetech::Vector4));
-
     d.run();
+
     d.shutdown();
 
     application_globals::shutdown();

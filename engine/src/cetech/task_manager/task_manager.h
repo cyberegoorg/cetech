@@ -8,33 +8,29 @@
 #define NULL_TASK {0}
 
 namespace cetech {
-    class TaskManager {
-        public:
-            typedef void (* TaskWorkFce_t)(void*);
+    namespace task_manager {
+        typedef void (* TaskWorkFce_t)(void*);
+        struct TaskID {
+            uint32_t i;
+        };
 
-            struct TaskID {
-                uint32_t i;
-            };
+        TaskID add_begin(const TaskWorkFce_t fce,
+                         void* data,
+                         const uint32_t priority,
+                         const TaskID depend = NULL_TASK,
+                         const TaskID parent = NULL_TASK);
 
-            virtual ~TaskManager() {};
+        TaskID add_empty_begin(const uint32_t priority,
+                               const TaskID depend = NULL_TASK,
+                               const TaskID parent = NULL_TASK);
 
-            virtual TaskID add_begin(const TaskWorkFce_t fce,
-                                     void* data,
-                                     const uint32_t priority,
-                                     const TaskID depend = NULL_TASK,
-                                     const TaskID parent = NULL_TASK) = 0;
+        void add_end(const TaskID* tasks, const uint32_t count);
+        void wait(const TaskID id);
+        void do_work();
+    }
 
-            virtual TaskID add_empty_begin(const uint32_t priority,
-                                           const TaskID depend = NULL_TASK,
-                                           const TaskID parent = NULL_TASK) = 0;
-
-            virtual void add_end(const TaskID* tasks, const uint32_t count) = 0;
-
-            virtual void wait(const TaskID id) = 0;
-
-            virtual void do_work() = 0;
-
-            static TaskManager* make(Allocator& allocator);
-            static void destroy(Allocator& allocator, TaskManager* tm);
-    };
+    namespace task_manager_globals {
+        void init();
+        void shutdown();
+    }
 }
