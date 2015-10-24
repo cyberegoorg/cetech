@@ -1,24 +1,20 @@
 #pragma once
 
-#include <cinttypes>
-
 #include "celib/string/stringid_types.h"
-#include "celib/memory/memory_types.h"
 
 namespace cetech {
-    class PackageManager {
-        public:
-            virtual ~PackageManager() {}
+    namespace package_manager {
+        void load(StringId64_t name);
+        void unload(StringId64_t name);
 
-            virtual void load(StringId64_t name) = 0;
-            virtual void unload(StringId64_t name) = 0;
+        bool is_loaded(StringId64_t name);
+        void flush(StringId64_t name);
 
-            virtual bool is_loaded(StringId64_t name) = 0;
-            virtual void flush(StringId64_t name) = 0;
+        void load_boot_package();
+    }
 
-            virtual void load_boot_package() = 0;
-
-            static PackageManager* make(Allocator& allocator);
-            static void destroy(Allocator& allocator, PackageManager* pm);
-    };
+    namespace package_manager_globals {
+        void init();
+        void shutdown();
+    }
 }
