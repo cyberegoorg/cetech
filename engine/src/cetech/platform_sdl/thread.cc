@@ -1,3 +1,5 @@
+#ifdef CETECH_RUNTIME_SDL2
+
 #include <dirent.h>
 #include <time.h>
 #include <errno.h>
@@ -11,7 +13,7 @@
 #include "celib/math/vector2.inl.h"
 #include "cetech/application/application.h"
 
-#include "celib/platform_sdl/types.h"
+#include "cetech/platform_sdl/types.h"
 
 #include "SDL2/SDL.h"
 
@@ -45,3 +47,4 @@ namespace cetech {
     }
 }
 
+#endif

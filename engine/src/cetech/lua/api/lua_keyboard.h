@@ -1,6 +1,6 @@
 #include "cetech/lua/lua_stack.h"
 
-#include "celib/platform/keyboard.h"
+#include "cetech/platform/keyboard.h"
 
 namespace cetech {
     static int keyboard_button_index(lua_State* L) {

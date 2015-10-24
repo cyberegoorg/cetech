@@ -6,8 +6,8 @@
 #include "celib/memory/memory.h"
 #include "celib/macros.h"
 
-#include "celib/platform/dir.h"
-#include "celib/platform/file.h"
+#include "cetech/platform/dir.h"
+#include "cetech/platform/file.h"
 
 namespace cetech {
     class DiskFile : public FSFile {
