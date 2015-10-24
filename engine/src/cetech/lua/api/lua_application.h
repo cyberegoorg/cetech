@@ -35,9 +35,7 @@ namespace cetech {
 
     static int application_resize(lua_State* L) {
         LuaStack s(L);
-
-        application_globals::app().renderer().resize(s.to_int(1), s.to_int(2));
-
+        renderer::resize(s.to_int(1), s.to_int(2));
         return 0;
     }
 

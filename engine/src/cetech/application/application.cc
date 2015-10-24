@@ -70,7 +70,6 @@ namespace cetech {
             ConsoleServer* _console_server;
             LuaEnviroment* _lua_eviroment;
             FileSystem* _filesystem;
-            Renderer* _renderer;
 
             uint32_t _frame_id;
             uint32_t _last_frame_ticks;
@@ -85,7 +84,6 @@ namespace cetech {
 
             ApplicationImplementation() : _develop_manager(nullptr), _console_server(nullptr),
                                           _lua_eviroment(nullptr), _filesystem(nullptr),
-                                          _renderer(nullptr),
                                           _frame_id(0), _last_frame_ticks(0), _delta_time(0) {
                 _flags = {0, 0, 0};
 
@@ -134,8 +132,8 @@ namespace cetech {
 
                 _console_server = ConsoleServer::make(memory_globals::default_allocator());
                 _lua_eviroment = LuaEnviroment::make(memory_globals::default_allocator());
-                _renderer = Renderer::make(memory_globals::default_allocator());
 
+                renderer_globals::init();
 
                 _console_server->register_command("lua.execute", &cmd_lua_execute);
                 _console_server->register_command("resource_compiler.compile_all", &cmd_compile_all);
@@ -179,7 +177,7 @@ namespace cetech {
                             );
                     }
 
-                    _renderer->init(main_window, RenderType::RenderType::OpenGL);
+                    renderer::init(main_window, renderer::RenderType::OpenGL);
                 }
 
                 init_boot();
@@ -194,7 +192,7 @@ namespace cetech {
 
                 shutdown_boot();
 
-                _renderer->shutdown();
+                renderer_globals::shutdown();
 
                 package_manager_globals::shutdown();
                 resource_manager_globals::shutdown();
@@ -203,7 +201,6 @@ namespace cetech {
                 task_manager_globals::shutdown();
                 ConsoleServer::destroy(memory_globals::default_allocator(), _console_server);
                 LuaEnviroment::destroy(memory_globals::default_allocator(), _lua_eviroment);
-                Renderer::destroy(memory_globals::default_allocator(), _renderer);
                 resource_compiler_globals::shutdown();
                 disk_filesystem::destroy(memory_globals::default_allocator(), _filesystem);
 
@@ -235,7 +232,7 @@ namespace cetech {
                     mouse::retrive_state();
 
                     if (!_flags.daemon_mod) {
-                        _renderer->begin_frame();
+                        renderer::begin_frame();
                     }
 
                     task_manager::TaskID frame_task = task_manager::add_empty_begin(0);
@@ -271,7 +268,7 @@ namespace cetech {
                     task_manager::wait(frame_task); // TODO
 
                     if (!_flags.daemon_mod) {
-                        _renderer->end_frame();
+                        renderer::end_frame();
                         window::update(main_window);
                     }
                 }
@@ -303,12 +300,6 @@ namespace cetech {
                 CE_CHECK_PTR(this->_lua_eviroment);
 
                 return *(this->_lua_eviroment);
-            }
-
-            virtual Renderer&  renderer() final {
-                CE_CHECK_PTR(this->_renderer);
-
-                return *(this->_renderer);
             }
 
             void register_resources() {
@@ -369,7 +360,7 @@ namespace cetech {
                 CE_UNUSED(out);
                 const uint32_t width = in["args"]["width"].GetInt();
                 const uint32_t height = in["args"]["height"].GetInt();
-                application_globals::app().renderer().resize(width, height);
+                renderer::resize(width, height);
             }
 
             void load_config_json() {
