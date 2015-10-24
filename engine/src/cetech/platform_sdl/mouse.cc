@@ -1,3 +1,5 @@
+#ifdef CETECH_RUNTIME_SDL2
+
 #include <dirent.h>
 #include <time.h>
 #include <errno.h>
@@ -24,7 +26,6 @@ namespace cetech {
         static uint64_t middle_btn_hash;
         static uint64_t right_btn_hash;
     }
-
 
     namespace mouse {
         void init() {
@@ -95,3 +96,4 @@ namespace cetech {
 
 }
 
+#endif

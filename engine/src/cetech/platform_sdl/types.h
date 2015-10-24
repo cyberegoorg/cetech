@@ -1,5 +1,6 @@
 #pragma once
 
+#ifdef CETECH_RUNTIME_SDL2
 #include "SDL2/SDL.h"
 
 namespace cetech {
@@ -23,3 +24,5 @@ namespace cetech {
         SDL_Window* wnd;
     };
 }
+
+#endif

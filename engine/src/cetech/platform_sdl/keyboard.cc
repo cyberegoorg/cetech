@@ -1,3 +1,5 @@
+#ifdef CETECH_RUNTIME_SDL2
+
 #include <dirent.h>
 #include <time.h>
 #include <errno.h>
@@ -15,7 +17,7 @@
 #include "SDL2/SDL.h"
 
 namespace cetech {
-    namespace keyboard_internal {
+    namespace {
         static uint8_t KeyboardStates[512];
         static uint8_t KeyboardStatesLast[512];
     }
@@ -23,13 +25,12 @@ namespace cetech {
     namespace keyboard {
         void frame_start() {
             /*Keyboard*/
-            memcpy(keyboard_internal::KeyboardStates, SDL_GetKeyboardState(NULL), 512);
+            memcpy(KeyboardStates, SDL_GetKeyboardState(NULL), 512);
         }
 
         void frame_end() {
-            memcpy(keyboard_internal::KeyboardStatesLast, keyboard_internal::KeyboardStates, 512);
+            memcpy(KeyboardStatesLast, KeyboardStates, 512);
         }
-
 
         uint32_t button_index(const char* scancode) {
             return SDL_GetScancodeFromName(scancode);
@@ -40,19 +41,20 @@ namespace cetech {
         }
 
         bool button_state(const uint32_t button_index) {
-            return keyboard_internal::KeyboardStates[button_index];
+            return KeyboardStates[button_index];
         }
 
         bool button_pressed(const uint32_t button_index) {
-            return !keyboard_internal::KeyboardStatesLast[button_index] &&
-                   keyboard_internal::KeyboardStates[button_index];
+            return !KeyboardStatesLast[button_index] &&
+                   KeyboardStates[button_index];
         }
 
         bool button_released(const uint32_t button_index) {
-            return keyboard_internal::KeyboardStatesLast[button_index] &&
-                   !keyboard_internal::KeyboardStates[button_index];
+            return KeyboardStatesLast[button_index] &&
+                   !KeyboardStates[button_index];
         }
     };
 
 }
 
+#endif

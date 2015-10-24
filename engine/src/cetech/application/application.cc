@@ -20,11 +20,11 @@
 #include "cetech/package_manager/package_resource.h"
 #include "cetech/renderer/renderer.h"
 
-#include "celib/platform/keyboard.h"
-#include "celib/platform/mouse.h"
-#include "celib/platform/thread.h"
-#include "celib/platform/window.h"
-#include "celib/platform/dir.h"
+#include "cetech/platform/keyboard.h"
+#include "cetech/platform/mouse.h"
+#include "cetech/platform/thread.h"
+#include "cetech/platform/window.h"
+#include "cetech/platform/dir.h"
 
 #include "cetech/cvars/cvars.h"
 #include "cetech/os/os.h"

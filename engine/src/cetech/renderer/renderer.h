@@ -4,7 +4,7 @@
 
 #include "celib/string/stringid_types.h"
 #include "celib/memory/memory_types.h"
-#include "celib/platform/types.h"
+#include "cetech/platform/types.h"
 
 namespace cetech {
     struct RenderType {

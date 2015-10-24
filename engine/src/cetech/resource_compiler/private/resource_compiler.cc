@@ -9,8 +9,8 @@
 #include "celib/container/hash.inl.h"
 #include "celib/memory/memory.h"
 #include "celib/string/stringid.inl.h"
-#include "celib/platform/dir.h"
-#include "celib/platform/thread.h"
+#include "cetech/platform/dir.h"
+#include "cetech/platform/thread.h"
 #include "sqlite/sqlite3.h"
 
 #include "cetech/application/application.h"

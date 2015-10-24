@@ -1,3 +1,5 @@
+#ifdef CETECH_RUNTIME_SDL2
+
 #include <dirent.h>
 #include <time.h>
 #include <errno.h>
@@ -101,3 +103,4 @@ namespace cetech {
     }
 }
 
+#endif

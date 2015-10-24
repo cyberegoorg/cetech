@@ -97,24 +97,9 @@ project "celib_static"
     }
 
     files {
-        ROOT_DIR .. "src/celib/*.*",
-        ROOT_DIR .. "src/celib/command_line/*.*",
-        ROOT_DIR .. "src/celib/compilers/*.*",
-        ROOT_DIR .. "src/celib/container/*.*",
-        ROOT_DIR .. "src/celib/crypto/*.*",
-        ROOT_DIR .. "src/celib/ecs/*.*",
-        ROOT_DIR .. "src/celib/handler/*.*",
-        ROOT_DIR .. "src/celib/log_system/*.*",
-        ROOT_DIR .. "src/celib/math/*.*",
-        ROOT_DIR .. "src/celib/memory/*.*",
-        ROOT_DIR .. "src/celib/platform/*.*",
-        ROOT_DIR .. "src/celib/string/*.*",
+        ROOT_DIR .. "src/celib/**.cc",
+        ROOT_DIR .. "src/celib/**.h",
     }
-
-    configuration "linux*"
-        files {
-            ROOT_DIR .. "src/celib/platform_sdl/*.*",
-        }
 
 
     configuration {}
@@ -141,10 +126,6 @@ project "celib_static"
 project "cetech1"
     kind "ConsoleApp"
     language "C++"
-
-    excludes {
-        ROOT_DIR .. "src/celib/**",
-    }
 
     files {
         ROOT_DIR .. "src/cetech/**.cc",

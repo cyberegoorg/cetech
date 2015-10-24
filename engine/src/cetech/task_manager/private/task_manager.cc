@@ -2,8 +2,8 @@
 
 #include "celib/memory/memory.h"
 #include "celib/container/array.inl.h"
-#include "celib/platform/cpu.h"
-#include "celib/platform/thread.h"
+#include "cetech/platform/cpu.h"
+#include "cetech/platform/thread.h"
 
 #include "cetech/application/application.h"
 #include "cetech/log_system/log_system.h"
