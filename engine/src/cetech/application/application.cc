@@ -66,7 +66,6 @@ namespace cetech {
         public:
             friend class Application;
 
-            ConsoleServer* _console_server;
             LuaEnviroment* _lua_eviroment;
             FileSystem* _filesystem;
 
@@ -81,8 +80,7 @@ namespace cetech {
                 char daemon_mod : 1;
             } _flags;
 
-            ApplicationImplementation() : _console_server(nullptr),
-                                          _lua_eviroment(nullptr), _filesystem(nullptr),
+            ApplicationImplementation() : _lua_eviroment(nullptr), _filesystem(nullptr),
                                           _frame_id(0), _last_frame_ticks(0), _delta_time(0) {
                 _flags = {0, 0, 0};
 
@@ -98,8 +96,6 @@ namespace cetech {
 
             Window main_window;
             virtual void init(int argc, const char** argv) final {
-                command_line_globals::set_args(argc, argv);
-
                 if (command_line_globals::has_argument("daemon", 'd')) {
                     _flags.daemon_mod = 1;
                 }
@@ -129,14 +125,15 @@ namespace cetech {
 
                 package_manager_globals::init();
 
-                _console_server = ConsoleServer::make(memory_globals::default_allocator());
+                console_server_globals::init();
+                console_server::init();
                 _lua_eviroment = LuaEnviroment::make(memory_globals::default_allocator());
 
                 renderer_globals::init();
 
-                _console_server->register_command("lua.execute", &cmd_lua_execute);
-                _console_server->register_command("resource_compiler.compile_all", &cmd_compile_all);
-                _console_server->register_command("renderer.resize", cmd_renderer_resize);
+                console_server::register_command("lua.execute", &cmd_lua_execute);
+                console_server::register_command("resource_compiler.compile_all", &cmd_compile_all);
+                console_server::register_command("renderer.resize", cmd_renderer_resize);
 
                 register_resources();
 
@@ -152,8 +149,8 @@ namespace cetech {
 
                 if (command_line_globals::has_argument("wait", 'w')) {
                     log_globals::log().info("main", "Wating for clients.");
-                    while (!_console_server->has_clients()) {
-                        _console_server->tick();
+                    while (!console_server::has_clients()) {
+                        console_server::tick();
                     }
 
                     log_globals::log().debug("main", "Client connected.");
@@ -198,7 +195,8 @@ namespace cetech {
 
                 develop_manager_globals::shutdown();
                 task_manager_globals::shutdown();
-                ConsoleServer::destroy(memory_globals::default_allocator(), _console_server);
+                console_server_globals::shutdown();
+
                 LuaEnviroment::destroy(memory_globals::default_allocator(), _lua_eviroment);
                 resource_compiler_globals::shutdown();
                 disk_filesystem::destroy(memory_globals::default_allocator(), _filesystem);
@@ -207,8 +205,7 @@ namespace cetech {
             }
 
             static void console_server_tick(void* data) {
-                ApplicationImplementation* d = (ApplicationImplementation*) data;
-                d->_console_server->tick();
+                console_server::tick();
             }
 
             virtual void run() final {
@@ -283,13 +280,6 @@ namespace cetech {
 
             virtual bool is_run() final {
                 return _flags.run != 0;
-            }
-
-
-            virtual ConsoleServer& console_server() final {
-                CE_CHECK_PTR(this->_console_server);
-
-                return *(this->_console_server);
             }
 
             virtual LuaEnviroment& lua_enviroment() final {

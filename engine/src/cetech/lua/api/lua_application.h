@@ -28,7 +28,7 @@ namespace cetech {
         d.SetObject();
         LuaStack(L).to_json(1, d, d);
 
-        application_globals::app().console_server().send_json_document(d);
+        console_server::send_json_document(d);
 
         return 0;
     }

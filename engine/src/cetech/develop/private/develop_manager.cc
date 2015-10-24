@@ -77,11 +77,9 @@ namespace cetech {
         }
 
         void send_buffer() {
-            ConsoleServer& cs = application_globals::app().console_server();
-
             flush_stream_buffer();
 
-            if (!cs.has_clients() || eventstream::empty(_globals.data->stream)) {
+            if (!console_server::has_clients() || eventstream::empty(_globals.data->stream)) {
                 return;
             }
 
@@ -107,7 +105,7 @@ namespace cetech {
                     to_json_fce(eventstream::event < void* > (_globals.data->stream, it), json_data);
                 }
 
-                cs.send_json_document(json_data);
+                console_server::send_json_document(json_data);
 
                 it = eventstream::next(_globals.data->stream, it);
             }
@@ -176,5 +174,4 @@ namespace cetech {
             _globals = Globals();
         }
     }
-
 }
