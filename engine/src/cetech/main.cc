@@ -1,4 +1,5 @@
 #include "celib/memory/memory.h"
+#include "celib/string/stringid.inl.h"
 #include "celib/command_line/command_line.h"
 
 #include "cetech/cvar/cvar.h"
@@ -112,6 +113,19 @@ void load_config_json() {
 }
 
 
+void init_boot() {
+    package_manager::load_boot_package();
+
+    // Execute boot script
+    StringId64_t boot_script_name_h = stringid64::from_cstringn(cvars::boot_script.value_str,
+                                                                cvars::boot_script.str_len);
+
+    const resource_lua::Resource* res_lua;
+    res_lua = (const resource_lua::Resource*) resource_manager::get(
+        resource_lua::type_hash(), boot_script_name_h);
+    lua_enviroment::execute_resource(res_lua);
+}
+
 bool big_init() {
 #if CETECH_LINUX
     posix_init();
@@ -163,6 +177,8 @@ bool big_init() {
 
     renderer_globals::init();
 
+    lua_enviroment_globals::init();
+    
     application_globals::init();
     
     return true;
@@ -211,7 +227,32 @@ void parse_command_line(int argc, const char** argv) {
     }
 }
 
+
+void shutdown_boot() {
+    StringId64_t boot_pkg_name_h = stringid64::from_cstringn(cvars::boot_pkg.value_str,
+                                                                cvars::boot_pkg.str_len);
+
+    package_manager::unload(boot_pkg_name_h);
+    resource_manager::unload(resource_package::type_hash(), &boot_pkg_name_h, 1);
+
+}
+
 void big_shutdown() {
+    shutdown_boot();
+    
+    renderer_globals::shutdown();
+
+    package_manager_globals::shutdown();
+    resource_manager_globals::shutdown();
+
+    develop_manager_globals::shutdown();
+    task_manager_globals::shutdown();
+    console_server_globals::shutdown();
+
+    resource_compiler_globals::shutdown();
+
+    os::shutdown();
+
     application_globals::shutdown();
 
     log_globals::shutdown();
@@ -225,6 +266,7 @@ int main(int argc, const char** argv) {
         Application& d = application_globals::app();
 
         d.init(_filesystem);
+        init_boot();
 
         d.run();
 

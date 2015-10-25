@@ -14,8 +14,7 @@ namespace cetech {
     namespace lua_utils {
         static const char* module_name = "Utils";
 
-        void load_libs(LuaEnviroment& env) {
-            CE_UNUSED(env);
+        void load_libs() {
         }
     }
 }

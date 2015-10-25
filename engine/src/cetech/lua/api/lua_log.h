@@ -43,11 +43,11 @@ namespace cetech {
     namespace lua_log {
         static const char* module_name = "Log";
 
-        void load_libs(LuaEnviroment& env) {
-            env.set_module_function(module_name, "_info", log_info);
-            env.set_module_function(module_name, "_warning", log_warning);
-            env.set_module_function(module_name, "_error", log_error);
-            env.set_module_function(module_name, "_debug", log_debug);
+        void load_libs() {
+            lua_enviroment::set_module_function(module_name, "_info", log_info);
+            lua_enviroment::set_module_function(module_name, "_warning", log_warning);
+            lua_enviroment::set_module_function(module_name, "_error", log_error);
+            lua_enviroment::set_module_function(module_name, "_debug", log_debug);
         }
     }
 }

@@ -6,23 +6,23 @@
 #include "lua_resource.h"
 
 namespace cetech {
-    class LuaEnviroment {
-        public:
-            virtual ~LuaEnviroment() {};
 
-            virtual void execute_resource(const resource_lua::Resource* res) = 0;
-            virtual void execute_string(const char* str) = 0;
+    namespace lua_enviroment {
+        void execute_resource(const resource_lua::Resource* res);
+        void execute_string(const char* str);
 
-            virtual void set_module_function(const char* module, const char* name, const lua_CFunction func) = 0;
-            virtual void set_module_constructor(const char* module, const lua_CFunction func) = 0;
+        void set_module_function(const char* module, const char* name, const lua_CFunction func);
+        void set_module_constructor(const char* module, const lua_CFunction func);
 
-            virtual void call_global(const char* func, const char* args = nullptr, ...) = 0;
+        void call_global(const char* func, const char* args = nullptr, ...);
 
-            virtual void clean_temp() = 0;
-            virtual Vector2& new_tmp_vector2() = 0;
-            virtual Vector3& new_tmp_vector3() = 0;
+        void clean_temp();
+        Vector2& new_tmp_vector2();
+        Vector3& new_tmp_vector3();
+    }
 
-            static LuaEnviroment* make(Allocator& allocator);
-            static void destroy(Allocator& allocator, LuaEnviroment* le);
-    };
+    namespace lua_enviroment_globals {
+        void init();
+        void shutdown();
+    }
 }

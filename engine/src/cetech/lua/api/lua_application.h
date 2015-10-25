@@ -42,13 +42,13 @@ namespace cetech {
     namespace lua_application {
         static const char* module_name = "Application";
 
-        void load_libs(LuaEnviroment& env) {
-            env.set_module_function(module_name, "quit", application_quit);
-            env.set_module_function(module_name, "get_frame_id", application_get_frame_id);
-            env.set_module_function(module_name, "get_delta_time", application_get_delta_time);
+        void load_libs() {
+            lua_enviroment::set_module_function(module_name, "quit", application_quit);
+            lua_enviroment::set_module_function(module_name, "get_frame_id", application_get_frame_id);
+            lua_enviroment::set_module_function(module_name, "get_delta_time", application_get_delta_time);
 
-            env.set_module_function(module_name, "console_send", application_console_send);
-            env.set_module_function(module_name, "resize", application_resize);
+            lua_enviroment::set_module_function(module_name, "console_send", application_console_send);
+            lua_enviroment::set_module_function(module_name, "resize", application_resize);
         }
     }
 }

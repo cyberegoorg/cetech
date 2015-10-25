@@ -33,8 +33,6 @@ namespace cetech {
 
             virtual bool is_run() = 0;
 
-            virtual LuaEnviroment& lua_enviroment() = 0;
-
             virtual Platform platform() = 0;
 
             static Application* make(Allocator& allocator);

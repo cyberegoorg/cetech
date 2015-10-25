@@ -139,31 +139,31 @@ namespace cetech {
     namespace lua_vector3 {
         static const char* module_name = "Vector3";
 
-        void load_libs(LuaEnviroment& env) {
-            env.set_module_constructor(module_name, vector3_ctor);
-            env.set_module_function(module_name, "new", vector3_new);
+        void load_libs() {
+            lua_enviroment::set_module_constructor(module_name, vector3_ctor);
+            lua_enviroment::set_module_function(module_name, "new", vector3_new);
 
-            env.set_module_function(module_name, "len", vector3_len);
-            env.set_module_function(module_name, "len_inv", vector3_len_inv);
-            env.set_module_function(module_name, "len_sq", vector3_len_sq);
+            lua_enviroment::set_module_function(module_name, "len", vector3_len);
+            lua_enviroment::set_module_function(module_name, "len_inv", vector3_len_inv);
+            lua_enviroment::set_module_function(module_name, "len_sq", vector3_len_sq);
 
-            env.set_module_function(module_name, "distance", vector3_distance);
-            env.set_module_function(module_name, "distance_sq", vector3_distance_sq);
+            lua_enviroment::set_module_function(module_name, "distance", vector3_distance);
+            lua_enviroment::set_module_function(module_name, "distance_sq", vector3_distance_sq);
 
-            env.set_module_function(module_name, "normalized", vector3_normalized);
-            env.set_module_function(module_name, "is_normalized", vector3_is_normalized);
+            lua_enviroment::set_module_function(module_name, "normalized", vector3_normalized);
+            lua_enviroment::set_module_function(module_name, "is_normalized", vector3_is_normalized);
 
-            env.set_module_function(module_name, "dot", vector3_dot);
-            env.set_module_function(module_name, "cross", vector3_cross);
+            lua_enviroment::set_module_function(module_name, "dot", vector3_dot);
+            lua_enviroment::set_module_function(module_name, "cross", vector3_cross);
 
-            env.set_module_function(module_name, "zero", vector3_zero);
-            env.set_module_function(module_name, "unit", vector3_unit);
-            env.set_module_function(module_name, "up", vector3_up);
-            env.set_module_function(module_name, "down", vector3_down);
-            env.set_module_function(module_name, "forwards", vector3_forwards);
-            env.set_module_function(module_name, "backwards", vector3_backwards);
-            env.set_module_function(module_name, "right", vector3_right);
-            env.set_module_function(module_name, "left", vector3_left);
+            lua_enviroment::set_module_function(module_name, "zero", vector3_zero);
+            lua_enviroment::set_module_function(module_name, "unit", vector3_unit);
+            lua_enviroment::set_module_function(module_name, "up", vector3_up);
+            lua_enviroment::set_module_function(module_name, "down", vector3_down);
+            lua_enviroment::set_module_function(module_name, "forwards", vector3_forwards);
+            lua_enviroment::set_module_function(module_name, "backwards", vector3_backwards);
+            lua_enviroment::set_module_function(module_name, "right", vector3_right);
+            lua_enviroment::set_module_function(module_name, "left", vector3_left);
         }
     }
 }
