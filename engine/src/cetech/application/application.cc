@@ -37,7 +37,6 @@ namespace cetech {
         public:
             friend class Application;
 
-            LuaEnviroment* _lua_eviroment;
             FileSystem* _filesystem;
 
             uint32_t _frame_id;
@@ -51,7 +50,7 @@ namespace cetech {
                 char daemon_mod : 1;
             } _flags;
 
-            ApplicationImplementation() : _lua_eviroment(nullptr), _filesystem(nullptr),
+            ApplicationImplementation() : _filesystem(nullptr),
                                           _frame_id(0), _last_frame_ticks(0), _delta_time(0) {
                 _flags = {0, 0, 0};
 
@@ -75,12 +74,6 @@ namespace cetech {
 
                 _flags.run = 1;
 
-                _lua_eviroment = LuaEnviroment::make(memory_globals::default_allocator());
-
-                console_server::register_command("lua.execute", &cmd_lua_execute);
-                console_server::register_command("resource_compiler.compile_all", &cmd_compile_all);
-                console_server::register_command("renderer.resize", cmd_renderer_resize);
-
                 if (!_flags.daemon_mod) {
                     if (command_line_globals::has_argument("wid")) {
                         char* ptr;
@@ -101,32 +94,15 @@ namespace cetech {
                     renderer::init(main_window, renderer::RenderType::OpenGL);
                 }
 
-                init_boot();
 
                 this->_last_frame_ticks = os::get_ticks();
 
-                _lua_eviroment->call_global("init");
+                lua_enviroment::call_global("init");
             }
 
             virtual void shutdown() final {
-                _lua_eviroment->call_global("shutdown");
+                lua_enviroment::call_global("shutdown");
 
-                shutdown_boot();
-
-                renderer_globals::shutdown();
-
-                package_manager_globals::shutdown();
-                resource_manager_globals::shutdown();
-
-                develop_manager_globals::shutdown();
-                task_manager_globals::shutdown();
-                console_server_globals::shutdown();
-
-                LuaEnviroment::destroy(memory_globals::default_allocator(), _lua_eviroment);
-                resource_compiler_globals::shutdown();
-                disk_filesystem::destroy(memory_globals::default_allocator(), _filesystem);
-
-                os::shutdown();
             }
 
             static void console_server_tick(void* data) {
@@ -137,7 +113,6 @@ namespace cetech {
                 float dt = 0.0f;
                 uint32_t now_ticks = 0;
                 while (_flags.run) {
-
 
                     now_ticks = os::get_ticks();
                     dt = (now_ticks - this->_last_frame_ticks) * 0.001f;
@@ -172,8 +147,8 @@ namespace cetech {
 
                     //usleep(3 * 1000);
                     if (!_flags.pause) {
-                        _lua_eviroment->call_global("update", "f", dt);
-                        _lua_eviroment->clean_temp();
+                        lua_enviroment::call_global("update", "f", dt);
+                        lua_enviroment::clean_temp();
                     }
 
                     //
@@ -206,55 +181,6 @@ namespace cetech {
 
             virtual bool is_run() final {
                 return _flags.run != 0;
-            }
-
-            virtual LuaEnviroment& lua_enviroment() final {
-                CE_CHECK_PTR(this->_lua_eviroment);
-
-                return *(this->_lua_eviroment);
-            }
-
-
-            static void cmd_lua_execute(const rapidjson::Document& in, rapidjson::Document& out) {
-                CE_UNUSED(out);
-                application_globals::app().lua_enviroment().execute_string(in["args"]["script"].GetString());
-            }
-
-            static void cmd_compile_all(const rapidjson::Document& in, rapidjson::Document& out) {
-                CE_UNUSED(in);
-                CE_UNUSED(out);
-                //resource_compiler::compile_all_resource();
-                //application_globals::app().resource_compiler().compile_all_resource();
-            }
-
-            static void cmd_renderer_resize(const rapidjson::Document& in, rapidjson::Document& out) {
-                CE_UNUSED(out);
-                const uint32_t width = in["args"]["width"].GetInt();
-                const uint32_t height = in["args"]["height"].GetInt();
-                renderer::resize(width, height);
-            }
-
-
-            void init_boot() {
-                package_manager::load_boot_package();
-
-                // Execute boot script
-                StringId64_t boot_script_name_h = stringid64::from_cstringn(cvars::boot_script.value_str,
-                                                                            cvars::boot_script.str_len);
-
-                const resource_lua::Resource* res_lua;
-                res_lua = (const resource_lua::Resource*) resource_manager::get(
-                    resource_lua::type_hash(), boot_script_name_h);
-                _lua_eviroment->execute_resource(res_lua);
-            }
-
-            void shutdown_boot() {
-                StringId64_t boot_pkg_name_h = stringid64::from_cstringn(cvars::boot_pkg.value_str,
-                                                                         cvars::boot_pkg.str_len);
-
-                package_manager::unload(boot_pkg_name_h);
-                resource_manager::unload(resource_package::type_hash(), &boot_pkg_name_h, 1);
-
             }
 
             virtual Platform platform() final {

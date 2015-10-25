@@ -57,13 +57,13 @@ namespace cetech {
     namespace lua_mouse {
         static const char* module_name = "Mouse";
 
-        void load_libs(LuaEnviroment& env) {
-            env.set_module_function(module_name, "button_index", mouse_button_index);
-            env.set_module_function(module_name, "button_name", mouse_button_name);
-            env.set_module_function(module_name, "button_state", mouse_button_state);
-            env.set_module_function(module_name, "pressed", mouse_button_pressed);
-            env.set_module_function(module_name, "released", mouse_button_released);
-            env.set_module_function(module_name, "axis", mouse_axis);
+        void load_libs() {
+            lua_enviroment::set_module_function(module_name, "button_index", mouse_button_index);
+            lua_enviroment::set_module_function(module_name, "button_name", mouse_button_name);
+            lua_enviroment::set_module_function(module_name, "button_state", mouse_button_state);
+            lua_enviroment::set_module_function(module_name, "pressed", mouse_button_pressed);
+            lua_enviroment::set_module_function(module_name, "released", mouse_button_released);
+            lua_enviroment::set_module_function(module_name, "axis", mouse_axis);
         }
     }
 }

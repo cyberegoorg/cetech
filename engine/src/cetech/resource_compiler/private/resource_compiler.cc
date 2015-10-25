@@ -8,6 +8,7 @@
 #include "celib/container/queue.inl.h"
 #include "celib/container/hash.inl.h"
 #include "celib/memory/memory.h"
+#include "celib/macros.h"
 #include "celib/string/stringid.inl.h"
 #include "cetech/platform/dir.h"
 #include "cetech/platform/thread.h"
@@ -238,6 +239,13 @@ namespace cetech {
 
             build_fs->close(build_index_file);
         }
+        
+        static void cmd_compile_all(const rapidjson::Document& in, rapidjson::Document& out) {
+            CE_UNUSED(in);
+            CE_UNUSED(out);
+            //resource_compiler::compile_all_resource();
+            //application_globals::app().resource_compiler().compile_all_resource();
+        }
     }
 
     namespace resource_compiler {
@@ -282,6 +290,8 @@ namespace cetech {
         void init() {
             char* p = _globals.buffer;
             _globals.data = new(p) ResouceCompilerData(memory_globals::default_allocator());
+            
+            console_server::register_command("resource_compiler.compile_all", &cmd_compile_all);
         }
 
         void shutdown() {

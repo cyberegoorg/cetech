@@ -55,12 +55,12 @@ namespace cetech {
     namespace lua_package {
         static const char* module_name = "Package";
 
-        void load_libs(LuaEnviroment& env) {
-            env.set_module_function(module_name, "create", package_create);
-            env.set_module_function(module_name, "load", package_load);
-            env.set_module_function(module_name, "unload", package_unload);
-            env.set_module_function(module_name, "is_loaded", package_is_loaded);
-            env.set_module_function(module_name, "flush", package_flush);
+        void load_libs() {
+            lua_enviroment::set_module_function(module_name, "create", package_create);
+            lua_enviroment::set_module_function(module_name, "load", package_load);
+            lua_enviroment::set_module_function(module_name, "unload", package_unload);
+            lua_enviroment::set_module_function(module_name, "is_loaded", package_is_loaded);
+            lua_enviroment::set_module_function(module_name, "flush", package_flush);
         }
     }
 }

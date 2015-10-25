@@ -1,6 +1,7 @@
 #include "cetech/renderer/renderer.h"
 #include "cetech/cvars/cvars.h"
 
+#include "celib/macros.h"
 #include "celib/memory/memory.h"
 #include "celib/math/math_types.h"
 #include "celib/math/matrix44.inl.h"
@@ -86,10 +87,19 @@ namespace cetech {
                 return bgfx::RendererType::Null;
             }
         }
+        
+        static void cmd_renderer_resize(const rapidjson::Document& in, rapidjson::Document& out) {
+            CE_UNUSED(out);
+            const uint32_t width = in["args"]["width"].GetInt();
+            const uint32_t height = in["args"]["height"].GetInt();
+            renderer::resize(width, height);
+        }
     }
 
     namespace renderer {
         void init(Window window, RenderType::Enum render_type) {
+            console_server::register_command("renderer.resize", cmd_renderer_resize);
+
             sdlSetWindow(window.wnd);
 
             bgfx::init(_bgfx_render_type(render_type));

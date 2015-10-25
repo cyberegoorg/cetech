@@ -47,12 +47,12 @@ namespace cetech {
     namespace lua_keyboard {
         static const char* module_name = "Keyboard";
 
-        void load_libs(LuaEnviroment& env) {
-            env.set_module_function(module_name, "button_index", keyboard_button_index);
-            env.set_module_function(module_name, "button_name", keyboard_button_name);
-            env.set_module_function(module_name, "button_state", keyboard_button_state);
-            env.set_module_function(module_name, "pressed", keyboard_button_pressed);
-            env.set_module_function(module_name, "released", keyboard_button_released);
+        void load_libs() {
+            lua_enviroment::set_module_function(module_name, "button_index", keyboard_button_index);
+            lua_enviroment::set_module_function(module_name, "button_name", keyboard_button_name);
+            lua_enviroment::set_module_function(module_name, "button_state", keyboard_button_state);
+            lua_enviroment::set_module_function(module_name, "pressed", keyboard_button_pressed);
+            lua_enviroment::set_module_function(module_name, "released", keyboard_button_released);
         }
     }
 }
