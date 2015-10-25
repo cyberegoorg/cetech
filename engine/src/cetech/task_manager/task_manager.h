@@ -25,8 +25,12 @@ namespace cetech {
                                const TaskID parent = NULL_TASK);
 
         void add_end(const TaskID* tasks, const uint32_t count);
+        
         void wait(const TaskID id);
+        
         void do_work();
+
+        void stop();
     }
 
     namespace task_manager_globals {
