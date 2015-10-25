@@ -26,7 +26,7 @@ namespace cetech {
             virtual uint32_t get_frame_id() const = 0;
             virtual float get_delta_time() const = 0;
 
-            virtual void init(FileSystem* fs) = 0;
+            virtual void init() = 0;
             virtual void shutdown() = 0;
             virtual void run() = 0;
             virtual void quit() = 0;

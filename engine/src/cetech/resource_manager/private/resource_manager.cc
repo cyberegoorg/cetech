@@ -52,20 +52,6 @@ namespace cetech {
             Globals() : data(0) {}
         } _globals;
 
-
-        CE_INLINE void calc_hash(const char* path, StringId64_t& type, StringId64_t& name) {
-            const char* t = strrchr(path, '.');
-            CE_CHECK_PTR(t);
-
-            const uint32_t sz = t - path;
-            t = t + 1;
-
-            const uint32_t len = strlen(t);
-
-            type = stringid64::from_cstringn(t, len);
-            name = stringid64::from_cstringn(path, sz);
-        }
-
         CE_INLINE void resource_id_to_str(char* buffer, const StringId64_t& type, const StringId64_t& name) {
             std::sprintf(buffer, "%" PRIx64 "%" PRIx64, type, name);
         }

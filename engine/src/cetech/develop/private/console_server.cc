@@ -49,7 +49,7 @@ namespace cetech {
 
             send_json_document(json_data);
         }
-        
+
         struct ConsoleServerData {
             ENetAddress server_addr;
             ENetHost* server_host;
@@ -59,8 +59,9 @@ namespace cetech {
 
             Hash < command_clb_t > cmds;
 
-            ConsoleServerData(Allocator & allocator) : client_peer(allocator), peer_free_queue(allocator), cmds(allocator) {}
-            
+            ConsoleServerData(Allocator & allocator) : client_peer(allocator), peer_free_queue(allocator), cmds(
+                                                           allocator) {}
+
             ~ConsoleServerData() {
                 enet_host_destroy(server_host);
                 log_globals::log().unregister_handler(&console_server_handler);
@@ -75,8 +76,8 @@ namespace cetech {
 
             Globals() : data(0) {}
         } _globals;
-        
-        
+
+
         bool validate_packet(rapidjson::Document& document, const char* packet, const uint32_t size) {
             CE_UNUSED(size);
 
@@ -99,8 +100,8 @@ namespace cetech {
 
         void parse_packet(uint32_t client, const char* packet, const uint32_t size) {
             CE_UNUSED(client);
-            
-            ConsoleServerData *data = _globals.data;
+
+            ConsoleServerData* data = _globals.data;
 
             rapidjson::Document document;
             if (!validate_packet(document, packet, size)) {
@@ -124,7 +125,7 @@ namespace cetech {
 
     namespace console_server {
         void init() {
-            ConsoleServerData *data = _globals.data;
+            ConsoleServerData* data = _globals.data;
 
             data->server_addr.host = ENET_HOST_ANY;
             data->server_addr.port = cvars::console_server_port.value_i;
@@ -134,21 +135,21 @@ namespace cetech {
         }
 
 
-         void register_command(const char* name, const command_clb_t clb)  {
-            ConsoleServerData *data = _globals.data;
-             
+        void register_command(const char* name, const command_clb_t clb) {
+            ConsoleServerData* data = _globals.data;
+
             hash::set(data->cmds, stringid64::from_cstring(name), clb);
         }
 
-         bool has_clients()  {
-            ConsoleServerData *data = _globals.data;
-             
+        bool has_clients() {
+            ConsoleServerData* data = _globals.data;
+
             return array::size(data->client_peer) != 0;
         }
 
-         void send_json_document(const rapidjson::Document& document)  {
-             ConsoleServerData *data = _globals.data;
-             
+        void send_json_document(const rapidjson::Document& document) {
+            ConsoleServerData* data = _globals.data;
+
             rapidjson::StringBuffer buffer;
             rapidjson::Writer < rapidjson::StringBuffer > writer(buffer);
             document.Accept(writer);
@@ -157,9 +158,9 @@ namespace cetech {
             enet_host_broadcast(data->server_host, 0, p);
         }
 
-         void tick()  {
-            ConsoleServerData *data = _globals.data;
-            
+        void tick() {
+            ConsoleServerData* data = _globals.data;
+
             ENetEvent Event;
 
             while (enet_host_service(data->server_host, &Event, 0) > 0) {
@@ -206,7 +207,7 @@ namespace cetech {
             }
         }
     }
-    
+
     namespace console_server_globals {
         void init() {
             char* p = _globals.buffer;

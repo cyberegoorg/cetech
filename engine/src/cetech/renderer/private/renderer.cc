@@ -87,7 +87,7 @@ namespace cetech {
                 return bgfx::RendererType::Null;
             }
         }
-        
+
         static void cmd_renderer_resize(const rapidjson::Document& in, rapidjson::Document& out) {
             CE_UNUSED(out);
             const uint32_t width = in["args"]["width"].GetInt();

@@ -239,7 +239,7 @@ namespace cetech {
 
             build_fs->close(build_index_file);
         }
-        
+
         static void cmd_compile_all(const rapidjson::Document& in, rapidjson::Document& out) {
             CE_UNUSED(in);
             CE_UNUSED(out);
@@ -290,7 +290,7 @@ namespace cetech {
         void init() {
             char* p = _globals.buffer;
             _globals.data = new(p) ResouceCompilerData(memory_globals::default_allocator());
-            
+
             console_server::register_command("resource_compiler.compile_all", &cmd_compile_all);
         }
 
