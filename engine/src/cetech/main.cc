@@ -89,7 +89,10 @@ void register_resources() {
         resource_manager::register_loader(it->type, it->loader);
         resource_manager::register_online(it->type, it->online);
         resource_manager::register_offline(it->type, it->offline);
+        
+#if defined(CETECH_DEVELOP)
         resource_compiler::register_compiler(it->type, it->compiler);
+#endif
         ++it;
     }
 }
@@ -148,8 +151,14 @@ bool big_init() {
     develop_manager_globals::init();
 
     resource_manager_globals::init(_filesystem);
+
+#if defined(CETECH_DEVELOP)
     resource_compiler_globals::init();
+#endif
+
     register_resources();
+
+#if defined(CETECH_DEVELOP)
     if (command_line_globals::has_argument("compile", 'c')) {
         resource_compiler::compile_all(_filesystem);
 
@@ -167,6 +176,7 @@ bool big_init() {
 
         log_globals::log().debug("main", "Client connected.");
     }
+#endif
 
     load_config_json();
 
@@ -200,24 +210,30 @@ void parse_command_line(int argc, const char** argv) {
 
     command_line_globals::set_args(argc, argv);
 
+#if defined(CETECH_DEVELOP)
     const char* source_dir = command_line_globals::get_parameter("source-dir", 's');
+#endif
+    
     const char* build_dir = command_line_globals::get_parameter("build-dir", 'b');
     const char* core_dir = command_line_globals::get_parameter("core-dir");
     const char* port = command_line_globals::get_parameter("port", 'p');
 
+
+#if defined(CETECH_DEVELOP)
     if (source_dir) {
         make_path(buffer, 1024, source_dir);
         cvar_internal::force_set(cvars::rm_source_dir, buffer);
     }
-
-    if (build_dir) {
-        make_path(buffer, 1024, build_dir);
-        cvar_internal::force_set(cvars::rm_build_dir, buffer);
-    }
-
+    
     if (core_dir) {
         make_path(buffer, 1024, core_dir);
         cvar_internal::force_set(cvars::compiler_core_path, buffer);
+    }
+#endif
+    
+    if (build_dir) {
+        make_path(buffer, 1024, build_dir);
+        cvar_internal::force_set(cvars::rm_build_dir, buffer);
     }
 
     if (port) {
@@ -249,8 +265,10 @@ void big_shutdown() {
     task_manager_globals::shutdown();
     console_server_globals::shutdown();
 
+#if defined(CETECH_DEVELOP)
     resource_compiler_globals::shutdown();
-
+#endif
+    
     os::shutdown();
 
     application_globals::shutdown();
