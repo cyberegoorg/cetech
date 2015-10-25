@@ -37,14 +37,6 @@ namespace cetech {
             MAX_TASK = 512
         };
 
-        static int task_worker(void* data) {
-            while (application_globals::app().is_run()) {
-                task_manager::do_work();
-            }
-
-            return 0;
-        }
-
         struct TaskManagerData {
             Spinlock _lock;               //!< Spinlock
 
@@ -57,7 +49,11 @@ namespace cetech {
             Task _task_pool[MAX_TASK];        //!< Task pool
 
             Array < Thread > _workers;
-
+            
+            struct {
+                char run: 1;
+            } flags;
+            
             TaskManagerData(Allocator & allocator) : _last_id(0), _task_count(0), _open_task_count(0), _workers(
                                                          allocator) {
                 memset(_task_queue, 0, sizeof(uint32_t) * MAX_TASK);
@@ -82,6 +78,13 @@ namespace cetech {
             Globals() : data(0) {}
         } _globals;
 
+        static int task_worker(void* data) {
+            while (_globals.data->flags.run) {
+                task_manager::do_work();
+            }
+
+            return 0;
+        }
 
 
         /*! NOP task.
@@ -338,7 +341,7 @@ namespace cetech {
         }
 
         void wait(const TaskID id) {
-            while (application_globals::app().is_run() && (array::size(_globals.data->_workers) > 0) &&
+            while (_globals.data->flags.run && (array::size(_globals.data->_workers) > 0) &&
                    !task_is_done(id)) {
                 do_work();
             }
@@ -360,7 +363,14 @@ namespace cetech {
                     array::push_back(_globals.data->_workers, thread::create_thread(task_worker, "Worker", 0));
                 }
             }
+            
+            _globals.data->flags.run = 1;
         }
+        
+        void stop() {
+            _globals.data->flags.run = 0;
+        }
+
     }
 
     namespace task_manager_globals {
@@ -372,6 +382,7 @@ namespace cetech {
         }
 
         void shutdown() {
+            _globals.data->~TaskManagerData();
             _globals = Globals();
         }
     }
