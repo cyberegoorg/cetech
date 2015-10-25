@@ -37,8 +37,6 @@ namespace cetech {
         public:
             friend class Application;
 
-            FileSystem* _filesystem;
-
             uint32_t _frame_id;
             uint32_t _last_frame_ticks;
 
@@ -50,8 +48,7 @@ namespace cetech {
                 char daemon_mod : 1;
             } _flags;
 
-            ApplicationImplementation() : _filesystem(nullptr),
-                                          _frame_id(0), _last_frame_ticks(0), _delta_time(0) {
+            ApplicationImplementation() : _frame_id(0), _last_frame_ticks(0), _delta_time(0) {
                 _flags = {0, 0, 0};
 
             }
@@ -65,12 +62,10 @@ namespace cetech {
 
 
             Window main_window;
-            virtual void init(FileSystem* fs) final {
+            virtual void init() final {
                 if (command_line_globals::has_argument("daemon", 'd')) {
                     _flags.daemon_mod = 1;
                 }
-
-                _filesystem = fs;
 
                 _flags.run = 1;
 
@@ -93,7 +88,6 @@ namespace cetech {
 
                     renderer::init(main_window, renderer::RenderType::OpenGL);
                 }
-
 
                 this->_last_frame_ticks = os::get_ticks();
 

@@ -66,18 +66,18 @@ void register_resources() {
     static ResourceRegistration resource_regs[] = {
         /* package */
         {resource_package::type_hash(), & resource_package::compile, & resource_package::loader,
-            & resource_package::online, & resource_package::offline,
-            & resource_package::unloader},
+         & resource_package::online, & resource_package::offline,
+         & resource_package::unloader},
 
         /* lua */
         {resource_lua::type_hash(), & resource_lua::compile, & resource_lua::loader,
-            & resource_lua::online, & resource_lua::offline,
-            & resource_lua::unloader},
+         & resource_lua::online, & resource_lua::offline,
+         & resource_lua::unloader},
 
         /* texture */
         {resource_texture::type_hash(), & resource_texture::compile, & resource_texture::loader,
-            & resource_texture::online, & resource_texture::offline,
-            & resource_texture::unloader},
+         & resource_texture::online, & resource_texture::offline,
+         & resource_texture::unloader},
 
         /* LAST */
         {0, nullptr, nullptr, nullptr, nullptr, nullptr}
@@ -89,7 +89,7 @@ void register_resources() {
         resource_manager::register_loader(it->type, it->loader);
         resource_manager::register_online(it->type, it->online);
         resource_manager::register_offline(it->type, it->offline);
-        
+
 #if defined(CETECH_DEVELOP)
         resource_compiler::register_compiler(it->type, it->compiler);
 #endif
@@ -176,6 +176,7 @@ bool big_init() {
 
         log_globals::log().debug("main", "Client connected.");
     }
+
 #endif
 
     load_config_json();
@@ -188,9 +189,9 @@ bool big_init() {
     renderer_globals::init();
 
     lua_enviroment_globals::init();
-    
+
     application_globals::init();
-    
+
     return true;
 }
 
@@ -210,27 +211,9 @@ void parse_command_line(int argc, const char** argv) {
 
     command_line_globals::set_args(argc, argv);
 
-#if defined(CETECH_DEVELOP)
-    const char* source_dir = command_line_globals::get_parameter("source-dir", 's');
-#endif
-    
     const char* build_dir = command_line_globals::get_parameter("build-dir", 'b');
-    const char* core_dir = command_line_globals::get_parameter("core-dir");
     const char* port = command_line_globals::get_parameter("port", 'p');
 
-
-#if defined(CETECH_DEVELOP)
-    if (source_dir) {
-        make_path(buffer, 1024, source_dir);
-        cvar_internal::force_set(cvars::rm_source_dir, buffer);
-    }
-    
-    if (core_dir) {
-        make_path(buffer, 1024, core_dir);
-        cvar_internal::force_set(cvars::compiler_core_path, buffer);
-    }
-#endif
-    
     if (build_dir) {
         make_path(buffer, 1024, build_dir);
         cvar_internal::force_set(cvars::rm_build_dir, buffer);
@@ -241,12 +224,29 @@ void parse_command_line(int argc, const char** argv) {
         sscanf(port, "%d", &p);
         cvar_internal::force_set(cvars::console_server_port, p);
     }
+
+#if defined(CETECH_DEVELOP)
+    const char* source_dir = command_line_globals::get_parameter("source-dir", 's');
+    const char* core_dir = command_line_globals::get_parameter("core-dir");
+
+    if (source_dir) {
+        make_path(buffer, 1024, source_dir);
+        cvar_internal::force_set(cvars::rm_source_dir, buffer);
+    }
+
+    if (core_dir) {
+        make_path(buffer, 1024, core_dir);
+        cvar_internal::force_set(cvars::compiler_core_path, buffer);
+    }
+
+#endif
+
 }
 
 
 void shutdown_boot() {
     StringId64_t boot_pkg_name_h = stringid64::from_cstringn(cvars::boot_pkg.value_str,
-                                                                cvars::boot_pkg.str_len);
+                                                             cvars::boot_pkg.str_len);
 
     package_manager::unload(boot_pkg_name_h);
     resource_manager::unload(resource_package::type_hash(), &boot_pkg_name_h, 1);
@@ -255,7 +255,7 @@ void shutdown_boot() {
 
 void big_shutdown() {
     shutdown_boot();
-    
+
     renderer_globals::shutdown();
 
     package_manager_globals::shutdown();
@@ -268,7 +268,7 @@ void big_shutdown() {
 #if defined(CETECH_DEVELOP)
     resource_compiler_globals::shutdown();
 #endif
-    
+
     os::shutdown();
 
     application_globals::shutdown();
@@ -280,10 +280,10 @@ void big_shutdown() {
 int main(int argc, const char** argv) {
     parse_command_line(argc, argv);
 
-    if(big_init()) {
+    if (big_init()) {
         Application& d = application_globals::app();
 
-        d.init(_filesystem);
+        d.init();
         init_boot();
 
         d.run();

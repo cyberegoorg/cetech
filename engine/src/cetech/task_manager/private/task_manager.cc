@@ -49,11 +49,11 @@ namespace cetech {
             Task _task_pool[MAX_TASK];        //!< Task pool
 
             Array < Thread > _workers;
-            
+
             struct {
-                char run: 1;
+                char run : 1;
             } flags;
-            
+
             TaskManagerData(Allocator & allocator) : _last_id(0), _task_count(0), _open_task_count(0), _workers(
                                                          allocator) {
                 memset(_task_queue, 0, sizeof(uint32_t) * MAX_TASK);
@@ -363,10 +363,10 @@ namespace cetech {
                     array::push_back(_globals.data->_workers, thread::create_thread(task_worker, "Worker", 0));
                 }
             }
-            
+
             _globals.data->flags.run = 1;
         }
-        
+
         void stop() {
             _globals.data->flags.run = 0;
         }

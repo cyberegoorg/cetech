@@ -33,7 +33,7 @@ namespace cetech {
             MAX_TEMP_VECTOR3 = 1024,
         };
 
-        struct LuaEnviromentData{
+        struct LuaEnviromentData {
             lua_State* _state;
 
             Vector2 _temp_vector2_buffer[MAX_TEMP_VECTOR2];
@@ -42,7 +42,7 @@ namespace cetech {
             Vector3 _temp_vector3_buffer[MAX_TEMP_VECTOR3];
             uint32_t _temp_vector3_used;
         };
-        
+
         struct Globals {
             static const int MEMORY = sizeof(LuaEnviromentData);
             char buffer[MEMORY];
@@ -51,7 +51,7 @@ namespace cetech {
 
             Globals() : data(0) {}
         } _globals;
-        
+
 
         static int require(lua_State* L) {
             const char* name = lua_tostring( L, 1);
@@ -133,8 +133,8 @@ namespace cetech {
         }
 
         void create_Vector2_mt() {
-            lua_State *_state = _globals.data->_state;
-            
+            lua_State* _state = _globals.data->_state;
+
             luaL_newmetatable(_state, "Vector2_mt");
 
             lua_pushstring(_state, "__add");
@@ -236,8 +236,8 @@ namespace cetech {
         }
 
         void create_Vector3_mt() {
-            lua_State *_state = _globals.data->_state;
-            
+            lua_State* _state = _globals.data->_state;
+
             luaL_newmetatable(_state, "Vector3_mt");
 
             lua_pushstring(_state, "__add");
@@ -271,7 +271,7 @@ namespace cetech {
             lua_pop(_state, 1);
         }
         // -- Vector3
-        
+
         static void cmd_lua_execute(const rapidjson::Document& in, rapidjson::Document& out) {
             CE_UNUSED(out);
             lua_enviroment::execute_string(in["args"]["script"].GetString());
@@ -280,7 +280,7 @@ namespace cetech {
 
     namespace lua_enviroment {
         void init() {
-            LuaEnviromentData *data = _globals.data;
+            LuaEnviromentData* data = _globals.data;
 
             console_server::register_command("lua.execute", &cmd_lua_execute);
 
@@ -323,15 +323,15 @@ namespace cetech {
             lua_log::load_libs();
         }
 
-        void shutdown(){
+        void shutdown() {
             lua_close(_globals.data->_state);
         }
 
-         void execute_resource(const resource_lua::Resource* res)  {
-            lua_State *_state = _globals.data->_state;
+        void execute_resource(const resource_lua::Resource* res) {
+            lua_State* _state = _globals.data->_state;
             //lua_pushcfunction(_state, error_handler);
 
-            
+
             luaL_loadbuffer(_state, resource_lua::get_source(res), res->size, "<unknown>");
 
             if (lua_pcall(_state, 0, 0, 0)) {
@@ -341,8 +341,8 @@ namespace cetech {
             }
         }
 
-         void execute_string(const char* str)  {
-            lua_State *_state = _globals.data->_state;
+        void execute_string(const char* str) {
+            lua_State* _state = _globals.data->_state;
             //lua_pushcfunction(_state, error_handler);
 
             if (luaL_dostring(_state, str)) {
@@ -352,9 +352,9 @@ namespace cetech {
             }
         }
 
-         void set_module_function(const char* module, const char* name, const lua_CFunction func)  {
-            lua_State *_state = _globals.data->_state;
-            
+        void set_module_function(const char* module, const char* name, const lua_CFunction func) {
+            lua_State* _state = _globals.data->_state;
+
             luaL_newmetatable(_state, module);
             luaL_Reg entry[2];
 
@@ -368,9 +368,9 @@ namespace cetech {
             lua_pop(_state, -1);
         }
 
-         void set_module_constructor(const char* module, const lua_CFunction func)  {
-            lua_State *_state = _globals.data->_state;
-            
+        void set_module_constructor(const char* module, const lua_CFunction func) {
+            lua_State* _state = _globals.data->_state;
+
             lua_createtable(_state, 0, 1);
             lua_pushstring(_state, "__call");
             lua_pushcfunction(_state, func);
@@ -385,9 +385,9 @@ namespace cetech {
             lua_pop(_state, -1);
         }
 
-         void call_global(const char* func, const char* args, ...)  {
-            lua_State *_state = _globals.data->_state;
-            
+        void call_global(const char* func, const char* args, ...) {
+            lua_State* _state = _globals.data->_state;
+
             LuaStack stack(_state);
             uint32_t argc = 0;
 
@@ -425,24 +425,24 @@ namespace cetech {
             lua_pop(_state, -1);
         }
 
-         void clean_temp()  {
-            LuaEnviromentData *data = _globals.data;
-            
+        void clean_temp() {
+            LuaEnviromentData* data = _globals.data;
+
             data->_temp_vector2_used = 0;
             data->_temp_vector3_used = 0;
         }
 
         // Vector2
-         Vector2& new_tmp_vector2()  {
-             LuaEnviromentData *data = _globals.data;
-             
+        Vector2& new_tmp_vector2() {
+            LuaEnviromentData* data = _globals.data;
+
             CE_ASSERT( data->_temp_vector2_used < MAX_TEMP_VECTOR2 );
             return data->_temp_vector2_buffer[data->_temp_vector2_used++];
         }
 
-         Vector3& new_tmp_vector3() {
-            LuaEnviromentData *data = _globals.data;
-            
+        Vector3& new_tmp_vector3() {
+            LuaEnviromentData* data = _globals.data;
+
             CE_ASSERT( data->_temp_vector3_used < MAX_TEMP_VECTOR3 );
             return data->_temp_vector3_buffer[data->_temp_vector3_used++];
         }
@@ -453,13 +453,13 @@ namespace cetech {
         void init() {
             char* p = _globals.buffer;
             _globals.data = new(p) LuaEnviromentData();
-            
+
             lua_enviroment::init();
         }
 
         void shutdown() {
             _globals = Globals();
-            
+
             lua_enviroment::shutdown();
         }
     }
