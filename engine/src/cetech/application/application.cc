@@ -25,7 +25,6 @@
 #include "cetech/platform/dir.h"
 
 #include "cetech/cvars/cvars.h"
-#include "cetech/os/os.h"
 
 
 #include "rapidjson/prettywriter.h"
@@ -84,9 +83,46 @@ namespace cetech {
             resource_manager::unload(resource_package::type_hash(), &boot_pkg_name_h, 1);
 
         }
+        
+
+        inline void init_os() {
+#if defined(CETECH_RUNTIME_SDL2)
+            CE_ASSERT(SDL_Init(SDL_INIT_EVERYTHING) == 0);
+#endif
+        }
+
+        inline void shutdown_os() {
+#if defined(CETECH_RUNTIME_SDL2)
+            SDL_Quit();
+#endif
+        }
+
+        inline void process_os() {
+#if defined(CETECH_RUNTIME_SDL2)
+            SDL_Event e;
+            while (SDL_PollEvent(&e) > 0) {
+                switch (e.type) {
+                case SDL_QUIT:
+                    application::quit();
+                    break;
+
+                case SDL_WINDOWEVENT_SIZE_CHANGED:
+                    log_globals::log().info("sdl2", "Window size changed to %dx%d", e.window.data1, e.window.data2);
+                    break;
+
+                }
+            }
+#endif
+        }
     }
 
     namespace application {
+        uint32_t get_ticks() {
+#if defined(CETECH_RUNTIME_SDL2)
+            return SDL_GetTicks();
+#endif
+        }
+
         float get_delta_time() {
             return _globals.data->_delta_time;
         }
@@ -96,7 +132,9 @@ namespace cetech {
 
         void init() {
             ApplictionData* data = _globals.data;
-
+            
+            init_os();
+            
             if (command_line_globals::has_argument("daemon", 'd')) {
                 data->_flags.daemon_mod = 1;
             }
@@ -123,7 +161,7 @@ namespace cetech {
                 renderer::init(data->main_window, renderer::RenderType::OpenGL);
             }
 
-            data->_last_frame_ticks = os::get_ticks();
+            data->_last_frame_ticks = get_ticks();
             
             init_boot();
             lua_enviroment::call_global("init");
@@ -133,11 +171,14 @@ namespace cetech {
             lua_enviroment::call_global("shutdown");
 
             shutdown_boot();
+            shutdown_os();
         }
 
         static void console_server_tick(void* data) {
             console_server::tick();
         }
+
+
 
         void run() {
             ApplictionData* data = _globals.data;
@@ -145,18 +186,18 @@ namespace cetech {
             float dt = 0.0f;
             uint32_t now_ticks = 0;
             while (data->_flags.run) {
+                now_ticks = get_ticks();
 
-                now_ticks = os::get_ticks();
                 dt = (now_ticks - data->_last_frame_ticks) * 0.001f;
                 data->_delta_time = dt;
                 data->_last_frame_ticks = now_ticks;
-
 
                 develop_manager::push_record_float("engine.frame_id", data->_frame_id);
                 develop_manager::push_record_float("engine.delta_time", dt);
                 develop_manager::push_record_float("engine.frame_rate", 1.0f / dt);
 
-                os::frame_start();
+                process_os();
+
                 keyboard::frame_start();
                 mouse::retrive_state();
 
@@ -182,9 +223,6 @@ namespace cetech {
                     lua_enviroment::call_global("update", "f", dt);
                     lua_enviroment::clean_temp();
                 }
-
-                //
-                os::frame_end();
 
                 keyboard::frame_end();
                 mouse::swap_states();

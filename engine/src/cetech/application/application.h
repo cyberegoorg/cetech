@@ -22,6 +22,8 @@ namespace cetech {
         uint32_t get_frame_id();
         float get_delta_time();
 
+        uint32_t get_ticks();
+        
         void init();
         void shutdown();
         void run();

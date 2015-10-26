@@ -2,7 +2,6 @@
 
 #include "celib/string/stringid_types.h"
 #include "celib/memory/memory.h"
-#include "cetech/os/os.h"
 #include "celib/crypto/murmur_hash.inl.h"
 #include "cetech/filesystem/file.h"
 #include "cetech/resource_compiler/resource_compiler.h"

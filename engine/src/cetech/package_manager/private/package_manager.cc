@@ -6,8 +6,6 @@
 #include "celib/crypto/murmur_hash.inl.h"
 #include "cetech/application/application.h"
 
-#include "cetech/os/os.h"
-
 #include "cetech/package_manager/package_manager.h"
 #include "cetech/package_manager/package_resource.h"
 
