@@ -9,7 +9,6 @@
 #include "cetech/log_system/handlers.h"
 #include "cetech/filesystem/disk_filesystem.h"
 #include "cetech/platform/mouse.h"
-#include "cetech/os/os.h"
 
 #include "cetech/renderer/texture/texture_resource.h"
 #include "cetech/package_manager/package_resource.h"
@@ -177,7 +176,6 @@ bool big_init() {
 
     load_config_json();
 
-    os::init();
     mouse::init();
 
     package_manager_globals::init();
@@ -252,8 +250,6 @@ void big_shutdown() {
 #if defined(CETECH_DEVELOP)
     resource_compiler_globals::shutdown();
 #endif
-
-    os::shutdown();
 
     application_globals::shutdown();
 

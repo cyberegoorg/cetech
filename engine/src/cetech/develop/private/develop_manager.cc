@@ -5,7 +5,6 @@
 #include "cetech/develop/develop_manager.h"
 #include "cetech/develop/console_server.h"
 #include "cetech/application/application.h"
-#include "cetech/os/os.h"
 
 #include "rapidjson/document.h"
 
@@ -114,7 +113,7 @@ namespace cetech {
         void push_begin_frame() {
             BeginFrameEvent event = {
                 .get_frame_id = application::get_frame_id(),
-                .time = os::get_ticks()
+                .time = application::get_ticks()
             };
 
             push(EVENT_BEGIN_FRAME, event);
@@ -123,7 +122,7 @@ namespace cetech {
         void push_end_frame() {
             EndFrameEvent event = {
                 .get_frame_id = application::get_frame_id(),
-                .time = os::get_ticks()
+                .time = application::get_ticks()
             };
 
             push(EVENT_END_FRAME, event);

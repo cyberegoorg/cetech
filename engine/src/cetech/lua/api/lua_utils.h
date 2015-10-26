@@ -3,7 +3,6 @@
 #include "cetech/lua/lua_enviroment.h"
 #include "cetech/lua/lua_stack.h"
 
-#include "cetech/os/os.h"
 #include "celib/string/stringid.inl.h"
 #include "cetech/application/application.h"
 
