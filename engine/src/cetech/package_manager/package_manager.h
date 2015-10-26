@@ -11,6 +11,7 @@ namespace cetech {
         void flush(StringId64_t name);
 
         void load_boot_package();
+        void unload_boot_package();
     }
 
     namespace package_manager_globals {

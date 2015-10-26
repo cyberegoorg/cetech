@@ -76,6 +76,8 @@ namespace cetech {
         }
 
         void shutdown_boot() {
+            package_manager::unload_boot_package();
+            
             StringId64_t boot_pkg_name_h = stringid64::from_cstringn(cvars::boot_pkg.value_str,
                                                                      cvars::boot_pkg.str_len);
 
@@ -183,6 +185,7 @@ namespace cetech {
             lua_enviroment::call_global("shutdown");
 
             shutdown_boot();
+            renderer_globals::shutdown();
             shutdown_os();
         }
 
@@ -191,6 +194,8 @@ namespace cetech {
         }
 
         void run() {
+            init();
+            
             ApplictionData* data = _globals.data;
 
             float dt = 0.0f;
@@ -249,6 +254,8 @@ namespace cetech {
             }
 
             log_globals::log().info("main", "Bye Bye");
+            
+            shutdown();
         }
 
         void quit() {

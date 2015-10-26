@@ -375,6 +375,7 @@ namespace cetech {
 
     namespace task_manager_globals {
         void init() {
+            log_globals::log().info("task_manager_globals", "Init");
             char* p = _globals.buffer;
             _globals.data = new(p) TaskManagerData(memory_globals::default_allocator());
 
@@ -382,6 +383,8 @@ namespace cetech {
         }
 
         void shutdown() {
+            log_globals::log().info("task_manager_globals", "Shutdown");
+            
             _globals.data->~TaskManagerData();
             _globals = Globals();
         }

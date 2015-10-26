@@ -19,8 +19,6 @@ namespace cetech {
             PLATFORM_WINDOWS,
         };
 
-        void init();
-        void shutdown();
         void run();
         void quit();
 
