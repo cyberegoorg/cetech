@@ -1,4 +1,6 @@
 #include <cstring>
+#include <sys/stat.h>
+
 
 #include "cetech/filesystem/file.h"
 #include "cetech/filesystem/filesystem.h"
@@ -9,53 +11,83 @@
 #include "celib/macros.h"
 
 #include "cetech/platform/dir.h"
-#include "cetech/platform/file.h"
+
+#include "cetech/log_system/log_system.h"
+
+
+#if defined(CETECH_RUNTIME_SDL2)
+    #include "SDL2/SDL.h"
+#endif
 
 
 namespace cetech {
     class DiskFile : public FSFile {
         public:
-            File _file;
+#if defined(CETECH_RUNTIME_SDL2)
+            SDL_RWops * rwops;
+#endif
 
             DiskFile(const char* path, FSFile::OpenMode mode) {
-                _file = file::from_file(path, mode == FSFile::WRITE ? "w" : "r");
+#if defined(CETECH_RUNTIME_SDL2)
+                rwops = SDL_RWFromFile(path, mode == FSFile::WRITE ? "w" : "r");
+                CE_ASSERT( is_valid() );
+#endif
             }
 
             virtual ~DiskFile() {
-                file::close(_file);
+                CE_ASSERT( is_valid() );
+
+#if defined(CETECH_RUNTIME_SDL2)
+                SDL_RWclose(rwops);
+#endif
             }
 
             virtual bool is_valid() {
-                return !file::is_null(_file);
+#if defined(CETECH_RUNTIME_SDL2)
+                return rwops != nullptr;
+#endif
             }
 
             virtual void seek(size_t position) final {
-                file::seek(_file, position, file::SW_SEEK_SET);
+                CE_ASSERT( is_valid() );
+                
+#if defined(CETECH_RUNTIME_SDL2)
+                SDL_RWseek(rwops, position, RW_SEEK_SET);
+#endif
             };
 
             virtual void seek_to_end() final {
-                file::seek(_file, 0, file::SW_SEEK_END);
+                CE_ASSERT( is_valid() );
+#if defined(CETECH_RUNTIME_SDL2)
+                SDL_RWseek(rwops, 0, RW_SEEK_END);
+#endif
             };
 
             virtual void skip(size_t bytes) final {
-                file::seek(_file, bytes, file::SW_SEEK_CUR);
+                CE_ASSERT( is_valid() );
+                
+#if defined(CETECH_RUNTIME_SDL2)
+                SDL_RWseek(rwops, bytes, RW_SEEK_CUR);
+#endif
             };
 
-            virtual void read(void* buffer, size_t size) final {
-                file::read(_file, buffer, sizeof(char), size);
+            virtual size_t position() final {
+                CE_ASSERT( is_valid() );
+                
+#if defined(CETECH_RUNTIME_SDL2)
+                return SDL_RWtell(rwops);
+#endif
             };
-
-            virtual void write(const void* buffer, size_t size)  final {
-                file::write(_file, buffer, sizeof(char), size);
-            };
-
-            virtual void flush() final {};
 
             virtual bool end_of_file()  final {
+                CE_ASSERT( is_valid() );
+                
                 return position() == size();
             };
 
             virtual size_t size()  final {
+                CE_ASSERT( is_valid() );
+                
                 const size_t curent_pos = position();
                 seek_to_end();
                 const size_t sz = position();
@@ -63,10 +95,24 @@ namespace cetech {
 
                 return sz;
             };
-
-            virtual size_t position() final {
-                return file::tell(_file);
+            
+            virtual void read(void* buffer, size_t size) final {
+                CE_ASSERT( is_valid() );
+#if defined(CETECH_RUNTIME_SDL2)
+                SDL_RWread(rwops, buffer, sizeof(char), size);
+#endif
             };
+
+            virtual void write(const void* buffer, size_t size)  final {
+                CE_ASSERT( is_valid() );
+
+#if defined(CETECH_RUNTIME_SDL2)
+                SDL_RWwrite(rwops, buffer, sizeof(char), size);
+#endif
+            };
+
+            virtual void flush() final {};
+
     };
 
     namespace {
@@ -104,7 +150,6 @@ namespace cetech {
         FSFile& open(StringId64_t root, const char* path, FSFile::OpenMode mode) {
             char abs_path[2048] = {0};
             absolute_path(abs_path, root, path);
-
             return *MAKE_NEW(_globals.data->_allocator, DiskFile, abs_path, mode);
         }
 
@@ -156,7 +201,11 @@ namespace cetech {
         time_t file_mtime(StringId64_t root, const char* path) {
             char abs_path[4096] = {0};
             absolute_path(abs_path, root, path);
-            return file::mtime(abs_path);
+
+            struct stat st;
+            stat(abs_path, &st);
+
+            return st.st_mtime;
         }
 
     };

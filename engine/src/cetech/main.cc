@@ -17,6 +17,8 @@
 #include <unistd.h>
 #include <csignal>
 
+#include "rapidjson/error/en.h"
+
 using namespace cetech;
 
 /*********
@@ -119,6 +121,13 @@ void load_config_json() {
 
     rapidjson::Document document;
     document.Parse((const char*)mem);
+    
+    if (document.HasParseError()) {
+        log_globals::log().error("main", "Parse config.json error: %s", GetParseError_En(
+                                        document.GetParseError()), document.GetErrorOffset());
+        abort();
+    }
+    
     cvar::load_from_json(document);
 
     memory_globals::default_allocator().deallocate(mem);
@@ -148,10 +157,12 @@ bool big_init() {
 
     task_manager_globals::init();
 
+#if defined(CETECH_DEVELOP)
     console_server_globals::init();
     console_server::init();
     develop_manager_globals::init();
-
+#endif
+    
     resource_manager_globals::init();
 
 #if defined(CETECH_DEVELOP)

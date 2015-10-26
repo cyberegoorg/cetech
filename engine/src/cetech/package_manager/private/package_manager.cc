@@ -49,8 +49,6 @@ namespace cetech {
         };
 
         static void package_loader_task(void* data) {
-            log_globals::log().debug("package_manager.loader.task", "Loading package");
-
             PackageLoaderTask* pkg_loader = (PackageLoaderTask*) data;
 
             Array < char* > loaded_data(memory_globals::default_allocator());

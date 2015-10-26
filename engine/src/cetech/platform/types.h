@@ -4,9 +4,6 @@
 #include "SDL2/SDL.h"
 
 namespace cetech {
-    struct File {
-        SDL_RWops* ops;
-    };
 
     typedef int (* thread_fce_t) (void* data);
 
