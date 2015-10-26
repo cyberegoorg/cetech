@@ -13,10 +13,11 @@
 #include "bgfx/bgfxdefines.h"
 
 #include "cetech/application/application.h"
-#include "cetech/renderer/texture/texture_resource.h"
+#include "cetech/renderer/texture_resource.h"
 #include "celib/string/stringid.inl.h"
 
-// TODO: rewrite,
+
+#if defined(CETECH_RUNTIME_SDL2)
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_syswm.h>
 uint8_t sdlSetWindow(SDL_Window* _window) {
@@ -38,6 +39,7 @@ uint8_t sdlSetWindow(SDL_Window* _window) {
 
     return 1;
 }
+#endif
 
 namespace cetech {
     namespace {
@@ -100,7 +102,9 @@ namespace cetech {
         void init(Window window, RenderType::Enum render_type) {
             console_server::register_command("renderer.resize", cmd_renderer_resize);
 
+            #if defined(CETECH_RUNTIME_SDL2)
             sdlSetWindow(window.wnd);
+            #endif
 
             bgfx::init(_bgfx_render_type(render_type));
             resize(cvars::screen_width.value_i, cvars::screen_height.value_i);

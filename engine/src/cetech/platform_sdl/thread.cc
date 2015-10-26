@@ -13,8 +13,6 @@
 #include "celib/math/vector2.inl.h"
 #include "cetech/application/application.h"
 
-#include "cetech/platform_sdl/types.h"
-
 #include "SDL2/SDL.h"
 
 namespace cetech {
