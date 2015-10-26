@@ -65,14 +65,14 @@ namespace cetech {
             compilator.write_to_build(dds_data, dds_size);
         }
 
-        char* loader (FSFile* f, Allocator& a) {
-            const uint64_t f_sz = f->size();
+        char* loader (FSFile& f, Allocator& a) {
+            const uint64_t f_sz = f.size();
 
             Header header;
-            f->read(&header, sizeof(Header));
+            f.read(&header, sizeof(Header));
 
             const bgfx::Memory* mem = bgfx::alloc(header.size);
-            f->read(mem->data, header.size);
+            f.read(mem->data, header.size);
 
             Resource* res = (Resource*) a.allocate(f_sz);
 

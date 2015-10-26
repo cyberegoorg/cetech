@@ -107,13 +107,13 @@ void register_resources() {
 }
 
 void load_config_json() {
-    FSFile* f = filesystem::open(BUILD_DIR, "config.json", FSFile::READ);
+    FSFile& f = filesystem::open(BUILD_DIR, "config.json", FSFile::READ);
 
-    const uint64_t f_sz = f->size();
+    const uint64_t f_sz = f.size();
     void* mem = memory_globals::default_allocator().allocate(f_sz + 1);
     memset(mem, 0, f_sz + 1);
 
-    f->read(mem, f_sz);
+    f.read(mem, f_sz);
 
     filesystem::close(f);
 
@@ -142,9 +142,9 @@ bool big_init() {
     strcat(build_path, cvars::compiler_platform.value_str);
     strcat(build_path, "/");
 
-    filesystem::setDirMap(SRC_DIR, cvars::rm_source_dir.value_str);
-    filesystem::setDirMap(BUILD_DIR, build_path);
-    filesystem::setDirMap(CORE_DIR, cvars::compiler_core_path.value_str);
+    filesystem::map_root_dir(SRC_DIR, cvars::rm_source_dir.value_str);
+    filesystem::map_root_dir(BUILD_DIR, build_path);
+    filesystem::map_root_dir(CORE_DIR, cvars::compiler_core_path.value_str);
 
     task_manager_globals::init();
 

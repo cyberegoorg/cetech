@@ -10,7 +10,7 @@
 
 namespace cetech {
     namespace resource_manager {
-        typedef char* (* resource_loader_clb_t)(FSFile*, Allocator&);
+        typedef char* (* resource_loader_clb_t)(FSFile&, Allocator&);
         typedef void (* resource_unloader_clb_t)(Allocator&, void*);
         typedef void (* resource_online_clb_t)(void*);
         typedef void (* resource_offline_clb_t)(void*);

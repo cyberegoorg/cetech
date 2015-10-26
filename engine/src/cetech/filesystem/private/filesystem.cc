@@ -95,21 +95,21 @@ namespace cetech {
     }
 
     namespace filesystem {
-        void setDirMap(StringId64_t name, const char* dir) {
+        void map_root_dir(StringId64_t name, const char* dir) {
             CE_ASSERT( dir[strlen(dir) - 1] == '/' );
 
             hash::set < const char* > (_globals.data->_dir_map, name, strdup(dir));
         }
 
-        FSFile* open(StringId64_t root, const char* path, FSFile::OpenMode mode) {
+        FSFile& open(StringId64_t root, const char* path, FSFile::OpenMode mode) {
             char abs_path[2048] = {0};
             absolute_path(abs_path, root, path);
 
-            return MAKE_NEW(_globals.data->_allocator, DiskFile, abs_path, mode);
+            return *MAKE_NEW(_globals.data->_allocator, DiskFile, abs_path, mode);
         }
 
-        void close(FSFile* file) {
-            MAKE_DELETE(_globals.data->_allocator, FSFile, file);
+        void close(FSFile& file) {
+            MAKE_DELETE(_globals.data->_allocator, FSFile, &file);
         };
 
         bool exists(StringId64_t root, const char* path) {     /*TODO: #43*/

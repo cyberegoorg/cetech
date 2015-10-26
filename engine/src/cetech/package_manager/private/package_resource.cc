@@ -68,11 +68,11 @@ namespace cetech {
         void online(void* data) {}
         void offline(void* data) {}
 
-        char* loader (FSFile* f, Allocator& a) {
-            const uint64_t f_sz = f->size();
+        char* loader (FSFile& f, Allocator& a) {
+            const uint64_t f_sz = f.size();
 
             char* mem = (char*) a.allocate(f_sz);
-            f->read(mem, f_sz);
+            f.read(mem, f_sz);
 
             return mem;
         }

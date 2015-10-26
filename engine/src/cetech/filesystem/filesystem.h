@@ -13,10 +13,10 @@ namespace cetech {
     static StringId64_t SRC_DIR = stringid64::from_cstring("src");
 
     namespace filesystem {
-        void setDirMap(StringId64_t name, const char* dir);
+        void map_root_dir(StringId64_t name, const char* dir);
 
-        FSFile* open(StringId64_t root, const char* path, FSFile::OpenMode mode);
-        void close(FSFile* file);
+        FSFile& open(StringId64_t root, const char* path, FSFile::OpenMode mode);
+        void close(FSFile& file);
 
         bool exists(StringId64_t root, const char* path);
         bool is_directory(StringId64_t root, const char* path);
