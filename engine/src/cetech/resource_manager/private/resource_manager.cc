@@ -54,18 +54,17 @@ namespace cetech {
             std::sprintf(buffer, "%" PRIx64 "%" PRIx64, type, name);
         }
 
-        void shutdown() {}
     }
 
     namespace resource_manager {
         CE_INLINE void inc_reference(StringId64_t type, const StringId64_t name) {
             const uint32_t counter = hash::get < uint32_t > (_globals.data->_data_refcount_map, type ^ name, 0) + 1;
 
-            log_globals::log().debug("resource_manager",
-                                     "Inc reference for (%" PRIx64 ", %" PRIx64 ") counter == %d ",
-                                     type,
-                                     name,
-                                     counter);
+//             log_globals::log().debug("resource_manager",
+//                                      "Inc reference for (%" PRIx64 ", %" PRIx64 ") counter == %d ",
+//                                      type,
+//                                      name,
+//                                      counter);
 
             hash::set(_globals.data->_data_refcount_map, type ^ name, counter);
         }
@@ -73,11 +72,11 @@ namespace cetech {
         CE_INLINE bool dec_reference(StringId64_t type, const StringId64_t name) {
             const uint32_t counter = hash::get < uint32_t > (_globals.data->_data_refcount_map, type ^ name, 1) - 1;
 
-            log_globals::log().debug("resource_manager",
-                                     "Dec reference for %" PRIx64 "%" PRIx64 "." " counter == %d ",
-                                     type,
-                                     name,
-                                     counter);
+//             log_globals::log().debug("resource_manager",
+//                                      "Dec reference for %" PRIx64 "%" PRIx64 "." " counter == %d ",
+//                                      type,
+//                                      name,
+//                                      counter);
 
             hash::set(_globals.data->_data_refcount_map, type ^ name, counter);
 
@@ -102,7 +101,7 @@ namespace cetech {
                 name = names[i];
 
                 log_globals::log().debug("resource_manager",
-                                         "Loading resource " "%" PRIx64 "%" PRIx64 ".",
+                                         "Loading resource " "%" PRIx64 "%" PRIx64 "",
                                          type, name);
 
                 char resource_srt[32 + 1] = {0};
@@ -198,7 +197,7 @@ namespace cetech {
                 name = names[i];
 
                 log_globals::log().debug("resource_manager",
-                                         "Unload resource " "%" PRIx64 "%" PRIx64 ".",
+                                         "Unload resource " "%" PRIx64 "%" PRIx64 "",
                                          type, name);
 
                 if (!dec_reference(type, name)) {
