@@ -86,7 +86,10 @@ namespace cetech {
             res->handle = bgfx::createTexture(res->mem);
         }
 
-        void offline(void* data) {}
+        void offline(void* data) {
+            Resource* res = (Resource*) data;
+            bgfx::destroyTexture(res->handle);
+        }
 
         void unloader(Allocator& a, void* data) {
             a.deallocate(data);

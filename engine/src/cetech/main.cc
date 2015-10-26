@@ -183,11 +183,9 @@ bool big_init() {
     mouse::init();
 
     package_manager_globals::init();
-
     renderer_globals::init();
 
     lua_enviroment_globals::init();
-
     application_globals::init();
 
     return true;
@@ -241,18 +239,15 @@ void parse_command_line(int argc, const char** argv) {
 }
 
 void big_shutdown() {
-    renderer_globals::shutdown();
-
     package_manager_globals::shutdown();
     resource_manager_globals::shutdown();
-
-    develop_manager_globals::shutdown();
-    task_manager_globals::shutdown();
-    console_server_globals::shutdown();
-
+    
 #if defined(CETECH_DEVELOP)
     resource_compiler_globals::shutdown();
 #endif
+develop_manager_globals::shutdown();
+    console_server_globals::shutdown();
+    task_manager_globals::shutdown();
 
     application_globals::shutdown();
 
@@ -264,11 +259,7 @@ int main(int argc, const char** argv) {
     parse_command_line(argc, argv);
 
     if (big_init()) {
-        application::init();
-
         application::run();
-
-        application::shutdown();
     }
 
     big_shutdown();

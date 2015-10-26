@@ -147,8 +147,8 @@ project "cetech1"
 
     configuration "Debug"
         links {
-          --"bgfxDebug",
-            "bgfxRelease",
+          "bgfxDebug",
+          --"bgfxRelease",
         }
 
     configuration ("linux*")

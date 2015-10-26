@@ -2,7 +2,6 @@ local log = require "core/cetech/log"
 
 Game = Game or {}
 
-local pkg1 = Package.create("pkg1")
 local quit_btn = Keyboard.button_index 'q' 
 
 function Game:init() 
@@ -13,7 +12,6 @@ function Game:init()
     log.error("boot.lua", "error")
     log.debug("boot.lua", "debug")
     
---     Package.load(pkg1)
 end
 
 function Game:shutdown()
@@ -28,10 +26,4 @@ function Game:update(dt)
         print("q")
         Application.quit()
     end
-
-    
---     if Package.is_loaded(pkg1) then
---         print("unload")
---         Package.unload(pkg1)
---     end
 end
