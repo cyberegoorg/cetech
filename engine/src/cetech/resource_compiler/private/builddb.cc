@@ -114,7 +114,7 @@ namespace cetech {
                    ).bind_text(1, filename).bind_text(2, depend_on).step();
     }
 
-    bool BuildDB::need_compile(const char* filename, FileSystem* source_fs) {
+    bool BuildDB::need_compile(StringId64_t root, const char* filename) {
         bool compile = true;
 
         SQLiteSTMT stmt(_db,
@@ -133,7 +133,7 @@ namespace cetech {
         while (stmt.step() == SQLITE_ROW) {
             compile = false;
 
-            time_t actual_mtime = source_fs->file_mtime(stmt.get_column_text(0));
+            time_t actual_mtime = filesystem::file_mtime(root, stmt.get_column_text(0));
             time_t last_mtime = stmt.get_column_int64(1);
 
             if (actual_mtime != last_mtime) {

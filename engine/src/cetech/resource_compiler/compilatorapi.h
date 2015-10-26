@@ -6,8 +6,6 @@
 namespace cetech {
     struct CompilatorAPI {
         CompilatorAPI(const char* filename,
-                      FileSystem * src_fs,
-                      FileSystem * build_fs,
                       FSFile * resource_file,
                       FSFile * build_file);
         ~CompilatorAPI();

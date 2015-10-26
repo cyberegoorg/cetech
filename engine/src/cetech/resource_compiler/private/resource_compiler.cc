@@ -16,7 +16,6 @@
 
 #include "cetech/application/application.h"
 #include "cetech/cvars/cvars.h"
-#include "cetech/filesystem/disk_filesystem.h"
 
 #include "rapidjson/prettywriter.h"
 #include "rapidjson/memorybuffer.h"
@@ -29,8 +28,7 @@ namespace cetech {
 
         struct CompileTask {
             resource_compiler_clb_t clb;
-            FileSystem* source_fs;
-            FileSystem* build_fs;
+            StringId64_t source_fs;
 
             char* filename;
             StringId64_t name;
@@ -94,54 +92,51 @@ namespace cetech {
             resource_id_to_str(output_filename, ct->type, ct->name);
 
             FSFile* source_file;
-            source_file = ct->source_fs->open(ct->filename, FSFile::READ);
+            source_file = filesystem::open(ct->source_fs, ct->filename, FSFile::READ);
             if (!source_file->is_valid()) {
                 log_globals::log().error("resource_compiler", "Could not open source file \"%s\"", ct->filename);
                 return;
             }
 
-            FSFile* build_file = ct->build_fs->open(output_filename, FSFile::WRITE);
+            FSFile* build_file = filesystem::open(BUILD_DIR, output_filename, FSFile::WRITE);
 
-            CompilatorAPI comp(ct->filename, ct->source_fs, ct->build_fs, source_file, build_file);
+            CompilatorAPI comp(ct->filename, source_file, build_file);
 
             ct->clb(ct->filename, comp);
 
 
             char db_path[512] = {0};
-            sprintf(db_path, "%s%s", ct->build_fs->root_dir(), "build.db");
+            sprintf(db_path, "%s%s", filesystem::root_dir(BUILD_DIR), "build.db");
 
             BuildDB bdb;
             bdb.open(db_path);
-            bdb.set_file(ct->filename, ct->source_fs->file_mtime(ct->filename));
+            bdb.set_file(ct->filename, filesystem::file_mtime(ct->source_fs, ct->filename));
             bdb.set_file_depend(ct->filename, ct->filename);
             bdb.close();
 
-            ct->source_fs->close(source_file);
-            ct->build_fs->close(build_file);
+            filesystem::close(source_file);
+            filesystem::close(build_file);
 
             log_globals::log().info("resource_compiler", "Compiled \"%s\".", ct->filename );
         }
 
-        task_manager::TaskID compile(FileSystem* source_fs, FileSystem* build_fs,
-                                     rapidjson::Document& debug_index) {
-
+        task_manager::TaskID compile(StringId64_t root, rapidjson::Document& debug_index) {
             Array < char* > files(memory_globals::default_allocator());
-            source_fs->list_directory(source_fs->root_dir(), files);
+            filesystem::list_directory(root, 0, files);
 
             task_manager::TaskID top_compile_task = task_manager::add_empty_begin(0);
 
             const uint32_t files_count = array::size(files);
 
-
             char resource_id_str[64] = {0};
 
             char db_path[512] = {0};
-            sprintf(db_path, "%s%s", build_fs->root_dir(), "build.db");
+            sprintf(db_path, "%s%s", filesystem::root_dir(BUILD_DIR), "build.db");
             BuildDB bdb;
             bdb.open(db_path);
 
             for (uint32_t i = 0; i < files_count; ++i) {
-                const char* filename = files[i] + strlen(source_fs->root_dir());         /* Base path */
+                const char* filename = files[i] + strlen(filesystem::root_dir(root));         /* Base path */
 
                 if (!strcmp(filename, "config.json")) {
                     continue;
@@ -170,13 +165,12 @@ namespace cetech {
 
                 resource_id_str[0] = '\0';
 
-                if (!bdb.need_compile(filename, source_fs)) {
+                if (!bdb.need_compile(root, filename)) {
                     continue;
                 }
 
                 CompileTask& ct = new_compile_task();
-                ct.source_fs = source_fs;
-                ct.build_fs = build_fs;
+                ct.source_fs = root;
                 ct.filename = strdup(filename);         // TODO: LEAK!!!
                 ct.name = name;
                 ct.type = type;
@@ -193,57 +187,34 @@ namespace cetech {
         }
 
 
-        void save_json(FileSystem* build_fs, const char* filename, const rapidjson::Document& document) {
+        void save_json(const char* filename, const rapidjson::Document& document) {
             rapidjson::StringBuffer buffer;
             rapidjson::PrettyWriter < rapidjson::StringBuffer > writer(buffer);
             document.Accept(writer);
 
-            FSFile* debug_index_file = build_fs->open(filename, FSFile::WRITE);
+            FSFile* debug_index_file = filesystem::open(BUILD_DIR, filename, FSFile::WRITE);
             debug_index_file->write(buffer.GetString(), buffer.GetSize());
-            build_fs->close(debug_index_file);
+            filesystem::close(debug_index_file);
         }
 
-        void build_config_json(FileSystem* source_fs, FileSystem* build_fs) {
-            FSFile* src_config = source_fs->open("config.json", FSFile::READ);
-            FSFile* out_config = build_fs->open("config.json", FSFile::WRITE);
+        void build_config_json() {
+            FSFile* src_config = filesystem::open(SRC_DIR, "config.json", FSFile::READ);
+            FSFile* out_config = filesystem::open(BUILD_DIR, "config.json", FSFile::WRITE);
 
             size_t size = src_config->size();
             char data[size];
             memset(data, 0, size);
             src_config->read(data, size);
-            source_fs->close(src_config);
+            filesystem::close(src_config);
 
             out_config->write(data, size);
-            build_fs->close(out_config);
-        }
-
-        void load_debug_index(FileSystem* build_fs, rapidjson::Document& build_index) {
-            FSFile* build_index_file = build_fs->open("build_index.json", FSFile::READ);
-
-            if (!build_index_file->is_valid()) {
-                build_fs->close(build_index_file);
-                build_index.SetObject();
-                return;
-            }
-
-            size_t size = build_index_file->size();
-            char data[size + 1];
-            memset(data, 0, size + 1);
-            build_index_file->read(data, size);
-
-            build_index.Parse(data);
-            if (build_index.HasParseError()) {
-                log_globals::log().error("resouce_compiler", "debug_index.json parse error: %s", GetParseError_En(
-                                             build_index.GetParseError()), build_index.GetErrorOffset());
-            }
-
-            build_fs->close(build_index_file);
+            filesystem::close(out_config);
         }
 
         static void cmd_compile_all(const rapidjson::Document& in, rapidjson::Document& out) {
             CE_UNUSED(in);
             CE_UNUSED(out);
-            //resource_compiler::compile_all_resource();
+            resource_compiler::compile_all();
             //application_globals::app().resource_compiler().compile_all_resource();
         }
     }
@@ -253,36 +224,28 @@ namespace cetech {
             hash::set(_globals.data->_compile_clb_map, type, clb);
         }
 
-        void compile_all(FileSystem* build_fs) {
-            dir::mkpath(build_fs->root_dir());
+        void compile_all() {
+            dir::mkpath(filesystem::root_dir(BUILD_DIR));
 
             BuildDB bdb;
             char db_path[512] = {0};
-            sprintf(db_path, "%s%s", build_fs->root_dir(), "build.db");
+            sprintf(db_path, "%s%s", filesystem::root_dir(BUILD_DIR), "build.db");
             bdb.open(db_path);
             bdb.init_db();
 
-            FileSystem* source_fs = disk_filesystem::make(
-                memory_globals::default_allocator(), cvars::rm_source_dir.value_str);
-
-            FileSystem* core_fs = disk_filesystem::make(
-                memory_globals::default_allocator(), cvars::compiler_core_path.value_str);
 
             rapidjson::Document debug_index;
             debug_index.SetObject();
 
-            build_config_json(source_fs, build_fs);
+            build_config_json();
 
-            task_manager::TaskID compile_tid = compile(source_fs, build_fs, debug_index);
+            task_manager::TaskID compile_tid = compile(SRC_DIR, debug_index);
             task_manager::wait(compile_tid);
 
-            compile_tid = compile(core_fs, build_fs, debug_index);
+            compile_tid = compile(CORE_DIR, debug_index);
             task_manager::wait(compile_tid);
 
-            save_json(build_fs, "debug_index.json", debug_index);
-
-            disk_filesystem::destroy(memory_globals::default_allocator(), source_fs);
-            disk_filesystem::destroy(memory_globals::default_allocator(), core_fs);
+            save_json("debug_index.json", debug_index);
         }
     }
 

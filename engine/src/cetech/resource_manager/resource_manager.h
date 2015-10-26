@@ -34,7 +34,7 @@ namespace cetech {
 
 
     namespace resource_manager_globals {
-        void init(FileSystem* fs);
+        void init();
         void shutdown();
     }
 }
