@@ -1,6 +1,7 @@
 require "lua/game"
  
 function init()
+    print('init............')
   Game:init()
 end 
 

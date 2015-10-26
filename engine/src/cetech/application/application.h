@@ -12,37 +12,28 @@
 #include <inttypes.h>
 
 namespace cetech {
-    class Application {
-        public:
-            enum Platform {
-                PLATFORM_NONE = 0,
-                PLATFORM_LINUX,
-                PLATFORM_WINDOWS,
-            };
+    namespace application {
+        enum Platform {
+            PLATFORM_NONE = 0,
+            PLATFORM_LINUX,
+            PLATFORM_WINDOWS,
+        };
 
-        public:
-            virtual ~Application() {};
+        uint32_t get_frame_id();
+        float get_delta_time();
 
-            virtual uint32_t get_frame_id() const = 0;
-            virtual float get_delta_time() const = 0;
+        void init();
+        void shutdown();
+        void run();
+        void quit();
 
-            virtual void init() = 0;
-            virtual void shutdown() = 0;
-            virtual void run() = 0;
-            virtual void quit() = 0;
+        bool is_run();
 
-            virtual bool is_run() = 0;
-
-            virtual Platform platform() = 0;
-
-            static Application* make(Allocator& allocator);
-            static void destroy(Allocator& allocator, Application* rm);
-    };
+        Platform platform();
+    }
 
     namespace application_globals {
         void init();
         void shutdown();
-
-        Application& app();
     }
 }

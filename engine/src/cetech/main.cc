@@ -26,7 +26,7 @@ void posix_signal_handler(int sig) {
     switch (sig) {
     case SIGKILL:
     case SIGINT:
-        cetech::application_globals::app().quit();
+        application::quit();
         break;
 
     default:
@@ -65,18 +65,27 @@ void register_resources() {
 
     static ResourceRegistration resource_regs[] = {
         /* package */
-        {resource_package::type_hash(), & resource_package::compile, & resource_package::loader,
-         & resource_package::online, & resource_package::offline,
-         & resource_package::unloader},
+        { resource_package::type_hash(),
+          & resource_package::compile,
+          & resource_package::loader,
+          & resource_package::online,
+          & resource_package::offline,
+          & resource_package::unloader},
 
         /* lua */
-        {resource_lua::type_hash(), & resource_lua::compile, & resource_lua::loader,
-         & resource_lua::online, & resource_lua::offline,
+        {resource_lua::type_hash(),
+         & resource_lua::compile,
+         & resource_lua::loader,
+         & resource_lua::online,
+         & resource_lua::offline,
          & resource_lua::unloader},
 
         /* texture */
-        {resource_texture::type_hash(), & resource_texture::compile, & resource_texture::loader,
-         & resource_texture::online, & resource_texture::offline,
+        {resource_texture::type_hash(),
+         & resource_texture::compile,
+         & resource_texture::loader,
+         & resource_texture::online,
+         & resource_texture::offline,
          & resource_texture::unloader},
 
         /* LAST */
@@ -115,19 +124,6 @@ void load_config_json() {
     memory_globals::default_allocator().deallocate(mem);
 }
 
-
-void init_boot() {
-    package_manager::load_boot_package();
-
-    // Execute boot script
-    StringId64_t boot_script_name_h = stringid64::from_cstringn(cvars::boot_script.value_str,
-                                                                cvars::boot_script.str_len);
-
-    const resource_lua::Resource* res_lua;
-    res_lua = (const resource_lua::Resource*) resource_manager::get(
-        resource_lua::type_hash(), boot_script_name_h);
-    lua_enviroment::execute_resource(res_lua);
-}
 
 bool big_init() {
 #if CETECH_LINUX
@@ -243,19 +239,7 @@ void parse_command_line(int argc, const char** argv) {
 
 }
 
-
-void shutdown_boot() {
-    StringId64_t boot_pkg_name_h = stringid64::from_cstringn(cvars::boot_pkg.value_str,
-                                                             cvars::boot_pkg.str_len);
-
-    package_manager::unload(boot_pkg_name_h);
-    resource_manager::unload(resource_package::type_hash(), &boot_pkg_name_h, 1);
-
-}
-
 void big_shutdown() {
-    shutdown_boot();
-
     renderer_globals::shutdown();
 
     package_manager_globals::shutdown();
@@ -281,14 +265,11 @@ int main(int argc, const char** argv) {
     parse_command_line(argc, argv);
 
     if (big_init()) {
-        Application& d = application_globals::app();
+        application::init();
 
-        d.init();
-        init_boot();
+        application::run();
 
-        d.run();
-
-        d.shutdown();
+        application::shutdown();
     }
 
     big_shutdown();
