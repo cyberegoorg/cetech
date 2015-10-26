@@ -77,7 +77,7 @@ namespace cetech {
 
         void shutdown_boot() {
             package_manager::unload_boot_package();
-            
+
             StringId64_t boot_pkg_name_h = stringid64::from_cstringn(cvars::boot_pkg.value_str,
                                                                      cvars::boot_pkg.str_len);
 
@@ -117,8 +117,8 @@ namespace cetech {
 
 #endif
         }
-        
-        
+
+
         inline void process_hid() {
             mouse::retrive_state();
             keyboard::frame_start();
@@ -195,7 +195,7 @@ namespace cetech {
 
         void run() {
             init();
-            
+
             ApplictionData* data = _globals.data;
 
             float dt = 0.0f;
@@ -254,7 +254,7 @@ namespace cetech {
             }
 
             log_globals::log().info("main", "Bye Bye");
-            
+
             shutdown();
         }
 

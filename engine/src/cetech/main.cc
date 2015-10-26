@@ -241,11 +241,11 @@ void parse_command_line(int argc, const char** argv) {
 void big_shutdown() {
     package_manager_globals::shutdown();
     resource_manager_globals::shutdown();
-    
+
 #if defined(CETECH_DEVELOP)
     resource_compiler_globals::shutdown();
 #endif
-develop_manager_globals::shutdown();
+    develop_manager_globals::shutdown();
     console_server_globals::shutdown();
     task_manager_globals::shutdown();
 

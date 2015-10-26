@@ -25,7 +25,7 @@ namespace cetech {
         bool is_run();
 
         Platform platform();
-        
+
         uint32_t get_frame_id();
         float get_delta_time();
         uint32_t get_ticks();
