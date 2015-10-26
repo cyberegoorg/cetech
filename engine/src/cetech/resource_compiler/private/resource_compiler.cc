@@ -119,73 +119,6 @@ namespace cetech {
             log_globals::log().info("resource_compiler", "Compiled \"%s\".", ct->filename );
         }
 
-        task_manager::TaskID compile(StringId64_t root, rapidjson::Document& debug_index) {
-            Array < char* > files(memory_globals::default_allocator());
-            filesystem::list_directory(root, 0, files);
-
-            task_manager::TaskID top_compile_task = task_manager::add_empty_begin(0);
-
-            const uint32_t files_count = array::size(files);
-
-            char resource_id_str[64] = {0};
-
-            char db_path[512] = {0};
-            sprintf(db_path, "%s%s", filesystem::root_dir(BUILD_DIR), "build.db");
-            BuildDB bdb;
-            bdb.open(db_path);
-
-            for (uint32_t i = 0; i < files_count; ++i) {
-                const char* filename = files[i] + strlen(filesystem::root_dir(root));         /* Base path */
-
-                if (!strcmp(filename, "config.json")) {
-                    continue;
-                }
-
-                uint64_t name, type = 0;
-                calc_hash(filename, type, name);
-                resource_id_to_str(resource_id_str, type, name);
-
-                resource_compiler_clb_t clb = hash::get < resource_compiler_clb_t >
-                                              (_globals.data->_compile_clb_map, type, nullptr);
-
-
-                if (clb == nullptr) {
-                    log_globals::log().warning("resource_compiler",
-                                               "Resource type " "%" PRIx64 " not register compiler.",
-                                               type);
-                    continue;
-                }
-
-                debug_index.AddMember(
-                    rapidjson::Value(resource_id_str, strlen(resource_id_str), debug_index.GetAllocator()),
-                    rapidjson::Value(filename, strlen(filename),
-                                     debug_index.GetAllocator()), debug_index.GetAllocator()
-                    );
-
-                resource_id_str[0] = '\0';
-
-                if (!bdb.need_compile(root, filename)) {
-                    continue;
-                }
-
-                CompileTask& ct = new_compile_task();
-                ct.source_fs = root;
-                ct.filename = strdup(filename);         // TODO: LEAK!!!
-                ct.name = name;
-                ct.type = type;
-                ct.clb = clb;
-
-                task_manager::TaskID tid = task_manager::add_begin(compile_task, &ct, 0, NULL_TASK, top_compile_task);
-                task_manager::add_end(&tid, 1);
-            }
-
-            dir::listdir_free(files);
-
-            task_manager::add_end(&top_compile_task, 1);
-            return top_compile_task;
-        }
-
-
         void save_json(const char* filename, const rapidjson::Document& document) {
             rapidjson::StringBuffer buffer;
             rapidjson::PrettyWriter < rapidjson::StringBuffer > writer(buffer);
@@ -238,11 +171,75 @@ namespace cetech {
 
             build_config_json();
 
-            task_manager::TaskID compile_tid = compile(SRC_DIR, debug_index);
-            task_manager::wait(compile_tid);
+            static StringId64_t in_dirs[] = {CORE_DIR, SRC_DIR};
+            
+            task_manager::TaskID top_compile_task = task_manager::add_empty_begin(0);
+            
+            for( int i = 0; i < sizeof(in_dirs)/sizeof(StringId64_t); ++i) {
+                StringId64_t src_dir = in_dirs[i];
 
-            compile_tid = compile(CORE_DIR, debug_index);
-            task_manager::wait(compile_tid);
+                Array < char* > files(memory_globals::default_allocator());
+                filesystem::list_directory(src_dir, 0, files);
+
+                const uint32_t files_count = array::size(files);
+
+                char resource_id_str[64] = {0};
+
+                char db_path[512] = {0};
+                sprintf(db_path, "%s%s", filesystem::root_dir(BUILD_DIR), "build.db");
+                BuildDB bdb;
+                bdb.open(db_path);
+
+                for (uint32_t i = 0; i < files_count; ++i) {
+                    const char* filename = files[i] + strlen(filesystem::root_dir(src_dir));         /* Base path */
+
+                    if (!strcmp(filename, "config.json")) {
+                        continue;
+                    }
+
+                    uint64_t name, type = 0;
+                    calc_hash(filename, type, name);
+                    resource_id_to_str(resource_id_str, type, name);
+
+                    resource_compiler_clb_t clb = hash::get < resource_compiler_clb_t >
+                                                (_globals.data->_compile_clb_map, type, nullptr);
+
+
+                    if (clb == nullptr) {
+                        log_globals::log().warning("resource_compiler",
+                                                "Resource type " "%" PRIx64 " not register compiler.",
+                                                type);
+                        continue;
+                    }
+
+                    debug_index.AddMember(
+                        rapidjson::Value(resource_id_str, strlen(resource_id_str), debug_index.GetAllocator()),
+                        rapidjson::Value(filename, strlen(filename),
+                                        debug_index.GetAllocator()), debug_index.GetAllocator()
+                        );
+
+                    resource_id_str[0] = '\0';
+
+                    if (!bdb.need_compile(src_dir, filename)) {
+                        continue;
+                    }
+
+                    CompileTask& ct = new_compile_task();
+                    ct.source_fs = src_dir;
+                    ct.filename = strdup(filename);         // TODO: LEAK!!!
+                    ct.name = name;
+                    ct.type = type;
+                    ct.clb = clb;
+
+                    task_manager::TaskID tid = task_manager::add_begin(compile_task, &ct, 0, NULL_TASK, top_compile_task);
+                    task_manager::add_end(&tid, 1);
+                }
+
+                dir::listdir_free(files);
+            }
+
+            task_manager::add_end(&top_compile_task, 1);
+            task_manager::wait(top_compile_task);
 
             save_json("debug_index.json", debug_index);
         }
