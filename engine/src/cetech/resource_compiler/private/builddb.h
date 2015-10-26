@@ -1,6 +1,7 @@
 #pragma once
 
 #include <ctime>
+#include "celib/string/stringid_types.h"
 
 struct sqlite3;
 
@@ -18,7 +19,7 @@ namespace cetech {
         void set_file(const char* filename, time_t mtime);
         void set_file_depend(const char* filename, const char* depend_on);
 
-        bool need_compile(const char* filename, FileSystem* source_fs);
+        bool need_compile(StringId64_t root, const char* filename);
 
         sqlite3* _db;
     };

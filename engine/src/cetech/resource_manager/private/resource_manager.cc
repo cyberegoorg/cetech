@@ -21,8 +21,6 @@ namespace cetech {
         using namespace resource_manager;
 
         struct ResouceManagerData {
-            FileSystem* _fs;
-
             Hash < char* > _data_map;
             Hash < uint32_t > _data_refcount_map;
 
@@ -34,13 +32,13 @@ namespace cetech {
             Spinlock add_lock;
             bool autoreload;
 
-            ResouceManagerData(FileSystem * fs, Allocator & allocator) : _fs(fs), _data_map(allocator),
-                                                                         _data_refcount_map(allocator),
-                                                                         _load_clb_map(allocator),
-                                                                         _unload_clb_map(allocator),
-                                                                         _online_clb_map(allocator),
-                                                                         _offline_clb_map(allocator),
-                                                                         autoreload(true) {}
+            ResouceManagerData(Allocator & allocator) : _data_map(allocator),
+                                                        _data_refcount_map(allocator),
+                                                        _load_clb_map(allocator),
+                                                        _unload_clb_map(allocator),
+                                                        _online_clb_map(allocator),
+                                                        _offline_clb_map(allocator),
+                                                        autoreload(true) {}
         };
 
         struct Globals {
@@ -110,7 +108,7 @@ namespace cetech {
                 char resource_srt[32 + 1] = {0};
                 resource_id_to_str(resource_srt, type, name);
 
-                FSFile* f = _globals.data->_fs->open(resource_srt, FSFile::READ);
+                FSFile* f = filesystem::open(BUILD_DIR, resource_srt, FSFile::READ);
 
                 if (!f->is_valid()) {
                     log_globals::log().error("resource_manager",
@@ -118,7 +116,7 @@ namespace cetech {
                                              type,
                                              name);
                     loaded_data[i] = nullptr;
-                    _globals.data->_fs->close(f);
+                    filesystem::close(f);
                     continue;
                 }
 
@@ -133,7 +131,7 @@ namespace cetech {
 
                 loaded_data[i] = data;
 
-                _globals.data->_fs->close(f);
+                filesystem::close(f);
             }
         }
 
@@ -264,9 +262,9 @@ namespace cetech {
     }
 
     namespace resource_manager_globals {
-        void init(FileSystem* fs) {
+        void init() {
             char* p = _globals.buffer;
-            _globals.data = new(p) ResouceManagerData(fs, memory_globals::default_allocator());
+            _globals.data = new(p) ResouceManagerData(memory_globals::default_allocator());
         }
 
         void shutdown() {

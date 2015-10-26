@@ -7,7 +7,6 @@
 #include "cetech/log_system/log_system.h"
 #include "cetech/application/application.h"
 #include "cetech/log_system/handlers.h"
-#include "cetech/filesystem/disk_filesystem.h"
 #include "cetech/platform/mouse.h"
 
 #include "cetech/renderer/texture_resource.h"
@@ -52,8 +51,6 @@ void posix_init() {
 }
 #endif
 /********/
-
-FileSystem* _filesystem;
 
 void register_resources() {
     struct ResourceRegistration {
@@ -110,7 +107,7 @@ void register_resources() {
 }
 
 void load_config_json() {
-    FSFile* f = _filesystem->open("config.json", FSFile::READ);
+    FSFile* f = filesystem::open(BUILD_DIR, "config.json", FSFile::READ);
 
     const uint64_t f_sz = f->size();
     void* mem = memory_globals::default_allocator().allocate(f_sz + 1);
@@ -118,7 +115,7 @@ void load_config_json() {
 
     f->read(mem, f_sz);
 
-    _filesystem->close(f);
+    filesystem::close(f);
 
     rapidjson::Document document;
     document.Parse((const char*)mem);
@@ -138,10 +135,16 @@ bool big_init() {
     log_globals::init();
     log_globals::log().register_handler(&log_handlers::stdout_handler);
 
+    filesystem_globals::init();
+
     char build_path[4096] = {0};
     strcat(build_path, cvars::rm_build_dir.value_str);
     strcat(build_path, cvars::compiler_platform.value_str);
-    _filesystem = disk_filesystem::make(memory_globals::default_allocator(), build_path);
+    strcat(build_path, "/");
+
+    filesystem::setDirMap(SRC_DIR, cvars::rm_source_dir.value_str);
+    filesystem::setDirMap(BUILD_DIR, build_path);
+    filesystem::setDirMap(CORE_DIR, cvars::compiler_core_path.value_str);
 
     task_manager_globals::init();
 
@@ -149,7 +152,7 @@ bool big_init() {
     console_server::init();
     develop_manager_globals::init();
 
-    resource_manager_globals::init(_filesystem);
+    resource_manager_globals::init();
 
 #if defined(CETECH_DEVELOP)
     resource_compiler_globals::init();
@@ -159,7 +162,7 @@ bool big_init() {
 
 #if defined(CETECH_DEVELOP)
     if (command_line_globals::has_argument("compile", 'c')) {
-        resource_compiler::compile_all(_filesystem);
+        resource_compiler::compile_all();
 
         if (!command_line_globals::has_argument("continue")) {
             return false;

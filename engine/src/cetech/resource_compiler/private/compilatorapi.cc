@@ -10,17 +10,14 @@
 namespace cetech {
     struct CompilatorAPI::Implementation {
         BuildDB bdb;
-        FileSystem* src_fs;
-        FileSystem* build_fs;
         FSFile* resource_file;
         FSFile* build_file;
         const char* filename;
 
-        Implementation(const char* filename, FileSystem * src_fs, FileSystem * build_fs, FSFile * resource_file,
-                       FSFile * build_file) : src_fs(src_fs), build_fs(build_fs),
-                                              resource_file(resource_file), build_file(build_file), filename(filename) {
+        Implementation(const char* filename, FSFile * resource_file,
+                       FSFile * build_file) : resource_file(resource_file), build_file(build_file), filename(filename) {
             char db_path[512] = {0};
-            sprintf(db_path, "%s%s", build_fs->root_dir(), "build.db");
+            sprintf(db_path, "%s%s", filesystem::root_dir(BUILD_DIR), "build.db");
             bdb.open(db_path);
 
         }
@@ -43,7 +40,7 @@ namespace cetech {
         }
 
         bool add_dependency(const char* path) {
-            bdb.set_file(path, src_fs->file_mtime(path));
+            bdb.set_file(path, filesystem::file_mtime(SRC_DIR, path));
             bdb.set_file_depend(filename, path);
             return true;
         }
@@ -65,11 +62,9 @@ namespace cetech {
     };
 
     CompilatorAPI::CompilatorAPI(const char* filename,
-                                 FileSystem* src_fs,
-                                 FileSystem* build_fs,
                                  FSFile* resource_file,
                                  FSFile* build_file) {
-        _impl = new CompilatorAPI::Implementation(filename, src_fs, build_fs, resource_file, build_file);
+        _impl = new CompilatorAPI::Implementation(filename, resource_file, build_file);
     }
 
     CompilatorAPI::~CompilatorAPI() {

@@ -13,7 +13,6 @@
 #include "cetech/resource_compiler/resource_compiler.h"
 #include "cetech/package_manager/package_manager.h"
 #include "cetech/develop/develop_manager.h"
-#include "cetech/filesystem/disk_filesystem.h"
 #include "cetech/package_manager/package_resource.h"
 
 #include "cetech/renderer/renderer.h"
