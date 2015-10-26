@@ -19,11 +19,6 @@ namespace cetech {
             PLATFORM_WINDOWS,
         };
 
-        uint32_t get_frame_id();
-        float get_delta_time();
-
-        uint32_t get_ticks();
-
         void init();
         void shutdown();
         void run();
@@ -32,6 +27,10 @@ namespace cetech {
         bool is_run();
 
         Platform platform();
+        
+        uint32_t get_frame_id();
+        float get_delta_time();
+        uint32_t get_ticks();
     }
 
     namespace application_globals {

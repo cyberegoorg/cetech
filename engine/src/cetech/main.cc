@@ -20,6 +20,9 @@
 
 using namespace cetech;
 
+/*********
+ * POSIX *
+ ********/
 #if CETECH_LINUX
 void posix_signal_handler(int sig) {
     switch (sig) {
@@ -48,6 +51,7 @@ void posix_init() {
     }
 }
 #endif
+/********/
 
 FileSystem* _filesystem;
 
@@ -201,10 +205,9 @@ static void make_path(char* buffer, size_t max_size, const char* path) {
 
 
 void parse_command_line(int argc, const char** argv) {
-    char buffer[1024] = {0};
-
     command_line_globals::set_args(argc, argv);
 
+    char buffer[1024] = {0};
     const char* build_dir = command_line_globals::get_parameter("build-dir", 'b');
     const char* port = command_line_globals::get_parameter("port", 'p');
 
