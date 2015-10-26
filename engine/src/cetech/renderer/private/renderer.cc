@@ -18,8 +18,8 @@
 
 
 /********
- * SDL2 *
- ********/
+* SDL2 *
+********/
 #if defined(CETECH_RUNTIME_SDL2)
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_syswm.h>
@@ -108,7 +108,7 @@ namespace cetech {
             console_server::register_command("renderer.resize", cmd_renderer_resize);
 
             #if defined(CETECH_RUNTIME_SDL2)
-                sdlSetWindow(window.wnd);
+            sdlSetWindow(window.wnd);
             #endif
 
             bgfx::init(_bgfx_render_type(render_type));
@@ -160,17 +160,17 @@ namespace cetech {
     namespace renderer_globals {
         void init() {
             log_globals::log().info("renderer_globals", "init");
-            
+
             char* p = _globals.buffer;
             _globals.data = new(p) RendererData();
         }
 
         void shutdown() {
             log_globals::log().info("renderer_globals", "shutdown");
-            
+
             bgfx::shutdown();
             _globals = Globals();
-            
+
             log_globals::log().info("renderer_globals", "shutdownddddddddddd");
         }
     }

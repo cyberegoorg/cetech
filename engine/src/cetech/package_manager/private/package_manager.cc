@@ -47,7 +47,7 @@ namespace cetech {
         CE_INLINE PackageLoaderTask& new_loader_task() {
             return _globals.data->loader_task_pool[(_globals.data->loader_task_pool_idx++) % TASK_POOL_SIZE];
         };
-        
+
         static void package_loader_task(void* data) {
             log_globals::log().debug("package_manager.loader.task", "Loading package");
 
@@ -71,8 +71,11 @@ namespace cetech {
                 log_globals::log().error("package_manager", "Could not get resource for package " "%" PRIx64, name);
                 return;
             }
-            
-            log_globals::log().debug("package_manager", "Loading package  %" PRIx64 "%" PRIx64, resource_package::type_hash(), name);
+
+            log_globals::log().debug("package_manager",
+                                     "Loading package  %" PRIx64 "%" PRIx64,
+                                     resource_package::type_hash(),
+                                     name);
 
             resource_package::Header* header = (resource_package::Header*)res;
             resource_package::TypeHeader* type_header = (resource_package::TypeHeader*)(header + 1);
@@ -100,7 +103,10 @@ namespace cetech {
         void unload(StringId64_t name) {
             const char* res = resource_manager::get(resource_package::type_hash(), name);
 
-            log_globals::log().debug("package_manager", "Unloading package  %" PRIx64 "%" PRIx64, resource_package::type_hash(), name);
+            log_globals::log().debug("package_manager",
+                                     "Unloading package  %" PRIx64 "%" PRIx64,
+                                     resource_package::type_hash(),
+                                     name);
 
             if (res == nullptr) {
                 log_globals::log().error("package_manager", "Could not get resource for package " "%" PRIx64, name);
@@ -187,7 +193,7 @@ namespace cetech {
                 break;
             }
         }
-        
+
         void unload_boot_package() {
             StringId64_t boot_pkg_name_h = stringid64::from_cstringn(cvars::boot_pkg.value_str,
                                                                      cvars::boot_pkg.str_len);
@@ -208,7 +214,7 @@ namespace cetech {
                 StringId64_t* names = (StringId64_t*)(res + type_header[i].offset);
 
                 for (uint32_t j = 0; j < count; ++j) {
-                     unload(names[j]);
+                    unload(names[j]);
                 }
 
                 break;

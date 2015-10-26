@@ -55,10 +55,8 @@ namespace cetech {
         CE_INLINE void resource_id_to_str(char* buffer, const StringId64_t& type, const StringId64_t& name) {
             std::sprintf(buffer, "%" PRIx64 "%" PRIx64, type, name);
         }
-        
-        void shutdown() {
-            
-        }
+
+        void shutdown() {}
     }
 
     namespace resource_manager {
@@ -78,7 +76,7 @@ namespace cetech {
             const uint32_t counter = hash::get < uint32_t > (_globals.data->_data_refcount_map, type ^ name, 1) - 1;
 
             log_globals::log().debug("resource_manager",
-                                     "Dec reference for %" PRIx64 "%" PRIx64"." " counter == %d ",
+                                     "Dec reference for %" PRIx64 "%" PRIx64 "." " counter == %d ",
                                      type,
                                      name,
                                      counter);
@@ -106,8 +104,8 @@ namespace cetech {
                 name = names[i];
 
                 log_globals::log().debug("resource_manager",
-                                        "Loading resource " "%" PRIx64 "%" PRIx64".",
-                                        type, name);
+                                         "Loading resource " "%" PRIx64 "%" PRIx64 ".",
+                                         type, name);
 
                 char resource_srt[32 + 1] = {0};
                 resource_id_to_str(resource_srt, type, name);
@@ -143,9 +141,9 @@ namespace cetech {
                         StringId64_t type,
                         const StringId64_t* names,
                         const uint32_t count) {
-            
+
             thread::spin_lock(_globals.data->add_lock);
-            
+
             for (uint32_t i = 0; i < count; ++i) {
                 const StringId64_t name = names[i];
 
@@ -185,8 +183,8 @@ namespace cetech {
 
             if (ofline_clb == nullptr) {
                 log_globals::log().error("resource_manager",
-                                            "Resource type " "%" PRIx64 " not register offline.",
-                                            type);
+                                         "Resource type " "%" PRIx64 " not register offline.",
+                                         type);
                 return;
             }
 
@@ -197,14 +195,14 @@ namespace cetech {
                 void* data = (void*) get(type, name);
                 ofline_clb(data);
             }
-            
+
             for (uint32_t i = 0; i < count; ++i) {
                 name = names[i];
 
                 log_globals::log().debug("resource_manager",
-                                        "Unload resource " "%" PRIx64 "%" PRIx64".",
-                                        type, name);
-                
+                                         "Unload resource " "%" PRIx64 "%" PRIx64 ".",
+                                         type, name);
+
                 if (!dec_reference(type, name)) {
                     continue;
                 }

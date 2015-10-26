@@ -384,7 +384,7 @@ namespace cetech {
 
         void shutdown() {
             log_globals::log().info("task_manager_globals", "Shutdown");
-            
+
             _globals.data->~TaskManagerData();
             _globals = Globals();
         }
