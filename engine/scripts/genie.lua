@@ -11,7 +11,6 @@ THIRD_PARTY_BUILD = path.join( ROOT_DIR, THIRD_PARTY, ".build")
 THIRD_PARTY_LIB = path.join(THIRD_PARTY_BUILD, "lib", OS_ARCH)
 THIRD_PARTY_INCLUDE = path.join( THIRD_PARTY_BUILD, "include")
 THIRD_PARTY_INCLUDE_ARCH_DEP = path.join(THIRD_PARTY_INCLUDE, OS_ARCH)
-
 --------------------------------------------------------------------------------
 newoption {
   trigger = 'simd',
