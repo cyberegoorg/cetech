@@ -30,6 +30,19 @@ PREMAKE5 := $(ROOT_DIR)/../3rdparty/.build/bin/$(OS)$(ARCH)/premake5
 GENIE=$(ROOT_DIR)/../3rdparty/.build/bin/$(OS)$(ARCH)/genie
 #########
 
+#########
+# Linux #
+#########
+LINUX_SIMD = fpu
+LINUX_RUNTIME = sdl2
+
+###########
+# Windows #
+###########
+WINDOWS_SIMD = fpu
+WINDOWS_RUNTIME = sdl2
+###########
+
 all:
 	$(GENIE) vs2008
 	$(GENIE) vs2010
@@ -279,20 +292,3 @@ clean-doc:
 	@echo Cleaning doc
 	-@rm -rf ./doc/doxygen/html
 #########
-
-#########
-# Linux #
-#########
-LINUX_SIMD = fpu
-LINUX_RUNTIME = sdl2
-
-#include scripts/linux.mk
-
-###########
-# Windows #
-###########
-WINDOWS_SIMD = fpu
-WINDOWS_RUNTIME = sdl2
-
-#include scripts/windows.mk
-###########

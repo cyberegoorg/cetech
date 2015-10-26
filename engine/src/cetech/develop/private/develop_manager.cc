@@ -113,7 +113,7 @@ namespace cetech {
 
         void push_begin_frame() {
             BeginFrameEvent event = {
-                .get_frame_id = application_globals::app().get_frame_id(),
+                .get_frame_id = application::get_frame_id(),
                 .time = os::get_ticks()
             };
 
@@ -122,7 +122,7 @@ namespace cetech {
 
         void push_end_frame() {
             EndFrameEvent event = {
-                .get_frame_id = application_globals::app().get_frame_id(),
+                .get_frame_id = application::get_frame_id(),
                 .time = os::get_ticks()
             };
 
@@ -132,7 +132,7 @@ namespace cetech {
         void push_record_float(const char* name, const float value) {
             RecordFloatEvent event = {
                 .name = strdup(name),
-                .get_frame_id = application_globals::app().get_frame_id(),
+                .get_frame_id = application::get_frame_id(),
                 .value = value
             };
             push(EVENT_RECORD_FLOAT, event);
