@@ -6,8 +6,8 @@
 namespace cetech {
     struct CompilatorAPI {
         CompilatorAPI(const char* filename,
-                      FSFile * resource_file,
-                      FSFile * build_file);
+                      FSFile & resource_file,
+                      FSFile & build_file);
         ~CompilatorAPI();
 
         bool resource_to_json(rapidjson::Document& document);

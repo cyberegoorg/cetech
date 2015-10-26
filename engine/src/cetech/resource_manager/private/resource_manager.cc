@@ -108,9 +108,9 @@ namespace cetech {
                 char resource_srt[32 + 1] = {0};
                 resource_id_to_str(resource_srt, type, name);
 
-                FSFile* f = filesystem::open(BUILD_DIR, resource_srt, FSFile::READ);
+                FSFile& f = filesystem::open(BUILD_DIR, resource_srt, FSFile::READ);
 
-                if (!f->is_valid()) {
+                if (!f.is_valid()) {
                     log_globals::log().error("resource_manager",
                                              "Could not open resouce (" "%" PRIx64 ", " "%" PRIx64 ").",
                                              type,

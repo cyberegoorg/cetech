@@ -91,14 +91,13 @@ namespace cetech {
             char output_filename[512] = {0};
             resource_id_to_str(output_filename, ct->type, ct->name);
 
-            FSFile* source_file;
-            source_file = filesystem::open(ct->source_fs, ct->filename, FSFile::READ);
-            if (!source_file->is_valid()) {
+            FSFile& source_file = filesystem::open(ct->source_fs, ct->filename, FSFile::READ);
+            if (!source_file.is_valid()) {
                 log_globals::log().error("resource_compiler", "Could not open source file \"%s\"", ct->filename);
                 return;
             }
 
-            FSFile* build_file = filesystem::open(BUILD_DIR, output_filename, FSFile::WRITE);
+            FSFile& build_file = filesystem::open(BUILD_DIR, output_filename, FSFile::WRITE);
 
             CompilatorAPI comp(ct->filename, source_file, build_file);
 
@@ -192,22 +191,22 @@ namespace cetech {
             rapidjson::PrettyWriter < rapidjson::StringBuffer > writer(buffer);
             document.Accept(writer);
 
-            FSFile* debug_index_file = filesystem::open(BUILD_DIR, filename, FSFile::WRITE);
-            debug_index_file->write(buffer.GetString(), buffer.GetSize());
+            FSFile& debug_index_file = filesystem::open(BUILD_DIR, filename, FSFile::WRITE);
+            debug_index_file.write(buffer.GetString(), buffer.GetSize());
             filesystem::close(debug_index_file);
         }
 
         void build_config_json() {
-            FSFile* src_config = filesystem::open(SRC_DIR, "config.json", FSFile::READ);
-            FSFile* out_config = filesystem::open(BUILD_DIR, "config.json", FSFile::WRITE);
+            FSFile& src_config = filesystem::open(SRC_DIR, "config.json", FSFile::READ);
+            FSFile& out_config = filesystem::open(BUILD_DIR, "config.json", FSFile::WRITE);
 
-            size_t size = src_config->size();
+            size_t size = src_config.size();
             char data[size];
             memset(data, 0, size);
-            src_config->read(data, size);
+            src_config.read(data, size);
             filesystem::close(src_config);
 
-            out_config->write(data, size);
+            out_config.write(data, size);
             filesystem::close(out_config);
         }
 

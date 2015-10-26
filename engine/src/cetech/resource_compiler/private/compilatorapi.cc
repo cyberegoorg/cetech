@@ -10,12 +10,12 @@
 namespace cetech {
     struct CompilatorAPI::Implementation {
         BuildDB bdb;
-        FSFile* resource_file;
-        FSFile* build_file;
+        FSFile& resource_file;
+        FSFile& build_file;
         const char* filename;
 
-        Implementation(const char* filename, FSFile * resource_file,
-                       FSFile * build_file) : resource_file(resource_file), build_file(build_file), filename(filename) {
+        Implementation(const char* filename, FSFile & resource_file,
+                       FSFile & build_file) : resource_file(resource_file), build_file(build_file), filename(filename) {
             char db_path[512] = {0};
             sprintf(db_path, "%s%s", filesystem::root_dir(BUILD_DIR), "build.db");
             bdb.open(db_path);
@@ -24,8 +24,8 @@ namespace cetech {
 
         bool resource_to_json(rapidjson::Document& document) {
             /* parse resouce json */
-            char tmp[resource_file->size() + 1];
-            memset(tmp, 0, resource_file->size() + 1);
+            char tmp[resource_file.size() + 1];
+            memset(tmp, 0, resource_file.size() + 1);
 
             read_resource_file(tmp);
 
@@ -46,24 +46,24 @@ namespace cetech {
         }
 
         size_t resource_file_size() {
-            return resource_file->size();
+            return resource_file.size();
         }
 
         bool read_resource_file(char* buffer) {
-            size_t sz_in = resource_file->size();
-            resource_file->read(buffer, sz_in);
+            size_t sz_in = resource_file.size();
+            resource_file.read(buffer, sz_in);
             return true;
         }
 
         void write_to_build(const void* buffer, size_t size) {
-            build_file->write(buffer, size);
+            build_file.write(buffer, size);
         }
 
     };
 
     CompilatorAPI::CompilatorAPI(const char* filename,
-                                 FSFile* resource_file,
-                                 FSFile* build_file) {
+                                 FSFile& resource_file,
+                                 FSFile& build_file) {
         _impl = new CompilatorAPI::Implementation(filename, resource_file, build_file);
     }
 
