@@ -4,7 +4,8 @@
 
 #include "celib/string/stringid_types.h"
 #include "celib/memory/memory_types.h"
-#include "cetech/platform/types.h"
+
+#include "cetech/window/window.h"
 
 namespace cetech {
     namespace renderer {

@@ -4,10 +4,28 @@
 
 #include "celib/container/container_types.h"
 #include "celib/math/math_types.h"
-#include "cetech/platform/types.h"
+
+#if defined(CETECH_SDL2)
+    #include "SDL2/SDL.h"
+#endif
+
 
 namespace cetech {
 
+#if defined(CETECH_SDL2)
+    typedef int (* thread_fce_t) (void* data);
+
+    struct Thread {
+        SDL_Thread* t;
+    };
+
+    struct Spinlock {
+        SDL_SpinLock l;
+
+        Spinlock() : l(0) {}
+    };
+#endif
+    
     namespace thread {
         /*!
          * Create thread.
