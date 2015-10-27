@@ -8,13 +8,13 @@
 
 namespace cetech {
     namespace log_handlers {
-        void stdout_handler(const LogLevel::Enum level,
+        void stdout_handler(const log::LogLevel::Enum level,
                             const time_t time,
                             const char* where,
                             const char* msg,
                             void* data);
 
-        void file_handler(const LogLevel::Enum level,
+        void file_handler(const log::LogLevel::Enum level,
                           const time_t time,
                           const char* where,
                           const char* msg,

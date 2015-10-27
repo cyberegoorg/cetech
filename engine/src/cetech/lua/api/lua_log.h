@@ -9,7 +9,7 @@ namespace cetech {
         const char* where = s.to_string(1);
         const char* msg = s.to_string(2);
 
-        log_globals::log().info(where, "%s", msg);
+        log::info(where, "%s", msg);
         return 0;
     }
 
@@ -18,7 +18,7 @@ namespace cetech {
         const char* where = s.to_string(1);
         const char* msg = s.to_string(2);
 
-        log_globals::log().warning(where, "%s", msg);
+        log::warning(where, "%s", msg);
         return 0;
     }
 
@@ -27,7 +27,7 @@ namespace cetech {
         const char* where = s.to_string(1);
         const char* msg = s.to_string(2);
 
-        log_globals::log().error(where, "%s", msg);
+        log::error(where, "%s", msg);
         return 0;
     }
 
@@ -36,7 +36,7 @@ namespace cetech {
         const char* where = s.to_string(1);
         const char* msg = s.to_string(2);
 
-        log_globals::log().debug(where, "%s", msg);
+        log::debug(where, "%s", msg);
         return 0;
     }
 

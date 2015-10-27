@@ -81,18 +81,18 @@ namespace cetech {
         static void compile_task(void* data) {
             CompileTask* ct = (CompileTask*)data;
 
-            log_globals::log().info("resource_compiler",
-                                    "Compile \"%s\" => (" "%" PRIx64 ", " "%" PRIx64 ").",
-                                    ct->filename,
-                                    ct->type,
-                                    ct->name);
+            log::info("resource_compiler",
+                      "Compile \"%s\" => (" "%" PRIx64 ", " "%" PRIx64 ").",
+                      ct->filename,
+                      ct->type,
+                      ct->name);
 
             char output_filename[512] = {0};
             resource_id_to_str(output_filename, ct->type, ct->name);
 
             FSFile& source_file = filesystem::open(ct->source_fs, ct->filename, FSFile::READ);
             if (!source_file.is_valid()) {
-                log_globals::log().error("resource_compiler", "Could not open source file \"%s\"", ct->filename);
+                log::error("resource_compiler", "Could not open source file \"%s\"", ct->filename);
                 return;
             }
 
@@ -115,7 +115,7 @@ namespace cetech {
             filesystem::close(source_file);
             filesystem::close(build_file);
 
-            log_globals::log().info("resource_compiler", "Compiled \"%s\".", ct->filename );
+            log::info("resource_compiler", "Compiled \"%s\".", ct->filename );
         }
 
         void save_json(const char* filename, const rapidjson::Document& document) {
@@ -207,9 +207,9 @@ namespace cetech {
 
 
                     if (clb == nullptr) {
-                        log_globals::log().warning("resource_compiler",
-                                                   "Resource type " "%" PRIx64 " not register compiler.",
-                                                   type);
+                        log::warning("resource_compiler",
+                                     "Resource type " "%" PRIx64 " not register compiler.",
+                                     type);
                         continue;
                     }
 

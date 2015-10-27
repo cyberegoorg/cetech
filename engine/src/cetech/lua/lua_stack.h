@@ -201,7 +201,7 @@ namespace cetech {
                 if (luaL_dostring(_L, string)) {
                     const char* last_error = lua_tostring(_L, -1);
                     lua_pop(_L, 1);
-                    log_globals::log().error("lua", "%s", last_error);
+                    log::error("lua", "%s", last_error);
                 }
             }
 

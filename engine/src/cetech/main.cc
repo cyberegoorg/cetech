@@ -121,8 +121,8 @@ void load_config_json() {
     document.Parse((const char*)mem);
 
     if (document.HasParseError()) {
-        log_globals::log().error("main", "Parse config.json error: %s", GetParseError_En(
-                                     document.GetParseError()), document.GetErrorOffset());
+        log::error("main", "Parse config.json error: %s", GetParseError_En(
+                       document.GetParseError()), document.GetErrorOffset());
         abort();
     }
 
@@ -141,7 +141,7 @@ bool big_init() {
     memory_globals::init();
 
     log_globals::init();
-    log_globals::log().register_handler(&log_handlers::stdout_handler);
+    log::register_handler(&log_handlers::stdout_handler);
 
     filesystem_globals::init();
 
@@ -181,13 +181,13 @@ bool big_init() {
     }
 
     if (command_line_globals::has_argument("wait", 'w')) {
-        log_globals::log().info("main", "Wating for clients.");
+        log::info("main", "Wating for clients.");
 
         while (!console_server::has_clients()) {
             console_server::tick(); // TODO: spawn task in init
         }
 
-        log_globals::log().debug("main", "Client connected.");
+        log::debug("main", "Client connected.");
     }
 
 #endif

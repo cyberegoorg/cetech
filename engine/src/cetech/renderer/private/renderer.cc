@@ -159,20 +159,20 @@ namespace cetech {
 
     namespace renderer_globals {
         void init() {
-            log_globals::log().info("renderer_globals", "init");
+            log::info("renderer_globals", "init");
 
             char* p = _globals.buffer;
             _globals.data = new(p) RendererData();
         }
 
         void shutdown() {
-            log_globals::log().info("renderer_globals", "shutdown");
+            log::info("renderer_globals", "shutdown");
 
             bgfx::shutdown();
             _globals.data->~RendererData();
             _globals = Globals();
 
-            log_globals::log().info("renderer_globals", "shutdownddddddddddd");
+            log::info("renderer_globals", "shutdownddddddddddd");
         }
     }
 }

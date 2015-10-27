@@ -59,7 +59,7 @@ namespace cetech {
                 );
 
             if (res.wnd == nullptr) {
-                log_globals::log().error("sys", "Could not create window: %s", SDL_GetError());
+                log::error("sys", "Could not create window: %s", SDL_GetError());
             }
 
             return res;
@@ -71,7 +71,7 @@ namespace cetech {
             res.wnd = SDL_CreateWindowFrom(hndl);
 
             if (res.wnd == nullptr) {
-                log_globals::log().error("sys", "Could not create window: %s", SDL_GetError());
+                log::error("sys", "Could not create window: %s", SDL_GetError());
             }
 
             return res;

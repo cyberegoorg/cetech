@@ -65,11 +65,11 @@ namespace cetech {
 
             ~TaskManagerData() {
                 for (uint32_t i = 0; i < array::size(_workers); ++i) {
-                    log_globals::log().debug("task", "Killing worker%u.", i);
+                    log::debug("task", "Killing worker%u.", i);
                     thread::kill(_workers[i]);
                 }
             };
-            
+
 
         };
 
@@ -84,10 +84,10 @@ namespace cetech {
 
         uint32_t _core_count() {
 #if defined(CETECH_SDL2)
-                return SDL_GetCPUCount();
+            return SDL_GetCPUCount();
 #endif
         }
-        
+
         static int task_worker(void* data) {
             while (_globals.data->flags.run) {
                 task_manager::do_work();
@@ -114,7 +114,7 @@ namespace cetech {
             }
 
             /* TODO =( */
-            log_globals::log().error("task", "Pool overflow");
+            log::error("task", "Pool overflow");
             abort();
         }
 
@@ -363,13 +363,13 @@ namespace cetech {
             static const uint32_t main_threads_count = 1 + 1;
             const uint32_t worker_count = core_count - main_threads_count;
 
-            log_globals::log().info("task", "Core count: %u", core_count);
-            log_globals::log().info("task", "Main thread count: %u", main_threads_count);
-            log_globals::log().info("task", "Worker count: %u", worker_count);
+            log::info("task", "Core count: %u", core_count);
+            log::info("task", "Main thread count: %u", main_threads_count);
+            log::info("task", "Worker count: %u", worker_count);
 
             if (worker_count > 0) {
                 for (uint32_t i = 0; i < worker_count; ++i) {
-                    log_globals::log().debug("task", "Creating worker %u.", i);
+                    log::debug("task", "Creating worker %u.", i);
                     array::push_back(_globals.data->_workers, thread::create_thread(task_worker, "Worker", 0));
                 }
             }
@@ -385,7 +385,7 @@ namespace cetech {
 
     namespace task_manager_globals {
         void init() {
-            log_globals::log().info("task_manager_globals", "Init");
+            log::info("task_manager_globals", "Init");
             char* p = _globals.buffer;
             _globals.data = new(p) TaskManagerData(memory_globals::default_allocator());
 
@@ -393,7 +393,7 @@ namespace cetech {
         }
 
         void shutdown() {
-            log_globals::log().info("task_manager_globals", "Shutdown");
+            log::info("task_manager_globals", "Shutdown");
 
             _globals.data->~TaskManagerData();
             _globals = Globals();

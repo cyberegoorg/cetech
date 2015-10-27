@@ -106,7 +106,7 @@ namespace cetech {
                     break;
 
                 case SDL_WINDOWEVENT_SIZE_CHANGED:
-                    log_globals::log().info("sdl2", "Window size changed to %dx%d", e.window.data1, e.window.data2);
+                    log::info("sdl2", "Window size changed to %dx%d", e.window.data1, e.window.data2);
                     break;
 
                 }
@@ -250,7 +250,7 @@ namespace cetech {
                 }
             }
 
-            log_globals::log().info("main", "Bye Bye");
+            log::info("main", "Bye Bye");
 
             shutdown();
         }

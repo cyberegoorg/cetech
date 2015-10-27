@@ -66,14 +66,14 @@ namespace cetech {
             const char* res = resource_manager::get(resource_package::type_hash(), name);
 
             if (res == nullptr) {
-                log_globals::log().error("package_manager", "Could not get resource for package " "%" PRIx64, name);
+                log::error("package_manager", "Could not get resource for package " "%" PRIx64, name);
                 return;
             }
 
-            log_globals::log().debug("package_manager",
-                                     "Loading package  %" PRIx64 "%" PRIx64,
-                                     resource_package::type_hash(),
-                                     name);
+            log::debug("package_manager",
+                       "Loading package  %" PRIx64 "%" PRIx64,
+                       resource_package::type_hash(),
+                       name);
 
             resource_package::Header* header = (resource_package::Header*)res;
             resource_package::TypeHeader* type_header = (resource_package::TypeHeader*)(header + 1);
@@ -101,13 +101,13 @@ namespace cetech {
         void unload(StringId64_t name) {
             const char* res = resource_manager::get(resource_package::type_hash(), name);
 
-            log_globals::log().debug("package_manager",
-                                     "Unloading package  %" PRIx64 "%" PRIx64,
-                                     resource_package::type_hash(),
-                                     name);
+            log::debug("package_manager",
+                       "Unloading package  %" PRIx64 "%" PRIx64,
+                       resource_package::type_hash(),
+                       name);
 
             if (res == nullptr) {
-                log_globals::log().error("package_manager", "Could not get resource for package " "%" PRIx64, name);
+                log::error("package_manager", "Could not get resource for package " "%" PRIx64, name);
                 return;
             }
 
@@ -129,7 +129,7 @@ namespace cetech {
                 resource_manager::get(resource_package::type_hash(), name);
 
             if (res == nullptr) {
-                log_globals::log().warning("package_manager", "Could not get resource for package " "%" PRIx64, name);
+                log::warning("package_manager", "Could not get resource for package " "%" PRIx64, name);
                 return false;
             }
 

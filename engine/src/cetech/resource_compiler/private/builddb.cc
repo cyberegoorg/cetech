@@ -72,8 +72,8 @@ namespace cetech {
                     break;
 
                 default:
-                    log_globals::log().error("BuildDB", "SQL error '%s' (%d): %s", sqlite3_sql(
-                                                 _stmt), rc, sqlite3_errmsg(_db));
+                    log::error("BuildDB", "SQL error '%s' (%d): %s", sqlite3_sql(
+                                   _stmt), rc, sqlite3_errmsg(_db));
                     run = false;
                     break;
                 }
