@@ -4,9 +4,18 @@
 
 #include "celib/container/container_types.h"
 #include "celib/math/math_types.h"
-#include "cetech/platform/types.h"
+
+#if defined(CETECH_SDL2)
+    #include "SDL2/SDL.h"
+#endif
 
 namespace cetech {
+#if defined(CETECH_SDL2)
+    struct Window {
+        SDL_Window* wnd;
+    };
+#endif
+    
     namespace window {
         enum WindowFlags {
             WINDOW_NOFLAG = 0,

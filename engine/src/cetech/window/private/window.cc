@@ -13,7 +13,6 @@
 #include "celib/math/vector2.inl.h"
 #include "cetech/application/application.h"
 
-#include "cetech/platform/window.h"
 
 #include "SDL2/SDL.h"
 
