@@ -10,7 +10,6 @@
 #include "celib/memory/memory.h"
 #include "celib/macros.h"
 #include "celib/string/stringid.inl.h"
-#include "cetech/platform/dir.h"
 #include "cetech/platform/thread.h"
 #include "sqlite/sqlite3.h"
 
@@ -157,7 +156,7 @@ namespace cetech {
         }
 
         void compile_all() {
-            dir::mkpath(filesystem::root_dir(BUILD_DIR));
+            filesystem::create_directory(BUILD_DIR, 0);
 
             BuildDB bdb;
             char db_path[512] = {0};
@@ -238,7 +237,7 @@ namespace cetech {
                     task_manager::add_end(&tid, 1);
                 }
 
-                dir::listdir_free(files);
+                //listdir_free(files);
             }
 
             task_manager::add_end(&top_compile_task, 1);

@@ -1,17 +1,16 @@
 #include <cstring>
 #include <sys/stat.h>
-
-
-#include "cetech/filesystem/file.h"
-#include "cetech/filesystem/filesystem.h"
+#include <dirent.h>
+#include <time.h>
+#include <errno.h>
 
 #include "celib/string/stringid.inl.h"
 #include "celib/container/hash.inl.h"
 #include "celib/memory/memory.h"
 #include "celib/macros.h"
 
-#include "cetech/platform/dir.h"
-
+#include "cetech/filesystem/file.h"
+#include "cetech/filesystem/filesystem.h"
 #include "cetech/log_system/log_system.h"
 
 
@@ -138,7 +137,96 @@ namespace cetech {
         void absolute_path(char* buffer, StringId64_t root, const char* path) {
             std::sprintf(buffer, "%s%s", root_dir(root), path);
         }
+        
+        bool mkdir(const char* path) {
+            struct stat st;
+            int mode = 0775;
 
+            if (stat(path, &st) != 0) {
+                if (::mkdir(path, mode) != 0 && errno != EEXIST) {
+                    return false;
+                }
+            } else if (!S_ISDIR(st.st_mode)) {
+                errno = ENOTDIR;
+                return false;
+            }
+
+            return true;
+        }
+
+        bool mkpath(const char* path) {
+            char* pp;
+            char* sp;
+            bool status = true;
+            char* copypath = strdup(path);
+
+            pp = copypath;
+            while (status == true && (sp = strchr(pp, '/')) != 0) {
+                if (sp != pp) {
+                    *sp = '\0';
+                    status = mkdir(copypath);
+                    *sp = '/';
+                }
+
+                pp = sp + 1;
+            }
+
+            if (status == true) {
+                status = mkdir(path);
+            }
+
+            free(copypath);
+            return status;
+        }
+
+        void listdir(const char* name, Array < char* >& files) {
+            DIR* dir;
+            struct dirent* entry;
+
+            if (!(dir = opendir(name))) {
+                return;
+            }
+
+            if (!(entry = readdir(dir))) {
+                return;
+            }
+
+            do {
+                if (entry->d_type == 4) {
+                    if (strcmp(entry->d_name, ".") == 0 || strcmp(entry->d_name, "..") == 0) {
+                        continue;
+                    }
+
+                    char path[1024];
+                    int len = 0;
+
+                    if (name[strlen(name) - 1] != '/') {
+                        len = snprintf(path, sizeof(path) - 1, "%s/%s/", name, entry->d_name);
+                    } else {
+                        len = snprintf(path, sizeof(path) - 1, "%s%s/", name, entry->d_name);
+                    }
+
+                    path[len] = '\0';
+
+                    listdir(path, files);
+                } else {
+                    uint32_t size = strlen(name) + strlen(entry->d_name) + 2;
+                    char* path = (char*)malloc(sizeof(char) * size);
+
+                    snprintf(path, size - 1, "%s%s", name, entry->d_name);
+
+                    array::push_back(files, path);
+                }
+            } while ((entry = readdir(dir)));
+
+            closedir(dir);
+        }
+
+        void listdir_free(Array < char* >& files) {
+            for (uint32_t i = 0; i < array::size(files); ++i) {
+                free(files[i]);
+            }
+        }
     }
 
     namespace filesystem {
@@ -178,7 +266,9 @@ namespace cetech {
         };
 
         void create_directory(StringId64_t root, const char* path) {
-            dir::mkpath(path);
+            char buffer[4096] = {0};
+            absolute_path(buffer, root, path ? path : "");
+            mkpath(buffer);
         };
 
         void delete_directory(StringId64_t root, const char* path) {     /*TODO: #43*/
@@ -188,7 +278,7 @@ namespace cetech {
         void list_directory (StringId64_t root, const char* path, cetech::Array < char* >& files ) {
             char buffer[4096] = {0};
             absolute_path(buffer, root, path ? path : "");
-            dir::listdir(buffer, files);
+            listdir(buffer, files);
         }
 
         void create_file(StringId64_t root, const char* path) {      /*TODO: #43*/
