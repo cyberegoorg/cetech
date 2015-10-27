@@ -100,7 +100,8 @@ namespace cetech {
                              const int line,
                              const char* fce) {
         char* trace = stacktrace(2);
-        fprintf(stderr, "[A] \'%s\' in %s:%i:%s.\nstacktrace:\n%s\n", condition_str, SHORT_FILE(file), line, fce, trace);
+        fprintf(stderr, "[A] \'%s\' in %s:%i:%s.\nstacktrace:\n%s\n", condition_str, SHORT_FILE(file), line, fce,
+                trace);
         free(trace);
         abort();
     }

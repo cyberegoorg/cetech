@@ -7,7 +7,7 @@
 #include "cetech/log_system/log_system.h"
 #include "cetech/application/application.h"
 #include "cetech/log_system/handlers.h"
-#include "cetech/platform/mouse.h"
+#include "cetech/input/mouse.h"
 
 #include "cetech/renderer/texture_resource.h"
 #include "cetech/package_manager/package_resource.h"

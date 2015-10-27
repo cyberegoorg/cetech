@@ -137,7 +137,7 @@ namespace cetech {
         void absolute_path(char* buffer, StringId64_t root, const char* path) {
             std::sprintf(buffer, "%s%s", root_dir(root), path);
         }
-        
+
         bool mkdir(const char* path) {
             struct stat st;
             int mode = 0775;

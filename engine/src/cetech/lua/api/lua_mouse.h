@@ -1,7 +1,7 @@
 #include "cetech/lua/lua_enviroment.h"
 #include "cetech/lua/lua_stack.h"
 
-#include "cetech/platform/mouse.h"
+#include "cetech/input/mouse.h"
 
 namespace cetech {
 
