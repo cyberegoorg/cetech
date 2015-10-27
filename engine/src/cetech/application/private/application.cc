@@ -104,27 +104,12 @@ namespace cetech {
                 case SDL_QUIT:
                     application::quit();
                     break;
-
-                case SDL_WINDOWEVENT_SIZE_CHANGED:
-                    log::info("sdl2", "Window size changed to %dx%d", e.window.data1, e.window.data2);
-                    break;
-
                 }
             }
 
 #endif
         }
 
-
-        inline void process_hid() {
-            mouse::retrive_state();
-            keyboard::frame_start();
-        }
-
-        inline void process_hid_end_frame() {
-            mouse::swap_states();
-            keyboard::frame_end();
-        }
     }
 
     namespace application {
@@ -179,11 +164,21 @@ namespace cetech {
         }
 
         void shutdown() {
+            log::info("main", "Bye Bye");
+
             lua_enviroment::call_global("shutdown");
 
             shutdown_boot();
             renderer_globals::shutdown();
             shutdown_os();
+        }
+
+        static void process_mouse(void* data) {
+            mouse::process_mouse();
+        }
+
+        static void process_keyboard(void* data) {
+            keyboard::process_keyboard();
         }
 
         static void console_server_tick(void* data) {
@@ -208,22 +203,36 @@ namespace cetech {
                 develop_manager::push_record_float("engine.delta_time", dt);
                 develop_manager::push_record_float("engine.frame_rate", 1.0f / dt);
 
+                task_manager::TaskID frame_task = task_manager::add_empty_begin(0);
+                task_manager::TaskID input_task = task_manager::add_empty_begin(0, NULL_TASK, frame_task);
+                
                 process_os();
-                process_hid();
 
                 if (!data->_flags.daemon_mod) {
                     renderer::begin_frame();
                 }
 
-                task_manager::TaskID frame_task = task_manager::add_empty_begin(0);
                 task_manager::TaskID console_server_task = task_manager::add_begin(
                     console_server_tick, nullptr, 0,
                     NULL_TASK, frame_task
                     );
 
+                task_manager::TaskID process_mouse_task = task_manager::add_begin(
+                    process_mouse, nullptr, 0,
+                    NULL_TASK, input_task
+                    );
+
+                task_manager::TaskID process_keyboard_task = task_manager::add_begin(
+                    process_keyboard, nullptr, 0,
+                    NULL_TASK, input_task
+                    );
+
                 const task_manager::TaskID task_end[] = {
                     frame_task,
                     console_server_task,
+                    process_mouse_task,
+                    process_keyboard_task,
+                    input_task
                 };
 
                 task_manager::add_end(task_end, sizeof(task_end) / sizeof(task_manager::TaskID));
@@ -233,8 +242,6 @@ namespace cetech {
                     lua_enviroment::call_global("update", "f", dt);
                     lua_enviroment::clean_temp();
                 }
-
-                process_hid_end_frame();
 
                 develop_manager::push_end_frame();
                 develop_manager::send_buffer();
@@ -249,9 +256,6 @@ namespace cetech {
                     window::update(data->main_window);
                 }
             }
-
-            log::info("main", "Bye Bye");
-
             shutdown();
         }
 

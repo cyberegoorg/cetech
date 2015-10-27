@@ -22,13 +22,10 @@ namespace cetech {
     }
 
     namespace keyboard {
-        void frame_start() {
+        void process_keyboard() {
             /*Keyboard*/
-            memcpy(KeyboardStates, SDL_GetKeyboardState(NULL), 512);
-        }
-
-        void frame_end() {
             memcpy(KeyboardStatesLast, KeyboardStates, 512);
+            memcpy(KeyboardStates, SDL_GetKeyboardState(NULL), 512);
         }
 
         uint32_t button_index(const char* scancode) {
