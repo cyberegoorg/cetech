@@ -86,7 +86,7 @@ namespace cetech {
 
         inline void init_os() {
 #if defined(CETECH_SDL2)
-            CE_ASSERT(SDL_Init(SDL_INIT_EVERYTHING) == 0);
+            CE_ASSERT_MSG(SDL_Init(SDL_INIT_EVERYTHING) == 0, SDL_GetError());
 #endif
         }
 
