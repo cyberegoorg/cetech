@@ -133,7 +133,7 @@ namespace cetech {
          * \param id Task id.
          */
         void _mark_task_job_done(TaskID id) {
-            thread::spin_lock(_globals.data->_lock);
+            //thread::spin_lock(_globals.data->_lock);
 
             for (uint32_t i = 0; i < _globals.data->_open_task_count; ++i) {
                 Task* t = &_globals.data->_task_pool[_globals.data->_open_task[i]];
@@ -154,7 +154,7 @@ namespace cetech {
                 break;
             }
 
-            thread::spin_unlock(_globals.data->_lock);
+            //thread::spin_unlock(_globals.data->_lock);
         }
 
         /*! Is task done?
@@ -205,10 +205,10 @@ namespace cetech {
 
 
         Task task_pop_new_work() {
-            thread::spin_lock(_globals.data->_lock);
+            //thread::spin_lock(_globals.data->_lock);
 
             if (_globals.data->_task_count < 1) {
-                thread::spin_unlock(_globals.data->_lock);
+                //thread::spin_unlock(_globals.data->_lock);
                 return (Task)TASK_INITIALIZER;
             }
 
@@ -232,11 +232,11 @@ namespace cetech {
                 --_globals.data->_task_count;
                 CE_ASSERT(_globals.data->_task_count != 4294967295);
 
-                thread::spin_unlock(_globals.data->_lock);
+                //thread::spin_unlock(_globals.data->_lock);
                 return t;
             }
 
-            thread::spin_unlock(_globals.data->_lock);
+            //thread::spin_unlock(_globals.data->_lock);
             return (Task)TASK_INITIALIZER;
         }
 
@@ -250,7 +250,7 @@ namespace cetech {
                          const TaskID parent) {
             TaskWorkCallback callback = { fce, data };
 
-            thread::spin_lock(_globals.data->_lock);
+            //thread::spin_lock(_globals.data->_lock);
 
             const uint32_t id = ++_globals.data->_last_id;
 
@@ -301,7 +301,7 @@ namespace cetech {
             ++_globals.data->_open_task_count;
             ++_globals.data->_task_count;
 
-            thread::spin_unlock(_globals.data->_lock);
+            //thread::spin_unlock(_globals.data->_lock);
             return (TaskID) {
                        id
             };
@@ -313,7 +313,7 @@ namespace cetech {
         }
 
         void add_end(const TaskID* tasks, const uint32_t count) {
-            thread::spin_lock(_globals.data->_lock);
+            //thread::spin_lock(_globals.data->_lock);
 
             for (uint32_t i = 0; i < MAX_TASK; ++i) {
                 for (uint32_t j = 0; j < count; ++j) {
@@ -326,7 +326,7 @@ namespace cetech {
                 }
             }
 
-            thread::spin_unlock(_globals.data->_lock);
+            //thread::spin_unlock(_globals.data->_lock);
         }
 
         void do_work() {
