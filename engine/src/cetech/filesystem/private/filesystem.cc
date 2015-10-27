@@ -114,7 +114,6 @@ namespace cetech {
             };
 
             virtual void flush() final {};
-
     };
 
     namespace {

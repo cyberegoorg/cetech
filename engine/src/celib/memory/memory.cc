@@ -4,6 +4,8 @@
 
 #include <stdlib.h>
 #include <assert.h>
+#include <cstdint>
+
 
 #include <execinfo.h>
 #include <cxxabi.h>
@@ -111,7 +113,7 @@ namespace {
             struct TraceEntry {
                 char used : 1;
                 void* p;
-                const char* traceback;
+                char* traceback;
             } mem_trace[MAX_MEM_TRACE];
 
             void add_entry(void* p, const char* traceback) {
@@ -132,6 +134,7 @@ namespace {
                     }
 
                     mem_trace[i].used = 0;
+                    free(mem_trace[i].traceback);
                 }
             }
 
@@ -145,7 +148,8 @@ namespace {
                         continue;
                     }
 
-                    printf("Undealocated memory :\n%s", mem_trace[i].traceback);
+                    fprintf(stderr,"[MEMORY LEAK][%p] allocate traceback:\n%s", mem_trace[i].p, mem_trace[i].traceback);
+                    deallocate(mem_trace[i].p);
                 }
 
                 CE_ASSERT(_total_allocated == 0);
