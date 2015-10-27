@@ -188,27 +188,28 @@ namespace cetech {
         void run() {
             init();
 
-            ApplictionData* data = _globals.data;
+            CE_CHECK_PTR(_globals.data);
+            ApplictionData& data = *_globals.data;
 
             float dt = 0.0f;
             uint32_t now_ticks = 0;
-            while (data->_flags.run) {
+            while (data._flags.run) {
                 now_ticks = get_ticks();
 
-                dt = (now_ticks - data->_last_frame_ticks) * 0.001f;
-                data->_delta_time = dt;
-                data->_last_frame_ticks = now_ticks;
+                dt = (now_ticks - data._last_frame_ticks) * 0.001f;
+                data._delta_time = dt;
+                data._last_frame_ticks = now_ticks;
 
-                develop_manager::push_record_float("engine.frame_id", data->_frame_id);
+                develop_manager::push_record_float("engine.frame_id", data._frame_id);
                 develop_manager::push_record_float("engine.delta_time", dt);
                 develop_manager::push_record_float("engine.frame_rate", 1.0f / dt);
 
                 task_manager::TaskID frame_task = task_manager::add_empty_begin(0);
                 task_manager::TaskID input_task = task_manager::add_empty_begin(0, NULL_TASK, frame_task);
-                
+
                 process_os();
 
-                if (!data->_flags.daemon_mod) {
+                if (!data._flags.daemon_mod) {
                     renderer::begin_frame();
                 }
 
@@ -238,7 +239,7 @@ namespace cetech {
                 task_manager::add_end(task_end, sizeof(task_end) / sizeof(task_manager::TaskID));
 
                 //usleep(3 * 1000);
-                if (!data->_flags.pause) {
+                if (!data._flags.pause) {
                     lua_enviroment::call_global("update", "f", dt);
                     lua_enviroment::clean_temp();
                 }
@@ -247,13 +248,13 @@ namespace cetech {
                 develop_manager::send_buffer();
                 develop_manager::clear();
 
-                ++(data->_frame_id);
+                ++(data._frame_id);
 
                 task_manager::wait(frame_task); // TODO
 
-                if (!data->_flags.daemon_mod) {
+                if (!data._flags.daemon_mod) {
                     renderer::end_frame();
-                    window::update(data->main_window);
+                    window::update(data.main_window);
                 }
             }
             shutdown();
