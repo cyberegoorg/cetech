@@ -19,7 +19,7 @@
 
 #include "cetech/input/keyboard.h"
 #include "cetech/input/mouse.h"
-#include "cetech/platform/thread.h"
+#include "cetech/thread/thread.h"
 #include "cetech/platform/window.h"
 
 #include "cetech/cvars/cvars.h"

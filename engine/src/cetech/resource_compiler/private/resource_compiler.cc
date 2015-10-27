@@ -10,7 +10,7 @@
 #include "celib/memory/memory.h"
 #include "celib/macros.h"
 #include "celib/string/stringid.inl.h"
-#include "cetech/platform/thread.h"
+#include "cetech/thread/thread.h"
 #include "sqlite/sqlite3.h"
 
 #include "cetech/application/application.h"
