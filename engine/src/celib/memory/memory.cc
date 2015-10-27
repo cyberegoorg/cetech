@@ -100,10 +100,11 @@ namespace {
                 }
 
                 for (int i = 0; i < 4096; ++i) {
-                    if( mem_trace[i].traceback != 0) {
+                    if (mem_trace[i].traceback != 0) {
                         free(mem_trace[i].traceback);
                     }
                 }
+
 #endif
                 CE_ASSERT(_total_allocated == 0);
 
@@ -135,7 +136,7 @@ namespace {
 #if defined(CETECH_DEBUG)
                 remove_entry(p);
 #endif
-                
+
                 free(h);
             }
 
