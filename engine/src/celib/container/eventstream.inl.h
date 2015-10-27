@@ -75,5 +75,5 @@ namespace cetech {
         }
     }
 
-    CE_INLINE EventStream::EventStream ( Allocator& allocator)  : stream(allocator) {}
+    EventStream::EventStream ( Allocator& allocator)  : stream(allocator) {}
 };

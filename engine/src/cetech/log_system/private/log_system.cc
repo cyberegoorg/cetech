@@ -148,8 +148,8 @@ namespace cetech {
         }
 
         void shutdown() {
-            //_log_globals.logger->~Logger();
             _log_globals.logger_impl->~Implementation();
+            _log_globals.logger->~LogSystem();
             _log_globals = LogGlobals();
 
         }

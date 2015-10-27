@@ -280,6 +280,7 @@ namespace cetech {
         }
 
         void shutdown() {
+            _globals.data->~ApplictionData();
             _globals = Globals();
         }
     }

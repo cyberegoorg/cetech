@@ -23,7 +23,11 @@ namespace cetech {
             Hash < const char* > type_to_string;
 
             DevelopManagerData(Allocator & allocator) : stream(allocator), to_json(allocator),
-                                                        type_to_string(allocator) {}
+                                                        type_to_string(allocator) {
+                array::resize(stream.stream, 4096);
+            }
+            ~DevelopManagerData() {}
+
         };
 
         struct Globals {
@@ -170,6 +174,7 @@ namespace cetech {
         }
 
         void shutdown() {
+            _globals.data->~DevelopManagerData();
             _globals = Globals();
         }
     }

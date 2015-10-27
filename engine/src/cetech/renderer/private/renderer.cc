@@ -169,6 +169,7 @@ namespace cetech {
             log_globals::log().info("renderer_globals", "shutdown");
 
             bgfx::shutdown();
+            _globals.data->~RendererData();
             _globals = Globals();
 
             log_globals::log().info("renderer_globals", "shutdownddddddddddd");

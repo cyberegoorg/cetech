@@ -194,7 +194,7 @@ namespace cetech {
         }
 
 
-        template < typename T > inline void set_capacity(Array < T >& a, const uint32_t new_capacity) {
+        template < typename T > inline void     set_capacity(Array < T >& a, const uint32_t new_capacity) {
             CE_CHECK_PTR(a._allocator);
 
             if (new_capacity == a._capacity) {
@@ -267,7 +267,8 @@ namespace cetech {
     }
 
     template < typename T >
-    inline Array < T > ::Array(Allocator & a) : _allocator(&a), _size(0), _capacity(0), _data(nullptr) {}
+    inline Array < T > ::Array(Allocator & a) : _allocator(&a), _size(0), _capacity(0),
+                                                _data(nullptr) {}
 
     template < typename T >
     inline Array < T > ::Array(const Array &other) : _allocator(other._allocator), _size(0), _capacity(0),

@@ -172,13 +172,15 @@ namespace cetech {
             build_config_json();
 
             static StringId64_t in_dirs[] = {CORE_DIR, SRC_DIR};
-            
+
             task_manager::TaskID top_compile_task = task_manager::add_empty_begin(0);
-            
-            for( int i = 0; i < sizeof(in_dirs)/sizeof(StringId64_t); ++i) {
+
+            Array < char* > files(memory_globals::default_allocator());
+            for (int i = 0; i < sizeof(in_dirs) / sizeof(StringId64_t); ++i) {
+                array::clear(files);
                 StringId64_t src_dir = in_dirs[i];
 
-                Array < char* > files(memory_globals::default_allocator());
+
                 filesystem::list_directory(src_dir, 0, files);
 
                 const uint32_t files_count = array::size(files);
@@ -202,20 +204,20 @@ namespace cetech {
                     resource_id_to_str(resource_id_str, type, name);
 
                     resource_compiler_clb_t clb = hash::get < resource_compiler_clb_t >
-                                                (_globals.data->_compile_clb_map, type, nullptr);
+                                                  (_globals.data->_compile_clb_map, type, nullptr);
 
 
                     if (clb == nullptr) {
                         log_globals::log().warning("resource_compiler",
-                                                "Resource type " "%" PRIx64 " not register compiler.",
-                                                type);
+                                                   "Resource type " "%" PRIx64 " not register compiler.",
+                                                   type);
                         continue;
                     }
 
                     debug_index.AddMember(
                         rapidjson::Value(resource_id_str, strlen(resource_id_str), debug_index.GetAllocator()),
                         rapidjson::Value(filename, strlen(filename),
-                                        debug_index.GetAllocator()), debug_index.GetAllocator()
+                                         debug_index.GetAllocator()), debug_index.GetAllocator()
                         );
 
                     resource_id_str[0] = '\0';
@@ -231,7 +233,8 @@ namespace cetech {
                     ct.type = type;
                     ct.clb = clb;
 
-                    task_manager::TaskID tid = task_manager::add_begin(compile_task, &ct, 0, NULL_TASK, top_compile_task);
+                    task_manager::TaskID tid =
+                        task_manager::add_begin(compile_task, &ct, 0, NULL_TASK, top_compile_task);
                     task_manager::add_end(&tid, 1);
                 }
 
@@ -254,6 +257,7 @@ namespace cetech {
         }
 
         void shutdown() {
+            _globals.data->~ResouceCompilerData();
             _globals = Globals();
         }
     }

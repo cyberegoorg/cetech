@@ -73,7 +73,7 @@ namespace cetech {
         char* loader (FSFile& f, Allocator& a) {
             const uint64_t f_sz = f.size();
 
-            char* mem = (char*)a.allocate(f_sz);
+            char* mem = (char*)a.allocate( f_sz);
             f.read(mem, f_sz);
 
             return mem;
