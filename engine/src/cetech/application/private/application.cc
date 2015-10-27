@@ -86,19 +86,19 @@ namespace cetech {
 
 
         inline void init_os() {
-#if defined(CETECH_RUNTIME_SDL2)
+#if defined(CETECH_SDL2)
             CE_ASSERT(SDL_Init(SDL_INIT_EVERYTHING) == 0);
 #endif
         }
 
         inline void shutdown_os() {
-#if defined(CETECH_RUNTIME_SDL2)
+#if defined(CETECH_SDL2)
             SDL_Quit();
 #endif
         }
 
         inline void process_os() {
-#if defined(CETECH_RUNTIME_SDL2)
+#if defined(CETECH_SDL2)
             SDL_Event e;
             while (SDL_PollEvent(&e) > 0) {
                 switch (e.type) {
@@ -130,7 +130,7 @@ namespace cetech {
 
     namespace application {
         uint32_t get_ticks() {
-#if defined(CETECH_RUNTIME_SDL2)
+#if defined(CETECH_SDL2)
             return SDL_GetTicks();
 #endif
         }

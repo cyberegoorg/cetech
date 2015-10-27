@@ -14,7 +14,7 @@
 #include "cetech/log_system/log_system.h"
 
 
-#if defined(CETECH_RUNTIME_SDL2)
+#if defined(CETECH_SDL2)
     #include "SDL2/SDL.h"
 #endif
 
@@ -22,12 +22,12 @@
 namespace cetech {
     class DiskFile : public FSFile {
         public:
-#if defined(CETECH_RUNTIME_SDL2)
+#if defined(CETECH_SDL2)
             SDL_RWops * rwops;
 #endif
 
             DiskFile(const char* path, FSFile::OpenMode mode) {
-#if defined(CETECH_RUNTIME_SDL2)
+#if defined(CETECH_SDL2)
                 rwops = SDL_RWFromFile(path, mode == FSFile::WRITE ? "w" : "r");
                 CE_ASSERT( is_valid());
 #endif
@@ -35,7 +35,7 @@ namespace cetech {
 
             virtual ~DiskFile() {
                 CE_ASSERT( is_valid());
-#if defined(CETECH_RUNTIME_SDL2)
+#if defined(CETECH_SDL2)
                 if (SDL_RWclose(rwops) != 0) {
                     log_globals::log().error("FSFile", "close error: %s", SDL_GetError());
                 }
@@ -44,7 +44,7 @@ namespace cetech {
             }
 
             virtual bool is_valid() {
-#if defined(CETECH_RUNTIME_SDL2)
+#if defined(CETECH_SDL2)
                 return rwops != nullptr;
 #endif
             }
@@ -52,14 +52,14 @@ namespace cetech {
             virtual void seek(size_t position) final {
                 CE_ASSERT( is_valid());
 
-#if defined(CETECH_RUNTIME_SDL2)
+#if defined(CETECH_SDL2)
                 SDL_RWseek(rwops, position, RW_SEEK_SET);
 #endif
             };
 
             virtual void seek_to_end() final {
                 CE_ASSERT( is_valid());
-#if defined(CETECH_RUNTIME_SDL2)
+#if defined(CETECH_SDL2)
                 SDL_RWseek(rwops, 0, RW_SEEK_END);
 #endif
             };
@@ -67,7 +67,7 @@ namespace cetech {
             virtual void skip(size_t bytes) final {
                 CE_ASSERT( is_valid());
 
-#if defined(CETECH_RUNTIME_SDL2)
+#if defined(CETECH_SDL2)
                 SDL_RWseek(rwops, bytes, RW_SEEK_CUR);
 #endif
             };
@@ -75,7 +75,7 @@ namespace cetech {
             virtual size_t position() final {
                 CE_ASSERT( is_valid());
 
-#if defined(CETECH_RUNTIME_SDL2)
+#if defined(CETECH_SDL2)
                 return SDL_RWtell(rwops);
 #endif
             };
@@ -99,7 +99,7 @@ namespace cetech {
 
             virtual void read(void* buffer, size_t size) final {
                 CE_ASSERT( is_valid());
-#if defined(CETECH_RUNTIME_SDL2)
+#if defined(CETECH_SDL2)
                 SDL_RWread(rwops, buffer, sizeof(char), size);
 #endif
             };
@@ -107,7 +107,7 @@ namespace cetech {
             virtual void write(const void* buffer, size_t size)  final {
                 CE_ASSERT( is_valid());
 
-#if defined(CETECH_RUNTIME_SDL2)
+#if defined(CETECH_SDL2)
                 SDL_RWwrite(rwops, buffer, sizeof(char), size);
 #endif
             };

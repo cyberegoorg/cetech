@@ -46,7 +46,7 @@ solution "cyberego.org tech1"
 
     defines {
         'CETECH_SIMD_FPU',
-        'CETECH_RUNTIME_SDL2'
+        'CETECH_SDL2'
     }
 
     configuration "Debug"

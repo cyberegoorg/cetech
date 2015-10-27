@@ -1,6 +1,6 @@
 #pragma once
 
-#ifdef CETECH_RUNTIME_SDL2
+#ifdef CETECH_SDL2
 #include "SDL2/SDL.h"
 
 namespace cetech {

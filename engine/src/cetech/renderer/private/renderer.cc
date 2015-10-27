@@ -20,7 +20,7 @@
 /********
 * SDL2 *
 ********/
-#if defined(CETECH_RUNTIME_SDL2)
+#if defined(CETECH_SDL2)
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_syswm.h>
 uint8_t sdlSetWindow(SDL_Window* _window) {
@@ -107,7 +107,7 @@ namespace cetech {
         void init(Window window, RenderType::Enum render_type) {
             console_server::register_command("renderer.resize", cmd_renderer_resize);
 
-            #if defined(CETECH_RUNTIME_SDL2)
+            #if defined(CETECH_SDL2)
             sdlSetWindow(window.wnd);
             #endif
 
