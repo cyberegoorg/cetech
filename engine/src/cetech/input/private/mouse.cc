@@ -1,4 +1,4 @@
-#ifdef CETECH_RUNTIME_SDL2
+#ifdef CETECH_SDL2
 
 #include <dirent.h>
 #include <time.h>

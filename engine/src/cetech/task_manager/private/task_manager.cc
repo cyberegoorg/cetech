@@ -2,7 +2,6 @@
 
 #include "celib/memory/memory.h"
 #include "celib/container/array.inl.h"
-#include "cetech/platform/cpu.h"
 #include "cetech/platform/thread.h"
 
 #include "cetech/application/application.h"
@@ -70,6 +69,8 @@ namespace cetech {
                     thread::kill(_workers[i]);
                 }
             };
+            
+
         };
 
         struct Globals {
@@ -81,6 +82,12 @@ namespace cetech {
             Globals() : data(0) {}
         } _globals;
 
+        uint32_t _core_count() {
+#if defined(CETECH_SDL2)
+                return SDL_GetCPUCount();
+#endif
+        }
+        
         static int task_worker(void* data) {
             while (_globals.data->flags.run) {
                 task_manager::do_work();
@@ -351,7 +358,7 @@ namespace cetech {
         }
 
         void spawn_workers() {
-            uint32_t core_count = cpu::core_count() * 2;
+            uint32_t core_count = _core_count() * 2;
 
             static const uint32_t main_threads_count = 1 + 1;
             const uint32_t worker_count = core_count - main_threads_count;
