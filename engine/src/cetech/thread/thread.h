@@ -25,7 +25,7 @@ namespace cetech {
         Spinlock() : l(0) {}
     };
 #endif
-    
+
     namespace thread {
         /*!
          * Create thread.

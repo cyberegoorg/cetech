@@ -51,7 +51,7 @@ namespace cetech {
 
             data = SOIL_load_image(full_input_path, &w, &h, &ch, SOIL_LOAD_AUTO);
             if (!data) {
-                log_globals::log().error("texture.compiler", "soil loda fail");
+                log::error("texture.compiler", "soil loda fail");
                 return;
             }
 

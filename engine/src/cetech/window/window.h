@@ -15,7 +15,7 @@ namespace cetech {
         SDL_Window* wnd;
     };
 #endif
-    
+
     namespace window {
         enum WindowFlags {
             WINDOW_NOFLAG = 0,

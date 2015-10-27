@@ -37,7 +37,7 @@ namespace cetech {
                 CE_ASSERT( is_valid());
 #if defined(CETECH_SDL2)
                 if (SDL_RWclose(rwops) != 0) {
-                    log_globals::log().error("FSFile", "close error: %s", SDL_GetError());
+                    log::error("FSFile", "close error: %s", SDL_GetError());
                 }
 
 #endif

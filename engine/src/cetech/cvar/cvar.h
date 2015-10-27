@@ -81,7 +81,7 @@ namespace cetech {
     namespace cvar_internal {
         bool check_set_flags(const CVar& cv) {
             if (cv.flags & CVar::FLAG_CONST) {
-                log_globals::log().error("CVar", "Could not set cvar \"%s\". CVar is const.", cv.name);
+                log::error("CVar", "Could not set cvar \"%s\". CVar is const.", cv.name);
                 return false;
             }
 
@@ -94,7 +94,7 @@ namespace cetech {
 
             if ((cv.f_min != cv.f_max) && (cv.f_max != 0)) {
                 if ((value < cv.f_min) || (value > cv.f_max)) {
-                    log_globals::log().error("CVar", "Range error: %f <= (%f) <= %f", cv.f_min, value, cv.f_max);
+                    log::error("CVar", "Range error: %f <= (%f) <= %f", cv.f_min, value, cv.f_max);
                     return;
                 }
             }
@@ -107,7 +107,7 @@ namespace cetech {
 
             if ((cv.f_min != cv.i_max) && (cv.i_max != 0)) {
                 if ((value < cv.i_min) || (value > cv.i_max)) {
-                    log_globals::log().error("CVar", "Range error: %i <= (%i) <= %i", cv.i_min, value, cv.i_max);
+                    log::error("CVar", "Range error: %i <= (%i) <= %i", cv.i_min, value, cv.i_max);
                     return;
                 }
             }
@@ -188,14 +188,14 @@ namespace cetech {
                 CVar* cvar = cvar::find(name.GetString());
 
                 if (cvar == nullptr) {
-                    log_globals::log().error("cvar", "Undefined cvar \"%s\"", name.GetString());
+                    log::error("cvar", "Undefined cvar \"%s\"", name.GetString());
                     continue;
                 }
 
                 /* INT */
                 if (value.IsInt()) {
                     if (cvar->type != CVar::CVAR_INT) {
-                        log_globals::log().error("cvar", "Invalid type for cvar \"%s\".", name.GetString());
+                        log::error("cvar", "Invalid type for cvar \"%s\".", name.GetString());
                         continue;
                     }
 
@@ -204,7 +204,7 @@ namespace cetech {
                     /* FLOAT */
                 } else if (value.IsDouble()) {
                     if (cvar->type != CVar::CVAR_FLOAT) {
-                        log_globals::log().error("cvar", "Invalid type for cvar \"%s\".", name.GetString());
+                        log::error("cvar", "Invalid type for cvar \"%s\".", name.GetString());
                         continue;
                     }
 
@@ -213,7 +213,7 @@ namespace cetech {
                     /* STR */
                 } else if (value.IsString()) {
                     if (cvar->type != CVar::CVAR_STR) {
-                        log_globals::log().error("cvar", "Invalid type for cvar \"%s\".", name.GetString());
+                        log::error("cvar", "Invalid type for cvar \"%s\".", name.GetString());
                         continue;
                     }
 
@@ -231,30 +231,30 @@ namespace cetech {
 
                 switch (it->type) {
                 case CVar::CVAR_INT:
-                    log_globals::log().info("CVar.dump",
-                                            "[%u] name: %s  type: int  value: %i  desc: %s",
-                                            pos,
-                                            it->name,
-                                            it->value_i,
-                                            it->desc);
+                    log::info("CVar.dump",
+                              "[%u] name: %s  type: int  value: %i  desc: %s",
+                              pos,
+                              it->name,
+                              it->value_i,
+                              it->desc);
                     break;
 
                 case CVar::CVAR_FLOAT:
-                    log_globals::log().info("CVar.dump",
-                                            "[%u] name: %s  type: float  value: %f  desc: %s",
-                                            pos,
-                                            it->name,
-                                            it->value_f,
-                                            it->desc);
+                    log::info("CVar.dump",
+                              "[%u] name: %s  type: float  value: %f  desc: %s",
+                              pos,
+                              it->name,
+                              it->value_f,
+                              it->desc);
                     break;
 
                 case CVar::CVAR_STR:
-                    log_globals::log().info("CVar.dump",
-                                            "[%u] name: %s  type: str  value: \"%s\"  desc: %s",
-                                            pos,
-                                            it->name,
-                                            it->value_str,
-                                            it->desc);
+                    log::info("CVar.dump",
+                              "[%u] name: %s  type: str  value: \"%s\"  desc: %s",
+                              pos,
+                              it->name,
+                              it->value_str,
+                              it->desc);
                     break;
                 }
 

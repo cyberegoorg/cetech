@@ -111,7 +111,7 @@ namespace cetech {
             {
             case 'x': stack.push_float(v.x); return 1;
             case 'y': stack.push_float(v.y); return 1;
-            default: log_globals::log().error("lua", "Vector2 bad index '%s'", s[0]); break;
+            default: log::error("lua", "Vector2 bad index '%s'", s[0]); break;
             }
 
             return 0;
@@ -126,7 +126,7 @@ namespace cetech {
             {
             case 'x': v.x = value; break;
             case 'y': v.y = value; break;
-            default: log_globals::log().error("lua", "Vector2 bad index '%s'", s[0]); break;
+            default: log::error("lua", "Vector2 bad index '%s'", s[0]); break;
             }
 
             return 0;
@@ -213,7 +213,7 @@ namespace cetech {
             case 'x': stack.push_float(v.x); return 1;
             case 'y': stack.push_float(v.y); return 1;
             case 'z': stack.push_float(v.z); return 1;
-            default: log_globals::log().error("lua", "Vector3 bad index '%s'", s[0]); break;
+            default: log::error("lua", "Vector3 bad index '%s'", s[0]); break;
             }
 
             return 0;
@@ -229,7 +229,7 @@ namespace cetech {
             case 'x': v.x = value; break;
             case 'y': v.y = value; break;
             case 'z': v.z = value; break;
-            default: log_globals::log().error("lua", "Vector3 bad index '%s'", s[0]); break;
+            default: log::error("lua", "Vector3 bad index '%s'", s[0]); break;
             }
 
             return 0;
@@ -337,7 +337,7 @@ namespace cetech {
             if (lua_pcall(_state, 0, 0, 0)) {
                 const char* last_error = lua_tostring(_state, -1);
                 lua_pop(_state, 1);
-                log_globals::log().error("lua", "%s", last_error);
+                log::error("lua", "%s", last_error);
             }
         }
 
@@ -348,7 +348,7 @@ namespace cetech {
             if (luaL_dostring(_state, str)) {
                 const char* last_error = lua_tostring(_state, -1);
                 lua_pop(_state, 1);
-                log_globals::log().error("lua", "%s", last_error);
+                log::error("lua", "%s", last_error);
             }
         }
 

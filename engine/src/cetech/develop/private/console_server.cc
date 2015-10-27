@@ -23,7 +23,7 @@ namespace cetech {
     namespace {
         using namespace console_server;
 
-        void console_server_handler(const LogLevel::Enum level,
+        void console_server_handler(const log::LogLevel::Enum level,
                                     const time_t time,
                                     const char* where,
                                     const char* msg,
@@ -64,7 +64,7 @@ namespace cetech {
 
             ~ConsoleServerData() {
                 enet_host_destroy(server_host);
-                log_globals::log().unregister_handler(&console_server_handler);
+                log::unregister_handler(&console_server_handler);
             }
         };
 
@@ -84,14 +84,14 @@ namespace cetech {
             document.Parse(packet);
 
             if (document.HasParseError()) {
-                log_globals::log().error("console_server", "Packet parse error: %s", GetParseError_En(
-                                             document.GetParseError()), document.GetErrorOffset());
+                log::error("console_server", "Packet parse error: %s", GetParseError_En(
+                               document.GetParseError()), document.GetErrorOffset());
                 return false;
             }
 
             /* Name */
             if (!document.HasMember("name")) {
-                log_globals::log().error("console_server", "Packet require key \"name\"");
+                log::error("console_server", "Packet require key \"name\"");
                 return false;
             }
 
@@ -112,7 +112,7 @@ namespace cetech {
             command_clb_t cmd = hash::get < command_clb_t >
                                 (data->cmds, stringid64::from_cstring(document["name"].GetString()), nullptr);
             if (cmd == nullptr) {
-                log_globals::log().error("console_server", "Command \"%s\" not found.", document["name"].GetString());
+                log::error("console_server", "Command \"%s\" not found.", document["name"].GetString());
                 return;
             }
 
@@ -131,7 +131,7 @@ namespace cetech {
             data->server_addr.port = cvars::console_server_port.value_i;
             data->server_host = enet_host_create(&data->server_addr, 32, 10, 0, 0);
 
-            log_globals::log().register_handler(&console_server_handler);
+            log::register_handler(&console_server_handler);
         }
 
 
@@ -178,7 +178,7 @@ namespace cetech {
                     }
 
                     Event.peer->data = (void*)cid;
-                    log_globals::log().info("console_server", "Client connected. %d", cid);
+                    log::info("console_server", "Client connected. %d", cid);
                     break;
                 }
 
@@ -188,7 +188,7 @@ namespace cetech {
                     data->client_peer[cid - 1] = nullptr;
                     queue::push_back(data->peer_free_queue, (int)(cid - 1));
 
-                    log_globals::log().info("console_server", "Client %d disconnected.", cid);
+                    log::info("console_server", "Client %d disconnected.", cid);
                     break;
                 }
 

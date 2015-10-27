@@ -45,7 +45,7 @@ namespace cetech {
     };
 
     namespace log_handlers {
-        void stdout_handler(const LogLevel::Enum level,
+        void stdout_handler(const log::LogLevel::Enum level,
                             const time_t time,
                             const char* where,
                             const char* msg,
@@ -56,12 +56,12 @@ namespace cetech {
             FILE* out;
 
             switch (level) {
-            case LogLevel::LOG_ERROR:
-                out = stdout;
+            case log::LogLevel::LOG_ERROR:
+                out = stderr;
                 break;
 
             default:
-                out = stderr;
+                out = stdout;
                 break;
             }
 
@@ -70,7 +70,7 @@ namespace cetech {
             funlockfile(out);
         }
 
-        void file_handler(const LogLevel::Enum level,
+        void file_handler(const log::LogLevel::Enum level,
                           const time_t time,
                           const char* where,
                           const char* msg,
