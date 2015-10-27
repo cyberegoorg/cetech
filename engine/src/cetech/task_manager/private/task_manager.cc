@@ -2,8 +2,9 @@
 
 #include "celib/memory/memory.h"
 #include "celib/container/array.inl.h"
-#include "cetech/thread/thread.h"
+#include "celib/container/queue.inl.h"
 
+#include "cetech/thread/thread.h"
 #include "cetech/application/application.h"
 #include "cetech/log_system/log_system.h"
 
@@ -43,11 +44,11 @@ namespace cetech {
             uint32_t _task_count;             //!< Task count
             uint32_t _open_task_count;        //!< Open task count
 
-            uint32_t _task_queue[MAX_TASK];   //!< Task queue
             uint32_t _open_task[MAX_TASK];    //!< Open task
             Task _task_pool[MAX_TASK];        //!< Task pool
 
             Array < Thread > _workers;
+            Queue<uint32_t> _queue;
 
             struct {
                 char run : 1;
@@ -56,9 +57,8 @@ namespace cetech {
             TaskManagerData(Allocator & allocator) : _last_id(0),
                                                      _task_count(0),
                                                      _open_task_count(0),
-                                                     _workers(allocator) {
+                                                     _workers(allocator), _queue(allocator) {
 
-                memset(_task_queue, 0, sizeof(uint32_t) * MAX_TASK);
                 memset(_open_task, 0, sizeof(uint32_t) * MAX_TASK);
                 memset(_task_pool, 0, sizeof(Task) * MAX_TASK);
             }
@@ -112,9 +112,7 @@ namespace cetech {
 
                 return i;
             }
-
-            /* TODO =( */
-            log::error("task", "Pool overflow");
+            CE_ASSERT_MSG(false, "Pool overflow");
             abort();
         }
 
@@ -214,37 +212,36 @@ namespace cetech {
         Task task_pop_new_work() {
             //thread::spin_lock(_globals.data->_lock);
 
-            if (_globals.data->_task_count < 1) {
-                //thread::spin_unlock(_globals.data->_lock);
-                return (Task)TASK_INITIALIZER;
-            }
+            while(1) {
+                if(queue::size(_globals.data->_queue) < 1) {
+                    return (Task)TASK_INITIALIZER;
+                }
 
-            for (int32_t i = _globals.data->_task_count - 1; i >= 0; --i) {
-                Task t = _globals.data->_task_pool[_globals.data->_task_queue[i]];
+                uint32_t poped_task = _globals.data->_queue[0];
+                queue::pop_front(_globals.data->_queue);
 
+                Task t = _globals.data->_task_pool[poped_task];
+                
                 if (t.job_count != 1) {
+                    queue::push_back(_globals.data->_queue, poped_task);
                     continue;
                 }
 
                 if (t.depend.i > 0) {
                     if (!_is_task_done(t.depend)) {
+                        queue::push_back(_globals.data->_queue, poped_task);
                         continue;
                     }
                 }
 
-                for (; i < _globals.data->_task_count; ++i) {
-                    _globals.data->_task_queue[i] = _globals.data->_task_queue[i + 1];
-                }
-
                 --_globals.data->_task_count;
-                CE_ASSERT(_globals.data->_task_count != 4294967295);
-
-                //thread::spin_unlock(_globals.data->_lock);
                 return t;
             }
 
-            //thread::spin_unlock(_globals.data->_lock);
             return (Task)TASK_INITIALIZER;
+
+            //thread::spin_unlock(_globals.data->_lock);
+            //return (Task)TASK_INITIALIZER;
         }
 
     }
@@ -263,41 +260,15 @@ namespace cetech {
 
             uint32_t task = _new_task_from_pool();
 
-            /* First? */
-            if (_globals.data->_task_count == 0) {
-                Task t;
-                t.id = { id },
-                t.priority = priority,
-                t.clb = callback,
-                t.job_count = 2,
-                t.depend = depend,
-                t.parent = parent,
+            Task t;
+            t.id = { id },
+            t.priority = priority,
+            t.clb = callback,
+            t.job_count = 2,
+            t.depend = depend,
+            t.parent = parent,
 
-                _globals.data->_task_pool[task] = t;
-
-                _globals.data->_task_queue[0] = task;
-            } else {
-
-                /* push item to queue */
-                uint32_t i = _globals.data->_task_count;
-
-                while (i > 0 && _globals.data->_task_pool[_globals.data->_task_queue[i - 1]].priority > priority) {
-                    _globals.data->_task_queue[i] = _globals.data->_task_queue[i - 1];
-                    --i;
-                }
-
-                Task t;
-                t.id = { id },
-                t.priority = priority,
-                t.clb = callback,
-                t.job_count = 2,
-                t.depend = depend,
-                t.parent = parent,
-
-                _globals.data->_task_pool[task] = t;
-
-                _globals.data->_task_queue[i] = task;
-            }
+            _globals.data->_task_pool[task] = t;
 
             if (parent.i != 0) {
                 Task* t = _find_task_in_pool(parent);
@@ -329,6 +300,7 @@ namespace cetech {
                     }
 
                     --_globals.data->_task_pool[i].job_count;
+                    queue::push_back(_globals.data->_queue, i);
                     break;
                 }
             }
