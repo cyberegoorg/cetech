@@ -2,7 +2,7 @@
 
 #include "celib/memory/memory.h"
 #include "celib/container/array.inl.h"
-#include "cetech/platform/thread.h"
+#include "cetech/thread/thread.h"
 
 #include "cetech/application/application.h"
 #include "cetech/log_system/log_system.h"
