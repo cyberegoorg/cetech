@@ -5,6 +5,7 @@
 #include <cstring>
 
 #include "celib/defines.h"
+#include "celib/stacktrace.h"
 
 /*!
  * Check ptr macro.
@@ -98,7 +99,9 @@ namespace cetech {
                              const char* file,
                              const int line,
                              const char* fce) {
-        fprintf(stderr, "[A] \'%s\' in %s:%i:%s. \n", condition_str, SHORT_FILE(file), line, fce);
+        char* trace = stacktrace(2);
+        fprintf(stderr, "[A] \'%s\' in %s:%i:%s. stacktrace:\n%s\n", condition_str, SHORT_FILE(file), line, fce, trace);
+        free(trace);
         abort();
     }
 
@@ -107,13 +110,19 @@ namespace cetech {
                                  const char* file,
                                  const int line,
                                  const char* fce) {
-        fprintf(stderr, "[A] \'%s\': \"%s\" %s:%i:%s. \n", where, what, SHORT_FILE(file), line, fce);
+
+        char* trace = stacktrace(2);
+        fprintf(stderr, "[A] \'%s\': \"%s\" %s:%i:%s. stacktrace:\n%s\n", where, what, SHORT_FILE(
+                    file), line, fce, trace);
+        free(trace);
         abort();
     }
 
     CE_INLINE void ce_check_ptr(const char* file, const int line) {
-        fprintf(stderr, "[A][check_ptr] in file %s on line %i is invalid pointer. \n", SHORT_FILE(file),
-                line);
+        char* trace = stacktrace(2);
+        fprintf(stderr, "[A][check_ptr] in file %s on line %i is invalid pointer. stacktrace:\n%s\n \n", SHORT_FILE(
+                    file), line, trace);
+        free(trace);
         abort();
     }
 }
