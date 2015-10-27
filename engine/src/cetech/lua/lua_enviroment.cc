@@ -458,9 +458,9 @@ namespace cetech {
         }
 
         void shutdown() {
-            _globals = Globals();
-
             lua_enviroment::shutdown();
+            _globals.data->~LuaEnviromentData();
+            _globals = Globals();
         }
     }
 }

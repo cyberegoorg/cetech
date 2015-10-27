@@ -60,11 +60,11 @@ namespace cetech {
         CE_INLINE void inc_reference(StringId64_t type, const StringId64_t name) {
             const uint32_t counter = hash::get < uint32_t > (_globals.data->_data_refcount_map, type ^ name, 0) + 1;
 
-//             log_globals::log().debug("resource_manager",
-//                                      "Inc reference for (%" PRIx64 ", %" PRIx64 ") counter == %d ",
-//                                      type,
-//                                      name,
-//                                      counter);
+            //             log_globals::log().debug("resource_manager",
+            //                                      "Inc reference for (%" PRIx64 ", %" PRIx64 ") counter == %d ",
+            //                                      type,
+            //                                      name,
+            //                                      counter);
 
             hash::set(_globals.data->_data_refcount_map, type ^ name, counter);
         }
@@ -72,11 +72,11 @@ namespace cetech {
         CE_INLINE bool dec_reference(StringId64_t type, const StringId64_t name) {
             const uint32_t counter = hash::get < uint32_t > (_globals.data->_data_refcount_map, type ^ name, 1) - 1;
 
-//             log_globals::log().debug("resource_manager",
-//                                      "Dec reference for %" PRIx64 "%" PRIx64 "." " counter == %d ",
-//                                      type,
-//                                      name,
-//                                      counter);
+            //             log_globals::log().debug("resource_manager",
+            //                                      "Dec reference for %" PRIx64 "%" PRIx64 "." " counter == %d ",
+            //                                      type,
+            //                                      name,
+            //                                      counter);
 
             hash::set(_globals.data->_data_refcount_map, type ^ name, counter);
 
@@ -267,6 +267,7 @@ namespace cetech {
         }
 
         void shutdown() {
+            _globals.data->~ResouceManagerData();
             _globals = Globals();
         }
     }

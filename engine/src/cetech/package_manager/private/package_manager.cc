@@ -227,6 +227,7 @@ namespace cetech {
         }
 
         void shutdown() {
+            _globals.data->~PackageManagerData();
             _globals = Globals();
         }
     }

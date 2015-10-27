@@ -54,8 +54,11 @@ namespace cetech {
                 char run : 1;
             } flags;
 
-            TaskManagerData(Allocator & allocator) : _last_id(0), _task_count(0), _open_task_count(0), _workers(
-                                                         allocator) {
+            TaskManagerData(Allocator & allocator) : _last_id(0),
+                                                     _task_count(0),
+                                                     _open_task_count(0),
+                                                     _workers(allocator) {
+
                 memset(_task_queue, 0, sizeof(uint32_t) * MAX_TASK);
                 memset(_open_task, 0, sizeof(uint32_t) * MAX_TASK);
                 memset(_task_pool, 0, sizeof(Task) * MAX_TASK);

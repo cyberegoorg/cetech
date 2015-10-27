@@ -43,7 +43,7 @@ void posix_init() {
 
     new_action.sa_handler = posix_signal_handler;
     sigemptyset(&new_action.sa_mask);
-    //sigaddset(&sigIntHandler.sa_mask, SIGTERM);
+    //sigaddset(&sigIntHandler.sa_mask, SIGABRT);
     new_action.sa_flags = 0;
 
     sigaction(SIGINT, NULL, &old_action);
@@ -114,23 +114,22 @@ void load_config_json() {
     const uint64_t f_sz = f.size();
     void* mem = memory_globals::default_allocator().allocate(f_sz + 1);
     memset(mem, 0, f_sz + 1);
-
     f.read(mem, f_sz);
-
     filesystem::close(f);
 
     rapidjson::Document document;
     document.Parse((const char*)mem);
-    
+
     if (document.HasParseError()) {
         log_globals::log().error("main", "Parse config.json error: %s", GetParseError_En(
-                                        document.GetParseError()), document.GetErrorOffset());
+                                     document.GetParseError()), document.GetErrorOffset());
         abort();
     }
-    
-    cvar::load_from_json(document);
 
     memory_globals::default_allocator().deallocate(mem);
+
+    cvar::load_from_json(document);
+
 }
 
 
@@ -155,6 +154,7 @@ bool big_init() {
     filesystem::map_root_dir(BUILD_DIR, build_path);
     filesystem::map_root_dir(CORE_DIR, cvars::compiler_core_path.value_str);
 
+
     task_manager_globals::init();
 
 #if defined(CETECH_DEVELOP)
@@ -162,7 +162,7 @@ bool big_init() {
     console_server::init();
     develop_manager_globals::init();
 #endif
-    
+
     resource_manager_globals::init();
 
 #if defined(CETECH_DEVELOP)
@@ -258,13 +258,16 @@ void big_shutdown() {
 
 #if defined(CETECH_DEVELOP)
     resource_compiler_globals::shutdown();
-#endif
     develop_manager_globals::shutdown();
     console_server_globals::shutdown();
+#endif
+
     task_manager_globals::shutdown();
 
     application_globals::shutdown();
+    lua_enviroment_globals::shutdown();
 
+    filesystem_globals::shutdown();
     log_globals::shutdown();
     memory_globals::shutdown();
 }

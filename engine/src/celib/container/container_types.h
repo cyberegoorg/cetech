@@ -38,6 +38,7 @@ namespace cetech {
 
 
         Allocator* _allocator; //!< Pointer to allocator.
+        const char* _tag;
         uint32_t _size;        //!< Size
         uint32_t _capacity;    //!< Allocate size.
         T* _data;              //!< Array data;

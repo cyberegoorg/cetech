@@ -59,8 +59,8 @@ namespace cetech {
 
             Hash < command_clb_t > cmds;
 
-            ConsoleServerData(Allocator & allocator) : client_peer(allocator), peer_free_queue(allocator), cmds(
-                                                           allocator) {}
+            ConsoleServerData(Allocator & allocator) : client_peer(allocator), peer_free_queue(allocator),
+                                                       cmds(allocator) {}
 
             ~ConsoleServerData() {
                 enet_host_destroy(server_host);
