@@ -10,7 +10,6 @@
 
   
   "package": [
-    "core",
-    "pkg1"
+    "core"
   ] 
 }
