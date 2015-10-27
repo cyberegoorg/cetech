@@ -76,7 +76,7 @@ namespace {
                     }
 
                     mem_trace[i].used = 0;
-                    free(mem_trace[i].traceback);
+                    //free(mem_trace[i].traceback);
                 }
             }
 #endif
@@ -97,6 +97,12 @@ namespace {
                     fprintf(stderr, "[MEMORY LEAK][%p]\ntraceback:\n%s", mem_trace[i].p,
                             mem_trace[i].traceback);
                     deallocate(mem_trace[i].p);
+                }
+
+                for (int i = 0; i < 4096; ++i) {
+                    if( mem_trace[i].traceback != 0) {
+                        free(mem_trace[i].traceback);
+                    }
                 }
 #endif
                 CE_ASSERT(_total_allocated == 0);
