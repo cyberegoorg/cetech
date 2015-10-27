@@ -47,6 +47,7 @@ namespace {
 
     class MallocAllocator : public Allocator {
         public:
+#if defined(CETECH_DEBUG)
             enum {
                 MAX_MEM_TRACE = 4096
             };
@@ -78,23 +79,28 @@ namespace {
                     free(mem_trace[i].traceback);
                 }
             }
+#endif
 
             MallocAllocator() : _total_allocated(0) {
+#if defined(CETECH_DEBUG)
                 memset(mem_trace, 0, sizeof(TraceEntry) * 4096);
+#endif
             }
 
             ~MallocAllocator() {
+#if defined(CETECH_DEBUG)
                 for (int i = 0; i < 4096; ++i) {
                     if (!mem_trace[i].used) {
                         continue;
                     }
 
-                    fprintf(stderr, "[MEMORY LEAK][%p] allocate traceback:\n%s", mem_trace[i].p,
+                    fprintf(stderr, "[MEMORY LEAK][%p]\ntraceback:\n%s", mem_trace[i].p,
                             mem_trace[i].traceback);
                     deallocate(mem_trace[i].p);
                 }
-
+#endif
                 CE_ASSERT(_total_allocated == 0);
+
             }
 
             virtual void* allocate(const uint32_t size, const uint32_t align) {
@@ -105,9 +111,10 @@ namespace {
                 fill(h, p, ts);
                 _total_allocated += ts;
 
-
+#if defined(CETECH_DEBUG)
                 const char* trace = stacktrace(2);
                 add_entry(p, trace);
+#endif
                 return p;
             }
 
@@ -119,7 +126,10 @@ namespace {
                 Header* h = header(p);
                 _total_allocated -= h->size;
 
+#if defined(CETECH_DEBUG)
                 remove_entry(p);
+#endif
+                
                 free(h);
             }
 
