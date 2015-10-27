@@ -4,8 +4,7 @@
 
 namespace cetech {
     namespace keyboard {
-        void frame_start();
-        void frame_end();
+        void process_keyboard();
 
         uint32_t button_index(const char* scancode);
         const char* button_name(const uint32_t button_index);
