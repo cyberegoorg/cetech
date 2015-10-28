@@ -26,7 +26,7 @@
 
 #include "rapidjson/prettywriter.h"
 
-
+#include <unistd.h>
 
 namespace cetech {
     namespace {
@@ -218,6 +218,7 @@ namespace cetech {
                     NULL_TASK, frame_task
                     );
 
+
                 task_manager::TaskID process_mouse_task = task_manager::add_begin(
                     process_mouse, nullptr, 0,
                     NULL_TASK, input_task
@@ -229,19 +230,19 @@ namespace cetech {
                     );
 
                 const task_manager::TaskID task_end[] = {
-                    frame_task,
                     console_server_task,
                     process_mouse_task,
                     process_keyboard_task,
+                    frame_task,
                     input_task
                 };
 
                 task_manager::add_end(task_end, sizeof(task_end) / sizeof(task_manager::TaskID));
 
-                //usleep(3 * 1000);
                 if (!data._flags.pause) {
                     lua_enviroment::call_global("update", "f", dt);
                     lua_enviroment::clean_temp();
+                    usleep(100);
                 }
 
                 develop_manager::push_end_frame();
@@ -250,13 +251,16 @@ namespace cetech {
 
                 ++(data._frame_id);
 
+                //log::info("application", "begin wait.");
                 task_manager::wait(frame_task); // TODO
+                //log::info("application", "wait end.");
 
                 if (!data._flags.daemon_mod) {
                     renderer::end_frame();
                     window::update(data.main_window);
                 }
             }
+
             shutdown();
         }
 
