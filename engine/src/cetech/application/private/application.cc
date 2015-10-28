@@ -185,9 +185,52 @@ namespace cetech {
             console_server::tick();
         }
 
-        static void foo_tick(void* data) {
-            //log::info("foo", "ID %d", task_manager::get_worker_id());
-            //console_server::tick();
+        static void frame_begin_tick(void* _data) {
+            CE_CHECK_PTR(_globals.data);
+            ApplictionData& data = *_globals.data;
+
+            float dt = 0.0f;
+            uint32_t now_ticks = 0;
+
+            now_ticks = get_ticks();
+
+            dt = (now_ticks - data._last_frame_ticks) * 0.001f;
+            data._delta_time = dt;
+            data._last_frame_ticks = now_ticks;
+
+#if defined(CETECH_DEVELOP)
+            develop_manager::push_record_float("engine.frame_id", data._frame_id);
+            develop_manager::push_record_float("engine.delta_time", dt);
+            develop_manager::push_record_float("engine.frame_rate", 1.0f / dt);
+#endif
+            
+            if (!data._flags.daemon_mod) {
+                renderer::begin_frame();
+            }
+
+            if (!data._flags.pause) {
+                lua_enviroment::call_global("update", "f", dt);
+                lua_enviroment::clean_temp();
+                usleep(100);
+            }
+        }
+
+        static void frame_end_tick(void* _data) {
+            CE_CHECK_PTR(_globals.data);
+            ApplictionData& data = *_globals.data;
+
+#if defined(CETECH_DEVELOP)
+            develop_manager::push_end_frame();
+            develop_manager::send_buffer();
+            develop_manager::clear();
+#endif
+            
+            ++(data._frame_id);
+
+            if (!data._flags.daemon_mod) {
+                renderer::end_frame();
+                window::update(data.main_window);
+            }
         }
 
         void run() {
@@ -196,37 +239,13 @@ namespace cetech {
             CE_CHECK_PTR(_globals.data);
             ApplictionData& data = *_globals.data;
 
-            float dt = 0.0f;
-            uint32_t now_ticks = 0;
+
             while (data._flags.run) {
-                now_ticks = get_ticks();
-
-                dt = (now_ticks - data._last_frame_ticks) * 0.001f;
-                data._delta_time = dt;
-                data._last_frame_ticks = now_ticks;
-
-                develop_manager::push_record_float("engine.frame_id", data._frame_id);
-                develop_manager::push_record_float("engine.delta_time", dt);
-                develop_manager::push_record_float("engine.frame_rate", 1.0f / dt);
-
-                task_manager::TaskID frame_task = task_manager::add_empty_begin(0);
-                task_manager::TaskID input_task = task_manager::add_empty_begin(0, NULL_TASK, frame_task);
-
                 process_os();
 
-                if (!data._flags.daemon_mod) {
-                    renderer::begin_frame();
-                }
+                task_manager::TaskID frame_task = task_manager::add_empty_begin(0);
 
-                task_manager::TaskID console_server_task = task_manager::add_begin(
-                    console_server_tick, nullptr, 0,
-                    NULL_TASK, frame_task
-                    );
-
-//                 task_manager::TaskID foo_task = task_manager::add_begin(
-//                     foo_tick, nullptr, 0,
-//                     NULL_TASK, frame_task, 0
-//                     );
+                task_manager::TaskID input_task = task_manager::add_empty_begin(0, NULL_TASK, frame_task);
 
                 task_manager::TaskID process_mouse_task = task_manager::add_begin(
                     process_mouse, nullptr, 0,
@@ -238,36 +257,40 @@ namespace cetech {
                     NULL_TASK, input_task
                     );
 
+
+                task_manager::TaskID frame_begin_task = task_manager::add_begin(
+                    frame_begin_tick, nullptr, 0,
+                    NULL_TASK, frame_task, task_manager::WorkerAffinity::MAIN_THEAD
+                    );
+
+#if defined(CETECH_DEVELOP)
+                task_manager::TaskID console_server_task = task_manager::add_begin(
+                    console_server_tick, nullptr, 0,
+                    NULL_TASK, frame_task, task_manager::WorkerAffinity::MAIN_THEAD
+                    );
+#endif
                 
+                task_manager::TaskID frame_end_task = task_manager::add_begin(
+                    frame_end_tick, nullptr, 0,
+                    frame_task, NULL_TASK, task_manager::WorkerAffinity::MAIN_THEAD
+                    );
+
+
                 const task_manager::TaskID task_end[] = {
+#if defined(CETECH_DEVELOP)
                     console_server_task,
+#endif
+
                     process_mouse_task,
                     process_keyboard_task,
-//                     foo_task,
+                    frame_end_task,
+                    frame_begin_task,
                     frame_task,
                     input_task
                 };
-
                 task_manager::add_end(task_end, sizeof(task_end) / sizeof(task_manager::TaskID));
 
-                if (!data._flags.pause) {
-                    lua_enviroment::call_global("update", "f", dt);
-                    lua_enviroment::clean_temp();
-                    usleep(100);
-                }
-
-                develop_manager::push_end_frame();
-                develop_manager::send_buffer();
-                develop_manager::clear();
-
-                ++(data._frame_id);
-
-                task_manager::wait(frame_task); // TODO
-
-                if (!data._flags.daemon_mod) {
-                    renderer::end_frame();
-                    window::update(data.main_window);
-                }
+                task_manager::wait(frame_task);
             }
 
             shutdown();

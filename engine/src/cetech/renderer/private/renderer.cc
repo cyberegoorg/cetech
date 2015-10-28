@@ -105,8 +105,10 @@ namespace cetech {
 
     namespace renderer {
         void init(Window window, RenderType::Enum render_type) {
+#if defined(CETECH_DEVELOP)
             console_server::register_command("renderer.resize", cmd_renderer_resize);
-
+#endif
+            
             #if defined(CETECH_SDL2)
             sdlSetWindow(window.wnd);
             #endif

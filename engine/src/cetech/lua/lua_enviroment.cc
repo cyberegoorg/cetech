@@ -272,17 +272,21 @@ namespace cetech {
         }
         // -- Vector3
 
+#if defined(CETECH_DEVELOP)
         static void cmd_lua_execute(const rapidjson::Document& in, rapidjson::Document& out) {
             CE_UNUSED(out);
             lua_enviroment::execute_string(in["args"]["script"].GetString());
         }
+#endif
     }
 
     namespace lua_enviroment {
         void init() {
             LuaEnviromentData* data = _globals.data;
 
+#if defined(CETECH_DEVELOP)
             console_server::register_command("lua.execute", &cmd_lua_execute);
+#endif
 
             lua_State* _state = luaL_newstate();
             CE_CHECK_PTR(_state);
