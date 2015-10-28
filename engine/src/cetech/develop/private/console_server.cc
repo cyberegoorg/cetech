@@ -210,11 +210,15 @@ namespace cetech {
 
     namespace console_server_globals {
         void init() {
+            log::info("console_server_globals", "Init");
+
             char* p = _globals.buffer;
             _globals.data = new(p) ConsoleServerData(memory_globals::default_allocator());
         }
 
         void shutdown() {
+            log::info("console_server_globals", "Shutdown");
+            
             _globals.data->~ConsoleServerData();
             _globals = Globals();
         }

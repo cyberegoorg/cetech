@@ -249,6 +249,8 @@ namespace cetech {
 
     namespace resource_compiler_globals {
         void init() {
+             log::info("resource_compiler_globals", "Init");
+            
             char* p = _globals.buffer;
             _globals.data = new(p) ResouceCompilerData(memory_globals::default_allocator());
 
@@ -256,6 +258,8 @@ namespace cetech {
         }
 
         void shutdown() {
+             log::info("resource_compiler_globals", "Shutdown");
+
             _globals.data->~ResouceCompilerData();
             _globals = Globals();
         }
