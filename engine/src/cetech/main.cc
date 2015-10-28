@@ -262,9 +262,10 @@ void big_shutdown() {
     console_server_globals::shutdown();
 #endif
 
+    application_globals::shutdown();
+    
     task_manager_globals::shutdown();
 
-    application_globals::shutdown();
     lua_enviroment_globals::shutdown();
 
     filesystem_globals::shutdown();

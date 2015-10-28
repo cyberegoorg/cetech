@@ -222,11 +222,15 @@ namespace cetech {
 
     namespace package_manager_globals {
         void init() {
+            log::info("package_manager_globals", "Init");
+
             char* p = _globals.buffer;
             _globals.data = new(p) PackageManagerData();
         }
 
         void shutdown() {
+            log::info("package_manager_globals", "Shutdown");
+            
             _globals.data->~PackageManagerData();
             _globals = Globals();
         }

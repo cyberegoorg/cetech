@@ -6,6 +6,8 @@
 #include "cetech/develop/console_server.h"
 #include "cetech/application/application.h"
 
+#include "cetech/log_system/log_system.h"
+
 #include "rapidjson/document.h"
 
 namespace cetech {
@@ -165,6 +167,8 @@ namespace cetech {
 
     namespace develop_manager_globals {
         void init() {
+            log::info("develop_manager_globals", "Init");
+
             char* p = _globals.buffer;
             _globals.data = new(p) DevelopManagerData(memory_globals::default_allocator());
 
@@ -174,6 +178,8 @@ namespace cetech {
         }
 
         void shutdown() {
+            log::info("develop_manager_globals", "Shutdown");
+
             _globals.data->~DevelopManagerData();
             _globals = Globals();
         }

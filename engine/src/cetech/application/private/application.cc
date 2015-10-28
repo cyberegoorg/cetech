@@ -282,13 +282,18 @@ namespace cetech {
 
     namespace application_globals {
         void init() {
+            log::info("appplication_globals", "Init");
+
             char* p = _globals.buffer;
             _globals.data = new(p) ApplictionData();
         }
 
         void shutdown() {
+            log::info("appplication_globals", "Shutdown");
+
             _globals.data->~ApplictionData();
             _globals = Globals();
+
         }
     }
 }

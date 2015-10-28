@@ -137,9 +137,13 @@ namespace cetech {
             char* p = _globals.buffer;
 
             _globals.data = new(p) LogData(memory_globals::default_allocator());
+            
+            log::info("filesystem_globals", "Initialized");
         }
 
         void shutdown() {
+            log::info("filesystem_globals", "Shutdown");
+            
             _globals.data->~LogData();
             _globals = Globals();
 
