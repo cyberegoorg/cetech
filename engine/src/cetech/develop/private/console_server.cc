@@ -218,7 +218,7 @@ namespace cetech {
 
         void shutdown() {
             log::info("console_server_globals", "Shutdown");
-            
+
             _globals.data->~ConsoleServerData();
             _globals = Globals();
         }

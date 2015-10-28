@@ -263,7 +263,7 @@ void big_shutdown() {
 #endif
 
     application_globals::shutdown();
-    
+
     task_manager_globals::shutdown();
 
     lua_enviroment_globals::shutdown();

@@ -262,14 +262,14 @@ namespace cetech {
     namespace resource_manager_globals {
         void init() {
             log::info("resource_manager_globals", "Init");
-            
+
             char* p = _globals.buffer;
             _globals.data = new(p) ResouceManagerData(memory_globals::default_allocator());
         }
 
         void shutdown() {
             log::info("resource_manager_globals", "Shutdown");
-            
+
             _globals.data->~ResouceManagerData();
             _globals = Globals();
         }

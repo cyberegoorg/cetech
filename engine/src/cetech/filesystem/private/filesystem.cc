@@ -304,14 +304,14 @@ namespace cetech {
     namespace filesystem_globals {
         void init() {
             log::info("filesystem_globals", "Init");
-            
+
             char* p = _globals.buffer;
             _globals.data = new(p) FilesystemData(memory_globals::default_allocator());
         }
 
         void shutdown() {
             log::info("filesystem_globals", "Shutdown");
-            
+
             _globals.data->~FilesystemData();
             _globals = Globals();
         }
