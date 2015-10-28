@@ -230,7 +230,7 @@ namespace cetech {
 
         void shutdown() {
             log::info("package_manager_globals", "Shutdown");
-            
+
             _globals.data->~PackageManagerData();
             _globals = Globals();
         }

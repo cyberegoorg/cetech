@@ -10,7 +10,7 @@
 
 #include <unistd.h>
 
-#define TASK_INITIALIZER { { 0 }, { 0 }, { 0 }, 0, 0, { 0, 0 } }
+#define TASK_INITIALIZER { { 0 }, { 0 }, { 0 }, 0, 0, 0, { 0, 0 } }
 
 //TODO: REWRITE !!! #62
 namespace cetech {
@@ -32,46 +32,42 @@ namespace cetech {
 
             uint32_t priority;         //!< Task priority
             uint32_t job_count;        //!< Task child active job
+            uint32_t worker_affinity;  //!< Worker affinity
             TaskWorkCallback clb;      //!< Callback
         };
 
         enum {
-            MAX_TASK = 512
+            MAX_TASK = 4096
         };
 
 
-        template < int SIZE >
         struct TaskQueue {
             enum {
-                MASK = SIZE - 1u
+                MASK = MAX_TASK - 1u
             };
 
             Spinlock _lock;
             uint32_t _top;
             uint32_t _bottom;
 
-            uint32_t _data[SIZE];
+            uint32_t _data[MAX_TASK];
 
             TaskQueue() : _top(0), _bottom(0) {
-                //SDL_AtomicSet(&_top, 0);
-                //SDL_AtomicSet(&_bottom, 0);
-                memset(_data, 0, sizeof(uint32_t) * SIZE);
+                memset(_data, 0, sizeof(uint32_t) * MAX_TASK);
             }
         };
 
         namespace taskqueue {
-            template < int SIZE >
-            void push(TaskQueue < SIZE >& q, uint32_t task) {
+            void push(TaskQueue& q, uint32_t task) {
                 thread::spin_lock(q._lock);
 
-                q._data[q._bottom & TaskQueue < SIZE > ::MASK] = task + 1;
+                q._data[q._bottom & TaskQueue ::MASK] = task + 1;
                 ++q._bottom;
 
                 thread::spin_unlock(q._lock);
             }
 
-            template < int SIZE >
-            uint32_t pop(TaskQueue < SIZE >& q) {
+            uint32_t pop(TaskQueue& q) {
                 thread::spin_lock(q._lock);
 
                 const int jobCount = q._bottom - q._top;
@@ -80,7 +76,7 @@ namespace cetech {
                     return 0;
                 }
 
-                uint32_t task = q._data[q._top & TaskQueue < SIZE > ::MASK];
+                uint32_t task = q._data[q._top & TaskQueue ::MASK];
                 ++q._top;
 
                 thread::spin_unlock(q._lock);
@@ -88,6 +84,7 @@ namespace cetech {
             }
         }
 
+        static thread_local uint32_t _worker_id = 0; // Worker id (thanks thread_local)
         struct TaskManagerData {
             Spinlock _lock;
 
@@ -98,7 +95,10 @@ namespace cetech {
             Task _task_pool[MAX_TASK];        //!< Task pool
 
             Array < Thread > _workers;
-            TaskQueue < MAX_TASK > _tqueue;
+
+            TaskQueue _global_queue;
+
+            Allocator& _allocator;
 
             struct {
                 char run : 1;
@@ -106,7 +106,7 @@ namespace cetech {
 
             TaskManagerData(Allocator & allocator) : _last_id(0),
                                                      _open_task_count(0),
-                                                     _workers(allocator) {
+                                                     _workers(allocator), _allocator(allocator) {
 
                 memset(_open_task, 0, sizeof(uint32_t) * MAX_TASK);
                 memset(_task_pool, 0, sizeof(Task) * MAX_TASK);
@@ -138,7 +138,10 @@ namespace cetech {
         }
 
         static int task_worker(void* data) {
+            // Wait for run signal 0 -> 1
             while (_globals.data->flags.run == 0) {}
+
+            _worker_id = (uint64_t)data; // TODO: (uint64_t)?? !!!
 
             log::info("task_worker", "Worker init");
 
@@ -219,21 +222,8 @@ namespace cetech {
             return id.i == 0;
         }
 
-        uint32_t task_get_worker_id() {
-            CE_CHECK_PTR(_globals.data);
-            TaskManagerData& tm = *_globals.data;
-
-            uint32_t id = thread::id();
-
-            for (uint8_t i = 0; i < array::size(tm._workers); ++i) {
-                if (thread::get_id(tm._workers[i]) != id) {
-                    continue;
-                }
-
-                return i + 1;
-            }
-
-            return 0;
+        uint32_t get_worker_id() {
+            return _worker_id;
         }
 
         bool task_is_done(TaskID id) {
@@ -254,28 +244,31 @@ namespace cetech {
         Task task_pop_new_work() {
             CE_CHECK_PTR(_globals.data);
             TaskManagerData& tm = *_globals.data;
+            TaskQueue& q = tm._global_queue;
 
 begin:
-            uint32_t poped_task = taskqueue::pop(tm._tqueue);
-            if (poped_task == 0) {
-                return (Task)TASK_INITIALIZER;
-            }
+                uint32_t poped_task = taskqueue::pop(q);
+                if (poped_task == 0) {
+                    return (Task)TASK_INITIALIZER;
+                }
 
-            Task t = tm._task_pool[poped_task - 1];
+                Task t = tm._task_pool[poped_task - 1];
 
-            if (t.job_count != 1) {
-                taskqueue::push(tm._tqueue, poped_task - 1);
-                goto begin;
-                return (Task)TASK_INITIALIZER;
-            }
+                if (t.job_count != 1) {
+                    taskqueue::push(q, poped_task - 1);
+                    goto begin;
+                    //continue;
+                    //return (Task)TASK_INITIALIZER;
+                }
 
-            if ((t.depend.i > 0) && !task_is_done(t.depend)) {
-                taskqueue::push(tm._tqueue, poped_task - 1);
-                goto begin;
-                return (Task)TASK_INITIALIZER;
-            }
+                if ((t.depend.i > 0) && !task_is_done(t.depend)) {
+                    taskqueue::push(q, poped_task - 1);
+                    goto begin;
+                    //continue;
+                    //return (Task)TASK_INITIALIZER;
+                }
 
-            return t;
+                return t;
         }
 
     }
@@ -314,7 +307,7 @@ begin:
             tm._open_task[tm._open_task_count] = task;
             ++tm._open_task_count;
 
-            taskqueue::push(tm._tqueue, task);
+            taskqueue::push(tm._global_queue, task);
 
             return (TaskID) {
                        task
@@ -369,9 +362,9 @@ begin:
             log::info("task", "Worker count: %u", worker_count);
 
             if (worker_count > 0) {
-                for (uint32_t i = 0; i < worker_count; ++i) {
+                for (uint32_t i = 1; i < worker_count; ++i) {
                     log::debug("task", "Creating worker %u.", i);
-                    array::push_back(tm._workers, thread::create_thread(task_worker, "Worker", 0));
+                    array::push_back(tm._workers, thread::create_thread(task_worker, "Worker", (void*)(i))); // TODO: (void*)?? !!!
                 }
             }
 

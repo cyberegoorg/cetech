@@ -185,6 +185,11 @@ namespace cetech {
             console_server::tick();
         }
 
+        static void foo_tick(void* data) {
+            //log::info("foo", "ID %d", task_manager::get_worker_id());
+            //console_server::tick();
+        }
+
         void run() {
             init();
 
@@ -218,6 +223,10 @@ namespace cetech {
                     NULL_TASK, frame_task
                     );
 
+//                 task_manager::TaskID foo_task = task_manager::add_begin(
+//                     foo_tick, nullptr, 0,
+//                     NULL_TASK, frame_task, 0
+//                     );
 
                 task_manager::TaskID process_mouse_task = task_manager::add_begin(
                     process_mouse, nullptr, 0,
@@ -229,10 +238,12 @@ namespace cetech {
                     NULL_TASK, input_task
                     );
 
+                
                 const task_manager::TaskID task_end[] = {
                     console_server_task,
                     process_mouse_task,
                     process_keyboard_task,
+//                     foo_task,
                     frame_task,
                     input_task
                 };
@@ -251,9 +262,7 @@ namespace cetech {
 
                 ++(data._frame_id);
 
-                //log::info("application", "begin wait.");
                 task_manager::wait(frame_task); // TODO
-                //log::info("application", "wait end.");
 
                 if (!data._flags.daemon_mod) {
                     renderer::end_frame();

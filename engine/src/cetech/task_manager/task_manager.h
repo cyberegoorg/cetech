@@ -29,6 +29,7 @@ namespace cetech {
         void wait(const TaskID id);
 
         void do_work();
+        uint32_t get_worker_id();
 
         void stop();
     }

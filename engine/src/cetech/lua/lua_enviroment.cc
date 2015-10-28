@@ -452,7 +452,7 @@ namespace cetech {
     namespace lua_enviroment_globals {
         void init() {
             log::info("lua_enviroment_globals", "Init");
-                        
+
             char* p = _globals.buffer;
             _globals.data = new(p) LuaEnviromentData();
 
@@ -461,7 +461,7 @@ namespace cetech {
 
         void shutdown() {
             log::info("lua_enviroment_globals", "Shutdown");
-            
+
             lua_enviroment::shutdown();
             _globals.data->~LuaEnviromentData();
             _globals = Globals();
