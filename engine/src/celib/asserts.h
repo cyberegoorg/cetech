@@ -45,7 +45,7 @@
                                                                                   __PRETTY_FUNCTION__) : \
                                              cetech::ce_noop(); } while (0)
 #else
-  #define CE_ASSERT_MSG(condition, where, what) do {} while (0)
+  #define CE_ASSERT_MSG(condition, msg) do {} while (0)
 #endif
 
 #define SHORT_FILE(filename) (strrchr(filename, '/') ? strrchr(filename, '/') + 1 : filename)
