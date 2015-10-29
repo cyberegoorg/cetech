@@ -142,6 +142,13 @@ namespace cetech {
 
             _worker_id = (uint64_t)data; // TODO: (uint64_t)?? !!!
 
+//             cpu_set_t cpuset;
+//             CPU_ZERO(&cpuset);
+//             CPU_SET(_worker_id, &cpuset);
+// 
+//             pthread_t current_thread = pthread_self();
+//             CE_ASSERT(!pthread_setaffinity_np(current_thread, sizeof(cpu_set_t), &cpuset));
+            
             log::info("task_worker", "Worker init %d", _worker_id);
 
             while (_globals.data->flags.run) {

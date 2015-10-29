@@ -5,7 +5,6 @@
 #include "celib/memory/memory_types.h"
 
 namespace cetech {
-
     /*! Array container.
      */
     template < typename T > struct Array {
