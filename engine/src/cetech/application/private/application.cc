@@ -203,7 +203,7 @@ namespace cetech {
             develop_manager::push_record_float("engine.delta_time", dt);
             develop_manager::push_record_float("engine.frame_rate", 1.0f / dt);
 #endif
-            
+
             if (!data._flags.daemon_mod) {
                 renderer::begin_frame();
             }
@@ -224,7 +224,7 @@ namespace cetech {
             develop_manager::send_buffer();
             develop_manager::clear();
 #endif
-            
+
             ++(data._frame_id);
 
             if (!data._flags.daemon_mod) {
@@ -269,7 +269,7 @@ namespace cetech {
                     NULL_TASK, frame_task, task_manager::WorkerAffinity::MAIN_THEAD
                     );
 #endif
-                
+
                 task_manager::TaskID frame_end_task = task_manager::add_begin(
                     frame_end_tick, nullptr, 0,
                     frame_task, NULL_TASK, task_manager::WorkerAffinity::MAIN_THEAD

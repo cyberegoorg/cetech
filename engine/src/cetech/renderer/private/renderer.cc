@@ -108,7 +108,7 @@ namespace cetech {
 #if defined(CETECH_DEVELOP)
             console_server::register_command("renderer.resize", cmd_renderer_resize);
 #endif
-            
+
             #if defined(CETECH_SDL2)
             sdlSetWindow(window.wnd);
             #endif
