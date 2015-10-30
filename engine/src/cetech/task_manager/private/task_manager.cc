@@ -10,6 +10,8 @@
 
 #include <unistd.h>
 
+#include "cetech/task_manager/private/taskqueue.h"
+
 #define TASK_INITIALIZER { { 0 }, { 0 }, { 0 }, 0, 0, WorkerAffinity::NONE, { 0, 0 } }
 
 //TODO: REWRITE !!! #62
@@ -41,49 +43,6 @@ namespace cetech {
         };
 
 
-        struct TaskQueue {
-            enum {
-                MASK = MAX_TASK - 1u
-            };
-
-            Spinlock _lock;
-            uint32_t _top;
-            uint32_t _bottom;
-
-            uint32_t _data[MAX_TASK];
-
-            TaskQueue() : _top(0), _bottom(0) {
-                memset(_data, 0, sizeof(uint32_t) * MAX_TASK);
-            }
-        };
-
-        namespace taskqueue {
-            void push(TaskQueue& q, uint32_t task) {
-                thread::spin_lock(q._lock);
-
-                q._data[q._bottom & TaskQueue ::MASK] = task + 1;
-                ++q._bottom;
-
-                thread::spin_unlock(q._lock);
-            }
-
-            uint32_t pop(TaskQueue& q) {
-                thread::spin_lock(q._lock);
-
-                const int jobCount = q._bottom - q._top;
-                if (jobCount <= 0) {
-                    thread::spin_unlock(q._lock);
-                    return 0;
-                }
-
-                uint32_t task = q._data[q._top & TaskQueue ::MASK];
-                ++q._top;
-
-                thread::spin_unlock(q._lock);
-                return task;
-            }
-        }
-
         static thread_local uint32_t _worker_id = 0; // Worker id (thanks thread_local)
         struct TaskManagerData {
             Spinlock _lock;
@@ -95,9 +54,9 @@ namespace cetech {
 
             Array < Thread > _workers;
 
-            TaskQueue _global_queue;
+            TaskQueue<MAX_TASK> _global_queue;
 
-            TaskQueue _workers_queue[3]; // TODO: dynamic
+            TaskQueue<MAX_TASK> _workers_queue[10]; // TODO: dynamic
 
             Allocator& _allocator;
 
@@ -142,13 +101,13 @@ namespace cetech {
 
             _worker_id = (uint64_t)data; // TODO: (uint64_t)?? !!!
 
-//             cpu_set_t cpuset;
-//             CPU_ZERO(&cpuset);
-//             CPU_SET(_worker_id, &cpuset);
-// 
-//             pthread_t current_thread = pthread_self();
-//             CE_ASSERT(!pthread_setaffinity_np(current_thread, sizeof(cpu_set_t), &cpuset));
-            
+// //             cpu_set_t cpuset;
+// //             CPU_ZERO(&cpuset);
+// //             CPU_SET(_worker_id, &cpuset);
+// //
+// //             pthread_t current_thread = pthread_self();
+// //             CE_ASSERT(!pthread_setaffinity_np(current_thread, sizeof(cpu_set_t), &cpuset));
+
             log::info("task_worker", "Worker init %d", _worker_id);
 
             while (_globals.data->flags.run) {
@@ -229,8 +188,6 @@ namespace cetech {
                     continue;
                 }
 
-                t->id.i = 0;
-
                 if (t->parent.i != 0) {
                     Task* parent_task = get_task(t->parent);
                     --parent_task->job_count;
@@ -240,9 +197,15 @@ namespace cetech {
                     }
                 }
 
+                t->id.i = 0;
                 tm._open_task[i] = tm._open_task[tm._open_task_count - 1];
                 --tm._open_task_count;
-                continue;
+
+                // must process swaped item
+                t = &tm._task_pool[tm._open_task[i]];
+                if (t->depend.i == id.i) {
+                    push_task(get_task(t->depend));
+                }
             }
 
             thread::spin_unlock(tm._lock);
@@ -275,7 +238,7 @@ namespace cetech {
             //const uint32_t id = _worker_id + 1;
             uint32_t poped_task;
 
-            TaskQueue& q = tm._workers_queue[_worker_id];
+            TaskQueue<MAX_TASK>& q = tm._workers_queue[_worker_id];
             poped_task = taskqueue::pop(q);
             if (poped_task != 0) {
                 Task t = tm._task_pool[poped_task - 1];
@@ -407,7 +370,6 @@ namespace cetech {
 
             tm.flags.run = 0;
         }
-
     }
 
     namespace task_manager_globals {
