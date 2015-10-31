@@ -9,13 +9,20 @@ namespace cetech {
     template<int SIZE>
     struct TaskQueue {
         enum {
-            MASK = SIZE - 1u
+            MASK = SIZE - 1u,
+            CACHE_SIZE = 64
         };
+        typedef char            cacheline_pad_t [CACHE_SIZE];
 
-        std::atomic<size_t> enqueue_pos;
-        std::atomic<size_t> dequeue_pos;
+
         std::atomic<size_t> sequences[SIZE];
+        cacheline_pad_t pad0_;
+        std::atomic<size_t> enqueue_pos;
+        cacheline_pad_t pad1_;
+        std::atomic<size_t> dequeue_pos;
+        cacheline_pad_t pad2_;
         uint32_t _task_ids[SIZE];
+        cacheline_pad_t pad3_;
 
         TaskQueue() {
             memset(_task_ids, 0, sizeof(uint32_t) * SIZE);
