@@ -46,11 +46,11 @@ namespace cetech {
         static thread_local uint32_t _worker_id = 0; // Worker id (thanks thread_local)
         struct TaskManagerData {
             Spinlock _lock;
+            
+            uint32_t _open_task_count;     //!< Open task count
+            uint32_t _open_task[MAX_TASK]; //!< Open task
 
-            uint32_t _open_task_count;        //!< Open task count
-            uint32_t _open_task[MAX_TASK];    //!< Open task
-
-            Task _task_pool[MAX_TASK];        //!< Task pool
+            Task _task_pool[MAX_TASK];     //!< Task pool
 
             Array < Thread > _workers;
 
@@ -101,12 +101,14 @@ namespace cetech {
 
             _worker_id = (uint64_t)data; // TODO: (uint64_t)?? !!!
 
-// //             cpu_set_t cpuset;
-// //             CPU_ZERO(&cpuset);
-// //             CPU_SET(_worker_id, &cpuset);
-// //
-// //             pthread_t current_thread = pthread_self();
-// //             CE_ASSERT(!pthread_setaffinity_np(current_thread, sizeof(cpu_set_t), &cpuset));
+#if defined(CETECH_LINUX)
+            cpu_set_t cpuset;
+            CPU_ZERO(&cpuset);
+            CPU_SET(_worker_id, &cpuset);
+
+            pthread_t current_thread = pthread_self();
+            CE_ASSERT(!pthread_setaffinity_np(current_thread, sizeof(cpu_set_t), &cpuset));
+#endif
 
             log::info("task_worker", "Worker init %d", _worker_id);
 
@@ -153,9 +155,13 @@ namespace cetech {
         void push_task(Task* task) {
             CE_CHECK_PTR(_globals.data);
             TaskManagerData& tm = *_globals.data;
+            
+            CE_ASSERT(task->job_count == 1);
 
             WorkerAffinity::Enum aff = task->worker_affinity;
-
+            
+            //printf("open task: %d\n", tm._open_task_count);
+            
             switch (aff) {
             case WorkerAffinity::NONE:
                 taskqueue::push(tm._global_queue, task->id.i);
@@ -174,36 +180,38 @@ namespace cetech {
             CE_CHECK_PTR(_globals.data);
             TaskManagerData& tm = *_globals.data;
 
+            //printf("mark: %d\n", id.i);
             thread::spin_lock(tm._lock);
+            Task* task =  get_task(id);
+            task->id.i = 0;
+
+            if (task->parent.i != 0) {
+                Task* parent_task = get_task(task->parent);
+                parent_task->job_count = parent_task->job_count - 1;
+
+                //printf("mark: %d mark parent: %d, count %d\n", id.i, parent_task->id.i, parent_task->job_count);
+                
+                if (parent_task->job_count == 1) {
+                    push_task(parent_task);
+                }
+            }
 
             for (uint32_t i = 0; i < tm._open_task_count; ++i) {
                 Task* t = &tm._task_pool[tm._open_task[i]];
 
-                if (t->id.i != id.i) {
-
-                    if (t->depend.i == id.i) {
-                        push_task(get_task(t->depend));
-                    }
-
-                    continue;
+                if(t == task) {
+                    tm._open_task[i] = tm._open_task[tm._open_task_count - 1];
+                    tm._open_task_count = tm._open_task_count - 1;
+                    break;
                 }
 
-                if (t->parent.i != 0) {
-                    Task* parent_task = get_task(t->parent);
-                    --parent_task->job_count;
+            }
 
-                    if (parent_task->job_count == 1) {
-                        push_task(parent_task);
-                    }
-                }
+            for (uint32_t i = 0; i < tm._open_task_count; ++i) {
+                Task* t = &tm._task_pool[tm._open_task[i]];
 
-                t->id.i = 0;
-                tm._open_task[i] = tm._open_task[tm._open_task_count - 1];
-                --tm._open_task_count;
-
-                // must process swaped item
-                t = &tm._task_pool[tm._open_task[i]];
                 if (t->depend.i == id.i) {
+                    //printf("dep mark: %d\n", t->depend.i);
                     push_task(get_task(t->depend));
                 }
             }
@@ -219,15 +227,21 @@ namespace cetech {
             CE_CHECK_PTR(_globals.data);
             TaskManagerData& tm = *_globals.data;
 
-            for (uint32_t i = 0; i < tm._open_task_count; ++i) {
+            thread::spin_lock(tm._lock);
+            const uint32_t count = tm._open_task_count;
+            bool ret = true;
+
+            for (uint32_t i = 0; i < count; ++i) {
                 if (tm._task_pool[tm._open_task[i]].id.i != id.i) {
                     continue;
                 }
 
-                return false;
+                ret = false;
+                break;
             }
 
-            return true;
+            thread::spin_unlock(tm._lock);
+            return ret;
         }
 
         Task task_pop_new_work() {
@@ -261,6 +275,11 @@ namespace cetech {
             return _worker_id;
         }
 
+        uint32_t open_task_count() {
+            TaskManagerData& tm = *_globals.data;
+            return tm._open_task_count;
+        }
+        
         TaskID add_begin(const TaskWorkFce_t fce,
                          void* data,
                          const uint32_t priority,
@@ -275,7 +294,7 @@ namespace cetech {
 
             uint32_t task = _new_task();
 
-            Task t;
+            Task &t = tm._task_pool[task];
             t.id = { task },
             t.priority = priority,
             t.clb = callback,
@@ -284,15 +303,13 @@ namespace cetech {
             t.parent = parent,
             t.worker_affinity = worker_affinity;
 
-            tm._task_pool[task] = t;
-
             if (parent.i != 0) {
-                Task* t = get_task(parent);
-                ++t->job_count;
+                Task* paren_task = get_task(parent);
+                paren_task->job_count = paren_task->job_count + 1;
             }
 
             tm._open_task[tm._open_task_count] = task;
-            ++tm._open_task_count;
+            tm._open_task_count = tm._open_task_count + 1;
 
             return (TaskID) {
                        task
@@ -308,22 +325,32 @@ namespace cetech {
         }
 
         void add_end(const TaskID* tasks, const uint32_t count) {
+            CE_CHECK_PTR(_globals.data);
+            TaskManagerData& tm = *_globals.data;
+            
+            //thread::spin_lock(tm._lock);
             for (uint32_t i = 0; i < count; ++i) {
                 Task* t = get_task(tasks[i]);
 
-                --t->job_count;
+                t->job_count = t->job_count - 1;
+            }
+
+            for (uint32_t i = 0; i < count; ++i) {
+                Task* t = get_task(tasks[i]);
 
                 if (t->job_count == 1) {
                     push_task(t);
                 }
             }
+            //thread::spin_unlock(tm._lock);
         }
 
         void do_work() {
             Task t = task_pop_new_work();
 
             if (t.id.i == 0) {
-                usleep(0);
+                //usleep(0);
+                pthread_yield();
                 return;
             }
 
@@ -332,7 +359,6 @@ namespace cetech {
             t.clb.fce(t.clb.data);
 
             mark_task_job_done(t.id);
-
         }
 
         void wait(const TaskID id) {

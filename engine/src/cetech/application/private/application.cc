@@ -241,6 +241,8 @@ namespace cetech {
 
 
             while (data._flags.run) {
+                //printf("frame start\n");
+                
                 process_os();
 
                 task_manager::TaskID frame_task = task_manager::add_empty_begin(0);
@@ -258,9 +260,14 @@ namespace cetech {
                     );
 
 
+                task_manager::TaskID frame_end_task = task_manager::add_begin(
+                    frame_end_tick, nullptr, 0,
+                    NULL_TASK, frame_task, task_manager::WorkerAffinity::MAIN_THEAD
+                    );
+
                 task_manager::TaskID frame_begin_task = task_manager::add_begin(
                     frame_begin_tick, nullptr, 0,
-                    NULL_TASK, frame_task, task_manager::WorkerAffinity::MAIN_THEAD
+                    NULL_TASK, frame_end_task, task_manager::WorkerAffinity::MAIN_THEAD
                     );
 
 #if defined(CETECH_DEVELOP)
@@ -269,11 +276,6 @@ namespace cetech {
                     NULL_TASK, frame_task, task_manager::WorkerAffinity::MAIN_THEAD
                     );
 #endif
-
-                task_manager::TaskID frame_end_task = task_manager::add_begin(
-                    frame_end_tick, nullptr, 0,
-                    frame_task, NULL_TASK, task_manager::WorkerAffinity::MAIN_THEAD
-                    );
 
 
                 const task_manager::TaskID task_end[] = {
@@ -290,7 +292,11 @@ namespace cetech {
                 };
                 task_manager::add_end(task_end, sizeof(task_end) / sizeof(task_manager::TaskID));
 
+                //printf("w: %d\n", task_manager::open_task_count());
                 task_manager::wait(frame_task);
+                //printf("ww: %d\n", task_manager::open_task_count());
+                //CE_ASSERT(task_manager::open_task_count() == 0);
+                //printf("frame end\n");
             }
 
             shutdown();
