@@ -295,6 +295,11 @@ namespace cetech {
 
                 task_manager::add_end(task_end, sizeof(task_end) / sizeof(task_manager::TaskID));
                 task_manager::wait(frame_task);
+                
+                if(task_manager::open_task_count() != 0) {
+                    printf("c: %d \n", task_manager::open_task_count());
+                }
+
                 CE_ASSERT(task_manager::open_task_count() == 0);
             }
 

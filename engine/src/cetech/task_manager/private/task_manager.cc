@@ -172,9 +172,11 @@ namespace cetech {
             CE_CHECK_PTR(_globals.data);
             TaskManagerData& tm = *_globals.data;
 
-            const uint32_t count = tm._open_task_count;
-            bool ret = true;
+            bool ret;
+            uint32_t count = 0;
 
+            ret = true;
+            count = tm._open_task_count;
             for (uint32_t i = 0; i < count; ++i) {
                 if (&tm._task_pool[tm._open_task[i]] != task) {
                     continue;
@@ -199,15 +201,14 @@ namespace cetech {
             if (task->parent) {
                 --task->parent->job_count;
             }
-
+            
+            --task->job_count;
             size_t s = tm._open_task_count;
-
             for (uint32_t i = 0; i < s; ++i) {
                 Task* t = &tm._task_pool[tm._open_task[i]];
 
                 if (t == task) {
                     size_t idx = --tm._open_task_count;
-
                     tm._open_task[i] = tm._open_task[idx];
 
                     task->used = 0;
