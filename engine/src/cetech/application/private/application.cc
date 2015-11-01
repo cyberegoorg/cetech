@@ -211,7 +211,6 @@ namespace cetech {
             if (!data._flags.pause) {
                 lua_enviroment::call_global("update", "f", dt);
                 lua_enviroment::clean_temp();
-                usleep(16 * 1000);
             }
         }
 
@@ -301,6 +300,7 @@ namespace cetech {
                 }
 
                 CE_ASSERT(task_manager::open_task_count() == 0);
+                usleep(16 * 1000);
             }
 
             shutdown();
