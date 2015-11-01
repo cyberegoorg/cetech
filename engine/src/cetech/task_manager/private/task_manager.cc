@@ -336,8 +336,8 @@ namespace cetech {
             Task* t = task_pop_new_work();
 
             if (t == 0) {
-                usleep(0);
-                //pthread_yield();
+                //usleep(0);
+                pthread_yield();
                 return;
             }
 

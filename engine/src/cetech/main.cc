@@ -138,10 +138,10 @@ bool big_init() {
     posix_init();
 #endif
 
-    memory_globals::init();
-
     log_globals::init();
     log::register_handler(&log_handlers::stdout_handler);
+
+    memory_globals::init();
 
     filesystem_globals::init();
 
@@ -269,8 +269,9 @@ void big_shutdown() {
     lua_enviroment_globals::shutdown();
 
     filesystem_globals::shutdown();
-    log_globals::shutdown();
+
     memory_globals::shutdown();
+    log_globals::shutdown();
 }
 
 int main(int argc, const char** argv) {
