@@ -101,8 +101,9 @@ namespace cetech {
                              const int line,
                              const char* fce) {
         char* trace = stacktrace(2);
-        
-        log::error("assert", "\'%s\' in %s:%i:%s.\nstacktrace:\n%s\n", condition_str, SHORT_FILE(file), line, fce, trace);
+
+        log::error("assert", "\'%s\' in %s:%i:%s.\nstacktrace:\n%s\n", condition_str, SHORT_FILE(file), line, fce,
+                   trace);
 
         free(trace);
         abort();
@@ -115,14 +116,16 @@ namespace cetech {
                                  const char* fce) {
 
         char* trace = stacktrace(2);
-        log::error("assert", "\'%s\': \"%s\" %s:%i:%s.\nstacktrace:\n%s\n", where, what, SHORT_FILE(file), line, fce, trace);
+        log::error("assert", "\'%s\': \"%s\" %s:%i:%s.\nstacktrace:\n%s\n", where, what, SHORT_FILE(
+                       file), line, fce, trace);
         free(trace);
         abort();
     }
 
     CE_INLINE void ce_check_ptr(const char* file, const int line) {
         char* trace = stacktrace(2);
-        log::error("assert.check_ptr", "in file %s on line %i is invalid pointer.\nstacktrace:\n%s\n \n", SHORT_FILE(file), line, trace);
+        log::error("assert.check_ptr", "in file %s on line %i is invalid pointer.\nstacktrace:\n%s\n \n",
+                   SHORT_FILE(file), line, trace);
         free(trace);
         abort();
     }

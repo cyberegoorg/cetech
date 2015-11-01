@@ -19,7 +19,7 @@ namespace cetech {
             void* handlers_data[MAX_HANDLERS];
             uint8_t handlers_count;
 
-            LogData(){
+            LogData() {
                 memset(this, 0, sizeof(LogData));
             }
         };
@@ -56,7 +56,7 @@ namespace cetech {
         void register_handler(handler_t handler, void* data) {
             CE_CHECK_PTR( _globals.data );
             LogData& log_data = *_globals.data;
-            
+
             uint8_t count = log_data.handlers_count;
             ++log_data.handlers_count;
 
@@ -68,7 +68,7 @@ namespace cetech {
             CE_CHECK_PTR( _globals.data );
             LogData& log_data = *_globals.data;
 
-            
+
             uint8_t count = log_data.handlers_count;
             for (uint32_t i = 0; i < count; ++i) {
                 if (log_data.handlers[i] != handler) {

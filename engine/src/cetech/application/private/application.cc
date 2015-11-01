@@ -211,7 +211,7 @@ namespace cetech {
             if (!data._flags.pause) {
                 lua_enviroment::call_global("update", "f", dt);
                 lua_enviroment::clean_temp();
-                usleep(16*1000);
+                usleep(16 * 1000);
             }
         }
 
@@ -247,32 +247,34 @@ namespace cetech {
 
                 task_manager::TaskID frame_task = task_manager::add_empty_begin();
 
-                task_manager::TaskID input_task = task_manager::add_empty_begin(task_manager::Priority::Normal, NULL_TASK, frame_task);
+                task_manager::TaskID input_task = task_manager::add_empty_begin(task_manager::Priority::High,
+                                                                                NULL_TASK,
+                                                                                frame_task);
 
                 task_manager::TaskID process_mouse_task = task_manager::add_begin(
-                    process_mouse, nullptr, task_manager::Priority::Normal,
+                    process_mouse, nullptr, task_manager::Priority::High,
                     NULL_TASK, input_task
                     );
 
                 task_manager::TaskID process_keyboard_task = task_manager::add_begin(
-                    process_keyboard, nullptr,  task_manager::Priority::Normal,
+                    process_keyboard, nullptr, task_manager::Priority::High,
                     NULL_TASK, input_task
                     );
 
 
                 task_manager::TaskID frame_end_task = task_manager::add_begin(
-                    frame_end_tick, nullptr,  task_manager::Priority::Normal,
+                    frame_end_tick, nullptr, task_manager::Priority::High,
                     NULL_TASK, frame_task, task_manager::WorkerAffinity::MAIN_THEAD
                     );
 
                 task_manager::TaskID frame_begin_task = task_manager::add_begin(
-                    frame_begin_tick, nullptr,  task_manager::Priority::Normal,
+                    frame_begin_tick, nullptr, task_manager::Priority::High,
                     NULL_TASK, frame_end_task, task_manager::WorkerAffinity::MAIN_THEAD
                     );
 
 #if defined(CETECH_DEVELOP)
                 task_manager::TaskID console_server_task = task_manager::add_begin(
-                    console_server_tick, nullptr,  task_manager::Priority::Normal,
+                    console_server_tick, nullptr, task_manager::Priority::High,
                     NULL_TASK, frame_task, task_manager::WorkerAffinity::MAIN_THEAD
                     );
 #endif
@@ -290,12 +292,10 @@ namespace cetech {
                     frame_task,
                     input_task
                 };
-                task_manager::add_end(task_end, sizeof(task_end) / sizeof(task_manager::TaskID));
 
-                //printf("w: %d\n", task_manager::open_task_count());
+                task_manager::add_end(task_end, sizeof(task_end) / sizeof(task_manager::TaskID));
                 task_manager::wait(frame_task);
-                //printf("ww: %d\n", task_manager::open_task_count());
-                //printf("frame end\n");
+                CE_ASSERT(task_manager::open_task_count() == 0);
             }
 
             shutdown();
