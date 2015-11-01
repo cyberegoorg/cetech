@@ -93,9 +93,9 @@ namespace {
                     if (!mem_trace[i].used) {
                         continue;
                     }
-                
+
                     log::error("memory", "LEAK: %p\ntraceback:\n%s", mem_trace[i].p,
-                            mem_trace[i].traceback);
+                               mem_trace[i].traceback);
                     deallocate(mem_trace[i].p);
                 }
 

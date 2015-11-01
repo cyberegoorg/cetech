@@ -46,7 +46,7 @@ namespace cetech {
          * \param thread Thread.
          */
         void wait(Thread thread, int* status);
-        
+
         /*!
          * Get id for thread.
          * \param thread Thread.

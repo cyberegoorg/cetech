@@ -31,7 +31,7 @@ namespace cetech {
                 Count
             };
         };
-        
+
         struct TaskID {
             uint32_t i;
         };

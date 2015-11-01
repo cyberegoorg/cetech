@@ -4,8 +4,8 @@
 #include <atomic>
 
 namespace cetech {
-    // Based on http://www.1024cores.net/home/lock-free-algorithms/queues/bounded-mpmc-queue (thanks Dmitry Vyukov =))
 
+    // Based on http://www.1024cores.net/home/lock-free-algorithms/queues/bounded-mpmc-queue (thanks Dmitry Vyukov =))
     template < typename T, int SIZE >
     struct TaskQueue {
         enum {
@@ -14,13 +14,13 @@ namespace cetech {
         };
         typedef char cacheline_pad_t[CACHE_SIZE];
 
-        T _task_ids[SIZE];
-        cacheline_pad_t pad0_;
         std::atomic < size_t > sequences[SIZE];
-        cacheline_pad_t pad1_;
+        cacheline_pad_t pad0_;
         std::atomic < size_t > enqueue_pos;
-        cacheline_pad_t pad2_;
+        cacheline_pad_t pad1_;
         std::atomic < size_t > dequeue_pos;
+        cacheline_pad_t pad2_;
+        T _task_ids[SIZE];
         cacheline_pad_t pad3_;
 
         TaskQueue() {
@@ -39,13 +39,13 @@ namespace cetech {
         template < typename T, int SIZE >
         size_t size(TaskQueue < T, SIZE >& q) {
             //(((B)->end + 1) % (B)->length - (B)->start - 1)
-            
-            size_t e = q.enqueue_pos & TaskQueue < T, SIZE >::MASK;
-            size_t d = q.dequeue_pos & TaskQueue < T, SIZE >::MASK;
+
+            size_t e = q.enqueue_pos & TaskQueue < T, SIZE > ::MASK;
+            size_t d = q.dequeue_pos & TaskQueue < T, SIZE > ::MASK;
 
             return (e > d) ? (e - d) : (d - e);
         }
-        
+
         template < typename T, int SIZE >
         void push(TaskQueue < T, SIZE >& q, T task) {
             size_t pos = q.enqueue_pos.load(std::memory_order_relaxed);

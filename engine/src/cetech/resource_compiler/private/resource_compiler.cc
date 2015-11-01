@@ -233,7 +233,11 @@ namespace cetech {
                     ct.clb = clb;
 
                     task_manager::TaskID tid =
-                        task_manager::add_begin(compile_task, &ct,  task_manager::Priority::Normal, NULL_TASK, top_compile_task);
+                        task_manager::add_begin(compile_task,
+                                                &ct,
+                                                task_manager::Priority::Normal,
+                                                NULL_TASK,
+                                                top_compile_task);
                     task_manager::add_end(&tid, 1);
                 }
 
