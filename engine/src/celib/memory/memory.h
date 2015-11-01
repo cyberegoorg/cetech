@@ -77,8 +77,20 @@ namespace cetech {
     /*! Frees an object allocated with MAKE_NEW. */
     #define MAKE_DELETE(a, T, p)    do {if (p) {(p)->~T(); a.deallocate(p); }} while (0)
 
-
     namespace memory {
+        template<typename T, typename... ARGS>
+        CE_INLINE T* alloc_array(Allocator &allocator, const size_t size, ARGS... args) {
+            T* mem = (T*) allocator.allocate(sizeof(T)*size, alignof(T));
+            char* p = (char*)mem;
+
+            for(size_t i = 0; i < size; ++i) {
+                new (p) T(args...);
+                p += sizeof(T);
+            }
+
+            return mem;
+        }
+
         /*! Allign pointer.
          * \param p Pointer.
          * \param align Align.

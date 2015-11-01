@@ -245,34 +245,34 @@ namespace cetech {
 
                 process_os();
 
-                task_manager::TaskID frame_task = task_manager::add_empty_begin(0);
+                task_manager::TaskID frame_task = task_manager::add_empty_begin();
 
-                task_manager::TaskID input_task = task_manager::add_empty_begin(0, NULL_TASK, frame_task);
+                task_manager::TaskID input_task = task_manager::add_empty_begin(task_manager::Priority::Normal, NULL_TASK, frame_task);
 
                 task_manager::TaskID process_mouse_task = task_manager::add_begin(
-                    process_mouse, nullptr, 0,
+                    process_mouse, nullptr, task_manager::Priority::Normal,
                     NULL_TASK, input_task
                     );
 
                 task_manager::TaskID process_keyboard_task = task_manager::add_begin(
-                    process_keyboard, nullptr, 0,
+                    process_keyboard, nullptr,  task_manager::Priority::Normal,
                     NULL_TASK, input_task
                     );
 
 
                 task_manager::TaskID frame_end_task = task_manager::add_begin(
-                    frame_end_tick, nullptr, 0,
+                    frame_end_tick, nullptr,  task_manager::Priority::Normal,
                     NULL_TASK, frame_task, task_manager::WorkerAffinity::MAIN_THEAD
                     );
 
                 task_manager::TaskID frame_begin_task = task_manager::add_begin(
-                    frame_begin_tick, nullptr, 0,
+                    frame_begin_tick, nullptr,  task_manager::Priority::Normal,
                     NULL_TASK, frame_end_task, task_manager::WorkerAffinity::MAIN_THEAD
                     );
 
 #if defined(CETECH_DEVELOP)
                 task_manager::TaskID console_server_task = task_manager::add_begin(
-                    console_server_tick, nullptr, 0,
+                    console_server_tick, nullptr,  task_manager::Priority::Normal,
                     NULL_TASK, frame_task, task_manager::WorkerAffinity::MAIN_THEAD
                     );
 #endif
@@ -295,7 +295,6 @@ namespace cetech {
                 //printf("w: %d\n", task_manager::open_task_count());
                 task_manager::wait(frame_task);
                 //printf("ww: %d\n", task_manager::open_task_count());
-                //CE_ASSERT(task_manager::open_task_count() == 0);
                 //printf("frame end\n");
             }
 
@@ -305,7 +304,7 @@ namespace cetech {
         void quit() {
             ApplictionData* data = _globals.data;
             data->_flags.run = 0;
-            task_manager::stop();
+            //task_manager::stop();
         }
 
         bool is_run() {

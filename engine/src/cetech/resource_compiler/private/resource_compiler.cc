@@ -172,7 +172,7 @@ namespace cetech {
 
             static StringId64_t in_dirs[] = {CORE_DIR, SRC_DIR};
 
-            task_manager::TaskID top_compile_task = task_manager::add_empty_begin(0);
+            task_manager::TaskID top_compile_task = task_manager::add_empty_begin();
 
             Array < char* > files(memory_globals::default_allocator());
             for (int i = 0; i < sizeof(in_dirs) / sizeof(StringId64_t); ++i) {
@@ -233,7 +233,7 @@ namespace cetech {
                     ct.clb = clb;
 
                     task_manager::TaskID tid =
-                        task_manager::add_begin(compile_task, &ct, 0, NULL_TASK, top_compile_task);
+                        task_manager::add_begin(compile_task, &ct,  task_manager::Priority::Normal, NULL_TASK, top_compile_task);
                     task_manager::add_end(&tid, 1);
                 }
 

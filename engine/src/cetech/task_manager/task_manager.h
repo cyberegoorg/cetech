@@ -23,19 +23,29 @@ namespace cetech {
             };
         };
 
-        typedef void (* TaskWorkFce_t)(void*);
+        struct Priority {
+            enum Enum {
+                High = 0,
+                Normal,
+                Low,
+                Count
+            };
+        };
+        
         struct TaskID {
             uint32_t i;
         };
 
+        typedef void (* TaskWorkFce_t)(void*);
+
         TaskID add_begin(const TaskWorkFce_t fce,
                          void* data,
-                         const uint32_t priority,
+                         const Priority::Enum priority = Priority::Normal,
                          const TaskID depend = NULL_TASK,
                          const TaskID parent = NULL_TASK,
                          const WorkerAffinity::Enum worker_affinity = WorkerAffinity::NONE);
 
-        TaskID add_empty_begin(const uint32_t priority,
+        TaskID add_empty_begin(const Priority::Enum priority = Priority::Normal,
                                const TaskID depend = NULL_TASK,
                                const TaskID parent = NULL_TASK,
                                const WorkerAffinity::Enum worker_affinity = WorkerAffinity::NONE);
@@ -50,7 +60,6 @@ namespace cetech {
         void stop();
 
         uint32_t open_task_count();
-        //printf("count %d\n", tm._open_task_count);
     }
 
     namespace task_manager_globals {

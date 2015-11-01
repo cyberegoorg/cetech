@@ -264,12 +264,11 @@ void big_shutdown() {
 
     application_globals::shutdown();
 
-    task_manager_globals::shutdown();
-
     lua_enviroment_globals::shutdown();
 
     filesystem_globals::shutdown();
 
+    task_manager_globals::shutdown();
     memory_globals::shutdown();
     log_globals::shutdown();
 }
