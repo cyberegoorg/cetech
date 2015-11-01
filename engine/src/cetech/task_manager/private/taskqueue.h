@@ -6,22 +6,21 @@
 namespace cetech {
     // Based on http://www.1024cores.net/home/lock-free-algorithms/queues/bounded-mpmc-queue (thanks Dmitry Vyukov =))
 
-    template<int SIZE>
+    template < typename T, int SIZE >
     struct TaskQueue {
         enum {
             MASK = SIZE - 1u,
             CACHE_SIZE = 64
         };
-        typedef char            cacheline_pad_t [CACHE_SIZE];
+        typedef char cacheline_pad_t[CACHE_SIZE];
 
-
-        std::atomic<size_t> sequences[SIZE];
+        T _task_ids[SIZE];
         cacheline_pad_t pad0_;
-        std::atomic<size_t> enqueue_pos;
+        std::atomic < size_t > sequences[SIZE];
         cacheline_pad_t pad1_;
-        std::atomic<size_t> dequeue_pos;
+        std::atomic < size_t > enqueue_pos;
         cacheline_pad_t pad2_;
-        uint32_t _task_ids[SIZE];
+        std::atomic < size_t > dequeue_pos;
         cacheline_pad_t pad3_;
 
         TaskQueue() {
@@ -37,55 +36,56 @@ namespace cetech {
     };
 
     namespace taskqueue {
-        template<int SIZE>
-        void push(TaskQueue<SIZE>& q, uint32_t task) {
+        template < typename T, int SIZE >
+        void push(TaskQueue < T, SIZE >& q, T task) {
             size_t pos = q.enqueue_pos.load(std::memory_order_relaxed);
 
-            for (;;) {
-              size_t seq = q.sequences[pos & TaskQueue<SIZE> ::MASK].load(std::memory_order_acquire);
+            for (;; ) {
+                size_t seq = q.sequences[pos & TaskQueue < T, SIZE > ::MASK].load(std::memory_order_acquire);
 
-              intptr_t dif = (intptr_t)seq - (intptr_t)pos;
+                intptr_t dif = (intptr_t)seq - (intptr_t)pos;
 
-              if (dif == 0) {
-                if (q.enqueue_pos.compare_exchange_weak(pos, pos + 1, std::memory_order_relaxed))
-                  break;
+                if (dif == 0) {
+                    if (q.enqueue_pos.compare_exchange_weak(pos, pos + 1, std::memory_order_relaxed)) {
+                        break;
+                    }
+                } else if (dif < 0) {
+                    return /*false*/;
 
-              } else if (dif < 0) {
-                return /*false*/;
-
-              } else {
-                pos = q.enqueue_pos.load(std::memory_order_relaxed);
-              }
+                } else {
+                    pos = q.enqueue_pos.load(std::memory_order_relaxed);
+                }
             }
 
-            q._task_ids[pos & TaskQueue<SIZE> ::MASK] = task + 1;
-            q.sequences[pos & TaskQueue<SIZE> ::MASK].store(pos + 1, std::memory_order_release);
+            q._task_ids[pos & TaskQueue < T, SIZE > ::MASK] = task;
+            q.sequences[pos & TaskQueue < T, SIZE > ::MASK].store(pos + 1, std::memory_order_release);
         }
 
-        template<int SIZE>
-        uint32_t pop(TaskQueue<SIZE>& q) {
+        template < typename T, int SIZE >
+        T pop(TaskQueue < T, SIZE >& q) {
             size_t pos = q.dequeue_pos.load(std::memory_order_relaxed);
 
-            for (;;) {
-              size_t seq = q.sequences[pos & TaskQueue<SIZE> ::MASK].load(std::memory_order_acquire);
+            for (;; ) {
+                size_t seq = q.sequences[pos & TaskQueue < T, SIZE > ::MASK].load(std::memory_order_acquire);
 
-              intptr_t dif = (intptr_t)seq - (intptr_t)(pos + 1);
-              if (dif == 0) {
-                if (q.dequeue_pos.compare_exchange_weak(pos, pos + 1, std::memory_order_relaxed)) {
-                    break;
+                intptr_t dif = (intptr_t)seq - (intptr_t)(pos + 1);
+                if (dif == 0) {
+                    if (q.dequeue_pos.compare_exchange_weak(pos, pos + 1, std::memory_order_relaxed)) {
+                        break;
+                    }
+                } else if (dif < 0) {
+                    return 0;
+
+                } else {
+                    pos = q.dequeue_pos.load(std::memory_order_relaxed);
                 }
-
-              } else if (dif < 0) {
-                return 0;
-
-              } else {
-                pos = q.dequeue_pos.load(std::memory_order_relaxed);
-              }
             }
 
-            uint32_t ret = q._task_ids[pos & TaskQueue<SIZE> ::MASK];
+            T ret = q._task_ids[pos & TaskQueue < T, SIZE > ::MASK];
 
-            q.sequences[pos & TaskQueue<SIZE>::MASK].store(pos + TaskQueue<SIZE> ::MASK + 1, std::memory_order_release);
+            q.sequences[pos & TaskQueue < T, SIZE > ::MASK].store(pos + TaskQueue < T,
+                                                                  SIZE > ::MASK + 1,
+                                                                  std::memory_order_release);
 
             return ret;
         }
