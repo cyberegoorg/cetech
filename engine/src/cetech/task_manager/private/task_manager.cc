@@ -304,7 +304,7 @@ namespace cetech {
             }
 
             tm._open_task[tm._open_task_count] = task;
-            tm._open_task_count = tm._open_task_count + 1;
+            ++tm._open_task_count;
 
             return (TaskID) {
                        task
@@ -336,7 +336,8 @@ namespace cetech {
             Task* t = task_pop_new_work();
 
             if (t == 0) {
-                pthread_yield();
+                usleep(0);
+                //pthread_yield();
                 return;
             }
 
