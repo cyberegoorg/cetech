@@ -27,7 +27,11 @@ namespace cetech {
         void kill(Thread thread) {
             SDL_DetachThread(thread.t);
         }
-
+        
+        void wait(Thread thread, int* status) {
+            SDL_WaitThread(thread.t, status);
+        }
+        
         uint32_t get_id(Thread thread) {
             return SDL_GetThreadID(thread.t);
         }

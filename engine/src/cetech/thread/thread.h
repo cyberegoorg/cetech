@@ -42,6 +42,12 @@ namespace cetech {
         void kill(Thread thread);
 
         /*!
+         * Wait.
+         * \param thread Thread.
+         */
+        void wait(Thread thread, int* status);
+        
+        /*!
          * Get id for thread.
          * \param thread Thread.
          * \return thread id.

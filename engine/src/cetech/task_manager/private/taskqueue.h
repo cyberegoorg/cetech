@@ -37,6 +37,16 @@ namespace cetech {
 
     namespace taskqueue {
         template < typename T, int SIZE >
+        size_t size(TaskQueue < T, SIZE >& q) {
+            //(((B)->end + 1) % (B)->length - (B)->start - 1)
+            
+            size_t e = q.enqueue_pos & TaskQueue < T, SIZE >::MASK;
+            size_t d = q.dequeue_pos & TaskQueue < T, SIZE >::MASK;
+
+            return (e > d) ? (e - d) : (d - e);
+        }
+        
+        template < typename T, int SIZE >
         void push(TaskQueue < T, SIZE >& q, T task) {
             size_t pos = q.enqueue_pos.load(std::memory_order_relaxed);
 
