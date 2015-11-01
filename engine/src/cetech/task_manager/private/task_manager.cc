@@ -201,13 +201,14 @@ namespace cetech {
             if (task->parent) {
                 --task->parent->job_count;
             }
-            
-            --task->job_count;
+
             size_t s = tm._open_task_count;
             for (uint32_t i = 0; i < s; ++i) {
                 Task* t = &tm._task_pool[tm._open_task[i]];
 
                 if (t == task) {
+                    //--task->job_count;
+
                     size_t idx = --tm._open_task_count;
                     tm._open_task[i] = tm._open_task[idx];
 
