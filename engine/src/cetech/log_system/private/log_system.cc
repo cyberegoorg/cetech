@@ -10,14 +10,18 @@
 namespace cetech {
     namespace {
         using namespace log;
-
-
         struct LogData {
-            Array < handler_t > handlers;
-            Array < void* > handlers_data;
+            enum {
+                MAX_HANDLERS = 32,
+            };
 
-            LogData(Allocator & allocator) : handlers(allocator), handlers_data(allocator) {}
+            handler_t handlers[MAX_HANDLERS];
+            void* handlers_data[MAX_HANDLERS];
+            uint8_t handlers_count;
 
+            LogData(){
+                memset(this, 0, sizeof(LogData));
+            }
         };
 
         struct Globals {
@@ -37,8 +41,8 @@ namespace cetech {
             vsnprintf(msg, 4096, format, va);
 
             time_t tm = std::time(NULL);
-            const uint32_t handlers_count = array::size(data.handlers);
-            for (uint32_t i = 0; i < handlers_count; ++i) {
+            //const uint32_t handlers_count = array::size(data.handlers);
+            for (uint32_t i = 0; i < LogData::MAX_HANDLERS; ++i) {
                 if (data.handlers[i] == nullptr) {
                     continue;
                 }
@@ -52,17 +56,21 @@ namespace cetech {
         void register_handler(handler_t handler, void* data) {
             CE_CHECK_PTR( _globals.data );
             LogData& log_data = *_globals.data;
+            
+            uint8_t count = log_data.handlers_count;
+            ++log_data.handlers_count;
 
-            array::push_back(log_data.handlers, handler);
-            array::push_back(log_data.handlers_data, data);
+            log_data.handlers[count] = handler;
+            log_data.handlers_data[count] = data;
         }
 
         void unregister_handler(handler_t handler) {
             CE_CHECK_PTR( _globals.data );
             LogData& log_data = *_globals.data;
 
-
-            for (uint32_t i = 0; i < array::size(log_data.handlers); ++i) {
+            
+            uint8_t count = log_data.handlers_count;
+            for (uint32_t i = 0; i < count; ++i) {
                 if (log_data.handlers[i] != handler) {
                     continue;
                 }
@@ -136,7 +144,7 @@ namespace cetech {
         void init() {
             char* p = _globals.buffer;
 
-            _globals.data = new(p) LogData(memory_globals::default_allocator());
+            _globals.data = new(p) LogData();
 
             log::info("filesystem_globals", "Initialized");
         }
