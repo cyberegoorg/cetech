@@ -211,7 +211,7 @@ namespace cetech {
             if (!data._flags.pause) {
                 lua_enviroment::call_global("update", "f", dt);
                 lua_enviroment::clean_temp();
-                usleep(100);
+                usleep(16*1000);
             }
         }
 
@@ -242,7 +242,7 @@ namespace cetech {
 
             while (data._flags.run) {
                 //printf("frame start\n");
-                
+
                 process_os();
 
                 task_manager::TaskID frame_task = task_manager::add_empty_begin(0);

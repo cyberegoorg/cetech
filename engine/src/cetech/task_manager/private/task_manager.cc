@@ -28,14 +28,14 @@ namespace cetech {
         };
 
         struct Task {
-            TaskID id;                  //!< Task id
-            TaskID depend;              //!< Task depend
-            TaskID parent;              //!< Task parent
+            TaskWorkCallback clb;      //!< Callback
+            Task* depend;              //!< Task depend
+            Task* parent;              //!< Task parent
 
-            uint32_t priority;                    //!< Task priority
-            uint32_t job_count;                   //!< Task child active job
             WorkerAffinity::Enum worker_affinity; //!< Worker affinity
-            TaskWorkCallback clb;                 //!< Callback
+            std::atomic < uint32_t > job_count;   //!< Task child active job
+            uint32_t priority;                    //!< Task priority
+            bool used;
         };
 
         enum {
@@ -45,20 +45,13 @@ namespace cetech {
 
         static thread_local uint32_t _worker_id = 0; // Worker id (thanks thread_local)
         struct TaskManagerData {
-            Spinlock _lock;
-            
-            uint32_t _open_task_count;     //!< Open task count
-            uint32_t _open_task[MAX_TASK]; //!< Open task
-
-            Task _task_pool[MAX_TASK];     //!< Task pool
-
             Array < Thread > _workers;
-
-            TaskQueue<MAX_TASK> _global_queue;
-
-            TaskQueue<MAX_TASK> _workers_queue[10]; // TODO: dynamic
-
+            uint32_t _open_task[MAX_TASK];  //!< Open task
+            Task _task_pool[MAX_TASK];      //!< Task pool
+            TaskQueue < Task*, MAX_TASK > _workers_queue[10]; // TODO: dynamic
+            TaskQueue < Task*, MAX_TASK > _global_queue;
             Allocator& _allocator;
+            std::atomic < uint32_t > _open_task_count;               //!< Open task count
 
             struct {
                 char run : 1;
@@ -133,10 +126,11 @@ namespace cetech {
             TaskManagerData& tm = *_globals.data;
 
             for (uint32_t i = 1; i < MAX_TASK; ++i) {
-                if (tm._task_pool[i].id.i != 0) {
+                if (tm._task_pool[i].used != 0) {
                     continue;
                 }
 
+                tm._task_pool[i].used = 1;
                 return i;
             }
 
@@ -153,86 +147,33 @@ namespace cetech {
         }
 
         void push_task(Task* task) {
+            CE_ASSERT(task->used);
             CE_CHECK_PTR(_globals.data);
+
             TaskManagerData& tm = *_globals.data;
-            
-            CE_ASSERT(task->job_count == 1);
 
             WorkerAffinity::Enum aff = task->worker_affinity;
-            
-            //printf("open task: %d\n", tm._open_task_count);
-            
+
             switch (aff) {
             case WorkerAffinity::NONE:
-                taskqueue::push(tm._global_queue, task->id.i);
+                taskqueue::push(tm._global_queue, task);
                 break;
 
             default:
-                taskqueue::push(tm._workers_queue[aff - 1], task->id.i);
+                taskqueue::push(tm._workers_queue[aff - 1], task);
                 break;
             }
         }
 
-        /*! Mark job as done.
-         * \param id Task id.
-         */
-        void mark_task_job_done(TaskID id) {
+        bool _task_is_done(Task* task) {
             CE_CHECK_PTR(_globals.data);
             TaskManagerData& tm = *_globals.data;
 
-            //printf("mark: %d\n", id.i);
-            thread::spin_lock(tm._lock);
-            Task* task =  get_task(id);
-            task->id.i = 0;
-
-            if (task->parent.i != 0) {
-                Task* parent_task = get_task(task->parent);
-                parent_task->job_count = parent_task->job_count - 1;
-
-                //printf("mark: %d mark parent: %d, count %d\n", id.i, parent_task->id.i, parent_task->job_count);
-                
-                if (parent_task->job_count == 1) {
-                    push_task(parent_task);
-                }
-            }
-
-            for (uint32_t i = 0; i < tm._open_task_count; ++i) {
-                Task* t = &tm._task_pool[tm._open_task[i]];
-
-                if(t == task) {
-                    tm._open_task[i] = tm._open_task[tm._open_task_count - 1];
-                    tm._open_task_count = tm._open_task_count - 1;
-                    break;
-                }
-
-            }
-
-            for (uint32_t i = 0; i < tm._open_task_count; ++i) {
-                Task* t = &tm._task_pool[tm._open_task[i]];
-
-                if (t->depend.i == id.i) {
-                    //printf("dep mark: %d\n", t->depend.i);
-                    push_task(get_task(t->depend));
-                }
-            }
-
-            thread::spin_unlock(tm._lock);
-        }
-
-        int8_t task_is_null(TaskID id) {
-            return id.i == 0;
-        }
-
-        bool task_is_done(TaskID id) {
-            CE_CHECK_PTR(_globals.data);
-            TaskManagerData& tm = *_globals.data;
-
-            thread::spin_lock(tm._lock);
             const uint32_t count = tm._open_task_count;
             bool ret = true;
 
             for (uint32_t i = 0; i < count; ++i) {
-                if (tm._task_pool[tm._open_task[i]].id.i != id.i) {
+                if (&tm._task_pool[tm._open_task[i]] != task) {
                     continue;
                 }
 
@@ -240,32 +181,87 @@ namespace cetech {
                 break;
             }
 
-            thread::spin_unlock(tm._lock);
             return ret;
         }
 
-        Task task_pop_new_work() {
+        bool task_is_done(TaskID id) {
+            return _task_is_done(get_task(id));
+
+        }
+
+        /*! Mark job as done.
+         * \param id Task id.
+         */
+        void mark_task_job_done(Task* task) {
+            CE_CHECK_PTR(_globals.data);
+            TaskManagerData& tm = *_globals.data;
+
+            if (task->parent) {
+                --task->parent->job_count;
+            }
+
+            for (uint32_t i = 0; i < tm._open_task_count; ++i) {
+                Task* t = &tm._task_pool[tm._open_task[i]];
+
+                if (t == task) {
+                    tm._open_task[i] = tm._open_task[tm._open_task_count - 1];
+                    --tm._open_task_count;
+                    task->used = 0;
+                    break;
+                }
+            }
+        }
+
+        int8_t task_is_null(TaskID id) {
+            return id.i == 0;
+        }
+
+
+
+        bool can_work_on(Task* task) {
+            if (task->job_count != 1) {
+                return false;
+            }
+
+            if ((task->depend) && !_task_is_done(task->depend)) {
+                return false;
+            }
+
+            return true;
+        }
+
+        Task* task_pop_new_work() {
             CE_CHECK_PTR(_globals.data);
             TaskManagerData& tm = *_globals.data;
 
 
-            //const uint32_t id = _worker_id + 1;
-            uint32_t poped_task;
+            Task* poped_task;
 
-            TaskQueue<MAX_TASK>& q = tm._workers_queue[_worker_id];
+            TaskQueue < Task*, MAX_TASK >& q = tm._workers_queue[_worker_id];
             poped_task = taskqueue::pop(q);
             if (poped_task != 0) {
-                Task t = tm._task_pool[poped_task - 1];
-                return t;
+                CE_ASSERT(poped_task->used);
+
+                if (can_work_on(poped_task)) {
+                    return poped_task;
+                } else {
+                    push_task(poped_task);
+                }
             }
 
             poped_task = taskqueue::pop(tm._global_queue);
+
             if (poped_task != 0) {
-                Task t = tm._task_pool[poped_task - 1];
-                return t;
+                CE_ASSERT(poped_task->used);
+
+                if (can_work_on(poped_task)) {
+                    return poped_task;
+                } else {
+                    push_task(poped_task);
+                }
             }
 
-            return (Task)TASK_INITIALIZER;
+            return 0;
         }
 
     }
@@ -279,7 +275,7 @@ namespace cetech {
             TaskManagerData& tm = *_globals.data;
             return tm._open_task_count;
         }
-        
+
         TaskID add_begin(const TaskWorkFce_t fce,
                          void* data,
                          const uint32_t priority,
@@ -294,18 +290,17 @@ namespace cetech {
 
             uint32_t task = _new_task();
 
-            Task &t = tm._task_pool[task];
-            t.id = { task },
+            Task& t = tm._task_pool[task];
             t.priority = priority,
             t.clb = callback,
             t.job_count = 2,
-            t.depend = depend,
-            t.parent = parent,
+            t.depend = depend.i != 0 ? get_task(depend) : 0;
+            t.parent = parent.i != 0 ? get_task(parent) : 0;
             t.worker_affinity = worker_affinity;
 
             if (parent.i != 0) {
                 Task* paren_task = get_task(parent);
-                paren_task->job_count = paren_task->job_count + 1;
+                ++paren_task->job_count;
             }
 
             tm._open_task[tm._open_task_count] = task;
@@ -325,40 +320,31 @@ namespace cetech {
         }
 
         void add_end(const TaskID* tasks, const uint32_t count) {
-            CE_CHECK_PTR(_globals.data);
-            TaskManagerData& tm = *_globals.data;
-            
-            //thread::spin_lock(tm._lock);
             for (uint32_t i = 0; i < count; ++i) {
                 Task* t = get_task(tasks[i]);
 
-                t->job_count = t->job_count - 1;
+                push_task(t);
             }
 
             for (uint32_t i = 0; i < count; ++i) {
                 Task* t = get_task(tasks[i]);
-
-                if (t->job_count == 1) {
-                    push_task(t);
-                }
+                --t->job_count;
             }
-            //thread::spin_unlock(tm._lock);
         }
 
         void do_work() {
-            Task t = task_pop_new_work();
+            Task* t = task_pop_new_work();
 
-            if (t.id.i == 0) {
-                //usleep(0);
+            if (t == 0) {
                 pthread_yield();
                 return;
             }
 
-            CE_ASSERT(t.clb.fce != NULL);
+            CE_ASSERT(t->clb.fce != NULL);
 
-            t.clb.fce(t.clb.data);
+            t->clb.fce(t->clb.data);
 
-            mark_task_job_done(t.id);
+            mark_task_job_done(t);
         }
 
         void wait(const TaskID id) {

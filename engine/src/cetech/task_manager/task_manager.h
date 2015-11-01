@@ -48,7 +48,7 @@ namespace cetech {
         uint32_t get_worker_id();
 
         void stop();
-        
+
         uint32_t open_task_count();
         //printf("count %d\n", tm._open_task_count);
     }
