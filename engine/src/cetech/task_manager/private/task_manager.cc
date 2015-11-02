@@ -75,7 +75,7 @@ namespace cetech {
                 stop();
 
                 for (uint32_t i = 0; i < array::size(_workers); ++i) {
-                    log::debug("task", "Killing worker%u.", i);
+                    log::debug("task", "Killing worker %u.", i + 1);
                     thread::wait(_workers[i], 0);
                 }
 
@@ -385,7 +385,7 @@ namespace cetech {
 
             if (worker_count > 0) {
                 for (uint32_t i = 0; i < worker_count; ++i) {
-                    log::debug("task", "Creating worker %u.", i);
+                    log::debug("task", "Creating worker %u.", i + 1);
                     array::push_back(tm._workers, thread::create_thread(task_worker, "Worker", (void*)(i + 1))); // TODO: (void*)?? !!!
                 }
             }
