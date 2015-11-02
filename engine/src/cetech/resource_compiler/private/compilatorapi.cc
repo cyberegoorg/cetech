@@ -31,7 +31,7 @@ namespace cetech {
 
             document.Parse(tmp);
             if (document.HasParseError()) {
-                log::error("resource_package.compiler", "Parse error: %s", GetParseError_En(
+                log::error("resource_compiler", "[%s] Parse error: %s", filename, GetParseError_En(
                                document.GetParseError()), document.GetErrorOffset());
                 return false;
             }
