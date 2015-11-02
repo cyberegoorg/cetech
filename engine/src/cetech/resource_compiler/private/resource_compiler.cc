@@ -35,7 +35,8 @@ namespace cetech {
         };
 
         enum {
-            TASK_POOL_SIZE = 4096
+            TASK_POOL_SIZE = 4096,
+            TASK_POOL_SIZE_MASK = TASK_POOL_SIZE - 1u
         };
 
         struct ResouceCompilerData {
@@ -58,7 +59,7 @@ namespace cetech {
         CE_INLINE CompileTask& new_compile_task() {
             ResouceCompilerData* data = _globals.data;
 
-            return data->compile_task_pool[(data->compile_task_pool_idx++) % TASK_POOL_SIZE];
+            return data->compile_task_pool[(data->compile_task_pool_idx++) & TASK_POOL_SIZE_MASK];
         };
 
         CE_INLINE void calc_hash(const char* path, StringId64_t& type, StringId64_t& name) {
@@ -82,7 +83,7 @@ namespace cetech {
             CompileTask* ct = (CompileTask*)data;
 
             log::info("resource_compiler",
-                      "Compile \"%s\" => (" "%" PRIx64 ", " "%" PRIx64 ").",
+                      "[%s] Compile => (" "%" PRIx64 ", " "%" PRIx64 ").",
                       ct->filename,
                       ct->type,
                       ct->name);
@@ -92,7 +93,7 @@ namespace cetech {
 
             FSFile& source_file = filesystem::open(ct->source_fs, ct->filename, FSFile::READ);
             if (!source_file.is_valid()) {
-                log::error("resource_compiler", "Could not open source file \"%s\"", ct->filename);
+                log::error("resource_compiler", "[%s] Could not open source file.", ct->filename);
                 return;
             }
 
@@ -115,7 +116,7 @@ namespace cetech {
             filesystem::close(source_file);
             filesystem::close(build_file);
 
-            log::info("resource_compiler", "Compiled \"%s\".", ct->filename );
+            log::info("resource_compiler", "[%s] Compiled.", ct->filename );
         }
 
         void save_json(const char* filename, const rapidjson::Document& document) {
