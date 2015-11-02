@@ -149,7 +149,6 @@ namespace cetech {
             CE_UNUSED(in);
             CE_UNUSED(out);
             resource_compiler::compile_all();
-            //application_globals::app().resource_compiler().compile_all_resource();
         }
     }
 
@@ -178,7 +177,7 @@ namespace cetech {
             task_manager::TaskID top_compile_task = task_manager::add_empty_begin();
 
             Array < char* > files(memory_globals::default_allocator());
-            for (int i = 0; i < sizeof(in_dirs) / sizeof(StringId64_t); ++i) {
+            for (ulong i = 0; i < sizeof(in_dirs) / sizeof(StringId64_t); ++i) {
                 array::clear(files);
                 StringId64_t src_dir = in_dirs[i];
 
