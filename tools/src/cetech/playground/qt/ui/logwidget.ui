@@ -49,6 +49,11 @@
      </column>
      <column>
       <property name="text">
+       <string>Worker ID</string>
+      </property>
+     </column>
+     <column>
+      <property name="text">
        <string>Where</string>
       </property>
      </column>
