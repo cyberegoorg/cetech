@@ -46,13 +46,13 @@ class LogWidget(QFrame, Ui_LogWidget):
         m = self.ignore_where.match(name)
         return m is not None
 
-    def add_log(self, time, level, where, msg):
+    def add_log(self, time, level, worker_id,  where, msg):
         if self._is_ignored(where):
             return
 
         dt_s = QDateTime.fromTime_t(time).toString("hh:mm:ss.zzz")
 
-        item = QTreeWidgetItem([dt_s, '', where, msg])
+        item = QTreeWidgetItem([dt_s, '', str(worker_id), where, msg])
 
         item.setIcon(1, self.style().standardIcon(self.LOG_ICON[level]))
 
