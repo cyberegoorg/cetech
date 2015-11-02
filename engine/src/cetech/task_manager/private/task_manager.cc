@@ -10,7 +10,7 @@
 
 #include <unistd.h>
 
-#include "cetech/task_manager/private/taskqueue.h"
+#include "cetech/task_manager/private/queuempmc.h"
 
 //TODO: REWRITE !!! #62
 namespace cetech {
@@ -44,12 +44,12 @@ namespace cetech {
 
         static thread_local uint32_t _worker_id = 0; // Worker id (thanks thread_local)
         struct TaskManagerData {
-            TaskQueue < Task*, MAX_TASK > _global_queue[Priority::Count];
+            QueueMPMC < Task*, MAX_TASK > _global_queue[Priority::Count];
             Array < Thread > _workers;
 
             uint32_t* _open_task;  //!< Open task
             Task* _task_pool;      //!< Task pool
-            TaskQueue < Task*, MAX_TASK > *_workers_queue;
+            QueueMPMC < Task*, MAX_TASK > *_workers_queue;
 
             Allocator& _allocator;
             std::atomic < uint32_t > _open_task_count;               //!< Open task count
@@ -157,11 +157,11 @@ namespace cetech {
 
             switch (aff) {
             case WorkerAffinity::NONE:
-                taskqueue::push(tm._global_queue[priority], task);
+                queuempmc::push(tm._global_queue[priority], task);
                 break;
 
             default:
-                taskqueue::push(tm._workers_queue[((aff - 1) * Priority::Count) + priority], task);
+                queuempmc::push(tm._workers_queue[((aff - 1) * Priority::Count) + priority], task);
                 break;
             }
         }
@@ -224,12 +224,12 @@ namespace cetech {
             return (task->job_count == 1) && (task->depend ? _task_is_done(task->depend) : 1);
         }
 
-        CE_INLINE Task* try_pop(TaskQueue < Task*, MAX_TASK >& q) {
+        CE_INLINE Task* try_pop(QueueMPMC < Task*, MAX_TASK >& q) {
             Task* poped_task;
 
-            size_t s = taskqueue::size(q);
+            size_t s = queuempmc::size(q);
             do {
-                poped_task = taskqueue::pop(q);
+                poped_task = queuempmc::pop(q);
                 if (poped_task != 0) {
                     CE_ASSERT(poped_task->used);
 
@@ -255,7 +255,7 @@ namespace cetech {
             Task* poped_task;
 
             for (int i = 0; i < Priority::Count; ++i) {
-                TaskQueue < Task*, MAX_TASK >& q = tm._workers_queue[(_worker_id * Priority::Count) + i];
+                QueueMPMC < Task*, MAX_TASK >& q = tm._workers_queue[(_worker_id * Priority::Count) + i];
 
                 poped_task = try_pop(q);
                 if (poped_task != 0) {
@@ -264,7 +264,7 @@ namespace cetech {
             }
 
             for (int i = 0; i < Priority::Count; ++i) {
-                TaskQueue < Task*, MAX_TASK >& q = tm._global_queue[i];
+                QueueMPMC < Task*, MAX_TASK >& q = tm._global_queue[i];
 
                 poped_task = try_pop(q);
                 if (poped_task != 0) {
@@ -378,7 +378,7 @@ namespace cetech {
             log::info("task", "Main thread count: %u", main_threads_count);
             log::info("task", "Worker count: %u", worker_count);
 
-            tm._workers_queue = memory::alloc_array < TaskQueue < Task*,
+            tm._workers_queue = memory::alloc_array < QueueMPMC < Task*,
             MAX_TASK >> (tm._allocator, (worker_count + 1) * Priority::Count);
 
             if (worker_count > 0) {
