@@ -12,7 +12,7 @@
 #include "rapidjson/encodings.h"
 
 
-#define LOG_FORMAT_NO_TIME "[%s][%s] %s"
+#define LOG_FORMAT_NO_TIME "[%s][%d][%s] %s"
 #define LOG_FORMAT  "[%s]" LOG_FORMAT_NO_TIME
 
 #define COLOR_RED  "\x1B[31m"
@@ -47,6 +47,7 @@ namespace cetech {
     namespace log_handlers {
         void stdout_handler(const log::LogLevel::Enum level,
                             const time_t time,
+                            const uint32_t worker_id,
                             const char* where,
                             const char* msg,
                             void* data) {
@@ -66,12 +67,13 @@ namespace cetech {
             }
 
             flockfile(out);
-            fprintf(out, level_format[level], level_to_str[level], where, msg);
+            fprintf(out, level_format[level], level_to_str[level], worker_id, where, msg);
             funlockfile(out);
         }
 
         void file_handler(const log::LogLevel::Enum level,
                           const time_t time,
+                          const uint32_t worker_id,
                           const char* where,
                           const char* msg,
                           void* data) {
@@ -81,7 +83,7 @@ namespace cetech {
             char* time_str = time_to_utc_str(gmtm);
 
             flockfile(out);
-            fprintf(out, LOG_FORMAT "\n", time_str, level_to_str[level], where, msg);
+            fprintf(out, LOG_FORMAT "\n", time_str, level_to_str[level], worker_id, where, msg);
             fflush(out);
             funlockfile(out);
         }

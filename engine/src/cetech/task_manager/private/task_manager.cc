@@ -12,8 +12,6 @@
 
 #include "cetech/task_manager/private/taskqueue.h"
 
-#define TASK_INITIALIZER { { 0 }, { 0 }, { 0 }, 0, 0, WorkerAffinity::NONE, { 0, 0 } }
-
 //TODO: REWRITE !!! #62
 namespace cetech {
     namespace {
@@ -115,13 +113,13 @@ namespace cetech {
             CE_ASSERT(!pthread_setaffinity_np(current_thread, sizeof(cpu_set_t), &cpuset));
 #endif
 
-            log::info("task_worker", "Worker init %d", _worker_id);
+            log::info("task_worker", "Worker%d init", _worker_id);
 
             while (_globals.data->flags.run) {
                 task_manager::do_work();
             }
 
-            log::info("task_worker", "Worker shutdown");
+            log::info("task_worker", "Worker%d shutdown", _worker_id);
             return 0;
         }
 
