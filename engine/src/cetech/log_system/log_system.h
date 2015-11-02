@@ -17,7 +17,7 @@ namespace cetech {
             };
         };
 
-        typedef void (* handler_t)(const LogLevel::Enum, const time_t, const char*, const char*, void*);
+        typedef void (* handler_t)(const LogLevel::Enum, const time_t, uint32_t worker_id, const char*, const char*, void*);
 
         void register_handler(handler_t handler, void* data = nullptr);
         void unregister_handler(handler_t handler);

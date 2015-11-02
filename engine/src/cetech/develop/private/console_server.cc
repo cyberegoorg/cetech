@@ -25,6 +25,7 @@ namespace cetech {
 
         void console_server_handler(const log::LogLevel::Enum level,
                                     const time_t time,
+                                    const uint32_t worker_id,
                                     const char* where,
                                     const char* msg,
                                     void* data) {

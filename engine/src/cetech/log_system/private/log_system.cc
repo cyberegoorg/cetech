@@ -4,6 +4,7 @@
 #include "celib/defines.h"
 
 #include "cetech/log_system/log_system.h"
+#include <cetech/task_manager/task_manager.h>
 #include "celib/memory/memory.h"
 #include "celib/container/array.inl.h"
 
@@ -41,13 +42,13 @@ namespace cetech {
             vsnprintf(msg, 4096, format, va);
 
             time_t tm = std::time(NULL);
-            //const uint32_t handlers_count = array::size(data.handlers);
+
             for (uint32_t i = 0; i < LogData::MAX_HANDLERS; ++i) {
                 if (data.handlers[i] == nullptr) {
                     continue;
                 }
 
-                data.handlers[i](level, tm, where, msg, data.handlers_data[i]);
+                data.handlers[i](level, tm, task_manager::get_worker_id(), where, msg, data.handlers_data[i]);
             }
         }
     }
