@@ -11,7 +11,6 @@
 #include "cetech/lua/api/lua_package.h"
 #include "cetech/lua/api/lua_vector2.h"
 #include "cetech/lua/api/lua_vector3.h"
-#include "cetech/lua/api/lua_utils.h"
 #include "cetech/lua/api/lua_log.h"
 
 
@@ -323,7 +322,6 @@ namespace cetech {
             lua_vector2::load_libs();
             lua_vector3::load_libs();
 
-            lua_utils::load_libs();
             lua_log::load_libs();
         }
 
