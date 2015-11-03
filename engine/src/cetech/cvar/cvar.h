@@ -35,12 +35,12 @@ namespace cetech {
         CE_INLINE void force_set(CVar& cv, const char* str);
     }
 
-    CVar::CVar(const char* name, const char* desc, CVarType type, uint32_t flags) : _next(nullptr), type(type), flags(
-            flags) {
-        strncpy(this->name, name, 512);
-        strncpy(this->desc, desc, 1024);
+    CVar::CVar(const char* name_, const char* desc_, CVarType type_, uint32_t flags_) : _next(nullptr), type(type_), flags(
+            flags_) {
+        strncpy(this->name, name_, 512);
+        strncpy(this->desc, desc_, 1024);
 
-        hash = murmur_hash_64(name, strlen(name), 22);
+        hash = murmur_hash_64(name_, strlen(name_), 22);
 
         f_max = 0.0f;
         f_min = 0.0f;
@@ -53,29 +53,29 @@ namespace cetech {
         }
     }
 
-    CVar::CVar(const char* name, const char* desc, float value, uint32_t flags, float min, float max) : CVar(name,
-                                                                                                             desc,
+    CVar::CVar(const char* name_, const char* desc_, float value_, uint32_t flags_, float min_, float max_) : CVar(name_,
+                                                                                                             desc_,
                                                                                                              CVAR_FLOAT,
-                                                                                                             flags) {
-        f_min = min;
-        f_max = max;
+                                                                                                             flags_) {
+        f_min = min_;
+        f_max = max_;
 
-        cvar_internal::force_set(*this, value);
+        cvar_internal::force_set(*this, value_);
     }
 
-    CVar::CVar(const char* name, const char* desc, int value, uint32_t flags, int min, int max) : CVar(name,
-                                                                                                       desc,
+    CVar::CVar(const char* name_, const char* desc_, int value_, uint32_t flags_, int min_, int max_) : CVar(name_,
+                                                                                                       desc_,
                                                                                                        CVAR_INT,
-                                                                                                       flags) {
-        i_min = min;
-        i_max = max;
+                                                                                                       flags_) {
+        i_min = min_;
+        i_max = max_;
 
-        cvar_internal::force_set(*this, value);
+        cvar_internal::force_set(*this, value_);
     }
 
-    CVar::CVar(const char* name, const char* desc, const char* value, uint32_t flags) : CVar(name, desc, CVAR_STR,
-                                                                                             flags) {
-        cvar_internal::force_set(*this, value);
+    CVar::CVar(const char* name_, const char* desc_, const char* value_, uint32_t flags_) : CVar(name_, desc_, CVAR_STR,
+                                                                                             flags_) {
+        cvar_internal::force_set(*this, value_);
     }
 
     namespace cvar_internal {

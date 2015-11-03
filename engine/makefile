@@ -257,11 +257,11 @@ analyze:
 
 .PHONY: scan-build32
 scan-build32:
-	scan-build -analyze-headers make -C ${ROOT_DIR} -j 4 test-linux-debug64
+	scan-build -analyze-headers make -C ${ROOT_DIR} -j 4 linux-clang-debug32
 	
 .PHONY: scan-build64
 scan-build64:
-	scan-build -analyze-headers make -C ${ROOT_DIR} -j 4 test-linux-debug64
+	scan-build -analyze-headers make -C ${ROOT_DIR} -j 4 linux-clang-debug64
 
 .PHONY: uncrustify
 uncrustify:
