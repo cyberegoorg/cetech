@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+    <meta charset='utf-8' />
+    <meta http-equiv="X-UA-Compatible" content="chrome=1" />
+    <meta name="viewport" content="width=480">
+
+    <link rel="stylesheet" type="text/css" media="screen" href="{{ site.baseurl }}stylesheets/stylesheet.css">
+
+    <title>Cap'n Proto: {{ page.title }}</title>
+
+    <script type="text/javascript" src="{{ site.baseurl }}javascripts/main.js"></script>
+  </head>
+
+  <body class="desktop">
+
+    <!-- HEADER -->
+    <div id="header_wrap" class="outer">
+      <header class="inner">
+        <img src="{{ site.baseurl }}images/logo.png">
+        <div id="infinitely_faster">
+          <img src="{{ site.baseurl }}images/infinitely_faster.png">
+        </div>
+      </header>
+      <a id="discuss_banner" href="https://groups.google.com/group/capnproto">Discuss on Groups</a>
+      <a id="forkme_banner" href="https://github.com/sandstorm-io/capnproto">View on GitHub</a>
+    </div>
+
+    {% if site.is_next %}
+    <div id="next_banner">
+      <h1>PREVIEW</h1>
+      <p>You are looking at the site as it will appear after the next release.  This is a draft
+         version that may be incomplete, buggy, or not yet applicable.  To look at the current
+         site, <a href="../">click here</a>.
+    </div>
+    {% endif %}
+
+    <!-- MAIN CONTENT -->
+    <div id="main_content_wrap" class="outer">
+
+      <section id="menu">
+        <ul>
+          <li><a href="{{ site.baseurl }}index.html">Introduction</a></li>
+          <li><a href="{{ site.baseurl }}news/">News</a></li>
+          <li><a href="{{ site.baseurl }}install.html">Installation</a></li>
+          <li><a href="{{ site.baseurl }}language.html">Schema Language</a></li>
+          <li><a href="{{ site.baseurl }}encoding.html">Encoding</a></li>
+          <li><a href="{{ site.baseurl }}rpc.html">RPC Protocol</a></li>
+          <li><a href="{{ site.baseurl }}capnp-tool.html">The <code>capnp</code> Tool</a></li>
+          <li><a href="{{ site.baseurl }}cxx.html">C++ Serialization</a></li>
+          <li><a href="{{ site.baseurl }}cxxrpc.html">C++ RPC</a></li>
+          <li><a href="{{ site.baseurl }}otherlang.html">Other Languages</a></li>
+          <li><a href="{{ site.baseurl }}roadmap.html">Road Map</a></li>
+          <li><a href="{{ site.baseurl }}faq.html">FAQ</a></li>
+        </ul>
+      </section>
+      <section id="main_content" class="inner">
