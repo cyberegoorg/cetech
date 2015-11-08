@@ -239,7 +239,7 @@ namespace cetech {
 
             develop_manager::send_buffer();
             console_server::tick();
-            
+
             while (data._flags.run) {
                 develop_manager::clear();
                 ++data._frame_id;
@@ -270,7 +270,6 @@ namespace cetech {
                 if (!data._flags.daemon_mod) {
                     renderer::begin_frame();
                 }
-
 
                 if (!data._flags.pause) {
                     auto time = develop_manager::enter_scope("Game::Update()");

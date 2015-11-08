@@ -26,11 +26,11 @@ namespace cetech {
     namespace keyboard {
         void process_keyboard() {
             auto time = develop_manager::enter_scope("keyboard::process_keyboard");
-            
+
             /*Keyboard*/
             memcpy(KeyboardStatesLast, KeyboardStates, 512);
             memcpy(KeyboardStates, SDL_GetKeyboardState(NULL), 512);
-            
+
             develop_manager::leave_scope("keyboard::process_keyboard", time);
         }
 
