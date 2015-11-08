@@ -1,0 +1,1 @@
+/usr/bin/c++   -std=gnu++0x -Wall -Wextra -Wno-strict-aliasing -Wno-sign-compare -Wno-unused-parameter -pthread     CMakeFiles/capnpc_cpp.dir/compiler/capnpc-c++.c++.o  -o capnpc-c++ -rdynamic libcapnp.a ../kj/libkj.a 

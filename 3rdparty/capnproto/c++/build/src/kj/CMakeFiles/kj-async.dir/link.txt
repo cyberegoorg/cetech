@@ -1,0 +1,2 @@
+/usr/bin/ar cq libkj-async.a  CMakeFiles/kj-async.dir/async.c++.o CMakeFiles/kj-async.dir/async-unix.c++.o CMakeFiles/kj-async.dir/async-io.c++.o CMakeFiles/kj-async.dir/time.c++.o
+/usr/bin/ranlib libkj-async.a

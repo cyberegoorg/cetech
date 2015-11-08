@@ -35,7 +35,8 @@ namespace cetech {
         CE_INLINE void force_set(CVar& cv, const char* str);
     }
 
-    CVar::CVar(const char* name_, const char* desc_, CVarType type_, uint32_t flags_) : _next(nullptr), type(type_), flags(
+    CVar::CVar(const char* name_, const char* desc_, CVarType type_, uint32_t flags_) : _next(nullptr), type(type_),
+        flags(
             flags_) {
         strncpy(this->name, name_, 512);
         strncpy(this->desc, desc_, 1024);
@@ -53,10 +54,11 @@ namespace cetech {
         }
     }
 
-    CVar::CVar(const char* name_, const char* desc_, float value_, uint32_t flags_, float min_, float max_) : CVar(name_,
-                                                                                                             desc_,
-                                                                                                             CVAR_FLOAT,
-                                                                                                             flags_) {
+    CVar::CVar(const char* name_, const char* desc_, float value_, uint32_t flags_, float min_, float max_) : CVar(
+            name_,
+            desc_,
+            CVAR_FLOAT,
+            flags_) {
         f_min = min_;
         f_max = max_;
 
@@ -64,9 +66,9 @@ namespace cetech {
     }
 
     CVar::CVar(const char* name_, const char* desc_, int value_, uint32_t flags_, int min_, int max_) : CVar(name_,
-                                                                                                       desc_,
-                                                                                                       CVAR_INT,
-                                                                                                       flags_) {
+                                                                                                             desc_,
+                                                                                                             CVAR_INT,
+                                                                                                             flags_) {
         i_min = min_;
         i_max = max_;
 
@@ -74,7 +76,7 @@ namespace cetech {
     }
 
     CVar::CVar(const char* name_, const char* desc_, const char* value_, uint32_t flags_) : CVar(name_, desc_, CVAR_STR,
-                                                                                             flags_) {
+                                                                                                 flags_) {
         cvar_internal::force_set(*this, value_);
     }
 

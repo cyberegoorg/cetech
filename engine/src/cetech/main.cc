@@ -155,13 +155,12 @@ bool big_init() {
     filesystem::map_root_dir(CORE_DIR, cvars::compiler_core_path.value_str);
 
 
-    task_manager_globals::init();
-
 #if defined(CETECH_DEVELOP)
     console_server_globals::init();
     console_server::init();
     develop_manager_globals::init();
 #endif
+    task_manager_globals::init();
 
     resource_manager_globals::init();
 

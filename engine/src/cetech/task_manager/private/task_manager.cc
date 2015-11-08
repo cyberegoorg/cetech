@@ -29,6 +29,7 @@ namespace cetech {
             TaskWorkCallback clb;               //!< Callback
             std::atomic < uint32_t > job_count; //!< Task child active job
 
+            char name[256];
             Task* depend;              //!< Task depend
             Task* parent;              //!< Task parent
 
@@ -58,9 +59,9 @@ namespace cetech {
                 char run : 1;
             } flags;
 
-            TaskManagerData(Allocator & allocator) : _open_task_count(0),
-                                                     _workers(allocator),
-                                                     _allocator(allocator) {
+            TaskManagerData(Allocator & allocator) : _workers(allocator),
+                                                     _allocator(allocator),
+                                                     _open_task_count(0) {
 
                 _open_task = (uint32_t*) allocator.allocate(sizeof(uint32_t) * MAX_TASK);
                 _task_pool = memory::alloc_array < Task > (allocator, MAX_TASK);
@@ -189,7 +190,6 @@ namespace cetech {
 
         bool task_is_done(TaskID id) {
             return _task_is_done(get_task(id));
-
         }
 
         void mark_task_job_done(Task* task) {
@@ -200,8 +200,7 @@ namespace cetech {
                 --task->parent->job_count;
             }
 
-            size_t s = tm._open_task_count;
-            for (uint32_t i = 0; i < s; ++i) {
+            for (uint32_t i = 0; i < tm._open_task_count; ++i) {
                 Task* t = &tm._task_pool[tm._open_task[i]];
 
                 if (t == task) {
@@ -209,6 +208,8 @@ namespace cetech {
 
                     size_t idx = --tm._open_task_count;
                     tm._open_task[i] = tm._open_task[idx];
+
+                    //log::info("task", "%d task %s done.", application::get_frame_id(), task->name);
 
                     task->used = 0;
                     break;
@@ -286,7 +287,8 @@ namespace cetech {
             return tm._open_task_count;
         }
 
-        TaskID add_begin(const TaskWorkFce_t fce,
+        TaskID add_begin(const char* name,
+                         const TaskWorkFce_t fce,
                          void* data,
                          const Priority::Enum priority,
                          const TaskID depend,
@@ -301,6 +303,8 @@ namespace cetech {
             uint32_t task = _new_task();
 
             Task& t = tm._task_pool[task];
+            strncpy(t.name, name, 255);
+
             t.priority = priority,
             t.clb = callback,
             t.job_count = 2,
@@ -323,23 +327,24 @@ namespace cetech {
 
         }
 
-        TaskID add_empty_begin(const Priority::Enum priority,
+        TaskID add_empty_begin(const char* name,
+                               const Priority::Enum priority,
                                const TaskID depend,
                                const TaskID parent,
                                const WorkerAffinity::Enum worker_affinity) {
-            return add_begin(_task_nop, 0, priority, depend, parent, worker_affinity);
+            return add_begin(name, _task_nop, 0, priority, depend, parent, worker_affinity);
         }
 
         void add_end(const TaskID* tasks, const uint32_t count) {
             for (uint32_t i = 0; i < count; ++i) {
                 Task* t = get_task(tasks[i]);
-
-                push_task(t);
+                --t->job_count;
             }
 
             for (uint32_t i = 0; i < count; ++i) {
                 Task* t = get_task(tasks[i]);
-                --t->job_count;
+
+                push_task(t);
             }
         }
 
@@ -354,15 +359,20 @@ namespace cetech {
 
             CE_ASSERT(t->clb.fce != NULL);
 
+            auto time = develop_manager::enter_scope(t->name);
             t->clb.fce(t->clb.data);
+            develop_manager::leave_scope(t->name, time);
 
             mark_task_job_done(t);
         }
 
         void wait(const TaskID id) {
+            //auto time = develop_manager::push_enter_scope("TaskManager::wait()");
             while (!task_is_done(id)) {
                 do_work();
             }
+
+            //develop_manager::push_leave_scope("TaskManager::wait()", time);
         }
 
         void spawn_workers() {

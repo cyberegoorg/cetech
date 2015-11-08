@@ -61,7 +61,7 @@ namespace cetech {
         CE_INLINE CompileTask& new_compile_task() {
             ResouceCompilerData* data = _globals.data;
 
-            return data->compile_task_pool[(data->compile_task_pool_idx++) &  TASK_POOL_SIZE_MASK];
+            return data->compile_task_pool[(data->compile_task_pool_idx++) & TASK_POOL_SIZE_MASK];
         };
 
         CE_INLINE void calc_hash(const char* path, StringId64_t& type, StringId64_t& name) {
@@ -174,7 +174,7 @@ namespace cetech {
 
             static StringId64_t in_dirs[] = {CORE_DIR, SRC_DIR};
 
-            task_manager::TaskID top_compile_task = task_manager::add_empty_begin();
+            task_manager::TaskID top_compile_task = task_manager::add_empty_begin("compiler");
 
             Array < char* > files(memory_globals::default_allocator());
             for (ulong i = 0; i < sizeof(in_dirs) / sizeof(StringId64_t); ++i) {
@@ -235,7 +235,8 @@ namespace cetech {
                     ct.clb = clb;
 
                     task_manager::TaskID tid =
-                        task_manager::add_begin(compile_task,
+                        task_manager::add_begin("compile_task",
+                                                compile_task,
                                                 &ct,
                                                 task_manager::Priority::Normal,
                                                 NULL_TASK,

@@ -15,6 +15,8 @@
 
 #include "SDL2/SDL.h"
 
+#include "unistd.h"
+
 namespace cetech {
     namespace mouse_internal {
         static Vector2 MouseAxis;
@@ -34,6 +36,8 @@ namespace cetech {
         }
 
         void process_mouse() {
+            auto time = develop_manager::enter_scope("keyboard::process_keyboard");
+
             mouse_internal::MouseButtonStateLast = mouse_internal::MouseButtonState;
 
             /*Mouse*/
@@ -44,6 +48,8 @@ namespace cetech {
 
             mouse_internal::MouseAxis.x = x;
             mouse_internal::MouseAxis.y = y;
+
+            develop_manager::leave_scope("keyboard::process_mouse", time);
         }
 
         uint32_t button_index(const char* scancode) {

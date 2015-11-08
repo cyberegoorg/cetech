@@ -62,7 +62,7 @@ namespace cetech {
             Header header = {.type = type, .size = size};
 
             array::push( stream.stream, (char*)&header, sizeof(Header));
-            array::push( stream.stream, (char*)events, (size_t) size);
+            array::push( stream.stream, (char*)events, (uint32_t) size);
         }
 
         void write(EventStream& stream, const void* events, uint32_t size ) {

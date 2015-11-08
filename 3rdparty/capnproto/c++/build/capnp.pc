@@ -1,0 +1,11 @@
+prefix=/usr/local
+exec_prefix=/usr/local
+libdir=/usr/local/lib
+includedir=/usr/local/include
+
+Name: Cap'n Proto
+Description: Insanely fast serialization system
+Version: 0.6-dev
+Libs: -L${libdir} -lcapnp -lkj -pthread  
+Libs.private: 
+Cflags: -I${includedir} -pthread  

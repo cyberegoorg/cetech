@@ -156,15 +156,22 @@ namespace cetech {
             rapidjson::Writer < rapidjson::StringBuffer > writer(buffer);
             document.Accept(writer);
 
+            //printf("\nSEND: %s\n", buffer.GetString());
+
             ENetPacket* p = enet_packet_create(buffer.GetString(), buffer.GetSize(), ENET_PACKET_FLAG_RELIABLE);
             enet_host_broadcast(data->server_host, 0, p);
+            enet_host_flush(data->server_host);
         }
 
         void tick() {
             ConsoleServerData* data = _globals.data;
+            if (!data->server_host) {
+                return;
+            }
 
             ENetEvent Event;
 
+            auto time = develop_manager::enter_scope("ConsoleServer::tick()");
             while (enet_host_service(data->server_host, &Event, 0) > 0) {
 
                 switch (Event.type) {
@@ -207,6 +214,8 @@ namespace cetech {
                     break;
                 }
             }
+
+            develop_manager::leave_scope("ConsoleServer::tick()", time);
         }
     }
 

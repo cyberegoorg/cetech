@@ -136,7 +136,8 @@ project "cetech1"
       "luajit",
       "enet",
       "SOIL",
-      "sqlite3"
+      "sqlite3",
+      "rt"
     }
     
     configuration "Release or Develop"
