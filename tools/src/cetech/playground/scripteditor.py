@@ -1,9 +1,10 @@
 import os
 
-from PyQt5 import Qsci
-from PyQt5.QtCore import QTextCodec, QFile, QDir, QFileInfo
-from PyQt5.QtGui import QColor, QPixmap, QKeySequence
-from PyQt5.QtWidgets import QMainWindow, QFileDialog, QMessageBox, QShortcut
+from PyQt5.QtCore import QTextCodec, QFile, QDir, QFileInfo, QUrl
+from PyQt5.QtGui import QPixmap
+from PyQt5.QtWebKit import QWebSettings
+from PyQt5.QtWebKitWidgets import QWebView
+from PyQt5.QtWidgets import QMainWindow, QFileDialog, QMessageBox
 
 from cetech.engine.api import ConsoleAPI
 from cetech.playground.engine.cetechproject import CetechProject
@@ -21,15 +22,7 @@ class ScriptEditor(QMainWindow, Ui_MainWindow):
         self.project_manager = project_manager
         self.api = api
 
-        self.lexer = Qsci.QsciLexerLua()
-        self.lua_api = Qsci.QsciAPIs(self.lexer)
-        self.lua_api.prepare()
-        self.lexer.setAPIs(self.lua_api)
-
         self.api.register_handler('autocomplete_list', self.update_autocomplete)
-
-        self.autocomplete_shortcut = QShortcut(QKeySequence("Ctrl+Space"), self)
-        self.autocomplete_shortcut.activated.connect(self.autocomplete)
 
         self.TYPE_ICONS = {
             0: QPixmap(":code-function"),
@@ -41,17 +34,10 @@ class ScriptEditor(QMainWindow, Ui_MainWindow):
         "table": 1
     }
 
-    def autocomplete(self):
-        self.get_editor(self.main_tabs.currentIndex()).autoCompleteFromAll()
-
     def update_autocomplete(self, list):
-        self.lua_api.clear()
-        for k, v in list.items():
-            icon_id = self.TYPE_TO_ICON_ID.get(v, None)
-            if icon_id is not None:
-                self.lua_api.add("%s?%s" % (k, icon_id))
-
-        self.lua_api.prepare()
+        pass
+        # self.lua_api.clear()
+        # self.lua_api.prepare()
 
     def support_ext(self, ext):
         return ext in self.SUPPORTED_EXT
@@ -74,12 +60,36 @@ class ScriptEditor(QMainWindow, Ui_MainWindow):
         codec = QTextCodec.codecForUtfText(data)
         unistr = codec.toUnicode(data)
 
-        idx, sci = self.create_new_editor(fileinfo.fileName())
-        sci.setText(unistr)
-        sci.setModified(False)
-        sci.setProperty("filename", filename)
+        def on_load():
+            editor.page().mainFrame().findFirstElement("#editor").setInnerXml(unistr)
+            editor.page().mainFrame().evaluateJavaScript("init()")
 
-        self.api.autocomplete_list()
+            if fileinfo.suffix() == "lua":
+                editor.page().mainFrame().evaluateJavaScript("editor.getSession().setMode('ace/mode/lua');")
+            else:
+                editor.page().mainFrame().evaluateJavaScript("editor.getSession().setMode('ace/mode/json');")
+
+        idx, editor = self.create_new_editor(fileinfo.fileName(), onload=on_load)
+
+        # class TEXT_OBJ(QObject):
+        #     def __init__(self, text, parent=None):
+        #         self.text = text
+        #         super(TEXT_OBJ, self).__init__(parent)
+        #
+        #     @pyqtSlot(result=str)
+        #     def get_text_data(self):
+        #         return self.text
+        #
+        # def on_init():
+        #     editor.page().mainFrame().addToJavaScriptWindowObject("text_object", TEXT_OBJ(unistr, self))
+        #
+        # editor.page().mainFrame().javaScriptWindowObjectCleared.connect(
+        #     on_init
+        # )
+
+        #editor.page().mainFrame().loadFinished.connect(on_load)
+
+        editor.setProperty("filename", filename)
 
     def find_tab_by_filename(self, filename):
         for i in range(self.main_tabs.count()):
@@ -97,32 +107,30 @@ class ScriptEditor(QMainWindow, Ui_MainWindow):
 
     def send_current(self):
         sci = self.main_tabs.widget(self.main_tabs.currentIndex())
-        self.api.lua_execute(sci.text())
+        self.api.lua_execute(sci.page().mainFrame().evaluateJavaScript("editor.getValue()"))
+        pass
 
     def open_new_file(self):
         # TODO: Untitled + id (Untitled1, Untitled2, ... )
+
         idx, sci = self.create_new_editor("Untitled")
         sci.setProperty("filename", "")
 
-    def create_new_editor(self, name):
-        sci = Qsci.QsciScintilla(self)
-        sci.setLexer(self.lexer)
+    def create_new_editor(self, name, onload=None):
+        editor_webview = QWebView(self)
 
-        sci.setCaretLineVisible(True)
-        sci.setCaretLineBackgroundColor(QColor("gray"))
+        editor_webview.page().settings().setAttribute(QWebSettings.DeveloperExtrasEnabled, True)
+        editor_webview.page().mainFrame().setUrl(QUrl("qrc:/html/editor.html"))
 
-        sci.setAutoCompletionThreshold(1)
-        sci.setAutoCompletionSource(Qsci.QsciScintilla.AcsAPIs)
-        sci.setAutoCompletionFillupsEnabled(True)
-        sci.setAutoCompletionShowSingle(True)
+        if onload:
+            editor_webview.page().mainFrame().loadFinished.connect(onload)
+        else:
+            editor_webview.page().mainFrame().loadFinished.connect(lambda: editor_webview.page().mainFrame().evaluateJavaScript("init()"))
 
-        for id, img in self.TYPE_ICONS.items():
-            sci.registerImage(id, img)
-
-        idx = self.main_tabs.addTab(sci, name)
+        idx = self.main_tabs.addTab(editor_webview, name)
         self.main_tabs.setCurrentIndex(idx)
 
-        return idx, sci
+        return idx, editor_webview
 
     def save_as(self, tab_index, filename):
         if not self.is_editor_modified(tab_index):
@@ -132,11 +140,10 @@ class ScriptEditor(QMainWindow, Ui_MainWindow):
 
         out_file = QFile(filename)
         out_file.open(QFile.WriteOnly)
-        out_file.write(sci.text().encode())
+        out_file.write(sci.page().mainFrame().evaluateJavaScript("editor.getValue()").encode())
         out_file.close()
 
-        sci.setModified(False)
-
+        sci.setProperty("modified", False)
         sci.setProperty("filename", filename)
 
         file_info = QFileInfo(out_file)
@@ -168,33 +175,33 @@ class ScriptEditor(QMainWindow, Ui_MainWindow):
 
     def get_editor(self, tab_index):
         """
-        :rtype: Qsci.QsciScintilla
+        :rtype: QWebView
         """
         return self.main_tabs.widget(tab_index)
 
     def is_editor_modified(self, tab_index):
         sci = self.main_tabs.widget(tab_index)
-        return sci.isModified()
+        return sci.property("modified")
 
-    def undo(self):
-        sci = self.main_tabs.widget(self.main_tabs.currentIndex())
-        sci.undo()
-
-    def redo(self):
-        sci = self.main_tabs.widget(self.main_tabs.currentIndex())
-        sci.redo()
-
-    def copy(self):
-        sci = self.main_tabs.widget(self.main_tabs.currentIndex())
-        sci.copy()
-
-    def cut(self):
-        sci = self.main_tabs.widget(self.main_tabs.currentIndex())
-        sci.cut()
-
-    def paste(self):
-        sci = self.main_tabs.widget(self.main_tabs.currentIndex())
-        sci.paste()
+    # def undo(self):
+    #     sci = self.main_tabs.widget(self.main_tabs.currentIndex())
+    #     sci.undo()
+    #
+    # def redo(self):
+    #     sci = self.main_tabs.widget(self.main_tabs.currentIndex())
+    #     sci.redo()
+    #
+    # def copy(self):
+    #     sci = self.main_tabs.widget(self.main_tabs.currentIndex())
+    #     sci.copy()
+    #
+    # def cut(self):
+    #     sci = self.main_tabs.widget(self.main_tabs.currentIndex())
+    #     sci.cut()
+    #
+    # def paste(self):
+    #     sci = self.main_tabs.widget(self.main_tabs.currentIndex())
+    #     sci.paste()
 
     def save_file(self, tab_index):
         if self.get_editor_filename(tab_index) == "":
