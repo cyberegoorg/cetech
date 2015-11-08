@@ -6,7 +6,8 @@ function init() {
     editor.getSession().setMode("ace/mode/javascript");
 
     editor.setOptions({
-        enableBasicAutocompletion: true
+        enableBasicAutocompletion: true,
+         enableSnippets: true
     })
 
     editor.setFontSize(13)
