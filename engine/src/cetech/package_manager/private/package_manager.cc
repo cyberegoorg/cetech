@@ -89,8 +89,10 @@ namespace cetech {
                 pkg_task.names = names;
                 pkg_task.type = type;
 
-                task_manager::TaskID tid = task_manager::add_begin(package_loader_task,
-                                                                   &pkg_task);
+                task_manager::TaskID tid = task_manager::add_begin(
+                    "package_loader",
+                    package_loader_task,
+                    &pkg_task);
                 task_manager::add_end(&tid, 1);
             }
         }

@@ -38,14 +38,16 @@ namespace cetech {
 
         typedef void (* TaskWorkFce_t)(void*);
 
-        TaskID add_begin(const TaskWorkFce_t fce,
+        TaskID add_begin(const char* name,
+                         const TaskWorkFce_t fce,
                          void* data,
                          const Priority::Enum priority = Priority::Normal,
                          const TaskID depend = NULL_TASK,
                          const TaskID parent = NULL_TASK,
                          const WorkerAffinity::Enum worker_affinity = WorkerAffinity::NONE);
 
-        TaskID add_empty_begin(const Priority::Enum priority = Priority::Normal,
+        TaskID add_empty_begin(const char* name,
+                               const Priority::Enum priority = Priority::Normal,
                                const TaskID depend = NULL_TASK,
                                const TaskID parent = NULL_TASK,
                                const WorkerAffinity::Enum worker_affinity = WorkerAffinity::NONE);

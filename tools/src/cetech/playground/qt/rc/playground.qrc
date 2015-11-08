@@ -2,5 +2,9 @@
     <qresource prefix="/">
         <file alias="code-function">icons/code-function.png</file>
         <file alias="code-table">namespace.png</file>
+        <file>html/profiler.html</file>
+        <file>html/profiler.js</file>
+        <file>html/vis.min.css</file>
+        <file>html/vis.min.js</file>
     </qresource>
 </RCC>

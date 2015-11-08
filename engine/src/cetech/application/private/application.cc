@@ -123,6 +123,10 @@ namespace cetech {
             return _globals.data->_delta_time;
         }
         uint32_t get_frame_id() {
+            if (!_globals.data) {
+                return 0;
+            }
+
             return _globals.data->_frame_id;
         }
 
@@ -175,17 +179,19 @@ namespace cetech {
 
         static void process_mouse(void* data) {
             mouse::process_mouse();
+            usleep(2 * 1000);
         }
 
         static void process_keyboard(void* data) {
             keyboard::process_keyboard();
+            usleep(2 * 1000);
         }
 
         static void console_server_tick(void* data) {
             console_server::tick();
         }
 
-        static void frame_begin_tick(void* _data) {
+        static void frame_tick(void* _data) {
             CE_CHECK_PTR(_globals.data);
             ApplictionData& data = *_globals.data;
 
@@ -198,11 +204,12 @@ namespace cetech {
             data._delta_time = dt;
             data._last_frame_ticks = now_ticks;
 
-#if defined(CETECH_DEVELOP)
+
+    #if defined(CETECH_DEVELOP)
             develop_manager::push_record_float("engine.frame_id", data._frame_id);
             develop_manager::push_record_float("engine.delta_time", dt);
             develop_manager::push_record_float("engine.frame_rate", 1.0f / dt);
-#endif
+    #endif
 
             if (!data._flags.daemon_mod) {
                 renderer::begin_frame();
@@ -212,24 +219,16 @@ namespace cetech {
                 lua_enviroment::call_global("update", "f", dt);
                 lua_enviroment::clean_temp();
             }
-        }
-
-        static void frame_end_tick(void* _data) {
-            CE_CHECK_PTR(_globals.data);
-            ApplictionData& data = *_globals.data;
 
 #if defined(CETECH_DEVELOP)
-            develop_manager::push_end_frame();
-            develop_manager::send_buffer();
-            develop_manager::clear();
 #endif
-
-            ++(data._frame_id);
 
             if (!data._flags.daemon_mod) {
                 renderer::end_frame();
                 window::update(data.main_window);
             }
+
+            usleep(2 * 1000);
         }
 
         void run() {
@@ -238,69 +237,64 @@ namespace cetech {
             CE_CHECK_PTR(_globals.data);
             ApplictionData& data = *_globals.data;
 
-
+            develop_manager::send_buffer();
+            console_server::tick();
+            
             while (data._flags.run) {
-                //printf("frame start\n");
+                develop_manager::clear();
+                ++data._frame_id;
+
+                auto time = develop_manager::enter_scope("Application::Update()");
+
+                console_server::tick();
+                develop_manager::push_begin_frame();
 
                 process_os();
+                keyboard::process_keyboard();
+                mouse::process_mouse();
 
-                task_manager::TaskID frame_task = task_manager::add_empty_begin();
+                float dt = 0.0f;
+                uint32_t now_ticks = 0;
 
-                task_manager::TaskID input_task = task_manager::add_empty_begin(task_manager::Priority::High,
-                                                                                NULL_TASK,
-                                                                                frame_task);
+                now_ticks = get_ticks();
 
-                task_manager::TaskID process_mouse_task = task_manager::add_begin(
-                    process_mouse, nullptr, task_manager::Priority::High,
-                    NULL_TASK, input_task
-                    );
-
-                task_manager::TaskID process_keyboard_task = task_manager::add_begin(
-                    process_keyboard, nullptr, task_manager::Priority::High,
-                    NULL_TASK, input_task
-                    );
+                dt = (now_ticks - data._last_frame_ticks) * 0.001f;
+                data._delta_time = dt;
+                data._last_frame_ticks = now_ticks;
 
 
-                task_manager::TaskID frame_end_task = task_manager::add_begin(
-                    frame_end_tick, nullptr, task_manager::Priority::High,
-                    NULL_TASK, frame_task, task_manager::WorkerAffinity::MAIN_THEAD
-                    );
+                develop_manager::push_record_float("engine.frame_id", data._frame_id);
+                develop_manager::push_record_float("engine.delta_time", dt);
+                develop_manager::push_record_float("engine.frame_rate", 1.0f / dt);
 
-                task_manager::TaskID frame_begin_task = task_manager::add_begin(
-                    frame_begin_tick, nullptr, task_manager::Priority::High,
-                    NULL_TASK, frame_end_task, task_manager::WorkerAffinity::MAIN_THEAD
-                    );
-
-#if defined(CETECH_DEVELOP)
-                task_manager::TaskID console_server_task = task_manager::add_begin(
-                    console_server_tick, nullptr, task_manager::Priority::High,
-                    NULL_TASK, frame_task, task_manager::WorkerAffinity::MAIN_THEAD
-                    );
-#endif
+                if (!data._flags.daemon_mod) {
+                    renderer::begin_frame();
+                }
 
 
-                const task_manager::TaskID task_end[] = {
-#if defined(CETECH_DEVELOP)
-                    console_server_task,
-#endif
+                if (!data._flags.pause) {
+                    auto time = develop_manager::enter_scope("Game::Update()");
+                    lua_enviroment::call_global("update", "f", dt);
+                    lua_enviroment::clean_temp();
+                    usleep(10 * 100);
+                    develop_manager::leave_scope("Game::Update()", time);
+                }
 
-                    process_mouse_task,
-                    process_keyboard_task,
-                    frame_end_task,
-                    frame_begin_task,
-                    frame_task,
-                    input_task
-                };
+                if (!data._flags.daemon_mod) {
+                    renderer::end_frame();
+                    window::update(data.main_window);
+                }
 
-                task_manager::add_end(task_end, sizeof(task_end) / sizeof(task_manager::TaskID));
-                task_manager::wait(frame_task);
+                develop_manager::push_end_frame();
+                develop_manager::leave_scope("Application::Update()", time);
+                develop_manager::flush_all_stream_buffer();
+                develop_manager::send_buffer();
 
-                //                 if(task_manager::open_task_count() != 0) {
+                //                 if (task_manager::open_task_count() != 0) {
                 //                     printf("c: %d \n", task_manager::open_task_count());
+                //                     CE_ASSERT(task_manager::open_task_count() == 0);
                 //                 }
 
-                CE_ASSERT(task_manager::open_task_count() == 0);
-                usleep(16 * 1000);
             }
 
             shutdown();
@@ -314,6 +308,10 @@ namespace cetech {
 
         bool is_run() {
             ApplictionData* data = _globals.data;
+            if (!data) {
+                return false;
+            }
+
             return data->_flags.run != 0;
         }
 
