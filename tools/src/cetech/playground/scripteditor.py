@@ -12,8 +12,8 @@ from cetech.playground.qt.ui.luaeditorwindow import Ui_MainWindow
 
 
 class ScriptEditor(QMainWindow, Ui_MainWindow):
-    SUPPORTED_EXT = ('lua', 'package', 'json')
-    FILES_FILTER = "Lua (*.lua); Package (*.package); JSON (*.json)"
+    SUPPORTED_EXT = ('lua', 'package', 'json', 'texture')
+    FILES_FILTER = "Lua (*.lua);;Package (*.package);;JSON (*.json)"
 
     def __init__(self, project_manager: CetechProject, api: ConsoleAPI):
         super(ScriptEditor, self).__init__()
@@ -241,5 +241,8 @@ class ScriptEditor(QMainWindow, Ui_MainWindow):
                 self.project_manager.project_dir, 'src'),
             self.FILES_FILTER
         )
+
+        if len(filename) == 0:
+            return
 
         self.save_as(idx, filename)

@@ -7,7 +7,7 @@ function init() {
 
     editor.setOptions({
         enableBasicAutocompletion: true,
-         enableSnippets: true
+        enableSnippets: true
     })
 
     editor.setFontSize(13)
