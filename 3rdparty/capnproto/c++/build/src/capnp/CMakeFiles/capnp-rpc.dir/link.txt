@@ -1,2 +1,0 @@
-/usr/bin/ar cq libcapnp-rpc.a  CMakeFiles/capnp-rpc.dir/serialize-async.c++.o CMakeFiles/capnp-rpc.dir/capability.c++.o CMakeFiles/capnp-rpc.dir/membrane.c++.o CMakeFiles/capnp-rpc.dir/dynamic-capability.c++.o CMakeFiles/capnp-rpc.dir/rpc.c++.o CMakeFiles/capnp-rpc.dir/rpc.capnp.c++.o CMakeFiles/capnp-rpc.dir/rpc-twoparty.c++.o CMakeFiles/capnp-rpc.dir/rpc-twoparty.capnp.c++.o CMakeFiles/capnp-rpc.dir/persistent.capnp.c++.o CMakeFiles/capnp-rpc.dir/ez-rpc.c++.o
-/usr/bin/ranlib libcapnp-rpc.a

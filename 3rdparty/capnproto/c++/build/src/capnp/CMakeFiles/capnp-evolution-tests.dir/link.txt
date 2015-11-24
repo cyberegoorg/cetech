@@ -1,1 +1,0 @@
-/usr/bin/c++   -std=gnu++0x -Wall -Wextra -Wno-strict-aliasing -Wno-sign-compare -Wno-unused-parameter -pthread     CMakeFiles/capnp-evolution-tests.dir/compiler/evolution-test.c++.o  -o capnp-evolution-tests -rdynamic libcapnpc.a libcapnp.a ../kj/libkj.a 
