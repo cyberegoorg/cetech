@@ -36,11 +36,11 @@ namespace cetech {
             };
         }
 
-        inline long get_sec(const PerfTimer& timer) {
+        inline int64_t get_sec(const PerfTimer& timer) {
             return timer.time.tv_sec;
         }
 
-        inline long get_nsec(const PerfTimer& timer) {
+        inline int64_t get_nsec(const PerfTimer& timer) {
             return timer.time.tv_nsec;
         }
     }
