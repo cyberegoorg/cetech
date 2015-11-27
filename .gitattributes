@@ -1,3 +1,3 @@
-playground/icons/** linguist-vendored
+playground/icons linguist-vendored
 playground/html/ace/* linguist-vendored
-3rdparty/bitsquid-foundation/* linguist-vendored
+3rdparty linguist-vendored
