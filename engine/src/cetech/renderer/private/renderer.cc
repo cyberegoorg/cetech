@@ -35,9 +35,9 @@ uint8_t sdlSetWindow(SDL_Window* _window) {
 #if BX_PLATFORM_LINUX || BX_PLATFORM_FREEBSD
     bgfx::x11SetDisplayWindow(wmi.info.x11.display, wmi.info.x11.window);
 #elif BX_PLATFORM_OSX
-    osxSetNSWindow(wmi.info.cocoa.window);
+    bgfx::osxSetNSWindow(wmi.info.cocoa.window);
 #elif BX_PLATFORM_WINDOWS
-    winSetHwnd(wmi.info.win.window);
+    bgfx::winSetHwnd(wmi.info.win.window);
 #endif  /* BX_PLATFORM_ */
 
     return 1;
