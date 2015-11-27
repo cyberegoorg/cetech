@@ -1,0 +1,172 @@
+#########
+# GENIE #
+########################################################################################################################
+genie:
+  clone: git clone https://github.com/bkaradzic/genie
+
+  build:
+    linux: &genie_linux_build
+      [make]
+
+    linux32: *genie_linux_build
+    linux64: *genie_linux_build
+
+  install:
+    linux: &genie_linux_install
+      - copy: [bin/linux/genie, bin]
+
+    linux64: *genie_linux_install
+    linux32: *genie_linux_install
+
+########
+# bgfx #
+########################################################################################################################
+bgfx:
+  clone: git clone https://github.com/bkaradzic/bgfx
+
+  build:
+    linux64: [make linux-release64]
+    linux32: [make linux-release32]
+
+  install:
+    includes: &bgfx_install_includes
+      [include/bgfx, include/bgfx]
+
+    linux64:
+      - copy: [.build/linux64_gcc/bin/libbgfxRelease.a, lib]
+      - copytree: *bgfx_install_includes
+
+    linux32:
+      - copy: [.build/linux32_gcc/bin/libbgfxRelease.a, lib]
+      - copytree: *bgfx_install_includes
+
+######
+# bx #
+########################################################################################################################
+bx:
+  clone: git clone https://github.com/bkaradzic/bx
+
+  install:
+    all: &bx_install_all
+      - copytree: [include/bx, include/bx]
+
+    linux32: *bx_install_all
+    linux64: *bx_install_all
+
+########
+# enet #
+########################################################################################################################
+enet:
+  clone: git clone https://github.com/lsalzman/enet.git
+
+  build:
+    linux64: [autoreconf -vfi, ./configure, make]
+    linux32: [autoreconf -vfi, ./configure, make]
+
+  install:
+    linux64:
+      - copy: [.libs/libenet.a, lib]
+      - copytree: [include/enet, include/enet]
+
+    linux32:
+      - copy: [.libs/libenet.a, lib]
+      - copytree: [include/enet, include/enet]
+
+
+##########
+# luajit #
+########################################################################################################################
+luajit:
+  clone: git clone http://luajit.org/git/luajit-2.0.git
+
+  build:
+    linux64: [make]
+    linux32: [make]
+
+  install:
+    linux64:
+      - copy: [src/libluajit.a, lib]
+      - copy: [src/lauxlib.h, include/luajit]
+      - copy: [src/luaconf.h, include/luajit]
+      - copy: [src/lua.h, include/luajit]
+      - copy: [src/lua.hpp, include/luajit]
+      - copy: [src/luajit.h, include/luajit]
+      - copy: [src/lualib.h, include/luajit]
+
+    linux32:
+      - copy: [src/libluajit.a, lib]
+      - copy: [src/lauxlib.h, include/luajit]
+      - copy: [src/luaconf.h, include/luajit]
+      - copy: [src/lua.h, include/luajit]
+      - copy: [src/lua.hpp, include/luajit]
+      - copy: [src/luajit.h, include/luajit]
+      - copy: [src/lualib.h, include/luajit]
+
+
+#############
+# rapidjson #
+########################################################################################################################
+rapidjson:
+  clone: git clone https://github.com/miloyip/rapidjson/
+
+  install:
+    includes: &rapidjson_install_includes
+      - copytree: [include/rapidjson, include/rapidjson]
+
+    linux64: *rapidjson_install_includes
+    linux32: *rapidjson_install_includes
+
+########
+# SLD2 #
+########################################################################################################################
+sdl2:
+  clone: git clone https://github.com/spurious/SDL-mirror.git
+
+  build:
+    linux64: [./configure, make]
+    linux32: [./configure, make]
+
+  install:
+    installs: &sdl2_instals
+      - copy: [build/.libs/libSDL2.a, lib]
+      - copytree: [include, include/SDL2]
+
+    linux64: *sdl2_instals
+    linux32: *sdl2_instals
+
+########
+# soil #
+########################################################################################################################
+soil:
+  clone: git clone https://github.com/kbranigan/Simple-OpenGL-Image-Library.git
+  build:
+    linux64: [make]
+    linux32: [make]
+
+  install:
+    linux64:
+      - copy: [src/SOIL.h, include/soil]
+      - copy: [lib/libSOIL.a, lib]
+
+    linux32:
+      - copy: [src/SOIL.h, include/soil]
+      - copy: [lib/libSOIL.a, lib]
+
+###########
+# sqlite3 #
+########################################################################################################################
+sqlite3:
+  clone: ['git clone https://github.com/mackyle/sqlite',
+          'download http://repo.or.cz/sqlite-export.git/blob_plain/master:/create-fossil-manifest create-fossil-manifest.sh']
+  build:
+    linux64: [/bin/sh ./create-fossil-manifest.sh, ./configure, make]
+    linux32: [/bin/sh ./create-fossil-manifest.sh, ./configure, make]
+
+  install:
+    linux64:
+      - copy: [sqlite3.h, include/sqlite3]
+      - copy: [.libs/libsqlite3.a, lib]
+
+    linux32:
+      - copy: [sqlite3.h, include/sqlite3]
+      - copy: [.libs/libsqlite3.a, lib]

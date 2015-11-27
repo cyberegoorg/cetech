@@ -1,0 +1,43 @@
+# constants
+
+COMPILER = "g++"
+EXEC = "unit_test"
+# Use -DPLATFORM_BIG_ENDIAN for big endian platforms
+FLAGS = "-Wall -Wextra -g"
+
+OBJECTS = %w(unit_test.o memory.o murmur_hash.o string_stream.o)
+HEADERS = %w(array.h collection_types.h memory.h memory_types.h types.h 
+	temp_allocator.h hash.h string_stream.h queue.h)
+
+# tasks
+
+task :build => [EXEC]
+
+task :test => :build do
+	sh "./#{EXEC}"
+end
+
+task :default => :test
+
+desc "Clean stuff"
+task :clean do
+	files = (Dir["*.o"] + Dir["#{EXEC}"]).uniq
+	rm_f files unless files.empty?
+end
+
+# rules
+
+rule '.o' => '.cpp' do |target|
+	sh "#{COMPILER} #{FLAGS} -c -o #{target.name} #{target.source}"
+end
+
+file EXEC => OBJECTS do
+	sh "#{COMPILER} #{FLAGS} #{OBJECTS.join(" ")} -o #{EXEC}"
+end
+
+# dependencies
+
+file 'unit_test.o' => %w(unit_test.cpp) + HEADERS
+file 'memory.o' => %w(memory.cpp) + %w(types.h memory_types.h memory.h)
+file 'murmur_hash.o' => %w(murmur_hash.cpp) + %w(murmur_hash.h)
+file 'string_stream.o' => %w(string_stream.cpp) + %w(string_stream.h collection_types.h array.h types.h memory_types.h  )
