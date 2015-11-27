@@ -90,7 +90,8 @@ solution "cyberego.org tech1"
     configuration "osx*"
         defines {
           'CETECH_PLATFORM=linux',
-          'CETECH_LINUX'
+          'CETECH_LINUX',
+          'CETECH_DARWIN'
         }
 
         linkoptions {

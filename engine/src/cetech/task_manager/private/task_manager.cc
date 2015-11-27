@@ -13,6 +13,10 @@
 
 #include "cetech/task_manager/private/queuempmc.h"
 
+#if defined(CETECH_DARWIN)
+    #include <sched.h>
+#endif
+
 //TODO: REWRITE !!! #62
 namespace cetech {
     namespace {
@@ -357,7 +361,12 @@ namespace cetech {
 
             if (t == 0) {
                 //usleep(0);
-                pthread_yield();
+                
+                #if defined(CETECH_DARWIN)
+                    sched_yield();
+                #elif defined(CETECH_LINUX)
+                    pthread_yield();
+                #endif
                 return;
             }
 
