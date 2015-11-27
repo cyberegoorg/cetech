@@ -10,6 +10,7 @@ genie:
 
     linux32: *genie_linux_build
     linux64: *genie_linux_build
+    darwin64: *genie_linux_build
 
   install:
     linux: &genie_linux_install
@@ -17,6 +18,8 @@ genie:
 
     linux64: *genie_linux_install
     linux32: *genie_linux_install
+
+    darwin64: [bin/darwin/genie, bin]
 
 ########
 # bgfx #
@@ -27,6 +30,7 @@ bgfx:
   build:
     linux64: [make linux-release64]
     linux32: [make linux-release32]
+    darwin64: [make osx-release64]
 
   install:
     includes: &bgfx_install_includes
@@ -38,6 +42,10 @@ bgfx:
 
     linux32:
       - copy: [.build/linux32_gcc/bin/libbgfxRelease.a, lib]
+      - copytree: *bgfx_install_includes
+
+    darwin64:
+      - copy: [.build/osx64_clang/bin/libbgfxRelease.a, lib]
       - copytree: *bgfx_install_includes
 
 ######
@@ -52,6 +60,7 @@ bx:
 
     linux32: *bx_install_all
     linux64: *bx_install_all
+    darwin64: *bx_install_all
 
 ########
 # enet #
@@ -62,6 +71,7 @@ enet:
   build:
     linux64: [autoreconf -vfi, ./configure, make]
     linux32: [autoreconf -vfi, ./configure, make]
+    darwin64: [autoreconf -vfi, ./configure, make]
 
   install:
     linux64:
@@ -69,6 +79,10 @@ enet:
       - copytree: [include/enet, include/enet]
 
     linux32:
+      - copy: [.libs/libenet.a, lib]
+      - copytree: [include/enet, include/enet]
+
+    darwin64:
       - copy: [.libs/libenet.a, lib]
       - copytree: [include/enet, include/enet]
 
@@ -82,6 +96,7 @@ luajit:
   build:
     linux64: [make]
     linux32: [make]
+    darwin64: [make]
 
   install:
     linux64:
@@ -102,6 +117,14 @@ luajit:
       - copy: [src/luajit.h, include/luajit]
       - copy: [src/lualib.h, include/luajit]
 
+    darwin64:
+      - copy: [src/libluajit.a, lib]
+      - copy: [src/lauxlib.h, include/luajit]
+      - copy: [src/luaconf.h, include/luajit]
+      - copy: [src/lua.h, include/luajit]
+      - copy: [src/lua.hpp, include/luajit]
+      - copy: [src/luajit.h, include/luajit]
+      - copy: [src/lualib.h, include/luajit]
 
 #############
 # rapidjson #
@@ -115,6 +138,7 @@ rapidjson:
 
     linux64: *rapidjson_install_includes
     linux32: *rapidjson_install_includes
+    darwin64: *rapidjson_install_includes
 
 ########
 # SLD2 #
@@ -125,6 +149,7 @@ sdl2:
   build:
     linux64: [./configure, make]
     linux32: [./configure, make]
+    darwin64: [./configure, make]
 
   install:
     installs: &sdl2_instals
@@ -133,6 +158,7 @@ sdl2:
 
     linux64: *sdl2_instals
     linux32: *sdl2_instals
+    darwin64: *sdl2_instals
 
 ########
 # soil #
@@ -142,6 +168,7 @@ soil:
   build:
     linux64: [make]
     linux32: [make]
+    darwin64: [make]
 
   install:
     linux64:
@@ -149,6 +176,10 @@ soil:
       - copy: [lib/libSOIL.a, lib]
 
     linux32:
+      - copy: [src/SOIL.h, include/soil]
+      - copy: [lib/libSOIL.a, lib]
+
+    darwin64:
       - copy: [src/SOIL.h, include/soil]
       - copy: [lib/libSOIL.a, lib]
 
@@ -161,6 +192,7 @@ sqlite3:
   build:
     linux64: [/bin/sh ./create-fossil-manifest.sh, ./configure, make]
     linux32: [/bin/sh ./create-fossil-manifest.sh, ./configure, make]
+    darwin64: [/bin/sh ./create-fossil-manifest.sh, ./configure, make]
 
   install:
     linux64:
@@ -168,5 +200,9 @@ sqlite3:
       - copy: [.libs/libsqlite3.a, lib]
 
     linux32:
+      - copy: [sqlite3.h, include/sqlite3]
+      - copy: [.libs/libsqlite3.a, lib]
+
+    darwin64:
       - copy: [sqlite3.h, include/sqlite3]
       - copy: [.libs/libsqlite3.a, lib]
