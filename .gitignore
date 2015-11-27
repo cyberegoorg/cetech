@@ -1,1 +1,9 @@
 .idea
+*~
+*.orig
+*.o
+
+external
+data/build
+.build/
+site/

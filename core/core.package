@@ -1,0 +1,6 @@
+{
+  "lua" : [
+    "core/cetech/log",
+    "core/cetech/editor"
+  ]
+}
