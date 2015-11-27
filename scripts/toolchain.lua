@@ -895,6 +895,9 @@ function toolchain(_buildDir, _libDir)
 			"-Wunused-value",
 			"-Wundef",
 		}
+		buildoptions_cpp {
+			"-std=c++0x",
+		}
 		includedirs { path.join(bxDir, "include/compat/osx") }
 
 	configuration { "ios*" }
