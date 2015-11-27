@@ -196,6 +196,8 @@ project "cetech1"
             "-framework CoreAudio",
             "-framework AudioToolbox",
             "-framework AudioUnit",
+            '-pagezero_size 10000',
+            '-image_base 100000000',
         }
 
         links {
