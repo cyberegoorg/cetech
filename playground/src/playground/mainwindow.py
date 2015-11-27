@@ -1,4 +1,5 @@
 import argparse
+import platform
 
 from PyQt5.QtCore import QThread, Qt, QFileSystemWatcher, QDirIterator
 from PyQt5.QtWidgets import QMainWindow, QDockWidget, QTabWidget
@@ -67,11 +68,13 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.recorded_event_dock_widget.setWidget(self.recorded_event_widget)
         self.addDockWidget(Qt.RightDockWidgetArea, self.recorded_event_dock_widget)
 
-        self.ogl_widget = CetechWidget(self, self.api)
-        self.ogl_dock = QDockWidget(self)
-        self.ogl_dock.hide()
-        self.ogl_dock.setWidget(self.ogl_widget)
-        self.addDockWidget(Qt.TopDockWidgetArea, self.ogl_dock)
+        #TODO bug #114 workaround. Disable create sub engine...
+        if platform.system().lower() != 'darwin':
+            self.ogl_widget = CetechWidget(self, self.api)
+            self.ogl_dock = QDockWidget(self)
+            self.ogl_dock.hide()
+            self.ogl_dock.setWidget(self.ogl_widget)
+            self.addDockWidget(Qt.TopDockWidgetArea, self.ogl_dock)
 
         self.tabifyDockWidget(self.assetb_dock_widget, self.log_dock_widget)
 
@@ -102,7 +105,10 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.assetb_widget.open_project(self.project.project_dir)
         self.assetb_dock_widget.show()
         self.log_dock_widget.show()
-        self.ogl_dock.show()
+
+        #TODO bug #114 workaround. Disable create sub engine...
+        if platform.system().lower() != 'darwin':
+            self.ogl_dock.show()
 
         self.watch_project_dir()
 
