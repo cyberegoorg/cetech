@@ -22,7 +22,7 @@ class ProjectManagerDialog(QDialog, Ui_Dialog):
         item = QListWidgetItem()
         item.setText(name)
         item.setData(self._PROJECT_DIR_ROLE, dir)
-        item.setIcon(QIcon.fromTheme("document"))
+        item.setIcon(QIcon.fromTheme("package_games"))
 
         self.projects_list.addItem(item)
 
