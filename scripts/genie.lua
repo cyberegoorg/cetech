@@ -161,7 +161,6 @@ project "cetech1"
       "enet",
       "SOIL",
       "sqlite3",
-      "rt"
     }
     
     configuration "Release or Develop"
@@ -181,7 +180,8 @@ project "cetech1"
             'dl',
             'pthread',
             "GL",
-            "X11"
+            "X11",
+            "rt"
         }
 
     configuration ("osx*")
