@@ -150,7 +150,7 @@ sdl2:
   build:
     linux64: [./configure, make]
     linux32: [./configure, make]
-    darwin64: [./configure, make]
+    darwin64: [./configure --with-x=no, make]
 
   install:
     installs: &sdl2_instals
