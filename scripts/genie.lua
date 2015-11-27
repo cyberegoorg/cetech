@@ -3,6 +3,11 @@ ROOT_DIR = path.getabsolute("..")
 BUILD_DIR = path.join( ROOT_DIR, ".build")
 
 ARCH = os.is64bit() and '64' or '32'
+
+if _OS == 'macosx' then
+    _OS = 'darwin'
+end
+
 OS_ARCH = _OS .. ARCH
 OS_ARCH_DIR = _OS ..'/' .. ARCH
 
@@ -12,7 +17,9 @@ THIRD_PARTY = path.join(ROOT_DIR, "external")
 THIRD_PARTY_BUILD = path.join( ROOT_DIR, THIRD_PARTY, ".build")
 THIRD_PARTY_LIB = path.join(THIRD_PARTY_BUILD, OS_ARCH, "lib")
 THIRD_PARTY_INCLUDE = path.join( THIRD_PARTY_BUILD, OS_ARCH, "include")
+
 print(OS_ARCH)
+
 --------------------------------------------------------------------------------
 newoption {
   trigger = 'simd',
