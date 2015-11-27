@@ -1,5 +1,6 @@
 #include "cetech/task_manager/task_manager.h"
 
+#include "celib/types.h"
 #include "celib/memory/memory.h"
 #include "celib/container/array.inl.h"
 #include "celib/container/queue.inl.h"

@@ -1,3 +1,4 @@
+#include "celib/types.h"
 #include "celib/memory/memory.h"
 #include "celib/container/hash.inl.h"
 #include "celib/container/eventstream.inl.h"
