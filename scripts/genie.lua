@@ -78,7 +78,21 @@ solution "cyberego.org tech1"
         links {
             "m",
         }
-    
+
+    configuration "osx*"
+        defines {
+          'CETECH_PLATFORM=linux',
+          'CETECH_LINUX'
+        }
+
+        linkoptions {
+          "-rdynamic",
+        }
+
+        links {
+            "m",
+        }
+
     dofile(path.join(ROOT_DIR, "scripts", "toolchain.lua"))
     if not toolchain(BUILD_DIR, THIRD_PARTY) then
             return -- no action specified
@@ -153,6 +167,15 @@ project "cetech1"
         }
 
     configuration ("linux*")
+        links {
+            'SDL2',
+            'dl',
+            'pthread',
+            "GL",
+            "X11"
+        }
+
+    configuration ("osx*")
         links {
             'SDL2',
             'dl',
