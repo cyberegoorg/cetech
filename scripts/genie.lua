@@ -189,7 +189,6 @@ project "cetech1"
             'dl',
             'pthread',
             "GL",
-            "X11"
         }
 
     strip()
