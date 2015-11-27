@@ -106,14 +106,15 @@ namespace cetech {
 
             _worker_id = (uint64_t)data; // TODO: (uint64_t)?? !!!
 
-#if defined(CETECH_LINUX)
-            cpu_set_t cpuset;
-            CPU_ZERO(&cpuset);
-            CPU_SET(_worker_id, &cpuset);
-
-            pthread_t current_thread = pthread_self();
-            CE_ASSERT(!pthread_setaffinity_np(current_thread, sizeof(cpu_set_t), &cpuset));
-#endif
+// TODO: multiplatform core afinity... linux ok but mac? no no no
+// #if defined(CETECH_LINUX)
+//             cpu_set_t cpuset;
+//             CPU_ZERO(&cpuset);
+//             CPU_SET(_worker_id, &cpuset);
+// 
+//             pthread_t current_thread = pthread_self();
+//             CE_ASSERT(!pthread_setaffinity_np(current_thread, sizeof(cpu_set_t), &cpuset));
+// #endif
 
             log::info("task_worker", "Worker%d init", _worker_id);
 
