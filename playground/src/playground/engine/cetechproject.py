@@ -110,7 +110,8 @@ class CetechProject(object):
         if daemon:
             args.append("--daemon")
 
-        if wid:
+        #TODO bug #114 workaround. Disable create sub engine...
+        if wid and platform.system().lower() != 'darwin':
             args.append("--wid %s" % int(wid))
 
         if core_dir:
