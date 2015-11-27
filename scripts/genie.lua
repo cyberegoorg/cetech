@@ -185,6 +185,13 @@ project "cetech1"
         }
 
     configuration ("osx*")
+        linkoptions {
+            "-framework Cocoa",
+            "-framework Metal",
+            "-framework QuartzCore",
+            "-framework OpenGL",
+        }
+
         links {
             'SDL2',
             'dl',
