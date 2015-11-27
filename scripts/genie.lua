@@ -202,7 +202,7 @@ project "cetech1"
             'SDL2',
             'dl',
             'pthread',
-            'liconv',
+            'iconv',
         }
 
     strip()
