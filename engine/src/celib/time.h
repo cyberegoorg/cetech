@@ -1,6 +1,10 @@
 #pragma once
 
+// TODO: REWRITE to multiplatform!!!
 #ifdef __MACH__
+
+#define CLOCK_PROCESS_CPUTIME_ID 0
+
 #include <sys/time.h>
 //clock_gettime is not implemented on OSX
 int clock_gettime(int /*clk_id*/, struct timespec* t) {
