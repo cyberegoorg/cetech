@@ -1,6 +1,6 @@
 # [CETech](https://github.com/cyberegoorg/cetech)
 
-## [Whas is it?] (https://cyberegoorg.github.io/cetech/)
+## [What is it?] (https://cyberegoorg.github.io/cetech/)
 
 CETech is Data-Driven [game engine](https://en.wikipedia.org/wiki/Game_engine) and toolbox for game and
 interactive application developing.
