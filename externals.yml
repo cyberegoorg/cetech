@@ -5,19 +5,19 @@ genie:
   clone: git clone https://github.com/bkaradzic/genie
 
   build:
-    linux: &genie_linux_build
-      [make]
-
-    linux32: *genie_linux_build
-    linux64: *genie_linux_build
-    darwin64: *genie_linux_build
+    linux32:  [make]
+    linux64:  [make]
+    darwin64: [make]
 
   install:
-    linux: &genie_linux_install
-      - copy: [bin/linux/genie, bin]
+    linux: &genie_install_linux
+      [bin/linux/genie, bin]
 
-    linux64: *genie_linux_install
-    linux32: *genie_linux_install
+    linux32:
+      - copy: *genie_install_linux
+
+    linux64:
+      - copy: *genie_install_linux
 
     darwin64:
       - copy: [bin/darwin/genie, bin]
@@ -29,25 +29,25 @@ bgfx:
   clone: git clone https://github.com/bkaradzic/bgfx
 
   build:
-    linux64: [make linux-release64]
-    linux32: [make linux-release32]
+    linux64:  [make linux-release64]
+    linux32:  [make linux-release32]
     darwin64: [make osx-release64]
 
   install:
-    includes: &bgfx_install_includes
+    includes: &bgfx_include
       [include/bgfx, include/bgfx]
 
     linux64:
-      - copy: [.build/linux64_gcc/bin/libbgfxRelease.a, lib]
-      - copytree: *bgfx_install_includes
+      - copy:     [.build/linux64_gcc/bin/libbgfxRelease.a, lib]
+      - copytree: *bgfx_include
 
     linux32:
-      - copy: [.build/linux32_gcc/bin/libbgfxRelease.a, lib]
-      - copytree: *bgfx_install_includes
+      - copy:     [.build/linux32_gcc/bin/libbgfxRelease.a, lib]
+      - copytree: *bgfx_include
 
     darwin64:
-      - copy: [.build/osx64_clang/bin/libbgfxRelease.a, lib]
-      - copytree: *bgfx_install_includes
+      - copy:     [.build/osx64_clang/bin/libbgfxRelease.a, lib]
+      - copytree: *bgfx_include
 
 ######
 # bx #
@@ -56,12 +56,17 @@ bx:
   clone: git clone https://github.com/bkaradzic/bx
 
   install:
-    all: &bx_install_all
-      - copytree: [include/bx, include/bx]
+    includes: &bx_install_include
+      [include/bx, include/bx]
 
-    linux32: *bx_install_all
-    linux64: *bx_install_all
-    darwin64: *bx_install_all
+    linux32:
+      - copytree: *bx_install_include
+
+    linux64:
+      - copytree: *bx_install_include
+
+    darwin64:
+      - copytree: *bx_install_include
 
 ########
 # enet #
@@ -70,23 +75,31 @@ enet:
   clone: git clone https://github.com/lsalzman/enet.git
 
   build:
-    linux64: [autoreconf -vfi, ./configure, make]
-    linux32: [autoreconf -vfi, ./configure, make]
-    darwin64: [autoreconf -vfi, ./configure, make]
+    configure: &enet_build_configure
+      [autoreconf -vfi, ./configure, make]
+
+    linux64:  *enet_build_configure
+    linux32:  *enet_build_configure
+    darwin64: *enet_build_configure
 
   install:
+    lib: &enet_install_lib
+      [.libs/libenet.a, lib]
+
+    include: &enet_install_include
+      [include/enet, include/enet]
+
     linux64:
-      - copy: [.libs/libenet.a, lib]
-      - copytree: [include/enet, include/enet]
+      - copy:     *enet_install_lib
+      - copytree: *enet_install_include
 
     linux32:
-      - copy: [.libs/libenet.a, lib]
-      - copytree: [include/enet, include/enet]
+      - copy:     *enet_install_lib
+      - copytree: *enet_install_include
 
     darwin64:
-      - copy: [.libs/libenet.a, lib]
-      - copytree: [include/enet, include/enet]
-
+      - copy:     *enet_install_lib
+      - copytree: *enet_install_include
 
 ##########
 # luajit #
@@ -95,8 +108,8 @@ luajit:
   clone: git clone http://luajit.org/git/luajit-2.0.git
 
   build:
-    linux64: [make]
-    linux32: [make]
+    linux64:  [make]
+    linux32:  [make]
     darwin64: [make]
 
   install:
@@ -134,12 +147,17 @@ rapidjson:
   clone: git clone https://github.com/miloyip/rapidjson/
 
   install:
-    includes: &rapidjson_install_includes
-      - copytree: [include/rapidjson, include/rapidjson]
+    includes: &rapidjson_install_include
+      [include/rapidjson, include/rapidjson]
 
-    linux64: *rapidjson_install_includes
-    linux32: *rapidjson_install_includes
-    darwin64: *rapidjson_install_includes
+    linux64:
+      - copytree: *rapidjson_install_include
+
+    linux32:
+      - copytree: *rapidjson_install_include
+
+    darwin64:
+      - copytree: *rapidjson_install_include
 
 ########
 # SLD2 #
@@ -148,18 +166,34 @@ sdl2:
   clone: git clone https://github.com/spurious/SDL-mirror.git
 
   build:
-    linux64: [./configure, make]
-    linux32: [./configure, make]
-    darwin64: [./configure --with-x=no, make]
+    configure: &sdl2_build_configure
+      [./configure, make]
+
+    configure_darwin: &sdl2_build_configure_darwin
+      [./configure --with-x=no, make]
+
+    linux64:  *sdl2_build_configure
+    linux32:  *sdl2_build_configure
+    darwin64: *sdl2_build_configure_darwin
 
   install:
-    installs: &sdl2_instals
-      - copy: [build/.libs/libSDL2.a, lib]
-      - copytree: [include, include/SDL2]
+    lib: &sdl2_install_lib
+      [build/.libs/libSDL2.a, lib]
 
-    linux64: *sdl2_instals
-    linux32: *sdl2_instals
-    darwin64: *sdl2_instals
+    include: &sdl2_install_include
+      [include, include/SDL2]
+
+    linux64:
+      - copy: *sdl2_install_lib
+      - copytree: *sdl2_install_include
+
+    linux32:
+      - copy: *sdl2_install_lib
+      - copytree: *sdl2_install_include
+
+    darwin64:
+      - copy: *sdl2_install_lib
+      - copytree: *sdl2_install_include
 
 ########
 # soil #
@@ -167,22 +201,28 @@ sdl2:
 soil:
   clone: git clone https://github.com/kbranigan/Simple-OpenGL-Image-Library.git
   build:
-    linux64: [make]
-    linux32: [make]
+    linux64:  [make]
+    linux32:  [make]
     darwin64: [make]
 
   install:
-    linux64:
-      - copy: [src/SOIL.h, include/soil]
-      - copy: [lib/libSOIL.a, lib]
+    include: &soil_install_include
+      [src/SOIL.h, include/soil]
+
+    lib: &soil_install_lib
+      [lib/libSOIL.a, lib]
 
     linux32:
-      - copy: [src/SOIL.h, include/soil]
-      - copy: [lib/libSOIL.a, lib]
+      - copy: *soil_install_include
+      - copy: *soil_install_lib
+
+    linux64:
+      - copy: *soil_install_include
+      - copy: *soil_install_lib
 
     darwin64:
-      - copy: [src/SOIL.h, include/soil]
-      - copy: [lib/libSOIL.a, lib]
+      - copy: *soil_install_include
+      - copy: *soil_install_lib
 
 ###########
 # sqlite3 #
@@ -191,19 +231,28 @@ sqlite3:
   clone: ['git clone https://github.com/mackyle/sqlite',
           'download http://repo.or.cz/sqlite-export.git/blob_plain/master:/create-fossil-manifest create-fossil-manifest.sh']
   build:
-    linux64: [/bin/sh ./create-fossil-manifest.sh, ./configure, make]
-    linux32: [/bin/sh ./create-fossil-manifest.sh, ./configure, make]
-    darwin64: [/bin/sh ./create-fossil-manifest.sh, ./configure, make]
+    posix: &sqlite3_build_posix
+      [/bin/sh ./create-fossil-manifest.sh, ./configure, make]
+
+    linux64:  *sqlite3_build_posix
+    linux32:  *sqlite3_build_posix
+    darwin64: *sqlite3_build_posix
 
   install:
+    include: &sqlite_install_include
+      [sqlite3.h, include/sqlite3]
+
+    lib: &sqlite_install_lib
+      [.libs/libsqlite3.a, lib]
+
     linux64:
-      - copy: [sqlite3.h, include/sqlite3]
-      - copy: [.libs/libsqlite3.a, lib]
+      - copy: *sqlite_install_include
+      - copy: *sqlite_install_lib
 
     linux32:
-      - copy: [sqlite3.h, include/sqlite3]
-      - copy: [.libs/libsqlite3.a, lib]
+      - copy: *sqlite_install_include
+      - copy: *sqlite_install_lib
 
     darwin64:
-      - copy: [sqlite3.h, include/sqlite3]
-      - copy: [.libs/libsqlite3.a, lib]
+      - copy: *sqlite_install_include
+      - copy: *sqlite_install_lib

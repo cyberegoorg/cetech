@@ -52,12 +52,13 @@ CONFIG = {
 
 # Build platform.
 PLATFORMS = {
-    'linux64'
+    'linux64',
+    'darwin64'
 }
 
 
 # EXTERNALS
-with open(os.path.join(ROOT_DIR, '.externals.yml')) as f:
+with open(os.path.join(ROOT_DIR, 'externals.yml')) as f:
     EXTERNALS = yaml.load(f.read())
 
 EXTERNALS.update({'': None})
@@ -90,7 +91,8 @@ ARGS_PARSER.add_argument(
 
 ARGS_PARSER.add_argument(
         "--platform",
-        default=DEFAULT_BUILD, choices=PLATFORMS, help='Target platform')
+        help='Target platform',
+        default=DEFAULT_BUILD, choices=PLATFORMS)
 
 ###########
 # PROGRAM #
