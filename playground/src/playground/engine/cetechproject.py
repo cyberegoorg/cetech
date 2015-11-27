@@ -77,7 +77,12 @@ class CetechProject(object):
 
     def get_executable_path(self, build_type):
         engine_bin_path = '../.build/'
-        platform_dir = "%s%s_clang" % (platform.system().lower(), platform.architecture()[0][0:2])
+
+        _platform = platform.system().lower()
+        if _platform == 'darwin':
+            _platform = 'osx'
+
+        platform_dir = "%s%s_clang" % (_platform, platform.architecture()[0][0:2])
 
         exec_name = "cetech1%s" % build_type
 
