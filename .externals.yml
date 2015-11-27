@@ -19,7 +19,8 @@ genie:
     linux64: *genie_linux_install
     linux32: *genie_linux_install
 
-    darwin64: *genie_linux_install
+    darwin64:
+      - copy: [bin/darwin/genie, bin]
 
 ########
 # bgfx #
