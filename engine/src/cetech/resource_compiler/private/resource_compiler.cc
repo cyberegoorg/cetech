@@ -190,7 +190,7 @@ namespace cetech {
                 Array < char* > (memory_globals::default_allocator())
             };
 
-            for (ulong i = 0; i < sizeof(in_dirs) / sizeof(StringId64_t); ++i) {
+            for (unsigned long i = 0; i < sizeof(in_dirs) / sizeof(StringId64_t); ++i) {
                 StringId64_t src_dir = in_dirs[i];
 
                 Array < char* >& files = dir_files[i];
@@ -263,7 +263,7 @@ namespace cetech {
 
             save_json("debug_index.json", debug_index);
 
-            for (ulong i = 0; i < sizeof(in_dirs) / sizeof(StringId64_t); ++i) {
+            for (unsigned long i = 0; i < sizeof(in_dirs) / sizeof(StringId64_t); ++i) {
                 filesystem::free_list_directory(dir_files[i]);
             }
         }
