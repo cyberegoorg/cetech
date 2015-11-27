@@ -90,7 +90,7 @@ ARGS_PARSER.add_argument(
 
 ARGS_PARSER.add_argument(
         "--platform",
-        default='linux64', choices=PLATFORMS, help='Target platform')
+        default=DEFAULT_BUILD, choices=PLATFORMS, help='Target platform')
 
 ###########
 # PROGRAM #
