@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>CETech1 - project manager</string>
+   <string>CETech - project manager</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout_2">
    <item>
@@ -39,8 +39,7 @@
               </property>
               <property name="icon">
                <iconset theme="folder-new">
-                <normaloff/>
-               </iconset>
+                <normaloff>.</normaloff>.</iconset>
               </property>
              </widget>
             </item>
@@ -51,8 +50,7 @@
               </property>
               <property name="icon">
                <iconset theme="edit-delete">
-                <normaloff/>
-               </iconset>
+                <normaloff>.</normaloff>.</iconset>
               </property>
              </widget>
             </item>
@@ -79,6 +77,9 @@
               <height>64</height>
              </size>
             </property>
+            <property name="movement">
+             <enum>QListView::Static</enum>
+            </property>
             <property name="viewMode">
              <enum>QListView::IconMode</enum>
             </property>
@@ -99,7 +100,7 @@
    <item>
     <widget class="QDialogButtonBox" name="buttonBox">
      <property name="standardButtons">
-      <set>QDialogButtonBox::Close</set>
+      <set>QDialogButtonBox::Close|QDialogButtonBox::Open</set>
      </property>
     </widget>
    </item>
@@ -171,10 +172,43 @@
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>buttonBox</sender>
+   <signal>accepted()</signal>
+   <receiver>Dialog</receiver>
+   <slot>accept()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>365</x>
+     <y>422</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>365</x>
+     <y>221</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>projects_list</sender>
+   <signal>itemSelectionChanged()</signal>
+   <receiver>Dialog</receiver>
+   <slot>project_selected()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>365</x>
+     <y>244</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>365</x>
+     <y>221</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
  <slots>
   <slot>add_existing()</slot>
   <slot>project_list_dclicked(QListWidgetItem*)</slot>
   <slot>remove_project()</slot>
+  <slot>project_selected()</slot>
  </slots>
 </ui>
