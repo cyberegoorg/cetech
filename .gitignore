@@ -7,3 +7,4 @@ external
 data/build
 .build/
 site/
+.directory

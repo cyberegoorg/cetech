@@ -8,6 +8,7 @@ import os
 import sys
 
 from PyQt5.QtCore import QDir
+from PyQt5.QtGui import QIcon
 from PyQt5.uic import compileUiDir
 
 ###########
@@ -20,6 +21,9 @@ QDir.setCurrent(PLAYGROUND_DIR)
 
 def compile_map(d, f):
     return 'src/playground/ui/', f
+
+QIcon.setThemeSearchPaths([os.path.join(PLAYGROUND_DIR, 'icons')])
+QIcon.setThemeName('Faenza')
 
 ########
 # MAIN #
