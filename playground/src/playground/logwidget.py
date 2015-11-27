@@ -58,10 +58,10 @@ class LogWidget(QFrame, Ui_LogWidget):
 
         dt_s = QDateTime.fromTime_t(time).toString("hh:mm:ss.zzz")
 
-        item = QTreeWidgetItem([dt_s, '', str(worker_id), where, msg])
+        item = QTreeWidgetItem(['', dt_s, str(worker_id), where, msg])
 
-        item.setIcon(1, self.style().standardIcon(LOG_ICON[level]))
-        item.setData(1, Qt.UserRole, level)
+        item.setIcon(0, self.style().standardIcon(LOG_ICON[level]))
+        item.setData(0, Qt.UserRole, level)
 
         self.log_tree_widget.addTopLevelItem(item)
 
@@ -74,7 +74,7 @@ class LogWidget(QFrame, Ui_LogWidget):
         :type item: QTreeWidgetItem
         """
 
-        level = item.data(1, Qt.UserRole)
+        level = item.data(0, Qt.UserRole)
         if level != 'E':
             return
 

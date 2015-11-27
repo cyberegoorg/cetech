@@ -45,12 +45,12 @@
      </attribute>
      <column>
       <property name="text">
-       <string>Time</string>
+       <string>Level</string>
       </property>
      </column>
      <column>
       <property name="text">
-       <string>Level</string>
+       <string>Time</string>
       </property>
      </column>
      <column>
