@@ -87,9 +87,9 @@ PLATFORMS_BUILD = {
     },
 
     'darwin64': {
-        'develop': DARWIN_BUILD + ['config=develop32'],
-        'debug': DARWIN_BUILD + ['config=debug32'],
-        'release': DARWIN_BUILD + ['config=release32'],
+        'develop': DARWIN_BUILD + ['config=develop64'],
+        'debug': DARWIN_BUILD + ['config=debug64'],
+        'release': DARWIN_BUILD + ['config=release64'],
     },
 }
 
