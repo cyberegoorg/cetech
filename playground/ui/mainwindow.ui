@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>CETech1 - plaground</string>
+   <string>CETech - Plaground</string>
   </property>
   <property name="dockOptions">
    <set>QMainWindow::AllowNestedDocks|QMainWindow::AllowTabbedDocks|QMainWindow::AnimatedDocks</set>
@@ -41,7 +41,7 @@
     </property>
     <widget class="QMenu" name="menuDebug">
      <property name="title">
-      <string>Debug</string>
+      <string>&amp;Debug</string>
      </property>
      <addaction name="actionRecorded_events"/>
     </widget>
@@ -72,7 +72,7 @@
   </action>
   <action name="actionRecorded_events">
    <property name="text">
-    <string>Recorded events</string>
+    <string>&amp;Recorded events</string>
    </property>
   </action>
  </widget>

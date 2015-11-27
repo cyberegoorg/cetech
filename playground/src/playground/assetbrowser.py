@@ -29,7 +29,7 @@ class AssetBrowser(QMainWindow, Ui_MainWindow):
         self.file_view.setModel(self.file_model)
 
     def open_project(self, project_dir):
-        path = os.path.join(project_dir, 'src')
+        path = os.path.join(project_dir)
 
         self.dir_model.setRootPath(path)
         self.file_model.setRootPath(path)
