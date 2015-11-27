@@ -190,13 +190,19 @@ project "cetech1"
             "-framework Metal",
             "-framework QuartzCore",
             "-framework OpenGL",
+            "-framework ForceFeedback",
+            "-framework Carbon",
+            "-framework IOKit",
+            "-framework CoreAudio",
+            "-framework AudioToolbox",
+            "-framework AudioUnit",
         }
 
         links {
             'SDL2',
             'dl',
             'pthread',
-            "GL",
+            'liconv',
         }
 
     strip()
