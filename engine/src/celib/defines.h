@@ -7,4 +7,3 @@
 #elif defined(CETECH_WINDOWS)
     #include "celib/compilers/msvc/defines.h"
 #endif
-

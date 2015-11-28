@@ -11,7 +11,7 @@
 #include "celib/container/array.inl.h"
 #include "celib/crypto/murmur_hash.inl.h"
 #include "celib/math/vector2.inl.h"
-#include "cetech/application/application.h"
+#include "cetech/window/window.h"
 
 
 #include "SDL2/SDL.h"

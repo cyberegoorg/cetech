@@ -3,6 +3,7 @@
 
 #include "celib/string/stringid.inl.h"
 #include "cetech/application/application.h"
+#include "cetech/package_manager/package_manager.h"
 
 namespace cetech {
 

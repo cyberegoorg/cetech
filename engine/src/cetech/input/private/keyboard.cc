@@ -12,6 +12,7 @@
 #include "celib/crypto/murmur_hash.inl.h"
 #include "celib/math/vector2.inl.h"
 #include "cetech/application/application.h"
+#include "cetech/develop/develop_manager.h"
 
 #include "SDL2/SDL.h"
 

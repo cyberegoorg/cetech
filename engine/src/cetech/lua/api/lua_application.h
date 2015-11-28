@@ -4,6 +4,8 @@
 #include "cetech/lua/lua_stack.h"
 
 #include "cetech/application/application.h"
+#include "cetech/renderer/renderer.h"
+#include "cetech/develop/console_server.h"
 
 namespace cetech {
     static int application_quit(lua_State* L) {

@@ -16,6 +16,8 @@
 
 #include "cetech/renderer/renderer.h"
 
+#include "cetech/develop/console_server.h"
+
 #include "cetech/input/keyboard.h"
 #include "cetech/input/mouse.h"
 #include "cetech/thread/thread.h"
@@ -174,59 +176,59 @@ namespace cetech {
             shutdown_os();
         }
 
-        static void process_mouse(void* data) {
-            mouse::process_mouse();
-            usleep(2 * 1000);
-        }
-
-        static void process_keyboard(void* data) {
-            keyboard::process_keyboard();
-            usleep(2 * 1000);
-        }
-
-        static void console_server_tick(void* data) {
-            console_server::tick();
-        }
-
-        static void frame_tick(void* _data) {
-            CE_CHECK_PTR(_globals.data);
-            ApplictionData& data = *_globals.data;
-
-            float dt = 0.0f;
-            uint32_t now_ticks = 0;
-
-            now_ticks = get_ticks();
-
-            dt = (now_ticks - data._last_frame_ticks) * 0.001f;
-            data._delta_time = dt;
-            data._last_frame_ticks = now_ticks;
-
-
-    #if defined(CETECH_DEVELOP)
-            develop_manager::push_record_float("engine.frame_id", data._frame_id);
-            develop_manager::push_record_float("engine.delta_time", dt);
-            develop_manager::push_record_float("engine.frame_rate", 1.0f / dt);
-    #endif
-
-            if (!data._flags.daemon_mod) {
-                renderer::begin_frame();
-            }
-
-            if (!data._flags.pause) {
-                lua_enviroment::call_global("update", "f", dt);
-                lua_enviroment::clean_temp();
-            }
-
-#if defined(CETECH_DEVELOP)
-#endif
-
-            if (!data._flags.daemon_mod) {
-                renderer::end_frame();
-                window::update(data.main_window);
-            }
-
-            usleep(2 * 1000);
-        }
+        //         static void process_mouse(void* data) {
+        //             mouse_globals::process_mouse();
+        //             usleep(2 * 1000);
+        //         }
+        //
+        //         static void process_keyboard(void* data) {
+        //             keyboard::process_keyboard();
+        //             usleep(2 * 1000);
+        //         }
+        //
+        //         static void console_server_tick(void* data) {
+        //             console_server::tick();
+        //         }
+        //
+        //         static void frame_tick(void* _data) {
+        //             CE_CHECK_PTR(_globals.data);
+        //             ApplictionData& data = *_globals.data;
+        //
+        //             float dt = 0.0f;
+        //             uint32_t now_ticks = 0;
+        //
+        //             now_ticks = get_ticks();
+        //
+        //             dt = (now_ticks - data._last_frame_ticks) * 0.001f;
+        //             data._delta_time = dt;
+        //             data._last_frame_ticks = now_ticks;
+        //
+        //
+        //     #if defined(CETECH_DEVELOP)
+        //             develop_manager::push_record_float("engine.frame_id", data._frame_id);
+        //             develop_manager::push_record_float("engine.delta_time", dt);
+        //             develop_manager::push_record_float("engine.frame_rate", 1.0f / dt);
+        //     #endif
+        //
+        //             if (!data._flags.daemon_mod) {
+        //                 renderer::begin_frame();
+        //             }
+        //
+        //             if (!data._flags.pause) {
+        //                 lua_enviroment::call_global("update", "f", dt);
+        //                 lua_enviroment::clean_temp();
+        //             }
+        //
+        // #if defined(CETECH_DEVELOP)
+        // #endif
+        //
+        //             if (!data._flags.daemon_mod) {
+        //                 renderer::end_frame();
+        //                 window::update(data.main_window);
+        //             }
+        //
+        //             usleep(2 * 1000);
+        //         }
 
         void run() {
             init();
@@ -248,7 +250,7 @@ namespace cetech {
 
                 process_os();
                 keyboard::process_keyboard();
-                mouse::process_mouse();
+                mouse_globals::process_mouse();
 
                 float dt = 0.0f;
                 uint32_t now_ticks = 0;

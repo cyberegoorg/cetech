@@ -1,6 +1,6 @@
 #include <cstdio>
 
-
+#include "cetech/resource_compiler/resource_compiler.h"
 #include "cetech/resource_manager/resource_manager.h"
 #include "cetech/resource_compiler/private/builddb.h"
 
@@ -15,6 +15,7 @@
 
 #include "cetech/application/application.h"
 #include "cetech/cvars/cvars.h"
+#include "cetech/develop/console_server.h"
 
 #include "rapidjson/prettywriter.h"
 #include "rapidjson/memorybuffer.h"

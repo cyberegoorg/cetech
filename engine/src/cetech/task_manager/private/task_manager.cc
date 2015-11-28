@@ -1,5 +1,7 @@
 #include "cetech/task_manager/task_manager.h"
 
+#include <unistd.h>
+
 #include "celib/types.h"
 #include "celib/memory/memory.h"
 #include "celib/container/array.inl.h"
@@ -9,11 +11,12 @@
 #include "cetech/application/application.h"
 #include "cetech/log/log.h"
 
-#include <unistd.h>
-
 #include "cetech/task_manager/private/queuempmc.h"
+#include "cetech/develop/develop_manager.h"
 
-#if defined(CETECH_DARWIN)
+#if defined(CETECH_LINUX)
+    #include <pthread.h>
+#elif defined(CETECH_DARWIN)
     #include <sched.h>
 #endif
 
@@ -110,15 +113,15 @@ namespace cetech {
 
             _worker_id = (uint64_t)data; // TODO: (uint64_t)?? !!!
 
-// TODO: multiplatform core afinity... linux ok but mac? no no no
-// #if defined(CETECH_LINUX)
-//             cpu_set_t cpuset;
-//             CPU_ZERO(&cpuset);
-//             CPU_SET(_worker_id, &cpuset);
-// 
-//             pthread_t current_thread = pthread_self();
-//             CE_ASSERT(!pthread_setaffinity_np(current_thread, sizeof(cpu_set_t), &cpuset));
-// #endif
+            // TODO: multiplatform core afinity... linux ok but mac? no no no
+            // #if defined(CETECH_LINUX)
+            //             cpu_set_t cpuset;
+            //             CPU_ZERO(&cpuset);
+            //             CPU_SET(_worker_id, &cpuset);
+            //
+            //             pthread_t current_thread = pthread_self();
+            //             CE_ASSERT(!pthread_setaffinity_np(current_thread, sizeof(cpu_set_t), &cpuset));
+            // #endif
 
             log::info("task_worker", "Worker%d init", _worker_id);
 
@@ -361,11 +364,11 @@ namespace cetech {
 
             if (t == 0) {
                 //usleep(0);
-                
+
                 #if defined(CETECH_DARWIN)
-                    sched_yield();
+                sched_yield();
                 #elif defined(CETECH_LINUX)
-                    pthread_yield();
+                pthread_yield();
                 #endif
                 return;
             }
