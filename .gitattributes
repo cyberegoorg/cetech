@@ -1,3 +1,4 @@
-playground/icons linguist-vendored
+playground/icons/* linguist-vendored
 playground/html/ace/* linguist-vendored
+playground/html/ace/snipets/* linguist-vendored
 3rdparty linguist-vendored
