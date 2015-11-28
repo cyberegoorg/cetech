@@ -75,14 +75,12 @@ $ python make.py
 ```bash
 $ python playground.py
 ```
-
 * Click on `add exist`.
 * Set name `SAMPLE`.
 * Click on `...` and select repository folder `data`.
 * Click on `ok`.
-* Double click on `SAMPLE`.
+* Click on `Open`.
 * Enjoy playground bugs.
-
 
 ## [License](http://creativecommons.org/publicdomain/zero/1.0/)
 
