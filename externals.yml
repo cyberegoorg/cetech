@@ -159,6 +159,26 @@ rapidjson:
     darwin64:
       - copytree: *rapidjson_install_include
 
+#########
+# Catch #
+########################################################################################################################
+catch:
+  clone: git clone https://github.com/philsquared/Catch.git
+
+  install:
+    includes: &catch_install_include
+      [single_include/catch.hpp, include/catch]
+
+    linux64:
+      - copy: *catch_install_include
+
+    linux32:
+      - copy: *catch_install_include
+
+    darwin64:
+      - copy: *catch_install_include
+
+
 ########
 # SLD2 #
 ########################################################################################################################
