@@ -1,7 +1,8 @@
 #pragma once
 
 #include <ctime>
-#include "celib/string/stringid_types.h"
+
+#include "celib/stringid_types.h"
 
 struct sqlite3;
 

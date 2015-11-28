@@ -134,18 +134,18 @@ namespace cetech {
 
             init_os();
 
-            if (command_line_globals::has_argument("daemon", 'd')) {
+            if (command_line::has_argument("daemon", 'd')) {
                 data->_flags.daemon_mod = 1;
             }
 
             data->_flags.run = 1;
 
             if (!data->_flags.daemon_mod) {
-                if (command_line_globals::has_argument("wid")) {
+                if (command_line::has_argument("wid")) {
                     char* ptr;
                     long wid;
 
-                    wid = strtol(command_line_globals::get_parameter("wid"), &ptr, 10);
+                    wid = strtol(command_line::get_parameter("wid"), &ptr, 10);
                     data->main_window = window::make_from((void*)wid);
 
                 } else {

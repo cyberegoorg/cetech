@@ -7,7 +7,7 @@
 #include <cstdint>
 #include <string.h>
 
-#include "celib/memory/memory_types.h"
+#include "celib/memory_types.h"
 
 #define NULL_TASK {0}
 

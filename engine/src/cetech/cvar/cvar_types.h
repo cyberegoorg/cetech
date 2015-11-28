@@ -4,7 +4,7 @@
 #include <cstdlib>
 
 #include "celib/defines.h"
-#include "celib/string/stringid_types.h"
+#include "celib/stringid_types.h"
 
 namespace cetech {
     struct CVar {

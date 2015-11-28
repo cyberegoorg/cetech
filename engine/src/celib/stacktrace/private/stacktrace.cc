@@ -1,5 +1,6 @@
-#pragma once
-
+/*******************************************************************************
+**** Includes
+*******************************************************************************/
 #include <execinfo.h>
 #include <cxxabi.h>
 
@@ -7,8 +8,12 @@
 #include <cstdlib>
 #include <cstring>
 
+
+/*******************************************************************************
+**** Implementation
+*******************************************************************************/
 namespace cetech {
-    static char* stacktrace(int skip) {
+    char* stacktrace(int skip) {
         char* return_str = (char*)malloc(4096 * 8);
         return_str[0] = '\0';
 

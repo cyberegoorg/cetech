@@ -1,15 +1,25 @@
 #pragma once
 
-#include "math_types.h"
-#include "math.h"
-#include "simd/simd.h"
-#include "vector3.inl.h"
-#include "vector4.inl.h"
+/*******************************************************************************
+**** Includes
+*******************************************************************************/
+
+#include "celib/math_types.h"
+#include "celib/math/math.inl.h"
+#include "celib/math/simd/simd.h"
+#include "celib/math/vector3.inl.h"
+#include "celib/math/vector4.inl.h"
 
 namespace cetech {
+
+    /***************************************************************************
+    **** Matrix 4x4 constatns
+    ***************************************************************************/
     namespace matrix44 {
-        /*! Identity matrix.
-         */
+
+        /***********************************************************************
+        **** Identity matrix
+        ***********************************************************************/
         static const Matrix44 IDENTITY = {
             {1.0f, 0.0f, 0.0f, 0.0f},
             {0.0f, 1.0f, 0.0f, 0.0f},
@@ -18,41 +28,68 @@ namespace cetech {
         };
     }
 
+    /***************************************************************************
+    **** Matrix 4x4 interface
+    ***************************************************************************/
     namespace matrix44 {
+
+        /***********************************************************************
+        **** Create matrix from axis X, Y, Z, T
+        ***********************************************************************/
         CE_INLINE Matrix44 make_matrix44(const Vector4& x,
                                          const Vector4& y,
                                          const Vector4& z,
                                          const Vector4& t);
 
+        /***********************************************************************
+        **** Create matrix from orthographic params
+        ***********************************************************************/
         CE_INLINE Matrix44 make_ortho(float left,
                                       float right,
                                       float bottom,
                                       float top,
                                       float near,
                                       float far);
+
+        /***********************************************************************
+        **** Create matrix from perspective params
+        ***********************************************************************/
         CE_INLINE Matrix44 make_perspective(float fov,
                                             float aspect,
                                             float near,
                                             float far);
 
-        /*! Make matrix44 from axis and angle.
-         * \param axis Axis
-         * \param angle_deg Angle in deg
-         * \return New rotation matrix
-         */
+        /***********************************************************************
+        **** Create matrix from axis and angle
+        ***********************************************************************/
         CE_INLINE Matrix44 from_axis_angle(const Vector3& axis,
                                            const float angle_deg);
 
+        /***********************************************************************
+        **** Transpose matrix
+        ***********************************************************************/
         CE_INLINE Matrix44 transpose(const Matrix44& m1);
 
+        /***********************************************************************
+        **** Get determinant
+        ***********************************************************************/
         CE_INLINE float determinant(const Matrix44& m1);
     }
 
+    /***************************************************************************
+    **** Matrix44 * Matrix44
+    ***************************************************************************/
     CE_INLINE Matrix44 operator* (const Matrix44 &m1, const Matrix44 &m2);
 
+    /***************************************************************************
+    **** Matrix44 * Vector3
+    ***************************************************************************/
     CE_INLINE Vector3 operator* (const Matrix44 &m1, const Vector3 &v);
 
 
+    /***************************************************************************
+    **** Matrix 4x4 implementation
+    ***************************************************************************/
     namespace matrix44 {
         Matrix44 make_matrix44(const Vector4& x,
                                const Vector4& y,
@@ -156,6 +193,9 @@ namespace cetech {
         }
     }
 
+    /***************************************************************************
+    **** Matrix 4x4 implementation
+    ***************************************************************************/
     Matrix44 operator* (const Matrix44 &m1, const Matrix44 &m2) {
         Matrix44 res;
         simd::mat44_mult(&m1, &m2, &res);

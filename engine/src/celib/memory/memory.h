@@ -1,5 +1,13 @@
-// based on bitsquid foundation
 #pragma once
+
+/*******************************************************************************
+**** Based on bitsquid foundation.
+*******************************************************************************/
+
+
+/*******************************************************************************
+**** Includes
+*******************************************************************************/
 
 #include <cstring>
 #include <new>
@@ -7,43 +15,66 @@
 #include "celib/asserts.h"
 #include "celib/types.h"
 
+
+/***************************************************************************
+**** allocate T(...) with 'a' alocator
+***************************************************************************/
+#define MAKE_NEW(a, T, ...) (new((a).allocate(sizeof(T), alignof(T))) T(__VA_ARGS__))
+
+/***************************************************************************
+**** deallocate T* p with 'a' alocator
+***************************************************************************/
+#define MAKE_DELETE(a, T, p)    do {if (p) {(p)->~T(); a.deallocate(p); }} while (0)
+
 namespace cetech {
 
-    /*! Abstract allocator.
-     */
+    /***************************************************************************
+    **** Abstract allocator
+    ***************************************************************************/
     class Allocator {
         public:
-            static const uint32_t DEFAULT_ALIGN = 4;              //!< Default align.
-            static const uint32_t SIZE_NOT_TRACKED = 0xffffffffu; //!< Size not tracked
+
+            /*******************************************************************
+            **** Default align.
+            *******************************************************************/
+            static const uint32_t DEFAULT_ALIGN = 4;
+
+            /*******************************************************************
+            **** Size not tracked
+            *******************************************************************/
+            static const uint32_t SIZE_NOT_TRACKED = 0xffffffffu;
 
         public:
+            /*******************************************************************
+            **** Constructor and destructor
+            *******************************************************************/
             Allocator() {};
             virtual ~Allocator() {};
 
         public:
-            /*! Allocate memory.
-             * \param size Alloc size.
-             * \param align align.
-             * \return Pointer to new memory.
-             */
+
+            /*******************************************************************
+            **** Allocate memory.
+            *******************************************************************/
             virtual void* allocate(const uint32_t size,
                                    const uint32_t align = DEFAULT_ALIGN) = 0;
 
-            /*! Deallocate memory.
-             * \param p Pointer to memory.
-             */
+            /*******************************************************************
+            **** Deallocate memory.
+            *******************************************************************/
             virtual void deallocate(void* p) = 0;
 
         public:
-            /*! Get allocated size of memory.
-             * \param p Pointer to memory.
-             * \return Allocated size or SIZE_NOT_TRACKED if allocator does not track size.
-             */
+            /*******************************************************************
+            **** Get allocated size of memory or SIZE_NOT_TRACKED if allocator
+            **** does not track size.
+            *******************************************************************/
             virtual uint32_t allocated_size(void* p) = 0;
 
-            /*! Total allocated memory.
-             * \return Total allocated memory or SIZE_NOT_TRACKED if allocator does not track size.
-             */
+            /*******************************************************************
+            **** Total allocated memory or SIZE_NOT_TRACKED if allocator
+            **** does not track size
+            *******************************************************************/
             virtual uint32_t total_allocated() = 0;
 
         private:
@@ -56,29 +87,35 @@ namespace cetech {
     };
 
 
-
+    /***************************************************************************
+    **** Memory system globals function.
+    ***************************************************************************/
     namespace memory_globals {
-        /*! Init global memory.
-         */
+
+        /***********************************************************************
+        **** Init system.
+        ***********************************************************************/
         void init();
 
-        /*! Shutdown global memory.
-         */
+        /***********************************************************************
+        **** Shutdown system.
+        ***********************************************************************/
         void shutdown();
 
-        /*! Get default allocator.
-         * \return Default allocator.
-         */
+        /***********************************************************************
+        **** Get default allocator.
+        ***********************************************************************/
         Allocator& default_allocator();
     }
 
-    /* Creates a new object of type T using the allocator a to allocate the memory. */
-    #define MAKE_NEW(a, T, ...) (new((a).allocate(sizeof(T), alignof(T))) T(__VA_ARGS__))
-
-    /*! Frees an object allocated with MAKE_NEW. */
-    #define MAKE_DELETE(a, T, p)    do {if (p) {(p)->~T(); a.deallocate(p); }} while (0)
-
+    /***************************************************************************
+    **** Memory interface
+    ***************************************************************************/
     namespace memory {
+
+        /***********************************************************************
+        **** Allocate array system globals function.
+        ***********************************************************************/
         template < typename T, typename ... ARGS >
         CE_INLINE T* alloc_array(Allocator& allocator,
                                  const size_t size,
@@ -94,30 +131,52 @@ namespace cetech {
             return mem;
         }
 
-        /*! Allign pointer.
-         * \param p Pointer.
-         * \param align Align.
-         * \return Alligned pointer.
-         */
+        /***********************************************************************
+        **** Allign pointer.
+        ***********************************************************************/
         CE_INLINE void* align_forward(void* p,
                                       const uint32_t align);
 
+        /***********************************************************************
+        **** Return pointer + bytes
+        ***********************************************************************/
         CE_INLINE void* pointer_add(void* p,
                                     const uint32_t bytes);
+
+        /***********************************************************************
+        **** Return pointer + bytes
+        ***********************************************************************/
         CE_INLINE const void* pointer_add(const void* p,
                                           const uint32_t bytes);
 
+        /***********************************************************************
+        **** Return pointer - bytes
+        ***********************************************************************/
         CE_INLINE void* pointer_sub(void* p,
                                     const uint32_t bytes);
+
+        /***********************************************************************
+        **** Return pointer - bytes
+        ***********************************************************************/
         CE_INLINE const void* pointer_sub(const void* p,
                                           const uint32_t bytes);
 
+        /***********************************************************************
+        **** Memcpy
+        ***********************************************************************/
         CE_INLINE void* memcpy(void* dst,
                                const void* src,
                                const uint32_t bytes);
+
+        /***********************************************************************
+        **** Malloc
+        ***********************************************************************/
         CE_INLINE void* malloc(const uint32_t bytes);
     }
 
+    /***************************************************************************
+    **** Memory implementation
+    ***************************************************************************/
     void* memory::align_forward(void* p,
                                 const uint32_t align) {
         uintptr_t pi = uintptr_t(p);

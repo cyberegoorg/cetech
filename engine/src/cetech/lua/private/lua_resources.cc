@@ -1,15 +1,17 @@
 #include "cetech/lua/lua_resource.h"
-#include "cetech/lua/lua_enviroment.h"
-#include "cetech/lua/lua_stack.h"
-
-#include "celib/string/stringid_types.h"
-#include "celib/memory/memory.h"
-#include "celib/macros.h"
-#include "celib/string/stringid.inl.h"
 
 #include "rapidjson/document.h"
 #include "rapidjson/writer.h"
 #include "rapidjson/stringbuffer.h"
+
+#include "celib/stringid_types.h"
+#include "celib/memory/memory.h"
+#include "celib/macros.h"
+#include "celib/string/stringid.inl.h"
+
+#include "cetech/lua/lua_enviroment.h"
+#include "cetech/lua/lua_stack.h"
+
 
 namespace cetech {
     namespace resource_lua {

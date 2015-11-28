@@ -4,7 +4,7 @@
 **** Includes
 *******************************************************************************/
 
-#include "celib/string/stringid_types.h"
+#include "celib/stringid_types.h"
 #include "celib/memory/memory.h"
 #include "celib/crypto/murmur_hash.inl.h"
 #include "cetech/filesystem/file.h"

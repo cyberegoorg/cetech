@@ -6,10 +6,13 @@
 
 #include <cinttypes>
 
+#include "rapidjson/document.h"
+
+#include "celib/stringid_types.h"
+
 #include "cetech/resource_compiler/compilatorapi.h"
 #include "cetech/filesystem/filesystem.h"
-#include "celib/string/stringid_types.h"
-#include "rapidjson/document.h"
+
 
 /*******************************************************************************
 **** Interface

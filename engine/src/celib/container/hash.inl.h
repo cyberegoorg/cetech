@@ -1,136 +1,130 @@
-// based on bitsquid foundation
+/*******************************************************************************
+**** Based on bitsquid foundation.
+*******************************************************************************/
+
 #pragma once
 
+/*******************************************************************************
+**** Includes
+*******************************************************************************/
+
 #include "celib/container/array.inl.h"
-#include "celib/container/container_types.h"
+#include "celib/container_types.h"
 
 namespace cetech {
 
-    /*! Hash map.
-     */
+    /***************************************************************************
+    **** Hash map
+    ***************************************************************************/
     namespace hash {
 
-        /*! Exist key in hash
-         * \param h Hash
-         * \param key Key
-         * \return True if key exist in hash.
-         */
+        /***********************************************************************
+        **** Exist key in hash?
+        ***********************************************************************/
         template < typename T > bool has(const Hash < T >& h,
                                          const uint64_t key);
 
-        /*! Get value stored for the key or return default if key does not exist.
-         * \param h Hash
-         * \param key Key
-         * \param deffault Default value
-         * \return Value or default
-         */
+        /***********************************************************************
+        **** Get item associate with key or return deffault value
+        ***********************************************************************/
         template < typename T > const T& get(const Hash < T >& h,
                                              const uint64_t key,
                                              const T& deffault);
 
 
-        /*! Set value for the key.
-         * \param h Hash
-         * \param key Key
-         * \param value Value
-         */
+        /***********************************************************************
+        **** Map key to value
+        ***********************************************************************/
         template < typename T > void set(Hash < T >& h,
                                          const uint64_t key,
                                          const T& value);
 
-        /*! Remove key from hash if exist.
-         * \param h Hash
-         * \param key Key
-         */
+        /***********************************************************************
+        **** Remove item form hash map
+        ***********************************************************************/
         template < typename T > void remove(Hash < T >& h,
                                             const uint64_t key);
 
 
-        /*! Resize hash lookup table to the specified size.
-         * Table will grow automatically when 70% full.
-         * \param h Hash.
-         * \param size Size.
-         */
+        /***********************************************************************
+        **** Resize hash lookup table to the specified size.
+        **** Table will grow automatically when 70% full.
+        ***********************************************************************/
         template < typename T > void reserve(Hash < T >& h,
                                              const uint32_t size);
 
-        /*! Remove all elements.
-         * \param h Hash.
-         */
+        /***********************************************************************
+        **** Remove all items
+        ***********************************************************************/
         template < typename T > void clear(Hash < T >& h);
 
 
-        /*! Return pointer to the first entry.
-         * \param h Hash.
-         * \return Pointer to first entry.
-         */
+        /***********************************************************************
+        **** Return pointer to first item
+        ***********************************************************************/
         template < typename T > const typename Hash < T > ::Entry * begin(const Hash < T > &h);
 
-        /*! Return pointer to the last entry.
-         * \param h Hash.
-         * \return Pointer to last entry.
-         */
+        /***********************************************************************
+        **** Return pointer to last item
+        ***********************************************************************/
         template < typename T > const typename Hash < T > ::Entry * end(const Hash < T > &h);
     }
 
+
+    /***************************************************************************
+    **** Hash multi map
+    ***************************************************************************/
     namespace multi_hash {
-        /*! Find first entry with specified key.
-         * \param h Hash.
-         * \param key Key.
-         * \return Pointer to entry or NULL if key does not exist.
-         */
+
+        /***********************************************************************
+        **** Find first entry with specified key.
+        ***********************************************************************/
         template < typename T > const typename Hash < T > ::Entry * find_first(const Hash < T > &h, const uint64_t key);
 
 
-        /*! Find next entry with same key as e.
-         * \param h Hash
-         * \param e Entry pointer.
-         * \return Pointer to next entry or NULL.
-         */
+        /***********************************************************************
+        **** Find next entry with same key as e.
+        ***********************************************************************/
         template < typename T > const typename Hash < T > ::Entry * find_next(const Hash < T > &h,
                                                                               const typename Hash < T > ::Entry * e);
 
-        /*! Returns the number of entries with the key.
-         * \param h Hash.
-         * \param key Key
-         * \return Number of entries.
-         */
+
+        /***********************************************************************
+        **** Returns the number of entries with the key.
+        ***********************************************************************/
         template < typename T > uint32_t count(const Hash < T >& h,
                                                const uint64_t key);
 
-        /*! Returns all the entries with the specified key.
-         * \param h Hash.
-         * \param key Key.
-         * \param items Reference to result array.
-         */
+        /***********************************************************************
+        **** Returns all the entries with the specified key.
+        ***********************************************************************/
         template < typename T > void get(const Hash < T >& h,
                                          const uint64_t key,
                                          Array < T >& items);
 
-        /*! Inserts the value as an aditional value for the key.
-         * \param h Hash.
-         * \param key Key.
-         * \param value Value.
-         */
+        /***********************************************************************
+        **** Inserts the value as an aditional value for the key.
+        ***********************************************************************/
         template < typename T > void insert(Hash < T >& h,
                                             const uint64_t key,
                                             const T& value);
 
-        /*! Removes the specified entry.
-         * \param h Hash
-         * \param e Entry pointer
-         */
+        /***********************************************************************
+        **** Removes the specified entry.
+        ***********************************************************************/
         template < typename T > void remove(Hash < T >& h,
                                             const typename Hash < T > ::Entry* e);
 
-        /*! Removes all entrise with the specified key.
-         * \param h Hash
-         * \param key Key
-         */
+        /***********************************************************************
+        **** Removes all entrise with the specified key.
+        ***********************************************************************/
         template < typename T > void remove_all(Hash < T >& h,
                                                 const uint64_t key);
     }
 
+    /***************************************************************************
+    **** Hash internals
+    ***************************************************************************/
     namespace hash_internal {
         static const uint32_t END_OF_LIST = 0xffffffffu; //!< End of list marker.
 
@@ -300,6 +294,9 @@ namespace cetech {
         }
     }
 
+    /***************************************************************************
+    **** Hash implementation
+    ***************************************************************************/
     namespace hash {
         template < typename T > bool has(const Hash < T >& h,
                                          const uint64_t key) {
@@ -354,6 +351,9 @@ namespace cetech {
         }
     }
 
+    /***************************************************************************
+    **** Hash multi map
+    ***************************************************************************/
     namespace multi_hash {
         template < typename T > const typename Hash < T > ::Entry * find_first(const Hash < T > &h, const uint64_t key)
         {
@@ -432,6 +432,9 @@ namespace cetech {
     }
 
 
+    /***************************************************************************
+    **** Hash implementation
+    ***************************************************************************/
     template < typename T > Hash < T > ::Hash(Allocator & a) : _hash(a), _data(a) {}
 
 }

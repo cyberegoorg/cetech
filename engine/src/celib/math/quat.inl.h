@@ -1,129 +1,131 @@
 #pragma once
 
-#include "celib/asserts.h"
+/*******************************************************************************
+**** Includes
+*******************************************************************************/
 
-#include "math_types.h"
-#include "math.h"
-#include "vector3.inl.h"
-#include "simd/simd.h"
+#include "celib/asserts.h"
+#include "celib/math_types.h"
+#include "celib/math/math.h"
+#include "celib/math/vector3.inl.h"
+#include "celib/math/simd/simd.h"
 
 namespace cetech {
+
+    /***************************************************************************
+    **** Quaternion constatns
+    ***************************************************************************/
     namespace quat {
+
+        /***********************************************************************
+        **** Zero quaternion
+        ***********************************************************************/
         static const Quat ZERO = {0.0f, 0.0f, 0.0f, 0.0f};
+
+        /***********************************************************************
+        **** Identity quaternion
+        ***********************************************************************/
         static const Quat IDENTITY = {0.0f, 0.0f, 0.0f, 1.0f};
 
+        /***********************************************************************
+        **** quaternion (1.0, 0.0, 0.0, 0.0)
+        ***********************************************************************/
         static const Quat I = {1.0f, 0.0f, 0.0f, 0.0f};
+
+        /***********************************************************************
+        **** quaternion (0.0, 1.0, 0.0, 0.0)
+        ***********************************************************************/
         static const Quat J = {0.0f, 1.0f, 0.0f, 0.0f};
+
+        /***********************************************************************
+        **** quaternion (0.0, 0.0, 1.0, 0.0)
+        ***********************************************************************/
         static const Quat K = {0.0f, 0.0f, 1.0f, 0.0f};
     }
 
-    /*! Quat functions.
-     */
+    /***************************************************************************
+    **** Quaternion interface
+    ***************************************************************************/
     namespace quat {
-        /*! Make Quat
-         * \param x X
-         * \param y Y
-         * \param z Z
-         * \param w W
-         * \return New vector
-         */
+
+        /***********************************************************************
+        **** Create quaternion
+        ***********************************************************************/
         CE_INLINE Quat make_quat(const float x,
                                  const float y,
                                  const float z,
                                  const float w);
 
-        /*! Make Quat from axis and angle.
-         * \param axis Axis
-         * \param angle_deg Angle in degy Y
-         * \return New quaternion
-         */
+        /***********************************************************************
+        **** Create quaternion from axis angle
+        ***********************************************************************/
         CE_INLINE Quat from_axis_angle(const Vector3& axis,
                                        const float angle_deg);
 
-
-        /*! Quaternion len
-         * \param q1 Quaternion.
-         * \return Quaternion len.
-         */
+        /***********************************************************************
+        **** Return quaternion len
+        ***********************************************************************/
         CE_INLINE float len(const Quat& q1);
 
-        /*! Quaternion squared len.
-         * \param q1 Quaternion.
-         * \return Quaternion squared len.
-         */
+        /***********************************************************************
+        **** Return squared quaternion len
+        ***********************************************************************/
         CE_INLINE float len_sq(const Quat& q1);
 
-        /*! Quaternion 1/len
-         * \param q1 Quaternion.
-         * \return Quaternion 1/len.
-         */
+        /***********************************************************************
+        **** Return quaternion 1/len
+        ***********************************************************************/
         CE_INLINE float len_inv(const Quat& q1);
 
-
-        /*! Return normalized vector.
-         * \param q1 Quaternion.
-         * \return Normalized vector.
-         */
+        /***********************************************************************
+        **** Return normalized vector.
+        ***********************************************************************/
         CE_INLINE Quat normalized(const Quat& q1);
 
-        /*! Is quaternion normalized?
-         * \param q1 Quaternion.
-         * \return True if quaternion is normalized.
-         */
+        /***********************************************************************
+        **** Is quaternion normalized?
+        ***********************************************************************/
         CE_INLINE bool is_normalized(const Quat& q1);
     }
 
-    /*! Return negativ vector.
-     * \param q1 Quaternion.
-     * \return -q1
-     */
+    /***************************************************************************
+    **** Return negativ vector.
+    ***************************************************************************/
     CE_INLINE Quat operator - (const Quat &q1);
 
-
-    /*! V1 + V2
-     * \param q1 Quaternion1.
-     * \param q2 Quat.
-     * \return V1 + V2.
-     */
+    /***************************************************************************
+    **** V1 + V2
+    ***************************************************************************/
     CE_INLINE Quat operator + (const Quat &q1, const Quat &q2);
 
-    /*! V1 - V2
-     * \param q1 Quaternion1.
-     * \param q2 Quat.
-     * \return V1 - V2.
-     */
+    /***************************************************************************
+    **** V1 - V2
+    ***************************************************************************/
     CE_INLINE Quat operator - (const Quat &q1, const Quat &q2);
 
-    /*! Q1 * Q2
-     * \param q1 Quaternion.
-     * \param q2 Quaternion.
-     * \return Q1 * Q2.
-     */
+    /***************************************************************************
+    **** Q1 * Q2
+    ***************************************************************************/
     CE_INLINE Quat operator* (const Quat &q1, const Quat &q2);
 
-    /*! Q1 * V1
-     * \param q1 Quaternion.
-     * \param v1 VectorQuaternion.
-     * \return Transformed vector.
-     */
+    /***************************************************************************
+    **** Q1 * V1
+    ***************************************************************************/
     CE_INLINE Vector3 operator* (const Quat &q1, const Vector3 &v1);
 
-    /*! V1 * scalar
-     * \param q1 Quaternion1.
-     * \param s ScalarQuat.
-     * \return V1 * scalar
-     */
+    /***************************************************************************
+    **** V1 * scalar
+    ***************************************************************************/
     CE_INLINE Quat operator* (const Quat &q1, const float s);
 
-    /*! V1 / scalar
-     * \param q1 Quaternion1.
-     * \param s ScalarQuat.
-     * \return V1 / scalar
-     */
+    /***************************************************************************
+    **** V1 / scalar
+    ***************************************************************************/
     CE_INLINE Quat operator / (const Quat &q1, const float s);
 
-
-
+    /***************************************************************************
+    **** Quaternion implementation
+    ***************************************************************************/
     namespace quat {
         CE_INLINE Quat make_quat(const float x,
                                  const float y,

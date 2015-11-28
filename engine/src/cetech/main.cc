@@ -117,7 +117,7 @@ void register_resources() {
         /***********************************************************************
         **** LOOP BREAK.
         ***********************************************************************/
-        {0,nullptr, nullptr, nullptr, nullptr, nullptr}
+        {0, nullptr, nullptr, nullptr, nullptr, nullptr}
     };
 
     /***************************************************************************
@@ -204,15 +204,15 @@ bool big_init() {
     register_resources();
 
 #if defined(CETECH_DEVELOP)
-    if (command_line_globals::has_argument("compile", 'c')) {
+    if (command_line::has_argument("compile", 'c')) {
         resource_compiler::compile_all();
 
-        if (!command_line_globals::has_argument("continue")) {
+        if (!command_line::has_argument("continue")) {
             return false;
         }
     }
 
-    if (command_line_globals::has_argument("wait", 'w')) {
+    if (command_line::has_argument("wait", 'w')) {
         log::info("main", "Wating for clients.");
 
         while (!console_server::has_clients()) {
@@ -221,6 +221,7 @@ bool big_init() {
 
         log::debug("main", "Client connected.");
     }
+
 #endif
 
     load_config_json();
@@ -253,11 +254,11 @@ static void make_path(char* buffer,
 *******************************************************************************/
 void parse_command_line(int argc,
                         const char** argv) {
-    command_line_globals::set_args(argc, argv);
+    command_line::set_args(argc, argv);
 
     char buffer[1024] = {0};
-    const char* build_dir = command_line_globals::get_parameter("build-dir", 'b');
-    const char* port = command_line_globals::get_parameter("port", 'p');
+    const char* build_dir = command_line::get_parameter("build-dir", 'b');
+    const char* port = command_line::get_parameter("port", 'p');
 
     if (build_dir) {
         make_path(buffer, 1024, build_dir);
@@ -271,8 +272,8 @@ void parse_command_line(int argc,
     }
 
 #if defined(CETECH_DEVELOP)
-    const char* source_dir = command_line_globals::get_parameter("source-dir", 's');
-    const char* core_dir = command_line_globals::get_parameter("core-dir");
+    const char* source_dir = command_line::get_parameter("source-dir", 's');
+    const char* core_dir = command_line::get_parameter("core-dir");
 
     if (source_dir) {
         make_path(buffer, 1024, source_dir);

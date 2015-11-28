@@ -1,91 +1,94 @@
+/*******************************************************************************
+**** Based on bitsquid foundation.
+*******************************************************************************/
+
 #pragma once
 
-// based on bitsquid foundation
-#include "container_types.h"
-#include "array.inl.h"
+/*******************************************************************************
+**** Includes
+*******************************************************************************/
+
+#include "celib/container_types.h"
+#include "celib/container/array.inl.h"
+
 
 namespace cetech {
 
-    /*! Queue.
-     */
+    /***************************************************************************
+    **** Queue interface
+    ***************************************************************************/
     namespace queue {
-        /*! Returns the number of items in the queue.
-         * \param q Queue
-         * \return Number of items
-         */
+
+        /***********************************************************************
+        **** Returns the number of items in the queue.
+        ***********************************************************************/
         template < typename T > uint32_t size(const Queue < T >& q);
 
-        /*! Returns the ammount of free space in the queue/ring buffer.
-         * \param q Queue
-         * \return number of items we can push before the queue needs to grow.
-         */
+        /***********************************************************************
+        **** Returns the ammount of free space in the queue/ring buffer.
+        ***********************************************************************/
         template < typename T > uint32_t space(const Queue < T >& q);
 
-        /*! Makes sure the queue has room for at least the specified number of items.
-         * \param q Queue.
-         * \param size Size.
-         */
+
+        /***********************************************************************
+        **** Makes sure the queue has room for at least the specified number of items.
+        ***********************************************************************/
         template < typename T > void reserve(Queue < T >& q,
                                              uint32_t const size);
 
-
-        /*! Pushes the item to the end of the queue.
-         * \param q Queue.
-         * \param item Item.
-         */
+        /***********************************************************************
+        **** Pushes the item to the end of the queue.
+        ***********************************************************************/
         template < typename T > void push_back(Queue < T >& q,
                                                const T& item);
 
-        /*! Pops the last item from the queue.
-         * The queue cannot be empty.
-         * \param q Queue
-         */
+        /***********************************************************************
+        **** Pops the last item from the queue.
+        ***********************************************************************/
         template < typename T > void pop_back(Queue < T >& q);
 
-        /*! Pushes the item to the front of the queue.
-         * \param q Queu.
-         * \param item Item.
-         */
+        /***********************************************************************
+        **** Pushes the item to the front of the queue.
+        ***********************************************************************/
         template < typename T > void push_front(Queue < T >& q,
                                                 const T& item);
 
-        /*! Pops the first item from the queue.
-         * The queue cannot be empty.
-         * \param q Queue.
-         */
+        /***********************************************************************
+        **** Pops the first item from the queue.
+        ***********************************************************************/
         template < typename T > void pop_front(Queue < T >& q);
 
-
-        /*! Consumes n items from the front of the queue.
-         * \param q Queue.
-         * \param n Number of items to pop.
-         */
+        /***********************************************************************
+        **** Consumes n items from the front of the queue.
+        ***********************************************************************/
         template < typename T > void consume(Queue < T >& q,
                                              const uint32_t n);
 
-        /*! Pushes n items to the back of the queue.
-         * \param q Queue.
-         * \param items Array of items.
-         * \param n Number of items.
-         */
+        /***********************************************************************
+        **** Pushes n items to the back of the queue.
+        ***********************************************************************/
         template < typename T > void push(Queue < T >& q,
                                           const T* items,
                                           const uint32_t n);
 
-        /*! Returns the begin and end of the continuous chunk of elements at
-         * the start of the queue. (Note that this chunk does not necessarily
-         * contain all the elements in the queue (if the queue wraps around
-         * the array).
-         *
-         * This is useful for when you want to process many queue elements at
-         * once.
-         */
+        /***********************************************************************
+        **** Returns the begin and end of the continuous chunk of elements at
+        **** the start of the queue. (Note that this chunk does not necessarily
+        **** contain all the elements in the queue (if the queue wraps around
+        **** the array).
+        ****
+        **** This is useful for when you want to process many queue elements at
+        **** once.
+        ***********************************************************************/
         template < typename T > T* begin_front(Queue < T >& q);
         template < typename T > const T* begin_front(const Queue < T >& q);
         template < typename T > T* end_front(Queue < T >& q);
         template < typename T > const T* end_front(const Queue < T >& q);
     }
 
+    /***************************************************************************
+    **** Queue internals
+    ***************************************************************************/
     namespace queue_internal {
         // Can only be used to increase the capacity.
         template < typename T > void increase_capacity(Queue < T >& q,
@@ -111,6 +114,9 @@ namespace cetech {
         }
     }
 
+    /***************************************************************************
+    **** Queue implementation
+    ***************************************************************************/
     namespace queue {
         template < typename T > inline uint32_t size(const Queue < T >& q) {
             return q._size;
@@ -200,6 +206,9 @@ namespace cetech {
         }
     }
 
+    /***************************************************************************
+    **** Queue implementation
+    ***************************************************************************/
     template < typename T > inline Queue < T > ::Queue(Allocator & allocator) : _data(allocator),
                                                                                 _size(0) {}
 

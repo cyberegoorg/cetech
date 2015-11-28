@@ -1,28 +1,37 @@
 #pragma once
 
+/*******************************************************************************
+**** Includes
+*******************************************************************************/
+
 #include <cmath>
 
-#include "../types.h"
 
 namespace cetech {
 
-    /*! Math
-     */
+    /***************************************************************************
+    **** Math constants
+    ***************************************************************************/
     namespace math {
-        /*! PI
-         */
+
+        /***********************************************************************
+        **** TT
+        ***********************************************************************/
         constexpr float PI = 3.1415926535897932f;
 
-        /*! 1/PI
-         */
+        /***********************************************************************
+        **** 1/TT
+        ***********************************************************************/
         constexpr float INV_PI = 0.31830988618f;
 
-        /*! PI/2
-         */
+        /***********************************************************************
+        **** TT/2
+        ***********************************************************************/
         constexpr float HALF_PI = 1.57079632679f;
 
-        /*! e
-         */
+        /***********************************************************************
+        **** e
+        ***********************************************************************/
         constexpr float EULERS_NUMBER = 2.71828182845904523536f;
 
         constexpr float DOUBLE_SMALL_NUMBER = 1.e-8f;
@@ -31,111 +40,96 @@ namespace cetech {
         constexpr float MAX_FLT = 3.402823466e+38f;
     }
 
+    /***************************************************************************
+    **** Math interface
+    ***************************************************************************/
     namespace math {
-        /*! Return greater of two numbers.
-         * \param a First number.
-         * \param b Second number.
-         * \return greater of two numbers.
-         */
+
+        /***********************************************************************
+        **** Return greater of two numbers.
+        ***********************************************************************/
         template < class T >
         CE_INLINE T max( const T a,
                          const T b);
 
-        /*! Return smaller of two numbers.
-         * \param a First number.
-         * \param b Second number.
-         * \return smaller of two numbers.
-         */
+        /***********************************************************************
+        **** Return smaller of two numbers.
+        ***********************************************************************/
         template < class T >
         CE_INLINE T min( const T a,
                          const T b);
 
-        /*! Clamps a value between a minimum and maximum value.
-         * \param a Value.
-         * \param min Down range.
-         * \param max Upper range.
-         * \return Value between a minimum and maximum.
-         */
+        /***********************************************************************
+        **** Clamps a value between a minimum and maximum value.
+        ***********************************************************************/
         template < class T >
         CE_INLINE T clamp( const T a,
                            const T min,
                            const T max);
 
-        /*! Return absolute value.
-         * \param a Number.
-         * \return Absolute value
-         */
+        /***********************************************************************
+        **** Return absolute value.
+        ***********************************************************************/
         template < class T > T
         abs( const T a);
 
-        /*! Compare two floats.
-         * \param f1 Float 1.
-         * \param f2 Float 2.
-         * \param epsilon Epsilon.
-         */
+        /***********************************************************************
+        **** Compare two floats.
+        ***********************************************************************/
         CE_INLINE bool almost_equal(const float f1,
                                     const float f2,
                                     const float epsilon = FLOAT_SMALL_NUMBER);
 
-
-        /*! X * X
-         * \param x
-         * \return x * x
-         */
+        /***********************************************************************
+        **** X * X
+        ***********************************************************************/
         CE_INLINE float square(const float x);
 
-        /*! Fast version of sqrt.
-         * \param number Number.
-         * \return sqrt.
-         */
+        /***********************************************************************
+        **** Fast version of sqrt.
+        ***********************************************************************/
         CE_INLINE float fast_sqrt(const float number);
 
-        /*! Fast version of invert sqrt.
-         * Bassed on quake3 inv_sqrt bu constant is change to 0x5f375a86.
-         * \param number Number.
-         * \return invert sqrt.
-         */
+        /***********************************************************************
+        **** Fast version of invert sqrt.
+        **** Bassed on quake3 inv_sqrt but constant is change to 0x5f375a86.
+        ***********************************************************************/
         CE_INLINE float fast_inv_sqrt(const float number);
 
-        /*! Deg to Rad.
-         * \param deg Deg.
-         * \return Rad.
-         */
+        /***********************************************************************
+        **** Deg to Rad.
+        ***********************************************************************/
         CE_INLINE float deg2rad(const float deg);
 
-        /*! Rad to Deg.
-         * \param rad Deg.
-         * \return Deg.
-         */
+        /***********************************************************************
+        **** Rad to Deg.
+        ***********************************************************************/
         CE_INLINE float rad2deg(const float rad);
 
-        /*! Fast version of sin.
-         * \param angle_deg Angle in deg.
-         * \return sin
-         */
+        /***********************************************************************
+        **** Fast version of sin.
+        ***********************************************************************/
         CE_INLINE float fast_sin(const float angle_deg);
 
-        /*! Fast version of sin, cos.
-         * \param angle_deg Angle in deg.
-         * \param sin Sin.
-         * \param cos Cos.
-         */
+        /***********************************************************************
+        **** Fast version of sin, cos.
+        ***********************************************************************/
         CE_INLINE void fast_sincos(const float angle_deg,
                                    float& sin,
                                    float& cos);
 
-        /*! Return value based on value a. (  )
-         * \param a Input value.
-         * \param ge_zero Value for a >= 0.0f.
-         * \param lt_zero Value for a <= 0.0f.
-         * \return a >= 0.0f ? ge_zero : lt_zero
-         */
+        /***********************************************************************
+        **** Return value based on value a. ( a >= 0.0f ? ge_zero : lt_zero )
+        ***********************************************************************/
         CE_INLINE float float_select(const float a,
                                      const float ge_zero,
                                      const float lt_zero);
     }
 
 
+    /***************************************************************************
+    **** Math implementation
+    ***************************************************************************/
     namespace math {
         template < class T >
         T max( const T a,
