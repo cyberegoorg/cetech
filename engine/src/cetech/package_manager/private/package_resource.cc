@@ -1,16 +1,16 @@
 #include "cetech/package_manager/package_resource.h"
 
-
-#include "celib/container/array.inl.h"
-#include "celib/string/stringid_types.h"
-#include "celib/memory/memory.h"
-#include "celib/macros.h"
-#include "celib/string/stringid.inl.h"
-
 #include "rapidjson/document.h"
 #include "rapidjson/writer.h"
 #include "rapidjson/stringbuffer.h"
 #include "rapidjson/error/en.h"
+
+#include "celib/container/array.inl.h"
+#include "celib/stringid_types.h"
+#include "celib/memory/memory.h"
+#include "celib/macros.h"
+#include "celib/string/stringid.inl.h"
+
 
 namespace cetech {
     namespace resource_package {

@@ -8,7 +8,7 @@
 #include "celib/asserts.h"
 #include "cetech/cvar/cvar_types.h"
 #include "celib/crypto/murmur_hash.inl.h"
-#include "celib/string/stringid_types.h"
+#include "celib/stringid_types.h"
 
 #include "cetech/log/log.h"
 

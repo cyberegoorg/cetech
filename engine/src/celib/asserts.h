@@ -9,7 +9,7 @@
 #include <cstring>
 
 #include "celib/defines.h"
-#include "celib/stacktrace.h"
+#include "celib/stacktrace/stacktrace.h"
 #include "cetech/log/log.h"
 
 

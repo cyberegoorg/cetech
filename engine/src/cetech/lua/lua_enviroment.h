@@ -4,7 +4,7 @@
 **** Includes
 *******************************************************************************/
 
-#include "celib/math/math_types.h"
+#include "celib/math_types.h"
 
 #include "luajit/lua.hpp"
 #include "lua_resource.h"

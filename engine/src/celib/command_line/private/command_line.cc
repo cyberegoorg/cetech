@@ -6,7 +6,7 @@ namespace cetech {
         static const char** _argv;
     }
 
-    namespace command_line_globals {
+    namespace command_line {
         void set_args(int argc,
                       const char** argv) {
             internal::_argc = argc;

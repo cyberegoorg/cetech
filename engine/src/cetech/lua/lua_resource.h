@@ -4,8 +4,8 @@
 **** Includes
 *******************************************************************************/
 
-#include "celib/string/stringid_types.h"
-#include "celib/memory/memory_types.h"
+#include "celib/stringid_types.h"
+#include "celib/memory_types.h"
 
 #include "cetech/filesystem/file.h"
 #include "cetech/resource_compiler/resource_compiler.h"

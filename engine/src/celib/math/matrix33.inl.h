@@ -1,14 +1,24 @@
 #pragma once
 
-#include "math_types.h"
-#include "math.inl.h"
-#include "simd/simd.h"
-#include "vector3.inl.h"
+/*******************************************************************************
+**** Includes
+*******************************************************************************/
+
+#include "celib/math_types.h"
+#include "celib/math/math.inl.h"
+#include "celib/math/simd/simd.h"
+#include "celib/math/vector3.inl.h"
 
 namespace cetech {
+
+    /***************************************************************************
+    **** Matrix 3x3 constatns
+    ***************************************************************************/
     namespace matrix33 {
-        /*! Identity matrix.
-         */
+
+        /***********************************************************************
+        **** Identity matrix
+        ***********************************************************************/
         static const Matrix33 IDENTITY = {
             {1.0f, 0.0f, 0.0f},
             {0.0f, 1.0f, 0.0f},
@@ -16,25 +26,38 @@ namespace cetech {
         };
     }
 
+    /***************************************************************************
+    **** Matrix 3x3 interface
+    ***************************************************************************/
     namespace matrix33 {
+
+        /***********************************************************************
+        **** Create matrix from axis X, Y, Z
+        ***********************************************************************/
         CE_INLINE Matrix33 make_matrix33(const Vector3& x,
                                          const Vector3& y,
                                          const Vector3& z);
 
-        /*! Make matrix33 from axis and angle.
-         * \param axis Axis
-         * \param angle_deg Angle in deg
-         * \return New rotation matrix
-         */
+        /***********************************************************************
+        **** Create matrix from axis and angle
+        ***********************************************************************/
         CE_INLINE Matrix33 from_axis_angle(const Vector3& axis,
                                            const float angle_deg);
-
     }
 
+    /***************************************************************************
+    **** Matrix33 * Matrix33
+    ***************************************************************************/
     CE_INLINE Matrix33 operator* (const Matrix33 &m1, const Matrix33 &m2);
+
+    /***************************************************************************
+    **** Matrix33 * Vector3
+    ***************************************************************************/
     CE_INLINE Vector3 operator* (const Matrix33 &m1, const Vector3 &v1);
 
-
+    /***************************************************************************
+    **** Matrix 3x3 implementation
+    ***************************************************************************/
     namespace matrix33 {
         CE_INLINE Matrix33 make_matrix33(const Vector3& x,
                                          const Vector3& y,
@@ -62,6 +85,9 @@ namespace cetech {
         }
     }
 
+    /***************************************************************************
+    **** Matrix 3x3 implementation
+    ***************************************************************************/
     Matrix33 operator* (const Matrix33 &m1, const Matrix33 &m2) {
         Matrix33 res;
         simd::mat33_mult(&m1, &m2, &res);

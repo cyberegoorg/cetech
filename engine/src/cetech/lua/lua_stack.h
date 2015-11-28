@@ -1,8 +1,9 @@
 #pragma once
 
 #include "luajit/lua.hpp"
-#include "celib/string/stringid_types.h"
-#include "celib/math/math_types.h"
+
+#include "celib/stringid_types.h"
+#include "celib/math_types.h"
 
 #include "cetech/application/application.h"
 #include "cetech/log/log.h"

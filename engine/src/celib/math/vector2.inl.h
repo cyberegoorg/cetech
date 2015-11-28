@@ -1,214 +1,179 @@
 #pragma once
 
-#include "celib/defines.h"
+/*******************************************************************************
+**** Includes
+*******************************************************************************/
 
-#include "math_types.h"
-#include "math.inl.h"
+#include "celib/defines.h"
+#include "celib/math_types.h"
+#include "celib/math/math.inl.h"
+
 
 namespace cetech {
+
+    /***************************************************************************
+    **** Vector2 constatns
+    ***************************************************************************/
     namespace vector2 {
-        /*! Zero vector [0.0f, 0.0f]
-         */
+
+        /***********************************************************************
+        **** Zero vector
+        ***********************************************************************/
         static const Vector2 ZERO = {0.0f, 0.0f};
 
-        /*! Unit vector [1.0f, 1.0f]
-         */
+        /***********************************************************************
+        **** Unit vector
+        ***********************************************************************/
         static const Vector2 UNIT = {1.0f, 1.0f};
 
-
-        /*! Up vector [0.0f, 1.0f]
-         */
+        /***********************************************************************
+        **** Up vector
+        ***********************************************************************/
         static const Vector2 UP = {0.0f, 1.0f};
 
-        /*! Down vector [0.0f, -1.0f]
-         */
+        /***********************************************************************
+        **** Down vector
+        ***********************************************************************/
         static const Vector2 DOWN = {0.0f, -1.0f};
 
-        /*! Right vector [1.0f, 0.0f]
-         */
+        /***********************************************************************
+        **** Right vector
+        ***********************************************************************/
         static const Vector2 RIGHT = {1.0f, 0.0f};
 
-        /*! Left vector [-1.0f, 0.0f]
-         */
+        /***********************************************************************
+        **** Left vector
+        ***********************************************************************/
         static const Vector2 LEFT = {-1.0f, 0.0f};
     }
 
-    /*! Vector2 functions.
-     */
+    /***************************************************************************
+    **** Vector2 interface
+    ***************************************************************************/
     namespace vector2 {
-        /*! Make Vector2
-         * ~~~~~~~~~~~~~~~
-         * Vector2 v = make_vector2(1.0f, 2.0f); // v = [1.0f, 2.0f]
-         * ~~~~~~~~~~~~~~~
-         * \param x X
-         * \param y Y
-         * \return New vector
-         */
+
+        /***********************************************************************
+        **** Make Vector2
+        ***********************************************************************/
         CE_INLINE Vector2 make_vector2(const float x,
                                        const float y);
 
-
-        /*! Vector len
-         * ~~~~~~~~~~~~~~~
-         * const float len = len({1.0f, 0.0f}); // len == 1
-         * ~~~~~~~~~~~~~~~
-         * \param v1 Vector.
-         * \return Vector len.
-         */
+        /***********************************************************************
+        **** Vector len
+        ***********************************************************************/
         CE_INLINE float len(const Vector2& v1);
 
-        /*! Vector squared len.
-         * ~~~~~~~~~~~~~~~
-         * const float len_sq = len_sq({2.0f, 0.0f}); // len_sq == 4
-         * ~~~~~~~~~~~~~~~
-         * \param v1 Vector.
-         * \return Vector squared len.
-         */
+        /***********************************************************************
+        **** Vector squared len.
+        ***********************************************************************/
         CE_INLINE float len_sq(const Vector2& v1);
 
-        /*! Vector 1/len
-         * \param v1 Vector.
-         * \return Vector 1/len.
-         */
+        /***********************************************************************
+        **** Vector 1/len
+        ***********************************************************************/
         CE_INLINE float len_inv(const Vector2& v1);
 
-
-        /*! Return normalized vector.
-         * ~~~~~~~~~~~~~~~
-         * const Vector2 v = normalized({2.0f, 0.0f}); // is_normalized(v) == true
-         * ~~~~~~~~~~~~~~~
-         * \param v1 Vector.
-         * \return Normalized vector.
-         */
+        /***********************************************************************
+        **** Return normalized vector.
+        ***********************************************************************/
         CE_INLINE Vector2 normalized(const Vector2& v1);
 
-        /*! Is vector normalized?
-         * \param v1 Vector.
-         * \return True if vector is normalized.
-         */
+        /***********************************************************************
+        **** Is vector normalized?
+        ***********************************************************************/
         CE_INLINE bool is_normalized(const Vector2& v1);
 
-        /*! Dot product.
-         * \param v1 Vector 1.
-         * \param v2 Vector 2.
-         * \return Dot product.
-         */
+        /***********************************************************************
+        **** Dot product.
+        ***********************************************************************/
         CE_INLINE float dot(const Vector2& v1,
                             const Vector2& v2);
 
-        /*! Cross product.
-         * \param v1 Vector 1.
-         * \param v2 Vector 2.
-         * \return Cross product.
-         */
+        /***********************************************************************
+        **** Cross product.
+        ***********************************************************************/
         CE_INLINE float cross(const Vector2& v1,
                               const Vector2& v2);
 
-        /*! Squared distance between two point.
-         * \param v1 Point 1.
-         * \param v2 Point 2.
-         * \return Squared distace.
-         */
+        /***********************************************************************
+        **** Squared distance between two point.
+        ***********************************************************************/
         CE_INLINE float distance_sq(const Vector2& v1,
                                     const Vector2& v2);
 
-        /*! Distance between two point.
-         * \param v1 Point 1.
-         * \param v2 Point 2.
-         * \return Distace.
-         */
+        /***********************************************************************
+        **** Distance between two point.
+        ***********************************************************************/
         CE_INLINE float distance(const Vector2& v1,
                                  const Vector2& v2);
 
-
-        /*! Rotate vector by given angle.
-         * \param v1 Vector.
-         * \param angle_deg Angle in deg.
-         * \return Rotated vector.
-         */
+        /***********************************************************************
+        **** Rotate vector by given angle.
+        ***********************************************************************/
         CE_INLINE Vector2 rotated(const Vector2& v1,
                                   const float angle_deg);
 
-
-        /*! Get minimal value from vector element.
-         * \param v1 Vector.
-         * \return Minimal value from vector element.
-         */
+        /***********************************************************************
+        **** Get minimal value from vector element.
+        ***********************************************************************/
         CE_INLINE float min(const Vector2& v1);
 
-        /*! Get maximum value from vector element.
-         * \param v1 Vector.
-         * \return Maximum value from vector element.
-         */
+        /***********************************************************************
+        **** Get maximum value from vector element.
+        ***********************************************************************/
         CE_INLINE float max(const Vector2& v1);
 
-        /*! Get maximum absolute value from vector element.
-         * \param v1 Vector.
-         * \return Absolute maximum value from vector element.
-         */
+        /***********************************************************************
+        **** Get maximum absolute value from vector element.
+        ***********************************************************************/
         CE_INLINE float abs_max(const Vector2& v1);
 
-        /*! Get sign vector.
-         * if element is positive return 1.0f else -1.0f.
-         * \param v1 Vector.
-         * \return Sign vector.
-         */
+        /***********************************************************************
+        **** Get sign vector.
+        ***********************************************************************/
         CE_INLINE Vector2 sign_vector(const Vector2& v1);
     }
 
-    /*! Return negativ vector.
-     * \param v1 Vector.
-     * \return -v1
-     */
+    /***************************************************************************
+    **** Return negativ vector.
+    ***************************************************************************/
     CE_INLINE Vector2 operator - (const Vector2 &v1);
 
 
-    /*! V1 + V2
-     * \param v1 Vector1.
-     * \param v2 Vector2.
-     * \return V1 + V2.
-     */
+    /***************************************************************************
+    **** V1 + V2
+    ***************************************************************************/
     CE_INLINE Vector2 operator + (const Vector2 &v1, const Vector2 &v2);
 
-    /*! V1 - V2
-     * \param v1 Vector1.
-     * \param v2 Vector2.
-     * \return V1 - V2.
-     */
+    /***************************************************************************
+    **** V1 - V2
+    ***************************************************************************/
     CE_INLINE Vector2 operator - (const Vector2 &v1, const Vector2 &v2);
 
-    /*! V1 * V2 [x1 * x2, y1 * y2]
-     * \param v1 Vector1.
-     * \param v2 Vector2.
-     * \return [x1*x2, y1 * y2]
-     */
+    /***************************************************************************
+    **** V1 * V2 [x1 * x2, y1 * y2]
+    ***************************************************************************/
     CE_INLINE Vector2 operator* (const Vector2 &v1, const Vector2 &v2);
 
-    /*! V1 / V2 [x1 / x2, y1 / y2]
-     *
-     * \param v1 Vector1.
-     * \param v2 Vector2.
-     * \return [x1 / x2, y1 / y2]
-     */
+    /***************************************************************************
+    **** V1 / V2 [x1 / x2, y1 / y2]
+    ***************************************************************************/
     CE_INLINE Vector2 operator / (const Vector2 &v1, const Vector2 &v2);
 
-
-    /*! V1 * scalar
-     * \param v1 Vector1.
-     * \param s ScalarVector2.
-     * \return V1 * scalar
-     */
+    /***************************************************************************
+    **** V1 * scalar
+    ***************************************************************************/
     CE_INLINE Vector2 operator* (const Vector2 &v1, const float s);
 
-    /*! V1 / scalar
-     * \param v1 Vector1.
-     * \param s ScalarVector2.
-     * \return V1 / scalar
-     */
+    /***************************************************************************
+    ****  V1 / scalar
+    ***************************************************************************/
     CE_INLINE Vector2 operator / (const Vector2 &v1, const float s);
 
 
-
+    /***************************************************************************
+    **** Vector2 implementation
+    ***************************************************************************/
     namespace vector2 {
         Vector2 make_vector2(const float x,
                              const float y) {

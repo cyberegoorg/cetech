@@ -1,19 +1,21 @@
 #pragma once
 
-#include "entitymanager_types.h"
-#include "celib/memory/memory_types.h"
+/*******************************************************************************
+**** Includes
+*******************************************************************************/
 
 #include "celib/types.h"
 #include "celib/handler/handler_manager.h"
-
 #include "celib/memory/memory.h"
 #include "celib/container/queue.inl.h"
+#include "celib/entitymanager_types.h"
+#include "celib/memory_types.h"
 
 namespace cetech {
-    namespace entity_manager_internal {
-        typename handler::HandlerManager < uint32_t, uint32_t, unsigned char, 22, 8, 1024 > entity_handler_manager;
-    }
 
+    /***************************************************************************
+    **** Entity manager interface
+    ***************************************************************************/
     namespace entity_manager {
         CE_INLINE Entity create(EntityManager& em);
         CE_INLINE void destroy(EntityManager& em,
@@ -23,6 +25,16 @@ namespace cetech {
                              const Entity e);
     }
 
+    /***************************************************************************
+    **** Entity manager internals
+    ***************************************************************************/
+    namespace entity_manager_internal {
+        typename handler::HandlerManager < uint32_t, uint32_t, unsigned char, 22, 8, 1024 > entity_handler_manager;
+    }
+
+    /***************************************************************************
+    **** Entity manager implementations
+    ***************************************************************************/
     namespace entity_manager {
         Entity create(EntityManager& em) {
             return {

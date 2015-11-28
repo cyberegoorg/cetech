@@ -1,9 +1,14 @@
-// based on bitsquid foundation
-#include "celib/memory/memory.h"
-#include "celib/stacktrace.h"
+/*******************************************************************************
+**** Based on bitsquid foundation.
+*******************************************************************************/
+
 #include <stdlib.h>
 #include <assert.h>
 #include <cstdint>
+
+#include "celib/memory/memory.h"
+#include "celib/stacktrace/stacktrace.h"
+
 
 
 namespace {

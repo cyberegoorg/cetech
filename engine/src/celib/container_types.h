@@ -4,120 +4,133 @@
 **** Includes
 *******************************************************************************/
 
-#include <cinttypes>
-
-#include "celib/stringid_types.h"
+#include "celib/types.h"
 #include "celib/memory_types.h"
-
-#include "cetech/filesystem/filesystem.h"
-#include "cetech/task_manager/task_manager.h"
 
 
 /*******************************************************************************
-**** Interface
+**** Containers
 *******************************************************************************/
 namespace cetech {
 
     /***************************************************************************
-    **** Resouce manager.
+    **** Generic array
     ***************************************************************************/
-    namespace resource_manager {
+    template < typename T > struct Array {
 
         /***********************************************************************
-        **** Resouce loader callback.
+        **** Constructor
         ***********************************************************************/
-        typedef char* (* resource_loader_clb_t)(FSFile&,
-                                                Allocator&);
+        Array(Allocator & a);
 
         /***********************************************************************
-        **** Resouce unloader callback.
+        **** Copy constructor
         ***********************************************************************/
-        typedef void (* resource_unloader_clb_t)(Allocator&,
-                                                 void*);
-        /***********************************************************************
-        **** Resouce online callback.
-        ***********************************************************************/
-        typedef void (* resource_online_clb_t)(void*);
+        Array(const Array &other);
 
         /***********************************************************************
-        **** Resouce offline callback.
+        **** Destructor
         ***********************************************************************/
-        typedef void (* resource_offline_clb_t)(void*);
+        ~Array();
 
         /***********************************************************************
-        **** Register loader.
+        **** Set operator
         ***********************************************************************/
-        void register_loader(const StringId64_t type,
-                             const resource_loader_clb_t clb);
+        Array& operator = (const Array &other);
 
         /***********************************************************************
-        **** Register unloader.
+        **** Item accessor []
         ***********************************************************************/
-        void register_unloader(const StringId64_t type,
-                               const resource_unloader_clb_t clb);
+        T& operator[] (const uint32_t i);
 
         /***********************************************************************
-        **** Register online callback.
+        **** Const item accessor []
         ***********************************************************************/
-        void register_online(const StringId64_t type,
-                             const resource_online_clb_t clb);
+        const T& operator[] (const uint32_t i) const;
 
         /***********************************************************************
-        **** Register offline callback.
+        **** Members variables
         ***********************************************************************/
-        void register_offline(const StringId64_t type,
-                              const resource_offline_clb_t clb);
+        Allocator* _allocator; //!< Pointer to allocator.
+        const char* _tag;
+        uint32_t _size;        //!< Size
+        uint32_t _capacity;    //!< Allocate size.
+        T* _data;              //!< Array data;
+    };
 
-        /***********************************************************************
-        **** Load resources to loaded_data.
-        ***********************************************************************/
-        void load(char** loaded_data,
-                  const StringId64_t type,
-                  const StringId64_t* names,
-                  const uint32_t count);
-
-        /***********************************************************************
-        **** Add load resources.
-        ***********************************************************************/
-        void add_loaded(char** loaded_data,
-                        const StringId64_t type,
-                        const StringId64_t* names,
-                        const uint32_t count);
-
-        /***********************************************************************
-        **** Unload resources.
-        ***********************************************************************/
-        void unload(const StringId64_t type,
-                    const StringId64_t* names,
-                    const uint32_t count);
-
-        /***********************************************************************
-        **** Can get resources.
-        ***********************************************************************/
-        bool can_get(const StringId64_t type,
-                     const StringId64_t* names,
-                     const uint32_t count);
-
-        /***********************************************************************
-        **** Get resource.
-        ***********************************************************************/
-        const char* get(const StringId64_t type,
-                        const StringId64_t name);
-    }
 
     /***************************************************************************
-    **** Resouce manager globals function.
+    **** Hash
     ***************************************************************************/
-    namespace resource_manager_globals {
+    template < typename T > struct Hash {
 
         /***********************************************************************
-        **** Init system.
+        **** Constructor
         ***********************************************************************/
-        void init();
+        Hash(Allocator & a);
+
+        /*! Destroy hash map
+         */
+        //~Hash();
 
         /***********************************************************************
-        **** Shutdown system.
+        **** Hash entry
         ***********************************************************************/
-        void shutdown();
-    }
+        struct Entry {
+            uint64_t key;  // Key.
+            uint32_t next; // Next entry index.
+            T value;       // Entry value.
+        };
+
+        /***********************************************************************
+        **** Members variables
+        ***********************************************************************/
+        Array < uint32_t > _hash; // Key hash -> Data index.
+        Array < Entry > _data;    // Data.
+    };
+
+    /***************************************************************************
+    **** A double-ended queue/ring buffer
+    ***************************************************************************/
+    template < typename T > struct Queue {
+
+        /***********************************************************************
+        **** Constructor
+        ***********************************************************************/
+        Queue(Allocator & a);
+
+        /***********************************************************************
+        **** Item accessor []
+        ***********************************************************************/
+        T& operator[] (const uint32_t i);
+
+        /***********************************************************************
+        **** Const item accessor []
+        ***********************************************************************/
+        const T& operator[] (const uint32_t i) const;
+
+        /***********************************************************************
+        **** Members variables
+        ***********************************************************************/
+        Array < T > _data; // Data
+        uint32_t _size;    // Size
+        uint32_t _offset;  // Offset
+    };
+
+
+    /***************************************************************************
+    **** Event stream
+    ***************************************************************************/
+    struct EventStream {
+
+        /***********************************************************************
+        **** Constructor
+        ***********************************************************************/
+        EventStream(Allocator & allocator);
+
+        /***********************************************************************
+        **** Members variables
+        ***********************************************************************/
+        Array < char > stream;
+    };
 }

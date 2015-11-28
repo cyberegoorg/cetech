@@ -1,37 +1,41 @@
 #pragma once
 
+/*******************************************************************************
+**** Includes
+*******************************************************************************/
 #include <cstring>
 
+/*******************************************************************************
+**** Interface
+*******************************************************************************/
 namespace cetech {
-    namespace command_line_globals {
-        /*! Set argument for command line parser.
-         * \param argc Argument count.
-         * \param argv Argument strings.
-         */
+
+    /***************************************************************************
+    **** Command line parser
+    ***************************************************************************/
+    namespace command_line {
+
+        /***********************************************************************
+        **** Set args
+        ***********************************************************************/
         void set_args(int argc,
                       const char** argv);
 
-        /*! Find argument.
-         * \param longopt Long option.
-         * \param shortopt Shortopt option.
-         * \return Argument index or ARGC if argument not found.
-         */
+        /***********************************************************************
+        **** Find argument. Return index or argc if not found
+        ***********************************************************************/
         int find_argument(const char* longopt,
                           char shortopt = '\0');
 
-        /*! Get argument parameter.
-         * \param longopt Long option.
-         * \param shortopt Shortopt option.
-         * \return Parameter or NULL.
-         */
+        /***********************************************************************
+        **** Get parametr or nullptr
+        ***********************************************************************/
         const char* get_parameter(const char* longopt,
                                   char shortopt = '\0');
 
-        /*! Has command line argument.
-         * \param longopt Long option.
-         * \param shortopt Shortopt option.
-         * \return True if has else false.
-         */
+        /***********************************************************************
+        **** Has arguments?
+        ***********************************************************************/
         bool has_argument(const char* longopt,
                           char shortopt = '\0');
     }

@@ -1,16 +1,32 @@
-// based on bitsquid foundation
 #pragma once
+
+/*******************************************************************************
+**** Includes
+*******************************************************************************/
 
 #include "celib/defines.h"
 #include "celib/types.h"
 
+/*******************************************************************************
+**** Murmur hash interface
+*******************************************************************************/
 namespace cetech {
-    /*! Implementation of the 64 bit MurmurHash2 function http://murmurhash.googlepages.com/.
-     */
+
+    /***************************************************************************
+    **** Murmure hash
+    **** Implementation of the 64 bit MurmurHash2
+    **** function http://murmurhash.googlepages.com/.
+    ***************************************************************************/
     CE_INLINE uint64_t murmur_hash_64(const void* key,
                                       const uint32_t len,
                                       const uint64_t seed);
+}
 
+
+/*******************************************************************************
+**** Murmur hash implementation
+*******************************************************************************/
+namespace cetech {
     uint64_t murmur_hash_64(const void* key,
                             const uint32_t len,
                             const uint64_t seed) {

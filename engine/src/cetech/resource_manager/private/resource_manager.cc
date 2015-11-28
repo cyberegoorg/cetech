@@ -3,7 +3,7 @@
 #include "cetech/resource_manager/resource_manager.h"
 #include "cetech/application/application.h"
 
-#include "celib/container/container_types.h"
+#include "celib/container_types.h"
 #include "celib/container/queue.inl.h"
 #include "celib/container/hash.inl.h"
 #include "celib/memory/memory.h"
