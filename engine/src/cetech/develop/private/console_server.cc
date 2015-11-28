@@ -9,6 +9,7 @@
 #include "cetech/cvars/cvars.h"
 
 #include "cetech/application/application.h"
+#include "cetech/develop/develop_manager.h"
 
 #include "rapidjson/writer.h"
 #include "rapidjson/stringbuffer.h"

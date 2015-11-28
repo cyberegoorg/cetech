@@ -12,6 +12,7 @@
 #include "celib/crypto/murmur_hash.inl.h"
 #include "celib/math/vector2.inl.h"
 #include "cetech/application/application.h"
+#include "cetech/develop/develop_manager.h"
 
 #include "SDL2/SDL.h"
 
@@ -29,29 +30,6 @@ namespace cetech {
     }
 
     namespace mouse {
-        void init() {
-            mouse_internal::left_btn_hash = murmur_hash_64("left", strlen("left"), 22);
-            mouse_internal::middle_btn_hash = murmur_hash_64("middle", strlen("middle"), 22);
-            mouse_internal::right_btn_hash = murmur_hash_64("right", strlen("right"), 22);
-        }
-
-        void process_mouse() {
-            auto time = develop_manager::enter_scope("keyboard::process_keyboard");
-
-            mouse_internal::MouseButtonStateLast = mouse_internal::MouseButtonState;
-
-            /*Mouse*/
-            int32_t x, y;
-            x = y = 0;
-
-            mouse_internal::MouseButtonState = SDL_GetMouseState(&x, &y);
-
-            mouse_internal::MouseAxis.x = x;
-            mouse_internal::MouseAxis.y = y;
-
-            develop_manager::leave_scope("keyboard::process_mouse", time);
-        }
-
         uint32_t button_index(const char* scancode) {
             uint64_t h = murmur_hash_64(scancode, strlen(scancode), 22);
 
@@ -97,6 +75,30 @@ namespace cetech {
         }
     };
 
+    namespace mouse_globals {
+        void init() {
+            mouse_internal::left_btn_hash = murmur_hash_64("left", strlen("left"), 22);
+            mouse_internal::middle_btn_hash = murmur_hash_64("middle", strlen("middle"), 22);
+            mouse_internal::right_btn_hash = murmur_hash_64("right", strlen("right"), 22);
+        }
+
+        void process_mouse() {
+            auto time = develop_manager::enter_scope("keyboard::process_keyboard");
+
+            mouse_internal::MouseButtonStateLast = mouse_internal::MouseButtonState;
+
+            /* Mouse */
+            int32_t x, y;
+            x = y = 0;
+
+            mouse_internal::MouseButtonState = SDL_GetMouseState(&x, &y);
+
+            mouse_internal::MouseAxis.x = x;
+            mouse_internal::MouseAxis.y = y;
+
+            develop_manager::leave_scope("keyboard::process_mouse", time);
+        }
+    }
 }
 
 #endif

@@ -16,6 +16,9 @@
 #include "cetech/renderer/texture_resource.h"
 #include "celib/string/stringid.inl.h"
 
+#if defined(CETECH_DEVELOP)
+    #include "cetech/develop/console_server.h"
+#endif
 
 /********
 * SDL2 *

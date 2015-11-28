@@ -7,11 +7,15 @@
 
 #include <sys/time.h>
 //clock_gettime is not implemented on OSX
-static int clock_gettime(int /*clk_id*/, struct timespec* t) {
+static int clock_gettime(int /*clk_id*/,
+                         struct timespec* t) {
     struct timeval now;
     int rv = gettimeofday(&now, NULL);
-    if (rv) return rv;
-    t->tv_sec  = now.tv_sec;
+    if (rv) {
+        return rv;
+    }
+
+    t->tv_sec = now.tv_sec;
     t->tv_nsec = now.tv_usec * 1000;
     return 0;
 }

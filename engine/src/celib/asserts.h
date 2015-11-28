@@ -1,5 +1,9 @@
 #pragma once
 
+/*******************************************************************************
+**** Includes
+*******************************************************************************/
+
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
@@ -8,94 +12,148 @@
 #include "celib/stacktrace.h"
 #include "cetech/log/log.h"
 
-/*!
- * Check ptr macro.
- * \param ptr Pointer.
- */
-#ifdef CETECH_DEBUG
-  #define CE_CHECK_PTR(ptr) \
-    do { if (!ptr) { cetech::ce_check_ptr(__FILE__, __LINE__); } } while (0)
-#else
-  #define CE_CHECK_PTR(ptr) do {} while (0)
-#endif
 
-/*!
- * Assert macro.
- * \param condition Asset condition.
- */
+/*******************************************************************************
+**** Macros
+*******************************************************************************/
+
+/*******************************************************************************
+**** Check ptr
+*******************************************************************************/
+#define CE_CHECK_PTR(ptr) do { \
+        if (!ptr) { \
+            cetech::ce_check_ptr(__FILE__, __LINE__); \
+        } \
+} while (0) \
+
+
+/*******************************************************************************
+**** Check
+*******************************************************************************/
+#define CE_CHECK(condition) \
+    do { \
+        !(condition) ? cetech::ce_check(#condition, \
+                                        __FILE__, \
+                                        __LINE__, \
+                                        __PRETTY_FUNCTION__) : cetech::ce_noop(); \
+    } while (0)
+
+
+/*******************************************************************************
+**** Check with message
+*******************************************************************************/
+#define CE_CHECKT_MSG(condition, msg) \
+    do { !(condition) ? cetech::ce_check_msg(msg, \
+                                             #condition, \
+                                             __FILE__, \
+                                             __LINE__, \
+                                             __PRETTY_FUNCTION__) : (); \
+    } while (0)
+
+/*******************************************************************************
+**** Assert
+*******************************************************************************/
 #ifdef CETECH_DEBUG
-  #define CE_ASSERT(condition) do { !(condition) ? cetech::ce_assert( #condition, \
-                                                                      __FILE__, \
-                                                                      __LINE__, \
-                                                                      __PRETTY_FUNCTION__) : cetech::ce_noop(); \
-} while (0)
+  #define CE_ASSERT(condition) \
+    do { \
+        !(condition) ? cetech::ce_assert(#condition, \
+                                         __FILE__, \
+                                         __LINE__, \
+                                         __PRETTY_FUNCTION__) : cetech::ce_noop(); \
+    } while (0)
 #else
   #define CE_ASSERT(condition) do {} while (0)
 #endif
 
-/*!
- * Assert macro with message.
- * \param condition Asset condition.
- * \param msg Message.
- */
+/*******************************************************************************
+**** Assert with message
+*******************************************************************************/
 #ifdef CETECH_DEBUG
-  #define CE_ASSERT_MSG(condition, msg) do { !(condition) ? cetech::ce_assert_msg(msg, \
-                                                                                  #condition, \
-                                                                                  __FILE__, \
-                                                                                  __LINE__, \
-                                                                                  __PRETTY_FUNCTION__) : \
-                                             cetech::ce_noop(); } while (0)
+  #define CE_ASSERT_MSG(condition, msg) \
+    do { !(condition) ? cetech::ce_assert_msg(msg, \
+                                              #condition, \
+                                              __FILE__, \
+                                              __LINE__, \
+                                              __PRETTY_FUNCTION__) : \
+         cetech::ce_noop(); } while (0)
 #else
   #define CE_ASSERT_MSG(condition, msg) do {} while (0)
 #endif
 
-#define SHORT_FILE(filename) (strrchr(filename, '/') ? strrchr(filename, '/') + 1 : filename)
+/*******************************************************************************
+**** Assert ptr
+*******************************************************************************/
+#ifdef CETECH_DEBUG
+  #define CE_ASSERT_PTR(condition) \
+    do { \
+        !(condition) ? cetech::ce_assert_ptr(#condition, \
+                                             __FILE__, \
+                                             __LINE__, \
+                                             __PRETTY_FUNCTION__) : cetech::ce_noop(); \
+    } while (0)
+#else
+  #define CE_ASSERT_PTR(condition) do {} while (0)
+#endif
 
+/*******************************************************************************
+**** Interface
+*******************************************************************************/
 namespace cetech {
-    /*!
-     * No operation fce.
-     */
-    CE_INLINE void ce_noop();
 
-    /*!
-     * This fce print assert message.
-     * "ASSERT: 'CONDITION_STR' in file FILE on line LINE"
-     * \param condition_str Condition as string.
-     * \param file Filename.
-     * \param line Line.
-     * \param fce Fce name.
-     */
+    /***************************************************************************
+    **** Assert
+    ***************************************************************************/
     CE_INLINE void ce_assert(const char* condition_str,
                              const char* file,
                              const int line,
                              const char* fce);
 
-    /*!
-     * This fce print assert message.
-     * "ASSERT failure in 'WHERE': "WHAT", file FILE on line LINE
-     * \param where Where did it happend.
-     * \param what What happend?
-     * \param file Filename.
-     * \param line Line.
-     * \param fce Fce name.
-     */
+    /***************************************************************************
+    **** Assert message
+    ***************************************************************************/
     CE_INLINE void ce_assert_msg(const char* where,
                                  const char* what,
                                  const char* file,
                                  const int line,
                                  const char* fce);
 
-    /*!
-     * Print check_ptr message.
-     * \param file File.
-     * \param line Line.
-     */
+    /***************************************************************************
+    **** Check
+    ***************************************************************************/
+    CE_INLINE void ce_check(const char* where,
+                            const char* what,
+                            const char* file,
+                            const int line,
+                            const char* fce);
+
+    /***************************************************************************
+    **** Check with message
+    ***************************************************************************/
+    CE_INLINE void ce_check_msg(const char* where,
+                                const char* what,
+                                const char* file,
+                                const int line,
+                                const char* fce);
+
+    /***************************************************************************
+    **** Check pointer
+    ***************************************************************************/
     CE_INLINE void ce_check_ptr(const char* file,
                                 const int line);
+
+    /***************************************************************************
+    **** NOOP
+    ***************************************************************************/
+    CE_INLINE void ce_noop() {};
 }
 
+
+/******************************************************************************
+ **** Implementation
+ *******************************************************************************/
+
 namespace cetech {
-    CE_INLINE void ce_noop() {}
+    #define SHORT_FILE(filename) (strrchr(filename, '/') ? strrchr(filename, '/') + 1 : filename)
 
     CE_INLINE void ce_assert(const char* condition_str,
                              const char* file,
@@ -103,7 +161,8 @@ namespace cetech {
                              const char* fce) {
         char* trace = stacktrace(2);
 
-        log::error("assert", "\'%s\' in %s:%i:%s.\n    stacktrace:\n%s\n", condition_str, SHORT_FILE(file), line, fce,
+        log::error("assert", "\'%s\' in %s:%i:%s.\n    stacktrace:\n%s\n",
+                   condition_str, SHORT_FILE(file), line, fce,
                    trace);
 
         free(trace);
@@ -117,7 +176,48 @@ namespace cetech {
                                  const char* fce) {
 
         char* trace = stacktrace(2);
-        log::error("assert", "\'%s\': \"%s\" %s:%i:%s.\n    stacktrace:\n%s\n",
+        log::error("assert", "\'%s\': \"%s\" %s:%i:%s.\n"
+                   "    stacktrace:\n%s\n",
+                   where, what, SHORT_FILE(file), line, fce, trace);
+
+        free(trace);
+        abort();
+    }
+
+    CE_INLINE void ce_assert_ptr(const char* file,
+                                 const int line) {
+        char* trace = stacktrace(2);
+        log::error("assert.check_ptr", "in file %s on line %i is invalid pointer.\n"
+                   "    stacktrace:\n%s\n \n",
+                   SHORT_FILE(file), line, trace);
+
+        free(trace);
+        abort();
+    }
+
+    CE_INLINE void ce_check(const char* condition_str,
+                            const char* file,
+                            const int line,
+                            const char* fce) {
+        char* trace = stacktrace(2);
+
+        log::error("check", "\'%s\' in %s:%i:%s.\n    stacktrace:\n%s\n",
+                   condition_str, SHORT_FILE(file), line, fce,
+                   trace);
+
+        free(trace);
+        abort();
+    }
+
+    CE_INLINE void ce_check_msg(const char* where,
+                                const char* what,
+                                const char* file,
+                                const int line,
+                                const char* fce) {
+
+        char* trace = stacktrace(2);
+        log::error("check", "\'%s\': \"%s\" %s:%i:%s.\n"
+                   "    stacktrace:\n%s\n",
                    where, what, SHORT_FILE(file), line, fce, trace);
 
         free(trace);
@@ -127,9 +227,13 @@ namespace cetech {
     CE_INLINE void ce_check_ptr(const char* file,
                                 const int line) {
         char* trace = stacktrace(2);
-        log::error("assert.check_ptr", "in file %s on line %i is invalid pointer.\n    stacktrace:\n%s\n \n",
+        log::error("check_ptr", "in file %s on line %i is invalid pointer.\n"
+                   "    stacktrace:\n%s\n \n",
                    SHORT_FILE(file), line, trace);
+
         free(trace);
         abort();
     }
+
+    #undef SHORT_FILE
 }

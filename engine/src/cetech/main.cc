@@ -11,7 +11,15 @@
 #include "cetech/renderer/texture_resource.h"
 #include "cetech/package_manager/package_resource.h"
 #include "cetech/lua/lua_resource.h"
+#include "cetech/resource_manager/resource_manager.h"
 
+#include "cetech/develop/console_server.h"
+#include "cetech/develop/develop_manager.h"
+
+#include "cetech/package_manager/package_manager.h"
+
+#include "cetech/renderer/renderer.h"
+#include "cetech/lua/lua_enviroment.h"
 
 #include <unistd.h>
 #include <csignal>
@@ -192,7 +200,7 @@ bool big_init() {
 
     load_config_json();
 
-    mouse::init();
+    mouse_globals::init();
 
     package_manager_globals::init();
     renderer_globals::init();
