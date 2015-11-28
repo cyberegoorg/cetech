@@ -1,3 +1,8 @@
+
+/*******************************************************************************
+**** Includes
+*******************************************************************************/
+
 #include "celib/memory/memory.h"
 #include "celib/string/stringid.inl.h"
 #include "celib/command_line/command_line.h"
@@ -28,9 +33,10 @@
 
 using namespace cetech;
 
-/*********
- * POSIX *
- ********/
+/*******************************************************************************
+**** PSOIX
+*******************************************************************************/
+
 #if CETECH_LINUX
 void posix_signal_handler(int sig) {
     switch (sig) {
@@ -59,10 +65,15 @@ void posix_init() {
     }
 }
 #endif
-/********/
 
+/*******************************************************************************
+**** Register resource.
+*******************************************************************************/
 void register_resources() {
-    struct ResourceRegistration {
+    /***************************************************************************
+    **** Registertration helper
+    ***************************************************************************/
+    static struct ResourceRegistration {
         StringId64_t type;
 
         resource_compiler::resource_compiler_clb_t compiler;
@@ -70,10 +81,12 @@ void register_resources() {
         resource_manager::resource_online_clb_t online;
         resource_manager::resource_offline_clb_t offline;
         resource_manager::resource_unloader_clb_t unloader;
-    };
 
-    static ResourceRegistration resource_regs[] = {
-        /* package */
+    } resource_regs[] = {
+
+        /***********************************************************************
+        **** Package resource.
+        ***********************************************************************/
         { resource_package::type_hash(),
           & resource_package::compile,
           & resource_package::loader,
@@ -81,7 +94,9 @@ void register_resources() {
           & resource_package::offline,
           & resource_package::unloader},
 
-        /* lua */
+        /***********************************************************************
+        **** Lua resource.
+        ***********************************************************************/
         {resource_lua::type_hash(),
          & resource_lua::compile,
          & resource_lua::loader,
@@ -89,7 +104,9 @@ void register_resources() {
          & resource_lua::offline,
          & resource_lua::unloader},
 
-        /* texture */
+        /***********************************************************************
+        **** Texture resource.
+        ***********************************************************************/
         {resource_texture::type_hash(),
          & resource_texture::compile,
          & resource_texture::loader,
@@ -97,10 +114,16 @@ void register_resources() {
          & resource_texture::offline,
          & resource_texture::unloader},
 
-        /* LAST */
-        {0, nullptr, nullptr, nullptr, nullptr, nullptr}
+        /***********************************************************************
+        **** LOOP BREAK.
+        ***********************************************************************/
+        {0,nullptr, nullptr, nullptr, nullptr, nullptr}
     };
 
+    /***************************************************************************
+    **** NOW register all resource but if defined CETECH_DEVELOP skip compiler
+    **** registration
+    ***************************************************************************/
     const ResourceRegistration* it = resource_regs;
     while (it->type != 0) {
         resource_manager::register_unloader(it->type, it->unloader);
@@ -115,6 +138,9 @@ void register_resources() {
     }
 }
 
+/*******************************************************************************
+**** Load config.
+*******************************************************************************/
 void load_config_json() {
     FSFile& f = filesystem::open(BUILD_DIR, "config.json", FSFile::READ);
 
@@ -126,7 +152,6 @@ void load_config_json() {
 
     rapidjson::Document document;
     document.Parse((const char*)mem);
-
     if (document.HasParseError()) {
         log::error("main", "Parse config.json error: %s", GetParseError_En(
                        document.GetParseError()), document.GetErrorOffset());
@@ -136,11 +161,13 @@ void load_config_json() {
     memory_globals::default_allocator().deallocate(mem);
 
     cvar::load_from_json(document);
-
 }
 
-
+/*******************************************************************************
+**** Big init.
+*******************************************************************************/
 bool big_init() {
+
 #if CETECH_LINUX
     posix_init();
 #endif
@@ -149,7 +176,6 @@ bool big_init() {
     log::register_handler(&log::stdout_handler);
 
     memory_globals::init();
-
     filesystem_globals::init();
 
     char build_path[4096] = {0};
@@ -167,8 +193,8 @@ bool big_init() {
     console_server::init();
     develop_manager_globals::init();
 #endif
-    task_manager_globals::init();
 
+    task_manager_globals::init();
     resource_manager_globals::init();
 
 #if defined(CETECH_DEVELOP)
@@ -195,22 +221,21 @@ bool big_init() {
 
         log::debug("main", "Client connected.");
     }
-
 #endif
 
     load_config_json();
 
     mouse_globals::init();
-
     package_manager_globals::init();
     renderer_globals::init();
-
     lua_enviroment_globals::init();
     application_globals::init();
-
     return true;
 }
 
+/*******************************************************************************
+**** Make path.
+*******************************************************************************/
 static void make_path(char* buffer,
                       size_t max_size,
                       const char* path) {
@@ -223,7 +248,9 @@ static void make_path(char* buffer,
     }
 }
 
-
+/*******************************************************************************
+**** Parse command line.
+*******************************************************************************/
 void parse_command_line(int argc,
                         const char** argv) {
     command_line_globals::set_args(argc, argv);
@@ -261,6 +288,9 @@ void parse_command_line(int argc,
 
 }
 
+/*******************************************************************************
+**** Big shutdown.
+*******************************************************************************/
 void big_shutdown() {
     package_manager_globals::shutdown();
     resource_manager_globals::shutdown();
@@ -282,8 +312,12 @@ void big_shutdown() {
     log_globals::shutdown();
 }
 
+/*******************************************************************************
+**** Main.
+*******************************************************************************/
 int main(int argc,
          const char** argv) {
+
     parse_command_line(argc, argv);
 
     if (big_init()) {
