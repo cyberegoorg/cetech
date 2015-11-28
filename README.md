@@ -31,7 +31,7 @@ interactive application developing.
 
 #### OSX
 
-* Install python3, pyqt5, automake, libtool
+* Install clang, python3, pyqt5, automake, libtool
 
 ```bash
 $ brew install python3
