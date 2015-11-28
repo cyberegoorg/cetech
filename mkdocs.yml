@@ -6,7 +6,6 @@ theme: readthedocs
 
 pages:
   - Úvod: 'index.md'
-  - Instalace: 'install.md'
   - Architektůra: 'architecture/overview.md'
   - New Game: 'new_game/overview.md'
 
