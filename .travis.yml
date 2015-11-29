@@ -30,6 +30,8 @@ addons:
       - clang-3.7
 
 install:
+  - sudo update-alternatives --install /usr/bin/clang clang /usr/bin/clang-3.7 20
+  - sudo update-alternatives --install /usr/bin/clang++ clang++ /usr/bin/clang++-3.7 20
   - clang --version
   - pip install -r requirements.txt
   - python ./external.py
