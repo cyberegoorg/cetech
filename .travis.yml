@@ -1,5 +1,4 @@
 language: cpp
-compiler: clang
 
 branches:
   only:
@@ -8,16 +7,15 @@ branches:
 os:
   - linux
 
-python:
-  - "3.5"
-
 addons:
   apt:
     packages:
+      - clang-3.7
       - gcc
       - make
       - libtool
       - automake
+      - python3.5
       - time
 
 install:
