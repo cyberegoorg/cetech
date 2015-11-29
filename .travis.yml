@@ -12,6 +12,12 @@ os:
 python:
   - "3.5"
 
+cache:
+  - pip
+
+  - directories:
+    - external
+
 addons:
   apt:
     sources:
@@ -27,14 +33,12 @@ addons:
       - time
 
 install:
+  - clang --version
   - python --version
   - pip install -r requirements.txt
   - python ./external.py
   - python ./make.py
 
-cache:
-  directories:
-    - external
 
 script:
  - ./.build/linux64_clang/bin/cetech_testDebug
