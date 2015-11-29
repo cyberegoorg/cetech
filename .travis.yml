@@ -1,5 +1,7 @@
 language: cpp
 
+sudo: false
+
 branches:
   only:
     - master
@@ -9,6 +11,9 @@ os:
 
 addons:
   apt:
+    sources:
+      - ubuntu-toolchain-r-test
+
     packages:
       - clang-3.7
       - gcc
