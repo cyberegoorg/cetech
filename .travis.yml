@@ -1,5 +1,7 @@
 language: python
 
+sudo: false
+
 python:
   - "3.5"
 
@@ -13,6 +15,12 @@ install:
   - pip install pyyaml
   - python external.py
   - python make.py --cxx=$COMPILER
+
+cache:
+  apt: true
+  pip: true
+  directories:
+  - external
 
 script:
   - ./.build/linux64_clang/bin/cetech_testDebug
