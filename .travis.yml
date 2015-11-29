@@ -8,10 +8,17 @@ branches:
 os:
   - linux
 
+addons:
+  apt:
+    packages:
+      - python3.5
+      - gcc
+      - make
+      - libtool
+      - automake
+      - time
 
 install:
-  - sudo apt-get update -qq
-  - sudo apt-get install -qq python3.5 gcc make libtool automake
   - python3.5 ./external.py
   - python3.5 ./make.py
 
