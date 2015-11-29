@@ -1,0 +1,20 @@
+language: python
+
+python:
+  - "3.5"
+
+matrix:
+  include:
+    - os: linux
+      compiler: clang
+      addons:
+        apt:
+          sources: ['ubuntu-toolchain-r-test', 'llvm-toolchain-precise-3.7']
+          packages: ['clang-3.7']
+      env: COMPILER=clang++-3.7
+
+install:
+  - python external.py
+
+script:
+  python make.py --cxx=$COMPILER
