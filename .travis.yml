@@ -1,32 +1,15 @@
 language: cpp
 
-branches:
-  only:
-    - master
+compiler: clang
+python: "3.5"
+clang: "3.7"
 
-cache:
-  pip: true
-  apt: true
-  directories:
-  - ./external/
+before_install:
+  - clang --version
+  - pip install -r requirements.txt
 
-matrix:
-  - os: linux
-    compiler: clang
-    addons:
-      apt:
-        sources: ['ubuntu-toolchain-r-test', 'llvm-toolchain-precise-3.7']
-        packages: ['clang-3.7', 'python3', ' cython3']
+install:
+  - python3 ./external.py
+  - python3 ./make.py
 
-    install:
-      - sudo update-alternatives --install /usr/bin/clang clang /usr/bin/clang-3.7 20
-      - sudo update-alternatives --install /usr/bin/clang++ clang++ /usr/bin/clang++-3.7 20
-      - clang --version
-      - pip install -r requirements.txt
-      - python3 ./external.py
-      - python3 ./make.py
-
-
-script:
- - ./.build/linux64_clang/bin/cetech_testDebug
-
+script: ./.build/linux64_clang/bin/cetech_testDebug
