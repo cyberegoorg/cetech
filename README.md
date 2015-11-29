@@ -1,4 +1,5 @@
 # [CETech](https://github.com/cyberegoorg/cetech)
+[![Issues](https://img.shields.io/github/issues/ColinH/PEGTL.svg)](https://github.com/cyberegoorg/cetech/issues)
 
 ## [What is it?] (https://cyberegoorg.github.io/cetech/)
 
