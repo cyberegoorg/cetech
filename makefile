@@ -18,4 +18,7 @@ uncrustify:
 
 linux:
 	python ./make.py
+	.build/linux64_clang/bin/cetech_testDebug
 
+clean:
+	python ./make.py clean

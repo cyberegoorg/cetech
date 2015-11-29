@@ -243,7 +243,7 @@ namespace cetech {
                 develop_manager::clear();
                 ++data._frame_id;
 
-                auto time = develop_manager::enter_scope("Application::Update()");
+                time::PerfTimer stime = develop_manager::enter_scope("Application::Update()");
 
                 console_server::tick();
                 develop_manager::push_begin_frame();
@@ -271,11 +271,11 @@ namespace cetech {
                 }
 
                 if (!data._flags.pause) {
-                    auto time = develop_manager::enter_scope("Game::Update()");
+                    time::PerfTimer etime = develop_manager::enter_scope("Game::Update()");
                     lua_enviroment::call_global("update", "f", dt);
                     lua_enviroment::clean_temp();
                     usleep(10 * 100);
-                    develop_manager::leave_scope("Game::Update()", time);
+                    develop_manager::leave_scope("Game::Update()", etime);
                 }
 
                 if (!data._flags.daemon_mod) {
@@ -284,7 +284,7 @@ namespace cetech {
                 }
 
                 develop_manager::push_end_frame();
-                develop_manager::leave_scope("Application::Update()", time);
+                develop_manager::leave_scope("Application::Update()", stime);
                 develop_manager::flush_all_stream_buffer();
                 develop_manager::send_buffer();
 

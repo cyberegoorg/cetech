@@ -43,6 +43,11 @@ solution "CETech"
     configurations {"Debug", "Develop", "Release"}
     platforms {"native", "x32", "x64"}
 
+    dofile(path.join(ROOT_DIR, "scripts", "toolchain.lua"))
+    if not toolchain(BUILD_DIR, THIRD_PARTY) then
+            return -- no action specified
+    end
+
     includedirs {
       THIRD_PARTY_INCLUDE,
       ENGINE_SRC_DIR,
@@ -64,6 +69,7 @@ solution "CETech"
           "CETECH_DEVELOP",
           "CETECH_CE_INLINE_OFF",
         }
+
 
     configuration "Develop"
         targetsuffix 'Develop'
@@ -102,11 +108,6 @@ solution "CETech"
             "m",
         }
 
-    dofile(path.join(ROOT_DIR, "scripts", "toolchain.lua"))
-    if not toolchain(BUILD_DIR, THIRD_PARTY) then
-            return -- no action specified
-    end
-
     configuration {}
 
 function cetech_project(name, test)
@@ -132,6 +133,10 @@ function cetech_project(name, test)
 
             defines {
                 'CETECH_TEST'
+            }
+
+            removeflags {
+                "NoExceptions",
             }
         end
 
