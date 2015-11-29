@@ -1,7 +1,9 @@
-language: python
+language: cpp
 
-python:
-  - "3.5"
+addons:
+  apt:
+    sources: ['ubuntu-toolchain-r-test']
+    packages: ['python3.5']
 
 matrix:
   include:
@@ -15,7 +17,7 @@ matrix:
 
 install:
   - pip install -r requirements.txt
-  - python external.py
+  - python3.5 external.py
 
 script:
   python make.py --cxx=$COMPILER
