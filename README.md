@@ -1,5 +1,7 @@
 # [CETech](https://github.com/cyberegoorg/cetech)
 
+[![Issues](https://img.shields.io/github/issues/cyberegoorg/cetech.svg)](https://github.com/cyberegoorg/cetech/issues)
+
 ## [What is it?] (https://cyberegoorg.github.io/cetech/)
 
 CETech is Data-Driven [game engine](https://en.wikipedia.org/wiki/Game_engine) and toolbox for game and
