@@ -10,7 +10,12 @@ os:
   - linux
 
 addons:
-    apt_packages:
+  apt:
+    sources:
+      - ubuntu-toolchain-r-test
+      - llvm-toolchain-precise
+
+    packages:
       - clang-3.7
       - gcc
       - make
