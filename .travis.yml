@@ -1,5 +1,7 @@
 language: cpp
 
+sudo: false
+
 compiler: clang
 python: "3.5"
 clang: "3.7"
