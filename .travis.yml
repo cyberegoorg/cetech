@@ -10,11 +10,7 @@ os:
   - linux
 
 addons:
-  apt:
-    sources:
-      - ubuntu-toolchain-r-test
-
-    packages:
+    apt_packages:
       - clang-3.7
       - gcc
       - make
@@ -26,6 +22,10 @@ addons:
 install:
   - python3.5 ./external.py
   - python3.5 ./make.py
+
+cache:
+  directories:
+    - external
 
 script:
  - ./.build/linux64_clang/bin/cetech_testDebug
