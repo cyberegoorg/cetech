@@ -1,14 +1,8 @@
-language: python
-
-python:
-  - "3.5"
+language: cpp
 
 branches:
   only:
     - master
-
-os:
-  - linux
 
 cache:
   pip: true
@@ -16,26 +10,21 @@ cache:
   directories:
   - ./external/
 
-addons:
-  apt:
-    sources:
-      - ubuntu-toolchain-r-test
-      - llvm-toolchain-precise
+matrix:
+  - os: linux
+    compiler: clang
+    addons:
+      apt:
+        sources: ['ubuntu-toolchain-r-test', 'llvm-toolchain-precise-3.7']
+        packages: ['clang-3.7', 'python3', ' cython3']
 
-    packages:
-      - make
-      - libtool
-      - automake
-      - time
-      - clang-3.7
-
-install:
-  - sudo update-alternatives --install /usr/bin/clang clang /usr/bin/clang-3.7 20
-  - sudo update-alternatives --install /usr/bin/clang++ clang++ /usr/bin/clang++-3.7 20
-  - clang --version
-  - pip install -r requirements.txt
-  - python ./external.py
-  - python ./make.py
+    install:
+      - sudo update-alternatives --install /usr/bin/clang clang /usr/bin/clang-3.7 20
+      - sudo update-alternatives --install /usr/bin/clang++ clang++ /usr/bin/clang++-3.7 20
+      - clang --version
+      - pip install -r requirements.txt
+      - python3 ./external.py
+      - python3 ./make.py
 
 
 script:
