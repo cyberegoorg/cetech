@@ -8,10 +8,6 @@
 #include "cetech/develop/console_server.h"
 #include "cetech/application/application.h"
 
-#include "rapidjson/rapidjson.h"
-#include "rapidjson/document.h"
-#include "rapidjson/encodings.h"
-
 
 #define LOG_FORMAT_NO_TIME "[%s][%d][%s] %s"
 #define LOG_FORMAT  "[%s]" LOG_FORMAT_NO_TIME
