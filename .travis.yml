@@ -1,8 +1,7 @@
-language: c++
-compiler: clang
+language: python
 
-clang:
-  - "3.7"
+python:
+  - "3.5"
 
 branches:
   only:
@@ -12,10 +11,10 @@ os:
   - linux
 
 cache:
-  - pip
-
-  - directories:
-    - ./external/
+  pip: true
+  apt: true
+  directories:
+  - ./external/
 
 addons:
   apt:
@@ -28,14 +27,13 @@ addons:
       - libtool
       - automake
       - time
-      - python3
+      - clang-3.7
 
 install:
   - clang --version
-  - python3 --version
   - pip install -r requirements.txt
-  - python3 ./external.py
-  - python3 ./make.py
+  - python ./external.py
+  - python ./make.py
 
 
 script:
