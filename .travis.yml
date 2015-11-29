@@ -20,7 +20,7 @@ addons:
 
     packages:
       - clang-3.7
-      - gcc
+      - g++
       - make
       - libtool
       - automake
