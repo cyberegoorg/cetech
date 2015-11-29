@@ -39,7 +39,7 @@ newoption {
   }
 }
 --------------------------------------------------------------------------------
-solution "cyberego.org tech1"
+solution "CETech"
     configurations {"Debug", "Develop", "Release"}
     platforms {"native", "x32", "x64"}
 
@@ -72,7 +72,7 @@ solution "cyberego.org tech1"
           "NDEBUG",
           "CETECH_DEVELOP",
         }
-        
+
     configuration "linux*"
         defines {
           'CETECH_PLATFORM=linux',
@@ -108,103 +108,86 @@ solution "cyberego.org tech1"
     end
 
     configuration {}
-    
---------------------------------------------------------------------------------
-project "celib_static"
-    kind "StaticLib"
-    language "C++"
 
-    defines {
-        'DTHREADSAFE=1'
-    }
+function cetech_project(name, test)
+    project(name)
+        kind "ConsoleApp"
+        language "C++"
 
-    files {
-        path.join(ENGINE_SRC_DIR, "celib", "**.cc"),
-        path.join(ENGINE_SRC_DIR, "celib", "**.h"),
-    }
-
-
-    configuration {}
---------------------------------------------------------------------------------
--- project "cetech1_test"
---     kind "ConsoleApp"
---     language "C++"
--- 
---     links {
---       'celib_static'
---     }
--- 
---     includedirs {
---       ROOT_DIR .. "tests"
---     }
--- 
---     files {
---         ROOT_DIR .. "tests/**.cc",
---         ROOT_DIR .. "tests/**.h",
---     }
--- 
---     configuration {}
---------------------------------------------------------------------------------
-project "cetech1"
-    kind "ConsoleApp"
-    language "C++"
-
-    files {
-        path.join(ENGINE_SRC_DIR, "cetech", "**.cc"),
-        path.join(ENGINE_SRC_DIR, "cetech", "**.h"),
-    }
-
-    links {
-      'celib_static',
-
-      "luajit",
-      "enet",
-      "SOIL",
-      "sqlite3",
-    }
-    
-    configuration "Release or Develop"
-        links {
-            "bgfxRelease",
+        files {
+            path.join(ENGINE_SRC_DIR, "cetech", "**.cc"),
+            path.join(ENGINE_SRC_DIR, "cetech", "**.h"),
+            path.join(ENGINE_SRC_DIR, "celib", "**.cc"),
+            path.join(ENGINE_SRC_DIR, "celib", "**.h"),
         }
 
-    configuration "Debug"
-        links {
-          --"bgfxDebug",
-          "bgfxRelease",
-        }
+        if test then
+            files {
+                path.join(ENGINE_SRC_DIR, "tests_main.cc"),
+            }
 
-    configuration ("linux*")
-        links {
-            'SDL2',
-            'dl',
-            'pthread',
-            "GL",
-            "X11",
-            "rt"
-        }
+            excludes {
+                path.join(ENGINE_SRC_DIR, "cetech", "main.cc"),
+            }
 
-    configuration ("osx*")
-        linkoptions {
-            "-framework Cocoa",
-            "-framework Metal",
-            "-framework QuartzCore",
-            "-framework OpenGL",
-            "-framework ForceFeedback",
-            "-framework Carbon",
-            "-framework IOKit",
-            "-framework CoreAudio",
-            "-framework AudioToolbox",
-            "-framework AudioUnit",
-            '-pagezero_size 10000',
-            '-image_base 100000000',
-        }
+            defines {
+                'CETECH_TEST'
+            }
+        end
 
         links {
-            'SDL2',
-            'dl',
-            'pthread',
-            'iconv',
+            "luajit",
+            "enet",
+            "SOIL",
+            "sqlite3",
         }
 
-    strip()
+        configuration "Release or Develop"
+            links {
+                "bgfxRelease",
+            }
+
+        configuration "Debug"
+            links {
+                --"bgfxDebug",
+                "bgfxRelease",
+            }
+
+        configuration ("linux*")
+            links {
+                'SDL2',
+                'dl',
+                'pthread',
+                "GL",
+                "X11",
+                "rt"
+            }
+
+        configuration ("osx*")
+            linkoptions {
+                "-framework Cocoa",
+                "-framework Metal",
+                "-framework QuartzCore",
+                "-framework OpenGL",
+                "-framework ForceFeedback",
+                "-framework Carbon",
+                "-framework IOKit",
+                "-framework CoreAudio",
+                "-framework AudioToolbox",
+                "-framework AudioUnit",
+                '-pagezero_size 10000',
+                '-image_base 100000000',
+            }
+
+            links {
+                'SDL2',
+                'dl',
+                'pthread',
+                'iconv',
+            }
+
+        strip()
+end
+
+cetech_project('cetech', false)
+cetech_project('cetech_test', true)

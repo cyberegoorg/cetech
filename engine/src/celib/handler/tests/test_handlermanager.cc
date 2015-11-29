@@ -1,4 +1,6 @@
-#include "catch.hpp"
+#ifdef CETECH_TEST
+
+#include "catch/catch.hpp"
 
 #include "celib/handler/handler_manager.h"
 
@@ -44,3 +46,5 @@ SCENARIO( "Handler manager can create/destroy handler", "[handlermanager]" ) {
 
     cetech::memory_globals::shutdown();
 }
+
+#endif

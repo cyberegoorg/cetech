@@ -1,9 +1,10 @@
-#include "catch.hpp"
+#ifdef CETECH_TEST
+
+#include "catch/catch.hpp"
 
 #include "celib/memory/memory.h"
 #include "celib/math/vector2.inl.h"
-
-#include "test_utils.h"
+#include "celib/test_utils.h"
 
 TEST_CASE( "Vector2 operation", "[vector2]" ) {
     cetech::Vector2 v1 = {1.0f, 2.0f};
@@ -134,3 +135,4 @@ TEST_CASE( "Vector2 operation", "[vector2]" ) {
         REQUIRE_ALMOST( sign.y, -1.0f);
     }
 }
+#endif

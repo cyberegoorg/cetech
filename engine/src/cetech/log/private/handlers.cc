@@ -4,6 +4,7 @@
 
 #include "cetech/log/log.h"
 #include "celib/macros.h"
+#include "celib/defines.h"
 #include "cetech/develop/console_server.h"
 #include "cetech/application/application.h"
 

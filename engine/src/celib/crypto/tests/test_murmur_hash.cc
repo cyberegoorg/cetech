@@ -1,6 +1,8 @@
+#ifdef CETECH_TEST
+
 #include <string.h>
 
-#include "catch.hpp"
+#include "catch/catch.hpp"
 
 #include "celib/crypto/murmur_hash.inl.h"
 
@@ -25,3 +27,5 @@ SCENARIO( "Murmur hash", "[murmur]" ) {
         }
     }
 }
+
+#endif
