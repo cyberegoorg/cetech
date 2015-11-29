@@ -100,36 +100,47 @@ PLATFORMS_BUILD = {
 ARGS_PARSER = argparse.ArgumentParser(description='CETech build script')
 
 ARGS_PARSER.add_argument(
-    "action",
-    help="Build action",
-    nargs='?', type=str, default='', choices=ACTIONS)
+        "action",
+        help="Build action",
+        nargs='?', type=str, default='', choices=ACTIONS)
 
 ARGS_PARSER.add_argument(
-    "--generate",
-    help='Only generate project files to build dir',
-    action='store_true')
+        "--generate",
+        help='Only generate project files to build dir',
+        action='store_true')
 
 ARGS_PARSER.add_argument(
-    "--config",
-    help='Build configuration',
-    default='debug', choices=CONFIG)
+        "--config",
+        help='Build configuration',
+        default='debug', choices=CONFIG)
 
 ARGS_PARSER.add_argument(
-    "--platform",
-    default=DEFAULT_BUILD, choices=PLATFORMS, help='Target platform')
+        "--platform",
+        default=DEFAULT_BUILD, choices=PLATFORMS, help='Target platform')
+
+ARGS_PARSER.add_argument(
+        "--cc",
+        help='CC')
+
+ARGS_PARSER.add_argument(
+        "--cxx",
+        help='CXX')
 
 
 ###########
 # PROGRAM #
 ########################################################################################################################
 
-def run_genie(platform):
+def run_genie(platform, cc=None, cxx=None):
     """Run platform specific genie command.
     """
-    subprocess.check_call(PLATFORMS_GENIE[platform])
+
+    cmd = PLATFORMS_GENIE[platform]
+
+    subprocess.check_call(cmd)
 
 
-def make(config, platform, only_genie=False):
+def make(config, platform, only_genie=False, cc=None, cxx=None):
     """Make build
 
     :param config: Build configuration.
@@ -141,7 +152,15 @@ def make(config, platform, only_genie=False):
 
     print('Building.')
     if not only_genie:
-        subprocess.check_call(PLATFORMS_BUILD[platform][config])
+        cmd = PLATFORMS_BUILD[platform][config]
+
+        if cc is not None:
+            cmd.append('CC=%s' % cc)
+
+        if cxx is not None:
+            cmd.append('CXX=%s' % cxx)
+
+        subprocess.check_call(cmd)
 
 
 def clean():
@@ -160,7 +179,7 @@ def main(args=None):
 
     action = args.action
     if action == '':
-        make(args.config, args.platform, args.generate)
+        make(args.config, args.platform, args.generate, args.cc, args.cxx)
 
     elif action == 'clean':
         clean()

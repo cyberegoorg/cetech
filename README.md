@@ -27,11 +27,11 @@ interactive application developing.
 
 #### Linux
 
-* Install python >= 3.5, PyQt5, gcc, clang, make, libtool, automake
+* Install python >= 3.5, Qt5, PyQt5, gcc, clang, make, libtool, automake
 
 #### OSX
 
-* Install clang, python3, pyqt5, automake, libtool
+* Install clang, python3, qt, pyqt5, automake, libtool
 
 ```bash
 $ brew install python3
