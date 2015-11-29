@@ -9,7 +9,7 @@ cache:
   apt: true
   pip: true
   directories:
-  -./external/
+  - ./external/
 
 addons:
   apt:
