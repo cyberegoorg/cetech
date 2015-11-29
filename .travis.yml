@@ -1,4 +1,8 @@
 language: c++
+compiler: clang
+
+clang:
+  - "3.7"
 
 branches:
   only:
@@ -20,13 +24,11 @@ addons:
       - llvm-toolchain-precise
 
     packages:
-      - g++
       - make
       - libtool
       - automake
       - time
       - python3
-      - clang-3.7
 
 install:
   - clang --version
