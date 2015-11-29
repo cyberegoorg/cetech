@@ -158,9 +158,9 @@ def make_externals(config, platform, external='', only_clone=False):
         for cmd in commands:
             cmd_lst = cmd.split(' ')
 
-            if cmd[0] == 'make':
-                cmd.insert(1, '-j')
-                cmd.insert(2, CPU_COUNT_STR)
+            if cmd_lst[0] == 'make':
+                cmd_lst.insert(1, '-j')
+                cmd_lst.insert(2, CPU_COUNT_STR)
 
             print(cmd_lst)
 
