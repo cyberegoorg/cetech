@@ -1,4 +1,7 @@
-language: python
+language: c++
+
+compiler:
+  - clang
 
 sudo: false
 
@@ -9,6 +12,9 @@ branches:
 os:
   - linux
 
+clang:
+  - "3.7"
+
 python:
   - "3.5"
 
@@ -16,7 +22,7 @@ cache:
   - pip
 
   - directories:
-    - external
+    - ./external/
 
 addons:
   apt:
@@ -25,12 +31,12 @@ addons:
       - llvm-toolchain-precise
 
     packages:
-      - clang-3.7
       - g++
       - make
       - libtool
       - automake
       - time
+      - python3
 
 install:
   - clang --version
