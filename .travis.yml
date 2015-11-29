@@ -1,4 +1,4 @@
-language: cpp
+language: python
 
 sudo: false
 
@@ -8,6 +8,9 @@ branches:
 
 os:
   - linux
+
+python:
+  - "3.5"
 
 addons:
   apt:
@@ -21,12 +24,12 @@ addons:
       - make
       - libtool
       - automake
-      - python3.5
       - time
 
 install:
-  - python3.5 ./external.py
-  - python3.5 ./make.py
+  - python --version
+  - python ./external.py
+  - python ./make.py
 
 cache:
   directories:
