@@ -1,4 +1,6 @@
-#include "catch.hpp"
+#ifdef CETECH_TEST
+
+#include "catch/catch.hpp"
 
 #include "celib/memory/memory.h"
 #include "celib/container/array.inl.h"
@@ -90,3 +92,6 @@ SCENARIO( "Array can be sized and resized", "[array]" ) {
 
     cetech::memory_globals::shutdown();
 }
+
+
+#endif

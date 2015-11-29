@@ -1,9 +1,11 @@
-#include "catch.hpp"
+#ifdef CETECH_TEST
+
+#include "catch/catch.hpp"
 
 #include "celib/memory/memory.h"
 #include "celib/math/math.inl.h"
 
-#include "test_utils.h"
+#include "celib/test_utils.h"
 
 TEST_CASE( "Math operation", "[math]" ) {
     SECTION( "max()" ) {
@@ -103,3 +105,5 @@ TEST_CASE( "Math operation", "[math]" ) {
         REQUIRE( selected == -1.0f );
     }
 }
+
+#endif

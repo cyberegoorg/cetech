@@ -1,12 +1,14 @@
-#include "catch.hpp"
+#ifdef CETECH_TEST
+
+#include "catch/catch.hpp"
 
 #include "celib/memory/memory.h"
-#include "celib/math/matrix33.inl.h"
+#include "celib/math/matrix44.inl.h"
 
-#include "test_utils.h"
+#include "celib/test_utils.h"
 
-TEST_CASE( "Matrix33 operation", "[matrix33]" ) {
-    cetech::Matrix33 m1 = cetech::matrix33::IDENTITY;
+TEST_CASE( "Matrix44 operation", "[matrix4]" ) {
+    cetech::Matrix44 m1 = cetech::matrix44::IDENTITY;
 
     SECTION( "m1 * v" ) {
         cetech::Vector3 res = m1 * cetech::vector3::UP;
@@ -17,7 +19,7 @@ TEST_CASE( "Matrix33 operation", "[matrix33]" ) {
     }
 
     SECTION( "from_axis_angle()" ) {
-        cetech::Matrix33 m = cetech::matrix33::from_axis_angle(cetech::vector3::FORWARDS, 90.0f);
+        cetech::Matrix44 m = cetech::matrix44::from_axis_angle(cetech::vector3::FORWARDS, 90.0f);
         cetech::Vector3 res = m * cetech::vector3::UP;
 
         REQUIRE_ALMOST( res.x, cetech::vector3::LEFT.x);
@@ -25,4 +27,12 @@ TEST_CASE( "Matrix33 operation", "[matrix33]" ) {
         REQUIRE_ALMOST( res.z, cetech::vector3::LEFT.z);
     }
 
+
+    SECTION( "determinant(m1)" ) {
+        const float det = cetech::matrix44::determinant(m1);
+        REQUIRE( det == 1.0f);
+    }
+
+
 }
+#endif

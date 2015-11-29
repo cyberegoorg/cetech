@@ -1,9 +1,11 @@
-#include "catch.hpp"
+#ifdef CETECH_TEST
+
+#include "catch/catch.hpp"
 
 #include "celib/memory/memory.h"
 #include "celib/math/simd/fpu.h"
 
-#include "test_utils.h"
+#include "celib/test_utils.h"
 
 TEST_CASE( "SIMD: FPU", "[simd]" ) {
     cetech::SimdVector v1 = SIMD_VECTOR(1.0f, 2.0f, 3.0f, 4.0f);
@@ -156,3 +158,5 @@ TEST_CASE( "SIMD: FPU", "[simd]" ) {
         REQUIRE( x == 1.0f );
     }
 }
+
+#endif

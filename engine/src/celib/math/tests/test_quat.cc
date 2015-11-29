@@ -1,9 +1,10 @@
-#include "catch.hpp"
+#ifdef CETECH_TEST
+
+#include "catch/catch.hpp"
 
 #include "celib/memory/memory.h"
 #include "celib/math/quat.inl.h"
-
-#include "test_utils.h"
+#include "celib/test_utils.h"
 
 TEST_CASE( "Quat operation", "[quat]" ) {
     cetech::Quat q1 = {1.0f, 2.0f, 3.0f, 4.0f};
@@ -93,3 +94,5 @@ TEST_CASE( "Quat operation", "[quat]" ) {
         REQUIRE_ALMOST3( len, 1.0f, 0.01f); // TODO: check compare
     }
 }
+
+#endif

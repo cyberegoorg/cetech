@@ -1,4 +1,6 @@
-#include "catch.hpp"
+#ifdef CETECH_TEST
+
+#include "catch/catch.hpp"
 
 #include "celib/ecs/entitymanager.h"
 
@@ -35,3 +37,4 @@ SCENARIO( "Entity manager can create/destroy entity", "[entity]" ) {
 
     cetech::memory_globals::shutdown();
 }
+#endif
