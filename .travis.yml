@@ -1,22 +1,11 @@
 language: c++
 
-compiler:
-  - clang
-
-sudo: false
-
 branches:
   only:
     - master
 
 os:
   - linux
-
-clang:
-  - "3.7"
-
-python:
-  - "3.5"
 
 cache:
   - pip
@@ -37,13 +26,14 @@ addons:
       - automake
       - time
       - python3
+      - clang-3.7
 
 install:
   - clang --version
-  - python --version
+  - python3 --version
   - pip install -r requirements.txt
-  - python ./external.py
-  - python ./make.py
+  - python3 ./external.py
+  - python3 ./make.py
 
 
 script:
