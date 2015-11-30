@@ -11,23 +11,16 @@ cache:
   directories:
   - ./external/
 
-matrix:
-  include:
-    - os: linux
-      addons:
-        apt:
-          sources: ['ubuntu-toolchain-r-test', 'llvm-toolchain-precise-3.7']
-          packages: ['clang-3.7']
+addons:
+  apt:
+    sources: ['ubuntu-toolchain-r-test', 'llvm-toolchain-precise-3.7']
+    packages: ['clang-3.7']
+env: COMPILER=clang++-3.7
 
-      env:
-        - COMPILER=clang++-3.7
-        - PYTHON=python
-        - BUILD_TARGET=python
-
-      install:
-        - pip install pyyaml
-        - $PYTHON external.py
-        - $PYTHON make.py --cxx=$COMPILER
+install:
+  - pip install pyyaml
+  - python external.py
+  - python make.py --cxx=$COMPILER
 
 script:
-  - ./.build/$BUILD_TARGET/bin/cetech_testDebug
+  - ./.build/linux64_clang/bin/cetech_testDebug
