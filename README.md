@@ -30,7 +30,7 @@ interactive application developing.
 
 #### Linux
 
-* Install python >= 3.5, Qt5, PyQt5, gcc, clang, make, libtool, automake
+* Install python >= 3.5, Qt5, PyQt5, gcc, clang >= 3.7, make, libtool, automake
 
 #### OSX
 
