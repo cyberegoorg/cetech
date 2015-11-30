@@ -98,8 +98,16 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.project.open_project(name, dir)
 
         # self.project.run_cetech(build_type=CetechProject.BUILD_DEBUG, compile=True, continu=True, daemon=True)
+
+        if platform.system().lower() == 'darwin':
+            wid = None
+        else:
+            wid = self.ogl_widget.winId()
+
         self.project.run_cetech(build_type=CetechProject.BUILD_DEBUG, compile_=True, continue_=True,
-                                wid=self.ogl_widget.winId())
+                                wid=wid)
+
+
         self.api.start(QThread.LowPriority)
 
         self.assetb_widget.open_project(self.project.project_dir)
