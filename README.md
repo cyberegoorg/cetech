@@ -2,14 +2,19 @@
 
 [![Build Status](https://travis-ci.org/cyberegoorg/cetech.svg?branch=master)](https://travis-ci.org/cyberegoorg/cetech)
 [![Issues](https://img.shields.io/github/issues/cyberegoorg/cetech.svg)](https://github.com/cyberegoorg/cetech/issues)
+[![Release](https://img.shields.io/github/release/cyberegoorg/cetech.svg)](https://github.com/cyberegoorg/cetech/releases)
 
 ## [What is it?] (https://cyberegoorg.github.io/cetech/)
 
-CETech is Data-Driven [game engine](https://en.wikipedia.org/wiki/Game_engine) and toolbox for game and
-interactive application developing.
+CETech is Data-Driven [game engine](https://en.wikipedia.org/wiki/Game_engine) and toolbox inspired by [Bitsquid](http://bitsquid.blogspot.se/)/[Stingray](http://stingrayengine.com/) engine.
 
 * [Release notes](http://cyberegoorg.github.io/cetech/about/release-notes)
 * [Documentation](http://cyberegoorg.github.io/cetech) (temporarily in czech language)
+
+## Similar projects
+
+* [crown](https://github.com/taylor001/crown)
+* [lumix](https://github.com/nem0/LumixEngine)
 
 ## Suported platforms
 
@@ -23,6 +28,23 @@ interactive application developing.
 * asm.js/Emscripten (Runtime)
 * Android (Runtime)
 * RaspberryPi (Runtime)
+
+## 3rd party libraries and tools
+
+* [genie](https://github.com/bkaradzic/genie)
+* [BGFX](https://github.com/bkaradzic/bgfx)
+* [SDL2](https://www.libsdl.org/)
+* [enet](http://enet.bespin.org/)
+* [luajit](http://luajit.org/)
+* [rapidjson](http://rapidjson.org/)
+* [catch](https://github.com/philsquared/Catch)
+* [SOIL](http://www.lonesock.net/soil.html )
+* [sqlite3](https://www.sqlite.org/)
+* [python](https://www.python.org/)
+* [Qt](https://www.qt.io/)
+* [PyQT](https://www.riverbankcomputing.com/software/pyqt/intro)
+* [Ace](https://ace.c9.io/)
+* [GoJS](http://gojs.net/)
 
 ## Building
 
