@@ -12,7 +12,7 @@
 using namespace cetech;
 
 /*******************************************************************************
-**** Array can store items
+**** comand_line can parse comand line =D
 *******************************************************************************/
 SCENARIO( "comand_line can parse comand line =D", "[command_line]" ) {
     memory_globals::init();
@@ -27,7 +27,7 @@ SCENARIO( "comand_line can parse comand line =D", "[command_line]" ) {
 
         const int argc = sizeof(argv) / sizeof(char*);
         command_line::set_args(argc, argv);
-        
+
         WHEN( "find args --path -p" ) {
             THEN( "has argument" ) {
                 REQUIRE( command_line::has_argument("path", 'p'));
@@ -41,10 +41,31 @@ SCENARIO( "comand_line can parse comand line =D", "[command_line]" ) {
                 REQUIRE( command_line::get_parameter("path", 'p') == "foo/bar" );
             }
         }
+
+        WHEN( "find args --verbose -v" ) {
+            THEN( "has argument" ) {
+                REQUIRE( command_line::has_argument("vetbose", 'v'));
+            }
+
+            AND_THEN("index is 1") {
+                REQUIRE( command_line::find_argument("vetbose", 'v') == 1);
+            }
+        }
+
+        WHEN( "find args --invalid -i" ) {
+            THEN( "no argument" ) {
+                REQUIRE( not command_line::has_argument("invalid", 'i'));
+            }
+
+            AND_THEN("index is argc") {
+                REQUIRE( command_line::find_argument("invalid", 'i') == argc);
+            }
+
+            AND_THEN("parametr is nullptr") {
+                REQUIRE( command_line::get_parameter("invalid", 'i') == nullptr);
+            }
+        }
     }
-
-
-
 
     memory_globals::shutdown();
 }
