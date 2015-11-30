@@ -84,7 +84,7 @@ class CetechProject(object):
 
         platform_dir = "%s%s_clang" % (_platform, platform.architecture()[0][0:2])
 
-        exec_name = "cetech1%s" % build_type
+        exec_name = "cetech%s" % build_type
 
         return os.path.join(engine_bin_path, platform_dir, 'bin', exec_name)
 
