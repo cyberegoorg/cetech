@@ -1,3 +1,8 @@
+##################################
+# Makefile helper.               #
+# Used as Kdevelop root makefile #
+##################################
+
 #########
 # Utils #
 #########
@@ -18,7 +23,7 @@ uncrustify:
 
 linux:
 	python ./make.py
-	.build/linux64_clang/bin/cetech_testDebug
+	.build/linux64_clang/bin/cetech_testDebug -a
 
 clean:
 	python ./make.py clean
