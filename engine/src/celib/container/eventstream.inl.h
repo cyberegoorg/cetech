@@ -151,5 +151,5 @@ namespace cetech {
     /***************************************************************************
     **** Event stream implementation
     ***************************************************************************/
-    EventStream::EventStream ( Allocator& allocator)  : stream(allocator) {}
+    inline EventStream::EventStream ( Allocator& allocator)  : stream(allocator) {}
 };
