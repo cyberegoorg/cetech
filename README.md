@@ -6,10 +6,15 @@
 ## [What is it?] (https://cyberegoorg.github.io/cetech/)
 
 CETech is Data-Driven [game engine](https://en.wikipedia.org/wiki/Game_engine) and toolbox for game and
-interactive application developing.
+interactive application developing inspired by Bitsquid/Stingray engine.
 
 * [Release notes](http://cyberegoorg.github.io/cetech/about/release-notes)
 * [Documentation](http://cyberegoorg.github.io/cetech) (temporarily in czech language)
+
+## Similar projects
+
+* [crown](https://github.com/taylor001/crown)
+* [lumix](https://github.com/nem0/LumixEngine)
 
 ## Suported platforms
 
@@ -23,6 +28,18 @@ interactive application developing.
 * asm.js/Emscripten (Runtime)
 * Android (Runtime)
 * RaspberryPi (Runtime)
+
+## [3rd party libraries and tools](externals.yml)
+
+* [genie](https://github.com/bkaradzic/genie)
+* [BGFX](https://github.com/bkaradzic/bgfx)
+* [SDL2](https://www.libsdl.org/)
+* [enet](http://enet.bespin.org/)
+* [luajit](http://luajit.org/)
+* [rapidjson](http://rapidjson.org/)
+* [catch](https://github.com/philsquared/Catch)
+* [SOIL](http://www.lonesock.net/soil.html )
+* [sqlite3](https://www.sqlite.org/)
 
 ## Building
 
