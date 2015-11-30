@@ -20,7 +20,7 @@ function Game:init()
 end
 
 function Game:update(dt)
-    if Package.loaded(monster_pkg) then
+    if Package.is_loaded(monster_pkg) then
         -- Package loaded
     end
 end
