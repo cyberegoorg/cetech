@@ -43,6 +43,8 @@ CETech is Data-Driven [game engine](https://en.wikipedia.org/wiki/Game_engine) a
 * [python](https://www.python.org/)
 * [Qt](https://www.qt.io/)
 * [PyQT](https://www.riverbankcomputing.com/software/pyqt/intro)
+* [Ace](https://ace.c9.io/)
+* [GoJS](http://gojs.net/)
 
 ## Building
 
