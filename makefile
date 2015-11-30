@@ -3,6 +3,14 @@
 # Used as Kdevelop root makefile #
 ##################################
 
+
+linux64-clang:
+	python ./make.py
+	.build/linux64_clang/bin/cetech_testDebug -a
+
+clean:
+	python ./make.py clean
+
 #########
 # Utils #
 #########
@@ -12,7 +20,7 @@ analyze:
 	cppcheck --template=gcc --enable=all --inconclusive --std=posix ./engine/src/
 
 .PHONY: scan-build64
-scan-build64:
+scan-build64: clean
 	scan-build -analyze-headers make -j 4 linux
 
 .PHONY: uncrustify
@@ -21,9 +29,3 @@ uncrustify:
 	-@find ./engine/src/ ./engine/tests/ -regex ".*\.\(c\|cc\|h\)" -print0 | xargs -0 uncrustify -l c -c ./scripts/uncrustify.cfg --no-backup
 #########
 
-linux:
-	python ./make.py
-	.build/linux64_clang/bin/cetech_testDebug -a
-
-clean:
-	python ./make.py clean
