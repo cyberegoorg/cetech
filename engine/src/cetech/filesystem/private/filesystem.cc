@@ -254,24 +254,6 @@ namespace cetech {
             MAKE_DELETE(_globals.data->_allocator, FSFile, &file);
         };
 
-        bool exists(StringId64_t root,
-                    const char* path) {                        /*TODO: #43*/
-            CE_UNUSED(path);
-            return false;
-        };
-
-        bool is_directory(StringId64_t root,
-                          const char* path) {                        /*TODO: #43*/
-            CE_UNUSED(path);
-            return false;
-        };
-
-        bool is_file(StringId64_t root,
-                     const char* path) {                         /*TODO: #43*/
-            CE_UNUSED(path);
-            return false;
-        };
-
         const char* root_dir(StringId64_t root) {
             return hash::get < const char* > (_globals.data->_dir_map, root, nullptr);
         };
@@ -281,11 +263,6 @@ namespace cetech {
             char buffer[4096] = {0};
             absolute_path(buffer, root, path ? path : "");
             mkpath(buffer);
-        };
-
-        void delete_directory(StringId64_t root,
-                              const char* path) {                        /*TODO: #43*/
-            CE_UNUSED(path);
         };
 
         void list_directory (StringId64_t root,
@@ -298,16 +275,6 @@ namespace cetech {
 
         void free_list_directory(Array < char* >& files) {
             listdir_free(files);
-        };
-
-        void create_file(StringId64_t root,
-                         const char* path) {                         /*TODO: #43*/
-            CE_UNUSED(path);
-        };
-
-        void delete_file(StringId64_t root,
-                         const char* path) {                         /*TODO: #43*/
-            CE_UNUSED(path);
         };
 
         time_t file_mtime(StringId64_t root,

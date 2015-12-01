@@ -67,9 +67,6 @@ namespace cetech {
             compilator.write_to_build(array::begin(names), sizeof(StringId64_t) * array::size(names));
         }
 
-        void online(void* data) {}
-        void offline(void* data) {}
-
         char* loader (FSFile& f,
                       Allocator& a) {
             const uint64_t f_sz = f.size();

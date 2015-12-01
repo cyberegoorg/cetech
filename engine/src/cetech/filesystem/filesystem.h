@@ -23,15 +23,6 @@ namespace cetech {
 
         const char* root_dir(const StringId64_t root);
 
-        bool exists(const StringId64_t root,
-                    const char* path);
-
-        bool is_directory(const StringId64_t root,
-                          const char* path);
-
-        bool is_fileconst (const StringId64_t root,
-                           const char* path);
-
         void create_directory(const StringId64_t root,
                               const char* path);
 
@@ -46,9 +37,6 @@ namespace cetech {
         void free_list_directory(Array < char* >& files);
 
         void create_file(const StringId64_t root,
-                         const char* path);
-
-        void delete_file(const StringId64_t root,
                          const char* path);
 
         time_t file_mtime(const StringId64_t root,

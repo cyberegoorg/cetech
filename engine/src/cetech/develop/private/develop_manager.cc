@@ -1,3 +1,4 @@
+#include "celib/macros.h"
 #include "celib/types.h"
 #include "celib/memory/memory.h"
 #include "celib/container/hash.inl.h"
@@ -23,7 +24,6 @@ namespace cetech {
         static thread_local uint32_t _stream_buffer_count = 0;
 
         static thread_local uint32_t _scope_depth = 0;
-        static thread_local uint32_t _scope_id = 0;
 
         struct DevelopManagerData {
             Spinlock lock;
@@ -158,6 +158,8 @@ namespace cetech {
         }
 
         time::PerfTimer enter_scope(const char* name) {
+            CE_UNUSED(name);
+
             ++_scope_depth;
             return time::get_perftime();
         }
@@ -191,11 +193,9 @@ namespace cetech {
         }
 
         static void flush_develop_manager(void* data) {
-            develop_manager::flush_stream_buffer();
-        }
+            CE_UNUSED(data);
 
-        static void send_develop_manager(void* data) {
-            develop_manager::send_buffer();
+            develop_manager::flush_stream_buffer();
         }
 
         void flush_all_stream_buffer() {

@@ -51,14 +51,16 @@ namespace cetech {
         };
 
 
+        typedef QueueMPMC < Task*, MAX_TASK > TaskQueue;
+
         static thread_local uint32_t _worker_id = 0; // Worker id (thanks thread_local)
         struct TaskManagerData {
-            QueueMPMC < Task*, MAX_TASK > _global_queue[Priority::Count];
+            TaskQueue _global_queue[Priority::Count];
             Array < Thread > _workers;
 
             uint32_t* _open_task;  //!< Open task
             Task* _task_pool;      //!< Task pool
-            QueueMPMC < Task*, MAX_TASK > *_workers_queue;
+            TaskQueue* _workers_queue;
 
             Allocator& _allocator;
             std::atomic < uint32_t > _open_task_count;               //!< Open task count
@@ -226,9 +228,9 @@ namespace cetech {
             }
         }
 
-        int8_t task_is_null(TaskID id) {
-            return id.i == 0;
-        }
+        //         int8_t task_is_null(TaskID id) {
+        //             return id.i == 0;
+        //         }
 
         CE_INLINE bool can_work_on(Task* task) {
             return (task->job_count == 1) && (task->depend ? _task_is_done(task->depend) : 1);
@@ -262,11 +264,10 @@ namespace cetech {
             CE_CHECK_PTR(_globals.data);
             TaskManagerData& tm = *_globals.data;
 
-
             Task* poped_task;
 
             for (int i = 0; i < Priority::Count; ++i) {
-                QueueMPMC < Task*, MAX_TASK >& q = tm._workers_queue[(_worker_id * Priority::Count) + i];
+                TaskQueue& q = tm._workers_queue[(_worker_id * Priority::Count) + i];
 
                 poped_task = try_pop(q);
                 if (poped_task != 0) {
@@ -275,7 +276,7 @@ namespace cetech {
             }
 
             for (int i = 0; i < Priority::Count; ++i) {
-                QueueMPMC < Task*, MAX_TASK >& q = tm._global_queue[i];
+                TaskQueue& q = tm._global_queue[i];
 
                 poped_task = try_pop(q);
                 if (poped_task != 0) {
@@ -404,8 +405,7 @@ namespace cetech {
             log::info("task", "Main thread count: %u", main_threads_count);
             log::info("task", "Worker count: %u", worker_count);
 
-            tm._workers_queue = memory::alloc_array < QueueMPMC < Task*,
-            MAX_TASK >> (tm._allocator, (worker_count + 1) * Priority::Count);
+            tm._workers_queue = memory::alloc_array < TaskQueue > (tm._allocator, (worker_count + 1) * Priority::Count);
 
             if (worker_count > 0) {
                 for (uint32_t i = 0; i < worker_count; ++i) {
@@ -413,7 +413,7 @@ namespace cetech {
                     array::push_back(tm._workers,
                                      thread::create_thread(task_worker,
                                                            "Worker",
-                                                           (void*)(i + 1))); // TODO: (void*)?? !!!
+                                                           (void*)(intptr_t)(i + 1))); // TODO: wtf =D
                 }
             }
 
