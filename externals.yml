@@ -276,3 +276,37 @@ sqlite3:
     darwin64:
       - copy: *sqlite_install_include
       - copy: *sqlite_install_lib
+
+
+###########
+# nanomsg #
+########################################################################################################################
+nanomsg:
+  clone: git clone git@github.com:nanomsg/nanomsg.git --depth 1
+
+  build:
+    posix: &nanomsg_build_posix
+      [./autogen.sh, ./configure, make]
+
+    linux64:  *nanomsg_build_posix
+    linux32:  *nanomsg_build_posix
+    darwin64: *nanomsg_build_posix
+
+  install:
+    include: &nanomsg_install_include
+      [src, include/sqlite3]
+
+    lib: &nanomsg_install_lib
+      [.libs/libnanomsg.a, lib]
+
+    linux64:
+      - copytree: *nanomsg_install_include
+      - copy: *nanomsg_install_lib
+
+    linux32:
+      - copytree: *nanomsg_install_include
+      - copy: *nanomsg_install_lib
+
+    darwin64:
+      - copytree: *nanomsg_install_include
+      - copy: *nanomsg_install_lib

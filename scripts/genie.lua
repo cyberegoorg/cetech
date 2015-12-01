@@ -152,6 +152,7 @@ function cetech_project(name, test)
             "enet",
             "SOIL",
             "sqlite3",
+            "nanomsg"
         }
 
         configuration "Release or Develop"
@@ -172,7 +173,7 @@ function cetech_project(name, test)
                 'pthread',
                 "GL",
                 "X11",
-                "rt"
+                "rt",
             }
 
         configuration ("osx*")
