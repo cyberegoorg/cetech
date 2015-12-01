@@ -62,6 +62,13 @@ solution "CETech"
         'CETECH_SDL2'
     }
 
+    configuration "*-clang "
+        linkoptions {
+          --"-fsanitize=thread",
+          --"-fsanitize=cfi",
+          --"-fsanitize=alignment"
+        }
+    
     configuration "Debug"
         defines {
           "DEBUG",
