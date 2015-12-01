@@ -21,33 +21,34 @@ CETech is Data-Driven [game engine](https://en.wikipedia.org/wiki/Game_engine) a
 
 ## Suported platforms
 
-* Linux (Runtime + Develop)
-* OSX (10.9+) (Runtime + Develop)
+* Linux (Runtime + Develop) - Work in progress
+* OSX (10.9+) (Runtime + Develop) - Work in progress
 
 ## Planned platforms
 
-* FreeBSD (Runtime + Develop)
 * Windows (Runtime + Develop)
 * asm.js/Emscripten (Runtime)
 * Android (Runtime)
+* FreeBSD (Runtime + Develop)
 * RaspberryPi (Runtime)
 
 ## 3rd party libraries and tools
 
-* [genie](https://github.com/bkaradzic/genie)
-* [BGFX](https://github.com/bkaradzic/bgfx)
-* [SDL2](https://www.libsdl.org/)
-* [enet](http://enet.bespin.org/)
-* [luajit](http://luajit.org/)
-* [rapidjson](http://rapidjson.org/)
-* [catch](https://github.com/philsquared/Catch)
-* [SOIL](http://www.lonesock.net/soil.html )
-* [sqlite3](https://www.sqlite.org/)
-* [python](https://www.python.org/)
-* [Qt](https://www.qt.io/)
-* [PyQT](https://www.riverbankcomputing.com/software/pyqt/intro)
-* [Ace](https://ace.c9.io/)
-* [GoJS](http://gojs.net/)
+* [genie](https://github.com/bkaradzic/genie) - Project generator.
+* [BGFX](https://github.com/bkaradzic/bgfx) - Renderer.
+* [SDL2](https://www.libsdl.org/) - Cross-platform development library.
+* [enet](http://enet.bespin.org/) - Cross-platform network lib.
+* [luajit](http://luajit.org/) - Lua on steroids.
+* [rapidjson](http://rapidjson.org/) - Json parser.
+* [catch](https://github.com/philsquared/Catch) -  Multi-paradigm automated test framework for C++.
+* [SOIL](http://www.lonesock.net/soil.html ) - Simple OpenGL Image Library.
+* [sqlite3](https://www.sqlite.org/) - SQL database engine.
+* [python](https://www.python.org/) - Multi-paradigm Programming language.
+* [pyaml](http://pyyaml.org/wiki/PyYAML) - YAML parser and emitter for Python.
+* [Qt](https://www.qt.io/) - Cross-platform GUI library.
+* [PyQT](https://www.riverbankcomputing.com/software/pyqt/intro) - Python QT binding
+* [Ace](https://ace.c9.io/) - JavaScript editor.
+* [GoJS](http://gojs.net/) - JavaScript diagram library.
 
 ## Building
 
