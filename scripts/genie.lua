@@ -131,7 +131,7 @@ function cetech_project(name, test)
 
         if test then
             files {
-                path.join(ENGINE_SRC_DIR, "tests_main.cc"),
+                path.join(ENGINE_SRC_DIR, "tests/tests_main.cc"),
             }
 
             excludes {
