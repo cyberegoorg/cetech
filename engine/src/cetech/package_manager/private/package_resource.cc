@@ -70,8 +70,12 @@ namespace cetech {
                                       sizeof(StringId64_t) * array::size(names));
         }
 
-        void online(void* data) {CE_UNUSED(data);}
-        void offline(void* data) {CE_UNUSED(data);}
+        void online(void* data) {
+            CE_UNUSED(data);
+        }
+        void offline(void* data) {
+            CE_UNUSED(data);
+        }
 
         char* loader (FSFile& f,
                       Allocator& a) {
