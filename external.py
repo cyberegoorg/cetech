@@ -94,11 +94,16 @@ ARGS_PARSER.add_argument(
         help='Target platform',
         default=DEFAULT_BUILD, choices=PLATFORMS)
 
+ARGS_PARSER.add_argument(
+        "-j", "--job-count",
+        help='Max job count',
+        default=CPU_COUNT)
+
 ###########
 # PROGRAM #
 ########################################################################################################################
 
-def make_externals(config, platform, external='', only_clone=False):
+def make_externals(config, platform, external='', only_clone=False, job_count=CPU_COUNT):
     """Make externals build
 
     :param config: Build configuration.
@@ -106,6 +111,8 @@ def make_externals(config, platform, external='', only_clone=False):
     :param external: External.
     :param only_clone: Do not run build, only create projects files.
     """
+
+    job_count_str = str(job_count)
 
     try:
         os.mkdir(EXTERNAL_DIR)
@@ -124,13 +131,15 @@ def make_externals(config, platform, external='', only_clone=False):
         clone_cmds = [v['clone']] if isinstance(v['clone'], str) else v['clone']
 
         for clone in clone_cmds:
-            cmd = clone.split(' ') + [clone_dir]
+            cmd = clone.split(' ')
             if cmd[0] == 'git':
                 if os.path.exists(clone_dir):
                     print('external %s exist. skiping...' % k)
                     continue
 
                 print('Cloning %s' % k)
+
+                cmd = cmd + [clone_dir]
                 subprocess.check_call(cmd)
 
             elif cmd[0] == 'download':
@@ -160,7 +169,7 @@ def make_externals(config, platform, external='', only_clone=False):
 
             if cmd_lst[0] == 'make':
                 cmd_lst.insert(1, '-j')
-                cmd_lst.insert(2, CPU_COUNT_STR)
+                cmd_lst.insert(2, job_count_str)
 
             print(cmd_lst)
 
@@ -221,7 +230,11 @@ def main(args=None):
 
     action = args.action
     if action == '':
-        make_externals(config=args.config, platform=args.platform, external=args.external, only_clone=args.clone)
+        make_externals(config=args.config,
+                       platform=args.platform,
+                       external=args.external,
+                       only_clone=args.clone,
+                       job_count=args.job_count)
 
     elif action == 'clean':
         clean()

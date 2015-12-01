@@ -35,7 +35,7 @@ GENIE = os.path.join(EXTERNAL_BUILD_DIR,
                      'genie')
 
 LINUX_GENIE = [GENIE, '--gcc=linux-clang', 'gmake']
-LINUX_BUILD = ['make', '-j', CPU_COUNT_STR, '-R', '-C', '.build/projects/gmake-linux-clang']
+LINUX_BUILD = ['make', '-R', '-C', '.build/projects/gmake-linux-clang']
 
 DARWIN_GENIE = [GENIE, '--gcc=osx', 'gmake']
 DARWIN_BUILD = ['make', '-j', CPU_COUNT_STR, '-R', '-C', '.build/projects/gmake-osx']
@@ -126,6 +126,10 @@ ARGS_PARSER.add_argument(
         "--cxx",
         help='CXX')
 
+ARGS_PARSER.add_argument(
+        "-j", "--job-count",
+        help='Max job count',
+        default=CPU_COUNT)
 
 ###########
 # PROGRAM #
@@ -140,7 +144,7 @@ def run_genie(platform, cc=None, cxx=None):
     subprocess.check_call(cmd)
 
 
-def make(config, platform, only_genie=False, cc=None, cxx=None):
+def make(config, platform, only_genie=False, cc=None, cxx=None, job_count=CPU_COUNT):
     """Make build
 
     :param config: Build configuration.
@@ -150,9 +154,14 @@ def make(config, platform, only_genie=False, cc=None, cxx=None):
     print('Runing genie.')
     run_genie(platform=platform)
 
-    print('Building.')
     if not only_genie:
+        print('Building.')
+
         cmd = PLATFORMS_BUILD[platform][config]
+
+        if cmd[0] == 'make':
+            cmd.insert(1, '-j')
+            cmd.insert(2, CPU_COUNT_STR)
 
         if cc is not None:
             cmd.append('CC=%s' % cc)
@@ -179,7 +188,12 @@ def main(args=None):
 
     action = args.action
     if action == '':
-        make(args.config, args.platform, args.generate, args.cc, args.cxx)
+        make(args.config,
+             args.platform,
+             args.generate,
+             args.cc,
+             args.cxx,
+             args.job_count)
 
     elif action == 'clean':
         clean()

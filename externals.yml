@@ -2,7 +2,7 @@
 # GENIE #
 ########################################################################################################################
 genie:
-  clone: git clone https://github.com/bkaradzic/genie
+  clone: git clone https://github.com/bkaradzic/genie --depth 1
 
   build:
     linux32:  [make]
@@ -26,7 +26,7 @@ genie:
 # bgfx #
 ########################################################################################################################
 bgfx:
-  clone: git clone https://github.com/bkaradzic/bgfx
+  clone: git clone https://github.com/bkaradzic/bgfx --depth 1
 
   build:
     linux64:  [make linux-release64]
@@ -53,7 +53,7 @@ bgfx:
 # bx #
 ########################################################################################################################
 bx:
-  clone: git clone https://github.com/bkaradzic/bx
+  clone: git clone https://github.com/bkaradzic/bx --depth 1
 
   install:
     includes: &bx_install_include
@@ -72,7 +72,7 @@ bx:
 # enet #
 ########################################################################################################################
 enet:
-  clone: git clone https://github.com/lsalzman/enet.git
+  clone: git clone https://github.com/lsalzman/enet.git --depth 1
 
   build:
     configure: &enet_build_configure
@@ -144,7 +144,7 @@ luajit:
 # rapidjson #
 ########################################################################################################################
 rapidjson:
-  clone: git clone https://github.com/miloyip/rapidjson/
+  clone: git clone https://github.com/miloyip/rapidjson/ --depth 1
 
   install:
     includes: &rapidjson_install_include
@@ -163,7 +163,7 @@ rapidjson:
 # Catch #
 ########################################################################################################################
 catch:
-  clone: git clone https://github.com/philsquared/Catch.git
+  clone: git clone https://github.com/philsquared/Catch.git --depth 1
 
   install:
     includes: &catch_install_include
@@ -183,7 +183,7 @@ catch:
 # SLD2 #
 ########################################################################################################################
 sdl2:
-  clone: git clone https://github.com/spurious/SDL-mirror.git
+  clone: git clone https://github.com/spurious/SDL-mirror.git --depth 1
 
   build:
     configure: &sdl2_build_configure
@@ -219,7 +219,7 @@ sdl2:
 # soil #
 ########################################################################################################################
 soil:
-  clone: git clone https://github.com/kbranigan/Simple-OpenGL-Image-Library.git
+  clone: git clone https://github.com/kbranigan/Simple-OpenGL-Image-Library.git --depth 1
   build:
     linux64:  [make]
     linux32:  [make]
@@ -248,7 +248,7 @@ soil:
 # sqlite3 #
 ########################################################################################################################
 sqlite3:
-  clone: ['git clone https://github.com/mackyle/sqlite',
+  clone: ['git clone https://github.com/mackyle/sqlite --depth 1',
           'download http://repo.or.cz/sqlite-export.git/blob_plain/master:/create-fossil-manifest create-fossil-manifest.sh']
   build:
     posix: &sqlite3_build_posix
