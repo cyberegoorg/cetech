@@ -90,8 +90,8 @@ void register_resources() {
         { resource_package::type_hash(),
           & resource_package::compile,
           & resource_package::loader,
-          & resource_package::online,
-          & resource_package::offline,
+      nullptr,
+      nullptr,
           & resource_package::unloader},
 
         /***********************************************************************

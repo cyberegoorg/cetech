@@ -34,7 +34,7 @@ namespace cetech {
                                   char shortopt = '\0');
 
         /***********************************************************************
-        **** Has arguments?
+        **** Has any arguments?
         ***********************************************************************/
         bool has_argument(const char* longopt,
                           char shortopt = '\0');
