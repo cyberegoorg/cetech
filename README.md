@@ -12,6 +12,8 @@ CETech is Data-Driven [game engine](https://en.wikipedia.org/wiki/Game_engine) a
 * [Release notes](http://cyberegoorg.github.io/cetech/about/release-notes)
 * [Documentation](http://cyberegoorg.github.io/cetech) (temporarily in czech language)
 
+![Prototyp](docs/img/prototyp.png)
+
 ## Similar projects
 
 * [crown](https://github.com/taylor001/crown)
