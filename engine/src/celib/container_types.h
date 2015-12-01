@@ -51,11 +51,10 @@ namespace cetech {
         /***********************************************************************
         **** Members variables
         ***********************************************************************/
-        Allocator* _allocator; //!< Pointer to allocator.
-        const char* _tag;
-        uint32_t _size;        //!< Size
-        uint32_t _capacity;    //!< Allocate size.
-        T* _data;              //!< Array data;
+        Allocator* _allocator; // Pointer to allocator.
+        uint32_t _size;        // Size
+        uint32_t _capacity;    // Allocate size.
+        T* _data;              // Array data;
     };
 
 
