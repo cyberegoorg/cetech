@@ -63,9 +63,15 @@ namespace cetech {
             }
 
             /* Write types and names */
-            compilator.write_to_build(array::begin(typesheader), sizeof(TypeHeader) * array::size(typesheader));
-            compilator.write_to_build(array::begin(names), sizeof(StringId64_t) * array::size(names));
+            compilator.write_to_build(array::begin(typesheader),
+                                      sizeof(TypeHeader) * array::size(typesheader));
+
+            compilator.write_to_build(array::begin(names),
+                                      sizeof(StringId64_t) * array::size(names));
         }
+
+        void online(void* data) {CE_UNUSED(data);}
+        void offline(void* data) {CE_UNUSED(data);}
 
         char* loader (FSFile& f,
                       Allocator& a) {
