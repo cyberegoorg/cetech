@@ -4,7 +4,7 @@
 [![Issues](https://img.shields.io/github/issues/cyberegoorg/cetech.svg)](https://github.com/cyberegoorg/cetech/issues)
 [![Release](https://img.shields.io/github/release/cyberegoorg/cetech.svg)](https://github.com/cyberegoorg/cetech/releases)
 [![License](https://img.shields.io/badge/license-CC0-blue.svg)](LICENSE.md)
-[![Gitter](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/cyberegoorg/cetech?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge)
+[![Gitter](https://img.shields.io/gitter/room/cyberegoorg/cetech.svg)](https://gitter.im/cyberegoorg/cetech)
 
 ## [What is it?] (https://cyberegoorg.github.io/cetech/)
 
