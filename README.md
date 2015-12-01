@@ -16,8 +16,8 @@ CETech is Data-Driven [game engine](https://en.wikipedia.org/wiki/Game_engine) a
 
 ## Similar projects
 
-* [crown](https://github.com/taylor001/crown)
-* [lumix](https://github.com/nem0/LumixEngine)
+* [crown](https://github.com/taylor001/crown) -  Lightweight and flexible cross-platform game engine. 
+* [lumix](https://github.com/nem0/LumixEngine) - Easy to use, fast and flexible 3D game engine.
 
 ## Suported platforms
 
