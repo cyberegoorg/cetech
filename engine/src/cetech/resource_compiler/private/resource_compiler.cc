@@ -36,7 +36,7 @@ namespace cetech {
         };
 
         enum {
-            TASK_POOL_SIZE = 8,
+            TASK_POOL_SIZE = 4096,
             TASK_POOL_SIZE_MASK = TASK_POOL_SIZE - 1u
         };
 

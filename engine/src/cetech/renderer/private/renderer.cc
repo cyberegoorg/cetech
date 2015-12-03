@@ -98,6 +98,7 @@ namespace cetech {
             }
         }
 
+#if defined(CETECH_DEVELOP)
         static void cmd_renderer_resize(const rapidjson::Document& in,
                                         rapidjson::Document& out) {
             CE_UNUSED(out);
@@ -105,7 +106,9 @@ namespace cetech {
             const uint32_t height = in["args"]["height"].GetInt();
             renderer::resize(width, height);
         }
+#endif
     }
+
 
     namespace renderer {
         void init(Window window,
