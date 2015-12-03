@@ -14,6 +14,11 @@ clean:
 #########
 # Utils #
 #########
+.PHONY: tidy
+tidy:
+	@echo Tidy...
+	clang-tidy -header-filter='.*' `find ./engine/src/ -regex ".*\.\(c\|cc\|h\)"`  -- -Iengine/src/ -Iexternal/.build/linux64/include -DCETECH_LINUX -DCETECH_SDL2 -DDEBUG -DCETECH_DEVELOP
+	
 .PHONY: analyze
 analyze:
 	@echo Analyze...
@@ -21,11 +26,11 @@ analyze:
 
 .PHONY: scan-build64
 scan-build64: clean
-	scan-build -analyze-headers make -j 4 linux
+	scan-build -V -analyze-headers make linux64-clang
 
 .PHONY: uncrustify
 uncrustify:
 	@echo Uncrustify...
-	-@find ./engine/src/ ./engine/tests/ -regex ".*\.\(c\|cc\|h\)" -print0 | xargs -0 uncrustify -l c -c ./scripts/uncrustify.cfg --no-backup
+	-@find ./engine/src/ -regex ".*\.\(c\|cc\|h\)" -print0 | xargs -0 uncrustify -l c -c ./scripts/uncrustify.cfg --no-backup
 #########
 
