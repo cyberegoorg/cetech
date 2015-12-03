@@ -11,7 +11,7 @@
 namespace cetech {
     class LuaStack {
         public:
-            LuaStack(lua_State * L) : _L(L) {}
+            explicit LuaStack(lua_State * L) : _L(L) {}
 
             int num_args() {
                 return lua_gettop(_L);

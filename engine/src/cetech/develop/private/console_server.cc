@@ -59,7 +59,7 @@ namespace cetech {
 
             Hash < command_clb_t > cmds;
 
-            ConsoleServerData(Allocator & allocator) : client_peer(allocator), peer_free_queue(allocator),
+            ConsoleServerData(Allocator & allocator) : server_addr{0, 0}, server_host(0), client_peer(allocator), peer_free_queue(allocator),
                                                        cmds(allocator) {}
 
             ~ConsoleServerData() {
@@ -74,7 +74,7 @@ namespace cetech {
 
             ConsoleServerData* data;
 
-            Globals() : data(0) {}
+            Globals() : buffer{0}, data(0) {}
         } _globals;
 
 

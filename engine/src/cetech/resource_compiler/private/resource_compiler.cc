@@ -36,18 +36,20 @@ namespace cetech {
         };
 
         enum {
-            TASK_POOL_SIZE = 4096,
+            TASK_POOL_SIZE = 8,
             TASK_POOL_SIZE_MASK = TASK_POOL_SIZE - 1u
         };
 
         struct ResouceCompilerData {
-            ResouceCompilerData(Allocator & allocator) : _compile_clb_map(allocator) {
-                static_assert( 0 == (TASK_POOL_SIZE & TASK_POOL_SIZE_MASK), "TASK_POOL_SIZE must be power of two,");
-            }
-
             Hash < resource_compiler_clb_t > _compile_clb_map;
             CompileTask compile_task_pool[TASK_POOL_SIZE];
             uint32_t compile_task_pool_idx;
+
+            ResouceCompilerData(Allocator & allocator) : _compile_clb_map(allocator),  compile_task_pool_idx(0){
+                static_assert( 0 == (TASK_POOL_SIZE & TASK_POOL_SIZE_MASK), "TASK_POOL_SIZE must be power of two,");
+                
+                memset(compile_task_pool, 0, sizeof(CompileTask)* TASK_POOL_SIZE);
+            }
         };
 
         struct Globals {
@@ -56,7 +58,7 @@ namespace cetech {
 
             ResouceCompilerData* data;
 
-            Globals() : data(0) {}
+            Globals() : buffer{0}, data(0) {}
         } _globals;
 
         CE_INLINE CompileTask& new_compile_task() {
@@ -243,7 +245,7 @@ namespace cetech {
 
                     CompileTask& ct = new_compile_task();
                     ct.source_fs = src_dir;
-                    ct.filename = filename; // TODO: LEAK!!!
+                    ct.filename = filename;
                     ct.name = name;
                     ct.type = type;
                     ct.clb = clb;

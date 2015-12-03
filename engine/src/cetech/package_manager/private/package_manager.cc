@@ -42,7 +42,7 @@ namespace cetech {
 
             PackageManagerData* data;
 
-            Globals() : data(0) {}
+            Globals() : buffer{0}, data(0) {}
         } _globals;
 
 
