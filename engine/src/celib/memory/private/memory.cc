@@ -180,7 +180,7 @@ namespace {
 
         MallocAllocator* default_allocator;
 
-        MemoryGlobals() : default_allocator(0) {}
+        MemoryGlobals() : buffer{0}, default_allocator(0) {}
     };
 
     MemoryGlobals _memory_globals;

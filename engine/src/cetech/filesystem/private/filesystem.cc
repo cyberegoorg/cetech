@@ -133,7 +133,7 @@ namespace cetech {
 
             FilesystemData* data;
 
-            Globals() : data(0) {}
+            Globals() : buffer{0}, data(0) {}
         } _globals;
 
         void absolute_path(char* buffer,
@@ -144,7 +144,7 @@ namespace cetech {
 
         bool mkdir(const char* path) {
             struct stat st;
-            int mode = 0775;
+            const int mode = 0775;
 
             if (stat(path, &st) != 0) {
                 if (::mkdir(path, mode) != 0 && errno != EEXIST) {
@@ -193,6 +193,7 @@ namespace cetech {
             }
 
             if (!(entry = readdir(dir))) {
+                closedir(dir);
                 return;
             }
 

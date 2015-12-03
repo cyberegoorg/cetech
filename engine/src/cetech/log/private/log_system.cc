@@ -31,7 +31,7 @@ namespace cetech {
 
             LogData* data;
 
-            Globals() : data(0) {}
+            Globals() : buffer{0}, data(0) {}
         } _globals;
 
         void vlog(const LogLevel::Enum level,

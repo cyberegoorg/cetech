@@ -17,7 +17,7 @@ clean:
 .PHONY: analyze
 analyze:
 	@echo Analyze...
-	cppcheck --template=gcc --enable=all --inconclusive --std=posix ./engine/src/
+	cppcheck --std=c++11 --template=gcc --enable=all --inconclusive --std=posix engine/src/ -I engine/src/ -I external/.build/linux64/include -I external/.build/linux64/include -UCETECH_TEST -j 4 -i external/.build/linux64/include/catch -i engine/src/tests/
 
 .PHONY: scan-build64
 scan-build64: clean

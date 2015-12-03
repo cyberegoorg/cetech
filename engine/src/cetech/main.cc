@@ -34,10 +34,11 @@
 using namespace cetech;
 
 /*******************************************************************************
-**** PSOIX
+**** POSIX
 *******************************************************************************/
 
-#if CETECH_LINUX
+#if defined(CETECH_LINUX)
+
 void posix_signal_handler(int sig) {
     switch (sig) {
     case SIGKILL:
@@ -168,7 +169,7 @@ void load_config_json() {
 *******************************************************************************/
 bool big_init() {
 
-#if CETECH_LINUX
+#if defined(CETECH_LINUX)
     posix_init();
 #endif
 
