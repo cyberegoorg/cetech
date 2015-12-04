@@ -2,6 +2,7 @@
 
 #include "cetech/filesystem/filesystem.h"
 #include "rapidjson/document.h"
+#include "yaml-cpp/yaml.h"
 
 namespace cetech {
     struct CompilatorAPI {
@@ -11,7 +12,8 @@ namespace cetech {
 
         ~CompilatorAPI();
 
-        bool resource_to_json(rapidjson::Document& document);
+        bool resource_to_yaml(YAML::Node& document);
+
         bool add_dependency(const char* path);
 
         size_t resource_file_size();

@@ -22,17 +22,17 @@ namespace cetech {
 
         }
 
-        bool resource_to_json(rapidjson::Document& document) {
-            /* parse resouce json */
+        bool resource_to_yaml(YAML::Node& document) {
             char tmp[resource_file.size() + 1];
             memset(tmp, 0, resource_file.size() + 1);
 
             read_resource_file(tmp);
 
-            document.Parse(tmp);
-            if (document.HasParseError()) {
-                log::error("resource_compiler", "[%s] Parse error: %s", filename, GetParseError_En(
-                               document.GetParseError()), document.GetErrorOffset());
+            // TODO: =( exceptions...
+            try {
+                document = YAML::Load(tmp);
+            } catch(YAML::ParserException & e) {
+                log::error("resource_compiler", "[%s] Parse error: %s", filename, e.what());
                 return false;
             }
 
@@ -74,8 +74,8 @@ namespace cetech {
         delete _impl;
     }
 
-    bool CompilatorAPI::resource_to_json(rapidjson::Document& document) {
-        return _impl->resource_to_json(document);
+    bool CompilatorAPI::resource_to_yaml(YAML::Node& document) {
+        return _impl->resource_to_yaml(document);
     }
 
     bool CompilatorAPI::add_dependency(const char* path) {

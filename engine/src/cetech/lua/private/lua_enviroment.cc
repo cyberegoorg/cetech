@@ -48,7 +48,9 @@ namespace cetech {
 
             LuaEnviromentData* data;
 
-            Globals() : buffer{0}, data(0) {}
+            Globals() : buffer {
+                0
+            }, data(0) {}
         } _globals;
 
 

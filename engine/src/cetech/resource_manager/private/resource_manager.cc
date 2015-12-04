@@ -46,7 +46,9 @@ namespace cetech {
 
             ResouceManagerData* data;
 
-            Globals() : buffer{0}, data(0) {}
+            Globals() : buffer {
+                0
+            }, data(0) {}
         } _globals;
 
         CE_INLINE void resource_id_to_str(char* buffer,

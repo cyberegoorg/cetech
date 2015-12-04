@@ -1,14 +1,9 @@
-{
-  "lua" : [
-    "lua/boot",
-    "lua/game"
-  ], 
- 
-  "texture" : [
-    "content/texture1"
-  ],
+lua:
+  - lua/boot
+  - lua/game
+
+texture:
+  - content/texture1
   
-  "package": [
-    "core"
-  ] 
-}
+package:
+  - core

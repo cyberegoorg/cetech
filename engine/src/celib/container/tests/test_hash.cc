@@ -93,7 +93,7 @@ SCENARIO( "Hash can map value to keys", "[multi_hash]" ) {
             multi_hash::insert(hash_map, 1, 20);
             multi_hash::insert(hash_map, 3, 30);
 
-            const Hash<int>::Entry* entry = multi_hash::find_first(hash_map, 1);
+            const Hash < int > ::Entry* entry = multi_hash::find_first(hash_map, 1);
             THEN( "First item has value 20" ) {
                 REQUIRE(entry->value == 20);
 
@@ -122,7 +122,7 @@ SCENARIO( "Can remove item from multi hash", "[multi_hash]" ) {
         multi_hash::insert(hash_map, 3, 30);
 
         WHEN("Remove key 3") {
-            const Hash<int>::Entry* entry = multi_hash::find_first(hash_map, 3);
+            const Hash < int > ::Entry* entry = multi_hash::find_first(hash_map, 3);
             multi_hash::remove(hash_map, entry);
 
             THEN("key 3 does not have values" ) {
@@ -131,7 +131,7 @@ SCENARIO( "Can remove item from multi hash", "[multi_hash]" ) {
             }
 
         } AND_WHEN("Remove key 1") {
-            const Hash<int>::Entry* entry = multi_hash::find_first(hash_map, 1);
+            const Hash < int > ::Entry* entry = multi_hash::find_first(hash_map, 1);
             multi_hash::remove(hash_map, entry);
 
             THEN( "key 1 has one value" ) {

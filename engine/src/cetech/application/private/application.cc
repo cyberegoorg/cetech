@@ -46,8 +46,9 @@ namespace cetech {
                 char daemon_mod : 1;
             } _flags;
 
-            ApplictionData() : _frame_id(0), _last_frame_ticks(0), _delta_time(0), _flags{0, 0, 0} {
-            }
+            ApplictionData() : _frame_id(0), _last_frame_ticks(0), _delta_time(0), _flags {
+                0, 0, 0
+            } {}
         };
 
         struct Globals {
@@ -56,7 +57,9 @@ namespace cetech {
 
             ApplictionData* data;
 
-            Globals() : buffer{0}, data(0) {}
+            Globals() : buffer {
+                0
+            }, data(0) {}
         } _globals;
 
         void init_boot() {

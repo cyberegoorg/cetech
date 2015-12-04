@@ -122,6 +122,10 @@ function cetech_project(name, test)
         kind "ConsoleApp"
         language "C++"
 
+        removeflags {
+            "NoExceptions",
+        }
+
         files {
             path.join(ENGINE_SRC_DIR, "cetech", "**.cc"),
             path.join(ENGINE_SRC_DIR, "cetech", "**.h"),
@@ -141,10 +145,6 @@ function cetech_project(name, test)
             defines {
                 'CETECH_TEST'
             }
-
-            removeflags {
-                "NoExceptions",
-            }
         end
 
         links {
@@ -152,6 +152,7 @@ function cetech_project(name, test)
             "enet",
             "SOIL",
             "sqlite3",
+            "yaml-cpp"
         }
 
         configuration "Release or Develop"
