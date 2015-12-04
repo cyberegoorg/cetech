@@ -92,7 +92,7 @@ $ cd ..
 * Download and build externals.
 
 ```bash
-$ python external.py
+$ python externals.py
 ```
 
 * Build engine

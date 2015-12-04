@@ -19,7 +19,7 @@ env: COMPILER=clang++-3.7
 
 install:
   - pip install pyyaml
-  - python external.py -v
+  - python externals.py -v
   - python make.py --cxx=$COMPILER
 
 script:
