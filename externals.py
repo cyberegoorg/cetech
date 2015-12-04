@@ -120,10 +120,9 @@ def clone(name, body):
         cmd = clone_cmd.split(' ')
         if cmd[0] == 'git':
             if os.path.exists(clone_dir):
-                print('external %s exist. skiping...' % name)
                 continue
 
-            print('Cloning %s' % name)
+            print('Clone: %s' % name)
 
             cmd = cmd + [clone_dir]
             subprocess.check_call(cmd)
@@ -139,7 +138,7 @@ def clone(name, body):
 def build(name, body, platform_, job_count_str, verbose):
     clone_dir = os.path.join('external', name)
 
-    print('Building %s' % name)
+    print('Build: %s' % name)
 
     commands = body['build'][platform_]
     os.chdir(clone_dir)
@@ -152,11 +151,11 @@ def build(name, body, platform_, job_count_str, verbose):
             cmd_lst.insert(2, job_count_str)
 
         elif cmd_lst[0] == 'cmake':
-            cmd_lst.insert(1, '-DCMAKE_INCLUDE_PATH=%s' % os.path.join(EXTERNAL_BUILD_DIR, platform_))
+            cmd_lst.insert(1, '-DCMAKE_INCLUDE_PATH=%s' % os.path.join(EXTERNAL_BUILD_DIR, platform_, 'include'))
             cmd_lst.insert(2, job_count_str)
 
         if verbose:
-            print(cmd_lst)
+            print("Build cmd: %s" % cmd_lst)
 
         _stdout = subprocess.DEVNULL if not verbose else None
         subprocess.check_call(cmd_lst, stdout=_stdout, stderr=subprocess.STDOUT, universal_newlines=True)
@@ -170,7 +169,7 @@ def build(name, body, platform_, job_count_str, verbose):
 def install(name, body, platform_):
     clone_dir = os.path.join('external', name)
 
-    print('Instaling %s' % name)
+    print('Install: %s' % name)
 
     commands = body['install'][platform_]
     os.chdir(clone_dir)
