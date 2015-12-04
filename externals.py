@@ -211,7 +211,7 @@ def do_job(name, body, job_list, config, platform_, external, only_clone, job_co
 
         if depend in job_list:
             do_job(name=depend,
-                   body=job_list[depend],
+                   body=EXTERNALS[depend],
                    job_list=job_list,
                    config=config,
                    platform_=platform_,
