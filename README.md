@@ -48,7 +48,7 @@ CETech is Data-Driven [game engine](https://en.wikipedia.org/wiki/Game_engine) a
 * [pyaml](http://pyyaml.org/wiki/PyYAML) - YAML parser and emitter for Python.
 * [Qt](https://www.qt.io/) - Cross-platform GUI library.
 * [PyQT](https://www.riverbankcomputing.com/software/pyqt/intro) - Python QT binding
-* [Ace](https://ace.c9.io/) - JavaScript editor.
+* [Ace](https://ace.c9.io/) - JavaScript editor library.
 * [GoJS](http://gojs.net/) - JavaScript diagram library.
 
 ## Building
