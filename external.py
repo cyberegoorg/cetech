@@ -56,7 +56,6 @@ PLATFORMS = {
     'darwin64'
 }
 
-
 # EXTERNALS
 with open(os.path.join(ROOT_DIR, 'externals.yml')) as f:
     EXTERNALS = yaml.load(f.read())
@@ -99,17 +98,25 @@ ARGS_PARSER.add_argument(
         help='Max job count',
         default=CPU_COUNT)
 
+ARGS_PARSER.add_argument(
+        "-v", "--verbose",
+        help='Verbose mode',
+        action='store_true')
+
+
 ###########
 # PROGRAM #
 ########################################################################################################################
 
-def make_externals(config, platform, external='', only_clone=False, job_count=CPU_COUNT):
+def make_externals(config, platformm, external='', only_clone=False, job_count=CPU_COUNT, verbose=False):
     """Make externals build
 
-    :param config: Build configuration.
-    :param platform: Build platform.
-    :param external: External.
-    :param only_clone: Do not run build, only create projects files.
+    :type verbose: bool
+    :type job_count: int
+    :type only_clone: bool
+    :type external: str
+    :type platformm: str
+    :type config: str
     """
 
     job_count_str = str(job_count)
@@ -161,7 +168,7 @@ def make_externals(config, platform, external='', only_clone=False, job_count=CP
 
         print('Building %s' % k)
 
-        commands = v['build'][platform]
+        commands = v['build'][platformm]
         os.chdir(clone_dir)
 
         for cmd in commands:
@@ -171,9 +178,11 @@ def make_externals(config, platform, external='', only_clone=False, job_count=CP
                 cmd_lst.insert(1, '-j')
                 cmd_lst.insert(2, job_count_str)
 
-            print(cmd_lst)
+            if verbose:
+                print(cmd_lst)
 
-            subprocess.check_call(cmd_lst, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT,universal_newlines=True)
+            _stdout = subprocess.DEVNULL if not verbose else None
+            subprocess.check_call(cmd_lst, stdout=_stdout, stderr=subprocess.STDOUT, universal_newlines=True)
 
         os.chdir(ROOT_DIR)
 
@@ -189,13 +198,13 @@ def make_externals(config, platform, external='', only_clone=False, job_count=CP
 
         print('Instaling %s' % k)
 
-        commands = v['install'][platform]
+        commands = v['install'][platformm]
         os.chdir(clone_dir)
 
         for cmd in commands:
             for name, params in cmd.items():
                 src, dst_dir = params
-                dst_dir = os.path.join(EXTERNAL_BUILD_DIR, platform, dst_dir)
+                dst_dir = os.path.join(EXTERNAL_BUILD_DIR, platformm, dst_dir)
 
                 if name == 'copy':
                     try:
@@ -226,15 +235,16 @@ def main(args=None):
     """ ENTRY POINT
     """
 
-    args = ARGS_PARSER.parse_args(args=args)
+    args_parse = ARGS_PARSER.parse_args(args=args)
 
-    action = args.action
+    action = args_parse.action
     if action == '':
-        make_externals(config=args.config,
-                       platform=args.platform,
-                       external=args.external,
-                       only_clone=args.clone,
-                       job_count=args.job_count)
+        make_externals(config=args_parse.config,
+                       platformm=args_parse.platform,
+                       external=args_parse.external,
+                       only_clone=args_parse.clone,
+                       job_count=args_parse.job_count,
+                       verbose=args_parse.verbose)
 
     elif action == 'clean':
         clean()
