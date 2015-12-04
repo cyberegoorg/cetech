@@ -50,6 +50,7 @@ CETech is Data-Driven [game engine](https://en.wikipedia.org/wiki/Game_engine) a
 * [PyQT](https://www.riverbankcomputing.com/software/pyqt/intro) - Python QT binding
 * [Ace](https://ace.c9.io/) - JavaScript editor library.
 * [GoJS](http://gojs.net/) - JavaScript diagram library.
+* [YAML-C++](https://github.com/jbeder/yaml-cpp) - C++ YAML 1.2 parser
 
 ## Building
 
