@@ -67,7 +67,9 @@ namespace cetech {
 
             RendererData* data;
 
-            Globals() : buffer{0}, data(0) {}
+            Globals() : buffer {
+                0
+            }, data(0) {}
         } _globals;
 
         CE_INLINE bgfx::RendererType::Enum _bgfx_render_type(RenderType::Enum render_type) {

@@ -73,7 +73,9 @@ namespace cetech {
                                                      _workers_queue(nullptr),
                                                      _allocator(allocator),
                                                      _open_task_count(0),
-                                                     flags{0} {
+                                                     flags {
+                0
+            } {
 
                 _open_task = (uint32_t*) allocator.allocate(sizeof(uint32_t) * MAX_TASK);
                 _task_pool = memory::alloc_array < Task > (allocator, MAX_TASK);
@@ -102,7 +104,9 @@ namespace cetech {
 
             TaskManagerData* data;
 
-            Globals() : buffer{0}, data(0) {}
+            Globals() : buffer {
+                0
+            }, data(0) {}
         } _globals;
 
         uint32_t _core_count() {

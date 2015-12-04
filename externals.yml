@@ -276,3 +276,31 @@ sqlite3:
     darwin64:
       - copy: *sqlite_install_include
       - copy: *sqlite_install_lib
+
+############
+# yaml-cpp #
+########################################################################################################################
+yaml-cpp:
+  clone: git clone https://github.com/jbeder/yaml-cpp.git --depth 1
+
+  build:
+    posix: &yampcpp_build_posix
+      [cmake -DBUILD_SHARED_LIBS=OFF ., make]
+
+    linux64:  *yampcpp_build_posix
+    linux32:  *yampcpp_build_posix
+
+  install:
+    include: &yampcpp_include_posix
+      [include/yaml-cpp, include/yaml-cpp]
+
+    lib: &yampcpp_lib_posix
+      [libyaml-cpp.a, lib]
+
+    linux32:
+      - copy:  *yampcpp_lib_posix
+      - copytree: *yampcpp_include_posix
+
+    linux64:
+      - copy:  *yampcpp_lib_posix
+      - copytree: *yampcpp_include_posix

@@ -45,10 +45,10 @@ namespace cetech {
             CompileTask compile_task_pool[TASK_POOL_SIZE];
             uint32_t compile_task_pool_idx;
 
-            ResouceCompilerData(Allocator & allocator) : _compile_clb_map(allocator),  compile_task_pool_idx(0){
+            ResouceCompilerData(Allocator & allocator) : _compile_clb_map(allocator), compile_task_pool_idx(0) {
                 static_assert( 0 == (TASK_POOL_SIZE & TASK_POOL_SIZE_MASK), "TASK_POOL_SIZE must be power of two,");
-                
-                memset(compile_task_pool, 0, sizeof(CompileTask)* TASK_POOL_SIZE);
+
+                memset(compile_task_pool, 0, sizeof(CompileTask) * TASK_POOL_SIZE);
             }
         };
 
@@ -58,7 +58,9 @@ namespace cetech {
 
             ResouceCompilerData* data;
 
-            Globals() : buffer{0}, data(0) {}
+            Globals() : buffer {
+                0
+            }, data(0) {}
         } _globals;
 
         CE_INLINE CompileTask& new_compile_task() {
@@ -141,9 +143,9 @@ namespace cetech {
             filesystem::close(debug_index_file);
         }
 
-        void build_config_json() {
-            FSFile& src_config = filesystem::open(SRC_DIR, "config.json", FSFile::READ);
-            FSFile& out_config = filesystem::open(BUILD_DIR, "config.json", FSFile::WRITE);
+        void build_config_yaml() {
+            FSFile& src_config = filesystem::open(SRC_DIR, "config.yaml", FSFile::READ);
+            FSFile& out_config = filesystem::open(BUILD_DIR, "config.yaml", FSFile::WRITE);
 
             size_t size = src_config.size();
             char data[size];
@@ -182,7 +184,7 @@ namespace cetech {
             rapidjson::Document debug_index;
             debug_index.SetObject();
 
-            build_config_json();
+            build_config_yaml();
 
             static StringId64_t in_dirs[] = {CORE_DIR, SRC_DIR};
 

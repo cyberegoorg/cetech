@@ -32,12 +32,12 @@ namespace cetech {
                      CompilatorAPI& compilator) {
             CE_UNUSED(filename);
 
-            rapidjson::Document document;
-            if (!compilator.resource_to_json(document)) {
+            YAML::Node document;
+            if (!compilator.resource_to_yaml(document)) {
                 return;
             }
 
-            const char* input = document["input"].GetString();
+            const char* input = document["input"].Scalar().c_str();
             compilator.add_dependency(input);
 
             char full_input_path[1024] = {0};

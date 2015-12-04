@@ -2,8 +2,9 @@
 
 #include <cstring>
 #include <cstdlib>
+#include <iostream>
 
-#include "rapidjson/document.h"
+#include "yaml-cpp/yaml.h"
 
 #include "celib/asserts.h"
 #include "cetech/cvar/cvar_types.h"
@@ -25,7 +26,7 @@ namespace cetech {
 
         CE_INLINE CVar* find(const char* name);
 
-        CE_INLINE void load_from_json(const rapidjson::Document& document);
+        CE_INLINE void load_from_yaml(const YAML::Node& document);
 
         CE_INLINE void dump_all();
     }
@@ -208,46 +209,31 @@ namespace cetech {
             return nullptr;
         }
 
-        void load_from_json(const rapidjson::Document& document) {
-            const rapidjson::Value& ar = document["cvars"];
+        void load_from_yaml(const YAML::Node& document) {
+            for (auto itr = document.begin(); itr != document.end(); ++itr) {
+                const char* name = itr->first.Scalar().c_str();
 
-            for (rapidjson::Value::ConstMemberIterator itr = ar.MemberBegin(); itr != ar.MemberEnd(); ++itr) {
-                const rapidjson::Value& name = itr->name;
-                const rapidjson::Value& value = itr->value;
+                const YAML::Node& value = itr->second;
 
-                CVar* cvar = cvar::find(name.GetString());
+                CVar* cvar = cvar::find(name);
 
                 if (cvar == nullptr) {
-                    log::error("cvar", "Undefined cvar \"%s\"", name.GetString());
+                    log::error("cvar", "Undefined cvar \"%s\"", name);
                     continue;
                 }
 
-                /* INT */
-                if (value.IsInt()) {
-                    if (cvar->type != CVar::CVAR_INT) {
-                        log::error("cvar", "Invalid type for cvar \"%s\".", name.GetString());
-                        continue;
-                    }
+                switch (cvar->type) {
+                case CVar::CVAR_INT:
+                    cvar_internal::force_set(*cvar, value.as < int > ());
+                    break;
 
-                    cvar_internal::force_set(*cvar, value.GetInt());
+                case CVar::CVAR_FLOAT:
+                    cvar_internal::force_set(*cvar, value.as < float > ());
+                    break;
 
-                    /* FLOAT */
-                } else if (value.IsDouble()) {
-                    if (cvar->type != CVar::CVAR_FLOAT) {
-                        log::error("cvar", "Invalid type for cvar \"%s\".", name.GetString());
-                        continue;
-                    }
-
-                    cvar_internal::force_set(*cvar, (float)value.GetDouble());
-
-                    /* STR */
-                } else if (value.IsString()) {
-                    if (cvar->type != CVar::CVAR_STR) {
-                        log::error("cvar", "Invalid type for cvar \"%s\".", name.GetString());
-                        continue;
-                    }
-
-                    cvar_internal::force_set(*cvar, value.GetString());
+                case CVar::CVAR_STR:
+                    cvar_internal::force_set(*cvar, value.Scalar().c_str());
+                    break;
                 }
             }
         }
