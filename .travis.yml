@@ -24,4 +24,4 @@ install:
   - python make.py --cxx=$COMPILER
 
 script:
-  - ./.build/linux64_clang/bin/cetech_testDebug
+  - ./build/linux64_clang/bin/cetech_testDebug

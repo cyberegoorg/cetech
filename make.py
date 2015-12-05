@@ -26,7 +26,7 @@ OS_NAME = platform.system().lower()
 OS_ARCH = 64 if sys.maxsize > 2 ** 32 else 32
 
 ROOT_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)))
-BUILD_DIR = os.path.abspath(os.path.join(ROOT_DIR, '.build'))
+BUILD_DIR = os.path.abspath(os.path.join(ROOT_DIR, 'build'))
 EXTERNAL_BUILD_DIR = os.path.abspath(os.path.join(ROOT_DIR, 'externals', 'build'))
 
 GENIE = os.path.join(EXTERNAL_BUILD_DIR,
@@ -35,10 +35,10 @@ GENIE = os.path.join(EXTERNAL_BUILD_DIR,
                      'genie')
 
 LINUX_GENIE = [GENIE, '--gcc=linux-clang', 'gmake']
-LINUX_BUILD = ['make', '-R', '-C', '.build/projects/gmake-linux-clang']
+LINUX_BUILD = ['make', '-R', '-C', 'build/projects/gmake-linux-clang']
 
 DARWIN_GENIE = [GENIE, '--gcc=osx', 'gmake']
-DARWIN_BUILD = ['make', '-j', CPU_COUNT_STR, '-R', '-C', '.build/projects/gmake-osx']
+DARWIN_BUILD = ['make', '-j', CPU_COUNT_STR, '-R', '-C', 'build/projects/gmake-osx']
 
 DEFAULT_BUILD = "%s%s" % (OS_NAME, OS_ARCH)
 
