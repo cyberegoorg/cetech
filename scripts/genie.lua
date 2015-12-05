@@ -122,11 +122,6 @@ function cetech_project(name, test)
         kind "ConsoleApp"
         language "C++"
 
-        removeflags {
-            "NoExceptions",
-            "NoRTTI"
-        }
-
         files {
             path.join(ENGINE_SRC_DIR, "cetech", "**.cc"),
             path.join(ENGINE_SRC_DIR, "cetech", "**.h"),
@@ -145,6 +140,10 @@ function cetech_project(name, test)
 
             defines {
                 'CETECH_TEST'
+            }
+
+            removeflags {
+                "NoExceptions",
             }
         end
 
