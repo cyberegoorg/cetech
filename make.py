@@ -34,17 +34,16 @@ GENIE = os.path.join(EXTERNAL_BUILD_DIR,
                      'bin',
                      'genie')
 
-LINUX_GENIE = [GENIE, '--gcc=linux-clang', 'gmake']
-LINUX_BUILD = ['make', '-R', '-C', 'build/projects/gmake-linux-clang']
-
-DARWIN_GENIE = [GENIE, '--gcc=osx', 'gmake']
-DARWIN_BUILD = ['make', '-j', CPU_COUNT_STR, '-R', '-C', 'build/projects/gmake-osx']
-
 DEFAULT_BUILD = "%s%s" % (OS_NAME, OS_ARCH)
 
 ##########
 # CONFIG #
 ########################################################################################################################
+LINUX_GENIE = [GENIE, '--gcc=linux-clang', 'gmake']
+LINUX_BUILD = ['make', '-R', '-C', 'build/projects/gmake-linux-clang']
+
+DARWIN_GENIE = [GENIE, '--gcc=osx', 'gmake']
+DARWIN_BUILD = ['make', '-j', CPU_COUNT_STR, '-R', '-C', 'build/projects/gmake-osx']
 
 # Command line actions.
 ACTIONS = {
@@ -131,33 +130,34 @@ ARGS_PARSER.add_argument(
         help='Max job count',
         default=CPU_COUNT)
 
+
 ###########
 # PROGRAM #
 ########################################################################################################################
 
-def run_genie(platform, cc=None, cxx=None):
+def run_genie(platform_, cc=None, cxx=None):
     """Run platform specific genie command.
     """
 
-    cmd = PLATFORMS_GENIE[platform]
+    cmd = PLATFORMS_GENIE[platform_]
 
     subprocess.check_call(cmd)
 
 
-def make(config, platform, only_genie=False, cc=None, cxx=None, job_count=CPU_COUNT):
+def make(config, platform_, only_genie=False, cc=None, cxx=None, job_count=CPU_COUNT):
     """Make build
 
     :param config: Build configuration.
-    :param platform: Build platform.
+    :param platform_: Build platform.
     :param only_genie: Do not run build, only create projects files.
     """
     print('Runing genie.')
-    run_genie(platform=platform)
+    run_genie(platform_=platform_)
 
     if not only_genie:
         print('Building.')
 
-        cmd = PLATFORMS_BUILD[platform][config]
+        cmd = PLATFORMS_BUILD[platform_][config]
 
         if cmd[0] == 'make':
             cmd.insert(1, '-j')
