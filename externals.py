@@ -143,6 +143,8 @@ def build(name, body, platform_, job_count_str, verbose):
     print('Build: %s' % name)
 
     commands = body['build'][platform_]
+    commands = [commands] if isinstance(commands, str) else commands
+
     os.chdir(clone_dir)
 
     for cmd in commands:

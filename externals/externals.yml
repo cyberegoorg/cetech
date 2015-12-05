@@ -5,9 +5,9 @@ genie:
   clone: git clone https://github.com/bkaradzic/genie --depth 1
 
   build:
-    linux32:  [make]
-    linux64:  [make]
-    darwin64: [make]
+    linux32:  make
+    linux64:  make
+    darwin64: make
 
   install:
     linux: &genie_install_linux
@@ -29,9 +29,9 @@ bgfx:
   clone: git clone https://github.com/bkaradzic/bgfx --depth 1
 
   build:
-    linux64:  [make linux-release64]
-    linux32:  [make linux-release32]
-    darwin64: [make osx-release64]
+    linux64:  make linux-release64
+    linux32:  make linux-release32
+    darwin64: make osx-release64
 
   install:
     includes: &bgfx_include
@@ -76,7 +76,9 @@ enet:
 
   build:
     configure: &enet_build_configure
-      [autoreconf -vfi, ./configure, make]
+      - autoreconf -vfi
+      - ./configure
+      - make
 
     linux64:  *enet_build_configure
     linux32:  *enet_build_configure
@@ -108,9 +110,9 @@ luajit:
   clone: git clone http://luajit.org/git/luajit-2.0.git
 
   build:
-    linux64:  [make]
-    linux32:  [make]
-    darwin64: [make]
+    linux64:  make
+    linux32:  make
+    darwin64: make
 
   install:
     linux64:
@@ -187,7 +189,8 @@ sdl2:
 
   build:
     configure: &sdl2_build_configure
-      [./configure, make]
+      - ./configure
+      - make
 
     configure_darwin: &sdl2_build_configure_darwin
       [./configure --with-x=no, make]
@@ -221,9 +224,9 @@ sdl2:
 soil:
   clone: git clone https://github.com/kbranigan/Simple-OpenGL-Image-Library.git --depth 1
   build:
-    linux64:  [make]
-    linux32:  [make]
-    darwin64: [make]
+    linux64:  make
+    linux32:  make
+    darwin64: make
 
   install:
     include: &soil_install_include
@@ -248,11 +251,15 @@ soil:
 # sqlite3 #
 ########################################################################################################################
 sqlite3:
-  clone: ['git clone https://github.com/mackyle/sqlite --depth 1',
-          'download http://repo.or.cz/sqlite-export.git/blob_plain/master:/create-fossil-manifest create-fossil-manifest.sh']
+  clone:
+    - git clone https://github.com/mackyle/sqlite --depth 1
+    - download http://repo.or.cz/sqlite-export.git/blob_plain/master:/create-fossil-manifest create-fossil-manifest.sh
+
   build:
     posix: &sqlite3_build_posix
-      [/bin/sh ./create-fossil-manifest.sh, ./configure, make]
+      - /bin/sh ./create-fossil-manifest.sh
+      - ./configure
+      - make
 
     linux64:  *sqlite3_build_posix
     linux32:  *sqlite3_build_posix
