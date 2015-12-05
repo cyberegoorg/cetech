@@ -61,8 +61,6 @@ PLATFORMS = {
 with open(os.path.join(EXTERNAL_DIR, 'externals.yml')) as f:
     EXTERNALS = yaml.load(f.read())
 
-EXTERNALS.update({'': None})
-
 ########
 # ARGS #
 ########################################################################################################################
@@ -87,7 +85,7 @@ ARGS_PARSER.add_argument(
 ARGS_PARSER.add_argument(
         "--external",
         help='Build configuration',
-        default='', choices=[x for x in EXTERNALS.keys()])
+        default='', choices=[''] + [x for x in EXTERNALS.keys()])
 
 ARGS_PARSER.add_argument(
         "--platform",
@@ -290,7 +288,6 @@ def main(args=None):
 
     action = args_parse.action
     if action == '':
-        EXTERNALS.pop('')
         make_externals(config=args_parse.config,
                        platform_=args_parse.platform,
                        external=args_parse.external,
