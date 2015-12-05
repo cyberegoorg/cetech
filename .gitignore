@@ -13,3 +13,4 @@ externals/build
 externals/src
 
 .directory
+log.yaml
