@@ -13,8 +13,8 @@ OS_ARCH_DIR = _OS ..'/' .. ARCH
 
 ENGINE_SRC_DIR = path.join(ROOT_DIR, 'engine', 'src')
 
-THIRD_PARTY = path.join(ROOT_DIR, "external")
-THIRD_PARTY_BUILD = path.join( ROOT_DIR, THIRD_PARTY, ".build")
+THIRD_PARTY = path.join(ROOT_DIR, "externals")
+THIRD_PARTY_BUILD = path.join( ROOT_DIR, THIRD_PARTY, "build")
 THIRD_PARTY_LIB = path.join(THIRD_PARTY_BUILD, OS_ARCH, "lib")
 THIRD_PARTY_INCLUDE = path.join( THIRD_PARTY_BUILD, OS_ARCH, "include")
 
@@ -143,6 +143,7 @@ function cetech_project(name, test)
             }
 
             removeflags {
+                "NoRTTI",
                 "NoExceptions",
             }
         end

@@ -4,7 +4,8 @@
 *.orig
 *.o
 
-external
+externals/build
+externals/src
 data/build
 .build/
 site/
