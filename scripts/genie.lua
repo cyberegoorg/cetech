@@ -153,7 +153,7 @@ function cetech_project(name, test)
             "enet",
             "SOIL",
             "sqlite3",
-            "yaml-cpp"
+            "yaml"
         }
 
         configuration "Release or Develop"

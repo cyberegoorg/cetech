@@ -1,8 +1,8 @@
 #pragma once
 
 #include "cetech/filesystem/filesystem.h"
-#include "rapidjson/document.h"
-#include "yaml-cpp/yaml.h"
+
+
 
 namespace cetech {
     struct CompilatorAPI {
@@ -11,8 +11,6 @@ namespace cetech {
                       FSFile & build_file);
 
         ~CompilatorAPI();
-
-        bool resource_to_yaml(YAML::Node& document);
 
         bool add_dependency(const char* path);
 

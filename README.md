@@ -44,13 +44,13 @@ CETech is Data-Driven [game engine](https://en.wikipedia.org/wiki/Game_engine) a
 * [catch](https://github.com/philsquared/Catch) -  Multi-paradigm automated test framework for C++.
 * [SOIL](http://www.lonesock.net/soil.html ) - Simple OpenGL Image Library.
 * [sqlite3](https://www.sqlite.org/) - SQL database engine.
+* [libyaml](https://github.com/yaml/libyaml.git) - C YAML parser.
 * [python](https://www.python.org/) - Multi-paradigm Programming language.
 * [pyaml](http://pyyaml.org/wiki/PyYAML) - YAML parser and emitter for Python.
 * [Qt](https://www.qt.io/) - Cross-platform GUI library.
 * [PyQT](https://www.riverbankcomputing.com/software/pyqt/intro) - Python QT binding
 * [Ace](https://ace.c9.io/) - JavaScript editor library.
 * [GoJS](http://gojs.net/) - JavaScript diagram library.
-* [YAML-C++](https://github.com/jbeder/yaml-cpp) - C++ YAML 1.2 parser
 
 ## Building
 

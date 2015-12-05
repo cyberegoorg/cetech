@@ -4,7 +4,7 @@
 #include <cstdlib>
 #include <iostream>
 
-#include "yaml-cpp/yaml.h"
+#include "yaml/yaml.h"
 
 #include "celib/asserts.h"
 #include "cetech/cvar/cvar_types.h"
@@ -26,7 +26,8 @@ namespace cetech {
 
         CE_INLINE CVar* find(const char* name);
 
-        CE_INLINE void load_from_yaml(const YAML::Node& document);
+        CE_INLINE void load_from_yaml(const char* yaml_str,
+                                      const size_t len);
 
         CE_INLINE void dump_all();
     }
@@ -209,33 +210,100 @@ namespace cetech {
             return nullptr;
         }
 
-        void load_from_yaml(const YAML::Node& document) {
-            for (auto itr = document.begin(); itr != document.end(); ++itr) {
-                const char* name = itr->first.Scalar().c_str();
+        void load_from_yaml(const char* yaml_str,
+                            const size_t len) {
+            yaml_parser_t parser;
+            yaml_token_t token;
+            const char* cvar_name;
+            const char* cvar_value;
 
-                const YAML::Node& value = itr->second;
+            if (!yaml_parser_initialize(&parser)) {
+                log::error("cvar.load", "yaml: Failed to initialize parser!");
+            }
 
-                CVar* cvar = cvar::find(name);
+            yaml_parser_set_input_string(&parser, (unsigned char*)yaml_str, len);
+
+            // begin
+            yaml_parser_scan(&parser, &token);
+            if (token.type != YAML_STREAM_START_TOKEN) {
+                log::error("cvar.load", "Invalid yaml");
+                goto clean_up;
+            }
+
+            yaml_parser_scan(&parser, &token);
+            if (token.type != YAML_BLOCK_MAPPING_START_TOKEN) {
+                log::error("cvar.load", "Root node must be maping");
+                goto clean_up;
+            }
+
+            // overall types
+            do {
+                // Name
+                yaml_parser_scan(&parser, &token);
+
+                if (token.type == YAML_BLOCK_END_TOKEN) {
+                    break;
+                }
+
+                if (token.type != YAML_KEY_TOKEN) {
+                    log::error("cvar.load", "Need key");
+                    goto clean_up;
+                }
+
+                yaml_parser_scan(&parser, &token);
+                if (token.type != YAML_SCALAR_TOKEN) {
+                    log::error("cvar.load", "Need key");
+                    goto clean_up;
+                }
+
+                cvar_name = (const char*)token.data.scalar.value;
+
+                // Value
+                yaml_parser_scan(&parser, &token);
+                if (token.type != YAML_VALUE_TOKEN) {
+                    log::error("cvar.load", "Need value");
+                    goto clean_up;
+                }
+
+                yaml_parser_scan(&parser, &token);
+                if (token.type != YAML_SCALAR_TOKEN) {
+                    log::error("cvar.load", "Need value");
+                    goto clean_up;
+                }
+
+                cvar_value = (const char*)token.data.scalar.value;
+
+                CVar* cvar = cvar::find(cvar_name);
 
                 if (cvar == nullptr) {
-                    log::error("cvar", "Undefined cvar \"%s\"", name);
+                    log::error("cvar.load", "Undefined cvar \"%s\"", cvar_name);
                     continue;
                 }
 
                 switch (cvar->type) {
-                case CVar::CVAR_INT:
-                    cvar_internal::force_set(*cvar, value.as < int > ());
-                    break;
+                case CVar::CVAR_INT: {
+                    int i = 0;
+                    sscanf(cvar_value, "%d", &i);
+                    cvar_internal::force_set(*cvar, i);
+                }
+                break;
 
-                case CVar::CVAR_FLOAT:
-                    cvar_internal::force_set(*cvar, value.as < float > ());
-                    break;
+                case CVar::CVAR_FLOAT: {
+                    float f = 0;
+                    sscanf(cvar_value, "%f", &f);
+                    cvar_internal::force_set(*cvar, f);
+                }
+                break;
 
                 case CVar::CVAR_STR:
-                    cvar_internal::force_set(*cvar, value.Scalar().c_str());
+                    cvar_internal::force_set(*cvar, cvar_value);
                     break;
                 }
-            }
+            } while (true);
+
+clean_up:
+            yaml_token_delete(&token);
+            yaml_parser_delete(&parser);
         }
 
         void dump_all() {
