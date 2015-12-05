@@ -124,6 +124,7 @@ function cetech_project(name, test)
 
         removeflags {
             "NoExceptions",
+            "NoRTTI"
         }
 
         files {
