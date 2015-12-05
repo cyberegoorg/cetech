@@ -14,7 +14,7 @@ cache:
 addons:
   apt:
     sources: ['ubuntu-toolchain-r-test', 'llvm-toolchain-precise-3.7']
-    packages: ['clang-3.7']
+    packages: ['clang-3.7', 'libboost-all-dev']
 env: COMPILER=clang++-3.7
 
 install:

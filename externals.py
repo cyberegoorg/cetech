@@ -152,7 +152,6 @@ def build(name, body, platform_, job_count_str, verbose):
 
         elif cmd_lst[0] == 'cmake':
             cmd_lst.insert(1, '-DCMAKE_INCLUDE_PATH=%s' % os.path.join(EXTERNAL_BUILD_DIR, platform_, 'include'))
-            cmd_lst.insert(2, job_count_str)
 
         if verbose:
             print("Build cmd: %s" % cmd_lst)
@@ -207,7 +206,7 @@ def do_job(name, body, job_list, config, platform_, external, only_clone, job_co
 
     if 'depend' in body:
         depend = body['depend']
-
+        print(depend)
         if depend in job_list:
             do_job(name=depend,
                    body=EXTERNALS[depend],
