@@ -76,7 +76,7 @@ class CetechProject(object):
             print("out:\n%s\n err:\n%s\n" % (out, err))
 
     def get_executable_path(self, build_type):
-        engine_bin_path = '../.build/'
+        engine_bin_path = '../build/'
 
         _platform = platform.system().lower()
         if _platform == 'darwin':

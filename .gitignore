@@ -4,9 +4,12 @@
 *.orig
 *.o
 
+site/
+
+build/
+data/build
+
 externals/build
 externals/src
-data/build
-.build/
-site/
+
 .directory

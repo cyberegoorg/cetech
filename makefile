@@ -6,7 +6,7 @@
 
 linux64-clang:
 	python ./make.py
-	.build/linux64_clang/bin/cetech_testDebug -a
+	build/linux64_clang/bin/cetech_testDebug -a
 
 clean:
 	python ./make.py clean

@@ -1,6 +1,6 @@
 --------------------------------------------------------------------------------
 ROOT_DIR = path.getabsolute("..")
-BUILD_DIR = path.join( ROOT_DIR, ".build")
+BUILD_DIR = path.join( ROOT_DIR, "build")
 
 ARCH = os.is64bit() and '64' or '32'
 
@@ -9,7 +9,6 @@ if _OS == 'macosx' then
 end
 
 OS_ARCH = _OS .. ARCH
-OS_ARCH_DIR = _OS ..'/' .. ARCH
 
 ENGINE_SRC_DIR = path.join(ROOT_DIR, 'engine', 'src')
 
