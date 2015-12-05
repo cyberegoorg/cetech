@@ -61,7 +61,7 @@ PLATFORMS = {
 # EXTERNALS
 with open(os.path.join(EXTERNAL_DIR, 'externals.yml')) as f:
     EXTERNALS = yaml.load(f.read())
-yaml.
+
 ########
 # ARGS #
 ########################################################################################################################
