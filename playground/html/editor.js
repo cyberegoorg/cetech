@@ -2,7 +2,7 @@ var editor;
 
 function init() {
     editor = ace.edit("editor");
-    editor.setTheme("ace/theme/monokai");
+    editor.setTheme("ace/theme/solarized_dark");
     editor.getSession().setMode("ace/mode/javascript");
 
     editor.getSession().on("change", function(e){
