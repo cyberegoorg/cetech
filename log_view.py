@@ -62,6 +62,11 @@ ARGS_PARSER.add_argument(
         type=str)
 
 ARGS_PARSER.add_argument(
+        "--msg",
+        help='Message regexp',
+        type=str)
+
+ARGS_PARSER.add_argument(
         "logfile",
         nargs='?',
         help='Log file',
@@ -107,6 +112,11 @@ def main(args=None):
     else:
         where_re = None
 
+    if args.msg:
+        msg_re = re.compile(args.msg)
+    else:
+        msg_re = None
+
     log_yaml = yaml.load_all(args.logfile.read())
 
     out = args.out
@@ -115,6 +125,9 @@ def main(args=None):
             continue
 
         if where_re and not where_re.match(entry['where']):
+            continue
+
+        if msg_re and not msg_re.match(entry['msg']):
             continue
 
         out.write(PRINT_TEMPLATE.format(**entry))
