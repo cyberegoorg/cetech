@@ -11,7 +11,7 @@
 #include "celib/macros.h"
 #include "celib/string/stringid.inl.h"
 
-#include "yaml-cpp/yaml.h"
+#include "yaml/yaml.h"
 
 namespace cetech {
     namespace resource_package {
@@ -26,46 +26,130 @@ namespace cetech {
                      CompilatorAPI& compilator) {
             CE_UNUSED(filename);
 
-            YAML::Node document;
-            if (!compilator.resource_to_yaml(document)) {
-                return;
+            yaml_parser_t parser;
+            yaml_token_t token;
+
+            const unsigned char* name;
+            const unsigned char* type_name;
+
+            int resource_count = 0;
+            int type_count = 0;
+
+            TypeHeader type_header;
+            Header header;
+            uint32_t names_offset;
+
+            char tmp[compilator.resource_file_size() + 1];
+            memset(tmp, 0, compilator.resource_file_size() + 1);
+
+
+            if (!yaml_parser_initialize(&parser)) {
+                log::error("package_resource", "yaml: Failed to initialize parser!");
             }
 
-            Header header = {document.size()};
-            compilator.write_to_build(&header, sizeof(Header));
+            compilator.read_resource_file(tmp);
+            yaml_parser_set_input_string(&parser, (unsigned char*)tmp, compilator.resource_file_size());
 
             /* Prepare arrays structs */
             Array < TypeHeader > typesheader(memory_globals::default_allocator()); // TODO: TEMP ALLOCATOR
             Array < StringId64_t > names(memory_globals::default_allocator());     // TODO: TEMP ALLOCATOR
 
-            uint32_t names_offset = sizeof(Header) + (sizeof(TypeHeader) * header.count);
+            // begin
+            yaml_parser_scan(&parser, &token);
+            if (token.type != YAML_STREAM_START_TOKEN) {
+                log::error("package_resource", "Invalid yaml");
+                goto clean_up;
+            }
 
-            for (auto itr = document.begin(); itr != document.end(); ++itr) {
-                const YAML::Node& ar = itr->second;
+            yaml_parser_scan(&parser, &token);
+            if (token.type != YAML_BLOCK_MAPPING_START_TOKEN) {
+                log::error("package_resource", "Root node must be maping");
 
-                CE_ASSERT(ar.IsSequence());
+                goto clean_up;
+            }
 
-                const char* type_name = itr->first.Scalar().c_str();
-                TypeHeader type_header = {
-                    .type = murmur_hash_64(type_name, strlen(type_name), 22),
-                    .count = ar.size(),
-                    .offset = names_offset
+            // overall types
+            do {
+                // TYPE
+                yaml_parser_scan(&parser, &token);
+
+                if (token.type == YAML_BLOCK_END_TOKEN) {
+                    break;
+                }
+
+                if (token.type != YAML_KEY_TOKEN) {
+                    log::error("package_resource", "Need key");
+                    goto clean_up;
+                }
+
+                yaml_parser_scan(&parser, &token);
+                if (token.type != YAML_SCALAR_TOKEN) {
+                    log::error("package_resource", "Need key");
+                    goto clean_up;
+                }
+
+                type_name = token.data.scalar.value;
+
+                // Value
+                yaml_parser_scan(&parser, &token);
+                if (token.type != YAML_VALUE_TOKEN) {
+                    log::error("package_resource", "Need value");
+                    goto clean_up;
+                }
+
+                yaml_parser_scan(&parser, &token);
+                if (token.type != YAML_BLOCK_SEQUENCE_START_TOKEN) {
+                    log::error("package_resource", "Need sequence");
+                    goto clean_up;
+                }
+
+                // Resource name
+                resource_count = 0;
+                do {
+                    yaml_parser_scan(&parser, &token);
+                    if (token.type == YAML_BLOCK_END_TOKEN) {
+                        break;
+                    }
+
+                    if (token.type != YAML_BLOCK_ENTRY_TOKEN) {
+                        log::error("package_resource", "Need block entry");
+                        goto clean_up;
+                    }
+
+                    yaml_parser_scan(&parser, &token);
+                    if (token.type != YAML_SCALAR_TOKEN) {
+                        log::error("package_resource", "Need scalar");
+                        goto clean_up;
+                    }
+
+                    name = token.data.scalar.value;
+                    array::push_back(names, murmur_hash_64(name, strlen((const char*)name), 22));
+
+                    ++resource_count;
+                } while (true);
+
+                type_header = {
+                    .type = murmur_hash_64(type_name, strlen((const char*)type_name), 22),
+                    .count = (uint64_t)resource_count,
+                    .offset = 0
                 };
-
-                names_offset += sizeof(StringId64_t) * ar.size();
 
                 array::push_back(typesheader, type_header);
 
-                for (std::size_t i = 0; i < ar.size(); ++i) {
-                    const YAML::Node& v = ar[i];
+                ++type_count;
+            } while (true);
 
-                    CE_ASSERT(v.IsScalar());
+            header = {(uint64_t)type_count};
 
-                    const char* name = v.Scalar().c_str();
-
-                    array::push_back(names, murmur_hash_64(name, strlen(name), 22));
-                }
+            // calc offset
+            names_offset = sizeof(Header) + (sizeof(TypeHeader) * type_count);
+            for (auto it = array::begin(typesheader); it != array::end(typesheader); ++it) {
+                it->offset = names_offset;
+                names_offset += sizeof(StringId64_t) * it->count;
             }
+
+            /* Write header */
+            compilator.write_to_build(&header, sizeof(Header));
 
             /* Write types and names */
             compilator.write_to_build(array::begin(typesheader),
@@ -73,6 +157,10 @@ namespace cetech {
 
             compilator.write_to_build(array::begin(names),
                                       sizeof(StringId64_t) * array::size(names));
+
+clean_up:
+            yaml_token_delete(&token);
+            yaml_parser_delete(&parser);
         }
 
         void online(void* data) {

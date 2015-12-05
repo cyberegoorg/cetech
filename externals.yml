@@ -277,30 +277,31 @@ sqlite3:
       - copy: *sqlite_install_include
       - copy: *sqlite_install_lib
 
-############
-# yaml-cpp #
+###########
+# libyaml #
 ########################################################################################################################
-yaml-cpp:
-  clone: git clone https://github.com/jbeder/yaml-cpp.git --depth 1
+libyaml:
+  clone: git clone https://github.com/yaml/libyaml.git --depth 1
 
   build:
-    posix: &yampcpp_build_posix
-      [cmake -DBUILD_SHARED_LIBS=OFF ., make]
+    posix: &libyaml_build_posix
+      [./bootstrap, ./configure, make]
 
-    linux64:  *yampcpp_build_posix
-    linux32:  *yampcpp_build_posix
+    linux64:  *libyaml_build_posix
+    linux32:  *libyaml_build_posix
 
   install:
-    include: &yampcpp_include_posix
-      [include/yaml-cpp, include/yaml-cpp]
+    include: &libyaml_include_posix
+      [include/yaml.h, include/yaml]
 
-    lib: &yampcpp_lib_posix
-      [libyaml-cpp.a, lib]
+    lib: &libyaml_lib_posix
+      [src/.libs/libyaml.a, lib]
 
     linux32:
-      - copy:  *yampcpp_lib_posix
-      - copytree: *yampcpp_include_posix
+      - copy:  *libyaml_lib_posix
+      - copy: *libyaml_include_posix
 
     linux64:
-      - copy:  *yampcpp_lib_posix
-      - copytree: *yampcpp_include_posix
+      - copy:  *libyaml_lib_posix
+      - copy: *libyaml_include_posix
+
