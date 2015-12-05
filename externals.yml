@@ -281,8 +281,6 @@ sqlite3:
 # yaml-cpp #
 ########################################################################################################################
 yaml-cpp:
-  depend: smart_ptr
-
   clone: git clone https://github.com/jbeder/yaml-cpp.git --depth 1
 
   build:
@@ -306,19 +304,3 @@ yaml-cpp:
     linux64:
       - copy:  *yampcpp_lib_posix
       - copytree: *yampcpp_include_posix
-
-##################
-# BOST smart_ptr #
-########################################################################################################################
-smart_ptr:
-  clone: git clone https://github.com/boostorg/smart_ptr.git --depth 1
-
-  install:
-    include: &smart_ptr_include
-      [include/boost, include/boost]
-
-    linux32:
-      - copytree: *smart_ptr_include
-
-    linux64:
-      - copytree: *smart_ptr_include
