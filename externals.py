@@ -28,8 +28,9 @@ OS_NAME = platform.system().lower()
 OS_ARCH = 64 if sys.maxsize > 2 ** 32 else 32
 
 ROOT_DIR = os.path.abspath(os.path.join(os.path.dirname(os.path.abspath(__file__))))
-EXTERNAL_DIR = os.path.join(ROOT_DIR, 'external')
-EXTERNAL_BUILD_DIR = os.path.join(EXTERNAL_DIR, '.build')
+EXTERNAL_DIR = os.path.join(ROOT_DIR, 'externals')
+EXTERNAL_BUILD_DIR = os.path.join(EXTERNAL_DIR, 'build')
+EXTERNAL_SRC_DIR = os.path.join(EXTERNAL_DIR, 'src')
 
 DEFAULT_BUILD = "%s%s" % (OS_NAME, OS_ARCH)
 
@@ -57,7 +58,7 @@ PLATFORMS = {
 }
 
 # EXTERNALS
-with open(os.path.join(ROOT_DIR, 'externals.yml')) as f:
+with open(os.path.join(EXTERNAL_DIR, 'externals.yml')) as f:
     EXTERNALS = yaml.load(f.read())
 
 EXTERNALS.update({'': None})
@@ -111,32 +112,35 @@ ARGS_PARSER.add_argument(
 ########################################################################################################################
 # Clone
 ########################################################################################################################
-def clone(name, body):
-    clone_dir = os.path.join('external', name)
+def clone(name, body, verbose):
+    clone_dir = os.path.join(EXTERNAL_SRC_DIR, name)
+
+    print('Clone: %s' % name)
 
     clone_cmds = [body['clone']] if isinstance(body['clone'], str) else body['clone']
 
     for clone_cmd in clone_cmds:
         cmd = clone_cmd.split(' ')
+
         if cmd[0] == 'git':
             if os.path.exists(clone_dir):
                 continue
 
-            print('Clone: %s' % name)
-
             cmd = cmd + [clone_dir]
-            subprocess.check_call(cmd)
+            _stdout = subprocess.DEVNULL if not verbose else None
+            subprocess.check_call(cmd, stdout=_stdout, stderr=subprocess.STDOUT, universal_newlines=True)
 
         elif cmd[0] == 'download':
+            print('Download: %s' % cmd[1])
+
             urllib.request.urlretrieve(cmd[1], os.path.abspath(os.path.join(clone_dir, cmd[2])))
-            pass
 
 
 ########################################################################################################################
 # Build
 ########################################################################################################################
 def build(name, body, platform_, job_count_str, verbose):
-    clone_dir = os.path.join('external', name)
+    clone_dir = os.path.join(EXTERNAL_SRC_DIR, name)
 
     print('Build: %s' % name)
 
@@ -166,7 +170,7 @@ def build(name, body, platform_, job_count_str, verbose):
 # Install
 ########################################################################################################################
 def install(name, body, platform_):
-    clone_dir = os.path.join('external', name)
+    clone_dir = os.path.join(EXTERNAL_SRC_DIR, name)
 
     print('Install: %s' % name)
 
@@ -199,7 +203,7 @@ def install(name, body, platform_):
 # Job
 ########################################################################################################################
 def do_job(name, body, job_list, config, platform_, external, only_clone, job_count, verbose):
-    clone(name, body)
+    clone(name, body, verbose)
 
     if only_clone:
         return
@@ -274,7 +278,8 @@ def clean():
     """
 
     print('Cleaning...')
-    shutil.rmtree(EXTERNAL_DIR, ignore_errors=True)
+    shutil.rmtree(EXTERNAL_BUILD_DIR, ignore_errors=True)
+    shutil.rmtree(EXTERNAL_SRC_DIR, ignore_errors=True)
 
 
 def main(args=None):
