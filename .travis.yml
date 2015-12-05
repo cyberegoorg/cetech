@@ -9,8 +9,8 @@ cache:
   apt: true
   pip: true
   directories:
-  - ./external/build
-  - ./external/src
+  - ./externals/build
+  - ./externals/src
 
 addons:
   apt:
@@ -20,7 +20,7 @@ env: COMPILER=clang++-3.7
 
 install:
   - pip install pyyaml
-  - python externals.py -v
+  - python externals.py
   - python make.py --cxx=$COMPILER
 
 script:
