@@ -169,11 +169,11 @@ namespace cetech {
 
             _globals.data = new(p) LogData();
 
-            log::info("filesystem_globals", "Initialized");
+            log::info("log_globals", "Initialized");
         }
 
         void shutdown() {
-            log::info("filesystem_globals", "Shutdown");
+            log::info("log_globals", "Shutdown");
 
             _globals.data->~LogData();
             _globals = Globals();
