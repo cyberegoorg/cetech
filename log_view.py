@@ -59,6 +59,13 @@ LEVEL_TO_COLOR = {
 ARGS_PARSER = argparse.ArgumentParser(description='CETech yaml log view script', formatter_class=RawTextHelpFormatter)
 
 ARGS_PARSER.add_argument(
+        "logfile",
+        nargs='?',
+        help='Log file. \'-\' for stdin',
+        default='log.yaml',
+        type=argparse.FileType('r'))
+
+ARGS_PARSER.add_argument(
         "-i", "--info",
         help='Show info msg',
         action='store_true')
@@ -102,15 +109,13 @@ ARGS_PARSER.add_argument(
         type=argparse.FileType('w'))
 
 ARGS_PARSER.add_argument(
-        "logfile",
-        nargs='?',
-        help='Log file. \'-\' for stdin',
-        default='log.yaml',
-        type=argparse.FileType('r'))
-
-ARGS_PARSER.add_argument(
         "--no-color",
         help='Disable colors',
+        action='store_true')
+
+ARGS_PARSER.add_argument(
+        "--count",
+        help='Print log entry count',
         action='store_true')
 
 
@@ -157,6 +162,8 @@ def main(args=None):
     log_yaml = yaml.load_all(args.logfile.read())
 
     out = args.out
+    count = args.count
+    entry_count = 0
     for entry in log_yaml:
         level = entry['level']
         if level not in level_mask:
@@ -168,7 +175,14 @@ def main(args=None):
         if msg_re and not msg_re.match(entry['msg']):
             continue
 
+        if count:
+            entry_count += 1
+            continue
+
         out.write(LEVEL_TO_COLOR[level] % args.template.format(**entry).replace('\\n', '\n'))
+
+    if count:
+        print("count: %s" % entry_count)
 
 
 ########
