@@ -45,6 +45,8 @@ COLOR_YELLOW = "\x1B[33m"
 COLOR_BLUE = "\x1B[34m"
 COLOR_RESET = "\033[0m"
 
+COLORS = (COLOR_RED, COLOR_GREEN, COLOR_YELLOW, COLOR_BLUE, COLOR_RESET)
+
 LEVEL_TO_COLOR = {
     'info': COLOR_BLUE + "%s" + COLOR_RESET,
     'error': COLOR_RED + "%s" + COLOR_RESET,
@@ -159,7 +161,11 @@ def main(args=None):
     else:
         msg_re = None
 
-    log_yaml = yaml.load_all(args.logfile.read())
+    log_data = args.logfile.read()
+    for c in COLORS:
+        log_data = log_data.replace(c, '')
+
+    log_yaml = yaml.load_all(log_data)
 
     out = args.out
     count = args.count
