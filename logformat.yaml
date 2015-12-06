@@ -1,0 +1,30 @@
+template: |
+  ---
+  level: {level}
+  where: {where}
+  time: {time}
+  worker: {worker}
+  msg: |
+    {msg}
+
+args:
+  level: Log level
+  where: Where
+  time: Time
+  worker: Worker ID
+  msg: Message
+
+levels:
+  args: level
+  types:
+    - info
+    - error
+    - debug
+    - warning
+
+colors:
+  arg: level
+  info: blue
+  error: red
+  debug: green
+  warning: yellow

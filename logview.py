@@ -6,7 +6,7 @@
 ###########
 # IMPORTS #
 ########################################################################################################################
-
+import os
 import re
 import sys
 import argparse
@@ -17,47 +17,37 @@ import yaml
 ###########
 # GLOBALS #
 ########################################################################################################################
-TEMPLATE_ARGS = {
-    'level': 'Log level',
-    'where': 'Where',
-    'time': 'Time',
-    'worker': 'Worker ID',
-    'msg': 'Message'
-}
-
-TEMPLATE_ARGS_HELP = '\n\t'.join(["{%s} = %s" % (k, v) for k, v in TEMPLATE_ARGS.items()])
-
-PRINT_TEMPLATE = "---\n" \
-                 "level: {level}\n" \
-                 "where: {where}\n" \
-                 "time: {time}\n" \
-                 "worker: {worker}\n" \
-                 "msg: |\n" \
-                 "  {msg}"
 
 ##########
 # CONFIG #
 ########################################################################################################################
+with open(os.path.join('logformat.yaml'), 'r') as f:
+    CONFIG = yaml.load(f.read())
 
-COLOR_RED = "\x1B[31m"
-COLOR_GREEN = "\x1B[32m"
-COLOR_YELLOW = "\x1B[33m"
-COLOR_BLUE = "\x1B[34m"
-COLOR_RESET = "\033[0m"
+TEMPLATE_ARGS = CONFIG['args']
+TEMPLATE_ARGS_HELP = '\n\t'.join(["{%s} = %s" % (k, v) for k, v in TEMPLATE_ARGS.items()])
 
-COLORS = (COLOR_RED, COLOR_GREEN, COLOR_YELLOW, COLOR_BLUE, COLOR_RESET)
+PRINT_TEMPLATE = CONFIG['template'][:-1]
+LEVELS = CONFIG['levels']['types']
 
-LEVEL_TO_COLOR = {
-    'info': COLOR_BLUE + "%s" + COLOR_RESET,
-    'error': COLOR_RED + "%s" + COLOR_RESET,
-    'debug': COLOR_GREEN + "%s" + COLOR_RESET,
-    'warning': COLOR_YELLOW + "%s" + COLOR_RESET,
+COLORS = {
+    'red': "\x1B[31m",
+    'green': "\x1B[32m",
+    'yellow': "\x1B[33m",
+    'blue': "\x1B[34m",
+    'reset': "\033[0m"
 }
+
+LEVEL_TO_COLOR = {}
+for k, v in CONFIG['colors'].items():
+    if k == 'arg':
+        continue
+
+    LEVEL_TO_COLOR[k] = "%s%%s%s" % (COLORS[v], COLORS['reset'])
 
 ########
 # ARGS #
 ########################################################################################################################
-
 ARGS_PARSER = argparse.ArgumentParser(description='CETech yaml log view script', formatter_class=RawTextHelpFormatter)
 
 ARGS_PARSER.add_argument(
@@ -67,39 +57,21 @@ ARGS_PARSER.add_argument(
         default='log.yaml',
         type=argparse.FileType('r'))
 
-ARGS_PARSER.add_argument(
-        "-i", "--info",
-        help='Show info msg',
-        action='store_true')
+for v in LEVELS:
+    ARGS_PARSER.add_argument(
+            "-%s" % v[0], "--%s" % v,
+            help='Show %s msg' % v,
+            action='store_true')
 
-ARGS_PARSER.add_argument(
-        "-e", "--error",
-        help='Show error msg',
-        action='store_true')
-
-ARGS_PARSER.add_argument(
-        "-d", "--debug",
-        help='Show debug msg',
-        action='store_true')
-
-ARGS_PARSER.add_argument(
-        "-w", "--warn",
-        help='Show warning msg',
-        action='store_true')
-
-ARGS_PARSER.add_argument(
-        "--where",
-        help='Where regexp',
-        type=str)
-
-ARGS_PARSER.add_argument(
-        "--msg",
-        help='Message regexp',
-        type=str)
+for k, v in TEMPLATE_ARGS.items():
+    ARGS_PARSER.add_argument(
+            "--%s" % k,
+            help='%s regexp' % v,
+            type=str)
 
 ARGS_PARSER.add_argument(
         "-t", "--template",
-        help='Output template. Variables:\n\t%s' % TEMPLATE_ARGS_HELP,
+        help='Output template.\n  Variables:\n\t%s' % TEMPLATE_ARGS_HELP,
         default=PRINT_TEMPLATE,
         type=str)
 
@@ -134,32 +106,26 @@ def main(args=None):
         global LEVEL_TO_COLOR
         LEVEL_TO_COLOR = {k: "%s" for k, v in LEVEL_TO_COLOR.items()}
 
-    if not (args.info or args.error or args.debug or args.warn):
-        level_mask = {"info", "debug", "warning", "error"}
+    any_level_mask = False
+    for level in LEVELS:
+        attr = getattr(args, level)
+        if attr:
+            any_level_mask = True
+            break
 
-    else:
+    if any_level_mask:
         level_mask = set()
-        if args.info:
-            level_mask.add("info")
 
-        if args.debug:
-            level_mask.add("debug")
-
-        if args.warn:
-            level_mask.add("warning")
-
-        if args.error:
-            level_mask.add("error")
-
-    if args.where:
-        where_re = re.compile(args.where)
+        for level in LEVELS:
+            if getattr(args, level):
+                level_mask.add(level)
     else:
-        where_re = None
+        level_mask = LEVELS
 
-    if args.msg:
-        msg_re = re.compile(args.msg, re.MULTILINE)
-    else:
-        msg_re = None
+    arg_re = {}
+    for k, v in TEMPLATE_ARGS.items():
+        if getattr(args, k):
+            arg_re[k] = re.compile(getattr(args, k), re.MULTILINE | re.DOTALL)
 
     log_data = args.logfile.read()
     for c in COLORS:
@@ -171,14 +137,17 @@ def main(args=None):
     count = args.count
     entry_count = 0
     for entry in log_yaml:
+        skip = False
+        for k, v in arg_re.items():
+            if not v.match(str(entry[k])):
+                skip = True
+                break
+
+        if skip:
+            continue
+
         level = entry['level']
         if level not in level_mask:
-            continue
-
-        if where_re and not where_re.match(entry['where']):
-            continue
-
-        if msg_re and not msg_re.match(entry['msg']):
             continue
 
         if count:
