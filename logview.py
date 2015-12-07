@@ -59,7 +59,7 @@ ARGS_PARSER.add_argument(
 
 for v in LEVELS:
     ARGS_PARSER.add_argument(
-            "-%s" % v[0], "--%s" % v,
+            "--%s" % v,
             help='Show %s msg' % v,
             action='store_true')
 
