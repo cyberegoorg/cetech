@@ -17,11 +17,12 @@ import yaml
 ###########
 # GLOBALS #
 ########################################################################################################################
+ROOT_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)))
 
 ##########
 # CONFIG #
 ########################################################################################################################
-with open(os.path.join('logformat.yaml'), 'r') as f:
+with open(os.path.join(ROOT_DIR, 'logformat.yaml'), 'r') as f:
     CONFIG = yaml.load(f.read())
 
 TEMPLATE_ARGS = CONFIG['args']
