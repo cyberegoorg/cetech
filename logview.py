@@ -136,7 +136,14 @@ def main(args=None):
     out = args.out
     count = args.count
     entry_count = 0
+    template_format = args.template.format
+    out_write = out.write
+
     for entry in log_yaml:
+        level = entry['level']
+        if level not in level_mask:
+            continue
+
         skip = False
         for k, v in arg_re.items():
             if not v.match(str(entry[k])):
@@ -146,17 +153,14 @@ def main(args=None):
         if skip:
             continue
 
-        level = entry['level']
-        if level not in level_mask:
-            continue
-
         if count:
             entry_count += 1
             continue
 
-        out.write(LEVEL_TO_COLOR[level] % args.template.format(**entry).replace('\\n', '\n'))
+        out_write(LEVEL_TO_COLOR[level] % template_format(**entry))
 
     if count:
+        out_write = entry_count
         print("count: %s" % entry_count)
 
 
