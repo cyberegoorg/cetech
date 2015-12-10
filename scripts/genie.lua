@@ -153,7 +153,8 @@ function cetech_project(name, test)
             "SOIL",
             "sqlite3",
             "yaml",
-            "nanomsg"
+            "nanomsg",
+            "anl"
         }
 
         configuration "Release or Develop"

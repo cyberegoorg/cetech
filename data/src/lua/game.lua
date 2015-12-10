@@ -21,6 +21,8 @@ function Game:update(dt)
     local m_axis = Mouse.axis()
     --print("%f, %f", m_axis.x, m_axis.y)
     
+    print(dt)
+    
     if Keyboard.pressed(quit_btn) then
         print("q")
         Application.quit()

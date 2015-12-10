@@ -1,8 +1,12 @@
 import re
+from time import sleep
 
-from PyQt5.QtCore import QDateTime, Qt
+import nanomsg
+from PyQt5.QtCore import QDateTime, Qt, QThread
 from PyQt5.QtGui import QColor
 from PyQt5.QtWidgets import QFrame, QStyle, QTreeWidgetItem
+from nanomsg import Socket, SUB, SUB_SUBSCRIBE
+
 from playground.ui.logwidget import Ui_LogWidget
 
 RESOURCE_NAME_RE = re.compile("^\[([^\]]+)\]")
@@ -22,6 +26,28 @@ LOG_ICON = {
 }
 
 
+class LogSub(QThread):
+    def __init__(self, url):
+        self.socket = Socket(SUB)
+        self.url = url
+        super().__init__()
+
+    def run(self):
+        sleep(3)
+        self.socket.set_string_option(SUB, SUB_SUBSCRIBE, b'')
+        self.socket.connect(self.url)
+        while True:
+            try:
+                print('ddd')
+                data = self.socket.recv(flags=nanomsg.DONTWAIT)
+                print(data)
+            except nanomsg.NanoMsgAPIError as e:
+                print(e)
+                pass
+
+            QThread.msleep(10)
+
+
 class LogWidget(QFrame, Ui_LogWidget):
     def __init__(self, api, script_editor, ignore_where=None):
         """
@@ -38,7 +64,7 @@ class LogWidget(QFrame, Ui_LogWidget):
             self.set_ignore_where(ignore_where)
 
         self.api = api
-        self.api.register_handler('log', self.add_log)
+        # self.api.register_handler('log', self.add_log)
 
         self.log_tree_widget.header().setStretchLastSection(True)
 
@@ -86,4 +112,3 @@ class LogWidget(QFrame, Ui_LogWidget):
 
         resource_name = RESOURCE_NAME_RE.match(msg).group(1)
         self.script_editor.open_resource(resource_name)
-

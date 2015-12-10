@@ -242,26 +242,20 @@ namespace cetech {
             return (task->job_count == 1) && (task->depend ? _task_is_done(task->depend) : 1);
         }
 
-        CE_INLINE Task* try_pop(QueueMPMC < Task*,
-                                MAX_TASK >& q) {
+        CE_INLINE Task* try_pop(QueueMPMC < Task*, MAX_TASK >& q) {
             Task* poped_task;
 
-            size_t s = queuempmc::size(q);
-            do {
-                poped_task = queuempmc::pop(q);
-                if (poped_task != 0) {
-                    CE_ASSERT(poped_task->used);
+            poped_task = queuempmc::pop(q);
+            if (poped_task != 0) {
+                CE_ASSERT(poped_task->used);
 
-                    if (can_work_on(poped_task)) {
-                        return poped_task;
-                    } else {
-                        push_task(poped_task);
-                        //continue;
-                    }
+                if (can_work_on(poped_task)) {
+                    return poped_task;
+                } else {
+                    push_task(poped_task);
+                    //continue;
                 }
-
-                break;
-            } while (--s);
+            }
 
             return 0;
         }

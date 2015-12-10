@@ -6,7 +6,7 @@ from PyQt5.QtWidgets import QMainWindow, QDockWidget, QTabWidget
 from playground.assetbrowser import AssetBrowser
 from playground.engine.cetechproject import CetechProject
 from playground.engine.qtapi import QtConsoleAPI
-from playground.logwidget import LogWidget
+from playground.logwidget import LogWidget, LogSub
 from playground.ui.mainwindow import Ui_MainWindow
 from playground.recordeventwidget import RecordEventWidget
 from playground.scripteditor import ScriptEditor
@@ -68,7 +68,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.recorded_event_dock_widget.setWidget(self.recorded_event_widget)
         self.addDockWidget(Qt.RightDockWidgetArea, self.recorded_event_dock_widget)
 
-        #TODO bug #114 workaround. Disable create sub engine...
+        # TODO bug #114 workaround. Disable create sub engine...
         if platform.system().lower() != 'darwin':
             self.ogl_widget = CetechWidget(self, self.api)
             self.ogl_dock = QDockWidget(self)
@@ -107,14 +107,16 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.project.run_cetech(build_type=CetechProject.BUILD_DEBUG, compile_=True, continue_=True,
                                 wid=wid)
 
-
         self.api.start(QThread.LowPriority)
+
+        self.logsub = LogSub(b"tcp://localhost:5555")
+        self.logsub.start(QThread.LowPriority)
 
         self.assetb_widget.open_project(self.project.project_dir)
         self.assetb_dock_widget.show()
         self.log_dock_widget.show()
 
-        #TODO bug #114 workaround. Disable create sub engine...
+        # TODO bug #114 workaround. Disable create sub engine...
         if platform.system().lower() != 'darwin':
             self.ogl_dock.show()
 

@@ -15,7 +15,20 @@
 #include "rapidjson/stringbuffer.h"
 #include "rapidjson/error/en.h"
 
+#include "nanomsg/nn.h"
+#include "nanomsg/pubsub.h"
+
 #include "enet/enet.h"
+//class format;
+
+
+#define LOG_FORMAT "---\n"\
+                   "level: %s\n"\
+                   "where: %s\n"\
+                   "time: %ld\n"\
+                   "worker: %d\n"\
+                   "msg: |\n"\
+                   "  %s\n"
 
 namespace cetech {
     namespace {
@@ -50,19 +63,36 @@ namespace cetech {
             send_json_document(json_data);
         }
 
+        void nanolog_handler(const log::LogLevel::Enum level,
+                             const time_t time,
+                             const uint32_t worker_id,
+                             const char* where,
+                             const char* msg,
+                             void* data) {
+
+            static const char* level_to_str[] = { "I", "W", "E", "D" };
+
+            int socket = (intptr_t)data;
+            
+            static __thread char packet[4096];     //!< Final msg.
+            int len = snprintf(packet, 4096, LOG_FORMAT, level_to_str[level], where, time, worker_id, msg);
+            int bytes = nn_send (socket, packet, len, 0);
+            CE_ASSERT(bytes == len);
+        }
+        
         struct ConsoleServerData {
             ENetAddress server_addr;
             ENetHost* server_host;
-
+            
+            int log_socket;
+            
             Array < ENetPeer * > client_peer;
             Queue < int > peer_free_queue;
 
             Hash < command_clb_t > cmds;
 
-            ConsoleServerData(Allocator & allocator) : server_addr {
-                0, 0
-            }, server_host(0), client_peer(allocator), peer_free_queue(allocator),
-            cmds(allocator) {}
+            ConsoleServerData(Allocator & allocator) : server_addr {0, 0}, server_host(0),
+            log_socket(0), client_peer(allocator), peer_free_queue(allocator), cmds(allocator) {}
 
             ~ConsoleServerData() {
                 enet_host_destroy(server_host);
@@ -138,8 +168,15 @@ namespace cetech {
             data->server_addr.host = ENET_HOST_ANY;
             data->server_addr.port = cvars::console_server_port.value_i;
             data->server_host = enet_host_create(&data->server_addr, 32, 10, 0, 0);
-
+            
+            int socket = nn_socket (AF_SP, NN_PUB);
+            CE_ASSERT(socket >= 0);
+            CE_ASSERT(nn_bind (socket, "tcp://*:5555") >= 0);          
+            
+            data->log_socket = socket;            
+            
             log::register_handler(&console_server_handler);
+            log::register_handler(&nanolog_handler, (void*)(intptr_t)socket);
         }
 
 
