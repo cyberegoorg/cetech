@@ -22,23 +22,6 @@ namespace cetech {
 
         }
 
-        bool resource_to_json(rapidjson::Document& document) {
-            /* parse resouce json */
-            char tmp[resource_file.size() + 1];
-            memset(tmp, 0, resource_file.size() + 1);
-
-            read_resource_file(tmp);
-
-            document.Parse(tmp);
-            if (document.HasParseError()) {
-                log::error("resource_compiler", "[%s] Parse error: %s", filename, GetParseError_En(
-                               document.GetParseError()), document.GetErrorOffset());
-                return false;
-            }
-
-            return true;
-        }
-
         bool add_dependency(const char* path) {
             bdb.set_file(path, filesystem::file_mtime(SRC_DIR, path));
             bdb.set_file_depend(filename, path);
@@ -72,10 +55,6 @@ namespace cetech {
 
     CompilatorAPI::~CompilatorAPI() {
         delete _impl;
-    }
-
-    bool CompilatorAPI::resource_to_json(rapidjson::Document& document) {
-        return _impl->resource_to_json(document);
     }
 
     bool CompilatorAPI::add_dependency(const char* path) {

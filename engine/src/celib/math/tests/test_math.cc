@@ -22,7 +22,7 @@ TEST_CASE( "Math operation", "[math]" ) {
     }
 
     SECTION( "clamp()" ) {
-        float clamp = 0.0f;
+        float clamp;
 
         clamp = cetech::math::clamp(0.5f, 0.0f, 1.0f);
         REQUIRE( clamp == 0.5f );
@@ -35,7 +35,7 @@ TEST_CASE( "Math operation", "[math]" ) {
     }
 
     SECTION( "abs()" ) {
-        float abs = 0.0f;
+        float abs;
 
         abs = cetech::math::abs(1.0f);
         REQUIRE( abs == 1.0f );
@@ -96,7 +96,7 @@ TEST_CASE( "Math operation", "[math]" ) {
     }
 
     SECTION( "float_select()" ) {
-        float selected = 0.0f;
+        float selected;
 
         selected = cetech::math::float_select(2.0f, 1.0f, -1.0f);
         REQUIRE( selected == 1.0f );

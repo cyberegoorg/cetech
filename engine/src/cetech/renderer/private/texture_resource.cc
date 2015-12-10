@@ -6,14 +6,11 @@
 #include "celib/macros.h"
 #include "celib/string/stringid.inl.h"
 
-#include "rapidjson/document.h"
-#include "rapidjson/writer.h"
-#include "rapidjson/stringbuffer.h"
-#include "rapidjson/error/en.h"
+#include "yaml/yaml.h"
 
 #include "soil/SOIL.h"
 #include "cetech/renderer/private/image_DXT.h"
-#include <cetech/cvars/cvars.h>
+#include "cetech/cvars/cvars.h"
 
 namespace cetech {
     namespace resource_texture {
@@ -32,15 +29,64 @@ namespace cetech {
                      CompilatorAPI& compilator) {
             CE_UNUSED(filename);
 
-            rapidjson::Document document;
-            if (!compilator.resource_to_json(document)) {
-                return;
+            yaml_parser_t parser;
+            yaml_token_t token;
+            const char* input;
+            char full_input_path[1024] = {0};
+
+            char tmp[compilator.resource_file_size() + 1];
+            memset(tmp, 0, compilator.resource_file_size() + 1);
+
+            if (!yaml_parser_initialize(&parser)) {
+                fputs("Failed to initialize parser!\n", stderr);
             }
 
-            const char* input = document["input"].GetString();
+            compilator.read_resource_file(tmp);
+            yaml_parser_set_input_string(&parser, (unsigned char*)tmp, compilator.resource_file_size());
+
+            yaml_parser_scan(&parser, &token);
+            if (token.type != YAML_STREAM_START_TOKEN) {
+                log::error("resource_compiler.texture", "Invalid yaml");
+                goto clean_up;
+            }
+
+            yaml_parser_scan(&parser, &token);
+            if (token.type != YAML_BLOCK_MAPPING_START_TOKEN) {
+                log::error("resource_compiler.texture", "Root node must be maping");
+
+                goto clean_up;
+            }
+
+            // Input
+            yaml_parser_scan(&parser, &token);
+
+            if (token.type != YAML_KEY_TOKEN) {
+                log::error("resource_compiler.texture", "Need key");
+                goto clean_up;
+            }
+
+            yaml_parser_scan(&parser, &token);
+            if (token.type != YAML_SCALAR_TOKEN) {
+                log::error("resource_compiler.texture", "Need key");
+                goto clean_up;
+            }
+
+            // Value
+            yaml_parser_scan(&parser, &token);
+            if (token.type != YAML_VALUE_TOKEN) {
+                log::error("package_resource", "Need value");
+                goto clean_up;
+            }
+
+            yaml_parser_scan(&parser, &token);
+            if (token.type != YAML_SCALAR_TOKEN) {
+                log::error("package_resource", "Need sequence");
+                goto clean_up;
+            }
+
+            input = (const char*)token.data.scalar.value;
             compilator.add_dependency(input);
 
-            char full_input_path[1024] = {0};
             std::sprintf(full_input_path, "%s%s", cvars::rm_source_dir.value_str, input);
 
             unsigned char* data;
@@ -64,6 +110,10 @@ namespace cetech {
 
             compilator.write_to_build(&header, sizeof(Header));
             compilator.write_to_build(dds_data, dds_size);
+
+clean_up:
+            yaml_token_delete(&token);
+            yaml_parser_delete(&parser);
         }
 
         char* loader (FSFile& f,

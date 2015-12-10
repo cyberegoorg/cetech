@@ -4,8 +4,15 @@
 *.orig
 *.o
 
-external
-data/build
-.build/
 site/
+
+build/
+data/build
+
+externals/build
+externals/src
+
 .directory
+log.yaml
+
+__pycache__

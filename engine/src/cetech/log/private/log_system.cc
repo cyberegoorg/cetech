@@ -31,7 +31,9 @@ namespace cetech {
 
             LogData* data;
 
-            Globals() : data(0) {}
+            Globals() : buffer {
+                0
+            }, data(0) {}
         } _globals;
 
         void vlog(const LogLevel::Enum level,
@@ -167,11 +169,11 @@ namespace cetech {
 
             _globals.data = new(p) LogData();
 
-            log::info("filesystem_globals", "Initialized");
+            log::info("log_globals", "Initialized");
         }
 
         void shutdown() {
-            log::info("filesystem_globals", "Shutdown");
+            log::info("log_globals", "Shutdown");
 
             _globals.data->~LogData();
             _globals = Globals();

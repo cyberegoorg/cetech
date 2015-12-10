@@ -46,9 +46,9 @@ namespace cetech {
                 char daemon_mod : 1;
             } _flags;
 
-            ApplictionData() : _frame_id(0), _last_frame_ticks(0), _delta_time(0) {
-                _flags = {0, 0, 0};
-            }
+            ApplictionData() : _frame_id(0), _last_frame_ticks(0), _delta_time(0), _flags {
+                0, 0, 0
+            } {}
         };
 
         struct Globals {
@@ -57,7 +57,9 @@ namespace cetech {
 
             ApplictionData* data;
 
-            Globals() : data(0) {}
+            Globals() : buffer {
+                0
+            }, data(0) {}
         } _globals;
 
         void init_boot() {
@@ -252,8 +254,8 @@ namespace cetech {
                 keyboard::process_keyboard();
                 mouse_globals::process_mouse();
 
-                float dt = 0.0f;
-                uint32_t now_ticks = 0;
+                float dt;
+                uint32_t now_ticks;
 
                 now_ticks = get_ticks();
 
@@ -274,7 +276,7 @@ namespace cetech {
                     time::PerfTimer etime = develop_manager::enter_scope("Game::Update()");
                     lua_enviroment::call_global("update", "f", dt);
                     lua_enviroment::clean_temp();
-                    usleep(10 * 100);
+                    //usleep(10 * 100);
                     develop_manager::leave_scope("Game::Update()", etime);
                 }
 

@@ -12,7 +12,7 @@ from playground.engine.cetechproject import CetechProject
 class ScriptEditorWidget(QWebView):
     SUFIX_2_MODE = {
         'lua': 'ace/mode/lua',
-        None: 'ace/mode/json'
+        None: 'ace/mode/yaml'
     }
 
     def __init__(self, filename, parent=None):

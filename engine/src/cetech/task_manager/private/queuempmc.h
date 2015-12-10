@@ -20,7 +20,7 @@ namespace cetech {
         cacheline_pad_t pad1_;
         std::atomic < size_t > dequeue_pos;
         cacheline_pad_t pad2_;
-        T _task_ids[SIZE];
+        T _task_ids[SIZE]; // TODO:
         cacheline_pad_t pad3_;
 
         QueueMPMC() {
