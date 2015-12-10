@@ -7,6 +7,7 @@
 #include "celib/types.h"
 #include "celib/memory_types.h"
 
+#include <vector>
 
 /*******************************************************************************
 **** Containers
@@ -131,5 +132,6 @@ namespace cetech {
         **** Members variables
         ***********************************************************************/
         Array < char > stream;
+        std::vector< char > _stream;
     };
 }

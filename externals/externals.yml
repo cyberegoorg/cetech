@@ -330,7 +330,7 @@ nanomsg:
 
   install:
     include: &nanomsg_install_include
-      [src, include/sqlite3]
+      [src, include/nanomsg]
 
     lib: &nanomsg_install_lib
       [.libs/libnanomsg.a, lib]
