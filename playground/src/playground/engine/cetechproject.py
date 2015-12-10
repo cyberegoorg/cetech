@@ -12,8 +12,8 @@ def validate_project(project_dir):
                              QMessageBox.Yes, QMessageBox.Yes)
         return False
 
-    if not selected_dir.exists('src/config.json'):
-        QMessageBox.critical(None, 'Project validation error', 'Project dir does not contain src/config.json',
+    if not selected_dir.exists('src/config.yaml'):
+        QMessageBox.critical(None, 'Project validation error', 'Project dir does not contain src/config.yaml',
                              QMessageBox.Yes, QMessageBox.Yes)
         return False
 
@@ -76,7 +76,7 @@ class CetechProject(object):
             print("out:\n%s\n err:\n%s\n" % (out, err))
 
     def get_executable_path(self, build_type):
-        engine_bin_path = '../.build/'
+        engine_bin_path = '../build/'
 
         _platform = platform.system().lower()
         if _platform == 'darwin':

@@ -8,9 +8,13 @@
 #include "cetech/develop/console_server.h"
 #include "cetech/application/application.h"
 
-
-#define LOG_FORMAT_NO_TIME "[%s][%d][%s] %s"
-#define LOG_FORMAT  "[%s]" LOG_FORMAT_NO_TIME
+#define LOG_FORMAT "---\n"\
+                   "level: %s\n"\
+                   "where: %s\n"\
+                   "time: %s\n"\
+                   "worker: %d\n"\
+                   "msg: |\n"\
+                   "  %s\n"
 
 #define COLOR_RED  "\x1B[31m"
 #define COLOR_GREEN  "\x1B[32m"
@@ -18,18 +22,19 @@
 #define COLOR_BLUE  "\x1B[34m"
 #define COLOR_RESET "\033[0m"
 
+                  
 #ifdef CETECH_COLORED_LOG
   #define COLORED_TEXT(color, text) color text COLOR_RESET
 #else
   #define COLORED_TEXT(color, text) text
 #endif
 
-static const char* level_to_str[] = { "I", "W", "E", "D" };
+static const char* level_to_str[] = { "info", "warning", "error", "debug" };
 static const char* level_format[] = {
-    COLORED_TEXT(COLOR_BLUE, LOG_FORMAT_NO_TIME) "\n",          /* INFO    */
-    COLORED_TEXT(COLOR_YELLOW, LOG_FORMAT_NO_TIME) "\n",        /* WARNING */
-    COLORED_TEXT(COLOR_RED, LOG_FORMAT_NO_TIME) "\n",           /* ERROR   */
-    COLORED_TEXT(COLOR_GREEN, LOG_FORMAT_NO_TIME) "\n"          /* DEBUG   */
+    COLORED_TEXT(COLOR_BLUE, LOG_FORMAT),   /* INFO    */
+    COLORED_TEXT(COLOR_YELLOW, LOG_FORMAT), /* WARNING */
+    COLORED_TEXT(COLOR_RED, LOG_FORMAT),    /* ERROR   */
+    COLORED_TEXT(COLOR_GREEN, LOG_FORMAT)   /* DEBUG   */
 };
 
 namespace cetech {
@@ -53,6 +58,9 @@ namespace cetech {
 
             FILE* out;
 
+            std::tm* gmtm = std::gmtime(&time);
+            char* time_str = time_to_utc_str(gmtm);
+            
             switch (level) {
             case log::LogLevel::ERROR:
                 out = stderr;
@@ -64,7 +72,7 @@ namespace cetech {
             }
 
             flockfile(out);
-            fprintf(out, level_format[level], level_to_str[level], worker_id, where, msg);
+            fprintf(out, level_format[level], level_to_str[level], where, time_str, worker_id, msg);
             funlockfile(out);
         }
 
@@ -80,7 +88,7 @@ namespace cetech {
             char* time_str = time_to_utc_str(gmtm);
 
             flockfile(out);
-            fprintf(out, LOG_FORMAT "\n", time_str, level_to_str[level], worker_id, where, msg);
+            fprintf(out, LOG_FORMAT, level_to_str[level], where, time_str, worker_id, msg);
             fflush(out);
             funlockfile(out);
         }

@@ -70,14 +70,18 @@ namespace cetech {
             } flags;
 
             TaskManagerData(Allocator & allocator) : _workers(allocator),
+                                                     _workers_queue(nullptr),
                                                      _allocator(allocator),
-                                                     _open_task_count(0) {
+                                                     _open_task_count(0),
+                                                     flags {
+                0
+            } {
 
                 _open_task = (uint32_t*) allocator.allocate(sizeof(uint32_t) * MAX_TASK);
                 _task_pool = memory::alloc_array < Task > (allocator, MAX_TASK);
 
                 memset(_open_task, 0, sizeof(uint32_t) * MAX_TASK);
-                memset(_task_pool, 0, sizeof(Task) * MAX_TASK);
+                //memset(_task_pool, 0, sizeof(Task) * MAX_TASK);
             }
 
             ~TaskManagerData() {
@@ -100,7 +104,9 @@ namespace cetech {
 
             TaskManagerData* data;
 
-            Globals() : data(0) {}
+            Globals() : buffer {
+                0
+            }, data(0) {}
         } _globals;
 
         uint32_t _core_count() {

@@ -2,8 +2,9 @@
 
 #include <cstring>
 #include <cstdlib>
+#include <iostream>
 
-#include "rapidjson/document.h"
+#include "yaml/yaml.h"
 
 #include "celib/asserts.h"
 #include "cetech/cvar/cvar_types.h"
@@ -25,7 +26,8 @@ namespace cetech {
 
         CE_INLINE CVar* find(const char* name);
 
-        CE_INLINE void load_from_json(const rapidjson::Document& document);
+        CE_INLINE void load_from_yaml(const char* yaml_str,
+                                      const size_t len);
 
         CE_INLINE void dump_all();
     }
@@ -208,48 +210,100 @@ namespace cetech {
             return nullptr;
         }
 
-        void load_from_json(const rapidjson::Document& document) {
-            const rapidjson::Value& ar = document["cvars"];
+        void load_from_yaml(const char* yaml_str,
+                            const size_t len) {
+            yaml_parser_t parser;
+            yaml_token_t token;
+            const char* cvar_name;
+            const char* cvar_value;
 
-            for (rapidjson::Value::ConstMemberIterator itr = ar.MemberBegin(); itr != ar.MemberEnd(); ++itr) {
-                const rapidjson::Value& name = itr->name;
-                const rapidjson::Value& value = itr->value;
+            if (!yaml_parser_initialize(&parser)) {
+                log::error("cvar.load", "yaml: Failed to initialize parser!");
+            }
 
-                CVar* cvar = cvar::find(name.GetString());
+            yaml_parser_set_input_string(&parser, (unsigned char*)yaml_str, len);
+
+            // begin
+            yaml_parser_scan(&parser, &token);
+            if (token.type != YAML_STREAM_START_TOKEN) {
+                log::error("cvar.load", "Invalid yaml");
+                goto clean_up;
+            }
+
+            yaml_parser_scan(&parser, &token);
+            if (token.type != YAML_BLOCK_MAPPING_START_TOKEN) {
+                log::error("cvar.load", "Root node must be maping");
+                goto clean_up;
+            }
+
+            // overall types
+            do {
+                // Name
+                yaml_parser_scan(&parser, &token);
+
+                if (token.type == YAML_BLOCK_END_TOKEN) {
+                    break;
+                }
+
+                if (token.type != YAML_KEY_TOKEN) {
+                    log::error("cvar.load", "Need key");
+                    goto clean_up;
+                }
+
+                yaml_parser_scan(&parser, &token);
+                if (token.type != YAML_SCALAR_TOKEN) {
+                    log::error("cvar.load", "Need key");
+                    goto clean_up;
+                }
+
+                cvar_name = (const char*)token.data.scalar.value;
+
+                // Value
+                yaml_parser_scan(&parser, &token);
+                if (token.type != YAML_VALUE_TOKEN) {
+                    log::error("cvar.load", "Need value");
+                    goto clean_up;
+                }
+
+                yaml_parser_scan(&parser, &token);
+                if (token.type != YAML_SCALAR_TOKEN) {
+                    log::error("cvar.load", "Need value");
+                    goto clean_up;
+                }
+
+                cvar_value = (const char*)token.data.scalar.value;
+
+                CVar* cvar = cvar::find(cvar_name);
 
                 if (cvar == nullptr) {
-                    log::error("cvar", "Undefined cvar \"%s\"", name.GetString());
+                    log::error("cvar.load", "Undefined cvar \"%s\"", cvar_name);
                     continue;
                 }
 
-                /* INT */
-                if (value.IsInt()) {
-                    if (cvar->type != CVar::CVAR_INT) {
-                        log::error("cvar", "Invalid type for cvar \"%s\".", name.GetString());
-                        continue;
-                    }
-
-                    cvar_internal::force_set(*cvar, value.GetInt());
-
-                    /* FLOAT */
-                } else if (value.IsDouble()) {
-                    if (cvar->type != CVar::CVAR_FLOAT) {
-                        log::error("cvar", "Invalid type for cvar \"%s\".", name.GetString());
-                        continue;
-                    }
-
-                    cvar_internal::force_set(*cvar, (float)value.GetDouble());
-
-                    /* STR */
-                } else if (value.IsString()) {
-                    if (cvar->type != CVar::CVAR_STR) {
-                        log::error("cvar", "Invalid type for cvar \"%s\".", name.GetString());
-                        continue;
-                    }
-
-                    cvar_internal::force_set(*cvar, value.GetString());
+                switch (cvar->type) {
+                case CVar::CVAR_INT: {
+                    int i = 0;
+                    sscanf(cvar_value, "%d", &i);
+                    cvar_internal::force_set(*cvar, i);
                 }
-            }
+                break;
+
+                case CVar::CVAR_FLOAT: {
+                    float f = 0;
+                    sscanf(cvar_value, "%f", &f);
+                    cvar_internal::force_set(*cvar, f);
+                }
+                break;
+
+                case CVar::CVAR_STR:
+                    cvar_internal::force_set(*cvar, cvar_value);
+                    break;
+                }
+            } while (true);
+
+clean_up:
+            yaml_token_delete(&token);
+            yaml_parser_delete(&parser);
         }
 
         void dump_all() {

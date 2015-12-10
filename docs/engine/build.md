@@ -1,6 +1,6 @@
 # A co závislosti?
 
-V hlávním adresáři se nachází python skript [external.py](#external.py) který vše obstará.
+V hlávním adresáři se nachází python skript [externals.py](#externals.py) který vše obstará.
 
 ## externals.py
 
@@ -9,7 +9,7 @@ V hlávním adresáři se nachází python skript [external.py](#external.py) kt
 Připravý všechny závislosti pro aktuální [platformu](#podporovane-platformy) v konfiguraci [develop](#develop)
 
 ```bash
-$ python external.py
+$ python externals.py
 ```
 
 # Jak to zkompilovat?

@@ -29,15 +29,14 @@
 #include <unistd.h>
 #include <csignal>
 
-#include "rapidjson/error/en.h"
-
 using namespace cetech;
 
 /*******************************************************************************
-**** PSOIX
+**** POSIX
 *******************************************************************************/
 
-#if CETECH_LINUX
+#if defined(CETECH_LINUX)
+
 void posix_signal_handler(int sig) {
     switch (sig) {
     case SIGKILL:
@@ -141,26 +140,26 @@ void register_resources() {
 /*******************************************************************************
 **** Load config.
 *******************************************************************************/
-void load_config_json() {
-    FSFile& f = filesystem::open(BUILD_DIR, "config.json", FSFile::READ);
+void load_config_yaml() {
+    FSFile& f = filesystem::open(BUILD_DIR, "config.yaml", FSFile::READ);
 
     const uint64_t f_sz = f.size();
-    void* mem = memory_globals::default_allocator().allocate(f_sz + 1);
+    char* mem = (char*)memory_globals::default_allocator().allocate(f_sz + 1);
     memset(mem, 0, f_sz + 1);
     f.read(mem, f_sz);
     filesystem::close(f);
 
-    rapidjson::Document document;
-    document.Parse((const char*)mem);
-    if (document.HasParseError()) {
-        log::error("main", "Parse config.json error: %s", GetParseError_En(
-                       document.GetParseError()), document.GetErrorOffset());
-        abort();
-    }
+    //     YAML::Node document;
+    //     try {
+    //         document = YAML::Load(mem);
+    //     } catch(YAML::ParserException & e) {
+    //         log::error("main", "Parse config.yaml error: %s", e.what());
+    //         memory_globals::default_allocator().deallocate(mem);
+    //         abort();
+    //     }
 
+    cvar::load_from_yaml(mem, f_sz);
     memory_globals::default_allocator().deallocate(mem);
-
-    cvar::load_from_json(document);
 }
 
 /*******************************************************************************
@@ -168,12 +167,16 @@ void load_config_json() {
 *******************************************************************************/
 bool big_init() {
 
-#if CETECH_LINUX
+#if defined(CETECH_LINUX)
     posix_init();
 #endif
 
     log_globals::init();
     log::register_handler(&log::stdout_handler);
+    
+    FILE* log = fopen("log.yaml", "w");
+    log::register_handler(&log::file_handler, log);
+    
 
     memory_globals::init();
     filesystem_globals::init();
@@ -224,7 +227,7 @@ bool big_init() {
 
 #endif
 
-    load_config_json();
+    load_config_yaml();
 
     mouse_globals::init();
     package_manager_globals::init();

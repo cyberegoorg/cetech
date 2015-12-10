@@ -1,5 +1,2 @@
-{
-  "lua" : [
-    "lua/foo"
-  ]
-}
+lua:
+  - lua/foo

@@ -11,7 +11,7 @@
 CETech is Data-Driven [game engine](https://en.wikipedia.org/wiki/Game_engine) and toolbox inspired by [Bitsquid](http://bitsquid.blogspot.se/)/[Stingray](http://stingrayengine.com/) engine.
 
 * [Release notes](http://cyberegoorg.github.io/cetech/about/release-notes)
-* [Documentation](http://cyberegoorg.github.io/cetech) (temporarily in czech language)
+* [Documentation](http://cyberegoorg.github.io/cetech) work in progress, temporarily in czech language
 
 ![Prototyp](docs/img/prototyp.png)
 
@@ -44,11 +44,12 @@ CETech is Data-Driven [game engine](https://en.wikipedia.org/wiki/Game_engine) a
 * [catch](https://github.com/philsquared/Catch) -  Multi-paradigm automated test framework for C++.
 * [SOIL](http://www.lonesock.net/soil.html ) - Simple OpenGL Image Library.
 * [sqlite3](https://www.sqlite.org/) - SQL database engine.
+* [libyaml](https://github.com/yaml/libyaml.git) - C YAML parser.
 * [python](https://www.python.org/) - Multi-paradigm Programming language.
 * [pyaml](http://pyyaml.org/wiki/PyYAML) - YAML parser and emitter for Python.
 * [Qt](https://www.qt.io/) - Cross-platform GUI library.
 * [PyQT](https://www.riverbankcomputing.com/software/pyqt/intro) - Python QT binding
-* [Ace](https://ace.c9.io/) - JavaScript editor.
+* [Ace](https://ace.c9.io/) - JavaScript editor library.
 * [GoJS](http://gojs.net/) - JavaScript diagram library.
 
 ## Building
@@ -91,7 +92,7 @@ $ cd ..
 * Download and build externals.
 
 ```bash
-$ python external.py
+$ python externals.py
 ```
 
 * Build engine
