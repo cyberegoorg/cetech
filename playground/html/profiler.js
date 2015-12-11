@@ -62,4 +62,19 @@ function update() {
 
 document.getElementById('draw').onclick = update;
 
+function ab2str(buf) {
+    return String.fromCharCode.apply(null, new Uint8Array(buf));
+}
+ws = new WebSocket("ws://localhost:5555", "pub.sp.nanomsg.org");
+ws.binaryType = "arraybuffer";
+ws.onopen = function () {
+    console.log("opend");
+};
+ws.onclosed = function () {
+    console.log("closed");
+};
+ws.onmessage = function (evt) {
+    console.log(ab2str(evt.data));
+};
+
 //setInterval(update, 1000)
