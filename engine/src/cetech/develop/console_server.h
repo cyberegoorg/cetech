@@ -5,6 +5,7 @@
 *******************************************************************************/
 
 #include "celib/memory_types.h"
+#include "celib/container_types.h"
 #include "rapidjson/document.h"
 
 /*******************************************************************************
@@ -45,9 +46,10 @@ namespace cetech {
                               const command_clb_t clb);
 
         /***********************************************************************
-        **** Send json document.
+        **** Send message.
         ***********************************************************************/
-        void send_json_document(const rapidjson::Document& document);
+        void send_msg(const char* msg,
+                      const size_t len);
     }
 
     /***************************************************************************

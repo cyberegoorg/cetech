@@ -108,7 +108,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.project.run_cetech(build_type=CetechProject.BUILD_DEBUG, compile_=True, continue_=True,
                                 wid=wid)
 
-        self.api.start(QThread.LowPriority)
+        #self.api.start(QThread.LowPriority)
         self.logsub.start(QThread.LowPriority)
 
         self.assetb_widget.open_project(self.project.project_dir)

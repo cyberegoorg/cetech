@@ -15,12 +15,12 @@ def main():
     ret = pm.exec()
 
     if ret == pm.Accepted:
-        name, dir = pm.open_project_name, pm.open_project_dir
+        name, directory = pm.open_project_name, pm.open_project_dir
 
         mw = MainWindow()
         mw.show()
         mw.focusWidget()
-        mw.open_project(name, dir)
+        mw.open_project(name, directory)
 
         sys.exit(app.exec_())
 
