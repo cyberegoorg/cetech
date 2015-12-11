@@ -134,6 +134,7 @@ namespace cetech {
                 }
 
                 events.PushBack(json_data, allocator);
+                
                 it = eventstream::next(_globals.data->stream, it);
             }
 
