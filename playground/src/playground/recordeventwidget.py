@@ -14,7 +14,7 @@ class RecordEventWidget(QFrame, Ui_RecordEventsWidget):
         self.setupUi(self)
 
         self.api = api
-        self.api.register_handler('debug_event', self.debug_event)
+        #self.api.register_handler('debug_event', self.debug_event)
 
         page = self.profile_webview.page()
         page.settings().setAttribute(QWebSettings.DeveloperExtrasEnabled, True)
@@ -118,7 +118,7 @@ class RecordEventWidget(QFrame, Ui_RecordEventsWidget):
                     return temp
 
                 delta_ms = diff_time(t_s, t_e)[1] / 1000000
-                label = "%s: %fms, depth: %d" % (name, delta_ms, depth)
+                label = "{0}: %fms, depth: %d".format(name, delta_ms, depth)
 
                 self.profile_data[frame_id].append({
                     "content": label,

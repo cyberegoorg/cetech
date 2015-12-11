@@ -20,10 +20,10 @@ namespace cetech {
         **** Platform enum.
         ***********************************************************************/
         enum Platform {
-            PLATFORM_NONE = 0,
             PLATFORM_LINUX,
             PLATFORM_DARWIN,
             PLATFORM_WINDOWS,
+            PLATFORM_ANDROID,
         };
 
         /***********************************************************************

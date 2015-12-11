@@ -79,6 +79,7 @@ class LogWidget(QFrame, Ui_LogWidget):
         return m is not None
 
     def add_log(self, time, level, worker, where, msg):
+        #print(time, level, worker, where, msg)
         if self._is_ignored(where):
             return
 

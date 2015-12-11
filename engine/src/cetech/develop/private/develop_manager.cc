@@ -13,12 +13,15 @@
 
 #include "rapidjson/document.h"
 
+#include "nanomsg/nn.h"
+#include "nanomsg/pubsub.h"
+
 namespace cetech {
     namespace {
         using namespace develop_manager;
 
         typedef void (* to_json_fce_t)(const void*,
-                                       rapidjson::Document&);
+                                       Array<char>& buffer);
 
         static thread_local char _stream_buffer[64 * 1024] = {0};
         static thread_local uint32_t _stream_buffer_count = 0;
@@ -100,17 +103,11 @@ namespace cetech {
         }
 
         void send_buffer() {
-            if (!console_server::has_clients() || eventstream::empty(_globals.data->stream)) {
+            if (eventstream::empty(_globals.data->stream)) {
                 return;
             }
-
-            rapidjson::Document data;
-            data.SetObject();
-
-            rapidjson::Value events(rapidjson::kArrayType);
-            rapidjson::Document::AllocatorType& allocator = data.GetAllocator();
-
-            data.AddMember("type", "debug_event", allocator);
+            
+            Array<char> buffer(memory_globals::default_allocator());
 
             eventstream::event_it it = 0;
             while (eventstream::valid(_globals.data->stream, it)) {
@@ -121,25 +118,26 @@ namespace cetech {
                                         (EventType)header->type,
                                         "NONE");
                 //CE_ASSERT(header->type > 0);
-
-                rapidjson::Document json_data;
-                json_data.SetObject();
-
-                json_data.AddMember("etype", rapidjson::Value(type_str, strlen(type_str)), allocator);
-
-                to_json_fce_t to_json_fce = hash::get < to_json_fce_t >
-                                            (_globals.data->to_json, header->type, nullptr);
-                if (to_json_fce) {
-                    to_json_fce(eventstream::event < void* > (_globals.data->stream, it), json_data);
+               
+                char etype_buffer[256] = {0};
+                size_t len = snprintf(etype_buffer, 256, "  - etype: %s\n", type_str);
+                array::push(buffer, etype_buffer, len);
+                                
+                to_json_fce_t to_json_fce = hash::get < to_json_fce_t > (_globals.data->to_json, header->type, nullptr);
+                
+                if(to_json_fce) {
+                    to_json_fce(eventstream::event < void* > (_globals.data->stream, it), buffer);
                 }
-
-                events.PushBack(json_data, allocator);
+                //CE_ASSERT(to_json_fce);
                 
                 it = eventstream::next(_globals.data->stream, it);
             }
 
-            data.AddMember("events", events, allocator);
-            console_server::send_json_document(data);
+            array::push_back(buffer, '\0');
+            
+            char buf[4096] = {0};
+            size_t len = snprintf(buf, 4096, "events:\n%s", array::begin(buffer));
+            console_server::send_msg(buf, len);
         }
 
         void push_begin_frame() {
@@ -226,47 +224,74 @@ namespace cetech {
         }
 
         static void beginframe_to_json(const void* event,
-                                       rapidjson::Document& document) {
+                                       Array<char>& buffer) {
             BeginFrameEvent* e = (BeginFrameEvent*)event;
-            document.AddMember("time", time::get_sec(e->time), document.GetAllocator());
-            document.AddMember("time_ns", time::get_nsec(e->time), document.GetAllocator());
-            document.AddMember("frame_id", e->frame_id, document.GetAllocator());
+            
+            char buf[4096] = {0};
+            
+            static char format[] = "    time: %ld\n"
+                                   "    time_ns: %ld\n"
+                                   "    frame_id: %d\n";
+            
+            size_t len = snprintf(buf, 4096, format, time::get_sec(e->time),  time::get_nsec(e->time), e->frame_id);
+            array::push(buffer, buf, len);
         }
 
         static void endframe_to_json(const void* event,
-                                     rapidjson::Document& document) {
+                                     Array<char>& buffer) {
             EndFrameEvent* e = (EndFrameEvent*)event;
-            document.AddMember("time", time::get_sec(e->time), document.GetAllocator());
-            document.AddMember("time_ns", time::get_nsec(e->time), document.GetAllocator());
-            document.AddMember("frame_id", e->frame_id, document.GetAllocator());
+            
+            char buf[4096] = {0};
+            
+            static const char format[] = "    time: %ld\n"
+                                         "    time_ns: %ld\n"
+                                         "    frame_id: %d\n";
+            
+            size_t len = snprintf(buf, 4096, format, time::get_sec(e->time),  time::get_nsec(e->time), e->frame_id);
+            array::push(buffer, buf, len);
         }
 
         static void begintask_to_json(const void* event,
-                                      rapidjson::Document& document) {
+                                      Array<char>& buffer) {
             ScopeEvent* e = (ScopeEvent*)event;
 
-            document.AddMember("name", rapidjson::Value(e->name, strlen(e->name)), document.GetAllocator());
-            document.AddMember("frame_id", e->frame_id, document.GetAllocator());
-
-            document.AddMember("start", time::get_sec(e->start), document.GetAllocator());
-            document.AddMember("start_ns", time::get_nsec(e->start), document.GetAllocator());
-
-            document.AddMember("end", time::get_sec(e->end), document.GetAllocator());
-            document.AddMember("end_ns", time::get_nsec(e->end), document.GetAllocator());
-
-            document.AddMember("worker_id", e->worker_id, document.GetAllocator());
-            document.AddMember("depth", e->depth, document.GetAllocator());
+            char buf[4096] = {0};
+            static const char format[] = "    name: %s\n"
+                                         "    frame_id: %d\n"
+                                         "    start: %ld\n"
+                                         "    start_ns: %ld\n"
+                                         "    end: %ld\n"
+                                         "    end_ns: %ld\n"
+                                         "    worker_id: %d\n"
+                                         "    depth: %d\n";
+            
+            size_t len = snprintf(buf, 4096, format,
+                                  e->name,
+                                  e->frame_id,
+                                  time::get_sec(e->start),
+                                  time::get_nsec(e->start),
+                                  time::get_sec(e->end),
+                                  time::get_nsec(e->end),
+                                  e->worker_id,
+                                  e->depth);
+            
+            array::push(buffer, buf, len);
         }
 
         static void recordfloat_to_json(const void* event,
-                                        rapidjson::Document& document) {
+                                        Array<char>& buffer) {
             RecordFloatEvent* e = (RecordFloatEvent*)event;
 
-            document.AddMember("name", rapidjson::Value(e->name, strlen(e->name)), document.GetAllocator());
-            document.AddMember("value", e->value, document.GetAllocator());
+            char buf[4096] = {0};
+            static const char format[] = "    name: %s\n"
+                                         "    value: %f\n";
+            
+            size_t len = snprintf(buf, 4096, format,
+                                  e->name,
+                                  e->value);
+            
+            array::push(buffer, buf, len);
         }
-
-
     }
 
     namespace develop_manager_globals {
@@ -278,10 +303,8 @@ namespace cetech {
 
             register_type(EVENT_BEGIN_FRAME, "EVENT_BEGIN_FRAME", beginframe_to_json);
             register_type(EVENT_END_FRAME, "EVENT_END_FRAME", endframe_to_json);
-
             register_type(EVENT_SCOPE, "EVENT_SCOPE", begintask_to_json);
             //register_type(EVENT_LEAVE_SCOPE, "EVENT_LEAVE_SCOPE", endtask_to_json);
-
             register_type(EVENT_RECORD_FLOAT, "EVENT_RECORD_FLOAT", recordfloat_to_json);
         }
 

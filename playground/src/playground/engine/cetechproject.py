@@ -88,7 +88,7 @@ class CetechProject(object):
 
         return os.path.join(engine_bin_path, platform_dir, 'bin', exec_name)
 
-    def run_cetech(self, build_type, compile_=False, continue_=False, wait=True, daemon=False, port=None, wid=None,
+    def run_cetech(self, build_type, compile_=False, continue_=False, wait=False, daemon=False, port=None, wid=None,
                    core_dir=None):
         args = [
             "-s %s" % self.source_dir,
