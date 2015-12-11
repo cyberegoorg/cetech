@@ -45,9 +45,11 @@ CETech is Data-Driven [game engine](https://en.wikipedia.org/wiki/Game_engine) a
 * [SOIL](http://www.lonesock.net/soil.html ) - Simple OpenGL Image Library.
 * [sqlite3](https://www.sqlite.org/) - SQL database engine.
 * [libyaml](https://github.com/yaml/libyaml.git) - C YAML parser.
+* [nanomsg](http://nanomsg.org/) - Socket library that provides several common communication patterns.
 * [python](https://www.python.org/) - Multi-paradigm Programming language.
 * [pyaml](http://pyyaml.org/wiki/PyYAML) - YAML parser and emitter for Python.
 * [Qt](https://www.qt.io/) - Cross-platform GUI library.
+* [python-nanomsg](https://github.com/tonysimpson/nanomsg-python) - Nanomsg python binding.
 * [PyQT](https://www.riverbankcomputing.com/software/pyqt/intro) - Python QT binding
 * [Ace](https://ace.c9.io/) - JavaScript editor library.
 * [GoJS](http://gojs.net/) - JavaScript diagram library.
