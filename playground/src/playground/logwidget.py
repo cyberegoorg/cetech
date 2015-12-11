@@ -1,11 +1,12 @@
 import re
-from time import sleep
+
 import nanomsg
 import yaml
 from PyQt5.QtCore import QDateTime, Qt, QThread
 from PyQt5.QtGui import QColor
 from PyQt5.QtWidgets import QFrame, QStyle, QTreeWidgetItem
-from nanomsg import Socket, SUB, SUB_SUBSCRIBE
+from nanomsg import Socket, SUB, SUB_SUBSCRIBE, DONTWAIT
+
 from playground.ui.logwidget import Ui_LogWidget
 
 RESOURCE_NAME_RE = re.compile("^\[([^\]]+)\]")
@@ -36,7 +37,7 @@ class LogSub(QThread):
         self.handlers.append(handler)
 
     def run(self):
-        self.socket.set_string_option(SUB, SUB_SUBSCRIBE, b'')
+        self.socket.set_string_option(SUB, SUB_SUBSCRIBE, b'---')
         self.socket.connect(self.url)
 
         while True:

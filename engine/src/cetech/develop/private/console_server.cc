@@ -171,7 +171,7 @@ namespace cetech {
             
             int socket = nn_socket (AF_SP, NN_PUB);
             CE_ASSERT(socket >= 0);
-            CE_ASSERT(nn_bind (socket, "tcp://*:5555") >= 0);          
+            CE_ASSERT(nn_bind (socket, "ws://*:5555") >= 0);          
             
             data->log_socket = socket;            
             
