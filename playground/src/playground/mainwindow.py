@@ -45,7 +45,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.script_editor_dock_widget.setWidget(self.script_editor_widget)
         self.addDockWidget(Qt.TopDockWidgetArea, self.script_editor_dock_widget)
 
-        self.log_widget = LogWidget(self.api, self.script_editor_widget)
+        self.logsub = LogSub(b"tcp://localhost:5555")
+        self.log_widget = LogWidget(self.script_editor_widget, self.logsub)
         self.log_dock_widget = QDockWidget(self)
         self.log_dock_widget.hide()
         self.log_dock_widget.setWindowTitle("Log")
@@ -108,8 +109,6 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                                 wid=wid)
 
         self.api.start(QThread.LowPriority)
-
-        self.logsub = LogSub(b"tcp://localhost:5555")
         self.logsub.start(QThread.LowPriority)
 
         self.assetb_widget.open_project(self.project.project_dir)
