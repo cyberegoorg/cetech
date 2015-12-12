@@ -20,7 +20,7 @@ namespace cetech {
     namespace {
         using namespace develop_manager;
 
-        typedef void (* to_json_fce_t)(const void*,
+        typedef void (* to_yaml_fce_t)(const void*,
                                        Array<char>& buffer);
 
         static thread_local char _stream_buffer[64 * 1024] = {0};
@@ -29,14 +29,18 @@ namespace cetech {
         static thread_local uint32_t _scope_depth = 0;
 
         struct DevelopManagerData {
-            Spinlock lock;
-            EventStream stream;
-            Hash < to_json_fce_t > to_json;
+            Hash < to_yaml_fce_t > to_yaml;
             Hash < const char* > type_to_string;
+            Array<char> buffer;
+            EventStream stream;
+            Spinlock lock;
 
-            DevelopManagerData(Allocator & allocator) : stream(allocator), to_json(allocator),
-                                                        type_to_string(allocator) {
+            DevelopManagerData(Allocator & allocator) : to_yaml(allocator),
+                                                        type_to_string(allocator),
+                                                        buffer(allocator),
+                                                        stream(allocator) {
                 array::set_capacity(stream.stream, 4096);
+                array::set_capacity(buffer, 4096);
             }
             ~DevelopManagerData() {}
 
@@ -97,8 +101,8 @@ namespace cetech {
 
         void register_type(EventType type,
                            const char* type_str,
-                           to_json_fce_t fce) {
-            hash::set(_globals.data->to_json, type, fce);
+                           to_yaml_fce_t fce) {
+            hash::set(_globals.data->to_yaml, type, fce);
             hash::set(_globals.data->type_to_string, type, type_str);
         }
 
@@ -107,7 +111,10 @@ namespace cetech {
                 return;
             }
             
-            Array<char> buffer(memory_globals::default_allocator());
+            Array<char>& buffer = _globals.data->buffer;
+            array::clear(buffer);
+            
+            array::push(buffer, "#develop_manager\nevents:\n", sizeof("#develop_manager\nevents:\n"));
 
             eventstream::event_it it = 0;
             while (eventstream::valid(_globals.data->stream, it)) {
@@ -117,27 +124,22 @@ namespace cetech {
                                        (_globals.data->type_to_string,
                                         (EventType)header->type,
                                         "NONE");
-                //CE_ASSERT(header->type > 0);
-               
+
                 char etype_buffer[256] = {0};
                 size_t len = snprintf(etype_buffer, 256, "  - etype: %s\n", type_str);
                 array::push(buffer, etype_buffer, len);
                                 
-                to_json_fce_t to_json_fce = hash::get < to_json_fce_t > (_globals.data->to_json, header->type, nullptr);
-                
-                if(to_json_fce) {
-                    to_json_fce(eventstream::event < void* > (_globals.data->stream, it), buffer);
-                }
-                //CE_ASSERT(to_json_fce);
+                to_yaml_fce_t to_json_fce = hash::get < to_yaml_fce_t > (_globals.data->to_yaml, header->type, nullptr);
+                CE_ASSERT(to_json_fce);
+
+                to_json_fce(eventstream::event < void* > (_globals.data->stream, it), buffer);
+
                 
                 it = eventstream::next(_globals.data->stream, it);
             }
 
             array::push_back(buffer, '\0');
-            
-            char buf[4096] = {0};
-            size_t len = snprintf(buf, 4096, "#develop_manager\nevents:\n%s", array::begin(buffer));
-            console_server::send_msg(buf, len);
+            console_server::send_msg(array::begin(buffer), array::size(buffer));
         }
 
         void push_begin_frame() {
