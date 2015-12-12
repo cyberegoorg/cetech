@@ -88,7 +88,7 @@ class ScriptEditor(QMainWindow, Ui_MainWindow):
         self.project_manager = project_manager
         self.api = api
 
-        self.api.register_handler('autocomplete_list', self.update_autocomplete)
+        # self.api.register_handler('autocomplete_list', self.update_autocomplete)
 
         self.TYPE_ICONS = {
             0: QPixmap(":code-function"),

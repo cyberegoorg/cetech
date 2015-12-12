@@ -1,5 +1,5 @@
 var container = document.getElementById('vizu');
-var frame_id = document.getElementById('frame_id');
+//var frame_id = document.getElementById('frame_id');
 // Create a DataSet (allows two way data-binding)
 
 var items = new vis.DataSet();
@@ -106,9 +106,9 @@ ws.onmessage = function (evt) {
                     depth: event.depth
                 }
 
-                items.clear();
-                items.add(item);
-                timeline.fit();
+                //items.clear();
+                //items.add(item);
+                //timeline.fit();
 
             }
 

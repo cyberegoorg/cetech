@@ -4,8 +4,8 @@ import platform
 from PyQt5.QtCore import QThread, Qt, QFileSystemWatcher, QDirIterator
 from PyQt5.QtWidgets import QMainWindow, QDockWidget, QTabWidget
 from playground.assetbrowser import AssetBrowser
+from playground.engine.api import ConsoleAPI
 from playground.engine.cetechproject import CetechProject
-from playground.engine.qtapi import QtConsoleAPI
 from playground.logwidget import LogWidget, LogSub
 from playground.ui.mainwindow import Ui_MainWindow
 from playground.recordeventwidget import RecordEventWidget
@@ -33,7 +33,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
         self.project = CetechProject()
 
-        self.api = QtConsoleAPI(self.console_address, self.console_port)
+        self.api = ConsoleAPI(b"ws://localhost:5557")
 
         self.setTabPosition(Qt.AllDockWidgetAreas, QTabWidget.North)
 
@@ -73,6 +73,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         if platform.system().lower() != 'darwin':
             self.ogl_widget = CetechWidget(self, self.api)
             self.ogl_dock = QDockWidget(self)
+            self.ogl_dock.setWindowTitle("Engine View")
             self.ogl_dock.hide()
             self.ogl_dock.setWidget(self.ogl_widget)
             self.addDockWidget(Qt.TopDockWidgetArea, self.ogl_dock)
@@ -174,14 +175,5 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
     def closeEvent(self, evnt):
         self.api.disconnect()
-
         self.project.killall_process()
-
-        self.statusbar.showMessage("Disconnecting ...")
-
-        while self.api.connected:
-            self.api.tick()
-
-        self.statusbar.showMessage("Disconnected")
-
         evnt.accept()

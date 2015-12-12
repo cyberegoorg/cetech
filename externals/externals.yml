@@ -338,11 +338,15 @@ nanomsg:
     linux64:
       - copytree: *nanomsg_install_include
       - copy: *nanomsg_install_lib
+      - copy: [.libs/libnanomsg.so, dynlib]
 
     linux32:
       - copytree: *nanomsg_install_include
       - copy: *nanomsg_install_lib
+      - copy: [.libs/libnanomsg.so, dynlib]
 
     darwin64:
       - copytree: *nanomsg_install_include
       - copy: *nanomsg_install_lib
+      - copy: [.libs/libnanomsg.so, dynlib]
+

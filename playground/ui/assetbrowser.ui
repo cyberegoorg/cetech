@@ -55,7 +55,7 @@
        <bool>true</bool>
       </property>
       <property name="dragDropMode">
-       <enum>QAbstractItemView::DragDrop</enum>
+       <enum>QAbstractItemView::NoDragDrop</enum>
       </property>
       <property name="movement">
        <enum>QListView::Static</enum>
