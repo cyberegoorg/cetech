@@ -91,7 +91,7 @@ ws.onmessage = function (evt) {
     //var yaml = require('js-yaml');
 
     var data = ab2str(evt.data);
-    if (data.indexOf("#develop_manager") == -1) {
+    if (data.indexOf("#develop_manager") != 0) {
         return
     }
 
@@ -112,15 +112,10 @@ ws.onmessage = function (evt) {
                     depth: event.depth
                 };
 
-
-                if (items.length < 20) {
-                    if (data_window.length > 20) {
-                        items.add(item);
-                        timeline.fit();
-                    } else {
-                        data_window.push(item);
-                    }
+                if (data_window.length > 20) {
+                    data_window.shift();
                 }
+                data_window.push(item);
             }
 
             //console.log(entry);

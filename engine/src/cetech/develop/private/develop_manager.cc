@@ -113,9 +113,10 @@ namespace cetech {
             
             Array<char>& buffer = _globals.data->buffer;
             array::clear(buffer);
-            
-            array::push(buffer, CSTR_TO_ARG("#develop_manager\nevents:\n"));
 
+            char buf[256];      
+            array::push(buffer, buf, snprintf(buf, 256, "#develop_manager\nevents:\n"));
+            
             eventstream::event_it it = 0;
             while (eventstream::valid(_globals.data->stream, it)) {
                 eventstream::Header* header = eventstream::header(_globals.data->stream, it);
@@ -125,9 +126,7 @@ namespace cetech {
                                         (EventType)header->type,
                                         "NONE");
 
-                array::push(buffer, CSTR_TO_ARG("  - etype: "));
-                array::push(buffer, STR_TO_ARG(type_str));
-                array::push(buffer, CSTR_TO_ARG("\n"));
+                array::push(buffer, buf, snprintf(buf, 256, "  - etype: %s\n", type_str));
                                 
                 to_yaml_fce_t to_json_fce = hash::get < to_yaml_fce_t > (_globals.data->to_yaml, header->type, nullptr);
                 CE_ASSERT(to_json_fce);
@@ -137,7 +136,6 @@ namespace cetech {
                 it = eventstream::next(_globals.data->stream, it);
             }
 
-            array::push_back(buffer, '\0');
             console_server::send_msg(buffer);
         }
 
