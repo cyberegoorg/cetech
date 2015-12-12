@@ -11,5 +11,5 @@ function update(dt)
 end 
 
 function shutdown()
-  Game:shutdown()
+  Game:shutdown() 
 end
