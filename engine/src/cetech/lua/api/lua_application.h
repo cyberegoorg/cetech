@@ -30,7 +30,7 @@ namespace cetech {
         d.SetObject();
         LuaStack(L).to_json(1, d, d);
 
-        //console_server::send_json_document(d); TODO: write
+        console_server::send_json_document(d);// TODO: write
 
         return 0;
     }

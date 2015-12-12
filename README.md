@@ -83,14 +83,6 @@ $ brew install libtool
 $ pip install -r requirements.txt
 ```
 
-* Install pyenet (folder `3rparty/pyenet`)
-
-```bash
-$ cd 3rparty/pyenet
-$ python setup.py install
-$ cd ..
-```
-
 * Download and build externals.
 
 ```bash
@@ -108,6 +100,7 @@ $ python make.py
 ```bash
 $ python playground.py
 ```
+
 * Click on `add exist`.
 * Set name `SAMPLE`.
 * Click on `...` and select repository folder `data`.

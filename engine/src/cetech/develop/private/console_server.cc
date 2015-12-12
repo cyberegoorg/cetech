@@ -1,5 +1,7 @@
 #include "cetech/develop/console_server.h"
 
+#include <cerrno>
+
 #include "celib/macros.h"
 #include "celib/memory/memory.h"
 #include "celib/container/array.inl.h"
@@ -17,8 +19,7 @@
 
 #include "nanomsg/nn.h"
 #include "nanomsg/pubsub.h"
-
-#include "enet/enet.h"
+#include "nanomsg/reqrep.h"
 
 
 #define LOG_FORMAT "---\n"\
@@ -51,13 +52,12 @@ namespace cetech {
         }
         
         struct ConsoleServerData {       
-            Array < ENetPeer * > client_peer;
-            Queue < int > peer_free_queue;
             Hash < command_clb_t > cmds;
             int log_socket;
-            int socket;
+            int develop_socket;
+            int dev_socket;
             
-            ConsoleServerData(Allocator & allocator) : client_peer(allocator), peer_free_queue(allocator), cmds(allocator), log_socket(0), socket(0) {}
+            ConsoleServerData(Allocator & allocator) : cmds(allocator), log_socket(0), develop_socket(0) {}
 
             ~ConsoleServerData() {
             }
@@ -137,9 +137,13 @@ namespace cetech {
             socket = nn_socket (AF_SP, NN_PUB);
             CE_ASSERT(socket >= 0);
             CE_ASSERT(nn_bind (socket, "ws://*:5556") >= 0);
-            data->socket = socket;
-        }
+            data->develop_socket = socket;
 
+            socket = nn_socket (AF_SP, NN_REP);
+            CE_ASSERT(socket >= 0);
+            CE_ASSERT(nn_bind (socket, "ws://*:5557") >= 0);
+            data->dev_socket = socket;
+        }
 
         void register_command(const char* name,
                               const command_clb_t clb) {
@@ -150,69 +154,35 @@ namespace cetech {
 
         bool has_clients() {
             ConsoleServerData* data = _globals.data;
-
-            return array::size(data->client_peer) != 0;
+            return 1;
         }
 
         void send_msg(const char* msg, const size_t len) {
-            int socket = _globals.data->socket;
+            int socket = _globals.data->develop_socket;
             size_t bytes = nn_send (socket, msg, len, 0);
             CE_ASSERT(bytes == len);
         }
         
+        void send_json_document(const rapidjson::Document& document) {
+        }
+        
         void tick() {
-//             ConsoleServerData* data = _globals.data;
-//             if (!data->server_host) {
-//                 return;
-//             }
-// 
-//             ENetEvent Event;
-// 
-//             auto time = develop_manager::enter_scope("ConsoleServer::tick()");
-//             while (enet_host_service(data->server_host, &Event, 0) > 0) {
-// 
-//                 switch (Event.type) {
-//                 case ENET_EVENT_TYPE_CONNECT: {
-//                     int64_t cid = 0;
-// 
-//                     if (queue::size(data->peer_free_queue) > 0) {
-//                         cid = data->peer_free_queue[0] + 1;
-//                         queue::pop_front(data->peer_free_queue);
-//                     } else {
-//                         array::push_back(data->client_peer, Event.peer);
-//                         cid = array::size(data->client_peer);
-//                     }
-// 
-//                     Event.peer->data = (void*)cid;
-//                     log::info("console_server", "Client connected. %d", cid);
-//                     break;
-//                 }
-// 
-//                 case ENET_EVENT_TYPE_DISCONNECT: {
-//                     int64_t cid = (int64_t)(Event.peer->data);
-// 
-//                     data->client_peer[cid - 1] = nullptr;
-//                     queue::push_back(data->peer_free_queue, (int)(cid - 1));
-// 
-//                     log::info("console_server", "Client %d disconnected.", cid);
-//                     break;
-//                 }
-// 
-// 
-//                 case ENET_EVENT_TYPE_RECEIVE: {
-//                     char buff[4096] = {0};
-//                     strncpy(buff, (char*)Event.packet->data, Event.packet->dataLength);
-//                     parse_packet(0, buff, Event.packet->dataLength);
-//                     //enet_packet_destroy(Event.packet);
-//                     break;
-//                 }
-// 
-//                 default:
-//                     break;
-//                 }
-//             }
-// 
-//             develop_manager::leave_scope("ConsoleServer::tick()", time);
+            int socket = _globals.data->dev_socket;
+
+            auto time = develop_manager::enter_scope("ConsoleServer::tick()");            
+            
+            char *buf = NULL;
+            int bytes = nn_recv(socket, &buf, NN_MSG, NN_DONTWAIT);
+            if(bytes < 0) {
+                CE_ASSERT( errno == EAGAIN );
+                return;
+            }
+            
+            parse_packet(0, buf, bytes);
+            nn_freemsg (buf);
+
+
+            develop_manager::leave_scope("ConsoleServer::tick()", time);
         }
     }
 
@@ -230,7 +200,7 @@ namespace cetech {
             log::unregister_handler(&nanolog_handler);
             
             nn_close(_globals.data->log_socket);
-            nn_close(_globals.data->socket);
+            nn_close(_globals.data->develop_socket);
             
             _globals.data->~ConsoleServerData();
             _globals = Globals();

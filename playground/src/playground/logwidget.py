@@ -1,10 +1,11 @@
 import re
 
-import nanomsg
 import yaml
 from PyQt5.QtCore import QDateTime, Qt, QThread
 from PyQt5.QtGui import QColor
 from PyQt5.QtWidgets import QFrame, QStyle, QTreeWidgetItem
+
+import nanomsg
 from nanomsg import Socket, SUB, SUB_SUBSCRIBE, DONTWAIT
 
 from playground.ui.logwidget import Ui_LogWidget
@@ -24,6 +25,7 @@ LOG_ICON = {
     'D': QStyle.SP_MessageBoxQuestion,
     'E': QStyle.SP_MessageBoxCritical,
 }
+
 
 class LogSub(QThread):
     def __init__(self, url):
@@ -79,7 +81,7 @@ class LogWidget(QFrame, Ui_LogWidget):
         return m is not None
 
     def add_log(self, time, level, worker, where, msg):
-        #print(time, level, worker, where, msg)
+        # print(time, level, worker, where, msg)
         if self._is_ignored(where):
             return
 
