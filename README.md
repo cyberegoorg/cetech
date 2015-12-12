@@ -35,24 +35,39 @@ CETech is Data-Driven [game engine](https://en.wikipedia.org/wiki/Game_engine) a
 
 ## 3rd party libraries and tools
 
+### Tools
+
 * [genie](https://github.com/bkaradzic/genie) - Project generator.
+
+### C/C++
+
 * [BGFX](https://github.com/bkaradzic/bgfx) - Renderer.
 * [SDL2](https://www.libsdl.org/) - Cross-platform development library.
 * [enet](http://enet.bespin.org/) - Cross-platform network lib.
 * [luajit](http://luajit.org/) - Lua on steroids.
 * [rapidjson](http://rapidjson.org/) - Json parser.
-* [catch](https://github.com/philsquared/Catch) -  Multi-paradigm automated test framework for C++.
+* [catch](https://github.com/philsquared/Catch) -  Multi-paradigm automated test framework.
 * [SOIL](http://www.lonesock.net/soil.html ) - Simple OpenGL Image Library.
 * [sqlite3](https://www.sqlite.org/) - SQL database engine.
-* [libyaml](https://github.com/yaml/libyaml.git) - C YAML parser.
+* [libyaml](https://github.com/yaml/libyaml.git) - YAML parser.
 * [nanomsg](http://nanomsg.org/) - Socket library that provides several common communication patterns.
+
+### Python
+
 * [python](https://www.python.org/) - Multi-paradigm Programming language.
 * [pyaml](http://pyyaml.org/wiki/PyYAML) - YAML parser and emitter for Python.
-* [Qt](https://www.qt.io/) - Cross-platform GUI library.
 * [python-nanomsg](https://github.com/tonysimpson/nanomsg-python) - Nanomsg python binding.
 * [PyQT](https://www.riverbankcomputing.com/software/pyqt/intro) - Python QT binding
-* [Ace](https://ace.c9.io/) - JavaScript editor library.
-* [GoJS](http://gojs.net/) - JavaScript diagram library.
+
+### JavaScript
+
+* [Ace](https://ace.c9.io/) - Editor library.
+* [GoJS](http://gojs.net/) - Diagram library.
+* [vis.js](http://visjs.org/) - Visualization library.
+
+### Others
+
+* [Qt](https://www.qt.io/) - Cross-platform GUI library.
 
 ## Building
 
