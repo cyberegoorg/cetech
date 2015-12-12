@@ -39,7 +39,7 @@ class LogSub(QThread):
         self.handlers.append(handler)
 
     def run(self):
-        self.socket.set_string_option(SUB, SUB_SUBSCRIBE, b'---')
+        self.socket.set_string_option(SUB, SUB_SUBSCRIBE, b'#log')
         self.socket.connect(self.url)
 
         while True:

@@ -136,7 +136,7 @@ namespace cetech {
             array::push_back(buffer, '\0');
             
             char buf[4096] = {0};
-            size_t len = snprintf(buf, 4096, "events:\n%s", array::begin(buffer));
+            size_t len = snprintf(buf, 4096, "#develop_manager\nevents:\n%s", array::begin(buffer));
             console_server::send_msg(buf, len);
         }
 

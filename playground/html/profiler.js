@@ -78,6 +78,8 @@ function diff_time(start, end) {
     return temp;
 }
 
+var data_window = [];
+
 ws = new WebSocket("ws://localhost:5556", "pub.sp.nanomsg.org");
 ws.binaryType = "arraybuffer";
 ws.onopen = function () {
@@ -88,8 +90,13 @@ ws.onclosed = function () {
 };
 ws.onmessage = function (evt) {
     //var yaml = require('js-yaml');
-    //
-    jsyaml.safeLoadAll(ab2str(evt.data), function (doc) {
+
+    var data = ab2str(evt.data);
+    if (data.indexOf("#develop_manager") == -1) {
+        return
+    }
+
+    jsyaml.safeLoadAll(data, function (doc) {
         doc.events.forEach(function(event) {
             if(event.etype == 'EVENT_SCOPE') {
                 var t_s = [event.start, event.start_ns];
@@ -104,12 +111,17 @@ ws.onmessage = function (evt) {
                     end: (t_e[0] * 1000) + (t_e[1] / 1000000),
                     group: event.worker_id,
                     depth: event.depth
+                };
+
+
+                if (items.length < 20) {
+                    if (data_window.length > 20) {
+                        items.add(item);
+                        timeline.fit();
+                    } else {
+                        data_window.push(item);
+                    }
                 }
-
-                //items.clear();
-                //items.add(item);
-                //timeline.fit();
-
             }
 
             //console.log(entry);
