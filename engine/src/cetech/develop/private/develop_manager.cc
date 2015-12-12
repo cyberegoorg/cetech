@@ -114,7 +114,7 @@ namespace cetech {
             Array<char>& buffer = _globals.data->buffer;
             array::clear(buffer);
             
-            array::push(buffer, "#develop_manager\nevents:\n", sizeof("#develop_manager\nevents:\n"));
+            array::push(buffer, CSTR_TO_ARG("#develop_manager\nevents:\n"));
 
             eventstream::event_it it = 0;
             while (eventstream::valid(_globals.data->stream, it)) {
@@ -125,21 +125,20 @@ namespace cetech {
                                         (EventType)header->type,
                                         "NONE");
 
-                char etype_buffer[256] = {0};
-                size_t len = snprintf(etype_buffer, 256, "  - etype: %s\n", type_str);
-                array::push(buffer, etype_buffer, len);
+                array::push(buffer, CSTR_TO_ARG("  - etype: "));
+                array::push(buffer, STR_TO_ARG(type_str));
+                array::push(buffer, CSTR_TO_ARG("\n"));
                                 
                 to_yaml_fce_t to_json_fce = hash::get < to_yaml_fce_t > (_globals.data->to_yaml, header->type, nullptr);
                 CE_ASSERT(to_json_fce);
 
                 to_json_fce(eventstream::event < void* > (_globals.data->stream, it), buffer);
-
                 
                 it = eventstream::next(_globals.data->stream, it);
             }
 
             array::push_back(buffer, '\0');
-            console_server::send_msg(array::begin(buffer), array::size(buffer));
+            console_server::send_msg(buffer);
         }
 
         void push_begin_frame() {
@@ -229,7 +228,7 @@ namespace cetech {
                                        Array<char>& buffer) {
             BeginFrameEvent* e = (BeginFrameEvent*)event;
             
-            char buf[4096] = {0};
+            static char buf[4096] = {0};
             
             static char format[] = "    time: %ld\n"
                                    "    time_ns: %ld\n"
@@ -243,7 +242,7 @@ namespace cetech {
                                      Array<char>& buffer) {
             EndFrameEvent* e = (EndFrameEvent*)event;
             
-            char buf[4096] = {0};
+            static char buf[4096] = {0};
             
             static const char format[] = "    time: %ld\n"
                                          "    time_ns: %ld\n"
@@ -257,7 +256,7 @@ namespace cetech {
                                       Array<char>& buffer) {
             ScopeEvent* e = (ScopeEvent*)event;
 
-            char buf[4096] = {0};
+            static char buf[4096] = {0};
             static const char format[] = "    name: %s\n"
                                          "    frame_id: %d\n"
                                          "    start: %ld\n"
@@ -284,7 +283,7 @@ namespace cetech {
                                         Array<char>& buffer) {
             RecordFloatEvent* e = (RecordFloatEvent*)event;
 
-            char buf[4096] = {0};
+            static char buf[4096] = {0};
             static const char format[] = "    name: %s\n"
                                          "    value: %f\n";
             
@@ -306,7 +305,6 @@ namespace cetech {
             register_type(EVENT_BEGIN_FRAME, "EVENT_BEGIN_FRAME", beginframe_to_json);
             register_type(EVENT_END_FRAME, "EVENT_END_FRAME", endframe_to_json);
             register_type(EVENT_SCOPE, "EVENT_SCOPE", begintask_to_json);
-            //register_type(EVENT_LEAVE_SCOPE, "EVENT_LEAVE_SCOPE", endtask_to_json);
             register_type(EVENT_RECORD_FLOAT, "EVENT_RECORD_FLOAT", recordfloat_to_json);
         }
 

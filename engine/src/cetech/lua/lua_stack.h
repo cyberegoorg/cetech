@@ -4,6 +4,8 @@
 
 #include "celib/stringid_types.h"
 #include "celib/math_types.h"
+#include "celib/macros.h"
+#include "celib/container/array.inl.h"
 
 #include "cetech/application/application.h"
 #include "cetech/log/log.h"
@@ -147,50 +149,64 @@ namespace cetech {
                 return *(Vector3*)v;
             }
 
-            void to_json(int i,
-                         rapidjson::Document& document,
-                         rapidjson::Value& root) {
+            CE_INLINE void push_indent(Array<char>& output, const uint32_t level) {
+                for( uint32_t i = 0; i < level; ++i) {
+                    array::push(output, CSTR_TO_ARG("  "));
+                }
+            }
+            
+            void to_yaml(const int i,
+                         Array<char>& output,
+                         uint32_t level) {
+
                 lua_pushnil(_L);
                 while (lua_next(_L, i) != 0) {
                     const char* key = lua_tostring(_L, -2);
-                    rapidjson::Value rapid_key(key,
-                                               strlen(key),
-                                               document.GetAllocator());
-
+                    
+                    push_indent(output, level);
+                    array::push(output, STR_TO_ARG(key));
+                    array::push(output, CSTR_TO_ARG(": "));
+                                        
                     int type = lua_type(_L, -1);
 
                     switch (type) {
                     case LUA_TNUMBER: {
+                        char number_str[64];
                         uint32_t number = lua_tonumber(_L, -1);
-                        root.AddMember(rapid_key, number, document.GetAllocator());
+                        
+                        sprintf(number_str, "%d", number);
+
+                        array::push(output, STR_TO_ARG(number_str));
+                        array::push(output, CSTR_TO_ARG("\n"));
                     }
                     break;
                     case LUA_TSTRING: {
                         const char* str = lua_tostring(_L, -1);
-                        root.AddMember(rapid_key, rapidjson::Value(str, strlen(str),
-                                                                   document.GetAllocator()), document.GetAllocator());
+
+                        array::push(output, STR_TO_ARG(str));
+                        array::push(output, CSTR_TO_ARG("\n"));
                     }
                     break;
                     case LUA_TBOOLEAN: {
                         bool b = lua_toboolean(_L, -1);
-                        root.AddMember(rapid_key, rapidjson::Value(b), document.GetAllocator());
+
+                        array::push(output, CSTR_TO_ARG(b ? "True" : "False"));
+                        array::push(output, CSTR_TO_ARG("\n"));
                     }
                     break;
                     case LUA_TNIL: {
-                        root.AddMember(rapid_key, rapidjson::Value(rapidjson::kNullType), document.GetAllocator());
+                        array::push(output, CSTR_TO_ARG("~\n"));
                     }
                     break;
 
                     case LUA_TTABLE: {
-                        rapidjson::Value v(rapidjson::kObjectType);
-                        to_json(lua_gettop(_L), document, v);
-                        root.AddMember(rapid_key, v, document.GetAllocator());
+                        array::push(output, CSTR_TO_ARG("\n"));
+                        to_yaml(lua_gettop(_L), output, level+1);
                     }
                     break;
 
                     case LUA_TFUNCTION: {
-                        //const char* str = lua_typename(_L, -1);
-                        root.AddMember(rapid_key, "function", document.GetAllocator());
+                        array::push(output, CSTR_TO_ARG("function\n"));
                     }
 
                     }
@@ -199,6 +215,7 @@ namespace cetech {
                 }
             }
 
+            
             void load_string(const char* string) {
                 luaL_loadstring(_L, string);
             }

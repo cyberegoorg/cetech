@@ -26,11 +26,16 @@ namespace cetech {
     }
 
     static int application_console_send(lua_State* L) {
-        rapidjson::Document d;
-        d.SetObject();
-        LuaStack(L).to_json(1, d, d);
+        LuaStack stack(L);
+        
+        Array<char> buffer(memory_globals::default_allocator());
+        
+        char buf[256];      
+        array::push(buffer, buf, snprintf(buf, 256, "#%s\n", stack.to_string(1)));
 
-        console_server::send_json_document(d);// TODO: write
+        stack.to_yaml(2, buffer, 0);
+
+        console_server::send_msg(buffer);
 
         return 0;
     }

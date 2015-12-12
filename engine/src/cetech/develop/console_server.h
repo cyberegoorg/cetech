@@ -48,8 +48,7 @@ namespace cetech {
         /***********************************************************************
         **** Send message.
         ***********************************************************************/
-        void send_msg(const char* msg,
-                      const size_t len);
+        void send_msg(const Array<char>& msg);
         
         void send_json_document(const rapidjson::Document& document);
     }
