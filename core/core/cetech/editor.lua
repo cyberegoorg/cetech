@@ -12,7 +12,7 @@ function autocomplite_list()
         end
     end
 
-    Application.console_send({
+    Application.console_send("autocomplite_list",{
         type = "autocomplete_list",
         list = t
     })

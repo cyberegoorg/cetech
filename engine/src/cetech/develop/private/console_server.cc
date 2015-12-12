@@ -156,10 +156,10 @@ namespace cetech {
             return 1;
         }
 
-        void send_msg(const char* msg, const size_t len) {
+        void send_msg(const Array<char>& msg) {
             int socket = _globals.data->develop_socket;
-            size_t bytes = nn_send (socket, msg, len, 0);
-            CE_ASSERT(bytes == len);
+            size_t bytes = nn_send (socket, array::begin(msg), array::size(msg), 0);
+            CE_ASSERT(bytes == array::size(msg));
         }
         
         void send_json_document(const rapidjson::Document& document) {
