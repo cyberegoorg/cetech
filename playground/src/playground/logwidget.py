@@ -44,15 +44,14 @@ class LogSub(QThread):
 
         while True:
             try:
-                msg = self.socket.recv(flags=nanomsg.DONTWAIT)
+                #msg = self.socket.recv(flags=nanomsg.DONTWAIT)
+                msg = self.socket.recv()
                 msg_yaml = yaml.load(msg)
                 for h in self.handlers:
                     h(**msg_yaml)
 
             except nanomsg.NanoMsgAPIError as e:
                 pass
-
-            QThread.msleep(10)
 
 
 class LogWidget(QFrame, Ui_LogWidget):
@@ -81,7 +80,7 @@ class LogWidget(QFrame, Ui_LogWidget):
         return m is not None
 
     def add_log(self, time, level, worker, where, msg):
-        # print(time, level, worker, where, msg)
+        print(time, level, worker, where, msg)
         if self._is_ignored(where):
             return
 

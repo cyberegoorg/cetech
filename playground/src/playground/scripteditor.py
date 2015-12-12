@@ -1,10 +1,12 @@
 import os
+
 from PyQt5.QtCore import QTextCodec, QFile, QDir, QFileInfo, QUrl, pyqtSlot
 from PyQt5.QtGui import QPixmap
 from PyQt5.QtWebKit import QWebSettings
 from PyQt5.QtWebKitWidgets import QWebView
 from PyQt5.QtWidgets import QMainWindow, QFileDialog, QMessageBox
-from playground.engine.api import ConsoleAPI
+
+from playground.engine.consoleapi import ConsoleAPI
 from playground.ui.luaeditorwindow import Ui_MainWindow
 from playground.engine.cetechproject import CetechProject
 

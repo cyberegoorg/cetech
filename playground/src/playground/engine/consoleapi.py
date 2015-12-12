@@ -1,4 +1,4 @@
-from playground.engine.proxy import ConsoleProxy
+from playground.engine.consoleproxy import ConsoleProxy
 
 
 class ConsoleAPI(ConsoleProxy):

@@ -4,7 +4,7 @@ import platform
 from PyQt5.QtCore import QThread, Qt, QFileSystemWatcher, QDirIterator
 from PyQt5.QtWidgets import QMainWindow, QDockWidget, QTabWidget
 from playground.assetbrowser import AssetBrowser
-from playground.engine.api import ConsoleAPI
+from playground.engine.consoleapi import ConsoleAPI
 from playground.engine.cetechproject import CetechProject
 from playground.logwidget import LogWidget, LogSub
 from playground.ui.mainwindow import Ui_MainWindow

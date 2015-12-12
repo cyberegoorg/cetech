@@ -1,5 +1,4 @@
 import json
-
 from nanomsg import Socket, REQ
 
 
@@ -15,6 +14,8 @@ class ConsoleProxy(object):
             "name": cmd_name,
             "args": kwargs
         }
+
+        print(command_json)
 
         dump = str.encode('%s\0' % json.dumps(command_json))
         self.socket.send(dump)
