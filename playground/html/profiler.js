@@ -49,17 +49,15 @@ var groups = [
 
 var timeline = new vis.Timeline(container, items, groups, options);
 
-//function update() {
-//    var val = JSON.parse(RecordEventWidget.get_data(parseInt(frame_id.value)));
-//
-//    items.clear();
-//    items.add(val);
-//    timeline.fit();
-//
-//    //console.log(items)
-//}
+var data_window = [];
 
-//document.getElementById('draw').onclick = update;
+function update() {
+    items.clear();
+    items.add(data_window);
+    timeline.fit();
+}
+
+document.getElementById('draw').onclick = update;
 
 function ab2str(buf) {
     return String.fromCharCode.apply(null, new Uint8Array(buf));
@@ -76,8 +74,6 @@ function diff_time(start, end) {
     }
     return temp;
 }
-
-var data_window = [];
 
 ws = new WebSocket("ws://localhost:5556", "pub.sp.nanomsg.org");
 ws.binaryType = "arraybuffer";
