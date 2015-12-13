@@ -165,9 +165,8 @@ bool big_init() {
     log_globals::init();
     log::register_handler(&log::stdout_handler);
     
-    FILE* log = fopen("log.yaml", "w");
-    log::register_handler(&log::file_handler, log);
-    
+//     FILE* log = fopen("log.yaml", "w");
+//     log::register_handler(&log::file_handler, log);
 
     memory_globals::init();
     filesystem_globals::init();
