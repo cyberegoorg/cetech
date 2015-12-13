@@ -14,5 +14,6 @@ externals/src
 
 .directory
 log.yaml
+litelog.db
 
 __pycache__
