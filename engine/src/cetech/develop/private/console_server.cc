@@ -150,20 +150,13 @@ namespace cetech {
             hash::set(data->cmds, stringid64::from_cstring(name), clb);
         }
 
-        bool has_clients() {
-            ConsoleServerData* data = _globals.data;
-            return 1;
-        }
 
         void send_msg(const Array<char>& msg) {
             int socket = _globals.data->dev_pub_socket;
             size_t bytes = nn_send (socket, array::begin(msg), array::size(msg), 0);
             CE_ASSERT(bytes == array::size(msg));
         }
-        
-        void send_json_document(const rapidjson::Document& document) {
-        }
-        
+               
         void tick() {
             int socket = _globals.data->dev_rep_socket;
 
@@ -173,13 +166,13 @@ namespace cetech {
             int bytes = nn_recv(socket, &buf, NN_MSG, NN_DONTWAIT);
             if(bytes < 0) {
                 CE_ASSERT( errno == EAGAIN );
-                return;
+                goto end;
             }
             
             parse_packet(0, buf, bytes);
             nn_freemsg (buf);
 
-
+end:
             develop_manager::leave_scope("ConsoleServer::tick()", time);
         }
     }

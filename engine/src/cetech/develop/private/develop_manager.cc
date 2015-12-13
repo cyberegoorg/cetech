@@ -121,18 +121,17 @@ namespace cetech {
             while (eventstream::valid(_globals.data->stream, it)) {
                 eventstream::Header* header = eventstream::header(_globals.data->stream, it);
 
-                const char* type_str = hash::get < const char* >
-                                       (_globals.data->type_to_string,
-                                        (EventType)header->type,
-                                        "NONE");
+                const char* type_str = hash::get < const char* > (_globals.data->type_to_string,
+                                                                  (EventType)header->type,
+                                                                  "NONE");
 
                 array::push(buffer, buf, snprintf(buf, 256, "  - etype: %s\n", type_str));
                                 
-                to_yaml_fce_t to_json_fce = hash::get < to_yaml_fce_t > (_globals.data->to_yaml, header->type, nullptr);
-                CE_ASSERT(to_json_fce);
+                to_yaml_fce_t to_yaml_fce = hash::get < to_yaml_fce_t > (_globals.data->to_yaml, header->type, nullptr);
+                CE_ASSERT(to_yaml_fce);
 
-                to_json_fce(eventstream::event < void* > (_globals.data->stream, it), buffer);
-                
+                to_yaml_fce(eventstream::event < void* > (_globals.data->stream, it), buffer);
+
                 it = eventstream::next(_globals.data->stream, it);
             }
 

@@ -1,20 +1,9 @@
 var container = document.getElementById('vizu');
-//var frame_id = document.getElementById('frame_id');
-// Create a DataSet (allows two way data-binding)
-
 var items = new vis.DataSet();
 
-// Configuration for the Timeline
 var options = {
- // timeAxis: {scale: 'minute', step: 1}
     timeAxis: {scale: 'millisecond', step: 1},
     showMajorLabels: false,
-
-//    moment: function(date) {
-//        console.log(date)
-//        return vis.moment(date).utc();
-//    },
-
 
     order: function (a, b) {
         if(a.depth > b.depth)
@@ -50,14 +39,8 @@ var groups = [
 var timeline = new vis.Timeline(container, items, groups, options);
 
 var data_window = [];
-
-function update() {
-    items.clear();
-    items.add(data_window);
-    timeline.fit();
-}
-
-document.getElementById('draw').onclick = update;
+var Record = false;
+var sample_count = 0;
 
 function ab2str(buf) {
     return String.fromCharCode.apply(null, new Uint8Array(buf));
@@ -74,6 +57,38 @@ function diff_time(start, end) {
     }
     return temp;
 }
+function parse_data(data) {
+    jsyaml.safeLoadAll(data, function (doc) {
+        doc.events.forEach(function (event) {
+            if (event.etype != 'EVENT_SCOPE') {
+                return;
+            }
+
+            if (sample_count < 100) {
+                sample_count += 1;
+                return;
+            }
+            sample_count = 0;
+
+
+            var t_s = [event.start, event.start_ns];
+            var t_e = [event.end, event.end_ns];
+            var delta_ms = diff_time(t_s, t_e)[1] / 1000000;
+            var label = event.name + ": " + delta_ms + "ms, depth: " + event.depth;
+
+            var item = {
+                content: label,
+                title: label,
+                start: (t_s[0] * 1000) + (t_s[1] / 1000000),
+                end: (t_e[0] * 1000) + (t_e[1] / 1000000),
+                group: event.worker_id,
+                depth: event.depth
+            };
+
+            data_window.push(item);
+        });
+    });
+}
 
 ws = new WebSocket("ws://localhost:5556", "pub.sp.nanomsg.org");
 ws.binaryType = "arraybuffer";
@@ -84,39 +99,29 @@ ws.onclosed = function () {
     console.log("closed");
 };
 ws.onmessage = function (evt) {
-    //var yaml = require('js-yaml');
-
-    var data = ab2str(evt.data);
-    if (data.indexOf("#develop_manager") != 0) {
-        return
+    if (!Record) {
+        return;
     }
 
-    jsyaml.safeLoadAll(data, function (doc) {
-        doc.events.forEach(function(event) {
-            if(event.etype == 'EVENT_SCOPE') {
-                var t_s = [event.start, event.start_ns];
-                var t_e = [event.end, event.end_ns];
-                var delta_ms = diff_time(t_s, t_e)[1] / 1000000;
-                var label = event.name + ": " + delta_ms +"ms, depth: "+event.depth;
+    var data = ab2str(evt.data);
 
-                var item = {
-                    content: label,
-                    title: label,
-                    start: (t_s[0] * 1000) + (t_s[1] / 1000000),
-                    end: (t_e[0] * 1000) + (t_e[1] / 1000000),
-                    group: event.worker_id,
-                    depth: event.depth
-                };
+    if (data.indexOf("#develop_manager") != 0) {
+        return;
+    }
 
-                if (data_window.length > 20) {
-                    data_window.shift();
-                }
-                data_window.push(item);
-            }
-
-            //console.log(entry);
-        });
-    });
+    parse_data(data);
 };
 
-//setInterval(update, 1000)
+document.getElementById('start').onclick = function () {
+    Record = true;
+};
+
+document.getElementById('stop').onclick = function () {
+    Record = false;
+
+    console.log(data_window.length);
+
+    items.clear();
+    items.add(data_window);
+    timeline.fit();
+};
