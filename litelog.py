@@ -13,6 +13,7 @@ import platform
 import sqlite3
 from argparse import RawTextHelpFormatter
 
+import time
 import yaml
 
 ###########
@@ -93,9 +94,21 @@ def main(args=None):
     socket.connect(args.url.encode())
 
     while True:
-        msg = socket.recv()
-        msg_yaml = yaml.load(msg)
-        insert_log(conn, **msg_yaml)
+        try:
+            msg = socket.recv(flags=nanomsg.DONTWAIT)
+
+            msg_yaml = yaml.load(msg)
+            insert_log(conn, **msg_yaml)
+
+        except nanomsg.NanoMsgAPIError as e:
+            if e.errno == nanomsg.EAGAIN:
+                continue
+
+            raise
+
+        time.sleep(0)
+
+    socket.close()
 
 ########
 # MAIN #
