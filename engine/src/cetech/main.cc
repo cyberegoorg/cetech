@@ -149,15 +149,6 @@ void load_config_yaml() {
     f.read(mem, f_sz);
     filesystem::close(f);
 
-    //     YAML::Node document;
-    //     try {
-    //         document = YAML::Load(mem);
-    //     } catch(YAML::ParserException & e) {
-    //         log::error("main", "Parse config.yaml error: %s", e.what());
-    //         memory_globals::default_allocator().deallocate(mem);
-    //         abort();
-    //     }
-
     cvar::load_from_yaml(mem, f_sz);
     memory_globals::default_allocator().deallocate(mem);
 }
@@ -218,9 +209,10 @@ bool big_init() {
     if (command_line::has_argument("wait", 'w')) {
         log::info("main", "Wating for clients.");
 
-        while (!console_server::has_clients()) {
-            console_server::tick(); // TODO: spawn task in init
-        }
+// TODO: Rewrite wait method. rpc call.
+//         while (!console_server::has_clients()) {
+//             console_server::tick(); // TODO: spawn task in init
+//         }
 
         log::debug("main", "Client connected.");
     }
