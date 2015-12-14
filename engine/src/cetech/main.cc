@@ -183,7 +183,6 @@ bool big_init() {
 
 #if defined(CETECH_DEVELOP)
     console_server_globals::init();
-    console_server::init();
     develop_manager_globals::init();
 #endif
 
