@@ -123,26 +123,6 @@ namespace cetech {
     }
 
     namespace console_server {
-        void init() {
-            ConsoleServerData* data = _globals.data;
-
-//             int socket = nn_socket (AF_SP, NN_PUB);
-//             CE_ASSERT(socket >= 0);
-//             CE_ASSERT(nn_bind (socket, "ws://*:5555") >= 0);          
-//             data->log_socket = socket;                                   
-
-            int socket = nn_socket (AF_SP, NN_PUB);
-            CE_ASSERT(socket >= 0);
-            CE_ASSERT(nn_bind (socket, "ws://*:5556") >= 0);
-            data->dev_pub_socket = socket;
-            log::register_handler(&nanolog_handler, (void*)(intptr_t)socket);
-            
-            socket = nn_socket (AF_SP, NN_REP);
-            CE_ASSERT(socket >= 0);
-            CE_ASSERT(nn_bind (socket, "ws://*:5557") >= 0);
-            data->dev_rep_socket = socket;
-        }
-
         void register_command(const char* name,
                               const command_clb_t clb) {
             ConsoleServerData* data = _globals.data;
@@ -183,6 +163,17 @@ end:
 
             char* p = _globals.buffer;
             _globals.data = new(p) ConsoleServerData(memory_globals::default_allocator());
+            
+            int socket = nn_socket (AF_SP, NN_PUB);
+            CE_ASSERT(socket >= 0);
+            CE_ASSERT(nn_bind (socket, "ws://*:5556") >= 0);
+            _globals.data->dev_pub_socket = socket;
+            log::register_handler(&nanolog_handler, (void*)(intptr_t)socket);
+            
+            socket = nn_socket (AF_SP, NN_REP);
+            CE_ASSERT(socket >= 0);
+            CE_ASSERT(nn_bind (socket, "ws://*:5557") >= 0);
+            _globals.data->dev_rep_socket = socket;
         }
 
         void shutdown() {
@@ -190,7 +181,7 @@ end:
             
             log::unregister_handler(&nanolog_handler);
             
-            //nn_close(_globals.data->log_socket);
+            nn_close(_globals.data->dev_rep_socket);
             nn_close(_globals.data->dev_pub_socket);
             
             _globals.data->~ConsoleServerData();
