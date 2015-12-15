@@ -13,7 +13,6 @@ import platform
 import sqlite3
 from argparse import RawTextHelpFormatter
 
-import time
 import yaml
 
 ###########
@@ -36,6 +35,23 @@ import nanomsg
 # CONFIG #
 ########################################################################################################################
 
+#######
+# SQL #
+########################################################################################################################
+CREATE_SQL = """
+CREATE TABLE IF NOT EXISTS log (
+    time INTEGER  NOT NULL,
+    level TEXT NOT NULL,
+    worker INTEGER NOT NULL,
+    wheree TEXT NOT NULL,
+    msg TEXT NOT NULL
+);
+"""
+
+INSERT_SQL = """
+INSERT INTO log VALUES (?, ?, ?, ?, ?);
+"""
+
 ########
 # ARGS #
 ########################################################################################################################
@@ -48,7 +64,7 @@ ARGS_PARSER.add_argument(
         type=str)
 
 ARGS_PARSER.add_argument(
-        "--sqlite-db",
+        "-d", "--sqlite-db",
         nargs='?',
         help='SQLite file',
         default='litelog.db',
@@ -59,24 +75,12 @@ ARGS_PARSER.add_argument(
 # PROGRAM #
 ########################################################################################################################
 def crate_table(conn):
-    sql = """
-    CREATE TABLE IF NOT EXISTS log (
-        time INTEGER  NOT NULL,
-        level TEXT NOT NULL,
-        worker INTEGER NOT NULL,
-        wheree TEXT NOT NULL,
-        msg TEXT NOT NULL
-    );
-    """
-    conn.execute(sql)
+    conn.execute(CREATE_SQL)
     conn.commit()
 
 
 def insert_log(conn, time, level, worker, where, msg):
-    sql = """
-    INSERT INTO log VALUES (?, ?, ?, ?, ?);
-    """
-    conn.execute(sql, (time, level, worker, where, msg))
+    conn.execute(INSERT_SQL, (time, level, worker, where, msg))
     conn.commit()
 
 
@@ -90,25 +94,18 @@ def main(args=None):
     crate_table(conn)
 
     socket = nanomsg.Socket(nanomsg.SUB)
-    socket.set_string_option(nanomsg.SUB, nanomsg.SUB_SUBSCRIBE, b'#log')
-    socket.connect(args.url.encode())
+    try:
+        socket.set_string_option(nanomsg.SUB, nanomsg.SUB_SUBSCRIBE, b'#log')
+        socket.connect(args.url.encode())
 
-    while True:
-        try:
-            msg = socket.recv(flags=nanomsg.DONTWAIT)
-
+        while True:
+            msg = socket.recv()
             msg_yaml = yaml.load(msg)
             insert_log(conn, **msg_yaml)
 
-        except nanomsg.NanoMsgAPIError as e:
-            if e.errno == nanomsg.EAGAIN:
-                continue
-
-            raise
-
-        time.sleep(0)
-
-    socket.close()
+    except Exception:
+        socket.close()
+        raise
 
 ########
 # MAIN #
