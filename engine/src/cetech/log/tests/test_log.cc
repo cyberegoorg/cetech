@@ -55,7 +55,7 @@ void test_handler(const cetech::log::LogLevel::Enum level,
 *******************************************************************************/
 SCENARIO( "Log system can log message =D", "[log]" ) {
     cetech::memory_globals::init();
-
+    
     GIVEN( "New logsystem" ) {
         cetech::log_globals::init();
         cetech::log::register_handler(test_handler, (void*)(intptr_t)42);
