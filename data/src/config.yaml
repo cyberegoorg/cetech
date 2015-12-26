@@ -1,9 +1,9 @@
-console_server:
-  port: 2222
-
 boot:
   pkg: boot
   script: lua/boot
+
+console_server:
+  port: 2222
 
 screen:
   width: 800
