@@ -20,35 +20,26 @@
 /*******************************************************************************
 **** Check ptr
 *******************************************************************************/
-#define CE_CHECK_PTR(ptr) do { \
-        if (!ptr) { \
-            cetech::ce_check_ptr(__FILE__, __LINE__); \
-        } \
-} while (0) \
-
+#define CE_CHECK_PTR(ptr) (!ptr ? cetech::ce_check_ptr(__FILE__, __LINE__) : true)
 
 /*******************************************************************************
 **** Check
 *******************************************************************************/
-#define CE_CHECK(condition) \
-    do { \
-        !(condition) ? cetech::ce_check(#condition, \
-                                        __FILE__, \
-                                        __LINE__, \
-                                        __PRETTY_FUNCTION__) : cetech::ce_noop(); \
-    } while (0)
-
+#define CE_CHECK(condition)\
+    (!(condition) ? cetech::ce_check(#condition, \
+                                     __FILE__, \
+                                     __LINE__, \
+                                     __PRETTY_FUNCTION__) : true)
 
 /*******************************************************************************
 **** Check with message
 *******************************************************************************/
 #define CE_CHECKT_MSG(condition, msg) \
-    do { !(condition) ? cetech::ce_check_msg(msg, \
-                                             #condition, \
-                                             __FILE__, \
-                                             __LINE__, \
-                                             __PRETTY_FUNCTION__) : (); \
-    } while (0)
+    (!(condition) ? cetech::ce_check_msg(msg, \
+                                         #condition, \
+                                         __FILE__, \
+                                         __LINE__, \
+                                         __PRETTY_FUNCTION__) : true)
 
 /*******************************************************************************
 **** Assert
@@ -120,7 +111,7 @@ namespace cetech {
     /***************************************************************************
     **** Check
     ***************************************************************************/
-    CE_INLINE void ce_check(const char* where,
+    CE_INLINE bool ce_check(const char* where,
                             const char* what,
                             const char* file,
                             const int line,
@@ -129,7 +120,7 @@ namespace cetech {
     /***************************************************************************
     **** Check with message
     ***************************************************************************/
-    CE_INLINE void ce_check_msg(const char* where,
+    CE_INLINE bool ce_check_msg(const char* where,
                                 const char* what,
                                 const char* file,
                                 const int line,
@@ -138,7 +129,7 @@ namespace cetech {
     /***************************************************************************
     **** Check pointer
     ***************************************************************************/
-    CE_INLINE void ce_check_ptr(const char* file,
+    CE_INLINE bool ce_check_ptr(const char* file,
                                 const int line);
 
     /***************************************************************************
@@ -195,7 +186,7 @@ namespace cetech {
         abort();
     }
 
-    CE_INLINE void ce_check(const char* condition_str,
+    CE_INLINE bool ce_check(const char* condition_str,
                             const char* file,
                             const int line,
                             const char* fce) {
@@ -206,10 +197,11 @@ namespace cetech {
                    trace);
 
         free(trace);
-        abort();
+        
+        return false;
     }
 
-    CE_INLINE void ce_check_msg(const char* where,
+    CE_INLINE bool ce_check_msg(const char* where,
                                 const char* what,
                                 const char* file,
                                 const int line,
@@ -221,10 +213,11 @@ namespace cetech {
                    where, what, SHORT_FILE(file), line, fce, trace);
 
         free(trace);
-        abort();
+        
+        return false;
     }
 
-    CE_INLINE void ce_check_ptr(const char* file,
+    CE_INLINE bool ce_check_ptr(const char* file,
                                 const int line) {
         char* trace = stacktrace(2);
         log::error("check_ptr", "in file %s on line %i is invalid pointer.\n"
@@ -232,7 +225,7 @@ namespace cetech {
                    SHORT_FILE(file), line, trace);
 
         free(trace);
-        abort();
+        return false;
     }
 
     #undef SHORT_FILE
