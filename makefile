@@ -8,7 +8,7 @@ CPPCHECK_ARGS = --std=c++11 --template=gcc --enable=all --inconclusive --std=pos
 
 linux64-clang:
 	python ./make.py
-	build/linux64_clang/bin/cetech_testDebug -a
+	build/linux64_clang/bin/cetech_testDebug --order rand -b
 
 clean:
 	python ./make.py clean
