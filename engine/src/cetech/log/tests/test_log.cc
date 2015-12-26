@@ -1,10 +1,17 @@
 #ifdef CETECH_TEST
 
+/*******************************************************************************
+**** Includes
+*******************************************************************************/
+
 #include "catch/catch.hpp"
 
 #include "cetech/log/log.h"
 #include "celib/memory/memory.h"
 
+/*******************************************************************************
+**** Test helpers
+*******************************************************************************/
 static struct LogEntry {
     cetech::log::LogLevel::Enum level;
     const char* where;
@@ -33,6 +40,10 @@ void test_handler(const cetech::log::LogLevel::Enum level,
     _LastLogEntry = log_entry;
 }
 
+
+/*******************************************************************************
+**** Log system can log message =D
+*******************************************************************************/
 SCENARIO( "Log system can log message =D", "[log]" ) {
     cetech::memory_globals::init();
 
@@ -41,6 +52,10 @@ SCENARIO( "Log system can log message =D", "[log]" ) {
         
         cetech::log::register_handler(test_handler, (void*)(intptr_t)42);
 
+        
+        /***********************************************************************
+        **** Info
+        ***********************************************************************/
         WHEN("Log info msg") {
             cetech::log::info("test.info", "Test msg %d.", 42);
             
@@ -55,7 +70,11 @@ SCENARIO( "Log system can log message =D", "[log]" ) {
                 REQUIRE( _LastLogEntry.data == (void*)(intptr_t)42);
             }
         }
+
         
+        /***********************************************************************
+        **** Warning
+        ***********************************************************************/
         WHEN("Log warning msg") {
             cetech::log::warning("test.warning", "Test msg %d.", 42);
             
@@ -71,6 +90,10 @@ SCENARIO( "Log system can log message =D", "[log]" ) {
             }
         }
         
+        
+        /***********************************************************************
+        **** Error
+        ***********************************************************************/
         WHEN("Log error msg") {
             cetech::log::error("test.error", "Test msg %d.", 42);
             
@@ -86,6 +109,9 @@ SCENARIO( "Log system can log message =D", "[log]" ) {
             }
         }
 
+        /***********************************************************************
+        **** Debug
+        ***********************************************************************/
         WHEN("Log debug msg") {
             cetech::log::debug("test.debug", "Test msg %d.", 42);
             
