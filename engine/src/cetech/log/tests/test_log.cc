@@ -19,7 +19,16 @@ static struct LogEntry {
     void* data;
     time_t time;
     uint32_t worker_id;
-} _LastLogEntry = {cetech::log::LogLevel::ERROR, 0, 0, 0, 0, 0};
+} _LastLogEntry;
+
+#define NULL_ENTRY_INIT {\
+    .level = cetech::log::LogLevel::ERROR,\
+    .time = 0,\
+    .worker_id = 0,\
+    .where = 0,\
+    .msg = 0,\
+    .data = 0,\
+};
 
 void test_handler(const cetech::log::LogLevel::Enum level,
                   const time_t time,
@@ -49,13 +58,13 @@ SCENARIO( "Log system can log message =D", "[log]" ) {
 
     GIVEN( "New logsystem" ) {
         cetech::log_globals::init();
-        
         cetech::log::register_handler(test_handler, (void*)(intptr_t)42);
-
+        
+        _LastLogEntry = NULL_ENTRY_INIT;
         
         /***********************************************************************
         **** Info
-        ***********************************************************************/
+        *****************************************************--order rand -s******************/       
         WHEN("Log info msg") {
             cetech::log::info("test.info", "Test msg %d.", 42);
             
