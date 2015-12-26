@@ -305,11 +305,11 @@ libyaml:
       [src/.libs/libyaml.a, lib]
 
     linux32:
-      - copy:  *libyaml_lib_posix
+      - copy: *libyaml_lib_posix
       - copy: *libyaml_include_posix
 
     linux64:
-      - copy:  *libyaml_lib_posix
+      - copy: *libyaml_lib_posix
       - copy: *libyaml_include_posix
 
 
