@@ -299,6 +299,7 @@ clean_up:
 
             if (!yaml_parser_initialize(&parser)) {
                 log::error("cvar.load", "yaml: Failed to initialize parser!");
+                return;
             }
 
             yaml_parser_set_input_string(&parser, (unsigned char*)yaml_str, len);
