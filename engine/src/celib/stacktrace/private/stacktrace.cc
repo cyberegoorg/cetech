@@ -54,13 +54,13 @@ namespace cetech {
                         offset_end);
                 strcat(return_str, buffer);
                 free(real_name);
-                
+
             } else {
                 sprintf(buffer, "    - %s\n", messages[i]);
                 strcat(return_str, buffer);
             }
         }
-        
+
         free(messages);
 
         return return_str;

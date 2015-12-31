@@ -11,13 +11,13 @@
 #include "cetech/application/application.h"
 
 
-#define LOG_FORMAT "---\n"\
-                   "level: %s\n"\
-                   "where: %s\n"\
-                   "time: %s\n"\
-                   "worker: %d\n"\
-                   "msg: %s\n"
-                   
+#define LOG_FORMAT "---\n" \
+    "level: %s\n" \
+    "where: %s\n" \
+    "time: %s\n" \
+    "worker: %d\n" \
+    "msg: %s\n"
+
 #define COLOR_RED  "\x1B[31m"
 #define COLOR_GREEN  "\x1B[32m"
 #define COLOR_YELLOW  "\x1B[33m"
@@ -68,7 +68,7 @@ namespace cetech {
 
             std::tm* gmtm = std::gmtime(&time);
             char* time_str = time_to_utc_str(gmtm);
-            
+
             switch (level) {
             case log::LogLevel::ERROR:
                 out = stderr;
@@ -91,11 +91,11 @@ namespace cetech {
                           const char* msg,
                           void* data) {
             FILE* out = (FILE*)(data);
-            
+
             std::tm* gmtm = std::gmtime(&time);
             char* time_str = time_to_utc_str(gmtm);
 
-           
+
             flockfile(out);
             fprintf(out, nocolor_level_format[level], level_to_str[level], where, time_str, worker_id, msg);
             fflush(out);

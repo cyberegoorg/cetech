@@ -27,10 +27,10 @@ namespace cetech {
 
     static int application_console_send(lua_State* L) {
         LuaStack stack(L);
-        
-        Array<char> buffer(memory_globals::default_allocator());
-        
-        char buf[256];      
+
+        Array < char > buffer(memory_globals::default_allocator());
+
+        char buf[256];
         array::push(buffer, buf, snprintf(buf, 256, "#%s\n", stack.to_string(1)));
 
         stack.to_yaml(2, buffer, 0);

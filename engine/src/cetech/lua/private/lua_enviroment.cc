@@ -291,9 +291,9 @@ namespace cetech {
 #endif
 
             lua_State* _state = luaL_newstate();
-            
+
             CE_ASSERT("lua_enviroment", _state != nullptr);
-            
+
             data->_state = _state;
 
 

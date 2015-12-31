@@ -21,7 +21,7 @@ namespace cetech {
         using namespace develop_manager;
 
         typedef void (* to_yaml_fce_t)(const void*,
-                                       Array<char>& buffer);
+                                       Array < char >& buffer);
 
         static thread_local char _stream_buffer[64 * 1024] = {0};
         static thread_local uint32_t _stream_buffer_count = 0;
@@ -31,7 +31,7 @@ namespace cetech {
         struct DevelopManagerData {
             Hash < to_yaml_fce_t > to_yaml;
             Hash < const char* > type_to_string;
-            Array<char> buffer;
+            Array < char > buffer;
             EventStream stream;
             Spinlock lock;
 
@@ -110,13 +110,13 @@ namespace cetech {
             if (eventstream::empty(_globals.data->stream)) {
                 return;
             }
-            
-            Array<char>& buffer = _globals.data->buffer;
+
+            Array < char >& buffer = _globals.data->buffer;
             array::clear(buffer);
 
-            char buf[256];      
+            char buf[256];
             array::push(buffer, buf, snprintf(buf, 256, "#develop_manager\nevents:\n"));
-            
+
             eventstream::event_it it = 0;
             while (eventstream::valid(_globals.data->stream, it)) {
                 eventstream::Header* header = eventstream::header(_globals.data->stream, it);
@@ -126,7 +126,7 @@ namespace cetech {
                                                                   "NONE");
 
                 array::push(buffer, buf, snprintf(buf, 256, "  - etype: %s\n", type_str));
-                                
+
                 to_yaml_fce_t to_yaml_fce = hash::get < to_yaml_fce_t > (_globals.data->to_yaml, header->type, nullptr);
                 CE_ASSERT("develop_manager", to_yaml_fce);
 
@@ -222,35 +222,35 @@ namespace cetech {
         }
 
         static void beginframe_to_json(const void* event,
-                                       Array<char>& buffer) {
+                                       Array < char >& buffer) {
             BeginFrameEvent* e = (BeginFrameEvent*)event;
-            
+
             static char buf[4096] = {0};
-            
+
             static char format[] = "    time: %ld\n"
                                    "    time_ns: %ld\n"
                                    "    frame_id: %d\n";
-            
-            size_t len = snprintf(buf, 4096, format, time::get_sec(e->time),  time::get_nsec(e->time), e->frame_id);
+
+            size_t len = snprintf(buf, 4096, format, time::get_sec(e->time), time::get_nsec(e->time), e->frame_id);
             array::push(buffer, buf, len);
         }
 
         static void endframe_to_json(const void* event,
-                                     Array<char>& buffer) {
+                                     Array < char >& buffer) {
             EndFrameEvent* e = (EndFrameEvent*)event;
-            
+
             static char buf[4096] = {0};
-            
+
             static const char format[] = "    time: %ld\n"
                                          "    time_ns: %ld\n"
                                          "    frame_id: %d\n";
-            
-            size_t len = snprintf(buf, 4096, format, time::get_sec(e->time),  time::get_nsec(e->time), e->frame_id);
+
+            size_t len = snprintf(buf, 4096, format, time::get_sec(e->time), time::get_nsec(e->time), e->frame_id);
             array::push(buffer, buf, len);
         }
 
         static void begintask_to_json(const void* event,
-                                      Array<char>& buffer) {
+                                      Array < char >& buffer) {
             ScopeEvent* e = (ScopeEvent*)event;
 
             static char buf[4096] = {0};
@@ -262,7 +262,7 @@ namespace cetech {
                                          "    end_ns: %ld\n"
                                          "    worker_id: %d\n"
                                          "    depth: %d\n";
-            
+
             size_t len = snprintf(buf, 4096, format,
                                   e->name,
                                   e->frame_id,
@@ -272,22 +272,22 @@ namespace cetech {
                                   time::get_nsec(e->end),
                                   e->worker_id,
                                   e->depth);
-            
+
             array::push(buffer, buf, len);
         }
 
         static void recordfloat_to_json(const void* event,
-                                        Array<char>& buffer) {
+                                        Array < char >& buffer) {
             RecordFloatEvent* e = (RecordFloatEvent*)event;
 
             static char buf[4096] = {0};
             static const char format[] = "    name: %s\n"
                                          "    value: %f\n";
-            
+
             size_t len = snprintf(buf, 4096, format,
                                   e->name,
                                   e->value);
-            
+
             array::push(buffer, buf, len);
         }
     }

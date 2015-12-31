@@ -304,7 +304,7 @@ namespace cetech {
         inline void push_back(Array < T >& a,
                               const T& item) {
             CE_ASSERT("array", std::is_pod < T > ());
-            
+
             if (a._size + 1 > a._capacity) {
                 grow(a);
             }
