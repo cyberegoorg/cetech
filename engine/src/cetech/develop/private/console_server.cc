@@ -21,16 +21,16 @@
 #include "nanomsg/pubsub.h"
 #include "nanomsg/reqrep.h"
 
-#define LOG_FORMAT "#log\n"\
-                   "level: %s\n"\
-                   "where: %s\n"\
-                   "time: %ld\n"\
-                   "worker: %d\n"\
-                   "msg: |\n"\
-                   "  %s\n"
+#define LOG_FORMAT "#log\n" \
+    "level: %s\n" \
+    "where: %s\n" \
+    "time: %ld\n" \
+    "worker: %d\n" \
+    "msg: |\n" \
+    "  %s\n"
 
 static const char* level_to_str[] = { "I", "W", "E", "D" };
-            
+
 namespace cetech {
     namespace {
         using namespace console_server;
@@ -43,22 +43,21 @@ namespace cetech {
                              void* data) {
 
             int socket = (intptr_t)data;
-            
+
             char packet[4096];     //!< Final msg.
             int len = snprintf(packet, 4096, LOG_FORMAT, level_to_str[level], where, time, worker_id, msg);
-            int bytes = nn_send (socket, packet, len, 0);
+            int bytes = nn_send(socket, packet, len, 0);
             CE_ASSERT("console_server", bytes == len);
         }
-        
-        struct ConsoleServerData {       
+
+        struct ConsoleServerData {
             Hash < command_clb_t > cmds;
             int dev_pub_socket;
             int dev_rep_socket;
-            
+
             ConsoleServerData(Allocator & allocator) : cmds(allocator), dev_pub_socket(0) {}
 
-            ~ConsoleServerData() {
-            }
+            ~ConsoleServerData() {}
         };
 
         struct Globals {
@@ -131,26 +130,26 @@ namespace cetech {
         }
 
 
-        void send_msg(const Array<char>& msg) {
+        void send_msg(const Array < char >& msg) {
             int socket = _globals.data->dev_pub_socket;
-            size_t bytes = nn_send (socket, array::begin(msg), array::size(msg), 0);
+            size_t bytes = nn_send(socket, array::begin(msg), array::size(msg), 0);
             CE_ASSERT("console_server", bytes == array::size(msg));
         }
-               
+
         void tick() {
             int socket = _globals.data->dev_rep_socket;
 
-            auto time = develop_manager::enter_scope("ConsoleServer::tick()");            
-            
-            char *buf = NULL;
+            auto time = develop_manager::enter_scope("ConsoleServer::tick()");
+
+            char* buf = NULL;
             int bytes = nn_recv(socket, &buf, NN_MSG, NN_DONTWAIT);
-            if(bytes < 0) {
-                CE_ASSERT("console_server",  errno == EAGAIN );
+            if (bytes < 0) {
+                CE_ASSERT("console_server", errno == EAGAIN );
                 goto end;
             }
-            
+
             parse_packet(0, buf, bytes);
-            nn_freemsg (buf);
+            nn_freemsg(buf);
 
 end:
             develop_manager::leave_scope("ConsoleServer::tick()", time);
@@ -163,27 +162,27 @@ end:
 
             char* p = _globals.buffer;
             _globals.data = new(p) ConsoleServerData(memory_globals::default_allocator());
-            
-            int socket = nn_socket (AF_SP, NN_PUB);
+
+            int socket = nn_socket(AF_SP, NN_PUB);
             CE_ASSERT("console_server", socket >= 0);
-            CE_ASSERT("console_server", nn_bind (socket, "ws://*:5556") >= 0);
+            CE_ASSERT("console_server", nn_bind(socket, "ws://*:5556") >= 0);
             _globals.data->dev_pub_socket = socket;
             log::register_handler(&nanolog_handler, (void*)(intptr_t)socket);
-            
-            socket = nn_socket (AF_SP, NN_REP);
+
+            socket = nn_socket(AF_SP, NN_REP);
             CE_ASSERT("console_server", socket >= 0);
-            CE_ASSERT("console_server", nn_bind (socket, "ws://*:5557") >= 0);
+            CE_ASSERT("console_server", nn_bind(socket, "ws://*:5557") >= 0);
             _globals.data->dev_rep_socket = socket;
         }
 
         void shutdown() {
             log::info("console_server_globals", "Shutdown");
-            
+
             log::unregister_handler(&nanolog_handler);
-            
+
             nn_close(_globals.data->dev_rep_socket);
             nn_close(_globals.data->dev_pub_socket);
-            
+
             _globals.data->~ConsoleServerData();
             _globals = Globals();
         }

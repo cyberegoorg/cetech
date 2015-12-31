@@ -165,7 +165,7 @@ bool big_init() {
 
     log_globals::init();
     log::register_handler(&log::stdout_handler);
-    
+
     FILE* log = fopen("log.yaml", "w");
     log::register_handler(&log::file_handler, log);
 
@@ -210,10 +210,10 @@ bool big_init() {
     if (command_line::has_argument("wait", 'w')) {
         log::info("main", "Wating for clients.");
 
-// TODO: Rewrite wait method. rpc call.
-//         while (!console_server::has_clients()) {
-//             console_server::tick(); // TODO: spawn task in init
-//         }
+        // TODO: Rewrite wait method. rpc call.
+        //         while (!console_server::has_clients()) {
+        //             console_server::tick(); // TODO: spawn task in init
+        //         }
 
         log::debug("main", "Client connected.");
     }
@@ -227,7 +227,7 @@ bool big_init() {
     renderer_globals::init();
     lua_enviroment_globals::init();
     application_globals::init();
-   
+
     return true;
 }
 

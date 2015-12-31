@@ -41,8 +41,9 @@ namespace cetech {
                                  int value);
         CE_INLINE void force_set(CVar& cv,
                                  const char* str);
-        
-        CE_INLINE void _load_from_yaml(yaml_parser_t &parser, const char* parent_name = nullptr);
+
+        CE_INLINE void _load_from_yaml(yaml_parser_t& parser,
+                                       const char* parent_name = nullptr);
     }
 
     CVar::CVar(const char* name_,
@@ -156,12 +157,15 @@ namespace cetech {
             cv.value_str = strdup(str);
             cv.str_len = strlen(str);
         }
-        
-        void _load_from_yaml(yaml_parser_t &parser, const char* parent_name) {
+
+        void _load_from_yaml(yaml_parser_t& parser,
+                             const char* parent_name) {
             yaml_token_t token;
             char cvar_name[256] = {0};
-            char* place_holder = parent_name != nullptr ? strcat(strncpy(cvar_name, parent_name, 255), ".") + 1 + strlen(parent_name) : cvar_name;
-            
+            char* place_holder = parent_name !=
+                                 nullptr ? strcat(strncpy(cvar_name, parent_name, 255),
+                                                  ".") + 1 + strlen(parent_name) : cvar_name;
+
             const char* cvar_value;
 
             // overall types
@@ -184,20 +188,20 @@ namespace cetech {
                 }
 
                 strcpy(place_holder, (const char*)token.data.scalar.value);
-                
+
                 // Value
                 yaml_parser_scan(&parser, &token);
                 if (token.type != YAML_VALUE_TOKEN) {
                     log::error("cvar.load", "Need value");
                     goto clean_up;
                 }
-                
+
                 yaml_parser_scan(&parser, &token);
-                if( token.type == YAML_BLOCK_MAPPING_START_TOKEN ) {
+                if (token.type == YAML_BLOCK_MAPPING_START_TOKEN) {
                     _load_from_yaml(parser, cvar_name);
                     continue;
                 }
-                
+
                 //yaml_parser_scan(&parser, &token);
                 if (token.type != YAML_SCALAR_TOKEN) {
                     log::error("cvar.load", "Need value");
@@ -292,7 +296,7 @@ clean_up:
 
             return nullptr;
         }
-        
+
         void load_from_yaml(const char* yaml_str,
                             const size_t len) {
             yaml_parser_t parser;
@@ -303,7 +307,7 @@ clean_up:
             }
 
             yaml_parser_set_input_string(&parser, (unsigned char*)yaml_str, len);
-            
+
             yaml_token_t token;
 
             // begin
@@ -318,10 +322,10 @@ clean_up:
                 log::error("cvar.load", "Root node must be maping");
                 goto clean_up;
             }
-            
+
             cvar_internal::_load_from_yaml(parser);
-            
-            clean_up:
+
+clean_up:
             yaml_token_delete(&token);
             yaml_parser_delete(&parser);
         }

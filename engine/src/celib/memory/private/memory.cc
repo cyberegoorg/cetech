@@ -23,7 +23,7 @@ namespace {
 
     inline void* data_pointer(Header* header,
                               const uint32_t align) {
-        
+
         CE_ASSERT("memory", header != nullptr);
 
         void* p = header + 1;
@@ -158,7 +158,7 @@ namespace {
 
             virtual uint32_t allocated_size(void* p) {
                 CE_ASSERT("memory", p != nullptr);
-                        
+
                 return header(p)->size;
             }
 

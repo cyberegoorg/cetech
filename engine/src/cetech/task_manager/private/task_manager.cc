@@ -74,7 +74,9 @@ namespace cetech {
                                                      _workers_queue(nullptr),
                                                      _allocator(allocator),
                                                      _open_task_count(0),
-                                                     flags {0} {
+                                                     flags {
+                0
+            } {
 
                 _open_task = (uint32_t*) allocator.allocate(sizeof(uint32_t) * MAX_TASK);
                 _task_pool = memory::alloc_array < Task > (allocator, MAX_TASK);
@@ -244,7 +246,8 @@ namespace cetech {
             return (task->job_count == 1) && (task->depend ? _task_is_done(task->depend) : 1);
         }
 
-        CE_INLINE Task* try_pop(QueueMPMC < Task*, MAX_TASK >& q) {
+        CE_INLINE Task* try_pop(QueueMPMC < Task*,
+                                MAX_TASK >& q) {
             Task* poped_task;
 
             poped_task = queuempmc::pop(q);

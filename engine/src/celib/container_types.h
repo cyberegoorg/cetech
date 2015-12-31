@@ -132,6 +132,6 @@ namespace cetech {
         **** Members variables
         ***********************************************************************/
         Array < char > stream;
-        std::vector< char > _stream;
+        std::vector < char > _stream;
     };
 }

@@ -32,9 +32,9 @@ namespace cetech {
             // TODO: lua + LuaStack?, inline lua?
             lua_State* state = luaL_newstate();
             luaL_openlibs(state);
-            
+
             CE_ASSERT("simd_vector", state != nullptr);
-            
+
             LuaStack s(state);
             s.execute_string(
                 "function compile(what, filename,  strip)\n"
