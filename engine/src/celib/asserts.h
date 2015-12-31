@@ -7,6 +7,7 @@
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
+#include <unistd.h>
 
 #include "celib/defines.h"
 #include "celib/stacktrace/stacktrace.h"
@@ -37,6 +38,7 @@
                        __FILE__, \
                        __LINE__, \
                        st); \
+            usleep(1000);\
             free(st); \
             abort(); \
         } \

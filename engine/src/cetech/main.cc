@@ -227,7 +227,7 @@ bool big_init() {
     renderer_globals::init();
     lua_enviroment_globals::init();
     application_globals::init();
-
+    
     return true;
 }
 

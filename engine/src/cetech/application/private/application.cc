@@ -295,7 +295,7 @@ namespace cetech {
                 //                     printf("c: %d \n", task_manager::open_task_count());
                 //                     CE_ASSERT(task_manager::open_task_count() == 0);
                 //                 }
-
+                CE_ASSERT("main", false);
             }
 
             shutdown();
