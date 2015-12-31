@@ -6,6 +6,7 @@
 #include "celib/memory/memory.h"
 #include "celib/container/array.inl.h"
 #include "celib/container/queue.inl.h"
+#include "celib/errors/errors.h"
 
 #include "cetech/thread/thread.h"
 #include "cetech/application/application.h"
@@ -73,9 +74,7 @@ namespace cetech {
                                                      _workers_queue(nullptr),
                                                      _allocator(allocator),
                                                      _open_task_count(0),
-                                                     flags {
-                0
-            } {
+                                                     flags {0} {
 
                 _open_task = (uint32_t*) allocator.allocate(sizeof(uint32_t) * MAX_TASK);
                 _task_pool = memory::alloc_array < Task > (allocator, MAX_TASK);
@@ -116,6 +115,8 @@ namespace cetech {
         }
 
         static int task_worker(void* data) {
+            error_globals::init();
+
             // Wait for run signal 0 -> 1
             while (_globals.data->flags.run == 0) {}
 
@@ -138,13 +139,14 @@ namespace cetech {
             }
 
             log::info("task_worker", "Worker%d shutdown", _worker_id);
+            error_globals::shutdown();
             return 0;
         }
 
         static void _task_nop(void*) {}
 
         uint32_t _new_task() {
-            CE_CHECK_PTR(_globals.data);
+            CE_ASSERT("task_manager", _globals.data != nullptr);
             TaskManagerData& tm = *_globals.data;
 
             for (uint32_t i = 1; i < MAX_TASK; ++i) {
@@ -156,7 +158,7 @@ namespace cetech {
                 return i;
             }
 
-            CE_ASSERT_MSG(false, "Pool overflow");
+            CE_ASSERT_MSG("task_manager", false, "Pool overflow");
             abort();
         }
 
@@ -165,8 +167,8 @@ namespace cetech {
         }
 
         void push_task(Task* task) {
-            CE_ASSERT(task->used);
-            CE_CHECK_PTR(_globals.data);
+            CE_ASSERT("task_manager", task->used);
+            CE_ASSERT("task_manager", _globals.data != nullptr);
 
             TaskManagerData& tm = *_globals.data;
 
@@ -185,7 +187,7 @@ namespace cetech {
         }
 
         bool _task_is_done(Task* task) {
-            CE_CHECK_PTR(_globals.data);
+            CE_ASSERT("task_manager", _globals.data != nullptr);
             TaskManagerData& tm = *_globals.data;
 
             bool ret;
@@ -210,7 +212,7 @@ namespace cetech {
         }
 
         void mark_task_job_done(Task* task) {
-            CE_CHECK_PTR(_globals.data);
+            CE_ASSERT("task_manager", _globals.data != nullptr);
             TaskManagerData& tm = *_globals.data;
 
             if (task->parent) {
@@ -247,7 +249,7 @@ namespace cetech {
 
             poped_task = queuempmc::pop(q);
             if (poped_task != 0) {
-                CE_ASSERT(poped_task->used);
+                CE_ASSERT("task_manager", poped_task->used);
 
                 if (can_work_on(poped_task)) {
                     return poped_task;
@@ -261,7 +263,7 @@ namespace cetech {
         }
 
         Task* task_pop_new_work() {
-            CE_CHECK_PTR(_globals.data);
+            CE_ASSERT("task_manager", _globals.data != nullptr);
             TaskManagerData& tm = *_globals.data;
 
             Task* poped_task;
@@ -306,7 +308,7 @@ namespace cetech {
                          const TaskID parent,
                          const WorkerAffinity::Enum worker_affinity) {
 
-            CE_CHECK_PTR(_globals.data);
+            CE_ASSERT("task_manager", _globals.data != nullptr);
             TaskManagerData& tm = *_globals.data;
 
             TaskWorkCallback callback = { fce, data };
@@ -374,7 +376,7 @@ namespace cetech {
                 return;
             }
 
-            CE_ASSERT(t->clb.fce != NULL);
+            CE_ASSERT("task_manager", t->clb.fce != NULL);
 
             auto time = develop_manager::enter_scope(t->name);
             t->clb.fce(t->clb.data);
@@ -393,7 +395,7 @@ namespace cetech {
         }
 
         void spawn_workers() {
-            CE_CHECK_PTR(_globals.data);
+            CE_ASSERT("task_manager", _globals.data != nullptr);
             TaskManagerData& tm = *_globals.data;
 
             uint32_t core_count = _core_count();
@@ -421,7 +423,7 @@ namespace cetech {
         }
 
         void stop() {
-            CE_CHECK_PTR(_globals.data);
+            CE_ASSERT("task_manager", _globals.data != nullptr);
             TaskManagerData& tm = *_globals.data;
 
             tm.flags.run = 0;

@@ -73,7 +73,7 @@ namespace cetech {
                                  StringId64_t& type,
                                  StringId64_t& name) {
             const char* t = strrchr(path, '.');
-            CE_CHECK_PTR(t);
+            CE_ASSERT("resource_compiler", t != nullptr);
 
             const uint32_t sz = t - path;
             t = t + 1;

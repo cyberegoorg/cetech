@@ -23,7 +23,8 @@ namespace {
 
     inline void* data_pointer(Header* header,
                               const uint32_t align) {
-        CE_CHECK_PTR(header);
+        
+        CE_ASSERT("memory", header != nullptr);
 
         void* p = header + 1;
 
@@ -31,7 +32,7 @@ namespace {
     }
 
     inline Header* header(void* data) {
-        CE_CHECK_PTR(data);
+        CE_ASSERT("memory", data != nullptr);
 
         uint32_t* p = (uint32_t*)data;
 
@@ -118,9 +119,9 @@ namespace {
                     }
                 }
 
-                CE_ASSERT(ok);
+                CE_ASSERT("allocator", ok);
 #endif
-                CE_ASSERT(_total_allocated == 0);
+                CE_ASSERT("allocator", _total_allocated == 0);
 
             }
 
@@ -156,7 +157,8 @@ namespace {
             }
 
             virtual uint32_t allocated_size(void* p) {
-                CE_CHECK_PTR(p);
+                CE_ASSERT("memory", p != nullptr);
+                        
                 return header(p)->size;
             }
 

@@ -87,7 +87,7 @@ namespace cetech {
 
         inline void init_os() {
 #if defined(CETECH_SDL2)
-            CE_ASSERT_MSG(SDL_Init(SDL_INIT_EVERYTHING) == 0, SDL_GetError());
+            CE_ASSERT_MSG("os", SDL_Init(SDL_INIT_EVERYTHING) == 0, "%s", SDL_GetError());
 #endif
         }
 
@@ -235,7 +235,8 @@ namespace cetech {
         void run() {
             init();
 
-            CE_CHECK_PTR(_globals.data);
+            CE_ASSERT("application", _globals.data != nullptr);
+
             ApplictionData& data = *_globals.data;
 
             develop_manager::send_buffer();

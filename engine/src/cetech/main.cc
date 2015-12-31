@@ -6,6 +6,7 @@
 #include "celib/memory/memory.h"
 #include "celib/string/stringid.inl.h"
 #include "celib/command_line/command_line.h"
+#include "celib/errors/errors.h"
 
 #include "cetech/cvar/cvar.h"
 #include "cetech/cvars/cvars.h"
@@ -165,10 +166,12 @@ bool big_init() {
     log_globals::init();
     log::register_handler(&log::stdout_handler);
     
-//     FILE* log = fopen("log.yaml", "w");
-//     log::register_handler(&log::file_handler, log);
+    FILE* log = fopen("log.yaml", "w");
+    log::register_handler(&log::file_handler, log);
 
     memory_globals::init();
+    error_globals::init();
+
     filesystem_globals::init();
 
     char build_path[4096] = {0};
@@ -224,6 +227,7 @@ bool big_init() {
     renderer_globals::init();
     lua_enviroment_globals::init();
     application_globals::init();
+   
     return true;
 }
 
@@ -302,6 +306,7 @@ void big_shutdown() {
     filesystem_globals::shutdown();
 
     task_manager_globals::shutdown();
+    error_globals::shutdown();
     memory_globals::shutdown();
     log_globals::shutdown();
 }

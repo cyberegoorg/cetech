@@ -119,7 +119,7 @@ namespace cetech {
 
         void force_set(CVar& cv,
                        float value) {
-            CE_ASSERT( cv.type == CVar::CVAR_FLOAT );
+            CE_ASSERT( "cvar", cv.type == CVar::CVAR_FLOAT );
 
             if ((cv.f_min != cv.f_max) && (cv.f_max != 0)) {
                 if ((value < cv.f_min) || (value > cv.f_max)) {
@@ -133,7 +133,7 @@ namespace cetech {
 
         void force_set(CVar& cv,
                        int value) {
-            CE_ASSERT( cv.type == CVar::CVAR_INT );
+            CE_ASSERT( "cvar", cv.type == CVar::CVAR_INT );
 
             if ((cv.f_min != cv.i_max) && (cv.i_max != 0)) {
                 if ((value < cv.i_min) || (value > cv.i_max)) {
@@ -147,7 +147,7 @@ namespace cetech {
 
         void force_set(CVar& cv,
                        const char* str) {
-            CE_ASSERT( cv.type == CVar::CVAR_STR );
+            CE_ASSERT( "cvar", cv.type == CVar::CVAR_STR );
 
             if (cv.value_str) {
                 free(cv.value_str);
@@ -242,7 +242,7 @@ clean_up:
     namespace cvar {
         void set(CVar& cv,
                  float value) {
-            CE_ASSERT( cv.type == CVar::CVAR_FLOAT );
+            CE_ASSERT( "cvar", cv.type == CVar::CVAR_FLOAT );
 
             if (!cvar_internal::check_set_flags(cv)) {
                 return;
@@ -253,7 +253,7 @@ clean_up:
 
         void set(CVar& cv,
                  int value) {
-            CE_ASSERT( cv.type == CVar::CVAR_INT );
+            CE_ASSERT( "cvar", cv.type == CVar::CVAR_INT );
 
             if (!cvar_internal::check_set_flags(cv)) {
                 return;
@@ -264,7 +264,7 @@ clean_up:
 
         void set(CVar& cv,
                  const char* str) {
-            CE_ASSERT( cv.type == CVar::CVAR_STR );
+            CE_ASSERT( "cvar", cv.type == CVar::CVAR_STR );
 
             if (!cvar_internal::check_set_flags(cv)) {
                 return;

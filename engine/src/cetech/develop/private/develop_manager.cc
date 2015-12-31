@@ -128,7 +128,7 @@ namespace cetech {
                 array::push(buffer, buf, snprintf(buf, 256, "  - etype: %s\n", type_str));
                                 
                 to_yaml_fce_t to_yaml_fce = hash::get < to_yaml_fce_t > (_globals.data->to_yaml, header->type, nullptr);
-                CE_ASSERT(to_yaml_fce);
+                CE_ASSERT("develop_manager", to_yaml_fce);
 
                 to_yaml_fce(eventstream::event < void* > (_globals.data->stream, it), buffer);
 

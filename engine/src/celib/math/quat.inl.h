@@ -176,7 +176,7 @@ namespace cetech {
     }
 
     CE_INLINE Quat operator - (const Quat &q1) {
-        CE_ASSERT(quat::is_normalized(q1));
+        CE_ASSERT("quaternion", quat::is_normalized(q1));
 
         return quat::make_quat(
             -q1.x,
