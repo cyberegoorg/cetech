@@ -22,7 +22,9 @@ namespace cetech {
 
         char** messages = backtrace_symbols(array, size);
 
+        char buffer[4096];
         for (int i = skip; i < size && messages != NULL; ++i) {
+            buffer[0] = '\0';
             char* mangled_name = 0, * offset_begin = 0, * offset_end = 0;
 
             for (char* p = messages[i]; *p; ++p) {
@@ -44,25 +46,21 @@ namespace cetech {
                 int status;
                 char* real_name = abi::__cxa_demangle(mangled_name, 0, 0, &status);
 
-                if (status == 0) {
-                    char buffer[4096] = {0};
-                    sprintf(buffer,
-                            "        [%d] %s: (%s)+%s %s\n",
-                            i,
-                            messages[i],
-                            (status == 0 ? real_name : mangled_name),
-                            offset_begin,
-                            offset_end);
-                    strcat(return_str, buffer);
-                    free(real_name);
-                }
+                sprintf(buffer,
+                        "    - %s: (%s)+%s %s\n",
+                        messages[i],
+                        (status == 0 ? real_name : mangled_name),
+                        offset_begin,
+                        offset_end);
+                strcat(return_str, buffer);
+                free(real_name);
+                
             } else {
-                char buffer[4096] = {0};
-                sprintf(buffer, "\t[%d] %s\n", i, messages[i]);
+                sprintf(buffer, "    - %s\n", messages[i]);
                 strcat(return_str, buffer);
             }
         }
-
+        
         free(messages);
 
         return return_str;

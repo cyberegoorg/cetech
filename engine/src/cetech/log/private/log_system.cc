@@ -41,7 +41,7 @@ namespace cetech {
                   const char* where,
                   const char* format,
                   va_list va) {
-            CE_CHECK_PTR( _globals.data );
+            CE_ASSERT("log", _globals.data != nullptr);
             LogData& data = *_globals.data;
 
             char msg[4096];     //!< Final msg.
@@ -62,7 +62,7 @@ namespace cetech {
     namespace log {
         void register_handler(handler_t handler,
                               void* data) {
-            CE_CHECK_PTR( _globals.data );
+            CE_ASSERT("log", _globals.data != nullptr);
             LogData& log_data = *_globals.data;
 
             uint8_t count = log_data.handlers_count;
@@ -73,7 +73,7 @@ namespace cetech {
         }
 
         void unregister_handler(handler_t handler) {
-            CE_CHECK_PTR( _globals.data );
+            CE_ASSERT("log", _globals.data != nullptr);
             LogData& log_data = *_globals.data;
 
 

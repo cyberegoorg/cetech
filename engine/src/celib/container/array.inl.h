@@ -237,7 +237,7 @@ namespace cetech {
         template < typename T >
         inline void     set_capacity(Array < T >& a,
                                      const uint32_t new_capacity) {
-            CE_CHECK_PTR(a._allocator);
+            CE_ASSERT("array", a._allocator != nullptr);
 
             if (new_capacity == a._capacity) {
                 return;
@@ -290,7 +290,7 @@ namespace cetech {
         void push(Array < T >& a,
                   const T* items,
                   uint32_t count) {
-            CE_ASSERT(std::is_pod < T > ());
+            CE_ASSERT("array", std::is_pod < T > ());
 
             if (a._capacity <= a._size + count) {
                 grow(a, a._size + count);
@@ -303,8 +303,8 @@ namespace cetech {
         template < typename T >
         inline void push_back(Array < T >& a,
                               const T& item) {
-            CE_ASSERT(std::is_pod < T > ());
-
+            CE_ASSERT("array", std::is_pod < T > ());
+            
             if (a._size + 1 > a._capacity) {
                 grow(a);
             }

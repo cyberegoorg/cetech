@@ -36,14 +36,14 @@ namespace cetech {
         StringId64_t from_cstringn(const char* str,
                                    const uint32_t len,
                                    const uint32_t seed) {
-            CE_CHECK_PTR(str);
+            CE_ASSERT("stringid64", str != nullptr);
 
             return murmur_hash_64(str, len, seed);
         }
 
         StringId64_t from_cstring(const char* str,
                                   const uint32_t seed) {
-            CE_CHECK_PTR(str);
+            CE_ASSERT("stringid64", str != nullptr);
 
             return from_cstringn(str, strlen(str), seed);
         }

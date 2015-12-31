@@ -88,7 +88,7 @@ namespace cetech {
         }
 
         CE_INLINE SimdVector load(const void* src) {
-            CE_CHECK_PTR(src);
+            CE_ASSERT("simd_vector", src != nullptr);
 
             return make_simd_vector(
                 ((const float*) src)[0],
@@ -99,7 +99,7 @@ namespace cetech {
         }
 
         CE_INLINE SimdVector load3(const void* src) {
-            CE_CHECK_PTR(src);
+            CE_ASSERT("simd_vector", src != nullptr);
 
             return make_simd_vector(
                 ((const float*) src)[0],
@@ -110,7 +110,7 @@ namespace cetech {
         }
 
         CE_INLINE SimdVector load3_w0(const void* src) {
-            CE_CHECK_PTR(src);
+            CE_ASSERT("simd_vector", src != nullptr);
 
             return make_simd_vector(
                 ((const float*) src)[0],
@@ -121,7 +121,7 @@ namespace cetech {
         }
 
         CE_INLINE SimdVector load3_w1(const void* src) {
-            CE_CHECK_PTR(src);
+            CE_ASSERT("simd_vector", src != nullptr);
 
             return make_simd_vector(
                 ((const float*) src)[0],
@@ -133,21 +133,21 @@ namespace cetech {
 
         CE_INLINE void store(const SimdVector& v1,
                              void* dst) {
-            CE_CHECK_PTR(dst);
+            CE_ASSERT("simd_vector", dst != nullptr);
 
             memory::memcpy(dst, v1.v, 16);
         }
 
         CE_INLINE void store3(const SimdVector& v1,
                               void* dst) {
-            CE_CHECK_PTR(dst);
+            CE_ASSERT("simd_vector", dst != nullptr);
 
             memory::memcpy(dst, v1.v, 12);
         }
 
         CE_INLINE void store1(const SimdVector& v1,
                               void* dst) {
-            CE_CHECK_PTR(dst);
+            CE_ASSERT("simd_vector", dst != nullptr);
 
             memory::memcpy(dst, v1.v, 4);
         }
@@ -155,9 +155,8 @@ namespace cetech {
         CE_INLINE void quat_mult(const void* q1,
                                  const void* q2,
                                  void* dst) {
-            CE_CHECK_PTR(q1);
-            CE_CHECK_PTR(q2);
-            CE_CHECK_PTR(dst);
+            CE_ASSERT("quaterinon", q1 != nullptr);
+            CE_ASSERT("quaterinon", q2 != nullptr);
 
             const float* q1f = (const float*)q1;
             const float* q2f = (const float*)q2;
@@ -176,9 +175,8 @@ namespace cetech {
         CE_INLINE void mat33_mult(const void* m1,
                                   const void* m2,
                                   void* dst) {
-            CE_CHECK_PTR(m1);
-            CE_CHECK_PTR(m2);
-            CE_CHECK_PTR(dst);
+            CE_ASSERT("simd_vector", m1 != nullptr);
+            CE_ASSERT("simd_vector", m2 != nullptr);
 
             const float* m1f = (const float*)m1;
             const float* m2f = (const float*)m2;
@@ -201,9 +199,9 @@ namespace cetech {
         CE_INLINE void mat44_mult(const void* m1,
                                   const void* m2,
                                   void* dst) {
-            CE_CHECK_PTR(m1);
-            CE_CHECK_PTR(m2);
-            CE_CHECK_PTR(dst);
+            CE_ASSERT("simd_vector", m1 != nullptr);
+            CE_ASSERT("simd_vector", m2 != nullptr);
+            CE_ASSERT("simd_vector", dst != nullptr);
 
             const float* m1f = (const float*)m1;
             const float* m2f = (const float*)m2;

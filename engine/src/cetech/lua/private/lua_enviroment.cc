@@ -291,7 +291,9 @@ namespace cetech {
 #endif
 
             lua_State* _state = luaL_newstate();
-            CE_CHECK_PTR(_state);
+            
+            CE_ASSERT("lua_enviroment", _state != nullptr);
+            
             data->_state = _state;
 
 
@@ -446,14 +448,14 @@ namespace cetech {
         Vector2& new_tmp_vector2() {
             LuaEnviromentData* data = _globals.data;
 
-            CE_ASSERT( data->_temp_vector2_used < MAX_TEMP_VECTOR2 );
+            CE_ASSERT( "lua_enviroment", data->_temp_vector2_used < MAX_TEMP_VECTOR2 );
             return data->_temp_vector2_buffer[data->_temp_vector2_used++];
         }
 
         Vector3& new_tmp_vector3() {
             LuaEnviromentData* data = _globals.data;
 
-            CE_ASSERT( data->_temp_vector3_used < MAX_TEMP_VECTOR3 );
+            CE_ASSERT( "lua_enviroment", data->_temp_vector3_used < MAX_TEMP_VECTOR3 );
             return data->_temp_vector3_buffer[data->_temp_vector3_used++];
         }
 

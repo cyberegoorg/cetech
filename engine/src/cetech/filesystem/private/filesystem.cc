@@ -29,12 +29,12 @@ namespace cetech {
             DiskFile(const char* path, FSFile::OpenMode mode) {
 #if defined(CETECH_SDL2)
                 rwops = SDL_RWFromFile(path, mode == FSFile::WRITE ? "w" : "r");
-                CE_ASSERT_MSG( is_valid(), SDL_GetError());
+                CE_ASSERT_MSG( "FSFile", is_valid(),  "%s", SDL_GetError(), SDL_GetError());
 #endif
             }
 
             virtual ~DiskFile() {
-                CE_ASSERT( is_valid());
+                CE_ASSERT( "FSFile", is_valid());
 #if defined(CETECH_SDL2)
                 if (SDL_RWclose(rwops) != 0) {
                     log::error("FSFile", "close error: %s", SDL_GetError());
@@ -50,7 +50,7 @@ namespace cetech {
             }
 
             virtual void seek(size_t position) final {
-                CE_ASSERT( is_valid());
+                CE_ASSERT( "FSFile", is_valid());
 
 #if defined(CETECH_SDL2)
                 SDL_RWseek(rwops, position, RW_SEEK_SET);
@@ -58,14 +58,14 @@ namespace cetech {
             };
 
             virtual void seek_to_end() final {
-                CE_ASSERT( is_valid());
+                CE_ASSERT( "FSFile", is_valid());
 #if defined(CETECH_SDL2)
                 SDL_RWseek(rwops, 0, RW_SEEK_END);
 #endif
             };
 
             virtual void skip(size_t bytes) final {
-                CE_ASSERT( is_valid());
+                CE_ASSERT( "FSFile",is_valid());
 
 #if defined(CETECH_SDL2)
                 SDL_RWseek(rwops, bytes, RW_SEEK_CUR);
@@ -73,7 +73,7 @@ namespace cetech {
             };
 
             virtual size_t position() final {
-                CE_ASSERT( is_valid());
+                CE_ASSERT( "FSFile", is_valid());
 
 #if defined(CETECH_SDL2)
                 return SDL_RWtell(rwops);
@@ -81,13 +81,13 @@ namespace cetech {
             };
 
             virtual bool end_of_file()  final {
-                CE_ASSERT( is_valid());
+                CE_ASSERT( "FSFile", is_valid());
 
                 return position() == size();
             };
 
             virtual size_t size()  final {
-                CE_ASSERT( is_valid());
+                CE_ASSERT( "FSFile", is_valid());
 
                 const size_t curent_pos = position();
                 seek_to_end();
@@ -99,7 +99,7 @@ namespace cetech {
 
             virtual void read(void* buffer,
                               size_t size) final {
-                CE_ASSERT( is_valid());
+                CE_ASSERT( "FSFile", is_valid());
 #if defined(CETECH_SDL2)
                 SDL_RWread(rwops, buffer, sizeof(char), size);
 #endif
@@ -107,7 +107,7 @@ namespace cetech {
 
             virtual void write(const void* buffer,
                                size_t size)  final {
-                CE_ASSERT( is_valid());
+                CE_ASSERT( "FSFile", is_valid());
 
 #if defined(CETECH_SDL2)
                 SDL_RWwrite(rwops, buffer, sizeof(char), size);
@@ -240,7 +240,7 @@ namespace cetech {
     namespace filesystem {
         void map_root_dir(StringId64_t name,
                           const char* dir) {
-            CE_ASSERT( dir[strlen(dir) - 1] == '/' );
+            CE_ASSERT( "filesystem", dir[strlen(dir) - 1] == '/' );
 
             hash::set < const char* > (_globals.data->_dir_map, name, strdup(dir));
         }

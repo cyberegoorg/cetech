@@ -29,6 +29,8 @@
                    "msg: |\n"\
                    "  %s\n"
 
+static const char* level_to_str[] = { "I", "W", "E", "D" };
+            
 namespace cetech {
     namespace {
         using namespace console_server;
@@ -40,14 +42,12 @@ namespace cetech {
                              const char* msg,
                              void* data) {
 
-            static const char* level_to_str[] = { "I", "W", "E", "D" };
-
             int socket = (intptr_t)data;
             
-            static __thread char packet[4096];     //!< Final msg.
+            char packet[4096];     //!< Final msg.
             int len = snprintf(packet, 4096, LOG_FORMAT, level_to_str[level], where, time, worker_id, msg);
             int bytes = nn_send (socket, packet, len, 0);
-            CE_ASSERT(bytes == len);
+            CE_ASSERT("console_server", bytes == len);
         }
         
         struct ConsoleServerData {       
@@ -134,7 +134,7 @@ namespace cetech {
         void send_msg(const Array<char>& msg) {
             int socket = _globals.data->dev_pub_socket;
             size_t bytes = nn_send (socket, array::begin(msg), array::size(msg), 0);
-            CE_ASSERT(bytes == array::size(msg));
+            CE_ASSERT("console_server", bytes == array::size(msg));
         }
                
         void tick() {
@@ -145,7 +145,7 @@ namespace cetech {
             char *buf = NULL;
             int bytes = nn_recv(socket, &buf, NN_MSG, NN_DONTWAIT);
             if(bytes < 0) {
-                CE_ASSERT( errno == EAGAIN );
+                CE_ASSERT("console_server",  errno == EAGAIN );
                 goto end;
             }
             
@@ -165,14 +165,14 @@ end:
             _globals.data = new(p) ConsoleServerData(memory_globals::default_allocator());
             
             int socket = nn_socket (AF_SP, NN_PUB);
-            CE_ASSERT(socket >= 0);
-            CE_ASSERT(nn_bind (socket, "ws://*:5556") >= 0);
+            CE_ASSERT("console_server", socket >= 0);
+            CE_ASSERT("console_server", nn_bind (socket, "ws://*:5556") >= 0);
             _globals.data->dev_pub_socket = socket;
             log::register_handler(&nanolog_handler, (void*)(intptr_t)socket);
             
             socket = nn_socket (AF_SP, NN_REP);
-            CE_ASSERT(socket >= 0);
-            CE_ASSERT(nn_bind (socket, "ws://*:5557") >= 0);
+            CE_ASSERT("console_server", socket >= 0);
+            CE_ASSERT("console_server", nn_bind (socket, "ws://*:5557") >= 0);
             _globals.data->dev_rep_socket = socket;
         }
 

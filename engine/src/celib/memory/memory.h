@@ -191,39 +191,39 @@ namespace cetech {
 
     void* memory::pointer_add(void* p,
                               const uint32_t bytes) {
-        CE_CHECK_PTR(p);
+        CE_ASSERT("memory", p != nullptr);
 
         return (void*)((char*)p + bytes);
     }
 
     const void* memory::pointer_add(const void* p,
                                     const uint32_t bytes) {
-        CE_CHECK_PTR(p);
+        CE_ASSERT("memory", p != nullptr);
         return (const void*)((const char*)p + bytes);
     }
 
     void* memory::pointer_sub(void* p,
                               const uint32_t bytes) {
-        CE_CHECK_PTR(p);
+        CE_ASSERT("memory", p != nullptr);
         return (void*)((char*)p - bytes);
     }
 
     const void* memory::pointer_sub(const void* p,
                                     const uint32_t bytes) {
-        CE_CHECK_PTR(p);
+        CE_ASSERT("memory", p != nullptr);
         return (const void*)((const char*)p - bytes);
     }
 
     void* memory::memcpy(void* dst,
                          const void* src,
                          const uint32_t bytes) {
-        CE_CHECK_PTR(dst);
+        CE_ASSERT("memory", dst != nullptr);
         return std::memcpy(dst, src, bytes);
     }
 
     void* memory::malloc(const uint32_t bytes) {
         void* res = std::malloc(bytes);
-        CE_CHECK_PTR(res);
+        CE_ASSERT("memory", res != nullptr);
         return res;
     }
 }
