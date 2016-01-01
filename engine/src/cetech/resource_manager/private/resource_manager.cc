@@ -31,13 +31,13 @@ namespace cetech {
             Spinlock add_lock;
             bool autoreload;
 
-            ResouceManagerData(Allocator & allocator) : _data_map(allocator),
-                                                        _data_refcount_map(allocator),
-                                                        _load_clb_map(allocator),
-                                                        _unload_clb_map(allocator),
-                                                        _online_clb_map(allocator),
-                                                        _offline_clb_map(allocator),
-                                                        autoreload(true) {}
+            explicit ResouceManagerData(Allocator& allocator) : _data_map(allocator),
+                                                                _data_refcount_map(allocator),
+                                                                _load_clb_map(allocator),
+                                                                _unload_clb_map(allocator),
+                                                                _online_clb_map(allocator),
+                                                                _offline_clb_map(allocator),
+                                                                autoreload(true) {}
         };
 
         struct Globals {
@@ -94,8 +94,6 @@ namespace cetech {
                   const StringId64_t* names,
                   const uint32_t count) {
 
-            StringId64_t name = 0;
-
             resource_loader_clb_t clb = hash::get < resource_loader_clb_t >
                                         (_globals.data->_load_clb_map, type, nullptr);
 
@@ -107,7 +105,7 @@ namespace cetech {
             }
 
             for (uint32_t i = 0; i < count; ++i) {
-                name = names[i];
+                StringId64_t name = name = names[i];
 
                 log::debug("resource_manager",
                            "Loading resource " "%" PRIx64 "%" PRIx64 "",
@@ -225,9 +223,9 @@ namespace cetech {
         bool can_get(const StringId64_t type,
                      const StringId64_t* names,
                      const uint32_t count) {
-            StringId64_t name = 0;
+
             for (uint32_t i = 0; i < count; ++i) {
-                name = names[i];
+                StringId64_t name = names[i];
 
                 if (!hash::has(_globals.data->_data_map, type ^ name)) {
                     thread::spin_unlock(_globals.data->add_lock);

@@ -38,7 +38,7 @@
                        __FILE__, \
                        __LINE__, \
                        st); \
-            usleep(1000);\
+            sleep(1); \
             free(st); \
             abort(); \
         } \

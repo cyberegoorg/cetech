@@ -227,7 +227,7 @@ bool big_init() {
     renderer_globals::init();
     lua_enviroment_globals::init();
     application_globals::init();
-    
+
     return true;
 }
 
@@ -237,7 +237,6 @@ bool big_init() {
 static void make_path(char* buffer,
                       size_t max_size,
                       const char* path) {
-    memset(buffer, 0, max_size);
     strcpy(buffer, path);
 
     const size_t len = strlen(buffer);

@@ -93,7 +93,7 @@ namespace cetech {
             unsigned char* dds_data;
             int w, h, ch, dds_size;
 
-            data = dds_data = 0;
+            dds_data = 0;
             w = h = ch = 0;
 
             data = SOIL_load_image(full_input_path, &w, &h, &ch, SOIL_LOAD_AUTO);

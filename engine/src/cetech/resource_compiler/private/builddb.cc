@@ -89,7 +89,7 @@ namespace cetech {
 
     };
 
-    BuildDB::BuildDB() {}
+    BuildDB::BuildDB() : _db(0) {}
 
     BuildDB::~BuildDB() {
         close();
