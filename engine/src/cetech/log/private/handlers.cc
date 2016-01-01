@@ -16,7 +16,7 @@
     "where: %s\n" \
     "time: %s\n" \
     "worker: %d\n" \
-    "msg: %s\n"
+    "msg: |\n  %s\n"
 
 #define COLOR_RED  "\x1B[31m"
 #define COLOR_GREEN  "\x1B[32m"

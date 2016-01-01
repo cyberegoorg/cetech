@@ -75,8 +75,9 @@ namespace cetech {
                     break;
 
                 default:
-                    log::error("BuildDB", "SQL error '%s' (%d): %s", sqlite3_sql(
-                                   _stmt), rc, sqlite3_errmsg(_db));
+                    CE_ASSERT_MSG("builddb", false, "SQL error '%s' (%d): %s",
+                                  sqlite3_sql(_stmt), rc, sqlite3_errmsg(_db));
+
                     run = false;
                     break;
                 }
@@ -153,7 +154,6 @@ namespace cetech {
 
     bool BuildDB::init_db() {
         // Create files table
-
         {
             SQLiteSTMT query(_db,
                              "CREATE TABLE IF NOT EXISTS files (\n"
@@ -167,8 +167,8 @@ namespace cetech {
             }
         }
 
+        // Create file_dependency table
         {
-            // Create file_dependency table
             SQLiteSTMT query(_db,
                              "CREATE TABLE IF NOT EXISTS file_dependency (\n"
                              "id        INTEGER PRIMARY KEY    AUTOINCREMENT    NOT NULL,\n"

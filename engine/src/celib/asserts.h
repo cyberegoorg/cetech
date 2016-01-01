@@ -32,7 +32,7 @@
             char buffer[4096] = {0}; \
             error::to_yaml(buffer); \
             log::error(where ".assert", \
-                       "|\n  when: %s  msg: " #condition msg "\n  file: %s\n  line: %d\n  stacktrace:\n%s", \
+                       "when: %s  msg: " #condition msg "\n  file: %s\n  line: %d\n  stacktrace:\n%s", \
                        buffer, \
                        ## __VA_ARGS__, \
                        __FILE__, \
