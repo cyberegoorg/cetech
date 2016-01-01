@@ -22,7 +22,7 @@ namespace cetech {
         void to_yaml(char* buffer) {
             // TODO: rewrite, safety
             const int size = array::size(*_scope_name);
-
+                       
             if (size == 0) {
                 sprintf(buffer, " ~\n");
                 return;
