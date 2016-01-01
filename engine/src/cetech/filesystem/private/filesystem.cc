@@ -124,7 +124,7 @@ namespace cetech {
             Allocator& _allocator;
             Hash < const char* > _dir_map;
 
-            FilesystemData(Allocator & allocator) : _allocator(allocator), _dir_map(allocator) {}
+            explicit FilesystemData(Allocator& allocator) : _allocator(allocator), _dir_map(allocator) {}
         };
 
         struct Globals {

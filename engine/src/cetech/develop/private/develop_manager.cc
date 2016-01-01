@@ -35,10 +35,10 @@ namespace cetech {
             EventStream stream;
             Spinlock lock;
 
-            DevelopManagerData(Allocator & allocator) : to_yaml(allocator),
-                                                        type_to_string(allocator),
-                                                        buffer(allocator),
-                                                        stream(allocator) {
+            explicit DevelopManagerData(Allocator& allocator) : to_yaml(allocator),
+                                                                type_to_string(allocator),
+                                                                buffer(allocator),
+                                                                stream(allocator) {
                 array::set_capacity(stream.stream, 4096);
                 array::set_capacity(buffer, 4096);
             }

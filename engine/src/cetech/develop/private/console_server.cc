@@ -55,7 +55,7 @@ namespace cetech {
             int dev_pub_socket;
             int dev_rep_socket;
 
-            ConsoleServerData(Allocator & allocator) : cmds(allocator), dev_pub_socket(0) {}
+            ConsoleServerData(Allocator & allocator) : cmds(allocator), dev_pub_socket(0), dev_rep_socket(0) {}
 
             ~ConsoleServerData() {}
         };

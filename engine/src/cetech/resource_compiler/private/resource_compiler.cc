@@ -45,7 +45,7 @@ namespace cetech {
             CompileTask compile_task_pool[TASK_POOL_SIZE];
             uint32_t compile_task_pool_idx;
 
-            ResouceCompilerData(Allocator & allocator) : _compile_clb_map(allocator), compile_task_pool_idx(0) {
+            explicit ResouceCompilerData(Allocator& allocator) : _compile_clb_map(allocator), compile_task_pool_idx(0) {
                 static_assert( 0 == (TASK_POOL_SIZE & TASK_POOL_SIZE_MASK), "TASK_POOL_SIZE must be power of two,");
 
                 memset(compile_task_pool, 0, sizeof(CompileTask) * TASK_POOL_SIZE);
