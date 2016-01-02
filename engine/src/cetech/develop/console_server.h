@@ -4,8 +4,8 @@
 **** Includes
 *******************************************************************************/
 
-#include "celib/memory_types.h"
-#include "celib/container_types.h"
+#include "celib/memory/types.h"
+#include "celib/container/types.h"
 #include "rapidjson/document.h"
 
 /*******************************************************************************

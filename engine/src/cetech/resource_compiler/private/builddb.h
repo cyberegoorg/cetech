@@ -2,7 +2,7 @@
 
 #include <ctime>
 
-#include "celib/stringid_types.h"
+#include "celib/string/types.h"
 
 struct sqlite3;
 

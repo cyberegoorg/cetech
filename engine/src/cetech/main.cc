@@ -237,7 +237,7 @@ bool big_init() {
 static void make_path(char* buffer,
                       size_t max_size,
                       const char* path) {
-    strcpy(buffer, path);
+    strncpy(buffer, path, max_size);
 
     const size_t len = strlen(buffer);
     if (buffer[len - 1] != '/') {

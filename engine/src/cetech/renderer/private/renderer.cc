@@ -3,7 +3,7 @@
 
 #include "celib/macros.h"
 #include "celib/memory/memory.h"
-#include "celib/math_types.h"
+#include "celib/math/types.h"
 #include "celib/math/matrix44.inl.h"
 
 

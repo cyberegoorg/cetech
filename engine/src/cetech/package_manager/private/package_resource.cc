@@ -6,7 +6,7 @@
 #include "rapidjson/error/en.h"
 
 #include "celib/container/array.inl.h"
-#include "celib/stringid_types.h"
+#include "celib/string/types.h"
 #include "celib/memory/memory.h"
 #include "celib/macros.h"
 #include "celib/string/stringid.inl.h"
