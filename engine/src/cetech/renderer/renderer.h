@@ -6,8 +6,8 @@
 
 #include <cinttypes>
 
-#include "celib/stringid_types.h"
-#include "celib/memory_types.h"
+#include "celib/string/types.h"
+#include "celib/memory/types.h"
 
 #include "cetech/window/window.h"
 

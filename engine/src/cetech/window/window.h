@@ -6,8 +6,8 @@
 
 #include "celib/defines.h"
 
-#include "celib/container_types.h"
-#include "celib/math_types.h"
+#include "celib/container/types.h"
+#include "celib/math/types.h"
 
 #if defined(CETECH_SDL2)
     #include "SDL2/SDL.h"

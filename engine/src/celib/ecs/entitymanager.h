@@ -8,8 +8,8 @@
 #include "celib/handler/handler_manager.h"
 #include "celib/memory/memory.h"
 #include "celib/container/queue.inl.h"
-#include "celib/entitymanager_types.h"
-#include "celib/memory_types.h"
+#include "celib/ecs/types.h"
+#include "celib/memory/types.h"
 
 namespace cetech {
 

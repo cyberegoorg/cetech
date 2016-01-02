@@ -4,7 +4,7 @@
 **** Includes
 *******************************************************************************/
 
-#include "celib/math_types.h"
+#include "celib/math/types.h"
 #include "celib/math/math.inl.h"
 #include "celib/math/simd/simd.h"
 #include "celib/math/vector3.inl.h"

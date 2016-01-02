@@ -2,8 +2,8 @@
 
 #include "luajit/lua.hpp"
 
-#include "celib/stringid_types.h"
-#include "celib/math_types.h"
+#include "celib/string/types.h"
+#include "celib/math/types.h"
 #include "celib/macros.h"
 #include "celib/container/array.inl.h"
 

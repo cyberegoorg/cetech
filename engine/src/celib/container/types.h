@@ -5,7 +5,7 @@
 *******************************************************************************/
 
 #include "celib/types.h"
-#include "celib/memory_types.h"
+#include "celib/memory/types.h"
 
 #include <vector>
 

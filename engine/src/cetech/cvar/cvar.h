@@ -9,7 +9,7 @@
 #include "celib/asserts.h"
 #include "cetech/cvar/cvar_types.h"
 #include "celib/crypto/murmur_hash.inl.h"
-#include "celib/stringid_types.h"
+#include "celib/string/types.h"
 
 #include "cetech/log/log.h"
 

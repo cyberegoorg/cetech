@@ -5,7 +5,7 @@
 *******************************************************************************/
 
 #include "celib/asserts.h"
-#include "celib/stringid_types.h"
+#include "celib/string/types.h"
 #include "celib/crypto/murmur_hash.inl.h"
 
 namespace cetech {

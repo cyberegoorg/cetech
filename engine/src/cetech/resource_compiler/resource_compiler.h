@@ -8,7 +8,7 @@
 
 #include "rapidjson/document.h"
 
-#include "celib/stringid_types.h"
+#include "celib/string/types.h"
 
 #include "cetech/resource_compiler/compilatorapi.h"
 #include "cetech/filesystem/filesystem.h"

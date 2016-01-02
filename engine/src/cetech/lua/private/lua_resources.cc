@@ -4,7 +4,7 @@
 #include "rapidjson/writer.h"
 #include "rapidjson/stringbuffer.h"
 
-#include "celib/stringid_types.h"
+#include "celib/string/types.h"
 #include "celib/memory/memory.h"
 #include "celib/macros.h"
 #include "celib/string/stringid.inl.h"
