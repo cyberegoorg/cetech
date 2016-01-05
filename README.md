@@ -51,6 +51,7 @@ CETech is Data-Driven [game engine](https://en.wikipedia.org/wiki/Game_engine) a
 * [sqlite3](https://www.sqlite.org/) - SQL database engine.
 * [libyaml](https://github.com/yaml/libyaml.git) - YAML parser.
 * [nanomsg](http://nanomsg.org/) - Socket library that provides several common communication patterns.
+* [mpack](https://github.com/ludocode/mpack) - A C encoder/decoder for the MessagePack serialization format.
 
 ### Python
 
@@ -64,6 +65,7 @@ CETech is Data-Driven [game engine](https://en.wikipedia.org/wiki/Game_engine) a
 * [Ace](https://ace.c9.io/) - Editor library.
 * [GoJS](http://gojs.net/) - Diagram library.
 * [vis.js](http://visjs.org/) - Visualization library.
+* [MSGPack-lite](https://github.com/kawanet/msgpack-lite) - Fast Pure JavaScript MessagePack Encoder and Decoder.
 
 ### Others
 

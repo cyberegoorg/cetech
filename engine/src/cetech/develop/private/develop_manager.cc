@@ -16,15 +16,17 @@
 #include "nanomsg/nn.h"
 #include "nanomsg/pubsub.h"
 
+#include "mpack/mpack.h"
+
 namespace cetech {
     namespace {
         using namespace develop_manager;
 
         typedef void (* to_yaml_fce_t)(const void*,
-                                       Array < char >& buffer);
+                                       mpack_writer_t* writer);
 
         static thread_local char _stream_buffer[64 * 1024] = {0};
-        static thread_local uint32_t _stream_buffer_count = 0;
+        static thread_local uint32_t _stream_buffer_size = 0;
 
         static thread_local uint32_t _scope_depth = 0;
 
@@ -34,11 +36,13 @@ namespace cetech {
             Array < char > buffer;
             EventStream stream;
             Spinlock lock;
+            int dev_pub_socket;
 
             explicit DevelopManagerData(Allocator& allocator) : to_yaml(allocator),
                                                                 type_to_string(allocator),
                                                                 buffer(allocator),
-                                                                stream(allocator) {
+                                                                stream(allocator),
+                                                                dev_pub_socket(0) {
                 array::set_capacity(stream.stream, 4096);
                 array::set_capacity(buffer, 4096);
             }
@@ -60,20 +64,20 @@ namespace cetech {
         template < typename T >
         void push(uint32_t type,
                   const T& event) {
-            //log::info("dm", "push: %d %d\n", type, _stream_buffer_count);
+            //log::info("dm", "push: %d %d\n", type, _stream_buffer_size);
             const uint32_t sz = sizeof(eventstream::Header) + sizeof(T);
 
-            if ((_stream_buffer_count + sz) >= 64 * 1024) {
+            if ((_stream_buffer_size + sz) >= 64 * 1024) {
                 flush_stream_buffer();
             }
 
-            char* p = _stream_buffer + _stream_buffer_count;
+            char* p = _stream_buffer + _stream_buffer_size;
 
             eventstream::Header* h = (eventstream::Header*)p;
             h->type = type;
             h->size = sizeof(T);
 
-            _stream_buffer_count += sz;
+            _stream_buffer_size += sz;
 
             *(T*)(p + sizeof(eventstream::Header)) = event;
         }
@@ -92,9 +96,8 @@ namespace cetech {
         void flush_stream_buffer() {
             thread::spin_lock(_globals.data->lock);
 
-            //printf("flush: %d\n", _stream_buffer_count);
-            eventstream::write(develop_manager::event_stream(), _stream_buffer, _stream_buffer_count);
-            _stream_buffer_count = 0;
+            eventstream::write(develop_manager::event_stream(), _stream_buffer, _stream_buffer_size);
+            _stream_buffer_size = 0;
 
             thread::spin_unlock(_globals.data->lock);
         }
@@ -111,31 +114,43 @@ namespace cetech {
                 return;
             }
 
-            Array < char >& buffer = _globals.data->buffer;
-            array::clear(buffer);
+            thread::spin_lock(_globals.data->lock); // TODO: remove
 
-            char buf[256];
-            array::push(buffer, buf, snprintf(buf, 256, "#develop_manager\nevents:\n"));
-
+            uint32_t event_num = 0;
             eventstream::event_it it = 0;
+            while (eventstream::valid(_globals.data->stream, it)) {
+                event_num += 1;
+                it = eventstream::next(_globals.data->stream, it);
+            }
+
+            char* data;
+            size_t size;
+            mpack_writer_t writer;
+            mpack_writer_init_growable(&writer, &data, &size);
+
+            mpack_start_array(&writer, event_num);
+
+            it = 0;
             while (eventstream::valid(_globals.data->stream, it)) {
                 eventstream::Header* header = eventstream::header(_globals.data->stream, it);
 
-                const char* type_str = hash::get < const char* > (_globals.data->type_to_string,
-                                                                  (EventType)header->type,
-                                                                  "NONE");
-
-                array::push(buffer, buf, snprintf(buf, 256, "  - etype: %s\n", type_str));
-
+                //etype
                 to_yaml_fce_t to_yaml_fce = hash::get < to_yaml_fce_t > (_globals.data->to_yaml, header->type, nullptr);
                 CE_ASSERT("develop_manager", to_yaml_fce);
 
-                to_yaml_fce(eventstream::event < void* > (_globals.data->stream, it), buffer);
+                to_yaml_fce(eventstream::event < void* > (_globals.data->stream, it), &writer);
 
                 it = eventstream::next(_globals.data->stream, it);
             }
 
-            console_server::send_msg(buffer);
+            thread::spin_unlock(_globals.data->lock);
+            mpack_finish_array(&writer);
+
+            CE_ASSERT("develop_manager", mpack_writer_destroy(&writer) == mpack_ok);
+
+            int socket = _globals.data->dev_pub_socket;
+            size_t bytes = nn_send(socket, data, size, 0);
+            CE_ASSERT("console_server", bytes == size);
         }
 
         void push_begin_frame() {
@@ -222,73 +237,99 @@ namespace cetech {
         }
 
         static void beginframe_to_json(const void* event,
-                                       Array < char >& buffer) {
+                                       mpack_writer_t* writer) {
             BeginFrameEvent* e = (BeginFrameEvent*)event;
 
-            static char buf[4096] = {0};
+            mpack_start_map(writer, 4);
 
-            static char format[] = "    time: %ld\n"
-                                   "    time_ns: %ld\n"
-                                   "    frame_id: %d\n";
+            mpack_write_cstr(writer, "etype");
+            mpack_write_cstr(writer, "EVENT_BEGIN_FRAME");
 
-            size_t len = snprintf(buf, 4096, format, time::get_sec(e->time), time::get_nsec(e->time), e->frame_id);
-            array::push(buffer, buf, len);
+            mpack_write_cstr(writer, "time");
+            mpack_write_i64(writer, time::get_sec(e->time));
+
+            mpack_write_cstr(writer, "time_ns");
+            mpack_write_i64(writer, time::get_nsec(e->time));
+
+            mpack_write_cstr(writer, "frame_id");
+            mpack_write_i64(writer, e->frame_id);
+
+            mpack_finish_map(writer);
         }
 
         static void endframe_to_json(const void* event,
-                                     Array < char >& buffer) {
+                                     mpack_writer_t* writer) {
             EndFrameEvent* e = (EndFrameEvent*)event;
 
-            static char buf[4096] = {0};
+            mpack_start_map(writer, 4);
 
-            static const char format[] = "    time: %ld\n"
-                                         "    time_ns: %ld\n"
-                                         "    frame_id: %d\n";
+            mpack_write_cstr(writer, "etype");
+            mpack_write_cstr(writer, "EVENT_END_FRAME");
 
-            size_t len = snprintf(buf, 4096, format, time::get_sec(e->time), time::get_nsec(e->time), e->frame_id);
-            array::push(buffer, buf, len);
+            mpack_write_cstr(writer, "time");
+            mpack_write_i64(writer, time::get_sec(e->time));
+
+            mpack_write_cstr(writer, "time_ns");
+            mpack_write_i64(writer, time::get_nsec(e->time));
+
+            mpack_write_cstr(writer, "frame_id");
+            mpack_write_i64(writer, e->frame_id);
+
+            mpack_finish_map(writer);
         }
 
         static void begintask_to_json(const void* event,
-                                      Array < char >& buffer) {
+                                      mpack_writer_t* writer) {
             ScopeEvent* e = (ScopeEvent*)event;
 
-            static char buf[4096] = {0};
-            static const char format[] = "    name: %s\n"
-                                         "    frame_id: %d\n"
-                                         "    start: %ld\n"
-                                         "    start_ns: %ld\n"
-                                         "    end: %ld\n"
-                                         "    end_ns: %ld\n"
-                                         "    worker_id: %d\n"
-                                         "    depth: %d\n";
+            mpack_start_map(writer, 9);
 
-            size_t len = snprintf(buf, 4096, format,
-                                  e->name,
-                                  e->frame_id,
-                                  time::get_sec(e->start),
-                                  time::get_nsec(e->start),
-                                  time::get_sec(e->end),
-                                  time::get_nsec(e->end),
-                                  e->worker_id,
-                                  e->depth);
+            mpack_write_cstr(writer, "etype");
+            mpack_write_cstr(writer, "EVENT_SCOPE");
 
-            array::push(buffer, buf, len);
+            mpack_write_cstr(writer, "name");
+            mpack_write_cstr(writer, e->name);
+
+            mpack_write_cstr(writer, "frame_id");
+            mpack_write_i64(writer, e->frame_id);
+
+            mpack_write_cstr(writer, "start");
+            mpack_write_i64(writer, time::get_sec(e->start));
+
+            mpack_write_cstr(writer, "start_ns");
+            mpack_write_i64(writer, time::get_nsec(e->start));
+
+            mpack_write_cstr(writer, "end");
+            mpack_write_i64(writer, time::get_sec(e->end));
+
+            mpack_write_cstr(writer, "end_ns");
+            mpack_write_i64(writer, time::get_nsec(e->end));
+
+            mpack_write_cstr(writer, "worker_id");
+            mpack_write_i32(writer, e->worker_id);
+
+            mpack_write_cstr(writer, "depth");
+            mpack_write_i32(writer, e->depth);
+
+            mpack_finish_map(writer);
         }
 
         static void recordfloat_to_json(const void* event,
-                                        Array < char >& buffer) {
+                                        mpack_writer_t* writer) {
             RecordFloatEvent* e = (RecordFloatEvent*)event;
 
-            static char buf[4096] = {0};
-            static const char format[] = "    name: %s\n"
-                                         "    value: %f\n";
+            mpack_start_map(writer, 3);
 
-            size_t len = snprintf(buf, 4096, format,
-                                  e->name,
-                                  e->value);
+            mpack_write_cstr(writer, "etype");
+            mpack_write_cstr(writer, "EVENT_RECORD_FLOAT");
 
-            array::push(buffer, buf, len);
+            mpack_write_cstr(writer, "name");
+            mpack_write_cstr(writer, e->name);
+
+            mpack_write_cstr(writer, "value");
+            mpack_write_float(writer, e->value);
+
+            mpack_finish_map(writer);
         }
     }
 
@@ -303,6 +344,11 @@ namespace cetech {
             register_type(EVENT_END_FRAME, "EVENT_END_FRAME", endframe_to_json);
             register_type(EVENT_SCOPE, "EVENT_SCOPE", begintask_to_json);
             register_type(EVENT_RECORD_FLOAT, "EVENT_RECORD_FLOAT", recordfloat_to_json);
+
+            int socket = nn_socket(AF_SP, NN_PUB);
+            CE_ASSERT("develop_manager", socket >= 0);
+            CE_ASSERT("develop_manager", nn_bind(socket, "ws://*:5558") >= 0);
+            _globals.data->dev_pub_socket = socket;
         }
 
         void shutdown() {
