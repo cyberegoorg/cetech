@@ -163,7 +163,7 @@ bool big_init() {
     posix_init();
 #endif
 
-    log_globals::init();
+    log_globals::init(&task_manager::get_worker_id);
     log::register_handler(&log::stdout_handler);
 
     FILE* log = fopen("log.yaml", "w");
