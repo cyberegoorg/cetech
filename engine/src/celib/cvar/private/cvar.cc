@@ -18,7 +18,7 @@ namespace cetech {
 
     namespace cvar_internal {
         using namespace cvar;
-        
+
         bool check_set_flags(const CVar& cv) {
             if (cv.flags & CVar::FLAG_CONST) {
                 log::error("CVar", "Could not set cvar \"%s\". CVar is const.", cv.name);
@@ -112,7 +112,7 @@ clean_up:
             yaml_token_delete(&token);
         }
     }
-    
+
     CVar::CVar(const char* name_,
                const char* desc_,
                CVarType type_,
@@ -215,7 +215,7 @@ clean_up:
             cv.value_str = strdup(str);
             cv.str_len = strlen(str);
         }
-        
+
         void set(CVar& cv,
                  float value) {
             CE_ASSERT( "cvar", cv.type == CVar::CVAR_FLOAT );
@@ -344,4 +344,3 @@ clean_up:
         }
     }
 }
-

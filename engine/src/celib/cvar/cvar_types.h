@@ -45,27 +45,27 @@ namespace cetech {
         };
 
         CVar(const char* name,
-                       const char* desc,
-                       CVarType type,
-                       uint32_t flags);
+             const char* desc,
+             CVarType type,
+             uint32_t flags);
 
         CVar(const char* name,
-                       const char* desc,
-                       float value,
-                       uint32_t flags = FLAG_NONE,
-                       float min = 0.0f,
-                       float max = 0.0f);
+             const char* desc,
+             float value,
+             uint32_t flags = FLAG_NONE,
+             float min = 0.0f,
+             float max = 0.0f);
 
         CVar(const char* name,
-                       const char* desc,
-                       int value,
-                       uint32_t flags = FLAG_NONE,
-                       int min = 0,
-                       int max = 0);
+             const char* desc,
+             int value,
+             uint32_t flags = FLAG_NONE,
+             int min = 0,
+             int max = 0);
 
         CVar(const char* name,
-                       const char* desc,
-                       const char* value,
-                       uint32_t flags = FLAG_NONE);
+             const char* desc,
+             const char* value,
+             uint32_t flags = FLAG_NONE);
     };
 }

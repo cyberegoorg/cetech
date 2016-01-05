@@ -9,7 +9,7 @@ namespace cetech {
     };
 
     namespace error {
-        void to_yaml(char* buffer) {           
+        void to_yaml(char* buffer) {
             // TODO: rewrite, safety
             const int size = array::size(*_scope_name);
 
