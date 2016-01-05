@@ -75,7 +75,7 @@ namespace cetech {
 
         CE_INLINE void write(EventStream& stream,
                              const void* events,
-                             uint32_t size );
+                             uint32_t size);
 
         /***********************************************************************
         **** Write event

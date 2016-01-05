@@ -38,6 +38,8 @@ namespace cetech {
         /***********************************************************************
         **** Send message.
         ***********************************************************************/
+        void send_msg(const char* buffer,
+                      size_t size);
         void send_msg(const Array < char >& msg);
     }
 

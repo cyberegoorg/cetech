@@ -129,11 +129,15 @@ namespace cetech {
             hash::set(data->cmds, stringid64::from_cstring(name), clb);
         }
 
+        void send_msg(const char* buffer,
+                      size_t size) {
+            int socket = _globals.data->dev_pub_socket;
+            size_t bytes = nn_send(socket, buffer, size, 0);
+            CE_ASSERT("console_server", bytes == size);
+        }
 
         void send_msg(const Array < char >& msg) {
-            int socket = _globals.data->dev_pub_socket;
-            size_t bytes = nn_send(socket, array::begin(msg), array::size(msg), 0);
-            CE_ASSERT("console_server", bytes == array::size(msg));
+            send_msg(array::begin(msg), array::size(msg));
         }
 
         void tick() {
