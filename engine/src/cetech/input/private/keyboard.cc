@@ -7,7 +7,7 @@
 
 #include "celib/macros.h"
 #include "celib/log/log.h"
-#include "celib/asserts.h"
+#include "celib/errors/errors.h"
 #include "celib/container/array.inl.h"
 #include "celib/crypto/murmur_hash.inl.h"
 #include "celib/math/vector2.inl.h"
