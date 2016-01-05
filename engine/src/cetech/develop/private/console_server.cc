@@ -13,10 +13,6 @@
 #include "cetech/application/application.h"
 #include "cetech/develop/develop_manager.h"
 
-#include "rapidjson/writer.h"
-#include "rapidjson/stringbuffer.h"
-#include "rapidjson/error/en.h"
-
 #include "nanomsg/nn.h"
 #include "nanomsg/pubsub.h"
 #include "nanomsg/reqrep.h"
@@ -72,28 +68,6 @@ namespace cetech {
         } _globals;
 
 
-        bool validate_packet(rapidjson::Document& document,
-                             const char* packet,
-                             const uint32_t size) {
-            CE_UNUSED(size);
-
-            document.Parse(packet);
-
-            if (document.HasParseError()) {
-                log::error("console_server", "Packet parse error: %s", GetParseError_En(
-                               document.GetParseError()), document.GetErrorOffset());
-                return false;
-            }
-
-            /* Name */
-            if (!document.HasMember("name")) {
-                log::error("console_server", "Packet require key \"name\"");
-                return false;
-            }
-
-            return true;
-        }
-
         void parse_packet(uint32_t client,
                           const char* packet,
                           const uint32_t size) {
@@ -101,23 +75,21 @@ namespace cetech {
 
             ConsoleServerData* data = _globals.data;
 
-            rapidjson::Document document;
-            if (!validate_packet(document, packet, size)) {
-                return;
-            }
+            mpack_tree_t tree;
+            mpack_tree_init(&tree, packet, size);
+            mpack_node_t root = mpack_tree_root(&tree);
 
             // Find command
-            command_clb_t cmd = hash::get < command_clb_t >
-                                (data->cmds, stringid64::from_cstring(document["name"].GetString()), nullptr);
+            char cmd_name[256];
+            mpack_node_copy_cstr(mpack_node_map_cstr(root, "name"), cmd_name, 256);
+                       
+            command_clb_t cmd = hash::get < command_clb_t > (data->cmds, stringid64::from_cstring(cmd_name), nullptr);
             if (cmd == nullptr) {
-                log::error("console_server", "Command \"%s\" not found.", document["name"].GetString());
+                log::error("console_server", "Command \"%s\" not found.", cmd_name);
                 return;
             }
-
-            rapidjson::Document document_out;
-            cmd(document, document_out);
-
-            if (document_out.IsObject()) {}
+            
+            cmd(root);
         }
     }
 
@@ -152,6 +124,7 @@ namespace cetech {
                 goto end;
             }
 
+            //log::debug("ddddd", "parse");
             parse_packet(0, buf, bytes);
             nn_freemsg(buf);
 

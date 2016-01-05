@@ -274,10 +274,10 @@ namespace cetech {
         // -- Vector3
 
 #if defined(CETECH_DEVELOP)
-        static void cmd_lua_execute(const rapidjson::Document& in,
-                                    rapidjson::Document& out) {
-            CE_UNUSED(out);
-            lua_enviroment::execute_string(in["args"]["script"].GetString());
+        static void cmd_lua_execute(const mpack_node_t& root) {           
+            char script[4096];
+            mpack_node_copy_cstr(mpack_node_map_cstr(mpack_node_map_cstr(root, "args"),"script"), script, 4096);
+            lua_enviroment::execute_string(script);
         }
 #endif
     }

@@ -101,11 +101,11 @@ namespace cetech {
         }
 
 #if defined(CETECH_DEVELOP)
-        static void cmd_renderer_resize(const rapidjson::Document& in,
-                                        rapidjson::Document& out) {
-            CE_UNUSED(out);
-            const uint32_t width = in["args"]["width"].GetInt();
-            const uint32_t height = in["args"]["height"].GetInt();
+        static void cmd_renderer_resize(const mpack_node_t& root) {           
+            mpack_node_t args = mpack_node_map_cstr(root, "args");
+            
+            const uint32_t width = mpack_node_i32(mpack_node_map_cstr(args, "width"));
+            const uint32_t height = mpack_node_i32(mpack_node_map_cstr(args, "height"));
             renderer::resize(width, height);
         }
 #endif

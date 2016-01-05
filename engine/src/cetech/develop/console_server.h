@@ -7,6 +7,7 @@
 #include "celib/memory/types.h"
 #include "celib/container/types.h"
 #include "rapidjson/document.h"
+#include "mpack/mpack.h"
 
 /*******************************************************************************
 **** Interface
@@ -21,8 +22,7 @@ namespace cetech {
         /***********************************************************************
         **** Command callback.
         ***********************************************************************/
-        typedef void (* command_clb_t)(const rapidjson::Document&,
-                                       rapidjson::Document&);
+        typedef void (* command_clb_t)(const mpack_node_t&);
 
         /***********************************************************************
         **** Proccess network.

@@ -157,10 +157,8 @@ namespace cetech {
             filesystem::close(out_config);
         }
 
-        static void cmd_compile_all(const rapidjson::Document& in,
-                                    rapidjson::Document& out) {
-            CE_UNUSED(in);
-            CE_UNUSED(out);
+        static void cmd_compile_all(const mpack_node_t& root) {
+            CE_UNUSED(root);
             resource_compiler::compile_all();
         }
     }
