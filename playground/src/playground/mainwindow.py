@@ -1,5 +1,6 @@
 import argparse
 import platform
+from time import sleep
 
 from PyQt5.QtCore import QThread, Qt, QFileSystemWatcher, QDirIterator
 from PyQt5.QtWidgets import QMainWindow, QDockWidget, QTabWidget
@@ -121,6 +122,9 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             self.ogl_dock.show()
 
         self.watch_project_dir()
+
+        self.ogl_widget.resize_event_enable = True
+        self.ogl_widget.resize(self.ogl_widget.size())
 
     def watch_project_dir(self):
         files = self.file_watch.files()

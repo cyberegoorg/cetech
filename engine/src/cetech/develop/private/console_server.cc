@@ -127,7 +127,20 @@ namespace cetech {
             //log::debug("ddddd", "parse");
             parse_packet(0, buf, bytes);
             nn_freemsg(buf);
+            
+            char* data;
+            size_t size;
+            mpack_writer_t writer;
+            mpack_writer_init_growable(&writer, &data, &size);
 
+            mpack_start_map(&writer, 1);
+            mpack_write_cstr(&writer, "status");
+            mpack_write_i32(&writer, 200);
+            mpack_finish_map(&writer);
+            CE_ASSERT("develop_manager", mpack_writer_destroy(&writer) == mpack_ok);
+            
+            bytes = nn_send(socket, data, size, 0);
+            //CE_ASSERT("console_server", bytes == size);
 end:
             develop_manager::leave_scope("ConsoleServer::tick()", time);
         }

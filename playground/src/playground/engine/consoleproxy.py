@@ -10,14 +10,16 @@ class ConsoleProxy(object):
         self.socket.connect(url)
 
     def send_command(self, cmd_name, **kwargs):
-        command_json = {
+        command = {
             "name": cmd_name,
             "args": kwargs
         }
 
-        dump = msgpack.packb(command_json)
-        print(dump)
+        dump = msgpack.packb(command)
         self.socket.send(dump)
+
+        recv = self.socket.recv()
+        msgpack.unpackb(recv)
 
     def disconnect(self):
         self.socket.close()
