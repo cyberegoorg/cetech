@@ -12,10 +12,10 @@ OS_ARCH = _OS .. ARCH
 
 ENGINE_SRC_DIR = path.join(ROOT_DIR, 'engine', 'src')
 
-THIRD_PARTY = path.join(ROOT_DIR, "externals")
-THIRD_PARTY_BUILD = path.join( ROOT_DIR, THIRD_PARTY, "build")
-THIRD_PARTY_LIB = path.join(THIRD_PARTY_BUILD, OS_ARCH, "lib")
-THIRD_PARTY_INCLUDE = path.join( THIRD_PARTY_BUILD, OS_ARCH, "include")
+EXTERNALS = path.join(ROOT_DIR, "externals")
+EXTERNALS_BUILD = path.join( ROOT_DIR, EXTERNALS, "build")
+EXTERNALS_LIB = path.join(EXTERNALS_BUILD, OS_ARCH, "lib")
+EXTERNALS_INCLUDE = path.join( EXTERNALS_BUILD, OS_ARCH, "include")
 
 print(OS_ARCH)
 
@@ -43,17 +43,17 @@ solution "CETech"
     platforms {"native", "x32", "x64"}
 
     dofile(path.join(ROOT_DIR, "scripts", "toolchain.lua"))
-    if not toolchain(BUILD_DIR, THIRD_PARTY) then
+    if not toolchain(BUILD_DIR, EXTERNALS) then
             return -- no action specified
     end
 
     includedirs {
-      THIRD_PARTY_INCLUDE,
+      EXTERNALS_INCLUDE,
       ENGINE_SRC_DIR,
     }
 
     libdirs {
-      THIRD_PARTY_LIB
+      EXTERNALS_LIB
     }
 
     defines {
@@ -126,6 +126,8 @@ function cetech_project(name, test)
             path.join(ENGINE_SRC_DIR, "cetech", "**.h"),
             path.join(ENGINE_SRC_DIR, "celib", "**.cc"),
             path.join(ENGINE_SRC_DIR, "celib", "**.h"),
+            
+            path.join(EXTERNALS_INCLUDE, "mpack", "*.c"),
         }
 
         if test then

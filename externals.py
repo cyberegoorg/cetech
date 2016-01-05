@@ -191,7 +191,15 @@ def install(name, body, platform_):
 
                 shutil.copy(src, dst_dir)
 
-            if name == 'copytree':
+            elif name == 'copyfile':
+                try:
+                    os.makedirs(os.path.dirname(dst_dir))
+                except FileExistsError:
+                    pass
+
+                shutil.copyfile(src, dst_dir)
+
+            elif name == 'copytree':
                 try:
                     shutil.copytree(src, dst_dir)
                 except FileExistsError:
