@@ -6,7 +6,7 @@
 #include <sys/stat.h>
 
 #include "celib/macros.h"
-#include "cetech/log/log.h"
+#include "celib/log/log.h"
 #include "celib/asserts.h"
 #include "celib/container/array.inl.h"
 #include "celib/crypto/murmur_hash.inl.h"

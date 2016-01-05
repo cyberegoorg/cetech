@@ -11,7 +11,7 @@
 #include "celib/crypto/murmur_hash.inl.h"
 #include "celib/string/types.h"
 
-#include "cetech/log/log.h"
+#include "celib/log/log.h"
 
 namespace cetech {
     extern CVar* _head;

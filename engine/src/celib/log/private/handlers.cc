@@ -6,7 +6,7 @@
 #include "celib/defines.h"
 #include "celib/stacktrace/stacktrace.h"
 
-#include "cetech/log/log.h"
+#include "celib/log/log.h"
 #include "cetech/develop/console_server.h"
 #include "cetech/application/application.h"
 

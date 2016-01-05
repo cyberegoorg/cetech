@@ -11,7 +11,7 @@
 
 #include "cetech/filesystem/file.h"
 #include "cetech/filesystem/filesystem.h"
-#include "cetech/log/log.h"
+#include "celib/log/log.h"
 
 
 #if defined(CETECH_SDL2)
