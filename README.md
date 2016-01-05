@@ -65,7 +65,7 @@ CETech is Data-Driven [game engine](https://en.wikipedia.org/wiki/Game_engine) a
 * [Ace](https://ace.c9.io/) - Editor library.
 * [GoJS](http://gojs.net/) - Diagram library.
 * [vis.js](http://visjs.org/) - Visualization library.
-* [MSGPack-lite](https://github.com/kawanet/msgpack-lite) - Fast Pure JavaScript MessagePack Encoder and Decoder.
+* [msgpack-lite](https://github.com/kawanet/msgpack-lite) - Fast Pure JavaScript MessagePack Encoder and Decoder.
 
 ### Others
 
