@@ -239,9 +239,10 @@ static void make_path(char* buffer,
                       const char* path) {
     strcpy(buffer, path);
 
-    const size_t len = strlen(buffer);
+    const size_t len = strlen(path);
     if (buffer[len - 1] != '/') {
         buffer[len] = '/';
+        buffer[len+1] = '\0';
     }
 }
 
@@ -270,7 +271,9 @@ void parse_command_line(int argc,
 #if defined(CETECH_DEVELOP)
     const char* source_dir = command_line::get_parameter("source-dir", 's');
     const char* core_dir = command_line::get_parameter("core-dir");
-
+    
+    printf("sd: %s\n", source_dir);
+    
     if (source_dir) {
         make_path(buffer, 1024, source_dir);
         cvar_internal::force_set(cvars::rm_source_dir, buffer);
