@@ -4,7 +4,7 @@
 **** Includes
 *******************************************************************************/
 
-#include "celib/asserts.h"
+#include "celib/errors/errors.h"
 #include "celib/string/types.h"
 #include "celib/crypto/murmur_hash.inl.h"
 

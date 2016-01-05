@@ -9,17 +9,7 @@ namespace cetech {
     };
 
     namespace error {
-        const Array < const char* >& scope_name() {
-            CE_ASSERT("error", _scope_name != nullptr);
-            return *_scope_name;
-        }
-
-        const Array < const char* >& scope_data() {
-            CE_ASSERT("error", _scope_data != nullptr);
-            return *_scope_data;
-        }
-
-        void to_yaml(char* buffer) {
+        void to_yaml(char* buffer) {           
             // TODO: rewrite, safety
             const int size = array::size(*_scope_name);
 
