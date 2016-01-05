@@ -350,3 +350,13 @@ nanomsg:
       - copy: *nanomsg_install_lib
       - copy: [.libs/libnanomsg.so, dynlib]
 
+#########
+# MPack #
+########################################################################################################################
+mpack:
+  clone: git clone https://github.com/ludocode/mpack.git --depth 1
+
+  install:
+    linux64:
+      - copytree: [src/mpack, include/mpack]
+      - copyfile: [src/mpack-config.h.sample, include/mpack/mpack-config.h]
