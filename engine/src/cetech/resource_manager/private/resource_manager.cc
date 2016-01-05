@@ -10,7 +10,7 @@
 #include "celib/string/stringid.inl.h"
 
 #include "cetech/cvars/cvars.h"
-#include "cetech/thread/thread.h"
+#include "celib/thread/thread.h"
 
 #include "rapidjson/prettywriter.h"
 #include "rapidjson/memorybuffer.h"

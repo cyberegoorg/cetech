@@ -181,6 +181,10 @@ namespace cetech {
             }
         }
 
+        // thanks http://stackoverflow.com/questions/1711631/improve-insert-per-second-performance-of-sqlite 
+        sqlite3_exec(_db, "PRAGMA synchronous = OFF", NULL, NULL, NULL);
+        sqlite3_exec(_db, "PRAGMA journal_mode = MEMORY", NULL, NULL, NULL);
+        
         return true;
     }
 }
