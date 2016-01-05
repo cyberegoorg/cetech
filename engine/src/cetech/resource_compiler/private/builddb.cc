@@ -2,7 +2,7 @@
 
 #include "cetech/resource_compiler/private/builddb.h"
 
-#include "cetech/log/log.h"
+#include "celib/log/log.h"
 #include "celib/defines.h"
 
 #include "sqlite3/sqlite3.h"

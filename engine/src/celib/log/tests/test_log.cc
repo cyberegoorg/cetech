@@ -6,7 +6,7 @@
 
 #include "catch/catch.hpp"
 
-#include "cetech/log/log.h"
+#include "celib/log/log.h"
 #include "celib/memory/memory.h"
 
 /*******************************************************************************

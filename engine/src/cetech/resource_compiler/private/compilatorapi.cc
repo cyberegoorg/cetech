@@ -1,7 +1,7 @@
 #include "cetech/resource_compiler/compilatorapi.h"
 #include "cetech/resource_compiler/private/builddb.h"
 
-#include "cetech/log/log.h"
+#include "celib/log/log.h"
 
 #include "rapidjson/prettywriter.h"
 #include "rapidjson/memorybuffer.h"

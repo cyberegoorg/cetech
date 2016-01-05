@@ -8,7 +8,7 @@
 #include "celib/container/array.inl.h"
 
 #include "cetech/application/application.h"
-#include "cetech/log/log.h"
+#include "celib/log/log.h"
 
 namespace cetech {
     class LuaStack {

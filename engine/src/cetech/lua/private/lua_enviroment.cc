@@ -15,7 +15,7 @@
 
 
 #include "celib/asserts.h"
-#include "cetech/log/log.h"
+#include "celib/log/log.h"
 #include "celib/math/vector2.inl.h"
 #include "celib/math/vector3.inl.h"
 #include "celib/crypto/murmur_hash.inl.h"

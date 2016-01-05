@@ -10,7 +10,7 @@
 
 #include "cetech/cvar/cvar.h"
 #include "cetech/cvars/cvars.h"
-#include "cetech/log/log.h"
+#include "celib/log/log.h"
 #include "cetech/application/application.h"
 #include "cetech/input/mouse.h"
 

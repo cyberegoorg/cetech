@@ -10,7 +10,7 @@
 
 #include "cetech/thread/thread.h"
 #include "cetech/application/application.h"
-#include "cetech/log/log.h"
+#include "celib/log/log.h"
 
 #include "cetech/task_manager/private/queuempmc.h"
 #include "cetech/develop/develop_manager.h"

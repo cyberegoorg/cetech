@@ -8,7 +8,7 @@
 #include "cetech/develop/console_server.h"
 #include "cetech/application/application.h"
 
-#include "cetech/log/log.h"
+#include "celib/log/log.h"
 #include "cetech/thread/thread.h"
 
 #include "rapidjson/document.h"
