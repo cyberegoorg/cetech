@@ -56,7 +56,7 @@ namespace cetech {
                 error::leave_scope();
             }
         };
-        
+
         void to_yaml(char* buffer);
     }
 

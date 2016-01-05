@@ -17,25 +17,25 @@ namespace cetech {
     namespace cvar {
         void force_set(CVar& cv,
                        float value);
-        
+
         void force_set(CVar& cv,
                        int value);
 
         void force_set(CVar& cv,
                        const char* str);
-        
+
         void set(CVar& cv,
-                           float value);
+                 float value);
         void set(CVar& cv,
                  int value);
-        
+
         void set(CVar& cv,
                  const char* str);
 
         CVar* find(const char* name);
 
         void load_from_yaml(const char* yaml_str,
-                                      const size_t len);
+                            const size_t len);
 
         void dump_all();
     }
