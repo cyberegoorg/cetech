@@ -29,7 +29,7 @@ namespace cetech {
             DiskFile(const char* path, FSFile::OpenMode mode) {
 #if defined(CETECH_SDL2)
                 rwops = SDL_RWFromFile(path, mode == FSFile::WRITE ? "w" : "r");
-                CE_ASSERT_MSG( "FSFile", is_valid(), "%s", SDL_GetError(), SDL_GetError());
+                CE_ASSERT_MSG( "FSFile", is_valid(), "%s", SDL_GetError());
 #endif
             }
 
