@@ -9,7 +9,7 @@
 #include "cetech/application/application.h"
 
 #include "celib/log/log.h"
-#include "cetech/thread/thread.h"
+#include "celib/thread/thread.h"
 
 #include "rapidjson/document.h"
 

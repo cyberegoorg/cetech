@@ -8,7 +8,7 @@
 #include "celib/container/queue.inl.h"
 #include "celib/errors/errors.h"
 
-#include "cetech/thread/thread.h"
+#include "celib/thread/thread.h"
 #include "cetech/application/application.h"
 #include "celib/log/log.h"
 

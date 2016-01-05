@@ -9,7 +9,7 @@
 #include "celib/string/types.h"
 #include "celib/memory/types.h"
 
-#include "cetech/window/window.h"
+#include "celib/window/window.h"
 
 /*******************************************************************************
 **** Interface

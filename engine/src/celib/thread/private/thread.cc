@@ -13,7 +13,7 @@
 #include "celib/math/vector2.inl.h"
 #include "cetech/application/application.h"
 
-#include "cetech/thread/thread.h"
+#include "celib/thread/thread.h"
 
 namespace cetech {
     namespace thread {
