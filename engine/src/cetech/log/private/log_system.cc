@@ -19,9 +19,10 @@ namespace cetech {
 
             handler_t handlers[MAX_HANDLERS];
             void* handlers_data[MAX_HANDLERS];
+            log_globals::get_worker_id_clb_t get_worker_id_clb;
             uint8_t handlers_count;
 
-            LogData() {
+            LogData(const log_globals::get_worker_id_clb_t get_worker_id_clb) : get_worker_id_clb(get_worker_id_clb) {
                 memset(this, 0, sizeof(LogData));
             }
         };
@@ -165,10 +166,10 @@ namespace cetech {
     }
 
     namespace log_globals {
-        void init() {
+        void init(const log_globals::get_worker_id_clb_t get_worker_id_clb) {
             char* p = _globals.buffer;
 
-            _globals.data = new(p) LogData();
+            _globals.data = new(p) LogData(get_worker_id_clb);
 
             log::info("log_globals", "Initialized");
         }
