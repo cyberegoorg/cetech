@@ -1,4 +1,4 @@
-import json
+import msgpack
 from nanomsg import Socket, REQ
 
 
@@ -15,9 +15,8 @@ class ConsoleProxy(object):
             "args": kwargs
         }
 
-        print(command_json)
-
-        dump = str.encode('%s\0' % json.dumps(command_json))
+        dump = msgpack.packb(command_json)
+        print(dump)
         self.socket.send(dump)
 
     def disconnect(self):
