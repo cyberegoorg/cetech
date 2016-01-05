@@ -9,6 +9,7 @@ namespace cetech {
                           "Path to build data dir.",
                           "./data/build/",
                           CVar::FLAG_CONST);
+
         CVar rm_source_dir("rm.source_dir",
                            "Path to source data dir.",
                            "./data/src/",
@@ -18,6 +19,7 @@ namespace cetech {
                       "Boot package",
                       "boot",
                       CVar::FLAG_CONST);
+
         CVar boot_script("boot.script",
                          "Boot script",
                          "lua/boot",
@@ -32,6 +34,7 @@ namespace cetech {
                                "Compiler platform",
                                xstr(CETECH_PLATFORM),
                                CVar::FLAG_CONST);
+
         CVar compiler_core_path("compiler.core_path",
                                 "Compiler core path",
                                 "./core/",
@@ -40,6 +43,7 @@ namespace cetech {
         CVar screen_width("screen.width",
                           "Screen width",
                           800);
+
         CVar screen_height("screen.height",
                            "Screen height",
                            600);

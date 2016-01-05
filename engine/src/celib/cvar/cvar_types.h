@@ -44,26 +44,26 @@ namespace cetech {
             int i_min;
         };
 
-        CE_INLINE CVar(const char* name,
+        CVar(const char* name,
                        const char* desc,
                        CVarType type,
                        uint32_t flags);
 
-        CE_INLINE CVar(const char* name,
+        CVar(const char* name,
                        const char* desc,
                        float value,
                        uint32_t flags = FLAG_NONE,
                        float min = 0.0f,
                        float max = 0.0f);
 
-        CE_INLINE CVar(const char* name,
+        CVar(const char* name,
                        const char* desc,
                        int value,
                        uint32_t flags = FLAG_NONE,
                        int min = 0,
                        int max = 0);
 
-        CE_INLINE CVar(const char* name,
+        CVar(const char* name,
                        const char* desc,
                        const char* value,
                        uint32_t flags = FLAG_NONE);

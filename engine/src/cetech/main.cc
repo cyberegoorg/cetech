@@ -8,7 +8,7 @@
 #include "celib/command_line/command_line.h"
 #include "celib/errors/errors.h"
 
-#include "cetech/cvar/cvar.h"
+#include "celib/cvar/cvar.h"
 #include "cetech/cvars/cvars.h"
 #include "celib/log/log.h"
 #include "cetech/application/application.h"
@@ -259,13 +259,13 @@ void parse_command_line(int argc,
 
     if (build_dir) {
         make_path(buffer, 1024, build_dir);
-        cvar_internal::force_set(cvars::rm_build_dir, buffer);
+        cvar::force_set(cvars::rm_build_dir, buffer);
     }
 
     if (port) {
         int p = 0;
         sscanf(port, "%d", &p);
-        cvar_internal::force_set(cvars::console_server_port, p);
+        cvar::force_set(cvars::console_server_port, p);
     }
 
 #if defined(CETECH_DEVELOP)
@@ -276,12 +276,12 @@ void parse_command_line(int argc,
     
     if (source_dir) {
         make_path(buffer, 1024, source_dir);
-        cvar_internal::force_set(cvars::rm_source_dir, buffer);
+        cvar::force_set(cvars::rm_source_dir, buffer);
     }
 
     if (core_dir) {
         make_path(buffer, 1024, core_dir);
-        cvar_internal::force_set(cvars::compiler_core_path, buffer);
+        cvar::force_set(cvars::compiler_core_path, buffer);
     }
 
 #endif
