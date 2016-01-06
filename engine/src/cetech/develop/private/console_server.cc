@@ -15,6 +15,7 @@
 
 #include "nanomsg/nn.h"
 #include "nanomsg/pubsub.h"
+#include "nanomsg/pipeline.h"
 #include "nanomsg/reqrep.h"
 
 #define LOG_FORMAT "#log\n" \
@@ -128,18 +129,18 @@ namespace cetech {
             parse_packet(0, buf, bytes);
             nn_freemsg(buf);
             
-            char* data;
-            size_t size;
-            mpack_writer_t writer;
-            mpack_writer_init_growable(&writer, &data, &size);
-
-            mpack_start_map(&writer, 1);
-            mpack_write_cstr(&writer, "status");
-            mpack_write_i32(&writer, 200);
-            mpack_finish_map(&writer);
-            CE_ASSERT("develop_manager", mpack_writer_destroy(&writer) == mpack_ok);
-            
-            bytes = nn_send(socket, data, size, 0);
+//             char* data;
+//             size_t size;
+//             mpack_writer_t writer;
+//             mpack_writer_init_growable(&writer, &data, &size);
+// 
+//             mpack_start_map(&writer, 1);
+//             mpack_write_cstr(&writer, "status");
+//             mpack_write_i32(&writer, 200);
+//             mpack_finish_map(&writer);
+//             CE_ASSERT("develop_manager", mpack_writer_destroy(&writer) == mpack_ok);
+//             
+//             bytes = nn_send(socket, data, size, 0);
             //CE_ASSERT("console_server", bytes == size);
 end:
             develop_manager::leave_scope("ConsoleServer::tick()", time);
@@ -159,7 +160,7 @@ end:
             _globals.data->dev_pub_socket = socket;
             log::register_handler(&nanolog_handler, (void*)(intptr_t)socket);
 
-            socket = nn_socket(AF_SP, NN_REP);
+            socket = nn_socket(AF_SP, NN_PULL);
             CE_ASSERT("console_server", socket >= 0);
             CE_ASSERT("console_server", nn_bind(socket, "ws://*:5557") >= 0);
             _globals.data->dev_rep_socket = socket;
