@@ -164,8 +164,6 @@ namespace cetech {
             bdb.open(db_path);
             bdb.init_db();
 
-            rapidjson::Document debug_index;
-            debug_index.SetObject();
 
             static StringId64_t in_dirs[] = {CORE_DIR, SRC_DIR};
 
@@ -213,13 +211,10 @@ namespace cetech {
                                      type);
                         continue;
                     }
-
-                    debug_index.AddMember(
-                        rapidjson::Value(resource_id_str, strlen(resource_id_str), debug_index.GetAllocator()),
-                        rapidjson::Value(filename, strlen(filename),
-                                         debug_index.GetAllocator()), debug_index.GetAllocator()
-                        );
-
+                    
+                    
+                    
+                    bdb.set_file_hash(filename, resource_id_str);
                     resource_id_str[0] = '\0';
 
                     if (!bdb.need_compile(src_dir, filename)) {
@@ -246,8 +241,6 @@ namespace cetech {
 
             task_manager::add_end(&top_compile_task, 1);
             task_manager::wait(top_compile_task);
-
-            save_json("debug_index.json", debug_index);
 
             for (unsigned long i = 0; i < sizeof(in_dirs) / sizeof(StringId64_t); ++i) {
                 filesystem::free_list_directory(dir_files[i]);

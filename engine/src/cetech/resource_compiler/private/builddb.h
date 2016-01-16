@@ -22,6 +22,9 @@ namespace cetech {
         void set_file_depend(const char* filename,
                              const char* depend_on);
 
+        void set_file_hash(const char* filename,
+                           const char* hash);
+        
         bool need_compile(StringId64_t root,
                           const char* filename);
 
