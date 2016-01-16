@@ -120,6 +120,13 @@ namespace cetech {
                    ).bind_text(1, filename).bind_text(2, depend_on).step();
     }
 
+    void BuildDB::set_file_hash(const char* filename,
+                                const char* hash) {
+        SQLiteSTMT(_db,
+                   "INSERT OR REPLACE INTO file_hash VALUES(?1, ?2);"
+                   ).bind_text(1, filename).bind_text(2, hash).step();
+    }
+    
     bool BuildDB::need_compile(StringId64_t root,
                                const char* filename) {
         bool compile = true;
@@ -181,6 +188,19 @@ namespace cetech {
             }
         }
 
+        // Create file_dependency table
+        {
+            SQLiteSTMT query(_db,
+                             "CREATE TABLE IF NOT EXISTS file_hash (\n"
+                             "filename  TEXT    PRIMARY KEY NOT NULL,\n"
+                             "hash      TEXT    UNIQUE NOT NULL\n"
+                             ");");
+
+            if (query.step() != SQLITE_DONE) {
+                return false;
+            }
+        }
+        
         // thanks http://stackoverflow.com/questions/1711631/improve-insert-per-second-performance-of-sqlite
         sqlite3_exec(_db, "PRAGMA synchronous = OFF", NULL, NULL, NULL);
         sqlite3_exec(_db, "PRAGMA journal_mode = MEMORY", NULL, NULL, NULL);
