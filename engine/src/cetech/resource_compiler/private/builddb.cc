@@ -126,7 +126,7 @@ namespace cetech {
                    "INSERT OR REPLACE INTO file_hash VALUES(?1, ?2);"
                    ).bind_text(1, filename).bind_text(2, hash).step();
     }
-    
+
     bool BuildDB::need_compile(StringId64_t root,
                                const char* filename) {
         bool compile = true;
@@ -200,7 +200,7 @@ namespace cetech {
                 return false;
             }
         }
-        
+
         // thanks http://stackoverflow.com/questions/1711631/improve-insert-per-second-performance-of-sqlite
         sqlite3_exec(_db, "PRAGMA synchronous = OFF", NULL, NULL, NULL);
         sqlite3_exec(_db, "PRAGMA journal_mode = MEMORY", NULL, NULL, NULL);

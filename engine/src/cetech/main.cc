@@ -125,7 +125,7 @@ void register_resources() {
          & resource_config::online,
          & resource_config::offline,
          & resource_config::unloader},
-         
+
         /***********************************************************************
         **** LOOP BREAK.
         ***********************************************************************/
@@ -153,7 +153,7 @@ void register_resources() {
 /*******************************************************************************
 **** Load config.
 *******************************************************************************/
-void load_config_yaml() {   
+void load_config_yaml() {
     StringId64_t global_config_name_h = stringid64::from_cstringn("global", strlen("global"));
 
     // Load boot package
@@ -209,7 +209,7 @@ bool big_init() {
 #if defined(CETECH_DEVELOP)
     if (command_line::has_argument("compile", 'c')) {
         resource_compiler::compile_all();
- 
+
         if (!command_line::has_argument("continue")) {
             return false;
         }
