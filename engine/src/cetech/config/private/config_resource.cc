@@ -16,39 +16,38 @@ namespace cetech {
 
         StringId64_t type_hash() {
             return _type_hash;
-        }   
+        }
 
 
         void compile(const char* filename,
                      CompilatorAPI& compilator) {
             CE_UNUSED(filename);
-            
-            const size_t config_size =  compilator.resource_file_size();
+
+            const size_t config_size = compilator.resource_file_size();
             char buffer[config_size];
             compilator.read_resource_file(buffer);
 
-            compilator.write_to_build(buffer, config_size);   
+            compilator.write_to_build(buffer, config_size);
         }
 
         char* loader (FSFile& f,
                       Allocator& a) {
-            error::ErrorScope es("loading config", nullptr);
-            
-            const size_t config_size =  f.size();
+            error::ErrorScope es("loading config",
+                                 nullptr);
+
+            const size_t config_size = f.size();
             char buffer[config_size];
-            
+
             f.read(buffer, config_size);
-            
+
             cvar::load_from_yaml(buffer, config_size);
-            
+
             return (char*)1; // TODO =(
         }
 
-        void online(void* data) {
-        }
+        void online(void* data) {}
 
-        void offline(void* data) {
-        }
+        void offline(void* data) {}
 
         void unloader(Allocator& a,
                       void* data) {

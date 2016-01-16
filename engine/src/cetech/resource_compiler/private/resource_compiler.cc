@@ -211,9 +211,7 @@ namespace cetech {
                                      type);
                         continue;
                     }
-                    
-                    
-                    
+
                     bdb.set_file_hash(filename, resource_id_str);
                     resource_id_str[0] = '\0';
 

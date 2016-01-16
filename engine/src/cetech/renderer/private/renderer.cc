@@ -101,9 +101,9 @@ namespace cetech {
         }
 
 #if defined(CETECH_DEVELOP)
-        static void cmd_renderer_resize(const mpack_node_t& root) {           
+        static void cmd_renderer_resize(const mpack_node_t& root) {
             mpack_node_t args = mpack_node_map_cstr(root, "args");
-            
+
             const uint32_t width = mpack_node_i32(mpack_node_map_cstr(args, "width"));
             const uint32_t height = mpack_node_i32(mpack_node_map_cstr(args, "height"));
             renderer::resize(width, height);
