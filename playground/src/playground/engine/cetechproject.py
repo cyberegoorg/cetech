@@ -12,8 +12,8 @@ def validate_project(project_dir):
                              QMessageBox.Yes, QMessageBox.Yes)
         return False
 
-    if not selected_dir.exists('src/config.yaml'):
-        QMessageBox.critical(None, 'Project validation error', 'Project dir does not contain src/config.yaml',
+    if not selected_dir.exists('src/global.config'):
+        QMessageBox.critical(None, 'Project validation error', 'Project dir does not contain src/global.config',
                              QMessageBox.Yes, QMessageBox.Yes)
         return False
 
