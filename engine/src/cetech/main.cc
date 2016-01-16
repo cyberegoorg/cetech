@@ -27,6 +27,8 @@
 #include "cetech/renderer/renderer.h"
 #include "cetech/lua/lua_enviroment.h"
 
+#include "cetech/config/config_resource.h"
+
 #include <unistd.h>
 #include <csignal>
 
@@ -115,13 +117,23 @@ void register_resources() {
          & resource_texture::unloader},
 
         /***********************************************************************
+        **** Config resource.
+        ***********************************************************************/
+        {resource_config::type_hash(),
+         & resource_config::compile,
+         & resource_config::loader,
+         & resource_config::online,
+         & resource_config::offline,
+         & resource_config::unloader},
+         
+        /***********************************************************************
         **** LOOP BREAK.
         ***********************************************************************/
         {0, nullptr, nullptr, nullptr, nullptr, nullptr}
     };
 
     /***************************************************************************
-    **** NOW register all resource but if defined CETECH_DEVELOP skip compiler
+    **** NOW register all resource but if not defined CETECH_DEVELOP skip compiler
     **** registration
     ***************************************************************************/
     const ResourceRegistration* it = resource_regs;
@@ -141,17 +153,13 @@ void register_resources() {
 /*******************************************************************************
 **** Load config.
 *******************************************************************************/
-void load_config_yaml() {
-    FSFile& f = filesystem::open(BUILD_DIR, "config.yaml", FSFile::READ);
+void load_config_yaml() {   
+    StringId64_t global_config_name_h = stringid64::from_cstringn("global", strlen("global"));
 
-    const uint64_t f_sz = f.size();
-    char* mem = (char*)memory_globals::default_allocator().allocate(f_sz + 1);
-    memset(mem, 0, f_sz + 1);
-    f.read(mem, f_sz);
-    filesystem::close(f);
-
-    cvar::load_from_yaml(mem, f_sz);
-    memory_globals::default_allocator().deallocate(mem);
+    // Load boot package
+    char* package_data[1];
+    resource_manager::load(package_data, resource_config::type_hash(), &global_config_name_h, 1);
+    resource_manager::add_loaded(package_data, resource_config::type_hash(), &global_config_name_h, 1);
 }
 
 /*******************************************************************************
@@ -201,7 +209,7 @@ bool big_init() {
 #if defined(CETECH_DEVELOP)
     if (command_line::has_argument("compile", 'c')) {
         resource_compiler::compile_all();
-
+ 
         if (!command_line::has_argument("continue")) {
             return false;
         }
@@ -271,8 +279,6 @@ void parse_command_line(int argc,
 #if defined(CETECH_DEVELOP)
     const char* source_dir = command_line::get_parameter("source-dir", 's');
     const char* core_dir = command_line::get_parameter("core-dir");
-
-    printf("sd: %s\n", source_dir);
 
     if (source_dir) {
         make_path(buffer, 1024, source_dir);

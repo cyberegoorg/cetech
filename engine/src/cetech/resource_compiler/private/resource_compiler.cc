@@ -143,20 +143,6 @@ namespace cetech {
             filesystem::close(debug_index_file);
         }
 
-        void build_config_yaml() {
-            FSFile& src_config = filesystem::open(SRC_DIR, "config.yaml", FSFile::READ);
-            FSFile& out_config = filesystem::open(BUILD_DIR, "config.yaml", FSFile::WRITE);
-
-            size_t size = src_config.size();
-            char data[size];
-            memset(data, 0, size);
-            src_config.read(data, size);
-            filesystem::close(src_config);
-
-            out_config.write(data, size);
-            filesystem::close(out_config);
-        }
-
         static void cmd_compile_all(const mpack_node_t& root) {
             CE_UNUSED(root);
             resource_compiler::compile_all();
@@ -178,11 +164,8 @@ namespace cetech {
             bdb.open(db_path);
             bdb.init_db();
 
-
             rapidjson::Document debug_index;
             debug_index.SetObject();
-
-            build_config_yaml();
 
             static StringId64_t in_dirs[] = {CORE_DIR, SRC_DIR};
 
