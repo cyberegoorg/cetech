@@ -140,16 +140,16 @@ namespace cetech {
                                      T* mem,
                                      const size_t size) {
             char* p = (char*)mem;
-            
+
             for (size_t i = 0; i < size; ++i) {
                 ((T*)p)->~T();
 
                 p += sizeof(T);
             }
-            
+
             allocator.deallocate(mem);
         }
-        
+
         /***********************************************************************
         **** Allign pointer.
         ***********************************************************************/
