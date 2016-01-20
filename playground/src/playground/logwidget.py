@@ -112,4 +112,4 @@ class LogWidget(QFrame, Ui_LogWidget):
         msg = item.text(4)
 
         resource_name = RESOURCE_NAME_RE.match(msg).group(1)
-        self.script_editor.open_resource(resource_name)
+        #self.script_editor.open_resource(resource_name)
