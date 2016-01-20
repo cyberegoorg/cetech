@@ -32,6 +32,8 @@ namespace cetech {
 
         char* loader (FSFile& f,
                       Allocator& a) {
+            CE_UNUSED(a);
+            
             error::ErrorScope es("loading config",
                                  nullptr);
 
@@ -45,12 +47,14 @@ namespace cetech {
             return (char*)1; // TODO =(
         }
 
-        void online(void* data) {}
+        void online(void* data) {CE_UNUSED(data);}
 
-        void offline(void* data) {}
+        void offline(void* data) {CE_UNUSED(data);}
 
         void unloader(Allocator& a,
                       void* data) {
+            CE_UNUSED(a);
+            CE_UNUSED(data);
             //a.deallocate(data);
         }
     }

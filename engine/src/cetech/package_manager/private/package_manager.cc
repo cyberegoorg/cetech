@@ -14,6 +14,7 @@
 #include "cetech/application/application.h"
 #include "cetech/package_manager/package_manager.h"
 #include "cetech/package_manager/package_resource.h"
+#include "cetech/task_manager/task_manager.h"
 #include "cetech/cvars/cvars.h"
 
 namespace cetech {

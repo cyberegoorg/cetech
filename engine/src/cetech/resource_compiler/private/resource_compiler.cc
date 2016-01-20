@@ -1,5 +1,10 @@
 #include <cstdio>
 
+#include "sqlite3/sqlite3.h"
+#include "rapidjson/prettywriter.h"
+#include "rapidjson/memorybuffer.h"
+#include "rapidjson/error/en.h"
+
 #include "cetech/resource_compiler/resource_compiler.h"
 #include "cetech/resource_manager/resource_manager.h"
 #include "cetech/resource_compiler/private/builddb.h"
@@ -11,15 +16,12 @@
 #include "celib/macros.h"
 #include "celib/string/stringid.inl.h"
 #include "celib/thread/thread.h"
-#include "sqlite3/sqlite3.h"
 
 #include "cetech/application/application.h"
 #include "cetech/cvars/cvars.h"
 #include "cetech/develop/console_server.h"
+#include "cetech/task_manager/task_manager.h"
 
-#include "rapidjson/prettywriter.h"
-#include "rapidjson/memorybuffer.h"
-#include "rapidjson/error/en.h"
 
 
 namespace cetech {
@@ -130,17 +132,6 @@ namespace cetech {
             filesystem::close(build_file);
 
             log::info("resource_compiler", "[%s] Compiled.", ct->filename );
-        }
-
-        void save_json(const char* filename,
-                       const rapidjson::Document& document) {
-            rapidjson::StringBuffer buffer;
-            rapidjson::PrettyWriter < rapidjson::StringBuffer > writer(buffer);
-            document.Accept(writer);
-
-            FSFile& debug_index_file = filesystem::open(BUILD_DIR, filename, FSFile::WRITE);
-            debug_index_file.write(buffer.GetString(), buffer.GetSize());
-            filesystem::close(debug_index_file);
         }
 
         static void cmd_compile_all(const mpack_node_t& root) {
