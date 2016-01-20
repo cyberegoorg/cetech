@@ -43,28 +43,13 @@ namespace cetech {
         typedef void (* resource_offline_clb_t)(void*);
 
         /***********************************************************************
-        **** Register loader.
+        **** Register type.
         ***********************************************************************/
-        void register_loader(const StringId64_t type,
-                             const resource_loader_clb_t clb);
-
-        /***********************************************************************
-        **** Register unloader.
-        ***********************************************************************/
-        void register_unloader(const StringId64_t type,
-                               const resource_unloader_clb_t clb);
-
-        /***********************************************************************
-        **** Register online callback.
-        ***********************************************************************/
-        void register_online(const StringId64_t type,
-                             const resource_online_clb_t clb);
-
-        /***********************************************************************
-        **** Register offline callback.
-        ***********************************************************************/
-        void register_offline(const StringId64_t type,
-                              const resource_offline_clb_t clb);
+        void register_type(const StringId64_t type,
+                           const resource_loader_clb_t loader_clb,
+                           const resource_unloader_clb_t unloader_clb,
+                           const resource_online_clb_t online_clb,
+                           const resource_offline_clb_t offline_clb);
 
         /***********************************************************************
         **** Load resources to loaded_data.

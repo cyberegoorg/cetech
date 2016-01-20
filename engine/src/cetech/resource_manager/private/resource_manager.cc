@@ -85,12 +85,6 @@ namespace cetech {
             auto& ref_count_map = _globals.data->_data_refcount_map[type_idx];
             const uint32_t counter = hash::get < uint32_t > (ref_count_map, name, 0) + 1;
 
-            //             log::debug("resource_manager",
-            //                                      "Inc reference for (%" PRIx64 ", %" PRIx64 ") counter == %d ",
-            //                                      type,
-            //                                      name,
-            //                                      counter);
-
             hash::set(ref_count_map, name, counter);
         }
 
@@ -99,12 +93,6 @@ namespace cetech {
 
             auto& ref_count_map = _globals.data->_data_refcount_map[type_idx];
             const uint32_t counter = hash::get < uint32_t > (ref_count_map, name, 0) - 1;
-
-            //             log::debug("resource_manager",
-            //                                      "Dec reference for %" PRIx64 "%" PRIx64 "." " counter == %d ",
-            //                                      type,
-            //                                      name,
-            //                                      counter);
 
             hash::set(ref_count_map, name, counter);
 
@@ -118,13 +106,6 @@ namespace cetech {
 
             resource_loader_clb_t clb = hash::get < resource_loader_clb_t >
                                         (_globals.data->_load_clb_map, type, nullptr);
-
-            if (clb == nullptr) {
-                log::error("resource_manager",
-                           "Resource type " "%" PRIx64 " not register loader.",
-                           type);
-                return;
-            }
 
             for (uint32_t i = 0; i < count; ++i) {
                 StringId64_t name = name = names[i];
@@ -182,13 +163,6 @@ namespace cetech {
                 resource_online_clb_t online_clb = hash::get < resource_online_clb_t >
                                                    (_globals.data->_online_clb_map, type, nullptr);
 
-                //                 if (online_clb == nullptr) {
-                //                     log::error("resource_manager",
-                //                                "Resource type " "%" PRIx64 " not register online.",
-                //                                type);
-                //                     return;
-                //                 }
-
                 online_clb(loaded_data[i]);
             }
 
@@ -202,22 +176,8 @@ namespace cetech {
             resource_unloader_clb_t clb = hash::get < resource_unloader_clb_t >
                                           (_globals.data->_unload_clb_map, type, nullptr);
 
-            if (clb == nullptr) {
-                log::error("resource_manager",
-                           "Resource type " "%" PRIx64 " not register unloader.",
-                           type);
-                return;
-            }
-
             resource_offline_clb_t ofline_clb = hash::get < resource_offline_clb_t >
                                                 (_globals.data->_offline_clb_map, type, nullptr);
-
-            if (ofline_clb == nullptr) {
-                log::error("resource_manager",
-                           "Resource type " "%" PRIx64 " not register offline.",
-                           type);
-                return;
-            }
 
             const uint32_t type_idx = hash::get < uint32_t > (_globals.data->_types_map, type, 0);
             auto& data_map = _globals.data->_data_map[type_idx];
@@ -296,29 +256,27 @@ namespace cetech {
             return hash::get < char* > (data_map, name, nullptr);
         }
 
-        void register_loader(const StringId64_t type,
-                             const resource_loader_clb_t clb) {
+        void register_type(const StringId64_t type,
+                           const resource_loader_clb_t loader_clb,
+                           const resource_unloader_clb_t unloader_clb,
+                           const resource_online_clb_t online_clb,
+                           const resource_offline_clb_t offline_clb) {
+
+            CE_ASSERT("resource_manager", loader_clb != nullptr);
+            CE_ASSERT("resource_manager", unloader_clb != nullptr);
+            CE_ASSERT("resource_manager", online_clb != nullptr);
+            CE_ASSERT("resource_manager", offline_clb != nullptr);
+
+
             const uint32_t type_idx = _globals.data->type_count++;
 
             hash::set(_globals.data->_types_map, type, type_idx);
-            hash::set(_globals.data->_load_clb_map, type, clb);
-
+            hash::set(_globals.data->_load_clb_map, type, loader_clb);
+            hash::set(_globals.data->_unload_clb_map, type, unloader_clb);
+            hash::set(_globals.data->_online_clb_map, type, online_clb);
+            hash::set(_globals.data->_offline_clb_map, type, offline_clb);
         }
 
-        void register_unloader(const cetech::StringId64_t type,
-                               const cetech::resource_manager::resource_unloader_clb_t clb) {
-            hash::set(_globals.data->_unload_clb_map, type, clb);
-        }
-
-        void register_online(const StringId64_t type,
-                             const resource_online_clb_t clb) {
-            hash::set(_globals.data->_online_clb_map, type, clb);
-        };
-
-        void register_offline(const StringId64_t type,
-                              const resource_offline_clb_t clb) {
-            hash::set(_globals.data->_offline_clb_map, type, clb);
-        };
     }
 
     namespace resource_manager_globals {

@@ -138,10 +138,11 @@ void register_resources() {
     ***************************************************************************/
     const ResourceRegistration* it = resource_regs;
     while (it->type != 0) {
-        resource_manager::register_unloader(it->type, it->unloader);
-        resource_manager::register_loader(it->type, it->loader);
-        resource_manager::register_online(it->type, it->online);
-        resource_manager::register_offline(it->type, it->offline);
+        resource_manager::register_type(it->type,
+                                        it->loader,
+                                        it->unloader,
+                                        it->online,
+                                        it->offline);
 
 #if defined(CETECH_DEVELOP)
         resource_compiler::register_compiler(it->type, it->compiler);
