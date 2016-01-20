@@ -61,11 +61,12 @@ solution "CETech"
         'CETECH_SDL2'
     }
 
-    configuration "*-clang "
+    configuration "*-clang"
         linkoptions {
           --"-fsanitize=thread",
           --"-fsanitize=cfi",
-          --"-fsanitize=alignment"
+          --"-fsanitize=alignment",
+          --"-fsanitize=memory"
         }
     
     configuration "Debug"

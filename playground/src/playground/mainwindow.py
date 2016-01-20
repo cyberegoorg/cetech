@@ -10,7 +10,7 @@ from playground.engine.cetechproject import CetechProject
 from playground.logwidget import LogWidget, LogSub
 from playground.ui.mainwindow import Ui_MainWindow
 from playground.recordeventwidget import RecordEventWidget
-from playground.scripteditor import ScriptEditor
+from playground.scripteditor import ScriptEditor, ScriptEditorDock
 
 from playground.engine.cetechwidget import CetechWidget
 
@@ -38,16 +38,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
         self.setTabPosition(Qt.AllDockWidgetAreas, QTabWidget.North)
 
-        self.script_editor_widget = ScriptEditor(project_manager=self.project, api=self.api)
-        self.script_editor_dock_widget = QDockWidget(self)
-        self.script_editor_dock_widget.setWindowTitle("Script editor")
-        self.script_editor_dock_widget.hide()
-        self.script_editor_dock_widget.setFeatures(QDockWidget.AllDockWidgetFeatures)
-        self.script_editor_dock_widget.setWidget(self.script_editor_widget)
-        self.addDockWidget(Qt.TopDockWidgetArea, self.script_editor_dock_widget)
-
         self.logsub = LogSub(b"ws://localhost:5556")
-        self.log_widget = LogWidget(self.script_editor_widget, self.logsub)
+        self.log_widget = LogWidget(None, self.logsub) #TODO: open file
         self.log_dock_widget = QDockWidget(self)
         self.log_dock_widget.hide()
         self.log_dock_widget.setWindowTitle("Log")
@@ -92,10 +84,13 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.build_file_watch.directoryChanged.connect(self.build_dir_changed)
 
     def open_asset(self, path, ext):
-        if self.script_editor_widget.support_ext(ext):
-            self.script_editor_widget.open_file(path)
-            self.script_editor_dock_widget.show()
-            self.script_editor_dock_widget.focusWidget()
+        if ScriptEditor.support_ext(ext):
+            script_editor_dock_widget = ScriptEditorDock(filename=path, project_manager=self.project, api=self.api)
+
+            self.addDockWidget(Qt.TopDockWidgetArea, script_editor_dock_widget)
+
+            script_editor_dock_widget.show()
+            script_editor_dock_widget.focusWidget()
 
     def open_project(self, name, dir):
         self.project.open_project(name, dir)
