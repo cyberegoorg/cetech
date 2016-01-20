@@ -25,7 +25,7 @@
 /***************************************************************************
 **** deallocate T* p with 'a' alocator
 ***************************************************************************/
-#define MAKE_DELETE(a, T, p)    do {if (p) {(p)->~T(); a.deallocate(p); }} while (0)
+#define MAKE_DELETE(a, T, p) do {if (p) {(p)->~T(); a.deallocate(p); }} while (0)
 
 namespace cetech {
 
@@ -115,7 +115,7 @@ namespace cetech {
     namespace memory {
 
         /***********************************************************************
-        **** Allocate array system globals function.
+        **** Allocate array.
         ***********************************************************************/
         template < typename T, typename ... ARGS >
         CE_INLINE T* alloc_array(Allocator& allocator,
@@ -132,6 +132,24 @@ namespace cetech {
             return mem;
         }
 
+        /***********************************************************************
+        **** Deallocate array.
+        ***********************************************************************/
+        template < typename T >
+        CE_INLINE void dealloc_array(Allocator& allocator,
+                                     T* mem,
+                                     const size_t size) {
+            char* p = (char*)mem;
+            
+            for (size_t i = 0; i < size; ++i) {
+                ((T*)p)->~T();
+
+                p += sizeof(T);
+            }
+            
+            allocator.deallocate(mem);
+        }
+        
         /***********************************************************************
         **** Allign pointer.
         ***********************************************************************/

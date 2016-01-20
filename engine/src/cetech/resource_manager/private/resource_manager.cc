@@ -18,26 +18,45 @@
 namespace cetech {
     namespace {
         using namespace resource_manager;
-
+              
+        
+        enum {
+            MAX_TYPES = 64,
+        };
+        
         struct ResouceManagerData {
-            Hash < char* > _data_map;
-            Hash < uint32_t > _data_refcount_map;
+            Hash < uint32_t > _types_map;
+            Hash < char* >* _data_map;
+            Hash < uint32_t >* _data_refcount_map;
 
             Hash < resource_loader_clb_t > _load_clb_map;
             Hash < resource_unloader_clb_t > _unload_clb_map;
             Hash < resource_online_clb_t > _online_clb_map;
             Hash < resource_offline_clb_t > _offline_clb_map;
 
+            Allocator& _allocator;
+            
             Spinlock add_lock;
+            uint32_t type_count;
             bool autoreload;
 
-            explicit ResouceManagerData(Allocator& allocator) : _data_map(allocator),
-                                                                _data_refcount_map(allocator),
+            explicit ResouceManagerData(Allocator& allocator) : _types_map(allocator),
                                                                 _load_clb_map(allocator),
                                                                 _unload_clb_map(allocator),
                                                                 _online_clb_map(allocator),
                                                                 _offline_clb_map(allocator),
-                                                                autoreload(true) {}
+                                                                _allocator(allocator),
+                                                                type_count(0),
+                                                                autoreload(true){
+                
+                _data_map = memory::alloc_array< Hash < char* > ,  Allocator& >(allocator, MAX_TYPES, allocator);
+                _data_refcount_map = memory::alloc_array<Hash < uint32_t > ,  Allocator& >(allocator, MAX_TYPES, allocator);
+            }
+            
+            ~ResouceManagerData() {
+                memory::dealloc_array(_allocator, _data_map, MAX_TYPES);
+                memory::dealloc_array(_allocator, _data_refcount_map, MAX_TYPES);
+            }
         };
 
         struct Globals {
@@ -60,9 +79,10 @@ namespace cetech {
     }
 
     namespace resource_manager {
-        CE_INLINE void inc_reference(const StringId64_t type,
+        CE_INLINE void inc_reference(const uint32_t type_idx,
                                      const StringId64_t name) {
-            const uint32_t counter = hash::get < uint32_t > (_globals.data->_data_refcount_map, type ^ name, 0) + 1;
+            auto& ref_count_map = _globals.data->_data_refcount_map[type_idx];
+            const uint32_t counter = hash::get < uint32_t > (ref_count_map, name, 0) + 1;
 
             //             log::debug("resource_manager",
             //                                      "Inc reference for (%" PRIx64 ", %" PRIx64 ") counter == %d ",
@@ -70,13 +90,14 @@ namespace cetech {
             //                                      name,
             //                                      counter);
 
-            hash::set(_globals.data->_data_refcount_map, type ^ name, counter);
+            hash::set(ref_count_map, name, counter);
         }
 
-        CE_INLINE bool dec_reference(const StringId64_t type,
+        CE_INLINE bool dec_reference(const uint32_t type_idx,
                                      const StringId64_t name) {
 
-            const uint32_t counter = hash::get < uint32_t > (_globals.data->_data_refcount_map, type ^ name, 1) - 1;
+            auto& ref_count_map = _globals.data->_data_refcount_map[type_idx];
+            const uint32_t counter = hash::get < uint32_t > (ref_count_map, name, 0) - 1;
 
             //             log::debug("resource_manager",
             //                                      "Dec reference for %" PRIx64 "%" PRIx64 "." " counter == %d ",
@@ -84,7 +105,7 @@ namespace cetech {
             //                                      name,
             //                                      counter);
 
-            hash::set(_globals.data->_data_refcount_map, type ^ name, counter);
+            hash::set(ref_count_map, name, counter);
 
             return counter == 0;
         }
@@ -146,23 +167,26 @@ namespace cetech {
                         const StringId64_t* names,
                         const uint32_t count) {
 
+            const uint32_t type_idx = hash::get<uint32_t>(_globals.data->_types_map, type, 0);
+            auto& data_map = _globals.data->_data_map[type_idx];
+
             thread::spin_lock(_globals.data->add_lock);
 
             for (uint32_t i = 0; i < count; ++i) {
                 const StringId64_t name = names[i];
-
-                hash::set(_globals.data->_data_map, type ^ name, loaded_data[i]);
-                inc_reference(type, name);
+                
+                hash::set(data_map, name, loaded_data[i]);
+                inc_reference(type_idx, name);
 
                 resource_online_clb_t online_clb = hash::get < resource_online_clb_t >
                                                    (_globals.data->_online_clb_map, type, nullptr);
 
-                if (online_clb == nullptr) {
-                    log::error("resource_manager",
-                               "Resource type " "%" PRIx64 " not register online.",
-                               type);
-                    return;
-                }
+//                 if (online_clb == nullptr) {
+//                     log::error("resource_manager",
+//                                "Resource type " "%" PRIx64 " not register online.",
+//                                type);
+//                     return;
+//                 }
 
                 online_clb(loaded_data[i]);
             }
@@ -194,6 +218,9 @@ namespace cetech {
                 return;
             }
 
+            const  uint32_t type_idx = hash::get<uint32_t>(_globals.data->_types_map, type, 0);
+            auto& data_map = _globals.data->_data_map[type_idx];
+            
             StringId64_t name = 0;
 
             for (uint32_t i = 0; i < count; ++i) {
@@ -209,14 +236,14 @@ namespace cetech {
                            "Unload resource " "%" PRIx64 "%" PRIx64 "",
                            type, name);
 
-                if (!dec_reference(type, name)) {
+                if (!dec_reference(type_idx, name)) {
                     continue;
                 }
 
                 void* data = (void*) get(type, name);
                 clb(memory_globals::default_allocator(), data);
 
-                hash::remove(_globals.data->_data_map, type ^ name);
+                hash::remove(data_map, name);
             }
         }
 
@@ -224,11 +251,15 @@ namespace cetech {
                      const StringId64_t* names,
                      const uint32_t count) {
 
+            CE_ASSERT("resource_manager", hash::has(_globals.data->_types_map, type) );
+
+            const  uint32_t type_idx = hash::get<uint32_t>(_globals.data->_types_map, type, 0);
+            auto& data_map = _globals.data->_data_map[type_idx];
+            
             for (uint32_t i = 0; i < count; ++i) {
                 StringId64_t name = names[i];
 
-                if (!hash::has(_globals.data->_data_map, type ^ name)) {
-                    thread::spin_unlock(_globals.data->add_lock);
+                if (!hash::has(data_map, name)) {
                     return false;
                 }
             }
@@ -248,6 +279,12 @@ namespace cetech {
 
         const char* get(const StringId64_t type,
                         const StringId64_t name) {
+
+            CE_ASSERT("resource_manager", hash::has(_globals.data->_types_map, type) );
+
+            const uint32_t type_idx = hash::get<uint32_t>(_globals.data->_types_map, type, 0);
+            auto& data_map = _globals.data->_data_map[type_idx];
+            
             if (_globals.data->autoreload) {
                 if (!can_get(type, &name, 1)) {
                     log::warning("resource_manager", "Autoreload " "%" PRIx64 "%" PRIx64 "", type, name);
@@ -255,12 +292,16 @@ namespace cetech {
                 }
             }
 
-            return hash::get < char* > (_globals.data->_data_map, type ^ name, nullptr);
+            return hash::get < char* > (data_map, name, nullptr);
         }
 
         void register_loader(const StringId64_t type,
                              const resource_loader_clb_t clb) {
+            const uint32_t type_idx = _globals.data->type_count++;
+            
+            hash::set(_globals.data->_types_map, type, type_idx);
             hash::set(_globals.data->_load_clb_map, type, clb);
+            
         }
 
         void register_unloader(const cetech::StringId64_t type,
