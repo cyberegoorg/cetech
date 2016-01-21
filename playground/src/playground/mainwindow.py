@@ -1,18 +1,17 @@
 import argparse
 import platform
-from time import sleep
 
 from PyQt5.QtCore import QThread, Qt, QFileSystemWatcher, QDirIterator
 from PyQt5.QtWidgets import QMainWindow, QDockWidget, QTabWidget
-from playground.assetbrowser import AssetBrowser
-from playground.engine.consoleapi import ConsoleAPI
-from playground.engine.cetechproject import CetechProject
-from playground.logwidget import LogWidget, LogSub
-from playground.ui.mainwindow import Ui_MainWindow
-from playground.recordeventwidget import RecordEventWidget
-from playground.scripteditor import ScriptEditor, ScriptEditorDock
 
+from playground.assetbrowser import AssetBrowser
+from playground.engine.cetechproject import CetechProject
 from playground.engine.cetechwidget import CetechWidget
+from playground.engine.consoleapi import ConsoleAPI
+from playground.logwidget import LogWidget, LogSub
+from playground.recordeventwidget import RecordEventWidget
+from playground.scripteditor import ScriptEditorWidget
+from playground.ui.mainwindow import Ui_MainWindow
 
 
 class MainWindow(QMainWindow, Ui_MainWindow):
@@ -84,12 +83,11 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.build_file_watch.directoryChanged.connect(self.build_dir_changed)
 
     def open_asset(self, path, ext):
-        if ScriptEditor.support_ext(ext):
-            script_editor_dock_widget = ScriptEditorDock(filename=path, project_manager=self.project, api=self.api)
+        if ScriptEditorWidget.support_ext(ext):
+            script_editor_dock_widget = ScriptEditorWidget(filename=path, project_manager=self.project, api=self.api)
+            # script_editor_dock_widget.open(path)
 
             self.addDockWidget(Qt.TopDockWidgetArea, script_editor_dock_widget)
-
-            script_editor_dock_widget.show()
             script_editor_dock_widget.focusWidget()
 
     def open_project(self, name, dir):

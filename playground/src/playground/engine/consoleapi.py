@@ -12,4 +12,6 @@ class ConsoleAPI(ConsoleProxy):
         self.lua_execute('autocomplite_list()')
 
     def resize(self, w, h):
-        self.send_command('renderer.resize', width=w, height=h)
+        # self.send_command('renderer.resize', width=w, height=h)
+        # FIXME:
+        pass

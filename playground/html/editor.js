@@ -14,5 +14,5 @@ function init() {
         enableSnippets: true
     });
 
-    editor.setFontSize(13)
+    editor.setFontSize(15)
 }
