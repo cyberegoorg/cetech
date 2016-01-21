@@ -2,9 +2,9 @@ import os
 
 from PyQt5.QtCore import QTextCodec, QFile, QDir, QFileInfo, QUrl, pyqtSlot, Qt
 from PyQt5.QtWebKit import QWebSettings
-from PyQt5.QtWidgets import QFileDialog, QMessageBox, QDockWidget
+from PyQt5.QtWidgets import QFileDialog, QMessageBox, QDockWidget, QMainWindow
 
-from playground.ui.scripteditor import Ui_DockWidget
+from playground.ui.scripteditorwindow import Ui_MainWindow
 
 SUFIX_2_MODE = {
     'lua': 'ace/mode/lua',
@@ -15,10 +15,34 @@ SUPPORTED_EXT = ('lua', 'package', 'texture', 'json')
 FILES_FILTER = "Lua (*.lua);;Package (*.package);;Texture (*.texture);;JSON (*.json)"
 
 
-class ScriptEditorWidget(QDockWidget, Ui_DockWidget):
+class ScriptEditorWidget(QDockWidget):
+    def __init__(self, project_manager, api, filename=None):
+        super(ScriptEditorWidget, self).__init__()
+
+        self.editor = ScriptEditorWindow(project_manager=project_manager, api=api, filename=filename)
+        self.setWidget(self.editor)
+
+        self.setFeatures(QDockWidget.AllDockWidgetFeatures)
+        self.setAttribute(Qt.WA_DeleteOnClose)
+
+    @classmethod
+    def support_ext(cls, ext):
+        return ext in SUPPORTED_EXT
+
+    def closeEvent(self, event):
+        if self.editor.close_request():
+            event.accept()
+        else:
+            event.ignore()
+
+
+class ScriptEditorWindow(QMainWindow, Ui_MainWindow):
     def __init__(self, project_manager, api, filename=None, parent=None):
-        super(ScriptEditorWidget, self).__init__(parent=parent)
+        super(ScriptEditorWindow, self).__init__(parent=parent)
         self.setupUi(self)
+
+        self.addAction(self.actionSave)
+        self.addAction(self.actionSend)
 
         self.project_manager = project_manager
         self.api = api
@@ -37,13 +61,6 @@ class ScriptEditorWidget(QDockWidget, Ui_DockWidget):
         else:
             self.webView.page().mainFrame().loadFinished.connect(
                     lambda: self.webView.page().mainFrame().evaluateJavaScript("init()"))
-
-        self.setFeatures(QDockWidget.AllDockWidgetFeatures)
-        self.setAttribute(Qt.WA_DeleteOnClose)
-
-    @classmethod
-    def support_ext(cls, ext):
-        return ext in SUPPORTED_EXT
 
     @property
     def text(self):
@@ -115,7 +132,7 @@ class ScriptEditorWidget(QDockWidget, Ui_DockWidget):
         ))
 
     def _set_window_title(self, filename):
-        self.setWindowTitle(filename.replace(self.project_manager.source_dir, '')[1:])
+        self.parent().setWindowTitle(filename.replace(self.project_manager.source_dir, '')[1:])
 
     def _open_save_dialog(self):
         idx = self.main_tabs.currentIndex()
@@ -135,7 +152,7 @@ class ScriptEditorWidget(QDockWidget, Ui_DockWidget):
 
         self.save_as(filename)
 
-    def _close_request(self):
+    def close_request(self):
         if self.filename is None:
             return False
 
@@ -149,10 +166,3 @@ class ScriptEditorWidget(QDockWidget, Ui_DockWidget):
                 return False
 
         return True
-
-    def closeEvent(self, event):
-        if self._close_request():
-            event.accept()
-
-        else:
-            event.ignore()
