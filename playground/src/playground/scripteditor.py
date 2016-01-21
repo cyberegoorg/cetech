@@ -115,7 +115,7 @@ class ScriptEditorWidget(QDockWidget, Ui_DockWidget):
         ))
 
     def _set_window_title(self, filename):
-        self.setWindowTitle(filename.replace("%s/" % self.project_manager.source_dir, ''))
+        self.setWindowTitle(filename.replace(self.project_manager.source_dir, '')[1:])
 
     def _open_save_dialog(self):
         idx = self.main_tabs.currentIndex()
@@ -140,7 +140,7 @@ class ScriptEditorWidget(QDockWidget, Ui_DockWidget):
             return False
 
         if self.modified:
-            res = QMessageBox.question(self, "File is modified", "File '%s' is modified" % self.editor_widget.filename,
+            res = QMessageBox.question(self, "File is modified", "File '%s' is modified" % self.filename,
                                        QMessageBox.Save | QMessageBox.Discard | QMessageBox.Cancel)
             if res == QMessageBox.Save:
                 self.save()

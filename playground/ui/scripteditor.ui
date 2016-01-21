@@ -10,6 +10,9 @@
     <height>491</height>
    </rect>
   </property>
+  <property name="focusPolicy">
+   <enum>Qt::StrongFocus</enum>
+  </property>
   <property name="windowTitle">
    <string>Sc&amp;ript editor: </string>
   </property>
@@ -19,11 +22,17 @@
      <layout class="QHBoxLayout" name="horizontalLayout">
       <item>
        <widget class="QPushButton" name="saveButton">
+        <property name="toolTip">
+         <string>Save</string>
+        </property>
         <property name="text">
          <string/>
         </property>
         <property name="icon">
          <iconset theme="document-save"/>
+        </property>
+        <property name="shortcut">
+         <string>Ctrl+S</string>
         </property>
         <property name="flat">
          <bool>true</bool>
@@ -32,11 +41,17 @@
       </item>
       <item>
        <widget class="QPushButton" name="sendButton">
+        <property name="toolTip">
+         <string>Send text to engine</string>
+        </property>
         <property name="text">
          <string/>
         </property>
         <property name="icon">
          <iconset theme="system-run"/>
+        </property>
+        <property name="shortcut">
+         <string>Alt+Return</string>
         </property>
         <property name="flat">
          <bool>true</bool>
@@ -45,6 +60,9 @@
       </item>
       <item>
        <widget class="QPushButton" name="undoButton">
+        <property name="toolTip">
+         <string>Rendo</string>
+        </property>
         <property name="text">
          <string/>
         </property>
@@ -58,6 +76,9 @@
       </item>
       <item>
        <widget class="QPushButton" name="redoButton">
+        <property name="toolTip">
+         <string>undo</string>
+        </property>
         <property name="text">
          <string/>
         </property>
