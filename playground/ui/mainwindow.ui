@@ -61,7 +61,7 @@
   </action>
   <action name="actionRecorded_events">
    <property name="text">
-    <string>&amp;Recorded events</string>
+    <string>Profiler</string>
    </property>
   </action>
  </widget>

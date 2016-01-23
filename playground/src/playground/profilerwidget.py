@@ -5,12 +5,12 @@ from PyQt5.QtCore import QUrl, pyqtSlot, QDir
 from PyQt5.QtWebKit import QWebSettings
 from PyQt5.QtWidgets import QFrame
 
-from playground.ui.recordeventswidget import Ui_RecordEventsWidget
+from playground.ui.profilerwidget import Ui_ProfilerWidget
 
 
-class RecordEventWidget(QFrame, Ui_RecordEventsWidget):
+class ProfilerWidget(QFrame, Ui_ProfilerWidget):
     def __init__(self, api):
-        super(RecordEventWidget, self).__init__()
+        super(ProfilerWidget, self).__init__()
         self.setupUi(self)
 
         self.api = api

@@ -318,7 +318,7 @@ namespace cetech {
                                         mpack_writer_t* writer) {
             RecordFloatEvent* e = (RecordFloatEvent*)event;
 
-            mpack_start_map(writer, 3);
+            mpack_start_map(writer, 4);
 
             mpack_write_cstr(writer, "etype");
             mpack_write_cstr(writer, "EVENT_RECORD_FLOAT");
@@ -328,7 +328,10 @@ namespace cetech {
 
             mpack_write_cstr(writer, "value");
             mpack_write_float(writer, e->value);
-
+                        
+            mpack_write_cstr(writer, "frame_id");
+            mpack_write_i64(writer, e->frame_id);
+            
             mpack_finish_map(writer);
         }
     }
