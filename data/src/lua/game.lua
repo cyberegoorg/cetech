@@ -11,26 +11,10 @@ function Game:init()
     log.warn("boot.lua", "warn")
     log.error("boot.lua", "error")
     log.debug("boot.lua", "debug")
-    
-    Application.console_send("hello",{
-            type = "autocomplete_list",
-            list = {
-                foo = 2
-            }
-        })
 end
 
 function Game:shutdown()
     log.info("boot.lua", "shutdown")
-
-    Application.console_send("hello", {
-            type = "autocomplethelloe_list",
-            list = {
-                foo = 2,
-                fod = "ddddd",
-                aaa = 222
-            }
-        })
 end
 
 function Game:update(dt)
