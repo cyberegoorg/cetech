@@ -121,6 +121,11 @@ class ScriptEditorWindow(QMainWindow, Ui_MainWindow):
     def _on_change(self):
         self.modified = True
 
+        title = self._get_window_title()
+
+        if not title.endswith("*"):
+            self._set_window_title("%s*" % title)
+
     def _set_mode_by_filename(self, filename):
         file = QFile(filename)
         fileinfo = QFileInfo(file)
@@ -132,6 +137,12 @@ class ScriptEditorWindow(QMainWindow, Ui_MainWindow):
         ))
 
     def _set_window_title(self, filename):
+        self.parent().setWindowTitle(filename.replace(self.project_manager.source_dir, '')[1:])
+
+    def _get_window_title(self):
+        return self.parent().windowTitle()
+
+    def _set_window_title_modified(self, filename, modified):
         self.parent().setWindowTitle(filename.replace(self.project_manager.source_dir, '')[1:])
 
     def _open_save_dialog(self):
