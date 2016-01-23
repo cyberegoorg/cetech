@@ -9,7 +9,7 @@ from playground.engine.cetechproject import CetechProject
 from playground.engine.cetechwidget import CetechWidget
 from playground.engine.consoleapi import ConsoleAPI
 from playground.logwidget import LogWidget, LogSub
-from playground.recordeventwidget import RecordEventWidget
+from playground.profilerwidget import ProfilerWidget
 from playground.scripteditor import ScriptEditorWidget
 from playground.ui.mainwindow import Ui_MainWindow
 
@@ -37,30 +37,6 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
         self.setTabPosition(Qt.AllDockWidgetAreas, QTabWidget.North)
 
-        self.logsub = LogSub(b"ws://localhost:5556")
-        self.log_widget = LogWidget(None, self.logsub) #TODO: open file
-        self.log_dock_widget = QDockWidget(self)
-        self.log_dock_widget.hide()
-        self.log_dock_widget.setWindowTitle("Log")
-        self.log_dock_widget.setWidget(self.log_widget)
-        self.addDockWidget(Qt.BottomDockWidgetArea, self.log_dock_widget)
-
-        self.assetb_widget = AssetBrowser()
-        self.assetb_dock_widget = QDockWidget(self)
-        self.assetb_dock_widget.hide()
-        self.assetb_dock_widget.setWindowTitle("Asset browser")
-        self.assetb_dock_widget.setFeatures(QDockWidget.AllDockWidgetFeatures)
-        self.assetb_dock_widget.setWidget(self.assetb_widget)
-        self.addDockWidget(Qt.LeftDockWidgetArea, self.assetb_dock_widget)
-
-        self.recorded_event_widget = RecordEventWidget(api=self.api)
-        self.recorded_event_dock_widget = QDockWidget(self)
-        self.recorded_event_dock_widget.setWindowTitle("Recorded events")
-        self.recorded_event_dock_widget.hide()
-        self.recorded_event_dock_widget.setFeatures(QDockWidget.AllDockWidgetFeatures)
-        self.recorded_event_dock_widget.setWidget(self.recorded_event_widget)
-        self.addDockWidget(Qt.RightDockWidgetArea, self.recorded_event_dock_widget)
-
         # TODO bug #114 workaround. Disable create sub engine...
         if platform.system().lower() != 'darwin':
             self.ogl_widget = CetechWidget(self, self.api)
@@ -70,7 +46,33 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             self.ogl_dock.setWidget(self.ogl_widget)
             self.addDockWidget(Qt.TopDockWidgetArea, self.ogl_dock)
 
+        self.assetb_widget = AssetBrowser()
+        self.assetb_dock_widget = QDockWidget(self)
+        self.assetb_dock_widget.hide()
+        self.assetb_dock_widget.setWindowTitle("Asset browser")
+        self.assetb_dock_widget.setFeatures(QDockWidget.AllDockWidgetFeatures)
+        self.assetb_dock_widget.setWidget(self.assetb_widget)
+        self.addDockWidget(Qt.BottomDockWidgetArea, self.assetb_dock_widget)
+
+        self.profiler_widget = ProfilerWidget(api=self.api)
+        self.profiler_doc_widget = QDockWidget(self)
+        self.profiler_doc_widget.setWindowTitle("Profiler")
+        self.profiler_doc_widget.hide()
+        self.profiler_doc_widget.setFeatures(QDockWidget.AllDockWidgetFeatures)
+        self.profiler_doc_widget.setWidget(self.profiler_widget)
+        self.addDockWidget(Qt.RightDockWidgetArea, self.profiler_doc_widget)
+
+        self.logsub = LogSub(b"ws://localhost:5556")
+        self.log_widget = LogWidget(None, self.logsub)  # TODO: open file
+        self.log_dock_widget = QDockWidget(self)
+        self.log_dock_widget.hide()
+        self.log_dock_widget.setWindowTitle("Log")
+        self.log_dock_widget.setWidget(self.log_widget)
+
+        self.addDockWidget(Qt.BottomDockWidgetArea, self.log_dock_widget)
         self.tabifyDockWidget(self.assetb_dock_widget, self.log_dock_widget)
+
+
 
         self.assetb_widget.asset_clicked.connect(self.open_asset)
 
@@ -168,7 +170,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.script_editor_dock_widget.show()
 
     def open_recorded_events(self):
-        self.recorded_event_dock_widget.show()
+        self.profiler_doc_widget.show()
 
     def closeEvent(self, evnt):
         self.api.disconnect()
