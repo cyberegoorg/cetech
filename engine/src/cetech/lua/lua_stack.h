@@ -1,6 +1,7 @@
 #pragma once
 
 #include "luajit/lua.hpp"
+#include "mpack/mpack.h"
 
 #include "celib/string/types.h"
 #include "celib/math/types.h"
@@ -153,6 +154,64 @@ namespace cetech {
                                        const uint32_t level) {
                 for (uint32_t i = 0; i < level; ++i) {
                     array::push(output, CSTR_TO_ARG("  "));
+                }
+            }
+
+            void to_mpack(const int i,
+                          mpack_writer_t& writer,
+                          uint32_t level) {
+
+                int type = lua_type(_L, i);
+
+                switch (type) {
+                case LUA_TNUMBER: {
+                    uint32_t number = lua_tonumber(_L, i);
+                    mpack_write_i32(&writer, number);
+                }
+                break;
+
+                case LUA_TSTRING: {
+                    const char* str = lua_tostring(_L, i);
+                    mpack_write_cstr(&writer, str);
+                }
+                break;
+
+                case LUA_TBOOLEAN: {
+                    bool b = lua_toboolean(_L, i);
+                    mpack_write_bool(&writer, b);
+                }
+                break;
+
+                case LUA_TNIL: {
+                    mpack_write_nil(&writer);
+                }
+                break;
+
+                case LUA_TTABLE: {
+                    size_t count = 0;
+
+                    for (lua_pushnil(_L); lua_next(_L, -2); lua_pop(_L, 1)) {
+                        ++count;
+                    }
+
+                    mpack_start_map(&writer, count);
+
+                    for (lua_pushnil(_L); lua_next(_L, -2); lua_pop(_L, 1)) {
+                        const char* key = lua_tostring(_L, -2);
+
+                        mpack_write_cstr(&writer, key);
+                        to_mpack(lua_gettop(_L), writer, level + 1);
+                    }
+
+                    mpack_finish_map(&writer);
+                }
+                break;
+
+                case LUA_TFUNCTION: {
+                    mpack_write_cstr(&writer, "function");
+                }
+                break;
+
                 }
             }
 
