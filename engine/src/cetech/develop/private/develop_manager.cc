@@ -22,7 +22,7 @@ namespace cetech {
     namespace {
         using namespace develop_manager;
 
-        typedef void (* to_yaml_fce_t)(const void*,
+        typedef void (* to_mpack_fce_t)(const void*,
                                        mpack_writer_t* writer);
 
         static thread_local char _stream_buffer[64 * 1024] = {0};
@@ -31,14 +31,14 @@ namespace cetech {
         static thread_local uint32_t _scope_depth = 0;
 
         struct DevelopManagerData {
-            Hash < to_yaml_fce_t > to_yaml;
+            Hash < to_mpack_fce_t > to_mpack;
             Hash < const char* > type_to_string;
             Array < char > buffer;
             EventStream stream;
             Spinlock lock;
             int dev_pub_socket;
 
-            explicit DevelopManagerData(Allocator& allocator) : to_yaml(allocator),
+            explicit DevelopManagerData(Allocator& allocator) : to_mpack(allocator),
                                                                 type_to_string(allocator),
                                                                 buffer(allocator),
                                                                 stream(allocator),
@@ -104,8 +104,8 @@ namespace cetech {
 
         void register_type(EventType type,
                            const char* type_str,
-                           to_yaml_fce_t fce) {
-            hash::set(_globals.data->to_yaml, type, fce);
+                           to_mpack_fce_t fce) {
+            hash::set(_globals.data->to_mpack, type, fce);
             hash::set(_globals.data->type_to_string, type, type_str);
         }
 
@@ -135,10 +135,10 @@ namespace cetech {
                 eventstream::Header* header = eventstream::header(_globals.data->stream, it);
 
                 //etype
-                to_yaml_fce_t to_yaml_fce = hash::get < to_yaml_fce_t > (_globals.data->to_yaml, header->type, nullptr);
-                CE_ASSERT("develop_manager", to_yaml_fce);
+                to_mpack_fce_t to_mpack_fce = hash::get < to_mpack_fce_t > (_globals.data->to_mpack, header->type, nullptr);
+                CE_ASSERT("develop_manager", to_mpack_fce);
 
-                to_yaml_fce(eventstream::event < void* > (_globals.data->stream, it), &writer);
+                to_mpack_fce(eventstream::event < void* > (_globals.data->stream, it), &writer);
 
                 it = eventstream::next(_globals.data->stream, it);
             }
@@ -236,7 +236,7 @@ namespace cetech {
             task_manager::wait(flush_develop_manager_task2);
         }
 
-        static void beginframe_to_json(const void* event,
+        static void beginframe_to_mpack(const void* event,
                                        mpack_writer_t* writer) {
             BeginFrameEvent* e = (BeginFrameEvent*)event;
 
@@ -257,7 +257,7 @@ namespace cetech {
             mpack_finish_map(writer);
         }
 
-        static void endframe_to_json(const void* event,
+        static void endframe_to_mpack(const void* event,
                                      mpack_writer_t* writer) {
             EndFrameEvent* e = (EndFrameEvent*)event;
 
@@ -278,7 +278,7 @@ namespace cetech {
             mpack_finish_map(writer);
         }
 
-        static void begintask_to_json(const void* event,
+        static void begintask_to_mpack(const void* event,
                                       mpack_writer_t* writer) {
             ScopeEvent* e = (ScopeEvent*)event;
 
@@ -314,7 +314,7 @@ namespace cetech {
             mpack_finish_map(writer);
         }
 
-        static void recordfloat_to_json(const void* event,
+        static void recordfloat_to_mpack(const void* event,
                                         mpack_writer_t* writer) {
             RecordFloatEvent* e = (RecordFloatEvent*)event;
 
@@ -343,10 +343,10 @@ namespace cetech {
             char* p = _globals.buffer;
             _globals.data = new(p) DevelopManagerData(memory_globals::default_allocator());
 
-            register_type(EVENT_BEGIN_FRAME, "EVENT_BEGIN_FRAME", beginframe_to_json);
-            register_type(EVENT_END_FRAME, "EVENT_END_FRAME", endframe_to_json);
-            register_type(EVENT_SCOPE, "EVENT_SCOPE", begintask_to_json);
-            register_type(EVENT_RECORD_FLOAT, "EVENT_RECORD_FLOAT", recordfloat_to_json);
+            register_type(EVENT_BEGIN_FRAME, "EVENT_BEGIN_FRAME", beginframe_to_mpack);
+            register_type(EVENT_END_FRAME, "EVENT_END_FRAME", endframe_to_mpack);
+            register_type(EVENT_SCOPE, "EVENT_SCOPE", begintask_to_mpack);
+            register_type(EVENT_RECORD_FLOAT, "EVENT_RECORD_FLOAT", recordfloat_to_mpack);
 
             int socket = nn_socket(AF_SP, NN_PUB);
             CE_ASSERT("develop_manager", socket >= 0);
