@@ -18,6 +18,7 @@
 
 #if defined(CETECH_DEVELOP)
     #include "cetech/develop/console_server.h"
+    #include "cetech/develop/develop_manager.h"
 #endif
 
 /********
@@ -172,6 +173,16 @@ namespace cetech {
         void end_frame() {
             RendererData* data = _globals.data;
             data->frame_id = bgfx::frame();
+            
+            const bgfx::Stats* stats = bgfx::getStats();
+            
+            develop_manager::push_record_float("renderer.cpu_time_begin", stats->cpuTimeBegin);
+            develop_manager::push_record_float("renderer.cpu_time_end", stats->cpuTimeEnd);
+            develop_manager::push_record_float("renderer.cpu_timer_freq", stats->cpuTimerFreq);
+            
+            develop_manager::push_record_float("renderer.gpu_time_begin", stats->gpuTimeBegin);
+            develop_manager::push_record_float("renderer.gpu_time_end", stats->gpuTimeEnd);
+            develop_manager::push_record_float("renderer.gpu_timer_freq", stats->gpuTimerFreq);
         }
     }
 
