@@ -134,9 +134,12 @@ namespace cetech {
             log::info("resource_compiler", "[%s] Compiled.", ct->filename );
         }
 
-        static void cmd_compile_all(const mpack_node_t& root) {
+        static void cmd_compile_all(const mpack_node_t& root,
+                                    mpack_writer_t& writer) {
+            CE_UNUSED(writer);
             CE_UNUSED(root);
             resource_compiler::compile_all();
+            mpack_write_nil(&writer);
         }
     }
 

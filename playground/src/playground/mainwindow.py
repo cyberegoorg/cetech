@@ -33,7 +33,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
         self.project = CetechProject()
 
-        self.api = ConsoleAPI(b"ws://localhost:5557")
+        self.api = ConsoleAPI(b"tcp://localhost:5557")
 
         self.setTabPosition(Qt.AllDockWidgetAreas, QTabWidget.North)
 

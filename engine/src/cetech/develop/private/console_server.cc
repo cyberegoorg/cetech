@@ -71,7 +71,9 @@ namespace cetech {
 
         void parse_packet(uint32_t client,
                           const char* packet,
-                          const uint32_t size) {
+                          const uint32_t size,
+                          mpack_writer_t& writer) {
+
             CE_UNUSED(client);
 
             ConsoleServerData* data = _globals.data;
@@ -90,7 +92,7 @@ namespace cetech {
                 return;
             }
 
-            cmd(root);
+            cmd(root, writer);
         }
     }
 
@@ -122,27 +124,30 @@ namespace cetech {
             int bytes = nn_recv(socket, &buf, NN_MSG, NN_DONTWAIT);
             if (bytes < 0) {
                 CE_ASSERT("console_server", errno == EAGAIN );
-                goto end;
+                develop_manager::leave_scope("ConsoleServer::tick()", time);
+                return;
             }
 
-            //log::debug("ddddd", "parse");
-            parse_packet(0, buf, bytes);
+            char* data;
+            size_t size;
+            mpack_writer_t writer;
+            mpack_writer_init_growable(&writer, &data, &size);
+
+            mpack_start_map(&writer, 2);
+            mpack_write_cstr(&writer, "status");
+            mpack_write_i32(&writer, 200);
+            mpack_write_cstr(&writer, "response");
+
+            parse_packet(0, buf, bytes, writer);
             nn_freemsg(buf);
 
-            //             char* data;
-            //             size_t size;
-            //             mpack_writer_t writer;
-            //             mpack_writer_init_growable(&writer, &data, &size);
-            //
-            //             mpack_start_map(&writer, 1);
-            //             mpack_write_cstr(&writer, "status");
-            //             mpack_write_i32(&writer, 200);
-            //             mpack_finish_map(&writer);
-            //             CE_ASSERT("develop_manager", mpack_writer_destroy(&writer) == mpack_ok);
-            //
-            //             bytes = nn_send(socket, data, size, 0);
-            //CE_ASSERT("console_server", bytes == size);
-end:
+            mpack_finish_map(&writer);
+
+            CE_ASSERT("console_server", mpack_writer_destroy(&writer) == mpack_ok);
+
+            bytes = nn_send(socket, data, size, 0);
+            CE_ASSERT("console_server", (size_t)bytes == size);
+
             develop_manager::leave_scope("ConsoleServer::tick()", time);
         }
     }
@@ -160,9 +165,9 @@ end:
             _globals.data->dev_pub_socket = socket;
             log::register_handler(&nanolog_handler, (void*)(intptr_t)socket);
 
-            socket = nn_socket(AF_SP, NN_PULL);
+            socket = nn_socket(AF_SP, NN_REP);
             CE_ASSERT("console_server", socket >= 0);
-            CE_ASSERT("console_server", nn_bind(socket, "ws://*:5557") >= 0);
+            CE_ASSERT("console_server", nn_bind(socket, "tcp://*:5557") >= 0);
             _globals.data->dev_rep_socket = socket;
         }
 

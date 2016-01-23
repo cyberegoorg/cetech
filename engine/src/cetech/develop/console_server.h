@@ -22,7 +22,8 @@ namespace cetech {
         /***********************************************************************
         **** Command callback.
         ***********************************************************************/
-        typedef void (* command_clb_t)(const mpack_node_t&);
+        typedef void (* command_clb_t)(const mpack_node_t&,
+                                       mpack_writer_t& writer);
 
         /***********************************************************************
         **** Proccess network.
