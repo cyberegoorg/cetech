@@ -215,67 +215,6 @@ namespace cetech {
                 }
             }
 
-            void to_yaml(const int i,
-                         Array < char >& output,
-                         uint32_t level) {
-
-                lua_pushnil(_L);
-                while (lua_next(_L, i) != 0) {
-                    const char* key = lua_tostring(_L, -2);
-
-                    push_indent(output, level);
-                    array::push(output, STR_TO_ARG(key));
-                    array::push(output, CSTR_TO_ARG(": "));
-
-                    int type = lua_type(_L, -1);
-
-                    switch (type) {
-                    case LUA_TNUMBER: {
-                        char number_str[64];
-                        uint32_t number = lua_tonumber(_L, -1);
-
-                        sprintf(number_str, "%d", number);
-
-                        array::push(output, STR_TO_ARG(number_str));
-                        array::push(output, CSTR_TO_ARG("\n"));
-                    }
-                    break;
-                    case LUA_TSTRING: {
-                        const char* str = lua_tostring(_L, -1);
-
-                        array::push(output, STR_TO_ARG(str));
-                        array::push(output, CSTR_TO_ARG("\n"));
-                    }
-                    break;
-                    case LUA_TBOOLEAN: {
-                        bool b = lua_toboolean(_L, -1);
-
-                        array::push(output, CSTR_TO_ARG(b ? "True" : "False"));
-                        array::push(output, CSTR_TO_ARG("\n"));
-                    }
-                    break;
-                    case LUA_TNIL: {
-                        array::push(output, CSTR_TO_ARG("~\n"));
-                    }
-                    break;
-
-                    case LUA_TTABLE: {
-                        array::push(output, CSTR_TO_ARG("\n"));
-                        to_yaml(lua_gettop(_L), output, level + 1);
-                    }
-                    break;
-
-                    case LUA_TFUNCTION: {
-                        array::push(output, CSTR_TO_ARG("function\n"));
-                    }
-
-                    }
-
-                    lua_pop(_L, 1);
-                }
-            }
-
-
             void load_string(const char* string) {
                 luaL_loadstring(_L, string);
             }
