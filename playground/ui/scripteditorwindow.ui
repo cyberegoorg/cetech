@@ -81,7 +81,8 @@
   </action>
   <action name="actionSend">
    <property name="icon">
-    <iconset theme="system-run"/>
+    <iconset theme="system-run">
+     <normaloff>.</normaloff>.</iconset>
    </property>
    <property name="text">
     <string>Send script to engine</string>
@@ -98,7 +99,8 @@
   </action>
   <action name="actionRedo">
    <property name="icon">
-    <iconset theme="edit-redo"/>
+    <iconset theme="edit-redo">
+     <normaloff>.</normaloff>.</iconset>
    </property>
    <property name="text">
     <string>Redo</string>
@@ -109,7 +111,8 @@
   </action>
   <action name="actionUndo">
    <property name="icon">
-    <iconset theme="edit-undo"/>
+    <iconset theme="edit-undo">
+     <normaloff>.</normaloff>.</iconset>
    </property>
    <property name="text">
     <string>Undo</string>
