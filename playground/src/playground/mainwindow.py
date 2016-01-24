@@ -10,7 +10,7 @@ from playground.engine.cetechwidget import CetechWidget
 from playground.engine.consoleapi import ConsoleAPI
 from playground.logwidget import LogWidget, LogSub
 from playground.profilerwidget import ProfilerWidget
-from playground.scripteditor import ScriptEditorWidget
+from playground.scripteditor import ScriptEditorWidget, ScriptEditorManager
 from playground.ui.mainwindow import Ui_MainWindow
 
 
@@ -36,6 +36,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.api = ConsoleAPI(b"tcp://localhost:5557")
 
         self.setTabPosition(Qt.AllDockWidgetAreas, QTabWidget.North)
+
+        self.editors_manager = ScriptEditorManager(project_manager=self.project, api=self.api)
 
         # TODO bug #114 workaround. Disable create sub engine...
         if platform.system().lower() != 'darwin':
@@ -72,8 +74,6 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.addDockWidget(Qt.BottomDockWidgetArea, self.log_dock_widget)
         self.tabifyDockWidget(self.assetb_dock_widget, self.log_dock_widget)
 
-
-
         self.assetb_widget.asset_clicked.connect(self.open_asset)
 
         self.file_watch = QFileSystemWatcher(self)
@@ -86,11 +86,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
     def open_asset(self, path, ext):
         if ScriptEditorWidget.support_ext(ext):
-            script_editor_dock_widget = ScriptEditorWidget(filename=path, project_manager=self.project, api=self.api)
-            # script_editor_dock_widget.open(path)
-
-            self.addDockWidget(Qt.TopDockWidgetArea, script_editor_dock_widget)
-            script_editor_dock_widget.focusWidget()
+            self.editors_manager.open(self, path)
 
     def open_project(self, name, dir):
         self.project.open_project(name, dir)

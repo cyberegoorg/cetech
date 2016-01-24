@@ -15,27 +15,6 @@ SUPPORTED_EXT = ('lua', 'package', 'texture', 'json')
 FILES_FILTER = "Lua (*.lua);;Package (*.package);;Texture (*.texture);;JSON (*.json)"
 
 
-class ScriptEditorWidget(QDockWidget):
-    def __init__(self, project_manager, api, filename=None):
-        super(ScriptEditorWidget, self).__init__()
-
-        self.editor = ScriptEditorWindow(project_manager=project_manager, api=api, filename=filename)
-        self.setWidget(self.editor)
-
-        self.setFeatures(QDockWidget.AllDockWidgetFeatures)
-        self.setAttribute(Qt.WA_DeleteOnClose)
-
-    @classmethod
-    def support_ext(cls, ext):
-        return ext in SUPPORTED_EXT
-
-    def closeEvent(self, event):
-        if self.editor.close_request():
-            event.accept()
-        else:
-            event.ignore()
-
-
 class ScriptEditorWindow(QMainWindow, Ui_MainWindow):
     def __init__(self, project_manager, api, filename=None, parent=None):
         super(ScriptEditorWindow, self).__init__(parent=parent)
@@ -177,3 +156,52 @@ class ScriptEditorWindow(QMainWindow, Ui_MainWindow):
                 return False
 
         return True
+
+
+class ScriptEditorWidget(QDockWidget):
+    def __init__(self, project_manager, api, filename=None):
+        super(ScriptEditorWidget, self).__init__()
+
+        self.editor = ScriptEditorWindow(project_manager=project_manager, api=api, filename=filename)
+        self.setWidget(self.editor)
+
+        self.setFeatures(QDockWidget.AllDockWidgetFeatures)
+        self.setAttribute(Qt.WA_DeleteOnClose)
+
+    @classmethod
+    def support_ext(cls, ext):
+        return ext in SUPPORTED_EXT
+
+    def closeEvent(self, event):
+        if self.editor.close_request():
+            event.accept()
+        else:
+            event.ignore()
+
+
+class ScriptEditorManager(object):
+    def __init__(self, project_manager, api):
+        self.api = api
+        self.project_manager = project_manager
+        self.editors = {}
+
+    def open(self, root, filename):
+        if filename in self.editors:
+            self.editors[filename].raise_()
+
+        else:
+            editor = ScriptEditorWidget(filename=filename, project_manager=self.project_manager, api=self.api)
+            editor.setProperty("filename", filename)
+
+            editor.destroyed.connect(self._editor_destroyed)
+
+            root.addDockWidget(Qt.TopDockWidgetArea, editor)
+
+            if len(self.editors):
+                root.tabifyDockWidget(editor, tuple(self.editors.values())[0])
+
+            self.editors[filename] = editor
+            editor.raise_()
+
+    def _editor_destroyed(self, obj):
+        del self.editors[obj.property("filename")]
