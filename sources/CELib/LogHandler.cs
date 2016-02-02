@@ -3,6 +3,9 @@ using System.IO;
 
 namespace CELib
 {
+    /// <summary>
+    /// Log handlers
+    /// </summary>
     public class LogHandler
     {
         private static readonly string LogFormat = "---" + System.Environment.NewLine +
@@ -30,6 +33,15 @@ namespace CELib
             }
         }
 
+        /// <summary>
+        /// Console log handler
+        /// </summary>
+        /// <param name="level"></param>
+        /// <param name="time"></param>
+        /// <param name="workerId"></param>
+        /// <param name="where"></param>
+        /// <param name="msg"></param>
+        /// <param name="args"></param>
         public static void console_log(Log.Level level, DateTime time, int workerId, string where, string msg, params Object[] args)
         {
             Console.ForegroundColor = LevelToColor(level);
@@ -38,18 +50,34 @@ namespace CELib
         }
 
 
+        /// <summary>
+        /// File log handler
+        /// </summary>
         public class FileLog : LogHandler
         {
             private readonly StreamWriter _write;
 
+            /// <summary>
+            /// Create file log handler
+            /// </summary>
+            /// <param name="filename">Filename</param>
             public FileLog(string filename)
             {
                 _write = new StreamWriter(filename);
             }
 
-            public void Log(Log.Level level, DateTime time, int workerId, string where, string msg, params Object[] args)
+            /// <summary>
+            /// Log handler
+            /// </summary>
+            /// <param name="level"></param>
+            /// <param name="time"></param>
+            /// <param name="workerId"></param>
+            /// <param name="where"></param>
+            /// <param name="msg"></param>
+            /// <param name="args"></param>
+            public void Log(Log.Level level, DateTime time, int workerId, string where, string msg, params object[] args)
             {
-                _write.Write(LogFormat, level, where, time, workerId, String.Format(msg, args));
+                _write.Write(LogFormat, level, where, time, workerId, string.Format(msg, args));
                 _write.Flush();
             }
         }
