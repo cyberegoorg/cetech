@@ -20,8 +20,9 @@ namespace CETech
 
 
             Log.Info("dddd", "dsasadsadsad");
-            Log.Info("dddd", "dsasadsadsad");
-            Log.Info("dddd", "dsasadsadsad");
+            Log.Error("dddd", "dsasadsadsad");
+            Log.Warning("dddd", "dsasadsadsad");
+            Log.Debug("dddd", "dsasadsadsad");
         }
     }
 }

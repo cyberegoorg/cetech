@@ -5,7 +5,7 @@ VisualStudioVersion = 12.0.31101.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CETech", "sources\CETech\CETech.csproj", "{DCC6F18B-E854-4C81-AB12-35DC05DD2DB9}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CELib", "CELib\CELib.csproj", "{34DEF76A-96F9-4CF1-8089-EE64EDE6F3AA}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CELib", "sources\CELib\CELib.csproj", "{34DEF76A-96F9-4CF1-8089-EE64EDE6F3AA}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
