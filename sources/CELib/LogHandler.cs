@@ -7,8 +7,8 @@ namespace CELib
     /// Log handlers
     /// </summary>
     public class LogHandler
-    {
-        private static readonly string LogFormat = "---" + System.Environment.NewLine +
+    {       
+        public static readonly string LogFormat = "---" + System.Environment.NewLine +
                                                    "level: {0}" + System.Environment.NewLine +
                                                    "where: {1}" + System.Environment.NewLine +
                                                    "time: {2}" + System.Environment.NewLine +
@@ -45,7 +45,7 @@ namespace CELib
         public static void console_log(Log.Level level, DateTime time, int workerId, string where, string msg, params Object[] args)
         {
             Console.ForegroundColor = LevelToColor(level);
-            Console.WriteLine(LogFormat, level, where, time, workerId, String.Format(msg, args));
+            Console.WriteLine(LogFormat, level, where, time, workerId, string.Format(msg, args));
             Console.ResetColor();
         }
 

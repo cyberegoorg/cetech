@@ -7,8 +7,6 @@ namespace CETech
     public partial class MainForm : Form
     {
 
-
-
         public MainForm()
         {
             InitializeComponent();
@@ -17,12 +15,22 @@ namespace CETech
 
             Log.LogEvent += LogHandler.console_log;
             Log.LogEvent += file_log.Log;
+            Log.LogEvent += ListLog;
 
+            Log.Info("MainForm", "Info");
+            Log.Error("MainForm", "Error");
+            Log.Warning("MainForm", "Warning");
+            Log.Debug("MainForm", "Debug");
+        }
 
-            Log.Info("dddd", "dsasadsadsad");
-            Log.Error("dddd", "dsasadsadsad");
-            Log.Warning("dddd", "dsasadsadsad");
-            Log.Debug("dddd", "dsasadsadsad");
+        private void ListLog(Log.Level level, DateTime time, int workerId, string where, string msg, params object[] args)
+        {
+            listBox1.Items.Add(string.Format(LogHandler.LogFormat, level, where, time, workerId, string.Format(msg, args)));
+        }
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+            Log.Info("MainForm", sender.ToString());
         }
     }
 }
