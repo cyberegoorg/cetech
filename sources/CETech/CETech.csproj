@@ -81,7 +81,7 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\CELib\CELib.csproj">
+    <ProjectReference Include="..\CELib\CELib.csproj">
       <Project>{34def76a-96f9-4cf1-8089-ee64ede6f3aa}</Project>
       <Name>CELib</Name>
     </ProjectReference>
