@@ -4,17 +4,17 @@ using System.IO;
 namespace CELib
 {
     /// <summary>
-    /// Log handlers
+    ///     Log handlers
     /// </summary>
     public class LogHandler
-    {       
-        public static readonly string LogFormat = "---" + System.Environment.NewLine +
-                                                   "level: {0}" + System.Environment.NewLine +
-                                                   "where: {1}" + System.Environment.NewLine +
-                                                   "time: {2}" + System.Environment.NewLine +
-                                                   "worker: {3}" + System.Environment.NewLine +
-                                                   "msg: |" + System.Environment.NewLine +
-                                                   "  {4}\n" + System.Environment.NewLine;
+    {
+        public static readonly string LogFormat = "---" + Environment.NewLine +
+                                                  "level: {0}" + Environment.NewLine +
+                                                  "where: {1}" + Environment.NewLine +
+                                                  "time: {2}" + Environment.NewLine +
+                                                  "worker: {3}" + Environment.NewLine +
+                                                  "msg: |" + Environment.NewLine +
+                                                  "  {4}\n" + Environment.NewLine;
 
         internal static ConsoleColor LevelToColor(Log.Level level)
         {
@@ -34,7 +34,7 @@ namespace CELib
         }
 
         /// <summary>
-        /// Console log handler
+        ///     Console log handler
         /// </summary>
         /// <param name="level"></param>
         /// <param name="time"></param>
@@ -42,7 +42,8 @@ namespace CELib
         /// <param name="where"></param>
         /// <param name="msg"></param>
         /// <param name="args"></param>
-        public static void console_log(Log.Level level, DateTime time, int workerId, string where, string msg, params Object[] args)
+        public static void console_log(Log.Level level, DateTime time, int workerId, string where, string msg,
+            params object[] args)
         {
             Console.ForegroundColor = LevelToColor(level);
             Console.WriteLine(LogFormat, level, where, time, workerId, string.Format(msg, args));
@@ -51,14 +52,14 @@ namespace CELib
 
 
         /// <summary>
-        /// File log handler
+        ///     File log handler
         /// </summary>
         public class FileLog : LogHandler
         {
             private readonly StreamWriter _write;
 
             /// <summary>
-            /// Create file log handler
+            ///     Create file log handler
             /// </summary>
             /// <param name="filename">Filename</param>
             public FileLog(string filename)
@@ -67,7 +68,7 @@ namespace CELib
             }
 
             /// <summary>
-            /// Log handler
+            ///     Log handler
             /// </summary>
             /// <param name="level"></param>
             /// <param name="time"></param>
