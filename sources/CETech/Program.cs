@@ -1,19 +1,34 @@
 ﻿using System;
-using System.Windows.Forms;
 
 namespace CETech
 {
     internal static class Program
     {
         /// <summary>
-        /// The main entry point for the application.
+        ///     The main entry point for the application.
         /// </summary>
         [STAThread]
         private static void Main()
         {
-            Application.EnableVisualStyles();
-            Application.SetCompatibleTextRenderingDefault(false);
-            Application.Run(new MainForm());
+            if (BigInit())
+            {
+                Application.Run();
+            }
+
+
+            BigShutdown();
+        }
+
+        private static bool BigInit()
+        {
+            Application.Init();
+
+            return true;
+        }
+
+        private static void BigShutdown()
+        {
+            Application.Shutdown();
         }
     }
 }
