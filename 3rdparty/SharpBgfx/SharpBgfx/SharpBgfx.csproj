@@ -84,16 +84,6 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\..\..\sources\CELib\CELib.csproj">
-      <Project>{34DEF76A-96F9-4CF1-8089-EE64EDE6F3AA}</Project>
-      <Name>CELib</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\SDL2-CS\SDL2-CS.csproj">
-      <Project>{85480198-8711-4355-830E-72FD794AD3F6}</Project>
-      <Name>SDL2-CS</Name>
-    </ProjectReference>
-  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>
