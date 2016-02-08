@@ -67,6 +67,11 @@
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Renderer\BgfxRenderer.cs" />
+    <Compile Include="Window\IWindow.cs" />
+    <Compile Include="Window\Private\SDLWindow.cs" />
+    <Compile Include="Window\Window.cs" />
+    <Compile Include="Window\WindowFlags.cs" />
+    <Compile Include="Window\WindowPos.cs" />
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
