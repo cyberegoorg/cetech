@@ -105,13 +105,13 @@ namespace cetech {
         static void cmd_renderer_resize(const mpack_node_t& root,
                                         mpack_writer_t& writer) {
             CE_UNUSED(writer);
-            
+
             mpack_node_t args = mpack_node_map_cstr(root, "args");
 
             const uint32_t width = mpack_node_i32(mpack_node_map_cstr(args, "width"));
             const uint32_t height = mpack_node_i32(mpack_node_map_cstr(args, "height"));
             renderer::resize(width, height);
-            
+
             mpack_write_nil(&writer);
         }
 #endif
@@ -173,13 +173,13 @@ namespace cetech {
         void end_frame() {
             RendererData* data = _globals.data;
             data->frame_id = bgfx::frame();
-            
+
             const bgfx::Stats* stats = bgfx::getStats();
-            
+
             develop_manager::push_record_float("renderer.cpu_time_begin", stats->cpuTimeBegin);
             develop_manager::push_record_float("renderer.cpu_time_end", stats->cpuTimeEnd);
             develop_manager::push_record_float("renderer.cpu_timer_freq", stats->cpuTimerFreq);
-            
+
             develop_manager::push_record_float("renderer.gpu_time_begin", stats->gpuTimeBegin);
             develop_manager::push_record_float("renderer.gpu_time_end", stats->gpuTimeEnd);
             develop_manager::push_record_float("renderer.gpu_timer_freq", stats->gpuTimerFreq);
