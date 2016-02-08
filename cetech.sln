@@ -16,6 +16,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SharpBgfx", "3rdparty\Sharp
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SDL2-CS", "3rdparty\SDL2-CS\SDL2-CS.csproj", "{85480198-8711-4355-830E-72FD794AD3F6}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "3rdparty", "3rdparty", "{CEFDBAF1-EE63-4F26-823F-B4854145EE64}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -65,5 +67,9 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{4DE918D2-89AB-433D-9F22-BE0407FF0E59} = {CEFDBAF1-EE63-4F26-823F-B4854145EE64}
+		{85480198-8711-4355-830E-72FD794AD3F6} = {CEFDBAF1-EE63-4F26-823F-B4854145EE64}
 	EndGlobalSection
 EndGlobal
