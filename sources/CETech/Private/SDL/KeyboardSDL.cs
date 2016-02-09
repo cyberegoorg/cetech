@@ -10,11 +10,11 @@ namespace CETech.Input
         private static readonly byte[] _keyboardStates = new byte[512];
         private static readonly byte[] _keyboardStatesLast = new byte[512];
 
-        public static void PlatformInit()
+        private static void PlatformInit()
         {
         }
 
-        public static void PlatformProcessKeyboard()
+        private static void PlatformProcessKeyboard()
         {
             int numKeys;
 
@@ -22,27 +22,27 @@ namespace CETech.Input
             Marshal.Copy(SDL.SDL_GetKeyboardState(out numKeys), _keyboardStates, 0, 512);
         }
 
-        public static int PlatformButtonIndex(string buttonName)
+        private static int PlatformButtonIndex(string buttonName)
         {
             return (int) SDL.SDL_GetScancodeFromName(buttonName);
         }
 
-        public static string PlatformButtonName(int buttonIndex)
+        private static string PlatformButtonName(int buttonIndex)
         {
             return SDL.SDL_GetScancodeName((SDL.SDL_Scancode) buttonIndex);
         }
 
-        public static bool PlatformButtonState(int buttonIndex)
+        private static bool PlatformButtonState(int buttonIndex)
         {
             return _keyboardStates[buttonIndex] != 0;
         }
 
-        public static bool PlatformButtonPressed(int buttonIndex)
+        private static bool PlatformButtonPressed(int buttonIndex)
         {
             return _keyboardStates[buttonIndex] == 1 && _keyboardStatesLast[buttonIndex] == 0;
         }
 
-        public static bool PlatformButtonReleased(int buttonIndex)
+        private static bool PlatformButtonReleased(int buttonIndex)
         {
             return _keyboardStates[buttonIndex] == 0 && _keyboardStatesLast[buttonIndex] == 1;
         }
