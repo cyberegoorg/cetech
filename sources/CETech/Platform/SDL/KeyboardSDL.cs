@@ -3,7 +3,7 @@ using SDL2;
 
 // ReSharper disable once CheckNamespace
 
-namespace CETech
+namespace CETech.Input
 {
     public static partial class Keyboard
     {

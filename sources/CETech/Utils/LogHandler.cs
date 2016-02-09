@@ -1,7 +1,7 @@
 ﻿using System;
 using System.IO;
 
-namespace CETech
+namespace CETech.Utils
 {
     /// <summary>
     ///     Log handlers
@@ -16,17 +16,17 @@ namespace CETech
                                                   "msg: |" + Environment.NewLine +
                                                   "  {4}\n" + Environment.NewLine;
 
-        internal static ConsoleColor LevelToColor(CETech.Log.Level level)
+        internal static ConsoleColor LevelToColor(Log.Level level)
         {
             switch (level)
             {
-                case CETech.Log.Level.Info:
+                case Log.Level.Info:
                     return ConsoleColor.Blue;
-                case CETech.Log.Level.Warning:
+                case Log.Level.Warning:
                     return ConsoleColor.Yellow;
-                case CETech.Log.Level.Error:
+                case Log.Level.Error:
                     return ConsoleColor.Red;
-                case CETech.Log.Level.Debug:
+                case Log.Level.Debug:
                     return ConsoleColor.Green;
                 default:
                     throw new ArgumentOutOfRangeException("level", level, null);
@@ -42,7 +42,7 @@ namespace CETech
         /// <param name="where"></param>
         /// <param name="msg"></param>
         /// <param name="args"></param>
-        public static void console_log(CETech.Log.Level level, DateTime time, int workerId, string where, string msg,
+        public static void console_log(Log.Level level, DateTime time, int workerId, string where, string msg,
             params object[] args)
         {
             Console.ForegroundColor = LevelToColor(level);
@@ -76,7 +76,7 @@ namespace CETech
             /// <param name="where"></param>
             /// <param name="msg"></param>
             /// <param name="args"></param>
-            public void Log(CETech.Log.Level level, DateTime time, int workerId, string where, string msg, params object[] args)
+            public void Log(Log.Level level, DateTime time, int workerId, string where, string msg, params object[] args)
             {
                 _write.Write(LogFormat, level, where, time, workerId, string.Format(msg, args));
                 _write.Flush();
