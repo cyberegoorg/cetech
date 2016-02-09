@@ -2,6 +2,7 @@ using System;
 using SDL2;
 
 // ReSharper disable once CheckNamespace
+
 namespace CETech
 {
     public static partial class Application
@@ -17,7 +18,7 @@ namespace CETech
                     case SDL.SDL_EventType.SDL_QUIT:
                         Quit();
                         break;
-                    
+
                     // TODO: No coment =D
                     case SDL.SDL_EventType.SDL_FIRSTEVENT:
                         break;

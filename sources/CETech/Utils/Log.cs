@@ -3,39 +3,12 @@
 namespace CETech.Utils
 {
     /// <summary>
-    /// Log system.
+    ///     Log system.
     /// </summary>
     public static class Log
     {
         /// <summary>
-        /// Log level enum.
-        /// </summary>
-        public enum Level
-        {
-            /// <summary>
-            /// Informatin message
-            /// </summary>
-            Info,
-
-            /// <summary>
-            /// Warning message
-            /// </summary>
-            Warning,
-            
-            /// <summary>
-            /// Error message
-            /// </summary>
-            Error,
-
-
-            /// <summary>
-            /// Debug message
-            /// </summary>
-            Debug
-        }
-
-        /// <summary>
-        /// Log handler
+        ///     Log handler
         /// </summary>
         /// <param name="level">Log level</param>
         /// <param name="time">Time</param>
@@ -43,15 +16,43 @@ namespace CETech.Utils
         /// <param name="where">Where</param>
         /// <param name="msg">Message</param>
         /// <param name="args">Message format arguments</param>
-        public delegate void LogHandler(Level level, DateTime time, int workerId, string where, string msg, params object[] args);
-        
+        public delegate void LogHandler(
+            Level level, DateTime time, int workerId, string where, string msg, params object[] args);
+
         /// <summary>
-        /// Main log event
+        ///     Log level enum.
+        /// </summary>
+        public enum Level
+        {
+            /// <summary>
+            ///     Informatin message
+            /// </summary>
+            Info,
+
+            /// <summary>
+            ///     Warning message
+            /// </summary>
+            Warning,
+
+            /// <summary>
+            ///     Error message
+            /// </summary>
+            Error,
+
+
+            /// <summary>
+            ///     Debug message
+            /// </summary>
+            Debug
+        }
+
+        /// <summary>
+        ///     Main log event
         /// </summary>
         public static event LogHandler LogEvent;
 
         /// <summary>
-        /// Log info message
+        ///     Log info message
         /// </summary>
         /// <param name="where">Where</param>
         /// <param name="msg">Message</param>
@@ -63,7 +64,7 @@ namespace CETech.Utils
 
 
         /// <summary>
-        /// Warning info message
+        ///     Warning info message
         /// </summary>
         /// <param name="where">Where</param>
         /// <param name="msg">Message</param>
@@ -74,7 +75,7 @@ namespace CETech.Utils
         }
 
         /// <summary>
-        /// Error info message
+        ///     Error info message
         /// </summary>
         /// <param name="where">Where</param>
         /// <param name="msg">Message</param>
@@ -85,7 +86,7 @@ namespace CETech.Utils
         }
 
         /// <summary>
-        /// Debug info message
+        ///     Debug info message
         /// </summary>
         /// <param name="where">Where</param>
         /// <param name="msg">Message</param>
@@ -98,7 +99,7 @@ namespace CETech.Utils
         }
 
         /// <summary>
-        /// On log
+        ///     On log
         /// </summary>
         /// <param name="level">Log level</param>
         /// <param name="time">Time</param>
@@ -106,11 +107,11 @@ namespace CETech.Utils
         /// <param name="where">Where</param>
         /// <param name="msg">Message</param>
         /// <param name="args">Message format arguments</param>
-        private static void OnLog(Level level, DateTime time, int workerId, string @where, string msg, params object[] args)
+        private static void OnLog(Level level, DateTime time, int workerId, string @where, string msg,
+            params object[] args)
         {
             var handler = LogEvent;
             if (handler != null) handler(level, time, workerId, @where, msg, args);
         }
-
     }
 }
