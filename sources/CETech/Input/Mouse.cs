@@ -1,6 +1,6 @@
-﻿namespace CETech
+﻿namespace CETech.Input
 {
-    public static partial class Keyboard
+    public partial class Mouse
     {
         public static void Init()
         {
@@ -9,7 +9,7 @@
 
         public static void Process()
         {
-            PlatformProcessKeyboard();
+            PlatformProcess();
         }
 
         public static int ButtonIndex(string buttonName)

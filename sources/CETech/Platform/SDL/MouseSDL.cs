@@ -2,7 +2,7 @@
 
 // ReSharper disable once CheckNamespace
 
-namespace CETech
+namespace CETech.Input
 {
     public static partial class Mouse
     {

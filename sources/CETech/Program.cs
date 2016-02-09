@@ -1,4 +1,6 @@
 ﻿using System;
+using CETech.Input;
+using CETech.Utils;
 
 namespace CETech
 {
@@ -23,7 +25,10 @@ namespace CETech
             Log.LogEvent += LogHandler.console_log;
 
             Keyboard.Init();
+            Mouse.Init();
+
             Application.Init();
+
             return true;
         }
 

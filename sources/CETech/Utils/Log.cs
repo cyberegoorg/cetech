@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace CETech
+namespace CETech.Utils
 {
     /// <summary>
     /// Log system.
