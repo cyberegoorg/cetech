@@ -1,15 +1,14 @@
-﻿#if PLATFORM_SDL2
 using System;
 using SDL2;
 
-
-namespace CETech 
+// ReSharper disable once CheckNamespace
+namespace CETech
 {
-    public partial class Application
+    public static partial class Application
     {
-        static private SDL.SDL_Event _sdlEvent;
+        private static SDL.SDL_Event _sdlEvent;
 
-        static private void UpdateEvents()
+        private static void PlaformUpdateEvents()
         {
             while (SDL.SDL_PollEvent(out _sdlEvent) > 0)
             {
@@ -18,7 +17,8 @@ namespace CETech
                     case SDL.SDL_EventType.SDL_QUIT:
                         Quit();
                         break;
-
+                    
+                    // TODO: No coment =D
                     case SDL.SDL_EventType.SDL_FIRSTEVENT:
                         break;
                     case SDL.SDL_EventType.SDL_WINDOWEVENT:
@@ -102,4 +102,3 @@ namespace CETech
         }
     }
 }
-#endif
