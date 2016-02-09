@@ -1,6 +1,6 @@
 using System;
 
-namespace CELib.Window
+namespace CETech
 {
     [Flags]
     public enum WindowFlags

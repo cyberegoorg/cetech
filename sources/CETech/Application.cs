@@ -1,51 +1,42 @@
-using CELib.Window;
-using CETech.Renderer;
+using System;
+using SDL2;
 using SharpBgfx;
 
 namespace CETech
 {
     public static partial class Application
     {
-        private struct Data
-        {
-            public IWindow Window;
-            public long LastFrameTick;
-            public bool Run;
-        }
+        private static long _lastFrameTick;
+        private static bool _run;
 
-        private static Data _data;
-
-        public static IWindow MainWindow
-        {
-            get { return _data.Window; }
-        }
+        public static Window MainWindow { get; private set; }
 
         public static void Init()
         {
-            _data.Window = Window.CreateWindow(
+            MainWindow = new Window(
                 "Application",
                 WindowPos.Centered, WindowPos.Centered,
                 800, 600, 0);
 
-            BgfxRenderer.Init(_data.Window, RendererBackend.Default);
+            Renderer.Init(MainWindow, RendererBackend.Default);
         }
 
         public static void Shutdown()
         {
-            _data.Window = null;
+            MainWindow = null;
         }
 
         public static void Run()
         {
-            _data.Run = true;
+            _run = true;
 
 
-            while (_data.Run)
+            while (_run)
             {
-                UpdateEvents();
-                BgfxRenderer.BeginFrame();
-                BgfxRenderer.EndFrame();
-                _data.Window.Update();
+                PlaformUpdateEvents();
+                Renderer.BeginFrame();
+                Renderer.EndFrame();
+                MainWindow.Update();
             }
 
             Shutdown();
@@ -53,7 +44,8 @@ namespace CETech
 
         public static void Quit()
         {
-            _data.Run = false;
+            _run = false;
         }
+
     }
 }

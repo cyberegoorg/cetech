@@ -1,4 +1,4 @@
-﻿namespace CELib.Window
+﻿namespace CETech
 {
     public enum WindowPos
     {

@@ -15,14 +15,12 @@ namespace CETech
                 Application.Run();
             }
 
-
             BigShutdown();
         }
 
         private static bool BigInit()
         {
             Application.Init();
-
             return true;
         }
 
