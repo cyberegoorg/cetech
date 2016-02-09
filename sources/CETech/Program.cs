@@ -20,6 +20,9 @@ namespace CETech
 
         private static bool BigInit()
         {
+            Log.LogEvent += LogHandler.console_log;
+
+            Keyboard.Init();
             Application.Init();
             return true;
         }

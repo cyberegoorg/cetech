@@ -1,4 +1,4 @@
-﻿using System;
+﻿using System.Runtime.InteropServices;
 using SDL2;
 
 // ReSharper disable once CheckNamespace
@@ -7,15 +7,21 @@ namespace CETech
 {
     public static partial class Keyboard
     {
-        private static IntPtr _keyboardStates;
-        private static IntPtr _keyboardStatesLast;
+
+        private static byte[] _keyboardStates = new byte[512];
+        private static byte[] _keyboardStatesLast = new byte[512];
+
+        public static void PlatformInit()
+        {
+
+        }
 
         public static void PlatformProcessKeyboard()
         {
             int numKeys;
 
-            _keyboardStatesLast = _keyboardStates;
-            _keyboardStates = SDL.SDL_GetKeyboardState(out numKeys);
+            _keyboardStates.CopyTo(_keyboardStatesLast,0);
+            Marshal.Copy(SDL.SDL_GetKeyboardState(out numKeys), _keyboardStates, 0, 512);
         }
 
         public static int PlatformButtonIndex(string buttonName)
@@ -30,33 +36,17 @@ namespace CETech
 
         public static bool PlatformButtonState(int buttonIndex)
         {
-            unsafe
-            {
-                var ptr = (int*) _keyboardStates.ToPointer();
-                return ptr[buttonIndex] != 0;
-            }
+            return _keyboardStates[buttonIndex] != 0;
         }
 
         public static bool PlatformButtonPressed(int buttonIndex)
         {
-            unsafe
-            {
-                var ptr = (int*) _keyboardStates.ToPointer();
-                var ptrLast = (int*) _keyboardStatesLast.ToPointer();
-
-                return ptrLast[buttonIndex] == 0 && ptr[buttonIndex] != 0;
-            }
+            return _keyboardStates[buttonIndex] == 1 && _keyboardStatesLast[buttonIndex] == 0;
         }
 
         public static bool PlatformButtonReleased(int buttonIndex)
         {
-            unsafe
-            {
-                var ptr = (int*) _keyboardStates.ToPointer();
-                var ptrLast = (int*) _keyboardStatesLast.ToPointer();
-
-                return ptrLast[buttonIndex] != 0 && ptr[buttonIndex] == 0;
-            }
+            return _keyboardStates[buttonIndex] == 0 && _keyboardStatesLast[buttonIndex] == 1;
         }
     }
 }
