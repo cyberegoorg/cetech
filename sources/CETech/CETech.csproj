@@ -86,11 +86,13 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Mouse.cs" />
     <Compile Include="Platform\SDL\ApplicationSDL.cs" />
     <Compile Include="Application.cs" />
     <Compile Include="Keyboard.cs" />
     <Compile Include="Log.cs" />
     <Compile Include="LogHandler.cs" />
+    <Compile Include="Platform\SDL\MouseSDL.cs" />
     <Compile Include="Platform\SDL\KeyboardSDL.cs" />
     <Compile Include="Platform\SDL\WindowSDL.cs" />
     <Compile Include="Program.cs" />
