@@ -32,9 +32,11 @@ namespace CETech
             while (_run)
             {
                 PlaformUpdateEvents();
-                Keyboard.ProcessKeyboard();
+                
+                Keyboard.Process();
+                Mouse.Process();
 
-                if (Keyboard.ButtonReleased(Keyboard.ButtonIndex("Q")))
+                if (Mouse.ButtonReleased(Mouse.ButtonIndex("left")))
                 {
                     Quit();
                 }
