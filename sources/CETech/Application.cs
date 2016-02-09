@@ -1,5 +1,3 @@
-using System;
-using SDL2;
 using SharpBgfx;
 
 namespace CETech
@@ -34,6 +32,13 @@ namespace CETech
             while (_run)
             {
                 PlaformUpdateEvents();
+                Keyboard.ProcessKeyboard();
+
+                if (Keyboard.ButtonReleased(Keyboard.ButtonIndex("Q")))
+                {
+                    Quit();
+                }
+
                 Renderer.BeginFrame();
                 Renderer.EndFrame();
                 MainWindow.Update();
@@ -46,6 +51,5 @@ namespace CETech
         {
             _run = false;
         }
-
     }
 }

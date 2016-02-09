@@ -2,6 +2,11 @@
 {
     public static partial class Keyboard
     {
+        public static void Init()
+        {
+            PlatformInit();
+        }
+
         public static void ProcessKeyboard()
         {
             PlatformProcessKeyboard();
