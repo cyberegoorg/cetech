@@ -37,7 +37,7 @@ namespace CETech
                 Keyboard.Process();
                 Mouse.Process();
 
-                if (Mouse.ButtonReleased(Mouse.ButtonIndex("left")))
+                if (Keyboard.ButtonReleased(Keyboard.ButtonIndex("q")))
                 {
                     Quit();
                 }
