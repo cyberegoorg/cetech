@@ -1,13 +1,12 @@
 using System;
-using SDL2;
 
 namespace CETech
 {
     public partial class Window
     {
+        public int _height;
         private string _title;
         public int _width;
-        public int _height;
 
 
         public Window(string title, WindowPos x, WindowPos y, int width, int height, int flags)
@@ -30,10 +29,7 @@ namespace CETech
 
         public IntPtr NativeWindowPtr
         {
-            get
-            {
-                return PlatformNativePtr();
-            }
+            get { return PlatformNativePtr(); }
         }
 
         public int Height

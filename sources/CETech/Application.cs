@@ -33,7 +33,7 @@ namespace CETech
             while (_run)
             {
                 PlaformUpdateEvents();
-                
+
                 Keyboard.Process();
                 Mouse.Process();
 

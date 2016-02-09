@@ -2,6 +2,7 @@ using System;
 using SDL2;
 
 // ReSharper disable once CheckNamespace
+
 namespace CETech
 {
     public partial class Window

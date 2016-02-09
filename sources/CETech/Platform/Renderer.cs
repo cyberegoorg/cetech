@@ -23,6 +23,5 @@ namespace CETech
         {
             PlatformResize(width, height);
         }
-
     }
 }

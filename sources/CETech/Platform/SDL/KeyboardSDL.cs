@@ -7,9 +7,8 @@ namespace CETech.Input
 {
     public static partial class Keyboard
     {
-
-        private static byte[] _keyboardStates = new byte[512];
-        private static byte[] _keyboardStatesLast = new byte[512];
+        private static readonly byte[] _keyboardStates = new byte[512];
+        private static readonly byte[] _keyboardStatesLast = new byte[512];
 
         public static void PlatformInit()
         {
@@ -19,7 +18,7 @@ namespace CETech.Input
         {
             int numKeys;
 
-            _keyboardStates.CopyTo(_keyboardStatesLast,0);
+            _keyboardStates.CopyTo(_keyboardStatesLast, 0);
             Marshal.Copy(SDL.SDL_GetKeyboardState(out numKeys), _keyboardStates, 0, 512);
         }
 
