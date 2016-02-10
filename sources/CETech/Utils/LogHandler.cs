@@ -14,7 +14,7 @@ namespace CETech.Utils
                                                   "time: {2}" + Environment.NewLine +
                                                   "worker: {3}" + Environment.NewLine +
                                                   "msg: |" + Environment.NewLine +
-                                                  "  {4}\n" + Environment.NewLine;
+                                                  "  {4}" + Environment.NewLine;
 
         internal static ConsoleColor LevelToColor(Log.Level level)
         {
@@ -42,11 +42,10 @@ namespace CETech.Utils
         /// <param name="where"></param>
         /// <param name="msg"></param>
         /// <param name="args"></param>
-        public static void console_log(Log.Level level, DateTime time, int workerId, string where, string msg,
-            params object[] args)
+        public static void ConsoleLog(Log.Level level, DateTime time, int workerId, string where, string msg)
         {
             Console.ForegroundColor = LevelToColor(level);
-            Console.WriteLine(LogFormat, level, where, time, workerId, string.Format(msg, args));
+            Console.WriteLine(LogFormat, level, where, time, workerId, msg);
             Console.ResetColor();
         }
 
@@ -76,9 +75,9 @@ namespace CETech.Utils
             /// <param name="where"></param>
             /// <param name="msg"></param>
             /// <param name="args"></param>
-            public void Log(Log.Level level, DateTime time, int workerId, string where, string msg, params object[] args)
+            public void Log(Log.Level level, DateTime time, int workerId, string where, string msg)
             {
-                _write.Write(LogFormat, level, where, time, workerId, string.Format(msg, args));
+                _write.Write(LogFormat, level, where, time, workerId, msg);
                 _write.Flush();
             }
         }

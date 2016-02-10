@@ -15,9 +15,8 @@ namespace CETech.Utils
         /// <param name="workerId">Worker id</param>
         /// <param name="where">Where</param>
         /// <param name="msg">Message</param>
-        /// <param name="args">Message format arguments</param>
         public delegate void LogHandler(
-            Level level, DateTime time, int workerId, string where, string msg, params object[] args);
+            Level level, DateTime time, int workerId, string where, string msg);
 
         /// <summary>
         ///     Log level enum.
@@ -111,7 +110,7 @@ namespace CETech.Utils
             params object[] args)
         {
             var handler = LogEvent;
-            if (handler != null) handler(level, time, workerId, @where, msg, args);
+            if (handler != null) handler(level, time, workerId, @where, string.Format(msg, args));
         }
     }
 }
