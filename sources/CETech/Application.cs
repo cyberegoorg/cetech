@@ -1,5 +1,4 @@
 using CETech.Input;
-using SharpBgfx;
 
 namespace CETech
 {
@@ -17,7 +16,7 @@ namespace CETech
                 WindowPos.Centered, WindowPos.Centered,
                 800, 600, 0);
 
-            Renderer.Init(MainWindow, RendererBackend.Default);
+            Renderer.Init(MainWindow, Renderer.BackendType.Default);
         }
 
         public static void Shutdown()

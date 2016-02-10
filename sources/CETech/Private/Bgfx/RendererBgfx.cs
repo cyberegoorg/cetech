@@ -1,4 +1,5 @@
-﻿using SharpBgfx;
+﻿using System;
+using SharpBgfx;
 
 namespace CETech
 {
@@ -6,10 +7,46 @@ namespace CETech
     {
         private static Data _data;
 
-        private static void PlatformInit(Window window, RendererBackend type)
+        private static RendererBackend ToRendererBackend(BackendType type)
+        {
+            switch (type)
+            {
+                case BackendType.Null:
+                    return RendererBackend.Null;
+
+                case BackendType.Direct3D9:
+                    return RendererBackend.Direct3D9;
+
+                case BackendType.Direct3D11:
+                    return RendererBackend.Direct3D11;
+
+                case BackendType.Direct3D12:
+                    return RendererBackend.Direct3D12;
+
+                case BackendType.Metal:
+                    return RendererBackend.Metal;
+
+                case BackendType.OpenGLES:
+                    return RendererBackend.OpenGLES;
+
+                case BackendType.OpenGL:
+                    return RendererBackend.OpenGL;
+
+                case BackendType.Vulkan:
+                    return RendererBackend.Vulkan;
+
+                case BackendType.Default:
+                    return RendererBackend.Default;
+
+                default:
+                    throw new ArgumentOutOfRangeException("type", type, null);
+            }
+        }
+
+        private static void PlatformInit(Window window, BackendType type)
         {
             Bgfx.SetWindowHandle(window.NativeWindowPtr);
-            Bgfx.Init();
+            Bgfx.Init(ToRendererBackend(type));
             Bgfx.SetDebugFeatures(DebugFeatures.DisplayStatistics);
 
             Resize(window.Width, window.Height);
@@ -25,10 +62,7 @@ namespace CETech
             }
 
             Bgfx.SetDebugFeatures(DebugFeatures.DisplayStatistics | DebugFeatures.DisplayText);
-            Bgfx.SetViewClear(
-                0
-                , ClearTargets.Color | ClearTargets.Depth
-                , 0x66CCFFff);
+            Bgfx.SetViewClear(0, ClearTargets.Color | ClearTargets.Depth, 0x66CCFFff);
 
             Bgfx.Touch(0);
 
