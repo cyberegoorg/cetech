@@ -8,13 +8,13 @@ namespace CETech.Utils
     /// </summary>
     public class LogHandler
     {
-        public static readonly string LogFormat = "---" + Environment.NewLine +
-                                                  "level: {0}" + Environment.NewLine +
-                                                  "where: {1}" + Environment.NewLine +
-                                                  "time: {2}" + Environment.NewLine +
-                                                  "worker: {3}" + Environment.NewLine +
-                                                  "msg: |" + Environment.NewLine +
-                                                  "  {4}" + Environment.NewLine;
+        private static readonly string LogFormat = "---" + Environment.NewLine +
+                                                   "level: {0}" + Environment.NewLine +
+                                                   "where: {1}" + Environment.NewLine +
+                                                   "time: {2}" + Environment.NewLine +
+                                                   "worker: {3}" + Environment.NewLine +
+                                                   "msg: |" + Environment.NewLine +
+                                                   "  {4}" + Environment.NewLine;
 
         internal static ConsoleColor LevelToColor(Log.Level level)
         {
@@ -36,12 +36,11 @@ namespace CETech.Utils
         /// <summary>
         ///     Console log handler
         /// </summary>
-        /// <param name="level"></param>
-        /// <param name="time"></param>
-        /// <param name="workerId"></param>
-        /// <param name="where"></param>
-        /// <param name="msg"></param>
-        /// <param name="args"></param>
+        /// <param name="level">Level</param>
+        /// <param name="time">Time</param>
+        /// <param name="workerId">Worker id</param>
+        /// <param name="where">Where</param>
+        /// <param name="msg">Msg</param>
         public static void ConsoleLog(Log.Level level, DateTime time, int workerId, string where, string msg)
         {
             Console.ForegroundColor = LevelToColor(level);
@@ -69,12 +68,11 @@ namespace CETech.Utils
             /// <summary>
             ///     Log handler
             /// </summary>
-            /// <param name="level"></param>
-            /// <param name="time"></param>
-            /// <param name="workerId"></param>
-            /// <param name="where"></param>
-            /// <param name="msg"></param>
-            /// <param name="args"></param>
+            /// <param name="level">Level</param>
+            /// <param name="time">Time</param>
+            /// <param name="workerId">Worker id</param>
+            /// <param name="where">Where</param>
+            /// <param name="msg">Msg</param>
             public void Log(Log.Level level, DateTime time, int workerId, string where, string msg)
             {
                 _write.Write(LogFormat, level, where, time, workerId, msg);

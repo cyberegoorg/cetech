@@ -77,6 +77,9 @@ namespace CETech
             Height = height;
         }
 
+        /// <summary>
+        ///     Window destructor
+        /// </summary>
         ~Window()
         {
             PlatformDtor();
