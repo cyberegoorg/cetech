@@ -31,9 +31,9 @@ namespace CETech.Input
                     return (int) SDL.SDL_BUTTON_MMASK;
                 case "right":
                     return (int) SDL.SDL_BUTTON_RMASK;
+                default:
+                    return 0;
             }
-
-            return 0;
         }
 
         private static string PlatformButtonName(int buttonIndex)

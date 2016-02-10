@@ -22,7 +22,7 @@ namespace CETech
 
         private static bool BigInit()
         {
-            Log.LogEvent += LogHandler.console_log;
+            Log.LogEvent += LogHandler.ConsoleLog;
 
             Keyboard.Init();
             Mouse.Init();
