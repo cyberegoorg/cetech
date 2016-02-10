@@ -2,13 +2,22 @@ using CETech.Input;
 
 namespace CETech
 {
+    /// <summary>
+    ///     Application
+    /// </summary>
     public static partial class Application
     {
-        private static long _lastFrameTick;
+        //private static long _lastFrameTick;
         private static bool _run;
 
+        /// <summary>
+        ///     Get application main window
+        /// </summary>
         public static Window MainWindow { get; private set; }
 
+        /// <summary>
+        ///     Init application
+        /// </summary>
         public static void Init()
         {
             MainWindow = new Window(
@@ -19,11 +28,17 @@ namespace CETech
             Renderer.Init(MainWindow, Renderer.BackendType.Default);
         }
 
+        /// <summary>
+        ///     Shutdown application
+        /// </summary>
         public static void Shutdown()
         {
             MainWindow = null;
         }
 
+        /// <summary>
+        ///     Run application
+        /// </summary>
         public static void Run()
         {
             _run = true;
@@ -49,6 +64,9 @@ namespace CETech
             Shutdown();
         }
 
+        /// <summary>
+        ///     Quit application
+        /// </summary>
         public static void Quit()
         {
             _run = false;

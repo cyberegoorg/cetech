@@ -1,18 +1,19 @@
-﻿ // ReSharper disable once CheckNamespace
+﻿// ReSharper disable once CheckNamespace
+
 namespace CETech
 {
     /// <summary>
-    /// Initial window position
+    ///     Initial window position
     /// </summary>
     public enum WindowPos
     {
         /// <summary>
-        /// Centered position
+        ///     Centered position
         /// </summary>
         Centered = 1,
-        
+
         /// <summary>
-        /// Undefined position
+        ///     Undefined position
         /// </summary>
         Undefined = 2
     }
