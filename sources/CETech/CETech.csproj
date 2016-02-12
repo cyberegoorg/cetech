@@ -88,6 +88,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Config.cs" />
     <Compile Include="Input\Mouse.cs" />
     <Compile Include="Private\SDL\ApplicationSDL.cs" />
     <Compile Include="Application.cs" />
@@ -124,7 +125,9 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="App.config" />
+    <None Include="App.config">
+      <SubType>Designer</SubType>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\3rdparty\SDL2-CS\SDL2-CS.csproj">
