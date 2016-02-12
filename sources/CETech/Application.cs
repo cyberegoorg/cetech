@@ -20,12 +20,9 @@ namespace CETech
         /// </summary>
         public static void Init()
         {
-            MainWindow = new Window(
-                "Application",
-                WindowPos.Centered, WindowPos.Centered,
-                800, 600, 0);
-
-            Renderer.Init(MainWindow, Renderer.BackendType.Default);
+            Config.CreateValue("window.title", "main window title", "CETech application");
+            Config.CreateValue("window.width", "main window width", 800);
+            Config.CreateValue("window.height", "main window height", 600);
         }
 
         /// <summary>
@@ -33,7 +30,6 @@ namespace CETech
         /// </summary>
         public static void Shutdown()
         {
-            MainWindow = null;
         }
 
         /// <summary>
@@ -42,7 +38,13 @@ namespace CETech
         public static void Run()
         {
             _run = true;
+            
+            MainWindow = new Window(
+                Config.GetValueString("window.title"),
+                WindowPos.Centered, WindowPos.Centered,
+                Config.GetValueInt("window.width"), Config.GetValueInt("window.height"), 0);
 
+            Renderer.Init(MainWindow, Renderer.BackendType.Default);
 
             while (_run)
             {
@@ -60,7 +62,9 @@ namespace CETech
                 Renderer.EndFrame();
                 MainWindow.Update();
             }
-
+            
+            MainWindow = null;
+            
             Shutdown();
         }
 
