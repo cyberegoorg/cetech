@@ -24,6 +24,8 @@ namespace CETech
         {
             Log.LogEvent += LogHandler.ConsoleLog;
 
+            TaskManager.Init();
+
             Keyboard.Init();
             Mouse.Init();
 
@@ -35,6 +37,8 @@ namespace CETech
         private static void BigShutdown()
         {
             Application.Shutdown();
+
+            TaskManager.Shutdown();
         }
     }
 }
