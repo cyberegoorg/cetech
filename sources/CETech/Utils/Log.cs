@@ -58,7 +58,7 @@ namespace CETech.Utils
         /// <param name="args">Message format arguments</param>
         public static void Info(string where, string msg, params object[] args)
         {
-            OnLog(Level.Info, DateTime.Now, 0, where, msg, args);
+            OnLog(Level.Info, DateTime.Now, TaskManager.WorkerId, where, msg, args);
         }
 
 
@@ -70,7 +70,7 @@ namespace CETech.Utils
         /// <param name="args">Message format arguments</param>
         public static void Warning(string where, string msg, params object[] args)
         {
-            OnLog(Level.Warning, DateTime.Now, 0, where, msg, args);
+            OnLog(Level.Warning, DateTime.Now, TaskManager.WorkerId, where, msg, args);
         }
 
         /// <summary>
@@ -81,7 +81,7 @@ namespace CETech.Utils
         /// <param name="args">Message format arguments</param>
         public static void Error(string where, string msg, params object[] args)
         {
-            OnLog(Level.Error, DateTime.Now, 0, where, msg, args);
+            OnLog(Level.Error, DateTime.Now, TaskManager.WorkerId, where, msg, args);
         }
 
         /// <summary>
@@ -93,7 +93,7 @@ namespace CETech.Utils
         public static void Debug(string where, string msg, params object[] args)
         {
 #if DEBUG
-            OnLog(Level.Debug, DateTime.Now, 0, where, msg, args);
+            OnLog(Level.Debug, DateTime.Now, TaskManager.WorkerId, where, msg, args);
 #endif
         }
 

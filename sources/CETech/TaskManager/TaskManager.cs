@@ -4,7 +4,6 @@ using CETech.Utils;
 
 namespace CETech
 {
-    using TaskId = Int32;
     using TaskQueue = QueueMpmc<int>;
 
     public enum TaskPriority
@@ -46,6 +45,18 @@ namespace CETech
 
         private static bool _Run;
 
+        private static SpinLock _doneLock = new SpinLock();
+
+        public static int WorkerId
+        {
+            get { return _worker_id; }
+        }
+
+        public static int OpenTaskCount
+        {
+            get { return _openTaskCount; }
+        }
+
         public static void Init()
         {
             var core_count = Environment.ProcessorCount;
@@ -53,9 +64,9 @@ namespace CETech
             var main_threads_count = 1 + 1;
             var worker_count = core_count - main_threads_count;
 
-            Log.Info("task", "Core count: {0}", core_count);
-            Log.Info("task", "Main thread count: {0}", main_threads_count);
-            Log.Info("task", "Worker count: {0}", worker_count);
+            Log.Info("task_manager", "Core count: {0}", core_count);
+            Log.Info("task_manager", "Main thread count: {0}", main_threads_count);
+            Log.Info("task_manager", "Worker count: {0}", worker_count);
 
             for (var i = 0; i < _gloalQueue.Length; i++)
             {
@@ -74,10 +85,11 @@ namespace CETech
 
                 for (var i = 0; i < worker_count; ++i)
                 {
-                    Log.Debug("task", "Creating worker {0}", i + 1);
+                    Log.Debug("task_manager", "Creating worker {0}", i + 1);
 
                     _workers[i] = new Thread(_task_worker);
                     _workers[i].Start(i + 1);
+                    _workers[i].Name = string.Format("Worker{0}", i + 1);
                 }
             }
 
@@ -110,7 +122,7 @@ namespace CETech
 
             if (parent != 0)
             {
-                Interlocked.Increment(ref _taskPool[task].JobCount);
+                Interlocked.Increment(ref _taskPool[parent].JobCount);
             }
 
             _openTasks[_openTaskCount] = task;
@@ -139,7 +151,6 @@ namespace CETech
 
             if (t == 0)
             {
-                Thread.Sleep(0);
                 return;
             }
 
@@ -163,7 +174,7 @@ namespace CETech
             {
             }
 
-            _worker_id = (int)o;
+            _worker_id = (int) o;
 
             Log.Info("task_worker", "Worker {0} init", _worker_id);
 
@@ -257,17 +268,27 @@ namespace CETech
                 Interlocked.Decrement(ref _taskPool[_taskPool[task].Parent].JobCount);
             }
 
-            for (var i = 0; i < _openTaskCount; ++i)
+
+            var gotLock = false;
+            try
             {
-                if (_openTasks[i] == task)
+                _doneLock.Enter(ref gotLock);
+
+                for (var i = 0; i < _openTaskCount; ++i)
                 {
-                    var idx = Interlocked.Decrement(ref _openTaskCount);
-                    _openTasks[i] = _openTasks[idx];
-
-
-                    _taskPool[task].Used = false;
-                    break;
+                    if (_openTasks[i] == task)
+                    {
+                        var idx = Interlocked.Decrement(ref _openTaskCount);
+                        _openTasks[i] = _openTasks[idx];
+                        _taskPool[task].Used = false;
+                        break;
+                    }
                 }
+            }
+            finally
+            {
+                // Only give up the lock if you actually acquired it
+                if (gotLock) _doneLock.Exit();
             }
         }
 
