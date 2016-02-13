@@ -1,4 +1,5 @@
 using CETech.Input;
+using CETech.Utils;
 
 namespace CETech
 {
@@ -20,6 +21,8 @@ namespace CETech
         /// </summary>
         public static void Init()
         {
+            Config.CreateValue("boot_pacakge", "Boot package", "boot");
+
             Config.CreateValue("window.title", "main window title", "CETech application");
             Config.CreateValue("window.width", "main window width", 800);
             Config.CreateValue("window.height", "main window height", 600);
@@ -58,9 +61,14 @@ namespace CETech
                     Quit();
                 }
 
+                int[] tasks = new[] { TaskManager.AddBegin("task1", delegate(object data) {  }, null) };
+                TaskManager.AddEnd(tasks);
+
                 Renderer.BeginFrame();
                 Renderer.EndFrame();
                 MainWindow.Update();
+
+                TaskManager.Wait(tasks[0]);
             }
             
             MainWindow = null;
