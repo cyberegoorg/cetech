@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using CETech.Input;
 using CETech.Utils;
 
@@ -51,24 +52,25 @@ namespace CETech
 
             while (_run)
             {
+                Debug.Assert(TaskManager.OpenTaskCount == 0);
+
                 PlaformUpdateEvents();
 
-                Keyboard.Process();
-                Mouse.Process();
+                var frameTask = TaskManager.AddBegin("frame", delegate(object data) { }, null);
+                var keyboardTask = TaskManager.AddBegin("keyboard", delegate(object data) { Keyboard.Process(); }, null, parent:frameTask);
+                var mouseTask = TaskManager.AddBegin("mouseTask", delegate(object data) { Mouse.Process(); }, null, parent: frameTask);
+
+                TaskManager.AddEnd( new int[] { frameTask, keyboardTask, mouseTask });
+                TaskManager.Wait(frameTask);
 
                 if (Keyboard.ButtonReleased(Keyboard.ButtonIndex("q")))
                 {
                     Quit();
                 }
 
-                int[] tasks = new[] { TaskManager.AddBegin("task1", delegate(object data) {  }, null) };
-                TaskManager.AddEnd(tasks);
-
                 Renderer.BeginFrame();
                 Renderer.EndFrame();
                 MainWindow.Update();
-
-                TaskManager.Wait(tasks[0]);
             }
             
             MainWindow = null;
