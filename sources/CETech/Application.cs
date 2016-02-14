@@ -1,6 +1,4 @@
-using System.Diagnostics;
 using CETech.Input;
-using CETech.Utils;
 
 namespace CETech
 {
@@ -42,7 +40,7 @@ namespace CETech
         public static void Run()
         {
             _run = true;
-            
+
             MainWindow = new Window(
                 Config.GetValueString("window.title"),
                 WindowPos.Centered, WindowPos.Centered,
@@ -52,15 +50,16 @@ namespace CETech
 
             while (_run)
             {
-                Debug.Assert(TaskManager.OpenTaskCount == 0);
+                //Debug.Assert(TaskManager.OpenTaskCount < 2);
 
                 PlaformUpdateEvents();
 
-                var frameTask = TaskManager.AddBegin("frame", delegate(object data) { }, null);
-                var keyboardTask = TaskManager.AddBegin("keyboard", delegate(object data) { Keyboard.Process(); }, null, parent:frameTask);
-                var mouseTask = TaskManager.AddBegin("mouseTask", delegate(object data) { Mouse.Process(); }, null, parent: frameTask);
+                var frameTask = TaskManager.AddNull("frame");
+                var keyboardTask = TaskManager.AddBegin("keyboard", delegate { Keyboard.Process(); }, null,
+                    parent: frameTask);
+                var mouseTask = TaskManager.AddBegin("mouseTask", delegate { Mouse.Process(); }, null, parent: frameTask);
 
-                TaskManager.AddEnd( new int[] { frameTask, keyboardTask, mouseTask });
+                TaskManager.AddEnd(new[] {frameTask, keyboardTask, mouseTask});
                 TaskManager.Wait(frameTask);
 
                 if (Keyboard.ButtonReleased(Keyboard.ButtonIndex("q")))
@@ -72,9 +71,9 @@ namespace CETech
                 Renderer.EndFrame();
                 MainWindow.Update();
             }
-            
+
             MainWindow = null;
-            
+
             Shutdown();
         }
 

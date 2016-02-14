@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using CETech.Input;
 using CETech.Utils;
 
@@ -14,6 +15,11 @@ namespace CETech
         {
             if (BigInit())
             {
+                ResourceCompiler.CompileAll();
+
+                ResourceManager.LoadNow(PackageResource.Type, new[] {new StringId64("boot")});
+                PackageManager.Load(new StringId64("boot"));
+
                 Application.Run();
             }
 
@@ -24,7 +30,27 @@ namespace CETech
         {
             Log.LogEvent += LogHandler.ConsoleLog;
 
+            FileSystem.MapRootDir("core", "core");
+            FileSystem.MapRootDir("src", Path.Combine("data", "src"));
+            FileSystem.MapRootDir("build", Path.Combine("data", "build"));
+
             TaskManager.Init();
+
+            ResourceCompiler.registerCompiler(PackageResource.Type, PackageResource.compile);
+            ResourceCompiler.registerCompiler(new StringId64("lua"), delegate { });
+            ResourceCompiler.registerCompiler(new StringId64("texture"), delegate { });
+            ResourceCompiler.registerCompiler(new StringId64("config"), delegate { });
+
+            ResourceManager.RegisterType(PackageResource.Type,
+                PackageResource.ResourceLoader, PackageResource.ResourceUnloader,
+                PackageResource.ResourceOnline, PackageResource.ResourceOffline);
+
+            ResourceManager.RegisterType(new StringId64("lua"), delegate { return null; }, delegate { }, delegate { },
+                delegate { });
+            ResourceManager.RegisterType(new StringId64("texture"), delegate { return null; }, delegate { },
+                delegate { }, delegate { });
+            ResourceManager.RegisterType(new StringId64("config"), delegate { return null; }, delegate { }, delegate { },
+                delegate { });
 
             Keyboard.Init();
             Mouse.Init();
