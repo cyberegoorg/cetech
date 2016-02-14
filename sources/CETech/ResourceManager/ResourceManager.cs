@@ -114,7 +114,6 @@ namespace CETech
                 {
                     return false;
                 }
-                ;
             }
 
             return true;

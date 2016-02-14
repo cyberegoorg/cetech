@@ -8,7 +8,7 @@ namespace CETech
     {
         public static readonly StringId Type = new StringId("package");
 
-        public static void compile(ResourceCompiler.CompilatorAPI capi)
+        public static void Compile(ResourceCompiler.CompilatorAPI capi)
         {
             TextReader input = new StreamReader(capi.ResourceFile);
             var yaml = new YamlStream();
@@ -16,9 +16,9 @@ namespace CETech
 
             var rootNode = yaml.Documents[0].RootNode as YamlMappingNode;
 
-            var pack = new PackagePack();
-            pack.type = new StringId[rootNode.Children.Count];
-            pack.names = new StringId[rootNode.Children.Count][];
+            var pack = new Resource();
+            pack.Type = new StringId[rootNode.Children.Count];
+            pack.Names = new StringId[rootNode.Children.Count][];
 
             var idx = 0;
             foreach (var type in rootNode.Children)
@@ -28,28 +28,28 @@ namespace CETech
 
                 var typeid = new StringId(typestr.Value);
 
-                pack.type[idx] = typeid;
-                pack.names[idx] = new StringId[sequence.Children.Count];
+                pack.Type[idx] = typeid;
+                pack.Names[idx] = new StringId[sequence.Children.Count];
 
                 var name_idx = 0;
                 foreach (var name in sequence.Children)
                 {
                     var nameid = new StringId(((YamlScalarNode) name).Value);
 
-                    pack.names[idx][name_idx] = nameid;
+                    pack.Names[idx][name_idx] = nameid;
                     ++name_idx;
                 }
 
                 ++idx;
             }
 
-            var serializer = MessagePackSerializer.Get<PackagePack>();
+            var serializer = MessagePackSerializer.Get<Resource>();
             serializer.Pack(capi.BuildFile, pack);
         }
 
         public static object ResourceLoader(Stream input)
         {
-            var serializer = MessagePackSerializer.Get<PackagePack>();
+            var serializer = MessagePackSerializer.Get<Resource>();
             return serializer.Unpack(input);
         }
 
@@ -65,10 +65,10 @@ namespace CETech
         {
         }
 
-        public struct PackagePack
+        public struct Resource
         {
-            public StringId[] type;
-            public StringId[][] names;
+            public StringId[] Type;
+            public StringId[][] Names;
         }
     }
 }
