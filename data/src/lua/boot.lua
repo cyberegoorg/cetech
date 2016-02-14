@@ -1,15 +1,16 @@
-require "lua/game"
-require "core/cetech/editor"
- 
+--require "lua/game"
+--require "core/cetech/editor"
+
 function init()
     print('init............')
-    Game:init()
-end 
+    --Game:init()
+end
 
-function update(dt) 
-  Game:update(dt) 
-end 
+function update(dt)
+  print(dt)
+  --Game:update(dt)
+end
 
 function shutdown()
-  Game:shutdown() 
+  --Game:shutdown()
 end

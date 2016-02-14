@@ -15,15 +15,15 @@ namespace CETech
 
         public static void Load(StringId name)
         {
-            var pack = ResourceManager.Get<PackageResource.PackagePack>(PackageResource.Type, name);
+            var pack = ResourceManager.Get<PackageResource.Resource>(PackageResource.Type, name);
 
             int[] tasks = {0};
-            for (var i = 0; i < pack.type.Length; ++i)
+            for (var i = 0; i < pack.Type.Length; ++i)
             {
                 var task = new PackageTask
                 {
-                    type = new StringId(pack.type[i]),
-                    names = pack.names[i],
+                    type = new StringId(pack.Type[i]),
+                    names = pack.Names[i],
                     name = name
                 };
 
@@ -34,21 +34,21 @@ namespace CETech
 
         public static void Unload(StringId name)
         {
-            var pack = ResourceManager.Get<PackageResource.PackagePack>(PackageResource.Type, name);
+            var pack = ResourceManager.Get<PackageResource.Resource>(PackageResource.Type, name);
 
-            for (var i = 0; i < pack.type.Length; ++i)
+            for (var i = 0; i < pack.Type.Length; ++i)
             {
-                ResourceManager.Unload(new StringId(pack.type[i]), pack.names[i]);
+                ResourceManager.Unload(new StringId(pack.Type[i]), pack.Names[i]);
             }
         }
 
         public static bool IsLoaded(StringId name)
         {
-            var pack = ResourceManager.Get<PackageResource.PackagePack>(PackageResource.Type, name);
+            var pack = ResourceManager.Get<PackageResource.Resource>(PackageResource.Type, name);
 
-            for (var i = 0; i < pack.type.Length; ++i)
+            for (var i = 0; i < pack.Type.Length; ++i)
             {
-                if (!ResourceManager.CanGet(new StringId(pack.type[i]), pack.names[i]))
+                if (!ResourceManager.CanGet(new StringId(pack.Type[i]), pack.Names[i]))
                 {
                     return false;
                 }

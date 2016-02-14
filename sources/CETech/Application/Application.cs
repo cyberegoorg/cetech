@@ -1,4 +1,5 @@
 using CETech.Input;
+using MoonSharp.Interpreter;
 
 namespace CETech
 {
@@ -48,6 +49,12 @@ namespace CETech
 
             Renderer.Init(MainWindow, Renderer.BackendType.Default);
 
+            Script boot_script = ResourceManager.Get<Script>(LuaResource.Type, new StringId("lua/boot"));
+            var init_fce = boot_script.Globals.Get("init");
+            var update_fce = boot_script.Globals.Get("update");
+            var shutdown_fce = boot_script.Globals.Get("shutdown");
+
+            boot_script.Call(init_fce);
             while (_run)
             {
                 //Debug.Assert(TaskManager.OpenTaskCount < 2);
@@ -62,6 +69,8 @@ namespace CETech
                 TaskManager.AddEnd(new[] {frameTask, keyboardTask, mouseTask});
                 TaskManager.Wait(frameTask);
 
+                boot_script.Call(update_fce, 10);
+
                 if (Keyboard.ButtonReleased(Keyboard.ButtonIndex("q")))
                 {
                     Quit();
@@ -71,6 +80,8 @@ namespace CETech
                 Renderer.EndFrame();
                 MainWindow.Update();
             }
+            
+            boot_script.Call(shutdown_fce);
 
             MainWindow = null;
 

@@ -29,18 +29,20 @@ namespace CETech
 
         private static void InitResouce()
         {
-//#if CETECH_DEVELOP
-            ResourceCompiler.registerCompiler(PackageResource.Type, PackageResource.compile);
-            ResourceCompiler.registerCompiler(new StringId("lua"), delegate { });
+
+#if CETECH_DEVELOP
+            ResourceCompiler.registerCompiler(PackageResource.Type, PackageResource.Compile);
+            ResourceCompiler.registerCompiler(LuaResource.Type, LuaResource.Compile);
             ResourceCompiler.registerCompiler(new StringId("texture"), delegate { });
             ResourceCompiler.registerCompiler(new StringId("config"), delegate { });
-//#endif
+#endif
+
             ResourceManager.RegisterType(PackageResource.Type,
                 PackageResource.ResourceLoader, PackageResource.ResourceUnloader,
                 PackageResource.ResourceOnline, PackageResource.ResourceOffline);
 
-            ResourceManager.RegisterType(new StringId("lua"), delegate { return null; }, delegate { }, delegate { },
-                delegate { });
+            ResourceManager.RegisterType(LuaResource.Type, LuaResource.ResourceLoader, LuaResource.ResourceUnloader, LuaResource.ResourceOnline, LuaResource.ResourceOffline);
+            
             ResourceManager.RegisterType(new StringId("texture"), delegate { return null; }, delegate { },
                 delegate { }, delegate { });
             ResourceManager.RegisterType(new StringId("config"), delegate { return null; }, delegate { }, delegate { },
@@ -53,7 +55,7 @@ namespace CETech
 
             FileSystem.MapRootDir("core", "core");
             FileSystem.MapRootDir("src", Path.Combine("data", "src"));
-            FileSystem.MapRootDir("build", Path.Combine("data", "build"));
+            FileSystem.MapRootDir("build", Path.Combine("data", "build", "win"));
 
             TaskManager.Init();
 

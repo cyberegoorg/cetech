@@ -1,4 +1,6 @@
-﻿using System;
+﻿#if CETECH_DEVELOP
+
+using System;
 using System.Collections.Generic;
 using System.IO;
 using CETech.Utils;
@@ -18,7 +20,7 @@ namespace CETech
 
         public static void CompileAll()
         {
-            FileSystem.CreateDirectory("build", null);
+            FileSystem.CreateDirectory("build",null);
             Compille("src");
             Compille("core");
         }
@@ -54,16 +56,6 @@ namespace CETech
             }
 
             Log.Info("compile_task", "{0} compiled", task.filename);
-        }
-
-        private static string ReplaceFirst(string text, string search, string replace)
-        {
-            var pos = text.IndexOf(search, StringComparison.Ordinal);
-            if (pos < 0)
-            {
-                return text;
-            }
-            return text.Substring(0, pos) + replace + text.Substring(pos + search.Length);
         }
 
         private static void Compille(string root)
@@ -130,3 +122,4 @@ namespace CETech
         }
     }
 }
+#endif
