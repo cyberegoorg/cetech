@@ -1,4 +1,6 @@
+using System.IO;
 using CETech.Input;
+using CETech.Lua;
 using MoonSharp.Interpreter;
 
 namespace CETech
@@ -22,10 +24,11 @@ namespace CETech
         public static void Init()
         {
             Config.CreateValue("boot_pacakge", "Boot package", "boot");
-
             Config.CreateValue("window.title", "main window title", "CETech application");
             Config.CreateValue("window.width", "main window width", 800);
             Config.CreateValue("window.height", "main window height", 600);
+
+            LuaEnviroment.Init();
         }
 
         /// <summary>
@@ -33,6 +36,7 @@ namespace CETech
         /// </summary>
         public static void Shutdown()
         {
+            LuaEnviroment.Shutdown();
         }
 
         /// <summary>
@@ -49,12 +53,13 @@ namespace CETech
 
             Renderer.Init(MainWindow, Renderer.BackendType.Default);
 
-            Script boot_script = ResourceManager.Get<Script>(LuaResource.Type, new StringId("lua/boot"));
-            var init_fce = boot_script.Globals.Get("init");
-            var update_fce = boot_script.Globals.Get("update");
-            var shutdown_fce = boot_script.Globals.Get("shutdown");
+            LuaEnviroment.DoResouece(new StringId("lua/boot"));
 
-            boot_script.Call(init_fce);
+            var init_fce = LuaEnviroment.EnviromentScript.Globals.Get("init");
+            var update_fce = LuaEnviroment.EnviromentScript.Globals.Get("update");
+            var shutdown_fce = LuaEnviroment.EnviromentScript.Globals.Get("shutdown");
+
+             LuaEnviroment.EnviromentScript.Call(init_fce);
             while (_run)
             {
                 //Debug.Assert(TaskManager.OpenTaskCount < 2);
@@ -69,7 +74,7 @@ namespace CETech
                 TaskManager.AddEnd(new[] {frameTask, keyboardTask, mouseTask});
                 TaskManager.Wait(frameTask);
 
-                boot_script.Call(update_fce, 10);
+                LuaEnviroment.EnviromentScript.Call(update_fce, 10);
 
                 if (Keyboard.ButtonReleased(Keyboard.ButtonIndex("q")))
                 {
@@ -80,8 +85,8 @@ namespace CETech
                 Renderer.EndFrame();
                 MainWindow.Update();
             }
-            
-            boot_script.Call(shutdown_fce);
+
+            LuaEnviroment.EnviromentScript.Call(shutdown_fce);
 
             MainWindow = null;
 

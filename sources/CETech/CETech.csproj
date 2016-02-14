@@ -97,6 +97,9 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Lua\Api\KeyboardApi.cs" />
+    <Compile Include="Lua\Api\LogApi.cs" />
+    <Compile Include="Lua\LuaEnviroment.cs" />
     <Compile Include="Lua\LuaResource.cs" />
     <Compile Include="Utils\Config.cs" />
     <Compile Include="FileSystem\FileSystem.cs" />

@@ -1,7 +1,7 @@
 using System.IO;
 using MoonSharp.Interpreter;
 
-namespace CETech
+namespace CETech.Lua
 {
     public class LuaResource
     {
@@ -15,9 +15,11 @@ namespace CETech
 
         public static object ResourceLoader(Stream input)
         {
-            var script = new Script();
-            script.DoStream(input);
-            return script;
+            using (MemoryStream ms = new MemoryStream())
+            {
+                input.CopyTo(ms);
+                return ms.ToArray();
+            }
         }
 
         public static void ResourceOffline(object data)
