@@ -65,7 +65,7 @@ namespace CETech
             var worker_count = core_count - main_threads_count;
 
             Log.Info("task_manager", "Core count: {0}" + Environment.NewLine +
-                                     "  Main thread count: {1}" + Environment.NewLine+
+                                     "  Main thread count: {1}" + Environment.NewLine +
                                      "  Worker count: {2}", core_count, main_threads_count, worker_count);
 
             for (var i = 0; i < _gloalQueue.Length; i++)
@@ -85,7 +85,7 @@ namespace CETech
 
                 for (var i = 0; i < worker_count; ++i)
                 {
-                    int next_i = i + 1;
+                    var next_i = i + 1;
 
                     Log.Debug("task_manager", "Creating worker {0}", next_i);
 

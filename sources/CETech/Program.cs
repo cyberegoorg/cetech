@@ -29,7 +29,6 @@ namespace CETech
 
         private static void InitResouce()
         {
-
 //#if CETECH_DEVELOP
             ResourceCompiler.registerCompiler(PackageResource.Type, PackageResource.compile);
             ResourceCompiler.registerCompiler(new StringId("lua"), delegate { });
