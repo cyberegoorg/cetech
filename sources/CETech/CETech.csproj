@@ -86,15 +86,25 @@
     <Reference Include="System.Drawing" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
+    <Reference Include="YamlDotNet">
+      <HintPath>..\..\packages\YamlDotNet.3.8.0\lib\net35\YamlDotNet.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Config.cs" />
+    <Compile Include="FileSystem\FileSystem.cs" />
     <Compile Include="Input\Mouse.cs" />
+    <Compile Include="PackageManager\PackageManager.cs" />
+    <Compile Include="PackageManager\PackageResource.cs" />
     <Compile Include="Private\SDL\ApplicationSDL.cs" />
     <Compile Include="Application.cs" />
     <Compile Include="Input\Keyboard.cs" />
+    <Compile Include="ResourceCompiler\ResourceCompiler.cs" />
+    <Compile Include="ResourceManager\ResourceManager.cs" />
+    <Compile Include="StringId64.cs" />
     <Compile Include="TaskManager\QueueMPMC.cs" />
     <Compile Include="TaskManager\TaskManager.cs" />
+    <Compile Include="Utils\ByteUtils.cs" />
     <Compile Include="Utils\Log.cs" />
     <Compile Include="Utils\LogHandler.cs" />
     <Compile Include="Private\SDL\MouseSDL.cs" />
@@ -116,6 +126,7 @@
       <AutoGen>True</AutoGen>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
+    <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
@@ -163,6 +174,7 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

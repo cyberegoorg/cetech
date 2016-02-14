@@ -119,6 +119,7 @@ namespace CETech
             _taskPool[task].Depend = depend;
             _taskPool[task].Parent = parent;
             _taskPool[task].Affinity = affinity;
+            _taskPool[task].TaskData = data;
 
             if (parent != 0)
             {
@@ -129,6 +130,12 @@ namespace CETech
             Interlocked.Increment(ref _openTaskCount);
 
             return task;
+        }
+
+        public static int AddNull(string name, TaskPriority priority = TaskPriority.Normal, int depend = 0,
+            int parent = 0, TaskAffinity affinity = TaskAffinity.None)
+        {
+            return AddBegin(name, delegate { }, null, priority, depend, parent, affinity);
         }
 
         public static void AddEnd(int[] tasks)
@@ -287,7 +294,6 @@ namespace CETech
             }
             finally
             {
-                // Only give up the lock if you actually acquired it
                 if (gotLock) _doneLock.Exit();
             }
         }
