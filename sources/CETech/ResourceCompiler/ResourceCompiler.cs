@@ -20,7 +20,7 @@ namespace CETech
 
         public static void CompileAll()
         {
-            FileSystem.CreateDirectory("build",null);
+            FileSystem.CreateDirectory("build", null);
             Compille("src");
             Compille("core");
         }
@@ -122,4 +122,5 @@ namespace CETech
         }
     }
 }
+
 #endif

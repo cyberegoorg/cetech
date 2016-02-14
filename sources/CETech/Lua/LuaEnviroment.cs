@@ -15,7 +15,7 @@ namespace CETech.Lua
             UserData.RegisterAssembly();
 
             EnviromentScript.Options.ScriptLoader = new ScriptLoader {ModulePaths = new[] {"?"}};
-         
+
             EnviromentScript.Globals["Log"] = new LogApi();
             EnviromentScript.Globals["Keyboard"] = new KeyboardApi();
         }

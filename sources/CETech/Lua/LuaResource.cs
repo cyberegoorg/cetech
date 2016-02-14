@@ -15,7 +15,7 @@ namespace CETech.Lua
 
         public static object ResourceLoader(Stream input)
         {
-            using (MemoryStream ms = new MemoryStream())
+            using (var ms = new MemoryStream())
             {
                 input.CopyTo(ms);
                 return ms.ToArray();
