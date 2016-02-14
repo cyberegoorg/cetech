@@ -1,7 +1,5 @@
-using System.IO;
 using CETech.Input;
 using CETech.Lua;
-using MoonSharp.Interpreter;
 
 namespace CETech
 {
@@ -59,7 +57,7 @@ namespace CETech
             var update_fce = LuaEnviroment.EnviromentScript.Globals.Get("update");
             var shutdown_fce = LuaEnviroment.EnviromentScript.Globals.Get("shutdown");
 
-             LuaEnviroment.EnviromentScript.Call(init_fce);
+            LuaEnviroment.EnviromentScript.Call(init_fce);
             while (_run)
             {
                 //Debug.Assert(TaskManager.OpenTaskCount < 2);

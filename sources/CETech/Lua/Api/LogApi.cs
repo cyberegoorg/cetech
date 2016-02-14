@@ -4,7 +4,7 @@ using MoonSharp.Interpreter;
 namespace CETech.Lua.Api
 {
     [MoonSharpUserData]
-    class LogApi
+    internal class LogApi
     {
         public static void Info(string where, string msg, params object[] args)
         {

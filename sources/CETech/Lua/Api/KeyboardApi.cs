@@ -4,7 +4,7 @@ using MoonSharp.Interpreter;
 namespace CETech.Lua.Api
 {
     [MoonSharpUserData]
-    class KeyboardApi
+    internal class KeyboardApi
     {
         public static int ButtonIndex(string buttonName)
         {
