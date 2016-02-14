@@ -120,6 +120,14 @@ namespace CETech
             return true;
         }
 
+        public static void Flush(StringId64 name)
+        {
+            while (!IsLoaded(name))
+            {
+                TaskManager.DoWork();
+            }
+        }
+
         internal struct PackageTask
         {
             public StringId64 name;
