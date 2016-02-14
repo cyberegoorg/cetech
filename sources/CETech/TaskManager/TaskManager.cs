@@ -64,9 +64,9 @@ namespace CETech
             var main_threads_count = 1 + 1;
             var worker_count = core_count - main_threads_count;
 
-            Log.Info("task_manager", "Core count: {0}", core_count);
-            Log.Info("task_manager", "Main thread count: {0}", main_threads_count);
-            Log.Info("task_manager", "Worker count: {0}", worker_count);
+            Log.Info("task_manager", "Core count: {0}" + Environment.NewLine +
+                                     "  Main thread count: {1}" + Environment.NewLine+
+                                     "  Worker count: {2}", core_count, main_threads_count, worker_count);
 
             for (var i = 0; i < _gloalQueue.Length; i++)
             {
@@ -85,11 +85,13 @@ namespace CETech
 
                 for (var i = 0; i < worker_count; ++i)
                 {
-                    Log.Debug("task_manager", "Creating worker {0}", i + 1);
+                    int next_i = i + 1;
+
+                    Log.Debug("task_manager", "Creating worker {0}", next_i);
 
                     _workers[i] = new Thread(_task_worker);
-                    _workers[i].Start(i + 1);
-                    _workers[i].Name = string.Format("Worker{0}", i + 1);
+                    _workers[i].Start(next_i);
+                    _workers[i].Name = string.Format("Worker{0}", next_i);
                 }
             }
 

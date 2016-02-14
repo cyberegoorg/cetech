@@ -76,6 +76,9 @@
     <DocumentationFile>bin\x64\Release\CETech.XML</DocumentationFile>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="MsgPack">
+      <HintPath>..\..\packages\MsgPack.Cli.0.6.8\lib\net45\MsgPack.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
@@ -101,7 +104,7 @@
     <Compile Include="Input\Keyboard.cs" />
     <Compile Include="ResourceCompiler\ResourceCompiler.cs" />
     <Compile Include="ResourceManager\ResourceManager.cs" />
-    <Compile Include="Utils\StringId64.cs" />
+    <Compile Include="Utils\StringId.cs" />
     <Compile Include="TaskManager\QueueMPMC.cs" />
     <Compile Include="TaskManager\TaskManager.cs" />
     <Compile Include="Utils\ByteUtils.cs" />

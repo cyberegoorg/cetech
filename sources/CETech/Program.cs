@@ -17,13 +17,35 @@ namespace CETech
             {
                 ResourceCompiler.CompileAll();
 
-                ResourceManager.LoadNow(PackageResource.Type, new[] {new StringId64("boot")});
-                PackageManager.Load(new StringId64("boot"));
+                ResourceManager.LoadNow(PackageResource.Type, new[] {new StringId("boot")});
+                PackageManager.Load(new StringId("boot"));
+                PackageManager.Flush(new StringId("boot"));
 
                 Application.Run();
             }
 
             BigShutdown();
+        }
+
+        private static void InitResouce()
+        {
+
+//#if CETECH_DEVELOP
+            ResourceCompiler.registerCompiler(PackageResource.Type, PackageResource.compile);
+            ResourceCompiler.registerCompiler(new StringId("lua"), delegate { });
+            ResourceCompiler.registerCompiler(new StringId("texture"), delegate { });
+            ResourceCompiler.registerCompiler(new StringId("config"), delegate { });
+//#endif
+            ResourceManager.RegisterType(PackageResource.Type,
+                PackageResource.ResourceLoader, PackageResource.ResourceUnloader,
+                PackageResource.ResourceOnline, PackageResource.ResourceOffline);
+
+            ResourceManager.RegisterType(new StringId("lua"), delegate { return null; }, delegate { }, delegate { },
+                delegate { });
+            ResourceManager.RegisterType(new StringId("texture"), delegate { return null; }, delegate { },
+                delegate { }, delegate { });
+            ResourceManager.RegisterType(new StringId("config"), delegate { return null; }, delegate { }, delegate { },
+                delegate { });
         }
 
         private static bool BigInit()
@@ -36,21 +58,7 @@ namespace CETech
 
             TaskManager.Init();
 
-            ResourceCompiler.registerCompiler(PackageResource.Type, PackageResource.compile);
-            ResourceCompiler.registerCompiler(new StringId64("lua"), delegate { });
-            ResourceCompiler.registerCompiler(new StringId64("texture"), delegate { });
-            ResourceCompiler.registerCompiler(new StringId64("config"), delegate { });
-
-            ResourceManager.RegisterType(PackageResource.Type,
-                PackageResource.ResourceLoader, PackageResource.ResourceUnloader,
-                PackageResource.ResourceOnline, PackageResource.ResourceOffline);
-
-            ResourceManager.RegisterType(new StringId64("lua"), delegate { return null; }, delegate { }, delegate { },
-                delegate { });
-            ResourceManager.RegisterType(new StringId64("texture"), delegate { return null; }, delegate { },
-                delegate { }, delegate { });
-            ResourceManager.RegisterType(new StringId64("config"), delegate { return null; }, delegate { }, delegate { },
-                delegate { });
+            InitResouce();
 
             Keyboard.Init();
             Mouse.Init();
@@ -63,7 +71,6 @@ namespace CETech
         private static void BigShutdown()
         {
             Application.Shutdown();
-
             TaskManager.Shutdown();
         }
     }

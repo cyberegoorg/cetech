@@ -9,9 +9,9 @@ namespace CETech
     {
         public delegate void Compiler(CompilatorAPI capi);
 
-        private static readonly Dictionary<StringId64, Compiler> _compoilerMap = new Dictionary<StringId64, Compiler>();
+        private static readonly Dictionary<StringId, Compiler> _compoilerMap = new Dictionary<StringId, Compiler>();
 
-        public static void registerCompiler(StringId64 type, Compiler compiler)
+        public static void registerCompiler(StringId type, Compiler compiler)
         {
             _compoilerMap[type] = compiler;
         }
@@ -23,15 +23,15 @@ namespace CETech
             Compille("core");
         }
 
-        private static void calcHash(string filename, out StringId64 type, out StringId64 name)
+        private static void calcHash(string filename, out StringId type, out StringId name)
         {
             var last_idx = filename.LastIndexOf(".", StringComparison.Ordinal);
 
             var namestr = filename.Substring(0, last_idx);
             var typestr = filename.Substring(last_idx + 1);
 
-            type = new StringId64(typestr);
-            name = new StringId64(namestr);
+            type = new StringId(typestr);
+            name = new StringId(namestr);
         }
 
 
@@ -78,7 +78,7 @@ namespace CETech
             {
                 var filename = files[i].Remove(0, FileSystem.RootDir(root).Length + 1);
 
-                StringId64 name, type;
+                StringId name, type;
                 calcHash(filename, out type, out name);
 
                 Compiler compiler;
@@ -125,8 +125,8 @@ namespace CETech
             public string source_fs;
 
             public string filename;
-            public StringId64 name;
-            public StringId64 type;
+            public StringId name;
+            public StringId type;
         }
     }
 }
