@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using CETech.Utils;
-using MsgPack.Serialization;
+﻿using CETech.Utils;
 
 namespace CETech
 {
@@ -16,14 +13,12 @@ namespace CETech
         }
 
 
-        public static unsafe void Load(StringId name)
+        public static void Load(StringId name)
         {
-            object data;
-            ResourceManager.Get(PackageResource.Type, name, out data);
-            PackageResource.PackagePack pack = (PackageResource.PackagePack) (data);
-            
+            var pack = ResourceManager.Get<PackageResource.PackagePack>(PackageResource.Type, name);
+
             int[] tasks = {0};
-            for (int i = 0; i < pack.type.Length; ++i)
+            for (var i = 0; i < pack.type.Length; ++i)
             {
                 var task = new PackageTask
                 {
@@ -37,31 +32,26 @@ namespace CETech
             }
         }
 
-        public static unsafe void Unload(StringId name)
+        public static void Unload(StringId name)
         {
-            object data;
-            ResourceManager.Get(PackageResource.Type, name, out data);
-            PackageResource.PackagePack pack = (PackageResource.PackagePack)(data);
+            var pack = ResourceManager.Get<PackageResource.PackagePack>(PackageResource.Type, name);
 
-            for (int i = 0; i < pack.type.Length; ++i)
+            for (var i = 0; i < pack.type.Length; ++i)
             {
                 ResourceManager.Unload(new StringId(pack.type[i]), pack.names[i]);
             }
         }
 
-        public static unsafe bool IsLoaded(StringId name)
+        public static bool IsLoaded(StringId name)
         {
-            object data;
-            ResourceManager.Get(PackageResource.Type, name, out data);
-            PackageResource.PackagePack pack = (PackageResource.PackagePack)(data);
+            var pack = ResourceManager.Get<PackageResource.PackagePack>(PackageResource.Type, name);
 
-            for (int i = 0; i < pack.type.Length; ++i)
+            for (var i = 0; i < pack.type.Length; ++i)
             {
                 if (!ResourceManager.CanGet(new StringId(pack.type[i]), pack.names[i]))
                 {
                     return false;
                 }
-
             }
 
             return true;

@@ -8,15 +8,8 @@ namespace CETech
     {
         public static readonly StringId Type = new StringId("package");
 
-        public struct PackagePack
+        public static void compile(ResourceCompiler.CompilatorAPI capi)
         {
-            public StringId[] type;
-            public StringId[][] names;
-        }
-
-        public static unsafe void compile(ResourceCompiler.CompilatorAPI capi)
-        {
-
             TextReader input = new StreamReader(capi.ResourceFile);
             var yaml = new YamlStream();
             yaml.Load(input);
@@ -27,7 +20,7 @@ namespace CETech
             pack.type = new StringId[rootNode.Children.Count];
             pack.names = new StringId[rootNode.Children.Count][];
 
-            int idx = 0;
+            var idx = 0;
             foreach (var type in rootNode.Children)
             {
                 var typestr = type.Key as YamlScalarNode;
@@ -38,7 +31,7 @@ namespace CETech
                 pack.type[idx] = typeid;
                 pack.names[idx] = new StringId[sequence.Children.Count];
 
-                int name_idx = 0;
+                var name_idx = 0;
                 foreach (var name in sequence.Children)
                 {
                     var nameid = new StringId(((YamlScalarNode) name).Value);
@@ -70,6 +63,12 @@ namespace CETech
 
         public static void ResourceUnloader(object data)
         {
+        }
+
+        public struct PackagePack
+        {
+            public StringId[] type;
+            public StringId[][] names;
         }
     }
 }

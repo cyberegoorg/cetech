@@ -128,7 +128,7 @@ namespace CETech
             var idx = _types_map[type];
 
             for (var i = 0; i < names.Length; i++)
-            {              
+            {
                 offline(_data_map[idx][names[i]]);
             }
 
@@ -163,7 +163,7 @@ namespace CETech
             return _ref_map[type_idx][name] == 0;
         }
 
-        public static void Get(StringId type, StringId name, out object data)
+        public static T Get<T>(StringId type, StringId name)
         {
             StringId[] names = {name};
 
@@ -173,7 +173,7 @@ namespace CETech
             }
 
             var idx = _types_map[type];
-            data = _data_map[idx][name];
+            return (T) _data_map[idx][name];
         }
     }
 }
