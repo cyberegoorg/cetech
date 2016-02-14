@@ -152,7 +152,7 @@ namespace CETech
         }
 
 
-        public static void do_work()
+        public static void DoWork()
         {
             var t = _task_pop_new_work();
 
@@ -170,7 +170,7 @@ namespace CETech
         {
             while (!_task_is_done(id))
             {
-                do_work();
+                DoWork();
             }
         }
 
@@ -187,7 +187,7 @@ namespace CETech
 
             while (_Run)
             {
-                do_work();
+                DoWork();
             }
 
             Log.Info("task_worker", "Worker {0} shutdown", _worker_id);
