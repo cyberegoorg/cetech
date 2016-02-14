@@ -91,17 +91,17 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Config.cs" />
+    <Compile Include="Utils\Config.cs" />
     <Compile Include="FileSystem\FileSystem.cs" />
     <Compile Include="Input\Mouse.cs" />
     <Compile Include="PackageManager\PackageManager.cs" />
     <Compile Include="PackageManager\PackageResource.cs" />
     <Compile Include="Private\SDL\ApplicationSDL.cs" />
-    <Compile Include="Application.cs" />
+    <Compile Include="Application\Application.cs" />
     <Compile Include="Input\Keyboard.cs" />
     <Compile Include="ResourceCompiler\ResourceCompiler.cs" />
     <Compile Include="ResourceManager\ResourceManager.cs" />
-    <Compile Include="StringId64.cs" />
+    <Compile Include="Utils\StringId64.cs" />
     <Compile Include="TaskManager\QueueMPMC.cs" />
     <Compile Include="TaskManager\TaskManager.cs" />
     <Compile Include="Utils\ByteUtils.cs" />
