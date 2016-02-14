@@ -1,96 +1,75 @@
-using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Runtime.InteropServices;
-using CETech.Utils;
+using MsgPack.Serialization;
 using YamlDotNet.RepresentationModel;
 
 namespace CETech
 {
     public class PackageResource
     {
-        public static readonly StringId64 Type = new StringId64("package");
+        public static readonly StringId Type = new StringId("package");
+
+        public struct PackagePack
+        {
+            public StringId[] type;
+            public StringId[][] names;
+        }
 
         public static unsafe void compile(ResourceCompiler.CompilatorAPI capi)
         {
+
             TextReader input = new StreamReader(capi.ResourceFile);
             var yaml = new YamlStream();
             yaml.Load(input);
 
             var rootNode = yaml.Documents[0].RootNode as YamlMappingNode;
 
-            var typeHeaders = new List<TypeHeader>();
-            var names = new List<long>();
+            var pack = new PackagePack();
+            pack.type = new StringId[rootNode.Children.Count];
+            pack.names = new StringId[rootNode.Children.Count][];
 
+            int idx = 0;
             foreach (var type in rootNode.Children)
             {
                 var typestr = type.Key as YamlScalarNode;
-                var maping = type.Value as YamlSequenceNode;
+                var sequence = type.Value as YamlSequenceNode;
 
-                var typeid = new StringId64(typestr.Value);
+                var typeid = new StringId(typestr.Value);
 
-                typeHeaders.Add(new TypeHeader {type = typeid, count = (ulong) maping.Children.Count, offset = 0});
+                pack.type[idx] = typeid;
+                pack.names[idx] = new StringId[sequence.Children.Count];
 
-                foreach (var name in maping.Children)
+                int name_idx = 0;
+                foreach (var name in sequence.Children)
                 {
-                    var nameid = new StringId64(((YamlScalarNode) name).Value);
-                    names.Add(nameid);
+                    var nameid = new StringId(((YamlScalarNode) name).Value);
+
+                    pack.names[idx][name_idx] = nameid;
+                    ++name_idx;
                 }
+
+                ++idx;
             }
 
-            var b = ByteUtils.ToByteArray(new Header {count = (ulong) typeHeaders.Count});
-            capi.BuildFile.Write(b, 0, b.Length);
-
-            var names_offset = (ulong) (sizeof (Header) + sizeof (TypeHeader)*typeHeaders.Count);
-            for (var i = 0; i < typeHeaders.Count; i++)
-            {
-                var th = typeHeaders[i];
-                th.offset = names_offset;
-
-                b = ByteUtils.ToByteArray(th);
-                capi.BuildFile.Write(b, 0, b.Length);
-
-                names_offset += sizeof (long)*typeHeaders[i].count;
-            }
-
-            for (var i = 0; i < names.Count; i++)
-            {
-                b = BitConverter.GetBytes(names[i]);
-                capi.BuildFile.Write(b, 0, b.Length);
-            }
+            var serializer = MessagePackSerializer.Get<PackagePack>();
+            serializer.Pack(capi.BuildFile, pack);
         }
 
-        public static byte[] ResourceLoader(Stream input)
+        public static object ResourceLoader(Stream input)
         {
-            var buffer = new byte[input.Length];
-            input.Read(buffer, 0, (int) input.Length);
-            return buffer;
+            var serializer = MessagePackSerializer.Get<PackagePack>();
+            return serializer.Unpack(input);
         }
 
-        public static void ResourceOffline(byte[] data)
+        public static void ResourceOffline(object data)
         {
         }
 
-        public static void ResourceOnline(byte[] data)
+        public static void ResourceOnline(object data)
         {
         }
 
-        public static void ResourceUnloader(byte[] data)
+        public static void ResourceUnloader(object data)
         {
-        }
-
-        [StructLayout(LayoutKind.Sequential, Pack = 1)]
-        public struct Header
-        {
-            public ulong count;
-        }
-
-        [StructLayout(LayoutKind.Sequential, Pack = 1)]
-        public struct TypeHeader
-        {
-            public long type;
-            public ulong count;
-            public ulong offset;
         }
     }
 }

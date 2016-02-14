@@ -1,5 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using CETech.Utils;
+using MsgPack.Serialization;
 
 namespace CETech
 {
@@ -14,37 +16,19 @@ namespace CETech
         }
 
 
-        public static unsafe void Load(StringId64 name)
+        public static unsafe void Load(StringId name)
         {
-            byte[] data;
+            object data;
             ResourceManager.Get(PackageResource.Type, name, out data);
-
-            var header = ByteUtils.FromBytes<PackageResource.Header>(data);
-
-            var headerSizeof = sizeof (PackageResource.Header);
-            var typeHeaderSizeof = sizeof (PackageResource.TypeHeader);
-            var stringIdSizeof = sizeof (StringId64);
-
-            var typeHeaderOffset = headerSizeof;
-
+            PackageResource.PackagePack pack = (PackageResource.PackagePack) (data);
+            
             int[] tasks = {0};
-            var name_list = new List<StringId64>();
-            for (ulong i = 0; i < header.count; i++, typeHeaderOffset += typeHeaderSizeof)
+            for (int i = 0; i < pack.type.Length; ++i)
             {
-                name_list.Clear();
-
-                var type_header = ByteUtils.FromBytes<PackageResource.TypeHeader>(data, typeHeaderOffset);
-                var namesOffset = type_header.offset;
-                for (ulong j = 0; j < type_header.count; ++j, namesOffset += (ulong) stringIdSizeof)
-                {
-                    var res_name = ByteUtils.FromBytes<StringId64>(data, (int) namesOffset);
-                    name_list.Add(res_name);
-                }
-
                 var task = new PackageTask
                 {
-                    type = new StringId64(type_header.type),
-                    names = name_list.ToArray(),
+                    type = new StringId(pack.type[i]),
+                    names = pack.names[i],
                     name = name
                 };
 
@@ -53,74 +37,37 @@ namespace CETech
             }
         }
 
-        public static unsafe void Unload(StringId64 name)
+        public static unsafe void Unload(StringId name)
         {
-            byte[] data;
+            object data;
             ResourceManager.Get(PackageResource.Type, name, out data);
+            PackageResource.PackagePack pack = (PackageResource.PackagePack)(data);
 
-            var header = ByteUtils.FromBytes<PackageResource.Header>(data);
-
-            var headerSizeof = sizeof (PackageResource.Header);
-            var typeHeaderSizeof = sizeof (PackageResource.TypeHeader);
-            var stringIdSizeof = sizeof (StringId64);
-
-            var typeHeaderOffset = headerSizeof;
-
-            int[] tasks = {0};
-            var name_list = new List<StringId64>();
-            for (ulong i = 0; i < header.count; i++, typeHeaderOffset += typeHeaderSizeof)
+            for (int i = 0; i < pack.type.Length; ++i)
             {
-                name_list.Clear();
-
-                var type_header = ByteUtils.FromBytes<PackageResource.TypeHeader>(data, typeHeaderOffset);
-                var namesOffset = type_header.offset;
-                for (ulong j = 0; j < type_header.count; ++j, namesOffset += (ulong) stringIdSizeof)
-                {
-                    var res_name = ByteUtils.FromBytes<StringId64>(data, (int) namesOffset);
-                    name_list.Add(res_name);
-                }
-
-                ResourceManager.Unload(new StringId64(type_header.type), name_list.ToArray());
+                ResourceManager.Unload(new StringId(pack.type[i]), pack.names[i]);
             }
         }
 
-        public static unsafe bool IsLoaded(StringId64 name)
+        public static unsafe bool IsLoaded(StringId name)
         {
-            byte[] data;
+            object data;
             ResourceManager.Get(PackageResource.Type, name, out data);
+            PackageResource.PackagePack pack = (PackageResource.PackagePack)(data);
 
-            var header = ByteUtils.FromBytes<PackageResource.Header>(data);
-
-            var headerSizeof = sizeof (PackageResource.Header);
-            var typeHeaderSizeof = sizeof (PackageResource.TypeHeader);
-            var stringIdSizeof = sizeof (StringId64);
-
-            var typeHeaderOffset = headerSizeof;
-
-            int[] tasks = {0};
-            var name_list = new List<StringId64>();
-            for (ulong i = 0; i < header.count; i++, typeHeaderOffset += typeHeaderSizeof)
+            for (int i = 0; i < pack.type.Length; ++i)
             {
-                name_list.Clear();
-
-                var type_header = ByteUtils.FromBytes<PackageResource.TypeHeader>(data, typeHeaderOffset);
-                var namesOffset = type_header.offset;
-                for (ulong j = 0; j < type_header.count; ++j, namesOffset += (ulong) stringIdSizeof)
-                {
-                    var res_name = ByteUtils.FromBytes<StringId64>(data, (int) namesOffset);
-                    name_list.Add(res_name);
-                }
-
-                if (!ResourceManager.CanGet(new StringId64(type_header.type), name_list.ToArray()))
+                if (!ResourceManager.CanGet(new StringId(pack.type[i]), pack.names[i]))
                 {
                     return false;
                 }
+
             }
 
             return true;
         }
 
-        public static void Flush(StringId64 name)
+        public static void Flush(StringId name)
         {
             while (!IsLoaded(name))
             {
@@ -130,9 +77,9 @@ namespace CETech
 
         internal struct PackageTask
         {
-            public StringId64 name;
-            public StringId64[] names;
-            public StringId64 type;
+            public StringId name;
+            public StringId[] names;
+            public StringId type;
         }
     }
 }
