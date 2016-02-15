@@ -47,7 +47,7 @@ namespace CETech
                     return FileMode.Open;
 
                 case OpenMode.Write:
-                    return FileMode.OpenOrCreate;
+                    return FileMode.Create;
 
                 default:
                     throw new ArgumentOutOfRangeException("mode", mode, null);

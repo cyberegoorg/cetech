@@ -1,16 +1,19 @@
 using System.IO;
-using MoonSharp.Interpreter;
 
 namespace CETech.Lua
 {
     public class LuaResource
     {
-        public static readonly StringId Type = new StringId("lua");
+        public static readonly long Type = StringId.FromString("lua");
 
         public static void Compile(ResourceCompiler.CompilatorAPI capi)
         {
-            var script = new Script();
-            script.Dump(script.LoadStream(capi.ResourceFile), capi.BuildFile);
+            capi.ResourceFile.CopyTo(capi.BuildFile);
+
+            // TODO: COMPILE!!!!
+            //var script = new Script();
+            //script.Dump(script.LoadStream(capi.ResourceFile), capi.BuildFile);
+
         }
 
         public static object ResourceLoader(Stream input)

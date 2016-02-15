@@ -17,24 +17,24 @@ namespace CETech
 
         public static bool _autoReload;
 
-        private static readonly Dictionary<StringId, ResourceLoader> _loader_map =
-            new Dictionary<StringId, ResourceLoader>();
+        private static readonly Dictionary<long, ResourceLoader> _loader_map =
+            new Dictionary<long, ResourceLoader>();
 
-        private static readonly Dictionary<StringId, ResourceUnloader> _unloader_map =
-            new Dictionary<StringId, ResourceUnloader>();
+        private static readonly Dictionary<long, ResourceUnloader> _unloader_map =
+            new Dictionary<long, ResourceUnloader>();
 
-        private static readonly Dictionary<StringId, ResourceOnline> _online_map =
-            new Dictionary<StringId, ResourceOnline>();
+        private static readonly Dictionary<long, ResourceOnline> _online_map =
+            new Dictionary<long, ResourceOnline>();
 
-        private static readonly Dictionary<StringId, ResourceOffline> _offline_map =
-            new Dictionary<StringId, ResourceOffline>();
+        private static readonly Dictionary<long, ResourceOffline> _offline_map =
+            new Dictionary<long, ResourceOffline>();
 
-        private static readonly Dictionary<StringId, int> _types_map = new Dictionary<StringId, int>();
+        private static readonly Dictionary<long, int> _types_map = new Dictionary<long, int>();
 
-        private static readonly List<Dictionary<StringId, object>> _data_map =
-            new List<Dictionary<StringId, object>>();
+        private static readonly List<Dictionary<long, object>> _data_map =
+            new List<Dictionary<long, object>>();
 
-        private static readonly List<Dictionary<StringId, int>> _ref_map = new List<Dictionary<StringId, int>>();
+        private static readonly List<Dictionary<long, int>> _ref_map = new List<Dictionary<long, int>>();
 
         private static SpinLock _add_lock = new SpinLock();
 
@@ -44,12 +44,12 @@ namespace CETech
             set { _autoReload = value; }
         }
 
-        public static void RegisterType(StringId type, ResourceLoader loader, ResourceUnloader unloader,
+        public static void RegisterType(long type, ResourceLoader loader, ResourceUnloader unloader,
             ResourceOnline online, ResourceOffline offline)
         {
             var idx = _data_map.Count;
-            _data_map.Add(new Dictionary<StringId, object>());
-            _ref_map.Add(new Dictionary<StringId, int>());
+            _data_map.Add(new Dictionary<long, object>());
+            _ref_map.Add(new Dictionary<long, int>());
 
             _types_map[type] = idx;
 
@@ -59,22 +59,22 @@ namespace CETech
             _offline_map[type] = offline;
         }
 
-        public static object[] Load(StringId type, StringId[] names)
+        public static object[] Load(long type, long[] names)
         {
             var data = new object[names.Length];
 
             for (var i = 0; i < names.Length; i++)
             {
-                Log.Debug("resource_manager", "Loading resource {0}{1}", type, names[i]);
+                Log.Debug("resource_manager", "Loading resource {0:x}{1:x}", type, names[i]);
 
-                var input = FileSystem.Open("build", string.Format("{0}{1}", type, names[i]), FileSystem.OpenMode.Read);
+                var input = FileSystem.Open("build", string.Format("{0:x}{1:x}", type, names[i]), FileSystem.OpenMode.Read);
                 data[i] = _loader_map[type](input);
             }
 
             return data;
         }
 
-        public static void AddLoaded(object[] loaded_data, StringId type, StringId[] names)
+        public static void AddLoaded(object[] loaded_data, long type, long[] names)
         {
             var online = _online_map[type];
             var idx = _types_map[type];
@@ -99,13 +99,13 @@ namespace CETech
             }
         }
 
-        public static void LoadNow(StringId type, StringId[] names)
+        public static void LoadNow(long type, long[] names)
         {
             var loaded_data = Load(type, names);
             AddLoaded(loaded_data, type, names);
         }
 
-        public static bool CanGet(StringId type, StringId[] names)
+        public static bool CanGet(long type, long[] names)
         {
             var idx = _types_map[type];
             for (var i = 0; i < names.Length; i++)
@@ -119,7 +119,7 @@ namespace CETech
             return true;
         }
 
-        public static void Unload(StringId type, StringId[] names)
+        public static void Unload(long type, long[] names)
         {
             var offline = _offline_map[type];
             var unloader = _unloader_map[type];
@@ -143,7 +143,7 @@ namespace CETech
             }
         }
 
-        private static void incRef(int type_idx, StringId name)
+        private static void incRef(int type_idx, long name)
         {
             int counter;
 
@@ -155,16 +155,16 @@ namespace CETech
             _ref_map[type_idx][name] = counter + 1;
         }
 
-        private static bool decRef(int type_idx, StringId name)
+        private static bool decRef(int type_idx, long name)
         {
             _ref_map[type_idx][name] -= 1;
 
             return _ref_map[type_idx][name] == 0;
         }
 
-        public static T Get<T>(StringId type, StringId name)
+        public static T Get<T>(long type, long name)
         {
-            StringId[] names = {name};
+            long[] names = {name};
 
             if (_autoReload && !CanGet(type, names))
             {

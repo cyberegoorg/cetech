@@ -46,7 +46,7 @@ namespace CETech
 
             Renderer.Init(MainWindow, Renderer.BackendType.Default);
 
-            LuaEnviroment.DoResouece(new StringId("lua/boot"));
+            LuaEnviroment.DoResouece(StringId.FromString("lua/boot"));
 
             var init_fce = LuaEnviroment.EnviromentScript.Globals.Get("init");
             var update_fce = LuaEnviroment.EnviromentScript.Globals.Get("update");
