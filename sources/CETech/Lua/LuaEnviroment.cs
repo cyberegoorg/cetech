@@ -26,7 +26,7 @@ namespace CETech.Lua
             EnviromentScript = null;
         }
 
-        public static void DoResouece(StringId name)
+        public static void DoResouece(long name)
         {
             var ms = new MemoryStream(ResourceManager.Get<byte[]>(LuaResource.Type, name));
             EnviromentScript.DoStream(ms);
@@ -36,13 +36,13 @@ namespace CETech.Lua
         {
             public override object LoadFile(string file, Table globalContext)
             {
-                var name = new StringId(file);
+                var name = StringId.FromString(file);
                 return ResourceManager.Get<byte[]>(LuaResource.Type, name);
             }
 
             public override bool ScriptFileExists(string name)
             {
-                StringId[] names = {new StringId(name)};
+                long[] names = {StringId.FromString(name)};
                 return ResourceManager.CanGet(LuaResource.Type, names);
             }
         }

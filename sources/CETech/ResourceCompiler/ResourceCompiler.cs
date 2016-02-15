@@ -11,9 +11,9 @@ namespace CETech
     {
         public delegate void Compiler(CompilatorAPI capi);
 
-        private static readonly Dictionary<StringId, Compiler> _compoilerMap = new Dictionary<StringId, Compiler>();
+        private static readonly Dictionary<long, Compiler> _compoilerMap = new Dictionary<long, Compiler>();
 
-        public static void registerCompiler(StringId type, Compiler compiler)
+        public static void registerCompiler(long type, Compiler compiler)
         {
             _compoilerMap[type] = compiler;
         }
@@ -25,15 +25,15 @@ namespace CETech
             Compille("core");
         }
 
-        private static void calcHash(string filename, out StringId type, out StringId name)
+        private static void calcHash(string filename, out long type, out long name)
         {
             var last_idx = filename.LastIndexOf(".", StringComparison.Ordinal);
 
             var namestr = filename.Substring(0, last_idx);
             var typestr = filename.Substring(last_idx + 1);
 
-            type = new StringId(typestr);
-            name = new StringId(namestr);
+            type = StringId.FromString(typestr);
+            name = StringId.FromString(namestr);
         }
 
 
@@ -41,12 +41,12 @@ namespace CETech
         {
             var task = (CompileTask) data;
 
-            Log.Info("compile_task", "Compile {0} => {1}{2}", task.filename, task.type, task.name);
+            Log.Info("compile_task", "Compile {0} => {1:x}{2:x}", task.filename, task.type, task.name);
 
             using (var input = FileSystem.Open(task.source_fs, task.filename, FileSystem.OpenMode.Read))
             {
                 using (
-                    var build = FileSystem.Open("build", string.Format("{0}{1}", task.type, task.name),
+                    var build = FileSystem.Open("build", string.Format("{0:x}{1:x}", task.type, task.name),
                         FileSystem.OpenMode.Write))
                 {
                     var capi = new CompilatorAPI(task.filename, input, build);
@@ -70,7 +70,7 @@ namespace CETech
             {
                 var filename = files[i].Remove(0, FileSystem.RootDir(root).Length + 1);
 
-                StringId name, type;
+                long name, type;
                 calcHash(filename, out type, out name);
 
                 Compiler compiler;
@@ -117,8 +117,8 @@ namespace CETech
             public string source_fs;
 
             public string filename;
-            public StringId name;
-            public StringId type;
+            public long name;
+            public long type;
         }
     }
 }

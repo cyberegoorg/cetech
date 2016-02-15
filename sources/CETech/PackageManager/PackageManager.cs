@@ -7,13 +7,13 @@ namespace CETech
         private static void package_task(object data)
         {
             var task = (PackageTask) data;
-            Log.Debug("package_task", "Load package {0}{1}", task.type, task.name);
+            Log.Debug("package_task", "Load package {0:x}{1:x}", task.type, task.name);
 
             ResourceManager.LoadNow(task.type, task.names);
         }
 
 
-        public static void Load(StringId name)
+        public static void Load(long name)
         {
             var pack = ResourceManager.Get<PackageResource.Resource>(PackageResource.Type, name);
 
@@ -22,7 +22,7 @@ namespace CETech
             {
                 var task = new PackageTask
                 {
-                    type = new StringId(pack.Type[i]),
+                    type = pack.Type[i],
                     names = pack.Names[i],
                     name = name
                 };
@@ -32,23 +32,23 @@ namespace CETech
             }
         }
 
-        public static void Unload(StringId name)
+        public static void Unload(long name)
         {
             var pack = ResourceManager.Get<PackageResource.Resource>(PackageResource.Type, name);
 
             for (var i = 0; i < pack.Type.Length; ++i)
             {
-                ResourceManager.Unload(new StringId(pack.Type[i]), pack.Names[i]);
+                ResourceManager.Unload(pack.Type[i], pack.Names[i]);
             }
         }
 
-        public static bool IsLoaded(StringId name)
+        public static bool IsLoaded(long name)
         {
             var pack = ResourceManager.Get<PackageResource.Resource>(PackageResource.Type, name);
 
             for (var i = 0; i < pack.Type.Length; ++i)
             {
-                if (!ResourceManager.CanGet(new StringId(pack.Type[i]), pack.Names[i]))
+                if (!ResourceManager.CanGet(pack.Type[i], pack.Names[i]))
                 {
                     return false;
                 }
@@ -57,7 +57,7 @@ namespace CETech
             return true;
         }
 
-        public static void Flush(StringId name)
+        public static void Flush(long name)
         {
             while (!IsLoaded(name))
             {
@@ -67,9 +67,9 @@ namespace CETech
 
         internal struct PackageTask
         {
-            public StringId name;
-            public StringId[] names;
-            public StringId type;
+            public long name;
+            public long[] names;
+            public long type;
         }
     }
 }

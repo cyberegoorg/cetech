@@ -6,7 +6,7 @@ namespace CETech
 {
     public class PackageResource
     {
-        public static readonly StringId Type = new StringId("package");
+        public static readonly long Type = StringId.FromString("package");
 
         public static void Compile(ResourceCompiler.CompilatorAPI capi)
         {
@@ -17,8 +17,8 @@ namespace CETech
             var rootNode = yaml.Documents[0].RootNode as YamlMappingNode;
 
             var pack = new Resource();
-            pack.Type = new StringId[rootNode.Children.Count];
-            pack.Names = new StringId[rootNode.Children.Count][];
+            pack.Type = new long[rootNode.Children.Count];
+            pack.Names = new long[rootNode.Children.Count][];
 
             var idx = 0;
             foreach (var type in rootNode.Children)
@@ -26,15 +26,15 @@ namespace CETech
                 var typestr = type.Key as YamlScalarNode;
                 var sequence = type.Value as YamlSequenceNode;
 
-                var typeid = new StringId(typestr.Value);
+                var typeid = StringId.FromString(typestr.Value);
 
                 pack.Type[idx] = typeid;
-                pack.Names[idx] = new StringId[sequence.Children.Count];
+                pack.Names[idx] = new long[sequence.Children.Count];
 
                 var name_idx = 0;
                 foreach (var name in sequence.Children)
                 {
-                    var nameid = new StringId(((YamlScalarNode) name).Value);
+                    var nameid = StringId.FromString(((YamlScalarNode)name).Value);
 
                     pack.Names[idx][name_idx] = nameid;
                     ++name_idx;
@@ -67,8 +67,8 @@ namespace CETech
 
         public struct Resource
         {
-            public StringId[] Type;
-            public StringId[][] Names;
+            public long[] Type;
+            public long[][] Names;
         }
     }
 }

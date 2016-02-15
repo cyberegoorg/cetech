@@ -23,9 +23,9 @@ namespace CETech
             {
                 ResourceCompiler.CompileAll();
 
-                ResourceManager.LoadNow(PackageResource.Type, new[] {new StringId("boot")});
-                PackageManager.Load(new StringId("boot"));
-                PackageManager.Flush(new StringId("boot"));
+                ResourceManager.LoadNow(PackageResource.Type, new[] {StringId.FromString("boot")});
+                PackageManager.Load(StringId.FromString("boot"));
+                PackageManager.Flush(StringId.FromString("boot"));
 
                 Application.Run();
             }
@@ -38,8 +38,8 @@ namespace CETech
 #if CETECH_DEVELOP
             ResourceCompiler.registerCompiler(PackageResource.Type, PackageResource.Compile);
             ResourceCompiler.registerCompiler(LuaResource.Type, LuaResource.Compile);
-            ResourceCompiler.registerCompiler(new StringId("texture"), delegate { });
-            ResourceCompiler.registerCompiler(new StringId("config"), delegate { });
+            ResourceCompiler.registerCompiler(StringId.FromString("texture"), delegate { });
+            ResourceCompiler.registerCompiler(StringId.FromString("config"), delegate { });
 #endif
 
             ResourceManager.RegisterType(PackageResource.Type,
@@ -49,9 +49,9 @@ namespace CETech
             ResourceManager.RegisterType(LuaResource.Type, LuaResource.ResourceLoader, LuaResource.ResourceUnloader,
                 LuaResource.ResourceOnline, LuaResource.ResourceOffline);
 
-            ResourceManager.RegisterType(new StringId("texture"), delegate { return null; }, delegate { },
+            ResourceManager.RegisterType(StringId.FromString("texture"), delegate { return null; }, delegate { },
                 delegate { }, delegate { });
-            ResourceManager.RegisterType(new StringId("config"), delegate { return null; }, delegate { }, delegate { },
+            ResourceManager.RegisterType(StringId.FromString("config"), delegate { return null; }, delegate { }, delegate { },
                 delegate { });
         }
 
