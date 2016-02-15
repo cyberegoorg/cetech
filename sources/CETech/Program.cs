@@ -14,6 +14,11 @@ namespace CETech
         [STAThread]
         private static void Main()
         {
+            Config.CreateValue("boot_pacakge", "Boot package", "boot");
+            Config.CreateValue("window.title", "main window title", "CETech application");
+            Config.CreateValue("window.width", "main window width", 800);
+            Config.CreateValue("window.height", "main window height", 600);
+
             if (BigInit())
             {
                 ResourceCompiler.CompileAll();

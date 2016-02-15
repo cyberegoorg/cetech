@@ -1,23 +1,25 @@
---local log = require "core/cetech/log"
+local Game = Game or {}
 
---Game = Game or {}
+--local quit_btn = Keyboard.ButtonIndex 'q'
+--local btn = Keyboard.ButtonIndex 'd'
 
---local quit_btn = Keyboard.button_index 'q'
+function Game:init()
+ --    Log.Info("boot.lua", "init")
 
---function Game:init()
-    --log.info("boot.lua", "init")
+  --  Log.Info("boot.lua", "info")
+  --  Log.Warning("boot.lua", "warn")
+  --  Log.Error("boot.lua", "error")
+  --  Log.Debug("boot.lua", "debug")
+end
 
-    --log.info("boot.lua", "info")
-    --log.warn("boot.lua", "warn")
-    --log.error("boot.lua", "error")
-    --log.debug("boot.lua", "debug")
---end
+function Game:shutdown()
+  --  Log.Info("boot.lua", "shutdown")
+end
 
---function Game:shutdown()
-    --log.info("boot.lua", "shutdown")
---end
-
---function Game:update(dt)
+function Game:update(dt)
+--  if Keyboard.ButtonPressed(btn) then
+  --  Log.Info("lua", "DOWN.......")
+  --end
     --local m_axis = Mouse.axis()
     --print("%f, %f", m_axis.x, m_axis.y)
 
@@ -27,4 +29,6 @@
         --print("q")
         --Application.quit()
     --end
---end
+end
+
+return Game
