@@ -46,13 +46,9 @@ namespace CETech
 
             RenderSystem.Init(MainWindow, RenderSystem.BackendType.Default);
 
-            LuaEnviroment.DoResouece(StringId.FromString("lua/boot"));
+            LuaEnviroment.BootScriptInit(StringId.FromString("lua/boot"));
 
-            var init_fce = LuaEnviroment.EnviromentScript.Globals.Get("init");
-            var update_fce = LuaEnviroment.EnviromentScript.Globals.Get("update");
-            var shutdown_fce = LuaEnviroment.EnviromentScript.Globals.Get("shutdown");
-
-            LuaEnviroment.EnviromentScript.Call(init_fce);
+            LuaEnviroment.BootScriptCallInit();
             while (_run)
             {
                 //Debug.Assert(TaskManager.OpenTaskCount < 2);
@@ -67,7 +63,7 @@ namespace CETech
                 TaskManager.AddEnd(new[] {frameTask, keyboardTask, mouseTask});
                 TaskManager.Wait(frameTask);
 
-                LuaEnviroment.EnviromentScript.Call(update_fce, 10);
+                LuaEnviroment.BootScriptCallUpdate(10.0f);
 
                 if (Keyboard.ButtonReleased(Keyboard.ButtonIndex("q")))
                 {
@@ -79,7 +75,7 @@ namespace CETech
                 MainWindow.Update();
             }
 
-            LuaEnviroment.EnviromentScript.Call(shutdown_fce);
+            LuaEnviroment.BootScriptCallShutdown();
 
             MainWindow = null;
 
