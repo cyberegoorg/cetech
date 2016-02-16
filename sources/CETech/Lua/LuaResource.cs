@@ -2,10 +2,20 @@ using System.IO;
 
 namespace CETech.Lua
 {
+    /// <summary>
+    /// Lua script resouce
+    /// </summary>
     public class LuaResource
     {
+        /// <summary>
+        /// Resource type
+        /// </summary>
         public static readonly long Type = StringId.FromString("lua");
 
+        /// <summary>
+        /// Resource compiler
+        /// </summary>
+        /// <param name="capi">Compiler api</param>
         public static void Compile(ResourceCompiler.CompilatorApi capi)
         {
             capi.ResourceFile.CopyTo(capi.BuildFile);
@@ -15,6 +25,11 @@ namespace CETech.Lua
             //script.Dump(script.LoadStream(capi.ResourceFile), capi.BuildFile);
         }
 
+        /// <summary>
+        /// Resource loader
+        /// </summary>
+        /// <param name="input">Resource data stream</param>
+        /// <returns>Resource data</returns>
         public static object ResourceLoader(Stream input)
         {
             using (var ms = new MemoryStream())
@@ -24,14 +39,26 @@ namespace CETech.Lua
             }
         }
 
+        /// <summary>
+        /// Resource offline.
+        /// </summary>
+        /// <param name="data">Data</param>
         public static void ResourceOffline(object data)
         {
         }
 
+        /// <summary>
+        /// Resource online
+        /// </summary>
+        /// <param name="data">Data</param>
         public static void ResourceOnline(object data)
         {
         }
 
+        /// <summary>
+        /// Resource unloader
+        /// </summary>
+        /// <param name="data">data</param>
         public static void ResourceUnloader(object data)
         {
         }

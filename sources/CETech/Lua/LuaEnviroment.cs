@@ -5,6 +5,9 @@ using MoonSharp.Interpreter.Loaders;
 
 namespace CETech.Lua
 {
+    /// <summary>
+    /// Main lua enviroment.
+    /// </summary>
     public static class LuaEnviroment
     {
         private static Script _enviromentScript;
@@ -13,6 +16,9 @@ namespace CETech.Lua
         private static DynValue _updateFce;
         private static DynValue _shutdownFce;
 
+        /// <summary>
+        /// Init lua enviroment
+        /// </summary>
         public static void Init()
         {
             _enviromentScript = new Script();
@@ -28,36 +34,57 @@ namespace CETech.Lua
             _enviromentScript.Globals["PackageManager"] = new PackageManagerApi();
         }
 
+        /// <summary>
+        /// Shutdown lua enviroment
+        /// </summary>
         public static void Shutdown()
         {
             _enviromentScript = null;
         }
 
-        public static void DoResouece(long name)
+        /// <summary>
+        /// Run script
+        /// </summary>
+        /// <param name="name">Script resource name</param>
+        public static void DoResource(long name)
         {
             var ms = new MemoryStream(ResourceManager.Get<byte[]>(LuaResource.Type, name));
             _enviromentScript.DoStream(ms);
         }
 
+        /// <summary>
+        /// Init boot script
+        /// </summary>
+        /// <param name="name">Boot sript name</param>
         public static void BootScriptInit(long name)
         {
-            DoResouece(name);
+            DoResource(name);
 
             _initFce = _enviromentScript.Globals.Get("init");
             _updateFce = _enviromentScript.Globals.Get("update");
             _shutdownFce = _enviromentScript.Globals.Get("shutdown");
         }
 
+        /// <summary>
+        /// Call boot script init fce.
+        /// </summary>
         public static void BootScriptCallInit()
         {
             _enviromentScript.Call(_initFce);
         }
 
+        /// <summary>
+        /// Call boot script update
+        /// </summary>
+        /// <param name="dt">Deltatime</param>
         public static void BootScriptCallUpdate(float dt)
         {
             _enviromentScript.Call(_updateFce, dt);
         }
 
+        /// <summary>
+        /// Call boot script shutdown
+        /// </summary>
         public static void BootScriptCallShutdown()
         {
             _enviromentScript.Call(_shutdownFce);

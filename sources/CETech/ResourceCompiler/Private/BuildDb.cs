@@ -6,12 +6,18 @@ using System.IO;
 
 namespace CETech
 {
+    /// <summary>
+    /// Build DB
+    /// </summary>
     public static class BuildDb
     {
         private static readonly string dbPath = string.Format("Data Source={0}; version=3;",
             Path.Combine(FileSystem.RootDir("build"), "build.db"));
 
 
+        /// <summary>
+        /// Init db
+        /// </summary>
         public static void init_db()
         {
             using (var c = new SQLiteConnection(dbPath))
@@ -54,6 +60,11 @@ namespace CETech
             }
         }
 
+        /// <summary>
+        /// Set file
+        /// </summary>
+        /// <param name="filename">filename</param>
+        /// <param name="mtime">last modified time</param>
         public static void set_file(string filename, DateTime mtime)
         {
             using (var c = new SQLiteConnection(dbPath))
@@ -76,6 +87,11 @@ namespace CETech
             }
         }
 
+        /// <summary>
+        /// Set file depend
+        /// </summary>
+        /// <param name="filename">filename</param>
+        /// <param name="depend_on">depend filename</param>
         public static void set_file_depend(string filename, string depend_on)
         {
             using (var c = new SQLiteConnection(dbPath))
@@ -99,6 +115,11 @@ namespace CETech
             }
         }
 
+        /// <summary>
+        /// Set file hash.
+        /// </summary>
+        /// <param name="filename">filename</param>
+        /// <param name="hash">hash</param>
         public static void set_file_hash(string filename, string hash)
         {
             using (var c = new SQLiteConnection(dbPath))
@@ -121,6 +142,12 @@ namespace CETech
             }
         }
 
+        /// <summary>
+        /// Need compile resource?
+        /// </summary>
+        /// <param name="root">filesystem root</param>
+        /// <param name="filename">filename</param>
+        /// <returns>True if need</returns>
         public static bool need_compile(string root, string filename)
         {
             var compile = true;
