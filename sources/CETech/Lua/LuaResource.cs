@@ -13,7 +13,6 @@ namespace CETech.Lua
             // TODO: COMPILE!!!!
             //var script = new Script();
             //script.Dump(script.LoadStream(capi.ResourceFile), capi.BuildFile);
-
         }
 
         public static object ResourceLoader(Stream input)

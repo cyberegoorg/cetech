@@ -51,7 +51,8 @@ namespace CETech
 
             ResourceManager.RegisterType(StringId.FromString("texture"), delegate { return null; }, delegate { },
                 delegate { }, delegate { });
-            ResourceManager.RegisterType(StringId.FromString("config"), delegate { return null; }, delegate { }, delegate { },
+            ResourceManager.RegisterType(StringId.FromString("config"), delegate { return null; }, delegate { },
+                delegate { },
                 delegate { });
         }
 

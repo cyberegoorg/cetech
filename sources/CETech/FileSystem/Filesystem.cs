@@ -62,7 +62,7 @@ namespace CETech
 
         public static string GetFullPath(string root, string path)
         {
-            return path == null ? _dir_map[root]:  Path.Combine(_dir_map[root], path);
+            return path == null ? _dir_map[root] : Path.Combine(_dir_map[root], path);
         }
     }
 }

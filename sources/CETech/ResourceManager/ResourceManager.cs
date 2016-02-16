@@ -67,7 +67,8 @@ namespace CETech
             {
                 Log.Debug("resource_manager", "Loading resource {0:x}{1:x}", type, names[i]);
 
-                var input = FileSystem.Open("build", string.Format("{0:x}{1:x}", type, names[i]), FileSystem.OpenMode.Read);
+                var input = FileSystem.Open("build", string.Format("{0:x}{1:x}", type, names[i]),
+                    FileSystem.OpenMode.Read);
                 data[i] = _loader_map[type](input);
             }
 
