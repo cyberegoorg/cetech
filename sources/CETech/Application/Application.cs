@@ -65,11 +65,6 @@ namespace CETech
 
                 LuaEnviroment.BootScriptCallUpdate(10.0f);
 
-                if (Keyboard.ButtonReleased(Keyboard.ButtonIndex("q")))
-                {
-                    Quit();
-                }
-
                 RenderSystem.BeginFrame();
                 RenderSystem.EndFrame();
                 MainWindow.Update();
