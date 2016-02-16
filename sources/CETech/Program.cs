@@ -36,10 +36,10 @@ namespace CETech
         private static void InitResouce()
         {
 #if CETECH_DEVELOP
-            ResourceCompiler.registerCompiler(PackageResource.Type, PackageResource.Compile);
-            ResourceCompiler.registerCompiler(LuaResource.Type, LuaResource.Compile);
-            ResourceCompiler.registerCompiler(StringId.FromString("texture"), delegate { });
-            ResourceCompiler.registerCompiler(StringId.FromString("config"), delegate { });
+            ResourceCompiler.RegisterCompiler(PackageResource.Type, PackageResource.Compile);
+            ResourceCompiler.RegisterCompiler(LuaResource.Type, LuaResource.Compile);
+            ResourceCompiler.RegisterCompiler(StringId.FromString("texture"), delegate { });
+            ResourceCompiler.RegisterCompiler(StringId.FromString("config"), delegate { });
 #endif
 
             ResourceManager.RegisterType(PackageResource.Type,

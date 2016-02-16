@@ -6,7 +6,7 @@ namespace CETech.Lua
     {
         public static readonly long Type = StringId.FromString("lua");
 
-        public static void Compile(ResourceCompiler.CompilatorAPI capi)
+        public static void Compile(ResourceCompiler.CompilatorApi capi)
         {
             capi.ResourceFile.CopyTo(capi.BuildFile);
 

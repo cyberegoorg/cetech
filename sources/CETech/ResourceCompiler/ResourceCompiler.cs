@@ -9,11 +9,11 @@ namespace CETech
 {
     public static class ResourceCompiler
     {
-        public delegate void Compiler(CompilatorAPI capi);
+        public delegate void Compiler(CompilatorApi capi);
 
         private static readonly Dictionary<long, Compiler> _compoilerMap = new Dictionary<long, Compiler>();
 
-        public static void registerCompiler(long type, Compiler compiler)
+        public static void RegisterCompiler(long type, Compiler compiler)
         {
             _compoilerMap[type] = compiler;
         }
@@ -21,11 +21,14 @@ namespace CETech
         public static void CompileAll()
         {
             FileSystem.CreateDirectory("build", null);
-            Compille("src");
-            Compille("core");
+
+            BuildDb.init_db();
+
+            CompileRoot("src");
+            CompileRoot("core");
         }
 
-        private static void calcHash(string filename, out long type, out long name)
+        private static void CalcHash(string filename, out long type, out long name)
         {
             var last_idx = filename.LastIndexOf(".", StringComparison.Ordinal);
 
@@ -49,21 +52,26 @@ namespace CETech
                     var build = FileSystem.Open("build", string.Format("{0:x}{1:x}", task.type, task.name),
                         FileSystem.OpenMode.Write))
                 {
-                    var capi = new CompilatorAPI(task.filename, input, build);
+                    var capi = new CompilatorApi(task.filename, input, build);
 
                     task.compiler(capi);
+
+                    BuildDb.set_file(task.filename, FileSystem.FileMTime(task.source_fs, task.filename));
+                    BuildDb.set_file_depend(task.filename, task.filename);
+
                 }
             }
 
             Log.Info("compile_task", "{0} compiled", task.filename);
         }
 
-        private static void Compille(string root)
+        private static void CompileRoot(string root)
         {
             string[] files;
             FileSystem.ListDirectory(root, "", out files);
 
             var topCompileTask = TaskManager.AddNull("compiler");
+           
 
             int[] tasks = {0};
             for (var i = 0; i < files.Length; i++)
@@ -71,10 +79,17 @@ namespace CETech
                 var filename = files[i].Remove(0, FileSystem.RootDir(root).Length + 1);
 
                 long name, type;
-                calcHash(filename, out type, out name);
+                CalcHash(filename, out type, out name);
 
                 Compiler compiler;
                 if (!_compoilerMap.TryGetValue(type, out compiler))
+                {
+                    continue;
+                }
+
+                BuildDb.set_file_hash(filename, string.Format("{0:x}{1:x}", type, name));
+
+                if (!BuildDb.need_compile(root, filename))
                 {
                     continue;
                 }
@@ -97,13 +112,13 @@ namespace CETech
             TaskManager.Wait(topCompileTask);
         }
 
-        public class CompilatorAPI
+        public class CompilatorApi
         {
             public Stream BuildFile;
             public string Filename;
             public Stream ResourceFile;
 
-            public CompilatorAPI(string filename, Stream resourceFile, Stream buildFile)
+            public CompilatorApi(string filename, Stream resourceFile, Stream buildFile)
             {
                 Filename = filename;
                 ResourceFile = resourceFile;
