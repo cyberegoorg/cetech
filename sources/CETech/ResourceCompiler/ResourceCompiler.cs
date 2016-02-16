@@ -58,7 +58,6 @@ namespace CETech
 
                     BuildDb.set_file(task.filename, FileSystem.FileMTime(task.source_fs, task.filename));
                     BuildDb.set_file_depend(task.filename, task.filename);
-
                 }
             }
 
@@ -71,7 +70,7 @@ namespace CETech
             FileSystem.ListDirectory(root, "", out files);
 
             var topCompileTask = TaskManager.AddNull("compiler");
-           
+
 
             int[] tasks = {0};
             for (var i = 0; i < files.Length; i++)

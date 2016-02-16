@@ -34,7 +34,7 @@ namespace CETech
                 var name_idx = 0;
                 foreach (var name in sequence.Children)
                 {
-                    var nameid = StringId.FromString(((YamlScalarNode)name).Value);
+                    var nameid = StringId.FromString(((YamlScalarNode) name).Value);
 
                     pack.Names[idx][name_idx] = nameid;
                     ++name_idx;
