@@ -3,7 +3,7 @@ using SharpBgfx;
 
 namespace CETech
 {
-    public static partial class Renderer
+    public static partial class RenderSystem
     {
         private static Data _data;
 
