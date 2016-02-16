@@ -52,7 +52,7 @@ namespace CETech
                     var build = FileSystem.Open("build", string.Format("{0:x}{1:x}", task.type, task.name),
                         FileSystem.OpenMode.Write))
                 {
-                    var capi = new CompilatorApi(task.filename, input, build);
+                    var capi = new CompilatorApi(task.filename, input, build, task.source_fs);
 
                     task.compiler(capi);
 
@@ -117,11 +117,20 @@ namespace CETech
             public string Filename;
             public Stream ResourceFile;
 
-            public CompilatorApi(string filename, Stream resourceFile, Stream buildFile)
+            private string _sourceRoot;
+
+            public CompilatorApi(string filename, Stream resourceFile, Stream buildFile, string sourceRoot)
             {
                 Filename = filename;
                 ResourceFile = resourceFile;
                 BuildFile = buildFile;
+                _sourceRoot = sourceRoot;
+            }
+
+            public void add_dependency(string path)
+            {
+                BuildDb.set_file(path, FileSystem.FileMTime(_sourceRoot, path));
+                BuildDb.set_file_depend(Filename, path);
             }
         }
 
