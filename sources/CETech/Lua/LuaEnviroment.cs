@@ -21,8 +21,11 @@ namespace CETech.Lua
             _enviromentScript.Options.ScriptLoader = new ScriptLoader {ModulePaths = new[] {"?"}};
             _enviromentScript.Options.UseLuaErrorLocations = true;
 
+            _enviromentScript.Globals["Application"] = new ApplicationApi();
             _enviromentScript.Globals["Log"] = new LogApi();
             _enviromentScript.Globals["Keyboard"] = new KeyboardApi();
+            _enviromentScript.Globals["Mouse"] = new MouseApi();
+            _enviromentScript.Globals["PackageManager"] = new PackageManagerApi();
         }
 
         public static void Shutdown()

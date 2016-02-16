@@ -115,6 +115,9 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Lua\Api\ApplicationApi.cs" />
+    <Compile Include="Lua\Api\PackageManagerApi.cs" />
+    <Compile Include="Lua\Api\MouseApi.cs" />
     <Compile Include="Lua\Api\KeyboardApi.cs" />
     <Compile Include="Lua\Api\LogApi.cs" />
     <Compile Include="Lua\LuaEnviroment.cs" />
