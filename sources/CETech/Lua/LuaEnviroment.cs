@@ -7,29 +7,57 @@ namespace CETech.Lua
 {
     public static class LuaEnviroment
     {
-        public static Script EnviromentScript { get; private set; }
+        private static Script _enviromentScript;
+
+        private static DynValue _initFce;
+        private static DynValue _updateFce;
+        private static DynValue _shutdownFce;
 
         public static void Init()
         {
-            EnviromentScript = new Script();
+            _enviromentScript = new Script();
             UserData.RegisterAssembly();
 
-            EnviromentScript.Options.ScriptLoader = new ScriptLoader {ModulePaths = new[] {"?"}};
-            EnviromentScript.Options.UseLuaErrorLocations = true;
+            _enviromentScript.Options.ScriptLoader = new ScriptLoader {ModulePaths = new[] {"?"}};
+            _enviromentScript.Options.UseLuaErrorLocations = true;
 
-            EnviromentScript.Globals["Log"] = new LogApi();
-            EnviromentScript.Globals["Keyboard"] = new KeyboardApi();
+            _enviromentScript.Globals["Log"] = new LogApi();
+            _enviromentScript.Globals["Keyboard"] = new KeyboardApi();
         }
 
         public static void Shutdown()
         {
-            EnviromentScript = null;
+            _enviromentScript = null;
         }
 
         public static void DoResouece(long name)
         {
             var ms = new MemoryStream(ResourceManager.Get<byte[]>(LuaResource.Type, name));
-            EnviromentScript.DoStream(ms);
+            _enviromentScript.DoStream(ms);
+        }
+
+        public static void BootScriptInit(long name)
+        {
+            DoResouece(name);
+
+            _initFce = _enviromentScript.Globals.Get("init");
+            _updateFce = _enviromentScript.Globals.Get("update");
+            _shutdownFce = _enviromentScript.Globals.Get("shutdown");
+        }
+
+        public static void BootScriptCallInit()
+        {
+            _enviromentScript.Call(_initFce);
+        }
+
+        public static void BootScriptCallUpdate(float dt)
+        {
+            _enviromentScript.Call(_updateFce, dt);
+        }
+
+        public static void BootScriptCallShutdown()
+        {
+            _enviromentScript.Call(_shutdownFce);
         }
 
         private class ScriptLoader : ScriptLoaderBase
