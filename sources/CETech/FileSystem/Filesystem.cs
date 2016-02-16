@@ -26,17 +26,23 @@ namespace CETech
 
         public static Stream Open(string root, string path, OpenMode mode)
         {
-            return new FileStream(get_full_path(root, path), toFileFileMode(mode));
+            return new FileStream(GetFullPath(root, path), toFileFileMode(mode));
         }
 
         public static void ListDirectory(string root, string path, out string[] files)
         {
-            files = Directory.GetFiles(get_full_path(root, path), "*", SearchOption.AllDirectories);
+            files = Directory.GetFiles(GetFullPath(root, path), "*", SearchOption.AllDirectories);
         }
 
         public static void CreateDirectory(string root, string path)
         {
-            Directory.CreateDirectory(get_full_path(root, path));
+            Directory.CreateDirectory(GetFullPath(root, path));
+        }
+
+
+        public static DateTime FileMTime(string root, string path)
+        {
+            return File.GetLastWriteTimeUtc(GetFullPath(root, path));
         }
 
         private static FileMode toFileFileMode(OpenMode mode)
@@ -54,14 +60,9 @@ namespace CETech
             }
         }
 
-        private static string get_full_path(string root, string path)
+        public static string GetFullPath(string root, string path)
         {
-            if (path == null)
-            {
-                return _dir_map[root];
-            }
-
-            return Path.Combine(_dir_map[root], path);
+            return path == null ? _dir_map[root]:  Path.Combine(_dir_map[root], path);
         }
     }
 }

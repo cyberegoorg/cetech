@@ -8,7 +8,7 @@ namespace CETech
     {
         public static readonly long Type = StringId.FromString("package");
 
-        public static void Compile(ResourceCompiler.CompilatorAPI capi)
+        public static void Compile(ResourceCompiler.CompilatorApi capi)
         {
             TextReader input = new StreamReader(capi.ResourceFile);
             var yaml = new YamlStream();
