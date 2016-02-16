@@ -119,7 +119,7 @@
     <Compile Include="Lua\Api\LogApi.cs" />
     <Compile Include="Lua\LuaEnviroment.cs" />
     <Compile Include="Lua\LuaResource.cs" />
-    <Compile Include="ResourceCompiler\BuildDb.cs" />
+    <Compile Include="ResourceCompiler\Private\BuildDb.cs" />
     <Compile Include="Utils\Config.cs" />
     <Compile Include="FileSystem\FileSystem.cs" />
     <Compile Include="Input\Mouse.cs" />
