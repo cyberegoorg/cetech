@@ -1,9 +1,9 @@
 ﻿namespace CETech
 {
     /// <summary>
-    ///     Renderer system
+    ///     Render system
     /// </summary>
-    public static partial class Renderer
+    public static partial class RenderSystem
     {
         /// <summary>
         ///     Render backend type.

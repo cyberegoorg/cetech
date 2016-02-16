@@ -44,7 +44,7 @@ namespace CETech
                 WindowPos.Centered, WindowPos.Centered,
                 Config.GetValueInt("window.width"), Config.GetValueInt("window.height"), 0);
 
-            Renderer.Init(MainWindow, Renderer.BackendType.Default);
+            RenderSystem.Init(MainWindow, RenderSystem.BackendType.Default);
 
             LuaEnviroment.DoResouece(StringId.FromString("lua/boot"));
 
@@ -74,8 +74,8 @@ namespace CETech
                     Quit();
                 }
 
-                Renderer.BeginFrame();
-                Renderer.EndFrame();
+                RenderSystem.BeginFrame();
+                RenderSystem.EndFrame();
                 MainWindow.Update();
             }
 
