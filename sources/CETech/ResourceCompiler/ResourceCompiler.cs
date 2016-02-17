@@ -152,10 +152,9 @@ namespace CETech
             ///     Create compilator api.
             /// </summary>
             /// <param name="filename">Source filename</param>
-            /// <param name="resourceFile">
-            ///     Source stream/param>
-            ///     <param name="buildFile">Compiled resource stream</param>
-            ///     <param name="sourceRoot">Source file root</param>
+            /// <param name="resourceFile">Source stream</param>
+            /// <param name="buildFile">Compiled resource stream</param>
+            /// <param name="sourceRoot">Source file root</param>
             public CompilatorApi(string filename, Stream resourceFile, Stream buildFile, string sourceRoot)
             {
                 Filename = filename;
