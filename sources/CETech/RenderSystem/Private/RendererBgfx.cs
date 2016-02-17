@@ -43,7 +43,7 @@ namespace CETech
             }
         }
 
-        private static void PlatformInit(Window window, BackendType type)
+        private static void InitImpl(Window window, BackendType type)
         {
             Bgfx.SetWindowHandle(window.NativeWindowPtr);
             Bgfx.Init(ToRendererBackend(type));
@@ -52,7 +52,7 @@ namespace CETech
             Resize(window.Width, window.Height);
         }
 
-        private static void PlatformBeginFrame()
+        private static void BeginFrameImpl()
         {
             if (_data.NeedResize)
             {
@@ -71,12 +71,12 @@ namespace CETech
             Bgfx.Submit(0, SharpBgfx.Program.Invalid);
         }
 
-        private static void PlatformEndFrame()
+        private static void EndFrameImpl()
         {
             Bgfx.Frame();
         }
 
-        private static void PlatformResize(int width, int height)
+        private static void ResizeImpl(int width, int height)
         {
             _data.NeedResize = true;
             _data.ResizeW = width;

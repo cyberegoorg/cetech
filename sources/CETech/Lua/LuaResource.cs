@@ -3,17 +3,17 @@ using System.IO;
 namespace CETech.Lua
 {
     /// <summary>
-    /// Lua script resouce
+    ///     Lua script resouce
     /// </summary>
     public class LuaResource
     {
         /// <summary>
-        /// Resource type
+        ///     Resource type
         /// </summary>
         public static readonly long Type = StringId.FromString("lua");
 
         /// <summary>
-        /// Resource compiler
+        ///     Resource compiler
         /// </summary>
         /// <param name="capi">Compiler api</param>
         public static void Compile(ResourceCompiler.CompilatorApi capi)
@@ -26,7 +26,7 @@ namespace CETech.Lua
         }
 
         /// <summary>
-        /// Resource loader
+        ///     Resource loader
         /// </summary>
         /// <param name="input">Resource data stream</param>
         /// <returns>Resource data</returns>
@@ -40,7 +40,7 @@ namespace CETech.Lua
         }
 
         /// <summary>
-        /// Resource offline.
+        ///     Resource offline.
         /// </summary>
         /// <param name="data">Data</param>
         public static void ResourceOffline(object data)
@@ -48,7 +48,7 @@ namespace CETech.Lua
         }
 
         /// <summary>
-        /// Resource online
+        ///     Resource online
         /// </summary>
         /// <param name="data">Data</param>
         public static void ResourceOnline(object data)
@@ -56,7 +56,7 @@ namespace CETech.Lua
         }
 
         /// <summary>
-        /// Resource unloader
+        ///     Resource unloader
         /// </summary>
         /// <param name="data">data</param>
         public static void ResourceUnloader(object data)

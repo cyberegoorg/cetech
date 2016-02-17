@@ -23,7 +23,7 @@ namespace CETech
             Width = width;
             Height = height;
 
-            PlatformCtor(title, x, y, width, height, flags);
+            CtorImpl(title, x, y, width, height, flags);
         }
 
         /// <summary>
@@ -35,7 +35,7 @@ namespace CETech
             set
             {
                 _title = value;
-                PlarformSetTitle(value);
+                SetTitleImpl(value);
             }
         }
 
@@ -44,7 +44,7 @@ namespace CETech
         /// </summary>
         public IntPtr NativeWindowPtr
         {
-            get { return PlatformNativePtr(); }
+            get { return GetNativePtrImpl(); }
         }
 
         /// <summary>
@@ -62,7 +62,7 @@ namespace CETech
         /// </summary>
         public void Update()
         {
-            PlatformUpdate();
+            UpdateImpl();
         }
 
         /// <summary>
@@ -72,7 +72,7 @@ namespace CETech
         /// <param name="height">Height</param>
         public void Resize(int width, int height)
         {
-            PlatformResize(width, height);
+            ResizeImpl(width, height);
             Width = width;
             Height = height;
         }
@@ -82,7 +82,7 @@ namespace CETech
         /// </summary>
         ~Window()
         {
-            PlatformDtor();
+            DtorImpl();
         }
     }
 }

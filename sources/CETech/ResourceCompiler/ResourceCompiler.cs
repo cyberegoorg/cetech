@@ -7,17 +7,32 @@ using CETech.Utils;
 
 namespace CETech
 {
+    /// <summary>
+    ///     Resources compiler
+    /// </summary>
     public static class ResourceCompiler
     {
+        /// <summary>
+        ///     Compiler delegate
+        /// </summary>
+        /// <param name="capi">Compiler api</param>
         public delegate void Compiler(CompilatorApi capi);
 
         private static readonly Dictionary<long, Compiler> _compoilerMap = new Dictionary<long, Compiler>();
 
+        /// <summary>
+        ///     Register compiler for type
+        /// </summary>
+        /// <param name="type">Type</param>
+        /// <param name="compiler">Compiler delegate</param>
         public static void RegisterCompiler(long type, Compiler compiler)
         {
             _compoilerMap[type] = compiler;
         }
 
+        /// <summary>
+        ///     Compile all resource
+        /// </summary>
         public static void CompileAll()
         {
             FileSystem.CreateDirectory("build", null);
@@ -44,24 +59,24 @@ namespace CETech
         {
             var task = (CompileTask) data;
 
-            Log.Info("compile_task", "Compile {0} => {1:x}{2:x}", task.filename, task.type, task.name);
+            Log.Info("compile_task", "Compile {0} => {1:x}{2:x}", task.Filename, task.Type, task.Name);
 
-            using (var input = FileSystem.Open(task.source_fs, task.filename, FileSystem.OpenMode.Read))
+            using (var input = FileSystem.Open(task.SourceFs, task.Filename, FileSystem.OpenMode.Read))
             {
                 using (
-                    var build = FileSystem.Open("build", string.Format("{0:x}{1:x}", task.type, task.name),
+                    var build = FileSystem.Open("build", string.Format("{0:x}{1:x}", task.Type, task.Name),
                         FileSystem.OpenMode.Write))
                 {
-                    var capi = new CompilatorApi(task.filename, input, build, task.source_fs);
+                    var capi = new CompilatorApi(task.Filename, input, build, task.SourceFs);
 
-                    task.compiler(capi);
+                    task.Compiler(capi);
 
-                    BuildDb.set_file(task.filename, FileSystem.FileMTime(task.source_fs, task.filename));
-                    BuildDb.set_file_depend(task.filename, task.filename);
+                    BuildDb.set_file(task.Filename, FileSystem.GetFileMTime(task.SourceFs, task.Filename));
+                    BuildDb.set_file_depend(task.Filename, task.Filename);
                 }
             }
 
-            Log.Info("compile_task", "{0} compiled", task.filename);
+            Log.Info("compile_task", "{0} compiled", task.Filename);
         }
 
         private static void CompileRoot(string root)
@@ -75,7 +90,7 @@ namespace CETech
             int[] tasks = {0};
             for (var i = 0; i < files.Length; i++)
             {
-                var filename = files[i].Remove(0, FileSystem.RootDir(root).Length + 1);
+                var filename = files[i].Remove(0, FileSystem.GetRootDir(root).Length + 1);
 
                 long name, type;
                 CalcHash(filename, out type, out name);
@@ -95,11 +110,11 @@ namespace CETech
 
                 var task = new CompileTask
                 {
-                    compiler = compiler,
-                    filename = filename,
-                    name = name,
-                    type = type,
-                    source_fs = root
+                    Compiler = compiler,
+                    Filename = filename,
+                    Name = name,
+                    Type = type,
+                    SourceFs = root
                 };
 
                 tasks[0] = TaskManager.AddBegin("compile_task", compile_task, task, parent: topCompileTask);
@@ -111,14 +126,36 @@ namespace CETech
             TaskManager.Wait(topCompileTask);
         }
 
+        /// <summary>
+        ///     Compilator api
+        /// </summary>
         public class CompilatorApi
         {
-            public Stream BuildFile;
+            private readonly string _sourceRoot;
+
+            /// <summary>
+            ///     Compiled resource stream
+            /// </summary>
+            public readonly Stream BuildFile;
+
+            /// <summary>
+            ///     Source stream
+            /// </summary>
+            public readonly Stream ResourceFile;
+
+            /// <summary>
+            ///     Source filename
+            /// </summary>
             public string Filename;
-            public Stream ResourceFile;
 
-            private string _sourceRoot;
-
+            /// <summary>
+            ///     Create compilator api.
+            /// </summary>
+            /// <param name="filename">Source filename</param>
+            /// <param name="resourceFile">
+            ///     Source stream/param>
+            ///     <param name="buildFile">Compiled resource stream</param>
+            ///     <param name="sourceRoot">Source file root</param>
             public CompilatorApi(string filename, Stream resourceFile, Stream buildFile, string sourceRoot)
             {
                 Filename = filename;
@@ -127,21 +164,25 @@ namespace CETech
                 _sourceRoot = sourceRoot;
             }
 
+            /// <summary>
+            ///     Add resource dependency
+            /// </summary>
+            /// <param name="path"></param>
             public void add_dependency(string path)
             {
-                BuildDb.set_file(path, FileSystem.FileMTime(_sourceRoot, path));
+                BuildDb.set_file(path, FileSystem.GetFileMTime(_sourceRoot, path));
                 BuildDb.set_file_depend(Filename, path);
             }
         }
 
         internal struct CompileTask
         {
-            public Compiler compiler;
-            public string source_fs;
+            public Compiler Compiler;
+            public string SourceFs;
 
-            public string filename;
-            public long name;
-            public long type;
+            public string Filename;
+            public long Name;
+            public long Type;
         }
     }
 }

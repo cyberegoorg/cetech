@@ -7,16 +7,16 @@ using System.IO;
 namespace CETech
 {
     /// <summary>
-    /// Build DB
+    ///     Build DB
     /// </summary>
     public static class BuildDb
     {
         private static readonly string dbPath = string.Format("Data Source={0}; version=3;",
-            Path.Combine(FileSystem.RootDir("build"), "build.db"));
+            Path.Combine(FileSystem.GetRootDir("build"), "build.db"));
 
 
         /// <summary>
-        /// Init db
+        ///     Init db
         /// </summary>
         public static void init_db()
         {
@@ -61,7 +61,7 @@ namespace CETech
         }
 
         /// <summary>
-        /// Set file
+        ///     Set file
         /// </summary>
         /// <param name="filename">filename</param>
         /// <param name="mtime">last modified time</param>
@@ -88,7 +88,7 @@ namespace CETech
         }
 
         /// <summary>
-        /// Set file depend
+        ///     Set file depend
         /// </summary>
         /// <param name="filename">filename</param>
         /// <param name="depend_on">depend filename</param>
@@ -116,7 +116,7 @@ namespace CETech
         }
 
         /// <summary>
-        /// Set file hash.
+        ///     Set file hash.
         /// </summary>
         /// <param name="filename">filename</param>
         /// <param name="hash">hash</param>
@@ -143,7 +143,7 @@ namespace CETech
         }
 
         /// <summary>
-        /// Need compile resource?
+        ///     Need compile resource?
         /// </summary>
         /// <param name="root">filesystem root</param>
         /// <param name="filename">filename</param>
@@ -179,7 +179,7 @@ namespace CETech
                             {
                                 compile = false;
 
-                                var actual_mtime = FileSystem.FileMTime(root, rdr.GetString(0));
+                                var actual_mtime = FileSystem.GetFileMTime(root, rdr.GetString(0));
                                 var last_mtime = rdr.GetDateTime(1).ToUniversalTime();
 
                                 if (actual_mtime != last_mtime)
