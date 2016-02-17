@@ -1,7 +1,15 @@
 ﻿namespace CETech
 {
+    /// <summary>
+    ///     String id
+    /// </summary>
     public static class StringId
     {
+        /// <summary>
+        ///     Get stringid from string
+        /// </summary>
+        /// <param name="str">String</param>
+        /// <returns>String id</returns>
         public static long FromString(string str)
         {
             var s1 = str.Substring(0, str.Length/2);
@@ -10,11 +18,6 @@
             var x = (long) s1.GetHashCode() << 0x20 | s2.GetHashCode();
 
             return x;
-        }
-
-        public static string ToHexString(long stringid)
-        {
-            return string.Format("{0:x}", stringid);
         }
     }
 }

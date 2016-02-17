@@ -5,17 +5,34 @@ using CETech.Utils;
 
 namespace CETech
 {
+    /// <summary>
+    ///     Resource manager
+    /// </summary>
     public static class ResourceManager
     {
+        /// <summary>
+        ///     Resource loader delegate
+        /// </summary>
+        /// <param name="input">Resource input</param>
         public delegate object ResourceLoader(Stream input);
 
+        /// <summary>
+        ///     Resource offline delegate.
+        /// </summary>
+        /// <param name="data">Resource data</param>
         public delegate void ResourceOffline(object data);
 
+        /// <summary>
+        ///     Resource online delegate.
+        /// </summary>
+        /// <param name="data">Resource data</param>
         public delegate void ResourceOnline(object data);
 
+        /// <summary>
+        ///     Resource unloader delegate.
+        /// </summary>
+        /// <param name="data">Resource data</param>
         public delegate void ResourceUnloader(object data);
-
-        public static bool _autoReload;
 
         private static readonly Dictionary<long, ResourceLoader> _loader_map =
             new Dictionary<long, ResourceLoader>();
@@ -36,14 +53,21 @@ namespace CETech
 
         private static readonly List<Dictionary<long, int>> _ref_map = new List<Dictionary<long, int>>();
 
-        private static SpinLock _add_lock = new SpinLock();
+        private static SpinLock _addLock = new SpinLock();
 
-        public static bool AutoReload
-        {
-            get { return _autoReload; }
-            set { _autoReload = value; }
-        }
+        /// <summary>
+        ///     Auto load
+        /// </summary>
+        public static bool AutoLoad { get; set; }
 
+        /// <summary>
+        ///     Register resource type
+        /// </summary>
+        /// <param name="type">Type name</param>
+        /// <param name="loader">Loader delegate</param>
+        /// <param name="unloader">Unloader delegate</param>
+        /// <param name="online">Online delegate</param>
+        /// <param name="offline">Offline delegate</param>
         public static void RegisterType(long type, ResourceLoader loader, ResourceUnloader unloader,
             ResourceOnline online, ResourceOffline offline)
         {
@@ -59,6 +83,12 @@ namespace CETech
             _offline_map[type] = offline;
         }
 
+        /// <summary>
+        ///     Load resources.
+        /// </summary>
+        /// <param name="type">Resource type</param>
+        /// <param name="names">Resource names</param>
+        /// <returns>Loaded resource data</returns>
         public static object[] Load(long type, long[] names)
         {
             var data = new object[names.Length];
@@ -75,6 +105,12 @@ namespace CETech
             return data;
         }
 
+        /// <summary>
+        ///     Add loaded resources
+        /// </summary>
+        /// <param name="loaded_data">Loaded data</param>
+        /// <param name="type">Resource type</param>
+        /// <param name="names">Resource names</param>
         public static void AddLoaded(object[] loaded_data, long type, long[] names)
         {
             var online = _online_map[type];
@@ -83,11 +119,11 @@ namespace CETech
             var gotLock = false;
             try
             {
-                _add_lock.Enter(ref gotLock);
+                _addLock.Enter(ref gotLock);
 
                 for (var i = 0; i < names.Length; i++)
                 {
-                    incRef(idx, names[i]);
+                    IncRef(idx, names[i]);
 
                     _data_map[idx][names[i]] = loaded_data[i];
 
@@ -96,30 +132,27 @@ namespace CETech
             }
             finally
             {
-                if (gotLock) _add_lock.Exit();
+                if (gotLock) _addLock.Exit();
             }
         }
 
+        /// <summary>
+        ///     Load resource now.
+        /// </summary>
+        /// <param name="type">Resource type</param>
+        /// <param name="names">Resource names</param>
         public static void LoadNow(long type, long[] names)
         {
             var loaded_data = Load(type, names);
             AddLoaded(loaded_data, type, names);
         }
 
-        public static bool CanGet(long type, long[] names)
-        {
-            var idx = _types_map[type];
-            for (var i = 0; i < names.Length; i++)
-            {
-                if (!_data_map[idx].ContainsKey(names[i]))
-                {
-                    return false;
-                }
-            }
 
-            return true;
-        }
-
+        /// <summary>
+        ///     Unload resource
+        /// </summary>
+        /// <param name="type">Resource type</param>
+        /// <param name="names">Resource names</param>
         public static void Unload(long type, long[] names)
         {
             var offline = _offline_map[type];
@@ -134,7 +167,7 @@ namespace CETech
 
             for (var i = 0; i < names.Length; i++)
             {
-                if (decRef(idx, names[i]))
+                if (DecRef(idx, names[i]))
                 {
                     unloader(_data_map[idx][names[i]]);
 
@@ -144,7 +177,47 @@ namespace CETech
             }
         }
 
-        private static void incRef(int type_idx, long name)
+        /// <summary>
+        ///     Can get resources?
+        /// </summary>
+        /// <param name="type">Resource type</param>
+        /// <param name="names">Resource names</param>
+        /// <returns>True if can</returns>
+        public static bool CanGet(long type, long[] names)
+        {
+            var idx = _types_map[type];
+            for (var i = 0; i < names.Length; i++)
+            {
+                if (!_data_map[idx].ContainsKey(names[i]))
+                {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        /// <summary>
+        ///     Get resource data.
+        /// </summary>
+        /// <param name="type"></param>
+        /// <param name="name"></param>
+        /// <typeparam name="T"></typeparam>
+        /// <returns></returns>
+        public static T Get<T>(long type, long name)
+        {
+            long[] names = {name};
+
+            if (AutoLoad && !CanGet(type, names))
+            {
+                LoadNow(type, names);
+            }
+
+            var idx = _types_map[type];
+            return (T) _data_map[idx][name];
+        }
+
+        private static void IncRef(int type_idx, long name)
         {
             int counter;
 
@@ -156,24 +229,11 @@ namespace CETech
             _ref_map[type_idx][name] = counter + 1;
         }
 
-        private static bool decRef(int type_idx, long name)
+        private static bool DecRef(int type_idx, long name)
         {
             _ref_map[type_idx][name] -= 1;
 
             return _ref_map[type_idx][name] == 0;
-        }
-
-        public static T Get<T>(long type, long name)
-        {
-            long[] names = {name};
-
-            if (_autoReload && !CanGet(type, names))
-            {
-                LoadNow(type, names);
-            }
-
-            var idx = _types_map[type];
-            return (T) _data_map[idx][name];
         }
     }
 }

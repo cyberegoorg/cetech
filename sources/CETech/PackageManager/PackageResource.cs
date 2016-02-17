@@ -4,10 +4,20 @@ using YamlDotNet.RepresentationModel;
 
 namespace CETech
 {
+    /// <summary>
+    ///     Package resource
+    /// </summary>
     public class PackageResource
     {
+        /// <summary>
+        ///     Resource type
+        /// </summary>
         public static readonly long Type = StringId.FromString("package");
 
+        /// <summary>
+        ///     Resource compiler
+        /// </summary>
+        /// <param name="capi">Compiler api</param>
         public static void Compile(ResourceCompiler.CompilatorApi capi)
         {
             TextReader input = new StreamReader(capi.ResourceFile);
@@ -47,27 +57,54 @@ namespace CETech
             serializer.Pack(capi.BuildFile, pack);
         }
 
+        /// <summary>
+        ///     Resource loader
+        /// </summary>
+        /// <param name="input">Resource data stream</param>
+        /// <returns>Resource data</returns>
         public static object ResourceLoader(Stream input)
         {
             var serializer = MessagePackSerializer.Get<Resource>();
             return serializer.Unpack(input);
         }
 
+        /// <summary>
+        ///     Resource offline.
+        /// </summary>
+        /// <param name="data">Data</param>
         public static void ResourceOffline(object data)
         {
         }
 
+        /// <summary>
+        ///     Resource online
+        /// </summary>
+        /// <param name="data">Data</param>
         public static void ResourceOnline(object data)
         {
         }
 
+        /// <summary>
+        ///     Resource unloader
+        /// </summary>
+        /// <param name="data">data</param>
         public static void ResourceUnloader(object data)
         {
         }
 
+        /// <summary>
+        ///     Package resouce format
+        /// </summary>
         public struct Resource
         {
+            /// <summary>
+            ///     Types
+            /// </summary>
             public long[] Type;
+
+            /// <summary>
+            ///     [type][name, name, ...]
+            /// </summary>
             public long[][] Names;
         }
     }

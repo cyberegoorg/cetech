@@ -2,6 +2,9 @@
 
 namespace CETech
 {
+    /// <summary>
+    ///     Package manager
+    /// </summary>
     public class PackageManager
     {
         private static void package_task(object data)
@@ -13,6 +16,10 @@ namespace CETech
         }
 
 
+        /// <summary>
+        ///     Load package
+        /// </summary>
+        /// <param name="name">Package name</param>
         public static void Load(long name)
         {
             var pack = ResourceManager.Get<PackageResource.Resource>(PackageResource.Type, name);
@@ -32,6 +39,10 @@ namespace CETech
             }
         }
 
+        /// <summary>
+        ///     Unload package
+        /// </summary>
+        /// <param name="name">Package name</param>
         public static void Unload(long name)
         {
             var pack = ResourceManager.Get<PackageResource.Resource>(PackageResource.Type, name);
@@ -42,6 +53,11 @@ namespace CETech
             }
         }
 
+        /// <summary>
+        ///     Is package is loaded?
+        /// </summary>
+        /// <param name="name">Package name</param>
+        /// <returns></returns>
         public static bool IsLoaded(long name)
         {
             var pack = ResourceManager.Get<PackageResource.Resource>(PackageResource.Type, name);
@@ -57,6 +73,10 @@ namespace CETech
             return true;
         }
 
+        /// <summary>
+        ///     Wait for package load done.
+        /// </summary>
+        /// <param name="name">Package name</param>
         public static void Flush(long name)
         {
             while (!IsLoaded(name))

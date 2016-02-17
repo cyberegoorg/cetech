@@ -9,7 +9,7 @@ namespace CETech
     {
         private IntPtr _windowPtr;
 
-        private void PlatformCtor(string title, WindowPos x, WindowPos y, int width, int height, int flags)
+        private void CtorImpl(string title, WindowPos x, WindowPos y, int width, int height, int flags)
         {
             _windowPtr = SDL.SDL_CreateWindow(title, sdl_pos(x), sdl_pos(x), width, height, sdl_flags(flags));
 
@@ -46,12 +46,12 @@ namespace CETech
             return sdlFlags;
         }
 
-        private void PlarformSetTitle(string value)
+        private void SetTitleImpl(string value)
         {
             SDL.SDL_SetWindowTitle(_windowPtr, value);
         }
 
-        private IntPtr PlatformNativePtr()
+        private IntPtr GetNativePtrImpl()
         {
             var wmi = new SDL.SDL_SysWMinfo();
             SDL.SDL_GetWindowWMInfo(_windowPtr, ref wmi);
@@ -59,17 +59,17 @@ namespace CETech
             return wmi.info.win.window;
         }
 
-        private void PlatformResize(int width, int height)
+        private void ResizeImpl(int width, int height)
         {
             SDL.SDL_SetWindowSize(_windowPtr, width, height);
         }
 
-        private void PlatformDtor()
+        private void DtorImpl()
         {
             SDL.SDL_DestroyWindow(_windowPtr);
         }
 
-        private void PlatformUpdate()
+        private void UpdateImpl()
         {
             SDL.SDL_UpdateWindowSurface(_windowPtr);
         }

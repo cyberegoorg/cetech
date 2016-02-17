@@ -64,7 +64,7 @@
         /// <param name="type">Render backend</param>
         public static void Init(Window window, BackendType type)
         {
-            PlatformInit(window, type);
+            InitImpl(window, type);
         }
 
         /// <summary>
@@ -72,7 +72,7 @@
         /// </summary>
         public static void BeginFrame()
         {
-            PlatformBeginFrame();
+            BeginFrameImpl();
         }
 
         /// <summary>
@@ -80,7 +80,7 @@
         /// </summary>
         public static void EndFrame()
         {
-            PlatformEndFrame();
+            EndFrameImpl();
         }
 
         /// <summary>
@@ -90,7 +90,7 @@
         /// <param name="height">New height</param>
         public static void Resize(int width, int height)
         {
-            PlatformResize(width, height);
+            ResizeImpl(width, height);
         }
     }
 }

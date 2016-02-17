@@ -5,7 +5,6 @@ namespace CETech.Lua.Api
     [MoonSharpUserData]
     internal class PackageManagerApi
     {
-
         public static void Load(long name)
         {
             PackageManager.Load(name);
@@ -25,6 +24,5 @@ namespace CETech.Lua.Api
         {
             PackageManager.Flush(name);
         }
-
     }
 }

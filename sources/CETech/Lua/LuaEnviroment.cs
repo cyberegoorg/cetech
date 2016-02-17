@@ -6,7 +6,7 @@ using MoonSharp.Interpreter.Loaders;
 namespace CETech.Lua
 {
     /// <summary>
-    /// Main lua enviroment.
+    ///     Main lua enviroment.
     /// </summary>
     public static class LuaEnviroment
     {
@@ -17,7 +17,7 @@ namespace CETech.Lua
         private static DynValue _shutdownFce;
 
         /// <summary>
-        /// Init lua enviroment
+        ///     Init lua enviroment
         /// </summary>
         public static void Init()
         {
@@ -35,7 +35,7 @@ namespace CETech.Lua
         }
 
         /// <summary>
-        /// Shutdown lua enviroment
+        ///     Shutdown lua enviroment
         /// </summary>
         public static void Shutdown()
         {
@@ -43,7 +43,7 @@ namespace CETech.Lua
         }
 
         /// <summary>
-        /// Run script
+        ///     Run script
         /// </summary>
         /// <param name="name">Script resource name</param>
         public static void DoResource(long name)
@@ -53,7 +53,7 @@ namespace CETech.Lua
         }
 
         /// <summary>
-        /// Init boot script
+        ///     Init boot script
         /// </summary>
         /// <param name="name">Boot sript name</param>
         public static void BootScriptInit(long name)
@@ -66,7 +66,7 @@ namespace CETech.Lua
         }
 
         /// <summary>
-        /// Call boot script init fce.
+        ///     Call boot script init fce.
         /// </summary>
         public static void BootScriptCallInit()
         {
@@ -74,7 +74,7 @@ namespace CETech.Lua
         }
 
         /// <summary>
-        /// Call boot script update
+        ///     Call boot script update
         /// </summary>
         /// <param name="dt">Deltatime</param>
         public static void BootScriptCallUpdate(float dt)
@@ -83,7 +83,7 @@ namespace CETech.Lua
         }
 
         /// <summary>
-        /// Call boot script shutdown
+        ///     Call boot script shutdown
         /// </summary>
         public static void BootScriptCallShutdown()
         {
