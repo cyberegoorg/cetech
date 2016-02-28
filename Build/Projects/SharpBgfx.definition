@@ -1,0 +1,9 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ExternalProject Name="SharpBgfx">
+  <Binary
+    Name="ExternalLib"
+    Path="externals\build\SharpBgfx\Windows\x64\SharpBgfx.dll" />
+
+  <NativeBinary Path="externals\build\bgfx\Windows\x64\bgfx.dll" />
+
+</ExternalProject>

@@ -5,7 +5,7 @@
     <Platform Condition=" '$(Platform)' == '' ">x86</Platform>
     <ProductVersion>9.0.21022</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{85480198-8711-4355-830E-72FD794AD3F6}</ProjectGuid>
+    <ProjectGuid>{758CB34D-6EBD-41EA-BB0C-55B1C97A325F}</ProjectGuid>
     <OutputType>Library</OutputType>
     <RootNamespace>SDL2</RootNamespace>
     <AssemblyName>SDL2-CS</AssemblyName>

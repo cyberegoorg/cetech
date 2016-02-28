@@ -4,7 +4,7 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{4DE918D2-89AB-433D-9F22-BE0407FF0E59}</ProjectGuid>
+    <ProjectGuid>{758CB33D-6EBD-41EA-BB0C-55B1C97A325F}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>SharpBgfx</RootNamespace>

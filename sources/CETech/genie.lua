@@ -1,5 +1,5 @@
 --------------------------------------------------------------------------------
-ROOT_DIR = path.getabsolute(path.join( ".."))
+ROOT_DIR = path.getabsolute("..")
 BUILD_DIR = path.join( ROOT_DIR, "build")
 
 ARCH = os.is64bit() and '64' or '32'
@@ -29,58 +29,32 @@ newoption {
   }
 }
 --------------------------------------------------------------------------------
-
-function nuget_dir(dir_path)
-    libdirs {
-        path.join(ENGINE_SRC_DIR, "CETech", "packages", dir_path)
-    }
-end
-
 solution "CETech"
     configurations {"Debug", "Develop", "Release"}
-    platforms {"x32", "x64"}
-    location(path.join(ENGINE_SRC_DIR,  "CETech"))
+    platforms {"native", "x32", "x64"}
 
 --    dofile(path.join(ROOT_DIR, "scripts", "toolchain.lua"))
 --    if not toolchain(BUILD_DIR, EXTERNALS) then
 --            return -- no action specified
 --    end
 
-project "CETech"
-    kind "ConsoleApp"
-    language "C#"
-
-    location(path.join(ENGINE_SRC_DIR,  "CETech"))
-
-    files {
-        path.join(ENGINE_SRC_DIR, "CETech", "**.cs"),
-    }
-
-    nuget_dir("MoonSharp.1.5.0.1/lib/portable-net4+sl5+wp8+win8")
-    nuget_dir("YamlDotNet.3.8.0/lib/portable-net45+netcore45+wpa81+wp8+MonoAndroid1+MonoTouch1")
-    nuget_dir("EntityFramework.6.0.0/lib/net45/EntityFramework")
-    nuget_dir("MsgPack.Cli.0.6.8/lib/net45")
-    nuget_dir("System.Data.SQLite.Core.1.0.99.0/lib/net45")
-    nuget_dir("System.Data.SQLite.Linq.1.0.99.0/lib/net45")
-
     libdirs {
-      EXTERNALS_LIB,
-    }
-
-    links {
-        "System",
-        "MoonSharp.Interpreter.dll",
-        "YamlDotNet.dll",
-        "MsgPack.dll"
+      EXTERNALS_LIB
     }
 
     defines {
         'CETECH_SDL2'
     }
 
+    configuration "*-clang"
+        linkoptions {
+          --"-fsanitize=thread",
+          --"-fsanitize=cfi",
+          --"-fsanitize=alignment",
+          --"-fsanitize=memory"
+        }
+    
     configuration "Debug"
-        targetdir "bin/Debug"
-        targetsuffix 'Debug'
         defines {
           "DEBUG",
           "CETECH_DEBUG",
@@ -89,16 +63,43 @@ project "CETech"
 
 
     configuration "Develop"
-        targetdir "bin/Develop"
         targetsuffix 'Develop'
 
         defines {
+          "NDEBUG",
           "CETECH_DEVELOP",
+        }
+
+    configuration "linux*"
+        defines {
+          'CETECH_LINUX'
         }
 
     configuration {}
 
+    project "CETech"
+        kind "ConsoleApp"
+        language "C#"
 
+
+
+        files {
+            path.join(ENGINE_SRC_DIR, "CETech", "Application", "**.cs"),
+            path.join(ENGINE_SRC_DIR, "CETech", "FileSystem", "**.cs"),
+            path.join(ENGINE_SRC_DIR, "CETech", "Input", "**.cs"),
+            path.join(ENGINE_SRC_DIR, "CETech", "Lua", "**.cs"),
+            path.join(ENGINE_SRC_DIR, "CETech", "PackageManager", "**.cs"),
+            path.join(ENGINE_SRC_DIR, "CETech", "Properties", "**.cs"),
+            path.join(ENGINE_SRC_DIR, "CETech", "RenderSystem", "**.cs"),
+            path.join(ENGINE_SRC_DIR, "CETech", "ResourceCompiler", "**.cs"),
+            path.join(ENGINE_SRC_DIR, "CETech", "ResourceManager", "**.cs"),
+            path.join(ENGINE_SRC_DIR, "CETech", "TaskManager", "**.cs"),
+            path.join(ENGINE_SRC_DIR, "CETech", "Utils", "**.cs"),
+            path.join(ENGINE_SRC_DIR, "CETech", "Window", "**.cs"),
+            path.join(ENGINE_SRC_DIR, "CETech", "Program.cs"),
+        }
+
+        vpaths { ["Application"] ='*' }
 
 --function cetech_project(name, test)
 --    project(name)
