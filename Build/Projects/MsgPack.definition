@@ -1,0 +1,7 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ExternalProject Name="MsgPack">
+  <Binary
+    Name="ExternalLib"
+    Path="externals\build\MsgPack\Windows\x64\MsgPack.dll" />
+
+</ExternalProject>

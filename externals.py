@@ -17,7 +17,6 @@ import sys
 import urllib.request
 import yaml
 
-
 ###########
 # GLOBALS #
 ########################################################################################################################
@@ -55,7 +54,8 @@ CONFIG = {
 # Build platform.
 PLATFORMS = {
     'linux64',
-    'darwin64'
+    'darwin64',
+    'windows64'
 }
 
 # EXTERNALS
@@ -69,39 +69,39 @@ with open(os.path.join(EXTERNAL_DIR, 'externals.yml')) as f:
 ARGS_PARSER = argparse.ArgumentParser(description='CETech external dependencies build script')
 
 ARGS_PARSER.add_argument(
-        "action",
-        help="Build action",
-        nargs='?', type=str, default='', choices=ACTIONS)
+    "action",
+    help="Build action",
+    nargs='?', type=str, default='', choices=ACTIONS)
 
 ARGS_PARSER.add_argument(
-        "--clone",
-        help='Only clone externals',
-        action='store_true')
+    "--clone",
+    help='Only clone externals',
+    action='store_true')
 
 ARGS_PARSER.add_argument(
-        "--config",
-        help='Build configuration',
-        default='debug', choices=CONFIG)
+    "--config",
+    help='Build configuration',
+    default='debug', choices=CONFIG)
 
 ARGS_PARSER.add_argument(
-        "--external",
-        help='Build configuration',
-        default='', choices=[''] + [x for x in EXTERNALS.keys()])
+    "--external",
+    help='Build configuration',
+    default='', choices=[''] + [x for x in EXTERNALS.keys()])
 
 ARGS_PARSER.add_argument(
-        "--platform",
-        help='Target platform',
-        default=DEFAULT_BUILD, choices=PLATFORMS)
+    "--platform",
+    help='Target platform',
+    default=DEFAULT_BUILD, choices=PLATFORMS)
 
 ARGS_PARSER.add_argument(
-        "-j", "--job-count",
-        help='Max job count',
-        default=CPU_COUNT)
+    "-j", "--job-count",
+    help='Max job count',
+    default=CPU_COUNT)
 
 ARGS_PARSER.add_argument(
-        "-v", "--verbose",
-        help='Verbose mode',
-        action='store_true')
+    "-v", "--verbose",
+    help='Verbose mode',
+    action='store_true')
 
 
 ###########
@@ -156,7 +156,18 @@ def build(name, body, platform_, job_count_str, verbose):
             cmd_lst.insert(2, job_count_str)
 
         elif cmd_lst[0] == 'cmake':
-            cmd_lst.insert(1, '-DCMAKE_INCLUDE_PATH=%s' % os.path.join(EXTERNAL_BUILD_DIR, platform_, 'include'))
+            build_dir = os.path.join(EXTERNAL_SRC_DIR, 'build-sdl2')
+
+            if not os.path.exists(build_dir):
+                os.mkdir(build_dir)
+
+            os.chdir(build_dir)
+
+            cmd_lst.append('-DCMAKE_INCLUDE_PATH=%s' % os.path.join(EXTERNAL_BUILD_DIR, platform_, 'include'))
+            cmd_lst.append(clone_dir)
+
+        elif cmd_lst[0] == 'devenv':
+            cmd_lst[0] = os.path.join('C:\Program Files (x86)\Microsoft Visual Studio 14.0\Common7\IDE', 'devenv')
 
         if verbose:
             print("Build cmd: %s" % cmd_lst)
@@ -296,6 +307,8 @@ def main(args=None):
     """
 
     args_parse = ARGS_PARSER.parse_args(args=args)
+
+    print('Platform: %s' % args_parse.platform)
 
     action = args_parse.action
     if action == '':

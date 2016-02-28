@@ -3,13 +3,15 @@
 *~
 *.orig
 *.o
+*.sln
+*.csproj
+*.speccache
 
 site/
 
-build/
 data/build
 
-externals/build
+#externals/build
 externals/src
 
 .directory

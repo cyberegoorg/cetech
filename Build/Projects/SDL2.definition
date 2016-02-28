@@ -1,0 +1,9 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ExternalProject Name="SDL2">
+  <Binary
+    Name="ExternalLib"
+    Path="externals\build\SDL2-CS\Windows\x64\SDL2-CS.dll" />
+
+  <NativeBinary Path="externals\build\SDL2\Windows\x64\SDL2.dll" />
+
+</ExternalProject>

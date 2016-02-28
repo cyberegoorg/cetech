@@ -1,0 +1,51 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project Name="CETech" Path="CETech" Type="Console">
+  <References>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Data" />
+
+    <Reference Include="SharpBgfx" />
+    <Reference Include="SDL2" />
+    <Reference Include="MoonSharp" />
+    <Reference Include="MsgPack" />
+    <Reference Include="YamlDotNet" />
+    <Reference Include="SQLite" />
+
+  </References>
+  <Files>
+    <Compile Include="Application\Application.cs" />
+    <Compile Include="Application\Private\ApplicationSDL.cs" />
+    <Compile Include="FileSystem\FileSystem.cs" />
+    <Compile Include="Input\Keyboard.cs" />
+    <Compile Include="Input\Mouse.cs" />
+    <Compile Include="Input\Private\KeyboardSDL.cs" />
+    <Compile Include="Input\Private\MouseSDL.cs" />
+    <Compile Include="Lua\Api\ApplicationApi.cs" />
+    <Compile Include="Lua\Api\KeyboardApi.cs" />
+    <Compile Include="Lua\Api\LogApi.cs" />
+    <Compile Include="Lua\Api\MouseApi.cs" />
+    <Compile Include="Lua\Api\PackageManagerApi.cs" />
+    <Compile Include="Lua\LuaEnviroment.cs" />
+    <Compile Include="Lua\LuaResource.cs" />
+    <Compile Include="PackageManager\PackageManager.cs" />
+    <Compile Include="PackageManager\PackageResource.cs" />
+    <Compile Include="Program.cs" />
+    <Compile Include="RenderSystem\Private\RendererBgfx.cs" />
+    <Compile Include="RenderSystem\RenderSystem.cs" />
+    <Compile Include="ResourceCompiler\Private\BuildDb.cs" />
+    <Compile Include="ResourceCompiler\ResourceCompiler.cs" />
+    <Compile Include="ResourceManager\ResourceManager.cs" />
+    <Compile Include="ResourceManager\StringId.cs" />
+    <Compile Include="TaskManager\Private\QueueMPMC.cs" />
+    <Compile Include="TaskManager\TaskManager.cs" />
+    <Compile Include="Utils\ByteUtils.cs" />
+    <Compile Include="Utils\Config.cs" />
+    <Compile Include="Utils\Log.cs" />
+    <Compile Include="Utils\LogHandler.cs" />
+    <Compile Include="Window\Private\WindowSDL.cs" />
+    <Compile Include="Window\Window.cs" />
+    <Compile Include="Window\WindowFlags.cs" />
+    <Compile Include="Window\WindowPos.cs" />
+  </Files>
+</Project>
