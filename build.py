@@ -39,11 +39,6 @@ DEFAULT_BUILD = "%s%s" % (OS_NAME, OS_ARCH)
 ##########
 # CONFIG #
 ########################################################################################################################
-LINUX_GENIE = [GENIE, '--gcc=linux-clang', 'gmake']
-LINUX_BUILD = ['make', '-R', '-C', 'build/projects/gmake-linux-clang']
-
-DARWIN_GENIE = [GENIE, '--gcc=osx', 'gmake']
-DARWIN_BUILD = ['make', '-j', CPU_COUNT_STR, '-R', '-C', 'build/projects/gmake-osx']
 
 # Command line actions.
 ACTIONS = {
@@ -54,42 +49,22 @@ ACTIONS = {
 # Build config.
 CONFIG = {
     'develop',
-    'debug',
-    'release'
+    'runtime'
 }
 
 # Build platform.
 PLATFORMS = {
-    'linux64'
-    'darwin64'
+    'windows64'
 }
 
-# Platform specific genie command.
-PLATFORMS_GENIE = {
-    'linux64': LINUX_GENIE,
-    'linux32': LINUX_GENIE,
-    'darwin64': DARWIN_GENIE,
+# Build platform.
+PLATFORMS_PROTOBUILD = {
+    'windows64': 'Windows'
 }
 
-# PLatform specific build command.
-PLATFORMS_BUILD = {
-    'linux64': {
-        'develop': LINUX_BUILD + ['config=develop64'],
-        'debug': LINUX_BUILD + ['config=debug64'],
-        'release': LINUX_BUILD + ['config=release64'],
-    },
-
-    'linux32': {
-        'develop': LINUX_BUILD + ['config=develop32'],
-        'debug': LINUX_BUILD + ['config=debug32'],
-        'release': LINUX_BUILD + ['config=release32'],
-    },
-
-    'darwin64': {
-        'develop': DARWIN_BUILD + ['config=develop64'],
-        'debug': DARWIN_BUILD + ['config=debug64'],
-        'release': DARWIN_BUILD + ['config=release64'],
-    },
+# Build platform.
+PROTOBUILD_CONFIG = {
+    'runtime': ['-disable', 'Develop']
 }
 
 ########
@@ -99,85 +74,76 @@ PLATFORMS_BUILD = {
 ARGS_PARSER = argparse.ArgumentParser(description='CETech build script')
 
 ARGS_PARSER.add_argument(
-        "action",
-        help="Build action",
-        nargs='?', type=str, default='', choices=ACTIONS)
+    "action",
+    help="Build action",
+    nargs='?', type=str, default='', choices=ACTIONS)
 
 ARGS_PARSER.add_argument(
-        "--generate",
-        help='Only generate project files to build dir',
-        action='store_true')
+    "--generate",
+    help='Only generate project files',
+    action='store_true')
 
 ARGS_PARSER.add_argument(
-        "--config",
-        help='Build configuration',
-        default='debug', choices=CONFIG)
+    "--config",
+    help='Build configuration',
+    default='develop', choices=CONFIG)
 
 ARGS_PARSER.add_argument(
-        "--platform",
-        default=DEFAULT_BUILD, choices=PLATFORMS, help='Target platform')
-
-ARGS_PARSER.add_argument(
-        "--cc",
-        help='CC')
-
-ARGS_PARSER.add_argument(
-        "--cxx",
-        help='CXX')
-
-ARGS_PARSER.add_argument(
-        "-j", "--job-count",
-        help='Max job count',
-        default=CPU_COUNT)
+    "--platform",
+    default=DEFAULT_BUILD, choices=PLATFORMS, help='Target platform')
 
 
 ###########
 # PROGRAM #
 ########################################################################################################################
 
-def run_genie(platform_, cc=None, cxx=None):
+def run_protobuild(config, platform_):
     """Run platform specific genie command.
     """
+    print('Runing Protobuild.exe.')
 
-    cmd = PLATFORMS_GENIE[platform_]
+    cmds = [os.path.join('Protobuild.exe')]
 
-    subprocess.check_call(cmd)
+    if config in PROTOBUILD_CONFIG:
+        cmds.extend(PROTOBUILD_CONFIG[config])
+
+    cmds.append(PLATFORMS_PROTOBUILD[platform_])
+
+    subprocess.check_call(cmds)
 
 
-def make(config, platform_, only_genie=False, cc=None, cxx=None, job_count=CPU_COUNT):
+def make_vs(config, platform_):
+    cmds = [os.path.join('C:\Program Files (x86)\Microsoft Visual Studio 14.0\Common7\IDE', 'devenv')]
+    cmds.append('CETech\CETech.Windows.csproj')
+    cmds.append('/build')
+    cmds.append('Release')
+
+    return cmds
+
+PLATFORMS_MAKE = {
+    'windows64': make_vs
+}
+
+def make(config, platform_, generate_only=False):
     """Make build
 
     :param config: Build configuration.
     :param platform_: Build platform.
-    :param only_genie: Do not run build, only create projects files.
+    :param generate_only: Do not run build, only create projects files.
     """
-    print('Runing genie.')
-    run_genie(platform_=platform_)
+    run_protobuild(config=config, platform_=platform_)
 
-    if not only_genie:
-        print('Building.')
-
-        cmd = PLATFORMS_BUILD[platform_][config]
-
-        if cmd[0] == 'make':
-            cmd.insert(1, '-j')
-            cmd.insert(2, CPU_COUNT_STR)
-
-        if cc is not None:
-            cmd.append('CC=%s' % cc)
-
-        if cxx is not None:
-            cmd.append('CXX=%s' % cxx)
-
-        subprocess.check_call(cmd)
-
+    if not generate_only:
+        cmds = PLATFORMS_MAKE[platform_](config=config, platform_=platform_)
+        subprocess.check_call(cmds)
 
 def clean():
     """ Remove build dir.
     """
 
     print('Cleaning...')
-    shutil.rmtree(BUILD_DIR, ignore_errors=True)
+    shutil.rmtree(os.path.join('CETech', 'bin'))
+    shutil.rmtree(os.path.join('CETech', 'obj'))
 
 
 def main(args=None):
@@ -190,10 +156,7 @@ def main(args=None):
     if action == '':
         make(args.config,
              args.platform,
-             args.generate,
-             args.cc,
-             args.cxx,
-             args.job_count)
+             args.generate)
 
     elif action == 'clean':
         clean()
