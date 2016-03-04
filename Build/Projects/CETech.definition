@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project Name="CETech" Path="CETech" Type="Console">
+<Project Name="CETech" Path="sources/CETech" Type="Console">
   <References>
     <Reference Include="System" />
     <Reference Include="System.Core" />
