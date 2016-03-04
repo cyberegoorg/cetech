@@ -9,11 +9,6 @@
 
 site/
 
-data/build
-
-#externals/build
-externals/src
-
 .directory
 log.yaml
 litelog.db
