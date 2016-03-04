@@ -14,6 +14,7 @@ namespace CETech
         /// </summary>
         public static readonly long Type = StringId.FromString("package");
 
+#if CETECH_DEVELOP
         /// <summary>
         ///     Resource compiler
         /// </summary>
@@ -56,6 +57,7 @@ namespace CETech
             var serializer = MessagePackSerializer.Get<Resource>();
             serializer.Pack(capi.BuildFile, pack);
         }
+#endif
 
         /// <summary>
         ///     Resource loader

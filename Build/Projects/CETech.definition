@@ -4,23 +4,45 @@
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Data" />
-
     <Reference Include="SharpBgfx" />
-    <Reference Include="SDL2" />
     <Reference Include="MoonSharp" />
     <Reference Include="MsgPack" />
     <Reference Include="YamlDotNet" />
-    <Reference Include="SQLite" />
-
   </References>
+  <Dependencies>
+    <Uses Name="SDL2">
+      <Platforms>Windows,MacOS,Linux</Platforms>
+    </Uses>
+    <Recommends Name="Develop">
+      <Platforms>Windows,MacOS,Linux</Platforms>
+    </Recommends>
+  </Dependencies>
+  <Services>
+    <Service Name="SDL2">
+      <AddDefine>CETECH_SDL2</AddDefine>
+      <Reference Include="SDL2" />
+      <Platforms>Windows,MacOS,Linux</Platforms>
+    </Service>
+    <Service Name="Develop">
+      <AddDefine>CETECH_DEVELOP</AddDefine>
+      <Reference Include="SQLite" />
+      <Platforms>Windows,MacOS,Linux</Platforms>
+    </Service>
+  </Services>
   <Files>
     <Compile Include="Application\Application.cs" />
-    <Compile Include="Application\Private\ApplicationSDL.cs" />
+    <Compile Include="Application\Private\ApplicationSDL.cs">
+      <Platforms>Windows,Linux</Platforms>
+    </Compile>
     <Compile Include="FileSystem\FileSystem.cs" />
     <Compile Include="Input\Keyboard.cs" />
     <Compile Include="Input\Mouse.cs" />
-    <Compile Include="Input\Private\KeyboardSDL.cs" />
-    <Compile Include="Input\Private\MouseSDL.cs" />
+    <Compile Include="Input\Private\KeyboardSDL.cs">
+      <Services>SDL2</Services>
+    </Compile>
+    <Compile Include="Input\Private\MouseSDL.cs">
+      <Services>SDL2</Services>
+    </Compile>
     <Compile Include="Lua\Api\ApplicationApi.cs" />
     <Compile Include="Lua\Api\KeyboardApi.cs" />
     <Compile Include="Lua\Api\LogApi.cs" />
@@ -33,8 +55,12 @@
     <Compile Include="Program.cs" />
     <Compile Include="RenderSystem\Private\RendererBgfx.cs" />
     <Compile Include="RenderSystem\RenderSystem.cs" />
-    <Compile Include="ResourceCompiler\Private\BuildDb.cs" />
-    <Compile Include="ResourceCompiler\ResourceCompiler.cs" />
+    <Compile Include="ResourceCompiler\Private\BuildDb.cs">
+      <Services>Develop</Services>
+    </Compile>
+    <Compile Include="ResourceCompiler\ResourceCompiler.cs">
+      <Services>Develop</Services>
+    </Compile>
     <Compile Include="ResourceManager\ResourceManager.cs" />
     <Compile Include="ResourceManager\StringId.cs" />
     <Compile Include="TaskManager\Private\QueueMPMC.cs" />
@@ -43,7 +69,9 @@
     <Compile Include="Utils\Config.cs" />
     <Compile Include="Utils\Log.cs" />
     <Compile Include="Utils\LogHandler.cs" />
-    <Compile Include="Window\Private\WindowSDL.cs" />
+    <Compile Include="Window\Private\WindowSDL.cs">
+      <Services>SDL2</Services>
+    </Compile>
     <Compile Include="Window\Window.cs" />
     <Compile Include="Window\WindowFlags.cs" />
     <Compile Include="Window\WindowPos.cs" />
