@@ -39,7 +39,7 @@ CETech is Data-Driven [game engine](https://en.wikipedia.org/wiki/Game_engine) a
 
 * [protobuild](https://github.com/Protobuild/Protobuild) - Project generator.
 
-### C\#
+### C # 
 * [SharpBGFX](https://github.com/MikePopoloski/SharpBgfx) - C# bindings for the bgfx graphics library.
 * [MoonSharp](https://github.com/xanathar/moonsharp) - An interpreter for the Lua language, written entirely in C#.
 * [SDL2-CS](https://github.com/flibitijibibo/SDL2-CS) - C# Wrapper for SDL2.
