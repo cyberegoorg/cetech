@@ -1,29 +1,91 @@
-#########
-# GENIE #
+#############
+# SharpBGFX #
 ########################################################################################################################
-genie:
-  clone: git clone https://github.com/bkaradzic/genie --depth 1
+sharp-bgfx:
+  clone: git clone https://github.com/MikePopoloski/SharpBgfx.git --depth 1
 
   build:
-    linux32:  make
-    linux64:  make
-    darwin64: make
-    windows64: make
+    windows64:
+      - devenv SharpBgfx/SharpBgfx.csproj /build Debug
+      - devenv SharpBgfx/SharpBgfx.csproj /build Release
 
   install:
-    linux: &genie_install_linux
-      [bin/linux/genie, bin]
+     windows64:
+      - copytree: [SharpBgfx\bin, SharpBgfx]
 
-    linux32:
-      - copy: *genie_install_linux
+#############
+# MoonSharp #
+########################################################################################################################
+moonsharp:
+  clone: git clone https://github.com/xanathar/moonsharp.git --depth 1
 
-    linux64:
-      - copy: *genie_install_linux
-
-    darwin64:
-      - copy: [bin/darwin/genie, bin]
-
+  build:
     windows64:
-      - copy: [bin/windows/genie.exe, bin]
+      - devenv src\MoonSharp.Interpreter\MoonSharp.Interpreter.net35-client.csproj /build Debug
+      - devenv src\MoonSharp.Interpreter\MoonSharp.Interpreter.net35-client.csproj /build Release
+
+  install:
+     windows64:
+      - copytree: [src\MoonSharp.Interpreter\bin, MoonSharp]
+
+###########
+# SDL2-CS #
+########################################################################################################################
+sdl2-cs:
+  clone: git clone https://github.com/flibitijibibo/SDL2-CS.git --depth 1
+
+  build:
+    windows64:
+      - devenv SDL2-CS.csproj /build Debug
+      - devenv SDL2-CS.csproj /build Release
+
+  install:
+     windows64:
+      - copytree: [bin, SDL2-CS]
 
 
+##############
+# YamlDotNet #
+########################################################################################################################
+yamldotnet:
+  clone: git clone https://github.com/aaubry/YamlDotNet.git --depth 1
+
+  build:
+    windows64:
+      - devenv YamlDotNet.sln /build Debug /project YamlDotNet
+      - devenv YamlDotNet.sln /build Release-Unsigned /project YamlDotNet
+
+  install:
+     windows64:
+      - copytree: [YamlDotNet\bin, YamlDotNet]
+
+
+###############
+# MsgPack-cli #
+########################################################################################################################
+msgpack-cli:
+  clone: git clone https://github.com/msgpack/msgpack-cli.git --depth 1
+
+  build:
+    windows64:
+      - devenv src\MsgPack.Net40\MsgPack.Net40.csproj /build Debug
+      - devenv src\MsgPack.Net40\MsgPack.Net40.csproj /build Release
+
+  install:
+     windows64:
+      - copytree: [src\MsgPack.Net40\bin, MsgPack]
+      - copytree: [bin\net40-client, MsgPack\Release]
+
+
+########
+# SLD2 #
+########################################################################################################################
+sdl2:
+  clone: download https://www.libsdl.org/release/SDL2-2.0.4-win32-x64.zip SDL2-2.0.4-win32-x64.zip
+
+  build:
+    windows64: extract SDL2-2.0.4-win32-x64.zip
+
+  install:
+     windows64:
+      - copy: [SDL2.dll, sdl2\Release]

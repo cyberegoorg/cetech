@@ -2,8 +2,8 @@
 <ExternalProject Name="SDL2">
   <Binary
     Name="ExternalLib"
-    Path="externals\build\SDL2-CS\Windows\x64\SDL2-CS.dll" />
+    Path="externals\build\windows64\SDL2-CS\Debug\SDL2-CS.dll" />
 
-  <NativeBinary Path="externals\build\SDL2\Windows\x64\SDL2.dll" />
+  <NativeBinary Path="externals\build\windows64\sdl2\Release\SDL2.dll" />
 
 </ExternalProject>

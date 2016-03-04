@@ -2,6 +2,6 @@
 <ExternalProject Name="MsgPack">
   <Binary
     Name="ExternalLib"
-    Path="externals\build\MsgPack\Windows\x64\MsgPack.dll" />
+    Path="externals\build\windows64\MsgPack\Debug\MsgPack.dll" />
 
 </ExternalProject>
