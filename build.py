@@ -95,22 +95,22 @@ ARGS_PARSER.add_argument(
     nargs='?', type=str, default='', choices=ACTIONS)
 
 ARGS_PARSER.add_argument(
-    "--generate",
+    "-g", "--generate",
     help='Only generate project files',
     action='store_true')
 
 ARGS_PARSER.add_argument(
-    "--config",
+    "-c", "--config",
     help='Build configuration',
     default='develop', choices=CONFIG)
 
 ARGS_PARSER.add_argument(
-    "--debug",
+    "-d", "--debug",
     help='Debug build',
     default='store_false')
 
 ARGS_PARSER.add_argument(
-    "--platform",
+    "-p", "--platform",
     default=DEFAULT_BUILD, choices=PLATFORMS, help='Target platform')
 
 
