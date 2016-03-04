@@ -16,7 +16,7 @@ namespace CETech
         {
             /// <summary>
             ///     Read
-            /// </summary>
+            /// </summary>d
             Read = 0,
 
             /// <summary>

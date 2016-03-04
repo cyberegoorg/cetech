@@ -12,6 +12,7 @@ namespace CETech.Lua
         /// </summary>
         public static readonly long Type = StringId.FromString("lua");
 
+#if CETECH_DEVELOP
         /// <summary>
         ///     Resource compiler
         /// </summary>
@@ -24,6 +25,7 @@ namespace CETech.Lua
             //var script = new Script();
             //script.Dump(script.LoadStream(capi.ResourceFile), capi.BuildFile);
         }
+#endif
 
         /// <summary>
         ///     Resource loader

@@ -21,8 +21,10 @@ namespace CETech
 
             if (BigInit())
             {
-                ResourceCompiler.CompileAll();
 
+#if CETECH_DEVELOP
+                ResourceCompiler.CompileAll();
+#endif
                 ResourceManager.LoadNow(PackageResource.Type, new[] {StringId.FromString("boot")});
                 PackageManager.Load(StringId.FromString("boot"));
                 PackageManager.Flush(StringId.FromString("boot"));
