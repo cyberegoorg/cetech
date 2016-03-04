@@ -78,17 +78,17 @@ ARGS_PARSER.add_argument(
     action='store_true')
 
 ARGS_PARSER.add_argument(
-    "--config",
+    "-c", "--config",
     help='Build configuration',
     default='debug', choices=CONFIG)
 
 ARGS_PARSER.add_argument(
-    "--external",
+    "-e", "--external",
     help='Build configuration',
     default='', choices=[''] + [x for x in EXTERNALS.keys()])
 
 ARGS_PARSER.add_argument(
-    "--platform",
+    "-p", "--platform",
     help='Target platform',
     default=DEFAULT_BUILD, choices=PLATFORMS)
 
