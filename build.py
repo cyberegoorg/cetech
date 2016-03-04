@@ -67,6 +67,22 @@ PROTOBUILD_CONFIG = {
     'runtime': ['-disable', 'Develop']
 }
 
+def make_vs(config, platform_, debug):
+    cmds = [os.path.join('C:\Program Files (x86)\Microsoft Visual Studio 14.0\Common7\IDE', 'devenv')]
+    cmds.append('CETech\CETech.Windows.csproj')
+    cmds.append('/build')
+
+    if not debug:
+        cmds.append('Release')
+    else:
+        cmds.append('Debug')
+
+    return cmds
+
+PLATFORMS_MAKE = {
+    'windows64': make_vs
+}
+
 ########
 # ARGS #
 ########################################################################################################################
@@ -87,6 +103,11 @@ ARGS_PARSER.add_argument(
     "--config",
     help='Build configuration',
     default='develop', choices=CONFIG)
+
+ARGS_PARSER.add_argument(
+    "--debug",
+    help='Debug build',
+    default='store_false')
 
 ARGS_PARSER.add_argument(
     "--platform",
@@ -111,20 +132,7 @@ def run_protobuild(config, platform_):
 
     subprocess.check_call(cmds)
 
-
-def make_vs(config, platform_):
-    cmds = [os.path.join('C:\Program Files (x86)\Microsoft Visual Studio 14.0\Common7\IDE', 'devenv')]
-    cmds.append('CETech\CETech.Windows.csproj')
-    cmds.append('/build')
-    cmds.append('Release')
-
-    return cmds
-
-PLATFORMS_MAKE = {
-    'windows64': make_vs
-}
-
-def make(config, platform_, generate_only=False):
+def make(config, platform_, debug, generate_only=False):
     """Make build
 
     :param config: Build configuration.
@@ -134,7 +142,7 @@ def make(config, platform_, generate_only=False):
     run_protobuild(config=config, platform_=platform_)
 
     if not generate_only:
-        cmds = PLATFORMS_MAKE[platform_](config=config, platform_=platform_)
+        cmds = PLATFORMS_MAKE[platform_](config=config, platform_=platform_, debug=debug)
         subprocess.check_call(cmds)
 
 def clean():
@@ -154,9 +162,10 @@ def main(args=None):
 
     action = args.action
     if action == '':
-        make(args.config,
-             args.platform,
-             args.generate)
+        make(config=args.config,
+             platform_=args.platform,
+             generate_only=args.generate,
+             debug=args.debug)
 
     elif action == 'clean':
         clean()
