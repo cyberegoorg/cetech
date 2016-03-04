@@ -2,8 +2,9 @@
 <ExternalProject Name="SharpBgfx">
   <Binary
     Name="ExternalLib"
-    Path="externals\build\SharpBgfx\Windows\x64\SharpBgfx.dll" />
+    Path="externals\build\windows64\SharpBgfx\Debug\SharpBgfx.dll" />
 
-  <NativeBinary Path="externals\build\bgfx\Windows\x64\bgfx.dll" />
+  <NativeBinary Path="externals\build\windows64\SharpBgfx\Debug\bgfx.dll" />
+  <NativeBinary Path="externals\build\windows64\SharpBgfx\Debug\bgfx_debug.dll" />
 
 </ExternalProject>

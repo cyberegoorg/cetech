@@ -2,6 +2,6 @@
 <ExternalProject Name="MoonSharp">
   <Binary
     Name="ExternalLib"
-    Path="externals\build\MoonSharp\Windows\x64\MoonSharp.Interpreter.dll" />
+    Path="externals\build\windows64\MoonSharp\Debug\MoonSharp.Interpreter.dll" />
 
 </ExternalProject>

@@ -31,7 +31,6 @@ ROOT_DIR = os.path.abspath(os.path.join(os.path.dirname(os.path.abspath(__file__
 EXTERNAL_DIR = os.path.join(ROOT_DIR, 'externals')
 EXTERNAL_BUILD_DIR = os.path.join(EXTERNAL_DIR, 'build')
 EXTERNAL_SRC_DIR = os.path.join(EXTERNAL_DIR, 'src')
-
 DEFAULT_BUILD = "%s%s" % (OS_NAME, OS_ARCH)
 
 ##########
@@ -132,6 +131,9 @@ def clone(name, body, verbose):
         elif cmd[0] == 'download':
             print('Download: %s' % cmd[1])
 
+            if not os.path.exists(clone_dir):
+                os.mkdir(clone_dir)
+
             urllib.request.urlretrieve(cmd[1], os.path.abspath(os.path.join(clone_dir, cmd[2])))
 
 
@@ -168,6 +170,11 @@ def build(name, body, platform_, job_count_str, verbose):
 
         elif cmd_lst[0] == 'devenv':
             cmd_lst[0] = os.path.join('C:\Program Files (x86)\Microsoft Visual Studio 14.0\Common7\IDE', 'devenv')
+
+        elif cmd_lst[0] == 'extract':
+            cmd_lst[0] = os.path.join(EXTERNAL_DIR, 'tools', 'windows64', '7zip', '7za.exe')
+            cmd_lst.insert(1, 'e')
+            cmd_lst.insert(2, '-aoa')
 
         if verbose:
             print("Build cmd: %s" % cmd_lst)
