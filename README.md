@@ -21,44 +21,43 @@ CETech is Data-Driven [game engine](https://en.wikipedia.org/wiki/Game_engine) a
 * [lumix](https://github.com/nem0/LumixEngine) - Easy to use, fast and flexible 3D game engine.
 
 ## Suported platforms
-
+ 
+* Windows (Runtime + Develop) - Work in progress
 * Linux (Runtime + Develop) - Work in progress
-* OSX (10.9+) (Runtime + Develop) - Work in progress
 
 ## Planned platforms
 
-* Windows (Runtime + Develop)
+* OSX (Runtime + Develop)
+* FreeBSD (Runtime + Develop)
 * asm.js/Emscripten (Runtime)
 * Android (Runtime)
-* FreeBSD (Runtime + Develop)
 * RaspberryPi (Runtime)
 
 ## 3rd party libraries and tools
 
 ### Tools
 
-* [genie](https://github.com/bkaradzic/genie) - Project generator.
+* [protobuild](https://github.com/Protobuild/Protobuild) - Project generator.
+
+### C\#
+* [SharpBGFX](https://github.com/MikePopoloski/SharpBgfx) - C# bindings for the bgfx graphics library.
+* [MoonSharp](https://github.com/xanathar/moonsharp) - An interpreter for the Lua language, written entirely in C#.
+* [SDL2-CS](https://github.com/flibitijibibo/SDL2-CS) - C# Wrapper for SDL2.
+* [YamlDotNet](https://github.com/aaubry/YamlDotNet) - .NET library for YAML.
+* [MsgPack-cli]( https://github.com/msgpack/msgpack-cli) - MessagePack implementation for Common Language Infrastructure.
+* [YamlDotNet](https://github.com/aaubry/YamlDotNet) - .NET library for YAML.
 
 ### C/C++
 
 * [BGFX](https://github.com/bkaradzic/bgfx) - Renderer.
 * [SDL2](https://www.libsdl.org/) - Cross-platform development library.
-* [enet](http://enet.bespin.org/) - Cross-platform network lib.
-* [luajit](http://luajit.org/) - Lua on steroids.
-* [rapidjson](http://rapidjson.org/) - Json parser.
-* [catch](https://github.com/philsquared/Catch) -  Multi-paradigm automated test framework.
-* [SOIL](http://www.lonesock.net/soil.html ) - Simple OpenGL Image Library.
 * [sqlite3](https://www.sqlite.org/) - SQL database engine.
-* [libyaml](https://github.com/yaml/libyaml.git) - YAML parser.
 * [nanomsg](http://nanomsg.org/) - Socket library that provides several common communication patterns.
-* [mpack](https://github.com/ludocode/mpack) - A C encoder/decoder for the MessagePack serialization format.
 
 ### Python
 
 * [python](https://www.python.org/) - Multi-paradigm Programming language.
 * [pyaml](http://pyyaml.org/wiki/PyYAML) - YAML parser and emitter for Python.
-* [python-nanomsg](https://github.com/tonysimpson/nanomsg-python) - Nanomsg python binding.
-* [PyQT](https://www.riverbankcomputing.com/software/pyqt/intro) - Python QT binding
 
 ### JavaScript
 
@@ -77,22 +76,8 @@ CETech is Data-Driven [game engine](https://en.wikipedia.org/wiki/Game_engine) a
 
 #### Linux
 
-* Install python >= 3.5, Qt5, PyQt5, gcc, clang >= 3.7, make, libtool, automake
-
-#### OSX
-
-* Install clang, python3, qt, pyqt5, automake, libtool
-
-```bash
-$ brew install python3
-$ brew install pyqt5
-$ brew install automake
-$ brew install libtool
-```
-
-### Building
-
-#### Linux, OSX
+* Install python >= 3.5
+* Install Mono
 
 * Install requirements.txt
 
@@ -100,30 +85,24 @@ $ brew install libtool
 $ pip install -r requirements.txt
 ```
 
-* Download and build externals.
+
+#### Windows
+* Install python >= 3.5
+* Install Visual Studio 2015
+
+* Install requirements.txt
 
 ```bash
-$ python externals.py
+$ pip install -r requirements.txt
 ```
+
+### Building
 
 * Build engine
 
 ```bash
-$ python make.py
+$ python build.py
 ```
-
-## Run playground
-
-```bash
-$ python playground.py
-```
-
-* Click on `add exist`.
-* Set name `SAMPLE`.
-* Click on `...` and select repository folder `data`.
-* Click on `ok`.
-* Click on `Open`.
-* Enjoy playground bugs.
 
 ## [License](http://creativecommons.org/publicdomain/zero/1.0/)
 
