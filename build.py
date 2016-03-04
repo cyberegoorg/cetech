@@ -69,7 +69,7 @@ PROTOBUILD_CONFIG = {
 
 def make_vs(config, platform_, debug):
     cmds = [os.path.join('C:\Program Files (x86)\Microsoft Visual Studio 14.0\Common7\IDE', 'devenv')]
-    cmds.append('CETech\CETech.Windows.csproj')
+    cmds.append('sources\CETech\CETech.Windows.csproj')
     cmds.append('/build')
 
     if not debug:
@@ -150,8 +150,8 @@ def clean():
     """
 
     print('Cleaning...')
-    shutil.rmtree(os.path.join('CETech', 'bin'))
-    shutil.rmtree(os.path.join('CETech', 'obj'))
+    shutil.rmtree(os.path.join('sources', 'CETech', 'bin'))
+    shutil.rmtree(os.path.join('sources', 'CETech', 'obj'))
 
 
 def main(args=None):
