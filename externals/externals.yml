@@ -9,9 +9,16 @@ sharp-bgfx:
       - devenv SharpBgfx/SharpBgfx.csproj /build Debug
       - devenv SharpBgfx/SharpBgfx.csproj /build Release
 
+    linux64:
+      - xbuild /p:Configuration=Debug SharpBgfx/SharpBgfx.csproj
+      - xbuild /p:Configuration=Release SharpBgfx/SharpBgfx.csproj
+
   install:
      windows64:
       - copytree: [SharpBgfx\bin, SharpBgfx]
+
+     linux64:
+      - copytree: [SharpBgfx/bin, SharpBgfx]
 
 #############
 # MoonSharp #
@@ -24,9 +31,15 @@ moonsharp:
       - devenv src\MoonSharp.Interpreter\MoonSharp.Interpreter.net35-client.csproj /build Debug
       - devenv src\MoonSharp.Interpreter\MoonSharp.Interpreter.net35-client.csproj /build Release
 
+    linux64:
+      - xbuild /p:TargetFrameworkVersion=v4.0 /p:Configuration=Debug src/MoonSharp.Interpreter/MoonSharp.Interpreter.net35-client.csproj
+      - xbuild /p:TargetFrameworkVersion=v4.0 /p:Configuration=Release src/MoonSharp.Interpreter/MoonSharp.Interpreter.net35-client.csproj
+
   install:
-     windows64:
+    windows64:
       - copytree: [src\MoonSharp.Interpreter\bin, MoonSharp]
+    linux64:
+      - copytree: [src/MoonSharp.Interpreter/bin, MoonSharp]
 
 ###########
 # SDL2-CS #
@@ -39,8 +52,16 @@ sdl2-cs:
       - devenv SDL2-CS.csproj /build Debug
       - devenv SDL2-CS.csproj /build Release
 
+    linux64:
+      - xbuild /p:Configuration=Debug SDL2-CS.csproj
+      - xbuild /p:Configuration=Release SDL2-CS.csproj
+
+
   install:
      windows64:
+      - copytree: [bin, SDL2-CS]
+
+     linux64:
       - copytree: [bin, SDL2-CS]
 
 
@@ -55,10 +76,16 @@ yamldotnet:
       - devenv YamlDotNet.sln /build Debug /project YamlDotNet
       - devenv YamlDotNet.sln /build Release-Unsigned /project YamlDotNet
 
+    linux64:
+      - xbuild /p:Configuration=Debug YamlDotNet/YamlDotNet.csproj
+      - xbuild /p:Configuration=Release-Unsigned YamlDotNet/YamlDotNet.csproj
+
   install:
      windows64:
       - copytree: [YamlDotNet\bin, YamlDotNet]
 
+     linux64:
+      - copytree: [YamlDotNet\bin, YamlDotNet]
 
 ###############
 # MsgPack-cli #
@@ -71,10 +98,18 @@ msgpack-cli:
       - devenv src\MsgPack.Net40\MsgPack.Net40.csproj /build Debug
       - devenv src\MsgPack.Net40\MsgPack.Net40.csproj /build Release
 
+    linux64:
+      - xbuild /p:Configuration=Debug src/MsgPack.Net40/MsgPack.Net40.csproj
+      - xbuild /p:Configuration=Release src/MsgPack.Net40/MsgPack.Net40.csproj
+
   install:
      windows64:
       - copytree: [src\MsgPack.Net40\bin, MsgPack]
       - copytree: [bin\net40-client, MsgPack\Release]
+
+     linux64:
+      - copytree: [src/MsgPack.Net40/bin, MsgPack]
+      - copytree: [bin/net40-client, MsgPack/Release]
 
 
 ########
