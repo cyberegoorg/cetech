@@ -89,3 +89,33 @@ sdl2:
   install:
      windows64:
       - copy: [SDL2.dll, sdl2\Release]
+
+###########
+# nanomsg #
+########################################################################################################################
+nanomsg:
+  clone: git clone https://github.com/nanomsg/nanomsg.git --depth 1
+
+  build:
+    posix: &nanomsg_build_posix
+      [./autogen.sh, ./configure, make]
+
+    linux64:  *nanomsg_build_posix
+    linux32:  *nanomsg_build_posix
+    darwin64: *nanomsg_build_posix
+    windows64:
+      - cmake .
+      - devenv nanomsg.sln /build Release
+
+  install:
+    linux64:
+      - copy: [.libs/libnanomsg.so, dynlib]
+
+    linux32:
+      - copy: [.libs/libnanomsg.so, dynlib]
+
+    darwin64:
+      - copy: [.libs/libnanomsg.so, dynlib]
+
+    windows64:
+      - copy: [Release\nanomsg.dll, nanomsg\Release]
