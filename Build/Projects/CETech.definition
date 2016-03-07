@@ -54,7 +54,7 @@
     <Compile Include="PackageManager\PackageResource.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="RenderSystem\Private\RendererBgfx.cs" />
-    <Compile Include="RenderSystem\RenderSystem.cs"\>
+    <Compile Include="RenderSystem\RenderSystem.cs" />
     <Compile Include="ResourceCompiler\Private\BuildDb.cs">
       <Services>Develop</Services>
     </Compile>
