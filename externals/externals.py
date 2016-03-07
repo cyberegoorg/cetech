@@ -158,15 +158,12 @@ def build(name, body, platform_, job_count_str, verbose):
             cmd_lst.insert(2, job_count_str)
 
         elif cmd_lst[0] == 'cmake':
-            build_dir = os.path.join(EXTERNAL_SRC_DIR, 'build-sdl2')
+            if "windows" in platform_:
+                cmd_lst.append('-G')
+                cmd_lst.append('Visual Studio 14 2015 Win64')
 
-            if not os.path.exists(build_dir):
-                os.mkdir(build_dir)
-
-            os.chdir(build_dir)
-
-            cmd_lst.append('-DCMAKE_INCLUDE_PATH=%s' % os.path.join(EXTERNAL_BUILD_DIR, platform_, 'include'))
-            cmd_lst.append(clone_dir)
+            #cmd_lst.append('-DCMAKE_INCLUDE_PATH=%s' % os.path.join(EXTERNAL_BUILD_DIR, platform_, 'include'))
+            #cmd_lst.append(clone_dir)
 
         elif cmd_lst[0] == 'devenv':
             cmd_lst[0] = os.path.join('C:\Program Files (x86)\Microsoft Visual Studio 14.0\Common7\IDE', 'devenv')

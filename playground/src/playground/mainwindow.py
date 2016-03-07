@@ -105,7 +105,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.logsub.start(QThread.LowPriority)
 
         self.assetb_widget.open_project(self.project.project_dir)
-        self.assetb_dock_widget.show()
+
         self.log_dock_widget.show()
 
         # TODO bug #114 workaround. Disable create sub engine...
@@ -116,6 +116,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
         self.ogl_widget.resize_event_enable = True
         self.ogl_widget.resize(self.ogl_widget.size())
+
+        self.assetb_dock_widget.show()
 
     def watch_project_dir(self):
         files = self.file_watch.files()

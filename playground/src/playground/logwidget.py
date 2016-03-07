@@ -29,7 +29,7 @@ LOG_ICON = {
 
 class LogSub(QThread):
     def __init__(self, url):
-        self.socket = Socket(SUB)
+        #self.socket = Socket(SUB)
         self.url = url
         self.handlers = []
 
@@ -39,19 +39,19 @@ class LogSub(QThread):
         self.handlers.append(handler)
 
     def run(self):
-        self.socket.set_string_option(SUB, SUB_SUBSCRIBE, b'#log')
-        self.socket.connect(self.url)
-
-        while True:
-            try:
-                msg = self.socket.recv()
-                msg_yaml = yaml.load(msg)
-                for h in self.handlers:
-                    h(**msg_yaml)
-
-            except nanomsg.NanoMsgAPIError as e:
-                pass
-
+        # self.socket.set_string_option(SUB, SUB_SUBSCRIBE, b'#log')
+        # self.socket.connect(self.url)
+        #
+        # while True:
+        #     try:
+        #         msg = self.socket.recv()
+        #         msg_yaml = yaml.load(msg)
+        #         for h in self.handlers:
+        #             h(**msg_yaml)
+        #
+        #     except nanomsg.NanoMsgAPIError as e:
+        #         pass
+        pass
 
 class LogWidget(QFrame, Ui_LogWidget):
     def __init__(self, script_editor, logsub, ignore_where=None):

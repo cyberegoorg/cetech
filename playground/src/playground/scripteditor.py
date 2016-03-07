@@ -30,7 +30,7 @@ class ScriptEditorWindow(QMainWindow, Ui_MainWindow):
         self.filename = filename
 
         self.webView.page().settings().setAttribute(QWebSettings.DeveloperExtrasEnabled, True)
-        self.webView.page().mainFrame().setUrl(QUrl("file://%s/html/editor.html" % QDir.currentPath()))
+        self.webView.page().mainFrame().setUrl(QUrl("file:///%s/html/editor.html" % QDir.currentPath()))
 
         self.webView.page().mainFrame().javaScriptWindowObjectCleared.connect(
                 lambda: self.webView.page().mainFrame().addToJavaScriptWindowObject("editor_widget", self))

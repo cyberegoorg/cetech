@@ -20,8 +20,8 @@ class ConsoleProxy(object):
         self.socket.send(dump)
 
         print('recv: ')
-        recv = self.socket.recv()
-        print(msgpack.unpackb(recv, encoding='utf-8'))
+        #recv = self.socket.recv()
+        #print(msgpack.unpackb(recv, encoding='utf-8'))
 
     def disconnect(self):
         self.socket.close()
