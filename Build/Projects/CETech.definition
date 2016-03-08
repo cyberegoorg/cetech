@@ -25,8 +25,12 @@
     </Service>
     <Service Name="Develop">
       <AddDefine>CETECH_DEVELOP</AddDefine>
-      <Reference Include="SQLite" />
-      <Platforms>Windows,MacOS,Linux</Platforms>
+      <Reference Include="SQLite">
+        <Platforms>Windows</Platforms>
+      </Reference>
+      <Reference Include="Mono.Data.SQLite">
+        <Platforms>Windows,MacOS,Linux</Platforms>
+      </Reference>
     </Service>
   </Services>
   <Files>
