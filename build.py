@@ -54,12 +54,20 @@ CONFIG = {
 
 # Build platform.
 PLATFORMS = {
-    'windows64'
+    'windows64',
+    'linux64'
 }
 
 # Build platform.
 PLATFORMS_PROTOBUILD = {
-    'windows64': 'Windows'
+    'windows64': 'Windows',
+    'linux64': 'Linux'
+}
+
+# Build platform.
+PLATFORMS_SLN  = {
+    'windows64': 'CETech.Windows.sln',
+    'linux64': 'CETech.Linux.sln'
 }
 
 # Build platform.
@@ -68,8 +76,9 @@ PROTOBUILD_CONFIG = {
 }
 
 def make_vs(config, platform_, debug):
-    cmds = [os.path.join('C:\Program Files (x86)\Microsoft Visual Studio 14.0\Common7\IDE', 'devenv')]
-    cmds.append('sources\CETech\CETech.Windows.csproj')
+    cmds = [os.path.join('C:\Program Files (x86)\Microsoft Visual Studio 14.0\Common7\IDE', 'devenv'),
+            PLATFORMS_SLN[platform_]]
+
     cmds.append('/build')
 
     if not debug:
@@ -79,8 +88,19 @@ def make_vs(config, platform_, debug):
 
     return cmds
 
+def make_xbuild(config, platform_, debug):
+    cmds = ['xbuild', PLATFORMS_SLN[platform_]]
+
+    if not debug:
+        cmds.append('/p:configuration=Release')
+    else:
+        cmds.append('/p:configuration=Debug')
+
+    return cmds
+
 PLATFORMS_MAKE = {
-    'windows64': make_vs
+    'windows64': make_vs,
+    'linux64':make_xbuild
 }
 
 ########
@@ -123,7 +143,7 @@ def run_protobuild(config, platform_):
     """
     print('Runing Protobuild.exe.')
 
-    cmds = [os.path.join('Protobuild.exe')]
+    cmds = [os.path.join(ROOT_DIR, 'Protobuild.exe')]
 
     if config in PROTOBUILD_CONFIG:
         cmds.extend(PROTOBUILD_CONFIG[config])
