@@ -4,7 +4,6 @@ from PyQt5.QtWidgets import QFrame
 
 from playground.ui.profilerwidget import Ui_ProfilerWidget
 
-
 class ProfilerWidget(QFrame, Ui_ProfilerWidget):
     def __init__(self, api):
         super(ProfilerWidget, self).__init__()
@@ -16,3 +15,4 @@ class ProfilerWidget(QFrame, Ui_ProfilerWidget):
         page.settings().setAttribute(QWebSettings.DeveloperExtrasEnabled, True)
 
         self.profile_webview.page().mainFrame().setUrl(QUrl("file:///%s/html/profiler.html" % QDir.currentPath()))
+

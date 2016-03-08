@@ -15,7 +15,7 @@ namespace CETech
 
             if (_windowPtr == IntPtr.Zero)
             {
-                throw new NullReferenceException();
+                throw new Exception(string.Format("Could not create window: {0}", SDL.SDL_GetError()));
             }
         }
 
