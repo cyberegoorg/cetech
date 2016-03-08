@@ -1,0 +1,9 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ExternalProject Name="NNanomsg">
+  <Binary
+    Name="ExternalLib"
+    Path="externals\build\windows64\NNanomsg\Debug\NNanomsg.dll" />
+
+  <NativeBinary Path="externals\build\windows64\nanomsg\Release\nanomsg.dll" />
+
+</ExternalProject>

@@ -1,5 +1,8 @@
 ﻿using System;
 using System.IO;
+using MoonSharp.Interpreter;
+using NNanomsg;
+using NNanomsg.Protocols;
 
 namespace CETech.Utils
 {
@@ -52,7 +55,7 @@ namespace CETech.Utils
         /// <summary>
         ///     File log handler
         /// </summary>
-        public class FileLog : LogHandler
+        public class FileLog 
         {
             private readonly StreamWriter _write;
 
@@ -77,6 +80,37 @@ namespace CETech.Utils
             {
                 _write.Write(LogFormat, level, where, time, workerId, msg);
                 _write.Flush();
+            }
+        }
+
+        /// <summary>
+        ///     Nanomsg log handler
+        /// </summary>
+        public class NanoLog
+        {
+            private PublishSocket _socket;
+
+            /// <summary>
+            ///     Create file log handler
+            /// </summary>
+            /// <param name="url">url</param>
+            public NanoLog(string url)
+            {
+                _socket = new PublishSocket();
+                _socket.Bind(url);
+            }
+
+            /// <summary>
+            ///     Log handler
+            /// </summary>
+            /// <param name="level">Level</param>
+            /// <param name="time">Time</param>
+            /// <param name="workerId">Worker id</param>
+            /// <param name="where">Where</param>
+            /// <param name="msg">Msg</param>
+            public void Log(Log.Level level, DateTime time, int workerId, string where, string msg)
+            {
+                _socket.Send(System.Text.Encoding.UTF8.GetBytes(string.Format(LogFormat, level, where, time, workerId, msg).ToCharArray()));
             }
         }
     }

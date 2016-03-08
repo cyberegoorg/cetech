@@ -154,3 +154,22 @@ nanomsg:
 
     windows64:
       - copy: [Release\nanomsg.dll, nanomsg\Release]
+
+nnanomsg:
+  clone: git clone https://github.com/mhowlett/NNanomsg.git --depth 1
+
+  build:
+    windows64:
+      - devenv NNanomsg.sln /build Debug /project NNanomsg
+      - devenv NNanomsg.sln /build Release /project NNanomsg
+
+    linux64:
+      - xbuild /p:Configuration=Debug NNanomsg/NNanomsg.csproj
+      - xbuild /p:Configuration=Release-Unsigned NNanomsg/NNanomsg.csproj
+
+  install:
+     windows64:
+      - copytree: [NNanomsg\bin, NNanomsg]
+
+     linux64:
+      - copytree: [NNanomsg\bin, NNanomsg]

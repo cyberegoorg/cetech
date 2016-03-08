@@ -59,9 +59,14 @@ namespace CETech
                 delegate { });
         }
 
+
+        private static LogHandler.NanoLog nnlog;
         private static bool BigInit()
         {
+            nnlog = new LogHandler.NanoLog("ws://*:5556");
+
             Log.LogEvent += LogHandler.ConsoleLog;
+            Log.LogEvent += nnlog.Log;
 
             FileSystem.MapRootDir("core", "core");
             FileSystem.MapRootDir("src", Path.Combine("data", "src"));
