@@ -31,9 +31,7 @@
       <Reference Include="Mono.Data.SQLite">
         <Platforms>Windows,MacOS,Linux</Platforms>
       </Reference>
-
       <Reference Include="NNanomsg" />
-
     </Service>
   </Services>
   <Files>
