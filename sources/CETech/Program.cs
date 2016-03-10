@@ -6,6 +6,10 @@ using CETech.Input;
 using CETech.Lua;
 using CETech.Utils;
 using Mono.Options;
+#if CETECH_SDL2
+using SDL2;
+
+#endif
 
 namespace CETech
 {
@@ -59,7 +63,7 @@ namespace CETech
             string core_dir = null;
             string source_dir = null;
 
-            DevelopFlags.wid = 0;
+            DevelopFlags.wid = IntPtr.Zero;
 #endif
             var p = new OptionSet
             {
@@ -95,7 +99,7 @@ namespace CETech
 
                 {
                     "wid=", "Window ptr.",
-                    (uint v) => DevelopFlags.wid = v
+                    (long v) => DevelopFlags.wid = new IntPtr(v)
                 }
 #endif
             };
@@ -157,7 +161,7 @@ namespace CETech
                 }
             }
 
-            if (DevelopFlags.wid == 0)
+            if (DevelopFlags.wid == IntPtr.Zero)
             {
                 main_window = new Window(
                     Config.GetValueString("window.title"),
@@ -217,6 +221,10 @@ namespace CETech
         {
             Log.LogEvent += LogHandler.ConsoleLog;
 
+#if CETECH_SDL2
+            SDL.SDL_Init(SDL.SDL_INIT_EVERYTHING);
+#endif
+
 #if CETECH_DEVELOP
             FileSystem.MapRootDir("core", Config.GetValueString("resource_manager.core"));
             FileSystem.MapRootDir("src", Config.GetValueString("resource_manager.src"));
@@ -252,7 +260,7 @@ namespace CETech
         {
             public bool compile;
             public bool ccontinue;
-            public uint wid;
+            public IntPtr wid;
         }
 
         private static DevelopCmdFlags DevelopFlags;

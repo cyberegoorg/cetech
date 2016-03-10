@@ -7,11 +7,11 @@ namespace CETech
 {
     public partial class Window
     {
-        public Window(uint id)
+        public Window(IntPtr id)
         {
             //Width = width;
             //Height = height;
-            _windowPtr = SDL.SDL_GetWindowFromID(id);
+            _windowPtr = SDL.SDL_CreateWindowFrom(id);
 
             if (_windowPtr == IntPtr.Zero)
             {
