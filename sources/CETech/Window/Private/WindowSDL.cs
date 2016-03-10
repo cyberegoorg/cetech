@@ -7,6 +7,18 @@ namespace CETech
 {
     public partial class Window
     {
+        public Window(uint id)
+        {
+            //Width = width;
+            //Height = height;
+            _windowPtr = SDL.SDL_GetWindowFromID(id);
+
+            if (_windowPtr == IntPtr.Zero)
+            {
+                throw new Exception(string.Format("Could not create window: {0}", SDL.SDL_GetError()));
+            }
+        }
+
         private IntPtr _windowPtr;
 
         private void CtorImpl(string title, WindowPos x, WindowPos y, int width, int height, int flags)
@@ -56,7 +68,12 @@ namespace CETech
             var wmi = new SDL.SDL_SysWMinfo();
             SDL.SDL_GetWindowWMInfo(_windowPtr, ref wmi);
 
+#if PLATFORM_WINDOWS
             return wmi.info.win.window;
+
+#elif PLATFORM_LINUX
+            return wmi.info.x11.window;
+#endif
         }
 
         private void ResizeImpl(int width, int height)

@@ -14,7 +14,7 @@ namespace CETech
         /// <summary>
         ///     Get application main window
         /// </summary>
-        public static Window MainWindow { get; private set; }
+        public static Window MainWindow { get; set; }
 
         /// <summary>
         ///     Init application
@@ -38,11 +38,6 @@ namespace CETech
         public static void Run()
         {
             _run = true;
-
-            MainWindow = new Window(
-                Config.GetValueString("window.title"),
-                WindowPos.Centered, WindowPos.Centered,
-                Config.GetValueInt("window.width"), Config.GetValueInt("window.height"), 0);
 
             RenderSystem.Init(MainWindow, RenderSystem.BackendType.Default);
 

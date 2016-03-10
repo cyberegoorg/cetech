@@ -100,7 +100,7 @@ class LogWidget(QFrame, Ui_LogWidget):
         """
 
         level = item.data(0, Qt.UserRole)
-        if level != 'E':
+        if level != 'Error':
             return
 
         where = item.text(3)

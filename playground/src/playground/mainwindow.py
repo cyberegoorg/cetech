@@ -96,7 +96,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         if platform.system().lower() == 'darwin':
             wid = None
         else:
-            wid = self.ogl_widget.winId()
+            wid = self.ogl_widget.nativeParentWidget().winId()
 
         self.project.run_cetech(build_type=CetechProject.BUILD_DEBUG, compile_=True, continue_=True,
                                 wid=wid)

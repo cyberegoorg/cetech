@@ -25,6 +25,16 @@ class CetechProject(object):
     BUILD_DEVELOP = 'Develop'
     BUILD_RELEASE = 'Release'
 
+    _BIN_PLATFORM = {
+        'windows': 'Windows'
+    }
+
+    _BUILD_DIR = {
+        BUILD_DEBUG: 'Debug',
+        BUILD_DEVELOP: 'Debug',
+        BUILD_RELEASE: 'Release'
+    }
+
     def __init__(self):
         self.project_dir = None
         self.spawned_process = []
@@ -76,19 +86,13 @@ class CetechProject(object):
             print("out:\n%s\n err:\n%s\n" % (out, err))
 
     def get_executable_path(self, build_type):
-        engine_bin_path = '../build/'
-
         _platform = platform.system().lower()
-        if _platform == 'darwin':
-            _platform = 'osx'
 
-        platform_dir = "%s%s_clang" % (_platform, platform.architecture()[0][0:2])
+        engine_bin_path = os.path.join('..', 'sources', 'CETech', 'bin', self._BIN_PLATFORM[_platform], 'AnyCPU',
+                                       self._BUILD_DIR[build_type], 'CETech.exe')
+        return engine_bin_path
 
-        exec_name = "cetech%s" % build_type
-
-        return os.path.join(engine_bin_path, platform_dir, 'bin', exec_name)
-
-    def run_cetech(self, build_type, compile_=False, continue_=False, wait=False, daemon=False, port=None, wid=None,
+    def run_cetech(self, build_type, compile_=False, continue_=False, wait=False, daemon=False, wid=None,
                    core_dir=None):
         args = [
             "-s %s" % self.source_dir,
@@ -96,31 +100,27 @@ class CetechProject(object):
         ]
 
         if compile_:
-            args.append("-c")
+            args.append("--compile")
 
         if continue_:
             args.append("--continue")
 
         if wait:
-            args.append("-w")
-
-        if port:
-            args.append("-p %d" % port)
+            args.append("-wait")
 
         if daemon:
             args.append("--daemon")
 
-        #TODO bug #114 workaround. Disable create sub engine...
+        # TODO bug #114 workaround. Disable create sub engine...
         if wid and platform.system().lower() != 'darwin':
             args.append("--wid %s" % int(wid))
 
         if core_dir:
-            args.append("--core-dir %s" % core_dir)
+            args.append("--core %s" % core_dir)
         else:
-            args.append("--core-dir ../core")
+            args.append("--core ../core")
 
         cmd = "%s %s" % (self.get_executable_path(build_type), ' '.join(args))
-        print(cmd)
 
         process = QProcess()
         process.start(cmd)
