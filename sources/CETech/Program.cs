@@ -22,8 +22,8 @@ namespace CETech
         private static void Main(string[] args)
         {
             Config.CreateValue("platform", "Platform", GetPlatform());
-            Config.CreateValue("resource_manager.core", "Path to core dir", "core");
-            Config.CreateValue("resource_manager.src", "Path to source dir", Path.Combine("data", "src"));
+            Config.CreateValue("resource_compiler.core", "Path to core dir", "core");
+            Config.CreateValue("resource_compiler.src", "Path to source dir", Path.Combine("data", "src"));
             Config.CreateValue("resource_manager.build", "Path to build dir", Path.Combine("data", "build"));
 
             Config.CreateValue("boot_pacakge", "Boot package", "boot");
@@ -126,12 +126,12 @@ namespace CETech
 #if CETECH_DEVELOP
             if (source_dir != null)
             {
-                Config.SetValue("resource_manager.src", source_dir);
+                Config.SetValue("resource_compiler.src", source_dir);
             }
 
             if (core_dir != null)
             {
-                Config.SetValue("resource_manager.core", core_dir);
+                Config.SetValue("resource_compiler.core", core_dir);
             }
 #endif
 
@@ -226,8 +226,8 @@ namespace CETech
 #endif
 
 #if CETECH_DEVELOP
-            FileSystem.MapRootDir("core", Config.GetValueString("resource_manager.core"));
-            FileSystem.MapRootDir("src", Config.GetValueString("resource_manager.src"));
+            FileSystem.MapRootDir("core", Config.GetValueString("resource_compiler.core"));
+            FileSystem.MapRootDir("src", Config.GetValueString("resource_compiler.src"));
 #endif
 
             FileSystem.MapRootDir("build",
