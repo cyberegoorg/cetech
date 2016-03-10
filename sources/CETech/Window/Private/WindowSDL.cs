@@ -17,6 +17,13 @@ namespace CETech
             {
                 throw new Exception(string.Format("Could not create window: {0}", SDL.SDL_GetError()));
             }
+
+
+            int w, h;
+            SDL.SDL_GetWindowSize(_windowPtr, out w, out h);
+
+            Width = w;
+            Height = h;
         }
 
         private IntPtr _windowPtr;
