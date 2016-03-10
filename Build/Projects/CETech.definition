@@ -39,6 +39,8 @@
     <Compile Include="Application\Private\ApplicationSDL.cs">
       <Platforms>Windows,Linux</Platforms>
     </Compile>
+    <Compile Include="Develop\ConsoleServer.cs" />
+    <Compile Include="Develop\Private\ConsoleServer.cs" />
     <Compile Include="FileSystem\FileSystem.cs" />
     <Compile Include="Input\Keyboard.cs" />
     <Compile Include="Input\Mouse.cs" />
@@ -74,14 +76,12 @@
     <Compile Include="Utils\Config.cs" />
     <Compile Include="Utils\Log.cs" />
     <Compile Include="Utils\LogHandler.cs" />
+    <Compile Include="Utils\Options.cs" />
     <Compile Include="Window\Private\WindowSDL.cs">
       <Services>SDL2</Services>
     </Compile>
     <Compile Include="Window\Window.cs" />
     <Compile Include="Window\WindowFlags.cs" />
     <Compile Include="Window\WindowPos.cs" />
-    <Compile Include="Utils\Options.cs" />
-    <Compile Include="Develop\ConsoleServer.cs" />
-    <Compile Include="Develop\Private\ConsoleServer.cs" />
   </Files>
 </Project>
