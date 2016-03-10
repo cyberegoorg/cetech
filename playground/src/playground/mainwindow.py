@@ -91,12 +91,10 @@ class MainWindow(QMainWindow, Ui_MainWindow):
     def open_project(self, name, dir):
         self.project.open_project(name, dir)
 
-        # self.project.run_cetech(build_type=CetechProject.BUILD_DEBUG, compile=True, continu=True, daemon=True)
-
         if platform.system().lower() == 'darwin':
             wid = None
         else:
-            wid = self.ogl_widget.nativeParentWidget().winId()
+            wid = self.ogl_widget.winId()
 
         self.project.run_cetech(build_type=CetechProject.BUILD_DEBUG, compile_=True, continue_=True,
                                 wid=wid)
