@@ -65,7 +65,7 @@ PLATFORMS_PROTOBUILD = {
 }
 
 # Build platform.
-PLATFORMS_SLN  = {
+PLATFORMS_SLN = {
     'windows64': 'CETech.Windows.sln',
     'linux64': 'CETech.Linux.sln'
 }
@@ -75,11 +75,10 @@ PROTOBUILD_CONFIG = {
     'runtime': ['-disable', 'Develop']
 }
 
+
 def make_vs(config, platform_, debug):
     cmds = [os.path.join('C:\Program Files (x86)\Microsoft Visual Studio 14.0\Common7\IDE', 'devenv'),
-            PLATFORMS_SLN[platform_]]
-
-    cmds.append('/build')
+            PLATFORMS_SLN[platform_], '/build']
 
     if not debug:
         cmds.append('Release')
@@ -87,6 +86,7 @@ def make_vs(config, platform_, debug):
         cmds.append('Debug')
 
     return cmds
+
 
 def make_xbuild(config, platform_, debug):
     cmds = ['xbuild', PLATFORMS_SLN[platform_]]
@@ -98,9 +98,10 @@ def make_xbuild(config, platform_, debug):
 
     return cmds
 
+
 PLATFORMS_MAKE = {
     'windows64': make_vs,
-    'linux64':make_xbuild
+    'linux64': make_xbuild
 }
 
 ########
@@ -127,7 +128,7 @@ ARGS_PARSER.add_argument(
 ARGS_PARSER.add_argument(
     "-d", "--debug",
     help='Debug build',
-    default='store_false')
+    action='store_true')
 
 ARGS_PARSER.add_argument(
     "-p", "--platform",
@@ -143,7 +144,10 @@ def run_protobuild(config, platform_):
     """
     print('Runing Protobuild.exe.')
 
-    cmds = [os.path.join(ROOT_DIR, 'Protobuild.exe')]
+    if 'windows' in platform_:
+        cmds = [os.path.join(ROOT_DIR, 'Protobuild.exe')]
+    else:
+        cmds = ['mono', os.path.join(ROOT_DIR, 'Protobuild.exe')]
 
     if config in PROTOBUILD_CONFIG:
         cmds.extend(PROTOBUILD_CONFIG[config])
@@ -151,6 +155,7 @@ def run_protobuild(config, platform_):
     cmds.append(PLATFORMS_PROTOBUILD[platform_])
 
     subprocess.check_call(cmds)
+
 
 def make(config, platform_, debug, generate_only=False):
     """Make build
@@ -164,6 +169,7 @@ def make(config, platform_, debug, generate_only=False):
     if not generate_only:
         cmds = PLATFORMS_MAKE[platform_](config=config, platform_=platform_, debug=debug)
         subprocess.check_call(cmds)
+
 
 def clean():
     """ Remove build dir.
