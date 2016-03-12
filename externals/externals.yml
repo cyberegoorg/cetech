@@ -142,7 +142,7 @@ nanomsg:
 
   build:
     posix: &nanomsg_build_posix
-      [./autogen.sh, ./configure, make]
+      [autoreconf -ifv, ./configure, make]
 
     linux64:  *nanomsg_build_posix
     linux32:  *nanomsg_build_posix
@@ -174,7 +174,7 @@ nnanomsg:
 
     linux64:
       - xbuild /p:Configuration=Debug NNanomsg/NNanomsg.csproj
-      - xbuild /p:Configuration=Release-Unsigned NNanomsg/NNanomsg.csproj
+      - xbuild /p:Configuration=Release NNanomsg/NNanomsg.csproj
 
   install:
      windows64:
@@ -182,5 +182,5 @@ nnanomsg:
       - copytree: [NNanomsg\bin\Debug, Debug\lib]
 
      linux64:
-      - copytree: [NNanomsg/bin/Release, Release]
-      - copytree: [NNanomsg/bin/Debug, Debug]
+      - copytree: [NNanomsg/bin/Release, Release/lib]
+      - copytree: [NNanomsg/bin/Debug, Debug/lib]
