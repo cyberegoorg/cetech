@@ -1,4 +1,5 @@
 ﻿using System;
+using CETech.Develop;
 using SharpBgfx;
 
 namespace CETech
@@ -50,6 +51,8 @@ namespace CETech
             Bgfx.SetDebugFeatures(DebugFeatures.DisplayStatistics);
 
             Resize(window.Width, window.Height);
+
+            ConsoleServer.RegisterCommand("renderer.resize", args => Resize(args["width"].AsInt32(), args["height"].AsInt32()));
         }
 
         private static void BeginFrameImpl()

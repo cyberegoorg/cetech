@@ -1,3 +1,4 @@
+using CETech.Develop;
 using CETech.Input;
 using CETech.Lua;
 
@@ -47,6 +48,8 @@ namespace CETech
             while (_run)
             {
                 //Debug.Assert(TaskManager.OpenTaskCount < 2);
+
+                ConsoleServer.Tick();
 
                 PlaformUpdateEvents();
 

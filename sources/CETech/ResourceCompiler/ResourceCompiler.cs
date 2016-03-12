@@ -3,6 +3,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using CETech.Develop;
 using CETech.Utils;
 
 namespace CETech
@@ -19,6 +20,16 @@ namespace CETech
         public delegate void Compiler(CompilatorApi capi);
 
         private static readonly Dictionary<long, Compiler> _compoilerMap = new Dictionary<long, Compiler>();
+
+        public static void Init()
+        {
+            ConsoleServer.RegisterCommand("resource_compiler.compile_all", args => CompileAll());
+        }
+
+        public static void Shutdown()
+        {
+        }
+
 
         /// <summary>
         ///     Register compiler for type

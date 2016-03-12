@@ -17,6 +17,8 @@ function Game:shutdown()
 end
 
 function Game:update(dt)
+    --Log.Info("boot.lua", "init")
+    
     if Keyboard.ButtonPressed(btn) then
         Log.Info("lua", "DOWN.......")
     end
