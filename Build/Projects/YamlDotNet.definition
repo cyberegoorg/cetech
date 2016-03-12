@@ -2,6 +2,6 @@
 <ExternalProject Name="YamlDotNet">
   <Binary
     Name="ExternalLib"
-    Path="externals\build\windows64\YamlDotNet\Debug\YamlDotNet.dll" />
+    Path="externals\build\windows64\Debug\lib\YamlDotNet.dll" />
 
 </ExternalProject>
