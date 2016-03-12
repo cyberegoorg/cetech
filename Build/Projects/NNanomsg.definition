@@ -2,8 +2,8 @@
 <ExternalProject Name="NNanomsg">
   <Binary
     Name="ExternalLib"
-    Path="externals\build\windows64\NNanomsg\Debug\NNanomsg.dll" />
+    Path="externals\build\windows64\Debug\lib\NNanomsg.dll" />
 
-  <NativeBinary Path="externals\build\windows64\nanomsg\Release\nanomsg.dll" />
+  <NativeBinary Path="externals\build\windows64\Release\lib\nanomsg.dll" />
 
 </ExternalProject>

@@ -15,10 +15,12 @@ sharp-bgfx:
 
   install:
      windows64:
-      - copytree: [SharpBgfx\bin, SharpBgfx]
+      - copytree: [SharpBgfx\bin\Debug, Debug\lib]
+      - copytree: [SharpBgfx\bin\Release, Release\lib]
 
      linux64:
-      - copytree: [SharpBgfx/bin, SharpBgfx]
+      - copytree: [SharpBgfx/bin/Debug, Debug\lib]
+      - copytree: [SharpBgfx/bin/Release, Release\lib]
 
 #############
 # MoonSharp #
@@ -37,9 +39,12 @@ moonsharp:
 
   install:
     windows64:
-      - copytree: [src\MoonSharp.Interpreter\bin, MoonSharp]
+      - copytree: [src\MoonSharp.Interpreter\bin\Debug, Debug\lib]
+      - copytree: [src\MoonSharp.Interpreter\bin\Release, Release\lib]
+
     linux64:
-      - copytree: [src/MoonSharp.Interpreter/bin, MoonSharp]
+      - copytree: [src/MoonSharp.Interpreter/bin/Debug, Debug/lib]
+      - copytree: [src/MoonSharp.Interpreter/bin/Release, Release/lib]
 
 ###########
 # SDL2-CS #
@@ -59,10 +64,12 @@ sdl2-cs:
 
   install:
      windows64:
-      - copytree: [bin, SDL2-CS]
+      - copytree: [bin\Debug, Debug\lib]
+      - copytree: [bin\Release, Release\lib]
 
      linux64:
-      - copytree: [bin, SDL2-CS]
+      - copytree: [bin/Debug, Debug/lib]
+      - copytree: [bin/Release, Release/lib]
 
 
 ##############
@@ -82,10 +89,12 @@ yamldotnet:
 
   install:
      windows64:
-      - copytree: [YamlDotNet\bin, YamlDotNet]
+      - copytree: [YamlDotNet\bin\Debug, Debug\lib]
+      - copytree: [YamlDotNet\bin\Release-Unsigned, Release\lib]
 
      linux64:
-      - copytree: [YamlDotNet\bin, YamlDotNet]
+      - copytree: [YamlDotNet/bin/Debug, Debug/lib]
+      - copytree: [YamlDotNet/bin/Release-Unsigned, Release/lib]
 
 ###############
 # MsgPack-cli #
@@ -104,12 +113,12 @@ msgpack-cli:
 
   install:
      windows64:
-      - copytree: [src\MsgPack.Net40\bin, MsgPack]
-      - copytree: [bin\net40-client, MsgPack\Release]
+      - copytree: [src\MsgPack.Net40\bin\Debug, Debug\lib]
+      - copytree: [bin\net40-client, Release\lib]
 
      linux64:
-      - copytree: [src/MsgPack.Net40/bin, MsgPack]
-      - copytree: [bin/net40-client, MsgPack/Release]
+      - copytree: [src/MsgPack.Net40/bin/Debug, Debug/lib]
+      - copytree: [bin/net40-client, Release/lib]
 
 
 ########
@@ -123,7 +132,7 @@ sdl2:
 
   install:
      windows64:
-      - copy: [SDL2.dll, sdl2\Release]
+      - copy: [SDL2.dll, Release\lib]
 
 ###########
 # nanomsg #
@@ -153,7 +162,7 @@ nanomsg:
       - copy: [.libs/libnanomsg.so, dynlib]
 
     windows64:
-      - copy: [Release\nanomsg.dll, nanomsg\Release]
+      - copy: [Release\nanomsg.dll, Release\lib]
 
 nnanomsg:
   clone: git clone https://github.com/mhowlett/NNanomsg.git --depth 1
@@ -169,7 +178,9 @@ nnanomsg:
 
   install:
      windows64:
-      - copytree: [NNanomsg\bin, NNanomsg]
+      - copytree: [NNanomsg\bin\Release, Release\lib]
+      - copytree: [NNanomsg\bin\Debug, Debug\lib]
 
      linux64:
-      - copytree: [NNanomsg\bin, NNanomsg]
+      - copytree: [NNanomsg/bin/Release, Release]
+      - copytree: [NNanomsg/bin/Debug, Debug]
