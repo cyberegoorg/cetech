@@ -30,7 +30,7 @@ LIB_DIR = os.path.join(ROOT_DIR,
 
 if _platform == 'windows':
     QApplication.addLibraryPath(os.path.join(os.path.dirname(PyQt5.__file__), "plugins"))
-    ctypes.windll.LoadLibrary(os.path.join(ROOT_DIR, 'externals', 'build','windows64', 'nanomsg', 'Release', 'nanomsg.dll'))
+    ctypes.windll.LoadLibrary(os.path.join(ROOT_DIR, 'externals', 'build','windows64', 'Release', 'lib', 'nanomsg.dll'))
     #ctypes.windll.LoadLibrary('nanomsg.dll')
 
 else:

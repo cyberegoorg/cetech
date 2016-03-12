@@ -1,4 +1,5 @@
 ﻿using System.IO;
+using CETech.Develop;
 using CETech.Lua.Api;
 using MoonSharp.Interpreter;
 using MoonSharp.Interpreter.Loaders;
@@ -32,6 +33,8 @@ namespace CETech.Lua
             _enviromentScript.Globals["Keyboard"] = new KeyboardApi();
             _enviromentScript.Globals["Mouse"] = new MouseApi();
             _enviromentScript.Globals["PackageManager"] = new PackageManagerApi();
+
+            ConsoleServer.RegisterCommand("lua.execute", args => _enviromentScript.DoString(args["script"].AsString()));
         }
 
         /// <summary>

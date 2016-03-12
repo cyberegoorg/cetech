@@ -149,8 +149,6 @@ namespace CETech
             Window main_window = null;
 
 #if CETECH_DEVELOP
-            ConsoleServer.Init();
-
             if (DevelopFlags.compile)
             {
                 ResourceCompiler.CompileAll();
@@ -226,6 +224,8 @@ namespace CETech
 #endif
 
 #if CETECH_DEVELOP
+            ConsoleServer.Init();
+            ResourceCompiler.Init();
             FileSystem.MapRootDir("core", Config.GetValueString("resource_compiler.core"));
             FileSystem.MapRootDir("src", Config.GetValueString("resource_compiler.src"));
 #endif
@@ -250,6 +250,7 @@ namespace CETech
             Application.Shutdown();
 
 #if CETECH_DEVELOP
+            ResourceCompiler.Shutdown();
             ConsoleServer.Shutdown();
 #endif
             TaskManager.Shutdown();

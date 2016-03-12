@@ -92,7 +92,7 @@ namespace CETech
         {
             SDL.SDL_DestroyWindow(_windowPtr);
         }
-
+        
         private void UpdateImpl()
         {
             SDL.SDL_UpdateWindowSurface(_windowPtr);
