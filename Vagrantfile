@@ -12,7 +12,9 @@ Vagrant.configure(2) do |config|
         linux64.vm.box = "bugyt/archlinux"
 
         linux64.vm.provision "shell", inline: <<-SHELL
-            sudo pacman --noconfirm -S mono
+            sudo pacman -Syu --noconfirm
+            sudo pacman --noconfirm -S mono python-pip
+            sudo pip install -r requirements.txt
         SHELL
     end
 end
