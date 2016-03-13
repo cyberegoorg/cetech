@@ -52,7 +52,11 @@ namespace CETech
 
             Resize(window.Width, window.Height);
 
-            ConsoleServer.RegisterCommand("renderer.resize", args => Resize(args["width"].AsInt32(), args["height"].AsInt32()));
+            ConsoleServer.RegisterCommand("renderer.resize", (args, response) =>
+            {
+                Resize(args["width"].AsInt32(), args["height"].AsInt32());
+                Application.MainWindow.Resize(args["width"].AsInt32(), args["height"].AsInt32());
+            });
         }
 
         private static void BeginFrameImpl()

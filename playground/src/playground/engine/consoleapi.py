@@ -2,6 +2,9 @@ from playground.engine.consoleproxy import ConsoleProxy
 
 
 class ConsoleAPI(ConsoleProxy):
+    def wait(self):
+        self.send_command('wait')
+
     def lua_execute(self, script):
         self.send_command('lua.execute', script=script)
 

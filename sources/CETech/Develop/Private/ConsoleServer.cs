@@ -1,10 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
 using CETech.Utils;
-using MoonSharp.Interpreter.CoreLib;
 using MsgPack;
 using MsgPack.Serialization;
 using NNanomsg;
@@ -21,7 +18,6 @@ namespace CETech.Develop
 
         private static void InitImpl()
         {
-
             _nanoLog = new LogHandler.NanoLog("ws://*:5556");
             Log.LogEvent += _nanoLog.Log;
 
@@ -37,6 +33,8 @@ namespace CETech.Develop
                 var msg = _socket.Receive();
                 ParseMsg(msg);
             };
+
+            RegisterCommand("wait", (args, response) => {});
         }
 
         private static void ParseMsg(byte[] msg)
@@ -45,18 +43,26 @@ namespace CETech.Develop
                 MessagePackSerializer.Create<Dictionary<MessagePackObject, MessagePackObject>>()
                     .Unpack(new MemoryStream(msg));
 
-            string name = (string) mpoDict["name"];
+            var name = (string) mpoDict["name"];
             var args = mpoDict["args"].AsDictionary();
 
-            if (_commandHandlers.ContainsKey(name))
-            {
-                _commandHandlers[name](args);
-            }
-            else
+            if (!_commandHandlers.ContainsKey(name))
             {
                 Log.Warning("console_server", "Invalid command \"{0}\"", name);
+                return;
             }
 
+            var ms = new MemoryStream();
+            var packer = Packer.Create(ms);
+
+            _commandHandlers[name](args, packer);
+
+            if (ms.Length == 0)
+            {
+                packer.PackNull();
+            }
+
+            _socket.Send(ms.ToArray());
         }
 
         private static void ShutdownImpl()

@@ -1,6 +1,7 @@
 import argparse
 import platform
 
+import time
 from PyQt5.QtCore import QThread, Qt, QFileSystemWatcher, QDirIterator
 from PyQt5.QtWidgets import QMainWindow, QDockWidget, QTabWidget
 
@@ -41,7 +42,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
         # TODO bug #114 workaround. Disable create sub engine...
         if platform.system().lower() != 'darwin':
-            self.ogl_widget = CetechWidget(self, self.api)
+            self.ogl_widget = CetechWidget(self, self.api, self.project)
             self.ogl_dock = QDockWidget(self)
             self.ogl_dock.setWindowTitle("Engine View")
             self.ogl_dock.hide()
@@ -98,6 +99,11 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
         self.project.run_cetech(build_type=CetechProject.BUILD_DEBUG, compile_=True, continue_=True,
                                 wid=wid)
+
+        time.sleep(5)
+
+        self.api.connect()
+        self.api.wait()
 
         #self.api.start(QThread.LowPriority)
         self.logsub.start(QThread.LowPriority)

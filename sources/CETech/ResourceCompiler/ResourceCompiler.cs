@@ -23,7 +23,7 @@ namespace CETech
 
         public static void Init()
         {
-            ConsoleServer.RegisterCommand("resource_compiler.compile_all", args => CompileAll());
+            ConsoleServer.RegisterCommand("resource_compiler.compile_all", (args, response) => CompileAll());
         }
 
         public static void Shutdown()

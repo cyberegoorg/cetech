@@ -1,8 +1,11 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
+using System.Linq;
 using CETech.Develop;
 using CETech.Lua.Api;
 using MoonSharp.Interpreter;
 using MoonSharp.Interpreter.Loaders;
+using MsgPack;
 
 namespace CETech.Lua
 {
@@ -16,6 +19,57 @@ namespace CETech.Lua
         private static DynValue _initFce;
         private static DynValue _updateFce;
         private static DynValue _shutdownFce;
+
+        private static void PackDynValue(DynValue value, Packer packer)
+        {
+            switch (value.Type)
+            {
+                case DataType.Nil:
+                    packer.PackNull();
+                    break;
+                case DataType.Void:
+                    packer.PackNull();
+                    break;
+                case DataType.Boolean:
+                    packer.Pack(value.Boolean);
+                    break;
+                case DataType.Number:
+                    packer.Pack(value.Number);
+                    break;
+                case DataType.String:
+                    packer.Pack(value.String);
+                    break;
+                case DataType.Function:
+                    break;
+                case DataType.Table:
+                    packer.PackMapHeader(value.Table.Pairs.Count());
+                    foreach (var pair in value.Table.Pairs)
+                    {
+                        PackDynValue(pair.Key, packer);
+                        PackDynValue(pair.Value, packer);
+                    }
+                    break;
+                case DataType.Tuple:
+                    packer.PackArrayHeader(value.Tuple.Length);
+                    for (var i = 0; i < value.Tuple.Length; ++i)
+                    {
+                        PackDynValue(value.Tuple[i], packer);
+                    }
+                    break;
+                case DataType.UserData:
+                    break;
+                case DataType.Thread:
+                    break;
+                case DataType.ClrFunction:
+                    break;
+                case DataType.TailCallRequest:
+                    break;
+                case DataType.YieldRequest:
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException();
+            }
+        }
 
         /// <summary>
         ///     Init lua enviroment
@@ -34,7 +88,11 @@ namespace CETech.Lua
             _enviromentScript.Globals["Mouse"] = new MouseApi();
             _enviromentScript.Globals["PackageManager"] = new PackageManagerApi();
 
-            ConsoleServer.RegisterCommand("lua.execute", args => _enviromentScript.DoString(args["script"].AsString()));
+            ConsoleServer.RegisterCommand("lua.execute", (args, response) =>
+            {
+                DynValue ret = _enviromentScript.DoString(args["script"].AsString());
+                PackDynValue(ret, response);
+            });
         }
 
         /// <summary>
