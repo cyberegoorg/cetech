@@ -4,7 +4,6 @@ using System.IO;
 
 namespace CETech
 {
-
     public static partial class FileSystem
     {
         private static readonly Dictionary<string, string> RootDirMap = new Dictionary<string, string>();
