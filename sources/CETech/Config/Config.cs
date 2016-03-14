@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 
 namespace CETech
 {
@@ -12,6 +13,16 @@ namespace CETech
 
         private static readonly Dictionary<string, ConfigValueType> ConfigType =
             new Dictionary<string, ConfigValueType>();
+
+        public static ConfigValueType GetValueType(string name)
+        {
+            return ConfigType[name];
+        }
+
+        public static void LoadFromYaml(Stream input)
+        {
+            
+        }
 
         public static void CreateValue(string name, string description, int value)
         {
@@ -70,7 +81,7 @@ namespace CETech
             return ConfigValueString[name];
         }
 
-        private enum ConfigValueType
+        public enum ConfigValueType
         {
             Int,
             Float,
