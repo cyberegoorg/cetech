@@ -26,7 +26,8 @@ namespace CETech
             Config.CreateValue("resource_compiler.src", "Path to source dir", Path.Combine("data", "src"));
             Config.CreateValue("resource_manager.build", "Path to build dir", Path.Combine("data", "build"));
 
-            Config.CreateValue("boot_pacakge", "Boot package", "boot");
+            Config.CreateValue("boot.pkg", "Boot package", "boot");
+            Config.CreateValue("boot.script", "Boot script", "lua/boot");
 
             Config.CreateValue("window.title", "main window title", "CETech application");
             Config.CreateValue("window.width", "main window width", 800);
@@ -149,16 +150,6 @@ namespace CETech
             Window main_window = null;
 
 #if CETECH_DEVELOP
-            if (DevelopFlags.compile)
-            {
-                ResourceCompiler.CompileAll();
-
-                if (!DevelopFlags.ccontinue)
-                {
-                    return;
-                }
-            }
-
             if (DevelopFlags.wid == IntPtr.Zero)
             {
                 main_window = new Window(
@@ -180,9 +171,9 @@ namespace CETech
 #endif
             Application.MainWindow = main_window;
 
-            ResourceManager.LoadNow(PackageResource.Type, new[] {StringId.FromString("boot")});
-            PackageManager.Load(StringId.FromString("boot"));
-            PackageManager.Flush(StringId.FromString("boot"));
+            ResourceManager.LoadNow(PackageResource.Type, new[] {StringId.FromString(Config.GetValueString("boot.pkg"))});
+            PackageManager.Load(StringId.FromString(Config.GetValueString("boot.pkg")));
+            PackageManager.Flush(StringId.FromString(Config.GetValueString("boot.pkg")));
 
             Application.Run();
         }
@@ -193,8 +184,25 @@ namespace CETech
             ResourceCompiler.RegisterCompiler(PackageResource.Type, PackageResource.Compile);
             ResourceCompiler.RegisterCompiler(LuaResource.Type, LuaResource.Compile);
             ResourceCompiler.RegisterCompiler(StringId.FromString("texture"), delegate { });
-            ResourceCompiler.RegisterCompiler(StringId.FromString("config"), delegate { });
+            ResourceCompiler.RegisterCompiler(ConfigResource.Type, ConfigResource.Compile);
+
+            if (DevelopFlags.compile)
+            {
+                ResourceCompiler.CompileAll();
+
+                if (!DevelopFlags.ccontinue)
+                {
+                    return;
+                }
+            }
 #endif
+
+
+
+            ResourceManager.RegisterType(
+                ConfigResource.Type,
+                ConfigResource.ResourceLoader, ConfigResource.ResourceUnloader,
+                ConfigResource.ResourceOnline, ConfigResource.ResourceOffline);
 
             ResourceManager.RegisterType(
                 PackageResource.Type,
@@ -210,9 +218,7 @@ namespace CETech
                 StringId.FromString("texture"),
                 delegate { return null; }, delegate { },
                 delegate { }, delegate { });
-            ResourceManager.RegisterType(StringId.FromString("config"), delegate { return null; }, delegate { },
-                delegate { },
-                delegate { });
+
         }
 
         private static bool BigInit()
@@ -236,6 +242,8 @@ namespace CETech
             TaskManager.Init();
 
             InitResouce();
+
+            ResourceManager.LoadNow(ConfigResource.Type, new []{StringId.FromString("global")});
 
             Keyboard.Init();
             Mouse.Init();

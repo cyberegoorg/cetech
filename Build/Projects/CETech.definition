@@ -40,6 +40,8 @@
     <Compile Include="Application\Private\ApplicationSDL.cs">
       <Platforms>Windows,Linux</Platforms>
     </Compile>
+    <Compile Include="Config\Config.cs" />
+    <Compile Include="Config\ConfigResource.cs" />
     <Compile Include="Develop\ConsoleServer.cs" />
     <Compile Include="Develop\Private\BuildDb.cs" />
     <Compile Include="Develop\Private\ConsoleServer.cs" />
@@ -70,13 +72,12 @@
     <Compile Include="RenderSystem\Private\RendererBgfx.cs" />
     <Compile Include="RenderSystem\RenderSystem.cs" />
     <Compile Include="ResourceManager\Private\ResourceManager.cs" />
+    <Compile Include="ResourceManager\Private\StringId.cs" />
     <Compile Include="ResourceManager\ResourceManager.cs" />
     <Compile Include="ResourceManager\StringId.cs" />
     <Compile Include="TaskManager\Private\QueueMPMC.cs" />
     <Compile Include="TaskManager\Private\TaskManager.cs" />
     <Compile Include="TaskManager\TaskManager.cs" />
-    <Compile Include="Utils\ByteUtils.cs" />
-    <Compile Include="Utils\Config.cs" />
     <Compile Include="Utils\Log.cs" />
     <Compile Include="Utils\LogHandler.cs" />
     <Compile Include="Utils\Options.cs" />
