@@ -806,7 +806,6 @@ namespace Mono.Options
 #endif
 
         public string OptionName { get; }
-
 #if !PCL
 #pragma warning disable 618 // SecurityPermissionAttribute is obsolete
         [SecurityPermission(SecurityAction.LinkDemand, SerializationFormatter = true)]
@@ -827,10 +826,10 @@ namespace Mono.Options
         private const int Description_FirstWidth = 80 - OptionWidth;
         private const int Description_RemWidth = 80 - OptionWidth - 2;
 
+        private readonly List<ArgumentSource> sources = new List<ArgumentSource>();
+
         private readonly Regex ValueOption = new Regex(
             @"^(?<flag>--|-|/)(?<name>[^:=]+)((?<sep>[:=])(?<value>.*))?$");
-
-        private readonly List<ArgumentSource> sources = new List<ArgumentSource>();
 
         public OptionSet()
             : this(delegate(string f) { return f; })

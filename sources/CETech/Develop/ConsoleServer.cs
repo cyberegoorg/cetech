@@ -1,16 +1,16 @@
-﻿using MsgPack;
+﻿using System.IO;
+using MsgPack;
 
 namespace CETech.Develop
 {
     public static partial class ConsoleServer
     {
-        public delegate void CommandHandler(MessagePackObjectDictionary args, Packer response);
+        public delegate void CommandHandler(MessagePackObjectDictionary args, ResponsePacker response);
 
         public static void RegisterCommand(string name, CommandHandler handler)
         {
             RegisterCommandImpl(name, handler);
         }
-
 
         public static void Init()
         {
@@ -25,6 +25,49 @@ namespace CETech.Develop
         public static void Tick()
         {
             TickImpl();
+        }
+
+        public partial class ResponsePacker
+        {
+            public ResponsePacker()
+            {
+                CtorImpl();
+            }
+
+            public MemoryStream GetMemoryStream()
+            {
+                return GetMemoryStreamImpl();
+            }
+
+            public void PackNull()
+            {
+                PackNullImpl();
+            }
+
+            public void Pack(bool boolean)
+            {
+                PackImpl(boolean);
+            }
+
+            public void Pack(double number)
+            {
+                PackImpl(number);
+            }
+
+            public void Pack(string @string)
+            {
+                PackImpl(@string);
+            }
+
+            public void PackMapHeader(int count)
+            {
+                PackMapHeaderImpl(count);
+            }
+
+            public void PackArrayHeader(int length)
+            {
+                PackArrayHeaderImpl(length);
+            }
         }
     }
 }

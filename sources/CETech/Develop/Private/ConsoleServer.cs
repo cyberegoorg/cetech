@@ -52,17 +52,16 @@ namespace CETech.Develop
                 return;
             }
 
-            var ms = new MemoryStream();
-            var packer = Packer.Create(ms);
-
+            var packer = new ResponsePacker();
             _commandHandlers[name](args, packer);
 
-            if (ms.Length == 0)
+            var stream = packer.GetMemoryStream();
+            if (stream.Length == 0)
             {
                 packer.PackNull();
             }
 
-            _socket.Send(ms.ToArray());
+            _socket.Send(stream.ToArray());
         }
 
         private static void ShutdownImpl()
@@ -80,6 +79,53 @@ namespace CETech.Develop
         private static void RegisterCommandImpl(string name, CommandHandler handler)
         {
             _commandHandlers[name] = handler;
+        }
+
+        public partial class ResponsePacker
+        {
+            private MemoryStream _ms;
+            private Packer _packer;
+
+            private void CtorImpl()
+            {
+                _ms = new MemoryStream();
+                _packer = Packer.Create(_ms);
+            }
+
+            private void PackNullImpl()
+            {
+                _packer.PackNull();
+            }
+
+            private void PackImpl(bool boolean)
+            {
+                _packer.Pack(boolean);
+            }
+
+            private void PackImpl(double number)
+            {
+                _packer.Pack(number);
+            }
+
+            private void PackImpl(string @string)
+            {
+                _packer.Pack(@string);
+            }
+
+            private void PackMapHeaderImpl(int count)
+            {
+                _packer.PackMapHeader(count);
+            }
+
+            private void PackArrayHeaderImpl(int length)
+            {
+                _packer.PackArrayHeader(length);
+            }
+
+            private MemoryStream GetMemoryStreamImpl()
+            {
+                return _ms;
+            }
         }
     }
 }
