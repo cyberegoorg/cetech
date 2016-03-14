@@ -101,7 +101,7 @@ namespace CETech
         /// <returns>True if can</returns>
         public static bool CanGet(long type, long[] names)
         {
-            return CanGet(type, names);
+            return CanGetImpl(type, names);
         }
 
         /// <summary>

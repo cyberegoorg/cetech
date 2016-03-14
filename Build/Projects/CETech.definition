@@ -29,7 +29,7 @@
         <Platforms>Windows</Platforms>
       </Reference>
       <Reference Include="Mono.Data.SQLite">
-        <Platforms>Windows,MacOS,Linux</Platforms>
+        <Platforms>MacOS,Linux</Platforms>
       </Reference>
       <Reference Include="NNanomsg" />
     </Service>

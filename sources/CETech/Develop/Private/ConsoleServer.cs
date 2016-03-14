@@ -40,7 +40,7 @@ namespace CETech.Develop
         private static void ParseMsg(byte[] msg)
         {
             var mpoDict =
-                MessagePackSerializer.Create<Dictionary<MessagePackObject, MessagePackObject>>()
+                MessagePackSerializer.Get<Dictionary<MessagePackObject, MessagePackObject>>()
                     .Unpack(new MemoryStream(msg));
 
             var name = (string) mpoDict["name"];
