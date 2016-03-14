@@ -5,7 +5,6 @@ using CETech.Develop;
 using CETech.Lua.Api;
 using MoonSharp.Interpreter;
 using MoonSharp.Interpreter.Loaders;
-using MsgPack;
 
 namespace CETech.Lua
 {
@@ -17,7 +16,7 @@ namespace CETech.Lua
         private static DynValue _updateFce;
         private static DynValue _shutdownFce;
 
-        private static void PackDynValue(DynValue value, Packer packer)
+        private static void PackDynValue(DynValue value, ConsoleServer.ResponsePacker packer)
         {
             switch (value.Type)
             {

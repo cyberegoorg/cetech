@@ -1,8 +1,9 @@
 ﻿//#if CETECH_DEVELOP
 
 using System.IO;
+using CETech.Develop.Private;
 
-namespace CETech
+namespace CETech.Develop
 {
     /// <summary>
     ///     Resources compiler
@@ -16,11 +17,18 @@ namespace CETech
         public delegate void Compiler(CompilatorApi capi);
 
 
+        /// <summary>
+        /// Init resource compiler.
+        /// </summary>
         public static void Init()
         {
             InitImpl();
         }
 
+
+        /// <summary>
+        /// Shutdown resource compiler.
+        /// </summary>
         public static void Shutdown()
         {
             ShutdownImpl();

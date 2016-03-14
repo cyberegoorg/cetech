@@ -2,10 +2,10 @@
 
 using System;
 using System.Collections.Generic;
-using CETech.Develop;
+using CETech.Develop.Private;
 using CETech.Utils;
 
-namespace CETech
+namespace CETech.Develop
 {
     /// <summary>
     ///     Resources compiler

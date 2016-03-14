@@ -1,14 +1,15 @@
 ﻿using System;
+using System.Data.SQLite;
 using System.IO;
 #if PLATFORM_WINDOWS
-using System.Data.SQLite;
+
 #elif PLATFORM_LINUX
 using Mono.Data.Sqlite;
 #endif
 
 // TODO: speed?
 
-namespace CETech
+namespace CETech.Develop.Private
 {
 #if PLATFORM_LINUX
 	using SQLiteConnection = SqliteConnection;
