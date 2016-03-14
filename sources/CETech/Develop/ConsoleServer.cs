@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using MsgPack;
+﻿using MsgPack;
 
 namespace CETech.Develop
 {

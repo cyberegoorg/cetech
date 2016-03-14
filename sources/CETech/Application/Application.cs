@@ -1,7 +1,3 @@
-using CETech.Develop;
-using CETech.Input;
-using CETech.Lua;
-
 namespace CETech
 {
     /// <summary>
@@ -9,9 +5,6 @@ namespace CETech
     /// </summary>
     public static partial class Application
     {
-        //private static long _lastFrameTick;
-        private static bool _run;
-
         /// <summary>
         ///     Get application main window
         /// </summary>
@@ -22,7 +15,7 @@ namespace CETech
         /// </summary>
         public static void Init()
         {
-            LuaEnviroment.Init();
+            InitImpl();
         }
 
         /// <summary>
@@ -30,7 +23,7 @@ namespace CETech
         /// </summary>
         public static void Shutdown()
         {
-            LuaEnviroment.Shutdown();
+            ShutdownImpl();
         }
 
         /// <summary>
@@ -38,41 +31,7 @@ namespace CETech
         /// </summary>
         public static void Run()
         {
-            _run = true;
-
-            RenderSystem.Init(MainWindow, RenderSystem.BackendType.Default);
-
-            LuaEnviroment.BootScriptInit(StringId.FromString("lua/boot"));
-
-            LuaEnviroment.BootScriptCallInit();
-            while (_run)
-            {
-                //Debug.Assert(TaskManager.OpenTaskCount < 2);
-
-                ConsoleServer.Tick();
-
-                PlaformUpdateEvents();
-
-                var frameTask = TaskManager.AddNull("frame");
-                var keyboardTask = TaskManager.AddBegin("keyboard", delegate { Keyboard.Process(); }, null,
-                    parent: frameTask);
-                var mouseTask = TaskManager.AddBegin("mouseTask", delegate { Mouse.Process(); }, null, parent: frameTask);
-
-                TaskManager.AddEnd(new[] {frameTask, keyboardTask, mouseTask});
-                TaskManager.Wait(frameTask);
-
-                LuaEnviroment.BootScriptCallUpdate(10.0f);
-
-                RenderSystem.BeginFrame();
-                RenderSystem.EndFrame();
-                MainWindow.Update();
-            }
-
-            LuaEnviroment.BootScriptCallShutdown();
-
-            MainWindow = null;
-
-            Shutdown();
+            RunImpl();
         }
 
         /// <summary>
@@ -80,7 +39,7 @@ namespace CETech
         /// </summary>
         public static void Quit()
         {
-            _run = false;
+            QuitImpl();
         }
     }
 }

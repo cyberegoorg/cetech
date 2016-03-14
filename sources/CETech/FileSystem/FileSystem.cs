@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
 
 namespace CETech
@@ -7,7 +6,7 @@ namespace CETech
     /// <summary>
     ///     File system
     /// </summary>
-    public static class FileSystem
+    public static partial class FileSystem
     {
         /// <summary>
         ///     File open mode
@@ -16,7 +15,8 @@ namespace CETech
         {
             /// <summary>
             ///     Read
-            /// </summary>d
+            /// </summary>
+            /// d
             Read = 0,
 
             /// <summary>
@@ -25,8 +25,6 @@ namespace CETech
             Write = 1
         }
 
-        private static readonly Dictionary<string, string> RootDirMap = new Dictionary<string, string>();
-
         /// <summary>
         ///     Map root to dir
         /// </summary>
@@ -34,7 +32,7 @@ namespace CETech
         /// <param name="dir">dir path</param>
         public static void MapRootDir(string root, string dir)
         {
-            RootDirMap[root] = dir;
+            MapRootDirImpl(root, dir);
         }
 
         /// <summary>
@@ -44,7 +42,7 @@ namespace CETech
         /// <returns></returns>
         public static string GetRootDir(string root)
         {
-            return RootDirMap[root];
+            return GetRootDirImpl(root);
         }
 
         /// <summary>
@@ -56,7 +54,7 @@ namespace CETech
         /// <returns>Stream</returns>
         public static Stream Open(string root, string path, OpenMode mode)
         {
-            return new FileStream(GetFullPath(root, path), ToFileFileMode(mode));
+            return OpenImpl(root, path, mode);
         }
 
         /// <summary>
@@ -67,7 +65,7 @@ namespace CETech
         /// <param name="files">Files in directory</param>
         public static void ListDirectory(string root, string path, out string[] files)
         {
-            files = Directory.GetFiles(GetFullPath(root, path), "*", SearchOption.AllDirectories);
+            ListDirectoryImpl(root, path, out files);
         }
 
         /// <summary>
@@ -77,7 +75,7 @@ namespace CETech
         /// <param name="path">Directory path</param>
         public static void CreateDirectory(string root, string path)
         {
-            Directory.CreateDirectory(GetFullPath(root, path));
+            CreateDirectoryImpl(root, path);
         }
 
         /// <summary>
@@ -88,7 +86,7 @@ namespace CETech
         /// <returns></returns>
         public static DateTime GetFileMTime(string root, string path)
         {
-            return File.GetLastWriteTimeUtc(GetFullPath(root, path));
+            return GetFileMTimeImpl(root, path);
         }
 
         /// <summary>
@@ -99,22 +97,7 @@ namespace CETech
         /// <returns></returns>
         public static string GetFullPath(string root, string path)
         {
-            return path == null ? RootDirMap[root] : Path.Combine(RootDirMap[root], path);
-        }
-
-        private static FileMode ToFileFileMode(OpenMode mode)
-        {
-            switch (mode)
-            {
-                case OpenMode.Read:
-                    return FileMode.Open;
-
-                case OpenMode.Write:
-                    return FileMode.Create;
-
-                default:
-                    throw new ArgumentOutOfRangeException("mode", mode, null);
-            }
+            return GetFullPathImpl(root, path);
         }
     }
 }

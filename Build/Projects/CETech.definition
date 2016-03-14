@@ -36,12 +36,14 @@
   </Services>
   <Files>
     <Compile Include="Application\Application.cs" />
+    <Compile Include="Application\Private\Application.cs" />
     <Compile Include="Application\Private\ApplicationSDL.cs">
       <Platforms>Windows,Linux</Platforms>
     </Compile>
     <Compile Include="Develop\ConsoleServer.cs" />
     <Compile Include="Develop\Private\ConsoleServer.cs" />
     <Compile Include="FileSystem\FileSystem.cs" />
+    <Compile Include="FileSystem\Private\FileSystem.cs" />
     <Compile Include="Input\Keyboard.cs" />
     <Compile Include="Input\Mouse.cs" />
     <Compile Include="Input\Private\KeyboardSDL.cs">
@@ -57,20 +59,25 @@
     <Compile Include="Lua\Api\PackageManagerApi.cs" />
     <Compile Include="Lua\LuaEnviroment.cs" />
     <Compile Include="Lua\LuaResource.cs" />
+    <Compile Include="Lua\Private\LuaEnviroment.cs" />
     <Compile Include="PackageManager\PackageManager.cs" />
     <Compile Include="PackageManager\PackageResource.cs" />
+    <Compile Include="PackageManager\Private\PackageManager.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="RenderSystem\Private\RendererBgfx.cs" />
     <Compile Include="RenderSystem\RenderSystem.cs" />
     <Compile Include="ResourceCompiler\Private\BuildDb.cs">
       <Services>Develop</Services>
     </Compile>
+    <Compile Include="ResourceCompiler\Private\ResourceCompiler.cs" />
     <Compile Include="ResourceCompiler\ResourceCompiler.cs">
       <Services>Develop</Services>
     </Compile>
+    <Compile Include="ResourceManager\Private\ResourceManager.cs" />
     <Compile Include="ResourceManager\ResourceManager.cs" />
     <Compile Include="ResourceManager\StringId.cs" />
     <Compile Include="TaskManager\Private\QueueMPMC.cs" />
+    <Compile Include="TaskManager\Private\TaskManager.cs" />
     <Compile Include="TaskManager\TaskManager.cs" />
     <Compile Include="Utils\ByteUtils.cs" />
     <Compile Include="Utils\Config.cs" />
