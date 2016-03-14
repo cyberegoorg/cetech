@@ -1,10 +1,6 @@
 ﻿//#if CETECH_DEVELOP
 
-using System;
-using System.Collections.Generic;
 using System.IO;
-using CETech.Develop;
-using CETech.Utils;
 
 namespace CETech
 {

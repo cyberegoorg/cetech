@@ -34,7 +34,7 @@ namespace CETech.Develop
                 ParseMsg(msg);
             };
 
-            RegisterCommand("wait", (args, response) => {});
+            RegisterCommand("wait", (args, response) => { });
         }
 
         private static void ParseMsg(byte[] msg)
