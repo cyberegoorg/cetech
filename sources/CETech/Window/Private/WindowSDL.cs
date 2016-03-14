@@ -7,6 +7,8 @@ namespace CETech
 {
     public partial class Window
     {
+        private IntPtr _windowPtr;
+
         public Window(IntPtr id)
         {
             //Width = width;
@@ -25,8 +27,6 @@ namespace CETech
             Width = w;
             Height = h;
         }
-
-        private IntPtr _windowPtr;
 
         private void CtorImpl(string title, WindowPos x, WindowPos y, int width, int height, int flags)
         {
@@ -92,7 +92,7 @@ namespace CETech
         {
             SDL.SDL_DestroyWindow(_windowPtr);
         }
-        
+
         private void UpdateImpl()
         {
             SDL.SDL_UpdateWindowSurface(_windowPtr);

@@ -1,24 +1,21 @@
 ﻿using System;
-
+using System.IO;
 #if PLATFORM_WINDOWS
 using System.Data.SQLite;
 #elif PLATFORM_LINUX
 using Mono.Data.Sqlite;
 #endif
 
-using System.IO;
-
 // TODO: speed?
-
 
 namespace CETech
 {
-	#if PLATFORM_LINUX
+#if PLATFORM_LINUX
 	using SQLiteConnection = SqliteConnection;
 	using SQLiteCommand = SqliteCommand;
 	#endif
 
-	/// <summary>
+    /// <summary>
     ///     Build DB
     /// </summary>
     public static class BuildDb

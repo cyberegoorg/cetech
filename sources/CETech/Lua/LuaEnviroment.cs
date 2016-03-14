@@ -1,20 +1,10 @@
-﻿using System;
-using System.IO;
-using System.Linq;
-using CETech.Develop;
-using CETech.Lua.Api;
-using MoonSharp.Interpreter;
-using MoonSharp.Interpreter.Loaders;
-using MsgPack;
-
-namespace CETech.Lua
+﻿namespace CETech.Lua
 {
     /// <summary>
     ///     Main lua enviroment.
     /// </summary>
     public static partial class LuaEnviroment
     {
-
         /// <summary>
         ///     Init lua enviroment
         /// </summary>
@@ -73,6 +63,5 @@ namespace CETech.Lua
         {
             _enviromentScript.Call(_shutdownFce);
         }
-
     }
 }

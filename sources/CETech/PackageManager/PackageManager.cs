@@ -1,13 +1,10 @@
-﻿using CETech.Utils;
-
-namespace CETech
+﻿namespace CETech
 {
     /// <summary>
     ///     Package manager
     /// </summary>
     public partial class PackageManager
     {
-
         /// <summary>
         ///     Load package
         /// </summary>
@@ -24,7 +21,6 @@ namespace CETech
         public static void Unload(long name)
         {
             UnloadImpl(name);
-
         }
 
         /// <summary>
