@@ -73,7 +73,7 @@ namespace CETech.Develop
 
         private static void TickImpl()
         {
-            _listener.Listen(TimeSpan.FromMilliseconds(1));
+            _listener.Listen(TimeSpan.FromMilliseconds(0));
         }
 
         private static void RegisterCommandImpl(string name, CommandHandler handler)
