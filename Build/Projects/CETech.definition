@@ -43,8 +43,10 @@
     <Compile Include="Config\Config.cs" />
     <Compile Include="Config\ConfigResource.cs" />
     <Compile Include="Develop\ConsoleServer.cs" />
+    <Compile Include="Develop\DevelopSystem.cs" />
     <Compile Include="Develop\Private\BuildDb.cs" />
     <Compile Include="Develop\Private\ConsoleServer.cs" />
+    <Compile Include="Develop\Private\DevelopSystem.cs" />
     <Compile Include="Develop\Private\ResourceCompiler.cs" />
     <Compile Include="Develop\ResourceCompiler.cs" />
     <Compile Include="FileSystem\FileSystem.cs" />

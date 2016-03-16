@@ -1,3 +1,4 @@
+using System;
 using CETech.Develop;
 using CETech.Input;
 using CETech.Lua;
@@ -45,13 +46,15 @@ namespace CETech
                 //Debug.Assert(TaskManager.OpenTaskCount < 2);
 
                 ConsoleServer.Tick();
+                DevelopSystem.FrameBegin();
+                var updateScope = DevelopSystem.EnterScope();
 
                 PlaformUpdateEvents();
 
                 var frameTask = TaskManager.AddNull("frame");
-                var keyboardTask = TaskManager.AddBegin("keyboard", delegate { Keyboard.Process(); }, null,
+                var keyboardTask = TaskManager.AddBegin("keyboard", delegate { var scope = DevelopSystem.EnterScope(); Keyboard.Process(); DevelopSystem.LeaveScope("Keyboard", scope); }, null,
                     parent: frameTask);
-                var mouseTask = TaskManager.AddBegin("mouseTask", delegate { Mouse.Process(); }, null, parent: frameTask);
+                var mouseTask = TaskManager.AddBegin("mouseTask", delegate { var scope = DevelopSystem.EnterScope();  Mouse.Process(); DevelopSystem.LeaveScope("Mouse", scope); }, null, parent: frameTask);
 
                 TaskManager.AddEnd(new[] {frameTask, keyboardTask, mouseTask});
                 TaskManager.Wait(frameTask);
@@ -61,6 +64,9 @@ namespace CETech
                 RenderSystem.BeginFrame();
                 RenderSystem.EndFrame();
                 MainWindow.Update();
+
+                DevelopSystem.LeaveScope("Application::Update", updateScope);
+                DevelopSystem.Send();
             }
 
             LuaEnviroment.BootScriptCallShutdown();
