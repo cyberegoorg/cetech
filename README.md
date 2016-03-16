@@ -93,6 +93,7 @@ $ brew install libtool
 ### Building
 
 #### Linux, OSX
+* On OSX use `pip3` and `python3`
 
 * Install requirements.txt
 
