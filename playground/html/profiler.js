@@ -57,31 +57,27 @@ function diff_time(start, end) {
     }
     return temp;
 }
+
 function parse_data(data) {
     var events = msgpack.decode(data);
 
-    events.forEach(function (event) {
-        if (event.etype != 'EVENT_SCOPE') {
-            return;
-        }
-
-        if (sample_count < 100) {
+    events.EVENT_SCOPE.forEach(function (event) {
+        if (sample_count < 10) {
             sample_count += 1;
             return;
         }
         sample_count = 0;
 
-        var t_s = [event.start, event.start_ns];
-        var t_e = [event.end, event.end_ns];
-        var delta_ms = diff_time(t_s, t_e)[1] / 1000000;
-        var label = event.name + ": " + delta_ms + "ms, depth: " + event.depth;
+        var label = event.name + ": " + (event.end - event.start) + "ms, depth: " + event.depth;
+
+        //console.log(event);
 
         var item = {
             content: label,
             title: label,
-            start: (t_s[0] * 1000) + (t_s[1] / 1000000),
-            end: (t_e[0] * 1000) + (t_e[1] / 1000000),
-            group: event.worker_id,
+            start: event.start,
+            end:  event.end,
+            group: event.workerid,
             depth: event.depth
         };
 

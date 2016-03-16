@@ -2,8 +2,12 @@ import argparse
 import platform
 
 import time
+
+import msgpack
+import nanomsg
 from PyQt5.QtCore import QThread, Qt, QFileSystemWatcher, QDirIterator
 from PyQt5.QtWidgets import QMainWindow, QDockWidget, QTabWidget
+from nanomsg import Socket, SUB, SUB_SUBSCRIBE
 
 from playground.assetbrowser import AssetBrowser
 from playground.engine.cetechproject import CetechProject
@@ -14,6 +18,29 @@ from playground.profilerwidget import ProfilerWidget
 from playground.scripteditor import ScriptEditorWidget, ScriptEditorManager
 from playground.ui.mainwindow import Ui_MainWindow
 
+
+class DevelopSub(QThread):
+    def __init__(self, url):
+        self.socket = Socket(SUB)
+        self.url = url
+        self.handlers = []
+
+        super().__init__()
+
+    def register_handler(self, handler):
+        self.handlers.append(handler)
+
+    def run(self):
+        self.socket.set_string_option(SUB, SUB_SUBSCRIBE, b'')
+        self.socket.connect(self.url)
+        while True:
+            try:
+                msg = self.socket.recv()
+                unpack_msg = msgpack.unpackb(msg, encoding='utf-8')
+                print(unpack_msg)
+
+            except nanomsg.NanoMsgAPIError as e:
+                raise
 
 class MainWindow(QMainWindow, Ui_MainWindow):
     def __init__(self):
@@ -35,6 +62,9 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.project = CetechProject()
 
         self.api = ConsoleAPI(b"tcp://localhost:5557")
+
+        # self.develop_sub = DevelopSub(b"ws://localhost:5558")
+        # self.develop_sub.run()
 
         self.setTabPosition(Qt.AllDockWidgetAreas, QTabWidget.North)
 

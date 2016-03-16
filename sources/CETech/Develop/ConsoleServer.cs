@@ -34,6 +34,11 @@ namespace CETech.Develop
                 CtorImpl();
             }
 
+            public void Reset()
+            {
+                ResetImpl();
+            }
+
             public MemoryStream GetMemoryStream()
             {
                 return GetMemoryStreamImpl();
@@ -47,6 +52,11 @@ namespace CETech.Develop
             public void Pack(bool boolean)
             {
                 PackImpl(boolean);
+            }
+
+            public void Pack(int value)
+            {
+                PackImpl(value);
             }
 
             public void Pack(double number)

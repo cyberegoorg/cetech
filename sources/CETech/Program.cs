@@ -183,8 +183,10 @@ namespace CETech
 #if CETECH_DEVELOP
             ResourceCompiler.RegisterCompiler(PackageResource.Type, PackageResource.Compile);
             ResourceCompiler.RegisterCompiler(LuaResource.Type, LuaResource.Compile);
-            ResourceCompiler.RegisterCompiler(StringId.FromString("texture"), delegate { });
             ResourceCompiler.RegisterCompiler(ConfigResource.Type, ConfigResource.Compile);
+
+            // TODO: Implement
+            ResourceCompiler.RegisterCompiler(StringId.FromString("texture"), delegate { });
 
             if (DevelopFlags.compile)
             {
@@ -213,7 +215,8 @@ namespace CETech
                 LuaResource.Type,
                 LuaResource.ResourceLoader, LuaResource.ResourceUnloader,
                 LuaResource.ResourceOnline, LuaResource.ResourceOffline);
-
+            
+            // TODO: Implement
             ResourceManager.RegisterType(
                 StringId.FromString("texture"),
                 delegate { return null; }, delegate { },
@@ -231,6 +234,7 @@ namespace CETech
 
 #if CETECH_DEVELOP
             ConsoleServer.Init();
+            DevelopSystem.Init();
             ResourceCompiler.Init();
             FileSystem.MapRootDir("core", Config.GetValueString("resource_compiler.core"));
             FileSystem.MapRootDir("src", Config.GetValueString("resource_compiler.src"));
@@ -259,6 +263,7 @@ namespace CETech
 
 #if CETECH_DEVELOP
             ResourceCompiler.Shutdown();
+            DevelopSystem.Shutdown();
             ConsoleServer.Shutdown();
 #endif
             TaskManager.Shutdown();

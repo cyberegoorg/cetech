@@ -107,6 +107,11 @@ namespace CETech.Develop
                 _packer.Pack(number);
             }
 
+            private void PackImpl(int value)
+            {
+                _packer.Pack(value);
+            }
+
             private void PackImpl(string @string)
             {
                 _packer.Pack(@string);
@@ -125,6 +130,11 @@ namespace CETech.Develop
             private MemoryStream GetMemoryStreamImpl()
             {
                 return _ms;
+            }
+
+            private void ResetImpl()
+            {
+                _ms.Seek(0, SeekOrigin.Begin);
             }
         }
     }

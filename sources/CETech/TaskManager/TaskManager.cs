@@ -1,7 +1,5 @@
 ﻿namespace CETech
 {
-    using TaskQueue = QueueMpmc<int>;
-
     public enum TaskPriority
     {
         High = 0,
