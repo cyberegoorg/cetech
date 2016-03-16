@@ -296,6 +296,7 @@ libyaml:
 
     linux64:  *libyaml_build_posix
     linux32:  *libyaml_build_posix
+    darwin64:  *libyaml_build_posix
 
   install:
     include: &libyaml_include_posix
@@ -312,7 +313,9 @@ libyaml:
       - copy: *libyaml_lib_posix
       - copy: *libyaml_include_posix
 
-
+    darwin64:
+      - copy: *libyaml_lib_posix
+      - copy: *libyaml_include_posix
 
 ###########
 # nanomsg #
@@ -358,5 +361,9 @@ mpack:
 
   install:
     linux64:
+      - copytree: [src/mpack, include/mpack]
+      - copyfile: [src/mpack-config.h.sample, include/mpack/mpack-config.h]
+      
+    darwin64:
       - copytree: [src/mpack, include/mpack]
       - copyfile: [src/mpack-config.h.sample, include/mpack/mpack-config.h]
