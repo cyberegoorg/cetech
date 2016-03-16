@@ -93,30 +93,29 @@ $ brew install libtool
 ### Building
 
 #### Linux, OSX
-* On OSX use `pip3` and `python3`
 
 * Install requirements.txt
 
 ```bash
-$ pip install -r requirements.txt
+$ pip3 install -r requirements.txt
 ```
 
 * Download and build externals.
 
 ```bash
-$ python externals.py
+$ python3 externals.py
 ```
 
 * Build engine
 
 ```bash
-$ python make.py
+$ python3 make.py
 ```
 
 ## Run playground
 
 ```bash
-$ python playground.py
+$ python3 playground.py
 ```
 
 * Click on `add exist`.
