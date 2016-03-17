@@ -90,7 +90,7 @@ namespace CETech
 			SDL.SDL_GetWindowWMInfo(_windowPtr, ref wmi);
 
 #if PLATFORM_WINDOWS
-			return null;
+			return wmi.info.win.hdc;
 
 #elif PLATFORM_LINUX
 			return wmi.info.x11.display;

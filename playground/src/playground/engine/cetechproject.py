@@ -1,5 +1,7 @@
 import os
 import platform
+
+import time
 from PyQt5.QtCore import QDir, QProcess
 from PyQt5.QtWidgets import QFileDialog, QMessageBox
 

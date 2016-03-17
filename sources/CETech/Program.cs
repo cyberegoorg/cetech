@@ -161,6 +161,7 @@ namespace CETech
             {
                 Log.Debug("ddd", "wid {0}", DevelopFlags.wid);
                 main_window = new Window(DevelopFlags.wid);
+                Log.Info("ddd", "ddddd");
             }
 
 #else
@@ -228,6 +229,8 @@ namespace CETech
         {
             Log.LogEvent += LogHandler.ConsoleLog;
 
+            Log.LogEvent += new LogHandler.FileLog("log.yml").Log;
+
 #if CETECH_SDL2
             SDL.SDL_Init(SDL.SDL_INIT_EVERYTHING);
 #endif
@@ -235,6 +238,7 @@ namespace CETech
 #if CETECH_DEVELOP
             ConsoleServer.Init();
             DevelopSystem.Init();
+
             ResourceCompiler.Init();
             FileSystem.MapRootDir("core", Config.GetValueString("resource_compiler.core"));
             FileSystem.MapRootDir("src", Config.GetValueString("resource_compiler.src"));
