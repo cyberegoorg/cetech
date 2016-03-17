@@ -26,7 +26,8 @@ class CetechProject(object):
     BUILD_RELEASE = 'Release'
 
     _BIN_PLATFORM = {
-        'windows': 'Windows'
+        'windows': 'Windows',
+        'linux': 'Linux'
     }
 
     _BUILD_DIR = {
