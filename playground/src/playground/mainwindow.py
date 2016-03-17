@@ -122,36 +122,33 @@ class MainWindow(QMainWindow, Ui_MainWindow):
     def open_project(self, name, dir):
         self.project.open_project(name, dir)
 
-        if platform.system().lower() == 'darwin':
-            wid = None
-        else:
-            wid = self.ogl_widget.winId()
-
-        self.project.run_cetech(build_type=CetechProject.BUILD_DEBUG, compile_=True, continue_=True,
-                                wid=wid)
-
-        time.sleep(5)
-
-        self.api.connect()
-        self.api.wait()
-
         #self.api.start(QThread.LowPriority)
+        self.api.connect()
         self.logsub.start(QThread.LowPriority)
 
         self.assetb_widget.open_project(self.project.project_dir)
 
         self.log_dock_widget.show()
 
+        self.watch_project_dir()
+
+        self.assetb_dock_widget.show()
+
+        if platform.system().lower() == 'darwin':
+            wid = None
+        else:
+            wid = self.ogl_widget.winId()
+            #wid = None
+
         # TODO bug #114 workaround. Disable create sub engine...
         if platform.system().lower() != 'darwin':
             self.ogl_dock.show()
 
-        self.watch_project_dir()
+        self.project.run_cetech(build_type=CetechProject.BUILD_DEBUG, compile_=True, continue_=True,
+                                wid=wid)
 
-        self.ogl_widget.resize_event_enable = True
-        self.ogl_widget.resize(self.ogl_widget.size())
+        #self.api.wait()
 
-        self.assetb_dock_widget.show()
 
     def watch_project_dir(self):
         files = self.file_watch.files()

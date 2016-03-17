@@ -44,8 +44,6 @@ namespace CETech
             while (_run)
             {
                 //Debug.Assert(TaskManager.OpenTaskCount < 2);
-
-                ConsoleServer.Tick();
                 DevelopSystem.FrameBegin();
                 var updateScope = DevelopSystem.EnterScope();
 
@@ -67,6 +65,8 @@ namespace CETech
 
                 DevelopSystem.LeaveScope("Application::Update", updateScope);
                 DevelopSystem.Send();
+
+                ConsoleServer.Tick();
             }
 
             LuaEnviroment.BootScriptCallShutdown();

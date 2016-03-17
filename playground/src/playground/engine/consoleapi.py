@@ -4,6 +4,7 @@ from playground.engine.consoleproxy import ConsoleProxy
 class ConsoleAPI(ConsoleProxy):
     def wait(self):
         self.send_command('wait')
+        pass
 
     def lua_execute(self, script):
         self.send_command('lua.execute', script=script)
@@ -17,3 +18,4 @@ class ConsoleAPI(ConsoleProxy):
 
     def resize(self, w, h):
         self.send_command('renderer.resize', width=w, height=h)
+        pass
