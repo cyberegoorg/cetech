@@ -28,7 +28,7 @@
       <Reference Include="SQLite">
         <Platforms>Windows</Platforms>
       </Reference>
-      <Reference Include="Mono.Data.SQLite">
+      <Reference Include="Mono.Data.Sqlite">
         <Platforms>MacOS,Linux</Platforms>
       </Reference>
       <Reference Include="NNanomsg" />
