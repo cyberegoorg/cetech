@@ -47,6 +47,14 @@ namespace CETech
             get { return GetNativePtrImpl(); }
         }
 
+		/// <summary>
+		///     Native display ptr
+		/// </summary>
+		public IntPtr NativeDisplayPtr
+		{
+			get { return GetNativeDisplayPtrImpl(); }
+		}
+
         /// <summary>
         ///     Window height
         /// </summary>

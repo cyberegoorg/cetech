@@ -46,7 +46,7 @@ namespace CETech
 
         private static void InitImpl(Window window, BackendType type)
         {
-            Bgfx.SetWindowHandle(window.NativeWindowPtr);
+			Bgfx.SetPlatformData (new PlatformData {WindowHandle = window.NativeWindowPtr, DisplayType = window.NativeDisplayPtr } );
             Bgfx.Init(ToRendererBackend(type));
             Bgfx.SetDebugFeatures(DebugFeatures.DisplayStatistics);
 

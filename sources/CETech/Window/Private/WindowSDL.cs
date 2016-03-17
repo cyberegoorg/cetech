@@ -73,6 +73,7 @@ namespace CETech
         private IntPtr GetNativePtrImpl()
         {
             var wmi = new SDL.SDL_SysWMinfo();
+			SDL.SDL_VERSION(out wmi.version);
             SDL.SDL_GetWindowWMInfo(_windowPtr, ref wmi);
 
 #if PLATFORM_WINDOWS
@@ -82,6 +83,19 @@ namespace CETech
             return wmi.info.x11.window;
 #endif
         }
+
+		private IntPtr GetNativeDisplayPtrImpl() {
+			var wmi = new SDL.SDL_SysWMinfo();
+			SDL.SDL_VERSION(out wmi.version);
+			SDL.SDL_GetWindowWMInfo(_windowPtr, ref wmi);
+
+#if PLATFORM_WINDOWS
+			return null;
+
+#elif PLATFORM_LINUX
+			return wmi.info.x11.display;
+#endif
+		}
 
         private void ResizeImpl(int width, int height)
         {
