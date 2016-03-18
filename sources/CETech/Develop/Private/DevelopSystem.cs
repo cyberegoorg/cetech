@@ -131,18 +131,11 @@ namespace CETech.Develop
             //
             packer.Pack("EVENT_RECORD_FLOAT");
 
-            packer.PackArrayHeader(RecordFloats.Count);
+            packer.PackMapHeader(RecordFloats.Count);
             for (var i = 0; i < RecordFloats.Count; ++i)
             {
-                packer.PackMapHeader(2);
-
-                //
-                packer.Pack("name");
-                packer.Pack(RecordFloats[i].name);
-
-                //
-                packer.Pack("value");
-                packer.Pack(RecordFloats[i].value);
+				packer.Pack(RecordFloats[i].name);
+				packer.Pack(RecordFloats[i].value);
             }
         }
 
@@ -150,17 +143,10 @@ namespace CETech.Develop
         {
             packer.Pack("EVENT_RECORD_INT");
 
-            packer.PackArrayHeader(RecordInts.Count);
+			packer.PackMapHeader(RecordInts.Count);
             for (var i = 0; i < RecordInts.Count; ++i)
             {
-                packer.PackMapHeader(2);
-
-                //
-                packer.Pack("name");
                 packer.Pack(RecordInts[i].name);
-
-                //
-                packer.Pack("value");
                 packer.Pack(RecordInts[i].value);
             }
         }
