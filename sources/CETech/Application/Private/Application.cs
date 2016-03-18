@@ -12,6 +12,7 @@ namespace CETech
     {
         //private static long _lastFrameTick;
         private static bool _run;
+		private static float _delta_time;
 
         /// <summary>
         ///     Init application
@@ -41,10 +42,20 @@ namespace CETech
             LuaEnviroment.BootScriptInit(StringId.FromString(Config.GetValueString("boot.script")));
 
             LuaEnviroment.BootScriptCallInit();
+
+			DateTime last_frame_tick = DateTime.Now;
+			DateTime curent_frame_tick;
             while (_run)
             {
-                //Debug.Assert(TaskManager.OpenTaskCount < 2);
-                DevelopSystem.FrameBegin();
+				//Debug.Assert(TaskManager.OpenTaskCount < 2);
+				DevelopSystem.FrameBegin();
+
+				curent_frame_tick = DateTime.Now;
+				_delta_time = (float)(curent_frame_tick - last_frame_tick).TotalMilliseconds;
+				last_frame_tick = curent_frame_tick;
+
+
+				DevelopSystem.PushRecordFloat ("application.dt", _delta_time);
                 var updateScope = DevelopSystem.EnterScope();
 
                 PlaformUpdateEvents();
@@ -57,7 +68,7 @@ namespace CETech
                 TaskManager.AddEnd(new[] {frameTask, keyboardTask, mouseTask});
                 TaskManager.Wait(frameTask);
 
-                LuaEnviroment.BootScriptCallUpdate(10.0f);
+				LuaEnviroment.BootScriptCallUpdate(_delta_time);
 
                 RenderSystem.BeginFrame();
                 RenderSystem.EndFrame();
