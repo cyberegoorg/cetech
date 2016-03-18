@@ -44,11 +44,9 @@ var timeline = new vis.Timeline(container, items, groups, options);
 
 var data_window = [];
 var Record = false;
-var sample_count = 0;
+sample_count = 0;
 
-function parse_data(data) {
-    var events = msgpack.decode(data);
-
+function parse_data(events) {
     events.EVENT_SCOPE.forEach(function (event) {
         if (sample_count < 10) {
             sample_count += 1;
@@ -84,18 +82,11 @@ ws.onclosed = function () {
 ws.onmessage = function (evt) {
     var events = msgpack.decode(new Uint8Array(evt.data));
 
-    events.EVENT_RECORD_INT.forEach(function (event) {
-        if(event.name != 'renderer.frame') {
-            return
-        }
-
-        series.append(new Date().getTime(), event.value);
-    });
+    series.append(new Date().getTime(), events.EVENT_RECORD_FLOAT['application.dt']);
 
     if (!Record) {
         return;
     }
-
     parse_data(events);
 };
 
