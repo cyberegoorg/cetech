@@ -2,7 +2,7 @@ import os
 import platform
 
 import time
-from PyQt5.QtCore import QDir, QProcess
+from PyQt5.QtCore import QDir, QProcess, QProcessEnvironment
 from PyQt5.QtWidgets import QFileDialog, QMessageBox
 
 
@@ -88,6 +88,13 @@ class CetechProject(object):
             out, err = bytearray(p.readAllStandardOutput()).decode(), bytearray(p.readAllStandardError()).decode()
             print("out:\n%s\n err:\n%s\n" % (out, err))
 
+    def get_lib_path(self, build_type):
+        _platform = platform.system().lower()
+
+        engine_bin_path = os.path.join('..', 'sources', 'CETech', 'bin', self._BIN_PLATFORM[_platform], 'AnyCPU',
+                                       self._BUILD_DIR[build_type])
+        return engine_bin_path
+
     def get_executable_path(self, build_type):
         _platform = platform.system().lower()
 
@@ -126,6 +133,12 @@ class CetechProject(object):
         cmd = "%s %s" % (self.get_executable_path(build_type), ' '.join(args))
 
         process = QProcess()
+
+        if platform.system().lower() != 'windows':
+            process_env = QProcessEnvironment.systemEnvironment()
+            process_env.insert("LD_LIBRARY_PATH", self.get_lib_path(build_type))
+            process.setProcessEnvironment(process_env)
+
         process.start(cmd)
         process.waitForStarted()
 
