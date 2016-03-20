@@ -22,8 +22,10 @@ Vagrant.configure(2) do |config|
 
     config.vm.define "osx" do |osx|
         osx.vm.box = "jhcook/osx-elcapitan-10.11"
+        osx.vm.synced_folder ".", "/Users/vagrant/cetech"
 
         osx.vm.provision "shell", inline: <<-SHELL
+            /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
         SHELL
     end
 end
