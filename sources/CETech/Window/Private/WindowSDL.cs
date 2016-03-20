@@ -9,7 +9,7 @@ namespace CETech
     {
         private IntPtr _windowPtr;
 
-        public Window(IntPtr id)
+        private void CtorImpl(IntPtr id)
         {
             //Width = width;
             //Height = height;
