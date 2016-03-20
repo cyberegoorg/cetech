@@ -27,6 +27,15 @@ namespace CETech
         }
 
         /// <summary>
+        /// Create new window from native window pointer.
+        /// </summary>
+        /// <param name="id">Native window pointer.</param>
+        public Window(IntPtr id)
+        {
+            CtorImpl(id);
+        }
+
+        /// <summary>
         ///     Window title
         /// </summary>
         public string Title
