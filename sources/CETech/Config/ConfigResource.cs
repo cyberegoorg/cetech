@@ -72,16 +72,16 @@ namespace CETech
                 {
                     var s = type.Value as YamlScalarNode;
 
-                    switch (Config.GetValueType(new_root_str))
+                    switch (ConfigSystem.GetValueType(new_root_str))
                     {
-                        case Config.ConfigValueType.Int:
-                            Config.SetValue(new_root_str, int.Parse(s.Value));
+                        case ConfigSystem.ConfigValueType.Int:
+                            ConfigSystem.SetValue(new_root_str, int.Parse(s.Value));
                             break;
-                        case Config.ConfigValueType.Float:
-                            Config.SetValue(new_root_str, float.Parse(s.Value));
+                        case ConfigSystem.ConfigValueType.Float:
+                            ConfigSystem.SetValue(new_root_str, float.Parse(s.Value));
                             break;
-                        case Config.ConfigValueType.String:
-                            Config.SetValue(new_root_str, s.Value);
+                        case ConfigSystem.ConfigValueType.String:
+                            ConfigSystem.SetValue(new_root_str, s.Value);
                             break;
                         default:
                             throw new ArgumentOutOfRangeException();

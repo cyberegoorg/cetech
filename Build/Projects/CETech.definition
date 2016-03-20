@@ -40,8 +40,9 @@
     <Compile Include="Application\Private\ApplicationSDL.cs">
       <Platforms>Windows,Linux</Platforms>
     </Compile>
-    <Compile Include="Config\Config.cs" />
     <Compile Include="Config\ConfigResource.cs" />
+    <Compile Include="Config\ConfigSystem.cs" />
+    <Compile Include="Config\Private\ConfigSystem.cs" />
     <Compile Include="Develop\ConsoleServer.cs" />
     <Compile Include="Develop\DevelopSystem.cs" />
     <Compile Include="Develop\Private\BuildDb.cs" />
