@@ -39,7 +39,7 @@ namespace CETech
 
             RenderSystem.Init(MainWindow, RenderSystem.BackendType.Default);
 
-            LuaEnviroment.BootScriptInit(StringId.FromString(Config.GetValueString("boot.script")));
+            LuaEnviroment.BootScriptInit(StringId.FromString(ConfigSystem.GetValueString("boot.script")));
 
             LuaEnviroment.BootScriptCallInit();
 
