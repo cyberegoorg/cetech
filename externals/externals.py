@@ -316,8 +316,14 @@ def install(name, body, platform_):
 # Job
 ########################################################################################################################
 def do_job(name, body, job_list, config, platform_, external, only_clone, job_count, verbose):
-    clone(name, body, verbose)
+    suported_platform = body.get('platforms', PLATFORMS)
+    if isinstance(suported_platform, str):
+        suported_platform = [suported_platform]
 
+    if platform_ not in suported_platform:
+        return
+
+    clone(name, body, verbose)
     if only_clone:
         return
 
