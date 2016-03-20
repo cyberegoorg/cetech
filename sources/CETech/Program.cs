@@ -21,17 +21,17 @@ namespace CETech
         [STAThread]
         private static void Main(string[] args)
         {
-            Config.CreateValue("platform", "Platform", GetPlatform());
-            Config.CreateValue("resource_compiler.core", "Path to core dir", "core");
-            Config.CreateValue("resource_compiler.src", "Path to source dir", Path.Combine("data", "src"));
-            Config.CreateValue("resource_manager.build", "Path to build dir", Path.Combine("data", "build"));
+            ConfigSystem.CreateValue("platform", "Platform", GetPlatform());
+            ConfigSystem.CreateValue("resource_compiler.core", "Path to core dir", "core");
+            ConfigSystem.CreateValue("resource_compiler.src", "Path to source dir", Path.Combine("data", "src"));
+            ConfigSystem.CreateValue("resource_manager.build", "Path to build dir", Path.Combine("data", "build"));
 
-            Config.CreateValue("boot.pkg", "Boot package", "boot");
-            Config.CreateValue("boot.script", "Boot script", "lua/boot");
+            ConfigSystem.CreateValue("boot.pkg", "Boot package", "boot");
+            ConfigSystem.CreateValue("boot.script", "Boot script", "lua/boot");
 
-            Config.CreateValue("window.title", "main window title", "CETech application");
-            Config.CreateValue("window.width", "main window width", 800);
-            Config.CreateValue("window.height", "main window height", 600);
+            ConfigSystem.CreateValue("window.title", "main window title", "CETech application");
+            ConfigSystem.CreateValue("window.width", "main window width", 800);
+            ConfigSystem.CreateValue("window.height", "main window height", 600);
 
             if (!ParseCmdLine(args))
             {
@@ -127,18 +127,18 @@ namespace CETech
 #if CETECH_DEVELOP
             if (source_dir != null)
             {
-                Config.SetValue("resource_compiler.src", source_dir);
+                ConfigSystem.SetValue("resource_compiler.src", source_dir);
             }
 
             if (core_dir != null)
             {
-                Config.SetValue("resource_compiler.core", core_dir);
+                ConfigSystem.SetValue("resource_compiler.core", core_dir);
             }
 #endif
 
             if (build_dir != null)
             {
-                Config.SetValue("resource_manager.build", build_dir);
+                ConfigSystem.SetValue("resource_manager.build", build_dir);
             }
 
 
@@ -153,9 +153,9 @@ namespace CETech
             if (DevelopFlags.wid == IntPtr.Zero)
             {
                 main_window = new Window(
-                    Config.GetValueString("window.title"),
+					ConfigSystem.GetValueString("window.title"),
                     WindowPos.Centered, WindowPos.Centered,
-                    Config.GetValueInt("window.width"), Config.GetValueInt("window.height"), 0);
+					ConfigSystem.GetValueInt("window.width"), ConfigSystem.GetValueInt("window.height"), 0);
             }
             else
             {
@@ -166,15 +166,15 @@ namespace CETech
 
 #else
             main_window = new Window(
-                Config.GetValueString("window.title"),
+                ConfigSystem.GetValueString("window.title"),
                 WindowPos.Centered, WindowPos.Centered,
-                Config.GetValueInt("window.width"), Config.GetValueInt("window.height"), 0);
+                ConfigSystem.GetValueInt("window.width"), ConfigSystem.GetValueInt("window.height"), 0);
 #endif
             Application.MainWindow = main_window;
 
-            ResourceManager.LoadNow(PackageResource.Type, new[] {StringId.FromString(Config.GetValueString("boot.pkg"))});
-            PackageManager.Load(StringId.FromString(Config.GetValueString("boot.pkg")));
-            PackageManager.Flush(StringId.FromString(Config.GetValueString("boot.pkg")));
+            ResourceManager.LoadNow(PackageResource.Type, new[] {StringId.FromString(ConfigSystem.GetValueString("boot.pkg"))});
+            PackageManager.Load(StringId.FromString(ConfigSystem.GetValueString("boot.pkg")));
+            PackageManager.Flush(StringId.FromString(ConfigSystem.GetValueString("boot.pkg")));
 
             Application.Run();
         }
@@ -240,12 +240,12 @@ namespace CETech
             DevelopSystem.Init();
 
             ResourceCompiler.Init();
-            FileSystem.MapRootDir("core", Config.GetValueString("resource_compiler.core"));
-            FileSystem.MapRootDir("src", Config.GetValueString("resource_compiler.src"));
+            FileSystem.MapRootDir("core", ConfigSystem.GetValueString("resource_compiler.core"));
+            FileSystem.MapRootDir("src", ConfigSystem.GetValueString("resource_compiler.src"));
 #endif
 
             FileSystem.MapRootDir("build",
-                Path.Combine(Config.GetValueString("resource_manager.build"), Config.GetValueString("platform")));
+                Path.Combine(ConfigSystem.GetValueString("resource_manager.build"), ConfigSystem.GetValueString("platform")));
 
             TaskManager.Init();
 
