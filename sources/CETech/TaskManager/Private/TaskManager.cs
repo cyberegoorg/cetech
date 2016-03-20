@@ -34,7 +34,7 @@ namespace CETech
             return _openTaskCount;
         }
 
-        public static void InitImpl()
+        private static void InitImpl()
         {
             var core_count = Environment.ProcessorCount;
 
@@ -75,7 +75,7 @@ namespace CETech
             _Run = true;
         }
 
-        public static void ShutdownImpl()
+        private static void ShutdownImpl()
         {
             _Run = false;
 
@@ -85,7 +85,7 @@ namespace CETech
             }
         }
 
-        public static int AddBeginImpl(string name, TaskWork taskWork, object data,
+        private static int AddBeginImpl(string name, TaskWork taskWork, object data,
             TaskPriority priority = TaskPriority.Normal, int depend = 0, int parent = 0,
             TaskAffinity affinity = TaskAffinity.None)
         {
@@ -111,13 +111,13 @@ namespace CETech
             return task;
         }
 
-        public static int AddNullImpl(string name, TaskPriority priority = TaskPriority.Normal, int depend = 0,
+        private static int AddNullImpl(string name, TaskPriority priority = TaskPriority.Normal, int depend = 0,
             int parent = 0, TaskAffinity affinity = TaskAffinity.None)
         {
             return AddBegin(name, delegate { }, null, priority, depend, parent, affinity);
         }
 
-        public static void AddEndImpl(int[] tasks)
+        private static void AddEndImpl(int[] tasks)
         {
             for (var i = 0; i < tasks.Length; ++i)
             {
@@ -131,7 +131,7 @@ namespace CETech
         }
 
 
-        public static void DoWorkImpl()
+        private static void DoWorkImpl()
         {
             var t = _task_pop_new_work();
 
@@ -145,7 +145,7 @@ namespace CETech
             _mark_task_job_done(t);
         }
 
-        public static void WaitImpl(int id)
+        private static void WaitImpl(int id)
         {
             while (!_task_is_done(id))
             {
