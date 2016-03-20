@@ -82,7 +82,7 @@ ws.onclosed = function () {
 ws.onmessage = function (evt) {
     var events = msgpack.decode(new Uint8Array(evt.data));
 
-    series.append(new Date().getTime(), events.EVENT_RECORD_FLOAT['application.dt']);
+    series.append(new Date().getTime(), events.EVENT_RECORD_INT['gc.total_memory'] / 100000);
 
     if (!Record) {
         return;
