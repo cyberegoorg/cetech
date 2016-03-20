@@ -23,26 +23,27 @@ bgfx:
   clone: git clone https://github.com/bkaradzic/bgfx --depth 1
 
   build:
-    linux64:  make linux-release64
-    darwin64: make osx-release64
-
-  install:
-    includes: &bgfx_include
-      [include/bgfx, include/bgfx]
-
     linux64:
-      - copy:     [.build/linux64_gcc/bin/libbgfxRelease.a, lib]
-      - copytree: *bgfx_include
+      - make linux-release64
+      - make linux-debug64
 
     darwin64:
-      - copy:     [.build/osx64_clang/bin/libbgfxRelease.a, lib]
-      - copytree: *bgfx_include
+      - make osx-release64
+      - make osx-debug64
+
+  install:
+    linux64:
+      - copyfile: [.build/linux64_gcc/bin/libbgfx-shared-libRelease.so, Release/lib/bgfx.so]
+      - copyfile: [.build/linux64_gcc/bin/libbgfx-shared-libDebug.so, Debug/lib/bgfx_debug.so]
+
+    darwin64:
+      - copyfile: [.build/osx64_clang/bin/libbgfxRelease.a, lib]
 
 #############
 # SharpBGFX #
 ########################################################################################################################
 sharp-bgfx:
-  clone: git clone https://github.com/MikePopoloski/SharpBgfx.git --depth 1
+  clone: git clone https://github.com/OndraVoves/SharpBgfx.git --depth 1
 
   build:
     windows64:
@@ -59,8 +60,8 @@ sharp-bgfx:
       - copytree: [SharpBgfx\bin\Release, Release\lib]
 
      linux64:
-      - copytree: [SharpBgfx/bin/Debug, Debug\lib]
-      - copytree: [SharpBgfx/bin/Release, Release\lib]
+      - copytree: [SharpBgfx/bin/Debug, Debug/lib]
+      - copytree: [SharpBgfx/bin/Release, Release/lib]
 
 #############
 # MoonSharp #
@@ -180,18 +181,13 @@ sdl2:
 
   install:
     lib: &sdl2_install_lib
-      [build/.libs/libSDL2.a, lib]
-
-    include: &sdl2_install_include
-      [include, include/SDL2]
+      [build/.libs/libSDL2-2.0.so.0.4.0, Release/lib/libSDL2-2.0.so]
 
     linux64:
-      - copy: *sdl2_install_lib
-      - copytree: *sdl2_install_include
+      - copyfile: *sdl2_install_lib
 
     darwin64:
-      - copy: *sdl2_install_lib
-      - copytree: *sdl2_install_include
+      - copyfile: *sdl2_install_lib
 
 ########
 # SLD2 #
@@ -218,7 +214,6 @@ nanomsg:
       [autoreconf -ifv, ./configure, make]
 
     linux64:  *nanomsg_build_posix
-    linux32:  *nanomsg_build_posix
     darwin64: *nanomsg_build_posix
     windows64:
       - cmake .
@@ -226,19 +221,16 @@ nanomsg:
 
   install:
     linux64:
-      - copy: [.libs/libnanomsg.so, dynlib]
-
-    linux32:
-      - copy: [.libs/libnanomsg.so, dynlib]
+      - copyfile: [.libs/libnanomsg.so.4.0.0, Release/lib/libnanomsg.so]
 
     darwin64:
-      - copy: [.libs/libnanomsg.so, dynlib]
+      - copyfile: [.libs/libnanomsg.so.4.0.0, Release/lib/libnanomsg.so]
 
     windows64:
-      - copy: [Release\nanomsg.dll, Release\lib]
+      - copy: [Release\nanomsg.dll, Release/lib]
 
 nnanomsg:
-  clone: git clone https://github.com/mhowlett/NNanomsg.git --depth 1
+  clone: git clone https://github.com/OndraVoves/NNanomsg.git --depth 1
 
   build:
     windows64:

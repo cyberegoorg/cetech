@@ -5,5 +5,6 @@
     Path="externals\build\windows64\Debug\lib\NNanomsg.dll" />
 
   <NativeBinary Path="externals\build\windows64\Release\lib\nanomsg.dll" />
+  <NativeBinary Path="externals\build\linux64\Release\lib\libnanomsg.so" />
 
 </ExternalProject>
