@@ -1,5 +1,6 @@
 ﻿using System;
 using CETech.Develop;
+using CETech.Utils;
 using SharpBgfx;
 
 namespace CETech
@@ -7,6 +8,7 @@ namespace CETech
     public static partial class RenderSystem
     {
         private static Data _data;
+        static private CallbackHandler _callback_handler;
 
         private static RendererBackend ToRendererBackend(BackendType type)
         {
@@ -46,8 +48,10 @@ namespace CETech
 
         private static void InitImpl(Window window, BackendType type)
         {
-			Bgfx.SetPlatformData (new PlatformData {WindowHandle = window.NativeWindowPtr, DisplayType = window.NativeDisplayPtr } );
-            Bgfx.Init(ToRendererBackend(type));
+            _callback_handler = new CallbackHandler();
+
+            Bgfx.SetPlatformData (new PlatformData {WindowHandle = window.NativeWindowPtr, DisplayType = window.NativeDisplayPtr } );
+            Bgfx.Init(ToRendererBackend(type), callbackHandler: _callback_handler);
             Bgfx.SetDebugFeatures(DebugFeatures.DisplayStatistics);
 
             Resize(window.Width, window.Height);
@@ -98,11 +102,55 @@ namespace CETech
             _data.ResizeH = height;
         }
 
+        
+
         private struct Data
         {
             public int ResizeW;
             public int ResizeH;
             public bool NeedResize;
         }
+
+    class CallbackHandler : ICallbackHandler
+    {
+        public void ReportError(ErrorType errorType, string message)
+        {
+        }
+
+        public void ReportDebug(string fileName, int line, string format, IntPtr args)
+        {
+        }
+
+        public int GetCachedSize(long id)
+        {
+            return 0;
+        }
+
+        public bool GetCacheEntry(long id, IntPtr data, int size)
+        {
+            return false;
+        }
+
+        public void SetCacheEntry(long id, IntPtr data, int size)
+        {
+        }
+
+        public void SaveScreenShot(string path, int width, int height, int pitch, IntPtr data, int size, bool flipVertical)
+        {
+            Log.Debug("renderer.bgfx", "Save screenshot to \"{0}\"", path);
+        }
+
+        public void CaptureStarted(int width, int height, int pitch, TextureFormat format, bool flipVertical)
+        {
+        }
+
+        public void CaptureFinished()
+        {
+        }
+
+        public void CaptureFrame(IntPtr data, int size)
+        {
+        }
+    }
     }
 }
