@@ -1,12 +1,9 @@
 ﻿using System.Collections.Generic;
 using System.Diagnostics;
-using System.IO;
 
 namespace CETech
 {
-	/// <summary>
-	/// Config system.
-	/// </summary>
+
     public static partial class ConfigSystem
     {
         private static readonly Dictionary<string, int> ConfigValueInt = new Dictionary<string, int>();
