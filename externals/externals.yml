@@ -1,3 +1,43 @@
+######
+# bx #
+########################################################################################################################
+bx:
+  platforms: [linux64, darwin64]
+  clone: git clone https://github.com/bkaradzic/bx --depth 1
+
+  install:
+    includes: &bx_install_include
+      [include/bx, include/bx]
+
+    linux64:
+      - copytree: *bx_install_include
+
+    darwin64:
+      - copytree: *bx_install_include
+
+########
+# bgfx #
+########################################################################################################################
+bgfx:
+  platforms: [linux64, darwin64]
+  clone: git clone https://github.com/bkaradzic/bgfx --depth 1
+
+  build:
+    linux64:  make linux-release64
+    darwin64: make osx-release64
+
+  install:
+    includes: &bgfx_include
+      [include/bgfx, include/bgfx]
+
+    linux64:
+      - copy:     [.build/linux64_gcc/bin/libbgfxRelease.a, lib]
+      - copytree: *bgfx_include
+
+    darwin64:
+      - copy:     [.build/osx64_clang/bin/libbgfxRelease.a, lib]
+      - copytree: *bgfx_include
+
 #############
 # SharpBGFX #
 ########################################################################################################################
@@ -120,11 +160,44 @@ msgpack-cli:
       - copytree: [src/MsgPack.Net40/bin/Debug, Debug/lib]
       - copytree: [bin/net40-client, Release/lib]
 
-
 ########
 # SLD2 #
 ########################################################################################################################
 sdl2:
+  platforms: [linux64, darwin64]
+  clone: git clone https://github.com/spurious/SDL-mirror.git --depth 1
+
+  build:
+    configure: &sdl2_build_configure
+      - ./configure
+      - make
+
+    configure_darwin: &sdl2_build_configure_darwin
+      [./configure --with-x=no, make]
+
+    linux64:  *sdl2_build_configure
+    darwin64: *sdl2_build_configure_darwin
+
+  install:
+    lib: &sdl2_install_lib
+      [build/.libs/libSDL2.a, lib]
+
+    include: &sdl2_install_include
+      [include, include/SDL2]
+
+    linux64:
+      - copy: *sdl2_install_lib
+      - copytree: *sdl2_install_include
+
+    darwin64:
+      - copy: *sdl2_install_lib
+      - copytree: *sdl2_install_include
+
+########
+# SLD2 #
+########################################################################################################################
+sdl2_win_bin:
+  platforms: windows64
   clone: download https://www.libsdl.org/release/SDL2-2.0.4-win32-x64.zip SDL2-2.0.4-win32-x64.zip
 
   build:
