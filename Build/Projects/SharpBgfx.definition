@@ -6,5 +6,6 @@
 
   <NativeBinary Path="externals\build\windows64\Debug\lib\bgfx.dll" />
   <NativeBinary Path="externals\build\windows64\Debug\lib\bgfx_debug.dll" />
+  <NativeBinary Path="externals/static/SharpBgfx.dll.config"/>
 
 </ExternalProject>
