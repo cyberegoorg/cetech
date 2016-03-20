@@ -90,5 +90,8 @@
     <Compile Include="Window\Window.cs" />
     <Compile Include="Window\WindowFlags.cs" />
     <Compile Include="Window\WindowPos.cs" />
+    <None Include="CETech.sh">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
   </Files>
 </Project>
