@@ -43,7 +43,7 @@ namespace CETech
 
             LuaEnviroment.BootScriptCallInit();
 
-			DateTime last_frame_tick = DateTime.Now;
+            DateTime last_frame_tick = DateTime.Now;
 			DateTime curent_frame_tick;
             while (_run)
             {
@@ -75,6 +75,7 @@ namespace CETech
                 MainWindow.Update();
 
                 DevelopSystem.LeaveScope("Application::Update", updateScope);
+                DevelopSystem.PushRecordInt("gc.total_memory", (int)GC.GetTotalMemory(false));
                 DevelopSystem.Send();
 
                 ConsoleServer.Tick();
