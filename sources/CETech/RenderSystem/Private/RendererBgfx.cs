@@ -48,7 +48,7 @@ namespace CETech
 
         private static void InitImpl(Window window, BackendType type)
         {
-            _callback_handler = new CallbackHandler();
+			_callback_handler = null;//new CallbackHandler();
 
             Bgfx.SetPlatformData (new PlatformData {WindowHandle = window.NativeWindowPtr, DisplayType = window.NativeDisplayPtr } );
             Bgfx.Init(ToRendererBackend(type), callbackHandler: _callback_handler);

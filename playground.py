@@ -22,10 +22,9 @@ PLAYGROUND_DIR = os.path.join(ROOT_DIR, 'playground')
 
 _platform = platform.system().lower()
 LIB_DIR = os.path.join(ROOT_DIR,
-                       'externals',
-                       'build',
+                       'externals', 'build',
                        "%s%s" % (_platform if _platform != 'darwin' else 'osx', platform.architecture()[0][0:2]),
-                       'dynlib')
+                       'Release', 'lib')
 
 
 if _platform == 'windows':
