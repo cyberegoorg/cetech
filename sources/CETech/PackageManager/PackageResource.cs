@@ -14,22 +14,6 @@ namespace CETech
         ///     Resource type
         /// </summary>
         public static readonly long Type = StringId.FromString("package");
-        
-        /// <summary>
-        ///     Package resouce format
-        /// </summary>
-        public struct Resource
-        {
-            /// <summary>
-            ///     Types
-            /// </summary>
-            public long[] Type;
-
-            /// <summary>
-            ///     [type][name, name, ...]
-            /// </summary>
-            public long[][] Names;
-        }
 
 #if CETECH_DEVELOP
 
@@ -110,6 +94,22 @@ namespace CETech
         /// <param name="data">data</param>
         public static void ResourceUnloader(object data)
         {
+        }
+
+        /// <summary>
+        ///     Package resouce format
+        /// </summary>
+        public struct Resource
+        {
+            /// <summary>
+            ///     Types
+            /// </summary>
+            public long[] Type;
+
+            /// <summary>
+            ///     [type][name, name, ...]
+            /// </summary>
+            public long[][] Names;
         }
     }
 }

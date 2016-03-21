@@ -134,8 +134,8 @@ namespace CETech.Develop
             packer.PackMapHeader(RecordFloats.Count);
             for (var i = 0; i < RecordFloats.Count; ++i)
             {
-				packer.Pack(RecordFloats[i].name);
-				packer.Pack(RecordFloats[i].value);
+                packer.Pack(RecordFloats[i].name);
+                packer.Pack(RecordFloats[i].value);
             }
         }
 
@@ -143,7 +143,7 @@ namespace CETech.Develop
         {
             packer.Pack("EVENT_RECORD_INT");
 
-			packer.PackMapHeader(RecordInts.Count);
+            packer.PackMapHeader(RecordInts.Count);
             for (var i = 0; i < RecordInts.Count; ++i)
             {
                 packer.Pack(RecordInts[i].name);

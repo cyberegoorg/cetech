@@ -3,7 +3,6 @@ using System.Diagnostics;
 
 namespace CETech
 {
-
     public static partial class ConfigSystem
     {
         private static readonly Dictionary<string, int> ConfigValueInt = new Dictionary<string, int>();
@@ -14,64 +13,64 @@ namespace CETech
         private static readonly Dictionary<string, ConfigValueType> ConfigType =
             new Dictionary<string, ConfigValueType>();
 
-		private static ConfigValueType GetValueTypeImpl(string name)
+        private static ConfigValueType GetValueTypeImpl(string name)
         {
             return ConfigType[name];
         }
 
-		private static void CreateValueImpl(string name, string description, int value)
+        private static void CreateValueImpl(string name, string description, int value)
         {
             ConfigType[name] = ConfigValueType.Int;
             ConfigValueInt[name] = value;
             ConfigDescription[name] = description;
         }
-			
-		private static void CreateValueImpl(string name, string description, float value)
+
+        private static void CreateValueImpl(string name, string description, float value)
         {
             ConfigType[name] = ConfigValueType.Float;
             ConfigValueFloat[name] = value;
             ConfigDescription[name] = description;
         }
-			
-		private static void CreateValueImpl(string name, string description, string value)
+
+        private static void CreateValueImpl(string name, string description, string value)
         {
             ConfigType[name] = ConfigValueType.String;
             ConfigValueString[name] = value;
             ConfigDescription[name] = description;
         }
-			
-		private static void SetValueImpl(string name, int value)
+
+        private static void SetValueImpl(string name, int value)
         {
             Debug.Assert(ConfigType[name] == ConfigValueType.Int);
 
             ConfigValueInt[name] = value;
         }
-			
-		private static void SetValueImpl(string name, float value)
+
+        private static void SetValueImpl(string name, float value)
         {
             Debug.Assert(ConfigType[name] == ConfigValueType.Float);
 
             ConfigValueFloat[name] = value;
         }
 
-		private static void SetValueImpl(string name, string value)
+        private static void SetValueImpl(string name, string value)
         {
             Debug.Assert(ConfigType[name] == ConfigValueType.String);
 
             ConfigValueString[name] = value;
         }
-			
-		private static int GetValueIntImpl(string name)
+
+        private static int GetValueIntImpl(string name)
         {
             return ConfigValueInt[name];
         }
-			
-		private static float GetValueFloatImpl(string name)
+
+        private static float GetValueFloatImpl(string name)
         {
             return ConfigValueFloat[name];
         }
 
-		private static string GetValueStringImpl(string name)
+        private static string GetValueStringImpl(string name)
         {
             return ConfigValueString[name];
         }
