@@ -11,11 +11,21 @@ namespace CETech
         public static Window MainWindow { get; set; }
 
         /// <summary>
+        /// Parse command line args
+        /// </summary>
+        /// <param name="args">args</param>
+        /// <returns></returns>
+        public static bool ParseCmdLine(string[] args)
+        {
+            return ParseCmdLineImpl(args);
+        }
+
+        /// <summary>
         ///     Init application
         /// </summary>
-        public static void Init()
+        public static bool Init()
         {
-            InitImpl();
+            return InitImpl();
         }
 
         /// <summary>
