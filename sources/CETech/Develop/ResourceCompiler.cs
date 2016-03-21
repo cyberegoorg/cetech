@@ -18,7 +18,7 @@ namespace CETech.Develop
 
 
         /// <summary>
-        /// Init resource compiler.
+        ///     Init resource compiler.
         /// </summary>
         public static void Init()
         {
@@ -27,7 +27,7 @@ namespace CETech.Develop
 
 
         /// <summary>
-        /// Shutdown resource compiler.
+        ///     Shutdown resource compiler.
         /// </summary>
         public static void Shutdown()
         {

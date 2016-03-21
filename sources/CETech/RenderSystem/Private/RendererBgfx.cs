@@ -8,7 +8,7 @@ namespace CETech
     public static partial class RenderSystem
     {
         private static Data _data;
-        static private CallbackHandler _callback_handler;
+        private static CallbackHandler _callback_handler;
 
         private static RendererBackend ToRendererBackend(BackendType type)
         {
@@ -48,9 +48,13 @@ namespace CETech
 
         private static void InitImpl(Window window, BackendType type)
         {
-			_callback_handler = null;//new CallbackHandler();
+            _callback_handler = null; //new CallbackHandler();
 
-            Bgfx.SetPlatformData (new PlatformData {WindowHandle = window.NativeWindowPtr, DisplayType = window.NativeDisplayPtr } );
+            Bgfx.SetPlatformData(new PlatformData
+            {
+                WindowHandle = window.NativeWindowPtr,
+                DisplayType = window.NativeDisplayPtr
+            });
             Bgfx.Init(ToRendererBackend(type), callbackHandler: _callback_handler);
             Bgfx.SetDebugFeatures(DebugFeatures.DisplayStatistics);
 
@@ -84,15 +88,14 @@ namespace CETech
 
         private static void EndFrameImpl()
         {
-            int frame = Bgfx.Frame();
+            var frame = Bgfx.Frame();
 
 #if CETECH_DEVELOP
             var stats = Bgfx.GetStats();
             DevelopSystem.PushRecordInt("renderer.frame", frame);
-            DevelopSystem.PushRecordFloat("renderer.cpu_elapsed", (float)stats.CpuElapsed.TotalMilliseconds);
-            DevelopSystem.PushRecordFloat("renderer.gpu_elapsed", (float)stats.GpuElapsed.TotalMilliseconds);
+            DevelopSystem.PushRecordFloat("renderer.cpu_elapsed", (float) stats.CpuElapsed.TotalMilliseconds);
+            DevelopSystem.PushRecordFloat("renderer.gpu_elapsed", (float) stats.GpuElapsed.TotalMilliseconds);
 #endif
-
         }
 
         private static void ResizeImpl(int width, int height)
@@ -102,7 +105,6 @@ namespace CETech
             _data.ResizeH = height;
         }
 
-        
 
         private struct Data
         {
@@ -111,46 +113,47 @@ namespace CETech
             public bool NeedResize;
         }
 
-    class CallbackHandler : ICallbackHandler
-    {
-        public void ReportError(ErrorType errorType, string message)
+        private class CallbackHandler : ICallbackHandler
         {
-        }
+            public void ReportError(ErrorType errorType, string message)
+            {
+            }
 
-        public void ReportDebug(string fileName, int line, string format, IntPtr args)
-        {
-        }
+            public void ReportDebug(string fileName, int line, string format, IntPtr args)
+            {
+            }
 
-        public int GetCachedSize(long id)
-        {
-            return 0;
-        }
+            public int GetCachedSize(long id)
+            {
+                return 0;
+            }
 
-        public bool GetCacheEntry(long id, IntPtr data, int size)
-        {
-            return false;
-        }
+            public bool GetCacheEntry(long id, IntPtr data, int size)
+            {
+                return false;
+            }
 
-        public void SetCacheEntry(long id, IntPtr data, int size)
-        {
-        }
+            public void SetCacheEntry(long id, IntPtr data, int size)
+            {
+            }
 
-        public void SaveScreenShot(string path, int width, int height, int pitch, IntPtr data, int size, bool flipVertical)
-        {
-            Log.Debug("renderer.bgfx", "Save screenshot to \"{0}\"", path);
-        }
+            public void SaveScreenShot(string path, int width, int height, int pitch, IntPtr data, int size,
+                bool flipVertical)
+            {
+                Log.Debug("renderer.bgfx", "Save screenshot to \"{0}\"", path);
+            }
 
-        public void CaptureStarted(int width, int height, int pitch, TextureFormat format, bool flipVertical)
-        {
-        }
+            public void CaptureStarted(int width, int height, int pitch, TextureFormat format, bool flipVertical)
+            {
+            }
 
-        public void CaptureFinished()
-        {
-        }
+            public void CaptureFinished()
+            {
+            }
 
-        public void CaptureFrame(IntPtr data, int size)
-        {
+            public void CaptureFrame(IntPtr data, int size)
+            {
+            }
         }
-    }
     }
 }

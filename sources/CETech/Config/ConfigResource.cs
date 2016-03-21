@@ -14,7 +14,7 @@ namespace CETech
         ///     Resource type
         /// </summary>
         public static readonly long Type = StringId.FromString("config");
-        
+
 #if CETECH_DEVELOP
 
         /// <summary>
@@ -64,11 +64,11 @@ namespace CETech
                 }
 
                 var t = type.Value.GetType();
-                if ( t == typeof (YamlMappingNode))
+                if (t == typeof (YamlMappingNode))
                 {
                     _LoadConfig(type.Value as YamlMappingNode, new_root_str);
                 }
-                else if ( t == typeof(YamlScalarNode))
+                else if (t == typeof (YamlScalarNode))
                 {
                     var s = type.Value as YamlScalarNode;
 
@@ -97,7 +97,7 @@ namespace CETech
         public static void ResourceOnline(object data)
         {
             ((MemoryStream) data).Seek(0, SeekOrigin.Begin);
-            TextReader input = new StreamReader((MemoryStream)data);
+            TextReader input = new StreamReader((MemoryStream) data);
             var yaml = new YamlStream();
             yaml.Load(input);
 

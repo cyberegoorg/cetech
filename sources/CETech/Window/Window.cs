@@ -27,7 +27,7 @@ namespace CETech
         }
 
         /// <summary>
-        /// Create new window from native window pointer.
+        ///     Create new window from native window pointer.
         /// </summary>
         /// <param name="id">Native window pointer.</param>
         public Window(IntPtr id)
@@ -56,13 +56,13 @@ namespace CETech
             get { return GetNativePtrImpl(); }
         }
 
-		/// <summary>
-		///     Native display ptr
-		/// </summary>
-		public IntPtr NativeDisplayPtr
-		{
-			get { return GetNativeDisplayPtrImpl(); }
-		}
+        /// <summary>
+        ///     Native display ptr
+        /// </summary>
+        public IntPtr NativeDisplayPtr
+        {
+            get { return GetNativeDisplayPtrImpl(); }
+        }
 
         /// <summary>
         ///     Window height

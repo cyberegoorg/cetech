@@ -3,10 +3,10 @@ using System.Threading;
 
 namespace CETech
 {
-	/// <summary>
-	/// MPMC Queue.
-	/// Based on http://www.1024cores.net/home/lock-free-algorithms/queues/bounded-mpmc-queue (thanks Dmitry Vyukov =))
-	/// </summary>
+    /// <summary>
+    ///     MPMC Queue.
+    ///     Based on http://www.1024cores.net/home/lock-free-algorithms/queues/bounded-mpmc-queue (thanks Dmitry Vyukov =))
+    /// </summary>
     public class QueueMpmc<T>
     {
         private readonly int _capacityMask;
@@ -17,10 +17,10 @@ namespace CETech
         private int _dequeuePos;
         private int _enqueuePos;
 
-		/// <summary>
-		/// Create new queue.
-		/// </summary>
-		/// <param name="capacity">Capacity.</param>
+        /// <summary>
+        ///     Create new queue.
+        /// </summary>
+        /// <param name="capacity">Capacity.</param>
         public QueueMpmc(int capacity)
         {
             _capacityMask = capacity - 1;
@@ -39,10 +39,10 @@ namespace CETech
             _dequeuePos = 0;
         }
 
-		/// <summary>
-		/// Gets the size.
-		/// </summary>
-		/// <value>The size.</value>
+        /// <summary>
+        ///     Gets the size.
+        /// </summary>
+        /// <value>The size.</value>
         public int Size
         {
             get
@@ -53,10 +53,10 @@ namespace CETech
             }
         }
 
-		/// <summary>
-		/// Push the specified value.
-		/// </summary>
-		/// <param name="value">Value.</param>
+        /// <summary>
+        ///     Push the specified value.
+        /// </summary>
+        /// <param name="value">Value.</param>
         public bool Push(T value)
         {
             var pos = _enqueuePos;
@@ -90,10 +90,10 @@ namespace CETech
             return true;
         }
 
-		/// <summary>
-		/// Pop the specified value.
-		/// </summary>
-		/// <param name="value">Value.</param>
+        /// <summary>
+        ///     Pop the specified value.
+        /// </summary>
+        /// <param name="value">Value.</param>
         public bool Pop(out T value)
         {
             var pos = _dequeuePos;
