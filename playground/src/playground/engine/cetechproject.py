@@ -110,7 +110,7 @@ class CetechProject(object):
             "-b %s" % self.build_dir,
         ]
 
-        self.run_cetech(self.BUILD_RELEASE, args)
+        self._run_cetech(self.BUILD_RELEASE, args)
 
     def run_cetech_develop(self, compile_=False, continue_=False, wait=False, daemon=False, wid=None,
                    core_dir=None, port=None):
@@ -143,9 +143,9 @@ class CetechProject(object):
         else:
             args.append("--core ../core") # TODO ?
 
-        self.run_cetech(self.BUILD_DEVELOP, args)
+        self._run_cetech(self.BUILD_DEVELOP, args)
 
-    def run_cetech(self, build_type, args):
+    def _run_cetech(self, build_type, args):
         cmd = "%s %s" % (self.get_executable_path(build_type), ' '.join(args))
 
         process = QProcess()
