@@ -89,7 +89,10 @@ class CetechProject(object):
     def dump(self):
         for p in self.spawned_process:
             out, err = bytearray(p.readAllStandardOutput()).decode(), bytearray(p.readAllStandardError()).decode()
+
+            print("="*32)
             print("out:\n%s\n err:\n%s\n" % (out, err))
+            print("="*32)
 
     def get_lib_path(self, build_type):
         _platform = platform.system().lower()
@@ -102,11 +105,18 @@ class CetechProject(object):
         engine_bin_path = os.path.join(self.get_lib_path(build_type), self._ENGINE_BIN[build_type])
         return engine_bin_path
 
-    def run_cetech(self, build_type, compile_=False, continue_=False, wait=False, daemon=False, wid=None,
-                   core_dir=None):
+    def run_cetech_release(self):
         args = [
-            "-s %s" % self.source_dir,
             "-b %s" % self.build_dir,
+        ]
+
+        self.run_cetech(self.BUILD_RELEASE, args)
+
+    def run_cetech_develop(self, compile_=False, continue_=False, wait=False, daemon=False, wid=None,
+                   core_dir=None, port=None):
+        args = [
+            "-b %s" % self.build_dir,
+            "-s %s" % self.source_dir
         ]
 
         if compile_:
@@ -121,15 +131,21 @@ class CetechProject(object):
         if daemon:
             args.append("--daemon")
 
+        if port:
+            args.append("--port %s"%port)
+
         # TODO bug #114 workaround. Disable create sub engine...
         if wid and platform.system().lower() != 'darwin':
             args.append("--wid %s" % int(wid))
 
-        if core_dir:
+        if core_dir :
             args.append("--core %s" % core_dir)
         else:
-            args.append("--core ../core")
+            args.append("--core ../core") # TODO ?
 
+        self.run_cetech(self.BUILD_DEVELOP, args)
+
+    def run_cetech(self, build_type, args):
         cmd = "%s %s" % (self.get_executable_path(build_type), ' '.join(args))
 
         process = QProcess()
