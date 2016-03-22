@@ -1,7 +1,10 @@
 ﻿using System;
 using System.IO;
 using System.Text;
+
+#if CETECH_DEVELOP
 using NNanomsg.Protocols;
+#endif
 
 namespace CETech.Utils
 {
@@ -82,6 +85,7 @@ namespace CETech.Utils
             }
         }
 
+#if CETECH_DEVELOP
         /// <summary>
         ///     Nanomsg log handler
         /// </summary>
@@ -113,5 +117,6 @@ namespace CETech.Utils
                     Encoding.UTF8.GetBytes(string.Format(LogFormat, level, where, time, workerId, msg).ToCharArray()));
             }
         }
+#endif
     }
 }

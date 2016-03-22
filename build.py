@@ -120,10 +120,10 @@ ARGS_PARSER.add_argument(
     help='Only generate project files',
     action='store_true')
 
-ARGS_PARSER.add_argument(
-    "-c", "--config",
-    help='Build configuration',
-    default='develop', choices=CONFIG)
+# ARGS_PARSER.add_argument(
+#     "-c", "--config",
+#     help='Build configuration',
+#     default='develop', choices=CONFIG)
 
 ARGS_PARSER.add_argument(
     "-d", "--debug",
@@ -149,8 +149,8 @@ def run_protobuild(config, platform_):
     else:
         cmds = ['mono', os.path.join(ROOT_DIR, 'Protobuild.exe')]
 
-    if config in PROTOBUILD_CONFIG:
-        cmds.extend(PROTOBUILD_CONFIG[config])
+    # if config in PROTOBUILD_CONFIG:
+    #     cmds.extend(PROTOBUILD_CONFIG[config])
 
     cmds.append(PLATFORMS_PROTOBUILD[platform_])
 
@@ -188,7 +188,7 @@ def main(args=None):
 
     action = args.action
     if action == '':
-        make(config=args.config,
+        make(config=None, #args.config,
              platform_=args.platform,
              generate_only=args.generate,
              debug=args.debug)

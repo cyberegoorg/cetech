@@ -62,8 +62,11 @@ namespace CETech
 
             ConsoleServer.RegisterCommand("renderer.resize", (args, response) =>
             {
-                Resize(args["width"].AsInt32(), args["height"].AsInt32());
-                Application.MainWindow.Resize(args["width"].AsInt32(), args["height"].AsInt32());
+                var width = args["width"].AsInt32();
+                var height = args["height"].AsInt32();
+
+                Resize(width, height);
+                window.Resize(width, height);
             });
         }
 
