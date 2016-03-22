@@ -1,30 +1,31 @@
 # Playground
 
-Vývojové prostředí které se snáží o snadnou **modifikovatelnost** aby mohlo co nejlépe vyhovovát specifikacím projektu
-pokud to bude potřeba. Proto je zvolena kombinace jazyků **Python**, **LUA**, **JS**, **HTML**.
+Development environment that tries to ease **modifiable** so that it can best comply with the specifications of the project
+if needed. Therefore, the selected combination of languages **Python** **LUA**, **JS** **HTML**.
 
 ---
 
-# Proč tolik jazyků?
+# Why so many languages?
 
-* **Python + QT** jako základ. Výborná podpora napříč OS.
-* **LUA** pro komunikaci s enginem. To umožnuje mít kód nástrojů oddělený od enginu (nástroj pouze pošle script a ten
-  nastaví požadované chování a pak stačí komunikovat přes `console_server`)
-* **HTML + JS** pro vizualizace a různé widgety. Snadné použití a mocná vizualizace (a taky můžete mít puštěný
-editor, upravovat kód a pak jenom zmáčnout RELOAD, stránka se načte a hned vydíte co dělate == rychlá iterace).
+* **Python + QT** is base. Good support for multiplatform.
+* **LUA** for comunication with engine. This allows code to be separated from engine tools (tool only sends the script and the sets the desired behavior, and then you can just communicate through `console_server`)
+
+* **HTML + JS** for vizualization and widgets. Easy to use and powerful visualization (and you too can have runing
+editor, edit the code, and then just when to pull reload the page loads and just see what makes == rapid iteration).
 
 ---
 
-# Jak to spustím?
+# How does it run?
 
-V hlavním adresáří spuste skript **playground.py**
+In the main directory, run the script **playground.py**
+
+```bash
+$ python3 playground.py
+```
 
 !!! note
 
-    Při spuštění na vás vyskočí uvodní dialog kde můžete přidat projekt který se nachází v adresáři `data`. Po
-    vytvoření už stačí jenom na projekt dvakrát kliknout.
+    When you start to pop up a dialog displays where you can add a project which is located in the `data` dir. After
+    enough to create a project just double-click.
 
-```bash
-$ python playground.py
-```
 

@@ -48,7 +48,6 @@ dosti omezená (ok... zatím to beží jenom na linuxu takže se dá hovořit o 
 
 Platforma  | Popis
 -----------|------------------------------
-`linux32`  | Linux na architektuře x86
 `linux64`  | Linux na architektuře x86-64
 
 
