@@ -1,14 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using CETech.Develop;
-using CETech.Input;
-using CETech.Lua;
-using CETech.Utils;
-using Mono.Options;
-using SharpBgfx;
 #if CETECH_SDL2
-using SDL2;
 
 #endif
 
@@ -22,13 +13,7 @@ namespace CETech
         [STAThread]
         private static void Main(string[] args)
         {
-            
-            if (!Application.ParseCmdLine(args))
-            {
-                return;
-            }
-
-            if (Application.Init())
+            if (Application.Init(args))
             {
                 Application.Run();
             }

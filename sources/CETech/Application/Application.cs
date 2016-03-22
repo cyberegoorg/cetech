@@ -5,13 +5,17 @@ namespace CETech
     /// </summary>
     public static partial class Application
     {
-        /// <summary>
-        ///     Get application main window
-        /// </summary>
-        public static Window MainWindow { get; set; }
+        public delegate void SystemInitDelegate();
+        public delegate void SystemInitConfig();
+        public delegate void SystemShutdownDelegate();
+
+        public static void RegisterSystems(SystemInitConfig[] initConfig, SystemInitDelegate[] init, SystemShutdownDelegate[] shutdown)
+        {
+            RegisterSystemsImpl(initConfig, init, shutdown);
+        }
 
         /// <summary>
-        /// Parse command line args
+        ///     Parse command line args
         /// </summary>
         /// <param name="args">args</param>
         /// <returns></returns>
@@ -23,9 +27,9 @@ namespace CETech
         /// <summary>
         ///     Init application
         /// </summary>
-        public static bool Init()
+        public static bool Init(string[] args)
         {
-            return InitImpl();
+            return InitImpl(args);
         }
 
         /// <summary>

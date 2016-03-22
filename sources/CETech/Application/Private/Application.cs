@@ -15,14 +15,14 @@ namespace CETech
     /// </summary>
     public static partial class Application
     {
-        //private static long _lastFrameTick;
         private static bool _run;
-		private static float _delta_time;
+        private static float _deltaTime;
+        private static Window _mainWindow;
 
         /// <summary>
         ///     Init application
         /// </summary>
-        private static bool InitImpl()
+        private static bool InitImpl(string[] args)
         {
             ConfigSystem.CreateValue("platform", "Platform", GetPlatform());
             ConfigSystem.CreateValue("resource_compiler.core", "Path to core dir", "core");
@@ -35,6 +35,11 @@ namespace CETech
             ConfigSystem.CreateValue("window.title", "main window title", "CETech application");
             ConfigSystem.CreateValue("window.width", "main window width", 800);
             ConfigSystem.CreateValue("window.height", "main window height", 600);
+
+            if (!ParseCmdLine(args))
+            {
+                return false;
+            }
 
             if (!BigInit())
             {
@@ -64,45 +69,55 @@ namespace CETech
         {
             _run = true;
 
-            RenderSystem.Init(MainWindow, RenderSystem.BackendType.Default);
+            RenderSystem.Init(_mainWindow, RenderSystem.BackendType.Default);
 
             LuaEnviroment.BootScriptInit(StringId.FromString(ConfigSystem.GetValueString("boot.script")));
 
             LuaEnviroment.BootScriptCallInit();
 
-            DateTime last_frame_tick = DateTime.Now;
-			DateTime curent_frame_tick;
+            var last_frame_tick = DateTime.Now;
+            DateTime curent_frame_tick;
             while (_run)
             {
-				//Debug.Assert(TaskManager.OpenTaskCount < 2);
-				DevelopSystem.FrameBegin();
+                //Debug.Assert(TaskManager.OpenTaskCount < 2);
+                DevelopSystem.FrameBegin();
 
-				curent_frame_tick = DateTime.Now;
-				_delta_time = (float)(curent_frame_tick - last_frame_tick).TotalMilliseconds;
-				last_frame_tick = curent_frame_tick;
+                curent_frame_tick = DateTime.Now;
+                _deltaTime = (float) (curent_frame_tick - last_frame_tick).TotalMilliseconds;
+                last_frame_tick = curent_frame_tick;
 
 
-				DevelopSystem.PushRecordFloat ("application.dt", _delta_time);
+                DevelopSystem.PushRecordFloat("application.dt", _deltaTime);
                 var updateScope = DevelopSystem.EnterScope();
 
                 PlaformUpdateEvents();
 
                 var frameTask = TaskManager.AddNull("frame");
-                var keyboardTask = TaskManager.AddBegin("keyboard", delegate { var scope = DevelopSystem.EnterScope(); Keyboard.Process(); DevelopSystem.LeaveScope("Keyboard", scope); }, null,
+                var keyboardTask = TaskManager.AddBegin("keyboard", delegate
+                {
+                    var scope = DevelopSystem.EnterScope();
+                    Keyboard.Process();
+                    DevelopSystem.LeaveScope("Keyboard", scope);
+                }, null,
                     parent: frameTask);
-                var mouseTask = TaskManager.AddBegin("mouseTask", delegate { var scope = DevelopSystem.EnterScope();  Mouse.Process(); DevelopSystem.LeaveScope("Mouse", scope); }, null, parent: frameTask);
+                var mouseTask = TaskManager.AddBegin("mouseTask", delegate
+                {
+                    var scope = DevelopSystem.EnterScope();
+                    Mouse.Process();
+                    DevelopSystem.LeaveScope("Mouse", scope);
+                }, null, parent: frameTask);
 
                 TaskManager.AddEnd(new[] {frameTask, keyboardTask, mouseTask});
                 TaskManager.Wait(frameTask);
 
-				LuaEnviroment.BootScriptCallUpdate(_delta_time);
+                LuaEnviroment.BootScriptCallUpdate(_deltaTime);
 
                 RenderSystem.BeginFrame();
                 RenderSystem.EndFrame();
-                MainWindow.Update();
+                _mainWindow.Update();
 
                 DevelopSystem.LeaveScope("Application::Update", updateScope);
-                DevelopSystem.PushRecordInt("gc.total_memory", (int)GC.GetTotalMemory(false));
+                DevelopSystem.PushRecordInt("gc.total_memory", (int) GC.GetTotalMemory(false));
                 DevelopSystem.Send();
 
                 ConsoleServer.Tick();
@@ -110,7 +125,7 @@ namespace CETech
 
             LuaEnviroment.BootScriptCallShutdown();
 
-            MainWindow = null;
+            _mainWindow = null;
         }
 
         /// <summary>
@@ -222,7 +237,7 @@ namespace CETech
 
         private static void Boot()
         {
-            Window main_window = null;
+            Window main_window;
 
 #if CETECH_DEVELOP
             if (DevelopFlags.wid == IntPtr.Zero)
@@ -234,9 +249,7 @@ namespace CETech
             }
             else
             {
-                Log.Debug("ddd", "wid {0}", DevelopFlags.wid);
                 main_window = new Window(DevelopFlags.wid);
-                Log.Info("ddd", "ddddd");
             }
 
 #else
@@ -245,9 +258,10 @@ namespace CETech
                 WindowPos.Centered, WindowPos.Centered,
                 ConfigSystem.GetValueInt("window.width"), ConfigSystem.GetValueInt("window.height"), 0);
 #endif
-            Application.MainWindow = main_window;
+            _mainWindow = main_window;
 
-            ResourceManager.LoadNow(PackageResource.Type, new[] { StringId.FromString(ConfigSystem.GetValueString("boot.pkg")) });
+            ResourceManager.LoadNow(PackageResource.Type,
+                new[] {StringId.FromString(ConfigSystem.GetValueString("boot.pkg"))});
             PackageManager.Load(StringId.FromString(ConfigSystem.GetValueString("boot.pkg")));
             PackageManager.Flush(StringId.FromString(ConfigSystem.GetValueString("boot.pkg")));
         }
@@ -265,15 +279,8 @@ namespace CETech
             if (DevelopFlags.compile)
             {
                 ResourceCompiler.CompileAll();
-
-                if (!DevelopFlags.ccontinue)
-                {
-                    return;
-                }
             }
 #endif
-
-
 
             ResourceManager.RegisterType(
                 ConfigResource.Type,
@@ -295,7 +302,6 @@ namespace CETech
                 StringId.FromString("texture"),
                 delegate { return null; }, delegate { },
                 delegate { }, delegate { });
-
         }
 
         private static bool BigInit()
@@ -318,13 +324,20 @@ namespace CETech
 #endif
 
             FileSystem.MapRootDir("build",
-                Path.Combine(ConfigSystem.GetValueString("resource_manager.build"), ConfigSystem.GetValueString("platform")));
+                Path.Combine(ConfigSystem.GetValueString("resource_manager.build"),
+                    ConfigSystem.GetValueString("platform")));
 
             TaskManager.Init();
 
             InitResouce();
 
-            ResourceManager.LoadNow(ConfigResource.Type, new[] { StringId.FromString("global") });
+#if CETECH_DEVELOP
+            if (DevelopFlags.compile && !DevelopFlags.ccontinue)
+            {
+                return false;
+            }
+#endif
+            ResourceManager.LoadNow(ConfigResource.Type, new[] {StringId.FromString("global")});
 
             Keyboard.Init();
             Mouse.Init();
@@ -352,5 +365,12 @@ namespace CETech
 
         private static DevelopCmdFlags DevelopFlags;
 #endif
+
+        private static List<SystemInitConfig> initConfigsDelegates = new List<SystemInitConfig>();
+        private static List<SystemInitDelegate> InitDelegates = new List<SystemInitDelegate>();
+        private static List<SystemShutdownDelegate> ShutdownDelegates = new List<SystemShutdownDelegate>();
+        private static void RegisterSystemsImpl(SystemInitConfig[] initConfig, SystemInitDelegate[] init, SystemShutdownDelegate[] shutdown)
+        {
+        }
     }
 }

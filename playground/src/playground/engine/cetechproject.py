@@ -23,7 +23,6 @@ def validate_project(project_dir):
 
 
 class CetechProject(object):
-    BUILD_DEBUG = 'Debug'
     BUILD_DEVELOP = 'Develop'
     BUILD_RELEASE = 'Release'
 
@@ -32,8 +31,12 @@ class CetechProject(object):
         'linux': 'Linux'
     }
 
+    _ENGINE_BIN = {
+        BUILD_DEVELOP: 'CETechDevelop.exe',
+        BUILD_RELEASE: 'CETech.exe'
+    }
+
     _BUILD_DIR = {
-        BUILD_DEBUG: 'Debug',
         BUILD_DEVELOP: 'Debug',
         BUILD_RELEASE: 'Release'
     }
@@ -92,14 +95,11 @@ class CetechProject(object):
         _platform = platform.system().lower()
 
         engine_bin_path = os.path.join('..', 'sources', 'CETech', 'bin', self._BIN_PLATFORM[_platform], 'AnyCPU',
-                                       self._BUILD_DIR[build_type])
+                                       'Debug')
         return engine_bin_path
 
     def get_executable_path(self, build_type):
-        _platform = platform.system().lower()
-
-        engine_bin_path = os.path.join('..', 'sources', 'CETech', 'bin', self._BIN_PLATFORM[_platform], 'AnyCPU',
-                                       self._BUILD_DIR[build_type], 'CETech.exe')
+        engine_bin_path = os.path.join(self.get_lib_path(build_type), self._ENGINE_BIN[build_type])
         return engine_bin_path
 
     def run_cetech(self, build_type, compile_=False, continue_=False, wait=False, daemon=False, wid=None,
@@ -143,5 +143,7 @@ class CetechProject(object):
         process.waitForStarted()
 
         self.spawned_process.append(process)
+
+        print(cmd)
 
         return process

@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project Name="CETech" Path="sources/CETech" Type="Console">
+<Project Name="CETechDevelop" Path="sources/CETech" Type="Console">
   <References>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -13,12 +13,25 @@
     <Uses Name="SDL2">
       <Platforms>Windows,MacOS,Linux</Platforms>
     </Uses>
+    <Uses Name="Develop">
+      <Platforms>Windows,MacOS,Linux</Platforms>
+    </Uses>
   </Dependencies>
   <Services>
     <Service Name="SDL2">
       <AddDefine>CETECH_SDL2</AddDefine>
       <Reference Include="SDL2" />
       <Platforms>Windows,MacOS,Linux</Platforms>
+    </Service>
+    <Service Name="Develop">
+      <AddDefine>CETECH_DEVELOP</AddDefine>
+      <Reference Include="SQLite">
+        <Platforms>Windows</Platforms>
+      </Reference>
+      <Reference Include="Mono.Data.Sqlite">
+        <Platforms>MacOS,Linux</Platforms>
+      </Reference>
+      <Reference Include="NNanomsg" />
     </Service>
   </Services>
   <Files>
@@ -32,8 +45,11 @@
     <Compile Include="Config\Private\ConfigSystem.cs" />
     <Compile Include="Develop\ConsoleServer.cs" />
     <Compile Include="Develop\DevelopSystem.cs" />
-    <Compile Include="Develop\Private\ConsoleServerNull.cs" />
-    <Compile Include="Develop\Private\DevelopSystemNull.cs" />
+    <Compile Include="Develop\Private\BuildDb.cs" />
+    <Compile Include="Develop\Private\ConsoleServer.cs" />
+    <Compile Include="Develop\Private\DevelopSystem.cs" />
+    <Compile Include="Develop\Private\ResourceCompiler.cs" />
+    <Compile Include="Develop\ResourceCompiler.cs" />
     <Compile Include="FileSystem\FileSystem.cs" />
     <Compile Include="FileSystem\Private\FileSystem.cs" />
     <Compile Include="Input\Keyboard.cs" />
@@ -74,7 +90,7 @@
     <Compile Include="Window\Window.cs" />
     <Compile Include="Window\WindowFlags.cs" />
     <Compile Include="Window\WindowPos.cs" />
-    <None Include="CETech.sh">
+    <None Include="CETechDevelop.sh">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </Files>

@@ -144,7 +144,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         if platform.system().lower() != 'darwin':
             self.ogl_dock.show()
 
-        self.project.run_cetech(build_type=CetechProject.BUILD_DEBUG, compile_=True, continue_=True,
+        self.project.run_cetech(build_type=CetechProject.BUILD_DEVELOP, compile_=True, continue_=True,
                                 wid=wid)
 
         #self.api.wait()
