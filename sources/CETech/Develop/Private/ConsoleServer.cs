@@ -18,14 +18,14 @@ namespace CETech.Develop
 
         private static void InitImpl()
         {
-            _nanoLog = new LogHandler.NanoLog("ws://*:5556");
+            _nanoLog = new LogHandler.NanoLog($"ws://*:{ConfigSystem.GetValueInt("console_server.base_port")}");
             Log.LogEvent += _nanoLog.Log;
 
 
             _commandHandlers = new Dictionary<string, CommandHandler>();
             _socket = new ReplySocket();
 
-            _socket.Bind("tcp://*:5557");
+            _socket.Bind($"tcp://*:{ConfigSystem.GetValueInt("console_server.base_port")+1}");
             _listener = new NanomsgListener();
             _listener.AddSocket(_socket);
             _listener.ReceivedMessage += socketId =>

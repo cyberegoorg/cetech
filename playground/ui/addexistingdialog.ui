@@ -54,7 +54,8 @@
         <string>...</string>
        </property>
        <property name="icon">
-        <iconset theme="directory"/>
+        <iconset theme="directory">
+         <normaloff>../../../../../.designer/backup</normaloff>../../../../../.designer/backup</iconset>
        </property>
       </widget>
      </item>

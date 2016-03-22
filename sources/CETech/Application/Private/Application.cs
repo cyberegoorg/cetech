@@ -29,6 +29,8 @@ namespace CETech
             ConfigSystem.CreateValue("resource_compiler.src", "Path to source dir", Path.Combine("data", "src"));
             ConfigSystem.CreateValue("resource_manager.build", "Path to build dir", Path.Combine("data", "build"));
 
+            ConfigSystem.CreateValue("console_server.base_port", "First used port", 5556);
+
             ConfigSystem.CreateValue("boot.pkg", "Boot package", "boot");
             ConfigSystem.CreateValue("boot.script", "Boot script", "lua/boot");
 
@@ -153,9 +155,11 @@ namespace CETech
 #if CETECH_DEVELOP
             string core_dir = null;
             string source_dir = null;
+            int? first_port = null;
 
             DevelopFlags.wid = IntPtr.Zero;
 #endif
+            
             var p = new OptionSet
             {
                 {
@@ -176,6 +180,11 @@ namespace CETech
                 {
                     "core=", "Core dir.",
                     v => core_dir = v
+                },
+
+                {
+                    "p|port", "First port",
+                    (int v) => first_port = v
                 },
 
                 {
@@ -223,6 +232,11 @@ namespace CETech
             if (core_dir != null)
             {
                 ConfigSystem.SetValue("resource_compiler.core", core_dir);
+            }
+
+            if (first_port != null)
+            {
+                ConfigSystem.SetValue("console_server.base_port", (int)first_port);
             }
 #endif
 
@@ -307,7 +321,12 @@ namespace CETech
         private static bool BigInit()
         {
             Log.LogEvent += LogHandler.ConsoleLog;
-            Log.LogEvent += new LogHandler.FileLog("log.yml").Log;
+
+#if CETECH_DEVELOP
+            Log.LogEvent += new LogHandler.FileLog("log_develop.yml").Log;
+#else
+            Log.LogEvent += new LogHandler.FileLog("log_release.yml").Log;
+#endif
 
 #if CETECH_SDL2
             SDL.SDL_Init(SDL.SDL_INIT_EVERYTHING);

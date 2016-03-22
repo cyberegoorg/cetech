@@ -144,8 +144,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         if platform.system().lower() != 'darwin':
             self.ogl_dock.show()
 
-        self.project.run_cetech(build_type=CetechProject.BUILD_DEVELOP, compile_=True, continue_=True,
-                                wid=wid)
+        self.project.run_cetech_develop(compile_=True, continue_=True,wid=wid)
 
         #self.api.wait()
 
@@ -200,6 +199,9 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
     def open_recorded_events(self):
         self.profiler_doc_widget.show()
+
+    def run_standalone(self):
+        self.project.run_cetech_release()
 
     def closeEvent(self, evnt):
         self.api.disconnect()
