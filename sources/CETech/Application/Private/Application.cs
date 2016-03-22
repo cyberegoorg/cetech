@@ -24,12 +24,16 @@ namespace CETech
         /// </summary>
         private static bool InitImpl(string[] args)
         {
-            ConfigSystem.CreateValue("platform", "Platform", GetPlatform());
+            ConfigSystem.CreateValue("application.platform", "Platform", GetPlatform());
+            ConfigSystem.CreateValue("application.log_file", "Log file", "");
+
+#if CETECH_DEVELOP
             ConfigSystem.CreateValue("resource_compiler.core", "Path to core dir", "core");
             ConfigSystem.CreateValue("resource_compiler.src", "Path to source dir", Path.Combine("data", "src"));
-            ConfigSystem.CreateValue("resource_manager.build", "Path to build dir", Path.Combine("data", "build"));
-
             ConfigSystem.CreateValue("console_server.base_port", "First used port", 5556);
+#endif
+
+            ConfigSystem.CreateValue("resource_manager.build", "Path to build dir", Path.Combine("data", "build"));
 
             ConfigSystem.CreateValue("boot.pkg", "Boot package", "boot");
             ConfigSystem.CreateValue("boot.script", "Boot script", "lua/boot");
@@ -151,6 +155,7 @@ namespace CETech
         {
             var show_help = false;
             string build_dir = null;
+            string log_file = null;
 
 #if CETECH_DEVELOP
             string core_dir = null;
@@ -165,6 +170,12 @@ namespace CETech
                 {
                     "h|help", "show this message and exit",
                     v => show_help = v != null
+                },
+
+
+                {
+                    "l|log-file=", "Log file",
+                    v => log_file = v
                 },
 
                 {
@@ -239,6 +250,11 @@ namespace CETech
                 ConfigSystem.SetValue("console_server.base_port", (int)first_port);
             }
 #endif
+
+            if (log_file != null)
+            {
+                ConfigSystem.SetValue("application.log_file", log_file);
+            }
 
             if (build_dir != null)
             {
@@ -322,11 +338,11 @@ namespace CETech
         {
             Log.LogEvent += LogHandler.ConsoleLog;
 
-#if CETECH_DEVELOP
-            Log.LogEvent += new LogHandler.FileLog("log_develop.yml").Log;
-#else
-            Log.LogEvent += new LogHandler.FileLog("log_release.yml").Log;
-#endif
+            string log_file = ConfigSystem.GetValueString("application.log_file");
+            if (log_file.Length != 0)
+            {
+                Log.LogEvent += new LogHandler.FileLog(log_file).Log;
+            }
 
 #if CETECH_SDL2
             SDL.SDL_Init(SDL.SDL_INIT_EVERYTHING);
@@ -344,7 +360,7 @@ namespace CETech
 
             FileSystem.MapRootDir("build",
                 Path.Combine(ConfigSystem.GetValueString("resource_manager.build"),
-                    ConfigSystem.GetValueString("platform")));
+                    ConfigSystem.GetValueString("application.platform")));
 
             TaskManager.Init();
 
