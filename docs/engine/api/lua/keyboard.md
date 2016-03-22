@@ -1,93 +1,99 @@
-# Popis
-Modul obsahuje funkce pro obsluhu klávesnice.
+# Keyboard
+
+Module contain functions for keyboard.
 
 ---
 
-# Ukázka
+# Example
 ```lua
-local quit_btn = Keyboard.button_index 'q'
+local quit_btn = Keyboard.ButtonIndex 'q'
 
 function Game:update(dt)
-    if Keyboard.pressed(quit_btn) then
-        Application.quit()
+    if Keyboard.ButtonPressed(quit_btn) then
+        Application.Quit()
     end
 end
 ```
 
 ---
 
-# Metody
+# Methods
 
-## button_index
+## ButtonIndex
+
 ```lua
-function button_index(button_name)
+function Keyboard.ButtonIndex(buttonName)
+end
 ```
 
-Vrátí index tlačítka který má název `button_name`.
+Return button index for `buttonName`.
 
-### Parametry
+### Arguments
 
-Parametr      | Typ | Popis
---------------|-----|---------------
-`button_name` | str | Název tlačítka
+Argument     | Type | Description
+-------------|------|---------------
+`buttonName` | str  | Button name
 
 ---
 
-## button_name
+## ButtonName
 ```lua
-function button_name(button_index)
+function Keyboard.ButtonName(buttonIndex)
+end
 ```
 
-Vrátí název tlačítka nebo prázdný řetezec pokud je index špatný.
+Return button name for `buttonIndex` or empty string if `ButtonIndex` is invalid.
 
-### Parametry
+### Arguments
 
-Parametr       | Typ | Popis
----------------|-----|---------------
-`button_index` | int | Index tlačítka
+Argument      | Type | Description
+--------------|------|--------------
+`buttonIndex` | int  | Button index
 
 ---
 
-## button_state
+## ButtonState
 ```lua
-function button_state(button_index)
+function Keyboard.ButtonState(buttonIndex)
+end
 ```
 
-Vrátí `true` pokud je tlačítka v aktuálním frejmu stisknuté.
+Return `true` if button is down in actual frame.
 
-### Parametry
+### Arguments
 
-Parametr       | Typ | Popis
----------------|-----|---------------
-`button_index` | int | Index tlačítka
+Argument      | Type | Description
+--------------|----- |--------------
+`buttonIndex` | int  | Button Index
 
 ---
 
-## pressed
+## ButtonPressed
 ```lua
-function pressed(button_index)
+function Keyboard.ButtonPressed(buttonIndex)
+end
 ```
 
-Vráti `true` pokud nebylo tlačítko v minulém frejmu stisknuté.
+Return `true` if button is not down in last frame and now is.
 
-### Parametry
+### Arguments
 
-Parametr       | Typ | Popis
----------------|-----|---------------
-`button_index` | int | Index tlačítka
+Argument      | Type | Description
+--------------|------|--------------
+`buttonIndex` | int  | Button index
 
 ---
 
-## released
+## ButtonReleased
 ```lua
-function released(button_index)
+function Keyboard.ButtonReleased(buttonIndex)
+end
 ```
 
-Vráti `true` pokud bylo tlačítko v minulém frejmu stisknuté ale v aktuálním není.
+Return `true` if button is down in last frame and now is not.
 
-### Parametry
+### Arguments
 
-Parametr       | Typ | Popis
----------------|-----|---------------
-`button_index` | int | Index tlačítka
-
+Argument      | Type | Description
+--------------|------|--------------
+`buttonIndex` | int  | Button index
