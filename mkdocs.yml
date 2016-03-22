@@ -5,9 +5,7 @@ repo_url: https://github.com/cyberegoorg/cetech
 theme: readthedocs
 
 pages:
-  - Úvod: 'index.md'
-  - Architektůra: 'architecture/overview.md'
-  - New Game: 'new_game/overview.md'
+  - CETech: 'index.md'
 
   - Engine:
     - Popis: 'engine/overview.md'
@@ -15,21 +13,17 @@ pages:
 
   - Playground:
     - Popis: 'playground/overview.md'
-    - Historie v obrázcích: 'playground/image_history.md'
+    - Histori v obrázcích: 'playground/image_history.md'
 
-  - API C++:
-    - log: 'engine/api/cpp/log.md'
-
-  - API Lua:
-    - Application: 'engine/api/lua/application.md'
-    - Package: 'engine/api/lua/package.md'
-    - Keyboard: 'engine/api/lua/keyboard.md'
-    - Mouse: 'engine/api/lua/mouse.md'
-    - Vector2: 'engine/api/lua/vector2.md'
-    - Vector3: 'engine/api/lua/vector3.md'
+  - Lua API:
+    - Log: 'engine/api/lua/Log.md'
+    - Application: 'engine/api/lua/Application.md'
+    - Package: 'engine/api/lua/PackageManager.md'
+    - Keyboard: 'engine/api/lua/Keyboard.md'
+    - Mouse: 'engine/api/lua/Mouse.md'
 
   - About:
-    - Poznámky k vydání: 'about/release-notes.md'
+    - Release notes: 'about/release-notes.md'
     - Licence: 'about/license.md'
 
 markdown_extensions:
