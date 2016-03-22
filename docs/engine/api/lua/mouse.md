@@ -1,18 +1,18 @@
-# Popis
+# Mouse
 
-Modul obsahuje funkce pro obsluhu myši (jasně že počítačové, rozhodně vám neumožní podrobit si krysí národ podobně jako
-v [Dishonored][dishonored]).
+Module contain functions for mouse (For computer mouse because this is not [Dishonored][dishonored])
 
 ---
 
-# Ukázka
+# Example
+
 ```lua
-local left_btn = Mouse.button_index 'left'
+local left_btn = Mouse.ButtonIndex 'left'
 
 function Game:update(dt)
-    local m_axis = Mouse.axis()
+    local m_axis = Mouse.Axis()
 
-    if Mouse.button_state(left_btn) then
+    if Mouse.ButtonState(left_btn) then
         print("%f, %f", m_axis.x, m_axis.y)
     end
 end
@@ -20,100 +20,97 @@ end
 
 ---
 
-# Metody
+# Methods
 
-## button_index
+## ButtonIndex
 ```lua
-function Mouse.button_index(button_name)
+function Mouse.ButtonIndex(buttonName)
+end
 ```
 
-Vrátí index tlačítka který má název `button_name`.
+Return button index for `buttonName`.
 
-### Parametry
+### Arguments
 
-Parametr      | Typ | Popis
---------------|-----|---------------
-`button_name` | str | Název tlačítka
+Argument     | Typ | Popis
+-------------|-----|--------------
+`buttonName` | str | Button name
 
-### button_name
-button_name   | Tlačítko
---------------|------------
-`left`        | Levé
-`middle`      | Prostřední
-`right`       | Pravé
+### buttonName
+
+buttonName | Tlačítko
+-----------|------------
+`left`     | Levé
+`middle`   | Prostřední
+`right`    | Pravé
 
 ---
 
-## button_name
+## buttonName
 ```lua
-function Mouse.button_name(button_index)
+function Mouse.buttonName(ButtonIndex)
+end
 ```
 
-Vrátí název tlačítka nebo prázdný řetezec pokud je index špatný.
+Return button name for `buttonIndex` or empty string if `ButtonIndex` is invalid.
 
-### Parametry
+### Arguments
 
-Parametr       | Typ | Popis
+Argument       | Typ | Popis
 ---------------|-----|---------------
-`button_index` | int | Index tlačítka
+`ButtonIndex` | int | Button index
 
 ---
 
-## button_state
+## ButtonState
 
 ```lua
-function Mouse.button_state(button_index)
+function Mouse.ButtonState(ButtonIndex)
+end
 ```
 
-Vrátí `true` pokuď je tlačítko v aktuálním frejmu stisknuté.
+Return `true` if button is down in actual frame.
 
-### Parametry
+### Arguments
 
-Parametr       | Typ | Popis
----------------|-----|---------------
-`button_index` | int | Index tlačítka
+Argument      | Typ | Popis
+--------------|-----|--------------
+`ButtonIndex` | int | Button index
 
 ---
 
 ## pressed
 
 ```lua
-function Mouse.pressed(button_index)
+function Mouse.pressed(ButtonIndex)
+end
 ```
 
-Vráti `true` pokud nebylo tlačítko v minulém frejmu stisknuté ale v aktuálním je jinak vrací `false`. 
+Return `true` if button is not down in last frame and now is.
 
-### Parametry
+### Arguments
 
-Parametr       | Typ | Popis
----------------|-----|---------------
-`button_index` | int | Index tlačítka
+Argument      | Typ | Popis
+--------------|-----|--------------
+`ButtonIndex` | int | Button index
 
 ---
 
-## released
+## Released
 
 ```lua
-function Mouse.released(button_index)
+function Mouse.Released(ButtonIndex)
+end
 ```
 
-Vráti `true` pokud bylo tlačítko v minulém frejmu stisknuté ale v aktuálním není jinak vrací `false`.
+Return `true` if button is down in last frame and now is not.
 
-### Parametry
+### Arguments
 
-Parametr       | Typ | Popis
----------------|-----|---------------
-`button_index` | int | Index tlačítka
-
-
-## axis
-
-```lua
-function Mouse.axis()
-```
-
-Vrátí `Vector2` s pozicí kurzoru.
+Argument      | Typ | Popis
+--------------|-----|--------------
+`ButtonIndex` | int | Button index
 
 ---
 
-[dishonored]: https://cs.wikipedia.org/wiki/Dishonored
+[dishonored]: https://www.wikipedia.org/wiki/Dishonored
