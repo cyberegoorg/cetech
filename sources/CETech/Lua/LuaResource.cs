@@ -1,5 +1,8 @@
 using System.IO;
+
+#if CETECH_DEVELOP
 using CETech.Develop;
+#endif
 
 namespace CETech.Lua
 {
