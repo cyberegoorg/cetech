@@ -5,11 +5,14 @@ namespace CETech
     /// </summary>
     public static partial class Application
     {
-        public delegate void SystemInitDelegate();
         public delegate void SystemInitConfig();
+
+        public delegate void SystemInitDelegate();
+
         public delegate void SystemShutdownDelegate();
 
-        public static void RegisterSystems(SystemInitConfig[] initConfig, SystemInitDelegate[] init, SystemShutdownDelegate[] shutdown)
+        public static void RegisterSystems(SystemInitConfig[] initConfig, SystemInitDelegate[] init,
+            SystemShutdownDelegate[] shutdown)
         {
             RegisterSystemsImpl(initConfig, init, shutdown);
         }
