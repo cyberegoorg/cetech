@@ -15,12 +15,13 @@ pages:
     - Popis: 'playground/overview.md'
     - Histori v obrázcích: 'playground/image_history.md'
 
-  - Lua API:
-    - Log: 'engine/api/lua/Log.md'
-    - Application: 'engine/api/lua/Application.md'
-    - Package: 'engine/api/lua/PackageManager.md'
-    - Keyboard: 'engine/api/lua/Keyboard.md'
-    - Mouse: 'engine/api/lua/Mouse.md'
+  - Lua:
+    - API:
+      - Log: 'engine/api/lua/Log.md'
+      - Application: 'engine/api/lua/Application.md'
+      - Package: 'engine/api/lua/PackageManager.md'
+      - Keyboard: 'engine/api/lua/Keyboard.md'
+      - Mouse: 'engine/api/lua/Mouse.md'
 
   - About:
     - Release notes: 'about/release-notes.md'
