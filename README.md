@@ -70,39 +70,7 @@ CETech is Data-Driven [game engine](https://en.wikipedia.org/wiki/Game_engine) a
 
 * [Qt](https://www.qt.io/) - Cross-platform GUI library.
 
-## Building
-
-### Prerequisites
-
-#### Linux
-
-* Install python >= 3.5
-* Install Mono
-
-* Install requirements.txt
-
-```bash
-$ pip install -r requirements.txt
-```
-
-
-#### Windows
-* Install python >= 3.5
-* Install Visual Studio 2015
-
-* Install requirements.txt
-
-```bash
-$ pip install -r requirements.txt
-```
-
-### Building
-
-* Build engine
-
-```bash
-$ python build.py
-```
+## [Building] (https://cyberegoorg.github.io/cetech/engine/build) 
 
 ## [License](http://creativecommons.org/publicdomain/zero/1.0/)
 
