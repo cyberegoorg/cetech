@@ -2,7 +2,9 @@
 
 ## Prerequisites
 
-* Install python >= 3.5, Mono
+* Install python >= 3.5
+* Install QT5
+* Install Mono
 * Install requirements.txt
 
 ```bash
@@ -19,7 +21,9 @@ $ python3 build.py
 
 ## Prerequisites
 
-* Install python >= 3.5, Install Visual Studio 2015
+* Install python >= 3.5
+* Install QT5
+* Install Visual Studio 2015
 * Install requirements.txt
 
 ```bash

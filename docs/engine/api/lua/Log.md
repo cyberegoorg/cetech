@@ -6,7 +6,7 @@ Module contain functions for logging
 
 # Methods
 
-## Info
+## Log.Info
 
 ```lua
 function Log.Info(where, msg, ...)
@@ -23,7 +23,7 @@ Argument | Type | Description
 `msg`    | str  | Message.
 `...`    | str  | Message args.
 
-## Warning
+## Log.Warning
 
 ```lua
 function Log.Warning(where, msg, ...)
@@ -40,7 +40,7 @@ Argument | Type | Description
 `msg`    | str  | Message.
 `...`    | str  | Message args.
 
-## Error
+## Log.Error
 
 ```lua
 function Log.Error(where, msg, ...)
@@ -57,7 +57,7 @@ Argument | Type | Description
 `msg`    | str  | Message.
 `...`    | str  | Message args.
 
-## Debug
+## Log.Debug
 
 ```lua
 function Log.Debug(where, msg, ...)
