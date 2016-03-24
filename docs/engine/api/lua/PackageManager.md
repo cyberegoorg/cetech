@@ -43,8 +43,8 @@ Load all resource that are in the package. If one is already loaded will not rel
 !!! important
 
     The function does not wait to finish loading.
-    For querying whether the package is already loaded use method [**is_loaded**](#IsLoaded)
-    or you can wait to load using method [**PackageManager.Flush**](#Flush)
+    For querying whether the package is already loaded use method [**PackageManager.IsLoaded**](#packagemanagerisloaded)
+    or you can wait to load using method [**PackageManager.Flush**](#packagemanagerflush)
 
 ### Arguments
 
@@ -70,7 +70,7 @@ Argument      | Type | Description
 
 ---
 
-## IsLoaded
+## PackageManager.IsLoaded
 ```lua
 function PackageManager.IsLoaded(packageName)
 end

@@ -13,13 +13,13 @@ function Game:update(dt)
         Application.Quit()
     end
 end
-```
+``` 
 
 ---
 
 # Methods
 
-## ButtonIndex
+## Keyboard.ButtonIndex
 
 ```lua
 function Keyboard.ButtonIndex(buttonName)
@@ -36,7 +36,7 @@ Argument     | Type | Description
 
 ---
 
-## ButtonName
+## Keyboard.ButtonName
 ```lua
 function Keyboard.ButtonName(buttonIndex)
 end
@@ -52,7 +52,7 @@ Argument      | Type | Description
 
 ---
 
-## ButtonState
+## Keyboard.ButtonState
 ```lua
 function Keyboard.ButtonState(buttonIndex)
 end
@@ -68,7 +68,7 @@ Argument      | Type | Description
 
 ---
 
-## ButtonPressed
+## Keyboard.ButtonPressed
 ```lua
 function Keyboard.ButtonPressed(buttonIndex)
 end
@@ -84,7 +84,7 @@ Argument      | Type | Description
 
 ---
 
-## ButtonReleased
+## Keyboard.ButtonReleased
 ```lua
 function Keyboard.ButtonReleased(buttonIndex)
 end

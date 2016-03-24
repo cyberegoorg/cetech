@@ -6,7 +6,7 @@ Module contain functions for Application.
 
 # Methods
 
-## Quit
+## Application.Quit 
 
 ```lua
 function Application.Quit()

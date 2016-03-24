@@ -20,9 +20,19 @@ end
 
 ---
 
+# Button name
+
+Name        | Button
+------------|--------
+`left`      | Left
+`middle`    | Midle
+`right`     | Right
+
+---
+
 # Methods
 
-## ButtonIndex
+## Mouse.ButtonIndex
 ```lua
 function Mouse.ButtonIndex(buttonName)
 end
@@ -33,20 +43,12 @@ Return button index for `buttonName`.
 ### Arguments
 
 Argument     | Typ | Popis
--------------|-----|--------------
-`buttonName` | str | Button name
-
-### buttonName
-
-buttonName | Tlačítko
------------|------------
-`left`     | Levé
-`middle`   | Prostřední
-`right`    | Pravé
+-------------|-----|----------------------------
+`buttonName` | str | [Button name](#button-name)
 
 ---
 
-## buttonName
+## Mouse.ButtonName
 ```lua
 function Mouse.buttonName(ButtonIndex)
 end
@@ -62,7 +64,7 @@ Argument       | Typ | Popis
 
 ---
 
-## ButtonState
+## Mouse.ButtonState
 
 ```lua
 function Mouse.ButtonState(ButtonIndex)
@@ -79,10 +81,10 @@ Argument      | Typ | Popis
 
 ---
 
-## pressed
+## Mouse.Pressed
 
 ```lua
-function Mouse.pressed(ButtonIndex)
+function Mouse.Pressed(ButtonIndex)
 end
 ```
 
@@ -96,7 +98,7 @@ Argument      | Typ | Popis
 
 ---
 
-## Released
+## Mouse.Released
 
 ```lua
 function Mouse.Released(ButtonIndex)
