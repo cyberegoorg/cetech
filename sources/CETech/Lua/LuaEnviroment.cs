@@ -61,7 +61,7 @@
         /// </summary>
         public static void BootScriptCallShutdown()
         {
-            _enviromentScript.Call(_shutdownFce);
+            BootScriptCallShutdownImpl();
         }
     }
 }
