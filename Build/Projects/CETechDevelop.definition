@@ -60,13 +60,13 @@
     <Compile Include="Input\Private\MouseSDL.cs">
       <Services>SDL2</Services>
     </Compile>
-    <Compile Include="Lua\Api\ApplicationApi.cs" />
-    <Compile Include="Lua\Api\KeyboardApi.cs" />
-    <Compile Include="Lua\Api\LogApi.cs" />
-    <Compile Include="Lua\Api\MouseApi.cs" />
-    <Compile Include="Lua\Api\PackageManagerApi.cs" />
     <Compile Include="Lua\LuaEnviroment.cs" />
     <Compile Include="Lua\LuaResource.cs" />
+    <Compile Include="Lua\Private\Api\ApplicationApi.cs" />
+    <Compile Include="Lua\Private\Api\KeyboardApi.cs" />
+    <Compile Include="Lua\Private\Api\LogApi.cs" />
+    <Compile Include="Lua\Private\Api\MouseApi.cs" />
+    <Compile Include="Lua\Private\Api\PackageManagerApi.cs" />
     <Compile Include="Lua\Private\LuaEnviroment.cs" />
     <Compile Include="PackageManager\PackageManager.cs" />
     <Compile Include="PackageManager\PackageResource.cs" />
