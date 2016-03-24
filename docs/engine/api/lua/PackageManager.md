@@ -32,7 +32,7 @@ end
 
 ---
 
-## Load
+## PackageManager.Load
 ```lua
 function PackageManager.Load(packageName)
 end
@@ -54,7 +54,7 @@ Argument      | Type | Description
 
 ---
 
-## Unload
+## PackageManager.Unload
 ```lua
 function PackageManager.Unload(packageName)
 end
@@ -86,7 +86,7 @@ Argument      | Type | Description
 
 ---
 
-## Flush
+## PackageManager.Flush
 ```lua
 function PackageManager.Flush(packageName)
 end
