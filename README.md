@@ -11,7 +11,7 @@
 CETech is Data-Driven [game engine](https://en.wikipedia.org/wiki/Game_engine) and toolbox inspired by [Bitsquid](http://bitsquid.blogspot.se/)/[Stingray](http://stingrayengine.com/) engine.
 
 * [Release notes](http://cyberegoorg.github.io/cetech/about/release-notes)
-* [Documentation](http://cyberegoorg.github.io/cetech) work in progress, temporarily in czech language
+* [Documentation](http://cyberegoorg.github.io/cetech) work in progress
 
 ![Prototyp](docs/img/prototyp.png)
 
