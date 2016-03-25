@@ -16,7 +16,10 @@ addons:
     sources:
       - mono
     packages:
-      - mono-complete >= 4
+      - mono-complete
+      - mono-devel
+      - mono-4.0-service
+      - libmono-cil-dev
 
 install:
   - pip install -r requirements.txt
