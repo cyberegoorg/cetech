@@ -2,19 +2,18 @@ site_name: CETech
 site_author: Ondra Voves
 
 repo_url: https://github.com/cyberegoorg/cetech
-#theme: readthedocs
-theme: material
+theme: readthedocs
 
 pages:
   - CETech: 'index.md'
 
   - Engine:
-    - Popis: 'engine/overview.md'
+    - Overview: 'engine/overview.md'
     - Build: 'engine/build.md'
 
   - Playground:
-    - Popis: 'playground/overview.md'
-    - Histori v obrázcích: 'playground/image_history.md'
+    - Overview: 'playground/overview.md'
+    - Images: 'playground/image_history.md'
 
   - Lua:
     - API:
@@ -27,10 +26,6 @@ pages:
   - About:
     - Release notes: 'about/release-notes.md'
     - Licence: 'about/license.md'
-
-extra:
-  palette:
-    primary: 'light green'
 
 markdown_extensions:
     - admonition

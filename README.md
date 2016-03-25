@@ -27,11 +27,17 @@ CETech is Data-Driven [game engine](https://en.wikipedia.org/wiki/Game_engine) a
 
 ## Planned platforms
 
+* RaspberryPi (Runtime + Develop)
 * OSX (Runtime + Develop)
 * FreeBSD (Runtime + Develop)
+
 * asm.js/Emscripten (Runtime)
 * Android (Runtime)
-* RaspberryPi (Runtime)
+
+## Build
+
+* [Linux](https://cyberegoorg.github.io/cetech/engine/buil#linux)
+* [Windows](https://cyberegoorg.github.io/cetech/engine/build#windows)
 
 ## 3rd party libraries and tools
 
@@ -40,12 +46,12 @@ CETech is Data-Driven [game engine](https://en.wikipedia.org/wiki/Game_engine) a
 * [protobuild](https://github.com/Protobuild/Protobuild) - Project generator.
 
 ### C # 
+
 * [SharpBGFX](https://github.com/MikePopoloski/SharpBgfx) - C# bindings for the bgfx graphics library.
 * [MoonSharp](https://github.com/xanathar/moonsharp) - An interpreter for the Lua language, written entirely in C#.
 * [SDL2-CS](https://github.com/flibitijibibo/SDL2-CS) - C# Wrapper for SDL2.
 * [YamlDotNet](https://github.com/aaubry/YamlDotNet) - .NET library for YAML.
 * [MsgPack-cli]( https://github.com/msgpack/msgpack-cli) - MessagePack implementation for Common Language Infrastructure.
-* [YamlDotNet](https://github.com/aaubry/YamlDotNet) - .NET library for YAML.
 
 ### C/C++
 
@@ -71,8 +77,6 @@ CETech is Data-Driven [game engine](https://en.wikipedia.org/wiki/Game_engine) a
 ### Others
 
 * [Qt](https://www.qt.io/) - Cross-platform GUI library.
-
-## [Building](https://cyberegoorg.github.io/cetech/engine/build)
 
 ## [License](http://creativecommons.org/publicdomain/zero/1.0/)
 
