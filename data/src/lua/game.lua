@@ -4,7 +4,7 @@ local quit_btn = Keyboard.ButtonIndex 'q'
 local btn = Keyboard.ButtonIndex 'd'
 
 function Game:init()
-    Log.Info("boot.lua", "init")
+    Log.Info("boot.lua", "init {0}", Application.GetPlatform())
 
     Log.Info("boot.lua", "info")
     Log.Warning("boot.lua", "warn")
