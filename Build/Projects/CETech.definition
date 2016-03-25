@@ -23,21 +23,12 @@
   </Services>
   <Files>
     <Compile Include="Application\Application.cs" />
-    <Compile Include="Application\Private\Application.cs" />
     <Compile Include="Application\Private\ApplicationSDL.cs">
       <Platforms>Windows,Linux</Platforms>
     </Compile>
-    <Compile Include="Config\ConfigResource.cs" />
-    <Compile Include="Config\ConfigSystem.cs" />
-    <Compile Include="Config\Private\ConfigSystem.cs" />
     <Compile Include="Develop\ConsoleServer.cs" />
-    <Compile Include="Develop\DevelopSystem.cs" />
-    <Compile Include="Develop\Private\ConsoleServerNull.cs" />
-    <Compile Include="Develop\Private\DevelopSystemNull.cs" />
-    <Compile Include="EntityManager\EntityManager.cs" />
-    <Compile Include="EntityManager\Private\EntityManager.cs" />
+    <Compile Include="Develop\Private\ConsoleServer.cs" />
     <Compile Include="FileSystem\FileSystem.cs" />
-    <Compile Include="FileSystem\Private\FileSystem.cs" />
     <Compile Include="Input\Keyboard.cs" />
     <Compile Include="Input\Mouse.cs" />
     <Compile Include="Input\Private\KeyboardSDL.cs">
@@ -46,27 +37,30 @@
     <Compile Include="Input\Private\MouseSDL.cs">
       <Services>SDL2</Services>
     </Compile>
+    <Compile Include="Lua\Api\ApplicationApi.cs" />
+    <Compile Include="Lua\Api\KeyboardApi.cs" />
+    <Compile Include="Lua\Api\LogApi.cs" />
+    <Compile Include="Lua\Api\MouseApi.cs" />
+    <Compile Include="Lua\Api\PackageManagerApi.cs" />
     <Compile Include="Lua\LuaEnviroment.cs" />
     <Compile Include="Lua\LuaResource.cs" />
-    <Compile Include="Lua\Private\Api\ApplicationApi.cs" />
-    <Compile Include="Lua\Private\Api\KeyboardApi.cs" />
-    <Compile Include="Lua\Private\Api\LogApi.cs" />
-    <Compile Include="Lua\Private\Api\MouseApi.cs" />
-    <Compile Include="Lua\Private\Api\PackageManagerApi.cs" />
-    <Compile Include="Lua\Private\LuaEnviroment.cs" />
     <Compile Include="PackageManager\PackageManager.cs" />
     <Compile Include="PackageManager\PackageResource.cs" />
-    <Compile Include="PackageManager\Private\PackageManager.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="RenderSystem\Private\RendererBgfx.cs" />
     <Compile Include="RenderSystem\RenderSystem.cs" />
-    <Compile Include="ResourceManager\Private\ResourceManager.cs" />
-    <Compile Include="ResourceManager\Private\StringId.cs" />
+    <Compile Include="ResourceCompiler\Private\BuildDb.cs">
+      <Services>Develop</Services>
+    </Compile>
+    <Compile Include="ResourceCompiler\ResourceCompiler.cs">
+      <Services>Develop</Services>
+    </Compile>
     <Compile Include="ResourceManager\ResourceManager.cs" />
     <Compile Include="ResourceManager\StringId.cs" />
     <Compile Include="TaskManager\Private\QueueMPMC.cs" />
-    <Compile Include="TaskManager\Private\TaskManager.cs" />
     <Compile Include="TaskManager\TaskManager.cs" />
+    <Compile Include="Utils\ByteUtils.cs" />
+    <Compile Include="Utils\Config.cs" />
     <Compile Include="Utils\Log.cs" />
     <Compile Include="Utils\LogHandler.cs" />
     <Compile Include="Utils\Options.cs" />
@@ -76,8 +70,5 @@
     <Compile Include="Window\Window.cs" />
     <Compile Include="Window\WindowFlags.cs" />
     <Compile Include="Window\WindowPos.cs" />
-    <None Include="CETech.sh">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
   </Files>
 </Project>

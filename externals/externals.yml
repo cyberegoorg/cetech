@@ -211,7 +211,7 @@ nanomsg:
 
   build:
     posix: &nanomsg_build_posix
-      [autoreconf -ifv, ./configure, make]
+      [autoreconf -vfi, ./configure, make]
 
     linux64:  *nanomsg_build_posix
     darwin64: *nanomsg_build_posix
@@ -229,6 +229,9 @@ nanomsg:
     windows64:
       - copy: [Release\nanomsg.dll, Release/lib]
 
+############
+# NNanomsg #
+########################################################################################################################
 nnanomsg:
   clone: git clone https://github.com/OndraVoves/NNanomsg.git --depth 1
 
@@ -249,3 +252,26 @@ nnanomsg:
      linux64:
       - copytree: [NNanomsg/bin/Release, Release/lib]
       - copytree: [NNanomsg/bin/Debug, Debug/lib]
+
+#########
+# NSpec #
+########################################################################################################################
+nspec:
+  clone: git clone https://github.com/mattflo/NSpec.git --depth 1
+
+  build:
+    windows64:
+      - devenv NSpec.sln /build Release
+
+    linux64:
+      - xbuild /p:Configuration=Release NSpec/NSpec.csproj
+      - xbuild /p:Configuration=Release NSpecRunner/NSpecRunner.csproj
+
+  install:
+     windows64:
+      - copytree: [NSpec\bin\Release, Release\lib]
+      - copytree: [NSpecRunner\bin\Release, Release\bin]
+
+     linux64:
+      - copytree: [NSpec/bin/Release, Release/lib]
+      - copytree: [NSpecRunner/bin/Release, Release/bin]
