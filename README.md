@@ -27,10 +27,9 @@ CETech is Data-Driven [game engine](https://en.wikipedia.org/wiki/Game_engine) a
 
 ## Planned platforms
 
-* RaspberryPi (Runtime + Develop)
 * OSX (Runtime + Develop)
 * FreeBSD (Runtime + Develop)
-
+* RaspberryPi (Runtime + Develop)
 * asm.js/Emscripten (Runtime)
 * Android (Runtime)
 
