@@ -13,14 +13,13 @@ cache:
 
 addons:
   apt:
-    sources: ['ubuntu-toolchain-r-test', 'llvm-toolchain-precise-3.7']
-    packages: ['clang-3.7']
-env: COMPILER=clang++-3.7
+    packages:
+      - mono-complete
 
 install:
-  - pip install pyyaml
-  - python externals.py -v
-  - python build.py --cxx=$COMPILER
+  - pip install -r requirements.txt
+  - python externals/externals.py
+  - python build.py -d
 
 script:
-  - ./build/linux64_clang/bin/cetech_testDebug
+  - sources/CETech/bin/Linux/AnyCPU/Debug/NSpecRunner.exe sources/CETech/bin/Linux/AnyCPU/Debug/CETechDevelopTest.dll
