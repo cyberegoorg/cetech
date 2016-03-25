@@ -58,6 +58,8 @@ CETech is Data-Driven [game engine](https://en.wikipedia.org/wiki/Game_engine) a
 
 * [python](https://www.python.org/) - Multi-paradigm Programming language.
 * [pyaml](http://pyyaml.org/wiki/PyYAML) - YAML parser and emitter for Python.
+* [python-nanomsg](https://github.com/tonysimpson/nanomsg-python) - Nanomsg python binding.
+* [PyQT](https://www.riverbankcomputing.com/software/pyqt/intro) - Python QT binding
 
 ### JavaScript
 
@@ -70,7 +72,7 @@ CETech is Data-Driven [game engine](https://en.wikipedia.org/wiki/Game_engine) a
 
 * [Qt](https://www.qt.io/) - Cross-platform GUI library.
 
-## [Building] (https://cyberegoorg.github.io/cetech/engine/build) 
+## [Building](https://cyberegoorg.github.io/cetech/engine/build)
 
 ## [License](http://creativecommons.org/publicdomain/zero/1.0/)
 
