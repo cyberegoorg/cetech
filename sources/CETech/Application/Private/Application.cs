@@ -142,7 +142,7 @@ namespace CETech
             _run = false;
         }
 
-        private static string GetPlatform()
+        private static string GetPlatformImpl()
         {
 #if PLATFORM_WINDOWS
             return "windows";
@@ -410,5 +410,6 @@ namespace CETech
         private static void RegisterSystemsImpl(SystemInitConfig[] initConfig, SystemInitDelegate[] init, SystemShutdownDelegate[] shutdown)
         {
         }
+
     }
 }

@@ -9,5 +9,10 @@ namespace CETech.Lua.Api
         {
             Application.Quit();
         }
+
+        public static string GetPlatform()
+        {
+            return Application.GetPlatform();
+        }
     }
 }
