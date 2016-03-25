@@ -374,6 +374,8 @@ namespace CETech
 #endif
             ResourceManager.LoadNow(ConfigResource.Type, new[] {StringId.FromString("global")});
 
+            EntityManager.Init();
+
             Keyboard.Init();
             Mouse.Init();
 
@@ -388,6 +390,7 @@ namespace CETech
             ConsoleServer.Shutdown();
 #endif
             TaskManager.Shutdown();
+            EntityManager.Shutdown();
         }
 
 #if CETECH_DEVELOP
