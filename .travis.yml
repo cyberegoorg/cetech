@@ -13,6 +13,8 @@ cache:
 
 addons:
   apt:
+    sources:
+      - mono
     packages:
       - mono-complete
 
