@@ -1,9 +1,9 @@
 # Playground
 
+[![Prototyp](../img/prototyp.png)](../img/prototyp.png)
+
 Development environment that tries to ease **modifiable** so that it can best comply with the specifications of the project
 if needed. Therefore, the selected combination of languages **Python** **LUA**, **JS** **HTML**.
-
----
 
 # Why so many languages?
 
@@ -12,8 +12,6 @@ if needed. Therefore, the selected combination of languages **Python** **LUA**, 
 
 * **HTML + JS** for vizualization and widgets. Easy to use and powerful visualization (and you too can have runing
 editor, edit the code, and then just when to pull reload the page loads and just see what makes == rapid iteration).
-
----
 
 # How does it run?
 

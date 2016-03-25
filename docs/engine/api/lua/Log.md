@@ -2,8 +2,6 @@
 
 Module contain functions for logging
 
----
-
 # Methods
 
 ## Log.Info
@@ -14,8 +12,6 @@ end
 ```
 
 Log info message.
-
-### Arguments
 
 Argument | Type | Description
 ---------|------|-------------------------
@@ -32,8 +28,6 @@ end
 
 Log warning message.
 
-### Arguments
-
 Argument | Type | Description
 ---------|------|-------------------------
 `where`  | str  | Where is message logged.
@@ -48,8 +42,6 @@ end
 ```
 
 Log error message.
-
-### Arguments
 
 Argument | Type | Description
 ---------|------|-------------------------
@@ -66,12 +58,8 @@ end
 
 Log debug message.
 
-### Arguments
-
 Argument | Type | Description
 ---------|------|-------------------------
 `where`  | str  | Where is message logged.
 `msg`    | str  | Message.
 `...`    | str  | Message args.
-
----
