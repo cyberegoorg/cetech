@@ -156,7 +156,6 @@ def run_protobuild(config, platform_):
 
     subprocess.check_call(cmds)
 
-
 def make(config, platform_, debug, generate_only=False):
     """Make build
 
