@@ -2,7 +2,6 @@
 
 Module contain functions for Application.
 
----
 
 # Methods
 
@@ -14,5 +13,4 @@ end
 ```
 
 Quit application.
-
----
+ 
