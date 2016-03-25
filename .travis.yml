@@ -18,7 +18,7 @@ addons:
 
 install:
   - pip install -r requirements.txt
-  - python externals/externals.py
+  #- python externals/externals.py
   - python build.py -d
 
 script:
