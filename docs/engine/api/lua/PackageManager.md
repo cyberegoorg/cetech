@@ -2,8 +2,6 @@
 
 Module contain functions for resource package manage.
 
----
-
 # Example
 
 ```lua
@@ -26,11 +24,7 @@ function Game:update(dt)
 end
 ```
 
----
-
 # Methods
-
----
 
 ## PackageManager.Load
 ```lua
@@ -46,13 +40,9 @@ Load all resource that are in the package. If one is already loaded will not rel
     For querying whether the package is already loaded use method [**PackageManager.IsLoaded**](#packagemanagerisloaded)
     or you can wait to load using method [**PackageManager.Flush**](#packagemanagerflush)
 
-### Arguments
-
 Argument      | Type | Description
 --------------|------|-------------
 `packageName` | str  | Package name
-
----
 
 ## PackageManager.Unload
 ```lua
@@ -62,13 +52,9 @@ end
 
 Load all resource that are in the package.
 
-### Arguments
-
 Argument      | Type | Description
 --------------|------|-------------
 `packageName` | str  | Package name
-
----
 
 ## PackageManager.IsLoaded
 ```lua
@@ -78,13 +64,9 @@ end
 
 Returns `true` if all resource that are in the package loaded in memory and ready to use.
 
-### Arguments
-
 Argument      | Type | Description
 --------------|------|-------------
 `packageName` | str  | Package name
-
----
 
 ## PackageManager.Flush
 ```lua
@@ -94,11 +76,7 @@ end
 
 It would wait until they are loaded all the resource that is in the package.
 
-### Arguments
-
 Argument      | Type | Description
 --------------|------|-------------
 `packageName` | str  | Package name
-
----
 

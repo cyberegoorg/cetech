@@ -2,7 +2,8 @@ site_name: CETech
 site_author: Ondra Voves
 
 repo_url: https://github.com/cyberegoorg/cetech
-theme: readthedocs
+#theme: readthedocs
+theme: material
 
 pages:
   - CETech: 'index.md'
@@ -27,7 +28,12 @@ pages:
     - Release notes: 'about/release-notes.md'
     - Licence: 'about/license.md'
 
+extra:
+  palette:
+    primary: 'light green'
+
 markdown_extensions:
+    - admonition
+    - codehilite(css_class=code)
     - toc:
-        permalink: 
-    - admonition:
+        permalink: '#'
