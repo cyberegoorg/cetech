@@ -2,7 +2,7 @@
 
 ## Prerequisites
 
-* Install python >= 3.4
+* Install python and pip >= 3.4
 * Install QT5 + PyQT
 * Install Mono
 * Install requirements.txt (```$ pip3 install -r requirements.txt```)
