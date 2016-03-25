@@ -1,9 +1,8 @@
 ﻿using System;
-using System.Data.SQLite;
 using System.IO;
 
 #if PLATFORM_WINDOWS
-
+using System.Data.SQLite;
 #elif PLATFORM_LINUX
 using Mono.Data.Sqlite;
 #endif
