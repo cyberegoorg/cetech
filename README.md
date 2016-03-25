@@ -1,6 +1,6 @@
 # [CETech](https://github.com/cyberegoorg/cetech)
 
-[![Build Status](https://travis-ci.org/cyberegoorg/cetech.svg?branch=master)](https://travis-ci.org/cyberegoorg/cetech)
+[![Build Status](https://travis-ci.org/cyberegoorg/cetech.svg?branch=csharp)](https://travis-ci.org/cyberegoorg/cetech)
 [![Issues](https://img.shields.io/github/issues/cyberegoorg/cetech.svg)](https://github.com/cyberegoorg/cetech/issues)
 [![Release](https://img.shields.io/github/release/cyberegoorg/cetech.svg)](https://github.com/cyberegoorg/cetech/releases)
 [![License](https://img.shields.io/badge/license-CC0-blue.svg)](LICENSE.md)
