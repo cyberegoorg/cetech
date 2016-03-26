@@ -1,29 +1,28 @@
-﻿using System;
+﻿// ReSharper disable UnusedMember.Local
 using NSpec;
 
 namespace CETech.Tests
 {
-    public class EntityManagerTest: nspec
+    public class entitymanager_spec: nspec
     {
-
-
-        void before_each() { Console.WriteLine("before"); name = "NSpec"; }
-
-        void after_each() { Console.WriteLine("after"); }
-
-        void it_works()
+        void given_entity_manager()
         {
-            name.should_be("NSpec");
+            before = () => EntityManager.Init();
+            after = () => EntityManager.Shutdown();
+
+            context["When create new entity"] = () =>
+            {
+                int ent1 = 0;
+
+                before = () => ent1 = EntityManager.Create();
+                it["New entity is alive"] = () => EntityManager.Alive(ent1).should_be_true();
+
+                context["When destroy entity"] = () =>
+                {
+                    before = () => EntityManager.Destroy(ent1);
+                    it["Entity is not alive"] = () => EntityManager.Alive(ent1).should_be_false();
+                };
+            };
         }
-
-        void describe_nesting()
-        {
-            before = () => name += " BDD";
-
-            it["works here"] = () => name.should_be("NSpec BDD");
-
-            it["and here"] = () => name.should_be("NSpec BDD");
-        }
-        string name;
     }
 }

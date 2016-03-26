@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project Name="CETechDevelopTest" Path="sources/CETech" Type="Library">
+<Project Name="CETechDevelop.Test" Path="sources/CETech" Type="Library">
   <References>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -44,6 +44,8 @@
     <Compile Include="Config\ConfigResource.cs" />
     <Compile Include="Config\ConfigSystem.cs" />
     <Compile Include="Config\Private\ConfigSystem.cs" />
+    <Compile Include="Config\Test\ConfigSystemTest.cs" />
+    <Compile Include="DebuggerShim.cs" />
     <Compile Include="Develop\ConsoleServer.cs" />
     <Compile Include="Develop\DevelopSystem.cs" />
     <Compile Include="Develop\Private\BuildDb.cs" />
@@ -53,6 +55,7 @@
     <Compile Include="Develop\ResourceCompiler.cs" />
     <Compile Include="EntityManager\EntityManager.cs" />
     <Compile Include="EntityManager\Private\EntityManager.cs" />
+    <Compile Include="EntityManager\Tests\EntityManagerTest.cs" />
     <Compile Include="FileSystem\FileSystem.cs" />
     <Compile Include="FileSystem\Private\FileSystem.cs" />
     <Compile Include="Input\Keyboard.cs" />
@@ -74,7 +77,6 @@
     <Compile Include="PackageManager\PackageManager.cs" />
     <Compile Include="PackageManager\PackageResource.cs" />
     <Compile Include="PackageManager\Private\PackageManager.cs" />
-    <Compile Include="Program.cs" />
     <Compile Include="RenderSystem\Private\RendererBgfx.cs" />
     <Compile Include="RenderSystem\RenderSystem.cs" />
     <Compile Include="ResourceManager\Private\ResourceManager.cs" />
