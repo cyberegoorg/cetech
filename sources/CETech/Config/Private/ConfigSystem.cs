@@ -5,10 +5,10 @@ namespace CETech
 {
     public static partial class ConfigSystem
     {
-        private static readonly Dictionary<string, int> ConfigValueInt = new Dictionary<string, int>();
-        private static readonly Dictionary<string, float> ConfigValueFloat = new Dictionary<string, float>();
-        private static readonly Dictionary<string, string> ConfigValueString = new Dictionary<string, string>();
-        private static readonly Dictionary<string, string> ConfigDescription = new Dictionary<string, string>();
+        private static Dictionary<string, int> ConfigValueInt;
+        private static Dictionary<string, float> ConfigValueFloat;
+        private static Dictionary<string, string> ConfigValueString;
+        private static Dictionary<string, string> ConfigDescription;
 
         private static readonly Dictionary<string, ConfigValueType> ConfigType =
             new Dictionary<string, ConfigValueType>();
@@ -73,6 +73,19 @@ namespace CETech
         private static string GetValueStringImpl(string name)
         {
             return ConfigValueString[name];
+        }
+
+        private static void InitImpl()
+        {
+            ConfigValueInt = new Dictionary<string, int>();
+            ConfigValueFloat = new Dictionary<string, float>();
+            ConfigValueString = new Dictionary<string, string>();
+            ConfigDescription = new Dictionary<string, string>();
+        }
+
+        private static void ShutdownImpl()
+        {
+
         }
     }
 }

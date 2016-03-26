@@ -128,5 +128,15 @@
         {
             return GetValueStringImpl(name);
         }
+
+        public static void Init()
+        {
+            InitImpl();
+        }
+
+        public static void Shutdown()
+        {
+            ShutdownImpl();
+        }
     }
 }
