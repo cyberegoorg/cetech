@@ -5,6 +5,7 @@ using CETech.Develop;
 using CETech.Input;
 using CETech.Lua;
 using CETech.Utils;
+using CETech.World;
 using Mono.Options;
 using SDL2;
 
@@ -84,6 +85,19 @@ namespace CETech
 
             var last_frame_tick = DateTime.Now;
             DateTime curent_frame_tick;
+
+            SceneGraph.InitWorld(0);
+            var ent = UnitManager.Spawn(0, StringId.FromString("unit1"));
+
+            var position = SceneGraph.GetPosition(0, ent);
+            var rotation = SceneGraph.GetRotation(0, ent);
+            var scale = SceneGraph.GetScale(0, ent);
+
+            Log.Debug("App", "instance [{0} {1} {2}], [{3} {4} {5}], [{6} {7} {8}],",
+                position.x, position.y, position.z,
+                rotation.x, rotation.y, rotation.z,
+                scale.x, scale.y, scale.z);
+
             while (_run)
             {
                 //Debug.Assert(TaskManager.OpenTaskCount < 2);
@@ -303,9 +317,12 @@ namespace CETech
             ResourceCompiler.RegisterCompiler(PackageResource.Type, PackageResource.Compile);
             ResourceCompiler.RegisterCompiler(LuaResource.Type, LuaResource.Compile);
             ResourceCompiler.RegisterCompiler(ConfigResource.Type, ConfigResource.Compile);
+            ResourceCompiler.RegisterCompiler(UnitResource.Type, UnitResource.Compile);
 
             // TODO: Implement
             ResourceCompiler.RegisterCompiler(StringId.FromString("texture"), delegate { });
+
+            SceneGraph.Init();
 
             if (DevelopFlags.compile)
             {
@@ -327,6 +344,11 @@ namespace CETech
                 LuaResource.Type,
                 LuaResource.ResourceLoader, LuaResource.ResourceUnloader,
                 LuaResource.ResourceOnline, LuaResource.ResourceOffline);
+
+            ResourceManager.RegisterType(
+                UnitResource.Type,
+                UnitResource.ResourceLoader, UnitResource.ResourceUnloader,
+                UnitResource.ResourceOnline, UnitResource.ResourceOffline);
 
             // TODO: Implement
             ResourceManager.RegisterType(
