@@ -1,14 +1,14 @@
 ﻿// ReSharper disable once CheckNamespace
+
 namespace CETech
 {
-
     /// <summary>
-    /// Entity manager
+    ///     Entity manager
     /// </summary>
     public partial class EntityManager
     {
         /// <summary>
-        /// Init entity manager
+        ///     Init entity manager
         /// </summary>
         public static void Init()
         {
@@ -16,7 +16,7 @@ namespace CETech
         }
 
         /// <summary>
-        /// Shutdown entity manager.
+        ///     Shutdown entity manager.
         /// </summary>
         public static void Shutdown()
         {
@@ -24,7 +24,7 @@ namespace CETech
         }
 
         /// <summary>
-        /// Create new entity
+        ///     Create new entity
         /// </summary>
         /// <returns>entity handler</returns>
         public static int Create()
@@ -33,7 +33,7 @@ namespace CETech
         }
 
         /// <summary>
-        /// Destroy entity.
+        ///     Destroy entity.
         /// </summary>
         /// <param name="entity">entity handler</param>
         public static void Destroy(int entity)
@@ -42,7 +42,7 @@ namespace CETech
         }
 
         /// <summary>
-        /// Is entity alive?
+        ///     Is entity alive?
         /// </summary>
         /// <param name="entity">Entity handler</param>
         /// <returns>True if entity is live else return false</returns>

@@ -8,7 +8,7 @@ namespace CETech
         private static Dictionary<string, int> ConfigValueInt;
         private static Dictionary<string, float> ConfigValueFloat;
         private static Dictionary<string, string> ConfigValueString;
-        private static Dictionary<string, string> ConfigDescription; 
+        private static Dictionary<string, string> ConfigDescription;
 
         private static readonly Dictionary<string, ConfigValueType> ConfigType =
             new Dictionary<string, ConfigValueType>();
@@ -85,7 +85,6 @@ namespace CETech
 
         private static void ShutdownImpl()
         {
-
         }
     }
 }

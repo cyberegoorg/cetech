@@ -31,15 +31,15 @@ namespace CETech
         /// <param name="data">Resource data</param>
         public delegate void ResourceUnloader(object data);
 
-        public static void InitConfig()
-        {
-            InitConfigImpl();
-        }
-
         /// <summary>
         ///     Auto load
         /// </summary>
         public static bool AutoLoad { get; set; }
+
+        public static void InitConfig()
+        {
+            InitConfigImpl();
+        }
 
         /// <summary>
         ///     Register resource type

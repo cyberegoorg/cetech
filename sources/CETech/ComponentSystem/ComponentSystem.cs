@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using CETech.Develop;
 using MsgPack;
 using YamlDotNet.RepresentationModel;
@@ -8,6 +7,7 @@ namespace CETech
     public partial class ComponentSystem
     {
         public delegate void Compiler(YamlMappingNode body, ConsoleServer.ResponsePacker packer);
+
         public delegate void Spawner(int world, int[] ent_ids, MessagePackObjectDictionary[] data);
 
         public static void RegisterCompiler(long type, Compiler compiler)
