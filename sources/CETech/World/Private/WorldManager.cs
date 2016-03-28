@@ -15,11 +15,14 @@
 
         public static int CreateWorldImpl()
         {
-            return _handlers.Create();
+            var id = _handlers.Create();
+            SceneGraph.InitWorld(id);
+            return id;
         }
 
         private static void DestroyWorldImpl(int world)
         {
+            SceneGraph.RemoveWorld(world);
             _handlers.Destroy(world);
         }
 

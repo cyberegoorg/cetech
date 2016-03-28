@@ -11,12 +11,12 @@ function Game:init()
     Log.Error("boot.lua", "error")
     Log.Debug("boot.lua", "debug")
 
-    Game.world = World.Create();
+    self.world = World.Create();
 end
 
 function Game:shutdown()
     Log.Info("boot.lua", "shutdown")
-    World.Destroy(Game.world);
+    World.Destroy(self.world);
 end
 
 function Game:update(dt)
@@ -30,7 +30,7 @@ function Game:update(dt)
         Application.Quit()
     end
 
-    World.Update(Game.world)
+    World.Update(self.world)
     --local m_axis = Mouse.axis()
     --print("%f, %f", m_axis.x, m_axis.y)
     --print(dt)
