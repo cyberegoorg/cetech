@@ -16,6 +16,13 @@ namespace CETech.Develop
         private static NanomsgListener _listener;
         private static Dictionary<string, CommandHandler> _commandHandlers;
 
+
+        private static void InitConfigImpl()
+        {
+            ConfigSystem.CreateValue("console_server.base_port", "First used port", 5556);
+        }
+
+
         private static void InitImpl()
         {
             _nanoLog = new LogHandler.NanoLog($"ws://*:{ConfigSystem.GetValueInt("console_server.base_port")}");

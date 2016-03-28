@@ -2,6 +2,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.IO;
 using CETech.Develop.Private;
 using CETech.Utils;
 
@@ -138,6 +139,12 @@ namespace CETech.Develop
             public string Filename;
             public long Name;
             public long Type;
+        }
+
+        private static void InitConfigImpl()
+        {
+            ConfigSystem.CreateValue("resource_compiler.core", "Path to core dir", "core");
+            ConfigSystem.CreateValue("resource_compiler.src", "Path to source dir", Path.Combine("data", "src"));
         }
     }
 }

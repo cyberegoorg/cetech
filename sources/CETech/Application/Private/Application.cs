@@ -24,16 +24,17 @@ namespace CETech
         /// </summary>
         private static bool InitImpl(string[] args)
         {
-            ConfigSystem.CreateValue("application.platform", "Platform", GetPlatform());
-            ConfigSystem.CreateValue("application.log_file", "Log file", "");
+            ConfigSystem.Init();
 
 #if CETECH_DEVELOP
-            ConfigSystem.CreateValue("resource_compiler.core", "Path to core dir", "core");
-            ConfigSystem.CreateValue("resource_compiler.src", "Path to source dir", Path.Combine("data", "src"));
-            ConfigSystem.CreateValue("console_server.base_port", "First used port", 5556);
+            ResourceCompiler.InitConfig();
+            ConsoleServer.InitConfig();
 #endif
 
-            ConfigSystem.CreateValue("resource_manager.build", "Path to build dir", Path.Combine("data", "build"));
+            ResourceManager.InitConfig();
+
+            ConfigSystem.CreateValue("application.platform", "Platform", GetPlatform());
+            ConfigSystem.CreateValue("application.log_file", "Log file", "");
 
             ConfigSystem.CreateValue("boot.pkg", "Boot package", "boot");
             ConfigSystem.CreateValue("boot.script", "Boot script", "lua/boot");
@@ -391,6 +392,7 @@ namespace CETech
 #endif
             TaskManager.Shutdown();
             EntityManager.Shutdown();
+            ConfigSystem.Shutdown();
         }
 
 #if CETECH_DEVELOP
