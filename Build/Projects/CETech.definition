@@ -55,6 +55,7 @@
     <Compile Include="Lua\Private\Api\LogApi.cs" />
     <Compile Include="Lua\Private\Api\MouseApi.cs" />
     <Compile Include="Lua\Private\Api\PackageManagerApi.cs" />
+    <Compile Include="Lua\Private\Api\WorldApi.cs" />
     <Compile Include="Lua\Private\LuaEnviroment.cs" />
     <Compile Include="Math\Vector2f.cs" />
     <Compile Include="Math\Vector3f.cs" />
@@ -83,6 +84,7 @@
     <Compile Include="UnitManager\Private\UnitManager.cs" />
     <Compile Include="UnitManager\UnitManager.cs" />
     <Compile Include="UnitManager\UnitResource.cs" />
+    <Compile Include="Utils\HandlerID.cs" />
     <Compile Include="Utils\Log.cs" />
     <Compile Include="Utils\LogHandler.cs" />
     <Compile Include="Utils\Options.cs" />

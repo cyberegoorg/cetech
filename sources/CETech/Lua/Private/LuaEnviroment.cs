@@ -80,6 +80,7 @@ namespace CETech.Lua
             _enviromentScript.Globals["Keyboard"] = new KeyboardApi();
             _enviromentScript.Globals["Mouse"] = new MouseApi();
             _enviromentScript.Globals["PackageManager"] = new PackageManagerApi();
+            _enviromentScript.Globals["World"] = new WorldApi();
 
             ConsoleServer.RegisterCommand("lua.execute", (args, response) =>
             {
