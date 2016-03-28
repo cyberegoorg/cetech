@@ -60,7 +60,7 @@ namespace CETech
         }
 
         /// <summary>
-        /// Get native platform name
+        ///     Get native platform name
         /// </summary>
         /// <returns>Platform name</returns>
         public static string GetPlatform()

@@ -20,6 +20,10 @@ namespace CETech
         private static float _deltaTime;
         private static Window _mainWindow;
 
+        private static List<SystemInitConfig> initConfigsDelegates = new List<SystemInitConfig>();
+        private static List<SystemInitDelegate> InitDelegates = new List<SystemInitDelegate>();
+        private static List<SystemShutdownDelegate> ShutdownDelegates = new List<SystemShutdownDelegate>();
+
         /// <summary>
         ///     Init application
         /// </summary>
@@ -179,7 +183,7 @@ namespace CETech
 
             DevelopFlags.wid = IntPtr.Zero;
 #endif
-            
+
             var p = new OptionSet
             {
                 {
@@ -262,7 +266,7 @@ namespace CETech
 
             if (first_port != null)
             {
-                ConfigSystem.SetValue("console_server.base_port", (int)first_port);
+                ConfigSystem.SetValue("console_server.base_port", (int) first_port);
             }
 #endif
 
@@ -361,7 +365,7 @@ namespace CETech
         {
             Log.LogEvent += LogHandler.ConsoleLog;
 
-            string log_file = ConfigSystem.GetValueString("application.log_file");
+            var log_file = ConfigSystem.GetValueString("application.log_file");
             if (log_file.Length != 0)
             {
                 Log.LogEvent += new LogHandler.FileLog(log_file).Log;
@@ -417,6 +421,11 @@ namespace CETech
             ConfigSystem.Shutdown();
         }
 
+        private static void RegisterSystemsImpl(SystemInitConfig[] initConfig, SystemInitDelegate[] init,
+            SystemShutdownDelegate[] shutdown)
+        {
+        }
+
 #if CETECH_DEVELOP
         private struct DevelopCmdFlags
         {
@@ -427,13 +436,5 @@ namespace CETech
 
         private static DevelopCmdFlags DevelopFlags;
 #endif
-
-        private static List<SystemInitConfig> initConfigsDelegates = new List<SystemInitConfig>();
-        private static List<SystemInitDelegate> InitDelegates = new List<SystemInitDelegate>();
-        private static List<SystemShutdownDelegate> ShutdownDelegates = new List<SystemShutdownDelegate>();
-        private static void RegisterSystemsImpl(SystemInitConfig[] initConfig, SystemInitDelegate[] init, SystemShutdownDelegate[] shutdown)
-        {
-        }
-
     }
 }

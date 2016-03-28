@@ -2,12 +2,12 @@
 {
     public partial class SceneGraph
     {
-        static public void Init()
+        public static void Init()
         {
             InitImpl();
         }
 
-        static public void Shutdown()
+        public static void Shutdown()
         {
             ShutdownImpl();
         }

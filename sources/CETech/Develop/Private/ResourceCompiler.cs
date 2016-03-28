@@ -131,6 +131,12 @@ namespace CETech.Develop
             TaskManager.Wait(topCompileTask);
         }
 
+        private static void InitConfigImpl()
+        {
+            ConfigSystem.CreateValue("resource_compiler.core", "Path to core dir", "core");
+            ConfigSystem.CreateValue("resource_compiler.src", "Path to source dir", Path.Combine("data", "src"));
+        }
+
         internal struct CompileTask
         {
             public Compiler Compiler;
@@ -139,12 +145,6 @@ namespace CETech.Develop
             public string Filename;
             public long Name;
             public long Type;
-        }
-
-        private static void InitConfigImpl()
-        {
-            ConfigSystem.CreateValue("resource_compiler.core", "Path to core dir", "core");
-            ConfigSystem.CreateValue("resource_compiler.src", "Path to source dir", Path.Combine("data", "src"));
         }
     }
 }

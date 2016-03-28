@@ -32,7 +32,7 @@ namespace CETech.Develop
             _commandHandlers = new Dictionary<string, CommandHandler>();
             _socket = new ReplySocket();
 
-            _socket.Bind($"tcp://*:{ConfigSystem.GetValueInt("console_server.base_port")+1}");
+            _socket.Bind($"tcp://*:{ConfigSystem.GetValueInt("console_server.base_port") + 1}");
             _listener = new NanomsgListener();
             _listener.AddSocket(_socket);
             _listener.ReceivedMessage += socketId =>
