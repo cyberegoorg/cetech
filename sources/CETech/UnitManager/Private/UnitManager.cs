@@ -23,5 +23,13 @@ namespace CETech
 
             return entity;
         }
+
+        private static void InitImpl()
+        {
+        }
+
+        private static void ShutdownImpl()
+        {
+        }
     }
 }

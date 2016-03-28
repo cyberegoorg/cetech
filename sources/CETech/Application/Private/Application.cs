@@ -90,12 +90,12 @@ namespace CETech
             var last_frame_tick = DateTime.Now;
             DateTime curent_frame_tick;
 
-            SceneGraph.InitWorld(0);
-            var ent = UnitManager.Spawn(0, StringId.FromString("unit1"));
+            var world1 = WorldManager.CreateWorld();
+            var ent = UnitManager.Spawn(world1, StringId.FromString("unit1"));
 
-            var position = SceneGraph.GetPosition(0, ent);
-            var rotation = SceneGraph.GetRotation(0, ent);
-            var scale = SceneGraph.GetScale(0, ent);
+            var position = SceneGraph.GetPosition(world1, ent);
+            var rotation = SceneGraph.GetRotation(world1, ent);
+            var scale = SceneGraph.GetScale(world1, ent);
 
             Log.Debug("App", "instance [{0} {1} {2}], [{3} {4} {5}], [{6} {7} {8}],",
                 position.x, position.y, position.z,
@@ -402,6 +402,8 @@ namespace CETech
             ResourceManager.LoadNow(ConfigResource.Type, new[] {StringId.FromString("global")});
 
             EntityManager.Init();
+            WorldManager.Init();
+            UnitManager.Init();
 
             Keyboard.Init();
             Mouse.Init();
@@ -416,6 +418,11 @@ namespace CETech
             DevelopSystem.Shutdown();
             ConsoleServer.Shutdown();
 #endif
+
+            UnitManager.Shutdown();
+            WorldManager.Shutdown();
+            EntityManager.Shutdown();
+
             TaskManager.Shutdown();
             EntityManager.Shutdown();
             ConfigSystem.Shutdown();

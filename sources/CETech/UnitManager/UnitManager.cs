@@ -6,5 +6,15 @@ namespace CETech
         {
             return SpawnImpl(world, unit);
         }
+
+        public static void Init()
+        {
+            InitImpl();
+        }
+
+        public static void Shutdown()
+        {
+            ShutdownImpl();
+        }
     }
 }

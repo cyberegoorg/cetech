@@ -17,6 +17,11 @@
             InitWorldImpl(world);
         }
 
+        public static void RemoveWorld(int world)
+        {
+            RemoveWorldImpl(world);
+        }
+
         public static Vector3f GetPosition(int world, int entity)
         {
             return GetPositionImpl(world, entity);

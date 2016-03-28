@@ -11,8 +11,8 @@ SUFIX_2_MODE = {
     None: 'ace/mode/yaml'
 }
 
-SUPPORTED_EXT = ('lua', 'package', 'texture', 'json')
-FILES_FILTER = "Lua (*.lua);;Package (*.package);;Texture (*.texture);;JSON (*.json)"
+SUPPORTED_EXT = ('lua', 'package', 'texture', 'json', 'unit')
+FILES_FILTER = "Lua (*.lua);;Package (*.package);;Texture (*.texture);;JSON (*.json);;Unit (*.unit)"
 
 
 class ScriptEditorWindow(QMainWindow, Ui_MainWindow):

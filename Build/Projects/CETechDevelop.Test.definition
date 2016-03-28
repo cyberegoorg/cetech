@@ -106,6 +106,8 @@
     <Compile Include="Window\Window.cs" />
     <Compile Include="Window\WindowFlags.cs" />
     <Compile Include="Window\WindowPos.cs" />
+    <Compile Include="World\Private\WorldManager.cs" />
+    <Compile Include="World\WorldManager.cs" />
     <None Include="CETechDevelop.sh">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>

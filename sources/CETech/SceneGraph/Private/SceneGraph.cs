@@ -28,7 +28,15 @@ namespace CETech.World
             _world_scale[world] = new List<Vector3f>();
         }
 
-        private static int createInstance(int world, int entity, Vector3f position, Vector3f rotation, Vector3f scale)
+        private static void RemoveWorldImpl(int world)
+        {
+            _world_ent_idx.Remove(world);
+            _world_position.Remove(world);
+            _world_rotaiton.Remove(world);
+            _world_scale.Remove(world);
+        }
+
+        private static int CreateInstance(int world, int entity, Vector3f position, Vector3f rotation, Vector3f scale)
         {
             var idx = _world_position[world].Count;
             _world_position[world].Add(position);
@@ -57,11 +65,11 @@ namespace CETech.World
                 var rotation = new Vector3f {x = rot[0].AsSingle(), y = rot[1].AsSingle(), z = rot[2].AsSingle()};
                 var scale = new Vector3f {x = sca[0].AsSingle(), y = sca[1].AsSingle(), z = sca[2].AsSingle()};
 
-                createInstance(world, ent_ids[i], position, rotation, scale);
+                CreateInstance(world, ent_ids[i], position, rotation, scale);
             }
         }
 
-        public static void Compiler(YamlMappingNode body, ConsoleServer.ResponsePacker packer)
+        private static void Compiler(YamlMappingNode body, ConsoleServer.ResponsePacker packer)
         {
             var position = body.Children[new YamlScalarNode("position")] as YamlSequenceNode;
             var rotation = body.Children[new YamlScalarNode("rotation")] as YamlSequenceNode;
@@ -114,5 +122,7 @@ namespace CETech.World
         {
             return _world_scale[world][getIdx(world, entity)];
         }
+
+ 
     }
 }
