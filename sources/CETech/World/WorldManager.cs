@@ -21,5 +21,10 @@
         {
             DestroyWorldImpl(world);
         }
+
+        public static void Update(int world)
+        {
+            UpdateImpl(world);
+        }
     }
 }

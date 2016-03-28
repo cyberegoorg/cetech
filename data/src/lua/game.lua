@@ -10,10 +10,13 @@ function Game:init()
     Log.Warning("boot.lua", "warn")
     Log.Error("boot.lua", "error")
     Log.Debug("boot.lua", "debug")
+
+    Game.world = World.Create();
 end
 
 function Game:shutdown()
     Log.Info("boot.lua", "shutdown")
+    World.Destroy(Game.world);
 end
 
 function Game:update(dt)
@@ -26,6 +29,8 @@ function Game:update(dt)
     if Keyboard.ButtonPressed(quit_btn) then
         Application.Quit()
     end
+
+    World.Update(Game.world)
     --local m_axis = Mouse.axis()
     --print("%f, %f", m_axis.x, m_axis.y)
     --print(dt)

@@ -375,6 +375,10 @@ namespace CETech
             SDL.SDL_Init(SDL.SDL_INIT_EVERYTHING);
 #endif
 
+            EntityManager.Init();
+            WorldManager.Init();
+            UnitManager.Init();
+
 #if CETECH_DEVELOP
 
             ConsoleServer.Init();
@@ -400,10 +404,6 @@ namespace CETech
             }
 #endif
             ResourceManager.LoadNow(ConfigResource.Type, new[] {StringId.FromString("global")});
-
-            EntityManager.Init();
-            WorldManager.Init();
-            UnitManager.Init();
 
             Keyboard.Init();
             Mouse.Init();
