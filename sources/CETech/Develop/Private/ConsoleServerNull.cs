@@ -4,6 +4,12 @@ namespace CETech.Develop
 {
     public static partial class ConsoleServer
     {
+
+        private static void InitConfigImpl()
+        {
+            
+        }
+
         private static void InitImpl()
         {
         }

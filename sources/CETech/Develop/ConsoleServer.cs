@@ -24,6 +24,11 @@ namespace CETech.Develop
             RegisterCommandImpl(name, handler);
         }
 
+        public static void InitConfig()
+        {
+            InitConfigImpl();
+        }
+
         /// <summary>
         ///     Init console server.
         /// </summary>

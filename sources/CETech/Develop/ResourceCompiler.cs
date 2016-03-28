@@ -17,6 +17,11 @@ namespace CETech.Develop
         public delegate void Compiler(CompilatorApi capi);
 
 
+        public static void InitConfig()
+        {
+            InitConfigImpl();
+        }
+
         /// <summary>
         ///     Init resource compiler.
         /// </summary>

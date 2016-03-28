@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.IO;
 using System.Threading;
 using CETech.Utils;
 
@@ -160,6 +161,11 @@ namespace CETech
             RefMap[type_idx][name] -= 1;
 
             return RefMap[type_idx][name] == 0;
+        }
+
+        private static void InitConfigImpl()
+        {
+            ConfigSystem.CreateValue("resource_manager.build", "Path to build dir", Path.Combine("data", "build"));
         }
     }
 }
