@@ -110,6 +110,15 @@ namespace CETech.Develop
             }
 
             /// <summary>
+            ///     Pack the specified value.
+            /// </summary>
+            /// <param name="value">Value.</param>
+            public void Pack(long value)
+            {
+                PackImpl(value);
+            }
+
+            /// <summary>
             ///     Pack the specified number.
             /// </summary>
             /// <param name="number">Number.</param>

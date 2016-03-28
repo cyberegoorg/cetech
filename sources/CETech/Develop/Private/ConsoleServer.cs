@@ -121,6 +121,12 @@ namespace CETech.Develop
                 _packer.Pack(value);
             }
 
+            private void PackImpl(long value)
+            {
+                _packer.Pack(value);
+            }
+
+
             private void PackImpl(string @string)
             {
                 _packer.Pack(@string);
