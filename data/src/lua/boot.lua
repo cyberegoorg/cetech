@@ -13,3 +13,6 @@ function shutdown()
   Game:shutdown()
 end
  
+function render()
+  Game:render()
+end

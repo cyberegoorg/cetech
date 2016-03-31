@@ -41,11 +41,14 @@ namespace CETech.Develop
         private static void CompileAllImpl()
         {
             FileSystem.CreateDirectory("build", null);
+            FileSystem.CreateDirectory("build", "tmp");
 
             BuildDb.init_db();
 
             CompileRoot("src");
             CompileRoot("core");
+
+            Directory.Delete(FileSystem.GetFullPath("build", "tmp"), true);
         }
 
         private static void CalcHash(string filename, out long type, out long name)
@@ -64,12 +67,12 @@ namespace CETech.Develop
         {
             var task = (CompileTask) data;
 
-            Log.Info("compile_task", "Compile {0} => {1:x}{2:x}", task.Filename, task.Type, task.Name);
+            Log.Info("compile_task", "Compile {0} => {1:X}{2:X}", task.Filename, task.Type, task.Name);
 
             using (var input = FileSystem.Open(task.SourceFs, task.Filename, FileSystem.OpenMode.Read))
             {
                 using (
-                    var build = FileSystem.Open("build", string.Format("{0:x}{1:x}", task.Type, task.Name),
+                    var build = FileSystem.Open("build", string.Format("{0:X}{1:X}", task.Type, task.Name),
                         FileSystem.OpenMode.Write))
                 {
                     var capi = new CompilatorApi(task.Filename, input, build, task.SourceFs);
@@ -106,7 +109,7 @@ namespace CETech.Develop
                     continue;
                 }
 
-                BuildDb.set_file_hash(filename, string.Format("{0:x}{1:x}", type, name));
+                BuildDb.set_file_hash(filename, string.Format("{0:X}{1:X}", type, name));
 
                 if (!BuildDb.need_compile(root, filename))
                 {
@@ -135,6 +138,7 @@ namespace CETech.Develop
         {
             ConfigSystem.CreateValue("resource_compiler.core", "Path to core dir", "core");
             ConfigSystem.CreateValue("resource_compiler.src", "Path to source dir", Path.Combine("data", "src"));
+            ConfigSystem.CreateValue("resource_compiler.bin", "Binary program path", "");
         }
 
         internal struct CompileTask

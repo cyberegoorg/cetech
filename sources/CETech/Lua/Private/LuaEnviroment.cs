@@ -15,6 +15,7 @@ namespace CETech.Lua
         private static DynValue _initFce;
         private static DynValue _updateFce;
         private static DynValue _shutdownFce;
+        private static DynValue _renderFce;
 
         private static void PackDynValue(DynValue value, ConsoleServer.ResponsePacker packer)
         {
@@ -81,6 +82,11 @@ namespace CETech.Lua
             _enviromentScript.Globals["Mouse"] = new MouseApi();
             _enviromentScript.Globals["PackageManager"] = new PackageManagerApi();
             _enviromentScript.Globals["World"] = new WorldApi();
+            _enviromentScript.Globals["UnitManager"] = new UnitManagerApi();
+            _enviromentScript.Globals["RenderSystem"] = new RenderSystemApi();
+            _enviromentScript.Globals["Transformation"] = new TransformSystemApi();
+
+
 
             ConsoleServer.RegisterCommand("lua.execute", (args, response) =>
             {
@@ -107,6 +113,7 @@ namespace CETech.Lua
             _initFce = _enviromentScript.Globals.Get("init");
             _updateFce = _enviromentScript.Globals.Get("update");
             _shutdownFce = _enviromentScript.Globals.Get("shutdown");
+            _renderFce = _enviromentScript.Globals.Get("render");
         }
 
         private static void BootScriptCallInitImpl()
@@ -124,6 +131,11 @@ namespace CETech.Lua
             _enviromentScript.Call(_shutdownFce);
         }
 
+        private static void BootScriptCallRenderImpl()
+        {
+            _enviromentScript.Call(_renderFce);
+        }
+
         private class ScriptLoader : ScriptLoaderBase
         {
             public override object LoadFile(string file, Table globalContext)
@@ -138,5 +150,7 @@ namespace CETech.Lua
                 return ResourceManager.CanGet(LuaResource.Type, names);
             }
         }
+
+
     }
 }

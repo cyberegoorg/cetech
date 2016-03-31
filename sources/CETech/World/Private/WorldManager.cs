@@ -16,13 +16,15 @@
         public static int CreateWorldImpl()
         {
             var id = _handlers.Create();
-            SceneGraph.InitWorld(id);
+            TranformationSystem.InitWorld(id);
+            PrimitiveMeshRenderer.InitWorld(id);
             return id;
         }
 
         private static void DestroyWorldImpl(int world)
         {
-            SceneGraph.RemoveWorld(world);
+            TranformationSystem.RemoveWorld(world);
+            PrimitiveMeshRenderer.RemoveWorld(world);
             _handlers.Destroy(world);
         }
 

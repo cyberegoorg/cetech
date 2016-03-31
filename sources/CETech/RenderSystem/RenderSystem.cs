@@ -67,20 +67,10 @@
             InitImpl(window, type);
         }
 
-        /// <summary>
-        ///     Begin frame.
-        /// </summary>
-        public static void BeginFrame()
-        {
-            BeginFrameImpl();
-        }
 
-        /// <summary>
-        ///     End frame.
-        /// </summary>
-        public static void EndFrame()
+        public static void RenderWorld(int world)
         {
-            EndFrameImpl();
+            RenderWorldImpl(world);
         }
 
         /// <summary>

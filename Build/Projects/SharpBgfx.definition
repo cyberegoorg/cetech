@@ -12,4 +12,6 @@
 
   <NativeBinary Path="externals/build/linux64/Release/lib/SharpBgfx.dll.config"/>
 
+  <NativeBinary Path="externals/build/windows64/Release/bin/shaderc.exe"/>
+
 </ExternalProject>

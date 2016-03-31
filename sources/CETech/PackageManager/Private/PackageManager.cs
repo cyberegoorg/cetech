@@ -7,7 +7,7 @@ namespace CETech
         private static void package_task(object data)
         {
             var task = (PackageTask) data;
-            Log.Debug("package_task", "Load package {0:x}{1:x}", task.type, task.name);
+            Log.Debug("package_task", "Load package {0:X}{1:X}", task.type, task.name);
 
             ResourceManager.LoadNow(task.type, task.names);
         }

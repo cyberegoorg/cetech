@@ -121,6 +121,7 @@ class CetechProject(object):
 
         if compile_:
             args.append("--compile")
+            args.append("--bin %s"%self.get_lib_path(self.BUILD_DEVELOP))
 
         if continue_:
             args.append("--continue")
@@ -142,6 +143,8 @@ class CetechProject(object):
             args.append("--core %s" % core_dir)
         else:
             args.append("--core ../core") # TODO ?
+
+        #bin_dir
 
         self._run_cetech(self.BUILD_DEVELOP, args)
 

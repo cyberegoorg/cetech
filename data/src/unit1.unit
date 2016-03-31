@@ -1,32 +1,23 @@
 components:
   2342343313252:
     component_type: "transform"
-    position: [1, 2, 3]
-    rotation: [4, 5, 6]
-    scale: [7, 8, 44]
+    position: [0, 0, 0]
+    rotation: [0, 0, 0]
+    scale: [1, 1, 1]
+
+  4154322234:
+    component_type: "primitive_mesh"
+    size: 5.0
 
 children:
   45646412341346465:
     components:
       41543643634:
         component_type: "transform"
-        position: [12, 22, 33]
-        rotation: [34, 55, 64]
+        position: [0, 10, 0]
+        rotation: [0, 0, 0]
         scale: [72, 28, 414]
 
-    children:
-      456464123Ddd6465:
-        components:
-          41543ddd4:
-            component_type: "transform"
-            position: [22, 22, 22]
-            rotation: [33, 33, 33]
-            scale: [44, 44, 44]
-
-  45646412341343335:
-    components:
-      41543643634:
-        component_type: "transform"
-        position: [4, 24, 43]
-        rotation: [44, 44, 44]
-        scale: [37, 8, 4]
+      4154322234:
+        component_type: "primitive_mesh"
+        size: 2.0

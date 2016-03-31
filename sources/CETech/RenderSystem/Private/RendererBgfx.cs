@@ -1,6 +1,7 @@
 ﻿using System;
 using CETech.Develop;
 using CETech.Utils;
+using CETech.World;
 using SharpBgfx;
 
 namespace CETech
@@ -56,7 +57,6 @@ namespace CETech
                 DisplayType = window.NativeDisplayPtr
             });
             Bgfx.Init(ToRendererBackend(type), callbackHandler: _callback_handler);
-            Bgfx.SetDebugFeatures(DebugFeatures.DisplayStatistics);
 
             Resize(window.Width, window.Height);
 
@@ -67,7 +67,7 @@ namespace CETech
 
                 Resize(width, height);
                 window.Resize(width, height);
-            });
+            });         
         }
 
         private static void BeginFrameImpl()
@@ -75,12 +75,21 @@ namespace CETech
             if (_data.NeedResize)
             {
                 Bgfx.Reset(_data.ResizeW, _data.ResizeH);
-                Bgfx.SetViewRect(0, 0, 0, _data.ResizeW, _data.ResizeH);
                 _data.NeedResize = false;
             }
 
             Bgfx.SetDebugFeatures(DebugFeatures.DisplayStatistics | DebugFeatures.DisplayText);
             Bgfx.SetViewClear(0, ClearTargets.Color | ClearTargets.Depth, 0x66CCFFff);
+
+            Bgfx.SetViewRect(0, 0, 0, _data.ResizeW, _data.ResizeH);
+
+            var viewMatrix = Matrix4f.CreateLookAt(new Vector3f(0.0f, 0.0f, -35.0f), Vector3f.Zero, Vector3f.UnitY);
+            var projMatrix = Matrix4f.CreatePerspectiveFieldOfView((float)Math.PI / 3, (float)_data.ResizeW/ _data.ResizeH, 0.1f, 100.0f);
+
+            unsafe
+            {
+                Bgfx.SetViewTransform(0, &viewMatrix.M11, &projMatrix.M11);
+            }
 
             Bgfx.Touch(0);
 
@@ -157,6 +166,13 @@ namespace CETech
             public void CaptureFrame(IntPtr data, int size)
             {
             }
+        }
+
+        private static void RenderWorldImpl(int world)
+        {
+            BeginFrameImpl();
+            PrimitiveMeshRenderer.RenderWorld(world);
+            EndFrameImpl();
         }
     }
 }

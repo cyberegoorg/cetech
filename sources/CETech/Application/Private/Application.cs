@@ -80,27 +80,12 @@ namespace CETech
         private static void RunImpl()
         {
             _run = true;
-
-            RenderSystem.Init(_mainWindow, RenderSystem.BackendType.Default);
-
             LuaEnviroment.BootScriptInit(StringId.FromString(ConfigSystem.GetValueString("boot.script")));
 
             LuaEnviroment.BootScriptCallInit();
 
             var last_frame_tick = DateTime.Now;
             DateTime curent_frame_tick;
-
-            var world1 = WorldManager.CreateWorld();
-            var ent = UnitManager.Spawn(world1, StringId.FromString("unit1"));
-
-            var position = SceneGraph.GetPosition(world1, ent);
-            var rotation = SceneGraph.GetRotation(world1, ent);
-            var scale = SceneGraph.GetScale(world1, ent);
-
-            Log.Debug("App", "instance [{0} {1} {2}], [{3} {4} {5}], [{6} {7} {8}],",
-                position.x, position.y, position.z,
-                rotation.x, rotation.y, rotation.z,
-                scale.x, scale.y, scale.z);
 
             while (_run)
             {
@@ -136,9 +121,7 @@ namespace CETech
                 TaskManager.Wait(frameTask);
 
                 LuaEnviroment.BootScriptCallUpdate(_deltaTime);
-
-                RenderSystem.BeginFrame();
-                RenderSystem.EndFrame();
+                LuaEnviroment.BootScriptCallRender();
                 _mainWindow.Update();
 
                 DevelopSystem.LeaveScope("Application::Update", updateScope);
@@ -179,6 +162,7 @@ namespace CETech
 #if CETECH_DEVELOP
             string core_dir = null;
             string source_dir = null;
+            string bin_dir = null;
             int? first_port = null;
 
             DevelopFlags.wid = IntPtr.Zero;
@@ -210,6 +194,11 @@ namespace CETech
                 {
                     "core=", "Core dir.",
                     v => core_dir = v
+                },
+
+                {
+                    "bin=", "Bin dir.",
+                    v => bin_dir = v
                 },
 
                 {
@@ -264,9 +253,14 @@ namespace CETech
                 ConfigSystem.SetValue("resource_compiler.core", core_dir);
             }
 
+            if (bin_dir != null)
+            {
+                ConfigSystem.SetValue("resource_compiler.bin", bin_dir);
+            }
+
             if (first_port != null)
             {
-                ConfigSystem.SetValue("console_server.base_port", (int) first_port);
+                ConfigSystem.SetValue("console_server.base_port", (int)first_port);
             }
 #endif
 
@@ -286,28 +280,6 @@ namespace CETech
 
         private static void Boot()
         {
-            Window main_window;
-
-#if CETECH_DEVELOP
-            if (DevelopFlags.wid == IntPtr.Zero)
-            {
-                main_window = new Window(
-                    ConfigSystem.GetValueString("window.title"),
-                    WindowPos.Centered, WindowPos.Centered,
-                    ConfigSystem.GetValueInt("window.width"), ConfigSystem.GetValueInt("window.height"), 0);
-            }
-            else
-            {
-                main_window = new Window(DevelopFlags.wid);
-            }
-
-#else
-            main_window = new Window(
-                ConfigSystem.GetValueString("window.title"),
-                WindowPos.Centered, WindowPos.Centered,
-                ConfigSystem.GetValueInt("window.width"), ConfigSystem.GetValueInt("window.height"), 0);
-#endif
-            _mainWindow = main_window;
 
             ResourceManager.LoadNow(PackageResource.Type,
                 new[] {StringId.FromString(ConfigSystem.GetValueString("boot.pkg"))});
@@ -322,11 +294,14 @@ namespace CETech
             ResourceCompiler.RegisterCompiler(LuaResource.Type, LuaResource.Compile);
             ResourceCompiler.RegisterCompiler(ConfigResource.Type, ConfigResource.Compile);
             ResourceCompiler.RegisterCompiler(UnitResource.Type, UnitResource.Compile);
+            ResourceCompiler.RegisterCompiler(ShaderResource.Type, ShaderResource.Compile);
+            ResourceCompiler.RegisterCompiler(MaterialResource.Type, MaterialResource.Compile);
 
             // TODO: Implement
             ResourceCompiler.RegisterCompiler(StringId.FromString("texture"), delegate { });
 
-            SceneGraph.Init();
+            TranformationSystem.Init();
+            PrimitiveMeshRenderer.Init();
 
             if (DevelopFlags.compile)
             {
@@ -353,6 +328,16 @@ namespace CETech
                 UnitResource.Type,
                 UnitResource.ResourceLoader, UnitResource.ResourceUnloader,
                 UnitResource.ResourceOnline, UnitResource.ResourceOffline);
+
+            ResourceManager.RegisterType(
+                ShaderResource.Type,
+                ShaderResource.ResourceLoader, ShaderResource.ResourceUnloader,
+                ShaderResource.ResourceOnline, ShaderResource.ResourceOffline);
+
+            ResourceManager.RegisterType(
+                MaterialResource.Type,
+                MaterialResource.ResourceLoader, MaterialResource.ResourceUnloader,
+                MaterialResource.ResourceOnline, MaterialResource.ResourceOffline);
 
             // TODO: Implement
             ResourceManager.RegisterType(
@@ -407,6 +392,31 @@ namespace CETech
 
             Keyboard.Init();
             Mouse.Init();
+
+            Window main_window;
+
+#if CETECH_DEVELOP
+            if (DevelopFlags.wid == IntPtr.Zero)
+            {
+                main_window = new Window(
+                    ConfigSystem.GetValueString("window.title"),
+                    WindowPos.Centered, WindowPos.Centered,
+                    ConfigSystem.GetValueInt("window.width"), ConfigSystem.GetValueInt("window.height"), 0);
+            }
+            else
+            {
+                main_window = new Window(DevelopFlags.wid);
+            }
+
+#else
+            main_window = new Window(
+                ConfigSystem.GetValueString("window.title"),
+                WindowPos.Centered, WindowPos.Centered,
+                ConfigSystem.GetValueInt("window.width"), ConfigSystem.GetValueInt("window.height"), 0);
+#endif
+            _mainWindow = main_window;
+
+            RenderSystem.Init(_mainWindow, RenderSystem.BackendType.Default);
 
             return true;
         }

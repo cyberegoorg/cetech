@@ -10,3 +10,9 @@ package:
 
 unit:
   - unit1
+
+material:
+  - material1
+
+shader:
+  - shader1

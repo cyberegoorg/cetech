@@ -38,6 +38,7 @@ namespace CETech
 
         public static void InitConfig()
         {
+            //AutoLoad = true;
             InitConfigImpl();
         }
 

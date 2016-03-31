@@ -55,17 +55,25 @@
     <Compile Include="Lua\Private\Api\LogApi.cs" />
     <Compile Include="Lua\Private\Api\MouseApi.cs" />
     <Compile Include="Lua\Private\Api\PackageManagerApi.cs" />
+    <Compile Include="Lua\Private\Api\RendererSystem.cs" />
+    <Compile Include="Lua\Private\Api\TransformSystem.cs" />
+    <Compile Include="Lua\Private\Api\UnitManager.cs" />
     <Compile Include="Lua\Private\Api\WorldApi.cs" />
     <Compile Include="Lua\Private\LuaEnviroment.cs" />
+    <Compile Include="Math\Matrix4f.cs" />
     <Compile Include="Math\Vector2f.cs" />
     <Compile Include="Math\Vector3f.cs" />
     <Compile Include="Math\Vector4f.cs" />
     <Compile Include="PackageManager\PackageManager.cs" />
     <Compile Include="PackageManager\PackageResource.cs" />
     <Compile Include="PackageManager\Private\PackageManager.cs" />
+    <Compile Include="PrimitiveMeshRenderer\PrimitiveMeshRenderer.cs" />
+    <Compile Include="PrimitiveMeshRenderer\Private\PrimitiveMeshRenderer.cs" />
     <Compile Include="Program.cs" />
+    <Compile Include="RenderSystem\MaterialResource.cs" />
     <Compile Include="RenderSystem\Private\RendererBgfx.cs" />
     <Compile Include="RenderSystem\RenderSystem.cs" />
+    <Compile Include="RenderSystem\ShaderResource.cs" />
     <Compile Include="ResourceCompiler\Private\BuildDb.cs">
       <Services>Develop</Services>
     </Compile>
@@ -76,11 +84,11 @@
     <Compile Include="ResourceManager\Private\StringId.cs" />
     <Compile Include="ResourceManager\ResourceManager.cs" />
     <Compile Include="ResourceManager\StringId.cs" />
-    <Compile Include="SceneGraph\Private\SceneGraph.cs" />
-    <Compile Include="SceneGraph\SceneGraph.cs" />
     <Compile Include="TaskManager\Private\QueueMPMC.cs" />
     <Compile Include="TaskManager\Private\TaskManager.cs" />
     <Compile Include="TaskManager\TaskManager.cs" />
+    <Compile Include="TransformationSystem\Private\TranformationSystem.cs" />
+    <Compile Include="TransformationSystem\TranformationSystem.cs" />
     <Compile Include="UnitManager\Private\UnitManager.cs" />
     <Compile Include="UnitManager\UnitManager.cs" />
     <Compile Include="UnitManager\UnitResource.cs" />
