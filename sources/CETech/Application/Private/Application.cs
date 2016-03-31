@@ -300,9 +300,6 @@ namespace CETech
             // TODO: Implement
             ResourceCompiler.RegisterCompiler(StringId.FromString("texture"), delegate { });
 
-            TranformationSystem.Init();
-            PrimitiveMeshRenderer.Init();
-
             if (DevelopFlags.compile)
             {
                 ResourceCompiler.CompileAll();
@@ -344,6 +341,10 @@ namespace CETech
                 StringId.FromString("texture"),
                 delegate { return null; }, delegate { },
                 delegate { }, delegate { });
+
+
+            TranformationSystem.Init();
+            PrimitiveMeshRenderer.Init();
         }
 
         private static bool BigInit()
