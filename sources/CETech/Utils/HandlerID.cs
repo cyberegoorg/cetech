@@ -4,12 +4,12 @@ namespace CETech
 {
     public class HandlerID
     {
-        private readonly int _indexBitCount = 22;
         private readonly int _genBitCount = 8;
+        private readonly int _indexBitCount = 22;
         private readonly int _minFreeIndexs = 1024;
 
-        private Queue<int> _freeIdx = new Queue<int>();
-        private List<int> _generation = new List<int>();
+        private readonly Queue<int> _freeIdx = new Queue<int>();
+        private readonly List<int> _generation = new List<int>();
 
         public int Create()
         {

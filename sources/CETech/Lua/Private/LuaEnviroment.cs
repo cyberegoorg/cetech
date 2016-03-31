@@ -87,7 +87,6 @@ namespace CETech.Lua
             _enviromentScript.Globals["Transformation"] = new TransformSystemApi();
 
 
-
             ConsoleServer.RegisterCommand("lua.execute", (args, response) =>
             {
                 var ret = _enviromentScript.DoString(args["script"].AsString());
@@ -150,7 +149,5 @@ namespace CETech.Lua
                 return ResourceManager.CanGet(LuaResource.Type, names);
             }
         }
-
-
     }
 }

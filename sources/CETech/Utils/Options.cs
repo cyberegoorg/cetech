@@ -152,6 +152,8 @@ using MessageLocalizerConverter = System.Func<string, string>;
 #else
 using MessageLocalizerConverter = System.Converter<string, string>;
 
+// ReSharper disable RedundantNameQualifier
+
 #endif
 
 #if NDESK_OPTIONS

@@ -30,7 +30,6 @@
 
         private static void UpdateImpl(int world)
         {
-
         }
     }
 }

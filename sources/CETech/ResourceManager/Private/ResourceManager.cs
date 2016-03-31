@@ -90,9 +90,10 @@ namespace CETech
         private static void LoadNowImpl(long type, long[] names)
         {
             var loaded_data = Load(type, names);
-            
-            var taskid = TaskManager.AddBegin("addloaded", data => AddLoaded(loaded_data, type, names), null, TaskManager.TaskPriority.High, affinity:TaskManager.TaskAffinity.MainThead);
-            TaskManager.AddEnd(new int[] {taskid});
+
+            var taskid = TaskManager.AddBegin("addloaded", data => AddLoaded(loaded_data, type, names), null,
+                TaskManager.TaskPriority.High, affinity: TaskManager.TaskAffinity.MainThead);
+            TaskManager.AddEnd(new[] {taskid});
             TaskManager.Wait(taskid);
         }
 

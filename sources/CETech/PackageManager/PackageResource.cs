@@ -37,8 +37,8 @@ namespace CETech
             pack.Type = new long[rootNode.Children.Count];
             pack.Names = new long[rootNode.Children.Count][];
 
-            Dictionary<long, int> prioritDictionary = new Dictionary<long, int>();
-            prioritDictionary[PackageResource.Type] = 0;
+            var prioritDictionary = new Dictionary<long, int>();
+            prioritDictionary[Type] = 0;
             prioritDictionary[ShaderResource.Type] = 0;
             prioritDictionary[LuaResource.Type] = 1;
             prioritDictionary[ConfigResource.Type] = 2;
@@ -47,7 +47,7 @@ namespace CETech
             prioritDictionary[MaterialResource.Type] = 5;
             prioritDictionary[StringId.FromString("texture")] = 6;
 
-            Dictionary<long, YamlSequenceNode> types_nodes = new Dictionary<long, YamlSequenceNode>();
+            var types_nodes = new Dictionary<long, YamlSequenceNode>();
             foreach (var type in rootNode.Children)
             {
                 var typestr = type.Key as YamlScalarNode;
@@ -68,7 +68,7 @@ namespace CETech
                 var name_idx = 0;
                 foreach (var name in sequence.Children)
                 {
-                    var nameid = StringId.FromString(((YamlScalarNode)name).Value);
+                    var nameid = StringId.FromString(((YamlScalarNode) name).Value);
 
                     pack.Names[idx][name_idx] = nameid;
                     ++name_idx;
@@ -76,7 +76,7 @@ namespace CETech
 
                 ++idx;
             }
-            
+
             var serializer = MessagePackSerializer.Get<Resource>();
             serializer.Pack(capi.BuildFile, pack);
         }

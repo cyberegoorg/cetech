@@ -10,7 +10,12 @@ namespace CETech.World
     public partial class PrimitiveMeshRenderer
 
     {
-        private static readonly Dictionary<int, Dictionary<int, float>> _world_ent_idx = new Dictionary<int, Dictionary<int, float>>();
+        private static readonly Dictionary<int, Dictionary<int, float>> _world_ent_idx =
+            new Dictionary<int, Dictionary<int, float>>();
+
+        private static readonly Dictionary<int, Dictionary<int, MaterialResource.MaterialInstance>> _world_ent_material
+            = new Dictionary<int, Dictionary<int, MaterialResource.MaterialInstance>>();
+
         private static readonly Dictionary<float, VertexBuffer> _size_vb = new Dictionary<float, VertexBuffer>();
         private static IndexBuffer _size_ib;
 
@@ -19,6 +24,7 @@ namespace CETech.World
             _size_ib = Cube.CreateIndexBuffer();
 
             _world_ent_idx[world] = new Dictionary<int, float>();
+            _world_ent_material[world] = new Dictionary<int, MaterialResource.MaterialInstance>();
         }
 
         private static void RemoveWorldImpl(int world)
@@ -39,22 +45,28 @@ namespace CETech.World
                 }
 
                 _world_ent_idx[world][ent_ids[i]] = size;
+                _world_ent_material[world][ent_ids[i]] =
+                    ResourceManager.Get<MaterialResource.MaterialInstance>(MaterialResource.Type,
+                        data[i]["material"].AsInt64());
             }
         }
 
         private static void Compiler(YamlMappingNode body, ConsoleServer.ResponsePacker packer)
         {
             var size = body.Children[new YamlScalarNode("size")] as YamlScalarNode;
+            var material = body.Children[new YamlScalarNode("material")] as YamlScalarNode;
 
-            packer.PackMapHeader(1);
+            packer.PackMapHeader(2);
 
             packer.Pack("size");
             packer.Pack(float.Parse(size.Value, CultureInfo.InvariantCulture));
+
+            packer.Pack("material");
+            packer.Pack(StringId.FromString(material.Value));
         }
 
         private static void InitImpl()
         {
-
 #if CETECH_DEVELOP
             ComponentSystem.RegisterCompiler(StringId.FromString("primitive_mesh"), Compiler);
 #endif
@@ -63,6 +75,28 @@ namespace CETech.World
 
         private static void ShutdownImpl()
         {
+        }
+
+        public static void RenderWorldImpl(int world)
+
+
+        {
+            foreach (var f in _world_ent_idx[world])
+            {
+                var world_matrix = TranformationSystem.GetWorldMatrix(world, f.Key);
+                unsafe
+                {
+                    Bgfx.SetTransform(&world_matrix.M11);
+                }
+
+                // set pipeline states
+                Bgfx.SetVertexBuffer(_size_vb[f.Value]);
+                Bgfx.SetIndexBuffer(_size_ib);
+                Bgfx.SetRenderState(RenderState.Default);
+
+                // submit primitives
+                Bgfx.Submit(0, _world_ent_material[world][f.Key].instance.program);
+            }
         }
 
         public struct PosColorVertex
@@ -84,30 +118,6 @@ namespace CETech.World
                 .Add(VertexAttributeUsage.Position, 3, VertexAttributeType.Float)
                 .Add(VertexAttributeUsage.Color0, 4, VertexAttributeType.UInt8, true)
                 .End();
-        }
-
-        public static void RenderWorldImpl(int world)
-
-
-        {
-            foreach (var f in _world_ent_idx[world])
-            {
-                var world_matrix = TranformationSystem.GetWorldMatrix(world, f.Key);
-                unsafe
-                {
-                    Bgfx.SetTransform(&world_matrix.M11);
-                }
-
-                // set pipeline states
-                Bgfx.SetVertexBuffer(_size_vb[f.Value]);
-                Bgfx.SetIndexBuffer(_size_ib);
-                Bgfx.SetRenderState(RenderState.Default);
-
-                // submit primitives
-                Bgfx.Submit(0, ResourceManager.Get<MaterialResource.MaterialInstance>(MaterialResource.Type, StringId.FromString("material1")).instance.program);
-
-            }
-
         }
 
         public static class Cube
