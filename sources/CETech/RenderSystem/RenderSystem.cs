@@ -87,5 +87,21 @@
         {
             SetDebugImpl(enabled);
         }
+
+        public static void SaveScreenShot(string filename)
+        {
+            SaveScreenShotImpl(filename);
+        }
+
+        public static void BeginCapture()
+        {
+            BeginCaptureImpl();
+        }
+
+
+        public static void EndCapture()
+        {
+            EndCaptureImpl();
+        }
     }
 }
