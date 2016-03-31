@@ -1,4 +1,6 @@
-﻿namespace CETech.Input
+﻿using CETech.World;
+
+namespace CETech.Input
 {
     /// <summary>
     ///     Mouse system
@@ -69,6 +71,11 @@
         public static bool ButtonReleased(int buttonIndex)
         {
             return PlatformButtonReleased(buttonIndex);
+        }
+
+        public static Vector2f Axis(string name)
+        {
+            return AxisImpl(name);
         }
     }
 }
