@@ -68,6 +68,8 @@ namespace CETech
                 Resize(width, height);
                 window.Resize(width, height);
             });
+
+            Bgfx.SetViewClear(0, ClearTargets.Color | ClearTargets.Depth, 0x66CCFFff);
         }
 
         private static void BeginFrameImpl()
@@ -77,9 +79,6 @@ namespace CETech
                 Bgfx.Reset(_data.ResizeW, _data.ResizeH);
                 _data.NeedResize = false;
             }
-
-            Bgfx.SetDebugFeatures(DebugFeatures.DisplayStatistics | DebugFeatures.DisplayText);
-            Bgfx.SetViewClear(0, ClearTargets.Color | ClearTargets.Depth, 0x66CCFFff);
 
             Bgfx.SetViewRect(0, 0, 0, _data.ResizeW, _data.ResizeH);
 
@@ -95,8 +94,6 @@ namespace CETech
             Bgfx.Touch(0);
 
             Bgfx.DebugTextClear();
-
-            Bgfx.Submit(0, SharpBgfx.Program.Invalid);
         }
 
         private static void EndFrameImpl()
@@ -173,6 +170,18 @@ namespace CETech
 
             public void CaptureFrame(IntPtr data, int size)
             {
+            }
+        }
+
+        private static void SetDebugImpl(bool enabled)
+        {
+            if (enabled)
+            {
+                Bgfx.SetDebugFeatures(DebugFeatures.DisplayStatistics | DebugFeatures.DisplayText);
+            }
+            else
+            {
+                Bgfx.SetDebugFeatures(DebugFeatures.None);
             }
         }
     }

@@ -154,6 +154,7 @@ using MessageLocalizerConverter = System.Converter<string, string>;
 
 // ReSharper disable RedundantNameQualifier
 
+using Math = System.Math;
 #endif
 
 #if NDESK_OPTIONS

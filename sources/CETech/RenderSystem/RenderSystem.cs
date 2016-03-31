@@ -82,5 +82,10 @@
         {
             ResizeImpl(width, height);
         }
+
+        public static void SetDebug(bool enabled)
+        {
+            SetDebugImpl(enabled);
+        }
     }
 }

@@ -9,5 +9,10 @@ namespace CETech.Lua.Api
         {
             RenderSystem.RenderWorld(world);
         }
+
+        public static void SetDebug(bool enabled)
+        {
+            RenderSystem.SetDebug(enabled);
+        }   
     }
 }

@@ -1,4 +1,5 @@
 using CETech.Input;
+using CETech.World;
 using MoonSharp.Interpreter;
 
 namespace CETech.Lua.Api
@@ -29,6 +30,11 @@ namespace CETech.Lua.Api
         public static bool ButtonReleased(int buttonIndex)
         {
             return Mouse.ButtonReleased(buttonIndex);
+        }
+
+        public static Vector2f Axis(string name)
+        {
+            return Mouse.Axis(name);
         }
     }
 }

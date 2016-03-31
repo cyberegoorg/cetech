@@ -1,15 +1,16 @@
-﻿using SDL2;
+﻿using CETech.World;
+using SDL2;
 
 // ReSharper disable once CheckNamespace
-
 namespace CETech.Input
 {
     public static partial class Mouse
     {
         private static int _buttonStates;
         private static int _buttonStatesLast;
-        private static int _posX;
-        private static int _posY;
+        private static Vector2f _position;
+        private static Vector2f _dt_position;
+
 
         private static void PlatformInit()
         {
@@ -18,7 +19,18 @@ namespace CETech.Input
         private static void PlatformProcess()
         {
             _buttonStatesLast = _buttonStates;
+
+            int _posX;
+            int _posY;
             _buttonStates = (int) SDL.SDL_GetMouseState(out _posX, out _posY);
+
+            _dt_position.X = _position.X - _posX;
+            _dt_position.Y = _position.Y - _posY;
+
+            _position.X = _posX;
+            _position.Y = _posY;
+
+
         }
 
         private static int PlatformButtonIndex(string buttonName)
@@ -64,6 +76,21 @@ namespace CETech.Input
         private static bool PlatformButtonReleased(int buttonIndex)
         {
             return (_buttonStates & buttonIndex) == 0 && (_buttonStatesLast & buttonIndex) == 1;
+        }
+
+        private static Vector2f AxisImpl(string name)
+        {
+            if (name == "abs")
+            {
+                return _position;
+            }
+
+            if (name == "delta")
+            {
+                return _dt_position;
+            }
+
+            return Vector2f.Zero;
         }
     }
 }

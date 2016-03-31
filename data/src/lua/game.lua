@@ -14,6 +14,7 @@ function Game:init()
     self.world = World.Create();
 
     self.unit = UnitManager.Spawn(self.world, "unit1");
+    self.debug = false
 end
 
 function Game:shutdown()
@@ -23,13 +24,25 @@ end
 
 function Game:update(dt)
     --Log.Info("boot.lua", "init")
-    
+
     if Keyboard.ButtonPressed(quit_btn) then
         Application.Quit()
     end
 
     local pos = Transformation.GetPosition(self.world, self.unit)
     local rot = Transformation.GetRotation(self.world, self.unit)
+
+    local m_axis = Mouse.axis("delta")
+
+    if Keyboard.ButtonPressed(Keyboard.ButtonIndex('e')) then
+      self.debug = not self.debug;
+      RenderSystem.SetDebug(self.debug)
+    end
+
+    if Mouse.ButtonState(Mouse.ButtonIndex("left") ) then
+        rot.X = rot.X + m_axis.X * -0.1;
+        rot.Y = rot.Y + m_axis.Y * 0.1;
+    end
 
     if Keyboard.ButtonState(Keyboard.ButtonIndex('a')) then
         rot.X = rot.X + 0.02
@@ -47,13 +60,12 @@ function Game:update(dt)
         pos.Z = pos.Z - 0.2
     end
 
-    rot.Y = rot.Y - 0.005
+    --rot.Y = rot.Y - 0.005
 
     Transformation.SetPosition(self.world, self.unit, pos)
     Transformation.SetRotation(self.world, self.unit, rot)
 
     World.Update(self.world)
-    --local m_axis = Mouse.axis()
     --print("%f, %f", m_axis.x, m_axis.y)
     --print(dt)
 end
