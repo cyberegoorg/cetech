@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
 using CETech.Develop;
 using MsgPack;
@@ -15,9 +14,44 @@ namespace CETech.World
         /// </summary>
         public static readonly long Type = StringId.FromString("unit");
 
+        /// <summary>
+        ///     Resource loader
+        /// </summary>
+        /// <param name="input">Resource data stream</param>
+        /// <returns>Resource data</returns>
+        public static object ResourceLoader(Stream input)
+        {
+            return MessagePackSerializer.Get<Dictionary<MessagePackObject, MessagePackObject>>().Unpack(input);
+        }
+
+        /// <summary>
+        ///     Resource offline.
+        /// </summary>
+        /// <param name="data">Data</param>
+        public static void ResourceOffline(object data)
+        {
+        }
+
+        /// <summary>
+        ///     Resource online
+        /// </summary>
+        /// <param name="data">Data</param>
+        public static void ResourceOnline(object data)
+        {
+        }
+
+        /// <summary>
+        ///     Resource unloader
+        /// </summary>
+        /// <param name="data">data</param>
+        public static void ResourceUnloader(object data)
+        {
+        }
+
 #if CETECH_DEVELOP
 
-        private static void compile_entitity(YamlMappingNode rootNode, ref int entities_id, int parent, Dictionary<long, long> ents_parent, List<long> components_type,
+        private static void compile_entitity(YamlMappingNode rootNode, ref int entities_id, int parent,
+            Dictionary<long, long> ents_parent, List<long> components_type,
             Dictionary<long, List<long>> component_ent, Dictionary<long, List<YamlMappingNode>> components_body)
         {
             ents_parent[entities_id] = parent;
@@ -53,7 +87,8 @@ namespace CETech.World
                 foreach (var child in childrenNode.Children)
                 {
                     entities_id += 1;
-                    compile_entitity(child.Value as YamlMappingNode, ref entities_id, parent_ent, ents_parent, components_type, component_ent,
+                    compile_entitity(child.Value as YamlMappingNode, ref entities_id, parent_ent, ents_parent,
+                        components_type, component_ent,
                         components_body);
                 }
             }
@@ -71,14 +106,15 @@ namespace CETech.World
 
             var rootNode = yaml.Documents[0].RootNode as YamlMappingNode;
 
-            int entities_id = 0;
+            var entities_id = 0;
 
             var components_type = new List<long>();
             var component_ent = new Dictionary<long, List<long>>();
             var components_body = new Dictionary<long, List<YamlMappingNode>>();
             var ents_parent = new Dictionary<long, long>();
 
-            compile_entitity(rootNode, ref entities_id, Int32.MaxValue, ents_parent, components_type, component_ent, components_body);
+            compile_entitity(rootNode, ref entities_id, int.MaxValue, ents_parent, components_type, component_ent,
+                components_body);
 
             var packer = new ConsoleServer.ResponsePacker();
 
@@ -112,11 +148,11 @@ namespace CETech.World
                 var ents = component_ent[comp_type];
 
                 packer.PackArrayHeader(ents.Count);
-                for (int j = 0; j < ents.Count; j++)
+                for (var j = 0; j < ents.Count; j++)
                 {
                     packer.Pack(ents[j]);
                 }
-           }
+            }
 
             packer.Pack("data");
             packer.PackArrayHeader(components_type.Count);
@@ -126,7 +162,7 @@ namespace CETech.World
                 var comp_body = components_body[comp_type];
 
                 packer.PackArrayHeader(comp_body.Count);
-                for (int j = 0; j < comp_body.Count; j++)
+                for (var j = 0; j < comp_body.Count; j++)
                 {
                     ComponentSystem.Compile(comp_type, comp_body[j], packer);
                 }
@@ -137,39 +173,5 @@ namespace CETech.World
             packer.GetMemoryStream().WriteTo(capi.BuildFile);
         }
 #endif
-
-        /// <summary>
-        ///     Resource loader
-        /// </summary>
-        /// <param name="input">Resource data stream</param>
-        /// <returns>Resource data</returns>
-        public static object ResourceLoader(Stream input)
-        {
-            return MessagePackSerializer.Get<Dictionary<MessagePackObject, MessagePackObject>>().Unpack(input);
-        }
-
-        /// <summary>
-        ///     Resource offline.
-        /// </summary>
-        /// <param name="data">Data</param>
-        public static void ResourceOffline(object data)
-        {
-        }
-
-        /// <summary>
-        ///     Resource online
-        /// </summary>
-        /// <param name="data">Data</param>
-        public static void ResourceOnline(object data)
-        {
-        }
-
-        /// <summary>
-        ///     Resource unloader
-        /// </summary>
-        /// <param name="data">data</param>
-        public static void ResourceUnloader(object data)
-        {
-        }
     }
 }

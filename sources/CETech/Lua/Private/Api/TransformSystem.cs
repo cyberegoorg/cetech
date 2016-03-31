@@ -40,6 +40,5 @@ namespace CETech.Lua.Api
         {
             return TranformationSystem.GetWorldMatrix(world, entity);
         }
-
     }
 }

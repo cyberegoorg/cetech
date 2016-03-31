@@ -20,6 +20,5 @@ namespace CETech.Lua.Api
         {
             WorldManager.Update(world);
         }
-
     }
 }

@@ -9,6 +9,5 @@ namespace CETech.Lua.Api
         {
             return UnitManager.Spawn(world, StringId.FromString(unit));
         }
-
     }
 }

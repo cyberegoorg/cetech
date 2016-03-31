@@ -18,7 +18,7 @@ namespace CETech
 
             var ents_parent = unit_resource["ents_parent"].AsList();
             var entities = new int[ent_count];
-            for (int i = 0; i < ent_count; i++)
+            for (var i = 0; i < ent_count; i++)
             {
                 entities[i] = EntityManager.Create();
             }
@@ -32,7 +32,7 @@ namespace CETech
                 var entities_body = new MessagePackObjectDictionary[ents.Count];
                 var entities_parent = new int[ents.Count];
 
-                for (int j = 0; j < ents.Count; j++)
+                for (var j = 0; j < ents.Count; j++)
                 {
                     entities_id[j] = entities[ents[j].AsInt32()];
                     entities_body[j] = edata[j].AsDictionary();

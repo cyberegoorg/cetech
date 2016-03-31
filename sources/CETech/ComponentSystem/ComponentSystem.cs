@@ -25,7 +25,8 @@ namespace CETech
             RegisterSpawnerCompilerImpl(type, spawner);
         }
 
-        public static void Spawn(int world, long type, int[] ent_ids, int[] ents_parent, MessagePackObjectDictionary[] data)
+        public static void Spawn(int world, long type, int[] ent_ids, int[] ents_parent,
+            MessagePackObjectDictionary[] data)
         {
             SpawnImpl(world, type, ent_ids, ents_parent, data);
         }

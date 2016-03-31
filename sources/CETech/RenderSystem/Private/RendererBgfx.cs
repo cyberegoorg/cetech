@@ -67,7 +67,7 @@ namespace CETech
 
                 Resize(width, height);
                 window.Resize(width, height);
-            });         
+            });
         }
 
         private static void BeginFrameImpl()
@@ -84,7 +84,8 @@ namespace CETech
             Bgfx.SetViewRect(0, 0, 0, _data.ResizeW, _data.ResizeH);
 
             var viewMatrix = Matrix4f.CreateLookAt(new Vector3f(0.0f, 0.0f, -35.0f), Vector3f.Zero, Vector3f.UnitY);
-            var projMatrix = Matrix4f.CreatePerspectiveFieldOfView((float)Math.PI / 3, (float)_data.ResizeW/ _data.ResizeH, 0.1f, 100.0f);
+            var projMatrix = Matrix4f.CreatePerspectiveFieldOfView((float) Math.PI/3,
+                (float) _data.ResizeW/_data.ResizeH, 0.1f, 100.0f);
 
             unsafe
             {
@@ -115,6 +116,13 @@ namespace CETech
             _data.NeedResize = true;
             _data.ResizeW = width;
             _data.ResizeH = height;
+        }
+
+        private static void RenderWorldImpl(int world)
+        {
+            BeginFrameImpl();
+            PrimitiveMeshRenderer.RenderWorld(world);
+            EndFrameImpl();
         }
 
 
@@ -166,13 +174,6 @@ namespace CETech
             public void CaptureFrame(IntPtr data, int size)
             {
             }
-        }
-
-        private static void RenderWorldImpl(int world)
-        {
-            BeginFrameImpl();
-            PrimitiveMeshRenderer.RenderWorld(world);
-            EndFrameImpl();
         }
     }
 }

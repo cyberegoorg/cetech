@@ -5,8 +5,9 @@ components:
     rotation: [0, 0, 0]
     scale: [1, 1, 1]
 
-  4154322234:
+  412321322234:
     component_type: "primitive_mesh"
+    material: "material1"
     size: 5.0
 
 children:
@@ -20,4 +21,5 @@ children:
 
       4154322234:
         component_type: "primitive_mesh"
+        material: "material1"
         size: 2.0

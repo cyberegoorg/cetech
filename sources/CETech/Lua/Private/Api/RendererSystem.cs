@@ -9,6 +9,5 @@ namespace CETech.Lua.Api
         {
             RenderSystem.RenderWorld(world);
         }
-
     }
 }

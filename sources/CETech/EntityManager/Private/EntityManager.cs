@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-
-namespace CETech
+﻿namespace CETech
 {
     public partial class EntityManager
     {

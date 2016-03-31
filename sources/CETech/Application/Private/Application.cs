@@ -260,7 +260,7 @@ namespace CETech
 
             if (first_port != null)
             {
-                ConfigSystem.SetValue("console_server.base_port", (int)first_port);
+                ConfigSystem.SetValue("console_server.base_port", (int) first_port);
             }
 #endif
 
@@ -280,7 +280,6 @@ namespace CETech
 
         private static void Boot()
         {
-
             ResourceManager.LoadNow(PackageResource.Type,
                 new[] {StringId.FromString(ConfigSystem.GetValueString("boot.pkg"))});
             PackageManager.Load(StringId.FromString(ConfigSystem.GetValueString("boot.pkg")));
@@ -289,6 +288,9 @@ namespace CETech
 
         private static void InitResouce()
         {
+            TranformationSystem.Init();
+            PrimitiveMeshRenderer.Init();
+
 #if CETECH_DEVELOP
             ResourceCompiler.RegisterCompiler(PackageResource.Type, PackageResource.Compile);
             ResourceCompiler.RegisterCompiler(LuaResource.Type, LuaResource.Compile);
@@ -341,10 +343,6 @@ namespace CETech
                 StringId.FromString("texture"),
                 delegate { return null; }, delegate { },
                 delegate { }, delegate { });
-
-
-            TranformationSystem.Init();
-            PrimitiveMeshRenderer.Init();
         }
 
         private static bool BigInit()
