@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.IO;
 using System.Runtime.InteropServices;
 using System.Text.RegularExpressions;
@@ -140,10 +141,13 @@ namespace CETech
 
             public void ReportError(ErrorType errorType, string message)
             {
+                Log.Error("renderer.bgfx", "{0}", message);
+                Debugger.Break();
             }
 
             public void ReportDebug(string fileName, int line, string format, IntPtr args)
             {
+                //Log.Debug("renderer.bgfx", "({0}:{1}) {2}", fileName, line, format); // TODO: args
             }
 
             public int GetCachedSize(long id)
@@ -204,7 +208,7 @@ namespace CETech
 
             public void CaptureStarted(int width, int height, int pitch, TextureFormat format, bool flipVertical)
             {
-                aviWriter = new AviWriter(File.Create("capture.avi", pitch * height), width, height, 60, !flipVertical);
+                aviWriter = new AviWriter(File.Create("capture.avi", pitch * height), width, height, 30, !flipVertical);
             }
 
             public void CaptureFinished()
