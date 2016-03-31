@@ -56,6 +56,11 @@
             BootScriptCallUpdateImpl(dt);
         }
 
+        public static void BootScriptCallRender()
+        {
+            BootScriptCallRenderImpl();
+        }
+
         /// <summary>
         ///     Call boot script shutdown
         /// </summary>

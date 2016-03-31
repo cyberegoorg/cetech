@@ -13,8 +13,8 @@ namespace CETech
         ///     Create new window
         /// </summary>
         /// <param name="title">Window title</param>
-        /// <param name="x">Create x position</param>
-        /// <param name="y">Create y position</param>
+        /// <param name="x">Create X position</param>
+        /// <param name="y">Create Y position</param>
         /// <param name="width">Width</param>
         /// <param name="height">Height</param>
         /// <param name="flags">Flags</param>

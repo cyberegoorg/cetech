@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using CETech.Develop;
 using MsgPack;
@@ -16,9 +17,11 @@ namespace CETech.World
 
 #if CETECH_DEVELOP
 
-        private static void compile_entitity(YamlMappingNode rootNode, ref int entities_id, List<long> components_type,
+        private static void compile_entitity(YamlMappingNode rootNode, ref int entities_id, int parent, Dictionary<long, long> ents_parent, List<long> components_type,
             Dictionary<long, List<long>> component_ent, Dictionary<long, List<YamlMappingNode>> components_body)
         {
+            ents_parent[entities_id] = parent;
+
             var componentsNode = rootNode.Children[new YamlScalarNode("components")] as YamlMappingNode;
             foreach (var component in componentsNode.Children)
             {
@@ -38,19 +41,19 @@ namespace CETech.World
                     components_body[cid] = new List<YamlMappingNode>();
                 }
 
-
                 component_ent[cid].Add(entities_id);
                 components_body[cid].Add(component_body);
             }
 
-
             if (rootNode.Children.ContainsKey(new YamlScalarNode("children")))
             {
+                var parent_ent = entities_id;
+
                 var childrenNode = rootNode.Children[new YamlScalarNode("children")] as YamlMappingNode;
                 foreach (var child in childrenNode.Children)
                 {
                     entities_id += 1;
-                    compile_entitity(child.Value as YamlMappingNode, ref entities_id, components_type, component_ent,
+                    compile_entitity(child.Value as YamlMappingNode, ref entities_id, parent_ent, ents_parent, components_type, component_ent,
                         components_body);
                 }
             }
@@ -73,15 +76,26 @@ namespace CETech.World
             var components_type = new List<long>();
             var component_ent = new Dictionary<long, List<long>>();
             var components_body = new Dictionary<long, List<YamlMappingNode>>();
+            var ents_parent = new Dictionary<long, long>();
 
-            compile_entitity(rootNode, ref entities_id, components_type, component_ent, components_body);
+            compile_entitity(rootNode, ref entities_id, Int32.MaxValue, ents_parent, components_type, component_ent, components_body);
 
             var packer = new ConsoleServer.ResponsePacker();
 
-            packer.PackMapHeader(4);
+            packer.PackMapHeader(5);
 
+            var ent_count = entities_id + 1;
             packer.Pack("ent_count");
-            packer.Pack(entities_id + 1);
+            packer.Pack(ent_count);
+
+            packer.Pack("ents_parent");
+            packer.PackArrayHeader(ent_count);
+            for (var i = 0; i < ent_count; ++i)
+            {
+                packer.Pack(ents_parent[i]);
+            }
+
+//            packer.Pack(entities_id + 1);
 
             packer.Pack("type");
             packer.PackArrayHeader(components_type.Count);

@@ -52,9 +52,9 @@ namespace CETech
 
             for (var i = 0; i < names.Length; i++)
             {
-                Log.Debug("resource_manager", "Loading resource {0:x}{1:x}", type, names[i]);
+                Log.Debug("resource_manager", "Loading resource {0:X}{1:X}", type, names[i]);
 
-                var input = FileSystem.Open("build", string.Format("{0:x}{1:x}", type, names[i]),
+                var input = FileSystem.Open("build", string.Format("{0:X}{1:X}", type, names[i]),
                     FileSystem.OpenMode.Read);
                 data[i] = LoaderMap[type](input);
             }
@@ -90,7 +90,10 @@ namespace CETech
         private static void LoadNowImpl(long type, long[] names)
         {
             var loaded_data = Load(type, names);
-            AddLoaded(loaded_data, type, names);
+            
+            var taskid = TaskManager.AddBegin("addloaded", data => AddLoaded(loaded_data, type, names), null, TaskManager.TaskPriority.High, affinity:TaskManager.TaskAffinity.MainThead);
+            TaskManager.AddEnd(new int[] {taskid});
+            TaskManager.Wait(taskid);
         }
 
         private static void UnloadImpl(long type, long[] names)

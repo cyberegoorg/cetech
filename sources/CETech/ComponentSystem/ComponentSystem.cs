@@ -8,7 +8,7 @@ namespace CETech
     {
         public delegate void Compiler(YamlMappingNode body, ConsoleServer.ResponsePacker packer);
 
-        public delegate void Spawner(int world, int[] ent_ids, MessagePackObjectDictionary[] data);
+        public delegate void Spawner(int world, int[] ent_ids, int[] ents_parent, MessagePackObjectDictionary[] data);
 
         public static void RegisterCompiler(long type, Compiler compiler)
         {
@@ -25,9 +25,9 @@ namespace CETech
             RegisterSpawnerCompilerImpl(type, spawner);
         }
 
-        public static void Spawn(int world, long type, int[] ent_ids, MessagePackObjectDictionary[] data)
+        public static void Spawn(int world, long type, int[] ent_ids, int[] ents_parent, MessagePackObjectDictionary[] data)
         {
-            SpawnImpl(world, type, ent_ids, data);
+            SpawnImpl(world, type, ent_ids, ents_parent, data);
         }
     }
 }

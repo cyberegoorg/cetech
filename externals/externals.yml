@@ -58,6 +58,7 @@ sharp-bgfx:
      windows64:
       - copytree: [SharpBgfx\bin\Debug, Debug\lib]
       - copytree: [SharpBgfx\bin\Release, Release\lib]
+      - copy: [tools\shaderc.exe, Release\bin]
 
      linux64:
       - copytree: [SharpBgfx/bin/Debug, Debug/lib]

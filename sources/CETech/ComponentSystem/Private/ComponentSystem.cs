@@ -25,9 +25,9 @@ namespace CETech
             _spawnerMap[type] = spawner;
         }
 
-        public static void SpawnImpl(int world, long type, int[] ent_ids, MessagePackObjectDictionary[] data)
+        public static void SpawnImpl(int world, long type, int[] ent_ids, int[] ents_parent, MessagePackObjectDictionary[] data)
         {
-            _spawnerMap[type](world, ent_ids, data);
+            _spawnerMap[type](world, ent_ids, ents_parent, data);
         }
     }
 }

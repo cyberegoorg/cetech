@@ -16,7 +16,7 @@ namespace CETech
             var ent_list = unit_resource["ent"].AsList();
             var ent_count = unit_resource["ent_count"].AsInt32();
 
-
+            var ents_parent = unit_resource["ents_parent"].AsList();
             var entities = new int[ent_count];
             for (int i = 0; i < ent_count; i++)
             {
@@ -30,13 +30,16 @@ namespace CETech
 
                 var entities_id = new int[ents.Count];
                 var entities_body = new MessagePackObjectDictionary[ents.Count];
+                var entities_parent = new int[ents.Count];
+
                 for (int j = 0; j < ents.Count; j++)
                 {
                     entities_id[j] = entities[ents[j].AsInt32()];
                     entities_body[j] = edata[j].AsDictionary();
+                    entities_parent[j] = ents_parent[j].AsInt32();
                 }
 
-                ComponentSystem.Spawn(world, types[i].AsInt64(), entities_id, entities_body);
+                ComponentSystem.Spawn(world, types[i].AsInt64(), entities_id, entities_parent, entities_body);
             }
 
             return entities[0];
