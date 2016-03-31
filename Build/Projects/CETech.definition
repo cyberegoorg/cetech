@@ -71,6 +71,7 @@
     <Compile Include="PrimitiveMeshRenderer\Private\PrimitiveMeshRenderer.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="RenderSystem\MaterialResource.cs" />
+    <Compile Include="RenderSystem\Private\AviWriter.cs" />
     <Compile Include="RenderSystem\Private\RendererBgfx.cs" />
     <Compile Include="RenderSystem\RenderSystem.cs" />
     <Compile Include="RenderSystem\ShaderResource.cs" />

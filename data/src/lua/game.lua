@@ -15,6 +15,7 @@ function Game:init()
 
     self.unit = UnitManager.Spawn(self.world, "unit1");
     self.debug = false
+    self.capture = false
 end
 
 function Game:shutdown()
@@ -29,14 +30,28 @@ function Game:update(dt)
         Application.Quit()
     end
 
+    local m_axis = Mouse.axis("delta")
+
     local pos = Transformation.GetPosition(self.world, self.unit)
     local rot = Transformation.GetRotation(self.world, self.unit)
 
-    local m_axis = Mouse.axis("delta")
-
-    if Keyboard.ButtonPressed(Keyboard.ButtonIndex('e')) then
+    if Keyboard.ButtonPressed(Keyboard.ButtonIndex('f9')) then
       self.debug = not self.debug;
       RenderSystem.SetDebug(self.debug)
+    end
+
+    if Keyboard.ButtonPressed(Keyboard.ButtonIndex('f10')) then
+      self.capture = not self.capture;
+
+      if self.capture then
+        RenderSystem.BeginCapture()
+      else
+        RenderSystem.EndCapture()
+      end
+    end
+
+    if Keyboard.ButtonPressed(Keyboard.ButtonIndex('f11')) then
+      RenderSystem.SaveScreenShot("screenshot");
     end
 
     if Mouse.ButtonState(Mouse.ButtonIndex("left") ) then
@@ -60,7 +75,7 @@ function Game:update(dt)
         pos.Z = pos.Z - 0.2
     end
 
-    --rot.Y = rot.Y - 0.005
+    rot.Y = rot.Y - 0.005
 
     Transformation.SetPosition(self.world, self.unit, pos)
     Transformation.SetRotation(self.world, self.unit, rot)

@@ -1,4 +1,7 @@
 ﻿using System;
+using System.IO;
+using System.Runtime.InteropServices;
+using System.Text.RegularExpressions;
 using CETech.Develop;
 using CETech.Utils;
 using CETech.World;
@@ -10,6 +13,7 @@ namespace CETech
     {
         private static Data _data;
         private static CallbackHandler _callback_handler;
+        private static bool Capture;
 
         private static RendererBackend ToRendererBackend(BackendType type)
         {
@@ -49,7 +53,7 @@ namespace CETech
 
         private static void InitImpl(Window window, BackendType type)
         {
-            _callback_handler = null; //new CallbackHandler();
+            _callback_handler = new CallbackHandler();
 
             Bgfx.SetPlatformData(new PlatformData
             {
@@ -76,7 +80,7 @@ namespace CETech
         {
             if (_data.NeedResize)
             {
-                Bgfx.Reset(_data.ResizeW, _data.ResizeH);
+                Bgfx.Reset(_data.ResizeW, _data.ResizeH, Capture ? ResetFlags.Capture : 0 );
                 _data.NeedResize = false;
             }
 
@@ -132,6 +136,8 @@ namespace CETech
 
         private class CallbackHandler : ICallbackHandler
         {
+            AviWriter aviWriter;
+
             public void ReportError(ErrorType errorType, string message)
             {
             }
@@ -157,19 +163,59 @@ namespace CETech
             public void SaveScreenShot(string path, int width, int height, int pitch, IntPtr data, int size,
                 bool flipVertical)
             {
-                Log.Debug("renderer.bgfx", "Save screenshot to \"{0}\"", path);
+                // save screenshot as TGA
+                var filename = Path.ChangeExtension(path, "tga");
+                var file = File.Create(filename);
+
+                Log.Debug("renderer.bgfx", "Save screenshot to \"{0}\"", filename);
+
+                using (var writer = new BinaryWriter(file))
+                {
+                    // write header
+                    var header = new byte[18];
+                    header[2] = 2;      // uncompressed RGB
+                    header[12] = (byte)width;
+                    header[13] = (byte)(width >> 8);
+                    header[14] = (byte)height;
+                    header[15] = (byte)(height >> 8);
+                    header[16] = 32;    // bpp
+                    header[17] = 32;    // origin upper-left
+                    writer.Write(header);
+
+                    var destPitch = width * 4;
+                    var srcPitch = pitch;
+                    var dataPtr = data;
+                    if (flipVertical)
+                    {
+                        dataPtr += srcPitch * (height - 1);
+                        srcPitch = -srcPitch;
+                    }
+
+                    // write image data
+                    var buffer = new byte[destPitch];
+                    for (int y = 0; y < height; y++)
+                    {
+                        Marshal.Copy(dataPtr, buffer, 0, destPitch);
+                        writer.Write(buffer);
+                        dataPtr += srcPitch;
+                    }
+                }
             }
 
             public void CaptureStarted(int width, int height, int pitch, TextureFormat format, bool flipVertical)
             {
+                aviWriter = new AviWriter(File.Create("capture.avi", pitch * height), width, height, 60, !flipVertical);
             }
 
             public void CaptureFinished()
             {
+                aviWriter.Close();
+                aviWriter = null;
             }
 
             public void CaptureFrame(IntPtr data, int size)
             {
+                aviWriter.WriteFrame(data, size);
             }
         }
 
@@ -183,6 +229,23 @@ namespace CETech
             {
                 Bgfx.SetDebugFeatures(DebugFeatures.None);
             }
+        }
+
+        private static void SaveScreenShotImpl(string filename)
+        {
+            Bgfx.SaveScreenShot(filename);
+        }
+
+        private static void BeginCaptureImpl()
+        {
+            Capture = true;
+            _data.NeedResize = true;
+        }
+
+        private static void EndCaptureImpl()
+        {
+            Capture = false;
+            _data.NeedResize = true;
         }
     }
 }
