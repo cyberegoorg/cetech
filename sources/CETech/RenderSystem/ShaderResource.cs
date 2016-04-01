@@ -153,5 +153,10 @@ namespace CETech
             capi.add_dependency(fs_input);
         }
 #endif
+
+        public static object Reloader(long name, object new_data)
+        {
+            return new_data;
+        }
     }
 }

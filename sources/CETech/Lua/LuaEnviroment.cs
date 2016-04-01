@@ -1,4 +1,6 @@
-﻿namespace CETech.Lua
+﻿using System.IO;
+
+namespace CETech.Lua
 {
     /// <summary>
     ///     Main lua enviroment.
@@ -28,6 +30,11 @@
         public static void DoResource(long name)
         {
             DoResourceImpl(name);
+        }
+
+        public static void DoStream(Stream stream)
+        {
+            DoStreamImpl(stream);
         }
 
         /// <summary>

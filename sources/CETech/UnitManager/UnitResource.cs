@@ -173,5 +173,10 @@ namespace CETech.World
             packer.GetMemoryStream().WriteTo(capi.BuildFile);
         }
 #endif
+
+        public static object Reloader(long name, object new_data)
+        {
+            return new_data;
+        }
     }
 }

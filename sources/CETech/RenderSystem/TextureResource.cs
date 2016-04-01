@@ -2,6 +2,7 @@ using System.Diagnostics;
 using System.IO;
 using CETech.Develop;
 using CETech.Utils;
+using Mono.Options;
 using SharpBgfx;
 using YamlDotNet.RepresentationModel;
 
@@ -56,6 +57,18 @@ namespace CETech
         /// <param name="data">data</param>
         public static void ResourceUnloader(object data)
         {
+        }
+
+        public static object ResourceReloader(long name, object new_data)
+        {
+            var old = ResourceManager.Get<Resource>(Type, name);
+            var neww = (Resource) new_data;
+
+            old.data = neww.data;
+            var mem = MemoryBlock.FromArray(old.data);
+            old.texture = Texture.FromFile(mem, TextureFlags.None, 0);
+
+            return old;
         }
 
         public class Resource

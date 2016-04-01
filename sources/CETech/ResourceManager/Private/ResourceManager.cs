@@ -1,6 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Threading;
+using CETech.Develop;
 using CETech.Utils;
 
 namespace CETech
@@ -22,6 +24,9 @@ namespace CETech
         private static readonly Dictionary<long, ResourceOffline> OfflineMap =
             new Dictionary<long, ResourceOffline>();
 
+        private static readonly Dictionary<long, ResourceReloader> ReloaderMap =
+            new Dictionary<long, ResourceReloader>();
+
         private static readonly Dictionary<long, int> TypesMap = new Dictionary<long, int>();
 
         private static readonly List<Dictionary<long, object>> DataMap =
@@ -32,7 +37,7 @@ namespace CETech
         private static SpinLock _addLock = new SpinLock();
 
         private static void RegisterTypeImpl(long type, ResourceLoader loader, ResourceUnloader unloader,
-            ResourceOnline online, ResourceOffline offline)
+            ResourceOnline online, ResourceOffline offline, ResourceReloader reloader)
         {
             var idx = DataMap.Count;
             DataMap.Add(new Dictionary<long, object>());
@@ -44,6 +49,7 @@ namespace CETech
             UnloaderMap[type] = unloader;
             OnlineMap[type] = online;
             OfflineMap[type] = offline;
+            ReloaderMap[type] = reloader;
         }
 
         private static object[] LoadImpl(long type, long[] names)
@@ -54,9 +60,11 @@ namespace CETech
             {
                 Log.Debug("resource_manager", "Loading resource {0:X}{1:X}", type, names[i]);
 
-                var input = FileSystem.Open("build", string.Format("{0:X}{1:X}", type, names[i]),
-                    FileSystem.OpenMode.Read);
-                data[i] = LoaderMap[type](input);
+                using (var input = FileSystem.Open("build", string.Format("{0:X}{1:X}", type, names[i]),
+                    FileSystem.OpenMode.Read))
+                {
+                    data[i] = LoaderMap[type](input);
+                }
             }
 
             return data;
@@ -171,6 +179,44 @@ namespace CETech
         {
             ConfigSystem.CreateValue("resource_manager.build", "Path to build dir", Path.Combine("data", "build"));
             AutoLoad = true;
+        }
+
+        private static void ReloadImpl(long type, long[] names)
+        {
+            var data = new object[names.Length];
+
+            var new_data = Load(type, names);
+
+            for (var i = 0; i < names.Length; i++)
+            {
+                Log.Debug("resource_manager", "Reloading resource {0:X}{1:X}", type, names[i]);
+                data[i] = ReloaderMap[type](names[i], new_data[i]);
+            }
+        }
+
+        private static void ReloadAllImpl(long type)
+        {
+            var idx = TypesMap[type];
+
+            Reload(type, DataMap[idx].Keys.ToArray());
+        }
+
+        private static void InitImpl()
+        {
+            ConsoleServer.RegisterCommand("resource_manager.reload_all", (args, response) =>
+            {
+                var types = args["types"].AsList();
+
+                for (var i = 0; i < types.Count; i++)
+                {
+                    ReloadAll(StringId.FromString(types[i].AsString()));
+                }
+
+            });
+        }
+
+        private static void ShutdownImpl()
+        {
         }
     }
 }
