@@ -2,7 +2,7 @@
 
 Module contain functions for keyboard.
 
-# Example
+## Example
 
 ```lua
 local quit_btn = Keyboard.ButtonIndex 'q'
@@ -14,14 +14,9 @@ function Game:update(dt)
 end
 ``` 
  
-# Methods
+## Methods
 
-## Keyboard.ButtonIndex
-
-```lua
-function Keyboard.ButtonIndex(buttonName)
-end
-```
+### ButtonIndex(buttonName)
 
 Return button index for `buttonName`.
 
@@ -29,11 +24,7 @@ Argument     | Type | Description
 -------------|------|---------------
 `buttonName` | str  | Button name
 
-## Keyboard.ButtonName
-```lua
-function Keyboard.ButtonName(buttonIndex)
-end
-```
+### ButtonName(buttonIndex)
 
 Return button name for `buttonIndex` or empty string if `ButtonIndex` is invalid.
 
@@ -41,11 +32,7 @@ Argument      | Type | Description
 --------------|------|--------------
 `buttonIndex` | int  | Button index
 
-## Keyboard.ButtonState
-```lua
-function Keyboard.ButtonState(buttonIndex)
-end
-```
+### ButtonState(buttonIndex)
 
 Return `true` if button is down in actual frame.
 
@@ -54,11 +41,7 @@ Argument      | Type | Description
 `buttonIndex` | int  | Button Index
 
 
-## Keyboard.ButtonPressed
-```lua
-function Keyboard.ButtonPressed(buttonIndex)
-end
-```
+### ButtonPressed(buttonIndex)
 
 Return `true` if button is not down in last frame and now is.
 
@@ -66,11 +49,7 @@ Argument      | Type | Description
 --------------|------|--------------
 `buttonIndex` | int  | Button index
 
-## Keyboard.ButtonReleased
-```lua
-function Keyboard.ButtonReleased(buttonIndex)
-end
-```
+### ButtonReleased(buttonIndex)
 
 Return `true` if button is down in last frame and now is not.
 

@@ -3,23 +3,13 @@
 Module contain functions for Application.
 
 
-# Methods
+## Methods
 
-## Application.Quit 
-
-```lua
-function Application.Quit()
-end
-```
+### Application.Quit()
 
 Quit application.
  
-## Application.GetPlatform
-
-```lua
-function Application.GetPlatform()
-end
-```
+### Application.GetPlatform()
 
 Return platform name.
 

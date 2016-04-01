@@ -8,7 +8,8 @@ like Unreal Engine, Unity etc... But instead will provide a good basis for furth
 !!! danger
 
     CETech is under havy development and now is only prototype.
-    First i need make simple and well tested public api, resource data format, usable playground ecosystem and than optimize engine for speed and size.
+    First i need make simple and well tested api, resource data format, usable playground ecosystem and than optimize
+    engine for speed and size.
 
 ### Who is it for?
 
