@@ -37,6 +37,7 @@ namespace CETech
             pack.Type = new long[rootNode.Children.Count];
             pack.Names = new long[rootNode.Children.Count][];
 
+            // TODO: generic
             var prioritDictionary = new Dictionary<long, int>();
             prioritDictionary[Type] = 0;
             prioritDictionary[LuaResource.Type] = 2;
@@ -130,6 +131,11 @@ namespace CETech
             ///     [type][name, name, ...]
             /// </summary>
             public long[][] Names;
+        }
+
+        public static object Reloader(long name, object new_data)
+        {
+            return new_data;
         }
     }
 }

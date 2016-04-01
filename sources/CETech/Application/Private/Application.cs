@@ -309,37 +309,37 @@ namespace CETech
             ResourceManager.RegisterType(
                 ConfigResource.Type,
                 ConfigResource.ResourceLoader, ConfigResource.ResourceUnloader,
-                ConfigResource.ResourceOnline, ConfigResource.ResourceOffline);
+                ConfigResource.ResourceOnline, ConfigResource.ResourceOffline, ConfigResource.Reloader);
 
             ResourceManager.RegisterType(
                 PackageResource.Type,
                 PackageResource.ResourceLoader, PackageResource.ResourceUnloader,
-                PackageResource.ResourceOnline, PackageResource.ResourceOffline);
+                PackageResource.ResourceOnline, PackageResource.ResourceOffline, PackageResource.Reloader);
 
             ResourceManager.RegisterType(
                 LuaResource.Type,
                 LuaResource.ResourceLoader, LuaResource.ResourceUnloader,
-                LuaResource.ResourceOnline, LuaResource.ResourceOffline);
+                LuaResource.ResourceOnline, LuaResource.ResourceOffline, LuaResource.Reloader);
 
             ResourceManager.RegisterType(
                 UnitResource.Type,
                 UnitResource.ResourceLoader, UnitResource.ResourceUnloader,
-                UnitResource.ResourceOnline, UnitResource.ResourceOffline);
+                UnitResource.ResourceOnline, UnitResource.ResourceOffline, UnitResource.Reloader);
 
             ResourceManager.RegisterType(
                 ShaderResource.Type,
                 ShaderResource.ResourceLoader, ShaderResource.ResourceUnloader,
-                ShaderResource.ResourceOnline, ShaderResource.ResourceOffline);
+                ShaderResource.ResourceOnline, ShaderResource.ResourceOffline, ShaderResource.Reloader);
 
             ResourceManager.RegisterType(
                 MaterialResource.Type,
                 MaterialResource.ResourceLoader, MaterialResource.ResourceUnloader,
-                MaterialResource.ResourceOnline, MaterialResource.ResourceOffline);
+                MaterialResource.ResourceOnline, MaterialResource.ResourceOffline, MaterialResource.Reloader);
 
             ResourceManager.RegisterType(
                 TextureResource.Type,
                 TextureResource.ResourceLoader, TextureResource.ResourceUnloader,
-                TextureResource.ResourceOnline, TextureResource.ResourceOffline);
+                TextureResource.ResourceOnline, TextureResource.ResourceOffline, TextureResource.ResourceReloader);
         }
 
         private static bool BigInit()
@@ -377,6 +377,8 @@ namespace CETech
             TaskManager.Init();
 
             InitResouce();
+
+            ResourceManager.Init();
 
 #if CETECH_DEVELOP
             if (DevelopFlags.compile && !DevelopFlags.ccontinue)

@@ -53,7 +53,14 @@
     </property>
     <addaction name="actionRun_standalone"/>
    </widget>
+   <widget class="QMenu" name="menuEdit">
+    <property name="title">
+     <string>Edit</string>
+    </property>
+    <addaction name="actionReload_all"/>
+   </widget>
    <addaction name="menu_File"/>
+   <addaction name="menuEdit"/>
    <addaction name="menuGame"/>
    <addaction name="menuTools"/>
   </widget>
@@ -74,6 +81,14 @@
   <action name="actionRun_standalone">
    <property name="text">
     <string>Run standalone</string>
+   </property>
+  </action>
+  <action name="actionReload_all">
+   <property name="text">
+    <string>Reload all</string>
+   </property>
+   <property name="shortcut">
+    <string>F5</string>
    </property>
   </action>
  </widget>
@@ -127,6 +142,22 @@
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>actionReload_all</sender>
+   <signal>triggered()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>reload_all()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>366</x>
+     <y>285</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
  <slots>
   <slot>open_project()</slot>
@@ -134,5 +165,6 @@
   <slot>open_script_editor()</slot>
   <slot>open_recorded_events()</slot>
   <slot>run_standalone()</slot>
+  <slot>reload_all()</slot>
  </slots>
 </ui>

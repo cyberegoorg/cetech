@@ -31,6 +31,8 @@ namespace CETech
         /// <param name="data">Resource data</param>
         public delegate void ResourceUnloader(object data);
 
+        public delegate object ResourceReloader(long name, object new_data);
+
         /// <summary>
         ///     Auto load
         /// </summary>
@@ -42,6 +44,16 @@ namespace CETech
             InitConfigImpl();
         }
 
+        public static void Init()
+        {
+            InitImpl();
+        }
+
+        public static void Shutdown()
+        {
+            ShutdownImpl();
+        }
+
         /// <summary>
         ///     Register resource type
         /// </summary>
@@ -51,9 +63,9 @@ namespace CETech
         /// <param name="online">Online delegate</param>
         /// <param name="offline">Offline delegate</param>
         public static void RegisterType(long type, ResourceLoader loader, ResourceUnloader unloader,
-            ResourceOnline online, ResourceOffline offline)
+            ResourceOnline online, ResourceOffline offline, ResourceReloader reloader)
         {
-            RegisterTypeImpl(type, loader, unloader, online, offline);
+            RegisterTypeImpl(type, loader, unloader, online, offline, reloader);
         }
 
         /// <summary>
@@ -78,6 +90,7 @@ namespace CETech
             AddLoadedImpl(loaded_data, type, names);
         }
 
+
         /// <summary>
         ///     Load resource now.
         /// </summary>
@@ -88,6 +101,15 @@ namespace CETech
             LoadNowImpl(type, names);
         }
 
+        public static void Reload(long type, long[] names)
+        {
+            ReloadImpl(type, names);
+        }
+
+        public static void ReloadAll(long type)
+        {
+            ReloadAllImpl(type);
+        }
 
         /// <summary>
         ///     Unload resource

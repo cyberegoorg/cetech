@@ -112,5 +112,10 @@ namespace CETech
         public static void ResourceUnloader(object data)
         {
         }
+
+        public static object Reloader(long name, object new_data)
+        {
+            return new_data;
+        }
     }
 }

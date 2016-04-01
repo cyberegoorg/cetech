@@ -120,5 +120,24 @@ namespace CETech
             public Uniform[] texture_uniform;
             public TextureResource.Resource[] texture_resource;
         }
+
+        public static object Reloader(long name, object new_data)
+        {
+            var old = ResourceManager.Get<MaterialInstance>(Type, name);
+            var resource = (MaterialInstance)new_data;
+
+            old.instance = ResourceManager.Get<ShaderResource.ShaderInstance>(ShaderResource.Type,
+                resource.resource.shader_name);
+
+            var idx = 0;
+            foreach (var uniform_name in resource.resource.unforms_value)
+            {
+                old.texture_uniform[idx] = new Uniform(uniform_name, UniformType.Int1);
+                old.texture_resource[idx] = ResourceManager.Get<TextureResource.Resource>(TextureResource.Type, StringId.FromString(uniform_name));
+                ++idx;
+            }
+
+            return old;
+        }
     }
 }

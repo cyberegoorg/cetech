@@ -149,5 +149,10 @@ namespace CETech.Lua
                 return ResourceManager.CanGet(LuaResource.Type, names);
             }
         }
+
+        private static void DoStreamImpl(Stream stream)
+        {
+            _enviromentScript.DoStream(stream);
+        }
     }
 }
