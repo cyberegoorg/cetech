@@ -4,7 +4,8 @@ lua:
 
 texture:
   - content/texture1
-  
+  - texture2
+
 package:
   - core
 
@@ -13,6 +14,8 @@ unit:
 
 material:
   - material1
+  - material2
+
 
 shader:
   - shader1

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Globalization;
 using CETech.Develop;
 using MsgPack;
@@ -81,8 +82,19 @@ namespace CETech.World
 
 
         {
+
             foreach (var f in _world_ent_idx[world])
             {
+
+                var idx = 0;
+                var textures = _world_ent_material[world][f.Key].texture_resource;
+                foreach (var un in _world_ent_material[world][f.Key].texture_uniform)
+                {
+                    Bgfx.SetTexture(0, un, textures[idx].texture);
+                    ++idx;
+                }
+
+
                 var world_matrix = TranformationSystem.GetWorldMatrix(world, f.Key);
                 unsafe
                 {
@@ -99,63 +111,99 @@ namespace CETech.World
             }
         }
 
-        public struct PosColorVertex
+        public struct PosNormalTexcoordVertex
         {
-            private float x;
-            private float y;
-            private float z;
-            private uint abgr;
+            float x;
+            float y;
+            float z;
+            uint normal;
+            float u;
+            float v;
 
-            public PosColorVertex(float x, float y, float z, uint abgr)
+            public PosNormalTexcoordVertex(float x, float y, float z, uint normal, float u, float v)
             {
                 this.x = x;
                 this.y = y;
                 this.z = z;
-                this.abgr = abgr;
+                this.normal = normal;
+                this.u = u;
+                this.v = v;
             }
 
             public static readonly VertexLayout Layout = new VertexLayout().Begin()
                 .Add(VertexAttributeUsage.Position, 3, VertexAttributeType.Float)
-                .Add(VertexAttributeUsage.Color0, 4, VertexAttributeType.UInt8, true)
+                .Add(VertexAttributeUsage.Normal, 4, VertexAttributeType.UInt8, true, true)
+                .Add(VertexAttributeUsage.TexCoord0, 2, VertexAttributeType.Float)
                 .End();
         }
+
 
         public static class Cube
         {
             private static readonly ushort[] indices =
             {
-                0, 1, 2, // 0
-                1, 3, 2,
-                4, 6, 5, // 2
-                5, 6, 7,
-                0, 2, 4, // 4
-                4, 2, 6,
-                1, 5, 3, // 6
-                5, 7, 3,
-                0, 4, 1, // 8
-                4, 5, 1,
-                2, 3, 6, // 10
-                6, 3, 7
+                0,  1,  2,
+                1,  3,  2,
+                4,  6,  5,
+                5,  6,  7,
+
+                8,  9, 10,
+                9, 11, 10,
+                12, 14, 13,
+                13, 14, 15,
+
+                16, 17, 18,
+                17, 19, 18,
+                20, 22, 21,
+                21, 22, 23,
             };
+
+            static uint PackF4u(float x, float y, float z)
+            {
+                var bytes = new byte[] {
+                    (byte)(x * 127.0f + 128.0f),
+                    (byte)(y * 127.0f + 128.0f),
+                    (byte)(z * 127.0f + 128.0f),
+                    128
+                };
+
+                return BitConverter.ToUInt32(bytes, 0);
+            }
 
             public static VertexBuffer CreateVertexBuffer(float size)
             {
-                PosColorVertex[] vertices =
+                PosNormalTexcoordVertex[] vertices =
                 {
-                    new PosColorVertex(-size, size, size, 0xff000000),
-                    new PosColorVertex(size, size, size, 0xff0000ff),
-                    new PosColorVertex(-size, -size, size, 0xff00ff00),
-                    new PosColorVertex(size, -size, size, 0xff00ffff),
-                    new PosColorVertex(-size, size, -size, 0xffff0000),
-                    new PosColorVertex(size, size, -size, 0xffff00ff),
-                    new PosColorVertex(-size, -size, -size, 0xffffff00),
-                    new PosColorVertex(size, -size, -size, 0xffffffff)
+                    new PosNormalTexcoordVertex(-size,  size,  size, PackF4u( 0.0f,  1.0f,  0.0f), 1.0f, 1.0f),
+                    new PosNormalTexcoordVertex( size,  size,  size, PackF4u( 0.0f,  1.0f,  0.0f), 0.0f, 1.0f),
+                    new PosNormalTexcoordVertex(-size,  size, -size, PackF4u( 0.0f,  1.0f,  0.0f), 1.0f, 0.0f),
+                    new PosNormalTexcoordVertex( size,  size, -size, PackF4u( 0.0f,  1.0f,  0.0f), 0.0f, 0.0f),
+                    new PosNormalTexcoordVertex(-size, -size,  size, PackF4u( 0.0f, -1.0f,  0.0f), 1.0f, 1.0f),
+                    new PosNormalTexcoordVertex( size, -size,  size, PackF4u( 0.0f, -1.0f,  0.0f), 0.0f, 1.0f),
+                    new PosNormalTexcoordVertex(-size, -size, -size, PackF4u( 0.0f, -1.0f,  0.0f), 1.0f, 0.0f),
+                    new PosNormalTexcoordVertex( size, -size, -size, PackF4u( 0.0f, -1.0f,  0.0f), 0.0f, 0.0f),
+                    new PosNormalTexcoordVertex( size, -size,  size, PackF4u( 0.0f,  0.0f,  1.0f), 0.0f, 0.0f),
+                    new PosNormalTexcoordVertex( size,  size,  size, PackF4u( 0.0f,  0.0f,  1.0f), 0.0f, 1.0f),
+                    new PosNormalTexcoordVertex(-size, -size,  size, PackF4u( 0.0f,  0.0f,  1.0f), 1.0f, 0.0f),
+                    new PosNormalTexcoordVertex(-size,  size,  size, PackF4u( 0.0f,  0.0f,  1.0f), 1.0f, 1.0f),
+                    new PosNormalTexcoordVertex( size, -size, -size, PackF4u( 0.0f,  0.0f, -1.0f), 0.0f, 0.0f),
+                    new PosNormalTexcoordVertex( size,  size, -size, PackF4u( 0.0f,  0.0f, -1.0f), 0.0f, 1.0f),
+                    new PosNormalTexcoordVertex(-size, -size, -size, PackF4u( 0.0f,  0.0f, -1.0f), 1.0f, 0.0f),
+                    new PosNormalTexcoordVertex(-size,  size, -size, PackF4u( 0.0f,  0.0f, -1.0f), 1.0f, 1.0f),
+                    new PosNormalTexcoordVertex( size,  size, -size, PackF4u( 1.0f,  0.0f,  0.0f), 1.0f, 1.0f),
+                    new PosNormalTexcoordVertex( size,  size,  size, PackF4u( 1.0f,  0.0f,  0.0f), 0.0f, 1.0f),
+                    new PosNormalTexcoordVertex( size, -size, -size, PackF4u( 1.0f,  0.0f,  0.0f), 1.0f, 0.0f),
+                    new PosNormalTexcoordVertex( size, -size,  size, PackF4u( 1.0f,  0.0f,  0.0f), 0.0f, 0.0f),
+                    new PosNormalTexcoordVertex(-size,  size, -size, PackF4u(-1.0f,  0.0f,  0.0f), 1.0f, 1.0f),
+                    new PosNormalTexcoordVertex(-size,  size,  size, PackF4u(-1.0f,  0.0f,  0.0f), 0.0f, 1.0f),
+                    new PosNormalTexcoordVertex(-size, -size, -size, PackF4u(-1.0f,  0.0f,  0.0f), 1.0f, 0.0f),
+                    new PosNormalTexcoordVertex(-size, -size,  size, PackF4u(-1.0f,  0.0f,  0.0f), 0.0f, 0.0f)
                 };
 
-                return new VertexBuffer(MemoryBlock.FromArray(vertices), PosColorVertex.Layout);
+                return new VertexBuffer(MemoryBlock.FromArray(vertices), PosNormalTexcoordVertex.Layout);
             }
 
-            public static IndexBuffer CreateIndexBuffer()
+            public static IndexBuffer CreateIndexBuffer()   
             {
                 return new IndexBuffer(MemoryBlock.FromArray(indices));
             }

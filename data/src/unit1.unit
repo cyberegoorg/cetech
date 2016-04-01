@@ -21,5 +21,5 @@ children:
 
       4154322234:
         component_type: "primitive_mesh"
-        material: "material1"
+        material: "material2"
         size: 2.0

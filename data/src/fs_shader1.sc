@@ -1,13 +1,14 @@
-$input v_color0
+$input v_texcoord0
 
 /*
- * Copyright 2011-2015 Branimir Karadzic. All rights reserved.
+ * Copyright 2013-2014 Dario Manesku. All rights reserved.
  * License: http://www.opensource.org/licenses/BSD-2-Clause
  */
 
 #include "common.sh"
+SAMPLER2D(u_texColor, 0);
 
 void main()
 {
-	gl_FragColor = v_color0;
+	gl_FragColor = texture2D(u_texColor, v_texcoord0);
 }
