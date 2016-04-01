@@ -1,1 +1,5 @@
 shader: shader1
+uniforms:
+    u_texColor:
+        #texture: content/texture2
+        texture: content/texture1

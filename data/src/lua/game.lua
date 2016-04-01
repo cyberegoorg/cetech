@@ -75,7 +75,7 @@ function Game:update(dt)
         pos.Z = pos.Z - 0.2
     end
 
-    rot.Y = rot.Y - 0.005
+    --rot.X = rot.X - 0.005
 
     Transformation.SetPosition(self.world, self.unit, pos)
     Transformation.SetRotation(self.world, self.unit, rot)

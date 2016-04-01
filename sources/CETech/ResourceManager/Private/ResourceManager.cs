@@ -170,6 +170,7 @@ namespace CETech
         private static void InitConfigImpl()
         {
             ConfigSystem.CreateValue("resource_manager.build", "Path to build dir", Path.Combine("data", "build"));
+            AutoLoad = true;
         }
     }
 }
