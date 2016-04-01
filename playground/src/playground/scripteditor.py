@@ -11,8 +11,8 @@ SUFIX_2_MODE = {
     None: 'ace/mode/yaml'
 }
 
-SUPPORTED_EXT = ('lua', 'package', 'texture', 'json', 'unit')
-FILES_FILTER = "Lua (*.lua);;Package (*.package);;Texture (*.texture);;JSON (*.json);;Unit (*.unit)"
+SUPPORTED_EXT = ('lua', 'package', 'texture', 'json', 'unit', 'material', 'shader')
+FILES_FILTER = "Lua (*.lua);;Package (*.package);;Texture (*.texture);;JSON (*.json);;Unit (*.unit);;Material (*.material);;Shader (*.shader)"
 
 
 class ScriptEditorWindow(QMainWindow, Ui_MainWindow):
@@ -33,13 +33,13 @@ class ScriptEditorWindow(QMainWindow, Ui_MainWindow):
         self.webView.page().mainFrame().setUrl(QUrl("file:///%s/html/editor.html" % QDir.currentPath()))
 
         self.webView.page().mainFrame().javaScriptWindowObjectCleared.connect(
-                lambda: self.webView.page().mainFrame().addToJavaScriptWindowObject("editor_widget", self))
+            lambda: self.webView.page().mainFrame().addToJavaScriptWindowObject("editor_widget", self))
 
         if filename:
             self.webView.page().mainFrame().loadFinished.connect(lambda: self.open(self.filename))
         else:
             self.webView.page().mainFrame().loadFinished.connect(
-                    lambda: self.webView.page().mainFrame().evaluateJavaScript("init()"))
+                lambda: self.webView.page().mainFrame().evaluateJavaScript("init()"))
 
     @property
     def text(self):
@@ -131,10 +131,10 @@ class ScriptEditorWindow(QMainWindow, Ui_MainWindow):
             return
 
         filename, _ = QFileDialog.getSaveFileName(
-                self,
-                "Save file",
-                QDir.currentPath() if self.project_manager.project_dir is None else os.path.join(
-                        self.project_manager.project_dir, 'src'), FILES_FILTER
+            self,
+            "Save file",
+            QDir.currentPath() if self.project_manager.project_dir is None else os.path.join(
+                self.project_manager.project_dir, 'src'), FILES_FILTER
         )
 
         if len(filename) == 0:

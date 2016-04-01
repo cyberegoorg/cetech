@@ -149,7 +149,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         #self.api.wait()
 
     def reload_all(self):
-        self.api.reload_all(["shader", "material", "texture", "lua"])
+        self.api.reload_all(["shader", "texture", "material", "lua"])
 
     def watch_project_dir(self):
         files = self.file_watch.files()
