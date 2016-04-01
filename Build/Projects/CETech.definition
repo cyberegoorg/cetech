@@ -75,6 +75,7 @@
     <Compile Include="RenderSystem\Private\RendererBgfx.cs" />
     <Compile Include="RenderSystem\RenderSystem.cs" />
     <Compile Include="RenderSystem\ShaderResource.cs" />
+    <Compile Include="RenderSystem\TextureResource.cs" />
     <Compile Include="ResourceCompiler\Private\BuildDb.cs">
       <Services>Develop</Services>
     </Compile>
