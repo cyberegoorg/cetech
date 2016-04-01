@@ -298,9 +298,7 @@ namespace CETech
             ResourceCompiler.RegisterCompiler(UnitResource.Type, UnitResource.Compile);
             ResourceCompiler.RegisterCompiler(ShaderResource.Type, ShaderResource.Compile);
             ResourceCompiler.RegisterCompiler(MaterialResource.Type, MaterialResource.Compile);
-
-            // TODO: Implement
-            ResourceCompiler.RegisterCompiler(StringId.FromString("texture"), delegate { });
+            ResourceCompiler.RegisterCompiler(TextureResource.Type, TextureResource.Compile);
 
             if (DevelopFlags.compile)
             {
@@ -338,11 +336,10 @@ namespace CETech
                 MaterialResource.ResourceLoader, MaterialResource.ResourceUnloader,
                 MaterialResource.ResourceOnline, MaterialResource.ResourceOffline);
 
-            // TODO: Implement
             ResourceManager.RegisterType(
-                StringId.FromString("texture"),
-                delegate { return null; }, delegate { },
-                delegate { }, delegate { });
+                TextureResource.Type,
+                TextureResource.ResourceLoader, TextureResource.ResourceUnloader,
+                TextureResource.ResourceOnline, TextureResource.ResourceOffline);
         }
 
         private static bool BigInit()

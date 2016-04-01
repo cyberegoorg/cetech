@@ -94,6 +94,7 @@
     <Compile Include="RenderSystem\Private\RendererBgfx.cs" />
     <Compile Include="RenderSystem\RenderSystem.cs" />
     <Compile Include="RenderSystem\ShaderResource.cs" />
+    <Compile Include="RenderSystem\TextureResource.cs" />
     <Compile Include="ResourceManager\Private\ResourceManager.cs" />
     <Compile Include="ResourceManager\Private\StringId.cs" />
     <Compile Include="ResourceManager\ResourceManager.cs" />
