@@ -2,13 +2,13 @@
 
 Module contain functions for mouse (computer mouse because this is not [Dishonored][dishonored])
 
-# Example
+## Example
 
 ```lua
 local left_btn = Mouse.ButtonIndex 'left'
 
 function Game:update(dt)
-    local m_axis = Mouse.Axis()
+    local m_axis = Mouse.Axis('abs')
 
     if Mouse.ButtonState(left_btn) then
         print("%f, %f", m_axis.x, m_axis.y)
@@ -16,21 +16,9 @@ function Game:update(dt)
 end 
 ```
 
-# Button name
+## Methods
 
-Name        | Button
-------------|--------
-`left`      | Left
-`middle`    | Midle
-`right`     | Right
-
-# Methods
-
-## Mouse.ButtonIndex
-```lua
-function Mouse.ButtonIndex(buttonName)
-end
-```
+### ButtonIndex(buttonName)
 
 Return button index for `buttonName`.
 
@@ -38,11 +26,15 @@ Argument     | Typ | Popis
 -------------|-----|----------------------------
 `buttonName` | str | [Button name](#button-name)
 
-## Mouse.ButtonName
-```lua
-function Mouse.buttonName(ButtonIndex)
-end
-```
+#### Button name
+
+Name        | Button
+------------|--------
+`left`      | Left
+`middle`    | Midle
+`right`     | Right
+
+### ButtonName(ButtonIndex)
 
 Return button name for `buttonIndex` or empty string if `ButtonIndex` is invalid.
 
@@ -50,12 +42,7 @@ Argument       | Typ | Popis
 ---------------|-----|---------------
 `ButtonIndex` | int | Button index
 
-## Mouse.ButtonState
-
-```lua
-function Mouse.ButtonState(ButtonIndex)
-end
-```
+### ButtonState(ButtonIndex)
 
 Return `true` if button is down in actual frame.
 
@@ -63,12 +50,7 @@ Argument      | Typ | Popis
 --------------|-----|--------------
 `ButtonIndex` | int | Button index
 
-## Mouse.Pressed
-
-```lua
-function Mouse.Pressed(ButtonIndex)
-end
-```
+### Pressed(ButtonIndex)
 
 Return `true` if button is not down in last frame and now is.
 
@@ -76,12 +58,7 @@ Argument      | Typ | Popis
 --------------|-----|--------------
 `ButtonIndex` | int | Button index
 
-## Mouse.Released
-
-```lua
-function Mouse.Released(ButtonIndex)
-end
-```
+### Released(ButtonIndex)
 
 Return `true` if button is down in last frame and now is not.
 

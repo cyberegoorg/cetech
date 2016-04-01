@@ -2,14 +2,9 @@
 
 Module contain functions for logging
 
-# Methods
+## Methods
 
-## Log.Info
-
-```lua
-function Log.Info(where, msg, ...)
-end
-```
+### Info(where, msg, ...)
 
 Log info message.
 
@@ -19,12 +14,7 @@ Argument | Type | Description
 `msg`    | str  | Message.
 `...`    | str  | Message args.
 
-## Log.Warning
-
-```lua
-function Log.Warning(where, msg, ...)
-end
-```
+### Warning(where, msg, ...)
 
 Log warning message.
 
@@ -34,12 +24,7 @@ Argument | Type | Description
 `msg`    | str  | Message.
 `...`    | str  | Message args.
 
-## Log.Error
-
-```lua
-function Log.Error(where, msg, ...)
-end
-```
+### Error(where, msg, ...)
 
 Log error message.
 
@@ -49,12 +34,7 @@ Argument | Type | Description
 `msg`    | str  | Message.
 `...`    | str  | Message args.
 
-## Log.Debug
-
-```lua
-function Log.Debug(where, msg, ...)
-end
-```
+### Debug(where, msg, ...)
 
 Log debug message.
 
