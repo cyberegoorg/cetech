@@ -87,10 +87,10 @@
     <Compile Include="PackageManager\PackageManager.cs" />
     <Compile Include="PackageManager\PackageResource.cs" />
     <Compile Include="PackageManager\Private\PackageManager.cs" />
-    <Compile Include="PrimitiveMeshRenderer\PrimitiveMeshRenderer.cs" />
-    <Compile Include="PrimitiveMeshRenderer\Private\PrimitiveMeshRenderer.cs" />
     <Compile Include="RenderSystem\MaterialResource.cs" />
+    <Compile Include="RenderSystem\PrimitiveMeshRenderer.cs" />
     <Compile Include="RenderSystem\Private\AviWriter.cs" />
+    <Compile Include="RenderSystem\Private\PrimitiveMeshRenderer.cs" />
     <Compile Include="RenderSystem\Private\RendererBgfx.cs" />
     <Compile Include="RenderSystem\RenderSystem.cs" />
     <Compile Include="RenderSystem\ShaderResource.cs" />
@@ -103,8 +103,6 @@
     <Compile Include="TaskManager\Private\TaskManager.cs" />
     <Compile Include="TaskManager\TaskManager.cs" />
     <Compile Include="TestProgram.cs" />
-    <Compile Include="TransformationSystem\Private\TranformationSystem.cs" />
-    <Compile Include="TransformationSystem\TranformationSystem.cs" />
     <Compile Include="UnitManager\Private\UnitManager.cs" />
     <Compile Include="UnitManager\UnitManager.cs" />
     <Compile Include="UnitManager\UnitResource.cs" />
@@ -118,7 +116,10 @@
     <Compile Include="Window\Window.cs" />
     <Compile Include="Window\WindowFlags.cs" />
     <Compile Include="Window\WindowPos.cs" />
+    <Compile Include="World\LevelResource.cs" />
+    <Compile Include="World\Private\TranformationSystem.cs" />
     <Compile Include="World\Private\WorldManager.cs" />
+    <Compile Include="World\TranformationSystem.cs" />
     <Compile Include="World\WorldManager.cs" />
     <None Include="CETechDevelop.sh">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>

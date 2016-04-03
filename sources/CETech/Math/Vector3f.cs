@@ -10,8 +10,10 @@ namespace CETech.World
         public static readonly Vector3f UnitX = new Vector3f(1.0f, 0.0f, 0.0f);
         public static readonly Vector3f UnitY = new Vector3f(0.0f, 1.0f, 0.0f);
         public static readonly Vector3f UnitZ = new Vector3f(0.0f, 0.0f, 1.0f);
+        public static readonly Vector3f Unit = new Vector3f(1.0f, 1.0f, 1.0f);
 
         public float X, Y, Z;
+
 
         public Vector3f(float x, float y, float z)
         {
@@ -27,8 +29,8 @@ namespace CETech.World
 
         public static Vector3f Normalize(Vector3f value)
         {
-            var length = (float) Math.Sqrt(value.X*value.X + value.Y*value.Y + value.Z*value.Z);
-            return new Vector3f(value.X/length, value.Y/length, value.Z/length);
+            var length = 1.0f / (float) Math.Sqrt(value.X*value.X + value.Y*value.Y + value.Z*value.Z);
+            return new Vector3f(value.X*length, value.Y*length, value.Z*length);
         }
 
         public static float Dot(Vector3f vector1, Vector3f vector2)

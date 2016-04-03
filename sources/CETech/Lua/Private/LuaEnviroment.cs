@@ -3,6 +3,7 @@ using System.IO;
 using System.Linq;
 using CETech.Develop;
 using CETech.Lua.Api;
+using CETech.World;
 using MoonSharp.Interpreter;
 using MoonSharp.Interpreter.Loaders;
 
@@ -68,6 +69,21 @@ namespace CETech.Lua
             }
         }
 
+        [MoonSharpUserData]
+        internal class Vector3fApi
+        {
+            public static readonly Vector3f Zero = new Vector3f();
+            public static readonly Vector3f UnitX = new Vector3f(1.0f, 0.0f, 0.0f);
+            public static readonly Vector3f UnitY = new Vector3f(0.0f, 1.0f, 0.0f);
+            public static readonly Vector3f UnitZ = new Vector3f(0.0f, 0.0f, 1.0f);
+            public static readonly Vector3f Unit = new Vector3f(1.0f, 1.0f, 1.0f);
+
+            public static Vector3f make(float x, float y, float z)
+            {
+                return new Vector3f(x, y, z);
+            }
+        }
+
         private static void InitImpl()
         {
             _enviromentScript = new Script();
@@ -86,6 +102,7 @@ namespace CETech.Lua
             _enviromentScript.Globals["RenderSystem"] = new RenderSystemApi();
             _enviromentScript.Globals["Transformation"] = new TransformSystemApi();
 
+            _enviromentScript.Globals["Vector3f"] = new Vector3fApi();
 
             ConsoleServer.RegisterCommand("lua.execute", (args, response) =>
             {

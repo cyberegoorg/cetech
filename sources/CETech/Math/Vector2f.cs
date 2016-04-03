@@ -26,7 +26,7 @@ namespace CETech.World
         public static Vector2f Normalize(Vector2f value)
         {
             var inv_length = 1.0f / (float)Math.Sqrt(value.X * value.X + value.Y * value.Y);
-            return new Vector2f(value.X * inv_length, value.Y / inv_length);
+            return new Vector2f(value.X * inv_length, value.Y * inv_length);
         }
 
         public static float Dot(Vector2f vector1, Vector2f vector2)

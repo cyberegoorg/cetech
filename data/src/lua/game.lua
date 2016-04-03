@@ -12,7 +12,18 @@ function Game:init()
 
     self.world = World.Create();
 
-    self.unit = UnitManager.Spawn(self.world, "unit1");
+    --self.unit = UnitManager.Spawn(self.world, "unit1");
+    World.LoadLevel(self.world, "level1");
+    self.level = World.LoadLevel(self.world, "level1",
+                 Vector3f.make(0.0, 5.0, 0.0),
+                 Vector3f.Zero, Vector3f.Unit);
+
+    self.unit = World.UnitByName(self.world, self.level, "box1")
+    self.unit2 = World.UnitByName(self.world, self.level, "box2")
+
+    Log.Info("sadsadas", "{0}", self.unit);
+    Log.Info("sadsadas", "{0}", self.unit2);
+
     self.debug = false
     self.capture = false
 end
@@ -23,8 +34,6 @@ function Game:shutdown()
 end
 
 function Game:update(dt)
-    --Log.Info("boot.lua", "init")
-
     if Keyboard.ButtonPressed(quit_btn) then
         Application.Quit()
     end

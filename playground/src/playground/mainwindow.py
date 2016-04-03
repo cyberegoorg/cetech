@@ -42,6 +42,7 @@ class DevelopSub(QThread):
             except nanomsg.NanoMsgAPIError as e:
                 raise
 
+
 class MainWindow(QMainWindow, Ui_MainWindow):
     def __init__(self):
         super(MainWindow, self).__init__()
@@ -116,13 +117,22 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.build_file_watch.directoryChanged.connect(self.build_dir_changed)
 
     def open_asset(self, path, ext):
+        """
+        :type path: str
+        :type path: ext
+        """
+        if ext == 'level':
+            level_name = path.replace(self.project.project_dir, '').replace('/src/', '').split('.')[0]
+            self.api.lua_execute("Editor:load_level(\"%s\")" % level_name)
+            return
+
         if ScriptEditorWidget.support_ext(ext):
             self.editors_manager.open(self, path)
 
     def open_project(self, name, dir):
         self.project.open_project(name, dir)
 
-        #self.api.start(QThread.LowPriority)
+        # self.api.start(QThread.LowPriority)
         self.api.connect()
         self.logsub.start(QThread.LowPriority)
 
@@ -138,15 +148,15 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             wid = None
         else:
             wid = self.ogl_widget.winId()
-            #wid = None
+            # wid = None
 
         # TODO bug #114 workaround. Disable create sub engine...
         if platform.system().lower() != 'darwin':
             self.ogl_dock.show()
 
-        self.project.run_cetech_develop(compile_=True, continue_=True,wid=wid)
+        self.project.run_cetech_develop(compile_=True, continue_=True, wid=wid, bootscript="playground\\boot")
 
-        #self.api.wait()
+        # self.api.wait()
 
     def reload_all(self):
         self.api.reload_all(["shader", "texture", "material", "lua"])

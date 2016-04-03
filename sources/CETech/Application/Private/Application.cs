@@ -163,9 +163,11 @@ namespace CETech
             string core_dir = null;
             string source_dir = null;
             string bin_dir = null;
+            string bootscript = null;
             int? first_port = null;
 
             DevelopFlags.wid = IntPtr.Zero;
+            DevelopFlags.bootscript = null;
 #endif
 
             var p = new OptionSet
@@ -199,6 +201,11 @@ namespace CETech
                 {
                     "bin=", "Bin dir.",
                     v => bin_dir = v
+                },
+
+                {
+                    "bootscript=", "Boot script.",
+                    v => DevelopFlags.bootscript = v
                 },
 
                 {
@@ -262,6 +269,7 @@ namespace CETech
             {
                 ConfigSystem.SetValue("console_server.base_port", (int) first_port);
             }
+
 #endif
 
             if (log_file != null)
@@ -299,6 +307,7 @@ namespace CETech
             ResourceCompiler.RegisterCompiler(ShaderResource.Type, ShaderResource.Compile);
             ResourceCompiler.RegisterCompiler(MaterialResource.Type, MaterialResource.Compile);
             ResourceCompiler.RegisterCompiler(TextureResource.Type, TextureResource.Compile);
+            ResourceCompiler.RegisterCompiler(LevelResource.Type, LevelResource.Compile);
 
             if (DevelopFlags.compile)
             {
@@ -334,12 +343,17 @@ namespace CETech
             ResourceManager.RegisterType(
                 MaterialResource.Type,
                 MaterialResource.ResourceLoader, MaterialResource.ResourceUnloader,
-                MaterialResource.ResourceOnline, MaterialResource.ResourceOffline, MaterialResource.Reloader);
+                MaterialResource.ResourceOnline, MaterialResource.ResourceOffline, MaterialResource.ResourceReloader);
 
             ResourceManager.RegisterType(
                 TextureResource.Type,
                 TextureResource.ResourceLoader, TextureResource.ResourceUnloader,
                 TextureResource.ResourceOnline, TextureResource.ResourceOffline, TextureResource.ResourceReloader);
+
+            ResourceManager.RegisterType(
+                LevelResource.Type,
+                LevelResource.ResourceLoader, LevelResource.ResourceUnloader,
+                LevelResource.ResourceOnline, LevelResource.ResourceOffline, LevelResource.ResourceReloader);
         }
 
         private static bool BigInit()
@@ -357,8 +371,8 @@ namespace CETech
 #endif
 
             EntityManager.Init();
-            WorldManager.Init();
             UnitManager.Init();
+            WorldManager.Init();
 
 #if CETECH_DEVELOP
 
@@ -379,14 +393,19 @@ namespace CETech
             InitResouce();
 
             ResourceManager.Init();
+            ResourceManager.LoadNow(ConfigResource.Type, new[] { StringId.FromString("global") });
 
 #if CETECH_DEVELOP
             if (DevelopFlags.compile && !DevelopFlags.ccontinue)
             {
                 return false;
             }
+
+            if (DevelopFlags.bootscript != null)
+            {
+                ConfigSystem.SetValue("boot.script", DevelopFlags.bootscript);
+            }
 #endif
-            ResourceManager.LoadNow(ConfigResource.Type, new[] {StringId.FromString("global")});
 
             Keyboard.Init();
             Mouse.Init();
@@ -447,6 +466,7 @@ namespace CETech
             public bool compile;
             public bool ccontinue;
             public IntPtr wid;
+            public string bootscript;
         }
 
         private static DevelopCmdFlags DevelopFlags;

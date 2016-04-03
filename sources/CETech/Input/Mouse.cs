@@ -12,7 +12,7 @@ namespace CETech.Input
         /// </summary>
         public static void Init()
         {
-            PlatformInit();
+            InitImpl();
         }
 
         /// <summary>
@@ -20,7 +20,7 @@ namespace CETech.Input
         /// </summary>
         public static void Process()
         {
-            PlatformProcess();
+            ProcessImpl();
         }
 
         /// <summary>
@@ -30,7 +30,7 @@ namespace CETech.Input
         /// <returns>Button index</returns>
         public static int ButtonIndex(string buttonName)
         {
-            return PlatformButtonIndex(buttonName);
+            return ButtonIndexImpl(buttonName);
         }
 
         /// <summary>
@@ -40,7 +40,7 @@ namespace CETech.Input
         /// <returns>Button name</returns>
         public static string ButtonName(int buttonIndex)
         {
-            return PlatformButtonName(buttonIndex);
+            return ButtonNameImpl(buttonIndex);
         }
 
         /// <summary>
@@ -50,7 +50,7 @@ namespace CETech.Input
         /// <returns>True if button is now down</returns>
         public static bool ButtonState(int buttonIndex)
         {
-            return PlatformButtonState(buttonIndex);
+            return ButtonStateImpl(buttonIndex);
         }
 
         /// <summary>
@@ -60,7 +60,7 @@ namespace CETech.Input
         /// <returns>True if button is pressed</returns>
         public static bool ButtonPressed(int buttonIndex)
         {
-            return PlatformButtonPressed(buttonIndex);
+            return ButtonPressedImpl(buttonIndex);
         }
 
         /// <summary>
@@ -70,7 +70,7 @@ namespace CETech.Input
         /// <returns>True if button is released</returns>
         public static bool ButtonReleased(int buttonIndex)
         {
-            return PlatformButtonReleased(buttonIndex);
+            return ButtonReleasedImpl(buttonIndex);
         }
 
         public static Vector2f Axis(string name)

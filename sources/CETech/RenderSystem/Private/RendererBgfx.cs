@@ -2,7 +2,6 @@
 using System.Diagnostics;
 using System.IO;
 using System.Runtime.InteropServices;
-using System.Text.RegularExpressions;
 using CETech.Develop;
 using CETech.Utils;
 using CETech.World;
@@ -137,7 +136,7 @@ namespace CETech
 
         private class CallbackHandler : ICallbackHandler
         {
-            AviWriter aviWriter;
+            AviWriter _aviWriter;
 
             public void ReportError(ErrorType errorType, string message)
             {
@@ -171,7 +170,7 @@ namespace CETech
                 var filename = Path.ChangeExtension(path, "tga");
                 var file = File.Create(filename);
 
-                Log.Debug("renderer.bgfx", "Save screenshot to \"{0}\"", filename);
+                Log.Info("renderer.bgfx", "Save screenshot to \"{0}\"", filename);
 
                 using (var writer = new BinaryWriter(file))
                 {
@@ -208,18 +207,20 @@ namespace CETech
 
             public void CaptureStarted(int width, int height, int pitch, TextureFormat format, bool flipVertical)
             {
-                aviWriter = new AviWriter(File.Create("capture.avi", pitch * height), width, height, 30, !flipVertical);
+                Log.Info("renderer.bgfx", "Capture to avi begin.");
+                _aviWriter = new AviWriter(File.Create("capture.avi", pitch * height), width, height, 30, !flipVertical);
             }
 
             public void CaptureFinished()
             {
-                aviWriter.Close();
-                aviWriter = null;
+                Log.Info("renderer.bgfx", "Capture to avi end.");
+                _aviWriter.Close();
+                _aviWriter = null;
             }
 
             public void CaptureFrame(IntPtr data, int size)
             {
-                aviWriter.WriteFrame(data, size);
+                _aviWriter.WriteFrame(data, size);
             }
         }
 

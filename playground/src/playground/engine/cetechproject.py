@@ -90,9 +90,9 @@ class CetechProject(object):
         for p in self.spawned_process:
             out, err = bytearray(p.readAllStandardOutput()).decode(), bytearray(p.readAllStandardError()).decode()
 
-            print("="*32)
+            print("=" * 32)
             print("out:\n%s\n err:\n%s\n" % (out, err))
-            print("="*32)
+            print("=" * 32)
 
     def get_lib_path(self, build_type):
         _platform = platform.system().lower()
@@ -113,7 +113,7 @@ class CetechProject(object):
         self._run_cetech(self.BUILD_RELEASE, args)
 
     def run_cetech_develop(self, compile_=False, continue_=False, wait=False, daemon=False, wid=None,
-                   core_dir=None, port=None):
+                           core_dir=None, port=None, bootscript=None):
         args = [
             "-b %s" % self.build_dir,
             "-s %s" % self.source_dir
@@ -121,7 +121,7 @@ class CetechProject(object):
 
         if compile_:
             args.append("--compile")
-            args.append("--bin %s"%self.get_lib_path(self.BUILD_DEVELOP))
+            args.append("--bin %s" % self.get_lib_path(self.BUILD_DEVELOP))
 
         if continue_:
             args.append("--continue")
@@ -129,22 +129,25 @@ class CetechProject(object):
         if wait:
             args.append("-wait")
 
+        if bootscript:
+            args.append("--bootscript %s" % bootscript)
+
         if daemon:
             args.append("--daemon")
 
         if port:
-            args.append("--port %s"%port)
+            args.append("--port %s" % port)
 
         # TODO bug #114 workaround. Disable create sub engine...
         if wid and platform.system().lower() != 'darwin':
             args.append("--wid %s" % int(wid))
 
-        if core_dir :
+        if core_dir:
             args.append("--core %s" % core_dir)
         else:
-            args.append("--core ../core") # TODO ?
+            args.append("--core ../core")  # TODO ?
 
-        #bin_dir
+        # bin_dir
 
         self._run_cetech(self.BUILD_DEVELOP, args)
 
