@@ -1,8 +1,8 @@
 using System.IO;
+using System.Yaml;
 using CETech.Develop;
 using MsgPack.Serialization;
 using SharpBgfx;
-using YamlDotNet.RepresentationModel;
 
 namespace CETech
 {
@@ -25,26 +25,25 @@ namespace CETech
         public static void Compile(ResourceCompiler.CompilatorApi capi)
         {
             TextReader input = new StreamReader(capi.ResourceFile);
-            var yaml = new YamlStream();
-            yaml.Load(input);
+            var yaml = YamlNode.FromYaml(input);
 
-            var rootNode = yaml.Documents[0].RootNode as YamlMappingNode;
-            var shader_name = ((YamlScalarNode) rootNode.Children[new YamlScalarNode("shader")]).Value;
+            var rootNode = yaml[0] as YamlMapping;
+            var shader_name = ((YamlScalar) rootNode["shader"]).Value;
 
             var resource = new Resource {shader_name = StringId.FromString(shader_name)};
 
-            if (rootNode.Children.ContainsKey(new YamlScalarNode("textures")))
+            if (rootNode.ContainsKey("textures"))
             {
-                var textures = (YamlMappingNode) rootNode.Children[new YamlScalarNode("textures")];
+                var textures = (YamlMapping) rootNode["textures"];
 
-                resource.unforms_name = new string[textures.Children.Count];
-                resource.texture = new string[textures.Children.Count];
+                resource.unforms_name = new string[textures.Count];
+                resource.texture = new string[textures.Count];
 
                 var idx = 0;
-                foreach (var texture in textures.Children)
+                foreach (var texture in textures)
                 {
-                    resource.unforms_name[idx] = ((YamlScalarNode) texture.Key).Value;
-                    resource.texture[idx] = ((YamlScalarNode) texture.Value).Value;
+                    resource.unforms_name[idx] = ((YamlScalar) texture.Key).Value;
+                    resource.texture[idx] = ((YamlScalar) texture.Value).Value;
 
                     ++idx;
                 }

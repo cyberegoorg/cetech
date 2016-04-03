@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.Yaml;
 using CETech.Develop;
 using MsgPack;
 using SharpBgfx;
-using YamlDotNet.RepresentationModel;
 
 namespace CETech.World
 {
@@ -52,10 +52,10 @@ namespace CETech.World
             }
         }
 
-        private static void Compiler(YamlMappingNode body, ConsoleServer.ResponsePacker packer)
+        private static void Compiler(YamlMapping body, ConsoleServer.ResponsePacker packer)
         {
-            var size = body.Children[new YamlScalarNode("size")] as YamlScalarNode;
-            var material = body.Children[new YamlScalarNode("material")] as YamlScalarNode;
+            var size = body["size"] as YamlScalar;
+            var material = body["material"] as YamlScalar;
 
             packer.PackMapHeader(2);
 

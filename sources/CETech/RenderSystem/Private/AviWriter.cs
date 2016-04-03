@@ -8,17 +8,18 @@ internal class AviWriter : IDisposable
     private const MainHeaderFlags StandardFlags =
         MainHeaderFlags.IsInterleaved | MainHeaderFlags.TrustChunkType | MainHeaderFlags.HasIndex;
 
-    private bool closed;
-    private long currentMovie;
-    private long currentRiff;
     private readonly bool flipVertical;
     private readonly int fps;
-    private int frameCount;
     private readonly int frameSize;
-    private long header;
     private readonly int videoHeight;
     private readonly int videoWidth;
     private readonly BinaryWriter writer;
+
+    private bool closed;
+    private long currentMovie;
+    private long currentRiff;
+    private int frameCount;
+    private long header;
 
     public AviWriter(Stream stream, int width, int height, int fps, bool flipVertical)
     {

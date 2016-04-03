@@ -1,9 +1,9 @@
 ﻿using System.Collections.Generic;
 using System.IO;
+using System.Yaml;
 using CETech.Develop;
 using MsgPack;
 using MsgPack.Serialization;
-using YamlDotNet.RepresentationModel;
 
 namespace CETech.World
 {
@@ -66,21 +66,19 @@ namespace CETech.World
 
 #if CETECH_DEVELOP
 
-        public static void compile_entitity(YamlMappingNode rootNode, ref int entities_id, int parent,
+        public static void compile_entitity(YamlMapping rootNode, ref int entities_id, int parent,
             Dictionary<long, long> ents_parent, List<long> components_type,
-            Dictionary<long, List<long>> component_ent, Dictionary<long, List<YamlMappingNode>> components_body)
+            Dictionary<long, List<long>> component_ent, Dictionary<long, List<YamlMapping>> components_body)
         {
             ents_parent[entities_id] = parent;
 
-            var componentsNode = rootNode.Children[new YamlScalarNode("components")] as YamlSequenceNode;
+            var componentsNode = (YamlSequence) rootNode["components"];
 
-            for (var i = 0; i < componentsNode.Children.Count; i++)
+            for (var i = 0; i < componentsNode.Count; i++)
             {
-                var component = componentsNode.Children[i];
-
                 //var components_id = component.Key as YamlScalarNode;
-                var component_body = component as YamlMappingNode;
-                var component_type = component_body.Children[new YamlScalarNode("component_type")] as YamlScalarNode;
+                var component_body = componentsNode[i] as YamlMapping;
+                var component_type = component_body["component_type"] as YamlScalar;
 
                 var cid = StringId.FromString(component_type.Value);
                 if (!components_type.Contains(cid))
@@ -91,24 +89,22 @@ namespace CETech.World
 
                 if (!components_body.ContainsKey(cid))
                 {
-                    components_body[cid] = new List<YamlMappingNode>();
+                    components_body[cid] = new List<YamlMapping>();
                 }
 
                 component_ent[cid].Add(entities_id);
                 components_body[cid].Add(component_body);
             }
 
-            if (rootNode.Children.ContainsKey(new YamlScalarNode("children")))
+            if (rootNode.ContainsKey("children"))
             {
                 var parent_ent = entities_id;
+                var childrenNode = rootNode["children"] as YamlSequence;
 
-
-                var childrenNode = rootNode.Children[new YamlScalarNode("children")] as YamlSequenceNode;
-
-                for (var i = 0; i < childrenNode.Children.Count; i++)
+                for (var i = 0; i < childrenNode.Count; i++)
                 {
                     entities_id += 1;
-                    compile_entitity(childrenNode.Children[i] as YamlMappingNode, ref entities_id, parent_ent,
+                    compile_entitity(childrenNode[i] as YamlMapping, ref entities_id, parent_ent,
                         ents_parent,
                         components_type, component_ent,
                         components_body);
@@ -117,13 +113,13 @@ namespace CETech.World
         }
 
 
-        public static void Compile(YamlMappingNode root, ConsoleServer.ResponsePacker packer)
+        public static void Compile(YamlMapping root, ConsoleServer.ResponsePacker packer)
         {
             var entities_id = 0;
 
             var components_type = new List<long>();
             var component_ent = new Dictionary<long, List<long>>();
-            var components_body = new Dictionary<long, List<YamlMappingNode>>();
+            var components_body = new Dictionary<long, List<YamlMapping>>();
             var ents_parent = new Dictionary<long, long>();
 
             compile_entitity(root, ref entities_id, int.MaxValue, ents_parent, components_type, component_ent,
@@ -186,15 +182,26 @@ namespace CETech.World
         public static void Compile(ResourceCompiler.CompilatorApi capi)
         {
             TextReader input = new StreamReader(capi.ResourceFile);
-            var yaml = new YamlStream();
-            yaml.Load(input);
+            var yaml = YamlNode.FromYaml(input);
 
-            var rootNode = yaml.Documents[0].RootNode as YamlMappingNode;
             var packer = new ConsoleServer.ResponsePacker();
 
-            Compile(rootNode, packer);
+            Compile((YamlMapping) yaml[0], packer);
 
             packer.GetMemoryStream().WriteTo(capi.BuildFile);
+
+            /*
+                        TextReader input = new StreamReader(capi.ResourceFile);
+                        var yaml = new YamlStream();
+                        yaml.Load(input);
+
+                        var rootNode = yaml.Documents[0].RootNode as YamlMappingNode;
+                        var packer = new ConsoleServer.ResponsePacker();
+
+                        Compile(rootNode, packer);
+
+                        packer.GetMemoryStream().WriteTo(capi.BuildFile);
+            */
         }
 #endif
     }

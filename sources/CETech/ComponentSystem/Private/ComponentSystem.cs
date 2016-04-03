@@ -1,7 +1,7 @@
 using System.Collections.Generic;
+using System.Yaml;
 using CETech.Develop;
 using MsgPack;
-using YamlDotNet.RepresentationModel;
 
 namespace CETech
 {
@@ -15,7 +15,7 @@ namespace CETech
             _compoilerMap[type] = compiler;
         }
 
-        public static void CompileImpl(long type, YamlMappingNode body, ConsoleServer.ResponsePacker packer)
+        public static void CompileImpl(long type, YamlMapping body, ConsoleServer.ResponsePacker packer)
         {
             _compoilerMap[type](body, packer);
         }

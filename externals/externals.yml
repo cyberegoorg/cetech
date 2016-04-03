@@ -114,30 +114,14 @@ sdl2-cs:
       - copytree: [bin/Debug, Debug/lib]
       - copytree: [bin/Release, Release/lib]
 
-
-##############
-# YamlDotNet #
-########################################################################################################################
-yamldotnet:
-  clone: git clone https://github.com/aaubry/YamlDotNet.git --depth 1
-
-  build:
-    windows64:
-      - devenv YamlDotNet.sln /build Debug /project YamlDotNet
-      - devenv YamlDotNet.sln /build Release-Unsigned /project YamlDotNet
-
-    linux64:
-      - xbuild /p:Configuration=Debug YamlDotNet/YamlDotNet.csproj
-      - xbuild /p:Configuration=Release-Unsigned YamlDotNet/YamlDotNet.csproj
-
-  install:
-     windows64:
-      - copytree: [YamlDotNet\bin\Debug, Debug\lib]
-      - copytree: [YamlDotNet\bin\Release-Unsigned, Release\lib]
-
-     linux64:
-      - copytree: [YamlDotNet/bin/Debug, Debug/lib]
-      - copytree: [YamlDotNet/bin/Release-Unsigned, Release/lib]
+#yaml-serializer:
+#  clone: git clone https://github.com/newky2k/YamlSerializer.git --depth 1
+#
+#  build:
+#    windows64:
+#      - devenv YamlSerializer.sln /project YamlSerializer /upgrade
+#      - devenv YamlSerializer.sln /build Debug /project YamlSerializer
+#      - devenv YamlSerializer.sln /build Release /project YamlSerializer
 
 ###############
 # MsgPack-cli #

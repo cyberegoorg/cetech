@@ -7,7 +7,6 @@
     <Reference Include="SharpBgfx" />
     <Reference Include="MoonSharp" />
     <Reference Include="MsgPack" />
-    <Reference Include="YamlDotNet" />
   </References>
   <Dependencies>
     <Uses Name="SDL2">
@@ -117,6 +116,25 @@
     <Compile Include="World\Private\WorldManager.cs" />
     <Compile Include="World\TranformationSystem.cs" />
     <Compile Include="World\WorldManager.cs" />
+    <Compile Include="YamlSerializer\EasyTypeConverter.cs" />
+    <Compile Include="YamlSerializer\ObjectMemberAccessor.cs" />
+    <Compile Include="YamlSerializer\Parser.cs" />
+    <Compile Include="YamlSerializer\RehashableDictionary.cs" />
+    <Compile Include="YamlSerializer\TypeUtils.cs" />
+    <Compile Include="YamlSerializer\UriEncoding.cs" />
+    <Compile Include="YamlSerializer\YamlAnchorDictionary.cs" />
+    <Compile Include="YamlSerializer\YamlConstructor.cs" />
+    <Compile Include="YamlSerializer\YamlDoubleQuoteEscaping.cs" />
+    <Compile Include="YamlSerializer\YamlNode.cs" />
+    <Compile Include="YamlSerializer\YamlParser.cs" />
+    <Compile Include="YamlSerializer\YamlPresenter.cs" />
+    <Compile Include="YamlSerializer\YamlRepresenter.cs" />
+    <Compile Include="YamlSerializer\YamlSerializer.cs" />
+    <Compile Include="YamlSerializer\YamlTagPrefixes.cs" />
+    <Compile Include="YamlSerializer\YamlTagResolutionScheme.cs" />
+    <Compile Include="YamlSerializer\YamlTagValidator.cs" />
+    <Content Include="YamlSerializer\ChangeLog.txt" />
+    <Content Include="YamlSerializer\Readme.txt" />
     <None Include="CETechDevelop.sh">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>

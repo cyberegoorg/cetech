@@ -1,10 +1,10 @@
 using System.Diagnostics;
 using System.IO;
+using System.Yaml;
+using System.Yaml.Serialization;
 using CETech.Develop;
 using CETech.Utils;
 using SharpBgfx;
-using YamlDotNet.Serialization;
-using YamlDotNet.Serialization.NamingConventions;
 
 namespace CETech
 {
@@ -79,14 +79,10 @@ namespace CETech
 
 #if CETECH_DEVELOP
 
-        public class TextureYaml
+        public struct TextureYaml
         {
             public string input { get; set; }
-
-            [YamlAlias("gen_mipmaps")]
             public bool gen_mipmaps { get; set; }
-
-            [YamlAlias("is_normalmap")]
             public bool is_normalmap { get; set; }
         }
 
@@ -99,9 +95,8 @@ namespace CETech
             var build_dir = FileSystem.GetRootDir("build");
 
             TextReader input = new StreamReader(capi.ResourceFile);
-
-            var deserializer = new Deserializer(namingConvention: new CamelCaseNamingConvention());
-            var texture_yaml = deserializer.Deserialize<TextureYaml>(input);
+            var serializer = new YamlSerializer();
+            var texture_yaml = (TextureYaml)serializer.Deserialize(input, typeof (TextureYaml))[0];
 
             var input_img = FileSystem.GetFullPath("src", texture_yaml.input);
             var output_img = Path.Combine(build_dir, "tmp", Path.GetFileName(texture_yaml.input) + ".ktx");
