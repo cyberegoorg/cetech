@@ -76,5 +76,10 @@ namespace CETech.World
             int unit;
             return level_instance.units.TryGetValue(name, out unit) ? unit : 0;
         }
+
+        private static int LevelUnitImpl(int world, int level)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

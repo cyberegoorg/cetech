@@ -48,9 +48,9 @@ namespace CETech.Input
         /// </summary>
         /// <param name="buttonIndex">Button index</param>
         /// <returns>True if button is now down</returns>
-        public static bool ButtonState(int buttonIndex)
+        public static bool State(int buttonIndex)
         {
-            return ButtonStateImpl(buttonIndex);
+            return StateImpl(buttonIndex);
         }
 
         /// <summary>
@@ -58,9 +58,9 @@ namespace CETech.Input
         /// </summary>
         /// <param name="buttonIndex">Button index</param>
         /// <returns>True if button is pressed</returns>
-        public static bool ButtonPressed(int buttonIndex)
+        public static bool Pressed(int buttonIndex)
         {
-            return ButtonPressedImpl(buttonIndex);
+            return PressedImpl(buttonIndex);
         }
 
         /// <summary>
@@ -68,9 +68,9 @@ namespace CETech.Input
         /// </summary>
         /// <param name="buttonIndex">Button index</param>
         /// <returns>True if button is released</returns>
-        public static bool ButtonReleased(int buttonIndex)
+        public static bool Released(int buttonIndex)
         {
-            return ButtonReleasedImpl(buttonIndex);
+            return ReleasedImpl(buttonIndex);
         }
 
         public static Vector2f Axis(string name)
