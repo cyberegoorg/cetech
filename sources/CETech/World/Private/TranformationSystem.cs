@@ -1,8 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.Globalization;
+using System.Yaml;
 using CETech.Develop;
 using MsgPack;
-using YamlDotNet.RepresentationModel;
 
 namespace CETech.World
 {
@@ -118,31 +118,31 @@ namespace CETech.World
             }
         }
 
-        private static void Compiler(YamlMappingNode body, ConsoleServer.ResponsePacker packer)
+        private static void Compiler(YamlMapping body, ConsoleServer.ResponsePacker packer)
         {
-            var position = body.Children[new YamlScalarNode("position")] as YamlSequenceNode;
-            var rotation = body.Children[new YamlScalarNode("rotation")] as YamlSequenceNode;
-            var scale = body.Children[new YamlScalarNode("scale")] as YamlSequenceNode;
+            var position = body["position"] as YamlSequence;
+            var rotation = body["rotation"] as YamlSequence;
+            var scale = body["scale"] as YamlSequence;
 
             packer.PackMapHeader(3);
 
             packer.Pack("position");
             packer.PackArrayHeader(3);
-            packer.Pack(float.Parse(((YamlScalarNode) position.Children[0]).Value, CultureInfo.InvariantCulture));
-            packer.Pack(float.Parse(((YamlScalarNode) position.Children[1]).Value, CultureInfo.InvariantCulture));
-            packer.Pack(float.Parse(((YamlScalarNode) position.Children[2]).Value, CultureInfo.InvariantCulture));
+            packer.Pack(float.Parse(((YamlScalar) position[0]).Value, CultureInfo.InvariantCulture));
+            packer.Pack(float.Parse(((YamlScalar) position[1]).Value, CultureInfo.InvariantCulture));
+            packer.Pack(float.Parse(((YamlScalar) position[2]).Value, CultureInfo.InvariantCulture));
 
             packer.Pack("rotation");
             packer.PackArrayHeader(3);
-            packer.Pack(float.Parse(((YamlScalarNode) rotation.Children[0]).Value, CultureInfo.InvariantCulture));
-            packer.Pack(float.Parse(((YamlScalarNode) rotation.Children[1]).Value, CultureInfo.InvariantCulture));
-            packer.Pack(float.Parse(((YamlScalarNode) rotation.Children[2]).Value, CultureInfo.InvariantCulture));
+            packer.Pack(float.Parse(((YamlScalar) rotation[0]).Value, CultureInfo.InvariantCulture));
+            packer.Pack(float.Parse(((YamlScalar) rotation[1]).Value, CultureInfo.InvariantCulture));
+            packer.Pack(float.Parse(((YamlScalar) rotation[2]).Value, CultureInfo.InvariantCulture));
 
             packer.Pack("scale");
             packer.PackArrayHeader(3);
-            packer.Pack(float.Parse(((YamlScalarNode) scale.Children[0]).Value, CultureInfo.InvariantCulture));
-            packer.Pack(float.Parse(((YamlScalarNode) scale.Children[1]).Value, CultureInfo.InvariantCulture));
-            packer.Pack(float.Parse(((YamlScalarNode) scale.Children[2]).Value, CultureInfo.InvariantCulture));
+            packer.Pack(float.Parse(((YamlScalar) scale[0]).Value, CultureInfo.InvariantCulture));
+            packer.Pack(float.Parse(((YamlScalar) scale[1]).Value, CultureInfo.InvariantCulture));
+            packer.Pack(float.Parse(((YamlScalar) scale[2]).Value, CultureInfo.InvariantCulture));
         }
 
         private static void InitImpl()

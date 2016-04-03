@@ -174,7 +174,7 @@ def build(name, body, platform_, job_count_str, verbose):
             cmd_lst.insert(2, '-aoa')
 
         if verbose:
-            print("Build cmd: %s" % cmd_lst)
+            print("Build cmd: %s" % ''.join(cmd_lst))
 
         _stdout = subprocess.DEVNULL if not verbose else None
         subprocess.check_call(cmd_lst, stdout=_stdout, stderr=subprocess.STDOUT, universal_newlines=True)

@@ -1,10 +1,10 @@
 using System.Diagnostics;
 using System.IO;
+using System.Yaml;
 using CETech.Develop;
 using CETech.Utils;
 using MsgPack.Serialization;
 using SharpBgfx;
-using YamlDotNet.RepresentationModel;
 
 namespace CETech
 {
@@ -130,14 +130,12 @@ namespace CETech
 
             var include_path = Path.Combine(core_dir, "bgfxshaders");
 
-
             TextReader input = new StreamReader(capi.ResourceFile);
-            var yaml = new YamlStream();
-            yaml.Load(input);
+            var yaml = YamlNode.FromYaml(input);
 
-            var rootNode = yaml.Documents[0].RootNode as YamlMappingNode;
-            var vs_input = ((YamlScalarNode) rootNode.Children[new YamlScalarNode("vs_input")]).Value;
-            var fs_input = ((YamlScalarNode) rootNode.Children[new YamlScalarNode("fs_input")]).Value;
+            var rootNode = yaml[0] as YamlMapping;
+            var vs_input = ((YamlScalar) rootNode["vs_input"]).Value;
+            var fs_input = ((YamlScalar) rootNode["fs_input"]).Value;
 
             var input_shader = Path.Combine(src_dir, vs_input);
             var output_vsshader = Path.Combine(build_dir, "tmp", vs_input + ".bin");

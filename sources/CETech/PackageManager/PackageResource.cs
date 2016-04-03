@@ -1,11 +1,11 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Yaml;
 using CETech.Develop;
 using CETech.Lua;
 using CETech.World;
 using MsgPack.Serialization;
-using YamlDotNet.RepresentationModel;
 
 namespace CETech
 {
@@ -28,14 +28,13 @@ namespace CETech
         public static void Compile(ResourceCompiler.CompilatorApi capi)
         {
             TextReader input = new StreamReader(capi.ResourceFile);
-            var yaml = new YamlStream();
-            yaml.Load(input);
+            var yaml = YamlNode.FromYaml(input);
 
-            var rootNode = yaml.Documents[0].RootNode as YamlMappingNode;
+            var rootNode = yaml[0] as YamlMapping;
 
             var pack = new Resource();
-            pack.Type = new long[rootNode.Children.Count];
-            pack.Names = new long[rootNode.Children.Count][];
+            pack.Type = new long[rootNode.Count];
+            pack.Names = new long[rootNode.Count][];
 
             // TODO: generic
             var prioritDictionary = new Dictionary<long, int>();
@@ -48,11 +47,11 @@ namespace CETech
             prioritDictionary[UnitResource.Type] = 7;
             prioritDictionary[LevelResource.Type] = 8;
 
-            var types_nodes = new Dictionary<long, YamlSequenceNode>();
-            foreach (var type in rootNode.Children)
+            var types_nodes = new Dictionary<long, YamlSequence>();
+            foreach (var type in rootNode)
             {
-                var typestr = type.Key as YamlScalarNode;
-                var sequence = type.Value as YamlSequenceNode;
+                var typestr = type.Key as YamlScalar;
+                var sequence = type.Value as YamlSequence;
 
                 var typeid = StringId.FromString(typestr.Value);
                 types_nodes.Add(typeid, sequence);
@@ -64,12 +63,12 @@ namespace CETech
             {
                 var sequence = types_nodes[node];
                 pack.Type[idx] = node;
-                pack.Names[idx] = new long[sequence.Children.Count];
+                pack.Names[idx] = new long[sequence.Count];
 
                 var name_idx = 0;
-                foreach (var name in sequence.Children)
+                foreach (var name in sequence)
                 {
-                    var nameid = StringId.FromString(((YamlScalarNode) name).Value);
+                    var nameid = StringId.FromString(((YamlScalar) name).Value);
 
                     pack.Names[idx][name_idx] = nameid;
                     ++name_idx;

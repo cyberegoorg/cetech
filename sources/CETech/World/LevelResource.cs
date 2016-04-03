@@ -1,8 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.IO;
+using System.Yaml;
 using CETech.Develop;
 using MsgPack.Serialization;
-using YamlDotNet.RepresentationModel;
 
 namespace CETech.World
 {
@@ -55,29 +55,28 @@ namespace CETech.World
         public static void Compile(ResourceCompiler.CompilatorApi capi)
         {
             TextReader input = new StreamReader(capi.ResourceFile);
-            var yaml = new YamlStream();
-            yaml.Load(input);
+            var yaml = YamlNode.FromYaml(input);
 
-            var rootNode = yaml.Documents[0].RootNode as YamlMappingNode;
-            var unitsNode = rootNode.Children[new YamlScalarNode("units")] as YamlSequenceNode;
+            var rootNode = yaml[0] as YamlMapping;
+            var unitsNode = rootNode["units"] as YamlSequence;
 
             var packer = new ConsoleServer.ResponsePacker();
 
-            var units_names = new List<long>(unitsNode.Children.Count);
+            var units_names = new List<long>(unitsNode.Count);
 
             packer.PackMapHeader(2);
             packer.Pack("units");
 
-            packer.PackArrayHeader(unitsNode.Children.Count);
+            packer.PackArrayHeader(unitsNode.Count);
 
-            for (var i = 0; i < unitsNode.Children.Count; i++)
+            for (var i = 0; i < unitsNode.Count; i++)
             {
-                var unit_def = unitsNode.Children[i] as YamlMappingNode;
-                var name = unit_def.Children[new YamlScalarNode("name")] as YamlScalarNode;
+                var unit_def = unitsNode[i] as YamlMapping;
+                var name = unit_def["name"] as YamlScalar;
 
                 units_names.Add(StringId.FromString(name.Value));
 
-                UnitResource.Compile(unitsNode.Children[i] as YamlMappingNode, packer);
+                UnitResource.Compile(unitsNode[i] as YamlMapping, packer);
             }
 
             packer.Pack("units_name");

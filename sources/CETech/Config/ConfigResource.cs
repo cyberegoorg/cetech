@@ -1,7 +1,7 @@
 using System;
 using System.IO;
+using System.Yaml;
 using CETech.Develop;
-using YamlDotNet.RepresentationModel;
 
 namespace CETech
 {
@@ -47,11 +47,11 @@ namespace CETech
         {
         }
 
-        private static void _LoadConfig(YamlMappingNode root_node, string root_string)
+        private static void _LoadConfig(YamlMapping root_node, string root_string)
         {
-            foreach (var type in root_node.Children)
+            foreach (var type in root_node)
             {
-                var typestr = (type.Key as YamlScalarNode).Value;
+                var typestr = ((YamlScalar) type.Key).Value;
 
                 string new_root_str;
                 if (root_string.Length > 0)
@@ -64,13 +64,13 @@ namespace CETech
                 }
 
                 var t = type.Value.GetType();
-                if (t == typeof (YamlMappingNode))
+                if (t == typeof (YamlMapping))
                 {
-                    _LoadConfig(type.Value as YamlMappingNode, new_root_str);
+                    _LoadConfig(type.Value as YamlMapping, new_root_str);
                 }
-                else if (t == typeof (YamlScalarNode))
+                else if (t == typeof (YamlScalar))
                 {
-                    var s = type.Value as YamlScalarNode;
+                    var s = type.Value as YamlScalar;
 
                     switch (ConfigSystem.GetValueType(new_root_str))
                     {
@@ -98,10 +98,10 @@ namespace CETech
         {
             ((MemoryStream) data).Seek(0, SeekOrigin.Begin);
             TextReader input = new StreamReader((MemoryStream) data);
-            var yaml = new YamlStream();
-            yaml.Load(input);
 
-            var rootNode = yaml.Documents[0].RootNode as YamlMappingNode;
+            var yaml = YamlNode.FromYaml(input);
+
+            var rootNode = yaml[0] as YamlMapping;
             _LoadConfig(rootNode, "");
         }
 
