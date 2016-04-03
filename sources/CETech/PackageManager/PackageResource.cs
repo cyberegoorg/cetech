@@ -28,7 +28,7 @@ namespace CETech
         public static void Compile(ResourceCompiler.CompilatorApi capi)
         {
             TextReader input = new StreamReader(capi.ResourceFile);
-            var yaml = YamlNode.FromYaml(input);
+            var yaml = YamlNode.FromYaml(input, new YamlConfig());
 
             var rootNode = yaml[0] as YamlMapping;
 

@@ -24,7 +24,7 @@ function Game:init()
     self.unit2 = World.UnitByName(self.world, self.level, "box2")
     self.unit = self.unit1
 
-    UnitManager.Spawn(self.world, "unit1");
+    UnitManager.Spawn(self.world, "unit11");
 
     Log.Info("sadsadas", "{0}", self.unit);
     Log.Info("sadsadas", "{0}", self.unit2);
