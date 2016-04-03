@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Yaml;
 using CETech.Develop;
@@ -72,12 +73,13 @@ namespace CETech.World
         {
             ents_parent[entities_id] = parent;
 
-            var componentsNode = (YamlSequence) rootNode["components"];
+            var componentsNode = (YamlMapping) rootNode["components"];
 
-            for (var i = 0; i < componentsNode.Count; i++)
+            foreach (var component in componentsNode)
             {
+                //var component_guid = component.Value as YamlScalar;
                 //var components_id = component.Key as YamlScalarNode;
-                var component_body = componentsNode[i] as YamlMapping;
+                var component_body = component.Value as YamlMapping;
                 var component_type = component_body["component_type"] as YamlScalar;
 
                 var cid = StringId.FromString(component_type.Value);
@@ -99,12 +101,12 @@ namespace CETech.World
             if (rootNode.ContainsKey("children"))
             {
                 var parent_ent = entities_id;
-                var childrenNode = rootNode["children"] as YamlSequence;
+                var childrenNode = rootNode["children"] as YamlMapping;
 
-                for (var i = 0; i < childrenNode.Count; i++)
+                foreach (var child in childrenNode)
                 {
                     entities_id += 1;
-                    compile_entitity(childrenNode[i] as YamlMapping, ref entities_id, parent_ent,
+                    compile_entitity(child.Value as YamlMapping, ref entities_id, parent_ent,
                         ents_parent,
                         components_type, component_ent,
                         components_body);
@@ -112,6 +114,34 @@ namespace CETech.World
             }
         }
 
+        private static void preprocess(YamlMapping root)
+        {
+            if (root.ContainsKey("prefab"))
+            {
+                var prefab_file = ((YamlScalar)root["prefab"]).Value + ".unit";
+
+                using (var prefab_source = FileSystem.Open("src", prefab_file, FileSystem.OpenMode.Read))
+                {
+                    TextReader input = new StreamReader(prefab_source);
+                    var yaml = YamlNode.FromYaml(input)[0] as YamlMapping;
+
+                    preprocess(yaml);
+
+                    root["components"] = yaml["components"];
+
+                    if (root.ContainsKey("children"))
+                    {
+                        var children = root["children"] as YamlMapping;
+                        foreach (var child in children)
+                        {
+                            preprocess(child.Value as YamlMapping);
+
+                            ((YamlMapping) root["children"])[child.Key] = child.Value;
+                        }
+                    }
+                }
+            }
+        }
 
         public static void Compile(YamlMapping root, ConsoleServer.ResponsePacker packer)
         {
@@ -121,6 +151,8 @@ namespace CETech.World
             var component_ent = new Dictionary<long, List<long>>();
             var components_body = new Dictionary<long, List<YamlMapping>>();
             var ents_parent = new Dictionary<long, long>();
+
+            preprocess(root);
 
             compile_entitity(root, ref entities_id, int.MaxValue, ents_parent, components_type, component_ent,
                 components_body);

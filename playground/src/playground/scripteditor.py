@@ -8,11 +8,21 @@ from playground.ui.scripteditorwindow import Ui_MainWindow
 
 SUFIX_2_MODE = {
     'lua': 'ace/mode/lua',
+    'sc': 'ace/mode/c_cpp',
+    'sh': 'ace/mode/c_cpp',
     None: 'ace/mode/yaml'
 }
 
-SUPPORTED_EXT = ('lua', 'package', 'texture', 'json', 'unit', 'material', 'shader')
-FILES_FILTER = "Lua (*.lua);;Package (*.package);;Texture (*.texture);;JSON (*.json);;Unit (*.unit);;Material (*.material);;Shader (*.shader)"
+SUPPORTED_EXT = ('lua', 'package', 'texture', 'json', 'unit', 'material', 'shader', 'sc', 'sh')
+FILES_FILTER = "Lua (*.lua);;" \
+               "Package (*.package);;" \
+               "Texture (*.texture);;" \
+               "JSON (*.json);;" \
+               "Unit (*.unit);;" \
+               "Material (*.material);;" \
+               "Shader (*.shader)"\
+               "Shader source (*.sc)"\
+               "Shader header (*.sh)"
 
 
 class ScriptEditorWindow(QMainWindow, Ui_MainWindow):

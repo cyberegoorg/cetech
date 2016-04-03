@@ -63,7 +63,7 @@ namespace CETech.Develop
         /// </summary>
         public class CompilatorApi
         {
-            private readonly string _sourceRoot;
+            public readonly string _sourceRoot;
 
             /// <summary>
             ///     Compiled resource stream

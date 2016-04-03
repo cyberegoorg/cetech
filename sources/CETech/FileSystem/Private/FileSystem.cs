@@ -20,7 +20,7 @@ namespace CETech
 
         private static Stream OpenImpl(string root, string path, OpenMode mode)
         {
-            return new FileStream(GetFullPath(root, path), ToFileFileMode(mode));
+            return new FileStream(GetFullPath(root, path), ToFileFileMode(mode),mode == OpenMode.Read ? FileAccess.Read: FileAccess.Write, FileShare.Read);
         }
 
         private static void ListDirectoryImpl(string root, string path, out string[] files)

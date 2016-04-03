@@ -1,4 +1,2 @@
-%YAML 1.2
----
 input: content/texture1.tga
 gen_mipmaps: true

@@ -58,7 +58,7 @@ namespace CETech.World
             var yaml = YamlNode.FromYaml(input);
 
             var rootNode = yaml[0] as YamlMapping;
-            var unitsNode = rootNode["units"] as YamlSequence;
+            var unitsNode = rootNode["units"] as YamlMapping;
 
             var packer = new ConsoleServer.ResponsePacker();
 
@@ -69,14 +69,15 @@ namespace CETech.World
 
             packer.PackArrayHeader(unitsNode.Count);
 
-            for (var i = 0; i < unitsNode.Count; i++)
+
+            foreach (var unit in unitsNode)
             {
-                var unit_def = unitsNode[i] as YamlMapping;
+                var unit_def = unit.Value as YamlMapping;
                 var name = unit_def["name"] as YamlScalar;
 
                 units_names.Add(StringId.FromString(name.Value));
 
-                UnitResource.Compile(unitsNode[i] as YamlMapping, packer);
+                UnitResource.Compile(unit_def, packer);
             }
 
             packer.Pack("units_name");
