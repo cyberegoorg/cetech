@@ -121,7 +121,7 @@ namespace CETech
         /// <summary>
         ///     Package resouce format
         /// </summary>
-        public struct Resource
+        public class Resource
         {
             /// <summary>
             ///     Types

@@ -18,7 +18,7 @@ function Editor:render()
 end
 
 function Editor:load_level(level)
-  self.level = World.Spawn(self.world, level)
+  self.level = World.LoadLevel(self.world, level)
 end
 
 function init()

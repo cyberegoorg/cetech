@@ -2,9 +2,9 @@ using System.Diagnostics;
 using System.IO;
 using CETech.Develop;
 using CETech.Utils;
-using Mono.Options;
 using SharpBgfx;
-using YamlDotNet.RepresentationModel;
+using YamlDotNet.Serialization;
+using YamlDotNet.Serialization.NamingConventions;
 
 namespace CETech
 {
@@ -48,7 +48,7 @@ namespace CETech
         {
             var resource = (Resource) data;
             var mem = MemoryBlock.FromArray(resource.data);
-            resource.texture = Texture.FromFile(mem, TextureFlags.None, 0);
+            resource.texture = Texture.FromFile(mem);
         }
 
         /// <summary>
@@ -66,7 +66,7 @@ namespace CETech
 
             old.data = neww.data;
             var mem = MemoryBlock.FromArray(old.data);
-            old.texture = Texture.FromFile(mem, TextureFlags.None, 0);
+            old.texture = Texture.FromFile(mem);
 
             return old;
         }
@@ -79,6 +79,17 @@ namespace CETech
 
 #if CETECH_DEVELOP
 
+        public class TextureYaml
+        {
+            public string input { get; set; }
+
+            [YamlAlias("gen_mipmaps")]
+            public bool gen_mipmaps { get; set; }
+
+            [YamlAlias("is_normalmap")]
+            public bool is_normalmap { get; set; }
+        }
+
         /// <summary>
         ///     Resource compiler
         /// </summary>
@@ -88,29 +99,41 @@ namespace CETech
             var build_dir = FileSystem.GetRootDir("build");
 
             TextReader input = new StreamReader(capi.ResourceFile);
-            var yaml = new YamlStream();
-            yaml.Load(input);
 
-            var rootNode = yaml.Documents[0].RootNode as YamlMappingNode;
-            var input_path = ((YamlScalarNode) rootNode.Children[new YamlScalarNode("input")]).Value;
-            var input_img = FileSystem.GetFullPath("src", input_path);
-
-            var output_img = Path.Combine(build_dir, "tmp", Path.GetFileName(input_path) + ".ktx");
+            var deserializer = new Deserializer(namingConvention: new CamelCaseNamingConvention());
+            var texture_yaml = deserializer.Deserialize<TextureYaml>(input);
+    
+            var input_img = FileSystem.GetFullPath("src", texture_yaml.input);
+            var output_img = Path.Combine(build_dir, "tmp", Path.GetFileName(texture_yaml.input) + ".ktx");
 
             capi.add_dependency(input_img);
 
-            texturec(input_img, output_img);
+            texturec(input_img, output_img, texture_yaml.gen_mipmaps, texture_yaml.is_normalmap);
 
-            var output_stream = new FileStream(output_img, FileMode.Open);
-            output_stream.CopyTo(capi.BuildFile);
+            using (var output_stream = new FileStream(output_img, FileMode.Open))
+            {
+                output_stream.CopyTo(capi.BuildFile);
+            };            
         }
 
-        private static void texturec(string inputImg, string outputImg)
+        private static void texturec(string inputImg, string outputImg, bool gen_mipmaps, bool is_normalmap)
         {
             // Prepare the process to run
             var start = new ProcessStartInfo();
             // Enter in the command line arguments, everything you would enter after the executable name itself
-            start.Arguments = string.Format("-f {0} -o {1}", inputImg, outputImg);
+
+            var args = string.Format("-f {0} -o {1}", inputImg, outputImg);
+            if (gen_mipmaps)
+            {
+                args += " --mips";
+            }
+
+            if (is_normalmap)
+            {
+                args += " --normalmap";
+            }
+
+            start.Arguments = args;
 
             Log.Debug("texturec", "{0}", start.Arguments);
 

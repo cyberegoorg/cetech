@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using MsgPack;
+﻿using System.Collections.Generic;
 
 namespace CETech.World
 {
@@ -12,6 +10,7 @@ namespace CETech.World
 
         private class Levelnstance
         {
+            public int unit;
             public readonly Dictionary<long, int> units = new Dictionary<long, int>();
         }
 
@@ -46,20 +45,22 @@ namespace CETech.World
 
         private static int LoadLevelImpl(int world, long level, Vector3f position, Vector3f rotation, Vector3f scale)
         {
-            var level_resource = ResourceManager.Get<MessagePackObjectDictionary>(LevelResource.Type, level);
+            var level_resource = ResourceManager.Get<LevelResource.CompiledResource>(LevelResource.Type, level);
             var level_instance = new Levelnstance();
 
-            var units = level_resource["units"].AsList();
-            var units_name = level_resource["units_name"].AsList();
+            var units = level_resource.units;
+            var units_name = level_resource.units_name;
 
             var level_ent = EntityManager.Create();
-            TranformationSystem.Create(world, level_ent, Int32.MaxValue, position, rotation, scale);
+            level_instance.unit = level_ent;
 
-            for (var i = 0; i < units.Count; ++i)
+            TranformationSystem.Create(world, level_ent, int.MaxValue, position, rotation, scale);
+
+            for (var i = 0; i < units.Length; ++i)
             {
-                var spawned_unit = UnitManager.Spawn(units[i].AsDictionary(), world);
+                var spawned_unit = UnitManager.Spawn(units[i], world);
 
-                level_instance.units[units_name[i].AsInt64()] = spawned_unit;
+                level_instance.units[units_name[i]] = spawned_unit;
 
                 TranformationSystem.Link(world, level_ent, spawned_unit);
             }
@@ -79,7 +80,7 @@ namespace CETech.World
 
         private static int LevelUnitImpl(int world, int level)
         {
-            throw new NotImplementedException();
+            return _levelnstances[world][level].unit;
         }
     }
 }

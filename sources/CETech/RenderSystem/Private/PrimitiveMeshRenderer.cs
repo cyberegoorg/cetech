@@ -94,7 +94,6 @@ namespace CETech.World
                     ++idx;
                 }
 
-
                 var world_matrix = TranformationSystem.GetWorldMatrix(world, f.Key);
                 unsafe
                 {

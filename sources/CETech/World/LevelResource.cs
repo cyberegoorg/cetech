@@ -21,7 +21,7 @@ namespace CETech.World
         /// <returns>Resource data</returns>
         public static object ResourceLoader(Stream input)
         {
-            return MessagePackSerializer.Get<MessagePackObjectDictionary>().Unpack(input);
+            return MessagePackSerializer.Get<CompiledResource>().Unpack(input);
         }
 
         /// <summary>
@@ -48,6 +48,12 @@ namespace CETech.World
         {
         }
 
+        public class CompiledResource
+        {
+            public UnitResource.CompiledResource[] units { get; set; }
+            public long[] units_name { get; set; }
+        }
+
 #if CETECH_DEVELOP
         /// <summary>
         ///     Resource compiler
@@ -60,7 +66,7 @@ namespace CETech.World
             yaml.Load(input);
 
             var rootNode = yaml.Documents[0].RootNode as YamlMappingNode;
-            var unitsNode = rootNode.Children[new YamlScalarNode("units")] as YamlMappingNode;
+            var unitsNode = rootNode.Children[new YamlScalarNode("units")] as YamlSequenceNode;
 
             var packer = new ConsoleServer.ResponsePacker();
 
@@ -70,14 +76,15 @@ namespace CETech.World
             packer.Pack("units");
 
             packer.PackArrayHeader(unitsNode.Children.Count);
-            foreach (var unit in unitsNode.Children)
+
+            for (int i = 0; i < unitsNode.Children.Count; i++)
             {
-                var unit_def = unit.Value as YamlMappingNode;
+                var unit_def = unitsNode.Children[i] as YamlMappingNode;
                 var name = unit_def.Children[new YamlScalarNode("name")] as YamlScalarNode;
 
                 units_names.Add(StringId.FromString(name.Value));
 
-                UnitResource.Compile(unit.Value as YamlMappingNode, packer);
+                UnitResource.Compile(unitsNode.Children[i] as YamlMappingNode, packer);
             }
 
             packer.Pack("units_name");

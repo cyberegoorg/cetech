@@ -116,7 +116,7 @@ namespace CETech.Develop
                     continue;
                 }
 
-                var task = new CompileTask
+                var task = new CompileTask // TODO: pool
                 {
                     Compiler = compiler,
                     Filename = filename,
