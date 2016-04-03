@@ -1,5 +1,4 @@
-using System.Collections.Generic;
-using MsgPack;
+using CETech.World;
 
 namespace CETech
 {
@@ -10,7 +9,7 @@ namespace CETech
             return SpawnImpl(world, unit);
         }
 
-        public static int Spawn(MessagePackObjectDictionary resource, int world)
+        public static int Spawn(UnitResource.CompiledResource resource, int world)
         {
             return SpawnImpl(resource, world);
         }

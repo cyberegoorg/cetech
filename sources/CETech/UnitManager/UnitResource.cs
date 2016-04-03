@@ -21,7 +21,8 @@ namespace CETech.World
         /// <returns>Resource data</returns>
         public static object ResourceLoader(Stream input)
         {
-            return MessagePackSerializer.Get<MessagePackObjectDictionary>().Unpack(input);
+            //return MessagePackSerializer.Get<MessagePackObjectDictionary>().Unpack(input);
+            return MessagePackSerializer.Get<CompiledResource>().Unpack(input);
         }
 
         /// <summary>
@@ -48,18 +49,32 @@ namespace CETech.World
         {
         }
 
+        public class CompiledResource
+        {
+            public int ent_count { get; set; }
+            public int[] ents_parent { get; set; }
+            public long[] type { get; set; }
+            public long[][] ent { get; set; }
+
+            public MessagePackObjectDictionary[][] data { get; set; }
+        }
+
 #if CETECH_DEVELOP
+
         public static void compile_entitity(YamlMappingNode rootNode, ref int entities_id, int parent,
             Dictionary<long, long> ents_parent, List<long> components_type,
             Dictionary<long, List<long>> component_ent, Dictionary<long, List<YamlMappingNode>> components_body)
         {
             ents_parent[entities_id] = parent;
 
-            var componentsNode = rootNode.Children[new YamlScalarNode("components")] as YamlMappingNode;
-            foreach (var component in componentsNode.Children)
+            var componentsNode = rootNode.Children[new YamlScalarNode("components")] as YamlSequenceNode;
+
+            for (int i = 0; i < componentsNode.Children.Count; i++)
             {
-                var components_id = component.Key as YamlScalarNode;
-                var component_body = component.Value as YamlMappingNode;
+                var component = componentsNode.Children[i];
+
+                //var components_id = component.Key as YamlScalarNode;
+                var component_body = component as YamlMappingNode;
                 var component_type = component_body.Children[new YamlScalarNode("component_type")] as YamlScalarNode;
 
                 var cid = StringId.FromString(component_type.Value);
@@ -82,16 +97,20 @@ namespace CETech.World
             {
                 var parent_ent = entities_id;
 
-                var childrenNode = rootNode.Children[new YamlScalarNode("children")] as YamlMappingNode;
-                foreach (var child in childrenNode.Children)
+
+                var childrenNode = rootNode.Children[new YamlScalarNode("children")] as YamlSequenceNode;
+
+                for (int i = 0; i < childrenNode.Children.Count; i++)
                 {
                     entities_id += 1;
-                    compile_entitity(child.Value as YamlMappingNode, ref entities_id, parent_ent, ents_parent,
+                    compile_entitity(childrenNode.Children[i] as YamlMappingNode, ref entities_id, parent_ent, ents_parent,
                         components_type, component_ent,
                         components_body);
                 }
             }
         }
+
+
 
         public static void Compile(YamlMappingNode root, ConsoleServer.ResponsePacker packer)
         {

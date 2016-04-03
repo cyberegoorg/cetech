@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using CETech.World;
 using MsgPack;
 
@@ -6,38 +5,37 @@ namespace CETech
 {
     public partial class UnitManager
     {
-
-        private static int SpawnImpl(MessagePackObjectDictionary unit_resource, int world)
+        private static int SpawnImpl(UnitResource.CompiledResource unit_resource, int world)
         {
-            var types = unit_resource["type"].AsList();
-            var data = unit_resource["data"].AsList();
-            var ent_list = unit_resource["ent"].AsList();
-            var ent_count = unit_resource["ent_count"].AsInt32();
+            var types = unit_resource.type;
+            var data = unit_resource.data;
+            var ent_list = unit_resource.ent;
+            var ent_count = unit_resource.ent_count;
 
-            var ents_parent = unit_resource["ents_parent"].AsList();
+            var ents_parent = unit_resource.ents_parent;
             var entities = new int[ent_count];
             for (var i = 0; i < ent_count; i++)
             {
                 entities[i] = EntityManager.Create();
             }
 
-            for (var i = 0; i < types.Count; ++i)
+            for (var i = 0; i < types.Length; ++i)
             {
-                var ents = ent_list[i].AsList();
-                var edata = data[i].AsList();
+                var ents = ent_list[i];
+                var edata = data[i];
 
-                var entities_id = new int[ents.Count];
-                var entities_body = new MessagePackObjectDictionary[ents.Count];
-                var entities_parent = new int[ents.Count];
+                var entities_id = new int[ents.Length];
+                var entities_body = new MessagePackObjectDictionary[ents.Length];
+                var entities_parent = new int[ents.Length];
 
-                for (var j = 0; j < ents.Count; j++)
+                for (var j = 0; j < ents.Length; j++)
                 {
-                    entities_id[j] = entities[ents[j].AsInt32()];
-                    entities_body[j] = edata[j].AsDictionary();
-                    entities_parent[j] = ents_parent[j].AsInt32();
+                    entities_id[j] = entities[ents[j]];
+                    entities_body[j] = edata[j];
+                    entities_parent[j] = ents_parent[j];
                 }
 
-                ComponentSystem.Spawn(world, types[i].AsInt64(), entities_id, entities_parent, entities_body);
+                ComponentSystem.Spawn(world, types[i], entities_id, entities_parent, entities_body);
             }
 
             return entities[0];
@@ -45,7 +43,7 @@ namespace CETech
 
         private static int SpawnImpl(int world, long unit)
         {
-            var unit_resource = ResourceManager.Get<MessagePackObjectDictionary>(
+            var unit_resource = ResourceManager.Get<UnitResource.CompiledResource>(
                 UnitResource.Type, unit);
 
             return Spawn(unit_resource, world);

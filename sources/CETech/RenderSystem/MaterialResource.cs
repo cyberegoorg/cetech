@@ -33,19 +33,17 @@ namespace CETech
 
             var resource = new Resource { shader_name = StringId.FromString(shader_name) };
 
-            if (rootNode.Children.ContainsKey(new YamlScalarNode("uniforms"))) {
-                var uniforms = (YamlMappingNode)rootNode.Children[new YamlScalarNode("uniforms")];
+            if (rootNode.Children.ContainsKey(new YamlScalarNode("textures"))) {
+                var textures = (YamlMappingNode)rootNode.Children[new YamlScalarNode("textures")];
 
-                resource.unforms_name = new string[uniforms.Children.Count];
-                resource.unforms_value = new string[uniforms.Children.Count];
-                resource.unforms_type = new int[uniforms.Children.Count];
+                resource.unforms_name = new string[textures.Children.Count];
+                resource.texture = new string[textures.Children.Count];
 
                 var idx = 0;
-                foreach (var child in uniforms.Children)
+                foreach (var texture in textures.Children)
                 {
-                    resource.unforms_type[idx] = 1; // TEXTURE
-                    resource.unforms_name[idx] = ((YamlScalarNode)child.Key).Value;
-                    resource.unforms_value[idx] = ((YamlScalarNode)((YamlMappingNode)child.Value).Children[new YamlScalarNode("texture")]).Value;
+                    resource.unforms_name[idx] = ((YamlScalarNode) texture.Key).Value;
+                    resource.texture[idx] = ((YamlScalarNode)texture.Value).Value;
 
                     ++idx;
                 }
@@ -54,8 +52,7 @@ namespace CETech
             else
             {
                 resource.unforms_name = new string[0];
-                resource.unforms_value = new string[0];
-                resource.unforms_type = new int[0];
+                resource.texture = new string[0];
             }
 
             var serializer = MessagePackSerializer.Get<Resource>();
@@ -75,7 +72,7 @@ namespace CETech
             var serializer = MessagePackSerializer.Get<Resource>();
             var resource = serializer.Unpack(input);
 
-            var mat_inst = new MaterialInstance { resource = resource, texture_uniform = new Uniform[resource.unforms_value.Length], texture_resource = new TextureResource.Resource[resource.unforms_value.Length] };
+            var mat_inst = new MaterialInstance { resource = resource, texture_uniform = new Uniform[resource.texture.Length], texture_resource = new TextureResource.Resource[resource.texture.Length] };
 
             return mat_inst;
         }
@@ -99,7 +96,7 @@ namespace CETech
                 resource.resource.shader_name);
 
             var idx = 0;
-            foreach (var uniform_name in resource.resource.unforms_value)
+            foreach (var uniform_name in resource.resource.texture)
             {
                 resource.texture_uniform[idx] = new Uniform(uniform_name, UniformType.Int1);
                 resource.texture_resource[idx] = ResourceManager.Get<TextureResource.Resource>(TextureResource.Type, StringId.FromString(uniform_name));
@@ -119,8 +116,7 @@ namespace CETech
         {
             public long shader_name;
             public string[] unforms_name;
-            public int[] unforms_type;
-            public string[] unforms_value;
+            public string[] texture;
         }
 
         public class MaterialInstance
@@ -144,10 +140,10 @@ namespace CETech
             old.texture_uniform = resource.texture_uniform;
             old.texture_resource = resource.texture_resource;
 
-            if (resource.resource.unforms_value.Length > 0)
+            if (resource.resource.texture.Length > 0)
             {
                 var idx = 0;
-                foreach (var uniform_name in resource.resource.unforms_value)
+                foreach (var uniform_name in resource.resource.texture)
                 {
 
                     old.texture_uniform[idx] = new Uniform(uniform_name, UniformType.Int1);
