@@ -10,7 +10,7 @@ local left_btn = Mouse.ButtonIndex 'left'
 function Game:update(dt)
     local m_axis = Mouse.Axis('abs')
 
-    if Mouse.ButtonState(left_btn) then
+    if Mouse.State(left_btn) then
         print("%f, %f", m_axis.x, m_axis.y)
     end
 end 
@@ -18,7 +18,7 @@ end
 
 ## Methods
 
-### ButtonIndex(buttonName)
+### index(buttonName)
 
 Return button index for `buttonName`.
 
@@ -34,37 +34,37 @@ Name        | Button
 `middle`    | Midle
 `right`     | Right
 
-### ButtonName(ButtonIndex)
+### ButtonName(index)
 
-Return button name for `buttonIndex` or empty string if `ButtonIndex` is invalid.
+Return button name for `buttonIndex` or empty string if `index` is invalid.
 
 Argument       | Typ | Popis
 ---------------|-----|---------------
-`ButtonIndex` | int | Button index
+`index` | int | Button index
 
-### ButtonState(ButtonIndex)
+### State(index)
 
 Return `true` if button is down in actual frame.
 
 Argument      | Typ | Popis
 --------------|-----|--------------
-`ButtonIndex` | int | Button index
+`index` | int | Button index
 
-### Pressed(ButtonIndex)
+### Pressed(index)
 
 Return `true` if button is not down in last frame and now is.
 
 Argument      | Typ | Popis
 --------------|-----|--------------
-`ButtonIndex` | int | Button index
+`index` | int | Button index
 
-### Released(ButtonIndex)
+### Released(index)
 
 Return `true` if button is down in last frame and now is not.
 
 Argument      | Typ | Popis
 --------------|-----|--------------
-`ButtonIndex` | int | Button index
+`index` | int | Button index
 
 
 [dishonored]: https://www.wikipedia.org/wiki/Dishonored

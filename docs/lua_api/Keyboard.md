@@ -24,35 +24,35 @@ Argument     | Type | Description
 -------------|------|---------------
 `buttonName` | str  | Button name
 
-### ButtonName(buttonIndex)
+### ButtonName(index)
 
-Return button name for `buttonIndex` or empty string if `ButtonIndex` is invalid.
+Return button name for `index` or empty string if `ButtonIndex` is invalid.
 
 Argument      | Type | Description
 --------------|------|--------------
-`buttonIndex` | int  | Button index
+`index` | int  | Button index
 
-### ButtonState(buttonIndex)
+### State(index)
 
 Return `true` if button is down in actual frame.
 
 Argument      | Type | Description
 --------------|----- |--------------
-`buttonIndex` | int  | Button Index
+`index` | int  | Button Index
 
 
-### ButtonPressed(buttonIndex)
+### Pressed(index)
 
 Return `true` if button is not down in last frame and now is.
 
 Argument      | Type | Description
 --------------|------|--------------
-`buttonIndex` | int  | Button index
+`index` | int  | Button index
 
-### ButtonReleased(buttonIndex)
+### Released(index)
 
 Return `true` if button is down in last frame and now is not.
 
 Argument      | Type | Description
 --------------|------|--------------
-`buttonIndex` | int  | Button index
+`index` | int  | Button index

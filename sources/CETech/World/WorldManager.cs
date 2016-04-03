@@ -36,5 +36,10 @@
         {
             return UnitByNameImpl(world, level, name);
         }
+
+        public static int LevelUnit(int world, int level)
+        {
+            return LevelUnitImpl(world, level);
+        }
     }
 }

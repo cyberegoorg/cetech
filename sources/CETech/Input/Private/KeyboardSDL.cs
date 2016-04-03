@@ -32,17 +32,17 @@ namespace CETech.Input
             return SDL.SDL_GetScancodeName((SDL.SDL_Scancode) buttonIndex);
         }
 
-        private static bool ButtonStateImpl(int buttonIndex)
+        private static bool StateImpl(int buttonIndex)
         {
             return _keyboardStates[buttonIndex] != 0;
         }
 
-        private static bool ButtonPressedImpl(int buttonIndex)
+        private static bool PressedImpl(int buttonIndex)
         {
             return _keyboardStates[buttonIndex] == 1 && _keyboardStatesLast[buttonIndex] == 0;
         }
 
-        private static bool ButtonReleasedImpl(int buttonIndex)
+        private static bool ReleasedImpl(int buttonIndex)
         {
             return _keyboardStates[buttonIndex] == 0 && _keyboardStatesLast[buttonIndex] == 1;
         }

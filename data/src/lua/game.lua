@@ -34,7 +34,7 @@ function Game:shutdown()
 end
 
 function Game:update(dt)
-    if Keyboard.ButtonPressed(quit_btn) then
+    if Keyboard.Pressed(quit_btn) then
         Application.Quit()
     end
 
@@ -43,12 +43,12 @@ function Game:update(dt)
     local pos = Transformation.GetPosition(self.world, self.unit)
     local rot = Transformation.GetRotation(self.world, self.unit)
 
-    if Keyboard.ButtonPressed(Keyboard.ButtonIndex('f9')) then
+    if Keyboard.Pressed(Keyboard.ButtonIndex('f9')) then
       self.debug = not self.debug;
       RenderSystem.SetDebug(self.debug)
     end
 
-    if Keyboard.ButtonPressed(Keyboard.ButtonIndex('f10')) then
+    if Keyboard.Pressed(Keyboard.ButtonIndex('f10')) then
       self.capture = not self.capture;
 
       if self.capture then
@@ -58,28 +58,28 @@ function Game:update(dt)
       end
     end
 
-    if Keyboard.ButtonPressed(Keyboard.ButtonIndex('f11')) then
+    if Keyboard.Pressed(Keyboard.ButtonIndex('f11')) then
       RenderSystem.SaveScreenShot("screenshot");
     end
 
-    if Mouse.ButtonState(Mouse.ButtonIndex("left") ) then
+    if Mouse.State(Mouse.ButtonIndex("left") ) then
         rot.X = rot.X + m_axis.X * -0.1;
         rot.Y = rot.Y + m_axis.Y * 0.1;
     end
 
-    if Keyboard.ButtonState(Keyboard.ButtonIndex('a')) then
+    if Keyboard.State(Keyboard.ButtonIndex('a')) then
         rot.X = rot.X + 0.02
     end
 
-    if Keyboard.ButtonState(Keyboard.ButtonIndex('d')) then
+    if Keyboard.State(Keyboard.ButtonIndex('d')) then
         rot.X = rot.X - 0.02
     end
 
-    if Keyboard.ButtonState(Keyboard.ButtonIndex('w')) then
+    if Keyboard.State(Keyboard.ButtonIndex('w')) then
         pos.Z = pos.Z + 0.2
     end
 
-    if Keyboard.ButtonState(Keyboard.ButtonIndex('s')) then
+    if Keyboard.State(Keyboard.ButtonIndex('s')) then
         pos.Z = pos.Z - 0.2
     end
 
