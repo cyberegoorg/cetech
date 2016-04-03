@@ -1,3 +1,6 @@
+using System.Collections.Generic;
+using MsgPack;
+
 namespace CETech
 {
     public partial class UnitManager
@@ -5,6 +8,11 @@ namespace CETech
         public static int Spawn(int world, long unit)
         {
             return SpawnImpl(world, unit);
+        }
+
+        public static int Spawn(MessagePackObjectDictionary resource, int world)
+        {
+            return SpawnImpl(resource, world);
         }
 
         public static void Init()

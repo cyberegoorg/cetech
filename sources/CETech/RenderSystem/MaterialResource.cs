@@ -131,7 +131,7 @@ namespace CETech
             public TextureResource.Resource[] texture_resource;
         }
 
-        public static object Reloader(long name, object new_data)
+        public static object ResourceReloader(long name, object new_data)
         {
             // TODO: !!!
 

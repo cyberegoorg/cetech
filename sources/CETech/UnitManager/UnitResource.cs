@@ -21,7 +21,7 @@ namespace CETech.World
         /// <returns>Resource data</returns>
         public static object ResourceLoader(Stream input)
         {
-            return MessagePackSerializer.Get<Dictionary<MessagePackObject, MessagePackObject>>().Unpack(input);
+            return MessagePackSerializer.Get<MessagePackObjectDictionary>().Unpack(input);
         }
 
         /// <summary>
@@ -49,8 +49,7 @@ namespace CETech.World
         }
 
 #if CETECH_DEVELOP
-
-        private static void compile_entitity(YamlMappingNode rootNode, ref int entities_id, int parent,
+        public static void compile_entitity(YamlMappingNode rootNode, ref int entities_id, int parent,
             Dictionary<long, long> ents_parent, List<long> components_type,
             Dictionary<long, List<long>> component_ent, Dictionary<long, List<YamlMappingNode>> components_body)
         {
@@ -94,18 +93,8 @@ namespace CETech.World
             }
         }
 
-        /// <summary>
-        ///     Resource compiler
-        /// </summary>
-        /// <param name="capi">Compiler api</param>
-        public static void Compile(ResourceCompiler.CompilatorApi capi)
+        public static void Compile(YamlMappingNode root, ConsoleServer.ResponsePacker packer)
         {
-            TextReader input = new StreamReader(capi.ResourceFile);
-            var yaml = new YamlStream();
-            yaml.Load(input);
-
-            var rootNode = yaml.Documents[0].RootNode as YamlMappingNode;
-
             var entities_id = 0;
 
             var components_type = new List<long>();
@@ -113,10 +102,8 @@ namespace CETech.World
             var components_body = new Dictionary<long, List<YamlMappingNode>>();
             var ents_parent = new Dictionary<long, long>();
 
-            compile_entitity(rootNode, ref entities_id, int.MaxValue, ents_parent, components_type, component_ent,
+            compile_entitity(root, ref entities_id, int.MaxValue, ents_parent, components_type, component_ent,
                 components_body);
-
-            var packer = new ConsoleServer.ResponsePacker();
 
             packer.PackMapHeader(5);
 
@@ -131,7 +118,6 @@ namespace CETech.World
                 packer.Pack(ents_parent[i]);
             }
 
-//            packer.Pack(entities_id + 1);
 
             packer.Pack("type");
             packer.PackArrayHeader(components_type.Count);
@@ -168,7 +154,22 @@ namespace CETech.World
                 }
             }
 
-            //
+        }
+
+        /// <summary>
+        ///     Resource compiler
+        /// </summary>
+        /// <param name="capi">Compiler api</param>
+        public static void Compile(ResourceCompiler.CompilatorApi capi)
+        {
+            TextReader input = new StreamReader(capi.ResourceFile);
+            var yaml = new YamlStream();
+            yaml.Load(input);
+
+            var rootNode = yaml.Documents[0].RootNode as YamlMappingNode;
+            var packer = new ConsoleServer.ResponsePacker();
+
+            Compile(rootNode, packer);
 
             packer.GetMemoryStream().WriteTo(capi.BuildFile);
         }

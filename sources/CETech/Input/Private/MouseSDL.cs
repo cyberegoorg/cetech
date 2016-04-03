@@ -12,11 +12,11 @@ namespace CETech.Input
         private static Vector2f _dt_position;
 
 
-        private static void PlatformInit()
+        private static void InitImpl()
         {
         }
 
-        private static void PlatformProcess()
+        private static void ProcessImpl()
         {
             _buttonStatesLast = _buttonStates;
 
@@ -33,7 +33,7 @@ namespace CETech.Input
 
         }
 
-        private static int PlatformButtonIndex(string buttonName)
+        private static int ButtonIndexImpl(string buttonName)
         {
             switch (buttonName)
             {
@@ -48,7 +48,7 @@ namespace CETech.Input
             }
         }
 
-        private static string PlatformButtonName(int buttonIndex)
+        private static string ButtonNameImpl(int buttonIndex)
         {
             if (buttonIndex == SDL.SDL_BUTTON_LMASK)
             {
@@ -63,17 +63,17 @@ namespace CETech.Input
             return buttonIndex == SDL.SDL_BUTTON_RMASK ? "right" : "";
         }
 
-        private static bool PlatformButtonState(int buttonIndex)
+        private static bool ButtonStateImpl(int buttonIndex)
         {
             return (_buttonStates & buttonIndex) > 0;
         }
 
-        private static bool PlatformButtonPressed(int buttonIndex)
+        private static bool ButtonPressedImpl(int buttonIndex)
         {
             return (_buttonStates & buttonIndex) == 1 && (_buttonStatesLast & buttonIndex) == 0;
         }
 
-        private static bool PlatformButtonReleased(int buttonIndex)
+        private static bool ButtonReleasedImpl(int buttonIndex)
         {
             return (_buttonStates & buttonIndex) == 0 && (_buttonStatesLast & buttonIndex) == 1;
         }

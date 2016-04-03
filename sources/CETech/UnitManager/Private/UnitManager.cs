@@ -6,11 +6,9 @@ namespace CETech
 {
     public partial class UnitManager
     {
-        private static int SpawnImpl(int world, long unit)
-        {
-            var unit_resource = ResourceManager.Get<Dictionary<MessagePackObject, MessagePackObject>>(
-                UnitResource.Type, unit);
 
+        private static int SpawnImpl(MessagePackObjectDictionary unit_resource, int world)
+        {
             var types = unit_resource["type"].AsList();
             var data = unit_resource["data"].AsList();
             var ent_list = unit_resource["ent"].AsList();
@@ -43,6 +41,14 @@ namespace CETech
             }
 
             return entities[0];
+        }
+
+        private static int SpawnImpl(int world, long unit)
+        {
+            var unit_resource = ResourceManager.Get<MessagePackObjectDictionary>(
+                UnitResource.Type, unit);
+
+            return Spawn(unit_resource, world);
         }
 
         private static void InitImpl()

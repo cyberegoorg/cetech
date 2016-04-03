@@ -22,6 +22,17 @@
             RemoveWorldImpl(world);
         }
 
+        public static int Create(int world, int entity, int parent, Vector3f position, Vector3f rotation,
+            Vector3f scale)
+        {
+            return CreateImpl(world, entity, parent, position, rotation, scale);
+        }
+
+        public static void Link(int world, int parent_ent, int child_ent)
+        {
+            LinkImpl(world, parent_ent, child_ent);
+        }
+
         public static void SetPosition(int world, int entity, Vector3f pos)
         {
             SetPositionImpl(world, entity, pos);

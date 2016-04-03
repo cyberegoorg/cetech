@@ -22,27 +22,27 @@ namespace CETech.Input
             Marshal.Copy(SDL.SDL_GetKeyboardState(out numKeys), _keyboardStates, 0, 512);
         }
 
-        private static int PlatformButtonIndex(string buttonName)
+        private static int ButtonIndexImpl(string buttonName)
         {
             return (int) SDL.SDL_GetScancodeFromName(buttonName);
         }
 
-        private static string PlatformButtonName(int buttonIndex)
+        private static string ButtonNameImpl(int buttonIndex)
         {
             return SDL.SDL_GetScancodeName((SDL.SDL_Scancode) buttonIndex);
         }
 
-        private static bool PlatformButtonState(int buttonIndex)
+        private static bool ButtonStateImpl(int buttonIndex)
         {
             return _keyboardStates[buttonIndex] != 0;
         }
 
-        private static bool PlatformButtonPressed(int buttonIndex)
+        private static bool ButtonPressedImpl(int buttonIndex)
         {
             return _keyboardStates[buttonIndex] == 1 && _keyboardStatesLast[buttonIndex] == 0;
         }
 
-        private static bool PlatformButtonReleased(int buttonIndex)
+        private static bool ButtonReleasedImpl(int buttonIndex)
         {
             return _keyboardStates[buttonIndex] == 0 && _keyboardStatesLast[buttonIndex] == 1;
         }
