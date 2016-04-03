@@ -20,19 +20,19 @@ namespace CETech.World
 
         public float LengthSquared()
         {
-            return X * X + Y * Y;
+            return X*X + Y*Y;
         }
 
         public static Vector2f Normalize(Vector2f value)
         {
-            var inv_length = 1.0f / (float)Math.Sqrt(value.X * value.X + value.Y * value.Y);
-            return new Vector2f(value.X * inv_length, value.Y * inv_length);
+            var inv_length = 1.0f/(float) Math.Sqrt(value.X*value.X + value.Y*value.Y);
+            return new Vector2f(value.X*inv_length, value.Y*inv_length);
         }
 
         public static float Dot(Vector2f vector1, Vector2f vector2)
         {
-            return vector1.X * vector2.X +
-                   vector1.Y * vector2.Y;
+            return vector1.X*vector2.X +
+                   vector1.Y*vector2.Y;
         }
 
         public static Vector2f Cross(Vector2f vector1, Vector2f vector2)
@@ -52,12 +52,12 @@ namespace CETech.World
 
         public static Vector2f operator *(Vector2f left, Vector2f right)
         {
-            return new Vector2f(left.X * right.X, left.Y * right.Y);
+            return new Vector2f(left.X*right.X, left.Y*right.Y);
         }
 
         public static Vector2f operator *(Vector2f left, float right)
         {
-            return new Vector2f(left.X * right, left.Y * right);
+            return new Vector2f(left.X*right, left.Y*right);
         }
     }
 }

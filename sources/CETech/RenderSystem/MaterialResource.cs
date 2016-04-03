@@ -31,10 +31,11 @@ namespace CETech
             var rootNode = yaml.Documents[0].RootNode as YamlMappingNode;
             var shader_name = ((YamlScalarNode) rootNode.Children[new YamlScalarNode("shader")]).Value;
 
-            var resource = new Resource { shader_name = StringId.FromString(shader_name) };
+            var resource = new Resource {shader_name = StringId.FromString(shader_name)};
 
-            if (rootNode.Children.ContainsKey(new YamlScalarNode("textures"))) {
-                var textures = (YamlMappingNode)rootNode.Children[new YamlScalarNode("textures")];
+            if (rootNode.Children.ContainsKey(new YamlScalarNode("textures")))
+            {
+                var textures = (YamlMappingNode) rootNode.Children[new YamlScalarNode("textures")];
 
                 resource.unforms_name = new string[textures.Children.Count];
                 resource.texture = new string[textures.Children.Count];
@@ -43,11 +44,10 @@ namespace CETech
                 foreach (var texture in textures.Children)
                 {
                     resource.unforms_name[idx] = ((YamlScalarNode) texture.Key).Value;
-                    resource.texture[idx] = ((YamlScalarNode)texture.Value).Value;
+                    resource.texture[idx] = ((YamlScalarNode) texture.Value).Value;
 
                     ++idx;
                 }
-
             }
             else
             {
@@ -72,7 +72,12 @@ namespace CETech
             var serializer = MessagePackSerializer.Get<Resource>();
             var resource = serializer.Unpack(input);
 
-            var mat_inst = new MaterialInstance { resource = resource, texture_uniform = new Uniform[resource.texture.Length], texture_resource = new TextureResource.Resource[resource.texture.Length] };
+            var mat_inst = new MaterialInstance
+            {
+                resource = resource,
+                texture_uniform = new Uniform[resource.texture.Length],
+                texture_resource = new TextureResource.Resource[resource.texture.Length]
+            };
 
             return mat_inst;
         }
@@ -99,7 +104,8 @@ namespace CETech
             foreach (var uniform_name in resource.resource.texture)
             {
                 resource.texture_uniform[idx] = new Uniform(uniform_name, UniformType.Int1);
-                resource.texture_resource[idx] = ResourceManager.Get<TextureResource.Resource>(TextureResource.Type, StringId.FromString(uniform_name));
+                resource.texture_resource[idx] = ResourceManager.Get<TextureResource.Resource>(TextureResource.Type,
+                    StringId.FromString(uniform_name));
                 ++idx;
             }
         }
@@ -110,6 +116,34 @@ namespace CETech
         /// <param name="data">data</param>
         public static void ResourceUnloader(object data)
         {
+        }
+
+        public static object ResourceReloader(long name, object new_data)
+        {
+            // TODO: !!!
+
+            var old = ResourceManager.Get<MaterialInstance>(Type, name);
+            var resource = (MaterialInstance) new_data;
+            old.resource = resource.resource;
+            old.instance = ResourceManager.Get<ShaderResource.ShaderInstance>(ShaderResource.Type,
+                resource.resource.shader_name);
+
+            old.texture_uniform = resource.texture_uniform;
+            old.texture_resource = resource.texture_resource;
+
+            if (resource.resource.texture.Length > 0)
+            {
+                var idx = 0;
+                foreach (var uniform_name in resource.resource.texture)
+                {
+                    old.texture_uniform[idx] = new Uniform(uniform_name, UniformType.Int1);
+                    old.texture_resource[idx] = ResourceManager.Get<TextureResource.Resource>(TextureResource.Type,
+                        StringId.FromString(uniform_name));
+                    ++idx;
+                }
+            }
+
+            return old;
         }
 
         public struct Resource
@@ -123,37 +157,8 @@ namespace CETech
         {
             public ShaderResource.ShaderInstance instance;
             public Resource resource;
-            public Uniform[] texture_uniform;
             public TextureResource.Resource[] texture_resource;
-        }
-
-        public static object ResourceReloader(long name, object new_data)
-        {
-            // TODO: !!!
-
-            var old = ResourceManager.Get<MaterialInstance>(Type, name);
-            var resource = (MaterialInstance)new_data;
-            old.resource = resource.resource;
-            old.instance = ResourceManager.Get<ShaderResource.ShaderInstance>(ShaderResource.Type,
-                resource.resource.shader_name);
-
-            old.texture_uniform = resource.texture_uniform;
-            old.texture_resource = resource.texture_resource;
-
-            if (resource.resource.texture.Length > 0)
-            {
-                var idx = 0;
-                foreach (var uniform_name in resource.resource.texture)
-                {
-
-                    old.texture_uniform[idx] = new Uniform(uniform_name, UniformType.Int1);
-                    old.texture_resource[idx] = ResourceManager.Get<TextureResource.Resource>(TextureResource.Type,
-                        StringId.FromString(uniform_name));
-                    ++idx;
-                }
-            }
-
-            return old;
+            public Uniform[] texture_uniform;
         }
     }
 }

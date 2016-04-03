@@ -59,6 +59,11 @@ namespace CETech
         {
         }
 
+        public static object Reloader(long name, object new_data)
+        {
+            return new_data;
+        }
+
         public struct Resource
         {
             public byte[] vs_file;
@@ -153,10 +158,5 @@ namespace CETech
             capi.add_dependency(fs_input);
         }
 #endif
-
-        public static object Reloader(long name, object new_data)
-        {
-            return new_data;
-        }
     }
 }

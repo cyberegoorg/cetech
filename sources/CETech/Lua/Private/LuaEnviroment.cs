@@ -69,21 +69,6 @@ namespace CETech.Lua
             }
         }
 
-        [MoonSharpUserData]
-        internal class Vector3fApi
-        {
-            public static readonly Vector3f Zero = new Vector3f();
-            public static readonly Vector3f UnitX = new Vector3f(1.0f, 0.0f, 0.0f);
-            public static readonly Vector3f UnitY = new Vector3f(0.0f, 1.0f, 0.0f);
-            public static readonly Vector3f UnitZ = new Vector3f(0.0f, 0.0f, 1.0f);
-            public static readonly Vector3f Unit = new Vector3f(1.0f, 1.0f, 1.0f);
-
-            public static Vector3f make(float x, float y, float z)
-            {
-                return new Vector3f(x, y, z);
-            }
-        }
-
         private static void InitImpl()
         {
             _enviromentScript = new Script();
@@ -152,6 +137,26 @@ namespace CETech.Lua
             _enviromentScript.Call(_renderFce);
         }
 
+        private static void DoStreamImpl(Stream stream)
+        {
+            _enviromentScript.DoStream(stream);
+        }
+
+        [MoonSharpUserData]
+        internal class Vector3fApi
+        {
+            public static readonly Vector3f Zero = new Vector3f();
+            public static readonly Vector3f UnitX = new Vector3f(1.0f, 0.0f, 0.0f);
+            public static readonly Vector3f UnitY = new Vector3f(0.0f, 1.0f, 0.0f);
+            public static readonly Vector3f UnitZ = new Vector3f(0.0f, 0.0f, 1.0f);
+            public static readonly Vector3f Unit = new Vector3f(1.0f, 1.0f, 1.0f);
+
+            public static Vector3f make(float x, float y, float z)
+            {
+                return new Vector3f(x, y, z);
+            }
+        }
+
         private class ScriptLoader : ScriptLoaderBase
         {
             public override object LoadFile(string file, Table globalContext)
@@ -165,11 +170,6 @@ namespace CETech.Lua
                 long[] names = {StringId.FromString(name)};
                 return ResourceManager.CanGet(LuaResource.Type, names);
             }
-        }
-
-        private static void DoStreamImpl(Stream stream)
-        {
-            _enviromentScript.DoStream(stream);
         }
     }
 }

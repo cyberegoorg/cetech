@@ -29,7 +29,7 @@ namespace CETech.World
 
         public static Vector3f Normalize(Vector3f value)
         {
-            var length = 1.0f / (float) Math.Sqrt(value.X*value.X + value.Y*value.Y + value.Z*value.Z);
+            var length = 1.0f/(float) Math.Sqrt(value.X*value.X + value.Y*value.Y + value.Z*value.Z);
             return new Vector3f(value.X*length, value.Y*length, value.Z*length);
         }
 

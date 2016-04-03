@@ -82,10 +82,8 @@ namespace CETech.World
 
 
         {
-
             foreach (var f in _world_ent_idx[world])
             {
-
                 var idx = 0;
                 var textures = _world_ent_material[world][f.Key].texture_resource;
                 foreach (var un in _world_ent_material[world][f.Key].texture_uniform)
@@ -112,12 +110,12 @@ namespace CETech.World
 
         public struct PosNormalTexcoordVertex
         {
-            float x;
-            float y;
-            float z;
-            uint normal;
-            float u;
-            float v;
+            private float x;
+            private float y;
+            private float z;
+            private uint normal;
+            private float u;
+            private float v;
 
             public PosNormalTexcoordVertex(float x, float y, float z, uint normal, float u, float v)
             {
@@ -141,28 +139,27 @@ namespace CETech.World
         {
             private static readonly ushort[] indices =
             {
-                0,  1,  2,
-                1,  3,  2,
-                4,  6,  5,
-                5,  6,  7,
-
-                8,  9, 10,
+                0, 1, 2,
+                1, 3, 2,
+                4, 6, 5,
+                5, 6, 7,
+                8, 9, 10,
                 9, 11, 10,
                 12, 14, 13,
                 13, 14, 15,
-
                 16, 17, 18,
                 17, 19, 18,
                 20, 22, 21,
-                21, 22, 23,
+                21, 22, 23
             };
 
-            static uint PackF4u(float x, float y, float z)
+            private static uint PackF4u(float x, float y, float z)
             {
-                var bytes = new byte[] {
-                    (byte)(x * 127.0f + 128.0f),
-                    (byte)(y * 127.0f + 128.0f),
-                    (byte)(z * 127.0f + 128.0f),
+                var bytes = new byte[]
+                {
+                    (byte) (x*127.0f + 128.0f),
+                    (byte) (y*127.0f + 128.0f),
+                    (byte) (z*127.0f + 128.0f),
                     128
                 };
 
@@ -173,36 +170,36 @@ namespace CETech.World
             {
                 PosNormalTexcoordVertex[] vertices =
                 {
-                    new PosNormalTexcoordVertex(-size,  size,  size, PackF4u( 0.0f,  1.0f,  0.0f), 1.0f, 1.0f),
-                    new PosNormalTexcoordVertex( size,  size,  size, PackF4u( 0.0f,  1.0f,  0.0f), 0.0f, 1.0f),
-                    new PosNormalTexcoordVertex(-size,  size, -size, PackF4u( 0.0f,  1.0f,  0.0f), 1.0f, 0.0f),
-                    new PosNormalTexcoordVertex( size,  size, -size, PackF4u( 0.0f,  1.0f,  0.0f), 0.0f, 0.0f),
-                    new PosNormalTexcoordVertex(-size, -size,  size, PackF4u( 0.0f, -1.0f,  0.0f), 1.0f, 1.0f),
-                    new PosNormalTexcoordVertex( size, -size,  size, PackF4u( 0.0f, -1.0f,  0.0f), 0.0f, 1.0f),
-                    new PosNormalTexcoordVertex(-size, -size, -size, PackF4u( 0.0f, -1.0f,  0.0f), 1.0f, 0.0f),
-                    new PosNormalTexcoordVertex( size, -size, -size, PackF4u( 0.0f, -1.0f,  0.0f), 0.0f, 0.0f),
-                    new PosNormalTexcoordVertex( size, -size,  size, PackF4u( 0.0f,  0.0f,  1.0f), 0.0f, 0.0f),
-                    new PosNormalTexcoordVertex( size,  size,  size, PackF4u( 0.0f,  0.0f,  1.0f), 0.0f, 1.0f),
-                    new PosNormalTexcoordVertex(-size, -size,  size, PackF4u( 0.0f,  0.0f,  1.0f), 1.0f, 0.0f),
-                    new PosNormalTexcoordVertex(-size,  size,  size, PackF4u( 0.0f,  0.0f,  1.0f), 1.0f, 1.0f),
-                    new PosNormalTexcoordVertex( size, -size, -size, PackF4u( 0.0f,  0.0f, -1.0f), 0.0f, 0.0f),
-                    new PosNormalTexcoordVertex( size,  size, -size, PackF4u( 0.0f,  0.0f, -1.0f), 0.0f, 1.0f),
-                    new PosNormalTexcoordVertex(-size, -size, -size, PackF4u( 0.0f,  0.0f, -1.0f), 1.0f, 0.0f),
-                    new PosNormalTexcoordVertex(-size,  size, -size, PackF4u( 0.0f,  0.0f, -1.0f), 1.0f, 1.0f),
-                    new PosNormalTexcoordVertex( size,  size, -size, PackF4u( 1.0f,  0.0f,  0.0f), 1.0f, 1.0f),
-                    new PosNormalTexcoordVertex( size,  size,  size, PackF4u( 1.0f,  0.0f,  0.0f), 0.0f, 1.0f),
-                    new PosNormalTexcoordVertex( size, -size, -size, PackF4u( 1.0f,  0.0f,  0.0f), 1.0f, 0.0f),
-                    new PosNormalTexcoordVertex( size, -size,  size, PackF4u( 1.0f,  0.0f,  0.0f), 0.0f, 0.0f),
-                    new PosNormalTexcoordVertex(-size,  size, -size, PackF4u(-1.0f,  0.0f,  0.0f), 1.0f, 1.0f),
-                    new PosNormalTexcoordVertex(-size,  size,  size, PackF4u(-1.0f,  0.0f,  0.0f), 0.0f, 1.0f),
-                    new PosNormalTexcoordVertex(-size, -size, -size, PackF4u(-1.0f,  0.0f,  0.0f), 1.0f, 0.0f),
-                    new PosNormalTexcoordVertex(-size, -size,  size, PackF4u(-1.0f,  0.0f,  0.0f), 0.0f, 0.0f)
+                    new PosNormalTexcoordVertex(-size, size, size, PackF4u(0.0f, 1.0f, 0.0f), 1.0f, 1.0f),
+                    new PosNormalTexcoordVertex(size, size, size, PackF4u(0.0f, 1.0f, 0.0f), 0.0f, 1.0f),
+                    new PosNormalTexcoordVertex(-size, size, -size, PackF4u(0.0f, 1.0f, 0.0f), 1.0f, 0.0f),
+                    new PosNormalTexcoordVertex(size, size, -size, PackF4u(0.0f, 1.0f, 0.0f), 0.0f, 0.0f),
+                    new PosNormalTexcoordVertex(-size, -size, size, PackF4u(0.0f, -1.0f, 0.0f), 1.0f, 1.0f),
+                    new PosNormalTexcoordVertex(size, -size, size, PackF4u(0.0f, -1.0f, 0.0f), 0.0f, 1.0f),
+                    new PosNormalTexcoordVertex(-size, -size, -size, PackF4u(0.0f, -1.0f, 0.0f), 1.0f, 0.0f),
+                    new PosNormalTexcoordVertex(size, -size, -size, PackF4u(0.0f, -1.0f, 0.0f), 0.0f, 0.0f),
+                    new PosNormalTexcoordVertex(size, -size, size, PackF4u(0.0f, 0.0f, 1.0f), 0.0f, 0.0f),
+                    new PosNormalTexcoordVertex(size, size, size, PackF4u(0.0f, 0.0f, 1.0f), 0.0f, 1.0f),
+                    new PosNormalTexcoordVertex(-size, -size, size, PackF4u(0.0f, 0.0f, 1.0f), 1.0f, 0.0f),
+                    new PosNormalTexcoordVertex(-size, size, size, PackF4u(0.0f, 0.0f, 1.0f), 1.0f, 1.0f),
+                    new PosNormalTexcoordVertex(size, -size, -size, PackF4u(0.0f, 0.0f, -1.0f), 0.0f, 0.0f),
+                    new PosNormalTexcoordVertex(size, size, -size, PackF4u(0.0f, 0.0f, -1.0f), 0.0f, 1.0f),
+                    new PosNormalTexcoordVertex(-size, -size, -size, PackF4u(0.0f, 0.0f, -1.0f), 1.0f, 0.0f),
+                    new PosNormalTexcoordVertex(-size, size, -size, PackF4u(0.0f, 0.0f, -1.0f), 1.0f, 1.0f),
+                    new PosNormalTexcoordVertex(size, size, -size, PackF4u(1.0f, 0.0f, 0.0f), 1.0f, 1.0f),
+                    new PosNormalTexcoordVertex(size, size, size, PackF4u(1.0f, 0.0f, 0.0f), 0.0f, 1.0f),
+                    new PosNormalTexcoordVertex(size, -size, -size, PackF4u(1.0f, 0.0f, 0.0f), 1.0f, 0.0f),
+                    new PosNormalTexcoordVertex(size, -size, size, PackF4u(1.0f, 0.0f, 0.0f), 0.0f, 0.0f),
+                    new PosNormalTexcoordVertex(-size, size, -size, PackF4u(-1.0f, 0.0f, 0.0f), 1.0f, 1.0f),
+                    new PosNormalTexcoordVertex(-size, size, size, PackF4u(-1.0f, 0.0f, 0.0f), 0.0f, 1.0f),
+                    new PosNormalTexcoordVertex(-size, -size, -size, PackF4u(-1.0f, 0.0f, 0.0f), 1.0f, 0.0f),
+                    new PosNormalTexcoordVertex(-size, -size, size, PackF4u(-1.0f, 0.0f, 0.0f), 0.0f, 0.0f)
                 };
 
                 return new VertexBuffer(MemoryBlock.FromArray(vertices), PosNormalTexcoordVertex.Layout);
             }
 
-            public static IndexBuffer CreateIndexBuffer()   
+            public static IndexBuffer CreateIndexBuffer()
             {
                 return new IndexBuffer(MemoryBlock.FromArray(indices));
             }

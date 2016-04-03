@@ -2,6 +2,7 @@
 using SDL2;
 
 // ReSharper disable once CheckNamespace
+
 namespace CETech.Input
 {
     public static partial class Mouse
@@ -29,8 +30,6 @@ namespace CETech.Input
 
             _position.X = _posX;
             _position.Y = _posY;
-
-
         }
 
         private static int ButtonIndexImpl(string buttonName)

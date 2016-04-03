@@ -71,7 +71,7 @@ namespace CETech.Lua
 
         public static object Reloader(long name, object new_data)
         {
-            var ms = new MemoryStream((byte[])new_data);
+            var ms = new MemoryStream((byte[]) new_data);
             LuaEnviroment.DoStream(ms);
             return new_data;
         }

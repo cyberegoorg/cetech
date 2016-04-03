@@ -211,7 +211,6 @@ namespace CETech
                 {
                     ReloadAll(StringId.FromString(types[i].AsString()));
                 }
-
             });
         }
 

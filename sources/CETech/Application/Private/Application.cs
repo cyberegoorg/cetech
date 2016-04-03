@@ -393,7 +393,7 @@ namespace CETech
             InitResouce();
 
             ResourceManager.Init();
-            ResourceManager.LoadNow(ConfigResource.Type, new[] { StringId.FromString("global") });
+            ResourceManager.LoadNow(ConfigResource.Type, new[] {StringId.FromString("global")});
 
 #if CETECH_DEVELOP
             if (DevelopFlags.compile && !DevelopFlags.ccontinue)

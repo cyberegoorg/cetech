@@ -211,13 +211,32 @@ namespace CETech.World
             Transform(world, getIdx(world, entity), parent);
         }
 
+        private static void LinkImpl(int world, int parent, int child)
+        {
+            var world_instance = _worldInstance[world];
+
+            var parent_idx = getIdx(world, parent);
+            var child_idx = getIdx(world, child);
+
+            world_instance.Parent[child_idx] = parent_idx;
+
+            var tmp = world_instance.FirstChild[parent_idx];
+
+            world_instance.FirstChild[parent_idx] = child_idx;
+            world_instance.NextSibling[child_idx] = tmp;
+
+            var p = parent_idx != int.MaxValue ? world_instance.World[parent_idx] : Matrix4f.Identity;
+            Transform(world, parent_idx, p); // TODO:
+            Transform(world, child_idx, GetWorldMatrix(world, parent));
+        }
+
         private class WorldInstance
         {
             public readonly Dictionary<int, int> EntIdx;
-
-            public readonly List<int> Parent;
             public readonly List<int> FirstChild;
             public readonly List<int> NextSibling;
+
+            public readonly List<int> Parent;
 
 
             public readonly List<Vector3f> Position;
@@ -237,25 +256,6 @@ namespace CETech.World
                 FirstChild = new List<int>();
                 World = new List<Matrix4f>();
             }
-        }
-
-        private static void LinkImpl(int world, int parent, int child)
-        {
-            var world_instance = _worldInstance[world];
-
-            var parent_idx = getIdx(world, parent);
-            var child_idx = getIdx(world, child);
-
-            world_instance.Parent[child_idx] = parent_idx;
-
-            var tmp = world_instance.FirstChild[parent_idx];
-
-            world_instance.FirstChild[parent_idx] = child_idx;
-            world_instance.NextSibling[child_idx] = tmp;
-
-            var p = parent_idx != int.MaxValue ? world_instance.World[parent_idx] : Matrix4f.Identity;
-            Transform(world, parent_idx, p); // TODO:
-            Transform(world, child_idx, GetWorldMatrix(world, parent));
         }
     }
 }

@@ -23,12 +23,12 @@ namespace CETech.World
 
         public float LengthSquared()
         {
-            return X*X + Y*Y + Z*Z + W * W;
+            return X*X + Y*Y + Z*Z + W*W;
         }
 
         public static Vector4f Normalize(Vector4f value)
         {
-            var length = 1.0f / (float) Math.Sqrt(value.X*value.X + value.Y*value.Y + value.Z*value.Z + value.W * value.W);
+            var length = 1.0f/(float) Math.Sqrt(value.X*value.X + value.Y*value.Y + value.Z*value.Z + value.W*value.W);
             return new Vector4f(value.X*length, value.Y*length, value.Z*length, value.W*length);
         }
 
@@ -37,7 +37,7 @@ namespace CETech.World
             return vector1.X*vector2.X +
                    vector1.Y*vector2.Y +
                    vector1.Z*vector2.Z +
-                   vector1.W * vector2.W;
+                   vector1.W*vector2.W;
         }
 
         public static Vector4f operator -(Vector4f left, Vector4f right)
@@ -52,12 +52,12 @@ namespace CETech.World
 
         public static Vector4f operator *(Vector4f left, Vector4f right)
         {
-            return new Vector4f(left.X*right.X, left.Y*right.Y, left.Z*right.Z, left.W * right.W);
+            return new Vector4f(left.X*right.X, left.Y*right.Y, left.Z*right.Z, left.W*right.W);
         }
 
         public static Vector4f operator *(Vector4f left, float right)
         {
-            return new Vector4f(left.X*right, left.Y*right, left.Z*right, left.W * right);
+            return new Vector4f(left.X*right, left.Y*right, left.Z*right, left.W*right);
         }
     }
 }
