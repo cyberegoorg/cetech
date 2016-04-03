@@ -28,7 +28,7 @@ namespace CETech
             using (var ms = new MemoryStream())
             {
                 input.CopyTo(ms);
-                return new Resource() {data = ms.ToArray()};
+                return new Resource {data = ms.ToArray()};
             }
         }
 
@@ -102,7 +102,7 @@ namespace CETech
 
             var deserializer = new Deserializer(namingConvention: new CamelCaseNamingConvention());
             var texture_yaml = deserializer.Deserialize<TextureYaml>(input);
-    
+
             var input_img = FileSystem.GetFullPath("src", texture_yaml.input);
             var output_img = Path.Combine(build_dir, "tmp", Path.GetFileName(texture_yaml.input) + ".ktx");
 
@@ -113,7 +113,8 @@ namespace CETech
             using (var output_stream = new FileStream(output_img, FileMode.Open))
             {
                 output_stream.CopyTo(capi.BuildFile);
-            };            
+            }
+            ;
         }
 
         private static void texturec(string inputImg, string outputImg, bool gen_mipmaps, bool is_normalmap)

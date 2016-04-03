@@ -25,13 +25,13 @@ namespace CETech
         /// <param name="data">Resource data</param>
         public delegate void ResourceOnline(object data);
 
+        public delegate object ResourceReloader(long name, object new_data);
+
         /// <summary>
         ///     Resource unloader delegate.
         /// </summary>
         /// <param name="data">Resource data</param>
         public delegate void ResourceUnloader(object data);
-
-        public delegate object ResourceReloader(long name, object new_data);
 
         /// <summary>
         ///     Auto load

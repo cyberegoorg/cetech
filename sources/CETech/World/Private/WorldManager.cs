@@ -6,13 +6,8 @@ namespace CETech.World
     {
         private static HandlerID _handlers;
 
-        private static Dictionary<long, List<Levelnstance>> _levelnstances = new Dictionary<long,List<Levelnstance>>();
-
-        private class Levelnstance
-        {
-            public int unit;
-            public readonly Dictionary<long, int> units = new Dictionary<long, int>();
-        }
+        private static readonly Dictionary<long, List<Levelnstance>> _levelnstances =
+            new Dictionary<long, List<Levelnstance>>();
 
         public static void InitImpl()
         {
@@ -81,6 +76,12 @@ namespace CETech.World
         private static int LevelUnitImpl(int world, int level)
         {
             return _levelnstances[world][level].unit;
+        }
+
+        private class Levelnstance
+        {
+            public readonly Dictionary<long, int> units = new Dictionary<long, int>();
+            public int unit;
         }
     }
 }

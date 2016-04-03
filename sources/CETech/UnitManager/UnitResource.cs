@@ -49,6 +49,11 @@ namespace CETech.World
         {
         }
 
+        public static object Reloader(long name, object new_data)
+        {
+            return new_data;
+        }
+
         public class CompiledResource
         {
             public int ent_count { get; set; }
@@ -69,7 +74,7 @@ namespace CETech.World
 
             var componentsNode = rootNode.Children[new YamlScalarNode("components")] as YamlSequenceNode;
 
-            for (int i = 0; i < componentsNode.Children.Count; i++)
+            for (var i = 0; i < componentsNode.Children.Count; i++)
             {
                 var component = componentsNode.Children[i];
 
@@ -100,16 +105,16 @@ namespace CETech.World
 
                 var childrenNode = rootNode.Children[new YamlScalarNode("children")] as YamlSequenceNode;
 
-                for (int i = 0; i < childrenNode.Children.Count; i++)
+                for (var i = 0; i < childrenNode.Children.Count; i++)
                 {
                     entities_id += 1;
-                    compile_entitity(childrenNode.Children[i] as YamlMappingNode, ref entities_id, parent_ent, ents_parent,
+                    compile_entitity(childrenNode.Children[i] as YamlMappingNode, ref entities_id, parent_ent,
+                        ents_parent,
                         components_type, component_ent,
                         components_body);
                 }
             }
         }
-
 
 
         public static void Compile(YamlMappingNode root, ConsoleServer.ResponsePacker packer)
@@ -172,7 +177,6 @@ namespace CETech.World
                     ComponentSystem.Compile(comp_type, comp_body[j], packer);
                 }
             }
-
         }
 
         /// <summary>
@@ -193,10 +197,5 @@ namespace CETech.World
             packer.GetMemoryStream().WriteTo(capi.BuildFile);
         }
 #endif
-
-        public static object Reloader(long name, object new_data)
-        {
-            return new_data;
-        }
     }
 }

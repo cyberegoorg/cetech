@@ -80,7 +80,7 @@ namespace CETech
         {
             if (_data.NeedResize)
             {
-                Bgfx.Reset(_data.ResizeW, _data.ResizeH, Capture ? ResetFlags.Capture : 0 );
+                Bgfx.Reset(_data.ResizeW, _data.ResizeH, Capture ? ResetFlags.Capture : 0);
                 _data.NeedResize = false;
             }
 
@@ -126,6 +126,35 @@ namespace CETech
             EndFrameImpl();
         }
 
+        private static void SetDebugImpl(bool enabled)
+        {
+            if (enabled)
+            {
+                Bgfx.SetDebugFeatures(DebugFeatures.DisplayStatistics | DebugFeatures.DisplayText);
+            }
+            else
+            {
+                Bgfx.SetDebugFeatures(DebugFeatures.None);
+            }
+        }
+
+        private static void SaveScreenShotImpl(string filename)
+        {
+            Bgfx.SaveScreenShot(filename);
+        }
+
+        private static void BeginCaptureImpl()
+        {
+            Capture = true;
+            _data.NeedResize = true;
+        }
+
+        private static void EndCaptureImpl()
+        {
+            Capture = false;
+            _data.NeedResize = true;
+        }
+
 
         private struct Data
         {
@@ -136,7 +165,7 @@ namespace CETech
 
         private class CallbackHandler : ICallbackHandler
         {
-            AviWriter _aviWriter;
+            private AviWriter _aviWriter;
 
             public void ReportError(ErrorType errorType, string message)
             {
@@ -176,27 +205,27 @@ namespace CETech
                 {
                     // write header
                     var header = new byte[18];
-                    header[2] = 2;      // uncompressed RGB
-                    header[12] = (byte)width;
-                    header[13] = (byte)(width >> 8);
-                    header[14] = (byte)height;
-                    header[15] = (byte)(height >> 8);
-                    header[16] = 32;    // bpp
-                    header[17] = 32;    // origin upper-left
+                    header[2] = 2; // uncompressed RGB
+                    header[12] = (byte) width;
+                    header[13] = (byte) (width >> 8);
+                    header[14] = (byte) height;
+                    header[15] = (byte) (height >> 8);
+                    header[16] = 32; // bpp
+                    header[17] = 32; // origin upper-left
                     writer.Write(header);
 
-                    var destPitch = width * 4;
+                    var destPitch = width*4;
                     var srcPitch = pitch;
                     var dataPtr = data;
                     if (flipVertical)
                     {
-                        dataPtr += srcPitch * (height - 1);
+                        dataPtr += srcPitch*(height - 1);
                         srcPitch = -srcPitch;
                     }
 
                     // write image data
                     var buffer = new byte[destPitch];
-                    for (int y = 0; y < height; y++)
+                    for (var y = 0; y < height; y++)
                     {
                         Marshal.Copy(dataPtr, buffer, 0, destPitch);
                         writer.Write(buffer);
@@ -208,7 +237,7 @@ namespace CETech
             public void CaptureStarted(int width, int height, int pitch, TextureFormat format, bool flipVertical)
             {
                 Log.Info("renderer.bgfx", "Capture to avi begin.");
-                _aviWriter = new AviWriter(File.Create("capture.avi", pitch * height), width, height, 30, !flipVertical);
+                _aviWriter = new AviWriter(File.Create("capture.avi", pitch*height), width, height, 30, !flipVertical);
             }
 
             public void CaptureFinished()
@@ -222,35 +251,6 @@ namespace CETech
             {
                 _aviWriter.WriteFrame(data, size);
             }
-        }
-
-        private static void SetDebugImpl(bool enabled)
-        {
-            if (enabled)
-            {
-                Bgfx.SetDebugFeatures(DebugFeatures.DisplayStatistics | DebugFeatures.DisplayText);
-            }
-            else
-            {
-                Bgfx.SetDebugFeatures(DebugFeatures.None);
-            }
-        }
-
-        private static void SaveScreenShotImpl(string filename)
-        {
-            Bgfx.SaveScreenShot(filename);
-        }
-
-        private static void BeginCaptureImpl()
-        {
-            Capture = true;
-            _data.NeedResize = true;
-        }
-
-        private static void EndCaptureImpl()
-        {
-            Capture = false;
-            _data.NeedResize = true;
         }
     }
 }

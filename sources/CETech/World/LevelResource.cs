@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.IO;
 using CETech.Develop;
-using MsgPack;
 using MsgPack.Serialization;
 using YamlDotNet.RepresentationModel;
 
@@ -48,12 +47,6 @@ namespace CETech.World
         {
         }
 
-        public class CompiledResource
-        {
-            public UnitResource.CompiledResource[] units { get; set; }
-            public long[] units_name { get; set; }
-        }
-
 #if CETECH_DEVELOP
         /// <summary>
         ///     Resource compiler
@@ -77,7 +70,7 @@ namespace CETech.World
 
             packer.PackArrayHeader(unitsNode.Children.Count);
 
-            for (int i = 0; i < unitsNode.Children.Count; i++)
+            for (var i = 0; i < unitsNode.Children.Count; i++)
             {
                 var unit_def = unitsNode.Children[i] as YamlMappingNode;
                 var name = unit_def.Children[new YamlScalarNode("name")] as YamlScalarNode;
@@ -89,7 +82,7 @@ namespace CETech.World
 
             packer.Pack("units_name");
             packer.PackArrayHeader(units_names.Count);
-            for (int i = 0; i < units_names.Count; i++)
+            for (var i = 0; i < units_names.Count; i++)
             {
                 packer.Pack(units_names[i]);
             }
@@ -101,6 +94,12 @@ namespace CETech.World
         public static object ResourceReloader(long name, object new_data)
         {
             return new_data;
+        }
+
+        public class CompiledResource
+        {
+            public UnitResource.CompiledResource[] units { get; set; }
+            public long[] units_name { get; set; }
         }
     }
 }

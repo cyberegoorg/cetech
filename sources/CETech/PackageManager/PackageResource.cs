@@ -118,25 +118,25 @@ namespace CETech
         {
         }
 
+        public static object Reloader(long name, object new_data)
+        {
+            return new_data;
+        }
+
         /// <summary>
         ///     Package resouce format
         /// </summary>
         public class Resource
         {
             /// <summary>
-            ///     Types
-            /// </summary>
-            public long[] Type;
-
-            /// <summary>
             ///     [type][name, name, ...]
             /// </summary>
             public long[][] Names;
-        }
 
-        public static object Reloader(long name, object new_data)
-        {
-            return new_data;
+            /// <summary>
+            ///     Types
+            /// </summary>
+            public long[] Type;
         }
     }
 }
