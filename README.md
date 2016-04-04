@@ -37,7 +37,7 @@ CETech is Data-Driven game engine and toolbox inspired by [Bitsquid](http://bits
 
 ## Build
 
-* [Linux](https://cyberegoorg.github.io/cetech/engine/buil#linux)
+* [Linux](https://cyberegoorg.github.io/cetech/engine/build#linux)
 * [Windows](https://cyberegoorg.github.io/cetech/engine/build#windows)
 
 ## [License](http://creativecommons.org/publicdomain/zero/1.0/)
