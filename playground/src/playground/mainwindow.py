@@ -1,7 +1,6 @@
 import argparse
+import os
 import platform
-
-import time
 
 import msgpack
 import nanomsg
@@ -154,7 +153,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         if platform.system().lower() != 'darwin':
             self.ogl_dock.show()
 
-        self.project.run_cetech_develop(compile_=True, continue_=True, wid=wid, bootscript="playground\\boot")
+        self.project.run_cetech_develop(compile_=True, continue_=True, wid=wid,
+                                        bootscript=os.path.join("playground", "boot"))
 
         # self.api.wait()
 

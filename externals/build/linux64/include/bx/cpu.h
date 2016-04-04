@@ -19,9 +19,6 @@
 #		include <intrin.h>
 #		include <windows.h>
 #	endif // !BX_PLATFORM_XBOX360
-#	if BX_PLATFORM_WINRT
-#		define _InterlockedExchangeAdd64 InterlockedExchangeAdd64
-#	endif // BX_PLATFORM_WINRT
 extern "C" void _ReadBarrier();
 extern "C" void _WriteBarrier();
 extern "C" void _ReadWriteBarrier();

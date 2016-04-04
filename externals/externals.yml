@@ -35,6 +35,8 @@ bgfx:
     linux64:
       - copyfile: [.build/linux64_gcc/bin/libbgfx-shared-libRelease.so, Release/lib/bgfx.so]
       - copyfile: [.build/linux64_gcc/bin/libbgfx-shared-libDebug.so, Debug/lib/bgfx_debug.so]
+      - copyfile: [.build/linux64_gcc/bin/shadercRelease, Release/bin/shaderc]
+      - copyfile: [.build/linux64_gcc/bin/texturecRelease, Release/bin/texturec]
 
     darwin64:
       - copyfile: [.build/osx64_clang/bin/libbgfxRelease.a, lib]
@@ -156,7 +158,7 @@ sdl2:
 
   build:
     configure: &sdl2_build_configure
-      - ./configure
+      - ./configure --disable-video-wayland
       - make
 
     configure_darwin: &sdl2_build_configure_darwin
@@ -250,8 +252,9 @@ nspec:
       - devenv NSpec.sln /build Release
 
     linux64:
+      - sed /nuget/d NSpec/NSpec.csproj -i
+      - nuget restore NSpec.sln
       - xbuild /p:Configuration=Release NSpec/NSpec.csproj
-      - xbuild /p:Configuration=Release NSpecRunner/NSpecRunner.csproj
 
   install:
      windows64:
@@ -260,4 +263,3 @@ nspec:
 
      linux64:
       - copytree: [NSpec/bin/Release, Release/lib]
-      - copytree: [NSpecRunner/bin/Release, Release/bin]

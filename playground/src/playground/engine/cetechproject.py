@@ -1,7 +1,6 @@
 import os
 import platform
 
-import time
 from PyQt5.QtCore import QDir, QProcess, QProcessEnvironment
 from PyQt5.QtWidgets import QFileDialog, QMessageBox
 
@@ -152,7 +151,10 @@ class CetechProject(object):
         self._run_cetech(self.BUILD_DEVELOP, args)
 
     def _run_cetech(self, build_type, args):
-        cmd = "%s %s" % (self.get_executable_path(build_type), ' '.join(args))
+        if platform.system().lower() != 'windows':
+            cmd = "mono %s %s" % (self.get_executable_path(build_type), ' '.join(args))
+        else:
+            cmd = "%s %s" % (self.get_executable_path(build_type), ' '.join(args))
 
         process = QProcess()
 

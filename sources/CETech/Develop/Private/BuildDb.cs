@@ -88,7 +88,7 @@ namespace CETech.Develop.Private
                         cmd.CommandText = @"INSERT OR REPLACE INTO files VALUES(NULL, @filename, @mtime);";
 
                         cmd.Parameters.AddWithValue("@filename", filename);
-                        cmd.Parameters.AddWithValue("@mtime", mtime);
+						cmd.Parameters.AddWithValue("@mtime", mtime.ToFileTimeUtc());
                         cmd.ExecuteNonQuery();
                     }
                     transaction.Commit();
@@ -189,8 +189,8 @@ namespace CETech.Develop.Private
                             {
                                 compile = false;
 
-                                var actual_mtime = FileSystem.GetFileMTime(root, rdr.GetString(0));
-                                var last_mtime = rdr.GetDateTime(1).ToUniversalTime();
+								var actual_mtime = FileSystem.GetFileMTime(root, rdr.GetString(0)).ToFileTimeUtc();
+								var last_mtime = rdr.GetDateTime(1).ToFileTimeUtc();
 
                                 if (actual_mtime != last_mtime)
                                 {

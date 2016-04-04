@@ -29,19 +29,9 @@ namespace bx
 		return _rad * 180.0f / pi;
 	}
 
-	inline float ffloor(float _f)
-	{
-		return floorf(_f);
-	}
-
-	inline float fceil(float _f)
-	{
-		return ceilf(_f);
-	}
-
 	inline float fround(float _f)
 	{
-		return ffloor(_f + 0.5f);
+		return floorf(_f + 0.5f);
 	}
 
 	inline float fmin(float _a, float _b)
@@ -149,11 +139,6 @@ namespace bx
 		return _a - floorf(_a);
 	}
 
-	inline float fmod(float _a, float _b)
-	{
-		return fmodf(_a, _b);
-	}
-
 	inline bool fequal(float _a, float _b, float _epsilon)
 	{
 		// http://realtimecollisiondetection.net/blog/?p=89
@@ -174,7 +159,7 @@ namespace bx
 
 	inline float fwrap(float _a, float _wrap)
 	{
-		const float mod    = fmod(_a, _wrap);
+		const float mod    = fmodf(_a, _wrap);
 		const float result = mod < 0.0f ? _wrap + mod : mod;
 		return result;
 	}
@@ -427,8 +412,8 @@ namespace bx
 	inline void quatRotateAxis(float* __restrict _result, const float* _axis, float _angle)
 	{
 		const float ha = _angle * 0.5f;
-		const float ca = fcos(ha);
-		const float sa = fsin(ha);
+		const float ca = cosf(ha);
+		const float sa = sinf(ha);
 		_result[0] = _axis[0] * sa;
 		_result[1] = _axis[1] * sa;
 		_result[2] = _axis[2] * sa;
@@ -438,8 +423,8 @@ namespace bx
 	inline void quatRotateX(float* _result, float _ax)
 	{
 		const float hx = _ax * 0.5f;
-		const float cx = fcos(hx);
-		const float sx = fsin(hx);
+		const float cx = cosf(hx);
+		const float sx = sinf(hx);
 		_result[0] = sx;
 		_result[1] = 0.0f;
 		_result[2] = 0.0f;
@@ -449,8 +434,8 @@ namespace bx
 	inline void quatRotateY(float* _result, float _ay)
 	{
 		const float hy = _ay * 0.5f;
-		const float cy = fcos(hy);
-		const float sy = fsin(hy);
+		const float cy = cosf(hy);
+		const float sy = sinf(hy);
 		_result[0] = 0.0f;
 		_result[1] = sy;
 		_result[2] = 0.0f;
@@ -460,8 +445,8 @@ namespace bx
 	inline void quatRotateZ(float* _result, float _az)
 	{
 		const float hz = _az * 0.5f;
-		const float cz = fcos(hz);
-		const float sz = fsin(hz);
+		const float cz = cosf(hz);
+		const float sz = sinf(hz);
 		_result[0] = 0.0f;
 		_result[1] = 0.0f;
 		_result[2] = sz;
@@ -567,44 +552,7 @@ namespace bx
 		mtxQuatTranslation(_result, quat, _translation);
 	}
 
-	inline void mtxLookAt_Impl(float* __restrict _result, const float* __restrict _eye, const float* __restrict _view, const float* __restrict _up = NULL)
-	{
-		float up[3] = { 0.0f, 1.0f, 0.0f };
-		if (NULL != _up)
-		{
-			up[0] = _up[0];
-			up[1] = _up[1];
-			up[2] = _up[2];
-		}
-
-		float tmp[4];
-		vec3Cross(tmp, up, _view);
-
-		float right[4];
-		vec3Norm(right, tmp);
-
-		vec3Cross(up, _view, right);
-
-		memset(_result, 0, sizeof(float)*16);
-		_result[ 0] = right[0];
-		_result[ 1] = up[0];
-		_result[ 2] = _view[0];
-
-		_result[ 4] = right[1];
-		_result[ 5] = up[1];
-		_result[ 6] = _view[1];
-
-		_result[ 8] = right[2];
-		_result[ 9] = up[2];
-		_result[10] = _view[2];
-
-		_result[12] = -vec3Dot(right, _eye);
-		_result[13] = -vec3Dot(up, _eye);
-		_result[14] = -vec3Dot(_view, _eye);
-		_result[15] = 1.0f;
-	}
-
-	inline void mtxLookAtLh(float* __restrict _result, const float* __restrict _eye, const float* __restrict _at, const float* __restrict _up = NULL)
+	inline void mtxLookAt(float* __restrict _result, const float* __restrict _eye, const float* __restrict _at, const float* __restrict _up = NULL)
 	{
 		float tmp[4];
 		vec3Sub(tmp, _at, _eye);
@@ -612,126 +560,84 @@ namespace bx
 		float view[4];
 		vec3Norm(view, tmp);
 
-		mtxLookAt_Impl(_result, _eye, view, _up);
+		float up[3] = { 0.0f, 1.0f, 0.0f };
+		if (NULL != _up)
+		{
+			up[0] = _up[0];
+			up[1] = _up[1];
+			up[2] = _up[2];
+		}
+		vec3Cross(tmp, up, view);
+
+		float right[4];
+		vec3Norm(right, tmp);
+
+		vec3Cross(up, view, right);
+
+		memset(_result, 0, sizeof(float)*16);
+		_result[ 0] = right[0];
+		_result[ 1] = up[0];
+		_result[ 2] = view[0];
+
+		_result[ 4] = right[1];
+		_result[ 5] = up[1];
+		_result[ 6] = view[1];
+
+		_result[ 8] = right[2];
+		_result[ 9] = up[2];
+		_result[10] = view[2];
+
+		_result[12] = -vec3Dot(right, _eye);
+		_result[13] = -vec3Dot(up, _eye);
+		_result[14] = -vec3Dot(view, _eye);
+		_result[15] = 1.0f;
 	}
 
-	inline void mtxLookAtRh(float* __restrict _result, const float* __restrict _eye, const float* __restrict _at, const float* __restrict _up = NULL)
-	{
-		float tmp[4];
-		vec3Sub(tmp, _eye, _at);
-
-		float view[4];
-		vec3Norm(view, tmp);
-
-		mtxLookAt_Impl(_result, _eye, view, _up);
-	}
-
-	inline void mtxLookAt(float* __restrict _result, const float* __restrict _eye, const float* __restrict _at, const float* __restrict _up = NULL)
-	{
-		mtxLookAtLh(_result, _eye, _at, _up);
-	}
-
-	inline void mtxProjRhXYWH(float* _result, float _x, float _y, float _width, float _height, float _near, float _far, bool _oglNdc = false)
+	inline void mtxProjXYWH(float* _result, float _x, float _y, float _width, float _height, float _near, float _far, bool _oglNdc = false)
 	{
 		const float diff = _far-_near;
 		const float aa = _oglNdc ?       (_far+_near)/diff : _far/diff;
-		const float bb = _oglNdc ?  (2.0f*_far*_near)/diff : _near*aa;
+		const float bb = _oglNdc ? -(2.0f*_far*_near)/diff : -_near*aa;
 
 		memset(_result, 0, sizeof(float)*16);
 		_result[ 0] = _width;
 		_result[ 5] = _height;
-		_result[ 8] = _x;
-		_result[ 9] = _y;
-		_result[10] = -aa;
-		_result[11] = -1.0f;
-		_result[14] = -bb;
-	}
-
-	inline void mtxProjRh(float* _result, float _ut, float _dt, float _lt, float _rt, float _near, float _far, bool _oglNdc = false)
-	{
-		const float invDiffRl = 1.0f/(_rt - _lt);
-		const float invDiffUd = 1.0f/(_ut - _dt);
-		const float width  =  2.0f*_near * invDiffRl;
-		const float height =  2.0f*_near * invDiffUd;
-		const float xx     = (_rt + _lt) * invDiffRl;
-		const float yy     = (_ut + _dt) * invDiffUd;
-		mtxProjRhXYWH(_result, xx, yy, width, height, _near, _far, _oglNdc);
-	}
-
-	inline void mtxProjRh(float* _result, const float _fov[4], float _near, float _far, bool _oglNdc = false)
-	{
-		mtxProjRh(_result, _fov[0], _fov[1], _fov[2], _fov[3], _near, _far, _oglNdc);
-	}
-
-	inline void mtxProjRh(float* _result, float _fovy, float _aspect, float _near, float _far, bool _oglNdc = false)
-	{
-		const float height = 1.0f/tanf(toRad(_fovy)*0.5f);
-		const float width  = height * 1.0f/_aspect;
-		mtxProjRhXYWH(_result, 0.0f, 0.0f, width, height, _near, _far, _oglNdc);
-	}
-
-	inline void mtxProjLhXYWH(float* _result, float _x, float _y, float _width, float _height, float _near, float _far, bool _oglNdc = false)
-	{
-		const float diff = _far-_near;
-		const float aa = _oglNdc ?       (_far+_near)/diff : _far/diff;
-		const float bb = _oglNdc ?  (2.0f*_far*_near)/diff : _near*aa;
-
-		memset(_result, 0, sizeof(float)*16);
-		_result[ 0] = _width;
-		_result[ 5] = _height;
-		_result[ 8] = -_x;
+		_result[ 8] =  _x;
 		_result[ 9] = -_y;
 		_result[10] = aa;
 		_result[11] = 1.0f;
-		_result[14] = -bb;
-	}
-
-	inline void mtxProjLh(float* _result, float _ut, float _dt, float _lt, float _rt, float _near, float _far, bool _oglNdc = false)
-	{
-		const float invDiffRl = 1.0f/(_rt - _lt);
-		const float invDiffUd = 1.0f/(_ut - _dt);
-		const float width  =  2.0f*_near * invDiffRl;
-		const float height =  2.0f*_near * invDiffUd;
-		const float xx     = (_rt + _lt) * invDiffRl;
-		const float yy     = (_ut + _dt) * invDiffUd;
-		mtxProjLhXYWH(_result, xx, yy, width, height, _near, _far, _oglNdc);
-	}
-
-	inline void mtxProjLh(float* _result, const float _fov[4], float _near, float _far, bool _oglNdc = false)
-	{
-		mtxProjLh(_result, _fov[0], _fov[1], _fov[2], _fov[3], _near, _far, _oglNdc);
-	}
-
-	inline void mtxProjLh(float* _result, float _fovy, float _aspect, float _near, float _far, bool _oglNdc = false)
-	{
-		const float height = 1.0f/tanf(toRad(_fovy)*0.5f);
-		const float width  = height * 1.0f/_aspect;
-		mtxProjLhXYWH(_result, 0.0f, 0.0f, width, height, _near, _far, _oglNdc);
+		_result[14] = bb;
 	}
 
 	inline void mtxProj(float* _result, float _ut, float _dt, float _lt, float _rt, float _near, float _far, bool _oglNdc = false)
 	{
-		mtxProjLh(_result, _ut, _dt, _lt, _rt, _near, _far, _oglNdc);
+		const float width  = 2.0f / (_lt + _rt);
+		const float height = 2.0f / (_ut + _dt);
+		const float xx     = (_lt - _rt) * width  * 0.5f;
+		const float yy     = (_ut - _dt) * height * 0.5f;
+		mtxProjXYWH(_result, xx, yy, width, height, _near, _far, _oglNdc);
 	}
 
 	inline void mtxProj(float* _result, const float _fov[4], float _near, float _far, bool _oglNdc = false)
 	{
-		mtxProjLh(_result, _fov, _near, _far, _oglNdc);
+		mtxProj(_result, _fov[0], _fov[1], _fov[2], _fov[3], _near, _far, _oglNdc);
 	}
 
 	inline void mtxProj(float* _result, float _fovy, float _aspect, float _near, float _far, bool _oglNdc = false)
 	{
-		mtxProjLh(_result, _fovy, _aspect, _near, _far, _oglNdc);
+		const float height = 1.0f/tanf(toRad(_fovy)*0.5f);
+		const float width  = height * 1.0f/_aspect;
+		mtxProjXYWH(_result, 0.0f, 0.0f, width, height, _near, _far, _oglNdc);
 	}
 
-	inline void mtxOrthoLh(float* _result, float _left, float _right, float _bottom, float _top, float _near, float _far, float _offset = 0.0f, bool _oglNdc = false)
+	inline void mtxOrtho(float* _result, float _left, float _right, float _bottom, float _top, float _near, float _far, float _offset = 0.0f)
 	{
 		const float aa = 2.0f/(_right - _left);
 		const float bb = 2.0f/(_top - _bottom);
-		const float cc = (_oglNdc ? 2.0f : 1.0f) / (_far - _near);
+		const float cc = 1.0f/(_far - _near);
 		const float dd = (_left + _right)/(_left - _right);
 		const float ee = (_top + _bottom)/(_bottom - _top);
-		const float ff = _oglNdc ? (_near + _far)/(_near - _far) : _near/(_near - _far);
+		const float ff = _near / (_near - _far);
 
 		memset(_result, 0, sizeof(float)*16);
 		_result[ 0] = aa;
@@ -743,34 +649,10 @@ namespace bx
 		_result[15] = 1.0f;
 	}
 
-	inline void mtxOrthoRh(float* _result, float _left, float _right, float _bottom, float _top, float _near, float _far, float _offset = 0.0f, bool _oglNdc = false)
-	{
-		const float aa = 2.0f/(_right - _left);
-		const float bb = 2.0f/(_top - _bottom);
-		const float cc = (_oglNdc ? 2.0f : 1.0f) / (_far - _near);
-		const float dd = (_left + _right)/(_left - _right);
-		const float ee = (_top + _bottom)/(_bottom - _top);
-		const float ff = _oglNdc ? (_near + _far)/(_near - _far) : _near/(_near - _far);
-
-		memset(_result, 0, sizeof(float)*16);
-		_result[ 0] = aa;
-		_result[ 5] = bb;
-		_result[10] = -cc;
-		_result[12] = dd + _offset;
-		_result[13] = ee;
-		_result[14] = ff;
-		_result[15] = 1.0f;
-	}
-
-	inline void mtxOrtho(float* _result, float _left, float _right, float _bottom, float _top, float _near, float _far, float _offset = 0.0f, bool _oglNdc = false)
-	{
-	    return mtxOrthoLh(_result, _left, _right, _bottom, _top, _near, _far, _offset, _oglNdc);
-	}
-
 	inline void mtxRotateX(float* _result, float _ax)
 	{
-		const float sx = fsin(_ax);
-		const float cx = fcos(_ax);
+		const float sx = sinf(_ax);
+		const float cx = cosf(_ax);
 
 		memset(_result, 0, sizeof(float)*16);
 		_result[ 0] = 1.0f;
@@ -783,8 +665,8 @@ namespace bx
 
 	inline void mtxRotateY(float* _result, float _ay)
 	{
-		const float sy = fsin(_ay);
-		const float cy = fcos(_ay);
+		const float sy = sinf(_ay);
+		const float cy = cosf(_ay);
 
 		memset(_result, 0, sizeof(float)*16);
 		_result[ 0] = cy;
@@ -797,8 +679,8 @@ namespace bx
 
 	inline void mtxRotateZ(float* _result, float _az)
 	{
-		const float sz = fsin(_az);
-		const float cz = fcos(_az);
+		const float sz = sinf(_az);
+		const float cz = cosf(_az);
 
 		memset(_result, 0, sizeof(float)*16);
 		_result[ 0] = cz;
@@ -811,10 +693,10 @@ namespace bx
 
 	inline void mtxRotateXY(float* _result, float _ax, float _ay)
 	{
-		const float sx = fsin(_ax);
-		const float cx = fcos(_ax);
-		const float sy = fsin(_ay);
-		const float cy = fcos(_ay);
+		const float sx = sinf(_ax);
+		const float cx = cosf(_ax);
+		const float sy = sinf(_ay);
+		const float cy = cosf(_ay);
 
 		memset(_result, 0, sizeof(float)*16);
 		_result[ 0] = cy;
@@ -830,12 +712,12 @@ namespace bx
 
 	inline void mtxRotateXYZ(float* _result, float _ax, float _ay, float _az)
 	{
-		const float sx = fsin(_ax);
-		const float cx = fcos(_ax);
-		const float sy = fsin(_ay);
-		const float cy = fcos(_ay);
-		const float sz = fsin(_az);
-		const float cz = fcos(_az);
+		const float sx = sinf(_ax);
+		const float cx = cosf(_ax);
+		const float sy = sinf(_ay);
+		const float cy = cosf(_ay);
+		const float sz = sinf(_az);
+		const float cz = cosf(_az);
 
 		memset(_result, 0, sizeof(float)*16);
 		_result[ 0] = cy*cz;
@@ -852,12 +734,12 @@ namespace bx
 
 	inline void mtxRotateZYX(float* _result, float _ax, float _ay, float _az)
 	{
-		const float sx = fsin(_ax);
-		const float cx = fcos(_ax);
-		const float sy = fsin(_ay);
-		const float cy = fcos(_ay);
-		const float sz = fsin(_az);
-		const float cz = fcos(_az);
+		const float sx = sinf(_ax);
+		const float cx = cosf(_ax);
+		const float sy = sinf(_ay);
+		const float cy = cosf(_ay);
+		const float sz = sinf(_az);
+		const float cz = cosf(_az);
 
 		memset(_result, 0, sizeof(float)*16);
 		_result[ 0] = cy*cz;
@@ -874,12 +756,12 @@ namespace bx
 
 	inline void mtxSRT(float* _result, float _sx, float _sy, float _sz, float _ax, float _ay, float _az, float _tx, float _ty, float _tz)
 	{
-		const float sx = fsin(_ax);
-		const float cx = fcos(_ax);
-		const float sy = fsin(_ay);
-		const float cy = fcos(_ay);
-		const float sz = fsin(_az);
-		const float cz = fcos(_az);
+		const float sx = sinf(_ax);
+		const float cx = cosf(_ax);
+		const float sy = sinf(_ay);
+		const float cy = cosf(_ay);
+		const float sz = sinf(_az);
+		const float cz = cosf(_az);
 
 		const float sxsz = sx*sz;
 		const float cycz = cy*cz;

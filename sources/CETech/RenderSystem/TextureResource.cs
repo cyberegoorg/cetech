@@ -134,7 +134,15 @@ namespace CETech
 
             // Enter the executable to run, including the complete path
             var bin_path = ConfigSystem.GetValueString("resource_compiler.bin");
-            start.FileName = Path.Combine(bin_path, "texturec.exe");
+            
+		#if PLATFORM_LINUX
+			start.FileName = Path.Combine(bin_path, "texturec");
+		#else
+			start.FileName = Path.Combine(bin_path, "texturec.exe");
+		#endif
+			
+
+
             start.RedirectStandardOutput = true;
             start.RedirectStandardError = true;
             start.UseShellExecute = false;
