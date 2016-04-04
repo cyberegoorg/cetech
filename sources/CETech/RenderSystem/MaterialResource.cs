@@ -1,6 +1,7 @@
 using System.IO;
 using System.Yaml;
 using CETech.Develop;
+using CETechDevelop.Utils;
 using MsgPack.Serialization;
 using SharpBgfx;
 
@@ -18,6 +19,23 @@ namespace CETech
 
 #if CETECH_DEVELOP
 
+        private static void preprocess(YamlMapping root)
+        {
+            if (root.ContainsKey("parent"))
+            {
+                var prefab_file = ((YamlScalar)root["parent"]).Value + ".material";
+
+                using (var prefab_source = FileSystem.Open("src", prefab_file, FileSystem.OpenMode.Read))
+                {
+                    TextReader input = new StreamReader(prefab_source);
+                    var parent_yaml = YamlNode.FromYaml(input)[0] as YamlMapping;
+                    preprocess(parent_yaml);
+
+                    Yaml.merge(root, parent_yaml);
+                }
+            }
+        }
+
         /// <summary>
         ///     Resource compiler
         /// </summary>
@@ -28,10 +46,11 @@ namespace CETech
             var yaml = YamlNode.FromYaml(input);
 
             var rootNode = yaml[0] as YamlMapping;
+
+            preprocess(rootNode);
+
             var shader_name = ((YamlScalar) rootNode["shader"]).Value;
-
             var resource = new Resource {shader_name = StringId.FromString(shader_name)};
-
             if (rootNode.ContainsKey("textures"))
             {
                 var textures = (YamlMapping) rootNode["textures"];

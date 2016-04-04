@@ -75,10 +75,10 @@ namespace CETech
             var online = OnlineMap[type];
             var idx = TypesMap[type];
 
-            var gotLock = false;
+/*            var gotLock = false;
             try
             {
-                _addLock.Enter(ref gotLock);
+                _addLock.Enter(ref gotLock);*/
 
                 for (var i = 0; i < names.Length; i++)
                 {
@@ -88,18 +88,18 @@ namespace CETech
 
                     online(DataMap[idx][names[i]]);
                 }
-            }
+/*            }
             finally
             {
                 if (gotLock) _addLock.Exit();
-            }
+            }*/
         }
 
         private static void LoadNowImpl(long type, long[] names)
         {
             var loaded_data = Load(type, names);
 
-            var taskid = TaskManager.AddBegin("addloaded", data => AddLoaded(loaded_data, type, names), null,
+            var taskid = TaskManager.AddBegin("addloaded", data => AddLoadedImpl(loaded_data, type, names), null,
                 TaskManager.TaskPriority.High, affinity: TaskManager.TaskAffinity.MainThead);
             TaskManager.AddEnd(new[] {taskid});
             TaskManager.Wait(taskid);
@@ -150,6 +150,7 @@ namespace CETech
             if (AutoLoad && !CanGet(type, names))
             {
                 LoadNow(type, names);
+                Log.Warning("resource_manager", "Autoloading {0:X}", name);
             }
 
             var idx = TypesMap[type];

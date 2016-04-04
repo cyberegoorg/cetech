@@ -5,9 +5,6 @@ Vagrant.configure(2) do |config|
     config.vm.provider "virtualbox" do |vb|
         vb.memory = "2404"
         vb.cpus = "4"
-
-        vb.customize ["modifyvm", :id, "--usb", "off"]
-        vb.customize ["modifyvm", :id, "--usbehci", "off"]
     end
 
     config.vm.define "linux64" do |linux64|
@@ -22,15 +19,6 @@ Vagrant.configure(2) do |config|
 
             sudo apt-get install git python3-pip mono-complete mono-vbnc autoconf libtool libgl1-mesa-dev
             sudo mozroots --import --sync
-        SHELL
-    end
-
-    config.vm.define "osx" do |osx|
-        osx.vm.box = "jhcook/osx-elcapitan-10.11"
-        osx.vm.synced_folder ".", "/Users/vagrant/cetech"
-
-        osx.vm.provision "shell", inline: <<-SHELL
-            /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
         SHELL
     end
 end
