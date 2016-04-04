@@ -25,6 +25,7 @@ pages:
   - About:
     - Release notes: 'about/release-notes.md'
     - Licence: 'about/license.md'
+    - 3rd party: 'about/3rdparty.md'
 
 markdown_extensions:
     - admonition

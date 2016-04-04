@@ -17,7 +17,7 @@
 ### Build
 
 ```bash
-$ python3 build.py
+$ python3 build.py -d
 ```
 
 #### Optional
@@ -38,7 +38,7 @@ $ python3 build.py
 ### Build
 
 ```bash
-$ python build.py
+$ python build.py -d
 ```
 
 #### Optional
