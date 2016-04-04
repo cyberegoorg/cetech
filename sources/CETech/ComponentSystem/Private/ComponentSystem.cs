@@ -9,10 +9,12 @@ namespace CETech
     {
         private static readonly Dictionary<long, Spawner> _spawnerMap = new Dictionary<long, Spawner>();
         private static readonly Dictionary<long, Compiler> _compoilerMap = new Dictionary<long, Compiler>();
+        private static readonly Dictionary<long, int> _spawnOrderMap = new Dictionary<long, int>();
 
-        public static void RegisterCompilerImpl(long type, Compiler compiler)
+        public static void RegisterCompilerImpl(long type, Compiler compiler, int spawn_order)
         {
             _compoilerMap[type] = compiler;
+            _spawnOrderMap[type] = spawn_order;
         }
 
         public static void CompileImpl(long type, YamlMapping body, ConsoleServer.ResponsePacker packer)
@@ -20,7 +22,7 @@ namespace CETech
             _compoilerMap[type](body, packer);
         }
 
-        public static void RegisterSpawnerCompilerImpl(long type, Spawner spawner)
+        public static void RegisterSpawnerImpl(long type, Spawner spawner)
         {
             _spawnerMap[type] = spawner;
         }
@@ -29,6 +31,11 @@ namespace CETech
             MessagePackObjectDictionary[] data)
         {
             _spawnerMap[type](world, ent_ids, ents_parent, data);
+        }
+
+        private static  int GetSpawnOrderImpl(long type)
+        {
+            return _spawnOrderMap[type];
         }
     }
 }

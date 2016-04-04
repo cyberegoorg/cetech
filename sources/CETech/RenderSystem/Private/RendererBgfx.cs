@@ -76,7 +76,14 @@ namespace CETech
             Bgfx.SetViewClear(0, ClearTargets.Color | ClearTargets.Depth, 0x66CCFFff);
         }
 
-        private static void BeginFrameImpl()
+        private static void ResizeImpl(int width, int height)
+        {
+            _data.NeedResize = true;
+            _data.ResizeW = width;
+            _data.ResizeH = height;
+        }
+
+        private static void RenderWorldImpl(int world, int camera)
         {
             if (_data.NeedResize)
             {
@@ -86,9 +93,9 @@ namespace CETech
 
             Bgfx.SetViewRect(0, 0, 0, _data.ResizeW, _data.ResizeH);
 
-            var viewMatrix = Matrix4f.CreateLookAt(new Vector3f(0.0f, 0.0f, -35.0f), Vector3f.Zero, Vector3f.UnitY);
-            var projMatrix = Matrix4f.CreatePerspectiveFieldOfView((float) Math.PI/3,
-                (float) _data.ResizeW/_data.ResizeH, 0.1f, 100.0f);
+            Matrix4f viewMatrix;
+            Matrix4f projMatrix;
+            CameraSystem.GetProjectView(world, camera, out projMatrix, out viewMatrix);
 
             unsafe
             {
@@ -98,32 +105,18 @@ namespace CETech
             Bgfx.Touch(0);
 
             Bgfx.DebugTextClear();
-        }
 
-        private static void EndFrameImpl()
-        {
+            PrimitiveMeshRenderer.RenderWorld(world);
+
+
             var frame = Bgfx.Frame();
 
 #if CETECH_DEVELOP
             var stats = Bgfx.GetStats();
             DevelopSystem.PushRecordInt("renderer.frame", frame);
-            DevelopSystem.PushRecordFloat("renderer.cpu_elapsed", (float) stats.CpuElapsed.TotalMilliseconds);
-            DevelopSystem.PushRecordFloat("renderer.gpu_elapsed", (float) stats.GpuElapsed.TotalMilliseconds);
+            DevelopSystem.PushRecordFloat("renderer.cpu_elapsed", (float)stats.CpuElapsed.TotalMilliseconds);
+            DevelopSystem.PushRecordFloat("renderer.gpu_elapsed", (float)stats.GpuElapsed.TotalMilliseconds);
 #endif
-        }
-
-        private static void ResizeImpl(int width, int height)
-        {
-            _data.NeedResize = true;
-            _data.ResizeW = width;
-            _data.ResizeH = height;
-        }
-
-        private static void RenderWorldImpl(int world)
-        {
-            BeginFrameImpl();
-            PrimitiveMeshRenderer.RenderWorld(world);
-            EndFrameImpl();
         }
 
         private static void SetDebugImpl(bool enabled)

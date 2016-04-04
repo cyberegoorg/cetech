@@ -298,6 +298,7 @@ namespace CETech
         {
             TranformationSystem.Init();
             PrimitiveMeshRenderer.Init();
+            CameraSystem.Init();
 
 #if CETECH_DEVELOP
             ResourceCompiler.RegisterCompiler(PackageResource.Type, PackageResource.Compile);

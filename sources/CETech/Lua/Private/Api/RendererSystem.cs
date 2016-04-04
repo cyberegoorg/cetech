@@ -5,9 +5,9 @@ namespace CETech.Lua.Api
     [MoonSharpUserData]
     internal class RenderSystemApi
     {
-        public static void RenderWorld(int world)
+        public static void RenderWorld(int world, int camera)
         {
-            RenderSystem.RenderWorld(world);
+            RenderSystem.RenderWorld(world, camera);
         }
 
         public static void SetDebug(bool enabled)

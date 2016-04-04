@@ -23,6 +23,7 @@ namespace CETech.World
             var id = _handlers.Create();
             TranformationSystem.InitWorld(id);
             PrimitiveMeshRenderer.InitWorld(id);
+            CameraSystem.InitWorld(id);
             _levelnstances[id] = new List<Levelnstance>();
             return id;
         }
@@ -31,6 +32,7 @@ namespace CETech.World
         {
             TranformationSystem.RemoveWorld(world);
             PrimitiveMeshRenderer.RemoveWorld(world);
+            CameraSystem.RemoveWorld(world);
             _handlers.Destroy(world);
         }
 

@@ -148,67 +148,67 @@ namespace CETech.World
         private static void InitImpl()
         {
 #if CETECH_DEVELOP
-            ComponentSystem.RegisterCompiler(StringId.FromString("transform"), Compiler);
+            ComponentSystem.RegisterCompiler(StringId.FromString("transform"), Compiler, 1);
 #endif
-            ComponentSystem.RegisterSpawnerCompiler(StringId.FromString("transform"), Spawner);
+            ComponentSystem.RegisterSpawner(StringId.FromString("transform"), Spawner);
         }
 
         private static void ShutdownImpl()
         {
         }
 
-        private static Vector3f GetPositionImpl(int world, int entity)
+        private static Vector3f GetPositionImpl(int world, int transform)
         {
             var world_instance = _worldInstance[world];
-            return world_instance.Position[getIdx(world, entity)];
+            return world_instance.Position[transform];
         }
 
-        private static Vector3f GetRotationImpl(int world, int entity)
+        private static Vector3f GetRotationImpl(int world, int transform)
         {
             var world_instance = _worldInstance[world];
-            return world_instance.Rotation[getIdx(world, entity)];
+            return world_instance.Rotation[transform];
         }
 
-        private static Vector3f GetScaleImpl(int world, int entity)
+        private static Vector3f GetScaleImpl(int world, int transform)
         {
             var world_instance = _worldInstance[world];
-            return world_instance.Scale[getIdx(world, entity)];
+            return world_instance.Scale[transform];
         }
 
-        private static Matrix4f GetWorldMatrixImpl(int world, int entity)
+        private static Matrix4f GetWorldMatrixImpl(int world, int transform)
         {
             var world_instance = _worldInstance[world];
-            return world_instance.World[getIdx(world, entity)];
+            return world_instance.World[transform];
         }
 
-        private static void SetPositionImpl(int world, int entity, Vector3f pos)
+        private static void SetPositionImpl(int world, int transform, Vector3f pos)
         {
             var world_instance = _worldInstance[world];
-            var parent_idx = world_instance.Parent[getIdx(world, entity)];
+            var parent_idx = world_instance.Parent[transform];
             var parent = parent_idx != int.MaxValue ? world_instance.World[parent_idx] : Matrix4f.Identity;
 
-            world_instance.Position[getIdx(world, entity)] = pos;
-            Transform(world, getIdx(world, entity), parent);
+            world_instance.Position[transform] = pos;
+            Transform(world, transform, parent);
         }
 
-        private static void SetRotationImpl(int world, int entity, Vector3f rot)
+        private static void SetRotationImpl(int world, int transform, Vector3f rot)
         {
             var world_instance = _worldInstance[world];
-            var parent_idx = world_instance.Parent[getIdx(world, entity)];
+            var parent_idx = world_instance.Parent[transform];
             var parent = parent_idx != int.MaxValue ? world_instance.World[parent_idx] : Matrix4f.Identity;
 
-            world_instance.Rotation[getIdx(world, entity)] = rot;
-            Transform(world, getIdx(world, entity), parent);
+            world_instance.Rotation[transform] = rot;
+            Transform(world, transform, parent);
         }
 
-        private static void SetScaleImpl(int world, int entity, Vector3f scale)
+        private static void SetScaleImpl(int world, int transform, Vector3f scale)
         {
             var world_instance = _worldInstance[world];
-            var parent_idx = world_instance.Parent[getIdx(world, entity)];
+            var parent_idx = world_instance.Parent[transform];
             var parent = parent_idx != int.MaxValue ? world_instance.World[parent_idx] : Matrix4f.Identity;
 
-            world_instance.Scale[getIdx(world, entity)] = scale;
-            Transform(world, getIdx(world, entity), parent);
+            world_instance.Scale[transform] = scale;
+            Transform(world, transform, parent);
         }
 
         private static void LinkImpl(int world, int parent, int child)
@@ -227,7 +227,7 @@ namespace CETech.World
 
             var p = parent_idx != int.MaxValue ? world_instance.World[parent_idx] : Matrix4f.Identity;
             Transform(world, parent_idx, p); // TODO:
-            Transform(world, child_idx, GetWorldMatrix(world, parent));
+            Transform(world, child_idx, GetWorldMatrix(world, GetTranform(world, parent)));
         }
 
         private class WorldInstance
@@ -256,6 +256,11 @@ namespace CETech.World
                 FirstChild = new List<int>();
                 World = new List<Matrix4f>();
             }
+        }
+
+        private static int GetTranformImpl(int world, int entity)
+        {
+            return getIdx(world, entity);
         }
     }
 }
