@@ -1,0 +1,8 @@
+units:
+  "5564343313252":
+    name: "box1"
+    prefab: box1
+
+  "55643433135454252":
+    name: "box2"
+    prefab: box2

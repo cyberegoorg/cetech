@@ -1,0 +1,14 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ExternalProject Name="NSpec">
+  <Binary
+    Name="ExternalLib"
+    Path="externals\build\windows64\Release\lib\NSpec.dll" />
+
+  <Binary
+  Name="ExternalLib"
+  Path="externals\build\windows64\Release\lib\nunit.framework.dll" />
+
+  <NativeBinary Path="externals\build\windows64\Release\bin\NSpecRunner.exe" />
+  <NativeBinary Path="externals\build\windows64\Release\bin\NSpecRunner.exe.config" />
+
+</ExternalProject>

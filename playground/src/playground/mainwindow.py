@@ -1,8 +1,12 @@
 import argparse
+import os
 import platform
 
+import msgpack
+import nanomsg
 from PyQt5.QtCore import QThread, Qt, QFileSystemWatcher, QDirIterator
 from PyQt5.QtWidgets import QMainWindow, QDockWidget, QTabWidget
+from nanomsg import Socket, SUB, SUB_SUBSCRIBE
 
 from playground.assetbrowser import AssetBrowser
 from playground.engine.cetechproject import CetechProject
@@ -12,6 +16,30 @@ from playground.logwidget import LogWidget, LogSub
 from playground.profilerwidget import ProfilerWidget
 from playground.scripteditor import ScriptEditorWidget, ScriptEditorManager
 from playground.ui.mainwindow import Ui_MainWindow
+
+
+class DevelopSub(QThread):
+    def __init__(self, url):
+        self.socket = Socket(SUB)
+        self.url = url
+        self.handlers = []
+
+        super().__init__()
+
+    def register_handler(self, handler):
+        self.handlers.append(handler)
+
+    def run(self):
+        self.socket.set_string_option(SUB, SUB_SUBSCRIBE, b'')
+        self.socket.connect(self.url)
+        while True:
+            try:
+                msg = self.socket.recv()
+                unpack_msg = msgpack.unpackb(msg, encoding='utf-8')
+                print(unpack_msg)
+
+            except nanomsg.NanoMsgAPIError as e:
+                raise
 
 
 class MainWindow(QMainWindow, Ui_MainWindow):
@@ -35,13 +63,16 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
         self.api = ConsoleAPI(b"tcp://localhost:5557")
 
+        # self.develop_sub = DevelopSub(b"ws://localhost:5558")
+        # self.develop_sub.run()
+
         self.setTabPosition(Qt.AllDockWidgetAreas, QTabWidget.North)
 
         self.editors_manager = ScriptEditorManager(project_manager=self.project, api=self.api)
 
         # TODO bug #114 workaround. Disable create sub engine...
         if platform.system().lower() != 'darwin':
-            self.ogl_widget = CetechWidget(self, self.api)
+            self.ogl_widget = CetechWidget(self, self.api, self.project)
             self.ogl_dock = QDockWidget(self)
             self.ogl_dock.setWindowTitle("Engine View")
             self.ogl_dock.hide()
@@ -85,37 +116,50 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.build_file_watch.directoryChanged.connect(self.build_dir_changed)
 
     def open_asset(self, path, ext):
+        """
+        :type path: str
+        :type path: ext
+        """
+        if ext == 'level':
+            level_name = path.replace(self.project.project_dir, '').replace('/src/', '').split('.')[0]
+            self.api.lua_execute("Editor:load_level(\"%s\")" % level_name)
+            return
+
         if ScriptEditorWidget.support_ext(ext):
             self.editors_manager.open(self, path)
 
     def open_project(self, name, dir):
         self.project.open_project(name, dir)
 
-        # self.project.run_cetech(build_type=CetechProject.BUILD_DEBUG, compile=True, continu=True, daemon=True)
+        # self.api.start(QThread.LowPriority)
+        self.api.connect()
+        self.logsub.start(QThread.LowPriority)
+
+        self.assetb_widget.open_project(self.project.project_dir)
+
+        self.log_dock_widget.show()
+
+        self.watch_project_dir()
+
+        self.assetb_dock_widget.show()
 
         if platform.system().lower() == 'darwin':
             wid = None
         else:
             wid = self.ogl_widget.winId()
-
-        self.project.run_cetech(build_type=CetechProject.BUILD_DEBUG, compile_=True, continue_=True,
-                                wid=wid)
-
-        #self.api.start(QThread.LowPriority)
-        self.logsub.start(QThread.LowPriority)
-
-        self.assetb_widget.open_project(self.project.project_dir)
-        self.assetb_dock_widget.show()
-        self.log_dock_widget.show()
+            # wid = None
 
         # TODO bug #114 workaround. Disable create sub engine...
         if platform.system().lower() != 'darwin':
             self.ogl_dock.show()
 
-        self.watch_project_dir()
+        self.project.run_cetech_develop(compile_=True, continue_=True, wid=wid,
+                                        bootscript=os.path.join("playground", "boot"))
 
-        self.ogl_widget.resize_event_enable = True
-        self.ogl_widget.resize(self.ogl_widget.size())
+        # self.api.wait()
+
+    def reload_all(self):
+        self.api.reload_all(["shader", "texture", "material", "lua"])
 
     def watch_project_dir(self):
         files = self.file_watch.files()
@@ -167,6 +211,9 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
     def open_recorded_events(self):
         self.profiler_doc_widget.show()
+
+    def run_standalone(self):
+        self.project.run_cetech_release()
 
     def closeEvent(self, evnt):
         self.api.disconnect()

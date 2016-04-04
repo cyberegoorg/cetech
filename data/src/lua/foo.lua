@@ -1,3 +1,3 @@
-local log = require "core/cetech/log"
+--local log = require "core/cetech/log"
 
-Foo = Foo or {}
+--Foo = Foo or {}

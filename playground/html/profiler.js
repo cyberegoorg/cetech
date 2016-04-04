@@ -1,6 +1,10 @@
 var container = document.getElementById('vizu');
 var items = new vis.DataSet();
 
+var chart = new SmoothieChart(),
+    canvas = document.getElementById('smoothie-chart'),
+    series = new TimeSeries();
+
 var options = {
     timeAxis: {scale: 'millisecond', step: 1},
     showMajorLabels: false,
@@ -40,48 +44,26 @@ var timeline = new vis.Timeline(container, items, groups, options);
 
 var data_window = [];
 var Record = false;
-var sample_count = 0;
+sample_count = 0;
 
-function ab2str(buf) {
-    return String.fromCharCode.apply(null, new Uint8Array(buf));
-}
-
-function diff_time(start, end) {
-    var temp = [0, 0];
-    if( (end[1] - start[1]) < 0) {
-        temp[0] = end[0] - start[0] - 1;
-        temp[1] = 1000000000 + end[1] - start[1];
-    } else {
-        temp[0] = end[0] - start[0];
-        temp[1] = end[1] - start[1];
-    }
-    return temp;
-}
-function parse_data(data) {
-    var events = msgpack.decode(data);
-
-    events.forEach(function (event) {
-        if (event.etype != 'EVENT_SCOPE') {
-            return;
-        }
-
-        if (sample_count < 100) {
+function parse_data(events) {
+    events.EVENT_SCOPE.forEach(function (event) {
+        if (sample_count < 10) {
             sample_count += 1;
             return;
         }
         sample_count = 0;
 
-        var t_s = [event.start, event.start_ns];
-        var t_e = [event.end, event.end_ns];
-        var delta_ms = diff_time(t_s, t_e)[1] / 1000000;
-        var label = event.name + ": " + delta_ms + "ms, depth: " + event.depth;
+        var label = event.name + ": " + (event.end - event.start) + "ms, depth: " + event.depth;
+
+        //console.log(event);
 
         var item = {
             content: label,
             title: label,
-            start: (t_s[0] * 1000) + (t_s[1] / 1000000),
-            end: (t_e[0] * 1000) + (t_e[1] / 1000000),
-            group: event.worker_id,
+            start: event.start,
+            end:  event.end,
+            group: event.workerid,
             depth: event.depth
         };
 
@@ -98,11 +80,14 @@ ws.onclosed = function () {
     console.log("closed");
 };
 ws.onmessage = function (evt) {
+    var events = msgpack.decode(new Uint8Array(evt.data));
+
+    series.append(new Date().getTime(), events.EVENT_RECORD_INT['gc.total_memory'] / 100000);
+
     if (!Record) {
         return;
     }
-
-    parse_data(new Uint8Array(evt.data));
+    parse_data(events);
 };
 
 document.getElementById('start').onclick = function () {
@@ -118,3 +103,6 @@ document.getElementById('stop').onclick = function () {
     items.add(data_window);
     timeline.fit();
 };
+
+chart.addTimeSeries(series, {lineWidth:2,strokeStyle:'#00ff00'});
+chart.streamTo(canvas, 500);
