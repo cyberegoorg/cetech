@@ -22,6 +22,11 @@
             RemoveWorldImpl(world);
         }
 
+        public static int GetTranform(int world, int entity)
+        {
+            return GetTranformImpl(world, entity);
+        }
+
         public static int Create(int world, int entity, int parent, Vector3f position, Vector3f rotation,
             Vector3f scale)
         {
@@ -33,39 +38,39 @@
             LinkImpl(world, parent_ent, child_ent);
         }
 
-        public static void SetPosition(int world, int entity, Vector3f pos)
+        public static void SetPosition(int world, int transform, Vector3f pos)
         {
-            SetPositionImpl(world, entity, pos);
+            SetPositionImpl(world, transform, pos);
         }
 
-        public static void SetRotation(int world, int entity, Vector3f rot)
+        public static void SetRotation(int world, int transform, Vector3f rot)
         {
-            SetRotationImpl(world, entity, rot);
+            SetRotationImpl(world, transform, rot);
         }
 
-        public static void SetScale(int world, int entity, Vector3f scale)
+        public static void SetScale(int world, int transform, Vector3f scale)
         {
-            SetScaleImpl(world, entity, scale);
+            SetScaleImpl(world, transform, scale);
         }
 
-        public static Vector3f GetPosition(int world, int entity)
+        public static Vector3f GetPosition(int world, int transform)
         {
-            return GetPositionImpl(world, entity);
+            return GetPositionImpl(world, transform);
         }
 
-        public static Vector3f GetRotation(int world, int entity)
+        public static Vector3f GetRotation(int world, int transform)
         {
-            return GetRotationImpl(world, entity);
+            return GetRotationImpl(world, transform);
         }
 
-        public static Vector3f GetScale(int world, int entity)
+        public static Vector3f GetScale(int world, int transform)
         {
-            return GetScaleImpl(world, entity);
+            return GetScaleImpl(world, transform);
         }
 
-        public static Matrix4f GetWorldMatrix(int world, int entity)
+        public static Matrix4f GetWorldMatrix(int world, int transform)
         {
-            return GetWorldMatrixImpl(world, entity);
+            return GetWorldMatrixImpl(world, transform);
         }
     }
 }

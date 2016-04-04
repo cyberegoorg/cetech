@@ -6,39 +6,44 @@ namespace CETech.Lua.Api
     [MoonSharpUserData]
     internal class TransformSystemApi
     {
-        public static void SetPosition(int world, int entity, Vector3f pos)
+        public static int GetTransform(int world, int entity)
         {
-            TranformationSystem.SetPosition(world, entity, pos);
+            return TranformationSystem.GetTranform(world, entity);
         }
 
-        public static void SetRotation(int world, int entity, Vector3f rot)
+        public static void SetPosition(int world, int transform, Vector3f pos)
         {
-            TranformationSystem.SetRotation(world, entity, rot);
+            TranformationSystem.SetPosition(world, transform, pos);
         }
 
-        public static void SetScale(int world, int entity, Vector3f scale)
+        public static void SetRotation(int world, int transform, Vector3f rot)
         {
-            TranformationSystem.SetScale(world, entity, scale);
+            TranformationSystem.SetRotation(world, transform, rot);
         }
 
-        public static Vector3f GetPosition(int world, int entity)
+        public static void SetScale(int world, int transform, Vector3f scale)
         {
-            return TranformationSystem.GetPosition(world, entity);
+            TranformationSystem.SetScale(world, transform, scale);
         }
 
-        public static Vector3f GetRotation(int world, int entity)
+        public static Vector3f GetPosition(int world, int transform)
         {
-            return TranformationSystem.GetRotation(world, entity);
+            return TranformationSystem.GetPosition(world, transform);
         }
 
-        public static Vector3f GetScale(int world, int entity)
+        public static Vector3f GetRotation(int world, int transform)
         {
-            return TranformationSystem.GetScale(world, entity);
+            return TranformationSystem.GetRotation(world, transform);
         }
 
-        public static Matrix4f GetWorldMatrix(int world, int entity)
+        public static Vector3f GetScale(int world, int transform)
         {
-            return TranformationSystem.GetWorldMatrix(world, entity);
+            return TranformationSystem.GetScale(world, transform);
+        }
+
+        public static Matrix4f GetWorldMatrix(int world, int transform)
+        {
+            return TranformationSystem.GetWorldMatrix(world, transform);
         }
     }
 }

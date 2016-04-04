@@ -1,4 +1,6 @@
-﻿namespace CETech
+﻿using System;
+
+namespace CETech
 {
     /// <summary>
     ///     Render system
@@ -68,10 +70,11 @@
         }
 
 
-        public static void RenderWorld(int world)
+        public static void RenderWorld(int world, int camera)
         {
-            RenderWorldImpl(world);
+            RenderWorldImpl(world, camera);
         }
+
 
         /// <summary>
         ///     Resize render view

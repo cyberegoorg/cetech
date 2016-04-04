@@ -86,6 +86,7 @@ namespace CETech.Lua
             _enviromentScript.Globals["UnitManager"] = new UnitManagerApi();
             _enviromentScript.Globals["RenderSystem"] = new RenderSystemApi();
             _enviromentScript.Globals["Transformation"] = new TransformSystemApi();
+            _enviromentScript.Globals["Camera"] = new CameraApi();
 
             _enviromentScript.Globals["Vector3f"] = new Vector3fApi();
 

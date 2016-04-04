@@ -2,6 +2,9 @@ Editor = Editor or {}
 
 function Editor:init()
     self.world = World.Create()
+    self.camera_unit = UnitManager.Spawn(self.world, "camera")
+    self.camera = Camera.GetCamera(self.world, self.camera_unit)
+
     self.level = nil
 end
 
@@ -14,7 +17,7 @@ function Editor:update(dt)
 end
 
 function Editor:render()
-    RenderSystem.RenderWorld(self.world)
+    RenderSystem.RenderWorld(self.world, self.camera)
 end
 
 function Editor:load_level(level)

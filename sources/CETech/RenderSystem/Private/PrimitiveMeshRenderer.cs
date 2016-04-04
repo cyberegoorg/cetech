@@ -69,9 +69,9 @@ namespace CETech.World
         private static void InitImpl()
         {
 #if CETECH_DEVELOP
-            ComponentSystem.RegisterCompiler(StringId.FromString("primitive_mesh"), Compiler);
+            ComponentSystem.RegisterCompiler(StringId.FromString("primitive_mesh"), Compiler, 10);
 #endif
-            ComponentSystem.RegisterSpawnerCompiler(StringId.FromString("primitive_mesh"), Spawner);
+            ComponentSystem.RegisterSpawner(StringId.FromString("primitive_mesh"), Spawner);
         }
 
         private static void ShutdownImpl()
@@ -92,7 +92,7 @@ namespace CETech.World
                     ++idx;
                 }
 
-                var world_matrix = TranformationSystem.GetWorldMatrix(world, f.Key);
+                var world_matrix = TranformationSystem.GetWorldMatrix(world, TranformationSystem.GetTranform(world,f.Key));
                 unsafe
                 {
                     Bgfx.SetTransform(&world_matrix.M11);

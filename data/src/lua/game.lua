@@ -24,6 +24,9 @@ function Game:init()
     self.unit2 = World.UnitByName(self.world, self.level, "box2")
     self.unit = self.unit1
 
+    self.camera_unit = UnitManager.Spawn(self.world, "camera");
+    self.camera = Camera.GetCamera(self.world, self.camera_unit);
+
     UnitManager.Spawn(self.world, "unit11");
 
     Log.Info("sadsadas", "{0}", self.unit);
@@ -74,8 +77,10 @@ function Game:update(dt)
 
     local m_axis = Mouse.axis("delta")
 
-    local pos = Transformation.GetPosition(self.world, self.unit)
-    local rot = Transformation.GetRotation(self.world, self.unit)
+    local unit_transform = Transformation.GetTransform(self.world, self.camera_unit)
+
+    local pos = Transformation.GetPosition(self.world, unit_transform)
+    local rot = Transformation.GetRotation(self.world, unit_transform)
 
     if Mouse.State(Mouse.ButtonIndex("left") ) then
         rot.X = rot.X + m_axis.X * -0.1;
@@ -98,10 +103,10 @@ function Game:update(dt)
         pos.Z = pos.Z - 0.2
     end
 
-    rot.X = rot.X - 0.005 * dt
+    --rot.X = rot.X - 0.005 * dt
 
-    Transformation.SetPosition(self.world, self.unit, pos)
-    Transformation.SetRotation(self.world, self.unit, rot)
+    Transformation.SetPosition(self.world, unit_transform, pos)
+    Transformation.SetRotation(self.world, unit_transform, rot)
 
     World.Update(self.world)
     --print("%f, %f", m_axis.x, m_axis.y)
@@ -109,7 +114,7 @@ function Game:update(dt)
 end
 
 function Game:render()
-    RenderSystem.RenderWorld(self.world)
+    RenderSystem.RenderWorld(self.world, self.camera)
 end
 
 function foo(value)
