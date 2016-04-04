@@ -76,6 +76,11 @@ namespace CETech
             Bgfx.SetViewClear(0, ClearTargets.Color | ClearTargets.Depth, 0x66CCFFff);
         }
 
+		private static void ShutdownImpl()
+		{
+			Bgfx.Shutdown ();
+		}
+
         private static void ResizeImpl(int width, int height)
         {
             _data.NeedResize = true;

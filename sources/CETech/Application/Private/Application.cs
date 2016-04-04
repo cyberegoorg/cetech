@@ -453,6 +453,8 @@ namespace CETech
 
             TaskManager.Shutdown();
             EntityManager.Shutdown();
+
+			RenderSystem.Shutdown ();
             ConfigSystem.Shutdown();
         }
 

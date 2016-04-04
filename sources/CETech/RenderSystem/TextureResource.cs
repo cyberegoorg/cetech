@@ -100,7 +100,7 @@ namespace CETech
             var input_img = FileSystem.GetFullPath("src", texture_yaml.input);
             var output_img = Path.Combine(build_dir, "tmp", Path.GetFileName(texture_yaml.input) + ".ktx");
 
-            capi.add_dependency(input_img);
+			capi.add_dependency(texture_yaml.input);
 
             texturec(input_img, output_img, texture_yaml.gen_mipmaps, texture_yaml.is_normalmap);
 

@@ -302,7 +302,7 @@ def install(name, body, platform_):
                 except FileExistsError:
                     pass
 
-                shutil.copyfile(src, dst_dir)
+                shutil.copy(src, dst_dir)
 
             elif name == 'copytree':
                 try:
