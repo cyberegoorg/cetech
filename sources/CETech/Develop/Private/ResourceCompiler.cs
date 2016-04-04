@@ -125,7 +125,9 @@ namespace CETech.Develop
                     SourceFs = root
                 };
 
-                tasks[0] = TaskManager.AddBegin("compile_task", compile_task, task, parent: topCompileTask, affinity:TaskManager.TaskAffinity.MainThead/* TODO: this fix yamlserializer (problem with thread????)*/);
+                tasks[0] = TaskManager.AddBegin("compile_task", compile_task, task, parent: topCompileTask,
+                    affinity: TaskManager.TaskAffinity.MainThead
+                    /* TODO: this fix yamlserializer (problem with thread????)*/);
                 TaskManager.AddEnd(tasks);
             }
 

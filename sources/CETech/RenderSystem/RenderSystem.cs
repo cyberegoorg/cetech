@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace CETech
+﻿namespace CETech
 {
     /// <summary>
     ///     Render system

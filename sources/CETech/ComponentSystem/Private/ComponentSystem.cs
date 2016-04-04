@@ -33,7 +33,7 @@ namespace CETech
             _spawnerMap[type](world, ent_ids, ents_parent, data);
         }
 
-        private static  int GetSpawnOrderImpl(long type)
+        private static int GetSpawnOrderImpl(long type)
         {
             return _spawnOrderMap[type];
         }

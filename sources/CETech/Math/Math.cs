@@ -1,10 +1,12 @@
-﻿namespace CETech.World
+﻿using System;
+
+namespace CETech.World
 {
     public class MathUtils
     {
-        static public float DegToRad(float angle)
+        public static float DegToRad(float angle)
         {
-            return (float) ((System.Math.PI / 180) * angle);
+            return (float) (Math.PI/180*angle);
         }
     }
 }

@@ -66,6 +66,7 @@
     <Compile Include="Lua\LuaEnviroment.cs" />
     <Compile Include="Lua\LuaResource.cs" />
     <Compile Include="Lua\Private\Api\ApplicationApi.cs" />
+    <Compile Include="Lua\Private\Api\Camera.cs" />
     <Compile Include="Lua\Private\Api\KeyboardApi.cs" />
     <Compile Include="Lua\Private\Api\LogApi.cs" />
     <Compile Include="Lua\Private\Api\MouseApi.cs" />
@@ -75,6 +76,7 @@
     <Compile Include="Lua\Private\Api\UnitManager.cs" />
     <Compile Include="Lua\Private\Api\WorldApi.cs" />
     <Compile Include="Lua\Private\LuaEnviroment.cs" />
+    <Compile Include="Math\Math.cs" />
     <Compile Include="Math\Matrix4f.cs" />
     <Compile Include="Math\Vector2f.cs" />
     <Compile Include="Math\Vector3f.cs" />
@@ -83,9 +85,11 @@
     <Compile Include="PackageManager\PackageResource.cs" />
     <Compile Include="PackageManager\Private\PackageManager.cs" />
     <Compile Include="Program.cs" />
+    <Compile Include="RenderSystem\CameraSystem.cs" />
     <Compile Include="RenderSystem\MaterialResource.cs" />
     <Compile Include="RenderSystem\PrimitiveMeshRenderer.cs" />
     <Compile Include="RenderSystem\Private\AviWriter.cs" />
+    <Compile Include="RenderSystem\Private\CameraSystem.cs" />
     <Compile Include="RenderSystem\Private\PrimitiveMeshRenderer.cs" />
     <Compile Include="RenderSystem\Private\RendererBgfx.cs" />
     <Compile Include="RenderSystem\RenderSystem.cs" />
@@ -105,6 +109,24 @@
     <Compile Include="Utils\Log.cs" />
     <Compile Include="Utils\LogHandler.cs" />
     <Compile Include="Utils\Options.cs" />
+    <Compile Include="Utils\Yaml.cs" />
+    <Compile Include="Utils\YamlSerializer\EasyTypeConverter.cs" />
+    <Compile Include="Utils\YamlSerializer\ObjectMemberAccessor.cs" />
+    <Compile Include="Utils\YamlSerializer\Parser.cs" />
+    <Compile Include="Utils\YamlSerializer\RehashableDictionary.cs" />
+    <Compile Include="Utils\YamlSerializer\TypeUtils.cs" />
+    <Compile Include="Utils\YamlSerializer\UriEncoding.cs" />
+    <Compile Include="Utils\YamlSerializer\YamlAnchorDictionary.cs" />
+    <Compile Include="Utils\YamlSerializer\YamlConstructor.cs" />
+    <Compile Include="Utils\YamlSerializer\YamlDoubleQuoteEscaping.cs" />
+    <Compile Include="Utils\YamlSerializer\YamlNode.cs" />
+    <Compile Include="Utils\YamlSerializer\YamlParser.cs" />
+    <Compile Include="Utils\YamlSerializer\YamlPresenter.cs" />
+    <Compile Include="Utils\YamlSerializer\YamlRepresenter.cs" />
+    <Compile Include="Utils\YamlSerializer\YamlSerializer.cs" />
+    <Compile Include="Utils\YamlSerializer\YamlTagPrefixes.cs" />
+    <Compile Include="Utils\YamlSerializer\YamlTagResolutionScheme.cs" />
+    <Compile Include="Utils\YamlSerializer\YamlTagValidator.cs" />
     <Compile Include="Window\Private\WindowSDL.cs">
       <Services>SDL2</Services>
     </Compile>
@@ -116,25 +138,8 @@
     <Compile Include="World\Private\WorldManager.cs" />
     <Compile Include="World\TranformationSystem.cs" />
     <Compile Include="World\WorldManager.cs" />
-    <Compile Include="YamlSerializer\EasyTypeConverter.cs" />
-    <Compile Include="YamlSerializer\ObjectMemberAccessor.cs" />
-    <Compile Include="YamlSerializer\Parser.cs" />
-    <Compile Include="YamlSerializer\RehashableDictionary.cs" />
-    <Compile Include="YamlSerializer\TypeUtils.cs" />
-    <Compile Include="YamlSerializer\UriEncoding.cs" />
-    <Compile Include="YamlSerializer\YamlAnchorDictionary.cs" />
-    <Compile Include="YamlSerializer\YamlConstructor.cs" />
-    <Compile Include="YamlSerializer\YamlDoubleQuoteEscaping.cs" />
-    <Compile Include="YamlSerializer\YamlNode.cs" />
-    <Compile Include="YamlSerializer\YamlParser.cs" />
-    <Compile Include="YamlSerializer\YamlPresenter.cs" />
-    <Compile Include="YamlSerializer\YamlRepresenter.cs" />
-    <Compile Include="YamlSerializer\YamlSerializer.cs" />
-    <Compile Include="YamlSerializer\YamlTagPrefixes.cs" />
-    <Compile Include="YamlSerializer\YamlTagResolutionScheme.cs" />
-    <Compile Include="YamlSerializer\YamlTagValidator.cs" />
-    <Content Include="YamlSerializer\ChangeLog.txt" />
-    <Content Include="YamlSerializer\Readme.txt" />
+    <Content Include="Utils\YamlSerializer\ChangeLog.txt" />
+    <Content Include="Utils\YamlSerializer\Readme.txt" />
     <None Include="CETechDevelop.sh">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>

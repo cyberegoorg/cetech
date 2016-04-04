@@ -17,69 +17,6 @@ namespace CETech
         /// </summary>
         public static readonly long Type = StringId.FromString("material");
 
-#if CETECH_DEVELOP
-
-        private static void preprocess(YamlMapping root)
-        {
-            if (root.ContainsKey("parent"))
-            {
-                var prefab_file = ((YamlScalar)root["parent"]).Value + ".material";
-
-                using (var prefab_source = FileSystem.Open("src", prefab_file, FileSystem.OpenMode.Read))
-                {
-                    TextReader input = new StreamReader(prefab_source);
-                    var parent_yaml = YamlNode.FromYaml(input)[0] as YamlMapping;
-                    preprocess(parent_yaml);
-
-                    Yaml.merge(root, parent_yaml);
-                }
-            }
-        }
-
-        /// <summary>
-        ///     Resource compiler
-        /// </summary>
-        /// <param name="capi">Compiler api</param>
-        public static void Compile(ResourceCompiler.CompilatorApi capi)
-        {
-            TextReader input = new StreamReader(capi.ResourceFile);
-            var yaml = YamlNode.FromYaml(input);
-
-            var rootNode = yaml[0] as YamlMapping;
-
-            preprocess(rootNode);
-
-            var shader_name = ((YamlScalar) rootNode["shader"]).Value;
-            var resource = new Resource {shader_name = StringId.FromString(shader_name)};
-            if (rootNode.ContainsKey("textures"))
-            {
-                var textures = (YamlMapping) rootNode["textures"];
-
-                resource.unforms_name = new string[textures.Count];
-                resource.texture = new string[textures.Count];
-
-                var idx = 0;
-                foreach (var texture in textures)
-                {
-                    resource.unforms_name[idx] = ((YamlScalar) texture.Key).Value;
-                    resource.texture[idx] = ((YamlScalar) texture.Value).Value;
-
-                    ++idx;
-                }
-            }
-            else
-            {
-                resource.unforms_name = new string[0];
-                resource.texture = new string[0];
-            }
-
-            var serializer = MessagePackSerializer.Get<Resource>();
-            serializer.Pack(capi.BuildFile, resource);
-
-            capi.add_dependency(shader_name + ".shader");
-        }
-#endif
-
         /// <summary>
         ///     Resource loader
         /// </summary>
@@ -178,5 +115,68 @@ namespace CETech
             public TextureResource.Resource[] texture_resource;
             public Uniform[] texture_uniform;
         }
+
+#if CETECH_DEVELOP
+
+        private static void preprocess(YamlMapping root)
+        {
+            if (root.ContainsKey("parent"))
+            {
+                var prefab_file = ((YamlScalar) root["parent"]).Value + ".material";
+
+                using (var prefab_source = FileSystem.Open("src", prefab_file, FileSystem.OpenMode.Read))
+                {
+                    TextReader input = new StreamReader(prefab_source);
+                    var parent_yaml = YamlNode.FromYaml(input)[0] as YamlMapping;
+                    preprocess(parent_yaml);
+
+                    Yaml.merge(root, parent_yaml);
+                }
+            }
+        }
+
+        /// <summary>
+        ///     Resource compiler
+        /// </summary>
+        /// <param name="capi">Compiler api</param>
+        public static void Compile(ResourceCompiler.CompilatorApi capi)
+        {
+            TextReader input = new StreamReader(capi.ResourceFile);
+            var yaml = YamlNode.FromYaml(input);
+
+            var rootNode = yaml[0] as YamlMapping;
+
+            preprocess(rootNode);
+
+            var shader_name = ((YamlScalar) rootNode["shader"]).Value;
+            var resource = new Resource {shader_name = StringId.FromString(shader_name)};
+            if (rootNode.ContainsKey("textures"))
+            {
+                var textures = (YamlMapping) rootNode["textures"];
+
+                resource.unforms_name = new string[textures.Count];
+                resource.texture = new string[textures.Count];
+
+                var idx = 0;
+                foreach (var texture in textures)
+                {
+                    resource.unforms_name[idx] = ((YamlScalar) texture.Key).Value;
+                    resource.texture[idx] = ((YamlScalar) texture.Value).Value;
+
+                    ++idx;
+                }
+            }
+            else
+            {
+                resource.unforms_name = new string[0];
+                resource.texture = new string[0];
+            }
+
+            var serializer = MessagePackSerializer.Get<Resource>();
+            serializer.Pack(capi.BuildFile, resource);
+
+            capi.add_dependency(shader_name + ".shader");
+        }
+#endif
     }
 }

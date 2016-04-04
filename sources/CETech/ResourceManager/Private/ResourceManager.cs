@@ -80,14 +80,14 @@ namespace CETech
             {
                 _addLock.Enter(ref gotLock);*/
 
-                for (var i = 0; i < names.Length; i++)
-                {
-                    IncRef(idx, names[i]);
+            for (var i = 0; i < names.Length; i++)
+            {
+                IncRef(idx, names[i]);
 
-                    DataMap[idx][names[i]] = loaded_data[i];
+                DataMap[idx][names[i]] = loaded_data[i];
 
-                    online(DataMap[idx][names[i]]);
-                }
+                online(DataMap[idx][names[i]]);
+            }
 /*            }
             finally
             {

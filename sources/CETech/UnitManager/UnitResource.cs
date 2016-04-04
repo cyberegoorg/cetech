@@ -1,10 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Yaml;
 using CETech.Develop;
-using CETech.Lua;
 using CETechDevelop.Utils;
 using MsgPack;
 using MsgPack.Serialization;
@@ -121,7 +119,7 @@ namespace CETech.World
         {
             if (root.ContainsKey("prefab"))
             {
-                var prefab_file = ((YamlScalar)root["prefab"]).Value + ".unit";
+                var prefab_file = ((YamlScalar) root["prefab"]).Value + ".unit";
 
                 using (var prefab_source = FileSystem.Open("src", prefab_file, FileSystem.OpenMode.Read))
                 {
@@ -148,7 +146,8 @@ namespace CETech.World
             compile_entitity(root, ref entities_id, int.MaxValue, ents_parent, components_type, component_ent,
                 components_body);
 
-            var components_type_sorted = components_type.OrderBy(pair => ComponentSystem.GetSpawnOrder(pair)).Select(pair => pair).ToArray();
+            var components_type_sorted =
+                components_type.OrderBy(pair => ComponentSystem.GetSpawnOrder(pair)).Select(pair => pair).ToArray();
 
             packer.PackMapHeader(5);
 
