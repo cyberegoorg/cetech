@@ -190,7 +190,7 @@ namespace CETech.Develop.Private
                                 compile = false;
 
 								var actual_mtime = FileSystem.GetFileMTime(root, rdr.GetString(0)).ToFileTimeUtc();
-								var last_mtime = rdr.GetDateTime(1).ToFileTimeUtc();
+								var last_mtime = rdr.GetInt64 (1);
 
                                 if (actual_mtime != last_mtime)
                                 {

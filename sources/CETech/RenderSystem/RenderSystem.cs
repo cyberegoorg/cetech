@@ -67,6 +67,10 @@
             InitImpl(window, type);
         }
 
+		public static void Shutdown()
+		{
+			ShutdownImpl ();
+		}
 
         public static void RenderWorld(int world, int camera)
         {
