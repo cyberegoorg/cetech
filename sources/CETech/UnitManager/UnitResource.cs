@@ -1,8 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Yaml;
 using CETech.Develop;
+using CETech.Lua;
+using CETechDevelop.Utils;
 using MsgPack;
 using MsgPack.Serialization;
 
@@ -123,22 +126,10 @@ namespace CETech.World
                 using (var prefab_source = FileSystem.Open("src", prefab_file, FileSystem.OpenMode.Read))
                 {
                     TextReader input = new StreamReader(prefab_source);
-                    var yaml = YamlNode.FromYaml(input)[0] as YamlMapping;
+                    var parent_yaml = YamlNode.FromYaml(input)[0] as YamlMapping;
 
-                    preprocess(yaml);
-
-                    root["components"] = yaml["components"];
-
-                    if (root.ContainsKey("children"))
-                    {
-                        var children = root["children"] as YamlMapping;
-                        foreach (var child in children)
-                        {
-                            preprocess(child.Value as YamlMapping);
-
-                            ((YamlMapping) root["children"])[child.Key] = child.Value;
-                        }
-                    }
+                    preprocess(parent_yaml);
+                    Yaml.merge(root, parent_yaml);
                 }
             }
         }
@@ -157,6 +148,8 @@ namespace CETech.World
             compile_entitity(root, ref entities_id, int.MaxValue, ents_parent, components_type, component_ent,
                 components_body);
 
+            var components_type_sorted = components_type.OrderBy(pair => ComponentSystem.GetSpawnOrder(pair)).Select(pair => pair).ToArray();
+
             packer.PackMapHeader(5);
 
             var ent_count = entities_id + 1;
@@ -172,17 +165,17 @@ namespace CETech.World
 
 
             packer.Pack("type");
-            packer.PackArrayHeader(components_type.Count);
-            for (var i = 0; i < components_type.Count; ++i)
+            packer.PackArrayHeader(components_type_sorted.Length);
+            for (var i = 0; i < components_type_sorted.Length; ++i)
             {
-                packer.Pack(components_type[i]);
+                packer.Pack(components_type_sorted[i]);
             }
 
             packer.Pack("ent");
-            packer.PackArrayHeader(components_type.Count);
-            for (var i = 0; i < components_type.Count; ++i)
+            packer.PackArrayHeader(components_type_sorted.Length);
+            for (var i = 0; i < components_type_sorted.Length; ++i)
             {
-                var comp_type = components_type[i];
+                var comp_type = components_type_sorted[i];
                 var ents = component_ent[comp_type];
 
                 packer.PackArrayHeader(ents.Count);
@@ -193,10 +186,10 @@ namespace CETech.World
             }
 
             packer.Pack("data");
-            packer.PackArrayHeader(components_type.Count);
-            for (var i = 0; i < components_type.Count; ++i)
+            packer.PackArrayHeader(components_type_sorted.Length);
+            for (var i = 0; i < components_type_sorted.Length; ++i)
             {
-                var comp_type = components_type[i];
+                var comp_type = components_type_sorted[i];
                 var comp_body = components_body[comp_type];
 
                 packer.PackArrayHeader(comp_body.Count);

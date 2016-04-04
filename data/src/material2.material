@@ -1,4 +1,4 @@
-shader: shader1
+parent: material1
 
 textures:
   u_texColor: texture2
