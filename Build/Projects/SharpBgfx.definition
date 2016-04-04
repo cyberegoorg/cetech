@@ -15,4 +15,7 @@
   <NativeBinary Path="externals/build/windows64/Release/bin/shaderc.exe"/>
   <NativeBinary Path="externals/build/windows64/Release/bin/texturec.exe"/>
 
+  <NativeBinary Path="externals/build/linux64/Release/bin/shaderc"/>
+  <NativeBinary Path="externals/build/linux64/Release/bin/texturec"/>
+
 </ExternalProject>
