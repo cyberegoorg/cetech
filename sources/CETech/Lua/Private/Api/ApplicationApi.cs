@@ -1,3 +1,4 @@
+using CETech.Develop;
 using MoonSharp.Interpreter;
 
 namespace CETech.Lua.Api
@@ -13,6 +14,22 @@ namespace CETech.Lua.Api
         public static string GetPlatform()
         {
             return Application.GetPlatform();
+        }
+
+        public static void RecompileAll()
+        {
+#if CETECH_DEVELOP
+            ResourceCompiler.CompileAll();
+#endif
+        }
+
+        public static void ReloadAll()
+        {
+            var types = new[] {"shader", "texture", "material", "lua"};
+            for (var i = 0; i < types.Length; i++)
+            {
+                ResourceManager.ReloadAll(StringId.FromString(types[i]));
+            }
         }
     }
 }
