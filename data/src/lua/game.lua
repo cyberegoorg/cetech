@@ -43,6 +43,11 @@ function Game:shutdown()
 end
 
 function Game:update(dt)
+    if Keyboard.Pressed(Keyboard.ButtonIndex('r')) then
+        Application.RecompileAll()
+        Application.ReloadAll()
+    end
+
     if Keyboard.Pressed(quit_btn) then
         Application.Quit()
     end
