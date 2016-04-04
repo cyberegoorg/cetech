@@ -1,6 +1,5 @@
 using System.Diagnostics;
 using System.IO;
-using System.Yaml;
 using System.Yaml.Serialization;
 using CETech.Develop;
 using CETech.Utils;
@@ -96,7 +95,7 @@ namespace CETech
 
             TextReader input = new StreamReader(capi.ResourceFile);
             var serializer = new YamlSerializer();
-            var texture_yaml = (TextureYaml)serializer.Deserialize(input, typeof (TextureYaml))[0];
+            var texture_yaml = (TextureYaml) serializer.Deserialize(input, typeof (TextureYaml))[0];
 
             var input_img = FileSystem.GetFullPath("src", texture_yaml.input);
             var output_img = Path.Combine(build_dir, "tmp", Path.GetFileName(texture_yaml.input) + ".ktx");

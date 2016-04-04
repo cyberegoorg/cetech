@@ -92,7 +92,8 @@ namespace CETech.World
                     ++idx;
                 }
 
-                var world_matrix = TranformationSystem.GetWorldMatrix(world, TranformationSystem.GetTranform(world,f.Key));
+                var world_matrix = TranformationSystem.GetWorldMatrix(world,
+                    TranformationSystem.GetTranform(world, f.Key));
                 unsafe
                 {
                     Bgfx.SetTransform(&world_matrix.M11);

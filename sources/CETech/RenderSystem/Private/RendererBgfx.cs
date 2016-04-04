@@ -114,8 +114,8 @@ namespace CETech
 #if CETECH_DEVELOP
             var stats = Bgfx.GetStats();
             DevelopSystem.PushRecordInt("renderer.frame", frame);
-            DevelopSystem.PushRecordFloat("renderer.cpu_elapsed", (float)stats.CpuElapsed.TotalMilliseconds);
-            DevelopSystem.PushRecordFloat("renderer.gpu_elapsed", (float)stats.GpuElapsed.TotalMilliseconds);
+            DevelopSystem.PushRecordFloat("renderer.cpu_elapsed", (float) stats.CpuElapsed.TotalMilliseconds);
+            DevelopSystem.PushRecordFloat("renderer.gpu_elapsed", (float) stats.GpuElapsed.TotalMilliseconds);
 #endif
         }
 

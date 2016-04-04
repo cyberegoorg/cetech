@@ -85,12 +85,6 @@ namespace CETech
         /// <param name="loaded_data">Loaded data</param>
         /// <param name="type">Resource type</param>
         /// <param name="names">Resource names</param>
-//        public static void AddLoaded(object[] loaded_data, long type, long[] names)
-//        {
-//            AddLoadedImpl(loaded_data, type, names);
-//        }
-
-
         /// <summary>
         ///     Load resource now.
         /// </summary>

@@ -230,6 +230,11 @@ namespace CETech.World
             Transform(world, child_idx, GetWorldMatrix(world, GetTranform(world, parent)));
         }
 
+        private static int GetTranformImpl(int world, int entity)
+        {
+            return getIdx(world, entity);
+        }
+
         private class WorldInstance
         {
             public readonly Dictionary<int, int> EntIdx;
@@ -256,11 +261,6 @@ namespace CETech.World
                 FirstChild = new List<int>();
                 World = new List<Matrix4f>();
             }
-        }
-
-        private static int GetTranformImpl(int world, int entity)
-        {
-            return getIdx(world, entity);
         }
     }
 }

@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Globalization;
 using System.Yaml;
 using CETech.Develop;
@@ -61,6 +60,7 @@ namespace CETech.World
         {
             return float.Parse(scalar.Value, CultureInfo.InvariantCulture);
         }
+
         private static void Compiler(YamlMapping body, ConsoleServer.ResponsePacker packer)
         {
             var near = body["near"] as YamlScalar;
@@ -91,13 +91,27 @@ namespace CETech.World
         {
         }
 
+        private static void GetProjectViewImpl(int world, int camera, out Matrix4f proj, out Matrix4f view)
+        {
+            var world_instance = _worldInstance[world];
+
+            view = TranformationSystem.GetWorldMatrix(world, world_instance.Tranform[camera]);
+            proj = Matrix4f.CreatePerspectiveFieldOfView(MathUtils.DegToRad(world_instance.Fov[camera]), 800.0f/600.0f,
+                world_instance.Near[camera], world_instance.Far[camera]);
+        }
+
+        private static int GetCameraImpl(int world, int entity)
+        {
+            return _worldInstance[world].EntIdx[entity];
+        }
+
         private class WorldInstance
         {
             public readonly Dictionary<int, int> EntIdx;
-
-            public readonly List<float> Near;
             public readonly List<float> Far;
             public readonly List<float> Fov;
+
+            public readonly List<float> Near;
             public readonly List<int> Tranform;
 
             public WorldInstance()
@@ -109,19 +123,6 @@ namespace CETech.World
                 Fov = new List<float>();
                 Tranform = new List<int>();
             }
-        }
-
-        private static void GetProjectViewImpl(int world, int camera, out Matrix4f proj, out Matrix4f view)
-        {
-            var world_instance = _worldInstance[world];
-
-            view = TranformationSystem.GetWorldMatrix(world, world_instance.Tranform[camera]);
-            proj = Matrix4f.CreatePerspectiveFieldOfView(MathUtils.DegToRad(world_instance.Fov[camera]), 800.0f/600.0f, world_instance.Near[camera], world_instance.Far[camera]);
-        }
-
-        private static int GetCameraImpl(int world, int entity)
-        {
-            return _worldInstance[world].EntIdx[entity];
         }
     }
 }

@@ -18,10 +18,9 @@ namespace CETechDevelop.Utils
                 {
                     if (node_type == "!!map")
                     {
-                        merge((YamlMapping)root[parent_item.Key], (YamlMapping)parent_item.Value);
+                        merge((YamlMapping) root[parent_item.Key], (YamlMapping) parent_item.Value);
                     }
                 }
-
             }
         }
     }

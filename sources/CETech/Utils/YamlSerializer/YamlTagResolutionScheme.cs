@@ -1,20 +1,28 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Globalization;
-using System.Linq;
-using System.Text;
-
 using System.Text.RegularExpressions;
 
 namespace System.Yaml
 {
     /// <summary>
-    /// Represents the way to automatically resolve Tag from the Value of a YamlScalar.
+    ///     Represents the way to automatically resolve Tag from the Value of a YamlScalar.
     /// </summary>
     internal class YamlTagResolver
     {
+        private Dictionary<string, Regex> algorithms;
+
         /// <summary>
-        /// Create TagResolver with default resolution rules.
+        ///     List of tag resolution rules.
+        /// </summary>
+        private readonly List<YamlTagResolutionRule> Rules = new List<YamlTagResolutionRule>();
+
+        private Dictionary<string, List<YamlTagResolutionRule>> types;
+        private Dictionary<Type, YamlTagResolutionRule> TypeToRule;
+
+        private int UpdateCounter;
+
+        /// <summary>
+        ///     Create TagResolver with default resolution rules.
         /// </summary>
         public YamlTagResolver()
         {
@@ -22,100 +30,101 @@ namespace System.Yaml
         }
 
         /// <summary>
-        /// Add default tag resolution rules to the rule list.
+        ///     Add default tag resolution rules to the rule list.
         /// </summary>
-        void AddDefaultRules()
+        private void AddDefaultRules()
         {
             BeginUpdate();
-            AddRule<int>("!!int", @"([-+]?(0|[1-9][0-9_]*))", 
+            AddRule("!!int", @"([-+]?(0|[1-9][0-9_]*))",
                 m => Convert.ToInt32(m.Value.Replace("_", "")), null);
-            AddRule<int>("!!int", @"([-+]?)0b([01_]+)", m => {
+            AddRule("!!int", @"([-+]?)0b([01_]+)", m =>
+            {
                 var v = Convert.ToInt32(m.Groups[2].Value.Replace("_", ""), 2);
                 return m.Groups[1].Value == "-" ? -v : v;
-                }, null);
-            AddRule<int>("!!int", @"([-+]?)0o?([0-7_]+)", m => {
+            }, null);
+            AddRule("!!int", @"([-+]?)0o?([0-7_]+)", m =>
+            {
                 var v = Convert.ToInt32(m.Groups[2].Value.Replace("_", ""), 8);
                 return m.Groups[1].Value == "-" ? -v : v;
             }, null);
-            AddRule<int>("!!int", @"([-+]?)0x([0-9a-fA-F_]+)", m => {
+            AddRule("!!int", @"([-+]?)0x([0-9a-fA-F_]+)", m =>
+            {
                 var v = Convert.ToInt32(m.Groups[2].Value.Replace("_", ""), 16);
                 return m.Groups[1].Value == "-" ? -v : v;
             }, null);
             // Todo: http://yaml.org/type/float.html is wrong  => [0-9.] should be [0-9_]
-            AddRule<double>("!!float", @"[-+]?(0|[1-9][0-9_]*)\.[0-9_]*([eE][-+]?[0-9]+)?",
+            AddRule("!!float", @"[-+]?(0|[1-9][0-9_]*)\.[0-9_]*([eE][-+]?[0-9]+)?",
                 m => Convert.ToDouble(m.Value.Replace("_", ""), CultureInfo.InvariantCulture), null);
-            AddRule<double>("!!float", @"[-+]?\._*[0-9][0-9_]*([eE][-+]?[0-9]+)?",
+            AddRule("!!float", @"[-+]?\._*[0-9][0-9_]*([eE][-+]?[0-9]+)?",
                 m => Convert.ToDouble(m.Value.Replace("_", ""), CultureInfo.InvariantCulture), null);
-            AddRule<double>("!!float", @"[-+]?(0|[1-9][0-9_]*)([eE][-+]?[0-9]+)",
+            AddRule("!!float", @"[-+]?(0|[1-9][0-9_]*)([eE][-+]?[0-9]+)",
                 m => Convert.ToDouble(m.Value.Replace("_", ""), CultureInfo.InvariantCulture), null);
-            AddRule<double>("!!float", @"\+?(\.inf|\.Inf|\.INF)", m => double.PositiveInfinity, null);
-            AddRule<double>("!!float", @"-(\.inf|\.Inf|\.INF)", m => double.NegativeInfinity, null);
-            AddRule<double>("!!float", @"\.nan|\.NaN|\.NAN", m => double.NaN, null);
-            AddRule<bool>("!!bool", @"y|Y|yes|Yes|YES|true|True|TRUE|on|On|ON", m => true, null);
-            AddRule<bool>("!!bool", @"n|N|no|No|NO|false|False|FALSE|off|Off|OFF", m => false, null);
+            AddRule("!!float", @"\+?(\.inf|\.Inf|\.INF)", m => double.PositiveInfinity, null);
+            AddRule("!!float", @"-(\.inf|\.Inf|\.INF)", m => double.NegativeInfinity, null);
+            AddRule("!!float", @"\.nan|\.NaN|\.NAN", m => double.NaN, null);
+            AddRule("!!bool", @"y|Y|yes|Yes|YES|true|True|TRUE|on|On|ON", m => true, null);
+            AddRule("!!bool", @"n|N|no|No|NO|false|False|FALSE|off|Off|OFF", m => false, null);
             AddRule<object>("!!null", @"null|Null|NULL|\~|", m => null, null);
-            AddRule<string>("!!merge", @"<<", m => "<<", null);
-            AddRule<DateTime>("!!timestamp",  // Todo: spec is wrong (([ \t]*)Z|[-+][0-9][0-9]?(:[0-9][0-9])?)? should be (([ \t]*)(Z|[-+][0-9][0-9]?(:[0-9][0-9])?))? to accept "2001-12-14 21:59:43.10 -5"
+            AddRule("!!merge", @"<<", m => "<<", null);
+            AddRule("!!timestamp",
+                // Todo: spec is wrong (([ \t]*)Z|[-+][0-9][0-9]?(:[0-9][0-9])?)? should be (([ \t]*)(Z|[-+][0-9][0-9]?(:[0-9][0-9])?))? to accept "2001-12-14 21:59:43.10 -5"
                 @"([0-9]{4})-([0-9]{2})-([0-9]{2})" +
                 @"(" +
-                    @"([Tt]|[\t ]+)" +
-                    @"([0-9]{1,2}):([0-9]{1,2}):([0-9]{1,2})(\.([0-9]*))?" +
-                    @"(" +
-                        @"([ \t]*)" +
-                        @"(Z|([-+])([0-9]{1,2})(:([0-9][0-9]))?)" +
-                    @")?" +
-                @")?", 
+                @"([Tt]|[\t ]+)" +
+                @"([0-9]{1,2}):([0-9]{1,2}):([0-9]{1,2})(\.([0-9]*))?" +
+                @"(" +
+                @"([ \t]*)" +
+                @"(Z|([-+])([0-9]{1,2})(:([0-9][0-9]))?)" +
+                @")?" +
+                @")?",
                 match => DateTime.Parse(match.Value),
-                datetime => {
+                datetime =>
+                {
                     var z = datetime.ToString("%K");
-                    if ( z != "Z" && z != "" )
+                    if (z != "Z" && z != "")
                         z = " " + z;
-                    if ( datetime.Millisecond == 0 ) {
-                        if ( datetime.Hour == 0 && datetime.Minute == 0 && datetime.Second == 0 ) {
+                    if (datetime.Millisecond == 0)
+                    {
+                        if (datetime.Hour == 0 && datetime.Minute == 0 && datetime.Second == 0)
+                        {
                             return datetime.ToString("yyyy-MM-dd" + z);
-                        } else {
-                            return datetime.ToString("yyyy-MM-dd HH:mm:ss" + z);
                         }
-                    } else {
-                        return datetime.ToString("yyyy-MM-dd HH:mm:ss.fff" + z);
+                        return datetime.ToString("yyyy-MM-dd HH:mm:ss" + z);
                     }
+                    return datetime.ToString("yyyy-MM-dd HH:mm:ss.fff" + z);
                 });
             EndUpdate();
         }
 
         public Type TypeFromTag(string tag)
         {
-            tag= YamlNode.ExpandTag(tag);
-            if ( types.ContainsKey(tag) )
+            tag = YamlNode.ExpandTag(tag);
+            if (types.ContainsKey(tag))
                 return types[tag][0].GetTypeOfValue();
             return null;
         }
 
         /// <summary>
-        /// List of tag resolution rules.
-        /// </summary>
-        List<YamlTagResolutionRule> Rules = new List<YamlTagResolutionRule>();
-        /// <summary>
-        /// Add a tag resolution rule that is invoked when <paramref name="regex"/> matches 
-        /// the <see cref="YamlScalar.Value">Value of</see> a <see cref="YamlScalar"/> node.
-        /// 
-        /// The tag is resolved to <paramref name="tag"/> and <paramref name="decode"/> is
-        /// invoked when actual value of type <typeparamref name="T"/> is extracted from 
-        /// the node text.
+        ///     Add a tag resolution rule that is invoked when <paramref name="regex" /> matches
+        ///     the <see cref="YamlScalar.Value">Value of</see> a <see cref="YamlScalar" /> node.
+        ///     The tag is resolved to <paramref name="tag" /> and <paramref name="decode" /> is
+        ///     invoked when actual value of type <typeparamref name="T" /> is extracted from
+        ///     the node text.
         /// </summary>
         /// <remarks>
-        /// Surround sequential calls of this function by <see cref="BeginUpdate"/> / <see cref="EndUpdate"/>
-        /// pair to avoid invoking slow internal calculation method many times.
+        ///     Surround sequential calls of this function by <see cref="BeginUpdate" /> / <see cref="EndUpdate" />
+        ///     pair to avoid invoking slow internal calculation method many times.
         /// </remarks>
         /// <example>
-        /// <code>
+        ///     <code>
         /// BeginUpdate(); // to avoid invoking slow internal calculation method many times.
         /// Add( ... );
         /// Add( ... );
         /// Add( ... );
         /// Add( ... );
         /// EndUpdate();   // automaticall invoke internal calculation method 
-        /// </code></example>
+        /// </code>
+        /// </example>
         /// <param name="tag"></param>
         /// <param name="regex"></param>
         /// <param name="decode"></param>
@@ -123,95 +132,96 @@ namespace System.Yaml
         public void AddRule<T>(string tag, string regex, Func<Match, T> decode, Func<T, string> encode)
         {
             Rules.Add(new YamlTagResolutionRule<T>(tag, regex, decode, encode));
-            if ( UpdateCounter == 0 )
+            if (UpdateCounter == 0)
                 Update();
         }
 
         public void AddRule<T>(string regex, Func<Match, T> decode, Func<T, string> encode)
         {
-            Rules.Add(new YamlTagResolutionRule<T>("!"+typeof(T).FullName, regex, decode, encode));
-            if ( UpdateCounter == 0 )
+            Rules.Add(new YamlTagResolutionRule<T>("!" + typeof (T).FullName, regex, decode, encode));
+            if (UpdateCounter == 0)
                 Update();
         }
 
-        int UpdateCounter = 0;
         /// <summary>
-        /// Supress invoking slow internal calculation method when 
-        /// <see cref="AddRule&lt;T&gt;(string,string,Func&lt;Match,T&gt;,Func&lt;T,string&gt;)"/> called.
-        /// 
-        /// BeginUpdate / <see cref="EndUpdate"/> can be called nestedly.
+        ///     Supress invoking slow internal calculation method when
+        ///     <see cref="AddRule&lt;T&gt;(string,string,Func&lt;Match,T&gt;,Func&lt;T,string&gt;)" /> called.
+        ///     BeginUpdate / <see cref="EndUpdate" /> can be called nestedly.
         /// </summary>
         public void BeginUpdate()
         {
             UpdateCounter++;
         }
+
         /// <summary>
-        /// Quit to supress invoking slow internal calculation method when 
-        /// <see cref="AddRule&lt;T&gt;(string,string,Func&lt;Match,T&gt;,Func&lt;T,string&gt;)"/> called.
+        ///     Quit to supress invoking slow internal calculation method when
+        ///     <see cref="AddRule&lt;T&gt;(string,string,Func&lt;Match,T&gt;,Func&lt;T,string&gt;)" /> called.
         /// </summary>
         public void EndUpdate()
         {
-            if ( UpdateCounter == 0 )
+            if (UpdateCounter == 0)
                 throw new InvalidOperationException();
             UpdateCounter--;
-            if ( UpdateCounter == 0 )
+            if (UpdateCounter == 0)
                 Update();
         }
 
-        Dictionary<string, Regex> algorithms;
-        void Update()
+        private void Update()
         {
             // Tag to joined regexp source
             var sources = new Dictionary<string, string>();
-            foreach ( var rule in Rules ) {
-                if ( !sources.ContainsKey(rule.Tag) ) {
+            foreach (var rule in Rules)
+            {
+                if (!sources.ContainsKey(rule.Tag))
+                {
                     sources.Add(rule.Tag, rule.PatternSource);
-                } else {
+                }
+                else
+                {
                     sources[rule.Tag] += "|" + rule.PatternSource;
                 }
             }
 
             // Tag to joined regexp
             algorithms = new Dictionary<string, Regex>();
-            foreach ( var entry in sources ) {
+            foreach (var entry in sources)
+            {
                 algorithms.Add(
                     entry.Key,
                     new Regex("^(" + entry.Value + ")$")
-                );
+                    );
             }
 
             // Tag to decoding methods
             types = new Dictionary<string, List<YamlTagResolutionRule>>();
-            foreach ( var rule in Rules ) {
-                if ( !types.ContainsKey(rule.Tag) ) 
+            foreach (var rule in Rules)
+            {
+                if (!types.ContainsKey(rule.Tag))
                     types[rule.Tag] = new List<YamlTagResolutionRule>();
                 types[rule.Tag].Add(rule);
             }
 
             TypeToRule = new Dictionary<Type, YamlTagResolutionRule>();
-            foreach ( var rule in Rules ) 
-                if(rule.HasEncoder())
+            foreach (var rule in Rules)
+                if (rule.HasEncoder())
                     TypeToRule[rule.GetTypeOfValue()] = rule;
         }
 
-        Dictionary<string, List<YamlTagResolutionRule>> types;
-        Dictionary<Type, YamlTagResolutionRule> TypeToRule;
-
         /// <summary>
-        /// Execute tag resolution and returns automatically determined tag value from <paramref name="text"/>.
+        ///     Execute tag resolution and returns automatically determined tag value from <paramref name="text" />.
         /// </summary>
         /// <param name="text">Node text with which automatic tag resolution is done.</param>
         /// <returns>Automatically determined tag value .</returns>
         public string Resolve(string text)
         {
-            foreach ( var entry in algorithms )
-                if ( entry.Value.IsMatch(text) )
+            foreach (var entry in algorithms)
+                if (entry.Value.IsMatch(text))
                     return entry.Key;
             return null;
         }
 
         /// <summary>
-        /// Decode <paramref name="text"/> and returns actual value in C# object.
+        ///     Decode <paramref name="text" /> and returns actual value in C# object.
         /// </summary>
         /// <param name="node">Node to be decoded.</param>
         /// <param name="obj">Decoded value.</param>
@@ -219,14 +229,16 @@ namespace System.Yaml
         public bool Decode(YamlScalar node, out object obj)
         {
             obj = null;
-            if ( node.Tag == null || node.Value == null )
+            if (node.Tag == null || node.Value == null)
                 return false;
-            var tag= YamlNode.ExpandTag(node.Tag);
-            if ( !types.ContainsKey(tag) )
+            var tag = YamlNode.ExpandTag(node.Tag);
+            if (!types.ContainsKey(tag))
                 return false;
-            foreach ( var rule in types[tag] ) {
+            foreach (var rule in types[tag])
+            {
                 var m = rule.Pattern.Match(node.Value);
-                if ( m.Success ) {
+                if (m.Success)
+                {
                     obj = rule.Decode(m);
                     return true;
                 }
@@ -238,7 +250,7 @@ namespace System.Yaml
         {
             node = null;
             YamlTagResolutionRule rule;
-            if ( !TypeToRule.TryGetValue(obj.GetType(), out rule) )
+            if (!TypeToRule.TryGetValue(obj.GetType(), out rule))
                 return false;
             node = new YamlScalar(rule.Tag, rule.Encode(obj));
             return true;
@@ -254,11 +266,18 @@ namespace System.Yaml
         public abstract string Encode(object obj);
         public abstract Type GetTypeOfValue();
         public abstract bool HasEncoder();
-        public bool IsMatch(string value) { return Pattern.IsMatch(value); }
+
+        public bool IsMatch(string value)
+        {
+            return Pattern.IsMatch(value);
+        }
     }
 
-    internal class YamlTagResolutionRule<T>: YamlTagResolutionRule
+    internal class YamlTagResolutionRule<T> : YamlTagResolutionRule
     {
+        private readonly Func<Match, T> Decoder;
+        private readonly Func<T, string> Encoder;
+
         public YamlTagResolutionRule(string tag, string regex, Func<Match, T> decoder, Func<T, string> encoder)
         {
             Tag = YamlNode.ExpandTag(tag);
@@ -267,24 +286,25 @@ namespace System.Yaml
             Decoder = decoder;
             Encoder = encoder;
         }
-        private Func<Match, T> Decoder;
-        private Func<T, string> Encoder;
+
         public override object Decode(Match m)
         {
             return Decoder(m);
         }
+
         public override string Encode(object obj)
         {
-            return Encoder((T)obj);
+            return Encoder((T) obj);
         }
+
         public override Type GetTypeOfValue()
         {
-            return typeof(T);
+            return typeof (T);
         }
+
         public override bool HasEncoder()
         {
             return Encoder != null;
         }
     }
-
 }
