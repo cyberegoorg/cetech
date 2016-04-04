@@ -120,7 +120,7 @@ class CetechProject(object):
 
         if compile_:
             args.append("--compile")
-            args.append("--bin %s" % self.get_lib_path(self.BUILD_DEVELOP))
+            #args.append("--bin %s" % self.get_lib_path(self.BUILD_DEVELOP))
 
         if continue_:
             args.append("--continue")

@@ -140,7 +140,7 @@ namespace CETech.Develop
         {
             ConfigSystem.CreateValue("resource_compiler.core", "Path to core dir", "core");
             ConfigSystem.CreateValue("resource_compiler.src", "Path to source dir", Path.Combine("data", "src"));
-            ConfigSystem.CreateValue("resource_compiler.bin", "Binary program path", "");
+            ConfigSystem.CreateValue("resource_compiler.bin", "Binary program path", Path.GetDirectoryName(System.Reflection.Assembly.GetAssembly(typeof(ResourceCompiler)).Location));
         }
 
         internal struct CompileTask
