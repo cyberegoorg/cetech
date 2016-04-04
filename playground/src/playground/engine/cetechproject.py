@@ -1,6 +1,7 @@
 import os
 import platform
-from PyQt5.QtCore import QDir, QProcess
+
+from PyQt5.QtCore import QDir, QProcess, QProcessEnvironment
 from PyQt5.QtWidgets import QFileDialog, QMessageBox
 
 
@@ -21,9 +22,23 @@ def validate_project(project_dir):
 
 
 class CetechProject(object):
-    BUILD_DEBUG = 'Debug'
     BUILD_DEVELOP = 'Develop'
     BUILD_RELEASE = 'Release'
+
+    _BIN_PLATFORM = {
+        'windows': 'Windows',
+        'linux': 'Linux'
+    }
+
+    _ENGINE_BIN = {
+        BUILD_DEVELOP: 'CETechDevelop.exe',
+        BUILD_RELEASE: 'CETech.exe'
+    }
+
+    _BUILD_DIR = {
+        BUILD_DEVELOP: 'Debug',
+        BUILD_RELEASE: 'Release'
+    }
 
     def __init__(self):
         self.project_dir = None
@@ -73,59 +88,86 @@ class CetechProject(object):
     def dump(self):
         for p in self.spawned_process:
             out, err = bytearray(p.readAllStandardOutput()).decode(), bytearray(p.readAllStandardError()).decode()
+
+            print("=" * 32)
             print("out:\n%s\n err:\n%s\n" % (out, err))
+            print("=" * 32)
+
+    def get_lib_path(self, build_type):
+        _platform = platform.system().lower()
+
+        engine_bin_path = os.path.join('..', 'sources', 'CETech', 'bin', self._BIN_PLATFORM[_platform], 'AnyCPU',
+                                       'Debug')
+        return engine_bin_path
 
     def get_executable_path(self, build_type):
-        engine_bin_path = '../build/'
+        engine_bin_path = os.path.join(self.get_lib_path(build_type), self._ENGINE_BIN[build_type])
+        return engine_bin_path
 
-        _platform = platform.system().lower()
-        if _platform == 'darwin':
-            _platform = 'osx'
-
-        platform_dir = "%s%s_clang" % (_platform, platform.architecture()[0][0:2])
-
-        exec_name = "cetech%s" % build_type
-
-        return os.path.join(engine_bin_path, platform_dir, 'bin', exec_name)
-
-    def run_cetech(self, build_type, compile_=False, continue_=False, wait=False, daemon=False, port=None, wid=None,
-                   core_dir=None):
+    def run_cetech_release(self):
         args = [
-            "-s %s" % self.source_dir,
             "-b %s" % self.build_dir,
         ]
 
+        self._run_cetech(self.BUILD_RELEASE, args)
+
+    def run_cetech_develop(self, compile_=False, continue_=False, wait=False, daemon=False, wid=None,
+                           core_dir=None, port=None, bootscript=None):
+        args = [
+            "-b %s" % self.build_dir,
+            "-s %s" % self.source_dir
+        ]
+
         if compile_:
-            args.append("-c")
+            args.append("--compile")
+            args.append("--bin %s" % self.get_lib_path(self.BUILD_DEVELOP))
 
         if continue_:
             args.append("--continue")
 
         if wait:
-            args.append("-w")
+            args.append("-wait")
 
-        if port:
-            args.append("-p %d" % port)
+        if bootscript:
+            args.append("--bootscript %s" % bootscript)
 
         if daemon:
             args.append("--daemon")
 
-        #TODO bug #114 workaround. Disable create sub engine...
+        if port:
+            args.append("--port %s" % port)
+
+        # TODO bug #114 workaround. Disable create sub engine...
         if wid and platform.system().lower() != 'darwin':
             args.append("--wid %s" % int(wid))
 
         if core_dir:
-            args.append("--core-dir %s" % core_dir)
+            args.append("--core %s" % core_dir)
         else:
-            args.append("--core-dir ../core")
+            args.append("--core ../core")  # TODO ?
 
-        cmd = "%s %s" % (self.get_executable_path(build_type), ' '.join(args))
-        print(cmd)
+        # bin_dir
+
+        self._run_cetech(self.BUILD_DEVELOP, args)
+
+    def _run_cetech(self, build_type, args):
+        if platform.system().lower() != 'windows':
+            cmd = "mono %s %s" % (self.get_executable_path(build_type), ' '.join(args))
+        else:
+            cmd = "%s %s" % (self.get_executable_path(build_type), ' '.join(args))
 
         process = QProcess()
+
+        if platform.system().lower() != 'windows':
+            process_env = QProcessEnvironment.systemEnvironment()
+            process_env.insert("LD_LIBRARY_PATH", self.get_lib_path(build_type))
+            process.setProcessEnvironment(process_env)
+
         process.start(cmd)
         process.waitForStarted()
 
         self.spawned_process.append(process)
+
+        print(cmd)
 
         return process

@@ -1,9 +1,23 @@
 lua:
-  - lua/boot
-  - lua/game
+  - "lua/boot"
+  - "lua/game"
 
 texture:
-  - content/texture1
-  
+  - "content/texture1"
+  - "texture2"
+
 package:
-  - core
+  - "core"
+
+unit:
+  - "unit1"
+
+material:
+  - "material1"
+  - "material2"
+
+shader:
+  - "shader1"
+
+level:
+  - "level1"

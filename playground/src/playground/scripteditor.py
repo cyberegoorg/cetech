@@ -8,11 +8,21 @@ from playground.ui.scripteditorwindow import Ui_MainWindow
 
 SUFIX_2_MODE = {
     'lua': 'ace/mode/lua',
+    'sc': 'ace/mode/c_cpp',
+    'sh': 'ace/mode/c_cpp',
     None: 'ace/mode/yaml'
 }
 
-SUPPORTED_EXT = ('lua', 'package', 'texture', 'json')
-FILES_FILTER = "Lua (*.lua);;Package (*.package);;Texture (*.texture);;JSON (*.json)"
+SUPPORTED_EXT = ('lua', 'package', 'texture', 'json', 'unit', 'material', 'shader', 'sc', 'sh')
+FILES_FILTER = "Lua (*.lua);;" \
+               "Package (*.package);;" \
+               "Texture (*.texture);;" \
+               "JSON (*.json);;" \
+               "Unit (*.unit);;" \
+               "Material (*.material);;" \
+               "Shader (*.shader)"\
+               "Shader source (*.sc)"\
+               "Shader header (*.sh)"
 
 
 class ScriptEditorWindow(QMainWindow, Ui_MainWindow):
@@ -30,16 +40,16 @@ class ScriptEditorWindow(QMainWindow, Ui_MainWindow):
         self.filename = filename
 
         self.webView.page().settings().setAttribute(QWebSettings.DeveloperExtrasEnabled, True)
-        self.webView.page().mainFrame().setUrl(QUrl("file://%s/html/editor.html" % QDir.currentPath()))
+        self.webView.page().mainFrame().setUrl(QUrl("file:///%s/html/editor.html" % QDir.currentPath()))
 
         self.webView.page().mainFrame().javaScriptWindowObjectCleared.connect(
-                lambda: self.webView.page().mainFrame().addToJavaScriptWindowObject("editor_widget", self))
+            lambda: self.webView.page().mainFrame().addToJavaScriptWindowObject("editor_widget", self))
 
         if filename:
             self.webView.page().mainFrame().loadFinished.connect(lambda: self.open(self.filename))
         else:
             self.webView.page().mainFrame().loadFinished.connect(
-                    lambda: self.webView.page().mainFrame().evaluateJavaScript("init()"))
+                lambda: self.webView.page().mainFrame().evaluateJavaScript("init()"))
 
     @property
     def text(self):
@@ -131,10 +141,10 @@ class ScriptEditorWindow(QMainWindow, Ui_MainWindow):
             return
 
         filename, _ = QFileDialog.getSaveFileName(
-                self,
-                "Save file",
-                QDir.currentPath() if self.project_manager.project_dir is None else os.path.join(
-                        self.project_manager.project_dir, 'src'), FILES_FILTER
+            self,
+            "Save file",
+            QDir.currentPath() if self.project_manager.project_dir is None else os.path.join(
+                self.project_manager.project_dir, 'src'), FILES_FILTER
         )
 
         if len(filename) == 0:

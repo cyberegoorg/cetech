@@ -1,25 +1,25 @@
-# O co jde?
+# What is it?
 
-CETech je Data-Driven [herní engine](https://en.wikipedia.org/wiki/Game_engine) a sada nastroju určených pro
-tovrbu her a jiných interaktivních aplikaci. Snaží se být **svobodný**, **malý**, **multiplatformní** a
-**snadno rozšířítelný** (jj typický kecy =D). Nesnaží se být funkcemi nabušený a neumožní vám na pár kliknutí vytvořít
-profesionálně vypadajcí hru jako například [Unreal Engine][unreal_engine], [Unity][unity3d] atp. ale místo toho vám
-poskytne dobrý zaklad pro další tvorbu. Takže je to vlstně takový **"kámen"** který si pomocí dat a dláta
-otesáte podle sebe.
+CETech is a Data-Driven game engine and toolset designed for develolp games and other interactive applications.
+They are trying to be free, small, easily expandable and multiplatform (yes, typical bullshit = D).
+Not trying to be a pummeling functions and does not allow you a few clicks to create professional look game
+like Unreal Engine, Unity etc... But instead will provide a good basis for further work.
 
-### Pro koho je určen?
+!!! danger
 
-Pro kohokoliv kdo chce tvořit hry nebo interaktivní aplikace, nebojí se učit novým věcem a nechci si psát technologii od
-uplného začátku.
+    CETech is under havy development and now is only prototype.
+    First i need make simple and well tested api, resource data format, usable playground ecosystem and than optimize
+    engine for speed and size.
 
-### Pro koho není určen?
+### Who is it for?
 
-Pro toho kdo čeká že si hru snadno a bez znalostí nakliká.
+For anyone who wants to make games or interactive applications, not afraid to learn new things and do not want to write
+from technology scratch.
 
-### Z čeho se skladá?
+### What does it consist?
 
-Hlavní součástí je samotný [**engine**][engine], vývojové prostředí [**Playground**][playground] a sada python skriptů
-pro usnadnění kompilace a spravy závislosti.
+The main part is the [**engine**][engine], development environment [**Playground**][playground] and a set of python
+scripts to facilitate the compilation and managing dependencies.
 
 ---
 

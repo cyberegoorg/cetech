@@ -1,67 +1,14 @@
-#########
-# GENIE #
-########################################################################################################################
-genie:
-  clone: git clone https://github.com/bkaradzic/genie --depth 1
-
-  build:
-    linux32:  make
-    linux64:  make
-    darwin64: make
-
-  install:
-    linux: &genie_install_linux
-      [bin/linux/genie, bin]
-
-    linux32:
-      - copy: *genie_install_linux
-
-    linux64:
-      - copy: *genie_install_linux
-
-    darwin64:
-      - copy: [bin/darwin/genie, bin]
-
-########
-# bgfx #
-########################################################################################################################
-bgfx:
-  clone: git clone https://github.com/bkaradzic/bgfx --depth 1
-
-  build:
-    linux64:  make linux-release64
-    linux32:  make linux-release32
-    darwin64: make osx-release64
-
-  install:
-    includes: &bgfx_include
-      [include/bgfx, include/bgfx]
-
-    linux64:
-      - copy:     [.build/linux64_gcc/bin/libbgfxRelease.a, lib]
-      - copytree: *bgfx_include
-
-    linux32:
-      - copy:     [.build/linux32_gcc/bin/libbgfxRelease.a, lib]
-      - copytree: *bgfx_include
-
-    darwin64:
-      - copy:     [.build/osx64_clang/bin/libbgfxRelease.a, lib]
-      - copytree: *bgfx_include
-
 ######
 # bx #
 ########################################################################################################################
 bx:
+  platforms: [linux64, darwin64]
   clone: git clone https://github.com/bkaradzic/bx --depth 1
 
   install:
     includes: &bx_install_include
       [include/bx, include/bx]
 
-    linux32:
-      - copytree: *bx_install_include
-
     linux64:
       - copytree: *bx_install_include
 
@@ -69,253 +16,180 @@ bx:
       - copytree: *bx_install_include
 
 ########
-# enet #
+# bgfx #
 ########################################################################################################################
-enet:
-  clone: git clone https://github.com/lsalzman/enet.git --depth 1
+bgfx:
+  platforms: [linux64, darwin64]
+  clone: git clone https://github.com/bkaradzic/bgfx --depth 1
 
   build:
-    configure: &enet_build_configure
-      - autoreconf -vfi
-      - ./configure
-      - make
-
-    linux64:  *enet_build_configure
-    linux32:  *enet_build_configure
-    darwin64: *enet_build_configure
-
-  install:
-    lib: &enet_install_lib
-      [.libs/libenet.a, lib]
-
-    include: &enet_install_include
-      [include/enet, include/enet]
-
     linux64:
-      - copy:     *enet_install_lib
-      - copytree: *enet_install_include
-
-    linux32:
-      - copy:     *enet_install_lib
-      - copytree: *enet_install_include
+      - make linux-release64
+      - make linux-debug64
 
     darwin64:
-      - copy:     *enet_install_lib
-      - copytree: *enet_install_include
-
-##########
-# luajit #
-########################################################################################################################
-luajit:
-  clone: git clone http://luajit.org/git/luajit-2.0.git
-
-  build:
-    linux64:  make
-    linux32:  make
-    darwin64: make
+      - make osx-release64
+      - make osx-debug64
 
   install:
     linux64:
-      - copy: [src/libluajit.a, lib]
-      - copy: [src/lauxlib.h, include/luajit]
-      - copy: [src/luaconf.h, include/luajit]
-      - copy: [src/lua.h, include/luajit]
-      - copy: [src/lua.hpp, include/luajit]
-      - copy: [src/luajit.h, include/luajit]
-      - copy: [src/lualib.h, include/luajit]
-
-    linux32:
-      - copy: [src/libluajit.a, lib]
-      - copy: [src/lauxlib.h, include/luajit]
-      - copy: [src/luaconf.h, include/luajit]
-      - copy: [src/lua.h, include/luajit]
-      - copy: [src/lua.hpp, include/luajit]
-      - copy: [src/luajit.h, include/luajit]
-      - copy: [src/lualib.h, include/luajit]
+      - copyfile: [.build/linux64_gcc/bin/libbgfx-shared-libRelease.so, Release/lib/bgfx.so]
+      - copyfile: [.build/linux64_gcc/bin/libbgfx-shared-libDebug.so, Debug/lib/bgfx_debug.so]
+      - copyfile: [.build/linux64_gcc/bin/shadercRelease, Release/bin/shaderc]
+      - copyfile: [.build/linux64_gcc/bin/texturecRelease, Release/bin/texturec]
 
     darwin64:
-      - copy: [src/libluajit.a, lib]
-      - copy: [src/lauxlib.h, include/luajit]
-      - copy: [src/luaconf.h, include/luajit]
-      - copy: [src/lua.h, include/luajit]
-      - copy: [src/lua.hpp, include/luajit]
-      - copy: [src/luajit.h, include/luajit]
-      - copy: [src/lualib.h, include/luajit]
+      - copyfile: [.build/osx64_clang/bin/libbgfxRelease.a, lib]
 
 #############
-# rapidjson #
+# SharpBGFX #
 ########################################################################################################################
-rapidjson:
-  clone: git clone https://github.com/miloyip/rapidjson/ --depth 1
+sharp-bgfx:
+  clone: git clone https://github.com/OndraVoves/SharpBgfx.git --depth 1
 
-  install:
-    includes: &rapidjson_install_include
-      [include/rapidjson, include/rapidjson]
+  build:
+    windows64:
+      - devenv SharpBgfx/SharpBgfx.csproj /build Debug
+      - devenv SharpBgfx/SharpBgfx.csproj /build Release
 
     linux64:
-      - copytree: *rapidjson_install_include
-
-    linux32:
-      - copytree: *rapidjson_install_include
-
-    darwin64:
-      - copytree: *rapidjson_install_include
-
-#########
-# Catch #
-########################################################################################################################
-catch:
-  clone: git clone https://github.com/philsquared/Catch.git --depth 1
+      - xbuild /p:Configuration=Debug SharpBgfx/SharpBgfx.csproj
+      - xbuild /p:Configuration=Release SharpBgfx/SharpBgfx.csproj
 
   install:
-    includes: &catch_install_include
-      [single_include/catch.hpp, include/catch]
+     windows64:
+      - copytree: [SharpBgfx\bin\Debug, Debug\lib]
+      - copytree: [SharpBgfx\bin\Release, Release\lib]
+      - copy: [tools\shaderc.exe, Release\bin]
+      - copy: [tools\texturec.exe, Release\bin]
+
+     linux64:
+      - copytree: [SharpBgfx/bin/Debug, Debug/lib]
+      - copytree: [SharpBgfx/bin/Release, Release/lib]
+
+#############
+# MoonSharp #
+########################################################################################################################
+moonsharp:
+  clone: git clone https://github.com/xanathar/moonsharp.git --depth 1
+
+  build:
+    windows64:
+      - devenv src\MoonSharp.Interpreter\MoonSharp.Interpreter.net35-client.csproj /build Debug
+      - devenv src\MoonSharp.Interpreter\MoonSharp.Interpreter.net35-client.csproj /build Release
 
     linux64:
-      - copy: *catch_install_include
+      - xbuild /p:TargetFrameworkVersion=v4.0 /p:Configuration=Debug src/MoonSharp.Interpreter/MoonSharp.Interpreter.net35-client.csproj
+      - xbuild /p:TargetFrameworkVersion=v4.0 /p:Configuration=Release src/MoonSharp.Interpreter/MoonSharp.Interpreter.net35-client.csproj
 
-    linux32:
-      - copy: *catch_install_include
+  install:
+    windows64:
+      - copytree: [src\MoonSharp.Interpreter\bin\Debug, Debug\lib]
+      - copytree: [src\MoonSharp.Interpreter\bin\Release, Release\lib]
 
-    darwin64:
-      - copy: *catch_install_include
+    linux64:
+      - copytree: [src/MoonSharp.Interpreter/bin/Debug, Debug/lib]
+      - copytree: [src/MoonSharp.Interpreter/bin/Release, Release/lib]
 
+###########
+# SDL2-CS #
+########################################################################################################################
+sdl2-cs:
+  clone: git clone https://github.com/flibitijibibo/SDL2-CS.git --depth 1
+
+  build:
+    windows64:
+      - devenv SDL2-CS.csproj /build Debug
+      - devenv SDL2-CS.csproj /build Release
+
+    linux64:
+      - xbuild /p:Configuration=Debug SDL2-CS.csproj
+      - xbuild /p:Configuration=Release SDL2-CS.csproj
+
+
+  install:
+     windows64:
+      - copytree: [bin\Debug, Debug\lib]
+      - copytree: [bin\Release, Release\lib]
+
+     linux64:
+      - copytree: [bin/Debug, Debug/lib]
+      - copytree: [bin/Release, Release/lib]
+
+#yaml-serializer:
+#  clone: git clone https://github.com/newky2k/YamlSerializer.git --depth 1
+#
+#  build:
+#    windows64:
+#      - devenv YamlSerializer.sln /project YamlSerializer /upgrade
+#      - devenv YamlSerializer.sln /build Debug /project YamlSerializer
+#      - devenv YamlSerializer.sln /build Release /project YamlSerializer
+
+###############
+# MsgPack-cli #
+########################################################################################################################
+msgpack-cli:
+  clone: git clone https://github.com/msgpack/msgpack-cli.git --depth 1
+
+  build:
+    windows64:
+      - devenv src\MsgPack.Net40\MsgPack.Net40.csproj /build Debug
+      - devenv src\MsgPack.Net40\MsgPack.Net40.csproj /build Release
+
+    linux64:
+      - xbuild /p:Configuration=Debug src/MsgPack.Net40/MsgPack.Net40.csproj
+      - xbuild /p:Configuration=Release src/MsgPack.Net40/MsgPack.Net40.csproj
+
+  install:
+     windows64:
+      - copytree: [src\MsgPack.Net40\bin\Debug, Debug\lib]
+      - copytree: [bin\net40-client, Release\lib]
+
+     linux64:
+      - copytree: [src/MsgPack.Net40/bin/Debug, Debug/lib]
+      - copytree: [bin/net40-client, Release/lib]
 
 ########
 # SLD2 #
 ########################################################################################################################
 sdl2:
+  platforms: [linux64, darwin64]
   clone: git clone https://github.com/spurious/SDL-mirror.git --depth 1
 
   build:
     configure: &sdl2_build_configure
-      - ./configure
+      - ./configure --disable-video-wayland
       - make
 
     configure_darwin: &sdl2_build_configure_darwin
       [./configure --with-x=no, make]
 
     linux64:  *sdl2_build_configure
-    linux32:  *sdl2_build_configure
     darwin64: *sdl2_build_configure_darwin
 
   install:
     lib: &sdl2_install_lib
-      [build/.libs/libSDL2.a, lib]
-
-    include: &sdl2_install_include
-      [include, include/SDL2]
+      [build/.libs/libSDL2-2.0.so.0.4.0, Release/lib/libSDL2-2.0.so]
 
     linux64:
-      - copy: *sdl2_install_lib
-      - copytree: *sdl2_install_include
-
-    linux32:
-      - copy: *sdl2_install_lib
-      - copytree: *sdl2_install_include
+      - copyfile: *sdl2_install_lib
 
     darwin64:
-      - copy: *sdl2_install_lib
-      - copytree: *sdl2_install_include
+      - copyfile: *sdl2_install_lib
 
 ########
-# soil #
+# SLD2 #
 ########################################################################################################################
-soil:
-  clone: git clone https://github.com/kbranigan/Simple-OpenGL-Image-Library.git --depth 1
-  build:
-    linux64:  make
-    linux32:  make
-    darwin64: make
-
-  install:
-    include: &soil_install_include
-      [src/SOIL.h, include/soil]
-
-    lib: &soil_install_lib
-      [lib/libSOIL.a, lib]
-
-    linux32:
-      - copy: *soil_install_include
-      - copy: *soil_install_lib
-
-    linux64:
-      - copy: *soil_install_include
-      - copy: *soil_install_lib
-
-    darwin64:
-      - copy: *soil_install_include
-      - copy: *soil_install_lib
-
-###########
-# sqlite3 #
-########################################################################################################################
-sqlite3:
-  clone:
-    - git clone https://github.com/mackyle/sqlite --depth 1
-    - download http://repo.or.cz/sqlite-export.git/blob_plain/master:/create-fossil-manifest create-fossil-manifest.sh
+sdl2_win_bin:
+  platforms: windows64
+  clone: download https://www.libsdl.org/release/SDL2-2.0.4-win32-x64.zip SDL2-2.0.4-win32-x64.zip
 
   build:
-    posix: &sqlite3_build_posix
-      - /bin/sh ./create-fossil-manifest.sh
-      - ./configure
-      - make
-
-    linux64:  *sqlite3_build_posix
-    linux32:  *sqlite3_build_posix
-    darwin64: *sqlite3_build_posix
+    windows64: extract SDL2-2.0.4-win32-x64.zip
 
   install:
-    include: &sqlite_install_include
-      [sqlite3.h, include/sqlite3]
-
-    lib: &sqlite_install_lib
-      [.libs/libsqlite3.a, lib]
-
-    linux64:
-      - copy: *sqlite_install_include
-      - copy: *sqlite_install_lib
-
-    linux32:
-      - copy: *sqlite_install_include
-      - copy: *sqlite_install_lib
-
-    darwin64:
-      - copy: *sqlite_install_include
-      - copy: *sqlite_install_lib
-
-###########
-# libyaml #
-########################################################################################################################
-libyaml:
-  clone: git clone https://github.com/yaml/libyaml.git --depth 1
-
-  build:
-    posix: &libyaml_build_posix
-      [./bootstrap, ./configure, make]
-
-    linux64:  *libyaml_build_posix
-    linux32:  *libyaml_build_posix
-    darwin64:  *libyaml_build_posix
-
-  install:
-    include: &libyaml_include_posix
-      [include/yaml.h, include/yaml]
-
-    lib: &libyaml_lib_posix
-      [src/.libs/libyaml.a, lib]
-
-    linux32:
-      - copy: *libyaml_lib_posix
-      - copy: *libyaml_include_posix
-
-    linux64:
-      - copy: *libyaml_lib_posix
-      - copy: *libyaml_include_posix
-
-    darwin64:
-      - copy: *libyaml_lib_posix
-      - copy: *libyaml_include_posix
+     windows64:
+      - copy: [SDL2.dll, Release\lib]
 
 ###########
 # nanomsg #
@@ -325,45 +199,67 @@ nanomsg:
 
   build:
     posix: &nanomsg_build_posix
-      [./autogen.sh, ./configure, make]
+      [autoreconf -vfi, ./configure, make]
 
     linux64:  *nanomsg_build_posix
-    linux32:  *nanomsg_build_posix
     darwin64: *nanomsg_build_posix
+    windows64:
+      - cmake .
+      - devenv nanomsg.sln /build Release
 
   install:
-    include: &nanomsg_install_include
-      [src, include/nanomsg]
-
-    lib: &nanomsg_install_lib
-      [.libs/libnanomsg.a, lib]
-
     linux64:
-      - copytree: *nanomsg_install_include
-      - copy: *nanomsg_install_lib
-      - copy: [.libs/libnanomsg.so, dynlib]
-
-    linux32:
-      - copytree: *nanomsg_install_include
-      - copy: *nanomsg_install_lib
-      - copy: [.libs/libnanomsg.so, dynlib]
+      - copyfile: [.libs/libnanomsg.so.4.0.0, Release/lib/libnanomsg.so]
 
     darwin64:
-      - copytree: *nanomsg_install_include
-      - copy: *nanomsg_install_lib
-      - copy: [.libs/libnanomsg.so, dynlib]
+      - copyfile: [.libs/libnanomsg.so.4.0.0, Release/lib/libnanomsg.so]
+
+    windows64:
+      - copy: [Release\nanomsg.dll, Release/lib]
+
+############
+# NNanomsg #
+########################################################################################################################
+nnanomsg:
+  clone: git clone https://github.com/OndraVoves/NNanomsg.git --depth 1
+
+  build:
+    windows64:
+      - devenv NNanomsg.sln /build Debug /project NNanomsg
+      - devenv NNanomsg.sln /build Release /project NNanomsg
+
+    linux64:
+      - xbuild /p:Configuration=Debug NNanomsg/NNanomsg.csproj
+      - xbuild /p:Configuration=Release NNanomsg/NNanomsg.csproj
+
+  install:
+     windows64:
+      - copytree: [NNanomsg\bin\Release, Release\lib]
+      - copytree: [NNanomsg\bin\Debug, Debug\lib]
+
+     linux64:
+      - copytree: [NNanomsg/bin/Release, Release/lib]
+      - copytree: [NNanomsg/bin/Debug, Debug/lib]
 
 #########
-# MPack #
+# NSpec #
 ########################################################################################################################
-mpack:
-  clone: git clone https://github.com/ludocode/mpack.git --depth 1
+nspec:
+  clone: git clone https://github.com/mattflo/NSpec.git --depth 1
+
+  build:
+    windows64:
+      - devenv NSpec.sln /build Release
+
+    linux64:
+      - sed /nuget/d NSpec/NSpec.csproj -i
+      - nuget restore NSpec.sln
+      - xbuild /p:Configuration=Release NSpec/NSpec.csproj
 
   install:
-    linux64:
-      - copytree: [src/mpack, include/mpack]
-      - copyfile: [src/mpack-config.h.sample, include/mpack/mpack-config.h]
-      
-    darwin64:
-      - copytree: [src/mpack, include/mpack]
-      - copyfile: [src/mpack-config.h.sample, include/mpack/mpack-config.h]
+     windows64:
+      - copytree: [NSpec\bin\Release, Release\lib]
+      - copytree: [NSpecRunner\bin\Release, Release\bin]
+
+     linux64:
+      - copytree: [NSpec/bin/Release, Release/lib]

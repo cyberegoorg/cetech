@@ -1,1 +1,2 @@
-# Poznámky k vydání
+# Release notes
+

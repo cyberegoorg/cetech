@@ -1,17 +1,17 @@
 # [CETech](https://github.com/cyberegoorg/cetech)
 
-[![Build Status](https://travis-ci.org/cyberegoorg/cetech.svg?branch=master)](https://travis-ci.org/cyberegoorg/cetech)
+[![Build Status](https://travis-ci.org/cyberegoorg/cetech.svg?branch=csharp)](https://travis-ci.org/cyberegoorg/cetech)
 [![Issues](https://img.shields.io/github/issues/cyberegoorg/cetech.svg)](https://github.com/cyberegoorg/cetech/issues)
 [![Release](https://img.shields.io/github/release/cyberegoorg/cetech.svg)](https://github.com/cyberegoorg/cetech/releases)
 [![License](https://img.shields.io/badge/license-CC0-blue.svg)](LICENSE.md)
 [![Gitter](https://img.shields.io/gitter/room/cyberegoorg/cetech.svg)](https://gitter.im/cyberegoorg/cetech)
 
-## [What is it?] (https://cyberegoorg.github.io/cetech/)
+## [What is it?](https://cyberegoorg.github.io/cetech/)
 
-CETech is Data-Driven [game engine](https://en.wikipedia.org/wiki/Game_engine) and toolbox inspired by [Bitsquid](http://bitsquid.blogspot.se/)/[Stingray](http://stingrayengine.com/) engine.
+CETech is Data-Driven game engine and toolbox inspired by [Bitsquid](http://bitsquid.blogspot.se/)/[Stingray](http://stingrayengine.com/) engine.
 
 * [Release notes](http://cyberegoorg.github.io/cetech/about/release-notes)
-* [Documentation](http://cyberegoorg.github.io/cetech) work in progress, temporarily in czech language
+* [Documentation](http://cyberegoorg.github.io/cetech) work in progress
 
 ![Prototyp](docs/img/prototyp.png)
 
@@ -20,110 +20,25 @@ CETech is Data-Driven [game engine](https://en.wikipedia.org/wiki/Game_engine) a
 * [crown](https://github.com/taylor001/crown) -  Lightweight and flexible cross-platform game engine. 
 * [lumix](https://github.com/nem0/LumixEngine) - Easy to use, fast and flexible 3D game engine.
 
-## Suported platforms
+## [3rd party libraries and tools](https://cyberegoorg.github.io/cetech/about/3rdparty/)
 
+## Suported platforms
+ 
+* Windows (Runtime + Develop) - Work in progress
 * Linux (Runtime + Develop) - Work in progress
-* OSX (10.9+) (Runtime + Develop) - Work in progress
 
 ## Planned platforms
 
-* Windows (Runtime + Develop)
+* OSX (Runtime + Develop)
+* FreeBSD (Runtime + Develop)
+* RaspberryPi (Runtime + Develop)
 * asm.js/Emscripten (Runtime)
 * Android (Runtime)
-* FreeBSD (Runtime + Develop)
-* RaspberryPi (Runtime)
 
-## 3rd party libraries and tools
+## Build
 
-### Tools
-
-* [genie](https://github.com/bkaradzic/genie) - Project generator.
-
-### C/C++
-
-* [BGFX](https://github.com/bkaradzic/bgfx) - Renderer.
-* [SDL2](https://www.libsdl.org/) - Cross-platform development library.
-* [enet](http://enet.bespin.org/) - Cross-platform network lib.
-* [luajit](http://luajit.org/) - Lua on steroids.
-* [rapidjson](http://rapidjson.org/) - Json parser.
-* [catch](https://github.com/philsquared/Catch) -  Multi-paradigm automated test framework.
-* [SOIL](http://www.lonesock.net/soil.html ) - Simple OpenGL Image Library.
-* [sqlite3](https://www.sqlite.org/) - SQL database engine.
-* [libyaml](https://github.com/yaml/libyaml.git) - YAML parser.
-* [nanomsg](http://nanomsg.org/) - Socket library that provides several common communication patterns.
-* [mpack](https://github.com/ludocode/mpack) - A C encoder/decoder for the MessagePack serialization format.
-
-### Python
-
-* [python](https://www.python.org/) - Multi-paradigm Programming language.
-* [pyaml](http://pyyaml.org/wiki/PyYAML) - YAML parser and emitter for Python.
-* [python-nanomsg](https://github.com/tonysimpson/nanomsg-python) - Nanomsg python binding.
-* [PyQT](https://www.riverbankcomputing.com/software/pyqt/intro) - Python QT binding
-
-### JavaScript
-
-* [Ace](https://ace.c9.io/) - Editor library.
-* [GoJS](http://gojs.net/) - Diagram library.
-* [vis.js](http://visjs.org/) - Visualization library.
-* [msgpack-lite](https://github.com/kawanet/msgpack-lite) - Fast Pure JavaScript MessagePack Encoder and Decoder.
-
-### Others
-
-* [Qt](https://www.qt.io/) - Cross-platform GUI library.
-
-## Building
-
-### Prerequisites
-
-#### Linux
-
-* Install python >= 3.5, Qt5, PyQt5, gcc, clang >= 3.7, make, libtool, automake
-
-#### OSX
-
-* Install clang, python3, qt, pyqt5, automake, libtool
-
-```bash
-$ brew install python3
-$ brew install pyqt5
-$ brew install automake
-$ brew install libtool
-```
-
-### Building
-
-#### Linux, OSX
-
-* Install requirements.txt
-
-```bash
-$ pip3 install -r requirements.txt
-```
-
-* Download and build externals.
-
-```bash
-$ python3 externals.py
-```
-
-* Build engine
-
-```bash
-$ python3 make.py
-```
-
-## Run playground
-
-```bash
-$ python3 playground.py
-```
-
-* Click on `add exist`.
-* Set name `SAMPLE`.
-* Click on `...` and select repository folder `data`.
-* Click on `ok`.
-* Click on `Open`.
-* Enjoy playground bugs.
+* [Linux](https://cyberegoorg.github.io/cetech/engine/buil#linux)
+* [Windows](https://cyberegoorg.github.io/cetech/engine/build#windows)
 
 ## [License](http://creativecommons.org/publicdomain/zero/1.0/)
 

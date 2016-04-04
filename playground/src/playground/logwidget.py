@@ -20,10 +20,10 @@ LOG_COLOR = {
 }
 
 LOG_ICON = {
-    'I': QStyle.SP_MessageBoxInformation,
-    'W': QStyle.SP_MessageBoxWarning,
-    'D': QStyle.SP_MessageBoxQuestion,
-    'E': QStyle.SP_MessageBoxCritical,
+    'Info': QStyle.SP_MessageBoxInformation,
+    'Warning': QStyle.SP_MessageBoxWarning,
+    'Debug': QStyle.SP_MessageBoxQuestion,
+    'Error': QStyle.SP_MessageBoxCritical,
 }
 
 
@@ -39,9 +39,8 @@ class LogSub(QThread):
         self.handlers.append(handler)
 
     def run(self):
-        self.socket.set_string_option(SUB, SUB_SUBSCRIBE, b'#log')
+        self.socket.set_string_option(SUB, SUB_SUBSCRIBE, b'')
         self.socket.connect(self.url)
-
         while True:
             try:
                 msg = self.socket.recv()
@@ -50,8 +49,7 @@ class LogSub(QThread):
                     h(**msg_yaml)
 
             except nanomsg.NanoMsgAPIError as e:
-                pass
-
+                raise
 
 class LogWidget(QFrame, Ui_LogWidget):
     def __init__(self, script_editor, logsub, ignore_where=None):
@@ -83,7 +81,7 @@ class LogWidget(QFrame, Ui_LogWidget):
         if self._is_ignored(where):
             return
 
-        dt_s = QDateTime.fromTime_t(time).toString("hh:mm:ss.zzz")
+        dt_s = time#QDateTime.fromTime_t(time).toString("hh:mm:ss.zzz")
 
         item = QTreeWidgetItem(['', dt_s, str(worker), where, msg[:-1]])
 
@@ -102,7 +100,7 @@ class LogWidget(QFrame, Ui_LogWidget):
         """
 
         level = item.data(0, Qt.UserRole)
-        if level != 'E':
+        if level != 'Error':
             return
 
         where = item.text(3)
