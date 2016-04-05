@@ -82,6 +82,7 @@ class CetechProject(object):
 
     def killall_process(self):
         self.dump()
+
         for p in self.spawned_process:
             p.terminate()
 

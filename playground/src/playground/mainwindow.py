@@ -215,7 +215,11 @@ class MainWindow(QMainWindow, Ui_MainWindow):
     def run_standalone(self):
         self.project.run_cetech_release()
 
+    def run_level(self):
+        self.project.run_cetech_develop(compile_=True, continue_=True, port=5566)
+
     def closeEvent(self, evnt):
+        self.api.quit()
         self.api.disconnect()
         self.project.killall_process()
         evnt.accept()
