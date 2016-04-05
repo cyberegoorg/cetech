@@ -39,7 +39,10 @@ bgfx:
       - copyfile: [.build/linux64_gcc/bin/texturecRelease, Release/bin/texturec]
 
     darwin64:
-      - copyfile: [.build/osx64_clang/bin/libbgfxRelease.a, lib]
+      - copyfile: [.build/osx64_clang/bin/libbgfx-shared-libRelease.so, Release/lib/bgfx_darwin.so]
+      - copyfile: [.build/osx64_clang/bin/libbgfx-shared-libDebug.so, Debug/lib/bgfx_debug_darwin.so]
+      - copyfile: [.build/osx64_clang/bin/shadercRelease, Release/bin/shaderc_darwin]
+      - copyfile: [.build/osx64_clang/bin/texturecRelease, Release/bin/texturec_darwin]
 
 #############
 # SharpBGFX #
@@ -56,6 +59,10 @@ sharp-bgfx:
       - xbuild /p:Configuration=Debug SharpBgfx/SharpBgfx.csproj
       - xbuild /p:Configuration=Release SharpBgfx/SharpBgfx.csproj
 
+    darwin64:
+      - xbuild /p:Configuration=Debug SharpBgfx/SharpBgfx.csproj
+      - xbuild /p:Configuration=Release SharpBgfx/SharpBgfx.csproj
+
   install:
      windows64:
       - copytree: [SharpBgfx\bin\Debug, Debug\lib]
@@ -64,6 +71,10 @@ sharp-bgfx:
       - copy: [tools\texturec.exe, Release\bin]
 
      linux64:
+      - copytree: [SharpBgfx/bin/Debug, Debug/lib]
+      - copytree: [SharpBgfx/bin/Release, Release/lib]
+
+     darwin64:
       - copytree: [SharpBgfx/bin/Debug, Debug/lib]
       - copytree: [SharpBgfx/bin/Release, Release/lib]
 
@@ -82,12 +93,20 @@ moonsharp:
       - xbuild /p:TargetFrameworkVersion=v4.0 /p:Configuration=Debug src/MoonSharp.Interpreter/MoonSharp.Interpreter.net35-client.csproj
       - xbuild /p:TargetFrameworkVersion=v4.0 /p:Configuration=Release src/MoonSharp.Interpreter/MoonSharp.Interpreter.net35-client.csproj
 
+    dawin64:
+      - xbuild /p:TargetFrameworkVersion=v4.0 /p:Configuration=Debug src/MoonSharp.Interpreter/MoonSharp.Interpreter.net35-client.csproj
+      - xbuild /p:TargetFrameworkVersion=v4.0 /p:Configuration=Release src/MoonSharp.Interpreter/MoonSharp.Interpreter.net35-client.csproj
+
   install:
     windows64:
       - copytree: [src\MoonSharp.Interpreter\bin\Debug, Debug\lib]
       - copytree: [src\MoonSharp.Interpreter\bin\Release, Release\lib]
 
     linux64:
+      - copytree: [src/MoonSharp.Interpreter/bin/Debug, Debug/lib]
+      - copytree: [src/MoonSharp.Interpreter/bin/Release, Release/lib]
+
+    darwin64:
       - copytree: [src/MoonSharp.Interpreter/bin/Debug, Debug/lib]
       - copytree: [src/MoonSharp.Interpreter/bin/Release, Release/lib]
 
@@ -106,6 +125,9 @@ sdl2-cs:
       - xbuild /p:Configuration=Debug SDL2-CS.csproj
       - xbuild /p:Configuration=Release SDL2-CS.csproj
 
+    darwin64:
+      - xbuild /p:Configuration=Debug SDL2-CS.csproj
+      - xbuild /p:Configuration=Release SDL2-CS.csproj
 
   install:
      windows64:
@@ -113,6 +135,10 @@ sdl2-cs:
       - copytree: [bin\Release, Release\lib]
 
      linux64:
+      - copytree: [bin/Debug, Debug/lib]
+      - copytree: [bin/Release, Release/lib]
+
+     darwin64:
       - copytree: [bin/Debug, Debug/lib]
       - copytree: [bin/Release, Release/lib]
 
@@ -140,10 +166,18 @@ msgpack-cli:
       - xbuild /p:Configuration=Debug src/MsgPack.Net40/MsgPack.Net40.csproj
       - xbuild /p:Configuration=Release src/MsgPack.Net40/MsgPack.Net40.csproj
 
+    darwin64:
+      - xbuild /p:Configuration=Debug src/MsgPack.Net40/MsgPack.Net40.csproj
+      - xbuild /p:Configuration=Release src/MsgPack.Net40/MsgPack.Net40.csproj
+
   install:
      windows64:
       - copytree: [src\MsgPack.Net40\bin\Debug, Debug\lib]
       - copytree: [bin\net40-client, Release\lib]
+
+     linux64:
+      - copytree: [src/MsgPack.Net40/bin/Debug, Debug/lib]
+      - copytree: [bin/net40-client, Release/lib]
 
      linux64:
       - copytree: [src/MsgPack.Net40/bin/Debug, Debug/lib]
@@ -232,12 +266,20 @@ nnanomsg:
       - xbuild /p:Configuration=Debug NNanomsg/NNanomsg.csproj
       - xbuild /p:Configuration=Release NNanomsg/NNanomsg.csproj
 
+    darwin64:
+      - xbuild /p:Configuration=Debug NNanomsg/NNanomsg.csproj
+      - xbuild /p:Configuration=Release NNanomsg/NNanomsg.csproj
+
   install:
      windows64:
       - copytree: [NNanomsg\bin\Release, Release\lib]
       - copytree: [NNanomsg\bin\Debug, Debug\lib]
 
      linux64:
+      - copytree: [NNanomsg/bin/Release, Release/lib]
+      - copytree: [NNanomsg/bin/Debug, Debug/lib]
+
+     darwin64:
       - copytree: [NNanomsg/bin/Release, Release/lib]
       - copytree: [NNanomsg/bin/Debug, Debug/lib]
 
@@ -256,10 +298,18 @@ nspec:
       - nuget restore NSpec.sln
       - xbuild /p:Configuration=Release NSpec/NSpec.csproj
 
+    darwin64:
+      - sed /nuget/d NSpec/NSpec.csproj -i
+      - nuget restore NSpec.sln
+      - xbuild /p:Configuration=Release NSpec/NSpec.csproj
+
   install:
      windows64:
       - copytree: [NSpec\bin\Release, Release\lib]
       - copytree: [NSpecRunner\bin\Release, Release\bin]
 
      linux64:
+      - copytree: [NSpec/bin/Release, Release/lib]
+
+     darwin64:
       - copytree: [NSpec/bin/Release, Release/lib]

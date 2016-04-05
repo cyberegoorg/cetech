@@ -2,8 +2,7 @@
 using System.IO;
 #if PLATFORM_WINDOWS
 using System.Data.SQLite;
-
-#elif PLATFORM_LINUX
+#else
 using Mono.Data.Sqlite;
 #endif
 
@@ -11,7 +10,7 @@ using Mono.Data.Sqlite;
 
 namespace CETech.Develop.Private
 {
-#if PLATFORM_LINUX
+#if !PLATFORM_WINDOWS
 	using SQLiteConnection = SqliteConnection;
 	using SQLiteCommand = SqliteCommand;
 	#endif

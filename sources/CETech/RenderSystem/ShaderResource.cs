@@ -102,6 +102,8 @@ namespace CETech
             
 		#if PLATFORM_LINUX
 			start.FileName = Path.Combine(bin_path, "shaderc");
+        #elif PLATFORM_MACOS
+            start.FileName = Path.Combine(bin_path, "shaderc_darwin");
 		#else
 			start.FileName = Path.Combine(bin_path, "shaderc.exe");
 		#endif
@@ -155,6 +157,8 @@ namespace CETech
             
 		#if PLATFORM_LINUX
 			shaderc(input_shader, output_vsshader, include_path, "vertex", "linux", "120");
+        #elif PLATFORM_MACOS
+            shaderc(input_shader, output_vsshader, include_path, "vertex", "osx", "120");
 		#else
 			shaderc(input_shader, output_vsshader, include_path, "vertex", "windows", "vs_4_0");
 		#endif
@@ -163,6 +167,8 @@ namespace CETech
         
 		#if PLATFORM_LINUX
 			shaderc(input_shader, output_fsshader, include_path, "fragment", "linux", "120");
+        #elif PLATFORM_MACOS
+            shaderc(input_shader, output_fsshader, include_path, "fragment", "osx", "120");
 		#else
 			shaderc(input_shader, output_fsshader, include_path, "fragment", "windows", "ps_4_0");
 		#endif

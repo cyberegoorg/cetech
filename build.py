@@ -55,19 +55,22 @@ CONFIG = {
 # Build platform.
 PLATFORMS = {
     'windows64',
-    'linux64'
+    'linux64',
+    'darwin64',
 }
 
 # Build platform.
 PLATFORMS_PROTOBUILD = {
     'windows64': 'Windows',
-    'linux64': 'Linux'
+    'linux64': 'Linux',
+    'darwin64': 'MacOS'
 }
 
 # Build platform.
 PLATFORMS_SLN = {
     'windows64': 'CETech.Windows.sln',
-    'linux64': 'CETech.Linux.sln'
+    'linux64': 'CETech.Linux.sln',
+    'darwin64': 'CETech.MacOS.sln'
 }
 
 # Build platform.

@@ -18,4 +18,11 @@
   <NativeBinary Path="externals/build/linux64/Release/bin/shaderc"/>
   <NativeBinary Path="externals/build/linux64/Release/bin/texturec"/>
 
+  <Platform Type="MacOS">
+    <NativeBinary Path="externals/build/darwin64/Release/bin/shaderc_darwin"/>
+    <NativeBinary Path="externals/build/darwin64/Release/bin/texturec_darwin"/>
+    <NativeBinary Path="externals\build\darwin64\Release\lib\bgfx_darwin.so" />
+    <NativeBinary Path="externals\build\darwin64\Debug\lib\bgfx_debug_darwin.so" />
+  </Platform>
+
 </ExternalProject>
