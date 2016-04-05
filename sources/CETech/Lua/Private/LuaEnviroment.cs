@@ -3,6 +3,7 @@ using System.IO;
 using System.Linq;
 using CETech.Develop;
 using CETech.Lua.Api;
+using CETech.Utils;
 using CETech.World;
 using MoonSharp.Interpreter;
 using MoonSharp.Interpreter.Loaders;
@@ -92,8 +93,32 @@ namespace CETech.Lua
 
             ConsoleServer.RegisterCommand("lua.execute", (args, response) =>
             {
-                var ret = _enviromentScript.DoString(args["script"].AsString());
-                PackDynValue(ret, response);
+                try
+                {
+                    var ret = _enviromentScript.DoString(args["script"].AsString());
+                    PackDynValue(ret, response);
+                }
+                catch (ScriptRuntimeException ex)
+                {
+                    var msg = string.Format("Error: {0}", ex.Message);
+
+                    Log.Error("lua", msg);
+
+                    response.PackMapHeader(1);
+                    response.Pack("error_msg");
+                    response.Pack(msg);
+                }
+                catch (SyntaxErrorException syntaxEx)
+                {
+                    var msg = string.Format("Syntax error: {0}", syntaxEx.Message);
+
+                    Log.Error("lua", msg);
+
+                    response.PackMapHeader(1);
+                    response.Pack("error_msg");
+                    response.Pack(msg);
+                }
+
             });
         }
 
@@ -105,7 +130,20 @@ namespace CETech.Lua
         private static void DoResourceImpl(long name)
         {
             var ms = new MemoryStream(ResourceManager.Get<byte[]>(LuaResource.Type, name));
-            _enviromentScript.DoStream(ms);
+
+            try {
+                _enviromentScript.DoStream(ms);
+            }
+            catch (ScriptRuntimeException ex)
+            {
+                var msg = string.Format("error: {0}", ex.Message);
+                Log.Error("lua", msg);
+            }
+            catch (SyntaxErrorException syntaxEx)
+            {
+                var msg = string.Format("Syntax error: {0}", syntaxEx.Message);
+                Log.Error("lua", msg);
+            }
         }
 
         private static void BootScriptInitImpl(long name)

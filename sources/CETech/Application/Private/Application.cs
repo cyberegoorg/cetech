@@ -213,7 +213,7 @@ namespace CETech
                 },
 
                 {
-                    "p|port", "First port",
+                    "p|port=", "First port",
                     (int v) => first_port = v
                 },
 
