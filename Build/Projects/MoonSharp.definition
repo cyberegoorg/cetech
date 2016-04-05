@@ -1,7 +1,23 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <ExternalProject Name="MoonSharp">
-  <Binary
-    Name="ExternalLib"
-    Path="externals\build\windows64\Debug\lib\MoonSharp.Interpreter.dll" />
+  <Platform Type="Windows">
+    <Binary
+      Name="ExternalLib"
+      Path="externals/build/windows64/Debug/lib/MoonSharp.Interpreter.dll" />
+  </Platform>
+
+    <Platform Type="Linux">
+    <Binary
+      Name="ExternalLib"
+      Path="externals/build/linux64/Debug/lib/MoonSharp.Interpreter.dll" />
+  </Platform>
+
+
+  <Platform Type="MacOS">
+    <Binary
+      Name="ExternalLib"
+      Path="externals/build/darwin64/Debug/lib/MoonSharp.Interpreter.dll" />
+  </Platform>
+
 
 </ExternalProject>

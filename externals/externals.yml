@@ -39,10 +39,10 @@ bgfx:
       - copyfile: [.build/linux64_gcc/bin/texturecRelease, Release/bin/texturec]
 
     darwin64:
-      - copyfile: [.build/osx64_clang/bin/libbgfx-shared-libRelease.so, Release/lib/bgfx_darwin.so]
-      - copyfile: [.build/osx64_clang/bin/libbgfx-shared-libDebug.so, Debug/lib/bgfx_debug_darwin.so]
-      - copyfile: [.build/osx64_clang/bin/shadercRelease, Release/bin/shaderc_darwin]
-      - copyfile: [.build/osx64_clang/bin/texturecRelease, Release/bin/texturec_darwin]
+      - copyfile: [.build/osx64_clang/bin/libbgfx-shared-libRelease.so, Release/lib/bgfx.so]
+      - copyfile: [.build/osx64_clang/bin/libbgfx-shared-libDebug.so, Debug/lib/bgfx_debug.so]
+      - copyfile: [.build/osx64_clang/bin/shadercRelease, Release/bin/shaderc]
+      - copyfile: [.build/osx64_clang/bin/texturecRelease, Release/bin/texturec]
 
 #############
 # SharpBGFX #

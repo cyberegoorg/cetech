@@ -1,7 +1,0 @@
-﻿<?xml version="1.0" encoding="utf-8" ?>
-<ExternalProject Name="YamlDotNet">
-  <Binary
-    Name="ExternalLib"
-    Path="externals\build\windows64\Debug\lib\YamlDotNet.dll" />
-
-</ExternalProject>
