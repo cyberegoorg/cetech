@@ -11,7 +11,9 @@ class ConsoleProxy(object):
     def connect(self):
         self.socket.connect(self.url)
 
-    def send_command(self, cmd_name, **kwargs):
+    # TODO: dangerous, block
+    def send_command_norcv(self, cmd_name, **kwargs):
+
         command = {
             "name": cmd_name,
             "args": kwargs
@@ -21,6 +23,8 @@ class ConsoleProxy(object):
         print('send: ', command)
         self.socket.send(dump)
 
+    def send_command(self, cmd_name, **kwargs):
+        self.send_command_norcv(cmd_name=cmd_name, **kwargs)
         recv = self.socket.recv()
         print('recv: ', recv)
         print(msgpack.unpackb(recv, encoding='utf-8'))

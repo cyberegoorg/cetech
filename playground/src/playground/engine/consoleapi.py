@@ -23,3 +23,6 @@ class ConsoleAPI(ConsoleProxy):
     def reload_all(self, types):
         self.send_command('resource_manager.reload_all', types=types)
         pass
+
+    def quit(self):
+        self.send_command_norcv('lua.execute', script="Application.Quit();")
