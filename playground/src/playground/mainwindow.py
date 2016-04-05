@@ -133,7 +133,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
         # self.api.start(QThread.LowPriority)
         self.api.connect()
-        self.logsub.start(QThread.LowPriority)
+        self.logsub.start(QThread.NormalPriority)
 
         self.assetb_widget.open_project(self.project.project_dir)
 
