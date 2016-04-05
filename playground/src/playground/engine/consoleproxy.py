@@ -13,7 +13,6 @@ class ConsoleProxy(object):
 
     # TODO: dangerous, block
     def send_command_norcv(self, cmd_name, **kwargs):
-
         command = {
             "name": cmd_name,
             "args": kwargs
