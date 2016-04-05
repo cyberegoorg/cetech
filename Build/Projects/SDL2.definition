@@ -5,6 +5,14 @@
     Path="externals\build\windows64\Debug\lib\SDL2-CS.dll" />
 
   <NativeBinary Path="externals\build\windows64\Release\lib\SDL2.dll" />
-  <NativeBinary Path="externals\build\linux64\Release\lib\libSDL2-2.0.so" />
   <NativeBinary Path="externals/build/windows64/Release/lib/SDL2-CS.dll.config"/>
+
+  <Platform Type="Linux">
+    <NativeBinary Path="externals\build\linux64\Release\lib\libSDL2-2.0.so" />
+  </Platform>
+
+  <Platform Type="MacOS">
+    <NativeBinary Path="externals\build\darwin64\Release\lib\libSDL2-2.0.so" />
+  </Platform>
+
 </ExternalProject>

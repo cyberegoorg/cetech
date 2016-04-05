@@ -137,6 +137,8 @@ namespace CETech
             
 		#if PLATFORM_LINUX
 			start.FileName = Path.Combine(bin_path, "texturec");
+		#elif PLATFORM_MACOS
+			start.FileName = Path.Combine(bin_path, "texturec_darwin");
 		#else
 			start.FileName = Path.Combine(bin_path, "texturec.exe");
 		#endif

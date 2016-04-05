@@ -150,6 +150,8 @@ namespace CETech
             return "windows";
 #elif PLATFORM_LINUX
             return "linux";
+#elif PLATFORM_MACOS
+            return "darwin";
 #endif
         }
 

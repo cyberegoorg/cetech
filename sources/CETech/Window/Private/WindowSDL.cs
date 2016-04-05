@@ -78,9 +78,10 @@ namespace CETech
 
 #if PLATFORM_WINDOWS
             return wmi.info.win.window;
-
 #elif PLATFORM_LINUX
             return wmi.info.x11.window;
+#elif PLATFORM_MACOS
+            return wmi.info.cocoa.window;
 #endif
         }
 
@@ -92,9 +93,10 @@ namespace CETech
 
 #if PLATFORM_WINDOWS
             return wmi.info.win.hdc;
-
 #elif PLATFORM_LINUX
 			return wmi.info.x11.display;
+#else
+            return IntPtr.zero;
 #endif
         }
 
