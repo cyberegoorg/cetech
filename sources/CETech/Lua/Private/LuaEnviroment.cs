@@ -100,7 +100,7 @@ namespace CETech.Lua
                 }
                 catch (ScriptRuntimeException ex)
                 {
-                    var msg = string.Format("Error: {0}", ex.Message);
+                    var msg = string.Format("Error: {0}", ex.DecoratedMessage);
 
                     Log.Error("lua", msg);
 
@@ -110,7 +110,7 @@ namespace CETech.Lua
                 }
                 catch (SyntaxErrorException syntaxEx)
                 {
-                    var msg = string.Format("Syntax error: {0}", syntaxEx.Message);
+                    var msg = string.Format("Syntax error: {0}", syntaxEx.DecoratedMessage);
 
                     Log.Error("lua", msg);
 
@@ -136,12 +136,12 @@ namespace CETech.Lua
             }
             catch (ScriptRuntimeException ex)
             {
-                var msg = string.Format("error: {0}", ex.Message);
+                var msg = string.Format("error: {0}", ex.DecoratedMessage);
                 Log.Error("lua", msg);
             }
             catch (SyntaxErrorException syntaxEx)
             {
-                var msg = string.Format("Syntax error: {0}", syntaxEx.Message);
+                var msg = string.Format("Syntax error: {0}", syntaxEx.DecoratedMessage);
                 Log.Error("lua", msg);
             }
         }
