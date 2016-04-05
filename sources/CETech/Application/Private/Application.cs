@@ -87,6 +87,8 @@ namespace CETech
             var last_frame_tick = DateTime.Now;
             DateTime curent_frame_tick;
 
+			Log.Info ("application.ready", "");
+
             while (_run)
             {
                 //Debug.Assert(TaskManager.OpenTaskCount < 2);

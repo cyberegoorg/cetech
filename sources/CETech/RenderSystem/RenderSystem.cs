@@ -1,4 +1,6 @@
-﻿namespace CETech
+﻿using CETech.World;
+
+namespace CETech
 {
     /// <summary>
     ///     Render system
@@ -77,6 +79,10 @@
             RenderWorldImpl(world, camera);
         }
 
+
+		public static Vector2f GetSize() {
+			return GetSizeImpl();
+		}
 
         /// <summary>
         ///     Resize render view

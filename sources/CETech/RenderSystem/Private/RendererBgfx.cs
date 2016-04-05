@@ -88,6 +88,10 @@ namespace CETech
             _data.ResizeH = height;
         }
 
+		public static Vector2f GetSizeImpl() {
+			return new Vector2f(_data.ResizeW, _data.ResizeH);
+		}
+
         private static void RenderWorldImpl(int world, int camera)
         {
             if (_data.NeedResize)
