@@ -1,4 +1,6 @@
-playground/icons/* linguist-vendored
-playground/html/ace/* linguist-vendored
-playground/html/ace/snipets/* linguist-vendored
-3rdparty linguist-vendored
+externals/build/** linguist-vendored=true
+playground/icons/** linguist-vendored=true
+playground/html/ace/** linguist-vendored=true
+playground/html/ace/snipets/** linguist-vendored=true
+
+sources/oldengine/** linguist-vendored=true
