@@ -99,15 +99,13 @@ namespace CETech
 
             // Enter the executable to run, including the complete path
             var bin_path = ConfigSystem.GetValueString("resource_compiler.bin");
-            
-		#if PLATFORM_LINUX
-			start.FileName = Path.Combine(bin_path, "shaderc");
-        #elif PLATFORM_MACOS
-            start.FileName = Path.Combine(bin_path, "shaderc_darwin");
-		#else
-			start.FileName = Path.Combine(bin_path, "shaderc.exe");
-		#endif
-			
+
+        #if PLATFORM_WINDOWS
+            start.FileName = Path.Combine(bin_path, "shaderc.exe");
+        #else
+            start.FileName = Path.Combine(bin_path, "shaderc");	
+        #endif
+
             start.RedirectStandardOutput = true;
             start.RedirectStandardError = true;
             start.UseShellExecute = false;
