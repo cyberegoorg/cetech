@@ -1,28 +1,40 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <ExternalProject Name="SharpBgfx">
-  <Binary
-    Name="ExternalLib"
-    Path="externals\build\windows64\Debug\lib\SharpBgfx.dll" />
+  <Platform Type="Windows">
+    <Binary
+      Name="ExternalLib"
+      Path="externals/build/windows64/Debug/lib/SharpBgfx.dll" />
 
-  <NativeBinary Path="externals\build\windows64\Debug\lib\bgfx.dll" />
-  <NativeBinary Path="externals\build\windows64\Debug\lib\bgfx_debug.dll" />
+    <NativeBinary Path="externals/build/windows64/Debug/lib/bgfx.dll" />
+    <NativeBinary Path="externals/build/windows64/Debug/lib/bgfx_debug.dll" />
+    <NativeBinary Path="externals/build/windows64/Release/bin/shaderc.exe"/>
+    <NativeBinary Path="externals/build/windows64/Release/bin/texturec.exe"/>
+    <NativeBinary Path="externals/build/windows64/Release/lib/SharpBgfx.dll.config"/>
+  </Platform>
 
-  <NativeBinary Path="externals\build\linux64\Release\lib\bgfx.so" />
-  <NativeBinary Path="externals\build\linux64\Debug\lib\bgfx_debug.so" />
+  <Platform Type="Linux">
+    <Binary
+      Name="ExternalLib"
+      Path="externals/build/linux64/Debug/lib/SharpBgfx.dll" />
 
-  <NativeBinary Path="externals/build/linux64/Release/lib/SharpBgfx.dll.config"/>
+    <NativeBinary Path="externals/build/linux64/Release/bin/shaderc"/>
+    <NativeBinary Path="externals/build/linux64/Release/bin/texturec"/>
 
-  <NativeBinary Path="externals/build/windows64/Release/bin/shaderc.exe"/>
-  <NativeBinary Path="externals/build/windows64/Release/bin/texturec.exe"/>
-
-  <NativeBinary Path="externals/build/linux64/Release/bin/shaderc"/>
-  <NativeBinary Path="externals/build/linux64/Release/bin/texturec"/>
+    <NativeBinary Path="externals/build/linux64/Release/lib/SharpBgfx.dll.config"/>
+    <NativeBinary Path="externals/build/linux64/Release/lib/bgfx.so" />
+    <NativeBinary Path="externals/build/linux64/Debug/lib/bgfx_debug.so" />
+  </Platform>
 
   <Platform Type="MacOS">
-    <NativeBinary Path="externals/build/darwin64/Release/bin/shaderc_darwin"/>
-    <NativeBinary Path="externals/build/darwin64/Release/bin/texturec_darwin"/>
-    <NativeBinary Path="externals\build\darwin64\Release\lib\bgfx_darwin.so" />
-    <NativeBinary Path="externals\build\darwin64\Debug\lib\bgfx_debug_darwin.so" />
+    <Binary
+      Name="ExternalLib"
+      Path="externals/build/darwin64/Debug/lib/SharpBgfx.dll" />
+
+    <NativeBinary Path="externals/build/darwin64/Release/bin/shaderc"/>
+    <NativeBinary Path="externals/build/darwin64/Release/bin/texturec"/>
+
+    <NativeBinary Path="externals/build/darwin64/Release/lib/bgfx.so" />
+    <NativeBinary Path="externals/build/darwin64/Debug/lib/bgfx_debug.so" />
   </Platform>
 
 </ExternalProject>

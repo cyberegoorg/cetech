@@ -1,9 +1,10 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <ExternalProject Name="SQLite">
-  <Binary
-    Name="ExternalLib"
-    Path="externals\build\SQLite\Windows\x64\System.Data.SQLite.dll" />
+  <Platform Type="Windows">
+    <Binary
+      Name="ExternalLib"
+      Path="externals/build/SQLite/Windows/x64/System.Data.SQLite.dll" />
 
-  <NativeBinary Path="externals\build\SQLite\Windows\x64\SQLite.Interop.dll" />
-
+    <NativeBinary Path="externals/build/SQLite/Windows/x64/SQLite.Interop.dll" />
+  </Platform>
 </ExternalProject>
