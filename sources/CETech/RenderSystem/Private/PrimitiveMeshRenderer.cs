@@ -31,6 +31,7 @@ namespace CETech.World
         private static void RemoveWorldImpl(int world)
         {
             _world_ent_idx.Remove(world);
+            //TODO clean all
         }
 
         private static void Spawner(int world, int[] ent_ids, int[] ents_parent, MessagePackObjectDictionary[] data)
@@ -71,7 +72,16 @@ namespace CETech.World
 #if CETECH_DEVELOP
             ComponentSystem.RegisterCompiler(StringId.FromString("primitive_mesh"), Compiler, 10);
 #endif
-            ComponentSystem.RegisterSpawner(StringId.FromString("primitive_mesh"), Spawner);
+            ComponentSystem.RegisterType(StringId.FromString("primitive_mesh"), Spawner, Destroyer);
+        }
+
+        private static void Destroyer(int world, int[] entIds)
+        {
+            for (int i = 0; i < entIds.Length; i++)
+            {
+                var ent_id = entIds[i];
+                _world_ent_idx[world].Remove(ent_id);
+            }
         }
 
         private static void ShutdownImpl()
@@ -79,9 +89,8 @@ namespace CETech.World
         }
 
         public static void RenderWorldImpl(int world)
-
-
         {
+            // TODO: SHITCODE
             foreach (var f in _world_ent_idx[world])
             {
                 var idx = 0;
@@ -94,6 +103,7 @@ namespace CETech.World
 
                 var world_matrix = TranformationSystem.GetWorldMatrix(world,
                     TranformationSystem.GetTranform(world, f.Key));
+
                 unsafe
                 {
                     Bgfx.SetTransform(&world_matrix.M11);

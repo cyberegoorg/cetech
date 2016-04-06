@@ -1,5 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Globalization;
+using System.Runtime.InteropServices;
 using System.Yaml;
 using CETech.Develop;
 using MsgPack;
@@ -150,7 +152,19 @@ namespace CETech.World
 #if CETECH_DEVELOP
             ComponentSystem.RegisterCompiler(StringId.FromString("transform"), Compiler, 1);
 #endif
-            ComponentSystem.RegisterSpawner(StringId.FromString("transform"), Spawner);
+            ComponentSystem.RegisterType(StringId.FromString("transform"), Spawner, Destroyer);
+        }
+
+        private static void Destroyer(int world, int[] entIds)
+        {
+            // TODO
+            var world_instance = _worldInstance[world];
+
+            for (int i = 0; i < entIds.Length; i++)
+            {
+                var ent_id = entIds[i];
+                world_instance.EntIdx.Remove(ent_id);
+            }
         }
 
         private static void ShutdownImpl()
@@ -243,7 +257,6 @@ namespace CETech.World
 
             public readonly List<int> Parent;
 
-
             public readonly List<Vector3f> Position;
             public readonly List<Vector3f> Rotation;
             public readonly List<Vector3f> Scale;
@@ -261,6 +274,11 @@ namespace CETech.World
                 FirstChild = new List<int>();
                 World = new List<Matrix4f>();
             }
+        }
+
+        public static bool HasTransform(int world, int entity)
+        {
+            return _worldInstance[world].EntIdx.ContainsKey(entity);
         }
     }
 }
