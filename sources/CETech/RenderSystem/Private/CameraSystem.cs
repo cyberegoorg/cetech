@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Globalization;
 using System.Yaml;
 using CETech.Develop;
@@ -30,6 +31,7 @@ namespace CETech.World
             var world_instance = _worldInstance[world];
 
             var idx = world_instance.Near.Count;
+            world_instance.Ent.Add(entity);
             world_instance.Near.Add(near);
             world_instance.Far.Add(far);
             world_instance.Fov.Add(fov);
@@ -84,7 +86,42 @@ namespace CETech.World
 #if CETECH_DEVELOP
             ComponentSystem.RegisterCompiler(StringId.FromString("camera"), Compiler, 10);
 #endif
-            ComponentSystem.RegisterSpawner(StringId.FromString("camera"), Spawner);
+            ComponentSystem.RegisterType(StringId.FromString("camera"), Spawner, Destroyer);
+        }
+
+        private static void Destroyer(int world, int[] entIds)
+        {
+            var world_instance = _worldInstance[world];
+
+            for (int i = 0; i < entIds.Length; i++)
+            {
+                var ent_id = entIds[i];
+
+                if (!world_instance.EntIdx.ContainsKey(ent_id))
+                {
+                    continue;
+                }
+
+                var item_idx = getIdx(world, ent_id);
+                var last_idx = world_instance.Near.Count-1;
+                var last_ent = world_instance.Ent[last_idx];
+
+                world_instance.EntIdx.Remove(ent_id);
+
+                world_instance.Near[item_idx] = world_instance.Tranform[last_idx];
+                world_instance.Far[item_idx] = world_instance.Tranform[last_idx];
+                world_instance.Fov[item_idx] = world_instance.Tranform[last_idx];
+                world_instance.Tranform[item_idx] = world_instance.Tranform[last_idx];
+                world_instance.EntIdx[item_idx] = world_instance.Tranform[last_idx];
+
+                world_instance.EntIdx[last_ent] = item_idx;
+
+                world_instance.Ent.RemoveAt(last_idx);
+                world_instance.Near.RemoveAt(last_idx);
+                world_instance.Far.RemoveAt(last_idx);
+                world_instance.Fov.RemoveAt(last_idx);
+                world_instance.Tranform.RemoveAt(last_idx);
+            }
         }
 
         private static void ShutdownImpl()
@@ -109,6 +146,7 @@ namespace CETech.World
         private class WorldInstance
         {
             public readonly Dictionary<int, int> EntIdx;
+            public readonly List<int> Ent;
             public readonly List<float> Far;
             public readonly List<float> Fov;
 
@@ -119,6 +157,7 @@ namespace CETech.World
             {
                 EntIdx = new Dictionary<int, int>();
 
+                Ent = new List<int>();
                 Near = new List<float>();
                 Far = new List<float>();
                 Fov = new List<float>();

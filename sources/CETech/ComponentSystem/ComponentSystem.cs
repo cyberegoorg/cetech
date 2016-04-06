@@ -8,6 +8,7 @@ namespace CETech
     {
         public delegate void Compiler(YamlMapping body, ConsoleServer.ResponsePacker packer);
         public delegate void Spawner(int world, int[] ent_ids, int[] ents_parent, MessagePackObjectDictionary[] data);
+        public delegate void Destroyer(int world, int[] ent_ids);
 
         public static void RegisterCompiler(long type, Compiler compiler, int spawn_order)
         {
@@ -24,9 +25,9 @@ namespace CETech
             CompileImpl(type, body, packer);
         }
 
-        public static void RegisterSpawner(long type, Spawner spawner)
+        public static void RegisterType(long type, Spawner spawner, Destroyer destroyer)
         {
-            RegisterSpawnerImpl(type, spawner);
+            RegisterSpawnerImpl(type, spawner, destroyer);
         }
 
         public static void Spawn(int world, long type, int[] ent_ids, int[] ents_parent,
@@ -34,5 +35,11 @@ namespace CETech
         {
             SpawnImpl(world, type, ent_ids, ents_parent, data);
         }
+
+        public static void DestroyAllType(int world, int[] ent_ids)
+        {
+            DestroyAllTypeImpl(world, ent_ids);
+        }
+
     }
 }

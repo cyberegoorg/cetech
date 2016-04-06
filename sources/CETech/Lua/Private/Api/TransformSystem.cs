@@ -6,6 +6,11 @@ namespace CETech.Lua.Api
     [MoonSharpUserData]
     internal class TransformSystemApi
     {
+        public static bool HasTransform(int world, int entity)
+        {
+            return TranformationSystem.HasTransform(world, entity);
+        }
+
         public static int GetTransform(int world, int entity)
         {
             return TranformationSystem.GetTranform(world, entity);

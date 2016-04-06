@@ -60,7 +60,9 @@ namespace CETech
 
         public static void Destroy(int world, int unit)
         {
-            
+            // TODO: children (track children)
+            ComponentSystem.DestroyAllType(world, new []{unit});
+            EntityManager.Destroy(unit);
         }
     }
 }
