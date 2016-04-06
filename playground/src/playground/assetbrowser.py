@@ -8,6 +8,7 @@ from playground.ui.assetbrowser import Ui_MainWindow
 
 class AssetBrowser(QMainWindow, Ui_MainWindow):
     asset_clicked = pyqtSignal(str, str, name='assetClicked')
+    asset_doubleclicked = pyqtSignal(str, str, name='assetDoubleClicked')
 
     def __init__(self):
         super(AssetBrowser, self).__init__()
@@ -43,6 +44,14 @@ class AssetBrowser(QMainWindow, Ui_MainWindow):
         self.file_view.setRootIndex(self.file_model.setRootPath(path))
 
     def file_doubleclicked(self, idx):
+        fileinfo = self.file_model.fileInfo(idx)
+
+        path = fileinfo.absoluteFilePath()
+        ext = fileinfo.suffix()
+
+        self.asset_doubleclicked.emit(path, ext)
+
+    def file_clicked(self, idx):
         fileinfo = self.file_model.fileInfo(idx)
 
         path = fileinfo.absoluteFilePath()

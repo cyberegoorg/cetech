@@ -36,8 +36,9 @@ namespace CETech.World
             _handlers.Destroy(world);
         }
 
-        private static void UpdateImpl(int world)
+        private static void UpdateImpl(int world, float dt)
         {
+            // TODO: ! ! !! !!! !!!!!
         }
 
         private static int LoadLevelImpl(int world, long level, Vector3f position, Vector3f rotation, Vector3f scale)

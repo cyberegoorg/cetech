@@ -37,21 +37,20 @@ class ReadyLock(QThread):
 
 
 class CetechWidget(QWidget):
-    def __init__(self, parent, api, project):
-        self.project = project
+    def __init__(self, parent, api, log_url):
         self.api = api
         self.ready = False
 
-        self.ready_lock = ReadyLock(b"ws://localhost:5556", self)
+        self.ready_lock = ReadyLock(log_url, self)
         self.ready_lock.start(QThread.NormalPriority)
 
         super(CetechWidget, self).__init__(parent, Qt.ForeignWindow)
 
-    def resizeEvent(self, event):
-        if len(self.project.spawned_process) == 0:
-            return
+    def set_api(self, api):
+        self.api = api
 
-        if self.ready:
+    def resizeEvent(self, event):
+        if self.api and self.ready:
             size = event.size()
             self.api.resize(size.width(), size.height())
 

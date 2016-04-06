@@ -113,7 +113,7 @@ function Game:update(dt)
     Transformation.SetPosition(self.world, unit_transform, pos)
     Transformation.SetRotation(self.world, unit_transform, rot)
 
-    World.Update(self.world)
+    World.Update(self.world, dt)
     --print("%f, %f", m_axis.x, m_axis.y)
     --print(dt)
 end

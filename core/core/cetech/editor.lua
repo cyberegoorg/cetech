@@ -12,8 +12,5 @@ function autocomplite_list()
         end
     end
 
-    Application.console_send("autocomplite_list",{
-        type = "autocomplete_list",
-        list = t
-    })
+    return t
 end

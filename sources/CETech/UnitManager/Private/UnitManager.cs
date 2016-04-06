@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using CETech.World;
 using MsgPack;
 
@@ -55,6 +56,11 @@ namespace CETech
 
         private static void ShutdownImpl()
         {
+        }
+
+        public static void Destroy(int world, int unit)
+        {
+            
         }
     }
 }

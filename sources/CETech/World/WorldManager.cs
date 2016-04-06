@@ -22,9 +22,9 @@
             DestroyWorldImpl(world);
         }
 
-        public static void Update(int world)
+        public static void Update(int world, float dt)
         {
-            UpdateImpl(world);
+            UpdateImpl(world, dt);
         }
 
         public static int LoadLevel(int world, long level, Vector3f position, Vector3f rotation, Vector3f scale)

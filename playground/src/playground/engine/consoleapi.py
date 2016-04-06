@@ -13,7 +13,7 @@ class ConsoleAPI(ConsoleProxy):
         self.send_command('resource_compiler.compile_all')
 
     def autocomplete_list(self):
-        # self.lua_execute('autocomplite_list()')
+        #self.lua_execute('autocomplite_list()')
         pass
 
     def resize(self, w, h):
