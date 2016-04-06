@@ -13,7 +13,7 @@ function Editor:shutdown()
 end
 
 function Editor:update(dt)
-    World.Update(self.world)
+    World.Update(self.world, dt)
 end
 
 function Editor:render()

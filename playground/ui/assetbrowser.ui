@@ -102,9 +102,26 @@
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>file_view</sender>
+   <signal>clicked(QModelIndex)</signal>
+   <receiver>MainWindow</receiver>
+   <slot>file_clicked(QModelIndex)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>540</x>
+     <y>173</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>409</x>
+     <y>173</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
  <slots>
   <slot>dir_clicked(QModelIndex)</slot>
   <slot>file_doubleclicked(QModelIndex)</slot>
+  <slot>file_clicked(QModelIndex)</slot>
  </slots>
 </ui>

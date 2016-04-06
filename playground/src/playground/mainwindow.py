@@ -9,6 +9,7 @@ from PyQt5.QtWidgets import QMainWindow, QDockWidget, QTabWidget
 from nanomsg import Socket, SUB, SUB_SUBSCRIBE
 
 from playground.assetbrowser import AssetBrowser
+from playground.assetview import AssetView
 from playground.engine.cetechproject import CetechProject
 from playground.engine.cetechwidget import CetechWidget
 from playground.engine.consoleapi import ConsoleAPI
@@ -72,12 +73,20 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
         # TODO bug #114 workaround. Disable create sub engine...
         if platform.system().lower() != 'darwin':
-            self.ogl_widget = CetechWidget(self, self.api, self.project)
+            self.ogl_widget = CetechWidget(self, self.api, log_url=b"ws://localhost:5556")
+            self.ogl_widget.set_api(self.api)
             self.ogl_dock = QDockWidget(self)
             self.ogl_dock.setWindowTitle("Engine View")
             self.ogl_dock.hide()
             self.ogl_dock.setWidget(self.ogl_widget)
             self.addDockWidget(Qt.TopDockWidgetArea, self.ogl_dock)
+
+        self.assetview_widget = AssetView(self)
+        self.assetview_dock = QDockWidget(self)
+        self.assetview_dock.setWindowTitle("Asset view")
+        #self.assetview_dock.hide()
+        self.assetview_dock.setWidget(self.assetview_widget)
+        self.addDockWidget(Qt.BottomDockWidgetArea, self.assetview_dock)
 
         self.assetb_widget = AssetBrowser()
         self.assetb_dock_widget = QDockWidget(self)
@@ -86,6 +95,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.assetb_dock_widget.setFeatures(QDockWidget.AllDockWidgetFeatures)
         self.assetb_dock_widget.setWidget(self.assetb_widget)
         self.addDockWidget(Qt.BottomDockWidgetArea, self.assetb_dock_widget)
+
+        self.splitDockWidget(self.assetb_dock_widget, self.assetview_dock, Qt.Horizontal)
 
         self.profiler_widget = ProfilerWidget(api=self.api)
         self.profiler_doc_widget = QDockWidget(self)
@@ -105,7 +116,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.addDockWidget(Qt.BottomDockWidgetArea, self.log_dock_widget)
         self.tabifyDockWidget(self.assetb_dock_widget, self.log_dock_widget)
 
-        self.assetb_widget.asset_clicked.connect(self.open_asset)
+        self.assetb_widget.asset_doubleclicked.connect(self.open_asset)
+        self.assetb_widget.asset_clicked.connect(self.show_asset)
 
         self.file_watch = QFileSystemWatcher(self)
         self.file_watch.fileChanged.connect(self.file_changed)
@@ -120,13 +132,20 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         :type path: str
         :type path: ext
         """
+
+        asset_name = path.replace(self.project.project_dir, '').replace('/src/', '').split('.')[0]
+
         if ext == 'level':
-            level_name = path.replace(self.project.project_dir, '').replace('/src/', '').split('.')[0]
+            level_name = asset_name
             self.api.lua_execute("Editor:load_level(\"%s\")" % level_name)
             return
 
         if ScriptEditorWidget.support_ext(ext):
             self.editors_manager.open(self, path)
+
+    def show_asset(self, path, ext):
+        asset_name = path.replace(self.project.project_dir, '').replace('/src/', '').split('.')[0]
+        self.assetview_widget.open_asset(asset_name, ext)
 
     def open_project(self, name, dir):
         self.project.open_project(name, dir)
@@ -156,10 +175,14 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.project.run_cetech_develop(compile_=True, continue_=True, wid=wid,
                                         bootscript=os.path.join("playground", "boot"))
 
+        self.assetview_widget.open_project(self.project)
+
         # self.api.wait()
 
     def reload_all(self):
-        self.api.reload_all(["shader", "texture", "material", "lua"])
+        order = ["shader", "texture", "material", "lua"]
+        self.api.reload_all(order)
+        self.assetview_widget.api.reload_all(order)
 
     def watch_project_dir(self):
         files = self.file_watch.files()
@@ -219,7 +242,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.project.run_cetech_develop(compile_=True, continue_=True, port=5566)
 
     def closeEvent(self, evnt):
-        self.api.quit()
+        self.api.quit();
         self.api.disconnect()
+        self.assetview_widget.close_project();
         self.project.killall_process()
         evnt.accept()
