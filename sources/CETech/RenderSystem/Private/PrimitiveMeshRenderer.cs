@@ -50,7 +50,7 @@ namespace CETech.World
 
                 _world_ent_idx[world][ent_ids[i]] = size;
                 _world_ent_material[world][ent_ids[i]] =
-                    ResourceManager.Get<MaterialResource.MaterialInstance>(MaterialResource.Type,
+                    Resource.Resource.Get<MaterialResource.MaterialInstance>(MaterialResource.Type,
                         data[i]["material"].AsInt64());
             }
         }
@@ -103,8 +103,8 @@ namespace CETech.World
                     ++idx;
                 }
 
-                var world_matrix = TranformationSystem.GetWorldMatrix(world,
-                    TranformationSystem.GetTranform(world, f.Key));
+                var world_matrix = Tranform.GetWorldMatrix(world,
+                    Tranform.GetTranform(world, f.Key));
 
                 unsafe
                 {

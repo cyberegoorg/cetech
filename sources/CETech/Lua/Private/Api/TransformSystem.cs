@@ -9,47 +9,47 @@ namespace CETech.Lua.Api
     {
         public static bool HasTransform(int world, int entity)
         {
-            return TranformationSystem.HasTransform(world, entity);
+            return Tranform.HasTransform(world, entity);
         }
 
         public static int GetTransform(int world, int entity)
         {
-            return TranformationSystem.GetTranform(world, entity);
+            return Tranform.GetTranform(world, entity);
         }
 
         public static void SetPosition(int world, int transform, Vector3f pos)
         {
-            TranformationSystem.SetPosition(world, transform, pos);
+            Tranform.SetPosition(world, transform, pos);
         }
 
         public static void SetRotation(int world, int transform, Vector3f rot)
         {
-            TranformationSystem.SetRotation(world, transform, rot);
+            Tranform.SetRotation(world, transform, rot);
         }
 
         public static void SetScale(int world, int transform, Vector3f scale)
         {
-            TranformationSystem.SetScale(world, transform, scale);
+            Tranform.SetScale(world, transform, scale);
         }
 
         public static Vector3f GetPosition(int world, int transform)
         {
-            return TranformationSystem.GetPosition(world, transform);
+            return Tranform.GetPosition(world, transform);
         }
 
         public static Vector3f GetRotation(int world, int transform)
         {
-            return TranformationSystem.GetRotation(world, transform);
+            return Tranform.GetRotation(world, transform);
         }
 
         public static Vector3f GetScale(int world, int transform)
         {
-            return TranformationSystem.GetScale(world, transform);
+            return Tranform.GetScale(world, transform);
         }
 
         public static Matrix4f GetWorldMatrix(int world, int transform)
         {
-            return TranformationSystem.GetWorldMatrix(world, transform);
+            return Tranform.GetWorldMatrix(world, transform);
         }
     }
 }

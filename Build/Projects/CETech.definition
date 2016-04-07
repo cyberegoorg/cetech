@@ -26,8 +26,11 @@
     <Compile Include="Application\Private\ApplicationSDL.cs">
       <Platforms>Windows,Linux</Platforms>
     </Compile>
-    <Compile Include="ComponentSystem\ComponentSystem.cs" />
-    <Compile Include="ComponentSystem\Private\ComponentSystem.cs" />
+    <Compile Include="CEMath\Math.cs" />
+    <Compile Include="CEMath\Matrix4f.cs" />
+    <Compile Include="CEMath\Vector2f.cs" />
+    <Compile Include="CEMath\Vector3f.cs" />
+    <Compile Include="CEMath\Vector4f.cs" />
     <Compile Include="Config\ConfigResource.cs" />
     <Compile Include="Config\ConfigSystem.cs" />
     <Compile Include="Config\Private\ConfigSystem.cs" />
@@ -62,14 +65,6 @@
     <Compile Include="Lua\Private\Api\UnitManager.cs" />
     <Compile Include="Lua\Private\Api\WorldApi.cs" />
     <Compile Include="Lua\Private\LuaEnviroment.cs" />
-    <Compile Include="Math\Math.cs" />
-    <Compile Include="Math\Matrix4f.cs" />
-    <Compile Include="Math\Vector2f.cs" />
-    <Compile Include="Math\Vector3f.cs" />
-    <Compile Include="Math\Vector4f.cs" />
-    <Compile Include="PackageManager\PackageManager.cs" />
-    <Compile Include="PackageManager\PackageResource.cs" />
-    <Compile Include="PackageManager\Private\PackageManager.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="RenderSystem\CameraSystem.cs" />
     <Compile Include="RenderSystem\MaterialResource.cs" />
@@ -78,25 +73,25 @@
     <Compile Include="RenderSystem\Private\CameraSystem.cs" />
     <Compile Include="RenderSystem\Private\PrimitiveMeshRenderer.cs" />
     <Compile Include="RenderSystem\Private\RendererBgfx.cs" />
-    <Compile Include="RenderSystem\RenderSystem.cs" />
+    <Compile Include="RenderSystem\Renderer.cs" />
     <Compile Include="RenderSystem\ShaderResource.cs" />
     <Compile Include="RenderSystem\TextureResource.cs" />
+    <Compile Include="Resource\Package.cs" />
+    <Compile Include="Resource\PackageResource.cs" />
+    <Compile Include="Resource\Private\Package.cs" />
+    <Compile Include="Resource\Private\Resource.cs" />
+    <Compile Include="Resource\Private\StringId.cs" />
+    <Compile Include="Resource\Resource.cs" />
+    <Compile Include="Resource\StringId.cs" />
     <Compile Include="ResourceCompiler\Private\BuildDb.cs">
       <Services>Develop</Services>
     </Compile>
     <Compile Include="ResourceCompiler\ResourceCompiler.cs">
       <Services>Develop</Services>
     </Compile>
-    <Compile Include="ResourceManager\Private\ResourceManager.cs" />
-    <Compile Include="ResourceManager\Private\StringId.cs" />
-    <Compile Include="ResourceManager\ResourceManager.cs" />
-    <Compile Include="ResourceManager\StringId.cs" />
     <Compile Include="TaskManager\Private\QueueMPMC.cs" />
     <Compile Include="TaskManager\Private\TaskManager.cs" />
     <Compile Include="TaskManager\TaskManager.cs" />
-    <Compile Include="UnitManager\Private\UnitManager.cs" />
-    <Compile Include="UnitManager\UnitManager.cs" />
-    <Compile Include="UnitManager\UnitResource.cs" />
     <Compile Include="Utils\HandlerID.cs" />
     <Compile Include="Utils\Log.cs" />
     <Compile Include="Utils\LogHandler.cs" />
@@ -126,12 +121,14 @@
     <Compile Include="Window\WindowFlags.cs" />
     <Compile Include="Window\WindowPos.cs" />
     <Compile Include="World\LevelResource.cs" />
-    <Compile Include="World\Private\TranformationSystem.cs" />
-    <Compile Include="World\Private\WorldManager.cs" />
-    <Compile Include="World\TranformationSystem.cs" />
-    <Compile Include="World\WorldManager.cs" />
+    <Compile Include="World\Private\Tranform.cs" />
+    <Compile Include="World\Private\Unit.cs" />
+    <Compile Include="World\Private\World.cs" />
+    <Compile Include="World\Tranform.cs" />
+    <Compile Include="World\Unit.cs" />
+    <Compile Include="World\UnitResource.cs" />
+    <Compile Include="World\World.cs" />
     <Content Include="Utils\YamlSerializer\ChangeLog.txt" />
     <Content Include="Utils\YamlSerializer\Readme.txt" />
-    <None Include="packages.config" />
   </Files>
 </Project>

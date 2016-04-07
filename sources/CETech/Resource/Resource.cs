@@ -5,7 +5,7 @@ namespace CETech.Resource
     /// <summary>
     ///     Resource manager
     /// </summary>
-    public static partial class ResourceManager
+    public static partial class Resource
     {
         /// <summary>
         ///     Resource loader delegate

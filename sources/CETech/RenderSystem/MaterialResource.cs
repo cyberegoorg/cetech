@@ -53,14 +53,14 @@ namespace CETech
         public static void ResourceOnline(object data)
         {
             var resource = (MaterialInstance) data;
-            resource.instance = ResourceManager.Get<ShaderResource.ShaderInstance>(ShaderResource.Type,
+            resource.instance = CETech.Resource.Resource.Get<ShaderResource.ShaderInstance>(ShaderResource.Type,
                 resource.resource.shader_name);
 
             var idx = 0;
             foreach (var uniform_name in resource.resource.texture)
             {
                 resource.texture_uniform[idx] = new Uniform(uniform_name, UniformType.Int1);
-                resource.texture_resource[idx] = ResourceManager.Get<TextureResource.Resource>(TextureResource.Type,
+                resource.texture_resource[idx] = CETech.Resource.Resource.Get<TextureResource.Resource>(TextureResource.Type,
                     StringId.FromString(uniform_name));
                 ++idx;
             }
@@ -78,10 +78,10 @@ namespace CETech
         {
             // TODO: !!!
 
-            var old = ResourceManager.Get<MaterialInstance>(Type, name);
+            var old = CETech.Resource.Resource.Get<MaterialInstance>(Type, name);
             var resource = (MaterialInstance) new_data;
             old.resource = resource.resource;
-            old.instance = ResourceManager.Get<ShaderResource.ShaderInstance>(ShaderResource.Type,
+            old.instance = CETech.Resource.Resource.Get<ShaderResource.ShaderInstance>(ShaderResource.Type,
                 resource.resource.shader_name);
 
             old.texture_uniform = resource.texture_uniform;
@@ -93,7 +93,7 @@ namespace CETech
                 foreach (var uniform_name in resource.resource.texture)
                 {
                     old.texture_uniform[idx] = new Uniform(uniform_name, UniformType.Int1);
-                    old.texture_resource[idx] = ResourceManager.Get<TextureResource.Resource>(TextureResource.Type,
+                    old.texture_resource[idx] = CETech.Resource.Resource.Get<TextureResource.Resource>(TextureResource.Type,
                         StringId.FromString(uniform_name));
                     ++idx;
                 }

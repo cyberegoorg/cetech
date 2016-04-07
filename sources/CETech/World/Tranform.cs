@@ -2,7 +2,7 @@
 
 namespace CETech.World
 {
-    public partial class TranformationSystem
+    public partial class Tranform
     {
         public static void Init()
         {

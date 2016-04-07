@@ -10,22 +10,22 @@ namespace CETech.Lua.Api
     {
         public static int Create()
         {
-            return WorldManager.CreateWorld();
+            return World.World.CreateWorld();
         }
 
         public static void Destroy(int world)
         {
-            WorldManager.DestroyWorld(world);
+            World.World.DestroyWorld(world);
         }
 
         public static void Update(int world, float dt)
         {
-            WorldManager.Update(world, dt);
+            World.World.Update(world, dt);
         }
 
         public static int LoadLevel(int world, string level, Vector3f? position, Vector3f? rotation, Vector3f? scale)
         {
-            return WorldManager.LoadLevel(world, StringId.FromString(level),
+            return World.World.LoadLevel(world, StringId.FromString(level),
                 position != null ? position.Value : Vector3f.Zero,
                 rotation != null ? rotation.Value : Vector3f.Zero,
                 scale != null ? scale.Value : Vector3f.Zero);
@@ -33,12 +33,12 @@ namespace CETech.Lua.Api
 
         public static int UnitByName(int world, int level, string name)
         {
-            return WorldManager.UnitByName(world, level, StringId.FromString(name));
+            return World.World.UnitByName(world, level, StringId.FromString(name));
         }
 
         public static int LevelUnit(int world, int level)
         {
-            return WorldManager.LevelUnit(world, level);
+            return World.World.LevelUnit(world, level);
         }
     }
 }

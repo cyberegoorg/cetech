@@ -8,22 +8,22 @@ namespace CETech.Lua.Api
     {
         public static void Load(long name)
         {
-            PackageManager.Load(name);
+            Package.Load(name);
         }
 
         public static void Unload(long name)
         {
-            PackageManager.Unload(name);
+            Package.Unload(name);
         }
 
         public static bool IsLoaded(long name)
         {
-            return PackageManager.IsLoaded(name);
+            return Package.IsLoaded(name);
         }
 
         public static void Flush(long name)
         {
-            PackageManager.Flush(name);
+            Package.Flush(name);
         }
     }
 }

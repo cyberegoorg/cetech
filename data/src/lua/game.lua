@@ -12,7 +12,7 @@ function Game:init()
 
     self.world = World.Create();
 
-    --self.unit = UnitManager.Spawn(self.world, "unit1");
+    --self.unit = Unit.Spawn(self.world, "unit1");
     World.LoadLevel(self.world, "level1");
     self.level = World.LoadLevel(self.world, "level1",
                  Vector3f.make(0.0, 5.0, 0.0),
@@ -24,10 +24,10 @@ function Game:init()
     self.unit2 = World.UnitByName(self.world, self.level, "box2")
     self.unit = self.unit1
 
-    self.camera_unit = UnitManager.Spawn(self.world, "camera");
+    self.camera_unit = Unit.Spawn(self.world, "camera");
     self.camera = Camera.GetCamera(self.world, self.camera_unit);
 
-    UnitManager.Spawn(self.world, "unit11");
+    Unit.Spawn(self.world, "unit11");
 
     Log.Info("sadsadas", "{0}", self.unit);
     Log.Info("sadsadas", "{0}", self.unit2);
@@ -54,7 +54,7 @@ function Game:update(dt)
 
     if Keyboard.Pressed(Keyboard.ButtonIndex('f9')) then
       self.debug = not self.debug;
-      RenderSystem.SetDebug(self.debug)
+      Renderer.SetDebug(self.debug)
     end
 
     if Keyboard.Pressed(Keyboard.ButtonIndex('f8')) then
@@ -82,10 +82,10 @@ function Game:update(dt)
 
     local m_axis = Mouse.axis("delta")
 
-    local unit_transform = Transformation.GetTransform(self.world, self.camera_unit)
+    local unit_transform = Transform.GetTransform(self.world, self.camera_unit)
 
-    local pos = Transformation.GetPosition(self.world, unit_transform)
-    local rot = Transformation.GetRotation(self.world, unit_transform)
+    local pos = Transform.GetPosition(self.world, unit_transform)
+    local rot = Transform.GetRotation(self.world, unit_transform)
 
     if Mouse.State(Mouse.ButtonIndex("left") ) then
         rot.X = rot.X + m_axis.X * -0.1;
@@ -110,8 +110,8 @@ function Game:update(dt)
 
     --rot.X = rot.X - 0.005 * dt
 
-    Transformation.SetPosition(self.world, unit_transform, pos)
-    Transformation.SetRotation(self.world, unit_transform, rot)
+    Transform.SetPosition(self.world, unit_transform, pos)
+    Transform.SetRotation(self.world, unit_transform, rot)
 
     World.Update(self.world, dt)
     --print("%f, %f", m_axis.x, m_axis.y)
@@ -119,7 +119,7 @@ function Game:update(dt)
 end
 
 function Game:render()
-    RenderSystem.RenderWorld(self.world, self.camera)
+    Renderer.RenderWorld(self.world, self.camera)
 end
 
 function foo(value)

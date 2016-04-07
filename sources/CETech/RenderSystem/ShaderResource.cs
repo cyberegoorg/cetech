@@ -63,7 +63,7 @@ namespace CETech
         public static object Reloader(long name, object new_data)
         {
             var resource = (ShaderInstance) new_data;
-            var old = ResourceManager.Get<ShaderInstance>(Type, name);
+            var old = CETech.Resource.Resource.Get<ShaderInstance>(Type, name);
 
             var vs_shader = new Shader(MemoryBlock.FromArray(resource.vs_file));
             var fs_shader = new Shader(MemoryBlock.FromArray(resource.fs_file));

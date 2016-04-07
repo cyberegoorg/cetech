@@ -37,7 +37,7 @@ namespace CETech.World
             world_instance.Near.Add(near);
             world_instance.Far.Add(far);
             world_instance.Fov.Add(fov);
-            world_instance.Tranform.Add(TranformationSystem.GetTranform(world, entity));
+            world_instance.Tranform.Add(Tranform.GetTranform(world, entity));
 
             world_instance.EntIdx[entity] = idx;
             return idx;
@@ -133,9 +133,9 @@ namespace CETech.World
         private static void GetProjectViewImpl(int world, int camera, out Matrix4f proj, out Matrix4f view)
         {
             var world_instance = _worldInstance[world];
-			var size = RenderSystem.GetSize ();
+			var size = Renderer.GetSize ();
 
-            view = TranformationSystem.GetWorldMatrix(world, world_instance.Tranform[camera]);
+            view = Tranform.GetWorldMatrix(world, world_instance.Tranform[camera]);
 			proj = Matrix4f.CreatePerspectiveFieldOfView(MathUtils.DegToRad(world_instance.Fov[camera]), size.X/size.Y,
                 world_instance.Near[camera], world_instance.Far[camera]);
         }

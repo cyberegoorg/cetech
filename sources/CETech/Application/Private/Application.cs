@@ -38,7 +38,7 @@ namespace CETech
             ConsoleServer.InitConfig();
 #endif
 
-            ResourceManager.InitConfig();
+            Resource.Resource.InitConfig();
 
             ConfigSystem.CreateValue("application.platform", "Platform", GetPlatform());
             ConfigSystem.CreateValue("application.log_file", "Log file", "");
@@ -294,15 +294,15 @@ namespace CETech
 
         private static void Boot()
         {
-            ResourceManager.LoadNow(PackageResource.Type,
+            Resource.Resource.LoadNow(PackageResource.Type,
                 new[] {StringId.FromString(ConfigSystem.GetValueString("boot.pkg"))});
-            PackageManager.Load(StringId.FromString(ConfigSystem.GetValueString("boot.pkg")));
-            PackageManager.Flush(StringId.FromString(ConfigSystem.GetValueString("boot.pkg")));
+            Package.Load(StringId.FromString(ConfigSystem.GetValueString("boot.pkg")));
+            Package.Flush(StringId.FromString(ConfigSystem.GetValueString("boot.pkg")));
         }
 
         private static void InitResouce()
         {
-            TranformationSystem.Init();
+            Tranform.Init();
             PrimitiveMeshRenderer.Init();
             CameraSystem.Init();
 
@@ -322,42 +322,42 @@ namespace CETech
             }
 #endif
 
-            ResourceManager.RegisterType(
+            Resource.Resource.RegisterType(
                 ConfigResource.Type,
                 ConfigResource.ResourceLoader, ConfigResource.ResourceUnloader,
                 ConfigResource.ResourceOnline, ConfigResource.ResourceOffline, ConfigResource.Reloader);
 
-            ResourceManager.RegisterType(
+            Resource.Resource.RegisterType(
                 PackageResource.Type,
                 PackageResource.ResourceLoader, PackageResource.ResourceUnloader,
                 PackageResource.ResourceOnline, PackageResource.ResourceOffline, PackageResource.Reloader);
 
-            ResourceManager.RegisterType(
+            Resource.Resource.RegisterType(
                 LuaResource.Type,
                 LuaResource.ResourceLoader, LuaResource.ResourceUnloader,
                 LuaResource.ResourceOnline, LuaResource.ResourceOffline, LuaResource.Reloader);
 
-            ResourceManager.RegisterType(
+            Resource.Resource.RegisterType(
                 UnitResource.Type,
                 UnitResource.ResourceLoader, UnitResource.ResourceUnloader,
                 UnitResource.ResourceOnline, UnitResource.ResourceOffline, UnitResource.Reloader);
 
-            ResourceManager.RegisterType(
+            Resource.Resource.RegisterType(
                 ShaderResource.Type,
                 ShaderResource.ResourceLoader, ShaderResource.ResourceUnloader,
                 ShaderResource.ResourceOnline, ShaderResource.ResourceOffline, ShaderResource.Reloader);
 
-            ResourceManager.RegisterType(
+            Resource.Resource.RegisterType(
                 MaterialResource.Type,
                 MaterialResource.ResourceLoader, MaterialResource.ResourceUnloader,
                 MaterialResource.ResourceOnline, MaterialResource.ResourceOffline, MaterialResource.ResourceReloader);
 
-            ResourceManager.RegisterType(
+            Resource.Resource.RegisterType(
                 TextureResource.Type,
                 TextureResource.ResourceLoader, TextureResource.ResourceUnloader,
                 TextureResource.ResourceOnline, TextureResource.ResourceOffline, TextureResource.ResourceReloader);
 
-            ResourceManager.RegisterType(
+            Resource.Resource.RegisterType(
                 LevelResource.Type,
                 LevelResource.ResourceLoader, LevelResource.ResourceUnloader,
                 LevelResource.ResourceOnline, LevelResource.ResourceOffline, LevelResource.ResourceReloader);
@@ -378,8 +378,8 @@ namespace CETech
 #endif
 
             EntityManager.Init();
-            UnitManager.Init();
-            WorldManager.Init();
+            Unit.Init();
+            World.World.Init();
 
 #if CETECH_DEVELOP
 
@@ -399,8 +399,8 @@ namespace CETech
 
             InitResouce();
 
-            ResourceManager.Init();
-            ResourceManager.LoadNow(ConfigResource.Type, new[] {StringId.FromString("global")});
+            Resource.Resource.Init();
+            Resource.Resource.LoadNow(ConfigResource.Type, new[] {StringId.FromString("global")});
 
 #if CETECH_DEVELOP
             if (DevelopFlags.compile && !DevelopFlags.ccontinue)
@@ -440,7 +440,7 @@ namespace CETech
 #endif
             _mainWindow = main_window;
 
-            RenderSystem.Init(_mainWindow, RenderSystem.BackendType.Default);
+            Renderer.Init(_mainWindow, Renderer.BackendType.Default);
 
             return true;
         }
@@ -453,14 +453,14 @@ namespace CETech
             ConsoleServer.Shutdown();
 #endif
 
-            UnitManager.Shutdown();
-            WorldManager.Shutdown();
+            Unit.Shutdown();
+            World.World.Shutdown();
             EntityManager.Shutdown();
 
             TaskManager.Shutdown();
             EntityManager.Shutdown();
 
-			RenderSystem.Shutdown ();
+			Renderer.Shutdown ();
             ConfigSystem.Shutdown();
         }
 

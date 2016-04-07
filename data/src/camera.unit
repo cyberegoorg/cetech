@@ -1,7 +1,7 @@
 components:
   "5sad4as64d65as4d65as65d4asd":
     component_type: "transform"
-    position: [0, 0, -50]
+    position: [0, 0, -25]
     rotation: [0, 0, 0]
     scale: [1, 1, 1]
 

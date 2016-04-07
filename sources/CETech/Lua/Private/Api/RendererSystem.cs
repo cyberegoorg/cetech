@@ -7,28 +7,28 @@ namespace CETech.Lua.Api
     {
         public static void RenderWorld(int world, int camera)
         {
-            RenderSystem.RenderWorld(world, camera);
+            Renderer.RenderWorld(world, camera);
         }
 
         public static void SetDebug(bool enabled)
         {
-            RenderSystem.SetDebug(enabled);
+            Renderer.SetDebug(enabled);
         }
 
         public static void SaveScreenShot(string filename)
         {
-            RenderSystem.SaveScreenShot(filename);
+            Renderer.SaveScreenShot(filename);
         }
 
         public static void BeginCapture()
         {
-            RenderSystem.BeginCapture();
+            Renderer.BeginCapture();
         }
 
 
         public static void EndCapture()
         {
-            RenderSystem.EndCapture();
+            Renderer.EndCapture();
         }
     }
 }
