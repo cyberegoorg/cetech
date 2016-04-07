@@ -2,6 +2,8 @@
 {
     public partial class WorldManager
     {
+        public static readonly int NullWorld = 0;
+
         public static void Init()
         {
             InitImpl();

@@ -7,6 +7,9 @@ namespace CETech
     /// </summary>
     public partial class EntityManager
     {
+
+        public static readonly int NullEntity = 0;
+
         /// <summary>
         ///     Init entity manager
         /// </summary>
