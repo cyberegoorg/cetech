@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Diagnostics;
 
 namespace CETech.World
 {
@@ -6,12 +7,14 @@ namespace CETech.World
     {
         private static HandlerID _handlers;
 
+        //TODO: arrays
         private static readonly Dictionary<long, List<Levelnstance>> _levelnstances =
             new Dictionary<long, List<Levelnstance>>();
 
         public static void InitImpl()
         {
             _handlers = new HandlerID();
+            Debug.Assert(_handlers.Create() == NullWorld);
         }
 
         public static void ShutdownImpl()
@@ -57,7 +60,7 @@ namespace CETech.World
             for (var i = 0; i < units.Length; ++i)
             {
                 var spawned_unit = UnitManager.Spawn(units[i], world);
-
+                
                 level_instance.units[units_name[i]] = spawned_unit;
 
                 TranformationSystem.Link(world, level_ent, spawned_unit);
@@ -73,7 +76,7 @@ namespace CETech.World
             var level_instance = _levelnstances[world][level];
 
             int unit;
-            return level_instance.units.TryGetValue(name, out unit) ? unit : 0;
+            return level_instance.units.TryGetValue(name, out unit) ? unit : EntityManager.NullEntity;
         }
 
         private static int LevelUnitImpl(int world, int level)
@@ -85,6 +88,7 @@ namespace CETech.World
         {
             public readonly Dictionary<long, int> units = new Dictionary<long, int>();
             public int unit;
+            public int[] spawned;
         }
     }
 }

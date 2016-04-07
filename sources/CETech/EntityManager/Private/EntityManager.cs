@@ -1,4 +1,6 @@
-﻿namespace CETech
+﻿using System.Diagnostics;
+
+namespace CETech
 {
     public partial class EntityManager
     {
@@ -7,6 +9,7 @@
         private static void InitImpl()
         {
             _hadlers = new HandlerID();
+            Debug.Assert(_hadlers.Create() == NullEntity);
         }
 
         private static void ShutdownImpl()
