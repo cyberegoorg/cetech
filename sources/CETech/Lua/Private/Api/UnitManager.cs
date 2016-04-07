@@ -1,3 +1,5 @@
+using CETech.Resource;
+using CETech.World;
 using MoonSharp.Interpreter;
 
 namespace CETech.Lua.Api

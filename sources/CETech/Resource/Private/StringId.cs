@@ -1,4 +1,4 @@
-﻿namespace CETech
+﻿namespace CETech.Resource
 {
     public static partial class StringId
     {

@@ -7,7 +7,7 @@ using CETech.Lua;
 using CETech.World;
 using MsgPack.Serialization;
 
-namespace CETech
+namespace CETech.Resource
 {
     /// <summary>
     ///     Package resource

@@ -1,4 +1,6 @@
-﻿namespace CETech.World
+﻿using CETech.CEMath;
+
+namespace CETech.World
 {
     public partial class CameraSystem
     {

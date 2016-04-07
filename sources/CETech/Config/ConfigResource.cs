@@ -2,6 +2,7 @@ using System;
 using System.IO;
 using System.Yaml;
 using CETech.Develop;
+using CETech.Resource;
 
 namespace CETech
 {

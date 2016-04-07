@@ -1,6 +1,6 @@
 ﻿using System.Diagnostics;
 
-namespace CETech
+namespace CETech.EntCom
 {
     public partial class EntityManager
     {

@@ -1,5 +1,7 @@
 ﻿// ReSharper disable UnusedMember.Local
+
 using NSpec;
+using CETech.EntCom;
 
 namespace CETech.Tests
 {

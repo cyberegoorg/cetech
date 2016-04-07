@@ -39,8 +39,6 @@
     <Compile Include="Application\Private\ApplicationSDL.cs">
       <Platforms>Windows,Linux</Platforms>
     </Compile>
-    <Compile Include="ComponentSystem\ComponentSystem.cs" />
-    <Compile Include="ComponentSystem\Private\ComponentSystem.cs" />
     <Compile Include="Config\ConfigResource.cs" />
     <Compile Include="Config\ConfigSystem.cs" />
     <Compile Include="Config\Private\ConfigSystem.cs" />
@@ -51,8 +49,10 @@
     <Compile Include="Develop\Private\DevelopSystem.cs" />
     <Compile Include="Develop\Private\ResourceCompiler.cs" />
     <Compile Include="Develop\ResourceCompiler.cs" />
-    <Compile Include="EntityManager\EntityManager.cs" />
-    <Compile Include="EntityManager\Private\EntityManager.cs" />
+    <Compile Include="EntCom\ComponentSystem.cs" />
+    <Compile Include="EntCom\EntityManager.cs" />
+    <Compile Include="EntCom\Private\ComponentSystem.cs" />
+    <Compile Include="EntCom\Private\EntityManager.cs" />
     <Compile Include="FileSystem\FileSystem.cs" />
     <Compile Include="FileSystem\Private\FileSystem.cs" />
     <Compile Include="Input\Keyboard.cs" />

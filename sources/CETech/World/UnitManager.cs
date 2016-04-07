@@ -1,6 +1,4 @@
-using CETech.World;
-
-namespace CETech
+namespace CETech.World
 {
     public partial class UnitManager
     {

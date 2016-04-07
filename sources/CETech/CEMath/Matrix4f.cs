@@ -1,6 +1,4 @@
-using System;
-
-namespace CETech.World
+namespace CETech.CEMath
 {
     public struct Matrix4f
     {
@@ -47,7 +45,7 @@ namespace CETech.World
         public static Matrix4f CreatePerspectiveFieldOfView(float fieldOfView, float aspectRatio,
             float nearPlaneDistance, float farPlaneDistance)
         {
-            var yScale = 1.0f/(float) Math.Tan(fieldOfView*0.5f);
+            var yScale = 1.0f/(float) System.Math.Tan(fieldOfView*0.5f);
             var xScale = yScale/aspectRatio;
 
             Matrix4f result;
@@ -114,8 +112,8 @@ namespace CETech.World
 
         public static Matrix4f CreateRotationY(float radians)
         {
-            var c = (float) Math.Cos(radians);
-            var s = (float) Math.Sin(radians);
+            var c = (float) System.Math.Cos(radians);
+            var s = (float) System.Math.Sin(radians);
 
             var result = Identity;
             result.M11 = c;
@@ -140,7 +138,7 @@ namespace CETech.World
             if (norm < epsilon)
                 zaxis = -cameraForwardVector;
             else
-                zaxis = zaxis*(1.0f/(float) Math.Sqrt(norm));
+                zaxis = zaxis*(1.0f/(float) System.Math.Sqrt(norm));
 
             var xaxis = Vector3f.Normalize(Vector3f.Cross(cameraUpVector, zaxis));
             var yaxis = Vector3f.Cross(zaxis, xaxis);
@@ -164,7 +162,7 @@ namespace CETech.World
 
         public static Matrix4f CreateReflection(Vector3f normal, float d)
         {
-            var scale = 1.0f/(float) Math.Sqrt(normal.LengthSquared());
+            var scale = 1.0f/(float) System.Math.Sqrt(normal.LengthSquared());
             var a = normal.X*scale;
             var b = normal.Y*scale;
             var c = normal.Z*scale;
@@ -204,16 +202,16 @@ namespace CETech.World
             //  Roll first, about axis the object is facing, then
             //  pitch upward, then yaw to face into the new heading
             var halfRoll = roll*0.5f;
-            var sr = (float) Math.Sin(halfRoll);
-            var cr = (float) Math.Cos(halfRoll);
+            var sr = (float) System.Math.Sin(halfRoll);
+            var cr = (float) System.Math.Cos(halfRoll);
 
             var halfPitch = pitch*0.5f;
-            var sp = (float) Math.Sin(halfPitch);
-            var cp = (float) Math.Cos(halfPitch);
+            var sp = (float) System.Math.Sin(halfPitch);
+            var cp = (float) System.Math.Cos(halfPitch);
 
             var halfYaw = yaw*0.5f;
-            var sy = (float) Math.Sin(halfYaw);
-            var cy = (float) Math.Cos(halfYaw);
+            var sy = (float) System.Math.Sin(halfYaw);
+            var cy = (float) System.Math.Cos(halfYaw);
 
             var x = cy*sp*cr + sy*cp*sr;
             var y = sy*cp*cr - cy*sp*sr;

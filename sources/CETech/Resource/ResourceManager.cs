@@ -1,6 +1,6 @@
 ﻿using System.IO;
 
-namespace CETech
+namespace CETech.Resource
 {
     /// <summary>
     ///     Resource manager

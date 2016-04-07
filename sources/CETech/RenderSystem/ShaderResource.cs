@@ -2,6 +2,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Yaml;
 using CETech.Develop;
+using CETech.Resource;
 using CETech.Utils;
 using MsgPack.Serialization;
 using SharpBgfx;

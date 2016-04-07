@@ -1,8 +1,9 @@
 using System;
 using MoonSharp.Interpreter;
 
-namespace CETech.World
+namespace CETech.CEMath
 {
+
     [MoonSharpUserData]
     public struct Vector4f
     {

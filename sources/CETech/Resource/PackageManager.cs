@@ -1,4 +1,4 @@
-﻿namespace CETech
+﻿namespace CETech.Resource
 {
     /// <summary>
     ///     Package manager

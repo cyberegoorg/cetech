@@ -1,4 +1,5 @@
 using System.IO;
+using CETech.Resource;
 #if CETECH_DEVELOP
 using CETech.Develop;
 

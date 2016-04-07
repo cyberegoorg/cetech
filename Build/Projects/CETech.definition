@@ -35,8 +35,10 @@
     <Compile Include="Develop\DevelopSystem.cs" />
     <Compile Include="Develop\Private\ConsoleServerNull.cs" />
     <Compile Include="Develop\Private\DevelopSystemNull.cs" />
-    <Compile Include="EntityManager\EntityManager.cs" />
-    <Compile Include="EntityManager\Private\EntityManager.cs" />
+    <Compile Include="EntCom\ComponentSystem.cs" />
+    <Compile Include="EntCom\EntityManager.cs" />
+    <Compile Include="EntCom\Private\ComponentSystem.cs" />
+    <Compile Include="EntCom\Private\EntityManager.cs" />
     <Compile Include="FileSystem\FileSystem.cs" />
     <Compile Include="FileSystem\Private\FileSystem.cs" />
     <Compile Include="Input\Keyboard.cs" />

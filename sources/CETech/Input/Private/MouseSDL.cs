@@ -1,4 +1,4 @@
-﻿using CETech.World;
+﻿using CETech.CEMath;
 using SDL2;
 
 // ReSharper disable once CheckNamespace

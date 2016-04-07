@@ -4,7 +4,7 @@ using System.Yaml;
 using CETech.Develop;
 using MsgPack;
 
-namespace CETech
+namespace CETech.EntCom
 {
     public partial class ComponentSystem
     {

@@ -5,7 +5,7 @@ using System.Threading;
 using CETech.Develop;
 using CETech.Utils;
 
-namespace CETech
+namespace CETech.Resource
 {
     /// <summary>
     ///     Resource manager
