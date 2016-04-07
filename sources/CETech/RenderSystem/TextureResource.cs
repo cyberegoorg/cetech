@@ -61,7 +61,7 @@ namespace CETech
 
         public static object ResourceReloader(long name, object new_data)
         {
-            var old = ResourceManager.Get<Resource>(Type, name);
+            var old = CETech.Resource.Resource.Get<Resource>(Type, name);
             var neww = (Resource) new_data;
 
             old.data = neww.data;

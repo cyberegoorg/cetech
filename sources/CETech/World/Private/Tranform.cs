@@ -9,7 +9,7 @@ using MsgPack;
 
 namespace CETech.World
 {
-    public partial class TranformationSystem
+    public partial class Tranform
     {
         private static readonly Dictionary<int, WorldInstance> _worldInstance = new Dictionary<int, WorldInstance>();
 

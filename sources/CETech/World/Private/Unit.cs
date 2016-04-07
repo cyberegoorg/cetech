@@ -4,7 +4,7 @@ using MsgPack;
 
 namespace CETech.World
 {
-    public partial class UnitManager
+    public partial class Unit
     {
         private static int SpawnFromResourceImpl(UnitResource.CompiledResource unit_resource, int world)
         {
@@ -44,7 +44,7 @@ namespace CETech.World
 
         private static int SpawnImpl(int world, long unit)
         {
-            var unit_resource = ResourceManager.Get<UnitResource.CompiledResource>(
+            var unit_resource = Resource.Resource.Get<UnitResource.CompiledResource>(
                 UnitResource.Type, unit);
 
             return SpawnFromResourceImpl(unit_resource, world);

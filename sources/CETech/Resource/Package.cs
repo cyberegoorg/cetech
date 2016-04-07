@@ -3,7 +3,7 @@
     /// <summary>
     ///     Package manager
     /// </summary>
-    public partial class PackageManager
+    public partial class Package
     {
         /// <summary>
         ///     Load package

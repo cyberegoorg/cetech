@@ -2,7 +2,7 @@
 
 namespace CETech.World
 {
-    public partial class WorldManager
+    public partial class World
     {
         public static readonly int NullWorld = 0;
 

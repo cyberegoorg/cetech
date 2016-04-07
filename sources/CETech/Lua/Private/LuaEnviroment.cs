@@ -20,6 +20,8 @@ namespace CETech.Lua
         private static DynValue _shutdownFce;
         private static DynValue _renderFce;
 
+        private static bool _Pause;
+
         private static void PackDynValue(DynValue value, ConsoleServer.ResponsePacker packer)
         {
             switch (value.Type)
@@ -73,6 +75,7 @@ namespace CETech.Lua
 
         private static void InitImpl()
         {
+            _Pause = false;
             _enviromentScript = new Script();
             UserData.RegisterAssembly();
 
@@ -83,11 +86,11 @@ namespace CETech.Lua
             _enviromentScript.Globals["Log"] = new LogApi();
             _enviromentScript.Globals["Keyboard"] = new KeyboardApi();
             _enviromentScript.Globals["Mouse"] = new MouseApi();
-            _enviromentScript.Globals["PackageManager"] = new PackageManagerApi();
+            _enviromentScript.Globals["Package"] = new PackageManagerApi();
             _enviromentScript.Globals["World"] = new WorldApi();
-            _enviromentScript.Globals["UnitManager"] = new UnitManagerApi();
-            _enviromentScript.Globals["RenderSystem"] = new RenderSystemApi();
-            _enviromentScript.Globals["Transformation"] = new TransformSystemApi();
+            _enviromentScript.Globals["Unit"] = new UnitManagerApi();
+            _enviromentScript.Globals["Renderer"] = new RenderSystemApi();
+            _enviromentScript.Globals["Transform"] = new TransformSystemApi();
             _enviromentScript.Globals["Camera"] = new CameraApi();
 
             _enviromentScript.Globals["Vector3f"] = new Vector3fApi();
@@ -130,7 +133,7 @@ namespace CETech.Lua
 
         private static void DoResourceImpl(long name)
         {
-            var ms = new MemoryStream(ResourceManager.Get<byte[]>(LuaResource.Type, name));
+            var ms = new MemoryStream(Resource.Resource.Get<byte[]>(LuaResource.Type, name));
 
             try {
                 _enviromentScript.DoStream(ms);
@@ -159,22 +162,63 @@ namespace CETech.Lua
 
         private static void BootScriptCallInitImpl()
         {
-            _enviromentScript.Call(_initFce);
+            try
+            {
+                _enviromentScript.Call(_initFce);
+            }
+            catch (ScriptRuntimeException ex)
+            {
+                var msg = string.Format("Init error: {0}", ex.DecoratedMessage);
+                Log.Error("lua", msg);
+                _Pause = true;
+            }
         }
 
         private static void BootScriptCallUpdateImpl(float dt)
         {
-            _enviromentScript.Call(_updateFce, dt);
+            if (!_Pause)
+            {
+                try
+                {
+                    _enviromentScript.Call(_updateFce, dt);
+                }
+                catch (ScriptRuntimeException ex)
+                {
+                    var msg = string.Format("Update error: {0}", ex.DecoratedMessage);
+                    Log.Error("lua", msg);
+                    _Pause = true;
+                }
+            }
         }
 
         private static void BootScriptCallShutdownImpl()
         {
-            _enviromentScript.Call(_shutdownFce);
+            try
+            {
+                _enviromentScript.Call(_shutdownFce);
+            }
+            catch (ScriptRuntimeException ex)
+            {
+                var msg = string.Format("Shutdown error: {0}", ex.DecoratedMessage);
+                Log.Error("lua", msg);
+                _Pause = true;
+            }
         }
 
         private static void BootScriptCallRenderImpl()
         {
-            _enviromentScript.Call(_renderFce);
+            if (!_Pause)
+            {
+                try
+                {
+                    _enviromentScript.Call(_renderFce);
+                }
+                catch (ScriptRuntimeException ex)
+                {
+                    var msg = string.Format("Render error: {0}", ex.DecoratedMessage);
+                    Log.Error("lua", msg);
+                }
+            }
         }
 
         private static void DoStreamImpl(Stream stream)
@@ -202,13 +246,13 @@ namespace CETech.Lua
             public override object LoadFile(string file, Table globalContext)
             {
                 var name = StringId.FromString(file);
-                return ResourceManager.Get<byte[]>(LuaResource.Type, name);
+                return Resource.Resource.Get<byte[]>(LuaResource.Type, name);
             }
 
             public override bool ScriptFileExists(string name)
             {
                 long[] names = {StringId.FromString(name)};
-                return ResourceManager.CanGet(LuaResource.Type, names);
+                return Resource.Resource.CanGet(LuaResource.Type, names);
             }
         }
     }

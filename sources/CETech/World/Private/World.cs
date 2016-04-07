@@ -6,7 +6,7 @@ using CETech.Resource;
 
 namespace CETech.World
 {
-    public partial class WorldManager
+    public partial class World
     {
         private static HandlerID _handlers;
 
@@ -44,7 +44,7 @@ namespace CETech.World
             _WordlId.Add(id);
             _levelnstances.Add(new Levelnstance());
 
-            TranformationSystem.InitWorld(id);
+            Tranform.InitWorld(id);
             PrimitiveMeshRenderer.InitWorld(id);
             CameraSystem.InitWorld(id);
 
@@ -58,7 +58,7 @@ namespace CETech.World
 
         private static void DestroyWorldImpl(int world)
         {
-            TranformationSystem.RemoveWorld(world);
+            Tranform.RemoveWorld(world);
             PrimitiveMeshRenderer.RemoveWorld(world);
             CameraSystem.RemoveWorld(world);
 
@@ -92,7 +92,7 @@ namespace CETech.World
 
             var level_instance = new Levelnstance();
 
-            var level_resource = ResourceManager.Get<LevelResource.CompiledResource>(LevelResource.Type, level);
+            var level_resource = Resource.Resource.Get<LevelResource.CompiledResource>(LevelResource.Type, level);
 
 
             var units = level_resource.units;
@@ -101,15 +101,15 @@ namespace CETech.World
             var level_ent = EntityManager.Create();
             level_instance.unit = level_ent;
 
-            TranformationSystem.Create(world, level_ent, int.MaxValue, position, rotation, scale);
+            Tranform.Create(world, level_ent, int.MaxValue, position, rotation, scale);
 
             for (var i = 0; i < units.Length; ++i)
             {
-                var spawned_unit = UnitManager.SpawnFromResource(units[i], world);
+                var spawned_unit = Unit.SpawnFromResource(units[i], world);
 
                 level_instance.units[units_name[i]] = spawned_unit;
 
-                TranformationSystem.Link(world, level_ent, spawned_unit);
+                Tranform.Link(world, level_ent, spawned_unit);
             }
 
             _levelnstances[world_idx] = level_instance;
