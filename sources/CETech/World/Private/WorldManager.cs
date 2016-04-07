@@ -105,7 +105,7 @@ namespace CETech.World
 
             for (var i = 0; i < units.Length; ++i)
             {
-                var spawned_unit = UnitManager.Spawn(units[i], world);
+                var spawned_unit = UnitManager.SpawnFromResource(units[i], world);
 
                 level_instance.units[units_name[i]] = spawned_unit;
 
