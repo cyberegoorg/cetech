@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using CETech.Develop.Private;
+using CETech.Resource;
 using CETech.Utils;
 
 namespace CETech.Develop

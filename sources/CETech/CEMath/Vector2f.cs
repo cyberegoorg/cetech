@@ -1,8 +1,9 @@
 using System;
 using MoonSharp.Interpreter;
 
-namespace CETech.World
+namespace CETech.CEMath
 {
+    //TODO: move to lua
     [MoonSharpUserData]
     public struct Vector2f
     {
@@ -24,7 +25,7 @@ namespace CETech.World
         }
 
         public static Vector2f Normalize(Vector2f value)
-        {
+        {       
             var inv_length = 1.0f/(float) Math.Sqrt(value.X*value.X + value.Y*value.Y);
             return new Vector2f(value.X*inv_length, value.Y*inv_length);
         }

@@ -1,6 +1,6 @@
 ﻿using System.Yaml;
 
-namespace CETechDevelop.Utils
+namespace CETech.Utils
 {
     public class Yaml
     {

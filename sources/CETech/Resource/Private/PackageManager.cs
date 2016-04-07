@@ -1,6 +1,6 @@
 ﻿using CETech.Utils;
 
-namespace CETech
+namespace CETech.Resource
 {
     public partial class PackageManager
     {

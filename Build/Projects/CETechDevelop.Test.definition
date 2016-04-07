@@ -54,9 +54,11 @@
     <Compile Include="Develop\Private\DevelopSystem.cs" />
     <Compile Include="Develop\Private\ResourceCompiler.cs" />
     <Compile Include="Develop\ResourceCompiler.cs" />
-    <Compile Include="EntityManager\EntityManager.cs" />
-    <Compile Include="EntityManager\Private\EntityManager.cs" />
-    <Compile Include="EntityManager\Tests\EntityManagerTest.cs" />
+    <Compile Include="EntCom\ComponentSystem.cs" />
+    <Compile Include="EntCom\EntityManager.cs" />
+    <Compile Include="EntCom\Private\ComponentSystem.cs" />
+    <Compile Include="EntCom\Private\EntityManager.cs" />
+    <Compile Include="EntCom\Tests\EntityManagerTest.cs" />
     <Compile Include="FileSystem\FileSystem.cs" />
     <Compile Include="FileSystem\Private\FileSystem.cs" />
     <Compile Include="Input\Keyboard.cs" />

@@ -1,4 +1,4 @@
-﻿using CETech.World;
+﻿using CETech.CEMath;
 
 namespace CETech.Input
 {

@@ -2,6 +2,7 @@
 using System.IO;
 using System.Yaml;
 using CETech.Develop;
+using CETech.Resource;
 using MsgPack.Serialization;
 
 namespace CETech.World

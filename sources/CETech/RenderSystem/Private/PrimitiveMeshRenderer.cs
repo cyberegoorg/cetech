@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Yaml;
 using CETech.Develop;
+using CETech.EntCom;
+using CETech.Resource;
 using MsgPack;
 using SharpBgfx;
 

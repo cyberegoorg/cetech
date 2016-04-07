@@ -1,8 +1,8 @@
-using System.Collections.Generic;
-using CETech.World;
+using CETech.EntCom;
+using CETech.Resource;
 using MsgPack;
 
-namespace CETech
+namespace CETech.World
 {
     public partial class UnitManager
     {

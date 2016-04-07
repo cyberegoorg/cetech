@@ -1,6 +1,6 @@
 ﻿// ReSharper disable once CheckNamespace
 
-namespace CETech
+namespace CETech.EntCom
 {
     /// <summary>
     ///     Entity manager
