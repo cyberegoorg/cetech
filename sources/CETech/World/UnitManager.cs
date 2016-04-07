@@ -7,9 +7,9 @@ namespace CETech.World
             return SpawnImpl(world, unit);
         }
 
-        public static int Spawn(UnitResource.CompiledResource resource, int world)
+        public static int SpawnFromResource(UnitResource.CompiledResource resource, int world)
         {
-            return SpawnImpl(resource, world);
+            return SpawnFromResourceImpl(resource, world);
         }
 
         public static void Init()

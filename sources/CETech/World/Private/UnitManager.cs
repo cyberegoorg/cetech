@@ -6,7 +6,7 @@ namespace CETech.World
 {
     public partial class UnitManager
     {
-        private static int SpawnImpl(UnitResource.CompiledResource unit_resource, int world)
+        private static int SpawnFromResourceImpl(UnitResource.CompiledResource unit_resource, int world)
         {
             var types = unit_resource.type;
             var data = unit_resource.data;
@@ -47,7 +47,7 @@ namespace CETech.World
             var unit_resource = ResourceManager.Get<UnitResource.CompiledResource>(
                 UnitResource.Type, unit);
 
-            return Spawn(unit_resource, world);
+            return SpawnFromResourceImpl(unit_resource, world);
         }
 
         private static void InitImpl()
