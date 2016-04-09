@@ -78,7 +78,6 @@ PROTOBUILD_CONFIG = {
     'runtime': ['-disable', 'Develop']
 }
 
-
 def make_vs(config, platform_, debug):
     cmds = [os.path.join('C:\Program Files (x86)\Microsoft Visual Studio 14.0\Common7\IDE', 'devenv'),
             PLATFORMS_SLN[platform_], '/build']
@@ -142,7 +141,7 @@ ARGS_PARSER.add_argument(
 # PROGRAM #
 ########################################################################################################################
 
-def run_protobuild(config, platform_):
+def run_protobuild(config, platform_, action=''):
     """Run platform specific genie command.
     """
     print('Runing Protobuild.exe.')
@@ -155,7 +154,11 @@ def run_protobuild(config, platform_):
     # if config in PROTOBUILD_CONFIG:
     #     cmds.extend(PROTOBUILD_CONFIG[config])
 
-    cmds.append(PLATFORMS_PROTOBUILD[platform_])
+    if action == '':
+        cmds.append('--generate')
+        cmds.append(PLATFORMS_PROTOBUILD[platform_])
+    elif action == 'clean':
+        cmds.append('--clean')
 
     subprocess.check_call(cmds)
 
@@ -173,13 +176,14 @@ def make(config, platform_, debug, generate_only=False):
         subprocess.check_call(cmds)
 
 
-def clean():
+def clean(config, platform_):
     """ Remove build dir.
     """
 
     print('Cleaning...')
     shutil.rmtree(os.path.join('sources', 'CETech', 'bin'))
     shutil.rmtree(os.path.join('sources', 'CETech', 'obj'))
+    run_protobuild(config=config, platform_=platform_, action='clean')
 
 
 def main(args=None):
@@ -196,7 +200,7 @@ def main(args=None):
              debug=args.debug)
 
     elif action == 'clean':
-        clean()
+        clean(config=None, platform_=args.platform)
 
 
 ########
