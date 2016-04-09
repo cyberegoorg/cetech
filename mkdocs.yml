@@ -18,9 +18,14 @@ pages:
   - Lua API:
       - Log: 'lua_api/Log.md'
       - Application: 'lua_api/Application.md'
-      - Package: 'lua_api/PackageManager.md'
       - Keyboard: 'lua_api/Keyboard.md'
       - Mouse: 'lua_api/Mouse.md'
+      - Package: 'lua_api/Package.md'
+      - Unit: 'lua_api/Unit.md'
+      - World: 'lua_api/World.md'
+      - Components:
+        - Transform: 'lua_api/Transform.md'
+        - Camera: 'lua_api/Camera.md'
 
   - About:
     - Release notes: 'about/release-notes.md'
