@@ -22,7 +22,7 @@ $ python3 build.py -d
 
 #### Optional
 
-* Generate project ```$ pthon build.py -g```
+* Generate project ```$ python3 build.py -g```
 * Open solution ```CETech.Linux.sln``` .
 * Build solution
 
@@ -43,6 +43,6 @@ $ python build.py -d
 
 #### Optional
 
-* Generate project ```$ pthon build.py -g```
+* Generate project ```$ ptyhon build.py -g```
 * Open solution ```CETech.Windows.sln``` .
 * Build solution
