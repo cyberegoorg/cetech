@@ -1,24 +1,24 @@
-# PackageManager
+# Package
 
 Module contain functions for resource package manage.
 
 ## Example
 
 ```lua
-local main_pkg = PackageManager.Create 'main'
-local monster_pkg = PackageManager.Create 'monster'
+local main_pkg = Package.Create 'main'
+local monster_pkg = Package.Create 'monster'
 
 function Game:init()
-    PackageManager.Load(monster_pkg)
+    Package.Load(monster_pkg)
 
-    PackageManager.Load(main_pkg)
-    PackageManager.Flush(main_pkg)
+    Package.Load(main_pkg)
+    Package.Flush(main_pkg)
 
     -- main_pkg loaded
 end
 
 function Game:update(dt)
-    if PackageManager.IsLoaded(monster_pkg) then
+    if Package.IsLoaded(monster_pkg) then
         -- Package loaded
     end
 end
@@ -33,8 +33,8 @@ Load all resource that are in the package. If one is already loaded will not rel
 !!! important
 
     The function does not wait to finish loading.
-    For querying whether the package is already loaded use method [**IsLoaded**](#packagemanagerisloaded)
-    or you can wait to load using method [**Flush**](#packagemanagerflush)
+    For querying whether the package is already loaded use method [**IsLoaded**](#Packageisloaded)
+    or you can wait to load using method [**Flush**](#Packageflush)
 
 Argument      | Type | Description
 --------------|------|-------------
