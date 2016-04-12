@@ -172,7 +172,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         if platform.system().lower() != 'darwin':
             self.ogl_dock.show()
 
-        self.project.run_cetech_develop(compile_=True, continue_=True, wid=wid,
+        self.project.run_cetech_develop("LevelView", compile_=True, continue_=True, wid=wid,
                                         bootscript=os.path.join("playground", "boot"))
 
         self.assetview_widget.open_project(self.project)
@@ -236,14 +236,14 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.profiler_doc_widget.show()
 
     def run_standalone(self):
-        self.project.run_cetech_release()
+        self.project.run_cetech_release("Standalone")
 
     def run_level(self):
-        self.project.run_cetech_develop(compile_=True, continue_=True, port=5566)
+        self.project.run_cetech_develop("Level", compile_=True, continue_=True, port=5566)
 
     def closeEvent(self, evnt):
-        self.api.quit();
+        self.api.quit()
         self.api.disconnect()
-        self.assetview_widget.close_project();
-        self.project.killall_process()
+        self.assetview_widget.close_project()
+        self.project.killall(True)
         evnt.accept()
