@@ -29,7 +29,7 @@ class AssetView(CetechWidget):
         else:
             wid = self.winId()
 
-        self.project.run_cetech_develop(wid=wid, port=5576,
+        self.project.run_cetech_develop("AssetView", wid=wid, port=5576,
                                         bootscript=os.path.join("playground", "assetview_boot"))
 
     def close_project(self):

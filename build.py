@@ -43,8 +43,11 @@ DEFAULT_BUILD = "%s%s" % (OS_NAME, OS_ARCH)
 # Command line actions.
 ACTIONS = {
     '',
+    'build'
     'clean'
 }
+
+BUILD_ACTION = ('build', '')
 
 # Build config.
 CONFIG = {
@@ -154,7 +157,7 @@ def run_protobuild(config, platform_, action=''):
     # if config in PROTOBUILD_CONFIG:
     #     cmds.extend(PROTOBUILD_CONFIG[config])
 
-    if action == '':
+    if action in BUILD_ACTION:
         cmds.append('--generate')
         cmds.append(PLATFORMS_PROTOBUILD[platform_])
     elif action == 'clean':

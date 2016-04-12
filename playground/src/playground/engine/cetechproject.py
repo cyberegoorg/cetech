@@ -21,6 +21,29 @@ def validate_project(project_dir):
     return True
 
 
+class ProjectInstance(object):
+    def __init__(self, name, process):
+        self.name = name
+        self.process = process
+
+    def kill(self, dump=False):
+        if dump:
+            self._dump()
+
+        self.process.terminate()
+
+    def _dump(self):
+        p = self.process
+        out, err = bytearray(p.readAllStandardOutput()).decode(), bytearray(p.readAllStandardError()).decode()
+
+        print("=== Process: %s ===" % self.name)
+        print("STDOUT:")
+        print(out)
+        print("STDERR:")
+        print(err)
+        print("===================%s\n" % ('=' * len(self.name)))
+
+
 class CetechProject(object):
     BUILD_DEVELOP = 'Develop'
     BUILD_RELEASE = 'Release'
@@ -43,6 +66,7 @@ class CetechProject(object):
     def __init__(self):
         self.project_dir = None
         self.spawned_process = []
+        self.instances = {}
 
     def open_project(self, name, project_dir):
         if project_dir == '':
@@ -80,19 +104,9 @@ class CetechProject(object):
         project_dir = QFileDialog.getExistingDirectory(parent, "Select project directory ...")
         return self.open_project(project_dir)
 
-    def killall_process(self):
-        self.dump()
-
-        for p in self.spawned_process:
-            p.terminate()
-
-    def dump(self):
-        for p in self.spawned_process:
-            out, err = bytearray(p.readAllStandardOutput()).decode(), bytearray(p.readAllStandardError()).decode()
-
-            print("=" * 32)
-            print("out:\n%s\n err:\n%s\n" % (out, err))
-            print("=" * 32)
+    def killall(self, dump=False):
+        for instance in self.instances.values():
+            instance.kill(dump=dump)
 
     def get_lib_path(self, build_type):
         _platform = platform.system().lower()
@@ -105,14 +119,14 @@ class CetechProject(object):
         engine_bin_path = os.path.join(self.get_lib_path(build_type), self._ENGINE_BIN[build_type])
         return engine_bin_path
 
-    def run_cetech_release(self):
+    def run_cetech_release(self, name):
         args = [
             "-b %s" % self.build_dir,
         ]
 
-        self._run_cetech(self.BUILD_RELEASE, args)
+        return self._run_cetech(name, self.BUILD_RELEASE, args)
 
-    def run_cetech_develop(self, compile_=False, continue_=False, wait=False, daemon=False, wid=None,
+    def run_cetech_develop(self, name, compile_=False, continue_=False, wait=False, daemon=False, wid=None,
                            core_dir=None, port=None, bootscript=None):
         args = [
             "-b %s" % self.build_dir,
@@ -149,9 +163,9 @@ class CetechProject(object):
 
         # bin_dir
 
-        self._run_cetech(self.BUILD_DEVELOP, args)
+        return self._run_cetech(name, self.BUILD_DEVELOP, args)
 
-    def _run_cetech(self, build_type, args):
+    def _run_cetech(self, name, build_type, args):
         if platform.system().lower() != 'windows':
             cmd = "mono %s %s" % (self.get_executable_path(build_type), ' '.join(args))
         else:
@@ -167,8 +181,9 @@ class CetechProject(object):
         process.start(cmd)
         process.waitForStarted()
 
-        self.spawned_process.append(process)
-
         print(cmd)
 
-        return process
+        instance = ProjectInstance(name=name, process=process)
+        self.instances[name] = instance
+
+        return instance
