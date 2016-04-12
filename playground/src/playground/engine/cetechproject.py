@@ -21,7 +21,7 @@ def validate_project(project_dir):
     return True
 
 
-class ProjectInstance(object):
+class EngineInstance(object):
     def __init__(self, name, process):
         self.name = name
         self.process = process
@@ -183,7 +183,7 @@ class CetechProject(object):
 
         print(cmd)
 
-        instance = ProjectInstance(name=name, process=process)
+        instance = EngineInstance(name=name, process=process)
         self.instances[name] = instance
 
         return instance
