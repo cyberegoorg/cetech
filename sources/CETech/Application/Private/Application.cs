@@ -88,6 +88,8 @@ namespace CETech
             DateTime curent_frame_tick;
 			Log.Info ("application.ready", "");
 
+            int[] tasks = new int[3];
+
             while (_run)
             {
                 //Debug.Assert(TaskManager.OpenTaskCount < 2);
@@ -103,23 +105,24 @@ namespace CETech
 
                 PlaformUpdateEvents();
 
-                var frameTask = TaskManager.AddNull("frame");
-                var keyboardTask = TaskManager.AddBegin("keyboard", delegate
+                tasks[0] = TaskManager.AddNull("frame");
+                tasks[1] = TaskManager.AddBegin("keyboard", delegate
                 {
                     var scope = DevelopSystem.EnterScope();
                     Keyboard.Process();
                     DevelopSystem.LeaveScope("Keyboard", scope);
                 }, null,
-                    parent: frameTask);
-                var mouseTask = TaskManager.AddBegin("mouseTask", delegate
+                    parent: tasks[0]);
+
+                tasks[2] = TaskManager.AddBegin("mouseTask", delegate
                 {
                     var scope = DevelopSystem.EnterScope();
                     Mouse.Process();
                     DevelopSystem.LeaveScope("Mouse", scope);
-                }, null, parent: frameTask);
+                }, null, parent: tasks[0]);
 
-                TaskManager.AddEnd(new[] {frameTask, keyboardTask, mouseTask});
-                TaskManager.Wait(frameTask);
+                TaskManager.AddEnd(tasks);
+                TaskManager.Wait(tasks[0]);
 
                 {
                     var scope = DevelopSystem.EnterScope();
