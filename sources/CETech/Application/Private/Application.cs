@@ -82,13 +82,10 @@ namespace CETech
         private static void RunImpl()
         {
             _run = true;
-            LuaEnviroment.BootScriptInit(StringId.FromString(ConfigSystem.GetValueString("boot.script")));
-
-            LuaEnviroment.BootScriptCallInit();
+            Game.Init();
 
             var last_frame_tick = DateTime.Now;
             DateTime curent_frame_tick;
-
 			Log.Info ("application.ready", "");
 
             while (_run)
@@ -124,8 +121,14 @@ namespace CETech
                 TaskManager.AddEnd(new[] {frameTask, keyboardTask, mouseTask});
                 TaskManager.Wait(frameTask);
 
-                LuaEnviroment.BootScriptCallUpdate(_deltaTime);
-                LuaEnviroment.BootScriptCallRender();
+                {
+                    var scope = DevelopSystem.EnterScope();
+                    Game.Update(_deltaTime);
+                    DevelopSystem.LeaveScope("Game::Update", scope);
+                }
+
+                Game.Render();
+
                 _mainWindow.Update();
 
                 DevelopSystem.LeaveScope("Application::Update", updateScope);
@@ -135,7 +138,7 @@ namespace CETech
                 ConsoleServer.Tick();
             }
 
-            LuaEnviroment.BootScriptCallShutdown();
+            Game.Shutdown();
 
             _mainWindow = null;
         }

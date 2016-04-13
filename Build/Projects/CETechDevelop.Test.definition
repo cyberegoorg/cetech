@@ -64,6 +64,8 @@
     <Compile Include="EntCom\Tests\EntityManagerTest.cs" />
     <Compile Include="FileSystem\FileSystem.cs" />
     <Compile Include="FileSystem\Private\FileSystem.cs" />
+    <Compile Include="Game\Game.cs" />
+    <Compile Include="Game\Private\Game.cs" />
     <Compile Include="Input\Keyboard.cs" />
     <Compile Include="Input\Mouse.cs" />
     <Compile Include="Input\Private\KeyboardSDL.cs">

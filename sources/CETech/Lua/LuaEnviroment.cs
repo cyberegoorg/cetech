@@ -1,4 +1,5 @@
 ﻿using System.IO;
+using CETech.Resource;
 
 namespace CETech.Lua
 {
@@ -51,6 +52,7 @@ namespace CETech.Lua
         /// </summary>
         public static void BootScriptCallInit()
         {
+            BootScriptInit(StringId.FromString(ConfigSystem.GetValueString("boot.script")));
             BootScriptCallInitImpl();
         }
 
