@@ -183,16 +183,19 @@ namespace CETech
 
             public int GetCachedSize(long id)
             {
+                // TODO: IMPLEMENT
                 return 0;
             }
 
             public bool GetCacheEntry(long id, IntPtr data, int size)
             {
+                // TODO: IMPLEMENT
                 return false;
             }
 
             public void SetCacheEntry(long id, IntPtr data, int size)
             {
+                // TODO: IMPLEMENT
             }
 
             public void SaveScreenShot(string path, int width, int height, int pitch, IntPtr data, int size,
