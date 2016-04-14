@@ -1,4 +1,4 @@
-from playground.engine.consoleproxy import ConsoleProxy
+from cetech.consoleproxy import ConsoleProxy
 
 
 class ConsoleAPI(ConsoleProxy):
@@ -11,10 +11,6 @@ class ConsoleAPI(ConsoleProxy):
 
     def compile_all(self):
         self.send_command('resource_compiler.compile_all')
-
-    def autocomplete_list(self):
-        #self.lua_execute('autocomplite_list()')
-        pass
 
     def resize(self, w, h):
         self.send_command('renderer.resize', width=w, height=h)

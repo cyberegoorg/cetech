@@ -10,9 +10,9 @@ from nanomsg import Socket, SUB, SUB_SUBSCRIBE
 
 from playground.assetbrowser import AssetBrowser
 from playground.assetview import AssetView
-from playground.engine.cetechproject import CetechProject
-from playground.engine.cetechwidget import CetechWidget
-from playground.engine.consoleapi import ConsoleAPI
+from cetech.project import Project
+from cetech.widget import Widget
+from cetech.consoleapi import ConsoleAPI
 from playground.logwidget import LogWidget, LogSub
 from playground.profilerwidget import ProfilerWidget
 from playground.scripteditor import ScriptEditorWidget, ScriptEditorManager
@@ -60,7 +60,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.console_port = self.args.console_port
         self.console_address = self.args.console_address
 
-        self.project = CetechProject()
+        self.project = Project()
 
         self.api = ConsoleAPI(b"tcp://localhost:5557")
 
@@ -73,7 +73,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
         # TODO bug #114 workaround. Disable create sub engine...
         if platform.system().lower() != 'darwin':
-            self.ogl_widget = CetechWidget(self, self.api, log_url=b"ws://localhost:5556")
+            self.ogl_widget = Widget(self, self.api, log_url=b"ws://localhost:5556")
             self.ogl_widget.set_api(self.api)
             self.ogl_dock = QDockWidget(self)
             self.ogl_dock.setWindowTitle("Engine View")
@@ -224,7 +224,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.watch_project_dir()
 
     def build_file_changed(self, path):
-        self.api.autocomplete_list()
+        pass
 
     def build_dir_changed(self, path):
         pass

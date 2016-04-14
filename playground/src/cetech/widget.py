@@ -26,8 +26,6 @@ class ReadyLock(QThread):
 
                 if msg_yaml["where"] == 'application.ready':
                     size = self.engine_widget.size()
-                    print("ready", size.width(), size.height())
-
                     self.engine_widget.ready = True
                     #self.api.resize(size.width(), size.height())
                     return
@@ -36,7 +34,7 @@ class ReadyLock(QThread):
                 raise
 
 
-class CetechWidget(QWidget):
+class Widget(QWidget):
     def __init__(self, parent, api, log_url):
         self.api = api
         self.ready = False
@@ -44,7 +42,7 @@ class CetechWidget(QWidget):
         self.ready_lock = ReadyLock(log_url, self)
         self.ready_lock.start(QThread.NormalPriority)
 
-        super(CetechWidget, self).__init__(parent, Qt.ForeignWindow)
+        super(Widget, self).__init__(parent, Qt.ForeignWindow)
 
     def set_api(self, api):
         self.api = api
