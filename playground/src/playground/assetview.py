@@ -1,11 +1,11 @@
 import os
 import platform
 
-from playground.engine.cetechwidget import CetechWidget, ReadyLock
-from playground.engine.consoleapi import ConsoleAPI
+from cetech.widget import Widget, ReadyLock
+from cetech.consoleapi import ConsoleAPI
 
 
-class AssetView(CetechWidget):
+class AssetView(Widget):
     def __init__(self, parent):
         self.project = None
 
@@ -19,7 +19,7 @@ class AssetView(CetechWidget):
 
     def open_project(self, project):
         """
-        :type project: playground.engine.cetechproject.CetechProject
+        :type project: cetech.project.Project
         """
         #                     /\     /\      /\             /\       WTF???? REFACTOR THIS !!!
         self.project = project

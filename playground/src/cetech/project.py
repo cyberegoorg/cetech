@@ -44,7 +44,7 @@ class EngineInstance(object):
         print("===================%s\n" % ('=' * len(self.name)))
 
 
-class CetechProject(object):
+class Project(object):
     BUILD_DEVELOP = 'Develop'
     BUILD_RELEASE = 'Release'
 
@@ -64,6 +64,7 @@ class CetechProject(object):
     }
 
     def __init__(self):
+        self.name = None
         self.project_dir = None
         self.spawned_process = []
         self.instances = {}
