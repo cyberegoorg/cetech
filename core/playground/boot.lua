@@ -1,9 +1,14 @@
+require "playground/editor_mouse"
+
 Editor = Editor or {}
 
 function Editor:init()
+    EditorMouse:Init()
+
     self.world = World.Create()
     self.camera_unit = Unit.Spawn(self.world, "camera")
     self.camera = Camera.GetCamera(self.world, self.camera_unit)
+    self.camera_transform = Transform.GetTransform(self.world, self.camera_unit)
 
     self.level = nil
 end
@@ -13,6 +18,18 @@ function Editor:shutdown()
 end
 
 function Editor:update(dt)
+    local pos = Transform.GetPosition(self.world, self.camera_transform)
+    local rot = Transform.GetRotation(self.world, self.camera_transform)
+
+    if EditorMouse.left then
+        rot.X = rot.X + EditorMouse.delta_x * -0.01;
+        rot.Y = rot.Y + EditorMouse.delta_y * 0.01;
+    end
+    EditorMouse:ResetButtons()
+
+    Transform.SetPosition(self.world, self.camera_transform, pos)
+    Transform.SetRotation(self.world, self.camera_transform, rot)
+
     World.Update(self.world, dt)
 end
 
