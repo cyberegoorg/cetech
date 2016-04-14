@@ -28,8 +28,8 @@ namespace CETech.World
             _worldInstance.Remove(world);
         }
 
-        private static int CreateImpl(int world, int entity, int parent, Vector3f position, Vector3f rotation,
-            Vector3f scale)
+        private static int CreateImpl(int world, int entity, int parent, Vec3f position, Vec3f rotation,
+            Vec3f scale)
         {
             var world_instance = _worldInstance[world];
 
@@ -42,7 +42,7 @@ namespace CETech.World
             world_instance.FirstChild.Add(int.MaxValue);
             world_instance.NextSibling.Add(int.MaxValue);
 
-            world_instance.World.Add(Matrix4f.Identity);
+            world_instance.World.Add(Mat4f.Identity);
 
             world_instance.EntIdx[entity] = idx;
 
@@ -75,7 +75,7 @@ namespace CETech.World
             return idx != int.MaxValue;
         }
 
-        private static void Transform(int world, int idx, Matrix4f parent)
+        private static void Transform(int world, int idx, Mat4f parent)
         {
             var world_instance = _worldInstance[world];
 
@@ -83,7 +83,7 @@ namespace CETech.World
             var rot = world_instance.Rotation[idx];
             var sca = world_instance.Scale[idx]; // TODO: !!!
 
-            var local = Matrix4f.CreateFromYawPitchRoll(rot.X, rot.Y, rot.Z);
+            var local = Mat4f.CreateFromYawPitchRoll(rot.X, rot.Y, rot.Z);
             local.M41 = pos.X;
             local.M42 = pos.Y;
             local.M43 = pos.Z;
@@ -107,9 +107,9 @@ namespace CETech.World
                 var rot = data[i]["rotation"].AsList();
                 var sca = data[i]["scale"].AsList();
 
-                var position = new Vector3f {X = pos[0].AsSingle(), Y = pos[1].AsSingle(), Z = pos[2].AsSingle()};
-                var rotation = new Vector3f {X = rot[0].AsSingle(), Y = rot[1].AsSingle(), Z = rot[2].AsSingle()};
-                var scale = new Vector3f {X = sca[0].AsSingle(), Y = sca[1].AsSingle(), Z = sca[2].AsSingle()};
+                var position = new Vec3f {X = pos[0].AsSingle(), Y = pos[1].AsSingle(), Z = pos[2].AsSingle()};
+                var rotation = new Vec3f {X = rot[0].AsSingle(), Y = rot[1].AsSingle(), Z = rot[2].AsSingle()};
+                var scale = new Vec3f {X = sca[0].AsSingle(), Y = sca[1].AsSingle(), Z = sca[2].AsSingle()};
 
                 Create(world, ent_ids[i],
                     ents_parent[i] != int.MaxValue ? ent_ids[ents_parent[i]] : int.MaxValue, position, rotation, scale);
@@ -117,7 +117,7 @@ namespace CETech.World
 
             for (var i = 0; i < ent_ids.Length; ++i)
             {
-                Transform(world, getIdx(world, ent_ids[i]), Matrix4f.Identity);
+                Transform(world, getIdx(world, ent_ids[i]), Mat4f.Identity);
             }
         }
 
@@ -172,55 +172,55 @@ namespace CETech.World
         {
         }
 
-        private static Vector3f GetPositionImpl(int world, int transform)
+        private static Vec3f GetPositionImpl(int world, int transform)
         {
             var world_instance = _worldInstance[world];
             return world_instance.Position[transform];
         }
 
-        private static Vector3f GetRotationImpl(int world, int transform)
+        private static Vec3f GetRotationImpl(int world, int transform)
         {
             var world_instance = _worldInstance[world];
             return world_instance.Rotation[transform];
         }
 
-        private static Vector3f GetScaleImpl(int world, int transform)
+        private static Vec3f GetScaleImpl(int world, int transform)
         {
             var world_instance = _worldInstance[world];
             return world_instance.Scale[transform];
         }
 
-        private static Matrix4f GetWorldMatrixImpl(int world, int transform)
+        private static Mat4f GetWorldMatrixImpl(int world, int transform)
         {
             var world_instance = _worldInstance[world];
             return world_instance.World[transform];
         }
 
-        private static void SetPositionImpl(int world, int transform, Vector3f pos)
+        private static void SetPositionImpl(int world, int transform, Vec3f pos)
         {
             var world_instance = _worldInstance[world];
             var parent_idx = world_instance.Parent[transform];
-            var parent = parent_idx != int.MaxValue ? world_instance.World[parent_idx] : Matrix4f.Identity;
+            var parent = parent_idx != int.MaxValue ? world_instance.World[parent_idx] : Mat4f.Identity;
 
             world_instance.Position[transform] = pos;
             Transform(world, transform, parent);
         }
 
-        private static void SetRotationImpl(int world, int transform, Vector3f rot)
+        private static void SetRotationImpl(int world, int transform, Vec3f rot)
         {
             var world_instance = _worldInstance[world];
             var parent_idx = world_instance.Parent[transform];
-            var parent = parent_idx != int.MaxValue ? world_instance.World[parent_idx] : Matrix4f.Identity;
+            var parent = parent_idx != int.MaxValue ? world_instance.World[parent_idx] : Mat4f.Identity;
 
             world_instance.Rotation[transform] = rot;
             Transform(world, transform, parent);
         }
 
-        private static void SetScaleImpl(int world, int transform, Vector3f scale)
+        private static void SetScaleImpl(int world, int transform, Vec3f scale)
         {
             var world_instance = _worldInstance[world];
             var parent_idx = world_instance.Parent[transform];
-            var parent = parent_idx != int.MaxValue ? world_instance.World[parent_idx] : Matrix4f.Identity;
+            var parent = parent_idx != int.MaxValue ? world_instance.World[parent_idx] : Mat4f.Identity;
 
             world_instance.Scale[transform] = scale;
             Transform(world, transform, parent);
@@ -240,7 +240,7 @@ namespace CETech.World
             world_instance.FirstChild[parent_idx] = child_idx;
             world_instance.NextSibling[child_idx] = tmp;
 
-            var p = parent_idx != int.MaxValue ? world_instance.World[parent_idx] : Matrix4f.Identity;
+            var p = parent_idx != int.MaxValue ? world_instance.World[parent_idx] : Mat4f.Identity;
             Transform(world, parent_idx, p); // TODO:
             Transform(world, child_idx, GetWorldMatrix(world, GetTranform(world, parent)));
         }
@@ -258,22 +258,22 @@ namespace CETech.World
 
             public readonly List<int> Parent;
 
-            public readonly List<Vector3f> Position;
-            public readonly List<Vector3f> Rotation;
-            public readonly List<Vector3f> Scale;
+            public readonly List<Vec3f> Position;
+            public readonly List<Vec3f> Rotation;
+            public readonly List<Vec3f> Scale;
 
-            public readonly List<Matrix4f> World;
+            public readonly List<Mat4f> World;
 
             public WorldInstance()
             {
                 NextSibling = new List<int>();
                 EntIdx = new Dictionary<int, int>();
-                Position = new List<Vector3f>();
-                Rotation = new List<Vector3f>();
-                Scale = new List<Vector3f>();
+                Position = new List<Vec3f>();
+                Rotation = new List<Vec3f>();
+                Scale = new List<Vec3f>();
                 Parent = new List<int>();
                 FirstChild = new List<int>();
-                World = new List<Matrix4f>();
+                World = new List<Mat4f>();
             }
         }
 

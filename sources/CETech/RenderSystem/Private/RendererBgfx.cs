@@ -89,8 +89,8 @@ namespace CETech
             _data.ResizeH = height;
         }
 
-		public static Vector2f GetSizeImpl() {
-			return new Vector2f(_data.ResizeW, _data.ResizeH);
+		public static Vec2f GetSizeImpl() {
+			return new Vec2f(_data.ResizeW, _data.ResizeH);
 		}
 
         private static void RenderWorldImpl(int world, int camera)
@@ -103,8 +103,8 @@ namespace CETech
 
             Bgfx.SetViewRect(0, 0, 0, _data.ResizeW, _data.ResizeH);
 
-            Matrix4f viewMatrix;
-            Matrix4f projMatrix;
+            Mat4f viewMatrix;
+            Mat4f projMatrix;
             CameraSystem.GetProjectView(world, camera, out projMatrix, out viewMatrix);
 
             unsafe

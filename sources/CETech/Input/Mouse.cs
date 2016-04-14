@@ -73,7 +73,7 @@ namespace CETech.Input
             return ReleasedImpl(buttonIndex);
         }
 
-        public static Vector2f Axis(string name)
+        public static Vec2f Axis(string name)
         {
             return AxisImpl(name);
         }

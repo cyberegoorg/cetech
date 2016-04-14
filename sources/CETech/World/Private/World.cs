@@ -86,7 +86,7 @@ namespace CETech.World
             // TODO: ! ! !! !!! !!!!!
         }
 
-        private static int LoadLevelImpl(int world, long level, Vector3f position, Vector3f rotation, Vector3f scale)
+        private static int LoadLevelImpl(int world, long level, Vec3f position, Vec3f rotation, Vec3f scale)
         {
             var world_idx = getIdx(world);
 

@@ -32,7 +32,7 @@ namespace CETech.Lua.Api
             return Mouse.Released(buttonIndex);
         }
 
-        public static Vector2f Axis(string name)
+        public static Vec2f Axis(string name)
         {
             return Mouse.Axis(name);
         }
