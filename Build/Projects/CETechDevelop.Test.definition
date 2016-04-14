@@ -40,11 +40,11 @@
     <Compile Include="Application\Private\ApplicationSDL.cs">
       <Platforms>Windows,Linux</Platforms>
     </Compile>
+    <Compile Include="CEMath\Mat4f.cs" />
     <Compile Include="CEMath\Math.cs" />
-    <Compile Include="CEMath\Matrix4f.cs" />
-    <Compile Include="CEMath\Vector2f.cs" />
-    <Compile Include="CEMath\Vector3f.cs" />
-    <Compile Include="CEMath\Vector4f.cs" />
+    <Compile Include="CEMath\Vec2f.cs" />
+    <Compile Include="CEMath\Vec3f.cs" />
+    <Compile Include="CEMath\Vec4f.cs" />
     <Compile Include="Config\ConfigResource.cs" />
     <Compile Include="Config\ConfigSystem.cs" />
     <Compile Include="Config\Private\ConfigSystem.cs" />

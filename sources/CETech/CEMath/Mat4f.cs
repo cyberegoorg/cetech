@@ -1,8 +1,8 @@
 namespace CETech.CEMath
 {
-    public struct Matrix4f
+    public struct Mat4f
     {
-        public static readonly Matrix4f Identity = new Matrix4f(
+        public static readonly Mat4f Identity = new Mat4f(
             1f, 0f, 0f, 0f,
             0f, 1f, 0f, 0f,
             0f, 0f, 1f, 0f,
@@ -14,7 +14,7 @@ namespace CETech.CEMath
         public float M31, M32, M33, M34;
         public float M41, M42, M43, M44;
 
-        public Matrix4f(
+        public Mat4f(
             float m11, float m12, float m13, float m14,
             float m21, float m22, float m23, float m24,
             float m31, float m32, float m33, float m34,
@@ -42,13 +42,13 @@ namespace CETech.CEMath
             M44 = m44;
         }
 
-        public static Matrix4f CreatePerspectiveFieldOfView(float fieldOfView, float aspectRatio,
+        public static Mat4f CreatePerspectiveFieldOfView(float fieldOfView, float aspectRatio,
             float nearPlaneDistance, float farPlaneDistance)
         {
             var yScale = 1.0f/(float) System.Math.Tan(fieldOfView*0.5f);
             var xScale = yScale/aspectRatio;
 
-            Matrix4f result;
+            Mat4f result;
             result.M11 = xScale;
             result.M12 = result.M13 = result.M14 = 0.0f;
             result.M22 = yScale;
@@ -62,35 +62,27 @@ namespace CETech.CEMath
             return result;
         }
 
-        public static Matrix4f CreateLookAt(Vector3f cameraPosition, Vector3f cameraTarget, Vector3f cameraUpVector)
+        public static Mat4f CreateLookAt(Vec3f cameraPosition, Vec3f cameraTarget, Vec3f cameraUpVector)
         {
-            var zaxis = Vector3f.Normalize(cameraPosition - cameraTarget);
-            var xaxis = Vector3f.Normalize(Vector3f.Cross(cameraUpVector, zaxis));
-            var yaxis = Vector3f.Cross(zaxis, xaxis);
+            var zaxis = Vec3f.Normalize(cameraPosition - cameraTarget);
+            var xaxis = Vec3f.Normalize(Vec3f.Cross(cameraUpVector, zaxis));
+            var yaxis = Vec3f.Cross(zaxis, xaxis);
 
             var result = Identity;
-            result.M11 = xaxis.X;
-            result.M12 = yaxis.X;
-            result.M13 = zaxis.X;
-            result.M21 = xaxis.Y;
-            result.M22 = yaxis.Y;
-            result.M23 = zaxis.Y;
-            result.M31 = xaxis.Z;
-            result.M32 = yaxis.Z;
-            result.M33 = zaxis.Z;
-            result.M41 = -Vector3f.Dot(xaxis, cameraPosition);
-            result.M42 = -Vector3f.Dot(yaxis, cameraPosition);
-            result.M43 = -Vector3f.Dot(zaxis, cameraPosition);
-
+            result.M11 = xaxis.X; result.M12 = yaxis.X; result.M13 = zaxis.X;
+            result.M21 = xaxis.Y; result.M22 = yaxis.Y; result.M23 = zaxis.Y;
+            result.M31 = xaxis.Z; result.M32 = yaxis.Z; result.M33 = zaxis.Z;
+            result.M41 = -Vec3f.Dot(xaxis, cameraPosition); result.M42 = -Vec3f.Dot(yaxis, cameraPosition); result.M43 = -Vec3f.Dot(zaxis, cameraPosition);
+            
             return result;
         }
 
-        public static Matrix4f CreateScale(float scale)
+        public static Mat4f CreateScale(float scale)
         {
             return CreateScale(scale, scale, scale);
         }
 
-        public static Matrix4f CreateScale(float xScale, float yScale, float zScale)
+        public static Mat4f CreateScale(float xScale, float yScale, float zScale)
         {
             var result = Identity;
             result.M11 = xScale;
@@ -100,7 +92,7 @@ namespace CETech.CEMath
             return result;
         }
 
-        public static Matrix4f CreateTranslation(float xPosition, float yPosition, float zPosition)
+        public static Mat4f CreateTranslation(float xPosition, float yPosition, float zPosition)
         {
             var result = Identity;
             result.M41 = xPosition;
@@ -110,7 +102,7 @@ namespace CETech.CEMath
             return result;
         }
 
-        public static Matrix4f CreateRotationY(float radians)
+        public static Mat4f CreateRotationY(float radians)
         {
             var c = (float) System.Math.Cos(radians);
             var s = (float) System.Math.Sin(radians);
@@ -124,24 +116,24 @@ namespace CETech.CEMath
             return result;
         }
 
-        public static Matrix4f CreateBillboard(Vector3f objectPosition, Vector3f cameraPosition, Vector3f cameraUpVector,
-            Vector3f cameraForwardVector)
+        public static Mat4f CreateBillboard(Vec3f objectPosition, Vec3f cameraPosition, Vec3f cameraUpVector,
+            Vec3f cameraForwardVector)
         {
             const float epsilon = 1e-4f;
 
-            var zaxis = new Vector3f(
+            var zaxis = new Vec3f(
                 objectPosition.X - cameraPosition.X,
                 objectPosition.Y - cameraPosition.Y,
                 objectPosition.Z - cameraPosition.Z);
 
-            var norm = zaxis.LengthSquared();
+            var norm = Vec3f.LengthSquared(zaxis);
             if (norm < epsilon)
                 zaxis = -cameraForwardVector;
             else
                 zaxis = zaxis*(1.0f/(float) System.Math.Sqrt(norm));
 
-            var xaxis = Vector3f.Normalize(Vector3f.Cross(cameraUpVector, zaxis));
-            var yaxis = Vector3f.Cross(zaxis, xaxis);
+            var xaxis = Vec3f.Normalize(Vec3f.Cross(cameraUpVector, zaxis));
+            var yaxis = Vec3f.Cross(zaxis, xaxis);
 
             var result = Identity;
             result.M11 = xaxis.X;
@@ -160,9 +152,9 @@ namespace CETech.CEMath
             return result;
         }
 
-        public static Matrix4f CreateReflection(Vector3f normal, float d)
+        public static Mat4f CreateReflection(Vec3f normal, float d)
         {
-            var scale = 1.0f/(float) System.Math.Sqrt(normal.LengthSquared());
+            var scale = 1.0f/(float) System.Math.Sqrt(Vec3f.LengthSquared(normal));
             var a = normal.X*scale;
             var b = normal.Y*scale;
             var c = normal.Z*scale;
@@ -172,7 +164,7 @@ namespace CETech.CEMath
             var fb = -2.0f*b;
             var fc = -2.0f*c;
 
-            Matrix4f result;
+            Mat4f result;
 
             result.M11 = fa*a + 1.0f;
             result.M12 = fb*a;
@@ -197,7 +189,7 @@ namespace CETech.CEMath
             return result;
         }
 
-        public static Matrix4f CreateFromYawPitchRoll(float yaw, float pitch, float roll)
+        public static Mat4f CreateFromYawPitchRoll(float yaw, float pitch, float roll)
         {
             //  Roll first, about axis the object is facing, then
             //  pitch upward, then yaw to face into the new heading
@@ -243,9 +235,9 @@ namespace CETech.CEMath
             return result;
         }
 
-        public static Matrix4f operator *(Matrix4f value1, Matrix4f value2)
+        public static Mat4f operator *(Mat4f value1, Mat4f value2)
         {
-            Matrix4f m;
+            Mat4f m;
 
             // First row
             m.M11 = value1.M11*value2.M11 + value1.M12*value2.M21 + value1.M13*value2.M31 + value1.M14*value2.M41;

@@ -23,12 +23,12 @@ namespace CETech.Lua.Api
             World.World.Update(world, dt);
         }
 
-        public static int LoadLevel(int world, string level, Vector3f? position, Vector3f? rotation, Vector3f? scale)
+        public static int LoadLevel(int world, string level, Vec3f? position, Vec3f? rotation, Vec3f? scale)
         {
             return World.World.LoadLevel(world, StringId.FromString(level),
-                position != null ? position.Value : Vector3f.Zero,
-                rotation != null ? rotation.Value : Vector3f.Zero,
-                scale != null ? scale.Value : Vector3f.Zero);
+                position != null ? position.Value : Vec3f.Zero,
+                rotation != null ? rotation.Value : Vec3f.Zero,
+                scale != null ? scale.Value : Vec3f.Zero);
         }
 
         public static int UnitByName(int world, int level, string name)

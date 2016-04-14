@@ -130,13 +130,13 @@ namespace CETech.World
         {
         }
 
-        private static void GetProjectViewImpl(int world, int camera, out Matrix4f proj, out Matrix4f view)
+        private static void GetProjectViewImpl(int world, int camera, out Mat4f proj, out Mat4f view)
         {
             var world_instance = _worldInstance[world];
 			var size = Renderer.GetSize ();
 
             view = Tranform.GetWorldMatrix(world, world_instance.Tranform[camera]);
-			proj = Matrix4f.CreatePerspectiveFieldOfView(MathUtils.DegToRad(world_instance.Fov[camera]), size.X/size.Y,
+			proj = Mat4f.CreatePerspectiveFieldOfView(MathUtils.DegToRad(world_instance.Fov[camera]), size.X/size.Y,
                 world_instance.Near[camera], world_instance.Far[camera]);
         }
 

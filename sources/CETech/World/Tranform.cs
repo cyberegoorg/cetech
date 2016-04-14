@@ -29,8 +29,8 @@ namespace CETech.World
             return GetTranformImpl(world, entity);
         }
 
-        public static int Create(int world, int entity, int parent, Vector3f position, Vector3f rotation,
-            Vector3f scale)
+        public static int Create(int world, int entity, int parent, Vec3f position, Vec3f rotation,
+            Vec3f scale)
         {
             return CreateImpl(world, entity, parent, position, rotation, scale);
         }
@@ -40,37 +40,37 @@ namespace CETech.World
             LinkImpl(world, parent_ent, child_ent);
         }
 
-        public static void SetPosition(int world, int transform, Vector3f pos)
+        public static void SetPosition(int world, int transform, Vec3f pos)
         {
             SetPositionImpl(world, transform, pos);
         }
 
-        public static void SetRotation(int world, int transform, Vector3f rot)
+        public static void SetRotation(int world, int transform, Vec3f rot)
         {
             SetRotationImpl(world, transform, rot);
         }
 
-        public static void SetScale(int world, int transform, Vector3f scale)
+        public static void SetScale(int world, int transform, Vec3f scale)
         {
             SetScaleImpl(world, transform, scale);
         }
 
-        public static Vector3f GetPosition(int world, int transform)
+        public static Vec3f GetPosition(int world, int transform)
         {
             return GetPositionImpl(world, transform);
         }
 
-        public static Vector3f GetRotation(int world, int transform)
+        public static Vec3f GetRotation(int world, int transform)
         {
             return GetRotationImpl(world, transform);
         }
 
-        public static Vector3f GetScale(int world, int transform)
+        public static Vec3f GetScale(int world, int transform)
         {
             return GetScaleImpl(world, transform);
         }
 
-        public static Matrix4f GetWorldMatrix(int world, int transform)
+        public static Mat4f GetWorldMatrix(int world, int transform)
         {
             return GetWorldMatrixImpl(world, transform);
         }

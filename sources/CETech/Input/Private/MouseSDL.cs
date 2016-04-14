@@ -9,8 +9,8 @@ namespace CETech.Input
     {
         private static int _buttonStates;
         private static int _buttonStatesLast;
-        private static Vector2f _position;
-        private static Vector2f _dt_position;
+        private static Vec2f _position;
+        private static Vec2f _dt_position;
 
 
         private static void InitImpl()
@@ -77,7 +77,7 @@ namespace CETech.Input
             return (_buttonStates & buttonIndex) == 0 && (_buttonStatesLast & buttonIndex) == 1;
         }
 
-        private static Vector2f AxisImpl(string name)
+        private static Vec2f AxisImpl(string name)
         {
             if (name == "abs")
             {
@@ -89,7 +89,7 @@ namespace CETech.Input
                 return _dt_position;
             }
 
-            return Vector2f.Zero;
+            return Vec2f.Zero;
         }
     }
 }

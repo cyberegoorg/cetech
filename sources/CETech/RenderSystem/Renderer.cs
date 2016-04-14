@@ -80,7 +80,7 @@ namespace CETech
         }
 
 
-		public static Vector2f GetSize() {
+		public static Vec2f GetSize() {
 			return GetSizeImpl();
 		}
 

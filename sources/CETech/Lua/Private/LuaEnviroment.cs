@@ -93,7 +93,7 @@ namespace CETech.Lua
             _enviromentScript.Globals["Transform"] = new TransformSystemApi();
             _enviromentScript.Globals["Camera"] = new CameraApi();
 
-            _enviromentScript.Globals["Vector3f"] = new Vector3fApi();
+            _enviromentScript.Globals["Vec3f"] = new Vector3fApi();
 
             ConsoleServer.RegisterCommand("lua.execute", (args, response) =>
             {
@@ -229,15 +229,15 @@ namespace CETech.Lua
         [MoonSharpUserData]
         internal class Vector3fApi
         {
-            public static readonly Vector3f Zero = new Vector3f();
-            public static readonly Vector3f UnitX = new Vector3f(1.0f, 0.0f, 0.0f);
-            public static readonly Vector3f UnitY = new Vector3f(0.0f, 1.0f, 0.0f);
-            public static readonly Vector3f UnitZ = new Vector3f(0.0f, 0.0f, 1.0f);
-            public static readonly Vector3f Unit = new Vector3f(1.0f, 1.0f, 1.0f);
+            public static readonly Vec3f Zero = new Vec3f();
+            public static readonly Vec3f UnitX = new Vec3f(1.0f, 0.0f, 0.0f);
+            public static readonly Vec3f UnitY = new Vec3f(0.0f, 1.0f, 0.0f);
+            public static readonly Vec3f UnitZ = new Vec3f(0.0f, 0.0f, 1.0f);
+            public static readonly Vec3f Unit = new Vec3f(1.0f, 1.0f, 1.0f);
 
-            public static Vector3f make(float x, float y, float z)
+            public static Vec3f make(float x, float y, float z)
             {
-                return new Vector3f(x, y, z);
+                return new Vec3f(x, y, z);
             }
         }
 

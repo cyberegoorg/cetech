@@ -17,37 +17,37 @@ namespace CETech.Lua.Api
             return Tranform.GetTranform(world, entity);
         }
 
-        public static void SetPosition(int world, int transform, Vector3f pos)
+        public static void SetPosition(int world, int transform, Vec3f pos)
         {
             Tranform.SetPosition(world, transform, pos);
         }
 
-        public static void SetRotation(int world, int transform, Vector3f rot)
+        public static void SetRotation(int world, int transform, Vec3f rot)
         {
             Tranform.SetRotation(world, transform, rot);
         }
 
-        public static void SetScale(int world, int transform, Vector3f scale)
+        public static void SetScale(int world, int transform, Vec3f scale)
         {
             Tranform.SetScale(world, transform, scale);
         }
 
-        public static Vector3f GetPosition(int world, int transform)
+        public static Vec3f GetPosition(int world, int transform)
         {
             return Tranform.GetPosition(world, transform);
         }
 
-        public static Vector3f GetRotation(int world, int transform)
+        public static Vec3f GetRotation(int world, int transform)
         {
             return Tranform.GetRotation(world, transform);
         }
 
-        public static Vector3f GetScale(int world, int transform)
+        public static Vec3f GetScale(int world, int transform)
         {
             return Tranform.GetScale(world, transform);
         }
 
-        public static Matrix4f GetWorldMatrix(int world, int transform)
+        public static Mat4f GetWorldMatrix(int world, int transform)
         {
             return Tranform.GetWorldMatrix(world, transform);
         }

@@ -6,7 +6,7 @@ function AssetView:init()
     self.camera = Camera.GetCamera(self.world, self.camera_unit)
 
     local transform = Transform.GetTransform(self.world, self.camera_unit)
-    Transform.SetPosition(self.world, transform, Vector3f.make(0.0, 0.0, -10))
+    Transform.SetPosition(self.world, transform, Vec3f.make(0.0, 0.0, -10))
 
 
     self.actual_asset_unit = nil
@@ -36,7 +36,7 @@ function AssetView:show_asset(asset, type)
 
         if Transform.HasTransform(self.world, self.actual_asset_unit) then
             local transform = Transform.GetTransform(self.world, self.actual_asset_unit)
-            Transform.SetPosition(self.world, transform, Vector3f.make(0.0, 0.0, 0.0))
+            Transform.SetPosition(self.world, transform, Vec3f.make(0.0, 0.0, 0.0))
         end
     end
 end

@@ -29,7 +29,7 @@ namespace CETech.World
             return CreateImpl(world, entity, near, far, fov);
         }
 
-        public static void GetProjectView(int world, int camera, out Matrix4f proj, out Matrix4f view)
+        public static void GetProjectView(int world, int camera, out Mat4f proj, out Mat4f view)
         {
             GetProjectViewImpl(world, camera, out proj, out view);
         }

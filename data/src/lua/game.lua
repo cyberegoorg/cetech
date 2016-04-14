@@ -15,8 +15,8 @@ function Game:init()
     --self.unit = Unit.Spawn(self.world, "unit1");
     World.LoadLevel(self.world, "level1");
     self.level = World.LoadLevel(self.world, "level1",
-                 Vector3f.make(0.0, 5.0, 0.0),
-                 Vector3f.Zero, Vector3f.Unit);
+                 Vec3f.make(0.0, 5.0, 0.0),
+                 Vec3f.Zero, Vec3f.Unit);
 
     self.level_unit = World.LevelUnit(self.world, self.level)
 
