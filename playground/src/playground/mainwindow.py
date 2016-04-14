@@ -74,7 +74,6 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         # TODO bug #114 workaround. Disable create sub engine...
         if platform.system().lower() != 'darwin':
             self.ogl_widget = Widget(self, self.api, log_url=b"ws://localhost:5556")
-            self.ogl_widget.set_api(self.api)
             self.ogl_dock = QDockWidget(self)
             self.ogl_dock.setWindowTitle("Engine View")
             self.ogl_dock.hide()

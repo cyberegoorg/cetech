@@ -1,5 +1,7 @@
 import nanomsg
 import yaml
+
+import PyQt5.QtGui
 from PyQt5.QtCore import Qt, QThread
 from PyQt5.QtWidgets import QWidget
 from nanomsg import Socket, SUB, SUB_SUBSCRIBE
@@ -27,7 +29,7 @@ class ReadyLock(QThread):
                 if msg_yaml["where"] == 'application.ready':
                     size = self.engine_widget.size()
                     self.engine_widget.ready = True
-                    #self.api.resize(size.width(), size.height())
+                    # self.api.resize(size.width(), size.height())
                     return
 
             except nanomsg.NanoMsgAPIError as e:
@@ -38,14 +40,14 @@ class Widget(QWidget):
     def __init__(self, parent, api, log_url):
         self.api = api
         self.ready = False
+        self.last_pos = (0, 0)
 
         self.ready_lock = ReadyLock(log_url, self)
         self.ready_lock.start(QThread.NormalPriority)
 
         super(Widget, self).__init__(parent, Qt.ForeignWindow)
 
-    def set_api(self, api):
-        self.api = api
+        self.setAttribute(Qt.WA_TransparentForMouseEvents)
 
     def resizeEvent(self, event):
         if self.api and self.ready:
@@ -53,3 +55,26 @@ class Widget(QWidget):
             self.api.resize(size.width(), size.height())
 
         event.accept()
+
+    def _move_mouse(self, x, y, left, midle, right):
+        self.api.send_command('lua.execute',
+                              script="EditorMouse:Move(%d, %d, %s, %s, %s)" % (x, y, left, midle, right))
+
+    def mouseMoveEvent(self, event):
+        """ QWidget.mouseMoveEvent(QMouseEvent) 
+        :type event: PyQt5.QtGui.QMouseEvent.QMouseEvent
+        """
+
+        if not self.ready:
+            return
+
+        buttons = event.buttons()
+
+        left = str(buttons == Qt.LeftButton).lower()
+        midle = str(buttons == Qt.MidButton).lower()
+        right = str(buttons == Qt.RightButton).lower()
+
+        last_pos = self.last_pos
+
+        actual_pos = (event.pos().x(), event.pos().y())
+        self._move_mouse(event.pos().x(), event.pos().y(), left, midle, right)

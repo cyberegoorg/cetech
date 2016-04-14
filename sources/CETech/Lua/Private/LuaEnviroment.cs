@@ -251,8 +251,15 @@ namespace CETech.Lua
 
             public override bool ScriptFileExists(string name)
             {
+                if (Resource.Resource.AutoLoad)
+                {
+                    return true;
+                }
+
                 long[] names = {StringId.FromString(name)};
-                return Resource.Resource.CanGet(LuaResource.Type, names);
+                bool can_get = Resource.Resource.CanGet(LuaResource.Type, names);
+
+                return can_get;
             }
         }
     }
