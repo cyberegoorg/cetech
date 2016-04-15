@@ -47,7 +47,7 @@ class Widget(QWidget):
 
         super(Widget, self).__init__(parent, Qt.ForeignWindow)
 
-        self.setAttribute(Qt.WA_TransparentForMouseEvents)
+        #self.setAttribute(Qt.WA_TransparentForMouseEvents)
 
     def resizeEvent(self, event):
         if self.api and self.ready:

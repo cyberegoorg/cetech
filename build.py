@@ -43,7 +43,7 @@ DEFAULT_BUILD = "%s%s" % (OS_NAME, OS_ARCH)
 # Command line actions.
 ACTIONS = {
     '',
-    'build'
+    'build',
     'clean'
 }
 
