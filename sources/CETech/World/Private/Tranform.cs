@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Globalization;
+using System.Runtime.Remoting.Metadata.W3cXsd2001;
 using System.Yaml;
 using CETech.CEMath;
 using CETech.Develop;
@@ -81,14 +82,17 @@ namespace CETech.World
 
             var pos = world_instance.Position[idx];
             var rot = world_instance.Rotation[idx];
-            var sca = world_instance.Scale[idx]; // TODO: !!!
+            var sca = world_instance.Scale[idx];
 
-            var local = Mat4f.CreateFromYawPitchRoll(rot.X, rot.Y, rot.Z);
-            local.M41 = pos.X;
-            local.M42 = pos.Y;
-            local.M43 = pos.Z;
+            var rm = Mat4f.CreateFromYawPitchRoll(rot.X, rot.Y, rot.Z);
+            var sm = Mat4f.CreateScale(sca.X, sca.Y, sca.Z);
 
-            world_instance.World[idx] = local*parent;
+            var m = rm * sm;
+            m.M41 = pos.X;
+            m.M42 = pos.Y;
+            m.M43 = pos.Z;
+
+            world_instance.World[idx] = parent * m;
 
             var child = world_instance.FirstChild[idx];
 

@@ -10,7 +10,11 @@ function Editor:init()
     self.camera = Camera.GetCamera(self.world, self.camera_unit)
     self.camera_transform = Transform.GetTransform(self.world, self.camera_unit)
 
+    Transform.SetPosition(self.world, self.camera_transform, Vec3f.make(0.0, 0.0, -10))
+
     self.level = nil
+
+    --Renderer.SetDebug(true)
 end
 
 function Editor:shutdown()
@@ -22,8 +26,8 @@ function Editor:update(dt)
     local rot = Transform.GetRotation(self.world, self.camera_transform)
 
     if EditorMouse.left then
-        rot.X = rot.X + EditorMouse.delta_x * -0.01;
-        rot.Y = rot.Y + EditorMouse.delta_y * 0.01;
+        rot.X = rot.X + EditorMouse.delta_x * -0.01
+        rot.Y = rot.Y + EditorMouse.delta_y * 0.01
     end
     EditorMouse:ResetButtons()
 
