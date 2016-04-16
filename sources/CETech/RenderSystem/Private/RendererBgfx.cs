@@ -113,7 +113,6 @@ namespace CETech
             }
 
             Bgfx.Touch(0);
-
             Bgfx.DebugTextClear();
 
             PrimitiveMeshRenderer.RenderWorld(world);

@@ -1,16 +1,17 @@
-require "playground/editor_mouse"
+require "playground/editor_input"
+require 'core/fpscamera'
 
 AssetView = AssetView or {}
 
 function AssetView:init()
-    EditorMouse:Init()
+    EditorInput:Init()
 
     self.world = World.Create()
     self.camera_unit = Unit.Spawn(self.world, "camera")
     self.camera = Camera.GetCamera(self.world, self.camera_unit)
     self.camera_transform = Transform.GetTransform(self.world, self.camera_unit)
 
-    Transform.SetPosition(self.world, self.camera_transform, Vec3f.make(0.0, 0.0, -10))
+    Transform.SetPosition(self.world, self.camera_transform, Vec3f.make(0.0, 0.0, 20))
 
     self.actual_asset_unit = nil
     self.level = nil
@@ -24,23 +25,23 @@ function AssetView:shutdown()
 end
 
 function AssetView:update(dt)
-    local transform = self.camera_transform
-    local pos = Transform.GetPosition(self.world, transform)
-    local rot = Transform.GetRotation(self.world, transform)
+    if self.actual_asset_unit then
+        if EditorInput.left then
+            local transform = Transform.GetTransform(self.world,  self.actual_asset_unit)
+            local rot = Transform.GetRotation(self.world, transform)
+            rot.X = rot.X + EditorInput.delta_x * 0.01
+            rot.Y = rot.Y + EditorInput.delta_y * 0.01
+            Transform.SetRotation(self.world, transform, rot)
+        end
 
-    if EditorMouse.left then
-        rot.X = rot.X + EditorMouse.delta_x * -0.01
-        rot.Y = rot.Y + EditorMouse.delta_y * 0.01
+        if EditorInput.right then
+            local pos = Transform.GetPosition(self.world,  self.camera_transform)
+            pos.Z = pos.Z + EditorInput.delta_y * -0.9
+            Transform.SetPosition(self.world, self.camera_transform, pos)
+        end
+
+        EditorInput:ResetButtons()
     end
-
-    if EditorMouse.right then
-        pos.Z = pos.Z + EditorMouse.delta_y * -0.9
-    end
-
-    EditorMouse:ResetButtons()
-
-    Transform.SetPosition(self.world,transform, pos)
-    Transform.SetRotation(self.world,transform, rot)
 
     World.Update(self.world, dt)
 end

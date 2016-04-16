@@ -100,6 +100,7 @@ namespace CETech.Develop
             for (var i = 0; i < files.Length; i++)
             {
                 var filename = files[i].Remove(0, FileSystem.GetRootDir(root).Length + 1);
+                filename = filename.Replace('\\', '/');
 
                 long name, type;
                 CalcHash(filename, out type, out name);

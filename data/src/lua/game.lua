@@ -1,5 +1,7 @@
 Game = Game or {}
 
+require 'core/fpscamera'
+
 local quit_btn = Keyboard.ButtonIndex 'q'
 
 function Game:init()
@@ -26,7 +28,7 @@ function Game:init()
 
     self.camera_unit = Unit.Spawn(self.world, "camera");
     self.camera = Camera.GetCamera(self.world, self.camera_unit);
-
+    self.fps_camera = FPSCamera(self.world, self.camera_unit)
     Unit.Spawn(self.world, "unit11");
 
     Log.Info("sadsadas", "{0}", self.unit);
@@ -80,39 +82,20 @@ function Game:update(dt)
       RenderSystem.SaveScreenShot("screenshot");
     end
 
-    local m_axis = Mouse.axis("delta")
 
-    local unit_transform = Transform.GetTransform(self.world, self.camera_unit)
-
-    local pos = Transform.GetPosition(self.world, unit_transform)
-    local rot = Transform.GetRotation(self.world, unit_transform)
-
+    local dx = 0
+    local dy = 0
     if Mouse.State(Mouse.ButtonIndex("left") ) then
-        rot.X = rot.X + m_axis.X * -0.01;
-        rot.Y = rot.Y + m_axis.Y * -0.01;
+        local m_axis = Mouse.axis("delta")
+        dx, dy = m_axis.X, m_axis.Y
     end
 
-    if Keyboard.State(Keyboard.ButtonIndex('a')) then
-        pos.X = pos.X + 0.02
-    end
+    local up = Keyboard.State(Keyboard.ButtonIndex('w'))
+    local down = Keyboard.State(Keyboard.ButtonIndex('s'))
+    local left = Keyboard.State(Keyboard.ButtonIndex('a'))
+    local right = Keyboard.State(Keyboard.ButtonIndex('d'))
 
-    if Keyboard.State(Keyboard.ButtonIndex('d')) then
-        pos.X = pos.X - 0.02
-    end
-
-    if Keyboard.State(Keyboard.ButtonIndex('w')) then
-        pos.Z = pos.Z + 0.2
-    end
-
-    if Keyboard.State(Keyboard.ButtonIndex('s')) then
-        pos.Z = pos.Z - 0.2
-    end
-
-    --rot.X = rot.X - 0.005 * dt
-
-    Transform.SetPosition(self.world, unit_transform, pos)
-    Transform.SetRotation(self.world, unit_transform, rot)
-
+    self.fps_camera:update(dt, dx * 0.01, dy * 0.01, left, right, up, down)
     World.Update(self.world, dt)
     --print("%f, %f", m_axis.x, m_axis.y)
     --print(dt)

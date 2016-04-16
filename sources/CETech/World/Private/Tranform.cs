@@ -86,11 +86,9 @@ namespace CETech.World
 
             var rm = Mat4f.CreateFromYawPitchRoll(rot.X, rot.Y, rot.Z);
             var sm = Mat4f.CreateScale(sca.X, sca.Y, sca.Z);
+            var tm = Mat4f.CreateTranslation(pos.X, pos.Y, pos.Z);
 
-            var m = rm * sm;
-            m.M41 = pos.X;
-            m.M42 = pos.Y;
-            m.M43 = pos.Z;
+            var m = tm * rm * sm;
 
             world_instance.World[idx] = parent * m;
 
