@@ -24,20 +24,23 @@ function AssetView:shutdown()
 end
 
 function AssetView:update(dt)
-    if self.actual_asset_unit then
-        transform = Transform.GetTransform(self.world, self.actual_asset_unit)
-        local pos = Transform.GetPosition(self.world, transform)
-        local rot = Transform.GetRotation(self.world, transform)
+    local transform = self.camera_transform
+    local pos = Transform.GetPosition(self.world, transform)
+    local rot = Transform.GetRotation(self.world, transform)
 
-        if EditorMouse.left then
-            rot.X = rot.X + EditorMouse.delta_x * -0.01;
-            rot.Y = rot.Y + EditorMouse.delta_y * 0.01;
-        end
-        EditorMouse:ResetButtons()
-
-        Transform.SetPosition(self.world, transform, pos)
-        Transform.SetRotation(self.world,transform, rot)
+    if EditorMouse.left then
+        rot.X = rot.X + EditorMouse.delta_x * -0.01
+        rot.Y = rot.Y + EditorMouse.delta_y * 0.01
     end
+
+    if EditorMouse.right then
+        pos.Z = pos.Z + EditorMouse.delta_y * -0.9
+    end
+
+    EditorMouse:ResetButtons()
+
+    Transform.SetPosition(self.world,transform, pos)
+    Transform.SetRotation(self.world,transform, rot)
 
     World.Update(self.world, dt)
 end

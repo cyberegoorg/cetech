@@ -89,12 +89,9 @@ namespace CETech.World
         private static int LoadLevelImpl(int world, long level, Vec3f position, Vec3f rotation, Vec3f scale)
         {
             var world_idx = getIdx(world);
-
             var level_instance = new Levelnstance();
 
             var level_resource = Resource.Resource.Get<LevelResource.CompiledResource>(LevelResource.Type, level);
-
-
             var units = level_resource.units;
             var units_name = level_resource.units_name;
 

@@ -88,16 +88,16 @@ function Game:update(dt)
     local rot = Transform.GetRotation(self.world, unit_transform)
 
     if Mouse.State(Mouse.ButtonIndex("left") ) then
-        rot.X = rot.X + m_axis.X * -0.1;
-        rot.Y = rot.Y + m_axis.Y * 0.1;
+        rot.X = rot.X + m_axis.X * -0.01;
+        rot.Y = rot.Y + m_axis.Y * -0.01;
     end
 
     if Keyboard.State(Keyboard.ButtonIndex('a')) then
-        rot.X = rot.X + 0.02
+        pos.X = pos.X + 0.02
     end
 
     if Keyboard.State(Keyboard.ButtonIndex('d')) then
-        rot.X = rot.X - 0.02
+        pos.X = pos.X - 0.02
     end
 
     if Keyboard.State(Keyboard.ButtonIndex('w')) then

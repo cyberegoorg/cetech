@@ -72,7 +72,10 @@ namespace CETech.CEMath
             result.M11 = xaxis.X; result.M12 = yaxis.X; result.M13 = zaxis.X;
             result.M21 = xaxis.Y; result.M22 = yaxis.Y; result.M23 = zaxis.Y;
             result.M31 = xaxis.Z; result.M32 = yaxis.Z; result.M33 = zaxis.Z;
-            result.M41 = -Vec3f.Dot(xaxis, cameraPosition); result.M42 = -Vec3f.Dot(yaxis, cameraPosition); result.M43 = -Vec3f.Dot(zaxis, cameraPosition);
+
+            result.M41 = -Vec3f.Dot(xaxis, cameraPosition);
+            result.M42 = -Vec3f.Dot(yaxis, cameraPosition);
+            result.M43 = -Vec3f.Dot(zaxis, cameraPosition);
             
             return result;
         }

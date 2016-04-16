@@ -35,7 +35,6 @@ class ReadyLock(QThread):
             except nanomsg.NanoMsgAPIError as e:
                 raise
 
-
 class Widget(QWidget):
     def __init__(self, parent, api, log_url):
         self.api = api

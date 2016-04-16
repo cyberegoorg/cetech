@@ -28,7 +28,7 @@ namespace CETech.Lua.Api
             return World.World.LoadLevel(world, StringId.FromString(level),
                 position != null ? position.Value : Vec3f.Zero,
                 rotation != null ? rotation.Value : Vec3f.Zero,
-                scale != null ? scale.Value : Vec3f.Zero);
+                scale != null ? scale.Value : Vec3f.Unit);
         }
 
         public static int UnitByName(int world, int level, string name)
