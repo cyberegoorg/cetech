@@ -22,6 +22,11 @@ namespace CETech.CEMath
             Z = z;
         }
 
+        public static Vec3f make(float x, float y, float z)
+        {
+            return new Vec3f(x, y, z);
+        }
+
         public static float LengthSquared(Vec3f value)
         {
             return value.X * value.X + value.Y * value.Y + value.Z * value.Z;
@@ -59,6 +64,11 @@ namespace CETech.CEMath
                 position.X*matrix.M11 + position.Y*matrix.M21 + position.Z*matrix.M31 + matrix.M41,
                 position.X*matrix.M12 + position.Y*matrix.M22 + position.Z*matrix.M32 + matrix.M42,
                 position.X*matrix.M13 + position.Y*matrix.M23 + position.Z*matrix.M33 + matrix.M43);
+        }
+
+        public static Vec3f operator +(Vec3f left, Vec3f right)
+        {
+            return new Vec3f(left.X + right.X, left.Y + right.Y, left.Z + right.Z);
         }
 
         public static Vec3f operator -(Vec3f left, Vec3f right)

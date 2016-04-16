@@ -1,14 +1,16 @@
-require "playground/editor_mouse"
+require "playground/editor_input"
+require 'core/fpscamera'
 
 Editor = Editor or {}
 
 function Editor:init()
-    EditorMouse:Init()
+    EditorInput:Init()
 
     self.world = World.Create()
     self.camera_unit = Unit.Spawn(self.world, "camera")
     self.camera = Camera.GetCamera(self.world, self.camera_unit)
     self.camera_transform = Transform.GetTransform(self.world, self.camera_unit)
+    self.fps_camera = FPSCamera(self.world, self.camera_unit)
 
     Transform.SetPosition(self.world, self.camera_transform, Vec3f.make(0.0, 0.0, -10))
 
@@ -22,17 +24,16 @@ function Editor:shutdown()
 end
 
 function Editor:update(dt)
-    local pos = Transform.GetPosition(self.world, self.camera_transform)
-    local rot = Transform.GetRotation(self.world, self.camera_transform)
+    local dx = 0
+    local dy = 0
 
-    if EditorMouse.left then
-        rot.X = rot.X + EditorMouse.delta_x * -0.01
-        rot.Y = rot.Y + EditorMouse.delta_y * 0.01
+    if EditorInput.left then
+        dx = EditorInput.delta_x * 0.01
+        dy = EditorInput.delta_y * 0.01
     end
-    EditorMouse:ResetButtons()
 
-    Transform.SetPosition(self.world, self.camera_transform, pos)
-    Transform.SetRotation(self.world, self.camera_transform, rot)
+    self.fps_camera:update(dt, dx, dy, EditorInput.keyboard.left, EditorInput.keyboard.right, EditorInput.keyboard.up, EditorInput.keyboard.down)
+    EditorInput:ResetButtons()
 
     World.Update(self.world, dt)
 end

@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Globalization;
+using System.Runtime.InteropServices;
 using System.Yaml;
 using CETech.CEMath;
 using CETech.Develop;
@@ -13,7 +14,7 @@ namespace CETech.World
     {
         private static readonly Dictionary<int, WorldInstance> _worldInstance = new Dictionary<int, WorldInstance>();
 
-        private static int getIdx(int world, int entity)
+        private static int GetIdx(int world, int entity)
         {
             return _worldInstance[world].EntIdx[entity];
         }
@@ -104,7 +105,7 @@ namespace CETech.World
                     continue;
                 }
 
-                var item_idx = getIdx(world, ent_id);
+                var item_idx = GetIdx(world, ent_id);
                 var last_idx = world_instance.Near.Count-1;
                 var last_ent = world_instance.Ent[last_idx];
 
@@ -133,11 +134,17 @@ namespace CETech.World
         private static void GetProjectViewImpl(int world, int camera, out Mat4f proj, out Mat4f view)
         {
             var world_instance = _worldInstance[world];
-			var size = Renderer.GetSize ();
+			var size = Renderer.GetSize();
 
-            view = Tranform.GetWorldMatrix(world, world_instance.Tranform[camera]);
-			proj = Mat4f.CreatePerspectiveFieldOfView(MathUtils.DegToRad(world_instance.Fov[camera]), size.X/size.Y,
+            proj = Mat4f.CreatePerspectiveFieldOfView(
+                MathUtils.DegToRad(world_instance.Fov[camera]), size.X/size.Y,
                 world_instance.Near[camera], world_instance.Far[camera]);
+
+            var t = world_instance.Tranform[camera];
+            var pos = Tranform.GetPosition(world, t);
+            var rot = Tranform.GetRotation(world, t);
+
+            view =  Mat4f.Inverted(Mat4f.CreateFromYawPitchRoll(rot.X, rot.Y, rot.Z) * Mat4f.CreateTranslation(pos.X, pos.Y, pos.Z));
         }
 
         private static int GetCameraImpl(int world, int entity)

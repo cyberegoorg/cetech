@@ -1,7 +1,7 @@
 import nanomsg
 import yaml
 
-import PyQt5.QtGui
+from PyQt5.QtGui import QCursor
 from PyQt5.QtCore import Qt, QThread
 from PyQt5.QtWidgets import QWidget
 from nanomsg import Socket, SUB, SUB_SUBSCRIBE
@@ -35,6 +35,7 @@ class ReadyLock(QThread):
             except nanomsg.NanoMsgAPIError as e:
                 raise
 
+
 class Widget(QWidget):
     def __init__(self, parent, api, log_url):
         self.api = api
@@ -44,9 +45,16 @@ class Widget(QWidget):
         self.ready_lock = ReadyLock(log_url, self)
         self.ready_lock.start(QThread.NormalPriority)
 
+        self.start_pos = None
+        self.move_skip = False
+
+        self.left = False
+        self.midle = False
+        self.right = False
+
         super(Widget, self).__init__(parent, Qt.ForeignWindow)
 
-        #self.setAttribute(Qt.WA_TransparentForMouseEvents)
+        self.setFocusPolicy(Qt.ClickFocus)
 
     def resizeEvent(self, event):
         if self.api and self.ready:
@@ -57,7 +65,7 @@ class Widget(QWidget):
 
     def _move_mouse(self, x, y, left, midle, right):
         self.api.send_command('lua.execute',
-                              script="EditorMouse:Move(%d, %d, %s, %s, %s)" % (x, y, left, midle, right))
+                              script="EditorInput:Move(%d, %d, %s, %s, %s)" % (x, y, left, midle, right))
 
     def mouseMoveEvent(self, event):
         """ QWidget.mouseMoveEvent(QMouseEvent) 
@@ -67,13 +75,70 @@ class Widget(QWidget):
         if not self.ready:
             return
 
+        if self.move_skip:
+            self.move_skip = False
+            return
+
+        if not self.start_pos:
+            self.start_pos = event.globalPos()
+
+        if self.left or self.right:
+            self.move_skip = True
+            QCursor.setPos(self.start_pos)
+
+        else:
+            self.start_pos = None
+
+        self._move_mouse(self.start_pos.x() - event.globalPos().x(),
+                         self.start_pos.y() - event.globalPos().y(),
+                         str(self.left).lower(), str(self.midle).lower(), str(self.right).lower())
+
+    def mousePressEvent(self, event):  # real signature unknown; restored from __doc__
+        """ QWidget.mousePressEvent(QMouseEvent) """
+
         buttons = event.buttons()
 
-        left = str(buttons == Qt.LeftButton).lower()
-        midle = str(buttons == Qt.MidButton).lower()
-        right = str(buttons == Qt.RightButton).lower()
+        self.left = buttons == Qt.LeftButton
+        self.midle = buttons == Qt.MidButton
+        self.right = buttons == Qt.RightButton
 
-        last_pos = self.last_pos
+        self.setCursor(Qt.BlankCursor)
 
-        actual_pos = (event.pos().x(), event.pos().y())
-        self._move_mouse(event.pos().x(), event.pos().y(), left, midle, right)
+    def mouseReleaseEvent(self, event):
+        """ QWidget.mouseReleaseEvent(QMouseEvent) """
+        buttons = event.buttons()
+
+        self.setCursor(Qt.ArrowCursor)
+
+    def keyPressEvent(self, event):
+        """ QWidget.keyPressEvent(QKeyEvent)
+        :type event: PyQt5.QtGui.QKeyEvent
+        """
+        btn = event.text()
+
+        btn_map = {
+            "w": "up",
+            "s": "down",
+            "a": "left",
+            "d": "right",
+        }
+
+        self.api.send_command('lua.execute',
+                              script="EditorInput.keyboard.%s = true" % (btn_map[btn]))
+
+
+    def keyReleaseEvent(self, event):
+        """ QWidget.keyReleaseEvent(QKeyEvent)
+        :type event: PyQt5.QtGui.QKeyEvent
+        """
+        btn = event.text()
+
+        btn_map = {
+            "w": "up",
+            "s": "down",
+            "a": "left",
+            "d": "right",
+        }
+
+        self.api.send_command('lua.execute',
+                              script="EditorInput.keyboard.%s = false" % (btn_map[btn]))

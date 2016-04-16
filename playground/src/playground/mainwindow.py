@@ -172,7 +172,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             self.ogl_dock.show()
 
         self.project.run_cetech_develop("LevelView", compile_=True, continue_=True, wid=wid,
-                                        bootscript=os.path.join("playground", "boot"))
+                                        bootscript="playground/leveleditor_boot")
 
         self.assetview_widget.open_project(self.project)
 

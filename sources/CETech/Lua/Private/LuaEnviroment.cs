@@ -93,7 +93,8 @@ namespace CETech.Lua
             _enviromentScript.Globals["Transform"] = new TransformSystemApi();
             _enviromentScript.Globals["Camera"] = new CameraApi();
 
-            _enviromentScript.Globals["Vec3f"] = new Vector3fApi();
+            _enviromentScript.Globals["Vec3f"] = typeof(Vec3f);
+            _enviromentScript.Globals["Mat4f"] = typeof (Mat4f);
 
             ConsoleServer.RegisterCommand("lua.execute", (args, response) =>
             {
@@ -238,6 +239,11 @@ namespace CETech.Lua
             public static Vec3f make(float x, float y, float z)
             {
                 return new Vec3f(x, y, z);
+            }
+
+            public static Vec3f Normalize(Vec3f v)
+            {
+                return Vec3f.Normalize(v);
             }
         }
 

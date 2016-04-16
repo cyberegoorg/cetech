@@ -1,5 +1,8 @@
+using MoonSharp.Interpreter;
+
 namespace CETech.CEMath
 {
+    [MoonSharpUserData]
     public struct Mat4f
     {
         public static readonly Mat4f Identity = new Mat4f(
@@ -236,6 +239,101 @@ namespace CETech.CEMath
             result.M33 = 1.0f - 2.0f*(yy + xx);
 
             return result;
+        }
+
+        public static Vec3f X(Mat4f m)
+        {
+            return new Vec3f(m.M11, m.M12, m.M13);
+        }
+
+        public static Vec3f Y(Mat4f m)
+        {
+            return new Vec3f(m.M21, m.M22, m.M23);
+        }
+
+        public static Vec3f Z(Mat4f m)
+        {
+            return new Vec3f(m.M31, m.M32, m.M33);
+        }
+
+
+        public static float GetDeterminant(Mat4f m)
+        {
+            float xx = m.M11;
+            float xy = m.M12;
+            float xz = m.M13;
+            float xw = m.M14;
+
+            float yx = m.M21;
+            float yy = m.M22;
+            float yz = m.M23;
+            float yw = m.M24;
+
+            float zx = m.M31;
+            float zy = m.M32;
+            float zz = m.M33;
+            float zw = m.M34;
+
+            float tx = m.M41;
+            float ty = m.M42;
+            float tz = m.M43;
+            float tw = m.M44;
+
+            float det = 0.0f;
+            det += +xx * (yy * (zz * tw - tz * zw) - zy * (yz * tw - tz * yw) + ty * (yz * zw - zz * yw));
+            det += -yx * (xy * (zz * tw - tz * zw) - zy * (xz * tw - tz * xw) + ty * (xz * zw - zz * xw));
+            det += +zx * (xy * (yz * tw - tz * yw) - yy * (xz * tw - tz * xw) + ty * (xz * yw - yz * xw));
+            det += -tx * (xy * (yz * zw - zz * yw) - yy * (xz * zw - zz * xw) + zy * (xz * yw - yz * xw));
+
+            return det;
+        }
+
+        public static Mat4f Inverted(Mat4f m)
+        {
+            float xx = m.M11;
+            float xy = m.M12;
+            float xz = m.M13;
+            float xw = m.M14;
+
+            float yx = m.M21;
+            float yy = m.M22;
+            float yz = m.M23;
+            float yw = m.M24;
+
+            float zx = m.M31;
+            float zy = m.M32;
+            float zz = m.M33;
+            float zw = m.M34;
+
+            float tx = m.M41;
+            float ty = m.M42;
+            float tz = m.M43;
+            float tw = m.M44;
+
+            float det = GetDeterminant(m);
+            float inv_det = 1.0f / det;
+
+            m.M11 = +(yy * (zz * tw - tz * zw) - zy * (yz * tw - tz * yw) + ty * (yz * zw - zz * yw)) * inv_det;
+            m.M12 = -(xy * (zz * tw - tz * zw) - zy * (xz * tw - tz * xw) + ty * (xz * zw - zz * xw)) * inv_det;
+            m.M13 = +(xy * (yz * tw - tz * yw) - yy * (xz * tw - tz * xw) + ty * (xz * yw - yz * xw)) * inv_det;
+            m.M14 = -(xy * (yz * zw - zz * yw) - yy * (xz * zw - zz * xw) + zy * (xz * yw - yz * xw)) * inv_det;
+
+            m.M21 = -(yx * (zz * tw - tz * zw) - zx * (yz * tw - tz * yw) + tx * (yz * zw - zz * yw)) * inv_det;
+            m.M22 = +(xx * (zz * tw - tz * zw) - zx * (xz * tw - tz * xw) + tx * (xz * zw - zz * xw)) * inv_det;
+            m.M23 = -(xx * (yz * tw - tz * yw) - yx * (xz * tw - tz * xw) + tx * (xz * yw - yz * xw)) * inv_det;
+            m.M24 = +(xx * (yz * zw - zz * yw) - yx * (xz * zw - zz * xw) + zx * (xz * yw - yz * xw)) * inv_det;
+
+            m.M31 = +(yx * (zy * tw - ty * zw) - zx * (yy * tw - ty * yw) + tx * (yy * zw - zy * yw)) * inv_det;
+            m.M32 = -(xx * (zy * tw - ty * zw) - zx * (xy * tw - ty * xw) + tx * (xy * zw - zy * xw)) * inv_det;
+            m.M33 = +(xx * (yy * tw - ty * yw) - yx * (xy * tw - ty * xw) + tx * (xy * yw - yy * xw)) * inv_det;
+            m.M34 = -(xx * (yy * zw - zy * yw) - yx * (xy * zw - zy * xw) + zx * (xy * yw - yy * xw)) * inv_det;
+
+            m.M41 = -(yx * (zy * tz - ty * zz) - zx * (yy * tz - ty * yz) + tx * (yy * zz - zy * yz)) * inv_det;
+            m.M42 = +(xx * (zy * tz - ty * zz) - zx * (xy * tz - ty * xz) + tx * (xy * zz - zy * xz)) * inv_det;
+            m.M43 = -(xx * (yy * tz - ty * yz) - yx * (xy * tz - ty * xz) + tx * (xy * yz - yy * xz)) * inv_det;
+            m.M44 = +(xx * (yy * zz - zy * yz) - yx * (xy * zz - zy * xz) + zx * (xy * yz - yy * xz)) * inv_det;
+
+            return m;
         }
 
         public static Mat4f operator *(Mat4f value1, Mat4f value2)

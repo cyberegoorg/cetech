@@ -182,6 +182,7 @@ class Project(object):
         process.start(cmd)
         process.waitForStarted()
 
+        print("spawn instance: %s" % name)
         print(cmd)
 
         instance = EngineInstance(name=name, process=process)
