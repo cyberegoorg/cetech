@@ -21,22 +21,23 @@ function FPSCamera:update(dt, dx, dy, left, right, up, down)
     local m_world = Transform.GetWorldMatrix(self.world, self.transform)
     local z_dir = Vec3f.Normalize(Mat4f.Z(m_world))
     local x_dir = Vec3f.Normalize(Mat4f.X(m_world))
-    local speed = 0.1 * dt
+
+    --Log.Debug("aaa", "{0}", dt)
 
     if up then
-        pos = pos - (z_dir * speed)
+        pos = pos - z_dir
     end
 
     if down then
-        pos = pos + (z_dir *  speed)
+        pos = pos + z_dir
     end
 
     if left then
-        pos = pos - (x_dir * speed)
+        pos = pos - x_dir
     end
 
     if right then
-        pos = pos + (x_dir * speed)
+        pos = pos + x_dir
     end
     Transform.SetPosition(self.world, self.transform, pos)
 end

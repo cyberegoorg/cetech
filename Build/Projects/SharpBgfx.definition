@@ -3,7 +3,7 @@
   <Platform Type="Windows">
     <Binary
       Name="ExternalLib"
-      Path="externals/build/windows64/Debug/lib/SharpBgfx.dll" />
+      Path="externals/build/windows64/Release/lib/SharpBgfx.dll" />
 
     <NativeBinary Path="externals/build/windows64/Debug/lib/bgfx.dll" />
     <NativeBinary Path="externals/build/windows64/Debug/lib/bgfx_debug.dll" />
@@ -15,7 +15,7 @@
   <Platform Type="Linux">
     <Binary
       Name="ExternalLib"
-      Path="externals/build/linux64/Debug/lib/SharpBgfx.dll" />
+      Path="externals/build/linux64/Release/lib/SharpBgfx.dll" />
 
     <NativeBinary Path="externals/build/linux64/Release/bin/shaderc"/>
     <NativeBinary Path="externals/build/linux64/Release/bin/texturec"/>
@@ -28,7 +28,7 @@
   <Platform Type="MacOS">
     <Binary
       Name="ExternalLib"
-      Path="externals/build/darwin64/Debug/lib/SharpBgfx.dll" />
+      Path="externals/build/darwin64/Release/lib/SharpBgfx.dll" />
 
     <NativeBinary Path="externals/build/darwin64/Release/bin/shaderc"/>
     <NativeBinary Path="externals/build/darwin64/Release/bin/texturec"/>
