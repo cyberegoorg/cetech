@@ -90,55 +90,62 @@ namespace CETech
 
             int[] tasks = new int[3];
 
+            var inv_fps = (1000.0f/60.0f);
+            var frame_acum = 0.0f;
             while (_run)
             {
                 //Debug.Assert(TaskManager.OpenTaskCount < 2);
-                DevelopSystem.FrameBegin();
+                ConsoleServer.Tick();
 
                 curent_frame_tick = DateTime.Now;
                 _deltaTime = (float) (curent_frame_tick - last_frame_tick).TotalMilliseconds;
                 last_frame_tick = curent_frame_tick;
 
-
-                DevelopSystem.PushRecordFloat("application.dt", _deltaTime);
-                var updateScope = DevelopSystem.EnterScope();
-
-                PlaformUpdateEvents();
-
-                tasks[0] = TaskManager.AddNull("frame");
-                tasks[1] = TaskManager.AddBegin("keyboard", delegate
+                frame_acum += _deltaTime;
+                if (frame_acum >= inv_fps)
                 {
-                    var scope = DevelopSystem.EnterScope();
-                    Keyboard.Process();
-                    DevelopSystem.LeaveScope("Keyboard", scope);
-                }, null,
-                    parent: tasks[0]);
+                    frame_acum = 0.0f;
 
-                tasks[2] = TaskManager.AddBegin("mouseTask", delegate
-                {
-                    var scope = DevelopSystem.EnterScope();
-                    Mouse.Process();
-                    DevelopSystem.LeaveScope("Mouse", scope);
-                }, null, parent: tasks[0]);
+                    DevelopSystem.FrameBegin();
+                    DevelopSystem.PushRecordFloat("application.dt", _deltaTime);
+                    var updateScope = DevelopSystem.EnterScope();
 
-                TaskManager.AddEnd(tasks);
-                TaskManager.Wait(tasks[0]);
+                    PlaformUpdateEvents();
 
-                {
-                    var scope = DevelopSystem.EnterScope();
-                    Game.Update(_deltaTime);
-                    DevelopSystem.LeaveScope("Game::Update", scope);
+                    tasks[0] = TaskManager.AddNull("frame");
+                    tasks[1] = TaskManager.AddBegin("keyboard", delegate
+                    {
+                        var scope = DevelopSystem.EnterScope();
+                        Keyboard.Process();
+                        DevelopSystem.LeaveScope("Keyboard", scope);
+                    }, null,
+                        parent: tasks[0]);
+
+                    tasks[2] = TaskManager.AddBegin("mouseTask", delegate
+                    {
+                        var scope = DevelopSystem.EnterScope();
+                        Mouse.Process();
+                        DevelopSystem.LeaveScope("Mouse", scope);
+                    }, null, parent: tasks[0]);
+
+                    TaskManager.AddEnd(tasks);
+                    TaskManager.Wait(tasks[0]);
+
+                    {
+                        var scope = DevelopSystem.EnterScope();
+                        Game.Update(_deltaTime);
+                        DevelopSystem.LeaveScope("Game::Update", scope);
+                    }
+
+                    Game.Render();
+
+                    _mainWindow.Update();
+
+                    DevelopSystem.LeaveScope("Application::Update", updateScope);
+                    DevelopSystem.PushRecordInt("gc.total_memory", (int)GC.GetTotalMemory(false));
+                    DevelopSystem.Send();
+
                 }
-
-                Game.Render();
-
-                _mainWindow.Update();
-
-                DevelopSystem.LeaveScope("Application::Update", updateScope);
-                DevelopSystem.PushRecordInt("gc.total_memory", (int) GC.GetTotalMemory(false));
-                DevelopSystem.Send();
-
-                ConsoleServer.Tick();
             }
 
             Game.Shutdown();
