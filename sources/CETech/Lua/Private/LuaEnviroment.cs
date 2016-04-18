@@ -84,20 +84,23 @@ namespace CETech.Lua
 
             _enviromentScript.Globals["Application"] = new ApplicationApi();
             _enviromentScript.Globals["Log"] = new LogApi();
+            _enviromentScript.Globals["Renderer"] = new RenderSystemApi();
+            _enviromentScript.Globals["Package"] = new PackageManagerApi();
 
             _enviromentScript.Globals["Keyboard"] = new KeyboardApi();
             _enviromentScript.Globals["Mouse"] = new MouseApi();
             _enviromentScript.Globals["Gamepad"] = new GamepadApi();
-
-            _enviromentScript.Globals["Package"] = new PackageManagerApi();
+            
             _enviromentScript.Globals["World"] = new WorldApi();
             _enviromentScript.Globals["Unit"] = new UnitManagerApi();
-            _enviromentScript.Globals["Renderer"] = new RenderSystemApi();
             _enviromentScript.Globals["Transform"] = new TransformSystemApi();
             _enviromentScript.Globals["Camera"] = new CameraApi();
 
+            _enviromentScript.Globals["Vec2f"] = typeof(Vec2f);
             _enviromentScript.Globals["Vec3f"] = typeof(Vec3f);
-            _enviromentScript.Globals["Mat4f"] = typeof (Mat4f);
+            _enviromentScript.Globals["Vec4f"] = typeof(Vec4f);
+            _enviromentScript.Globals["Mat4f"] = typeof(Mat4f);
+            _enviromentScript.Globals["Quatf"] = typeof(Quatf);
 
             ConsoleServer.RegisterCommand("lua.execute", (args, response) =>
             {

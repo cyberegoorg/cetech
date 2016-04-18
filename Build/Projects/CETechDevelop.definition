@@ -41,6 +41,7 @@
     </Compile>
     <Compile Include="CEMath\Mat4f.cs" />
     <Compile Include="CEMath\Math.cs" />
+    <Compile Include="CEMath\Quatf.cs" />
     <Compile Include="CEMath\Vec2f.cs" />
     <Compile Include="CEMath\Vec3f.cs" />
     <Compile Include="CEMath\Vec4f.cs" />

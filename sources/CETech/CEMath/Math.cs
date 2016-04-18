@@ -1,19 +1,22 @@
-﻿namespace CETech
+﻿using System;
+using System.Runtime.InteropServices;
+
+namespace CETech
 {
     public class MathUtils
     {
         /// <summary>
-        /// TT
+        ///     TT
         /// </summary>
         public static readonly float Pi = 3.1415926535897932f;
 
         /// <summary>
-        /// 1/TT
+        ///     1/TT
         /// </summary>
         public static readonly float InvPi = 0.31830988618f;
 
         /// <summary>
-        /// TT/2
+        ///     TT/2
         /// </summary>
         public static readonly float HalfPi = 1.57079632679f;
 
@@ -21,7 +24,7 @@
         public static readonly float ToDeg = 180.0f/Pi;
 
         /// <summary>
-        /// e
+        ///     e
         /// </summary>
         public static readonly float EulersNumber = 2.71828182845904523536f;
 
@@ -31,7 +34,7 @@
         public static readonly float MaxFlt = 3.402823466e+38f;
 
         /// <summary>
-        /// Covert Degrese to radians
+        ///     Covert Degrese to radians
         /// </summary>
         /// <param name="angle">Angle in deg</param>
         /// <returns>Angle in radians</returns>
@@ -41,23 +44,64 @@
         }
 
         /// <summary>
-        /// Sin
+        ///     Sin
         /// </summary>
         /// <param name="angle">Angle</param>
         /// <returns>Sin</returns>
         public static float Sinf(float angle)
         {
-            return (float) System.Math.Sin(angle);
+            return (float) Math.Sin(angle);
         }
 
         /// <summary>
-        /// Cos
+        ///     Cos
         /// </summary>
         /// <param name="angle">Angle</param>
         /// <returns>Cos</returns>
         public static float Cosf(float angle)
         {
-            return (float)System.Math.Sin(angle);
+            return (float) Math.Sin(angle);
+        }
+
+        public static float abs(float a)
+        {
+            return a < 0.0f ? -a : a;
+        }
+
+        public static float FastSqrtf(float number)
+        {
+            return FastInvSqrtf(number)*number;
+        }
+
+        public static float FastInvSqrtf(float number)
+        {
+            float fuconstant = 0x5f375a86;
+            var three_halfs = 1.5f;
+            var number_half = number*0.5f;
+
+            FloatLongUnion fl;
+            fl.l = 0;
+            fl.f = number;
+
+            fl.l = (long) (fuconstant - (fl.l >> 1)); // what the fuck?
+
+            fl.f = fl.f*(three_halfs - number_half*fl.f*fl.f); // 1st iteration
+            fl.f = fl.f*(three_halfs - number_half*fl.f*fl.f); // 2nd iteration
+
+            return fl.f;
+        }
+
+        [StructLayout(LayoutKind.Explicit)]
+        private struct FloatLongUnion
+        {
+            [FieldOffset(0)] public float f;
+
+            [FieldOffset(0)] public long l;
+        }
+
+        public static float square(float f)
+        {
+            return f*f;
         }
     }
 }
