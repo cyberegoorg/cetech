@@ -17,19 +17,19 @@ namespace CETech.Lua.Api
             return Mouse.ButtonName(buttonIndex);
         }
 
-        public static bool State(int buttonIndex)
+        public static bool ButtonState(int buttonIndex)
         {
-            return Mouse.State(buttonIndex);
+            return Mouse.ButtonState(buttonIndex);
         }
 
-        public static bool Pressed(int buttonIndex)
+        public static bool ButtonPressed(int buttonIndex)
         {
-            return Mouse.Pressed(buttonIndex);
+            return Mouse.ButtonPressed(buttonIndex);
         }
 
-        public static bool Released(int buttonIndex)
+        public static bool ButtonReleased(int buttonIndex)
         {
-            return Mouse.Released(buttonIndex);
+            return Mouse.ButtonReleased(buttonIndex);
         }
 
         public static Vec2f Axis(string name)
