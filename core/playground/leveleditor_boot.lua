@@ -10,7 +10,7 @@ function Editor:init()
     self.camera_unit = Unit.Spawn(self.world, "camera")
     self.camera = Camera.GetCamera(self.world, self.camera_unit)
     self.camera_transform = Transform.GetTransform(self.world, self.camera_unit)
-    self.fps_camera = FPSCamera(self.world, self.camera_unit)
+    self.fps_camera = FPSCamera(self.world, self.camera_unit, true)
 
     Transform.SetPosition(self.world, self.camera_transform, Vec3f.make(0.0, 0.0, -10))
 
@@ -27,12 +27,19 @@ function Editor:update(dt)
     local dx = 0
     local dy = 0
 
-    if EditorInput.left then
-        dx = EditorInput.delta_x * 0.01
-        dy = EditorInput.delta_y * 0.01
+    if EditorInput.mouse.left then
+        dx = EditorInput.mouse.dx * 0.01
+        dy = EditorInput.mouse.dy * 0.01
     end
 
-    self.fps_camera:update(dt, dx, dy, EditorInput.keyboard.left, EditorInput.keyboard.right, EditorInput.keyboard.up, EditorInput.keyboard.down)
+    local leftdown = 0.0
+    local updown = 0.0
+    if EditorInput.keyboard.left then leftdown = -1.0 end
+    if EditorInput.keyboard.right then leftdown = 1.0 end
+    if EditorInput.keyboard.up then updown = -1.0 end
+    if EditorInput.keyboard.down then updown = 1.0 end
+
+    self.fps_camera:update(dt, dx, dy, updown, leftdown)
     EditorInput:ResetButtons()
 
     World.Update(self.world, dt)

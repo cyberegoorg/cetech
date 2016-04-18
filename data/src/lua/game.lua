@@ -31,9 +31,6 @@ function Game:init()
     self.fps_camera = FPSCamera(self.world, self.camera_unit)
     Unit.Spawn(self.world, "unit11");
 
-    Log.Info("sadsadas", "{0}", self.unit);
-    Log.Info("sadsadas", "{0}", self.unit2);
-
     self.debug = false
     self.capture = false
     self.switch_unit = false
@@ -95,7 +92,26 @@ function Game:update(dt)
     local left = Keyboard.State(Keyboard.ButtonIndex('a'))
     local right = Keyboard.State(Keyboard.ButtonIndex('d'))
 
-    self.fps_camera:update(dt, dx * 0.01, dy * 0.01, left, right, up, down)
+    local updown = 0.0
+    local leftdown = 0.0
+    if up then updown = -1.0 end
+    if down then updown = 1.0 end
+    if left then leftdown = -1.0 end
+    if right then leftdown = 1.0 end
+
+    self.fps_camera:update(dt, dx * 0.01, dy * 0.01, updown, leftdown)
+
+    local right_a = Gamepad.Axis(0, Gamepad.AxisIndex("right"))
+    local left_a = Gamepad.Axis(0, Gamepad.AxisIndex("left"))
+
+    self.fps_camera:update(dt, right_a.X*-0.1, right_a.Y*-0.1, left_a.Y, left_a.X)
+
+    if Gamepad.ButtonState(0, Gamepad.ButtonIndex("right_shoulder")) then
+        self.fps_camera.fly_mode = true
+    else
+        self.fps_camera.fly_mode = false
+    end
+
     World.Update(self.world, dt)
     --print("%f, %f", m_axis.x, m_axis.y)
     --print(dt)

@@ -66,8 +66,11 @@
     <Compile Include="FileSystem\Private\FileSystem.cs" />
     <Compile Include="Game\Game.cs" />
     <Compile Include="Game\Private\Game.cs" />
+    <Compile Include="Input\Gamepad.cs" />
     <Compile Include="Input\Keyboard.cs" />
     <Compile Include="Input\Mouse.cs" />
+    <Compile Include="Input\Private\GamepadSDL.cs" />
+    <Compile Include="Input\Private\GamepadSDLDB.cs" />
     <Compile Include="Input\Private\KeyboardSDL.cs">
       <Services>SDL2</Services>
     </Compile>
@@ -78,6 +81,7 @@
     <Compile Include="Lua\LuaResource.cs" />
     <Compile Include="Lua\Private\Api\ApplicationApi.cs" />
     <Compile Include="Lua\Private\Api\Camera.cs" />
+    <Compile Include="Lua\Private\Api\GamepadApi.cs" />
     <Compile Include="Lua\Private\Api\KeyboardApi.cs" />
     <Compile Include="Lua\Private\Api\LogApi.cs" />
     <Compile Include="Lua\Private\Api\MouseApi.cs" />

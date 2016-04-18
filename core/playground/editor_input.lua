@@ -1,12 +1,14 @@
 EditorInput = EditorInput or {}
 
 function EditorInput:Init()
-    self.delta_x = 0
-    self.delta_y = 0
+    self.mouse = {
+        dx = 0,
+        dy = 0,
 
-    self.left = false
-    self.midle = false
-    self.right = false
+        left = false,
+        right = false,
+        midle = false
+    }
 
     self.keyboard = {
         up = false,
@@ -17,16 +19,16 @@ function EditorInput:Init()
 end
 
 function EditorInput:Move(dx, dy, left, midle, right)
-    self.delta_x = dx;
-    self.delta_y = dy;
+    self.mouse.dx = dx;
+    self.mouse.dy = dy;
 
-    self.left = left
-    self.midle = midle
-    self.right = right
+    self.mouse.left = left
+    self.mouse.midle = midle
+    self.mouse.right = right
 end
 
 function EditorInput:ResetButtons()
-    self.left = false
-    self.midle = false
-    self.right = false
+    self.mouse.left = false
+    self.mouse.midle = false
+    self.mouse.right = false
 end
