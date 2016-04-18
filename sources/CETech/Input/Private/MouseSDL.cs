@@ -1,4 +1,5 @@
-﻿using CETech.CEMath;
+﻿using System;
+using CETech.CEMath;
 using SDL2;
 
 // ReSharper disable once CheckNamespace
@@ -9,9 +10,15 @@ namespace CETech.Input
     {
         private static int _buttonStates;
         private static int _buttonStatesLast;
-        private static Vec2f _position;
-        private static Vec2f _dt_position;
+        private static Vec3f _position;
+        private static Vec3f _dt_position;
 
+        private enum MouseAxis
+        {
+            Invalid = 0,
+            Absolute = 1,
+            Delta = 2
+        }
 
         private static void InitImpl()
         {
@@ -77,19 +84,34 @@ namespace CETech.Input
             return (_buttonStates & buttonIndex) == 0 && (_buttonStatesLast & buttonIndex) == 1;
         }
 
-        private static Vec2f AxisImpl(string name)
+        private static Vec3f AxisImpl(int axisIndex)
         {
-            if (name == "abs")
+            switch ((MouseAxis)axisIndex)
             {
-                return _position;
-            }
+                case MouseAxis.Absolute:
+                    return _position;
 
-            if (name == "delta")
+                case MouseAxis.Delta:
+                    return _dt_position;
+
+                default:
+                    return Vec3f.Zero;
+            }
+        }
+
+        public static int AxisIndex(string axisName)
+        {
+            switch (axisName)
             {
-                return _dt_position;
-            }
+                case "absolute":
+                    return (int) MouseAxis.Absolute;
 
-            return Vec2f.Zero;
+                case "delta":
+                    return (int) MouseAxis.Delta;
+
+                default:
+                    return (int) MouseAxis.Invalid;
+            }
         }
     }
 }
