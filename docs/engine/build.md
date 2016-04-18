@@ -43,6 +43,6 @@ $ python build.py -d
 
 #### Optional
 
-* Generate project ```$ ptyhon build.py -g```
+* Generate project ```$ python build.py -g```
 * Open solution ```CETech.Windows.sln``` .
 * Build solution
