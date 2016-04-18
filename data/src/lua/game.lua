@@ -79,11 +79,10 @@ function Game:update(dt)
       RenderSystem.SaveScreenShot("screenshot");
     end
 
-
     local dx = 0
     local dy = 0
-    if Mouse.ButtonState(Mouse.ButtonIndex("left") ) then
-        local m_axis = Mouse.axis("delta")
+    if Mouse.ButtonState(Mouse.ButtonIndex("left")) then
+        local m_axis = Mouse.Axis(Mouse.AxisIndex("delta"))
         dx, dy = m_axis.X, m_axis.Y
     end
 

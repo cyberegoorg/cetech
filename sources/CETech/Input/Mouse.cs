@@ -73,9 +73,9 @@ namespace CETech.Input
             return ButtonReleasedImpl(buttonIndex);
         }
 
-        public static Vec2f Axis(string name)
+        public static Vec3f Axis(int axisIndex)
         {
-            return AxisImpl(name);
+            return AxisImpl(axisIndex);
         }
     }
 }
