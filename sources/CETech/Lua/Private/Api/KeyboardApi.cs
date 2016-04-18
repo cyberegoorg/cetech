@@ -16,19 +16,19 @@ namespace CETech.Lua.Api
             return Keyboard.ButtonName(buttonIndex);
         }
 
-        public static bool State(int buttonIndex)
+        public static bool ButtonState(int buttonIndex)
         {
-            return Keyboard.State(buttonIndex);
+            return Keyboard.ButtonState(buttonIndex);
         }
 
-        public static bool Pressed(int buttonIndex)
+        public static bool ButtonPressed(int buttonIndex)
         {
-            return Keyboard.Pressed(buttonIndex);
+            return Keyboard.ButtonPressed(buttonIndex);
         }
 
-        public static bool Released(int buttonIndex)
+        public static bool ButtonReleased(int buttonIndex)
         {
-            return Keyboard.Released(buttonIndex);
+            return Keyboard.ButtonReleased(buttonIndex);
         }
     }
 }

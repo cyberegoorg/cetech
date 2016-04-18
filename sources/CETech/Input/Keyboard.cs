@@ -47,9 +47,9 @@
         /// </summary>
         /// <param name="buttonIndex">Button index</param>
         /// <returns>True if button is now down</returns>
-        public static bool State(int buttonIndex)
+        public static bool ButtonState(int buttonIndex)
         {
-            return StateImpl(buttonIndex);
+            return ButtonStateImpl(buttonIndex);
         }
 
         /// <summary>
@@ -57,9 +57,9 @@
         /// </summary>
         /// <param name="buttonIndex">Button index</param>
         /// <returns>True if button is pressed</returns>
-        public static bool Pressed(int buttonIndex)
+        public static bool ButtonPressed(int buttonIndex)
         {
-            return PressedImpl(buttonIndex);
+            return ButtonPressedImpl(buttonIndex);
         }
 
         /// <summary>
@@ -67,9 +67,9 @@
         /// </summary>
         /// <param name="buttonIndex">Button index</param>
         /// <returns>True if button is released</returns>
-        public static bool Released(int buttonIndex)
+        public static bool ButtonReleased(int buttonIndex)
         {
-            return ReleasedImpl(buttonIndex);
+            return ButtonReleasedImpl(buttonIndex);
         }
     }
 }

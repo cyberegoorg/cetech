@@ -42,21 +42,21 @@ function Game:shutdown()
 end
 
 function Game:update(dt)
-    if Keyboard.Pressed(Keyboard.ButtonIndex('r')) then
+    if Keyboard.ButtonPressed(Keyboard.ButtonIndex('r')) then
         Application.RecompileAll()
         Application.ReloadAll()
     end
 
-    if Keyboard.Pressed(quit_btn) then
+    if Keyboard.ButtonPressed(quit_btn) then
         Application.Quit()
     end
 
-    if Keyboard.Pressed(Keyboard.ButtonIndex('f9')) then
+    if Keyboard.ButtonPressed(Keyboard.ButtonIndex('f9')) then
       self.debug = not self.debug;
       Renderer.SetDebug(self.debug)
     end
 
-    if Keyboard.Pressed(Keyboard.ButtonIndex('f8')) then
+    if Keyboard.ButtonPressed(Keyboard.ButtonIndex('f8')) then
       self.switch_unit = not self.switch_unit
       if self.switch_unit then
         self.unit = self.level_unit
@@ -65,7 +65,7 @@ function Game:update(dt)
       end
     end
 
-    if Keyboard.Pressed(Keyboard.ButtonIndex('f10')) then
+    if Keyboard.ButtonPressed(Keyboard.ButtonIndex('f10')) then
       self.capture = not self.capture;
 
       if self.capture then
@@ -75,22 +75,22 @@ function Game:update(dt)
       end
     end
 
-    if Keyboard.Pressed(Keyboard.ButtonIndex('f11')) then
+    if Keyboard.ButtonPressed(Keyboard.ButtonIndex('f11')) then
       RenderSystem.SaveScreenShot("screenshot");
     end
 
 
     local dx = 0
     local dy = 0
-    if Mouse.State(Mouse.ButtonIndex("left") ) then
+    if Mouse.ButtonState(Mouse.ButtonIndex("left") ) then
         local m_axis = Mouse.axis("delta")
         dx, dy = m_axis.X, m_axis.Y
     end
 
-    local up = Keyboard.State(Keyboard.ButtonIndex('w'))
-    local down = Keyboard.State(Keyboard.ButtonIndex('s'))
-    local left = Keyboard.State(Keyboard.ButtonIndex('a'))
-    local right = Keyboard.State(Keyboard.ButtonIndex('d'))
+    local up = Keyboard.ButtonState(Keyboard.ButtonIndex('w'))
+    local down = Keyboard.ButtonState(Keyboard.ButtonIndex('s'))
+    local left = Keyboard.ButtonState(Keyboard.ButtonIndex('a'))
+    local right = Keyboard.ButtonState(Keyboard.ButtonIndex('d'))
 
     local updown = 0.0
     local leftdown = 0.0

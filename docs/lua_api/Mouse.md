@@ -42,7 +42,7 @@ Argument       | Typ | Popis
 ---------------|-----|---------------
 `index` | int | Button index
 
-### State(index)
+### ButtonState(index)
 
 Return `true` if button is down in actual frame.
 
@@ -50,7 +50,7 @@ Argument      | Typ | Popis
 --------------|-----|--------------
 `index` | int | Button index
 
-### Pressed(index)
+### ButtonPressed(index)
 
 Return `true` if button is not down in last frame and now is.
 
@@ -58,7 +58,7 @@ Argument      | Typ | Popis
 --------------|-----|--------------
 `index` | int | Button index
 
-### Released(index)
+### ButtonReleased(index)
 
 Return `true` if button is down in last frame and now is not.
 

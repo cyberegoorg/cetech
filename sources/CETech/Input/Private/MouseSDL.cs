@@ -62,17 +62,17 @@ namespace CETech.Input
             return buttonIndex == SDL.SDL_BUTTON_RMASK ? "right" : "";
         }
 
-        private static bool StateImpl(int buttonIndex)
+        private static bool ButtonStateImpl(int buttonIndex)
         {
             return (_buttonStates & buttonIndex) > 0;
         }
 
-        private static bool PressedImpl(int buttonIndex)
+        private static bool ButtonPressedImpl(int buttonIndex)
         {
             return (_buttonStates & buttonIndex) == 1 && (_buttonStatesLast & buttonIndex) == 0;
         }
 
-        private static bool ReleasedImpl(int buttonIndex)
+        private static bool ButtonReleasedImpl(int buttonIndex)
         {
             return (_buttonStates & buttonIndex) == 0 && (_buttonStatesLast & buttonIndex) == 1;
         }
