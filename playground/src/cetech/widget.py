@@ -123,8 +123,9 @@ class Widget(QWidget):
             "d": "right",
         }
 
-        self.api.send_command('lua.execute',
-                              script="EditorInput.keyboard.%s = true" % (btn_map[btn]))
+        if btn in btn_map:
+            self.api.send_command('lua.execute',
+                                  script="EditorInput.keyboard.%s = true" % (btn_map[btn]))
 
 
     def keyReleaseEvent(self, event):
@@ -140,5 +141,6 @@ class Widget(QWidget):
             "d": "right",
         }
 
-        self.api.send_command('lua.execute',
-                              script="EditorInput.keyboard.%s = false" % (btn_map[btn]))
+        if btn in btn_map:
+            self.api.send_command('lua.execute',
+                                  script="EditorInput.keyboard.%s = false" % (btn_map[btn]))

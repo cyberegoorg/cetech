@@ -84,8 +84,11 @@ namespace CETech.Lua
 
             _enviromentScript.Globals["Application"] = new ApplicationApi();
             _enviromentScript.Globals["Log"] = new LogApi();
+
             _enviromentScript.Globals["Keyboard"] = new KeyboardApi();
             _enviromentScript.Globals["Mouse"] = new MouseApi();
+            _enviromentScript.Globals["Gamepad"] = new GamepadApi();
+
             _enviromentScript.Globals["Package"] = new PackageManagerApi();
             _enviromentScript.Globals["World"] = new WorldApi();
             _enviromentScript.Globals["Unit"] = new UnitManagerApi();

@@ -22,8 +22,101 @@ def validate_project(project_dir):
 
 
 class EngineInstance(object):
-    def __init__(self, name, process):
+    BUILD_DEVELOP = 'Develop'
+    BUILD_RELEASE = 'Release'
+
+    _BIN_PLATFORM = {
+        'windows': 'Windows',
+        'linux': 'Linux'
+    }
+
+    _ENGINE_BIN = {
+        BUILD_DEVELOP: 'CETechDevelop.exe',
+        BUILD_RELEASE: 'CETech.exe'
+    }
+
+    _BUILD_DIR = {
+        BUILD_DEVELOP: 'Debug',
+        BUILD_RELEASE: 'Release'
+    }
+
+    def __init__(self, name):
         self.name = name
+
+        self.process = None
+
+    def get_lib_path(self, build_type):
+        _platform = platform.system().lower()
+
+        engine_bin_path = os.path.join('..', 'sources', 'CETech', 'bin', self._BIN_PLATFORM[_platform], 'AnyCPU',
+                                       'Debug')
+        return engine_bin_path
+
+    def get_executable_path(self, build_type):
+        engine_bin_path = os.path.join(self.get_lib_path(build_type), self._ENGINE_BIN[build_type])
+        return engine_bin_path
+
+    def run_cetech_release(self, build_dir):
+        args = [
+            "-b %s" % build_dir,
+        ]
+
+        return self._run_cetech(self.BUILD_RELEASE, args)
+
+    def run_cetech_develop(self, build_dir, source_dir, compile_=False, continue_=False, wait=False, daemon=False,
+                           wid=None,
+                           core_dir=None, port=None, bootscript=None):
+        args = [
+            "-b %s" % build_dir,
+            "-s %s" % source_dir
+        ]
+
+        if compile_:
+            args.append("--compile")
+            # args.append("--bin %s" % self.get_lib_path(self.BUILD_DEVELOP))
+
+        if continue_:
+            args.append("--continue")
+
+        if wait:
+            args.append("-wait")
+
+        if bootscript:
+            args.append("--bootscript %s" % bootscript)
+
+        if daemon:
+            args.append("--daemon")
+
+        if port:
+            args.append("--port %s" % port)
+
+        # TODO bug #114 workaround. Disable create sub engine...
+        if wid and platform.system().lower() != 'darwin':
+            args.append("--wid %s" % int(wid))
+
+        if core_dir:
+            args.append("--core %s" % core_dir)
+        else:
+            args.append("--core ../core")  # TODO ?
+
+        self._run_cetech(self.BUILD_DEVELOP, args)
+
+    def _run_cetech(self, build_type, args):
+        if platform.system().lower() != 'windows':
+            cmd = "mono %s %s" % (self.get_executable_path(build_type), ' '.join(args))
+        else:
+            cmd = "%s %s" % (self.get_executable_path(build_type), ' '.join(args))
+
+        process = QProcess()
+
+        if platform.system().lower() != 'windows':
+            process_env = QProcessEnvironment.systemEnvironment()
+            process_env.insert("LD_LIBRARY_PATH", self.get_lib_path(build_type))
+            process.setProcessEnvironment(process_env)
+
+        process.start(cmd)
+        process.waitForStarted()
+
         self.process = process
 
     def kill(self, dump=False):
@@ -45,24 +138,6 @@ class EngineInstance(object):
 
 
 class Project(object):
-    BUILD_DEVELOP = 'Develop'
-    BUILD_RELEASE = 'Release'
-
-    _BIN_PLATFORM = {
-        'windows': 'Windows',
-        'linux': 'Linux'
-    }
-
-    _ENGINE_BIN = {
-        BUILD_DEVELOP: 'CETechDevelop.exe',
-        BUILD_RELEASE: 'CETech.exe'
-    }
-
-    _BUILD_DIR = {
-        BUILD_DEVELOP: 'Debug',
-        BUILD_RELEASE: 'Release'
-    }
-
     def __init__(self):
         self.name = None
         self.project_dir = None
@@ -109,83 +184,22 @@ class Project(object):
         for instance in self.instances.values():
             instance.kill(dump=dump)
 
-    def get_lib_path(self, build_type):
-        _platform = platform.system().lower()
-
-        engine_bin_path = os.path.join('..', 'sources', 'CETech', 'bin', self._BIN_PLATFORM[_platform], 'AnyCPU',
-                                       'Debug')
-        return engine_bin_path
-
-    def get_executable_path(self, build_type):
-        engine_bin_path = os.path.join(self.get_lib_path(build_type), self._ENGINE_BIN[build_type])
-        return engine_bin_path
-
     def run_cetech_release(self, name):
-        args = [
-            "-b %s" % self.build_dir,
-        ]
+        instance = EngineInstance(name)
+        self.instances[name] = instance
 
-        return self._run_cetech(name, self.BUILD_RELEASE, args)
+        instance.run_cetech_release(self.build_dir)
+
+        return instance
 
     def run_cetech_develop(self, name, compile_=False, continue_=False, wait=False, daemon=False, wid=None,
                            core_dir=None, port=None, bootscript=None):
-        args = [
-            "-b %s" % self.build_dir,
-            "-s %s" % self.source_dir
-        ]
 
-        if compile_:
-            args.append("--compile")
-            #args.append("--bin %s" % self.get_lib_path(self.BUILD_DEVELOP))
-
-        if continue_:
-            args.append("--continue")
-
-        if wait:
-            args.append("-wait")
-
-        if bootscript:
-            args.append("--bootscript %s" % bootscript)
-
-        if daemon:
-            args.append("--daemon")
-
-        if port:
-            args.append("--port %s" % port)
-
-        # TODO bug #114 workaround. Disable create sub engine...
-        if wid and platform.system().lower() != 'darwin':
-            args.append("--wid %s" % int(wid))
-
-        if core_dir:
-            args.append("--core %s" % core_dir)
-        else:
-            args.append("--core ../core")  # TODO ?
-
-        # bin_dir
-
-        return self._run_cetech(name, self.BUILD_DEVELOP, args)
-
-    def _run_cetech(self, name, build_type, args):
-        if platform.system().lower() != 'windows':
-            cmd = "mono %s %s" % (self.get_executable_path(build_type), ' '.join(args))
-        else:
-            cmd = "%s %s" % (self.get_executable_path(build_type), ' '.join(args))
-
-        process = QProcess()
-
-        if platform.system().lower() != 'windows':
-            process_env = QProcessEnvironment.systemEnvironment()
-            process_env.insert("LD_LIBRARY_PATH", self.get_lib_path(build_type))
-            process.setProcessEnvironment(process_env)
-
-        process.start(cmd)
-        process.waitForStarted()
-
-        print("spawn instance: %s" % name)
-        print(cmd)
-
-        instance = EngineInstance(name=name, process=process)
+        instance = EngineInstance(name)
         self.instances[name] = instance
+
+        instance.run_cetech_develop(self.build_dir, self.source_dir, compile_=compile_, continue_=continue_, wait=wait,
+                                    daemon=daemon, wid=wid,
+                                    core_dir=core_dir, port=port, bootscript=bootscript)
 
         return instance

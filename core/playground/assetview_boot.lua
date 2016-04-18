@@ -26,17 +26,17 @@ end
 
 function AssetView:update(dt)
     if self.actual_asset_unit then
-        if EditorInput.left then
+        if EditorInput.mouse.left then
             local transform = Transform.GetTransform(self.world,  self.actual_asset_unit)
             local rot = Transform.GetRotation(self.world, transform)
-            rot.X = rot.X + EditorInput.delta_x * 0.01
-            rot.Y = rot.Y + EditorInput.delta_y * 0.01
+            rot.X = rot.X + EditorInput.mouse.dx * 0.01
+            rot.Y = rot.Y + EditorInput.mouse.dy * 0.01
             Transform.SetRotation(self.world, transform, rot)
         end
 
-        if EditorInput.right then
+        if EditorInput.mouse.right then
             local pos = Transform.GetPosition(self.world,  self.camera_transform)
-            pos.Z = pos.Z + EditorInput.delta_y * -0.9
+            pos.Z = pos.Z + EditorInput.mouse.dy * -0.9
             Transform.SetPosition(self.world, self.camera_transform, pos)
         end
 

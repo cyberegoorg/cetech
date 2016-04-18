@@ -1,4 +1,5 @@
 ﻿using System.Runtime.InteropServices;
+using CETech.Utils;
 using SDL2;
 
 // ReSharper disable once CheckNamespace

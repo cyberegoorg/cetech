@@ -5,7 +5,7 @@ using System.Text.RegularExpressions;
 namespace System.Yaml
 {
     /// <summary>
-    ///     <para>When <see cref="Parser&lt;State&gt;" /> reports syntax error by exception, this class is thrown.</para>
+    ///     <para>When <see cref="Parser&lt;ButtonState&gt;" /> reports syntax error by exception, this class is thrown.</para>
     ///     <para>Sytax errors can also be reported by simply returing false with giving some warnings.</para>
     /// </summary>
     internal class ParseErrorException : Exception

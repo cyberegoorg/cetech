@@ -6,6 +6,7 @@ using CETech.CEMath;
 using CETech.Develop;
 using CETech.Utils;
 using CETech.World;
+using SDL2;
 using SharpBgfx;
 
 namespace CETech
@@ -97,7 +98,7 @@ namespace CETech
         {
             if (_data.NeedResize)
             {
-                Bgfx.Reset(_data.ResizeW, _data.ResizeH, Capture ? ResetFlags.Capture : 0);
+                Bgfx.Reset(_data.ResizeW, _data.ResizeH, (Capture ? ResetFlags.Capture : 0) | ResetFlags.Vsync);
                 _data.NeedResize = false;
             }
 
@@ -117,7 +118,6 @@ namespace CETech
 
             PrimitiveMeshRenderer.RenderWorld(world);
 
-
             var frame = Bgfx.Frame();
 
 #if CETECH_DEVELOP
@@ -126,6 +126,7 @@ namespace CETech
             DevelopSystem.PushRecordFloat("renderer.cpu_elapsed", (float) stats.CpuElapsed.TotalMilliseconds);
             DevelopSystem.PushRecordFloat("renderer.gpu_elapsed", (float) stats.GpuElapsed.TotalMilliseconds);
 #endif
+
         }
 
         private static void SetDebugImpl(bool enabled)

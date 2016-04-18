@@ -88,9 +88,9 @@ namespace CETech
             DateTime curent_frame_tick;
 			Log.Info ("application.ready", "");
 
-            int[] tasks = new int[3];
+            int[] tasks = new int[2];
 
-            var inv_fps = (1000.0f/60.0f);
+            var inv_fps = (1000.0f/120.0f);
             var frame_acum = 0.0f;
             while (_run)
             {
@@ -113,20 +113,17 @@ namespace CETech
                     PlaformUpdateEvents();
 
                     tasks[0] = TaskManager.AddNull("frame");
-                    tasks[1] = TaskManager.AddBegin("keyboard", delegate
+                    tasks[1] = TaskManager.AddBegin("input", delegate
                     {
                         var scope = DevelopSystem.EnterScope();
+
+                        Mouse.Process();
                         Keyboard.Process();
-                        DevelopSystem.LeaveScope("Keyboard", scope);
+                        Gamepad.Process();
+
+                        DevelopSystem.LeaveScope("input", scope);
                     }, null,
                         parent: tasks[0]);
-
-                    tasks[2] = TaskManager.AddBegin("mouseTask", delegate
-                    {
-                        var scope = DevelopSystem.EnterScope();
-                        Mouse.Process();
-                        DevelopSystem.LeaveScope("Mouse", scope);
-                    }, null, parent: tasks[0]);
 
                     TaskManager.AddEnd(tasks);
                     TaskManager.Wait(tasks[0]);
@@ -429,6 +426,7 @@ namespace CETech
 
             Keyboard.Init();
             Mouse.Init();
+            Gamepad.Init();
 
             Window main_window;
 
