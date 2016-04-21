@@ -19,14 +19,17 @@ function FPSCamera:update(dt, dx, dy, updown, leftright)
     local pos = Transform.GetPosition(self.world, self.transform)
     local rot = Transform.GetRotation(self.world, self.transform)
 
-    rot.X = rot.X + dx
-    rot.Y = rot.Y + dy
-    Transform.SetRotation(self.world, self.transform, rot)
-
     local m_world = Transform.GetWorldMatrix(self.world, self.transform)
     local z_dir = Mat4f.Z(m_world)
     local x_dir = Mat4f.X(m_world)
 
+    -- Rotation
+    local rotation_around_world_up = Quatf.FromAxisAngle(Vec3f.UnitY, dx * 1.0)
+    local rotation_around_camera_right = Quatf.FromAxisAngle(x_dir, dy * -1.0)
+    local rotation = rotation_around_camera_right * rotation_around_world_up
+    Transform.SetRotation(self.world, self.transform, rot * rotation)
+
+    -- Position
     if not self.fly_mode then
         z_dir.Y = 0.0
     end

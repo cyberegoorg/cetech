@@ -31,7 +31,7 @@ namespace CETech.World
             UpdateImpl(world, dt);
         }
 
-        public static int LoadLevel(int world, long level, Vec3f position, Vec3f rotation, Vec3f scale)
+        public static int LoadLevel(int world, long level, Vec3f position, Quatf rotation, Vec3f scale)
         {
             return LoadLevelImpl(world, level, position, rotation, scale);
         }

@@ -233,26 +233,6 @@ namespace CETech.Lua
             _enviromentScript.DoStream(stream);
         }
 
-        [MoonSharpUserData]
-        internal class Vector3fApi
-        {
-            public static readonly Vec3f Zero = new Vec3f();
-            public static readonly Vec3f UnitX = new Vec3f(1.0f, 0.0f, 0.0f);
-            public static readonly Vec3f UnitY = new Vec3f(0.0f, 1.0f, 0.0f);
-            public static readonly Vec3f UnitZ = new Vec3f(0.0f, 0.0f, 1.0f);
-            public static readonly Vec3f Unit = new Vec3f(1.0f, 1.0f, 1.0f);
-
-            public static Vec3f make(float x, float y, float z)
-            {
-                return new Vec3f(x, y, z);
-            }
-
-            public static Vec3f Normalize(Vec3f v)
-            {
-                return Vec3f.Normalize(v);
-            }
-        }
-
         private class ScriptLoader : ScriptLoaderBase
         {
             public override object LoadFile(string file, Table globalContext)

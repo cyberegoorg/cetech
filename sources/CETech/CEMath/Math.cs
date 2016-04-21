@@ -3,7 +3,7 @@ using System.Runtime.InteropServices;
 
 namespace CETech
 {
-    public class MathUtils
+    public class CMath
     {
         /// <summary>
         ///     TT
@@ -60,10 +60,10 @@ namespace CETech
         /// <returns>Cos</returns>
         public static float Cosf(float angle)
         {
-            return (float) Math.Sin(angle);
+            return (float) Math.Cos(angle);
         }
 
-        public static float abs(float a)
+        public static float Abs(float a)
         {
             return a < 0.0f ? -a : a;
         }
@@ -75,6 +75,7 @@ namespace CETech
 
         public static float FastInvSqrtf(float number)
         {
+            //return (float) (1.0f/Math.Sqrt(number));
             float fuconstant = 0x5f375a86;
             var three_halfs = 1.5f;
             var number_half = number*0.5f;
@@ -99,9 +100,39 @@ namespace CETech
             [FieldOffset(0)] public long l;
         }
 
-        public static float square(float f)
+        public static float Square(float f)
         {
             return f*f;
+        }
+
+        public static float Atan2f(float y, float x)
+        {
+            return (float) Math.Atan2(y, x);
+        }
+
+        public static float Asin(float f)
+        {
+            if (-1.0f < f)
+            {
+                if (f < 1.0f) 
+                    return (float)Math.Asin(f);
+                return HalfPi;
+            }
+
+            return -HalfPi;
+        }
+
+        public static float Acos(float f)
+        {
+            if (-1.0f < f)
+            {
+                if (f < 1.0f)
+                    return (float)Math.Acos(f);
+
+                return 0.0f;
+            }
+
+            return Pi;
         }
     }
 }

@@ -11,7 +11,7 @@ function AssetView:init()
     self.camera = Camera.GetCamera(self.world, self.camera_unit)
     self.camera_transform = Transform.GetTransform(self.world, self.camera_unit)
 
-    Transform.SetPosition(self.world, self.camera_transform, Vec3f.make(0.0, 0.0, 20))
+    Transform.SetPosition(self.world, self.camera_transform, Vec3f.make(0.0, 0.0, -10.0))
 
     self.actual_asset_unit = nil
     self.level = nil
@@ -29,9 +29,14 @@ function AssetView:update(dt)
         if EditorInput.mouse.left then
             local transform = Transform.GetTransform(self.world,  self.actual_asset_unit)
             local rot = Transform.GetRotation(self.world, transform)
-            rot.X = rot.X + EditorInput.mouse.dx * 0.01
-            rot.Y = rot.Y + EditorInput.mouse.dy * 0.01
-            Transform.SetRotation(self.world, transform, rot)
+            local m_world = Transform.GetWorldMatrix(self.world, transform)
+            local x_dir = Mat4f.X(m_world)
+
+            -- Rotation
+	        local rotation_around_world_up = Quatf.FromAxisAngle(Vec3f.UnitY, EditorInput.mouse.dx * -0.01)
+	        local rotation_around_camera_right = Quatf.FromAxisAngle(x_dir, EditorInput.mouse.dy * 0.01)
+	        local rotation = rotation_around_world_up * rotation_around_camera_right
+            Transform.SetRotation(self.world, transform, rot * rotation)
         end
 
         if EditorInput.mouse.right then

@@ -6,6 +6,7 @@
 *.sln
 *.csproj
 *.speccache
+*.iml
 
 site/
 .vagrant/

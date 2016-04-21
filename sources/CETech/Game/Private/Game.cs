@@ -1,4 +1,5 @@
-﻿using CETech.Lua;
+﻿using CETech.CEMath;
+using CETech.Lua;
 
 namespace CETech
 {

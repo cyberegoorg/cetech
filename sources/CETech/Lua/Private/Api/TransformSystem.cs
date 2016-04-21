@@ -22,7 +22,7 @@ namespace CETech.Lua.Api
             Tranform.SetPosition(world, transform, pos);
         }
 
-        public static void SetRotation(int world, int transform, Vec3f rot)
+        public static void SetRotation(int world, int transform, Quatf rot)
         {
             Tranform.SetRotation(world, transform, rot);
         }
@@ -37,7 +37,7 @@ namespace CETech.Lua.Api
             return Tranform.GetPosition(world, transform);
         }
 
-        public static Vec3f GetRotation(int world, int transform)
+        public static Quatf GetRotation(int world, int transform)
         {
             return Tranform.GetRotation(world, transform);
         }

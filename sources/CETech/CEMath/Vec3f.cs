@@ -8,7 +8,7 @@ namespace CETech.CEMath
     {
         public static readonly Vec3f Zero = new Vec3f();
         public static readonly Vec3f UnitX = new Vec3f(1.0f, 0.0f, 0.0f);
-        public static readonly Vec3f UnitY = new Vec3f(0.0f, 1.0f, 0.0f);
+        public static readonly Vec3f UnitY = new Vec3f(0.0f, 1.0f, 0.0f);   
         public static readonly Vec3f UnitZ = new Vec3f(0.0f, 0.0f, 1.0f);
         public static readonly Vec3f Unit = new Vec3f(1.0f, 1.0f, 1.0f);
 

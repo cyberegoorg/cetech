@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using System.Globalization;
-using System.Runtime.Remoting.Metadata.W3cXsd2001;
 using System.Yaml;
 using CETech.CEMath;
 using CETech.Develop;
@@ -29,7 +28,7 @@ namespace CETech.World
             _worldInstance.Remove(world);
         }
 
-        private static int CreateImpl(int world, int entity, int parent, Vec3f position, Vec3f rotation,
+        private static int CreateImpl(int world, int entity, int parent, Vec3f position, Quatf rotation,
             Vec3f scale)
         {
             var world_instance = _worldInstance[world];
@@ -84,11 +83,13 @@ namespace CETech.World
             var rot = world_instance.Rotation[idx];
             var sca = world_instance.Scale[idx];
 
-            var rm = Mat4f.CreateFromYawPitchRoll(rot.X, rot.Y, rot.Z);
+            var rm = Quatf.ToMat4F(rot);
             var sm = Mat4f.CreateScale(sca.X, sca.Y, sca.Z);
-            var tm = Mat4f.CreateTranslation(pos.X, pos.Y, pos.Z);
 
-            var m = tm * rm * sm;
+            var m = sm * rm;
+            m.M41 = pos.X;
+            m.M42 = pos.Y;
+            m.M43 = pos.Z;
 
             world_instance.World[idx] = parent * m;
 
@@ -114,7 +115,7 @@ namespace CETech.World
                 var scale = new Vec3f {X = sca[0].AsSingle(), Y = sca[1].AsSingle(), Z = sca[2].AsSingle()};
 
                 Create(world, ent_ids[i],
-                    ents_parent[i] != int.MaxValue ? ent_ids[ents_parent[i]] : int.MaxValue, position, rotation, scale);
+                    ents_parent[i] != int.MaxValue ? ent_ids[ents_parent[i]] : int.MaxValue, position, Quatf.FromEurelAngle(rotation.X, rotation.Y, rotation.Z), scale);
             }
 
             for (var i = 0; i < ent_ids.Length; ++i)
@@ -180,7 +181,7 @@ namespace CETech.World
             return world_instance.Position[transform];
         }
 
-        private static Vec3f GetRotationImpl(int world, int transform)
+        private static Quatf GetRotationImpl(int world, int transform)
         {
             var world_instance = _worldInstance[world];
             return world_instance.Rotation[transform];
@@ -208,13 +209,13 @@ namespace CETech.World
             Transform(world, transform, parent);
         }
 
-        private static void SetRotationImpl(int world, int transform, Vec3f rot)
+        private static void SetRotationImpl(int world, int transform, Quatf rot)
         {
             var world_instance = _worldInstance[world];
             var parent_idx = world_instance.Parent[transform];
             var parent = parent_idx != int.MaxValue ? world_instance.World[parent_idx] : Mat4f.Identity;
 
-            world_instance.Rotation[transform] = rot;
+            world_instance.Rotation[transform] = Quatf.Normalize(rot);
             Transform(world, transform, parent);
         }
 
@@ -261,7 +262,7 @@ namespace CETech.World
             public readonly List<int> Parent;
 
             public readonly List<Vec3f> Position;
-            public readonly List<Vec3f> Rotation;
+            public readonly List<Quatf> Rotation;
             public readonly List<Vec3f> Scale;
 
             public readonly List<Mat4f> World;
@@ -271,7 +272,7 @@ namespace CETech.World
                 NextSibling = new List<int>();
                 EntIdx = new Dictionary<int, int>();
                 Position = new List<Vec3f>();
-                Rotation = new List<Vec3f>();
+                Rotation = new List<Quatf>();
                 Scale = new List<Vec3f>();
                 Parent = new List<int>();
                 FirstChild = new List<int>();

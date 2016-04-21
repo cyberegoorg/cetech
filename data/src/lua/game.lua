@@ -18,7 +18,7 @@ function Game:init()
     World.LoadLevel(self.world, "level1");
     self.level = World.LoadLevel(self.world, "level1",
                  Vec3f.make(0.0, 5.0, 0.0),
-                 Vec3f.Zero, Vec3f.Unit);
+                 Quatf.Identity, Vec3f.Unit);
 
     self.level_unit = World.LevelUnit(self.world, self.level)
 
