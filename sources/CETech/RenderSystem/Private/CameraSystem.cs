@@ -137,7 +137,7 @@ namespace CETech.World
 			var size = Renderer.GetSize();// TODO, to arg... or viewport?
 
             proj = Mat4f.CreatePerspectiveFieldOfView(
-                CMath.DegToRad(world_instance.Fov[camera]), size.X/size.Y,
+                Mathf.DegToRad(world_instance.Fov[camera]), size.X/size.Y,
                 world_instance.Near[camera], world_instance.Far[camera]);
 
             var t = world_instance.Tranform[camera];
