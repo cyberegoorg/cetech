@@ -38,9 +38,9 @@ function Editor:update(dt)
     if EditorInput.keyboard.right then leftdown = 1.0 end
     if EditorInput.keyboard.up then updown = -1.0 end
     if EditorInput.keyboard.down then updown = 1.0 end
+    EditorInput:ResetButtons()
 
     self.fps_camera:update(dt, dx, dy, updown, leftdown)
-    EditorInput:ResetButtons()
 
     World.Update(self.world, dt)
 end
@@ -50,6 +50,7 @@ function Editor:render()
 end
 
 function Editor:load_level(level)
+    Log.Info("leveleditor", "load level {0}", level)
   self.level = World.LoadLevel(self.world, level)
 end
 

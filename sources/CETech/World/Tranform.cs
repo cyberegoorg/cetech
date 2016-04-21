@@ -29,7 +29,7 @@ namespace CETech.World
             return GetTranformImpl(world, entity);
         }
 
-        public static int Create(int world, int entity, int parent, Vec3f position, Vec3f rotation,
+        public static int Create(int world, int entity, int parent, Vec3f position, Quatf rotation,
             Vec3f scale)
         {
             return CreateImpl(world, entity, parent, position, rotation, scale);
@@ -45,7 +45,7 @@ namespace CETech.World
             SetPositionImpl(world, transform, pos);
         }
 
-        public static void SetRotation(int world, int transform, Vec3f rot)
+        public static void SetRotation(int world, int transform, Quatf rot)
         {
             SetRotationImpl(world, transform, rot);
         }
@@ -60,7 +60,7 @@ namespace CETech.World
             return GetPositionImpl(world, transform);
         }
 
-        public static Vec3f GetRotation(int world, int transform)
+        public static Quatf GetRotation(int world, int transform)
         {
             return GetRotationImpl(world, transform);
         }

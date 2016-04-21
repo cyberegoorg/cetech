@@ -53,7 +53,7 @@ namespace CETech.Develop
             var name = (string) mpoDict["name"];
             var args = mpoDict["args"].AsDictionary();
 
-            Log.Debug("console_server", "Recive cmd \"{0}\"", name);
+            //Log.Debug("console_server", "Recive cmd \"{0}\"", name);
 
             if (!_commandHandlers.ContainsKey(name))
             {
