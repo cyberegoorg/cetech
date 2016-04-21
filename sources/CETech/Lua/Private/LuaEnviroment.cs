@@ -96,6 +96,7 @@ namespace CETech.Lua
             _enviromentScript.Globals["Transform"] = new TransformSystemApi();
             _enviromentScript.Globals["Camera"] = new CameraApi();
 
+            _enviromentScript.Globals["Mathf"] = typeof (Mathf);
             _enviromentScript.Globals["Vec2f"] = typeof(Vec2f);
             _enviromentScript.Globals["Vec3f"] = typeof(Vec3f);
             _enviromentScript.Globals["Vec4f"] = typeof(Vec4f);

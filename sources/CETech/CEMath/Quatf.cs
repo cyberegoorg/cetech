@@ -71,8 +71,8 @@ namespace CETech.CEMath
     public static Quatf FromAxisAngle(Vec3f axis, float angle)
     {
         var angle_half = angle*0.5f;
-        var sin = CMath.Sinf(angle_half);
-        var cos = CMath.Cosf(angle_half);
+        var sin = Mathf.Sin(angle_half);
+        var cos = Mathf.Cos(angle_half);
 
         var a = Vec3f.Normalize(axis);
 
@@ -86,12 +86,12 @@ namespace CETech.CEMath
 
     public static Quatf FromEurelAngle(float heading, float attitude, float bank)
     {
-            float sx = CMath.Sinf(heading *0.5f);
-            float sy = CMath.Sinf(attitude * 0.5f);
-            float sz = CMath.Sinf(bank * 0.5f);
-            float cx = CMath.Cosf(heading * 0.5f);
-            float cy = CMath.Cosf(attitude * 0.5f);
-            float cz = CMath.Cosf(bank * 0.5f);
+            float sx = Mathf.Sin(heading *0.5f);
+            float sy = Mathf.Sin(attitude * 0.5f);
+            float sz = Mathf.Sin(bank * 0.5f);
+            float cx = Mathf.Cos(heading * 0.5f);
+            float cy = Mathf.Cos(attitude * 0.5f);
+            float cz = Mathf.Cos(bank * 0.5f);
 
         return new Quatf(cx*cy*cz + sx*sy*sz,
             sx*cy*cz - cx*sy*sz,
@@ -111,15 +111,15 @@ namespace CETech.CEMath
 	  float xx = x*x;
 
       return new Vec3f(
-          CMath.Atan2f(2.0f*(x*w - y*z), 1.0f - 2.0f*(xx + zz)),
-          CMath.Atan2f(2.0f*(y*w + x*z), 1.0f - 2.0f*(yy + zz)),
-          CMath.Asin(2.0f*(x*y + z*w))
+          Mathf.Atan2(2.0f*(x*w - y*z), 1.0f - 2.0f*(xx + zz)),
+          Mathf.Atan2(2.0f*(y*w + x*z), 1.0f - 2.0f*(yy + zz)),
+          Mathf.Asin(2.0f*(x*y + z*w))
       	);
     }
 
     public static float Length(Quatf q1)
     {
-      return CMath.FastSqrtf(LengthSquared(q1));
+      return Mathf.FastSqrtf(LengthSquared(q1));
     }
 
     public static float LengthSquared(Quatf q1)
@@ -129,7 +129,7 @@ namespace CETech.CEMath
 
     public static float InvLength(Quatf q1)
     {
-      return CMath.FastInvSqrtf(LengthSquared(q1));
+      return Mathf.FastInvSqrtf(LengthSquared(q1));
     }
 
     public static Quatf Normalize(Quatf q1)
@@ -139,7 +139,7 @@ namespace CETech.CEMath
 
     public static bool IsNormalized(Quatf v1)
     {
-      return CMath.Abs(1.0f - LengthSquared(v1)) < 0.001f;
+      return Mathf.Abs(1.0f - LengthSquared(v1)) < 0.001f;
     }
 
     public static Quatf operator -(Quatf q1)
@@ -209,7 +209,7 @@ namespace CETech.CEMath
       var qv = new Vec3f(q1.X, q1.Y, q1.Z);
 
       var res = Vec3f.Cross(qv, v1)*(2.0f*q1.W);
-      res = res + v1*(CMath.Square(q1.W) - Vec3f.Dot(qv, qv));
+      res = res + v1*(Mathf.Square(q1.W) - Vec3f.Dot(qv, qv));
       res = res + qv*(2.0f*Vec3f.Dot(qv, v1));
 
       return res;
