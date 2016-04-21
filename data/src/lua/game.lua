@@ -99,16 +99,17 @@ function Game:update(dt)
     if right then leftdown = 1.0 end
 
     self.fps_camera:update(dt, dx * 0.01, dy * 0.01, updown, leftdown)
+    
+    if Gamepad.IsActive(0) then
+        local right_a = Gamepad.Axis(0, Gamepad.AxisIndex("right"))
+        local left_a = Gamepad.Axis(0, Gamepad.AxisIndex("left"))
+        self.fps_camera:update(dt, right_a.X*-0.1, right_a.Y*-0.1, left_a.Y, left_a.X)
 
-    local right_a = Gamepad.Axis(0, Gamepad.AxisIndex("right"))
-    local left_a = Gamepad.Axis(0, Gamepad.AxisIndex("left"))
-
-    self.fps_camera:update(dt, right_a.X*-0.1, right_a.Y*-0.1, left_a.Y, left_a.X)
-
-    if Gamepad.ButtonState(0, Gamepad.ButtonIndex("right_shoulder")) then
-        self.fps_camera.fly_mode = true
-    else
-        self.fps_camera.fly_mode = false
+        if Gamepad.ButtonState(0, Gamepad.ButtonIndex("right_shoulder")) then
+            self.fps_camera.fly_mode = true
+        else
+            self.fps_camera.fly_mode = false
+        end
     end
 
     World.Update(self.world, dt)
