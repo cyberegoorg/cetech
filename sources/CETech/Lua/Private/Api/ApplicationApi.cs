@@ -1,3 +1,4 @@
+using CETech.CEMath;
 using CETech.Develop;
 using CETech.Resource;
 using MoonSharp.Interpreter;
@@ -31,6 +32,16 @@ namespace CETech.Lua.Api
             {
                 Resource.Resource.ReloadAll(StringId.FromString(types[i]));
             }
+        }
+
+        public static void SetCursorPosition(Vec2f pos)
+        {
+            Application.SetCursorPosition(pos);
+        }
+
+        public static Vec2f WindowSize()
+        {
+            return Application.WindowSize();
         }
     }
 }
