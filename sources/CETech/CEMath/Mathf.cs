@@ -1,9 +1,11 @@
-﻿using System;
+using System;
 using System.Runtime.InteropServices;
+using MoonSharp.Interpreter;
 
 namespace CETech
 {
-    public class Mathf
+    [MoonSharpUserData]
+    public static class Mathf
     {
         /// <summary>
         ///     TT

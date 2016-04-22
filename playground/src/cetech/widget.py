@@ -1,4 +1,4 @@
-import nanomsg
+﻿import nanomsg
 import yaml
 
 from PyQt5.QtGui import QCursor
