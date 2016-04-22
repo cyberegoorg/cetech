@@ -1,4 +1,5 @@
 using System;
+using CETech.CEMath;
 
 namespace CETech
 {
@@ -92,6 +93,11 @@ namespace CETech
             ResizeImpl(width, height);
             Width = width;
             Height = height;
+        }
+
+        public void SetCursorPosition(Vec2f pos)
+        {
+            SetCursorPositionImpl(pos);
         }
 
         /// <summary>

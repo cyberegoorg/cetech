@@ -1,3 +1,5 @@
+using CETech.CEMath;
+
 namespace CETech
 {
     /// <summary>
@@ -67,6 +69,16 @@ namespace CETech
         public static string GetPlatform()
         {
             return GetPlatformImpl();
+        }
+
+        public static void SetCursorPosition(Vec2f pos)
+        {
+            SetCursorPositionImpl(pos);
+        }
+
+        public static Vec2f WindowSize()
+        {
+            return new Vec2f(_mainWindow.Width, _mainWindow.Height);
         }
     }
 }

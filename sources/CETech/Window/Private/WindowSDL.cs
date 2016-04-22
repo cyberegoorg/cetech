@@ -1,4 +1,5 @@
 using System;
+using CETech.CEMath;
 using SDL2;
 
 // ReSharper disable once CheckNamespace
@@ -113,6 +114,11 @@ namespace CETech
         private void UpdateImpl()
         {
             SDL.SDL_UpdateWindowSurface(_windowPtr);
+        }
+
+        private void SetCursorPositionImpl(Vec2f pos)
+        {
+            SDL.SDL_WarpMouseInWindow(_windowPtr, (int)pos.X, (int)pos.Y);
         }
     }
 }

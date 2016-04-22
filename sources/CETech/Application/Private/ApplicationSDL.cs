@@ -1,4 +1,5 @@
 using System;
+using CETech.CEMath;
 using SDL2;
 
 // ReSharper disable once CheckNamespace
@@ -100,6 +101,11 @@ namespace CETech
                         throw new ArgumentOutOfRangeException();
                 }
             }
+        }
+
+        private static void SetCursorPositionImpl(Vec2f pos)
+        {
+            _mainWindow.SetCursorPosition(pos);
         }
     }
 }

@@ -103,7 +103,7 @@ function Game:update(dt)
     if Gamepad.IsActive(0) then
         local right_a = Gamepad.Axis(0, Gamepad.AxisIndex("right"))
         local left_a = Gamepad.Axis(0, Gamepad.AxisIndex("left"))
-        self.fps_camera:update(dt, right_a.X*-0.1, right_a.Y*-0.1, left_a.Y, left_a.X)
+        self.fps_camera:update(dt, right_a.X*-0.06, right_a.Y*-0.06, left_a.Y, left_a.X)
 
         if Gamepad.ButtonState(0, Gamepad.ButtonIndex("right_shoulder")) then
             self.fps_camera.fly_mode = true
