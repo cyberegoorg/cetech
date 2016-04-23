@@ -64,12 +64,12 @@ namespace CETech
         /// </summary>
         /// <param name="window">Window for render context</param>
         /// <param name="type">Render backend</param>
-        public static void Init(Window window, BackendType type)
+        public static void Init(Window window, string backend)
         {
-            InitImpl(window, type);
+            InitImpl(window, backend);
         }
 
-		public static void Shutdown()
+        public static void Shutdown()
 		{
 			ShutdownImpl ();
 		}
@@ -114,5 +114,21 @@ namespace CETech
         {
             EndCaptureImpl();
         }
+
+        public static ulong TextureFormat(string format)
+        {
+            return TextureFormatImpl(format);
+        }
+
+        public static ulong BackbufferRation(string ration)
+        {
+            return BackbufferRationImpl(ration);
+        }
+
+        public static ulong RenderState(string key, string value)
+        {
+            return RenderStateImpl(key, value);
+        }
+
     }
 }
