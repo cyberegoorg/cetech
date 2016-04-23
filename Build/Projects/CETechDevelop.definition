@@ -96,6 +96,7 @@
     <Compile Include="RenderSystem\Private\CameraSystem.cs" />
     <Compile Include="RenderSystem\Private\PrimitiveMeshRenderer.cs" />
     <Compile Include="RenderSystem\Private\RendererBgfx.cs" />
+    <Compile Include="RenderSystem\RenderConfig.cs" />
     <Compile Include="RenderSystem\Renderer.cs" />
     <Compile Include="RenderSystem\ShaderResource.cs" />
     <Compile Include="RenderSystem\TextureResource.cs" />

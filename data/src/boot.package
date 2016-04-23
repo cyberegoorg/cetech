@@ -21,3 +21,6 @@ shader:
 
 level:
   - "level1"
+
+render_config:
+  - "default"

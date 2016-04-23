@@ -1,0 +1,15 @@
+#render_states:
+#  default:
+#    states:
+#      color_write: "true"
+#      alpha_write: "true"
+#      depth_write: "true"
+#      depth_func: "less"
+#      cull_mode: "cw"
+
+global_resource:
+  - type: render_target
+    name: target1
+    format: RGBA8
+    ration: equal
+

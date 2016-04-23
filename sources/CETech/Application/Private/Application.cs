@@ -304,10 +304,12 @@ namespace CETech
 
         private static void Boot()
         {
-            Resource.Resource.LoadNow(PackageResource.Type,
-                new[] {StringId.FromString(ConfigSystem.GetValueString("boot.pkg"))});
-            Package.Load(StringId.FromString(ConfigSystem.GetValueString("boot.pkg")));
-            Package.Flush(StringId.FromString(ConfigSystem.GetValueString("boot.pkg")));
+            var boot_pkg = StringId.FromString(ConfigSystem.GetValueString("boot.pkg"));
+
+            Resource.Resource.LoadNow(PackageResource.Type, new[] {boot_pkg});
+
+            Package.Load(boot_pkg);
+            Package.Flush(boot_pkg);
         }
 
         private static void InitResouce()
@@ -325,6 +327,7 @@ namespace CETech
             ResourceCompiler.RegisterCompiler(MaterialResource.Type, MaterialResource.Compile);
             ResourceCompiler.RegisterCompiler(TextureResource.Type, TextureResource.Compile);
             ResourceCompiler.RegisterCompiler(LevelResource.Type, LevelResource.Compile);
+            ResourceCompiler.RegisterCompiler(RenderConfig.Type, RenderConfig.Compile);
 
             if (DevelopFlags.compile)
             {
@@ -371,6 +374,11 @@ namespace CETech
                 LevelResource.Type,
                 LevelResource.ResourceLoader, LevelResource.ResourceUnloader,
                 LevelResource.ResourceOnline, LevelResource.ResourceOffline, LevelResource.ResourceReloader);
+
+            Resource.Resource.RegisterType(
+                RenderConfig.Type,
+                RenderConfig.ResourceLoader, RenderConfig.ResourceUnloader,
+                RenderConfig.ResourceOnline, RenderConfig.ResourceOffline, RenderConfig.ResourceReloader);
         }
 
         private static bool BigInit()
@@ -451,7 +459,7 @@ namespace CETech
 #endif
             _mainWindow = main_window;
 
-            Renderer.Init(_mainWindow, Renderer.BackendType.Default);
+            Renderer.Init(_mainWindow, "default");
 
             return true;
         }
