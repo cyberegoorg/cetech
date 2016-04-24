@@ -3,7 +3,6 @@ using MoonSharp.Interpreter;
 
 namespace CETech.CEMath
 {
-
     [MoonSharpUserData]
     public struct Vec4f
     {
@@ -25,12 +24,12 @@ namespace CETech.CEMath
 
         public static float LengthSquared(Vec4f value)
         {
-            return value.X* value.X + value.Y * value.Y + value.Z * value.Z + value.W * value.W;
+            return value.X*value.X + value.Y*value.Y + value.Z*value.Z + value.W*value.W;
         }
 
         public static float Length(Vec4f value)
         {
-            return (float) Math.Sqrt(value.X * value.X + value.Y * value.Y + value.Z * value.Z + value.W * value.W);
+            return (float) Math.Sqrt(value.X*value.X + value.Y*value.Y + value.Z*value.Z + value.W*value.W);
         }
 
         public static Vec4f Normalize(Vec4f value)

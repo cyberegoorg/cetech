@@ -10,8 +10,8 @@ namespace CETech.Resource
     /// <summary>
     ///     Resource manager
     /// </summary>
-    public static partial class Resource { 
-
+    public static partial class Resource
+    {
         private static readonly Dictionary<long, ResourceLoader> LoaderMap =
             new Dictionary<long, ResourceLoader>();
 

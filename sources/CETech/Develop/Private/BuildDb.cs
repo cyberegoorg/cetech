@@ -2,6 +2,7 @@
 using System.IO;
 #if PLATFORM_WINDOWS
 using System.Data.SQLite;
+
 #else
 using Mono.Data.Sqlite;
 #endif
@@ -87,7 +88,7 @@ namespace CETech.Develop.Private
                         cmd.CommandText = @"INSERT OR REPLACE INTO files VALUES(NULL, @filename, @mtime);";
 
                         cmd.Parameters.AddWithValue("@filename", filename);
-						cmd.Parameters.AddWithValue("@mtime", mtime.ToFileTimeUtc());
+                        cmd.Parameters.AddWithValue("@mtime", mtime.ToFileTimeUtc());
                         cmd.ExecuteNonQuery();
                     }
                     transaction.Commit();
@@ -188,8 +189,8 @@ namespace CETech.Develop.Private
                             {
                                 compile = false;
 
-								var actual_mtime = FileSystem.GetFileMTime(root, rdr.GetString(0)).ToFileTimeUtc();
-								var last_mtime = rdr.GetInt64 (1);
+                                var actual_mtime = FileSystem.GetFileMTime(root, rdr.GetString(0)).ToFileTimeUtc();
+                                var last_mtime = rdr.GetInt64(1);
 
                                 if (actual_mtime != last_mtime)
                                 {

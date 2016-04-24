@@ -60,8 +60,9 @@ namespace CETech
             foreach (var uniform_name in resource.resource.texture)
             {
                 resource.texture_uniform[idx] = new Uniform(uniform_name, UniformType.Int1);
-                resource.texture_resource[idx] = CETech.Resource.Resource.Get<TextureResource.Resource>(TextureResource.Type,
-                    StringId.FromString(uniform_name));
+                resource.texture_resource[idx] =
+                    CETech.Resource.Resource.Get<TextureResource.Resource>(TextureResource.Type,
+                        StringId.FromString(uniform_name));
                 ++idx;
             }
         }
@@ -93,8 +94,9 @@ namespace CETech
                 foreach (var uniform_name in resource.resource.texture)
                 {
                     old.texture_uniform[idx] = new Uniform(uniform_name, UniformType.Int1);
-                    old.texture_resource[idx] = CETech.Resource.Resource.Get<TextureResource.Resource>(TextureResource.Type,
-                        StringId.FromString(uniform_name));
+                    old.texture_resource[idx] =
+                        CETech.Resource.Resource.Get<TextureResource.Resource>(TextureResource.Type,
+                            StringId.FromString(uniform_name));
                     ++idx;
                 }
             }

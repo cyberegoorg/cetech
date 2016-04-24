@@ -101,7 +101,7 @@ namespace CETech
             var input_img = FileSystem.GetFullPath("src", texture_yaml.input);
             var output_img = Path.Combine(build_dir, "tmp", Path.GetFileName(texture_yaml.input) + ".ktx");
 
-			capi.add_dependency(texture_yaml.input);
+            capi.add_dependency(texture_yaml.input);
 
             texturec(input_img, output_img, texture_yaml.gen_mipmaps, texture_yaml.is_normalmap);
 
@@ -136,9 +136,9 @@ namespace CETech
             // Enter the executable to run, including the complete path
             var bin_path = ConfigSystem.GetValueString("resource_compiler.bin");
 
-        #if PLATFORM_WINDOWS
+#if PLATFORM_WINDOWS
             start.FileName = Path.Combine(bin_path, "texturec.exe");
-        #else
+#else
             start.FileName = Path.Combine(bin_path, "texturec");
         #endif
 

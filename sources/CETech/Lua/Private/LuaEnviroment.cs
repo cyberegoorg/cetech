@@ -90,18 +90,18 @@ namespace CETech.Lua
             _enviromentScript.Globals["Keyboard"] = new KeyboardApi();
             _enviromentScript.Globals["Mouse"] = new MouseApi();
             _enviromentScript.Globals["Gamepad"] = new GamepadApi();
-            
+
             _enviromentScript.Globals["World"] = new WorldApi();
             _enviromentScript.Globals["Unit"] = new UnitManagerApi();
             _enviromentScript.Globals["Transform"] = new TransformSystemApi();
             _enviromentScript.Globals["Camera"] = new CameraApi();
 
             _enviromentScript.Globals["Mathf"] = typeof (Mathf);
-            _enviromentScript.Globals["Vec2f"] = typeof(Vec2f);
-            _enviromentScript.Globals["Vec3f"] = typeof(Vec3f);
-            _enviromentScript.Globals["Vec4f"] = typeof(Vec4f);
-            _enviromentScript.Globals["Mat4f"] = typeof(Mat4f);
-            _enviromentScript.Globals["Quatf"] = typeof(Quatf);
+            _enviromentScript.Globals["Vec2f"] = typeof (Vec2f);
+            _enviromentScript.Globals["Vec3f"] = typeof (Vec3f);
+            _enviromentScript.Globals["Vec4f"] = typeof (Vec4f);
+            _enviromentScript.Globals["Mat4f"] = typeof (Mat4f);
+            _enviromentScript.Globals["Quatf"] = typeof (Quatf);
 
             ConsoleServer.RegisterCommand("lua.execute", (args, response) =>
             {
@@ -130,7 +130,6 @@ namespace CETech.Lua
                     response.Pack("error_msg");
                     response.Pack(msg);
                 }
-
             });
         }
 
@@ -143,7 +142,8 @@ namespace CETech.Lua
         {
             var ms = new MemoryStream(Resource.Resource.Get<byte[]>(LuaResource.Type, name));
 
-            try {
+            try
+            {
                 _enviromentScript.DoStream(ms);
             }
             catch (ScriptRuntimeException ex)
@@ -250,7 +250,7 @@ namespace CETech.Lua
                 }
 
                 long[] names = {StringId.FromString(name)};
-                bool can_get = Resource.Resource.CanGet(LuaResource.Type, names);
+                var can_get = Resource.Resource.CanGet(LuaResource.Type, names);
 
                 return can_get;
             }

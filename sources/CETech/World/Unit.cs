@@ -1,4 +1,5 @@
 // ReSharper disable once CheckNamespace
+
 namespace CETech.World
 {
     public partial class Unit
@@ -22,6 +23,5 @@ namespace CETech.World
         {
             return SpawnFromResourceImpl(resource, world);
         }
-
     }
 }

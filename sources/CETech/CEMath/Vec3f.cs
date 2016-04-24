@@ -8,7 +8,7 @@ namespace CETech.CEMath
     {
         public static readonly Vec3f Zero = new Vec3f();
         public static readonly Vec3f UnitX = new Vec3f(1.0f, 0.0f, 0.0f);
-        public static readonly Vec3f UnitY = new Vec3f(0.0f, 1.0f, 0.0f);   
+        public static readonly Vec3f UnitY = new Vec3f(0.0f, 1.0f, 0.0f);
         public static readonly Vec3f UnitZ = new Vec3f(0.0f, 0.0f, 1.0f);
         public static readonly Vec3f Unit = new Vec3f(1.0f, 1.0f, 1.0f);
 
@@ -29,12 +29,12 @@ namespace CETech.CEMath
 
         public static float LengthSquared(Vec3f value)
         {
-            return value.X * value.X + value.Y * value.Y + value.Z * value.Z;
+            return value.X*value.X + value.Y*value.Y + value.Z*value.Z;
         }
 
         public static float Length(Vec3f value)
         {
-            return (float)Math.Sqrt(value.X * value.X + value.Y * value.Y + value.Z * value.Z);
+            return (float) Math.Sqrt(value.X*value.X + value.Y*value.Y + value.Z*value.Z);
         }
 
         public static Vec3f Normalize(Vec3f value)

@@ -43,8 +43,9 @@ namespace CETech.EntCom
 
         private static void DestroyAllTypeImpl(int world, int[] entIds)
         {
-            var components_type_sorted = _destroyersMap.Keys.OrderBy(pair => GetSpawnOrder(pair)).Select(pair => pair).ToArray();
-            for (int i = 0; i < components_type_sorted.Length; i++)
+            var components_type_sorted =
+                _destroyersMap.Keys.OrderBy(pair => GetSpawnOrder(pair)).Select(pair => pair).ToArray();
+            for (var i = 0; i < components_type_sorted.Length; i++)
             {
                 _destroyersMap[components_type_sorted[i]](world, entIds);
             }

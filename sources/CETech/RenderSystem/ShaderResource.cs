@@ -101,9 +101,9 @@ namespace CETech
             // Enter the executable to run, including the complete path
             var bin_path = ConfigSystem.GetValueString("resource_compiler.bin");
 
-        #if PLATFORM_WINDOWS
+#if PLATFORM_WINDOWS
             start.FileName = Path.Combine(bin_path, "shaderc.exe");
-        #else
+#else
             start.FileName = Path.Combine(bin_path, "shaderc");	
         #endif
 
@@ -153,24 +153,24 @@ namespace CETech
 
             var input_shader = Path.Combine(src_dir, vs_input);
             var output_vsshader = Path.Combine(build_dir, "tmp", vs_input + ".bin");
-            
-		#if PLATFORM_LINUX
+
+#if PLATFORM_LINUX
 			shaderc(input_shader, output_vsshader, include_path, "vertex", "linux", "120");
         #elif PLATFORM_MACOS
             shaderc(input_shader, output_vsshader, include_path, "vertex", "osx", "120");
 		#else
-			shaderc(input_shader, output_vsshader, include_path, "vertex", "windows", "vs_4_0");
-		#endif
+            shaderc(input_shader, output_vsshader, include_path, "vertex", "windows", "vs_4_0");
+#endif
             input_shader = Path.Combine(src_dir, fs_input);
             var output_fsshader = Path.Combine(build_dir, "tmp", fs_input + ".bin");
-        
-		#if PLATFORM_LINUX
+
+#if PLATFORM_LINUX
 			shaderc(input_shader, output_fsshader, include_path, "fragment", "linux", "120");
         #elif PLATFORM_MACOS
             shaderc(input_shader, output_fsshader, include_path, "fragment", "osx", "120");
 		#else
-			shaderc(input_shader, output_fsshader, include_path, "fragment", "windows", "ps_4_0");
-		#endif
+            shaderc(input_shader, output_fsshader, include_path, "fragment", "windows", "ps_4_0");
+#endif
 
             var vs_file = File.ReadAllBytes(output_vsshader);
             var fs_file = File.ReadAllBytes(output_fsshader);

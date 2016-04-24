@@ -7,10 +7,10 @@ namespace CETech.Lua.Api
     [MoonSharpUserData]
     internal class GamepadApi
     {
-		public static bool IsActive(int gamepad)
-		{
-			return Gamepad.IsActive(gamepad);
-		}
+        public static bool IsActive(int gamepad)
+        {
+            return Gamepad.IsActive(gamepad);
+        }
 
         public static int ButtonIndex(string buttonName)
         {

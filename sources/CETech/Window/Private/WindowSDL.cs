@@ -118,7 +118,7 @@ namespace CETech
 
         private void SetCursorPositionImpl(Vec2f pos)
         {
-            SDL.SDL_WarpMouseInWindow(_windowPtr, (int)pos.X, (int)pos.Y);
+            SDL.SDL_WarpMouseInWindow(_windowPtr, (int) pos.X, (int) pos.Y);
         }
     }
 }

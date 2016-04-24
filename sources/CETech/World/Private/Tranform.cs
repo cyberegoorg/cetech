@@ -43,8 +43,9 @@ namespace CETech.World
             world_instance.NextSibling.Add(int.MaxValue);
 
             world_instance.World.Add(Mat4f.Identity);
-            
-            Transform(world, idx, parent != int.MaxValue ? GetWorldMatrix(world, GetTranform(world, parent)): Mat4f.Identity);
+
+            Transform(world, idx,
+                parent != int.MaxValue ? GetWorldMatrix(world, GetTranform(world, parent)) : Mat4f.Identity);
 
             world_instance.EntIdx[entity] = idx;
 
@@ -70,7 +71,6 @@ namespace CETech.World
             }
 
 
-
             return idx;
         }
 
@@ -90,12 +90,12 @@ namespace CETech.World
             var rm = Quatf.ToMat4F(rot);
             var sm = Mat4f.CreateScale(sca.X, sca.Y, sca.Z);
 
-            var m = sm * rm;
+            var m = sm*rm;
             m.M41 = pos.X;
             m.M42 = pos.Y;
             m.M43 = pos.Z;
 
-            world_instance.World[idx] = m * parent;
+            world_instance.World[idx] = m*parent;
 
             var child = world_instance.FirstChild[idx];
 
@@ -121,7 +121,8 @@ namespace CETech.World
                 rotation = rotation*Mathf.ToRad;
 
                 Create(world, ent_ids[i],
-                    ents_parent[i] != int.MaxValue ? ent_ids[ents_parent[i]] : int.MaxValue, position, Quatf.FromEurelAngle(rotation.X, rotation.Y, rotation.Z), scale);
+                    ents_parent[i] != int.MaxValue ? ent_ids[ents_parent[i]] : int.MaxValue, position,
+                    Quatf.FromEurelAngle(rotation.X, rotation.Y, rotation.Z), scale);
             }
 
             for (var i = 0; i < ent_ids.Length; ++i)
@@ -170,7 +171,7 @@ namespace CETech.World
             // TODO
             var world_instance = _worldInstance[world];
 
-            for (int i = 0; i < entIds.Length; i++)
+            for (var i = 0; i < entIds.Length; i++)
             {
                 var ent_id = entIds[i];
                 world_instance.EntIdx.Remove(ent_id);
@@ -259,6 +260,11 @@ namespace CETech.World
             return getIdx(world, entity);
         }
 
+        public static bool HasTransform(int world, int entity)
+        {
+            return _worldInstance[world].EntIdx.ContainsKey(entity);
+        }
+
         private class WorldInstance
         {
             public readonly Dictionary<int, int> EntIdx;
@@ -284,11 +290,6 @@ namespace CETech.World
                 FirstChild = new List<int>();
                 World = new List<Mat4f>();
             }
-        }
-
-        public static bool HasTransform(int world, int entity)
-        {
-            return _worldInstance[world].EntIdx.ContainsKey(entity);
         }
     }
 }

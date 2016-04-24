@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using System.Globalization;
-using System.Runtime.InteropServices;
 using System.Yaml;
 using CETech.CEMath;
 using CETech.Develop;
@@ -96,7 +95,7 @@ namespace CETech.World
         {
             var world_instance = _worldInstance[world];
 
-            for (int i = 0; i < entIds.Length; i++)
+            for (var i = 0; i < entIds.Length; i++)
             {
                 var ent_id = entIds[i];
 
@@ -106,7 +105,7 @@ namespace CETech.World
                 }
 
                 var item_idx = GetIdx(world, ent_id);
-                var last_idx = world_instance.Near.Count-1;
+                var last_idx = world_instance.Near.Count - 1;
                 var last_ent = world_instance.Ent[last_idx];
 
                 world_instance.EntIdx.Remove(ent_id);
@@ -134,7 +133,7 @@ namespace CETech.World
         private static void GetProjectViewImpl(int world, int camera, out Mat4f proj, out Mat4f view)
         {
             var world_instance = _worldInstance[world];
-			var size = Renderer.GetSize();// TODO, to arg... or viewport?
+            var size = Renderer.GetSize(); // TODO, to arg... or viewport?
             var t = world_instance.Tranform[camera];
 
             proj = Mat4f.CreatePerspectiveFieldOfView(
@@ -151,8 +150,8 @@ namespace CETech.World
 
         private class WorldInstance
         {
-            public readonly Dictionary<int, int> EntIdx;
             public readonly List<int> Ent;
+            public readonly Dictionary<int, int> EntIdx;
             public readonly List<float> Far;
             public readonly List<float> Fov;
 

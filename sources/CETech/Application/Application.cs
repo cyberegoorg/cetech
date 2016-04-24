@@ -32,7 +32,6 @@ namespace CETech
         /// <summary>
         ///     Init application
         /// </summary>
-		/// 
         public static bool Init(string[] args)
         {
             return InitImpl(args);

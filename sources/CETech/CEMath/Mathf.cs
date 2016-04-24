@@ -65,18 +65,18 @@ namespace CETech
         }
 
         /// <summary>
-        /// http://blog.demofox.org/2012/09/24/bias-and-gain-are-your-friend/
+        ///     http://blog.demofox.org/2012/09/24/bias-and-gain-are-your-friend/
         /// </summary>
         /// <param name="time"></param>
         /// <param name="bias"></param>
         /// <returns></returns>
         public static float Bias(float time, float bias)
         {
-            return time / ((1.0f / bias - 2.0f) * (1.0f - time) + 1.0f);
+            return time/((1.0f/bias - 2.0f)*(1.0f - time) + 1.0f);
         }
 
         /// <summary>
-        /// http://blog.demofox.org/2012/09/24/bias-and-gain-are-your-friend/
+        ///     http://blog.demofox.org/2012/09/24/bias-and-gain-are-your-friend/
         /// </summary>
         /// <param name="time"></param>
         /// <param name="gain"></param>
@@ -84,9 +84,9 @@ namespace CETech
         public static float Gain(float time, float gain)
         {
             if (time < 0.5f)
-                return Bias(time * 2.0f, gain) / 2.0f;
+                return Bias(time*2.0f, gain)/2.0f;
 
-            return Bias(time * 2.0f - 1.0f, 1.0f - gain) / 2.0f + 0.5f;
+            return Bias(time*2.0f - 1.0f, 1.0f - gain)/2.0f + 0.5f;
         }
 
         /// <summary>
@@ -106,7 +106,7 @@ namespace CETech
         /// <returns>Angle in degrese</returns>
         public static float RadToDeg(float angle)
         {
-            return angle * ToDeg;
+            return angle*ToDeg;
         }
 
         /// <summary>

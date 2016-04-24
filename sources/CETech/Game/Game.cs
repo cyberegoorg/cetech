@@ -2,7 +2,6 @@
 {
     public partial class Game
     {
-
         public static void Init()
         {
             InitImpl();

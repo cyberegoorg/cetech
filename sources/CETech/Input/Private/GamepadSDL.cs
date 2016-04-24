@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Globalization;
 using CETech.CEMath;
 using CETech.Utils;
 using SDL2;
@@ -69,14 +68,15 @@ namespace CETech.Input
 
         private static void ProcessImpl()
         {
-            for (int i = 0; i < GameControlers.Count; ++i)
+            for (var i = 0; i < GameControlers.Count; ++i)
             {
                 var controler_id = GameControlers[i];
 
-                for (int j = 0; j < (int) GamepadButton.Max; ++j)
+                for (var j = 0; j < (int) GamepadButton.Max; ++j)
                 {
                     LastButtonState[i][j] = ActualButtonState[i][j];
-                    ActualButtonState[i][j] = (char) SDL.SDL_GameControllerGetButton(controler_id, GamepadButton2SDL((GamepadButton)j));
+                    ActualButtonState[i][j] =
+                        (char) SDL.SDL_GameControllerGetButton(controler_id, GamepadButton2SDL((GamepadButton) j));
                 }
             }
         }
@@ -85,22 +85,38 @@ namespace CETech.Input
         {
             switch (buttonName)
             {
-                case "a": return (int) GamepadButton.A;
-                case "b": return (int) GamepadButton.B;
-                case "x": return (int) GamepadButton.X;
-                case "y": return (int) GamepadButton.Y;
-                case "back": return (int) GamepadButton.Back;
-                case "guide": return (int) GamepadButton.Guide;
-                case "start": return (int) GamepadButton.Start;
-                case "left_stick": return (int) GamepadButton.Leftstick;
-                case "right_stick": return (int) GamepadButton.Rightstick;
-                case "left_shoulder": return (int) GamepadButton.Leftshoulder;
-                case "right_shoulder": return (int) GamepadButton.Rightshoulder;
-                case "dpad_up": return (int) GamepadButton.DpadUp;
-                case "dpad_down": return (int) GamepadButton.DpadDown;
-                case "dpad_left": return (int) GamepadButton.DpadLeft;
-                case "dpad_right": return (int) GamepadButton.DpadRight;
-                default: return (int) GamepadButton.INVALID;
+                case "a":
+                    return (int) GamepadButton.A;
+                case "b":
+                    return (int) GamepadButton.B;
+                case "x":
+                    return (int) GamepadButton.X;
+                case "y":
+                    return (int) GamepadButton.Y;
+                case "back":
+                    return (int) GamepadButton.Back;
+                case "guide":
+                    return (int) GamepadButton.Guide;
+                case "start":
+                    return (int) GamepadButton.Start;
+                case "left_stick":
+                    return (int) GamepadButton.Leftstick;
+                case "right_stick":
+                    return (int) GamepadButton.Rightstick;
+                case "left_shoulder":
+                    return (int) GamepadButton.Leftshoulder;
+                case "right_shoulder":
+                    return (int) GamepadButton.Rightshoulder;
+                case "dpad_up":
+                    return (int) GamepadButton.DpadUp;
+                case "dpad_down":
+                    return (int) GamepadButton.DpadDown;
+                case "dpad_left":
+                    return (int) GamepadButton.DpadLeft;
+                case "dpad_right":
+                    return (int) GamepadButton.DpadRight;
+                default:
+                    return (int) GamepadButton.INVALID;
             }
         }
 
@@ -215,8 +231,8 @@ namespace CETech.Input
             }
 
             var coef = 1.0f/short.MaxValue;
-            var axis_x_norm = axis_x * coef;
-            var axis_y_norm = axis_y * coef;
+            var axis_x_norm = axis_x*coef;
+            var axis_y_norm = axis_y*coef;
 
             var dead_zone = 0.2f;
             var start_low_zone = 1.0f - dead_zone;
@@ -253,6 +269,16 @@ namespace CETech.Input
             SDL.SDL_HapticRumblePlay(haptic, strength, length);
         }
 
+        private static bool ButtonPressedImpl(int gamepad, int buttonIndex)
+        {
+            return ActualButtonState[gamepad][buttonIndex] == 1 && LastButtonState[gamepad][buttonIndex] == 0;
+        }
+
+        private static bool ButtonReleasedImpl(int gamepad, int buttonIndex)
+        {
+            return ActualButtonState[gamepad][buttonIndex] == 0 && LastButtonState[gamepad][buttonIndex] == 1;
+        }
+
         private enum GamepadButton
         {
             INVALID = 0,
@@ -280,16 +306,6 @@ namespace CETech.Input
             Left = 1,
             Right = 2,
             Triger = 3
-        }
-
-        private static bool ButtonPressedImpl(int gamepad, int buttonIndex)
-        {
-            return ActualButtonState[gamepad][buttonIndex] == 1 && LastButtonState[gamepad][buttonIndex] == 0;
-        }
-
-        private static bool ButtonReleasedImpl(int gamepad, int buttonIndex)
-        {
-            return ActualButtonState[gamepad][buttonIndex] == 0 && LastButtonState[gamepad][buttonIndex] == 1;
         }
     }
 }

@@ -3,6 +3,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Reflection;
 using CETech.Develop.Private;
 using CETech.Resource;
 using CETech.Utils;
@@ -142,7 +143,8 @@ namespace CETech.Develop
         {
             ConfigSystem.CreateValue("resource_compiler.core", "Path to core dir", "core");
             ConfigSystem.CreateValue("resource_compiler.src", "Path to source dir", Path.Combine("data", "src"));
-            ConfigSystem.CreateValue("resource_compiler.bin", "Binary program path", Path.GetDirectoryName(System.Reflection.Assembly.GetAssembly(typeof(ResourceCompiler)).Location));
+            ConfigSystem.CreateValue("resource_compiler.bin", "Binary program path",
+                Path.GetDirectoryName(Assembly.GetAssembly(typeof (ResourceCompiler)).Location));
         }
 
         internal struct CompileTask
