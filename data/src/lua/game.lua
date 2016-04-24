@@ -16,20 +16,20 @@ function Game:init()
 
     --self.unit = Unit.Spawn(self.world, "unit1");
     World.LoadLevel(self.world, "level1");
-    self.level = World.LoadLevel(self.world, "level1",
-                 Vec3f.make(0.0, 5.0, 0.0),
-                 Quatf.Identity, Vec3f.Unit);
+--    self.level = World.LoadLevel(self.world, "level1",
+--                 Vec3f.make(2, 5.0, 0.0),
+--                 Quatf.Identity, Vec3f.Unit);
 
-    self.level_unit = World.LevelUnit(self.world, self.level)
+--    self.level_unit = World.LevelUnit(self.world, self.level)
 
-    self.unit1 = World.UnitByName(self.world, self.level, "box1")
-    self.unit2 = World.UnitByName(self.world, self.level, "box2")
-    self.unit = self.unit1
+--    self.unit1 = World.UnitByName(self.world, self.level, "box1")
+--    self.unit2 = World.UnitByName(self.world, self.level, "box2")
+--    self.unit = self.unit1
 
     self.camera_unit = Unit.Spawn(self.world, "camera");
     self.camera = Camera.GetCamera(self.world, self.camera_unit);
     self.fps_camera = FPSCamera(self.world, self.camera_unit)
-    Unit.Spawn(self.world, "unit11");
+    --Unit.Spawn(self.world, "unit11");
 
     self.debug = false
     self.capture = false
@@ -79,6 +79,14 @@ function Game:update(dt)
       RenderSystem.SaveScreenShot("screenshot");
     end
 
+    local transform = Transform.GetTransform(self.world, self.camera_unit)
+    local pos = Transform.GetPosition(self.world, transform)
+
+    if Keyboard.ButtonPressed(Keyboard.ButtonIndex('up')) then
+        pos.Y = pos.Y + 1;
+        Transform.SetPosition(self.world, transform, pos)
+    end
+
     local dx = 0
     local dy = 0
     if Mouse.ButtonState(Mouse.ButtonIndex("left")) then
@@ -93,8 +101,8 @@ function Game:update(dt)
 
     local updown = 0.0
     local leftdown = 0.0
-    if up then updown = -1.0 end
-    if down then updown = 1.0 end
+    if up then updown = 1.0 end
+    if down then updown = -1.0 end
     if left then leftdown = -1.0 end
     if right then leftdown = 1.0 end
 
@@ -103,6 +111,7 @@ function Game:update(dt)
     if Gamepad.IsActive(0) then
         local right_a = Gamepad.Axis(0, Gamepad.AxisIndex("right"))
         local left_a = Gamepad.Axis(0, Gamepad.AxisIndex("left"))
+        --Log.Info("lua", "{0}, {1}, {2}", left_a.X, left_a.Y, left_a.Z)
         self.fps_camera:update(dt, right_a.X*-0.06, right_a.Y*-0.06, left_a.Y, left_a.X)
 
         if Gamepad.ButtonState(0, Gamepad.ButtonIndex("right_shoulder")) then

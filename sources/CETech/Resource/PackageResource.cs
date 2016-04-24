@@ -39,14 +39,15 @@ namespace CETech.Resource
             // TODO: generic
             var prioritDictionary = new Dictionary<long, int>();
             prioritDictionary[Type] = 0;
+            prioritDictionary[RenderConfig.Type] = 0;
             prioritDictionary[LuaResource.Type] = 2;
             prioritDictionary[ConfigResource.Type] = 3;
             prioritDictionary[TextureResource.Type] = 4;
             prioritDictionary[ShaderResource.Type] = 5;
             prioritDictionary[MaterialResource.Type] = 6;
             prioritDictionary[UnitResource.Type] = 7;
-            prioritDictionary[LevelResource.Type] = 8;
-            prioritDictionary[RenderConfig.Type] = 0;
+            prioritDictionary[MeshResource.Type] = 8;
+            prioritDictionary[LevelResource.Type] = 9;
 
             var types_nodes = new Dictionary<long, YamlSequence>();
             foreach (var type in rootNode)

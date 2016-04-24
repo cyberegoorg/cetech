@@ -135,16 +135,13 @@ namespace CETech.World
         {
             var world_instance = _worldInstance[world];
 			var size = Renderer.GetSize();// TODO, to arg... or viewport?
+            var t = world_instance.Tranform[camera];
 
             proj = Mat4f.CreatePerspectiveFieldOfView(
                 Mathf.DegToRad(world_instance.Fov[camera]), size.X/size.Y,
                 world_instance.Near[camera], world_instance.Far[camera]);
 
-            var t = world_instance.Tranform[camera];
-            var pos = -Tranform.GetPosition(world, t);
-            var rot = -Tranform.GetRotation(world, t);
-
-            view = Mat4f.CreateTranslation(pos.X, pos.Y, pos.Z) * Quatf.ToMat4F(rot);
+            view = Mat4f.Inverted(Tranform.GetWorldMatrix(world, t));
         }
 
         private static int GetCameraImpl(int world, int entity)

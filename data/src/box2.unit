@@ -6,6 +6,6 @@ components:
     scale: [1, 1, 1]
 
   "41232132255234":
-    component_type: "primitive_mesh"
+    component_type: "mesh_renderer"
+    mesh: "cube"
     material: "material1"
-    size: 2.5

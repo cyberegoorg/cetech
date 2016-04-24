@@ -214,9 +214,9 @@ namespace CETech.Input
                     return Vec3f.Zero;
             }
 
-
-            var axis_x_norm = axis_x/(float) short.MaxValue;
-            var axis_y_norm = axis_y/(float) short.MaxValue;
+            var coef = 1.0f/short.MaxValue;
+            var axis_x_norm = axis_x * coef;
+            var axis_y_norm = axis_y * coef;
 
             var dead_zone = 0.2f;
             var start_low_zone = 1.0f - dead_zone;
@@ -234,7 +234,7 @@ namespace CETech.Input
                 axis_y_norm = 0.0f;
             }
 
-            return new Vec3f(axis_x_norm, axis_y_norm, 0.0f);
+            return new Vec3f(axis_x_norm, -axis_y_norm, 0.0f);
         }
 
         private static int GetNumGamepadImpl()

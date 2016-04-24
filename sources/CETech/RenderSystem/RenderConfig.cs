@@ -156,8 +156,6 @@ namespace CETech
         /// <param name="capi">Compiler api</param>
         public static void Compile(ResourceCompiler.CompilatorApi capi)
         {
-            var build_dir = FileSystem.GetRootDir("build");
-
             TextReader input = new StreamReader(capi.ResourceFile);
             var yaml = YamlNode.FromYaml(input);
             var rootNode = yaml[0] as YamlMapping;

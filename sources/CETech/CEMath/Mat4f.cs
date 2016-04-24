@@ -54,11 +54,14 @@ namespace CETech.CEMath
             Mat4f result;
             result.M11 = xScale;
             result.M12 = result.M13 = result.M14 = 0.0f;
+
             result.M22 = yScale;
             result.M21 = result.M23 = result.M24 = 0.0f;
+
             result.M31 = result.M32 = 0.0f;
             result.M33 = farPlaneDistance/(nearPlaneDistance - farPlaneDistance);
             result.M34 = -1.0f;
+
             result.M41 = result.M42 = result.M44 = 0.0f;
             result.M43 = nearPlaneDistance*farPlaneDistance/(nearPlaneDistance - farPlaneDistance);
 
@@ -170,7 +173,7 @@ namespace CETech.CEMath
             var fb = -2.0f*b;
             var fc = -2.0f*c;
 
-            Mat4f result;
+            Mat4f result = Identity;
 
             result.M11 = fa*a + 1.0f;
             result.M12 = fb*a;
@@ -338,7 +341,7 @@ namespace CETech.CEMath
 
         public static Mat4f operator *(Mat4f value1, Mat4f value2)
         {
-            Mat4f m;
+            Mat4f m = Identity;
 
             // First row
             m.M11 = value1.M11*value2.M11 + value1.M12*value2.M21 + value1.M13*value2.M31 + value1.M14*value2.M41;

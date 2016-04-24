@@ -102,8 +102,6 @@ namespace CETech
                 _data.NeedResize = false;
             }
 
-            Bgfx.SetViewRect(0, 0, 0, _data.ResizeW, _data.ResizeH);
-
             Mat4f viewMatrix;
             Mat4f projMatrix;
             CameraSystem.GetProjectView(world, camera, out projMatrix, out viewMatrix);
@@ -112,11 +110,12 @@ namespace CETech
             {
                 Bgfx.SetViewTransform(0, &viewMatrix.M11, &projMatrix.M11);
             }
+            Bgfx.SetViewRect(0, 0, 0, _data.ResizeW, _data.ResizeH);
 
             Bgfx.Touch(0);
             Bgfx.DebugTextClear();
 
-            PrimitiveMeshRenderer.RenderWorld(world);
+            MeshRenderer.RenderWorld(world);
 
             var frame = Bgfx.Frame();
 
