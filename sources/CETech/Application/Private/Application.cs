@@ -315,7 +315,7 @@ namespace CETech
         private static void InitResouce()
         {
             Tranform.Init();
-            PrimitiveMeshRenderer.Init();
+            MeshRenderer.Init();
             CameraSystem.Init();
 
 #if CETECH_DEVELOP
@@ -328,6 +328,7 @@ namespace CETech
             ResourceCompiler.RegisterCompiler(TextureResource.Type, TextureResource.Compile);
             ResourceCompiler.RegisterCompiler(LevelResource.Type, LevelResource.Compile);
             ResourceCompiler.RegisterCompiler(RenderConfig.Type, RenderConfig.Compile);
+            ResourceCompiler.RegisterCompiler(MeshResource.Type, MeshResource.Compile);
 
             if (DevelopFlags.compile)
             {
@@ -379,6 +380,12 @@ namespace CETech
                 RenderConfig.Type,
                 RenderConfig.ResourceLoader, RenderConfig.ResourceUnloader,
                 RenderConfig.ResourceOnline, RenderConfig.ResourceOffline, RenderConfig.ResourceReloader);
+
+
+            Resource.Resource.RegisterType(
+                MeshResource.Type,
+                MeshResource.ResourceLoader, MeshResource.ResourceUnloader,
+                MeshResource.ResourceOnline, MeshResource.ResourceOffline, MeshResource.ResourceReloader);
         }
 
         private static bool BigInit()

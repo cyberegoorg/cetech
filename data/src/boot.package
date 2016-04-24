@@ -24,3 +24,6 @@ level:
 
 render_config:
   - "default"
+
+mesh:
+  - "cube"

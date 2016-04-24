@@ -75,10 +75,11 @@
     <Compile Include="Program.cs" />
     <Compile Include="RenderSystem\CameraSystem.cs" />
     <Compile Include="RenderSystem\MaterialResource.cs" />
-    <Compile Include="RenderSystem\PrimitiveMeshRenderer.cs" />
+    <Compile Include="RenderSystem\MeshRenderer.cs" />
+    <Compile Include="RenderSystem\MeshResource.cs" />
     <Compile Include="RenderSystem\Private\AviWriter.cs" />
     <Compile Include="RenderSystem\Private\CameraSystem.cs" />
-    <Compile Include="RenderSystem\Private\PrimitiveMeshRenderer.cs" />
+    <Compile Include="RenderSystem\Private\MeshRenderer.cs" />
     <Compile Include="RenderSystem\Private\RendererBgfx.cs" />
     <Compile Include="RenderSystem\RenderConfig.cs" />
     <Compile Include="RenderSystem\Renderer.cs" />

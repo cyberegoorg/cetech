@@ -45,7 +45,7 @@ namespace CETech.World
             _levelnstances.Add(new Levelnstance());
 
             Tranform.InitWorld(id);
-            PrimitiveMeshRenderer.InitWorld(id);
+            MeshRenderer.InitWorld(id);
             CameraSystem.InitWorld(id);
 
             return id;
@@ -59,7 +59,7 @@ namespace CETech.World
         private static void DestroyWorldImpl(int world)
         {
             Tranform.RemoveWorld(world);
-            PrimitiveMeshRenderer.RemoveWorld(world);
+            MeshRenderer.RemoveWorld(world);
             CameraSystem.RemoveWorld(world);
 
             var item_idx = getIdx(world);

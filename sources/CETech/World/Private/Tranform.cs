@@ -43,6 +43,8 @@ namespace CETech.World
             world_instance.NextSibling.Add(int.MaxValue);
 
             world_instance.World.Add(Mat4f.Identity);
+            
+            Transform(world, idx, parent != int.MaxValue ? GetWorldMatrix(world, GetTranform(world, parent)): Mat4f.Identity);
 
             world_instance.EntIdx[entity] = idx;
 
@@ -66,6 +68,8 @@ namespace CETech.World
 
                 world_instance.Parent[idx] = parentIdx;
             }
+
+
 
             return idx;
         }
@@ -91,7 +95,7 @@ namespace CETech.World
             m.M42 = pos.Y;
             m.M43 = pos.Z;
 
-            world_instance.World[idx] = parent * m;
+            world_instance.World[idx] = m * parent;
 
             var child = world_instance.FirstChild[idx];
 
@@ -113,6 +117,8 @@ namespace CETech.World
                 var position = new Vec3f {X = pos[0].AsSingle(), Y = pos[1].AsSingle(), Z = pos[2].AsSingle()};
                 var rotation = new Vec3f {X = rot[0].AsSingle(), Y = rot[1].AsSingle(), Z = rot[2].AsSingle()};
                 var scale = new Vec3f {X = sca[0].AsSingle(), Y = sca[1].AsSingle(), Z = sca[2].AsSingle()};
+
+                rotation = rotation*Mathf.ToRad;
 
                 Create(world, ent_ids[i],
                     ents_parent[i] != int.MaxValue ? ent_ids[ents_parent[i]] : int.MaxValue, position, Quatf.FromEurelAngle(rotation.X, rotation.Y, rotation.Z), scale);

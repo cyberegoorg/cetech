@@ -1,7 +1,7 @@
 components:
   "5sad4as64d65as4d65as65d4asd":
     component_type: "transform"
-    position: [0, 0, -25]
+    position: [0, 0, 10]
     rotation: [0, 0, 0]
     scale: [1, 1, 1]
 
@@ -9,4 +9,4 @@ components:
     component_type: "camera"
     near: 0.1
     far: 1000.0
-    fov: 45
+    fov: 60

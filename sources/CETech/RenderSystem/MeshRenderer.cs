@@ -1,6 +1,6 @@
 ﻿namespace CETech.World
 {
-    public partial class PrimitiveMeshRenderer
+    public partial class MeshRenderer
     {
         public static void Init()
         {
