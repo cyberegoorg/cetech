@@ -86,11 +86,11 @@ namespace CETech
 
             var last_frame_tick = DateTime.Now;
             DateTime curent_frame_tick;
-			Log.Info ("application.ready", "");
+            Log.Info("application.ready", "");
 
-            int[] tasks = new int[2];
+            var tasks = new int[2];
 
-            var inv_fps = (1000.0f/120.0f);
+            var inv_fps = 1000.0f/120.0f;
             var frame_acum = 0.0f;
             while (_run)
             {
@@ -139,9 +139,8 @@ namespace CETech
                     _mainWindow.Update();
 
                     DevelopSystem.LeaveScope("Application::Update", updateScope);
-                    DevelopSystem.PushRecordInt("gc.total_memory", (int)GC.GetTotalMemory(false));
+                    DevelopSystem.PushRecordInt("gc.total_memory", (int) GC.GetTotalMemory(false));
                     DevelopSystem.Send();
-
                 }
             }
 
@@ -486,7 +485,7 @@ namespace CETech
             TaskManager.Shutdown();
             EntityManager.Shutdown();
 
-			Renderer.Shutdown ();
+            Renderer.Shutdown();
             ConfigSystem.Shutdown();
         }
 

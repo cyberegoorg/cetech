@@ -2,7 +2,6 @@
 using System.Diagnostics;
 using CETech.CEMath;
 using CETech.EntCom;
-using CETech.Resource;
 
 namespace CETech.World
 {
@@ -133,8 +132,8 @@ namespace CETech.World
         private class Levelnstance
         {
             public readonly Dictionary<long, int> units = new Dictionary<long, int>();
-            public int unit;
             public int[] spawned;
+            public int unit;
         }
     }
 }

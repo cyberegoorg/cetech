@@ -7,8 +7,10 @@ namespace CETech.EntCom
     public partial class ComponentSystem
     {
         public delegate void Compiler(YamlMapping body, ConsoleServer.ResponsePacker packer);
-        public delegate void Spawner(int world, int[] ent_ids, int[] ents_parent, MessagePackObjectDictionary[] data);
+
         public delegate void Destroyer(int world, int[] ent_ids);
+
+        public delegate void Spawner(int world, int[] ent_ids, int[] ents_parent, MessagePackObjectDictionary[] data);
 
         public static void RegisterCompiler(long type, Compiler compiler, int spawn_order)
         {
@@ -40,6 +42,5 @@ namespace CETech.EntCom
         {
             DestroyAllTypeImpl(world, ent_ids);
         }
-
     }
 }

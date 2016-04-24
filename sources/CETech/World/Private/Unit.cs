@@ -1,5 +1,4 @@
 using CETech.EntCom;
-using CETech.Resource;
 using MsgPack;
 
 namespace CETech.World
@@ -61,7 +60,7 @@ namespace CETech.World
         public static void Destroy(int world, int unit)
         {
             // TODO: children (track children)
-            ComponentSystem.DestroyAllType(world, new []{unit});
+            ComponentSystem.DestroyAllType(world, new[] {unit});
             EntityManager.Destroy(unit);
         }
     }

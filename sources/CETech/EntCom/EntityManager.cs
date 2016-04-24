@@ -7,7 +7,6 @@ namespace CETech.EntCom
     /// </summary>
     public partial class EntityManager
     {
-
         public static readonly int NullEntity = 0;
 
         /// <summary>

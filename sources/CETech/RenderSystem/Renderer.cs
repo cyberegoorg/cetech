@@ -70,9 +70,9 @@ namespace CETech
         }
 
         public static void Shutdown()
-		{
-			ShutdownImpl ();
-		}
+        {
+            ShutdownImpl();
+        }
 
         public static void RenderWorld(int world, int camera)
         {
@@ -80,9 +80,10 @@ namespace CETech
         }
 
 
-		public static Vec2f GetSize() {
-			return GetSizeImpl();
-		}
+        public static Vec2f GetSize()
+        {
+            return GetSizeImpl();
+        }
 
         /// <summary>
         ///     Resize render view
@@ -129,6 +130,5 @@ namespace CETech
         {
             return RenderStateImpl(key, value);
         }
-
     }
 }

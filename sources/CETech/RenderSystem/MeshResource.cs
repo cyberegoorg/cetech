@@ -31,7 +31,7 @@ namespace CETech
         {
             var serializer = MessagePackSerializer.Get<Resource>();
             var resource = serializer.Unpack(input);
-            return new MeshInstance() { resource = resource };
+            return new MeshInstance {resource = resource};
         }
 
         /// <summary>
@@ -55,11 +55,11 @@ namespace CETech
             instance.vb = new VertexBuffer[resource.geom_name.Length];
             instance.vl = new VertexLayout[resource.geom_name.Length];
 
-            for (int i = 0; i < resource.geom_name.Length; i++)
+            for (var i = 0; i < resource.geom_name.Length; i++)
             {
                 instance.vl[i] = new VertexLayout().Begin();
                 var layout = instance.vl[i];
-                
+
                 layout.Add(VertexAttributeUsage.Position, 3, VertexAttributeType.Float);
 
                 if (resource.normal_enabled[i])
@@ -111,36 +111,36 @@ namespace CETech
 
         public class MeshInstance
         {
+            public IndexBuffer[] ib;
             public Resource resource;
             public VertexBuffer[] vb;
-            public IndexBuffer[] ib;
             public VertexLayout[] vl;
         }
 
         public class Resource
         {
-            public long[] geom_name;
-            public bool[] normal_enabled;
-            public bool[] texcoord_enabled;
-            public bool[] tangent_enable;
             public bool[] bitangent_enabled;
+            public List<short[]> geom_ib = new List<short[]>();
+            public long[] geom_name;
 
             public List<byte[]> geom_vb = new List<byte[]>();
-            public List<short[]> geom_ib = new List<short[]>();
+            public bool[] normal_enabled;
+            public bool[] tangent_enable;
+            public bool[] texcoord_enabled;
         }
 
 #if CETECH_DEVELOP
 
         private static int WriteFloat(byte[] bytes, int idx, float value)
         {
-            byte[] byteArray = BitConverter.GetBytes(value);
-            for (int i = 0; i < byteArray.Length; i++)
+            var byteArray = BitConverter.GetBytes(value);
+            for (var i = 0; i < byteArray.Length; i++)
             {
                 bytes[idx + i] = byteArray[i];
             }
             return byteArray.Length;
         }
-        
+
         private static short YamlToShort(YamlNode node)
         {
             return short.Parse(((YamlScalar) node).Value);
@@ -148,7 +148,7 @@ namespace CETech
 
         private static float YamlToFloat(YamlNode node)
         {
-            return float.Parse(((YamlScalar)node).Value, CultureInfo.InvariantCulture);
+            return float.Parse(((YamlScalar) node).Value, CultureInfo.InvariantCulture);
         }
 
         /// <summary>
@@ -174,15 +174,15 @@ namespace CETech
             var geom_idx = 0;
             foreach (var geom in geometries)
             {
-                var name = ((YamlScalar)geom.Key).Value;
+                var name = ((YamlScalar) geom.Key).Value;
                 resource.geom_name[geom_idx] = StringId.FromString(name);
 
-                var geom_data = (YamlMapping)geom.Value;
+                var geom_data = (YamlMapping) geom.Value;
 
-                var indices = (YamlMapping)geom_data["indices"];
+                var indices = (YamlMapping) geom_data["indices"];
 
-                var position = (YamlSequence)geom_data["position"];
-                var position_indices = (YamlSequence)indices["position"];
+                var position = (YamlSequence) geom_data["position"];
+                var position_indices = (YamlSequence) indices["position"];
                 var vertex_count = position_indices.Count;
 
                 var normal_enabled = geom_data.ContainsKey("normal");
@@ -195,31 +195,31 @@ namespace CETech
                 resource.tangent_enable[geom_idx] = tangent_enabled;
                 resource.bitangent_enabled[geom_idx] = bitangent_enabled;
 
-                var float3_size = (sizeof (float)*3);
-                var float2_size = (sizeof (float)*2);
+                var float3_size = sizeof (float)*3;
+                var float2_size = sizeof (float)*2;
 
                 var vertex_size = float3_size + // Position
-                                  (normal_enabled ? float3_size : 0)   + // normal
+                                  (normal_enabled ? float3_size : 0) + // normal
                                   (texcoord_enabled ? float2_size : 0) + // texcoord
-                                  (tangent_enabled ? float3_size: 0)   + // tangent
-                                  (bitangent_enabled ? float3_size: 0) + // bitangent
+                                  (tangent_enabled ? float3_size : 0) + // tangent
+                                  (bitangent_enabled ? float3_size : 0) + // bitangent
                                   0;
 
                 var ib = new short[vertex_count];
                 var vb = new byte[vertex_size*vertex_count];
                 var write_idx = 0;
 
-                var wm = Quatf.ToMat4F(Quatf.FromEurelAngle(0.0f, 45 * Mathf.ToRad, 0.0f));
+                var wm = Quatf.ToMat4F(Quatf.FromEurelAngle(0.0f, 45*Mathf.ToRad, 0.0f));
 
-                for (int i = 0; i < vertex_count; i++)
+                for (var i = 0; i < vertex_count; i++)
                 {
                     ib[i] = (short) i;
 
-                    var idx = YamlToShort(position_indices[i]) * 3;
+                    var idx = YamlToShort(position_indices[i])*3;
 
                     var pos = new Vec3f(YamlToFloat(position[idx + 0]),
-                                        YamlToFloat(position[idx + 1]),
-                                        YamlToFloat(position[idx + 2]));
+                        YamlToFloat(position[idx + 1]),
+                        YamlToFloat(position[idx + 2]));
                     //pos = wm * pos;
 
                     // position
@@ -230,9 +230,9 @@ namespace CETech
                     // normal
                     if (normal_enabled)
                     {
-                        var normal = (YamlSequence)geom_data["normal"];
-                        var normal_indices = (YamlSequence)indices["normal"];
-                        idx = (short) (YamlToShort(normal_indices[i]) * 3);
+                        var normal = (YamlSequence) geom_data["normal"];
+                        var normal_indices = (YamlSequence) indices["normal"];
+                        idx = (short) (YamlToShort(normal_indices[i])*3);
 
                         write_idx += WriteFloat(vb, write_idx, YamlToFloat(normal[idx + 0]));
                         write_idx += WriteFloat(vb, write_idx, YamlToFloat(normal[idx + 1]));
@@ -242,20 +242,20 @@ namespace CETech
                     // texcoord
                     if (texcoord_enabled)
                     {
-                        var texcoord = (YamlSequence)geom_data["texcoord"];
-                        var texcoord_indices = (YamlSequence)indices["texcoord"];
-                        idx = (short) (YamlToShort(texcoord_indices[i]) * 2);
+                        var texcoord = (YamlSequence) geom_data["texcoord"];
+                        var texcoord_indices = (YamlSequence) indices["texcoord"];
+                        idx = (short) (YamlToShort(texcoord_indices[i])*2);
 
                         write_idx += WriteFloat(vb, write_idx, YamlToFloat(texcoord[idx + 0]));
                         write_idx += WriteFloat(vb, write_idx, YamlToFloat(texcoord[idx + 1]));
                     }
-                    
+
                     // tangent
                     if (tangent_enabled)
                     {
-                        var tangent = (YamlSequence)geom_data["tangent"];
-                        var tangent_indices = (YamlSequence)indices["tangent"];
-                        idx = (short) (YamlToShort(tangent_indices[i]) * 3);
+                        var tangent = (YamlSequence) geom_data["tangent"];
+                        var tangent_indices = (YamlSequence) indices["tangent"];
+                        idx = (short) (YamlToShort(tangent_indices[i])*3);
 
                         write_idx += WriteFloat(vb, write_idx, YamlToFloat(tangent[idx + 0]));
                         write_idx += WriteFloat(vb, write_idx, YamlToFloat(tangent[idx + 1]));
@@ -264,9 +264,9 @@ namespace CETech
                     // bitangent
                     if (bitangent_enabled)
                     {
-                        var bitangent = (YamlSequence)geom_data["bitangent"];
-                        var bitangent_indices = (YamlSequence)indices["bitangent"];
-                        idx = (short) (YamlToShort(bitangent_indices[i]) * 3);
+                        var bitangent = (YamlSequence) geom_data["bitangent"];
+                        var bitangent_indices = (YamlSequence) indices["bitangent"];
+                        idx = (short) (YamlToShort(bitangent_indices[i])*3);
 
                         write_idx += WriteFloat(vb, write_idx, YamlToFloat(bitangent[idx + 0]));
                         write_idx += WriteFloat(vb, write_idx, YamlToFloat(bitangent[idx + 1]));

@@ -1,3 +1,4 @@
+using System;
 using MoonSharp.Interpreter;
 
 namespace CETech.CEMath
@@ -48,7 +49,7 @@ namespace CETech.CEMath
         public static Mat4f CreatePerspectiveFieldOfView(float fieldOfView, float aspectRatio,
             float nearPlaneDistance, float farPlaneDistance)
         {
-            var yScale = 1.0f/(float) System.Math.Tan(fieldOfView*0.5f);
+            var yScale = 1.0f/(float) Math.Tan(fieldOfView*0.5f);
             var xScale = yScale/aspectRatio;
 
             Mat4f result;
@@ -75,14 +76,20 @@ namespace CETech.CEMath
             var yaxis = Vec3f.Cross(zaxis, xaxis);
 
             var result = Identity;
-            result.M11 = xaxis.X; result.M12 = yaxis.X; result.M13 = zaxis.X;
-            result.M21 = xaxis.Y; result.M22 = yaxis.Y; result.M23 = zaxis.Y;
-            result.M31 = xaxis.Z; result.M32 = yaxis.Z; result.M33 = zaxis.Z;
+            result.M11 = xaxis.X;
+            result.M12 = yaxis.X;
+            result.M13 = zaxis.X;
+            result.M21 = xaxis.Y;
+            result.M22 = yaxis.Y;
+            result.M23 = zaxis.Y;
+            result.M31 = xaxis.Z;
+            result.M32 = yaxis.Z;
+            result.M33 = zaxis.Z;
 
             result.M41 = -Vec3f.Dot(xaxis, cameraPosition);
             result.M42 = -Vec3f.Dot(yaxis, cameraPosition);
             result.M43 = -Vec3f.Dot(zaxis, cameraPosition);
-            
+
             return result;
         }
 
@@ -113,8 +120,8 @@ namespace CETech.CEMath
 
         public static Mat4f CreateRotationY(float radians)
         {
-            var c = (float) System.Math.Cos(radians);
-            var s = (float) System.Math.Sin(radians);
+            var c = (float) Math.Cos(radians);
+            var s = (float) Math.Sin(radians);
 
             var result = Identity;
             result.M11 = c;
@@ -139,7 +146,7 @@ namespace CETech.CEMath
             if (norm < epsilon)
                 zaxis = -cameraForwardVector;
             else
-                zaxis = zaxis*(1.0f/(float) System.Math.Sqrt(norm));
+                zaxis = zaxis*(1.0f/(float) Math.Sqrt(norm));
 
             var xaxis = Vec3f.Normalize(Vec3f.Cross(cameraUpVector, zaxis));
             var yaxis = Vec3f.Cross(zaxis, xaxis);
@@ -163,7 +170,7 @@ namespace CETech.CEMath
 
         public static Mat4f CreateReflection(Vec3f normal, float d)
         {
-            var scale = 1.0f/(float) System.Math.Sqrt(Vec3f.LengthSquared(normal));
+            var scale = 1.0f/(float) Math.Sqrt(Vec3f.LengthSquared(normal));
             var a = normal.X*scale;
             var b = normal.Y*scale;
             var c = normal.Z*scale;
@@ -173,7 +180,7 @@ namespace CETech.CEMath
             var fb = -2.0f*b;
             var fc = -2.0f*c;
 
-            Mat4f result = Identity;
+            var result = Identity;
 
             result.M11 = fa*a + 1.0f;
             result.M12 = fb*a;
@@ -203,16 +210,16 @@ namespace CETech.CEMath
             //  Roll first, about axis the object is facing, then
             //  pitch upward, then yaw to face into the new heading
             var halfRoll = roll*0.5f;
-            var sr = (float) System.Math.Sin(halfRoll);
-            var cr = (float) System.Math.Cos(halfRoll);
+            var sr = (float) Math.Sin(halfRoll);
+            var cr = (float) Math.Cos(halfRoll);
 
             var halfPitch = pitch*0.5f;
-            var sp = (float) System.Math.Sin(halfPitch);
-            var cp = (float) System.Math.Cos(halfPitch);
+            var sp = (float) Math.Sin(halfPitch);
+            var cp = (float) Math.Cos(halfPitch);
 
             var halfYaw = yaw*0.5f;
-            var sy = (float) System.Math.Sin(halfYaw);
-            var cy = (float) System.Math.Cos(halfYaw);
+            var sy = (float) Math.Sin(halfYaw);
+            var cy = (float) Math.Cos(halfYaw);
 
             var x = cy*sp*cr + sy*cp*sr;
             var y = sy*cp*cr - cy*sp*sr;
@@ -262,86 +269,86 @@ namespace CETech.CEMath
 
         public static float GetDeterminant(Mat4f m)
         {
-            float xx = m.M11;
-            float xy = m.M12;
-            float xz = m.M13;
-            float xw = m.M14;
+            var xx = m.M11;
+            var xy = m.M12;
+            var xz = m.M13;
+            var xw = m.M14;
 
-            float yx = m.M21;
-            float yy = m.M22;
-            float yz = m.M23;
-            float yw = m.M24;
+            var yx = m.M21;
+            var yy = m.M22;
+            var yz = m.M23;
+            var yw = m.M24;
 
-            float zx = m.M31;
-            float zy = m.M32;
-            float zz = m.M33;
-            float zw = m.M34;
+            var zx = m.M31;
+            var zy = m.M32;
+            var zz = m.M33;
+            var zw = m.M34;
 
-            float tx = m.M41;
-            float ty = m.M42;
-            float tz = m.M43;
-            float tw = m.M44;
+            var tx = m.M41;
+            var ty = m.M42;
+            var tz = m.M43;
+            var tw = m.M44;
 
-            float det = 0.0f;
-            det += +xx * (yy * (zz * tw - tz * zw) - zy * (yz * tw - tz * yw) + ty * (yz * zw - zz * yw));
-            det += -yx * (xy * (zz * tw - tz * zw) - zy * (xz * tw - tz * xw) + ty * (xz * zw - zz * xw));
-            det += +zx * (xy * (yz * tw - tz * yw) - yy * (xz * tw - tz * xw) + ty * (xz * yw - yz * xw));
-            det += -tx * (xy * (yz * zw - zz * yw) - yy * (xz * zw - zz * xw) + zy * (xz * yw - yz * xw));
+            var det = 0.0f;
+            det += +xx*(yy*(zz*tw - tz*zw) - zy*(yz*tw - tz*yw) + ty*(yz*zw - zz*yw));
+            det += -yx*(xy*(zz*tw - tz*zw) - zy*(xz*tw - tz*xw) + ty*(xz*zw - zz*xw));
+            det += +zx*(xy*(yz*tw - tz*yw) - yy*(xz*tw - tz*xw) + ty*(xz*yw - yz*xw));
+            det += -tx*(xy*(yz*zw - zz*yw) - yy*(xz*zw - zz*xw) + zy*(xz*yw - yz*xw));
 
             return det;
         }
 
         public static Mat4f Inverted(Mat4f m)
         {
-            float xx = m.M11;
-            float xy = m.M12;
-            float xz = m.M13;
-            float xw = m.M14;
+            var xx = m.M11;
+            var xy = m.M12;
+            var xz = m.M13;
+            var xw = m.M14;
 
-            float yx = m.M21;
-            float yy = m.M22;
-            float yz = m.M23;
-            float yw = m.M24;
+            var yx = m.M21;
+            var yy = m.M22;
+            var yz = m.M23;
+            var yw = m.M24;
 
-            float zx = m.M31;
-            float zy = m.M32;
-            float zz = m.M33;
-            float zw = m.M34;
+            var zx = m.M31;
+            var zy = m.M32;
+            var zz = m.M33;
+            var zw = m.M34;
 
-            float tx = m.M41;
-            float ty = m.M42;
-            float tz = m.M43;
-            float tw = m.M44;
+            var tx = m.M41;
+            var ty = m.M42;
+            var tz = m.M43;
+            var tw = m.M44;
 
-            float det = GetDeterminant(m);
-            float inv_det = 1.0f / det;
+            var det = GetDeterminant(m);
+            var inv_det = 1.0f/det;
 
-            m.M11 = +(yy * (zz * tw - tz * zw) - zy * (yz * tw - tz * yw) + ty * (yz * zw - zz * yw)) * inv_det;
-            m.M12 = -(xy * (zz * tw - tz * zw) - zy * (xz * tw - tz * xw) + ty * (xz * zw - zz * xw)) * inv_det;
-            m.M13 = +(xy * (yz * tw - tz * yw) - yy * (xz * tw - tz * xw) + ty * (xz * yw - yz * xw)) * inv_det;
-            m.M14 = -(xy * (yz * zw - zz * yw) - yy * (xz * zw - zz * xw) + zy * (xz * yw - yz * xw)) * inv_det;
+            m.M11 = +(yy*(zz*tw - tz*zw) - zy*(yz*tw - tz*yw) + ty*(yz*zw - zz*yw))*inv_det;
+            m.M12 = -(xy*(zz*tw - tz*zw) - zy*(xz*tw - tz*xw) + ty*(xz*zw - zz*xw))*inv_det;
+            m.M13 = +(xy*(yz*tw - tz*yw) - yy*(xz*tw - tz*xw) + ty*(xz*yw - yz*xw))*inv_det;
+            m.M14 = -(xy*(yz*zw - zz*yw) - yy*(xz*zw - zz*xw) + zy*(xz*yw - yz*xw))*inv_det;
 
-            m.M21 = -(yx * (zz * tw - tz * zw) - zx * (yz * tw - tz * yw) + tx * (yz * zw - zz * yw)) * inv_det;
-            m.M22 = +(xx * (zz * tw - tz * zw) - zx * (xz * tw - tz * xw) + tx * (xz * zw - zz * xw)) * inv_det;
-            m.M23 = -(xx * (yz * tw - tz * yw) - yx * (xz * tw - tz * xw) + tx * (xz * yw - yz * xw)) * inv_det;
-            m.M24 = +(xx * (yz * zw - zz * yw) - yx * (xz * zw - zz * xw) + zx * (xz * yw - yz * xw)) * inv_det;
+            m.M21 = -(yx*(zz*tw - tz*zw) - zx*(yz*tw - tz*yw) + tx*(yz*zw - zz*yw))*inv_det;
+            m.M22 = +(xx*(zz*tw - tz*zw) - zx*(xz*tw - tz*xw) + tx*(xz*zw - zz*xw))*inv_det;
+            m.M23 = -(xx*(yz*tw - tz*yw) - yx*(xz*tw - tz*xw) + tx*(xz*yw - yz*xw))*inv_det;
+            m.M24 = +(xx*(yz*zw - zz*yw) - yx*(xz*zw - zz*xw) + zx*(xz*yw - yz*xw))*inv_det;
 
-            m.M31 = +(yx * (zy * tw - ty * zw) - zx * (yy * tw - ty * yw) + tx * (yy * zw - zy * yw)) * inv_det;
-            m.M32 = -(xx * (zy * tw - ty * zw) - zx * (xy * tw - ty * xw) + tx * (xy * zw - zy * xw)) * inv_det;
-            m.M33 = +(xx * (yy * tw - ty * yw) - yx * (xy * tw - ty * xw) + tx * (xy * yw - yy * xw)) * inv_det;
-            m.M34 = -(xx * (yy * zw - zy * yw) - yx * (xy * zw - zy * xw) + zx * (xy * yw - yy * xw)) * inv_det;
+            m.M31 = +(yx*(zy*tw - ty*zw) - zx*(yy*tw - ty*yw) + tx*(yy*zw - zy*yw))*inv_det;
+            m.M32 = -(xx*(zy*tw - ty*zw) - zx*(xy*tw - ty*xw) + tx*(xy*zw - zy*xw))*inv_det;
+            m.M33 = +(xx*(yy*tw - ty*yw) - yx*(xy*tw - ty*xw) + tx*(xy*yw - yy*xw))*inv_det;
+            m.M34 = -(xx*(yy*zw - zy*yw) - yx*(xy*zw - zy*xw) + zx*(xy*yw - yy*xw))*inv_det;
 
-            m.M41 = -(yx * (zy * tz - ty * zz) - zx * (yy * tz - ty * yz) + tx * (yy * zz - zy * yz)) * inv_det;
-            m.M42 = +(xx * (zy * tz - ty * zz) - zx * (xy * tz - ty * xz) + tx * (xy * zz - zy * xz)) * inv_det;
-            m.M43 = -(xx * (yy * tz - ty * yz) - yx * (xy * tz - ty * xz) + tx * (xy * yz - yy * xz)) * inv_det;
-            m.M44 = +(xx * (yy * zz - zy * yz) - yx * (xy * zz - zy * xz) + zx * (xy * yz - yy * xz)) * inv_det;
+            m.M41 = -(yx*(zy*tz - ty*zz) - zx*(yy*tz - ty*yz) + tx*(yy*zz - zy*yz))*inv_det;
+            m.M42 = +(xx*(zy*tz - ty*zz) - zx*(xy*tz - ty*xz) + tx*(xy*zz - zy*xz))*inv_det;
+            m.M43 = -(xx*(yy*tz - ty*yz) - yx*(xy*tz - ty*xz) + tx*(xy*yz - yy*xz))*inv_det;
+            m.M44 = +(xx*(yy*zz - zy*yz) - yx*(xy*zz - zy*xz) + zx*(xy*yz - yy*xz))*inv_det;
 
             return m;
         }
 
         public static Mat4f operator *(Mat4f value1, Mat4f value2)
         {
-            Mat4f m = Identity;
+            var m = Identity;
 
             // First row
             m.M11 = value1.M11*value2.M11 + value1.M12*value2.M21 + value1.M13*value2.M31 + value1.M14*value2.M41;

@@ -1,11 +1,9 @@
-﻿using CETech.CEMath;
-using CETech.Lua;
+﻿using CETech.Lua;
 
 namespace CETech
 {
     public partial class Game
     {
-
         private static void InitImpl()
         {
             LuaEnviroment.BootScriptCallInit();

@@ -21,16 +21,16 @@ namespace CETech.CEMath
 
         public static float LengthSquared(Vec2f value)
         {
-            return value.X* value.X + value.Y * value.Y;
+            return value.X*value.X + value.Y*value.Y;
         }
 
         public static float Length(Vec2f value)
         {
-            return (float)Math.Sqrt(value.X * value.X + value.Y * value.Y);
+            return (float) Math.Sqrt(value.X*value.X + value.Y*value.Y);
         }
 
         public static Vec2f Normalize(Vec2f value)
-        {       
+        {
             var inv_length = 1.0f/(float) Math.Sqrt(value.X*value.X + value.Y*value.Y);
             return new Vec2f(value.X*inv_length, value.Y*inv_length);
         }

@@ -66,6 +66,5 @@ namespace CETech.Input
         {
             PlayRumbleimpl(gamepad, strength, length);
         }
-
     }
 }
