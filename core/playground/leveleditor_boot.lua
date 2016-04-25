@@ -6,6 +6,7 @@ Editor = Editor or {}
 function Editor:init()
     EditorInput:Init()
 
+    self.viewport = Renderer.GetViewport("default")
     self.world = World.Create()
     self.camera_unit = Unit.Spawn(self.world, "camera")
     self.camera = Camera.GetCamera(self.world, self.camera_unit)
@@ -46,7 +47,7 @@ function Editor:update(dt)
 end
 
 function Editor:render()
-    Renderer.RenderWorld(self.world, self.camera)
+    Renderer.RenderWorld(self.world, self.camera, self.viewport)
 end
 
 function Editor:load_level(level)

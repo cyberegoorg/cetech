@@ -1,4 +1,5 @@
-﻿using CETech.CEMath;
+﻿using System;
+using CETech.CEMath;
 
 namespace CETech
 {
@@ -74,11 +75,15 @@ namespace CETech
             ShutdownImpl();
         }
 
-        public static void RenderWorld(int world, int camera)
+        public static void RenderWorld(int world, int camera, int viewport)
         {
-            RenderWorldImpl(world, camera);
+            RenderWorldImpl(world, camera, viewport);
         }
 
+        public static int GetViewport(long name)
+        {
+            return GetViewportImpl(name);
+        }
 
         public static Vec2f GetSize()
         {

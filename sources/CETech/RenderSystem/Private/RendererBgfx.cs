@@ -4,6 +4,7 @@ using System.IO;
 using System.Runtime.InteropServices;
 using CETech.CEMath;
 using CETech.Develop;
+using CETech.Resource;
 using CETech.Utils;
 using CETech.World;
 using SharpBgfx;
@@ -94,7 +95,7 @@ namespace CETech
             return new Vec2f(_data.ResizeW, _data.ResizeH);
         }
 
-        private static void RenderWorldImpl(int world, int camera)
+        private static void RenderWorldImpl(int world, int camera, int viewport)
         {
             if (_data.NeedResize)
             {
@@ -478,6 +479,24 @@ namespace CETech
             {
                 _aviWriter.WriteFrame(data, size);
             }
+        }
+
+        private static int GetViewportImpl(long name)
+        {
+            var resource = Resource.Resource.Get<RenderConfig.ConfigInstance>(RenderConfig.Type,
+                StringId.FromString("default"));
+
+            for (int i = 0; i < resource.resource.ViewportName.Count; i++)
+            {
+                if (resource.resource.ViewportName[i] != name)
+                {
+                    continue;
+                }
+
+                return i;
+            }
+
+            return -1; //TODO:
         }
     }
 }

@@ -12,7 +12,8 @@ function Game:init()
     Log.Error("boot.lua", "error")
     Log.Debug("boot.lua", "debug")
 
-    self.world = World.Create();
+    self.viewport = Renderer.GetViewport("default")
+    self.world = World.Create()
 
     --self.unit = Unit.Spawn(self.world, "unit1");
     World.LoadLevel(self.world, "level1");
@@ -127,7 +128,7 @@ function Game:update(dt)
 end
 
 function Game:render()
-    Renderer.RenderWorld(self.world, self.camera)
+    Renderer.RenderWorld(self.world, self.camera, self.viewport)
 end
 
 function foo(value)
