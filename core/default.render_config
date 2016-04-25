@@ -8,8 +8,21 @@
 #      cull_mode: "cw"
 
 global_resource:
-  - type: render_target
-    name: target1
+  - name: gbuffer0
+    type: render_target
     format: RGBA8
     ration: equal
 
+  - name: gbuffer1
+    type: render_target
+    format: RGBA8
+    ration: equal
+
+layer:
+  default:
+    - name: "gbuffer"
+      output: ["gbuffer0", "gbuffer1"]
+
+viewport:
+  default:
+    layer: default

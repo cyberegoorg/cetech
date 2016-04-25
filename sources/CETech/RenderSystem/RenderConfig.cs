@@ -1,8 +1,10 @@
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Yaml;
 using CETech.Develop;
 using CETech.Resource;
+using CETech.Utils;
 using MsgPack.Serialization;
 using SharpBgfx;
 
@@ -83,9 +85,18 @@ namespace CETech
 
         public class Resource
         {
+            // Global resource
             public List<ulong> GlobalResourceFormat = new List<ulong>();
             public List<long> GlobalResourceName = new List<long>();
             public List<ulong> GlobalResourceRation = new List<ulong>();
+
+            // Vieport
+            public List<long> ViewportName= new List<long>();
+            public List<int> ViewportLayer= new List<int>();
+
+            // Layer
+            public List<long> LayerName = new List<long>();
+
         }
 
 #if CETECH_DEVELOP
@@ -162,26 +173,78 @@ namespace CETech
 
             var resource = new Resource();
 
-            foreach (var node in rootNode)
-            {
-                switch (((YamlScalar) node.Key).Value)
-                {
-                    case "global_resource":
-                        ParseGlobalResource((YamlSequence) node.Value, resource);
-                        break;
-                }
-            }
+            var global_resource = rootNode["global_resource"];
+            ParseGlobalResource((YamlSequence)global_resource, resource);
+
+            var layer = rootNode["layer"];
+            ParseLayer((YamlMapping)layer, resource);
+
+            var viewport = rootNode["viewport"];
+            ParseViewport((YamlMapping)viewport, resource);
 
             var serializer = MessagePackSerializer.Get<Resource>();
             serializer.Pack(capi.BuildFile, resource);
         }
 
+        private static int GetLayerIdx(long layer_name, Resource resource)
+        {
+            for (int i = 0; i < resource.LayerName.Count; i++)
+            {
+                if (resource.LayerName[i] != layer_name)
+                {
+                    continue;
+                }
+
+                return i;
+            }
+
+            return -1; // TODO:
+        }
+
+        private static void ParseLayer(YamlMapping layer, Resource resource)
+        {
+            for (var i = 0; i < layer.Count; i++)
+            {
+                var item = layer.ElementAt(i);
+
+                //var layer_def = (YamlMapping)item.Value;
+                var name = ((YamlScalar)item.Key).Value;
+
+                resource.LayerName.Add(StringId.FromString(name));
+
+                //var layer = ((YamlScalar)viewport_def["layer"]).Value;
+            }
+        }
+
+        private static void ParseViewport(YamlMapping viewport, Resource resource)
+        {
+            for (var i = 0; i < viewport.Count; i++)
+            {
+                var item = viewport.ElementAt(i);
+                var viewport_def = (YamlMapping) item.Value;
+                var name = ((YamlScalar) item.Key).Value;
+
+                var layer = ((YamlScalar) viewport_def["layer"]).Value;
+
+                var layer_idx = GetLayerIdx(StringId.FromString(layer), resource);
+
+                if (layer_idx < 0)
+                {
+                    Log.Error("rener_config", "Layer not found");
+                    return;
+                }
+
+                resource.ViewportName.Add(StringId.FromString(name));
+                resource.ViewportLayer.Add(layer_idx);                
+            }
+        }
 #endif
+
+        public class ConfigInstance
+        {
+            public Dictionary<long, Texture> GlobalResource = new Dictionary<long, Texture>();
+            public RenderConfig.Resource resource;
+        }
     }
 
-    public class ConfigInstance
-    {
-        public Dictionary<long, Texture> GlobalResource = new Dictionary<long, Texture>();
-        public RenderConfig.Resource resource;
-    }
 }
