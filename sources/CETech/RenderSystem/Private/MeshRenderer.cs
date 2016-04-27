@@ -115,7 +115,6 @@ namespace CETech.World
                     Bgfx.SetTexture(0, tu[j], t[j].texture);
                 }
 
-
                 var world_matrix = Tranform.GetWorldMatrix(world,
                     Tranform.GetTranform(world, item.Key));
 

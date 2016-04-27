@@ -215,7 +215,7 @@ namespace CETech
                 case "RG32F":
                     return (ulong) SharpBgfx.TextureFormat.RG32F;
 
-                /*                case "RGB8":
+                /* TODO:               case "RGB8":
                                     return (ulong)TextureFormat.RGB8;
                                 case "RGB8I":
                                     return (ulong)TextureFormat.RGB8I;
