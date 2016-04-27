@@ -4,7 +4,6 @@ using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Yaml;
-using CETech.CEMath;
 using CETech.Develop;
 using CETech.Resource;
 using MsgPack.Serialization;
@@ -17,6 +16,35 @@ namespace CETech
     /// </summary>
     public class MeshResource
     {
+        [Flags]
+        public enum ChanelType
+        {
+            Null = 0,
+            Position = 1 << 0,
+            Normal = 1 << 1,
+            Tangent = 1 << 2,
+            Bitangent = 1 << 3,
+            Color0 = 1 << 4,
+            Color1 = 1 << 5,
+            Indices = 1 << 6,
+            Weight = 1 << 7,
+            TexCoord0 = 1 << 8,
+            TexCoord1 = 1 << 9,
+            TexCoord2 = 1 << 10,
+            TexCoord3 = 1 << 11,
+            TexCoord4 = 1 << 12,
+            TexCoord5 = 1 << 13,
+            TexCoord6 = 1 << 14,
+            TexCoord7 = 1 << 15
+        }
+
+        public enum StreamType
+        {
+            Null = 0,
+            Vec2,
+            Vec3
+        }
+
         /// <summary>
         ///     Resource type
         /// </summary>
@@ -42,6 +70,13 @@ namespace CETech
         {
         }
 
+        public static void AddToLayout(VertexLayout layout, VertexAttributeUsage usage, StreamType type)
+        {
+            var sdef = StreamDefFromType(type);
+
+            layout.Add(usage, sdef.count, sdef.attr_type);
+        }
+
         /// <summary>
         ///     Resource online
         /// </summary>
@@ -59,30 +94,19 @@ namespace CETech
             {
                 instance.vl[i] = new VertexLayout().Begin();
                 var layout = instance.vl[i];
+                var stypes = resource.stypes[i];
+                var stypes_idx = 0;
 
-                layout.Add(VertexAttributeUsage.Position, 3, VertexAttributeType.Float);
 
-                if (resource.normal_enabled[i])
+                for (int j = 0; j < ChanelDefs.Length; j++)
                 {
-                    layout.Add(VertexAttributeUsage.Normal, 3, VertexAttributeType.Float, true);
+                    var chanel_def = ChanelDefs[j];
+                    if (resource.types[i].HasFlag(chanel_def.type))
+                    {
+                        var stype = stypes[stypes_idx++];
+                        AddToLayout(layout, chanel_def.usage, stype);
+                    }
                 }
-
-
-                if (resource.texcoord_enabled[i])
-                {
-                    layout.Add(VertexAttributeUsage.TexCoord0, 2, VertexAttributeType.Float);
-                }
-
-                if (resource.tangent_enable[i])
-                {
-                    layout.Add(VertexAttributeUsage.Tangent, 3, VertexAttributeType.Float, true);
-                }
-
-                if (resource.bitangent_enabled[i])
-                {
-                    layout.Add(VertexAttributeUsage.Bitangent, 3, VertexAttributeType.Float, true);
-                }
-
                 layout.End();
 
                 instance.ib[i] = new IndexBuffer(MemoryBlock.FromArray(resource.geom_ib[i]));
@@ -124,13 +148,97 @@ namespace CETech
             public long[] geom_name;
 
             public List<byte[]> geom_vb = new List<byte[]>();
-            public bool[] normal_enabled;
-            public bool[] tangent_enable;
-            public bool[] texcoord_enabled;
+            public List<ChanelType> types = new List<ChanelType>();
+            public List<List<StreamType>> stypes = new List<List<StreamType>>();
+        }
+
+        private struct ChanelDef
+        {
+            public string name;
+            public ChanelType type;
+            public VertexAttributeUsage usage;
+
+            public ChanelDef(string name, ChanelType type, VertexAttributeUsage usage)
+            {
+                this.name = name;
+                this.type = type;
+                this.usage = usage;
+            }
+        }
+
+        private struct StreamDef
+        {
+            public string name;
+            public StreamType type;
+            public VertexAttributeType attr_type;
+            public int size;
+            public int count;
+
+            public StreamDef(string name, StreamType type, VertexAttributeType attr_type, int size, int count)
+            {
+                this.name = name;
+                this.type = type;
+                this.attr_type = attr_type;
+                this.size = size;
+                this.count = count;
+            }
+        }
+
+        private static ChanelDef[] ChanelDefs =
+        {
+            new ChanelDef("position", ChanelType.Position, VertexAttributeUsage.Position),
+            new ChanelDef("normal", ChanelType.Normal, VertexAttributeUsage.Normal),
+            new ChanelDef("tangent", ChanelType.Tangent, VertexAttributeUsage.Tangent),
+            new ChanelDef("bitangent", ChanelType.Bitangent, VertexAttributeUsage.Bitangent),
+            new ChanelDef("color0", ChanelType.Color0, VertexAttributeUsage.Color0),
+            new ChanelDef("color1", ChanelType.Color1, VertexAttributeUsage.Color1),
+            new ChanelDef("indices", ChanelType.Indices, VertexAttributeUsage.Indices),
+            new ChanelDef("weight", ChanelType.Weight, VertexAttributeUsage.Weight),
+            new ChanelDef("texcoord0", ChanelType.TexCoord0, VertexAttributeUsage.TexCoord0),
+            new ChanelDef("texcoord1", ChanelType.TexCoord1, VertexAttributeUsage.TexCoord1),
+            new ChanelDef("texcoord2", ChanelType.TexCoord2, VertexAttributeUsage.TexCoord2),
+            new ChanelDef("texcoord3", ChanelType.TexCoord3, VertexAttributeUsage.TexCoord3),
+            new ChanelDef("texcoord4", ChanelType.TexCoord4, VertexAttributeUsage.TexCoord4),
+            new ChanelDef("texcoord5", ChanelType.TexCoord5, VertexAttributeUsage.TexCoord5),
+            new ChanelDef("texcoord6", ChanelType.TexCoord6, VertexAttributeUsage.TexCoord6),
+            new ChanelDef("texcoord7", ChanelType.TexCoord7, VertexAttributeUsage.TexCoord7)
+        };
+
+        private static StreamDef[] StreamDefs =
+        {
+            new StreamDef("vec2", StreamType.Vec2, VertexAttributeType.Float, sizeof(float)*2, 2),
+            new StreamDef("vec3", StreamType.Vec3, VertexAttributeType.Float, sizeof(float)*3, 3)
+        };
+
+        private static StreamDef StreamDefFromString(string str)
+        {
+            for (int i = 0; i < StreamDefs.Length; i++)
+            {
+                if (StreamDefs[i].name != str)
+                {
+                    continue;
+                }
+
+                return StreamDefs[i];
+            }
+            return new StreamDef();
+        }
+
+        private static StreamDef StreamDefFromType(StreamType type)
+        {
+            for (int i = 0; i < StreamDefs.Length; i++)
+            {
+                if (StreamDefs[i].type != type)
+                {
+                    continue;
+                }
+
+                return StreamDefs[i];
+            }
+            return new StreamDef();
         }
 
 #if CETECH_DEVELOP
-
         private static int WriteFloat(byte[] bytes, int idx, float value)
         {
             var byteArray = BitConverter.GetBytes(value);
@@ -151,6 +259,30 @@ namespace CETech
             return float.Parse(((YamlScalar) node).Value, CultureInfo.InvariantCulture);
         }
 
+        private static int WriteChanel(int write_idx, byte[] output, int vidx, string name, YamlMapping geom_data,
+            YamlMapping indices, float size)
+        {
+            var data = (YamlSequence) geom_data[name];
+            var indices_data = (YamlSequence) indices[name];
+
+            var idx = (short) (YamlToShort(indices_data[vidx])*size);
+
+
+            write_idx += WriteFloat(output, write_idx, YamlToFloat(data[idx + 0]));
+
+            if (size > 1)
+            {
+                write_idx += WriteFloat(output, write_idx, YamlToFloat(data[idx + 1]));
+            }
+
+            if (size > 2)
+            {
+                write_idx += WriteFloat(output, write_idx, YamlToFloat(data[idx + 2]));
+            }
+
+            return write_idx;
+        }
+
         /// <summary>
         ///     Resource compiler
         /// </summary>
@@ -166,10 +298,6 @@ namespace CETech
             var geometries = (YamlMapping) rootNode["geometries"];
 
             resource.geom_name = new long[geometries.Count];
-            resource.normal_enabled = new bool[geometries.Count];
-            resource.texcoord_enabled = new bool[geometries.Count];
-            resource.tangent_enable = new bool[geometries.Count];
-            resource.bitangent_enabled = new bool[geometries.Count];
 
             var geom_idx = 0;
             foreach (var geom in geometries)
@@ -180,101 +308,55 @@ namespace CETech
                 var geom_data = (YamlMapping) geom.Value;
 
                 var indices = (YamlMapping) geom_data["indices"];
+                var types = (YamlMapping) geom_data["types"];
+                var chanels = (YamlMapping) geom_data["chanels"];
+                var vertex_count = int.Parse(((YamlScalar)indices["size"]).Value);
 
-                var position = (YamlSequence) geom_data["position"];
-                var position_indices = (YamlSequence) indices["position"];
-                var vertex_count = position_indices.Count;
+                var vertex_size = 0;
+                var enabled = ChanelType.Null;
+                var stypes = new List<StreamType>();
+                for (int i = 0; i < ChanelDefs.Length; i++)
+                {
+                    var item = ChanelDefs[i];
 
-                var normal_enabled = geom_data.ContainsKey("normal");
-                var texcoord_enabled = geom_data.ContainsKey("texcoord");
-                var tangent_enabled = geom_data.ContainsKey("tangent");
-                var bitangent_enabled = geom_data.ContainsKey("bitangent");
+                    if (chanels.ContainsKey(item.name))
+                    {
+                        enabled |= item.type;
 
-                resource.normal_enabled[geom_idx] = normal_enabled;
-                resource.texcoord_enabled[geom_idx] = texcoord_enabled;
-                resource.tangent_enable[geom_idx] = tangent_enabled;
-                resource.bitangent_enabled[geom_idx] = bitangent_enabled;
+                        var stream_type = ((YamlScalar)types[item.name]).Value;
+                        var sdef = StreamDefFromString(stream_type);
+                        vertex_size += sdef.size;
 
-                var float3_size = sizeof (float)*3;
-                var float2_size = sizeof (float)*2;
+                        stypes.Add(sdef.type);
+                    }
+                }
+                resource.stypes.Add(stypes);
 
-                var vertex_size = float3_size + // Position
-                                  (normal_enabled ? float3_size : 0) + // normal
-                                  (texcoord_enabled ? float2_size : 0) + // texcoord
-                                  (tangent_enabled ? float3_size : 0) + // tangent
-                                  (bitangent_enabled ? float3_size : 0) + // bitangent
-                                  0;
-
+                var write_idx = 0;
                 var ib = new short[vertex_count];
                 var vb = new byte[vertex_size*vertex_count];
-                var write_idx = 0;
-
-                var wm = Quatf.ToMat4F(Quatf.FromEurelAngle(0.0f, 45*Mathf.ToRad, 0.0f));
 
                 for (var i = 0; i < vertex_count; i++)
                 {
                     ib[i] = (short) i;
 
-                    var idx = YamlToShort(position_indices[i])*3;
-
-                    var pos = new Vec3f(YamlToFloat(position[idx + 0]),
-                        YamlToFloat(position[idx + 1]),
-                        YamlToFloat(position[idx + 2]));
-                    //pos = wm * pos;
-
-                    // position
-                    write_idx += WriteFloat(vb, write_idx, pos.X);
-                    write_idx += WriteFloat(vb, write_idx, pos.Y);
-                    write_idx += WriteFloat(vb, write_idx, pos.Z);
-
-                    // normal
-                    if (normal_enabled)
+                    for (int j = 0; j < ChanelDefs.Length; j++)
                     {
-                        var normal = (YamlSequence) geom_data["normal"];
-                        var normal_indices = (YamlSequence) indices["normal"];
-                        idx = (short) (YamlToShort(normal_indices[i])*3);
+                        var item = ChanelDefs[j];
 
-                        write_idx += WriteFloat(vb, write_idx, YamlToFloat(normal[idx + 0]));
-                        write_idx += WriteFloat(vb, write_idx, YamlToFloat(normal[idx + 1]));
-                        write_idx += WriteFloat(vb, write_idx, YamlToFloat(normal[idx + 2]));
-                    }
+                        if (enabled.HasFlag(item.type))
+                        {
+                            var stream_type = ((YamlScalar)types[item.name]).Value;
+                            var sdef = StreamDefFromString(stream_type);
 
-                    // texcoord
-                    if (texcoord_enabled)
-                    {
-                        var texcoord = (YamlSequence) geom_data["texcoord"];
-                        var texcoord_indices = (YamlSequence) indices["texcoord"];
-                        idx = (short) (YamlToShort(texcoord_indices[i])*2);
-
-                        write_idx += WriteFloat(vb, write_idx, YamlToFloat(texcoord[idx + 0]));
-                        write_idx += WriteFloat(vb, write_idx, YamlToFloat(texcoord[idx + 1]));
-                    }
-
-                    // tangent
-                    if (tangent_enabled)
-                    {
-                        var tangent = (YamlSequence) geom_data["tangent"];
-                        var tangent_indices = (YamlSequence) indices["tangent"];
-                        idx = (short) (YamlToShort(tangent_indices[i])*3);
-
-                        write_idx += WriteFloat(vb, write_idx, YamlToFloat(tangent[idx + 0]));
-                        write_idx += WriteFloat(vb, write_idx, YamlToFloat(tangent[idx + 1]));
-                    }
-
-                    // bitangent
-                    if (bitangent_enabled)
-                    {
-                        var bitangent = (YamlSequence) geom_data["bitangent"];
-                        var bitangent_indices = (YamlSequence) indices["bitangent"];
-                        idx = (short) (YamlToShort(bitangent_indices[i])*3);
-
-                        write_idx += WriteFloat(vb, write_idx, YamlToFloat(bitangent[idx + 0]));
-                        write_idx += WriteFloat(vb, write_idx, YamlToFloat(bitangent[idx + 1]));
+                            write_idx = WriteChanel(write_idx, vb, i, item.name, chanels, indices, sdef.count);
+                        }
                     }
                 }
 
                 resource.geom_ib.Add(ib);
                 resource.geom_vb.Add(vb);
+                resource.types.Add(enabled);
                 ++geom_idx;
             }
 
