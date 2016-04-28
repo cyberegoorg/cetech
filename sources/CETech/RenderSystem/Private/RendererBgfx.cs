@@ -163,7 +163,6 @@ namespace CETech
             {
                 case "R1":
                     return (ulong) SharpBgfx.TextureFormat.R1;
-
                 case "A8":
                     return (ulong) SharpBgfx.TextureFormat.A8;
                 case "R8":
@@ -227,7 +226,6 @@ namespace CETech
 
                 case "RGB9E5F":
                     return (ulong) SharpBgfx.TextureFormat.RGB9E5F;
-
                 case "BGRA8":
                     return (ulong) SharpBgfx.TextureFormat.BGRA8;
                 case "RGBA8":
@@ -280,7 +278,6 @@ namespace CETech
                     return (ulong) SharpBgfx.TextureFormat.D32F;
                 case "D0S8":
                     return (ulong) SharpBgfx.TextureFormat.D0S8;
-
                 default:
                     return 0;
             }

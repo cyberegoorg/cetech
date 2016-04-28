@@ -327,7 +327,7 @@ namespace CETech
             ResourceCompiler.RegisterCompiler(TextureResource.Type, TextureResource.Compile);
             ResourceCompiler.RegisterCompiler(LevelResource.Type, LevelResource.Compile);
             ResourceCompiler.RegisterCompiler(RenderConfig.Type, RenderConfig.Compile);
-            ResourceCompiler.RegisterCompiler(MeshResource.Type, MeshResource.Compile);
+            ResourceCompiler.RegisterCompiler(SceneResource.Type, SceneResource.Compile);
 
             if (DevelopFlags.compile)
             {
@@ -382,9 +382,9 @@ namespace CETech
 
 
             Resource.Resource.RegisterType(
-                MeshResource.Type,
-                MeshResource.ResourceLoader, MeshResource.ResourceUnloader,
-                MeshResource.ResourceOnline, MeshResource.ResourceOffline, MeshResource.ResourceReloader);
+                SceneResource.Type,
+                SceneResource.ResourceLoader, SceneResource.ResourceUnloader,
+                SceneResource.ResourceOnline, SceneResource.ResourceOffline, SceneResource.ResourceReloader);
         }
 
         private static bool BigInit()

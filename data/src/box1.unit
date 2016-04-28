@@ -7,5 +7,6 @@ components:
 
   "412321322234":
     component_type: "mesh_renderer"
-    mesh: "cube"
+    scene: "cube"
+    mesh: "g_cube"
     material: "material2"
