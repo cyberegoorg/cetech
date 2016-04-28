@@ -481,7 +481,7 @@ namespace CETech
         private static int GetViewportImpl(long name)
         {
             var resource = Resource.Resource.Get<RenderConfig.ConfigInstance>(RenderConfig.Type,
-                StringId.FromString("default"));
+                StringId64.FromString("default"));
 
             for (int i = 0; i < resource.resource.ViewportName.Count; i++)
             {

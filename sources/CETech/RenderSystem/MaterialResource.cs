@@ -16,7 +16,7 @@ namespace CETech
         /// <summary>
         ///     Resource type
         /// </summary>
-        public static readonly long Type = StringId.FromString("material");
+        public static readonly long Type = StringId64.FromString("material");
 
         /// <summary>
         ///     Resource loader
@@ -62,7 +62,7 @@ namespace CETech
                 resource.texture_uniform[idx] = new Uniform(uniform_name, UniformType.Int1);
                 resource.texture_resource[idx] =
                     CETech.Resource.Resource.Get<TextureResource.Resource>(TextureResource.Type,
-                        StringId.FromString(uniform_name));
+                        StringId64.FromString(uniform_name));
                 ++idx;
             }
         }
@@ -96,7 +96,7 @@ namespace CETech
                     old.texture_uniform[idx] = new Uniform(uniform_name, UniformType.Int1);
                     old.texture_resource[idx] =
                         CETech.Resource.Resource.Get<TextureResource.Resource>(TextureResource.Type,
-                            StringId.FromString(uniform_name));
+                            StringId64.FromString(uniform_name));
                     ++idx;
                 }
             }
@@ -152,7 +152,7 @@ namespace CETech
             preprocess(rootNode);
 
             var shader_name = ((YamlScalar) rootNode["shader"]).Value;
-            var resource = new Resource {shader_name = StringId.FromString(shader_name)};
+            var resource = new Resource {shader_name = StringId64.FromString(shader_name)};
             if (rootNode.ContainsKey("textures"))
             {
                 var textures = (YamlMapping) rootNode["textures"];

@@ -7,21 +7,15 @@
 #      depth_func: "less"
 #      cull_mode: "cw"
 
+# Create on init
 global_resource:
-  - name: gbuffer0
-    type: render_target
-    format: RGBA8
-    ration: equal
+  - { name: gbuffer0, type: render_target, format: RGBA8, ration: equal }
+  - { name: gbuffer1, type: render_target, format: RGBA8, ration: equal }
 
-  - name: gbuffer1
-    type: render_target
-    format: RGBA8
-    ration: equal
-
+# Renderer layers
 layer:
   default:
-    - name: "gbuffer"
-      output: ["gbuffer0", "gbuffer1"]
+    - { name: "gbuffer", output: ["gbuffer0", "gbuffer1"] }
 
 viewport:
   default:

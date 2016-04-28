@@ -15,7 +15,7 @@ namespace CETech.Lua
         /// <summary>
         ///     Resource type
         /// </summary>
-        public static readonly long Type = StringId.FromString("lua");
+        public static readonly long Type = StringId64.FromString("lua");
 
 #if CETECH_DEVELOP
         /// <summary>

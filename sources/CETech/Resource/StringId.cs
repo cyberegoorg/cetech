@@ -3,7 +3,7 @@
     /// <summary>
     ///     String id
     /// </summary>
-    public static partial class StringId
+    public static partial class StringId64
     {
         /// <summary>
         ///     Get stringid from string

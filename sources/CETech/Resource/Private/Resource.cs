@@ -210,7 +210,7 @@ namespace CETech.Resource
 
                 for (var i = 0; i < types.Count; i++)
                 {
-                    ReloadAll(StringId.FromString(types[i].AsString()));
+                    ReloadAll(StringId64.FromString(types[i].AsString()));
                 }
             });
         }

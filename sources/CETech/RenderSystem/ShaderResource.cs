@@ -17,7 +17,7 @@ namespace CETech
         /// <summary>
         ///     Resource type
         /// </summary>
-        public static readonly long Type = StringId.FromString("shader");
+        public static readonly long Type = StringId64.FromString("shader");
 
         /// <summary>
         ///     Resource loader

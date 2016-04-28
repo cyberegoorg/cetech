@@ -18,7 +18,7 @@ namespace CETech
         /// <summary>
         ///     Resource type
         /// </summary>
-        public static readonly long Type = StringId.FromString("render_config");
+        public static readonly long Type = StringId64.FromString("render_config");
 
         /// <summary>
         ///     Resource loader
@@ -125,7 +125,7 @@ namespace CETech
             var rt_format = Renderer.TextureFormat(format);
             var rt_ration = Renderer.BackbufferRation(ration);
 
-            resource.GlobalResourceName.Add(StringId.FromString(name));
+            resource.GlobalResourceName.Add(StringId64.FromString(name));
             resource.GlobalResourceFormat.Add(rt_format);
             resource.GlobalResourceRation.Add(rt_ration);
         }
@@ -210,7 +210,7 @@ namespace CETech
                 //var layer_def = (YamlMapping)item.Value;
                 var name = ((YamlScalar)item.Key).Value;
 
-                resource.LayerName.Add(StringId.FromString(name));
+                resource.LayerName.Add(StringId64.FromString(name));
 
                 //var layer = ((YamlScalar)viewport_def["layer"]).Value;
             }
@@ -226,7 +226,7 @@ namespace CETech
 
                 var layer = ((YamlScalar) viewport_def["layer"]).Value;
 
-                var layer_idx = GetLayerIdx(StringId.FromString(layer), resource);
+                var layer_idx = GetLayerIdx(StringId64.FromString(layer), resource);
 
                 if (layer_idx < 0)
                 {
@@ -234,7 +234,7 @@ namespace CETech
                     return;
                 }
 
-                resource.ViewportName.Add(StringId.FromString(name));
+                resource.ViewportName.Add(StringId64.FromString(name));
                 resource.ViewportLayer.Add(layer_idx);                
             }
         }

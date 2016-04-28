@@ -48,7 +48,7 @@ namespace CETech
         /// <summary>
         ///     Resource Name
         /// </summary>
-        public static readonly long Type = StringId.FromString("scene");
+        public static readonly long Type = StringId64.FromString("scene");
 
         /// <summary>
         ///     Resource loader
@@ -302,7 +302,7 @@ namespace CETech
             foreach (var geom in geometries)
             {
                 var name = ((YamlScalar) geom.Key).Value;
-                resource.geom_name[geom_idx] = StringId.FromString(name);
+                resource.geom_name[geom_idx] = StringId64.FromString(name);
 
                 var geom_data = (YamlMapping) geom.Value;
 

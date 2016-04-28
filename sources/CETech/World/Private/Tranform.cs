@@ -161,9 +161,9 @@ namespace CETech.World
         private static void InitImpl()
         {
 #if CETECH_DEVELOP
-            ComponentSystem.RegisterCompiler(StringId.FromString("transform"), Compiler, 1);
+            ComponentSystem.RegisterCompiler(StringId64.FromString("transform"), Compiler, 1);
 #endif
-            ComponentSystem.RegisterType(StringId.FromString("transform"), Spawner, Destroyer);
+            ComponentSystem.RegisterType(StringId64.FromString("transform"), Spawner, Destroyer);
         }
 
         private static void Destroyer(int world, int[] entIds)

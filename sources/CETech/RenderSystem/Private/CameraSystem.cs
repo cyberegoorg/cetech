@@ -86,9 +86,9 @@ namespace CETech.World
         private static void InitImpl()
         {
 #if CETECH_DEVELOP
-            ComponentSystem.RegisterCompiler(StringId.FromString("camera"), Compiler, 10);
+            ComponentSystem.RegisterCompiler(StringId64.FromString("camera"), Compiler, 10);
 #endif
-            ComponentSystem.RegisterType(StringId.FromString("camera"), Spawner, Destroyer);
+            ComponentSystem.RegisterType(StringId64.FromString("camera"), Spawner, Destroyer);
         }
 
         private static void Destroyer(int world, int[] entIds)

@@ -60,8 +60,8 @@ namespace CETech.Develop
             var namestr = filename.Substring(0, last_idx);
             var typestr = filename.Substring(last_idx + 1);
 
-            type = StringId.FromString(typestr);
-            name = StringId.FromString(namestr);
+            type = StringId64.FromString(typestr);
+            name = StringId64.FromString(namestr);
         }
 
 
