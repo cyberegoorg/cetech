@@ -100,7 +100,7 @@ namespace CETech.Resource
             var loaded_data = Load(type, names);
 
             var taskid = TaskManager.AddBegin("addloaded", data => AddLoadedImpl(loaded_data, type, names), null,
-                TaskManager.TaskPriority.High, affinity: TaskManager.TaskAffinity.MainThead);
+                TaskManager.TaskPriority.High, affinity: TaskManager.TaskAffinity.MainThead); // TODO: MainThead? 
             TaskManager.AddEnd(new[] {taskid});
             TaskManager.Wait(taskid);
         }

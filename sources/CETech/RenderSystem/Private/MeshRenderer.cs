@@ -18,23 +18,34 @@ namespace CETech.World
             return _worldInstance[world].EntIdx[entity];
         }
 
-        private static int CreateImpl(int world, int entity, long material, long mesh)
+        private static int CreateImpl(int world, int entity, long material, long scene, long mesh)
         {
-            var world_instance = _worldInstance[world];
+            var mesh_instance = Resource.Resource.Get<SceneResource.SceneInstance>(SceneResource.Type, scene);
 
-            var idx = world_instance.MaterialInstance.Count;
+            var names = mesh_instance.resource.geom_name;
+            for (int i = 0; i < names.Length; i++)
+            {
+                if (names[i] != mesh)
+                {
+                    continue;
+                }
 
-            var material_instance = Resource.Resource.Get<MaterialResource.MaterialInstance>(MaterialResource.Type,
-                material);
+                var world_instance = _worldInstance[world];
 
-            var mesh_instance = Resource.Resource.Get<MeshResource.MeshInstance>(MeshResource.Type, mesh);
+                var idx = world_instance.MaterialInstance.Count;
+                var material_instance = Resource.Resource.Get<MaterialResource.MaterialInstance>(MaterialResource.Type,
+                    material);
 
-            world_instance.MaterialInstance.Add(material_instance);
-            world_instance.MeshInstance.Add(mesh_instance);
+                world_instance.MaterialInstance.Add(material_instance);
+                world_instance.SceneInstance.Add(mesh_instance);
+                world_instance.MeshIdx.Add(i);
 
-            world_instance.EntIdx[entity] = idx;
+                world_instance.EntIdx[entity] = idx;
 
-            return idx;
+                return idx;
+            }
+
+            return int.MaxValue;
         }
 
         private static void InitWorldImpl(int world)
@@ -52,16 +63,20 @@ namespace CETech.World
         {
             for (var i = 0; i < ent_ids.Length; ++i)
             {
-                CreateImpl(world, ent_ids[i], data[i]["material"].AsInt64(), data[i]["mesh"].AsInt64());
+                CreateImpl(world, ent_ids[i], data[i]["material"].AsInt64(), data[i]["scene"].AsInt64(), data[i]["mesh"].AsInt64());
             }
         }
 
         private static void Compiler(YamlMapping body, ConsoleServer.ResponsePacker packer)
         {
+            var scene = body["scene"] as YamlScalar;
             var mesh = body["mesh"] as YamlScalar;
             var material = body["material"] as YamlScalar;
 
-            packer.PackMapHeader(2);
+            packer.PackMapHeader(3);
+
+            packer.Pack("scene");
+            packer.Pack(StringId.FromString(scene.Value));
 
             packer.Pack("mesh");
             packer.Pack(StringId.FromString(mesh.Value));
@@ -96,23 +111,25 @@ namespace CETech.World
 
         public static void RenderWorldImpl(int world)
         {
-            // TODO: SHITCODE
             var world_instance = _worldInstance[world];
 
+            // TODO: SHITCODE
             for (var i = 0; i < world_instance.EntIdx.Count; i++)
             {
+                // TODO: !!!
                 var item = world_instance.EntIdx.ElementAt(i);
                 var idx = item.Value;
 
-                var mesh_instance = world_instance.MeshInstance[idx];
-                var material_instance = world_instance.MaterialInstance[idx];
+                var meshInstance = world_instance.SceneInstance[idx];
+                var materialInstance = world_instance.MaterialInstance[idx];
+                var mesh_idx = world_instance.MeshIdx[idx];
 
-                var tu = material_instance.texture_uniform;
-                var t = material_instance.texture_resource;
+                var textureUniforms = materialInstance.texture_uniform;
+                var textureResource = materialInstance.texture_resource;
 
-                for (var j = 0; j < tu.Length; j++)
+                for (var j = 0; j < textureUniforms.Length; j++)
                 {
-                    Bgfx.SetTexture(0, tu[j], t[j].texture);
+                    Bgfx.SetTexture(0, textureUniforms[j], textureResource[j].texture);
                 }
 
                 var world_matrix = Tranform.GetWorldMatrix(world,
@@ -124,8 +141,8 @@ namespace CETech.World
                 }
 
 
-                Bgfx.SetVertexBuffer(mesh_instance.vb[0]);
-                Bgfx.SetIndexBuffer(mesh_instance.ib[0]);
+                Bgfx.SetVertexBuffer(meshInstance.vb[mesh_idx]);
+                Bgfx.SetIndexBuffer(meshInstance.ib[mesh_idx]);
 
                 var state = 0 |
                             RenderState.ColorWrite |
@@ -138,7 +155,7 @@ namespace CETech.World
                 Bgfx.SetRenderState(state);
 
                 // submit primitives
-                Bgfx.Submit(0, material_instance.instance.program);
+                Bgfx.Submit(0, materialInstance.instance.program);
             }
         }
 
@@ -146,13 +163,15 @@ namespace CETech.World
         {
             public readonly Dictionary<int, int> EntIdx;
             public readonly List<MaterialResource.MaterialInstance> MaterialInstance;
-            public readonly List<MeshResource.MeshInstance> MeshInstance;
+            public readonly List<SceneResource.SceneInstance> SceneInstance;
+            public readonly List<int> MeshIdx;
 
             public WorldInstance()
             {
                 EntIdx = new Dictionary<int, int>();
                 MaterialInstance = new List<MaterialResource.MaterialInstance>();
-                MeshInstance = new List<MeshResource.MeshInstance>();
+                SceneInstance = new List<SceneResource.SceneInstance>();
+                MeshIdx = new List<int>();
             }
         }
     }

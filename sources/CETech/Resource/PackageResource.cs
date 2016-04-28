@@ -46,7 +46,7 @@ namespace CETech.Resource
             prioritDictionary[ShaderResource.Type] = 5;
             prioritDictionary[MaterialResource.Type] = 6;
             prioritDictionary[UnitResource.Type] = 7;
-            prioritDictionary[MeshResource.Type] = 8;
+            prioritDictionary[SceneResource.Type] = 8;
             prioritDictionary[LevelResource.Type] = 9;
 
             var types_nodes = new Dictionary<long, YamlSequence>();

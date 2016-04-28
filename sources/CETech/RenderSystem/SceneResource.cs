@@ -12,12 +12,12 @@ using SharpBgfx;
 namespace CETech
 {
     /// <summary>
-    ///     Package resource
+    ///     Scene resource
     /// </summary>
-    public class MeshResource
+    public class SceneResource
     {
         [Flags]
-        public enum ChanelType
+        public enum ChanelName
         {
             Null = 0,
             Position = 1 << 0,
@@ -46,9 +46,9 @@ namespace CETech
         }
 
         /// <summary>
-        ///     Resource type
+        ///     Resource Name
         /// </summary>
-        public static readonly long Type = StringId.FromString("mesh");
+        public static readonly long Type = StringId.FromString("scene");
 
         /// <summary>
         ///     Resource loader
@@ -59,7 +59,7 @@ namespace CETech
         {
             var serializer = MessagePackSerializer.Get<Resource>();
             var resource = serializer.Unpack(input);
-            return new MeshInstance {resource = resource};
+            return new SceneInstance {resource = resource};
         }
 
         /// <summary>
@@ -83,14 +83,15 @@ namespace CETech
         /// <param name="data">Data</param>
         public static void ResourceOnline(object data)
         {
-            var instance = (MeshInstance) data;
+            var instance = (SceneInstance) data;
             var resource = instance.resource;
+            var mesh_count = resource.geom_name.Length;
 
             instance.ib = new IndexBuffer[resource.geom_name.Length];
             instance.vb = new VertexBuffer[resource.geom_name.Length];
             instance.vl = new VertexLayout[resource.geom_name.Length];
 
-            for (var i = 0; i < resource.geom_name.Length; i++)
+            for (var i = 0; i < mesh_count; i++)
             {
                 instance.vl[i] = new VertexLayout().Begin();
                 var layout = instance.vl[i];
@@ -101,7 +102,7 @@ namespace CETech
                 for (int j = 0; j < ChanelDefs.Length; j++)
                 {
                     var chanel_def = ChanelDefs[j];
-                    if (resource.types[i].HasFlag(chanel_def.type))
+                    if (resource.types[i].HasFlag(chanel_def.Name))
                     {
                         var stype = stypes[stypes_idx++];
                         AddToLayout(layout, chanel_def.usage, stype);
@@ -133,35 +134,33 @@ namespace CETech
             return old;
         }
 
-        public class MeshInstance
+        public class SceneInstance
         {
-            public IndexBuffer[] ib;
             public Resource resource;
-            public VertexBuffer[] vb;
             public VertexLayout[] vl;
+            public IndexBuffer[] ib;
+            public VertexBuffer[] vb;
         }
 
         public class Resource
         {
-            public bool[] bitangent_enabled;
-            public List<short[]> geom_ib = new List<short[]>();
             public long[] geom_name;
-
-            public List<byte[]> geom_vb = new List<byte[]>();
-            public List<ChanelType> types = new List<ChanelType>();
+            public List<ChanelName> types = new List<ChanelName>();
             public List<List<StreamType>> stypes = new List<List<StreamType>>();
+            public List<short[]> geom_ib = new List<short[]>();
+            public List<byte[]> geom_vb = new List<byte[]>();
         }
 
         private struct ChanelDef
         {
             public string name;
-            public ChanelType type;
+            public ChanelName Name;
             public VertexAttributeUsage usage;
 
-            public ChanelDef(string name, ChanelType type, VertexAttributeUsage usage)
+            public ChanelDef(string name, ChanelName Name, VertexAttributeUsage usage)
             {
                 this.name = name;
-                this.type = type;
+                this.Name = Name;
                 this.usage = usage;
             }
         }
@@ -186,22 +185,22 @@ namespace CETech
 
         private static ChanelDef[] ChanelDefs =
         {
-            new ChanelDef("position", ChanelType.Position, VertexAttributeUsage.Position),
-            new ChanelDef("normal", ChanelType.Normal, VertexAttributeUsage.Normal),
-            new ChanelDef("tangent", ChanelType.Tangent, VertexAttributeUsage.Tangent),
-            new ChanelDef("bitangent", ChanelType.Bitangent, VertexAttributeUsage.Bitangent),
-            new ChanelDef("color0", ChanelType.Color0, VertexAttributeUsage.Color0),
-            new ChanelDef("color1", ChanelType.Color1, VertexAttributeUsage.Color1),
-            new ChanelDef("indices", ChanelType.Indices, VertexAttributeUsage.Indices),
-            new ChanelDef("weight", ChanelType.Weight, VertexAttributeUsage.Weight),
-            new ChanelDef("texcoord0", ChanelType.TexCoord0, VertexAttributeUsage.TexCoord0),
-            new ChanelDef("texcoord1", ChanelType.TexCoord1, VertexAttributeUsage.TexCoord1),
-            new ChanelDef("texcoord2", ChanelType.TexCoord2, VertexAttributeUsage.TexCoord2),
-            new ChanelDef("texcoord3", ChanelType.TexCoord3, VertexAttributeUsage.TexCoord3),
-            new ChanelDef("texcoord4", ChanelType.TexCoord4, VertexAttributeUsage.TexCoord4),
-            new ChanelDef("texcoord5", ChanelType.TexCoord5, VertexAttributeUsage.TexCoord5),
-            new ChanelDef("texcoord6", ChanelType.TexCoord6, VertexAttributeUsage.TexCoord6),
-            new ChanelDef("texcoord7", ChanelType.TexCoord7, VertexAttributeUsage.TexCoord7)
+            new ChanelDef("position", ChanelName.Position, VertexAttributeUsage.Position),
+            new ChanelDef("normal", ChanelName.Normal, VertexAttributeUsage.Normal),
+            new ChanelDef("tangent", ChanelName.Tangent, VertexAttributeUsage.Tangent),
+            new ChanelDef("bitangent", ChanelName.Bitangent, VertexAttributeUsage.Bitangent),
+            new ChanelDef("color0", ChanelName.Color0, VertexAttributeUsage.Color0),
+            new ChanelDef("color1", ChanelName.Color1, VertexAttributeUsage.Color1),
+            new ChanelDef("indices", ChanelName.Indices, VertexAttributeUsage.Indices),
+            new ChanelDef("weight", ChanelName.Weight, VertexAttributeUsage.Weight),
+            new ChanelDef("texcoord0", ChanelName.TexCoord0, VertexAttributeUsage.TexCoord0),
+            new ChanelDef("texcoord1", ChanelName.TexCoord1, VertexAttributeUsage.TexCoord1),
+            new ChanelDef("texcoord2", ChanelName.TexCoord2, VertexAttributeUsage.TexCoord2),
+            new ChanelDef("texcoord3", ChanelName.TexCoord3, VertexAttributeUsage.TexCoord3),
+            new ChanelDef("texcoord4", ChanelName.TexCoord4, VertexAttributeUsage.TexCoord4),
+            new ChanelDef("texcoord5", ChanelName.TexCoord5, VertexAttributeUsage.TexCoord5),
+            new ChanelDef("texcoord6", ChanelName.TexCoord6, VertexAttributeUsage.TexCoord6),
+            new ChanelDef("texcoord7", ChanelName.TexCoord7, VertexAttributeUsage.TexCoord7)
         };
 
         private static StreamDef[] StreamDefs =
@@ -313,7 +312,7 @@ namespace CETech
                 var vertex_count = int.Parse(((YamlScalar)indices["size"]).Value);
 
                 var vertex_size = 0;
-                var enabled = ChanelType.Null;
+                var enabled = ChanelName.Null;
                 var stypes = new List<StreamType>();
                 for (int i = 0; i < ChanelDefs.Length; i++)
                 {
@@ -321,7 +320,7 @@ namespace CETech
 
                     if (chanels.ContainsKey(item.name))
                     {
-                        enabled |= item.type;
+                        enabled |= item.Name;
 
                         var stream_type = ((YamlScalar)types[item.name]).Value;
                         var sdef = StreamDefFromString(stream_type);
@@ -344,7 +343,7 @@ namespace CETech
                     {
                         var item = ChanelDefs[j];
 
-                        if (enabled.HasFlag(item.type))
+                        if (enabled.HasFlag(item.Name))
                         {
                             var stream_type = ((YamlScalar)types[item.name]).Value;
                             var sdef = StreamDefFromString(stream_type);

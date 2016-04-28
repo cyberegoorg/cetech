@@ -95,13 +95,13 @@
     <Compile Include="RenderSystem\CameraSystem.cs" />
     <Compile Include="RenderSystem\MaterialResource.cs" />
     <Compile Include="RenderSystem\MeshRenderer.cs" />
-    <Compile Include="RenderSystem\MeshResource.cs" />
     <Compile Include="RenderSystem\Private\AviWriter.cs" />
     <Compile Include="RenderSystem\Private\CameraSystem.cs" />
     <Compile Include="RenderSystem\Private\MeshRenderer.cs" />
     <Compile Include="RenderSystem\Private\RendererBgfx.cs" />
     <Compile Include="RenderSystem\RenderConfig.cs" />
     <Compile Include="RenderSystem\Renderer.cs" />
+    <Compile Include="RenderSystem\SceneResource.cs" />
     <Compile Include="RenderSystem\ShaderResource.cs" />
     <Compile Include="RenderSystem\TextureResource.cs" />
     <Compile Include="Resource\Package.cs" />
