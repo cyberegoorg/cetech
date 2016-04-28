@@ -16,7 +16,7 @@ namespace CETech.World
         /// <summary>
         ///     Resource type
         /// </summary>
-        public static readonly long Type = StringId.FromString("unit");
+        public static readonly long Type = StringId64.FromString("unit");
 
         /// <summary>
         ///     Resource loader
@@ -85,7 +85,7 @@ namespace CETech.World
                 var component_body = component.Value as YamlMapping;
                 var component_type = component_body["component_type"] as YamlScalar;
 
-                var cid = StringId.FromString(component_type.Value);
+                var cid = StringId64.FromString(component_type.Value);
                 if (!components_type.Contains(cid))
                 {
                     components_type.Add(cid);

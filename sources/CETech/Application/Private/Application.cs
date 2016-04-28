@@ -303,7 +303,7 @@ namespace CETech
 
         private static void Boot()
         {
-            var boot_pkg = StringId.FromString(ConfigSystem.GetValueString("boot.pkg"));
+            var boot_pkg = StringId64.FromString(ConfigSystem.GetValueString("boot.pkg"));
 
             Resource.Resource.LoadNow(PackageResource.Type, new[] {boot_pkg});
 
@@ -424,7 +424,7 @@ namespace CETech
             InitResouce();
 
             Resource.Resource.Init();
-            Resource.Resource.LoadNow(ConfigResource.Type, new[] {StringId.FromString("global")});
+            Resource.Resource.LoadNow(ConfigResource.Type, new[] {StringId64.FromString("global")});
 
 #if CETECH_DEVELOP
             if (DevelopFlags.compile && !DevelopFlags.ccontinue)

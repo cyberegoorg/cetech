@@ -16,7 +16,7 @@ namespace CETech
         /// <summary>
         ///     Resource type
         /// </summary>
-        public static readonly long Type = StringId.FromString("texture");
+        public static readonly long Type = StringId64.FromString("texture");
 
         /// <summary>
         ///     Resource loader

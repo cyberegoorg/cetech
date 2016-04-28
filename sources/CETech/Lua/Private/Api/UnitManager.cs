@@ -9,7 +9,7 @@ namespace CETech.Lua.Api
     {
         public static int Spawn(int world, string unit)
         {
-            return Unit.Spawn(world, StringId.FromString(unit));
+            return Unit.Spawn(world, StringId64.FromString(unit));
         }
 
         public static void Destroy(int world, int unit)

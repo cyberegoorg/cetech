@@ -1,6 +1,6 @@
 ﻿namespace CETech.Resource
 {
-    public static partial class StringId
+    public static partial class StringId64
     {
         private static long FromStringImpl(string str)
         {

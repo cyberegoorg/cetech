@@ -14,7 +14,7 @@ namespace CETech
         /// <summary>
         ///     Resource type
         /// </summary>
-        public static readonly long Type = StringId.FromString("config");
+        public static readonly long Type = StringId64.FromString("config");
 
 #if CETECH_DEVELOP
 

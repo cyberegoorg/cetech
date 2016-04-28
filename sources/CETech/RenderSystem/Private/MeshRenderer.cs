@@ -76,21 +76,21 @@ namespace CETech.World
             packer.PackMapHeader(3);
 
             packer.Pack("scene");
-            packer.Pack(StringId.FromString(scene.Value));
+            packer.Pack(StringId64.FromString(scene.Value));
 
             packer.Pack("mesh");
-            packer.Pack(StringId.FromString(mesh.Value));
+            packer.Pack(StringId64.FromString(mesh.Value));
 
             packer.Pack("material");
-            packer.Pack(StringId.FromString(material.Value));
+            packer.Pack(StringId64.FromString(material.Value));
         }
 
         private static void InitImpl()
         {
 #if CETECH_DEVELOP
-            ComponentSystem.RegisterCompiler(StringId.FromString("mesh_renderer"), Compiler, 10);
+            ComponentSystem.RegisterCompiler(StringId64.FromString("mesh_renderer"), Compiler, 10);
 #endif
-            ComponentSystem.RegisterType(StringId.FromString("mesh_renderer"), Spawner, Destroyer);
+            ComponentSystem.RegisterType(StringId64.FromString("mesh_renderer"), Spawner, Destroyer);
         }
 
         private static void Destroyer(int world, int[] entIds)
@@ -139,7 +139,6 @@ namespace CETech.World
                 {
                     Bgfx.SetTransform(&world_matrix.M11);
                 }
-
 
                 Bgfx.SetVertexBuffer(meshInstance.vb[mesh_idx]);
                 Bgfx.SetIndexBuffer(meshInstance.ib[mesh_idx]);

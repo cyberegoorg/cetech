@@ -12,7 +12,7 @@ namespace CETech.World
         /// <summary>
         ///     Resource type
         /// </summary>
-        public static readonly long Type = StringId.FromString("level");
+        public static readonly long Type = StringId64.FromString("level");
 
         /// <summary>
         ///     Resource loader
@@ -76,7 +76,7 @@ namespace CETech.World
                 var unit_def = unit.Value as YamlMapping;
                 var name = unit_def["name"] as YamlScalar;
 
-                units_names.Add(StringId.FromString(name.Value));
+                units_names.Add(StringId64.FromString(name.Value));
 
                 UnitResource.Compile(unit_def, packer);
             }

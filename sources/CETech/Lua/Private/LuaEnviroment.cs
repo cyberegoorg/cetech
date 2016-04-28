@@ -238,7 +238,7 @@ namespace CETech.Lua
         {
             public override object LoadFile(string file, Table globalContext)
             {
-                var name = StringId.FromString(file);
+                var name = StringId64.FromString(file);
                 return Resource.Resource.Get<byte[]>(LuaResource.Type, name);
             }
 
@@ -249,7 +249,7 @@ namespace CETech.Lua
                     return true;
                 }
 
-                long[] names = {StringId.FromString(name)};
+                long[] names = {StringId64.FromString(name)};
                 var can_get = Resource.Resource.CanGet(LuaResource.Type, names);
 
                 return can_get;

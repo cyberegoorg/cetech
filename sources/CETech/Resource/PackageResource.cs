@@ -17,7 +17,7 @@ namespace CETech.Resource
         /// <summary>
         ///     Resource type
         /// </summary>
-        public static readonly long Type = StringId.FromString("package");
+        public static readonly long Type = StringId64.FromString("package");
 
 #if CETECH_DEVELOP
 
@@ -55,7 +55,7 @@ namespace CETech.Resource
                 var typestr = type.Key as YamlScalar;
                 var sequence = type.Value as YamlSequence;
 
-                var typeid = StringId.FromString(typestr.Value);
+                var typeid = StringId64.FromString(typestr.Value);
                 types_nodes.Add(typeid, sequence);
             }
 
@@ -70,7 +70,7 @@ namespace CETech.Resource
                 var name_idx = 0;
                 foreach (var name in sequence)
                 {
-                    var nameid = StringId.FromString(((YamlScalar) name).Value);
+                    var nameid = StringId64.FromString(((YamlScalar) name).Value);
 
                     pack.Names[idx][name_idx] = nameid;
                     ++name_idx;

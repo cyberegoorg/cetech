@@ -14,7 +14,7 @@ namespace CETech.Lua.Api
 
         public static int GetViewport(string name)
         {
-            return Renderer.GetViewport(StringId.FromString(name));
+            return Renderer.GetViewport(StringId64.FromString(name));
         }
 
         public static void SetDebug(bool enabled)
