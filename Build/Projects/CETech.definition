@@ -137,6 +137,8 @@
     <Compile Include="World\Unit.cs" />
     <Compile Include="World\UnitResource.cs" />
     <Compile Include="World\World.cs" />
+    <Compile Include="World\SceneGraph.cs" />
+    <Compile Include="World\Private\SceneGraph.cs" />
     <Content Include="Utils\YamlSerializer\ChangeLog.txt" />
     <Content Include="Utils\YamlSerializer\Readme.txt" />
   </Files>
