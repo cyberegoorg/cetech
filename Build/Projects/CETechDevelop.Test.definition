@@ -153,6 +153,8 @@
     <Compile Include="World\World.cs" />
     <Content Include="Utils\YamlSerializer\ChangeLog.txt" />
     <Content Include="Utils\YamlSerializer\Readme.txt" />
+    <Compile Include="World\SceneGraph.cs" />
+    <Compile Include="World\Private\SceneGraph.cs" />
     <None Include="CETechDevelop.sh">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
