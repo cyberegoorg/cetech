@@ -316,6 +316,7 @@ namespace CETech
             Tranform.Init();
             MeshRenderer.Init();
             CameraSystem.Init();
+            SceneGraph.Init();
 
 #if CETECH_DEVELOP
             ResourceCompiler.RegisterCompiler(PackageResource.Type, PackageResource.Compile);
