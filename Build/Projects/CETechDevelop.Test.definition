@@ -8,6 +8,7 @@
     <Reference Include="MoonSharp" />
     <Reference Include="MsgPack" />
     <Reference Include="NSpec" />
+    <Reference Include="Assimp" />
   </References>
   <Dependencies>
     <Uses Name="SDL2">

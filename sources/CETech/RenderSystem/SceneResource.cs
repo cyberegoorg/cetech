@@ -9,6 +9,11 @@ using CETech.Resource;
 using MsgPack.Serialization;
 using SharpBgfx;
 
+#if CETECH_DEVELOP
+    using Assimp;
+    using Assimp.Configs;
+#endif
+
 namespace CETech
 {
     /// <summary>
@@ -333,6 +338,11 @@ namespace CETech
 
             var resource = new Resource();
 
+            if (rootNode.ContainsKey("import"))
+            {
+                rootNode = import_assimp(((YamlScalar)rootNode["import"]).Value);
+            }
+
             var geometries = (YamlMapping) rootNode["geometries"];
 
             resource.geom_name = new long[geometries.Count];
@@ -445,6 +455,116 @@ namespace CETech
             serializer.Pack(capi.BuildFile, resource);
         }
 
+
+        private static YamlMapping import_assimp(string name)
+        {
+            var filename = FileSystem.GetFullPath("src", name);
+            AssimpContext importer = new AssimpContext();
+            importer.SetConfig(new NormalSmoothingAngleConfig(66.0f));
+            Scene scene = importer.ImportFile(filename, PostProcessPreset.TargetRealTimeMaximumQuality | PostProcessSteps.FlipUVs | PostProcessSteps.MakeLeftHanded);
+
+            var geometries = new YamlMapping();
+            var graph = new YamlMapping();
+
+            for (int i = 0; i < scene.MeshCount; i++)
+            {
+                var mesh = scene.Meshes[i];
+                var mesh_name = mesh.Name;
+
+                if (mesh_name.Length == 0)
+                {
+                    mesh_name = string.Format("geom_{0}", i);
+                }
+
+                var mesh_yaml = new YamlMapping();
+
+                geometries[mesh_name] = mesh_yaml;
+
+                var chanels = new YamlMapping();
+                var types = new YamlMapping();
+                var indices = new YamlMapping();
+
+                if (!mesh.HasBones)
+                {
+                    graph["n_" + mesh_name] = new YamlMapping(
+                        "local", new YamlSequence(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1)
+                        );
+                }
+
+                var indices_seq = new YamlSequence();
+                var mesh_indicies = mesh.GetIndices();
+                indices["size"] = mesh_indicies.Length;
+                for (int j = 0; j < mesh_indicies.Length; j++)
+                {
+                    indices_seq.Add(mesh_indicies[j]);
+                }
+
+                // position
+                var verticies_node = new YamlSequence();
+                var nromals_node = new YamlSequence();
+                var tc0_node = new YamlSequence();
+                for (int j = 0; j < mesh.VertexCount; j++)
+                {
+                    var vert = mesh.Vertices[j];
+
+                    verticies_node.Add(vert.X);
+                    verticies_node.Add(vert.Y);
+                    verticies_node.Add(vert.Z);
+
+
+                    if (mesh.HasNormals)
+                    {
+                        var norm = mesh.Normals[j];
+
+                        nromals_node.Add(norm.X);
+                        nromals_node.Add(norm.Y);
+                        nromals_node.Add(norm.Z);
+                    }
+
+
+                    if (mesh.HasTextureCoords(0))
+                    {
+                        var tc = mesh.TextureCoordinateChannels[0][j];
+
+                        tc0_node.Add(tc.X);
+                        tc0_node.Add(tc.Y);
+                    }
+
+                }
+
+                chanels["position"] = verticies_node;
+                indices["position"] = indices_seq;
+                types["position"] = "vec3";
+
+                // normals
+                if (mesh.HasNormals)
+                {
+                    chanels["normal"] = nromals_node;
+                    indices["normal"] = indices_seq;
+                    types["normal"] = "vec3";
+                }
+
+                // normals
+                if (mesh.HasTextureCoords(0))
+                {
+                    chanels["texcoord0"] = tc0_node;
+                    indices["texcoord0"] = indices_seq;
+                    types["texcoord0"] = "vec2";
+                }
+
+                mesh_yaml["chanels"] = chanels;
+                mesh_yaml["indices"] = indices;
+                mesh_yaml["types"] = types;
+            }
+
+            var rootNode = new YamlMapping(
+                "geometries", geometries,
+                "graph", graph
+            );
+            rootNode.ToYamlFile(filename+".imported");
+
+            return rootNode;
+        }
 #endif
     }
 }
