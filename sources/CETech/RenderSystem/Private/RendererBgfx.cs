@@ -377,6 +377,24 @@ namespace CETech
             }
         }
 
+        private static int GetViewportImpl(long name)
+        {
+            var resource = Resource.Resource.Get<RenderConfig.ConfigInstance>(RenderConfig.Type,
+                StringId64.FromString("default"));
+
+            for (var i = 0; i < resource.resource.ViewportName.Count; i++)
+            {
+                if (resource.resource.ViewportName[i] != name)
+                {
+                    continue;
+                }
+
+                return i;
+            }
+
+            return -1; //TODO:
+        }
+
 
         private struct Data
         {
@@ -476,24 +494,6 @@ namespace CETech
             {
                 _aviWriter.WriteFrame(data, size);
             }
-        }
-
-        private static int GetViewportImpl(long name)
-        {
-            var resource = Resource.Resource.Get<RenderConfig.ConfigInstance>(RenderConfig.Type,
-                StringId64.FromString("default"));
-
-            for (int i = 0; i < resource.resource.ViewportName.Count; i++)
-            {
-                if (resource.resource.ViewportName[i] != name)
-                {
-                    continue;
-                }
-
-                return i;
-            }
-
-            return -1; //TODO:
         }
     }
 }

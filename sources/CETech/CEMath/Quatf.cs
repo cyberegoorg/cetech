@@ -65,7 +65,7 @@ namespace CETech.CEMath
                 cos
                 );
         }
-			
+
 
         public static Quatf FromEurelAngle(float heading, float attitude, float bank)
         {

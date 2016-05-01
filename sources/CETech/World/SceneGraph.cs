@@ -24,12 +24,12 @@ namespace CETech.World
             RemoveWorldImpl(world);
         }
 
-		public static int GetNodeByName(int world, int entity, long name)
-		{
-			return GetNodeByNameImpl (world, entity, name);
-		}
+        public static int GetNodeByName(int world, int entity, long name)
+        {
+            return GetNodeByNameImpl(world, entity, name);
+        }
 
-		public static int Create(int world, int entity, long[] names, int[] parents, Mat4f[] pose)
+        public static int Create(int world, int entity, long[] names, int[] parents, Mat4f[] pose)
         {
             return CreateImpl(world, entity, names, parents, pose);
         }
