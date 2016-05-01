@@ -24,55 +24,54 @@ namespace CETech.World
             RemoveWorldImpl(world);
         }
 
-        public static int GetTranform(int world, int entity)
+		public static int GetNodeByName(int world, int entity, long name)
+		{
+			return GetNodeByNameImpl (world, entity, name);
+		}
+
+		public static int Create(int world, int entity, long[] names, int[] parents, Mat4f[] pose)
         {
-            return GetTranformImpl(world, entity);
+            return CreateImpl(world, entity, names, parents, pose);
         }
 
-        public static int Create(int world, int entity, int parent, Vec3f position, Quatf rotation,
-            Vec3f scale)
+        public static void Link(int world, int parent_node, int child_node)
         {
-            return CreateImpl(world, entity, parent, position, rotation, scale);
+            LinkImpl(world, parent_node, child_node);
         }
 
-        public static void Link(int world, int parent_ent, int child_ent)
+        public static void SetPosition(int world, int node, Vec3f pos)
         {
-            LinkImpl(world, parent_ent, child_ent);
+            SetPositionImpl(world, node, pos);
         }
 
-        public static void SetPosition(int world, int transform, Vec3f pos)
+        public static void SetRotation(int world, int node, Quatf rot)
         {
-            SetPositionImpl(world, transform, pos);
+            SetRotationImpl(world, node, rot);
         }
 
-        public static void SetRotation(int world, int transform, Quatf rot)
+        public static void SetScale(int world, int node, Vec3f scale)
         {
-            SetRotationImpl(world, transform, rot);
+            SetScaleImpl(world, node, scale);
         }
 
-        public static void SetScale(int world, int transform, Vec3f scale)
+        public static Vec3f GetPosition(int world, int node)
         {
-            SetScaleImpl(world, transform, scale);
+            return GetPositionImpl(world, node);
         }
 
-        public static Vec3f GetPosition(int world, int transform)
+        public static Quatf GetRotation(int world, int node)
         {
-            return GetPositionImpl(world, transform);
+            return GetRotationImpl(world, node);
         }
 
-        public static Quatf GetRotation(int world, int transform)
+        public static Vec3f GetScale(int world, int node)
         {
-            return GetRotationImpl(world, transform);
+            return GetScaleImpl(world, node);
         }
 
-        public static Vec3f GetScale(int world, int transform)
+        public static Mat4f GetWorldMatrix(int world, int node)
         {
-            return GetScaleImpl(world, transform);
-        }
-
-        public static Mat4f GetWorldMatrix(int world, int transform)
-        {
-            return GetWorldMatrixImpl(world, transform);
+            return GetWorldMatrixImpl(world, node);
         }
     }
 }

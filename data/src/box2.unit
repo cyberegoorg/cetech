@@ -9,4 +9,5 @@ components:
     component_type: "mesh_renderer"
     scene: "cube"
     mesh: "g_cube"
+    node: "n_cube"
     material: "material1"

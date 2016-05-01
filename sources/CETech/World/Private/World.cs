@@ -46,6 +46,7 @@ namespace CETech.World
             Tranform.InitWorld(id);
             MeshRenderer.InitWorld(id);
             CameraSystem.InitWorld(id);
+			SceneGraph.InitWorld (id);
 
             return id;
         }
@@ -60,6 +61,7 @@ namespace CETech.World
             Tranform.RemoveWorld(world);
             MeshRenderer.RemoveWorld(world);
             CameraSystem.RemoveWorld(world);
+			SceneGraph.RemoveWorld (world);
 
             var item_idx = getIdx(world);
             var last_idx = _WorldIdx.Count - 1;

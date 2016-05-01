@@ -149,7 +149,11 @@ namespace CETech
             public List<List<StreamType>> stypes = new List<List<StreamType>>();
             public List<short[]> geom_ib = new List<short[]>();
             public List<byte[]> geom_vb = new List<byte[]>();
-        }
+
+			public List<long[]> node_names = new List<long[]>();
+			public List<int[]> node_parent = new List<int[]>();
+			public List<float[]> node_local = new List<float[]>();
+		}
 
         private struct ChanelDef
         {
@@ -282,6 +286,40 @@ namespace CETech
             return write_idx;
         }
 
+		public static void compile_node(KeyValuePair<YamlNode, YamlNode> rootNode, ref int node_id, int parent,
+			Dictionary<long, long> node_parent, Dictionary<long, float[]> local_pose, Dictionary<long, long> names)
+		{
+			node_parent[node_id] = parent;
+
+			var name = rootNode.Key as YamlScalar;
+			var body = rootNode.Value as YamlMapping;
+			var local = body["local"] as YamlSequence;
+
+			var local_mat = new float[16];
+			for (int i = 0; i < 16; i++) {
+				local_mat[i] = YamlToFloat(local[i]);
+			}
+
+			var name_id = StringId64.FromString (name.Value);
+
+			names [node_id] = name_id;
+			node_parent [node_id] = parent;
+			local_pose [node_id] = local_mat;
+
+			if (body.ContainsKey("children"))
+			{
+				var parent_node = node_id;
+				var childrenNode = body["children"] as YamlMapping;
+
+				foreach (var child in childrenNode)
+				{
+					node_id += 1;
+					compile_node(child, ref node_id, parent_node,
+						node_parent, local_pose, names);
+				}
+			}
+		}
+
         /// <summary>
         ///     Resource compiler
         /// </summary>
@@ -297,7 +335,6 @@ namespace CETech
             var geometries = (YamlMapping) rootNode["geometries"];
 
             resource.geom_name = new long[geometries.Count];
-
             var geom_idx = 0;
             foreach (var geom in geometries)
             {
@@ -358,6 +395,47 @@ namespace CETech
                 resource.types.Add(enabled);
                 ++geom_idx;
             }
+
+			var graphs = (YamlMapping)rootNode ["graph"];
+			int node_id = 0;
+			Dictionary<long, long> node_parent = new Dictionary<long, long>();
+			Dictionary<long, float[]> local_pose = new Dictionary<long, float[]> ();
+			Dictionary<long, long> names = new Dictionary<long, long> ();
+
+
+			var tmp_node_parent = new List<int>();
+			var tmp_local_pose = new List<float>();
+			var tmp_names = new List<long>();
+
+			foreach (var graph in graphs) {
+				node_id = 0;
+
+				node_parent.Clear ();
+				local_pose.Clear ();
+				names.Clear ();
+				tmp_node_parent.Clear();
+				tmp_local_pose.Clear();
+				tmp_names.Clear();
+
+				compile_node (graph, ref node_id, int.MaxValue, node_parent, local_pose, names);
+
+				var node_count = node_id + 1;
+
+				for (int i = 0; i < node_count; i++) {
+					tmp_node_parent.Add((int)node_parent[i]);
+
+					var pose = local_pose [i];
+					for (int j = 0; j < 16; j++) {
+						tmp_local_pose.Add (pose[j]);
+					}
+	
+					tmp_names.Add(names[i]);
+				}
+
+				resource.node_names.Add (tmp_names.ToArray());
+				resource.node_local.Add (tmp_local_pose.ToArray());
+				resource.node_parent.Add (tmp_node_parent.ToArray());
+			}
 
             var serializer = MessagePackSerializer.Get<Resource>();
             serializer.Pack(capi.BuildFile, resource);
