@@ -1,4 +1,4 @@
 parent: material1
 
 textures:
-  u_texColor: m4_diff
+  u_texColor: content/scene/m4a1/m4_diff

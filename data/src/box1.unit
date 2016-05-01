@@ -7,11 +7,11 @@ components:
 
   "412321322234":
     component_type: "mesh_renderer"
-    scene: "duck"
+    scene: "content/scene/solider/solider"
 #    mesh: "geom_0"
 #    node: "n_geom_0"
 
-    mesh: "LOD3spShape"
-    node: "n_LOD3spShape"
+    mesh: "Mesh1Mesh1"
+    node: "n_Mesh1Mesh1"
 
-    material: "duck"
+    material: "content/scene/solider/solider"
