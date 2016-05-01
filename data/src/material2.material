@@ -1,4 +1,4 @@
 parent: material1
 
 textures:
-  u_texColor: content/texture1
+  u_texColor: m4_diff

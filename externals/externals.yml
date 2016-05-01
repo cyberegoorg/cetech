@@ -313,3 +313,27 @@ nspec:
 
      darwin64:
       - copytree: [NSpec/bin/Release, Release/lib]
+
+##############
+# Assimp-net #
+########################################################################################################################
+assimp-net:
+  clone: git clone https://github.com/assimp/assimp-net.git --depth 1
+
+  build:
+    windows64:
+      - devenv AssimpNet.sln /build net45-Release /project AssimpNet
+
+#    linux64:
+#      - sed /nuget/d NSpec/NSpec.csproj -i
+#      - nuget restore NSpec.sln
+#      - xbuild /p:Configuration=Release NSpec/NSpec.csproj
+#
+#    darwin64:
+#      - sed /nuget/d NSpec/NSpec.csproj -i
+#      - nuget restore NSpec.sln
+#      - xbuild /p:Configuration=Release NSpec/NSpec.csproj
+
+  install:
+     windows64:
+      - copytree: [AssimpNet\bin\Net45-Release, Release\lib]

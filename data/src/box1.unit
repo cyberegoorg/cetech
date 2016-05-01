@@ -7,7 +7,11 @@ components:
 
   "412321322234":
     component_type: "mesh_renderer"
-    scene: "cube"
-    mesh: "g_cube"
-    node: "n_cube"
-    material: "material2"
+    scene: "duck"
+#    mesh: "geom_0"
+#    node: "n_geom_0"
+
+    mesh: "LOD3spShape"
+    node: "n_LOD3spShape"
+
+    material: "duck"

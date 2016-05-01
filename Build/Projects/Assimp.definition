@@ -1,0 +1,11 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ExternalProject Name="Assimp">
+
+  <Platform Type="Windows">
+    <Binary
+      Name="ExternalLib"
+      Path="externals/build/windows64/Release/lib/AssimpNet.dll" />
+
+    <NativeBinary Path="externals/build/windows64/Release/lib/Assimp64.dll" />
+  </Platform>
+  </ExternalProject>
