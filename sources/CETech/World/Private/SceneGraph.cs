@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Globalization;
+using System.Linq.Expressions;
 using System.Yaml;
 using CETech.CEMath;
 using CETech.Develop;
@@ -9,13 +10,13 @@ using MsgPack;
 
 namespace CETech.World
 {
-    public partial class SceneGraph 
+    public partial class SceneGraph
     {
         private static readonly Dictionary<int, WorldInstance> _worldInstance = new Dictionary<int, WorldInstance>();
 
-        private static int getIdx(int world, int entity)
+        private static int getFirstNode(int world, int entity)
         {
-            return _worldInstance[world].EntIdx[entity];
+            return _worldInstance[world].EntNode[entity];
         }
 
         private static void InitWorldImpl(int world)
@@ -28,30 +29,64 @@ namespace CETech.World
             _worldInstance.Remove(world);
         }
 
-        private static int CreateImpl(int world, int entity, int parent, Vec3f position, Quatf rotation,
-            Vec3f scale)
+		private static int GetNodeByNameRecursive(int world, int node, long name ) {
+			var world_instance = _worldInstance[world];
+
+			if (world_instance.Name [node] == name) {
+				return node;
+			}
+
+			var child = world_instance.FirstChild[node];
+			while (is_valid(child))
+			{
+				var result_node = GetNodeByNameRecursive (world, child, name);
+
+				if (result_node != int.MaxValue) {
+					return result_node;
+				}
+
+				child = world_instance.NextSibling[child];
+			}
+
+			return int.MaxValue; 
+		}
+
+		public static int GetNodeByNameImpl(int world, int entity, long name) {
+			var world_instance = _worldInstance[world];
+
+			var idx = world_instance.EntNode [entity];
+			return GetNodeByNameRecursive (world, idx, name);
+		}
+
+        private static int CreateImpl(int world, int entity, long[] names, int[] parents, Mat4f[] pose)
         {
             var world_instance = _worldInstance[world];
 
-            var idx = world_instance.Position.Count;
-            world_instance.Position.Add(position);
-            world_instance.Rotation.Add(rotation);
-            world_instance.Scale.Add(scale);
-
+          var nodes_map = new int[names.Length];
+          for (int i = 0; i < names.Length; i++)
+          {
+            var idx = world_instance.Position.Count; 
+            nodes_map[i] = idx;
+            world_instance.Name.Add(names[i]);
             world_instance.Parent.Add(int.MaxValue);
             world_instance.FirstChild.Add(int.MaxValue);
             world_instance.NextSibling.Add(int.MaxValue);
+			
+			var local_pose = pose [i];
+		
+			world_instance.Position.Add (Mat4f.Translation(local_pose));
+			world_instance.Scale.Add (Vec3f.Unit); // TODO: from pose?
+				world_instance.Rotation.Add (Mat4f.ToQuat(local_pose));
 
             world_instance.World.Add(Mat4f.Identity);
 
-            Transform(world, idx,
-                parent != int.MaxValue ? GetWorldMatrix(world, GetTranform(world, parent)) : Mat4f.Identity);
-
-            world_instance.EntIdx[entity] = idx;
+            var parent = parents[i];
+            //Transform(world, idx,
+            //    parent != int.MaxValue ? GetWorldMatrix(world, nodes_map[parent]) : Mat4f.Identity);
 
             if (parent != int.MaxValue)
             {
-                var parentIdx = world_instance.EntIdx[parent];
+					var parentIdx = nodes_map[parent];
 
                 world_instance.Parent[idx] = parentIdx;
 
@@ -69,9 +104,10 @@ namespace CETech.World
 
                 world_instance.Parent[idx] = parentIdx;
             }
+          }
 
-
-            return idx;
+			world_instance.EntNode[entity] = nodes_map[0];
+          	return nodes_map[0];
         }
 
         private static bool is_valid(int idx)
@@ -105,66 +141,10 @@ namespace CETech.World
                 child = world_instance.NextSibling[child];
             }
         }
-
-        private static void Spawner(int world, int[] ent_ids, int[] ents_parent, MessagePackObjectDictionary[] data)
-        {
-            for (var i = 0; i < ent_ids.Length; ++i)
-            {
-                var pos = data[i]["position"].AsList();
-                var rot = data[i]["rotation"].AsList();
-                var sca = data[i]["scale"].AsList();
-
-                var position = new Vec3f {X = pos[0].AsSingle(), Y = pos[1].AsSingle(), Z = pos[2].AsSingle()};
-                var rotation = new Vec3f {X = rot[0].AsSingle(), Y = rot[1].AsSingle(), Z = rot[2].AsSingle()};
-                var scale = new Vec3f {X = sca[0].AsSingle(), Y = sca[1].AsSingle(), Z = sca[2].AsSingle()};
-
-                rotation = rotation*Mathf.ToRad;
-
-                Create(world, ent_ids[i],
-                    ents_parent[i] != int.MaxValue ? ent_ids[ents_parent[i]] : int.MaxValue, position,
-                    Quatf.FromEurelAngle(rotation.X, rotation.Y, rotation.Z), scale);
-            }
-
-            // Todo:
-            for (var i = 0; i < ent_ids.Length; ++i)
-            {
-                Transform(world, getIdx(world, ent_ids[i]), Mat4f.Identity);
-            }
-        }
-
-        private static void Compiler(YamlMapping body, ConsoleServer.ResponsePacker packer)
-        {
-            var position = body["position"] as YamlSequence;
-            var rotation = body["rotation"] as YamlSequence;
-            var scale = body["scale"] as YamlSequence;
-
-            packer.PackMapHeader(3);
-
-            packer.Pack("position");
-            packer.PackArrayHeader(3);
-            packer.Pack(float.Parse(((YamlScalar) position[0]).Value, CultureInfo.InvariantCulture));
-            packer.Pack(float.Parse(((YamlScalar) position[1]).Value, CultureInfo.InvariantCulture));
-            packer.Pack(float.Parse(((YamlScalar) position[2]).Value, CultureInfo.InvariantCulture));
-
-            packer.Pack("rotation");
-            packer.PackArrayHeader(3);
-            packer.Pack(float.Parse(((YamlScalar) rotation[0]).Value, CultureInfo.InvariantCulture));
-            packer.Pack(float.Parse(((YamlScalar) rotation[1]).Value, CultureInfo.InvariantCulture));
-            packer.Pack(float.Parse(((YamlScalar) rotation[2]).Value, CultureInfo.InvariantCulture));
-
-            packer.Pack("scale");
-            packer.PackArrayHeader(3);
-            packer.Pack(float.Parse(((YamlScalar) scale[0]).Value, CultureInfo.InvariantCulture));
-            packer.Pack(float.Parse(((YamlScalar) scale[1]).Value, CultureInfo.InvariantCulture));
-            packer.Pack(float.Parse(((YamlScalar) scale[2]).Value, CultureInfo.InvariantCulture));
-        }
+			
 
         private static void InitImpl()
         {
-#if CETECH_DEVELOP
-            ComponentSystem.RegisterCompiler(StringId64.FromString("scene_graph"), Compiler, 1);
-#endif
-            ComponentSystem.RegisterType(StringId64.FromString("scene_graph"), Spawner, Destroyer);
         }
 
         private static void Destroyer(int world, int[] entIds)
@@ -175,7 +155,7 @@ namespace CETech.World
             for (var i = 0; i < entIds.Length; i++)
             {
                 var ent_id = entIds[i];
-                world_instance.EntIdx.Remove(ent_id);
+                world_instance.EntNode.Remove(ent_id);
             }
         }
 
@@ -241,8 +221,8 @@ namespace CETech.World
         {
             var world_instance = _worldInstance[world];
 
-            var parent_idx = getIdx(world, parent);
-            var child_idx = getIdx(world, child);
+            var parent_idx = getFirstNode(world, parent);
+            var child_idx = getFirstNode(world, child);
 
             world_instance.Parent[child_idx] = parent_idx;
 
@@ -253,37 +233,37 @@ namespace CETech.World
 
             var p = parent_idx != int.MaxValue ? world_instance.World[parent_idx] : Mat4f.Identity;
             Transform(world, parent_idx, p); // TODO:
-            Transform(world, child_idx, GetWorldMatrix(world, GetTranform(world, parent)));
+            Transform(world, child_idx, GetWorldMatrix(world, parent));
         }
 
-        private static int GetTranformImpl(int world, int entity)
+        private static int GetRootNode(int world, int entity)
         {
-            return getIdx(world, entity);
+            return getFirstNode(world, entity);
         }
 
-        public static bool HasTransform(int world, int entity)
+        public static bool HasSceneGraph(int world, int entity)
         {
-            return _worldInstance[world].EntIdx.ContainsKey(entity);
+            return _worldInstance[world].EntNode.ContainsKey(entity);
         }
 
         private class WorldInstance
         {
-            public readonly Dictionary<int, int> EntIdx;
+            public readonly Dictionary<int, int> EntNode;
+
+            public readonly List<long> Name;
             public readonly List<int> FirstChild;
             public readonly List<int> NextSibling;
-
             public readonly List<int> Parent;
-
             public readonly List<Vec3f> Position;
             public readonly List<Quatf> Rotation;
             public readonly List<Vec3f> Scale;
-
             public readonly List<Mat4f> World;
 
             public WorldInstance()
             {
+				Name = new List<long>();
                 NextSibling = new List<int>();
-                EntIdx = new Dictionary<int, int>();
+                EntNode = new Dictionary<int, int>();
                 Position = new List<Vec3f>();
                 Rotation = new List<Quatf>();
                 Scale = new List<Vec3f>();

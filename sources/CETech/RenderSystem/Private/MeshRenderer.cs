@@ -4,8 +4,10 @@ using System.Yaml;
 using CETech.Develop;
 using CETech.EntCom;
 using CETech.Resource;
+using CETech.CEMath;
 using MsgPack;
 using SharpBgfx;
+using CETech.Utils;
 
 namespace CETech.World
 {
@@ -36,11 +38,48 @@ namespace CETech.World
                 var material_instance = Resource.Resource.Get<MaterialResource.MaterialInstance>(MaterialResource.Type,
                     material);
 
-                world_instance.MaterialInstance.Add(material_instance);
+				world_instance.EntIdx[entity] = idx;
+				world_instance.MaterialInstance.Add(material_instance);
                 world_instance.SceneInstance.Add(mesh_instance);
                 world_instance.MeshIdx.Add(i);
 
-                world_instance.EntIdx[entity] = idx;
+				var local_pose = mesh_instance.resource.node_local[i];
+				var pose = new Mat4f[mesh_instance.resource.node_names[i].Length];
+				var pose_id = 0;
+				for (int j = 0; j < pose.Length; j += 16) {
+					var m_idx = j;
+
+					pose [pose_id++] = new Mat4f (
+						local_pose[m_idx+0],
+						local_pose[m_idx+1],
+						local_pose[m_idx+2],
+						local_pose[m_idx+3],
+
+						local_pose[m_idx+4],
+						local_pose[m_idx+5],
+						local_pose[m_idx+6],
+						local_pose[m_idx+7],
+
+						local_pose[m_idx+8],
+						local_pose[m_idx+9],
+						local_pose[m_idx+10],
+						local_pose[m_idx+11],
+
+						local_pose[m_idx+12],
+						local_pose[m_idx+13],
+						local_pose[m_idx+14],
+						local_pose[m_idx+15]
+					);
+				}
+					
+				var node = SceneGraph.Create(world, entity,
+					mesh_instance.resource.node_names[i], mesh_instance.resource.node_parent[i], pose);
+
+				Log.Debug("scene_graph", "n_cube {0}", SceneGraph.GetNodeByName(world, entity, StringId64.FromString("n_cube")));
+				Log.Debug("scene_graph", "g_cube {0}", SceneGraph.GetNodeByName(world, entity, StringId64.FromString("g_cube")));
+				Log.Debug("scene_graph", "nn_cube {0}", SceneGraph.GetNodeByName(world, entity, StringId64.FromString("nn_cube")));
+
+				world_instance.NodeIdx.Add(node);
 
                 return idx;
             }
@@ -71,12 +110,16 @@ namespace CETech.World
         {
             var scene = body["scene"] as YamlScalar;
             var mesh = body["mesh"] as YamlScalar;
-            var material = body["material"] as YamlScalar;
+			var node = body["node"] as YamlScalar;
+			var material = body["material"] as YamlScalar;
 
-            packer.PackMapHeader(3);
+            packer.PackMapHeader(4);
 
             packer.Pack("scene");
             packer.Pack(StringId64.FromString(scene.Value));
+
+			packer.Pack("node");
+			packer.Pack(StringId64.FromString(node.Value));
 
             packer.Pack("mesh");
             packer.Pack(StringId64.FromString(mesh.Value));
@@ -164,6 +207,7 @@ namespace CETech.World
             public readonly List<MaterialResource.MaterialInstance> MaterialInstance;
             public readonly List<SceneResource.SceneInstance> SceneInstance;
             public readonly List<int> MeshIdx;
+			public readonly List<int> NodeIdx;
 
             public WorldInstance()
             {
@@ -171,6 +215,7 @@ namespace CETech.World
                 MaterialInstance = new List<MaterialResource.MaterialInstance>();
                 SceneInstance = new List<SceneResource.SceneInstance>();
                 MeshIdx = new List<int>();
+				NodeIdx = new List<int>();
             }
         }
     }
