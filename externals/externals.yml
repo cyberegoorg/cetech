@@ -324,6 +324,9 @@ assimp-net:
     windows64:
       - devenv AssimpNet.sln /build net45-Release /project AssimpNet
 
+    linux64:
+      -  xbuild /p:Project=AssimpNet /p:Configuration=net45-Release AssimpNet.sln
+
 #    linux64:
 #      - sed /nuget/d NSpec/NSpec.csproj -i
 #      - nuget restore NSpec.sln
@@ -337,3 +340,30 @@ assimp-net:
   install:
      windows64:
       - copytree: [AssimpNet\bin\Net45-Release, Release\lib]
+
+     linux64:
+      - copytree: [AssimpNet/bin/Net45-Release, Release/lib]
+
+assimp:
+  platforms: [linux64, darwin64]
+  clone: git clone https://github.com/assimp/assimp.git --depth 1
+
+  build:
+    linux64:
+      - cmake .
+      - make
+
+#    linux64:
+#      - sed /nuget/d NSpec/NSpec.csproj -i
+#      - nuget restore NSpec.sln
+#      - xbuild /p:Configuration=Release NSpec/NSpec.csproj
+#
+#    darwin64:
+#      - sed /nuget/d NSpec/NSpec.csproj -i
+#      - nuget restore NSpec.sln
+#      - xbuild /p:Configuration=Release NSpec/NSpec.csproj
+
+  install:
+     linux64:
+      - copyfile: [lib/libassimp.so.3.2.0, Release/lib/Assimp64.so]
+
