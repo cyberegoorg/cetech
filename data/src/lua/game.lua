@@ -16,14 +16,13 @@ function Game:init()
     self.world = World.Create()
 
     --self.unit = Unit.Spawn(self.world, "unit1");
-    World.LoadLevel(self.world, "level1");
+    self.level = World.LoadLevel(self.world, "level1");
 --    self.level = World.LoadLevel(self.world, "level1",
 --                 Vec3f.make(2, 5.0, 0.0),
 --                 Quatf.Identity, Vec3f.Unit);
 
 --    self.level_unit = World.LevelUnit(self.world, self.level)
 
---    self.unit1 = World.UnitByName(self.world, self.level, "box1")
 --    self.unit2 = World.UnitByName(self.world, self.level, "box2")
 --    self.unit = self.unit1
 
@@ -40,6 +39,12 @@ end
 function Game:shutdown()
     Log.Info("boot.lua", "shutdown")
     World.Destroy(self.world);
+end
+
+function rotator(world, node, delta_rot)
+    local rot = SceneGraph.GetRotation(world, node)
+    rot = rot * delta_rot
+    SceneGraph.SetRotation(world, node, rot)
 end
 
 function Game:update(dt)
@@ -121,6 +126,14 @@ function Game:update(dt)
             self.fps_camera.fly_mode = false
         end
     end
+
+    local unit1 = World.UnitByName(self.world, self.level, "box1")
+    local node = SceneGraph.GetNodeByName(self.world, unit1, "n_cube")
+    rotator(self.world, node, Quatf.FromAxisAngle(Vec3f.UnitY, 0.1) * Quatf.FromAxisAngle(Vec3f.UnitX, 0.1))
+
+    unit1 = World.UnitByName(self.world, self.level, "box2")
+    node = SceneGraph.GetNodeByName(self.world, unit1, "n_cube")
+    rotator(self.world, node, Quatf.FromAxisAngle(Vec3f.UnitZ, 0.1))
 
     World.Update(self.world, dt)
     --print("%f, %f", m_axis.x, m_axis.y)

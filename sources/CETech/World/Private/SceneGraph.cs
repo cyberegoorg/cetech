@@ -73,16 +73,19 @@ namespace CETech.World
             world_instance.NextSibling.Add(int.MaxValue);
 			
 			var local_pose = pose [i];
-		
-			world_instance.Position.Add (Mat4f.Translation(local_pose));
-			world_instance.Scale.Add (Vec3f.Unit); // TODO: from pose?
-				world_instance.Rotation.Add (Mat4f.ToQuat(local_pose));
+			var local_translation = Mat4f.Translation (local_pose);
+			var local_rotation = Mat4f.ToQuat (local_pose);
+			var local_scale = Vec3f.Unit;
+
+			world_instance.Position.Add (local_translation);
+			world_instance.Scale.Add (local_scale); // TODO: from pose?
+			world_instance.Rotation.Add (local_rotation);
 
             world_instance.World.Add(Mat4f.Identity);
 
             var parent = parents[i];
-            //Transform(world, idx,
-            //    parent != int.MaxValue ? GetWorldMatrix(world, nodes_map[parent]) : Mat4f.Identity);
+            Transform(world, idx,
+                parent != int.MaxValue ? GetWorldMatrix(world, nodes_map[parent]) : Mat4f.Identity);
 
             if (parent != int.MaxValue)
             {
@@ -104,6 +107,8 @@ namespace CETech.World
 
                 world_instance.Parent[idx] = parentIdx;
             }
+
+			
           }
 
 			world_instance.EntNode[entity] = nodes_map[0];

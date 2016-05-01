@@ -175,12 +175,13 @@ namespace CETech.World
                     Bgfx.SetTexture(0, textureUniforms[j], textureResource[j].texture);
                 }
 
-                var world_matrix = Tranform.GetWorldMatrix(world,
-                    Tranform.GetTranform(world, item.Key));
+                var world_matrix = Tranform.GetWorldMatrix(world, Tranform.GetTranform(world, item.Key));
+				var node_world = SceneGraph.GetWorldMatrix(world, world_instance.NodeIdx [idx]);
+				var final_matrix = node_world * world_matrix;
 
                 unsafe
                 {
-                    Bgfx.SetTransform(&world_matrix.M11);
+                    Bgfx.SetTransform(&final_matrix.M11);
                 }
 
                 Bgfx.SetVertexBuffer(meshInstance.vb[mesh_idx]);
