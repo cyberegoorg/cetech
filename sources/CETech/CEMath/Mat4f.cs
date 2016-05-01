@@ -1,6 +1,6 @@
 using System;
-using MoonSharp.Interpreter;
 using System.Diagnostics;
+using MoonSharp.Interpreter;
 
 namespace CETech.CEMath
 {
@@ -267,84 +267,90 @@ namespace CETech.CEMath
             return new Vec3f(m.M31, m.M32, m.M33);
         }
 
-		public static Vec3f Translation(Mat4f m) {
-			return new Vec3f (m.M41, m.M42, m.M43);
-		}
+        public static Vec3f Translation(Mat4f m)
+        {
+            return new Vec3f(m.M41, m.M42, m.M43);
+        }
 
-		public static Quatf ToQuat(Mat4f m) {
-			var x = X (m);
-			var y = Y (m);
-			var z = Z (m);
+        public static Quatf ToQuat(Mat4f m)
+        {
+            var x = X(m);
+            var y = Y(m);
+            var z = Z(m);
 
-			float ww = x.X + y.Y + z.Z;
-			float xx = x.X - y.Y - z.Z;
-			float yy = y.Y - x.X - z.Z;
-			float zz = z.Z - x.X - y.Y;
+            var ww = x.X + y.Y + z.Z;
+            var xx = x.X - y.Y - z.Z;
+            var yy = y.Y - x.X - z.Z;
+            var zz = z.Z - x.X - y.Y;
 
-			float max = ww;
-			int index = 0;
+            var max = ww;
+            var index = 0;
 
-			if (xx > max) {
-				max = xx;
-				index = 1;
-			}
+            if (xx > max)
+            {
+                max = xx;
+                index = 1;
+            }
 
-			if (yy > max) {
-				max = yy;
-				index = 2;
-			}
+            if (yy > max)
+            {
+                max = yy;
+                index = 2;
+            }
 
-			if (zz > max) {
-				max = zz;
-				index = 3;
-			}
+            if (zz > max)
+            {
+                max = zz;
+                index = 3;
+            }
 
-			float biggest = Mathf.FastSqrtf(max + 1.0f) * 0.5f;
-			float mult = 0.25f / biggest;
+            var biggest = Mathf.FastSqrtf(max + 1.0f)*0.5f;
+            var mult = 0.25f/biggest;
 
-			Quatf tmp = Quatf.Identity;
-			switch (index) {
-			case 0:
-				{
-					tmp.W = biggest;
-					tmp.X = (y.Z - z.Y) * mult;
-					tmp.Y = (z.X - x.Z) * mult;
-					tmp.Z = (x.Y - y.X) * mult;
-					break;
-				}
-			case 1:
-				{
-					tmp.X = biggest;
-					tmp.W = (y.Z - z.Y) * mult;
-					tmp.Y = (x.Y + y.X) * mult;
-					tmp.Z = (z.X + x.Z) * mult;
-					break;
-				}
-			case 2:
-				{
-					tmp.Y = biggest;
-					tmp.W = (z.X - x.Z) * mult;
-					tmp.X = (x.Y + y.X) * mult;
-					tmp.Z = (y.Z + z.Y) * mult;
-					break;
-				}
-			case 3:
-				{
-					tmp.Z = biggest;
-					tmp.W = (x.Y - y.X) * mult;
-					tmp.X = (z.X + x.Z) * mult;
-					tmp.Y = (y.Z + z.Y) * mult;
-					break;
-				}
-			default:
-				{
-					Debug.Assert (false);
-					break;
-				}
-			}
+            var tmp = Quatf.Identity;
+            switch (index)
+            {
+                case 0:
+                {
+                    tmp.W = biggest;
+                    tmp.X = (y.Z - z.Y)*mult;
+                    tmp.Y = (z.X - x.Z)*mult;
+                    tmp.Z = (x.Y - y.X)*mult;
+                    break;
+                }
+                case 1:
+                {
+                    tmp.X = biggest;
+                    tmp.W = (y.Z - z.Y)*mult;
+                    tmp.Y = (x.Y + y.X)*mult;
+                    tmp.Z = (z.X + x.Z)*mult;
+                    break;
+                }
+                case 2:
+                {
+                    tmp.Y = biggest;
+                    tmp.W = (z.X - x.Z)*mult;
+                    tmp.X = (x.Y + y.X)*mult;
+                    tmp.Z = (y.Z + z.Y)*mult;
+                    break;
+                }
+                case 3:
+                {
+                    tmp.Z = biggest;
+                    tmp.W = (x.Y - y.X)*mult;
+                    tmp.X = (z.X + x.Z)*mult;
+                    tmp.Y = (y.Z + z.Y)*mult;
+                    break;
+                }
+                default:
+                {
+                    Debug.Assert(false);
+                    break;
+                }
+            }
 
-			return Quatf.Normalize (tmp);
-		}
+            return Quatf.Normalize(tmp);
+        }
 
         public static float GetDeterminant(Mat4f m)
         {

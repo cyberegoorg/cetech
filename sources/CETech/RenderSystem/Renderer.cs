@@ -1,5 +1,4 @@
-﻿using System;
-using CETech.CEMath;
+﻿using CETech.CEMath;
 
 namespace CETech
 {

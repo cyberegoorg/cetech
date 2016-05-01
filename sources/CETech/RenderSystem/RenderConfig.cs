@@ -90,13 +90,18 @@ namespace CETech
             public List<long> GlobalResourceName = new List<long>();
             public List<ulong> GlobalResourceRation = new List<ulong>();
 
-            // Vieport
-            public List<long> ViewportName= new List<long>();
-            public List<int> ViewportLayer= new List<int>();
-
             // Layer
             public List<long> LayerName = new List<long>();
+            public List<int> ViewportLayer = new List<int>();
 
+            // Vieport
+            public List<long> ViewportName = new List<long>();
+        }
+
+        public class ConfigInstance
+        {
+            public Dictionary<long, Texture> GlobalResource = new Dictionary<long, Texture>();
+            public Resource resource;
         }
 
 #if CETECH_DEVELOP
@@ -174,13 +179,13 @@ namespace CETech
             var resource = new Resource();
 
             var global_resource = rootNode["global_resource"];
-            ParseGlobalResource((YamlSequence)global_resource, resource);
+            ParseGlobalResource((YamlSequence) global_resource, resource);
 
             var layer = rootNode["layer"];
-            ParseLayer((YamlMapping)layer, resource);
+            ParseLayer((YamlMapping) layer, resource);
 
             var viewport = rootNode["viewport"];
-            ParseViewport((YamlMapping)viewport, resource);
+            ParseViewport((YamlMapping) viewport, resource);
 
             var serializer = MessagePackSerializer.Get<Resource>();
             serializer.Pack(capi.BuildFile, resource);
@@ -188,7 +193,7 @@ namespace CETech
 
         private static int GetLayerIdx(long layer_name, Resource resource)
         {
-            for (int i = 0; i < resource.LayerName.Count; i++)
+            for (var i = 0; i < resource.LayerName.Count; i++)
             {
                 if (resource.LayerName[i] != layer_name)
                 {
@@ -208,7 +213,7 @@ namespace CETech
                 var item = layer.ElementAt(i);
 
                 //var layer_def = (YamlMapping)item.Value;
-                var name = ((YamlScalar)item.Key).Value;
+                var name = ((YamlScalar) item.Key).Value;
 
                 resource.LayerName.Add(StringId64.FromString(name));
 
@@ -235,16 +240,9 @@ namespace CETech
                 }
 
                 resource.ViewportName.Add(StringId64.FromString(name));
-                resource.ViewportLayer.Add(layer_idx);                
+                resource.ViewportLayer.Add(layer_idx);
             }
         }
 #endif
-
-        public class ConfigInstance
-        {
-            public Dictionary<long, Texture> GlobalResource = new Dictionary<long, Texture>();
-            public RenderConfig.Resource resource;
-        }
     }
-
 }

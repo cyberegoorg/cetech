@@ -1,12 +1,5 @@
 ﻿using System.Collections.Generic;
-using System.Globalization;
-using System.Linq.Expressions;
-using System.Yaml;
 using CETech.CEMath;
-using CETech.Develop;
-using CETech.EntCom;
-using CETech.Resource;
-using MsgPack;
 
 namespace CETech.World
 {
@@ -29,90 +22,92 @@ namespace CETech.World
             _worldInstance.Remove(world);
         }
 
-		private static int GetNodeByNameRecursive(int world, int node, long name ) {
-			var world_instance = _worldInstance[world];
+        private static int GetNodeByNameRecursive(int world, int node, long name)
+        {
+            var world_instance = _worldInstance[world];
 
-			if (world_instance.Name [node] == name) {
-				return node;
-			}
+            if (world_instance.Name[node] == name)
+            {
+                return node;
+            }
 
-			var child = world_instance.FirstChild[node];
-			while (is_valid(child))
-			{
-				var result_node = GetNodeByNameRecursive (world, child, name);
+            var child = world_instance.FirstChild[node];
+            while (is_valid(child))
+            {
+                var result_node = GetNodeByNameRecursive(world, child, name);
 
-				if (result_node != int.MaxValue) {
-					return result_node;
-				}
+                if (result_node != int.MaxValue)
+                {
+                    return result_node;
+                }
 
-				child = world_instance.NextSibling[child];
-			}
+                child = world_instance.NextSibling[child];
+            }
 
-			return int.MaxValue; 
-		}
+            return int.MaxValue;
+        }
 
-		public static int GetNodeByNameImpl(int world, int entity, long name) {
-			var world_instance = _worldInstance[world];
+        public static int GetNodeByNameImpl(int world, int entity, long name)
+        {
+            var world_instance = _worldInstance[world];
 
-			var idx = world_instance.EntNode [entity];
-			return GetNodeByNameRecursive (world, idx, name);
-		}
+            var idx = world_instance.EntNode[entity];
+            return GetNodeByNameRecursive(world, idx, name);
+        }
 
         private static int CreateImpl(int world, int entity, long[] names, int[] parents, Mat4f[] pose)
         {
             var world_instance = _worldInstance[world];
 
-          var nodes_map = new int[names.Length];
-          for (int i = 0; i < names.Length; i++)
-          {
-            var idx = world_instance.Position.Count; 
-            nodes_map[i] = idx;
-            world_instance.Name.Add(names[i]);
-            world_instance.Parent.Add(int.MaxValue);
-            world_instance.FirstChild.Add(int.MaxValue);
-            world_instance.NextSibling.Add(int.MaxValue);
-			
-			var local_pose = pose [i];
-			var local_translation = Mat4f.Translation (local_pose);
-			var local_rotation = Mat4f.ToQuat (local_pose);
-			var local_scale = Vec3f.Unit;
-
-			world_instance.Position.Add (local_translation);
-			world_instance.Scale.Add (local_scale); // TODO: from pose?
-			world_instance.Rotation.Add (local_rotation);
-
-            world_instance.World.Add(Mat4f.Identity);
-
-            var parent = parents[i];
-            Transform(world, idx,
-                parent != int.MaxValue ? GetWorldMatrix(world, nodes_map[parent]) : Mat4f.Identity);
-
-            if (parent != int.MaxValue)
+            var nodes_map = new int[names.Length];
+            for (var i = 0; i < names.Length; i++)
             {
-					var parentIdx = nodes_map[parent];
+                var idx = world_instance.Position.Count;
+                nodes_map[i] = idx;
+                world_instance.Name.Add(names[i]);
+                world_instance.Parent.Add(int.MaxValue);
+                world_instance.FirstChild.Add(int.MaxValue);
+                world_instance.NextSibling.Add(int.MaxValue);
 
-                world_instance.Parent[idx] = parentIdx;
+                var local_pose = pose[i];
+                var local_translation = Mat4f.Translation(local_pose);
+                var local_rotation = Mat4f.ToQuat(local_pose);
+                var local_scale = Vec3f.Unit;
 
-                if (!is_valid(world_instance.FirstChild[parentIdx]))
+                world_instance.Position.Add(local_translation);
+                world_instance.Scale.Add(local_scale); // TODO: from pose?
+                world_instance.Rotation.Add(local_rotation);
+
+                world_instance.World.Add(Mat4f.Identity);
+
+                var parent = parents[i];
+                Transform(world, idx,
+                    parent != int.MaxValue ? GetWorldMatrix(world, nodes_map[parent]) : Mat4f.Identity);
+
+                if (parent != int.MaxValue)
                 {
-                    world_instance.FirstChild[parentIdx] = idx;
-                }
-                else
-                {
-                    var firstChildIdx = world_instance.FirstChild[parentIdx];
+                    var parentIdx = nodes_map[parent];
 
-                    world_instance.FirstChild[parentIdx] = idx;
-                    world_instance.NextSibling[idx] = firstChildIdx;
-                }
+                    world_instance.Parent[idx] = parentIdx;
 
-                world_instance.Parent[idx] = parentIdx;
+                    if (!is_valid(world_instance.FirstChild[parentIdx]))
+                    {
+                        world_instance.FirstChild[parentIdx] = idx;
+                    }
+                    else
+                    {
+                        var firstChildIdx = world_instance.FirstChild[parentIdx];
+
+                        world_instance.FirstChild[parentIdx] = idx;
+                        world_instance.NextSibling[idx] = firstChildIdx;
+                    }
+
+                    world_instance.Parent[idx] = parentIdx;
+                }
             }
 
-			
-          }
-
-			world_instance.EntNode[entity] = nodes_map[0];
-          	return nodes_map[0];
+            world_instance.EntNode[entity] = nodes_map[0];
+            return nodes_map[0];
         }
 
         private static bool is_valid(int idx)
@@ -146,7 +141,7 @@ namespace CETech.World
                 child = world_instance.NextSibling[child];
             }
         }
-			
+
 
         private static void InitImpl()
         {
@@ -254,9 +249,9 @@ namespace CETech.World
         private class WorldInstance
         {
             public readonly Dictionary<int, int> EntNode;
+            public readonly List<int> FirstChild;
 
             public readonly List<long> Name;
-            public readonly List<int> FirstChild;
             public readonly List<int> NextSibling;
             public readonly List<int> Parent;
             public readonly List<Vec3f> Position;
@@ -266,7 +261,7 @@ namespace CETech.World
 
             public WorldInstance()
             {
-				Name = new List<long>();
+                Name = new List<long>();
                 NextSibling = new List<int>();
                 EntNode = new Dictionary<int, int>();
                 Position = new List<Vec3f>();

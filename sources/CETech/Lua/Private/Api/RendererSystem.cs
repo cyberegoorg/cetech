@@ -1,4 +1,3 @@
-using System;
 using CETech.Resource;
 using MoonSharp.Interpreter;
 

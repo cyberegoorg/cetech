@@ -68,6 +68,7 @@
     <Compile Include="Lua\Private\Api\MouseApi.cs" />
     <Compile Include="Lua\Private\Api\PackageManagerApi.cs" />
     <Compile Include="Lua\Private\Api\RendererSystem.cs" />
+    <Compile Include="Lua\Private\Api\SceneGraph.cs" />
     <Compile Include="Lua\Private\Api\TransformSystem.cs" />
     <Compile Include="Lua\Private\Api\UnitManager.cs" />
     <Compile Include="Lua\Private\Api\WorldApi.cs" />
@@ -130,15 +131,15 @@
     <Compile Include="Window\WindowFlags.cs" />
     <Compile Include="Window\WindowPos.cs" />
     <Compile Include="World\LevelResource.cs" />
+    <Compile Include="World\Private\SceneGraph.cs" />
     <Compile Include="World\Private\Tranform.cs" />
     <Compile Include="World\Private\Unit.cs" />
     <Compile Include="World\Private\World.cs" />
+    <Compile Include="World\SceneGraph.cs" />
     <Compile Include="World\Tranform.cs" />
     <Compile Include="World\Unit.cs" />
     <Compile Include="World\UnitResource.cs" />
     <Compile Include="World\World.cs" />
-    <Compile Include="World\SceneGraph.cs" />
-    <Compile Include="World\Private\SceneGraph.cs" />
     <Content Include="Utils\YamlSerializer\ChangeLog.txt" />
     <Content Include="Utils\YamlSerializer\Readme.txt" />
   </Files>
