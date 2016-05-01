@@ -129,7 +129,7 @@ function Game:update(dt)
 
     local unit1 = World.UnitByName(self.world, self.level, "box1")
     local node = SceneGraph.GetNodeByName(self.world, unit1, "n_cube")
-    rotator(self.world, node, Quatf.FromAxisAngle(Vec3f.UnitY, 0.1) * Quatf.FromAxisAngle(Vec3f.UnitX, 0.1))
+    rotator(self.world, node, Quatf.FromAxisAngle(Vec3f.UnitY, 0.05) * Quatf.FromAxisAngle(Vec3f.UnitX, 0.1))
 
     unit1 = World.UnitByName(self.world, self.level, "box2")
     node = SceneGraph.GetNodeByName(self.world, unit1, "n_cube")
