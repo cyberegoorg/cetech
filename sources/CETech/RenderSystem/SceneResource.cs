@@ -466,15 +466,28 @@ namespace CETech
             var geometries = new YamlMapping();
             var graph = new YamlMapping();
 
+            var used_names = new HashSet<string>();
+
             for (int i = 0; i < scene.MeshCount; i++)
             {
                 var mesh = scene.Meshes[i];
                 var mesh_name = mesh.Name;
-
+                
                 if (mesh_name.Length == 0)
                 {
                     mesh_name = string.Format("geom_{0}", i);
                 }
+
+                if (used_names.Contains(mesh_name))
+                {
+                    int unique = 1;
+                    while(used_names.Contains(mesh_name))
+                    {
+                        mesh_name = String.Format("{0}{1}", mesh.Name, unique++);
+                    }
+                }
+
+                used_names.Add(mesh_name);
 
                 var mesh_yaml = new YamlMapping();
 
@@ -484,12 +497,19 @@ namespace CETech
                 var types = new YamlMapping();
                 var indices = new YamlMapping();
 
-                if (!mesh.HasBones)
+                if (mesh.HasBones)
                 {
                     graph["n_" + mesh_name] = new YamlMapping(
                         "local", new YamlSequence(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1)
                         );
                 }
+                else
+                {
+                    graph["n_" + mesh_name] = new YamlMapping(
+                        "local", new YamlSequence(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1)
+                        );
+                }
+                
 
                 var indices_seq = new YamlSequence();
                 var mesh_indicies = mesh.GetIndices();
