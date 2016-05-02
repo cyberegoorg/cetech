@@ -78,7 +78,7 @@ namespace CETech.World
 
                 units_names.Add(StringId64.FromString(name.Value));
 
-                UnitResource.Compile(unit_def, packer);
+                UnitResource.Compile(unit_def, packer, capi);
             }
 
             packer.Pack("units_name");

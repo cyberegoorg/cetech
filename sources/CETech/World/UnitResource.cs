@@ -69,12 +69,17 @@ namespace CETech.World
         }
 
 #if CETECH_DEVELOP
-
-        public static void compile_entitity(YamlMapping rootNode, ref int entities_id, int parent,
-            Dictionary<long, long> ents_parent, List<long> components_type,
-            Dictionary<long, List<long>> component_ent, Dictionary<long, List<YamlMapping>> components_body)
+        public class EntityCompileOutput
         {
-            ents_parent[entities_id] = parent;
+            public List<long> ComponentsType = new List<long>();
+            public Dictionary<long, long> EntsParent = new Dictionary<long, long>();
+            public Dictionary<long, List<long>> ComponentEnt = new Dictionary<long, List<long>>();
+            public Dictionary<long, List<YamlMapping>> ComponentsBody = new Dictionary<long, List<YamlMapping>>();
+        }
+
+        public static void compile_entitity(YamlMapping rootNode, ref int entities_id, int parent, EntityCompileOutput output)
+        {
+            output.EntsParent[entities_id] = parent;
 
             var componentsNode = (YamlMapping) rootNode["components"];
 
@@ -86,19 +91,19 @@ namespace CETech.World
                 var component_type = component_body["component_type"] as YamlScalar;
 
                 var cid = StringId64.FromString(component_type.Value);
-                if (!components_type.Contains(cid))
+                if (!output.ComponentsType.Contains(cid))
                 {
-                    components_type.Add(cid);
-                    component_ent[cid] = new List<long>();
+                    output.ComponentsType.Add(cid);
+                    output.ComponentEnt[cid] = new List<long>();
                 }
 
-                if (!components_body.ContainsKey(cid))
+                if (!output.ComponentsBody.ContainsKey(cid))
                 {
-                    components_body[cid] = new List<YamlMapping>();
+                    output.ComponentsBody[cid] = new List<YamlMapping>();
                 }
 
-                component_ent[cid].Add(entities_id);
-                components_body[cid].Add(component_body);
+                output.ComponentEnt[cid].Add(entities_id);
+                output.ComponentsBody[cid].Add(component_body);
             }
 
             if (rootNode.ContainsKey("children"))
@@ -109,47 +114,42 @@ namespace CETech.World
                 foreach (var child in childrenNode)
                 {
                     entities_id += 1;
-                    compile_entitity(child.Value as YamlMapping, ref entities_id, parent_ent,
-                        ents_parent,
-                        components_type, component_ent,
-                        components_body);
+                    compile_entitity(child.Value as YamlMapping, ref entities_id, parent_ent, output);
                 }
             }
         }
 
-        private static void preprocess(YamlMapping root)
+        private static void preprocess(YamlMapping root, ResourceCompiler.CompilatorApi capi)
         {
             if (root.ContainsKey("prefab"))
             {
                 var prefab_file = ((YamlScalar) root["prefab"]).Value + ".unit";
+
+                capi.add_dependency(prefab_file);
 
                 using (var prefab_source = FileSystem.Open("src", prefab_file, FileSystem.OpenMode.Read))
                 {
                     TextReader input = new StreamReader(prefab_source);
                     var parent_yaml = YamlNode.FromYaml(input)[0] as YamlMapping;
 
-                    preprocess(parent_yaml);
+                    preprocess(parent_yaml, capi);
                     Yaml.merge(root, parent_yaml);
                 }
             }
         }
 
-        public static void Compile(YamlMapping root, ConsoleServer.ResponsePacker packer)
+        public static void Compile(YamlMapping root, ConsoleServer.ResponsePacker packer, ResourceCompiler.CompilatorApi capi)
         {
             var entities_id = 0;
 
-            var components_type = new List<long>();
-            var component_ent = new Dictionary<long, List<long>>();
-            var components_body = new Dictionary<long, List<YamlMapping>>();
-            var ents_parent = new Dictionary<long, long>();
 
-            preprocess(root);
+            preprocess(root, capi);
 
-            compile_entitity(root, ref entities_id, int.MaxValue, ents_parent, components_type, component_ent,
-                components_body);
+            var compile_output = new EntityCompileOutput();
+            compile_entitity(root, ref entities_id, int.MaxValue, compile_output);
 
             var components_type_sorted =
-                components_type.OrderBy(pair => ComponentSystem.GetSpawnOrder(pair)).Select(pair => pair).ToArray();
+                compile_output.ComponentsType.OrderBy(pair => ComponentSystem.GetSpawnOrder(pair)).Select(pair => pair).ToArray();
 
             packer.PackMapHeader(5);
 
@@ -161,7 +161,7 @@ namespace CETech.World
             packer.PackArrayHeader(ent_count);
             for (var i = 0; i < ent_count; ++i)
             {
-                packer.Pack(ents_parent[i]);
+                packer.Pack(compile_output.EntsParent[i]);
             }
 
 
@@ -177,7 +177,7 @@ namespace CETech.World
             for (var i = 0; i < components_type_sorted.Length; ++i)
             {
                 var comp_type = components_type_sorted[i];
-                var ents = component_ent[comp_type];
+                var ents = compile_output.ComponentEnt[comp_type];
 
                 packer.PackArrayHeader(ents.Count);
                 for (var j = 0; j < ents.Count; j++)
@@ -191,7 +191,7 @@ namespace CETech.World
             for (var i = 0; i < components_type_sorted.Length; ++i)
             {
                 var comp_type = components_type_sorted[i];
-                var comp_body = components_body[comp_type];
+                var comp_body = compile_output.ComponentsBody[comp_type];
 
                 packer.PackArrayHeader(comp_body.Count);
                 for (var j = 0; j < comp_body.Count; j++)
@@ -212,7 +212,7 @@ namespace CETech.World
 
             var packer = new ConsoleServer.ResponsePacker();
 
-            Compile((YamlMapping) yaml[0], packer);
+            Compile((YamlMapping) yaml[0], packer, capi);
 
             packer.GetMemoryStream().WriteTo(capi.BuildFile);
 
