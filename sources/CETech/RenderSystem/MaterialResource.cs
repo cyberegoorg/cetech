@@ -121,17 +121,19 @@ namespace CETech
 
 #if CETECH_DEVELOP
 
-        private static void preprocess(YamlMapping root)
+        private static void preprocess(YamlMapping root, ResourceCompiler.CompilatorApi capi)
         {
             if (root.ContainsKey("parent"))
             {
                 var prefab_file = ((YamlScalar) root["parent"]).Value + ".material";
 
+                capi.add_dependency(prefab_file);
+
                 using (var prefab_source = FileSystem.Open("src", prefab_file, FileSystem.OpenMode.Read))
                 {
                     TextReader input = new StreamReader(prefab_source);
                     var parent_yaml = YamlNode.FromYaml(input)[0] as YamlMapping;
-                    preprocess(parent_yaml);
+                    preprocess(parent_yaml, capi);
 
                     Yaml.merge(root, parent_yaml);
                 }
@@ -149,7 +151,7 @@ namespace CETech
 
             var rootNode = yaml[0] as YamlMapping;
 
-            preprocess(rootNode);
+            preprocess(rootNode, capi);
 
             var shader_name = ((YamlScalar) rootNode["shader"]).Value;
             var resource = new Resource {shader_name = StringId64.FromString(shader_name)};
