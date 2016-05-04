@@ -141,7 +141,7 @@ namespace CETech.Lua
 
         private static void DoResourceImpl(long name)
         {
-            var ms = new MemoryStream(Resource.Resource.Get<byte[]>(LuaResource.Type, name));
+            var ms = new MemoryStream(ResourceManager.Get<byte[]>(LuaResource.Type, name));
 
             try
             {
@@ -240,18 +240,18 @@ namespace CETech.Lua
             public override object LoadFile(string file, Table globalContext)
             {
                 var name = StringId64.FromString(file);
-                return Resource.Resource.Get<byte[]>(LuaResource.Type, name);
+                return ResourceManager.Get<byte[]>(LuaResource.Type, name);
             }
 
             public override bool ScriptFileExists(string name)
             {
-                if (Resource.Resource.AutoLoad)
+                if (ResourceManager.AutoLoad)
                 {
                     return true;
                 }
 
                 long[] names = {StringId64.FromString(name)};
-                var can_get = Resource.Resource.CanGet(LuaResource.Type, names);
+                var can_get = ResourceManager.CanGet(LuaResource.Type, names);
 
                 return can_get;
             }

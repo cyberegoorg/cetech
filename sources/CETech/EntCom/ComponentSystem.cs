@@ -4,6 +4,9 @@ using MsgPack;
 
 namespace CETech.EntCom
 {
+    /// <summary>
+    ///     Component manager.
+    /// </summary>
     public partial class ComponentSystem
     {
         public delegate void Compiler(YamlMapping body, ConsoleServer.ResponsePacker packer);
@@ -29,7 +32,7 @@ namespace CETech.EntCom
 
         public static void RegisterType(long type, Spawner spawner, Destroyer destroyer)
         {
-            RegisterSpawnerImpl(type, spawner, destroyer);
+            RegisterTypeImpl(type, spawner, destroyer);
         }
 
         public static void Spawn(int world, long type, int[] ent_ids, int[] ents_parent,

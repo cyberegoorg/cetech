@@ -43,7 +43,7 @@ namespace CETech.World
 
         private static int SpawnImpl(int world, long unit)
         {
-            var unit_resource = Resource.Resource.Get<UnitResource.CompiledResource>(
+            var unit_resource = Resource.ResourceManager.Get<UnitResource.CompiledResource>(
                 UnitResource.Type, unit);
 
             return SpawnFromResourceImpl(unit_resource, world);

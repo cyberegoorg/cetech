@@ -5,7 +5,6 @@ using CETech.CEMath;
 using CETech.Develop;
 using CETech.EntCom;
 using CETech.Resource;
-using CETech.Utils;
 using MsgPack;
 using SharpBgfx;
 
@@ -22,7 +21,7 @@ namespace CETech.World
 
         private static int CreateImpl(int world, int entity, long material, long scene, long mesh)
         {
-            var mesh_instance = Resource.Resource.Get<SceneResource.SceneInstance>(SceneResource.Type, scene);
+            var mesh_instance = Resource.ResourceManager.Get<SceneResource.SceneInstance>(SceneResource.Type, scene);
 
             var names = mesh_instance.resource.geom_name;
             for (var i = 0; i < names.Length; i++)
@@ -35,7 +34,7 @@ namespace CETech.World
                 var world_instance = _worldInstance[world];
 
                 var idx = world_instance.MaterialInstance.Count;
-                var material_instance = Resource.Resource.Get<MaterialResource.MaterialInstance>(MaterialResource.Type,
+                var material_instance = Resource.ResourceManager.Get<MaterialResource.MaterialInstance>(MaterialResource.Type,
                     material);
 
                 world_instance.EntIdx[entity] = idx;
@@ -72,13 +71,6 @@ namespace CETech.World
 
                 var node = SceneGraph.Create(world, entity,
                     mesh_instance.resource.node_names[i], mesh_instance.resource.node_parent[i], pose);
-
-                Log.Debug("scene_graph", "n_cube {0}",
-                    SceneGraph.GetNodeByName(world, entity, StringId64.FromString("n_cube")));
-                Log.Debug("scene_graph", "g_cube {0}",
-                    SceneGraph.GetNodeByName(world, entity, StringId64.FromString("g_cube")));
-                Log.Debug("scene_graph", "nn_cube {0}",
-                    SceneGraph.GetNodeByName(world, entity, StringId64.FromString("nn_cube")));
 
                 world_instance.NodeIdx.Add(node);
 

@@ -30,7 +30,7 @@ namespace CETech.Lua.Api
             var types = new[] {"shader", "texture", "material", "lua"};
             for (var i = 0; i < types.Length; i++)
             {
-                Resource.Resource.ReloadAll(StringId64.FromString(types[i]));
+                ResourceManager.ReloadAll(StringId64.FromString(types[i]));
             }
         }
 

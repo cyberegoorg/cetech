@@ -10,22 +10,22 @@ namespace CETech.World
     public class LevelResource
     {
         /// <summary>
-        ///     Resource type
+        ///     ResourceManager type
         /// </summary>
         public static readonly long Type = StringId64.FromString("level");
 
         /// <summary>
-        ///     Resource loader
+        ///     ResourceManager loader
         /// </summary>
-        /// <param name="input">Resource data stream</param>
-        /// <returns>Resource data</returns>
+        /// <param name="input">ResourceManager data stream</param>
+        /// <returns>ResourceManager data</returns>
         public static object ResourceLoader(Stream input)
         {
             return MessagePackSerializer.Get<CompiledResource>().Unpack(input);
         }
 
         /// <summary>
-        ///     Resource offline.
+        ///     ResourceManager offline.
         /// </summary>
         /// <param name="data">Data</param>
         public static void ResourceOffline(object data)
@@ -33,7 +33,7 @@ namespace CETech.World
         }
 
         /// <summary>
-        ///     Resource online
+        ///     ResourceManager online
         /// </summary>
         /// <param name="data">Data</param>
         public static void ResourceOnline(object data)
@@ -41,7 +41,7 @@ namespace CETech.World
         }
 
         /// <summary>
-        ///     Resource unloader
+        ///     ResourceManager unloader
         /// </summary>
         /// <param name="data">data</param>
         public static void ResourceUnloader(object data)
@@ -50,7 +50,7 @@ namespace CETech.World
 
 #if CETECH_DEVELOP
         /// <summary>
-        ///     Resource compiler
+        ///     ResourceManager compiler
         /// </summary>
         /// <param name="capi">Compiler api</param>
         public static void Compile(ResourceCompiler.CompilatorApi capi)

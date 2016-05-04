@@ -16,15 +16,15 @@ namespace CETech
     public class RenderConfig
     {
         /// <summary>
-        ///     Resource type
+        ///     ResourceManager type
         /// </summary>
         public static readonly long Type = StringId64.FromString("render_config");
 
         /// <summary>
-        ///     Resource loader
+        ///     ResourceManager loader
         /// </summary>
-        /// <param name="input">Resource data stream</param>
-        /// <returns>Resource data</returns>
+        /// <param name="input">ResourceManager data stream</param>
+        /// <returns>ResourceManager data</returns>
         public static object ResourceLoader(Stream input)
         {
             var serializer = MessagePackSerializer.Get<Resource>();
@@ -33,7 +33,7 @@ namespace CETech
         }
 
         /// <summary>
-        ///     Resource offline.
+        ///     ResourceManager offline.
         /// </summary>
         /// <param name="data">Data</param>
         public static void ResourceOffline(object data)
@@ -41,7 +41,7 @@ namespace CETech
         }
 
         /// <summary>
-        ///     Resource online
+        ///     ResourceManager online
         /// </summary>
         /// <param name="data">Data</param>
         public static void ResourceOnline(object data)
@@ -59,15 +59,13 @@ namespace CETech
                             TextureFlags.MinFilterPoint | TextureFlags.MagFilterPoint | TextureFlags.MipFilterPoint |
                             TextureFlags.ClampU | TextureFlags.ClampV;
 
-
                 var texture = Texture.Create2D(ration, 1, format, flags);
-
                 instance.GlobalResource.Add(name, texture);
             }
         }
 
         /// <summary>
-        ///     Resource unloader
+        ///     ResourceManager unloader
         /// </summary>
         /// <param name="data">data</param>
         public static void ResourceUnloader(object data)
@@ -76,9 +74,8 @@ namespace CETech
 
         public static object ResourceReloader(long name, object new_data)
         {
-            var old = CETech.Resource.Resource.Get<Resource>(Type, name);
+            var old = CETech.Resource.ResourceManager.Get<Resource>(Type, name);
             var neww = (Resource) new_data;
-
 
             return old;
         }
@@ -167,7 +164,7 @@ namespace CETech
         }
 
         /// <summary>
-        ///     Resource compiler
+        ///     ResourceManager compiler
         /// </summary>
         /// <param name="capi">Compiler api</param>
         public static void Compile(ResourceCompiler.CompilatorApi capi)

@@ -8,48 +8,51 @@ using CETech.Utils;
 namespace CETech.Resource
 {
     /// <summary>
-    ///     Resource manager
+    ///     ResourceManager manager
     /// </summary>
-    public static partial class Resource
+    public static partial class ResourceManager
     {
-        private static readonly Dictionary<long, ResourceLoader> LoaderMap =
+        private static readonly Dictionary<long, ResourceLoader> _loaderMap =
             new Dictionary<long, ResourceLoader>();
 
-        private static readonly Dictionary<long, ResourceUnloader> UnloaderMap =
+        private static readonly Dictionary<long, ResourceUnloader> _unloaderMap =
             new Dictionary<long, ResourceUnloader>();
 
-        private static readonly Dictionary<long, ResourceOnline> OnlineMap =
+        private static readonly Dictionary<long, ResourceOnline> _onlineMap =
             new Dictionary<long, ResourceOnline>();
 
-        private static readonly Dictionary<long, ResourceOffline> OfflineMap =
+        private static readonly Dictionary<long, ResourceOffline> _offlineMap =
             new Dictionary<long, ResourceOffline>();
 
-        private static readonly Dictionary<long, ResourceReloader> ReloaderMap =
+        private static readonly Dictionary<long, ResourceReloader> _reloaderMap =
             new Dictionary<long, ResourceReloader>();
 
-        private static readonly Dictionary<long, int> TypesMap = new Dictionary<long, int>();
 
-        private static readonly List<Dictionary<long, object>> DataMap =
+        private static readonly Dictionary<long, int> _typesMap = new Dictionary<long, int>();
+        private static readonly Dictionary<long, int> _loadPriority = new Dictionary<long, int>();
+
+        private static readonly List<Dictionary<long, object>> _dataMap =
             new List<Dictionary<long, object>>();
 
         private static readonly List<Dictionary<long, int>> RefMap = new List<Dictionary<long, int>>();
 
         private static SpinLock _addLock = new SpinLock();
 
-        private static void RegisterTypeImpl(long type, ResourceLoader loader, ResourceUnloader unloader,
-            ResourceOnline online, ResourceOffline offline, ResourceReloader reloader)
+        private static void RegisterTypeImpl(long type, int loadPriority, ResourceLoader loader,
+            ResourceUnloader unloader, ResourceOnline online, ResourceOffline offline, ResourceReloader reloader)
         {
-            var idx = DataMap.Count;
-            DataMap.Add(new Dictionary<long, object>());
+            var idx = _dataMap.Count;
+            _dataMap.Add(new Dictionary<long, object>());
             RefMap.Add(new Dictionary<long, int>());
 
-            TypesMap[type] = idx;
+            _typesMap[type] = idx;
 
-            LoaderMap[type] = loader;
-            UnloaderMap[type] = unloader;
-            OnlineMap[type] = online;
-            OfflineMap[type] = offline;
-            ReloaderMap[type] = reloader;
+            _loaderMap[type] = loader;
+            _unloaderMap[type] = unloader;
+            _onlineMap[type] = online;
+            _offlineMap[type] = offline;
+            _reloaderMap[type] = reloader;
+            _loadPriority[type] = loadPriority;
         }
 
         private static object[] LoadImpl(long type, long[] names)
@@ -63,7 +66,7 @@ namespace CETech.Resource
                 using (var input = FileSystem.Open("build", string.Format("{0:X}{1:X}", type, names[i]),
                     FileSystem.OpenMode.Read))
                 {
-                    data[i] = LoaderMap[type](input);
+                    data[i] = _loaderMap[type](input);
                 }
             }
 
@@ -72,8 +75,8 @@ namespace CETech.Resource
 
         private static void AddLoadedImpl(object[] loaded_data, long type, long[] names)
         {
-            var online = OnlineMap[type];
-            var idx = TypesMap[type];
+            var online = _onlineMap[type];
+            var idx = _typesMap[type];
 
 /*            var gotLock = false;
             try
@@ -84,9 +87,9 @@ namespace CETech.Resource
             {
                 IncRef(idx, names[i]);
 
-                DataMap[idx][names[i]] = loaded_data[i];
+                _dataMap[idx][names[i]] = loaded_data[i];
 
-                online(DataMap[idx][names[i]]);
+                online(_dataMap[idx][names[i]]);
             }
 /*            }
             finally
@@ -107,23 +110,23 @@ namespace CETech.Resource
 
         private static void UnloadImpl(long type, long[] names)
         {
-            var offline = OfflineMap[type];
-            var unloader = UnloaderMap[type];
+            var offline = _offlineMap[type];
+            var unloader = _unloaderMap[type];
 
-            var idx = TypesMap[type];
+            var idx = _typesMap[type];
 
             for (var i = 0; i < names.Length; i++)
             {
-                offline(DataMap[idx][names[i]]);
+                offline(_dataMap[idx][names[i]]);
             }
 
             for (var i = 0; i < names.Length; i++)
             {
                 if (DecRef(idx, names[i]))
                 {
-                    unloader(DataMap[idx][names[i]]);
+                    unloader(_dataMap[idx][names[i]]);
 
-                    DataMap[idx].Remove(names[i]);
+                    _dataMap[idx].Remove(names[i]);
                     RefMap[idx].Remove(names[i]);
                 }
             }
@@ -131,10 +134,10 @@ namespace CETech.Resource
 
         private static bool CanGetImpl(long type, long[] names)
         {
-            var idx = TypesMap[type];
+            var idx = _typesMap[type];
             for (var i = 0; i < names.Length; i++)
             {
-                if (!DataMap[idx].ContainsKey(names[i]))
+                if (!_dataMap[idx].ContainsKey(names[i]))
                 {
                     return false;
                 }
@@ -153,8 +156,8 @@ namespace CETech.Resource
                 Log.Warning("resource_manager", "Autoloading {0:X}", name);
             }
 
-            var idx = TypesMap[type];
-            return (T) DataMap[idx][name];
+            var idx = _typesMap[type];
+            return (T) _dataMap[idx][name];
         }
 
         private static void IncRef(int type_idx, long name)
@@ -191,19 +194,20 @@ namespace CETech.Resource
             for (var i = 0; i < names.Length; i++)
             {
                 Log.Debug("resource_manager", "Reloading resource {0:X}{1:X}", type, names[i]);
-                data[i] = ReloaderMap[type](names[i], new_data[i]);
+                data[i] = _reloaderMap[type](names[i], new_data[i]);
             }
         }
 
         private static void ReloadAllImpl(long type)
         {
-            var idx = TypesMap[type];
+            var idx = _typesMap[type];
 
-            Reload(type, DataMap[idx].Keys.ToArray());
+            Reload(type, _dataMap[idx].Keys.ToArray());
         }
 
         private static void InitImpl()
         {
+            // TODO: respect load order
             ConsoleServer.RegisterCommand("resource_manager.reload_all", (args, response) =>
             {
                 var types = args["types"].AsList();
@@ -217,6 +221,11 @@ namespace CETech.Resource
 
         private static void ShutdownImpl()
         {
+        }
+
+        private static int LoadPriorityImpl(long type)
+        {
+            return _loadPriority[type];
         }
     }
 }

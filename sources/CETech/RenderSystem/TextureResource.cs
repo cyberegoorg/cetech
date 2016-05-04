@@ -61,7 +61,7 @@ namespace CETech
 
         public static object ResourceReloader(long name, object new_data)
         {
-            var old = CETech.Resource.Resource.Get<Resource>(Type, name);
+            var old = ResourceManager.Get<Resource>(Type, name);
             var neww = (Resource) new_data;
 
             old.data = neww.data;
@@ -134,7 +134,7 @@ namespace CETech
             Log.Debug("texturec", "{0}", start.Arguments);
 
             // Enter the executable to run, including the complete path
-            var bin_path = ConfigSystem.GetValueString("resource_compiler.bin");
+            var bin_path = ConfigSystem.String("resource_compiler.bin");
 
 #if PLATFORM_WINDOWS
             start.FileName = Path.Combine(bin_path, "texturec.exe");

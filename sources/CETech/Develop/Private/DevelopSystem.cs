@@ -24,7 +24,7 @@ namespace CETech.Develop
         private static void InitImpl()
         {
             _socket = new PublishSocket();
-            _socket.Bind($"ws://*:{ConfigSystem.GetValueInt("console_server.base_port") + 2}");
+            _socket.Bind($"ws://*:{ConfigSystem.Int("console_server.base_port") + 2}");
         }
 
         private static void ShutdownImpl()

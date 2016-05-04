@@ -2,6 +2,7 @@
 using System.Diagnostics;
 using CETech.CEMath;
 using CETech.EntCom;
+using CETech.Resource;
 
 namespace CETech.World
 {
@@ -92,7 +93,7 @@ namespace CETech.World
             var world_idx = getIdx(world);
             var level_instance = new Levelnstance();
 
-            var level_resource = Resource.Resource.Get<LevelResource.CompiledResource>(LevelResource.Type, level);
+            var level_resource = ResourceManager.Get<LevelResource.CompiledResource>(LevelResource.Type, level);
             var units = level_resource.units;
             var units_name = level_resource.units_name;
 

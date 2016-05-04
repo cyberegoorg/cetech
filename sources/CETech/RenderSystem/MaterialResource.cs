@@ -14,15 +14,15 @@ namespace CETech
     public class MaterialResource
     {
         /// <summary>
-        ///     Resource type
+        ///     ResourceManager type
         /// </summary>
         public static readonly long Type = StringId64.FromString("material");
 
         /// <summary>
-        ///     Resource loader
+        ///     ResourceManager loader
         /// </summary>
-        /// <param name="input">Resource data stream</param>
-        /// <returns>Resource data</returns>
+        /// <param name="input">ResourceManager data stream</param>
+        /// <returns>ResourceManager data</returns>
         public static object ResourceLoader(Stream input)
         {
             var serializer = MessagePackSerializer.Get<Resource>();
@@ -39,7 +39,7 @@ namespace CETech
         }
 
         /// <summary>
-        ///     Resource offline.
+        ///     ResourceManager offline.
         /// </summary>
         /// <param name="data">Data</param>
         public static void ResourceOffline(object data)
@@ -47,13 +47,13 @@ namespace CETech
         }
 
         /// <summary>
-        ///     Resource online
+        ///     ResourceManager online
         /// </summary>
         /// <param name="data">Data</param>
         public static void ResourceOnline(object data)
         {
             var resource = (MaterialInstance) data;
-            resource.instance = CETech.Resource.Resource.Get<ShaderResource.ShaderInstance>(ShaderResource.Type,
+            resource.instance = CETech.Resource.ResourceManager.Get<ShaderResource.ShaderInstance>(ShaderResource.Type,
                 resource.resource.shader_name);
 
             var idx = 0;
@@ -61,14 +61,14 @@ namespace CETech
             {
                 resource.texture_uniform[idx] = new Uniform(uniform_name, UniformType.Int1);
                 resource.texture_resource[idx] =
-                    CETech.Resource.Resource.Get<TextureResource.Resource>(TextureResource.Type,
+                    CETech.Resource.ResourceManager.Get<TextureResource.Resource>(TextureResource.Type,
                         StringId64.FromString(uniform_name));
                 ++idx;
             }
         }
 
         /// <summary>
-        ///     Resource unloader
+        ///     ResourceManager unloader
         /// </summary>
         /// <param name="data">data</param>
         public static void ResourceUnloader(object data)
@@ -79,10 +79,10 @@ namespace CETech
         {
             // TODO: !!!
 
-            var old = CETech.Resource.Resource.Get<MaterialInstance>(Type, name);
+            var old = CETech.Resource.ResourceManager.Get<MaterialInstance>(Type, name);
             var resource = (MaterialInstance) new_data;
             old.resource = resource.resource;
-            old.instance = CETech.Resource.Resource.Get<ShaderResource.ShaderInstance>(ShaderResource.Type,
+            old.instance = CETech.Resource.ResourceManager.Get<ShaderResource.ShaderInstance>(ShaderResource.Type,
                 resource.resource.shader_name);
 
             old.texture_uniform = resource.texture_uniform;
@@ -95,7 +95,7 @@ namespace CETech
                 {
                     old.texture_uniform[idx] = new Uniform(uniform_name, UniformType.Int1);
                     old.texture_resource[idx] =
-                        CETech.Resource.Resource.Get<TextureResource.Resource>(TextureResource.Type,
+                        CETech.Resource.ResourceManager.Get<TextureResource.Resource>(TextureResource.Type,
                             StringId64.FromString(uniform_name));
                     ++idx;
                 }
@@ -141,7 +141,7 @@ namespace CETech
         }
 
         /// <summary>
-        ///     Resource compiler
+        ///     ResourceManager compiler
         /// </summary>
         /// <param name="capi">Compiler api</param>
         public static void Compile(ResourceCompiler.CompilatorApi capi)

@@ -24,7 +24,7 @@ namespace CETech.EntCom
             _compoilerMap[type](body, packer);
         }
 
-        public static void RegisterSpawnerImpl(long type, Spawner spawner, Destroyer destroyer)
+        public static void RegisterTypeImpl(long type, Spawner spawner, Destroyer destroyer)
         {
             _spawnerMap[type] = spawner;
             _destroyersMap[type] = destroyer;
