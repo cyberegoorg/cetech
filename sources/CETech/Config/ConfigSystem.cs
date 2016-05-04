@@ -37,6 +37,22 @@
         }
 
         /// <summary>
+        /// Init system
+        /// </summary>
+        public static void Init()
+        {
+            InitImpl();
+        }
+
+        /// <summary>
+        /// Shutdown system
+        /// </summary>
+        public static void Shutdown()
+        {
+            ShutdownImpl();
+        }
+
+        /// <summary>
         ///     Create int value.
         /// </summary>
         /// <param name="name">Name.</param>
@@ -104,7 +120,7 @@
         /// </summary>
         /// <returns>The value int.</returns>
         /// <param name="name">Name.</param>
-        public static int GetValueInt(string name)
+        public static int Int(string name)
         {
             return GetValueIntImpl(name);
         }
@@ -114,7 +130,7 @@
         /// </summary>
         /// <returns>The value float.</returns>
         /// <param name="name">Name.</param>
-        public static float GetValueFloat(string name)
+        public static float Float(string name)
         {
             return GetValueFloatImpl(name);
         }
@@ -124,19 +140,9 @@
         /// </summary>
         /// <returns>The value string.</returns>
         /// <param name="name">Name.</param>
-        public static string GetValueString(string name)
+        public static string String(string name)
         {
             return GetValueStringImpl(name);
-        }
-
-        public static void Init()
-        {
-            InitImpl();
-        }
-
-        public static void Shutdown()
-        {
-            ShutdownImpl();
         }
     }
 }

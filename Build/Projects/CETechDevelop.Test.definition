@@ -109,9 +109,9 @@
     <Compile Include="Resource\Package.cs" />
     <Compile Include="Resource\PackageResource.cs" />
     <Compile Include="Resource\Private\Package.cs" />
-    <Compile Include="Resource\Private\Resource.cs" />
+    <Compile Include="Resource\Private\ResourceManager.cs" />
     <Compile Include="Resource\Private\StringId.cs" />
-    <Compile Include="Resource\Resource.cs" />
+    <Compile Include="Resource\ResourceManager.cs" />
     <Compile Include="Resource\StringId.cs" />
     <Compile Include="TaskManager\Private\QueueMPMC.cs" />
     <Compile Include="TaskManager\Private\TaskManager.cs" />

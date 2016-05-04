@@ -22,10 +22,6 @@ namespace CETech
         private static float _deltaTime;
         private static Window _mainWindow;
 
-        private static List<SystemInitConfig> initConfigsDelegates = new List<SystemInitConfig>();
-        private static List<SystemInitDelegate> InitDelegates = new List<SystemInitDelegate>();
-        private static List<SystemShutdownDelegate> ShutdownDelegates = new List<SystemShutdownDelegate>();
-
         /// <summary>
         ///     Init application
         /// </summary>
@@ -38,7 +34,7 @@ namespace CETech
             ConsoleServer.InitConfig();
 #endif
 
-            Resource.Resource.InitConfig();
+            Resource.ResourceManager.InitConfig();
 
             ConfigSystem.CreateValue("application.platform", "Platform", GetPlatform());
             ConfigSystem.CreateValue("application.log_file", "Log file", "");
@@ -303,9 +299,9 @@ namespace CETech
 
         private static void Boot()
         {
-            var boot_pkg = StringId64.FromString(ConfigSystem.GetValueString("boot.pkg"));
+            var boot_pkg = StringId64.FromString(ConfigSystem.String("boot.pkg"));
 
-            Resource.Resource.LoadNow(PackageResource.Type, new[] {boot_pkg});
+            Resource.ResourceManager.LoadNow(PackageResource.Type, new[] {boot_pkg});
 
             Package.Load(boot_pkg);
             Package.Flush(boot_pkg);
@@ -317,6 +313,57 @@ namespace CETech
             MeshRenderer.Init();
             CameraSystem.Init();
             SceneGraph.Init();
+
+            Resource.ResourceManager.RegisterType(
+                 ConfigResource.Type, 3,
+                 ConfigResource.ResourceLoader, ConfigResource.ResourceUnloader,
+                 ConfigResource.ResourceOnline, ConfigResource.ResourceOffline, ConfigResource.Reloader);
+
+            Resource.ResourceManager.RegisterType(
+                PackageResource.Type, 0,
+                PackageResource.ResourceLoader, PackageResource.ResourceUnloader,
+                PackageResource.ResourceOnline, PackageResource.ResourceOffline, PackageResource.Reloader);
+
+            Resource.ResourceManager.RegisterType(
+                LuaResource.Type, 2,
+                LuaResource.ResourceLoader, LuaResource.ResourceUnloader,
+                LuaResource.ResourceOnline, LuaResource.ResourceOffline, LuaResource.Reloader);
+
+            Resource.ResourceManager.RegisterType(
+                UnitResource.Type, 7,
+                UnitResource.ResourceLoader, UnitResource.ResourceUnloader,
+                UnitResource.ResourceOnline, UnitResource.ResourceOffline, UnitResource.Reloader);
+
+            Resource.ResourceManager.RegisterType(
+                ShaderResource.Type, 5,
+                ShaderResource.ResourceLoader, ShaderResource.ResourceUnloader,
+                ShaderResource.ResourceOnline, ShaderResource.ResourceOffline, ShaderResource.Reloader);
+
+            Resource.ResourceManager.RegisterType(
+                MaterialResource.Type, 6,
+                MaterialResource.ResourceLoader, MaterialResource.ResourceUnloader,
+                MaterialResource.ResourceOnline, MaterialResource.ResourceOffline, MaterialResource.ResourceReloader);
+
+            Resource.ResourceManager.RegisterType(
+                TextureResource.Type, 4,
+                TextureResource.ResourceLoader, TextureResource.ResourceUnloader,
+                TextureResource.ResourceOnline, TextureResource.ResourceOffline, TextureResource.ResourceReloader);
+
+            Resource.ResourceManager.RegisterType(
+                LevelResource.Type, 9,
+                LevelResource.ResourceLoader, LevelResource.ResourceUnloader,
+                LevelResource.ResourceOnline, LevelResource.ResourceOffline, LevelResource.ResourceReloader);
+
+            Resource.ResourceManager.RegisterType(
+                RenderConfig.Type, 0,
+                RenderConfig.ResourceLoader, RenderConfig.ResourceUnloader,
+                RenderConfig.ResourceOnline, RenderConfig.ResourceOffline, RenderConfig.ResourceReloader);
+
+
+            Resource.ResourceManager.RegisterType(
+                SceneResource.Type, 8,
+                SceneResource.ResourceLoader, SceneResource.ResourceUnloader,
+                SceneResource.ResourceOnline, SceneResource.ResourceOffline, SceneResource.ResourceReloader);
 
 #if CETECH_DEVELOP
             ResourceCompiler.RegisterCompiler(PackageResource.Type, PackageResource.Compile);
@@ -335,64 +382,13 @@ namespace CETech
                 ResourceCompiler.CompileAll();
             }
 #endif
-
-            Resource.Resource.RegisterType(
-                ConfigResource.Type,
-                ConfigResource.ResourceLoader, ConfigResource.ResourceUnloader,
-                ConfigResource.ResourceOnline, ConfigResource.ResourceOffline, ConfigResource.Reloader);
-
-            Resource.Resource.RegisterType(
-                PackageResource.Type,
-                PackageResource.ResourceLoader, PackageResource.ResourceUnloader,
-                PackageResource.ResourceOnline, PackageResource.ResourceOffline, PackageResource.Reloader);
-
-            Resource.Resource.RegisterType(
-                LuaResource.Type,
-                LuaResource.ResourceLoader, LuaResource.ResourceUnloader,
-                LuaResource.ResourceOnline, LuaResource.ResourceOffline, LuaResource.Reloader);
-
-            Resource.Resource.RegisterType(
-                UnitResource.Type,
-                UnitResource.ResourceLoader, UnitResource.ResourceUnloader,
-                UnitResource.ResourceOnline, UnitResource.ResourceOffline, UnitResource.Reloader);
-
-            Resource.Resource.RegisterType(
-                ShaderResource.Type,
-                ShaderResource.ResourceLoader, ShaderResource.ResourceUnloader,
-                ShaderResource.ResourceOnline, ShaderResource.ResourceOffline, ShaderResource.Reloader);
-
-            Resource.Resource.RegisterType(
-                MaterialResource.Type,
-                MaterialResource.ResourceLoader, MaterialResource.ResourceUnloader,
-                MaterialResource.ResourceOnline, MaterialResource.ResourceOffline, MaterialResource.ResourceReloader);
-
-            Resource.Resource.RegisterType(
-                TextureResource.Type,
-                TextureResource.ResourceLoader, TextureResource.ResourceUnloader,
-                TextureResource.ResourceOnline, TextureResource.ResourceOffline, TextureResource.ResourceReloader);
-
-            Resource.Resource.RegisterType(
-                LevelResource.Type,
-                LevelResource.ResourceLoader, LevelResource.ResourceUnloader,
-                LevelResource.ResourceOnline, LevelResource.ResourceOffline, LevelResource.ResourceReloader);
-
-            Resource.Resource.RegisterType(
-                RenderConfig.Type,
-                RenderConfig.ResourceLoader, RenderConfig.ResourceUnloader,
-                RenderConfig.ResourceOnline, RenderConfig.ResourceOffline, RenderConfig.ResourceReloader);
-
-
-            Resource.Resource.RegisterType(
-                SceneResource.Type,
-                SceneResource.ResourceLoader, SceneResource.ResourceUnloader,
-                SceneResource.ResourceOnline, SceneResource.ResourceOffline, SceneResource.ResourceReloader);
         }
 
         private static bool BigInit()
         {
             Log.LogEvent += LogHandler.ConsoleLog;
 
-            var log_file = ConfigSystem.GetValueString("application.log_file");
+            var log_file = ConfigSystem.String("application.log_file");
             if (log_file.Length != 0)
             {
                 Log.LogEvent += new LogHandler.FileLog(log_file).Log;
@@ -412,20 +408,20 @@ namespace CETech
             DevelopSystem.Init();
 
             ResourceCompiler.Init();
-            FileSystem.MapRootDir("core", ConfigSystem.GetValueString("resource_compiler.core"));
-            FileSystem.MapRootDir("src", ConfigSystem.GetValueString("resource_compiler.src"));
+            FileSystem.MapRootDir("core", ConfigSystem.String("resource_compiler.core"));
+            FileSystem.MapRootDir("src", ConfigSystem.String("resource_compiler.src"));
 #endif
 
             FileSystem.MapRootDir("build",
-                Path.Combine(ConfigSystem.GetValueString("resource_manager.build"),
-                    ConfigSystem.GetValueString("application.platform")));
+                Path.Combine(ConfigSystem.String("resource_manager.build"),
+                    ConfigSystem.String("application.platform")));
 
             TaskManager.Init();
 
             InitResouce();
 
-            Resource.Resource.Init();
-            Resource.Resource.LoadNow(ConfigResource.Type, new[] {StringId64.FromString("global")});
+            Resource.ResourceManager.Init();
+            Resource.ResourceManager.LoadNow(ConfigResource.Type, new[] {StringId64.FromString("global")});
 
 #if CETECH_DEVELOP
             if (DevelopFlags.compile && !DevelopFlags.ccontinue)
@@ -443,28 +439,25 @@ namespace CETech
             Mouse.Init();
             Gamepad.Init();
 
-            Window main_window;
-
 #if CETECH_DEVELOP
             if (DevelopFlags.wid == IntPtr.Zero)
             {
-                main_window = new Window(
-                    ConfigSystem.GetValueString("window.title"),
+                _mainWindow = new Window(
+                    ConfigSystem.String("window.title"),
                     WindowPos.Centered, WindowPos.Centered,
-                    ConfigSystem.GetValueInt("window.width"), ConfigSystem.GetValueInt("window.height"), 0);
+                    ConfigSystem.Int("window.width"), ConfigSystem.Int("window.height"), 0);
             }
             else
             {
-                main_window = new Window(DevelopFlags.wid);
+                _mainWindow = new Window(DevelopFlags.wid);
             }
 
 #else
-            main_window = new Window(
-                ConfigSystem.GetValueString("window.title"),
+            _mainWindow = new Window(
+                ConfigSystem.String("window.title"),
                 WindowPos.Centered, WindowPos.Centered,
-                ConfigSystem.GetValueInt("window.width"), ConfigSystem.GetValueInt("window.height"), 0);
+                ConfigSystem.Int("window.width"), ConfigSystem.Int("window.height"), 0);
 #endif
-            _mainWindow = main_window;
 
             Renderer.Init(_mainWindow, "default");
 
@@ -488,11 +481,6 @@ namespace CETech
 
             Renderer.Shutdown();
             ConfigSystem.Shutdown();
-        }
-
-        private static void RegisterSystemsImpl(SystemInitConfig[] initConfig, SystemInitDelegate[] init,
-            SystemShutdownDelegate[] shutdown)
-        {
         }
 
 #if CETECH_DEVELOP

@@ -14,15 +14,15 @@ namespace CETech.World
     public class UnitResource
     {
         /// <summary>
-        ///     Resource type
+        ///     ResourceManager type
         /// </summary>
         public static readonly long Type = StringId64.FromString("unit");
 
         /// <summary>
-        ///     Resource loader
+        ///     ResourceManager loader
         /// </summary>
-        /// <param name="input">Resource data stream</param>
-        /// <returns>Resource data</returns>
+        /// <param name="input">ResourceManager data stream</param>
+        /// <returns>ResourceManager data</returns>
         public static object ResourceLoader(Stream input)
         {
             //return MessagePackSerializer.Get<MessagePackObjectDictionary>().Unpack(input);
@@ -30,7 +30,7 @@ namespace CETech.World
         }
 
         /// <summary>
-        ///     Resource offline.
+        ///     ResourceManager offline.
         /// </summary>
         /// <param name="data">Data</param>
         public static void ResourceOffline(object data)
@@ -38,7 +38,7 @@ namespace CETech.World
         }
 
         /// <summary>
-        ///     Resource online
+        ///     ResourceManager online
         /// </summary>
         /// <param name="data">Data</param>
         public static void ResourceOnline(object data)
@@ -46,7 +46,7 @@ namespace CETech.World
         }
 
         /// <summary>
-        ///     Resource unloader
+        ///     ResourceManager unloader
         /// </summary>
         /// <param name="data">data</param>
         public static void ResourceUnloader(object data)
@@ -71,13 +71,14 @@ namespace CETech.World
 #if CETECH_DEVELOP
         public class EntityCompileOutput
         {
-            public List<long> ComponentsType = new List<long>();
-            public Dictionary<long, long> EntsParent = new Dictionary<long, long>();
             public Dictionary<long, List<long>> ComponentEnt = new Dictionary<long, List<long>>();
             public Dictionary<long, List<YamlMapping>> ComponentsBody = new Dictionary<long, List<YamlMapping>>();
+            public List<long> ComponentsType = new List<long>();
+            public Dictionary<long, long> EntsParent = new Dictionary<long, long>();
         }
 
-        public static void compile_entitity(YamlMapping rootNode, ref int entities_id, int parent, EntityCompileOutput output)
+        public static void compile_entitity(YamlMapping rootNode, ref int entities_id, int parent,
+            EntityCompileOutput output)
         {
             output.EntsParent[entities_id] = parent;
 
@@ -138,10 +139,10 @@ namespace CETech.World
             }
         }
 
-        public static void Compile(YamlMapping root, ConsoleServer.ResponsePacker packer, ResourceCompiler.CompilatorApi capi)
+        public static void Compile(YamlMapping root, ConsoleServer.ResponsePacker packer,
+            ResourceCompiler.CompilatorApi capi)
         {
             var entities_id = 0;
-
 
             preprocess(root, capi);
 
@@ -149,7 +150,9 @@ namespace CETech.World
             compile_entitity(root, ref entities_id, int.MaxValue, compile_output);
 
             var components_type_sorted =
-                compile_output.ComponentsType.OrderBy(pair => ComponentSystem.GetSpawnOrder(pair)).Select(pair => pair).ToArray();
+                compile_output.ComponentsType.OrderBy(pair => ComponentSystem.GetSpawnOrder(pair))
+                    .Select(pair => pair)
+                    .ToArray();
 
             packer.PackMapHeader(5);
 
@@ -202,7 +205,7 @@ namespace CETech.World
         }
 
         /// <summary>
-        ///     Resource compiler
+        ///     ResourceManager compiler
         /// </summary>
         /// <param name="capi">Compiler api</param>
         public static void Compile(ResourceCompiler.CompilatorApi capi)

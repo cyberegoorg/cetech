@@ -15,15 +15,15 @@ namespace CETech
     public class ShaderResource
     {
         /// <summary>
-        ///     Resource type
+        ///     ResourceManager type
         /// </summary>
         public static readonly long Type = StringId64.FromString("shader");
 
         /// <summary>
-        ///     Resource loader
+        ///     ResourceManager loader
         /// </summary>
-        /// <param name="input">Resource data stream</param>
-        /// <returns>Resource data</returns>
+        /// <param name="input">ResourceManager data stream</param>
+        /// <returns>ResourceManager data</returns>
         public static object ResourceLoader(Stream input)
         {
             var serializer = MessagePackSerializer.Get<Resource>();
@@ -32,15 +32,17 @@ namespace CETech
         }
 
         /// <summary>
-        ///     Resource offline.
+        ///     ResourceManager offline.
         /// </summary>
         /// <param name="data">Data</param>
         public static void ResourceOffline(object data)
         {
+            var resource = (ShaderInstance) data;
+            resource.program.Dispose();
         }
 
         /// <summary>
-        ///     Resource online
+        ///     ResourceManager online
         /// </summary>
         /// <param name="data">Data</param>
         public static void ResourceOnline(object data)
@@ -53,7 +55,7 @@ namespace CETech
         }
 
         /// <summary>
-        ///     Resource unloader
+        ///     ResourceManager unloader
         /// </summary>
         /// <param name="data">data</param>
         public static void ResourceUnloader(object data)
@@ -63,7 +65,7 @@ namespace CETech
         public static object Reloader(long name, object new_data)
         {
             var resource = (ShaderInstance) new_data;
-            var old = CETech.Resource.Resource.Get<ShaderInstance>(Type, name);
+            var old = CETech.Resource.ResourceManager.Get<ShaderInstance>(Type, name);
 
             var vs_shader = new Shader(MemoryBlock.FromArray(resource.vs_file));
             var fs_shader = new Shader(MemoryBlock.FromArray(resource.fs_file));
@@ -82,6 +84,7 @@ namespace CETech
         {
             public byte[] fs_file;
             public SharpBgfx.Program program;
+            public Resource resource;
             public byte[] vs_file;
         }
 
@@ -99,13 +102,13 @@ namespace CETech
             Log.Debug("shaderc", "{0}", start.Arguments);
 
             // Enter the executable to run, including the complete path
-            var bin_path = ConfigSystem.GetValueString("resource_compiler.bin");
+            var bin_path = ConfigSystem.String("resource_compiler.bin");
 
 #if PLATFORM_WINDOWS
             start.FileName = Path.Combine(bin_path, "shaderc.exe");
 #else
             start.FileName = Path.Combine(bin_path, "shaderc");	
-        #endif
+#endif
 
             start.RedirectStandardOutput = true;
             start.RedirectStandardError = true;
@@ -133,7 +136,7 @@ namespace CETech
         }
 
         /// <summary>
-        ///     Resource compiler
+        ///     ResourceManager compiler
         /// </summary>
         /// <param name="capi">Compiler api</param>
         public static void Compile(ResourceCompiler.CompilatorApi capi)
@@ -154,13 +157,15 @@ namespace CETech
             var input_shader = Path.Combine(src_dir, vs_input);
             var output_vsshader = Path.Combine(build_dir, "tmp", vs_input + ".bin");
 
+// TODO: platform from capi
 #if PLATFORM_LINUX
 			shaderc(input_shader, output_vsshader, include_path, "vertex", "linux", "120");
-        #elif PLATFORM_MACOS
+#elif PLATFORM_MACOS
             shaderc(input_shader, output_vsshader, include_path, "vertex", "osx", "120");
-		#else
+#else
             shaderc(input_shader, output_vsshader, include_path, "vertex", "windows", "vs_4_0");
 #endif
+
             input_shader = Path.Combine(src_dir, fs_input);
             var output_fsshader = Path.Combine(build_dir, "tmp", fs_input + ".bin");
 

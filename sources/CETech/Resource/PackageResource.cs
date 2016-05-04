@@ -3,8 +3,6 @@ using System.IO;
 using System.Linq;
 using System.Yaml;
 using CETech.Develop;
-using CETech.Lua;
-using CETech.World;
 using MsgPack.Serialization;
 
 namespace CETech.Resource
@@ -15,14 +13,14 @@ namespace CETech.Resource
     public class PackageResource
     {
         /// <summary>
-        ///     Resource type
+        ///     ResourceManager type
         /// </summary>
         public static readonly long Type = StringId64.FromString("package");
 
 #if CETECH_DEVELOP
 
         /// <summary>
-        ///     Resource compiler
+        ///     ResourceManager compiler
         /// </summary>
         /// <param name="capi">Compiler api</param>
         public static void Compile(ResourceCompiler.CompilatorApi capi)
@@ -36,19 +34,6 @@ namespace CETech.Resource
             pack.Type = new long[rootNode.Count];
             pack.Names = new long[rootNode.Count][];
 
-            // TODO: generic
-            var prioritDictionary = new Dictionary<long, int>();
-            prioritDictionary[Type] = 0;
-            prioritDictionary[RenderConfig.Type] = 0;
-            prioritDictionary[LuaResource.Type] = 2;
-            prioritDictionary[ConfigResource.Type] = 3;
-            prioritDictionary[TextureResource.Type] = 4;
-            prioritDictionary[ShaderResource.Type] = 5;
-            prioritDictionary[MaterialResource.Type] = 6;
-            prioritDictionary[UnitResource.Type] = 7;
-            prioritDictionary[SceneResource.Type] = 8;
-            prioritDictionary[LevelResource.Type] = 9;
-
             var types_nodes = new Dictionary<long, YamlSequence>();
             foreach (var type in rootNode)
             {
@@ -60,7 +45,7 @@ namespace CETech.Resource
             }
 
             var idx = 0;
-            var nodes = types_nodes.OrderBy(pair => prioritDictionary[pair.Key]).Select(pair => pair.Key).ToArray();
+            var nodes = types_nodes.OrderBy(pair => ResourceManager.LoadPriority(pair.Key)).Select(pair => pair.Key).ToArray();
             foreach (var node in nodes)
             {
                 var sequence = types_nodes[node];
@@ -85,10 +70,10 @@ namespace CETech.Resource
 #endif
 
         /// <summary>
-        ///     Resource loader
+        ///     ResourceManager loader
         /// </summary>
-        /// <param name="input">Resource data stream</param>
-        /// <returns>Resource data</returns>
+        /// <param name="input">ResourceManager data stream</param>
+        /// <returns>ResourceManager data</returns>
         public static object ResourceLoader(Stream input)
         {
             var serializer = MessagePackSerializer.Get<Resource>();
@@ -96,7 +81,7 @@ namespace CETech.Resource
         }
 
         /// <summary>
-        ///     Resource offline.
+        ///     ResourceManager offline.
         /// </summary>
         /// <param name="data">Data</param>
         public static void ResourceOffline(object data)
@@ -104,7 +89,7 @@ namespace CETech.Resource
         }
 
         /// <summary>
-        ///     Resource online
+        ///     ResourceManager online
         /// </summary>
         /// <param name="data">Data</param>
         public static void ResourceOnline(object data)
@@ -112,7 +97,7 @@ namespace CETech.Resource
         }
 
         /// <summary>
-        ///     Resource unloader
+        ///     ResourceManager unloader
         /// </summary>
         /// <param name="data">data</param>
         public static void ResourceUnloader(object data)

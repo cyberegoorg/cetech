@@ -52,7 +52,7 @@ namespace CETech.Lua
         /// </summary>
         public static void BootScriptCallInit()
         {
-            BootScriptInit(StringId64.FromString(ConfigSystem.GetValueString("boot.script")));
+            BootScriptInit(StringId64.FromString(ConfigSystem.String("boot.script")));
             BootScriptCallInitImpl();
         }
 

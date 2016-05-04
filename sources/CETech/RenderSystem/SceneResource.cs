@@ -8,10 +8,10 @@ using CETech.Develop;
 using CETech.Resource;
 using MsgPack.Serialization;
 using SharpBgfx;
-
 #if CETECH_DEVELOP
-    using Assimp;
-    using Assimp.Configs;
+using Assimp;
+using Assimp.Configs;
+
 #endif
 
 namespace CETech
@@ -51,7 +51,7 @@ namespace CETech
         }
 
         /// <summary>
-        ///     Resource Name
+        ///     ResourceManager Name
         /// </summary>
         public static readonly long Type = StringId64.FromString("scene");
 
@@ -82,10 +82,10 @@ namespace CETech
         };
 
         /// <summary>
-        ///     Resource loader
+        ///     ResourceManager loader
         /// </summary>
-        /// <param name="input">Resource data stream</param>
-        /// <returns>Resource data</returns>
+        /// <param name="input">ResourceManager data stream</param>
+        /// <returns>ResourceManager data</returns>
         public static object ResourceLoader(Stream input)
         {
             var serializer = MessagePackSerializer.Get<Resource>();
@@ -94,7 +94,7 @@ namespace CETech
         }
 
         /// <summary>
-        ///     Resource offline.
+        ///     ResourceManager offline.
         /// </summary>
         /// <param name="data">Data</param>
         public static void ResourceOffline(object data)
@@ -109,7 +109,7 @@ namespace CETech
         }
 
         /// <summary>
-        ///     Resource online
+        ///     ResourceManager online
         /// </summary>
         /// <param name="data">Data</param>
         public static void ResourceOnline(object data)
@@ -150,7 +150,7 @@ namespace CETech
         }
 
         /// <summary>
-        ///     Resource unloader
+        ///     ResourceManager unloader
         /// </summary>
         /// <param name="data">data</param>
         public static void ResourceUnloader(object data)
@@ -159,7 +159,7 @@ namespace CETech
 
         public static object ResourceReloader(long name, object new_data)
         {
-            var old = CETech.Resource.Resource.Get<Resource>(Type, name);
+            var old = CETech.Resource.ResourceManager.Get<Resource>(Type, name);
             var neww = (Resource) new_data;
 
             return old;
@@ -327,7 +327,7 @@ namespace CETech
         }
 
         /// <summary>
-        ///     Resource compiler
+        ///     ResourceManager compiler
         /// </summary>
         /// <param name="capi">Compiler api</param>
         public static void Compile(ResourceCompiler.CompilatorApi capi)
@@ -340,7 +340,7 @@ namespace CETech
 
             if (rootNode.ContainsKey("import"))
             {
-                rootNode = import_assimp(((YamlScalar)rootNode["import"]).Value);
+                rootNode = import_assimp(((YamlScalar) rootNode["import"]).Value);
             }
 
             var geometries = (YamlMapping) rootNode["geometries"];
@@ -459,20 +459,22 @@ namespace CETech
         private static YamlMapping import_assimp(string name)
         {
             var filename = FileSystem.GetFullPath("src", name);
-            AssimpContext importer = new AssimpContext();
+            var importer = new AssimpContext();
             importer.SetConfig(new NormalSmoothingAngleConfig(66.0f));
-            Scene scene = importer.ImportFile(filename, PostProcessPreset.TargetRealTimeMaximumQuality | PostProcessSteps.FlipUVs | PostProcessSteps.MakeLeftHanded);
+            var scene = importer.ImportFile(filename,
+                PostProcessPreset.TargetRealTimeMaximumQuality | PostProcessSteps.FlipUVs |
+                PostProcessSteps.MakeLeftHanded);
 
             var geometries = new YamlMapping();
             var graph = new YamlMapping();
 
             var used_names = new HashSet<string>();
 
-            for (int i = 0; i < scene.MeshCount; i++)
+            for (var i = 0; i < scene.MeshCount; i++)
             {
                 var mesh = scene.Meshes[i];
                 var mesh_name = mesh.Name;
-                
+
                 if (mesh_name.Length == 0)
                 {
                     mesh_name = string.Format("geom_{0}", i);
@@ -480,10 +482,10 @@ namespace CETech
 
                 if (used_names.Contains(mesh_name))
                 {
-                    int unique = 1;
-                    while(used_names.Contains(mesh_name))
+                    var unique = 1;
+                    while (used_names.Contains(mesh_name))
                     {
-                        mesh_name = String.Format("{0}{1}", mesh.Name, unique++);
+                        mesh_name = string.Format("{0}{1}", mesh.Name, unique++);
                     }
                 }
 
@@ -509,12 +511,12 @@ namespace CETech
                         "local", new YamlSequence(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1)
                         );
                 }
-                
+
 
                 var indices_seq = new YamlSequence();
                 var mesh_indicies = mesh.GetIndices();
                 indices["size"] = mesh_indicies.Length;
-                for (int j = 0; j < mesh_indicies.Length; j++)
+                for (var j = 0; j < mesh_indicies.Length; j++)
                 {
                     indices_seq.Add(mesh_indicies[j]);
                 }
@@ -523,7 +525,7 @@ namespace CETech
                 var verticies_node = new YamlSequence();
                 var nromals_node = new YamlSequence();
                 var tc0_node = new YamlSequence();
-                for (int j = 0; j < mesh.VertexCount; j++)
+                for (var j = 0; j < mesh.VertexCount; j++)
                 {
                     var vert = mesh.Vertices[j];
 
@@ -549,7 +551,6 @@ namespace CETech
                         tc0_node.Add(tc.X);
                         tc0_node.Add(tc.Y);
                     }
-
                 }
 
                 chanels["position"] = verticies_node;
@@ -580,8 +581,8 @@ namespace CETech
             var rootNode = new YamlMapping(
                 "geometries", geometries,
                 "graph", graph
-            );
-            rootNode.ToYamlFile(filename+".imported");
+                );
+            rootNode.ToYamlFile(filename + ".imported");
 
             return rootNode;
         }
