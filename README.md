@@ -34,6 +34,8 @@ CETech is Data-Driven game engine and toolbox inspired by [Bitsquid](http://bits
 * RaspberryPi (Runtime + Develop)
 * asm.js/Emscripten (Runtime)
 * Android (Runtime)
+* XBox One (Runtime)
+* PS4 (Runtime)
 
 ## Build
 
