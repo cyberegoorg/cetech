@@ -34,7 +34,7 @@ namespace CETech
             if (rootNode.ContainsKey("assimp"))
             {
                 var assimp_node = (YamlMapping)rootNode["assimp"];
-                import_assimp(((YamlScalar)assimp_node["input"]).Value, capi);
+                import_assimp(assimp_node, capi);
                 return;
             }
         }
@@ -194,17 +194,40 @@ namespace CETech
             rootNode.ToYamlFile(FileSystem.GetFullPath(capi._sourceRoot, output_file));
         }
 
-        private static void import_assimp(string name, ResourceCompiler.CompilatorApi capi)
+        private static YamlConfig yampConfig;
+
+        private static bool to_bool(YamlScalar value)
         {
+            return (bool) value.NativeObject; //yampConfig.TypeConverter.ConvertFromString(value.Value, typeof(bool));
+        }
+
+        private static PostProcessSteps parse_postprocess(YamlMapping node)
+        {
+            PostProcessSteps ret = PostProcessSteps.None;
+
+            if (node.ContainsKey("flip_uvs") && to_bool((YamlScalar) node["flip_uvs"]))
+            {
+                ret |= PostProcessSteps.FlipUVs;
+            }
+
+            return ret;
+        }
+
+        private static void import_assimp(YamlMapping node, ResourceCompiler.CompilatorApi capi)
+        {
+            var name = ((YamlScalar) node["input"]).Value;
             var filename = FileSystem.GetFullPath("src", name);
 
-            //TODO: import config
             var importer = new AssimpContext();
+            var postprocess = PostProcessSteps.None;
+            if (node.ContainsKey("postprocess"))
+            {
+                postprocess = parse_postprocess((YamlMapping)node["postprocess"]);
+            }
 
             importer.SetConfig(new NormalSmoothingAngleConfig(66.0f));
             var scene = importer.ImportFile(filename,
-                PostProcessPreset.TargetRealTimeMaximumQuality | PostProcessSteps.FlipUVs |
-                PostProcessSteps.MakeLeftHanded);
+                PostProcessPreset.TargetRealTimeMaximumQuality | postprocess | PostProcessSteps.MakeLeftHanded); //TODO: <<< left hand??? 
 
             import_assimp_scene(scene, capi);
         }

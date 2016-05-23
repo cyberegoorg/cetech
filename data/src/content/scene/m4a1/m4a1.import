@@ -1,0 +1,6 @@
+assimp:
+    input: content/scene/m4a1/M4A1.fbx
+
+    postprocess:
+      flip_uvs: true
+ 
