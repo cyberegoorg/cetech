@@ -53,7 +53,7 @@ namespace CETech
         public static void ResourceOnline(object data)
         {
             var resource = (MaterialInstance) data;
-            resource.instance = CETech.Resource.ResourceManager.Get<ShaderResource.ShaderInstance>(ShaderResource.Type,
+            resource.instance = ResourceManager.Get<ShaderResource.ShaderInstance>(ShaderResource.Type,
                 resource.resource.shader_name);
 
             var idx = 0;
@@ -61,7 +61,7 @@ namespace CETech
             {
                 resource.texture_uniform[idx] = new Uniform(uniform_name, UniformType.Int1);
                 resource.texture_resource[idx] =
-                    CETech.Resource.ResourceManager.Get<TextureResource.Resource>(TextureResource.Type,
+                    ResourceManager.Get<TextureResource.Resource>(TextureResource.Type,
                         StringId64.FromString(uniform_name));
                 ++idx;
             }
@@ -79,10 +79,10 @@ namespace CETech
         {
             // TODO: !!!
 
-            var old = CETech.Resource.ResourceManager.Get<MaterialInstance>(Type, name);
+            var old = ResourceManager.Get<MaterialInstance>(Type, name);
             var resource = (MaterialInstance) new_data;
             old.resource = resource.resource;
-            old.instance = CETech.Resource.ResourceManager.Get<ShaderResource.ShaderInstance>(ShaderResource.Type,
+            old.instance = ResourceManager.Get<ShaderResource.ShaderInstance>(ShaderResource.Type,
                 resource.resource.shader_name);
 
             old.texture_uniform = resource.texture_uniform;
@@ -95,7 +95,7 @@ namespace CETech
                 {
                     old.texture_uniform[idx] = new Uniform(uniform_name, UniformType.Int1);
                     old.texture_resource[idx] =
-                        CETech.Resource.ResourceManager.Get<TextureResource.Resource>(TextureResource.Type,
+                        ResourceManager.Get<TextureResource.Resource>(TextureResource.Type,
                             StringId64.FromString(uniform_name));
                     ++idx;
                 }
