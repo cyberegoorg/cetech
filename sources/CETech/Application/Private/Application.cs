@@ -34,7 +34,7 @@ namespace CETech
             ConsoleServer.InitConfig();
 #endif
 
-            Resource.ResourceManager.InitConfig();
+            ResourceManager.InitConfig();
 
             ConfigSystem.CreateValue("application.platform", "Platform", GetPlatform());
             ConfigSystem.CreateValue("application.log_file", "Log file", "");
@@ -301,7 +301,7 @@ namespace CETech
         {
             var boot_pkg = StringId64.FromString(ConfigSystem.String("boot.pkg"));
 
-            Resource.ResourceManager.LoadNow(PackageResource.Type, new[] {boot_pkg});
+            ResourceManager.LoadNow(PackageResource.Type, new[] {boot_pkg});
 
             Package.Load(boot_pkg);
             Package.Flush(boot_pkg);
@@ -314,53 +314,53 @@ namespace CETech
             CameraSystem.Init();
             SceneGraph.Init();
 
-            Resource.ResourceManager.RegisterType(
+            ResourceManager.RegisterType(
                  ConfigResource.Type, 3,
                  ConfigResource.ResourceLoader, ConfigResource.ResourceUnloader,
                  ConfigResource.ResourceOnline, ConfigResource.ResourceOffline, ConfigResource.Reloader);
 
-            Resource.ResourceManager.RegisterType(
+            ResourceManager.RegisterType(
                 PackageResource.Type, 0,
                 PackageResource.ResourceLoader, PackageResource.ResourceUnloader,
                 PackageResource.ResourceOnline, PackageResource.ResourceOffline, PackageResource.Reloader);
 
-            Resource.ResourceManager.RegisterType(
+            ResourceManager.RegisterType(
                 LuaResource.Type, 2,
                 LuaResource.ResourceLoader, LuaResource.ResourceUnloader,
                 LuaResource.ResourceOnline, LuaResource.ResourceOffline, LuaResource.Reloader);
 
-            Resource.ResourceManager.RegisterType(
+            ResourceManager.RegisterType(
                 UnitResource.Type, 7,
                 UnitResource.ResourceLoader, UnitResource.ResourceUnloader,
                 UnitResource.ResourceOnline, UnitResource.ResourceOffline, UnitResource.Reloader);
 
-            Resource.ResourceManager.RegisterType(
+            ResourceManager.RegisterType(
                 ShaderResource.Type, 5,
                 ShaderResource.ResourceLoader, ShaderResource.ResourceUnloader,
                 ShaderResource.ResourceOnline, ShaderResource.ResourceOffline, ShaderResource.Reloader);
 
-            Resource.ResourceManager.RegisterType(
+            ResourceManager.RegisterType(
                 MaterialResource.Type, 6,
                 MaterialResource.ResourceLoader, MaterialResource.ResourceUnloader,
                 MaterialResource.ResourceOnline, MaterialResource.ResourceOffline, MaterialResource.ResourceReloader);
 
-            Resource.ResourceManager.RegisterType(
+            ResourceManager.RegisterType(
                 TextureResource.Type, 4,
                 TextureResource.ResourceLoader, TextureResource.ResourceUnloader,
                 TextureResource.ResourceOnline, TextureResource.ResourceOffline, TextureResource.ResourceReloader);
 
-            Resource.ResourceManager.RegisterType(
+            ResourceManager.RegisterType(
                 LevelResource.Type, 9,
                 LevelResource.ResourceLoader, LevelResource.ResourceUnloader,
                 LevelResource.ResourceOnline, LevelResource.ResourceOffline, LevelResource.ResourceReloader);
 
-            Resource.ResourceManager.RegisterType(
+            ResourceManager.RegisterType(
                 RenderConfig.Type, 0,
                 RenderConfig.ResourceLoader, RenderConfig.ResourceUnloader,
                 RenderConfig.ResourceOnline, RenderConfig.ResourceOffline, RenderConfig.ResourceReloader);
 
 
-            Resource.ResourceManager.RegisterType(
+            ResourceManager.RegisterType(
                 SceneResource.Type, 8,
                 SceneResource.ResourceLoader, SceneResource.ResourceUnloader,
                 SceneResource.ResourceOnline, SceneResource.ResourceOffline, SceneResource.ResourceReloader);
@@ -422,8 +422,8 @@ namespace CETech
 
             InitResouce();
 
-            Resource.ResourceManager.Init();
-            Resource.ResourceManager.LoadNow(ConfigResource.Type, new[] {StringId64.FromString("global")});
+            ResourceManager.Init();
+            ResourceManager.LoadNow(ConfigResource.Type, new[] {StringId64.FromString("global")});
 
 #if CETECH_DEVELOP
             if (DevelopFlags.compile && !DevelopFlags.ccontinue)
