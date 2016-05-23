@@ -50,7 +50,7 @@ namespace CETech.Develop
             CompileRoot("src");
             CompileRoot("core");
 
-            Directory.Delete(FileSystem.GetFullPath("build", "tmp"), true);
+            Directory.Delete(FileSystem.GetFullPath("build", "tmp"), true); // TODO: delet fce to Filesystem
         }
 
         private static void CalcHash(string filename, out long type, out long name)

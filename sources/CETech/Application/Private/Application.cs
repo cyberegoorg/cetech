@@ -293,7 +293,6 @@ namespace CETech
                 ConfigSystem.SetValue("resource_manager.build", build_dir);
             }
 
-
             return true;
         }
 

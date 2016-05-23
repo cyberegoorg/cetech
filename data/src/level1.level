@@ -3,6 +3,10 @@ units:
     name: "box1"
     prefab: box1
 
+  "55643423443313252":
+    name: "m4a1"
+    prefab: m4a1
+
   "55643433135454252":
     name: "box2"
     prefab: box2
