@@ -19,7 +19,7 @@ function FPSCamera:update(dt, dx, dy, updown, leftright)
     local pos = Transform.GetPosition(self.world, self.transform)
     local rot = Transform.GetRotation(self.world, self.transform)
 
-    Log.Info("pos", "{0} {1} {2}", pos.X, pos.Y, pos.Z)
+    --Log.Info("pos", "{0} {1} {2}", pos.X, pos.Y, pos.Z)
 
     local m_world = Transform.GetWorldMatrix(self.world, self.transform)
     local z_dir = -Mat4f.Z(m_world)

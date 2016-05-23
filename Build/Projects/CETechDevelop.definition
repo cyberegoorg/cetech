@@ -92,6 +92,7 @@
     <Compile Include="Lua\Private\LuaEnviroment.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="RenderSystem\CameraSystem.cs" />
+    <Compile Include="RenderSystem\ImportResource.cs" />
     <Compile Include="RenderSystem\MaterialResource.cs" />
     <Compile Include="RenderSystem\MeshRenderer.cs" />
     <Compile Include="RenderSystem\Private\AviWriter.cs" />

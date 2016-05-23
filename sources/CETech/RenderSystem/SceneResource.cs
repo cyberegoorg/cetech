@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
 using System.IO;
+using System.Linq;
 using System.Yaml;
 using CETech.Develop;
 using CETech.Resource;
@@ -11,7 +12,6 @@ using SharpBgfx;
 #if CETECH_DEVELOP
 using Assimp;
 using Assimp.Configs;
-
 #endif
 
 namespace CETech
@@ -159,7 +159,7 @@ namespace CETech
 
         public static object ResourceReloader(long name, object new_data)
         {
-            var old = CETech.Resource.ResourceManager.Get<Resource>(Type, name);
+            var old = ResourceManager.Get<Resource>(Type, name);
             var neww = (Resource) new_data;
 
             return old;
@@ -195,21 +195,25 @@ namespace CETech
 
         public class SceneInstance
         {
-            public IndexBuffer[] ib;
             public Resource resource;
-            public VertexBuffer[] vb;
+
             public VertexLayout[] vl;
+
+            public IndexBuffer[] ib;
+            public VertexBuffer[] vb;
         }
 
         public class Resource
         {
-            public List<short[]> geom_ib = new List<short[]>();
             public long[] geom_name;
+            public List<short[]> geom_ib = new List<short[]>();
             public List<byte[]> geom_vb = new List<byte[]>();
+            public Dictionary<long, long> geom_map = new Dictionary<long, long>();
+
+            public List<long> node_names = new List<long>();
+            public List<int> node_parent = new List<int>();
             public List<float[]> node_local = new List<float[]>();
 
-            public List<long[]> node_names = new List<long[]>();
-            public List<int[]> node_parent = new List<int[]>();
             public List<List<StreamType>> stypes = new List<List<StreamType>>();
             public List<ChanelName> types = new List<ChanelName>();
         }
@@ -250,10 +254,12 @@ namespace CETech
         private static int WriteFloat(byte[] bytes, int idx, float value)
         {
             var byteArray = BitConverter.GetBytes(value);
+
             for (var i = 0; i < byteArray.Length; i++)
             {
                 bytes[idx + i] = byteArray[i];
             }
+
             return byteArray.Length;
         }
 
@@ -291,12 +297,19 @@ namespace CETech
             return write_idx;
         }
 
-        public static void compile_node(KeyValuePair<YamlNode, YamlNode> rootNode, ref int node_id, int parent,
-            Dictionary<long, long> node_parent, Dictionary<long, float[]> local_pose, Dictionary<long, long> names)
+        public class CompileOutput
         {
-            node_parent[node_id] = parent;
+            public Dictionary<long, int> node_parent = new Dictionary<long, int>();
+            public Dictionary<long, float[]> local_pose = new Dictionary<long, float[]>();
+            public Dictionary<long, long> names = new Dictionary<long, long>();
+            public Dictionary<long, long> geometries_map = new Dictionary<long, long>();
+        }
 
-            var name = rootNode.Key as YamlScalar;
+        public static void compile_node(KeyValuePair<YamlNode, YamlNode> rootNode, ref int node_id, int parent, CompileOutput output)
+        {
+            output.node_parent[node_id] = parent;
+
+            var nodeNameNode = rootNode.Key as YamlScalar;
             var body = rootNode.Value as YamlMapping;
             var local = body["local"] as YamlSequence;
 
@@ -306,11 +319,12 @@ namespace CETech
                 local_mat[i] = YamlToFloat(local[i]);
             }
 
-            var name_id = StringId64.FromString(name.Value);
+            Debug.Assert(nodeNameNode != null, "nodeNameNode != null");
+            var nodeName = StringId64.FromString(nodeNameNode.Value);
 
-            names[node_id] = name_id;
-            node_parent[node_id] = parent;
-            local_pose[node_id] = local_mat;
+            output.names[node_id] = nodeName;
+            output.node_parent[node_id] = parent;
+            output.local_pose[node_id] = local_mat;
 
             if (body.ContainsKey("children"))
             {
@@ -320,14 +334,24 @@ namespace CETech
                 foreach (var child in childrenNode)
                 {
                     node_id += 1;
-                    compile_node(child, ref node_id, parent_node,
-                        node_parent, local_pose, names);
+                    compile_node(child, ref node_id, parent_node, output);
+                }
+            }
+
+            if (body.ContainsKey("geometries"))
+            {
+                var geometriesNode = body["geometries"] as YamlSequence;
+
+                foreach (var geometries in geometriesNode)
+                {
+                    var name = ((YamlScalar) geometries).Value;
+                    output.geometries_map[StringId64.FromString(name)] = nodeName;
                 }
             }
         }
 
         /// <summary>
-        ///     ResourceManager compiler
+        ///     Scene compiler
         /// </summary>
         /// <param name="capi">Compiler api</param>
         public static void Compile(ResourceCompiler.CompilatorApi capi)
@@ -337,11 +361,6 @@ namespace CETech
             var rootNode = yaml[0] as YamlMapping;
 
             var resource = new Resource();
-
-            if (rootNode.ContainsKey("import"))
-            {
-                rootNode = import_assimp(((YamlScalar) rootNode["import"]).Value);
-            }
 
             var geometries = (YamlMapping) rootNode["geometries"];
 
@@ -408,183 +427,37 @@ namespace CETech
             }
 
             var graphs = (YamlMapping) rootNode["graph"];
-            var node_id = 0;
-            var node_parent = new Dictionary<long, long>();
-            var local_pose = new Dictionary<long, float[]>();
-            var names = new Dictionary<long, long>();
-
+            int node_id = 0;
 
             var tmp_node_parent = new List<int>();
-            var tmp_local_pose = new List<float>();
+            var tmp_local_pose = new List<float[]>();
             var tmp_names = new List<long>();
+
+            CompileOutput output = new CompileOutput();
 
             foreach (var graph in graphs)
             {
-                node_id = 0;
-
-                node_parent.Clear();
-                local_pose.Clear();
-                names.Clear();
-                tmp_node_parent.Clear();
-                tmp_local_pose.Clear();
-                tmp_names.Clear();
-
-                compile_node(graph, ref node_id, int.MaxValue, node_parent, local_pose, names);
-
-                var node_count = node_id + 1;
-
-                for (var i = 0; i < node_count; i++)
-                {
-                    tmp_node_parent.Add((int) node_parent[i]);
-
-                    var pose = local_pose[i];
-                    for (var j = 0; j < 16; j++)
-                    {
-                        tmp_local_pose.Add(pose[j]);
-                    }
-
-                    tmp_names.Add(names[i]);
-                }
-
-                resource.node_names.Add(tmp_names.ToArray());
-                resource.node_local.Add(tmp_local_pose.ToArray());
-                resource.node_parent.Add(tmp_node_parent.ToArray());
+                compile_node(graph, ref node_id, int.MaxValue, output);
             }
+
+            var node_count = output.names.Count;
+            for (var i = 0; i < node_count; ++i)
+            {
+                tmp_node_parent.Add(output.node_parent[i]);
+
+                var pose = output.local_pose[i];
+                tmp_local_pose.Add(pose);
+
+                tmp_names.Add(output.names[i]);
+            }
+
+            output.geometries_map.ToList().ForEach(x => resource.geom_map.Add(x.Key, x.Value));
+            resource.node_names = tmp_names;
+            resource.node_local = tmp_local_pose;
+            resource.node_parent = tmp_node_parent;
 
             var serializer = MessagePackSerializer.Get<Resource>();
             serializer.Pack(capi.BuildFile, resource);
-        }
-
-
-        private static YamlMapping import_assimp(string name)
-        {
-            var filename = FileSystem.GetFullPath("src", name);
-            var importer = new AssimpContext();
-            importer.SetConfig(new NormalSmoothingAngleConfig(66.0f));
-            var scene = importer.ImportFile(filename,
-                PostProcessPreset.TargetRealTimeMaximumQuality | PostProcessSteps.FlipUVs |
-                PostProcessSteps.MakeLeftHanded);
-
-            var geometries = new YamlMapping();
-            var graph = new YamlMapping();
-
-            var used_names = new HashSet<string>();
-
-            for (var i = 0; i < scene.MeshCount; i++)
-            {
-                var mesh = scene.Meshes[i];
-                var mesh_name = mesh.Name;
-
-                if (mesh_name.Length == 0)
-                {
-                    mesh_name = string.Format("geom_{0}", i);
-                }
-
-                if (used_names.Contains(mesh_name))
-                {
-                    var unique = 1;
-                    while (used_names.Contains(mesh_name))
-                    {
-                        mesh_name = string.Format("{0}{1}", mesh.Name, unique++);
-                    }
-                }
-
-                used_names.Add(mesh_name);
-
-                var mesh_yaml = new YamlMapping();
-
-                geometries[mesh_name] = mesh_yaml;
-
-                var chanels = new YamlMapping();
-                var types = new YamlMapping();
-                var indices = new YamlMapping();
-
-                if (mesh.HasBones)
-                {
-                    graph["n_" + mesh_name] = new YamlMapping(
-                        "local", new YamlSequence(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1)
-                        );
-                }
-                else
-                {
-                    graph["n_" + mesh_name] = new YamlMapping(
-                        "local", new YamlSequence(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1)
-                        );
-                }
-
-
-                var indices_seq = new YamlSequence();
-                var mesh_indicies = mesh.GetIndices();
-                indices["size"] = mesh_indicies.Length;
-                for (var j = 0; j < mesh_indicies.Length; j++)
-                {
-                    indices_seq.Add(mesh_indicies[j]);
-                }
-
-                // position
-                var verticies_node = new YamlSequence();
-                var nromals_node = new YamlSequence();
-                var tc0_node = new YamlSequence();
-                for (var j = 0; j < mesh.VertexCount; j++)
-                {
-                    var vert = mesh.Vertices[j];
-
-                    verticies_node.Add(vert.X);
-                    verticies_node.Add(vert.Y);
-                    verticies_node.Add(vert.Z);
-
-
-                    if (mesh.HasNormals)
-                    {
-                        var norm = mesh.Normals[j];
-
-                        nromals_node.Add(norm.X);
-                        nromals_node.Add(norm.Y);
-                        nromals_node.Add(norm.Z);
-                    }
-
-
-                    if (mesh.HasTextureCoords(0))
-                    {
-                        var tc = mesh.TextureCoordinateChannels[0][j];
-
-                        tc0_node.Add(tc.X);
-                        tc0_node.Add(tc.Y);
-                    }
-                }
-
-                chanels["position"] = verticies_node;
-                indices["position"] = indices_seq;
-                types["position"] = "vec3";
-
-                // normals
-                if (mesh.HasNormals)
-                {
-                    chanels["normal"] = nromals_node;
-                    indices["normal"] = indices_seq;
-                    types["normal"] = "vec3";
-                }
-
-                // normals
-                if (mesh.HasTextureCoords(0))
-                {
-                    chanels["texcoord0"] = tc0_node;
-                    indices["texcoord0"] = indices_seq;
-                    types["texcoord0"] = "vec2";
-                }
-
-                mesh_yaml["chanels"] = chanels;
-                mesh_yaml["indices"] = indices;
-                mesh_yaml["types"] = types;
-            }
-
-            var rootNode = new YamlMapping(
-                "geometries", geometries,
-                "graph", graph
-                );
-            rootNode.ToYamlFile(filename + ".imported");
-
-            return rootNode;
         }
 #endif
     }

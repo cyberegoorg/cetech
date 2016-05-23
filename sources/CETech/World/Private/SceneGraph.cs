@@ -52,7 +52,8 @@ namespace CETech.World
             var world_instance = _worldInstance[world];
 
             var idx = world_instance.EntNode[entity];
-            return GetNodeByNameRecursive(world, idx, name);
+            var ret = GetNodeByNameRecursive(world, idx, name);
+            return ret;
         }
 
         private static int CreateImpl(int world, int entity, long[] names, int[] parents, Mat4f[] pose)
@@ -72,17 +73,17 @@ namespace CETech.World
                 var local_pose = pose[i];
                 var local_translation = Mat4f.Translation(local_pose);
                 var local_rotation = Mat4f.ToQuat(local_pose);
-                var local_scale = Vec3f.Unit;
+                var local_scale = Vec3f.Unit; // TODO: from pose?
 
                 world_instance.Position.Add(local_translation);
-                world_instance.Scale.Add(local_scale); // TODO: from pose?
+                world_instance.Scale.Add(local_scale);
                 world_instance.Rotation.Add(local_rotation);
 
                 world_instance.World.Add(Mat4f.Identity);
 
                 var parent = parents[i];
-                Transform(world, idx,
-                    parent != int.MaxValue ? GetWorldMatrix(world, nodes_map[parent]) : Mat4f.Identity);
+                var parent_matrix = parent != int.MaxValue ? GetWorldMatrix(world, nodes_map[parent]) : Mat4f.Identity;
+                Transform(world, idx, parent_matrix);
 
                 if (parent != int.MaxValue)
                 {

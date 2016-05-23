@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Yaml;
 using CETech.CEMath;
@@ -19,14 +20,14 @@ namespace CETech.World
             return _worldInstance[world].EntIdx[entity];
         }
 
-        private static int CreateImpl(int world, int entity, long material, long scene, long mesh)
+        private static int CreateImpl(int world, int entity, long material, long scene, long mesh_name, long node)
         {
-            var mesh_instance = Resource.ResourceManager.Get<SceneResource.SceneInstance>(SceneResource.Type, scene);
+            var mesh_instance = ResourceManager.Get<SceneResource.SceneInstance>(SceneResource.Type, scene);
 
             var names = mesh_instance.resource.geom_name;
             for (var i = 0; i < names.Length; i++)
             {
-                if (names[i] != mesh)
+                if (names[i] != mesh_name)
                 {
                     continue;
                 }
@@ -34,7 +35,7 @@ namespace CETech.World
                 var world_instance = _worldInstance[world];
 
                 var idx = world_instance.MaterialInstance.Count;
-                var material_instance = Resource.ResourceManager.Get<MaterialResource.MaterialInstance>(MaterialResource.Type,
+                var material_instance = ResourceManager.Get<MaterialResource.MaterialInstance>(MaterialResource.Type,
                     material);
 
                 world_instance.EntIdx[entity] = idx;
@@ -42,37 +43,42 @@ namespace CETech.World
                 world_instance.SceneInstance.Add(mesh_instance);
                 world_instance.MeshIdx.Add(i);
 
-                var local_pose = mesh_instance.resource.node_local[i];
-                var pose = new Mat4f[mesh_instance.resource.node_names[i].Length];
+                var pose = new Mat4f[mesh_instance.resource.node_names.Count];
                 var pose_id = 0;
-                for (var j = 0; j < pose.Length; j += 16)
+                for (var j = 0; j < pose.Length; ++j)
                 {
-                    var m_idx = j;
+                    var local_pose = mesh_instance.resource.node_local[i];
 
                     pose[pose_id++] = new Mat4f(
-                        local_pose[m_idx + 0],
-                        local_pose[m_idx + 1],
-                        local_pose[m_idx + 2],
-                        local_pose[m_idx + 3],
-                        local_pose[m_idx + 4],
-                        local_pose[m_idx + 5],
-                        local_pose[m_idx + 6],
-                        local_pose[m_idx + 7],
-                        local_pose[m_idx + 8],
-                        local_pose[m_idx + 9],
-                        local_pose[m_idx + 10],
-                        local_pose[m_idx + 11],
-                        local_pose[m_idx + 12],
-                        local_pose[m_idx + 13],
-                        local_pose[m_idx + 14],
-                        local_pose[m_idx + 15]
+                        local_pose[0],
+                        local_pose[1],
+                        local_pose[2],
+                        local_pose[3],
+                        local_pose[4],
+                        local_pose[5],
+                        local_pose[6],
+                        local_pose[7],
+                        local_pose[8],
+                        local_pose[9],
+                        local_pose[10],
+                        local_pose[11],
+                        local_pose[12],
+                        local_pose[13],
+                        local_pose[14],
+                        local_pose[15]
                         );
                 }
 
-                var node = SceneGraph.Create(world, entity,
-                    mesh_instance.resource.node_names[i], mesh_instance.resource.node_parent[i], pose);
+                // TODO: component
+                var __node = SceneGraph.Create(world, entity,
+                    mesh_instance.resource.node_names.ToArray(), mesh_instance.resource.node_parent.ToArray(), pose);
 
-                world_instance.NodeIdx.Add(node);
+                var geom_node = SceneGraph.GetNodeByName(world, entity,
+                    node == long.MaxValue ? mesh_instance.resource.geom_map[mesh_name] : node);
+
+                Debug.Assert(geom_node != int.MaxValue);
+
+                world_instance.NodeIdx.Add(geom_node);
 
                 return idx;
             }
@@ -95,8 +101,11 @@ namespace CETech.World
         {
             for (var i = 0; i < ent_ids.Length; ++i)
             {
-                CreateImpl(world, ent_ids[i], data[i]["material"].AsInt64(), data[i]["scene"].AsInt64(),
-                    data[i]["mesh"].AsInt64());
+                CreateImpl(world, ent_ids[i],
+                    data[i]["material"].AsInt64(),
+                    data[i]["scene"].AsInt64(),
+                    data[i]["mesh"].AsInt64(),
+                    data[i].ContainsKey("node") ? data[i]["node"].AsInt64() : long.MaxValue);
             }
         }
 
@@ -104,16 +113,25 @@ namespace CETech.World
         {
             var scene = body["scene"] as YamlScalar;
             var mesh = body["mesh"] as YamlScalar;
-            var node = body["node"] as YamlScalar;
-            var material = body["material"] as YamlScalar;
+            var node = body.ContainsKey("node") ? body["node"] as YamlScalar : null;
 
-            packer.PackMapHeader(4);
+            var material = body["material"] as YamlScalar;
+            if (node != null)
+            {
+                packer.PackMapHeader(4);
+            }
+            else
+            {
+                packer.PackMapHeader(3);
+            }
 
             packer.Pack("scene");
             packer.Pack(StringId64.FromString(scene.Value));
 
-            packer.Pack("node");
-            packer.Pack(StringId64.FromString(node.Value));
+            if(node != null) { 
+                packer.Pack("node");
+                packer.Pack(StringId64.FromString(node.Value));
+            }
 
             packer.Pack("mesh");
             packer.Pack(StringId64.FromString(mesh.Value));

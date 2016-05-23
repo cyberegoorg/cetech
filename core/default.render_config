@@ -11,12 +11,13 @@
 global_resource:
   - { name: gbuffer0, type: render_target, format: RGBA8, ration: equal }
   - { name: gbuffer1, type: render_target, format: RGBA8, ration: equal }
-
+  - { name: gbuffer2, type: render_target, format: D24, ration: equal }
 
 # Renderer layers
 layer:
   default:
-    - { name: "gbuffer", output: ["gbuffer0", "gbuffer1"] }
+    - { name: "gbuffer", output: ["gbuffer0", "gbuffer1", "gbuffer2"] }
+    #- { type: "fullscreen", name: "combine", input: ["gbuffer0", "gbuffer1", "gbuffer2"] }
 
 viewport:
   default:
