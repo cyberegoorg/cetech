@@ -376,6 +376,7 @@ namespace CETech
             ResourceCompiler.RegisterCompiler(LevelResource.Type, LevelResource.Compile);
             ResourceCompiler.RegisterCompiler(RenderConfig.Type, RenderConfig.Compile);
             ResourceCompiler.RegisterCompiler(SceneResource.Type, SceneResource.Compile);
+            ResourceCompiler.RegisterCompiler(ImportResource.Type, ImportResource.Compile);
 
             if (DevelopFlags.compile)
             {
@@ -394,6 +395,7 @@ namespace CETech
                 Log.LogEvent += new LogHandler.FileLog(log_file).Log;
             }
 
+// TODO: remove?
 #if CETECH_SDL2
             SDL.SDL_Init(SDL.SDL_INIT_EVERYTHING);
 #endif

@@ -112,12 +112,12 @@ namespace CETech.Develop
                     continue;
                 }
 
-                BuildDb.set_file_hash(filename, string.Format("{0:X}{1:X}", type, name));
-
                 if (!BuildDb.need_compile(root, filename))
                 {
                     continue;
                 }
+
+                BuildDb.set_file_hash(filename, string.Format("{0:X}{1:X}", type, name));
 
                 var task = new CompileTask // TODO: pool
                 {
