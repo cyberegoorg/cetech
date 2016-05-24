@@ -63,9 +63,9 @@ namespace CETech
         /// <param name="root">Root name</param>
         /// <param name="path">Directory path</param>
         /// <param name="files">Files in directory</param>
-        public static void ListDirectory(string root, string path, out string[] files)
+        public static void ListDirectory(string root, string path, string filter, out string[] files)
         {
-            ListDirectoryImpl(root, path, out files);
+            ListDirectoryImpl(root, path, filter, out files);
         }
 
         /// <summary>
