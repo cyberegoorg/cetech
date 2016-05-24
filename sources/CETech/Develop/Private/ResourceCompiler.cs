@@ -3,6 +3,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Reflection;
 using CETech.Develop.Private;
 using CETech.Resource;
@@ -89,49 +90,68 @@ namespace CETech.Develop
             Log.Info("compile_task", "{0} compiled", task.Filename);
         }
 
+        private static void _compile_file(string root, string filename, int topCompileTask)
+        {
+            filename = filename.Remove(0, FileSystem.GetRootDir(root).Length + 1);
+            filename = filename.Replace('\\', '/');
+
+            long name, type;
+            CalcHash(filename, out type, out name);
+
+            Compiler compiler;
+            if (!_compoilerMap.TryGetValue(type, out compiler))
+            {
+                return;
+            }
+
+            if (!BuildDb.need_compile(root, filename))
+            {
+                return;
+            }
+
+            BuildDb.set_file_hash(filename, string.Format("{0:X}{1:X}", type, name));
+
+            var compileTask = new CompileTask // TODO: pool
+            {
+                Compiler = compiler,
+                Filename = filename,
+                Name = name,
+                Type = type,
+                SourceFs = root
+            };
+
+            int[] tasks = { 0 };
+
+            tasks[0] = TaskManager.AddBegin("compile_task", compile_task, compileTask, parent: topCompileTask,
+                affinity: TaskManager.TaskAffinity.MainThead
+                /* TODO: this fix yamlserializer (problem with thread????)*/);
+            TaskManager.AddEnd(tasks);
+        }
+
         private static void CompileRoot(string root)
         {
             string[] files;
-            FileSystem.ListDirectory(root, "", out files);
+            int[] tasks = { 0 };
 
-            var topCompileTask = TaskManager.AddNull("compiler");
+            FileSystem.ListDirectory(root, "", ".import", out files);
+            var topImportTask = TaskManager.AddNull("compiler-importer");
 
-
-            int[] tasks = {0};
-            for (var i = 0; i < files.Length; i++)
+            for (var i = 0; i < files.Length; ++i)
             {
-                var filename = files[i].Remove(0, FileSystem.GetRootDir(root).Length + 1);
-                filename = filename.Replace('\\', '/');
+                var filename = files[i];
+                _compile_file(root, filename, topImportTask);
+            }
+            tasks[0] = topImportTask;
+            TaskManager.AddEnd(tasks);
+            TaskManager.Wait(topImportTask);
 
-                long name, type;
-                CalcHash(filename, out type, out name);
-
-                Compiler compiler;
-                if (!_compoilerMap.TryGetValue(type, out compiler))
-                {
-                    continue;
-                }
-
-                if (!BuildDb.need_compile(root, filename))
-                {
-                    continue;
-                }
-
-                BuildDb.set_file_hash(filename, string.Format("{0:X}{1:X}", type, name));
-
-                var task = new CompileTask // TODO: pool
-                {
-                    Compiler = compiler,
-                    Filename = filename,
-                    Name = name,
-                    Type = type,
-                    SourceFs = root
-                };
-
-                tasks[0] = TaskManager.AddBegin("compile_task", compile_task, task, parent: topCompileTask,
-                    affinity: TaskManager.TaskAffinity.MainThead
-                    /* TODO: this fix yamlserializer (problem with thread????)*/);
-                TaskManager.AddEnd(tasks);
+            FileSystem.ListDirectory(root, "", "*", out files);
+            files = files.Where(name => !name.EndsWith(".import")).ToArray();
+            var topCompileTask = TaskManager.AddNull("compiler");
+            for (var i = 0; i < files.Length; ++i)
+            {
+                var filename = files[i];
+                _compile_file(root, filename, topCompileTask);
             }
 
             tasks[0] = topCompileTask;

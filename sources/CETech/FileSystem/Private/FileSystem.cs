@@ -24,9 +24,9 @@ namespace CETech
                 mode == OpenMode.Read ? FileAccess.Read : FileAccess.Write, FileShare.Read);
         }
 
-        private static void ListDirectoryImpl(string root, string path, out string[] files)
+        private static void ListDirectoryImpl(string root, string path, string filter, out string[] files)
         {
-            files = Directory.GetFiles(GetFullPath(root, path), "*", SearchOption.AllDirectories);
+            files = Directory.GetFiles(GetFullPath(root, path), filter, SearchOption.AllDirectories);
         }
 
         private static void CreateDirectoryImpl(string root, string path)
