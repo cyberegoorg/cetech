@@ -131,7 +131,7 @@ namespace CETech.Develop
         private static void CompileRoot(string root)
         {
             string[] files;
-            int[] tasks = { 0 };
+            int[] tasks = {0};
 
             FileSystem.ListDirectory(root, "", ".import", out files);
             var topImportTask = TaskManager.AddNull("compiler-importer");
