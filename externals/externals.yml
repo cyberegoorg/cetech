@@ -7,7 +7,7 @@ bx:
 
   install:
     includes: &bx_install_include
-      [include/bx, include/bx]
+      [include/bx, release/include/bx]
 
     linux64:
       - copytree: *bx_install_include
@@ -32,156 +32,22 @@ bgfx:
       - make osx-debug64
 
   install:
+    includes: &bgfx_install_include
+      [include/bgfx, release/include/bgfx]
+
     linux64:
-      - copyfile: [.build/linux64_gcc/bin/libbgfx-shared-libRelease.so, Release/lib/bgfx.so]
-      - copyfile: [.build/linux64_gcc/bin/libbgfx-shared-libDebug.so, Debug/lib/bgfx_debug.so]
-      - copyfile: [.build/linux64_gcc/bin/shadercRelease, Release/bin/shaderc]
-      - copyfile: [.build/linux64_gcc/bin/texturecRelease, Release/bin/texturec]
+      - copytree: *bgfx_install_include
+      - copyfile: [.build/linux64_gcc/bin/libbgfxRelease.a, release/lib/libbgfxRelease.a]
+      - copyfile: [.build/linux64_gcc/bin/libbgfxDebug.a, debug/lib/libbgfxDebug.a]
+      - copyfile: [.build/linux64_gcc/bin/shadercRelease, release/bin/shaderc]
+      - copyfile: [.build/linux64_gcc/bin/texturecRelease, release/bin/texturec]
 
     darwin64:
-      - copyfile: [.build/osx64_clang/bin/libbgfx-shared-libRelease.so, Release/lib/bgfx.so]
-      - copyfile: [.build/osx64_clang/bin/libbgfx-shared-libDebug.so, Debug/lib/bgfx_debug.so]
-      - copyfile: [.build/osx64_clang/bin/shadercRelease, Release/bin/shaderc]
-      - copyfile: [.build/osx64_clang/bin/texturecRelease, Release/bin/texturec]
-
-#############
-# SharpBGFX #
-########################################################################################################################
-sharp-bgfx:
-  clone: git clone https://github.com/OndraVoves/SharpBgfx.git --depth 1
-
-  build:
-    windows64:
-      - devenv SharpBgfx/SharpBgfx.csproj /build Debug
-      - devenv SharpBgfx/SharpBgfx.csproj /build Release
-
-    linux64:
-      - xbuild /p:Configuration=Debug SharpBgfx/SharpBgfx.csproj
-      - xbuild /p:Configuration=Release SharpBgfx/SharpBgfx.csproj
-
-    darwin64:
-      - xbuild /p:Configuration=Debug SharpBgfx/SharpBgfx.csproj
-      - xbuild /p:Configuration=Release SharpBgfx/SharpBgfx.csproj
-
-  install:
-     windows64:
-      - copytree: [SharpBgfx\bin\Debug, Debug\lib]
-      - copytree: [SharpBgfx\bin\Release, Release\lib]
-      - copy: [tools\shaderc.exe, Release\bin]
-      - copy: [tools\texturec.exe, Release\bin]
-
-     linux64:
-      - copytree: [SharpBgfx/bin/Debug, Debug/lib]
-      - copytree: [SharpBgfx/bin/Release, Release/lib]
-
-     darwin64:
-      - copytree: [SharpBgfx/bin/Debug, Debug/lib]
-      - copytree: [SharpBgfx/bin/Release, Release/lib]
-
-#############
-# MoonSharp #
-########################################################################################################################
-moonsharp:
-  clone: git clone https://github.com/xanathar/moonsharp.git --depth 1
-
-  build:
-    windows64:
-      - devenv src\MoonSharp.Interpreter\MoonSharp.Interpreter.net35-client.csproj /build Debug
-      - devenv src\MoonSharp.Interpreter\MoonSharp.Interpreter.net35-client.csproj /build Release
-
-    linux64:
-      - xbuild /p:TargetFrameworkVersion=v4.0 /p:Configuration=Debug src/MoonSharp.Interpreter/MoonSharp.Interpreter.net35-client.csproj
-      - xbuild /p:TargetFrameworkVersion=v4.0 /p:Configuration=Release src/MoonSharp.Interpreter/MoonSharp.Interpreter.net35-client.csproj
-
-    dawin64:
-      - xbuild /p:TargetFrameworkVersion=v4.0 /p:Configuration=Debug src/MoonSharp.Interpreter/MoonSharp.Interpreter.net35-client.csproj
-      - xbuild /p:TargetFrameworkVersion=v4.0 /p:Configuration=Release src/MoonSharp.Interpreter/MoonSharp.Interpreter.net35-client.csproj
-
-  install:
-    windows64:
-      - copytree: [src\MoonSharp.Interpreter\bin\Debug, Debug\lib]
-      - copytree: [src\MoonSharp.Interpreter\bin\Release, Release\lib]
-
-    linux64:
-      - copytree: [src/MoonSharp.Interpreter/bin/Debug, Debug/lib]
-      - copytree: [src/MoonSharp.Interpreter/bin/Release, Release/lib]
-
-    darwin64:
-      - copytree: [src/MoonSharp.Interpreter/bin/Debug, Debug/lib]
-      - copytree: [src/MoonSharp.Interpreter/bin/Release, Release/lib]
-
-###########
-# SDL2-CS #
-########################################################################################################################
-sdl2-cs:
-  clone: git clone https://github.com/flibitijibibo/SDL2-CS.git --depth 1
-
-  build:
-    windows64:
-      - devenv SDL2-CS.csproj /build Debug
-      - devenv SDL2-CS.csproj /build Release
-
-    linux64:
-      - xbuild /p:Configuration=Debug SDL2-CS.csproj
-      - xbuild /p:Configuration=Release SDL2-CS.csproj
-
-    darwin64:
-      - xbuild /p:Configuration=Debug SDL2-CS.csproj
-      - xbuild /p:Configuration=Release SDL2-CS.csproj
-
-  install:
-     windows64:
-      - copytree: [bin\Debug, Debug\lib]
-      - copytree: [bin\Release, Release\lib]
-
-     linux64:
-      - copytree: [bin/Debug, Debug/lib]
-      - copytree: [bin/Release, Release/lib]
-
-     darwin64:
-      - copytree: [bin/Debug, Debug/lib]
-      - copytree: [bin/Release, Release/lib]
-
-#yaml-serializer:
-#  clone: git clone https://github.com/newky2k/YamlSerializer.git --depth 1
-#
-#  build:
-#    windows64:
-#      - devenv YamlSerializer.sln /project YamlSerializer /upgrade
-#      - devenv YamlSerializer.sln /build Debug /project YamlSerializer
-#      - devenv YamlSerializer.sln /build Release /project YamlSerializer
-
-###############
-# MsgPack-cli #
-########################################################################################################################
-msgpack-cli:
-  clone: git clone https://github.com/msgpack/msgpack-cli.git --depth 1
-
-  build:
-    windows64:
-      - devenv src\MsgPack.Net40\MsgPack.Net40.csproj /build Debug
-      - devenv src\MsgPack.Net40\MsgPack.Net40.csproj /build Release
-
-    linux64:
-      - xbuild /p:Configuration=Debug src/MsgPack.Net40/MsgPack.Net40.csproj
-      - xbuild /p:Configuration=Release src/MsgPack.Net40/MsgPack.Net40.csproj
-
-    darwin64:
-      - xbuild /p:Configuration=Debug src/MsgPack.Net40/MsgPack.Net40.csproj
-      - xbuild /p:Configuration=Release src/MsgPack.Net40/MsgPack.Net40.csproj
-
-  install:
-     windows64:
-      - copytree: [src\MsgPack.Net40\bin\Debug, Debug\lib]
-      - copytree: [bin\net40-client, Release\lib]
-
-     linux64:
-      - copytree: [src/MsgPack.Net40/bin/Debug, Debug/lib]
-      - copytree: [bin/net40-client, Release/lib]
-
-     linux64:
-      - copytree: [src/MsgPack.Net40/bin/Debug, Debug/lib]
-      - copytree: [bin/net40-client, Release/lib]
+      - copytree: *bgfx_install_include
+      - copyfile: [.build/osx64_clang/bin/libbgfxRelease.a, release/lib/libbgfxRelease.a]
+      - copyfile: [.build/osx64_clang/bin/libbgfxDebug.a, debug/lib/libbgfxDebug.a]
+      - copyfile: [.build/osx64_clang/bin/shadercRelease, release/bin/shaderc]
+      - copyfile: [.build/osx64_clang/bin/texturecRelease, release/bin/texturec]
 
 ########
 # SLD2 #
@@ -203,13 +69,15 @@ sdl2:
 
   install:
     lib: &sdl2_install_lib
-      [build/.libs/libSDL2-2.0.so.0.4.0, Release/lib/libSDL2-2.0.so]
+      [build/.libs/libSDL2.a, release/lib/libSDL2.a]
 
     linux64:
       - copyfile: *sdl2_install_lib
+      - copytree: [include, release/include/SDL2]
 
     darwin64:
       - copyfile: *sdl2_install_lib
+      - copytree: [include, release/include/SDL2]
 
 ########
 # SLD2 #
@@ -223,7 +91,7 @@ sdl2_win_bin:
 
   install:
      windows64:
-      - copy: [SDL2.dll, Release\lib]
+      - copy: [SDL2.dll, release\lib]
 
 ###########
 # nanomsg #
@@ -233,137 +101,75 @@ nanomsg:
 
   build:
     posix: &nanomsg_build_posix
-      [autoreconf -vfi, ./configure, make]
+      [cmake . -DNN_STATIC_LIB=TRUE, make]
 
     linux64:  *nanomsg_build_posix
     darwin64: *nanomsg_build_posix
     windows64:
-      - cmake .
-      - devenv nanomsg.sln /build Release
+      - cmake . -DNN_STATIC_LIB=TRUE
+      - devenv nanomsg.sln /build release
 
   install:
     linux64:
-      - copyfile: [.libs/libnanomsg.so.4.0.0, Release/lib/libnanomsg.so]
+      - copyfile: [libnanomsg.a, release/lib/libnanomsg.a]
+      - copytree: [src, release/include/nanomsg]
 
     darwin64:
-      - copyfile: [.libs/libnanomsg.so.4.0.0, Release/lib/libnanomsg.so]
+      - copyfile: [libnanomsg.a, release/lib/libnanomsg.a]
+      - copytree: [src, release/include/nanomsg]
 
     windows64:
-      - copy: [Release\nanomsg.dll, Release/lib]
+      - copy: [release\nanomsg.dll, release/lib]
+      - copytree: [src, release/include/nanomsg]
 
-############
-# NNanomsg #
+
+##########
+# assimp #
 ########################################################################################################################
-nnanomsg:
-  clone: git clone https://github.com/OndraVoves/NNanomsg.git --depth 1
-
-  build:
-    windows64:
-      - devenv NNanomsg.sln /build Debug /project NNanomsg
-      - devenv NNanomsg.sln /build Release /project NNanomsg
-
-    linux64:
-      - xbuild /p:Configuration=Debug NNanomsg/NNanomsg.csproj
-      - xbuild /p:Configuration=Release NNanomsg/NNanomsg.csproj
-
-    darwin64:
-      - xbuild /p:Configuration=Debug NNanomsg/NNanomsg.csproj
-      - xbuild /p:Configuration=Release NNanomsg/NNanomsg.csproj
-
-  install:
-     windows64:
-      - copytree: [NNanomsg\bin\Release, Release\lib]
-      - copytree: [NNanomsg\bin\Debug, Debug\lib]
-
-     linux64:
-      - copytree: [NNanomsg/bin/Release, Release/lib]
-      - copytree: [NNanomsg/bin/Debug, Debug/lib]
-
-     darwin64:
-      - copytree: [NNanomsg/bin/Release, Release/lib]
-      - copytree: [NNanomsg/bin/Debug, Debug/lib]
-
-#########
-# NSpec #
-########################################################################################################################
-nspec:
-  clone: git clone https://github.com/mattflo/NSpec.git --depth 1
-
-  build:
-    windows64:
-      - devenv NSpec.sln /build Release
-
-    linux64:
-      - sed /nuget/d NSpec/NSpec.csproj -i
-      - nuget restore NSpec.sln
-      - xbuild /p:Configuration=Release NSpec/NSpec.csproj
-
-    darwin64:
-      - sed /nuget/d NSpec/NSpec.csproj -i
-      - nuget restore NSpec.sln
-      - xbuild /p:Configuration=Release NSpec/NSpec.csproj
-
-  install:
-     windows64:
-      - copytree: [NSpec\bin\Release, Release\lib]
-      - copytree: [NSpecRunner\bin\Release, Release\bin]
-
-     linux64:
-      - copytree: [NSpec/bin/Release, Release/lib]
-
-     darwin64:
-      - copytree: [NSpec/bin/Release, Release/lib]
-
-##############
-# Assimp-net #
-########################################################################################################################
-assimp-net:
-  clone: git clone https://github.com/assimp/assimp-net.git --depth 1
-
-  build:
-    windows64:
-      - devenv AssimpNet.sln /build net45-Release /project AssimpNet
-
-    linux64:
-      -  xbuild /p:Project=AssimpNet /p:Configuration=net45-Release AssimpNet.sln
-
-#    linux64:
-#      - sed /nuget/d NSpec/NSpec.csproj -i
-#      - nuget restore NSpec.sln
-#      - xbuild /p:Configuration=Release NSpec/NSpec.csproj
-#
-#    darwin64:
-#      - sed /nuget/d NSpec/NSpec.csproj -i
-#      - nuget restore NSpec.sln
-#      - xbuild /p:Configuration=Release NSpec/NSpec.csproj
-
-  install:
-     windows64:
-      - copytree: [AssimpNet\bin\Net45-Release, Release\lib]
-
-     linux64:
-      - copytree: [AssimpNet/bin/Net45-Release, Release/lib]
-
 assimp:
   platforms: [linux64, darwin64]
   clone: git clone https://github.com/assimp/assimp.git --depth 1
 
   build:
     linux64:
-      - cmake .
+      - cmake . -DBUILD_SHARED_LIBS=FALSE -DASSIMP_BUILD_TESTS=FALSE
       - make
-
-#    linux64:
-#      - sed /nuget/d NSpec/NSpec.csproj -i
-#      - nuget restore NSpec.sln
-#      - xbuild /p:Configuration=Release NSpec/NSpec.csproj
-#
-#    darwin64:
-#      - sed /nuget/d NSpec/NSpec.csproj -i
-#      - nuget restore NSpec.sln
-#      - xbuild /p:Configuration=Release NSpec/NSpec.csproj
 
   install:
      linux64:
-      - copyfile: [lib/libassimp.so.3.2.0, Release/lib/Assimp64.so]
+      - copyfile: [lib/libassimp.a, release/lib/libassimp.a]
+      - copytree: [include/assimp, release/include/assimp]
 
+#########
+# catch #
+########################################################################################################################
+catch:
+  clone: git clone https://github.com/philsquared/Catch.git --depth 1
+
+  install:
+    includes: &catch_install_include
+      [single_include/catch.hpp, release/include/catch]
+
+    linux64:
+      - copy: *catch_install_include
+
+    linux32:
+      - copy: *catch_install_include
+
+    darwin64:
+      - copy: *catch_install_include
+
+#########
+# MPack #
+########################################################################################################################
+mpack:
+  clone: git clone https://github.com/ludocode/mpack.git --depth 1
+
+  install:
+    linux64:
+      - copytree: [src/mpack, release/include/mpack]
+      - copyfile: [src/mpack-config.h.sample, release/include/mpack/mpack-config.h.sample]
+
+    darwin64:
+      - copytree: [src/mpack, include/mpack]
+      - copyfile: [src/mpack-config.h.sample, release/include/mpack/mpack-config.h.sample]
