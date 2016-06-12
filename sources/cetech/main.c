@@ -12,6 +12,7 @@
 
 #include "include/mpack/mpack.h"
 #include "include/mpack/mpack-writer.h"
+#include "../celib/math/types.h"
 
 ////////////////////////////////////////////////////////////////////////////////////////
 char get_worker_id() {
@@ -59,9 +60,19 @@ int main(int argc, char **argv) {
     log_info("main", "capacity %zu", ARRAY_CAPACITY(&array));
     log_info("main", "size %zu", ARRAY_SIZE(&array));
 
-    //ARRAY_DESTROY(int, &array);
+    ARRAY_DESTROY(int, &array);
 
     mallocator_destroy(a);
+
+
+    vec2f_t v1 = {0};
+
+    v1.xy[0] = 1.0f;
+    v1.xy[1] = -1.0f;
+
+    log_info("main", "%zu, %f, %f", sizeof(v1), v1.x, v1.y);
+
+
     log_shutdown();
     return 0;
 }

@@ -86,7 +86,7 @@ set(MAIN_SOURCE_FILES
 set(TEST_SOURCE_FILES
         ${SOURCE_FILES}
         sources/tests_main.cc
-        )
+        sources/celib/math/types.h)
 
 ################################################################################
 # Release sources
