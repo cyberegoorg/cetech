@@ -1,5 +1,5 @@
 #include <stdint.h>
-#include <stdatomic.h>
+#include <stddef.h>
 
 uint64_t hash_murmur2_64(const void* key,
                          size_t len,
