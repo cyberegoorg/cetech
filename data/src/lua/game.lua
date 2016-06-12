@@ -97,7 +97,7 @@ function Game:update(dt)
     local dy = 0
     if Mouse.ButtonState(Mouse.ButtonIndex("left")) then
         local m_axis = Mouse.Axis(Mouse.AxisIndex("delta"))
-        dx, dy = m_axis.X, m_axis.Y
+        dx, dy = m_axis.X, -m_axis.Y
     end
 
     local up = Keyboard.ButtonState(Keyboard.ButtonIndex('w'))
@@ -133,6 +133,7 @@ function Game:update(dt)
 
     unit1 = World.UnitByName(self.world, self.level, "box2")
     node = SceneGraph.GetNodeByName(self.world, unit1, "n_cube")
+
     rotator(self.world, node, Quatf.FromAxisAngle(Vec3f.UnitZ, 0.1))
 
     World.Update(self.world, dt)
