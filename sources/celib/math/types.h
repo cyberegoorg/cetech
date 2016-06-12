@@ -19,7 +19,7 @@ typedef union {
     };
 
     // RAW
-    float xy[2];
+    float v[2];
 } vec2f_t;
 
 typedef union {
@@ -38,7 +38,7 @@ typedef union {
     };
 
     // RAW
-    float xyz[3];
+    float v[3];
 } vec3f_t;
 
 typedef union {
@@ -59,7 +59,7 @@ typedef union {
     };
 
     // RAW
-    float xyzw[4];
+    float v[4];
 } vec4f_t;
 
 /*******************************************************************************

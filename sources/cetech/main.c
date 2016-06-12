@@ -13,6 +13,8 @@
 #include "include/mpack/mpack.h"
 #include "include/mpack/mpack-writer.h"
 #include "../celib/math/types.h"
+#include "../celib/math/vec2f.h"
+#include "../celib/math/vec4f.h"
 
 ////////////////////////////////////////////////////////////////////////////////////////
 char get_worker_id() {
@@ -64,11 +66,11 @@ int main(int argc, char **argv) {
 
     mallocator_destroy(a);
 
+    vec4f_t v1 = {0};
+    vec4f_t v2 = {.x = 1.0f, .y = 2.0f, .z = 3.0f, .w = 4.0f};
 
-    vec2f_t v1 = {0};
-
-    v1.xy[0] = 1.0f;
-    v1.xy[1] = -1.0f;
+    v1 = vec4f_add(v1, v2);
+    v1 = vec4f_sub(v1, v2);
 
     log_info("main", "%zu, %f, %f", sizeof(v1), v1.x, v1.y);
 
