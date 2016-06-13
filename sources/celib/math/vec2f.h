@@ -3,57 +3,47 @@
 
 #include <math.h>
 
-#include "types.h"
-
-#define vec2f_make(xx, yy) (vec2f_t){ .x = xx, .y = yy }
-
-static inline vec2f_t vec2f_add(vec2f_t a, vec2f_t b) {
-    return vec2f_make(
-            a.x + b.x,
-            a.y + b.y
-    );
+static inline void vec2f_set(float* restrict result, const float* restrict a) {
+    result[0] = a[0];
+    result[1] = a[1];
 }
 
-static inline vec2f_t vec2f_sub(vec2f_t a, vec2f_t b) {
-    return vec2f_make(
-            a.x - b.x,
-            a.y - b.y
-    );
+static inline void vec2f_add(float* restrict result, const float* restrict a, const float* restrict b) {
+    result[0] = a[0] + b[0];
+    result[1] = a[1] + b[1];
 }
 
-static inline vec2f_t vec2f_mul(vec2f_t a, float s) {
-    return vec2f_make(
-            a.x * s,
-            a.y * s
-    );
+static inline void vec2f_sub(float* restrict result, const float* restrict a, const float* restrict b) {
+    result[0] = a[0] - b[0];
+    result[1] = a[1] - b[1];
 }
 
-static inline vec2f_t vec2f_div(vec2f_t a, float s) {
-    const float inv_s = 1.0f/s;
-    return vec2f_make(
-            a.x * inv_s,
-            a.y * inv_s
-    );
+static inline void vec2f_mul(float* restrict result, const float* restrict a, const float s) {
+    result[0] = a[0] * s;
+    result[1] = a[1] * s;
 }
 
-static inline vec2f_t vec2f_dot(vec2f_t a, vec2f_t b) {
-    return vec2f_make(
-            a.x * b.x,
-            a.y * b.y
-    );
+static inline void vec2f_div(float* restrict result, const float* restrict a, const float s) {
+    result[0] = a[0] / s;
+    result[1] = a[1] / s;
 }
 
-static inline float vec2f_length_squared(vec2f_t a) {
-    return (a.x * a.x) + (a.y * a.y);
+static inline float vec2f_dot(const float* restrict a, const float* restrict b) {
+    return (a[0] * b[0]) + (a[1] * b[1]);
 }
 
-static inline float vec2f_length(vec2f_t a) {
-    return sqrtf((a.x * a.x) + (a.y * a.y));
+static inline float vec2f_length_squared(const float* restrict a) {
+    return (a[0] * a[0]) + (a[1] * a[1]);
 }
 
-static inline vec2f_t vec2f_normalized(vec2f_t a) {
+static inline float vec2f_length(const float* restrict a) {
+    return sqrtf(vec2f_length_squared(a));
+}
+
+static inline void vec2f_normalized(float* restrict result, const float* restrict a) {
     const float inv_length = 1.0f/vec2f_length(a);
-    return vec2f_make(a.x * inv_length, a.y * inv_length);
+
+    vec2f_mul(result, a, inv_length);
 }
 
 #endif //CETECH_VEC2F_H
