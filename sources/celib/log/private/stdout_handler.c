@@ -17,13 +17,14 @@
 #define COLOR_BLUE  "\x1B[34m"
 #define COLOR_RESET "\033[0m"
 
-#define LOG_FORMAT \
-    "---\n" \
-    "level: %s\n" \
-    "where: %s\n" \
-    "time: %s\n" \
-    "worker: %d\n" \
-    "msg: |\n  %s\n"
+#define LOG_FORMAT   \
+    "---\n"          \
+    "level: %s\n"    \
+    "where: %s\n"    \
+    "time: %s\n"     \
+    "worker: %d\n"   \
+    "msg: |\n  %s\n" \
+
 
 #ifdef CETECH_COLORED_LOG
 #define COLORED_TEXT(color, text) color text COLOR_RESET
@@ -32,24 +33,24 @@
 #endif
 
 static const char* _level_to_str[4] = {
-        [LOG_INFO] = "info",
+        [LOG_INFO]    = "info",
         [LOG_WARNING] = "warning",
-        [LOG_ERROR] = "error",
-        [LOG_DBG] = "debug"
+        [LOG_ERROR]   = "error",
+        [LOG_DBG]     = "debug"
 };
 
 static const char* _level_format[4] = {
-        [LOG_INFO] = COLORED_TEXT(COLOR_BLUE, LOG_FORMAT),
+        [LOG_INFO]    = COLORED_TEXT(COLOR_BLUE, LOG_FORMAT),
         [LOG_WARNING] = COLORED_TEXT(COLOR_YELLOW, LOG_FORMAT),
-        [LOG_ERROR] = COLORED_TEXT(COLOR_RED, LOG_FORMAT),
-        [LOG_DBG] = COLORED_TEXT(COLOR_GREEN, LOG_FORMAT)
+        [LOG_ERROR]   = COLORED_TEXT(COLOR_RED, LOG_FORMAT),
+        [LOG_DBG]     = COLORED_TEXT(COLOR_GREEN, LOG_FORMAT)
 };
 
 static const char* _nocolor_level_format[4] = {
-        [LOG_INFO] = LOG_FORMAT,
+        [LOG_INFO]    = LOG_FORMAT,
         [LOG_WARNING] = LOG_FORMAT,
-        [LOG_ERROR] = LOG_FORMAT,
-        [LOG_DBG] =LOG_FORMAT
+        [LOG_ERROR]   = LOG_FORMAT,
+        [LOG_DBG]     =LOG_FORMAT
 };
 
 
@@ -82,5 +83,6 @@ void log_stdout_handler( enum log_level level,
             where, time_str, worker_id, msg);
 
     fflush(out);
+
     funlockfile(out);
 }
