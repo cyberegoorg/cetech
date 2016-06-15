@@ -16,6 +16,23 @@ if(CMAKE_BUILD_TYPE STREQUAL "Debug")
     add_definitions(-DCETECH_DEBUG)
 endif()
 
+if (CMAKE_BUILD_TYPE STREQUAL "Debug")
+    set(CONFIGURATION debug)
+else()
+    set(CONFIGURATION release)
+endif()
+
+if(UNIX)
+    set(PLATFORM_ID linux64)
+
+elseif(WIN32)
+    set(PLATFORM_ID windows64)
+
+elseif(APPLE)
+    set(PLATFORM_ID darwin64)
+
+endif()
+
 ################################################################################
 # Sources
 ################################################################################
@@ -23,12 +40,12 @@ set(SOURCE_FILES
         ########################################################################
         # Externals: MPack
         ########################################################################
-        externals/build/linux64/release/include/mpack/mpack-common.c
-        externals/build/linux64/release/include/mpack/mpack-expect.c
-        externals/build/linux64/release/include/mpack/mpack-node.c
-        externals/build/linux64/release/include/mpack/mpack-platform.c
-        externals/build/linux64/release/include/mpack/mpack-reader.c
-        externals/build/linux64/release/include/mpack/mpack-writer.c
+        externals/build/${PLATFORM_ID}/release/include/mpack/mpack-common.c
+        externals/build/${PLATFORM_ID}/release/include/mpack/mpack-expect.c
+        externals/build/${PLATFORM_ID}/release/include/mpack/mpack-node.c
+        externals/build/${PLATFORM_ID}/release/include/mpack/mpack-platform.c
+        externals/build/${PLATFORM_ID}/release/include/mpack/mpack-reader.c
+        externals/build/${PLATFORM_ID}/release/include/mpack/mpack-writer.c
 
         ########################################################################
         # CELIB: Containers
@@ -105,10 +122,10 @@ set(RELEASE_LIBS
 # Develop sources
 ################################################################################
 set(DEVELOP_LIBS
-        ${RELEASE_LIBS}
-        nanomsg
-        assimp
-        )
+    ${RELEASE_LIBS}
+    nanomsg
+    assimp
+)
 
 ################################################################################
 # Cetech RUNTIME
@@ -116,7 +133,7 @@ set(DEVELOP_LIBS
 add_executable(cetech ${MAIN_SOURCE_FILES})
 target_compile_definitions(cetech PUBLIC -DCETECH_RELEASE)
 target_link_libraries(cetech ${RELEASE_LIBS} )
-target_include_directories(cetech PUBLIC externals/build/linux64/release/ )
+target_include_directories(cetech PUBLIC externals/build/${PLATFORM_ID}/release/ )
 
 
 ################################################################################
@@ -125,7 +142,7 @@ target_include_directories(cetech PUBLIC externals/build/linux64/release/ )
 add_executable(cetech_develop ${MAIN_SOURCE_FILES})
 target_compile_definitions(cetech_develop PUBLIC -DCETECH_DEVELOP)
 target_link_libraries(cetech_develop ${DEVELOP_LIBS} )
-target_include_directories(cetech_develop PUBLIC externals/build/linux64/release/ )
+target_include_directories(cetech_develop PUBLIC externals/build/${PLATFORM_ID}/${CONFIGURATION}/ )
 
 
 ################################################################################
@@ -134,4 +151,4 @@ target_include_directories(cetech_develop PUBLIC externals/build/linux64/release
 add_executable(cetech_tests ${TEST_SOURCE_FILES})
 target_compile_definitions(cetech_tests PUBLIC -DCETECH_TEST -DCETECH_DEVELOP)
 target_link_libraries(cetech_tests ${DEVELOP_LIBS} )
-target_include_directories(cetech_tests PUBLIC externals/build/linux64/release/ )
+target_include_directories(cetech_tests PUBLIC externals/build/${PLATFORM_ID}/${CONFIGURATION}/ )

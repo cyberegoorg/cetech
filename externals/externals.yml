@@ -12,6 +12,9 @@ bx:
     linux64:
       - copytree: *bx_install_include
 
+    windows64:
+      - copytree: *bx_install_include
+
     darwin64:
       - copytree: *bx_install_include
 
@@ -30,6 +33,11 @@ bgfx:
     darwin64:
       - make osx-release64
       - make osx-debug64
+
+    windows64:
+      - ../tools/bin/windows/genie --with-tools --with-shared-lib vs2015
+      - devenv .build/projects/vs2015/bgfx.sln /Build "Debug|x64"
+      devenv .build/projects/vs2015/bgfx.sln /Build "Release|x64"
 
   install:
     includes: &bgfx_install_include
@@ -114,13 +122,22 @@ nanomsg:
       - copyfile: [libnanomsg.a, release/lib/libnanomsg.a]
       - copytree: [src, release/include/nanomsg]
 
+      - copyfile: [libnanomsg.a, debug/lib/libnanomsg.a]
+      - copytree: [src, debug/include/nanomsg]
+
     darwin64:
       - copyfile: [libnanomsg.a, release/lib/libnanomsg.a]
       - copytree: [src, release/include/nanomsg]
 
+      - copyfile: [libnanomsg.a, debug/lib/libnanomsg.a]
+      - copytree: [src, debug/include/nanomsg]
+
     windows64:
-      - copy: [release\nanomsg.dll, release/lib]
+      - copy: [release\nanomsg.dll, debugrelease/lib]
       - copytree: [src, release/include/nanomsg]
+
+      - copy: [release\nanomsg.dll, debug/lib]
+      - copytree: [src, debug/include/nanomsg]
 
 
 ##########
@@ -147,17 +164,23 @@ catch:
   clone: git clone https://github.com/philsquared/Catch.git --depth 1
 
   install:
-    includes: &catch_install_include
+    includes_relese: &catch_install_include_release
       [single_include/catch.hpp, release/include/catch]
 
-    linux64:
-      - copy: *catch_install_include
+    includes_debug: &catch_install_include_debug
+      [single_include/catch.hpp, debug/include/catch]
 
-    linux32:
-      - copy: *catch_install_include
+    linux64:
+      - copy: *catch_install_include_release
+      - copy: *catch_install_include_debug
+
+    windows64:
+      - copy: *catch_install_include_release
+      - copy: *catch_install_include_debug
 
     darwin64:
-      - copy: *catch_install_include
+      - copy: *catch_install_include_release
+      - copy: *catch_install_include_debug
 
 #########
 # MPack #
@@ -170,6 +193,20 @@ mpack:
       - copytree: [src/mpack, release/include/mpack]
       - copyfile: [src/mpack-config.h.sample, release/include/mpack/mpack-config.h.sample]
 
+      - copytree: [src/mpack, debug/include/mpack]
+      - copyfile: [src/mpack-config.h.sample, debug/include/mpack/mpack-config.h.sample]
+
+    windows64:
+      - copytree: [src/mpack, include/mpack]
+      - copyfile: [src/mpack-config.h.sample, release/include/mpack/mpack-config.h.sample]
+
+      - copytree: [src/mpack, debug/include/mpack]
+      - copyfile: [src/mpack-config.h.sample, debug/include/mpack/mpack-config.h.sample]
+
+
     darwin64:
       - copytree: [src/mpack, include/mpack]
       - copyfile: [src/mpack-config.h.sample, release/include/mpack/mpack-config.h.sample]
+
+      - copytree: [src/mpack, debug/include/mpack]
+      - copyfile: [src/mpack-config.h.sample, debug/include/mpack/mpack-config.h.sample]
