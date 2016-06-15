@@ -8,34 +8,32 @@ set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=c11")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11" )
 set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -rdynamic")
 
-add_definitions( -DCETECH_COLORED_LOG )
 include_directories(soureces)
-
-if(CMAKE_BUILD_TYPE STREQUAL "Debug")
-    add_definitions(-DCETECH_DEBUG)
-endif()
 
 if (CMAKE_BUILD_TYPE STREQUAL "Debug")
     set(CONFIGURATION debug)
+    add_definitions(-DCETECH_DEBUG)
 else()
     set(CONFIGURATION release)
 endif()
 
-if(UNIX)
+
+if(APPLE)
+    set(PLATFORM_ID darwin64)
+
+    add_definitions(-DCETECH_COLORED_LOG)
+    add_definitions(-DCETECH_DARWIN)
+
+elseif(UNIX)
     set(PLATFORM_ID linux64)
 
     add_definitions(-DCETECH_LINUX)
+    #add_definitions(-DCETECH_COLORED_LOG)
 
 elseif(WIN32)
     set(PLATFORM_ID windows64)
 
     add_definitions(-DCETECH_WINDOWS)
-
-elseif(APPLE)
-    set(PLATFORM_ID darwin64)
-
-    add_definitions(-DCETECH_DARWIN)
-
 endif()
 
 link_directories(externals/build/${PLATFORM_ID}/release/lib/)
