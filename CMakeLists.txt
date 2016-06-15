@@ -5,7 +5,7 @@ cmake_minimum_required(VERSION 3.5)
 project(cetech)
 
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=c11")
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11" )
 set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -rdynamic")
 
 add_definitions( -DCETECH_COLORED_LOG )
@@ -86,7 +86,7 @@ set(MAIN_SOURCE_FILES
 set(TEST_SOURCE_FILES
         ${SOURCE_FILES}
         sources/tests_main.cc
-)
+        sources/celib/math/tests/test_vec2f.cc)
 
 ################################################################################
 # Release sources
