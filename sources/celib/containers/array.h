@@ -82,6 +82,7 @@
         T* newdata = 0;                                                         \
         if (newcapacity > 0) {                                                  \
             newdata = (T*) alloc_alloc(a->allocator, sizeof(T) * newcapacity/*, __alignof(T)*/);\
+            CE_ASSERT("array", newdata !=NULL);                                 \
             memory_copy(newdata, a->data, sizeof(T) * a->size);                 \
         }                                                                       \
                                                                                 \
