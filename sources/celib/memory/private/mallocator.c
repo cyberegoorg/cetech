@@ -3,7 +3,7 @@
 #include <stdio.h>
 
 #include "../allocator.h"
-#include "ialocator.h"
+#include "../ialocator.h"
 
 #include "../../string/string.h"
 #include "../../utils/utils.h"
