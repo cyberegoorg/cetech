@@ -21,6 +21,55 @@ char get_worker_id() {
     return 0;
 }
 
+#include "../celib/memory/ialocator.h"
+
+#define STATOCATOR_T(size) \
+    struct statocator##size {\
+        struct iallocator i;\
+        size_t offset;\
+        char buffer[size];\
+    };\
+\
+    void *_statocator_malloc_##size(Alloc_t allocator, size_t _size) {\
+        CE_ASSERT("main", allocator != NULL);\
+        CE_ASSERT("main", _size != 0);\
+    \
+        struct statocator##size *a = (struct statocator##size*)allocator;\
+    \
+        if( a->offset + _size > size) {\
+            return NULL;\
+        }\
+    \
+        void *p = a->buffer + a->offset;\
+    \
+        a->offset += _size;\
+    \
+        return p;\
+    }\
+\
+    void _statocator_clear_##size(Alloc_t allocator) {\
+        CE_ASSERT("main", allocator != NULL);\
+    \
+        struct statocator##size *a = (struct statocator##size*)allocator;\
+        a->offset = 0;\
+    }\
+
+
+#define STATOCATOR(name, size) \
+    struct statocator##size name = { .i = {.type_name = "statocator", .alloc = _statocator_malloc_##size, .free = _statocator_free}, .buffer = {0}, .offset = 0} \
+
+#define STATOCATOR_CLEAR(allocator, size) \
+    _statocator_clear_##size (allocator)\
+
+
+#define STATOCATOR_INIT(size) \
+    { .i = {.type_name = "statocator", .alloc = _statocator_malloc_##size, .free = _statocator_free}, .buffer = {0}, .offset = 0} \
+
+
+STATOCATOR_T(_1KiB)
+
+void _statocator_free(Alloc_t allocator, void *ptr) {
+}
 
 
 int main(int argc, char **argv) {
@@ -66,14 +115,37 @@ int main(int argc, char **argv) {
 
     mallocator_destroy(a);
 
-    vec4f_t v1 = {0};
-    vec4f_t v2 = {.x = 1.0f, .y = 2.0f, .z = 3.0f, .w = 4.0f};
+    #define BLOCK (_8KiB*4)
 
-    v1 = vec4f_add(v1, v2);
-    v1 = vec4f_sub(v1, v2);
+    float v1[BLOCK] = {[0 ... (BLOCK-1)] = 1.0f};
+    float v2[BLOCK] = {[0 ... (BLOCK-1)] = 0.0f};
 
-    log_info("main", "%zu, %f, %f", sizeof(v1), v1.x, v1.y);
+    vec4f_t tmp_a = {0};
+    vec4f_t tmp_b = {0};
+    vec4f_t tmp_c = {0};
 
+    for (size_t j = 0; j < BLOCK; j += 4) {
+        vec4f_add(tmp_a, v1+j, v2+j);
+        vec4f_add(tmp_b, tmp_a, tmp_b);
+    }
+
+    log_info("main", "%f, %f, %f, %f", tmp_b[0], tmp_b[1], tmp_b[2], tmp_b[3]);
+
+
+    STATOCATOR(sa, _1KiB);
+    ARRAY_INIT(int, &array, &sa);
+
+    for (int i = 0; i < 100; ++i) {
+        ARRAY_PUSH_BACK(int, &array, i);
+    }
+
+    for (int i = 0; i < ARRAY_SIZE(&array); ++i) {
+        log_info("main", "II: %d", ARRAY_AT(&array, i));
+    }
+
+    ARRAY_DESTROY(int, &array);
+
+    STATOCATOR_CLEAR(&sa, _1KiB);
 
     log_shutdown();
     return 0;
