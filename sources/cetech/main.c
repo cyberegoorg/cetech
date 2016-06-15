@@ -143,7 +143,7 @@ int main(int argc, char **argv) {
         log_info("main", "II: %d", ARRAY_AT(&array, i));
     }
 
-    ARRAY_DESTROY(int, &array);
+    //ARRAY_DESTROY(int, &array);
 
     STATOCATOR_CLEAR(&sa, _1KiB);
 

@@ -77,12 +77,16 @@ void log_stdout_handler( enum log_level level,
     struct tm* gmtm = gmtime(&time);
     const char* time_str = _time_to_str(gmtm);
 
+#if defined(CETECH_LINUX)
     flockfile(out);
+#endif
 
     fprintf(out, _level_format[level], _level_to_str[level],
             where, time_str, worker_id, msg);
 
     fflush(out);
 
+#if defined(CETECH_LINUX)
     funlockfile(out);
+#endif
 }

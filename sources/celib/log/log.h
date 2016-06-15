@@ -12,8 +12,7 @@
 
 #include <time.h>
 #include <stdint.h>
-#include <zconf.h>
-
+#include <stdarg.h>
 
 #define ATTR_FORMAT(fmt, args) __attribute__ ((format(printf, fmt, args)))
 

@@ -2,7 +2,7 @@
 # bx #
 ########################################################################################################################
 bx:
-  platforms: [linux64, darwin64]
+  platforms: [linux64, darwin64, windows64]
   clone: git clone https://github.com/bkaradzic/bx --depth 1
 
   install:
@@ -22,7 +22,7 @@ bx:
 # bgfx #
 ########################################################################################################################
 bgfx:
-  platforms: [linux64, darwin64]
+  platforms: [linux64, darwin64, windows64]
   clone: git clone https://github.com/bkaradzic/bgfx --depth 1
 
   build:
@@ -35,9 +35,9 @@ bgfx:
       - make osx-debug64
 
     windows64:
-      - ../tools/bin/windows/genie --with-tools --with-shared-lib vs2015
-      - devenv .build/projects/vs2015/bgfx.sln /Build "Debug|x64"
-      devenv .build/projects/vs2015/bgfx.sln /Build "Release|x64"
+      - ../bx/tools/bin/windows/genie --with-tools --with-shared-lib vs2015
+      - devenv .build/projects/vs2015/bgfx.sln /Build Debug|x64
+      - devenv .build/projects/vs2015/bgfx.sln /Build Release|x64
 
   install:
     includes: &bgfx_install_include
@@ -56,6 +56,14 @@ bgfx:
       - copyfile: [.build/osx64_clang/bin/libbgfxDebug.a, debug/lib/libbgfxDebug.a]
       - copyfile: [.build/osx64_clang/bin/shadercRelease, release/bin/shaderc]
       - copyfile: [.build/osx64_clang/bin/texturecRelease, release/bin/texturec]
+
+    windows64:
+      - copytree: *bgfx_install_include
+      - copyfile: [.build/win64_vs2015/bin/bgfx-shared-libRelease.lib, release/lib/bgfxRelease.lib]
+      - copyfile: [.build/win64_vs2015/bin/bgfx-shared-libDebug.lib, debug/lib/bgfxDebug.lib]
+      - copyfile: [.build/win64_vs2015/bin/shadercRelease.exe, release/bin/shaderc.exe]
+      - copyfile: [.build/win64_vs2015/bin/texturecRelease.exe, release/bin/texturec.exe]
+
 
 ########
 # SLD2 #
@@ -114,7 +122,7 @@ nanomsg:
     linux64:  *nanomsg_build_posix
     darwin64: *nanomsg_build_posix
     windows64:
-      - cmake . -DNN_STATIC_LIB=TRUE
+      - cmake .
       - devenv nanomsg.sln /build release
 
   install:
@@ -133,10 +141,10 @@ nanomsg:
       - copytree: [src, debug/include/nanomsg]
 
     windows64:
-      - copy: [release\nanomsg.dll, debugrelease/lib]
+      - copy: [Release\nanomsg.dll, release/lib]
       - copytree: [src, release/include/nanomsg]
 
-      - copy: [release\nanomsg.dll, debug/lib]
+      - copy: [Release\nanomsg.dll, debug/lib]
       - copytree: [src, debug/include/nanomsg]
 
 
@@ -144,7 +152,7 @@ nanomsg:
 # assimp #
 ########################################################################################################################
 assimp:
-  platforms: [linux64, darwin64]
+  platforms: [linux64, windows64]
   clone: git clone https://github.com/assimp/assimp.git --depth 1
 
   build:
@@ -152,9 +160,18 @@ assimp:
       - cmake . -DBUILD_SHARED_LIBS=FALSE -DASSIMP_BUILD_TESTS=FALSE
       - make
 
+    windows64:
+      - cmake . -DBUILD_SHARED_LIBS=FALSE -DASSIMP_BUILD_TESTS=FALSE
+      - devenv assimp.sln /build release
+
   install:
      linux64:
       - copyfile: [lib/libassimp.a, release/lib/libassimp.a]
+      - copytree: [include/assimp, release/include/assimp]
+
+     windows64:
+      - copyfile: [lib/release/assimp.lib, release/lib/assimp.lib]
+      - copyfile: [lib/release/zlibstatic.lib, release/lib/zlibstatic.lib]
       - copytree: [include/assimp, release/include/assimp]
 
 #########
@@ -197,7 +214,7 @@ mpack:
       - copyfile: [src/mpack-config.h.sample, debug/include/mpack/mpack-config.h.sample]
 
     windows64:
-      - copytree: [src/mpack, include/mpack]
+      - copytree: [src/mpack, release/include/mpack]
       - copyfile: [src/mpack-config.h.sample, release/include/mpack/mpack-config.h.sample]
 
       - copytree: [src/mpack, debug/include/mpack]
@@ -205,7 +222,7 @@ mpack:
 
 
     darwin64:
-      - copytree: [src/mpack, include/mpack]
+      - copytree: [src/mpack, release/include/mpack]
       - copyfile: [src/mpack-config.h.sample, release/include/mpack/mpack-config.h.sample]
 
       - copytree: [src/mpack, debug/include/mpack]

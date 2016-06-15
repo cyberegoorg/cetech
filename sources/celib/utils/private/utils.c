@@ -1,11 +1,16 @@
 #include <memory.h>
 #include <stdlib.h>
-#include <execinfo.h>
+
 #include <stdio.h>
 #include "../../memory/memory.h"
 #include "../../memory/allocator.h"
 
+#if defined(CETECH_LINUX)
+#include <execinfo.h>
+#endif
+
 char *utils_stacktrace(int skip) {
+#if defined(CETECH_LINUX)
     char *return_str = (char *) memory_malloc(4096 * 8);
     return_str[0] = '\0';
 
@@ -51,8 +56,9 @@ char *utils_stacktrace(int skip) {
     }
 
     memory_free(messages);
-
     return return_str;
+#endif
+    return NULL;
 }
 
 void utils_stacktrace_free(char * st) {

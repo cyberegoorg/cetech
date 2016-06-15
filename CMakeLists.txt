@@ -10,7 +10,6 @@ set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -rdynamic")
 
 add_definitions( -DCETECH_COLORED_LOG )
 include_directories(soureces)
-link_directories(externals/build/linux64/release/lib/)
 
 if(CMAKE_BUILD_TYPE STREQUAL "Debug")
     add_definitions(-DCETECH_DEBUG)
@@ -25,13 +24,21 @@ endif()
 if(UNIX)
     set(PLATFORM_ID linux64)
 
+    add_definitions(-DCETECH_LINUX)
+
 elseif(WIN32)
     set(PLATFORM_ID windows64)
+
+    add_definitions(-DCETECH_WINDOWS)
 
 elseif(APPLE)
     set(PLATFORM_ID darwin64)
 
+    add_definitions(-DCETECH_DARWIN)
+
 endif()
+
+link_directories(externals/build/${PLATFORM_ID}/release/lib/)
 
 ################################################################################
 # Sources
@@ -108,14 +115,28 @@ set(TEST_SOURCE_FILES
 ################################################################################
 # Release sources
 ################################################################################
-set(RELEASE_LIBS
-    jemalloc_pic
-    pthread
-    anl # NANOMSG
 
+if(UNIX)
+    set(RELEASE_LIBS_LINUX
+        jemalloc_pic
+        pthread
+        anl # NANOMSG
+    )
+endif()
+
+if(WIN32)
+    set(RELEASE_LIBS_WINDOWS
+        zlibstatic
+    )
+endif()
+
+set(RELEASE_LIBS
+    ${RELEASE_LIBS_LINUX}
+    ${RELEASE_LIBS_WINDOWS}
+
+	nanomsg
     bgfxRelease
-    SDL2
-    nanomsg
+#    SDL2
 )
 
 ################################################################################
@@ -123,7 +144,6 @@ set(RELEASE_LIBS
 ################################################################################
 set(DEVELOP_LIBS
     ${RELEASE_LIBS}
-    nanomsg
     assimp
 )
 
