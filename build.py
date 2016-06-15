@@ -29,11 +29,6 @@ ROOT_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)))
 BUILD_DIR = os.path.abspath(os.path.join(ROOT_DIR, 'build'))
 EXTERNAL_BUILD_DIR = os.path.abspath(os.path.join(ROOT_DIR, 'externals', 'build'))
 
-GENIE = os.path.join(EXTERNAL_BUILD_DIR,
-                     "%s%s" % (OS_NAME, OS_ARCH),
-                     'bin',
-                     'genie')
-
 DEFAULT_BUILD = "%s%s" % (OS_NAME, OS_ARCH)
 
 ##########
@@ -49,37 +44,16 @@ ACTIONS = {
 
 BUILD_ACTION = ('build', '')
 
-# Build config.
-CONFIG = {
-    'develop',
-    'runtime'
-}
-
 # Build platform.
 PLATFORMS = {
-    'windows64',
     'linux64',
-    'darwin64',
-}
-
-# Build platform.
-PLATFORMS_PROTOBUILD = {
-    'windows64': 'Windows',
-    'linux64': 'Linux',
-    'darwin64': 'MacOS'
 }
 
 # Build platform.
 PLATFORMS_SLN = {
     'windows64': 'CETech.Windows.sln',
-    'linux64': 'CETech.Linux.sln',
-    'darwin64': 'CETech.MacOS.sln'
 }
 
-# Build platform.
-PROTOBUILD_CONFIG = {
-    'runtime': ['-disable', 'Develop']
-}
 
 def make_vs(config, platform_, debug):
     cmds = [os.path.join('C:\Program Files (x86)\Microsoft Visual Studio 14.0\Common7\IDE', 'devenv'),
@@ -93,20 +67,18 @@ def make_vs(config, platform_, debug):
     return cmds
 
 
-def make_xbuild(config, platform_, debug):
-    cmds = ['xbuild', PLATFORMS_SLN[platform_]]
-
+def make_make(config, platform_, debug):
     if not debug:
-        cmds.append('/p:configuration=Release')
+        cmds = ['make']
     else:
-        cmds.append('/p:configuration=Debug')
+        cmds = ['make']
 
     return cmds
 
 
 PLATFORMS_MAKE = {
-    'windows64': make_vs,
-    'linux64': make_xbuild
+    # 'windows64': make_vs,
+    'linux64': make_make
 }
 
 ########
@@ -144,26 +116,19 @@ ARGS_PARSER.add_argument(
 # PROGRAM #
 ########################################################################################################################
 
-def run_protobuild(config, platform_, action=''):
+def run_cmake(config, platform_, action=''):
     """Run platform specific genie command.
     """
-    print('Runing Protobuild.exe.')
 
-    if 'windows' in platform_:
-        cmds = [os.path.join(ROOT_DIR, 'Protobuild.exe')]
-    else:
-        cmds = ['mono', os.path.join(ROOT_DIR, 'Protobuild.exe')]
+    print('Runing cmake')
 
-    # if config in PROTOBUILD_CONFIG:
-    #     cmds.extend(PROTOBUILD_CONFIG[config])
+    os.makedirs(BUILD_DIR, exist_ok=True)
+    os.chdir(BUILD_DIR)
 
-    if action in BUILD_ACTION:
-        cmds.append('--generate')
-        cmds.append(PLATFORMS_PROTOBUILD[platform_])
-    elif action == 'clean':
-        cmds.append('--clean')
+    cmds = ['cmake', os.pardir, '-DCMAKE_C_COMPILER=clang', '-DCMAKE_CXX_COMPILER=clang++', '-DCMAKE_BUILD_TYPE=Debug']
 
     subprocess.check_call(cmds)
+
 
 def make(config, platform_, debug, generate_only=False):
     """Make build
@@ -172,7 +137,7 @@ def make(config, platform_, debug, generate_only=False):
     :param platform_: Build platform.
     :param generate_only: Do not run build, only create projects files.
     """
-    run_protobuild(config=config, platform_=platform_)
+    run_cmake(config=config, platform_=platform_)
 
     if not generate_only:
         cmds = PLATFORMS_MAKE[platform_](config=config, platform_=platform_, debug=debug)
@@ -184,9 +149,11 @@ def clean(config, platform_):
     """
 
     print('Cleaning...')
-    shutil.rmtree(os.path.join('sources', 'CETech', 'bin'))
-    shutil.rmtree(os.path.join('sources', 'CETech', 'obj'))
-    run_protobuild(config=config, platform_=platform_, action='clean')
+
+    try:
+        shutil.rmtree(BUILD_DIR);
+    except FileNotFoundError:
+        pass
 
 
 def main(args=None):
@@ -196,8 +163,8 @@ def main(args=None):
     args = ARGS_PARSER.parse_args(args=args)
 
     action = args.action
-    if action == '':
-        make(config=None, #args.config,
+    if action in BUILD_ACTION:
+        make(config=None,  # args.config,
              platform_=args.platform,
              generate_only=args.generate,
              debug=args.debug)
