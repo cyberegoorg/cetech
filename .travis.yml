@@ -1,17 +1,10 @@
 matrix:
   include:
     - os: linux
-      compiler: clang
-      addons: &clang38
-        apt:
-          sources: ['llvm-toolchain-precise-3.8', 'ubuntu-toolchain-r-test']
-          packages: ['clang-3.8']
-      env: COMPILER='ccache clang++-3.8' BUILD_TYPE='Release'
+      env: COMPILER='ccache clang++-3.8' BUILD_TYPE='Release' LLVM_VERSION=3.8.0
 
     - os: linux
-      compiler: clang
-      addons: *clang38
-      env: COMPILER='ccache clang++-3.8' BUILD_TYPE='Debug'
+      env: COMPILER='ccache clang++-3.8' BUILD_TYPE='Debug' LLVM_VERSION=3.8.0
 
 language: cpp
 sudo: false
@@ -24,6 +17,15 @@ install:
       CMAKE_URL="http://www.cmake.org/files/v3.5/cmake-3.5.2-Linux-x86_64.tar.gz"
       mkdir cmake && travis_retry wget --quiet -O - ${CMAKE_URL} | tar --strip-components=1 -xz -C cmake
       export PATH=${DEPS_DIR}/cmake/bin:${PATH}
+
+      if [ -z "$(ls -A llvm-$LLVM_VERSION)" ]; then
+        wget -O llvm-$LLVM_VERSION.tar.xz http://llvm.org/releases/$LLVM_VERSION/clang+llvm-$LLVM_VERSION-x86_64-linux-gnu-ubuntu-14.04.tar.xz;
+        mkdir llvm-$LLVM_VERSION;
+        xzcat llvm-$LLVM_VERSION.tar.xz | tar -xvf - --strip 1 -C llvm-$LLVM_VERSION;
+      fi;
+      llvm-$LLVM_VERSION/bin/llvm-config --version;
+      export LLVM_CONFIG="llvm-$LLVM_VERSION/bin/llvm-config";
+
     elif [[ "${TRAVIS_OS_NAME}" == "osx" ]]; then
       brew install cmake ccache
     fi
