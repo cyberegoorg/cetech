@@ -28,7 +28,7 @@ elseif(UNIX)
     set(PLATFORM_ID linux64)
 
     add_definitions(-DCETECH_LINUX)
-    #add_definitions(-DCETECH_COLORED_LOG)
+    add_definitions(-DCETECH_COLORED_LOG)
 
 elseif(WIN32)
     set(PLATFORM_ID windows64)
@@ -41,7 +41,8 @@ link_directories(externals/build/${PLATFORM_ID}/release/lib/)
 ################################################################################
 # Sources
 ################################################################################
-set(SOURCE_FILES
+
+set(EXTERNAL_SOURCE_FILES
         ########################################################################
         # Externals: MPack
         ########################################################################
@@ -51,6 +52,10 @@ set(SOURCE_FILES
         externals/build/${PLATFORM_ID}/release/include/mpack/mpack-platform.c
         externals/build/${PLATFORM_ID}/release/include/mpack/mpack-reader.c
         externals/build/${PLATFORM_ID}/release/include/mpack/mpack-writer.c
+)
+
+set(SOURCE_FILES
+        ${EXTERNAL_SOURCE_FILES}
 
         ########################################################################
         # CELIB: Containers
@@ -92,6 +97,12 @@ set(SOURCE_FILES
         ########################################################################
         sources/celib/crypto/private/murmur.c
         sources/celib/crypto/tests/test_murmur.cc
+
+        ########################################################################
+        # CELIB: Math
+        ########################################################################
+        sources/celib/math/tests/test_vec2f.cc
+        sources/celib/math/tests/test_vec3f.cc
 )
 
 ################################################################################
@@ -108,7 +119,7 @@ set(MAIN_SOURCE_FILES
 set(TEST_SOURCE_FILES
         ${SOURCE_FILES}
         sources/tests_main.cc
-        sources/celib/math/tests/test_vec2f.cc)
+)
 
 ################################################################################
 # Release sources
@@ -170,3 +181,13 @@ add_executable(cetech_tests ${TEST_SOURCE_FILES})
 target_compile_definitions(cetech_tests PUBLIC -DCETECH_TEST -DCETECH_DEVELOP)
 target_link_libraries(cetech_tests ${DEVELOP_LIBS} )
 target_include_directories(cetech_tests PUBLIC externals/build/${PLATFORM_ID}/${CONFIGURATION}/ )
+
+# configure unit tests via CTest
+enable_testing()
+add_test(NAME RunTests COMMAND cetech_tests)
+
+add_test(NAME ListTests COMMAND cetech_tests --list-tests)
+set_tests_properties(ListTests PROPERTIES PASS_REGULAR_EXPRESSION "[0-9]+ test cases")
+
+add_test(NAME ListTags COMMAND cetech_tests --list-tags)
+set_tests_properties(ListTags PROPERTIES PASS_REGULAR_EXPRESSION "[0-9]+ tags")
