@@ -4,10 +4,10 @@ sudo: false
 matrix:
   include:
     - os: linux
-      env: COMPILER='clang' COMPILERXX='clang++' BUILD_TYPE='Release' LLVM_VERSION=3.8.0
+      env: BUILD_TYPE='Release' LLVM_VERSION=3.8.0
 
     - os: linux
-      env: COMPILER='clang' COMPILERXX='clang++' BUILD_TYPE='Debug' LLVM_VERSION=3.8.0
+      env: BUILD_TYPE='Debug' LLVM_VERSION=3.8.0
 
 install:
   - DEPS_DIR="${TRAVIS_BUILD_DIR}/deps"
@@ -29,9 +29,8 @@ install:
       brew install cmake
     fi
 before_script:
-  - export CXX=${COMPILERXX}
   - cd ${TRAVIS_BUILD_DIR}
-  - cmake -DCMAKE_BUILD_TYPE=${BUILD_TYPE}
+  - cmake -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++ -DCMAKE_BUILD_TYPE=${BUILD_TYPE}
   - cd Build
 
 script:
