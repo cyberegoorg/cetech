@@ -44,7 +44,7 @@ SCENARIO( "Basic vec3f operation", "[math]" ) {
             THEN("result == [-3.0f, -3.0f, -3.0f]") {
                 REQUIRE( result[0] == -3.0f);
                 REQUIRE( result[1] == -3.0f);
-                REQUIRE( result[1] == -3.0f);
+                REQUIRE( result[2] == -3.0f);
             }
         }
 
@@ -53,10 +53,10 @@ SCENARIO( "Basic vec3f operation", "[math]" ) {
 
             vec3f_mul(result, v1, 2.0f);
 
-            THEN("result == [2.0f, 4.0f]") {
+            THEN("result == [2.0f, 4.0f, 6.0f]") {
                 REQUIRE( result[0] == 2.0f);
                 REQUIRE( result[1] == 4.0f);
-                REQUIRE( result[1] == 4.0f);
+                REQUIRE( result[2] == 6.0f);
             }
         }
 
@@ -68,7 +68,7 @@ SCENARIO( "Basic vec3f operation", "[math]" ) {
             THEN("result == [0.5f, 1.0f]") {
                 REQUIRE( result[0] == 0.5f);
                 REQUIRE( result[1] == 1.0f);
-                REQUIRE( result[1] == 1.0f);
+                REQUIRE( result[2] == 1.5f);
             }
         }
 
@@ -100,10 +100,10 @@ SCENARIO( "Basic vec3f operation", "[math]" ) {
             vec3f_t result = {0};
             vec3f_normalized(result, v1);
 
-            THEN("result == [~0.44721f, ~0.89443f]") {
+            THEN("result == [~0.26726f, ~0.53452f, ~0.80178f]") {
                 REQUIRE( result[0] == Approx(0.26726f));
                 REQUIRE( result[1] == Approx(0.53452f));
-                REQUIRE( result[1] == Approx(0.53452f));
+                REQUIRE( result[2] == Approx(0.80178f));
             }
         }
     }
