@@ -18,7 +18,7 @@ extern "C" {
 /*******************************************************************************
 **** Basic vector operation
 *******************************************************************************/
-SCENARIO( "Basic vector operation", "[math]" ) {
+SCENARIO( "Basic vec2f operation", "[math]" ) {
     GIVEN( "v1 = [1.0f, 2.0f] and v2 = [3.0f, 4.0f]" ) {
 
         vec2f_t v1 = {1.0f, 2.0f};
