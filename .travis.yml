@@ -4,10 +4,10 @@ sudo: false
 matrix:
   include:
     - os: linux
-      env: COMPILER='ccache clang++-3.8' BUILD_TYPE='Release' LLVM_VERSION=3.8.0
+      env: COMPILER='clang++' BUILD_TYPE='Release' LLVM_VERSION=3.8.0
 
     - os: linux
-      env: COMPILER='ccache clang++-3.8' BUILD_TYPE='Debug' LLVM_VERSION=3.8.0
+      env: COMPILER='clang++' BUILD_TYPE='Debug' LLVM_VERSION=3.8.0
 
 install:
   - DEPS_DIR="${TRAVIS_BUILD_DIR}/deps"
@@ -25,6 +25,7 @@ install:
       fi;
       llvm-$LLVM_VERSION/bin/llvm-config --version;
       export LLVM_CONFIG="llvm-$LLVM_VERSION/bin/llvm-config";
+      export PATH=${DEPS_DIR}/llvm-$LLVM_VERSION/bin:${PATH}
 
     elif [[ "${TRAVIS_OS_NAME}" == "osx" ]]; then
       brew install cmake ccache
