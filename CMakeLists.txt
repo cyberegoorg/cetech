@@ -103,6 +103,7 @@ set(SOURCE_FILES
         ########################################################################
         sources/celib/math/tests/test_vec2f.cc
         sources/celib/math/tests/test_vec3f.cc
+        sources/celib/math/tests/test_vec4f.cc
 )
 
 ################################################################################

@@ -15,6 +15,9 @@
 #include "../celib/math/types.h"
 #include "../celib/math/vec2f.h"
 #include "../celib/math/vec4f.h"
+#include "../celib/math/quatf.h"
+#include "../celib/math/fmath.h"
+
 
 ////////////////////////////////////////////////////////////////////////////////////////
 char get_worker_id() {
@@ -131,7 +134,6 @@ int main(int argc, char **argv) {
 
     log_info("main", "%f, %f, %f, %f", tmp_b[0], tmp_b[1], tmp_b[2], tmp_b[3]);
 
-
     STATOCATOR(sa, _1KiB);
     ARRAY_INIT(int, &array, &sa);
 
@@ -146,6 +148,13 @@ int main(int argc, char **argv) {
     //ARRAY_DESTROY(int, &array);
 
     STATOCATOR_CLEAR(&sa, _1KiB);
+
+    quatf_t q1 = QUATF_IDENTITY;
+
+    quatf_from_euler(q1, 1.0f, f_to_rad(180.0f), 0.0f);
+    quatf_to_eurel_angle(v1, q1);
+
+    log_info("main", "%f, %f, %f", v1[0], v1[1], v2[2]);
 
     log_shutdown();
     return 0;
