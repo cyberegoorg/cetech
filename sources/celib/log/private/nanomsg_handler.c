@@ -7,21 +7,11 @@
 #include <include/nanomsg/nn.h>
 
 #include "../log.h"
-#include "../../string/string.h"
 #include "../../errors/errors.h"
 
 /***********************************************************************
 **** Internals
 ***********************************************************************/
-
-
-#define LOG_FORMAT "#log\n" \
-    "level: %s\n" \
-    "where: %s\n" \
-    "time: %ld\n" \
-    "worker: %d\n" \
-    "msg: |\n" \
-    "  %s\n"
 
 static const char* _level_to_str[4] = {
         [LOG_INFO] = "info",
