@@ -104,6 +104,9 @@ set(SOURCE_FILES
         sources/celib/math/tests/test_vec2f.cc
         sources/celib/math/tests/test_vec3f.cc
         sources/celib/math/tests/test_vec4f.cc
+
+        sources/celib/yaml/private/yaml.cc
+        sources/celib/yaml/tests/test_yaml.cc
 )
 
 ################################################################################
@@ -146,6 +149,7 @@ set(RELEASE_LIBS
 
 	nanomsg
     bgfxRelease
+    yaml-cpp
 #    SDL2
 )
 
@@ -164,7 +168,7 @@ add_executable(cetech ${MAIN_SOURCE_FILES})
 target_compile_definitions(cetech PUBLIC -DCETECH_RELEASE)
 target_link_libraries(cetech ${RELEASE_LIBS} )
 target_include_directories(cetech PUBLIC externals/build/${PLATFORM_ID}/release/ )
-
+target_include_directories(cetech PUBLIC externals/build/${PLATFORM_ID}/${CONFIGURATION}/include )
 
 ################################################################################
 # Cetech DEVELOP
@@ -173,6 +177,7 @@ add_executable(cetech_develop ${MAIN_SOURCE_FILES})
 target_compile_definitions(cetech_develop PUBLIC -DCETECH_DEVELOP)
 target_link_libraries(cetech_develop ${DEVELOP_LIBS} )
 target_include_directories(cetech_develop PUBLIC externals/build/${PLATFORM_ID}/${CONFIGURATION}/ )
+target_include_directories(cetech_develop PUBLIC externals/build/${PLATFORM_ID}/${CONFIGURATION}/include )
 
 
 ################################################################################
@@ -182,6 +187,7 @@ add_executable(cetech_tests ${TEST_SOURCE_FILES})
 target_compile_definitions(cetech_tests PUBLIC -DCETECH_TEST -DCETECH_DEVELOP)
 target_link_libraries(cetech_tests ${DEVELOP_LIBS} )
 target_include_directories(cetech_tests PUBLIC externals/build/${PLATFORM_ID}/${CONFIGURATION}/ )
+target_include_directories(cetech_tests PUBLIC externals/build/${PLATFORM_ID}/${CONFIGURATION}/include )
 
 # configure unit tests via CTest
 enable_testing()

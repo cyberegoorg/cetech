@@ -227,3 +227,23 @@ mpack:
 
       - copytree: [src/mpack, debug/include/mpack]
       - copyfile: [src/mpack-config.h.sample, debug/include/mpack/mpack-config.h.sample]
+
+############
+# yaml-cpp #
+########################################################################################################################
+yaml-cpp:
+  platforms: [linux64]
+  clone: git clone https://github.com/jbeder/yaml-cpp.git --depth 1
+
+  build:
+    linux64:
+      - cmake .
+      - make
+
+  install:
+     linux64:
+      - copyfile: [libyaml-cpp.a, release/lib/libyaml-cpp.a]
+      - copytree: [include/yaml-cpp, release/include/yaml-cpp]
+
+      - copyfile: [libyaml-cpp.a, debug/lib/libyaml-cpp.a]
+      - copytree: [include/yaml-cpp, debug/include/yaml-cpp]
