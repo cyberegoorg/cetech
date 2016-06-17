@@ -40,7 +40,7 @@ install:
 
 before_script:
   - cd ${TRAVIS_BUILD_DIR}
-  - cmake -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++ -DCMAKE_BUILD_TYPE=${BUILD_TYPE}
+  - cmake -DCMAKE_BUILD_TYPE=${BUILD_TYPE}
   - cd ${TRAVIS_BUILD_DIR}
 
 script:
