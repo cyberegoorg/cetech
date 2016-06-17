@@ -106,6 +106,19 @@ SCENARIO( "Basic vec3f operation", "[math]" ) {
                 REQUIRE( result[2] == Approx(0.80178f));
             }
         }
+
+        WHEN("v1 eq v2") {
+            THEN("v1 != v2") {
+                REQUIRE_FALSE( vec3f_eq(v1, v2, f_Epsilon) );
+            }
+        }
+
+        WHEN("v1 eq v1") {
+            THEN("v1 == v1") {
+                REQUIRE( vec3f_eq(v1, v1, f_Epsilon) );
+            }
+        }
+
     }
 }
 

@@ -111,6 +111,19 @@ SCENARIO( "Basic vec4f operation", "[math]" ) {
                 REQUIRE( result[3] == Approx(0.7303f));
             }
         }
+
+        WHEN("v1 eq v2") {
+            THEN("v1 != v2") {
+                REQUIRE_FALSE( vec4f_eq(v1, v2, f_Epsilon) );
+            }
+        }
+
+        WHEN("v1 eq v1") {
+            THEN("v1 == v1") {
+                REQUIRE( vec4f_eq(v1, v1, f_Epsilon) );
+            }
+        }
+
     }
 }
 
