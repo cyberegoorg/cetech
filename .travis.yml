@@ -4,25 +4,24 @@ sudo: false
 matrix:
   include:
     - os: linux
-      compiler: clang
-           - BUILD_TYPE='Release'
-           - LLVM_VERSION=3.8.0
-           - LLVM_ARCHIVE_PATH=$HOME/clang+llvm.tar.xz
-           - CXX=$HOME/clang-$LLVM_VERSION/bin/clang++
-           - CPPFLAGS="-I $HOME/clang-$LLVM_VERSION/include/c++/v1"
-           - CXXFLAGS=-lc++
-           - LD_LIBRARY_PATH=$HOME/clang-$LLVM_VERSION/lib:$LD_LIBRARY_PATH
+      env:
+        - BUILD_TYPE='Release'
+        - LLVM_VERSION=3.8.0
+        - LLVM_ARCHIVE_PATH=$HOME/clang+llvm.tar.xz
+        - CXX=$HOME/clang-$LLVM_VERSION/bin/clang++
+        - CPPFLAGS="-I $HOME/clang-$LLVM_VERSION/include/c++/v1"
+        - CXXFLAGS=-lc++
+        - LD_LIBRARY_PATH=$HOME/clang-$LLVM_VERSION/lib:$LD_LIBRARY_PATH
 
     - os: linux
-      compiler: clang
       env:
-           - BUILD_TYPE='Debug'
-           - LLVM_VERSION=3.8.0
-           - LLVM_ARCHIVE_PATH=$HOME/clang+llvm.tar.xz
-           - CXX=$HOME/clang-$LLVM_VERSION/bin/clang++
-           - CPPFLAGS="-I $HOME/clang-$LLVM_VERSION/include/c++/v1"
-           - CXXFLAGS=-lc++
-           - LD_LIBRARY_PATH=$HOME/clang-$LLVM_VERSION/lib:$LD_LIBRARY_PATH
+        - BUILD_TYPE='Debug'
+        - LLVM_VERSION=3.8.0
+        - LLVM_ARCHIVE_PATH=$HOME/clang+llvm.tar.xz
+        - CXX=$HOME/clang-$LLVM_VERSION/bin/clang++
+        - CPPFLAGS="-I $HOME/clang-$LLVM_VERSION/include/c++/v1"
+        - CXXFLAGS=-lc++
+        - LD_LIBRARY_PATH=$HOME/clang-$LLVM_VERSION/lib:$LD_LIBRARY_PATH
 
 install:
   - DEPS_DIR="${TRAVIS_BUILD_DIR}/deps"
