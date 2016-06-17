@@ -74,6 +74,7 @@ STATOCATOR_T(_1KiB)
 void _statocator_free(Alloc_t allocator, void *ptr) {
 }
 
+#include "../celib/yaml/yaml.h"
 
 int main(int argc, char **argv) {
     log_init(get_worker_id);
@@ -155,6 +156,22 @@ int main(int argc, char **argv) {
     quatf_to_eurel_angle(v1, q1);
 
     log_info("main", "%f, %f, %f", v1[0], v1[1], v2[2]);
+
+    void* yn = yaml_load_str(
+        "foo: \n"
+        "    bar:  2212\n"
+        "    bars: true\n"
+    );
+
+    size_t foo = yaml_get_node(yn, 0, "foo");
+
+    YAML_NODE_SCOPE(tmp_node, yn, foo, "bar", {
+        log_info("main", "%u", yaml_node_as_int(yn, tmp_node));
+    });
+
+    YAML_NODE_SCOPE(tmp_node, yn, foo, "bars", {
+        log_info("main", "%u", yaml_node_as_bool(yn, tmp_node));
+    });
 
     log_shutdown();
     return 0;
