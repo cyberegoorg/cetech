@@ -25,7 +25,7 @@
         if (!(condition)) {                                                     \
             char* st = utils_stacktrace(1);                                     \
             log_error(where ".assert",                                          \
-                       "msg: " #condition msg _MSG_END,                         \
+                       "msg: " #condition " " msg _MSG_END,                     \
                        ## __VA_ARGS__,                                          \
                        __FILE__,                                                \
                        __LINE__,                                                \

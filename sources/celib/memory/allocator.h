@@ -11,7 +11,7 @@
 *******************************************************************************/
 
 #include <stddef.h>
-
+#include "../utils/macros.h"
 
 /*******************************************************************************
 **** Typedef
@@ -24,7 +24,7 @@ typedef void *Alloc_t;
 *******************************************************************************/
 
 #define ALLOCATOR_CREATE_SCOPED(vname, name)                                    \
-    Alloc_t vname __attribute__((cleanup(name##_destructor))) = name##_create() \
+    Alloc_t vname CE_CLEANUP_ATTR(name##_destructor) = name##_create()          \
 
 #define ALLOCATOR_CREATE(vname, name)                                           \
     Alloc_t vname = name##_create()                                             \
