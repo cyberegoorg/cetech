@@ -1,6 +1,5 @@
 language: c++
-sudo: required
-dist: trusty
+sudo: false
 
 env:
   global:
@@ -32,8 +31,8 @@ install:
   - cd ${TRAVIS_BUILD_DIR}
 
 script:
-  - CC  = clang
-  - CXX = clang++
+  - export CC=lang
+  - export CXX=clang++
   - mkdir build && cd build
   - cmake .. -DCMAKE_BUILD_TYPE=${BUILD_TYPE}
   - make -j 2
