@@ -1,27 +1,19 @@
-language: generic
+language: c++
 sudo: false
 
 matrix:
   include:
-    - os: linux
-      env:
-        - BUILD_TYPE='Release'
-        - LLVM_VERSION=3.8.0
-        - LLVM_ARCHIVE_PATH=$HOME/clang+llvm.tar.xz
-        - CXX=$HOME/clang-$LLVM_VERSION/bin/clang++
-        - CPPFLAGS="-I $HOME/clang-$LLVM_VERSION/include/c++/v1"
-        - CXXFLAGS=-lc++
-        - LD_LIBRARY_PATH=$HOME/clang-$LLVM_VERSION/lib:$LD_LIBRARY_PATH
-
-    - os: linux
-      env:
-        - BUILD_TYPE='Debug'
-        - LLVM_VERSION=3.8.0
-        - LLVM_ARCHIVE_PATH=$HOME/clang+llvm.tar.xz
-        - CXX=$HOME/clang-$LLVM_VERSION/bin/clang++
-        - CPPFLAGS="-I $HOME/clang-$LLVM_VERSION/include/c++/v1"
-        - CXXFLAGS=-lc++
-        - LD_LIBRARY_PATH=$HOME/clang-$LLVM_VERSION/lib:$LD_LIBRARY_PATH
+      - os: linux
+        compiler: clang
+        addons:
+          apt:
+            sources:
+              - ubuntu-toolchain-r-test
+              - llvm-toolchain-precise
+              - llvm-toolchain-precise-3.7
+            packages:
+              - clang-3.8
+        env: BUILD_TYPE='Debug'
 
 install:
   - DEPS_DIR="${TRAVIS_BUILD_DIR}/deps"
@@ -34,15 +26,9 @@ install:
     elif [[ "${TRAVIS_OS_NAME}" == "osx" ]]; then
       brew install cmake
     fi
-  - wget http://llvm.org/releases/$LLVM_VERSION/clang+llvm-$LLVM_VERSION-x86_64-linux-gnu-ubuntu-14.04.tar.xz -O $LLVM_ARCHIVE_PATH
-  - mkdir $HOME/clang-$LLVM_VERSION
-  - tar xf $LLVM_ARCHIVE_PATH -C $HOME/clang-$LLVM_VERSION --strip-components 1
-
-before_script:
-  - cd ${TRAVIS_BUILD_DIR}
-  - cmake -DCMAKE_BUILD_TYPE=${BUILD_TYPE}
-  - cd ${TRAVIS_BUILD_DIR}
 
 script:
+  - mkdir build && cd build
+  - cmake .. -DCMAKE_BUILD_TYPE=${BUILD_TYPE}
   - make -j 2
   - ctest -V -j 2
