@@ -29,8 +29,11 @@ install:
     elif [[ "${TRAVIS_OS_NAME}" == "osx" ]]; then
       brew install cmake
     fi
+  - cd ${TRAVIS_BUILD_DIR}
 
 script:
+  - CC  = clang
+  - CXX = clang++
   - mkdir build && cd build
   - cmake .. -DCMAKE_BUILD_TYPE=${BUILD_TYPE}
   - make -j 2
