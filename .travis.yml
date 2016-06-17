@@ -1,6 +1,10 @@
 language: c++
 sudo: false
 
+branches:
+  except:
+    - c_version
+
 env:
   global:
     - LLVM_VERSION=3.8.0
