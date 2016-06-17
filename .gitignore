@@ -8,7 +8,7 @@
 *.speccache
 *.iml
 
-build/
+/build/
 site/
 .vagrant/
 
