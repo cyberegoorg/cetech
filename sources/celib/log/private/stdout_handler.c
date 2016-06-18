@@ -4,6 +4,10 @@
 
 #include <stdio.h>
 
+#if defined(CETECH_LINUX)
+    #include <sys/file.h>
+#endif
+
 #include "../log.h"
 #include "../../string/string.h"
 
@@ -78,7 +82,7 @@ void log_stdout_handler( enum log_level level,
     const char* time_str = _time_to_str(gmtm);
 
 #if defined(CETECH_LINUX)
-    flockfile(out);
+    flock(out->_fileno, LOCK_EX);
 #endif
 
     fprintf(out, _level_format[level], _level_to_str[level],
@@ -87,6 +91,6 @@ void log_stdout_handler( enum log_level level,
     fflush(out);
 
 #if defined(CETECH_LINUX)
-    funlockfile(out);
+    flock(out->_fileno, LOCK_UN);
 #endif
 }
