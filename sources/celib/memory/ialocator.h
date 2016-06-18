@@ -3,18 +3,7 @@
 
 #include "allocator.h"
 
-#if defined(CETECH_DEBUG)
-enum {
-    MAX_MEM_TRACE = 128
-};
-
-
-struct trace_entry {
-    void *ptr;
-    char *stacktrace;
-    char used;
-};
-#endif
+#define CE_MAX_MEM_TRACE 1024
 
 struct iallocator {
     void *(*alloc)(Alloc_t allocator, size_t size);
@@ -22,9 +11,12 @@ struct iallocator {
     const char* type_name;
 
 #if defined(CETECH_DEBUG)
-    struct trace_entry trace[MAX_MEM_TRACE];
+    struct trace_entry {
+        void *ptr;
+        char *stacktrace;
+        char used;
+    } trace[CE_MAX_MEM_TRACE];
 #endif
-
 };
 
 

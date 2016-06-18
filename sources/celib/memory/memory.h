@@ -46,5 +46,6 @@ void  memory_free(void *ptr);
 **** Copy n bytes from dest to src
 *******************************************************************************/
 void* memory_copy(void *dest, const void* src, size_t n);
+void* memory_copy_r(void* __restrict dest, const void* __restrict src, size_t n);
 
 #endif //CETECH_MEMORY_H

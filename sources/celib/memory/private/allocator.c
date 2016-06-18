@@ -13,7 +13,7 @@ void _trace_pointer(Alloc_t allocator,
 
     char *stacktrace_str = utils_stacktrace(3);
 
-    for (int i = 0; i < MAX_MEM_TRACE; ++i) {
+    for (int i = 0; i < CE_MAX_MEM_TRACE; ++i) {
         if (!mem_trace[i].used) {
             mem_trace[i].used = 1;
             mem_trace[i].ptr = p;
@@ -28,7 +28,7 @@ void _stop_trace_pointer(Alloc_t allocator, void *p) {
 
     struct trace_entry *mem_trace = m->trace;
 
-    for (int i = 0; i < MAX_MEM_TRACE; ++i) {
+    for (int i = 0; i < CE_MAX_MEM_TRACE; ++i) {
         if (mem_trace[i].ptr != p) {
             continue;
         }
@@ -76,7 +76,7 @@ void alloc_destroy(Alloc_t allocator) {
     struct iallocator *m = (struct iallocator *) allocator;
 
     int ok = 1;
-    for (int i = 0; i < MAX_MEM_TRACE; ++i) {
+    for (int i = 0; i < CE_MAX_MEM_TRACE; ++i) {
         if (!m->trace[i].used) {
             continue;
         }
