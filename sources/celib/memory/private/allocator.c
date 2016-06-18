@@ -1,5 +1,5 @@
 #include "../allocator.h"
-#include "../ialocator.h"
+#include "../iallocator.h"
 #include "../../errors/errors.h"
 
 #define LOG_WHERE "allocator"

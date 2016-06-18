@@ -8,7 +8,7 @@
 
 extern "C" {
     #include "../allocator.h"
-    #include "../ialocator.h"
+    #include "../iallocator.h"
     #include "../memory.h"
 };
 

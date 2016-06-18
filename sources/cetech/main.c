@@ -24,7 +24,7 @@ char get_worker_id() {
     return 0;
 }
 
-#include "../celib/memory/ialocator.h"
+#include "../celib/memory/iallocator.h"
 
 #define STATOCATOR_T(size) \
     struct statocator##size {\
