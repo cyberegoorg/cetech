@@ -26,8 +26,7 @@ SCENARIO("Yaml string parse", "[yaml]") {
                 "  seq: [1, 2, 3]\n"
                 "  int: 1\n"
                 "  float: 3.14\n"
-                "  bool: true\n"
-                "";
+                "  bool: true\n";
 
         WHEN("Parse string") {
             auto h = yaml_load_str(yaml_str);

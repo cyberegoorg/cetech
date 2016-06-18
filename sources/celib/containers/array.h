@@ -50,8 +50,8 @@
     };                                                                          \
                                                                                 \
     void array_init_##T(struct array_##T *array, Alloc_t allocator) {           \
-        CE_ASSERT("array_"#T, array != NULL);                                      \
-        CE_ASSERT("array_"#T, allocator != NULL);                                  \
+        CE_ASSERT("array_"#T, array != NULL);                                   \
+        CE_ASSERT("array_"#T, allocator != NULL);                               \
         array->data = NULL;                                                     \
         array->size = 0;                                                        \
         array->capacity = 0;                                                    \
@@ -59,8 +59,8 @@
     }                                                                           \
                                                                                 \
     void array_destroy_##T(struct array_##T *a) {                               \
-        CE_ASSERT("array_"#T, a != NULL);                                          \
-        CE_ASSERT("array_"#T, a->allocator != NULL);                               \
+        CE_ASSERT("array_"#T, a != NULL);                                       \
+        CE_ASSERT("array_"#T, a->allocator != NULL);                            \
         alloc_free(a->allocator, a->data);                                      \
     }                                                                           \
                                                                                 \
@@ -68,8 +68,8 @@
     void array_grow_##T(struct array_##T *a, size_t mincapacity);               \
                                                                                 \
     void array_setcapacity_##T(struct array_##T *a, size_t  newcapacity) {      \
-        CE_ASSERT("array_"#T, a != NULL);                                          \
-        CE_ASSERT("array_"#T, a->allocator != NULL);                               \
+        CE_ASSERT("array_"#T, a != NULL);                                       \
+        CE_ASSERT("array_"#T, a->allocator != NULL);                            \
                                                                                 \
         if (newcapacity == a->capacity) {                                       \
             return;                                                             \
