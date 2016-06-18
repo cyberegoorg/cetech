@@ -68,8 +68,8 @@ set(SOURCE_FILES
         sources/celib/memory/private/mallocator.c
         sources/celib/memory/private/allocator.c
         sources/celib/memory/private/memory.c
-
         sources/celib/memory/tests/test_memory.cc
+        sources/celib/memory/tests/test_allocator.cc
 
 
         ########################################################################
