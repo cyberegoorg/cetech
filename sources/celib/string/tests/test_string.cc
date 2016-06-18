@@ -1,4 +1,4 @@
-#ifdef CETECH_TEST
+#if defined(CETECH_TEST)
 
 /*******************************************************************************
 **** Includes
@@ -9,8 +9,6 @@
 extern "C" {
     #include "../string.h"
     #include "../../memory/mallocator.h"
-    #include "../../log/log.h"
-    #include "../../log/handlers.h"
 };
 
 /*******************************************************************************
@@ -44,7 +42,7 @@ SCENARIO( "string duplicate", "[string]" ) {
 **** String compare
 *******************************************************************************/
 SCENARIO( "string compare", "[string]" ) {
-    GIVEN( "string 'test string'" ) {
+    GIVEN( "string 'test_string'" ) {
         const char* lstr = "test_string";
         const char* rstr_ok = "test_string";
         const char* rstr_dif = "test_s";
@@ -65,6 +63,23 @@ SCENARIO( "string compare", "[string]" ) {
             THEN("are not equal") {
                 REQUIRE( cmp  > 0 );
                 REQUIRE( cmp2 < 0 );
+            }
+        }
+    }
+}
+
+/*******************************************************************************
+**** String length
+*******************************************************************************/
+SCENARIO( "string length", "[string]" ) {
+    GIVEN( "string 'test_string'" ) {
+        const char* lstr = "test_string";
+
+        WHEN( "lenght \"test_string\" ") {
+            size_t len = string_lenght(lstr);
+
+            THEN("len == 11") {
+                REQUIRE( len == 11);
             }
         }
     }
