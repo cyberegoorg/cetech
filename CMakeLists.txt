@@ -93,6 +93,11 @@ set(SOURCE_FILES
         sources/celib/log/private/nanomsg_handler.c
         sources/celib/log/tests/test_log.cc
 
+        ########################################################################
+        # CELIB: File
+        ########################################################################
+        sources/celib/filesystem/private/vfile_sdl.c
+        sources/celib/filesystem/tests/test_vfile.cc
 
         ########################################################################
         # CELIB: Crypto
@@ -127,7 +132,7 @@ set(MAIN_SOURCE_FILES
 set(TEST_SOURCE_FILES
         ${SOURCE_FILES}
         sources/tests_main.cc
-)
+        )
 
 ################################################################################
 # Release sources
@@ -138,6 +143,8 @@ if(UNIX)
         jemalloc_pic
         pthread
         anl # NANOMSG
+        dl
+        X11
     )
 endif()
 
@@ -154,7 +161,8 @@ set(RELEASE_LIBS
 	nanomsg
     bgfxRelease
     yaml-cpp
-#    SDL2
+
+    SDL2
 )
 
 ################################################################################
