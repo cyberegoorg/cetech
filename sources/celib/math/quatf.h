@@ -107,6 +107,12 @@ CE_FORCE_INLINE void quatf_to_eurel_angle(float *__restrict result,
     result[2] = f_asin(2.0f * (a[0] * a[1] + a[2] * a[3]));
 }
 
+CE_FORCE_INLINE bool quatf_is_identity(const float *__restrict a,
+                                       const float epsilon) {
+    static quatf_t _identity = QUATF_IDENTITY;
+    return quatf_eq(a, _identity, epsilon);
+}
+
 CE_FORCE_INLINE void quatf_add(float *__restrict result,
                                const float *__restrict a,
                                const float *__restrict b) {
