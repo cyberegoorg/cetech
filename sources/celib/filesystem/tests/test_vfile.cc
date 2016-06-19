@@ -5,8 +5,8 @@
 #include "include/catch/catch.hpp"
 
 extern "C" {
-    #include "../vfile.h"
-    #include "../../string/string.h"
+#include "../vfile.h"
+#include "../../string/string.h"
 };
 
 SCENARIO( "Can read file", "[vfile]" ) {

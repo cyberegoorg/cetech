@@ -1,12 +1,12 @@
 #include <memory.h>
-#include <stdlib.h>
 
 #include <stdio.h>
 #include "../../memory/memory.h"
-#include "../../memory/allocator.h"
 
 #if defined(CETECH_LINUX)
+
 #include <execinfo.h>
+
 #endif
 
 char *utils_stacktrace(int skip) {
@@ -61,6 +61,6 @@ char *utils_stacktrace(int skip) {
     return NULL;
 }
 
-void utils_stacktrace_free(char * st) {
+void utils_stacktrace_free(char *st) {
     memory_free(st);
 }

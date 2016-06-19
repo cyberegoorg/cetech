@@ -5,7 +5,6 @@
 #include "../allocator.h"
 #include "../iallocator.h"
 
-#include "../../string/string.h"
 #include "../../utils/utils.h"
 #include "../../log/log.h"
 #include "../../errors/errors.h"
@@ -13,7 +12,7 @@
 
 #define LOG_WHERE "allocator.mallocator"
 
-static const char* _TYPE_NAME = "mallocator";
+static const char *_TYPE_NAME = "mallocator";
 
 struct mallocator {
     struct iallocator i;

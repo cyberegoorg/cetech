@@ -7,9 +7,9 @@
 #include "include/catch/catch.hpp"
 
 extern "C" {
-    #include "../allocator.h"
-    #include "../iallocator.h"
-    #include "../memory.h"
+#include "../allocator.h"
+#include "../iallocator.h"
+#include "../memory.h"
 };
 
 

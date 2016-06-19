@@ -25,7 +25,7 @@ typedef float quatf_t[4];
 **** Matrix 3x3, 4x4
 ***********************************************************************/
 
-typedef float mat33f_t[3*3];
-typedef float mat44f_t[4*4];
+typedef float mat33f_t[3 * 3];
+typedef float mat44f_t[4 * 4];
 
 #endif //CETECH_MATH_TYPES_H

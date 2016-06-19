@@ -28,8 +28,7 @@
 **** functions
 ***********************************************************************/
 
-CE_FORCE_INLINE void mat44f_identity(float* result)
-{
+CE_FORCE_INLINE void mat44f_identity(float *result) {
     memset(result, 0, sizeof(float) * 16);
 
     result[0] = 1.0f;
@@ -38,8 +37,7 @@ CE_FORCE_INLINE void mat44f_identity(float* result)
     result[15] = 1.0f;
 }
 
-CE_FORCE_INLINE void mat44f_translate(float* result, float x, float y, float z)
-{
+CE_FORCE_INLINE void mat44f_translate(float *result, float x, float y, float z) {
     mat44f_identity(result);
 
     result[12] = x;
@@ -47,12 +45,11 @@ CE_FORCE_INLINE void mat44f_translate(float* result, float x, float y, float z)
     result[14] = z;
 }
 
-CE_FORCE_INLINE void mat44f_scale(float* result, float x, float y, float z)
-{
+CE_FORCE_INLINE void mat44f_scale(float *result, float x, float y, float z) {
     memset(result, 0, sizeof(float) * 16);
 
-    result[0]  = x;
-    result[5]  = y;
+    result[0] = x;
+    result[5] = y;
     result[10] = z;
     result[15] = 1.0f;
 }

@@ -7,8 +7,10 @@
 
 struct iallocator {
     void *(*alloc)(Alloc_t allocator, size_t size);
+
     void (*free)(Alloc_t allocator, void *ptr);
-    const char* type_name;
+
+    const char *type_name;
 
 #if defined(CETECH_DEBUG)
     struct trace_entry {

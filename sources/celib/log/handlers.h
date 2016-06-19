@@ -30,6 +30,6 @@ void nano_log_handler(enum log_level level,
                       char worker_id,
                       const char *where,
                       const char *msg,
-                       void *data);
+                      void *data);
 
 #endif //CETECH_HANDLERS_H

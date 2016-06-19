@@ -5,7 +5,9 @@
 #include <stdio.h>
 
 #if defined(CETECH_LINUX)
-    #include <sys/file.h>
+
+#include <sys/file.h>
+
 #endif
 
 #include "../log.h"
@@ -36,21 +38,21 @@
 #define COLORED_TEXT(color, text) text
 #endif
 
-static const char* _level_to_str[4] = {
+static const char *_level_to_str[4] = {
         [LOG_INFO]    = "info",
         [LOG_WARNING] = "warning",
         [LOG_ERROR]   = "error",
         [LOG_DBG]     = "debug"
 };
 
-static const char* _level_format[4] = {
+static const char *_level_format[4] = {
         [LOG_INFO]    = COLORED_TEXT(COLOR_BLUE, LOG_FORMAT),
         [LOG_WARNING] = COLORED_TEXT(COLOR_YELLOW, LOG_FORMAT),
         [LOG_ERROR]   = COLORED_TEXT(COLOR_RED, LOG_FORMAT),
         [LOG_DBG]     = COLORED_TEXT(COLOR_GREEN, LOG_FORMAT)
 };
 
-static const char* _nocolor_level_format[4] = {
+static const char *_nocolor_level_format[4] = {
         [LOG_INFO]    = LOG_FORMAT,
         [LOG_WARNING] = LOG_FORMAT,
         [LOG_ERROR]   = LOG_FORMAT,
@@ -58,8 +60,8 @@ static const char* _nocolor_level_format[4] = {
 };
 
 
-static char* _time_to_str(struct tm *gmtm) {
-    char* time_str = asctime(gmtm);
+static char *_time_to_str(struct tm *gmtm) {
+    char *time_str = asctime(gmtm);
     time_str[str_lenght(time_str) - 1] = '\0';
     return time_str;
 }
@@ -69,17 +71,17 @@ static char* _time_to_str(struct tm *gmtm) {
 **** Interface implementation
 ***********************************************************************/
 
-void log_stdout_handler( enum log_level level,
-                    time_t time,
-                    char worker_id,
-                    const char *where,
-                    const char *msg,
-                    void *data) {
+void log_stdout_handler(enum log_level level,
+                        time_t time,
+                        char worker_id,
+                        const char *where,
+                        const char *msg,
+                        void *data) {
 
-    FILE* out = level == LOG_ERROR ? stderr : stdout;
+    FILE *out = level == LOG_ERROR ? stderr : stdout;
 
-    struct tm* gmtm = gmtime(&time);
-    const char* time_str = _time_to_str(gmtm);
+    struct tm *gmtm = gmtime(&time);
+    const char *time_str = _time_to_str(gmtm);
 
 #if defined(CETECH_LINUX)
     flock(out->_fileno, LOCK_EX);

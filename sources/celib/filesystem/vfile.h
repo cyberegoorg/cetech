@@ -35,6 +35,7 @@ enum open_mode {
 ***********************************************************************/
 
 vfile_t vfile_from_file(const char *path, enum open_mode mode);
+
 void vfile_close(vfile_t file);
 
 /***********************************************************************
@@ -42,25 +43,28 @@ void vfile_close(vfile_t file);
 ***********************************************************************/
 
 void vfile_seek(vfile_t file, size_t position);
+
 void vfile_seek_to_end(vfile_t file);
+
 void vfile_skip(vfile_t file, size_t bytes);
+
 size_t vfile_position(vfile_t file);
 
 /***********************************************************************
 **** Size
 ***********************************************************************/
 
-size_t vfile_size(vfile_t  file);
+size_t vfile_size(vfile_t file);
 
 /***********************************************************************
 **** Read/Write
 ***********************************************************************/
 size_t vfile_read(vfile_t file,
-          char* buffer,
-          size_t size);
+                  char *buffer,
+                  size_t size);
 
 size_t vfile_write(vfile_t file,
-           const char* buffer,
-           size_t size);
+                   const char *buffer,
+                   size_t size);
 
 #endif //CETECH_FILE_H

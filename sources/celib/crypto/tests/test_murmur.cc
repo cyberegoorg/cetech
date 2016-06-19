@@ -5,7 +5,7 @@
 #include "include/catch/catch.hpp"
 
 extern "C" {
-    #include "../hash.h"
+#include "../hash.h"
 };
 
 SCENARIO( "Murmur hash", "[hash]" ) {

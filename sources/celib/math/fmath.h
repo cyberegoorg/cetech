@@ -69,33 +69,27 @@ CE_FORCE_INLINE float f_abs(float a) {
     return a < 0.0f ? -a : a;
 }
 
-CE_FORCE_INLINE float f_clamp(float a, float min, float max)
-{
+CE_FORCE_INLINE float f_clamp(float a, float min, float max) {
     return f_min(f_max(a, min), max);
 }
 
-CE_FORCE_INLINE float f_saturate(float a)
-{
+CE_FORCE_INLINE float f_saturate(float a) {
     return f_clamp(a, 0.0f, 1.0f);
 }
 
-CE_FORCE_INLINE float f_lerp(float a, float b, float t)
-{
+CE_FORCE_INLINE float f_lerp(float a, float b, float t) {
     return a + (b - a) * t;
 }
 
-CE_FORCE_INLINE float f_sign(float a)
-{
+CE_FORCE_INLINE float f_sign(float a) {
     return a < 0.0f ? -1.0f : 1.0f;
 }
 
-CE_FORCE_INLINE float f_step(float edge, float a)
-{
+CE_FORCE_INLINE float f_step(float edge, float a) {
     return a < edge ? 0.0f : 1.0f;
 }
 
-CE_FORCE_INLINE float f_pulse(float a, float start, float end)
-{
+CE_FORCE_INLINE float f_pulse(float a, float start, float end) {
     return f_step(a, start) - f_step(a, end);
 }
 

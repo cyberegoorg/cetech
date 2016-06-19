@@ -29,7 +29,7 @@
 **** Typedef
 *******************************************************************************/
 
-typedef void* yaml_handler_t;
+typedef void *yaml_handler_t;
 typedef size_t yaml_node_t;
 
 
@@ -54,7 +54,7 @@ yaml_handler_t yaml_load_str(const char *str);
 
 yaml_node_t yaml_get_node(yaml_handler_t handler,
                           yaml_node_t node_idx,
-                          const char* key);
+                          const char *key);
 
 yaml_node_t yaml_get_seq_node(yaml_handler_t handler,
                               yaml_node_t seq_node_idx,
@@ -69,7 +69,9 @@ enum yaml_node_type yaml_node_type(yaml_handler_t handler,
 #define YAML_NODE_AS_DEF(type) type yaml_node_as_##type(yaml_handler_t handler, yaml_node_t node_idx)
 
 YAML_NODE_AS_DEF(int);
+
 YAML_NODE_AS_DEF(bool);
+
 YAML_NODE_AS_DEF(float);
 
 #undef YAML_NODE_AS_DEF

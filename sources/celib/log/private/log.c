@@ -10,15 +10,15 @@ enum {
 
 static struct global {
     log_handler_t handlers[MAX_HANDLERS];
-    void* handlers_data[MAX_HANDLERS];
+    void *handlers_data[MAX_HANDLERS];
 
     log_get_wid_clb_t get_wid_clb;
     char handlers_count;
 } _G = G_INIT;
 
 void vlog(const enum log_level level,
-          const char* where,
-          const char* format,
+          const char *where,
+          const char *format,
           va_list va) {
 
     //CE_ASSERT("log", _globals.data != nullptr);
@@ -36,13 +36,13 @@ void vlog(const enum log_level level,
 }
 
 void log_init(log_get_wid_clb_t get_wid_clb) {
-    _G = (struct global)G_INIT;
+    _G = (struct global) G_INIT;
 
     _G.get_wid_clb = get_wid_clb;
 }
 
 void log_shutdown() {
-    _G = (struct global)G_INIT;
+    _G = (struct global) G_INIT;
 }
 
 void log_register_handler(log_handler_t hander, void *data) {

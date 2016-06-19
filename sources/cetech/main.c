@@ -7,17 +7,10 @@
 #include "../celib/log/handlers.h"
 #include "../celib/containers/array.h"
 
-#include "include/nanomsg/nn.h"
-#include "include/nanomsg/pipeline.h"
-
-#include "include/mpack/mpack.h"
-#include "include/mpack/mpack-writer.h"
 #include "../celib/math/types.h"
 #include "../celib/math/vec2f.h"
 #include "../celib/math/vec4f.h"
 #include "../celib/math/quatf.h"
-#include "../celib/math/fmath.h"
-#include "../celib/math/mat44f.h"
 
 
 ////////////////////////////////////////////////////////////////////////////////////////
@@ -120,17 +113,17 @@ int main(int argc, char **argv) {
 
     mallocator_destroy(a);
 
-    #define BLOCK (_8KiB*4)
+#define BLOCK (_8KiB*4)
 
-    float v1[BLOCK] = {[0 ... (BLOCK-1)] = 1.0f};
-    float v2[BLOCK] = {[0 ... (BLOCK-1)] = 0.0f};
+    float v1[BLOCK] = {[0 ... (BLOCK - 1)] = 1.0f};
+    float v2[BLOCK] = {[0 ... (BLOCK - 1)] = 0.0f};
 
     vec4f_t tmp_a = {0};
     vec4f_t tmp_b = {0};
     vec4f_t tmp_c = {0};
 
     for (size_t j = 0; j < BLOCK; j += 4) {
-        vec4f_add(tmp_a, v1+j, v2+j);
+        vec4f_add(tmp_a, v1 + j, v2 + j);
         vec4f_add(tmp_b, tmp_a, tmp_b);
     }
 
@@ -158,10 +151,10 @@ int main(int argc, char **argv) {
 
     log_info("main", "%f, %f, %f", v1[0], v1[1], v2[2]);
 
-    void* yn = yaml_load_str(
-        "foo: \n"
-        "    bar:  2212\n"
-        "    bars: true\n"
+    void *yn = yaml_load_str(
+            "foo: \n"
+                    "    bar:  2212\n"
+                    "    bars: true\n"
     );
 
     size_t foo = yaml_get_node(yn, 0, "foo");

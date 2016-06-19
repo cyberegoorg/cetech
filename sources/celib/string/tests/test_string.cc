@@ -7,8 +7,8 @@
 #include "include/catch/catch.hpp"
 
 extern "C" {
-    #include "../string.h"
-    #include "../../memory/mallocator.h"
+#include "../string.h"
+#include "../../memory/mallocator.h"
 };
 
 /*******************************************************************************

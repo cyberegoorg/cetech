@@ -34,12 +34,15 @@ typedef void *Alloc_t;
 #define ALLOCATOR_DESTROY(vname, name)                                          \
     name##_destroy(vname)                                                       \
 
+
 /*******************************************************************************
 **** Interface
 *******************************************************************************/
 
 void *alloc_alloc(Alloc_t allocator, size_t size);
+
 void alloc_free(Alloc_t allocator, void *ptr);
+
 void alloc_destroy(Alloc_t allocator);
 
 #endif //CETECH_ALLOCATOR_H

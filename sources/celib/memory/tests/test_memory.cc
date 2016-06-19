@@ -7,7 +7,7 @@
 #include "include/catch/catch.hpp"
 
 extern "C" {
-    #include "../memory.h"
+#include "../memory.h"
 };
 
 

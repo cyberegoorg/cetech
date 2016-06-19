@@ -5,6 +5,7 @@
 #define LOG_WHERE "allocator"
 
 #if defined(CETECH_DEBUG)
+
 void _trace_pointer(Alloc_t allocator,
                     void *p) {
 
@@ -39,6 +40,7 @@ void _stop_trace_pointer(Alloc_t allocator, void *p) {
         mem_trace[i].stacktrace = NULL;
     }
 }
+
 #endif
 
 void *alloc_alloc(Alloc_t allocator, size_t size) {
@@ -51,7 +53,7 @@ void *alloc_alloc(Alloc_t allocator, size_t size) {
     log_debug(LOG_WHERE, "[%s] Alloc %zu bytes", a->type_name, size);
 #endif
 
-    void* p = a->alloc(allocator, size);
+    void *p = a->alloc(allocator, size);
 
 #if defined(CETECH_DEBUG)
     _trace_pointer(allocator, p);
