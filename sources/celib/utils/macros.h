@@ -3,6 +3,8 @@
 
 #define CE_ALIGNOF(type) __alignof(type)
 
+#define CE_RESTRICT __restrict
+
 #define CE_FORCE_INLINE __extension__ static __inline __attribute__( (__always_inline__) )
 #define CE_FUNCTION __PRETTY_FUNCTION__
 #define CE_LIKELY(x)   __builtin_expect(!!(x), 1)

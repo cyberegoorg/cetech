@@ -60,6 +60,16 @@ CE_FORCE_INLINE void vec4f_mul(float* __restrict result,
     result[3] = a[3] * s;
 }
 
+CE_FORCE_INLINE void vec4f_mul_mat44f(float* __restrict result,
+                                      const float* __restrict v,
+                                      const float* __restrict m)
+{
+    result[0] = v[0] * m[ 0] + v[1] * m[4] + v[2] * m[ 8] + v[3] * m[12];
+    result[1] = v[0] * m[ 1] + v[1] * m[5] + v[2] * m[ 9] + v[3] * m[13];
+    result[2] = v[0] * m[ 2] + v[1] * m[6] + v[2] * m[10] + v[3] * m[14];
+    result[3] = v[0] * m[ 3] + v[1] * m[7] + v[2] * m[11] + v[3] * m[15];
+}
+
 CE_FORCE_INLINE void vec4f_div(float* __restrict result,
                                const float* __restrict a,
                                const float s) {

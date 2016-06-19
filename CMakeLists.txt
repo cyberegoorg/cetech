@@ -106,6 +106,8 @@ set(SOURCE_FILES
         sources/celib/math/tests/test_vec2f.cc
         sources/celib/math/tests/test_vec3f.cc
         sources/celib/math/tests/test_vec4f.cc
+        sources/celib/math/tests/test_quatf.cc
+        sources/celib/math/tests/test_mat44f.cc
 
         sources/celib/yaml/private/yaml.cc
         sources/celib/yaml/tests/test_yaml.cc

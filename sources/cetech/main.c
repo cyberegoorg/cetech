@@ -17,6 +17,7 @@
 #include "../celib/math/vec4f.h"
 #include "../celib/math/quatf.h"
 #include "../celib/math/fmath.h"
+#include "../celib/math/mat44f.h"
 
 
 ////////////////////////////////////////////////////////////////////////////////////////
