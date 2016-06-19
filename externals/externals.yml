@@ -88,13 +88,16 @@ sdl2:
       [build/.libs/libSDL2.a, release/lib/libSDL2.a]
 
     linux64:
-      - copyfile: *sdl2_install_lib
+      - copyfile: [build/.libs/libSDL2.a, release/lib/libSDL2.a]
       - copytree: [include, release/include/SDL2]
+      - copyfile: [build/.libs/libSDL2.a, debug/lib/libSDL2.a]
+      - copytree: [include, debug/include/SDL2]
 
     darwin64:
-      - copyfile: *sdl2_install_lib
+      - copyfile: [build/.libs/libSDL2.a, release/lib/libSDL2.a]
       - copytree: [include, release/include/SDL2]
-
+      - copyfile: [build/.libs/libSDL2.a, debug/lib/libSDL2.a]
+      - copytree: [include, debug/include/SDL2]
 ########
 # SLD2 #
 ########################################################################################################################
