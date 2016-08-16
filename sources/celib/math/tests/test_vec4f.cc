@@ -114,13 +114,13 @@ SCENARIO( "Basic vec4f operation", "[math]" ) {
 
         WHEN("v1 eq v2") {
             THEN("v1 != v2") {
-                REQUIRE_FALSE( vec4f_eq(v1, v2, f_Epsilon) );
+                REQUIRE_FALSE( vec4f_eq(v1, v2, f32_Epsilon) );
             }
         }
 
         WHEN("v1 eq v1") {
             THEN("v1 == v1") {
-                REQUIRE( vec4f_eq(v1, v1, f_Epsilon) );
+                REQUIRE( vec4f_eq(v1, v1, f32_Epsilon) );
             }
         }
 

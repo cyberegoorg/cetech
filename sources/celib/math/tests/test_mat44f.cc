@@ -22,7 +22,7 @@ extern "C" {
 SCENARIO("Basic matrix 4x4 operation", "[math]") {
     GIVEN("Identity matrix") {
         mat44f_t m1 = MAT44F_INIT_IDENTITY;
-        REQUIRE(mat44f_is_identity(m1, f_Epsilon));
+        REQUIRE(mat44f_is_identity(m1, f32_Epsilon));
     }
 }
 

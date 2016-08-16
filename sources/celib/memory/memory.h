@@ -1,52 +1,60 @@
-/*******************************************************************************
-**** Memory module
-*******************************************************************************/
+#ifndef CETECH_MEMORY_SYSTEM_H
+#define CETECH_MEMORY_SYSTEM_H
 
-#ifndef CETECH_MEMORY_H
-#define CETECH_MEMORY_H
-
-
-/*******************************************************************************
-**** Includes
-*******************************************************************************/
+//==============================================================================
+// Includes
+//==============================================================================
 
 #include <stddef.h>
+#include <stdint.h>
 
-/*******************************************************************************
-**** Size constants (good for buffer size)
-*******************************************************************************/
+#include "types.h"
+#include "../types.h"
 
-#define _4B  (  4 )
-#define _8B  (  8 )
-#define _16B ( 16 )
-#define _32B ( 32 )
-#define _64B ( 64 )
+//==============================================================================
+// Includes
+//==============================================================================
 
-#define _1KiB  (  1024    )
-#define _4KiB  ( _1KiB*4  )
-#define _8KiB  ( _1KiB*8  )
-#define _16KiB ( _1KiB*16 )
-#define _32KiB ( _1KiB*32 )
 
-/*******************************************************************************
-**** Interface
-*******************************************************************************/
+//==============================================================================
+// Memory
+//==============================================================================
 
-/*******************************************************************************
-**** Native malloc
-*******************************************************************************/
-void *memory_malloc(size_t size);
+const void *pointer_align_forward(const void *p, uint32_t align);
+const void *pointer_add(const void *p, uint32_t bytes);
+const void *pointer_sub(const void *p, uint32_t bytes);
 
-/*******************************************************************************
-**** Native free
-*******************************************************************************/
-void memory_free(void *ptr);
 
-/*******************************************************************************
-**** Copy n bytes from dest to src
-*******************************************************************************/
-void *memory_copy(void *dest, const void *src, size_t n);
+void *memory_copy(void* __restrict dest, const void * __restrict src, size_t n);
 
-void *memory_copy_r(void *__restrict dest, const void *__restrict src, size_t n);
 
-#endif //CETECH_MEMORY_H
+//==============================================================================
+// Memory system
+//==============================================================================
+
+void memsys_init(int scratch_buffer_size);
+void memsys_shutdown();
+
+struct allocator* memsys_main_allocator();
+struct allocator* memsys_main_scratch_allocator();
+
+//==============================================================================
+// Allocator
+//==============================================================================
+
+#define CE_SIZE_NOT_TRACKED 0xffffffffu
+
+#define allocator_allocate(a, s, align) (a)->allocate(a, s, align)
+#define allocator_deallocate(a, p) (a)->deallocate(a, p)
+#define allocator_total_allocated(a) (a)->total_allocated(a)
+#define allocator_allocated_size(a, p) (a)->allocated_size(a, p)
+
+#define CE_ALLOCATE(a, T, size) (T*) allocator_allocate((a), size, CE_ALIGNOF(T))
+#define CE_ALLOCATE_ALIGN(a, T, size, align) (T*) allocator_allocate((a), size, align)
+#define CE_DEALLOCATE(a, p) allocator_deallocate((a), p)
+
+void allocator_trace_pointer(struct allocator_trace_entry* entries, u64 max_entries, void *p);
+void allocator_stop_trace_pointer(struct allocator_trace_entry* entries, u64 max_entries, void *p);
+void allocator_check_trace(struct allocator_trace_entry* entries, u64 max_entries);
+
+#endif //CETECH_MEMORY_SYSTEM_H

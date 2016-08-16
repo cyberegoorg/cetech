@@ -1,98 +1,63 @@
-#include "../allocator.h"
-#include "../iallocator.h"
+#include <stdint.h>
+#include <celib/types.h>
+#include "celib/memory/memory.h"
 #include "../../errors/errors.h"
 
 #define LOG_WHERE "allocator"
 
-#if defined(CETECH_DEBUG)
+//void* allocator_allocate(struct allocator* allocator, uint32_t size, uint32_t align) {
+//    return allocator->allocate(allocator, size, align);
+//}
+//
+//void allocator_deallocate(struct allocator* allocator, void* p) {
+//    allocator->deallocate(allocator, p);
+//}
+//
+//uint32_t allocator_total_allocated(struct allocator* allocator){
+//    return allocator->total_allocated(allocator);
+//}
+//
+//uint32_t allocator_allocated_size(struct allocator* allocator, void* p){
+//    return allocator->allocated_size(p);
+//}
 
-void _trace_pointer(Alloc_t allocator,
-                    void *p) {
-
-    struct iallocator *m = (struct iallocator *) allocator;
-    struct trace_entry *mem_trace = m->trace;
-
+void allocator_trace_pointer(struct allocator_trace_entry* entries, u64 max_entries, void *p) {
     char *stacktrace_str = utils_stacktrace(3);
 
-    for (int i = 0; i < CE_MAX_MEM_TRACE; ++i) {
-        if (!mem_trace[i].used) {
-            mem_trace[i].used = 1;
-            mem_trace[i].ptr = p;
-            mem_trace[i].stacktrace = stacktrace_str;
+    for (int i = 0; i < max_entries; ++i) {
+        if (!entries[i].used) {
+            entries[i].used = 1;
+            entries[i].ptr = p;
+            entries[i].stacktrace = stacktrace_str;
             break;
         }
     }
 }
 
-void _stop_trace_pointer(Alloc_t allocator, void *p) {
-    struct iallocator *m = (struct iallocator *) allocator;
-
-    struct trace_entry *mem_trace = m->trace;
-
-    for (int i = 0; i < CE_MAX_MEM_TRACE; ++i) {
-        if (mem_trace[i].ptr != p) {
+void allocator_stop_trace_pointer(struct allocator_trace_entry* entries, u64 max_entries, void *p) {
+    for (int i = 0; i < max_entries; ++i) {
+        if (entries[i].ptr != p) {
             continue;
         }
 
-        mem_trace[i].used = 0;
+        entries[i].used = 0;
 
-        utils_stacktrace_free(mem_trace[i].stacktrace);
-        mem_trace[i].stacktrace = NULL;
+        utils_stacktrace_free(entries[i].stacktrace);
+        entries[i].stacktrace = NULL;
     }
 }
 
-#endif
-
-void *alloc_alloc(Alloc_t allocator, size_t size) {
-    CE_ASSERT(LOG_WHERE, allocator != NULL);
-    CE_ASSERT(LOG_WHERE, size > 0);
-
-    struct iallocator *a = (struct iallocator *) allocator;
-
-#if defined(CETECH_DEBUG)
-    log_debug(LOG_WHERE, "[%s] Alloc %zu bytes", a->type_name, size);
-#endif
-
-    void *p = a->alloc(allocator, size);
-
-#if defined(CETECH_DEBUG)
-    _trace_pointer(allocator, p);
-#endif
-    return p;
-}
-
-void alloc_free(Alloc_t allocator, void *ptr) {
-    CE_ASSERT(LOG_WHERE, allocator != NULL);
-
-    struct iallocator *a = (struct iallocator *) allocator;
-
-    a->free(allocator, ptr);
-
-#if defined(CETECH_DEBUG)
-    _stop_trace_pointer(allocator, ptr);
-#endif
-}
-
-void alloc_destroy(Alloc_t allocator) {
-#if defined(CETECH_DEBUG)
-    struct iallocator *m = (struct iallocator *) allocator;
-
-    int ok = 1;
-    for (int i = 0; i < CE_MAX_MEM_TRACE; ++i) {
-        if (!m->trace[i].used) {
+void allocator_check_trace(struct allocator_trace_entry* entries, u64 max_entries) {
+    for (int i = 0; i < max_entries; ++i) {
+        if (!entries[i].used) {
             continue;
         }
-
-        ok = 0;
 
         log_error(LOG_WHERE, "memory_leak: %p\n  stacktrace:\n%s\n",
-                  m->trace[i].ptr, m->trace[i].stacktrace);
+                  entries[i].ptr, entries[i].stacktrace);
 
-        alloc_free(allocator, m->trace[i].ptr);
+        //allocator_free(allocator, entries[i].ptr); // TODO: need this?
 
-        utils_stacktrace_free(m->trace[i].stacktrace);
+        utils_stacktrace_free(entries[i].stacktrace);
     }
-
-    CE_ASSERT(LOG_WHERE, ok);
-#endif
 }

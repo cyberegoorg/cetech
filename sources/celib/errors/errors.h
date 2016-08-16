@@ -1,22 +1,18 @@
-/*******************************************************************************
-**** Erros and assert module
-*******************************************************************************/
-
 #ifndef CETECH_ERRORS_H
 #define CETECH_ERRORS_H
 
-/*******************************************************************************
-**** Include
-*******************************************************************************/
+//==============================================================================
+// Includes
+//==============================================================================
 
 #include <stdlib.h>
 
-#include "../log/log.h"
-#include "../utils/utils.h"
+#include "celib/log/log.h"
+#include "celib/os/stacktrace.h"
 
-/*******************************************************************************
-**** Assert with message
-*******************************************************************************/
+//==============================================================================
+// Iterface
+//==============================================================================
 
 #ifdef CETECH_DEBUG
 #define _MSG_END "\n  file: %s\n  line: %d\n  stacktrace:\n%s"
@@ -25,7 +21,8 @@
         if (!(condition)) {                                                     \
             char* st = utils_stacktrace(1);                                     \
             log_error(where ".assert",                                          \
-                       "msg: " #condition " " msg _MSG_END,                     \
+                       "msg: %s" msg _MSG_END,                                  \
+                       #condition,                                              \
                        ## __VA_ARGS__,                                          \
                        __FILE__,                                                \
                        __LINE__,                                                \
@@ -33,20 +30,13 @@
             utils_stacktrace_free(st);                                          \
             abort();                                                            \
         }                                                                       \
-    } while (0)
+    } while (0)                                                                 \
+
 #else
 #define CE_ASSERT_MSG(condition, msg, ...) do {} while (0)
 #endif
 
-/*******************************************************************************
-**** Assert
-*******************************************************************************/
-#ifdef CETECH_DEBUG
 #define CE_ASSERT(where, condition) CE_ASSERT_MSG(where, condition, "")
-#else
-#define CE_ASSERT(where, condition) do {} while (0)
-#endif
-
 #define CE_STATIC_ASSERT(expr, msg) _Static_assert(expr, msg)
 
 #endif //CETECH_ERRORS_H

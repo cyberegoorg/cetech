@@ -1,24 +1,23 @@
-/*******************************************************************************
-**** Generic dynamic array
-*******************************************************************************/
-
 #ifndef CETECH_ARRAY_H
 #define CETECH_ARRAY_H
 
-/*******************************************************************************
-**** Includes
-*******************************************************************************/
+//==============================================================================
+// Includes
+//==============================================================================
 
-#include "../memory/allocator.h"
+#include "../types.h"
 #include "../errors/errors.h"
+
 #include "../memory/memory.h"
+#include "../os/memory.h"
 
 
-/*******************************************************************************
-**** Interface macros
-*******************************************************************************/
 
-#define ARRAY_T(T)                   struct array_##T
+//==============================================================================
+// Interface macros
+//==============================================================================
+
+#define ARRAY_T(T)                 struct array_##T
 
 #define ARRAY_INIT(T, a, alloc)    array_init_##T(a, alloc)
 #define ARRAY_DESTROY(T, a)        array_destroy_##T(a)
@@ -37,19 +36,20 @@
 #define ARRAY_POP_BACK(T, a)       array_pop_back_##T(a)
 
 
-/*******************************************************************************
-**** Prototype macros
-*******************************************************************************/
+//==============================================================================
+// Prototypes macro
+//==============================================================================
 
 #define ARRAY_PROTOTYPE(T)                                                      \
     struct array_##T {                                                          \
-        Alloc_t allocator;                                                      \
+        struct allocator* allocator;                                            \
         T *data;                                                                \
         size_t size;                                                            \
         size_t capacity;                                                        \
     };                                                                          \
                                                                                 \
-    void array_init_##T(struct array_##T *array, Alloc_t allocator) {           \
+    static inline void array_init_##T(struct array_##T *array,                  \
+                                      struct allocator* allocator) {            \
         CE_ASSERT("array_"#T, array != NULL);                                   \
         CE_ASSERT("array_"#T, allocator != NULL);                               \
         array->data = NULL;                                                     \
@@ -58,16 +58,21 @@
         array->allocator = allocator;                                           \
     }                                                                           \
                                                                                 \
-    void array_destroy_##T(struct array_##T *a) {                               \
+    static inline  void array_destroy_##T(struct array_##T *a) {                \
         CE_ASSERT("array_"#T, a != NULL);                                       \
         CE_ASSERT("array_"#T, a->allocator != NULL);                            \
-        alloc_free(a->allocator, a->data);                                      \
+        allocator_deallocate(a->allocator, a->data);                            \
+        a->data = NULL;                                                         \
+        a->size = 0;                                                            \
+        a->capacity = 0;                                                        \
+        a->allocator = NULL;                                                    \
     }                                                                           \
                                                                                 \
-    void array_resize_##T(struct array_##T *a, size_t newsize);                 \
-    void array_grow_##T(struct array_##T *a, size_t mincapacity);               \
+    static inline  void array_resize_##T(struct array_##T *a, size_t newsize);  \
+    static inline  void array_grow_##T(struct array_##T *a, size_t mincapacity);\
                                                                                 \
-    void array_setcapacity_##T(struct array_##T *a, size_t  newcapacity) {      \
+    static inline  void array_setcapacity_##T(struct array_##T *a,              \
+                                              size_t  newcapacity) {            \
         CE_ASSERT("array_"#T, a != NULL);                                       \
         CE_ASSERT("array_"#T, a->allocator != NULL);                            \
                                                                                 \
@@ -81,18 +86,20 @@
                                                                                 \
         T* newdata = 0;                                                         \
         if (newcapacity > 0) {                                                  \
-            newdata = (T*) alloc_alloc(a->allocator, sizeof(T) * newcapacity/*, __alignof(T)*/);\
+            newdata = (T*) CE_ALLOCATE(a->allocator, T,                         \
+                                       sizeof(T) * newcapacity);                \
             CE_ASSERT("array_"#T, newdata !=NULL);                              \
             memory_copy(newdata, a->data, sizeof(T) * a->size);                 \
         }                                                                       \
                                                                                 \
-        alloc_free(a->allocator, a->data);                                      \
+        allocator_deallocate(a->allocator, a->data);                            \
                                                                                 \
         a->data = newdata;                                                      \
         a->capacity = newcapacity;                                              \
     }                                                                           \
                                                                                 \
-    void array_grow_##T(struct array_##T *a, size_t mincapacity) {              \
+    static inline  void array_grow_##T(struct array_##T *a,                     \
+                                       size_t mincapacity) {                    \
         CE_ASSERT("array_"#T, a != NULL);                                       \
         size_t newcapacity = a->capacity * 2 + 8;                               \
                                                                                 \
@@ -103,7 +110,7 @@
         array_setcapacity_##T(a, newcapacity);                                  \
     }                                                                           \
                                                                                 \
-    void array_resize_##T(struct array_##T *a, size_t newsize) {                \
+    static inline  void array_resize_##T(struct array_##T *a, size_t newsize) { \
         CE_ASSERT("array_"#T, a != NULL);                                       \
         if (newsize > a->capacity) {                                            \
             array_grow_##T(a, newsize);                                         \
@@ -112,14 +119,15 @@
         a->size = newsize;                                                      \
     }                                                                           \
                                                                                 \
-    void array_reserve_##T(struct array_##T *a, size_t new_capacity) {          \
+    static inline  void array_reserve_##T(struct array_##T *a,                  \
+                                          size_t new_capacity) {                \
         CE_ASSERT("array_"#T, a != NULL);                                       \
         if (new_capacity > a->capacity) {                                       \
             array_setcapacity_##T(a, new_capacity);                             \
         }                                                                       \
     }                                                                           \
                                                                                 \
-    void array_push_back_##T(struct array_##T *a, T item) {                     \
+    static inline  void array_push_back_##T(struct array_##T *a, T item) {      \
         CE_ASSERT("array_"#T, a != NULL);                                       \
         if (a->size + 1 > a->capacity) {                                        \
             array_grow_##T(a, 0);                                               \
@@ -127,7 +135,9 @@
         a->data[a->size++] = item;                                              \
     }                                                                           \
                                                                                 \
-    void array_push_##T(struct array_##T *a, T* items, size_t count) {          \
+    static inline  void array_push_##T(struct array_##T *a,                     \
+                                       T* items,                                \
+                                       size_t count) {                          \
         CE_ASSERT("array_"#T, a != NULL);                                       \
         if (a->capacity <= a->size + count) {                                   \
             array_grow_##T(a, a->size + count);                                 \
@@ -137,7 +147,7 @@
         a->size += count;                                                       \
     }                                                                           \
                                                                                 \
-    void array_pop_back_##T(struct array_##T *a) {                              \
+    static inline  void array_pop_back_##T(struct array_##T *a) {               \
         CE_ASSERT("array_"#T, a != NULL);                                       \
         CE_ASSERT("array_"#T, a->size != 0);                                    \
                                                                                 \
@@ -145,16 +155,26 @@
     }                                                                           \
 
 
-/*******************************************************************************
-**** Predefined arary for prim types
-*******************************************************************************/
+//==============================================================================
+// Predefined array for prim types
+//==============================================================================
 
+typedef char* pchar;
+
+ARRAY_PROTOTYPE(pchar)
 ARRAY_PROTOTYPE(char)
-
-ARRAY_PROTOTYPE(short)
-
 ARRAY_PROTOTYPE(int)
 
-ARRAY_PROTOTYPE(long)
+ARRAY_PROTOTYPE(u8)
+ARRAY_PROTOTYPE(u16)
+ARRAY_PROTOTYPE(u32)
+ARRAY_PROTOTYPE(u64)
+
+ARRAY_PROTOTYPE(i8)
+ARRAY_PROTOTYPE(i16)
+ARRAY_PROTOTYPE(i32)
+ARRAY_PROTOTYPE(i64)
+
+typedef ARRAY_T(pchar) string_array_t;
 
 #endif //CETECH_ARRAY_H

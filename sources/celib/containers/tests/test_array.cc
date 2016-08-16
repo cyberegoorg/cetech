@@ -7,20 +7,19 @@
 #include "include/catch/catch.hpp"
 
 extern "C" {
+#include <celib/memory/memory.h>
 #include "../array.h"
-#include "../../memory/mallocator.h"
 }
 
 /*******************************************************************************
 **** Array can store items
 *******************************************************************************/
 SCENARIO( "Array can store items", "[array]" ) {
+    memsys_init(4*1024*1024);
 
     GIVEN( "A empty array" ) {
-        ALLOCATOR_CREATE_SCOPED(a, mallocator);
-
         ARRAY_T(int) array;
-        ARRAY_INIT(int, &array, a);
+        ARRAY_INIT(int, &array, memsys_main_allocator());
 
         REQUIRE( ARRAY_SIZE(&array) == 0 );
         //REQUIRE( array::empty(a));
@@ -53,17 +52,19 @@ SCENARIO( "Array can store items", "[array]" ) {
 
         ARRAY_DESTROY(int, &array);
     }
+
+    memsys_shutdown();
 }
 
 /*******************************************************************************
 **** Array can be sized and resized
 *******************************************************************************/
 SCENARIO( "Array can be sized and resized", "[array]" ) {
-    GIVEN( "A array with some items" ) {
-        ALLOCATOR_CREATE_SCOPED(a, mallocator);
+    memsys_init(4*1024*1024);
 
+    GIVEN( "A array with some items" ) {
         ARRAY_T(int) array;
-        ARRAY_INIT(int, &array, a);
+        ARRAY_INIT(int, &array, memsys_main_allocator());
 
         ARRAY_PUSH_BACK(int, &array, 1);
         ARRAY_PUSH_BACK(int, &array, 2);
@@ -110,17 +111,20 @@ SCENARIO( "Array can be sized and resized", "[array]" ) {
 
         ARRAY_DESTROY(int, &array);
     }
+
+    memsys_shutdown();
 }
 
 /*******************************************************************************
 **** Can iterate.
 *******************************************************************************/
 SCENARIO( "Can iterate array", "[array]" ) {
-    GIVEN( "Array with elements [1, 2, 3, 4, 5]" ) {
-        ALLOCATOR_CREATE_SCOPED(a, mallocator);
+    memsys_init(4*1024*1024);
 
+
+    GIVEN( "Array with elements [1, 2, 3, 4, 5]" ) {
         ARRAY_T(int) array;
-        ARRAY_INIT(int, &array, a);
+        ARRAY_INIT(int, &array, memsys_main_allocator());
 
         static int items [] = {1, 2, 3, 4, 5};
         ARRAY_PUSH(int, &array, items, 5);
@@ -154,6 +158,8 @@ SCENARIO( "Can iterate array", "[array]" ) {
 
         ARRAY_DESTROY(int, &array);
     }
+
+    memsys_shutdown();
 }
 
 

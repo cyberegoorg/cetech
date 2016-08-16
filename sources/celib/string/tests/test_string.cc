@@ -7,8 +7,8 @@
 #include "include/catch/catch.hpp"
 
 extern "C" {
+#include <celib/memory/memory.h>
 #include "../string.h"
-#include "../../memory/mallocator.h"
 };
 
 /*******************************************************************************
@@ -19,23 +19,24 @@ extern "C" {
 **** String duplicate
 *******************************************************************************/
 SCENARIO( "string duplicate", "[string]" ) {
-    GIVEN( "string 'test string'" ) {
-        ALLOCATOR_CREATE(allocator, mallocator);
+    memsys_init(4*1024*1024);
 
+    GIVEN( "string 'test string'" ) {
         const char* test_string = "test_string";
 
         WHEN("duplicate sting") {
-            char* duplicate_string = str_duplicate(test_string, allocator); // TODO: LEAK
+            char* duplicate_string = str_duplicate(test_string, memsys_main_allocator());
 
             THEN("duplicate_string == 'test string'") {
                 REQUIRE(str_compare(test_string, duplicate_string) == 0);
             }
 
-            alloc_free(allocator, duplicate_string);
+            allocator_deallocate(memsys_main_allocator(), duplicate_string);
         }
 
-        ALLOCATOR_DESTROY(allocator, mallocator);
     }
+
+    memsys_shutdown();
 }
 
 /*******************************************************************************

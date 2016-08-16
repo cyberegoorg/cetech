@@ -109,7 +109,7 @@ SCENARIO("identity quaternion == identiy matrix", "[math]") {
 
             quatf_to_mat44f(mat, quat_identity);
 
-            REQUIRE(mat44f_is_identity(mat, f_Epsilon));
+            REQUIRE(mat44f_is_identity(mat, f32_Epsilon));
         }
     }
 }

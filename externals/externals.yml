@@ -250,3 +250,50 @@ yaml-cpp:
 
       - copyfile: [libyaml-cpp.a, debug/lib/libyaml-cpp.a]
       - copytree: [include/yaml-cpp, debug/include/yaml-cpp]
+
+
+##########
+# luajit #
+########################################################################################################################
+luajit:
+  clone: git clone http://luajit.org/git/luajit-2.0.git
+
+  build:
+    linux64:  make
+    linux32:  make
+    darwin64: make
+
+  install:
+    linux64:
+      - copy: [src/libluajit.a, release/lib]
+      - copy: [src/lauxlib.h, release/include/luajit]
+      - copy: [src/luaconf.h, release/include/luajit]
+      - copy: [src/lua.h, release/include/luajit]
+      - copy: [src/lua.hpp, release/include/luajit]
+      - copy: [src/luajit.h, release/include/luajit]
+      - copy: [src/lualib.h, release/include/luajit]
+
+      - copy: [src/libluajit.a, debug/lib]
+      - copy: [src/lauxlib.h, debug/include/luajit]
+      - copy: [src/luaconf.h, debug/include/luajit]
+      - copy: [src/lua.h, debug/include/luajit]
+      - copy: [src/lua.hpp, debug/include/luajit]
+      - copy: [src/luajit.h, debug/include/luajit]
+      - copy: [src/lualib.h, debug/include/luajit]
+
+    darwin64:
+      - copy: [src/libluajit.a, release/lib]
+      - copy: [src/lauxlib.h, release/include/luajit]
+      - copy: [src/luaconf.h, release/include/luajit]
+      - copy: [src/lua.h, release/include/luajit]
+      - copy: [src/lua.hpp, release/include/luajit]
+      - copy: [src/luajit.h, release/include/luajit]
+      - copy: [src/lualib.h, release/include/luajit]
+
+      - copy: [src/libluajit.a, debug/lib]
+      - copy: [src/lauxlib.h, debug/include/luajit]
+      - copy: [src/luaconf.h, debug/include/luajit]
+      - copy: [src/lua.h, debug/include/luajit]
+      - copy: [src/lua.hpp, debug/include/luajit]
+      - copy: [src/luajit.h, debug/include/luajit]
+      - copy: [src/lualib.h, debug/include/luajit]

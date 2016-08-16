@@ -6,8 +6,8 @@
 #include <include/mpack/mpack.h>
 #include <include/nanomsg/nn.h>
 
-#include "../log.h"
-#include "../../errors/errors.h"
+#include "celib/log/log.h"
+#include "celib/errors/errors.h"
 
 /***********************************************************************
 **** Internals
@@ -23,13 +23,13 @@ static const char *_level_to_str[4] = {
 void nano_log_handler(enum log_level level,
                       time_t time,
                       char worker_id,
-                      char *where,
-                      char *msg,
+                      const char *where,
+                      const char *msg,
                       void *_data) {
 
     CE_STATIC_ASSERT(sizeof(void *) >= sizeof(int), "AUTHOR IS IDIOT");
 
-    int socket = (int) _data; // TODO: problem if sizeof(void*) < int
+    int socket = *((int*)_data); // TODO: problem if sizeof(void*) < int
 
     int bytes;
     char *data;
@@ -56,8 +56,8 @@ void nano_log_handler(enum log_level level,
 
     mpack_finish_map(&writer);
 
-    CE_ASSERT("console_server", mpack_writer_destroy(&writer) == mpack_ok);
+    CE_ASSERT("consoleserver", mpack_writer_destroy(&writer) == mpack_ok);
 
     bytes = nn_send(socket, data, size, 0);
-    CE_ASSERT("console_server", (size_t) bytes == size);
+    CE_ASSERT("consoleserver", (size_t) bytes == size);
 }

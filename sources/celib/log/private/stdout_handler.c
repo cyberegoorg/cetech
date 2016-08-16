@@ -10,8 +10,8 @@
 
 #endif
 
-#include "../log.h"
-#include "../../string/string.h"
+#include "celib/log/log.h"
+#include "celib/string/string.h"
 
 /***********************************************************************
 **** Internals

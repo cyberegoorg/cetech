@@ -7,7 +7,7 @@
 #include "include/catch/catch.hpp"
 
 extern "C" {
-#include "../log.h"
+#include "celib/log/log.h"
 };
 
 /*******************************************************************************
