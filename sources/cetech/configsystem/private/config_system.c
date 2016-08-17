@@ -71,10 +71,10 @@ config_var_t _find_first_free() {
 }
 
 config_var_t config_find_or_create(const char *name, int *new) {
-    *new = 0;
+    if (new) *new = 0;
 
     for (u64 i = 1; i < MAX_VARIABLES; ++i) {
-        if (_G.name[i][0] != '\0') {
+        if (_G.name[i][0] == '\0') {
             continue;
         }
 
@@ -88,7 +88,9 @@ config_var_t config_find_or_create(const char *name, int *new) {
     const config_var_t var = _find_first_free();
 
     if (var.idx != 0) {
-        *new = 1;
+        str_set(_G.name[var.idx], name);
+
+        if (new) *new = 1;
         return var;
     }
 
@@ -98,10 +100,6 @@ config_var_t config_find_or_create(const char *name, int *new) {
 config_var_t config_new_float(const char *name, const char *desc, float f) {
     int new;
     config_var_t find = config_find_or_create(name, &new);
-
-    if (find.idx == 0) {
-        return find;
-    }
 
     if (new) {
         str_set(_G.name[find.idx], name);
@@ -118,10 +116,6 @@ config_var_t config_new_int(const char *name, const char *desc, int i) {
     int new;
     config_var_t find = config_find_or_create(name, &new);
 
-    if (find.idx == 0) {
-        return find;
-    }
-
     if (new) {
         str_set(_G.name[find.idx], name);
         _G.types[find.idx] = CV_INT;
@@ -136,10 +130,6 @@ config_var_t config_new_int(const char *name, const char *desc, int i) {
 config_var_t config_new_string(const char *name, const char *desc, const char *s) {
     int new;
     config_var_t find = config_find_or_create(name, &new);
-
-    if (find.idx == 0) {
-        return find;
-    }
 
     if (new) {
         str_set(_G.name[find.idx], name);

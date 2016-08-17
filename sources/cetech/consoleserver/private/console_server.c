@@ -99,7 +99,7 @@ void consolesrv_init() {
     char addr[128] = {0};
     snprintf(addr, 128, "%s:%d", config_get_string(rpc_addr), config_get_int(rpc_port));
 
-    log_debug(LOG_WHERE, "RPC addr: %s", addr);
+    log_debug(LOG_WHERE, "RPC address: %s", addr);
 
     if (nn_bind(socket, addr) < 0) {
         log_error(LOG_WHERE, "Could not bind socket to '%s': %s", addr, nn_strerror(errno));

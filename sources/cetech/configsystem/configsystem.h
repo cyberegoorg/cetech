@@ -30,7 +30,6 @@ config_var_t config_new_float(const char *name, const char *desc, float f);
 
 config_var_t config_new_int(const char *name, const char *desc, int i);
 
-
 config_var_t config_new_string(const char *name, const char *desc, const char *s);
 
 float config_get_float(config_var_t var);
