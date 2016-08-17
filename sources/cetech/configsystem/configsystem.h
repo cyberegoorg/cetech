@@ -11,7 +11,9 @@
 // Typedefs
 //==============================================================================
 
-typedef size_t config_var_t;
+typedef struct {
+    u64 idx;
+} config_var_t;
 
 
 //==============================================================================
@@ -22,24 +24,25 @@ void config_init();
 
 void config_shutdown();
 
-config_var_t config_find_or_create(const char *, int *);
+config_var_t config_find_or_create(const char *name, int *new);
 
-config_var_t config_new_float(const char *, const char *, float);
+config_var_t config_new_float(const char *name, const char *desc, float f);
 
-config_var_t config_new_int(const char *, const char *, int);
+config_var_t config_new_int(const char *name, const char *desc, int i);
 
-config_var_t config_new_string(const char *, const char *, const char *);
 
-float config_get_float(config_var_t);
+config_var_t config_new_string(const char *name, const char *desc, const char *s);
 
-int config_get_int(config_var_t);
+float config_get_float(config_var_t var);
 
-const char *config_get_string(config_var_t);
+int config_get_int(config_var_t var);
 
-void config_set_float(config_var_t, float);
+const char *config_get_string(config_var_t var);
 
-void config_set_int(config_var_t, int);
+void config_set_float(config_var_t var, float f);
 
-void config_set_string(config_var_t, const char *);
+void config_set_int(config_var_t var, int i);
+
+void config_set_string(config_var_t var, const char *s);
 
 #endif //CETECH_CONFIG_API_H

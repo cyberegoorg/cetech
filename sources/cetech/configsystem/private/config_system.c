@@ -1,4 +1,5 @@
 #include <celib/memory/memory.h>
+#include <cetech/configsystem/configsystem.h>
 #include "celib/string/string.h"
 
 #include "celib/log/log.h"
@@ -9,6 +10,8 @@
 #define MAX_NAME_LEN 128
 #define MAX_DESC_LEN 256
 #define LOG_WHERE "config_system"
+
+#define make_cvar(i) (config_var_t){.idx = i}
 
 enum cvar_type {
     CV_NONE = 0,
@@ -53,22 +56,24 @@ void config_shutdown() {
 ///
 
 config_var_t _find_first_free() {
-    for (config_var_t i = 1; i < MAX_VARIABLES; ++i) {
+
+    for (u64 i = 1; i < MAX_VARIABLES; ++i) {
         if (_G.name[i][0] != '\0') {
             continue;
         }
 
-        return i;
+        return make_cvar(i);
     }
 
     log_error(LOG_WHERE, "Could not create new config variable");
-    return 0;
+
+    return make_cvar(0);
 }
 
 config_var_t config_find_or_create(const char *name, int *new) {
     *new = 0;
 
-    for (config_var_t i = 1; i < MAX_VARIABLES; ++i) {
+    for (u64 i = 1; i < MAX_VARIABLES; ++i) {
         if (_G.name[i][0] != '\0') {
             continue;
         }
@@ -77,34 +82,34 @@ config_var_t config_find_or_create(const char *name, int *new) {
             continue;
         }
 
-        return i;
+        return make_cvar(i);
     }
 
     const config_var_t var = _find_first_free();
 
-    if (var != 0) {
+    if (var.idx != 0) {
         *new = 1;
         return var;
     }
 
-    return 0;
+    return make_cvar(0);
 }
 
 config_var_t config_new_float(const char *name, const char *desc, float f) {
     int new;
     config_var_t find = config_find_or_create(name, &new);
 
-    if (find == 0) {
+    if (find.idx == 0) {
         return find;
     }
 
     if (new) {
-        str_set(_G.name[find], name);
-        _G.types[find] = CV_FLOAT;
-        _G.values[find].f = f;
+        str_set(_G.name[find.idx], name);
+        _G.types[find.idx] = CV_FLOAT;
+        _G.values[find.idx].f = f;
     }
 
-    str_set(_G.desc[find], desc);
+    str_set(_G.desc[find.idx], desc);
 
     return find;
 }
@@ -113,17 +118,17 @@ config_var_t config_new_int(const char *name, const char *desc, int i) {
     int new;
     config_var_t find = config_find_or_create(name, &new);
 
-    if (find == 0) {
+    if (find.idx == 0) {
         return find;
     }
 
     if (new) {
-        str_set(_G.name[find], name);
-        _G.types[find] = CV_INT;
-        _G.values[find].i = i;
+        str_set(_G.name[find.idx], name);
+        _G.types[find.idx] = CV_INT;
+        _G.values[find.idx].i = i;
     }
 
-    str_set(_G.desc[find], desc);
+    str_set(_G.desc[find.idx], desc);
 
     return find;
 }
@@ -132,48 +137,48 @@ config_var_t config_new_string(const char *name, const char *desc, const char *s
     int new;
     config_var_t find = config_find_or_create(name, &new);
 
-    if (find == 0) {
+    if (find.idx == 0) {
         return find;
     }
 
     if (new) {
-        str_set(_G.name[find], name);
-        _G.types[find] = CV_STRING;
-        _G.values[find].s = str_duplicate(s, memsys_main_allocator());
+        str_set(_G.name[find.idx], name);
+        _G.types[find.idx] = CV_STRING;
+        _G.values[find.idx].s = str_duplicate(s, memsys_main_allocator());
     }
 
-    str_set(_G.desc[find], desc);
+    str_set(_G.desc[find.idx], desc);
 
     return find;
 }
 
 float config_get_float(config_var_t var) {
-    return _G.values[var].f;
+    return _G.values[var.idx].f;
 }
 
 int config_get_int(config_var_t var) {
-    return _G.values[var].i;
+    return _G.values[var.idx].i;
 }
 
 const char *config_get_string(config_var_t var) {
-    return _G.values[var].s;
+    return _G.values[var.idx].s;
 }
 
 void config_set_float(config_var_t var, float f) {
-    _G.values[var].f = f;
+    _G.values[var.idx].f = f;
 }
 
 void config_set_int(config_var_t var, int i) {
-    _G.values[var].i = i;
+    _G.values[var.idx].i = i;
 }
 
 void config_set_string(config_var_t var, const char *s) {
-    char *_s = _G.values[var].s;
+    char *_s = _G.values[var.idx].s;
 
     if (_s != NULL) {
         allocator_deallocate(memsys_main_allocator(), _s);
     }
 
-    _G.values[var].s = str_duplicate(s, memsys_main_allocator());
+    _G.values[var.idx].s = str_duplicate(s, memsys_main_allocator());
 }
 
