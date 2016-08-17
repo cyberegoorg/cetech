@@ -128,8 +128,10 @@ set(SOURCE_FILES
         sources/celib/log/private/log_system.c
 
         sources/cetech/luasystem/private/lua_system.c
-        sources/cetech/luasystem/private/api_log.c
-        sources/cetech/luasystem/private/api_keyboard.c
+        sources/cetech/luasystem/private/api/api_keyboard.c
+        sources/cetech/luasystem/private/api/api_log.c
+        sources/cetech/luasystem/private/api/api_mouse.c
+        sources/cetech/luasystem/private/api/api_application.c
 
         sources/cetech/configsystem/private/config_system.c
         sources/cetech/consoleserver/private/console_server.c
@@ -148,6 +150,8 @@ set(SOURCE_FILES
         sources/cetech/machine/private/sdl_machine.c
         sources/cetech/input/private/keyboard.c
         sources/cetech/input/private/mouse.c
+
+
 )
 
 ################################################################################

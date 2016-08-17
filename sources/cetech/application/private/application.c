@@ -32,22 +32,6 @@ static char _get_worker_id() {
 }
 
 //==============================================================================
-// LUA inteface
-//==============================================================================
-#define LUA_MODULE_NAME "App"
-
-static int _application_quit(lua_State *l) {
-    void application_quit();
-
-    application_quit();
-    return 0;
-}
-
-static void _register_lua_fce() {
-    LUA.add_module_function(LUA_MODULE_NAME, "quit", _application_quit);
-}
-
-//==============================================================================
 // Interface
 //==============================================================================
 
@@ -81,7 +65,6 @@ int application_init(int argc, char **argv) {
     };
 
     windowsys_init();
-    _register_lua_fce();
 
     return 1;
 }
@@ -101,7 +84,7 @@ void application_shutdown() {
     log_shutdown();
 }
 
-void dump_event() {
+static void _dump_event() {
     struct event_header *event = machine_event_begin();
 
     u32 size = 0;
@@ -134,7 +117,6 @@ void dump_event() {
         }
         event = machine_event_next(event);
     }
-
 }
 
 void application_start() {
@@ -149,7 +131,7 @@ void application_start() {
     _G.is_running = 1;
     while (_G.is_running) {
         machine_begin_frame();
-        dump_event();
+        _dump_event();
 
         keyboard_process();
         mouse_process();

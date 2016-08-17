@@ -220,6 +220,19 @@ static int _cmd_execute_string(mpack_node_t args, mpack_writer_t *writer) {
 }
 
 
+#define REGISTER_LUA_API(name) \
+    void _register_lua_##name##_api();\
+    _register_lua_##name##_api();
+
+
+static void _register_all_api() {
+    REGISTER_LUA_API(log);
+    REGISTER_LUA_API(keyboard);
+    REGISTER_LUA_API(mouse);
+    REGISTER_LUA_API(application);
+
+}
+
 static void _init() {
     log_info(LOG_WHERE, "Init");
 
@@ -228,11 +241,7 @@ static void _init() {
 
     luaL_openlibs(_G.L);
 
-    void _register_lua_log_api();
-    _register_lua_log_api();
-
-    void _register_lua_keyboard_api();
-    _register_lua_keyboard_api();
+    _register_all_api();
 
     _add_module_function("plugin", "reload", _reload_plugin);
 

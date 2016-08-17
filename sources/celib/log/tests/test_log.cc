@@ -26,14 +26,14 @@ static struct LogEntry {
     char worker_id;
 } LastLogEntry;
 
-#define NULL_ENTRY_INIT { \
+#define NULL_ENTRY_INIT (struct LogEntry) { \
         .level = LOG_ERROR, \
         .time = 0, \
         .worker_id = 0, \
         .where = 0, \
         .msg = 0, \
-        .data = 0, \
-};
+        .data = 0 \
+}
 
 void test_handler(enum log_level level,
                   time_t time,
