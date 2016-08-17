@@ -20,7 +20,7 @@ typedef struct {
 // Interface
 //==============================================================================
 
-void config_init();
+int config_init();
 
 void config_shutdown();
 

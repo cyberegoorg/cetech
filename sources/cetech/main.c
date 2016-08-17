@@ -3,12 +3,11 @@
 int main(int argc, char **argv) {
     const int init_result = application_init(argc, argv);
 
-    if (init_result < 0) {
-        return init_result;
+    if (init_result) {
+        application_start();
     }
 
-    application_start();
     application_shutdown();
 
-    return 0;
+    return init_result;
 }

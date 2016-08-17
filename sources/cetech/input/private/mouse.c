@@ -26,7 +26,7 @@ int mouse_init() {
     return 1;
 }
 
-void mouse_shutdow() {
+void mouse_shutdown() {
     _G = (struct G) {0};
 
     log_debug(LOG_WHERE, "Shutdown");

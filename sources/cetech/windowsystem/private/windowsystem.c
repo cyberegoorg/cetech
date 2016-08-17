@@ -28,8 +28,10 @@ static uint32_t _sdl_flags(enum WindowFlags flags) {
     return sdl_flags;
 }
 
-void windowsys_init() {
+int windowsys_init() {
     log_debug(LOG_WHERE, "Init");
+
+    return 1;
 }
 
 void windowsys_shutdown() {

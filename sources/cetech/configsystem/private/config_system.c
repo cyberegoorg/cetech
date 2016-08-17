@@ -43,8 +43,10 @@ void _dealloc_all_string() {
     }
 }
 
-void config_init() {
+int config_init() {
     log_debug(LOG_WHERE, "Init");
+
+    return 1;
 }
 
 void config_shutdown() {

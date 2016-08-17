@@ -29,7 +29,7 @@ enum WindowPos {
 // Interface
 //==============================================================================
 
-void windowsys_init();
+int windowsys_init();
 
 void windowsys_shutdown();
 

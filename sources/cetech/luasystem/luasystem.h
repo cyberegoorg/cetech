@@ -15,7 +15,7 @@
 // Interface
 //==============================================================================
 
-void luasys_init();
+int luasys_init();
 
 void luasys_shutdown();
 

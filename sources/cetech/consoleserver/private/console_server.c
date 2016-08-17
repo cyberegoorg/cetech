@@ -84,7 +84,7 @@ static void _serve_command(const char *packet, int len) {
 
 }
 
-void consolesrv_init() {
+int consolesrv_init() {
     log_debug(LOG_WHERE, "Init");
 
     config_var_t rpc_port = config_new_int("consoleserver.rpc.port", "Console server rpc port", 4444);
@@ -93,7 +93,7 @@ void consolesrv_init() {
     int socket = nn_socket(AF_SP, NN_REP);
     if (socket < 0) {
         log_error(LOG_WHERE, "Could not create nanomsg socket: %s", nn_strerror(errno));
-        return;
+        return 0;
     }
 
     char addr[128] = {0};
@@ -103,7 +103,7 @@ void consolesrv_init() {
 
     if (nn_bind(socket, addr) < 0) {
         log_error(LOG_WHERE, "Could not bind socket to '%s': %s", addr, nn_strerror(errno));
-        return;
+        return 0;
     }
 
     _G.rpc_socket = socket;
@@ -111,16 +111,18 @@ void consolesrv_init() {
     socket = nn_socket(AF_SP, NN_PUB);
     if (socket < 0) {
         log_error(LOG_WHERE, "Could not create nanomsg socket: %s", nn_strerror(errno));
-        return;
+        return 0;
     }
 
     if (nn_bind(socket, "ws://*:4445") < 0) {
         log_error(LOG_WHERE, "Could not bind socket to '%s': %s", addr, nn_strerror(errno));
-        return;
+        return 0;
     }
     _G.log_socket = socket;
 
     log_register_handler(nano_log_handler, &_G.log_socket);
+
+    return 1;
 }
 
 void consolesrv_shutdown() {

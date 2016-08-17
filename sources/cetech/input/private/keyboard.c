@@ -23,7 +23,7 @@ int keyboard_init() {
     return 1;
 }
 
-void keyboard_shutdow() {
+void keyboard_shutdown() {
     _G = (struct G) {0};
 
     log_debug(LOG_WHERE, "Shutdown");

@@ -14,7 +14,7 @@
 
 int keyboard_init();
 
-void keyboard_shutdow();
+void keyboard_shutdown();
 
 void keyboard_process();
 
@@ -34,7 +34,7 @@ int keyboard_button_released(const u32 button_index);
 
 int mouse_init();
 
-void mouse_shutdow();
+void mouse_shutdown();
 
 void mouse_process();
 

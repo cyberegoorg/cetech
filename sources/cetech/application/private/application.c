@@ -18,10 +18,33 @@
 //==============================================================================
 
 static struct G {
-    int is_running;
     window_t main_window;
+    int is_running;
+    int init_error;
 } _G = {0};
 
+//==============================================================================
+// Systems
+//==============================================================================
+
+#define _SYSTEMS_SIZE sizeof(_SYSTEMS)/sizeof(_SYSTEMS[0])
+#define _REGISTER_SYSTEM(n) {.name= #n, .init=n##_init, .shutdown=n##_shutdown}
+
+struct {
+    const char *name;
+
+    int (*init)();
+
+    void (*shutdown)();
+} _SYSTEMS[] = {
+        _REGISTER_SYSTEM(config),
+        _REGISTER_SYSTEM(consolesrv),
+        _REGISTER_SYSTEM(luasys),
+        _REGISTER_SYSTEM(machine),
+        _REGISTER_SYSTEM(keyboard),
+        _REGISTER_SYSTEM(mouse),
+        _REGISTER_SYSTEM(windowsys)
+};
 
 //==============================================================================
 // Private
@@ -37,6 +60,7 @@ static char _get_worker_id() {
 
 void application_quit() {
     _G.is_running = 0;
+    _G.init_error = 0;
 }
 
 int application_init(int argc, char **argv) {
@@ -48,25 +72,19 @@ int application_init(int argc, char **argv) {
     log_debug(LOG_WHERE, "Init");
 
     memsys_init(4 * 1024 * 1024);
-    config_init();
 
-    consolesrv_init();
+    for (int i = 0; i < _SYSTEMS_SIZE; ++i) {
+        if (!_SYSTEMS[i].init()) {
+            log_error(LOG_WHERE, "Could not init system \"%s\"", _SYSTEMS[i].name);
 
-    luasys_init();
+            for (i = i - 1; i >= 0; --i) {
+                _SYSTEMS[i].shutdown();
+            }
 
-    if (!machine_init()) {
-        return 0;
-    };
-
-    if (!keyboard_init()) {
-        return 0;
-    };
-
-    if (!mouse_init()) {
-        return 0;
-    };
-
-    windowsys_init();
+            _G.init_error = 1;
+            return 0;
+        }
+    }
 
     return 1;
 }
@@ -74,16 +92,14 @@ int application_init(int argc, char **argv) {
 void application_shutdown() {
     log_debug(LOG_WHERE, "Shutdown");
 
-    windowsys_destroy_window(_G.main_window);
+    if (!_G.init_error) {
+        for (int i = _SYSTEMS_SIZE - 1; i >= 0; --i) {
+            _SYSTEMS[i].shutdown();
+        }
 
-    windowsys_shutdown();
-    keyboard_shutdow();
-    mouse_shutdow();
-    machine_shutdown();
+        windowsys_destroy_window(_G.main_window);
+    }
 
-    luasys_shutdown();
-    consolesrv_shutdown();
-    config_shutdown();
     memsys_shutdown();
     log_shutdown();
 }

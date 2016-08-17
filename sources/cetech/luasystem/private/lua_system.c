@@ -226,7 +226,7 @@ static void _register_all_api() {
 
 }
 
-void luasys_init() {
+int luasys_init() {
     log_debug(LOG_WHERE, "Init");
 
     _G.L = luaL_newstate();
@@ -239,6 +239,8 @@ void luasys_init() {
     luasys_add_module_function("plugin", "reload", _reload_plugin);
 
     consolesrv_register_command("luasystem.execute", _cmd_execute_string);
+
+    return 1;
 }
 
 void luasys_shutdown() {
