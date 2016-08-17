@@ -2,14 +2,13 @@
 // Includes
 //==============================================================================
 
-#include <celib/memory/memory.h>
-#include <cetech/luasystem/luasystem.h>
-#include <cetech/machine/machine.h>
-#include <cetech/input/input.h>
 #include <celib/log/log.h>
-#include <cetech/configsystem/configsystem.h>
-#include <cetech/consoleserver/consoleserver.h>
-#include "cetech/windowsystem/windowsystem.h"
+#include <celib/memory/memory.h>
+
+#include "../../machine/machine.h"
+#include "../../input/input.h"
+#include "../../consoleserver/consoleserver.h"
+#include "../../windowsystem/windowsystem.h"
 
 #define LOG_WHERE "application"
 
@@ -27,24 +26,7 @@ static struct G {
 // Systems
 //==============================================================================
 
-#define _SYSTEMS_SIZE sizeof(_SYSTEMS)/sizeof(_SYSTEMS[0])
-#define _REGISTER_SYSTEM(n) {.name= #n, .init=n##_init, .shutdown=n##_shutdown}
-
-struct {
-    const char *name;
-
-    int (*init)();
-
-    void (*shutdown)();
-} _SYSTEMS[] = {
-        _REGISTER_SYSTEM(config),
-        _REGISTER_SYSTEM(consolesrv),
-        _REGISTER_SYSTEM(luasys),
-        _REGISTER_SYSTEM(machine),
-        _REGISTER_SYSTEM(keyboard),
-        _REGISTER_SYSTEM(mouse),
-        _REGISTER_SYSTEM(windowsys)
-};
+#include "systems.h"
 
 //==============================================================================
 // Private
@@ -165,7 +147,7 @@ void application_start() {
 
         if (mouse_button_state(mouse_button_index("left"))) {
             vec2f_t pos = {0};
-            mouse_axis(mouse_axis_index("delta"), pos);
+            mouse_axis(mouse_axis_index("absolute"), pos);
 
             if (pos[0] != 0.0f) {
                 log_info("sdadsad", "pos %f, %f", pos[0], pos[1]);

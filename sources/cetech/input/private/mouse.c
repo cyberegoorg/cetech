@@ -121,7 +121,7 @@ u32 mouse_axis_index(const char *axis_name) {
             continue;
         }
 
-        if (str_compare(_axis_to_str[i], axis_name)) {
+        if (str_compare(_axis_to_str[i], axis_name) != 0) {
             continue;
         }
 

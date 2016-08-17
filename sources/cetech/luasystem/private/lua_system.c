@@ -223,7 +223,6 @@ static void _register_all_api() {
     REGISTER_LUA_API(keyboard);
     REGISTER_LUA_API(mouse);
     REGISTER_LUA_API(application);
-
 }
 
 int luasys_init() {
