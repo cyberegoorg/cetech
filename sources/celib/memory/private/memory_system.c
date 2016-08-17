@@ -12,7 +12,7 @@
 struct G {
     struct allocator_malloc default_allocator;
     struct allocator_scratch default_scratch_allocator;
-} _G;
+}   _G;
 
 void memsys_init(int scratch_buffer_size) {
     _G = (struct G) {0};

@@ -20,11 +20,16 @@ static struct G {
 
 int mouse_init() {
     _G = (struct G) {0};
+
+    log_debug(LOG_WHERE, "Init");
+
     return 1;
 }
 
 void mouse_shutdow() {
     _G = (struct G) {0};
+
+    log_debug(LOG_WHERE, "Shutdown");
 }
 
 void mouse_process() {

@@ -39,10 +39,14 @@ static struct G {
 
 void filesystem_init() {
     _G = (struct G) {0};
+
+    log_debug(LOG_WHERE, "Init");
 }
 
 void filesystem_shutdown() {
     _G = (struct G) {0};
+
+    log_debug(LOG_WHERE, "Shutdown");
 }
 
 void filesystem_map_root_dir(stringid64_t root, const char *base_path) {

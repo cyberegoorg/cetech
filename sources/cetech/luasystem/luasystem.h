@@ -7,58 +7,50 @@
 
 #include <stdio.h>
 
-//==============================================================================
-// Typedefs
-//==============================================================================
-
-typedef struct lua_State lua_State;
-
-typedef int (*lua_CFunction)(lua_State *L);
+#include "include/luajit/lua.h"
+#include "include/luajit/lauxlib.h"
+#include "include/luajit/lualib.h"
 
 //==============================================================================
 // Interface
 //==============================================================================
 
-struct lua_api_v0 {
-    void (*init)();
+void luasys_init();
 
-    void (*shutdown)();
+void luasys_shutdown();
 
-    int (*get_top)(lua_State *);
+int luasys_get_top(lua_State *);
 
-    void (*remove)(lua_State *, int);
+void luasys_remove(lua_State *, int);
 
-    void (*pop)(lua_State *, int);
+void luasys_pop(lua_State *, int);
 
-    int (*is_nil)(lua_State *, int);
+int luasys_is_nil(lua_State *, int);
 
-    int (*is_number)(lua_State *, int);
+int luasys_is_number(lua_State *, int);
 
-    int (*value_type)(lua_State *, int);
+int luasys_value_type(lua_State *, int);
 
-    void (*push_nil)(lua_State *);
+void luasys_push_nil(lua_State *);
 
-    void (*push_bool)(lua_State *, int);
+void luasys_push_bool(lua_State *, int);
 
-    void (*push_float)(lua_State *, float);
+void luasys_push_float(lua_State *, float);
 
-    void (*push_string)(lua_State *, const char *);
+void luasys_push_string(lua_State *, const char *);
 
-    int (*to_bool)(lua_State *, int);
+int luasys_to_bool(lua_State *, int);
 
-    int (*to_int)(lua_State *, int);
+int luasys_to_int(lua_State *, int);
 
-    float (*to_float)(lua_State *, int);
+float luasys_to_float(lua_State *, int);
 
-    const char *(*to_string)(lua_State *, int);
+const char *luasys_to_string(lua_State *, int);
 
-    const char *(*to_string_l)(lua_State *, int, size_t *);
+const char *luasys_to_string_l(lua_State *, int, size_t *);
 
-    int (*execute_string)(const char *str);
+int luasys_execute_string(const char *str);
 
-    void (*add_module_function)(const char *module, const char *name, const lua_CFunction func);
-};
-
-extern struct lua_api_v0 LUA;
+void luasys_add_module_function(const char *module, const char *name, const lua_CFunction func);
 
 #endif //CETECH_LUA_API_H

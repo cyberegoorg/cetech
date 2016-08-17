@@ -17,11 +17,16 @@ static struct G {
 
 int keyboard_init() {
     _G = (struct G) {0};
+
+    log_debug(LOG_WHERE, "Init");
+
     return 1;
 }
 
 void keyboard_shutdow() {
     _G = (struct G) {0};
+
+    log_debug(LOG_WHERE, "Shutdown");
 }
 
 void keyboard_process() {

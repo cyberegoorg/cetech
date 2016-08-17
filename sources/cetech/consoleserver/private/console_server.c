@@ -85,7 +85,7 @@ static void _serve_command(const char *packet, int len) {
 }
 
 void consolesrv_init() {
-    log_info(LOG_WHERE, "Init");
+    log_debug(LOG_WHERE, "Init");
 
     config_var_t rpc_port = config_new_int("consoleserver.rpc.port", "Console server rpc port", 4444);
     config_var_t rpc_addr = config_new_string("consoleserver.rpc.addr", "Console server rpc addr", "ws://*");
@@ -124,6 +124,7 @@ void consolesrv_init() {
 }
 
 void consolesrv_shutdown() {
+    log_debug(LOG_WHERE, "Shutdown");
 }
 
 

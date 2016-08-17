@@ -41,11 +41,11 @@ void _dealloc_all_string() {
 }
 
 void config_init() {
-    log_info(LOG_WHERE, "Init");
+    log_debug(LOG_WHERE, "Init");
 }
 
 void config_shutdown() {
-    log_info(LOG_WHERE, "Shutdown");
+    log_debug(LOG_WHERE, "Shutdown");
 
     _dealloc_all_string();
 }

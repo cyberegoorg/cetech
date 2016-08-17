@@ -9,7 +9,7 @@ static int _log_format(lua_State *l, char *buffer, size_t buffer_len) {
     size_t buffer_write_len = buffer_len;
 
     size_t frmt_len;
-    const char *frmt = LUA.to_string_l(l, 2, &frmt_len);
+    const char *frmt = luasys_to_string_l(l, 2, &frmt_len);
 
     int arg_idx = 3;
     for (int i = 0; i < frmt_len; ++i) {
@@ -24,19 +24,19 @@ static int _log_format(lua_State *l, char *buffer, size_t buffer_len) {
         int n = 0;
         switch (frmt[i]) {
             case 'f':
-                n = snprintf(buffer_it, buffer_write_len, "%f", LUA.to_float(l, arg_idx));
+                n = snprintf(buffer_it, buffer_write_len, "%f", luasys_to_float(l, arg_idx));
                 buffer_it += n;
                 ++arg_idx;
                 break;
 
             case 'd':
-                n = snprintf(buffer_it, buffer_write_len, "%d", LUA.to_int(l, arg_idx));
+                n = snprintf(buffer_it, buffer_write_len, "%d", luasys_to_int(l, arg_idx));
                 buffer_it += n;
                 ++arg_idx;
                 break;
 
             case 's':
-                n = snprintf(buffer_it, buffer_write_len, "%s", LUA.to_string(l, arg_idx));
+                n = snprintf(buffer_it, buffer_write_len, "%s", luasys_to_string(l, arg_idx));
                 buffer_it += n;
                 ++arg_idx;
                 break;
@@ -54,7 +54,7 @@ static int _log_format(lua_State *l, char *buffer, size_t buffer_len) {
 static int _log_info(lua_State *l) {
     char buffer[_4KiB]; // TODO: dynamic
 
-    const char *where = LUA.to_string(l, 1);
+    const char *where = luasys_to_string(l, 1);
     _log_format(l, buffer, _4KiB);
 
     log_info(where, "%s", buffer);
@@ -64,7 +64,7 @@ static int _log_info(lua_State *l) {
 static int _log_warning(lua_State *l) {
     char buffer[_4KiB]; // TODO: dynamic
 
-    const char *where = LUA.to_string(l, 1);
+    const char *where = luasys_to_string(l, 1);
     _log_format(l, buffer, _4KiB);
 
     log_warning(where, "%s", buffer);
@@ -74,7 +74,7 @@ static int _log_warning(lua_State *l) {
 static int _log_error(lua_State *l) {
     char buffer[_4KiB]; // TODO: dynamic
 
-    const char *where = LUA.to_string(l, 1);
+    const char *where = luasys_to_string(l, 1);
     _log_format(l, buffer, _4KiB);
 
     log_error(where, "%s", buffer);
@@ -84,7 +84,7 @@ static int _log_error(lua_State *l) {
 static int _log_debug(lua_State *l) {
     char buffer[_4KiB]; // TODO: dynamic
 
-    const char *where = LUA.to_string(l, 1);
+    const char *where = luasys_to_string(l, 1);
     _log_format(l, buffer, _4KiB);
 
     log_debug(where, "%s", buffer);
@@ -92,8 +92,8 @@ static int _log_debug(lua_State *l) {
 }
 
 void _register_lua_log_api() {
-    LUA.add_module_function(API_NAME, "info", _log_info);
-    LUA.add_module_function(API_NAME, "warning", _log_warning);
-    LUA.add_module_function(API_NAME, "error", _log_error);
-    LUA.add_module_function(API_NAME, "debug", _log_debug);
+    luasys_add_module_function(API_NAME, "info", _log_info);
+    luasys_add_module_function(API_NAME, "warning", _log_warning);
+    luasys_add_module_function(API_NAME, "error", _log_error);
+    luasys_add_module_function(API_NAME, "debug", _log_debug);
 }

@@ -10,5 +10,5 @@ static int _application_quit(lua_State *l) {
 }
 
 void _register_lua_application_api() {
-    LUA.add_module_function(API_NAME, "quit", _application_quit);
+    luasys_add_module_function(API_NAME, "quit", _application_quit);
 }

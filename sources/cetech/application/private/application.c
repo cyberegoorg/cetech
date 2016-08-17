@@ -45,12 +45,14 @@ int application_init(int argc, char **argv) {
     log_init(_get_worker_id);
     log_register_handler(log_stdout_handler, NULL);
 
+    log_debug(LOG_WHERE, "Init");
+
     memsys_init(4 * 1024 * 1024);
     config_init();
 
     consolesrv_init();
 
-    LUA.init();
+    luasys_init();
 
     if (!machine_init()) {
         return 0;
@@ -70,6 +72,8 @@ int application_init(int argc, char **argv) {
 }
 
 void application_shutdown() {
+    log_debug(LOG_WHERE, "Shutdown");
+
     windowsys_destroy_window(_G.main_window);
 
     windowsys_shutdown();
@@ -77,7 +81,7 @@ void application_shutdown() {
     mouse_shutdow();
     machine_shutdown();
 
-    LUA.shutdown();
+    luasys_shutdown();
     consolesrv_shutdown();
     config_shutdown();
     memsys_shutdown();
