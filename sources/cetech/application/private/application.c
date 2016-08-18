@@ -132,7 +132,7 @@ void application_start() {
 
     _G.is_running = 1;
     while (_G.is_running) {
-        machine_begin_frame();
+        machine_process();
         _dump_event();
 
         keyboard_process();
@@ -153,8 +153,6 @@ void application_start() {
                 log_info("sdadsad", "pos %f, %f", pos[0], pos[1]);
             }
         }
-
-        machine_end_frame();
     }
 }
 

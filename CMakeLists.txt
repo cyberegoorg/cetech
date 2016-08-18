@@ -145,9 +145,9 @@ set(SOURCE_FILES
         sources/cetech/application/private/application.c
         sources/cetech/windowsystem/private/windowsystem.c
         sources/cetech/machine/private/machine.c
-        sources/cetech/machine/private/sdl_mouse.c
-        sources/cetech/machine/private/sdl_keyboard.c
-        sources/cetech/machine/private/sdl_machine.c
+        sources/cetech/machine/private/sdl2/sdl_mouse.c
+        sources/cetech/machine/private/sdl2/sdl_keyboard.c
+        sources/cetech/machine/private/sdl2/sdl_machine.c
         sources/cetech/input/private/keyboard.c
         sources/cetech/input/private/mouse.c
 

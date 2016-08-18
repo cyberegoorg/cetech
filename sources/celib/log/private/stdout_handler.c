@@ -56,7 +56,7 @@ static const char *_nocolor_level_format[4] = {
         [LOG_INFO]    = LOG_FORMAT,
         [LOG_WARNING] = LOG_FORMAT,
         [LOG_ERROR]   = LOG_FORMAT,
-        [LOG_DBG]     =LOG_FORMAT
+        [LOG_DBG]     = LOG_FORMAT
 };
 
 

@@ -5,7 +5,28 @@
 
 #define LOG_WHERE "machine.sdl"
 
-void machine_process_impl(struct eventstream *stream) {
+static struct G {
+    int _;
+} _G = {0};
+
+int sdl_init(){
+    _G = (struct G) {0};
+
+    if (SDL_Init(SDL_INIT_EVERYTHING) != 0) {
+        log_error(LOG_WHERE, "Could not init sdl - %s", SDL_GetError());
+        return 0;
+    }
+
+    return 1;
+}
+
+void sdl_shutdown() {
+    _G = (struct G) {0};
+
+    SDL_Quit();
+}
+
+void sdl_process(struct eventstream *stream) {
     SDL_Event e;
 
     while (SDL_PollEvent(&e) > 0) {
@@ -18,16 +39,4 @@ void machine_process_impl(struct eventstream *stream) {
                 break;
         }
     }
-}
-
-int machine_init_impl() {
-    if (SDL_Init(SDL_INIT_EVERYTHING) != 0) {
-        log_error(LOG_WHERE, "Could not init sdl - %s", SDL_GetError());
-        return 0;
-    }
-    return 1;
-}
-
-void machine_shutdown_impl() {
-    SDL_Quit();
 }
