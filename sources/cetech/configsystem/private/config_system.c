@@ -1,3 +1,7 @@
+//==============================================================================
+// Includes
+//==============================================================================
+
 #include <celib/memory/memory.h>
 #include <cetech/configsystem/configsystem.h>
 #include "celib/string/string.h"
@@ -6,6 +10,10 @@
 
 #include "cetech/configsystem/configsystem.h"
 
+//==============================================================================
+// Defines
+//==============================================================================
+
 #define MAX_VARIABLES 1024
 #define MAX_NAME_LEN 128
 #define MAX_DESC_LEN 256
@@ -13,12 +21,21 @@
 
 #define make_cvar(i) (config_var_t){.idx = i}
 
+//==============================================================================
+// Enums
+//==============================================================================
+
 enum cvar_type {
     CV_NONE = 0,
     CV_FLOAT,
     CV_INT,
     CV_STRING
 };
+
+
+//==============================================================================
+// Globals
+//==============================================================================
 
 static struct {
     char name[MAX_VARIABLES][MAX_NAME_LEN];
@@ -33,6 +50,12 @@ static struct {
     } values[MAX_VARIABLES];
 } _G = {0};
 
+
+//==============================================================================
+// Privates
+//==============================================================================
+
+
 void _dealloc_all_string() {
     for (int i = 0; i < MAX_VARIABLES; ++i) {
         if (_G.types[i] != CV_STRING) {
@@ -42,20 +65,6 @@ void _dealloc_all_string() {
         CE_DEALLOCATE(memsys_main_allocator(), _G.values[i].s);
     }
 }
-
-int config_init() {
-    log_debug(LOG_WHERE, "Init");
-
-    return 1;
-}
-
-void config_shutdown() {
-    log_debug(LOG_WHERE, "Shutdown");
-
-    _dealloc_all_string();
-}
-
-///
 
 config_var_t _find_first_free() {
 
@@ -70,6 +79,22 @@ config_var_t _find_first_free() {
     log_error(LOG_WHERE, "Could not create new config variable");
 
     return make_cvar(0);
+}
+
+//==============================================================================
+// Interface
+//==============================================================================
+
+int config_init() {
+    log_debug(LOG_WHERE, "Init");
+
+    return 1;
+}
+
+void config_shutdown() {
+    log_debug(LOG_WHERE, "Shutdown");
+
+    _dealloc_all_string();
 }
 
 config_var_t config_find_or_create(const char *name, int *new) {

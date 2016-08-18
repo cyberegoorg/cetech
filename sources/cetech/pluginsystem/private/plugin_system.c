@@ -1,3 +1,7 @@
+//==============================================================================
+// Includes
+//==============================================================================
+
 #include <stdlib.h>
 #include <memory.h>
 #include <celib/string/string.h>
@@ -8,9 +12,18 @@
 #include "celib/log/log.h"
 #include "celib/errors/errors.h"
 
+//==============================================================================
+// Defines
+//==============================================================================
+
 #define MAX_PATH_LEN 256
 #define PLUGIN_PREFIX "plugin_"
 #define LOG_WHERE "plugin_system"
+
+
+//==============================================================================
+// Globals
+//==============================================================================
 
 static struct {
     get_api_fce_t get_plugin_api[MAX_PLUGINS];
@@ -20,6 +33,9 @@ static struct {
     char path[MAX_PLUGINS][MAX_PATH_LEN];
 } _G = {0};
 
+//==============================================================================
+// Private
+//==============================================================================
 
 void _call_init(get_api_fce_t fce) {
     struct plugin_api_v0 *api = fce(PLUGIN_API_ID, 0);
@@ -50,6 +66,11 @@ void _add(const char *path, get_api_fce_t fce, void *handler) {
         break;
     }
 }
+
+
+//==============================================================================
+// Interface
+//==============================================================================
 
 void plugin_add_static(get_api_fce_t fce) {
     _add("__STATIC__", fce, NULL);
