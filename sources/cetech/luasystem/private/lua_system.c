@@ -13,9 +13,7 @@
 // Defines
 //==============================================================================
 
-#define MAX_PLUGIN_NAME_LEN 64
 #define LOG_WHERE "lua_system"
-
 
 #define REGISTER_LUA_API(name) \
     void _register_lua_##name##_api();\

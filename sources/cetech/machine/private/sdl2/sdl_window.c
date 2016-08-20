@@ -1,14 +1,6 @@
-//==============================================================================
-// Includes
-//==============================================================================
-
-#include <cetech/windowsystem/windowsystem.h>
-#include <celib/log/log.h>
-#include "include/SDL2/SDL.h"
-
-//==============================================================================
-// Defines
-//==============================================================================
+#include <stdint.h>
+#include <cetech/machine/types.h>
+#include <include/SDL2/SDL_video.h>
 
 #define LOG_WHERE "windowsys"
 
@@ -44,18 +36,21 @@ static uint32_t _sdl_flags(enum WindowFlags flags) {
 // Interface
 //==============================================================================
 
-int windowsys_init() {
+int sdl_window_init() {
     log_debug(LOG_WHERE, "Init");
 
     return 1;
 }
 
-void windowsys_shutdown() {
+void sdl_window_shutdown() {
     log_debug(LOG_WHERE, "Shutdown");
 }
 
-window_t windowsys_new_window(const char *title, enum WindowPos x, enum WindowPos y, const i32 width, const i32 height,
-                              enum WindowFlags flags) {
+void sdl_window_process() {
+}
+
+window_t machine_window_new(const char *title, enum WindowPos x, enum WindowPos y, const i32 width, const i32 height,
+                            enum WindowFlags flags) {
 
     SDL_Window *w = SDL_CreateWindow(
             title,
@@ -71,7 +66,7 @@ window_t windowsys_new_window(const char *title, enum WindowPos x, enum WindowPo
     return (window_t) {.w = w};
 }
 
-window_t windowsys_new_from(void *hndl) {
+window_t machine_window_new_from(void *hndl) {
     SDL_Window *w = SDL_CreateWindowFrom(hndl);
 
     if (w == NULL) {
@@ -81,22 +76,22 @@ window_t windowsys_new_from(void *hndl) {
     return (window_t) {.w = w};
 }
 
-void windowsys_destroy_window(window_t w) {
+void machine_window_destroy(window_t w) {
     SDL_DestroyWindow(w.w);
 }
 
-void windowsys_set_title(window_t w, const char *title) {
+void machine_window_set_title(window_t w, const char *title) {
     SDL_SetWindowTitle(w.w, title);
 }
 
-const char *windowsys_get_title(window_t w) {
+const char *machine_window_get_title(window_t w) {
     return SDL_GetWindowTitle(w.w);
 }
 
-void windowsys_update(window_t w) {
+void machine_window_update(window_t w) {
     SDL_UpdateWindowSurface(w.w);
 }
 
-void windowsys_resize(window_t w, uint32_t width, uint32_t height) {
+void machine_window_resize(window_t w, uint32_t width, uint32_t height) {
     SDL_SetWindowSize(w.w, width, height);
 }

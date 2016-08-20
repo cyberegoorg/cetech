@@ -8,7 +8,6 @@
 #include "../../machine/machine.h"
 #include "../../input/input.h"
 #include "../../consoleserver/consoleserver.h"
-#include "../../windowsystem/windowsystem.h"
 
 #define LOG_WHERE "application"
 
@@ -79,7 +78,7 @@ void application_shutdown() {
             _SYSTEMS[i].shutdown();
         }
 
-        windowsys_destroy_window(_G.main_window);
+        machine_window_destroy(_G.main_window);
     }
 
     memsys_shutdown();
@@ -122,7 +121,7 @@ static void _dump_event() {
 }
 
 void application_start() {
-    _G.main_window = windowsys_new_window(
+    _G.main_window = machine_window_new(
             "Cetech",
             WINDOWPOS_UNDEFINED,
             WINDOWPOS_UNDEFINED,
@@ -139,7 +138,7 @@ void application_start() {
         mouse_process();
 
         consolesrv_update();
-        windowsys_update(_G.main_window);
+        machine_window_update(_G.main_window);
 
         if (keyboard_button_state(keyboard_button_index("q"))) {
             application_quit();

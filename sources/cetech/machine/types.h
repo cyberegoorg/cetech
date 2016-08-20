@@ -327,4 +327,19 @@ enum {
     MOUSE_AXIS_MAX = 8
 };
 
+
+typedef struct {
+    void *w;
+} window_t;
+
+enum WindowFlags {
+    WINDOW_NOFLAG = 0,
+    WINDOW_FULLSCREEN = 1,
+};
+
+enum WindowPos {
+    WINDOWPOS_CENTERED = 1,
+    WINDOWPOS_UNDEFINED = 2
+};
+
 #endif //CETECH_MACHINE_TYPES_H

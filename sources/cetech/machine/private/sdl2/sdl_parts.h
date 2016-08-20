@@ -27,4 +27,13 @@ int sdl_mouse_init();
 void sdl_mouse_shutdown();
 void sdl_mouse_process(struct eventstream *stream);
 
+//==============================================================================
+// Window part
+//==============================================================================
+
+int sdl_window_init();
+void sdl_window_shutdown();
+void sdl_window_process(struct eventstream *stream);
+
+
 #endif //CETECH_SDL_PARTS_H

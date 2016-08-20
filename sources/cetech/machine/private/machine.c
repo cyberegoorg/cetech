@@ -41,6 +41,7 @@ int machine_init() {
     machine_register_part("sdl", sdl_init, sdl_shutdown, sdl_process);
     machine_register_part("sdl_keyboard", sdl_keyboard_init, sdl_keyboard_shutdown, sdl_keyboard_process);
     machine_register_part("sdl_mouse", sdl_mouse_init, sdl_mouse_shutdown, sdl_mouse_process);
+    machine_register_part("sdl_window", sdl_window_init, sdl_window_shutdown, sdl_window_process);
 
     for (int i = 0; i < _G.parts_count; ++i) {
         if(!_G.init[i]()) {
@@ -78,6 +79,7 @@ void machine_process() {
 struct event_header *machine_event_begin() {
     return eventstream_begin(&_G.eventstream);
 }
+
 
 struct event_header *machine_event_end() {
     return eventstream_end(&_G.eventstream);

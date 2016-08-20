@@ -14,7 +14,7 @@ typedef void (*machine_part_shutdown_t)();
 typedef void (*machine_part_process_t)(struct eventstream *stream);
 
 //==============================================================================
-// Interface
+// Machine interface
 //==============================================================================
 
 int machine_init();
@@ -33,5 +33,31 @@ struct event_header *machine_event_begin();
 struct event_header *machine_event_end();
 
 struct event_header *machine_event_next(struct event_header *header);
+
+//==============================================================================
+// Window interface
+//==============================================================================
+
+window_t machine_window_new(const char *title,
+                            enum WindowPos x,
+                            enum WindowPos y,
+                            const i32 width,
+                            const i32 height,
+                            enum WindowFlags flags);
+
+window_t machine_window_new_from(void *hndl);
+
+void machine_window_destroy(window_t w);
+
+void machine_window_set_title(window_t w,
+                              const char *title);
+
+const char *machine_window_get_title(window_t w);
+
+void machine_window_update(window_t w);
+
+void machine_window_resize(window_t w,
+                           uint32_t width,
+                           uint32_t height);
 
 #endif //CETECH_MACHINE_H
