@@ -68,6 +68,8 @@ void log_init(log_get_wid_clb_t get_wid_clb);
 //! Shutdown log system
 void log_shutdown();
 
+void log_set_wid_clb(log_get_wid_clb_t get_wid_clb);
+
 //! Register log handler
 //! \param handler Handler
 //! \param data Handler data

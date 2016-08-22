@@ -150,6 +150,7 @@ set(SOURCE_FILES
         sources/cetech/machine/private/sdl2/sdl_window.c
         sources/cetech/input/private/keyboard.c
         sources/cetech/input/private/mouse.c
+        sources/cetech/taskmanager/private/taskmanager.c
 
 
 )

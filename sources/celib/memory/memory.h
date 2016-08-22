@@ -49,7 +49,7 @@ struct allocator* memsys_main_scratch_allocator();
 #define allocator_total_allocated(a) (a)->total_allocated(a)
 #define allocator_allocated_size(a, p) (a)->allocated_size(a, p)
 
-#define CE_ALLOCATE(a, T, size) (T*) allocator_allocate((a), size, CE_ALIGNOF(T))
+#define CE_ALLOCATE(a, T, size) (T*) allocator_allocate((a), sizeof(T) * size, CE_ALIGNOF(T))
 #define CE_ALLOCATE_ALIGN(a, T, size, align) (T*) allocator_allocate((a), size, align)
 #define CE_DEALLOCATE(a, p) allocator_deallocate((a), p)
 

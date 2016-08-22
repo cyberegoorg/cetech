@@ -17,6 +17,11 @@ typedef struct {
     void *t;
 } thread_t;
 
+typedef struct {
+    int lock;
+} spinlock_t;
+
+
 //==============================================================================
 // Includes
 //==============================================================================
@@ -49,5 +54,9 @@ u64 thread_get_id(thread_t thread);
 //! Get actual thread id
 //! \return Thread id
 u64 thread_actual_id();
+
+
+void spin_lock(spinlock_t* lock);
+void spin_unlock(spinlock_t* lock);
 
 #endif //CETECH_THREAD_H

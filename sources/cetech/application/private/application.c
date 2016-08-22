@@ -4,10 +4,13 @@
 
 #include <celib/log/log.h>
 #include <celib/memory/memory.h>
+#include <unistd.h>
+#include <include/SDL2/SDL_timer.h>
 
 #include "../../machine/machine.h"
 #include "../../input/input.h"
 #include "../../consoleserver/consoleserver.h"
+#include "../../taskmanager/taskmanager.h"
 
 #define LOG_WHERE "application"
 
@@ -19,6 +22,7 @@ static struct G {
     window_t main_window;
     int is_running;
     int init_error;
+    float dt;
 } _G = {0};
 
 //==============================================================================
@@ -66,6 +70,8 @@ int application_init(int argc, char **argv) {
             return 0;
         }
     }
+
+    log_set_wid_clb(taskmanager_worker_id);
 
     return 1;
 }
@@ -120,6 +126,35 @@ static void _dump_event() {
     }
 }
 
+
+static void _task1(void* d) {
+    if (keyboard_button_state(keyboard_button_index("q"))) {
+        application_quit();
+    }
+
+    if (mouse_button_state(mouse_button_index("left"))) {
+        vec2f_t pos = {0};
+        mouse_axis(mouse_axis_index("absolute"), pos);
+
+        log_info("sdadsad", "time %f", _G.dt);
+
+        if (pos[0] != 0.0f) {
+            //log_info("sdadsad", "pos %f, %f", pos[0], pos[1]);
+        }
+    }
+
+   usleep(10 * 1000);
+}
+
+static void _input_task(void* d) {
+    keyboard_process();
+    mouse_process();
+}
+
+static void _consolesrv_task(void* d) {
+    consolesrv_update();
+}
+
 void application_start() {
     _G.main_window = machine_window_new(
             "Cetech",
@@ -130,28 +165,56 @@ void application_start() {
     );
 
     _G.is_running = 1;
+    uint32_t last_tick = SDL_GetTicks();
     while (_G.is_running) {
+        uint32_t now_ticks = SDL_GetTicks();
+        float dt = (now_ticks - last_tick) * 0.001f;
+        _G.dt = dt;
+        last_tick = now_ticks;
+
         machine_process();
         _dump_event();
 
-        keyboard_process();
-        mouse_process();
+        task_t frame_task = taskmanager_add_null("frame", task_null, task_null, TASK_PRIORITY_HIGH, TASK_AFFINITY_NONE);
 
-        consolesrv_update();
+        task_t consolesrv_task = taskmanager_add_begin(
+                "consolesrv",
+                _consolesrv_task,
+                NULL,
+                task_null,
+                frame_task,
+                TASK_PRIORITY_HIGH,
+                TASK_AFFINITY_MAIN
+        );
+
+        task_t input_task = taskmanager_add_begin(
+                "input",
+                _input_task,
+                NULL,
+                task_null,
+                frame_task,
+                TASK_PRIORITY_HIGH,
+                TASK_AFFINITY_MAIN
+        );
+
+        task_t task = taskmanager_add_begin(
+                "task1",
+                _task1,
+                NULL,
+                frame_task,
+                task_null,
+                TASK_PRIORITY_HIGH,
+                TASK_AFFINITY_NONE
+        );
+
+        task_t tasks[] = {task, input_task, consolesrv_task, frame_task};
+        taskmanager_add_end(tasks, sizeof(tasks)/sizeof(tasks[0]));
+
+        taskmanager_wait(task);
+
+        //log_info("app", "count   %d", taskmanager_open_task_count());
+
         machine_window_update(_G.main_window);
-
-        if (keyboard_button_state(keyboard_button_index("q"))) {
-            application_quit();
-        }
-
-        if (mouse_button_state(mouse_button_index("left"))) {
-            vec2f_t pos = {0};
-            mouse_axis(mouse_axis_index("absolute"), pos);
-
-            if (pos[0] != 0.0f) {
-                log_info("sdadsad", "pos %f, %f", pos[0], pos[1]);
-            }
-        }
     }
 }
 
