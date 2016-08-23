@@ -143,7 +143,7 @@ static void _task1(void* d) {
         }
     }
 
-   usleep(10 * 1000);
+   //usleep(1 * 1000);
 }
 
 static void _input_task(void* d) {

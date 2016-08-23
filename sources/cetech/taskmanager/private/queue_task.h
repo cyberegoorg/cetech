@@ -16,7 +16,7 @@
 //==============================================================================
 
 typedef char cacheline_pad_t[64];
-struct queue_mpmc {
+struct queue_task {
     cacheline_pad_t _pad0;
     u32 *_data;
     cacheline_pad_t _pad1;
@@ -31,11 +31,12 @@ struct queue_mpmc {
     int _capacityMask;
     cacheline_pad_t _pad6;
     struct allocator *allocator;
+    //spinlock_t _lock;
 };
 
 
-void queue_mpmc_init(struct queue_mpmc *q, u32 capacity, struct allocator *allocator) {
-    *q = (struct queue_mpmc){0};
+void queue_task_init(struct queue_task *q, u32 capacity, struct allocator *allocator) {
+    *q = (struct queue_task){0};
 
     q->_capacityMask = capacity - 1;
     q->allocator = allocator;
@@ -48,32 +49,32 @@ void queue_mpmc_init(struct queue_mpmc *q, u32 capacity, struct allocator *alloc
     q->_sequences = CE_ALLOCATE(allocator, atomic_int, capacity);
 
     for (u32 i = 0; i < capacity; ++i) {
-        atomic_store_explicit(q->_sequences+i, i, memory_order_relaxed);
+        atomic_init(q->_sequences+i, i);
     }
 
-    atomic_store_explicit(&q->_enqueuePos, 0, memory_order_relaxed);
-    atomic_store_explicit(&q->_dequeuePos, 0, memory_order_relaxed);
+    atomic_init(&q->_enqueuePos, 0);
+    atomic_init(&q->_dequeuePos, 0);
 }
 
-void queue_mpmc_destroy(struct queue_mpmc *q) {
+void queue_task_destroy(struct queue_task *q) {
     CE_DEALLOCATE(q->allocator, q->_data);
     CE_DEALLOCATE(q->allocator, q->_sequences);
 }
 
-u32 queue_mpmc_size(struct queue_mpmc* q) {
-    u32 e = atomic_load(&q->_enqueuePos) & q->_capacityMask;
-    u32 d = atomic_load(&q->_dequeuePos) & q->_capacityMask;
+//u32 queue_mpmc_size(struct queue_task* q) {
+//    u32 e = atomic_load(&q->_enqueuePos) & q->_capacityMask;
+//    u32 d = atomic_load(&q->_dequeuePos) & q->_capacityMask;
+//
+//    return e > d ? e - d : d - e;
+//}
 
-    return e > d ? e - d : d - e;
-}
-
-int queue_mpmc_push(struct queue_mpmc* q, u32 value) {
+int queue_task_push(struct queue_task *q, u32 value) {
     int pos = atomic_load_explicit(&q->_enqueuePos, memory_order_relaxed);
 
     for (;;) {
         int seq = atomic_load_explicit(q->_sequences + (pos & q->_capacityMask), memory_order_acquire);
 
-        i32 dif = seq - pos;
+        intptr_t dif = (intptr_t)seq - (intptr_t)pos;
 
         if (dif == 0) {
             if (atomic_compare_exchange_weak_explicit(&q->_enqueuePos, &pos, pos + 1, memory_order_relaxed, memory_order_relaxed)) {
@@ -92,13 +93,13 @@ int queue_mpmc_push(struct queue_mpmc* q, u32 value) {
     return 1;
 }
 
-int queue_mpmc_pop(struct queue_mpmc *q, u32 *value, u32 defaultt) {
+int queue_task_pop(struct queue_task *q, u32 *value, u32 defaultt) {
     int pos = atomic_load_explicit(&q->_dequeuePos, memory_order_relaxed);
 
     for (;;) {
         int seq = atomic_load_explicit(q->_sequences + (pos & q->_capacityMask), memory_order_acquire);
 
-        i32 dif = seq - (pos + 1);
+        intptr_t dif = (intptr_t)seq - (intptr_t)(pos + 1);
 
         if (dif == 0) {
             if (atomic_compare_exchange_weak_explicit(&q->_dequeuePos, &pos, pos + 1, memory_order_relaxed, memory_order_relaxed)) {
@@ -114,7 +115,6 @@ int queue_mpmc_pop(struct queue_mpmc *q, u32 *value, u32 defaultt) {
 
     *value = q->_data[pos & q->_capacityMask];
     atomic_store_explicit(&q->_sequences[pos & q->_capacityMask],  pos + q->_capacityMask + 1, memory_order_release);
-
     return 1;
 }
 

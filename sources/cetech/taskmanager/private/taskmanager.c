@@ -10,7 +10,7 @@
 #include <celib/os/thread.h>
 #include <include/SDL2/SDL_cpuinfo.h>
 
-#include "queue_mpmc.h"
+#include "queue_task.h"
 
 //==============================================================================
 // Defines
@@ -25,30 +25,30 @@
 struct task {
     task_work_t task_work;
     void *task_data;
-    atomic_int job_count;
-
     const char *name;
+    atomic_int job_count;
 
     task_t depend;
     task_t parent;
 
     enum task_priority priority;
     enum task_affinity affinity;
-    int used;
 };
 
-static __thread int _worker_id = 0;
+static __thread char _worker_id = 0;
+
+#define MAX_TASK 1024
 
 static struct G {
-    struct task _taskPool[4096];
-    int _openTasks[4096];
-    struct queue_mpmc _gloalQueue[3];
-    struct queue_mpmc *_workersQueue;
-    thread_t *_workers;
+    struct task _taskPool[MAX_TASK];
+    char _openTasks[MAX_TASK];
+    struct queue_task _gloalQueue[3];
+    struct queue_task _workersQueue[MAX_WORKERS * 3];
+    thread_t _workers[MAX_WORKERS - 1];
+    struct queue_task _free_task;
     int _workers_count;
-    spinlock_t openTaskLock;
-    atomic_int _openTaskCount;
     int _Run;
+    spinlock_t _lock; // TODO: lock-free
 } TaskManagerGlobal = {0};
 
 #define _G TaskManagerGlobal
@@ -58,21 +58,19 @@ static struct G {
 //==============================================================================
 
 static task_t _new_task() {
-    for (u32 i = 1; i < 4096; ++i) {
-        if (_G._taskPool[i].used) {
-            continue;
-        }
-
-        _G._taskPool[i].used = 1;
-
-        return make_task(i);
+    u32 idx = 0;
+    if (!queue_task_pop(&_G._free_task, &idx, 0)) {
+        log_error("task", "Could not create new task");
+        return task_null;
     }
 
-    return task_null;
+    return make_task(idx);
 }
 
 static void _push_task(task_t t) {
-    struct queue_mpmc *q;
+    CE_ASSERT("", t.id != 0);
+
+    struct queue_task *q;
     switch (_G._taskPool[t.id].affinity) {
         case TASK_AFFINITY_NONE:
             q = &_G._gloalQueue[(int) _G._taskPool[t.id].priority];
@@ -83,32 +81,29 @@ static void _push_task(task_t t) {
             break;
     }
 
-    queue_mpmc_push(q, t.id);
+    queue_task_push(q, t.id);
 }
 
 static int _task_is_done(task_t task) {
-    int count = atomic_load(&_G._openTaskCount);
+    return !_G._openTasks[task.id];
+}
 
-    for (u32 i = 0; i < count; ++i) {
-        if (_G._openTasks[i] != task.id) {
-            continue;
-        }
-
+static int _can_work_on(task_t task) {
+    if(atomic_load(&_G._taskPool[task.id].job_count) != 1) {
         return 0;
+    }
+
+    if(_G._taskPool[task.id].depend.id != 0) {
+        return _task_is_done(_G._taskPool[task.id].depend);
     }
 
     return 1;
 }
 
-static int _can_work_on(task_t task) {
-    return (_G._taskPool[task.id].job_count == 1) &&
-           (_G._taskPool[task.id].depend.id == 0 || _task_is_done(_G._taskPool[task.id].depend));
-}
-
-static task_t _try_pop(struct queue_mpmc *q) {
+static task_t _try_pop(struct queue_task *q) {
     u32 poped_task;
 
-    if (queue_mpmc_pop(q, &poped_task, 0)) {
+    if (queue_task_pop(q, &poped_task, 0)) {
         if (poped_task != 0) {
             if (_can_work_on(make_task(poped_task))) {
                 return make_task(poped_task);
@@ -122,39 +117,23 @@ static task_t _try_pop(struct queue_mpmc *q) {
 }
 
 static void _mark_task_job_done(task_t task) {
-    spin_lock(&_G.openTaskLock);
+    _G._openTasks[task.id] = 0;
 
-    if (_G._taskPool[task.id].parent.id != 0) {
-        atomic_fetch_sub(&_G._taskPool[_G._taskPool[task.id].parent.id].job_count, 1);
+    u32 parent_idx = _G._taskPool[task.id].parent.id;
+    if (parent_idx != 0) {
+        atomic_fetch_sub(&_G._taskPool[parent_idx].job_count, 1);
     }
 
-    int count = atomic_load(&_G._openTaskCount);
-    for (u32 i = 0; i < count; ++i) {
-        if (_G._openTasks[i] == task.id) {
-            atomic_fetch_sub(&_G._openTaskCount, 1);
-            int idx = atomic_load(&_G._openTaskCount);
+    _G._taskPool[task.id].job_count = 0;
 
-            _G._openTasks[i] = _G._openTasks[idx];
-            _G._openTasks[idx] = 0;
-
-            _G._taskPool[task.id].used = 0;
-
-            break;
-        }
-    }
-
-    spin_unlock(&_G.openTaskLock);
+    queue_task_push(&_G._free_task, task.id);
 }
 
 static task_t _task_pop_new_work() {
     task_t popedTask;
 
     for (u32 i = 0; i < 3; ++i) {
-        struct queue_mpmc *q = &_G._workersQueue[_worker_id * 3 + i];
-
-        if (0 == queue_mpmc_size(q)) {
-            continue;
-        }
+        struct queue_task *q = &_G._workersQueue[_worker_id * 3 + i];
 
         popedTask = _try_pop(q);
         if (popedTask.id != 0) {
@@ -162,17 +141,17 @@ static task_t _task_pop_new_work() {
         }
     }
 
+    spin_lock(&_G._lock);
     for (u32 i = 0; i < 3; ++i) {
-        struct queue_mpmc *q = &_G._gloalQueue[i];
+        struct queue_task *q = &_G._gloalQueue[i];
 
-        if (0 == queue_mpmc_size(q)) {
-            continue;
-        }
         popedTask = _try_pop(q);
         if (popedTask.id != 0) {
+            spin_unlock(&_G._lock);
             return popedTask;
         }
     }
+    spin_unlock(&_G._lock);
 
     return task_null;
 }
@@ -214,19 +193,25 @@ int taskmanager_init() {
 
     _G._workers_count = worker_count;
 
-    _G._workersQueue = CE_ALLOCATE(memsys_main_allocator(), struct queue_mpmc, 3 * (worker_count + 1));
-    _G._workers = CE_ALLOCATE(memsys_main_allocator(), thread_t, worker_count);
+//    _G._workersQueue = CE_ALLOCATE(memsys_main_allocator(), struct queue_task, 3 * (worker_count + 1));
+//    _G._workers = CE_ALLOCATE(memsys_main_allocator(), thread_t, worker_count);
+
+    queue_task_init(&_G._free_task, MAX_TASK, memsys_main_allocator());
+
+    for (u32 i = 1; i != MAX_TASK; ++i) {
+        queue_task_push(&_G._free_task, i);
+    }
 
     for (int i = 0; i < 3; ++i) {
-        queue_mpmc_init(&_G._gloalQueue[i], 4096, memsys_main_allocator());
+        queue_task_init(&_G._gloalQueue[i], MAX_TASK, memsys_main_allocator());
     }
 
     for (int i = 0; i < 3 * (worker_count + 1); ++i) {
-        queue_mpmc_init(&_G._workersQueue[i], 4096, memsys_main_allocator());
+        queue_task_init(&_G._workersQueue[i], MAX_TASK, memsys_main_allocator());
     }
 
     for (int j = 0; j < worker_count; ++j) {
-        _G._workers[j] = thread_create((thread_fce_t) _task_worker, "worker", (void *) (j + 1));
+        _G._workers[j] = thread_create((thread_fce_t) _task_worker, "worker", (void *) ((intptr_t)(j + 1)));
     }
 
     _G._Run = 1;
@@ -243,16 +228,18 @@ void taskmanager_shutdown() {
         thread_wait(_G._workers[i], &status);
     }
 
+    queue_task_destroy(&_G._free_task);
+
     for (int i = 0; i < 3; ++i) {
-        queue_mpmc_destroy(&_G._gloalQueue[i]);
+        queue_task_destroy(&_G._gloalQueue[i]);
     }
 
     for (int i = 0; i < 3 * (_G._workers_count + 1); ++i) {
-        queue_mpmc_destroy(&_G._workersQueue[i]);
+        queue_task_destroy(&_G._workersQueue[i]);
     }
 
-    CE_DEALLOCATE(memsys_main_allocator(), _G._workersQueue);
-    CE_DEALLOCATE(memsys_main_allocator(), _G._workers);
+//    CE_DEALLOCATE(memsys_main_allocator(), _G._workersQueue);
+//    CE_DEALLOCATE(memsys_main_allocator(), _G._workers);
 
     _G = (struct G) {0};
 }
@@ -279,12 +266,6 @@ task_t taskmanager_add_begin(const char *name,
         atomic_fetch_add(&_G._taskPool[parent.id].job_count, 1);
     }
 
-    {
-        int idx = atomic_fetch_add(&_G._openTaskCount, 1);
-        _G._openTasks[idx] = task.id;
-
-    }
-
     return task;
 }
 
@@ -306,8 +287,10 @@ void taskmanager_add_end(task_t *tasks, size_t count) {
     }
 
     for (u32 i = 0; i < count; ++i) {
+        _G._openTasks[tasks[i].id] = 1;
         _push_task(tasks[i]);
     }
+
 }
 
 void taskmanager_do_work() {
@@ -331,8 +314,4 @@ void taskmanager_wait(task_t task) {
 
 char taskmanager_worker_id() {
     return (char) _worker_id;
-}
-
-int taskmanager_open_task_count() {
-    return _G._openTaskCount;
 }

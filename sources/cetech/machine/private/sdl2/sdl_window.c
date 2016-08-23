@@ -1,6 +1,7 @@
 #include <stdint.h>
 #include <cetech/machine/types.h>
-#include <include/SDL2/SDL_video.h>
+#include <include/SDL2/SDL.h>
+#include <include/SDL2/SDL_syswm.h>
 
 #define LOG_WHERE "windowsys"
 
@@ -94,4 +95,40 @@ void machine_window_update(window_t w) {
 
 void machine_window_resize(window_t w, uint32_t width, uint32_t height) {
     SDL_SetWindowSize(w.w, width, height);
+}
+
+void* machine_window_native_window_ptr(window_t w) {
+    SDL_SysWMinfo wmi;
+
+    SDL_VERSION(&wmi.version);
+
+    if (!SDL_GetWindowWMInfo(w.w, &wmi)) {
+        return 0;
+    }
+
+#if CETECH_WINDOWS
+    return (void *) wmi.info.win.window;
+#elif CETECH_LINUX
+    return (void *) wmi.info.x11.window;
+#elif sCETECH_DARWIN
+    return (void *) wmi.info.cocoa.window;
+#endif
+}
+
+void* machine_window_native_display_ptr(window_t w) {
+    SDL_SysWMinfo wmi;
+
+    SDL_VERSION(&wmi.version);
+
+    if (!SDL_GetWindowWMInfo(w.w, &wmi)) {
+        return 0;
+    }
+
+#if CETECH_WINDOWS
+    return (void *) wmi.info.win.hdc;
+#elif CETECH_LINUX
+    return (void *) wmi.info.x11.display;
+#elif sCETECH_DARWIN
+    return (0;
+#endif
 }

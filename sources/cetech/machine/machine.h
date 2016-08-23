@@ -60,4 +60,7 @@ void machine_window_resize(window_t w,
                            uint32_t width,
                            uint32_t height);
 
+void* machine_window_native_window_ptr(window_t w);
+void* machine_window_native_display_ptr(window_t w);
+
 #endif //CETECH_MACHINE_H

@@ -30,7 +30,7 @@ enum task_affinity{
     TASK_AFFINITY_WORKER5 = 6,
     TASK_AFFINITY_WORKER6 = 7,
     TASK_AFFINITY_WORKER7 = 8,
-    TASK_AFFINITY_COUNT,
+    MAX_WORKERS = TASK_AFFINITY_WORKER7,
 };
 
 enum task_priority{
