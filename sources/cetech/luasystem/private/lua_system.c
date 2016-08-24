@@ -20,7 +20,6 @@
     _register_lua_##name##_api();
 
 
-
 //==============================================================================
 // Globals
 //==============================================================================
@@ -33,6 +32,13 @@ static struct {
 //==============================================================================
 // Private
 //==============================================================================
+
+static void _register_all_api() {
+    REGISTER_LUA_API(log);
+    REGISTER_LUA_API(keyboard);
+    REGISTER_LUA_API(mouse);
+    REGISTER_LUA_API(application);
+}
 
 static int _reload_plugin(lua_State *l) {
     size_t len;
@@ -129,14 +135,6 @@ static int _cmd_execute_string(mpack_node_t args, mpack_writer_t *writer) {
     }
 
     return 0;
-}
-
-
-static void _register_all_api() {
-    REGISTER_LUA_API(log);
-    REGISTER_LUA_API(keyboard);
-    REGISTER_LUA_API(mouse);
-    REGISTER_LUA_API(application);
 }
 
 
