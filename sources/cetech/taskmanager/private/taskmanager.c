@@ -197,6 +197,7 @@ void taskmanager_shutdown() {
     int status = 0;
 
     for (u32 i = 0; i < _G._workers_count; ++i) {
+        thread_kill(_G._workers[i]);
         thread_wait(_G._workers[i], &status);
     }
 
@@ -220,10 +221,12 @@ task_t taskmanager_add_begin(const char *name,
                              enum task_affinity affinity) {
     task_t task = _new_task();
 
+    _G._openTasks[task.id] = 1;
+
     _G._taskPool[task.id].name = name;
     _G._taskPool[task.id].priority = priority;
     _G._taskPool[task.id].task_work = work;
-    _G._taskPool[task.id].job_count = 2;
+    _G._taskPool[task.id].job_count = 1;
 
     _G._taskPool[task.id].depend_count = 0;
     memset(_G._taskPool[task.id].depend, 0, sizeof(task_t) * 32);
@@ -259,12 +262,7 @@ task_t taskmanager_add_null(const char *name,
 
 void taskmanager_add_end(task_t *tasks, size_t count) {
     for (u32 i = 0; i < count; ++i) {
-        _G._openTasks[tasks[i].id] = 1;
-        atomic_fetch_sub(&_G._taskPool[tasks[i].id].job_count, 1);
-    }
-
-    for (u32 i = 0; i < count; ++i) {
-        if(_G._taskPool[tasks[i].id].job_count == 1) {
+        if(atomic_load(&_G._taskPool[tasks[i].id].job_count) == 1) {
             _push_task(tasks[i]);
         }
     }
