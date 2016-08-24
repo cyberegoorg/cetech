@@ -234,15 +234,16 @@ task_t taskmanager_add_begin(const char *name,
 
     _G._openTasks[task.id] = 1;
 
-    _G._taskPool[task.id].name = name;
-    _G._taskPool[task.id].priority = priority;
-    _G._taskPool[task.id].task_work = work;
-    _G._taskPool[task.id].job_count = 1;
-
-    _G._taskPool[task.id].depend_on = depend;
-    _G._taskPool[task.id].continues_count = 0;
-    _G._taskPool[task.id].parent = parent;
-    _G._taskPool[task.id].affinity = affinity;
+    _G._taskPool[task.id] = (struct task) {
+            .name = name,
+            .priority = priority,
+            .task_work = work,
+            .job_count = 1,
+            .depend_on = depend,
+            .continues_count = 0,
+            .parent = parent,
+            .affinity = affinity,
+    };
 
     memory_copy(_G._taskPool[task.id].data, data, (size_t) data_len);
 
