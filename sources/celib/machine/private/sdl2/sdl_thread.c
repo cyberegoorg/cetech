@@ -1,4 +1,4 @@
-#include "celib/machine/thread.h"
+#include "celib/machine/machine.h"
 
 #include "include/SDL2/SDL.h"
 

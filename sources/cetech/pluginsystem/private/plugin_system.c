@@ -4,13 +4,10 @@
 
 #include <stdlib.h>
 #include <memory.h>
+#include <celib/machine/machine.h>
 #include "celib/string/string.h"
 
-#include "include/SDL2/SDL.h"
-
 #include "../plugin_system.h"
-#include "celib/log/log.h"
-#include "celib/errors/errors.h"
 
 //==============================================================================
 // Defines
@@ -78,20 +75,13 @@ void plugin_add_static(get_api_fce_t fce) {
 }
 
 void plugin_load(const char *path) {
-    void *obj = SDL_LoadObject(path);
-    CE_ASSERT(LOG_WHERE, obj != NULL);
-
-    log_debug(LOG_WHERE, "Load plugin from %s", path);
-
-    if (!obj) {
-        log_error(LOG_WHERE, "%s", SDL_GetError());
+    void *obj = machine_load_object(path);
+    if (obj != NULL) {
         return;
     }
 
-    void *fce = SDL_LoadFunction(obj, "get_plugin_api");
-    CE_ASSERT(LOG_WHERE, fce != NULL);
-    if (!fce) {
-        log_error(LOG_WHERE, "%s", SDL_GetError());
+    void *fce = machine_load_function(obj, "get_plugin_api");
+    if (fce != NULL) {
         return;
     }
 
@@ -108,20 +98,15 @@ void plugin_reload(const char *path) {
         struct plugin_api_v0 *api = _G.plugin_api[i];
         void *data = api->reload_begin(plugin_get_engine_api);
 
-        SDL_UnloadObject(_G.plugin_handler[i]);
+        machine_unload_object(_G.plugin_handler[i]);
 
-        void *obj = SDL_LoadObject(path);
-        CE_ASSERT(LOG_WHERE, obj != NULL);
-
-        if (!obj) {
-            log_error(LOG_WHERE, "%s", SDL_GetError());
+        void *obj = machine_load_object(path);
+        if (obj != NULL) {
             return;
         }
 
-        void *fce = SDL_LoadFunction(obj, "get_plugin_api");
-        CE_ASSERT(LOG_WHERE, fce != NULL);
-        if (!fce) {
-            log_error(LOG_WHERE, "%s", SDL_GetError());
+        void *fce = machine_load_function(obj, "get_plugin_api");
+        if (fce != NULL) {
             return;
         }
 

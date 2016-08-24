@@ -4,8 +4,6 @@
 
 #include <unistd.h>
 
-#include "include/SDL2/SDL_timer.h"
-
 #include "celib/log/log.h"
 #include "celib/memory/memory.h"
 #include "celib/machine/machine.h"
@@ -167,9 +165,9 @@ void application_start() {
     );
 
     _G.is_running = 1;
-    uint32_t last_tick = SDL_GetTicks();
+    uint32_t last_tick = machine_get_ticks();
     while (_G.is_running) {
-        uint32_t now_ticks = SDL_GetTicks();
+        uint32_t now_ticks = machine_get_ticks();
         float dt = (now_ticks - last_tick) * 0.001f;
         _G.dt = dt;
         last_tick = now_ticks;

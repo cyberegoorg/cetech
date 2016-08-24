@@ -8,7 +8,7 @@
 
 extern "C" {
 #include "celib/memory/memory.h"
-#include "../memory.h"
+#include "celib/machine/machine.h"
 };
 
 

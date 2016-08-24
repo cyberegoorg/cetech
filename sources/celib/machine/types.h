@@ -1,6 +1,8 @@
 #ifndef CETECH_MACHINE_TYPES_H
 #define CETECH_MACHINE_TYPES_H
 
+#include <stdio.h>
+
 #include "celib/types.h"
 #include "celib/math/types.h"
 #include "celib/containers/eventstream.h"

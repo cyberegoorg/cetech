@@ -1,3 +1,4 @@
+#include "celib/containers/eventstream.h"
 #include "celib/machine/types.h"
 
 #define LOG_WHERE "vfile"

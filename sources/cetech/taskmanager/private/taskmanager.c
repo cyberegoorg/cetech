@@ -7,7 +7,6 @@
 //==============================================================================
 
 #include "../types.h"
-#include "celib/machine/thread.h"
 #include "celib/machine/machine.h"
 
 #include "queue_task.h"

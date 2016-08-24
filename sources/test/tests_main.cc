@@ -2,6 +2,5 @@
 #pragma ide diagnostic ignored "UnusedImportStatement"
 
 #define CATCH_CONFIG_MAIN
-#include "include/catch/catch.hpp"
 
 #pragma clang diagnostic pop

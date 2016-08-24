@@ -6,8 +6,16 @@
 //==============================================================================
 
 #include "array.h"
-#include "types.h"
 #include "../types.h"
+
+struct event_header {
+    u32 type;
+    u64 size;
+};
+
+struct eventstream {
+    struct array_u8 stream;
+};
 
 //==============================================================================
 // Interface

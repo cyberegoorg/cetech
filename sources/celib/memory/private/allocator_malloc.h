@@ -4,7 +4,7 @@
 #include <stdint.h>
 #include "celib/memory/memory.h"
 #include "celib/errors/errors.h"
-#include "celib/machine/memory.h"
+#include "celib/machine/machine.h"
 #include "header.h"
 
 #define MAX_MEM_TRACE 1024

@@ -11,7 +11,7 @@ extern "C" {
 #include "celib/memory/memory.h"
 #include "celib/string/string.h"
 #include "../filesystem.h"
-#include "celib/machine/file.h"
+#include "celib/machine/machine.h"
 };
 
 SCENARIO( "map root to root_path", "[filesystem]" ) {

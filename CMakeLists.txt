@@ -154,7 +154,7 @@ set(SOURCE_FILES
         sources/cetech/taskmanager/private/taskmanager.c
 
 
-)
+        sources/celib/machine/private/sdl2/sdl_time.c sources/celib/machine/private/sdl2/sdl_object.c)
 
 ################################################################################
 # Main sources
@@ -169,8 +169,8 @@ set(MAIN_SOURCE_FILES
 ################################################################################
 set(TEST_SOURCE_FILES
         ${SOURCE_FILES}
-        sources/tests_main.cc
-        )
+        sources/test/tests_main.cc
+        sources/celib/machine/stacktrace.h)
 
 ################################################################################
 # Release sources

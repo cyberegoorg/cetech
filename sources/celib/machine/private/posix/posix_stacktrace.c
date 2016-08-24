@@ -2,7 +2,7 @@
 #include <string.h>
 
 #include <execinfo.h>
-#include "celib/machine/memory.h"
+#include "celib/machine/machine.h"
 
 
 char *machine_stacktrace(int skip) {
