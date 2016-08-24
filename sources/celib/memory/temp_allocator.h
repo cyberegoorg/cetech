@@ -79,6 +79,7 @@ static void temp_allocator_destroy_##S(struct temp_allocator_64 *allocator) {  \
     }                                                                          \
 }                                                                              \
 
+
 static void _temp_allocator_deallocate(struct allocator *allocator, void *p) {
 }
 
@@ -95,11 +96,17 @@ static uint32_t _temp_allocator_allocated_size(void *p) {
 //==============================================================================
 
 TEMP_ALLOCATOR_DEF(64)
+
 TEMP_ALLOCATOR_DEF(128)
+
 TEMP_ALLOCATOR_DEF(256)
+
 TEMP_ALLOCATOR_DEF(512)
+
 TEMP_ALLOCATOR_DEF(1024)
+
 TEMP_ALLOCATOR_DEF(2048)
+
 TEMP_ALLOCATOR_DEF(4096)
 
 #endif //CETECH_TEMP_ALLOCATOR_H

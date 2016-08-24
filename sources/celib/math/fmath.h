@@ -96,9 +96,9 @@ CE_FORCE_INLINE int f32_equal(float a, float b, float epsilon) {
 }
 
 CE_FORCE_INLINE int f32_equals(const float *__restrict _a,
-                              const float *__restrict _b,
-                              int _num,
-                              float _epsilon) {
+                               const float *__restrict _b,
+                               int _num,
+                               float _epsilon) {
 
     int equal = f32_equal(_a[0], _b[0], _epsilon);
 

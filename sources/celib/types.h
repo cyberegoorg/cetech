@@ -16,7 +16,7 @@
 #define CE_RESTRICT __restrict
 
 #define CE_FORCE_INLINE __extension__ static __inline __attribute__( (__always_inline__) )
-#define CE_FUNCTION __PRETTY_FUNCTION__
+#define CE_PRETTY_FUNCTION __PRETTY_FUNCTION__
 #define CE_LIKELY(x)   __builtin_expect(!!(x), 1)
 #define CE_UNLIKELY(x) __builtin_expect(!!(x), 0)
 #define CE_NO_INLINE __attribute__( (noinline) )
@@ -34,23 +34,26 @@
 
 #define ATTR_FORMAT(fmt, args) __attribute__ ((format(printf, fmt, args)))
 
+#define CE_STATIC_ASSERT(expr, msg) _Static_assert(expr, msg)
+
+
 //==============================================================================
 // Base typefed
 //==============================================================================
 
-typedef char* string_t;
+typedef char *string_t;
 
-typedef int8_t  i8;
+typedef int8_t i8;
 typedef int16_t i16;
 typedef int32_t i32;
 typedef int64_t i64;
 
-typedef uint8_t  u8;
+typedef uint8_t u8;
 typedef uint16_t u16;
 typedef uint32_t u32;
 typedef uint64_t u64;
 
-typedef float  f32;
+typedef float f32;
 typedef double f64;
 
 #endif //CETECH_TYPES_H

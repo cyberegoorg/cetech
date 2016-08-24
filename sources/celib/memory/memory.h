@@ -21,11 +21,13 @@
 //==============================================================================
 
 const void *pointer_align_forward(const void *p, uint32_t align);
+
 const void *pointer_add(const void *p, uint32_t bytes);
+
 const void *pointer_sub(const void *p, uint32_t bytes);
 
 
-void *memory_copy(void* __restrict dest, const void * __restrict src, size_t n);
+void *memory_copy(void *__restrict dest, const void *__restrict src, size_t n);
 
 
 //==============================================================================
@@ -33,10 +35,12 @@ void *memory_copy(void* __restrict dest, const void * __restrict src, size_t n);
 //==============================================================================
 
 void memsys_init(int scratch_buffer_size);
+
 void memsys_shutdown();
 
-struct allocator* memsys_main_allocator();
-struct allocator* memsys_main_scratch_allocator();
+struct allocator *memsys_main_allocator();
+
+struct allocator *memsys_main_scratch_allocator();
 
 //==============================================================================
 // Allocator
@@ -53,8 +57,10 @@ struct allocator* memsys_main_scratch_allocator();
 #define CE_ALLOCATE_ALIGN(a, T, size, align) (T*) allocator_allocate((a), size, align)
 #define CE_DEALLOCATE(a, p) allocator_deallocate((a), p)
 
-void allocator_trace_pointer(struct allocator_trace_entry* entries, u64 max_entries, void *p);
-void allocator_stop_trace_pointer(struct allocator_trace_entry* entries, u64 max_entries, void *p);
-void allocator_check_trace(struct allocator_trace_entry* entries, u64 max_entries);
+void allocator_trace_pointer(struct allocator_trace_entry *entries, u64 max_entries, void *p);
+
+void allocator_stop_trace_pointer(struct allocator_trace_entry *entries, u64 max_entries, void *p);
+
+void allocator_check_trace(struct allocator_trace_entry *entries, u64 max_entries);
 
 #endif //CETECH_MEMORY_SYSTEM_H

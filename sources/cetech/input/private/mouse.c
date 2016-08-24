@@ -6,8 +6,6 @@
 #include "celib/machine/machine.h"
 #include "celib/string/string.h"
 #include "celib/math/vec2f.h"
-#include "celib/memory/memory.h"
-#include "celib/errors/errors.h"
 
 #include "../input.h"
 

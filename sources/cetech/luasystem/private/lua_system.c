@@ -206,7 +206,7 @@ const char *luasys_to_string(lua_State *_L, int i) {
 }
 
 const char *luasys_to_string_l(lua_State *_L, int i,
-                         size_t *len) {
+                               size_t *len) {
     return lua_tolstring(_L, i, len);
 }
 
@@ -222,8 +222,8 @@ int luasys_execute_string(const char *str) {
 }
 
 void luasys_add_module_function(const char *module,
-                                 const char *name,
-                                 const lua_CFunction func) {
+                                const char *name,
+                                const lua_CFunction func) {
 
     luaL_newmetatable(_G.L, "cetech");
     luaL_newmetatable(_G.L, module);

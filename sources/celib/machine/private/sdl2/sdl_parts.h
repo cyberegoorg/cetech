@@ -6,7 +6,9 @@
 //==============================================================================
 
 int sdl_init();
+
 void sdl_shutdown();
+
 void sdl_process(struct eventstream *stream);
 
 
@@ -15,7 +17,9 @@ void sdl_process(struct eventstream *stream);
 //==============================================================================
 
 int sdl_keyboard_init();
+
 void sdl_keyboard_shutdown();
+
 void sdl_keyboard_process(struct eventstream *stream);
 
 
@@ -24,7 +28,9 @@ void sdl_keyboard_process(struct eventstream *stream);
 //==============================================================================
 
 int sdl_mouse_init();
+
 void sdl_mouse_shutdown();
+
 void sdl_mouse_process(struct eventstream *stream);
 
 //==============================================================================
@@ -32,7 +38,9 @@ void sdl_mouse_process(struct eventstream *stream);
 //==============================================================================
 
 int sdl_window_init();
+
 void sdl_window_shutdown();
+
 void sdl_window_process(struct eventstream *stream);
 
 
