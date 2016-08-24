@@ -163,6 +163,7 @@ static int _task_worker(void *o) {
 
 int taskmanager_init() {
     _G = (struct G) {0};
+    memset(_G._openTasks, 0, sizeof(char) * 1024);
 
     uint32_t core_count = SDL_GetCPUCount();
 
@@ -258,12 +259,12 @@ task_t taskmanager_add_null(const char *name,
 
 void taskmanager_add_end(task_t *tasks, size_t count) {
     for (u32 i = 0; i < count; ++i) {
+        _G._openTasks[tasks[i].id] = 1;
         atomic_fetch_sub(&_G._taskPool[tasks[i].id].job_count, 1);
     }
 
     for (u32 i = 0; i < count; ++i) {
         if(_G._taskPool[tasks[i].id].job_count == 1) {
-            _G._openTasks[tasks[i].id] = 1;
             _push_task(tasks[i]);
         }
     }
@@ -275,6 +276,8 @@ void taskmanager_do_work() {
     if (t.id == 0) {
         return;
     }
+
+    //log_debug("ddd", "work_on %d", t.id);
 
     _G._taskPool[t.id].task_work(_G._taskPool[t.id].task_data);
 
