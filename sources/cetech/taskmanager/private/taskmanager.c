@@ -19,7 +19,8 @@
 #define make_task(i) (task_t){.id = i}
 
 #define MAX_TASK 4096
-
+#define MAX_CONTINUES 32
+#define MAX_TASK_DATA_SIZE 64
 #define LOG_WHERE "taskmanager"
 
 //==============================================================================
@@ -27,8 +28,8 @@
 //==============================================================================
 
 struct task {
-    task_t continues[32];
-    u8 data[64];
+    task_t continues[MAX_CONTINUES];
+    u8 data[MAX_TASK_DATA_SIZE];
     task_work_t task_work;
     const char *name;
     atomic_int job_count;
@@ -239,12 +240,10 @@ task_t taskmanager_add_begin(const char *name,
 
     _G._taskPool[task.id].depend_on = depend;
     _G._taskPool[task.id].continues_count = 0;
-    memset(_G._taskPool[task.id].continues, 0, sizeof(task_t) * 32);
-
     _G._taskPool[task.id].parent = parent;
     _G._taskPool[task.id].affinity = affinity;
 
-    memcpy(_G._taskPool[task.id].data, data, data_len);
+    memcpy(_G._taskPool[task.id].data, data, (size_t) data_len);
 
     if (parent.id != 0) {
         atomic_fetch_add(&_G._taskPool[parent.id].job_count, 1);
