@@ -4,9 +4,9 @@
 
 extern "C" {
 #include <string.h>
-#include <celib/memory/memory.h>
+#include "celib/memory/memory.h"
 #include "../file.h"
-#include "../../string/string.h"
+#include "celib/string/string.h"
 };
 
 SCENARIO( "Can read file", "[vfile]" ) {

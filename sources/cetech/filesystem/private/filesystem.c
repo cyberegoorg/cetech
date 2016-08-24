@@ -3,8 +3,8 @@
 //==============================================================================
 
 #include "celib/containers/array.h"
-#include "celib/os/file.h"
-#include "celib/os/path.h"
+#include "celib/machine/file.h"
+#include "celib/machine/path.h"
 #include "celib/string/string.h"
 
 #include "../filesystem.h"

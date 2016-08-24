@@ -2,12 +2,12 @@
 // Includes
 //==============================================================================
 
-#include <celib/types.h>
-#include <cetech/machine/machine.h>
-#include <celib/string/string.h>
-#include <celib/math/vec2f.h>
-#include <celib/memory/memory.h>
-#include <celib/errors/errors.h>
+#include "celib/types.h"
+#include "celib/machine/machine.h"
+#include "celib/string/string.h"
+#include "celib/math/vec2f.h"
+#include "celib/memory/memory.h"
+#include "celib/errors/errors.h"
 
 #include "../input.h"
 

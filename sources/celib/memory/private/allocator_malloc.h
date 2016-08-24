@@ -2,9 +2,9 @@
 #define CETECH_ALLOCATOR_MALLOC_H
 
 #include <stdint.h>
-#include <celib/memory/memory.h>
-#include <celib/errors/errors.h>
-#include <celib/os/memory.h>
+#include "celib/memory/memory.h"
+#include "celib/errors/errors.h"
+#include "celib/machine/memory.h"
 #include "header.h"
 
 #define MAX_MEM_TRACE 1024

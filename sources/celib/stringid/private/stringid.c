@@ -1,7 +1,7 @@
-#include <celib/stringid/stringid.h>
-#include <celib/crypto/hash.h>
+#include "celib/stringid/stringid.h"
+#include "celib/crypto/hash.h"
 
-#include <celib/string/string.h>
+#include "celib/string/string.h"
 
 #define STRINGID64_SEED 22
 

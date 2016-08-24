@@ -1,8 +1,8 @@
 #include <string.h>
 
-#include <celib/errors/errors.h>
-#include <celib/memory/memory.h>
-#include "../../os/memory.h"
+#include "celib/errors/errors.h"
+#include "celib/memory/memory.h"
+#include "celib/machine/memory.h"
 
 size_t str_lenght(const char *s) {
     CE_ASSERT("string", s != NULL);

@@ -5,11 +5,11 @@
 // Includes
 //==============================================================================
 
-#include <celib/stringid/stringid.h>
-#include <celib/containers/array.h>
-#include <celib/types.h>
+#include "celib/stringid/stringid.h"
+#include "celib/containers/array.h"
+#include "celib/types.h"
 
-#include "celib/os/types.h"
+#include "celib/machine/types.h"
 
 //==============================================================================
 // Filesystem Interface

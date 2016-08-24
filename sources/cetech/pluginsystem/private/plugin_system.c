@@ -4,7 +4,7 @@
 
 #include <stdlib.h>
 #include <memory.h>
-#include <celib/string/string.h>
+#include "celib/string/string.h"
 
 #include "include/SDL2/SDL.h"
 

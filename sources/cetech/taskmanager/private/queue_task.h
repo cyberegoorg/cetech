@@ -7,9 +7,9 @@
 
 #include <stdatomic.h>
 
-#include <celib/types.h>
-#include <celib/errors/errors.h>
-#include <celib/memory/memory.h>
+#include "celib/types.h"
+#include "celib/errors/errors.h"
+#include "celib/memory/memory.h"
 
 //==============================================================================
 // Implementation

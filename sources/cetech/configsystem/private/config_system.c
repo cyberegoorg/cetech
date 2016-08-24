@@ -2,8 +2,8 @@
 // Includes
 //==============================================================================
 
-#include <celib/memory/memory.h>
-#include <cetech/configsystem/configsystem.h>
+#include "celib/memory/memory.h"
+#include "cetech/configsystem/configsystem.h"
 #include "celib/string/string.h"
 
 #include "celib/log/log.h"

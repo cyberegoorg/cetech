@@ -8,7 +8,7 @@
 #include <stdlib.h>
 
 #include "celib/log/log.h"
-#include "celib/os/stacktrace.h"
+#include "celib/machine/stacktrace.h"
 
 //==============================================================================
 // Iterface

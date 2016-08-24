@@ -1,12 +1,12 @@
 #ifndef CETECH_SYSTEMS_H
 #define CETECH_SYSTEMS_H
 
-#include <cetech/configsystem/configsystem.h>
-#include <cetech/consoleserver/consoleserver.h>
-#include <cetech/luasystem/luasystem.h>
-#include <cetech/machine/machine.h>
-#include <cetech/input/input.h>
-#include <cetech/taskmanager/taskmanager.h>
+#include "cetech/configsystem/configsystem.h"
+#include "cetech/consoleserver/consoleserver.h"
+#include "cetech/luasystem/luasystem.h"
+#include "celib/machine/machine.h"
+#include "cetech/input/input.h"
+#include "cetech/taskmanager/taskmanager.h"
 
 #define _SYSTEMS_SIZE sizeof(_SYSTEMS)/sizeof(_SYSTEMS[0])
 #define _REGISTER_SYSTEM(n) {.name= #n, .init=n##_init, .shutdown=n##_shutdown}

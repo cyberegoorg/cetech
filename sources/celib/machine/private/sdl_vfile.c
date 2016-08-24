@@ -1,8 +1,8 @@
-#include <celib/memory/memory.h>
+#include "celib/memory/memory.h"
 #include "include/SDL2/SDL.h"
 
 #include "celib/errors/errors.h"
-#include "../types.h"
+#include "celib/machine/types.h"
 
 
 #define LOG_WHERE "vfile_sdl"

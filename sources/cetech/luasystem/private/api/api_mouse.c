@@ -1,6 +1,6 @@
-#include <cetech/luasystem/luasystem.h>
-#include <celib/memory/types.h>
-#include <cetech/input/input.h>
+#include "cetech/luasystem/luasystem.h"
+#include "celib/memory/types.h"
+#include "cetech/input/input.h"
 
 #define API_NAME "Mouse"
 

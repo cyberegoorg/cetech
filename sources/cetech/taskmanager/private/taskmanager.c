@@ -6,8 +6,8 @@
 // Includes
 //==============================================================================
 
-#include <cetech/taskmanager/types.h>
-#include <celib/os/thread.h>
+#include "cetech/taskmanager/types.h"
+#include "celib/machine/thread.h"
 #include <include/SDL2/SDL_cpuinfo.h>
 
 #include "queue_task.h"
@@ -270,7 +270,7 @@ task_t taskmanager_add_null(const char *name,
     return taskmanager_add_begin(name, _null_task, NULL, 0, depend, parent, priority, affinity);
 }
 
-void taskmanager_add_end(task_t *tasks, size_t count) {
+void taskmanager_add_end(const task_t *tasks, size_t count) {
     for (u32 i = 0; i < count; ++i) {
         if(_G._taskPool[tasks[i].id].depend_on.id == 0) {
             if (atomic_load(&_G._taskPool[tasks[i].id].job_count) == 1) {

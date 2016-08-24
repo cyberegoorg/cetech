@@ -69,7 +69,7 @@ set(SOURCE_FILES
         ########################################################################
         sources/celib/memory/private/allocator.c
         sources/celib/memory/private/memory.c
-        sources/celib/os/tests/test_memory.cc
+        sources/celib/machine/tests/test_memory.cc
 
 
         ########################################################################
@@ -90,13 +90,13 @@ set(SOURCE_FILES
         ########################################################################
         # CELIB: File
         ########################################################################
-        sources/celib/os/private/memory.c
-        sources/celib/os/private/vfile.c
-        sources/celib/os/private/sdl_vfile.c
-        sources/celib/os/private/path.c
-        sources/celib/os/private/file.c
-        sources/celib/os/private/posix_stacktrace.c
-        sources/celib/os/tests/test_vfile.cc
+        sources/celib/machine/private/memory.c
+        sources/celib/machine/private/vfile.c
+        sources/celib/machine/private/sdl_vfile.c
+        sources/celib/machine/private/path.c
+        sources/celib/machine/private/file.c
+        sources/celib/machine/private/posix_stacktrace.c
+        sources/celib/machine/tests/test_vfile.cc
 
         ########################################################################
         # CELIB: Crypto
@@ -139,15 +139,15 @@ set(SOURCE_FILES
         sources/celib/stringid/private/stringid.c
         sources/cetech/filesystem/private/filesystem.c
         sources/cetech/filesystem/tests/test_filesystem.cc
-        sources/celib/os/private/sdl_thread.c
+        sources/celib/machine/private/sdl_thread.c
 
 
         sources/cetech/application/private/application.c
-        sources/cetech/machine/private/machine.c
-        sources/cetech/machine/private/sdl2/sdl_mouse.c
-        sources/cetech/machine/private/sdl2/sdl_keyboard.c
-        sources/cetech/machine/private/sdl2/sdl_machine.c
-        sources/cetech/machine/private/sdl2/sdl_window.c
+        sources/celib/machine/private/machine.c
+        sources/celib/machine/private/sdl2/sdl_mouse.c
+        sources/celib/machine/private/sdl2/sdl_keyboard.c
+        sources/celib/machine/private/sdl2/sdl_machine.c
+        sources/celib/machine/private/sdl2/sdl_window.c
         sources/cetech/input/private/keyboard.c
         sources/cetech/input/private/mouse.c
         sources/cetech/taskmanager/private/taskmanager.c

@@ -8,10 +8,10 @@
 
 extern "C" {
 #include <string.h>
-#include <celib/memory/memory.h>
-#include <celib/string/string.h>
+#include "celib/memory/memory.h"
+#include "celib/string/string.h"
 #include "../filesystem.h"
-#include "celib/os/file.h"
+#include "celib/machine/file.h"
 };
 
 SCENARIO( "map root to root_path", "[filesystem]" ) {

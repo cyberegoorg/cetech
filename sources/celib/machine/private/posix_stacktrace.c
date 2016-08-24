@@ -2,7 +2,7 @@
 #include <string.h>
 
 #include <execinfo.h>
-#include <celib/os/memory.h>
+#include "celib/machine/memory.h"
 
 #include "celib/memory/memory.h"
 

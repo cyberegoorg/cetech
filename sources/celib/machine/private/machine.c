@@ -2,9 +2,9 @@
 // Includes
 //==============================================================================
 
-#include <celib/containers/array.h>
-#include <cetech/machine/machine.h>
-#include <cetech/machine/private/sdl2/sdl_parts.h>
+#include "celib/containers/array.h"
+#include "celib/machine/machine.h"
+#include "celib/machine/private/sdl2/sdl_parts.h"
 
 //==============================================================================
 // Defines

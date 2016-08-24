@@ -1,5 +1,5 @@
 #include <memory.h>
-#include "../../errors/errors.h"
+#include "celib/errors/errors.h"
 
 #define LOG_WHERE "os.memory"
 

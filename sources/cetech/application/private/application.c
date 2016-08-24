@@ -2,12 +2,14 @@
 // Includes
 //==============================================================================
 
-#include <celib/log/log.h>
-#include <celib/memory/memory.h>
 #include <unistd.h>
-#include <include/SDL2/SDL_timer.h>
 
-#include "../../machine/machine.h"
+#include "include/SDL2/SDL_timer.h"
+
+#include "celib/log/log.h"
+#include "celib/memory/memory.h"
+#include "celib/machine/machine.h"
+
 #include "../../input/input.h"
 #include "../../consoleserver/consoleserver.h"
 #include "../../taskmanager/taskmanager.h"
@@ -210,14 +212,10 @@ void application_start() {
                 TASK_AFFINITY_NONE
         );
 
-        task_t tasks[] = {task, input_task, consolesrv_task, frame_task};
-        taskmanager_add_end(tasks, sizeof(tasks)/sizeof(tasks[0]));
+        const task_t tasks[] = {task, input_task, consolesrv_task, frame_task};
+        taskmanager_add_end(tasks, CE_ARRAY_LEN(tasks));
 
         taskmanager_wait(task);
-
-        //log_info("app", "count   %d", taskmanager_open_task_count());
-
         machine_window_update(_G.main_window);
     }
 }
-

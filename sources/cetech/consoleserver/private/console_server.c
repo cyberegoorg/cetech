@@ -164,11 +164,11 @@ void consolesrv_register_command(const char *name, console_server_command_t cmd)
 
 void consolesrv_update() {
     char *buf = NULL;
-    int bytes = nn_recv(_G.rpc_socket, &buf, NN_MSG, NN_DONTWAIT);
-    if (bytes < 0) {
-        return;
-    }
 
-    _serve_command(buf, bytes);
-    nn_freemsg(buf);
+    int bytes = 0;
+    while (!(bytes = nn_recv(_G.rpc_socket, &buf, NN_MSG, NN_DONTWAIT))) {
+        _serve_command(buf, bytes);
+        nn_freemsg(buf);
+
+    }
 }

@@ -5,9 +5,8 @@
 // Includes
 //==============================================================================
 
-#include <celib/math/types.h>
-#include "cetech/machine/types.h"
-
+#include "celib/math/types.h"
+#include "types.h"
 
 typedef int (*machine_part_init_t)();
 typedef void (*machine_part_shutdown_t)();

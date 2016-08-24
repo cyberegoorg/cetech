@@ -30,6 +30,8 @@
 
 #define CE_CLEANUP_ATTR(fce) __attribute__((cleanup(fce)))
 
+#define CE_ARRAY_LEN(_name) (sizeof(_name) / sizeof(_name[0]))
+
 #define ATTR_FORMAT(fmt, args) __attribute__ ((format(printf, fmt, args)))
 
 //==============================================================================

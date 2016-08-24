@@ -3,14 +3,15 @@
 //==============================================================================
 
 #include <include/SDL2/SDL.h>
-#include <cetech/machine/types.h>
+#include "celib/containers/array.h"
+#include "celib/containers/eventstream.h"
+#include "cetech/application/application.h"
 
 //==============================================================================
 // Defines
 //==============================================================================
 
-#define is_button_down(now, last) ((now) && !(last))
-#define is_button_up(now, last)   (!(now) && (last))
+#define LOG_WHERE "machine.sdl"
 
 
 //==============================================================================
@@ -18,7 +19,7 @@
 //==============================================================================
 
 static struct G {
-    u8 last_state[KEY_MAX];
+    int _;
 } _G = {0};
 
 
@@ -26,31 +27,34 @@ static struct G {
 // Interface
 //==============================================================================
 
-int sdl_keyboard_init(){
+int sdl_init(){
     _G = (struct G) {0};
+
+    if (SDL_Init(SDL_INIT_EVERYTHING) != 0) {
+        log_error(LOG_WHERE, "Could not init sdl - %s", SDL_GetError());
+        return 0;
+    }
 
     return 1;
 }
 
-void sdl_keyboard_shutdown() {
+void sdl_shutdown() {
     _G = (struct G) {0};
+
+    SDL_Quit();
 }
 
-void sdl_keyboard_process(struct eventstream *stream) {
-    const u8 *state = SDL_GetKeyboardState(NULL);
-    struct keyboard_event keyboard_ev;
+void sdl_process(struct eventstream *stream) {
+    SDL_Event e;
 
-    for (u32 i = 0; i < KEY_MAX; ++i) {
-        if (is_button_down(state[i], _G.last_state[i])) {
-            keyboard_ev.keycode = i;
-            event_stream_push(stream, EVENT_KEYBOARD_DOWN, keyboard_ev);
+    while (SDL_PollEvent(&e) > 0) {
+        switch (e.type) {
+            case SDL_QUIT:
+                application_quit();
+                break;
 
-        } else if (is_button_up(state[i], _G.last_state[i])) {
-            keyboard_ev.keycode = i;
-            event_stream_push(stream, EVENT_KEYBOARD_UP, keyboard_ev);
-
+            default:
+                break;
         }
-
-        _G.last_state[i] = state[i];
     }
 }
