@@ -18,28 +18,30 @@
 
 #define make_task(i) (task_t){.id = i}
 
-#define MAX_TASK 1024
+#define MAX_TASK 4096
+
+#define LOG_WHERE "taskmanager"
 
 //==============================================================================
 // Globals
 //==============================================================================
 
 struct task {
-    task_t depend[32];
+    task_t continues[32];
+    u8 data[64];
     task_work_t task_work;
-    void *task_data;
     const char *name;
     atomic_int job_count;
-    atomic_int depend_count;
+    atomic_int continues_count;
 
     task_t parent;
+    task_t depend_on;
 
     enum task_priority priority;
     enum task_affinity affinity;
 };
 
 static __thread char _worker_id = 0;
-
 
 static struct G {
     struct task _taskPool[MAX_TASK];
@@ -112,6 +114,10 @@ static void _mark_task_job_done(task_t task) {
         }
     }
 
+    for (int i = 0; i < _G._taskPool[task.id].continues_count; ++i) {
+        _push_task(_G._taskPool[task.id].continues[i]);
+    }
+    
     _G._taskPool[task.id].job_count = 0;
 }
 
@@ -162,6 +168,8 @@ static int _task_worker(void *o) {
 //==============================================================================
 
 int taskmanager_init() {
+    log_debug(LOG_WHERE, "Init (global size: %lu, task size: %lu)", sizeof(struct G), sizeof(struct task));
+
     _G = (struct G) {0};
     memset(_G._openTasks, 0, sizeof(char) * 1024);
 
@@ -197,7 +205,7 @@ void taskmanager_shutdown() {
     int status = 0;
 
     for (u32 i = 0; i < _G._workers_count; ++i) {
-        thread_kill(_G._workers[i]);
+        //thread_kill(_G._workers[i]);
         thread_wait(_G._workers[i], &status);
     }
 
@@ -215,6 +223,7 @@ void taskmanager_shutdown() {
 task_t taskmanager_add_begin(const char *name,
                              task_work_t work,
                              void *data,
+                             char data_len,
                              task_t depend,
                              task_t parent,
                              enum task_priority priority,
@@ -228,21 +237,23 @@ task_t taskmanager_add_begin(const char *name,
     _G._taskPool[task.id].task_work = work;
     _G._taskPool[task.id].job_count = 1;
 
-    _G._taskPool[task.id].depend_count = 0;
-    memset(_G._taskPool[task.id].depend, 0, sizeof(task_t) * 32);
+    _G._taskPool[task.id].depend_on = depend;
+    _G._taskPool[task.id].continues_count = 0;
+    memset(_G._taskPool[task.id].continues, 0, sizeof(task_t) * 32);
 
     _G._taskPool[task.id].parent = parent;
     _G._taskPool[task.id].affinity = affinity;
-    _G._taskPool[task.id].task_data = data;
+
+    memcpy(_G._taskPool[task.id].data, data, data_len);
 
     if (parent.id != 0) {
         atomic_fetch_add(&_G._taskPool[parent.id].job_count, 1);
     }
 
     if(depend.id != 0) {
-        int idx = atomic_fetch_add(&_G._taskPool[depend.id].depend_count, 1);
+        int idx = atomic_fetch_add(&_G._taskPool[depend.id].continues_count, 1);
 
-        _G._taskPool[depend.id].depend[idx] = task;
+        _G._taskPool[depend.id].continues[idx] = task;
     }
 
     return task;
@@ -257,13 +268,15 @@ task_t taskmanager_add_null(const char *name,
                             enum task_priority priority,
                             enum task_affinity affinity) {
 
-    return taskmanager_add_begin(name, _null_task, NULL, depend, parent, priority, affinity);
+    return taskmanager_add_begin(name, _null_task, NULL, 0, depend, parent, priority, affinity);
 }
 
 void taskmanager_add_end(task_t *tasks, size_t count) {
     for (u32 i = 0; i < count; ++i) {
-        if(atomic_load(&_G._taskPool[tasks[i].id].job_count) == 1) {
-            _push_task(tasks[i]);
+        if(_G._taskPool[tasks[i].id].depend_on.id == 0) {
+            if (atomic_load(&_G._taskPool[tasks[i].id].job_count) == 1) {
+                _push_task(tasks[i]);
+            }
         }
     }
 }
@@ -275,9 +288,7 @@ void taskmanager_do_work() {
         return;
     }
 
-    //log_debug("ddd", "work_on %d", t.id);
-
-    _G._taskPool[t.id].task_work(_G._taskPool[t.id].task_data);
+    _G._taskPool[t.id].task_work(_G._taskPool[t.id].data);
 
     _mark_task_job_done(t);
 }

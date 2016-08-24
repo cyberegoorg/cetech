@@ -17,6 +17,7 @@ void taskmanager_shutdown();
 task_t taskmanager_add_begin(const char* name,
                              task_work_t work,
                              void* data,
+                             char data_len,
                              task_t depend,
                              task_t parent,
                              enum task_priority priority,

@@ -9,5 +9,5 @@ int main(int argc, char **argv) {
 
     application_shutdown();
 
-    return init_result;
+    return !init_result;
 }

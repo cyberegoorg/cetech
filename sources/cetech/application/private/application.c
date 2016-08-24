@@ -54,7 +54,7 @@ int application_init(int argc, char **argv) {
     log_init(_get_worker_id);
     log_register_handler(log_stdout_handler, NULL);
 
-    log_debug(LOG_WHERE, "Init");
+    log_debug(LOG_WHERE, "Init (global size: %lu)", sizeof(struct G));
 
     memsys_init(4 * 1024 * 1024);
 
@@ -181,6 +181,7 @@ void application_start() {
                 "consolesrv",
                 _consolesrv_task,
                 NULL,
+                0,
                 task_null,
                 frame_task,
                 TASK_PRIORITY_HIGH,
@@ -191,6 +192,7 @@ void application_start() {
                 "input",
                 _input_task,
                 NULL,
+                0,
                 task_null,
                 frame_task,
                 TASK_PRIORITY_HIGH,
@@ -201,6 +203,7 @@ void application_start() {
                 "task1",
                 _task1,
                 NULL,
+                0,
                 frame_task,
                 task_null,
                 TASK_PRIORITY_HIGH,
