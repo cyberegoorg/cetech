@@ -45,7 +45,7 @@ static struct G {
     struct queue_task _gloalQueue[3];
     struct queue_task _workersQueue[MAX_WORKERS * 3];
     thread_t _workers[MAX_WORKERS - 1];
-    struct queue_task _free_task;
+    atomic_int _task_pool_idx;
     int _workers_count;
     int _Run;
     spinlock_t _lock; // TODO: lock-free
@@ -58,13 +58,13 @@ static struct G {
 //==============================================================================
 
 static task_t _new_task() {
-    u32 idx = 0;
-    if (!queue_task_pop(&_G._free_task, &idx, 0)) {
-        log_error("task", "Could not create new task");
-        return task_null;
+    int idx = atomic_fetch_add(&_G._task_pool_idx, 1);
+
+    if((idx & (MAX_TASK - 1)) == 0) {
+        idx = atomic_fetch_add(&_G._task_pool_idx, 1);
     }
 
-    return make_task(idx);
+    return make_task(idx & (MAX_TASK - 1));
 }
 
 static void _push_task(task_t t) {
@@ -125,33 +125,28 @@ static void _mark_task_job_done(task_t task) {
     }
 
     _G._taskPool[task.id].job_count = 0;
-
-    queue_task_push(&_G._free_task, task.id);
 }
 
 static task_t _task_pop_new_work() {
     task_t popedTask;
 
     for (u32 i = 0; i < 3; ++i) {
-        struct queue_task *q = &_G._workersQueue[_worker_id * 3 + i];
+        struct queue_task *qw = &_G._workersQueue[_worker_id * 3 + i];
+        struct queue_task *qg = &_G._gloalQueue[i];
 
-        popedTask = _try_pop(q);
+        popedTask = _try_pop(qw);
         if (popedTask.id != 0) {
             return popedTask;
         }
-    }
 
-    spin_lock(&_G._lock);
-    for (u32 i = 0; i < 3; ++i) {
-        struct queue_task *q = &_G._gloalQueue[i];
-
-        popedTask = _try_pop(q);
+        spin_lock(&_G._lock);
+        popedTask = _try_pop(qg);
         if (popedTask.id != 0) {
             spin_unlock(&_G._lock);
             return popedTask;
         }
+        spin_unlock(&_G._lock);
     }
-    spin_unlock(&_G._lock);
 
     return task_null;
 }
@@ -196,11 +191,11 @@ int taskmanager_init() {
 //    _G._workersQueue = CE_ALLOCATE(memsys_main_allocator(), struct queue_task, 3 * (worker_count + 1));
 //    _G._workers = CE_ALLOCATE(memsys_main_allocator(), thread_t, worker_count);
 
-    queue_task_init(&_G._free_task, MAX_TASK, memsys_main_allocator());
+//    queue_task_init(&_G._free_task, MAX_TASK, memsys_main_allocator());
 
-    for (u32 i = 1; i != MAX_TASK; ++i) {
-        queue_task_push(&_G._free_task, i);
-    }
+//    for (u32 i = 1; i != MAX_TASK; ++i) {
+//        queue_task_push(&_G._free_task, i);
+//    }
 
     for (int i = 0; i < 3; ++i) {
         queue_task_init(&_G._gloalQueue[i], MAX_TASK, memsys_main_allocator());
@@ -228,7 +223,7 @@ void taskmanager_shutdown() {
         thread_wait(_G._workers[i], &status);
     }
 
-    queue_task_destroy(&_G._free_task);
+//    queue_task_destroy(&_G._free_task);
 
     for (int i = 0; i < 3; ++i) {
         queue_task_destroy(&_G._gloalQueue[i]);
