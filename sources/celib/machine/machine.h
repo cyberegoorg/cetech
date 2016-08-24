@@ -100,33 +100,33 @@ time_t file_mtime(const char *path);
 // VFile Interface
 //==============================================================================
 
-struct vfile *vfile_from_file(const char *path,
-                              enum open_mode mode,
-                              struct allocator *allocator);
+struct vio *vio_from_file(const char *path,
+                          enum open_mode mode,
+                          struct allocator *allocator);
 
-int vfile_close(struct vfile *file);
+int vio_close(struct vio *file);
 
-int64_t vfile_seek(struct vfile *file,
-                   int64_t offset,
-                   enum vfile_seek whence);
+int64_t vio_seek(struct vio *file,
+                 int64_t offset,
+                 enum vio_seek whence);
 
-void vfile_seek_to_end(struct vfile *file);
+void vio_seek_to_end(struct vio *file);
 
-i64 vfile_skip(struct vfile *, i64 bytes);
+i64 vio_skip(struct vio *, i64 bytes);
 
-i64 vfile_position(struct vfile *file);
+i64 vio_position(struct vio *file);
 
-i64 vfile_size(struct vfile *file);
+i64 vio_size(struct vio *file);
 
-size_t vfile_read(struct vfile *file,
-                  void *buffer,
-                  size_t size,
-                  size_t maxnum);
+size_t vio_read(struct vio *file,
+                void *buffer,
+                size_t size,
+                size_t maxnum);
 
-size_t vfile_write(struct vfile *file,
-                   const void *buffer,
-                   size_t size,
-                   size_t num);
+size_t vio_write(struct vio *file,
+                 const void *buffer,
+                 size_t size,
+                 size_t num);
 
 //==============================================================================
 // Interface

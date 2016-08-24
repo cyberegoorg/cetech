@@ -9,7 +9,7 @@ extern "C" {
 #include "celib/string/string.h"
 };
 
-SCENARIO( "Can read file", "[vfile]" ) {
+SCENARIO( "Can read file", "[vio]" ) {
     memsys_init(4*1024*1024);
 
     char* test_dir = strdup(__FILE__);
@@ -19,19 +19,19 @@ SCENARIO( "Can read file", "[vfile]" ) {
         char path[1024] = {0};
         strcat(strcat(path, test_dir), "test_file.txt");
 
-        struct vfile* f = vfile_from_file(path, VFILE_OPEN_READ, memsys_main_allocator());
+        struct vio* f = vio_from_file(path, VIO_OPEN_READ, memsys_main_allocator());
         REQUIRE( f != NULL);
 
-        int64_t f_size = vfile_size(f);
+        int64_t f_size = vio_size(f);
         REQUIRE( f_size > 0 );
 
         char buffer[f_size+1];
-        vfile_read(f, buffer, sizeof(char), f_size);
+        vio_read(f, buffer, sizeof(char), f_size);
         buffer[f_size] = '\0';
 
         REQUIRE( str_compare(buffer, "test data\n") == 0);
 
-        vfile_close(f);
+        vio_close(f);
     }
 
     memsys_shutdown();

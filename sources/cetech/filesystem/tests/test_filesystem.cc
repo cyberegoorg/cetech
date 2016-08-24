@@ -75,11 +75,11 @@ SCENARIO( "Can open file", "[filesystem]" ) {
 
         WHEN("open file test_file.txt") {
             THEN("file is open") {
-                struct vfile* f = filesystem_open(root, "test_file.txt", VFILE_OPEN_READ);
+                struct vio* f = filesystem_open(root, "test_file.txt", VIO_OPEN_READ);
 
                 REQUIRE(f != NULL);
 
-                vfile_close(f);
+                vio_close(f);
             }
         }
 

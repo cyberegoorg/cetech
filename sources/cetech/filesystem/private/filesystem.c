@@ -77,14 +77,14 @@ int filesystem_get_fullpath(stringid64_t root, char *result, u64 maxlen, const c
     return path_join(result, maxlen, root_path, filename) == (str_lenght(root_path) + str_lenght(filename) + 1);
 }
 
-struct vfile *filesystem_open(stringid64_t root, const char *path, enum open_mode mode) {
+struct vio *filesystem_open(stringid64_t root, const char *path, enum open_mode mode) {
     char full_path[MAX_PATH_LEN] = {0};
 
     if (!filesystem_get_fullpath(root, full_path, sizeof(full_path) / sizeof(char), path)) {
         return NULL;
     }
 
-    struct vfile *file = vfile_from_file(full_path, mode, memsys_main_allocator());
+    struct vio *file = vio_from_file(full_path, mode, memsys_main_allocator());
 
     if (!file) {
         return NULL;
@@ -93,8 +93,8 @@ struct vfile *filesystem_open(stringid64_t root, const char *path, enum open_mod
     return file;
 }
 
-void filesystem_close(struct vfile *file) {
-    vfile_close(file);
+void filesystem_close(struct vio *file) {
+    vio_close(file);
 }
 
 int filesystem_create_directory(stringid64_t root, const char *path) {

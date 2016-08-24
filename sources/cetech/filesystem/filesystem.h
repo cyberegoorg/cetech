@@ -36,11 +36,11 @@ const char *filesystem_get_root_dir(stringid64_t root);
 //! \param path File path
 //! \param mode Open mode
 //! \return File or NULL
-struct vfile *filesystem_open(stringid64_t root, const char *path, enum open_mode mode);
+struct vio *filesystem_open(stringid64_t root, const char *path, enum open_mode mode);
 
 //! Close file
 //! \param file file
-void filesystem_close(struct vfile *file);
+void filesystem_close(struct vio *file);
 
 
 //! List directory

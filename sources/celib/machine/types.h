@@ -12,14 +12,14 @@
 //==============================================================================
 
 enum open_mode {
-    VFILE_OPEN_READ,
-    VFILE_OPEN_WRITE,
+    VIO_OPEN_READ,
+    VIO_OPEN_WRITE,
 };
 
-enum vfile_seek {
-    VFILE_SEEK_SET,
-    VFILE_SEEK_CUR,
-    VFILE_SEEK_END
+enum vio_seek {
+    VIO_SEEK_SET,
+    VIO_SEEK_CUR,
+    VIO_SEEK_END
 };
 
 
@@ -27,16 +27,16 @@ enum vfile_seek {
 // Structs
 //==============================================================================
 
-struct vfile {
-    i64 (*size)(struct vfile *vfile);
+struct vio {
+    i64 (*size)(struct vio *vio);
 
-    i64 (*seek)(struct vfile *vfile, i64 offset, enum vfile_seek whence);
+    i64 (*seek)(struct vio *vio, i64 offset, enum vio_seek whence);
 
-    size_t (*read)(struct vfile *vfile, void *ptr, size_t size, size_t maxnum);
+    size_t (*read)(struct vio *vio, void *ptr, size_t size, size_t maxnum);
 
-    size_t (*write)(struct vfile *vfile, const void *ptr, size_t size, size_t num);
+    size_t (*write)(struct vio *vio, const void *ptr, size_t size, size_t num);
 
-    int (*close)(struct vfile *vfile);
+    int (*close)(struct vio *vio);
 };
 
 //==============================================================================

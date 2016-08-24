@@ -91,8 +91,8 @@ set(SOURCE_FILES
         # CELIB: File
         ########################################################################
         sources/celib/machine/private/memory.c
-        sources/celib/machine/private/vfile.c
-        sources/celib/machine/private/sdl2/sdl_vfile.c
+        sources/celib/machine/private/vio.c
+        sources/celib/machine/private/sdl2/sdl_vio.c
         sources/celib/machine/private/path.c
         sources/celib/machine/private/file.c
         sources/celib/machine/private/posix/posix_stacktrace.c
@@ -154,7 +154,8 @@ set(SOURCE_FILES
         sources/cetech/taskmanager/private/taskmanager.c
 
 
-        sources/celib/machine/private/sdl2/sdl_time.c sources/celib/machine/private/sdl2/sdl_object.c)
+        sources/celib/machine/private/sdl2/sdl_time.c
+        sources/celib/machine/private/sdl2/sdl_object.c)
 
 ################################################################################
 # Main sources
