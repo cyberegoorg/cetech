@@ -92,10 +92,10 @@ set(SOURCE_FILES
         ########################################################################
         sources/celib/machine/private/memory.c
         sources/celib/machine/private/vfile.c
-        sources/celib/machine/private/sdl_vfile.c
+        sources/celib/machine/private/sdl2/sdl_vfile.c
         sources/celib/machine/private/path.c
         sources/celib/machine/private/file.c
-        sources/celib/machine/private/posix_stacktrace.c
+        sources/celib/machine/private/posix/posix_stacktrace.c
         sources/celib/machine/tests/test_vfile.cc
 
         ########################################################################
@@ -139,7 +139,8 @@ set(SOURCE_FILES
         sources/celib/stringid/private/stringid.c
         sources/cetech/filesystem/private/filesystem.c
         sources/cetech/filesystem/tests/test_filesystem.cc
-        sources/celib/machine/private/sdl_thread.c
+        sources/celib/machine/private/sdl2/sdl_thread.c
+        sources/celib/machine/private/sdl2/sdl_cpu.c
 
 
         sources/cetech/application/private/application.c

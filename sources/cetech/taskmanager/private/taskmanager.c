@@ -6,9 +6,9 @@
 // Includes
 //==============================================================================
 
-#include "cetech/taskmanager/types.h"
+#include "../types.h"
 #include "celib/machine/thread.h"
-#include <include/SDL2/SDL_cpuinfo.h>
+#include "celib/machine/machine.h"
 
 #include "queue_task.h"
 
@@ -74,14 +74,17 @@ static task_t _new_task() {
 static void _push_task(task_t t) {
     CE_ASSERT("", t.id != 0);
 
+    int priority = _G._taskPool[t.id].priority;
+    int affinity = _G._taskPool[t.id].affinity;
+
     struct queue_task *q;
     switch (_G._taskPool[t.id].affinity) {
         case TASK_AFFINITY_NONE:
-            q = &_G._gloalQueue[(int) _G._taskPool[t.id].priority];
+            q = &_G._gloalQueue[priority];
             break;
 
         default:
-            q = &_G._workersQueue[(((int) _G._taskPool[t.id].affinity - 1) * 3) + (int) _G._taskPool[t.id].priority];
+            q = &_G._workersQueue[((affinity - 1) * 3) + priority];
             break;
     }
 
@@ -107,15 +110,16 @@ static task_t _try_pop(struct queue_task *q) {
 static void _mark_task_job_done(task_t task) {
     _G._openTasks[task.id] = 0;
 
-    u32 parent_idx = _G._taskPool[task.id].parent.id;
-    if (parent_idx != 0) {
-        int count = atomic_fetch_sub(&_G._taskPool[parent_idx].job_count, 1);
+    task_t parent = _G._taskPool[task.id].parent;
+    if (parent.id != 0) {
+        int count = atomic_fetch_sub(&_G._taskPool[parent.id].job_count, 1);
         if (count == 2) {
-            _push_task(make_task(parent_idx));
+            _push_task(parent);
         }
     }
 
-    for (int i = 0; i < _G._taskPool[task.id].continues_count; ++i) {
+    int continue_count = atomic_load(&_G._taskPool[task.id].continues_count);
+    for (int i = 0; i < continue_count; ++i) {
         _push_task(_G._taskPool[task.id].continues[i]);
     }
 
@@ -150,7 +154,7 @@ static int _task_worker(void *o) {
     while (!_G._Run) {
     }
 
-    _worker_id = (int) o;
+    _worker_id = (char) o;
 
     log_debug("task_worker", "Worker %d init", _worker_id);
 
@@ -169,14 +173,12 @@ static int _task_worker(void *o) {
 //==============================================================================
 
 int taskmanager_init() {
-    log_debug(LOG_WHERE, "Init (global size: %lu, task size: %lu)", sizeof(struct G), sizeof(struct task));
-
     _G = (struct G) {0};
-    memset(_G._openTasks, 0, sizeof(char) * 1024);
+    memory_set(_G._openTasks, 0, sizeof(char) * MAX_TASK);
 
-    uint32_t core_count = SDL_GetCPUCount();
+    int core_count = machine_cpu_count();
 
-    static const uint32_t main_threads_count = 1 + 1;
+    static const uint32_t main_threads_count = 1;
     const uint32_t worker_count = core_count - main_threads_count;
 
     log_info("task", "Core/Main/Worker: %d, %d, %d", core_count, main_threads_count, worker_count);
@@ -243,7 +245,7 @@ task_t taskmanager_add_begin(const char *name,
     _G._taskPool[task.id].parent = parent;
     _G._taskPool[task.id].affinity = affinity;
 
-    memcpy(_G._taskPool[task.id].data, data, (size_t) data_len);
+    memory_copy(_G._taskPool[task.id].data, data, (size_t) data_len);
 
     if (parent.id != 0) {
         atomic_fetch_add(&_G._taskPool[parent.id].job_count, 1);

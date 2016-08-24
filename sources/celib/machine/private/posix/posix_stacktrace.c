@@ -5,8 +5,7 @@
 #include "celib/machine/memory.h"
 
 
-char *utils_stacktrace(int skip) {
-#if defined(CETECH_LINUX)
+char *machine_stacktrace(int skip) {
     char *return_str = (char *) os_malloc(4096 * 8);
     return_str[0] = '\0';
 
@@ -53,10 +52,8 @@ char *utils_stacktrace(int skip) {
 
     os_free(messages);
     return return_str;
-#endif
-    return NULL;
 }
 
-void utils_stacktrace_free(char *st) {
+void machine_stacktrace_free(char *st) {
     os_free(st);
 }

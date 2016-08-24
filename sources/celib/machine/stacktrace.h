@@ -5,8 +5,8 @@
 // Interface
 //==============================================================================
 
-char *utils_stacktrace(int skip);
+char *machine_stacktrace(int skip);
 
-void utils_stacktrace_free(char *st);
+void machine_stacktrace_free(char *st);
 
 #endif //CETECH_STACKTRACE_H

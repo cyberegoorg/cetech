@@ -35,6 +35,8 @@ struct event_header *machine_event_end();
 
 struct event_header *machine_event_next(struct event_header *header);
 
+int machine_cpu_count();
+
 //==============================================================================
 // Window interface
 //==============================================================================

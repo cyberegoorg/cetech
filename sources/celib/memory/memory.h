@@ -29,6 +29,8 @@ const void *pointer_sub(const void *p, uint32_t bytes);
 
 void *memory_copy(void *__restrict dest, const void *__restrict src, size_t n);
 
+void *memory_set(void *__restrict dest, int c, size_t n);
+
 
 //==============================================================================
 // Memory system

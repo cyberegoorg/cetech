@@ -58,3 +58,4 @@ void sdl_process(struct eventstream *stream) {
         }
     }
 }
+

@@ -19,7 +19,7 @@
 #define CE_ASSERT_MSG(where, condition, msg, ...)                               \
     do {                                                                        \
         if (!(condition)) {                                                     \
-            char* st = utils_stacktrace(1);                                     \
+            char* st = machine_stacktrace(1);                                   \
             log_error(where ".assert",                                          \
                        "msg: %s" msg _MSG_END,                                  \
                        #condition,                                              \
@@ -27,7 +27,7 @@
                        __FILE__,                                                \
                        __LINE__,                                                \
                        st);                                                     \
-            utils_stacktrace_free(st);                                          \
+            machine_stacktrace_free(st);                                        \
             abort();                                                            \
         }                                                                       \
     } while (0)                                                                 \
