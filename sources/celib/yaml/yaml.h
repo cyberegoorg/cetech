@@ -74,7 +74,9 @@ enum yaml_node_type yaml_node_type(yaml_handler_t handler,
 #define YAML_NODE_AS_DEF(type) type yaml_node_as_##type(yaml_handler_t handler, yaml_node_t node_idx)
 
 YAML_NODE_AS_DEF(int);
+
 YAML_NODE_AS_DEF(bool);
+
 YAML_NODE_AS_DEF(float);
 
 #undef YAML_NODE_AS_DEF

@@ -21,7 +21,7 @@
 //    return allocator->allocated_size(p);
 //}
 
-void allocator_trace_pointer(struct allocator_trace_entry* entries, u64 max_entries, void *p) {
+void allocator_trace_pointer(struct allocator_trace_entry *entries, u64 max_entries, void *p) {
     char *stacktrace_str = utils_stacktrace(3);
 
     for (int i = 0; i < max_entries; ++i) {
@@ -34,7 +34,7 @@ void allocator_trace_pointer(struct allocator_trace_entry* entries, u64 max_entr
     }
 }
 
-void allocator_stop_trace_pointer(struct allocator_trace_entry* entries, u64 max_entries, void *p) {
+void allocator_stop_trace_pointer(struct allocator_trace_entry *entries, u64 max_entries, void *p) {
     for (int i = 0; i < max_entries; ++i) {
         if (entries[i].ptr != p) {
             continue;
@@ -47,7 +47,7 @@ void allocator_stop_trace_pointer(struct allocator_trace_entry* entries, u64 max
     }
 }
 
-void allocator_check_trace(struct allocator_trace_entry* entries, u64 max_entries) {
+void allocator_check_trace(struct allocator_trace_entry *entries, u64 max_entries) {
     for (int i = 0; i < max_entries; ++i) {
         if (!entries[i].used) {
             continue;

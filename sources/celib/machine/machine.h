@@ -9,7 +9,9 @@
 #include "types.h"
 
 typedef int (*machine_part_init_t)();
+
 typedef void (*machine_part_shutdown_t)();
+
 typedef void (*machine_part_process_t)(struct eventstream *stream);
 
 //==============================================================================
@@ -20,7 +22,7 @@ int machine_init();
 
 void machine_shutdown();
 
-void machine_register_part(const char* name,
+void machine_register_part(const char *name,
                            machine_part_init_t init,
                            machine_part_shutdown_t shutdown,
                            machine_part_process_t process);
@@ -59,7 +61,8 @@ void machine_window_resize(window_t w,
                            uint32_t width,
                            uint32_t height);
 
-void* machine_window_native_window_ptr(window_t w);
-void* machine_window_native_display_ptr(window_t w);
+void *machine_window_native_window_ptr(window_t w);
+
+void *machine_window_native_display_ptr(window_t w);
 
 #endif //CETECH_MACHINE_H

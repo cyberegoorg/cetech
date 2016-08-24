@@ -20,9 +20,9 @@ int in_use(struct allocator_scratch *a, void *p) {
         return 0;
 
     if (a->allocate > a->free)
-        return ((char*)p >= a->free) && ((char*)p < a->allocate);
+        return ((char *) p >= a->free) && ((char *) p < a->allocate);
 
-    return ((char*)p >= a->free) || ((char*)p < a->allocate);
+    return ((char *) p >= a->free) || ((char *) p < a->allocate);
 }
 
 void *scratch_allocator_allocate(struct allocator *allocator, uint32_t size, uint32_t align) {
@@ -61,7 +61,7 @@ void scratch_allocator_deallocate(struct allocator *allocator, void *p) {
     if (!p)
         return;
 
-    if ((char*)p < a->begin || (char*)p >= a->end) {
+    if ((char *) p < a->begin || (char *) p >= a->end) {
         allocator_deallocate(a->backing, p);
         return;
     }

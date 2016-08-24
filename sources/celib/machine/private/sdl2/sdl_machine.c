@@ -27,7 +27,7 @@ static struct G {
 // Interface
 //==============================================================================
 
-int sdl_init(){
+int sdl_init() {
     _G = (struct G) {0};
 
     if (SDL_Init(SDL_INIT_EVERYTHING) != 0) {

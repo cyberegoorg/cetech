@@ -64,7 +64,7 @@ static struct G {
 static task_t _new_task() {
     int idx = atomic_fetch_add(&_G._task_pool_idx, 1);
 
-    if((idx & (MAX_TASK - 1)) == 0) {
+    if ((idx & (MAX_TASK - 1)) == 0) {
         idx = atomic_fetch_add(&_G._task_pool_idx, 1);
     }
 
@@ -110,7 +110,7 @@ static void _mark_task_job_done(task_t task) {
     u32 parent_idx = _G._taskPool[task.id].parent.id;
     if (parent_idx != 0) {
         int count = atomic_fetch_sub(&_G._taskPool[parent_idx].job_count, 1);
-        if(count == 2) {
+        if (count == 2) {
             _push_task(make_task(parent_idx));
         }
     }
@@ -118,7 +118,7 @@ static void _mark_task_job_done(task_t task) {
     for (int i = 0; i < _G._taskPool[task.id].continues_count; ++i) {
         _push_task(_G._taskPool[task.id].continues[i]);
     }
-    
+
     _G._taskPool[task.id].job_count = 0;
 }
 
@@ -192,7 +192,7 @@ int taskmanager_init() {
     }
 
     for (int j = 0; j < worker_count; ++j) {
-        _G._workers[j] = thread_create((thread_fce_t) _task_worker, "worker", (void *) ((intptr_t)(j + 1)));
+        _G._workers[j] = thread_create((thread_fce_t) _task_worker, "worker", (void *) ((intptr_t) (j + 1)));
     }
 
     _G._Run = 1;
@@ -249,7 +249,7 @@ task_t taskmanager_add_begin(const char *name,
         atomic_fetch_add(&_G._taskPool[parent.id].job_count, 1);
     }
 
-    if(depend.id != 0) {
+    if (depend.id != 0) {
         int idx = atomic_fetch_add(&_G._taskPool[depend.id].continues_count, 1);
 
         _G._taskPool[depend.id].continues[idx] = task;
@@ -272,7 +272,7 @@ task_t taskmanager_add_null(const char *name,
 
 void taskmanager_add_end(const task_t *tasks, size_t count) {
     for (u32 i = 0; i < count; ++i) {
-        if(_G._taskPool[tasks[i].id].depend_on.id == 0) {
+        if (_G._taskPool[tasks[i].id].depend_on.id == 0) {
             if (atomic_load(&_G._taskPool[tasks[i].id].job_count) == 1) {
                 _push_task(tasks[i]);
             }

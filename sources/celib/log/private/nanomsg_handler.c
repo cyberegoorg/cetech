@@ -29,7 +29,7 @@ void nano_log_handler(enum log_level level,
 
     CE_STATIC_ASSERT(sizeof(void *) >= sizeof(int), "AUTHOR IS IDIOT");
 
-    int socket = *((int*)_data); // TODO: problem if sizeof(void*) < int
+    int socket = *((int *) _data); // TODO: problem if sizeof(void*) < int
 
     int bytes;
     char *data;

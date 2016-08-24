@@ -129,7 +129,7 @@ static void _dump_event() {
 }
 
 
-static void _task1(void* d) {
+static void _task1(void *d) {
     if (keyboard_button_state(keyboard_button_index("q"))) {
         application_quit();
     }
@@ -145,15 +145,15 @@ static void _task1(void* d) {
         }
     }
 
-   //usleep(1 * 1000);
+    //usleep(1 * 1000);
 }
 
-static void _input_task(void* d) {
+static void _input_task(void *d) {
     keyboard_process();
     mouse_process();
 }
 
-static void _consolesrv_task(void* d) {
+static void _consolesrv_task(void *d) {
     consolesrv_update();
 }
 

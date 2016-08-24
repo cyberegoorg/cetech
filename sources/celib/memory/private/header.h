@@ -27,7 +27,7 @@ static struct Header *header(void *data) {
 static void fill(struct Header *header, void *data, uint32_t size) {
     header->size = size;
     uint32_t *p = (uint32_t *) (header + 1);
-    while (p < (uint32_t*)data)
+    while (p < (uint32_t *) data)
         *p++ = HEADER_PAD_VALUE;
 }
 

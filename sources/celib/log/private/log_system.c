@@ -2,7 +2,6 @@
 #include <stdint.h>
 
 #include "celib/errors/errors.h"
-#include "celib/log/log.h"
 
 #define LOG_WHERE "log_system"
 

@@ -28,7 +28,7 @@ static struct G {
 // Interface
 //==============================================================================
 
-int sdl_mouse_init(){
+int sdl_mouse_init() {
     _G = (struct G) {0};
 
     return 1;

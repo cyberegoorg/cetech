@@ -27,9 +27,13 @@ enum vfile_seek {
 
 struct vfile {
     i64 (*size)(struct vfile *vfile);
+
     i64 (*seek)(struct vfile *vfile, i64 offset, enum vfile_seek whence);
+
     size_t (*read)(struct vfile *vfile, void *ptr, size_t size, size_t maxnum);
+
     size_t (*write)(struct vfile *vfile, const void *ptr, size_t size, size_t num);
+
     int (*close)(struct vfile *vfile);
 };
 

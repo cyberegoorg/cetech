@@ -97,7 +97,7 @@ void machine_window_resize(window_t w, uint32_t width, uint32_t height) {
     SDL_SetWindowSize(w.w, width, height);
 }
 
-void* machine_window_native_window_ptr(window_t w) {
+void *machine_window_native_window_ptr(window_t w) {
     SDL_SysWMinfo wmi;
 
     SDL_VERSION(&wmi.version);
@@ -115,7 +115,7 @@ void* machine_window_native_window_ptr(window_t w) {
 #endif
 }
 
-void* machine_window_native_display_ptr(window_t w) {
+void *machine_window_native_display_ptr(window_t w) {
     SDL_SysWMinfo wmi;
 
     SDL_VERSION(&wmi.version);

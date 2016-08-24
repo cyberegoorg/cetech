@@ -7,7 +7,7 @@ void *os_malloc(size_t size) {
     CE_ASSERT(LOG_WHERE, size > 0);
 
     void *mem = malloc(size);
-    if(mem == NULL) {
+    if (mem == NULL) {
         log_error(LOG_WHERE, "Malloc return NULL");
         return NULL;
     }

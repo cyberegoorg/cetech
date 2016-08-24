@@ -35,8 +35,8 @@ CE_FORCE_INLINE void quatf_move(f32 *__restrict result,
 }
 
 CE_FORCE_INLINE int quatf_eq(const f32 *__restrict a,
-                              const f32 *__restrict b,
-                              const f32 epsilon) {
+                             const f32 *__restrict b,
+                             const f32 epsilon) {
     return f32_equals(a, b, 4, epsilon);
 }
 
@@ -105,7 +105,7 @@ CE_FORCE_INLINE void quatf_to_eurel_angle(f32 *__restrict result,
 }
 
 CE_FORCE_INLINE int quatf_is_identity(const f32 *__restrict a,
-                                       const f32 epsilon) {
+                                      const f32 epsilon) {
     static quatf_t _identity = QUATF_IDENTITY;
     return quatf_eq(a, _identity, epsilon);
 }

@@ -11,6 +11,6 @@
 // Interface
 //==============================================================================
 
-stringid64_t stringid64_from_string(const char* str);
+stringid64_t stringid64_from_string(const char *str);
 
 #endif //CETECH_STRINGID_H

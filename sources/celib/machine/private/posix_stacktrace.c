@@ -4,8 +4,6 @@
 #include <execinfo.h>
 #include "celib/machine/memory.h"
 
-#include "celib/memory/memory.h"
-
 
 char *utils_stacktrace(int skip) {
 #if defined(CETECH_LINUX)

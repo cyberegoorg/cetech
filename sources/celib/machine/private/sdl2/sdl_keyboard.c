@@ -26,7 +26,7 @@ static struct G {
 // Interface
 //==============================================================================
 
-int sdl_keyboard_init(){
+int sdl_keyboard_init() {
     _G = (struct G) {0};
 
     return 1;

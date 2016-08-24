@@ -18,7 +18,7 @@
 //! Get file modified time
 //! \param path File path
 //! \return Modified time
-time_t file_mtime(const char* path);
+time_t file_mtime(const char *path);
 
 //==============================================================================
 // VFile Interface

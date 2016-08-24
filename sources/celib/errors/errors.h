@@ -37,6 +37,5 @@
 #endif
 
 #define CE_ASSERT(where, condition) CE_ASSERT_MSG(where, condition, "")
-#define CE_STATIC_ASSERT(expr, msg) _Static_assert(expr, msg)
 
 #endif //CETECH_ERRORS_H

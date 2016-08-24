@@ -159,20 +159,28 @@
 // Predefined array for prim types
 //==============================================================================
 
-typedef char* pchar;
+typedef char *pchar;
 
 ARRAY_PROTOTYPE(pchar)
+
 ARRAY_PROTOTYPE(char)
+
 ARRAY_PROTOTYPE(int)
 
 ARRAY_PROTOTYPE(u8)
+
 ARRAY_PROTOTYPE(u16)
+
 ARRAY_PROTOTYPE(u32)
+
 ARRAY_PROTOTYPE(u64)
 
 ARRAY_PROTOTYPE(i8)
+
 ARRAY_PROTOTYPE(i16)
+
 ARRAY_PROTOTYPE(i32)
+
 ARRAY_PROTOTYPE(i64)
 
 typedef ARRAY_T(pchar) string_array_t;

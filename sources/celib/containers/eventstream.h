@@ -38,6 +38,7 @@ static inline struct event_header *eventstream_next(struct event_header *header)
 }
 
 #define event_stream_push(es, type, event) _eventstream_push(es, (struct event_header*)(&event), type, sizeof(event))
+
 static inline void _eventstream_push(struct eventstream *es, struct event_header *header, u32 type, u64 size) {
     header->type = type;
     header->size = size;

@@ -23,8 +23,8 @@ CE_FORCE_INLINE void vec4f_move(f32 *__restrict result,
 }
 
 CE_FORCE_INLINE int vec4f_eq(const f32 *__restrict a,
-                              const f32 *__restrict b,
-                              const f32 epsilon) {
+                             const f32 *__restrict b,
+                             const f32 epsilon) {
     return f32_equals(a, b, 4, epsilon);
 }
 
@@ -75,7 +75,7 @@ CE_FORCE_INLINE void vec4f_div(f32 *__restrict result,
 }
 
 CE_FORCE_INLINE f32 vec4f_dot(const f32 *__restrict a,
-                                const f32 *__restrict b) {
+                              const f32 *__restrict b) {
     return (a[0] * b[0]) + (a[1] * b[1]) + (a[2] * b[2]) + (a[3] * b[3]);
 }
 

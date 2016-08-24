@@ -22,7 +22,7 @@ static struct G {
     machine_part_init_t init[MAX_PARTS];
     machine_part_shutdown_t shutdown[MAX_PARTS];
     machine_part_process_t process[MAX_PARTS];
-    const char* name[MAX_PARTS];
+    const char *name[MAX_PARTS];
 
     struct eventstream eventstream;
     int parts_count;
@@ -44,13 +44,13 @@ int machine_init() {
     machine_register_part("sdl_window", sdl_window_init, sdl_window_shutdown, sdl_window_process);
 
     for (int i = 0; i < _G.parts_count; ++i) {
-        if(!_G.init[i]()) {
+        if (!_G.init[i]()) {
             log_error(LOG_WHERE, "Could not init machine part \"%s\"", _G.name[i]);
 
-            for ( i = i -1;  i >= 0; --i) {
+            for (i = i - 1; i >= 0; --i) {
                 _G.shutdown[i]();
             }
-            
+
             return 0;
         };
     }
@@ -89,7 +89,7 @@ struct event_header *machine_event_next(struct event_header *header) {
     return eventstream_next(header);
 }
 
-void machine_register_part(const char* name,
+void machine_register_part(const char *name,
                            machine_part_init_t init,
                            machine_part_shutdown_t shutdown,
                            machine_part_process_t process) {
