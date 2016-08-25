@@ -77,18 +77,18 @@ ConsoleApp = (function () {
                 parse_data(events);
             };
 
-            this.ws2 = new WebSocket("ws://localhost:4445", "pub.sp.nanomsg.org");
+            this.log_ws = new WebSocket("ws://localhost:4445", "pub.sp.nanomsg.org");
 
-            this.ws2.binaryType = "arraybuffer";
-            this.ws2.onopen = function () {
+            this.log_ws.binaryType = "arraybuffer";
+            this.log_ws.onopen = function () {
                 console.log("opend");
             };
 
-            this.ws2.onclosed = function () {
+            this.log_ws.onclosed = function () {
                 console.log("closed");
             };
 
-            this.ws2.onmessage = function (evt) {
+            this.log_ws.onmessage = function (evt) {
                 var data = new Uint8Array(evt.data);
 
                 var msg_data = data;//.subarray(4);

@@ -8,7 +8,7 @@ set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=gnu11")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
 set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -rdynamic")
 
-include_directories(sources)
+include_directories(engine/sources)
 
 add_definitions(-DCETECH_STATIC_PLUGINS)
 
@@ -54,7 +54,7 @@ set(EXTERNAL_SOURCE_FILES
         externals/build/${PLATFORM_ID}/release/include/mpack/mpack-platform.c
         externals/build/${PLATFORM_ID}/release/include/mpack/mpack-reader.c
         externals/build/${PLATFORM_ID}/release/include/mpack/mpack-writer.c
-        )
+        engine/sources/llm/thread_types.h)
 
 set(SOURCE_FILES
         ${EXTERNAL_SOURCE_FILES}
@@ -62,107 +62,106 @@ set(SOURCE_FILES
         ########################################################################
         # CELIB: Containers
         ########################################################################
-        sources/celib/containers/tests/test_array.cc
+        engine/sources/celib/containers/tests/test_array.cc
 
         ########################################################################
         # CELIB: Memory
         ########################################################################
-        sources/celib/memory/private/allocator.c
-        sources/celib/memory/private/memory.c
-        sources/celib/machine/tests/test_memory.cc
+        engine/sources/celib/memory/private/allocator.c
+        engine/sources/celib/memory/private/memory.c
+        engine/sources/llm/tests/test_memory.cc
 
 
         ########################################################################
         # CELIB: string
         ########################################################################
-        sources/celib/string/tests/test_string.cc
-        sources/celib/string/private/string.c
+        engine/sources/celib/string/tests/test_string.cc
+        engine/sources/celib/string/private/string.c
 
 
         ########################################################################
         # CELIB: Log
         #######################################################################
-        sources/celib/log/private/stdout_handler.c
-        sources/celib/log/private/nanomsg_handler.c
-        sources/celib/log/private/log_system.c
-        sources/celib/log/tests/test_log.cc
+        engine/sources/celib/log/private/stdout_handler.c
+        engine/sources/celib/log/private/nanomsg_handler.c
+        engine/sources/celib/log/private/log_system.c
+        engine/sources/celib/log/tests/test_log.cc
 
         ########################################################################
         # CELIB: File
         ########################################################################
-        sources/celib/machine/private/memory.c
-        sources/celib/machine/private/vio.c
-        sources/celib/machine/private/sdl2/sdl_vio.c
-        sources/celib/machine/private/path.c
-        sources/celib/machine/private/file.c
-        sources/celib/machine/private/posix/posix_stacktrace.c
-        sources/celib/machine/tests/test_vfile.cc
+        engine/sources/llm/private/vio.c
+        engine/sources/llm/private/sdl2/sdl_vio.c
+        engine/sources/llm/private/path.c
+        engine/sources/llm/private/file.c
+        engine/sources/celib/stacktrace/private/posix/posix_stacktrace.c
+        engine/sources/llm/tests/test_vfile.cc
 
         ########################################################################
         # CELIB: Crypto
         ########################################################################
-        sources/celib/crypto/private/hash.c
-        sources/celib/crypto/tests/test_murmur.cc
+        engine/sources/celib/crypto/private/hash.c
+        engine/sources/celib/crypto/tests/test_murmur.cc
 
         ########################################################################
         # CELIB: Math
         ########################################################################
-        sources/celib/math/tests/test_vec2f.cc
-        sources/celib/math/tests/test_vec3f.cc
-        sources/celib/math/tests/test_vec4f.cc
-        sources/celib/math/tests/test_quatf.cc
-        sources/celib/math/tests/test_mat44f.cc
+        engine/sources/celib/math/tests/test_vec2f.cc
+        engine/sources/celib/math/tests/test_vec3f.cc
+        engine/sources/celib/math/tests/test_vec4f.cc
+        engine/sources/celib/math/tests/test_quatf.cc
+        engine/sources/celib/math/tests/test_mat44f.cc
 
         ########################################################################
         # CELIB: Yaml
         ########################################################################
-        sources/celib/yaml/private/yaml.cc
-        sources/celib/yaml/tests/test_yaml.cc
+        engine/sources/celib/yaml/private/yaml.cc
+        engine/sources/celib/yaml/tests/test_yaml.cc
 
         ########################################################################
         # CETECH: Plugin system
         ########################################################################
-        sources/cetech/pluginsystem/private/plugin_system.c
+        engine/sources/hlm/pluginsystem/private/plugin_system.c
 
-        sources/cetech/pluginsystem/private/plugin_system.c
-        sources/celib/log/private/log_system.c
+        engine/sources/hlm/pluginsystem/private/plugin_system.c
+        engine/sources/celib/log/private/log_system.c
 
-        sources/cetech/luasystem/private/lua_system.c
-        sources/cetech/luasystem/private/api/api_keyboard.c
-        sources/cetech/luasystem/private/api/api_log.c
-        sources/cetech/luasystem/private/api/api_mouse.c
-        sources/cetech/luasystem/private/api/api_application.c
+        engine/sources/hlm/luasystem/private/lua_system.c
+        engine/sources/hlm/luasystem/private/api/api_keyboard.c
+        engine/sources/hlm/luasystem/private/api/api_log.c
+        engine/sources/hlm/luasystem/private/api/api_mouse.c
+        engine/sources/hlm/luasystem/private/api/api_application.c
 
-        sources/cetech/configsystem/private/config_system.c
-        sources/cetech/consoleserver/private/console_server.c
-        sources/celib/memory/private/memory_system.c
-        sources/celib/stringid/private/stringid.c
-        sources/cetech/filesystem/private/filesystem.c
-        sources/cetech/filesystem/tests/test_filesystem.cc
-        sources/celib/machine/private/sdl2/sdl_thread.c
-        sources/celib/machine/private/sdl2/sdl_cpu.c
-
-
-        sources/cetech/application/private/application.c
-        sources/celib/machine/private/machine.c
-        sources/celib/machine/private/sdl2/sdl_mouse.c
-        sources/celib/machine/private/sdl2/sdl_keyboard.c
-        sources/celib/machine/private/sdl2/sdl_machine.c
-        sources/celib/machine/private/sdl2/sdl_window.c
-        sources/cetech/input/private/keyboard.c
-        sources/cetech/input/private/mouse.c
-        sources/cetech/taskmanager/private/taskmanager.c
+        engine/sources/hlm/configsystem/private/config_system.c
+        engine/sources/hlm/consoleserver/private/console_server.c
+        engine/sources/celib/memory/private/memory_system.c
+        engine/sources/celib/stringid/private/stringid.c
+        engine/sources/hlm/filesystem/private/filesystem.c
+        engine/sources/hlm/filesystem/tests/test_filesystem.cc
+        engine/sources/llm/private/sdl2/sdl_thread.c
+        engine/sources/llm/private/sdl2/sdl_cpu.c
 
 
-        sources/celib/machine/private/sdl2/sdl_time.c
-        sources/celib/machine/private/sdl2/sdl_object.c)
+        engine/sources/hlm/application/private/application.c
+        engine/sources/llm/private/llm.c
+        engine/sources/llm/private/sdl2/sdl_mouse.c
+        engine/sources/llm/private/sdl2/sdl_keyboard.c
+        engine/sources/llm/private/sdl2/sdl_machine.c
+        engine/sources/llm/private/sdl2/sdl_window.c
+        engine/sources/hlm/input/private/keyboard.c
+        engine/sources/hlm/input/private/mouse.c
+        engine/sources/hlm/taskmanager/private/taskmanager.c
+
+
+        engine/sources/llm/private/sdl2/sdl_time.c
+        engine/sources/llm/private/sdl2/sdl_object.c engine/sources/celib/path/private/path.c)
 
 ################################################################################
 # Main sources
 ################################################################################
 set(MAIN_SOURCE_FILES
         ${SOURCE_FILES}
-        sources/cetech/main.c
+        engine/sources/hlm/main.c
         )
 
 ################################################################################
@@ -170,8 +169,8 @@ set(MAIN_SOURCE_FILES
 ################################################################################
 set(TEST_SOURCE_FILES
         ${SOURCE_FILES}
-        sources/test/tests_main.cc
-        sources/celib/machine/stacktrace.h)
+        engine/sources/test/tests_main.cc
+        engine/sources/celib/stacktrace/stacktrace.h engine/sources/llm/thread.h)
 
 ################################################################################
 # Release sources
@@ -252,5 +251,5 @@ set_tests_properties(ListTests PROPERTIES PASS_REGULAR_EXPRESSION "[0-9]+ test c
 add_test(NAME ListTags COMMAND cetech_tests --list-tags)
 set_tests_properties(ListTags PROPERTIES PASS_REGULAR_EXPRESSION "[0-9]+ tags")
 
-add_library(plugin_example SHARED sources/cetech/plugin_example.c)
+add_library(plugin_example SHARED engine/sources/hlm/plugin_example.c)
 set_target_properties(plugin_example PROPERTIES PREFIX "")

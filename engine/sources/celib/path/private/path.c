@@ -1,0 +1,42 @@
+#include <memory.h>
+
+#include <celib/memory/memory.h>
+#include <celib/string/string.h>
+#include <dirent.h>
+#include <stdio.h>
+#include <celib/containers/array.h>
+
+const char *path_filename(const char *path) {
+    char *ch = strrchr(path, '/');
+    return ch != NULL ? ch + 1 : path;
+}
+
+void path_basename(const char *path, char *out, size_t size) {
+    const char *filename = path_filename(path);
+    const char *ch = strrchr(filename, '.');
+
+    if (ch == NULL) {
+        memory_copy(out, filename, str_lenght(filename));
+        return;
+    }
+
+    const size_t basename_len = (ch - filename) / sizeof(char);
+    memory_copy(out, filename, basename_len);
+}
+
+const char *path_extension(const char *path) {
+    const char *filename = path_filename(path);
+    const char *ch = strrchr(filename, '.');
+
+    if (ch == NULL) {
+        return NULL;
+    }
+
+    return ch + 1;
+}
+
+#define DIR_DELIM "/"
+
+i64 path_join(char *result, u64 maxlen, const char *base_path, const char *path) {
+    return snprintf(result, maxlen, "%s" DIR_DELIM "%s", base_path, path);
+}
