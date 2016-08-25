@@ -110,7 +110,7 @@ void *llm_window_native_window_ptr(window_t w) {
     return (void *) wmi.info.win.window;
 #elif CETECH_LINUX
     return (void *) wmi.info.x11.window;
-#elif sCETECH_DARWIN
+#elif CETECH_DARWIN
     return (void *) wmi.info.cocoa.window;
 #endif
 }
@@ -128,7 +128,7 @@ void *llm_window_native_display_ptr(window_t w) {
     return (void *) wmi.info.win.hdc;
 #elif CETECH_LINUX
     return (void *) wmi.info.x11.display;
-#elif sCETECH_DARWIN
-    return (0;
+#elif CETECH_DARWIN
+    return (0);
 #endif
 }

@@ -33,6 +33,8 @@ u64 llm_thread_get_id(thread_t thread);
 //! \return Thread id
 u64 llm_thread_actual_id();
 
+void llm_thread_yield();
+
 void llm_spin_lock(spinlock_t *lock);
 
 void llm_spin_unlock(spinlock_t *lock);

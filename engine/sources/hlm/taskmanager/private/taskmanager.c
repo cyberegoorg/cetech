@@ -12,6 +12,7 @@
 
 #include "queue_task.h"
 
+
 //==============================================================================
 // Defines
 //==============================================================================
@@ -160,6 +161,7 @@ static int _task_worker(void *o) {
 
     while (_G._Run) {
         taskmanager_do_work();
+        llm_thread_yield();
     }
 
     log_debug("task_worker", "Worker %d shutdown", _worker_id);

@@ -33,7 +33,7 @@ static struct {
 // Private
 //==============================================================================
 
-static void _register_allm_api() {
+static void _register_all_api() {
     REGISTER_LUA_API(log);
     REGISTER_LUA_API(keyboard);
     REGISTER_LUA_API(mouse);
@@ -246,7 +246,7 @@ int luasys_init() {
 
     luaL_openlibs(_G.L);
 
-    _register_allm_api();
+    _register_all_api();
 
     luasys_add_module_function("plugin", "reload", _reload_plugin);
 

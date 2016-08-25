@@ -101,3 +101,17 @@ void llm_register_part(const char *name,
     _G.shutdown[idx] = shutdown;
     _G.process[idx] = process;
 }
+
+#if defined(CETECH_LINUX)
+
+#include <sched.h>
+
+#endif
+
+void llm_thread_yield() {
+#if defined(CETECH_DARWIN)
+    sched_yield();
+#elif defined(CETECH_LINUX)
+    sched_yield();
+#endif
+}
