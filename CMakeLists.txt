@@ -121,36 +121,36 @@ set(SOURCE_FILES
         ########################################################################
         # CETECH: Plugin system
         ########################################################################
-        engine/sources/hlm/pluginsystem/private/plugin_system.c
+        engine/sources/engine/pluginsystem/private/plugin_system.c
 
-        engine/sources/hlm/pluginsystem/private/plugin_system.c
+        engine/sources/engine/pluginsystem/private/plugin_system.c
         engine/sources/celib/log/private/log_system.c
 
-        engine/sources/hlm/luasystem/private/lua_system.c
-        engine/sources/hlm/luasystem/private/api/api_keyboard.c
-        engine/sources/hlm/luasystem/private/api/api_log.c
-        engine/sources/hlm/luasystem/private/api/api_mouse.c
-        engine/sources/hlm/luasystem/private/api/api_application.c
+        engine/sources/engine/luasystem/private/lua_system.c
+        engine/sources/engine/luasystem/private/api/api_keyboard.c
+        engine/sources/engine/luasystem/private/api/api_log.c
+        engine/sources/engine/luasystem/private/api/api_mouse.c
+        engine/sources/engine/luasystem/private/api/api_application.c
 
-        engine/sources/hlm/configsystem/private/config_system.c
-        engine/sources/hlm/consoleserver/private/console_server.c
+        engine/sources/engine/configsystem/private/config_system.c
+        engine/sources/engine/consoleserver/private/console_server.c
         engine/sources/celib/memory/private/memory_system.c
         engine/sources/celib/stringid/private/stringid.c
-        engine/sources/hlm/filesystem/private/filesystem.c
-        engine/sources/hlm/filesystem/tests/test_filesystem.cc
+        engine/sources/engine/filesystem/private/filesystem.c
+        engine/sources/engine/filesystem/tests/test_filesystem.cc
         engine/sources/llm/private/sdl2/sdl_thread.c
         engine/sources/llm/private/sdl2/sdl_cpu.c
 
 
-        engine/sources/hlm/application/private/application.c
+        engine/sources/engine/application/private/application.c
         engine/sources/llm/private/llm.c
         engine/sources/llm/private/sdl2/sdl_mouse.c
         engine/sources/llm/private/sdl2/sdl_keyboard.c
         engine/sources/llm/private/sdl2/sdl_machine.c
         engine/sources/llm/private/sdl2/sdl_window.c
-        engine/sources/hlm/input/private/keyboard.c
-        engine/sources/hlm/input/private/mouse.c
-        engine/sources/hlm/taskmanager/private/taskmanager.c
+        engine/sources/engine/input/private/keyboard.c
+        engine/sources/engine/input/private/mouse.c
+        engine/sources/engine/taskmanager/private/taskmanager.c
 
 
         engine/sources/llm/private/sdl2/sdl_time.c
@@ -161,7 +161,7 @@ set(SOURCE_FILES
 ################################################################################
 set(MAIN_SOURCE_FILES
         ${SOURCE_FILES}
-        engine/sources/hlm/main.c
+        engine/sources/engine/main.c
         )
 
 ################################################################################
@@ -251,5 +251,5 @@ set_tests_properties(ListTests PROPERTIES PASS_REGULAR_EXPRESSION "[0-9]+ test c
 add_test(NAME ListTags COMMAND cetech_tests --list-tags)
 set_tests_properties(ListTags PROPERTIES PASS_REGULAR_EXPRESSION "[0-9]+ tags")
 
-add_library(plugin_example SHARED engine/sources/hlm/plugin_example.c)
+add_library(plugin_example SHARED engine/sources/engine/plugin_example.c)
 set_target_properties(plugin_example PROPERTIES PREFIX "")
