@@ -1,3 +1,7 @@
+//==============================================================================
+// Includes
+//==============================================================================
+
 #include <stdio.h>
 
 #include "include/SDL2/SDL.h"
@@ -16,7 +20,18 @@
 
 #include "builddb.h"
 
+
+//==============================================================================
+// Defines
+//==============================================================================
+
 #define MAX_TYPES 128
+#define _G ResourceCompilerGlobal
+
+
+//==============================================================================
+// Globals
+//==============================================================================
 
 struct G {
     stringid64_t compilator_map_type[MAX_TYPES]; // TODO: MAP
@@ -26,29 +41,6 @@ struct G {
     config_var_t cv_build_dir; // TODO: MOVE TO RESOURCE MANAGER
 } ResourceCompilerGlobal = {0};
 
-#define _G ResourceCompilerGlobal
-
-int resource_compiler_init() {
-    _G = (struct G) {0};
-
-    _G.cv_source_dir = config_new_string("resource_compiler.source_dir", "Resource source dir", "data/src");
-    _G.cv_core_dir = config_new_string("resource_compiler.core_dir", "Resource core source dir", "core");
-    _G.cv_build_dir = config_new_string("resource_compiler.build_dir", "Resource buid dir", "data/build");
-
-
-    const char *build_dir = config_get_string(_G.cv_build_dir);
-    char build_dir_full[1024] = {0};
-    path_join(build_dir_full, CE_ARRAY_LEN(build_dir_full), build_dir, application_platform());
-
-    llm_dir_make_path(build_dir_full);
-    builddb_init_db(build_dir_full);
-
-    return 1;
-}
-
-void resource_compiler_shutdown() {
-    _G = (struct G) {0};
-}
 
 struct compile_task_data {
     char *source_filename;
@@ -60,6 +52,11 @@ struct compile_task_data {
     resource_compilator_t compilator;
 };
 CE_STATIC_ASSERT(sizeof(struct compile_task_data) < 64);
+
+
+//==============================================================================
+// Private
+//==============================================================================
 
 void _add_dependency(const char *who_filname, const char *depend_on_filename) {
 }
@@ -166,6 +163,33 @@ void _compile_dir(task_t root_task, struct array_pchar *files, const char *sourc
         taskmanager_add_end(&t, 1);
     }
     llm_dir_list_free(files, memsys_main_scratch_allocator());
+}
+
+
+//==============================================================================
+// Interface
+//==============================================================================
+
+int resource_compiler_init() {
+    _G = (struct G) {0};
+
+    _G.cv_source_dir = config_new_string("resource_compiler.source_dir", "Resource source dir", "data/src");
+    _G.cv_core_dir = config_new_string("resource_compiler.core_dir", "Resource core source dir", "core");
+    _G.cv_build_dir = config_new_string("resource_compiler.build_dir", "Resource buid dir", "data/build");
+
+
+    const char *build_dir = config_get_string(_G.cv_build_dir);
+    char build_dir_full[1024] = {0};
+    path_join(build_dir_full, CE_ARRAY_LEN(build_dir_full), build_dir, application_platform());
+
+    llm_dir_make_path(build_dir_full);
+    builddb_init_db(build_dir_full);
+
+    return 1;
+}
+
+void resource_compiler_shutdown() {
+    _G = (struct G) {0};
 }
 
 void resource_compiler_register(stringid64_t type, resource_compilator_t compilator) {

@@ -1,8 +1,17 @@
 #ifndef CETECH_RESOURCE_COMPILER_H
 #define CETECH_RESOURCE_COMPILER_H
 
+//==============================================================================
+// Private
+//==============================================================================
+
 #include <celib/stringid/types.h>
 #include <llm/vio_types.h>
+
+
+//==============================================================================
+// Structs and typedefs
+//==============================================================================
 
 struct compilator_api {
     void (*add_dependency)(const char *who_filname, const char *depend_on_filename);
@@ -13,6 +22,10 @@ typedef int (*resource_compilator_t)(const char *filename,
                                      struct vio *build_vio,
                                      struct compilator_api *compilator_api);
 
+
+//==============================================================================
+// Interface
+//==============================================================================
 
 int resource_compiler_init();
 
