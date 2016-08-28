@@ -28,7 +28,7 @@ int in_use(struct allocator_scratch *a, void *p) {
 void *scratch_allocator_allocate(struct allocator *allocator, uint32_t size, uint32_t align) {
     struct allocator_scratch *a = (struct allocator_scratch *) allocator;
 
-    CE_ASSERT("scratch", align % 4 == 0);
+    //CE_ASSERT("scratch", align % 4 == 0);
     size = ((size + 3) / 4) * 4;
 
     char *p = a->allocate;

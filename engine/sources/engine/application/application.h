@@ -20,4 +20,8 @@ void application_start();
 //! Stop main loop and quit.
 void application_quit();
 
+const char *application_platform();
+
+const char *application_native_platform();
+
 #endif //CETECH_APPLICATION_H

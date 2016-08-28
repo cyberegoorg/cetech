@@ -6,6 +6,7 @@
 //==============================================================================
 
 #include <stdio.h>
+#include "celib/types.h"
 
 //==============================================================================
 // Typedefs
@@ -24,6 +25,7 @@ int config_init();
 
 void config_shutdown();
 
+config_var_t config_find(const char *name);
 config_var_t config_find_or_create(const char *name, int *new);
 
 config_var_t config_new_float(const char *name, const char *desc, float f);

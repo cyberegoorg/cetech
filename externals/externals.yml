@@ -297,3 +297,41 @@ luajit:
       - copy: [src/lua.hpp, debug/include/luajit]
       - copy: [src/luajit.h, debug/include/luajit]
       - copy: [src/lualib.h, debug/include/luajit]
+
+###########
+# sqlite3 #
+########################################################################################################################
+sqlite3:
+  clone:
+    - git clone https://github.com/mackyle/sqlite --depth 1
+    - download http://repo.or.cz/sqlite-export.git/blob_plain/master:/create-fossil-manifest create-fossil-manifest.sh
+
+  build:
+    posix: &sqlite3_build_posix
+      - /bin/sh ./create-fossil-manifest.sh
+      - ./configure
+      - make
+
+    linux64:  *sqlite3_build_posix
+    linux32:  *sqlite3_build_posix
+    darwin64: *sqlite3_build_posix
+
+  install:
+    linux64:
+      - copy: [sqlite3.h, release/include/sqlite3]
+      - copy: [.libs/libsqlite3.a, release/lib]
+      - copy: [sqlite3.h, debug/include/sqlite3]
+      - copy: [.libs/libsqlite3.a, debug/lib]
+
+    linux32:
+      - copy: [sqlite3.h, release/include/sqlite3]
+      - copy: [.libs/libsqlite3.a, release/lib]
+      - copy: [sqlite3.h, debug/include/sqlite3]
+      - copy: [.libs/libsqlite3.a, debug/lib]
+
+    darwin64:
+      - copy: [sqlite3.h, release/include/sqlite3]
+      - copy: [.libs/libsqlite3.a, release/lib]
+      - copy: [sqlite3.h, debug/include/sqlite3]
+      - copy: [.libs/libsqlite3.a, debug/lib]
+

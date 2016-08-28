@@ -164,6 +164,10 @@ void application_start() {
             WINDOW_NOFLAG
     );
 
+
+    resource_compiler_compile_all();
+    return;
+
     _G.is_running = 1;
     uint32_t last_tick = llm_get_ticks();
     while (_G.is_running) {
@@ -216,4 +220,20 @@ void application_start() {
         taskmanager_wait(task);
         llm_window_update(_G.main_window);
     }
+}
+
+
+const char *application_native_platform() {
+#if defined(CETECH_LINUX)
+    return "linux";
+#elif defined(CETECH_WINDOWS)
+    return "windows";
+#elif defined(CETECH_DARWIN)
+    return "darwin";
+#endif
+    return NULL;
+}
+
+const char *application_platform() {
+    return application_native_platform();
 }

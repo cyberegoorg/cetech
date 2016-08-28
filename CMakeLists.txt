@@ -152,17 +152,18 @@ set(SOURCE_FILES
         engine/sources/engine/input/private/mouse.c
         engine/sources/engine/taskmanager/private/taskmanager.c
 
+        engine/sources/engine/resource_compiler/private/resource_compiler.c
 
         engine/sources/llm/private/sdl2/sdl_time.c
-        engine/sources/llm/private/sdl2/sdl_object.c engine/sources/celib/path/private/path.c)
+        engine/sources/llm/private/sdl2/sdl_object.c
+        engine/sources/celib/path/private/path.c)
 
 ################################################################################
 # Main sources
 ################################################################################
 set(MAIN_SOURCE_FILES
         ${SOURCE_FILES}
-        engine/sources/engine/main.c
-        )
+        engine/sources/engine/main.c)
 
 ################################################################################
 # Tests sources
@@ -178,7 +179,7 @@ set(TEST_SOURCE_FILES
 
 if (UNIX)
     set(RELEASE_LIBS_LINUX
-            jemalloc_pic
+            jemalloc_pic.a
             pthread
             anl # NANOMSG
             dl
@@ -196,13 +197,13 @@ set(RELEASE_LIBS
         ${RELEASE_LIBS_LINUX}
         ${RELEASE_LIBS_WINDOWS}
 
-        nanomsg
-        bgfxRelease
-        yaml-cpp
+        nanomsg.a
+        bgfxRelease.a
+        yaml-cpp.a
 
-        luajit
-
-        SDL2
+        luajit.a
+        sqlite3.a
+        SDL2.a
         )
 
 ################################################################################
@@ -210,7 +211,7 @@ set(RELEASE_LIBS
 ################################################################################
 set(DEVELOP_LIBS
         ${RELEASE_LIBS}
-        assimp
+        assimp.a
         )
 
 ################################################################################

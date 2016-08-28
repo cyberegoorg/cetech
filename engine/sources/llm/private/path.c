@@ -40,14 +40,16 @@ void llm_dir_list(const char *path,
                 len = snprintf(tmp_path, sizeof(tmp_path) - 1, "%s%s/", path, entry->d_name);
             }
 
-            tmp_path[len] = '\0';
-
             llm_dir_list(tmp_path, 1, files, allocator);
         } else {
-            size_t size = strlen(path) + strlen(entry->d_name) + 2;
+            size_t size = strlen(path) + strlen(entry->d_name) + 3;
             char *new_path = CE_ALLOCATE(allocator, char, sizeof(char) * size);
 
-            snprintf(new_path, size - 1, "%s%s", path, entry->d_name);
+            if (path[strlen(path) - 1] != '/') {
+                snprintf(new_path, size - 1, "%s/%s", path, entry->d_name);
+            } else {
+                snprintf(new_path, size - 1, "%s%s", path, entry->d_name);
+            }
 
             ARRAY_PUSH_BACK(pchar, files, new_path);
         }

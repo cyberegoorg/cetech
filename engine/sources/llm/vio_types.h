@@ -1,12 +1,13 @@
 #ifndef CETECH_VIO_TYPES_H
 #define CETECH_VIO_TYPES_H
 
+#include <stdio.h>
+#include <celib/types.h>
+
 //==============================================================================
 // Enums
 //==============================================================================
 
-#include <stdio.h>
-#include <celib/types.h>
 
 enum open_mode {
     VIO_OPEN_READ,

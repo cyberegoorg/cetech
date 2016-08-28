@@ -3,6 +3,10 @@
 //==============================================================================
 
 #include <include/mpack/mpack.h>
+#include <celib/stringid/stringid.h>
+#include <engine/resource_compiler/resource_compiler.h>
+#include <llm/vio.h>
+#include <celib/memory/memory.h>
 #include "celib/errors/errors.h"
 
 #include "engine/luasystem/luasystem.h"
@@ -137,6 +141,73 @@ static int _cmd_execute_string(mpack_node_t args, mpack_writer_t *writer) {
     return 0;
 }
 
+static int _execute_string(lua_State *_L, const char *str) {
+    if (luaL_dostring(_L, str)) {
+        const char *last_error = lua_tostring(_L, -1);
+        lua_pop(_L, 1);
+        log_error(LOG_WHERE, "%s", last_error);
+        return 0;
+    }
+
+    return 1;
+}
+
+
+//==============================================================================
+// Resource compiler
+//==============================================================================
+
+int _lua_compiler(const char *filename,
+                  struct vio *source_vio,
+                  struct vio *build_vio,
+                  struct compilator_api *compilator_api) {
+
+    char tmp[vio_size(source_vio) + 1];
+    memory_set(tmp, 0, vio_size(source_vio) + 1);
+
+    vio_read(source_vio, tmp, sizeof(char), vio_size(source_vio));
+
+    lua_State *state = luaL_newstate();
+    luaL_openlibs(state);
+
+    _execute_string(state,
+                    "function compile(what, filename,  strip)\n"
+                            " local s, err = loadstring(what, filename)\n"
+                            " if s ~= nil then\n"
+                            "   return string.dump(s, strip), nil\n"
+                            " end\n"
+                            " return nil, err\n"
+                            "end"
+    );
+
+    lua_getglobal(state, "compile");
+    luasys_push_string(state, tmp);
+    luasys_push_string(state, filename);
+
+#if defined(CETECH_DEBUG)
+    luasys_push_bool(state, 0);
+#else
+    luasys_push_bool(state, 1);
+#endif
+
+    lua_pcall(state, 3, 2, 0);
+    if (lua_isnil(state, 1)) {
+        const char *err = luasys_to_string(state, 2);
+        log_error("resource_compiler.lua", "[%s] %s", filename, err);
+
+        lua_close(state);
+        return 0;
+
+    } else {
+        size_t bc_len = 0;
+        const char *bc = luasys_to_string_l(state, 1, &bc_len);
+
+        vio_write(build_vio, bc, sizeof(char), bc_len);
+    }
+
+    lua_close(state);
+    return 1;
+}
 
 //==============================================================================
 // Interface
@@ -209,14 +280,7 @@ const char *luasys_to_string_l(lua_State *_L, int i,
 }
 
 int luasys_execute_string(const char *str) {
-    if (luaL_dostring(_G.L, str)) {
-        const char *last_error = lua_tostring(_G.L, -1);
-        lua_pop(_G.L, 1);
-        log_error(LOG_WHERE, "%s", last_error);
-        return 0;
-    }
-
-    return 1;
+    return _execute_string(_G.L, str);
 }
 
 void luasys_add_module_function(const char *module,
@@ -251,6 +315,8 @@ int luasys_init() {
     luasys_add_module_function("plugin", "reload", _reload_plugin);
 
     consolesrv_register_command("luasystem.execute", _cmd_execute_string);
+
+    resource_compiler_register(stringid64_from_string("lua"), _lua_compiler);
 
     return 1;
 }

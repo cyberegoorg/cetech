@@ -95,6 +95,22 @@ void config_shutdown() {
     _dealloc_allm_string();
 }
 
+config_var_t config_find(const char *name) {
+    for (u64 i = 1; i < MAX_VARIABLES; ++i) {
+        if (_G.name[i][0] == '\0') {
+            continue;
+        }
+
+        if (str_compare(_G.name[i], name) != 0) {
+            continue;
+        }
+
+        return make_cvar(i);
+    }
+
+    return make_cvar(0);
+}
+
 config_var_t config_find_or_create(const char *name, int *new) {
     if (new) *new = 0;
 

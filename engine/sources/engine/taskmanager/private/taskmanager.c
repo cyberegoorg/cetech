@@ -248,6 +248,7 @@ task_t taskmanager_add_begin(const char *name,
             .affinity = affinity,
     };
 
+    CE_ASSERT(LOG_WHERE, data_len < MAX_TASK_DATA_SIZE);
     memory_copy(_G._taskPool[task.id].data, data, (size_t) data_len);
 
     if (parent.id != 0) {

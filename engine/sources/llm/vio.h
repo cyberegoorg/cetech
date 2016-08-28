@@ -2,7 +2,8 @@
 #define CETECH_VIO_H
 
 #include <stdint.h>
-#include <celib/types.h>
+#include "celib/types.h"
+#include "celib/memory/types.h"
 #include "vio_types.h"
 
 struct vio *vio_from_file(const char *path,
