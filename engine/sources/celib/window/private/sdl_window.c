@@ -51,8 +51,8 @@ void sdl_window_shutdown() {
 void sdl_window_process() {
 }
 
-window_t llm_window_new(const char *title, enum WindowPos x, enum WindowPos y, const i32 width, const i32 height,
-                        enum WindowFlags flags) {
+window_t window_new(const char *title, enum WindowPos x, enum WindowPos y, const i32 width, const i32 height,
+                    enum WindowFlags flags) {
 
     SDL_Window *w = SDL_CreateWindow(
             title,
@@ -68,7 +68,7 @@ window_t llm_window_new(const char *title, enum WindowPos x, enum WindowPos y, c
     return (window_t) {.w = w};
 }
 
-window_t llm_window_new_from(void *hndl) {
+window_t window_new_from(void *hndl) {
     SDL_Window *w = SDL_CreateWindowFrom(hndl);
 
     if (w == NULL) {
@@ -78,27 +78,27 @@ window_t llm_window_new_from(void *hndl) {
     return (window_t) {.w = w};
 }
 
-void llm_window_destroy(window_t w) {
+void window_destroy(window_t w) {
     SDL_DestroyWindow(w.w);
 }
 
-void llm_window_set_title(window_t w, const char *title) {
+void window_set_title(window_t w, const char *title) {
     SDL_SetWindowTitle(w.w, title);
 }
 
-const char *llm_window_get_title(window_t w) {
+const char *window_get_title(window_t w) {
     return SDL_GetWindowTitle(w.w);
 }
 
-void llm_window_update(window_t w) {
+void window_update(window_t w) {
     SDL_UpdateWindowSurface(w.w);
 }
 
-void llm_window_resize(window_t w, uint32_t width, uint32_t height) {
+void window_resize(window_t w, uint32_t width, uint32_t height) {
     SDL_SetWindowSize(w.w, width, height);
 }
 
-void *llm_window_native_window_ptr(window_t w) {
+void *window_native_window_ptr(window_t w) {
     SDL_SysWMinfo wmi;
 
     SDL_VERSION(&wmi.version);
@@ -116,7 +116,7 @@ void *llm_window_native_window_ptr(window_t w) {
 #endif
 }
 
-void *llm_window_native_display_ptr(window_t w) {
+void *window_native_display_ptr(window_t w) {
     SDL_SysWMinfo wmi;
 
     SDL_VERSION(&wmi.version);

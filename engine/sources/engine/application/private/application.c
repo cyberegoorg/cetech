@@ -87,7 +87,7 @@ void application_shutdown() {
             _SYSTEMS[i].shutdown();
         }
 
-        llm_window_destroy(_G.main_window);
+        window_destroy(_G.main_window);
     }
 
     memsys_shutdown();
@@ -159,7 +159,7 @@ static void _consolesrv_task(void *d) {
 }
 
 void application_start() {
-    _G.main_window = llm_window_new(
+    _G.main_window = window_new(
             "Cetech",
             WINDOWPOS_UNDEFINED,
             WINDOWPOS_UNDEFINED,
@@ -221,7 +221,7 @@ void application_start() {
         taskmanager_add_end(tasks, CE_ARRAY_LEN(tasks));
 
         taskmanager_wait(task);
-        llm_window_update(_G.main_window);
+        window_update(_G.main_window);
     }
 }
 
