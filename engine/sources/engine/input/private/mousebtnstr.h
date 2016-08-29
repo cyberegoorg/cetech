@@ -2,8 +2,8 @@
 // Includes
 //==============================================================================
 
-#include <llm/mouse_types.h>
-#include "llm/types.h"
+#include <engine/machine/mouse_types.h>
+#include "engine/machine/types.h"
 
 static const char *_btn_to_str[MOUSE_BTN_MAX] = {
         [MOUSE_BTN_UNKNOWN] = "",

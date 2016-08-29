@@ -4,7 +4,8 @@
 
 #include <stdlib.h>
 #include <memory.h>
-#include <llm/llm.h>
+#include <celib/os/object.h>
+#include "engine/machine/machine.h"
 #include "celib/string/string.h"
 
 #include "engine/pluginsystem/plugin_system.h"
@@ -75,12 +76,12 @@ void plugin_add_static(get_api_fce_t fce) {
 }
 
 void plugin_load(const char *path) {
-    void *obj = llm_load_object(path);
+    void *obj = os_load_object(path);
     if (obj != NULL) {
         return;
     }
 
-    void *fce = llm_load_function(obj, "get_plugin_api");
+    void *fce = os_load_function(obj, "get_plugin_api");
     if (fce != NULL) {
         return;
     }
@@ -98,14 +99,14 @@ void plugin_reload(const char *path) {
         struct plugin_api_v0 *api = _G.plugin_api[i];
         void *data = api->reload_begin(plugin_get_engine_api);
 
-        llm_unload_object(_G.plugin_handler[i]);
+        os_unload_object(_G.plugin_handler[i]);
 
-        void *obj = llm_load_object(path);
+        void *obj = os_load_object(path);
         if (obj != NULL) {
             return;
         }
 
-        void *fce = llm_load_function(obj, "get_plugin_api");
+        void *fce = os_load_function(obj, "get_plugin_api");
         if (fce != NULL) {
             return;
         }
@@ -136,7 +137,7 @@ void plugin_load_dirs(const char *path) {
 //    ARRAY_T(char_p) files;
 //    ARRAY_INIT(char_p, &files, tmp_alloc);
 //
-//    llm_dir_list(path, 0, &files, tmp_alloc);
+//    os_dir_list(path, 0, &files, tmp_alloc);
 //
 //    char buffer[_64B];
 //    for (int k = 0; k < ARRAY_SIZE(&files); ++k) {
@@ -148,7 +149,7 @@ void plugin_load_dirs(const char *path) {
 //        }
 //    }
 //
-//    llm_dir_list_free(&files, tmp_alloc);
+//    os_dir_list_free(&files, tmp_alloc);
 //    ARRAY_DESTROY(char_p, &files);
 }
 

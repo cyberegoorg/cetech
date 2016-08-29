@@ -93,7 +93,7 @@ static int _do_sql_stmt(const char *sql) {
 }
 
 static int builddb_init_db(const char *build_dir) {
-    path_join(_build_db_path, CE_ARRAY_LEN(_build_db_path), build_dir, "build.db");
+    os_path_join(_build_db_path, CE_ARRAY_LEN(_build_db_path), build_dir, "build.db");
 
 
     if (!_do_sql("CREATE TABLE IF NOT EXISTS files (\n"
@@ -194,9 +194,9 @@ static int builddb_need_compile(const char *source_dir, const char *filename) {
 
         char full_path[1024] = {0};
         const char *dep_file = (const char *) sqlite3_column_text(stmt, 0);
-        path_join(full_path, CE_ARRAY_LEN(full_path), source_dir, dep_file);
+        os_path_join(full_path, CE_ARRAY_LEN(full_path), source_dir, dep_file);
 
-        time_t actual_mtime = llm_file_mtime(full_path);
+        time_t actual_mtime = os_file_mtime(full_path);
         time_t last_mtime = sqlite3_column_int64(stmt, 1);
 
         if (actual_mtime != last_mtime) {

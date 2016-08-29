@@ -3,7 +3,7 @@
 //==============================================================================
 
 #include "celib/types.h"
-#include "llm/llm.h"
+#include "engine/machine/machine.h"
 #include "celib/string/string.h"
 
 #include "engine/input/input.h"
@@ -47,12 +47,12 @@ void keyboard_shutdown() {
 }
 
 void keyboard_process() {
-    struct event_header *event = llm_event_begin();
+    struct event_header *event = machine_event_begin();
 
     memory_copy(_G.last_state, _G.state, 512);
 
     u32 size = 0;
-    while (event != llm_event_end()) {
+    while (event != machine_event_end()) {
         size = size + 1;
 
         switch (event->type) {
@@ -68,7 +68,7 @@ void keyboard_process() {
                 break;
         }
 
-        event = llm_event_next(event);
+        event = machine_event_next(event);
     }
 
 }

@@ -3,10 +3,13 @@
 //==============================================================================
 
 #include <unistd.h>
+#include <engine/memory_system/memory_system.h>
+#include <celib/os/time.h>
+#include <celib/window/types.h>
+#include <celib/window/window.h>
 
 #include "celib/log/log.h"
 #include "celib/memory/memory.h"
-#include "llm/llm.h"
 
 #include "engine/input/input.h"
 #include "engine/consoleserver/consoleserver.h"
@@ -92,10 +95,10 @@ void application_shutdown() {
 }
 
 static void _dump_event() {
-    struct event_header *event = llm_event_begin();
+    struct event_header *event = machine_event_begin();
 
     u32 size = 0;
-    while (event != llm_event_end()) {
+    while (event != machine_event_end()) {
         size = size + 1;
         switch (event->type) {
 //            case EVENT_KEYBOARD_DOWN:
@@ -122,7 +125,7 @@ static void _dump_event() {
             default:
                 break;
         }
-        event = llm_event_next(event);
+        event = machine_event_next(event);
     }
 }
 
@@ -169,14 +172,14 @@ void application_start() {
     return;
 
     _G.is_running = 1;
-    uint32_t last_tick = llm_get_ticks();
+    uint32_t last_tick = os_get_ticks();
     while (_G.is_running) {
-        uint32_t now_ticks = llm_get_ticks();
+        uint32_t now_ticks = os_get_ticks();
         float dt = (now_ticks - last_tick) * 0.001f;
         _G.dt = dt;
         last_tick = now_ticks;
 
-        llm_process();
+        machine_process();
         _dump_event();
 
         task_t frame_task = taskmanager_add_null("frame", task_null, task_null, TASK_PRIORITY_HIGH, TASK_AFFINITY_NONE);

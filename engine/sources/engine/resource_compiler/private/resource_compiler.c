@@ -6,16 +6,17 @@
 
 #include "include/SDL2/SDL.h"
 
-#include <llm/fs.h>
+#include <celib/os/fs.h>
 #include <celib/string/string.h>
-#include <celib/path/path.h>
+#include <celib/os/path.h>
 #include <celib/stringid/types.h>
 #include <celib/stringid/stringid.h>
 #include <engine/taskmanager/taskmanager.h>
 #include <engine/resource_compiler/resource_compiler.h>
 #include <engine/application/application.h>
+#include "engine/memory_system/memory_system.h"
 
-#include "llm/vio.h"
+#include "celib/os/vio.h"
 #include "engine/configsystem/configsystem.h"
 
 #include "builddb.h"
@@ -102,11 +103,11 @@ resource_compilator_t _find_compilator(stringid64_t type) {
 }
 
 void _compile_dir(task_t root_task, struct array_pchar *files, const char *source_dir, const char *build_dir_full) {
-    llm_dir_list(source_dir, 1, files, memsys_main_scratch_allocator());
+    os_dir_list(source_dir, 1, files, memsys_main_scratch_allocator());
     for (int i = 0; i < ARRAY_SIZE(files); ++i) {
         const char *source_filename_full = ARRAY_AT(files, i);
         const char *source_filename_short = ARRAY_AT(files, i) + str_lenght(source_dir) + 1;
-        const char *resource_type = path_extension(source_filename_short);
+        const char *resource_type = os_path_extension(source_filename_short);
 
         char resource_name[128] = {0};
         memory_copy(resource_name, source_filename_short,
@@ -137,7 +138,7 @@ void _compile_dir(task_t root_task, struct array_pchar *files, const char *sourc
         }
 
         char build_path[1024] = {0};
-        path_join(build_path, CE_ARRAY_LEN(build_path), build_dir_full, build_name);
+        os_path_join(build_path, CE_ARRAY_LEN(build_path), build_dir_full, build_name);
 
         struct vio *build_vio = vio_from_file(build_path, VIO_OPEN_WRITE, memsys_main_scratch_allocator());
         if (build_vio == NULL) {
@@ -152,7 +153,7 @@ void _compile_dir(task_t root_task, struct array_pchar *files, const char *sourc
                 .source = source_vio,
                 .compilator = compilator,
                 .source_filename = str_duplicate(source_filename_short, memsys_main_scratch_allocator()),
-                .mtime = llm_file_mtime(source_filename_full)
+                .mtime = os_file_mtime(source_filename_full)
         };
 
         task_t t = taskmanager_add_begin("compiler_task",
@@ -162,7 +163,7 @@ void _compile_dir(task_t root_task, struct array_pchar *files, const char *sourc
 
         taskmanager_add_end(&t, 1);
     }
-    llm_dir_list_free(files, memsys_main_scratch_allocator());
+    os_dir_list_free(files, memsys_main_scratch_allocator());
 }
 
 
@@ -180,9 +181,9 @@ int resource_compiler_init() {
 
     const char *build_dir = config_get_string(_G.cv_build_dir);
     char build_dir_full[1024] = {0};
-    path_join(build_dir_full, CE_ARRAY_LEN(build_dir_full), build_dir, application_platform());
+    os_path_join(build_dir_full, CE_ARRAY_LEN(build_dir_full), build_dir, application_platform());
 
-    llm_dir_make_path(build_dir_full);
+    os_dir_make_path(build_dir_full);
     builddb_init_db(build_dir_full);
 
     return 1;
@@ -212,7 +213,7 @@ void resource_compiler_compile_all() {
     const char *platform = application_platform();
 
     char build_dir_full[1024] = {0};
-    path_join(build_dir_full, CE_ARRAY_LEN(build_dir_full), build_dir, platform);
+    os_path_join(build_dir_full, CE_ARRAY_LEN(build_dir_full), build_dir, platform);
 
     task_t root_task = taskmanager_add_null("compile", task_null, task_null, TASK_PRIORITY_HIGH, TASK_AFFINITY_NONE);
 

@@ -6,9 +6,10 @@
 // Includes
 //==============================================================================
 
-#include <llm/thread.h>
+#include <celib/os/thread.h>
+#include <engine/memory_system/memory_system.h>
+#include <celib/os/cpu.h>
 #include "engine/taskmanager/types.h"
-#include "llm/llm.h"
 
 #include "queue_task.h"
 
@@ -161,7 +162,7 @@ static int _task_worker(void *o) {
 
     while (_G._Run) {
         taskmanager_do_work();
-        llm_thread_yield();
+        os_thread_yield();
     }
 
     log_debug("task_worker", "Worker %d shutdown", _worker_id);
@@ -178,7 +179,7 @@ int taskmanager_init() {
     _G = (struct G) {0};
     memory_set(_G._openTasks, 0, sizeof(char) * MAX_TASK);
 
-    int core_count = llm_cpu_count();
+    int core_count = os_cpu_count();
 
     static const uint32_t main_threads_count = 1;
     const uint32_t worker_count = core_count - main_threads_count;
@@ -196,7 +197,7 @@ int taskmanager_init() {
     }
 
     for (int j = 0; j < worker_count; ++j) {
-        _G._workers[j] = llm_thread_create((thread_fce_t) _task_worker, "worker", (void *) ((intptr_t) (j + 1)));
+        _G._workers[j] = os_thread_create((thread_fce_t) _task_worker, "worker", (void *) ((intptr_t) (j + 1)));
     }
 
     _G._Run = 1;
@@ -210,8 +211,8 @@ void taskmanager_shutdown() {
     int status = 0;
 
     for (u32 i = 0; i < _G._workers_count; ++i) {
-        //llm_thread_kill(_G._workers[i]);
-        llm_thread_wait(_G._workers[i], &status);
+        //os_thread_kill(_G._workers[i]);
+        os_thread_wait(_G._workers[i], &status);
     }
 
     for (int i = 0; i < 3; ++i) {

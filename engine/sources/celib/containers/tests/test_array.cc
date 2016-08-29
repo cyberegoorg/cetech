@@ -15,11 +15,11 @@ extern "C" {
 **** Array can store items
 *******************************************************************************/
 SCENARIO( "Array can store items", "[array]" ) {
-    memsys_init(4*1024*1024);
+    struct allocator* allocator = malloc_allocator_create();
 
     GIVEN( "A empty array" ) {
         ARRAY_T(int) array;
-        ARRAY_INIT(int, &array, memsys_main_allocator());
+        ARRAY_INIT(int, &array, allocator);
 
         REQUIRE( ARRAY_SIZE(&array) == 0 );
         //REQUIRE( array::empty(a));
@@ -53,18 +53,19 @@ SCENARIO( "Array can store items", "[array]" ) {
         ARRAY_DESTROY(int, &array);
     }
 
-    memsys_shutdown();
+    malloc_allocator_destroy(allocator);
 }
 
 /*******************************************************************************
 **** Array can be sized and resized
 *******************************************************************************/
 SCENARIO( "Array can be sized and resized", "[array]" ) {
-    memsys_init(4*1024*1024);
+    struct allocator* allocator = malloc_allocator_create();
+
 
     GIVEN( "A array with some items" ) {
         ARRAY_T(int) array;
-        ARRAY_INIT(int, &array, memsys_main_allocator());
+        ARRAY_INIT(int, &array, allocator);
 
         ARRAY_PUSH_BACK(int, &array, 1);
         ARRAY_PUSH_BACK(int, &array, 2);
@@ -112,19 +113,18 @@ SCENARIO( "Array can be sized and resized", "[array]" ) {
         ARRAY_DESTROY(int, &array);
     }
 
-    memsys_shutdown();
+    malloc_allocator_destroy(allocator);
 }
 
 /*******************************************************************************
 **** Can iterate.
 *******************************************************************************/
 SCENARIO( "Can iterate array", "[array]" ) {
-    memsys_init(4*1024*1024);
-
+    struct allocator* allocator = malloc_allocator_create();
 
     GIVEN( "Array with elements [1, 2, 3, 4, 5]" ) {
         ARRAY_T(int) array;
-        ARRAY_INIT(int, &array, memsys_main_allocator());
+        ARRAY_INIT(int, &array, allocator);
 
         static int items [] = {1, 2, 3, 4, 5};
         ARRAY_PUSH(int, &array, items, 5);
@@ -159,7 +159,7 @@ SCENARIO( "Can iterate array", "[array]" ) {
         ARRAY_DESTROY(int, &array);
     }
 
-    memsys_shutdown();
+    malloc_allocator_destroy(allocator);
 }
 
 

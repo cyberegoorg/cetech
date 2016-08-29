@@ -2,8 +2,8 @@
 // Includes
 //==============================================================================
 
-#include "llm/keyboard_types.h"
-#include "llm/types.h"
+#include "engine/machine/keyboard_types.h"
+#include "engine/machine/types.h"
 
 //TODO: string
 static const char *_key_to_str[512] = {

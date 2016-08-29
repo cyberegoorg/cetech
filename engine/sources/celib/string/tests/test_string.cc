@@ -4,6 +4,7 @@
 **** Includes
 *******************************************************************************/
 
+#include <engine/memory_system/memory_system.h>
 #include "include/catch/catch.hpp"
 
 extern "C" {
@@ -19,24 +20,24 @@ extern "C" {
 **** String duplicate
 *******************************************************************************/
 SCENARIO( "string duplicate", "[string]" ) {
-    memsys_init(4*1024*1024);
+    struct allocator* allocator = malloc_allocator_create();
 
     GIVEN( "string 'test string'" ) {
         const char* test_string = "test_string";
 
         WHEN("duplicate sting") {
-            char* duplicate_string = str_duplicate(test_string, memsys_main_allocator());
+            char* duplicate_string = str_duplicate(test_string, allocator);
 
             THEN("duplicate_string == 'test string'") {
                 REQUIRE(str_compare(test_string, duplicate_string) == 0);
             }
 
-            allocator_deallocate(memsys_main_allocator(), duplicate_string);
+            CE_DEALLOCATE(allocator, duplicate_string);
         }
 
     }
 
-    memsys_shutdown();
+    malloc_allocator_destroy(allocator);
 }
 
 /*******************************************************************************

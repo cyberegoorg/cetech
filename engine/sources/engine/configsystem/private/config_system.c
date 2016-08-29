@@ -2,6 +2,7 @@
 // Includes
 //==============================================================================
 
+#include <engine/memory_system/memory_system.h>
 #include "celib/memory/memory.h"
 #include "engine/configsystem/configsystem.h"
 #include "celib/string/string.h"

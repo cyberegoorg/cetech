@@ -54,7 +54,7 @@ set(EXTERNAL_SOURCE_FILES
         externals/build/${PLATFORM_ID}/release/include/mpack/mpack-platform.c
         externals/build/${PLATFORM_ID}/release/include/mpack/mpack-reader.c
         externals/build/${PLATFORM_ID}/release/include/mpack/mpack-writer.c
-        engine/sources/llm/thread_types.h)
+        engine/sources/celib/os/thread_types.h)
 
 set(SOURCE_FILES
         ${EXTERNAL_SOURCE_FILES}
@@ -69,7 +69,7 @@ set(SOURCE_FILES
         ########################################################################
         engine/sources/celib/memory/private/allocator.c
         engine/sources/celib/memory/private/memory.c
-        engine/sources/llm/tests/test_memory.cc
+        engine/sources/celib/os/tests/test_memory.cc
 
 
         ########################################################################
@@ -90,12 +90,11 @@ set(SOURCE_FILES
         ########################################################################
         # CELIB: File
         ########################################################################
-        engine/sources/llm/private/vio.c
-        engine/sources/llm/private/sdl2/sdl_vio.c
-        engine/sources/llm/private/path.c
-        engine/sources/llm/private/file.c
-        engine/sources/celib/stacktrace/private/posix/posix_stacktrace.c
-        engine/sources/llm/tests/test_vfile.cc
+        engine/sources/celib/os/private/vio.c
+        engine/sources/celib/os/private/sdl_vio.c
+        engine/sources/celib/os/private/file.c
+        engine/sources/celib/os/private/posix_stacktrace.c
+        engine/sources/celib/os/tests/test_vfile.cc
 
         ########################################################################
         # CELIB: Crypto
@@ -134,29 +133,29 @@ set(SOURCE_FILES
 
         engine/sources/engine/configsystem/private/config_system.c
         engine/sources/engine/consoleserver/private/console_server.c
-        engine/sources/celib/memory/private/memory_system.c
+        engine/sources/engine/memory_system/private/memory_system.c
         engine/sources/celib/stringid/private/stringid.c
         engine/sources/engine/filesystem/private/filesystem.c
         engine/sources/engine/filesystem/tests/test_filesystem.cc
-        engine/sources/llm/private/sdl2/sdl_thread.c
-        engine/sources/llm/private/sdl2/sdl_cpu.c
+        engine/sources/celib/os/private/sdl_thread.c
+        engine/sources/celib/os/private/sdl_cpu.c
 
 
         engine/sources/engine/application/private/application.c
-        engine/sources/llm/private/llm.c
-        engine/sources/llm/private/sdl2/sdl_mouse.c
-        engine/sources/llm/private/sdl2/sdl_keyboard.c
-        engine/sources/llm/private/sdl2/sdl_machine.c
-        engine/sources/llm/private/sdl2/sdl_window.c
+        engine/sources/engine/machine/private/machine.c
+        engine/sources/engine/machine/private/sdl2/sdl_mouse.c
+        engine/sources/engine/machine/private/sdl2/sdl_keyboard.c
+        engine/sources/engine/machine/private/sdl2/sdl_machine.c
+        engine/sources/celib/window/private/sdl_window.c
         engine/sources/engine/input/private/keyboard.c
         engine/sources/engine/input/private/mouse.c
         engine/sources/engine/taskmanager/private/taskmanager.c
 
         engine/sources/engine/resource_compiler/private/resource_compiler.c
 
-        engine/sources/llm/private/sdl2/sdl_time.c
-        engine/sources/llm/private/sdl2/sdl_object.c
-        engine/sources/celib/path/private/path.c)
+        engine/sources/celib/os/private/sdl_time.c
+        engine/sources/celib/os/private/sdl_object.c
+        engine/sources/celib/os/private/path.c)
 
 ################################################################################
 # Main sources
@@ -171,7 +170,7 @@ set(MAIN_SOURCE_FILES
 set(TEST_SOURCE_FILES
         ${SOURCE_FILES}
         engine/sources/test/tests_main.cc
-        engine/sources/celib/stacktrace/stacktrace.h engine/sources/llm/thread.h)
+        engine/sources/celib/os/stacktrace.h engine/sources/celib/os/thread.h)
 
 ################################################################################
 # Release sources

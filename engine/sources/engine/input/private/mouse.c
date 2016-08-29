@@ -3,7 +3,7 @@
 //==============================================================================
 
 #include "celib/types.h"
-#include "llm/llm.h"
+#include "engine/machine/machine.h"
 #include "celib/string/string.h"
 #include "celib/math/vec2f.h"
 
@@ -51,13 +51,13 @@ void mouse_shutdown() {
 }
 
 void mouse_process() {
-    struct event_header *event = llm_event_begin();
+    struct event_header *event = machine_event_begin();
 
     memory_copy(_G.last_state, _G.state, MOUSE_BTN_MAX);
     _G.last_delta_pos[0] = 0;
     _G.last_delta_pos[1] = 0;
 
-    while (event != llm_event_end()) {
+    while (event != machine_event_end()) {
         struct mouse_move_event *move_event;
 
         switch (event->type) {
@@ -83,7 +83,7 @@ void mouse_process() {
                 break;
         }
 
-        event = llm_event_next(event);
+        event = machine_event_next(event);
     }
 }
 
