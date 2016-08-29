@@ -4,17 +4,17 @@
 
 #include <stdio.h>
 #include <include/mpack/mpack.h>
-#include <engine/taskmanager/taskmanager.h>
+#include <engine/task_manager/task_manager.h>
 
 #include "include/nanomsg/nn.h"
 #include "include/nanomsg/reqrep.h"
 #include "include/nanomsg/pubsub.h"
 
-#include "engine/consoleserver/consoleserver.h"
+#include "engine/console_server/console_server.h"
 #include "celib/errors/errors.h"
 #include "celib/string/string.h"
 
-#include "engine/configsystem/configsystem.h"
+#include "engine/config_system/config_system.h"
 
 //==============================================================================
 // Defines
@@ -110,8 +110,8 @@ static void _serve_command(const char *packet, int len) {
 int consolesrv_init() {
     log_debug(LOG_WHERE, "Init");
 
-    config_var_t rpc_port = config_new_int("consoleserver.rpc.port", "Console server rpc port", 4444);
-    config_var_t rpc_addr = config_new_string("consoleserver.rpc.addr", "Console server rpc addr", "ws://*");
+    config_var_t rpc_port = config_new_int("console_server.rpc.port", "Console server rpc port", 4444);
+    config_var_t rpc_addr = config_new_string("console_server.rpc.addr", "Console server rpc addr", "ws://*");
 
     int socket = nn_socket(AF_SP, NN_REP);
     if (socket < 0) {

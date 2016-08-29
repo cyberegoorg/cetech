@@ -3,11 +3,11 @@
 
 #include "engine/machine/machine.h"
 
-#include "engine/configsystem/configsystem.h"
-#include "engine/consoleserver/consoleserver.h"
-#include "engine/luasystem/luasystem.h"
+#include "engine/config_system/config_system.h"
+#include "engine/console_server/console_server.h"
+#include "engine/lua_system/lua_system.h"
 #include "engine/input/input.h"
-#include "engine/taskmanager/taskmanager.h"
+#include "engine/task_manager/task_manager.h"
 #include "engine/resource_compiler/resource_compiler.h"
 
 #define _SYSTEMS_SIZE sizeof(_SYSTEMS)/sizeof(_SYSTEMS[0])

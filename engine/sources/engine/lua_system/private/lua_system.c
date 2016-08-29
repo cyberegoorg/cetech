@@ -9,9 +9,9 @@
 #include <celib/memory/memory.h>
 #include "celib/errors/errors.h"
 
-#include "engine/luasystem/luasystem.h"
-#include "engine/consoleserver/consoleserver.h"
-#include "engine/pluginsystem/plugin_system.h"
+#include "engine/lua_system/lua_system.h"
+#include "engine/console_server/console_server.h"
+#include "engine/plugin_system/plugin_system.h"
 
 //==============================================================================
 // Defines
@@ -316,7 +316,7 @@ int luasys_init() {
 
     luasys_add_module_function("plugin", "reload", _reload_plugin);
 
-    consolesrv_register_command("luasystem.execute", _cmd_execute_string);
+    consolesrv_register_command("lua_system.execute", _cmd_execute_string);
 
     resource_compiler_register(stringid64_from_string("lua"), _lua_compiler);
 

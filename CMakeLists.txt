@@ -120,19 +120,19 @@ set(SOURCE_FILES
         ########################################################################
         # CETECH: Plugin system
         ########################################################################
-        engine/sources/engine/pluginsystem/private/plugin_system.c
+        engine/sources/engine/plugin_system/private/plugin_system.c
 
-        engine/sources/engine/pluginsystem/private/plugin_system.c
+        engine/sources/engine/plugin_system/private/plugin_system.c
         engine/sources/celib/log/private/log_system.c
 
-        engine/sources/engine/luasystem/private/lua_system.c
-        engine/sources/engine/luasystem/private/api/api_keyboard.c
-        engine/sources/engine/luasystem/private/api/api_log.c
-        engine/sources/engine/luasystem/private/api/api_mouse.c
-        engine/sources/engine/luasystem/private/api/api_application.c
+        engine/sources/engine/lua_system/private/lua_system.c
+        engine/sources/engine/lua_system/private/api/api_keyboard.c
+        engine/sources/engine/lua_system/private/api/api_log.c
+        engine/sources/engine/lua_system/private/api/api_mouse.c
+        engine/sources/engine/lua_system/private/api/api_application.c
 
-        engine/sources/engine/configsystem/private/config_system.c
-        engine/sources/engine/consoleserver/private/console_server.c
+        engine/sources/engine/config_system/private/config_system.c
+        engine/sources/engine/console_server/private/console_server.c
         engine/sources/engine/memory_system/private/memory_system.c
         engine/sources/celib/stringid/private/stringid.c
         engine/sources/engine/filesystem/private/filesystem.c
@@ -149,7 +149,7 @@ set(SOURCE_FILES
         engine/sources/celib/window/private/sdl_window.c
         engine/sources/engine/input/private/keyboard.c
         engine/sources/engine/input/private/mouse.c
-        engine/sources/engine/taskmanager/private/taskmanager.c
+        engine/sources/engine/task_manager/private/task_manager.c
 
         engine/sources/engine/resource_compiler/private/resource_compiler.c
 

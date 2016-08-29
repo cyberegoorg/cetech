@@ -12,8 +12,8 @@
 #include "celib/memory/memory.h"
 
 #include "engine/input/input.h"
-#include "engine/consoleserver/consoleserver.h"
-#include "engine/taskmanager/taskmanager.h"
+#include "engine/console_server/console_server.h"
+#include "engine/task_manager/task_manager.h"
 
 #define LOG_WHERE "application"
 

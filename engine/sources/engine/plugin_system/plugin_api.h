@@ -26,7 +26,7 @@ struct plugin_api_v0 {
 
 //#include "../log_system/log_api.h"
 //#include "../memory_system/mem_api.h"
-//#include "../luasystem/lua_api.h"
-//#include "../configsystem/api.h"
+//#include "../lua_system/lua_api.h"
+//#include "../config_system/api.h"
 
 #endif //CETECH_PLUGIN_API_H

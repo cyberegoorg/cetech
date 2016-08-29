@@ -8,7 +8,7 @@
 #include "engine/machine/machine.h"
 #include "celib/string/string.h"
 
-#include "engine/pluginsystem/plugin_system.h"
+#include "engine/plugin_system/plugin_system.h"
 
 //==============================================================================
 // Defines
