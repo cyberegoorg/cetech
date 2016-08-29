@@ -23,13 +23,15 @@
 // Globals
 //==============================================================================
 
-static struct {
+#define _G PluginSystemGlobals
+
+static struct G {
     get_api_fce_t get_plugin_api[MAX_PLUGINS];
     struct plugin_api_v0 *plugin_api[MAX_PLUGINS];
     void *plugin_handler[MAX_PLUGINS];
     char used[MAX_PLUGINS];
     char path[MAX_PLUGINS][MAX_PATH_LEN];
-} _G = {0};
+} PluginSystemGlobals = {0};
 
 //==============================================================================
 // Private

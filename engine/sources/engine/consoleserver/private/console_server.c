@@ -29,13 +29,15 @@
 // Globals
 //==============================================================================
 
-static struct {
+#define _G ConsoleServerGlobals
+
+static struct G {
     char name[MAX_COMMANDS][MAX_COMMAND_NAME_LEN];
     console_server_command_t commands[MAX_COMMANDS];
 
     int rpc_socket;
     int log_socket;
-} _G;
+} ConsoleServerGlobals = {0};
 
 
 //==============================================================================

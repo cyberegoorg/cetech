@@ -36,7 +36,10 @@ enum cvar_type {
 // Globals
 //==============================================================================
 
-static struct {
+#define _G ConfigSystemGlobals
+
+
+static struct G {
     char name[MAX_VARIABLES][MAX_NAME_LEN];
     char desc[MAX_VARIABLES][MAX_DESC_LEN];
 
@@ -47,7 +50,7 @@ static struct {
         int i;
         char *s;
     } values[MAX_VARIABLES];
-} _G = {0};
+} ConfigSystemGlobals = {0};
 
 
 //==============================================================================

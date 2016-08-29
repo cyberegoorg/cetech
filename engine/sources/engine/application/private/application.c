@@ -21,12 +21,14 @@
 // Globals
 //==============================================================================
 
+#define _G ApplicationGlobals
+
 static struct G {
     window_t main_window;
     int is_running;
     int init_error;
     float dt;
-} _G = {0};
+} ApplicationGlobals = {0};
 
 //==============================================================================
 // Systems

@@ -28,12 +28,15 @@
 // Global
 //==============================================================================
 
+#define _G FilesystemGlobals
+
+
 static struct G {
     struct {
         stringid64_t id[MAX_ROOTS];
         const char *path[MAX_ROOTS];
     } rootmap;
-} _G = {0};
+} FilesystemGlobals = {0};
 
 
 //==============================================================================
