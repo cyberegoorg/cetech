@@ -161,6 +161,8 @@ static void _consolesrv_task(void *d) {
 }
 
 void application_start() {
+    resource_compiler_compile_all();
+
     _G.main_window = window_new(
             "Cetech",
             WINDOWPOS_UNDEFINED,
@@ -168,10 +170,6 @@ void application_start() {
             800, 600,
             WINDOW_NOFLAG
     );
-
-
-    resource_compiler_compile_all();
-    return;
 
     _G.is_running = 1;
     uint32_t last_tick = os_get_ticks();

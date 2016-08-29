@@ -9,6 +9,7 @@
 #include "engine/input/input.h"
 #include "engine/task_manager/task_manager.h"
 #include "engine/resource_compiler/resource_compiler.h"
+#include "engine/machine/machine.h"
 
 #define _SYSTEMS_SIZE sizeof(_SYSTEMS)/sizeof(_SYSTEMS[0])
 #define _REGISTER_SYSTEM(n) {.name= #n, .init=n##_init, .shutdown=n##_shutdown}
@@ -21,6 +22,7 @@ static const struct {
     void (*shutdown)();
 } _SYSTEMS[] = {
         _REGISTER_SYSTEM(config),
+        _REGISTER_SYSTEM(machine),
         _REGISTER_SYSTEM(taskmanager),
         _REGISTER_SYSTEM(resource_compiler),
         _REGISTER_SYSTEM(consolesrv),
