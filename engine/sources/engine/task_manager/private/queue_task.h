@@ -17,7 +17,6 @@
 
 typedef char cacheline_pad_t[64];
 struct queue_task {
-    cacheline_pad_t _pad0;
     u32 *_data;
     cacheline_pad_t _pad1;
     atomic_int *_sequences;
@@ -31,7 +30,6 @@ struct queue_task {
     int _capacityMask;
     cacheline_pad_t _pad6;
     struct allocator *allocator;
-    //spinlock_t _lock;
 };
 
 
