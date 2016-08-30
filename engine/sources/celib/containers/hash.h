@@ -3,12 +3,10 @@
 
 #include "array.h"
 
-#define T int
-
-
 #define HASH_T(T) struct Hash_##T
 
 const uint32_t _HASH_END_OF_LIST = 0xffffffffu;
+
 
 struct hash_find_result {
     uint32_t hash_i;
