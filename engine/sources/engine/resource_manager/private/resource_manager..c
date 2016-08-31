@@ -36,6 +36,7 @@ ARRAY_PROTOTYPE(resource_callbacks_t)
 // Gloals
 //==============================================================================
 
+
 static const resource_item_t default_item = {.data=NULL, .ref_count=0};
 
 #define _G ResourceManagerGlobals
