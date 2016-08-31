@@ -1,7 +1,34 @@
 #ifndef CETECH_CONTAINERS_HASH_H
 #define CETECH_CONTAINERS_HASH_H
 
+//==============================================================================
+// Includes
+//==============================================================================
+
 #include "array.h"
+
+
+//==============================================================================
+// defines
+//==============================================================================
+
+const uint32_t _HASH_END_OF_LIST = 0xffffffffu;
+
+
+//==============================================================================
+// Structs
+//==============================================================================
+
+struct hash_find_result {
+    uint32_t hash_i;
+    uint32_t data_prev;
+    uint32_t data_i;
+};
+
+
+//==============================================================================
+// Interface macros
+//==============================================================================
 
 #define HASH_T(T) struct Hash_##T
 #define HASH_ENTRY_T(T) struct hash_entry_##T
@@ -26,14 +53,10 @@
 #define MULTIHASH_REMOVE(T, h, key, e)     multihash_remove_##T(h, e)
 #define MULTIHASH_REMOVE_ALLHAS(T, h, key) multihash_remove_all_##T(h, key)
 
-const uint32_t _HASH_END_OF_LIST = 0xffffffffu;
 
-
-struct hash_find_result {
-    uint32_t hash_i;
-    uint32_t data_prev;
-    uint32_t data_i;
-};
+//==============================================================================
+// Prototypes macro
+//==============================================================================
 
 #define HASH_PROTOTYPE(T)                                                      \
                                                                                \
