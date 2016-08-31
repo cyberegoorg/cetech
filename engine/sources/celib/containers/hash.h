@@ -1,5 +1,10 @@
-#ifndef CETECH_CONTAINERS_HASH_H
-#define CETECH_CONTAINERS_HASH_H
+//==============================================================================
+// Based on bitsquid foundation.
+// git+web: https://bitbucket.org/bitsquid/foundation
+//==============================================================================
+
+#ifndef CETECH_CONTAINERS_MAP_H
+#define CETECH_CONTAINERS_MAP_H
 
 //==============================================================================
 // Includes
@@ -7,106 +12,107 @@
 
 #include "array.h"
 
-
 //==============================================================================
 // defines
 //==============================================================================
 
-const uint32_t _HASH_END_OF_LIST = 0xffffffffu;
+#define _MAP_END_OF_LIST 0xffffffffu
 
+//==============================================================================
+// Shared macros
+//==============================================================================
+
+#define MAP_T(N) struct map_##N
+#define MAP_ENTRY_T(N) struct map_entry_##N
+
+#define MAP_INIT(N, h, a) map_init_##N(h, a)
+#define MAP_DESTROY(N, h) map_destroy_##N(h)
+
+//==============================================================================
+// Map interface macros
+//==============================================================================
+
+#define MAP_HAS(N, h, key)                map_has_##N(h, key)
+#define MAP_GET(N, h, key, deffault)      map_get_##N(h, key, deffault)
+#define MAP_SET(N, h, key, value)         map_set_##N(h, key, (value))
+#define MAP_REMOVE(N, h, key)             map_remove_##N(h, key)
+#define MAP_RESERVE(N, h, size)           map_reserve_##N(h, size)
+#define MAP_CLEAR(N, h)                   map_clear_##N(h)
+#define MAP_BEGIN(N, h)                   map_begin_##N(h)
+#define MAP_END(N, h)                     map_end_##N(h)
+
+//==============================================================================
+// Multi-Map interface macros
+//==============================================================================
+
+#define MULTIMAP_FIND_FIRST(N, h, key)    multimap_find_first_##N(h, key)
+#define MULTIMAP_FIND_NEXT(N, h, e)       multimap_find_next_##N(h, e)
+#define MULTIMAP_COUNT(N, h, key)         multimap_count_##N(h, key)
+#define MULTIMAP_GET(N, h, key, items)    multimap_get_##N(h, key, items)
+#define MULTIMAP_INSERT(N, h, key, value) multimap_insert_##N(h, key, value)
+#define MULTIMAP_REMOVE(N, h, key, e)     multimap_remove_##N(h, e)
+#define MULTIMAP_REMOVE_ALL(N, h, key)    multimap_remove_all_##N(h, key)
 
 //==============================================================================
 // Structs
 //==============================================================================
 
-struct hash_find_result {
-    uint32_t hash_i;
+struct map_find_result {
+    uint32_t map_i;
     uint32_t data_prev;
     uint32_t data_i;
 };
 
-
-//==============================================================================
-// Interface macros
-//==============================================================================
-
-#define HASH_T(T) struct Hash_##T
-#define HASH_ENTRY_T(T) struct hash_entry_##T
-
-#define HASH_INIT(T, h, a) hash_init_##T(h, a)
-#define HASH_DESTROY(T, h) hash_destroy_##T(h)
-
-#define HASH_HAS(T, h, key)           hash_has_##T(h, key)
-#define HASH_GET(T, h, key, deffault) hash_get_##T(h, key, deffault)
-#define HASH_SET(T, h, key, value)    hash_set_##T(h, key, value)
-#define HASH_REMOVE(T, h, key)        hash_remove_##T(h, key)
-#define HASH_RESERVE(T, h, size)      hash_reserve_##T(h, size)
-#define HASH_CLEAR(T, h)              hash_clear_##T(h)
-#define HASH_BEGIN(T, h)              hash_begin_##T(h)
-#define HASH_END(T, h)                hash_end_##T(h)
-
-#define MULTIHASH_FIND_FIRST(T, h, key)    multihash_find_first_##T(h, key)
-#define MULTIHASH_FIND_NEXT(T, h, e)       multihash_find_next_##T(h, e)
-#define MULTIHASH_COUNT(T, h, key)         multihash_count_##T(h, key)
-#define MULTIHASH_GET(T, h, key, items)    multihash_get_##T(h, key, items)
-#define MULTIHASH_INSERT(T, h, key, value) multihash_insert_##T(h, key, value)
-#define MULTIHASH_REMOVE(T, h, key, e)     multihash_remove_##T(h, e)
-#define MULTIHASH_REMOVE_ALLHAS(T, h, key) multihash_remove_all_##T(h, key)
-
-
-//==============================================================================
-// Prototypes macro
-//==============================================================================
-
-#define HASH_PROTOTYPE(T)                                                      \
+#define MAP_PROTOTYPE(T) MAP_PROTOTYPE_N(T, T)
+#define MAP_PROTOTYPE_N(T, N)                                                  \
                                                                                \
-struct hash_entry_##T {                                                        \
+struct map_entry_##N {                                                         \
     u64 key;                                                                   \
     u32 next;                                                                  \
     T value;                                                                   \
 };                                                                             \
                                                                                \
-typedef struct hash_entry_##T hash_entry_t_##T;                                \
-ARRAY_PROTOTYPE(hash_entry_t_##T);                                             \
-struct Hash_##T {                                                              \
+typedef struct map_entry_##N map_entry_t_##N;                                  \
+ARRAY_PROTOTYPE(map_entry_t_##N);                                              \
+struct map_##N {                                                               \
     ARRAY_T(u32) _hash;                                                        \
-    ARRAY_T(hash_entry_t_##T) _data;                                           \
+    ARRAY_T(map_entry_t_##N) _data;                                            \
 };                                                                             \
                                                                                \
-static void hash_init_##T(HASH_T(T) *h, struct allocator *allocator) {         \
+static void map_init_##N(MAP_T(N) *h, struct allocator *allocator) {           \
     ARRAY_INIT(u32, &h->_hash, allocator);                                     \
-    ARRAY_INIT(hash_entry_t_##T, &h->_data, allocator);                        \
+    ARRAY_INIT(map_entry_t_##N, &h->_data, allocator);                         \
 }                                                                              \
                                                                                \
-static void hash_destroy_##T(HASH_T(T) *h) {                                   \
+static void map_destroy_##N(MAP_T(N) *h) {                                     \
     ARRAY_DESTROY(u32, &h->_hash);                                             \
-    ARRAY_DESTROY(hash_entry_t_##T, &h->_data);                                \
+    ARRAY_DESTROY(map_entry_t_##N, &h->_data);                                 \
 }                                                                              \
                                                                                \
                                                                                \
-static uint32_t _hash_add_entry_##T(HASH_T(T) *h, uint64_t key) {              \
-    hash_entry_t_##T e;                                                        \
+static uint32_t _map_add_entry_##N(MAP_T(N) *h, uint64_t key) {                \
+    map_entry_t_##N e;                                                         \
     e.key = key;                                                               \
-    e.next = _HASH_END_OF_LIST;                                                \
+    e.next = _MAP_END_OF_LIST;                                                 \
                                                                                \
     uint32_t ei = ARRAY_SIZE(&h->_data);                                       \
-    ARRAY_PUSH_BACK(hash_entry_t_##T, &h->_data, e);                           \
+    ARRAY_PUSH_BACK(map_entry_t_##N, &h->_data, e);                            \
                                                                                \
     return ei;                                                                 \
 }                                                                              \
                                                                                \
-static struct hash_find_result _hash_find_key_##T(HASH_T(T) *h, uint64_t key) {\
-    struct hash_find_result fr;                                                \
-    fr.hash_i = _HASH_END_OF_LIST;                                             \
-    fr.data_prev = _HASH_END_OF_LIST;                                          \
-    fr.data_i = _HASH_END_OF_LIST;                                             \
+static struct map_find_result _map_find_key_##N(MAP_T(N) *h, uint64_t key) {   \
+    struct map_find_result fr;                                                 \
+    fr.map_i = _MAP_END_OF_LIST;                                               \
+    fr.data_prev = _MAP_END_OF_LIST;                                           \
+    fr.data_i = _MAP_END_OF_LIST;                                              \
                                                                                \
     if (ARRAY_SIZE(&h->_hash) == 0)                                            \
         return fr;                                                             \
                                                                                \
-    fr.hash_i = key % ARRAY_SIZE(&h->_hash);                                   \
-    fr.data_i = ARRAY_AT(&h->_hash, fr.hash_i);                                \
-    while (fr.data_i != _HASH_END_OF_LIST) {                                   \
+    fr.map_i = key % ARRAY_SIZE(&h->_hash);                                    \
+    fr.data_i = ARRAY_AT(&h->_hash, fr.map_i);                                 \
+    while (fr.data_i != _MAP_END_OF_LIST) {                                    \
         if (ARRAY_AT(&h->_data, fr.data_i).key == key)                         \
             return fr;                                                         \
                                                                                \
@@ -117,41 +123,44 @@ static struct hash_find_result _hash_find_key_##T(HASH_T(T) *h, uint64_t key) {\
     return fr;                                                                 \
 }                                                                              \
                                                                                \
-static void _hash_erase_##T(HASH_T(T) *h, const struct hash_find_result *fr) { \
-    if (fr->data_prev == _HASH_END_OF_LIST)                                    \
-        ARRAY_AT(&h->_hash, fr->hash_i) = ARRAY_AT(&h->_data, fr->data_i).next;\
+static void _map_erase_##N(MAP_T(N) *h, const struct map_find_result *fr) {    \
+    if (fr->data_prev == _MAP_END_OF_LIST)                                     \
+        ARRAY_AT(&h->_hash, fr->map_i) = ARRAY_AT(&h->_data, fr->data_i).next; \
     else                                                                       \
         ARRAY_AT(&h->_data, fr->data_prev).next = ARRAY_AT(&h->_data,          \
                                                            fr->data_i).next;   \
                                                                                \
     if (fr->data_i == ARRAY_SIZE(&h->_data) - 1) {                             \
-        ARRAY_POP_BACK(hash_entry_t_##T, &h->_data);                           \
+        ARRAY_POP_BACK(map_entry_t_##N, &h->_data);                            \
         return;                                                                \
     }                                                                          \
                                                                                \
     ARRAY_AT(&h->_data, fr->data_i) = ARRAY_AT(&h->_data,                      \
                                                ARRAY_SIZE(&h->_data) - 1);     \
                                                                                \
-    struct hash_find_result last = _hash_find_key_##T(h, ARRAY_AT(&h->_data, fr->data_i).key);\
+    struct map_find_result last = _map_find_key_##N(h, ARRAY_AT(&h->_data, fr->data_i).key);\
                                                                                \
-    if (last.data_prev != _HASH_END_OF_LIST)                                   \
+    if (last.data_prev != _MAP_END_OF_LIST)                                    \
         ARRAY_AT(&h->_data, last.data_prev).next = fr->data_i;                 \
     else                                                                       \
-        ARRAY_AT(&h->_hash, last.hash_i) = fr->data_i;                         \
+        ARRAY_AT(&h->_hash, last.map_i) = fr->data_i;                          \
 }                                                                              \
                                                                                \
-static struct hash_find_result _hash_find_entry_##T(HASH_T(T) *h, const hash_entry_t_##T *e) {\
-    struct hash_find_result fr;                                                \
-    fr.hash_i = _HASH_END_OF_LIST;                                             \
-    fr.data_prev = _HASH_END_OF_LIST;                                          \
-    fr.data_i = _HASH_END_OF_LIST;                                             \
+static struct map_find_result _map_find_entry_##N(                             \
+    MAP_T(N) *h,                                                               \
+    const map_entry_t_##N *e                                                   \
+) {                                                                            \
+    struct map_find_result fr;                                                 \
+    fr.map_i = _MAP_END_OF_LIST;                                               \
+    fr.data_prev = _MAP_END_OF_LIST;                                           \
+    fr.data_i = _MAP_END_OF_LIST;                                              \
                                                                                \
     if (ARRAY_SIZE(&h->_hash) == 0)                                            \
         return fr;                                                             \
                                                                                \
-    fr.hash_i = e->key % ARRAY_SIZE(&h->_hash);                                \
-    fr.data_i = ARRAY_AT(&h->_hash, fr.hash_i);                                \
-    while (fr.data_i != _HASH_END_OF_LIST) {                                   \
+    fr.map_i = e->key % ARRAY_SIZE(&h->_hash);                                 \
+    fr.data_i = ARRAY_AT(&h->_hash, fr.map_i);                                 \
+    while (fr.data_i != _MAP_END_OF_LIST) {                                    \
         if (&ARRAY_AT(&h->_data, fr.data_i) == e)                              \
             return fr;                                                         \
                                                                                \
@@ -161,30 +170,30 @@ static struct hash_find_result _hash_find_entry_##T(HASH_T(T) *h, const hash_ent
     return fr;                                                                 \
 }                                                                              \
                                                                                \
-static uint32_t _hash_find_or_fail_##T(HASH_T(T) *h, uint64_t key) {           \
-    return _hash_find_key_##T(h, key).data_i;                                  \
+static uint32_t _map_find_or_fail_##N(MAP_T(N) *h, uint64_t key) {             \
+    return _map_find_key_##N(h, key).data_i;                                   \
 }                                                                              \
                                                                                \
-static uint32_t _hash_find_or_make_##T(HASH_T(T) *h, uint64_t key) {           \
-    const struct hash_find_result fr = _hash_find_key_##T(h, key);             \
-    if (fr.data_i != _HASH_END_OF_LIST)                                        \
+static uint32_t _map_find_or_make_##N(MAP_T(N) *h, uint64_t key) {             \
+    const struct map_find_result fr = _map_find_key_##N(h, key);               \
+    if (fr.data_i != _MAP_END_OF_LIST)                                         \
         return fr.data_i;                                                      \
                                                                                \
-    uint32_t i = _hash_add_entry_##T(h, key);                                  \
-    if (fr.data_prev == _HASH_END_OF_LIST)                                     \
-        ARRAY_AT(&h->_hash, fr.hash_i) = i;                                    \
+    uint32_t i = _map_add_entry_##N(h, key);                                   \
+    if (fr.data_prev == _MAP_END_OF_LIST)                                      \
+        ARRAY_AT(&h->_hash, fr.map_i) = i;                                     \
     else                                                                       \
         ARRAY_AT(&h->_data, fr.data_prev).next = i;                            \
                                                                                \
     return i;                                                                  \
 }                                                                              \
                                                                                \
-static uint32_t _hash_make_##T(HASH_T(T) *h, uint64_t key) {                   \
-    const struct hash_find_result fr = _hash_find_key_##T(h, key);             \
-    const uint32_t i = _hash_add_entry_##T(h, key);                            \
+static uint32_t _map_make_##N(MAP_T(N) *h, uint64_t key) {                     \
+    const struct map_find_result fr = _map_find_key_##N(h, key);               \
+    const uint32_t i = _map_add_entry_##N(h, key);                             \
                                                                                \
-    if (fr.data_prev == _HASH_END_OF_LIST)                                     \
-        ARRAY_AT(&h->_hash, fr.hash_i) = i;                                    \
+    if (fr.data_prev == _MAP_END_OF_LIST)                                      \
+        ARRAY_AT(&h->_hash, fr.map_i) = i;                                     \
                                                                                \
     else                                                                       \
         ARRAY_AT(&h->_data, fr.data_prev).next = i;                            \
@@ -194,97 +203,100 @@ static uint32_t _hash_make_##T(HASH_T(T) *h, uint64_t key) {                   \
     return i;                                                                  \
 }                                                                              \
                                                                                \
-static void _hash_find_and_erase_##T(HASH_T(T) *h, uint64_t key) {             \
-    const struct hash_find_result fr = _hash_find_key_##T(h, key);             \
-    if (fr.data_i != _HASH_END_OF_LIST)                                        \
-        _hash_erase_##T(h, &fr);                                               \
+static void _map_find_and_erase_##N(MAP_T(N) *h, uint64_t key) {               \
+    const struct map_find_result fr = _map_find_key_##N(h, key);               \
+    if (fr.data_i != _MAP_END_OF_LIST)                                         \
+        _map_erase_##N(h, &fr);                                                \
 }                                                                              \
                                                                                \
-static void multihash_insert_##T(HASH_T(T) *h, uint64_t key, const T value);   \
+static void multimap_insert_##N(MAP_T(N) *h, uint64_t key, T value);           \
                                                                                \
-static void _hash_rehash_##T(HASH_T(T) *h, uint32_t new_size) {                \
-    HASH_T(T) nh;                                                              \
-    hash_init_##T(&nh, h->_hash.allocator);                                    \
+static void _map_remap_##N(MAP_T(N) *h, uint32_t new_size) {                   \
+    MAP_T(N) nh;                                                               \
+    map_init_##N(&nh, h->_hash.allocator);                                     \
                                                                                \
     ARRAY_RESIZE(u32, &nh._hash, new_size);                                    \
-    ARRAY_RESERVE(hash_entry_t_##T, &nh._data, ARRAY_SIZE(&h->_data));         \
+    ARRAY_RESERVE(map_entry_t_##N, &nh._data, ARRAY_SIZE(&h->_data));          \
                                                                                \
     for (uint32_t i = 0; i < new_size; ++i)                                    \
-        ARRAY_AT(&nh._hash, i) = _HASH_END_OF_LIST;                            \
+        ARRAY_AT(&nh._hash, i) = _MAP_END_OF_LIST;                             \
                                                                                \
     for (uint32_t i = 0; i < ARRAY_SIZE(&h->_data); ++i) {                     \
-        const hash_entry_t_##T e = ARRAY_AT(&h->_data, i);                     \
+        const map_entry_t_##N e = ARRAY_AT(&h->_data, i);                      \
                                                                                \
-        multihash_insert_##T(&nh, e.key, e.value);                             \
+        multimap_insert_##N(&nh, e.key, e.value);                              \
     }                                                                          \
                                                                                \
-    HASH_T(T) empty;                                                           \
-    hash_init_##T(&empty, h->_hash.allocator);                                 \
+    MAP_T(N) empty;                                                            \
+    map_init_##N(&empty, h->_hash.allocator);                                  \
                                                                                \
-    hash_destroy_##T(h);                                                       \
-    memory_copy(h, &nh, sizeof(HASH_T(T)));                                    \
-    memory_copy(&nh, &empty, sizeof(HASH_T(T)));                               \
+    map_destroy_##N(h);                                                        \
+    memory_copy(h, &nh, sizeof(MAP_T(N)));                                     \
+    memory_copy(&nh, &empty, sizeof(MAP_T(N)));                                \
 }                                                                              \
                                                                                \
-static int _hash_full_##T(HASH_T(T) *h) {                                      \
+static int _map_full_##N(MAP_T(N) *h) {                                        \
     const float max_load_factor = 0.7f;                                        \
     return ARRAY_SIZE(&h->_data) >= ARRAY_SIZE(&h->_hash) * max_load_factor;   \
 }                                                                              \
                                                                                \
-static void _hash_grow_##T(HASH_T(T) *h) {                                     \
+static void _map_grow_##N(MAP_T(N) *h) {                                       \
     const uint32_t new_size = ARRAY_SIZE(&h->_data) * 2 + 10;                  \
-    _hash_rehash_##T(h, new_size);                                             \
+    _map_remap_##N(h, new_size);                                               \
 }                                                                              \
                                                                                \
-static int hash_has_##T(HASH_T(T) *h, uint64_t key) {                          \
-    return _hash_find_or_fail_##T(h, key) != _HASH_END_OF_LIST;                \
+static int map_has_##N(MAP_T(N) *h, uint64_t key) {                            \
+    return _map_find_or_fail_##N(h, key) != _MAP_END_OF_LIST;                  \
 }                                                                              \
                                                                                \
-static const T hash_get_##T(HASH_T(T) *h, uint64_t key, const T deffault) {    \
-    const uint32_t i = _hash_find_or_fail_##T(h, key);                         \
-    return i == _HASH_END_OF_LIST ? deffault : ARRAY_AT(&h->_data, i).value;   \
+static T map_get_##N(MAP_T(N) *h, uint64_t key, T deffault) {                  \
+    const uint32_t i = _map_find_or_fail_##N(h, key);                          \
+    return i == _MAP_END_OF_LIST ? deffault : ARRAY_AT(&h->_data, i).value;    \
 }                                                                              \
                                                                                \
-static void hash_set_##T(HASH_T(T) *h, uint64_t key, const T value) {          \
+static void map_set_##N(MAP_T(N) *h, uint64_t key, T value) {                  \
     if (ARRAY_SIZE(&h->_hash) == 0)                                            \
-        _hash_grow_##T(h);                                                     \
+        _map_grow_##N(h);                                                      \
                                                                                \
-    const uint32_t i = _hash_find_or_make_##T(h, key);                         \
+    const uint32_t i = _map_find_or_make_##N(h, key);                          \
     ARRAY_AT(&h->_data, i).value = value;                                      \
                                                                                \
-    if (_hash_full_##T(h))                                                     \
-        _hash_grow_##T(h);                                                     \
+    if (_map_full_##N(h))                                                      \
+        _map_grow_##N(h);                                                      \
 }                                                                              \
                                                                                \
-static void hash_remove_##T(HASH_T(T) *h, uint64_t key) {                      \
-    _hash_find_and_erase_##T(h, key);                                          \
+static void map_remove_##N(MAP_T(N) *h, uint64_t key) {                        \
+    _map_find_and_erase_##N(h, key);                                           \
 }                                                                              \
                                                                                \
-static void hash_reserve_##T(HASH_T(T) *h, uint32_t size) {                    \
-    _hash_rehash_##T(h, size);                                                 \
+static void map_reserve_##N(MAP_T(N) *h, uint32_t size) {                      \
+    _map_remap_##N(h, size);                                                   \
 }                                                                              \
                                                                                \
-static void hash_clear_##T(HASH_T(T) *h) {                                     \
+static void map_clear_##N(MAP_T(N) *h) {                                       \
     ARRAY_RESIZE(u32, &h->_hash, 0);                                           \
-    ARRAY_RESIZE(hash_entry_t_##T, &h->_data, 0);                              \
+    ARRAY_RESIZE(map_entry_t_##N, &h->_data, 0);                               \
 }                                                                              \
                                                                                \
-static const hash_entry_t_##T *hash_begin_##T(HASH_T(T) *h) {                  \
+static const map_entry_t_##N *map_begin_##N(MAP_T(N) *h) {                     \
     return ARRAY_BEGIN(&h->_data);                                             \
 }                                                                              \
                                                                                \
-static const hash_entry_t_##T *hash_end_##T(HASH_T(T) *h) {                    \
+static const map_entry_t_##N *map_end_##N(MAP_T(N) *h) {                       \
     return ARRAY_END(&h->_data);                                               \
 }                                                                              \
                                                                                \
-static const hash_entry_t_##T *multihash_find_first_##T(HASH_T(T) *h, uint64_t key) {                                                                                                                       \
-    const uint32_t i = _hash_find_or_fail_##T(h, key);                         \
-    return i == _HASH_END_OF_LIST ? 0 : &ARRAY_AT(&h->_data, i);               \
+static const map_entry_t_##N *multimap_find_first_##N(MAP_T(N) *h, uint64_t key) {                                                                                                                       \
+    const uint32_t i = _map_find_or_fail_##N(h, key);                          \
+    return i == _MAP_END_OF_LIST ? 0 : &ARRAY_AT(&h->_data, i);                \
 }                                                                              \
                                                                                \
-static const hash_entry_t_##T *multihash_find_next_##T(HASH_T(T) *h, const hash_entry_t_##T *e) {\
+static const map_entry_t_##N *multimap_find_next_##N(                          \
+    MAP_T(N) *h,                                                               \
+    const map_entry_t_##N *e                                                   \
+) {                                                                            \
     uint32_t i = e->next;                                                      \
-    while (i != _HASH_END_OF_LIST) {                                           \
+    while (i != _MAP_END_OF_LIST) {                                            \
         if (ARRAY_AT(&h->_data, i).key == e->key)                              \
             return &ARRAY_AT(&h->_data, i);                                    \
                                                                                \
@@ -293,46 +305,68 @@ static const hash_entry_t_##T *multihash_find_next_##T(HASH_T(T) *h, const hash_
     return 0;                                                                  \
 }                                                                              \
                                                                                \
-static uint32_t multihash_count_##T(HASH_T(T) *h, uint64_t key) {              \
+static uint32_t multimap_count_##N(MAP_T(N) *h, uint64_t key) {                \
     uint32_t i = 0;                                                            \
-    const hash_entry_t_##T *e = multihash_find_first_##T(h, key);              \
+    const map_entry_t_##N *e = multimap_find_first_##N(h, key);                \
     while (e) {                                                                \
         ++i;                                                                   \
-        e = multihash_find_next_##T(h, e);                                     \
+        e = multimap_find_next_##N(h, e);                                      \
     }                                                                          \
     return i;                                                                  \
 }                                                                              \
                                                                                \
-static void multihash_get_##T(HASH_T(T) *h, uint64_t key, ARRAY_T(int) *items) {\
-    const hash_entry_t_##T *e = multihash_find_first_##T(h, key);              \
+static void multimap_get_##N(MAP_T(N) *h, uint64_t key, ARRAY_T(N) *items) {   \
+    const map_entry_t_##N *e = multimap_find_first_##N(h, key);                \
     while (e) {                                                                \
-        ARRAY_PUSH_BACK(int, items, e->value);                                 \
-        e = multihash_find_next_##T(h, e);                                     \
+        ARRAY_PUSH_BACK(N, items, e->value);                                   \
+        e = multimap_find_next_##N(h, e);                                      \
     }                                                                          \
 }                                                                              \
                                                                                \
-static void multihash_insert_##T(HASH_T(T) *h, uint64_t key, const T value) {  \
+static void multimap_insert_##N(MAP_T(N) *h, uint64_t key, T value) {          \
     if (ARRAY_SIZE(&h->_hash) == 0)                                            \
-        _hash_grow_##T(h);                                                     \
+        _map_grow_##N(h);                                                      \
                                                                                \
-    const uint32_t i = _hash_make_##T(h, key);                                 \
+    const uint32_t i = _map_make_##N(h, key);                                  \
     ARRAY_AT(&h->_data, i).value = value;                                      \
                                                                                \
-    if (_hash_full_##T(h))                                                     \
-        _hash_grow_##T(h);                                                     \
+    if (_map_full_##N(h))                                                      \
+        _map_grow_##N(h);                                                      \
 }                                                                              \
                                                                                \
-static void multihash_remove_##T(HASH_T(T) *h, const hash_entry_t_##T *e) {    \
-    const struct hash_find_result fr = _hash_find_entry_##T(h, e);             \
-    if (fr.data_i != _HASH_END_OF_LIST)                                        \
-        _hash_erase_##T(h, &fr);                                               \
+static void multimap_remove_##N(MAP_T(N) *h, const map_entry_t_##N *e) {       \
+    const struct map_find_result fr = _map_find_entry_##N(h, e);               \
+    if (fr.data_i != _MAP_END_OF_LIST)                                         \
+        _map_erase_##N(h, &fr);                                                \
 }                                                                              \
                                                                                \
-static void multihash_remove_all_##T(HASH_T(T) *h, uint64_t key) {             \
-    while (hash_has_##T(h, key))                                               \
-        hash_remove_##T(h, key);                                               \
+static void multimap_remove_all_##N(MAP_T(N) *h, uint64_t key) {               \
+    while (map_has_##N(h, key))                                                \
+        map_remove_##N(h, key);                                                \
 }                                                                              \
 
-HASH_PROTOTYPE(int);
+MAP_PROTOTYPE_N(char*, pchar)
 
-#endif //CETECH_CONTAINERS_HASH_H
+MAP_PROTOTYPE_N(void*, void)
+
+MAP_PROTOTYPE(char)
+
+MAP_PROTOTYPE(int)
+
+MAP_PROTOTYPE(u8)
+
+MAP_PROTOTYPE(u16)
+
+MAP_PROTOTYPE(u32)
+
+MAP_PROTOTYPE(u64)
+
+MAP_PROTOTYPE(i8)
+
+MAP_PROTOTYPE(i16)
+
+MAP_PROTOTYPE(i32)
+
+MAP_PROTOTYPE(i64)
+
+#endif //CETECH_CONTAINERS_MAP_H
