@@ -4,6 +4,27 @@
 #include "array.h"
 
 #define HASH_T(T) struct Hash_##T
+#define HASH_ENTRY_T(T) struct hash_entry_##T
+
+#define HASH_INIT(T, h, a) hash_init_##T(h, a)
+#define HASH_DESTROY(T, h) hash_destroy_##T(h)
+
+#define HASH_HAS(T, h, key)           hash_has_##T(h, key)
+#define HASH_GET(T, h, key, deffault) hash_get_##T(h, key, deffault)
+#define HASH_SET(T, h, key, value)    hash_set_##T(h, key, value)
+#define HASH_REMOVE(T, h, key)        hash_remove_##T(h, key)
+#define HASH_RESERVE(T, h, size)      hash_reserve_##T(h, size)
+#define HASH_CLEAR(T, h)              hash_clear_##T(h)
+#define HASH_BEGIN(T, h)              hash_begin_##T(h)
+#define HASH_END(T, h)                hash_end_##T(h)
+
+#define MULTIHASH_FIND_FIRST(T, h, key)    multihash_find_first_##T(h, key)
+#define MULTIHASH_FIND_NEXT(T, h, e)       multihash_find_next_##T(h, e)
+#define MULTIHASH_COUNT(T, h, key)         multihash_count_##T(h, key)
+#define MULTIHASH_GET(T, h, key, items)    multihash_get_##T(h, key, items)
+#define MULTIHASH_INSERT(T, h, key, value) multihash_insert_##T(h, key, value)
+#define MULTIHASH_REMOVE(T, h, key, e)     multihash_remove_##T(h, e)
+#define MULTIHASH_REMOVE_ALLHAS(T, h, key) multihash_remove_all_##T(h, key)
 
 const uint32_t _HASH_END_OF_LIST = 0xffffffffu;
 
