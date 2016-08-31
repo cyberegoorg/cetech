@@ -1,3 +1,8 @@
+//==============================================================================
+// Based on bitsquid foundation.
+// git+web: https://bitbucket.org/bitsquid/foundation
+//==============================================================================
+
 #ifndef CETECH_TEMP_ALLOCATOR_H
 #define CETECH_TEMP_ALLOCATOR_H
 

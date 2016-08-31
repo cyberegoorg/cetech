@@ -1,3 +1,8 @@
+//==============================================================================
+// Based on bitsquid foundation.
+// git+web: https://bitbucket.org/bitsquid/foundation
+//==============================================================================
+
 #ifndef CETECH_MEMORY_H
 #define CETECH_MEMORY_H
 

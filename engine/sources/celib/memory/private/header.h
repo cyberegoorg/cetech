@@ -1,3 +1,8 @@
+//==============================================================================
+// Based on bitsquid foundation.
+// git+web: https://bitbucket.org/bitsquid/foundation
+//==============================================================================
+
 #ifndef CETECH_HEADER_H
 #define CETECH_HEADER_H
 
