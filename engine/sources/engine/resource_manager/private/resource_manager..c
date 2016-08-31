@@ -1,3 +1,7 @@
+//==============================================================================
+// Includes
+//==============================================================================
+
 #include "include/SDL2/SDL.h"
 
 #include <celib/stringid/types.h>
@@ -9,6 +13,10 @@
 #include <engine/application/application.h>
 #include "engine/memory_system/memory_system.h"
 #include "celib/containers/hash.h"
+
+//==============================================================================
+// Struct and types
+//==============================================================================
 
 typedef struct {
     void *data;
@@ -23,6 +31,11 @@ ARRAY_PROTOTYPE_N(MAP_T(resource_item_t), resource_data)
 
 ARRAY_PROTOTYPE(resource_callbacks_t)
 
+
+//==============================================================================
+// Gloals
+//==============================================================================
+
 static const resource_item_t default_item = {.data=NULL, .ref_count=0};
 
 #define _G ResourceManagerGlobals
@@ -33,12 +46,20 @@ struct G {
     config_var_t cv_build_dir;
 } _G = {0};
 
+
+//==============================================================================
+// Private
+//==============================================================================
+
 static MAP_T(resource_item_t) *_get_resource_map(stringid64_t type) {
     const u32 idx = MAP_GET(u32, &_G.type_map, type.id, 0);
 
     return &ARRAY_AT(&_G.resource_data, idx);
 }
 
+//==============================================================================
+// Public interface
+//==============================================================================
 
 int resource_init() {
     _G = (struct G) {0};
