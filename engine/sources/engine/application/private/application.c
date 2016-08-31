@@ -6,6 +6,7 @@
 #include <celib/os/time.h>
 #include <celib/window/types.h>
 #include <celib/window/window.h>
+#include <celib/stringid/stringid.h>
 
 #include "celib/log/log.h"
 #include "celib/memory/memory.h"
@@ -163,6 +164,12 @@ static void _consolesrv_task(void *d) {
 
 void application_start() {
     resource_compiler_compile_all();
+
+    stringid64_t lua_boot = stringid64_from_string("lua/boot");
+    resource_load_now(stringid64_from_string("lua"), &lua_boot, 1);
+    resource_get(stringid64_from_string("lua"), lua_boot);
+    resource_reload(stringid64_from_string("lua"), &lua_boot, 1);
+    resorucemanager_unload(stringid64_from_string("lua"), &lua_boot, 1);
 
     _G.main_window = window_new(
             "Cetech",

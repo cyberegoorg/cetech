@@ -34,7 +34,7 @@
 static struct G {
     struct {
         stringid64_t id[MAX_ROOTS];
-        const char *path[MAX_ROOTS];
+        char *path[MAX_ROOTS];
     } rootmap;
 } FilesystemGlobals = {0};
 
@@ -43,16 +43,26 @@ static struct G {
 // Interface
 //==============================================================================
 
-void filesystem_init() {
+int filesystem_init() {
     _G = (struct G) {0};
 
     log_debug(LOG_WHERE, "Init");
+
+    return 1;
 }
 
 void filesystem_shutdown() {
-    _G = (struct G) {0};
-
     log_debug(LOG_WHERE, "Shutdown");
+
+    for (int i = 0; i < MAX_ROOTS; ++i) {
+        if (_G.rootmap.path[i] == 0) {
+            continue;
+        }
+
+        CE_DEALLOCATE(memsys_main_allocator(), _G.rootmap.path[i]);
+    }
+
+    _G = (struct G) {0};
 }
 
 void filesystem_map_root_dir(stringid64_t root, const char *base_path) {
@@ -62,7 +72,8 @@ void filesystem_map_root_dir(stringid64_t root, const char *base_path) {
         }
 
         _G.rootmap.id[i] = root;
-        _G.rootmap.path[i] = base_path;
+        _G.rootmap.path[i] = str_duplicate(base_path, memsys_main_allocator());
+        break;
     }
 }
 
@@ -94,6 +105,7 @@ struct vio *filesystem_open(stringid64_t root, const char *path, enum open_mode 
     struct vio *file = vio_from_file(fullm_path, mode, memsys_main_allocator());
 
     if (!file) {
+        log_error(LOG_WHERE, "Could not load file %s", fullm_path);
         return NULL;
     }
 

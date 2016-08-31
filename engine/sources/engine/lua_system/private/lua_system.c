@@ -7,6 +7,8 @@
 #include <engine/resource_compiler/resource_compiler.h>
 #include <celib/os/vio.h>
 #include <celib/memory/memory.h>
+#include <engine/resource_manager/resource_manager.h>
+#include <engine/memory_system/memory_system.h>
 #include "celib/errors/errors.h"
 
 #include "engine/lua_system/lua_system.h"
@@ -38,6 +40,38 @@ static struct G {
 //==============================================================================
 // Private
 //==============================================================================
+
+void *lua_resource_loader(struct vio *input, struct allocator *allocator) {
+    const i64 size = vio_size(input);
+    char *data = CE_ALLOCATE(allocator, char, size);
+    vio_read(input, data, 1, size);
+
+    return data;
+}
+
+void lua_resource_unloader(void *new_data, struct allocator *allocator) {
+    CE_DEALLOCATE(allocator, new_data);
+}
+
+void lua_resource_online(void *data) {
+}
+
+void lua_resource_offline(void *data) {
+
+}
+
+void *resource_reloader(stringid64_t name, void *old_data, void *new_data, struct allocator *allocator) {
+    CE_DEALLOCATE(allocator, old_data);
+    return new_data;
+}
+
+static const resource_callbacks_t lua_resource_callback = {
+        .loader = lua_resource_loader,
+        .unloader =lua_resource_unloader,
+        .online =lua_resource_online,
+        .offline =lua_resource_offline,
+        .reloader = resource_reloader
+};
 
 static void _register_all_api() {
     REGISTER_LUA_API(log);
@@ -318,6 +352,7 @@ int luasys_init() {
 
     consolesrv_register_command("lua_system.execute", _cmd_execute_string);
 
+    resource_register_type(stringid64_from_string("lua"), lua_resource_callback);
     resource_compiler_register(stringid64_from_string("lua"), _lua_compiler);
 
     return 1;

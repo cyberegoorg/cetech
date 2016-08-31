@@ -15,7 +15,7 @@
 //==============================================================================
 
 //! Init filesystem
-void filesystem_init();
+int filesystem_init();
 
 //! Shutdown filesystem
 void filesystem_shutdown();

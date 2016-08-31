@@ -156,7 +156,7 @@ set(SOURCE_FILES
 
         engine/sources/celib/os/private/sdl_time.c
         engine/sources/celib/os/private/sdl_object.c
-        engine/sources/celib/os/private/path.c)
+        engine/sources/celib/os/private/path.c engine/sources/engine/resource_manager/private/resource_manager..c)
 
 ################################################################################
 # Main sources
