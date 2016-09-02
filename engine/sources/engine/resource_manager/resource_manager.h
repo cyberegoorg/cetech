@@ -26,6 +26,8 @@ int resource_init();
 
 void resource_shutdown();
 
+void resource_set_autoload(int enable);
+
 void resource_register_type(stringid64_t type,
                             resource_callbacks_t callbacks);
 

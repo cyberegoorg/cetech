@@ -36,8 +36,15 @@ ARRAY_PROTOTYPE(resource_callbacks_t)
 // Gloals
 //==============================================================================
 
+#define LOG_WHERE "resource_manager"
 
-static const resource_item_t default_item = {.data=NULL, .ref_count=0};
+//==============================================================================
+// Gloals
+//==============================================================================
+
+static const resource_item_t null_item = {.data=NULL, .ref_count=0};
+
+#define is_item_null(item) (item.data == null_item.data)
 
 #define _G ResourceManagerGlobals
 struct G {
@@ -45,6 +52,7 @@ struct G {
     ARRAY_T(resource_data) resource_data;
     ARRAY_T(resource_callbacks_t) resource_callbacks;
     config_var_t cv_build_dir;
+    int autoload_enabled;
 } _G = {0};
 
 
@@ -93,6 +101,10 @@ void resource_shutdown() {
     MAP_DESTROY(u32, &_G.type_map);
 
     _G = (struct G) {0};
+}
+
+void resource_set_autoload(int enable) {
+    _G.autoload_enabled = enable;
 }
 
 void resource_register_type(stringid64_t type,
@@ -164,7 +176,7 @@ void resource_load(void **loaded_data, stringid64_t type, stringid64_t *names, s
 
 
     for (int i = 0; i < count; ++i) {
-        resource_item_t item = MAP_GET(resource_item_t, resource_map, names[i].id, default_item);
+        resource_item_t item = MAP_GET(resource_item_t, resource_map, names[i].id, null_item);
 
         if (item.ref_count > 0) {
             ++item.ref_count;
@@ -196,7 +208,7 @@ void resorucemanager_unload(stringid64_t type, stringid64_t *names, size_t count
     resource_callbacks_t type_clb = ARRAY_AT(&_G.resource_callbacks, idx);
 
     for (int i = 0; i < count; ++i) {
-        resource_item_t item = MAP_GET(resource_item_t, resource_map, names[i].id, default_item);
+        resource_item_t item = MAP_GET(resource_item_t, resource_map, names[i].id, null_item);
 
         if (item.ref_count == 0) {
             continue;
@@ -218,7 +230,21 @@ void resorucemanager_unload(stringid64_t type, stringid64_t *names, size_t count
 void *resource_get(stringid64_t type, stringid64_t names) {
     MAP_T(resource_item_t) *resource_map = _get_resource_map(type);
 
-    return MAP_GET(resource_item_t, resource_map, names.id, default_item).data;
+    resource_item_t item = MAP_GET(resource_item_t, resource_map, names.id, null_item);
+    if (is_item_null(item)) {
+        char build_name[33] = {0};
+        type_name_to_str(build_name, CE_ARRAY_LEN(build_name), type, names);
+
+        if (_G.autoload_enabled) {
+            log_warning(LOG_WHERE, "Autoloading resource %s", build_name);
+            resource_load_now(type, &names, 1);
+            item = MAP_GET(resource_item_t, resource_map, names.id, null_item);
+        } else {
+            // TODO: fallback resource #CETECH-44
+        }
+    }
+
+    return item.data;
 }
 
 void resource_reload(stringid64_t type, stringid64_t *names, size_t count) {
@@ -238,7 +264,7 @@ void resource_reload(stringid64_t type, stringid64_t *names, size_t count) {
 
         type_clb.reloader(names[i], old_data, loaded_data[i], memsys_main_allocator());
 
-        resource_item_t item = MAP_GET(resource_item_t, resource_map, names[i].id, default_item);
+        resource_item_t item = MAP_GET(resource_item_t, resource_map, names[i].id, null_item);
         item.data = loaded_data[i];
         --item.ref_count; // Load call increase item.ref_count, because is loaded
         MAP_SET(resource_item_t, resource_map, names[i].id, item);
