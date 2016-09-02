@@ -234,14 +234,13 @@ void resource_reload(stringid64_t type, stringid64_t *names, size_t count) {
         type_name_to_str(build_name, CE_ARRAY_LEN(build_name), type, names[i]);
         log_debug("resource_manager", "Reload resource %s ", build_name);
 
-
         void *old_data = resource_get(type, names[i]);
 
         type_clb.reloader(names[i], old_data, loaded_data[i], memsys_main_allocator());
 
         resource_item_t item = MAP_GET(resource_item_t, resource_map, names[i].id, default_item);
         item.data = loaded_data[i];
-        --item.ref_count; // Load call increse item.ref_count, because is loaded
+        --item.ref_count; // Load call increase item.ref_count, because is loaded
         MAP_SET(resource_item_t, resource_map, names[i].id, item);
     }
 }

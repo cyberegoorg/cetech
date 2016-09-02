@@ -286,7 +286,7 @@ static const map_entry_t_##N *map_end_##N(MAP_T(N) *h) {                       \
     return ARRAY_END(&h->_data);                                               \
 }                                                                              \
                                                                                \
-static const map_entry_t_##N *multimap_find_first_##N(MAP_T(N) *h, uint64_t key) {                                                                                                                       \
+static const map_entry_t_##N *multimap_find_first_##N(MAP_T(N) *h, uint64_t key) {\
     const uint32_t i = _map_find_or_fail_##N(h, key);                          \
     return i == _MAP_END_OF_LIST ? 0 : &ARRAY_AT(&h->_data, i);                \
 }                                                                              \
