@@ -65,6 +65,7 @@ int resource_can_get_all(stringid64_t type, stringid64_t *names, size_t count);
 
 void *resource_get(stringid64_t type, stringid64_t names);
 
+int resource_type_name_string(char *str, size_t max_len, stringid64_t type, stringid64_t name);
 
 //==============================================================================
 // Package interface

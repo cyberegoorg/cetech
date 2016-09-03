@@ -178,7 +178,7 @@ int package_is_loaded(stringid64_t name) {
 
     const u32 task_count = package->type_count;
     for (int i = 0; i < task_count; ++i) {
-        struct package_task_data type_data = {
+        const struct package_task_data type_data = {
                 .count = package_name_count(package)[i],
                 .name = &package_name(package)[package_offset(package)[i]],
                 .type = package_type(package)[i]

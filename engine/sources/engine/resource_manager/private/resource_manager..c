@@ -12,6 +12,7 @@
 #include <celib/os/path.h>
 #include <engine/application/application.h>
 #include <celib/os/vio.h>
+#include <engine/resource_compiler/resource_compiler.h>
 #include "engine/memory_system/memory_system.h"
 #include "celib/containers/hash.h"
 
@@ -25,6 +26,8 @@ typedef struct {
 } resource_item_t;
 
 ARRAY_PROTOTYPE(resource_item_t)
+
+ARRAY_PROTOTYPE_N(const char*, cstring)
 
 MAP_PROTOTYPE(resource_item_t)
 
@@ -87,7 +90,6 @@ void package_resource_online(void *data) {
 }
 
 void package_resource_offline(void *data) {
-
 }
 
 void *resource_reloader(stringid64_t name, void *old_data, void *new_data, struct allocator *allocator) {
@@ -110,6 +112,7 @@ static const resource_callbacks_t package_resource_callback = {
 extern int package_init();
 
 extern void package_shutdown();
+
 
 int resource_init() {
     _G = (struct G) {0};
@@ -148,6 +151,11 @@ void resource_shutdown() {
     _G = (struct G) {0};
 }
 
+int resource_type_name_string(char *str, size_t max_len, stringid64_t type, stringid64_t name) {
+    return snprintf(str, max_len, "%" SDL_PRIX64 "%" SDL_PRIX64, type.id, name.id);
+}
+
+
 void resource_set_autoload(int enable) {
     _G.autoload_enabled = enable;
 }
@@ -161,6 +169,7 @@ void resource_register_type(stringid64_t type,
     ARRAY_PUSH_BACK(resource_callbacks_t, &_G.resource_callbacks, callbacks);
 
     MAP_INIT(resource_item_t, &ARRAY_AT(&_G.resource_data, idx), memsys_main_allocator());
+
     MAP_SET(u32, &_G.type_map, type.id, idx);
 }
 
@@ -218,15 +227,11 @@ int resource_can_get_all(stringid64_t type, stringid64_t *names, size_t count) {
     return 1;
 }
 
-static int type_name_to_str(char *result, size_t maxlen, stringid64_t type, stringid64_t name) {
-    return snprintf(result, maxlen, "%" SDL_PRIX64 "%" SDL_PRIX64, type.id, name.id);
-}
-
 void resource_load(void **loaded_data, stringid64_t type, stringid64_t *names, size_t count) {
     const u32 idx = MAP_GET(u32, &_G.type_map, type.id, UINT32_MAX);
 
     if (idx == UINT32_MAX) {
-        log_error(LOG_WHERE, "is not registred");
+        log_error(LOG_WHERE, "Loader for resource is not is not registred");
         memory_set(loaded_data, sizeof(void *), count);
         return;
     }
@@ -249,8 +254,12 @@ void resource_load(void **loaded_data, stringid64_t type, stringid64_t *names, s
         }
 
         char build_name[33] = {0};
-        type_name_to_str(build_name, CE_ARRAY_LEN(build_name), type, names[i]);
-        log_debug("resource_manager", "Loading resource %s from %s", build_name, filesystem_get_root_dir(root_name));
+        resource_type_name_string(build_name, CE_ARRAY_LEN(build_name), type, names[i]);
+
+
+        char filename[1024] = {0};
+        resource_compiler_get_filename(filename, CE_ARRAY_LEN(filename), type, names[i]);
+        log_debug("resource_manager", "Loading resource %s from %s", filename, filesystem_get_root_dir(root_name));
 
         struct vio *resource_file = filesystem_open(root_name, build_name, VIO_OPEN_READ);
 
@@ -283,8 +292,11 @@ void resource_unload(stringid64_t type, stringid64_t *names, size_t count) {
 
         if (--item.ref_count == 0) {
             char build_name[33] = {0};
-            type_name_to_str(build_name, CE_ARRAY_LEN(build_name), type, names[i]);
-            log_debug("resource_manager", "Unload resource %s ", build_name);
+            resource_type_name_string(build_name, CE_ARRAY_LEN(build_name), type, names[i]);
+
+            char filename[1024] = {0};
+            resource_compiler_get_filename(filename, CE_ARRAY_LEN(filename), type, names[i]);
+            log_debug("resource_manager", "Unload resource %s ", filename);
 
             type_clb.offline(item.data);
             type_clb.unloader(item.data, memsys_main_allocator());
@@ -302,10 +314,13 @@ void *resource_get(stringid64_t type, stringid64_t names) {
     resource_item_t item = MAP_GET(resource_item_t, resource_map, names.id, null_item);
     if (is_item_null(item)) {
         char build_name[33] = {0};
-        type_name_to_str(build_name, CE_ARRAY_LEN(build_name), type, names);
+        resource_type_name_string(build_name, CE_ARRAY_LEN(build_name), type, names);
 
         if (_G.autoload_enabled) {
-            log_warning(LOG_WHERE, "Autoloading resource %s", build_name);
+            char filename[1024] = {0};
+            resource_compiler_get_filename(filename, CE_ARRAY_LEN(filename), type, names);
+
+            log_warning(LOG_WHERE, "Autoloading resource %s", filename);
             resource_load_now(type, &names, 1);
             item = MAP_GET(resource_item_t, resource_map, names.id, null_item);
         } else {
@@ -326,7 +341,7 @@ void resource_reload(stringid64_t type, stringid64_t *names, size_t count) {
     resource_load(loaded_data, type, names, count);
     for (int i = 0; i < count; ++i) {
         char build_name[33] = {0};
-        type_name_to_str(build_name, CE_ARRAY_LEN(build_name), type, names[i]);
+        resource_type_name_string(build_name, CE_ARRAY_LEN(build_name), type, names[i]);
         log_debug("resource_manager", "Reload resource %s ", build_name);
 
         void *old_data = resource_get(type, names[i]);
