@@ -14,6 +14,7 @@
 #include <engine/task_manager/task_manager.h>
 #include <engine/resource_compiler/resource_compiler.h>
 #include <engine/application/application.h>
+#include <engine/resource_manager/resource_manager.h>
 #include "engine/memory_system/memory_system.h"
 
 #include "celib/os/vio.h"
@@ -228,4 +229,10 @@ void resource_compiler_compile_all() {
 
     taskmanager_add_end(&root_task, 1);
     taskmanager_wait(root_task);
+}
+
+int resource_compiler_get_filename(char *filename, size_t max_ken, stringid64_t type, stringid64_t name) {
+    char build_name[33] = {0};
+    resource_type_name_string(build_name, CE_ARRAY_LEN(build_name), type, name);
+    return builddb_get_filename_by_hash(filename, max_ken, build_name);
 }

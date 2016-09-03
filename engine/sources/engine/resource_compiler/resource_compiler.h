@@ -35,4 +35,6 @@ void resource_compiler_register(stringid64_t type, resource_compilator_t compila
 
 void resource_compiler_compile_all();
 
+int resource_compiler_get_filename(char *filename, size_t max_ken, stringid64_t type, stringid64_t name);
+
 #endif //CETECH_RESOURCE_COMPILER_H

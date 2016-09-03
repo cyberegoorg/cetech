@@ -167,7 +167,30 @@ static void builddb_set_file_hash(const char *filename, const char *hash) {
 
     sqlite3_finalize(stmt);
     sqlite3_close_v2(_db);
+}
 
+static int builddb_get_filename_by_hash(char *filename, size_t max_len, const char *hash) {
+    static const char *sql = "SELECT filename FROM file_hash WHERE hash = ?1;";
+
+    sqlite3 *_db = _opendb();
+    sqlite3_stmt *stmt;
+    sqlite3_prepare_v2(_db, sql, -1, &stmt, NULL);
+
+    sqlite3_bind_text(stmt, 1, hash, -1, SQLITE_TRANSIENT);
+
+    int ok = 0;
+    while (_step(_db, stmt) == SQLITE_ROW) {
+        const u_char *fn = sqlite3_column_text(stmt, 0);
+
+        snprintf(filename, max_len, "%s", fn);
+
+        ok = 1;
+    }
+
+    sqlite3_finalize(stmt);
+    sqlite3_close_v2(_db);
+
+    return ok;
 }
 
 static int builddb_need_compile(const char *source_dir, const char *filename) {
