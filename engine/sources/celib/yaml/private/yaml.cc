@@ -1,4 +1,5 @@
 #include <string>
+#include <stdlib.h>
 
 extern "C" {
 #include "celib/errors/errors.h"
@@ -39,12 +40,11 @@ static size_t new_node(yaml_handler_s *handler, const YAML::Node &node) {
     CE_ASSERT_MSG("yaml", false, "Node pool overflow");
 }
 
-extern "C" yaml_handler_t yaml_load_str(const char *str) {
+extern "C" yaml_node_t yaml_load_str(const char *str, yaml_handler_t **handler) {
     yaml_handler_s *nh = new yaml_handler_s;
 
-    new_node(nh, YAML::Load(str));
-
-    return nh;
+    *handler = (yaml_handler_t *) nh;
+    return new_node(nh, YAML::Load(str));
 }
 
 extern "C" size_t yaml_get_node(yaml_handler_t handler, yaml_node_t node_idx, const char *key) {
@@ -52,6 +52,7 @@ extern "C" size_t yaml_get_node(yaml_handler_t handler, yaml_node_t node_idx, co
 
     return new_node(nh, nh->nodes[node_idx][key]);
 }
+
 
 extern "C" yaml_node_t yaml_get_seq_node(yaml_handler_t handler, yaml_node_t seq_node_idx, size_t idx) {
     yaml_handler_s *nh = (yaml_handler_s *) handler;
@@ -73,10 +74,39 @@ extern "C" enum yaml_node_type yaml_node_type(yaml_handler_t handler, yaml_node_
     return _types[nh->nodes[node_idx].Type()];
 }
 
+extern "C" size_t yaml_node_size(yaml_handler_t handler, yaml_node_t node_idx) {
+    yaml_handler_s *nh = (yaml_handler_s *) handler;
+
+    return nh->nodes[node_idx].size();
+
+}
+
 extern "C" void yaml_node_free(yaml_handler_t handler, yaml_node_t node_idx) {
     yaml_handler_s *nh = (yaml_handler_s *) handler;
 
     nh->used[node_idx] = 0;
+}
+
+extern "C" void
+yaml_node_foreach_dict(yaml_handler_t handler, yaml_node_t node_idx, yaml_foreach_map_clb_t foreach_clb, void *data) {
+    yaml_handler_s *nh = (yaml_handler_s *) handler;
+    auto node = nh->nodes[node_idx];
+
+    for (YAML::const_iterator it = node.begin(); it != node.end(); ++it) {
+        yaml_node_t key = new_node(nh, it->first);
+        yaml_node_t value = new_node(nh, it->second);
+
+        foreach_clb(handler, key, value, data);
+
+        yaml_node_free(nh, key);
+        yaml_node_free(nh, value);
+    }
+}
+
+extern "C" int yaml_node_as_string(yaml_handler_t handler, yaml_node_t node_idx, char *output, size_t max_len) {
+    yaml_handler_s *nh = (yaml_handler_s *) handler;
+
+    YAML_EX_SCOPE({ return snprintf(output, max_len, "%s", nh->nodes[node_idx].as<std::string>().c_str()); })
 }
 
 #define YAML_NODE_AS_DECL(type)\

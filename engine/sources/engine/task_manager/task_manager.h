@@ -5,6 +5,7 @@
 // Includes
 //==============================================================================
 
+#include <stdlib.h>
 #include "types.h"
 
 #define CE_ASSERT_IS_WORKER(where, worker_id)\

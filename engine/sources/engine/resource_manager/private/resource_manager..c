@@ -11,6 +11,7 @@
 #include <engine/config_system/config_system.h>
 #include <celib/os/path.h>
 #include <engine/application/application.h>
+#include <celib/os/vio.h>
 #include "engine/memory_system/memory_system.h"
 #include "celib/containers/hash.h"
 
@@ -61,14 +62,54 @@ struct G {
 //==============================================================================
 
 static MAP_T(resource_item_t) *_get_resource_map(stringid64_t type) {
-    const u32 idx = MAP_GET(u32, &_G.type_map, type.id, 0);
+    const u32 idx = MAP_GET(u32, &_G.type_map, type.id, UINT32_MAX);
+
+    if (idx == UINT32_MAX) {
+        return NULL;
+    }
 
     return &ARRAY_AT(&_G.resource_data, idx);
 }
 
+void *package_resource_loader(struct vio *input, struct allocator *allocator) {
+    const i64 size = vio_size(input);
+    char *data = CE_ALLOCATE(allocator, char, size);
+    vio_read(input, data, 1, size);
+
+    return data;
+}
+
+void package_resource_unloader(void *new_data, struct allocator *allocator) {
+    CE_DEALLOCATE(allocator, new_data);
+}
+
+void package_resource_online(void *data) {
+}
+
+void package_resource_offline(void *data) {
+
+}
+
+void *resource_reloader(stringid64_t name, void *old_data, void *new_data, struct allocator *allocator) {
+    CE_DEALLOCATE(allocator, old_data);
+    return new_data;
+}
+
+static const resource_callbacks_t package_resource_callback = {
+        .loader = package_resource_loader,
+        .unloader =package_resource_unloader,
+        .online =package_resource_online,
+        .offline =package_resource_offline,
+        .reloader = resource_reloader
+};
+
+
 //==============================================================================
 // Public interface
 //==============================================================================
+extern int package_init();
+
+extern void package_shutdown();
 
 int resource_init() {
     _G = (struct G) {0};
@@ -87,7 +128,9 @@ int resource_init() {
 
     filesystem_map_root_dir(stringid64_from_string("build"), build_dir_full);
 
-    return 1;
+    resource_register_type(stringid64_from_string("package"), package_resource_callback);
+
+    return package_init();
 }
 
 void resource_shutdown() {
@@ -99,6 +142,8 @@ void resource_shutdown() {
     ARRAY_DESTROY(resource_data, &_G.resource_data);
     ARRAY_DESTROY(resource_callbacks_t, &_G.resource_callbacks);
     MAP_DESTROY(u32, &_G.type_map);
+
+    package_shutdown();
 
     _G = (struct G) {0};
 }
@@ -120,19 +165,22 @@ void resource_register_type(stringid64_t type,
 }
 
 void resource_add_loaded(stringid64_t type, stringid64_t *names, void **resource_data, size_t count) {
-    const u32 idx = MAP_GET(u32, &_G.type_map, type.id, 0);
+    const u32 idx = MAP_GET(u32, &_G.type_map, type.id, UINT32_MAX);
+
+    if (idx == UINT32_MAX) {
+        return;
+    }
 
     MAP_T(resource_item_t) *resource_map = &ARRAY_AT(&_G.resource_data, idx);
 
     resource_item_t item = {.ref_count=1};
     for (size_t i = 0; i < count; i++) {
-        if (resource_data[i] == 0) {
-            continue;
-        }
-
         item.data = resource_data[i];
         MAP_SET(resource_item_t, resource_map, names[i].id, item);
 
+        if (resource_data[i] == 0) {
+            continue;
+        }
         ARRAY_AT(&_G.resource_callbacks, idx).online(resource_data[i]);
     }
 }
@@ -147,11 +195,19 @@ void resource_load_now(stringid64_t type, stringid64_t *names, size_t count) {
 int resource_can_get(stringid64_t type, stringid64_t names) {
     MAP_T(resource_item_t) *resource_map = _get_resource_map(type);
 
+    if (resource_map == NULL) {
+        return 1;
+    }
+
     return MAP_HAS(resource_item_t, resource_map, names.id);
 }
 
 int resource_can_get_all(stringid64_t type, stringid64_t *names, size_t count) {
     MAP_T(resource_item_t) *resource_map = _get_resource_map(type);
+
+    if (resource_map == NULL) {
+        return 1;
+    }
 
     for (size_t i = 0; i < count; ++i) {
         if (!MAP_HAS(resource_item_t, resource_map, names[i].id)) {
@@ -167,7 +223,14 @@ static int type_name_to_str(char *result, size_t maxlen, stringid64_t type, stri
 }
 
 void resource_load(void **loaded_data, stringid64_t type, stringid64_t *names, size_t count) {
-    const u32 idx = MAP_GET(u32, &_G.type_map, type.id, 0);
+    const u32 idx = MAP_GET(u32, &_G.type_map, type.id, UINT32_MAX);
+
+    if (idx == UINT32_MAX) {
+        log_error(LOG_WHERE, "is not registred");
+        memory_set(loaded_data, sizeof(void *), count);
+        return;
+    }
+
     const stringid64_t root_name = stringid64_from_string("build");
 
     MAP_T(resource_item_t) *resource_map = &ARRAY_AT(&_G.resource_data, idx);
@@ -193,16 +256,20 @@ void resource_load(void **loaded_data, stringid64_t type, stringid64_t *names, s
 
         if (resource_file != NULL) {
             loaded_data[i] = type_clb.loader(resource_file, memsys_main_allocator());
+            filesystem_close(resource_file);
         } else {
             loaded_data[i] = 0;
         }
-
-        filesystem_close(resource_file);
     }
 }
 
-void resorucemanager_unload(stringid64_t type, stringid64_t *names, size_t count) {
-    const u32 idx = MAP_GET(u32, &_G.type_map, type.id, 0);
+void resource_unload(stringid64_t type, stringid64_t *names, size_t count) {
+    const u32 idx = MAP_GET(u32, &_G.type_map, type.id, UINT32_MAX);
+
+    if (idx == UINT32_MAX) {
+        return;
+    }
+
     MAP_T(resource_item_t) *resource_map = _get_resource_map(type);
 
     resource_callbacks_t type_clb = ARRAY_AT(&_G.resource_callbacks, idx);
@@ -221,6 +288,8 @@ void resorucemanager_unload(stringid64_t type, stringid64_t *names, size_t count
 
             type_clb.offline(item.data);
             type_clb.unloader(item.data, memsys_main_allocator());
+
+            MAP_REMOVE(resource_item_t, resource_map, names[i].id);
         }
 
         MAP_SET(resource_item_t, resource_map, names[i].id, item);
@@ -270,3 +339,4 @@ void resource_reload(stringid64_t type, stringid64_t *names, size_t count) {
         MAP_SET(resource_item_t, resource_map, names[i].id, item);
     }
 }
+

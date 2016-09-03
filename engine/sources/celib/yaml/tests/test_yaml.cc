@@ -29,7 +29,8 @@ SCENARIO("Yaml string parse", "[yaml]") {
                 "  bool: true\n";
 
         WHEN("Parse string") {
-            auto h = yaml_load_str(yaml_str);
+            yaml_handler_t *h;
+            yaml_load_str(yaml_str, &h);
 
             THEN("h != NULL") {
                 REQUIRE(h != NULL);

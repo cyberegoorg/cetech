@@ -163,13 +163,14 @@ static void _consolesrv_task(void *d) {
 }
 
 void application_start() {
+    resource_set_autoload(1);
     resource_compiler_compile_all();
 
-    stringid64_t lua_boot = stringid64_from_string("lua/boot");
-    resource_load_now(stringid64_from_string("lua"), &lua_boot, 1);
-    resource_get(stringid64_from_string("lua"), lua_boot);
-    resource_reload(stringid64_from_string("lua"), &lua_boot, 1);
-    resorucemanager_unload(stringid64_from_string("lua"), &lua_boot, 1);
+    stringid64_t lua_boot = stringid64_from_string("boot");
+    package_load(lua_boot);
+    package_flush(lua_boot);
+    package_unload(lua_boot);
+    resource_unload(stringid64_from_string("package"), &lua_boot, 1);
 
     _G.main_window = window_new(
             "Cetech",

@@ -60,7 +60,7 @@ void lua_resource_offline(void *data) {
 
 }
 
-void *resource_reloader(stringid64_t name, void *old_data, void *new_data, struct allocator *allocator) {
+void *lua_resource_reloader(stringid64_t name, void *old_data, void *new_data, struct allocator *allocator) {
     CE_DEALLOCATE(allocator, old_data);
     return new_data;
 }
@@ -70,7 +70,7 @@ static const resource_callbacks_t lua_resource_callback = {
         .unloader =lua_resource_unloader,
         .online =lua_resource_online,
         .offline =lua_resource_offline,
-        .reloader = resource_reloader
+        .reloader = lua_resource_reloader
 };
 
 static void _register_all_api() {

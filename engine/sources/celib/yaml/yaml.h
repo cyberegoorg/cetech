@@ -33,6 +33,7 @@
 typedef void *yaml_handler_t;
 typedef size_t yaml_node_t;
 
+typedef void(*yaml_foreach_map_clb_t)(yaml_handler_t handler, yaml_node_t key, yaml_node_t value, void *data);
 
 //==============================================================================
 // Enums
@@ -51,7 +52,7 @@ enum yaml_node_type {
 // Interface
 //==============================================================================
 
-yaml_handler_t yaml_load_str(const char *str);
+yaml_node_t yaml_load_str(const char *str, yaml_handler_t **handler);
 
 yaml_node_t yaml_get_node(yaml_handler_t handler,
                           yaml_node_t node_idx,
@@ -67,6 +68,11 @@ void yaml_node_free(yaml_handler_t handler,
 enum yaml_node_type yaml_node_type(yaml_handler_t handler,
                                    yaml_node_t node_idx);
 
+size_t yaml_node_size(yaml_handler_t handler, yaml_node_t node_idx);
+
+void
+yaml_node_foreach_dict(yaml_handler_t handler, yaml_node_t node_idx, yaml_foreach_map_clb_t foreach_clb, void *data);
+
 //==============================================================================
 // Define nodes
 //==============================================================================
@@ -78,6 +84,8 @@ YAML_NODE_AS_DEF(int);
 YAML_NODE_AS_DEF(bool);
 
 YAML_NODE_AS_DEF(float);
+
+int yaml_node_as_string(yaml_handler_t handler, yaml_node_t node_idx, char *output, size_t max_len);
 
 #undef YAML_NODE_AS_DEF
 
