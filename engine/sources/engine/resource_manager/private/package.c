@@ -62,8 +62,6 @@ void forach_clb(yaml_handler_t handler, yaml_node_t key, yaml_node_t value, void
         yaml_node_t name_node = yaml_get_seq_node(handler, value, i);
         yaml_node_as_string(handler, name_node, name_str, CE_ARRAY_LEN(name_str));
 
-        log_error("package", "%s %s", type_str, name_str);
-
         ARRAY_PUSH_BACK(stringid64_t, &compile_data->name, stringid64_from_string(name_str));
 
         yaml_node_free(handler, name_node);

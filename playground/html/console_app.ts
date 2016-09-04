@@ -47,7 +47,7 @@ class ConsoleApp {
 
         var msg = msgpack.encode({
 
-            name: "luasystem.execute",
+            name: "lua_system.execute",
             args: {
                 script: script
             }
@@ -147,7 +147,7 @@ class ConsoleApp {
             worker_id.innerHTML = events['worker_id'];
             message.innerHTML = events['msg'];
 
-            console.log(events)
+            //console.log(events)
         };
     };
 }

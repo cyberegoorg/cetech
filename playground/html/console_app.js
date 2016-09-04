@@ -29,7 +29,7 @@ var ConsoleApp = (function () {
     ConsoleApp.prototype.send_cmd = function () {
         var script = this.editor.getValue();
         var msg = msgpack.encode({
-            name: "luasystem.execute",
+            name: "lua_system.execute",
             args: {
                 script: script
             }
@@ -102,7 +102,7 @@ var ConsoleApp = (function () {
             where.innerHTML = events['where'];
             worker_id.innerHTML = events['worker_id'];
             message.innerHTML = events['msg'];
-            console.log(events);
+            //console.log(events)
         };
     };
     ;
