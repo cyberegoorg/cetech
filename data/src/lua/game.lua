@@ -56,7 +56,7 @@ end
 function Game:update(dt)
     if Keyboard.button_pressed(Keyboard.button_index('r')) then
         ResourceCompilator.compile_all()
-        -- Application.ReloadAll()
+        ResourceManager.reload_all()
     end
 
     if Keyboard.button_pressed(quit_btn) then

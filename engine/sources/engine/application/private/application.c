@@ -186,6 +186,8 @@ void application_start() {
 
     _boot();
 
+    //resource_reload_all();
+
     _G.main_window = window_new(
             "Cetech",
             WINDOWPOS_UNDEFINED,

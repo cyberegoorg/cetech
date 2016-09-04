@@ -27,6 +27,8 @@ typedef struct {
 
 ARRAY_PROTOTYPE(resource_item_t)
 
+ARRAY_PROTOTYPE(stringid64_t)
+
 ARRAY_PROTOTYPE_N(const char*, cstring)
 
 MAP_PROTOTYPE(resource_item_t)
@@ -92,7 +94,7 @@ void package_resource_online(void *data) {
 void package_resource_offline(void *data) {
 }
 
-void *resource_reloader(stringid64_t name, void *old_data, void *new_data, struct allocator *allocator) {
+void *package_resource_reloader(stringid64_t name, void *old_data, void *new_data, struct allocator *allocator) {
     CE_DEALLOCATE(allocator, old_data);
     return new_data;
 }
@@ -102,7 +104,7 @@ static const resource_callbacks_t package_resource_callback = {
         .unloader =package_resource_unloader,
         .online =package_resource_online,
         .offline =package_resource_offline,
-        .reloader = resource_reloader
+        .reloader = package_resource_reloader
 };
 
 
@@ -197,7 +199,7 @@ void resource_add_loaded(stringid64_t type, stringid64_t *names, void **resource
 void resource_load_now(stringid64_t type, stringid64_t *names, size_t count) {
     void *loaded_data[count];
 
-    resource_load(loaded_data, type, names, count);
+    resource_load(loaded_data, type, names, count, 0);
     resource_add_loaded(type, names, loaded_data, count);
 }
 
@@ -227,7 +229,7 @@ int resource_can_get_all(stringid64_t type, stringid64_t *names, size_t count) {
     return 1;
 }
 
-void resource_load(void **loaded_data, stringid64_t type, stringid64_t *names, size_t count) {
+void resource_load(void **loaded_data, stringid64_t type, stringid64_t *names, size_t count, int force) {
     const u32 idx = MAP_GET(u32, &_G.type_map, type.id, UINT32_MAX);
 
     if (idx == UINT32_MAX) {
@@ -246,7 +248,7 @@ void resource_load(void **loaded_data, stringid64_t type, stringid64_t *names, s
     for (int i = 0; i < count; ++i) {
         resource_item_t item = MAP_GET(resource_item_t, resource_map, names[i].id, null_item);
 
-        if (item.ref_count > 0) {
+        if (!force && (item.ref_count > 0)) {
             ++item.ref_count;
             MAP_SET(resource_item_t, resource_map, names[i].id, item);
             loaded_data[i] = 0;
@@ -339,20 +341,56 @@ void resource_reload(stringid64_t type, stringid64_t *names, size_t count) {
 
     resource_callbacks_t type_clb = ARRAY_AT(&_G.resource_callbacks, idx);
 
-    resource_load(loaded_data, type, names, count);
+    resource_load(loaded_data, type, names, count, 1);
     for (int i = 0; i < count; ++i) {
-        char build_name[33] = {0};
-        resource_type_name_string(build_name, CE_ARRAY_LEN(build_name), type, names[i]);
-        log_debug("resource_manager", "Reload resource %s ", build_name);
+//        char build_name[33] = {0};
+//        resource_type_name_string(build_name, CE_ARRAY_LEN(build_name), type, names[i]);
+
+        char filename[1024] = {0};
+        resource_compiler_get_filename(filename, CE_ARRAY_LEN(filename), type, names[i]);
+
+        log_debug("resource_manager", "Reload resource %s ", filename);
 
         void *old_data = resource_get(type, names[i]);
 
-        type_clb.reloader(names[i], old_data, loaded_data[i], memsys_main_allocator());
+        void *new_data = type_clb.reloader(names[i], old_data, loaded_data[i], memsys_main_allocator());
 
         resource_item_t item = MAP_GET(resource_item_t, resource_map, names[i].id, null_item);
-        item.data = loaded_data[i];
-        --item.ref_count; // Load call increase item.ref_count, because is loaded
+        item.data = new_data;
+        //--item.ref_count; // Load call increase item.ref_count, because is loaded
         MAP_SET(resource_item_t, resource_map, names[i].id, item);
     }
 }
 
+void resource_reload_all() {
+    const MAP_ENTRY_T(u32) *type_it = MAP_BEGIN(u32, &_G.type_map);
+    const MAP_ENTRY_T(u32) *type_end = MAP_END(u32, &_G.type_map);
+
+    ARRAY_T(stringid64_t) name_array = {0};
+    ARRAY_INIT(stringid64_t, &name_array, memsys_main_allocator());
+
+    while (type_it != type_end) {
+        stringid64_t type_id = {.id = type_it->key};
+
+        ARRAY_RESIZE(stringid64_t, &name_array, 0);
+
+        MAP_T(resource_item_t) *resource_map = _get_resource_map(type_id);
+
+        const MAP_ENTRY_T(resource_item_t) *name_it = MAP_BEGIN(resource_item_t, resource_map);
+        const MAP_ENTRY_T(resource_item_t) *name_end = MAP_END(resource_item_t, resource_map);
+
+        while (name_it != name_end) {
+            stringid64_t name_id = {.id = name_it->key};
+
+            ARRAY_PUSH_BACK(stringid64_t, &name_array, name_id);
+
+            ++name_it;
+        }
+
+        resource_reload(type_id, &ARRAY_AT(&name_array, 0), ARRAY_SIZE(&name_array));
+
+        ++type_it;
+    }
+
+    ARRAY_DESTROY(stringid64_t, &name_array);
+}

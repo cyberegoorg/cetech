@@ -132,6 +132,7 @@ set(SOURCE_FILES
         engine/sources/engine/lua_system/private/api/api_mouse.c
         engine/sources/engine/lua_system/private/api/api_application.c
         engine/sources/engine/lua_system/private/api/api_resouce_compilator.c
+        engine/sources/engine/lua_system/private/api/api_resouce_manager.c
 
         engine/sources/engine/config_system/private/config_system.c
         engine/sources/engine/console_server/private/console_server.c

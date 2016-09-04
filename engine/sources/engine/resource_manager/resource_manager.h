@@ -49,7 +49,7 @@ void resource_set_autoload(int enable);
 void resource_register_type(stringid64_t type,
                             resource_callbacks_t callbacks);
 
-void resource_load(void **loaded_data, stringid64_t type, stringid64_t *names, size_t count);
+void resource_load(void **loaded_data, stringid64_t type, stringid64_t *names, size_t count, int force);
 
 void resource_add_loaded(stringid64_t type, stringid64_t *names, void **resource_data, size_t count);
 
@@ -58,6 +58,8 @@ void resource_load_now(stringid64_t type, stringid64_t *names, size_t count);
 void resource_unload(stringid64_t type, stringid64_t *names, size_t count);
 
 void resource_reload(stringid64_t type, stringid64_t *names, size_t count);
+
+void resource_reload_all();
 
 int resource_can_get(stringid64_t type, stringid64_t names);
 
