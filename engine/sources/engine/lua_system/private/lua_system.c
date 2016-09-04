@@ -96,6 +96,18 @@ void lua_resource_offline(void *data) {
 
 void *lua_resource_reloader(stringid64_t name, void *old_data, void *new_data, struct allocator *allocator) {
     CE_DEALLOCATE(allocator, old_data);
+
+    struct lua_resource *resource = new_data;
+    char *data = (char *) (resource + 1);
+
+    luaL_loadbuffer(_G.L, data, resource->size, "<unknown>");
+
+    if (lua_pcall(_G.L, 0, 0, 0)) {
+        const char *last_error = lua_tostring(_G.L, -1);
+        lua_pop(_G.L, 1);
+        log_error(LOG_WHERE, "%s", last_error);
+    }
+
     return new_data;
 }
 

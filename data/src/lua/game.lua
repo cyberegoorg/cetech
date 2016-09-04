@@ -91,6 +91,7 @@ function Game:update(dt)
         RenderSystem.SaveScreenShot("screenshot");
     end
 
+    --    Log.info("dddd", "dddddd")
     --    local transform = Transform.GetTransform(self.world, self.camera_unit)
     --    local pos = Transform.GetPosition(self.world, transform)
     --
