@@ -11,6 +11,8 @@
 #include "include/luajit/lauxlib.h"
 #include "include/luajit/lualib.h"
 
+#include "celib/stringid/types.h"
+
 //==============================================================================
 // Interface
 //==============================================================================
@@ -53,6 +55,13 @@ int luasys_execute_string(const char *str);
 
 void luasys_add_module_function(const char *module, const char *name, const lua_CFunction func);
 
+void luasys_execute_resource(stringid64_t name);
+
 const struct game_callbacks *luasys_get_game_callbacks();
+
+void luasys_execute_boot_script(stringid64_t name);
+
+void luasys_call_global(const char *func, const char *args, ...);
+
 
 #endif //CETECH_LUA_API_H

@@ -31,10 +31,16 @@
 // Globals
 //==============================================================================
 
+struct lua_resource {
+    u32 version;
+    u32 size;
+};
+
 #define _G LuaGlobals
 
 static struct G {
     lua_State *L;
+    stringid64_t type_id;
 } LuaGlobals = {0};
 
 
@@ -42,6 +48,28 @@ static struct G {
 // Private
 //==============================================================================
 
+static int require(lua_State *L) {
+    const char *name = lua_tostring(L, 1);
+    stringid64_t name_hash = stringid64_from_string(name);
+
+    struct lua_resource *resource = resource_get(_G.type_id, name_hash);
+
+    if (resource == NULL) {
+        return 0;
+    }
+
+    char *data = (char *) (resource + 1);
+
+    luaL_loadbuffer(_G.L, data, resource->size, "<unknown>");
+
+//    if (lua_pcall(_G.L, 0, 0, 0)) {
+//        const char* last_error = lua_tostring(_G.L, -1);
+//        lua_pop(_G.L, 1);
+//        log_error(LOG_WHERE, "%s", last_error);
+//    }
+
+    return 1;
+}
 
 //==============================================================================
 // Lua resource
@@ -79,24 +107,27 @@ static const resource_callbacks_t lua_resource_callback = {
         .reloader = lua_resource_reloader
 };
 
+
 //==============================================================================
 // Game
 //==============================================================================
 
 
 int _game_init_clb() {
+    luasys_call_global("init", NULL);
     return 1;
 }
 
 void _game_shutdown_clb() {
-
+    luasys_call_global("shutdown", NULL);
 }
 
 void _game_update_clb(float dt) {
+    luasys_call_global("update", "f", dt);
 }
 
 void _game_render_clb() {
-
+    luasys_call_global("render", NULL);
 }
 
 static const struct game_callbacks _GameCallbacks = {
@@ -271,6 +302,12 @@ int _lua_compiler(const char *filename,
         size_t bc_len = 0;
         const char *bc = luasys_to_string_l(state, 1, &bc_len);
 
+        struct lua_resource resource = {
+                .version = 0,
+                .size = bc_len,
+        };
+
+        vio_write(build_vio, &resource, sizeof(struct lua_resource), 1);
         vio_write(build_vio, bc, sizeof(char), bc_len);
     }
 
@@ -352,6 +389,19 @@ int luasys_execute_string(const char *str) {
     return _execute_string(_G.L, str);
 }
 
+void luasys_execute_resource(stringid64_t name) {
+    struct lua_resource *resource = resource_get(_G.type_id, name);
+    char *data = (char *) (resource + 1);
+
+    luaL_loadbuffer(_G.L, data, resource->size, "<unknown>");
+
+    if (lua_pcall(_G.L, 0, 0, 0)) {
+        const char *last_error = lua_tostring(_G.L, -1);
+        lua_pop(_G.L, 1);
+        log_error(LOG_WHERE, "%s", last_error);
+    }
+}
+
 void luasys_add_module_function(const char *module,
                                 const char *name,
                                 const lua_CFunction func) {
@@ -377,7 +427,25 @@ int luasys_init() {
     _G.L = luaL_newstate();
     CE_ASSERT(LOG_WHERE, _G.L != NULL);
 
+    _G.type_id = stringid64_from_string("lua");
+
     luaL_openlibs(_G.L);
+
+    lua_getfield(_G.L, LUA_GLOBALSINDEX, "package");
+    lua_getfield(_G.L, -1, "loaders");
+    lua_remove(_G.L, -2);
+
+    int num_loaders = 0;
+    lua_pushnil(_G.L);
+    while (lua_next(_G.L, -2) != 0) {
+        lua_pop(_G.L, 1);
+        num_loaders++;
+    }
+
+    lua_pushinteger(_G.L, num_loaders + 1);
+    lua_pushcfunction(_G.L, require);
+    lua_rawset(_G.L, -3);
+    lua_pop(_G.L, 1);
 
     _register_all_api();
 
@@ -399,4 +467,52 @@ void luasys_shutdown() {
 
 const struct game_callbacks *luasys_get_game_callbacks() {
     return &_GameCallbacks;
+}
+
+void luasys_execute_boot_script(stringid64_t name) {
+    luasys_execute_resource(name);
+}
+
+void luasys_call_global(const char *func, const char *args, ...) {
+    lua_State *_state = _G.L;
+
+    uint32_t argc = 0;
+
+    //lua_pushcfunction(L, error_handler);
+    lua_getglobal(_state, func);
+
+    if (args != NULL) {
+        va_list vl;
+        va_start(vl, args);
+
+        const char *it = args;
+        while (*it != '\0') {
+            switch (*it) {
+                case 'i':
+                    luasys_push_int(_state, va_arg(vl, i32));
+                    break;
+
+//                case 'u':
+//                    stack.push_uint32(va_arg(vl, uint32_t));
+//                    break;
+
+                case 'f':
+                    luasys_push_float(_state, va_arg(vl, double));
+                    break;
+            }
+
+            ++argc;
+            ++it;
+        }
+
+        va_end(vl);
+    }
+
+    if (lua_pcall(_G.L, argc, 0, 0)) {
+        const char *last_error = lua_tostring(_G.L, -1);
+        lua_pop(_G.L, 1);
+        log_error(LOG_WHERE, "%s", last_error);
+    }
+
+    lua_pop(_state, -1);
 }

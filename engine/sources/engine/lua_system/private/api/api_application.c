@@ -1,10 +1,9 @@
+#include <engine/application/application.h>
 #include "engine/lua_system/lua_system.h"
 
 #define API_NAME "Application"
 
 static int _application_quit(lua_State *l) {
-    void application_quit();
-
     application_quit();
     return 0;
 }

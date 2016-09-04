@@ -8,6 +8,7 @@
 #include <celib/window/window.h>
 #include <celib/stringid/stringid.h>
 #include <engine/application/application.h>
+#include <engine/config_system/config_system.h>
 
 #include "celib/log/log.h"
 #include "celib/containers/hash.h"
@@ -28,6 +29,8 @@
 static struct G {
     const struct game_callbacks *game;
     window_t main_window;
+    config_var_t cv_boot_pkg;
+    config_var_t cv_boot_script;
     int is_running;
     int init_error;
     float dt;
@@ -65,6 +68,9 @@ int application_init(int argc, char **argv) {
     log_debug(LOG_WHERE, "Init (global size: %lu)", sizeof(struct G));
 
     memsys_init(4 * 1024 * 1024);
+
+    _G.cv_boot_pkg = config_new_string("application.boot_pkg", "Boot package", "boot");
+    _G.cv_boot_script = config_new_string("application.boot_scrpt", "Boot script", "lua/boot");
 
     for (int i = 0; i < _SYSTEMS_SIZE; ++i) {
         if (!_SYSTEMS[i].init()) {
@@ -135,25 +141,6 @@ static void _dump_event() {
 }
 
 
-static void _task1(void *d) {
-    if (keyboard_button_state(keyboard_button_index("q"))) {
-        application_quit();
-    }
-
-    if (mouse_button_state(mouse_button_index("left"))) {
-        vec2f_t pos = {0};
-        mouse_axis(mouse_axis_index("absolute"), pos);
-
-        log_info("sdadsad", "time %f", _G.dt);
-
-        if (pos[0] != 0.0f) {
-            //log_info("sdadsad", "pos %f, %f", pos[0], pos[1]);
-        }
-    }
-
-    //usleep(1 * 1000);
-}
-
 static void _input_task(void *d) {
     keyboard_process();
     mouse_process();
@@ -173,16 +160,31 @@ static void _game_render_task(void *d) {
     _G.game->render();
 }
 
+static void _boot() {
+    stringid64_t boot_pkg = stringid64_from_string(config_get_string(_G.cv_boot_pkg));
+    stringid64_t pkg = stringid64_from_string("package");
+
+    resource_load_now(pkg, &boot_pkg, 1);
+    package_load(boot_pkg);
+    package_flush(boot_pkg);
+
+    stringid64_t boot_script = stringid64_from_string(config_get_string(_G.cv_boot_script));
+    luasys_execute_boot_script(boot_script);
+}
+
+static void _boot_unload() {
+    stringid64_t boot_pkg = stringid64_from_string(config_get_string(_G.cv_boot_pkg));
+    stringid64_t pkg = stringid64_from_string("package");
+
+    package_unload(boot_pkg);
+    resource_unload(pkg, &boot_pkg, 1);
+}
 
 void application_start() {
     resource_set_autoload(1);
     resource_compiler_compile_all();
 
-    stringid64_t lua_boot = stringid64_from_string("boot");
-    package_load(lua_boot);
-    package_flush(lua_boot);
-    package_unload(lua_boot);
-    resource_unload(stringid64_from_string("package"), &lua_boot, 1);
+    _boot();
 
     _G.main_window = window_new(
             "Cetech",
@@ -256,19 +258,7 @@ void application_start() {
                 TASK_AFFINITY_MAIN
         );
 
-        task_t task = taskmanager_add_begin(
-                "task1",
-                _task1,
-                NULL,
-                0,
-                frame_task,
-                task_null,
-                TASK_PRIORITY_HIGH,
-                TASK_AFFINITY_NONE
-        );
-
         const task_t tasks[] = {
-                task,
                 input_task,
                 consolesrv_task,
                 game_render,
@@ -278,12 +268,13 @@ void application_start() {
 
         taskmanager_add_end(tasks, CE_ARRAY_LEN(tasks));
 
-        taskmanager_wait(task);
+        taskmanager_wait(frame_task);
         window_update(_G.main_window);
     }
 
     _G.game->shutdown();
 
+    _boot_unload();
 }
 
 
