@@ -4,7 +4,6 @@
 
 #include <stdio.h>
 #include <include/mpack/mpack.h>
-#include <engine/task_manager/task_manager.h>
 
 #include "include/nanomsg/nn.h"
 #include "include/nanomsg/reqrep.h"
@@ -171,7 +170,7 @@ void consolesrv_update() {
     while (--max_iteration) {
         bytes = nn_recv(_G.rpc_socket, &buf, NN_MSG, NN_DONTWAIT);
 
-        if( bytes <= 0) {
+        if (bytes <= 0) {
             break;
         }
 

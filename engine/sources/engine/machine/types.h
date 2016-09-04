@@ -21,5 +21,4 @@ enum event {
 };
 
 
-
 #endif //CETECH_MACHINE_TYPES_H

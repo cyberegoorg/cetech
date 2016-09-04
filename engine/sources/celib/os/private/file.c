@@ -1,13 +1,10 @@
 #include <string.h>
 
 #include "celib/memory/memory.h"
-#include "celib/string/string.h"
 #include "celib/containers/array.h"
 #include <dirent.h>
 #include <sys/stat.h>
 #include <errno.h>
-#include <time.h>
-#include <sys/stat.h>
 
 time_t os_file_mtime(const char *path) {
     struct stat st;

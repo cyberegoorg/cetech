@@ -259,7 +259,8 @@ void resource_load(void **loaded_data, stringid64_t type, stringid64_t *names, s
 
         char filename[1024] = {0};
         resource_compiler_get_filename(filename, CE_ARRAY_LEN(filename), type, names[i]);
-        log_debug("resource_manager", "Loading resource %s from %s", filename, filesystem_get_root_dir(root_name));
+        log_debug("resource_manager", "Loading resource %s from %s/%s", filename, filesystem_get_root_dir(root_name),
+                  build_name);
 
         struct vio *resource_file = filesystem_open(root_name, build_name, VIO_OPEN_READ);
 

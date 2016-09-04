@@ -5,7 +5,6 @@
 #include <celib/os/path.h>
 #include <engine/memory_system/memory_system.h>
 #include "celib/os/fs.h"
-#include "celib/containers/array.h"
 #include "celib/string/string.h"
 
 #include "celib/os/vio.h"

@@ -2,7 +2,6 @@
 
 #include <celib/memory/memory.h>
 #include <celib/string/string.h>
-#include <dirent.h>
 #include <stdio.h>
 #include <celib/containers/array.h>
 

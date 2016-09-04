@@ -5,7 +5,6 @@
 #include <stdlib.h>
 #include <memory.h>
 #include <celib/os/object.h>
-#include "engine/machine/machine.h"
 #include "celib/string/string.h"
 
 #include "engine/plugin_system/plugin_system.h"
