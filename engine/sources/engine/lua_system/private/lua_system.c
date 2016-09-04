@@ -9,6 +9,7 @@
 #include <celib/memory/memory.h>
 #include <engine/resource_manager/resource_manager.h>
 #include <engine/memory_system/memory_system.h>
+#include <engine/application/application.h>
 #include "celib/errors/errors.h"
 
 #include "engine/lua_system/lua_system.h"
@@ -41,6 +42,11 @@ static struct G {
 // Private
 //==============================================================================
 
+
+//==============================================================================
+// Lua resource
+//==============================================================================
+
 void *lua_resource_loader(struct vio *input, struct allocator *allocator) {
     const i64 size = vio_size(input);
     char *data = CE_ALLOCATE(allocator, char, size);
@@ -71,6 +77,33 @@ static const resource_callbacks_t lua_resource_callback = {
         .online =lua_resource_online,
         .offline =lua_resource_offline,
         .reloader = lua_resource_reloader
+};
+
+//==============================================================================
+// Game
+//==============================================================================
+
+
+int _game_init_clb() {
+    return 1;
+}
+
+void _game_shutdown_clb() {
+
+}
+
+void _game_update_clb(float dt) {
+}
+
+void _game_render_clb() {
+
+}
+
+static const struct game_callbacks _GameCallbacks = {
+        .init = _game_init_clb,
+        .shutdown = _game_shutdown_clb,
+        .update = _game_update_clb,
+        .render = _game_render_clb
 };
 
 static void _register_all_api() {
@@ -362,4 +395,8 @@ void luasys_shutdown() {
     log_debug(LOG_WHERE, "Shutdown");
 
     lua_close(_G.L);
+}
+
+const struct game_callbacks *luasys_get_game_callbacks() {
+    return &_GameCallbacks;
 }

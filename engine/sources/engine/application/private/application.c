@@ -7,6 +7,7 @@
 #include <celib/window/types.h>
 #include <celib/window/window.h>
 #include <celib/stringid/stringid.h>
+#include <engine/application/application.h>
 
 #include "celib/log/log.h"
 #include "celib/containers/hash.h"
@@ -25,6 +26,7 @@
 #define _G ApplicationGlobals
 
 static struct G {
+    const struct game_callbacks *game;
     window_t main_window;
     int is_running;
     int init_error;
@@ -161,6 +163,17 @@ static void _consolesrv_task(void *d) {
     consolesrv_update();
 }
 
+static void _game_update_task(void *d) {
+    float *dt = d;
+
+    _G.game->update(*dt);
+}
+
+static void _game_render_task(void *d) {
+    _G.game->render();
+}
+
+
 void application_start() {
     resource_set_autoload(1);
     resource_compiler_compile_all();
@@ -179,8 +192,15 @@ void application_start() {
             WINDOW_NOFLAG
     );
 
-    _G.is_running = 1;
     uint32_t last_tick = os_get_ticks();
+    _G.game = luasys_get_game_callbacks();
+
+    if (!_G.game->init()) {
+        log_error(LOG_WHERE, "Could not init game.");
+        return;
+    };
+
+    _G.is_running = 1;
     while (_G.is_running) {
         uint32_t now_ticks = os_get_ticks();
         float dt = (now_ticks - last_tick) * 0.001f;
@@ -214,6 +234,28 @@ void application_start() {
                 TASK_AFFINITY_MAIN
         );
 
+        task_t game_update = taskmanager_add_begin(
+                "game_update",
+                _game_update_task,
+                &dt,
+                sizeof(float *),
+                input_task,
+                frame_task,
+                TASK_PRIORITY_HIGH,
+                TASK_AFFINITY_MAIN
+        );
+
+        task_t game_render = taskmanager_add_begin(
+                "game_render",
+                _game_render_task,
+                NULL,
+                0,
+                game_update,
+                frame_task,
+                TASK_PRIORITY_HIGH,
+                TASK_AFFINITY_MAIN
+        );
+
         task_t task = taskmanager_add_begin(
                 "task1",
                 _task1,
@@ -225,12 +267,23 @@ void application_start() {
                 TASK_AFFINITY_NONE
         );
 
-        const task_t tasks[] = {task, input_task, consolesrv_task, frame_task};
+        const task_t tasks[] = {
+                task,
+                input_task,
+                consolesrv_task,
+                game_render,
+                game_update,
+                frame_task
+        };
+
         taskmanager_add_end(tasks, CE_ARRAY_LEN(tasks));
 
         taskmanager_wait(task);
         window_update(_G.main_window);
     }
+
+    _G.game->shutdown();
+
 }
 
 

@@ -1,6 +1,21 @@
 #ifndef CETECH_APPLICATION_H
 #define CETECH_APPLICATION_H
 
+typedef int(*game_init_clb_t)();
+
+typedef void(*game_shutdown_clb_t)();
+
+typedef void(*game_update_clb_t)(float dt);
+
+typedef void(*game_render_clb_t)();
+
+struct game_callbacks {
+    game_init_clb_t init;
+    game_shutdown_clb_t shutdown;
+    game_update_clb_t update;
+    game_render_clb_t render;
+};
+
 //==============================================================================
 // Interface
 //==============================================================================

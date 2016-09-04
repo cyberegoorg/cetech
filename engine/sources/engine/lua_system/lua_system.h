@@ -53,4 +53,6 @@ int luasys_execute_string(const char *str);
 
 void luasys_add_module_function(const char *module, const char *name, const lua_CFunction func);
 
+const struct game_callbacks *luasys_get_game_callbacks();
+
 #endif //CETECH_LUA_API_H
