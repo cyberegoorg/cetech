@@ -11,7 +11,7 @@ Game = Game or {}
 local quit_btn = Keyboard.button_index 'q'
 
 function Game:init()
-    --    Log.info("boot.lua", "init {0}", Application.GetPlatform())
+    Log.info("boot.lua", "Platform %s", Application.get_platform())
 
     Log.info("boot.lua", "info")
     Log.warning("boot.lua", "warn")
@@ -23,14 +23,14 @@ function Game:init()
 
     --self.unit = Unit.Spawn(self.world, "unit1");
     --    self.level = World.LoadLevel(self.world, "level1");
---    self.level = World.LoadLevel(self.world, "level1",
---                 Vec3f.make(2, 5.0, 0.0),
---                 Quatf.Identity, Vec3f.Unit);
+    --    self.level = World.LoadLevel(self.world, "level1",
+    --                 Vec3f.make(2, 5.0, 0.0),
+    --                 Quatf.Identity, Vec3f.Unit);
 
---    self.level_unit = World.LevelUnit(self.world, self.level)
+    --    self.level_unit = World.LevelUnit(self.world, self.level)
 
---    self.unit2 = World.UnitByName(self.world, self.level, "box2")
---    self.unit = self.unit1
+    --    self.unit2 = World.UnitByName(self.world, self.level, "box2")
+    --    self.unit = self.unit1
 
     --self.camera_unit = Unit.Spawn(self.world, "camera");
     --self.camera = Camera.GetCamera(self.world, self.camera_unit);
@@ -55,8 +55,8 @@ end
 
 function Game:update(dt)
     if Keyboard.button_pressed(Keyboard.button_index('r')) then
-        Application.RecompileAll()
-        Application.ReloadAll()
+        ResourceCompilator.compile_all()
+        -- Application.ReloadAll()
     end
 
     if Keyboard.button_pressed(quit_btn) then
@@ -64,31 +64,31 @@ function Game:update(dt)
     end
 
     if Keyboard.button_pressed(Keyboard.button_index('f9')) then
-      self.debug = not self.debug;
-      Renderer.Setdebug(self.debug)
+        self.debug = not self.debug;
+        Renderer.Setdebug(self.debug)
     end
 
     if Keyboard.button_pressed(Keyboard.button_index('f8')) then
-      self.switch_unit = not self.switch_unit
-      if self.switch_unit then
-        self.unit = self.level_unit
-      else
-        self.unit = self.unit1
-      end
+        self.switch_unit = not self.switch_unit
+        if self.switch_unit then
+            self.unit = self.level_unit
+        else
+            self.unit = self.unit1
+        end
     end
 
     if Keyboard.button_pressed(Keyboard.button_index('f10')) then
-      self.capture = not self.capture;
+        self.capture = not self.capture;
 
-      if self.capture then
-        RenderSystem.BeginCapture()
-      else
-        RenderSystem.EndCapture()
-      end
+        if self.capture then
+            RenderSystem.BeginCapture()
+        else
+            RenderSystem.EndCapture()
+        end
     end
 
     if Keyboard.button_pressed(Keyboard.button_index('f11')) then
-      RenderSystem.SaveScreenShot("screenshot");
+        RenderSystem.SaveScreenShot("screenshot");
     end
 
     --    local transform = Transform.GetTransform(self.world, self.camera_unit)

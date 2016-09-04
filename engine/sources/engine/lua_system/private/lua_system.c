@@ -142,6 +142,7 @@ static void _register_all_api() {
     REGISTER_LUA_API(keyboard);
     REGISTER_LUA_API(mouse);
     REGISTER_LUA_API(application);
+    REGISTER_LUA_API(resource_compilator);
 }
 
 static int _reload_plugin(lua_State *l) {
