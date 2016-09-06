@@ -13,6 +13,7 @@ local debug_btn = Keyboard.button_index 'f9'
 local reload_btn = Keyboard.button_index 'r'
 local capture_btn = Keyboard.button_index 'f10'
 local screenshot_btn = Keyboard.button_index 'f11'
+local log_test_btn = Keyboard.button_index 'l'
 
 function Game:init()
     Log.info("boot.lua", "Platform %s", Application.get_platform())
@@ -94,6 +95,14 @@ function Game:update(dt)
             self.unit = self.unit1
         end
     end
+
+    if Keyboard.button_pressed(log_test_btn) then
+        Log.info("game", "INFO TEST")
+        Log.warning("game", "WARN TEST")
+        Log.error("game", "ERROR TEST")
+        Log.debug("game", "DEBUG TEST")
+    end
+
 
     --    Log.info("dddd", "dddddd")
     --    local transform = Transform.GetTransform(self.world, self.camera_unit)
