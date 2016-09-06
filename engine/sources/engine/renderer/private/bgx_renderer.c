@@ -1,6 +1,14 @@
+//==============================================================================
+// includes
+//==============================================================================
+
 #include "../renderer.h"
 #include "bgfx/c99/bgfxplatform.h"
 #include "celib/window/window.h"
+
+//==============================================================================
+// GLobals
+//==============================================================================
 
 #define RendererGlobals _G
 struct G {
@@ -11,18 +19,26 @@ struct G {
     int need_reset;
 } _G = {0};
 
+
+//==============================================================================
+// Private
+//==============================================================================
+
+static u32 _get_reset_flags() {
+    return (_G.capture ? BGFX_RESET_CAPTURE : 0) |
+           (_G.vsync ? BGFX_RESET_VSYNC : 0);
+}
+
+//==============================================================================
+// Interface
+//==============================================================================
+
 int renderer_init() {
     return 1;
 }
 
 void renderer_shutdown() {
     bgfx_shutdown();
-}
-
-
-u32 _get_reset_flags() {
-    return (_G.capture ? BGFX_RESET_CAPTURE : 0) |
-           (_G.vsync ? BGFX_RESET_VSYNC : 0);
 }
 
 void renderer_create(window_t window) {
@@ -46,7 +62,6 @@ void renderer_set_debug(int debug) {
         bgfx_set_debug(BGFX_DEBUG_NONE);
     }
 }
-
 
 void renderer_render_world(world_t world, camera_t camera, viewport_t viewport) {
     if (_G.need_reset) {
