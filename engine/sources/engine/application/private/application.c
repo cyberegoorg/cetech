@@ -18,6 +18,9 @@
 #include "engine/console_server/console_server.h"
 #include "engine/task_manager/task_manager.h"
 
+#include "bgfx/c99/bgfx.h"
+#include "bgfx/c99/bgfxplatform.h"
+
 #define LOG_WHERE "application"
 
 //==============================================================================
@@ -195,6 +198,7 @@ void application_start() {
             800, 600,
             WINDOW_NOFLAG
     );
+    renderer_create(_G.main_window);
 
     uint32_t last_tick = os_get_ticks();
     _G.game = luasys_get_game_callbacks();
@@ -271,6 +275,8 @@ void application_start() {
         taskmanager_add_end(tasks, CE_ARRAY_LEN(tasks));
 
         taskmanager_wait(frame_task);
+
+
         window_update(_G.main_window);
     }
 

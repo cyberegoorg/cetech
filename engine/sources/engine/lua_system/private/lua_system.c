@@ -156,6 +156,7 @@ static void _register_all_api() {
     REGISTER_LUA_API(application);
     REGISTER_LUA_API(resource_compilator);
     REGISTER_LUA_API(resource_manager);
+    REGISTER_LUA_API(renderer);
 }
 
 static int _reload_plugin(lua_State *l) {
@@ -379,7 +380,7 @@ void luasys_push_string(lua_State *_L, const char *s) {
 
 
 int luasys_to_bool(lua_State *_L, int i) {
-    return lua_tointeger(_L, i) == 1;
+    return lua_toboolean(_L, i);
 }
 
 int luasys_to_int(lua_State *_L, int i) {

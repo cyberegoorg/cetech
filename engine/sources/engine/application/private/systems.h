@@ -12,6 +12,7 @@
 #include "engine/machine/machine.h"
 #include "engine/resource_manager/resource_manager.h"
 #include "engine/filesystem/filesystem.h"
+#include "engine/renderer/renderer.h"
 
 #define _SYSTEMS_SIZE sizeof(_SYSTEMS)/sizeof(_SYSTEMS[0])
 #define _REGISTER_SYSTEM(n) {.name= #n, .init=n##_init, .shutdown=n##_shutdown}
@@ -32,7 +33,8 @@ static const struct {
         _REGISTER_SYSTEM(consolesrv),
         _REGISTER_SYSTEM(keyboard),
         _REGISTER_SYSTEM(mouse),
-        _REGISTER_SYSTEM(luasys)
+        _REGISTER_SYSTEM(luasys),
+        _REGISTER_SYSTEM(renderer)
 };
 
 #endif //CETECH_SYSTEMS_H

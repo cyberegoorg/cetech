@@ -69,7 +69,7 @@ function Game:update(dt)
 
     if Keyboard.button_pressed(debug_btn) then
         self.debug = not self.debug;
-        Renderer.Setdebug(self.debug)
+        Renderer.set_debug(self.debug)
     end
 
     if Keyboard.button_pressed(capture_btn) then
@@ -153,7 +153,7 @@ function Game:update(dt)
 end
 
 function Game:render()
-    -- Renderer.RenderWorld(self.world, self.camera, self.viewport)
+    Renderer.render_world(self.world, self.camera, self.viewport)
 end
 
 function foo(value)

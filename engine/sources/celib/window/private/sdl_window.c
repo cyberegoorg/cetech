@@ -98,6 +98,17 @@ void window_resize(window_t w, uint32_t width, uint32_t height) {
     SDL_SetWindowSize(w.w, width, height);
 }
 
+void window_get_size(window_t window, uint32_t *width, uint32_t *height) {
+    int w, h;
+    w = h = 0;
+
+    SDL_GetWindowSize(window.w, &w, &h);
+
+    *width = (uint32_t) w;
+    *height = (uint32_t) h;
+}
+
+
 void *window_native_window_ptr(window_t w) {
     SDL_SysWMinfo wmi;
 

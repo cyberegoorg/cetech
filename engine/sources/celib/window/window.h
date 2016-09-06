@@ -1,6 +1,9 @@
 #ifndef CETECH_WINDOW_H
 #define CETECH_WINDOW_H
 
+#include "./types.h"
+#include "../types.h"
+
 //==============================================================================
 // Window interface
 //==============================================================================
@@ -26,6 +29,8 @@ void window_update(window_t w);
 void window_resize(window_t w,
                    uint32_t width,
                    uint32_t height);
+
+void window_get_size(window_t w, uint32_t *width, uint32_t *height);
 
 void *window_native_window_ptr(window_t w);
 
