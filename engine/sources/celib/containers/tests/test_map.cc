@@ -8,13 +8,13 @@
 
 extern "C" {
 #include "celib/memory/memory.h"
-#include "../hash.h"
+#include "../map.h"
 }
 
-SCENARIO( "Hash can store items", "[hashmap]" ) {
+SCENARIO( "Map can store items", "[hashmap]" ) {
     struct allocator* allocator = malloc_allocator_create();
 
-    GIVEN( "A empty array" ) {
+    GIVEN( "A empty map" ) {
         MAP_T(int) h;
         map_init_int(&h, allocator);
 

@@ -14,7 +14,7 @@
 #include <celib/os/vio.h>
 #include <engine/resource_compiler/resource_compiler.h>
 #include "engine/memory_system/memory_system.h"
-#include "celib/containers/hash.h"
+#include "celib/containers/map.h"
 
 //==============================================================================
 // Struct and types

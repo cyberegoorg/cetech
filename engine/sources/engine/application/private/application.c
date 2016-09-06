@@ -11,7 +11,7 @@
 #include <engine/config_system/config_system.h>
 
 #include "celib/log/log.h"
-#include "celib/containers/hash.h"
+#include "celib/containers/map.h"
 
 #include "engine/memory_system/memory_system.h"
 #include "engine/input/input.h"

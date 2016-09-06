@@ -63,7 +63,7 @@ set(SOURCE_FILES
         # CELIB: Containers
         ########################################################################
         engine/sources/celib/containers/tests/test_array.cc
-        engine/sources/celib/containers/tests/test_hash.cc
+        engine/sources/celib/containers/tests/test_map.cc
 
         ########################################################################
         # CELIB: Memory
