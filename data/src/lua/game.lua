@@ -9,6 +9,10 @@ require 'core/fpscamera'
 Game = Game or {}
 
 local quit_btn = Keyboard.button_index 'q'
+local debug_btn = Keyboard.button_index 'f9'
+local reload_btn = Keyboard.button_index 'r'
+local capture_btn = Keyboard.button_index 'f10'
+local screenshot_btn = Keyboard.button_index 'f11'
 
 function Game:init()
     Log.info("boot.lua", "Platform %s", Application.get_platform())
@@ -54,7 +58,7 @@ function rotator(world, node, delta_rot)
 end
 
 function Game:update(dt)
-    if Keyboard.button_pressed(Keyboard.button_index('r')) then
+    if Keyboard.button_pressed(reload_btn) then
         ResourceCompilator.compile_all()
         ResourceManager.reload_all()
     end
@@ -63,21 +67,12 @@ function Game:update(dt)
         Application.quit()
     end
 
-    if Keyboard.button_pressed(Keyboard.button_index('f9')) then
+    if Keyboard.button_pressed(debug_btn) then
         self.debug = not self.debug;
         Renderer.Setdebug(self.debug)
     end
 
-    if Keyboard.button_pressed(Keyboard.button_index('f8')) then
-        self.switch_unit = not self.switch_unit
-        if self.switch_unit then
-            self.unit = self.level_unit
-        else
-            self.unit = self.unit1
-        end
-    end
-
-    if Keyboard.button_pressed(Keyboard.button_index('f10')) then
+    if Keyboard.button_pressed(capture_btn) then
         self.capture = not self.capture;
 
         if self.capture then
@@ -87,8 +82,17 @@ function Game:update(dt)
         end
     end
 
-    if Keyboard.button_pressed(Keyboard.button_index('f11')) then
+    if Keyboard.button_pressed(screenshot_btn) then
         RenderSystem.SaveScreenShot("screenshot");
+    end
+
+    if Keyboard.button_pressed(Keyboard.button_index('f8')) then
+        self.switch_unit = not self.switch_unit
+        if self.switch_unit then
+            self.unit = self.level_unit
+        else
+            self.unit = self.unit1
+        end
     end
 
     --    Log.info("dddd", "dddddd")
