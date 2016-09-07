@@ -9,6 +9,7 @@
 #include <celib/stringid/stringid.h>
 #include <engine/application/application.h>
 #include <engine/config_system/config_system.h>
+#include <celib/os/process.h>
 
 #include "celib/log/log.h"
 #include "celib/containers/map.h"
@@ -175,6 +176,7 @@ static void _boot() {
     luasys_execute_boot_script(boot_script);
 }
 
+
 static void _boot_unload() {
     stringid64_t boot_pkg = stringid64_from_string(config_get_string(_G.cv_boot_pkg));
     stringid64_t pkg = stringid64_from_string("package");
@@ -188,8 +190,6 @@ void application_start() {
     resource_compiler_compile_all();
 
     _boot();
-
-    //resource_reload_all();
 
     _G.main_window = window_new(
             "Cetech",

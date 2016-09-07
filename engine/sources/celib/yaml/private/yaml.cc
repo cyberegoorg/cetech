@@ -40,7 +40,7 @@ static size_t new_node(yaml_handler_s *handler, const YAML::Node &node) {
     CE_ASSERT_MSG("yaml", false, "Node pool overflow");
 }
 
-extern "C" yaml_node_t yaml_load_str(const char *str, yaml_handler_t **handler) {
+extern "C" yaml_node_t yaml_load_str(const char *str, yaml_handler_t *handler) {
     yaml_handler_s *nh = new yaml_handler_s;
 
     *handler = (yaml_handler_t *) nh;

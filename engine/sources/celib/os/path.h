@@ -17,6 +17,10 @@ void os_path_basename(const char *path,
                       char *out,
                       size_t size);
 
+void os_path_dir(char *out,
+                 size_t size,
+                 const char *path);
+
 //! Get file extension
 //! \param path Path
 //! \return file extension

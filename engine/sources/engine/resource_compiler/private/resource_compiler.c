@@ -177,8 +177,7 @@ int resource_compiler_init() {
 
     _G.cv_source_dir = config_new_string("resource_compiler.source_dir", "Resource source dir", "data/src");
     _G.cv_core_dir = config_new_string("resource_compiler.core_dir", "Resource core source dir", "core");
-    _G.cv_build_dir = config_new_string("resource_compiler.build_dir", "Resource buid dir", "data/build");
-
+    _G.cv_build_dir = config_new_string("resource_compiler.build_dir", "Resource build dir", "data/build");
 
     const char *build_dir = config_get_string(_G.cv_build_dir);
     char build_dir_full[1024] = {0};
@@ -186,6 +185,10 @@ int resource_compiler_init() {
 
     os_dir_make_path(build_dir_full);
     builddb_init_db(build_dir_full);
+
+    char tmp_dir_full[1024] = {0};
+    os_path_join(tmp_dir_full, CE_ARRAY_LEN(tmp_dir_full), build_dir_full, "tmp");
+    os_dir_make_path(tmp_dir_full);
 
     return 1;
 }
@@ -235,4 +238,20 @@ int resource_compiler_get_filename(char *filename, size_t max_ken, stringid64_t 
     char build_name[33] = {0};
     resource_type_name_string(build_name, CE_ARRAY_LEN(build_name), type, name);
     return builddb_get_filename_by_hash(filename, max_ken, build_name);
+}
+
+const char *resource_compiler_get_source_dir() {
+    return config_get_string(_G.cv_source_dir);
+}
+
+int resource_compiler_get_build_dir(char *build_dir, size_t max_len, const char *platform) {
+    const char *build_dir_str = config_get_string(_G.cv_build_dir);
+    return os_path_join(build_dir, max_len, build_dir_str, platform);
+}
+
+int resource_compiler_get_tmp_dir(char *tmp_dir, size_t max_len, const char *platform) {
+    char build_dir[1024] = {0};
+    resource_compiler_get_build_dir(build_dir, CE_ARRAY_LEN(build_dir), platform);
+
+    return os_path_join(tmp_dir, max_len, build_dir, "tmp");
 }

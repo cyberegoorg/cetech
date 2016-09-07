@@ -52,7 +52,7 @@ enum yaml_node_type {
 // Interface
 //==============================================================================
 
-yaml_node_t yaml_load_str(const char *str, yaml_handler_t **handler);
+yaml_node_t yaml_load_str(const char *str, yaml_handler_t *handler);
 
 yaml_node_t yaml_get_node(yaml_handler_t handler,
                           yaml_node_t node_idx,

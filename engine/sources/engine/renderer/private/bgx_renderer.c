@@ -2,9 +2,13 @@
 // includes
 //==============================================================================
 
+#include <celib/stringid/types.h>
+#include <celib/stringid/stringid.h>
+#include <engine/resource_compiler/resource_compiler.h>
 #include "../renderer.h"
 #include "bgfx/c99/bgfxplatform.h"
 #include "celib/window/window.h"
+#include "bgfx_texture_resource.h"
 
 //==============================================================================
 // GLobals
@@ -12,6 +16,7 @@
 
 #define RendererGlobals _G
 struct G {
+    stringid64_t texture_type;
     u32 size_width;
     u32 size_height;
     int capture;
@@ -34,11 +39,19 @@ static u32 _get_reset_flags() {
 //==============================================================================
 
 int renderer_init() {
+    _G = (struct G) {0};
+
+    _G.texture_type = stringid64_from_string("texture");
+
+    resource_compiler_register(_G.texture_type, _texture_compiler);
+
     return 1;
 }
 
 void renderer_shutdown() {
     bgfx_shutdown();
+
+    _G = (struct G) {0};
 }
 
 void renderer_create(window_t window) {
