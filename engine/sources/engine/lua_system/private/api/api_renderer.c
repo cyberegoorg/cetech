@@ -5,7 +5,9 @@
 #define API_NAME "Renderer"
 
 static int _renderer_render_world(lua_State *l) {
-    renderer_render_world(0, 0, 0);
+    world_t w; // TODO
+
+    renderer_render_world(w, 0, 0);
     return 0;
 }
 

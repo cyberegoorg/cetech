@@ -124,7 +124,7 @@
                                                                                                             \
     static inline void queue_push_##N( QUEUE_T(N) *q, T *items, uint32_t n) {                               \
         if (queue_space_##N(q) < n) {                                                                       \
-            queue_grow_##N(q, ARRAY_SIZE_##N(q) + n);                                                       \
+            queue_grow_##N(q, ARRAY_SIZE(&q->_data) + n);                                                   \
         }                                                                                                   \
                                                                                                             \
         const uint32_t size = ARRAY_SIZE(&q->_data);                                                        \

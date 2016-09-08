@@ -5,6 +5,7 @@
 // Includes
 //==============================================================================
 
+#include "engine/world_system/types.h"
 #include "celib/window/types.h"
 
 
@@ -20,7 +21,6 @@ void renderer_create(window_t window);
 
 void renderer_set_debug(int debug);
 
-typedef int world_t;
 typedef int camera_t;
 typedef int viewport_t;
 
