@@ -13,6 +13,8 @@
 **** Internals
 ***********************************************************************/
 
+#define LOG_WHERE "nanolog_handler"
+
 static const char *_level_to_str[4] = {
         [LOG_INFO] = "info",
         [LOG_WARNING] = "warning",
@@ -36,7 +38,6 @@ void nano_log_handler(enum log_level level,
     size_t size;
     mpack_writer_t writer;
     mpack_writer_init_growable(&writer, &data, &size);
-
     mpack_start_map(&writer, 5);
 
     mpack_write_cstr(&writer, "level");
@@ -56,8 +57,10 @@ void nano_log_handler(enum log_level level,
 
     mpack_finish_map(&writer);
 
-    CE_ASSERT("console_server", mpack_writer_destroy(&writer) == mpack_ok);
+    CE_ASSERT(LOG_WHERE, mpack_writer_destroy(&writer) == mpack_ok);
 
     bytes = nn_send(socket, data, size, 0);
-    CE_ASSERT("console_server", (size_t) bytes == size);
+    CE_ASSERT(LOG_WHERE, (size_t) bytes == size);
+
+    free(data);
 }

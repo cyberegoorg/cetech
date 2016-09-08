@@ -5,9 +5,7 @@
 #include <stdio.h>
 
 #if defined(CETECH_LINUX)
-
-#include <sys/file.h>
-
+//  #include <sys/file.h>
 #endif
 
 #include "celib/log/log.h"
@@ -84,15 +82,15 @@ void log_stdout_handler(enum log_level level,
     const char *time_str = _time_to_str(gmtm);
 
 #if defined(CETECH_LINUX)
-    flock(out->_fileno, LOCK_EX);
+    // flock(out->_fileno, LOCK_EX);
 #endif
 
     fprintf(out, _level_format[level], _level_to_str[level],
             where, time_str, worker_id, msg);
 
-    fflush(out);
+    //fflush(out);
 
 #if defined(CETECH_LINUX)
-    flock(out->_fileno, LOCK_UN);
+    //   flock(out->_fileno, LOCK_UN);
 #endif
 }
