@@ -15,9 +15,9 @@
 
 typedef void *(*resource_loader_t)(struct vio *input, struct allocator *allocator);
 
-typedef void  (*resource_online_t)(void *data);
+typedef void  (*resource_online_t)(stringid64_t name, void *data);
 
-typedef void  (*resource_offline_t)(void *data);
+typedef void  (*resource_offline_t)(stringid64_t name, void *data);
 
 typedef void  (*resource_unloader_t)(void *new_data, struct allocator *allocator);
 

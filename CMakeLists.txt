@@ -85,6 +85,7 @@ set(SOURCE_FILES
         #######################################################################
         engine/sources/celib/log/private/stdout_handler.c
         engine/sources/celib/log/private/nanomsg_handler.c
+        engine/sources/celib/log/private/logdb_handler.c
         engine/sources/celib/log/private/log_system.c
         engine/sources/celib/log/tests/test_log.cc
 
@@ -163,7 +164,8 @@ set(SOURCE_FILES
         engine/sources/engine/resource_manager/private/resource_manager..c
         engine/sources/engine/resource_manager/private/package.c
 
-        engine/sources/engine/renderer/private/bgx_renderer.c)
+        engine/sources/engine/renderer/private/bgx_renderer.c
+        engine/sources/engine/renderer/private/bgfx_texture_resource.c)
 
 ################################################################################
 # Main sources

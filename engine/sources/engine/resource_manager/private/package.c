@@ -77,7 +77,7 @@ int _package_compiler(const char *filename,
     memory_set(source_data, 0, vio_size(source_vio) + 1);
     vio_read(source_vio, source_data, sizeof(char), vio_size(source_vio));
 
-    yaml_handler_t *h;
+    yaml_handler_t h;
     yaml_node_t root = yaml_load_str(source_data, &h);
 
     struct package_compile_data compile_data = {0};

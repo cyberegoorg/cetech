@@ -166,7 +166,7 @@ static void _game_render_task(void *d) {
     _G.game->render();
 }
 
-static void _boot() {
+static void _boot_stage() {
     stringid64_t boot_pkg = stringid64_from_string(config_get_string(_G.cv_boot_pkg));
     stringid64_t pkg = stringid64_from_string("package");
 
@@ -191,7 +191,6 @@ void application_start() {
     resource_set_autoload(1);
     resource_compiler_compile_all();
 
-    _boot();
 
     _G.main_window = window_new(
             "Cetech",
@@ -201,6 +200,8 @@ void application_start() {
             WINDOW_NOFLAG
     );
     renderer_create(_G.main_window);
+
+    _boot_stage();
 
     uint32_t last_tick = os_get_ticks();
     _G.game = luasys_get_game_callbacks();

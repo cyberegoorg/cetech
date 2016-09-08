@@ -39,7 +39,6 @@ const char *os_path_extension(const char *path) {
 i64 os_path_join(char *result, u64 maxlen, const char *base_path, const char *path) {
     return snprintf(result, maxlen, "%s" DIR_DELIM "%s", base_path, path);
 }
-
 void os_path_dir(char *out,
                  size_t size,
                  const char *path) {

@@ -79,9 +79,9 @@ yaml_node_foreach_dict(yaml_handler_t handler, yaml_node_t node_idx, yaml_foreac
 
 #define YAML_NODE_AS_DEF(type) type yaml_node_as_##type(yaml_handler_t handler, yaml_node_t node_idx)
 
-YAML_NODE_AS_DEF(int);
+int yaml_node_as_bool(yaml_handler_t handler, yaml_node_t node_idx);
 
-YAML_NODE_AS_DEF(bool);
+YAML_NODE_AS_DEF(int);
 
 YAML_NODE_AS_DEF(float);
 

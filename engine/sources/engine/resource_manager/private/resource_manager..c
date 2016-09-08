@@ -88,10 +88,10 @@ void package_resource_unloader(void *new_data, struct allocator *allocator) {
     CE_DEALLOCATE(allocator, new_data);
 }
 
-void package_resource_online(void *data) {
+void package_resource_online(stringid64_t name, void *data) {
 }
 
-void package_resource_offline(void *data) {
+void package_resource_offline(stringid64_t name, void *data) {
 }
 
 void *package_resource_reloader(stringid64_t name, void *old_data, void *new_data, struct allocator *allocator) {
@@ -192,7 +192,7 @@ void resource_add_loaded(stringid64_t type, stringid64_t *names, void **resource
         if (resource_data[i] == 0) {
             continue;
         }
-        ARRAY_AT(&_G.resource_callbacks, idx).online(resource_data[i]);
+        ARRAY_AT(&_G.resource_callbacks, idx).online(names[i], resource_data[i]);
     }
 }
 
@@ -301,7 +301,7 @@ void resource_unload(stringid64_t type, stringid64_t *names, size_t count) {
             resource_compiler_get_filename(filename, CE_ARRAY_LEN(filename), type, names[i]);
             log_debug("resource_manager", "Unload resource %s ", filename);
 
-            type_clb.offline(item.data);
+            type_clb.offline(names[i], item.data);
             type_clb.unloader(item.data, memsys_main_allocator());
 
             MAP_REMOVE(resource_item_t, resource_map, names[i].id);

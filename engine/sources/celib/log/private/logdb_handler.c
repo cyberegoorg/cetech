@@ -42,24 +42,31 @@ static int _step(sqlite3 *db, sqlite3_stmt *stmt) {
 
 static char _logdb_path[1024] = {0};
 static time_t _session_id = {0};
+static sqlite3 *db[256] = {0};
 
-static sqlite3 *_opendb() {
+static sqlite3 *_opendb(char worker_id) {
+    if (db[worker_id] != 0) {
+        return db[worker_id];
+    }
+
     sqlite3 *_db;
     sqlite3_open_v2(_logdb_path,
                     &_db,
-                    SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE | SQLITE_OPEN_SHAREDCACHE | SQLITE_OPEN_NOMUTEX,
+                    SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE | SQLITE_OPEN_SHAREDCACHE,
                     NULL);
 
     // thanks http://stackoverflow.com/questions/1711631/improve-insert-per-second-performance-of-sqlite
     sqlite3_exec(_db, "PRAGMA synchronous = OFF", NULL, NULL, NULL);
     sqlite3_exec(_db, "PRAGMA journal_mode = MEMORY", NULL, NULL, NULL);
 
+    db[worker_id] = _db;
+
     return _db;
 }
 
 
-static int _do_sql(const char *sql) {
-    sqlite3 *_db = _opendb();
+static int _do_sql(char worker_id, const char *sql) {
+    sqlite3 *_db = _opendb(worker_id);
     sqlite3_stmt *stmt;
     sqlite3_prepare_v2(_db, sql, -1, &stmt, NULL);
 
@@ -75,25 +82,6 @@ static int _do_sql(const char *sql) {
 
     return 0;
 }
-
-static int _do_sql_stmt(const char *sql) {
-    sqlite3 *_db = _opendb();
-    sqlite3_stmt *stmt;
-    sqlite3_prepare_v2(_db, sql, -1, &stmt, NULL);
-
-    if (_step(_db, stmt) != SQLITE_DONE) {
-        goto error;
-    }
-
-    return 1;
-
-    error:
-    sqlite3_finalize(stmt);
-    sqlite3_close_v2(_db);
-
-    return 0;
-}
-
 
 static const char *_level_to_str[4] = {
         [LOG_INFO] = "info",
@@ -106,11 +94,12 @@ void logdb_log(enum log_level level,
                time_t time,
                char worker_id,
                const char *where,
-               const char *msg, void *data) {
+               const char *msg,
+               void *data) {
 
     static const char *sql = "INSERT INTO log VALUES(NULL, ?1, ?2, ?3, ?4, ?5, ?6);";
 
-    sqlite3 *_db = _opendb();
+    sqlite3 *_db = _opendb(worker_id);
     sqlite3_stmt *stmt;
     sqlite3_prepare_v2(_db, sql, -1, &stmt, NULL);
 
@@ -124,16 +113,15 @@ void logdb_log(enum log_level level,
     _step(_db, stmt);
 
     sqlite3_finalize(stmt);
-    sqlite3_close_v2(_db);
+    //sqlite3_closeq_v2(_db);
 }
-
 
 int logdb_init_db(const char *log_dir) {
     os_path_join(_logdb_path, CE_ARRAY_LEN(_logdb_path), log_dir, "log.db");
 
     _session_id = time(NULL);
 
-    if (!_do_sql("CREATE TABLE IF NOT EXISTS log (\n"
+    if (!_do_sql(0, "CREATE TABLE IF NOT EXISTS log (\n"
                          "id         INTEGER PRIMARY KEY    AUTOINCREMENT   NOT NULL,\n"
                          "session_id INTEGER                                NOT NULL,\n"
                          "time       INTEGER                                NOT NULL,\n"

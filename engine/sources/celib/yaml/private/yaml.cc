@@ -26,7 +26,7 @@ struct yaml_handler_s {
 };
 
 static size_t new_node(yaml_handler_s *handler, const YAML::Node &node) {
-    for (size_t i = 0; i < 4096; ++i) {
+    for (size_t i = 1; i < 4096; ++i) {
         if (handler->used[i]) {
             continue;
         }
@@ -50,7 +50,12 @@ extern "C" yaml_node_t yaml_load_str(const char *str, yaml_handler_t *handler) {
 extern "C" size_t yaml_get_node(yaml_handler_t handler, yaml_node_t node_idx, const char *key) {
     yaml_handler_s *nh = (yaml_handler_s *) handler;
 
-    return new_node(nh, nh->nodes[node_idx][key]);
+    auto node = nh->nodes[node_idx][key];
+    if (!node) {
+        return 0;
+    }
+
+    return new_node(nh, node);
 }
 
 
@@ -76,6 +81,7 @@ extern "C" enum yaml_node_type yaml_node_type(yaml_handler_t handler, yaml_node_
 
 extern "C" size_t yaml_node_size(yaml_handler_t handler, yaml_node_t node_idx) {
     yaml_handler_s *nh = (yaml_handler_s *) handler;
+
 
     return nh->nodes[node_idx].size();
 
@@ -109,6 +115,11 @@ extern "C" int yaml_node_as_string(yaml_handler_t handler, yaml_node_t node_idx,
     YAML_EX_SCOPE({ return snprintf(output, max_len, "%s", nh->nodes[node_idx].as<std::string>().c_str()); })
 }
 
+extern "C" int yaml_node_as_bool(yaml_handler_t handler, yaml_node_t node_idx) {
+    yaml_handler_s *nh = (yaml_handler_s *) handler;
+    YAML_EX_SCOPE({ return nh->nodes[node_idx].as<bool>(); })
+}
+
 #define YAML_NODE_AS_DECL(type)\
     extern "C" type yaml_node_as_##type(yaml_handler_t handler, yaml_node_t node_idx) {\
         yaml_handler_s *nh = (yaml_handler_s *) handler;\
@@ -116,6 +127,5 @@ extern "C" int yaml_node_as_string(yaml_handler_t handler, yaml_node_t node_idx,
     }\
 
 YAML_NODE_AS_DECL(int);
-YAML_NODE_AS_DECL(bool);
 YAML_NODE_AS_DECL(float);
 

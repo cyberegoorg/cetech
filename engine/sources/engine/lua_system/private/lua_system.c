@@ -87,10 +87,10 @@ void lua_resource_unloader(void *new_data, struct allocator *allocator) {
     CE_DEALLOCATE(allocator, new_data);
 }
 
-void lua_resource_online(void *data) {
+void lua_resource_online(stringid64_t name, void *data) {
 }
 
-void lua_resource_offline(void *data) {
+void lua_resource_offline(stringid64_t name, void *data) {
 
 }
 

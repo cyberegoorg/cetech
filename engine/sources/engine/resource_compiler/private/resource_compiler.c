@@ -60,7 +60,13 @@ CE_STATIC_ASSERT(sizeof(struct compile_task_data) < 64);
 // Private
 //==============================================================================
 
-void _add_dependency(const char *who_filname, const char *depend_on_filename) {
+void _add_dependency(const char *who_filename, const char *depend_on_filename) {
+    builddb_set_file_depend(who_filename, depend_on_filename);
+
+    char path[1024] = {0};
+    os_path_join(path, CE_ARRAY_LEN(path), resource_compiler_get_source_dir(), depend_on_filename);
+
+    builddb_set_file(depend_on_filename, os_file_mtime(path));
 }
 
 static struct compilator_api _compilator_api = {
@@ -224,9 +230,12 @@ void resource_compiler_compile_all() {
     struct array_pchar files;
     array_init_pchar(&files, memsys_main_scratch_allocator());
 
-    _compile_dir(root_task, &files, source_dir, build_dir_full);
-    array_resize_pchar(&files, 0);
-    _compile_dir(root_task, &files, core_dir, build_dir_full);
+
+    const char *dirs[] = {source_dir, core_dir};
+    for (int i = 0; i < CE_ARRAY_LEN(dirs); ++i) {
+        array_resize_pchar(&files, 0);
+        _compile_dir(root_task, &files, dirs[i], build_dir_full);
+    }
 
     array_destroy_pchar(&files);
 

@@ -38,15 +38,14 @@ static int _step(sqlite3 *db, sqlite3_stmt *stmt) {
     return rc;
 }
 
-static char _build_db_path[1024] = {0};
+static char _logdb_path[1024] = {0};
 
 static sqlite3 *_opendb() {
     sqlite3 *_db;
-    sqlite3_open_v2(_build_db_path,
+    sqlite3_open_v2(_logdb_path,
                     &_db,
                     SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE | SQLITE_OPEN_SHAREDCACHE | SQLITE_OPEN_NOMUTEX,
                     NULL);
-
 
     // thanks http://stackoverflow.com/questions/1711631/improve-insert-per-second-performance-of-sqlite
     sqlite3_exec(_db, "PRAGMA synchronous = OFF", NULL, NULL, NULL);
@@ -74,26 +73,8 @@ static int _do_sql(const char *sql) {
     return 0;
 }
 
-static int _do_sql_stmt(const char *sql) {
-    sqlite3 *_db = _opendb();
-    sqlite3_stmt *stmt;
-    sqlite3_prepare_v2(_db, sql, -1, &stmt, NULL);
-
-    if (_step(_db, stmt) != SQLITE_DONE) {
-        goto error;
-    }
-
-    return 1;
-
-    error:
-    sqlite3_finalize(stmt);
-    sqlite3_close_v2(_db);
-
-    return 0;
-}
-
 static int builddb_init_db(const char *build_dir) {
-    os_path_join(_build_db_path, CE_ARRAY_LEN(_build_db_path), build_dir, "build.db");
+    os_path_join(_logdb_path, CE_ARRAY_LEN(_logdb_path), build_dir, "build.db");
 
 
     if (!_do_sql("CREATE TABLE IF NOT EXISTS files (\n"
@@ -210,7 +191,6 @@ static int builddb_need_compile(const char *source_dir, const char *filename) {
     sqlite3_prepare_v2(_db, sql, -1, &stmt, NULL);
 
     sqlite3_bind_text(stmt, 1, filename, -1, SQLITE_TRANSIENT);
-
 
     while (_step(_db, stmt) == SQLITE_ROW) {
         compile = 0;

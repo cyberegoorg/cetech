@@ -96,7 +96,7 @@ function Game:update(dt)
         end
     end
 
-    if Keyboard.button_pressed(log_test_btn) then
+    if Keyboard.button_state(log_test_btn) then
         Log.info("game", "INFO TEST")
         Log.warning("game", "WARN TEST")
         Log.error("game", "ERROR TEST")

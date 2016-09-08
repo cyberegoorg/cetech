@@ -5,8 +5,14 @@
 // Includes
 //==============================================================================
 
+#include <celib/containers/array.h>
 #include "celib/types.h"
 #include "celib/memory/types.h"
+
+
+typedef ARRAY_T(char) dynstr_t;
+#define DYNSTR_INIT(a, alloc) ARRAY_INIT(char, a, alloc)
+#define DYNSTR_CAT(a, str) ARRAY_PUSH(char, a, str, strlen(str))
 
 //==============================================================================
 // Interface
