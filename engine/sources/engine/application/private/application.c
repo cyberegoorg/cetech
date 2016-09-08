@@ -69,6 +69,8 @@ int application_init(int argc, char **argv) {
     log_init(_get_worker_id);
     log_register_handler(log_stdout_handler, NULL);
 
+    logdb_init_db(".");
+
     log_debug(LOG_WHERE, "Init (global size: %lu)", sizeof(struct G));
 
     memsys_init(4 * 1024 * 1024);
