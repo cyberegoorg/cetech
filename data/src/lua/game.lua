@@ -24,7 +24,7 @@ function Game:init()
     Log.debug("boot.lua", "debug")
 
     --    self.viewport = Renderer.GetViewport("default")
-    --    self.world = World.Create()
+    self.world = World.create()
 
     --self.unit = Unit.Spawn(self.world, "unit1");
     --    self.level = World.LoadLevel(self.world, "level1");
@@ -49,7 +49,7 @@ end
 
 function Game:shutdown()
     Log.info("boot.lua", "shutdown")
-    --World.Destroy(self.world);
+    World.destroy(self.world);
 end
 
 function rotator(world, node, delta_rot)
