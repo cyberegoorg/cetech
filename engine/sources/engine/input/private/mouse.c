@@ -2,6 +2,7 @@
 // Includes
 //==============================================================================
 
+#include <celib/math/types.h>
 #include "celib/types.h"
 #include "engine/machine/machine.h"
 #include "celib/string/string.h"
@@ -54,8 +55,8 @@ void mouse_process() {
     struct event_header *event = machine_event_begin();
 
     memory_copy(_G.last_state, _G.state, MOUSE_BTN_MAX);
-    _G.last_delta_pos[0] = 0;
-    _G.last_delta_pos[1] = 0;
+    _G.last_delta_pos.x = 0;
+    _G.last_delta_pos.y = 0;
 
     while (event != machine_event_end()) {
         struct mouse_move_event *move_event;
@@ -72,11 +73,11 @@ void mouse_process() {
             case EVENT_MOUSE_MOVE:
                 move_event = ((struct mouse_move_event *) event);
 
-                _G.last_delta_pos[0] = _G.last_pos[0] - move_event->pos[0];
-                _G.last_delta_pos[1] = _G.last_pos[1] - move_event->pos[1];
+                _G.last_delta_pos.x = _G.last_pos.x - move_event->pos.x;
+                _G.last_delta_pos.y = _G.last_pos.y - move_event->pos.y;
 
-                _G.last_pos[0] = move_event->pos[0];
-                _G.last_pos[1] = move_event->pos[1];
+                _G.last_pos.x = move_event->pos.x;
+                _G.last_pos.y = move_event->pos.y;
                 break;
 
             default:
@@ -154,11 +155,11 @@ void mouse_axis(const u32 axis_index, vec2f_t position) {
 
     switch (axis_index) {
         case MOUSE_AXIS_ABSOULTE:
-            vec2f_move(position, _G.last_pos);
+            vec2f_move(&position, &_G.last_pos);
             return;
 
         case MOUSE_AXIS_RELATIVE:
-            vec2f_move(position, _G.last_delta_pos);
+            vec2f_move(&position, &_G.last_delta_pos);
             return;
 
         default:

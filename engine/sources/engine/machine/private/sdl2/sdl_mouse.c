@@ -55,8 +55,8 @@ void sdl_mouse_process(struct eventstream *stream) {
         _G.last_position[1] = pos[1];
 
         struct mouse_move_event event;
-        event.pos[0] = pos[0];
-        event.pos[1] = pos[1];
+        event.pos.x = pos[0];
+        event.pos.y = pos[1];
 
         event_stream_push(stream, EVENT_MOUSE_MOVE, event);
     }
