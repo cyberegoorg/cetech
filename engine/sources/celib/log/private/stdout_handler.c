@@ -26,7 +26,7 @@
 #define NONE        "\033[0m"
 
 #define LOG_FORMAT   \
-    "---\n"          \s
+    "---\n"          \
     "level: %s\n"    \
     "where: %s\n"    \
     "time: %s\n"     \
