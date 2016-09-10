@@ -51,34 +51,34 @@ SCENARIO("Yaml string parse", "[yaml]") {
 
                             YAML_NODE_SCOPE_IDX(tmp_node, seq_node, 0, {
                                 REQUIRE(yaml_node_type( tmp_node) == YAML_TYPE_SCALAR);
-                                REQUIRE(yaml_node_as_int( tmp_node) == 1);
+                                REQUIRE(yaml_as_int( tmp_node) == 1);
                             });
 
                             YAML_NODE_SCOPE_IDX(tmp_node,  seq_node, 1, {
                                 REQUIRE(yaml_node_type( tmp_node) == YAML_TYPE_SCALAR);
-                                REQUIRE(yaml_node_as_int( tmp_node) == 2);
+                                REQUIRE(yaml_as_int( tmp_node) == 2);
                             });
 
                             YAML_NODE_SCOPE_IDX(tmp_node,  seq_node, 2, {
                                 REQUIRE(yaml_node_type( tmp_node) == YAML_TYPE_SCALAR);
-                                REQUIRE(yaml_node_as_int( tmp_node) == 3);
+                                REQUIRE(yaml_as_int( tmp_node) == 3);
                             });
 
                     });
 
                     YAML_NODE_SCOPE(tmp_node,  map_node, "int", {
                             REQUIRE(yaml_node_type( tmp_node) == YAML_TYPE_SCALAR);
-                            REQUIRE(yaml_node_as_int( tmp_node) == 1);
+                            REQUIRE(yaml_as_int( tmp_node) == 1);
                     });
 
                     YAML_NODE_SCOPE(tmp_node,  map_node, "bool", {
                             REQUIRE(yaml_node_type( tmp_node) == YAML_TYPE_SCALAR);
-                            REQUIRE(yaml_node_as_bool( tmp_node));
+                            REQUIRE(yaml_as_bool( tmp_node));
                     });
 
                     YAML_NODE_SCOPE(tmp_node,  map_node, "float", {
                             REQUIRE(yaml_node_type( tmp_node) == YAML_TYPE_SCALAR);
-                            REQUIRE(yaml_node_as_float( tmp_node));
+                            REQUIRE(yaml_as_float( tmp_node));
                     });
 
                 });

@@ -9,6 +9,7 @@
 #include <stdbool.h>
 
 #include "../types.h"
+#include "../math/types.h"
 
 //==============================================================================
 // Defines
@@ -87,16 +88,20 @@ void yaml_node_foreach_dict(yaml_node_t node,
 // Define nodes
 //==============================================================================
 
-#define YAML_NODE_AS_DEFN(T, N) T yaml_node_as_##N(yaml_node_t node)
+#define YAML_NODE_AS_DEFN(T, N) T yaml_as_##N(yaml_node_t node)
 #define YAML_NODE_AS_DEF(T) YAML_NODE_AS_DEFN(T, T)
 
 YAML_NODE_AS_DEFN(int, bool);
+
 YAML_NODE_AS_DEF(int);
+
 YAML_NODE_AS_DEF(float);
 
-int yaml_node_as_string(yaml_node_t node,
-                        char *output,
-                        size_t max_len);
+YAML_NODE_AS_DEF(vec3f_t);
+
+int yaml_as_string(yaml_node_t node,
+                   char *output,
+                   size_t max_len);
 
 #undef YAML_NODE_AS_DEF
 #undef YAML_NODE_AS_DEFN

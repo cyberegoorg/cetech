@@ -1,4 +1,5 @@
 #include <string>
+#include <celib/math/types.h>
 
 extern "C" {
 #include "celib/errors/errors.h"
@@ -118,26 +119,39 @@ yaml_node_foreach_dict(yaml_node_t node,
     }
 }
 
-extern "C" int yaml_node_as_string(yaml_node_t node,
-                                   char *output,
-                                   size_t max_len) {
+extern "C" int yaml_as_string(yaml_node_t node,
+                              char *output,
+                              size_t max_len) {
     yamlcpp_handler *nh = (yamlcpp_handler *) node.doc.d;
-
 
     YAML_EX_SCOPE({ return snprintf(output, max_len, "%s", nh->nodes[node.idx].as<std::string>().c_str()); })
 }
 
-extern "C" int yaml_node_as_bool(yaml_node_t node) {
+extern "C" int yaml_as_bool(yaml_node_t node) {
     yamlcpp_handler *nh = (yamlcpp_handler *) node.doc.d;
 
     YAML_EX_SCOPE({ return nh->nodes[node.idx].as<bool>(); })
 }
 
+vec3f_t yaml_as_vec3f_t(yaml_node_t body) {
+    CE_ASSERT("yaml", yaml_is_valid(body));
+
+    vec3f_t v = {0};
+
+    yaml_node_t x = yaml_get_seq_node(body, 0);
+    CE_ASSERT("yaml", yaml_is_valid(x));
+    v.x = yaml_as_float(x);
+    yaml_node_free(x);
+
+    return v;
+}
+
 #define YAML_NODE_AS_DECL(type)\
-    extern "C" type yaml_node_as_##type(yaml_node_t node) {\
+    extern "C" type yaml_as_##type(yaml_node_t node) {\
         yamlcpp_handler *nh = (yamlcpp_handler *) node.doc.d;\
         YAML_EX_SCOPE({ return nh->nodes[node.idx].as<type>(); })\
     }\
+
 
 YAML_NODE_AS_DECL(int);
 YAML_NODE_AS_DECL(float);
