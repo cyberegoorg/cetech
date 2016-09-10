@@ -157,6 +157,7 @@ static void _register_all_api() {
     REGISTER_LUA_API(resource_compilator);
     REGISTER_LUA_API(resource_manager);
     REGISTER_LUA_API(renderer);
+    REGISTER_LUA_API(world);
 }
 
 static int _reload_plugin(lua_State *l) {
@@ -366,6 +367,16 @@ void luasys_push_int(lua_State *_L, int value) {
     lua_pushinteger(_L, value);
 }
 
+void luasys_push_u64(lua_State *_L,
+                     u64 value) {
+    lua_pushinteger(_L, value);
+}
+
+void luasys_push_handler(lua_State *_L,
+                         handler_t value) {
+    lua_pushinteger(_L, value.h);
+}
+
 void luasys_push_bool(lua_State *_L, int value) {
     lua_pushboolean(_L, value);
 }
@@ -389,6 +400,11 @@ int luasys_to_int(lua_State *_L, int i) {
 
 float luasys_to_float(lua_State *_L, int i) {
     return (float) lua_tonumber(_L, i);
+}
+
+handler_t luasys_to_handler(lua_State *l,
+                            int i) {
+    return (handler_t) {.h = lua_tonumber(l, i)};
 }
 
 const char *luasys_to_string(lua_State *_L, int i) {

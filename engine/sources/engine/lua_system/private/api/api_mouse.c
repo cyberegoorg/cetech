@@ -1,3 +1,4 @@
+#include <celib/math/types.h>
 #include "engine/lua_system/lua_system.h"
 #include "celib/memory/types.h"
 #include "engine/input/input.h"
@@ -74,8 +75,8 @@ static int _mouse_axis(lua_State *l) {
     vec2f_t pos = {0};
     mouse_axis(idx, pos);
 
-    luasys_push_float(l, pos[0]);
-    luasys_push_float(l, pos[1]);
+    luasys_push_float(l, pos.x);
+    luasys_push_float(l, pos.y);
 
     return 2;
 

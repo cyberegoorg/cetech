@@ -6,6 +6,7 @@
 //==============================================================================
 
 #include <stdio.h>
+#include <celib/handler/handlerid.h>
 
 #include "include/luajit/lua.h"
 #include "include/luajit/lauxlib.h"
@@ -35,19 +36,38 @@ int luasys_value_type(lua_State *, int);
 
 void luasys_push_nil(lua_State *);
 
-void luasys_push_bool(lua_State *, int);
+void luasys_push_u64(lua_State *,
+                     u64 value);
 
-void luasys_push_float(lua_State *, float);
+void luasys_push_handler(lua_State *,
+                         handler_t value);
 
-void luasys_push_string(lua_State *, const char *);
+void luasys_push_int(lua_State *,
+                     int value);
 
-int luasys_to_bool(lua_State *, int);
+void luasys_push_bool(lua_State *,
+                      int value);
 
-int luasys_to_int(lua_State *, int);
+void luasys_push_float(lua_State *,
+                       float value);
 
-float luasys_to_float(lua_State *, int);
+void luasys_push_string(lua_State *,
+                        const char *value);
 
-const char *luasys_to_string(lua_State *, int);
+int luasys_to_bool(lua_State *,
+                   int i);
+
+int luasys_to_int(lua_State *,
+                  int i);
+
+float luasys_to_float(lua_State *,
+                      int i);
+
+handler_t luasys_to_handler(lua_State *l,
+                            int i);
+
+const char *luasys_to_string(lua_State *,
+                             int i);
 
 const char *luasys_to_string_l(lua_State *, int, size_t *);
 
