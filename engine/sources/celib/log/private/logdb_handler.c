@@ -5,9 +5,9 @@
 
 #include <celib/errors/errors.h>
 #include <celib/os/path.h>
-#include "celib/stringid/types.h"
 
-static int _step(sqlite3 *db, sqlite3_stmt *stmt) {
+static int _step(sqlite3 *db,
+                 sqlite3_stmt *stmt) {
     int rc;
     int run = 0;
 
@@ -65,7 +65,8 @@ static sqlite3 *_opendb(char worker_id) {
 }
 
 
-static int _do_sql(char worker_id, const char *sql) {
+static int _do_sql(char worker_id,
+                   const char *sql) {
     sqlite3 *_db = _opendb(worker_id);
     sqlite3_stmt *stmt;
     sqlite3_prepare_v2(_db, sql, -1, &stmt, NULL);
@@ -122,14 +123,14 @@ int logdb_init_db(const char *log_dir) {
     _session_id = time(NULL);
 
     if (!_do_sql(0, "CREATE TABLE IF NOT EXISTS log (\n"
-                         "id         INTEGER PRIMARY KEY    AUTOINCREMENT   NOT NULL,\n"
-                         "session_id INTEGER                                NOT NULL,\n"
-                         "time       INTEGER                                NOT NULL,\n"
-                         "level      TEXT                                   NOT NULL,\n"
-                         "wheree     TEXT                                   NOT NULL,\n"
-                         "worker     INTEGER                                NOT NULL,\n"
-                         "msg        TEXT                                   NOT NULL\n"
-                         ");")) {
+            "id         INTEGER PRIMARY KEY    AUTOINCREMENT   NOT NULL,\n"
+            "session_id INTEGER                                NOT NULL,\n"
+            "time       INTEGER                                NOT NULL,\n"
+            "level      TEXT                                   NOT NULL,\n"
+            "wheree     TEXT                                   NOT NULL,\n"
+            "worker     INTEGER                                NOT NULL,\n"
+            "msg        TEXT                                   NOT NULL\n"
+            ");")) {
         return 0;
     }
 

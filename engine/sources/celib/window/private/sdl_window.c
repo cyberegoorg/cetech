@@ -51,7 +51,11 @@ void sdl_window_shutdown() {
 void sdl_window_process() {
 }
 
-window_t window_new(const char *title, enum WindowPos x, enum WindowPos y, const i32 width, const i32 height,
+window_t window_new(const char *title,
+                    enum WindowPos x,
+                    enum WindowPos y,
+                    const i32 width,
+                    const i32 height,
                     enum WindowFlags flags) {
 
     SDL_Window *w = SDL_CreateWindow(
@@ -82,7 +86,8 @@ void window_destroy(window_t w) {
     SDL_DestroyWindow(w.w);
 }
 
-void window_set_title(window_t w, const char *title) {
+void window_set_title(window_t w,
+                      const char *title) {
     SDL_SetWindowTitle(w.w, title);
 }
 
@@ -94,11 +99,15 @@ void window_update(window_t w) {
     SDL_UpdateWindowSurface(w.w);
 }
 
-void window_resize(window_t w, uint32_t width, uint32_t height) {
+void window_resize(window_t w,
+                   uint32_t width,
+                   uint32_t height) {
     SDL_SetWindowSize(w.w, width, height);
 }
 
-void window_get_size(window_t window, uint32_t *width, uint32_t *height) {
+void window_get_size(window_t window,
+                     uint32_t *width,
+                     uint32_t *height) {
     int w, h;
     w = h = 0;
 

@@ -32,7 +32,8 @@ void os_dir_list(const char *path,
 //! Free list dir array
 //! \param files Files array
 //! \param allocator Allocator
-void os_dir_list_free(struct array_pchar *files, struct allocator *allocator);
+void os_dir_list_free(struct array_pchar *files,
+                      struct allocator *allocator);
 
 //! Create dir
 //! \param path Dir path

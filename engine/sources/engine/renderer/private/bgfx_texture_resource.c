@@ -45,7 +45,10 @@ struct G {
 // Compiler private
 //==============================================================================
 
-static int _texturec(const char *input, const char *output, int gen_mipmaps, int is_normalmap) {
+static int _texturec(const char *input,
+                     const char *output,
+                     int gen_mipmaps,
+                     int is_normalmap) {
     char cmd_line[4096] = {0};
     int s = snprintf(cmd_line, CE_ARRAY_LEN(cmd_line),
                      "externals/build/linux64/release/bin/texturec -f %s -o %s", input, output);
@@ -65,7 +68,10 @@ static int _texturec(const char *input, const char *output, int gen_mipmaps, int
     return status;
 }
 
-static int _gen_tmp_name(char *tmp_filename, const char *tmp_dir, size_t max_len, const char *filename) {
+static int _gen_tmp_name(char *tmp_filename,
+                         const char *tmp_dir,
+                         size_t max_len,
+                         const char *filename) {
     char dir[1024] = {0};
     os_path_dir(dir, CE_ARRAY_LEN(dir), filename);
 
@@ -142,7 +148,8 @@ int _texture_compiler(const char *filename,
 // Resource
 //==============================================================================
 
-void *texture_resource_loader(struct vio *input, struct allocator *allocator) {
+void *texture_resource_loader(struct vio *input,
+                              struct allocator *allocator) {
     const i64 size = vio_size(input);
     char *data = CE_ALLOCATE(allocator, char, size);
     vio_read(input, data, 1, size);
@@ -150,11 +157,13 @@ void *texture_resource_loader(struct vio *input, struct allocator *allocator) {
     return data;
 }
 
-void texture_resource_unloader(void *new_data, struct allocator *allocator) {
+void texture_resource_unloader(void *new_data,
+                               struct allocator *allocator) {
     CE_DEALLOCATE(allocator, new_data);
 }
 
-void texture_resource_online(stringid64_t name, void *data) {
+void texture_resource_online(stringid64_t name,
+                             void *data) {
     struct texture_resource *resource = data;
 
     const bgfx_memory_t *mem = bgfx_alloc(resource->size);
@@ -167,7 +176,8 @@ void texture_resource_online(stringid64_t name, void *data) {
 
 static const bgfx_texture_handle_t null_texture = {0};
 
-void texture_resource_offline(stringid64_t name, void *data) {
+void texture_resource_offline(stringid64_t name,
+                              void *data) {
     bgfx_texture_handle_t texture = MAP_GET(bgfx_texture_handle_t, &_G.handler_map, name.id, null_texture);
 
     if (texture.idx == null_texture.idx) {
@@ -179,7 +189,10 @@ void texture_resource_offline(stringid64_t name, void *data) {
     MAP_REMOVE(bgfx_texture_handle_t, &_G.handler_map, name.id);
 }
 
-void *texture_resource_reloader(stringid64_t name, void *old_data, void *new_data, struct allocator *allocator) {
+void *texture_resource_reloader(stringid64_t name,
+                                void *old_data,
+                                void *new_data,
+                                struct allocator *allocator) {
     texture_resource_offline(name, old_data);
     texture_resource_online(name, new_data);
 

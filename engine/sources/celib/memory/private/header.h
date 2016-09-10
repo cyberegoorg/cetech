@@ -15,7 +15,8 @@ struct Header {
 
 static const uint32_t HEADER_PAD_VALUE = 0xffffffffu;
 
-static void *data_pointer(struct Header *header, uint32_t align) {
+static void *data_pointer(struct Header *header,
+                          uint32_t align) {
     const void *p = header + 1;
     return (void *) pointer_align_forward(p, align);
 }
@@ -29,7 +30,9 @@ static struct Header *header(void *data) {
     return (struct Header *) p - 1;
 }
 
-static void fill(struct Header *header, void *data, uint32_t size) {
+static void fill(struct Header *header,
+                 void *data,
+                 uint32_t size) {
     header->size = size;
     uint32_t *p = (uint32_t *) (header + 1);
     while (p < (uint32_t *) data)

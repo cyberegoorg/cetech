@@ -55,7 +55,8 @@ static console_server_command_t _find_command(const char *name) {
     return 0;
 }
 
-static void _serve_command(const char *packet, int len) {
+static void _serve_command(const char *packet,
+                           int len) {
     mpack_tree_t tree;
     mpack_tree_init(&tree, packet, (size_t) len);
     mpack_tree_parse(&tree);
@@ -151,7 +152,8 @@ void consolesrv_shutdown() {
     log_debug(LOG_WHERE, "Shutdown");
 }
 
-void consolesrv_register_command(const char *name, console_server_command_t cmd) {
+void consolesrv_register_command(const char *name,
+                                 console_server_command_t cmd) {
     for (int i = 1; i < MAX_COMMANDS; ++i) {
         if (_G.name[i][0] != '\0') {
             continue;

@@ -35,7 +35,8 @@ task_t taskmanager_add_null(const char *name,
                             enum task_priority priority,
                             enum task_affinity affinity);
 
-void taskmanager_add_end(const task_t *tasks, size_t count);
+void taskmanager_add_end(const task_t *tasks,
+                         size_t count);
 
 void taskmanager_do_work();
 

@@ -50,7 +50,9 @@ void _callm_shutdown(get_api_fce_t fce) {
     }
 }
 
-void _add(const char *path, get_api_fce_t fce, void *handler) {
+void _add(const char *path,
+          get_api_fce_t fce,
+          void *handler) {
     for (size_t i = 0; i < MAX_PLUGINS; ++i) {
         if (_G.used[i]) {
             continue;
@@ -119,7 +121,8 @@ void plugin_reload(const char *path) {
     }
 }
 
-void *plugin_get_engine_api(int api, int version) {
+void *plugin_get_engine_api(int api,
+                            int version) {
     for (size_t i = 0; i < MAX_PLUGINS; ++i) {
         if (!_G.used[i]) {
             continue;

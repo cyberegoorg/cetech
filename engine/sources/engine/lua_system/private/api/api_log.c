@@ -1,10 +1,10 @@
 #include "engine/lua_system/lua_system.h"
-#include "celib/log/log.h"
-#include "celib/memory/types.h"
 
 #define API_NAME "Log"
 
-static int _log_format(lua_State *l, char *buffer, size_t buffer_len) {
+static int _log_format(lua_State *l,
+                       char *buffer,
+                       size_t buffer_len) {
     char *buffer_it = buffer;
     size_t buffer_write_len = buffer_len;
 

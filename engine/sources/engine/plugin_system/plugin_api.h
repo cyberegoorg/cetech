@@ -10,7 +10,8 @@
 //#define CONFIG_API_ID         5
 //#define CONSOLE_SERVER_API_ID 6
 
-typedef void *(*get_api_fce_t)(int api, int version);
+typedef void *(*get_api_fce_t)(int api,
+                               int version);
 
 struct plugin_api_v0 {
     void (*init            )(get_api_fce_t);
@@ -19,7 +20,8 @@ struct plugin_api_v0 {
 
     void *(*reload_begin    )(get_api_fce_t);
 
-    void (*reload_end      )(get_api_fce_t, void *);
+    void (*reload_end      )(get_api_fce_t,
+                             void *);
 
     void (*update          )();
 };

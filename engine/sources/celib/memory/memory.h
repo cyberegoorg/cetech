@@ -35,15 +35,22 @@
 // Memory
 //==============================================================================
 
-const void *pointer_align_forward(const void *p, uint32_t align);
+const void *pointer_align_forward(const void *p,
+                                  uint32_t align);
 
-const void *pointer_add(const void *p, uint32_t bytes);
+const void *pointer_add(const void *p,
+                        uint32_t bytes);
 
-const void *pointer_sub(const void *p, uint32_t bytes);
+const void *pointer_sub(const void *p,
+                        uint32_t bytes);
 
-void *memory_copy(void *__restrict dest, const void *__restrict src, size_t n);
+void *memory_copy(void *__restrict dest,
+                  const void *__restrict src,
+                  size_t n);
 
-void *memory_set(void *__restrict dest, int c, size_t n);
+void *memory_set(void *__restrict dest,
+                 int c,
+                 size_t n);
 
 void *os_malloc(size_t size);
 
@@ -54,11 +61,16 @@ void os_free(void *ptr);
 // Allocator
 //==============================================================================
 
-void allocator_trace_pointer(struct allocator_trace_entry *entries, u64 max_entries, void *p);
+void allocator_trace_pointer(struct allocator_trace_entry *entries,
+                             u64 max_entries,
+                             void *p);
 
-void allocator_stop_trace_pointer(struct allocator_trace_entry *entries, u64 max_entries, void *p);
+void allocator_stop_trace_pointer(struct allocator_trace_entry *entries,
+                                  u64 max_entries,
+                                  void *p);
 
-void allocator_check_trace(struct allocator_trace_entry *entries, u64 max_entries);
+void allocator_check_trace(struct allocator_trace_entry *entries,
+                           u64 max_entries);
 
 //==============================================================================
 // Malloc allocator
@@ -74,7 +86,8 @@ void malloc_allocator_destroy(struct allocator *a);
 // Scratch allocator
 //==============================================================================
 
-struct allocator *scratch_allocator_create(struct allocator *backing, int size);
+struct allocator *scratch_allocator_create(struct allocator *backing,
+                                           int size);
 
 void scratch_allocator_destroy(struct allocator *a);
 

@@ -1,6 +1,7 @@
 #include "engine/application/application.h"
 
-int main(int argc, char **argv) {
+int main(int argc,
+         char **argv) {
     const int init_result = application_init(argc, argv);
 
     if (init_result) {

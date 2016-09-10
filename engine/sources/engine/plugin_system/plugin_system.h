@@ -33,7 +33,8 @@ void reload_loaded();
 
 void plugin_callm_update();
 
-void *plugin_get_engine_api(int api, int version);
+void *plugin_get_engine_api(int api,
+                            int version);
 
 
 #endif //CETECH_PLUGIN_SYSTEM_H

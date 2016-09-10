@@ -32,7 +32,10 @@ const char *os_path_extension(const char *path);
 //! \param base_path Base path
 //! \param path Path
 //! \return Result path len
-i64 os_path_join(char *result, u64 maxlen, const char *base_path, const char *path);
+i64 os_path_join(char *result,
+                 u64 maxlen,
+                 const char *base_path,
+                 const char *path);
 
 
 #endif //CETECH_PATH_H

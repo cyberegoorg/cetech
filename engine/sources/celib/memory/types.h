@@ -28,9 +28,12 @@
 //==============================================================================
 
 struct allocator {
-    void *(*allocate)(struct allocator *allocator, uint32_t size, uint32_t align);
+    void *(*allocate)(struct allocator *allocator,
+                      uint32_t size,
+                      uint32_t align);
 
-    void (*deallocate)(struct allocator *allocator, void *p);
+    void (*deallocate)(struct allocator *allocator,
+                       void *p);
 
     uint32_t (*total_allocated)(struct allocator *allocator);
 

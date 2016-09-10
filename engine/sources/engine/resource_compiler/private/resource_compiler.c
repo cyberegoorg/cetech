@@ -60,7 +60,8 @@ CE_STATIC_ASSERT(sizeof(struct compile_task_data) < 64);
 // Private
 //==============================================================================
 
-void _add_dependency(const char *who_filename, const char *depend_on_filename) {
+void _add_dependency(const char *who_filename,
+                     const char *depend_on_filename) {
     builddb_set_file_depend(who_filename, depend_on_filename);
 
     char path[1024] = {0};
@@ -109,7 +110,10 @@ resource_compilator_t _find_compilator(stringid64_t type) {
     return NULL;
 }
 
-void _compile_dir(task_t root_task, struct array_pchar *files, const char *source_dir, const char *build_dir_full) {
+void _compile_dir(task_t root_task,
+                  struct array_pchar *files,
+                  const char *source_dir,
+                  const char *build_dir_full) {
     os_dir_list(source_dir, 1, files, memsys_main_scratch_allocator());
     for (int i = 0; i < ARRAY_SIZE(files); ++i) {
         const char *source_filename_full = ARRAY_AT(files, i);
@@ -203,7 +207,8 @@ void resource_compiler_shutdown() {
     _G = (struct G) {0};
 }
 
-void resource_compiler_register(stringid64_t type, resource_compilator_t compilator) {
+void resource_compiler_register(stringid64_t type,
+                                resource_compilator_t compilator) {
     for (int i = 0; i < MAX_TYPES; ++i) {
         if (_G.compilator_map_type[i].id != 0) {
             continue;
@@ -243,7 +248,10 @@ void resource_compiler_compile_all() {
     taskmanager_wait(root_task);
 }
 
-int resource_compiler_get_filename(char *filename, size_t max_ken, stringid64_t type, stringid64_t name) {
+int resource_compiler_get_filename(char *filename,
+                                   size_t max_ken,
+                                   stringid64_t type,
+                                   stringid64_t name) {
     char build_name[33] = {0};
     resource_type_name_string(build_name, CE_ARRAY_LEN(build_name), type, name);
     return builddb_get_filename_by_hash(filename, max_ken, build_name);
@@ -253,12 +261,16 @@ const char *resource_compiler_get_source_dir() {
     return config_get_string(_G.cv_source_dir);
 }
 
-int resource_compiler_get_build_dir(char *build_dir, size_t max_len, const char *platform) {
+int resource_compiler_get_build_dir(char *build_dir,
+                                    size_t max_len,
+                                    const char *platform) {
     const char *build_dir_str = config_get_string(_G.cv_build_dir);
     return os_path_join(build_dir, max_len, build_dir_str, platform);
 }
 
-int resource_compiler_get_tmp_dir(char *tmp_dir, size_t max_len, const char *platform) {
+int resource_compiler_get_tmp_dir(char *tmp_dir,
+                                  size_t max_len,
+                                  const char *platform) {
     char build_dir[1024] = {0};
     resource_compiler_get_build_dir(build_dir, CE_ARRAY_LEN(build_dir), platform);
 

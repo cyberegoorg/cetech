@@ -24,7 +24,8 @@ struct game_callbacks {
 //! \param argc Arg count
 //! \param argv Args array
 //! \return 1 if ok else error code
-int application_init(int argc, char **argv);
+int application_init(int argc,
+                     char **argv);
 
 //! Shutdown application
 void application_shutdown();

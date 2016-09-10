@@ -64,7 +64,8 @@ void os_dir_list(const char *path,
 #endif
 }
 
-void os_dir_list_free(ARRAY_T(pchar) *files, struct allocator *allocator) {
+void os_dir_list_free(ARRAY_T(pchar) *files,
+                      struct allocator *allocator) {
     for (int i = 0; i < ARRAY_SIZE(files); ++i) {
         CE_DEALLOCATE(allocator, ARRAY_AT(files, i));
     }

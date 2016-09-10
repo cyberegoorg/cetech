@@ -13,7 +13,8 @@
 
 #define MAX_MEM_TRACE 1024
 
-static uint32_t size_with_padding(uint32_t size, uint32_t align) {
+static uint32_t size_with_padding(uint32_t size,
+                                  uint32_t align) {
     return size + align + sizeof(struct Header);
 }
 
@@ -23,7 +24,9 @@ struct allocator_malloc {
     struct allocator_trace_entry trace[MAX_MEM_TRACE];
 };
 
-void *malloc_allocator_allocate(struct allocator *allocator, uint32_t size, uint32_t align) {
+void *malloc_allocator_allocate(struct allocator *allocator,
+                                uint32_t size,
+                                uint32_t align) {
     struct allocator_malloc *a = (struct allocator_malloc *) allocator;
 
     const uint32_t ts = size_with_padding(size, align);
@@ -38,7 +41,8 @@ void *malloc_allocator_allocate(struct allocator *allocator, uint32_t size, uint
     return p;
 }
 
-void malloc_allocator_deallocate(struct allocator *allocator, void *p) {
+void malloc_allocator_deallocate(struct allocator *allocator,
+                                 void *p) {
     struct allocator_malloc *a = (struct allocator_malloc *) allocator;
 
     if (!p)

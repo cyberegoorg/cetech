@@ -38,7 +38,8 @@ struct handlerid {
 // Public interface
 //==============================================================================
 
-static inline void handlerid_init(struct handlerid *hid, struct allocator *allocator) {
+static inline void handlerid_init(struct handlerid *hid,
+                                  struct allocator *allocator) {
     ARRAY_INIT(u32, &hid->_generation, allocator);
     QUEUE_INIT(u32, &hid->_freeIdx, allocator);
 }
@@ -62,14 +63,16 @@ static inline handler_t handlerid_handler_create(struct handlerid *hid) {
     return _make_entity(idx, ARRAY_AT(&hid->_generation, idx));
 }
 
-static inline void handlerid_handler_destroy(struct handlerid *hid, handler_t h) {
+static inline void handlerid_handler_destroy(struct handlerid *hid,
+                                             handler_t h) {
     u32 id = _idx(h);
 
     ARRAY_AT(&hid->_generation, id) += 1;
     QUEUE_PUSH_BACK(u32, &hid->_freeIdx, id);
 }
 
-static inline int handlerid_handler_alive(struct handlerid *hid, handler_t h) {
+static inline int handlerid_handler_alive(struct handlerid *hid,
+                                          handler_t h) {
     return ARRAY_AT(&hid->_generation, _idx(h)) == _gen(h);
 }
 

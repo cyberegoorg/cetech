@@ -30,7 +30,9 @@ void window_resize(window_t w,
                    uint32_t width,
                    uint32_t height);
 
-void window_get_size(window_t w, uint32_t *width, uint32_t *height);
+void window_get_size(window_t w,
+                     uint32_t *width,
+                     uint32_t *height);
 
 void *window_native_window_ptr(window_t w);
 

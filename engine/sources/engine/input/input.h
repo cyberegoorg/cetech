@@ -52,6 +52,7 @@ u32 mouse_axis_index(const char *axis_name);
 
 const char *mouse_axis_name(const u32 axis_index);
 
-void mouse_axis(const u32 axis_index, vec2f_t position);
+void mouse_axis(const u32 axis_index,
+                vec2f_t position);
 
 #endif //CETECH_INPUT_H

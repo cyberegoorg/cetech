@@ -2,15 +2,15 @@
 
 #include <celib/memory/memory.h>
 #include <celib/string/string.h>
-#include <stdio.h>
-#include <celib/containers/array.h>
 
 const char *os_path_filename(const char *path) {
     char *ch = strrchr(path, '/');
     return ch != NULL ? ch + 1 : path;
 }
 
-void os_path_basename(const char *path, char *out, size_t size) {
+void os_path_basename(const char *path,
+                      char *out,
+                      size_t size) {
     const char *filename = os_path_filename(path);
     const char *ch = strrchr(filename, '.');
 
@@ -36,9 +36,13 @@ const char *os_path_extension(const char *path) {
 
 #define DIR_DELIM "/"
 
-i64 os_path_join(char *result, u64 maxlen, const char *base_path, const char *path) {
+i64 os_path_join(char *result,
+                 u64 maxlen,
+                 const char *base_path,
+                 const char *path) {
     return snprintf(result, maxlen, "%s" DIR_DELIM "%s", base_path, path);
 }
+
 void os_path_dir(char *out,
                  size_t size,
                  const char *path) {

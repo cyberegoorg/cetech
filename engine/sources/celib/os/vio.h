@@ -18,7 +18,8 @@ int64_t vio_seek(struct vio *file,
 
 void vio_seek_to_end(struct vio *file);
 
-i64 vio_skip(struct vio *, i64 bytes);
+i64 vio_skip(struct vio *,
+             i64 bytes);
 
 i64 vio_position(struct vio *file);
 

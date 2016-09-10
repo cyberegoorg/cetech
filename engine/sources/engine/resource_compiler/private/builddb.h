@@ -5,7 +5,8 @@
 #include "include/sqlite3/sqlite3.h"
 #include "celib/stringid/types.h"
 
-static int _step(sqlite3 *db, sqlite3_stmt *stmt) {
+static int _step(sqlite3 *db,
+                 sqlite3_stmt *stmt) {
     int rc;
     int run = 0;
 
@@ -103,7 +104,8 @@ static int builddb_init_db(const char *build_dir) {
     return 1;
 }
 
-static void builddb_set_file(const char *filename, time_t mtime) {
+static void builddb_set_file(const char *filename,
+                             time_t mtime) {
     static const char *sql = "INSERT OR REPLACE INTO files VALUES(NULL, ?1, ?2);";
 
     sqlite3 *_db = _opendb();
@@ -118,7 +120,8 @@ static void builddb_set_file(const char *filename, time_t mtime) {
     sqlite3_close_v2(_db);
 }
 
-static void builddb_set_file_depend(const char *filename, const char *depend_on) {
+static void builddb_set_file_depend(const char *filename,
+                                    const char *depend_on) {
     static const char *sql = "INSERT INTO file_dependency (filename, depend_on) SELECT ?1, ?2 WHERE NOT EXISTS(SELECT 1 FROM file_dependency WHERE filename = ?1 AND depend_on = ?2);";
 
     sqlite3 *_db = _opendb();
@@ -134,7 +137,8 @@ static void builddb_set_file_depend(const char *filename, const char *depend_on)
     sqlite3_close_v2(_db);
 }
 
-static void builddb_set_file_hash(const char *filename, const char *hash) {
+static void builddb_set_file_hash(const char *filename,
+                                  const char *hash) {
     static const char *sql = "INSERT OR REPLACE INTO file_hash VALUES(?1, ?2);";
 
     sqlite3 *_db = _opendb();
@@ -150,7 +154,9 @@ static void builddb_set_file_hash(const char *filename, const char *hash) {
     sqlite3_close_v2(_db);
 }
 
-static int builddb_get_filename_by_hash(char *filename, size_t max_len, const char *hash) {
+static int builddb_get_filename_by_hash(char *filename,
+                                        size_t max_len,
+                                        const char *hash) {
     static const char *sql = "SELECT filename FROM file_hash WHERE hash = ?1;";
 
     sqlite3 *_db = _opendb();
@@ -174,7 +180,8 @@ static int builddb_get_filename_by_hash(char *filename, size_t max_len, const ch
     return ok;
 }
 
-static int builddb_need_compile(const char *source_dir, const char *filename) {
+static int builddb_need_compile(const char *source_dir,
+                                const char *filename) {
     static const char *sql = "SELECT\n"
             "    file_dependency.depend_on, files.mtime\n"
             "FROM\n"

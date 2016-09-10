@@ -1,4 +1,4 @@
-#include "engine/application/application.h"
+
 #include "engine/renderer/renderer.h"
 #include "engine/lua_system/lua_system.h"
 

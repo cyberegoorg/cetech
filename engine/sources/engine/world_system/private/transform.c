@@ -7,7 +7,6 @@
 #include <engine/memory_system/memory_system.h>
 #include <celib/math/quatf.h>
 #include <celib/math/mat44f.h>
-#include <engine/entcom/types.h>
 
 
 struct transform_data {

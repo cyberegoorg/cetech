@@ -20,7 +20,8 @@ struct allocator_scratch {
     char *free;
 };
 
-int in_use(struct allocator_scratch *a, void *p) {
+int in_use(struct allocator_scratch *a,
+           void *p) {
     if (a->free == a->allocate)
         return 0;
 
@@ -30,7 +31,9 @@ int in_use(struct allocator_scratch *a, void *p) {
     return ((char *) p >= a->free) || ((char *) p < a->allocate);
 }
 
-void *scratch_allocator_allocate(struct allocator *allocator, uint32_t size, uint32_t align) {
+void *scratch_allocator_allocate(struct allocator *allocator,
+                                 uint32_t size,
+                                 uint32_t align) {
     struct allocator_scratch *a = (struct allocator_scratch *) allocator;
 
     //CE_ASSERT("scratch", align % 4 == 0);
@@ -60,7 +63,8 @@ void *scratch_allocator_allocate(struct allocator *allocator, uint32_t size, uin
     return data;
 }
 
-void scratch_allocator_deallocate(struct allocator *allocator, void *p) {
+void scratch_allocator_deallocate(struct allocator *allocator,
+                                  void *p) {
     struct allocator_scratch *a = (struct allocator_scratch *) allocator;
 
     if (!p)
@@ -100,7 +104,8 @@ uint32_t scratch_allocator_total_allocated(struct allocator *allocator) {
 
 }
 
-struct allocator *scratch_allocator_create(struct allocator *backing, int size) {
+struct allocator *scratch_allocator_create(struct allocator *backing,
+                                           int size) {
     struct allocator_scratch *m = os_malloc(sizeof(struct allocator_scratch));
 
     m->base = (struct allocator) {

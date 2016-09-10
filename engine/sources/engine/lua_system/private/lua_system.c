@@ -75,7 +75,8 @@ static int require(lua_State *L) {
 // Lua resource
 //==============================================================================
 
-void *lua_resource_loader(struct vio *input, struct allocator *allocator) {
+void *lua_resource_loader(struct vio *input,
+                          struct allocator *allocator) {
     const i64 size = vio_size(input);
     char *data = CE_ALLOCATE(allocator, char, size);
     vio_read(input, data, 1, size);
@@ -83,18 +84,24 @@ void *lua_resource_loader(struct vio *input, struct allocator *allocator) {
     return data;
 }
 
-void lua_resource_unloader(void *new_data, struct allocator *allocator) {
+void lua_resource_unloader(void *new_data,
+                           struct allocator *allocator) {
     CE_DEALLOCATE(allocator, new_data);
 }
 
-void lua_resource_online(stringid64_t name, void *data) {
+void lua_resource_online(stringid64_t name,
+                         void *data) {
 }
 
-void lua_resource_offline(stringid64_t name, void *data) {
+void lua_resource_offline(stringid64_t name,
+                          void *data) {
 
 }
 
-void *lua_resource_reloader(stringid64_t name, void *old_data, void *new_data, struct allocator *allocator) {
+void *lua_resource_reloader(stringid64_t name,
+                            void *old_data,
+                            void *new_data,
+                            struct allocator *allocator) {
     CE_DEALLOCATE(allocator, old_data);
 
     struct lua_resource *resource = new_data;
@@ -167,7 +174,9 @@ static int _reload_plugin(lua_State *l) {
     return 0;
 }
 
-void _to_mpack(lua_State *_L, const int i, mpack_writer_t *writer) {
+void _to_mpack(lua_State *_L,
+               const int i,
+               mpack_writer_t *writer) {
     int type = lua_type(_L, i);
 
     switch (type) {
@@ -225,7 +234,8 @@ void _to_mpack(lua_State *_L, const int i, mpack_writer_t *writer) {
 }
 
 
-static int _cmd_execute_string(mpack_node_t args, mpack_writer_t *writer) {
+static int _cmd_execute_string(mpack_node_t args,
+                               mpack_writer_t *writer) {
     mpack_node_t node = mpack_node_map_cstr(args, "script");
 
     size_t str_len = mpack_node_strlen(node);
@@ -257,7 +267,8 @@ static int _cmd_execute_string(mpack_node_t args, mpack_writer_t *writer) {
     return 0;
 }
 
-static int _execute_string(lua_State *_L, const char *str) {
+static int _execute_string(lua_State *_L,
+                           const char *str) {
     if (luaL_dostring(_L, str)) {
         const char *last_error = lua_tostring(_L, -1);
         lua_pop(_L, 1);
@@ -339,23 +350,28 @@ int luasys_num_args(lua_State *_L) {
     return lua_gettop(_L);
 }
 
-void luasys_remove(lua_State *_L, int i) {
+void luasys_remove(lua_State *_L,
+                   int i) {
     lua_remove(_L, i);
 }
 
-void luasys_pop(lua_State *_L, int n) {
+void luasys_pop(lua_State *_L,
+                int n) {
     lua_pop(_L, n);
 }
 
-int luasys_is_nil(lua_State *_L, int i) {
+int luasys_is_nil(lua_State *_L,
+                  int i) {
     return lua_isnil(_L, i) == 1;
 }
 
-int luasys_is_number(lua_State *_L, int i) {
+int luasys_is_number(lua_State *_L,
+                     int i) {
     return lua_isnumber(_L, i) == 1;
 }
 
-int luasys_value_type(lua_State *_L, int i) {
+int luasys_value_type(lua_State *_L,
+                      int i) {
     return lua_type(_L, i);
 }
 
@@ -363,7 +379,8 @@ void luasys_push_nil(lua_State *_L) {
     lua_pushnil(_L);
 }
 
-void luasys_push_int(lua_State *_L, int value) {
+void luasys_push_int(lua_State *_L,
+                     int value) {
     lua_pushinteger(_L, value);
 }
 
@@ -377,28 +394,34 @@ void luasys_push_handler(lua_State *_L,
     lua_pushinteger(_L, value.h);
 }
 
-void luasys_push_bool(lua_State *_L, int value) {
+void luasys_push_bool(lua_State *_L,
+                      int value) {
     lua_pushboolean(_L, value);
 }
 
-void luasys_push_float(lua_State *_L, float value) {
+void luasys_push_float(lua_State *_L,
+                       float value) {
     lua_pushnumber(_L, value);
 }
 
-void luasys_push_string(lua_State *_L, const char *s) {
+void luasys_push_string(lua_State *_L,
+                        const char *s) {
     lua_pushstring(_L, s);
 }
 
 
-int luasys_to_bool(lua_State *_L, int i) {
+int luasys_to_bool(lua_State *_L,
+                   int i) {
     return lua_toboolean(_L, i);
 }
 
-int luasys_to_int(lua_State *_L, int i) {
+int luasys_to_int(lua_State *_L,
+                  int i) {
     return (int) lua_tointeger(_L, i);
 }
 
-float luasys_to_float(lua_State *_L, int i) {
+float luasys_to_float(lua_State *_L,
+                      int i) {
     return (float) lua_tonumber(_L, i);
 }
 
@@ -407,11 +430,13 @@ handler_t luasys_to_handler(lua_State *l,
     return (handler_t) {.h = lua_tonumber(l, i)};
 }
 
-const char *luasys_to_string(lua_State *_L, int i) {
+const char *luasys_to_string(lua_State *_L,
+                             int i) {
     return lua_tostring(_L, i);
 }
 
-const char *luasys_to_string_l(lua_State *_L, int i,
+const char *luasys_to_string_l(lua_State *_L,
+                               int i,
                                size_t *len) {
     return lua_tolstring(_L, i, len);
 }
@@ -504,7 +529,9 @@ void luasys_execute_boot_script(stringid64_t name) {
     luasys_execute_resource(name);
 }
 
-void luasys_call_global(const char *func, const char *args, ...) {
+void luasys_call_global(const char *func,
+                        const char *args,
+                        ...) {
     lua_State *_state = _G.L;
 
     uint32_t argc = 0;

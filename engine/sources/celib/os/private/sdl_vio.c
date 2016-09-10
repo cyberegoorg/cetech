@@ -14,7 +14,9 @@ struct sdl_vio {
 };
 
 
-int64_t vio_sdl_seek(struct vio *file, int64_t offset, enum vio_seek whence) {
+int64_t vio_sdl_seek(struct vio *file,
+                     int64_t offset,
+                     enum vio_seek whence) {
     CE_ASSERT(LOG_WHERE, file != NULL);
 
     static enum vio_seek _whence[3] = {
@@ -30,7 +32,8 @@ int64_t vio_sdl_seek(struct vio *file, int64_t offset, enum vio_seek whence) {
 
 size_t vio_sdl_read(struct vio *file,
                     void *buffer,
-                    size_t size, size_t maxnum) {
+                    size_t size,
+                    size_t maxnum) {
     CE_ASSERT(LOG_WHERE, file != NULL);
     struct sdl_vio *vf = (struct sdl_vio *) file;
 
@@ -39,7 +42,8 @@ size_t vio_sdl_read(struct vio *file,
 
 size_t vio_sdl_write(struct vio *file,
                      const void *buffer,
-                     size_t size, size_t maxnum) {
+                     size_t size,
+                     size_t maxnum) {
     CE_ASSERT(LOG_WHERE, file != NULL);
     struct sdl_vio *vf = (struct sdl_vio *) file;
 
@@ -65,7 +69,9 @@ int vio_sdl_close(struct vio *file) {
 }
 
 
-struct vio *vio_from_file(const char *path, enum open_mode mode, struct allocator *allocator) {
+struct vio *vio_from_file(const char *path,
+                          enum open_mode mode,
+                          struct allocator *allocator) {
     struct sdl_vio *vf = CE_ALLOCATE(allocator, struct sdl_vio, sizeof(struct sdl_vio));
     CE_ASSERT(LOG_WHERE, vf != NULL);
 

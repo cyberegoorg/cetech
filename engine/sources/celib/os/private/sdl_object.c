@@ -21,7 +21,8 @@ void os_unload_object(void *so) {
     SDL_UnloadObject(so);
 }
 
-void *os_load_function(void *so, void *name) {
+void *os_load_function(void *so,
+                       void *name) {
     void *fce = SDL_LoadFunction(so, "get_plugin_api");
     CE_ASSERT(LOG_WHERE, fce != NULL);
 

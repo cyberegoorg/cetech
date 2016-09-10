@@ -51,7 +51,8 @@ void log_set_wid_clb(log_get_wid_clb_t get_wid_clb) {
     _G.get_wid_clb = get_wid_clb;
 }
 
-void log_register_handler(log_handler_t handler, void *data) {
+void log_register_handler(log_handler_t handler,
+                          void *data) {
     const char idx = _G.handlers_count++;
 
     _G.handlers[idx] = handler;

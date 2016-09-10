@@ -76,7 +76,8 @@ static MAP_T(resource_item_t) *_get_resource_map(stringid64_t type) {
     return &ARRAY_AT(&_G.resource_data, idx);
 }
 
-void *package_resource_loader(struct vio *input, struct allocator *allocator) {
+void *package_resource_loader(struct vio *input,
+                              struct allocator *allocator) {
     const i64 size = vio_size(input);
     char *data = CE_ALLOCATE(allocator, char, size);
     vio_read(input, data, 1, size);
@@ -84,17 +85,23 @@ void *package_resource_loader(struct vio *input, struct allocator *allocator) {
     return data;
 }
 
-void package_resource_unloader(void *new_data, struct allocator *allocator) {
+void package_resource_unloader(void *new_data,
+                               struct allocator *allocator) {
     CE_DEALLOCATE(allocator, new_data);
 }
 
-void package_resource_online(stringid64_t name, void *data) {
+void package_resource_online(stringid64_t name,
+                             void *data) {
 }
 
-void package_resource_offline(stringid64_t name, void *data) {
+void package_resource_offline(stringid64_t name,
+                              void *data) {
 }
 
-void *package_resource_reloader(stringid64_t name, void *old_data, void *new_data, struct allocator *allocator) {
+void *package_resource_reloader(stringid64_t name,
+                                void *old_data,
+                                void *new_data,
+                                struct allocator *allocator) {
     CE_DEALLOCATE(allocator, old_data);
     return new_data;
 }
@@ -153,7 +160,10 @@ void resource_shutdown() {
     _G = (struct G) {0};
 }
 
-int resource_type_name_string(char *str, size_t max_len, stringid64_t type, stringid64_t name) {
+int resource_type_name_string(char *str,
+                              size_t max_len,
+                              stringid64_t type,
+                              stringid64_t name) {
     return snprintf(str, max_len, "%" SDL_PRIX64 "%" SDL_PRIX64, type.id, name.id);
 }
 
@@ -175,7 +185,10 @@ void resource_register_type(stringid64_t type,
     MAP_SET(u32, &_G.type_map, type.id, idx);
 }
 
-void resource_add_loaded(stringid64_t type, stringid64_t *names, void **resource_data, size_t count) {
+void resource_add_loaded(stringid64_t type,
+                         stringid64_t *names,
+                         void **resource_data,
+                         size_t count) {
     const u32 idx = MAP_GET(u32, &_G.type_map, type.id, UINT32_MAX);
 
     if (idx == UINT32_MAX) {
@@ -196,14 +209,17 @@ void resource_add_loaded(stringid64_t type, stringid64_t *names, void **resource
     }
 }
 
-void resource_load_now(stringid64_t type, stringid64_t *names, size_t count) {
+void resource_load_now(stringid64_t type,
+                       stringid64_t *names,
+                       size_t count) {
     void *loaded_data[count];
 
     resource_load(loaded_data, type, names, count, 0);
     resource_add_loaded(type, names, loaded_data, count);
 }
 
-int resource_can_get(stringid64_t type, stringid64_t names) {
+int resource_can_get(stringid64_t type,
+                     stringid64_t names) {
     MAP_T(resource_item_t) *resource_map = _get_resource_map(type);
 
     if (resource_map == NULL) {
@@ -213,7 +229,9 @@ int resource_can_get(stringid64_t type, stringid64_t names) {
     return MAP_HAS(resource_item_t, resource_map, names.id);
 }
 
-int resource_can_get_all(stringid64_t type, stringid64_t *names, size_t count) {
+int resource_can_get_all(stringid64_t type,
+                         stringid64_t *names,
+                         size_t count) {
     MAP_T(resource_item_t) *resource_map = _get_resource_map(type);
 
     if (resource_map == NULL) {
@@ -229,7 +247,11 @@ int resource_can_get_all(stringid64_t type, stringid64_t *names, size_t count) {
     return 1;
 }
 
-void resource_load(void **loaded_data, stringid64_t type, stringid64_t *names, size_t count, int force) {
+void resource_load(void **loaded_data,
+                   stringid64_t type,
+                   stringid64_t *names,
+                   size_t count,
+                   int force) {
     const u32 idx = MAP_GET(u32, &_G.type_map, type.id, UINT32_MAX);
 
     if (idx == UINT32_MAX) {
@@ -275,7 +297,9 @@ void resource_load(void **loaded_data, stringid64_t type, stringid64_t *names, s
     }
 }
 
-void resource_unload(stringid64_t type, stringid64_t *names, size_t count) {
+void resource_unload(stringid64_t type,
+                     stringid64_t *names,
+                     size_t count) {
     const u32 idx = MAP_GET(u32, &_G.type_map, type.id, UINT32_MAX);
 
     if (idx == UINT32_MAX) {
@@ -311,7 +335,8 @@ void resource_unload(stringid64_t type, stringid64_t *names, size_t count) {
     }
 }
 
-void *resource_get(stringid64_t type, stringid64_t names) {
+void *resource_get(stringid64_t type,
+                   stringid64_t names) {
     MAP_T(resource_item_t) *resource_map = _get_resource_map(type);
 
     resource_item_t item = MAP_GET(resource_item_t, resource_map, names.id, null_item);
@@ -334,7 +359,9 @@ void *resource_get(stringid64_t type, stringid64_t names) {
     return item.data;
 }
 
-void resource_reload(stringid64_t type, stringid64_t *names, size_t count) {
+void resource_reload(stringid64_t type,
+                     stringid64_t *names,
+                     size_t count) {
     void *loaded_data[count];
     MAP_T(resource_item_t) *resource_map = _get_resource_map(type);
     const u32 idx = MAP_GET(u32, &_G.type_map, type.id, 0);

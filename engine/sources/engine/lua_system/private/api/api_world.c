@@ -1,6 +1,5 @@
-#include <engine/application/application.h>
+
 #include <engine/world_system/world_system.h>
-#include <engine/world_system/types.h>
 #include "engine/lua_system/lua_system.h"
 
 #define API_NAME "World"

@@ -22,6 +22,7 @@ typedef struct {
 } world_callbacks_t;
 
 int world_init();
+
 void world_shutdown();
 
 void world_register_callback(world_callbacks_t clb);

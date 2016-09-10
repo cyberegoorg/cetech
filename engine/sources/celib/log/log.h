@@ -74,7 +74,8 @@ void log_set_wid_clb(log_get_wid_clb_t get_wid_clb);
 //! Register log handler
 //! \param handler Handler
 //! \param data Handler data
-void log_register_handler(log_handler_t handler, void *data);
+void log_register_handler(log_handler_t handler,
+                          void *data);
 
 //! Log info
 //! \param where Where

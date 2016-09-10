@@ -7,6 +7,7 @@
 #if defined(CETECH_LINUX)
 
 #include <sys/file.h>
+
 #endif
 
 #include "celib/log/log.h"
@@ -35,7 +36,7 @@
 
 
 #ifdef CETECH_COLORED_LOG
-#define COLORED_TEXT(color, text) color text NONE
+#define COLORED_TEXT(color, text) FBLACK color text NONE
 #else
 #define COLORED_TEXT(color, text) text
 #endif
@@ -48,14 +49,10 @@ static const char *_level_to_str[4] = {
 };
 
 static const char *_level_format[4] = {
-        [LOG_INFO]    = COLORED_TEXT(FBLACK
-                                             BBLUE, LOG_FORMAT),
-        [LOG_WARNING] = COLORED_TEXT(FBLACK
-                                             BYELLOW, LOG_FORMAT),
-        [LOG_ERROR]   = COLORED_TEXT(FBLACK
-                                             BRED, LOG_FORMAT),
-        [LOG_DBG]     = COLORED_TEXT(FBLACK
-                                             BGREEN, LOG_FORMAT)
+        [LOG_INFO]    = COLORED_TEXT(BBLUE, LOG_FORMAT),
+        [LOG_WARNING] = COLORED_TEXT(BYELLOW, LOG_FORMAT),
+        [LOG_ERROR]   = COLORED_TEXT(BRED, LOG_FORMAT),
+        [LOG_DBG]     = COLORED_TEXT(BGREEN, LOG_FORMAT)
 };
 
 static const char *_nocolor_level_format[4] = {

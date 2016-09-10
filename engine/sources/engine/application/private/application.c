@@ -11,16 +11,12 @@
 #include <engine/config_system/config_system.h>
 #include <celib/os/process.h>
 
-#include "celib/log/log.h"
 #include "celib/containers/map.h"
 
 #include "engine/memory_system/memory_system.h"
 #include "engine/input/input.h"
 #include "engine/console_server/console_server.h"
 #include "engine/task_manager/task_manager.h"
-
-#include "bgfx/c99/bgfx.h"
-#include "bgfx/c99/bgfxplatform.h"
 
 #define LOG_WHERE "application"
 
@@ -63,7 +59,8 @@ void application_quit() {
     _G.init_error = 0;
 }
 
-int application_init(int argc, char **argv) {
+int application_init(int argc,
+                     char **argv) {
     _G = (struct G) {0};
 
     log_init(_get_worker_id);

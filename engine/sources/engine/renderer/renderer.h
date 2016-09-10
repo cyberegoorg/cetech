@@ -24,6 +24,8 @@ void renderer_set_debug(int debug);
 typedef int camera_t;
 typedef int viewport_t;
 
-void renderer_render_world(world_t world, camera_t camera, viewport_t viewport);
+void renderer_render_world(world_t world,
+                           camera_t camera,
+                           viewport_t viewport);
 
 #endif //CETECH_RENDERER_H

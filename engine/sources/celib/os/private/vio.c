@@ -10,7 +10,9 @@ int vio_close(struct vio *file) {
 }
 
 
-int64_t vio_seek(struct vio *file, int64_t offset, enum vio_seek whence) {
+int64_t vio_seek(struct vio *file,
+                 int64_t offset,
+                 enum vio_seek whence) {
     CE_ASSERT(LOG_WHERE, file != NULL);
 
     return file->seek(file, offset, whence);
@@ -22,7 +24,8 @@ void vio_seek_to_end(struct vio *file) {
     vio_seek(file, 0, VIO_SEEK_END);
 }
 
-int64_t vio_skip(struct vio *file, i64 bytes) {
+int64_t vio_skip(struct vio *file,
+                 i64 bytes) {
     CE_ASSERT(LOG_WHERE, file != NULL);
 
     return vio_seek(file, bytes, VIO_SEEK_CUR);
@@ -52,7 +55,8 @@ size_t vio_read(struct vio *file,
 
 size_t vio_write(struct vio *file,
                  const void *buffer,
-                 size_t size, size_t num) {
+                 size_t size,
+                 size_t num) {
 
     CE_ASSERT(LOG_WHERE, file != NULL);
 

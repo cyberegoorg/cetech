@@ -85,7 +85,8 @@ static void temp_allocator_destroy_##S(struct temp_allocator_64 *allocator) {  \
 }                                                                              \
 
 
-static void _temp_allocator_deallocate(struct allocator *allocator, void *p) {
+static void _temp_allocator_deallocate(struct allocator *allocator,
+                                       void *p) {
 }
 
 static uint32_t _temp_allocator_total_allocated(struct allocator *allocator) {

@@ -21,7 +21,8 @@ struct eventstream {
 // Interface
 //==============================================================================
 
-static inline void eventstream_create(struct eventstream *es, struct allocator *allocator) {
+static inline void eventstream_create(struct eventstream *es,
+                                      struct allocator *allocator) {
     ARRAY_INIT(u8, &es->stream, allocator);
 }
 
@@ -47,7 +48,10 @@ static inline struct event_header *eventstream_next(struct event_header *header)
 
 #define event_stream_push(es, type, event) _eventstream_push(es, (struct event_header*)(&event), type, sizeof(event))
 
-static inline void _eventstream_push(struct eventstream *es, struct event_header *header, u32 type, u64 size) {
+static inline void _eventstream_push(struct eventstream *es,
+                                     struct event_header *header,
+                                     u32 type,
+                                     u64 size) {
     header->type = type;
     header->size = size;
     array_push_u8(&es->stream, (u8 *) header, size);

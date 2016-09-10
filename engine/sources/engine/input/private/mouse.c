@@ -3,7 +3,6 @@
 //==============================================================================
 
 #include <celib/math/types.h>
-#include "celib/types.h"
 #include "engine/machine/machine.h"
 #include "celib/string/string.h"
 #include "celib/math/vec2f.h"
@@ -150,7 +149,8 @@ u32 mouse_axis_index(const char *axis_name) {
     return 0;
 }
 
-void mouse_axis(const u32 axis_index, vec2f_t position) {
+void mouse_axis(const u32 axis_index,
+                vec2f_t position) {
     CE_ASSERT(LOG_WHERE, (axis_index >= 0) && (axis_index < MOUSE_AXIS_MAX));
 
     switch (axis_index) {

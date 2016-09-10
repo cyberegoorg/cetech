@@ -33,7 +33,9 @@ struct queue_task {
 };
 
 
-void queue_task_init(struct queue_task *q, u32 capacity, struct allocator *allocator) {
+void queue_task_init(struct queue_task *q,
+                     u32 capacity,
+                     struct allocator *allocator) {
     *q = (struct queue_task) {0};
 
     q->_capacityMask = capacity - 1;
@@ -66,7 +68,8 @@ void queue_task_destroy(struct queue_task *q) {
 //    return e > d ? e - d : d - e;
 //}
 
-int queue_task_push(struct queue_task *q, u32 value) {
+int queue_task_push(struct queue_task *q,
+                    u32 value) {
     int pos = atomic_load_explicit(&q->_enqueuePos, memory_order_relaxed);
 
     for (;;) {
@@ -92,7 +95,9 @@ int queue_task_push(struct queue_task *q, u32 value) {
     return 1;
 }
 
-int queue_task_pop(struct queue_task *q, u32 *value, u32 defaultt) {
+int queue_task_pop(struct queue_task *q,
+                   u32 *value,
+                   u32 defaultt) {
     int pos = atomic_load_explicit(&q->_dequeuePos, memory_order_relaxed);
 
     for (;;) {
