@@ -199,8 +199,8 @@ catch:
       - copy: *catch_install_include_debug
 
     darwin64:
-      - copy: *catch_install_include_release
       - copy: *catch_install_include_debug
+      - copy: *catch_install_include_release
 
 #########
 # MPack #
