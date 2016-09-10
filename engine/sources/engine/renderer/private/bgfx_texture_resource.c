@@ -6,7 +6,6 @@
 #include <celib/stringid/stringid.h>
 #include <bgfx/c99/bgfx.h>
 #include <engine/resource_manager/resource_manager.h>
-#include <celib/stringid/types.h>
 #include "celib/containers/array.h"
 #include "celib/containers/map.h"
 #include "celib/os/process.h"
@@ -85,15 +84,15 @@ int _texture_compiler(const char *filename,
     memory_set(source_data, 0, vio_size(source_vio) + 1);
     vio_read(source_vio, source_data, sizeof(char), vio_size(source_vio));
 
-    yaml_handler_t h;
+    yaml_document_t h;
     yaml_node_t root = yaml_load_str(source_data, &h);
 
-    yaml_node_t input = yaml_get_node(h, root, "input");
-    yaml_node_t n_gen_mipmaps = yaml_get_node(h, root, "gen_mipmaps");
-    yaml_node_t n_is_normalmap = yaml_get_node(h, root, "is_normalmap");
+    yaml_node_t input = yaml_get_node(root, "input");
+    yaml_node_t n_gen_mipmaps = yaml_get_node(root, "gen_mipmaps");
+    yaml_node_t n_is_normalmap = yaml_get_node(root, "is_normalmap");
 
-    int gen_mipmaps = n_gen_mipmaps ? yaml_node_as_bool(h, n_gen_mipmaps) : 0;
-    int is_normalmap = n_is_normalmap ? yaml_node_as_bool(h, n_is_normalmap) : 0;
+    int gen_mipmaps = yaml_is_valid(n_gen_mipmaps) ? yaml_as_bool(n_gen_mipmaps) : 0;
+    int is_normalmap = yaml_is_valid(n_is_normalmap) ? yaml_as_bool(n_is_normalmap) : 0;
 
     const char *source_dir = resource_compiler_get_source_dir();
 
@@ -108,7 +107,7 @@ int _texture_compiler(const char *filename,
     resource_compiler_get_build_dir(build_dir, CE_ARRAY_LEN(build_dir), application_platform());
     resource_compiler_get_tmp_dir(tmp_dir, CE_ARRAY_LEN(tmp_dir), application_platform());
 
-    yaml_node_as_string(h, input, input_str, CE_ARRAY_LEN(input_str));
+    yaml_as_string(input, input_str, CE_ARRAY_LEN(input_str));
 
     os_path_join(input_path, CE_ARRAY_LEN(input_path), source_dir, input_str);
 
