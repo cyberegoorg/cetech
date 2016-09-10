@@ -4,7 +4,6 @@
 **** Includes
 *******************************************************************************/
 
-#include <engine/memory_system/memory_system.h>
 #include "include/catch/catch.hpp"
 
 extern "C" {
