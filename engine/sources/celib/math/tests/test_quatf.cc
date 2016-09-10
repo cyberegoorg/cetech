@@ -28,52 +28,52 @@ SCENARIO("Basic quatf operation", "[math]") {
         WHEN("q1 + q2") {
             quatf_t result = {0};
 
-            quatf_add(result, q1, q2);
+            quatf_add(&result, &q1, &q2);
 
             THEN("result == [6.0f, 8.0f, 10.0f, 12.0f]") {
-                REQUIRE(result[0] == 6.0f);
-                REQUIRE(result[1] == 8.0f);
-                REQUIRE(result[2] == 10.0f);
-                REQUIRE(result[3] == 12.0f);
+                REQUIRE(result.f[0] == 6.0f);
+                REQUIRE(result.f[1] == 8.0f);
+                REQUIRE(result.f[2] == 10.0f);
+                REQUIRE(result.f[3] == 12.0f);
             }
         }
 
         WHEN("q1 - q2") {
             quatf_t result = {0};
 
-            quatf_sub(result, q1, q2);
+            quatf_sub(&result, &q1, &q2);
 
             THEN("result == [-4.0f, -4.0f, -4.0f, -4.0f]") {
-                REQUIRE(result[0] == -4.0f);
-                REQUIRE(result[1] == -4.0f);
-                REQUIRE(result[2] == -4.0f);
-                REQUIRE(result[3] == -4.0f);
+                REQUIRE(result.f[0] == -4.0f);
+                REQUIRE(result.f[1] == -4.0f);
+                REQUIRE(result.f[2] == -4.0f);
+                REQUIRE(result.f[3] == -4.0f);
             }
         }
 
         WHEN("q1 * 2.0f") {
             quatf_t result = {0};
 
-            quatf_mul_s(result, q1, 2.0f);
+            quatf_mul_s(&result, &q1, 2.0f);
 
             THEN("result == [2.0f, 4.0f, 6.0f, 8.0f]") {
-                REQUIRE(result[0] == 2.0f);
-                REQUIRE(result[1] == 4.0f);
-                REQUIRE(result[2] == 6.0f);
-                REQUIRE(result[3] == 8.0f);
+                REQUIRE(result.f[0] == 2.0f);
+                REQUIRE(result.f[1] == 4.0f);
+                REQUIRE(result.f[2] == 6.0f);
+                REQUIRE(result.f[3] == 8.0f);
             }
         }
 
         WHEN("q1 / 2.0f") {
             quatf_t result = {0};
 
-            quatf_div_s(result, q1, 2.0f);
+            quatf_div_s(&result, &q1, 2.0f);
 
             THEN("result == [0.5f, 1.0f, 1.5f, 2.0f]") {
-                REQUIRE(result[0] == 0.5f);
-                REQUIRE(result[1] == 1.0f);
-                REQUIRE(result[2] == 1.5f);
-                REQUIRE(result[3] == 2.0f);
+                REQUIRE(result.f[0] == 0.5f);
+                REQUIRE(result.f[1] == 1.0f);
+                REQUIRE(result.f[2] == 1.5f);
+                REQUIRE(result.f[3] == 2.0f);
             }
         }
     }
@@ -107,9 +107,9 @@ SCENARIO("identity quaternion == identiy matrix", "[math]") {
         WHEN("convert quat to mat") THEN("mat is identity") {
             mat44f_t mat = {0};
 
-            quatf_to_mat44f(mat, quat_identity);
+                quatf_to_mat44f(&mat, &quat_identity);
 
-            REQUIRE(mat44f_is_identity(mat, f32_Epsilon));
+                REQUIRE(mat44f_is_identity(&mat, f32_Epsilon));
         }
     }
 }

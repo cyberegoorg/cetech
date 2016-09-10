@@ -8,100 +8,104 @@
 
 #include "celib/types.h"
 #include "fmath.h"
+#include "types.h"
 
 
 //==============================================================================
 // Functions
 //==============================================================================
 
-CE_FORCE_INLINE void vec4f_move(f32 *__restrict result,
-                                const f32 *__restrict a) {
-    result[0] = a[0];
-    result[1] = a[1];
-    result[2] = a[2];
-    result[3] = a[3];
+CE_FORCE_INLINE void vec4f_move(vec4f_t *__restrict result,
+                                const vec4f_t *__restrict a) {
+    result->f[0] = a->f[0];
+    result->f[1] = a->f[1];
+    result->f[2] = a->f[2];
+    result->f[3] = a->f[3];
 }
 
-CE_FORCE_INLINE int vec4f_eq(const f32 *__restrict a,
-                             const f32 *__restrict b,
+CE_FORCE_INLINE int vec4f_eq(const vec4f_t *__restrict a,
+                             const vec4f_t *__restrict b,
                              const f32 epsilon) {
-    return f32_equals(a, b, 4, epsilon);
+    return f32_equals(a->f, b->f, 4, epsilon);
 }
 
 
-CE_FORCE_INLINE void vec4f_add(f32 *__restrict result,
-                               const f32 *__restrict a,
-                               const f32 *__restrict b) {
-    result[0] = a[0] + b[0];
-    result[1] = a[1] + b[1];
-    result[2] = a[2] + b[2];
-    result[3] = a[3] + b[3];
+CE_FORCE_INLINE void vec4f_add(vec4f_t *__restrict result,
+                               const vec4f_t *__restrict a,
+                               const vec4f_t *__restrict b) {
+    result->f[0] = a->f[0] + b->f[0];
+    result->f[1] = a->f[1] + b->f[1];
+    result->f[2] = a->f[2] + b->f[2];
+    result->f[3] = a->f[3] + b->f[3];
 }
 
-CE_FORCE_INLINE void vec4f_sub(f32 *__restrict result,
-                               const f32 *__restrict a,
-                               const f32 *__restrict b) {
-    result[0] = a[0] - b[0];
-    result[1] = a[1] - b[1];
-    result[2] = a[2] - b[2];
-    result[3] = a[3] - b[3];
+CE_FORCE_INLINE void vec4f_sub(vec4f_t *__restrict result,
+                               const vec4f_t *__restrict a,
+                               const vec4f_t *__restrict b) {
+    result->f[0] = a->f[0] - b->f[0];
+    result->f[1] = a->f[1] - b->f[1];
+    result->f[2] = a->f[2] - b->f[2];
+    result->f[3] = a->f[3] - b->f[3];
 }
 
-CE_FORCE_INLINE void vec4f_mul(f32 *__restrict result,
-                               const f32 *__restrict a,
+CE_FORCE_INLINE void vec4f_mul(vec4f_t *__restrict result,
+                               const vec4f_t *__restrict a,
                                const f32 s) {
-    result[0] = a[0] * s;
-    result[1] = a[1] * s;
-    result[2] = a[2] * s;
-    result[3] = a[3] * s;
+    result->f[0] = a->f[0] * s;
+    result->f[1] = a->f[1] * s;
+    result->f[2] = a->f[2] * s;
+    result->f[3] = a->f[3] * s;
 }
 
-CE_FORCE_INLINE void vec4f_mul_mat44f(f32 *__restrict result,
-                                      const f32 *__restrict v,
-                                      const f32 *__restrict m) {
-    result[0] = v[0] * m[0] + v[1] * m[4] + v[2] * m[8] + v[3] * m[12];
-    result[1] = v[0] * m[1] + v[1] * m[5] + v[2] * m[9] + v[3] * m[13];
-    result[2] = v[0] * m[2] + v[1] * m[6] + v[2] * m[10] + v[3] * m[14];
-    result[3] = v[0] * m[3] + v[1] * m[7] + v[2] * m[11] + v[3] * m[15];
+CE_FORCE_INLINE void vec4f_mul_mat44f(vec4f_t *__restrict result,
+                                      const vec4f_t *__restrict v,
+                                      const mat44f_t *__restrict m) {
+
+    result->f[0] = v->f[0] * m->f[0] + v->f[1] * m->f[4] + v->f[2] * m->f[8] + v->f[3] * m->f[12];
+    result->f[1] = v->f[0] * m->f[1] + v->f[1] * m->f[5] + v->f[2] * m->f[9] + v->f[3] * m->f[13];
+    result->f[2] = v->f[0] * m->f[2] + v->f[1] * m->f[6] + v->f[2] * m->f[10] + v->f[3] * m->f[14];
+    result->f[3] = v->f[0] * m->f[3] + v->f[1] * m->f[7] + v->f[2] * m->f[11] + v->f[3] * m->f[15];
 }
 
-CE_FORCE_INLINE void vec4f_div(f32 *__restrict result,
-                               const f32 *__restrict a,
+CE_FORCE_INLINE void vec4f_div(vec4f_t *__restrict result,
+                               const vec4f_t *__restrict a,
                                const f32 s) {
-    result[0] = a[0] / s;
-    result[1] = a[1] / s;
-    result[2] = a[2] / s;
-    result[3] = a[3] / s;
+
+    result->f[0] = a->f[0] / s;
+    result->f[1] = a->f[1] / s;
+    result->f[2] = a->f[2] / s;
+    result->f[3] = a->f[3] / s;
 }
 
-CE_FORCE_INLINE f32 vec4f_dot(const f32 *__restrict a,
-                              const f32 *__restrict b) {
-    return (a[0] * b[0]) + (a[1] * b[1]) + (a[2] * b[2]) + (a[3] * b[3]);
+CE_FORCE_INLINE f32 vec4f_dot(const vec4f_t *__restrict a,
+                              const vec4f_t *__restrict b) {
+    return (a->f[0] * b->f[0]) + (a->f[1] * b->f[1]) + (a->f[2] * b->f[2]) + (a->f[3] * b->f[3]);
 }
 
-CE_FORCE_INLINE f32 vec4f_length_squared(const f32 *__restrict a) {
-    return (a[0] * a[0]) + (a[1] * a[1]) + (a[2] * a[2]) + (a[3] * a[3]);
+CE_FORCE_INLINE f32 vec4f_length_squared(const vec4f_t *__restrict a) {
+    return (a->f[0] * a->f[0]) + (a->f[1] * a->f[1]) + (a->f[2] * a->f[2]) + (a->f[3] * a->f[3]);
 }
 
-CE_FORCE_INLINE f32 vec4f_length(const f32 *__restrict a) {
+CE_FORCE_INLINE f32 vec4f_length(const vec4f_t *__restrict a) {
     return f32_sqrt(vec4f_length_squared(a));
 }
 
-CE_FORCE_INLINE void vec4f_normalized(f32 *__restrict result,
-                                      const f32 *__restrict a) {
+CE_FORCE_INLINE void vec4f_normalized(vec4f_t *__restrict result,
+                                      const vec4f_t *__restrict a) {
     const f32 inv_length = 1.0f / vec4f_length(a);
 
     vec4f_mul(result, a, inv_length);
 }
 
-CE_FORCE_INLINE void vec4f_lerp(f32 *__restrict result,
-                                const f32 *__restrict a,
-                                const f32 *__restrict b,
+CE_FORCE_INLINE void vec4f_lerp(vec4f_t *__restrict result,
+                                const vec4f_t *__restrict a,
+                                const vec4f_t *__restrict b,
                                 f32 t) {
-    result[0] = f32_lerp(a[0], b[0], t);
-    result[1] = f32_lerp(a[1], b[1], t);
-    result[2] = f32_lerp(a[2], b[2], t);
-    result[3] = f32_lerp(a[3], b[3], t);
+
+    result->f[0] = f32_lerp(a->f[0], b->f[0], t);
+    result->f[1] = f32_lerp(a->f[1], b->f[1], t);
+    result->f[2] = f32_lerp(a->f[2], b->f[2], t);
+    result->f[3] = f32_lerp(a->f[3], b->f[3], t);
 }
 
 #endif //CETECH_VEC4F_H
