@@ -7,4 +7,8 @@ typedef struct {
     handler_t h;
 } world_t;
 
+typedef struct {
+    u32 idx;
+} transform_t;
+
 #endif //CETECH_WORLD_TYPES_H
