@@ -44,27 +44,29 @@ struct package_compile_data {
     ARRAY_T(u32) offset;
 };
 
-void forach_clb(yaml_handler_t handler, yaml_node_t key, yaml_node_t value, void *data) {
+void forach_clb(yaml_node_t key,
+                yaml_node_t value,
+                void *data) {
     struct package_compile_data *compile_data = data;
 
     char type_str[128] = {0};
     char name_str[128] = {0};
 
-    yaml_node_as_string(handler, key, type_str, CE_ARRAY_LEN(type_str));
+    yaml_as_string(key, type_str, CE_ARRAY_LEN(type_str));
 
     ARRAY_PUSH_BACK(stringid64_t, &compile_data->types, stringid64_from_string(type_str));
     ARRAY_PUSH_BACK(u32, &compile_data->offset, ARRAY_SIZE(&compile_data->name));
 
-    const size_t name_count = yaml_node_size(handler, value);
+    const size_t name_count = yaml_node_size(value);
     ARRAY_PUSH_BACK(u32, &compile_data->name_count, name_count);
 
     for (int i = 0; i < name_count; ++i) {
-        yaml_node_t name_node = yaml_get_seq_node(handler, value, i);
-        yaml_node_as_string(handler, name_node, name_str, CE_ARRAY_LEN(name_str));
+        yaml_node_t name_node = yaml_get_seq_node(value, i);
+        yaml_as_string(name_node, name_str, CE_ARRAY_LEN(name_str));
 
         ARRAY_PUSH_BACK(stringid64_t, &compile_data->name, stringid64_from_string(name_str));
 
-        yaml_node_free(handler, name_node);
+        yaml_node_free(name_node);
     }
 }
 
@@ -77,7 +79,7 @@ int _package_compiler(const char *filename,
     memory_set(source_data, 0, vio_size(source_vio) + 1);
     vio_read(source_vio, source_data, sizeof(char), vio_size(source_vio));
 
-    yaml_handler_t h;
+    yaml_document_t h;
     yaml_node_t root = yaml_load_str(source_data, &h);
 
     struct package_compile_data compile_data = {0};
@@ -86,7 +88,7 @@ int _package_compiler(const char *filename,
     ARRAY_INIT(u32, &compile_data.offset, memsys_main_allocator());
     ARRAY_INIT(u32, &compile_data.name_count, memsys_main_allocator());
 
-    yaml_node_foreach_dict(h, root, forach_clb, &compile_data);
+    yaml_node_foreach_dict(root, forach_clb, &compile_data);
 
     struct package_resource resource = {0};
     resource.type_count = ARRAY_SIZE(&compile_data.types);
