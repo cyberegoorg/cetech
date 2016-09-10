@@ -4,8 +4,8 @@
 cmake_minimum_required(VERSION 3.5)
 project(cetech)
 
-set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=gnu11")
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=gnu11 -Werror")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -Werror")
 set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -rdynamic")
 
 include_directories(engine/sources)
@@ -135,6 +135,7 @@ set(SOURCE_FILES
         engine/sources/engine/lua_system/private/api/api_resouce_compilator.c
         engine/sources/engine/lua_system/private/api/api_resouce_manager.c
         engine/sources/engine/lua_system/private/api/api_renderer.c
+        engine/sources/engine/lua_system/private/api/api_world.c
 
         engine/sources/engine/config_system/private/config_system.c
         engine/sources/engine/console_server/private/console_server.c
@@ -165,7 +166,7 @@ set(SOURCE_FILES
         engine/sources/engine/resource_manager/private/package.c
 
         engine/sources/engine/renderer/private/bgx_renderer.c
-        engine/sources/engine/renderer/private/bgfx_texture_resource.c engine/sources/engine/world_system/private/world_system.c)
+        engine/sources/engine/renderer/private/bgfx_texture_resource.c engine/sources/engine/world_system/private/world_system.c engine/sources/engine/entcom/private/entcom.c engine/sources/engine/world_system/private/transform.c)
 
 ################################################################################
 # Main sources
