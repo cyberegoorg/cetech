@@ -34,6 +34,7 @@
 
 #define MAP_HAS(N, h, key)                map_has_##N(h, key)
 #define MAP_GET(N, h, key, deffault)      map_get_##N(h, key, deffault)
+#define MAP_GET_PTR(N, h, key)            map_get_ptr##N(h, key)
 #define MAP_SET(N, h, key, value)         map_set_##N(h, key, (value))
 #define MAP_REMOVE(N, h, key)             map_remove_##N(h, key)
 #define MAP_RESERVE(N, h, size)           map_reserve_##N(h, size)
@@ -252,6 +253,10 @@ static int map_has_##N(MAP_T(N) *h, uint64_t key) {                            \
 static T map_get_##N(MAP_T(N) *h, uint64_t key, T deffault) {                  \
     const uint32_t i = _map_find_or_fail_##N(h, key);                          \
     return i == _MAP_END_OF_LIST ? deffault : ARRAY_AT(&h->_data, i).value;    \
+}                                                                              \
+static T* map_get_ptr##N(MAP_T(N) *h, uint64_t key) {                          \
+    const uint32_t i = _map_find_or_fail_##N(h, key);                          \
+    return i == _MAP_END_OF_LIST ? NULL : &(ARRAY_AT(&h->_data, i).value);     \
 }                                                                              \
                                                                                \
 static void map_set_##N(MAP_T(N) *h, uint64_t key, T value) {                  \
