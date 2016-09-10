@@ -5,7 +5,8 @@
 #include <stdio.h>
 
 #if defined(CETECH_LINUX)
-//  #include <sys/file.h>
+
+#include <sys/file.h>
 #endif
 
 #include "celib/log/log.h"
@@ -15,23 +16,26 @@
 **** Internals
 ***********************************************************************/
 
-#define COLOR_RED  "\x1B[31m"
-#define COLOR_GREEN  "\x1B[32m"
-#define COLOR_YELLOW  "\x1B[33m"
-#define COLOR_BLUE  "\x1B[34m"
-#define COLOR_RESET "\033[0m"
+#define FBLACK      "\033[30;"
+
+#define BRED        "41m"
+#define BGREEN      "42m"
+#define BYELLOW     "43m"
+#define BBLUE       "44m"
+
+#define NONE        "\033[0m"
 
 #define LOG_FORMAT   \
-    "---\n"          \
+    "---\n"          \s
     "level: %s\n"    \
     "where: %s\n"    \
     "time: %s\n"     \
     "worker: %d\n"   \
-    "msg: |\n  %s\n" \
+    "msg: |\n  %s\n"
 
 
 #ifdef CETECH_COLORED_LOG
-#define COLORED_TEXT(color, text) color text COLOR_RESET
+#define COLORED_TEXT(color, text) color text NONE
 #else
 #define COLORED_TEXT(color, text) text
 #endif
@@ -44,10 +48,14 @@ static const char *_level_to_str[4] = {
 };
 
 static const char *_level_format[4] = {
-        [LOG_INFO]    = COLORED_TEXT(COLOR_BLUE, LOG_FORMAT),
-        [LOG_WARNING] = COLORED_TEXT(COLOR_YELLOW, LOG_FORMAT),
-        [LOG_ERROR]   = COLORED_TEXT(COLOR_RED, LOG_FORMAT),
-        [LOG_DBG]     = COLORED_TEXT(COLOR_GREEN, LOG_FORMAT)
+        [LOG_INFO]    = COLORED_TEXT(FBLACK
+                                             BBLUE, LOG_FORMAT),
+        [LOG_WARNING] = COLORED_TEXT(FBLACK
+                                             BYELLOW, LOG_FORMAT),
+        [LOG_ERROR]   = COLORED_TEXT(FBLACK
+                                             BRED, LOG_FORMAT),
+        [LOG_DBG]     = COLORED_TEXT(FBLACK
+                                             BGREEN, LOG_FORMAT)
 };
 
 static const char *_nocolor_level_format[4] = {
@@ -82,15 +90,15 @@ void log_stdout_handler(enum log_level level,
     const char *time_str = _time_to_str(gmtm);
 
 #if defined(CETECH_LINUX)
-    // flock(out->_fileno, LOCK_EX);
+    flock(out->_fileno, LOCK_EX);
 #endif
 
     fprintf(out, _level_format[level], _level_to_str[level],
             where, time_str, worker_id, msg);
 
-    //fflush(out);
+    fflush(out);
 
 #if defined(CETECH_LINUX)
-    //   flock(out->_fileno, LOCK_UN);
+    flock(out->_fileno, LOCK_UN);
 #endif
 }
