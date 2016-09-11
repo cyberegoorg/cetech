@@ -2,10 +2,9 @@
 // Include
 //==============================================================================
 
-#include <engine/resource_compiler/resource_compiler.h>
-#include <celib/stringid/stringid.h>
 #include <bgfx/c99/bgfx.h>
-#include <engine/resource_manager/resource_manager.h>
+
+#include <celib/stringid/stringid.h>
 #include "celib/containers/array.h"
 #include "celib/containers/map.h"
 #include "celib/os/process.h"
@@ -16,6 +15,9 @@
 
 #include "engine/memory_system/memory_system.h"
 #include "engine/application/application.h"
+#include "engine/resource_manager/resource_manager.h"
+#include "engine/resource_compiler/resource_compiler.h"
+
 
 //==============================================================================
 // Structs
@@ -81,10 +83,10 @@ static int _gen_tmp_name(char *tmp_filename,
     return snprintf(tmp_filename, max_len, "%s/%s.ktx", tmp_dir, filename);
 }
 
-int _texture_compiler(const char *filename,
-                      struct vio *source_vio,
-                      struct vio *build_vio,
-                      struct compilator_api *compilator_api) {
+int _texture_resource_compiler(const char *filename,
+                               struct vio *source_vio,
+                               struct vio *build_vio,
+                               struct compilator_api *compilator_api) {
 
     char source_data[vio_size(source_vio) + 1];
     memory_set(source_data, 0, vio_size(source_vio) + 1);
@@ -221,7 +223,7 @@ int texture_resource_init() {
 
     MAP_INIT(bgfx_texture_handle_t, &_G.handler_map, memsys_main_allocator());
 
-    resource_compiler_register(_G.texture_type, _texture_compiler);
+    resource_compiler_register(_G.texture_type, _texture_resource_compiler);
 
     resource_register_type(_G.texture_type, texture_resource_callback);
 
