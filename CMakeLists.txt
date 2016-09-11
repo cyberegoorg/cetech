@@ -166,7 +166,7 @@ set(SOURCE_FILES
         engine/sources/engine/resource_manager/private/package.c
 
         engine/sources/engine/renderer/private/bgx_renderer.c
-        engine/sources/engine/renderer/private/bgfx_texture_resource.c engine/sources/engine/world_system/private/world_system.c engine/sources/engine/entcom/private/entcom.c engine/sources/engine/world_system/private/transform.c)
+        engine/sources/engine/renderer/private/bgfx_texture_resource.c engine/sources/engine/world_system/private/world_system.c engine/sources/engine/entcom/private/entcom.c engine/sources/engine/world_system/private/transform.c engine/sources/engine/world_system/private/unit_system.c)
 
 ################################################################################
 # Main sources
