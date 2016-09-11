@@ -84,6 +84,9 @@ void yaml_node_foreach_dict(yaml_node_t node,
                             yaml_foreach_map_clb_t foreach_clb,
                             void *data);
 
+void yaml_merge(yaml_node_t root,
+                yaml_node_t parent);
+
 //==============================================================================
 // Define nodes
 //==============================================================================

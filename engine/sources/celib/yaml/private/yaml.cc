@@ -25,6 +25,23 @@ struct yamlcpp_handler {
     char used[4096];
 };
 
+
+static inline void _yaml_merge_internal(YAML::Node &root,
+                                        const YAML::Node &parent) {
+    for (YAML::const_iterator it = parent.begin(); it != parent.end(); ++it) {
+        auto node = root[it->first];
+
+        if (!node) {
+            root[it->first] = it->second;
+        } else {
+            if (node.IsMap()) {
+                auto rnode = root[it->first];
+                _yaml_merge_internal(rnode, it->second);
+            }
+        }
+    }
+}
+
 static yaml_node_t new_node(yaml_document_t handler,
                             const YAML::Node &node) {
     struct yamlcpp_handler *yaml_handler = (yamlcpp_handler *) handler.d;
@@ -114,8 +131,8 @@ yaml_node_foreach_dict(yaml_node_t node,
 
         foreach_clb(key, value, data);
 
-        yaml_node_free(key);
-        yaml_node_free(value);
+        //yaml_node_free(key);
+        //yaml_node_free(value);
     }
 }
 
@@ -125,6 +142,17 @@ extern "C" int yaml_as_string(yaml_node_t node,
     yamlcpp_handler *nh = (yamlcpp_handler *) node.doc.d;
 
     YAML_EX_SCOPE({ return snprintf(output, max_len, "%s", nh->nodes[node.idx].as<std::string>().c_str()); })
+}
+
+extern "C" void yaml_merge(yaml_node_t root,
+                           yaml_node_t parent) {
+    yamlcpp_handler *root_h = (yamlcpp_handler *) root.doc.d;
+    yamlcpp_handler *parent_h = (yamlcpp_handler *) parent.doc.d;
+
+    auto root_node = root_h->nodes[root.idx];
+    auto parent_node = parent_h->nodes[parent.idx];
+
+    _yaml_merge_internal(root_node, parent_node);
 }
 
 extern "C" int yaml_as_bool(yaml_node_t node) {
@@ -142,6 +170,18 @@ vec3f_t yaml_as_vec3f_t(yaml_node_t body) {
     CE_ASSERT("yaml", yaml_is_valid(x));
     v.x = yaml_as_float(x);
     yaml_node_free(x);
+
+
+    yaml_node_t y = yaml_get_seq_node(body, 0);
+    CE_ASSERT("yaml", yaml_is_valid(y));
+    v.y = yaml_as_float(y);
+    yaml_node_free(y);
+
+
+    yaml_node_t z = yaml_get_seq_node(body, 0);
+    CE_ASSERT("yaml", yaml_is_valid(z));
+    v.z = yaml_as_float(z);
+    yaml_node_free(z);
 
     return v;
 }
