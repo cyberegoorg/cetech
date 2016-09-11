@@ -13,9 +13,11 @@
 #include "engine/resource_manager/resource_manager.h"
 #include "engine/filesystem/filesystem.h"
 #include "engine/renderer/renderer.h"
+#include "engine/entcom/entcom.h"
 #include "engine/world_system/world_system.h"
 #include "engine/world_system/transform.h"
-#include "engine/entcom/entcom.h"
+#include "engine/world_system/unit_system.h"
+
 
 
 #define _SYSTEMS_SIZE sizeof(_SYSTEMS)/sizeof(_SYSTEMS[0])
@@ -40,6 +42,7 @@ static const struct {
         _REGISTER_SYSTEM(luasys),
         _REGISTER_SYSTEM(renderer),
         _REGISTER_SYSTEM(world),
+        _REGISTER_SYSTEM(unit),
         _REGISTER_SYSTEM(entcom),
         _REGISTER_SYSTEM(transform),
 };
