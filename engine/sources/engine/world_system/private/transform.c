@@ -1,4 +1,3 @@
-
 #include <celib/containers/array.h>
 #include <celib/yaml/yaml.h>
 #include <celib/stringid/types.h>
@@ -7,13 +6,13 @@
 #include <engine/memory_system/memory_system.h>
 #include <celib/math/quatf.h>
 #include <celib/math/mat44f.h>
-
+#include <celib/stringid/stringid.h>
+#include "../transform.h"
 
 struct transform_data {
-    struct component_data component;
     vec3f_t position;
-    vec3f_t rotation;
     vec3f_t scale;
+    quatf_t rotation;
 };
 
 ARRAY_PROTOTYPE(vec3f_t)
@@ -88,14 +87,24 @@ int _transform_component_compiler(yaml_node_t body,
                                   ARRAY_T(u8) *data) {
 
     struct transform_data t_data;
-    t_data.component.size = sizeof(t_data);
-    t_data.component.type = _G.type;
 
-    YAML_NODE_SCOPE(position, body, "position", t_data.position = yaml_as_vec3f_t(position););
-    YAML_NODE_SCOPE(rotation, body, "rotation", t_data.rotation = yaml_as_vec3f_t(rotation););
     YAML_NODE_SCOPE(scale, body, "scale", t_data.scale = yaml_as_vec3f_t(scale););
+    YAML_NODE_SCOPE(position, body, "position", t_data.position = yaml_as_vec3f_t(position););
 
-    ARRAY_PUSH(u8, data, (u8 *) &t_data, t_data.component.size);
+    {
+        yaml_node_t rotation = yaml_get_node(body, "rotation");
+        vec3f_t v_rad = {0};
+
+        vec3f_t v = yaml_as_vec3f_t(rotation);
+        vec3f_mul(&v_rad, &v, f32_ToRad);
+
+        quatf_from_euler(&t_data.rotation, v.x, v.y, v.z);
+
+        yaml_node_free(rotation);
+    };
+
+
+    ARRAY_PUSH(u8, data, (u8 *) &t_data, sizeof(t_data));
 
     return 1;
 }
@@ -119,7 +128,21 @@ void _spawner(world_t world,
               entity_t *ents_parent,
               size_t ent_count,
               void *data) {
+    struct transform_data *tdata = data;
 
+    for (int i = 0; i < ent_count; ++i) {
+        transform_create(world,
+                         ents[i],
+                         ents_parent[i].idx != UINT32_MAX ? ents[ents_parent[i].idx] : (entity_t) {.idx = UINT32_MAX},
+                         tdata->position,
+                         tdata->rotation,
+                         tdata->scale);
+    }
+
+    mat44f_t m = MAT44F_INIT_IDENTITY;
+    for (int i = 0; i < ent_count; ++i) {
+        transform_transform(world, transform_get(world, ents[i]), &m);
+    }
 }
 
 
@@ -127,6 +150,8 @@ int transform_init() {
     _G = (struct G) {0};
 
     MAP_INIT(world_data_t, &_G.world, memsys_main_allocator());
+
+    _G.type = stringid64_from_string("transform");
 
     component_register_compiler(_G.type, _transform_component_compiler, 10);
     component_register_type(_G.type, _spawner, _destroyer, _on_world_create, _on_world_destroy);
@@ -287,7 +312,7 @@ transform_t transform_create(world_t world,
 
     ARRAY_PUSH_BACK(vec3f_t, &data->Position, position);
     ARRAY_PUSH_BACK(quatf_t, &data->Rotation, rotation);
-    ARRAY_PUSH_BACK(vec3f_t, &data->Position, scale);
+    ARRAY_PUSH_BACK(vec3f_t, &data->Scale, scale);
 
     ARRAY_PUSH_BACK(u32, &data->Parent, UINT32_MAX);
     ARRAY_PUSH_BACK(u32, &data->FirstChild, UINT32_MAX);
@@ -345,5 +370,4 @@ void transform_link(world_t world,
 
     transform_transform(world, parent_tr, p);
     transform_transform(world, child_tr, transform_get_world_matrix(world, transform_get(world, parent)));
-
 }
