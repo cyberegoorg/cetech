@@ -17,13 +17,11 @@
 //==============================================================================
 
 typedef struct {
-    handler_t h;
+    union {
+        handler_t h;
+        u32 idx;
+    };
 } entity_t;
-
-struct component_data {
-    stringid64_t type;
-    u32 size;
-};
 
 typedef int (*component_compiler_t)(yaml_node_t body,
                                     ARRAY_T(u8) *data);

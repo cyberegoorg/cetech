@@ -71,7 +71,7 @@ void entcom_shutdown() {
 }
 
 entity_t entity_manager_create() {
-    return (entity_t) {.h = handlerid_handler_create(&_G.entity_handler)};
+    return (entity_t) {.idx = handlerid_handler_create(&_G.entity_handler).h};
 }
 
 void entity_manager_destroy(entity_t entity) {
@@ -124,4 +124,20 @@ void component_register_type(stringid64_t type,
     };
 
     world_register_callback(clb);
+}
+
+void component_spawn(world_t world,
+                     stringid64_t type,
+                     entity_t *ent_ids,
+                     entity_t *ents_parent,
+                     u32 ent_count,
+                     void *data) {
+    component_spawner_t spawner = MAP_GET(component_spawner_t, &_G.spawner_map, type.id, NULL);
+
+    if (spawner == NULL) {
+        return;
+    }
+
+    spawner(world, ent_ids, ents_parent, ent_count, data);
+
 }

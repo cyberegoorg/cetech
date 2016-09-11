@@ -36,7 +36,7 @@ void component_register_compiler(stringid64_t type,
 
 int component_compile(stringid64_t type,
                       yaml_node_t body,
-                      struct vio *build);
+                      ARRAY_T(u8) *data);
 
 u32 component_get_spawn_order(stringid64_t type);
 
@@ -46,9 +46,13 @@ void component_register_type(stringid64_t type,
                              component_on_world_create_t on_world_create,
                              component_on_world_destroy_t on_world_destroy);
 
-//void Spawn(int world, long type, int[] ent_ids, int[] ents_parent,
-//                         MessagePackObjectDictionary[] data)
-//
+void component_spawn(world_t world,
+                     stringid64_t type,
+                     entity_t *ent_ids,
+                     entity_t *ents_parent,
+                     u32 ent_count,
+                     void *data);
+
 //public static void DestroyAllType(int world, int[] ent_ids)
 
 
