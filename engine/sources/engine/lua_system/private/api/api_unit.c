@@ -1,4 +1,4 @@
-#include <engine/application/application.h>
+
 #include <engine/entcom/types.h>
 #include <celib/stringid/stringid.h>
 #include <engine/world_system/unit_system.h>

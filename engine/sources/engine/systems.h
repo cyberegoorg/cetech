@@ -19,7 +19,6 @@
 #include "engine/world_system/unit_system.h"
 
 
-
 #define _SYSTEMS_SIZE sizeof(_SYSTEMS)/sizeof(_SYSTEMS[0])
 #define _REGISTER_SYSTEM(n) {.name= #n, .init=n##_init, .shutdown=n##_shutdown}
 

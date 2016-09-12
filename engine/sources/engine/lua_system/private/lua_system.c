@@ -12,9 +12,6 @@
 #include <engine/application/application.h>
 #include <celib/math/types.h>
 #include <celib/math/vec2f.h>
-#include <celib/math/vec3f.h>
-#include <celib/math/vec4f.h>
-#include <celib/math/quatf.h>
 #include "celib/errors/errors.h"
 
 #include "engine/lua_system/lua_system.h"
