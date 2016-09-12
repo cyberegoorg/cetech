@@ -10,6 +10,15 @@
 #include <engine/application/application.h>
 #include <engine/cvar/cvar.h>
 #include <celib/os/process.h>
+#include <engine/machine/machine.h>
+#include <engine/resource_manager/resource_manager.h>
+#include <engine/lua_system/lua_system.h>
+#include <engine/resource_compiler/resource_compiler.h>
+#include <engine/renderer/renderer.h>
+#include <engine/entcom/types.h>
+#include <engine/world_system/unit_system.h>
+#include <engine/world_system/transform.h>
+#include <engine/world_system/world_system.h>
 
 #include "celib/containers/map.h"
 
@@ -75,7 +84,7 @@ int application_init(int argc,
     _G.cv_boot_pkg = cvar_new_str("application.boot_pkg", "Boot package", "boot");
     _G.cv_boot_script = cvar_new_str("application.boot_scrpt", "Boot script", "lua/boot");
 
-    for (int i = 0; i < _SYSTEMS_SIZE; ++i) {
+    for (int i = 0; i < STATIC_SYSTEMS_SIZE; ++i) {
         if (!_SYSTEMS[i].init()) {
             log_error(LOG_WHERE, "Could not init system \"%s\"", _SYSTEMS[i].name);
 
@@ -97,7 +106,7 @@ void application_shutdown() {
     log_debug(LOG_WHERE, "Shutdown");
 
     if (!_G.init_error) {
-        for (int i = _SYSTEMS_SIZE - 1; i >= 0; --i) {
+        for (int i = STATIC_SYSTEMS_SIZE - 1; i >= 0; --i) {
             _SYSTEMS[i].shutdown();
         }
 
