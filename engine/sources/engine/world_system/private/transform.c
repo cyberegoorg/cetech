@@ -120,7 +120,12 @@ void _on_world_destroy(world_t world) {
 void _destroyer(world_t world,
                 entity_t *ents,
                 size_t ent_count) {
+    world_data_t *world_data = _get_world_data(world);
 
+    // TODO: remove from arrays, swap idx -> last AND change size
+    for (int i = 0; i < ent_count; i++) {
+        MAP_REMOVE(u32, &world_data->EntIdx, ents[i].idx);
+    }
 }
 
 void _spawner(world_t world,
@@ -155,6 +160,7 @@ int transform_init() {
 
     component_register_compiler(_G.type, _transform_component_compiler, 10);
     component_register_type(_G.type, _spawner, _destroyer, _on_world_create, _on_world_destroy);
+
     return 1;
 }
 
