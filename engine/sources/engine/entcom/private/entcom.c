@@ -2,14 +2,13 @@
 // Includes
 //==============================================================================
 
-#include <celib/stringid/types.h>
-#include <engine/world_system/world_system.h>
-#include "../types.h"
-
-#include "engine/memory_system/memory_system.h"
-
+#include "celib/stringid/types.h"
 #include "celib/containers/map.h"
 
+#include "engine/world_system/world_system.h"
+#include "engine/memory_system/memory_system.h"
+
+#include "../entcom.h"
 
 //==============================================================================
 // Globals
@@ -132,12 +131,12 @@ void component_spawn(world_t world,
                      entity_t *ents_parent,
                      u32 ent_count,
                      void *data) {
-    component_spawner_t spawner = MAP_GET(component_spawner_t, &_G.spawner_map, type.id, NULL);
+    component_spawner_t clb = MAP_GET(component_spawner_t, &_G.spawner_map, type.id, NULL);
 
-    if (spawner == NULL) {
+    if (clb == NULL) {
         return;
     }
 
-    spawner(world, ent_ids, ents_parent, ent_count, data);
+    clb(world, ent_ids, ents_parent, ent_count, data);
 
 }
