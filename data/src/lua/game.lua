@@ -26,7 +26,11 @@ function Game:init()
     --    self.viewport = Renderer.GetViewport("default")
     self.world = World.create()
 
-    --self.unit = Unit.Spawn(self.world, "unit1");
+    self.unit = Unit.spawn(self.world, "unit1");
+    local t = Transform.get(self.world, self.unit)
+    local p = Transform.get_scale(self.world, t)
+    Log.debug("lua", "%f %f %f", p.x, p.y, p.z)
+
     --    self.level = World.LoadLevel(self.world, "level1");
     --    self.level = World.LoadLevel(self.world, "level1",
     --                 Vec3f.make(2, 5.0, 0.0),
@@ -105,6 +109,7 @@ function Game:update(dt)
 
 
     --    Log.info("dddd", "dddddd")
+
     --    local transform = Transform.GetTransform(self.world, self.camera_unit)
     --    local pos = Transform.GetPosition(self.world, transform)
     --
@@ -112,25 +117,28 @@ function Game:update(dt)
     --        pos.Y = pos.Y + 1;
     --        Transform.SetPosition(self.world, transform, pos)
     --    end
-    --
-    --    local dx = 0
-    --    local dy = 0
-    --    if Mouse.ButtonState(Mouse.button_index("left")) then
-    --        local m_axis = Mouse.Axis(Mouse.AxisIndex("delta"))
-    --        dx, dy = m_axis.X, -m_axis.Y
-    --    end
-    --
-    --    local up = Keyboard.ButtonState(Keyboard.button_index('w'))
-    --    local down = Keyboard.ButtonState(Keyboard.button_index('s'))
-    --    local left = Keyboard.ButtonState(Keyboard.button_index('a'))
-    --    local right = Keyboard.ButtonState(Keyboard.button_index('d'))
-    --
-    --    local updown = 0.0
-    --    local leftdown = 0.0
-    --    if up then updown = 1.0 end
-    --    if down then updown = -1.0 end
-    --    if left then leftdown = -1.0 end
-    --    if right then leftdown = 1.0 end
+
+
+    local dx = 0
+    local dy = 0
+    if Mouse.button_state(Mouse.button_index("left")) then
+        local m_axis = Mouse.axis(Mouse.axis_index("relative"))
+        dx, dy = m_axis.x, -m_axis.y
+        --Log.debug("lua", "%f %f", dx, dy)
+    end
+
+
+    local up = Keyboard.button_state(Keyboard.button_index('w'))
+    local down = Keyboard.button_state(Keyboard.button_index('s'))
+    local left = Keyboard.button_state(Keyboard.button_index('a'))
+    local right = Keyboard.button_state(Keyboard.button_index('d'))
+
+    local updown = 0.0
+    local leftdown = 0.0
+    if up then updown = 1.0 end
+    if down then updown = -1.0 end
+    if left then leftdown = -1.0 end
+    if right then leftdown = 1.0 end
     --
     --    self.fps_camera:update(dt, dx * 0.01, dy * 0.01, updown, leftdown)
     --
@@ -140,7 +148,7 @@ function Game:update(dt)
     --        -- -- Log.info("lua", "{0}, {1}, {2}", left_a.X, left_a.Y, left_a.Z)
     --        self.fps_camera:update(dt, right_a.X*-0.06, right_a.Y*-0.06, left_a.Y, left_a.X)
     --
-    --        if Gamepad.ButtonState(0, Gamepad.button_index("right_shoulder")) then
+    --        if Gamepad.button_state(0, Gamepad.button_index("right_shoulder")) then
     --            self.fps_camera.fly_mode = true
     --        else
     --            self.fps_camera.fly_mode = false

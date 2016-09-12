@@ -136,6 +136,8 @@ set(SOURCE_FILES
         engine/sources/engine/lua_system/private/api/api_resouce_manager.c
         engine/sources/engine/lua_system/private/api/api_renderer.c
         engine/sources/engine/lua_system/private/api/api_world.c
+        engine/sources/engine/lua_system/private/api/api_unit.c
+        engine/sources/engine/lua_system/private/api/api_transform.c
 
         engine/sources/engine/config_system/private/config_system.c
         engine/sources/engine/console_server/private/console_server.c
