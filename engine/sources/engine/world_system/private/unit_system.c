@@ -401,3 +401,15 @@ entity_t unit_spawn_from_resource(world_t world,
 
     return entities[0];
 }
+
+entity_t unit_spawn(world_t world,
+                    stringid64_t name) {
+    void *res = resource_get(_G.type, name);
+
+    if (res == NULL) {
+        log_error("unit", "Could not spawn unit.");
+        return (entity_t) {.idx = 0};
+    }
+
+    return unit_spawn_from_resource(world, res);
+}
