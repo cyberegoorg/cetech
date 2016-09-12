@@ -69,16 +69,13 @@ static int _mouse_axis_name(lua_State *l) {
 }
 
 static int _mouse_axis(lua_State *l) {
-    u32 idx = (u32) (luasys_to_float(l, 1));
+    u32 idx = (u32) (luasys_to_int(l, 1));
 
     vec2f_t pos = {0};
-    mouse_axis(idx, pos);
+    mouse_axis(idx, &pos);
 
-    luasys_push_float(l, pos.x);
-    luasys_push_float(l, pos.y);
-
-    return 2;
-
+    luasys_push_vector2(l, pos);
+    return 1;
 }
 
 void _register_lua_mouse_api() {
