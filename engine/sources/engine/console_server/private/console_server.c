@@ -13,7 +13,7 @@
 #include "celib/errors/errors.h"
 #include "celib/string/string.h"
 
-#include "engine/config_system/config_system.h"
+#include "engine/cvar/cvar.h"
 
 //==============================================================================
 // Defines
@@ -110,8 +110,8 @@ static void _serve_command(const char *packet,
 int consolesrv_init() {
     log_debug(LOG_WHERE, "Init");
 
-    cvar_t rpc_port = config_new_int("console_server.rpc.port", "Console server rpc port", 4444);
-    cvar_t rpc_addr = config_new_string("console_server.rpc.addr", "Console server rpc addr", "ws://*");
+    cvar_t rpc_port = cvar_new_int("console_server.rpc.port", "Console server rpc port", 4444);
+    cvar_t rpc_addr = cvar_new_str("console_server.rpc.addr", "Console server rpc addr", "ws://*");
 
     int socket = nn_socket(AF_SP, NN_REP);
     if (socket < 0) {
@@ -120,7 +120,7 @@ int consolesrv_init() {
     }
 
     char addr[128] = {0};
-    snprintf(addr, 128, "%s:%d", config_get_string(rpc_addr), config_get_int(rpc_port));
+    snprintf(addr, 128, "%s:%d", cvar_get_string(rpc_addr), cvar_get_int(rpc_port));
 
     log_debug(LOG_WHERE, "RPC address: %s", addr);
 

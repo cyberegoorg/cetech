@@ -8,7 +8,7 @@
 #include <celib/window/window.h>
 #include <celib/stringid/stringid.h>
 #include <engine/application/application.h>
-#include <engine/config_system/config_system.h>
+#include <engine/cvar/cvar.h>
 #include <celib/os/process.h>
 
 #include "celib/containers/map.h"
@@ -72,8 +72,8 @@ int application_init(int argc,
 
     memsys_init(4 * 1024 * 1024);
 
-    _G.cv_boot_pkg = config_new_string("application.boot_pkg", "Boot package", "boot");
-    _G.cv_boot_script = config_new_string("application.boot_scrpt", "Boot script", "lua/boot");
+    _G.cv_boot_pkg = cvar_new_str("application.boot_pkg", "Boot package", "boot");
+    _G.cv_boot_script = cvar_new_str("application.boot_scrpt", "Boot script", "lua/boot");
 
     for (int i = 0; i < _SYSTEMS_SIZE; ++i) {
         if (!_SYSTEMS[i].init()) {
@@ -164,20 +164,20 @@ static void _game_render_task(void *d) {
 }
 
 static void _boot_stage() {
-    stringid64_t boot_pkg = stringid64_from_string(config_get_string(_G.cv_boot_pkg));
+    stringid64_t boot_pkg = stringid64_from_string(cvar_get_string(_G.cv_boot_pkg));
     stringid64_t pkg = stringid64_from_string("package");
 
     resource_load_now(pkg, &boot_pkg, 1);
     package_load(boot_pkg);
     package_flush(boot_pkg);
 
-    stringid64_t boot_script = stringid64_from_string(config_get_string(_G.cv_boot_script));
+    stringid64_t boot_script = stringid64_from_string(cvar_get_string(_G.cv_boot_script));
     luasys_execute_boot_script(boot_script);
 }
 
 
 static void _boot_unload() {
-    stringid64_t boot_pkg = stringid64_from_string(config_get_string(_G.cv_boot_pkg));
+    stringid64_t boot_pkg = stringid64_from_string(cvar_get_string(_G.cv_boot_pkg));
     stringid64_t pkg = stringid64_from_string("package");
 
     package_unload(boot_pkg);

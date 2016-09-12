@@ -18,7 +18,7 @@
 #include "engine/memory_system/memory_system.h"
 
 #include "celib/os/vio.h"
-#include "engine/config_system/config_system.h"
+#include "engine/cvar/cvar.h"
 
 #include "builddb.h"
 
@@ -185,11 +185,11 @@ void _compile_dir(task_t root_task,
 int resource_compiler_init() {
     _G = (struct G) {0};
 
-    _G.cv_source_dir = config_new_string("resource_compiler.source_dir", "Resource source dir", "data/src");
-    _G.cv_core_dir = config_new_string("resource_compiler.core_dir", "Resource core source dir", "core");
-    _G.cv_build_dir = config_new_string("resource_compiler.build_dir", "Resource build dir", "data/build");
+    _G.cv_source_dir = cvar_new_str("resource_compiler.source_dir", "Resource source dir", "data/src");
+    _G.cv_core_dir = cvar_new_str("resource_compiler.core_dir", "Resource core source dir", "core");
+    _G.cv_build_dir = cvar_new_str("resource_compiler.build_dir", "Resource build dir", "data/build");
 
-    const char *build_dir = config_get_string(_G.cv_build_dir);
+    const char *build_dir = cvar_get_string(_G.cv_build_dir);
     char build_dir_full[1024] = {0};
     os_path_join(build_dir_full, CE_ARRAY_LEN(build_dir_full), build_dir, application_platform());
 
@@ -222,9 +222,9 @@ void resource_compiler_register(stringid64_t type,
 
 
 void resource_compiler_compile_all() {
-    const char *core_dir = config_get_string(_G.cv_core_dir);
-    const char *build_dir = config_get_string(_G.cv_build_dir);
-    const char *source_dir = config_get_string(_G.cv_source_dir);
+    const char *core_dir = cvar_get_string(_G.cv_core_dir);
+    const char *build_dir = cvar_get_string(_G.cv_build_dir);
+    const char *source_dir = cvar_get_string(_G.cv_source_dir);
     const char *platform = application_platform();
 
     char build_dir_full[1024] = {0};
@@ -258,13 +258,13 @@ int resource_compiler_get_filename(char *filename,
 }
 
 const char *resource_compiler_get_source_dir() {
-    return config_get_string(_G.cv_source_dir);
+    return cvar_get_string(_G.cv_source_dir);
 }
 
 int resource_compiler_get_build_dir(char *build_dir,
                                     size_t max_len,
                                     const char *platform) {
-    const char *build_dir_str = config_get_string(_G.cv_build_dir);
+    const char *build_dir_str = cvar_get_string(_G.cv_build_dir);
     return os_path_join(build_dir, max_len, build_dir_str, platform);
 }
 

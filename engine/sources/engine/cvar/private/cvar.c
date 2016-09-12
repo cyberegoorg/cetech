@@ -4,7 +4,7 @@
 
 #include <engine/memory_system/memory_system.h>
 #include "celib/memory/memory.h"
-#include "engine/config_system/config_system.h"
+#include "engine/cvar/cvar.h"
 #include "celib/string/string.h"
 
 //==============================================================================
@@ -14,7 +14,7 @@
 #define MAX_VARIABLES 1024
 #define MAX_NAME_LEN 128
 #define MAX_DESC_LEN 256
-#define LOG_WHERE "config_system"
+#define LOG_WHERE "cvar"
 
 #define make_cvar(i) (cvar_t){.idx = i}
 
@@ -85,19 +85,19 @@ cvar_t _find_first_free() {
 // Interface
 //==============================================================================
 
-int config_init() {
+int cvar_init() {
     log_debug(LOG_WHERE, "Init");
 
     return 1;
 }
 
-void config_shutdown() {
+void cvar_shutdown() {
     log_debug(LOG_WHERE, "Shutdown");
 
     _dealloc_allm_string();
 }
 
-cvar_t config_find(const char *name) {
+cvar_t cvar_find(const char *name) {
     for (u64 i = 1; i < MAX_VARIABLES; ++i) {
         if (_G.name[i][0] == '\0') {
             continue;
@@ -113,8 +113,8 @@ cvar_t config_find(const char *name) {
     return make_cvar(0);
 }
 
-cvar_t config_find_or_create(const char *name,
-                             int *new) {
+cvar_t cvar_find_or_create(const char *name,
+                           int *new) {
     if (new) *new = 0;
 
     for (u64 i = 1; i < MAX_VARIABLES; ++i) {
@@ -141,11 +141,11 @@ cvar_t config_find_or_create(const char *name,
     return make_cvar(0);
 }
 
-cvar_t config_new_float(const char *name,
-                        const char *desc,
-                        float f) {
+cvar_t cvar_new_float(const char *name,
+                      const char *desc,
+                      float f) {
     int new;
-    cvar_t find = config_find_or_create(name, &new);
+    cvar_t find = cvar_find_or_create(name, &new);
 
     if (new) {
         str_set(_G.name[find.idx], name);
@@ -158,11 +158,11 @@ cvar_t config_new_float(const char *name,
     return find;
 }
 
-cvar_t config_new_int(const char *name,
-                      const char *desc,
-                      int i) {
+cvar_t cvar_new_int(const char *name,
+                    const char *desc,
+                    int i) {
     int new;
-    cvar_t find = config_find_or_create(name, &new);
+    cvar_t find = cvar_find_or_create(name, &new);
 
     if (new) {
         str_set(_G.name[find.idx], name);
@@ -175,11 +175,11 @@ cvar_t config_new_int(const char *name,
     return find;
 }
 
-cvar_t config_new_string(const char *name,
-                         const char *desc,
-                         const char *s) {
+cvar_t cvar_new_str(const char *name,
+                    const char *desc,
+                    const char *s) {
     int new;
-    cvar_t find = config_find_or_create(name, &new);
+    cvar_t find = cvar_find_or_create(name, &new);
 
     if (new) {
         str_set(_G.name[find.idx], name);
@@ -192,30 +192,30 @@ cvar_t config_new_string(const char *name,
     return find;
 }
 
-float config_get_float(cvar_t var) {
+float cvar_get_float(cvar_t var) {
     return _G.values[var.idx].f;
 }
 
-int config_get_int(cvar_t var) {
+int cvar_get_int(cvar_t var) {
     return _G.values[var.idx].i;
 }
 
-const char *config_get_string(cvar_t var) {
+const char *cvar_get_string(cvar_t var) {
     return _G.values[var.idx].s;
 }
 
-void config_set_float(cvar_t var,
-                      float f) {
+void cvar_set_float(cvar_t var,
+                    float f) {
     _G.values[var.idx].f = f;
 }
 
-void config_set_int(cvar_t var,
-                    int i) {
+void cvar_set_int(cvar_t var,
+                  int i) {
     _G.values[var.idx].i = i;
 }
 
-void config_set_string(cvar_t var,
-                       const char *s) {
+void cvar_set_string(cvar_t var,
+                     const char *s) {
     char *_s = _G.values[var.idx].s;
 
     if (_s != NULL) {

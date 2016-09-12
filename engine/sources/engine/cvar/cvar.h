@@ -1,0 +1,60 @@
+#ifndef CETECH_CONFIG_API_H
+#define CETECH_CONFIG_API_H
+
+//==============================================================================
+// Includes
+//==============================================================================
+
+#include <stdio.h>
+#include "celib/types.h"
+
+//==============================================================================
+// Typedefs
+//==============================================================================
+
+typedef struct {
+    u64 idx;
+} cvar_t;
+
+
+//==============================================================================
+// Interface
+//==============================================================================
+
+int cvar_init();
+
+void cvar_shutdown();
+
+cvar_t cvar_find(const char *name);
+
+cvar_t cvar_find_or_create(const char *name,
+                           int *new);
+
+cvar_t cvar_new_float(const char *name,
+                      const char *desc,
+                      float f);
+
+cvar_t cvar_new_int(const char *name,
+                    const char *desc,
+                    int i);
+
+cvar_t cvar_new_str(const char *name,
+                    const char *desc,
+                    const char *s);
+
+float cvar_get_float(cvar_t var);
+
+int cvar_get_int(cvar_t var);
+
+const char *cvar_get_string(cvar_t var);
+
+void cvar_set_float(cvar_t var,
+                    float f);
+
+void cvar_set_int(cvar_t var,
+                  int i);
+
+void cvar_set_string(cvar_t var,
+                     const char *s);
+
+#endif //CETECH_CONFIG_API_H

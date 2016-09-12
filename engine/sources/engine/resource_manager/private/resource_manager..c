@@ -8,7 +8,7 @@
 #include <engine/resource_manager/resource_manager.h>
 #include <celib/stringid/stringid.h>
 #include <engine/filesystem/filesystem.h>
-#include <engine/config_system/config_system.h>
+#include <engine/cvar/cvar.h>
 #include <celib/os/path.h>
 #include <engine/application/application.h>
 #include <celib/os/vio.h>
@@ -130,12 +130,12 @@ int resource_init() {
     ARRAY_INIT(resource_callbacks_t, &_G.resource_callbacks, memsys_main_allocator());
     MAP_INIT(u32, &_G.type_map, memsys_main_allocator());
 
-    _G.cv_build_dir = config_find("resource_compiler.build_dir");
+    _G.cv_build_dir = cvar_find("resource_compiler.build_dir");
 
     char build_dir_full[1024] = {0};
     os_path_join(build_dir_full,
                  CE_ARRAY_LEN(build_dir_full),
-                 config_get_string(_G.cv_build_dir),
+                 cvar_get_string(_G.cv_build_dir),
                  application_platform());
 
     filesystem_map_root_dir(stringid64_from_string("build"), build_dir_full);

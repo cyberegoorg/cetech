@@ -139,7 +139,7 @@ set(SOURCE_FILES
         engine/sources/engine/lua_system/private/api/api_unit.c
         engine/sources/engine/lua_system/private/api/api_transform.c
 
-        engine/sources/engine/config_system/private/config_system.c
+        engine/sources/engine/cvar/private/cvar.c
         engine/sources/engine/console_server/private/console_server.c
         engine/sources/engine/memory_system/private/memory_system.c
         engine/sources/celib/stringid/private/stringid.c

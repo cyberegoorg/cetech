@@ -3,7 +3,7 @@
 
 #include "engine/machine/machine.h"
 
-#include "engine/config_system/config_system.h"
+#include "engine/cvar/cvar.h"
 #include "engine/console_server/console_server.h"
 #include "engine/lua_system/lua_system.h"
 #include "engine/input/input.h"
@@ -29,7 +29,7 @@ static const struct {
 
     void (*shutdown)();
 } _SYSTEMS[] = {
-        _REGISTER_SYSTEM(config),
+        _REGISTER_SYSTEM(cvar),
         _REGISTER_SYSTEM(machine),
         _REGISTER_SYSTEM(taskmanager),
         _REGISTER_SYSTEM(filesystem),
