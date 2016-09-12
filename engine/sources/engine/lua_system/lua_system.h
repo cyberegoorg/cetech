@@ -6,13 +6,14 @@
 //==============================================================================
 
 #include <stdio.h>
-#include <celib/handler/handlerid.h>
 
 #include "include/luajit/lua.h"
 #include "include/luajit/lauxlib.h"
 #include "include/luajit/lualib.h"
 
 #include "celib/stringid/types.h"
+#include "celib/math/types.h"
+#include <celib/handler/handlerid.h>
 
 //==============================================================================
 // Interface
@@ -77,6 +78,30 @@ const char *luasys_to_string(lua_State *,
 const char *luasys_to_string_l(lua_State *,
                                int,
                                size_t *);
+
+vec2f_t *luasys_to_vector2(lua_State *l,
+                           int i);
+
+vec3f_t *luasys_to_vector3(lua_State *l,
+                           int i);
+
+vec4f_t *luasys_to_vector4(lua_State *l,
+                           int i);
+
+quatf_t *luasys_to_quat(lua_State *l,
+                        int i);
+
+void luasys_push_vector2(lua_State *l,
+                         vec2f_t v);
+
+void luasys_push_vector3(lua_State *l,
+                         vec3f_t v);
+
+void luasys_push_vector4(lua_State *l,
+                         vec4f_t v);
+
+void luasys_push_quat(lua_State *l,
+                      quatf_t v);
 
 int luasys_execute_string(const char *str);
 

@@ -10,11 +10,19 @@
 #include <engine/resource_manager/resource_manager.h>
 #include <engine/memory_system/memory_system.h>
 #include <engine/application/application.h>
+#include <celib/math/types.h>
+#include <celib/math/vec2f.h>
+#include <celib/math/vec3f.h>
+#include <celib/math/vec4f.h>
+#include <celib/math/quatf.h>
 #include "celib/errors/errors.h"
 
 #include "engine/lua_system/lua_system.h"
 #include "engine/console_server/console_server.h"
 #include "engine/plugin_system/plugin_system.h"
+
+#include "vectors.h"
+#include "quaternion.h"
 
 //==============================================================================
 // Defines
@@ -41,6 +49,16 @@ struct lua_resource {
 static struct G {
     lua_State *L;
     stringid64_t type_id;
+
+    vec2f_t _temp_vector2_buffer[1024];
+    vec3f_t _temp_vector3_buffer[1024];
+    vec4f_t _temp_vector4_buffer[1024];
+    quatf_t _temp_quat_buffer[1024];
+
+    u32 _temp_vector2_used;
+    u32 _temp_vector3_used;
+    u32 _temp_vector4_used;
+    u32 _temp_quat_used;
 } LuaGlobals = {0};
 
 
@@ -69,6 +87,26 @@ static int require(lua_State *L) {
 //    }
 
     return 1;
+}
+
+vec2f_t *_new_tmp_vector2() {
+    CE_ASSERT("lua_enviroment", _G._temp_vector2_used < 1024);
+    return &_G._temp_vector2_buffer[_G._temp_vector2_used++];
+}
+
+vec3f_t *_new_tmp_vector3() {
+    CE_ASSERT("lua_enviroment", _G._temp_vector3_used < 1024);
+    return &_G._temp_vector3_buffer[_G._temp_vector3_used++];
+}
+
+vec4f_t *_new_tmp_vector4() {
+    CE_ASSERT("lua_enviroment", _G._temp_vector4_used < 1024);
+    return &_G._temp_vector4_buffer[_G._temp_vector4_used++];
+}
+
+quatf_t *_new_tmp_quat() {
+    CE_ASSERT("lua_enviroment", _G._temp_quat_used < 1024);
+    return &_G._temp_quat_buffer[_G._temp_quat_used++];
 }
 
 //==============================================================================
@@ -142,6 +180,10 @@ void _game_shutdown_clb() {
 }
 
 void _game_update_clb(float dt) {
+    _G._temp_vector2_used = 0;
+    _G._temp_vector3_used = 0;
+    _G._temp_vector4_used = 0;
+
     luasys_call_global("update", "f", dt);
 }
 
@@ -165,6 +207,8 @@ static void _register_all_api() {
     REGISTER_LUA_API(resource_manager);
     REGISTER_LUA_API(renderer);
     REGISTER_LUA_API(world);
+    REGISTER_LUA_API(unit);
+    REGISTER_LUA_API(transform);
 }
 
 static int _reload_plugin(lua_State *l) {
@@ -278,6 +322,9 @@ static int _execute_string(lua_State *_L,
 
     return 1;
 }
+
+
+
 
 
 //==============================================================================
@@ -441,6 +488,71 @@ const char *luasys_to_string_l(lua_State *_L,
     return lua_tolstring(_L, i, len);
 }
 
+vec2f_t *luasys_to_vector2(lua_State *l,
+                           int i) {
+    void *v = lua_touserdata(l, i);
+    return (vec2f_t *) v;
+}
+
+vec3f_t *luasys_to_vector3(lua_State *l,
+                           int i) {
+    void *v = lua_touserdata(l, i);
+    return (vec3f_t *) v;
+}
+
+vec4f_t *luasys_to_vector4(lua_State *l,
+                           int i) {
+    void *v = lua_touserdata(l, i);
+    return (vec4f_t *) v;
+}
+
+quatf_t *luasys_to_quat(lua_State *l,
+                        int i) {
+    void *v = lua_touserdata(l, i);
+    return (quatf_t *) v;
+}
+
+
+void luasys_push_vector2(lua_State *l,
+                         vec2f_t v) {
+    vec2f_t *tmp_v = _new_tmp_vector2();
+    *tmp_v = v;
+
+    lua_pushlightuserdata(l, tmp_v);
+    luaL_getmetatable(l, "vector2_mt");
+    lua_setmetatable(l, -2);
+}
+
+void luasys_push_vector3(lua_State *l,
+                         vec3f_t v) {
+    vec3f_t *tmp_v = _new_tmp_vector3();
+    *tmp_v = v;
+
+    lua_pushlightuserdata(l, tmp_v);
+    luaL_getmetatable(l, "vector3_mt");
+    lua_setmetatable(l, -2);
+}
+
+void luasys_push_vector4(lua_State *l,
+                         vec4f_t v) {
+    vec4f_t *tmp_v = _new_tmp_vector4();
+    *tmp_v = v;
+
+    lua_pushlightuserdata(l, tmp_v);
+    luaL_getmetatable(l, "vector4_mt");
+    lua_setmetatable(l, -2);
+}
+
+void luasys_push_quat(lua_State *l,
+                      quatf_t v) {
+    quatf_t *tmp_v = _new_tmp_quat();
+    *tmp_v = v;
+
+    lua_pushlightuserdata(l, tmp_v);
+    luaL_getmetatable(l, "quat_mt");
+    lua_setmetatable(l, -2);
+}
+
 int luasys_execute_string(const char *str) {
     return _execute_string(_G.L, str);
 }
@@ -505,12 +617,17 @@ int luasys_init() {
 
     _register_all_api();
 
+    create_vector2_mt(_G.L);
+    create_vector3_mt(_G.L);
+    create_vector4_mt(_G.L);
+    create_quat_mt(_G.L);
+
     luasys_add_module_function("plugin", "reload", _reload_plugin);
 
     consolesrv_register_command("lua_system.execute", _cmd_execute_string);
 
-    resource_register_type(stringid64_from_string("lua"), lua_resource_callback);
-    resource_compiler_register(stringid64_from_string("lua"), _lua_compiler);
+    resource_register_type(_G.type_id, lua_resource_callback);
+    resource_compiler_register(_G.type_id, _lua_compiler);
 
     return 1;
 }
