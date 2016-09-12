@@ -102,8 +102,10 @@ CE_FORCE_INLINE void quatf_to_eurel_angle(quatf_t *__restrict result,
                                           const quatf_t *__restrict a) {
     result->f[0] = f32_atan2(2.0f * (a->f[0] * a->f[3] - a->f[1] * a->f[2]),
                              1.0f - 2.0f * (f32_sq(a->f[0]) + f32_sq(a->f[2])));
+
     result->f[1] = f32_atan2(2.0f * (a->f[1] * a->f[3] + a->f[0] * a->f[2]),
                              1.0f - 2.0f * (f32_sq(a->f[1]) + f32_sq(a->f[2])));
+
     result->f[2] = f32_asin(2.0f * (a->f[0] * a->f[1] + a->f[2] * a->f[3]));
 }
 
