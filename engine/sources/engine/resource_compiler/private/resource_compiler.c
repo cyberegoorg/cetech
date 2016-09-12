@@ -38,9 +38,9 @@
 struct G {
     stringid64_t compilator_map_type[MAX_TYPES]; // TODO: MAP
     resource_compilator_t compilator_map_compilator[MAX_TYPES]; // TODO: MAP
-    config_var_t cv_source_dir;
-    config_var_t cv_core_dir;
-    config_var_t cv_build_dir; // TODO: MOVE TO RESOURCE MANAGER
+    cvar_t cv_source_dir;
+    cvar_t cv_core_dir;
+    cvar_t cv_build_dir; // TODO: MOVE TO RESOURCE MANAGER
 } ResourceCompilerGlobal = {0};
 
 

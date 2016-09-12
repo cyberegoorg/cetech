@@ -29,8 +29,8 @@
 static struct G {
     const struct game_callbacks *game;
     window_t main_window;
-    config_var_t cv_boot_pkg;
-    config_var_t cv_boot_script;
+    cvar_t cv_boot_pkg;
+    cvar_t cv_boot_script;
     int is_running;
     int init_error;
     float dt;

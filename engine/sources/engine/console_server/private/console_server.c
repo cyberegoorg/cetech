@@ -110,8 +110,8 @@ static void _serve_command(const char *packet,
 int consolesrv_init() {
     log_debug(LOG_WHERE, "Init");
 
-    config_var_t rpc_port = config_new_int("console_server.rpc.port", "Console server rpc port", 4444);
-    config_var_t rpc_addr = config_new_string("console_server.rpc.addr", "Console server rpc addr", "ws://*");
+    cvar_t rpc_port = config_new_int("console_server.rpc.port", "Console server rpc port", 4444);
+    cvar_t rpc_addr = config_new_string("console_server.rpc.addr", "Console server rpc addr", "ws://*");
 
     int socket = nn_socket(AF_SP, NN_REP);
     if (socket < 0) {

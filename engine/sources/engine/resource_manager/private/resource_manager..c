@@ -57,7 +57,7 @@ struct G {
     MAP_T(u32) type_map;
     ARRAY_T(resource_data) resource_data;
     ARRAY_T(resource_callbacks_t) resource_callbacks;
-    config_var_t cv_build_dir;
+    cvar_t cv_build_dir;
     int autoload_enabled;
 } _G = {0};
 
