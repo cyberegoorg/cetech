@@ -45,6 +45,8 @@ int resource_compiler_get_filename(char *filename,
 
 const char *resource_compiler_get_source_dir();
 
+const char *resource_compiler_get_core_dir();
+
 int resource_compiler_get_build_dir(char *build_dir,
                                     size_t max_len,
                                     const char *platform);

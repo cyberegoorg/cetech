@@ -28,7 +28,7 @@ int application_init(int argc,
                      char **argv);
 
 //! Shutdown application
-void application_shutdown();
+int application_shutdown();
 
 //! Start application main loop
 void application_start();

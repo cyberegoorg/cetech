@@ -12,6 +12,8 @@
 static int os_exec(const char *argv) {
     char output[4096];
 
+    log_debug("os", "exec %s", argv);
+
     FILE *fp = popen(argv, "r");
     if (fp == NULL)
         return 0;
@@ -20,9 +22,13 @@ static int os_exec(const char *argv) {
         printf("%s", output);
     }
 
-    log_debug("os", "exec %s", argv);
+    int status = fclose(fp);
 
-    return fclose(fp);
+    if (!status) {
+        log_error("os", "output %s", output);
+    }
+
+    return status;
 }
 
 #endif //CETECH_PROCESS_H

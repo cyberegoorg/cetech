@@ -39,7 +39,7 @@ struct texture_resource {
 #define _G TextureResourceGlobals
 struct G {
     MAP_T(bgfx_texture_handle_t) handler_map;
-    stringid64_t texture_type;
+    stringid64_t shader_type;
 } _G = {0};
 
 
@@ -219,13 +219,13 @@ static const resource_callbacks_t texture_resource_callback = {
 int texture_resource_init() {
     _G = (struct G) {0};
 
-    _G.texture_type = stringid64_from_string("texture");
+    _G.shader_type = stringid64_from_string("texture");
 
     MAP_INIT(bgfx_texture_handle_t, &_G.handler_map, memsys_main_allocator());
 
-    resource_compiler_register(_G.texture_type, _texture_resource_compiler);
+    resource_compiler_register(_G.shader_type, _texture_resource_compiler);
 
-    resource_register_type(_G.texture_type, texture_resource_callback);
+    resource_register_type(_G.shader_type, texture_resource_callback);
 
     return 1;
 }

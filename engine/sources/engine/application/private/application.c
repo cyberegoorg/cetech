@@ -102,7 +102,7 @@ int application_init(int argc,
     return 1;
 }
 
-void application_shutdown() {
+int application_shutdown() {
     log_debug(LOG_WHERE, "Shutdown");
 
     if (!_G.init_error) {
@@ -115,6 +115,8 @@ void application_shutdown() {
 
     memsys_shutdown();
     log_shutdown();
+
+    return !_G.init_error;
 }
 
 static void _dump_event() {

@@ -2,13 +2,10 @@
 
 int main(int argc,
          char **argv) {
-    const int init_result = application_init(argc, argv);
 
-    if (init_result) {
+    if (application_init(argc, argv)) {
         application_start();
     }
 
-    application_shutdown();
-
-    return !init_result;
+    return application_shutdown();
 }
