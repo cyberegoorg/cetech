@@ -41,7 +41,7 @@ function Game:init()
     --    self.unit2 = World.UnitByName(self.world, self.level, "box2")
     --    self.unit = self.unit1
 
-    --self.camera_unit = Unit.Spawn(self.world, "camera");
+    self.camera_unit = Unit.spawn(self.world, "camera");
     --self.camera = Camera.GetCamera(self.world, self.camera_unit);
     --self.fps_camera = FPSCamera(self.world, self.camera_unit)
     --Unit.Spawn(self.world, "unit11");

@@ -56,3 +56,5 @@ SYSTEM(mouse)
 
 SYSTEM(transform)
 
+SYSTEM(camera)
+

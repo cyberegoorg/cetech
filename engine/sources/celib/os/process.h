@@ -24,7 +24,7 @@ static int os_exec(const char *argv) {
 
     int status = fclose(fp);
 
-    if (!status) {
+    if (status != 0) {
         log_error("os", "output %s", output);
     }
 

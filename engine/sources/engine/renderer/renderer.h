@@ -21,7 +21,6 @@ void renderer_create(window_t window);
 
 void renderer_set_debug(int debug);
 
-typedef int camera_t;
 typedef int viewport_t;
 
 void renderer_render_world(world_t world,

@@ -47,7 +47,7 @@ static struct G {
 } _G = {0};
 
 
-void _new_world(world_t world) {
+static void _new_world(world_t world) {
     world_data_t data = {0};
 
     MAP_INIT(u32, &data.EntIdx, memsys_main_allocator());
@@ -68,7 +68,7 @@ static world_data_t *_get_world_data(world_t world) {
     return MAP_GET_PTR(world_data_t, &_G.world, world.h.h);
 }
 
-void _destroy_world(world_t world) {
+static void _destroy_world(world_t world) {
     world_data_t *data = _get_world_data(world);
 
     MAP_DESTROY(u32, &data->EntIdx);
@@ -109,17 +109,17 @@ int _transform_component_compiler(yaml_node_t body,
     return 1;
 }
 
-void _on_world_create(world_t world) {
+static void _on_world_create(world_t world) {
     _new_world(world);
 }
 
-void _on_world_destroy(world_t world) {
+static void _on_world_destroy(world_t world) {
     _destroy_world(world);
 }
 
-void _destroyer(world_t world,
-                entity_t *ents,
-                size_t ent_count) {
+static void _destroyer(world_t world,
+                       entity_t *ents,
+                       size_t ent_count) {
     world_data_t *world_data = _get_world_data(world);
 
     // TODO: remove from arrays, swap idx -> last AND change size
@@ -128,11 +128,11 @@ void _destroyer(world_t world,
     }
 }
 
-void _spawner(world_t world,
-              entity_t *ents,
-              entity_t *ents_parent,
-              size_t ent_count,
-              void *data) {
+static void _spawner(world_t world,
+                     entity_t *ents,
+                     entity_t *ents_parent,
+                     size_t ent_count,
+                     void *data) {
     struct transform_data *tdata = data;
 
     for (int i = 0; i < ent_count; ++i) {

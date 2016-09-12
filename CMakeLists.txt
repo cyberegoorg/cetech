@@ -177,6 +177,7 @@ set(SOURCE_FILES
 
         engine/sources/engine/world_system/private/world_system.c
         engine/sources/engine/world_system/private/transform.c
+        engine/sources/engine/world_system/private/camera.c
         engine/sources/engine/world_system/private/unit_system.c
 
         )

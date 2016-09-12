@@ -6,8 +6,9 @@
 
 static int _renderer_render_world(lua_State *l) {
     world_t w = {.h = luasys_to_handler(l, 1)};
+    camera_t c = {.idx = luasys_to_handler(l, 2).h};
 
-    renderer_render_world(w, 0, 0);
+    renderer_render_world(w, c, 0);
     return 0;
 }
 

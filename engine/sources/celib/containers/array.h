@@ -186,6 +186,8 @@ ARRAY_PROTOTYPE(i32)
 
 ARRAY_PROTOTYPE(i64)
 
+ARRAY_PROTOTYPE(f32)
+
 typedef ARRAY_T(pchar) string_array_t;
 
 #endif //CETECH_ARRAY_H

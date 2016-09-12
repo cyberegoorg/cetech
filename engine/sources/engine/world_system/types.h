@@ -11,4 +11,8 @@ typedef struct {
     u32 idx;
 } transform_t;
 
+typedef struct {
+    u32 idx;
+} camera_t;
+
 #endif //CETECH_WORLD_TYPES_H
