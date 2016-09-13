@@ -7,7 +7,7 @@
 
 #include "engine/world_system/types.h"
 #include "celib/window/types.h"
-
+#include "celib/math/types.h"
 
 //==============================================================================
 // Interface
@@ -20,6 +20,8 @@ void renderer_shutdown();
 void renderer_create(window_t window);
 
 void renderer_set_debug(int debug);
+
+vec2f_t renderer_get_size();
 
 typedef int viewport_t;
 

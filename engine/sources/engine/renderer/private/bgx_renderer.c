@@ -3,6 +3,7 @@
 //==============================================================================
 
 #include <celib/stringid/types.h>
+#include <celib/math/types.h>
 #include "celib/window/window.h"
 #include "../renderer.h"
 
@@ -93,4 +94,13 @@ void renderer_render_world(world_t world,
     bgfx_dbg_text_clear(0, 0);
 
     bgfx_frame(0);
+}
+
+vec2f_t renderer_get_size() {
+    vec2f_t result;
+
+    result.x = _G.size_width;
+    result.y = _G.size_height;
+
+    return result;
 }
