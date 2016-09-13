@@ -4,6 +4,7 @@
 
 #include <celib/stringid/types.h>
 #include <celib/math/types.h>
+#include <engine/world_system/camera.h>
 #include "celib/window/window.h"
 #include "../renderer.h"
 
@@ -87,6 +88,12 @@ void renderer_render_world(world_t world,
     }
 
     bgfx_set_view_clear(0, BGFX_CLEAR_COLOR | BGFX_CLEAR_DEPTH, 0x66CCFFff, 1.0f, 0);
+
+    mat44f_t view_matrix;
+    mat44f_t proj_matrix;
+
+    camera_get_project_view(world, camera, &proj_matrix, &view_matrix);
+    bgfx_set_view_transform(0, view_matrix.f, proj_matrix.f);
 
     bgfx_set_view_rect(0, 0, 0, (uint16_t) _G.size_width, (uint16_t) _G.size_height);
 

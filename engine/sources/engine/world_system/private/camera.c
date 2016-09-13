@@ -7,8 +7,15 @@
 
 #include <engine/memory_system/memory_system.h>
 #include <engine/entcom/entcom.h>
+#include <engine/renderer/renderer.h>
+#include <engine/entcom/types.h>
+#include <engine/world_system/transform.h>
+#include <celib/math/types.h>
 
 #include "../camera.h"
+
+ARRAY_PROTOTYPE(entity_t)
+
 
 struct camera_data {
     f32 near;
@@ -19,6 +26,7 @@ struct camera_data {
 typedef struct {
     MAP_T(u32) EntIdx;
 
+    ARRAY_T(entity_t) Ent;
     ARRAY_T(f32) Near;
     ARRAY_T(f32) Far;
     ARRAY_T(f32) Fov;
@@ -26,9 +34,7 @@ typedef struct {
 } world_data_t;
 
 ARRAY_PROTOTYPE(world_data_t)
-
 MAP_PROTOTYPE(world_data_t)
-
 
 #define _G CameraGlobal
 static struct G {
@@ -43,6 +49,7 @@ static void _new_world(world_t world) {
 
     MAP_INIT(u32, &data.EntIdx, memsys_main_allocator());
 
+    ARRAY_INIT(entity_t, &data.Ent, memsys_main_allocator());
     ARRAY_INIT(f32, &data.Near, memsys_main_allocator());
     ARRAY_INIT(f32, &data.Far, memsys_main_allocator());
     ARRAY_INIT(f32, &data.Fov, memsys_main_allocator());
@@ -59,6 +66,7 @@ static void _destroy_world(world_t world) {
 
     MAP_DESTROY(u32, &data->EntIdx);
 
+    ARRAY_DESTROY(entity_t, &data->Ent);
     ARRAY_DESTROY(f32, &data->Near);
     ARRAY_DESTROY(f32, &data->Far);
     ARRAY_DESTROY(f32, &data->Fov);
@@ -139,11 +147,26 @@ int camera_is_valid(camera_t camera) {
     return camera.idx != UINT32_MAX;
 }
 
-mat44f_t camera_get_project_view(world_t world,
-                                 camera_t camera) {
+void camera_get_project_view(world_t world,
+                             camera_t camera,
+                             mat44f_t *proj,
+                             mat44f_t *view) {
 
     world_data_t *world_data = _get_world_data(world);
-    return (mat44f_t) MAT44F_INIT_IDENTITY;
+
+
+    vec2f_t size = renderer_get_size(); // TODO, to arg... or viewport?
+    entity_t e = ARRAY_AT(&world_data->Ent, camera.idx);
+    transform_t t = transform_get(world, e);
+
+    f32 fov = ARRAY_AT(&world_data->Fov, camera.idx);
+    f32 near = ARRAY_AT(&world_data->Near, camera.idx);
+    f32 far = ARRAY_AT(&world_data->Far, camera.idx);
+
+    mat44f_set_perspective_fov(proj, fov, size.x / size.y, near, far);
+
+    mat44f_t *w = transform_get_world_matrix(world, t);
+    mat44f_inverse(view, w);
 }
 
 int camera_has(world_t world,
@@ -172,6 +195,7 @@ camera_t camera_create(world_t world,
 
     u32 idx = (u32) ARRAY_SIZE(&data->Near);
 
+    ARRAY_PUSH_BACK(entity_t, &data->Ent, entity);
     ARRAY_PUSH_BACK(f32, &data->Near, near);
     ARRAY_PUSH_BACK(f32, &data->Far, far);
     ARRAY_PUSH_BACK(f32, &data->Fov, fov);

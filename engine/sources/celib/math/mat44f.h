@@ -269,5 +269,27 @@ CE_FORCE_INLINE void mat44f_transpose(mat44f_t *__restrict result,
     result->f[15] = a->f[15];
 }
 
+CE_FORCE_INLINE void mat44f_set_perspective_fov(mat44f_t *__restrict result,
+                                                const f32 fov,
+                                                const f32 aspect_ratio,
+                                                f32 near,
+                                                f32 far) {
+
+    f32 yScale = 1.0f / (float) f32_tan(fov * 0.5f);
+    f32 xScale = yScale / aspect_ratio;
+
+    result->x.x = xScale;
+    result->x.y = result->x.z = result->x.w = 0.0f;
+
+    result->y.y = yScale;
+    result->y.x = result->y.z = result->y.w = 0.0f;
+
+    result->z.x = result->z.y = 0.0f;
+    result->z.z = far / (near - far);
+    result->z.w = -1.0f;
+
+    result->w.x = result->w.y = result->w.w = 0.0f;
+    result->w.z = near * far / (near - far);
+}
 
 #endif //CETECH_MAT44F_H

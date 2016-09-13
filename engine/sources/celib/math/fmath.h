@@ -155,6 +155,10 @@ CE_FORCE_INLINE float f32_cos(float angle) {
     return cosf(angle);
 }
 
+CE_FORCE_INLINE float f32_tan(float angle) {
+    return tanf(angle);
+}
+
 CE_FORCE_INLINE float f32_fast_inv_sqrt(float number) {
     // QUAKE3 fast inverse TODO: URL here
 
