@@ -11,6 +11,7 @@
 #include "bgfx/c99/bgfxplatform.h"
 #include "bgfx_texture_resource.h"
 #include "bgfx_shader_resource.h"
+#include "engine/renderer/material.h"
 
 //==============================================================================
 // GLobals
@@ -45,6 +46,7 @@ int renderer_init() {
 
     texture_resource_init();
     shader_resource_init();
+    material_resource_init();
 
     return 1;
 }
@@ -52,6 +54,7 @@ int renderer_init() {
 void renderer_shutdown() {
     texture_resource_shutdown();
     shader_resource_shutdown();
+    material_resource_shutdown();
 
     bgfx_shutdown();
 

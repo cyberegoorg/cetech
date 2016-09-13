@@ -19,6 +19,7 @@
 #include <engine/world_system/unit_system.h>
 #include <engine/world_system/transform.h>
 #include <engine/world_system/world_system.h>
+#include <engine/renderer/material.h>
 
 #include "celib/containers/map.h"
 
@@ -211,11 +212,18 @@ void application_start() {
 
     _boot_stage();
 
+//////////////////
     void *data = resource_get(stringid64_from_string("unit"), stringid64_from_string("unit1"));
     world_t w = world_create();
     entity_t e = unit_spawn_from_resource(w, data);
     transform_t t = transform_get(w, e);
     vec3f_t s = transform_get_scale(w, t);
+
+    material_t m = material_resource_create(stringid64_from_string("material1"));
+    u32 count = material_get_texture_count(m);
+    u32 res = material_find_slot(m, stringid64_from_string("u_texColor"));
+    material_set_texture(m, res, stringid64_from_string("dasdasdsadasdasdas"));
+////////////
 
     uint32_t last_tick = os_get_ticks();
     _G.game = luasys_get_game_callbacks();

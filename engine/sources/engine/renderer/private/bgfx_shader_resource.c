@@ -287,5 +287,6 @@ void shader_resource_shutdown() {
 }
 
 bgfx_program_handle_t shader_resource_get(stringid64_t name) {
+    struct shader_resource *resource = resource_get(_G.shader_type, name);
     return MAP_GET(bgfx_program_handle_t, &_G.handler_map, name.id, null_program);
 }

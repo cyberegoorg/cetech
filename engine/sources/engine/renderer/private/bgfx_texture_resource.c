@@ -237,5 +237,6 @@ void texture_resource_shutdown() {
 }
 
 bgfx_texture_handle_t texture_resource_get(stringid64_t name) {
+    struct texture_resource *resource = resource_get(_G.shader_type, name);
     return MAP_GET(bgfx_texture_handle_t, &_G.handler_map, name.id, null_texture);
 }

@@ -195,6 +195,8 @@ camera_t camera_create(world_t world,
 
     u32 idx = (u32) ARRAY_SIZE(&data->Near);
 
+    MAP_SET(u32, &data->EntIdx, entity.h.h, idx);
+
     ARRAY_PUSH_BACK(entity_t, &data->Ent, entity);
     ARRAY_PUSH_BACK(f32, &data->Near, near);
     ARRAY_PUSH_BACK(f32, &data->Far, far);
