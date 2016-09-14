@@ -58,6 +58,7 @@ static yaml_node_t new_node(yaml_document_t handler,
     }
 
     CE_ASSERT_MSG("yaml", false, "Node pool overflow");
+    return (yaml_node_t) {0};
 }
 
 extern "C" yaml_node_t yaml_load_str(const char *str,
