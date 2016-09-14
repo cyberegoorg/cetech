@@ -219,10 +219,8 @@ void application_start() {
     transform_t t = transform_get(w, e);
     vec3f_t s = transform_get_scale(w, t);
 
-    material_t m = material_resource_create(stringid64_from_string("material1"));
-    u32 count = material_get_texture_count(m);
-    u32 res = material_find_slot(m, stringid64_from_string("u_texColor"));
-    material_set_texture(m, res, stringid64_from_string("dasdasdsadasdasdas"));
+//    material_set_texture(m, res, stringid64_from_string("dasdasdsadasdasdas"));
+//
 ////////////
 
     uint32_t last_tick = os_get_ticks();
@@ -242,6 +240,7 @@ void application_start() {
 
         machine_process();
         _dump_event();
+
 
         task_t frame_task = taskmanager_add_null("frame", task_null, task_null, TASK_PRIORITY_HIGH, TASK_AFFINITY_NONE);
 

@@ -5,6 +5,7 @@
 #include <celib/stringid/types.h>
 #include <celib/math/types.h>
 #include <engine/world_system/camera.h>
+#include <celib/stringid/stringid.h>
 #include "celib/window/window.h"
 #include "../renderer.h"
 
@@ -102,6 +103,14 @@ void renderer_render_world(world_t world,
 
     bgfx_touch(0);
     bgfx_dbg_text_clear(0, 0);
+
+
+//    material_t m = material_resource_create(stringid64_from_string("material1"));
+//    u32 count = material_get_texture_count(m);
+//    u32 res = material_find_slot(m, "u_texColor");
+//    material_use(m);
+
+//    material_submit(m);
 
     bgfx_frame(0);
 }
