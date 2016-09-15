@@ -1,6 +1,6 @@
 image: ondravoves/debian:python2.7
 
-stags:
+stages:
   - doc
 
 pages:
