@@ -14,7 +14,7 @@ static int _mouse_button_index(lua_State *l) {
 }
 
 static int _mouse_button_name(lua_State *l) {
-    u32 idx = (u32) (luasys_to_float(l, 1));
+    u32 idx = (u32) (luasys_to_f32(l, 1));
 
     luasys_push_string(l, mouse_button_name(idx));
 
@@ -23,7 +23,7 @@ static int _mouse_button_name(lua_State *l) {
 }
 
 static int _mouse_button_state(lua_State *l) {
-    u32 idx = (u32) (luasys_to_float(l, 1));
+    u32 idx = (u32) (luasys_to_f32(l, 1));
 
     luasys_push_bool(l, mouse_button_state(idx));
 
@@ -32,7 +32,7 @@ static int _mouse_button_state(lua_State *l) {
 }
 
 static int _mouse_button_pressed(lua_State *l) {
-    u32 idx = (u32) (luasys_to_float(l, 1));
+    u32 idx = (u32) (luasys_to_f32(l, 1));
 
     luasys_push_bool(l, mouse_button_pressed(idx));
 
@@ -41,7 +41,7 @@ static int _mouse_button_pressed(lua_State *l) {
 }
 
 static int _mouse_button_released(lua_State *l) {
-    u32 idx = (u32) (luasys_to_float(l, 1));
+    u32 idx = (u32) (luasys_to_f32(l, 1));
 
     luasys_push_bool(l, mouse_button_released(idx));
 
@@ -54,14 +54,13 @@ static int _mouse_axis_index(lua_State *l) {
     const char *name = luasys_to_string(l, 1);
 
     u32 idx = mouse_axis_index(name);
-    luasys_push_float(l, idx);
-
+    luasys_push_int(l, idx);
     return 1;
 
 }
 
 static int _mouse_axis_name(lua_State *l) {
-    u32 idx = (u32) (luasys_to_float(l, 1));
+    u32 idx = (u32) (luasys_to_f32(l, 1));
 
     luasys_push_string(l, mouse_axis_name(idx));
 
@@ -71,8 +70,7 @@ static int _mouse_axis_name(lua_State *l) {
 static int _mouse_axis(lua_State *l) {
     u32 idx = (u32) (luasys_to_int(l, 1));
 
-    vec2f_t pos = {0};
-    mouse_axis(idx, &pos);
+    vec2f_t pos = mouse_axis(idx);
 
     luasys_push_vector2(l, pos);
     return 1;

@@ -13,7 +13,7 @@ static int _keyboard_button_index(lua_State *l) {
 }
 
 static int _keyboard_button_name(lua_State *l) {
-    u32 idx = (u32) (luasys_to_float(l, 1));
+    u32 idx = (u32) (luasys_to_f32(l, 1));
 
     luasys_push_string(l, keyboard_button_name(idx));
 
@@ -22,7 +22,7 @@ static int _keyboard_button_name(lua_State *l) {
 }
 
 static int _keyboard_button_state(lua_State *l) {
-    u32 idx = (u32) (luasys_to_float(l, 1));
+    u32 idx = (u32) (luasys_to_f32(l, 1));
 
     luasys_push_bool(l, keyboard_button_state(idx));
 
@@ -31,7 +31,7 @@ static int _keyboard_button_state(lua_State *l) {
 }
 
 static int _keyboard_button_pressed(lua_State *l) {
-    u32 idx = (u32) (luasys_to_float(l, 1));
+    u32 idx = (u32) (luasys_to_f32(l, 1));
 
     luasys_push_bool(l, keyboard_button_pressed(idx));
 
@@ -40,7 +40,7 @@ static int _keyboard_button_pressed(lua_State *l) {
 }
 
 static int _keyboard_button_released(lua_State *l) {
-    u32 idx = (u32) (luasys_to_float(l, 1));
+    u32 idx = (u32) (luasys_to_f32(l, 1));
 
     luasys_push_bool(l, keyboard_button_released(idx));
 

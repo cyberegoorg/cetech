@@ -20,6 +20,7 @@
 
 #include "vectors.h"
 #include "quaternion.h"
+#include "matrix.h"
 
 //==============================================================================
 // Defines
@@ -50,11 +51,13 @@ static struct G {
     vec2f_t _temp_vector2_buffer[1024];
     vec3f_t _temp_vector3_buffer[1024];
     vec4f_t _temp_vector4_buffer[1024];
+    mat44f_t _temp_mat44f_buffer[1024];
     quatf_t _temp_quat_buffer[1024];
 
     u32 _temp_vector2_used;
     u32 _temp_vector3_used;
     u32 _temp_vector4_used;
+    u32 _temp_mat44f_used;
     u32 _temp_quat_used;
 } LuaGlobals = {0};
 
@@ -99,6 +102,11 @@ vec3f_t *_new_tmp_vector3() {
 vec4f_t *_new_tmp_vector4() {
     CE_ASSERT("lua_enviroment", _G._temp_vector4_used < 1024);
     return &_G._temp_vector4_buffer[_G._temp_vector4_used++];
+}
+
+mat44f_t *_new_tmp_mat44f() {
+    CE_ASSERT("lua_enviroment", _G._temp_mat44f_used < 1024);
+    return &_G._temp_mat44f_buffer[_G._temp_mat44f_used++];
 }
 
 quatf_t *_new_tmp_quat() {
@@ -180,6 +188,8 @@ void _game_update_clb(float dt) {
     _G._temp_vector2_used = 0;
     _G._temp_vector3_used = 0;
     _G._temp_vector4_used = 0;
+    _G._temp_mat44f_used = 0;
+    _G._temp_quat_used = 0;
 
     luasys_call_global("update", "f", dt);
 }
@@ -206,6 +216,8 @@ static void _register_all_api() {
     REGISTER_LUA_API(world);
     REGISTER_LUA_API(unit);
     REGISTER_LUA_API(transform);
+    REGISTER_LUA_API(vec3f);
+    REGISTER_LUA_API(quatf);
 }
 
 static int _reload_plugin(lua_State *l) {
@@ -464,9 +476,9 @@ int luasys_to_int(lua_State *_L,
     return (int) lua_tointeger(_L, i);
 }
 
-float luasys_to_float(lua_State *_L,
-                      int i) {
-    return (float) lua_tonumber(_L, i);
+f32 luasys_to_f32(lua_State *_L,
+                  int i) {
+    return (f32) lua_tonumber(_L, i);
 }
 
 handler_t luasys_to_handler(lua_State *l,
@@ -509,15 +521,12 @@ quatf_t *luasys_to_quat(lua_State *l,
     return (quatf_t *) v;
 }
 
-
 void luasys_push_vector2(lua_State *l,
                          vec2f_t v) {
     vec2f_t *tmp_v = _new_tmp_vector2();
     *tmp_v = v;
 
     lua_pushlightuserdata(l, tmp_v);
-    luaL_getmetatable(l, "vector2_mt");
-    lua_setmetatable(l, -2);
 }
 
 void luasys_push_vector3(lua_State *l,
@@ -526,8 +535,6 @@ void luasys_push_vector3(lua_State *l,
     *tmp_v = v;
 
     lua_pushlightuserdata(l, tmp_v);
-    luaL_getmetatable(l, "vector3_mt");
-    lua_setmetatable(l, -2);
 }
 
 void luasys_push_vector4(lua_State *l,
@@ -536,8 +543,6 @@ void luasys_push_vector4(lua_State *l,
     *tmp_v = v;
 
     lua_pushlightuserdata(l, tmp_v);
-    luaL_getmetatable(l, "vector4_mt");
-    lua_setmetatable(l, -2);
 }
 
 void luasys_push_quat(lua_State *l,
@@ -546,8 +551,20 @@ void luasys_push_quat(lua_State *l,
     *tmp_v = v;
 
     lua_pushlightuserdata(l, tmp_v);
-    luaL_getmetatable(l, "quat_mt");
-    lua_setmetatable(l, -2);
+}
+
+mat44f_t *luasys_to_mat44f(lua_State *l,
+                           int i) {
+    void *v = lua_touserdata(l, i);
+    return (mat44f_t *) v;
+}
+
+void luasys_push_mat44f(lua_State *l,
+                        mat44f_t v) {
+    mat44f_t *tmp_v = _new_tmp_mat44f();
+    *tmp_v = v;
+
+    lua_pushlightuserdata(l, tmp_v);
 }
 
 int luasys_execute_string(const char *str) {
@@ -585,6 +602,220 @@ void luasys_add_module_function(const char *module,
     lua_pop(_G.L, -1);
 };
 
+static int _is_vector2(lua_State *L,
+                       vec2f_t *p) {
+    return (p >= _G._temp_vector2_buffer) && (p < (_G._temp_vector2_buffer + 1024));
+}
+
+static int _is_vector3(lua_State *L,
+                       vec3f_t *p) {
+    return (p >= _G._temp_vector3_buffer) && (p < (_G._temp_vector3_buffer + 1024));
+}
+
+static int _is_vector4(lua_State *L,
+                       vec4f_t *p) {
+    return (p >= _G._temp_vector4_buffer) && (p < (_G._temp_vector4_buffer + 1024));
+}
+
+static int _is_quat(lua_State *L,
+                    quatf_t *p) {
+    return (p >= _G._temp_quat_buffer) && (p < (_G._temp_quat_buffer + 1024));
+}
+
+static int _is_mat44f(lua_State *L,
+                      mat44f_t *p) {
+    return (p >= _G._temp_mat44f_buffer) && (p < (_G._temp_mat44f_buffer + 1024));
+}
+
+
+static int lightuserdata_add(lua_State *L) {
+    void *p = lua_touserdata(L, 1);
+
+    if (_is_vector2(L, p)) {
+        return vector2_add(L);
+    }
+
+    if (_is_vector3(L, p)) {
+        return vector3_add(L);
+    }
+
+    if (_is_vector4(L, p)) {
+        return vector4_add(L);
+    }
+
+    if (_is_quat(L, p)) {
+        return quat_add(L);
+    }
+
+    return 0;
+}
+
+static int lightuserdata_sub(lua_State *L) {
+    void *p = lua_touserdata(L, 1);
+
+    if (_is_vector2(L, p)) {
+        return vector2_sub(L);
+    }
+
+    if (_is_vector3(L, p)) {
+        return vector3_sub(L);
+    }
+
+    if (_is_vector4(L, p)) {
+        return vector4_sub(L);
+    }
+
+    if (_is_quat(L, p)) {
+        return quat_sub(L);
+    }
+
+//    if( _is_mat44f(L, p)) {
+//        return _mat44f_add(L);
+//    }
+    return 0;
+}
+
+static int lightuserdata_mul(lua_State *L) {
+    void *p = lua_touserdata(L, 1);
+
+    if (_is_vector2(L, p)) {
+        return vector2_mul(L);
+    }
+
+    if (_is_vector3(L, p)) {
+        return vector3_mul(L);
+    }
+
+    if (_is_vector4(L, p)) {
+        return vector4_mul(L);
+    }
+
+    if (_is_quat(L, p)) {
+        return quat_mul(L);
+    }
+
+    if (_is_mat44f(L, p)) {
+        return _mat44f_mul(L);
+    }
+    return 0;
+}
+
+static int lightuserdata_div(lua_State *L) {
+    void *p = lua_touserdata(L, 1);
+
+    if (_is_vector2(L, p)) {
+        return vector2_div(L);
+    }
+
+    if (_is_vector3(L, p)) {
+        return vector3_div(L);
+    }
+
+    if (_is_vector4(L, p)) {
+        return vector4_div(L);
+    }
+
+    if (_is_quat(L, p)) {
+        return quat_div(L);
+    }
+
+//    if( _is_mat44f(L, p)) {
+//        return _mat44f_add(L);
+//    }}
+    return 0;
+}
+
+static int lightuserdata_unm(lua_State *L) {
+    void *p = lua_touserdata(L, 1);
+
+    if (_is_vector2(L, p)) {
+        return vector2_unm(L);
+    }
+
+    if (_is_vector3(L, p)) {
+        return vector3_unm(L);
+    }
+
+    if (_is_vector4(L, p)) {
+        return vector4_unm(L);
+    }
+
+    if (_is_quat(L, p)) {
+        return quat_unm(L);
+    }
+
+    if (_is_mat44f(L, p)) {
+        return _mat44f_unm(L);
+    }
+
+    return 0;
+}
+
+static int lightuserdata_index(lua_State *L) {
+    void *p = lua_touserdata(L, 1);
+
+    if (_is_vector2(L, p)) {
+        return vector2_index(L);
+    }
+
+    if (_is_vector3(L, p)) {
+        return vector3_index(L);
+    }
+
+    if (_is_vector4(L, p)) {
+        return vector4_index(L);
+    }
+
+    if (_is_quat(L, p)) {
+        return quat_index(L);
+    }
+
+    if (_is_mat44f(L, p)) {
+        return _mat44f_index(L);
+    }
+
+    return 0;
+}
+
+static int lightuserdata_newindex(lua_State *L) {
+    void *p = lua_touserdata(L, 1);
+
+    if (_is_vector2(L, p)) {
+        return vector2_newindex(L);
+    }
+
+    if (_is_vector3(L, p)) {
+        return vector3_newindex(L);
+    }
+
+    if (_is_vector4(L, p)) {
+        return vector4_newindex(L);
+    }
+
+    if (_is_quat(L, p)) {
+        return quat_newindex(L);
+    }
+
+    if (_is_mat44f(L, p)) {
+        return _mat44f_newindex(L);
+    }
+
+    return 0;
+}
+
+void _create_lightuserdata() {
+    luasys_add_module_function("lightuserdata_mt", "__add", lightuserdata_add);
+    luasys_add_module_function("lightuserdata_mt", "__sub", lightuserdata_sub);
+    luasys_add_module_function("lightuserdata_mt", "__mul", lightuserdata_mul);
+    luasys_add_module_function("lightuserdata_mt", "__unm", lightuserdata_unm);
+    luasys_add_module_function("lightuserdata_mt", "__index", lightuserdata_index);
+    luasys_add_module_function("lightuserdata_mt", "__newindex", lightuserdata_newindex);
+
+    lua_pushlightuserdata(_G.L, 0);
+    lua_getfield(_G.L, LUA_REGISTRYINDEX, "lightuserdata_mt");
+    lua_setmetatable(_G.L, -2);
+    lua_pop(_G.L, 1);
+}
 
 int luasys_init() {
     log_debug(LOG_WHERE, "Init");
@@ -612,12 +843,9 @@ int luasys_init() {
     lua_rawset(_G.L, -3);
     lua_pop(_G.L, 1);
 
-    _register_all_api();
+    _create_lightuserdata();
 
-    create_vector2_mt(_G.L);
-    create_vector3_mt(_G.L);
-    create_vector4_mt(_G.L);
-    create_quat_mt(_G.L);
+    _register_all_api();
 
     luasys_add_module_function("plugin", "reload", _reload_plugin);
 

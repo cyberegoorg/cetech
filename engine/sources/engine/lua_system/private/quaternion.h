@@ -45,7 +45,7 @@ static int quat_mul(lua_State *L) {
 
 static int quat_div(lua_State *L) {
     quatf_t *a = luasys_to_quat(L, 1);
-    float b = luasys_to_float(L, 2);
+    float b = luasys_to_f32(L, 2);
 
     quatf_t res = {0};
     quatf_div_s(&res, a, b);
@@ -93,7 +93,7 @@ static int quat_newindex(lua_State *L) {
     quatf_t *a = luasys_to_quat(L, 1);
 
     const char *s = luasys_to_string(L, 2);
-    const float value = luasys_to_float(L, 3);
+    const float value = luasys_to_f32(L, 3);
 
     switch (s[0]) {
         case 'x':
@@ -116,39 +116,7 @@ static int quat_newindex(lua_State *L) {
     return 0;
 }
 
-void create_quat_mt(lua_State *l) {
-    luaL_newmetatable(l, "quat_mt");
 
-    lua_pushstring(l, "__add");
-    lua_pushcfunction(l, quat_add);
-    lua_settable(l, 1);
-
-    lua_pushstring(l, "__sub");
-    lua_pushcfunction(l, quat_sub);
-    lua_settable(l, 1);
-
-    lua_pushstring(l, "__mul");
-    lua_pushcfunction(l, quat_mul);
-    lua_settable(l, 1);
-
-    lua_pushstring(l, "__div");
-    lua_pushcfunction(l, quat_div);
-    lua_settable(l, 1);
-
-    lua_pushstring(l, "__unm");
-    lua_pushcfunction(l, quat_unm);
-    lua_settable(l, 1);
-
-    lua_pushstring(l, "__index");
-    lua_pushcfunction(l, quat_index);
-    lua_settable(l, 1);
-
-    lua_pushstring(l, "__newindex");
-    lua_pushcfunction(l, quat_newindex);
-    lua_settable(l, 1);
-
-    lua_pop(l, 1);
-}
 //////
 
 

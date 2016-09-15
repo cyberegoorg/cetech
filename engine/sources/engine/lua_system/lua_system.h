@@ -66,8 +66,8 @@ int luasys_to_bool(lua_State *,
 int luasys_to_int(lua_State *,
                   int i);
 
-float luasys_to_float(lua_State *,
-                      int i);
+f32 luasys_to_f32(lua_State *,
+                  int i);
 
 handler_t luasys_to_handler(lua_State *l,
                             int i);
@@ -88,6 +88,9 @@ vec3f_t *luasys_to_vector3(lua_State *l,
 vec4f_t *luasys_to_vector4(lua_State *l,
                            int i);
 
+mat44f_t *luasys_to_mat44f(lua_State *l,
+                           int i);
+
 quatf_t *luasys_to_quat(lua_State *l,
                         int i);
 
@@ -99,6 +102,10 @@ void luasys_push_vector3(lua_State *l,
 
 void luasys_push_vector4(lua_State *l,
                          vec4f_t v);
+
+void luasys_push_mat44f(lua_State *l,
+                        mat44f_t v);
+
 
 void luasys_push_quat(lua_State *l,
                       quatf_t v);

@@ -35,7 +35,7 @@ static int vector2_sub(lua_State *L) {
 
 static int vector2_mul(lua_State *L) {
     vec2f_t *a = luasys_to_vector2(L, 1);
-    float b = luasys_to_float(L, 2);
+    float b = luasys_to_f32(L, 2);
 
     vec2f_t res = {0};
     vec2f_mul(&res, a, b);
@@ -46,7 +46,7 @@ static int vector2_mul(lua_State *L) {
 
 static int vector2_div(lua_State *L) {
     vec2f_t *a = luasys_to_vector2(L, 1);
-    float b = luasys_to_float(L, 2);
+    float b = luasys_to_f32(L, 2);
 
     vec2f_t res = {0};
     vec2f_div(&res, a, b);
@@ -88,7 +88,7 @@ static int vector2_newindex(lua_State *L) {
     vec2f_t *a = luasys_to_vector2(L, 1);
 
     const char *s = luasys_to_string(L, 2);
-    const float value = luasys_to_float(L, 3);
+    const float value = luasys_to_f32(L, 3);
 
     switch (s[0]) {
         case 'x':
@@ -103,40 +103,6 @@ static int vector2_newindex(lua_State *L) {
     }
 
     return 0;
-}
-
-void create_vector2_mt(lua_State *l) {
-    luaL_newmetatable(l, "vector2_mt");
-
-    lua_pushstring(l, "__add");
-    lua_pushcfunction(l, vector2_add);
-    lua_settable(l, 1);
-
-    lua_pushstring(l, "__sub");
-    lua_pushcfunction(l, vector2_sub);
-    lua_settable(l, 1);
-
-    lua_pushstring(l, "__mul");
-    lua_pushcfunction(l, vector2_mul);
-    lua_settable(l, 1);
-
-    lua_pushstring(l, "__div");
-    lua_pushcfunction(l, vector2_div);
-    lua_settable(l, 1);
-
-    lua_pushstring(l, "__unm");
-    lua_pushcfunction(l, vector2_unm);
-    lua_settable(l, 1);
-
-    lua_pushstring(l, "__index");
-    lua_pushcfunction(l, vector2_index);
-    lua_settable(l, 1);
-
-    lua_pushstring(l, "__newindex");
-    lua_pushcfunction(l, vector2_newindex);
-    lua_settable(l, 1);
-
-    lua_pop(l, 1);
 }
 
 //////
@@ -168,7 +134,7 @@ static int vector3_sub(lua_State *L) {
 
 static int vector3_mul(lua_State *L) {
     vec3f_t *a = luasys_to_vector3(L, 1);
-    float b = luasys_to_float(L, 2);
+    float b = luasys_to_f32(L, 2);
 
     vec3f_t res = {0};
     vec3f_mul(&res, a, b);
@@ -179,7 +145,7 @@ static int vector3_mul(lua_State *L) {
 
 static int vector3_div(lua_State *L) {
     vec3f_t *a = luasys_to_vector3(L, 1);
-    float b = luasys_to_float(L, 2);
+    float b = luasys_to_f32(L, 2);
 
     vec3f_t res = {0};
     vec3f_div(&res, a, b);
@@ -224,7 +190,7 @@ static int vector3_newindex(lua_State *L) {
     vec3f_t *a = luasys_to_vector3(L, 1);
 
     const char *s = luasys_to_string(L, 2);
-    const float value = luasys_to_float(L, 3);
+    const float value = luasys_to_f32(L, 3);
 
     switch (s[0]) {
         case 'x':
@@ -242,40 +208,6 @@ static int vector3_newindex(lua_State *L) {
     }
 
     return 0;
-}
-
-void create_vector3_mt(lua_State *l) {
-    luaL_newmetatable(l, "vector3_mt");
-
-    lua_pushstring(l, "__add");
-    lua_pushcfunction(l, vector3_add);
-    lua_settable(l, 1);
-
-    lua_pushstring(l, "__sub");
-    lua_pushcfunction(l, vector3_sub);
-    lua_settable(l, 1);
-
-    lua_pushstring(l, "__mul");
-    lua_pushcfunction(l, vector3_mul);
-    lua_settable(l, 1);
-
-    lua_pushstring(l, "__div");
-    lua_pushcfunction(l, vector3_div);
-    lua_settable(l, 1);
-
-    lua_pushstring(l, "__unm");
-    lua_pushcfunction(l, vector3_unm);
-    lua_settable(l, 1);
-
-    lua_pushstring(l, "__index");
-    lua_pushcfunction(l, vector3_index);
-    lua_settable(l, 1);
-
-    lua_pushstring(l, "__newindex");
-    lua_pushcfunction(l, vector3_newindex);
-    lua_settable(l, 1);
-
-    lua_pop(l, 1);
 }
 
 //////
@@ -307,7 +239,7 @@ static int vector4_sub(lua_State *L) {
 
 static int vector4_mul(lua_State *L) {
     vec4f_t *a = luasys_to_vector4(L, 1);
-    float b = luasys_to_float(L, 2);
+    float b = luasys_to_f32(L, 2);
 
     vec4f_t res = {0};
     vec4f_mul(&res, a, b);
@@ -318,7 +250,7 @@ static int vector4_mul(lua_State *L) {
 
 static int vector4_div(lua_State *L) {
     vec4f_t *a = luasys_to_vector4(L, 1);
-    float b = luasys_to_float(L, 2);
+    float b = luasys_to_f32(L, 2);
 
     vec4f_t res = {0};
     vec4f_div(&res, a, b);
@@ -366,7 +298,7 @@ static int vector4_newindex(lua_State *L) {
     vec4f_t *a = luasys_to_vector4(L, 1);
 
     const char *s = luasys_to_string(L, 2);
-    const float value = luasys_to_float(L, 3);
+    const float value = luasys_to_f32(L, 3);
 
     switch (s[0]) {
         case 'x':
@@ -389,39 +321,6 @@ static int vector4_newindex(lua_State *L) {
     return 0;
 }
 
-void create_vector4_mt(lua_State *l) {
-    luaL_newmetatable(l, "vector4_mt");
-
-    lua_pushstring(l, "__add");
-    lua_pushcfunction(l, vector4_add);
-    lua_settable(l, 1);
-
-    lua_pushstring(l, "__sub");
-    lua_pushcfunction(l, vector4_sub);
-    lua_settable(l, 1);
-
-    lua_pushstring(l, "__mul");
-    lua_pushcfunction(l, vector4_mul);
-    lua_settable(l, 1);
-
-    lua_pushstring(l, "__div");
-    lua_pushcfunction(l, vector4_div);
-    lua_settable(l, 1);
-
-    lua_pushstring(l, "__unm");
-    lua_pushcfunction(l, vector4_unm);
-    lua_settable(l, 1);
-
-    lua_pushstring(l, "__index");
-    lua_pushcfunction(l, vector4_index);
-    lua_settable(l, 1);
-
-    lua_pushstring(l, "__newindex");
-    lua_pushcfunction(l, vector4_newindex);
-    lua_settable(l, 1);
-
-    lua_pop(l, 1);
-}
 //////
 
 #endif //CETECH_VECTORS_H
