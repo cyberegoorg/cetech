@@ -275,7 +275,7 @@ CE_FORCE_INLINE void mat44f_set_perspective_fov(mat44f_t *__restrict result,
                                                 f32 near,
                                                 f32 far) {
 
-    f32 yScale = 1.0f / (float) f32_tan(fov * 0.5f);
+    f32 yScale = 1.0f / f32_tan(fov * f32_ToRad * 0.5f);
     f32 xScale = yScale / aspect_ratio;
 
     result->x.x = xScale;

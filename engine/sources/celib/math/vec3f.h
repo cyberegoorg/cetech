@@ -10,7 +10,9 @@
 #include "fmath.h"
 #include "types.h"
 
-
+#define VEC3F_UNIT_X (vec3f_t){1.0f, 0.0f, 0.0f}
+#define VEC3F_UNIT_Y (vec3f_t){0.0f, 1.0f, 0.0f}
+#define VEC3F_UNIT_Z (vec3f_t){0.0f, 0.0f, 1.0f}
 
 //==============================================================================
 // Interface

@@ -47,14 +47,14 @@ CE_FORCE_INLINE void quatf_from_axis_angle(quatf_t *__restrict result,
     vec3f_t norm_axis;
     vec3f_normalized(&norm_axis, axis);
 
-    const f32 angle_half = angle * 0.5f;
+    const f32 angle_half = angle * 0.5f * f32_ToRad;
     const f32 sin = f32_sin(angle_half);
 
     result->f[0] = sin * norm_axis.x;
     result->f[1] = sin * norm_axis.y;
     result->f[2] = sin * norm_axis.z;
 
-    result->f[2] = f32_cos(angle_half);
+    result->f[3] = f32_cos(angle_half);
 }
 
 CE_FORCE_INLINE void quatf_from_euler(quatf_t *__restrict result,

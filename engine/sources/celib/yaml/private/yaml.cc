@@ -113,6 +113,9 @@ extern "C" size_t yaml_node_size(yaml_node_t node) {
 
 extern "C" void yaml_node_free(yaml_node_t node) {
     yamlcpp_handler *nh = (yamlcpp_handler *) node.doc.d;
+    if (nh == NULL) {
+        return;
+    }
 
     nh->used[node.idx] = 0;
 }
@@ -173,13 +176,13 @@ vec3f_t yaml_as_vec3f_t(yaml_node_t body) {
     yaml_node_free(x);
 
 
-    yaml_node_t y = yaml_get_seq_node(body, 0);
+    yaml_node_t y = yaml_get_seq_node(body, 1);
     CE_ASSERT("yaml", yaml_is_valid(y));
     v.y = yaml_as_float(y);
     yaml_node_free(y);
 
 
-    yaml_node_t z = yaml_get_seq_node(body, 0);
+    yaml_node_t z = yaml_get_seq_node(body, 2);
     CE_ASSERT("yaml", yaml_is_valid(z));
     v.z = yaml_as_float(z);
     yaml_node_free(z);
