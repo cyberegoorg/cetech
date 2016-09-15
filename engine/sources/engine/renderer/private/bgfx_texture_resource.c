@@ -136,7 +136,7 @@ int _texture_resource_compiler(const char *filename,
     };
 
     vio_write(build_vio, &resource, sizeof(resource), 1);
-    vio_write(build_vio, tmp_data, sizeof(char), vio_size(tmp_file));
+    vio_write(build_vio, tmp_data, sizeof(char), resource.size);
 
     vio_close(tmp_file);
     CE_DEALLOCATE(memsys_main_allocator(), tmp_data);
@@ -169,7 +169,7 @@ void texture_resource_online(stringid64_t name,
     struct texture_resource *resource = data;
 
     const bgfx_memory_t *mem = bgfx_alloc(resource->size);
-    memory_copy(mem->data, data + 1, resource->size);
+    memory_copy(mem->data, (resource + 1), resource->size);
 
     bgfx_texture_handle_t texture = bgfx_create_texture(mem, BGFX_TEXTURE_NONE, 0, NULL);
 

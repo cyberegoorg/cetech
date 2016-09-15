@@ -138,6 +138,8 @@ set(SOURCE_FILES
         engine/sources/engine/lua_system/private/api/api_world.c
         engine/sources/engine/lua_system/private/api/api_unit.c
         engine/sources/engine/lua_system/private/api/api_transform.c
+        engine/sources/engine/lua_system/private/api/api_vec3f.c
+        engine/sources/engine/lua_system/private/api/api_quatf.c
 
         engine/sources/engine/cvar/private/cvar.c
         engine/sources/engine/console_server/private/console_server.c
@@ -172,6 +174,7 @@ set(SOURCE_FILES
         engine/sources/engine/renderer/private/bgfx_texture_resource.c
         engine/sources/engine/renderer/private/bgfx_shader_resource.c
         engine/sources/engine/renderer/private/material.c
+        engine/sources/engine/renderer/private/mesh_renderer.c
 
         engine/sources/engine/entcom/private/entcom.c
 

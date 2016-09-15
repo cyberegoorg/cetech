@@ -58,3 +58,4 @@ SYSTEM(transform)
 
 SYSTEM(camera)
 
+SYSTEM(mesh)

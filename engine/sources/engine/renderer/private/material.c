@@ -246,7 +246,9 @@ static const material_t null_material = {0};
 
 material_t material_resource_create(stringid64_t name) {
     struct material_resource *resource = resource_get(_G.type, name);
-    u32 size = sizeof(struct material_resource) + (resource->uniforms_count * sizeof(char) * 32) +
+
+    u32 size = sizeof(struct material_resource) +
+               (resource->uniforms_count * sizeof(char) * 32) +
                (resource->texture_count * sizeof(stringid64_t));
 
     handler_t h = handlerid_handler_create(&_G.material_handler);
@@ -273,14 +275,26 @@ material_t material_resource_create(stringid64_t name) {
 }
 
 u32 material_get_texture_count(material_t material) {
-    struct material_resource *resource = (struct material_resource *) &_G.material_instance_data.data[_G.material_instance_offset.data[material.idx]];
+    u32 idx = MAP_GET(u32, &_G.material_instace_map, material.idx, UINT32_MAX);
+
+    if (idx == UINT32_MAX) {
+        return 0;
+    }
+
+    struct material_resource *resource = (struct material_resource *) &_G.material_instance_data.data[_G.material_instance_offset.data[idx]];
 
     return resource->texture_count;
 }
 
 u32 material_find_slot(material_t material,
                        const char *name) {
-    struct material_resource *resource = (struct material_resource *) &_G.material_instance_data.data[_G.material_instance_offset.data[material.idx]];
+    u32 idx = MAP_GET(u32, &_G.material_instace_map, material.idx, UINT32_MAX);
+
+    if (idx == UINT32_MAX) {
+        return 0;
+    }
+
+    struct material_resource *resource = (struct material_resource *) &_G.material_instance_data.data[_G.material_instance_offset.data[idx]];
 
     const char *u_names = (const char *) (resource + 1);
     for (u32 i = 0; i < resource->uniforms_count; ++i) {
@@ -297,7 +311,13 @@ u32 material_find_slot(material_t material,
 void material_set_texture(material_t material,
                           u32 slot,
                           stringid64_t texture) {
-    struct material_resource *resource = (struct material_resource *) &_G.material_instance_data.data[_G.material_instance_offset.data[material.idx]];
+    u32 idx = MAP_GET(u32, &_G.material_instace_map, material.idx, UINT32_MAX);
+
+    if (idx == UINT32_MAX) {
+        return;
+    }
+
+    struct material_resource *resource = (struct material_resource *) &_G.material_instance_data.data[_G.material_instance_offset.data[idx]];
 
     char *u_names = (char *) (resource + 1);
     stringid64_t *u_texture = (stringid64_t *) (u_names + (32 * resource->uniforms_count));
@@ -306,7 +326,13 @@ void material_set_texture(material_t material,
 }
 
 void material_use(material_t material) {
-    struct material_resource *resource = (struct material_resource *) &_G.material_instance_data.data[_G.material_instance_offset.data[material.idx]];
+    u32 idx = MAP_GET(u32, &_G.material_instace_map, material.idx, UINT32_MAX);
+
+    if (idx == UINT32_MAX) {
+        return;
+    }
+
+    struct material_resource *resource = (struct material_resource *) &_G.material_instance_data.data[_G.material_instance_offset.data[idx]];
 
     char *u_names = (char *) (resource + 1);
     stringid64_t *u_texture = (stringid64_t *) (u_names + (32 * resource->uniforms_count));
@@ -322,14 +348,21 @@ void material_use(material_t material) {
                 BGFX_STATE_ALPHA_WRITE |
                 BGFX_STATE_DEPTH_WRITE |
                 BGFX_STATE_DEPTH_TEST_LESS |
-                BGFX_STATE_CULL_CCW |
+                BGFX_STATE_CULL_CW |
                 BGFX_STATE_MSAA;
 
     bgfx_set_state(state, 0);
 }
 
 void material_submit(material_t material) {
-    struct material_resource *resource = (struct material_resource *) &_G.material_instance_data.data[_G.material_instance_offset.data[material.idx]];
+    u32 idx = MAP_GET(u32, &_G.material_instace_map, material.idx, UINT32_MAX);
+
+    if (idx == UINT32_MAX) {
+        return;
+    }
+
+
+    struct material_resource *resource = (struct material_resource *) &_G.material_instance_data.data[_G.material_instance_offset.data[idx]];
 
     bgfx_submit(0, shader_resource_get(resource->shader_name), 0, 0);
 }
