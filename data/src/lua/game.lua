@@ -2,10 +2,6 @@ for k, v in pairs(cetech) do _G[k] = v end
 
 require 'core/fpscamera'
 
---local Log = cetech.Log
---local Application = cetech.Application
---local Keyboard = cetech.Keyboard
-
 Game = Game or {}
 
 local quit_btn = Keyboard.button_index 'q'
@@ -14,6 +10,7 @@ local reload_btn = Keyboard.button_index 'r'
 local capture_btn = Keyboard.button_index 'f10'
 local screenshot_btn = Keyboard.button_index 'f11'
 local log_test_btn = Keyboard.button_index 'l'
+local flymode_btn = Keyboard.button_index 'lshift'
 
 function Game:init()
     Log.info("boot.lua", "Platform %s", Application.get_platform())
@@ -42,8 +39,8 @@ function Game:init()
     --    self.unit = self.unit1
 
     self.camera_unit = Unit.spawn(self.world, "camera");
-    --self.camera = Camera.GetCamera(self.world, self.camera_unit);
-    --self.fps_camera = FPSCamera(self.world, self.camera_unit)
+    self.camera = 0; --Camera.GetCamera(self.world, self.camera_unit);
+    self.fps_camera = FPSCamera(self.world, self.camera_unit)
     --Unit.Spawn(self.world, "unit11");
 
     self.debug = false
@@ -107,17 +104,11 @@ function Game:update(dt)
         Log.debug("game", "DEBUG TEST")
     end
 
-
-    --    Log.info("dddd", "dddddd")
-
-    --    local transform = Transform.GetTransform(self.world, self.camera_unit)
-    --    local pos = Transform.GetPosition(self.world, transform)
-    --
-    --    if Keyboard.button_pressed(Keyboard.button_index('up')) then
-    --        pos.Y = pos.Y + 1;
-    --        Transform.SetPosition(self.world, transform, pos)
-    --    end
-
+    if Keyboard.button_state(flymode_btn) then
+        self.fps_camera.fly_mode = true
+    else
+        self.fps_camera.fly_mode = false
+    end
 
     local dx = 0
     local dy = 0
@@ -126,8 +117,7 @@ function Game:update(dt)
         dx, dy = m_axis.x, -m_axis.y
         --Log.debug("lua", "%f %f", dx, dy)
     end
-
-
+    
     local up = Keyboard.button_state(Keyboard.button_index('w'))
     local down = Keyboard.button_state(Keyboard.button_index('s'))
     local left = Keyboard.button_state(Keyboard.button_index('a'))
@@ -135,12 +125,13 @@ function Game:update(dt)
 
     local updown = 0.0
     local leftdown = 0.0
-    if up then updown = 1.0 end
-    if down then updown = -1.0 end
-    if left then leftdown = -1.0 end
-    if right then leftdown = 1.0 end
-    --
-    --    self.fps_camera:update(dt, dx * 0.01, dy * 0.01, updown, leftdown)
+    if up then updown = 10.0 end
+    if down then updown = -10.0 end
+    if left then leftdown = -10.0 end
+    if right then leftdown = 10.0 end
+
+    self.fps_camera:update(dt, dx, dy, updown, leftdown)
+
     --
     --    if Gamepad.IsActive(0) then
     --        local right_a = Gamepad.Axis(0, Gamepad.AxisIndex("right"))
