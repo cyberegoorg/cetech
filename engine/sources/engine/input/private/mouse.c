@@ -149,20 +149,17 @@ u32 mouse_axis_index(const char *axis_name) {
     return 0;
 }
 
-void mouse_axis(const u32 axis_index,
-                vec2f_t *position) {
+vec2f_t mouse_axis(const u32 axis_index) {
     CE_ASSERT(LOG_WHERE, (axis_index >= 0) && (axis_index < MOUSE_AXIS_MAX));
 
     switch (axis_index) {
         case MOUSE_AXIS_ABSOULTE:
-            vec2f_move(position, &_G.last_pos);
-            return;
+            return _G.last_pos;
 
         case MOUSE_AXIS_RELATIVE:
-            vec2f_move(position, &_G.last_delta_pos);
-            return;
+            return _G.last_delta_pos;
 
         default:
-            return;
+            return (vec2f_t) {0};
     }
 }

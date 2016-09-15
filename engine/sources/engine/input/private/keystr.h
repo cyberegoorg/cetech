@@ -226,14 +226,14 @@ static const char *_key_to_str[512] = {
         [KEY_KP_DECIMAL] = "",
         [KEY_KP_HEXADECIMAL] = "",
 
-        [KEY_LCTRL] = "",
-        [KEY_LSHIFT] = "",
-        [KEY_LALT] = "",
-        [KEY_LGUI] = "",
-        [KEY_RCTRL] = "",
-        [KEY_RSHIFT] = "",
-        [KEY_RALT] = "",
-        [KEY_RGUI] = "",
+        [KEY_LCTRL] = "lctrl",
+        [KEY_LSHIFT] = "lshift",
+        [KEY_LALT] = "lalt",
+        [KEY_LGUI] = "lgui",
+        [KEY_RCTRL] = "rctrl",
+        [KEY_RSHIFT] = "rshift",
+        [KEY_RALT] = "ralt",
+        [KEY_RGUI] = "rgui",
 
         [KEY_MODE] = "",
 
