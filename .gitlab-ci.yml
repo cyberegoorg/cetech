@@ -1,18 +1,32 @@
 ######s##
 # Core #
 ###############################################################################
-image: ondravoves/debian:python2.7
+image: registry.gitlab.com/cyberegoorg/cetech
 
 ##########
 # Stages #
 ###############################################################################
 stages:
+  - test
   - doc
+
+########
+# Test #
+###############################################################################
+test:
+  stage: test
+  script:
+  - mkdir build
+  - cd build
+  - cmake .. -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++ -DCMAKE_BUILD_TYPE=Develop
+  - make -j 4
+  - ./cetech_tests
 
 #################
 # Gitlab pages  #
 ###############################################################################
 pages:
+  image: ondravoves/debian:python2.7
   stage: doc
   script:
   - pip install mkdocs
