@@ -1,16 +1,18 @@
 require 'core/class'
 
 local Transform = cetech.Transform
-local Camera = cetech.Camera
+--local Camera = cetech.Camera
 local Mat4f = cetech.Mat4f
+local Vec3f = cetech.Vec3f
 local Quatf = cetech.Quatf
+local Log = cetech.Log
 
 FPSCamera = class(FPSCamera)
 
 function FPSCamera:init(world, camera_unit, fly_mode)
     self.world = world
     self.unit = camera_unit
-    self.camera = Camera.get(world, camera_unit)
+    --  self.camera = Camera.get(world, camera_unit)
     self.transform = Transform.get(world, camera_unit)
 
     self.fly_mode = fly_mode or false
@@ -24,27 +26,24 @@ function FPSCamera:update(dt, dx, dy, updown, leftright)
     local pos = Transform.get_position(self.world, self.transform)
     local rot = Transform.get_rotation(self.world, self.transform)
 
-    --Log.Info("pos", "{0} {1} {2}", pos.X, pos.Y, pos.Z)
-
     local m_world = Transform.get_world_matrix(self.world, self.transform)
-    local z_dir = -Mat4f.Z(m_world)
-    local x_dir = Mat4f.X(m_world)
 
-    -- Rotation
-    local rotation_around_world_up = Quatf.from_axis_angle(Vec3f.UnitY, dx * 1.0)
-    local rotation_around_camera_right = Quatf.from_axis_angle(x_dir, -dy * 1.0)
-    local rotation = rotation_around_world_up * rotation_around_camera_right
-    Transform.set_rotation(self.world, self.transform, rotation * rot)
+    local x_dir = m_world.x
+    local z_dir = -m_world.z
 
     -- Position
     if not self.fly_mode then
-        z_dir.Y = 0.0
+        z_dir.y = 0.0
     end
 
-    pos = pos + z_dir * updown
-    pos = pos + x_dir * leftright
+    pos = pos + z_dir * updown * dt
+    pos = pos + x_dir * leftright * dt
 
-    --Log.Info("z_dir", "{0} {1} {2}", z_dir.X, z_dir.Y, z_dir.Z)
+    -- Rotation
+    local rotation_around_world_up = Quatf.from_axis_angle(Vec3f.unit_y(), dx * 1 * 1)
+    local rotation_around_camera_right = Quatf.from_axis_angle(x_dir, -dy * 1 * 1)
+    local rotation = rotation_around_world_up * rotation_around_camera_right
 
     Transform.set_position(self.world, self.transform, pos)
+    Transform.set_rotation(self.world, self.transform, rotation * rot)
 end
