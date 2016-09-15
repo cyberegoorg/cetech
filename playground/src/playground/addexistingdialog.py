@@ -15,7 +15,7 @@ class AddExistItemDialog(QDialog, Ui_Dialog):
     def open_dir(self):
         selected_dir = QFileDialog.getExistingDirectory(self, "Select Directory")
 
-        if cetechproject.validate_project(selected_dir):
+        if project.validate_project(selected_dir):
             self.project_dir_edit.setText(selected_dir)
 
     def done(self, r):
@@ -25,7 +25,7 @@ class AddExistItemDialog(QDialog, Ui_Dialog):
                                      QMessageBox.Yes, QMessageBox.Yes)
                 return
 
-            if not cetechproject.validate_project(self.project_dir_edit.text()):
+            if not project.validate_project(self.project_dir_edit.text()):
                 return
             else:
                 super(AddExistItemDialog, self).done(r)

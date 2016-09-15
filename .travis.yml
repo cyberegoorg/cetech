@@ -1,27 +1,49 @@
-language: python
-
+language: c++
 sudo: false
 
-python:
-  - "3.5"
+branches:
+  except:
+    - c_version
+
+env:
+  global:
+    - LLVM_VERSION=3.8.0
+    - LLVM_ARCHIVE_PATH=$HOME/clang+llvm.tar.xz
+
+matrix:
+  include:
+      - os: linux
+        env: BUILD_TYPE='Debug'
 
 cache:
-  apt: true
-  pip: true
   directories:
-  - ./externals/src
+  - .autoconf
+  - $HOME/clang+llvm
+  - ${TRAVIS_BUILD_DIR}/deps
 
-addons:
-  apt:
-    sources:
-      - mono
-    packages:
-      - mono-devel
+before_install:
+  - wget http://llvm.org/releases/$LLVM_VERSION/clang+llvm-$LLVM_VERSION-x86_64-linux-gnu-ubuntu-14.04.tar.xz -O $LLVM_ARCHIVE_PATH
+  - mkdir $HOME/clang+llvm
+  - tar xf $LLVM_ARCHIVE_PATH -C $HOME/clang+llvm --strip-components 1
+  - export PATH=$HOME/clang+llvm/bin:$PATH
 
 install:
-  - pip install -r requirements.txt
-  #- python externals/externals.py
-  - python build.py -d
+  - DEPS_DIR="${TRAVIS_BUILD_DIR}/deps"
+  - mkdir -p ${DEPS_DIR} && cd ${DEPS_DIR}
+  - |
+    if [[ "${TRAVIS_OS_NAME}" == "linux" ]]; then
+      CMAKE_URL="https://www.cmake.org/files/v3.5/cmake-3.5.2-Linux-x86_64.tar.gz"
+      mkdir cmake && travis_retry wget --no-check-certificate -O - ${CMAKE_URL} | tar --strip-components=1 -xz -C cmake
+      export PATH=${DEPS_DIR}/cmake/bin:${PATH}
+    elif [[ "${TRAVIS_OS_NAME}" == "osx" ]]; then
+      brew install cmake
+    fi
+  - cd ${TRAVIS_BUILD_DIR}
 
 script:
-  - sources/CETech/bin/Linux/AnyCPU/Debug/NSpecRunner.exe sources/CETech/bin/Linux/AnyCPU/Debug/CETechDevelopTest.dll
+  - export CC=clang
+  - export CXX=clang++
+  - mkdir build && cd build
+  - cmake .. -DCMAKE_BUILD_TYPE=${BUILD_TYPE}
+  - make -j 2
+  - ctest -V -j 2

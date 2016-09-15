@@ -1,0 +1,14 @@
+image: ondravoves/debian:python2.7
+
+stages:
+  - doc
+
+pages:
+  stage: doc
+  script:
+  - pip install mkdocs
+  - mkdocs build -d public
+
+  artifacts:
+    paths:
+    - public

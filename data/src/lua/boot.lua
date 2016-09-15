@@ -1,7 +1,9 @@
 require "lua/game"
 
+local Log = cetech.Log
+
 function init()
-    Log.Info("lua", "INIT.......")
+    Log.info("lua", "INIT.......")
     Game:init()
 end
 
@@ -12,7 +14,7 @@ end
 function shutdown()
   Game:shutdown()
 end
- 
+
 function render()
   Game:render()
 end
