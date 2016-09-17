@@ -177,14 +177,14 @@ CE_FORCE_INLINE void mat44f_rotate_zyx(mat44f_t *result,
     result->f[15] = 1.0f;
 };
 
-CE_FORCE_INLINE bool mat44f_eq(const mat44f_t *__restrict a,
-                               const mat44f_t *__restrict b,
-                               const f32 epsilon) {
+CE_FORCE_INLINE int mat44f_eq(const mat44f_t *__restrict a,
+                              const mat44f_t *__restrict b,
+                              const f32 epsilon) {
     return f32_equals(a->f, b->f, 4 * 4, epsilon);
 }
 
-CE_FORCE_INLINE bool mat44f_is_identity(const mat44f_t *__restrict a,
-                                        f32 epsilon) {
+CE_FORCE_INLINE int mat44f_is_identity(const mat44f_t *__restrict a,
+                                       f32 epsilon) {
     static mat44f_t _identity = MAT44F_INIT_IDENTITY;
     return mat44f_eq(a, &_identity, epsilon);
 }
