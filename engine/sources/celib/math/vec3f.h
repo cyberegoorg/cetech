@@ -73,8 +73,8 @@ CE_FORCE_INLINE void vec3f_cross(vec3f_t *__restrict result,
                                  const vec3f_t *__restrict a,
                                  const vec3f_t *__restrict b) {
     result->f[0] = a->f[1] * b->f[2] - a->f[2] * b->f[1];
-    result->f[1] = a->f[2] * b->f[0] - a->f[0] * b->f[2],
-            result->f[2] = a->f[0] * b->f[1] - a->f[1] * b->f[0];
+    result->f[1] = a->f[2] * b->f[0] - a->f[0] * b->f[2];
+    result->f[2] = a->f[0] * b->f[1] - a->f[1] * b->f[0];
 }
 
 CE_FORCE_INLINE f32 vec3f_length_squared(const vec3f_t *__restrict a) {
