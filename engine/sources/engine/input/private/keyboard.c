@@ -49,7 +49,7 @@ void keyboard_shutdown() {
 void keyboard_process() {
     struct event_header *event = machine_event_begin();
 
-    memory_copy(_G.last_state, _G.state, 512);
+    memory_copy(_G.state, _G.state, 512);
 
     u32 size = 0;
     while (event != machine_event_end()) {
@@ -112,4 +112,3 @@ int keyboard_button_released(const u32 button_index) {
 
     return !_G.state[button_index] && _G.last_state[button_index];
 }
-

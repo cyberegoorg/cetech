@@ -36,4 +36,10 @@ struct event_header *machine_event_end();
 
 struct event_header *machine_event_next(struct event_header *header);
 
+int machine_gamepad_is_active(int gamepad);
+
+void machine_gamepad_play_rumble(int gamepad,
+                                 float strength,
+                                 u32 length);
+
 #endif //CETECH_MACHINE_H

@@ -132,19 +132,24 @@ function Game:update(dt)
 
     self.fps_camera:update(dt, dx, dy, updown, leftdown)
 
-    --
-    --    if Gamepad.IsActive(0) then
-    --        local right_a = Gamepad.Axis(0, Gamepad.AxisIndex("right"))
-    --        local left_a = Gamepad.Axis(0, Gamepad.AxisIndex("left"))
-    --        -- -- Log.info("lua", "{0}, {1}, {2}", left_a.X, left_a.Y, left_a.Z)
-    --        self.fps_camera:update(dt, right_a.X*-0.06, right_a.Y*-0.06, left_a.Y, left_a.X)
-    --
-    --        if Gamepad.button_state(0, Gamepad.button_index("right_shoulder")) then
-    --            self.fps_camera.fly_mode = true
-    --        else
-    --            self.fps_camera.fly_mode = false
-    --        end
-    --    end
+    if Gamepad.is_active(0) then
+        if Gamepad.button_pressed(0, Gamepad.button_index("left_shoulder")) then
+            Gamepad.play_rumble(0, 5.0, 1000)
+        end
+
+        local right_a = Gamepad.axis(0, Gamepad.axis_index("right"))
+        local left_a = Gamepad.axis(0, Gamepad.axis_index("left"))
+        -- -- Log.info("lua", "{0}, {1}, {2}", left_a.X, left_a.Y, left_a.Z)
+
+        if Gamepad.button_state(0, Gamepad.button_index("right_shoulder")) then
+            self.fps_camera.fly_mode = true
+        else
+            self.fps_camera.fly_mode = false
+        end
+
+        self.fps_camera:update(dt, right_a.x * -0.1, right_a.y * -0.1, left_a.y * 10, left_a.x * 10)
+    end
+
     --
     --- -    -- local unit1 = World.UnitByName(self.world, self.level, "box1")
     ---- -- local node = SceneGraph.GetNodeByName(self.world, unit1, "n_geom_0")

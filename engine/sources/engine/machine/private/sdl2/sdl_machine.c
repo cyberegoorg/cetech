@@ -6,6 +6,7 @@
 #include "celib/containers/array.h"
 #include "celib/containers/eventstream.h"
 #include "engine/application/application.h"
+#include "sdl_parts.h"
 
 //==============================================================================
 // Defines
@@ -51,6 +52,11 @@ void sdl_process(struct eventstream *stream) {
         switch (e.type) {
             case SDL_QUIT:
                 application_quit();
+                break;
+
+            case SDL_CONTROLLERDEVICEADDED:
+            case SDL_CONTROLLERDEVICEREMOVED:
+                sdl_gamepad_process_event(&e, stream);
                 break;
 
             default:
