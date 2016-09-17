@@ -58,23 +58,23 @@ INSERT INTO log VALUES (?, ?, ?, ?, ?);
 ARGS_PARSER = argparse.ArgumentParser(description='CETech log -> sql dumper', formatter_class=RawTextHelpFormatter)
 
 ARGS_PARSER.add_argument(
-        "-u", "--url",
-        help='Connection url',
-        default='ws://localhost:5556',
-        type=str)
+    "-u", "--url",
+    help='Connection url',
+    default='ws://localhost:5556',
+    type=str)
 
 ARGS_PARSER.add_argument(
-        "-d", "--sqlite-db",
-        nargs='?',
-        help='SQLite file',
-        default='litelog.db',
-        type=str)
+    "-d", "--sqlite-db",
+    nargs='?',
+    help='SQLite file',
+    default='litelog.db',
+    type=str)
 
 ARGS_PARSER.add_argument(
-        "-i", "--import",
-        help='Log file to import',
-        dest='importt',
-        type=str)
+    "-i", "--import",
+    help='Log file to import',
+    dest='importt',
+    type=str)
 
 
 ###########
