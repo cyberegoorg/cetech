@@ -42,6 +42,7 @@ int machine_init() {
     machine_register_part("sdl", sdl_init, sdl_shutdown, sdl_process);
     machine_register_part("sdl_keyboard", sdl_keyboard_init, sdl_keyboard_shutdown, sdl_keyboard_process);
     machine_register_part("sdl_mouse", sdl_mouse_init, sdl_mouse_shutdown, sdl_mouse_process);
+    machine_register_part("sdl_gamepad", sdl_gamepad_init, sdl_gamepad_shutdown, sdl_gamepad_process);
     machine_register_part("sdl_window", sdl_window_init, sdl_window_shutdown, sdl_window_process);
 
     for (int i = 0; i < _G.parts_count; ++i) {
@@ -103,16 +104,3 @@ void machine_register_part(const char *name,
     _G.process[idx] = process;
 }
 
-#if defined(CETECH_LINUX)
-
-#include <sched.h>
-
-#endif
-
-void os_thread_yield() {
-#if defined(CETECH_DARWIN)
-    sched_yield();
-#elif defined(CETECH_LINUX)
-    sched_yield();
-#endif
-}

@@ -20,6 +20,7 @@
 #include <engine/world_system/transform.h>
 #include <engine/world_system/world_system.h>
 #include <engine/renderer/material.h>
+#include <celib/math/types.h>
 
 #include "celib/containers/map.h"
 
@@ -127,6 +128,23 @@ static void _dump_event() {
     while (event != machine_event_end()) {
         size = size + 1;
         switch (event->type) {
+//            case EVENT_GAMEPAD_DOWN:
+//                log_info(LOG_WHERE, "Gamepad %d btn %d down", ((struct gamepad_btn_event*)event)->gamepad_id, ((struct gamepad_btn_event*)event)->button);
+//                break;
+//
+//            case EVENT_GAMEPAD_UP:
+//                log_info(LOG_WHERE, "Gamepad %d btn %d up", ((struct gamepad_btn_event*)event)->gamepad_id, ((struct gamepad_btn_event*)event)->button);
+//                break;
+//
+//            case EVENT_GAMEPAD_MOVE:
+//                log_info(LOG_WHERE, "Gamepad %d move axis %d [%f, %f]",
+//                         ((struct gamepad_move_event*)event)->gamepad_id,
+//                         ((struct gamepad_move_event*)event)->axis,
+//                         ((struct gamepad_move_event*)event)->position.x,
+//                         ((struct gamepad_move_event*)event)->position.y);
+//                break;
+
+
 //            case EVENT_KEYBOARD_DOWN:
 //                log_info(LOG_WHERE, "Key down %d", ((struct keyboard_event*)event)->button);
 //                break;
@@ -159,6 +177,7 @@ static void _dump_event() {
 static void _input_task(void *d) {
     keyboard_process();
     mouse_process();
+    gamepad_process();
 }
 
 static void _consolesrv_task(void *d) {

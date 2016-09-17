@@ -2,6 +2,14 @@
 #include <celib/types.h>
 #include "include/SDL2/SDL.h"
 
+
+#if defined(CETECH_LINUX)
+
+#include <sched.h>
+
+#endif
+
+
 thread_t os_thread_create(thread_fce_t fce,
                           const char *name,
                           void *data) {
@@ -25,6 +33,14 @@ u64 os_thread_get_id(thread_t thread) {
 
 u64 os_thread_actual_id() {
     return SDL_ThreadID();
+}
+
+void os_thread_yield() {
+#if defined(CETECH_DARWIN)
+    sched_yield();
+#elif defined(CETECH_LINUX)
+    sched_yield();
+#endif
 }
 
 void os_thread_spin_lock(spinlock_t *lock) {

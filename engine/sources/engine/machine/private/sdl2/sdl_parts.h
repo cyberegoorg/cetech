@@ -5,6 +5,8 @@
 // Main part
 //==============================================================================
 
+#include <SDL2/SDL_events.h>
+
 int sdl_init();
 
 void sdl_shutdown();
@@ -32,6 +34,19 @@ int sdl_mouse_init();
 void sdl_mouse_shutdown();
 
 void sdl_mouse_process(struct eventstream *stream);
+
+//==============================================================================
+// Gamepad part
+//==============================================================================
+
+int sdl_gamepad_init();
+
+void sdl_gamepad_shutdown();
+
+void sdl_gamepad_process(struct eventstream *stream);
+
+void sdl_gamepad_process_event(SDL_Event *event,
+                               struct eventstream *stream);
 
 //==============================================================================
 // Window part

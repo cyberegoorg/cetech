@@ -1,14 +1,3 @@
-#ifndef CETECH_KEYBOARD_TYPES_H
-#define CETECH_KEYBOARD_TYPES_H
-
-#include <celib/types.h>
-#include <celib/containers/eventstream.h>
-
-struct keyboard_event {
-    struct event_header h;
-    u32 keycode;
-};
-
 enum key {
     KEY_UNKNOWN = 0,
 
@@ -273,6 +262,3 @@ enum key {
 
     KEY_MAX = 512
 };
-
-
-#endif //CETECH_KEYBOARD_TYPES_H

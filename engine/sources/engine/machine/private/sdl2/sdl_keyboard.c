@@ -3,7 +3,6 @@
 //==============================================================================
 
 #include <include/SDL2/SDL.h>
-#include <engine/machine/keyboard_types.h>
 #include "engine/machine/types.h"
 
 //==============================================================================
@@ -19,7 +18,7 @@
 //==============================================================================
 
 static struct G {
-    u8 last_state[KEY_MAX];
+    u8 state[KEY_MAX];
 } _G = {0};
 
 
@@ -42,16 +41,16 @@ void sdl_keyboard_process(struct eventstream *stream) {
     struct keyboard_event keyboard_ev;
 
     for (u32 i = 0; i < KEY_MAX; ++i) {
-        if (is_button_down(state[i], _G.last_state[i])) {
+        if (is_button_down(state[i], _G.state[i])) {
             keyboard_ev.keycode = i;
             event_stream_push(stream, EVENT_KEYBOARD_DOWN, keyboard_ev);
 
-        } else if (is_button_up(state[i], _G.last_state[i])) {
+        } else if (is_button_up(state[i], _G.state[i])) {
             keyboard_ev.keycode = i;
             event_stream_push(stream, EVENT_KEYBOARD_UP, keyboard_ev);
 
         }
 
-        _G.last_state[i] = state[i];
+        _G.state[i] = state[i];
     }
 }

@@ -131,6 +131,7 @@ set(SOURCE_FILES
         engine/sources/engine/lua_system/private/api/api_keyboard.c
         engine/sources/engine/lua_system/private/api/api_log.c
         engine/sources/engine/lua_system/private/api/api_mouse.c
+        engine/sources/engine/lua_system/private/api/api_gamepad.c
         engine/sources/engine/lua_system/private/api/api_application.c
         engine/sources/engine/lua_system/private/api/api_resouce_compilator.c
         engine/sources/engine/lua_system/private/api/api_resouce_manager.c
@@ -155,13 +156,17 @@ set(SOURCE_FILES
 
 
         engine/sources/engine/application/private/application.c
+
         engine/sources/engine/machine/private/machine.c
         engine/sources/engine/machine/private/sdl2/sdl_mouse.c
         engine/sources/engine/machine/private/sdl2/sdl_keyboard.c
+        engine/sources/engine/machine/private/sdl2/sdl_gamepad.c
         engine/sources/engine/machine/private/sdl2/sdl_machine.c
+
         engine/sources/celib/window/private/sdl_window.c
         engine/sources/engine/input/private/keyboard.c
         engine/sources/engine/input/private/mouse.c
+        engine/sources/engine/input/private/gamepad.c
         engine/sources/engine/task_manager/private/task_manager.c
 
         engine/sources/engine/resource_compiler/private/resource_compiler.c

@@ -3,7 +3,6 @@
 //==============================================================================
 
 #include <include/SDL2/SDL.h>
-#include <engine/machine/mouse_types.h>
 #include "engine/machine/types.h"
 
 
@@ -20,8 +19,8 @@
 //==============================================================================
 
 static struct G {
-    u8 last_state[MOUSE_BTN_MAX];
-    int last_position[2];
+    u8 state[MOUSE_BTN_MAX];
+    int position[2];
 } _G = {0};
 
 
@@ -50,9 +49,9 @@ void sdl_mouse_process(struct eventstream *stream) {
     curent_state[MOUSE_BTN_RIGHT] = (u8) (state & SDL_BUTTON_RMASK);
     curent_state[MOUSE_BTN_MIDLE] = (u8) (state & SDL_BUTTON_MMASK);
 
-    if ((pos[0] != _G.last_position[0]) || (pos[1] != _G.last_position[1])) {
-        _G.last_position[0] = pos[0];
-        _G.last_position[1] = pos[1];
+    if ((pos[0] != _G.position[0]) || (pos[1] != _G.position[1])) {
+        _G.position[0] = pos[0];
+        _G.position[1] = pos[1];
 
         struct mouse_move_event event;
         event.pos.x = pos[0];
@@ -65,12 +64,12 @@ void sdl_mouse_process(struct eventstream *stream) {
         struct mouse_event event;
         event.button = i;
 
-        if (is_button_down(curent_state[i], _G.last_state[i]))
+        if (is_button_down(curent_state[i], _G.state[i]))
             event_stream_push(stream, EVENT_MOUSE_DOWN, event);
 
-        else if (is_button_up(curent_state[i], _G.last_state[i]))
+        else if (is_button_up(curent_state[i], _G.state[i]))
             event_stream_push(stream, EVENT_MOUSE_UP, event);
 
-        _G.last_state[i] = curent_state[i];
+        _G.state[i] = curent_state[i];
     }
 }

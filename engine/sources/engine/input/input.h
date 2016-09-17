@@ -54,4 +54,44 @@ const char *mouse_axis_name(const u32 axis_index);
 
 vec2f_t mouse_axis(const u32 axis_index);
 
+//==============================================================================
+// Gamepad
+//==============================================================================
+
+typedef struct {
+    u8 idx;
+} gamepad_t;
+
+int gamepad_init();
+
+void gamepad_shutdown();
+
+void gamepad_process();
+
+int gamepad_is_active(gamepad_t gamepad);
+
+u32 gamepad_button_index(const char *button_name);
+
+const char *gamepad_button_name(const u32 button_index);
+
+int gamepad_button_state(gamepad_t gamepad,
+                         const u32 button_index);
+
+int gamepad_button_pressed(gamepad_t gamepad,
+                           const u32 button_index);
+
+int gamepad_button_released(gamepad_t gamepad,
+                            const u32 button_index);
+
+u32 gamepad_axis_index(const char *axis_name);
+
+const char *gamepad_axis_name(const u32 axis_index);
+
+vec2f_t gamepad_axis(gamepad_t gamepad,
+                     const u32 axis_index);
+
+void gamepad_play_rumble(gamepad_t gamepad,
+                         float strength,
+                         u32 length);
+
 #endif //CETECH_INPUT_H
