@@ -18,9 +18,8 @@
 // Defines
 //==============================================================================
 
-#define QUATF_ZERO {0}
-#define QUATF_IDENTITY {0.0f, 0.0f, 0.0f, 1.0f}
-
+#define QUATF_ZERO (quatf_t){0}
+#define QUATF_IDENTITY (quatf_t){0.0f, 0.0f, 0.0f, 1.0f}
 
 //==============================================================================
 // Interface
@@ -98,7 +97,7 @@ CE_FORCE_INLINE void quatf_to_mat44f(mat44f_t *__restrict result,
 }
 
 
-CE_FORCE_INLINE void quatf_to_eurel_angle(quatf_t *__restrict result,
+CE_FORCE_INLINE void quatf_to_eurel_angle(vec3f_t *__restrict result,
                                           const quatf_t *__restrict a) {
     result->f[0] = f32_atan2(2.0f * (a->f[0] * a->f[3] - a->f[1] * a->f[2]),
                              1.0f - 2.0f * (f32_sq(a->f[0]) + f32_sq(a->f[2])));

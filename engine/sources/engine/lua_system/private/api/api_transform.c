@@ -18,7 +18,7 @@ static int _transform_get_position(lua_State *l) {
     world_t w = {.h = luasys_to_handler(l, 1)};
     transform_t t = {.idx = luasys_to_int(l, 2)};
 
-    luasys_push_vector3(l, transform_get_position(w, t));
+    luasys_push_vec3f(l, transform_get_position(w, t));
     return 1;
 }
 
@@ -34,14 +34,14 @@ static int _transform_get_scale(lua_State *l) {
     world_t w = {.h = luasys_to_handler(l, 1)};
     transform_t t = {.idx = luasys_to_int(l, 2)};
 
-    luasys_push_vector3(l, transform_get_scale(w, t));
+    luasys_push_vec3f(l, transform_get_scale(w, t));
     return 1;
 }
 
 static int _transform_set_position(lua_State *l) {
     world_t w = {.h = luasys_to_handler(l, 1)};
     transform_t t = {.idx = luasys_to_int(l, 2)};
-    vec3f_t *pos = luasys_to_vector3(l, 3);
+    vec3f_t *pos = luasys_to_vec3f(l, 3);
 
     transform_set_position(w, t, *pos);
     return 0;
@@ -50,7 +50,7 @@ static int _transform_set_position(lua_State *l) {
 static int _transform_set_scale(lua_State *l) {
     world_t w = {.h = luasys_to_handler(l, 1)};
     transform_t t = {.idx = luasys_to_int(l, 2)};
-    vec3f_t *pos = luasys_to_vector3(l, 3);
+    vec3f_t *pos = luasys_to_vec3f(l, 3);
 
     transform_set_scale(w, t, *pos);
     return 0;
