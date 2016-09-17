@@ -10,6 +10,8 @@
 #include "fmath.h"
 #include "types.h"
 
+#define VEC2F_UNIT_X (vec2f_t){1.0f, 0.0f}
+#define VEC2F_UNIT_Y (vec2f_t){0.0f, 1.0f}
 
 //==============================================================================
 // Interface

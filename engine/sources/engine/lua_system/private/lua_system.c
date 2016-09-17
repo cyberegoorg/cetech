@@ -216,6 +216,7 @@ static void _register_all_api() {
     REGISTER_LUA_API(world);
     REGISTER_LUA_API(unit);
     REGISTER_LUA_API(transform);
+    REGISTER_LUA_API(vec2f);
     REGISTER_LUA_API(vec3f);
     REGISTER_LUA_API(quatf);
 }
