@@ -10,6 +10,11 @@
 #include "fmath.h"
 #include "types.h"
 
+#define VEC4F_UNIT_X (vec4f_t){1.0f, 0.0f, 0.0f, 0.0f}
+#define VEC4F_UNIT_Y (vec4f_t){0.0f, 1.0f, 0.0f, 0.0f}
+#define VEC4F_UNIT_Z (vec4f_t){0.0f, 0.0f, 1.0f, 0.0f}
+#define VEC4F_UNIT_W (vec4f_t){0.0f, 0.0f, 0.0f, 1.0f}
+
 
 //==============================================================================
 // Functions
