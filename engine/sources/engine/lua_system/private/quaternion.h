@@ -8,7 +8,7 @@
 #include "../lua_system.h"
 
 
-static int quat_add(lua_State *L) {
+static int _quat_add(lua_State *L) {
     quatf_t *a = luasys_to_quat(L, 1);
     quatf_t *b = luasys_to_quat(L, 2);
 
@@ -19,7 +19,7 @@ static int quat_add(lua_State *L) {
     return 1;
 }
 
-static int quat_sub(lua_State *L) {
+static int _quat_sub(lua_State *L) {
     quatf_t *a = luasys_to_quat(L, 1);
     quatf_t *b = luasys_to_quat(L, 2);
 
@@ -32,7 +32,7 @@ static int quat_sub(lua_State *L) {
 
 
 //TODO: mul_s
-static int quat_mul(lua_State *L) {
+static int _quat_mul(lua_State *L) {
     quatf_t *a = luasys_to_quat(L, 1);
     quatf_t *b = luasys_to_quat(L, 2);
 
@@ -43,28 +43,28 @@ static int quat_mul(lua_State *L) {
     return 1;
 }
 
-static int quat_div(lua_State *L) {
+static int _quat_div(lua_State *L) {
     quatf_t *a = luasys_to_quat(L, 1);
     float b = luasys_to_f32(L, 2);
 
     quatf_t res = {0};
     quatf_div_s(&res, a, b);
 
-    luasys_push_vector4(L, res);
+    luasys_push_vec4f(L, res);
     return 1;
 }
 
-static int quat_unm(lua_State *L) {
+static int _quat_unm(lua_State *L) {
     quatf_t *a = luasys_to_quat(L, 1);
 
     quatf_t res = {0};
     quatf_invert(&res, a);
 
-    luasys_push_vector4(L, res);
+    luasys_push_vec4f(L, res);
     return 1;
 }
 
-static int quat_index(lua_State *L) {
+static int _quat_index(lua_State *L) {
     quatf_t *a = luasys_to_quat(L, 1);
     const char *s = luasys_to_string(L, 2);
 
@@ -89,7 +89,7 @@ static int quat_index(lua_State *L) {
     return 0;
 }
 
-static int quat_newindex(lua_State *L) {
+static int _quat_newindex(lua_State *L) {
     quatf_t *a = luasys_to_quat(L, 1);
 
     const char *s = luasys_to_string(L, 2);

@@ -7,70 +7,70 @@
 #define API_NAME "Vec3f"
 
 static int _unit_x(lua_State *l) {
-    luasys_push_vector3(l, VEC3F_UNIT_X);
+    luasys_push_vec3f(l, VEC3F_UNIT_X);
     return 1;
 }
 
 static int _unit_y(lua_State *l) {
-    luasys_push_vector3(l, VEC3F_UNIT_Y);
+    luasys_push_vec3f(l, VEC3F_UNIT_Y);
     return 1;
 }
 
 static int _unit_z(lua_State *l) {
-    luasys_push_vector3(l, VEC3F_UNIT_Z);
+    luasys_push_vec3f(l, VEC3F_UNIT_Z);
     return 1;
 }
 
 static int _length(lua_State *l) {
-    vec3f_t *v = luasys_to_vector3(l, 1);
+    vec3f_t *v = luasys_to_vec3f(l, 1);
     luasys_push_float(l, vec3f_length(v));
     return 1;
 }
 
 static int _length_squared(lua_State *l) {
-    vec3f_t *v = luasys_to_vector3(l, 1);
+    vec3f_t *v = luasys_to_vec3f(l, 1);
     luasys_push_float(l, vec3f_length_squared(v));
     return 1;
 }
 
 static int _normalized(lua_State *l) {
-    vec3f_t *v = luasys_to_vector3(l, 1);
+    vec3f_t *v = luasys_to_vec3f(l, 1);
     vec3f_t res = {0};
 
     vec3f_normalized(&res, v);
 
-    luasys_push_vector3(l, res);
+    luasys_push_vec3f(l, res);
     return 1;
 }
 
 static int _lerp(lua_State *l) {
-    vec3f_t *from = luasys_to_vector3(l, 1);
-    vec3f_t *to = luasys_to_vector3(l, 2);
+    vec3f_t *from = luasys_to_vec3f(l, 1);
+    vec3f_t *to = luasys_to_vec3f(l, 2);
     f32 time = luasys_to_f32(l, 3);
 
     vec3f_t res = {0};
 
     vec3f_lerp(&res, from, to, time);
 
-    luasys_push_vector3(l, res);
+    luasys_push_vec3f(l, res);
     return 1;
 }
 
 static int _cross(lua_State *l) {
-    vec3f_t *a = luasys_to_vector3(l, 1);
-    vec3f_t *b = luasys_to_vector3(l, 2);
+    vec3f_t *a = luasys_to_vec3f(l, 1);
+    vec3f_t *b = luasys_to_vec3f(l, 2);
 
     vec3f_t res = {0};
 
     vec3f_cross(&res, a, b);
 
-    luasys_push_vector3(l, res);
+    luasys_push_vec3f(l, res);
     return 1;
 }
 
 static int _dot(lua_State *l) {
-    vec3f_t *a = luasys_to_vector3(l, 1);
-    vec3f_t *b = luasys_to_vector3(l, 2);
+    vec3f_t *a = luasys_to_vec3f(l, 1);
+    vec3f_t *b = luasys_to_vec3f(l, 2);
 
     luasys_push_float(l, vec3f_dot(a, b));
     return 1;

@@ -8,7 +8,7 @@
 static int _from_axis_angle(lua_State *l) {
     quatf_t result = {0};
 
-    const vec3f_t *axis = luasys_to_vector3(l, 1);
+    const vec3f_t *axis = luasys_to_vec3f(l, 1);
     f32 angle = luasys_to_f32(l, 2);
 
     quatf_from_axis_angle(&result, axis, angle);

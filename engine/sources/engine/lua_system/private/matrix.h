@@ -34,19 +34,19 @@ static int _mat44f_index(lua_State *L) {
 
     switch (s[0]) {
         case 'x':
-            luasys_push_vector4(L, a->x);
+            luasys_push_vec4f(L, a->x);
             return 1;
 
         case 'y':
-            luasys_push_vector4(L, a->y);
+            luasys_push_vec4f(L, a->y);
             return 1;
 
         case 'z':
-            luasys_push_vector4(L, a->z);
+            luasys_push_vec4f(L, a->z);
             return 1;
 
         case 'w':
-            luasys_push_vector4(L, a->w);
+            luasys_push_vec4f(L, a->w);
             return 1;
 
         default:
@@ -61,7 +61,7 @@ static int _mat44f_newindex(lua_State *L) {
     mat44f_t *a = luasys_to_mat44f(L, 1);
 
     const char *s = luasys_to_string(L, 2);
-    vec4f_t *value = luasys_to_vector4(L, 3);
+    vec4f_t *value = luasys_to_vec4f(L, 3);
 
     switch (s[0]) {
         case 'x':
