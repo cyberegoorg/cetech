@@ -2,7 +2,7 @@
 
 Module contain functions for resource package manage.
 
-## Example
+# Example
 
 ```lua
 local main_pkg = 'main'
@@ -23,7 +23,7 @@ function Game:update(dt)
 end
 ```
 
-## Methods
+# Methods
 
 * [load( package )](#load-package)
 * [unload( package )](#unload-package)
@@ -32,7 +32,7 @@ end
 
 ------------------------------------------------------------------------------------------------------------------------
 
-### load( package )
+## load( package )
 
 Load all resource that are in the package. If one is already loaded will not reload.
 
@@ -42,33 +42,33 @@ Load all resource that are in the package. If one is already loaded will not rel
     For querying whether the package is already loaded use method [**IsLoaded**](#Packageisloaded)
     or you can wait to load using method [**Flush**](#Packageflush)
 
-#### Arguments
+### Arguments
 * **string** `package` - Package name
 
 ------------------------------------------------------------------------------------------------------------------------
 
-### unload( package )
+## unload( package )
 
 Load all resource that are in the package.
 
-#### Arguments
+### Arguments
 * **string** `package` - Package name
 
 ------------------------------------------------------------------------------------------------------------------------
 
-### is_loaded( package ) : bool
+## is_loaded( package ) : bool
 
 Returns `true` if all resource that are in the package loaded in memory and ready to use.
 
 
-#### Arguments
+### Arguments
 * **string** `package` - Package name
 
 ------------------------------------------------------------------------------------------------------------------------
 
-### flush( package )
+## flush( package )
 
 It would wait until they are loaded all the resource that is in the package.
 
-#### Arguments
+### Arguments
 * **string** `package` - Package name

@@ -2,7 +2,7 @@
 
 Module contain functions for Application.
 
-## Methods
+# Methods
 
 * [quit()](#quit)
 * [get_native_platform() : string](#get_native_platform-string)
@@ -11,24 +11,24 @@ Module contain functions for Application.
 
 ------------------------------------------------------------------------------------------------------------------------
 
-### quit()
+## quit()
 Quit application.
  
 
 ------------------------------------------------------------------------------------------------------------------------
 
-### get_native_platform() : string
+## get_native_platform() : string
 
 Return native platform name.
 
-#### Returns
+### Returns
 * Native platform
 
 ------------------------------------------------------------------------------------------------------------------------
 
-### get_platform() : string
+## get_platform() : string
 
 Return platform name.
 
-#### Returns
+### Returns
 * Platform

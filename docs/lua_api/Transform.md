@@ -2,12 +2,12 @@
 
 Module contain functions for transformation
 
-## Example
+# Example
 
 ```lua
 ```
 
-## Methods
+# Methods
 
 * Component
     * [get( world, entity ) : tranform](#get-world-entity-transform)
@@ -26,85 +26,85 @@ Module contain functions for transformation
 
 ------------------------------------------------------------------------------------------------------------------------
 
-### get( world, entity ) : tranform
+## get( world, entity ) : tranform
 
 Get transform from entity or unit.
 
-#### Arguments
+### Arguments
 * **world** `world` - World
 * **entity, unit** `entity` - Entity or unit
 
 ------------------------------------------------------------------------------------------------------------------------
 
-### has( world, entity ) : bool
+## has( world, entity ) : bool
 
 Return true if entity has transfom component.
 
-#### Arguments
+### Arguments
 * **world** `world` - World
 * **entity, unit** `entity` - Entity or unit
 
 ----------------------------------------------------------------------------------------------------------------------
 
-### get_position( world, transform ) : Vec3f
+## get_position( world, transform ) : Vec3f
 
 Get position
 
-#### Returns
+### Returns
 * Position
   
-#### Arguments
+### Arguments
 * **world** `world` - World
 * **transform** `transform` - Transform instance
 
 ------------------------------------------------------------------------------------------------------------------------
 
-### get_rotation( world, transform ) : Quatf
+## get_rotation( world, transform ) : Quatf
 
 Get rotation
 
-#### Returns
+### Returns
 * Rotation
 
-#### Arguments
+### Arguments
 * **world** `world` - World
 * **transform** `transform` - Transform instance
 
 
 ------------------------------------------------------------------------------------------------------------------------
 
-### get_scale( world, transform ) : Vec3f
+## get_scale( world, transform ) : Vec3f
 
 Get scale
 
-#### Returns
+### Returns
 * Scale
 
-#### Arguments
+### Arguments
 * **world** `world` - World
 * **transform** `transform` - Transform instance
 
 ------------------------------------------------------------------------------------------------------------------------
 
-### get_world_matrix( world, transform ) : Mat44f
+## get_world_matrix( world, transform ) : Mat44f
 
 Get world matrix.
 
-#### Returns
+### Returns
 * World matrix
 
-#### Arguments
+### Arguments
 * **world** `world` - World
 * **transform** `transform` - Transform instance
 
 
 ------------------------------------------------------------------------------------------------------------------------
 
-### set_position( world, transform, position )
+## set_position( world, transform, position )
 
 Set position.
 
-#### Arguments
+### Arguments
 * **world** `world` - World
 * **transform** `transform` - Transform instance
 * **Vec3f** `position` - New position
@@ -112,22 +112,22 @@ Set position.
 
 ------------------------------------------------------------------------------------------------------------------------
 
-### set_rotation( world, transform, rotation )
+## set_rotation( world, transform, rotation )
 
 Set rotation.
 
-#### Arguments
+### Arguments
 * **world** `world` - World
 * **transform** `transform` - Transform instance
 * **Quatf** `rotation` - New rotation
 
 ------------------------------------------------------------------------------------------------------------------------
 
-### set_scale( world, transform, scale )
+## set_scale( world, transform, scale )
 
 Set scale.
 
-#### Arguments
+### Arguments
 * **world** `world` - World
 * **transform** `transform` - Transform instance
 * **Vec3f** `scale` - New scale

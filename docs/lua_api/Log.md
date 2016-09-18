@@ -2,7 +2,7 @@
 
 Module contain functions for logging
 
-## Example
+# Example
 
 ```lua
 local Log = cetech.Log
@@ -13,7 +13,7 @@ Log.error("lua_example", "ERROR")
 Log.debug("lua_example", "DEBUG")
 ```
 
-## Methods
+# Methods
 
 * [info( where, msg, ... )](#info-where-msg)
 * [warning( where, msg, ... )](#warning-where-msg)
@@ -22,44 +22,44 @@ Log.debug("lua_example", "DEBUG")
 
 ------------------------------------------------------------------------------------------------------------------------
 
-### info( where, msg, ... )
+## info( where, msg, ... )
 
 Log info message.
   
-#### Arguments
+### Arguments
 * **string** `where` - Where is message logged.
 * **string** `msg` - Log message
 * **object** `...` - Log message arguments
 
 ------------------------------------------------------------------------------------------------------------------------
 
-### warning( where, msg, ...)
+## warning( where, msg, ...)
 
 Log warning message.
 
-#### Arguments
+### Arguments
 * **string** `where` - Where is message logged.
 * **string** `msg` - Log message
 * **object** `...` - Log message arguments
 
 ------------------------------------------------------------------------------------------------------------------------
 
-### error( where, msg, ... )
+## error( where, msg, ... )
 
 Log error message.
 
-#### Arguments
+### Arguments
 * **string** `where` - Where is message logged.
 * **string** `msg` - Log message
 * **object** `...` - Log message arguments
 
 ------------------------------------------------------------------------------------------------------------------------
 
-### debug( where, msg, ... )
+## debug( where, msg, ... )
 
 Log debug message.
 
-#### Arguments
+### Arguments
 * **string** `where` - Where is message logged.
 * **string** `msg` - Log message
 * **object** `...` - Log message arguments

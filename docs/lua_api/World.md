@@ -2,12 +2,12 @@
 
 Module contain functions for world  manager.
 
-## Example
+# Example
 
 ```lua
 ```
 
-## Methods
+# Methods
 * Basic
     * [create() : world](#create-world)
     * [destroy( world )](#destroy-world)
@@ -22,42 +22,42 @@ Module contain functions for world  manager.
 
 ------------------------------------------------------------------------------------------------------------------------
 
-### create() : world
+## create() : world
 
 Create new world and return worldId.
 
-#### Returns
+### Returns
 * World
 
 ------------------------------------------------------------------------------------------------------------------------
 
-### destroy( world )
+## destroy( world )
 
 Load all resource that are in the package.
 
-#### Arguments
+### Arguments
 * **world** `world` - World
 
 ------------------------------------------------------------------------------------------------------------------------
 
-### update( world, dt )
+## update( world, dt )
 
 Update world.
 
-#### Arguments
+### Arguments
 * **world** `world` - World
 * **number** `dt` - delta time
 
 ------------------------------------------------------------------------------------------------------------------------
 
-### load_level( world, name, position?, rotation?, scale? ) : Level
+## load_level( world, name, position?, rotation?, scale? ) : Level
 
 Load level from resource to world and return levelID
 
-#### Returns
+### Returns
 * Level
 
-#### Arguments
+### Arguments
 * **world** `world` - World
 * **string** `name` - Level resource name
 * **string** `name` - Level resource name
@@ -67,27 +67,27 @@ Load level from resource to world and return levelID
 
 ------------------------------------------------------------------------------------------------------------------------
 
-### level_unit( world, level) : Unit
+## level_unit( world, level) : Unit
 
 Return level unit.
 
-#### Returns
+### Returns
 * Level unit
 
-#### Arguments
+### Arguments
 * **world** `world` - World
 * **level** `level` - Level
 
 ------------------------------------------------------------------------------------------------------------------------
 
-### unit_by_name( world, level, name ) : Unit
+## unit_by_name( world, level, name ) : Unit
 
 Find unit in level by name and return it.
 
-#### Returns
+### Returns
 * Unit
 
-#### Arguments
+### Arguments
 * **world** `world` - World
 * **level** `level` - Level
 * **string** `name` - Unit name

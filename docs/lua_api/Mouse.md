@@ -2,7 +2,7 @@
 
 Module contain functions for mouse (computer mouse because this is not [Dishonored][dishonored])
 
-## Example
+# Example
 
 ```lua
 local left_btn = cetech.Mouse.button_index 'left'
@@ -16,20 +16,20 @@ function Game:update(dt)
 end 
 ```
 
-## Axis name
+# Axis name
 
 * ` ` - Invlaid axis
 * `absolute` - Abosilute position
 * `relative` - Relative position since last frame
 
-## Button name
+# Button name
 
 * ` ` - Invalid buton
 * `left` - Left button
 * `midle` - Midle button
 * `right` - Right buton
  
-## Methods
+# Methods
 
 * Buttons
     * [button_index(name) : string](#button_index-name-string)
@@ -44,102 +44,102 @@ end
 
 ------------------------------------------------------------------------------------------------------------------------
 
-### button_index( name ) : string
+## button_index( name ) : string
 
 Return button index for `name`.
 
-#### Returns
+### Returns
 * Button index
     
-#### Arguments
+### Arguments
 * **string** `name` - Button name 
 
 ------------------------------------------------------------------------------------------------------------------------
 
-### button_name( index ) : string
+## button_name( index ) : string
 
 Return button name for `index` or empty string if `index` is invalid.
 
-#### Returns
+### Returns
 * Button name
     
-#### Arguments
+### Arguments
 * **number** `index` - Button index
 
 ------------------------------------------------------------------------------------------------------------------------
 
-### button_state( index ) : bool
+## button_state( index ) : bool
 
 Return `true` if button is down in actual frame.
 
-#### Returns
+### Returns
 * Button state
     
-#### Arguments
+### Arguments
 * **number** `index` - Button index
 
 ------------------------------------------------------------------------------------------------------------------------
 
-### button_pressed( index ) : bool
+## button_pressed( index ) : bool
 
 Return `true` if button is not down in last frame and now is.
 
-#### Returns
+### Returns
 * Button pressed state
 
-#### Arguments
+### Arguments
 * **number** `index` - Button index
 
 ------------------------------------------------------------------------------------------------------------------------
 
-### button_released( index ) : bool
+## button_released( index ) : bool
 
 Return `true` if button is down in last frame and now is not.
 
-#### Returns
+### Returns
 * Button pressed state
 
-#### Arguments
+### Arguments
 * **number** `index` - Button index
 
 ------------------------------------------------------------------------------------------------------------------------
 
-### axis_index( name ) : number
+## axis_index( name ) : number
 
 Return axis index for `axisName`.
 
-#### Returns
+### Returns
 * Axis index
     
-#### Arguments
+### Arguments
 * **string** `name` - Axis name 
 
 ------------------------------------------------------------------------------------------------------------------------
 
-### axis_name( index ) : string
+## axis_name( index ) : string
 
 Return axis name for `index` or empty string if `index` is invalid.
 
-#### Returns
+### Returns
 * Axis name
     
-#### Arguments
+### Arguments
 * **number** `index` - Button index
 
 ------------------------------------------------------------------------------------------------------------------------
 
-### axis( index ) : cetech.Vec3f
+## axis( index ) : cetech.Vec3f
 
 Return axis values as Vec3f(x, y, 0.0f)
 
-### axis_name( index ) : string
+## axis_name( index ) : string
 
 Return button name for `index` or empty string if `index` is invalid.
 
-#### Returns
+### Returns
 * Axis value
     
-#### Arguments
+### Arguments
 * **number** `index` - Axis index
 
 

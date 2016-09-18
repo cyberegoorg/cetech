@@ -2,34 +2,34 @@
 
 Module contain functions for Unit manager.
 
-## Example
+# Example
 
 ```lua
 ```
 
-## Methods
+# Methods
  * [spawn( world, name ) : unit](#spawn-world-name-unit)
  * [destroy( world, unit )](#destroy-world-unit)
  
 ------------------------------------------------------------------------------------------------------------------------
 
-### spawn( world, name ) : unit
+## spawn( world, name ) : unit
 
 Spawn unit form resource `unitName` and return unit.
 
-#### Returns
+### Returns
 * Spawned unit
 
-#### Arguments
+### Arguments
 * **world** `world` - World
 * **string** `name` - Unit resource name
 
 ------------------------------------------------------------------------------------------------------------------------
 
-### destroy( world, unit )
+## destroy( world, unit )
 
 Destroy unit
 
-#### Arguments
+### Arguments
 * **world** `world` - World
 * **unit** `unit` - Unit
