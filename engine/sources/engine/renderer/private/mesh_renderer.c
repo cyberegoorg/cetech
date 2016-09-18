@@ -26,7 +26,7 @@ struct mesh_data {
 };
 
 typedef struct {
-    MAP_T(u32) EntIdx;
+    MAP_T(u32) ent_idx_map;
 
     ARRAY_T(stringid64_t) scene;
     ARRAY_T(stringid64_t) mesh;
@@ -52,7 +52,7 @@ static struct G {
 static void _new_world(world_t world) {
     world_data_t data = {0};
 
-    MAP_INIT(u32, &data.EntIdx, memsys_main_allocator());
+    MAP_INIT(u32, &data.ent_idx_map, memsys_main_allocator());
 
     ARRAY_INIT(stringid64_t, &data.scene, memsys_main_allocator());
     ARRAY_INIT(stringid64_t, &data.mesh, memsys_main_allocator());
@@ -69,7 +69,7 @@ static world_data_t *_get_world_data(world_t world) {
 static void _destroy_world(world_t world) {
     world_data_t *data = _get_world_data(world);
 
-    MAP_DESTROY(u32, &data->EntIdx);
+    MAP_DESTROY(u32, &data->ent_idx_map);
 
     ARRAY_DESTROY(stringid64_t, &data->scene);
     ARRAY_DESTROY(stringid64_t, &data->mesh);
@@ -126,7 +126,7 @@ static void _destroyer(world_t world,
 
     // TODO: remove from arrays, swap idx -> last AND change size
     for (int i = 0; i < ent_count; i++) {
-        MAP_REMOVE(u32, &world_data->EntIdx, ents[i].idx);
+        MAP_REMOVE(u32, &world_data->ent_idx_map, ents[i].idx);
     }
 }
 
@@ -291,14 +291,14 @@ int mesh_is_valid(mesh_t mesh) {
 int mesh_has(world_t world,
              entity_t entity) {
     world_data_t *world_data = _get_world_data(world);
-    return MAP_HAS(u32, &world_data->EntIdx, entity.h.h);
+    return MAP_HAS(u32, &world_data->ent_idx_map, entity.h.h);
 }
 
 mesh_t mesh_get(world_t world,
                 entity_t entity) {
 
     world_data_t *world_data = _get_world_data(world);
-    u32 idx = MAP_GET(u32, &world_data->EntIdx, entity.h.h, UINT32_MAX);
+    u32 idx = MAP_GET(u32, &world_data->ent_idx_map, entity.h.h, UINT32_MAX);
     return (mesh_t) {.idx = idx};
 }
 
@@ -317,7 +317,7 @@ mesh_t mesh_create(world_t world,
 
     u32 idx = (u32) ARRAY_SIZE(&data->material);
 
-    MAP_SET(u32, &data->EntIdx, entity.h.h, idx);
+    MAP_SET(u32, &data->ent_idx_map, entity.h.h, idx);
 
     ARRAY_PUSH_BACK(stringid64_t, &data->scene, scene);
     ARRAY_PUSH_BACK(stringid64_t, &data->mesh, mesh);
@@ -330,8 +330,8 @@ mesh_t mesh_create(world_t world,
 void mesh_render_all(world_t world) {
     world_data_t *data = _get_world_data(world);
 
-    const MAP_ENTRY_T(u32) *ce_it = MAP_BEGIN(u32, &data->EntIdx);
-    const MAP_ENTRY_T(u32) *ce_end = MAP_END(u32, &data->EntIdx);
+    const MAP_ENTRY_T(u32) *ce_it = MAP_BEGIN(u32, &data->ent_idx_map);
+    const MAP_ENTRY_T(u32) *ce_end = MAP_END(u32, &data->ent_idx_map);
     while (ce_it != ce_end) {
         material_t material = ARRAY_AT(&data->material, ce_it->value);
 
