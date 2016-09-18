@@ -1,92 +1,137 @@
-# Gamepad
+# cetech.Gamepad
 
 Module contain functions for gamepad.
 
 ## Example
 
 ```lua
-local right_a = Gamepad.Axis(0, Gamepad.AxisIndex("right"))
-local left_a = Gamepad.Axis(0, Gamepad.AxisIndex("left"))
+local right_a = Gamepad.axis(0, Gamepad.axis_index("right"))
+local left_a = Gamepad.axis(0, Gamepad.axis_index("left"))
 
-move_camera(dt, right_a.X, right_a.Y, left_a.Y, left_a.X)
+move_camera(dt, right_a.x, right_a.x, left_a.x, left_a.x)
 
-if Gamepad.ButtonState(0, Gamepad.ButtonIndex("right_shoulder")) then
+if Gamepad.button_state(0, Gamepad.button_index("right_shoulder")) then
     fire()
 end
 ```
  
-## Methods
-
-### ButtonIndex(buttonName)
-
-Return button index for `buttonName`.
-
-#### Supported button name:
+## Supported button name:
 
 * `a`, `b`, `x`, `y`
 * `back`, `guide`, `start`
 * `left_stick`, `right_stick`
 * `left_shoulder`, `right_shoulder`
 * `dpad_up`, `dpad_down`, `dpad_left`, `dpad_right`
+ 
+## Methods
 
-Argument     | Type | Description
--------------|------|---------------
-`buttonName` | str  | Button name
+* Buttons
+    * [button_index(name) : string](#button_index-name-string)
+    * [button_name( index ) : string](#button_name-index-string)
+    * [button_state( gamepad, index ) : bool](#button_state-gamepad-index-bool)
+    * [button_pressed( gamepad, index ) : bool](#button_pressed-gamepad-index-bool)
+    * [button_released( gamepad, index ) : bool](#button_released-gamepad-index-bool)
+* Axis
+    * [axis_index( name ) : number](#axis_index-name-number)
+    * [axis_name( index ) : string](#axis_name-index-string)
+    * [axis( gamepad, index ) : cetech.Vec3f](#axis-gamepad-index-cetechvec3f)
 
-### ButtonName(index)
+------------------------------------------------------------------------------------------------------------------------
 
-Return button name for `index` or empty string if `ButtonIndex` is invalid.
+### button_index( name ) : string
 
-Argument | Type | Description
----------|------|--------------
-`index`  | int  | Button index
+Return button index for `name`.
 
-### ButtonState(gamepad, index)
+#### Returns
+* Button index
+    
+#### Arguments
+* **string** `name` - Button name 
+
+------------------------------------------------------------------------------------------------------------------------
+
+### button_name( index ) : string
+
+Return button name for `index` or empty string if `index` is invalid.
+
+#### Returns
+* Button name
+    
+#### Arguments
+* **number** `index` - Button index
+
+------------------------------------------------------------------------------------------------------------------------
+
+### button_state( gamepad, index ) : bool
 
 Return `true` if button is down in actual frame.
 
-Argument  | Type | Description
-----------|----- |--------------
-`gamepad` | int  | Gamepad id
-`index`   | int  | Button Index
+#### Returns
+* Button state
+    
+#### Arguments
+* **gamepad** `gamepad` - Gamepad id
+* **number** `index` - Button index
 
+------------------------------------------------------------------------------------------------------------------------
 
-### ButtonPressed(gamepad, index)
+### button_pressed( gamepad, index ) : bool
 
 Return `true` if button is not down in last frame and now is.
 
-Argument  | Type | Description
-----------|------|--------------
-`gamepad` | int  | Gamepad id
-`index`   | int  | Button index
+#### Returns
+* Button pressed state
 
-### ButtonReleased(gamepad, index)
+#### Arguments
+* **gamepad** `gamepad` - Gamepad id
+* **number** `index` - Button index
+
+---
+
+### button_released( gamepad, index ) : bool
 
 Return `true` if button is down in last frame and now is not.
 
-Argument  | Type | Description
-----------|------|--------------
-`gamepad` | int  | Gamepad id
-`index`   | int  | Button index
+#### Returns
+* Button pressed state
 
-### AxisIndex(axisName)
+#### Arguments
+* **gamepad** `gamepad` - Gamepad id
+* **number** `index` - Button index
+
+------------------------------------------------------------------------------------------------------------------------
+
+### axis_index( name ) : number
 
 Return axis index for `axisName`.
 
-#### Supported axis name:
+#### Returns
+* Axis index
+    
+#### Arguments
+* **string** `name` - Axis name 
 
-* `left`, `right`
-* `triger`
+------------------------------------------------------------------------------------------------------------------------
 
-Argument     | Type | Description
--------------|------|---------------
-`axisName` | str  | Axis name
+### axis_name( index ) : string
 
-### Axis(gamepad, index) -> Vec3f
+Return axis name for `index` or empty string if `index` is invalid.
+
+#### Returns
+* Axis name
+    
+#### Arguments
+* **number** `index` - Button index
+
+------------------------------------------------------------------------------------------------------------------------
+
+### axis( gamepad, index ) : cetech.Vec3f
 
 Return axis values as Vec3f(x, y, 0.0f)
 
-Argument  | Type | Description
-----------|------|---------------
-`gamepad` | int  | Gamepad id
-`index`   | int  | Axis index
+#### Returns
+* Axis value
+    
+#### Arguments
+* **gamepad** `gamepad` - Gamepad id
+* **number** `index` - Axis index

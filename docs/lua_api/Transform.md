@@ -1,4 +1,4 @@
-# Transform
+# cetech.Transform
 
 Module contain functions for transformation
 
@@ -9,87 +9,126 @@ Module contain functions for transformation
 
 ## Methods
 
-### GetTransform(worldId, entity)
+* Component
+    * [get( world, entity ) : tranform](#get-world-entity-transform)
+    * [has( world, entity ) : bool](#has-world-entity-bool)
 
-Get transformId from entity or unit.
+* Get
+    * [get_position( world, transform ) : Vec3f](#get_position-world-transform-vec3f)
+    * [get_rotation( world, transform ) : Quatf](#get_rotation-world-transform-quatf)
+    * [get_scale( world, transform ) : Vec3f ](#get_scale-world-transform-vec3f)
+    * [get_world_matrix( world, transform ) : Mat44f](#get_world_matrix-world-transform-mat44f)
 
-Argument      | Type | Description
---------------|------|-------------------
-`worldId`     | int  | WorldId
-`entity`      | int  | Entity or Unit
+* Set
+    * [set_position( world, transform, position )](#set_position-world-transform-position)
+    * [set_rotation( world, transform, rotation )](#set_rotation-world-transform-rotation)
+    * [set_scale( world, transform, scale )](#set_scale-world-transform-scale)
 
-### HasTransform(worldId, entity)
+------------------------------------------------------------------------------------------------------------------------
+
+### get( world, entity ) : tranform
+
+Get transform from entity or unit.
+
+#### Arguments
+* **world** `world` - World
+* **entity, unit** `entity` - Entity or unit
+
+------------------------------------------------------------------------------------------------------------------------
+
+### has( world, entity ) : bool
 
 Return true if entity has transfom component.
 
-Argument      | Type | Description
---------------|------|-------------------
-`worldId`     | int  | WorldId
-`entity`      | int  | Entity or Unit
+#### Arguments
+* **world** `world` - World
+* **entity, unit** `entity` - Entity or unit
 
-### SetPosition(worldId, transformId, position)
+----------------------------------------------------------------------------------------------------------------------
 
-Set position.
-
-Argument      | Type     | Description
---------------|----------|-------------------
-`worldId`     | int      | WorldId
-`transformId` | int      | TransformId
-`position`    | Vector3f | Position
-
-### GetPosition(worldId, transformId)
+### get_position( world, transform ) : Vec3f
 
 Get position
 
-Argument      | Type     | Description
---------------|----------|-------------------
-`worldId`     | int      | WorldId
-`transformId` | int      | TransformId
+#### Returns
+* Position
+  
+#### Arguments
+* **world** `world` - World
+* **transform** `transform` - Transform instance
 
-### SetRotation(worldId, transformId, rotation)
+------------------------------------------------------------------------------------------------------------------------
 
-Set rotation.
-
-Argument      | Type     | Description
---------------|----------|-------------------
-`worldId`     | int      | WorldId
-`transformId` | int      | TransformId
-`rotation`    | Vector3f | Rotation
-
-### GetRotation(worldId, transformId)
+### get_rotation( world, transform ) : Quatf
 
 Get rotation
 
-Argument      | Type     | Description
---------------|----------|-------------------
-`worldId`     | int      | WorldId
-`transformId` | int      | TransformId
+#### Returns
+* Rotation
+
+#### Arguments
+* **world** `world` - World
+* **transform** `transform` - Transform instance
 
 
-### SetScale(worldId, transformId, scale)
+------------------------------------------------------------------------------------------------------------------------
 
-Set scale.
-
-Argument      | Type     | Description
---------------|----------|-------------------
-`worldId`     | int      | WorldId
-`transformId` | int      | TransformId
-`scale`       | Vector3f | Scale
-
-### GetScale(worldId, transformId)
+### get_scale( world, transform ) : Vec3f
 
 Get scale
 
-Argument      | Type     | Description
---------------|----------|-------------------
-`worldId`     | int      | WorldId
-`transformId` | int      | TransformId
+#### Returns
+* Scale
 
-### GetWorldMatrix(worldId, transformId)
+#### Arguments
+* **world** `world` - World
+* **transform** `transform` - Transform instance
+
+------------------------------------------------------------------------------------------------------------------------
+
+### get_world_matrix( world, transform ) : Mat44f
 
 Get world matrix.
 
-Argument      | Type     | Description
---------------|----------|-------------------
-`worldId`     | int      | WorldId
-`transformId` | int      | TransformId
+#### Returns
+* World matrix
+
+#### Arguments
+* **world** `world` - World
+* **transform** `transform` - Transform instance
+
+
+------------------------------------------------------------------------------------------------------------------------
+
+### set_position( world, transform, position )
+
+Set position.
+
+#### Arguments
+* **world** `world` - World
+* **transform** `transform` - Transform instance
+* **Vec3f** `position` - New position
+
+
+------------------------------------------------------------------------------------------------------------------------
+
+### set_rotation( world, transform, rotation )
+
+Set rotation.
+
+#### Arguments
+* **world** `world` - World
+* **transform** `transform` - Transform instance
+* **Quatf** `rotation` - New rotation
+
+------------------------------------------------------------------------------------------------------------------------
+
+### set_scale( world, transform, scale )
+
+Set scale.
+
+#### Arguments
+* **world** `world` - World
+* **transform** `transform` - Transform instance
+* **Vec3f** `scale` - New scale
+

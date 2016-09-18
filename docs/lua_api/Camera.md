@@ -9,12 +9,18 @@ Module contain functions for camera manager.
 
 ## Methods
 
-### GetCamera(world, entity)
+* [get(world, entity) : camera ](#get-world-entity-camera)
 
-Get cameraId from entity or unit.
+------------------------------------------------------------------------------------------------------------------------
 
-Argument      | Type | Description
---------------|------|-------------------
-`worldId`     | int  | WorldId
-`entity`      | int  | Entity or Unit
+### get(world, entity) : camera
+
+Get camera component from entity or unit.
+
+#### Returns
+* Camera
+
+#### Arguments
+* **world** `world` - World
+* **entity, unit** `entity` - Entity or unit
 

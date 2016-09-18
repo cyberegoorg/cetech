@@ -1,18 +1,34 @@
-# Application
+# cetech.Application
 
 Module contain functions for Application.
 
 ## Methods
 
-### Application.Quit()
+* [quit()](#quit)
+* [get_native_platform() : string](#get_native_platform-string)
+* [get_platform() : string](#get_platform-string)
 
+
+------------------------------------------------------------------------------------------------------------------------
+
+### quit()
 Quit application.
  
-### Application.GetPlatform()
+
+------------------------------------------------------------------------------------------------------------------------
+
+### get_native_platform() : string
+
+Return native platform name.
+
+#### Returns
+* Native platform
+
+------------------------------------------------------------------------------------------------------------------------
+
+### get_platform() : string
 
 Return platform name.
 
-Name      | Platform
-----------|----------
-`windows` | Windows
-`linux`   | Linux
+#### Returns
+* Platform

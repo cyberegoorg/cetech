@@ -8,21 +8,28 @@ Module contain functions for Unit manager.
 ```
 
 ## Methods
+ * [spawn( world, name ) : unit](#spawn-world-name-unit)
+ * [destroy( world, unit )](#destroy-world-unit)
+ 
+------------------------------------------------------------------------------------------------------------------------
 
-### Spawn(world, unitName)
+### spawn( world, name ) : unit
 
-Spawn unit form resource `unitName` and return unitId.
+Spawn unit form resource `unitName` and return unit.
 
-Argument      | Type | Description
---------------|------|---------------------
-`world`       | str  | Package name
-`unitName`    | str  | Unit resource name.
+#### Returns
+* Spawned unit
 
+#### Arguments
+* **world** `world` - World
+* **string** `name` - Unit resource name
 
-### Destroy(unitId)
+------------------------------------------------------------------------------------------------------------------------
 
-Load all resource that are in the package.
+### destroy( world, unit )
 
-Argument      | Type | Description
---------------|------|----------------
-`unitId`      | int  | Spawned unitId
+Destroy unit
+
+#### Arguments
+* **world** `world` - World
+* **unit** `unit` - Unit
