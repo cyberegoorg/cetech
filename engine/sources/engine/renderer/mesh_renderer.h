@@ -4,6 +4,7 @@
 #include <celib/stringid/types.h>
 #include "../world_system/types.h"
 #include "../entcom/types.h"
+#include "material.h"
 
 typedef struct {
     u32 idx;
@@ -27,6 +28,9 @@ mesh_t mesh_create(world_t world,
                    stringid64_t mesh,
                    stringid64_t node,
                    stringid64_t material);
+
+material_t mesh_get_material(world_t world,
+                             mesh_t mesh);
 
 void mesh_render_all(world_t world);
 

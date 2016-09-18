@@ -3,4 +3,3 @@ assimp:
 
     postprocess:
       flip_uvs: true
- 

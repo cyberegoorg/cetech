@@ -9,6 +9,7 @@
 #include <engine/renderer/material.h>
 #include <bgfx/c99/bgfx.h>
 #include <engine/world_system/transform.h>
+#include <engine/renderer/mesh_renderer.h>
 
 #include "../mesh_renderer.h"
 
@@ -314,7 +315,6 @@ mesh_t mesh_create(world_t world,
 
     material_t material_instance = material_resource_create(material);
 
-
     u32 idx = (u32) ARRAY_SIZE(&data->material);
 
     MAP_SET(u32, &data->EntIdx, entity.h.h, idx);
@@ -349,4 +349,11 @@ void mesh_render_all(world_t world) {
 
         ++ce_it;
     }
+}
+
+material_t mesh_get_material(world_t world,
+                             mesh_t mesh) {
+    world_data_t *data = _get_world_data(world);
+
+    return ARRAY_AT(&data->material, mesh.idx);
 }

@@ -222,6 +222,8 @@ static void _register_all_api() {
     REGISTER_LUA_API(vec4f);
     REGISTER_LUA_API(mat44f);
     REGISTER_LUA_API(quatf);
+    REGISTER_LUA_API(mesh);
+    REGISTER_LUA_API(material);
 }
 
 static int _reload_plugin(lua_State *l) {

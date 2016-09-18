@@ -224,7 +224,7 @@ void application_start() {
             "Cetech",
             WINDOWPOS_UNDEFINED,
             WINDOWPOS_UNDEFINED,
-            800, 600,
+            1024, 768,
             WINDOW_NOFLAG
     );
     renderer_create(_G.main_window);

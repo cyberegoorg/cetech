@@ -28,6 +28,8 @@ function Game:init()
     local p = Transform.get_scale(self.world, t)
     Log.debug("lua", "%f %f %f", p.x, p.y, p.z)
 
+    self.texture_cycle = true
+
     --    self.level = World.LoadLevel(self.world, "level1");
     --    self.level = World.LoadLevel(self.world, "level1",
     --                 Vec3f.make(2, 5.0, 0.0),
@@ -59,7 +61,21 @@ function rotator(world, node, delta_rot)
     SceneGraph.SetRotation(world, node, rot)
 end
 
+TEXTURE_CYCLE = { "texture2", "content/texture1", "content/scene/m4a1/m4_diff" }
+TEXTURE_CYCLE_IT = 1
+
 function Game:update(dt)
+    if Keyboard.button_pressed(Keyboard.button_index("t")) then
+        local mesh = Mesh.get(self.world, self.unit)
+        local material = Mesh.get_material(self.world, mesh)
+        local slot = Material.find_slot(material, "u_texColor")
+
+        Material.set_texture(material, slot, TEXTURE_CYCLE[(TEXTURE_CYCLE_IT % #TEXTURE_CYCLE) + 1])
+        TEXTURE_CYCLE_IT = TEXTURE_CYCLE_IT + 1
+
+        self.texture_cycle = not self.texture_cycle
+    end
+
     if Keyboard.button_pressed(reload_btn) then
         ResourceCompilator.compile_all()
         ResourceManager.reload_all()
