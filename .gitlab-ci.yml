@@ -31,7 +31,7 @@ pages:
   script:
   - pip install mkdocs mkdocs-bootswatch
   - cd docs/basic
-  - mkdocs buil d -d ../../public/basic
+  - mkdocs build -d ../../public/basic
   - cd ../lua_api
   - mkdocs build -d ../../public/lua_api
 
