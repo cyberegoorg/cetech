@@ -45,11 +45,6 @@ static const char *_key_to_str[512] = {
         [KEY_9] = "9",
         [KEY_0] = "0",
 
-        [KEY_RETURN] = "return",
-        [KEY_ESCAPE] = "escape",
-        [KEY_BACKSPACE] = "backspace",
-        [KEY_TAB] = "tab",
-        [KEY_SPACE] = "space",
 
         [KEY_MINUS] = "-",
         [KEY_EQUALS] = "=",
@@ -82,7 +77,13 @@ static const char *_key_to_str[512] = {
         [KEY_PRINTSCREEN] = "printscreen",
         [KEY_SCROLLLOCK] = "scrolllock",
         [KEY_PAUSE] = "pause",
+
         [KEY_INSERT] = "insert",
+        [KEY_RETURN] = "return",
+        [KEY_ESCAPE] = "escape",
+        [KEY_BACKSPACE] = "backspace",
+        [KEY_TAB] = "tab",
+        [KEY_SPACE] = "space",
 
         [KEY_HOME] = "home",
         [KEY_PAGEUP] = "pageup",
@@ -226,12 +227,15 @@ static const char *_key_to_str[512] = {
         [KEY_KP_HEXADECIMAL] = "",
 
         [KEY_LCTRL] = "lctrl",
-        [KEY_LSHIFT] = "lshift",
-        [KEY_LALT] = "lalt",
-        [KEY_LGUI] = "lgui",
         [KEY_RCTRL] = "rctrl",
+
+        [KEY_LSHIFT] = "lshift",
         [KEY_RSHIFT] = "rshift",
+
+        [KEY_LALT] = "lalt",
         [KEY_RALT] = "ralt",
+
+        [KEY_LGUI] = "lgui",
         [KEY_RGUI] = "rgui",
 
         [KEY_MODE] = "",
