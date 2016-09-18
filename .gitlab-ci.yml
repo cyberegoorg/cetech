@@ -6,8 +6,8 @@
 # Stages #
 ###############################################################################
 stages:
-#  - test
-  - doc
+ - test
+ - doc
 
 ########
 # Test #
@@ -15,12 +15,12 @@ stages:
 test:
   image: ondravoves/cetech:build_ci
   stage: test
-  script:
-  - mkdir build
-  - cd build
-  - cmake .. -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++ -DCMAKE_BUILD_TYPE=Develop
-  - make -j 4
-  #- ./cetech_tests
+#  script:
+#  - mkdir build
+#  - cd build
+#  - cmake .. -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++ -DCMAKE_BUILD_TYPE=Develop
+#  - make -j 4
+#  - ./cetech_tests
 
 #################
 # Gitlab pages  #
