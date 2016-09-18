@@ -2,7 +2,7 @@ site_name: CETech
 site_author: Ondra Voves
 
 repo_url: https://gitlab.com/cyberegoorg/cetech
-theme: slate
+theme: readthedocs
 
 pages:
   - CETech: 'index.md'
