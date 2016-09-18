@@ -5,8 +5,6 @@ They are trying to be free, small, easily expandable and multiplatform (yes, typ
 Not trying to be a pummeling functions and does not allow you a few clicks to create professional look game
 like Unreal Engine, Unity etc... But instead will provide a good basis for further work.
 
-[Lua api doc](../../lua_api)
-
 !!! danger
 
     CETech is under havy development and now is only prototype.
