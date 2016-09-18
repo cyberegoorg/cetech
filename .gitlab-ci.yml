@@ -20,7 +20,7 @@ test:
   - cd build
   - cmake .. -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++ -DCMAKE_BUILD_TYPE=Develop
   - make -j 4
-  - ./cetech_tests
+  #- ./cetech_tests
 
 #################
 # Gitlab pages  #
