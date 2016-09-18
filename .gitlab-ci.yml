@@ -6,15 +6,15 @@
 # Stages #
 ###############################################################################
 stages:
- - test
+# - test
  - doc
 
 ########
 # Test #
 ###############################################################################
-test:
-  image: ondravoves/cetech:build_ci
-  stage: test
+#test:
+#  image: ondravoves/cetech:build_ci
+#  stage: test
 #  script:
 #  - mkdir build
 #  - cd build
@@ -31,13 +31,13 @@ pages:
   script:
   - pip install mkdocs mkdocs-bootswatch
   - cd docs/basic
-  - mkdocs build -d ../site/basic
+  - mkdocs buil d -d ../../public/basic
   - cd ../lua_api
-  - mkdocs build -d ../site/lua_api
+  - mkdocs build -d ../../public/lua_api
 
   only:
     - master
 
   artifacts:
     paths:
-    - docs/site
+    - public
