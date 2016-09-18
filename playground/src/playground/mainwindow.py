@@ -1,22 +1,20 @@
 import argparse
-import os
-import platform
-
 import msgpack
 import nanomsg
+import platform
 from PyQt5.QtCore import QThread, Qt, QFileSystemWatcher, QDirIterator
 from PyQt5.QtWidgets import QMainWindow, QDockWidget, QTabWidget
-from nanomsg import Socket, SUB, SUB_SUBSCRIBE
-
-from playground.assetbrowser import AssetBrowser
-from playground.assetview import AssetView
+from cetech.consoleapi import ConsoleAPI
 from cetech.project import Project
 from cetech.widget import Widget
-from cetech.consoleapi import ConsoleAPI
-from playground.logwidget import LogWidget, LogSub
-from playground.profilerwidget import ProfilerWidget
-from playground.scripteditor import ScriptEditorWidget, ScriptEditorManager
-from playground.ui.mainwindow import Ui_MainWindow
+from nanomsg import Socket, SUB, SUB_SUBSCRIBE
+
+from playground.playground import AssetBrowser
+from playground.playground import AssetView
+from playground.playground import LogWidget, LogSub
+from playground.playground import ProfilerWidget
+from playground.playground import ScriptEditorWidget, ScriptEditorManager
+from playground.playground import Ui_MainWindow
 
 
 class DevelopSub(QThread):

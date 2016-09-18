@@ -2,7 +2,7 @@ from PyQt5.QtCore import QUrl, QDir
 from PyQt5.QtWebKit import QWebSettings
 from PyQt5.QtWidgets import QFrame
 
-from playground.ui.profilerwidget import Ui_ProfilerWidget
+from playground.playground import Ui_ProfilerWidget
 
 
 class ProfilerWidget(QFrame, Ui_ProfilerWidget):

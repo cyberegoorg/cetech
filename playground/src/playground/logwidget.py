@@ -1,14 +1,12 @@
+import nanomsg
 import re
-
 import yaml
-from PyQt5.QtCore import QDateTime, Qt, QThread
+from PyQt5.QtCore import Qt, QThread
 from PyQt5.QtGui import QColor
 from PyQt5.QtWidgets import QFrame, QStyle, QTreeWidgetItem
+from nanomsg import Socket, SUB, SUB_SUBSCRIBE
 
-import nanomsg
-from nanomsg import Socket, SUB, SUB_SUBSCRIBE, DONTWAIT
-
-from playground.ui.logwidget import Ui_LogWidget
+from playground.playground import Ui_LogWidget
 
 RESOURCE_NAME_RE = re.compile("^\[([^\]]+)\]")
 

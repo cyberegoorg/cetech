@@ -2,9 +2,9 @@ from PyQt5 import QtCore
 from PyQt5.QtCore import QSettings
 from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QListWidgetItem, QDialog, QDialogButtonBox
-from playground.addexistingdialog import AddExistItemDialog
 
-from playground.ui.projectmanagerdialog import Ui_Dialog
+from playground.playground import AddExistItemDialog
+from playground.playground import Ui_Dialog
 
 
 class ProjectManagerDialog(QDialog, Ui_Dialog):

@@ -23,7 +23,7 @@ from PyQt5.uic import compileUiDir
 ###########
 # GLOBALS #
 ########################################################################################################################
-ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
+ROOT_DIR = os.path.dirname(os.path.abspath(__file__), os.pardir)
 PLAYGROUND_DIR = os.path.join(ROOT_DIR, 'playground')
 
 _platform = platform.system().lower()
