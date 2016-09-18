@@ -20,23 +20,6 @@ pages:
     - Overview: 'playground/overview.md'
     - Images: 'playground/image_history.md'
 
-  - Lua API:
-    - Core:
-      - cetech.Log: 'lua_api/Log.md'
-      - cetech.Application: 'lua_api/Application.md'
-      - cetech.Package: 'lua_api/Package.md'
-      - cetech.World: 'lua_api/World.md'
-      - cetech.Unit: 'lua_api/Unit.md'
-
-    - Input:
-      - cetech.Keyboard: 'lua_api/Keyboard.md'
-      - cetech.Mouse: 'lua_api/Mouse.md'
-      - cetech.Gamepad: 'lua_api/Gamepad.md'
-
-    - Components:
-      - cetech.Transform: 'lua_api/Transform.md'
-      - cetech.Camera: 'lua_api/Camera.md'
-
 markdown_extensions:
     - admonition
     - codehilite(noclasses=true,pygments_style=tango)

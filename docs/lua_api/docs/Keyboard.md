@@ -35,7 +35,7 @@ end
 * `lalt`, `ralt`
 
 # Methods
-
+   
 * Button
     * [button_index( name ) : string](#button_index-name-string)
     * [button_name( index ) : string](#button_name-index-string)

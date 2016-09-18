@@ -6,7 +6,7 @@
 # Stages #
 ###############################################################################
 stages:
-  - test
+#  - test
   - doc
 
 ########
@@ -29,12 +29,15 @@ pages:
   image: ondravoves/debian:python2.7
   stage: doc
   script:
-  - pip install mkdocs
-  - mkdocs build -d public
+  - pip install mkdocs mkdocs-bootswatch
+  - cd docs/basic
+  - mkdocs build -d ../site/basic
+  - cd ../lua_api
+  - mkdocs build -d ../site/lua_api
 
   only:
     - master
 
   artifacts:
     paths:
-    - public
+    - docs/site
