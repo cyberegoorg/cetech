@@ -46,7 +46,7 @@ Return button index for `name`.
 * Button index
     
 ### Arguments
-* **string** `name` - Button name 
+* `name` : **string**   - Button name 
 
 ------------------------------------------------------------------------------------------------------------------------
 
@@ -58,7 +58,7 @@ Return button name for `index` or empty string if `index` is invalid.
 * Button name
     
 ### Arguments
-* **number** `index` - Button index
+* `index` : **number**   - Button index
 
 ------------------------------------------------------------------------------------------------------------------------
 
@@ -70,8 +70,8 @@ Return `true` if button is down in actual frame.
 * Button state
     
 ### Arguments
-* **gamepad** `gamepad` - Gamepad id
-* **number** `index` - Button index
+* `gamepad` : **gamepad**   - Gamepad id
+* `index` : **number**   - Button index
 
 ------------------------------------------------------------------------------------------------------------------------
 
@@ -83,8 +83,8 @@ Return `true` if button is not down in last frame and now is.
 * Button pressed state
 
 ### Arguments
-* **gamepad** `gamepad` - Gamepad id
-* **number** `index` - Button index
+* `gamepad` : **gamepad**   - Gamepad id
+* `index` : **number**   - Button index
 
 ---
 
@@ -96,8 +96,8 @@ Return `true` if button is down in last frame and now is not.
 * Button pressed state
 
 ### Arguments
-* **gamepad** `gamepad` - Gamepad id
-* **number** `index` - Button index
+* `gamepad` : **gamepad**   - Gamepad id
+* `index` : **number**   - Button index
 
 ------------------------------------------------------------------------------------------------------------------------
 
@@ -109,7 +109,7 @@ Return axis index for `axisName`.
 * Axis index
     
 ### Arguments
-* **string** `name` - Axis name 
+* `name` : **string**   - Axis name 
 
 ------------------------------------------------------------------------------------------------------------------------
 
@@ -121,7 +121,7 @@ Return axis name for `index` or empty string if `index` is invalid.
 * Axis name
     
 ### Arguments
-* **number** `index` - Button index
+* `index` : **number**   - Button index
 
 ------------------------------------------------------------------------------------------------------------------------
 
@@ -133,5 +133,5 @@ Return axis values as Vec3f(x, y, 0.0f)
 * Axis value
     
 ### Arguments
-* **gamepad** `gamepad` - Gamepad id
-* **number** `index` - Axis index
+* `gamepad` : **gamepad**   - Gamepad id
+* `index` : **number**   - Axis index

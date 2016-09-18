@@ -27,9 +27,9 @@ Log.debug("lua_example", "DEBUG")
 Log info message.
   
 ### Arguments
-* **string** `where` - Where is message logged.
-* **string** `msg` - Log message
-* **object** `...` - Log message arguments
+* `where` : **string**   - Where is message logged.
+* `msg`   : **string**   - Log message
+* `...`   : **object**   - Log message arguments
 
 ------------------------------------------------------------------------------------------------------------------------
 
@@ -38,9 +38,9 @@ Log info message.
 Log warning message.
 
 ### Arguments
-* **string** `where` - Where is message logged.
-* **string** `msg` - Log message
-* **object** `...` - Log message arguments
+* `where` : **string**   - Where is message logged.
+* `msg` : **string**   - Log message
+* `...` : **object**   - Log message arguments
 
 ------------------------------------------------------------------------------------------------------------------------
 
@@ -49,9 +49,9 @@ Log warning message.
 Log error message.
 
 ### Arguments
-* **string** `where` - Where is message logged.
-* **string** `msg` - Log message
-* **object** `...` - Log message arguments
+* `where` : **string**   - Where is message logged.
+* `msg` : **string**   - Log message
+* `...` : **object**   - Log message arguments
 
 ------------------------------------------------------------------------------------------------------------------------
 
@@ -60,7 +60,7 @@ Log error message.
 Log debug message.
 
 ### Arguments
-* **string** `where` - Where is message logged.
-* **string** `msg` - Log message
-* **object** `...` - Log message arguments
+* `where` : **string**   - Where is message logged.
+* `msg` : **string**   - Log message
+* `...` : **object**   - Log message arguments
 

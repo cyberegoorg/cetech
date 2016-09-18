@@ -53,7 +53,7 @@ Return button index for `name`.
 * Button index
     
 ### Arguments
-* **string** `name` - Button name 
+* `name` : **string**   - Button name 
 
 ------------------------------------------------------------------------------------------------------------------------
 
@@ -65,7 +65,7 @@ Return button name for `index` or empty string if `index` is invalid.
 * Button name
     
 ### Arguments
-* **number** `index` - Button index
+* `index` : **number**   - Button index
 
 ------------------------------------------------------------------------------------------------------------------------
 
@@ -77,7 +77,7 @@ Return `true` if button is down in actual frame.
 * Button state
     
 ### Arguments
-* **number** `index` - Button index
+* `index` : **number**   - Button index
 
 ------------------------------------------------------------------------------------------------------------------------
 
@@ -89,7 +89,7 @@ Return `true` if button is not down in last frame and now is.
 * Button pressed state
 
 ### Arguments
-* **number** `index` - Button index
+* `index` : **number**   - Button index
 
 ------------------------------------------------------------------------------------------------------------------------
 
@@ -101,5 +101,5 @@ Return `true` if button is down in last frame and now is not.
 * Button pressed state
 
 ### Arguments
-* **number** `index` - Button index
+* `index` : **number**   - Button index
 

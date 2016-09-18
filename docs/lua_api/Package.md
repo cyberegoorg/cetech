@@ -43,7 +43,7 @@ Load all resource that are in the package. If one is already loaded will not rel
     or you can wait to load using method [**Flush**](#Packageflush)
 
 ### Arguments
-* **string** `package` - Package name
+* `package` : **string**   - Package name
 
 ------------------------------------------------------------------------------------------------------------------------
 
@@ -52,7 +52,7 @@ Load all resource that are in the package. If one is already loaded will not rel
 Load all resource that are in the package.
 
 ### Arguments
-* **string** `package` - Package name
+* `package` : **string**   - Package name
 
 ------------------------------------------------------------------------------------------------------------------------
 
@@ -62,7 +62,7 @@ Returns `true` if all resource that are in the package loaded in memory and read
 
 
 ### Arguments
-* **string** `package` - Package name
+* `package` : **string**   - Package name
 
 ------------------------------------------------------------------------------------------------------------------------
 
@@ -71,4 +71,4 @@ Returns `true` if all resource that are in the package loaded in memory and read
 It would wait until they are loaded all the resource that is in the package.
 
 ### Arguments
-* **string** `package` - Package name
+* `package` : **string**   - Package name

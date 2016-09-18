@@ -31,8 +31,8 @@ Module contain functions for transformation
 Get transform from entity or unit.
 
 ### Arguments
-* **world** `world` - World
-* **entity, unit** `entity` - Entity or unit
+* `world` : **world**   - World
+* `entity` : **entity, unit**   - Entity or unit
 
 ------------------------------------------------------------------------------------------------------------------------
 
@@ -41,8 +41,8 @@ Get transform from entity or unit.
 Return true if entity has transfom component.
 
 ### Arguments
-* **world** `world` - World
-* **entity, unit** `entity` - Entity or unit
+* `world` : **world**   - World
+* `entity` : **entity, unit**   - Entity or unit
 
 ----------------------------------------------------------------------------------------------------------------------
 
@@ -54,8 +54,8 @@ Get position
 * Position
   
 ### Arguments
-* **world** `world` - World
-* **transform** `transform` - Transform instance
+* `world` : **world**   - World
+* `transform` : **transform**   - Transform instance
 
 ------------------------------------------------------------------------------------------------------------------------
 
@@ -67,8 +67,8 @@ Get rotation
 * Rotation
 
 ### Arguments
-* **world** `world` - World
-* **transform** `transform` - Transform instance
+* `world` : **world**   - World
+* `transform` : **transform**   - Transform instance
 
 
 ------------------------------------------------------------------------------------------------------------------------
@@ -81,8 +81,8 @@ Get scale
 * Scale
 
 ### Arguments
-* **world** `world` - World
-* **transform** `transform` - Transform instance
+* `world` : **world**   - World
+* `transform` : **transform**   - Transform instance
 
 ------------------------------------------------------------------------------------------------------------------------
 
@@ -94,8 +94,8 @@ Get world matrix.
 * World matrix
 
 ### Arguments
-* **world** `world` - World
-* **transform** `transform` - Transform instance
+* `world` : **world**   - World
+* `transform` : **transform**   - Transform instance
 
 
 ------------------------------------------------------------------------------------------------------------------------
@@ -105,9 +105,9 @@ Get world matrix.
 Set position.
 
 ### Arguments
-* **world** `world` - World
-* **transform** `transform` - Transform instance
-* **Vec3f** `position` - New position
+* `world` : **world**   - World
+* `transform` : **transform**   - Transform instance
+* `position` : **Vec3f**   - New position
 
 
 ------------------------------------------------------------------------------------------------------------------------
@@ -117,9 +117,9 @@ Set position.
 Set rotation.
 
 ### Arguments
-* **world** `world` - World
-* **transform** `transform` - Transform instance
-* **Quatf** `rotation` - New rotation
+* `world` : **world**   - World
+* `transform` : **transform**   - Transform instance
+* `rotation` : **Quatf**   - New rotation
 
 ------------------------------------------------------------------------------------------------------------------------
 
@@ -128,7 +128,7 @@ Set rotation.
 Set scale.
 
 ### Arguments
-* **world** `world` - World
-* **transform** `transform` - Transform instance
-* **Vec3f** `scale` - New scale
+* `world` : **world**   - World
+* `transform` : **transform**   - Transform instance
+* `scale` : **Vec3f**   - New scale
 

@@ -36,7 +36,7 @@ Create new world and return worldId.
 Load all resource that are in the package.
 
 ### Arguments
-* **world** `world` - World
+* `world` : **world**   - World
 
 ------------------------------------------------------------------------------------------------------------------------
 
@@ -45,8 +45,8 @@ Load all resource that are in the package.
 Update world.
 
 ### Arguments
-* **world** `world` - World
-* **number** `dt` - delta time
+* `world` : **world**   - World
+* `dt` : **number**   - delta time
 
 ------------------------------------------------------------------------------------------------------------------------
 
@@ -58,12 +58,12 @@ Load level from resource to world and return levelID
 * Level
 
 ### Arguments
-* **world** `world` - World
-* **string** `name` - Level resource name
-* **string** `name` - Level resource name
-* **Vec3f** `position` - Position(optional)
-* **Quatf** `rotation` - Rotation (optional)
-* **Vec3f** `scale` - Scale (optional)
+* `world` : **world**   - World
+* `name` : **string**   - Level resource name
+* `name` : **string**   - Level resource name
+* `position` : **Vec3f**   - Position(optional)
+* `rotation` : **Quatf**   - Rotation (optional)
+* `scale` : **Vec3f**   - Scale (optional)
 
 ------------------------------------------------------------------------------------------------------------------------
 
@@ -75,8 +75,8 @@ Return level unit.
 * Level unit
 
 ### Arguments
-* **world** `world` - World
-* **level** `level` - Level
+* `world` : **world**   - World
+* `level` : **level**   - Level
 
 ------------------------------------------------------------------------------------------------------------------------
 
@@ -88,6 +88,6 @@ Find unit in level by name and return it.
 * Unit
 
 ### Arguments
-* **world** `world` - World
-* **level** `level` - Level
-* **string** `name` - Unit name
+* `world` : **world**   - World
+* `level` : **level**   - Level
+* `name` : **string**   - Unit name

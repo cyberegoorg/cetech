@@ -21,8 +21,8 @@ Spawn unit form resource `unitName` and return unit.
 * Spawned unit
 
 ### Arguments
-* **world** `world` - World
-* **string** `name` - Unit resource name
+* `world` : **world**   - World
+* `name` : **string**   - Unit resource name
 
 ------------------------------------------------------------------------------------------------------------------------
 
@@ -31,5 +31,5 @@ Spawn unit form resource `unitName` and return unit.
 Destroy unit
 
 ### Arguments
-* **world** `world` - World
-* **unit** `unit` - Unit
+* `world` : **world**   - World
+* `unit` : **unit**   - Unit

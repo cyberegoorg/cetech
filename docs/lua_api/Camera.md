@@ -21,6 +21,6 @@ Get camera component from entity or unit.
 * Camera
 
 ### Arguments
-* **world** `world` - World
-* **entity, unit** `entity` - Entity or unit
+* `world` : **world**   - World
+* `entity` : **entity, unit**   - Entity or unit
 
