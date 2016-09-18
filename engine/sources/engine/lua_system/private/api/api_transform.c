@@ -14,6 +14,16 @@ static int _transform_get(lua_State *l) {
     return 1;
 }
 
+
+static int _transform_has(lua_State *l) {
+    world_t w = {.h = luasys_to_handler(l, 1)};
+    entity_t ent = {.h = luasys_to_handler(l, 2)};
+
+    luasys_push_bool(l, transform_has(w, ent));
+    return 1;
+}
+
+
 static int _transform_get_position(lua_State *l) {
     world_t w = {.h = luasys_to_handler(l, 1)};
     transform_t t = {.idx = luasys_to_int(l, 2)};
@@ -77,6 +87,7 @@ static int _transform_get_world_matrix(lua_State *l) {
 
 void _register_lua_transform_api() {
     luasys_add_module_function(API_NAME, "get", _transform_get);
+    luasys_add_module_function(API_NAME, "has", _transform_has);
 
     luasys_add_module_function(API_NAME, "get_position", _transform_get_position);
     luasys_add_module_function(API_NAME, "get_rotation", _transform_get_rotation);
