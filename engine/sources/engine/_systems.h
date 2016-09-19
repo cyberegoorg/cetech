@@ -1,12 +1,12 @@
 #ifdef _SYSTEM_DECL
-#define SYSTEM(n) int n##_init(); void n##_shutdown();
+#define SYSTEM(n) int n##_init(int); void n##_shutdown();
 #else
 #define SYSTEM(n) {.name= #n, .init=n##_init, .shutdown=n##_shutdown},
 
 static const struct {
     const char *name;
 
-    int (*init)();
+    int  (*init)(int stage);
 
     void (*shutdown)();
 } _SYSTEMS[] = {

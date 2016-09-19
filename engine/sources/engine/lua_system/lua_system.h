@@ -19,7 +19,7 @@
 // Interface
 //==============================================================================
 
-int luasys_init();
+int luasys_init(int stage);
 
 void luasys_shutdown();
 

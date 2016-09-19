@@ -182,7 +182,7 @@ void _compile_dir(task_t root_task,
 // Interface
 //==============================================================================
 
-int resource_compiler_init() {
+int resource_compiler_init(int stage) {
     _G = (struct G) {0};
 
     _G.cv_source_dir = cvar_new_str("resource_compiler.source_dir", "Resource source dir", "data/src");

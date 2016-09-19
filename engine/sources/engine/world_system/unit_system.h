@@ -2,7 +2,7 @@
 #define CETECH_UNIT_SYSTEM_H
 
 
-int unit_init();
+int unit_init(int stage);
 
 void unit_shutdown();
 

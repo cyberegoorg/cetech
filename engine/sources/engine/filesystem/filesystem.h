@@ -15,7 +15,7 @@
 //==============================================================================
 
 //! Init filesystem
-int filesystem_init();
+int filesystem_init(int stage);
 
 //! Shutdown filesystem
 void filesystem_shutdown();

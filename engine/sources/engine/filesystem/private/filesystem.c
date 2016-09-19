@@ -42,7 +42,7 @@ static struct G {
 // Interface
 //==============================================================================
 
-int filesystem_init() {
+int filesystem_init(int stage) {
     _G = (struct G) {0};
 
     log_debug(LOG_WHERE, "Init");

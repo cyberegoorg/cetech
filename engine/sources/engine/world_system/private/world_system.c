@@ -32,7 +32,7 @@ static struct G {
 // Public interface
 //==============================================================================
 
-int world_init() {
+int world_init(int stage) {
     _G = (struct G) {0};
 
     ARRAY_INIT(world_callbacks_t, &_G.callbacks, memsys_main_allocator());

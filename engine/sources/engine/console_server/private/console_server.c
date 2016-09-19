@@ -107,7 +107,7 @@ static void _serve_command(const char *packet,
 // Interface
 //==============================================================================
 
-int consolesrv_init() {
+int consolesrv_init(int stage) {
     log_debug(LOG_WHERE, "Init");
 
     cvar_t rpc_port = cvar_new_int("console_server.rpc.port", "Console server rpc port", 4444);

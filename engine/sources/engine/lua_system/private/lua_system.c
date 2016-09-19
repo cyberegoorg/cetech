@@ -823,7 +823,7 @@ void _create_lightuserdata() {
     lua_pop(_G.L, 1);
 }
 
-int luasys_init() {
+int luasys_init(int stage) {
     log_debug(LOG_WHERE, "Init");
 
     _G.L = luaL_newstate();

@@ -19,7 +19,7 @@ typedef void (*machine_part_process_t)(struct eventstream *stream);
 // Machine interface
 //==============================================================================
 
-int machine_init();
+int machine_init(int stage);
 
 void machine_shutdown();
 

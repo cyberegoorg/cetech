@@ -29,7 +29,7 @@ typedef int (*resource_compilator_t)(
 // Interface
 //==============================================================================
 
-int resource_compiler_init();
+int resource_compiler_init(int stage);
 
 void resource_compiler_shutdown();
 

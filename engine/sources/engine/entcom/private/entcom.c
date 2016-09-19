@@ -43,7 +43,7 @@ static struct G {
 // Public interface
 //==============================================================================
 
-int entcom_init() {
+int entcom_init(int stage) {
     _G = (struct G) {0};
 
     handlerid_init(&_G.entity_handler, memsys_main_allocator());

@@ -19,7 +19,7 @@ SCENARIO( "map root to root_path", "[filesystem]" ) {
     memsys_init(4*1024*1024);
 
     GIVEN( "Filesystem" ) {
-        filesystem_init();
+        filesystem_init(0);
 
         WHEN("map root 'foo' to path 'foopath'") {
             stringid64_t root = stringid64_from_string("foo");
@@ -41,7 +41,7 @@ SCENARIO( "Can get fullpath of file for root", "[filesystem]" ) {
     memsys_init(4*1024*1024);
 
     GIVEN( "Filesystem" ) {
-        filesystem_init();
+        filesystem_init(0);
 
         stringid64_t root = stringid64_from_string("foo");
         filesystem_map_root_dir(root, "foopath");
@@ -68,7 +68,7 @@ SCENARIO( "Can open file", "[filesystem]" ) {
     strrchr(test_dir, '/')[1] = '\0';
 
     GIVEN( "Filesystem" ) {
-        filesystem_init();
+        filesystem_init(0);
 
         stringid64_t root = stringid64_from_string("test_dir");
         filesystem_map_root_dir(root, test_dir);

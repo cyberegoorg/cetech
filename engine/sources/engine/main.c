@@ -1,7 +1,7 @@
 #include "engine/application/application.h"
 
 int main(int argc,
-         char **argv) {
+         const char **argv) {
 
     if (application_init(argc, argv)) {
         application_start();

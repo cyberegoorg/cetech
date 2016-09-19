@@ -18,7 +18,7 @@ typedef int (*console_server_command_t)(mpack_node_t,
 // Interface
 //==============================================================================
 
-int consolesrv_init();
+int consolesrv_init(int stage);
 
 void consolesrv_shutdown();
 

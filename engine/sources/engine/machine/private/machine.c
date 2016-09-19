@@ -34,7 +34,7 @@ static struct G {
 // Interface
 //==============================================================================
 
-int machine_init() {
+int machine_init(int stage) {
     _G = (struct G) {0};
 
     eventstream_create(&_G.eventstream, memsys_main_allocator());

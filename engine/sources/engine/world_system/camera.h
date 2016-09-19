@@ -5,7 +5,7 @@
 #include "../entcom/types.h"
 #include "types.h"
 
-int camera_init();
+int camera_init(int stage);
 
 void camera_shutdown();
 

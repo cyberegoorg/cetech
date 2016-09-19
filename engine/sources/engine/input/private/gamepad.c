@@ -36,7 +36,7 @@ static struct G {
 // Interface
 //==============================================================================
 
-int gamepad_init() {
+int gamepad_init(int stage) {
     _G = (struct G) {0};
 
     log_debug(LOG_WHERE, "Init");
