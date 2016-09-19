@@ -16,7 +16,7 @@
 #include <engine/machine/machine.h>
 #include <engine/resource_manager/resource_manager.h>
 #include <engine/lua_system/lua_system.h>
-#include <engine/resource_compiler/resource_compiler.h>
+#include <engine/resource_manager/resource_compiler.h>
 #include <engine/renderer/renderer.h>
 
 #include "engine/memory_system/memory_system.h"

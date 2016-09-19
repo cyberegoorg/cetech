@@ -12,7 +12,7 @@
 #include <celib/os/path.h>
 #include <engine/application/application.h>
 #include <celib/os/vio.h>
-#include <engine/resource_compiler/resource_compiler.h>
+#include <engine/resource_manager/resource_compiler.h>
 #include "engine/memory_system/memory_system.h"
 #include "celib/containers/map.h"
 

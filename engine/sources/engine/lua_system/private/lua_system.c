@@ -4,7 +4,7 @@
 
 #include <include/mpack/mpack.h>
 #include <celib/stringid/stringid.h>
-#include <engine/resource_compiler/resource_compiler.h>
+#include <engine/resource_manager/resource_compiler.h>
 #include <celib/os/vio.h>
 #include <celib/memory/memory.h>
 #include <engine/resource_manager/resource_manager.h>

@@ -16,7 +16,7 @@
 #include "engine/memory_system/memory_system.h"
 #include "engine/application/application.h"
 #include "engine/resource_manager/resource_manager.h"
-#include "engine/resource_compiler/resource_compiler.h"
+#include "engine/resource_manager/resource_compiler.h"
 
 
 //==============================================================================

@@ -5,7 +5,7 @@
 #include <celib/stringid/stringid.h>
 #include <engine/task_manager/types.h>
 #include <engine/task_manager/task_manager.h>
-#include <engine/resource_compiler/resource_compiler.h>
+#include <engine/resource_manager/resource_compiler.h>
 #include <celib/memory/memory.h>
 #include <celib/os/vio.h>
 #include <celib/yaml/yaml.h>
