@@ -1,10 +1,7 @@
 # [CETech](https://gitlab.com/cyberegoorg/cetech)
 
 [![build status](https://gitlab.com/cyberegoorg/cetech/badges/master/build.svg)](https://gitlab.com/cyberegoorg/cetech/commits/master)
-[![Issues](https://img.shields.io/github/issues/cyberegoorg/cetech.svg)](https://github.com/cyberegoorg/cetech/issues)
-[![Release](https://img.shields.io/github/release/cyberegoorg/cetech.svg)](https://github.com/cyberegoorg/cetech/releases)
 [![License](https://img.shields.io/badge/license-CC0-blue.svg)](LICENSE.md)
-[![Gitter](https://img.shields.io/gitter/room/cyberegoorg/cetech.svg)](https://gitter.im/cyberegoorg/cetech)
 
 ## [What is it?](https://cyberegoorg.github.io/cetech/)
 
