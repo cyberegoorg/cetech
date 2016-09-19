@@ -286,16 +286,8 @@ u32 material_get_texture_count(material_t material) {
     return resource->texture_count;
 }
 
-u32 material_find_slot(material_t material,
-                       const char *name) {
-    u32 idx = MAP_GET(u32, &_G.material_instace_map, material.idx, UINT32_MAX);
-
-    if (idx == UINT32_MAX) {
-        return 0;
-    }
-
-    struct material_resource *resource = (struct material_resource *) &_G.material_instance_data.data[_G.material_instance_offset.data[idx]];
-
+u32 _material_find_slot(struct material_resource *resource,
+                        const char *name) {
     const char *u_names = (const char *) (resource + 1);
     for (u32 i = 0; i < resource->uniforms_count; ++i) {
         if (str_compare(&u_names[i * 32], name) != 0) {
@@ -309,8 +301,9 @@ u32 material_find_slot(material_t material,
 }
 
 void material_set_texture(material_t material,
-                          u32 slot,
+                          const char *slot,
                           stringid64_t texture) {
+
     u32 idx = MAP_GET(u32, &_G.material_instace_map, material.idx, UINT32_MAX);
 
     if (idx == UINT32_MAX) {
@@ -322,7 +315,9 @@ void material_set_texture(material_t material,
     char *u_names = (char *) (resource + 1);
     stringid64_t *u_texture = (stringid64_t *) (u_names + (32 * resource->uniforms_count));
 
-    u_texture[slot] = texture;
+    int slot_idx = _material_find_slot(resource, slot);
+
+    u_texture[slot_idx] = texture;
 }
 
 void material_use(material_t material) {

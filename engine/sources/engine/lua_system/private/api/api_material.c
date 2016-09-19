@@ -9,29 +9,15 @@
 
 #define API_NAME "Material"
 
-static int _find_slot(lua_State *l) {
-    material_t m = {.h = luasys_to_handler(l, 1)};
-    const char *slot_name = luasys_to_string(l, 2);
-
-    luasys_push_int(l, material_find_slot(m, slot_name));
-    return 1;
-}
-
 static int _set_texture(lua_State *l) {
     material_t m = {.h = luasys_to_handler(l, 1)};
-    u32 slot = luasys_to_int(l, 2);
-    const char *texute_name = luasys_to_string(l, 3);
+    const char *slot_name = luasys_to_string(l, 2);
+    const char *texture_name = luasys_to_string(l, 3);
 
-    material_set_texture(m, slot, stringid64_from_string(texute_name));
+    material_set_texture(m, slot_name, stringid64_from_string(texture_name));
     return 0;
 }
 
-
-void material_set_texture(material_t material,
-                          u32 slot,
-                          stringid64_t texture);
-
 void _register_lua_material_api() {
-    luasys_add_module_function(API_NAME, "find_slot", _find_slot);
     luasys_add_module_function(API_NAME, "set_texture", _set_texture);
 }
