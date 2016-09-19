@@ -1,4 +1,4 @@
-#include "engine/resource_compiler/resource_compiler.h"
+#include "engine/resource_manager/resource_compiler.h"
 #include "engine/lua_system/lua_system.h"
 
 #define API_NAME "ResourceCompilator"
