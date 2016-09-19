@@ -1,6 +1,6 @@
-# [CETech](https://github.com/cyberegoorg/cetech)
+# [CETech](https://gitlab.com/cyberegoorg/cetech)
 
-[![Build Status](https://travis-ci.org/cyberegoorg/cetech.svg?branch=c_version)](https://travis-ci.org/cyberegoorg/cetech)
+[![build status](https://gitlab.com/cyberegoorg/cetech/badges/master/build.svg)](https://gitlab.com/cyberegoorg/cetech/commits/master)
 [![Issues](https://img.shields.io/github/issues/cyberegoorg/cetech.svg)](https://github.com/cyberegoorg/cetech/issues)
 [![Release](https://img.shields.io/github/release/cyberegoorg/cetech.svg)](https://github.com/cyberegoorg/cetech/releases)
 [![License](https://img.shields.io/badge/license-CC0-blue.svg)](LICENSE.md)
@@ -23,12 +23,11 @@ CETech is Data-Driven game engine and toolbox inspired by [Bitsquid](http://bits
 ## [3rd party libraries and tools](https://cyberegoorg.github.io/cetech/about/3rdparty/)
 
 ## Suported platforms
- 
-* Windows (Runtime + Develop) - Work in progress
+
 * Linux (Runtime + Develop) - Work in progress
 
 ## Planned platforms
-
+* Windows (Runtime + Develop)
 * OSX (Runtime + Develop)
 * FreeBSD (Runtime + Develop)
 * RaspberryPi (Runtime + Develop)
