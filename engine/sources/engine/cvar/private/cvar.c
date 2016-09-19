@@ -3,6 +3,7 @@
 //==============================================================================
 
 #include <engine/memory_system/memory_system.h>
+#include <engine/cvar/cvar.h>
 #include "celib/memory/memory.h"
 #include "engine/cvar/cvar.h"
 #include "celib/string/string.h"
@@ -29,6 +30,12 @@ enum cvar_type {
     CV_STRING
 };
 
+static const char *_type_to_str[4] = {
+        [CV_NONE] = "invalid",
+        [CV_FLOAT] = "float",
+        [CV_INT] = "int",
+        [CV_STRING] = "string"
+};
 
 //==============================================================================
 // Globals
@@ -95,6 +102,79 @@ void cvar_shutdown() {
     log_debug(LOG_WHERE, "Shutdown");
 
     _dealloc_allm_string();
+}
+
+
+int cvar_parse_args(struct args args) {
+    if (os_cmd_has_argument(args, "cvars", 0)) {
+        for (u64 i = 1; i < MAX_VARIABLES; ++i) {
+            if (_G.name[i][0] == '\0') {
+                continue;
+            }
+
+            log_info(LOG_WHERE, "%s : %s - %s", _G.name[i], _type_to_str[_G.types[i]], _G.desc[i]);
+
+        }
+        return 0;
+    }
+
+
+    struct args tmp_args = args;
+    for (int j = 0; j < tmp_args.argc; ++j) {
+        int idx = os_cmd_find_argument(tmp_args, "set", 's');
+        if (idx == tmp_args.argc) {
+            return 1;
+        }
+
+        const char *name = os_cmd_get_parameter(tmp_args, "set", 's', 0);
+        const char *value = os_cmd_get_parameter(tmp_args, "set", 's', 1);
+
+        log_info(LOG_WHERE, "%s : %s ", name, value);
+
+        union {
+            float f;
+            int i;
+            const char *s;
+        } tmp_var;
+
+        cvar_t cvar = cvar_find(name);
+        if (cvar.idx != 0) {
+            enum cvar_type type = _G.types[cvar.idx];
+            switch (type) {
+                case CV_FLOAT:
+                    sscanf(value, "%f", &tmp_var.f);
+                    cvar_set_float(cvar, tmp_var.f);
+                    break;
+
+                case CV_INT:
+                    sscanf(value, "%d", &tmp_var.i);
+                    cvar_set_float(cvar, tmp_var.i);
+                    break;
+
+                case CV_STRING:
+                    cvar_set_string(cvar, value);
+                    break;
+
+                default:
+                    log_error(LOG_WHERE, "Invalid type for cvar \"%s\"", name);
+                    break;
+            }
+
+        } else {
+            log_error(LOG_WHERE, "Invalid cvar \"%s\"", name);
+        }
+
+        tmp_args.argc -= 1 + 2;
+        tmp_args.argv = tmp_args.argv + idx + 1 + 2;
+        j = 0;
+    }
+
+    if (!os_cmd_has_argument(args, "set", 's')) {
+        return 1;
+    }
+
+
+    return 1;
 }
 
 cvar_t cvar_find(const char *name) {

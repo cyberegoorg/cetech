@@ -92,6 +92,9 @@ int application_init(int argc,
         }
     }
 
+    if (!cvar_parse_args(_G.args)) {
+        return 0;
+    }
 
     // main stage
     for (int i = 0; i < STATIC_SYSTEMS_SIZE; ++i) {

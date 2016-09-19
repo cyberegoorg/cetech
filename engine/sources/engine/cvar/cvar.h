@@ -6,6 +6,7 @@
 //==============================================================================
 
 #include <stdio.h>
+#include <celib/os/cmd_line.h>
 #include "celib/types.h"
 
 //==============================================================================
@@ -24,6 +25,8 @@ typedef struct {
 int cvar_init();
 
 void cvar_shutdown();
+
+int cvar_parse_args(struct args args);
 
 cvar_t cvar_find(const char *name);
 
