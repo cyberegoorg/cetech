@@ -41,9 +41,16 @@ static int os_cmd_find_argument(struct args args,
 
 static const char *os_cmd_get_parameter(struct args args,
                                         const char *longopt,
-                                        char shortopt) {
+                                        char shortopt,
+                                        int param) {
+
     int idx = os_cmd_find_argument(args, longopt, shortopt);
-    return idx < args.argc ? args.argv[idx + 1] : NULL;
+
+    if (idx < args.argc) {
+        return args.argv[idx + 1 + param];
+    }
+
+    return NULL;
 }
 
 static int os_cmd_has_argument(struct args args,
