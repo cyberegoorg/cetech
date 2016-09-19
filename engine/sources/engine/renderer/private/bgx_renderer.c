@@ -43,7 +43,12 @@ static u32 _get_reset_flags() {
 // Interface
 //==============================================================================
 
-int renderer_init() {
+int renderer_init(int stage) {
+    if (stage == 0) {
+        return 1;
+    }
+
+
     _G = (struct G) {0};
 
     texture_resource_init();

@@ -24,12 +24,12 @@ struct camera_data {
 };
 
 typedef struct {
-    MAP_T(u32) EntIdx;
+    MAP_T(u32) ent_idx_map;
 
-    ARRAY_T(entity_t) Ent;
-    ARRAY_T(f32) Near;
-    ARRAY_T(f32) Far;
-    ARRAY_T(f32) Fov;
+    ARRAY_T(entity_t) entity;
+    ARRAY_T(f32) near;
+    ARRAY_T(f32) far;
+    ARRAY_T(f32) fov;
 
 } world_data_t;
 
@@ -47,12 +47,12 @@ static struct G {
 static void _new_world(world_t world) {
     world_data_t data = {0};
 
-    MAP_INIT(u32, &data.EntIdx, memsys_main_allocator());
+    MAP_INIT(u32, &data.ent_idx_map, memsys_main_allocator());
 
-    ARRAY_INIT(entity_t, &data.Ent, memsys_main_allocator());
-    ARRAY_INIT(f32, &data.Near, memsys_main_allocator());
-    ARRAY_INIT(f32, &data.Far, memsys_main_allocator());
-    ARRAY_INIT(f32, &data.Fov, memsys_main_allocator());
+    ARRAY_INIT(entity_t, &data.entity, memsys_main_allocator());
+    ARRAY_INIT(f32, &data.near, memsys_main_allocator());
+    ARRAY_INIT(f32, &data.far, memsys_main_allocator());
+    ARRAY_INIT(f32, &data.fov, memsys_main_allocator());
 
     MAP_SET(world_data_t, &_G.world, world.h.h, data);
 }
@@ -64,12 +64,12 @@ static world_data_t *_get_world_data(world_t world) {
 static void _destroy_world(world_t world) {
     world_data_t *data = _get_world_data(world);
 
-    MAP_DESTROY(u32, &data->EntIdx);
+    MAP_DESTROY(u32, &data->ent_idx_map);
 
-    ARRAY_DESTROY(entity_t, &data->Ent);
-    ARRAY_DESTROY(f32, &data->Near);
-    ARRAY_DESTROY(f32, &data->Far);
-    ARRAY_DESTROY(f32, &data->Fov);
+    ARRAY_DESTROY(entity_t, &data->entity);
+    ARRAY_DESTROY(f32, &data->near);
+    ARRAY_DESTROY(f32, &data->far);
+    ARRAY_DESTROY(f32, &data->fov);
 
 }
 
@@ -102,7 +102,7 @@ void _destroyer(world_t world,
 
     // TODO: remove from arrays, swap idx -> last AND change size
     for (int i = 0; i < ent_count; i++) {
-        MAP_REMOVE(u32, &world_data->EntIdx, ents[i].idx);
+        MAP_REMOVE(u32, &world_data->ent_idx_map, ents[i].idx);
     }
 }
 
@@ -123,7 +123,12 @@ void _spawner(world_t world,
 }
 
 
-int camera_init() {
+int camera_init(int stage) {
+    if (stage == 0) {
+        return 1;
+    }
+
+
     _G = (struct G) {0};
 
     MAP_INIT(world_data_t, &_G.world, memsys_main_allocator());
@@ -156,12 +161,12 @@ void camera_get_project_view(world_t world,
 
 
     vec2f_t size = renderer_get_size(); // TODO, to arg... or viewport?
-    entity_t e = ARRAY_AT(&world_data->Ent, camera.idx);
+    entity_t e = ARRAY_AT(&world_data->entity, camera.idx);
     transform_t t = transform_get(world, e);
 
-    f32 fov = ARRAY_AT(&world_data->Fov, camera.idx);
-    f32 near = ARRAY_AT(&world_data->Near, camera.idx);
-    f32 far = ARRAY_AT(&world_data->Far, camera.idx);
+    f32 fov = ARRAY_AT(&world_data->fov, camera.idx);
+    f32 near = ARRAY_AT(&world_data->near, camera.idx);
+    f32 far = ARRAY_AT(&world_data->far, camera.idx);
 
     mat44f_set_perspective_fov(proj, fov, size.x / size.y, near, far);
 
@@ -172,14 +177,14 @@ void camera_get_project_view(world_t world,
 int camera_has(world_t world,
                entity_t entity) {
     world_data_t *world_data = _get_world_data(world);
-    return MAP_HAS(u32, &world_data->EntIdx, entity.h.h);
+    return MAP_HAS(u32, &world_data->ent_idx_map, entity.h.h);
 }
 
 camera_t camera_get(world_t world,
                     entity_t entity) {
 
     world_data_t *world_data = _get_world_data(world);
-    u32 idx = MAP_GET(u32, &world_data->EntIdx, entity.h.h, UINT32_MAX);
+    u32 idx = MAP_GET(u32, &world_data->ent_idx_map, entity.h.h, UINT32_MAX);
     return (camera_t) {.idx = idx};
 }
 
@@ -193,14 +198,14 @@ camera_t camera_create(world_t world,
 
     log_debug("camera", "create camera %f %f %f", near, far, fov);
 
-    u32 idx = (u32) ARRAY_SIZE(&data->Near);
+    u32 idx = (u32) ARRAY_SIZE(&data->near);
 
-    MAP_SET(u32, &data->EntIdx, entity.h.h, idx);
+    MAP_SET(u32, &data->ent_idx_map, entity.h.h, idx);
 
-    ARRAY_PUSH_BACK(entity_t, &data->Ent, entity);
-    ARRAY_PUSH_BACK(f32, &data->Near, near);
-    ARRAY_PUSH_BACK(f32, &data->Far, far);
-    ARRAY_PUSH_BACK(f32, &data->Fov, fov);
+    ARRAY_PUSH_BACK(entity_t, &data->entity, entity);
+    ARRAY_PUSH_BACK(f32, &data->near, near);
+    ARRAY_PUSH_BACK(f32, &data->far, far);
+    ARRAY_PUSH_BACK(f32, &data->fov, fov);
 
     return (camera_t) {.idx = idx};
 }

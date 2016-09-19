@@ -123,14 +123,19 @@ extern int package_init();
 extern void package_shutdown();
 
 
-int resource_init() {
+int resource_init(int stage) {
+    if (stage == 0) {
+        return 1;
+    }
+
+
     _G = (struct G) {0};
 
     ARRAY_INIT(resource_data, &_G.resource_data, memsys_main_allocator());
     ARRAY_INIT(resource_callbacks_t, &_G.resource_callbacks, memsys_main_allocator());
     MAP_INIT(u32, &_G.type_map, memsys_main_allocator());
 
-    _G.cv_build_dir = cvar_find("resource_compiler.build_dir");
+    _G.cv_build_dir = cvar_find(".build");
 
     char build_dir_full[1024] = {0};
     os_path_join(build_dir_full,

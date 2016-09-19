@@ -16,7 +16,7 @@
 // Interface
 //==============================================================================
 
-int taskmanager_init();
+int taskmanager_init(int stage);
 
 void taskmanager_shutdown();
 

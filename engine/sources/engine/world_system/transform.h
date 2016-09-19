@@ -5,7 +5,7 @@
 #include "../entcom/types.h"
 #include "types.h"
 
-int transform_init();
+int transform_init(int stage);
 
 void transform_shutdown();
 

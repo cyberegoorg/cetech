@@ -13,7 +13,7 @@
 // Interface
 //==============================================================================
 
-int renderer_init();
+int renderer_init(int stage);
 
 void renderer_shutdown();
 

@@ -11,7 +11,7 @@
 #include "engine/world_system/types.h"
 #include "engine/entcom/types.h"
 
-int entcom_init();
+int entcom_init(int stage);
 
 void entcom_shutdown();
 

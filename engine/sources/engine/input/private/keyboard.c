@@ -32,7 +32,12 @@ static struct G {
 // Interface
 //==============================================================================
 
-int keyboard_init() {
+int keyboard_init(int stage) {
+    if (stage == 0) {
+        return 1;
+    }
+
+
     _G = (struct G) {0};
 
     log_debug(LOG_WHERE, "Init");

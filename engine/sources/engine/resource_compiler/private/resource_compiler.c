@@ -182,23 +182,25 @@ void _compile_dir(task_t root_task,
 // Interface
 //==============================================================================
 
-int resource_compiler_init() {
-    _G = (struct G) {0};
+int resource_compiler_init(int stage) {
+    if (stage == 0) {
+        _G = (struct G) {0};
+        _G.cv_source_dir = cvar_new_str(".src", "Resource source dir", "data/src");
+        _G.cv_core_dir = cvar_new_str(".core", "Resource core source dir", "core");
+        _G.cv_build_dir = cvar_new_str(".build", "Resource build dir", "data/build");
+    } else {
 
-    _G.cv_source_dir = cvar_new_str("resource_compiler.source_dir", "Resource source dir", "data/src");
-    _G.cv_core_dir = cvar_new_str("resource_compiler.core_dir", "Resource core source dir", "core");
-    _G.cv_build_dir = cvar_new_str("resource_compiler.build_dir", "Resource build dir", "data/build");
+        const char *build_dir = cvar_get_string(_G.cv_build_dir);
+        char build_dir_full[1024] = {0};
+        os_path_join(build_dir_full, CE_ARRAY_LEN(build_dir_full), build_dir, application_platform());
 
-    const char *build_dir = cvar_get_string(_G.cv_build_dir);
-    char build_dir_full[1024] = {0};
-    os_path_join(build_dir_full, CE_ARRAY_LEN(build_dir_full), build_dir, application_platform());
+        os_dir_make_path(build_dir_full);
+        builddb_init_db(build_dir_full);
 
-    os_dir_make_path(build_dir_full);
-    builddb_init_db(build_dir_full);
-
-    char tmp_dir_full[1024] = {0};
-    os_path_join(tmp_dir_full, CE_ARRAY_LEN(tmp_dir_full), build_dir_full, "tmp");
-    os_dir_make_path(tmp_dir_full);
+        char tmp_dir_full[1024] = {0};
+        os_path_join(tmp_dir_full, CE_ARRAY_LEN(tmp_dir_full), build_dir_full, "tmp");
+        os_dir_make_path(tmp_dir_full);
+    }
 
     return 1;
 }

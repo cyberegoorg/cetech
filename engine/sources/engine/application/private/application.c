@@ -3,26 +3,21 @@
 //==============================================================================
 
 #include <unistd.h>
+
 #include <celib/os/time.h>
 #include <celib/window/types.h>
 #include <celib/window/window.h>
 #include <celib/stringid/stringid.h>
+#include <celib/os/process.h>
+#include <celib/os/cmd_line.h>
+
 #include <engine/application/application.h>
 #include <engine/cvar/cvar.h>
-#include <celib/os/process.h>
 #include <engine/machine/machine.h>
 #include <engine/resource_manager/resource_manager.h>
 #include <engine/lua_system/lua_system.h>
 #include <engine/resource_compiler/resource_compiler.h>
 #include <engine/renderer/renderer.h>
-#include <engine/entcom/types.h>
-#include <engine/world_system/unit_system.h>
-#include <engine/world_system/transform.h>
-#include <engine/world_system/world_system.h>
-#include <engine/renderer/material.h>
-#include <celib/math/types.h>
-
-#include "celib/containers/map.h"
 
 #include "engine/memory_system/memory_system.h"
 #include "engine/input/input.h"
@@ -42,6 +37,7 @@ static struct G {
     window_t main_window;
     cvar_t cv_boot_pkg;
     cvar_t cv_boot_script;
+    struct args args;
     int is_running;
     int init_error;
     float dt;
@@ -71,23 +67,38 @@ void application_quit() {
 }
 
 int application_init(int argc,
-                     char **argv) {
+                     const char **argv) {
     _G = (struct G) {0};
+    _G.args = (struct args) {.argc = argc, .argv = argv};
 
     log_init(_get_worker_id);
     log_register_handler(log_stdout_handler, NULL);
-
     logdb_init_db(".");
 
     log_debug(LOG_WHERE, "Init (global size: %lu)", sizeof(struct G));
 
     memsys_init(4 * 1024 * 1024);
+    cvar_init();
 
     _G.cv_boot_pkg = cvar_new_str("application.boot_pkg", "Boot package", "boot");
     _G.cv_boot_script = cvar_new_str("application.boot_scrpt", "Boot script", "lua/boot");
 
+    // Cvar stage
     for (int i = 0; i < STATIC_SYSTEMS_SIZE; ++i) {
-        if (!_SYSTEMS[i].init()) {
+        if (!_SYSTEMS[i].init(0)) {
+            log_error(LOG_WHERE, "Could not init system \"%s\"", _SYSTEMS[i].name);
+            _G.init_error = 1;
+            return 0;
+        }
+    }
+
+    if (!cvar_parse_args(_G.args)) {
+        return 0;
+    }
+
+    // main stage
+    for (int i = 0; i < STATIC_SYSTEMS_SIZE; ++i) {
+        if (!_SYSTEMS[i].init(1)) {
             log_error(LOG_WHERE, "Could not init system \"%s\"", _SYSTEMS[i].name);
 
             for (i = i - 1; i >= 0; --i) {
@@ -100,7 +111,6 @@ int application_init(int argc,
     }
 
     log_set_wid_clb(taskmanager_worker_id);
-
     return 1;
 }
 
@@ -115,6 +125,7 @@ int application_shutdown() {
         window_destroy(_G.main_window);
     }
 
+    cvar_shutdown();
     memsys_shutdown();
     log_shutdown();
 
@@ -231,16 +242,6 @@ void application_start() {
 
     _boot_stage();
 
-//////////////////
-    void *data = resource_get(stringid64_from_string("unit"), stringid64_from_string("unit1"));
-    world_t w = world_create();
-    entity_t e = unit_spawn_from_resource(w, data);
-    transform_t t = transform_get(w, e);
-    vec3f_t s = transform_get_scale(w, t);
-
-//    material_set_texture(m, res, stringid64_from_string("dasdasdsadasdasdas"));
-//
-////////////
 
     uint32_t last_tick = os_get_ticks();
     _G.game = luasys_get_game_callbacks();

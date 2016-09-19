@@ -47,7 +47,7 @@ typedef struct {
 // Resource interface
 //==============================================================================
 
-int resource_init();
+int resource_init(int stage);
 
 void resource_shutdown();
 

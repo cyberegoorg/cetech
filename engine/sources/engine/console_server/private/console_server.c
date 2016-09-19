@@ -36,6 +36,8 @@ static struct G {
 
     int rpc_socket;
     int log_socket;
+    cvar_t cv_rpc_port;
+    cvar_t cv_rpc_addr;
 } ConsoleServerGlobals = {0};
 
 
@@ -107,11 +109,18 @@ static void _serve_command(const char *packet,
 // Interface
 //==============================================================================
 
-int consolesrv_init() {
+int consolesrv_init(int stage) {
+    if (stage == 0) {
+        _G = (struct G) {0};
+
+        _G.cv_rpc_port = cvar_new_int("console_server.rpc.port", "Console server rpc port", 4444);
+        _G.cv_rpc_addr = cvar_new_str("console_server.rpc.addr", "Console server rpc addr", "ws://*");
+
+        return 1;
+    }
+
     log_debug(LOG_WHERE, "Init");
 
-    cvar_t rpc_port = cvar_new_int("console_server.rpc.port", "Console server rpc port", 4444);
-    cvar_t rpc_addr = cvar_new_str("console_server.rpc.addr", "Console server rpc addr", "ws://*");
 
     int socket = nn_socket(AF_SP, NN_REP);
     if (socket < 0) {
@@ -120,7 +129,7 @@ int consolesrv_init() {
     }
 
     char addr[128] = {0};
-    snprintf(addr, 128, "%s:%d", cvar_get_string(rpc_addr), cvar_get_int(rpc_port));
+    snprintf(addr, 128, "%s:%d", cvar_get_string(_G.cv_rpc_addr), cvar_get_int(_G.cv_rpc_port));
 
     log_debug(LOG_WHERE, "RPC address: %s", addr);
 

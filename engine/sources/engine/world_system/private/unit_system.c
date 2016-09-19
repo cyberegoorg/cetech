@@ -352,7 +352,12 @@ static const resource_callbacks_t unit_resource_callback = {
 };
 
 
-int unit_init() {
+int unit_init(int stage) {
+    if (stage == 0) {
+        return 1;
+    }
+
+
     _G = (struct G) {0};
 
     _G.type = stringid64_from_string("unit");

@@ -21,7 +21,7 @@ typedef struct {
     world_on_destroy_t on_destroy;
 } world_callbacks_t;
 
-int world_init();
+int world_init(int stage);
 
 void world_shutdown();
 
