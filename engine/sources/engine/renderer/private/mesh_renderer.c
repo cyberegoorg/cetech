@@ -264,8 +264,12 @@ void _init_cubes() {
 }
 
 
-int mesh_init() {
-    _G = (struct G) {0};
+int mesh_init(int stage) {
+    if (stage == 0) {
+        _G = (struct G) {0};
+
+        return 1;
+    }
 
     MAP_INIT(world_data_t, &_G.world, memsys_main_allocator());
 

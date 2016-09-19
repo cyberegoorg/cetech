@@ -6,7 +6,7 @@
 // Core engine systems
 //==============================================================================
 
-SYSTEM(cvar)
+//SYSTEM(cvar)
 
 SYSTEM(machine)
 

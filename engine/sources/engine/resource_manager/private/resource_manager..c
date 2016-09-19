@@ -124,6 +124,11 @@ extern void package_shutdown();
 
 
 int resource_init(int stage) {
+    if (stage == 0) {
+        return 1;
+    }
+
+
     _G = (struct G) {0};
 
     ARRAY_INIT(resource_data, &_G.resource_data, memsys_main_allocator());

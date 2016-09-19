@@ -69,6 +69,7 @@ void application_quit() {
 int application_init(int argc,
                      const char **argv) {
     _G = (struct G) {0};
+    _G.args = (struct args) {.argc = argc, .argv = argv};
 
     log_init(_get_worker_id);
     log_register_handler(log_stdout_handler, NULL);
@@ -77,15 +78,24 @@ int application_init(int argc,
     log_debug(LOG_WHERE, "Init (global size: %lu)", sizeof(struct G));
 
     memsys_init(4 * 1024 * 1024);
-
-    _G.args = (struct args) {.argc = argc, .argv = argv};
+    cvar_init();
 
     _G.cv_boot_pkg = cvar_new_str("application.boot_pkg", "Boot package", "boot");
     _G.cv_boot_script = cvar_new_str("application.boot_scrpt", "Boot script", "lua/boot");
 
-
+    // Cvar stage
     for (int i = 0; i < STATIC_SYSTEMS_SIZE; ++i) {
         if (!_SYSTEMS[i].init(0)) {
+            log_error(LOG_WHERE, "Could not init system \"%s\"", _SYSTEMS[i].name);
+            _G.init_error = 1;
+            return 0;
+        }
+    }
+
+
+    // main stage
+    for (int i = 0; i < STATIC_SYSTEMS_SIZE; ++i) {
+        if (!_SYSTEMS[i].init(1)) {
             log_error(LOG_WHERE, "Could not init system \"%s\"", _SYSTEMS[i].name);
 
             for (i = i - 1; i >= 0; --i) {
@@ -98,7 +108,6 @@ int application_init(int argc,
     }
 
     log_set_wid_clb(taskmanager_worker_id);
-
     return 1;
 }
 
@@ -113,6 +122,7 @@ int application_shutdown() {
         window_destroy(_G.main_window);
     }
 
+    cvar_shutdown();
     memsys_shutdown();
     log_shutdown();
 

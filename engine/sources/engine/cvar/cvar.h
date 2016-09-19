@@ -21,7 +21,7 @@ typedef struct {
 // Interface
 //==============================================================================
 
-int cvar_init(int stage);
+int cvar_init();
 
 void cvar_shutdown();
 

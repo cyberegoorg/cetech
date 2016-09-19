@@ -44,6 +44,10 @@ static struct G {
 //==============================================================================
 
 int entcom_init(int stage) {
+    if (stage == 0) {
+        return 1;
+    }
+
     _G = (struct G) {0};
 
     handlerid_init(&_G.entity_handler, memsys_main_allocator());

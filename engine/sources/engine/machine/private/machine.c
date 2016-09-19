@@ -35,6 +35,11 @@ static struct G {
 //==============================================================================
 
 int machine_init(int stage) {
+    if (stage == 0) {
+        return 1;
+    }
+
+
     _G = (struct G) {0};
 
     eventstream_create(&_G.eventstream, memsys_main_allocator());

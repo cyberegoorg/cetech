@@ -152,6 +152,11 @@ static void _spawner(world_t world,
 
 
 int transform_init(int stage) {
+    if (stage == 0) {
+        return 1;
+    }
+
+
     _G = (struct G) {0};
 
     MAP_INIT(world_data_t, &_G.world, memsys_main_allocator());

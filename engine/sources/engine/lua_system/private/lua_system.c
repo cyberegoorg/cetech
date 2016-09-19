@@ -824,6 +824,10 @@ void _create_lightuserdata() {
 }
 
 int luasys_init(int stage) {
+    if (stage == 0) {
+        return 1;
+    }
+
     log_debug(LOG_WHERE, "Init");
 
     _G.L = luaL_newstate();

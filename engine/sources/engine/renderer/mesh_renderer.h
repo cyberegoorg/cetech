@@ -10,7 +10,7 @@ typedef struct {
     u32 idx;
 } mesh_t;
 
-int mesh_init();
+int mesh_init(int stage);
 
 void mesh_shutdown();
 

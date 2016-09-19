@@ -176,6 +176,11 @@ static int _task_worker(void *o) {
 //==============================================================================
 
 int taskmanager_init(int stage) {
+    if (stage == 0) {
+        return 1;
+    }
+
+
     _G = (struct G) {0};
     memory_set(_G._openTasks, 0, sizeof(char) * MAX_TASK);
 

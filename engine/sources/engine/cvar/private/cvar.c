@@ -85,7 +85,7 @@ cvar_t _find_first_free() {
 // Interface
 //==============================================================================
 
-int cvar_init(int stage) {
+int cvar_init() {
     log_debug(LOG_WHERE, "Init");
 
     return 1;
