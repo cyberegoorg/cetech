@@ -102,6 +102,8 @@ YAML_NODE_AS_DEF(float);
 
 YAML_NODE_AS_DEF(vec3f_t);
 
+YAML_NODE_AS_DEF(vec4f_t);
+
 int yaml_as_string(yaml_node_t node,
                    char *output,
                    size_t max_len);

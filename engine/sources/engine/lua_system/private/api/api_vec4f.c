@@ -6,6 +6,17 @@
 
 #define API_NAME "Vec4f"
 
+
+static int _ctor(lua_State *l) {
+    f32 x = luasys_to_f32(l, 1);
+    f32 y = luasys_to_f32(l, 2);
+    f32 z = luasys_to_f32(l, 3);
+    f32 w = luasys_to_f32(l, 4);
+
+    luasys_push_vec4f(l, (vec4f_t) {.x=x, .y=y, .z=z, .w=w});
+    return 1;
+}
+
 static int _unit_x(lua_State *l) {
     luasys_push_vec4f(l, VEC4F_UNIT_X);
     return 1;
@@ -71,6 +82,8 @@ static int _dot(lua_State *l) {
 }
 
 void _register_lua_vec4f_api() {
+    luasys_add_module_function(API_NAME, "make", _ctor);
+
     luasys_add_module_function(API_NAME, "unit_x", _unit_x);
     luasys_add_module_function(API_NAME, "unit_y", _unit_y);
     luasys_add_module_function(API_NAME, "unit_z", _unit_z);

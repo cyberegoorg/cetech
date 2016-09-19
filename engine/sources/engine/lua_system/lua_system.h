@@ -116,6 +116,9 @@ void luasys_add_module_function(const char *module,
                                 const char *name,
                                 const lua_CFunction func);
 
+void luasys_add_module_constructor(const char *module,
+                                   const lua_CFunction func);
+
 void luasys_execute_resource(stringid64_t name);
 
 const struct game_callbacks *luasys_get_game_callbacks();

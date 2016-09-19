@@ -190,6 +190,36 @@ vec3f_t yaml_as_vec3f_t(yaml_node_t body) {
     return v;
 }
 
+vec4f_t yaml_as_vec4f_t(yaml_node_t body) {
+    CE_ASSERT("yaml", yaml_is_valid(body));
+
+    vec4f_t v = {0};
+
+    yaml_node_t x = yaml_get_seq_node(body, 0);
+    CE_ASSERT("yaml", yaml_is_valid(x));
+    v.x = yaml_as_float(x);
+    yaml_node_free(x);
+
+
+    yaml_node_t y = yaml_get_seq_node(body, 1);
+    CE_ASSERT("yaml", yaml_is_valid(y));
+    v.y = yaml_as_float(y);
+    yaml_node_free(y);
+
+
+    yaml_node_t z = yaml_get_seq_node(body, 2);
+    CE_ASSERT("yaml", yaml_is_valid(z));
+    v.z = yaml_as_float(z);
+    yaml_node_free(z);
+
+    yaml_node_t w = yaml_get_seq_node(body, 3);
+    CE_ASSERT("yaml", yaml_is_valid(w));
+    v.w = yaml_as_float(w);
+    yaml_node_free(w);
+
+    return v;
+}
+
 #define YAML_NODE_AS_DECL(type)\
     extern "C" type yaml_as_##type(yaml_node_t node) {\
         yamlcpp_handler *nh = (yamlcpp_handler *) node.doc.d;\

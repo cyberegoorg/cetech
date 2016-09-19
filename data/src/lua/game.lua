@@ -68,6 +68,9 @@ function Game:update(dt)
         local material = Mesh.get_material(self.world, mesh)
 
         Material.set_texture(material, "u_texColor", TEXTURE_CYCLE[(TEXTURE_CYCLE_IT % #TEXTURE_CYCLE) + 1])
+
+        Material.set_vec4f(material, "u_vec4", Vec4f.make(0.0, 1.0, 0.0, 0.0))
+
         TEXTURE_CYCLE_IT = TEXTURE_CYCLE_IT + 1
     end
 

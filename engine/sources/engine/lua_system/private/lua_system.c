@@ -608,6 +608,21 @@ void luasys_add_module_function(const char *module,
     lua_pop(_G.L, -1);
 };
 
+//void luasys_add_module_constructor(const char* module,
+//                                   const lua_CFunction func) {
+//
+//    lua_createtable(_G.L, 0, 1);
+//    lua_pushstring(_G.L, "__call");
+//    lua_pushcfunction(_G.L, func);
+//    lua_settable(_G.L, 1);
+//    lua_getglobal(_G.L, "cetech");
+//    lua_getglobal(_G.L, module);
+//    lua_pushvalue(_G.L, -2);
+//    lua_setmetatable(_G.L, -2);
+//    lua_pop(_G.L, -1);
+//}
+
+
 static int _is_vec2f(lua_State *L,
                      vec2f_t *p) {
     return (p >= _G._temp_vec2f_buffer) && (p < (_G._temp_vec2f_buffer + 1024));

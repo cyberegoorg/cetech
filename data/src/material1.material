@@ -1,3 +1,7 @@
 shader: shader1
+
 textures:
   u_texColor: texture2
+
+vec4f:
+  u_vec4: [1.0, 1.0, 1.0, 1.0]

@@ -26,6 +26,10 @@ void material_set_texture(material_t material,
                           const char *slot,
                           stringid64_t texture);
 
+void material_set_vec4f(material_t material,
+                        const char *slot,
+                        vec4f_t v);
+
 void material_use(material_t material);
 
 void material_submit(material_t material);
