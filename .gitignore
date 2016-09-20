@@ -1,4 +1,5 @@
 .idea
+.gtm
 *.kdev4
 *~
 *.orig
