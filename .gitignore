@@ -17,3 +17,4 @@ log.yaml
 litelog.db
 
 __pycache__
+/.gtm/

@@ -141,6 +141,22 @@ void forach_vec4fs_clb(yaml_node_t key,
     ARRAY_PUSH(u8, &output->data, (u8 *) &v, sizeof(vec4f_t));
 }
 
+void forach_vec4fs_clb(yaml_node_t key,
+                       yaml_node_t value,
+                       void *_data) {
+    struct material_compile_output *output = _data;
+
+    output->vec4f_count += 1;
+
+    char uniform_name[32] = {0};
+    yaml_as_string(key, uniform_name, CE_ARRAY_LEN(uniform_name) - 1);
+
+    //vec4f_t v = yaml_as_vec4f_t(value);
+// TODO: actual mat44f from yaml, push, 
+    ARRAY_PUSH(char, &output->uniform_names, uniform_name, CE_ARRAY_LEN(uniform_name));
+    ARRAY_PUSH(u8, &output->data, (u8 *) &v, sizeof(vec4f_t));
+}
+
 int _material_resource_compiler(const char *filename,
                                 struct vio *source_vio,
                                 struct vio *build_vio,
@@ -173,6 +189,11 @@ int _material_resource_compiler(const char *filename,
     yaml_node_t vec4 = yaml_get_node(root, "vec4f");
     if (yaml_is_valid(vec4)) {
         yaml_node_foreach_dict(vec4, forach_vec4fs_clb, &output);
+    }
+
+    yaml_node_t mat44 = yaml_get_node(root, "mat44f");
+    if (yaml_is_valid(mat44)) {
+        yaml_node_foreach_dict(mat44, forach_mat44f_clb, &output);
     }
 
     struct material_resource resource = {
