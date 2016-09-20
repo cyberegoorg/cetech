@@ -25,7 +25,7 @@ namespace cetech {
                          "lua/boot",
                          CVar::FLAG_CONST);
 
-        CVar console_server_port("console_server.port",
+        CVar console_server_port("develop.port",
                                  "Console server port.",
                                  2222,
                                  CVar::FLAG_CONST);

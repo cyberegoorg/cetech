@@ -110,7 +110,7 @@ namespace cetech {
             for (uint32_t i = 0; i < count; ++i) {
                 StringId64_t name = name = names[i];
 
-                log::debug("resource_manager",
+                log::debug("resource",
                            "Loading resource " "%" PRIx64 "%" PRIx64 "",
                            type, name);
 
@@ -120,7 +120,7 @@ namespace cetech {
                 FSFile& f = filesystem::open(BUILD_DIR, resource_srt, FSFile::READ);
 
                 if (!f.is_valid()) {
-                    log::error("resource_manager",
+                    log::error("resource",
                                "Could not open resouce (" "%" PRIx64 ", " "%" PRIx64 ").",
                                type,
                                name);
@@ -132,7 +132,7 @@ namespace cetech {
                 char* data = clb(f, memory_globals::default_allocator());
 
                 if (data == nullptr) {
-                    log::error("resource_manager",
+                    log::error("resource",
                                "Could not load resouce (" "%" PRIx64 ", " "%" PRIx64 ").",
                                type,
                                name);
@@ -193,7 +193,7 @@ namespace cetech {
             for (uint32_t i = 0; i < count; ++i) {
                 name = names[i];
 
-                log::debug("resource_manager",
+                log::debug("resource",
                            "Unload resource " "%" PRIx64 "%" PRIx64 "",
                            type, name);
 
@@ -212,7 +212,7 @@ namespace cetech {
                      const StringId64_t* names,
                      const uint32_t count) {
 
-            CE_ASSERT("resource_manager", hash::has(_globals.data->_types_map, type));
+            CE_ASSERT("resource", hash::has(_globals.data->_types_map, type));
 
             const uint32_t type_idx = hash::get < uint32_t > (_globals.data->_types_map, type, 0);
             auto& data_map = _globals.data->_data_map[type_idx];
@@ -241,14 +241,18 @@ namespace cetech {
         const char* get(const StringId64_t type,
                         const StringId64_t name) {
 
-            CE_ASSERT("resource_manager", hash::has(_globals.data->_types_map, type));
+            CE_ASSERT("resource", hash::has(_globals.data->_types_map, type));
 
             const uint32_t type_idx = hash::get < uint32_t > (_globals.data->_types_map, type, 0);
             auto& data_map = _globals.data->_data_map[type_idx];
 
             if (_globals.data->autoreload) {
                 if (!can_get(type, &name, 1)) {
-                    log::warning("resource_manager", "Autoreload " "%" PRIx64 "%" PRIx64 "", type, name);
+                    log::warning("resource", "Autoreload " "%"
+                    PRIx64
+                    "%"
+                    PRIx64
+                    "", type, name);
                     load_now(type, &name, 1);
                 }
             }
@@ -262,10 +266,10 @@ namespace cetech {
                            const resource_online_clb_t online_clb,
                            const resource_offline_clb_t offline_clb) {
 
-            CE_ASSERT("resource_manager", loader_clb != nullptr);
-            CE_ASSERT("resource_manager", unloader_clb != nullptr);
-            CE_ASSERT("resource_manager", online_clb != nullptr);
-            CE_ASSERT("resource_manager", offline_clb != nullptr);
+            CE_ASSERT("resource", loader_clb != nullptr);
+            CE_ASSERT("resource", unloader_clb != nullptr);
+            CE_ASSERT("resource", online_clb != nullptr);
+            CE_ASSERT("resource", offline_clb != nullptr);
 
 
             const uint32_t type_idx = _globals.data->type_count++;

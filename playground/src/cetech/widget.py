@@ -26,7 +26,7 @@ class ReadyLock(QThread):
                 msg = self.socket.recv()
                 msg_yaml = yaml.load(msg)
 
-                if msg_yaml["where"] == 'application.ready':
+                if msg_yaml["where"] == 'core.ready':
                     size = self.engine_widget.size()
                     self.engine_widget.ready = True
                     # self.api.resize(size.width(), size.height())

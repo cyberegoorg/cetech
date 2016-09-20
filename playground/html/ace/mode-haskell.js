@@ -12,7 +12,8 @@ var HaskellHighlightRules = function() {
               'keyword.operator.function.infix.haskell',
               'punctuation.definition.entity.haskell' ],
            regex: '(`)([a-zA-Z_\']*?)(`)',
-           comment: 'In case this regex seems unusual for an infix operator, note that Haskell allows any ordinary function application (elem 4 [1..10]) to be rewritten as an infix expression (4 `elem` [1..10]).' },
+           comment: 'In case this regex seems unusual for an infix operator, note that Haskell allows any ordinary function core (elem 4 [1..10]) to be rewritten as an infix expression (4 `elem` [1..10]).'
+       },
          { token: 'constant.language.unit.haskell', regex: '\\(\\)' },
          { token: 'constant.language.empty-list.haskell',
            regex: '\\[\\]' },

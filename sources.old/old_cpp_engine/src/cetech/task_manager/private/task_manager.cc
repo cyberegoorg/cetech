@@ -231,7 +231,7 @@ namespace cetech {
                     size_t idx = --tm._open_task_count;
                     tm._open_task[i] = tm._open_task[idx];
 
-                    //log::info("task", "%d task %s done.", application::get_frame_id(), task->name);
+                    //log::info("task", "%d task %s done.", core::get_frame_id(), task->name);
 
                     task->used = 0;
                     break;

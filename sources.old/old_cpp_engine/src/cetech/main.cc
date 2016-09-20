@@ -220,8 +220,8 @@ bool big_init() {
         log::info("main", "Wating for clients.");
 
         // TODO: Rewrite wait method. rpc call.
-        //         while (!console_server::has_clients()) {
-        //             console_server::tick(); // TODO: spawn task in init
+        //         while (!develop::has_clients()) {
+        //             develop::tick(); // TODO: spawn task in init
         //         }
 
         log::debug("main", "Client connected.");

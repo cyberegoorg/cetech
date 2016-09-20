@@ -5,7 +5,8 @@
 // Includes
 //==============================================================================
 
-#include "engine/world_system/types.h"
+#include <engine/core/types.h>
+#include "engine/components/types.h"
 #include "celib/window/types.h"
 #include "celib/math/types.h"
 

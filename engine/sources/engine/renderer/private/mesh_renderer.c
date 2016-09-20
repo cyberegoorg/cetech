@@ -4,12 +4,13 @@
 #include <celib/containers/map.h>
 #include <celib/stringid/stringid.h>
 
-#include <engine/memory_system/memory_system.h>
-#include <engine/entcom/entcom.h>
+#include <engine/core/memory_system.h>
+#include <engine/core/entcom.h>
 #include <engine/renderer/material.h>
 #include <bgfx/c99/bgfx.h>
-#include <engine/world_system/transform.h>
+#include <engine/components/transform.h>
 #include <engine/renderer/mesh_renderer.h>
+#include <engine/components/transform.h>
 
 #include "../mesh_renderer.h"
 

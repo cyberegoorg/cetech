@@ -44,7 +44,7 @@ namespace cetech {
             char packet[4096];     //!< Final msg.
             int len = snprintf(packet, 4096, LOG_FORMAT, level_to_str[level], where, time, worker_id, msg);
             int bytes = nn_send(socket, packet, len, 0);
-            CE_ASSERT("console_server", bytes == len);
+            CE_ASSERT("develop", bytes == len);
         }
 
         struct ConsoleServerData {
@@ -88,7 +88,7 @@ namespace cetech {
 
             command_clb_t cmd = hash::get < command_clb_t > (data->cmds, stringid64::from_cstring(cmd_name), nullptr);
             if (cmd == nullptr) {
-                log::error("console_server", "Command \"%s\" not found.", cmd_name);
+                log::error("develop", "Command \"%s\" not found.", cmd_name);
                 return;
             }
 
@@ -108,7 +108,7 @@ namespace cetech {
                       size_t size) {
             int socket = _globals.data->dev_pub_socket;
             size_t bytes = nn_send(socket, buffer, size, 0);
-            CE_ASSERT("console_server", bytes == size);
+            CE_ASSERT("develop", bytes == size);
         }
 
         void send_msg(const Array < char >& msg) {
@@ -123,7 +123,7 @@ namespace cetech {
             char* buf = NULL;
             int bytes = nn_recv(socket, &buf, NN_MSG, NN_DONTWAIT);
             if (bytes < 0) {
-                CE_ASSERT("console_server", errno == EAGAIN );
+                CE_ASSERT("develop", errno == EAGAIN);
                 develop_manager::leave_scope("ConsoleServer::tick()", time);
                 return;
             }
@@ -143,10 +143,10 @@ namespace cetech {
 
             mpack_finish_map(&writer);
 
-            CE_ASSERT("console_server", mpack_writer_destroy(&writer) == mpack_ok);
+            CE_ASSERT("develop", mpack_writer_destroy(&writer) == mpack_ok);
 
             bytes = nn_send(socket, data, size, 0);
-            CE_ASSERT("console_server", (size_t)bytes == size);
+            CE_ASSERT("develop", (size_t) bytes == size);
 
             develop_manager::leave_scope("ConsoleServer::tick()", time);
         }
@@ -160,14 +160,14 @@ namespace cetech {
             _globals.data = new(p) ConsoleServerData(memory_globals::default_allocator());
 
             int socket = nn_socket(AF_SP, NN_PUB);
-            CE_ASSERT("console_server", socket >= 0);
-            CE_ASSERT("console_server", nn_bind(socket, "ws://*:5556") >= 0);
+            CE_ASSERT("develop", socket >= 0);
+            CE_ASSERT("develop", nn_bind(socket, "ws://*:5556") >= 0);
             _globals.data->dev_pub_socket = socket;
             log::register_handler(&nanolog_handler, (void*)(intptr_t)socket);
 
             socket = nn_socket(AF_SP, NN_REP);
-            CE_ASSERT("console_server", socket >= 0);
-            CE_ASSERT("console_server", nn_bind(socket, "tcp://*:5557") >= 0);
+            CE_ASSERT("develop", socket >= 0);
+            CE_ASSERT("develop", nn_bind(socket, "tcp://*:5557") >= 0);
             _globals.data->dev_rep_socket = socket;
         }
 

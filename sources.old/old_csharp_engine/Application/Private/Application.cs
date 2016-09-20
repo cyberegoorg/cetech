@@ -36,13 +36,13 @@ namespace CETech
 
             ResourceManager.InitConfig();
 
-            ConfigSystem.CreateValue("application.platform", "Platform", GetPlatform());
-            ConfigSystem.CreateValue("application.log_file", "Log file", "");
+            ConfigSystem.CreateValue("core.platform", "Platform", GetPlatform());
+            ConfigSystem.CreateValue("core.log_file", "Log file", "");
 
             ConfigSystem.CreateValue("boot.pkg", "Boot package", "boot");
             ConfigSystem.CreateValue("boot.script", "Boot script", "lua/boot");
 
-            ConfigSystem.CreateValue("window.title", "main window title", "CETech application");
+            ConfigSystem.CreateValue("window.title", "main window title", "CETech core");
             ConfigSystem.CreateValue("window.width", "main window width", 800);
             ConfigSystem.CreateValue("window.height", "main window height", 600);
 
@@ -82,7 +82,7 @@ namespace CETech
 
             var last_frame_tick = DateTime.Now;
             DateTime curent_frame_tick;
-            Log.Info("application.ready", "");
+            Log.Info("core.ready", "");
 
             var tasks = new int[2];
 
@@ -103,7 +103,7 @@ namespace CETech
                     frame_acum = 0.0f;
 
                     DevelopSystem.FrameBegin();
-                    DevelopSystem.PushRecordFloat("application.dt", _deltaTime);
+                    DevelopSystem.PushRecordFloat("core.dt", _deltaTime);
                     var updateScope = DevelopSystem.EnterScope();
 
                     PlaformUpdateEvents();
@@ -285,12 +285,12 @@ namespace CETech
 
             if (log_file != null)
             {
-                ConfigSystem.SetValue("application.log_file", log_file);
+                ConfigSystem.SetValue("core.log_file", log_file);
             }
 
             if (build_dir != null)
             {
-                ConfigSystem.SetValue("resource_manager.build", build_dir);
+                ConfigSystem.SetValue("resource.build", build_dir);
             }
 
             return true;
@@ -388,7 +388,7 @@ namespace CETech
         {
             Log.LogEvent += LogHandler.ConsoleLog;
 
-            var log_file = ConfigSystem.String("application.log_file");
+            var log_file = ConfigSystem.String("core.log_file");
             if (log_file.Length != 0)
             {
                 Log.LogEvent += new LogHandler.FileLog(log_file).Log;
@@ -414,8 +414,8 @@ namespace CETech
 #endif
 
             FileSystem.MapRootDir("build",
-                Path.Combine(ConfigSystem.String("resource_manager.build"),
-                    ConfigSystem.String("application.platform")));
+                                  Path.Combine(ConfigSystem.String("resource.build"),
+                                               ConfigSystem.String("core.platform")));
 
             TaskManager.Init();
 

@@ -150,7 +150,7 @@ namespace cetech {
 
             int socket = _globals.data->dev_pub_socket;
             size_t bytes = nn_send(socket, data, size, 0);
-            CE_ASSERT("console_server", bytes == size);
+            CE_ASSERT("develop", bytes == size);
         }
 
         void push_begin_frame() {

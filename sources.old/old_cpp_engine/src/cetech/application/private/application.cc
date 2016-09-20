@@ -189,7 +189,7 @@ namespace cetech {
         //         }
         //
         //         static void console_server_tick(void* data) {
-        //             console_server::tick();
+        //             develop::tick();
         //         }
         //
         //         static void frame_tick(void* _data) {
@@ -235,7 +235,7 @@ namespace cetech {
         void run() {
             init();
 
-            CE_ASSERT("application", _globals.data != nullptr);
+            CE_ASSERT("core", _globals.data != nullptr);
 
             ApplictionData& data = *_globals.data;
 

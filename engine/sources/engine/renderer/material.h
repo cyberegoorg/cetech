@@ -2,7 +2,7 @@
 #define CETECH_BGFX_MATERIAL_H
 
 #include <celib/stringid/types.h>
-#include <engine/entcom/types.h>
+#include <engine/core/types.h>
 
 int material_resource_init();
 

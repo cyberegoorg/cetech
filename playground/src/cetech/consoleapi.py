@@ -15,7 +15,7 @@ class ConsoleAPI(ConsoleProxy):
         return self.send_command('renderer.resize', width=w, height=h)
 
     def reload_all(self, types):
-        return self.send_command('resource_manager.reload_all', types=types)
+        return self.send_command('resource.reload_all', types=types)
 
     def quit(self):
         return self.send_command('lua.execute', script="Application.Quit();")

@@ -2,8 +2,8 @@
 #define CETECH_MESH_RENDERER_H
 
 #include <celib/stringid/types.h>
-#include "../world_system/types.h"
-#include "../entcom/types.h"
+#include "../components/types.h"
+#include "engine/core/types.h"
 #include "material.h"
 
 typedef struct {

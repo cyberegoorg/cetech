@@ -27,7 +27,7 @@ var AppleScriptHighlightRules = function() {
     );
 
     var builtinTypes = (
-        "alias|application|boolean|class|constant|date|file|integer|list|" +
+        "alias|core|boolean|class|constant|date|file|integer|list|" +
         "number|real|record|string|text|character|characters|contents|day|" +
         "frontmost|id|item|length|month|name|paragraph|paragraphs|rest|" +
         "reverse|running|time|version|weekday|word|words|year"
@@ -67,13 +67,13 @@ var AppleScriptHighlightRules = function() {
           'set volume|system attribute|system info|time to GMT|' +
           '(load|run|store) script|scripting components|' +
           'ASCII (character|number)|localized string|' +
-          'choose (application|color|file|file name|' +
-          'folder|from list|remote application|URL)|' +
+                'choose (core|color|file|file name|' +
+                'folder|from list|remote core|URL)|' +
           'display (alert|dialog))\\b|^\\s*return\\b'
             },
             {
                 token: "constant.language",
-                regex: '\\b(text item delimiters|current application|missing value)\\b'
+                regex: '\\b(text item delimiters|current core|missing value)\\b'
             },
             {
                 token: "keyword",

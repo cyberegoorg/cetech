@@ -4,7 +4,7 @@
 
 #include <celib/stringid/types.h>
 #include <celib/math/types.h>
-#include <engine/world_system/camera.h>
+#include <engine/components/camera.h>
 #include <celib/stringid/stringid.h>
 #include <engine/renderer/mesh_renderer.h>
 #include "celib/window/window.h"

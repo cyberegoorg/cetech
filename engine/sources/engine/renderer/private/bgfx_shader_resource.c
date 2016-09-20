@@ -13,10 +13,10 @@
 #include "celib/os/vio.h"
 #include "celib/os/fs.h"
 
-#include "engine/memory_system/memory_system.h"
-#include "engine/application/application.h"
-#include "engine/resource_manager/resource_manager.h"
-#include "engine/resource_manager/resource_compiler.h"
+#include "engine/core/memory_system.h"
+#include "engine/core/application.h"
+#include "engine/core/resource_manager.h"
+#include "engine/develop/resource_compiler.h"
 
 
 //==============================================================================

@@ -557,13 +557,13 @@ snippet lia+\n\
 snippet link\n\
 	<link rel=\"${1}\" href=\"${2}\" title=\"${3}\" type=\"${4}\" />${5}\n\
 snippet link:atom\n\
-	<link rel=\"alternate\" href=\"${1:atom.xml}\" title=\"Atom\" type=\"application/atom+xml\" />${2}\n\
+	<link rel=\"alternate\" href=\"${1:atom.xml}\" title=\"Atom\" type=\"core/atom+xml\" />${2}\n\
 snippet link:css\n\
 	<link rel=\"stylesheet\" href=\"${2:style.css}\" type=\"text/css\" media=\"${3:all}\" />${4}\n\
 snippet link:favicon\n\
 	<link rel=\"shortcut icon\" href=\"${1:favicon.ico}\" type=\"image/x-icon\" />${2}\n\
 snippet link:rss\n\
-	<link rel=\"alternate\" href=\"${1:rss.xml}\" title=\"RSS\" type=\"application/atom+xml\" />${2}\n\
+	<link rel=\"alternate\" href=\"${1:rss.xml}\" title=\"RSS\" type=\"core/atom+xml\" />${2}\n\
 snippet link:touch\n\
 	<link rel=\"apple-touch-icon\" href=\"${1:favicon.png}\" />${2}\n\
 snippet map\n\

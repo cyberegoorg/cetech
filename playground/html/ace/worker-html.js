@@ -2051,7 +2051,7 @@ StackItem.prototype.isHtmlIntegrationPoint = function() {
 		if (!encoding)
 			return false;
 		encoding = encoding.toLowerCase();
-		return encoding === "text/html" || encoding === "application/xhtml+xml";
+        return encoding === "text/html" || encoding === "core/xhtml+xml";
 	}
 	if (this.namespaceURI === "http://www.w3.org/2000/svg") {
 		return this.localName === "foreignObject"

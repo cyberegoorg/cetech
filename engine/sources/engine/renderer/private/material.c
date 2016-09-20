@@ -12,9 +12,9 @@
 #include "celib/containers/map.h"
 #include "celib/os/vio.h"
 
-#include "engine/memory_system/memory_system.h"
-#include "engine/resource_manager/resource_manager.h"
-#include "engine/resource_manager/resource_compiler.h"
+#include "engine/core/memory_system.h"
+#include "engine/core/resource_manager.h"
+#include "engine/develop/resource_compiler.h"
 #include "bgfx_texture_resource.h"
 #include "bgfx_shader_resource.h"
 

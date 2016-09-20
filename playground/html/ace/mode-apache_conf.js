@@ -152,7 +152,8 @@ var ApacheConfHighlightRules = function() {
               'punctuation.variable.apacheconf' ],
            regex: '(%\\{)(?:(HTTP_USER_AGENT|HTTP_REFERER|HTTP_COOKIE|HTTP_FORWARDED|HTTP_HOST|HTTP_PROXY_CONNECTION|HTTP_ACCEPT|REMOTE_ADDR|REMOTE_HOST|REMOTE_PORT|REMOTE_USER|REMOTE_IDENT|REQUEST_METHOD|SCRIPT_FILENAME|PATH_INFO|QUERY_STRING|AUTH_TYPE|DOCUMENT_ROOT|SERVER_ADMIN|SERVER_NAME|SERVER_ADDR|SERVER_PORT|SERVER_PROTOCOL|SERVER_SOFTWARE|TIME_YEAR|TIME_MON|TIME_DAY|TIME_HOUR|TIME_MIN|TIME_SEC|TIME_WDAY|TIME|API_VERSION|THE_REQUEST|REQUEST_URI|REQUEST_FILENAME|IS_SUBREQ|HTTPS)|(.*?))(\\})' },
          { token: [ 'entity.mime-type.apacheconf', 'text' ],
-           regex: '\\b((?:text|image|application|video|audio)/.+?)(\\s)' },
+             regex: '\\b((?:text|image|core|video|audio)/.+?)(\\s)'
+         },
          { token: 'entity.helper.apacheconf',
            regex: '\\b(?:from|unset|set|on|off)\\b',
            caseInsensitive: true },
