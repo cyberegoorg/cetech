@@ -16,7 +16,7 @@
 //==============================================================================
 
 typedef char cacheline_pad_t[64];
-struct queue_task {
+struct task_queue {
     u32 *_data;
     cacheline_pad_t _pad1;
     atomic_int *_sequences;
@@ -33,10 +33,10 @@ struct queue_task {
 };
 
 
-void queue_task_init(struct queue_task *q,
+void queue_task_init(struct task_queue *q,
                      u32 capacity,
                      struct allocator *allocator) {
-    *q = (struct queue_task) {0};
+    *q = (struct task_queue) {0};
 
     q->_capacityMask = capacity - 1;
     q->allocator = allocator;
@@ -56,7 +56,7 @@ void queue_task_init(struct queue_task *q,
     atomic_init(&q->_dequeuePos, 0);
 }
 
-void queue_task_destroy(struct queue_task *q) {
+void queue_task_destroy(struct task_queue *q) {
     CE_DEALLOCATE(q->allocator, q->_data);
     CE_DEALLOCATE(q->allocator, q->_sequences);
 }
@@ -68,7 +68,7 @@ void queue_task_destroy(struct queue_task *q) {
 //    return e > d ? e - d : d - e;
 //}
 
-int queue_task_push(struct queue_task *q,
+int queue_task_push(struct task_queue *q,
                     u32 value) {
     int pos = atomic_load_explicit(&q->_enqueuePos, memory_order_relaxed);
 
@@ -95,7 +95,7 @@ int queue_task_push(struct queue_task *q,
     return 1;
 }
 
-int queue_task_pop(struct queue_task *q,
+int queue_task_pop(struct task_queue *q,
                    u32 *value,
                    u32 defaultt) {
     int pos = atomic_load_explicit(&q->_dequeuePos, memory_order_relaxed);

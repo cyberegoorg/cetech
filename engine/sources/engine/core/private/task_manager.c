@@ -11,7 +11,7 @@
 #include <celib/os/cpu.h>
 #include "engine/core/types.h"
 
-#include "queue_task.h"
+#include "task_queue.h"
 
 
 //==============================================================================
@@ -49,8 +49,8 @@ static __thread char _worker_id = 0;
 static struct G {
     struct task _taskPool[MAX_TASK];
     char _openTasks[MAX_TASK];
-    struct queue_task _gloalQueue[3];
-    struct queue_task _workersQueue[TASK_MAX_WORKERS * 3];
+    struct task_queue _gloalQueue[3];
+    struct task_queue _workersQueue[TASK_MAX_WORKERS * 3];
     thread_t _workers[TASK_MAX_WORKERS - 1];
     atomic_int _task_pool_idx;
     int _workers_count;
@@ -79,7 +79,7 @@ static void _push_task(task_t t) {
     int priority = _G._taskPool[t.id].priority;
     int affinity = _G._taskPool[t.id].affinity;
 
-    struct queue_task *q;
+    struct task_queue *q;
     switch (_G._taskPool[t.id].affinity) {
         case TASK_AFFINITY_NONE:
             q = &_G._gloalQueue[priority];
@@ -97,7 +97,7 @@ static int _task_is_done(task_t task) {
     return !_G._openTasks[task.id];
 }
 
-static task_t _try_pop(struct queue_task *q) {
+static task_t _try_pop(struct task_queue *q) {
     u32 poped_task;
 
     if (queue_task_pop(q, &poped_task, 0)) {
@@ -132,8 +132,8 @@ static task_t _task_pop_new_work() {
     task_t popedTask;
 
     for (u32 i = 0; i < 3; ++i) {
-        struct queue_task *qw = &_G._workersQueue[_worker_id * 3 + i];
-        struct queue_task *qg = &_G._gloalQueue[i];
+        struct task_queue *qw = &_G._workersQueue[_worker_id * 3 + i];
+        struct task_queue *qg = &_G._gloalQueue[i];
 
         popedTask = _try_pop(qw);
         if (popedTask.id != 0) {

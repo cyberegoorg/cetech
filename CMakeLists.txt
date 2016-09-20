@@ -180,7 +180,7 @@ set(SOURCE_FILES
         celib/sources/celib/os/private/path.c
 
         engine/sources/engine/core/private/resource_manager..c
-        engine/sources/engine/core/private/package.c
+        engine/sources/engine/core/private/resource_package.c
 
         engine/sources/engine/renderer/private/bgx_renderer.c
         engine/sources/engine/renderer/private/bgfx_texture_resource.c

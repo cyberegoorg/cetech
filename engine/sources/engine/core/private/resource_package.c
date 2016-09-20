@@ -14,7 +14,7 @@
 #include <engine/core/memory_system.h>
 
 #include "engine/core/resource_manager.h"
-#include "package.h"
+#include "resource_package.h"
 
 //==============================================================================
 // Public interface
