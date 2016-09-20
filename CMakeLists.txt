@@ -146,6 +146,7 @@ set(SOURCE_FILES
         engine/sources/engine/lua_system/private/api/api_mat44f.c
         engine/sources/engine/lua_system/private/api/api_mesh.c
         engine/sources/engine/lua_system/private/api/api_material.c
+        engine/sources/engine/lua_system/private/api/api_package.c
 
         engine/sources/engine/cvar/private/cvar.c
         engine/sources/engine/console_server/private/console_server.c
