@@ -148,7 +148,7 @@ int cvar_parse_args(struct args args) {
 
                 case CV_INT:
                     sscanf(value, "%d", &tmp_var.i);
-                    cvar_set_float(cvar, tmp_var.i);
+                    cvar_set_int(cvar, tmp_var.i);
                     break;
 
                 case CV_STRING:

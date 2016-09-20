@@ -161,7 +161,7 @@ function Game:update(dt)
             self.fps_camera.fly_mode = false
         end
 
-        self.fps_camera:update(dt, right_a.x * -0.1, right_a.y * -0.1, left_a.y * 10, left_a.x * 10)
+        self.fps_camera:update(dt, right_a.x * -1.0, right_a.y * -1.0, left_a.y * 10, left_a.x * 10)
     end
 
     --

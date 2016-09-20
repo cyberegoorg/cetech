@@ -40,8 +40,8 @@ function FPSCamera:update(dt, dx, dy, updown, leftright)
     pos = pos + x_dir * leftright * dt
 
     -- Rotation
-    local rotation_around_world_up = Quatf.from_axis_angle(Vec3f.unit_y(), dx * 1 * 1)
-    local rotation_around_camera_right = Quatf.from_axis_angle(x_dir, -dy * 1 * 1)
+    local rotation_around_world_up = Quatf.from_axis_angle(Vec3f.unit_y(), dx * dt * 100)
+    local rotation_around_camera_right = Quatf.from_axis_angle(x_dir, -dy * dt * 100)
     local rotation = rotation_around_world_up * rotation_around_camera_right
 
     Transform.set_position(self.world, self.transform, pos)

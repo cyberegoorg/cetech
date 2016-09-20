@@ -37,6 +37,9 @@ static struct G {
     window_t main_window;
     cvar_t cv_boot_pkg;
     cvar_t cv_boot_script;
+    cvar_t cv_screen_x;
+    cvar_t cv_screen_y;
+    cvar_t cv_fullscreen;
     struct args args;
     int is_running;
     int init_error;
@@ -82,6 +85,10 @@ int application_init(int argc,
 
     _G.cv_boot_pkg = cvar_new_str("core.boot_pkg", "Boot package", "boot");
     _G.cv_boot_script = cvar_new_str("core.boot_scrpt", "Boot script", "lua/boot");
+
+    _G.cv_screen_x = cvar_new_int("screen.x", "Screen width", 1024);
+    _G.cv_screen_y = cvar_new_int("screen.y", "Screen height", 768);
+    _G.cv_fullscreen = cvar_new_int("screen.fullscreen", "Fullscreen", 0);
 
     // Cvar stage
     for (int i = 0; i < STATIC_SYSTEMS_SIZE; ++i) {
@@ -235,13 +242,12 @@ void application_start() {
             "Cetech",
             WINDOWPOS_UNDEFINED,
             WINDOWPOS_UNDEFINED,
-            1024, 768,
-            WINDOW_NOFLAG
+            cvar_get_int(_G.cv_screen_x), cvar_get_int(_G.cv_screen_y),
+            cvar_get_int(_G.cv_fullscreen) ? WINDOW_FULLSCREEN : WINDOW_NOFLAG
     );
     renderer_create(_G.main_window);
 
     _boot_stage();
-
 
     uint32_t last_tick = os_get_ticks();
     _G.game = luasys_get_game_callbacks();
@@ -260,7 +266,6 @@ void application_start() {
 
         machine_process();
         _dump_event();
-
 
         task_t frame_task = taskmanager_add_null("frame", task_null, task_null, TASK_PRIORITY_HIGH, TASK_AFFINITY_NONE);
 
