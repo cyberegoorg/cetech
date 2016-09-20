@@ -1,4 +1,12 @@
 .idea
+.gtm
+.vagrant
+
+build
+site
+
+__pycache__
+
 *.kdev4
 *~
 *.orig
@@ -8,13 +16,4 @@
 *.speccache
 *.iml
 
-/build/
-site/
-.vagrant/
-
-.directory
-log.yaml
-litelog.db
-
-__pycache__
-/.gtm/
+log.db
