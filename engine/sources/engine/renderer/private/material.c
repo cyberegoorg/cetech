@@ -39,6 +39,10 @@ typedef struct material_resource {
     // texture_names + texture_count : vec4f vec4f_value [vec4f_count]
 } material_resource_t;
 
+#define material_resource_uniform_names(r) ((char*) ((r)+1))
+#define material_resource_uniform_texture(r) ((stringid64_t*) ((material_resource_uniform_names(r)+(32*((r)->uniforms_count)))))
+#define material_resource_uniform_vec4f(r) ((vec4f_t*) ((material_resource_uniform_texture(r)+((r)->texture_count))))
+#define material_resource_uniform_bgfx(r) ((bgfx_uniform_handle_t*) ((material_resource_uniform_vec4f(r)+((r)->vec4f_count))))
 
 ARRAY_PROTOTYPE(material_resource_t)
 
@@ -141,7 +145,7 @@ void forach_vec4fs_clb(yaml_node_t key,
     ARRAY_PUSH(u8, &output->data, (u8 *) &v, sizeof(vec4f_t));
 }
 
-void forach_vec4fs_clb(yaml_node_t key,
+void forach_mat44f_clb(yaml_node_t key,
                        yaml_node_t value,
                        void *_data) {
     struct material_compile_output *output = _data;
@@ -153,8 +157,8 @@ void forach_vec4fs_clb(yaml_node_t key,
 
     //vec4f_t v = yaml_as_vec4f_t(value);
 // TODO: actual mat44f from yaml, push, 
-    ARRAY_PUSH(char, &output->uniform_names, uniform_name, CE_ARRAY_LEN(uniform_name));
-    ARRAY_PUSH(u8, &output->data, (u8 *) &v, sizeof(vec4f_t));
+//    ARRAY_PUSH(char, &output->uniform_names, uniform_name, CE_ARRAY_LEN(uniform_name));
+//    ARRAY_PUSH(u8, &output->data, (u8 *) &v, sizeof(vec4f_t));
 }
 
 int _material_resource_compiler(const char *filename,
@@ -367,8 +371,8 @@ void material_set_texture(material_t material,
 
     struct material_resource *resource = (struct material_resource *) &_G.material_instance_data.data[_G.material_instance_offset.data[idx]];
 
-    char *u_names = (char *) (resource + 1);
-    stringid64_t *u_texture = (stringid64_t *) (u_names + (32 * resource->uniforms_count));
+
+    stringid64_t *u_texture = material_resource_uniform_texture(resource);
 
     int slot_idx = _material_find_slot(resource, slot);
 
@@ -387,9 +391,8 @@ void material_set_vec4f(material_t material,
 
     struct material_resource *resource = (struct material_resource *) &_G.material_instance_data.data[_G.material_instance_offset.data[idx]];
 
-    char *u_names = (char *) (resource + 1);
-    stringid64_t *u_texture = (stringid64_t *) (u_names + (32 * resource->uniforms_count));
-    vec4f_t *u_vec4f = (vec4f_t *) (u_texture + resource->texture_count);
+
+    vec4f_t *u_vec4f = material_resource_uniform_vec4f(resource);
 
     int slot_idx = _material_find_slot(resource, slot);
 
@@ -405,10 +408,9 @@ void material_use(material_t material) {
 
     struct material_resource *resource = (struct material_resource *) &_G.material_instance_data.data[_G.material_instance_offset.data[idx]];
 
-    char *u_names = (char *) (resource + 1);
-    stringid64_t *u_texture = (stringid64_t *) (u_names + (32 * resource->uniforms_count));
-    vec4f_t *u_vec4f = (vec4f_t *) (u_texture + resource->texture_count);
-    bgfx_uniform_handle_t *u_handler = (bgfx_uniform_handle_t *) (u_vec4f + resource->vec4f_count);
+    stringid64_t *u_texture = material_resource_uniform_texture(resource);
+    vec4f_t *u_vec4f = material_resource_uniform_vec4f(resource);
+    bgfx_uniform_handle_t *u_handler = material_resource_uniform_bgfx(resource);
 
     for (int i = 0; i < resource->texture_count; ++i) {
         bgfx_set_texture(i, u_handler[i], texture_resource_get(u_texture[i]), 0);
