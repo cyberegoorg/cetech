@@ -19,9 +19,6 @@ material_t material_resource_create(stringid64_t name);
 
 u32 material_get_texture_count(material_t material);
 
-//u32 material_find_slot(material_t material,
-//                       const char *name);
-
 void material_set_texture(material_t material,
                           const char *slot,
                           stringid64_t texture);
@@ -29,6 +26,15 @@ void material_set_texture(material_t material,
 void material_set_vec4f(material_t material,
                         const char *slot,
                         vec4f_t v);
+
+void material_set_mat33f(material_t material,
+                         const char *slot,
+                         mat33f_t v);
+
+void material_set_mat44f(material_t material,
+                         const char *slot,
+                         mat44f_t v);
+
 
 void material_use(material_t material);
 

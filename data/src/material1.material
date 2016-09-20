@@ -1,7 +1,18 @@
 shader: shader1
 
 textures:
-  u_texColor: texture2
+  u_texColor: texture2 # texture2.texture
 
 vec4f:
   u_vec4: [1.0, 1.0, 1.0, 1.0]
+
+mat33f:
+  u_m33: [[1.0, 1.0, 1.0],
+          [1.0, 1.0, 1.0],
+          [1.0, 1.0, 1.0]]
+
+mat44f:
+  u_m44: [[1.0, 1.0, 1.0, 1.0],
+          [1.0, 1.0, 1.0, 1.0],
+          [1.0, 1.0, 1.0, 1.0],
+          [1.0, 1.0, 1.0, 1.0]]

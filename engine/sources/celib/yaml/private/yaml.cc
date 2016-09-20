@@ -220,6 +220,61 @@ vec4f_t yaml_as_vec4f_t(yaml_node_t body) {
     return v;
 }
 
+mat44f_t yaml_as_mat44f_t(yaml_node_t body) {
+    CE_ASSERT("yaml", yaml_is_valid(body));
+
+    mat44f_t m = {0};
+
+    yaml_node_t x = yaml_get_seq_node(body, 0);
+    CE_ASSERT("yaml", yaml_is_valid(x));
+    m.x = yaml_as_vec4f_t(x);
+    yaml_node_free(x);
+
+
+    yaml_node_t y = yaml_get_seq_node(body, 1);
+    CE_ASSERT("yaml", yaml_is_valid(y));
+    m.y = yaml_as_vec4f_t(y);
+    yaml_node_free(y);
+
+
+    yaml_node_t z = yaml_get_seq_node(body, 2);
+    CE_ASSERT("yaml", yaml_is_valid(z));
+    m.z = yaml_as_vec4f_t(z);
+    yaml_node_free(z);
+
+    yaml_node_t w = yaml_get_seq_node(body, 3);
+    CE_ASSERT("yaml", yaml_is_valid(w));
+    m.z = yaml_as_vec4f_t(w);
+    yaml_node_free(w);
+
+    return m;
+}
+
+mat33f_t yaml_as_mat33f_t(yaml_node_t body) {
+    CE_ASSERT("yaml", yaml_is_valid(body));
+
+    mat33f_t m = {0};
+
+    yaml_node_t x = yaml_get_seq_node(body, 0);
+    CE_ASSERT("yaml", yaml_is_valid(x));
+    m.x = yaml_as_vec3f_t(x);
+    yaml_node_free(x);
+
+
+    yaml_node_t y = yaml_get_seq_node(body, 1);
+    CE_ASSERT("yaml", yaml_is_valid(y));
+    m.y = yaml_as_vec3f_t(y);
+    yaml_node_free(y);
+
+
+    yaml_node_t z = yaml_get_seq_node(body, 2);
+    CE_ASSERT("yaml", yaml_is_valid(z));
+    m.z = yaml_as_vec3f_t(z);
+    yaml_node_free(z);
+
+    return m;
+}
+
 #define YAML_NODE_AS_DECL(type)\
     extern "C" type yaml_as_##type(yaml_node_t node) {\
         yamlcpp_handler *nh = (yamlcpp_handler *) node.doc.d;\
