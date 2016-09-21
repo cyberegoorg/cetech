@@ -23,10 +23,10 @@ function Game:init()
     --    self.viewport = Renderer.GetViewport("default")
     self.world = World.create()
 
-    self.unit = Unit.spawn(self.world, "unit1");
-    local t = Transform.get(self.world, self.unit)
-    local p = Transform.get_scale(self.world, t)
-    Log.debug("lua", "%f %f %f", p.x, p.y, p.z)
+    --    self.unit = Unit.spawn(self.world, "unit1");
+    --    local t = Transform.get(self.world, self.unit)
+    --    local p = Transform.get_scale(self.world, t)
+    --    Log.debug("lua", "%f %f %f", p.x, p.y, p.z)
 
     --    self.level = World.LoadLevel(self.world, "level1");
     --    self.level = World.LoadLevel(self.world, "level1",
@@ -46,6 +46,8 @@ function Game:init()
     self.debug = false
     self.capture = false
     self.switch_unit = false
+
+    World.load_level(self.world, "level1")
 end
 
 function Game:shutdown()

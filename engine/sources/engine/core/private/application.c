@@ -234,7 +234,12 @@ static void _boot_unload() {
 }
 
 void application_start() {
+#if defined(CETECH_DEVELOP)
     resource_set_autoload(1);
+#else
+    resource_set_autoload(0);
+#endif
+
     resource_compiler_compile_all();
 
 

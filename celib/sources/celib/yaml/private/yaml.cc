@@ -29,14 +29,14 @@ struct yamlcpp_handler {
 static inline void _yaml_merge_internal(YAML::Node &root,
                                         const YAML::Node &parent) {
     for (YAML::const_iterator it = parent.begin(); it != parent.end(); ++it) {
-        auto node = root[it->first];
+        auto str = it->first.as<std::string>();
+        auto node = root[str];
 
         if (!node) {
-            root[it->first] = it->second;
+            root[str] = it->second;
         } else {
-            if (node.IsMap()) {
-                auto rnode = root[it->first];
-                _yaml_merge_internal(rnode, it->second);
+            if (it->second.IsMap()) {
+                _yaml_merge_internal(node, it->second);
             }
         }
     }
@@ -150,12 +150,12 @@ extern "C" int yaml_as_string(yaml_node_t node,
 
 extern "C" void yaml_merge(yaml_node_t root,
                            yaml_node_t parent) {
+
     yamlcpp_handler *root_h = (yamlcpp_handler *) root.doc.d;
     yamlcpp_handler *parent_h = (yamlcpp_handler *) parent.doc.d;
 
     auto root_node = root_h->nodes[root.idx];
     auto parent_node = parent_h->nodes[parent.idx];
-
     _yaml_merge_internal(root_node, parent_node);
 }
 
