@@ -36,6 +36,15 @@ static int _level_unit_by_id(lua_State *l) {
     return 1;
 }
 
+static int _level_unit(lua_State *l) {
+    level_t level = {.idx = luasys_to_int(l, 1)};
+
+    entity_t ent = level_unit(level);
+
+    luasys_push_int(l, ent.idx);
+    return 1;
+}
+
 void _register_lua_world_api() {
     luasys_add_module_function(API_NAME, "create", _world_create);
     luasys_add_module_function(API_NAME, "destroy", _world_destroy);
@@ -43,4 +52,5 @@ void _register_lua_world_api() {
     luasys_add_module_function(API_NAME, "load_level", _load_level);
 
     luasys_add_module_function(API_NAME, "unit_by_id", _level_unit_by_id);
+    luasys_add_module_function(API_NAME, "level_unit", _level_unit);
 }

@@ -45,4 +45,6 @@ level_t world_load_level(world_t world,
 entity_t level_unit_by_id(level_t level,
                           stringid64_t name);
 
+entity_t level_unit(level_t level);
+
 #endif //CETECH_WORLD_SYSTEM_H

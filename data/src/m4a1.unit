@@ -11,7 +11,6 @@ components:
     mesh: "geom_0"
     material: "content/scene/m4a1/m4a1"
 
-
 children:
   "e432c0ed88dd461e81f50973ffb00263":
       components:

@@ -291,3 +291,8 @@ entity_t level_unit_by_id(level_t level,
     struct level_instance *instance = _level_instance(level);
     return MAP_GET(entity_t, &instance->spawned_entity, id.id, (entity_t) {0});
 }
+
+entity_t level_unit(level_t level) {
+    struct level_instance *instance = _level_instance(level);
+    return instance->level_entity;
+}
