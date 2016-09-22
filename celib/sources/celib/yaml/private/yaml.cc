@@ -1,7 +1,7 @@
 #include <string>
-#include "../../math/types.h"
 
 extern "C" {
+#include "../../math/types.h"
 #include "../../errors/errors.h"
 #include "../yaml.h"
 }

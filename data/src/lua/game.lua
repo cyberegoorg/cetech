@@ -23,7 +23,8 @@ function Game:init()
     --    self.viewport = Renderer.GetViewport("default")
     self.world = World.create()
 
-    --    self.unit = Unit.spawn(self.world, "unit1");
+    --    self.unit = Unit.
+    -- -- (self.world, "unit1");
     --    local t = Transform.get(self.world, self.unit)
     --    local p = Transform.get_scale(self.world, t)
     --    Log.debug("lua", "%f %f %f", p.x, p.y, p.z)
@@ -47,7 +48,9 @@ function Game:init()
     self.capture = false
     self.switch_unit = false
 
-    World.load_level(self.world, "level1")
+    self.level = Level.load_level(self.world, "level1")
+
+    self.unit = Level.unit_by_id(self.level, "5564343313252");
 end
 
 function Game:shutdown()
@@ -56,25 +59,43 @@ function Game:shutdown()
 end
 
 function rotator(world, node, delta_rot)
-    local rot = SceneGraph.GetRotation(world, node)
+    local rot = SceneGraph.get_rotation(world, node)
     rot = rot * delta_rot
-    SceneGraph.SetRotation(world, node, rot)
+    SceneGraph.set_rotation(world, node, rot)
+end
+
+function transform_rotator(world, unit, delta_rot)
+    local lt = Transform.get(world, unit)
+    local rot = Transform.get_rotation(world, lt)
+    rot = rot * delta_rot
+
+    Transform.set_rotation(world, lt, rot)
 end
 
 TEXTURE_CYCLE = { "texture2", "content/texture1", "content/scene/m4a1/m4_diff" }
 TEXTURE_CYCLE_IT = 1
 
+L = 0
 function Game:update(dt)
-    if Keyboard.button_pressed(Keyboard.button_index("t")) then
-        local mesh = Mesh.get(self.world, self.unit)
-        local material = Mesh.get_material(self.world, mesh)
+    local mesh = Mesh.get(self.world, self.unit)
+    local material = Mesh.get_material(self.world, mesh)
 
+    L = L + dt * 0.1
+    if (L >= 1.0) then L = 0; end
+
+    Material.set_vec4f(material, "u_vec4", Vec4f.make(L, 0.0, 0.0, 0.0))
+
+    if Keyboard.button_pressed(Keyboard.button_index("t")) then
         Material.set_texture(material, "u_texColor", TEXTURE_CYCLE[(TEXTURE_CYCLE_IT % #TEXTURE_CYCLE) + 1])
 
-        Material.set_vec4f(material, "u_vec4", Vec4f.make(0.0, 1.0, 0.0, 0.0))
 
         TEXTURE_CYCLE_IT = TEXTURE_CYCLE_IT + 1
     end
+
+    local level_unit = Level.unit(self.level)
+    transform_rotator(self.world, level_unit, Quatf.from_axis_angle(Vec3f.unit_y(), 0.05))
+    transform_rotator(self.world, Level.unit_by_id(self.level, "55643423443313252"), Quatf.from_axis_angle(Vec3f.unit_x(), 0.05))
+    transform_rotator(self.world, Level.unit_by_id(self.level, "55643433135454252"), Quatf.from_axis_angle(Vec3f.unit_z(), 0.05))
 
     if Keyboard.button_pressed(reload_btn) then
         ResourceCompilator.compile_all()
@@ -133,7 +154,7 @@ function Game:update(dt)
         dx, dy = m_axis.x, -m_axis.y
         --Log.debug("lua", "%f %f", dx, dy)
     end
-    
+
     local up = Keyboard.button_state(Keyboard.button_index('w'))
     local down = Keyboard.button_state(Keyboard.button_index('s'))
     local left = Keyboard.button_state(Keyboard.button_index('a'))

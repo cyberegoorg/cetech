@@ -120,13 +120,21 @@ set(SOURCE_FILES
         celib/sources/celib/yaml/private/yaml.cc
         celib/sources/celib/yaml/tests/test_yaml.cc
 
+
+        celib/sources/celib/os/private/sdl_time.c
+        celib/sources/celib/os/private/sdl_object.c
+        celib/sources/celib/os/private/path.c
+        celib/sources/celib/os/private/sdl_thread.c
+        celib/sources/celib/os/private/sdl_cpu.c
+        celib/sources/celib/stringid/private/stringid.c
+        celib/sources/celib/window/private/sdl_window.c
+        celib/sources/celib/log/private/log_system.c
+
         ########################################################################
         # CETECH: Plugin system
         ########################################################################
         engine/sources/engine/core/private/plugin_system.c
-
         engine/sources/engine/core/private/plugin_system.c
-        celib/sources/celib/log/private/log_system.c
 
         engine/sources/engine/luasys/private/lua_system.c
         engine/sources/engine/luasys/private/api/api_keyboard.c
@@ -148,18 +156,22 @@ set(SOURCE_FILES
         engine/sources/engine/luasys/private/api/api_mesh.c
         engine/sources/engine/luasys/private/api/api_material.c
         engine/sources/engine/luasys/private/api/api_package.c
+        engine/sources/engine/luasys/private/api/api_level.c
 
-        engine/sources/engine/core/private/cvar.c
         engine/sources/engine/develop/private/console_server.c
         engine/sources/engine/core/private/memory_system.c
-        celib/sources/celib/stringid/private/stringid.c
-        engine/sources/engine/core/private/filesystem.c
+
         engine/sources/engine/core/tests/test_filesystem.cc
-        celib/sources/celib/os/private/sdl_thread.c
-        celib/sources/celib/os/private/sdl_cpu.c
-
-
+        engine/sources/engine/core/private/filesystem.c
+        engine/sources/engine/core/private/cvar.c
         engine/sources/engine/core/private/application.c
+        engine/sources/engine/core/private/task_manager.c
+        engine/sources/engine/core/private/resource_manager..c
+        engine/sources/engine/core/private/resource_package.c
+        engine/sources/engine/core/private/unit_system.c
+        engine/sources/engine/core/private/entcom.c
+        engine/sources/engine/core/private/world_system.c
+        engine/sources/engine/core/private/level.c
 
         engine/sources/engine/machine/private/machine.c
         engine/sources/engine/machine/private/sdl2/sdl_mouse.c
@@ -167,20 +179,11 @@ set(SOURCE_FILES
         engine/sources/engine/machine/private/sdl2/sdl_gamepad.c
         engine/sources/engine/machine/private/sdl2/sdl_machine.c
 
-        celib/sources/celib/window/private/sdl_window.c
         engine/sources/engine/input/private/keyboard.c
         engine/sources/engine/input/private/mouse.c
         engine/sources/engine/input/private/gamepad.c
-        engine/sources/engine/core/private/task_manager.c
 
         engine/sources/engine/develop/private/resource_compiler.c
-
-        celib/sources/celib/os/private/sdl_time.c
-        celib/sources/celib/os/private/sdl_object.c
-        celib/sources/celib/os/private/path.c
-
-        engine/sources/engine/core/private/resource_manager..c
-        engine/sources/engine/core/private/resource_package.c
 
         engine/sources/engine/renderer/private/bgx_renderer.c
         engine/sources/engine/renderer/private/bgfx_texture_resource.c
@@ -188,13 +191,8 @@ set(SOURCE_FILES
         engine/sources/engine/renderer/private/material.c
         engine/sources/engine/renderer/private/mesh_renderer.c
 
-        engine/sources/engine/core/private/entcom.c
-
-
-        engine/sources/engine/core/private/world_system.c
         engine/sources/engine/components/private/transform.c
         engine/sources/engine/components/private/camera.c
-        engine/sources/engine/core/private/unit_system.c
 
         )
 
