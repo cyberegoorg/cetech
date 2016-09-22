@@ -225,6 +225,7 @@ static void _register_all_api() {
     REGISTER_LUA_API(mesh);
     REGISTER_LUA_API(material);
     REGISTER_LUA_API(package);
+    REGISTER_LUA_API(level);
 }
 
 static int _reload_plugin(lua_State *l) {

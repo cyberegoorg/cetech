@@ -48,9 +48,9 @@ function Game:init()
     self.capture = false
     self.switch_unit = false
 
-    self.level = World.load_level(self.world, "level1")
+    self.level = Level.load_level(self.world, "level1")
 
-    self.unit = World.unit_by_id(self.level, "5564343313252");
+    self.unit = Level.unit_by_id(self.level, "5564343313252");
 end
 
 function Game:shutdown()
@@ -92,10 +92,10 @@ function Game:update(dt)
         TEXTURE_CYCLE_IT = TEXTURE_CYCLE_IT + 1
     end
 
-    local level_unit = World.level_unit(self.level)
+    local level_unit = Level.unit(self.level)
     transform_rotator(self.world, level_unit, Quatf.from_axis_angle(Vec3f.unit_y(), 0.05))
-    transform_rotator(self.world, World.unit_by_id(self.level, "55643423443313252"), Quatf.from_axis_angle(Vec3f.unit_x(), 0.05))
-    transform_rotator(self.world, World.unit_by_id(self.level, "55643433135454252"), Quatf.from_axis_angle(Vec3f.unit_z(), 0.05))
+    transform_rotator(self.world, Level.unit_by_id(self.level, "55643423443313252"), Quatf.from_axis_angle(Vec3f.unit_x(), 0.05))
+    transform_rotator(self.world, Level.unit_by_id(self.level, "55643433135454252"), Quatf.from_axis_angle(Vec3f.unit_z(), 0.05))
 
     if Keyboard.button_pressed(reload_btn) then
         ResourceCompilator.compile_all()
