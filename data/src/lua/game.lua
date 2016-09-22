@@ -48,6 +48,7 @@ function Game:init()
     self.switch_unit = false
 
     World.load_level(self.world, "level1")
+    self.unit = World.unit_by_id(self.world, "5564343313252");
 end
 
 function Game:shutdown()

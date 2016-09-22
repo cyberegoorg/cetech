@@ -23,6 +23,12 @@ typedef struct {
     world_on_destroy_t on_destroy;
 } world_callbacks_t;
 
+
+typedef struct {
+    u32 idx;
+} level_t;
+
+
 int world_init(int stage);
 
 void world_shutdown();
@@ -33,7 +39,10 @@ world_t world_create();
 
 void world_destroy(world_t world);
 
-void world_load_level(world_t world,
-                      stringid64_t name);
+level_t world_load_level(world_t world,
+                         stringid64_t name);
+
+entity_t level_unit_by_id(level_t level,
+                          stringid64_t name);
 
 #endif //CETECH_WORLD_SYSTEM_H
