@@ -132,9 +132,9 @@ struct foreach_componets_data {
     int ent_id;
 };
 
-void foreach_componets_clb(yaml_node_t key,
-                           yaml_node_t value,
-                           void *_data) {
+void foreach_components_clb(yaml_node_t key,
+                            yaml_node_t value,
+                            void *_data) {
     struct foreach_componets_data *data = _data;
 
     struct EntityCompileOutput *output = data->output;
@@ -191,15 +191,17 @@ static void compile_entitity(yaml_node_t rootNode,
     MAP_SET(u64, &output->EntsParent, *entities_id, parent);
 
     yaml_node_t components_node = yaml_get_node(rootNode, "components");
-    yaml_node_t children_node = yaml_get_node(rootNode, "children");
+    CE_ASSERT("unit_system", yaml_is_valid(components_node));
 
     struct foreach_componets_data data = {
             .ent_id = *entities_id,
             .output = output
     };
 
-    yaml_node_foreach_dict(components_node, foreach_componets_clb, &data);
+    yaml_node_foreach_dict(components_node, foreach_components_clb, &data);
 
+
+    yaml_node_t children_node = yaml_get_node(rootNode, "children");
     if (yaml_is_valid(children_node)) {
         int parent_ent = *entities_id;
         *entities_id += 1;
@@ -236,17 +238,11 @@ struct component_data {
 #define component_data_ent(cd) ((u64*)((cd) + 1))
 #define component_data_data(cd) ((char*)((component_data_ent(cd) + ((cd)->ent_count))))
 
-int _unit_resource_compiler(const char *filename,
-                            struct vio *source_vio,
-                            struct vio *build_vio,
+
+void unit_resource_compiler(yaml_node_t root,
+                            const char *filename,
+                            ARRAY_T(u8) *build,
                             struct compilator_api *compilator_api) {
-
-    char source_data[vio_size(source_vio) + 1];
-    memory_set(source_data, 0, vio_size(source_vio) + 1);
-    vio_read(source_vio, source_data, sizeof(char), vio_size(source_vio));
-
-    yaml_document_t h;
-    yaml_node_t root = yaml_load_str(source_data, &h);
 
     preprocess(filename, root, compilator_api);
 
@@ -260,17 +256,17 @@ int _unit_resource_compiler(const char *filename,
     res.ent_count = (u32) (ent_counter + 1);
     res.comp_type_count = (u32) ARRAY_SIZE(&output.ComponentsType);
 
-    vio_write(build_vio, &res, sizeof(struct unit_resource), 1);
+    ARRAY_PUSH(u8, build, (u8 *) &res, sizeof(struct unit_resource));
 
     //write parents
     for (int i = 0; i < res.ent_count; ++i) {
         u64 id = MAP_GET(u64, &output.EntsParent, i, UINT64_MAX);
 
-        vio_write(build_vio, &id, sizeof(id), 1);
+        ARRAY_PUSH(u8, build, (u8 *) &id, sizeof(id));;
     }
 
     //write comp types
-    vio_write(build_vio, ARRAY_BEGIN(&output.ComponentsType), sizeof(u64), ARRAY_SIZE(&output.ComponentsType));
+    ARRAY_PUSH(u8, build, (u8 *) ARRAY_BEGIN(&output.ComponentsType), sizeof(u64) * ARRAY_SIZE(&output.ComponentsType));
 
     //write comp data
     for (int j = 0; j < res.comp_type_count; ++j) {
@@ -293,14 +289,37 @@ int _unit_resource_compiler(const char *filename,
 
         cdata.size = ARRAY_SIZE(&comp_data);
 
-        vio_write(build_vio, &cdata, sizeof(cdata), 1);
-        vio_write(build_vio, ARRAY_BEGIN(ent_arr), sizeof(u64), cdata.ent_count);
-        vio_write(build_vio, ARRAY_BEGIN(&comp_data), sizeof(u8), ARRAY_SIZE(&comp_data));
+        ARRAY_PUSH(u8, build, (u8 *) &cdata, sizeof(cdata));
+        ARRAY_PUSH(u8, build, (u8 *) ARRAY_BEGIN(ent_arr), sizeof(u64) * cdata.ent_count);
+        ARRAY_PUSH(u8, build, ARRAY_BEGIN(&comp_data), sizeof(u8) * ARRAY_SIZE(&comp_data));
 
         ARRAY_DESTROY(u8, &comp_data);
     }
 
     _destroy_compile_output(&output);
+
+}
+
+int _unit_resource_compiler(const char *filename,
+                            struct vio *source_vio,
+                            struct vio *build_vio,
+                            struct compilator_api *compilator_api) {
+    char source_data[vio_size(source_vio) + 1];
+    memory_set(source_data, 0, vio_size(source_vio) + 1);
+    vio_read(source_vio, source_data, sizeof(char), vio_size(source_vio));
+
+    yaml_document_t h;
+    yaml_node_t root = yaml_load_str(source_data, &h);
+
+    ARRAY_T(u8) unit_data;
+    ARRAY_INIT(u8, &unit_data, memsys_main_allocator());
+
+    unit_resource_compiler(root, filename, &unit_data, compilator_api);
+
+    vio_write(build_vio, &ARRAY_AT(&unit_data, 0), sizeof(u8), ARRAY_SIZE(&unit_data));
+
+
+    ARRAY_DESTROY(u8, &unit_data);
     return 1;
 }
 

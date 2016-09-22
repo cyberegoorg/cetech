@@ -114,6 +114,7 @@ static void preprocess(const char *filename,
         char prefab_data[vio_size(prefab_vio) + 1];
         memory_set(prefab_data, 0, vio_size(prefab_vio) + 1);
         vio_read(prefab_vio, prefab_data, sizeof(char), vio_size(prefab_vio));
+        vio_close(prefab_vio);
 
         yaml_document_t h;
         yaml_node_t prefab_root = yaml_load_str(prefab_data, &h);
@@ -121,7 +122,6 @@ static void preprocess(const char *filename,
         preprocess(filename, prefab_root, capi);
         yaml_merge(root, prefab_root);
 
-        vio_close(prefab_vio);
     }
 }
 

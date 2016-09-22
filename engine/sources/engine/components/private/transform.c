@@ -7,6 +7,8 @@
 #include <celib/math/quatf.h>
 #include <celib/math/mat44f.h>
 #include <celib/stringid/stringid.h>
+#include <engine/components/types.h>
+#include <engine/core/types.h>
 #include "../transform.h"
 
 struct transform_data {
@@ -190,12 +192,11 @@ void transform_transform(world_t world,
     vec3f_t sca = ARRAY_AT(&world_data->scale, transform.idx);
 
     mat44f_t rm = {0};
-    quatf_to_mat44f(&rm, &rot);
-
     mat44f_t sm = {0};
-    mat44f_scale(&sm, sca.x, sca.y, sca.z);
-
     mat44f_t m = {0};
+
+    quatf_to_mat44f(&rm, &rot);
+    mat44f_scale(&sm, sca.x, sca.y, sca.z);
     mat44f_mul(&m, &sm, &rm);
 
     m.w.x = pos.x;
@@ -209,11 +210,8 @@ void transform_transform(world_t world,
     transform_t child_transform = {.idx = child};
 
     while (transform_is_valid(child_transform)) {
-        child_transform.idx = child;
-
         transform_transform(world, child_transform, &ARRAY_AT(&world_data->world_matrix, transform.idx));
-
-        child = ARRAY_AT(&world_data->next_sibling, transform.idx);
+        child_transform.idx = ARRAY_AT(&world_data->next_sibling, child_transform.idx);
     }
 }
 
@@ -340,7 +338,7 @@ transform_t transform_create(world_t world,
     MAP_SET(u32, &data->ent_idx_map, entity.h.h, idx);
 
     if (parent.h.h != UINT32_MAX) {
-        u32 parent_idx = MAP_GET(u32, &data->ent_idx_map, entity.h.h, UINT32_MAX);
+        u32 parent_idx = MAP_GET(u32, &data->ent_idx_map, parent.h.h, UINT32_MAX);
 
         ARRAY_AT(&data->parent, idx) = parent_idx;
 

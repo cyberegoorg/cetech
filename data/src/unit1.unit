@@ -20,3 +20,11 @@ children:
         position: [0, 10, 0]
         rotation: [0, 0, 0]
         scale: [72, 28, 414]
+
+  "e432cdasdasd1e81f50973affb00263":
+    components:
+      "92fc09cf72984acb9ccc8d87a429d8c714":
+        component_type: "transform"
+        position: [0, 10, 0]
+        rotation: [0, 0, 0]
+        scale: [72, 28, 414]

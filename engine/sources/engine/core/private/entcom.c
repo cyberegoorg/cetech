@@ -58,6 +58,8 @@ int entcom_init(int stage) {
     MAP_INIT(component_on_world_create_t, &_G.on_world_create_map, memsys_main_allocator());
     MAP_INIT(component_on_world_destroy_t, &_G.on_world_destroy_map, memsys_main_allocator());
 
+    CE_ASSERT("entcom", handlerid_handler_create(&_G.entity_handler).h == 0);
+
     return 1;
 }
 
