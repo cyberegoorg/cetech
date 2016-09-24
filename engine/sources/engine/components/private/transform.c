@@ -132,23 +132,25 @@ static void _destroyer(world_t world,
 
 static void _spawner(world_t world,
                      entity_t *ents,
-                     entity_t *ents_parent,
+                     u32 *cents,
+                     u32 *ents_parent,
                      size_t ent_count,
                      void *data) {
     struct transform_data *tdata = data;
 
     for (int i = 0; i < ent_count; ++i) {
         transform_create(world,
-                         ents[i],
-                         ents_parent[i].idx != UINT32_MAX ? ents[ents_parent[i].idx] : (entity_t) {.idx = UINT32_MAX},
-                         tdata->position,
-                         tdata->rotation,
-                         tdata->scale);
+                         ents[cents[i]],
+                         ents_parent[cents[i]] != UINT32_MAX ? ents[ents_parent[cents[i]]]
+                                                             : (entity_t) {.idx = UINT32_MAX},
+                         tdata[i].position,
+                         tdata[i].rotation,
+                         tdata[i].scale);
     }
 
     mat44f_t m = MAT44F_INIT_IDENTITY;
     for (int i = 0; i < ent_count; ++i) {
-        transform_transform(world, transform_get(world, ents[i]), &m);
+        transform_transform(world, transform_get(world, ents[cents[i]]), &m);
     }
 }
 

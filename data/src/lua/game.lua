@@ -42,7 +42,7 @@ function Game:init()
     self.camera_unit = Unit.spawn(self.world, "camera");
     self.camera = 0; --Camera.GetCamera(self.world, self.camera_unit);
     self.fps_camera = FPSCamera(self.world, self.camera_unit)
-    --Unit.Spawn(self.world, "unit11");
+    --Unit.spawn(self.world, "unit11");
 
     self.debug = false
     self.capture = false
@@ -50,7 +50,7 @@ function Game:init()
 
     self.level = Level.load_level(self.world, "level1")
 
-    self.unit = Level.unit_by_id(self.level, "5564343313252");
+    self.unit = Level.unit_by_id(self.level, "55643423443313252");
 end
 
 function Game:shutdown()
@@ -93,9 +93,9 @@ function Game:update(dt)
     end
 
     local level_unit = Level.unit(self.level)
-    transform_rotator(self.world, level_unit, Quatf.from_axis_angle(Vec3f.unit_y(), 0.05))
+    transform_rotator(self.world, level_unit, Quatf.from_axis_angle(Vec3f.unit_y(), 0.02))
     transform_rotator(self.world, Level.unit_by_id(self.level, "55643423443313252"), Quatf.from_axis_angle(Vec3f.unit_x(), 0.05))
-    transform_rotator(self.world, Level.unit_by_id(self.level, "55643433135454252"), Quatf.from_axis_angle(Vec3f.unit_z(), 0.05))
+    transform_rotator(self.world, Level.unit_by_id(self.level, "55643433135454252"), Quatf.from_axis_angle(Vec3f.unit_z(), 0.08))
 
     if Keyboard.button_pressed(reload_btn) then
         ResourceCompilator.compile_all()
@@ -151,8 +151,14 @@ function Game:update(dt)
     local dy = 0
     if Mouse.button_state(Mouse.button_index("left")) then
         local m_axis = Mouse.axis(Mouse.axis_index("relative"))
-        dx, dy = m_axis.x, -m_axis.y
-        --Log.debug("lua", "%f %f", dx, dy)
+        dx, dy = m_axis.x, m_axis.y
+        if dx ~= 0 or dy ~= 0 then
+            --  Log.debug("lua", "%f %f", dx, dy)
+        end
+
+        m_axis = Mouse.axis(Mouse.axis_index("absolute"))
+        local x, y = m_axis.x, m_axis.y
+        --Log.debug("lua", "abs: %f %f", x, y)
     end
 
     local up = Keyboard.button_state(Keyboard.button_index('w'))

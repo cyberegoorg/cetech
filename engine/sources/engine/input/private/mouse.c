@@ -58,8 +58,8 @@ void mouse_process() {
     struct event_header *event = machine_event_begin();
 
     memory_copy(_G.last_state, _G.state, MOUSE_BTN_MAX);
-    _G.last_delta_pos.x = 0;
-    _G.last_delta_pos.y = 0;
+//    _G.last_delta_pos.x = 0;
+//    _G.last_delta_pos.y = 0;
 
     while (event != machine_event_end()) {
         struct mouse_move_event *move_event;
@@ -76,11 +76,12 @@ void mouse_process() {
             case EVENT_MOUSE_MOVE:
                 move_event = ((struct mouse_move_event *) event);
 
-                _G.last_delta_pos.x = _G.last_pos.x - move_event->pos.x;
-                _G.last_delta_pos.y = _G.last_pos.y - move_event->pos.y;
+                _G.last_delta_pos.x = move_event->pos.x - _G.last_pos.x;
+                _G.last_delta_pos.y = move_event->pos.y - _G.last_pos.y;
 
                 _G.last_pos.x = move_event->pos.x;
                 _G.last_pos.y = move_event->pos.y;
+
                 break;
 
             default:
@@ -166,4 +167,8 @@ vec2f_t mouse_axis(const u32 axis_index) {
         default:
             return (vec2f_t) {0};
     }
+}
+
+void mouse_set_cursor_pos(vec2f_t pos) {
+
 }

@@ -5,6 +5,7 @@
 // Includes
 //==============================================================================
 
+#include "celib/containers/map.h"
 #include "celib/os/vio_types.h"
 #include "celib/handler/handlerid.h"
 #include "celib/yaml/yaml.h"
@@ -41,6 +42,10 @@ typedef struct {
     };
 } entity_t;
 
+ARRAY_PROTOTYPE(entity_t)
+
+MAP_PROTOTYPE(entity_t);
+
 typedef int (*component_compiler_t)(yaml_node_t body,
                                     ARRAY_T(u8) *data);
 
@@ -54,7 +59,8 @@ typedef void (*component_destroyer_t)(world_t world,
 
 typedef void (*component_spawner_t)(world_t world,
                                     entity_t *ents,
-                                    entity_t *ents_parent,
+                                    u32 *cent,
+                                    u32 *ents_parent,
                                     size_t ent_count,
                                     void *data);
 

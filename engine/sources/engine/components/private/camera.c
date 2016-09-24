@@ -14,9 +14,6 @@
 
 #include "../camera.h"
 
-ARRAY_PROTOTYPE(entity_t)
-
-
 struct camera_data {
     f32 near;
     f32 far;
@@ -108,17 +105,18 @@ void _destroyer(world_t world,
 
 void _spawner(world_t world,
               entity_t *ents,
-              entity_t *ents_parent,
+              u32 *cents,
+              u32 *ents_parent,
               size_t ent_count,
               void *data) {
     struct camera_data *tdata = data;
 
     for (int i = 0; i < ent_count; ++i) {
         camera_create(world,
-                      ents[i],
-                      tdata->near,
-                      tdata->far,
-                      tdata->fov);
+                      ents[cents[i]],
+                      tdata[i].near,
+                      tdata[i].far,
+                      tdata[i].fov);
     }
 }
 

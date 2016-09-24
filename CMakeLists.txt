@@ -185,7 +185,7 @@ set(SOURCE_FILES
 
         engine/sources/engine/develop/private/resource_compiler.c
 
-        engine/sources/engine/renderer/private/bgx_renderer.c
+        engine/sources/engine/renderer/private/bgfx_renderer.c
         engine/sources/engine/renderer/private/bgfx_texture_resource.c
         engine/sources/engine/renderer/private/bgfx_shader_resource.c
         engine/sources/engine/renderer/private/material.c

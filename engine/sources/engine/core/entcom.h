@@ -49,7 +49,8 @@ void component_register_type(stringid64_t type,
 void component_spawn(world_t world,
                      stringid64_t type,
                      entity_t *ent_ids,
-                     entity_t *ents_parent,
+                     u32 *cent,
+                     u32 *ents_parent,
                      u32 ent_count,
                      void *data);
 

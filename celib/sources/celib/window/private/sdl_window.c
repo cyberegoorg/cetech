@@ -1,6 +1,7 @@
 #include <stdint.h>
 #include <include/SDL2/SDL.h>
 #include <include/SDL2/SDL_syswm.h>
+#include <celib/math/types.h>
 #include "../types.h"
 #include "../../log/log.h"
 

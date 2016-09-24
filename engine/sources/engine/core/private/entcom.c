@@ -58,7 +58,7 @@ int entcom_init(int stage) {
     MAP_INIT(component_on_world_create_t, &_G.on_world_create_map, memsys_main_allocator());
     MAP_INIT(component_on_world_destroy_t, &_G.on_world_destroy_map, memsys_main_allocator());
 
-    CE_ASSERT("entcom", handlerid_handler_create(&_G.entity_handler).h == 0);
+//    CE_ASSERT("entcom", handlerid_handler_create(&_G.entity_handler).h == 0);
 
     return 1;
 }
@@ -134,7 +134,8 @@ void component_register_type(stringid64_t type,
 void component_spawn(world_t world,
                      stringid64_t type,
                      entity_t *ent_ids,
-                     entity_t *ents_parent,
+                     u32 *cent,
+                     u32 *ents_parent,
                      u32 ent_count,
                      void *data) {
     component_spawner_t clb = MAP_GET(component_spawner_t, &_G.spawner_map, type.id, NULL);
@@ -143,6 +144,6 @@ void component_spawn(world_t world,
         return;
     }
 
-    clb(world, ent_ids, ents_parent, ent_count, data);
+    clb(world, ent_ids, cent, ents_parent, ent_count, data);
 
 }

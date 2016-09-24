@@ -38,5 +38,4 @@ void *window_native_window_ptr(window_t w);
 
 void *window_native_display_ptr(window_t w);
 
-
 #endif //CETECH_WINDOW_H

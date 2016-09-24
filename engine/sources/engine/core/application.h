@@ -1,6 +1,8 @@
 #ifndef CETECH_APPLICATION_H
 #define CETECH_APPLICATION_H
 
+#include "celib/window/types.h"
+
 typedef int(*game_init_clb_t)();
 
 typedef void(*game_shutdown_clb_t)();
@@ -39,5 +41,7 @@ void application_quit();
 const char *application_platform();
 
 const char *application_native_platform();
+
+window_t application_get_main_window();
 
 #endif //CETECH_APPLICATION_H

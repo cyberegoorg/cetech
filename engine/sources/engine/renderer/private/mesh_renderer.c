@@ -14,6 +14,8 @@
 
 #include "../mesh_renderer.h"
 
+#define LOG_WHERE "mesh_renderer"
+
 ARRAY_PROTOTYPE(stringid64_t)
 
 ARRAY_PROTOTYPE(material_t)
@@ -133,7 +135,8 @@ static void _destroyer(world_t world,
 
 static void _spawner(world_t world,
                      entity_t *ents,
-                     entity_t *ents_parent,
+                     u32 *cents,
+                     u32 *ents_parent,
                      size_t ent_count,
                      void *data) {
     struct mesh_data *tdata = data;
@@ -142,11 +145,11 @@ static void _spawner(world_t world,
 
     for (int i = 0; i < ent_count; ++i) {
         mesh_create(world,
-                    ents[i],
-                    tdata->scene,
-                    tdata->mesh,
-                    tdata->node,
-                    tdata->material);
+                    ents[cents[i]],
+                    tdata[i].scene,
+                    tdata[i].mesh,
+                    tdata[i].node,
+                    tdata[i].material);
     }
 }
 
@@ -208,6 +211,8 @@ static const uint16_t s_cubeIndices[36] =
                 21, 23, 22,
         };
 
+
+// TODO: remove after scene resource
 PosNormalTangentTexcoordVertex s_cubeVertices[24];
 bgfx_vertex_decl_t vertex_decl = {0};
 
@@ -358,6 +363,7 @@ void mesh_render_all(world_t world) {
 
 material_t mesh_get_material(world_t world,
                              mesh_t mesh) {
+    CE_ASSERT(LOG_WHERE, mesh.idx != UINT32_MAX);
     world_data_t *data = _get_world_data(world);
 
     return ARRAY_AT(&data->material, mesh.idx);

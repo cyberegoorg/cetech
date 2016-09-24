@@ -11,6 +11,7 @@
 #include <celib/containers/map.h>
 #include <engine/core/entcom.h>
 
+
 #define _G UnitGlobal
 static struct G {
     stringid64_t type;
@@ -59,101 +60,66 @@ ARRAY_PROTOTYPE(yaml_node_t)
 
 ARRAY_PROTOTYPE_N(struct array_yaml_node_t, array_yaml_node_t)
 
-ARRAY_PROTOTYPE_N(struct array_u64, array_u64)
+ARRAY_PROTOTYPE_N(struct array_u32, array_u32)
 
 MAP_PROTOTYPE_N(struct array_yaml_node_t, array_yaml_node_t)
 
-MAP_PROTOTYPE_N(struct array_u64, array_u64)
+MAP_PROTOTYPE_N(struct array_u32, array_u32)
 
-struct EntityCompileOutput {
-    MAP_T(array_u64) ComponentEnt;
-    MAP_T(u64) EntsParent;
-    MAP_T(array_yaml_node_t) ComponentsBody;
-    ARRAY_T(u64) ComponentsType;
+struct entity_compile_output {
+    MAP_T(array_u32) component_ent;
+    MAP_T(u32) entity_parent;
+    MAP_T(array_yaml_node_t) component_body;
+    ARRAY_T(u64) component_type;
+    u32 ent_counter;
 };
 
 struct foreach_children_data {
-    int *entities_id;
     int parent_ent;
-    struct EntityCompileOutput *output;
+    struct entity_compile_output *output;
 };
 
 
 static void compile_entitity(yaml_node_t rootNode,
-                             int *entities_id,
                              int parent,
-                             struct EntityCompileOutput *output);
+                             struct entity_compile_output *output);
 
 void forach_children_clb(yaml_node_t key,
                          yaml_node_t value,
                          void *_data) {
     struct foreach_children_data *data = _data;
-    compile_entitity(value, data->entities_id, data->parent_ent, data->output);
+
+    compile_entitity(value, data->parent_ent, data->output);
 }
 
-static struct EntityCompileOutput _create_compile_output() {
-    struct allocator *a = memsys_main_allocator();
-
-    struct EntityCompileOutput output = {0};
-
-    ARRAY_INIT(u64, &output.ComponentsType, a);
-    MAP_INIT(array_u64, &output.ComponentEnt, a);
-    MAP_INIT(u64, &output.EntsParent, a);
-    MAP_INIT(array_yaml_node_t, &output.ComponentsBody, a);
-
-    return output;
-}
-
-static void _destroy_compile_output(struct EntityCompileOutput *output) {
-    ARRAY_DESTROY(u64, &output->ComponentsType);
-    MAP_DESTROY(u64, &output->EntsParent);
-
-    // clean inner array
-    const MAP_ENTRY_T(array_u64) *ce_it = MAP_BEGIN(array_u64, &output->ComponentEnt);
-    const MAP_ENTRY_T(array_u64) *ce_end = MAP_END(array_u64, &output->ComponentEnt);
-    while (ce_it != ce_end) {
-        ARRAY_DESTROY(u64, (struct array_u64 *) &ce_it->value);
-        ++ce_it;
-    }
-    MAP_DESTROY(array_u64, &output->ComponentEnt);
-
-    // clean inner array
-    const MAP_ENTRY_T(array_yaml_node_t) *cb_it = MAP_BEGIN(array_yaml_node_t, &output->ComponentsBody);
-    const MAP_ENTRY_T(array_yaml_node_t) *cb_end = MAP_END(array_yaml_node_t, &output->ComponentsBody);
-    while (cb_it != cb_end) {
-        ARRAY_DESTROY(yaml_node_t, (struct array_yaml_node_t *) &cb_it->value);
-        ++cb_it;
-    }
-    MAP_DESTROY(array_yaml_node_t, &output->ComponentsBody);
-}
 
 struct foreach_componets_data {
-    struct EntityCompileOutput *output;
+    struct entity_compile_output *output;
     int ent_id;
 };
 
 void foreach_components_clb(yaml_node_t key,
                             yaml_node_t value,
                             void *_data) {
-    struct foreach_componets_data *data = _data;
-
-    struct EntityCompileOutput *output = data->output;
-
     char uid_str[256] = {0};
+    char component_type_str[256] = {0};
+    stringid64_t cid;
+    int contain_cid = 0;
+
+    struct foreach_componets_data *data = _data;
+    struct entity_compile_output *output = data->output;
+
     yaml_as_string(key, uid_str, CE_ARRAY_LEN(uid_str));
 
-    char component_type_str[256] = {0};
     yaml_node_t component_type_node = yaml_get_node(value, "component_type");
     yaml_as_string(component_type_node, component_type_str, CE_ARRAY_LEN(component_type_str));
 
     log_debug("resouce_compier", "compile component type: %s", component_type_str);
 
+    cid = stringid64_from_string(component_type_str);
 
-    stringid64_t cid = stringid64_from_string(component_type_str);
-
-    int contain_cid = 0;
-    for (int i = 0; i < ARRAY_SIZE(&output->ComponentsType); ++i) {
-        if (ARRAY_AT(&output->ComponentsType, i) != cid.id) {
+    for (int i = 0; i < ARRAY_SIZE(&output->component_type); ++i) {
+        if (ARRAY_AT(&output->component_type, i) != cid.id) {
             continue;
         }
 
@@ -161,40 +127,41 @@ void foreach_components_clb(yaml_node_t key,
     }
 
     if (!contain_cid) {
-        ARRAY_PUSH_BACK(u64, &output->ComponentsType, cid.id);
+        ARRAY_PUSH_BACK(u64, &output->component_type, cid.id);
 
-        ARRAY_T(u64) tmp_a = {0};
-        ARRAY_INIT(u64, &tmp_a, memsys_main_allocator());
+        ARRAY_T(u32) tmp_a = {0};
+        ARRAY_INIT(u32, &tmp_a, memsys_main_allocator());
 
-        MAP_SET(array_u64, &output->ComponentEnt, cid.id, tmp_a);
+        MAP_SET(array_u32, &output->component_ent, cid.id, tmp_a);
     }
 
-    if (!MAP_HAS(array_yaml_node_t, &output->ComponentsBody, cid.id)) {
+    if (!MAP_HAS(array_yaml_node_t, &output->component_body, cid.id)) {
         ARRAY_T(yaml_node_t) tmp_a = {0};
         ARRAY_INIT(yaml_node_t, &tmp_a, memsys_main_allocator());
 
-        MAP_SET(array_yaml_node_t, &output->ComponentsBody, cid.id, tmp_a);
+        MAP_SET(array_yaml_node_t, &output->component_body, cid.id, tmp_a);
+
     }
+    ARRAY_T(u32) *tmp_a = MAP_GET_PTR(array_u32, &output->component_ent, cid.id);
+    ARRAY_PUSH_BACK(u32, tmp_a, data->ent_id);
 
-    ARRAY_T(u64) *tmp_a = MAP_GET_PTR(array_u64, &output->ComponentEnt, cid.id);
-    ARRAY_PUSH_BACK(u64, tmp_a, data->ent_id);
-
-    ARRAY_T(yaml_node_t) *tmp_b = MAP_GET_PTR(array_yaml_node_t, &output->ComponentsBody, cid.id);
+    ARRAY_T(yaml_node_t) *tmp_b = MAP_GET_PTR(array_yaml_node_t, &output->component_body, cid.id);
     ARRAY_PUSH_BACK(yaml_node_t, tmp_b, value);
 }
 
 static void compile_entitity(yaml_node_t rootNode,
-                             int *entities_id,
                              int parent,
-                             struct EntityCompileOutput *output) {
+                             struct entity_compile_output *output) {
 
-    MAP_SET(u64, &output->EntsParent, *entities_id, parent);
+    u32 ent_id = output->ent_counter++;
+
+    MAP_SET(u32, &output->entity_parent, ent_id, parent);
 
     yaml_node_t components_node = yaml_get_node(rootNode, "components");
     CE_ASSERT("unit_system", yaml_is_valid(components_node));
 
     struct foreach_componets_data data = {
-            .ent_id = *entities_id,
+            .ent_id = ent_id,
             .output = output
     };
 
@@ -203,11 +170,10 @@ static void compile_entitity(yaml_node_t rootNode,
 
     yaml_node_t children_node = yaml_get_node(rootNode, "children");
     if (yaml_is_valid(children_node)) {
-        int parent_ent = *entities_id;
-        *entities_id += 1;
+        int parent_ent = ent_id;
+        //output->ent_counter += 1;
 
         struct foreach_children_data data = {
-                .entities_id = entities_id,
                 .parent_ent = parent_ent,
                 .output = output
         };
@@ -227,59 +193,100 @@ struct unit_resource {
 struct component_data {
     u32 ent_count;
     u32 size;
-    // u64 ent[ent_count];
+    // u32 ent[ent_count];
     // char data[ent_count];
 };
 
-#define unit_resource_parents(r) ((u64*)((r) + 1))
-#define unit_resource_comp_types(r) ((u64*)unit_resource_parents(r) + ((r)->ent_count))
+#define unit_resource_parents(r) ((u32*)((r) + 1))
+#define unit_resource_comp_types(r) ((u64*)(unit_resource_parents(r) + ((r)->ent_count)))
 #define unit_resource_comp_data(r) ((struct component_data*)(unit_resource_comp_types(r) + ((r)->comp_type_count)))
 
-#define component_data_ent(cd) ((u64*)((cd) + 1))
+#define component_data_ent(cd) ((u32*)((cd) + 1))
 #define component_data_data(cd) ((char*)((component_data_ent(cd) + ((cd)->ent_count))))
 
+struct entity_compile_output *unit_compiler_create_output() {
+    struct allocator *a = memsys_main_allocator();
 
-void unit_resource_compiler(yaml_node_t root,
-                            const char *filename,
-                            ARRAY_T(u8) *build,
-                            struct compilator_api *compilator_api) {
+    struct entity_compile_output *output = CE_ALLOCATE(a, struct entity_compile_output, 1);
+    output->ent_counter = 0;
+    ARRAY_INIT(u64, &output->component_type, a);
+    MAP_INIT(array_u32, &output->component_ent, a);
+    MAP_INIT(u32, &output->entity_parent, a);
+    MAP_INIT(array_yaml_node_t, &output->component_body, a);
+
+    return output;
+}
+
+void unit_compiler_destroy_output(struct entity_compile_output *output) {
+    ARRAY_DESTROY(u64, &output->component_type);
+    MAP_DESTROY(u32, &output->entity_parent);
+
+    // clean inner array
+    const MAP_ENTRY_T(array_u32) *ce_it = MAP_BEGIN(array_u32, &output->component_ent);
+    const MAP_ENTRY_T(array_u32) *ce_end = MAP_END(array_u32, &output->component_ent);
+    while (ce_it != ce_end) {
+        ARRAY_DESTROY(u32, (struct array_u32 *) &ce_it->value);
+        ++ce_it;
+    }
+    MAP_DESTROY(array_u32, &output->component_ent);
+
+    // clean inner array
+    const MAP_ENTRY_T(array_yaml_node_t) *cb_it = MAP_BEGIN(array_yaml_node_t, &output->component_body);
+    const MAP_ENTRY_T(array_yaml_node_t) *cb_end = MAP_END(array_yaml_node_t, &output->component_body);
+    while (cb_it != cb_end) {
+        ARRAY_DESTROY(yaml_node_t, (struct array_yaml_node_t *) &cb_it->value);
+        ++cb_it;
+    }
+    MAP_DESTROY(array_yaml_node_t, &output->component_body);
+
+    struct allocator *a = memsys_main_allocator();
+    CE_DEALLOCATE(a, output);
+}
+
+void unit_compiler_compile_unit(struct entity_compile_output *output,
+                                yaml_node_t root,
+                                const char *filename,
+                                struct compilator_api *compilator_api) {
 
     preprocess(filename, root, compilator_api);
+    compile_entitity(root, UINT32_MAX, output);
+}
 
-    int ent_counter = 0;
-    struct EntityCompileOutput output = _create_compile_output();
+u32 unit_compiler_ent_counter(struct entity_compile_output *output) {
+    return output->ent_counter;
+}
 
-    compile_entitity(root, &ent_counter, UINT32_MAX, &output);
-
+void unit_compiler_write_to_build(struct entity_compile_output *output,
+                                  ARRAY_T(u8) *build) {
     struct unit_resource res = {0};
-
-    res.ent_count = (u32) (ent_counter + 1);
-    res.comp_type_count = (u32) ARRAY_SIZE(&output.ComponentsType);
+    res.ent_count = (u32) (output->ent_counter + 1);
+    res.comp_type_count = (u32) ARRAY_SIZE(&output->component_type);
 
     ARRAY_PUSH(u8, build, (u8 *) &res, sizeof(struct unit_resource));
 
     //write parents
     for (int i = 0; i < res.ent_count; ++i) {
-        u64 id = MAP_GET(u64, &output.EntsParent, i, UINT64_MAX);
+        u32 id = MAP_GET(u32, &output->entity_parent, i, UINT32_MAX);
 
-        ARRAY_PUSH(u8, build, (u8 *) &id, sizeof(id));;
+        ARRAY_PUSH(u8, build, (u8 *) &id, sizeof(id));
     }
 
     //write comp types
-    ARRAY_PUSH(u8, build, (u8 *) ARRAY_BEGIN(&output.ComponentsType), sizeof(u64) * ARRAY_SIZE(&output.ComponentsType));
+    ARRAY_PUSH(u8, build, (u8 *) ARRAY_BEGIN(&output->component_type),
+               sizeof(u64) * ARRAY_SIZE(&output->component_type));
 
     //write comp data
     for (int j = 0; j < res.comp_type_count; ++j) {
-        u64 cid = ARRAY_AT(&output.ComponentsType, j);
+        u64 cid = ARRAY_AT(&output->component_type, j);
         stringid64_t id = {.id = cid};
 
-        ARRAY_T(u64) *ent_arr = MAP_GET_PTR(array_u64, &output.ComponentEnt, cid);
+        ARRAY_T(u32) *ent_arr = MAP_GET_PTR(array_u32, &output->component_ent, cid);
 
         struct component_data cdata = {
                 .ent_count = ARRAY_SIZE(ent_arr)
         };
 
-        ARRAY_T(yaml_node_t) *body = MAP_GET_PTR(array_yaml_node_t, &output.ComponentsBody, cid);
+        ARRAY_T(yaml_node_t) *body = MAP_GET_PTR(array_yaml_node_t, &output->component_body, cid);
         ARRAY_T(u8) comp_data = {0};
         ARRAY_INIT(u8, &comp_data, memsys_main_allocator());
 
@@ -290,14 +297,22 @@ void unit_resource_compiler(yaml_node_t root,
         cdata.size = ARRAY_SIZE(&comp_data);
 
         ARRAY_PUSH(u8, build, (u8 *) &cdata, sizeof(cdata));
-        ARRAY_PUSH(u8, build, (u8 *) ARRAY_BEGIN(ent_arr), sizeof(u64) * cdata.ent_count);
+        ARRAY_PUSH(u8, build, (u8 *) ARRAY_BEGIN(ent_arr), sizeof(u32) * cdata.ent_count);
         ARRAY_PUSH(u8, build, ARRAY_BEGIN(&comp_data), sizeof(u8) * ARRAY_SIZE(&comp_data));
 
         ARRAY_DESTROY(u8, &comp_data);
     }
+}
 
-    _destroy_compile_output(&output);
+void unit_resource_compiler(yaml_node_t root,
+                            const char *filename,
+                            ARRAY_T(u8) *build,
+                            struct compilator_api *compilator_api) {
+    struct entity_compile_output *output = unit_compiler_create_output();
+    unit_compiler_compile_unit(output, root, filename, compilator_api);
+    unit_compiler_write_to_build(output, build);
 
+    unit_compiler_destroy_output(output);
 }
 
 int _unit_resource_compiler(const char *filename,
@@ -393,37 +408,30 @@ void unit_shutdown() {
 }
 
 
-entity_t unit_spawn_from_resource(world_t world,
-                                  void *resource) {
+void unit_spawn_from_resource(world_t world,
+                              void *resource,
+                              ARRAY_T(entity_t) *spawned) {
+
     struct unit_resource *res = resource;
 
-    entity_t entities[res->ent_count];
     for (int j = 0; j < res->ent_count; ++j) {
-        entities[j] = entity_manager_create();
+        ARRAY_PUSH_BACK(entity_t, spawned, entity_manager_create());
     }
 
-    u64 *parents = unit_resource_parents(res);
+    u32 *parents = unit_resource_parents(res);
     u64 *comp_types = unit_resource_comp_types(res);
 
     struct component_data *comp_data = unit_resource_comp_data(res);
     for (int i = 0; i < res->comp_type_count; ++i) {
         stringid64_t type = {.id = comp_types[i]};
 
-        u64 *c_ent = component_data_ent(comp_data);
+        u32 *c_ent = component_data_ent(comp_data);
         char *c_data = component_data_data(comp_data);
+        component_spawn(world, type, &ARRAY_AT(spawned, 0), c_ent, parents, comp_data->ent_count, c_data);
 
-        entity_t entities_id[comp_data->ent_count];
-
-        for (int j = 0; j < comp_data->ent_count; j++) {
-            entities_id[j] = entities[c_ent[j]];
-        }
-
-        component_spawn(world, type, entities_id, (entity_t *) parents, comp_data->ent_count, c_data);
-
-        comp_data = (struct component_data *) (((char *) c_data) + comp_data->size);
+        comp_data = (struct component_data *) (c_data + comp_data->size);
     }
 
-    return entities[0];
 }
 
 entity_t unit_spawn(world_t world,
@@ -435,5 +443,14 @@ entity_t unit_spawn(world_t world,
         return (entity_t) {.idx = 0};
     }
 
-    return unit_spawn_from_resource(world, res);
+    ARRAY_T(entity_t) spawned;
+    ARRAY_INIT(entity_t, &spawned, memsys_main_allocator());
+
+    unit_spawn_from_resource(world, res, &spawned);
+
+    entity_t root = ARRAY_AT(&spawned, 0);
+
+    ARRAY_DESTROY(entity_t, &spawned);
+
+    return root;
 }

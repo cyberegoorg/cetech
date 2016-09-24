@@ -21,11 +21,8 @@
 //==============================================================================
 
 ARRAY_T(world_t);
-ARRAY_PROTOTYPE(entity_t);
 ARRAY_PROTOTYPE(world_callbacks_t);
 ARRAY_PROTOTYPE(stringid64_t);
-
-MAP_PROTOTYPE(entity_t);
 
 //==============================================================================
 // Globals
@@ -125,6 +122,7 @@ struct foreach_units_data {
     ARRAY_T(stringid64_t) *id;
     ARRAY_T(u32) *offset;
     ARRAY_T(u8) *data;
+    struct entity_compile_output *output;
 };
 
 void forach_units_clb(yaml_node_t key,
@@ -134,11 +132,10 @@ void forach_units_clb(yaml_node_t key,
 
     char name[128] = {0};
     yaml_as_string(key, name, CE_ARRAY_LEN(name));
-
     ARRAY_PUSH_BACK(stringid64_t, data->id, stringid64_from_string(name));
-    ARRAY_PUSH_BACK(u32, data->offset, ARRAY_SIZE(data->data));
+    ARRAY_PUSH_BACK(u32, data->offset, unit_compiler_ent_counter(data->output));
 
-    unit_resource_compiler(value, data->filename, data->data, data->capi);
+    unit_compiler_compile_unit(data->output, value, data->filename, data->capi);
 }
 
 struct level_blob {
@@ -175,12 +172,16 @@ int _level_resource_compiler(const char *filename,
     ARRAY_INIT(u32, &offset, memsys_main_allocator());
     ARRAY_INIT(u8, &data, memsys_main_allocator());
 
+    struct entity_compile_output *output = unit_compiler_create_output();
+
+
     struct foreach_units_data unit_data = {
             .id = &id,
             .offset = &offset,
             .data = &data,
             .capi = compilator_api,
-            .filename = filename
+            .filename = filename,
+            .output = output
     };
 
     yaml_node_foreach_dict(units, forach_units_clb, &unit_data);
@@ -188,6 +189,8 @@ int _level_resource_compiler(const char *filename,
     struct level_blob res = {
             .units_count = ARRAY_SIZE(&id)
     };
+
+    unit_compiler_write_to_build(output, unit_data.data);
 
     vio_write(build_vio, &res, sizeof(struct level_blob), 1);
     vio_write(build_vio, &ARRAY_AT(&id, 0), sizeof(stringid64_t), ARRAY_SIZE(&id));
@@ -197,6 +200,8 @@ int _level_resource_compiler(const char *filename,
     ARRAY_DESTROY(stringid64_t, &id);
     ARRAY_DESTROY(u32, &offset);
     ARRAY_DESTROY(u8, &data);
+
+    unit_compiler_destroy_output(output);
 
     return 1;
 }
@@ -236,22 +241,39 @@ level_t world_load_level(world_t world,
     u8 *data = level_blob_data(res);
 
     entity_t level_ent = entity_manager_create();
-    level_t level = _new_level(level_ent);
-
     transform_t t = transform_create(world, level_ent, (entity_t) {UINT32_MAX}, (vec3f_t) {0}, QUATF_IDENTITY,
                                      (vec3f_t) {{1.0f, 1.0f, 1.0f}});
 
+    level_t level = _new_level(level_ent);
     struct level_instance *instance = _level_instance(level);
 
+    ARRAY_T(entity_t) spawned;
+    ARRAY_INIT(entity_t, &spawned, memsys_main_allocator());
+
+    unit_spawn_from_resource(world, data, &spawned);
+
     for (int i = 0; i < res->units_count; ++i) {
-        entity_t unit = unit_spawn_from_resource(world, (void *) &data[offset[i]]);
+        entity_t e = ARRAY_AT(&spawned, offset[i]);
+        MAP_SET(entity_t, &instance->spawned_entity, id[i].id, e);
 
-        MAP_SET(entity_t, &instance->spawned_entity, id[i].id, unit);
-
-        if (transform_has(world, unit)) {
-            transform_link(world, level_ent, unit);
+        if (transform_has(world, e)) {
+            transform_link(world, level_ent, e);
         }
     }
+
+    ARRAY_DESTROY(entity_t, &spawned);
+
+    //MAP_SET(entity_t, &instance->spawned_entity, id[i].id, unit);
+//
+//    for (int i = 0; i < res->units_count; ++i) {
+//        entity_t unit = unit_spawn_from_resource(world, (void *) &data[offset[i]]);
+//
+//        MAP_SET(entity_t, &instance->spawned_entity, id[i].id, unit);
+//
+//        if (transform_has(world, unit)) {
+//            transform_link(world, level_ent, unit);
+//        }
+//    }
 
     return level;
 }

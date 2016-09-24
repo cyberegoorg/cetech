@@ -354,3 +354,7 @@ const char *application_native_platform() {
 const char *application_platform() {
     return application_native_platform();
 }
+
+window_t application_get_main_window() {
+    return _G.main_window;
+}

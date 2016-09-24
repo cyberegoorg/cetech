@@ -2,30 +2,19 @@
 // Includes
 //==============================================================================
 
+#include "celib/containers/map.h"
 #include <engine/components/types.h>
 #include <engine/core/world_system.h>
-#include <celib/os/vio.h>
-#include <celib/stringid/types.h>
-#include <engine/core/resource_manager.h>
-#include <celib/stringid/stringid.h>
-#include <engine/develop/resource_compiler.h>
-#include <engine/core/unit_system.h>
-#include <engine/core/entcom.h>
-#include <engine/components/transform.h>
-#include <celib/math/quatf.h>
 #include "engine/core/memory_system.h"
-#include "celib/containers/map.h"
 
 //==============================================================================
 // Typedefs
 //==============================================================================
 
 ARRAY_T(world_t);
-ARRAY_PROTOTYPE(entity_t);
 ARRAY_PROTOTYPE(world_callbacks_t);
 ARRAY_PROTOTYPE(stringid64_t);
 
-MAP_PROTOTYPE(entity_t);
 
 //==============================================================================
 // Globals
