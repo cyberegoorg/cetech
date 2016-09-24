@@ -13,6 +13,8 @@
 #include <engine/core/application.h>
 #include <celib/os/vio.h>
 #include <engine/develop/resource_compiler.h>
+#include <mpack/mpack.h>
+#include <engine/develop/console_server.h>
 #include "engine/core/memory_system.h"
 #include "celib/containers/map.h"
 
@@ -65,6 +67,12 @@ struct G {
 //==============================================================================
 // Private
 //==============================================================================
+
+static int _cmd_reload_all(mpack_node_t args,
+                           mpack_writer_t *writer) {
+    resource_reload_all();
+    return 0;
+}
 
 static MAP_T(resource_item_t) *_get_resource_map(stringid64_t type) {
     const u32 idx = MAP_GET(u32, &_G.type_map, type.id, UINT32_MAX);
@@ -146,6 +154,8 @@ int resource_init(int stage) {
     filesystem_map_root_dir(stringid64_from_string("build"), build_dir_full);
 
     resource_register_type(stringid64_from_string("package"), package_resource_callback);
+
+    consolesrv_register_command("resource.reload_all", _cmd_reload_all);
 
     return package_init();
 }

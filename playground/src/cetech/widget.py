@@ -3,7 +3,7 @@ from PyQt5.QtGui import QCursor
 from PyQt5.QtWidgets import QWidget
 
 
-class ReadyLock(QThread):
+class _ReadyLock(QThread):
     def __init__(self, url, engine_widget):
         self.api = engine_widget.api
         self.engine_widget = engine_widget
@@ -20,7 +20,7 @@ class Widget(QWidget):
         self.ready = False
         self.last_pos = (0, 0)
 
-        self.ready_lock = ReadyLock(log_url, self)
+        self.ready_lock = _ReadyLock(log_url, self)
         self.ready_lock.start(QThread.NormalPriority)
 
         self.start_pos = None

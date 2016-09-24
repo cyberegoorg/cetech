@@ -1,7 +1,7 @@
 import os
 import platform
 
-from cetech.widget import Widget, ReadyLock
+from cetech.widget import Widget, _ReadyLock
 from cetech.consoleapi import ConsoleAPI
 
 

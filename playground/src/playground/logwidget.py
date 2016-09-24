@@ -1,13 +1,11 @@
 import re
 
 import msgpack
-import yaml
+import nanomsg
 from PyQt5.QtCore import QDateTime, Qt, QThread
 from PyQt5.QtGui import QColor
 from PyQt5.QtWidgets import QFrame, QStyle, QTreeWidgetItem
-
-import nanomsg
-from nanomsg import Socket, SUB, SUB_SUBSCRIBE, DONTWAIT
+from nanomsg import Socket, SUB, SUB_SUBSCRIBE
 
 from playground.ui.logwidget import Ui_LogWidget
 
