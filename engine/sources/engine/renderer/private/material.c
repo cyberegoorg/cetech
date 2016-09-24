@@ -506,7 +506,8 @@ void material_use(material_t material) {
     // TODO: refactor: one loop
     u32 offset = 0;
     for (int i = 0; i < resource->texture_count; ++i) {
-        bgfx_set_texture(i, u_handler[offset + i], texture_resource_get(u_texture[i]), 0);
+        bgfx_texture_handle_t texture = texture_resource_get(u_texture[i]);
+        bgfx_set_texture(i, u_handler[offset + i], texture, 0);
     }
     offset += resource->texture_count;
 

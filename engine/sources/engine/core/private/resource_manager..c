@@ -295,7 +295,6 @@ void resource_load(void **loaded_data,
         char build_name[33] = {0};
         resource_type_name_string(build_name, CE_ARRAY_LEN(build_name), type, names[i]);
 
-
         char filename[1024] = {0};
         resource_compiler_get_filename(filename, CE_ARRAY_LEN(filename), type, names[i]);
         log_debug("resource", "Loading resource %s from %s/%s", filename, filesystem_get_root_dir(root_name),
@@ -368,6 +367,7 @@ void *resource_get(stringid64_t type,
             item = MAP_GET(resource_item_t, resource_map, names.id, null_item);
         } else {
             // TODO: fallback resource #CETECH-44
+            log_info(LOG_WHERE, "ddddddd");
         }
     }
 

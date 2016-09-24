@@ -4,6 +4,7 @@ lua:
 
 texture:
   - "content/texture1"
+#  - "content/uv_checker"
   - "texture2"
 
 package:

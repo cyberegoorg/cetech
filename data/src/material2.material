@@ -1,5 +1,5 @@
 parent: material1
 
 textures:
-  #u_texColor: texture2
-  u_texColor: content/texture1
+ #u_texColor: texture2
+ u_texColor: content/scene/solider/body01

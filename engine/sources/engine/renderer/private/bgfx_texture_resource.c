@@ -87,6 +87,13 @@ int _texture_resource_compiler(const char *filename,
                                struct vio *source_vio,
                                struct vio *build_vio,
                                struct compilator_api *compilator_api) {
+    // TODO: temp allocator?
+    char build_dir[1024] = {0};
+    char tmp_dir[1024] = {0};
+    char input_str[1024] = {0};
+    char input_path[1024] = {0};
+    char output_path[1024] = {0};
+    char tmp_filename[1024] = {0};
 
     char source_data[vio_size(source_vio) + 1];
     memory_set(source_data, 0, vio_size(source_vio) + 1);
@@ -103,14 +110,6 @@ int _texture_resource_compiler(const char *filename,
     int is_normalmap = yaml_is_valid(n_is_normalmap) ? yaml_as_bool(n_is_normalmap) : 0;
 
     const char *source_dir = resource_compiler_get_source_dir();
-
-    // TODO: temp allocator?
-    char build_dir[1024] = {0};
-    char tmp_dir[1024] = {0};
-    char input_str[1024] = {0};
-    char input_path[1024] = {0};
-    char output_path[1024] = {0};
-    char tmp_filename[1024] = {0};
 
     resource_compiler_get_build_dir(build_dir, CE_ARRAY_LEN(build_dir), application_platform());
     resource_compiler_get_tmp_dir(tmp_dir, CE_ARRAY_LEN(tmp_dir), application_platform());
@@ -168,9 +167,7 @@ void texture_resource_online(stringid64_t name,
                              void *data) {
     struct texture_resource *resource = data;
 
-    const bgfx_memory_t *mem = bgfx_alloc(resource->size);
-    memory_copy(mem->data, (resource + 1), resource->size);
-
+    const bgfx_memory_t *mem = bgfx_copy((resource + 1), resource->size);
     bgfx_texture_handle_t texture = bgfx_create_texture(mem, BGFX_TEXTURE_NONE, 0, NULL);
 
     MAP_SET(bgfx_texture_handle_t, &_G.handler_map, name.id, texture);
@@ -188,7 +185,6 @@ void texture_resource_offline(stringid64_t name,
 
     bgfx_destroy_texture(texture);
 
-    MAP_REMOVE(bgfx_texture_handle_t, &_G.handler_map, name.id);
 }
 
 void *texture_resource_reloader(stringid64_t name,
@@ -237,6 +233,7 @@ void texture_resource_shutdown() {
 }
 
 bgfx_texture_handle_t texture_resource_get(stringid64_t name) {
-    struct texture_resource *resource = resource_get(_G.shader_type, name);
+    resource_get(_G.shader_type, name); // TODO: only for autoload
+
     return MAP_GET(bgfx_texture_handle_t, &_G.handler_map, name.id, null_texture);
 }

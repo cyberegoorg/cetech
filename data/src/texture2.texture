@@ -1,1 +1,2 @@
 input: content/texture2.png
+gen_mipmaps: true
