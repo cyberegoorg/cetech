@@ -15,8 +15,8 @@
 #include "engine/core/memory.h"
 #include "engine/core/resource.h"
 #include "engine/develop/resource_compiler.h"
-#include "texture_resource.h"
-#include "shader_resource.h"
+#include "texture.h"
+#include "shader.h"
 
 
 //==============================================================================

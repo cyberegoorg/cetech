@@ -13,8 +13,8 @@
 #include "engine/renderer/renderer.h"
 
 #include "bgfx/c99/bgfxplatform.h"
-#include "texture_resource.h"
-#include "shader_resource.h"
+#include "texture.h"
+#include "shader.h"
 #include "engine/renderer/material.h"
 
 //==============================================================================

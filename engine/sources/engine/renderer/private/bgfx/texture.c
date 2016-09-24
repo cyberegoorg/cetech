@@ -27,7 +27,7 @@ ARRAY_PROTOTYPE(bgfx_texture_handle_t)
 
 MAP_PROTOTYPE(bgfx_texture_handle_t)
 
-struct texture_resource {
+struct texture {
     u64 size;
 };
 
@@ -130,7 +130,7 @@ int _texture_resource_compiler(const char *filename,
     char *tmp_data = CE_ALLOCATE(memsys_main_allocator(), char, vio_size(tmp_file) + 1);
     vio_read(tmp_file, tmp_data, sizeof(char), vio_size(tmp_file));
 
-    struct texture_resource resource = {
+    struct texture resource = {
             .size = vio_size(tmp_file)
     };
 
@@ -165,7 +165,7 @@ void texture_resource_unloader(void *new_data,
 
 void texture_resource_online(stringid64_t name,
                              void *data) {
-    struct texture_resource *resource = data;
+    struct texture *resource = data;
 
     const bgfx_memory_t *mem = bgfx_copy((resource + 1), resource->size);
     bgfx_texture_handle_t texture = bgfx_create_texture(mem, BGFX_TEXTURE_NONE, 0, NULL);

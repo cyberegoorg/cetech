@@ -27,7 +27,7 @@ ARRAY_PROTOTYPE(bgfx_program_handle_t)
 
 MAP_PROTOTYPE(bgfx_program_handle_t)
 
-struct shader_resource {
+struct shader {
     u64 vs_size;
     u64 fs_size;
     // u8 vs [vs_size]
@@ -128,7 +128,7 @@ int _shader_resource_compiler(const char *filename,
     os_path_join(include_dir, CE_ARRAY_LEN(include_dir), core_dir, "bgfxshaders");
 
 
-    struct shader_resource resource = {0};
+    struct shader resource = {0};
 
     // TODO: temp allocator?
     char build_dir[256] = {0};
@@ -211,7 +211,7 @@ void shader_resource_unloader(void *new_data,
 
 void shader_resource_online(stringid64_t name,
                             void *data) {
-    struct shader_resource *resource = data;
+    struct shader *resource = data;
 
     const bgfx_memory_t *vs_mem = bgfx_alloc(resource->vs_size);
     const bgfx_memory_t *fs_mem = bgfx_alloc(resource->fs_size);
@@ -287,6 +287,6 @@ void shader_resource_shutdown() {
 }
 
 bgfx_program_handle_t shader_resource_get(stringid64_t name) {
-    struct shader_resource *resource = resource_get(_G.shader_type, name);
+    struct shader *resource = resource_get(_G.shader_type, name);
     return MAP_GET(bgfx_program_handle_t, &_G.handler_map, name.id, null_program);
 }

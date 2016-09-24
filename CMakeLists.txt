@@ -186,8 +186,8 @@ set(SOURCE_FILES
         engine/sources/engine/develop/private/resource_compiler.c
 
         engine/sources/engine/renderer/private/bgfx/renderer.c
-        engine/sources/engine/renderer/private/bgfx/texture_resource.c
-        engine/sources/engine/renderer/private/bgfx/shader_resource.c
+        engine/sources/engine/renderer/private/bgfx/texture.c
+        engine/sources/engine/renderer/private/bgfx/shader.c
         engine/sources/engine/renderer/private/bgfx/material.c
         engine/sources/engine/components/private/mesh_renderer.c
 
