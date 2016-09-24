@@ -12,7 +12,7 @@ extern "C" {
 #include "celib/string/string.h"
 #include "../filesystem.h"
 #include "celib/os/vio.h"
-#include <engine/core/memory_system.h>
+#include <engine/core/memory.h>
 };
 
 SCENARIO( "map root to root_path", "[filesystem]" ) {

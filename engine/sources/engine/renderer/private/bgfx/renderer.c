@@ -6,15 +6,15 @@
 #include <celib/math/types.h>
 #include <engine/components/camera.h>
 #include <celib/stringid/stringid.h>
-#include <engine/renderer/mesh_renderer.h>
+#include <engine/components/mesh_renderer.h>
 #include <engine/develop/console_server.h>
 #include <mpack/mpack.h>
 #include "celib/window/window.h"
-#include "../renderer.h"
+#include "engine/renderer/renderer.h"
 
 #include "bgfx/c99/bgfxplatform.h"
-#include "bgfx_texture_resource.h"
-#include "bgfx_shader_resource.h"
+#include "texture_resource.h"
+#include "shader_resource.h"
 #include "engine/renderer/material.h"
 
 //==============================================================================

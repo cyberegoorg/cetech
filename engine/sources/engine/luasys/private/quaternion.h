@@ -5,7 +5,7 @@
 
 #include "celib/math/quatf.h"
 
-#include "../lua_system.h"
+#include "engine/luasys/luasys.h"
 
 
 static int _quat_add(lua_State *L) {

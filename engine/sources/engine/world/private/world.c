@@ -4,8 +4,8 @@
 
 #include "celib/containers/map.h"
 #include <engine/components/types.h>
-#include <engine/core/world_system.h>
-#include "engine/core/memory_system.h"
+#include <engine/world/world.h>
+#include "engine/core/memory.h"
 
 //==============================================================================
 // Typedefs

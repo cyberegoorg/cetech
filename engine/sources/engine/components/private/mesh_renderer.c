@@ -4,15 +4,15 @@
 #include <celib/containers/map.h>
 #include <celib/stringid/stringid.h>
 
-#include <engine/core/memory_system.h>
+#include <engine/core/memory.h>
 #include <engine/core/entcom.h>
 #include <engine/renderer/material.h>
 #include <bgfx/c99/bgfx.h>
 #include <engine/components/transform.h>
-#include <engine/renderer/mesh_renderer.h>
+#include <engine/components/mesh_renderer.h>
 #include <engine/components/transform.h>
 
-#include "../mesh_renderer.h"
+#include "engine/components/mesh_renderer.h"
 
 #define LOG_WHERE "mesh_renderer"
 

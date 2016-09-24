@@ -7,9 +7,8 @@
 #include "celib/math/vec3f.h"
 #include "celib/math/vec4f.h"
 
-#include "../lua_system.h"
+#include "engine/luasys/luasys.h"
 
-/////// VECTOR2
 
 static int _vec2f_add(lua_State *L) {
     vec2f_t *a = luasys_to_vec2f(L, 1);
@@ -104,11 +103,6 @@ static int _vec2f_newindex(lua_State *L) {
 
     return 0;
 }
-
-//////
-
-/////// VECTOR3
-
 
 static int _vec3f_add(lua_State *L) {
     vec3f_t *a = luasys_to_vec3f(L, 1);
@@ -209,11 +203,6 @@ static int _vec3f_newindex(lua_State *L) {
 
     return 0;
 }
-
-//////
-
-/////// VECTOR4
-
 
 static int _vec4f_add(lua_State *L) {
     vec4f_t *a = luasys_to_vec4f(L, 1);
@@ -320,7 +309,5 @@ static int _vec4f_newindex(lua_State *L) {
 
     return 0;
 }
-
-//////
 
 #endif //CETECH_VECTORS_H

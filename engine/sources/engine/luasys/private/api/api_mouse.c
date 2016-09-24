@@ -1,5 +1,5 @@
 #include <celib/math/types.h>
-#include "engine/luasys/lua_system.h"
+#include "engine/luasys/luasys.h"
 #include "engine/input/input.h"
 
 #define API_NAME "Mouse"

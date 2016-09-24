@@ -1,8 +1,8 @@
 
 #include <engine/core/types.h>
 #include <celib/stringid/stringid.h>
-#include <engine/core/unit_system.h>
-#include "engine/luasys/lua_system.h"
+#include <engine/world/unit.h>
+#include "engine/luasys/luasys.h"
 
 #define API_NAME "Unit"
 

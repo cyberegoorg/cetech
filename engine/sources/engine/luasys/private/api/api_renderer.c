@@ -1,6 +1,6 @@
 
 #include "engine/renderer/renderer.h"
-#include "engine/luasys/lua_system.h"
+#include "engine/luasys/luasys.h"
 
 #define API_NAME "Renderer"
 

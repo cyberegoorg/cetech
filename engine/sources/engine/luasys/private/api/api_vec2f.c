@@ -3,7 +3,7 @@
 #include "celib/math/vec2f.h"
 
 #include "engine/core/types.h"
-#include "engine/luasys/lua_system.h"
+#include "engine/luasys/luasys.h"
 
 #define API_NAME "Vec2f"
 

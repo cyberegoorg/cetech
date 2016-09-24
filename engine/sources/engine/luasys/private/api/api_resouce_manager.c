@@ -1,5 +1,5 @@
-#include "engine/core/resource_manager.h"
-#include "engine/luasys/lua_system.h"
+#include "engine/core/resource.h"
+#include "engine/luasys/luasys.h"
 
 #define API_NAME "ResourceManager"
 

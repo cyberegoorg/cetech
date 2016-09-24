@@ -2,9 +2,9 @@
 #define CETECH_MESH_RENDERER_H
 
 #include <celib/stringid/types.h>
-#include "../components/types.h"
+#include "types.h"
 #include "engine/core/types.h"
-#include "material.h"
+#include "engine/renderer/material.h"
 
 typedef struct {
     u32 idx;

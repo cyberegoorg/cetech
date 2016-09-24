@@ -2,10 +2,10 @@
 #include <engine/core/types.h>
 #include <engine/components/transform.h>
 #include <celib/math/mat44f.h>
-#include <engine/renderer/mesh_renderer.h>
+#include <engine/components/mesh_renderer.h>
 #include <engine/renderer/material.h>
 #include <celib/stringid/stringid.h>
-#include "engine/luasys/lua_system.h"
+#include "engine/luasys/luasys.h"
 
 #define API_NAME "Material"
 

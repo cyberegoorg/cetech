@@ -13,9 +13,9 @@
 #include "celib/os/vio.h"
 #include "celib/os/fs.h"
 
-#include "engine/core/memory_system.h"
+#include "engine/core/memory.h"
 #include "engine/core/application.h"
-#include "engine/core/resource_manager.h"
+#include "engine/core/resource.h"
 #include "engine/develop/resource_compiler.h"
 
 

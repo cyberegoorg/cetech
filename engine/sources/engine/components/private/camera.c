@@ -5,7 +5,7 @@
 #include <celib/math/mat44f.h>
 #include <celib/stringid/stringid.h>
 
-#include <engine/core/memory_system.h>
+#include <engine/core/memory.h>
 #include <engine/core/entcom.h>
 #include <engine/renderer/renderer.h>
 #include <engine/core/types.h>

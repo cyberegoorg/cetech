@@ -3,7 +3,7 @@
 //==============================================================================
 
 #include <celib/os/path.h>
-#include <engine/core/memory_system.h>
+#include <engine/core/memory.h>
 #include "celib/os/fs.h"
 #include "celib/string/string.h"
 

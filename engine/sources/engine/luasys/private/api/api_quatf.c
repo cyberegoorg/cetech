@@ -1,7 +1,7 @@
 
 #include <engine/core/types.h>
 #include <celib/math/quatf.h>
-#include "engine/luasys/lua_system.h"
+#include "engine/luasys/luasys.h"
 
 #define API_NAME "Quatf"
 

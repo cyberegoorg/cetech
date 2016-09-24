@@ -7,7 +7,7 @@
 #include <celib/os/object.h>
 #include "celib/string/string.h"
 
-#include "engine/core/plugin_system.h"
+#include "engine/core/plugin.h"
 
 //==============================================================================
 // Defines

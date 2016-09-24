@@ -133,10 +133,10 @@ set(SOURCE_FILES
         ########################################################################
         # CETECH: Plugin system
         ########################################################################
-        engine/sources/engine/core/private/plugin_system.c
-        engine/sources/engine/core/private/plugin_system.c
+        engine/sources/engine/core/private/plugin.c
+        engine/sources/engine/core/private/plugin.c
 
-        engine/sources/engine/luasys/private/lua_system.c
+        engine/sources/engine/luasys/private/luasys.c
         engine/sources/engine/luasys/private/api/api_keyboard.c
         engine/sources/engine/luasys/private/api/api_log.c
         engine/sources/engine/luasys/private/api/api_mouse.c
@@ -159,19 +159,19 @@ set(SOURCE_FILES
         engine/sources/engine/luasys/private/api/api_level.c
 
         engine/sources/engine/develop/private/console_server.c
-        engine/sources/engine/core/private/memory_system.c
+        engine/sources/engine/core/private/memory.c
 
         engine/sources/engine/core/tests/test_filesystem.cc
         engine/sources/engine/core/private/filesystem.c
         engine/sources/engine/core/private/cvar.c
         engine/sources/engine/core/private/application.c
-        engine/sources/engine/core/private/task_manager.c
-        engine/sources/engine/core/private/resource_manager..c
+        engine/sources/engine/core/private/task.c
+        engine/sources/engine/core/private/resource.c
         engine/sources/engine/core/private/resource_package.c
-        engine/sources/engine/core/private/unit_system.c
+        engine/sources/engine/world/private/unit.c
         engine/sources/engine/core/private/entcom.c
-        engine/sources/engine/core/private/world_system.c
-        engine/sources/engine/core/private/level.c
+        engine/sources/engine/world/private/world.c
+        engine/sources/engine/world/private/level.c
 
         engine/sources/engine/machine/private/machine.c
         engine/sources/engine/machine/private/sdl2/sdl_mouse.c
@@ -185,11 +185,11 @@ set(SOURCE_FILES
 
         engine/sources/engine/develop/private/resource_compiler.c
 
-        engine/sources/engine/renderer/private/bgfx_renderer.c
-        engine/sources/engine/renderer/private/bgfx_texture_resource.c
-        engine/sources/engine/renderer/private/bgfx_shader_resource.c
-        engine/sources/engine/renderer/private/material.c
-        engine/sources/engine/renderer/private/mesh_renderer.c
+        engine/sources/engine/renderer/private/bgfx/renderer.c
+        engine/sources/engine/renderer/private/bgfx/texture_resource.c
+        engine/sources/engine/renderer/private/bgfx/shader_resource.c
+        engine/sources/engine/renderer/private/bgfx/material.c
+        engine/sources/engine/components/private/mesh_renderer.c
 
         engine/sources/engine/components/private/transform.c
         engine/sources/engine/components/private/camera.c

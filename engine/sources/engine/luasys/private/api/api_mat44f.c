@@ -2,7 +2,7 @@
 #include <celib/math/mat44f.h>
 
 #include <engine/core/types.h>
-#include "engine/luasys/lua_system.h"
+#include "engine/luasys/luasys.h"
 
 #define API_NAME "Mat44f"
 

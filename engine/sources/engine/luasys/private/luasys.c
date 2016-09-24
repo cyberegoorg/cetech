@@ -7,16 +7,16 @@
 #include <engine/develop/resource_compiler.h>
 #include <celib/os/vio.h>
 #include <celib/memory/memory.h>
-#include <engine/core/resource_manager.h>
-#include <engine/core/memory_system.h>
+#include <engine/core/resource.h>
+#include <engine/core/memory.h>
 #include <engine/core/application.h>
 #include <celib/math/types.h>
 #include <celib/math/vec2f.h>
 #include "celib/errors/errors.h"
 
-#include "engine/luasys/lua_system.h"
+#include "engine/luasys/luasys.h"
 #include "engine/develop/console_server.h"
-#include "engine/core/plugin_system.h"
+#include "engine/core/plugin.h"
 
 #include "vectors.h"
 #include "quaternion.h"

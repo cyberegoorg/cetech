@@ -2,7 +2,7 @@
 #include <engine/core/types.h>
 #include <engine/components/transform.h>
 #include <celib/math/mat44f.h>
-#include "engine/luasys/lua_system.h"
+#include "engine/luasys/luasys.h"
 
 #define API_NAME "Transform"
 

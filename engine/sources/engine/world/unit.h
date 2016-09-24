@@ -1,7 +1,7 @@
 #ifndef CETECH_UNIT_SYSTEM_H
 #define CETECH_UNIT_SYSTEM_H
 
-#include "../develop/resource_compiler.h"
+#include "engine/develop/resource_compiler.h"
 
 
 int unit_init(int stage);

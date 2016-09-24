@@ -1,8 +1,8 @@
 
-#include <engine/core/world_system.h>
+#include <engine/world/world.h>
 #include <celib/stringid/stringid.h>
 #include <engine/core/types.h>
-#include "engine/luasys/lua_system.h"
+#include "engine/luasys/luasys.h"
 
 #define API_NAME "World"
 

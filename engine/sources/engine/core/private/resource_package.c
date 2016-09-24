@@ -4,16 +4,16 @@
 
 #include <celib/stringid/stringid.h>
 #include <engine/core/types.h>
-#include <engine/core/task_manager.h>
+#include <engine/core/task.h>
 #include <engine/develop/resource_compiler.h>
 #include <celib/memory/memory.h>
 #include <celib/os/vio.h>
 #include <celib/yaml/yaml.h>
 #include <celib/log/log.h>
 #include <celib/containers/array.h>
-#include <engine/core/memory_system.h>
+#include <engine/core/memory.h>
 
-#include "engine/core/resource_manager.h"
+#include "engine/core/resource.h"
 #include "resource_package.h"
 
 //==============================================================================

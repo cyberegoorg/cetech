@@ -3,7 +3,7 @@
 #include <celib/stringid/types.h>
 #include <engine/core/entcom.h>
 #include <celib/containers/map.h>
-#include <engine/core/memory_system.h>
+#include <engine/core/memory.h>
 #include <celib/math/quatf.h>
 #include <celib/math/mat44f.h>
 #include <celib/stringid/stringid.h>

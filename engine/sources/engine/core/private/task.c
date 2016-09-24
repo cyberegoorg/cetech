@@ -7,7 +7,7 @@
 //==============================================================================
 
 #include <celib/os/thread.h>
-#include <engine/core/memory_system.h>
+#include <engine/core/memory.h>
 #include <celib/os/cpu.h>
 #include "engine/core/types.h"
 
