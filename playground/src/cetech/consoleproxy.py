@@ -25,7 +25,7 @@ class ConsoleProxy(object):
 
         self.socket.send(dump)
 
-    def send_command(self, cmd_name, echo=False,**kwargs):
+    def send_command(self, cmd_name, echo=True, **kwargs):
         self.send_command_norcv(cmd_name=cmd_name, echo=echo, **kwargs)
         recv = self.socket.recv()
 

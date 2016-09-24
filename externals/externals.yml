@@ -120,7 +120,7 @@ nanomsg:
 
   build:
     posix: &nanomsg_build_posix
-      [cmake . -DNN_STATIC_LIB=TRUE, make]
+      [cmake . -DNN_STATIC_LIB=TRUE, make, cmake . , make]
 
     linux64:  *nanomsg_build_posix
     darwin64: *nanomsg_build_posix
@@ -131,9 +131,11 @@ nanomsg:
   install:
     linux64:
       - copyfile: [libnanomsg.a, release/lib/libnanomsg.a]
+      - copyfile: [libnanomsg.so, release/lib/libnanomsg.so]
       - copytree: [src, release/include/nanomsg]
 
       - copyfile: [libnanomsg.a, debug/lib/libnanomsg.a]
+      - copyfile: [libnanomsg.so, debug/lib/libnanomsg.so]
       - copytree: [src, debug/include/nanomsg]
 
     darwin64:

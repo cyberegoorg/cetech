@@ -1,39 +1,17 @@
-﻿import nanomsg
-import yaml
-
+﻿from PyQt5.QtCore import Qt, QThread
 from PyQt5.QtGui import QCursor
-from PyQt5.QtCore import Qt, QThread
 from PyQt5.QtWidgets import QWidget
-from nanomsg import Socket, SUB, SUB_SUBSCRIBE
 
 
 class ReadyLock(QThread):
     def __init__(self, url, engine_widget):
-        self.socket = Socket(SUB)
-        self.url = url
+        self.api = engine_widget.api
         self.engine_widget = engine_widget
-
         super().__init__()
 
-    def register_handler(self, handler):
-        self.handlers.append(handler)
-
     def run(self):
-        self.socket.set_string_option(SUB, SUB_SUBSCRIBE, b'')
-        self.socket.connect(self.url)
-        while True:
-            try:
-                msg = self.socket.recv()
-                msg_yaml = yaml.load(msg)
-
-                if msg_yaml["where"] == 'core.ready':
-                    size = self.engine_widget.size()
-                    self.engine_widget.ready = True
-                    # self.api.resize(size.width(), size.height())
-                    return
-
-            except nanomsg.NanoMsgAPIError as e:
-                raise
+        self.api.send_command("console_server.ready")
+        self.engine_widget.ready = True
 
 
 class Widget(QWidget):
@@ -64,8 +42,7 @@ class Widget(QWidget):
         event.accept()
 
     def _move_mouse(self, x, y, left, midle, right):
-        self.api.send_command('lua.execute',
-                              script="EditorInput:Move(%d, %d, %s, %s, %s)" % (x, y, left, midle, right))
+        self.api.lua_execute(script="EditorInput:Move(%d, %d, %s, %s, %s)" % (x, y, left, midle, right))
 
     def mouseMoveEvent(self, event):
         """ QWidget.mouseMoveEvent(QMouseEvent) 
@@ -124,9 +101,7 @@ class Widget(QWidget):
         }
 
         if btn in btn_map:
-            self.api.send_command('lua.execute',
-                                  script="EditorInput.keyboard.%s = true" % (btn_map[btn]))
-
+            self.api.lua_execute(script="EditorInput.keyboard.%s = true" % (btn_map[btn]))
 
     def keyReleaseEvent(self, event):
         """ QWidget.keyReleaseEvent(QKeyEvent)
@@ -142,5 +117,4 @@ class Widget(QWidget):
         }
 
         if btn in btn_map:
-            self.api.send_command('lua.execute',
-                                  script="EditorInput.keyboard.%s = false" % (btn_map[btn]))
+            self.api.lua_execute(script="EditorInput.keyboard.%s = false" % (btn_map[btn]))

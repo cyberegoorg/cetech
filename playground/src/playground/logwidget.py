@@ -1,27 +1,30 @@
-import nanomsg
 import re
+
+import msgpack
 import yaml
-from PyQt5.QtCore import Qt, QThread
+from PyQt5.QtCore import QDateTime, Qt, QThread
 from PyQt5.QtGui import QColor
 from PyQt5.QtWidgets import QFrame, QStyle, QTreeWidgetItem
-from nanomsg import Socket, SUB, SUB_SUBSCRIBE
 
-from playground.playground import Ui_LogWidget
+import nanomsg
+from nanomsg import Socket, SUB, SUB_SUBSCRIBE, DONTWAIT
+
+from playground.ui.logwidget import Ui_LogWidget
 
 RESOURCE_NAME_RE = re.compile("^\[([^\]]+)\]")
 
 LOG_COLOR = {
-    'I': QColor("blue"),
-    'W': QColor("yellow"),
-    'D': QColor("green"),
-    'E': QColor("red"),
+    'info': QColor("blue"),
+    'warning': QColor("yellow"),
+    'debug': QColor("green"),
+    'error': QColor("red"),
 }
 
 LOG_ICON = {
-    'Info': QStyle.SP_MessageBoxInformation,
-    'Warning': QStyle.SP_MessageBoxWarning,
-    'Debug': QStyle.SP_MessageBoxQuestion,
-    'Error': QStyle.SP_MessageBoxCritical,
+    'info': QStyle.SP_MessageBoxInformation,
+    'warning': QStyle.SP_MessageBoxWarning,
+    'debug': QStyle.SP_MessageBoxQuestion,
+    'error': QStyle.SP_MessageBoxCritical,
 }
 
 
@@ -42,12 +45,14 @@ class LogSub(QThread):
         while True:
             try:
                 msg = self.socket.recv()
-                msg_yaml = yaml.load(msg)
+                msg_pack = msgpack.unpackb(msg, encoding='utf-8')
+
                 for h in self.handlers:
-                    h(**msg_yaml)
+                    h(**msg_pack)
 
             except nanomsg.NanoMsgAPIError as e:
                 raise
+
 
 class LogWidget(QFrame, Ui_LogWidget):
     def __init__(self, script_editor, logsub, ignore_where=None):
@@ -74,14 +79,14 @@ class LogWidget(QFrame, Ui_LogWidget):
         m = self.ignore_where.match(name)
         return m is not None
 
-    def add_log(self, time, level, worker, where, msg):
-        #print(time, level, worker, where, msg)
+    def add_log(self, time, level, worker_id, where, msg):
+        # print(time, level, worker, where, msg)
         if self._is_ignored(where):
             return
 
-        dt_s = time#QDateTime.fromTime_t(time).toString("hh:mm:ss.zzz")
+        dt_s = QDateTime.fromTime_t(time).toString("hh:mm:ss.zzz")
 
-        item = QTreeWidgetItem(['', dt_s, str(worker), where, msg[:-1]])
+        item = QTreeWidgetItem(['', dt_s, str(worker_id), where, msg[:-1]])
 
         item.setIcon(0, self.style().standardIcon(LOG_ICON[level]))
         item.setData(0, Qt.UserRole, level)
@@ -98,7 +103,7 @@ class LogWidget(QFrame, Ui_LogWidget):
         """
 
         level = item.data(0, Qt.UserRole)
-        if level != 'Error':
+        if level != 'error':
             return
 
         where = item.text(3)
@@ -108,4 +113,4 @@ class LogWidget(QFrame, Ui_LogWidget):
         msg = item.text(4)
 
         resource_name = RESOURCE_NAME_RE.match(msg).group(1)
-        #self.script_editor.open_resource(resource_name)
+        # self.script_editor.open_resource(resource_name)

@@ -23,15 +23,14 @@ from PyQt5.uic import compileUiDir
 ###########
 # GLOBALS #
 ########################################################################################################################
-ROOT_DIR = os.path.dirname(os.path.abspath(__file__), os.pardir)
-PLAYGROUND_DIR = os.path.join(ROOT_DIR, 'playground')
+ROOT_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), os.pardir)
+PLAYGROUND_DIR = os.path.abspath(os.path.join(ROOT_DIR, 'playground'))
 
 _platform = platform.system().lower()
 LIB_DIR = os.path.join(ROOT_DIR,
                        'externals', 'build',
                        "%s%s" % (_platform if _platform != 'darwin' else 'osx', platform.architecture()[0][0:2]),
-                       'Release', 'lib')
-
+                       'release', 'lib')
 
 if _platform == 'windows':
     QApplication.addLibraryPath(os.path.join(os.path.dirname(PyQt5.__file__), "plugins"))

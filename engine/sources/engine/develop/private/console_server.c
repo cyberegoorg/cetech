@@ -36,8 +36,12 @@ static struct G {
 
     int rpc_socket;
     int log_socket;
+
     cvar_t cv_rpc_port;
     cvar_t cv_rpc_addr;
+
+    cvar_t cv_log_port;
+    cvar_t cv_log_addr;
 } ConsoleServerGlobals = {0};
 
 
@@ -53,6 +57,8 @@ static console_server_command_t _find_command(const char *name) {
 
         return _G.commands[i];
     }
+
+    log_error(LOG_WHERE, "Invalid command \"%s\"", name);
 
     return 0;
 }
@@ -109,6 +115,11 @@ static void _serve_command(const char *packet,
 // Interface
 //==============================================================================
 
+static int _cmd_ready(mpack_node_t args,
+                      mpack_writer_t *writer) {
+    return 0;
+}
+
 int consolesrv_init(int stage) {
     if (stage == 0) {
         _G = (struct G) {0};
@@ -116,19 +127,21 @@ int consolesrv_init(int stage) {
         _G.cv_rpc_port = cvar_new_int("develop.rpc.port", "Console server rpc port", 4444);
         _G.cv_rpc_addr = cvar_new_str("develop.rpc.addr", "Console server rpc addr", "ws://*");
 
+        _G.cv_log_port = cvar_new_int("develop.log.port", "Console server log port", 4445);
+        _G.cv_log_addr = cvar_new_str("develop.log.addr", "Console server log addr", "ws://*");
+
         return 1;
     }
 
-    log_debug(LOG_WHERE, "Init");
+    char addr[128] = {0};
 
+    log_debug(LOG_WHERE, "Init");
 
     int socket = nn_socket(AF_SP, NN_REP);
     if (socket < 0) {
         log_error(LOG_WHERE, "Could not create nanomsg socket: %s", nn_strerror(errno));
         return 0;
     }
-
-    char addr[128] = {0};
     snprintf(addr, 128, "%s:%d", cvar_get_string(_G.cv_rpc_addr), cvar_get_int(_G.cv_rpc_port));
 
     log_debug(LOG_WHERE, "RPC address: %s", addr);
@@ -146,7 +159,10 @@ int consolesrv_init(int stage) {
         return 0;
     }
 
-    if (nn_bind(socket, "ws://*:4445") < 0) {
+    snprintf(addr, 128, "%s:%d", cvar_get_string(_G.cv_log_addr), cvar_get_int(_G.cv_log_port));
+    log_debug(LOG_WHERE, "LOG address: %s", addr);
+
+    if (nn_bind(socket, addr) < 0) {
         log_error(LOG_WHERE, "Could not bind socket to '%s': %s", addr, nn_strerror(errno));
         return 0;
     }
@@ -154,6 +170,7 @@ int consolesrv_init(int stage) {
 
     log_register_handler(nano_log_handler, &_G.log_socket);
 
+    consolesrv_register_command("console_server.ready", _cmd_ready);
     return 1;
 }
 
@@ -168,8 +185,9 @@ void consolesrv_register_command(const char *name,
             continue;
         }
 
-        str_set(_G.name[i], name);
+        str_set(&_G.name[i][0], name);
         _G.commands[i] = cmd;
+        break;
     }
 }
 

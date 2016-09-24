@@ -9,10 +9,10 @@ class AssetView(Widget):
     def __init__(self, parent):
         self.project = None
 
-        api = ConsoleAPI(b"tcp://localhost:5577")
+        api = ConsoleAPI(b"ws://localhost:5576")
         api.connect()
 
-        super(AssetView, self).__init__(parent, api=api, log_url=b"ws://localhost:5576")
+        super(AssetView, self).__init__(parent, api=api, log_url=b"ws://localhost:5577")
 
     def open_asset(self, asset_name, type):
         self.api.lua_execute("AssetView:show_asset(\"%s\", \"%s\")" % (asset_name, type))

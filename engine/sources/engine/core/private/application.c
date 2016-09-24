@@ -33,13 +33,22 @@
 #define _G ApplicationGlobals
 
 static struct G {
+    struct {
+        cvar_t cv_boot_pkg;
+        cvar_t cv_boot_script;
+        cvar_t cv_screen_x;
+        cvar_t cv_screen_y;
+        cvar_t cv_fullscreen;
+
+        cvar_t cv_daemon;
+        cvar_t cv_compile;
+        cvar_t cv_continue;
+        cvar_t cv_wait;
+        cvar_t cv_wid;
+    } config;
+
     const struct game_callbacks *game;
     window_t main_window;
-    cvar_t cv_boot_pkg;
-    cvar_t cv_boot_script;
-    cvar_t cv_screen_x;
-    cvar_t cv_screen_y;
-    cvar_t cv_fullscreen;
     struct args args;
     int is_running;
     int init_error;
@@ -83,12 +92,19 @@ int application_init(int argc,
     memsys_init(4 * 1024 * 1024);
     cvar_init();
 
-    _G.cv_boot_pkg = cvar_new_str("core.boot_pkg", "Boot package", "boot");
-    _G.cv_boot_script = cvar_new_str("core.boot_scrpt", "Boot script", "lua/boot");
+    _G.config.cv_boot_pkg = cvar_new_str("core.boot_pkg", "Boot package", "boot");
+    _G.config.cv_boot_script = cvar_new_str("core.boot_scrpt", "Boot script", "lua/boot");
 
-    _G.cv_screen_x = cvar_new_int("screen.x", "Screen width", 1024);
-    _G.cv_screen_y = cvar_new_int("screen.y", "Screen height", 768);
-    _G.cv_fullscreen = cvar_new_int("screen.fullscreen", "Fullscreen", 0);
+    _G.config.cv_screen_x = cvar_new_int("screen.x", "Screen width", 1024);
+    _G.config.cv_screen_y = cvar_new_int("screen.y", "Screen height", 768);
+    _G.config.cv_fullscreen = cvar_new_int("screen.fullscreen", "Fullscreen", 0);
+
+    _G.config.cv_daemon = cvar_new_int(".daemon", "Daemon mode", 0);
+    _G.config.cv_compile = cvar_new_int(".compile", "Comple", 0);
+    _G.config.cv_continue = cvar_new_int(".continue", "Continue after compile", 0);
+    _G.config.cv_wait = cvar_new_int(".wait", "Wait for client", 0);
+    _G.config.cv_wid = cvar_new_int(".wid", "Wid", 0);
+
 
     // Cvar stage
     for (int i = 0; i < STATIC_SYSTEMS_SIZE; ++i) {
@@ -209,24 +225,28 @@ static void _game_update_task(void *d) {
 }
 
 static void _game_render_task(void *d) {
+    if (cvar_get_int(_G.config.cv_daemon)) {
+        return;
+    }
+
     _G.game->render();
 }
 
 static void _boot_stage() {
-    stringid64_t boot_pkg = stringid64_from_string(cvar_get_string(_G.cv_boot_pkg));
+    stringid64_t boot_pkg = stringid64_from_string(cvar_get_string(_G.config.cv_boot_pkg));
     stringid64_t pkg = stringid64_from_string("package");
 
     resource_load_now(pkg, &boot_pkg, 1);
     package_load(boot_pkg);
     package_flush(boot_pkg);
 
-    stringid64_t boot_script = stringid64_from_string(cvar_get_string(_G.cv_boot_script));
+    stringid64_t boot_script = stringid64_from_string(cvar_get_string(_G.config.cv_boot_script));
     luasys_execute_boot_script(boot_script);
 }
 
 
 static void _boot_unload() {
-    stringid64_t boot_pkg = stringid64_from_string(cvar_get_string(_G.cv_boot_pkg));
+    stringid64_t boot_pkg = stringid64_from_string(cvar_get_string(_G.config.cv_boot_pkg));
     stringid64_t pkg = stringid64_from_string("package");
 
     package_unload(boot_pkg);
@@ -240,17 +260,31 @@ void application_start() {
     resource_set_autoload(0);
 #endif
 
-    resource_compiler_compile_all();
+    if (cvar_get_int(_G.config.cv_compile)) {
+        resource_compiler_compile_all();
 
+        if (!cvar_get_int(_G.config.cv_continue)) {
+            return;
+        }
+    }
 
-    _G.main_window = window_new(
-            "Cetech",
-            WINDOWPOS_UNDEFINED,
-            WINDOWPOS_UNDEFINED,
-            cvar_get_int(_G.cv_screen_x), cvar_get_int(_G.cv_screen_y),
-            cvar_get_int(_G.cv_fullscreen) ? WINDOW_FULLSCREEN : WINDOW_NOFLAG
-    );
-    renderer_create(_G.main_window);
+    if (!cvar_get_int(_G.config.cv_daemon)) {
+        intptr_t wid = cvar_get_int(_G.config.cv_wid);
+
+        if (wid == 0) {
+            _G.main_window = window_new(
+                    "Cetech",
+                    WINDOWPOS_UNDEFINED,
+                    WINDOWPOS_UNDEFINED,
+                    cvar_get_int(_G.config.cv_screen_x), cvar_get_int(_G.config.cv_screen_y),
+                    cvar_get_int(_G.config.cv_fullscreen) ? WINDOW_FULLSCREEN : WINDOW_NOFLAG
+            );
+        } else {
+            _G.main_window = window_new_from((void *) wid);
+        }
+
+        renderer_create(_G.main_window);
+    }
 
     _boot_stage();
 
@@ -263,6 +297,7 @@ void application_start() {
     };
 
     _G.is_running = 1;
+    log_info("core.ready", "Run main loop");
     while (_G.is_running) {
         uint32_t now_ticks = os_get_ticks();
         float dt = (now_ticks - last_tick) * 0.001f;
@@ -330,8 +365,9 @@ void application_start() {
 
         taskmanager_wait(frame_task);
 
-
-        window_update(_G.main_window);
+        if (!cvar_get_int(_G.config.cv_daemon)) {
+            window_update(_G.main_window);
+        }
     }
 
     _G.game->shutdown();

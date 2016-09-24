@@ -1,20 +1,22 @@
 import argparse
+import os
+import platform
+
 import msgpack
 import nanomsg
-import platform
 from PyQt5.QtCore import QThread, Qt, QFileSystemWatcher, QDirIterator
 from PyQt5.QtWidgets import QMainWindow, QDockWidget, QTabWidget
-from cetech.consoleapi import ConsoleAPI
-from cetech.project import Project
-from cetech.widget import Widget
 from nanomsg import Socket, SUB, SUB_SUBSCRIBE
 
-from playground.playground import AssetBrowser
-from playground.playground import AssetView
-from playground.playground import LogWidget, LogSub
-from playground.playground import ProfilerWidget
-from playground.playground import ScriptEditorWidget, ScriptEditorManager
-from playground.playground import Ui_MainWindow
+from playground.assetbrowser import AssetBrowser
+from playground.assetview import AssetView
+from cetech.project import Project
+from cetech.widget import Widget
+from cetech.consoleapi import ConsoleAPI
+from playground.logwidget import LogWidget, LogSub
+from playground.profilerwidget import ProfilerWidget
+from playground.scripteditor import ScriptEditorWidget, ScriptEditorManager
+from playground.ui.mainwindow import Ui_MainWindow
 
 
 class DevelopSub(QThread):
@@ -60,7 +62,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
         self.project = Project()
 
-        self.api = ConsoleAPI(b"tcp://localhost:5557")
+        self.api = ConsoleAPI(b"ws://localhost:4444")
 
         # self.develop_sub = DevelopSub(b"ws://localhost:5558")
         # self.develop_sub.run()
@@ -103,7 +105,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.profiler_doc_widget.setWidget(self.profiler_widget)
         self.addDockWidget(Qt.RightDockWidgetArea, self.profiler_doc_widget)
 
-        self.logsub = LogSub(b"ws://localhost:5556")
+        self.logsub = LogSub(b"ws://localhost:4445")
         self.log_widget = LogWidget(None, self.logsub)  # TODO: open file
         self.log_dock_widget = QDockWidget(self)
         self.log_dock_widget.hide()
@@ -147,10 +149,6 @@ class MainWindow(QMainWindow, Ui_MainWindow):
     def open_project(self, name, dir):
         self.project.open_project(name, dir)
 
-        # self.api.start(QThread.LowPriority)
-        self.api.connect()
-        self.logsub.start(QThread.NormalPriority)
-
         self.assetb_widget.open_project(self.project.project_dir)
 
         self.log_dock_widget.show()
@@ -169,11 +167,13 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         if platform.system().lower() != 'darwin':
             self.ogl_dock.show()
 
-        self.project.run_cetech_develop("LevelView", compile_=True, continue_=True, wid=wid,
-                                        bootscript="playground/leveleditor_boot")
+        self.api.connect()
+        self.logsub.start(QThread.NormalPriority)
+
+        self.project.run_cetech_develop("LevelView", compile_=True, continue_=True, wid=wid
+                                        , bootscript="playground/leveleditor_boot")
 
         self.assetview_widget.open_project(self.project)
-
         # self.api.wait()
 
     def reload_all(self):

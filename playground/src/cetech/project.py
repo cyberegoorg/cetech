@@ -31,8 +31,8 @@ class EngineInstance(object):
     }
 
     _ENGINE_BIN = {
-        BUILD_DEVELOP: 'CETechDevelop.exe',
-        BUILD_RELEASE: 'CETech.exe'
+        BUILD_DEVELOP: 'cetech_develop',
+        BUILD_RELEASE: 'cetech'
     }
 
     _BUILD_DIR = {
@@ -48,8 +48,7 @@ class EngineInstance(object):
     def get_lib_path(self, build_type):
         _platform = platform.system().lower()
 
-        engine_bin_path = os.path.join('..', 'sources', 'CETech', 'bin', self._BIN_PLATFORM[_platform], 'AnyCPU',
-                                       'Debug')
+        engine_bin_path = os.path.join('..', 'build')
         return engine_bin_path
 
     def get_executable_path(self, build_type):
@@ -67,45 +66,45 @@ class EngineInstance(object):
                            wid=None,
                            core_dir=None, port=None, bootscript=None):
         args = [
-            "-b %s" % build_dir,
-            "-s %s" % source_dir
+            "-s .build %s" % build_dir,
+            "-s .src %s" % source_dir
         ]
 
         if compile_:
-            args.append("--compile")
+            args.append("-s .compile 1")
             # args.append("--bin %s" % self.get_lib_path(self.BUILD_DEVELOP))
 
         if continue_:
-            args.append("--continue")
+            args.append("-s .continue 1")
 
         if wait:
-            args.append("-wait")
+            args.append("-s .wait 1")
 
         if bootscript:
-            args.append("--bootscript %s" % bootscript)
+            args.append("-s core.boot_scrpt %s" % bootscript)
 
         if daemon:
-            args.append("--daemon")
+            args.append("-s .daemon 1")
 
         if port:
-            args.append("--port %s" % port)
+            args.append("-s develop.rpc.port %s" % port)
+            args.append("-s develop.log.port %s" % (port + 1))
 
         # TODO bug #114 workaround. Disable create sub engine...
         if wid and platform.system().lower() != 'darwin':
-            args.append("--wid %s" % int(wid))
+            args.append("-s .wid %s" % int(wid))
 
         if core_dir:
-            args.append("--core %s" % core_dir)
+            args.append("-s .core %s" % core_dir)
         else:
-            args.append("--core ../core")  # TODO ?
+            args.append("-s .core ../core")  # TODO ?
 
         self._run_cetech(self.BUILD_DEVELOP, args)
 
     def _run_cetech(self, build_type, args):
-        if platform.system().lower() != 'windows':
-            cmd = "mono %s %s" % (self.get_executable_path(build_type), ' '.join(args))
-        else:
-            cmd = "%s %s" % (self.get_executable_path(build_type), ' '.join(args))
+        cmd = "%s %s" % (self.get_executable_path(build_type), ' '.join(args))
+
+        print(cmd)
 
         process = QProcess()
 

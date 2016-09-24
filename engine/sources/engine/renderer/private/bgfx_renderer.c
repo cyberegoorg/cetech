@@ -7,6 +7,8 @@
 #include <engine/components/camera.h>
 #include <celib/stringid/stringid.h>
 #include <engine/renderer/mesh_renderer.h>
+#include <engine/develop/console_server.h>
+#include <mpack/mpack.h>
 #include "celib/window/window.h"
 #include "../renderer.h"
 
@@ -43,6 +45,18 @@ static u32 _get_reset_flags() {
 // Interface
 //==============================================================================
 
+static int _cmd_resize(mpack_node_t args,
+                       mpack_writer_t *writer) {
+    mpack_node_t width = mpack_node_map_cstr(args, "width");
+    mpack_node_t height = mpack_node_map_cstr(args, "height");
+
+    _G.size_width = (u32) mpack_node_int(width);
+    _G.size_height = (u32) mpack_node_int(height);
+    _G.need_reset = 1;
+
+    return 0;
+}
+
 int renderer_init(int stage) {
     if (stage == 0) {
         return 1;
@@ -54,6 +68,8 @@ int renderer_init(int stage) {
     texture_resource_init();
     shader_resource_init();
     material_resource_init();
+
+    consolesrv_register_command("renderer.resize", _cmd_resize);
 
     return 1;
 }

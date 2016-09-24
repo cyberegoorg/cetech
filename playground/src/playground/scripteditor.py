@@ -1,9 +1,10 @@
 import os
+
 from PyQt5.QtCore import QTextCodec, QFile, QDir, QFileInfo, QUrl, pyqtSlot, Qt
 from PyQt5.QtWebKit import QWebSettings
 from PyQt5.QtWidgets import QFileDialog, QMessageBox, QDockWidget, QMainWindow
 
-from playground.playground import Ui_MainWindow
+from playground.ui.scripteditorwindow import Ui_MainWindow
 
 SUFIX_2_MODE = {
     'lua': 'ace/mode/lua',

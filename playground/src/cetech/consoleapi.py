@@ -1,12 +1,11 @@
 from cetech.consoleproxy import ConsoleProxy
 
-
 class ConsoleAPI(ConsoleProxy):
     def wait(self):
         return self.send_command('wait')
 
     def lua_execute(self, script):
-        return self.send_command('lua.execute', script=script)
+        return self.send_command('lua_system.execute', script=script)
 
     def compile_all(self):
         return self.send_command('resource_compiler.compile_all')
@@ -18,4 +17,4 @@ class ConsoleAPI(ConsoleProxy):
         return self.send_command('resource.reload_all', types=types)
 
     def quit(self):
-        return self.send_command('lua.execute', script="Application.Quit();")
+        return self.send_command('lua.execute', script="cetech.Application.quit();")

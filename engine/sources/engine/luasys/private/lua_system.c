@@ -875,7 +875,6 @@ int luasys_init(int stage) {
     _register_all_api();
 
     luasys_add_module_function("plugin", "reload", _reload_plugin);
-
     consolesrv_register_command("lua_system.execute", _cmd_execute_string);
 
     resource_register_type(_G.type_id, lua_resource_callback);
