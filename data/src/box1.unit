@@ -9,10 +9,10 @@ components:
     component_type: "mesh_renderer"
     scene: "content/scene/solider/ArmyPilot"
 
-    mesh: "Mesh1Mesh1"
+    mesh: "Mesh1Mesh"
 #    node: "Mesh1"
 
-    material: "content/scene/solider/solider"
+    material: "content/scene/solider/head"
 
 
 children:
@@ -28,10 +28,10 @@ children:
           component_type: "mesh_renderer"
           scene: "content/scene/solider/ArmyPilot"
 
-          mesh: "Mesh1Mesh"
+          mesh: "Mesh1Mesh1"
 #          node: "Mesh1"
 
-          material: "content/scene/solider/head"
+          material: "content/scene/solider/body"
 
   "81f50973ffb00263":
       components:
@@ -45,7 +45,7 @@ children:
           component_type: "mesh_renderer"
           scene: "content/scene/solider/ArmyPilot"
 
-          mesh: "Mesh1Mesh2"
+          mesh: "Mesh1Mesh12"
 #          node: "Mesh1"
 
           material: "content/scene/solider/m4"

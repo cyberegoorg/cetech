@@ -135,6 +135,7 @@ yaml_node_foreach_dict(yaml_node_t node,
 
         foreach_clb(key, value, data);
 
+        // TODO: ?????????
         //yaml_node_free(key);
         //yaml_node_free(value);
     }

@@ -42,7 +42,7 @@ struct shader {
 #define _G ShaderResourceGlobals
 struct G {
     MAP_T(bgfx_program_handle_t) handler_map;
-    stringid64_t shader_type;
+    stringid64_t type;
 } _G = {0};
 
 
@@ -271,12 +271,12 @@ static const resource_callbacks_t shader_resource_callback = {
 int shader_resource_init() {
     _G = (struct G) {0};
 
-    _G.shader_type = stringid64_from_string("shader");
+    _G.type = stringid64_from_string("shader");
 
     MAP_INIT(bgfx_program_handle_t, &_G.handler_map, memsys_main_allocator());
 
-    resource_compiler_register(_G.shader_type, _shader_resource_compiler);
-    resource_register_type(_G.shader_type, shader_resource_callback);
+    resource_compiler_register(_G.type, _shader_resource_compiler);
+    resource_register_type(_G.type, shader_resource_callback);
 
     return 1;
 }
@@ -287,6 +287,6 @@ void shader_resource_shutdown() {
 }
 
 bgfx_program_handle_t shader_resource_get(stringid64_t name) {
-    struct shader *resource = resource_get(_G.shader_type, name);
+    struct shader *resource = resource_get(_G.type, name);
     return MAP_GET(bgfx_program_handle_t, &_G.handler_map, name.id, null_program);
 }

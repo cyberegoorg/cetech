@@ -180,15 +180,15 @@ void forach_mat33f_clb(yaml_node_t key,
                        void *_data) {
     struct material_compile_output *output = _data;
 
-    output->vec4f_count += 1;
+    output->mat33f_count += 1;
 
     char uniform_name[32] = {0};
     yaml_as_string(key, uniform_name, CE_ARRAY_LEN(uniform_name) - 1);
 
-    mat44f_t m = yaml_as_mat44f_t(value);
+    mat33f_t m = yaml_as_mat33f_t(value);
 
     ARRAY_PUSH(char, &output->uniform_names, uniform_name, CE_ARRAY_LEN(uniform_name));
-    ARRAY_PUSH(u8, &output->data, (u8 *) &m, sizeof(mat44f_t));
+    ARRAY_PUSH(u8, &output->data, (u8 *) &m, sizeof(mat33f_t));
 }
 
 int _material_resource_compiler(const char *filename,
@@ -229,6 +229,12 @@ int _material_resource_compiler(const char *filename,
     if (yaml_is_valid(mat44)) {
         yaml_node_foreach_dict(mat44, forach_mat44f_clb, &output);
     }
+
+    yaml_node_t mat33 = yaml_get_node(root, "mat33f");
+    if (yaml_is_valid(mat33)) {
+        yaml_node_foreach_dict(mat33, forach_mat33f_clb, &output);
+    }
+
 
     struct material_blob resource = {
             .shader_name = stringid64_from_string(tmp_buffer),
@@ -370,7 +376,7 @@ material_t material_resource_create(stringid64_t name) {
     }
 
     tmp_off = off;
-    off += resource->vec4f_count;
+    off += resource->mat44f_count;
     for (int i = tmp_off; i < off; ++i) {
         bgfx_uniforms[i] = bgfx_create_uniform(&u_names[i * 32], BGFX_UNIFORM_TYPE_MAT4, 1);
     }
@@ -523,13 +529,20 @@ void material_use(material_t material) {
     }
     offset += resource->mat33f_count;
 
-    for (int i = 0; i < resource->mat33f_count; ++i) {
+    for (int i = 0; i < resource->mat44f_count; ++i) {
         bgfx_set_uniform(u_handler[offset + i], &u_mat44f[i], 1);
     }
     offset += resource->mat44f_count;
 
 
-    u64 state = BGFX_STATE_DEFAULT;
+    u64 state = (0
+                 | BGFX_STATE_RGB_WRITE
+                 | BGFX_STATE_ALPHA_WRITE
+                 | BGFX_STATE_DEPTH_TEST_LESS
+                 | BGFX_STATE_DEPTH_WRITE
+                 | BGFX_STATE_CULL_CCW
+                 | BGFX_STATE_MSAA
+    );
 
     bgfx_set_state(state, 0);
 }

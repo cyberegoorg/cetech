@@ -7,10 +7,10 @@ components:
 
   "6277d33652cd49b5b5828b686e7de2c6":
     component_type: "mesh_renderer"
-    scene: "cube"
-    mesh: "g_cube"
+    scene: "content/scene/m4a1/m4a1"
+    mesh: "geom_0"
     node: "n_cube"
-    material: "material2"
+    material: "content/scene/m4a1/m4a1"
 
 children:
   "e432c0ed88dd461e81f50973ffb00263":

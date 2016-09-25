@@ -189,6 +189,7 @@ set(SOURCE_FILES
         engine/sources/engine/renderer/private/bgfx/texture.c
         engine/sources/engine/renderer/private/bgfx/shader.c
         engine/sources/engine/renderer/private/bgfx/material.c
+        engine/sources/engine/renderer/private/bgfx/scene.c
         engine/sources/engine/components/private/mesh_renderer.c
 
         engine/sources/engine/components/private/transform.c
@@ -223,6 +224,7 @@ if (UNIX)
             dl
             X11
             GL
+            z
             )
 endif ()
 
@@ -243,6 +245,7 @@ set(RELEASE_LIBS
         luajit.a
         sqlite3.a
         SDL2.a
+        assimp.a
         )
 
 ################################################################################
@@ -250,7 +253,7 @@ set(RELEASE_LIBS
 ################################################################################
 set(DEVELOP_LIBS
         ${RELEASE_LIBS}
-        assimp.a
+
         )
 
 include_directories(externals/build/${PLATFORM_ID}/release/include)

@@ -11,6 +11,7 @@
 #include <engine/components/transform.h>
 #include <engine/components/mesh_renderer.h>
 #include <engine/components/transform.h>
+#include <engine/renderer/private/bgfx/scene.h>
 
 #include "engine/components/mesh_renderer.h"
 
@@ -344,6 +345,8 @@ void mesh_render_all(world_t world) {
     const MAP_ENTRY_T(u32) *ce_end = MAP_END(u32, &data->ent_idx_map);
     while (ce_it != ce_end) {
         material_t material = ARRAY_AT(&data->material, ce_it->value);
+        stringid64_t scene = ARRAY_AT(&data->scene, ce_it->value);
+        stringid64_t geom = ARRAY_AT(&data->mesh, ce_it->value);
 
         material_use(material);
 
@@ -352,8 +355,10 @@ void mesh_render_all(world_t world) {
 
         bgfx_set_transform(w, 1);
 
-        bgfx_set_vertex_buffer(vbh, 0, 24);
-        bgfx_set_index_buffer(ibh, 0, 36);
+        scene_resource_submit(scene, geom);
+
+        //bgfx_set_vertex_buffer(vbh, 0, 24);
+        //bgfx_set_index_buffer(ibh, 0, 36);
 
         material_submit(material);
 
