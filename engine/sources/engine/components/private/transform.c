@@ -100,7 +100,7 @@ int _transform_component_compiler(yaml_node_t body,
         vec3f_t v = yaml_as_vec3f_t(rotation);
         vec3f_mul(&v_rad, &v, f32_ToRad);
 
-        quatf_from_euler(&t_data.rotation, v.x, v.y, v.z);
+        quatf_from_euler(&t_data.rotation, v_rad.x, v_rad.y, v_rad.z);
 
         yaml_node_free(rotation);
     };

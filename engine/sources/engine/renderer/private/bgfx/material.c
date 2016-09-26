@@ -25,6 +25,7 @@
 
 ARRAY_PROTOTYPE(bgfx_program_handle_t)
 
+ARRAY_PROTOTYPE(bgfx_uniform_handle_t)
 ARRAY_PROTOTYPE(stringid64_t)
 
 MAP_PROTOTYPE(bgfx_program_handle_t)
@@ -61,8 +62,6 @@ ARRAY_PROTOTYPE(material_blob_t)
 //==============================================================================
 // GLobals
 //==============================================================================
-
-ARRAY_PROTOTYPE(bgfx_uniform_handle_t)
 
 #define _G MaterialGlobals
 struct G {
@@ -195,9 +194,9 @@ int _material_resource_compiler(const char *filename,
                                 struct vio *source_vio,
                                 struct vio *build_vio,
                                 struct compilator_api *compilator_api) {
-
-    char source_data[vio_size(source_vio) + 1];
+    char *source_data = CE_ALLOCATE(memsys_main_allocator(), char, vio_size(source_vio) + 1);
     memory_set(source_data, 0, vio_size(source_vio) + 1);
+
     vio_read(source_vio, source_data, sizeof(char), vio_size(source_vio));
 
     yaml_document_t h;
@@ -249,6 +248,7 @@ int _material_resource_compiler(const char *filename,
 
     ARRAY_DESTROY(char, &output.uniform_names);
     ARRAY_DESTROY(u8, &output.data);
+    CE_DEALLOCATE(memsys_main_allocator(), source_data);
     return 1;
 }
 
@@ -475,7 +475,6 @@ void material_set_mat33f(material_t material,
 void material_set_mat44f(material_t material,
                          const char *slot,
                          mat44f_t v) {
-
     u32 idx = MAP_GET(u32, &_G.material_instace_map, material.idx, UINT32_MAX);
 
     if (idx == UINT32_MAX) {
