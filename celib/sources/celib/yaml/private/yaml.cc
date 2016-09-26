@@ -1,9 +1,10 @@
 #include <string>
 
 extern "C" {
-#include "../../math/types.h"
-#include "../../errors/errors.h"
 #include "../yaml.h"
+#include "../../memory/memory.h"
+#include "../../errors/errors.h"
+#include "../../math/types.h"
 }
 
 #include "include/yaml-cpp/yaml.h"
@@ -23,6 +24,10 @@ extern "C" {
 struct yamlcpp_handler {
     YAML::Node nodes[4096];
     char used[4096];
+
+    yamlcpp_handler() {
+        memory_set(used, 0, CE_ARRAY_LEN(used));
+    }
 };
 
 
