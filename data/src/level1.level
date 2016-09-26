@@ -2,12 +2,12 @@ units:
   # 3
   "5564343313252":
     name: "box1"
-    prefab: unit1
+    prefab: box1
 
   # 2
   "55643423443313252":
     name: "m4a1"
-    prefab: box1
+    prefab: m4a1
 
   # 1
   "55643433135454252":
@@ -16,6 +16,7 @@ units:
     components:
       "234234331453252":
         position: [10, 10, 0]
+        rotation: [45, 0, 0]
       "41232132255234":
         material: "material1"
 
