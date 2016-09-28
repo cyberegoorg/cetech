@@ -31,6 +31,10 @@ mesh_t mesh_create(world_t world,
 material_t mesh_get_material(world_t world,
                              mesh_t mesh);
 
+void mesh_set_material(world_t world,
+                       mesh_t mesh,
+                       stringid64_t material);
+
 void mesh_render_all(world_t world);
 
 

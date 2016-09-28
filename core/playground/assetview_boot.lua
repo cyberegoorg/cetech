@@ -3,6 +3,41 @@ for k, v in pairs(cetech) do _G[k] = v end
 require "playground/editor_input"
 require 'core/fpscamera'
 
+ASSET_CREATOR = {
+    -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
+    -- UNIT
+    -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
+    unit = function(self, asset, type)
+        self.actual_asset_unit = Unit.spawn(self.world, asset)
+
+        if Transform.has(self.world, self.actual_asset_unit) then
+            local transform = Transform.get(self.world, self.actual_asset_unit)
+            Transform.set_position(self.world, transform, Vec3f.make(0.0, 0.0, 0.0))
+        end
+    end,
+
+    -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
+    -- MATERIAL
+    -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
+    material = function(self, asset, type)
+        self.actual_asset_unit = Unit.spawn(self.world, "playground/cube")
+
+        local mesh = Mesh.get(self.world, self.actual_asset_unit)
+        Mesh.set_material(self.world, mesh, asset)
+    end,
+
+    -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
+    -- TEXTURE
+    -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
+    texture = function(self, asset, type)
+        self.actual_asset_unit = Unit.spawn(self.world, "playground/cube")
+
+        local mesh = Mesh.get(self.world, self.actual_asset_unit)
+        local material = Mesh.get_material(self.world, mesh)
+        Material.set_texture(material, "u_texColor", asset)
+    end
+}
+
 AssetView = AssetView or {}
 
 function AssetView:init()
@@ -11,16 +46,13 @@ function AssetView:init()
     self.viewport = 0 --Renderer.GetViewport("default")
     self.world = World.create()
     self.camera_unit = Unit.spawn(self.world, "camera")
-    --self.camera = Camera.get(self.world, self.camera_unit)
+
     self.camera_transform = Transform.get(self.world, self.camera_unit)
 
     Transform.set_position(self.world, self.camera_transform, Vec3f.make(0.0, 0.0, -20.0))
 
     self.actual_asset_unit = nil
     self.level = nil
-
-    --self:show_asset("camera", "unit")
-    -- self:show_asset("box1", "unit")
 end
 
 function AssetView:shutdown()
@@ -59,16 +91,11 @@ function AssetView:render()
     Renderer.render_world(self.world, self.camera, self.viewport)
 end
 
+
 function AssetView:show_asset(asset, type)
     self:destroy_actual_asset()
-
-    if type == 'unit' then
-        self.actual_asset_unit = Unit.spawn(self.world, asset)
-
-        if Transform.has(self.world, self.actual_asset_unit) then
-            local transform = Transform.get(self.world, self.actual_asset_unit)
-            Transform.set_position(self.world, transform, Vec3f.make(0.0, 0.0, 0.0))
-        end
+    if ASSET_CREATOR[type] ~= nil then
+        ASSET_CREATOR[type](self, asset, type)
     end
 end
 

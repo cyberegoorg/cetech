@@ -1,0 +1,13 @@
+components:
+  "sadsa234234331453252":
+    component_type: "transform"
+    position: [0, 0, 0]
+    rotation: [0, 0, 0]
+    scale: [1, 1, 1]
+
+  "41232dsadsa132255234":
+    component_type: "mesh_renderer"
+    scene: "playground/cube"
+    material: "playground/cube"
+    mesh: "g_cube"
+    node: "n_cube"

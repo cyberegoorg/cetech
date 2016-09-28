@@ -274,3 +274,12 @@ material_t mesh_get_material(world_t world,
 
     return ARRAY_AT(&data->material, mesh.idx);
 }
+
+void mesh_set_material(world_t world,
+                       mesh_t mesh,
+                       stringid64_t material) {
+    world_data_t *data = _get_world_data(world);
+
+    material_t material_instance = material_resource_create(material);
+    ARRAY_AT(&data->material, mesh.idx) = material_instance;
+}
