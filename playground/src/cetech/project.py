@@ -4,6 +4,8 @@ import platform
 from PyQt5.QtCore import QDir, QProcess, QProcessEnvironment
 from PyQt5.QtWidgets import QFileDialog, QMessageBox
 
+from cetech.consoleapi import ConsoleAPI
+
 
 def validate_project(project_dir):
     selected_dir = QDir(project_dir)
@@ -40,15 +42,20 @@ class EngineInstance(object):
         BUILD_RELEASE: 'Release'
     }
 
-    def __init__(self, name):
+    def __init__(self, name, bin_dir):
         self.name = name
-
         self.process = None
+        self.bin_dir = bin_dir
+        self.rpc_url = "ws://localhost:%s" % 4444
+        self.log_url = "ws://localhost:%s" % 4445
+
+    def create_console_api(self):
+        return ConsoleAPI(self.rpc_url)
 
     def get_lib_path(self, build_type):
         _platform = platform.system().lower()
 
-        engine_bin_path = os.path.join('..', 'build')
+        engine_bin_path = self.bin_dir
         return engine_bin_path
 
     def get_executable_path(self, build_type):
@@ -64,7 +71,7 @@ class EngineInstance(object):
 
     def run_cetech_develop(self, build_dir, source_dir, compile_=False, continue_=False, wait=False, daemon=False,
                            wid=None,
-                           core_dir=None, port=None, bootscript=None):
+                           core_dir=None, port=None, bootscript=None, protocol='ws'):
         args = [
             "-s .build %s" % build_dir,
             "-s .src %s" % source_dir
@@ -87,8 +94,14 @@ class EngineInstance(object):
             args.append("-s .daemon 1")
 
         if port:
+            self.rpc_url = "%s://localhost:%s" % (protocol, port)
+            self.log_url = "%s://localhost:%s" % (protocol, port + 1)
+
             args.append("-s develop.rpc.port %s" % port)
+            args.append("-s develop.rpc.addr %s://*" % (protocol))
+
             args.append("-s develop.log.port %s" % (port + 1))
+            args.append("-s develop.log.addr %s://*" % (protocol))
 
         # TODO bug #114 workaround. Disable create sub engine...
         if wid and platform.system().lower() != 'darwin':
@@ -103,7 +116,6 @@ class EngineInstance(object):
 
     def _run_cetech(self, build_type, args):
         cmd = "%s %s" % (self.get_executable_path(build_type), ' '.join(args))
-
         print(cmd)
 
         process = QProcess()
@@ -184,7 +196,7 @@ class Project(object):
             instance.kill(dump=dump)
 
     def run_cetech_release(self, name):
-        instance = EngineInstance(name)
+        instance = EngineInstance(name, "../build")
         self.instances[name] = instance
 
         instance.run_cetech_release(self.build_dir)
@@ -194,7 +206,7 @@ class Project(object):
     def run_cetech_develop(self, name, compile_=False, continue_=False, wait=False, daemon=False, wid=None,
                            core_dir=None, port=None, bootscript=None):
 
-        instance = EngineInstance(name)
+        instance = EngineInstance(name, "../build")
         self.instances[name] = instance
 
         instance.run_cetech_develop(self.build_dir, self.source_dir, compile_=compile_, continue_=continue_, wait=wait,

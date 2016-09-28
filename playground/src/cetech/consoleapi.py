@@ -1,5 +1,6 @@
 from cetech.consoleproxy import ConsoleProxy
 
+
 class ConsoleAPI(ConsoleProxy):
     def wait(self):
         return self.send_command('wait')
@@ -17,4 +18,4 @@ class ConsoleAPI(ConsoleProxy):
         return self.send_command('resource.reload_all', types=types)
 
     def quit(self):
-        return self.send_command('lua.execute', script="cetech.Application.quit();")
+        return self.lua_execute(script="cetech.Application.quit()")

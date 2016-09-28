@@ -250,6 +250,19 @@ set(RELEASE_LIBS
         assimp.a
         )
 
+set(RELEASE_LIBS2
+        ${RELEASE_LIBS_LINUX}
+        ${RELEASE_LIBS_WINDOWS}
+
+        nanomsg
+        bgfx-shared-libRelease
+        sqlite3
+        assimp
+        SDL2
+        yaml-cpp
+        luajit
+        )
+
 ################################################################################
 # Develop sources
 ################################################################################
@@ -282,21 +295,29 @@ target_include_directories(cetech_develop PUBLIC externals/build/${PLATFORM_ID}/
 ################################################################################
 # Cetech TESTS
 ################################################################################
-add_executable(cetech_tests ${TEST_SOURCE_FILES})
-target_compile_definitions(cetech_tests PUBLIC -DCETECH_TEST -DCELIB_TEST -DCETECH_DEVELOP)
-target_link_libraries(cetech_tests ${DEVELOP_LIBS})
-target_include_directories(cetech_tests PUBLIC externals/build/${PLATFORM_ID}/${CONFIGURATION}/)
-target_include_directories(cetech_tests PUBLIC externals/build/${PLATFORM_ID}/${CONFIGURATION}/include)
+#add_executable(cetech_tests ${TEST_SOURCE_FILES})
+#target_compile_definitions(cetech_tests PUBLIC -DCETECH_TEST -DCELIB_TEST -DCETECH_DEVELOP)
+#target_link_libraries(cetech_tests ${DEVELOP_LIBS})
+#target_include_directories(cetech_tests PUBLIC externals/build/${PLATFORM_ID}/${CONFIGURATION}/)
+#target_include_directories(cetech_tests PUBLIC externals/build/${PLATFORM_ID}/${CONFIGURATION}/include)
 
-# configure unit tests via CTest
-enable_testing()
-add_test(NAME RunTests COMMAND cetech_tests)
+add_library(cetech_develop_lib SHARED ${SOURCE_FILES})
+target_link_libraries(cetech_develop_lib ${RELEASE_LIBS2})
+target_compile_definitions(cetech_develop_lib PUBLIC -DCETECH_DEVELOP)
+target_include_directories(cetech_develop_lib PUBLIC externals/build/${PLATFORM_ID}/${CONFIGURATION}/)
+target_include_directories(cetech_develop_lib PUBLIC externals/build/${PLATFORM_ID}/${CONFIGURATION}/include)
 
-add_test(NAME ListTests COMMAND cetech_tests --list-tests)
-set_tests_properties(ListTests PROPERTIES PASS_REGULAR_EXPRESSION "[0-9]+ test cases")
-
-add_test(NAME ListTags COMMAND cetech_tests --list-tags)
-set_tests_properties(ListTags PROPERTIES PASS_REGULAR_EXPRESSION "[0-9]+ tags")
+#set_target_properties(plugin_example PROPERTIES PREFIX "")
 
 add_library(plugin_example SHARED engine/sources/engine/plugin_example.c)
 set_target_properties(plugin_example PROPERTIES PREFIX "")
+
+## configure unit tests via CTest
+#enable_testing()
+#add_test(NAME RunTests COMMAND cetech_tests)
+#
+#add_test(NAME ListTests COMMAND cetech_tests --list-tests)
+#set_tests_properties(ListTests PROPERTIES PASS_REGULAR_EXPRESSION "[0-9]+ test cases")
+#
+#add_test(NAME ListTags COMMAND cetech_tests --list-tags)
+#set_tests_properties(ListTags PROPERTIES PASS_REGULAR_EXPRESSION "[0-9]+ tags")

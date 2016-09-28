@@ -6,9 +6,7 @@
 //==============================================================================
 
 
-// TODO: wrap mpack basic fce
-typedef struct mpack_node_t mpack_node_t;
-typedef struct mpack_writer_t mpack_writer_t;
+#include "include/mpack/mpack.h"
 
 typedef int (*console_server_command_t)(mpack_node_t,
                                         mpack_writer_t *);

@@ -78,6 +78,11 @@ void application_quit() {
     _G.init_error = 0;
 }
 
+static int _cmd_wait(mpack_node_t args,
+                     mpack_writer_t *writer) {
+    return 0;
+}
+
 int application_init(int argc,
                      const char **argv) {
     _G = (struct G) {0};
@@ -134,6 +139,8 @@ int application_init(int argc,
     }
 
     log_set_wid_clb(taskmanager_worker_id);
+
+    consolesrv_register_command("wait", _cmd_wait);
     return 1;
 }
 

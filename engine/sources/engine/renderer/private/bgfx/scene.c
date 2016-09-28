@@ -435,7 +435,7 @@ void _compile_assimp_node(struct aiNode *root,
 
     ARRAY_PUSH_BACK(stringid64_t, &output->node_name, name);
     ARRAY_PUSH_BACK(u32, &output->node_parent, parent);
-    ARRAY_PUSH_BACK(mat44f_t, &output->node_pose, *((mat44f_t *) root->mTransformation.mData));
+    ARRAY_PUSH_BACK(mat44f_t, &output->node_pose, *((mat44f_t *) &root->mTransformation));
 
     for (int i = 0; i < root->mNumChildren; ++i) {
         _compile_assimp_node(root->mChildren[i], idx, output);
@@ -523,15 +523,15 @@ int _compile_assimp(const char *filename,
 
         for (int j = 0; j < mesh->mNumVertices; ++j) {
             if (mesh->mVertices != NULL) {
-                ARRAY_PUSH(u8, &output->vb, (u8 *) mesh->mVertices[j].v, sizeof(f32) * 3);
+                ARRAY_PUSH(u8, &output->vb, (u8 *) &mesh->mVertices[j], sizeof(f32) * 3);
             }
 
             if (mesh->mNormals != NULL) {
-                ARRAY_PUSH(u8, &output->vb, (u8 *) mesh->mNormals[j].v, sizeof(f32) * 3);
+                ARRAY_PUSH(u8, &output->vb, (u8 *) &mesh->mNormals[j], sizeof(f32) * 3);
             }
 
             if (mesh->mTextureCoords[0] != NULL) {
-                ARRAY_PUSH(u8, &output->vb, (u8 *) mesh->mTextureCoords[0][j].v, sizeof(f32) * 2);
+                ARRAY_PUSH(u8, &output->vb, (u8 *) &mesh->mTextureCoords[0][j], sizeof(f32) * 2);
             }
         }
 

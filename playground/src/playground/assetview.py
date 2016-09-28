@@ -9,7 +9,7 @@ class AssetView(Widget):
     def __init__(self, parent):
         self.project = None
 
-        api = ConsoleAPI(b"ws://localhost:5576")
+        api = ConsoleAPI("ws://localhost:5576")
         api.connect()
 
         super(AssetView, self).__init__(parent, api=api, log_url=b"ws://localhost:5577")

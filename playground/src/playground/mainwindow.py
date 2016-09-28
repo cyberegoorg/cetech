@@ -62,7 +62,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
         self.project = Project()
 
-        self.api = ConsoleAPI(b"ws://localhost:4444")
+        self.api = ConsoleAPI("ws://localhost:4444")
 
         # self.develop_sub = DevelopSub(b"ws://localhost:5558")
         # self.develop_sub.run()
@@ -170,8 +170,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.api.connect()
         self.logsub.start(QThread.NormalPriority)
 
-        self.project.run_cetech_develop("LevelView", compile_=True, continue_=True, wid=wid
-                                        , bootscript="playground/leveleditor_boot")
+        self.project.run_cetech_develop("LevelView", compile_=True, continue_=True, wid=wid,
+                                        bootscript="playground/leveleditor_boot")
 
         self.assetview_widget.open_project(self.project)
         # self.api.wait()

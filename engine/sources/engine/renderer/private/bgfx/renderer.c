@@ -94,7 +94,7 @@ void renderer_create(window_t window) {
     bgfx_set_platform_data(&pd);
 
     // TODO: from config
-    bgfx_init(BGFX_RENDERER_TYPE_OPENGL, 0, 0, NULL, NULL);
+    bgfx_init(BGFX_RENDERER_TYPE_NULL, 0, 0, NULL, NULL);
 
     window_get_size(window, &_G.size_width, &_G.size_height);
 
