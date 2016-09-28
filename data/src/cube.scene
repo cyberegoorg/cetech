@@ -1,17 +1,9 @@
 geometries:
   g_cube:
     types:
-      position:
-        type: f32
-        size: 3
-
-      normal:
-        type: f32
-        size: 3
-
-      texcoord0:
-        type: f32
-        size: 2
+      position:  {type: f32, size: 3}
+      normal:    {type: f32, size: 3}
+      texcoord0: {type: f32, size: 2}
 
     chanels:
       position:  [ 1.000000, -1.000000, 1.000000,   # 0
@@ -46,15 +38,16 @@ geometries:
 
 #TODO: define default geometries scene node
 graph:
-  n_cube:
-    local: [ 1, 0, 0, 0,
-             0, 1, 0, 0,
-             0, 0, 1, 0,
-             0, 0, 0, 1 ]
+  root:
+    local: [ [1, 0, 0, 0],
+             [0, 1, 0, 0],
+             [0, 0, 1, 0],
+             [0, 0, 0, 1] ]
 
     children:
-      g_cube:
-        local: [ 1, 0, 0, 0,
-                 0, 1, 0, 0,
-                 0, 0, 1, 0,
-                 0, 0, 0, 1 ]
+      n_cube:
+        geometries: [g_cube]
+        local: [ [1, 0, 0, 0],
+                 [0, 1, 0, 0],
+                 [0, 0, 1, 0],
+                 [0, 0, 0, 1] ]

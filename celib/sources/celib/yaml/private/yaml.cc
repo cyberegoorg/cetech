@@ -146,6 +146,21 @@ yaml_node_foreach_dict(yaml_node_t node,
     }
 }
 
+extern "C"
+void yaml_node_foreach_seq(yaml_node_t node,
+                           yaml_foreach_seq_clb_t foreach_clb,
+                           void *data) {
+    yamlcpp_handler *nh = (yamlcpp_handler *) node.doc.d;
+
+    auto cpp_node = nh->nodes[node.idx];
+
+    for (int i = 0; i < cpp_node.size(); ++i) {
+        yaml_node_t value = new_node(node.doc, cpp_node[i]);
+        foreach_clb(i, value, data);
+    }
+
+}
+
 extern "C" int yaml_as_string(yaml_node_t node,
                               char *output,
                               size_t max_len) {

@@ -9,7 +9,6 @@ components:
     component_type: "mesh_renderer"
     scene: "content/scene/m4a1/m4a1"
     mesh: "geom_1"
-    node: "n_cube"
     material: "content/scene/m4a1/m4a1"
 
 children:

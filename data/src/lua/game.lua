@@ -58,7 +58,8 @@ function Game:shutdown()
     World.destroy(self.world);
 end
 
-function rotator(world, node, delta_rot)
+function rotator(world, unit, node_name, delta_rot)
+    local node = SceneGraph.node_by_name(world, unit, node_name)
     local rot = SceneGraph.get_rotation(world, node)
     rot = rot * delta_rot
     SceneGraph.set_rotation(world, node, rot)
@@ -94,8 +95,8 @@ function Game:update(dt)
 
     local level_unit = Level.unit(self.level)
     --    transform_rotator(self.world, level_unit, Quatf.from_axis_angle(Vec3f.unit_y(), 0.02))
-    --    transform_rotator(self.world, Level.unit_by_id(self.level, "55643423443313252"), Quatf.from_axis_angle(Vec3f.unit_x(), 0.05))
-    --    transform_rotator(self.world, Level.unit_by_id(self.level, "55643433135454252"), Quatf.from_axis_angle(Vec3f.unit_z(), 0.08))
+    rotator(self.world, Level.unit_by_id(self.level, "55643433135454252"), "n_cube", Quatf.from_axis_angle(Vec3f.unit_x(), 0.05))
+    --transform_rotator(self.world, self.unit, Quatf.from_axis_angle(Vec3f.unit_z(), 0.08))
 
     if Keyboard.button_pressed(reload_btn) then
         ResourceCompilator.compile_all()

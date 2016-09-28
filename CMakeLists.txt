@@ -157,6 +157,7 @@ set(SOURCE_FILES
         engine/sources/engine/luasys/private/api/api_material.c
         engine/sources/engine/luasys/private/api/api_package.c
         engine/sources/engine/luasys/private/api/api_level.c
+        engine/sources/engine/luasys/private/api/api_scenegraph.c
 
         engine/sources/engine/develop/private/console_server.c
         engine/sources/engine/core/private/memory.c
@@ -193,6 +194,7 @@ set(SOURCE_FILES
         engine/sources/engine/components/private/mesh_renderer.c
 
         engine/sources/engine/components/private/transform.c
+        engine/sources/engine/components/private/scenegraph.c
         engine/sources/engine/components/private/camera.c
 
         )
