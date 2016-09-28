@@ -1,7 +1,6 @@
 
 #include <engine/core/types.h>
-#include <engine/components/scenegraph.h>
-#include <engine/components/types.h>
+#include <engine/world/scenegraph.h>
 #include <celib/math/mat44f.h>
 #include <celib/stringid/stringid.h>
 #include "engine/luasys/luasys.h"

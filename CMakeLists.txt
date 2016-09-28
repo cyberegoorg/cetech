@@ -191,11 +191,11 @@ set(SOURCE_FILES
         engine/sources/engine/renderer/private/bgfx/shader.c
         engine/sources/engine/renderer/private/bgfx/material.c
         engine/sources/engine/renderer/private/bgfx/scene.c
-        engine/sources/engine/components/private/mesh_renderer.c
+        engine/sources/engine/renderer/private/bgfx/mesh_renderer.c
 
-        engine/sources/engine/components/private/transform.c
-        engine/sources/engine/components/private/scenegraph.c
-        engine/sources/engine/components/private/camera.c
+        engine/sources/engine/world/private/transform.c
+        engine/sources/engine/world/private/scenegraph.c
+        engine/sources/engine/world/private/camera.c
 
         )
 

@@ -8,7 +8,6 @@
 #include "celib/stringid/types.h"
 #include "types.h"
 #include "celib/yaml/yaml.h"
-#include "engine/components/types.h"
 #include "types.h"
 
 int entcom_init(int stage);

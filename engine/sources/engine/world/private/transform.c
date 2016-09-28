@@ -7,9 +7,8 @@
 #include <celib/math/quatf.h>
 #include <celib/math/mat44f.h>
 #include <celib/stringid/stringid.h>
-#include <engine/components/types.h>
 #include <engine/core/types.h>
-#include "../transform.h"
+#include "engine/world/transform.h"
 
 struct transform_data {
     vec3f_t position;

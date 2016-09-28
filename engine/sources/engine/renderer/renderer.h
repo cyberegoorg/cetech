@@ -5,8 +5,8 @@
 // Includes
 //==============================================================================
 
-#include <engine/core/types.h>
-#include "engine/components/types.h"
+#include <engine/world/camera.h>
+#include "engine/core/types.h"
 #include "celib/window/types.h"
 #include "celib/math/types.h"
 

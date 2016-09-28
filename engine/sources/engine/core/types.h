@@ -11,8 +11,6 @@
 #include "celib/yaml/yaml.h"
 #include "celib/types.h"
 
-#include "engine/components/types.h"
-
 
 //==============================================================================
 // CVar

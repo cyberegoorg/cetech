@@ -5,8 +5,7 @@
 // Includes
 //==============================================================================
 
-#include <celib/stringid/types.h>
-#include "engine/components/types.h"
+#include "celib/stringid/types.h"
 #include "engine/core/types.h"
 
 

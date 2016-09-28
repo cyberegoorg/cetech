@@ -2,7 +2,6 @@
 #define CETECH_MESH_RENDERER_H
 
 #include <celib/stringid/types.h>
-#include "types.h"
 #include "engine/core/types.h"
 #include "engine/renderer/material.h"
 

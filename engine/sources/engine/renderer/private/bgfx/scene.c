@@ -12,7 +12,7 @@
 #include <celib/string/string.h>
 #include <celib/stringid/types.h>
 #include <engine/core/types.h>
-#include <engine/components/scenegraph.h>
+#include <engine/world/scenegraph.h>
 #include "celib/containers/array.h"
 #include "celib/containers/map.h"
 #include "celib/os/process.h"

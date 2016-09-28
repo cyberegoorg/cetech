@@ -9,10 +9,10 @@
 #include <engine/core/entcom.h>
 #include <engine/renderer/renderer.h>
 #include <engine/core/types.h>
-#include <engine/components/transform.h>
+#include <engine/world/transform.h>
 #include <celib/math/types.h>
 
-#include "../camera.h"
+#include "engine/world/camera.h"
 
 struct camera_data {
     f32 near;

@@ -7,7 +7,7 @@
 #include <engine/core/entcom.h>
 #include <engine/core/memory.h>
 #include <engine/world/world.h>
-#include <engine/components/types.h>
+#include <engine/world/scenegraph.h>
 
 ARRAY_PROTOTYPE(vec3f_t)
 

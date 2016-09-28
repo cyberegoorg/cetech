@@ -8,15 +8,15 @@
 #include <engine/core/entcom.h>
 #include <engine/renderer/material.h>
 #include <bgfx/c99/bgfx.h>
-#include <engine/components/transform.h>
-#include <engine/components/mesh_renderer.h>
-#include <engine/components/transform.h>
+#include <engine/world/transform.h>
+#include <engine/renderer/mesh_renderer.h>
+#include <engine/world/transform.h>
 #include <engine/renderer/private/bgfx/scene.h>
 #include <engine/core/types.h>
-#include <engine/components/scenegraph.h>
+#include <engine/world/scenegraph.h>
 #include <celib/math/mat44f.h>
 
-#include "engine/components/mesh_renderer.h"
+#include "engine/renderer/mesh_renderer.h"
 
 #define LOG_WHERE "mesh_renderer"
 

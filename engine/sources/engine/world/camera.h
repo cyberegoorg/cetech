@@ -1,9 +1,12 @@
 #ifndef CETECH_CAMERA_H
 #define CETECH_CAMERA_H
 
-#include "../components/types.h"
 #include "engine/core/types.h"
-#include "types.h"
+
+
+typedef struct {
+    u32 idx;
+} camera_t;
 
 int camera_init(int stage);
 
