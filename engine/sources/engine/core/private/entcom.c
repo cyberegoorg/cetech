@@ -147,3 +147,14 @@ void component_spawn(world_t world,
     clb(world, ent_ids, cent, ents_parent, ent_count, data);
 
 }
+
+void component_destroy(world_t world,
+                       entity_t *ent,
+                       u32 count) {
+    const MAP_ENTRY_T(component_destroyer_t) *ce_it = MAP_BEGIN(component_destroyer_t, &_G.destroyer_map);
+    const MAP_ENTRY_T(component_destroyer_t) *ce_end = MAP_END(component_destroyer_t, &_G.destroyer_map);
+    while (ce_it != ce_end) {
+        ce_it->value(world, ent, count);
+        ++ce_it;
+    }
+}

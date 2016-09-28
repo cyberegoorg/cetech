@@ -15,6 +15,10 @@ entity_t *unit_spawn_from_resource(world_t world,
 entity_t unit_spawn(world_t world,
                     stringid64_t name);
 
+void unit_destroy(world_t world,
+                  entity_t *unit,
+                  u32 count);
+
 struct entity_compile_output *unit_compiler_create_output();
 
 void unit_compiler_destroy_output(struct entity_compile_output *output);

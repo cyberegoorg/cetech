@@ -16,7 +16,17 @@ static int _unit_spawn(lua_State *l) {
     return 1;
 }
 
+static int _unit_destroy(lua_State *l) {
+    world_t w = {.h = luasys_to_handler(l, 1)};
+    entity_t unit = {.h = luasys_to_handler(l, 2)};
+
+    unit_destroy(w, &unit, 1);
+    return 1;
+}
+
+
 
 void _register_lua_unit_api() {
     luasys_add_module_function(API_NAME, "spawn", _unit_spawn);
+    luasys_add_module_function(API_NAME, "destroy", _unit_destroy);
 }

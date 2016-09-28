@@ -53,7 +53,9 @@ void component_spawn(world_t world,
                      u32 ent_count,
                      void *data);
 
-//public static void DestroyAllType(int world, int[] ent_ids)
+void component_destroy(world_t world,
+                       entity_t *ent,
+                       u32 count);
 
 
 #endif //CETECH_ENTITY_MANAGER_H

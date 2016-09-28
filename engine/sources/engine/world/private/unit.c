@@ -454,3 +454,9 @@ entity_t unit_spawn(world_t world,
 
     return root;
 }
+
+void unit_destroy(world_t world,
+                  entity_t *unit,
+                  u32 count) {
+    component_destroy(world, unit, count);
+}

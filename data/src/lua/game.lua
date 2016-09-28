@@ -51,6 +51,7 @@ function Game:init()
     self.level = Level.load_level(self.world, "level1")
 
     self.unit = Level.unit_by_id(self.level, "55643423443313252");
+    --Unit.destroy(self.world, self.unit)
 end
 
 function Game:shutdown()
