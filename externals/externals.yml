@@ -47,6 +47,8 @@ bgfx:
       - copytree: *bgfx_install_include
       - copyfile: [.build/linux64_gcc/bin/libbgfxRelease.a, release/lib/libbgfxRelease.a]
       - copyfile: [.build/linux64_gcc/bin/libbgfxDebug.a, debug/lib/libbgfxDebug.a]
+      - copyfile: [.build/linux64_gcc/bin/libbgfx-shared-libDebug.so, debug/lib/libbgfx-shared-libDebug.so]
+      - copyfile: [.build/linux64_gcc/bin/libbgfx-shared-libRelease.so, release/lib/libbgfx-shared-libRelease.so]
       - copyfile: [.build/linux64_gcc/bin/shadercRelease, release/bin/shaderc]
       - copyfile: [.build/linux64_gcc/bin/texturecRelease, release/bin/texturec]
 
@@ -89,8 +91,10 @@ sdl2:
 
     linux64:
       - copyfile: [build/.libs/libSDL2.a, release/lib/libSDL2.a]
+      - copyfile: [build/.libs/libSDL2.so, release/lib/libSDL2.so]
       - copytree: [include, release/include/SDL2]
       - copyfile: [build/.libs/libSDL2.a, debug/lib/libSDL2.a]
+      - copyfile: [build/.libs/libSDL2.so, debug/lib/libSDL2.so]
       - copytree: [include, debug/include/SDL2]
 
     darwin64:
@@ -162,17 +166,22 @@ assimp:
 
   build:
     linux64:
+      - cmake . -DASSIMP_BUILD_TESTS=FALSE
+      - make
       - cmake . -DBUILD_SHARED_LIBS=FALSE -DASSIMP_BUILD_TESTS=FALSE
       - make
 
     windows64:
-      - cmake . -DBUILD_SHARED_LIBS=FALSE -DASSIMP_BUILD_TESTS=FALSE
+      - cmake . -DASSIMP_BUILD_TESTS=FALSE
       - devenv assimp.sln /build release
 
   install:
      linux64:
       - copyfile: [lib/libassimp.a, release/lib/libassimp.a]
+      - copyfile: [lib/libassimp.so, release/lib/libassimp.so]
+      - copyfile: [lib/libassimp.so, debug/lib/libassimp.so]
       - copytree: [include/assimp, release/include/assimp]
+      - copytree: [include/assimp, debug/include/assimp]
 
      windows64:
       - copyfile: [lib/release/assimp.lib, release/lib/assimp.lib]
@@ -242,15 +251,17 @@ yaml-cpp:
 
   build:
     linux64:
-      - cmake .
+      - cmake . -DBUILD_SHARED_LIBS=1
       - make
 
   install:
      linux64:
       - copyfile: [libyaml-cpp.a, release/lib/libyaml-cpp.a]
+      - copyfile: [libyaml-cpp.so, release/lib/libyaml-cpp.so]
       - copytree: [include/yaml-cpp, release/include/yaml-cpp]
 
       - copyfile: [libyaml-cpp.a, debug/lib/libyaml-cpp.a]
+      - copyfile: [libyaml-cpp.so, debug/lib/libyaml-cpp.so]
       - copytree: [include/yaml-cpp, debug/include/yaml-cpp]
 
 
@@ -268,6 +279,7 @@ luajit:
   install:
     linux64:
       - copy: [src/libluajit.a, release/lib]
+      - copy: [src/libluajit.so, release/lib]
       - copy: [src/lauxlib.h, release/include/luajit]
       - copy: [src/luaconf.h, release/include/luajit]
       - copy: [src/lua.h, release/include/luajit]
@@ -276,6 +288,7 @@ luajit:
       - copy: [src/lualib.h, release/include/luajit]
 
       - copy: [src/libluajit.a, debug/lib]
+      - copy: [src/libluajit.so, debug/lib]
       - copy: [src/lauxlib.h, debug/include/luajit]
       - copy: [src/luaconf.h, debug/include/luajit]
       - copy: [src/lua.h, debug/include/luajit]
@@ -322,7 +335,9 @@ sqlite3:
     linux64:
       - copy: [sqlite3.h, release/include/sqlite3]
       - copy: [.libs/libsqlite3.a, release/lib]
+      - copy: [.libs/libsqlite3.so, release/lib]
       - copy: [sqlite3.h, debug/include/sqlite3]
+      - copy: [.libs/libsqlite3.so, debug/lib]
       - copy: [.libs/libsqlite3.a, debug/lib]
 
     linux32:
