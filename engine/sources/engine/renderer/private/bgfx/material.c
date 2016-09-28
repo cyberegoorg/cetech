@@ -25,6 +25,7 @@
 
 ARRAY_PROTOTYPE(bgfx_program_handle_t)
 
+ARRAY_PROTOTYPE(bgfx_uniform_handle_t)
 ARRAY_PROTOTYPE(stringid64_t)
 
 MAP_PROTOTYPE(bgfx_program_handle_t)
@@ -61,8 +62,6 @@ ARRAY_PROTOTYPE(material_blob_t)
 //==============================================================================
 // GLobals
 //==============================================================================
-
-ARRAY_PROTOTYPE(bgfx_uniform_handle_t)
 
 #define _G MaterialGlobals
 struct G {
@@ -180,24 +179,24 @@ void forach_mat33f_clb(yaml_node_t key,
                        void *_data) {
     struct material_compile_output *output = _data;
 
-    output->vec4f_count += 1;
+    output->mat33f_count += 1;
 
     char uniform_name[32] = {0};
     yaml_as_string(key, uniform_name, CE_ARRAY_LEN(uniform_name) - 1);
 
-    mat44f_t m = yaml_as_mat44f_t(value);
+    mat33f_t m = yaml_as_mat33f_t(value);
 
     ARRAY_PUSH(char, &output->uniform_names, uniform_name, CE_ARRAY_LEN(uniform_name));
-    ARRAY_PUSH(u8, &output->data, (u8 *) &m, sizeof(mat44f_t));
+    ARRAY_PUSH(u8, &output->data, (u8 *) &m, sizeof(mat33f_t));
 }
 
 int _material_resource_compiler(const char *filename,
                                 struct vio *source_vio,
                                 struct vio *build_vio,
                                 struct compilator_api *compilator_api) {
-
-    char source_data[vio_size(source_vio) + 1];
+    char *source_data = CE_ALLOCATE(memsys_main_allocator(), char, vio_size(source_vio) + 1);
     memory_set(source_data, 0, vio_size(source_vio) + 1);
+
     vio_read(source_vio, source_data, sizeof(char), vio_size(source_vio));
 
     yaml_document_t h;
@@ -230,6 +229,12 @@ int _material_resource_compiler(const char *filename,
         yaml_node_foreach_dict(mat44, forach_mat44f_clb, &output);
     }
 
+    yaml_node_t mat33 = yaml_get_node(root, "mat33f");
+    if (yaml_is_valid(mat33)) {
+        yaml_node_foreach_dict(mat33, forach_mat33f_clb, &output);
+    }
+
+
     struct material_blob resource = {
             .shader_name = stringid64_from_string(tmp_buffer),
             .texture_count =output.texture_count,
@@ -243,6 +248,7 @@ int _material_resource_compiler(const char *filename,
 
     ARRAY_DESTROY(char, &output.uniform_names);
     ARRAY_DESTROY(u8, &output.data);
+    CE_DEALLOCATE(memsys_main_allocator(), source_data);
     return 1;
 }
 
@@ -370,7 +376,7 @@ material_t material_resource_create(stringid64_t name) {
     }
 
     tmp_off = off;
-    off += resource->vec4f_count;
+    off += resource->mat44f_count;
     for (int i = tmp_off; i < off; ++i) {
         bgfx_uniforms[i] = bgfx_create_uniform(&u_names[i * 32], BGFX_UNIFORM_TYPE_MAT4, 1);
     }
@@ -469,7 +475,6 @@ void material_set_mat33f(material_t material,
 void material_set_mat44f(material_t material,
                          const char *slot,
                          mat44f_t v) {
-
     u32 idx = MAP_GET(u32, &_G.material_instace_map, material.idx, UINT32_MAX);
 
     if (idx == UINT32_MAX) {
@@ -523,13 +528,20 @@ void material_use(material_t material) {
     }
     offset += resource->mat33f_count;
 
-    for (int i = 0; i < resource->mat33f_count; ++i) {
+    for (int i = 0; i < resource->mat44f_count; ++i) {
         bgfx_set_uniform(u_handler[offset + i], &u_mat44f[i], 1);
     }
     offset += resource->mat44f_count;
 
 
-    u64 state = BGFX_STATE_DEFAULT;
+    u64 state = (0
+                 | BGFX_STATE_RGB_WRITE
+                 | BGFX_STATE_ALPHA_WRITE
+                 | BGFX_STATE_DEPTH_TEST_LESS
+                 | BGFX_STATE_DEPTH_WRITE
+                 | BGFX_STATE_CULL_CCW
+                 | BGFX_STATE_MSAA
+    );
 
     bgfx_set_state(state, 0);
 }

@@ -11,6 +11,10 @@
 #include <engine/components/transform.h>
 #include <engine/components/mesh_renderer.h>
 #include <engine/components/transform.h>
+#include <engine/renderer/private/bgfx/scene.h>
+#include <engine/core/types.h>
+#include <engine/components/scenegraph.h>
+#include <celib/math/mat44f.h>
 
 #include "engine/components/mesh_renderer.h"
 
@@ -41,8 +45,6 @@ typedef struct {
 ARRAY_PROTOTYPE(world_data_t)
 
 MAP_PROTOTYPE(world_data_t)
-
-void _init_cubes();
 
 #define _G meshGlobal
 static struct G {
@@ -141,8 +143,6 @@ static void _spawner(world_t world,
                      void *data) {
     struct mesh_data *tdata = data;
 
-    _init_cubes();
-
     for (int i = 0; i < ent_count; ++i) {
         mesh_create(world,
                     ents[cents[i]],
@@ -152,123 +152,6 @@ static void _spawner(world_t world,
                     tdata[i].material);
     }
 }
-
-
-static const uint32_t packUint32(uint8_t _x,
-                                 uint8_t _y,
-                                 uint8_t _z,
-                                 uint8_t _w) {
-    union {
-        uint32_t ui32;
-        uint8_t arr[4];
-    } un;
-
-    un.arr[0] = _x;
-    un.arr[1] = _y;
-    un.arr[2] = _z;
-    un.arr[3] = _w;
-
-    return un.ui32;
-}
-
-static const uint32_t packF4u(float _x,
-                              float _y,
-                              float _z,
-                              float _w) {
-    const uint8_t xx = (uint8_t) (_x * 127.0f + 128.0f);
-    const uint8_t yy = (uint8_t) (_y * 127.0f + 128.0f);
-    const uint8_t zz = (uint8_t) (_z * 127.0f + 128.0f);
-    const uint8_t ww = (uint8_t) (_w * 127.0f + 128.0f);
-
-    return packUint32(xx, yy, zz, ww);
-}
-
-typedef struct {
-    float m_x;
-    float m_y;
-    float m_z;
-    uint32_t m_normal;
-    uint32_t m_tangent;
-    int16_t m_u;
-    int16_t m_v;
-} PosNormalTangentTexcoordVertex;
-
-static const uint16_t s_cubeIndices[36] =
-        {
-                0, 2, 1,
-                1, 2, 3,
-                4, 5, 6,
-                5, 7, 6,
-
-                8, 10, 9,
-                9, 10, 11,
-                12, 13, 14,
-                13, 15, 14,
-
-                16, 18, 17,
-                17, 18, 19,
-                20, 21, 22,
-                21, 23, 22,
-        };
-
-
-// TODO: remove after scene resource
-PosNormalTangentTexcoordVertex s_cubeVertices[24];
-bgfx_vertex_decl_t vertex_decl = {0};
-
-bgfx_vertex_buffer_handle_t vbh;
-bgfx_index_buffer_handle_t ibh;
-
-static int init = 0;
-
-void _init_cubes() {
-    if (init) {
-        return;
-    }
-    init = 1;
-
-    PosNormalTangentTexcoordVertex v[24] = {
-            {-1.0f, 1.0f,  1.0f,  packF4u(0.0f, 0.0f, 1.0f, 0.0f),  0, 0,      0},
-            {1.0f,  1.0f,  1.0f,  packF4u(0.0f, 0.0f, 1.0f, 0.0f),  0, 0x7fff, 0},
-            {-1.0f, -1.0f, 1.0f,  packF4u(0.0f, 0.0f, 1.0f, 0.0f),  0, 0,      0x7fff},
-            {1.0f,  -1.0f, 1.0f,  packF4u(0.0f, 0.0f, 1.0f, 0.0f),  0, 0x7fff, 0x7fff},
-            {-1.0f, 1.0f,  -1.0f, packF4u(0.0f, 0.0f, -1.0f, 0.0f), 0, 0,      0},
-            {1.0f,  1.0f,  -1.0f, packF4u(0.0f, 0.0f, -1.0f, 0.0f), 0, 0x7fff, 0},
-            {-1.0f, -1.0f, -1.0f, packF4u(0.0f, 0.0f, -1.0f, 0.0f), 0, 0,      0x7fff},
-            {1.0f,  -1.0f, -1.0f, packF4u(0.0f, 0.0f, -1.0f, 0.0f), 0, 0x7fff, 0x7fff},
-            {-1.0f, 1.0f,  1.0f,  packF4u(0.0f, 1.0f, 0.0f, 0.0f),  0, 0,      0},
-            {1.0f,  1.0f,  1.0f,  packF4u(0.0f, 1.0f, 0.0f, 0.0f),  0, 0x7fff, 0},
-            {-1.0f, 1.0f,  -1.0f, packF4u(0.0f, 1.0f, 0.0f, 0.0f),  0, 0,      0x7fff},
-            {1.0f,  1.0f,  -1.0f, packF4u(0.0f, 1.0f, 0.0f, 0.0f),  0, 0x7fff, 0x7fff},
-            {-1.0f, -1.0f, 1.0f,  packF4u(0.0f, -1.0f, 0.0f, 0.0f), 0, 0,      0},
-            {1.0f,  -1.0f, 1.0f,  packF4u(0.0f, -1.0f, 0.0f, 0.0f), 0, 0x7fff, 0},
-            {-1.0f, -1.0f, -1.0f, packF4u(0.0f, -1.0f, 0.0f, 0.0f), 0, 0,      0x7fff},
-            {1.0f,  -1.0f, -1.0f, packF4u(0.0f, -1.0f, 0.0f, 0.0f), 0, 0x7fff, 0x7fff},
-            {1.0f,  -1.0f, 1.0f,  packF4u(1.0f, 0.0f, 0.0f, 0.0f),  0, 0,      0},
-            {1.0f,  1.0f,  1.0f,  packF4u(1.0f, 0.0f, 0.0f, 0.0f),  0, 0x7fff, 0},
-            {1.0f,  -1.0f, -1.0f, packF4u(1.0f, 0.0f, 0.0f, 0.0f),  0, 0,      0x7fff},
-            {1.0f,  1.0f,  -1.0f, packF4u(1.0f, 0.0f, 0.0f, 0.0f),  0, 0x7fff, 0x7fff},
-            {-1.0f, -1.0f, 1.0f,  packF4u(-1.0f, 0.0f, 0.0f, 0.0f), 0, 0,      0},
-            {-1.0f, 1.0f,  1.0f,  packF4u(-1.0f, 0.0f, 0.0f, 0.0f), 0, 0x7fff, 0},
-            {-1.0f, -1.0f, -1.0f, packF4u(-1.0f, 0.0f, 0.0f, 0.0f), 0, 0,      0x7fff},
-            {-1.0f, 1.0f,  -1.0f, packF4u(-1.0f, 0.0f, 0.0f, 0.0f), 0, 0x7fff, 0x7fff},
-    };
-
-    memory_copy(s_cubeVertices, v, 24 * sizeof(PosNormalTangentTexcoordVertex));
-
-    bgfx_vertex_decl_begin(&vertex_decl, BGFX_RENDERER_TYPE_NULL);
-
-    bgfx_vertex_decl_add(&vertex_decl, BGFX_ATTRIB_POSITION, 3, BGFX_ATTRIB_TYPE_FLOAT, 0, 0);
-    bgfx_vertex_decl_add(&vertex_decl, BGFX_ATTRIB_NORMAL, 4, BGFX_ATTRIB_TYPE_UINT8, 1, 1);
-    bgfx_vertex_decl_add(&vertex_decl, BGFX_ATTRIB_TANGENT, 4, BGFX_ATTRIB_TYPE_UINT8, 1, 1);
-    bgfx_vertex_decl_add(&vertex_decl, BGFX_ATTRIB_TEXCOORD0, 2, BGFX_ATTRIB_TYPE_INT16, 1, 1);
-
-    bgfx_vertex_decl_end(&vertex_decl);
-
-    vbh = bgfx_create_vertex_buffer(bgfx_make_ref(s_cubeVertices, sizeof(s_cubeVertices)), &vertex_decl, 0);
-    ibh = bgfx_create_index_buffer(bgfx_make_ref(s_cubeIndices, sizeof(s_cubeVertices)), 0);
-}
-
 
 int mesh_init(int stage) {
     if (stage == 0) {
@@ -323,11 +206,17 @@ mesh_t mesh_create(world_t world,
 
     log_debug("mesh_renderer", "create mesh renderer");
 
+    scene_create_graph(world, entity, scene);
+
     material_t material_instance = material_resource_create(material);
 
     u32 idx = (u32) ARRAY_SIZE(&data->material);
 
     MAP_SET(u32, &data->ent_idx_map, entity.h.h, idx);
+
+    if (node.id == 0) {
+        node = scene_get_mesh_node(scene, mesh);
+    }
 
     ARRAY_PUSH_BACK(stringid64_t, &data->scene, scene);
     ARRAY_PUSH_BACK(stringid64_t, &data->mesh, mesh);
@@ -344,16 +233,33 @@ void mesh_render_all(world_t world) {
     const MAP_ENTRY_T(u32) *ce_end = MAP_END(u32, &data->ent_idx_map);
     while (ce_it != ce_end) {
         material_t material = ARRAY_AT(&data->material, ce_it->value);
+        stringid64_t scene = ARRAY_AT(&data->scene, ce_it->value);
+        stringid64_t geom = ARRAY_AT(&data->mesh, ce_it->value);
 
         material_use(material);
 
-        transform_t t = transform_get(world, (entity_t) {.idx = ce_it->key});
-        mat44f_t *w = transform_get_world_matrix(world, t);
+        entity_t ent = {.idx = ce_it->key};
 
-        bgfx_set_transform(w, 1);
+        transform_t t = transform_get(world, ent);
+        mat44f_t t_w = *transform_get_world_matrix(world, t);
+        //mat44f_t t_w = MAT44F_INIT_IDENTITY;//*transform_get_world_matrix(world, t);
+        mat44f_t node_w = MAT44F_INIT_IDENTITY;
+        mat44f_t final_w = MAT44F_INIT_IDENTITY;
 
-        bgfx_set_vertex_buffer(vbh, 0, 24);
-        bgfx_set_index_buffer(ibh, 0, 36);
+
+        if (scenegraph_has(world, ent)) {
+            stringid64_t name = scene_get_mesh_node(scene, geom);
+            if (name.id != 0) {
+                scene_node_t n = scenegraph_node_by_name(world, ent, name);
+                node_w = *scenegraph_get_world_matrix(world, n);
+            }
+        }
+
+        mat44f_mul(&final_w, &node_w, &t_w);
+
+        bgfx_set_transform(&final_w, 1);
+
+        scene_resource_submit(scene, geom);
 
         material_submit(material);
 

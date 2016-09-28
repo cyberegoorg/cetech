@@ -1,9 +1,10 @@
 #include <string>
 
 extern "C" {
-#include "../../math/types.h"
-#include "../../errors/errors.h"
 #include "../yaml.h"
+#include "../../memory/memory.h"
+#include "../../errors/errors.h"
+#include "../../math/types.h"
 }
 
 #include "include/yaml-cpp/yaml.h"
@@ -23,6 +24,10 @@ extern "C" {
 struct yamlcpp_handler {
     YAML::Node nodes[4096];
     char used[4096];
+
+    yamlcpp_handler() {
+        memory_set(used, 0, CE_ARRAY_LEN(used));
+    }
 };
 
 
@@ -135,9 +140,25 @@ yaml_node_foreach_dict(yaml_node_t node,
 
         foreach_clb(key, value, data);
 
+        // TODO: ?????????
         //yaml_node_free(key);
         //yaml_node_free(value);
     }
+}
+
+extern "C"
+void yaml_node_foreach_seq(yaml_node_t node,
+                           yaml_foreach_seq_clb_t foreach_clb,
+                           void *data) {
+    yamlcpp_handler *nh = (yamlcpp_handler *) node.doc.d;
+
+    auto cpp_node = nh->nodes[node.idx];
+
+    for (int i = 0; i < cpp_node.size(); ++i) {
+        yaml_node_t value = new_node(node.doc, cpp_node[i]);
+        foreach_clb(i, value, data);
+    }
+
 }
 
 extern "C" int yaml_as_string(yaml_node_t node,

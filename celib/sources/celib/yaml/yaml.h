@@ -48,6 +48,10 @@ typedef void(*yaml_foreach_map_clb_t)(yaml_node_t key,
                                       yaml_node_t value,
                                       void *data);
 
+typedef void(*yaml_foreach_seq_clb_t)(u32 idx,
+                                      yaml_node_t value,
+                                      void *data);
+
 //==============================================================================
 // Enums
 //==============================================================================
@@ -83,6 +87,10 @@ size_t yaml_node_size(yaml_node_t node);
 void yaml_node_foreach_dict(yaml_node_t node,
                             yaml_foreach_map_clb_t foreach_clb,
                             void *data);
+
+void yaml_node_foreach_seq(yaml_node_t node,
+                           yaml_foreach_seq_clb_t foreach_clb,
+                           void *data);
 
 void yaml_merge(yaml_node_t root,
                 yaml_node_t parent);

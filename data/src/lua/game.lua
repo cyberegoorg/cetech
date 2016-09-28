@@ -58,7 +58,8 @@ function Game:shutdown()
     World.destroy(self.world);
 end
 
-function rotator(world, node, delta_rot)
+function rotator(world, unit, node_name, delta_rot)
+    local node = SceneGraph.node_by_name(world, unit, node_name)
     local rot = SceneGraph.get_rotation(world, node)
     rot = rot * delta_rot
     SceneGraph.set_rotation(world, node, rot)
@@ -77,13 +78,13 @@ TEXTURE_CYCLE_IT = 1
 
 L = 0
 function Game:update(dt)
-    local mesh = Mesh.get(self.world, self.unit)
-    local material = Mesh.get_material(self.world, mesh)
-
-    L = L + dt * 0.1
-    if (L >= 1.0) then L = 0; end
-
-    Material.set_vec4f(material, "u_vec4", Vec4f.make(L, 0.0, 0.0, 0.0))
+    --    local mesh = Mesh.get(self.world, self.unit)
+    --    local material = Mesh.get_material(self.world, mesh)
+    --
+    --    L = L + dt * 0.1
+    --    if (L >= 1.0) then L = 0; end
+    --
+    --    Material.set_vec4f(material, "u_vec4", Vec4f.make(L, 0.0, 0.0, 0.0))
 
     if Keyboard.button_pressed(Keyboard.button_index("t")) then
         Material.set_texture(material, "u_texColor", TEXTURE_CYCLE[(TEXTURE_CYCLE_IT % #TEXTURE_CYCLE) + 1])
@@ -93,9 +94,9 @@ function Game:update(dt)
     end
 
     local level_unit = Level.unit(self.level)
-    transform_rotator(self.world, level_unit, Quatf.from_axis_angle(Vec3f.unit_y(), 0.02))
-    transform_rotator(self.world, Level.unit_by_id(self.level, "55643423443313252"), Quatf.from_axis_angle(Vec3f.unit_x(), 0.05))
-    transform_rotator(self.world, Level.unit_by_id(self.level, "55643433135454252"), Quatf.from_axis_angle(Vec3f.unit_z(), 0.08))
+    --    transform_rotator(self.world, level_unit, Quatf.from_axis_angle(Vec3f.unit_y(), 0.02))
+    rotator(self.world, Level.unit_by_id(self.level, "55643433135454252"), "n_cube", Quatf.from_axis_angle(Vec3f.unit_x(), 0.05))
+    --transform_rotator(self.world, self.unit, Quatf.from_axis_angle(Vec3f.unit_z(), 0.08))
 
     if Keyboard.button_pressed(reload_btn) then
         ResourceCompilator.compile_all()
@@ -168,10 +169,10 @@ function Game:update(dt)
 
     local updown = 0.0
     local leftdown = 0.0
-    if up then updown = 10.0 end
-    if down then updown = -10.0 end
-    if left then leftdown = -10.0 end
-    if right then leftdown = 10.0 end
+    if up then updown = 20.0 end
+    if down then updown = -20.0 end
+    if left then leftdown = -20.0 end
+    if right then leftdown = 20.0 end
 
     self.fps_camera:update(dt, dx, dy, updown, leftdown)
 
@@ -190,7 +191,7 @@ function Game:update(dt)
             self.fps_camera.fly_mode = false
         end
 
-        self.fps_camera:update(dt, right_a.x * -1.0, right_a.y * -1.0, left_a.y * 10, left_a.x * 10)
+        self.fps_camera:update(dt, right_a.x * 1.0, right_a.y * 1.0, left_a.y * 20, left_a.x * 20)
     end
 
     --

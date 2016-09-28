@@ -85,6 +85,16 @@ static int _transform_get_world_matrix(lua_State *l) {
     return 1;
 }
 
+
+static int _transform_link(lua_State *l) {
+    world_t w = {.h = luasys_to_handler(l, 1)};
+    entity_t root = {.idx = luasys_to_int(l, 2)};
+    entity_t child = {.idx = luasys_to_int(l, 3)};
+
+    transform_link(w, root, child);
+    return 0;
+}
+
 void _register_lua_transform_api() {
     luasys_add_module_function(API_NAME, "get", _transform_get);
     luasys_add_module_function(API_NAME, "has", _transform_has);
@@ -97,4 +107,5 @@ void _register_lua_transform_api() {
     luasys_add_module_function(API_NAME, "set_position", _transform_set_position);
     luasys_add_module_function(API_NAME, "set_rotation", _transform_set_rotation);
     luasys_add_module_function(API_NAME, "set_scale", _transform_set_scale);
+    luasys_add_module_function(API_NAME, "link", _transform_link);
 }

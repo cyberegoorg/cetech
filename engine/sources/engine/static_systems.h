@@ -60,6 +60,8 @@ SYSTEM(gamepad)
 
 SYSTEM(transform)
 
+SYSTEM(scenegraph)
+
 SYSTEM(camera)
 
 SYSTEM(mesh)

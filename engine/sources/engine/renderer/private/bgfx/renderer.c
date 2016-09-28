@@ -16,6 +16,7 @@
 #include "texture.h"
 #include "shader.h"
 #include "engine/renderer/material.h"
+#include "scene.h"
 
 //==============================================================================
 // GLobals
@@ -23,7 +24,7 @@
 
 #define _G RendererGlobals
 static struct G {
-    stringid64_t shader_type;
+    stringid64_t type;
     u32 size_width;
     u32 size_height;
     int capture;
@@ -68,6 +69,7 @@ int renderer_init(int stage) {
     texture_resource_init();
     shader_resource_init();
     material_resource_init();
+    scene_resource_init();
 
     consolesrv_register_command("renderer.resize", _cmd_resize);
 
@@ -78,6 +80,7 @@ void renderer_shutdown() {
     texture_resource_shutdown();
     shader_resource_shutdown();
     material_resource_shutdown();
+    scene_resource_shutdown();
 
     bgfx_shutdown();
 
