@@ -20,6 +20,8 @@ ASSET_CREATOR = {
     -- MATERIAL
     -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
     material = function(self, asset, type)
+        Transform.set_position(self.world, self.camera_transform, Vec3f.make(0.0, 0.0, 20.0))
+
         self.actual_asset_unit = Unit.spawn(self.world, "playground/cube")
 
         local mesh = Mesh.get(self.world, self.actual_asset_unit)
@@ -30,11 +32,20 @@ ASSET_CREATOR = {
     -- TEXTURE
     -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
     texture = function(self, asset, type)
+        Transform.set_position(self.world, self.camera_transform, Vec3f.make(0.0, 0.0, 20.0))
+
         self.actual_asset_unit = Unit.spawn(self.world, "playground/cube")
 
         local mesh = Mesh.get(self.world, self.actual_asset_unit)
         local material = Mesh.get_material(self.world, mesh)
         Material.set_texture(material, "u_texColor", asset)
+    end,
+
+    -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
+    -- LEVEL
+    -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
+    level = function(self, asset, type)
+        self.level = Level.load_level(self.world, asset)
     end
 }
 
@@ -93,23 +104,29 @@ end
 
 
 function AssetView:show_asset(asset, type)
-    self:destroy_actual_asset()
+    Transform.set_position(self.world, self.camera_transform, Vec3f.make(0.0, 0.0, 20.0))
 
+    self:destroy_actual_asset()
     if ASSET_CREATOR[type] ~= nil then
         ASSET_CREATOR[type](self, asset, type)
     end
 end
 
 function AssetView:destroy_actual_asset()
-    if self.actual_asset_unit then
+    if self.level then
+        Level.destroy(self.world, self.level)
+        self.level = nil
+
+    elseif self.actual_asset_unit then
         Unit.destroy(self.world, self.actual_asset_unit)
         self.actual_asset_unit = nil
     end
 end
 
-
 function init()
     AssetView:init()
+    AssetView:show_asset("level1", "level")
+    AssetView:show_asset("cube", "scene")
 end
 
 function update(dt)

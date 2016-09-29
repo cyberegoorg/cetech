@@ -29,7 +29,8 @@ ARRAY_PROTOTYPE(stringid64_t);
 
 struct level_instance {
     entity_t level_entity;
-    MAP_T(entity_t) spawned_entity;
+    MAP_T(entity_t) spawned_entity_map;
+    ARRAY_T(entity_t) *spawned_entity;
 };
 
 ARRAY_PROTOTYPE_N(struct level_instance, level_instance);
@@ -45,11 +46,11 @@ static struct G {
 void _init_level_instance(struct level_instance *instance,
                           entity_t level_entity) {
     instance->level_entity = level_entity;
-    MAP_INIT(entity_t, &instance->spawned_entity, memsys_main_allocator());
+    MAP_INIT(entity_t, &instance->spawned_entity_map, memsys_main_allocator());
 }
 
 void _destroy_level_instance(struct level_instance *instance) {
-    MAP_DESTROY(entity_t, &instance->spawned_entity);
+    MAP_DESTROY(entity_t, &instance->spawned_entity_map);
 }
 
 
@@ -247,10 +248,11 @@ level_t world_load_level(world_t world,
     struct level_instance *instance = _level_instance(level);
 
     ARRAY_T(entity_t) *spawned = unit_spawn_from_resource(world, data);
+    instance->spawned_entity = spawned;
 
     for (int i = 0; i < res->units_count; ++i) {
         entity_t e = ARRAY_AT(spawned, offset[i]);
-        MAP_SET(entity_t, &instance->spawned_entity, id[i].id, e);
+        MAP_SET(entity_t, &instance->spawned_entity_map, id[i].id, e);
 
         if (transform_has(world, e)) {
             transform_link(world, level_ent, e);
@@ -260,10 +262,18 @@ level_t world_load_level(world_t world,
     return level;
 }
 
+void level_destroy(world_t world,
+                   level_t level) {
+    struct level_instance *instance = _level_instance(level);
+
+    unit_destroy(world, &instance->spawned_entity->data[0], 1);
+    entity_manager_destroy(instance->level_entity);
+}
+
 entity_t level_unit_by_id(level_t level,
                           stringid64_t id) {
     struct level_instance *instance = _level_instance(level);
-    return MAP_GET(entity_t, &instance->spawned_entity, id.id, (entity_t) {0});
+    return MAP_GET(entity_t, &instance->spawned_entity_map, id.id, (entity_t) {0});
 }
 
 entity_t level_unit(level_t level) {
