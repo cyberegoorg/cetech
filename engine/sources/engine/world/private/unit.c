@@ -10,12 +10,50 @@
 #include <engine/core/memory.h>
 #include <celib/containers/map.h>
 #include <engine/core/entcom.h>
+#include <engine/core/types.h>
 
+ARRAY_PROTOTYPE_N(struct array_entity_t, array_entity_t);
+MAP_PROTOTYPE_N(struct array_entity_t, array_entity_t);
 
 #define _G UnitGlobal
 static struct G {
     stringid64_t type;
+    MAP_T(u32) spawned_map;
+    ARRAY_T(array_entity_t) spawned_array;
 } _G = {0};
+
+u32 _new_spawned_array() {
+    u32 idx = ARRAY_SIZE(&_G.spawned_array);
+
+    ARRAY_PUSH_BACK(array_entity_t, &_G.spawned_array, (struct array_entity_t) {0});
+    ARRAY_T(entity_t) *array = &ARRAY_AT(&_G.spawned_array, idx);
+
+    ARRAY_INIT(entity_t, array, memsys_main_allocator());
+    return idx;
+}
+
+void _map_spawned_array(entity_t root,
+                        u32 idx) {
+    MAP_SET(u32, &_G.spawned_map, root.idx, idx);
+}
+
+ARRAY_T(entity_t) *_get_spawned_array_by_idx(u32 idx) {
+    return &ARRAY_AT(&_G.spawned_array, idx);
+}
+
+ARRAY_T(entity_t) *_get_spawned_array(entity_t entity) {
+    u32 idx = MAP_GET(u32, &_G.spawned_map, entity.idx, UINT32_MAX);
+    return &ARRAY_AT(&_G.spawned_array, idx);
+}
+
+
+void _destroy_spawned_array(entity_t entity) {
+    u32 idx = MAP_GET(u32, &_G.spawned_map, entity.idx, UINT32_MAX);
+    MAP_REMOVE(u32, &_G.spawned_map, entity.idx);
+
+    ARRAY_T(entity_t) *array = &ARRAY_AT(&_G.spawned_array, idx);
+    ARRAY_DESTROY(entity_t, array);
+}
 
 //==============================================================================
 // Compiler private
@@ -259,7 +297,7 @@ u32 unit_compiler_ent_counter(struct entity_compile_output *output) {
 void unit_compiler_write_to_build(struct entity_compile_output *output,
                                   ARRAY_T(u8) *build) {
     struct unit_resource res = {0};
-    res.ent_count = (u32) (output->ent_counter + 1);
+    res.ent_count = (u32) (output->ent_counter);
     res.comp_type_count = (u32) ARRAY_SIZE(&output->component_type);
 
     ARRAY_PUSH(u8, build, (u8 *) &res, sizeof(struct unit_resource));
@@ -391,10 +429,12 @@ int unit_init(int stage) {
         return 1;
     }
 
-
     _G = (struct G) {0};
 
     _G.type = stringid64_from_string("unit");
+
+    MAP_INIT(u32, &_G.spawned_map, memsys_main_allocator());
+    ARRAY_INIT(array_entity_t, &_G.spawned_array, memsys_main_allocator());
 
     resource_register_type(_G.type, unit_resource_callback);
     resource_compiler_register(_G.type, _unit_resource_compiler);
@@ -403,20 +443,24 @@ int unit_init(int stage) {
 }
 
 void unit_shutdown() {
+    MAP_DESTROY(u32, &_G.spawned_map);
+    ARRAY_DESTROY(array_entity_t, &_G.spawned_array);
 
     _G = (struct G) {0};
 }
 
-
-void unit_spawn_from_resource(world_t world,
-                              void *resource,
-                              ARRAY_T(entity_t) *spawned) {
-
+ARRAY_T(entity_t) *unit_spawn_from_resource(world_t world,
+                                            void *resource) {
     struct unit_resource *res = resource;
+
+    u32 idx = _new_spawned_array();
+    ARRAY_T(entity_t) *spawned = _get_spawned_array_by_idx(idx);
 
     for (int j = 0; j < res->ent_count; ++j) {
         ARRAY_PUSH_BACK(entity_t, spawned, entity_manager_create());
     }
+
+    entity_t root = ARRAY_AT(spawned, 0);
 
     u32 *parents = unit_resource_parents(res);
     u64 *comp_types = unit_resource_comp_types(res);
@@ -432,6 +476,9 @@ void unit_spawn_from_resource(world_t world,
         comp_data = (struct component_data *) (c_data + comp_data->size);
     }
 
+    _map_spawned_array(root, idx);
+
+    return spawned;
 }
 
 entity_t unit_spawn(world_t world,
@@ -443,20 +490,21 @@ entity_t unit_spawn(world_t world,
         return (entity_t) {.idx = 0};
     }
 
-    ARRAY_T(entity_t) spawned;
-    ARRAY_INIT(entity_t, &spawned, memsys_main_allocator());
+    ARRAY_T(entity_t) *spawned = unit_spawn_from_resource(world, res);
 
-    unit_spawn_from_resource(world, res, &spawned);
-
-    entity_t root = ARRAY_AT(&spawned, 0);
-
-    ARRAY_DESTROY(entity_t, &spawned);
-
-    return root;
+    return spawned->data[0];
 }
 
 void unit_destroy(world_t world,
                   entity_t *unit,
                   u32 count) {
-    component_destroy(world, unit, count);
+
+    for (int i = 0; i < count; ++i) {
+        ARRAY_T(entity_t) *spawned = _get_spawned_array(unit[i]);
+
+        component_destroy(world, spawned->data, spawned->size);
+
+        _destroy_spawned_array(unit[i]);
+    }
+
 }

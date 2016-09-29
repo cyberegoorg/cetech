@@ -278,9 +278,12 @@ void application_start() {
     if (!cvar_get_int(_G.config.cv_daemon)) {
         intptr_t wid = cvar_get_int(_G.config.cv_wid);
 
+        char title[128] = {0};
+        snprintf(title, CE_ARRAY_LEN(title), "cetech-%s", cvar_get_string(_G.config.cv_boot_script));
+
         if (wid == 0) {
             _G.main_window = window_new(
-                    "Cetech",
+                    title,
                     WINDOWPOS_UNDEFINED,
                     WINDOWPOS_UNDEFINED,
                     cvar_get_int(_G.config.cv_screen_x), cvar_get_int(_G.config.cv_screen_y),

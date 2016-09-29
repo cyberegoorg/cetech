@@ -246,33 +246,16 @@ level_t world_load_level(world_t world,
     level_t level = _new_level(level_ent);
     struct level_instance *instance = _level_instance(level);
 
-    ARRAY_T(entity_t) spawned;
-    ARRAY_INIT(entity_t, &spawned, memsys_main_allocator());
-
-    unit_spawn_from_resource(world, data, &spawned);
+    ARRAY_T(entity_t) *spawned = unit_spawn_from_resource(world, data);
 
     for (int i = 0; i < res->units_count; ++i) {
-        entity_t e = ARRAY_AT(&spawned, offset[i]);
+        entity_t e = ARRAY_AT(spawned, offset[i]);
         MAP_SET(entity_t, &instance->spawned_entity, id[i].id, e);
 
         if (transform_has(world, e)) {
             transform_link(world, level_ent, e);
         }
     }
-
-    ARRAY_DESTROY(entity_t, &spawned);
-
-    //MAP_SET(entity_t, &instance->spawned_entity, id[i].id, unit);
-//
-//    for (int i = 0; i < res->units_count; ++i) {
-//        entity_t unit = unit_spawn_from_resource(world, (void *) &data[offset[i]]);
-//
-//        MAP_SET(entity_t, &instance->spawned_entity, id[i].id, unit);
-//
-//        if (transform_has(world, unit)) {
-//            transform_link(world, level_ent, unit);
-//        }
-//    }
 
     return level;
 }

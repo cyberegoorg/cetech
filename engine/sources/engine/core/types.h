@@ -48,8 +48,7 @@ typedef struct {
     };
 } entity_t;
 
-ARRAY_PROTOTYPE(entity_t)
-
+ARRAY_PROTOTYPE(entity_t);
 MAP_PROTOTYPE(entity_t);
 
 typedef int (*component_compiler_t)(yaml_node_t body,
@@ -74,7 +73,6 @@ typedef void (*component_spawner_t)(world_t world,
 //==============================================================================
 // Task
 //==============================================================================
-
 
 typedef struct {
     u32 id;

@@ -49,7 +49,7 @@ function AssetView:init()
 
     self.camera_transform = Transform.get(self.world, self.camera_unit)
 
-    Transform.set_position(self.world, self.camera_transform, Vec3f.make(0.0, 0.0, -20.0))
+    Transform.set_position(self.world, self.camera_transform, Vec3f.make(0.0, 0.0, 20.0))
 
     self.actual_asset_unit = nil
     self.level = nil
@@ -94,6 +94,7 @@ end
 
 function AssetView:show_asset(asset, type)
     self:destroy_actual_asset()
+
     if ASSET_CREATOR[type] ~= nil then
         ASSET_CREATOR[type](self, asset, type)
     end
@@ -102,6 +103,7 @@ end
 function AssetView:destroy_actual_asset()
     if self.actual_asset_unit then
         Unit.destroy(self.world, self.actual_asset_unit)
+        self.actual_asset_unit = nil
     end
 end
 

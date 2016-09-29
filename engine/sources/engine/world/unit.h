@@ -8,9 +8,8 @@ int unit_init(int stage);
 
 void unit_shutdown();
 
-entity_t *unit_spawn_from_resource(world_t world,
-                                   void *resource,
-                                   ARRAY_T(entity_t) *spawned);
+ARRAY_T(entity_t) *unit_spawn_from_resource(world_t world,
+                                            void *resource);
 
 entity_t unit_spawn(world_t world,
                     stringid64_t name);

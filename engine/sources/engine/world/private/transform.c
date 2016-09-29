@@ -125,6 +125,7 @@ static void _destroyer(world_t world,
 
     // TODO: remove from arrays, swap idx -> last AND change size
     for (int i = 0; i < ent_count; i++) {
+        CE_ASSERT("transform", MAP_HAS(u32, &world_data->ent_idx_map, ents[i].idx));
         MAP_REMOVE(u32, &world_data->ent_idx_map, ents[i].idx);
     }
 }

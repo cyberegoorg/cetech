@@ -145,6 +145,7 @@ static void _map_erase_##N(MAP_T(N) *h, const struct map_find_result *fr) {    \
         ARRAY_AT(&h->_data, last.data_prev).next = fr->data_i;                 \
     else                                                                       \
         ARRAY_AT(&h->_hash, last.map_i) = fr->data_i;                          \
+    ARRAY_RESIZE(map_entry_t_##N, &h->_data, ARRAY_SIZE(&h->_data) - 1);       \
 }                                                                              \
                                                                                \
 static struct map_find_result _map_find_entry_##N(                             \
