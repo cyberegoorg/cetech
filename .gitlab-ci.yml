@@ -16,7 +16,7 @@ test:
   image: ondravoves/cetech:build_ci
   stage: test
   script:
-  - scripts/build.py
+  - python3 scripts/build.py
   #- py.test -v engine/tests/
 
 #################
