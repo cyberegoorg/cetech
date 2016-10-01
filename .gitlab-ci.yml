@@ -23,10 +23,9 @@ test:
 # Gitlab pages  #
 ###############################################################################
 pages:
-  image: ondravoves/debian:python2.7
+  image: ondravoves/cetech:build_ci
   stage: doc
   script:
-  - pip install mkdocs mkdocs-bootswatch
   - mkdocs build -f scripts/mkdocs.yml -d public
 
   only:

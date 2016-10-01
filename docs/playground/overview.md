@@ -18,7 +18,7 @@ editor, edit the code, and then just when to pull reload the page loads and just
 In the main directory, run the script **playground.py**
 
 ```bash
-$ python3 playground.py
+$ python3 playground/playground.py
 ```
 
 !!! note

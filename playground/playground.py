@@ -45,13 +45,13 @@ else:
 sys.path.insert(0, os.path.join(PLAYGROUND_DIR, 'src'))
 QDir.setCurrent(PLAYGROUND_DIR)
 
-QIcon.setThemeSearchPaths([os.path.join(PLAYGROUND_DIR, 'icons', 'breeze')])
 
-if _platform == 'windows':
-    QIcon.setThemeName('Breeze')
-else:
-    QIcon.setThemeName('Breeze Dark')
-
+# QIcon.setThemeSearchPaths([os.path.join(PLAYGROUND_DIR, 'icons', 'breeze')])
+#
+# if _platform == 'windows':
+#     QIcon.setThemeName('Breeze')
+# else:
+#     QIcon.setThemeName('Breeze Dark')
 
 def compile_map(d, f):
     return 'src/playground/ui/', f
