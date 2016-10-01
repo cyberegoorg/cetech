@@ -213,14 +213,6 @@ set(MAIN_SOURCE_FILES
         engine/sources/engine/main.c)
 
 ################################################################################
-# Tests sources
-################################################################################
-set(TEST_SOURCE_FILES
-        ${SOURCE_FILES}
-        engine/sources/test/tests_main.cc
-        celib/sources/celib/os/stacktrace.h celib/sources/celib/os/thread.h)
-
-################################################################################
 # Release sources
 ################################################################################
 
@@ -297,33 +289,14 @@ target_link_libraries(cetech_develop ${DEVELOP_LIBS})
 target_include_directories(cetech_develop PUBLIC externals/build/${PLATFORM_ID}/${CONFIGURATION}/)
 target_include_directories(cetech_develop PUBLIC externals/build/${PLATFORM_ID}/${CONFIGURATION}/include)
 
-
-################################################################################
-# Cetech TESTS
-################################################################################
-#add_executable(cetech_tests ${TEST_SOURCE_FILES})
-#target_compile_definitions(cetech_tests PUBLIC -DCETECH_TEST -DCELIB_TEST -DCETECH_DEVELOP)
-#target_link_libraries(cetech_tests ${DEVELOP_LIBS})
-#target_include_directories(cetech_tests PUBLIC externals/build/${PLATFORM_ID}/${CONFIGURATION}/)
-#target_include_directories(cetech_tests PUBLIC externals/build/${PLATFORM_ID}/${CONFIGURATION}/include)
-
-add_library(cetech_develop_lib SHARED ${SOURCE_FILES})
-target_link_libraries(cetech_develop_lib ${RELEASE_LIBS2})
-target_compile_definitions(cetech_develop_lib PUBLIC -DCETECH_DEVELOP)
-target_include_directories(cetech_develop_lib PUBLIC externals/build/${PLATFORM_ID}/${CONFIGURATION}/)
-target_include_directories(cetech_develop_lib PUBLIC externals/build/${PLATFORM_ID}/${CONFIGURATION}/include)
+#add_library(cetech_develop_lib SHARED ${SOURCE_FILES})
+#target_link_libraries(cetech_develop_lib ${RELEASE_LIBS2})
+#target_compile_definitions(cetech_develop_lib PUBLIC -DCETECH_DEVELOP)
+#target_include_directories(cetech_develop_lib PUBLIC externals/build/${PLATFORM_ID}/${CONFIGURATION}/)
+#target_include_directories(cetech_develop_lib PUBLIC externals/build/${PLATFORM_ID}/${CONFIGURATION}/include)
 
 #set_target_properties(plugin_example PROPERTIES PREFIX "")
 
 add_library(plugin_example SHARED engine/sources/engine/plugin_example.c)
 set_target_properties(plugin_example PROPERTIES PREFIX "")
 
-## configure unit tests via CTest
-#enable_testing()
-#add_test(NAME RunTests COMMAND cetech_tests)
-#
-#add_test(NAME ListTests COMMAND cetech_tests --list-tests)
-#set_tests_properties(ListTests PROPERTIES PASS_REGULAR_EXPRESSION "[0-9]+ test cases")
-#
-#add_test(NAME ListTags COMMAND cetech_tests --list-tags)
-#set_tests_properties(ListTags PROPERTIES PASS_REGULAR_EXPRESSION "[0-9]+ tags")
