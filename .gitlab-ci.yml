@@ -16,8 +16,8 @@ test:
   image: ondravoves/cetech:build_ci
   stage: test
   script:
-  - python3 scripts/build.py
-  #- py.test -v engine/tests/
+    - python3 scripts/build.py
+    #- py.test -v engine/tests/
 
 #################
 # Gitlab pages  #
@@ -26,7 +26,9 @@ pages:
   image: ondravoves/cetech:build_ci
   stage: doc
   script:
-  - mkdocs build -f scripts/mkdocs.yml -d public
+    - export LC_ALL=C.UTF-8
+    - export LANG=C.UTF-8
+    - mkdocs build -f scripts/mkdocs.yml -d public
 
   only:
     - master
