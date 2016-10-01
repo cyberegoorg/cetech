@@ -16,8 +16,6 @@ test:
   image: ondravoves/cetech:build_ci
   stage: test
   script:
-  - pip install -r scripts/requirements.txt
-  - pip install -r scripts/dev_requirements.txt
   - scripts/build.py
   #- py.test -v engine/tests/
 
