@@ -242,5 +242,5 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.api.quit()
         self.api.disconnect()
         self.assetview_widget.close_project()
-        self.project.killall(True)
+        self.project.killall()
         evnt.accept()

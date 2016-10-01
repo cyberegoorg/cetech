@@ -3,40 +3,39 @@
 [![build status](https://gitlab.com/cyberegoorg/cetech/badges/master/build.svg)](https://gitlab.com/cyberegoorg/cetech/commits/master)
 [![License](https://img.shields.io/badge/license-CC0-blue.svg)](LICENSE.md)
 
-## [What is it?](https://cyberegoorg.github.io/cetech/)
+## [What is it?](https://cyberegoorg.gitlab.io/cetech/)
 
 CETech is Data-Driven game engine and toolbox inspired by [Bitsquid](http://bitsquid.blogspot.se/)/[Stingray](http://stingrayengine.com/) engine.
 
-* [Release notes](http://cyberegoorg.github.io/cetech/about/release-notes)
-* [Documentation](http://cyberegoorg.github.io/cetech) work in progress
+* [Release notes](http://cyberegoorg.gitlab.io/cetech/about/release-notes)
+* [Documentation](http://cyberegoorg.gitlab.io/cetech) work in progress
 
 ![Prototyp](https://raw.githubusercontent.com/cyberegoorg/cetech/master/docs/img/prototyp.png)
+
+## Suported platforms
+
+* Linux (Runtime + Playground) - Work in progress
+
+## Planned platforms
+* Windows (Runtime + Playground)
+* OSX (Runtime + Playground)
+* FreeBSD (Runtime + Playground)
+* RaspberryPi (Runtime + Playground)
+* asm.js/Emscripten (Runtime)
+* Android (Runtime)
+* XBox One (Runtime)
+* PS4 (Runtime)
 
 ## Similar projects
 
 * [crown](https://github.com/taylor001/crown) -  Lightweight and flexible cross-platform game engine. 
 * [lumix](https://github.com/nem0/LumixEngine) - Easy to use, fast and flexible 3D game engine.
 
-## [3rd party libraries and tools](https://cyberegoorg.github.io/cetech/about/3rdparty/)
-
-## Suported platforms
-
-* Linux (Runtime + Develop) - Work in progress
-
-## Planned platforms
-* Windows (Runtime + Develop)
-* OSX (Runtime + Develop)
-* FreeBSD (Runtime + Develop)
-* RaspberryPi (Runtime + Develop)
-* asm.js/Emscripten (Runtime)
-* Android (Runtime)
-* XBox One (Runtime)
-* PS4 (Runtime)
+## [3rd party libraries and tools](https://cyberegoorg.gitlab.io/cetech/about/3rdparty/)
 
 ## Build
 
-* [Linux](https://cyberegoorg.github.io/cetech/engine/build#linux)
-* [Windows](https://cyberegoorg.github.io/cetech/engine/build#windows)
+* [Linux](https://cyberegoorg.gitlab.io/cetech/engine/build#linux)
 
 ## [License](http://creativecommons.org/publicdomain/zero/1.0/)
 

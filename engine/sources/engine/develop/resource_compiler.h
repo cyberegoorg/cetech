@@ -55,4 +55,8 @@ int resource_compiler_get_tmp_dir(char *tmp_dir,
                                   size_t max_len,
                                   const char *platform);
 
+int resource_compiler_external_join(char *output,
+                                    u32 max_len,
+                                    const char *name);
+
 #endif //CETECH_RESOURCE_COMPILER_H

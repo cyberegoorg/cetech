@@ -275,6 +275,7 @@ def copytree(src, dst, symlinks=False, ignore=None, copy_function=shutil.copy2,
         raise shutil.Error(errors)
     return dst
 
+
 def install(name, body, platform_):
     clone_dir = os.path.join(EXTERNAL_SRC_DIR, name)
 

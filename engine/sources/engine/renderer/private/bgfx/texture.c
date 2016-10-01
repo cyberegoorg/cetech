@@ -52,9 +52,10 @@ static int _texturec(const char *input,
                      int gen_mipmaps,
                      int is_normalmap) {
     char cmd_line[4096] = {0};
-    int s = snprintf(cmd_line, CE_ARRAY_LEN(cmd_line),
-                     "externals/build/linux64/release/bin/texturec -f %s -o %s", input, output);
 
+    int s = resource_compiler_external_join(cmd_line, CE_ARRAY_LEN(cmd_line), "texturec");
+
+    s += snprintf(cmd_line + s, CE_ARRAY_LEN(cmd_line) - s, " -f %s -o %s", input, output);
     if (gen_mipmaps) {
         s += snprintf(cmd_line + s, CE_ARRAY_LEN(cmd_line) - s, " --mips");
     }
@@ -74,7 +75,7 @@ static int _gen_tmp_name(char *tmp_filename,
                          const char *tmp_dir,
                          size_t max_len,
                          const char *filename) {
-    char dir[1024] = {0};
+    char dir[4096] = {0};
     os_path_dir(dir, CE_ARRAY_LEN(dir), filename);
 
     os_path_join(tmp_filename, max_len, tmp_dir, dir);
@@ -88,12 +89,12 @@ int _texture_resource_compiler(const char *filename,
                                struct vio *build_vio,
                                struct compilator_api *compilator_api) {
     // TODO: temp allocator?
-    char build_dir[1024] = {0};
-    char tmp_dir[1024] = {0};
+    char build_dir[4096] = {0};
+    char tmp_dir[4096] = {0};
     char input_str[1024] = {0};
     char input_path[1024] = {0};
-    char output_path[1024] = {0};
-    char tmp_filename[1024] = {0};
+    char output_path[4096] = {0};
+    char tmp_filename[4096] = {0};
 
     char source_data[vio_size(source_vio) + 1];
     memory_set(source_data, 0, vio_size(source_vio) + 1);

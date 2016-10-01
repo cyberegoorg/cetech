@@ -1,6 +1,7 @@
 import ctypes
 import os
 import platform
+import random
 from time import sleep
 
 import PyQt5
@@ -37,23 +38,23 @@ instance_counter = 0
 
 
 @pytest.fixture(scope="function")
-def engine_instance(request, tmpdir):
+def engine_instance(request):
     from cetech.project import EngineInstance
 
-    instance = EngineInstance("test", os.path.join(ROOT_DIR, "build"))
+    instance = EngineInstance("test", os.path.join(ROOT_DIR, "bin"), os.path.join(ROOT_DIR, "externals/build"))
     global instance_counter
     port = 4444 + (instance_counter * 2)
     instance_counter += 1
 
-    instance.run_cetech_develop(
-        tmpdir.join("data", "build"),
+    build_dir = os.path.join(ROOT_DIR, ".test_tmp", "build")
+
+    instance.run_develop(
+        os.path.abspath(build_dir),
         os.path.join(ROOT_DIR, "data", "src"),
         core_dir=os.path.join(ROOT_DIR, "core"),
         port=port, protocol="tcp",
         compile_=True, continue_=True
     )
-
-    sleep(0.2)
 
     api = instance.create_console_api()
     api.connect()
@@ -63,5 +64,6 @@ def engine_instance(request, tmpdir):
     yield api
 
     api.quit()
+    sleep(0.2)
     api.disconnect()
-    instance.kill(True)
+    instance.kill(False)

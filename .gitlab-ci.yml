@@ -16,11 +16,9 @@ test:
   image: ondravoves/cetech:build_ci
   stage: test
   script:
+  - pip install -r scripts/requirements.txt
   - pip install -r scripts/dev_requirements.txt
-  - mkdir build
-  - cd build
-  - cmake .. -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++ -DCMAKE_BUILD_TYPE=Debug
-  - make -j 4
+  - scripts/build.py
   #- py.test -v engine/tests/
 
 #################

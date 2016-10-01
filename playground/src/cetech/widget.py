@@ -66,9 +66,10 @@ class Widget(QWidget):
         else:
             self.start_pos = None
 
-        self._move_mouse(self.start_pos.x() - event.globalPos().x(),
-                         self.start_pos.y() - event.globalPos().y(),
-                         str(self.left).lower(), str(self.midle).lower(), str(self.right).lower())
+        if self.start_pos is not None:
+            self._move_mouse(self.start_pos.x() - event.globalPos().x(),
+                             self.start_pos.y() - event.globalPos().y(),
+                             str(self.left).lower(), str(self.midle).lower(), str(self.right).lower())
 
     def mousePressEvent(self, event):  # real signature unknown; restored from __doc__
         """ QWidget.mousePressEvent(QMouseEvent) """

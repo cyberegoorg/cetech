@@ -41,6 +41,7 @@ struct G {
     cvar_t cv_source_dir;
     cvar_t cv_core_dir;
     cvar_t cv_build_dir; // TODO: MOVE TO RESOURCE MANAGER
+    cvar_t cv_external_dir;
 } ResourceCompilerGlobal = {0};
 
 
@@ -148,7 +149,7 @@ void _compile_dir(task_t root_task,
             continue;
         }
 
-        char build_path[1024] = {0};
+        char build_path[4096] = {0};
         os_path_join(build_path, CE_ARRAY_LEN(build_path), build_dir_full, build_name);
 
         struct vio *build_vio = vio_from_file(build_path, VIO_OPEN_WRITE, memsys_main_scratch_allocator());
@@ -187,6 +188,8 @@ int resource_compiler_init(int stage) {
         _G = (struct G) {0};
         _G.cv_source_dir = cvar_new_str(".src", "Resource source dir", "data/src");
         _G.cv_core_dir = cvar_new_str(".core", "Resource core source dir", "core");
+        _G.cv_external_dir = cvar_new_str(".external", "External build dir", "externals/build");
+
         _G.cv_build_dir = cvar_new_str(".build", "Resource build dir", "data/build");
     } else {
 
@@ -282,4 +285,18 @@ int resource_compiler_get_tmp_dir(char *tmp_dir,
     resource_compiler_get_build_dir(build_dir, CE_ARRAY_LEN(build_dir), platform);
 
     return os_path_join(tmp_dir, max_len, build_dir, "tmp");
+}
+
+int resource_compiler_external_join(char *output,
+                                    u32 max_len,
+                                    const char *name) {
+    char tmp_dir[1024] = {0};
+    char tmp_dir2[1024] = {0};
+
+    const char *external_dir_str = cvar_get_string(_G.cv_external_dir);
+    os_path_join(tmp_dir, CE_ARRAY_LEN(tmp_dir), external_dir_str, application_native_platform());
+    strncat(tmp_dir, "64", CE_ARRAY_LEN(tmp_dir));
+    os_path_join(tmp_dir2, CE_ARRAY_LEN(tmp_dir2), tmp_dir, "release/bin");
+
+    return os_path_join(output, max_len, tmp_dir2, name);
 }

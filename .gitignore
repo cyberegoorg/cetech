@@ -1,7 +1,10 @@
 .idea
 .gtm
 .vagrant
+.vagrant
+.cache
 
+bin
 build
 site
 
@@ -16,4 +19,5 @@ __pycache__
 *.speccache
 *.iml
 
+perf.data*
 log.db

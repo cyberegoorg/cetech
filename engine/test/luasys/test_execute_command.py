@@ -11,19 +11,21 @@ def test_execute_command():
 
 @given("New instance")
 def new_instance(engine_instance):
-    return engine_instance
+    return dict(engine=engine_instance)
 
 
-@given('Lua cmd <cmd> return value')
+@when('call lua cmd <cmd>')
 def execute_command(new_instance, cmd):
-    return new_instance.lua_execute(cmd)['response']
+    new_instance["cmd_ret_value"] = new_instance["engine"].lua_execute(cmd)['response']
 
 
 @then('Response is <response>')
-def response_is(execute_command, response):
-    if execute_command is None:
-        assert str(execute_command) == response
-    elif type(execute_command) is dict:
-        assert str(execute_command) == response
+def response_is(new_instance, response):
+    cmd_ret_value = new_instance["cmd_ret_value"]
+
+    if cmd_ret_value is None:
+        assert str(cmd_ret_value) == response
+    elif type(cmd_ret_value) is dict:
+        assert str(cmd_ret_value) == response
     else:
-        assert execute_command == type(execute_command)(response)
+        assert cmd_ret_value == type(cmd_ret_value)(response)

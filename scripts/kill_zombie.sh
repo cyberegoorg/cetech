@@ -1,4 +1,4 @@
 #!/bin/sh
 
-ps -A | tr -s " " | grep "bgfx" | cut -d ' ' -f 2 | xargs kill -9
-ps -A | tr -s " " | grep "cetech" | cut -d ' ' -f 2 | xargs kill -9
+ ps -A | grep "bgfx - renderer" | tr -s " " | cut -d ' ' -f 1 | xargs kill -9
+ ps -A | grep "cetech"          | tr -s " " | cut -d ' ' -f 1 | xargs kill -9

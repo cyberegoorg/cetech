@@ -1,0 +1,3 @@
+cffi
+pytest
+pytest-bdd

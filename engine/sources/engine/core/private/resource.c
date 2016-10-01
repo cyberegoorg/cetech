@@ -145,7 +145,7 @@ int resource_init(int stage) {
 
     _G.cv_build_dir = cvar_find(".build");
 
-    char build_dir_full[1024] = {0};
+    char build_dir_full[4096] = {0};
     os_path_join(build_dir_full,
                  CE_ARRAY_LEN(build_dir_full),
                  cvar_get_string(_G.cv_build_dir),
@@ -295,7 +295,7 @@ void resource_load(void **loaded_data,
         char build_name[33] = {0};
         resource_type_name_string(build_name, CE_ARRAY_LEN(build_name), type, names[i]);
 
-        char filename[1024] = {0};
+        char filename[4096] = {0};
         resource_compiler_get_filename(filename, CE_ARRAY_LEN(filename), type, names[i]);
         log_debug("resource", "Loading resource %s from %s/%s", filename, filesystem_get_root_dir(root_name),
                   build_name);

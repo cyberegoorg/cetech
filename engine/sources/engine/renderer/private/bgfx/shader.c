@@ -58,8 +58,10 @@ static int _shaderc(const char *input,
                     const char *platform,
                     const char *profile) {
     char cmd_line[4096] = {0};
-    int s = snprintf(cmd_line, CE_ARRAY_LEN(cmd_line),
-                     "externals/build/linux64/release/bin/shaderc"
+
+    int s = resource_compiler_external_join(cmd_line, CE_ARRAY_LEN(cmd_line), "shaderc");
+    s += snprintf(cmd_line + s, CE_ARRAY_LEN(cmd_line) - s,
+                  ""
                              " -f %s"
                              " -o %s"
                              " -i %s"
@@ -127,16 +129,15 @@ int _shader_resource_compiler(const char *filename,
     char include_dir[1024] = {0};
     os_path_join(include_dir, CE_ARRAY_LEN(include_dir), core_dir, "bgfxshaders");
 
-
     struct shader resource = {0};
 
     // TODO: temp allocator?
-    char build_dir[256] = {0};
-    char tmp_dir[256] = {0};
-    char input_str[256] = {0};
-    char input_path[256] = {0};
-    char output_path[256] = {0};
-    char tmp_filename[256] = {0};
+    char build_dir[4096] = {0};
+    char tmp_dir[4096] = {0};
+    char input_str[1024] = {0};
+    char input_path[1024] = {0};
+    char output_path[4096] = {0};
+    char tmp_filename[4096] = {0};
 
     resource_compiler_get_build_dir(build_dir, CE_ARRAY_LEN(build_dir), application_platform());
     resource_compiler_get_tmp_dir(tmp_dir, CE_ARRAY_LEN(tmp_dir), application_platform());
