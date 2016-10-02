@@ -42,14 +42,14 @@ def _build_dir(tmpdir_factory):
 
     global instance_counter
 
-    build_dir = tmpdir_factory.mktemp("data")
+    build_dir = os.path.join(ROOT_DIR, "engine", "test", "data", "build"),
 
     port = 4444 + (instance_counter * 2)
     instance_counter += 1
 
     instance.run_develop(
         build_dir,
-        os.path.join(ROOT_DIR, "data", "src"),
+        os.path.join(ROOT_DIR, "engine", "test", "data", "src"),
         core_dir=os.path.join(ROOT_DIR, "core"),
         compile_=True,
         check=True,
@@ -69,8 +69,8 @@ def engine_instance(request, _build_dir):
     instance_counter += 1
 
     instance.run_develop(
-        _build_dir,
-        os.path.join(ROOT_DIR, "data", "src"),
+        os.path.join(ROOT_DIR, "engine", "test", "data", "build"),
+        os.path.join(ROOT_DIR, "engine", "test", "data", "src"),
         core_dir=os.path.join(ROOT_DIR, "core"),
         port=port, protocol="tcp",
     )
@@ -84,7 +84,5 @@ def engine_instance(request, _build_dir):
     yield api
 
     api.quit()
-
     api.disconnect()
-
     instance.kill()

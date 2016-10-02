@@ -204,7 +204,7 @@ void consolesrv_shutdown() {
     log_debug(LOG_WHERE, "Shutdown");
 
     nn_close(_G.push_socket);
-    nn_close(_G.log_socket);
+    //nn_close(_G.log_socket);
     nn_close(_G.rpc_socket);
 }
 
