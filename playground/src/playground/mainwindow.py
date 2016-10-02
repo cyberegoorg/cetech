@@ -83,7 +83,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.assetview_widget = AssetView(self)
         self.assetview_dock = QDockWidget(self)
         self.assetview_dock.setWindowTitle("Asset view")
-        #self.assetview_dock.hide()
+        # self.assetview_dock.hide()
         self.assetview_dock.setWidget(self.assetview_widget)
         self.addDockWidget(Qt.BottomDockWidgetArea, self.assetview_dock)
 
@@ -170,8 +170,9 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.api.connect()
         self.logsub.start(QThread.NormalPriority)
 
-        self.project.run_cetech_develop("LevelView", compile_=True, continue_=True, wid=wid,
-                                        bootscript="playground/leveleditor_boot")
+        self.ogl_widget.set_instance(
+            self.project.run_cetech_develop("LevelView", compile_=True, continue_=True, wid=wid,
+                                            bootscript="playground/leveleditor_boot"))
 
         self.assetview_widget.open_project(self.project)
         # self.api.wait()

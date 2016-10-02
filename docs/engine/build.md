@@ -7,7 +7,7 @@
 * Install python and pip >= 3.4
 * Install QT5 + PyQT
 * Install requirements.txt (```$ pip3 install -r scripts/requirements.txt```)
-* Optional install dev_requirements.txt (```$ pip3 install -r scripts/requirements.txt```)
+* Optional install dev_requirements.txt (```$ pip3 install -r scripts/dev_requirements.txt```)
 
 ### Build
 

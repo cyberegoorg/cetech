@@ -1,12 +1,35 @@
 import os
 import platform
 import subprocess
-from time import sleep
+from threading import Thread
 
-import shutil
-from PyQt5.QtCore import QProcess, QProcessEnvironment
+import msgpack
+import nanomsg
 
 from cetech.consoleapi import ConsoleAPI
+
+
+class ReadyLock(Thread):
+    def __init__(self, url, on_ready=None):
+        self.url = url if isinstance(url, bytes) else url.encode()
+        self.on_ready = on_ready
+
+        self.ready = False
+
+        self.socket = nanomsg.Socket(nanomsg.PULL)
+        self.socket.bind(self.url)
+
+        super().__init__()
+
+    def wait_for_ready(self):
+        while not self.ready:
+            pass
+
+    def run(self):
+        recv = self.socket.recv()
+        self.ready = True
+        if self.on_ready is not None:
+            self.on_ready()
 
 
 class EngineInstance(object):
@@ -30,6 +53,8 @@ class EngineInstance(object):
         self.external_dir = external_dir
         self.rpc_url = "ws://localhost:%s" % 4444
         self.log_url = "ws://localhost:%s" % 4445
+        self.push_url = "ws://*:%s" % 4446
+        self.ready = False
 
     def create_console_api(self):
         return ConsoleAPI(self.rpc_url)
@@ -52,7 +77,7 @@ class EngineInstance(object):
 
     def run_develop(self, build_dir, source_dir, compile_=False, continue_=False, wait=False, daemon=False,
                     wid=None,
-                    core_dir=None, port=None, bootscript=None, protocol='ws'):
+                    core_dir=None, port=None, bootscript=None, protocol='ws', check=False, lock=True):
         args = [
             "-s .build %s" % build_dir,
             "-s .src %s" % source_dir
@@ -77,6 +102,7 @@ class EngineInstance(object):
         if port:
             self.rpc_url = "%s://localhost:%s" % (protocol, port)
             self.log_url = "%s://localhost:%s" % (protocol, port + 1)
+            self.push_url = "%s://*:%s" % (protocol, port + 2)
 
             args.append("-s develop.rpc.port %s" % port)
             args.append("-s develop.rpc.addr %s://*" % (protocol))
@@ -93,25 +119,34 @@ class EngineInstance(object):
         else:
             args.append("-s .core ../core")  # TODO ?
 
-        self._run(self.BUILD_DEVELOP, args)
+        self._run(self.BUILD_DEVELOP, args, check=check, lock=lock)
 
-    def _run(self, build_type, args):
+    def _run(self, build_type, args, lock, check=False):
+        if lock:
+            def _on_ready():
+                self.ready = True
+
+            self.rl = ReadyLock(self.push_url, on_ready=_on_ready)
+            self.rl.start()
+
+        args.append("-s develop.push.addr %s" % self.push_url.replace("*", "localhost"))
         cmd = "%s %s" % (self.get_executable_path(build_type), ' '.join(args))
         print(cmd)
 
-        self.process = subprocess.Popen(cmd.split(' '), stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+        self.process = subprocess.Popen(cmd.split(' '), stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+
+        if check:
+            self.process.wait()
 
     def kill(self, dump=False):
         if dump:
             self._dump()
 
-        self.process.terminate()
+        self.process.kill()
 
     def _dump(self):
         p = self.process
 
-        # out, err = bytearray(p.readAllStandardOutput()).decode(), bytearray(p.readAllStandardError()).decode()
-
         print("=== Process: %s ===" % self.name)
-        print(''.join([x.decode() for x in iter(p.stdout.readline, b'')]))
+        # print(''.join([x.decode() for x in iter(p.stdout.readline, b'')]))
         print("===================%s\n" % ('=' * len(self.name)))

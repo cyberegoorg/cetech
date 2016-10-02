@@ -1,13 +1,12 @@
-import ctypes
 import os
+import sys
+import ctypes
 import platform
-import random
+
 from time import sleep
 
-import PyQt5
-import sys
-
 import pytest
+import PyQt5
 from PyQt5.QtWidgets import QApplication
 
 ############
@@ -36,34 +35,60 @@ sys.path.insert(0, os.path.join(ROOT_DIR, "playground", "src"))
 
 instance_counter = 0
 
+from cetech.engine import EngineInstance, ReadyLock
 
-@pytest.fixture(scope="function")
-def engine_instance(request):
-    from cetech.project import EngineInstance
 
-    instance = EngineInstance("test", os.path.join(ROOT_DIR, "bin"), os.path.join(ROOT_DIR, "externals/build"))
+@pytest.fixture(scope='session')
+def _build_dir(tmpdir_factory):
+    instance = EngineInstance("compile test", os.path.join(ROOT_DIR, "bin"), os.path.join(ROOT_DIR, "externals/build"))
+
     global instance_counter
+
+    build_dir = tmpdir_factory.mktemp("data")
+
     port = 4444 + (instance_counter * 2)
     instance_counter += 1
 
-    build_dir = os.path.join(ROOT_DIR, ".test_tmp", "build")
+    instance.run_develop(
+        build_dir,
+        os.path.join(ROOT_DIR, "data", "src"),
+        core_dir=os.path.join(ROOT_DIR, "core"),
+        compile_=True,
+        check=True,
+        port=port,
+        lock=False
+    )
+
+    return build_dir
+
+
+@pytest.fixture(scope="function")
+def engine_instance(request, _build_dir):
+    instance = EngineInstance("test", os.path.join(ROOT_DIR, "bin"), os.path.join(ROOT_DIR, "externals/build"))
+    global instance_counter
+
+    port = 4444 + (instance_counter * 2)
+    instance_counter += 1
+
+    sleep(0.5)
 
     instance.run_develop(
-        os.path.abspath(build_dir),
+        _build_dir,
         os.path.join(ROOT_DIR, "data", "src"),
         core_dir=os.path.join(ROOT_DIR, "core"),
         port=port, protocol="tcp",
-        compile_=True, continue_=True
     )
+
+    while not instance.ready:
+        pass
 
     api = instance.create_console_api()
     api.connect()
 
-    api.wait()
-
     yield api
 
     api.quit()
-    sleep(0.2)
+
     api.disconnect()
-    instance.kill(False)
+
+    instance.kill()

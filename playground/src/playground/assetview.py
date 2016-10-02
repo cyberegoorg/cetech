@@ -1,7 +1,8 @@
 import os
 import platform
 
-from cetech.widget import Widget, _ReadyLock
+from cetech.widget import Widget
+from cetech.engine import ReadyLock
 from cetech.consoleapi import ConsoleAPI
 
 
@@ -21,20 +22,20 @@ class AssetView(Widget):
         """
         :type project: cetech.project.Project
         """
-        #                     /\     /\      /\             /\       WTF???? REFACTOR THIS !!!
         self.project = project
 
+        # TODO
         if platform.system().lower() == 'darwin':
             wid = None
         else:
             wid = self.winId()
 
-        self.project.run_cetech_develop("AssetView", wid=wid, port=5576,
-                                        bootscript="playground/assetview_boot")
+        self.set_instance(self.project.run_cetech_develop("AssetView", wid=wid, port=5576,
+                                                          bootscript="playground/assetview_boot"))
 
     def close_project(self):
         self.api.quit()
         self.api.disconnect()
 
-    # def resizeEvent(self, event):
-    #     event.accept()
+        # def resizeEvent(self, event):
+        #     event.accept()

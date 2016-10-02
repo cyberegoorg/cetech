@@ -8,6 +8,7 @@
 #include "include/nanomsg/nn.h"
 #include "include/nanomsg/reqrep.h"
 #include "include/nanomsg/pubsub.h"
+#include "include/nanomsg/pipeline.h"
 
 #include "engine/develop/console_server.h"
 #include "celib/errors/errors.h"
@@ -36,12 +37,15 @@ static struct G {
 
     int rpc_socket;
     int log_socket;
+    int push_socket;
 
     cvar_t cv_rpc_port;
     cvar_t cv_rpc_addr;
 
     cvar_t cv_log_port;
     cvar_t cv_log_addr;
+
+    cvar_t cv_push_addr;
 } ConsoleServerGlobals = {0};
 
 
@@ -130,6 +134,8 @@ int consolesrv_init(int stage) {
         _G.cv_log_port = cvar_new_int("develop.log.port", "Console server log port", 4445);
         _G.cv_log_addr = cvar_new_str("develop.log.addr", "Console server log addr", "ws://*");
 
+        _G.cv_push_addr = cvar_new_str("develop.push.addr", "Push addr", "");
+
         return 1;
     }
 
@@ -152,6 +158,26 @@ int consolesrv_init(int stage) {
     }
 
     _G.rpc_socket = socket;
+////
+
+    if (cvar_get_string(_G.cv_push_addr)[0] != '\0') {
+        socket = nn_socket(AF_SP, NN_PUSH);
+        if (socket < 0) {
+            log_error(LOG_WHERE, "Could not create nanomsg socket: %s", nn_strerror(errno));
+            return 0;
+        }
+
+        snprintf(addr, 128, "%s", cvar_get_string(_G.cv_push_addr));
+        log_debug(LOG_WHERE, "Push address: %s", addr);
+
+        if (nn_connect(socket, addr) < 0) {
+            log_error(LOG_WHERE, "Could not bind socket to '%s': %s", addr, nn_strerror(errno));
+            return 0;
+        }
+        _G.push_socket = socket;
+    }
+
+
 ////
     socket = nn_socket(AF_SP, NN_PUB);
     if (socket < 0) {
@@ -176,6 +202,10 @@ int consolesrv_init(int stage) {
 
 void consolesrv_shutdown() {
     log_debug(LOG_WHERE, "Shutdown");
+
+    nn_close(_G.push_socket);
+    nn_close(_G.log_socket);
+    nn_close(_G.rpc_socket);
 }
 
 void consolesrv_register_command(const char *name,
@@ -188,6 +218,12 @@ void consolesrv_register_command(const char *name,
         str_set(&_G.name[i][0], name);
         _G.commands[i] = cmd;
         break;
+    }
+}
+
+void consolesrv_push_begin() {
+    if (_G.push_socket) {
+        nn_send(_G.push_socket, "begin", strlen("begin") + 1, 0);
     }
 }
 

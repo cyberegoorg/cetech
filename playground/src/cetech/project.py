@@ -25,6 +25,7 @@ def validate_project(project_dir):
 
 ROOT_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), os.pardir, os.pardir, os.pardir)
 
+
 class Project(object):
     def __init__(self):
         self.name = None

@@ -308,6 +308,8 @@ void application_start() {
 
     _G.is_running = 1;
     log_info("core.ready", "Run main loop");
+
+    consolesrv_push_begin();
     while (_G.is_running) {
         uint32_t now_ticks = os_get_ticks();
         float dt = (now_ticks - last_tick) * 0.001f;

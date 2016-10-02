@@ -1,17 +1,6 @@
-﻿from PyQt5.QtCore import Qt, QThread
+﻿from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QCursor
 from PyQt5.QtWidgets import QWidget
-
-
-class _ReadyLock(QThread):
-    def __init__(self, url, engine_widget):
-        self.api = engine_widget.api
-        self.engine_widget = engine_widget
-        super().__init__()
-
-    def run(self):
-        self.api.send_command("console_server.ready")
-        self.engine_widget.ready = True
 
 
 class Widget(QWidget):
@@ -19,9 +8,7 @@ class Widget(QWidget):
         self.api = api
         self.ready = False
         self.last_pos = (0, 0)
-
-        self.ready_lock = _ReadyLock(log_url, self)
-        self.ready_lock.start(QThread.NormalPriority)
+        self.instance = None
 
         self.start_pos = None
         self.move_skip = False
@@ -49,7 +36,10 @@ class Widget(QWidget):
         :type event: PyQt5.QtGui.QMouseEvent.QMouseEvent
         """
 
-        if not self.ready:
+        if not self.instance:
+            return
+
+        if not self.instance.ready:
             return
 
         if self.move_skip:
@@ -119,3 +109,6 @@ class Widget(QWidget):
 
         if btn in btn_map:
             self.api.lua_execute(script="EditorInput.keyboard.%s = false" % (btn_map[btn]))
+
+    def set_instance(self, instance):
+        self.instance = instance
