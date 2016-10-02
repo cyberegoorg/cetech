@@ -1,12 +1,10 @@
-import os
-import sys
 import ctypes
+import os
 import platform
+import sys
 
-from time import sleep
-
-import pytest
 import PyQt5
+import pytest
 from PyQt5.QtWidgets import QApplication
 
 ############
@@ -35,7 +33,7 @@ sys.path.insert(0, os.path.join(ROOT_DIR, "playground", "src"))
 
 instance_counter = 0
 
-from cetech.engine import EngineInstance, ReadyLock
+from cetech.engine import EngineInstance
 
 
 @pytest.fixture(scope='session')
@@ -62,15 +60,13 @@ def _build_dir(tmpdir_factory):
     return build_dir
 
 
-@pytest.fixture(scope="function")
+@pytest.fixture(scope="session")
 def engine_instance(request, _build_dir):
     instance = EngineInstance("test", os.path.join(ROOT_DIR, "bin"), os.path.join(ROOT_DIR, "externals/build"))
     global instance_counter
 
     port = 4444 + (instance_counter * 2)
     instance_counter += 1
-
-    sleep(0.5)
 
     instance.run_develop(
         _build_dir,
