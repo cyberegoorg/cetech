@@ -23,7 +23,7 @@ $ python3 playground/playground.py
 
 !!! note
 
-    When you start to pop up a dialog displays where you can add a project which is located in the `data` dir. After
+    When you start to pop up a dialog displays where you can add a project which is located in the `examples/develop` dir. After
     enough to create a project just double-click.
 
 
