@@ -3,14 +3,14 @@
 [![build status](https://gitlab.com/cyberegoorg/cetech/badges/master/build.svg)](https://gitlab.com/cyberegoorg/cetech/commits/master)
 [![License](https://img.shields.io/badge/license-CC0-blue.svg)](LICENSE.md)
 
+![Prototyp](https://raw.githubusercontent.com/cyberegoorg/cetech/master/docs/img/prototyp.png)
+
 ## [What is it?](https://cyberegoorg.gitlab.io/cetech/)
 
 CETech is Data-Driven game engine and toolbox inspired by [Bitsquid](http://bitsquid.blogspot.se/)/[Stingray](http://stingrayengine.com/) engine.
 
-* [Release notes](http://cyberegoorg.gitlab.io/cetech/about/release-notes)
-* [Documentation](http://cyberegoorg.gitlab.io/cetech) work in progress
-
-![Prototyp](https://raw.githubusercontent.com/cyberegoorg/cetech/master/docs/img/prototyp.png)
+* [Release notes](http://cyberegoorg.gitlab.io/cetech/about/release-notes) (not released)
+* [Documentation](http://cyberegoorg.gitlab.io/cetech) (work in progress)
 
 ## Suported platforms
 
