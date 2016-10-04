@@ -20,7 +20,7 @@ $ python3 scripts/build.py
 #### Engine develop build
 
 ```bash
-$ ./bin/linux64/cetech_develop -s .compile 1 -s .continue 1
+$ ./bin/linux64/cetech_develop -s .compile 1 -s .continue 1 -s .source ./examples/develop/src/ -s .build ./examples/develop/build/
 ```
 
 #### Playground
@@ -28,3 +28,4 @@ $ ./bin/linux64/cetech_develop -s .compile 1 -s .continue 1
 ```bash
 $ python3 playground/playground.py
 ```
+* add folder `examples/develop`
