@@ -1,5 +1,4 @@
 import argparse
-import os
 import platform
 
 import msgpack
@@ -8,15 +7,15 @@ from PyQt5.QtCore import QThread, Qt, QFileSystemWatcher, QDirIterator
 from PyQt5.QtWidgets import QMainWindow, QDockWidget, QTabWidget
 from nanomsg import Socket, SUB, SUB_SUBSCRIBE
 
+from cetech.consoleapi import ConsoleAPI
 from playground.assetbrowser import AssetBrowser
 from playground.assetview import AssetView
-from cetech.project import Project
-from cetech.widget import Widget
-from cetech.consoleapi import ConsoleAPI
 from playground.logwidget import LogWidget, LogSub
 from playground.profilerwidget import ProfilerWidget
+from playground.project import Project
 from playground.scripteditor import ScriptEditorWidget, ScriptEditorManager
 from playground.ui.mainwindow import Ui_MainWindow
+from playground.widget import Widget
 
 
 class DevelopSub(QThread):
@@ -171,8 +170,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.logsub.start(QThread.NormalPriority)
 
         self.ogl_widget.set_instance(
-            self.project.run_cetech_develop("LevelView", compile_=True, continue_=True, wid=wid,
-                                            bootscript="playground/leveleditor_boot"))
+            self.project.run_develop("LevelView", compile_=True, continue_=True, wid=wid,
+                                     bootscript="playground/leveleditor_boot"))
 
         self.assetview_widget.open_project(self.project)
         # self.api.wait()
@@ -234,10 +233,10 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.profiler_doc_widget.show()
 
     def run_standalone(self):
-        self.project.run_cetech_release("Standalone")
+        self.project.run_release("Standalone")
 
     def run_level(self):
-        self.project.run_cetech_develop("Level", compile_=True, continue_=True, port=5566)
+        self.project.run_develop("Level", compile_=True, continue_=True, port=5566)
 
     def closeEvent(self, evnt):
         self.api.quit()

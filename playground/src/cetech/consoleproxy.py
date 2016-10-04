@@ -12,6 +12,9 @@ class ConsoleProxy(object):
     def connect(self):
         self.socket.connect(self.url)
 
+    def disconnect(self):
+        self.socket.close()
+
     # TODO: dangerous, block
     def send_command_norcv(self, cmd_name, echo=False, **kwargs):
         command = {
@@ -29,8 +32,6 @@ class ConsoleProxy(object):
     def send_command(self, cmd_name, echo=True, **kwargs):
         self.send_command_norcv(cmd_name=cmd_name, echo=echo, **kwargs)
 
-        # self.socket.reconnect_interval = 1
-        # self.socket.reconnect_interval_max = 10000
         recv = self.socket.recv()
 
         unpack_msg = msgpack.unpackb(recv, encoding='utf-8')
@@ -41,5 +42,4 @@ class ConsoleProxy(object):
 
         return unpack_msg
 
-    def disconnect(self):
-        self.socket.close()
+

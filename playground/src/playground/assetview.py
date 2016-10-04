@@ -1,9 +1,7 @@
-import os
 import platform
 
-from cetech.widget import Widget
-from cetech.engine import ReadyLock
 from cetech.consoleapi import ConsoleAPI
+from playground.widget import Widget
 
 
 class AssetView(Widget):
@@ -30,8 +28,8 @@ class AssetView(Widget):
         else:
             wid = self.winId()
 
-        self.set_instance(self.project.run_cetech_develop("AssetView", wid=wid, port=5576,
-                                                          bootscript="playground/assetview_boot"))
+        self.set_instance(self.project.run_develop("AssetView", wid=wid, port=5576,
+                                                   bootscript="playground/assetview_boot"))
 
     def close_project(self):
         self.api.quit()

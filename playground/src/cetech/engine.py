@@ -3,7 +3,6 @@ import platform
 import subprocess
 from threading import Thread
 
-import msgpack
 import nanomsg
 
 from cetech.consoleapi import ConsoleAPI
@@ -59,25 +58,21 @@ class EngineInstance(object):
     def create_console_api(self):
         return ConsoleAPI(self.rpc_url)
 
-    def get_lib_path(self):
-        _platform = platform.system().lower()
-        bin_dir = "%s%s" % (_platform if _platform != 'darwin' else 'osx', platform.architecture()[0][0:2])
-        return os.path.join(self.bin_dir, bin_dir)
+    def kill(self, dump=False):
+        if dump:
+            self._dump()
 
-    def get_executable_path(self, build_type):
-        engine_bin_path = os.path.join(self.get_lib_path(), self._ENGINE_BIN[build_type])
-        return engine_bin_path
+        self.process.kill()
 
-    def run_cetech_release(self, build_dir):
+    def run_release(self, build_dir):
         args = [
-            "-b %s" % build_dir,
+            "-s .build %s" % build_dir,
         ]
 
         return self._run(self.BUILD_RELEASE, args)
 
     def run_develop(self, build_dir, source_dir, compile_=False, continue_=False, wait=False, daemon=False,
-                    wid=None,
-                    core_dir=None, port=None, bootscript=None, protocol='ws', check=False, lock=True):
+                    wid=None, core_dir=None, port=None, bootscript=None, protocol='ws', check=False, lock=True):
         args = [
             "-s .build %s" % build_dir,
             "-s .src %s" % source_dir
@@ -130,7 +125,7 @@ class EngineInstance(object):
             self.rl.start()
 
         args.append("-s develop.push.addr %s" % self.push_url.replace("*", "localhost"))
-        cmd = "%s %s" % (self.get_executable_path(build_type), ' '.join(args))
+        cmd = "%s %s" % (self._get_executable_path(build_type), ' '.join(args))
         print(cmd)
 
         self.process = subprocess.Popen(cmd.split(' '), stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
@@ -138,15 +133,18 @@ class EngineInstance(object):
         if check:
             self.process.wait()
 
-    def kill(self, dump=False):
-        if dump:
-            self._dump()
-
-        self.process.kill()
-
     def _dump(self):
         p = self.process
 
         print("=== Process: %s ===" % self.name)
         # print(''.join([x.decode() for x in iter(p.stdout.readline, b'')]))
         print("===================%s\n" % ('=' * len(self.name)))
+
+    def _get_lib_path(self):
+        _platform = platform.system().lower()
+        bin_dir = "%s%s" % (_platform if _platform != 'darwin' else 'osx', platform.architecture()[0][0:2])
+        return os.path.join(self.bin_dir, bin_dir)
+
+    def _get_executable_path(self, build_type):
+        engine_bin_path = os.path.join(self._get_lib_path(), self._ENGINE_BIN[build_type])
+        return engine_bin_path

@@ -73,16 +73,16 @@ class Project(object):
         for instance in self.instances.values():
             instance.kill(dump=dump)
 
-    def run_cetech_release(self, name):
+    def run_release(self, name):
         instance = EngineInstance(name, "../bin", os.path.join(ROOT_DIR, 'externals', 'build'))
         self.instances[name] = instance
 
-        instance.run_cetech_release(self.build_dir)
+        instance.run_release(self.build_dir)
 
         return instance
 
-    def run_cetech_develop(self, name, compile_=False, continue_=False, wait=False, daemon=False, wid=None,
-                           core_dir=None, port=None, bootscript=None):
+    def run_develop(self, name, compile_=False, continue_=False, wait=False, daemon=False, wid=None,
+                    core_dir=None, port=None, bootscript=None):
 
         instance = EngineInstance(name, "../bin", os.path.join(ROOT_DIR, 'externals', 'build'))
         self.instances[name] = instance
