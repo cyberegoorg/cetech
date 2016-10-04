@@ -20,16 +20,6 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
         self.centralwidget.hide()
 
-        self.parser = argparse.ArgumentParser("playground")
-        self.parser.add_argument("-d", "--data-dir", type=str, help="data dir")
-        self.parser.add_argument("-a", "--console-address", type=str, help="console address", default='localhost')
-        self.parser.add_argument("-p", "--console-port", type=int, help="console port", default=2222)
-        self.args = self.parser.parse_args()
-
-        self.data_dir = self.args.data_dir
-        self.console_port = self.args.console_port
-        self.console_address = self.args.console_address
-
         self.project = ProjectManager()
 
         self.setTabPosition(Qt.AllDockWidgetAreas, QTabWidget.North)
