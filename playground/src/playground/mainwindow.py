@@ -1,45 +1,20 @@
 import argparse
 import platform
 
-import msgpack
-import nanomsg
 from PyQt5.QtCore import QThread, Qt, QFileSystemWatcher, QDirIterator
 from PyQt5.QtWidgets import QMainWindow, QDockWidget, QTabWidget
-from nanomsg import Socket, SUB, SUB_SUBSCRIBE
 
 from cetech.consoleapi import ConsoleAPI
-from playground.assetbrowser import AssetBrowser
-from playground.assetview import AssetView
-from playground.logwidget import LogWidget, LogSub
-from playground.profilerwidget import ProfilerWidget
-from playground.project import Project
-from playground.scripteditor import ScriptEditorWidget, ScriptEditorManager
+
+from playground.core.project import Project
+from playground.core.widget import CETechWiget
 from playground.ui.mainwindow import Ui_MainWindow
-from playground.widget import CETechWiget
 
-
-class DevelopSub(QThread):
-    def __init__(self, url):
-        self.socket = Socket(SUB)
-        self.url = url
-        self.handlers = []
-
-        super().__init__()
-
-    def register_handler(self, handler):
-        self.handlers.append(handler)
-
-    def run(self):
-        self.socket.set_string_option(SUB, SUB_SUBSCRIBE, b'')
-        self.socket.connect(self.url)
-        while True:
-            try:
-                msg = self.socket.recv()
-                unpack_msg = msgpack.unpackb(msg, encoding='utf-8')
-                print(unpack_msg)
-
-            except nanomsg.NanoMsgAPIError as e:
-                raise
+from playground.modules.assetbrowser import AssetBrowser
+from playground.modules.assetviewwidget import AssetViewWidget
+from playground.modules.logwidget import LogWidget, LogSub
+from playground.modules.profilerwidget import ProfilerWidget
+from playground.modules.scripteditor import ScriptEditorWidget, ScriptEditorManager
 
 
 class MainWindow(QMainWindow, Ui_MainWindow):
@@ -79,7 +54,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             self.ogl_dock.setWidget(self.ogl_widget)
             self.addDockWidget(Qt.TopDockWidgetArea, self.ogl_dock)
 
-        self.assetview_widget = AssetView(self)
+        self.assetview_widget = AssetViewWidget(self)
         self.assetview_dock = QDockWidget(self)
         self.assetview_dock.setWindowTitle("Asset view")
         # self.assetview_dock.hide()
