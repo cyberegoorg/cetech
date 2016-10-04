@@ -29,6 +29,7 @@
                        st);                                                     \
             os_stacktrace_free(st);                                             \
             abort();                                                            \
+            /*exit(1);*/                                                        \
         }                                                                       \
     } while (0)                                                                 \
 

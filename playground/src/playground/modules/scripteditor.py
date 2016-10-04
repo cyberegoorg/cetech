@@ -20,13 +20,13 @@ FILES_FILTER = "Lua (*.lua);;" \
                "JSON (*.json);;" \
                "Unit (*.unit);;" \
                "Material (*.material);;" \
-               "Shader (*.shader)"\
-               "Shader source (*.sc)"\
+               "Shader (*.shader)" \
+               "Shader source (*.sc)" \
                "Shader header (*.sh)"
 
 
 class ScriptEditorWindow(QMainWindow, Ui_MainWindow):
-    def __init__(self, project_manager, api, filename=None, parent=None):
+    def __init__(self, project_manager, filename=None, parent=None):
         super(ScriptEditorWindow, self).__init__(parent=parent)
         self.setupUi(self)
 
@@ -34,7 +34,6 @@ class ScriptEditorWindow(QMainWindow, Ui_MainWindow):
         self.addAction(self.actionSend)
 
         self.project_manager = project_manager
-        self.api = api
 
         self.modified = False
         self.filename = filename
@@ -83,7 +82,8 @@ class ScriptEditorWindow(QMainWindow, Ui_MainWindow):
         self.webView.page().mainFrame().evaluateJavaScript("editor.redo()")
 
     def send(self):
-        self.api.lua_execute(self.text)
+        # TODO: IMPLEMENT self.api.lua_execute(self.text)
+        pass
 
     def save(self):
         if self.filename is None:
@@ -105,6 +105,21 @@ class ScriptEditorWindow(QMainWindow, Ui_MainWindow):
         self.filename = filename
 
         self._set_window_title(filename)
+
+    def close_request(self):
+        if self.filename is None:
+            return False
+
+        if self.modified:
+            res = QMessageBox.question(self, "File is modified", "File '%s' is modified" % self.filename,
+                                       QMessageBox.Save | QMessageBox.Discard | QMessageBox.Cancel)
+            if res == QMessageBox.Save:
+                self.save()
+
+            elif res == QMessageBox.Cancel:
+                return False
+
+        return True
 
     @pyqtSlot()
     def _on_change(self):
@@ -152,27 +167,12 @@ class ScriptEditorWindow(QMainWindow, Ui_MainWindow):
 
         self.save_as(filename)
 
-    def close_request(self):
-        if self.filename is None:
-            return False
-
-        if self.modified:
-            res = QMessageBox.question(self, "File is modified", "File '%s' is modified" % self.filename,
-                                       QMessageBox.Save | QMessageBox.Discard | QMessageBox.Cancel)
-            if res == QMessageBox.Save:
-                self.save()
-
-            elif res == QMessageBox.Cancel:
-                return False
-
-        return True
-
 
 class ScriptEditorWidget(QDockWidget):
-    def __init__(self, project_manager, api, filename=None):
+    def __init__(self, project_manager, filename=None):
         super(ScriptEditorWidget, self).__init__()
 
-        self.editor = ScriptEditorWindow(project_manager=project_manager, api=api, filename=filename)
+        self.editor = ScriptEditorWindow(project_manager=project_manager, filename=filename)
         self.setWidget(self.editor)
 
         self.setFeatures(QDockWidget.AllDockWidgetFeatures)
@@ -190,8 +190,7 @@ class ScriptEditorWidget(QDockWidget):
 
 
 class ScriptEditorManager(object):
-    def __init__(self, project_manager, api):
-        self.api = api
+    def __init__(self, project_manager):
         self.project_manager = project_manager
         self.editors = {}
 
@@ -200,7 +199,7 @@ class ScriptEditorManager(object):
             self.editors[filename].raise_()
 
         else:
-            editor = ScriptEditorWidget(filename=filename, project_manager=self.project_manager, api=self.api)
+            editor = ScriptEditorWidget(filename=filename, project_manager=self.project_manager)
             editor.setProperty("filename", filename)
 
             editor.destroyed.connect(self._editor_destroyed)

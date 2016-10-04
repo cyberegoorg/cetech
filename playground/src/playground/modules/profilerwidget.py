@@ -6,11 +6,9 @@ from playground.ui.profilerwidget import Ui_ProfilerWidget
 
 
 class ProfilerWidget(QFrame, Ui_ProfilerWidget):
-    def __init__(self, api):
+    def __init__(self):
         super(ProfilerWidget, self).__init__()
         self.setupUi(self)
-
-        self.api = api
 
         page = self.profile_webview.page()
         page.settings().setAttribute(QWebSettings.DeveloperExtrasEnabled, True)

@@ -1,20 +1,16 @@
 import argparse
-import platform
 
 from PyQt5.QtCore import QThread, Qt, QFileSystemWatcher, QDirIterator
 from PyQt5.QtWidgets import QMainWindow, QDockWidget, QTabWidget
 
-from cetech.consoleapi import ConsoleAPI
-
-from playground.core.project import Project
-from playground.core.widget import CETechWiget
-from playground.ui.mainwindow import Ui_MainWindow
-
+from playground.core.projectmanager import ProjectManager
 from playground.modules.assetbrowser import AssetBrowser
 from playground.modules.assetviewwidget import AssetViewWidget
+from playground.modules.levelwidget import LevelWidget
 from playground.modules.logwidget import LogWidget, LogSub
 from playground.modules.profilerwidget import ProfilerWidget
 from playground.modules.scripteditor import ScriptEditorWidget, ScriptEditorManager
+from playground.ui.mainwindow import Ui_MainWindow
 
 
 class MainWindow(QMainWindow, Ui_MainWindow):
@@ -34,30 +30,22 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.console_port = self.args.console_port
         self.console_address = self.args.console_address
 
-        self.project = Project()
-
-        self.api = ConsoleAPI("ws://localhost:4444")
-
-        # self.develop_sub = DevelopSub(b"ws://localhost:5558")
-        # self.develop_sub.run()
+        self.project = ProjectManager()
 
         self.setTabPosition(Qt.AllDockWidgetAreas, QTabWidget.North)
 
-        self.editors_manager = ScriptEditorManager(project_manager=self.project, api=self.api)
+        self.editors_manager = ScriptEditorManager(project_manager=self.project)
 
-        # TODO bug #114 workaround. Disable create sub engine...
-        if platform.system().lower() != 'darwin':
-            self.ogl_widget = CETechWiget(self, self.api, log_url=b"ws://localhost:5556")
-            self.ogl_dock = QDockWidget(self)
-            self.ogl_dock.setWindowTitle("Engine View")
-            self.ogl_dock.hide()
-            self.ogl_dock.setWidget(self.ogl_widget)
-            self.addDockWidget(Qt.TopDockWidgetArea, self.ogl_dock)
+        self.level_widget = LevelWidget(self)
+        self.level_dock = QDockWidget(self)
+        self.level_dock.setWindowTitle("Level view")
+        self.level_dock.hide()
+        self.level_dock.setWidget(self.level_widget)
+        self.addDockWidget(Qt.TopDockWidgetArea, self.level_dock)
 
         self.assetview_widget = AssetViewWidget(self)
         self.assetview_dock = QDockWidget(self)
         self.assetview_dock.setWindowTitle("Asset view")
-        # self.assetview_dock.hide()
         self.assetview_dock.setWidget(self.assetview_widget)
         self.addDockWidget(Qt.BottomDockWidgetArea, self.assetview_dock)
 
@@ -71,7 +59,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
         self.splitDockWidget(self.assetb_dock_widget, self.assetview_dock, Qt.Horizontal)
 
-        self.profiler_widget = ProfilerWidget(api=self.api)
+        self.profiler_widget = ProfilerWidget()
         self.profiler_doc_widget = QDockWidget(self)
         self.profiler_doc_widget.setWindowTitle("Profiler")
         self.profiler_doc_widget.hide()
@@ -79,8 +67,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.profiler_doc_widget.setWidget(self.profiler_widget)
         self.addDockWidget(Qt.RightDockWidgetArea, self.profiler_doc_widget)
 
-        self.logsub = LogSub(b"ws://localhost:4445")
-        self.log_widget = LogWidget(None, self.logsub)  # TODO: open file
+        self.log_widget = LogWidget()
         self.log_dock_widget = QDockWidget(self)
         self.log_dock_widget.hide()
         self.log_dock_widget.setWindowTitle("Log")
@@ -105,12 +92,15 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         :type path: str
         :type path: ext
         """
+        # TODO: move fce to asset view
+
+        if not self.level_widget.instance.ready:
+            return
 
         asset_name = path.replace(self.project.project_dir, '').replace('/src/', '').split('.')[0]
 
         if ext == 'level':
-            level_name = asset_name
-            self.api.lua_execute("Editor:load_level(\"%s\")" % level_name)
+            self.level_widget.open_level(asset_name)
             return
 
         if ScriptEditorWidget.support_ext(ext):
@@ -124,36 +114,20 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.project.open_project(name, dir)
 
         self.assetb_widget.open_project(self.project.project_dir)
-
         self.log_dock_widget.show()
+        self.assetb_dock_widget.show()
+        self.level_dock.show()
+
+        self.level_widget.open_project(self.project)
+        self.log_widget.set_instance(self.level_widget.instance)
+        self.assetview_widget.open_project(self.project)
 
         self.watch_project_dir()
 
-        self.assetb_dock_widget.show()
-
-        if platform.system().lower() == 'darwin':
-            wid = None
-        else:
-            wid = self.ogl_widget.winId()
-            # wid = None
-
-        # TODO bug #114 workaround. Disable create sub engine...
-        if platform.system().lower() != 'darwin':
-            self.ogl_dock.show()
-
-        self.api.connect()
-        self.logsub.start(QThread.NormalPriority)
-
-        self.ogl_widget.set_instance(
-            self.project.run_develop("LevelView", compile_=True, continue_=True, wid=wid,
-                                     bootscript="playground/leveleditor_boot"))
-
-        self.assetview_widget.open_project(self.project)
-        # self.api.wait()
-
     def reload_all(self):
+        # TODO: implement reload all
         order = ["shader", "texture", "material", "lua"]
-        self.api.reload_all(order)
+        # self.api.reload_all(order)
         self.assetview_widget.api.reload_all(order)
 
     def watch_project_dir(self):
@@ -190,7 +164,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.build_file_watch.addPaths(files)
 
     def file_changed(self, path):
-        self.api.compile_all()
+        # TODO: self.api.compile_all()
+        pass
 
     def dir_changed(self, path):
         self.watch_project_dir()
@@ -214,8 +189,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.project.run_develop("Level", compile_=True, continue_=True, port=5566)
 
     def closeEvent(self, evnt):
-        self.api.quit()
-        self.api.disconnect()
+        self.level_widget.close_project()
         self.assetview_widget.close_project()
+
         self.project.killall()
         evnt.accept()

@@ -1,11 +1,12 @@
-﻿from PyQt5.QtCore import Qt
+﻿import platform
+
+from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QCursor
 from PyQt5.QtWidgets import QWidget
 
 
 class CETechWiget(QWidget):
-    def __init__(self, parent, api, log_url):
-        self.api = api
+    def __init__(self, parent):
         self.last_pos = (0, 0)
         self.instance = None
 
@@ -24,25 +25,36 @@ class CETechWiget(QWidget):
     def ready(self):
         return self.instance.ready if self.instance is not None else False
 
+    @property
+    def wid(self):
+        # TODO
+        if platform.system().lower() == 'darwin':
+            return None
+        else:
+            return self.winId()
+
     def resizeEvent(self, event):
-        if self.api and self.ready:
-            size = event.size()
-            self.api.resize(size.width(), size.height())
+        if not self.ready:
+            return
+
+        size = event.size()
+        self.instance.console_api.resize(size.width(), size.height())
 
         event.accept()
 
     def _move_mouse(self, x, y, left, midle, right):
-        self.api.lua_execute(script="EditorInput:Move(%d, %d, %s, %s, %s)" % (x, y, left, midle, right))
+        if not self.ready:
+            return
+
+        self.instance.console_api.lua_execute(
+            script="EditorInput:Move(%d, %d, %s, %s, %s)" % (x, y, left, midle, right))
 
     def mouseMoveEvent(self, event):
         """ QWidget.mouseMoveEvent(QMouseEvent) 
         :type event: PyQt5.QtGui.QMouseEvent.QMouseEvent
         """
 
-        if not self.instance:
-            return
-
-        if not self.instance.ready:
+        if not self.ready:
             return
 
         if self.move_skip:
@@ -85,6 +97,9 @@ class CETechWiget(QWidget):
         """ QWidget.keyPressEvent(QKeyEvent)
         :type event: PyQt5.QtGui.QKeyEvent
         """
+        if not self.ready:
+            return
+
         btn = event.text()
 
         btn_map = {
@@ -95,12 +110,15 @@ class CETechWiget(QWidget):
         }
 
         if btn in btn_map:
-            self.api.lua_execute(script="EditorInput.keyboard.%s = true" % (btn_map[btn]))
+            self.instance.console_api.lua_execute(script="EditorInput.keyboard.%s = true" % (btn_map[btn]))
 
     def keyReleaseEvent(self, event):
         """ QWidget.keyReleaseEvent(QKeyEvent)
         :type event: PyQt5.QtGui.QKeyEvent
         """
+        if not self.ready:
+            return
+
         btn = event.text()
 
         btn_map = {
@@ -111,7 +129,7 @@ class CETechWiget(QWidget):
         }
 
         if btn in btn_map:
-            self.api.lua_execute(script="EditorInput.keyboard.%s = false" % (btn_map[btn]))
+            self.instance.console_api.lua_execute(script="EditorInput.keyboard.%s = false" % (btn_map[btn]))
 
     def set_instance(self, instance):
         self.instance = instance

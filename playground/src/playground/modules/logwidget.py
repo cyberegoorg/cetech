@@ -53,19 +53,23 @@ class LogSub(QThread):
 
 
 class LogWidget(QFrame, Ui_LogWidget):
-    def __init__(self, script_editor, logsub, ignore_where=None):
+    def __init__(self, ignore_where=None):
         super(LogWidget, self).__init__()
         self.setupUi(self)
 
-        self.script_editor = script_editor
-
+        self.instance = None
         self.ignore_where = None
         if ignore_where is not None:
             self.set_ignore_where(ignore_where)
 
-        logsub.register_handler(self.add_log)
-
         self.log_tree_widget.header().setStretchLastSection(True)
+
+    def set_instance(self, instance):
+        url = instance.log_url if isinstance(instance.log_url, bytes) else instance.log_url.encode()
+        self.instance = instance
+        self.logsub = LogSub(url)
+        self.logsub.register_handler(self.add_log)
+        self.logsub.start(QThread.NormalPriority)
 
     def set_ignore_where(self, pattern):
         self.ignore_where = re.compile(pattern)

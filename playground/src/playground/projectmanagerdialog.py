@@ -11,12 +11,13 @@ class ProjectManagerDialog(QDialog, Ui_Dialog):
     _PROJECT_DIR_ROLE = QtCore.Qt.UserRole + 1
 
     def __init__(self):
+        self.open_project_name = None
+        self.open_project_dir = None
+        self.exist_projects = []
+
         super(ProjectManagerDialog, self).__init__()
         self.setupUi(self)
-
         self.buttonBox.button(QDialogButtonBox.Open).setDisabled(True)
-
-        self.exist_projects = []
 
     def add_exist(self, name, dir):
         self.exist_projects.append((name, dir))

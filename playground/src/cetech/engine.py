@@ -25,10 +25,13 @@ class ReadyLock(Thread):
             pass
 
     def run(self):
+        # TODO: quit freeze. rewrite to non blocking with exit value
         recv = self.socket.recv()
         self.ready = True
         if self.on_ready is not None:
             self.on_ready()
+
+        self.socket.close()
 
 
 class EngineInstance(object):
@@ -54,9 +57,11 @@ class EngineInstance(object):
         self.log_url = "ws://localhost:%s" % 4445
         self.push_url = "ws://*:%s" % 4446
         self.ready = False
+        self._console_api = None
 
-    def create_console_api(self):
-        return ConsoleAPI(self.rpc_url)
+    @property
+    def console_api(self):
+        return self._console_api
 
     def kill(self, dump=False):
         if dump:
@@ -124,11 +129,15 @@ class EngineInstance(object):
             self.rl = ReadyLock(self.push_url, on_ready=_on_ready)
             self.rl.start()
 
+        self._console_api = ConsoleAPI(self.rpc_url)
+
         args.append("-s develop.push.addr %s" % self.push_url.replace("*", "localhost"))
         cmd = "%s %s" % (self._get_executable_path(build_type), ' '.join(args))
         print(cmd)
 
         self.process = subprocess.Popen(cmd.split(' '), stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+
+        self._console_api.connect()
 
         if check:
             self.process.wait()
