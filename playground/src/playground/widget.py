@@ -6,7 +6,6 @@ from PyQt5.QtWidgets import QWidget
 class Widget(QWidget):
     def __init__(self, parent, api, log_url):
         self.api = api
-        self.ready = False
         self.last_pos = (0, 0)
         self.instance = None
 
@@ -20,6 +19,10 @@ class Widget(QWidget):
         super(Widget, self).__init__(parent, Qt.ForeignWindow)
 
         self.setFocusPolicy(Qt.ClickFocus)
+
+    @property
+    def ready(self):
+        return self.instance.ready if self.instance is not None else False
 
     def resizeEvent(self, event):
         if self.api and self.ready:
