@@ -1,10 +1,10 @@
 import platform
 
 from cetech.consoleapi import ConsoleAPI
-from playground.widget import Widget
+from playground.widget import CETechWiget
 
 
-class AssetView(Widget):
+class AssetView(CETechWiget):
     def __init__(self, parent):
         self.project = None
 

@@ -15,7 +15,7 @@ from playground.profilerwidget import ProfilerWidget
 from playground.project import Project
 from playground.scripteditor import ScriptEditorWidget, ScriptEditorManager
 from playground.ui.mainwindow import Ui_MainWindow
-from playground.widget import Widget
+from playground.widget import CETechWiget
 
 
 class DevelopSub(QThread):
@@ -72,7 +72,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
         # TODO bug #114 workaround. Disable create sub engine...
         if platform.system().lower() != 'darwin':
-            self.ogl_widget = Widget(self, self.api, log_url=b"ws://localhost:5556")
+            self.ogl_widget = CETechWiget(self, self.api, log_url=b"ws://localhost:5556")
             self.ogl_dock = QDockWidget(self)
             self.ogl_dock.setWindowTitle("Engine View")
             self.ogl_dock.hide()

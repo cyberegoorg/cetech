@@ -3,7 +3,7 @@ from PyQt5.QtGui import QCursor
 from PyQt5.QtWidgets import QWidget
 
 
-class Widget(QWidget):
+class CETechWiget(QWidget):
     def __init__(self, parent, api, log_url):
         self.api = api
         self.last_pos = (0, 0)
@@ -16,7 +16,7 @@ class Widget(QWidget):
         self.midle = False
         self.right = False
 
-        super(Widget, self).__init__(parent, Qt.ForeignWindow)
+        super(CETechWiget, self).__init__(parent, Qt.ForeignWindow)
 
         self.setFocusPolicy(Qt.ClickFocus)
 
