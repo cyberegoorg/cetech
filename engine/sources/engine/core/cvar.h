@@ -10,6 +10,13 @@
 #include "celib/types.h"
 #include "types.h"
 
+enum cvar_type {
+    CV_NONE = 0,
+    CV_FLOAT,
+    CV_INT,
+    CV_STRING
+};
+
 //==============================================================================
 // Interface
 //==============================================================================
@@ -17,6 +24,14 @@
 int cvar_init();
 
 void cvar_shutdown();
+
+void cvar_register_resource();
+
+void cvar_load_global();
+
+void cvar_compile_global();
+
+int cvar_parse_core_args(struct args args);
 
 int cvar_parse_args(struct args args);
 
@@ -42,6 +57,8 @@ float cvar_get_float(cvar_t var);
 int cvar_get_int(cvar_t var);
 
 const char *cvar_get_string(cvar_t var);
+
+enum cvar_type cvar_get_type(cvar_t var);
 
 void cvar_set_float(cvar_t var,
                     float f);

@@ -59,4 +59,6 @@ int resource_compiler_external_join(char *output,
                                     u32 max_len,
                                     const char *name);
 
+void resource_compiler_create_build_dir();
+
 #endif //CETECH_RESOURCE_COMPILER_H
