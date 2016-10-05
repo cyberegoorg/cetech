@@ -78,11 +78,9 @@ def engine_instance(request, _build_dir):
     while not instance.ready:
         pass
 
-    api = instance.create_console_api()
-    api.connect()
+    api = instance.console_api
 
     yield api
 
     api.quit()
-    api.disconnect()
     instance.kill()
