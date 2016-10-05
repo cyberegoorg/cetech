@@ -110,7 +110,6 @@ int application_init(int argc,
     _G.config.cv_wait = cvar_new_int(".wait", "Wait for client", 0);
     _G.config.cv_wid = cvar_new_int(".wid", "Wid", 0);
 
-
     // Cvar stage
     for (int i = 0; i < STATIC_SYSTEMS_SIZE; ++i) {
         if (!_SYSTEMS[i].init(0)) {
@@ -119,6 +118,15 @@ int application_init(int argc,
             return 0;
         }
     }
+
+    cvar_parse_core_args(_G.args);
+
+    if (cvar_get_int(_G.config.cv_compile)) {
+        resource_compiler_create_build_dir();
+        cvar_compile_global();
+    }
+
+    cvar_load_global();
 
     if (!cvar_parse_args(_G.args)) {
         return 0;

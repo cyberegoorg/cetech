@@ -208,6 +208,14 @@ int resource_compiler_init(int stage) {
     return 1;
 }
 
+void resource_compiler_create_build_dir() {
+    const char *build_dir = cvar_get_string(_G.cv_build_dir);
+    char build_dir_full[1024] = {0};
+    os_path_join(build_dir_full, CE_ARRAY_LEN(build_dir_full), build_dir, application_platform());
+
+    os_dir_make_path(build_dir_full);
+}
+
 void resource_compiler_shutdown() {
     _G = (struct G) {0};
 }
