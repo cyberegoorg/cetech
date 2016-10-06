@@ -5,7 +5,7 @@
 .cache
 
 bin
-build
+/build/**
 site
 
 __pycache__
