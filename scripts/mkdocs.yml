@@ -2,7 +2,7 @@ site_name: CETech
 site_author: Ondra Voves
 
 repo_url: https://gitlab.com/cyberegoorg/cetech
-theme: slate
+theme: readthedocs #slate
 
 pages:
   - CETech: 'index.md'
@@ -15,6 +15,7 @@ pages:
   - Engine:
     - Overview: 'engine/overview.md'
     - Build: 'engine/build.md'
+    - Resource: 'engine/resource.md'
 
   - Playground:
     - Overview: 'playground/overview.md'
