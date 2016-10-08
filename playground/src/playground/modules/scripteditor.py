@@ -26,7 +26,7 @@ FILES_FILTER = "Lua (*.lua);;" \
 
 
 class ScriptEditorWindow(QMainWindow, Ui_MainWindow):
-    def __init__(self, project_manager, filename=None, parent=None):
+    def __init__(self, project_manager, filename=None, parent=None, module_manager=None):
         super(ScriptEditorWindow, self).__init__(parent=parent)
         self.setupUi(self)
 
@@ -190,7 +190,7 @@ class ScriptEditorWidget(QDockWidget):
 
 
 class ScriptEditorManager(object):
-    def __init__(self, project_manager):
+    def __init__(self, project_manager, module_manager):
         self.project_manager = project_manager
         self.editors = {}
 
