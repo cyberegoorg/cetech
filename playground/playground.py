@@ -5,8 +5,8 @@
 ########################################################################################################################
 import ctypes
 import os
-import sys
 import platform
+import sys
 
 _platform = platform.system().lower()
 if _platform == 'windows':
@@ -16,7 +16,6 @@ print(sys.path)
 
 import PyQt5
 from PyQt5.QtCore import QDir
-from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QApplication
 from PyQt5.uic import compileUiDir
 
@@ -34,8 +33,9 @@ LIB_DIR = os.path.join(ROOT_DIR,
 
 if _platform == 'windows':
     QApplication.addLibraryPath(os.path.join(os.path.dirname(PyQt5.__file__), "plugins"))
-    ctypes.windll.LoadLibrary(os.path.join(ROOT_DIR, 'externals', 'build','windows64', 'Release', 'lib', 'nanomsg.dll'))
-    #ctypes.windll.LoadLibrary('nanomsg.dll')
+    ctypes.windll.LoadLibrary(
+        os.path.join(ROOT_DIR, 'externals', 'build', 'windows64', 'Release', 'lib', 'nanomsg.dll'))
+    # ctypes.windll.LoadLibrary('nanomsg.dll')
     sys.path.insert(0, 'C:\Python34\lib\site-packages')
 
 else:
@@ -64,9 +64,9 @@ def compile_map(d, f):
 if __name__ == '__main__':
     # good for develop and first run.
     compileUiDir(
-            dir='ui',
-            recurse=True,
-            map=compile_map
+        dir='ui',
+        recurse=True,
+        map=compile_map
     )
 
     from playground.main import main
