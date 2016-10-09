@@ -1,16 +1,18 @@
 import os
 
 from PyQt5.QtCore import QDir, pyqtSignal
+from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QMainWindow, QFileSystemModel
 
 from playground.ui.assetbrowser import Ui_MainWindow
 
 
 class AssetBrowser(QMainWindow, Ui_MainWindow):
-    asset_clicked = pyqtSignal(str, str, name='assetClicked')
-    asset_doubleclicked = pyqtSignal(str, str, name='assetDoubleClicked')
+    show_asset = pyqtSignal(str, str, name='showAsset')
+    open_asset = pyqtSignal(str, str, name='openAsset')
 
-    def __init__(self):
+    def __init__(self, module_manager):
+        self.modules_manager = module_manager
         super(AssetBrowser, self).__init__()
         self.setupUi(self)
 
@@ -29,7 +31,15 @@ class AssetBrowser(QMainWindow, Ui_MainWindow):
 
         self.file_view.setModel(self.file_model)
 
-    def open_project(self, project_dir):
+        self.modules_manager.new_docked(self, "asset_browser", "Asset browser",
+                                        Qt.BottomDockWidgetArea)
+
+        self.modules_manager.main_window.splitDockWidget(self.modules_manager["asset_browser"].dock,
+                                                         self.modules_manager["asset_view"].dock, Qt.Horizontal)
+
+    def open_project(self, project):
+        self.project = project
+        project_dir = project.project_dir
         path = os.path.join(project_dir)
 
         self.dir_model.setRootPath(path)
@@ -49,7 +59,7 @@ class AssetBrowser(QMainWindow, Ui_MainWindow):
         path = fileinfo.absoluteFilePath()
         ext = fileinfo.suffix()
 
-        self.asset_doubleclicked.emit(path, ext)
+        self.open_asset.emit(path, ext)
 
     def file_clicked(self, idx):
         fileinfo = self.file_model.fileInfo(idx)
@@ -57,4 +67,4 @@ class AssetBrowser(QMainWindow, Ui_MainWindow):
         path = fileinfo.absoluteFilePath()
         ext = fileinfo.suffix()
 
-        self.asset_clicked.emit(path, ext)
+        self.show_asset.emit(path, ext)

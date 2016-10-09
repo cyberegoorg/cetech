@@ -1,14 +1,16 @@
-import platform
+from PyQt5.QtCore import Qt
 
-from cetech.consoleapi import ConsoleAPI
 from playground.core.widget import CETechWiget
 
 
 class LevelWidget(CETechWiget):
-    def __init__(self, parent):
+    def __init__(self, module_manager):
         self.project = None
+        self.modules_manager = module_manager
 
-        super(LevelWidget, self).__init__(parent)
+        super(LevelWidget, self).__init__()
+
+        self.modules_manager.new_docked(self, "level_editor", "Level editor", Qt.TopDockWidgetArea)
 
     def open_project(self, project):
         """

@@ -1,6 +1,7 @@
 lua:
-  - core/cetech/log
   - core/cetech/editor
+  - core/class
+  - core/fpscamera
 
 material:
   - playground/cube

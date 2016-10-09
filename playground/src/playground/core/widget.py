@@ -6,7 +6,7 @@ from PyQt5.QtWidgets import QWidget
 
 
 class CETechWiget(QWidget):
-    def __init__(self, parent):
+    def __init__(self):
         self.last_pos = (0, 0)
         self.instance = None
 
@@ -17,7 +17,7 @@ class CETechWiget(QWidget):
         self.midle = False
         self.right = False
 
-        super(CETechWiget, self).__init__(parent, Qt.ForeignWindow)
+        super(CETechWiget, self).__init__(flags=Qt.ForeignWindow)
 
         self.setFocusPolicy(Qt.ClickFocus)
 

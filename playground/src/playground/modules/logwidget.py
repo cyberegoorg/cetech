@@ -53,18 +53,30 @@ class LogSub(QThread):
 
 
 class LogWidget(QFrame, Ui_LogWidget):
-    def __init__(self, ignore_where=None):
+    def __init__(self, module_manager):
         super(LogWidget, self).__init__()
         self.setupUi(self)
 
+        self.modules_manager = module_manager
         self.instance = None
         self.ignore_where = None
-        if ignore_where is not None:
-            self.set_ignore_where(ignore_where)
-
         self.log_tree_widget.header().setStretchLastSection(True)
 
+        self.modules_manager.new_docked(self, "log_view", "Log", Qt.BottomDockWidgetArea)
+
+        self.modules_manager.main_window.tabifyDockWidget(self.modules_manager["asset_browser"].dock,
+                                                          self.modules_manager["log_view"].dock)
+
+    def open_project(self, project):
+        # self.log_widget.set_instance()
+        self.set_instance(self.modules_manager["level_editor"].widget.instance)
+        pass
+
     def set_instance(self, instance):
+        # TODO: REFACTOR
+        if instance is None:
+            return
+
         url = instance.log_url if isinstance(instance.log_url, bytes) else instance.log_url.encode()
         self.instance = instance
         self.logsub = LogSub(url)
