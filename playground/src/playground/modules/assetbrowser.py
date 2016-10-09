@@ -4,17 +4,16 @@ from PyQt5.QtCore import QDir, pyqtSignal
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QMainWindow, QFileSystemModel
 
+from playground.core.modules import PlaygroundModule
 from playground.ui.assetbrowser import Ui_MainWindow
 
 
-class AssetBrowser(QMainWindow, Ui_MainWindow):
-    show_asset = pyqtSignal(str, str, name='showAsset')
-    open_asset = pyqtSignal(str, str, name='openAsset')
-
+class AssetBrowser(QMainWindow, Ui_MainWindow, PlaygroundModule):
     def __init__(self, module_manager):
-        self.modules_manager = module_manager
         super(AssetBrowser, self).__init__()
         self.setupUi(self)
+
+        self.init_module(module_manager)
 
         self.dir_model = QFileSystemModel()
         self.dir_model.setFilter(QDir.NoDotAndDotDot | QDir.AllDirs)
@@ -58,13 +57,15 @@ class AssetBrowser(QMainWindow, Ui_MainWindow):
 
         path = fileinfo.absoluteFilePath()
         ext = fileinfo.suffix()
+        asset_name = path.replace(self.project.project_dir, '').replace('/src/', '').split('.')[0]
 
-        self.open_asset.emit(path, ext)
+        self.modules_manager.open_asset(path, asset_name, ext)
 
     def file_clicked(self, idx):
         fileinfo = self.file_model.fileInfo(idx)
 
         path = fileinfo.absoluteFilePath()
         ext = fileinfo.suffix()
+        asset_name = path.replace(self.project.project_dir, '').replace('/src/', '').split('.')[0]
 
-        self.show_asset.emit(path, ext)
+        self.modules_manager.show_asset(path, asset_name, ext)

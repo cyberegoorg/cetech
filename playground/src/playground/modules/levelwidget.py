@@ -1,16 +1,27 @@
 from PyQt5.QtCore import Qt
 
+from playground.core.modules import PlaygroundModule
 from playground.core.widget import CETechWiget
 
 
-class LevelWidget(CETechWiget):
+class LevelWidget(CETechWiget, PlaygroundModule):
     def __init__(self, module_manager):
         self.project = None
-        self.modules_manager = module_manager
 
         super(LevelWidget, self).__init__()
+        self.init_module(module_manager)
 
         self.modules_manager.new_docked(self, "level_editor", "Level editor", Qt.TopDockWidgetArea)
+
+    def open_asset(self, path, name, ext):
+        if ext == "level":
+            if not self.instance.ready:
+                return True
+
+            self.open_level(name)
+            return True
+
+        return False
 
     def open_project(self, project):
         """

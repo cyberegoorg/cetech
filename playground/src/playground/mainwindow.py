@@ -8,7 +8,7 @@ from playground.modules.assetviewwidget import AssetViewWidget
 from playground.modules.levelwidget import LevelWidget
 from playground.modules.logwidget import LogWidget
 from playground.modules.profilerwidget import ProfilerWidget
-from playground.modules.scripteditor import ScriptEditorWidget, ScriptEditorManager
+from playground.modules.scripteditor import ScriptEditorManager
 from playground.ui.mainwindow import Ui_MainWindow
 
 
@@ -33,9 +33,6 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             ScriptEditorManager
         ])
 
-        self.modules_manager['asset_browser'].widget.open_asset.connect(self.open_asset)
-        self.modules_manager['asset_browser'].widget.show_asset.connect(self.show_asset)
-
         self.file_watch = QFileSystemWatcher(self)
         self.file_watch.fileChanged.connect(self.file_changed)
         self.file_watch.directoryChanged.connect(self.dir_changed)
@@ -43,29 +40,6 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.build_file_watch = QFileSystemWatcher(self)
         self.build_file_watch.fileChanged.connect(self.build_file_changed)
         self.build_file_watch.directoryChanged.connect(self.build_dir_changed)
-
-    def open_asset(self, path, ext):
-        """
-        :type path: str
-        :type path: ext
-        """
-        # TODO: move fce to asset view
-
-        asset_name = path.replace(self.project.project_dir, '').replace('/src/', '').split('.')[0]
-
-        if ext == 'level':
-            if not self.modules_manager['level_editor'].widget.instance.ready:
-                return
-
-            self.modules_manager['level_editor'].widget.open_level(asset_name)
-            return
-
-        if ScriptEditorWidget.support_ext(ext):
-            self.modules_manager['script_editor'].widget.open(self, path)
-
-    def show_asset(self, path, ext):
-        asset_name = path.replace(self.project.project_dir, '').replace('/src/', '').split('.')[0]
-        self.modules_manager['asset_view'].widget.open_asset(asset_name, ext)
 
     def open_project(self, name, dir):
         self.project.open_project(name, dir)
@@ -113,8 +87,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.build_file_watch.addPaths(files)
 
     def file_changed(self, path):
-        # TODO: self.api.compile_all()
-        pass
+        api = self.modules_manager['level_editor'].widget.instance.console_api
+        api.compile_all()
 
     def dir_changed(self, path):
         self.watch_project_dir()
@@ -138,8 +112,6 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.project.run_develop("Level", compile_=True, continue_=True, port=5566)
 
     def closeEvent(self, evnt):
-        self.modules_manager['level_editor'].widget.close_project()
-        self.modules_manager['asset_view'].widget.close_project()
-
+        self.modules_manager.close_project()
         self.project.killall()
         evnt.accept()

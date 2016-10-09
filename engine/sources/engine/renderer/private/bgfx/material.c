@@ -284,12 +284,10 @@ void *material_resource_reloader(stringid64_t name,
                                  void *old_data,
                                  void *new_data,
                                  struct allocator *allocator) {
-
     material_resource_offline(name, old_data);
     material_resource_online(name, new_data);
 
     CE_DEALLOCATE(allocator, old_data);
-
     return new_data;
 }
 
@@ -340,7 +338,9 @@ material_t material_resource_create(stringid64_t name) {
     u32 size = sizeof(struct material_blob) +
                (resource->uniforms_count * sizeof(char) * 32) +
                (resource->texture_count * sizeof(stringid64_t)) +
-               (resource->vec4f_count * sizeof(vec4f_t));
+               (resource->vec4f_count * sizeof(vec4f_t)) +
+               (resource->mat44f_count * sizeof(mat44f_t)) +
+               (resource->mat33f_count * sizeof(mat33f_t));
 
     handler_t h = handlerid_handler_create(&_G.material_handler);
 

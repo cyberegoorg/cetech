@@ -7,6 +7,7 @@ from PyQt5.QtGui import QColor
 from PyQt5.QtWidgets import QFrame, QStyle, QTreeWidgetItem
 from nanomsg import Socket, SUB, SUB_SUBSCRIBE
 
+from playground.core.modules import PlaygroundModule
 from playground.ui.logwidget import Ui_LogWidget
 
 RESOURCE_NAME_RE = re.compile("^\[([^\]]+)\]")
@@ -52,12 +53,13 @@ class LogSub(QThread):
                 raise
 
 
-class LogWidget(QFrame, Ui_LogWidget):
+class LogWidget(QFrame, Ui_LogWidget, PlaygroundModule):
     def __init__(self, module_manager):
         super(LogWidget, self).__init__()
-        self.setupUi(self)
 
-        self.modules_manager = module_manager
+        self.setupUi(self)
+        self.init_module(module_manager)
+
         self.instance = None
         self.ignore_where = None
         self.log_tree_widget.header().setStretchLastSection(True)
@@ -68,9 +70,7 @@ class LogWidget(QFrame, Ui_LogWidget):
                                                           self.modules_manager["log_view"].dock)
 
     def open_project(self, project):
-        # self.log_widget.set_instance()
         self.set_instance(self.modules_manager["level_editor"].widget.instance)
-        pass
 
     def set_instance(self, instance):
         # TODO: REFACTOR

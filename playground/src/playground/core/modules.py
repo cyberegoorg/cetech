@@ -3,6 +3,26 @@ from collections import OrderedDict
 from PyQt5.QtWidgets import QDockWidget
 
 
+class PlaygroundModule(object):
+    def __init__(self):
+        self.modules_manager = None
+
+    def init_module(self, module_manager):
+        self.modules_manager = module_manager
+
+    def show_asset(self, path, name, ext):
+        pass
+
+    def close_project(self):
+        pass
+
+    def open_asset(self, path, name, ext):
+        return False
+
+    def open_project(self, project):
+        pass
+
+
 class ModuleInstance(object):
     def __init__(self, widget, dock):
         self.widget = widget
@@ -17,6 +37,16 @@ class ModuleManager(object):
     def init_modules(self, modules):
         for module in modules:
             module(module_manager=self)
+
+    def show_asset(self, path, name, ext):
+        for k, v in self.modules_instance.items():
+            if v.widget.show_asset(path, name, ext):
+                break
+
+    def open_asset(self, path, name, ext):
+        for k, v in self.modules_instance.items():
+            if v.widget.open_asset(path, name, ext):
+                break
 
     def new_common(self, module_instance, name):
         self.modules_instance[name] = ModuleInstance(module_instance, None)
@@ -44,3 +74,7 @@ class ModuleManager(object):
     def open_project(self, project):
         for v in self.modules_instance.values():
             v.widget.open_project(project)
+
+    def close_project(self):
+        for v in self.modules_instance.values():
+            v.widget.close_project()

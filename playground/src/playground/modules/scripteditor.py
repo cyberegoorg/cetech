@@ -4,6 +4,7 @@ from PyQt5.QtCore import QTextCodec, QFile, QDir, QFileInfo, QUrl, pyqtSlot, Qt
 from PyQt5.QtWebKit import QWebSettings
 from PyQt5.QtWidgets import QFileDialog, QMessageBox, QDockWidget, QMainWindow
 
+from playground.core.modules import PlaygroundModule
 from playground.ui.scripteditorwindow import Ui_MainWindow
 
 SUFIX_2_MODE = {
@@ -189,16 +190,23 @@ class ScriptEditorWidget(QDockWidget):
             event.ignore()
 
 
-class ScriptEditorManager(object):
+class ScriptEditorManager(PlaygroundModule):
     def __init__(self, module_manager):
         self.project_manager = None
         self.editors = {}
+        self.init_module(module_manager)
 
-        module_manager.new_common(self, 'script_editor')
+        self.modules_manager.new_common(self, 'script_editor')
 
     def open_project(self, project):
         self.project_manager = project
-        pass
+
+    def open_asset(self, path, name, ext):
+        if ScriptEditorWidget.support_ext(ext):
+            self.open(self.modules_manager.main_window, path)
+            return True
+
+        return False
 
     def open(self, root, filename):
         if filename in self.editors:
