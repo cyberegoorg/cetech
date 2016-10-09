@@ -190,9 +190,15 @@ class ScriptEditorWidget(QDockWidget):
 
 
 class ScriptEditorManager(object):
-    def __init__(self, project_manager, module_manager):
-        self.project_manager = project_manager
+    def __init__(self, module_manager):
+        self.project_manager = None
         self.editors = {}
+
+        module_manager.new_common(self, 'script_editor')
+
+    def open_project(self, project):
+        self.project_manager = project
+        pass
 
     def open(self, root, filename):
         if filename in self.editors:

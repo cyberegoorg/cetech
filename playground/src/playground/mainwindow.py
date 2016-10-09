@@ -1,8 +1,7 @@
-from collections import OrderedDict
-
 from PyQt5.QtCore import Qt, QFileSystemWatcher, QDirIterator
-from PyQt5.QtWidgets import QMainWindow, QDockWidget, QTabWidget
+from PyQt5.QtWidgets import QMainWindow, QTabWidget
 
+from playground.core.modules import ModuleManager
 from playground.core.projectmanager import ProjectManager
 from playground.modules.assetbrowser import AssetBrowser
 from playground.modules.assetviewwidget import AssetViewWidget
@@ -13,71 +12,29 @@ from playground.modules.scripteditor import ScriptEditorWidget, ScriptEditorMana
 from playground.ui.mainwindow import Ui_MainWindow
 
 
-class ModuleInstance(object):
-    def __init__(self, widget, dock):
-        self.widget = widget
-        self.dock = dock
-
-
-class ModuleManager(object):
-    def __init__(self, main_window):
-        self.modules_instance = OrderedDict()
-        self.main_window = main_window
-
-    def new_docked(self, module_instance, name, title, dock_area):
-        dock = QDockWidget()
-        dock.setWindowTitle(title)
-        dock.hide()
-        dock.setWidget(module_instance)
-        dock.show()
-        self.main_window.addDockWidget(dock_area, dock)
-
-        self.modules_instance[name] = ModuleInstance(module_instance, dock)
-
-    def __getitem__(self, item):
-        return self.modules_instance[item]
-
-    def open_project(self, project):
-        for v in self.modules_instance.values():
-            v.widget.open_project(project)
-
-
-MODULES = [
-    LevelWidget,
-    AssetViewWidget,
-    AssetBrowser,
-    LogWidget
-]
-
-
 class MainWindow(QMainWindow, Ui_MainWindow):
     def __init__(self):
         super(MainWindow, self).__init__()
         self.setupUi(self)
 
-        self.modules_manager = ModuleManager(self)
-
         self.centralwidget.hide()
 
         self.project = ProjectManager()
+        self.modules_manager = ModuleManager(self)
 
         self.setTabPosition(Qt.AllDockWidgetAreas, QTabWidget.North)
 
-        for module in MODULES:
-            module(module_manager=self.modules_manager)
+        self.modules_manager.init_modules([
+            LevelWidget,
+            AssetViewWidget,
+            AssetBrowser,
+            LogWidget,
+            ProfilerWidget,
+            ScriptEditorManager
+        ])
 
         self.modules_manager['asset_browser'].widget.open_asset.connect(self.open_asset)
         self.modules_manager['asset_browser'].widget.show_asset.connect(self.show_asset)
-
-        self.editors_manager = ScriptEditorManager(project_manager=self.project, module_manager=self.modules_manager)
-
-        self.profiler_widget = ProfilerWidget()
-        self.profiler_doc_widget = QDockWidget(self)
-        self.profiler_doc_widget.setWindowTitle("Profiler")
-        self.profiler_doc_widget.hide()
-        self.profiler_doc_widget.setFeatures(QDockWidget.AllDockWidgetFeatures)
-        self.profiler_doc_widget.setWidget(self.profiler_widget)
-        self.addDockWidget(Qt.RightDockWidgetArea, self.profiler_doc_widget)
 
         self.file_watch = QFileSystemWatcher(self)
         self.file_watch.fileChanged.connect(self.file_changed)
@@ -104,7 +61,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             return
 
         if ScriptEditorWidget.support_ext(ext):
-            self.editors_manager.open(self, path)
+            self.modules_manager['script_editor'].widget.open(self, path)
 
     def show_asset(self, path, ext):
         asset_name = path.replace(self.project.project_dir, '').replace('/src/', '').split('.')[0]
@@ -172,7 +129,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.script_editor_dock_widget.show()
 
     def open_recorded_events(self):
-        self.profiler_doc_widget.show()
+        self.modules_manager['profiler'].dock.show()
 
     def run_standalone(self):
         self.project.run_release("Standalone")
