@@ -73,11 +73,11 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.watch_project_dir()
 
     def reload_all(self):
-        # TODO: implement reload all
-        order = ["shader", "texture", "material", "lua"]
-        # self.api.reload_all(order)
-        # self.assetview_widget.api.reload_all(order)
-        pass
+        api = self.modules_manager['level_editor'].widget.instance.console_api
+        api.compile_all()
+
+        for k, v in self.project.instances.items():
+            v.console_api.reload_all()
 
     def watch_project_dir(self):
         files = self.file_watch.files()

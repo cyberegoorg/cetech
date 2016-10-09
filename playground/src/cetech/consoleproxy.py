@@ -4,7 +4,7 @@ from nanomsg import Socket, REQ, NanoMsgAPIError
 
 
 class ConsoleProxy(object):
-    def __init__(self, url, recv_timeout=100, send_timeout=100):
+    def __init__(self, url, recv_timeout=1000, send_timeout=1000):
         self.url = url.encode()
         self.socket = Socket(REQ)
 

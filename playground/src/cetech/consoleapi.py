@@ -9,13 +9,13 @@ class ConsoleAPI(ConsoleProxy):
         return self.send_command('lua_system.execute', script=script)
 
     def compile_all(self):
-        return self.send_command('resource_compiler.compile_all')
+        return self.lua_execute("cetech.ResourceCompilator.compile_all()")
+
+    def reload_all(self):
+        return self.lua_execute("cetech.ResourceManager.reload_all()")
 
     def resize(self, w, h):
         return self.send_command('renderer.resize', width=w, height=h)
-
-    def reload_all(self, types):
-        return self.send_command('resource.reload_all', types=types)
 
     def quit(self):
         return self.lua_execute(script="cetech.Application.quit()")
