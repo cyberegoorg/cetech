@@ -25,3 +25,4 @@ children:
         mesh: "geom_1"
         scene: "content/scene/m4a1/m4a1"
         material: "content/scene/m4a1/m4a1"
+
