@@ -4,19 +4,35 @@ lua:
   - "lua/game"
 
 texture:
-  - "content/texture1"
-#  - "content/uv_checker"
   - "texture2"
+  - "content/texture1"
+  - "content/uv_checker"
+  - "content/scene/duck/duckCM"
+  - "content/scene/m4a1/m4_diff"
+  - "content/scene/solider/body01"
+  - "content/scene/solider/head01"
+  - "content/scene/solider/m4tex"
 
 package:
   - "core"
 
 unit:
+  - "camera"
+  - "box1"
+  - "box2"
+  - "m4a1"
   - "unit1"
+  - "unit10"
+  - "unit11"
 
 material:
   - "material1"
-  - "material2"
+  - "content/scene/duck/duck"
+  - "content/scene/m4a1/m4a1"
+  - "content/scene/solider/body"
+  - "content/scene/solider/head"
+  - "content/scene/solider/m4"
+  - "content/scene/solider/solider"
 
 shader:
   - "shader1"
@@ -29,3 +45,7 @@ render_config:
 
 scene:
   - "cube"
+  - "content/scene/duck/duck"
+  - "content/scene/m4a1/m4a1"
+  - "content/scene/solider/ArmyPilot"
+
