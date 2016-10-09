@@ -249,7 +249,12 @@ static void _game_render_task(void *d) {
 
 static void _boot_stage() {
     stringid64_t boot_pkg = stringid64_from_string(cvar_get_string(_G.config.cv_boot_pkg));
+    stringid64_t core_pkg = stringid64_from_string("core");
     stringid64_t pkg = stringid64_from_string("package");
+
+    resource_load_now(pkg, &core_pkg, 1);
+    package_load(core_pkg);
+    package_flush(core_pkg);
 
     resource_load_now(pkg, &boot_pkg, 1);
     package_load(boot_pkg);

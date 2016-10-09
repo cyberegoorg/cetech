@@ -365,8 +365,8 @@ void *resource_get(stringid64_t type,
             resource_load_now(type, &names, 1);
             item = MAP_GET(resource_item_t, resource_map, names.id, null_item);
         } else {
-            // TODO: fallback resource #CETECH-44
-            log_info(LOG_WHERE, "ddddddd");
+            // TODO: fallback resource #205
+            CE_ASSERT(LOG_WHERE, false);
         }
     }
 

@@ -253,8 +253,6 @@ scene_node_t scenegraph_create(world_t world,
         u32 idx = (u32) ARRAY_SIZE(&data->position);
         nodes[i] = (scene_node_t) {.idx = idx};
 
-        log_debug("scene_graph", "new node");
-
         mat44f_t local_pose = pose[i];
 
         vec3f_t position = {0};

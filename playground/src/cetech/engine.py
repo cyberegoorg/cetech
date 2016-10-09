@@ -74,7 +74,7 @@ class EngineInstance(object):
             "-s .build %s" % build_dir,
         ]
 
-        return self._run(self.BUILD_RELEASE, args)
+        return self._run(self.BUILD_RELEASE, args, lock=False)
 
     def run_develop(self, build_dir, source_dir, compile_=False, continue_=False, wait=False, daemon=False,
                     wid=None, core_dir=None, port=None, bootscript=None, protocol='ws', check=False, lock=True):
@@ -129,18 +129,20 @@ class EngineInstance(object):
             self.rl = ReadyLock(self.push_url, on_ready=_on_ready)
             self.rl.start()
 
-        self._console_api = ConsoleAPI(self.rpc_url)
+        if build_type == self.BUILD_DEVELOP:
+            self._console_api = ConsoleAPI(self.rpc_url)
+            args.append("-s develop.push.addr %s" % self.push_url.replace("*", "localhost"))
 
-        args.append("-s develop.push.addr %s" % self.push_url.replace("*", "localhost"))
         cmd = "%s %s" % (self._get_executable_path(build_type), ' '.join(args))
         print(cmd)
 
         self.process = subprocess.Popen(cmd.split(' '), stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
 
-        self._console_api.connect()
+        if build_type == self.BUILD_DEVELOP:
+            self._console_api.connect()
 
-        if check:
-            self.process.wait()
+            if check:
+                self.process.wait()
 
     def _dump(self):
         p = self.process
