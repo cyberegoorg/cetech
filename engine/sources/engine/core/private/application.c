@@ -98,7 +98,7 @@ int application_init(int argc,
     cvar_init();
 
     _G.config.cv_boot_pkg = cvar_new_str("core.boot_pkg", "Boot package", "boot");
-    _G.config.cv_boot_script = cvar_new_str("core.boot_scrpt", "Boot script", "lua/boot");
+    _G.config.cv_boot_script = cvar_new_str("core.boot_script", "Boot script", "lua/boot");
 
     _G.config.cv_screen_x = cvar_new_int("screen.x", "Screen width", 1024);
     _G.config.cv_screen_y = cvar_new_int("screen.y", "Screen height", 768);
@@ -249,12 +249,15 @@ static void _game_render_task(void *d) {
 
 static void _boot_stage() {
     stringid64_t boot_pkg = stringid64_from_string(cvar_get_string(_G.config.cv_boot_pkg));
-    stringid64_t core_pkg = stringid64_from_string("core");
     stringid64_t pkg = stringid64_from_string("package");
 
-    resource_load_now(pkg, &core_pkg, 1);
-    package_load(core_pkg);
-    package_flush(core_pkg);
+    // TODO: remove, this must be done by boot_package and load in boot_script
+    if (!cvar_get_int(_G.config.cv_daemon)) {
+        stringid64_t core_pkg = stringid64_from_string("core");
+        resource_load_now(pkg, &core_pkg, 1);
+        package_load(core_pkg);
+        package_flush(core_pkg);
+    }
 
     resource_load_now(pkg, &boot_pkg, 1);
     package_load(boot_pkg);

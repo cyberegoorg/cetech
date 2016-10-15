@@ -82,13 +82,13 @@ class ProjectManager(object):
         return instance
 
     def run_develop(self, name, compile_=False, continue_=False, wait=False, daemon=False, wid=None,
-                    core_dir=None, port=None, bootscript=None):
+                    core_dir=None, port=None, bootscript=None, bootpkg=None):
 
         instance = EngineInstance(name, "../bin", os.path.join(ROOT_DIR, 'externals', 'build'))
         self.instances[name] = instance
 
         instance.run_develop(self.build_dir, self.source_dir, compile_=compile_, continue_=continue_, wait=wait,
                              daemon=daemon, wid=wid,
-                             core_dir=core_dir, port=port, bootscript=bootscript)
+                             core_dir=core_dir, port=port, bootscript=bootscript, bootpkg=bootpkg)
 
         return instance
