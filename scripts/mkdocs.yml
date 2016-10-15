@@ -29,6 +29,9 @@ pages:
       - cetech.World: 'lua_api/World.md'
       - cetech.Unit: 'lua_api/Unit.md'
 
+    - Math:
+      - cetech.Vec2f: 'lua_api/Vec2f.md'
+
     - Input:
       - cetech.Keyboard: 'lua_api/Keyboard.md'
       - cetech.Mouse: 'lua_api/Mouse.md'
