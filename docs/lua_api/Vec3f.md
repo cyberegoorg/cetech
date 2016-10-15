@@ -21,6 +21,7 @@
     * [length_squared( v ) : number](#length_squared-v-number)
     * [normalized( v ) : Vec3f](#normalized-v-Vec3f)
     * [dot( v1, v2 ) : number](#dot-v1-v2-number)
+    * [cross( v1, v2 ) : Vec3f](#cross-v1-v2-Vec3f)
     * [lerp( from, to, time ) : Vec3f](#lerp-from-to-time-Vec3f)
 
 # Operators
