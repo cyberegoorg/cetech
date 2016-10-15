@@ -49,7 +49,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.watch_project_dir()
 
     def reload_all(self):
-        self.modules_manager['compiler'].widget.compile_all()
+        self.modules_manager['compiler'].compile_all()
 
         for k, v in self.project.instances.items():
             v.console_api.reload_all()
@@ -88,7 +88,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.build_file_watch.addPaths(files)
 
     def file_changed(self, path):
-        self.modules_manager['compiler'].widget.compile_all()
+        self.modules_manager['compiler'].compile_all()
 
     def dir_changed(self, path):
         self.watch_project_dir()
