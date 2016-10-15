@@ -9,6 +9,8 @@ from playground.ui.assetbrowser import Ui_MainWindow
 
 
 class AssetBrowser(QMainWindow, Ui_MainWindow, PlaygroundModule):
+    Name = "asset_browser"
+
     def __init__(self, module_manager):
         super(AssetBrowser, self).__init__()
         self.setupUi(self)
@@ -30,14 +32,13 @@ class AssetBrowser(QMainWindow, Ui_MainWindow, PlaygroundModule):
 
         self.file_view.setModel(self.file_model)
 
-        self.modules_manager.new_docked(self, "asset_browser", "Asset browser",
-                                        Qt.BottomDockWidgetArea)
+        self.dock = self.modules_manager.new_docked(self, self.Name, "Asset browser",
+                                                    Qt.BottomDockWidgetArea)
 
-        self.modules_manager.main_window.splitDockWidget(self.modules_manager["asset_browser"].dock,
+        self.modules_manager.main_window.splitDockWidget(self.dock,
                                                          self.modules_manager["asset_view"].dock, Qt.Horizontal)
 
-    def open_project(self, project):
-        self.project = project
+    def on_open_project(self, project):
         project_dir = project.project_dir
         path = os.path.join(project_dir)
 
@@ -57,7 +58,7 @@ class AssetBrowser(QMainWindow, Ui_MainWindow, PlaygroundModule):
 
         path = fileinfo.absoluteFilePath()
         ext = fileinfo.suffix()
-        asset_name = path.replace(self.project.project_dir, '').replace('/src/', '').split('.')[0]
+        asset_name = path.replace(self.project_manager.project_dir, '').replace('/src/', '').split('.')[0]
 
         self.modules_manager.open_asset(path, asset_name, ext)
 
@@ -66,6 +67,6 @@ class AssetBrowser(QMainWindow, Ui_MainWindow, PlaygroundModule):
 
         path = fileinfo.absoluteFilePath()
         ext = fileinfo.suffix()
-        asset_name = path.replace(self.project.project_dir, '').replace('/src/', '').split('.')[0]
+        asset_name = path.replace(self.project_manager.project_dir, '').replace('/src/', '').split('.')[0]
 
         self.modules_manager.show_asset(path, asset_name, ext)

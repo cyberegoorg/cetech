@@ -413,13 +413,12 @@ void resource_reload_all() {
     while (type_it != type_end) {
         stringid64_t type_id = {.id = type_it->key};
 
-        ARRAY_RESIZE(stringid64_t, &name_array, 0);
-
         MAP_T(resource_item_t) *resource_map = _get_resource_map(type_id);
 
         const MAP_ENTRY_T(resource_item_t) *name_it = MAP_BEGIN(resource_item_t, resource_map);
         const MAP_ENTRY_T(resource_item_t) *name_end = MAP_END(resource_item_t, resource_map);
 
+        ARRAY_RESIZE(stringid64_t, &name_array, 0);
         while (name_it != name_end) {
             stringid64_t name_id = {.id = name_it->key};
 

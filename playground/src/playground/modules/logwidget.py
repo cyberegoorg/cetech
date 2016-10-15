@@ -54,9 +54,10 @@ class LogSub(QThread):
 
 
 class LogWidget(QFrame, Ui_LogWidget, PlaygroundModule):
+    Name = "log_view"
+
     def __init__(self, module_manager):
         super(LogWidget, self).__init__()
-
         self.setupUi(self)
         self.init_module(module_manager)
 
@@ -64,13 +65,13 @@ class LogWidget(QFrame, Ui_LogWidget, PlaygroundModule):
         self.ignore_where = None
         self.log_tree_widget.header().setStretchLastSection(True)
 
-        self.modules_manager.new_docked(self, "log_view", "Log", Qt.BottomDockWidgetArea)
+        self.dock = self.modules_manager.new_docked(self, self.Name, "Log", Qt.BottomDockWidgetArea)
 
         self.modules_manager.main_window.tabifyDockWidget(self.modules_manager["asset_browser"].dock,
-                                                          self.modules_manager["log_view"].dock)
+                                                          self.dock)
 
-    def open_project(self, project):
-        self.set_instance(self.modules_manager["level_editor"].widget.instance)
+    def on_open_project(self, project):
+        self.set_instance(self.modules_manager["level_editor"].instance)
 
     def set_instance(self, instance):
         # TODO: REFACTOR

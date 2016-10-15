@@ -191,22 +191,12 @@ class ScriptEditorWidget(QDockWidget):
 
 
 class ScriptEditorManager(PlaygroundModule):
+    Name = 'script_editor'
+
     def __init__(self, module_manager):
         self.project_manager = None
         self.editors = {}
         self.init_module(module_manager)
-
-        self.modules_manager.new_common(self, 'script_editor')
-
-    def open_project(self, project):
-        self.project_manager = project
-
-    def open_asset(self, path, name, ext):
-        if ScriptEditorWidget.support_ext(ext):
-            self.open(self.modules_manager.main_window, path)
-            return True
-
-        return False
 
     def open(self, root, filename):
         if filename in self.editors:
@@ -225,6 +215,13 @@ class ScriptEditorManager(PlaygroundModule):
 
             self.editors[filename] = editor
             editor.raise_()
+
+    def on_open_asset(self, path, name, ext):
+        if ScriptEditorWidget.support_ext(ext):
+            self.open(self.modules_manager.main_window, path)
+            return True
+
+        return False
 
     def _editor_destroyed(self, obj):
         del self.editors[obj.property("filename")]
