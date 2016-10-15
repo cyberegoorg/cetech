@@ -119,7 +119,6 @@ static int _transpose(lua_State *l) {
 
 static int _perspective_fov(lua_State *l) {
     mat44f_t m = {0};
-    mat44f_t *a = luasys_to_mat44f(l, 1);
 
     f32 fov = luasys_to_f32(l, 1);
     f32 ar = luasys_to_f32(l, 2);
