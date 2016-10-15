@@ -31,6 +31,7 @@ pages:
 
     - Math:
       - cetech.Vec2f: 'lua_api/Vec2f.md'
+      - cetech.Vec3f: 'lua_api/Vec3f.md'
 
     - Input:
       - cetech.Keyboard: 'lua_api/Keyboard.md'
