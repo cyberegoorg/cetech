@@ -25,6 +25,7 @@ pages:
     - Core:
       - cetech.Log: 'lua_api/Log.md'
       - cetech.Application: 'lua_api/Application.md'
+      - cetech.Renderer: 'lua_api/Renderer.md'
       - cetech.Package: 'lua_api/Package.md'
       - cetech.World: 'lua_api/World.md'
       - cetech.Unit: 'lua_api/Unit.md'
