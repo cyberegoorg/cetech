@@ -34,6 +34,7 @@ pages:
       - cetech.Vec2f: 'lua_api/Vec2f.md'
       - cetech.Vec3f: 'lua_api/Vec3f.md'
       - cetech.Vec4f: 'lua_api/Vec4f.md'
+      - cetech.Mat44f: 'lua_api/Mat44f.md'
       - cetech.Quatf: 'lua_api/Quatf.md'
 
     - Input:
