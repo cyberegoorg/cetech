@@ -12,7 +12,7 @@ Matrix 4x4
 ```
 
 # Methods
-* Basic
+* Constructor
     * [make( x, y, z, w ) : Mat44f](#make-x-y-z-w-mat44f)
     * [perspective_fov( fov, aspect_ratio, near, far ) : Mat44f](#perspective_fov-fov-aspect_ratio-near-far-mat44f)
     * [identity() : Mat44f](#identity-mat44f)
@@ -23,7 +23,8 @@ Matrix 4x4
     * [rotate_z( z ) : Mat44f](#rotate_z-z-mat44f)
     * [rotate_xy( x, y ) : Mat44f](#rotate_xy-x-y-mat44f)
     * [rotate_xyz( x, y, z ) : Mat44f](#rotate_xyz-x-y-z-mat44f)
-    * [rotate_zyx( z, y, x ) : Mat44f](#rotate_zyx-z-y-x-mat44f)
+    * [rotate_zyx( z, y, x ) : Mat44f](#rotate_zyx-z-y-x-mat44f)    
+* Basic
     * [transpose( m ) : Mat44f](#transpose-m-mat44f)
 
 # Operators

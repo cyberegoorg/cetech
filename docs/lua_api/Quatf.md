@@ -12,9 +12,10 @@ Quaternion
 ```
 
 # Methods
-* Basic
+* Constructor
     * [from_axis_angle( axis, angle ) : Quatf](#from_axis_angle-axis-angle-quatf)
     * [from_euler( heading, attitude, bank ) : Quatf](#from_euler-heading-attitude-bank-quatf)
+* Basic
     * [to_mat44f( q ) : Mat44f](#to_mat44f-q-mat44f)
     * [to_euler_angle( q ) : Vec3f](#to_euler_angle-q-vec3f)
     * [length( q ) : number](#length-q-number)

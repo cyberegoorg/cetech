@@ -12,11 +12,12 @@
 ```
 
 # Methods
-* Basic
+* Constructor
     * [make( x, y, z ) : Vec4f](#make-x-y-zVec4f)
     * [unit_x() : Vec4f](#unit_x-Vec4f)
     * [unit_y() : Vec4f](#unit_y-Vec4f)
     * [unit_z() : Vec4f](#unit_z-Vec4f)
+* Basic
     * [length(v) : number](#length-v-number)
     * [length_squared( v ) : number](#length_squared-v-number)
     * [normalized( v ) : Vec4f](#normalized-v-Vec4f)

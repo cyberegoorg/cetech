@@ -12,10 +12,11 @@
 ```
 
 # Methods
-* Basic
+* Constructor
     * [make( x, y ) : Vec2f](#make-x-y-vec2f)
     * [unit_x() : Vec2f](#unit_x-vec2f)
     * [unit_y() : Vec2f](#unit_y-vec2f)
+* Basic
     * [length(v) : number](#length-v-number)
     * [length_squared( v ) : number](#length_squared-v-number)
     * [normalized( v ) : Vec2f](#normalized-v-Vec2f)
