@@ -56,6 +56,7 @@ class EngineInstance(object):
         self.rpc_url = "ws://localhost:%s" % 4444
         self.log_url = "ws://localhost:%s" % 4445
         self.push_url = "ws://*:%s" % 4446
+        self.pub_url = "ws://*:%s" % 4447
         self.ready = False
         self._console_api = None
 
@@ -77,7 +78,7 @@ class EngineInstance(object):
         return self._run(self.BUILD_RELEASE, args, lock=False)
 
     def run_develop(self, build_dir, source_dir, compile_=False, continue_=False, wait=False, daemon=False,
-                    wid=None, core_dir=None, port=None, bootscript=None, protocol='ws', check=False, lock=True):
+                    wid=None, core_dir=None, port=None, bootscript=None, bootpkg=None, protocol='ws', check=False, lock=True):
         args = [
             "-s .build %s" % build_dir,
             "-s .src %s" % source_dir
@@ -94,7 +95,10 @@ class EngineInstance(object):
             args.append("-s .wait 1")
 
         if bootscript:
-            args.append("-s core.boot_scrpt %s" % bootscript)
+            args.append("-s core.boot_script %s" % bootscript)
+
+        if bootpkg:
+            args.append("-s core.boot_pkg %s" % bootpkg)
 
         if daemon:
             args.append("-s .daemon 1")
@@ -103,12 +107,16 @@ class EngineInstance(object):
             self.rpc_url = "%s://localhost:%s" % (protocol, port)
             self.log_url = "%s://localhost:%s" % (protocol, port + 1)
             self.push_url = "%s://*:%s" % (protocol, port + 2)
+            self.pub_url = "%s://*:%s" % (protocol, port + 3)
 
             args.append("-s develop.rpc.port %s" % port)
             args.append("-s develop.rpc.addr %s://*" % (protocol))
 
             args.append("-s develop.log.port %s" % (port + 1))
             args.append("-s develop.log.addr %s://*" % (protocol))
+
+            args.append("-s develop.pub.port %s" % (port + 3))
+            args.append("-s develop.pub.addr %s://*" % (protocol))
 
         # TODO bug #114 workaround. Disable create sub engine...
         if wid and platform.system().lower() != 'darwin':

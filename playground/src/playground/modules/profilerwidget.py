@@ -8,6 +8,8 @@ from playground.ui.profilerwidget import Ui_ProfilerWidget
 
 
 class ProfilerWidget(QFrame, Ui_ProfilerWidget, PlaygroundModule):
+    Name = "profiler"
+
     def __init__(self, module_manager):
         super(ProfilerWidget, self).__init__()
         self.setupUi(self)
@@ -18,5 +20,5 @@ class ProfilerWidget(QFrame, Ui_ProfilerWidget, PlaygroundModule):
 
         self.profile_webview.page().mainFrame().setUrl(QUrl("file:///%s/html/profiler.html" % QDir.currentPath()))
 
-        self.modules_manager.new_docked(self, "profiler", "Profiler",
-                                        Qt.RightDockWidgetArea, hiden=True)
+        self.dock = self.modules_manager.new_docked(self, self.Name, "Profiler",
+                                                    Qt.RightDockWidgetArea, hiden=True)

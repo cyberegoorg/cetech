@@ -76,8 +76,6 @@ static void preprocess(const char *filename,
         const char *source_dir = resource_compiler_get_source_dir();
         os_path_join(full_path, CE_ARRAY_LEN(full_path), source_dir, prefab_file);
 
-        log_debug("unit_resource", "Loading prefab from: %s", full_path);
-
         struct vio *prefab_vio = vio_from_file(full_path, VIO_OPEN_READ, memsys_main_allocator());
 
         char prefab_data[vio_size(prefab_vio) + 1];
@@ -151,8 +149,6 @@ void foreach_components_clb(yaml_node_t key,
 
     yaml_node_t component_type_node = yaml_get_node(value, "component_type");
     yaml_as_string(component_type_node, component_type_str, CE_ARRAY_LEN(component_type_str));
-
-    log_debug("resouce_compier", "compile component type: %s", component_type_str);
 
     cid = stringid64_from_string(component_type_str);
 

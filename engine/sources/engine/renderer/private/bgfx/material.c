@@ -105,8 +105,6 @@ static void preprocess(const char *filename,
         const char *source_dir = resource_compiler_get_source_dir();
         os_path_join(full_path, CE_ARRAY_LEN(full_path), source_dir, prefab_file);
 
-        log_debug("material", "Loading parent from: %s", full_path);
-
         struct vio *prefab_vio = vio_from_file(full_path, VIO_OPEN_READ, memsys_main_allocator());
 
         char prefab_data[vio_size(prefab_vio) + 1];

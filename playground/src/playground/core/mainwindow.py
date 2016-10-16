@@ -5,6 +5,7 @@ from playground.core.modules import ModuleManager
 from playground.core.projectmanager import ProjectManager
 from playground.modules.assetbrowser import AssetBrowser
 from playground.modules.assetviewwidget import AssetViewWidget
+from playground.modules.compiler import CompilerModule
 from playground.modules.levelwidget import LevelWidget
 from playground.modules.logwidget import LogWidget
 from playground.modules.profilerwidget import ProfilerWidget
@@ -25,6 +26,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.setTabPosition(Qt.AllDockWidgetAreas, QTabWidget.North)
 
         self.modules_manager.init_modules([
+            CompilerModule,
             LevelWidget,
             AssetViewWidget,
             AssetBrowser,
@@ -47,8 +49,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.watch_project_dir()
 
     def reload_all(self):
-        api = self.modules_manager['level_editor'].widget.instance.console_api
-        api.compile_all()
+        self.modules_manager['compiler'].compile_all()
 
         for k, v in self.project.instances.items():
             v.console_api.reload_all()
@@ -87,8 +88,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.build_file_watch.addPaths(files)
 
     def file_changed(self, path):
-        api = self.modules_manager['level_editor'].widget.instance.console_api
-        api.compile_all()
+        self.modules_manager['compiler'].compile_all()
 
     def dir_changed(self, path):
         self.watch_project_dir()

@@ -166,6 +166,7 @@ set(SOURCE_FILES
         engine/sources/engine/luasys/private/api/api_scenegraph.c
 
         engine/sources/engine/develop/private/console_server.c
+        engine/sources/engine/develop/private/develop_system.c
         engine/sources/engine/core/private/memory.c
 
         engine/sources/engine/core/tests/test_filesystem.cc

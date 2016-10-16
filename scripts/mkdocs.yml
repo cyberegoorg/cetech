@@ -29,14 +29,26 @@ pages:
       - cetech.World: 'lua_api/World.md'
       - cetech.Unit: 'lua_api/Unit.md'
 
+    - Renderer:
+      - cetech.Renderer: 'lua_api/Renderer.md'
+      - cetech.Material: 'lua_api/Material.md'
+
+    - Math:
+      - cetech.Vec2f: 'lua_api/Vec2f.md'
+      - cetech.Vec3f: 'lua_api/Vec3f.md'
+      - cetech.Vec4f: 'lua_api/Vec4f.md'
+      - cetech.Quatf: 'lua_api/Quatf.md'
+      - cetech.Mat44f: 'lua_api/Mat44f.md'
+
     - Input:
       - cetech.Keyboard: 'lua_api/Keyboard.md'
       - cetech.Mouse: 'lua_api/Mouse.md'
       - cetech.Gamepad: 'lua_api/Gamepad.md'
 
     - Components:
-      - cetech.Transform: 'lua_api/Transform.md'
       - cetech.Camera: 'lua_api/Camera.md'
+      - cetech.Transform: 'lua_api/Transform.md'
+      - cetech.Mesh: 'lua_api/Mesh.md'
 
 markdown_extensions:
     - admonition

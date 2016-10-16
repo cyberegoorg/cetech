@@ -87,6 +87,7 @@ void _register_lua_vec4f_api() {
     luasys_add_module_function(API_NAME, "unit_x", _unit_x);
     luasys_add_module_function(API_NAME, "unit_y", _unit_y);
     luasys_add_module_function(API_NAME, "unit_z", _unit_z);
+    luasys_add_module_function(API_NAME, "unit_w", _unit_w);
 
     luasys_add_module_function(API_NAME, "length", _length);
     luasys_add_module_function(API_NAME, "length_squared", _length_squared);

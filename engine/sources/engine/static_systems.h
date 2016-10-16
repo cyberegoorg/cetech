@@ -21,7 +21,9 @@ SYSTEM(filesystem)
 
 SYSTEM(resource_compiler)
 
-SYSTEM(consolesrv) //TODO: on develop
+SYSTEM(consolesrv)
+
+SYSTEM(developsys)
 
 //==============================================================================
 

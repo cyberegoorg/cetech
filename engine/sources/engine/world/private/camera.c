@@ -194,8 +194,6 @@ camera_t camera_create(world_t world,
 
     world_data_t *data = _get_world_data(world);
 
-    log_debug("camera", "create camera %f %f %f", near, far, fov);
-
     u32 idx = (u32) ARRAY_SIZE(&data->near);
 
     MAP_SET(u32, &data->ent_idx_map, entity.h.h, idx);

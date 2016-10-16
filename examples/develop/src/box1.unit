@@ -4,7 +4,7 @@ components:
     position: [0, 0, 5]
     rotation: [0, 0, 0]
     scale: [1, 1, 1]
-  
+
   "412321322234":
     component_type: "mesh_renderer"
     scene: "content/scene/solider/ArmyPilot"

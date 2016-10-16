@@ -205,8 +205,6 @@ mesh_t mesh_create(world_t world,
 
     world_data_t *data = _get_world_data(world);
 
-    log_debug("mesh_renderer", "create mesh renderer");
-
     scene_create_graph(world, entity, scene);
 
     material_t material_instance = material_resource_create(material);

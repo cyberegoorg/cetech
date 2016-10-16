@@ -125,8 +125,6 @@ end
 
 function init()
     AssetView:init()
-    AssetView:show_asset("level1", "level")
-    AssetView:show_asset("cube", "scene")
 end
 
 function update(dt)

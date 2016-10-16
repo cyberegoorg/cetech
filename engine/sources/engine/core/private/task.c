@@ -9,6 +9,7 @@
 #include <celib/os/thread.h>
 #include <engine/core/memory.h>
 #include <celib/os/cpu.h>
+#include <engine/develop/develop_system.h>
 #include "engine/core/types.h"
 
 #include "task_queue.h"
@@ -300,7 +301,11 @@ void taskmanager_do_work() {
         return;
     }
 
+    time_t start_time = developsys_enter_scope(_G._taskPool[t.id].name);
+
     _G._taskPool[t.id].task_work(_G._taskPool[t.id].data);
+
+    developsys_leave_scope(_G._taskPool[t.id].name, start_time);
 
     _mark_task_job_done(t);
 }
@@ -313,4 +318,8 @@ void taskmanager_wait(task_t task) {
 
 char taskmanager_worker_id() {
     return _worker_id;
+}
+
+int taskmanager_worker_count() {
+    return _G._workers_count;
 }
