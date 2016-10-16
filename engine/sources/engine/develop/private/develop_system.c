@@ -3,22 +3,22 @@
 //==============================================================================
 
 #include <stdio.h>
-#include <engine/core/memory.h>
-#include <celib/os/thread_types.h>
-#include <celib/os/thread.h>
-#include <engine/core/task.h>
-#include <engine/develop/develop_system.h>
-#include <SDL2/SDL_timer.h>
 
-
+#include "include/SDL2/SDL_timer.h"
+#include "include/mpack/mpack.h"
 #include "include/nanomsg/nn.h"
 #include "include/nanomsg/pubsub.h"
 
+#include "celib/os/thread_types.h"
+#include "celib/os/thread.h"
 #include "celib/errors/errors.h"
 #include "celib/containers/eventstream.h"
 
 #include "engine/core/types.h"
 #include "engine/core/cvar.h"
+#include "engine/core/task.h"
+#include "engine/core/memory.h"
+#include "engine/develop/develop_system.h"
 
 //==============================================================================
 // Defines
@@ -32,9 +32,15 @@
 
 #define _G DevelopSystemGlobals
 
+typedef void (*to_mpack_fce_t)(const struct event_header *event,
+                               mpack_writer_t *writer);
+
+ARRAY_PROTOTYPE(to_mpack_fce_t);
+MAP_PROTOTYPE(to_mpack_fce_t);
+
 static struct G {
     struct eventstream eventstream;
-
+    MAP_T(to_mpack_fce_t) to_mpack;
     cvar_t cv_pub_port;
     cvar_t cv_pub_addr;
     int pub_socket;
@@ -92,6 +98,107 @@ void _developsys_push(struct event_header *header,
     _stream_buffer_size += size;
 }
 
+void _register_to_mpack(u64 type,
+                        to_mpack_fce_t fce) {
+    MAP_SET(to_mpack_fce_t, &_G.to_mpack, type, fce);
+}
+
+static void _scopeevent_to_mpack(const struct event_header *event,
+                                 mpack_writer_t *writer) {
+    const struct scope_event *e = (const struct scope_event *) event;
+
+    mpack_start_map(writer, 6);
+
+    mpack_write_cstr(writer, "etype");
+    mpack_write_cstr(writer, "EVENT_SCOPE");
+
+    mpack_write_cstr(writer, "name");
+    mpack_write_cstr(writer, e->name);
+
+    mpack_write_cstr(writer, "start");
+    mpack_write_i64(writer, e->start);
+
+    mpack_write_cstr(writer, "end");
+    mpack_write_i64(writer, e->end);
+
+    mpack_write_cstr(writer, "worker_id");
+    mpack_write_i32(writer, e->worker_id);
+
+    mpack_write_cstr(writer, "depth");
+    mpack_write_i32(writer, e->depth);
+
+    mpack_finish_map(writer);
+}
+
+static void _recordfloat_to_mpack(const struct event_header *event,
+                                  mpack_writer_t *writer) {
+    const struct record_float_event *e = (const struct record_float_event *) event;
+
+    mpack_start_map(writer, 3);
+
+    mpack_write_cstr(writer, "etype");
+    mpack_write_cstr(writer, "EVENT_RECORD_FLOAT");
+
+    mpack_write_cstr(writer, "name");
+    mpack_write_cstr(writer, e->name);
+
+    mpack_write_cstr(writer, "value");
+    mpack_write_float(writer, e->value);
+
+    mpack_finish_map(writer);
+}
+
+static void _recordint_to_mpack(const struct event_header *event,
+                                mpack_writer_t *writer) {
+    const struct record_int_event *e = (const struct record_int_event *) event;
+
+    mpack_start_map(writer, 3);
+
+    mpack_write_cstr(writer, "etype");
+    mpack_write_cstr(writer, "EVENT_RECORD_INT");
+
+    mpack_write_cstr(writer, "name");
+    mpack_write_cstr(writer, e->name);
+
+    mpack_write_cstr(writer, "value");
+    mpack_write_float(writer, e->value);
+
+    mpack_finish_map(writer);
+}
+
+void _send_events() {
+    uint32_t event_num = 0;
+
+    struct event_header *event = eventstream_begin(&_G.eventstream);
+    while (event != eventstream_end(&_G.eventstream)) {
+        ++event_num;
+        event = eventstream_next(event);
+    }
+
+    char *data;
+    size_t size;
+    mpack_writer_t writer;
+    mpack_writer_init_growable(&writer, &data, &size);
+
+    mpack_start_array(&writer, event_num);
+
+    event = eventstream_begin(&_G.eventstream);
+    while (event != eventstream_end(&_G.eventstream)) {
+        to_mpack_fce_t to_mpack_fce = MAP_GET(to_mpack_fce_t, &_G.to_mpack, event->type, NULL);
+
+        if (to_mpack_fce != NULL) {
+            to_mpack_fce(event, &writer);
+        }
+
+        event = eventstream_next(event);
+    }
+
+    mpack_finish_array(&writer);
+    CE_ASSERT("develop_manager", mpack_writer_destroy(&writer) == mpack_ok);
+    int bytes = nn_send(_G.pub_socket, data, size, 0);
+    CE_ASSERT("develop", bytes == size);
+}
+
 //==============================================================================
 // Interface
 //==============================================================================
@@ -106,7 +213,12 @@ int developsys_init(int stage) {
         return 1;
     }
 
+    MAP_INIT(to_mpack_fce_t, &_G.to_mpack, memsys_main_allocator());
     eventstream_create(&_G.eventstream, memsys_main_allocator());
+
+    _register_to_mpack(EVENT_SCOPE, _scopeevent_to_mpack);
+    _register_to_mpack(EVENT_RECORD_FLOAT, _recordfloat_to_mpack);
+    _register_to_mpack(EVENT_RECORD_INT, _recordint_to_mpack);
 
     char addr[128] = {0};
 
@@ -134,12 +246,16 @@ int developsys_init(int stage) {
 void developsys_shutdown() {
     log_debug(LOG_WHERE, "Shutdown");
 
+    MAP_DESTROY(to_mpack_fce_t, &_G.to_mpack);
+
     eventstream_destroy(&_G.eventstream);
     nn_close(_G.pub_socket);
 }
 
 void developsys_update() {
     _flush_all_streams();
+    _send_events();
+    eventstream_clear(&_G.eventstream);
 }
 
 void developsys_push_record_float(const char *name,
@@ -166,7 +282,7 @@ time_t developsys_enter_scope(const char *name) {
 }
 
 void developsys_leave_scope(const char *name,
-                            time_t start_time){
+                            time_t start_time) {
     --_scope_depth;
 
     struct scope_event ev = {
