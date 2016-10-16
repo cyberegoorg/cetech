@@ -17,16 +17,19 @@ enum {
 };
 
 struct record_float_event {
+    struct event_header header;
     char name[64];
     float value;
 };
 
 struct record_int_event {
+    struct event_header header;
     char name[64];
     i32 value;
 };
 
 struct scope_event {
+    struct event_header header;
     char name[64];
     time_t start;
     time_t end;

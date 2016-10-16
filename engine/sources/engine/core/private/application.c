@@ -398,6 +398,9 @@ void application_start() {
             window_update(_G.main_window);
         }
 
+        developsys_push_record_float("engine.delta_time", dt);
+        developsys_push_record_float("engine.frame_rate", 1.0f/dt);
+
         developsys_update();
     }
 

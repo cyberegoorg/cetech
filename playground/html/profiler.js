@@ -10,14 +10,14 @@ var options = {
     showMajorLabels: false,
 
     order: function (a, b) {
-        if(a.depth > b.depth)
+        if (a.depth > b.depth)
             return -1;
-        if(a.depth < b.depth)
+        if (a.depth < b.depth)
             return 1;
 
-        if(a.start < b.start)
+        if (a.start < b.start)
             return -1;
-        if(a.start > b.start)
+        if (a.start > b.start)
             return 1;
 
         return 0;
@@ -26,52 +26,30 @@ var options = {
 
 // TODO: dynamic or static? (N=64)
 var groups = [
-  {
-    id: 0,
-    content: 'Worker 0'
-  },
-  {
-    id: 1,
-    content: 'Worker 1'
-  },
-  {
-    id: 2,
-    content: 'Worker 2'
-  }
+    {
+        id: 0,
+        content: 'Worker 0'
+    },
+    {
+        id: 1,
+        content: 'Worker 1'
+    },
+    {
+        id: 2,
+        content: 'Worker 2'
+    },
+    {
+        id: 3,
+        content: 'Worker 3'
+    }
 ];
 
 var timeline = new vis.Timeline(container, items, groups, options);
 
-var data_window = [];
 var Record = false;
 sample_count = 0;
 
-function parse_data(events) {
-    events.EVENT_SCOPE.forEach(function (event) {
-        if (sample_count < 10) {
-            sample_count += 1;
-            return;
-        }
-        sample_count = 0;
-
-        var label = event.name + ": " + (event.end - event.start) + "ms, depth: " + event.depth;
-
-        //console.log(event);
-
-        var item = {
-            content: label,
-            title: label,
-            start: event.start,
-            end:  event.end,
-            group: event.workerid,
-            depth: event.depth
-        };
-
-        data_window.push(item);
-    });
-}
-
-ws = new WebSocket("ws://localhost:5558", "pub.sp.nanomsg.org");
+ws = new WebSocket("ws://localhost:4447", "pub.sp.nanomsg.org");
 ws.binaryType = "arraybuffer";
 ws.onopen = function () {
     console.log("opend");
@@ -81,28 +59,49 @@ ws.onclosed = function () {
 };
 ws.onmessage = function (evt) {
     var events = msgpack.decode(new Uint8Array(evt.data));
+    var data_window = [];
 
-    series.append(new Date().getTime(), events.EVENT_RECORD_INT['gc.total_memory'] / 100000);
+    for (var i = 0; i < events.length; ++i) {
+        var event = events[i];
 
-    if (!Record) {
-        return;
+        if (event.etype == "EVENT_RECORD_FLOAT") {
+            if (event.name == "engine.delta_time") {
+                series.append(new Date().getTime(), events[i].value);
+            }
+        } else if (event.etype == "EVENT_SCOPE") {
+            if (!Record) {
+                continue;
+            }
+
+            var label = event.name + ": " + (event.end - event.start) + "ms, depth: " + event.depth;
+
+            var item = {
+                content: label,
+                title: label,
+                start: event.start,
+                end: event.end,
+                group: event.worker_id,
+                depth: event.depth
+            };
+
+            data_window.push(item);
+        }
     }
-    parse_data(events);
+
+    if(Record) {
+        console.log(data_window.length);
+
+        items.clear();
+        items.add(data_window);
+        timeline.fit();
+
+        Record = false;
+    }
 };
 
 document.getElementById('start').onclick = function () {
     Record = true;
 };
 
-document.getElementById('stop').onclick = function () {
-    Record = false;
-
-    console.log(data_window.length);
-
-    items.clear();
-    items.add(data_window);
-    timeline.fit();
-};
-
-chart.addTimeSeries(series, {lineWidth:2,strokeStyle:'#00ff00'});
+chart.addTimeSeries(series, {lineWidth: 2, strokeStyle: '#00ff00'});
 chart.streamTo(canvas, 500);

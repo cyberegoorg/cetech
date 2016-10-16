@@ -54,6 +54,10 @@ static __thread u32 _stream_buffer_size = 0;
 static __thread u32 _scope_depth = 0;
 
 static void _flush_stream_buffer() {
+    if(_stream_buffer_size == 0) {
+        return;
+    }
+
     os_thread_spin_lock(&_G.flush_lock);
 
     array_push_u8(&_G.eventstream.stream, _stream_buffer, _stream_buffer_size);
@@ -260,7 +264,8 @@ void developsys_update() {
 
 void developsys_push_record_float(const char *name,
                                   float value) {
-    struct record_float_event ev;
+    struct record_float_event ev = {0};
+
     ev.value = value;
     memory_copy(ev.name, name, str_lenght(name));
 
@@ -269,7 +274,7 @@ void developsys_push_record_float(const char *name,
 
 void developsys_push_record_int(const char *name,
                                 int value) {
-    struct record_int_event ev;
+    struct record_int_event ev = {0};
     ev.value = value;
     memory_copy(ev.name, name, str_lenght(name));
 
@@ -286,6 +291,7 @@ void developsys_leave_scope(const char *name,
     --_scope_depth;
 
     struct scope_event ev = {
+            .name = {0},
             .worker_id = taskmanager_worker_id(),
             .start = start_time,
             .end = SDL_GetTicks(),
