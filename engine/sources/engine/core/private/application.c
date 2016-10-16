@@ -240,10 +240,20 @@ static void _game_update_task(void *d) {
     _G.game->update(*dt);
 }
 
+float frame_limit = 60.0f;
+float frame_time_accu = 0.0f;
+
 static void _game_render_task(void *d) {
     if (cvar_get_int(_G.config.cv_daemon)) {
         return;
     }
+
+    float frame_time = 1.0f/frame_limit;
+    if(frame_time_accu < frame_time) {
+        frame_time_accu += _G.dt;
+        return;
+    }
+    frame_time_accu = 0.0f;
 
     _G.game->render();
 }
@@ -296,7 +306,7 @@ void application_start() {
         intptr_t wid = cvar_get_int(_G.config.cv_wid);
 
         char title[128] = {0};
-        snprintf(title, CE_ARRAY_LEN(title), "cetech-%s", cvar_get_string(_G.config.cv_boot_script));
+        snprintf(title, CE_ARRAY_LEN(title), "cetech - %s", cvar_get_string(_G.config.cv_boot_script));
 
         if (wid == 0) {
             _G.main_window = window_new(
@@ -325,6 +335,7 @@ void application_start() {
 
     _G.is_running = 1;
     log_info("core.ready", "Run main loop");
+
 
     consolesrv_push_begin();
     while (_G.is_running) {
@@ -399,7 +410,6 @@ void application_start() {
         }
 
         developsys_push_record_float("engine.delta_time", dt);
-        developsys_push_record_float("engine.frame_rate", 1.0f/dt);
 
         developsys_update();
     }
