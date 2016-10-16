@@ -18,6 +18,7 @@
 #include <engine/luasys/luasys.h>
 #include <engine/develop/resource_compiler.h>
 #include <engine/renderer/renderer.h>
+#include <engine/develop/develop_system.h>
 
 #include "engine/core/memory.h"
 #include "engine/input/input.h"
@@ -396,6 +397,8 @@ void application_start() {
         if (!cvar_get_int(_G.config.cv_daemon)) {
             window_update(_G.main_window);
         }
+
+        developsys_update();
     }
 
     _G.game->shutdown();

@@ -42,6 +42,7 @@ namespace cetech {
 
         inline int64_t get_sec(const PerfTimer& timer) {
             return timer.time.tv_sec;
+            return timer.time.tv_sec;
         }
 
         inline int64_t get_nsec(const PerfTimer& timer) {

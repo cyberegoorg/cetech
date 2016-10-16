@@ -68,11 +68,11 @@ int machine_init(int stage) {
 void machine_shutdown() {
     eventstream_destroy(&_G.eventstream);
 
-    _G = (struct G) {0};
-
     for (int i = 0; i < _G.parts_count; ++i) {
         _G.shutdown[i]();
     }
+
+    _G = (struct G) {0};
 }
 
 void machine_process() {

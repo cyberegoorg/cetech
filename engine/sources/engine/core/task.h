@@ -20,6 +20,8 @@ int taskmanager_init(int stage);
 
 void taskmanager_shutdown();
 
+int taskmanager_worker_count();
+
 task_t taskmanager_add_begin(const char *name,
                              task_work_t work,
                              void *data,

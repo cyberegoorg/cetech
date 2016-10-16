@@ -56,6 +56,7 @@ class EngineInstance(object):
         self.rpc_url = "ws://localhost:%s" % 4444
         self.log_url = "ws://localhost:%s" % 4445
         self.push_url = "ws://*:%s" % 4446
+        self.pub_url = "ws://*:%s" % 4447
         self.ready = False
         self._console_api = None
 
@@ -106,12 +107,16 @@ class EngineInstance(object):
             self.rpc_url = "%s://localhost:%s" % (protocol, port)
             self.log_url = "%s://localhost:%s" % (protocol, port + 1)
             self.push_url = "%s://*:%s" % (protocol, port + 2)
+            self.pub_url = "%s://*:%s" % (protocol, port + 3)
 
             args.append("-s develop.rpc.port %s" % port)
             args.append("-s develop.rpc.addr %s://*" % (protocol))
 
             args.append("-s develop.log.port %s" % (port + 1))
             args.append("-s develop.log.addr %s://*" % (protocol))
+
+            args.append("-s develop.pub.port %s" % (port + 3))
+            args.append("-s develop.pub.addr %s://*" % (protocol))
 
         # TODO bug #114 workaround. Disable create sub engine...
         if wid and platform.system().lower() != 'darwin':
