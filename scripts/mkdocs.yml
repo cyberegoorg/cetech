@@ -43,8 +43,9 @@ pages:
       - cetech.Gamepad: 'lua_api/Gamepad.md'
 
     - Components:
-      - cetech.Transform: 'lua_api/Transform.md'
       - cetech.Camera: 'lua_api/Camera.md'
+      - cetech.Transform: 'lua_api/Transform.md'
+      - cetech.Mesh: 'lua_api/Mesh.md'
 
 markdown_extensions:
     - admonition
