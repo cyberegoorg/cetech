@@ -3,6 +3,7 @@
 //==============================================================================
 
 #include <stdio.h>
+#include <celib/os/time.h>
 
 #include "include/SDL2/SDL_timer.h"
 #include "include/mpack/mpack.h"
@@ -122,8 +123,8 @@ static void _scopeevent_to_mpack(const struct event_header *event,
     mpack_write_cstr(writer, "start");
     mpack_write_i64(writer, e->start);
 
-    mpack_write_cstr(writer, "end");
-    mpack_write_i64(writer, e->end);
+    mpack_write_cstr(writer, "duration");
+    mpack_write_float(writer, e->duration);
 
     mpack_write_cstr(writer, "worker_id");
     mpack_write_i32(writer, e->worker_id);
@@ -281,20 +282,24 @@ void developsys_push_record_int(const char *name,
     developsys_push(EVENT_RECORD_INT, ev);
 }
 
-time_t developsys_enter_scope(const char *name) {
+struct scope_data developsys_enter_scope(const char *name) {
     ++_scope_depth;
-    return SDL_GetTicks(); // TODO: High performance counter
+
+    return (struct scope_data){
+        .start = os_get_ticks(),
+        .start_timer = os_get_perf_counter()
+    };
 }
 
 void developsys_leave_scope(const char *name,
-                            time_t start_time) {
+                            struct scope_data scope_data) {
     --_scope_depth;
 
     struct scope_event ev = {
             .name = {0},
             .worker_id = taskmanager_worker_id(),
-            .start = start_time,
-            .end = SDL_GetTicks(),
+            .start = scope_data.start,
+            .duration = ((float)(os_get_perf_counter() - scope_data.start_timer) / os_get_perf_freq())*1000.0f,
             .depth = _scope_depth,
     };
 

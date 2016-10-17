@@ -248,8 +248,8 @@ static void _game_render_task(void *d) {
         return;
     }
 
-    float frame_time = 1.0f/frame_limit;
-    if(frame_time_accu < frame_time) {
+    float frame_time = 1.0f / frame_limit;
+    if (frame_time_accu < frame_time) {
         frame_time_accu += _G.dt;
         return;
     }
@@ -325,7 +325,7 @@ void application_start() {
 
     _boot_stage();
 
-    uint32_t last_tick = os_get_ticks();
+    u64 last_tick = os_get_perf_counter();
     _G.game = luasys_get_game_callbacks();
 
     if (!_G.game->init()) {
@@ -339,8 +339,11 @@ void application_start() {
 
     consolesrv_push_begin();
     while (_G.is_running) {
-        uint32_t now_ticks = os_get_ticks();
-        float dt = (now_ticks - last_tick) * 0.001f;
+        struct scope_data application_sd = developsys_enter_scope("Application:update()");
+
+        u64 now_ticks = os_get_perf_counter();
+        float dt = ((float)(now_ticks - last_tick)) / os_get_perf_freq();
+
         _G.dt = dt;
         last_tick = now_ticks;
 
@@ -410,6 +413,8 @@ void application_start() {
         }
 
         developsys_push_record_float("engine.delta_time", dt);
+
+        developsys_leave_scope("Application:update()", application_sd);
 
         developsys_update();
     }
