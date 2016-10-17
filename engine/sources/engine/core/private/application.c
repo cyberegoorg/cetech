@@ -219,7 +219,7 @@ static void _dump_event() {
             default:
                 break;
         }
-        event = machine_event_next(event);
+           event = machine_event_next(event);
     }
 }
 
@@ -240,7 +240,7 @@ static void _game_update_task(void *d) {
     _G.game->update(*dt);
 }
 
-float frame_limit = 60.0f;
+float frame_limit = 61.0f;
 float frame_time_accu = 0.0f;
 
 static void _game_render_task(void *d) {

@@ -112,7 +112,7 @@ static void _serve_command(const char *packet,
 
     int bytes = nn_send(_G.rpc_socket, data, size, 0);
     CE_ASSERT(LOG_WHERE, (size_t) bytes == size);
-
+    free(data);
 }
 
 //==============================================================================

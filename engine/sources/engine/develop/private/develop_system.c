@@ -55,7 +55,7 @@ static __thread u32 _stream_buffer_size = 0;
 static __thread u32 _scope_depth = 0;
 
 static void _flush_stream_buffer() {
-    if(_stream_buffer_size == 0) {
+    if (_stream_buffer_size == 0) {
         return;
     }
 
@@ -73,17 +73,17 @@ static void _flush_all_job(void *data) {
 
 static void _flush_all_streams() {
     const int wc = taskmanager_worker_count() + 1;
-    task_t tasks[wc + 1];
+    task_t tasks[wc];
 
-    tasks[0] = taskmanager_add_null("flush_all", task_null, task_null, TASK_PRIORITY_HIGH, TASK_AFFINITY_MAIN);
+    tasks[0] = taskmanager_add_null("flush_worker", task_null, task_null, TASK_PRIORITY_HIGH, TASK_AFFINITY_MAIN);
 
-    for (int i = 0; i < wc; ++i) {
-        tasks[i + 1] = taskmanager_add_begin("flush_worker", _flush_all_job, NULL, 0, task_null, tasks[0],
-                                             TASK_PRIORITY_HIGH, TASK_AFFINITY_MAIN + i);
+    for (int i = 1; i < wc; ++i) {
+        tasks[i] = taskmanager_add_begin("flush_worker", _flush_all_job, NULL, 0, tasks[i - 1], task_null,
+                                         TASK_PRIORITY_HIGH, TASK_AFFINITY_MAIN + i);
     }
 
-    taskmanager_add_end(tasks, wc + 1);
-    taskmanager_wait(tasks[0]);
+    taskmanager_add_end(tasks, wc);
+    taskmanager_wait(tasks[wc - 1]);
 }
 
 void _developsys_push(struct event_header *header,
@@ -202,6 +202,7 @@ void _send_events() {
     CE_ASSERT("develop_manager", mpack_writer_destroy(&writer) == mpack_ok);
     int bytes = nn_send(_G.pub_socket, data, size, 0);
     CE_ASSERT("develop", bytes == size);
+    free(data);
 }
 
 //==============================================================================
@@ -285,9 +286,9 @@ void developsys_push_record_int(const char *name,
 struct scope_data developsys_enter_scope(const char *name) {
     ++_scope_depth;
 
-    return (struct scope_data){
-        .start = os_get_ticks(),
-        .start_timer = os_get_perf_counter()
+    return (struct scope_data) {
+            .start = os_get_ticks(),
+            .start_timer = os_get_perf_counter()
     };
 }
 
@@ -299,7 +300,7 @@ void developsys_leave_scope(const char *name,
             .name = {0},
             .worker_id = taskmanager_worker_id(),
             .start = scope_data.start,
-            .duration = ((float)(os_get_perf_counter() - scope_data.start_timer) / os_get_perf_freq())*1000.0f,
+            .duration = ((float) (os_get_perf_counter() - scope_data.start_timer) / os_get_perf_freq()) * 1000.0f,
             .depth = _scope_depth,
     };
 
