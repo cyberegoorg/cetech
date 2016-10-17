@@ -301,11 +301,11 @@ void taskmanager_do_work() {
         return;
     }
 
-    time_t start_time = developsys_enter_scope(_G._taskPool[t.id].name);
+    struct scope_data sd = developsys_enter_scope(_G._taskPool[t.id].name);
 
     _G._taskPool[t.id].task_work(_G._taskPool[t.id].data);
 
-    developsys_leave_scope(_G._taskPool[t.id].name, start_time);
+    developsys_leave_scope(_G._taskPool[t.id].name, sd);
 
     _mark_task_job_done(t);
 }

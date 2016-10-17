@@ -6,7 +6,7 @@ var chart = new SmoothieChart(),
     series = new TimeSeries();
 
 var options = {
-    timeAxis: {scale: 'millisecond', step: 1},
+    timeAxis: {scale: 'millisecond', step: 0.01},
     showMajorLabels: false,
 
     order: function (a, b) {
@@ -79,13 +79,13 @@ ws.onmessage = function (evt) {
                 continue;
             }
 
-            var label = event.name + ": " + (event.end - event.start) + "ms, depth: " + event.depth;
+            var label = event.name + ": " + (event.duration) + "ms,\n depth: " + event.depth;
 
             var item = {
                 content: label,
                 title: label,
                 start: event.start,
-                end: event.end,
+                end: event.start + (event.duration*100000),
                 group: event.worker_id,
                 depth: event.depth
             };

@@ -32,7 +32,7 @@ struct scope_event {
     struct event_header header;
     char name[64];
     time_t start;
-    time_t end;
+    float duration;
     u32 depth;
     u32 worker_id;
 };
@@ -61,11 +61,15 @@ void developsys_push_record_float(const char *name,
 void developsys_push_record_int(const char *name,
                                 int value);
 
+struct scope_data {
+    time_t start;
+    u64 start_timer;
+};
 
-time_t developsys_enter_scope(const char *name);
+struct scope_data developsys_enter_scope(const char *name);
 
 void developsys_leave_scope(const char *name,
-                            time_t start_time);
+                            struct scope_data scope_data);
 
 
 #endif //CETECH_DEVELOP_SYSTEM_H
