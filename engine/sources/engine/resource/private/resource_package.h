@@ -2,7 +2,6 @@
 #define CETECH_PACKAGE_H
 
 #include <celib/types.h>
-#include <celib/stringid/types.h>
 
 struct package_resource {
     u32 type_count;

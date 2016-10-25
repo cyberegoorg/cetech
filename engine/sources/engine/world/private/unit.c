@@ -1,5 +1,5 @@
 
-#include <celib/stringid/stringid.h>
+#include <celib/string/stringid.h>
 #include <celib/memory/memory.h>
 #include <celib/os/vio.h>
 #include <engine/resource/resource.h>
@@ -7,10 +7,9 @@
 #include <engine/resource/resource.h>
 #include <celib/string/string.h>
 #include <celib/os/path.h>
-#include <engine/core/memory.h>
+#include <celib/memory/memory.h>
 #include <celib/containers/map.h>
-#include <engine/core/entcom.h>
-#include <engine/core/types.h>
+#include <engine/entcom/entcom.h>
 
 ARRAY_PROTOTYPE_N(struct array_entity_t, array_entity_t);
 MAP_PROTOTYPE_N(struct array_entity_t, array_entity_t);

@@ -1,7 +1,7 @@
 #ifndef CETECH_CAMERA_H
 #define CETECH_CAMERA_H
 
-#include "engine/core/types.h"
+#include "world.h"
 
 
 typedef struct {

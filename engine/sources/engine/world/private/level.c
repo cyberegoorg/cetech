@@ -4,15 +4,14 @@
 
 #include <engine/world/world.h>
 #include <celib/os/vio.h>
-#include <celib/stringid/types.h>
 #include <engine/resource/resource.h>
-#include <celib/stringid/stringid.h>
+#include <celib/string/stringid.h>
 #include <engine/resource/resource.h>
 #include <engine/world/unit.h>
-#include <engine/core/entcom.h>
+#include <engine/entcom/entcom.h>
 #include <engine/world/transform.h>
 #include <celib/math/quatf.h>
-#include "engine/core/memory.h"
+#include "celib/memory/memory.h"
 #include "celib/containers/map.h"
 
 //==============================================================================

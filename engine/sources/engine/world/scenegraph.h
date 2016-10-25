@@ -1,13 +1,14 @@
 #ifndef CETECH_SCENE_GAPH_H
 #define CETECH_SCENE_GAPH_H
 
-#include <celib/stringid/types.h>
-#include "engine/core/types.h"
+#import "engine/world/types.h"
+#import "engine/entcom/types.h"
+#import "celib/math/types.h"
+#import "celib/string/stringid.h"
 
 typedef struct {
     u32 idx;
 } scene_node_t;
-
 
 
 int scenegraph_init(int stage);

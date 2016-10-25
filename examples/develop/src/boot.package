@@ -13,7 +13,7 @@ texture:
   - "content/scene/solider/m4tex"
 
 package:
-  - "core"
+  - "application"
 
 unit:
   - "camera"

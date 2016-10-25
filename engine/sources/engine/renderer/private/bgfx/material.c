@@ -4,15 +4,16 @@
 
 #include <bgfx/c99/bgfx.h>
 
-#include <celib/stringid/stringid.h>
+#include <celib/string/stringid.h>
 #include <celib/os/path.h>
 #include <engine/renderer/material.h>
 #include <celib/string/string.h>
 #include <celib/math/types.h>
+#include <celib/yaml/yaml.h>
 #include "celib/containers/map.h"
 #include "celib/os/vio.h"
 
-#include "engine/core/memory.h"
+#include "celib/memory/memory.h"
 #include "engine/resource/resource.h"
 #include "engine/resource/resource.h"
 #include "texture.h"

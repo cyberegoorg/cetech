@@ -3,7 +3,7 @@
 //==============================================================================
 
 #include <include/SDL2/SDL.h>
-#include <engine/core/application.h>
+#include <engine/application/application.h>
 #include <celib/window/window.h>
 #include "engine/machine/types.h"
 

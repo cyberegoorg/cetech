@@ -2,7 +2,7 @@
 // Includes
 //==============================================================================
 
-#include <engine/core/memory.h>
+#include <celib/memory/memory.h>
 #include "celib/containers/array.h"
 #include "engine/machine/machine.h"
 #include "engine/machine/private/sdl2/sdl_parts.h"

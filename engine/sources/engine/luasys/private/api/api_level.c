@@ -1,7 +1,6 @@
 
 #include <engine/world/level.h>
-#include <engine/core/types.h>
-#include "celib/stringid/stringid.h"
+#include "celib/string/stringid.h"
 
 #include "engine/world/world.h"
 #include "engine/luasys/luasys.h"

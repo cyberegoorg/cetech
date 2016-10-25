@@ -42,7 +42,7 @@ ARGS_PARSER.add_argument(
 ARGS_PARSER.add_argument(
     "-w", "--where",
     nargs='?',
-    help='where sql expression ex.: -w "= \'core\'" ')
+    help='where sql expression ex.: -w "= \'application\'" ')
 
 ARGS_PARSER.add_argument(
     "-l", "--level",

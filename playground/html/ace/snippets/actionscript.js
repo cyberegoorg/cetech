@@ -14,7 +14,7 @@ exports.snippetText = "snippet main\n\
 			}\n\
 	\n\
 			private function resizeListener (e:Event):void {\n\
-				trace(\"The core window changed size!\");\n\
+				trace(\"The application window changed size!\");\n\
 				trace(\"New width:  \" + stage.stageWidth);\n\
 				trace(\"New height: \" + stage.stageHeight);\n\
 			}\n\

@@ -9,16 +9,16 @@
 #include <celib/os/fs.h>
 #include <celib/string/string.h>
 #include <celib/os/path.h>
-#include <celib/stringid/types.h>
-#include <celib/stringid/stringid.h>
-#include <engine/core/task.h>
+#include <celib/string/stringid.h>
+#include <celib/string/stringid.h>
+#include <celib/task/task.h>
 #include <engine/resource/resource.h>
-#include <engine/core/application.h>
+#include <engine/application/application.h>
 #include <engine/resource/resource.h>
-#include "engine/core/memory.h"
+#include "celib/memory/memory.h"
 
 #include "celib/os/vio.h"
-#include "engine/core/cvar.h"
+#include "celib/config/cvar.h"
 
 #include "builddb.h"
 
@@ -187,7 +187,7 @@ int resource_compiler_init(int stage) {
     if (stage == 0) {
         _G = (struct G) {0};
         _G.cv_source_dir = cvar_new_str(".src", "Resource source dir", "data/src");
-        _G.cv_core_dir = cvar_new_str(".core", "Resource core source dir", "core");
+        _G.cv_core_dir = cvar_new_str(".application", "Resource application source dir", "application");
         _G.cv_external_dir = cvar_new_str(".external", "External build dir", "externals/build");
 
         _G.cv_build_dir = cvar_new_str(".build", "Resource build dir", "data/build");

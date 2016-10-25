@@ -1,7 +1,7 @@
 for k, v in pairs(cetech) do _G[k] = v end
 
 require "playground/editor_input"
-require 'core/fpscamera'
+require 'application/fpscamera'
 
 ASSET_CREATOR = {
     -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --

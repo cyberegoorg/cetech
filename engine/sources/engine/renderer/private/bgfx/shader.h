@@ -2,7 +2,6 @@
 #define CETECH_BGFX_SHADER_RESOURCE_H
 
 #include <bgfx/c99/bgfx.h>
-#include <celib/stringid/types.h>
 
 int shader_resource_init();
 

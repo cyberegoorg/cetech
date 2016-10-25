@@ -3,7 +3,6 @@
 
 #include <time.h>
 #include "include/sqlite3/sqlite3.h"
-#include "celib/stringid/types.h"
 
 static int _step(sqlite3 *db,
                  sqlite3_stmt *stmt) {

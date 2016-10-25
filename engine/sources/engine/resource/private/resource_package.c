@@ -2,16 +2,15 @@
 // Includes
 //==============================================================================
 
-#include <celib/stringid/stringid.h>
-#include <engine/core/types.h>
-#include <engine/core/task.h>
+#include <celib/string/stringid.h>
+#include <celib/task/task.h>
 #include <engine/resource/resource.h>
 #include <celib/memory/memory.h>
 #include <celib/os/vio.h>
 #include <celib/yaml/yaml.h>
 #include <celib/log/log.h>
 #include <celib/containers/array.h>
-#include <engine/core/memory.h>
+#include <celib/memory/memory.h>
 
 #include "engine/resource/resource.h"
 #include "resource_package.h"

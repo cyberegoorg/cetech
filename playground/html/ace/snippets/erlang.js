@@ -67,11 +67,11 @@ snippet %s\n\
 # private function marker\n\
 snippet %p\n\
 	%% @private\n\
-# OTP core\n\
-snippet core\n\
+# OTP application\n\
+snippet application\n\
 	-module(${1:`Filename('', 'my')`}).\n\
 \n\
-	-behaviour(core).\n\
+	-behaviour(application).\n\
 \n\
 	-export([start/2, stop/1]).\n\
 \n\

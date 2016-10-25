@@ -1,13 +1,11 @@
 #include <celib/containers/array.h>
 #include <celib/yaml/yaml.h>
-#include <celib/stringid/types.h>
-#include <engine/core/entcom.h>
+#include <engine/entcom/entcom.h>
 #include <celib/containers/map.h>
-#include <engine/core/memory.h>
+#include <celib/memory/memory.h>
 #include <celib/math/quatf.h>
 #include <celib/math/mat44f.h>
-#include <celib/stringid/stringid.h>
-#include <engine/core/types.h>
+#include <celib/string/stringid.h>
 #include "engine/world/transform.h"
 
 struct transform_data {

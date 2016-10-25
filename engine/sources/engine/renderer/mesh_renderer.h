@@ -1,8 +1,7 @@
 #ifndef CETECH_MESH_RENDERER_H
 #define CETECH_MESH_RENDERER_H
 
-#include <celib/stringid/types.h>
-#include "engine/core/types.h"
+#include <celib/string/stringid.h>
 #include "engine/renderer/material.h"
 
 typedef struct {

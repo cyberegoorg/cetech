@@ -14,7 +14,7 @@
 #include "celib/errors/errors.h"
 #include "celib/string/string.h"
 
-#include "engine/core/cvar.h"
+#include "celib/config/cvar.h"
 
 //==============================================================================
 // Defines

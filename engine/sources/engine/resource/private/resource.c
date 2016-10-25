@@ -4,18 +4,17 @@
 
 #include "include/SDL2/SDL.h"
 
-#include <celib/stringid/types.h>
 #include <engine/resource/resource.h>
-#include <celib/stringid/stringid.h>
-#include <engine/core/filesystem.h>
-#include <engine/core/cvar.h>
+#include <celib/string/stringid.h>
+#include <engine/resource/filesystem.h>
+#include <celib/config/cvar.h>
 #include <celib/os/path.h>
-#include <engine/core/application.h>
+#include <engine/application/application.h>
 #include <celib/os/vio.h>
 #include <engine/resource/resource.h>
 #include <mpack/mpack.h>
 #include <engine/develop/console_server.h>
-#include "engine/core/memory.h"
+#include "celib/memory/memory.h"
 #include "celib/containers/map.h"
 
 //==============================================================================

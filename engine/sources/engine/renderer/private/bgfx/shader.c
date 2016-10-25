@@ -4,7 +4,7 @@
 
 #include <bgfx/c99/bgfx.h>
 
-#include <celib/stringid/stringid.h>
+#include <celib/string/stringid.h>
 #include "celib/containers/array.h"
 #include "celib/containers/map.h"
 #include "celib/os/process.h"
@@ -13,8 +13,8 @@
 #include "celib/os/vio.h"
 #include "celib/os/fs.h"
 
-#include "engine/core/memory.h"
-#include "engine/core/application.h"
+#include "celib/memory/memory.h"
+#include "engine/application/application.h"
 #include "engine/resource/resource.h"
 #include "engine/resource/resource.h"
 

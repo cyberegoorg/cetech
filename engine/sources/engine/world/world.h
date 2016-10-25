@@ -4,14 +4,15 @@
 //==============================================================================
 // Includes
 //==============================================================================
-
-#include "celib/stringid/types.h"
-#include "engine/core/types.h"
+#include <celib/string/stringid.h>
+#include <engine/entcom/types.h>
+#include "types.h"
 
 
 //==============================================================================
 // Interface
 //==============================================================================
+
 
 typedef void (*world_on_created_t)(world_t world);
 

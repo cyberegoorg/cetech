@@ -1,14 +1,12 @@
 #include <celib/containers/array.h>
 #include <celib/yaml/yaml.h>
-#include <celib/stringid/types.h>
 #include <celib/containers/map.h>
 #include <celib/math/mat44f.h>
-#include <celib/stringid/stringid.h>
+#include <celib/string/stringid.h>
 
-#include <engine/core/memory.h>
-#include <engine/core/entcom.h>
+#include <celib/memory/memory.h>
+#include <engine/entcom/entcom.h>
 #include <engine/renderer/renderer.h>
-#include <engine/core/types.h>
 #include <engine/world/transform.h>
 #include <celib/math/types.h>
 

@@ -1,7 +1,7 @@
 lua:
-  - core/cetech/editor
-  - core/class
-  - core/fpscamera
+  - application/cetech/editor
+  - application/class
+  - application/fpscamera
 
 material:
   - playground/cube

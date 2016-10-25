@@ -5,7 +5,7 @@
 #include <include/SDL2/SDL.h>
 #include "celib/containers/array.h"
 #include "celib/containers/eventstream.h"
-#include "engine/core/application.h"
+#include "engine/application/application.h"
 #include "sdl_parts.h"
 
 //==============================================================================

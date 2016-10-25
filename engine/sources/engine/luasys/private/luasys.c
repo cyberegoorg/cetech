@@ -3,20 +3,20 @@
 //==============================================================================
 
 #include <include/mpack/mpack.h>
-#include <celib/stringid/stringid.h>
+#include <celib/string/stringid.h>
 #include <engine/resource/resource.h>
 #include <celib/os/vio.h>
 #include <celib/memory/memory.h>
 #include <engine/resource/resource.h>
-#include <engine/core/memory.h>
-#include <engine/core/application.h>
+#include <celib/memory/memory.h>
+#include <engine/application/application.h>
 #include <celib/math/types.h>
 #include <celib/math/vec2f.h>
 #include "celib/errors/errors.h"
 
 #include "engine/luasys/luasys.h"
 #include "engine/develop/console_server.h"
-#include "engine/core/plugin.h"
+#include "engine/application/plugin.h"
 
 #include "vectors.h"
 #include "quaternion.h"

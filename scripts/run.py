@@ -46,7 +46,7 @@ if __name__ == '__main__':
     instance.run_develop(
         os.path.abspath(build_dir),
         os.path.join(ROOT_DIR, "data", "src"),
-        core_dir=os.path.join(ROOT_DIR, "core"),
+        core_dir=os.path.join(ROOT_DIR, "application"),
         port=port, protocol="tcp",
         compile_=True, continue_=True, check=True
     )

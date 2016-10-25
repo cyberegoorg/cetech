@@ -69,21 +69,19 @@ set(SOURCE_FILES
         ########################################################################
         # CELIB: Containers
         ########################################################################
-        celib/sources/celib/containers/tests/test_array.cc
-        celib/sources/celib/containers/tests/test_map.cc
 
         ########################################################################
         # CELIB: Memory
         ########################################################################
         celib/sources/celib/memory/private/allocator.c
+        celib/sources/celib/memory/private/allocator_malloc.c
+        celib/sources/celib/memory/private/allocator_scratch.c
         celib/sources/celib/memory/private/memory.c
-        celib/sources/celib/os/tests/test_memory.cc
 
 
         ########################################################################
         # CELIB: string
         ########################################################################
-        celib/sources/celib/string/tests/test_string.cc
         celib/sources/celib/string/private/string.c
 
 
@@ -94,7 +92,6 @@ set(SOURCE_FILES
         celib/sources/celib/log/private/nanomsg_handler.c
         celib/sources/celib/log/private/logdb_handler.c
         celib/sources/celib/log/private/log_system.c
-        celib/sources/celib/log/tests/test_log.cc
 
         ########################################################################
         # CELIB: File
@@ -103,28 +100,20 @@ set(SOURCE_FILES
         celib/sources/celib/os/private/sdl_vio.c
         celib/sources/celib/os/private/file.c
         celib/sources/celib/os/private/posix_stacktrace.c
-        celib/sources/celib/os/tests/test_vfile.cc
 
         ########################################################################
         # CELIB: Crypto
         ########################################################################
         celib/sources/celib/crypto/private/hash.c
-        celib/sources/celib/crypto/tests/test_murmur.cc
 
         ########################################################################
         # CELIB: Math
         ########################################################################
-        celib/sources/celib/math/tests/test_vec2f.cc
-        celib/sources/celib/math/tests/test_vec3f.cc
-        celib/sources/celib/math/tests/test_vec4f.cc
-        celib/sources/celib/math/tests/test_quatf.cc
-        celib/sources/celib/math/tests/test_mat44f.cc
 
         ########################################################################
         # CELIB: Yaml
         ########################################################################
         celib/sources/celib/yaml/private/yaml.cc
-        celib/sources/celib/yaml/tests/test_yaml.cc
 
 
         celib/sources/celib/os/private/sdl_time.c
@@ -132,15 +121,16 @@ set(SOURCE_FILES
         celib/sources/celib/os/private/path.c
         celib/sources/celib/os/private/sdl_thread.c
         celib/sources/celib/os/private/sdl_cpu.c
-        celib/sources/celib/stringid/private/stringid.c
+        celib/sources/celib/string/private/stringid.c
         celib/sources/celib/window/private/sdl_window.c
         celib/sources/celib/log/private/log_system.c
+        celib/sources/celib/config/private/cvar.c
 
         ########################################################################
         # CETECH: Plugin system
         ########################################################################
-        engine/sources/engine/core/private/plugin.c
-        engine/sources/engine/core/private/plugin.c
+        engine/sources/engine/application/private/plugin.c
+        engine/sources/engine/application/private/plugin.c
 
         engine/sources/engine/luasys/private/luasys.c
         engine/sources/engine/luasys/private/api/api_keyboard.c
@@ -167,18 +157,15 @@ set(SOURCE_FILES
 
         engine/sources/engine/develop/private/console_server.c
         engine/sources/engine/develop/private/develop_system.c
-        engine/sources/engine/core/private/memory.c
 
-        engine/sources/engine/core/tests/test_filesystem.cc
-        engine/sources/engine/core/private/filesystem.c
-        engine/sources/engine/core/private/cvar.c
-        engine/sources/engine/core/private/application.c
-        engine/sources/engine/core/private/task.c
+        engine/sources/engine/resource/private/filesystem.c
+        engine/sources/engine/application/private/application.c
+        celib/sources/celib/task/private/task.c
         engine/sources/engine/resource/private/resource.c
         engine/sources/engine/resource/private/resource_package.c
         engine/sources/engine/resource/private/resource_compiler.c
         engine/sources/engine/world/private/unit.c
-        engine/sources/engine/core/private/entcom.c
+        engine/sources/engine/entcom/private/entcom.c
         engine/sources/engine/world/private/world.c
         engine/sources/engine/world/private/level.c
 

@@ -8,10 +8,8 @@
 #include <assimp/scene.h>
 #include <assimp/postprocess.h>
 
-#include <celib/stringid/stringid.h>
+#include <celib/string/stringid.h>
 #include <celib/string/string.h>
-#include <celib/stringid/types.h>
-#include <engine/core/types.h>
 #include <engine/world/scenegraph.h>
 #include "celib/containers/array.h"
 #include "celib/containers/map.h"
@@ -21,8 +19,8 @@
 #include "celib/os/vio.h"
 #include "celib/os/fs.h"
 
-#include "engine/core/memory.h"
-#include "engine/core/application.h"
+#include "celib/memory/memory.h"
+#include "engine/application/application.h"
 #include "engine/resource/resource.h"
 #include "engine/resource/resource.h"
 

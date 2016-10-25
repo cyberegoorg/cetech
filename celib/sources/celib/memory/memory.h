@@ -31,9 +31,19 @@
 #define CE_ALLOCATE_ALIGN(a, T, size, align) (T*) allocator_allocate((a), size, align)
 #define CE_DEALLOCATE(a, p) allocator_deallocate((a), p)
 
+
 //==============================================================================
 // Memory
 //==============================================================================
+
+void memsys_init(int scratch_buffer_size);
+
+void memsys_shutdown();
+
+struct allocator *memsys_main_allocator();
+
+struct allocator *memsys_main_scratch_allocator();
+
 
 const void *pointer_align_forward(const void *p,
                                   uint32_t align);

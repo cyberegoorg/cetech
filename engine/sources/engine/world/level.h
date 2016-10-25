@@ -5,8 +5,9 @@
 // Includes
 //==============================================================================
 
-#include "celib/stringid/types.h"
-#include "engine/core/types.h"
+#include <engine/entcom/types.h>
+#include <celib/string/stringid.h>
+#include "types.h"
 
 //==============================================================================
 // Interface

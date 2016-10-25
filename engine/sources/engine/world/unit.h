@@ -1,7 +1,11 @@
 #ifndef CETECH_UNIT_SYSTEM_H
 #define CETECH_UNIT_SYSTEM_H
 
+#include <celib/containers/array.h>
+#include <engine/entcom/types.h>
+#include <celib/yaml/yaml.h>
 #include "engine/resource/resource.h"
+#include "types.h"
 
 
 int unit_init(int stage);

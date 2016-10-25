@@ -1,6 +1,6 @@
 
-#include <engine/core/types.h>
 #include <celib/math/quatf.h>
+#include "engine/entcom/types.h"
 #include "engine/luasys/luasys.h"
 
 #define API_NAME "Quatf"

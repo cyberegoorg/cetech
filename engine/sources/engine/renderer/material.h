@@ -1,8 +1,9 @@
 #ifndef CETECH_BGFX_MATERIAL_H
 #define CETECH_BGFX_MATERIAL_H
 
-#include <celib/stringid/types.h>
-#include <engine/core/types.h>
+#include <celib/string/stringid.h>
+#include <engine/world/types.h>
+#include <celib/math/types.h>
 
 int material_resource_init();
 

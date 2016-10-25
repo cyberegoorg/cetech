@@ -2,10 +2,9 @@
 // includes
 //==============================================================================
 
-#include <celib/stringid/types.h>
 #include <celib/math/types.h>
 #include <engine/world/camera.h>
-#include <celib/stringid/stringid.h>
+#include <celib/string/stringid.h>
 #include <engine/renderer/mesh_renderer.h>
 #include <engine/develop/console_server.h>
 #include <mpack/mpack.h>

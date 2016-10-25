@@ -4,6 +4,7 @@
 
 #include <stdio.h>
 #include <celib/os/time.h>
+#include <celib/containers/map.h>
 
 #include "include/SDL2/SDL_timer.h"
 #include "include/mpack/mpack.h"
@@ -15,10 +16,9 @@
 #include "celib/errors/errors.h"
 #include "celib/containers/eventstream.h"
 
-#include "engine/core/types.h"
-#include "engine/core/cvar.h"
-#include "engine/core/task.h"
-#include "engine/core/memory.h"
+#include "celib/config/cvar.h"
+#include "celib/task/task.h"
+#include "celib/memory/memory.h"
 #include "engine/develop/develop_system.h"
 
 //==============================================================================

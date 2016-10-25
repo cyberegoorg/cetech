@@ -1,11 +1,10 @@
 #include <celib/containers/array.h>
 #include <celib/yaml/yaml.h>
-#include <celib/stringid/types.h>
 #include <celib/math/quatf.h>
 #include <celib/math/mat44f.h>
 
-#include <engine/core/entcom.h>
-#include <engine/core/memory.h>
+#include <engine/entcom/entcom.h>
+#include <celib/memory/memory.h>
 #include <engine/world/world.h>
 #include <engine/world/scenegraph.h>
 

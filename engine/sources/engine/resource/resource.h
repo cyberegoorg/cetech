@@ -5,7 +5,7 @@
 // Includes
 //==============================================================================
 
-#include "celib/stringid/types.h"
+#include <celib/string/stringid.h>
 #include "celib/memory/types.h"
 #include "celib/os/vio_types.h"
 

@@ -1,12 +1,9 @@
 #ifndef CETECH_TRANSFORM_H
 #define CETECH_TRANSFORM_H
 
-#include "engine/core/types.h"
-
-
-typedef struct {
-    u32 idx;
-} transform_t;
+#include "types.h"
+#include "celib/math/types.h"
+#include "engine/entcom/types.h"
 
 int transform_init(int stage);
 

@@ -1,5 +1,4 @@
 
-#include <engine/core/types.h>
 #include <engine/world/transform.h>
 #include <celib/math/vec3f.h>
 #include "engine/luasys/luasys.h"
