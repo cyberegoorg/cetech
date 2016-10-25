@@ -4,10 +4,10 @@
 
 #include <include/mpack/mpack.h>
 #include <celib/stringid/stringid.h>
-#include <engine/develop/resource_compiler.h>
+#include <engine/resource/resource.h>
 #include <celib/os/vio.h>
 #include <celib/memory/memory.h>
-#include <engine/core/resource.h>
+#include <engine/resource/resource.h>
 #include <engine/core/memory.h>
 #include <engine/core/application.h>
 #include <celib/math/types.h>
@@ -211,7 +211,6 @@ static void _register_all_api() {
     REGISTER_LUA_API(mouse);
     REGISTER_LUA_API(gamepad);
     REGISTER_LUA_API(application);
-    REGISTER_LUA_API(resource_compilator);
     REGISTER_LUA_API(resource_manager);
     REGISTER_LUA_API(renderer);
     REGISTER_LUA_API(world);

@@ -1,4 +1,4 @@
-#include "engine/develop/resource_compiler.h"
+#include "engine/resource/resource.h"
 #include "engine/luasys/luasys.h"
 
 #define API_NAME "ResourceCompilator"

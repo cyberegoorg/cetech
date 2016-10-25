@@ -174,8 +174,9 @@ set(SOURCE_FILES
         engine/sources/engine/core/private/cvar.c
         engine/sources/engine/core/private/application.c
         engine/sources/engine/core/private/task.c
-        engine/sources/engine/core/private/resource.c
-        engine/sources/engine/core/private/resource_package.c
+        engine/sources/engine/resource/private/resource.c
+        engine/sources/engine/resource/private/resource_package.c
+        engine/sources/engine/resource/private/resource_compiler.c
         engine/sources/engine/world/private/unit.c
         engine/sources/engine/core/private/entcom.c
         engine/sources/engine/world/private/world.c
@@ -191,7 +192,6 @@ set(SOURCE_FILES
         engine/sources/engine/input/private/mouse.c
         engine/sources/engine/input/private/gamepad.c
 
-        engine/sources/engine/develop/private/resource_compiler.c
 
         engine/sources/engine/renderer/private/bgfx/renderer.c
         engine/sources/engine/renderer/private/bgfx/texture.c

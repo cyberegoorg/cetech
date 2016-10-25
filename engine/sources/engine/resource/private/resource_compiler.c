@@ -12,9 +12,9 @@
 #include <celib/stringid/types.h>
 #include <celib/stringid/stringid.h>
 #include <engine/core/task.h>
-#include <engine/develop/resource_compiler.h>
+#include <engine/resource/resource.h>
 #include <engine/core/application.h>
-#include <engine/core/resource.h>
+#include <engine/resource/resource.h>
 #include "engine/core/memory.h"
 
 #include "celib/os/vio.h"

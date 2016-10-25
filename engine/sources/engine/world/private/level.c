@@ -5,9 +5,9 @@
 #include <engine/world/world.h>
 #include <celib/os/vio.h>
 #include <celib/stringid/types.h>
-#include <engine/core/resource.h>
+#include <engine/resource/resource.h>
 #include <celib/stringid/stringid.h>
-#include <engine/develop/resource_compiler.h>
+#include <engine/resource/resource.h>
 #include <engine/world/unit.h>
 #include <engine/core/entcom.h>
 #include <engine/world/transform.h>
