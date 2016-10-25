@@ -8,7 +8,6 @@
 #include <stdlib.h>
 #include "celib/task/types.h"
 
-
 #define CE_ASSERT_IS_WORKER(where, worker_id)\
     CE_ASSERT_MSG(where, taskmanager_worker_id() == worker_id, "Current worker: %d", taskmanager_worker_id())
 
@@ -28,13 +27,11 @@ task_t taskmanager_add_begin(const char *name,
                              char data_len,
                              task_t depend,
                              task_t parent,
-                             enum task_priority priority,
                              enum task_affinity affinity);
 
 task_t taskmanager_add_null(const char *name,
                             task_t depend,
                             task_t parent,
-                            enum task_priority priority,
                             enum task_affinity affinity);
 
 void taskmanager_add_end(const task_t *tasks,

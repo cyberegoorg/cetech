@@ -98,8 +98,8 @@ int application_init(int argc,
     memsys_init(4 * 1024 * 1024);
     cvar_init();
 
-    _G.config.cv_boot_pkg = cvar_new_str("application.boot_pkg", "Boot package", "boot");
-    _G.config.cv_boot_script = cvar_new_str("application.boot_script", "Boot script", "lua/boot");
+    _G.config.cv_boot_pkg = cvar_new_str("core.boot_pkg", "Boot package", "boot");
+    _G.config.cv_boot_script = cvar_new_str("core.boot_script", "Boot script", "lua/boot");
 
     _G.config.cv_screen_x = cvar_new_int("screen.x", "Screen width", 1024);
     _G.config.cv_screen_y = cvar_new_int("screen.y", "Screen height", 768);
@@ -264,7 +264,7 @@ static void _boot_stage() {
 
     // TODO: remove, this must be done by boot_package and load in boot_script
     if (!cvar_get_int(_G.config.cv_daemon)) {
-        stringid64_t core_pkg = stringid64_from_string("application");
+        stringid64_t core_pkg = stringid64_from_string("core");
         resource_load_now(pkg, &core_pkg, 1);
         package_load(core_pkg);
         package_flush(core_pkg);
@@ -334,7 +334,7 @@ void application_start() {
     };
 
     _G.is_running = 1;
-    log_info("application.ready", "Run main loop");
+    log_info("core.ready", "Run main loop");
 
 
     consolesrv_push_begin();
@@ -350,7 +350,7 @@ void application_start() {
         machine_process();
         _dump_event();
 
-        task_t frame_task = taskmanager_add_null("frame", task_null, task_null, TASK_PRIORITY_HIGH, TASK_AFFINITY_NONE);
+        task_t frame_task = taskmanager_add_null("frame", task_null, task_null, TASK_AFFINITY_NONE);
 
         task_t consolesrv_task = taskmanager_add_begin(
                 "consolesrv",
@@ -359,7 +359,6 @@ void application_start() {
                 0,
                 task_null,
                 frame_task,
-                TASK_PRIORITY_HIGH,
                 TASK_AFFINITY_MAIN
         );
 
@@ -370,7 +369,6 @@ void application_start() {
                 0,
                 task_null,
                 frame_task,
-                TASK_PRIORITY_HIGH,
                 TASK_AFFINITY_MAIN
         );
 
@@ -381,7 +379,6 @@ void application_start() {
                 sizeof(float *),
                 input_task,
                 frame_task,
-                TASK_PRIORITY_HIGH,
                 TASK_AFFINITY_MAIN
         );
 
@@ -392,7 +389,6 @@ void application_start() {
                 0,
                 game_update,
                 frame_task,
-                TASK_PRIORITY_HIGH,
                 TASK_AFFINITY_MAIN
         );
 

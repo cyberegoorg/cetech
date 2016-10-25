@@ -1,6 +1,6 @@
 for k, v in pairs(cetech) do _G[k] = v end
 
-require 'application/fpscamera'
+require 'core/fpscamera'
 
 Game = Game or {}
 

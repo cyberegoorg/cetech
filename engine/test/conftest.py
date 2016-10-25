@@ -50,7 +50,7 @@ def _build_dir(tmpdir_factory):
     instance.run_develop(
         build_dir,
         os.path.join(ROOT_DIR, "engine", "test", "data", "src"),
-        core_dir=os.path.join(ROOT_DIR, "application"),
+        core_dir=os.path.join(ROOT_DIR, "core"),
         compile_=True,
         check=True,
         port=port,
@@ -71,7 +71,7 @@ def engine_instance(request, _build_dir):
     instance.run_develop(
         os.path.join(ROOT_DIR, "engine", "test", "data", "build"),
         os.path.join(ROOT_DIR, "engine", "test", "data", "src"),
-        core_dir=os.path.join(ROOT_DIR, "application"),
+        core_dir=os.path.join(ROOT_DIR, "core"),
         port=port, protocol="tcp",
     )
 

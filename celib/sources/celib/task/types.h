@@ -46,12 +46,5 @@ enum task_affinity {
 
 CE_STATIC_ASSERT(TASK_AFFINITY_MAX == TASK_MAX_WORKERS + 1);
 
-enum task_priority {
-    TASK_PRIORITY_HIGH = 0,
-    TASK_PRIORITY_NORMAL = 1,
-    TASK_PRIORITY_LOW = 2,
-    TASK_PRIORITY_COUNT,
-};
-
 
 #endif //CETECH_TASK_TYPES_H

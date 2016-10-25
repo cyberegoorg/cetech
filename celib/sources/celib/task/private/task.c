@@ -41,7 +41,6 @@ struct task {
     task_t parent;
     task_t depend_on;
 
-    enum task_priority priority;
     enum task_affinity affinity;
 };
 
@@ -50,8 +49,8 @@ static __thread char _worker_id = 0;
 static struct G {
     struct task _taskPool[MAX_TASK];
     char _openTasks[MAX_TASK];
-    struct task_queue _gloalQueue[3];
-    struct task_queue _workersQueue[TASK_MAX_WORKERS * 3];
+    struct task_queue _gloalQueue;
+    struct task_queue _workersQueue[TASK_MAX_WORKERS];
     thread_t _workers[TASK_MAX_WORKERS - 1];
     atomic_int _task_pool_idx;
     int _workers_count;
@@ -77,17 +76,16 @@ static task_t _new_task() {
 static void _push_task(task_t t) {
     CE_ASSERT("", t.id != 0);
 
-    int priority = _G._taskPool[t.id].priority;
     int affinity = _G._taskPool[t.id].affinity;
 
     struct task_queue *q;
     switch (_G._taskPool[t.id].affinity) {
         case TASK_AFFINITY_NONE:
-            q = &_G._gloalQueue[priority];
+            q = &_G._gloalQueue;
             break;
 
         default:
-            q = &_G._workersQueue[((affinity - 1) * 3) + priority];
+            q = &_G._workersQueue[affinity - 1];
             break;
     }
 
@@ -133,8 +131,8 @@ static task_t _task_pop_new_work() {
     task_t popedTask;
 
     for (u32 i = 0; i < 3; ++i) {
-        struct task_queue *qw = &_G._workersQueue[_worker_id * 3 + i];
-        struct task_queue *qg = &_G._gloalQueue[i];
+        struct task_queue *qw = &_G._workersQueue[_worker_id];
+        struct task_queue *qg = &_G._gloalQueue;
 
         popedTask = _try_pop(qw);
         if (popedTask.id != 0) {
@@ -192,11 +190,10 @@ int taskmanager_init(int stage) {
 
     _G._workers_count = worker_count;
 
-    for (int i = 0; i < 3; ++i) {
-        queue_task_init(&_G._gloalQueue[i], MAX_TASK, memsys_main_allocator());
-    }
 
-    for (int i = 0; i < 3 * (worker_count + 1); ++i) {
+    queue_task_init(&_G._gloalQueue, MAX_TASK, memsys_main_allocator());
+
+    for (int i = 0; i < worker_count + 1; ++i) {
         queue_task_init(&_G._workersQueue[i], MAX_TASK, memsys_main_allocator());
     }
 
@@ -219,11 +216,9 @@ void taskmanager_shutdown() {
         os_thread_wait(_G._workers[i], &status);
     }
 
-    for (int i = 0; i < 3; ++i) {
-        queue_task_destroy(&_G._gloalQueue[i]);
-    }
+    queue_task_destroy(&_G._gloalQueue);
 
-    for (int i = 0; i < 3 * (_G._workers_count + 1); ++i) {
+    for (int i = 0; i < _G._workers_count + 1; ++i) {
         queue_task_destroy(&_G._workersQueue[i]);
     }
 
@@ -236,7 +231,6 @@ task_t taskmanager_add_begin(const char *name,
                              char data_len,
                              task_t depend,
                              task_t parent,
-                             enum task_priority priority,
                              enum task_affinity affinity) {
     task_t task = _new_task();
 
@@ -244,7 +238,6 @@ task_t taskmanager_add_begin(const char *name,
 
     _G._taskPool[task.id] = (struct task) {
             .name = name,
-            .priority = priority,
             .task_work = work,
             .job_count = 1,
             .depend_on = depend,
@@ -275,10 +268,9 @@ static void _nullm_task(void *d) {
 task_t taskmanager_add_null(const char *name,
                             task_t depend,
                             task_t parent,
-                            enum task_priority priority,
                             enum task_affinity affinity) {
 
-    return taskmanager_add_begin(name, _nullm_task, NULL, 0, depend, parent, priority, affinity);
+    return taskmanager_add_begin(name, _nullm_task, NULL, 0, depend, parent, affinity);
 }
 
 void taskmanager_add_end(const task_t *tasks,

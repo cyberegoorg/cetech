@@ -171,7 +171,7 @@ void _compile_dir(task_t root_task,
         task_t t = taskmanager_add_begin("compiler_task",
                                          _compile_task, &data, sizeof(data),
                                          task_null, root_task,
-                                         TASK_PRIORITY_NORMAL, TASK_AFFINITY_NONE);
+                                         TASK_AFFINITY_NONE);
 
         taskmanager_add_end(&t, 1);
     }
@@ -187,7 +187,7 @@ int resource_compiler_init(int stage) {
     if (stage == 0) {
         _G = (struct G) {0};
         _G.cv_source_dir = cvar_new_str(".src", "Resource source dir", "data/src");
-        _G.cv_core_dir = cvar_new_str(".application", "Resource application source dir", "application");
+        _G.cv_core_dir = cvar_new_str(".core", "Resource application source dir", "core");
         _G.cv_external_dir = cvar_new_str(".external", "External build dir", "externals/build");
 
         _G.cv_build_dir = cvar_new_str(".build", "Resource build dir", "data/build");
@@ -243,7 +243,7 @@ void resource_compiler_compile_all() {
     char build_dir_full[1024] = {0};
     os_path_join(build_dir_full, CE_ARRAY_LEN(build_dir_full), build_dir, platform);
 
-    task_t root_task = taskmanager_add_null("compile", task_null, task_null, TASK_PRIORITY_HIGH, TASK_AFFINITY_NONE);
+    task_t root_task = taskmanager_add_null("compile", task_null, task_null, TASK_AFFINITY_NONE);
 
     struct array_pchar files;
     array_init_pchar(&files, memsys_main_scratch_allocator());

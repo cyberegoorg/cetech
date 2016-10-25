@@ -1,4 +1,4 @@
-require 'application/class'
+require 'core/class'
 
 local Transform, Mat4f, Vec3f, Quatf, Log = cetech.Transform, cetech.Mat4f, cetech.Vec3f, cetech.Quatf, cetech.Log
 --local Camera = cetech.Camera

@@ -75,11 +75,11 @@ static void _flush_all_streams() {
     const int wc = taskmanager_worker_count() + 1;
     task_t tasks[wc];
 
-    tasks[0] = taskmanager_add_null("flush_worker", task_null, task_null, TASK_PRIORITY_HIGH, TASK_AFFINITY_MAIN);
+    tasks[0] = taskmanager_add_null("flush_worker", task_null, task_null, TASK_AFFINITY_MAIN);
 
     for (int i = 1; i < wc; ++i) {
         tasks[i] = taskmanager_add_begin("flush_worker", _flush_all_job, NULL, 0, tasks[i - 1], task_null,
-                                         TASK_PRIORITY_HIGH, TASK_AFFINITY_MAIN + i);
+                                         TASK_AFFINITY_MAIN + i);
     }
 
     taskmanager_add_end(tasks, wc);

@@ -147,7 +147,6 @@ void package_load(stringid64_t name) {
                 &task_data, sizeof(struct package_task_data),
                 task_null,
                 task_null,
-                TASK_PRIORITY_HIGH,
                 TASK_AFFINITY_NONE
         );
 

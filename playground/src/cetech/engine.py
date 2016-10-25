@@ -95,10 +95,10 @@ class EngineInstance(object):
             args.append("-s .wait 1")
 
         if bootscript:
-            args.append("-s application.boot_script %s" % bootscript)
+            args.append("-s core.boot_script %s" % bootscript)
 
         if bootpkg:
-            args.append("-s application.boot_pkg %s" % bootpkg)
+            args.append("-s core.boot_pkg %s" % bootpkg)
 
         if daemon:
             args.append("-s .daemon 1")
@@ -123,9 +123,9 @@ class EngineInstance(object):
             args.append("-s .wid %s" % int(wid))
 
         if core_dir:
-            args.append("-s .application %s" % core_dir)
+            args.append("-s .core %s" % core_dir)
         else:
-            args.append("-s .application ../application")  # TODO ?
+            args.append("-s .core ../core")  # TODO ?
 
         self._run(self.BUILD_DEVELOP, args, check=check, lock=lock)
 
