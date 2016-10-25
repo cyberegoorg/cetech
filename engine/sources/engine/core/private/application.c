@@ -14,9 +14,9 @@
 #include <engine/core/application.h>
 #include <engine/core/cvar.h>
 #include <engine/machine/machine.h>
-#include <engine/core/resource.h>
+#include <engine/resource/resource.h>
 #include <engine/luasys/luasys.h>
-#include <engine/develop/resource_compiler.h>
+#include <engine/resource/resource.h>
 #include <engine/renderer/renderer.h>
 #include <engine/develop/develop_system.h>
 

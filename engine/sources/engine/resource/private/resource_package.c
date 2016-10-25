@@ -5,7 +5,7 @@
 #include <celib/stringid/stringid.h>
 #include <engine/core/types.h>
 #include <engine/core/task.h>
-#include <engine/develop/resource_compiler.h>
+#include <engine/resource/resource.h>
 #include <celib/memory/memory.h>
 #include <celib/os/vio.h>
 #include <celib/yaml/yaml.h>
@@ -13,7 +13,7 @@
 #include <celib/containers/array.h>
 #include <engine/core/memory.h>
 
-#include "engine/core/resource.h"
+#include "engine/resource/resource.h"
 #include "resource_package.h"
 
 //==============================================================================

@@ -13,8 +13,8 @@
 #include "celib/os/vio.h"
 
 #include "engine/core/memory.h"
-#include "engine/core/resource.h"
-#include "engine/develop/resource_compiler.h"
+#include "engine/resource/resource.h"
+#include "engine/resource/resource.h"
 #include "texture.h"
 #include "shader.h"
 

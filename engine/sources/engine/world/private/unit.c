@@ -2,9 +2,9 @@
 #include <celib/stringid/stringid.h>
 #include <celib/memory/memory.h>
 #include <celib/os/vio.h>
-#include <engine/core/resource.h>
+#include <engine/resource/resource.h>
 #include <celib/yaml/yaml.h>
-#include <engine/develop/resource_compiler.h>
+#include <engine/resource/resource.h>
 #include <celib/string/string.h>
 #include <celib/os/path.h>
 #include <engine/core/memory.h>

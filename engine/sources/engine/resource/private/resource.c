@@ -5,14 +5,14 @@
 #include "include/SDL2/SDL.h"
 
 #include <celib/stringid/types.h>
-#include <engine/core/resource.h>
+#include <engine/resource/resource.h>
 #include <celib/stringid/stringid.h>
 #include <engine/core/filesystem.h>
 #include <engine/core/cvar.h>
 #include <celib/os/path.h>
 #include <engine/core/application.h>
 #include <celib/os/vio.h>
-#include <engine/develop/resource_compiler.h>
+#include <engine/resource/resource.h>
 #include <mpack/mpack.h>
 #include <engine/develop/console_server.h>
 #include "engine/core/memory.h"

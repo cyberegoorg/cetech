@@ -4,9 +4,9 @@
 
 #include <engine/core/memory.h>
 #include <engine/core/cvar.h>
-#include <engine/core/resource.h>
+#include <engine/resource/resource.h>
 #include <celib/os/vio.h>
-#include <engine/develop/resource_compiler.h>
+#include <engine/resource/resource.h>
 #include <celib/stringid/stringid.h>
 #include <engine/core/application.h>
 #include <celib/os/path.h>

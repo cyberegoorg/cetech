@@ -1,4 +1,4 @@
-#include "engine/core/resource.h"
+#include "engine/resource/resource.h"
 #include "engine/luasys/luasys.h"
 
 #define API_NAME "ResourceManager"
