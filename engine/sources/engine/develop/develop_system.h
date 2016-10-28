@@ -48,7 +48,6 @@ void developsys_shutdown();
 
 void developsys_update();
 
-
 #define developsys_push(type, event) _developsys_push((struct event_header*)(&event), type, sizeof(event))
 
 void _developsys_push(struct event_header *header,

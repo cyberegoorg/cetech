@@ -49,6 +49,12 @@ static struct G {
 // Private
 //==============================================================================
 
+typedef struct {
+    u32 id;
+} task_t;
+
+static const task_t task_null = (task_t) {.id = 0};
+
 static task_t _new_task() {
     int idx = atomic_fetch_add(&_G._task_pool_idx, 1);
 

@@ -11,12 +11,6 @@
 // Task
 //==============================================================================
 
-typedef struct {
-    u32 id;
-} task_t;
-
-static const task_t task_null = (task_t) {.id = 0};
-
 typedef void (*task_work_t)(void *data);
 
 enum workers {

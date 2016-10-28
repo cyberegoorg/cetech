@@ -78,7 +78,7 @@ ws.onmessage = function (evt) {
                 content: label,
                 title: label,
                 start: event.start,
-                end: event.start + (event.duration*100000),
+                end: event.start + (event.duration),
                 group: event.worker_id,
                 depth: event.depth
             };
