@@ -99,7 +99,7 @@ function Game:update(dt)
     --transform_rotator(self.world, self.unit, Quatf.from_axis_angle(Vec3f.unit_z(), 0.08))
 
     if Keyboard.button_pressed(reload_btn) then
-        ResourceCompilator.compile_all()
+        ResourceManager.compile_all()
         ResourceManager.reload_all()
     end
 

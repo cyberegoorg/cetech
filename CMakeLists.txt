@@ -130,7 +130,6 @@ set(SOURCE_FILES
         # CETECH: Plugin system
         ########################################################################
         engine/sources/engine/application/private/plugin.c
-        engine/sources/engine/application/private/plugin.c
 
         engine/sources/engine/luasys/private/luasys.c
         engine/sources/engine/luasys/private/api/api_keyboard.c
@@ -138,7 +137,6 @@ set(SOURCE_FILES
         engine/sources/engine/luasys/private/api/api_mouse.c
         engine/sources/engine/luasys/private/api/api_gamepad.c
         engine/sources/engine/luasys/private/api/api_application.c
-        engine/sources/engine/luasys/private/api/api_resouce_compilator.c
         engine/sources/engine/luasys/private/api/api_resouce_manager.c
         engine/sources/engine/luasys/private/api/api_renderer.c
         engine/sources/engine/luasys/private/api/api_world.c
