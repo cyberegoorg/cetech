@@ -11,6 +11,7 @@
 #include <celib/log/log.h>
 #include <celib/containers/array.h>
 #include <celib/memory/memory.h>
+#include <celib/os/thread.h>
 
 #include "engine/resource/resource.h"
 #include "resource_package.h"
@@ -20,9 +21,7 @@
 //==============================================================================
 
 struct package_task_data {
-    stringid64_t type;
-    stringid64_t *name;
-    u32 count;
+    stringid64_t name;
 };
 
 #define _G PackageGlobals
@@ -124,34 +123,30 @@ void package_shutdown() {
 
 }
 
+
 void package_task(void *data) {
     struct package_task_data *task_data = data;
-
-    resource_load_now(task_data->type, task_data->name, task_data->count);
-}
-
-void package_load(stringid64_t name) {
-    struct package_resource *package = resource_get(_G.package_typel, name);
+    struct package_resource *package = resource_get(_G.package_typel, task_data->name);
 
     const u32 task_count = package->type_count;
     for (int j = 0; j < task_count; ++j) {
-        struct package_task_data task_data = {
-                .count = package_name_count(package)[j],
-                .name = &package_name(package)[package_offset(package)[j]],
-                .type = package_type(package)[j]
-        };
-
-        task_t load_task = taskmanager_add_begin(
-                "package_task",
-                package_task,
-                &task_data, sizeof(struct package_task_data),
-                task_null,
-                task_null,
-                TASK_AFFINITY_NONE
-        );
-
-        taskmanager_add_end(&load_task, 1);
+        resource_load_now(package_type(package)[j], &package_name(package)[package_offset(package)[j]],
+                          package_name_count(package)[j]);
     }
+}
+
+void package_load(stringid64_t name) {
+
+    struct package_task_data *task_data =  CE_ALLOCATE(memsys_main_allocator(), struct package_task_data, 1);
+
+    task_data->name = name;
+
+    taskmanager_add(
+            "package_task",
+            package_task,
+            task_data,
+            TASK_AFFINITY_NONE
+    );
 }
 
 void package_unload(stringid64_t name) {
@@ -159,13 +154,7 @@ void package_unload(stringid64_t name) {
 
     const u32 task_count = package->type_count;
     for (int j = 0; j < task_count; ++j) {
-        struct package_task_data type_data = {
-                .count = package_name_count(package)[j],
-                .name = &package_name(package)[package_offset(package)[j]],
-                .type = package_type(package)[j]
-        };
-
-        resource_unload(type_data.type, type_data.name, type_data.count);
+        resource_unload(package_type(package)[j], &package_name(package)[package_offset(package)[j]], package_name_count(package)[j]);
     }
 }
 
@@ -176,13 +165,7 @@ int package_is_loaded(stringid64_t name) {
 
     const u32 task_count = package->type_count;
     for (int i = 0; i < task_count; ++i) {
-        const struct package_task_data type_data = {
-                .count = package_name_count(package)[i],
-                .name = &package_name(package)[package_offset(package)[i]],
-                .type = package_type(package)[i]
-        };
-
-        if (!resource_can_get_all(type_data.type, type_data.name, type_data.count)) {
+        if (!resource_can_get_all(package_type(package)[i], &package_name(package)[package_offset(package)[i]], package_name_count(package)[i])) {
             return 0;
         }
     }
@@ -190,9 +173,10 @@ int package_is_loaded(stringid64_t name) {
     return 1;
 }
 
-
 void package_flush(stringid64_t name) {
     while (!package_is_loaded(name)) {
-        taskmanager_do_work();
+        if(!taskmanager_do_work()) {
+            os_thread_yield();
+        }
     }
 }

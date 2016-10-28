@@ -6,6 +6,7 @@
 //==============================================================================
 
 #include <stdlib.h>
+#include <stdatomic.h>
 #include "celib/task/types.h"
 
 #define CE_ASSERT_IS_WORKER(where, worker_id)\
@@ -21,25 +22,14 @@ void taskmanager_shutdown();
 
 int taskmanager_worker_count();
 
-task_t taskmanager_add_begin(const char *name,
-                             task_work_t work,
-                             void *data,
-                             char data_len,
-                             task_t depend,
-                             task_t parent,
-                             enum task_affinity affinity);
+void taskmanager_add(const char *name,
+                     task_work_t work,
+                     void *data,
+                     enum task_affinity affinity);
 
-task_t taskmanager_add_null(const char *name,
-                            task_t depend,
-                            task_t parent,
-                            enum task_affinity affinity);
+int taskmanager_do_work();
 
-void taskmanager_add_end(const task_t *tasks,
-                         size_t count);
-
-void taskmanager_do_work();
-
-void taskmanager_wait(task_t task);
+void taskmanager_wait_atomic(atomic_int *signal, u32 value);
 
 char taskmanager_worker_id();
 

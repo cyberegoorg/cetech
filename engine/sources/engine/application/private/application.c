@@ -219,43 +219,8 @@ static void _dump_event() {
             default:
                 break;
         }
-           event = machine_event_next(event);
+        event = machine_event_next(event);
     }
-}
-
-
-static void _input_task(void *d) {
-    keyboard_process();
-    mouse_process();
-    gamepad_process();
-}
-
-static void _consolesrv_task(void *d) {
-    consolesrv_update();
-}
-
-static void _game_update_task(void *d) {
-    float *dt = d;
-
-    _G.game->update(*dt);
-}
-
-float frame_limit = 61.0f;
-float frame_time_accu = 0.0f;
-
-static void _game_render_task(void *d) {
-    if (cvar_get_int(_G.config.cv_daemon)) {
-        return;
-    }
-
-    float frame_time = 1.0f / frame_limit;
-    if (frame_time_accu < frame_time) {
-        frame_time_accu += _G.dt;
-        return;
-    }
-    frame_time_accu = 0.0f;
-
-    _G.game->render();
 }
 
 static void _boot_stage() {
@@ -336,13 +301,16 @@ void application_start() {
     _G.is_running = 1;
     log_info("core.ready", "Run main loop");
 
+    float frame_time_accu = 0.0f;
+    float frame_limit = 61.0f;
+    float frame_time = 1.0f / frame_limit;
 
     consolesrv_push_begin();
     while (_G.is_running) {
         struct scope_data application_sd = developsys_enter_scope("Application:update()");
 
         u64 now_ticks = os_get_perf_counter();
-        float dt = ((float)(now_ticks - last_tick)) / os_get_perf_freq();
+        float dt = ((float) (now_ticks - last_tick)) / os_get_perf_freq();
 
         _G.dt = dt;
         last_tick = now_ticks;
@@ -350,62 +318,27 @@ void application_start() {
         machine_process();
         _dump_event();
 
-        task_t frame_task = taskmanager_add_null("frame", task_null, task_null, TASK_AFFINITY_NONE);
+        consolesrv_update();
 
-        task_t consolesrv_task = taskmanager_add_begin(
-                "consolesrv",
-                _consolesrv_task,
-                NULL,
-                0,
-                task_null,
-                frame_task,
-                TASK_AFFINITY_MAIN
-        );
+        keyboard_process();
+        mouse_process();
+        gamepad_process();
 
-        task_t input_task = taskmanager_add_begin(
-                "input",
-                _input_task,
-                NULL,
-                0,
-                task_null,
-                frame_task,
-                TASK_AFFINITY_MAIN
-        );
+        _G.game->update(dt);
 
-        task_t game_update = taskmanager_add_begin(
-                "game_update",
-                _game_update_task,
-                &dt,
-                sizeof(float *),
-                input_task,
-                frame_task,
-                TASK_AFFINITY_MAIN
-        );
 
-        task_t game_render = taskmanager_add_begin(
-                "game_render",
-                _game_render_task,
-                NULL,
-                0,
-                game_update,
-                frame_task,
-                TASK_AFFINITY_MAIN
-        );
+        if (cvar_get_int(_G.config.cv_daemon)) {
+            return;
+        }
 
-        const task_t tasks[] = {
-                input_task,
-                consolesrv_task,
-                game_render,
-                game_update,
-                frame_task
-        };
-
-        taskmanager_add_end(tasks, CE_ARRAY_LEN(tasks));
-
-        taskmanager_wait(frame_task);
-
-        if (!cvar_get_int(_G.config.cv_daemon)) {
-            window_update(_G.main_window);
+        if (frame_time_accu < frame_time) {
+            frame_time_accu += _G.dt;
+        } else {
+            frame_time_accu = 0.0f;
+            if (!cvar_get_int(_G.config.cv_daemon)) {
+                _G.game->render();
+                window_update(_G.main_window);
+            }
         }
 
         developsys_push_record_float("engine.delta_time", dt);

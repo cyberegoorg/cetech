@@ -47,7 +47,7 @@ static struct G {
     int pub_socket;
 
     spinlock_t flush_lock;
-
+    atomic_int complete_flag[8]; // TODO: dynamic
 } _G = {0};
 
 static __thread u8 _stream_buffer[64 * 1024] = {0};
@@ -67,23 +67,28 @@ static void _flush_stream_buffer() {
     os_thread_spin_unlock(&_G.flush_lock);
 }
 
-static void _flush_all_job(void *data) {
+static void _flush_job(void *data) {
     _flush_stream_buffer();
+
+   atomic_store_explicit(&_G.complete_flag[taskmanager_worker_id()], 1, memory_order_release);
 }
 
 static void _flush_all_streams() {
     const int wc = taskmanager_worker_count() + 1;
-    task_t tasks[wc];
 
-    tasks[0] = taskmanager_add_null("flush_worker", task_null, task_null, TASK_AFFINITY_MAIN);
-
-    for (int i = 1; i < wc; ++i) {
-        tasks[i] = taskmanager_add_begin("flush_worker", _flush_all_job, NULL, 0, tasks[i - 1], task_null,
-                                         TASK_AFFINITY_MAIN + i);
+    for(int i = 1; i < wc; ++i) {
+        atomic_init(&_G.complete_flag[i], 0);
     }
 
-    taskmanager_add_end(tasks, wc);
-    taskmanager_wait(tasks[wc - 1]);
+    _flush_stream_buffer();
+
+    for (int i = 1; i < wc; ++i) {
+        taskmanager_add("flush_worker", _flush_job, NULL, TASK_AFFINITY_WORKER1 + i);
+    }
+
+    for (int i = 1; i < wc; ++i) {
+        taskmanager_wait_atomic(&_G.complete_flag[i], 0);
+    }
 }
 
 void _developsys_push(struct event_header *header,
