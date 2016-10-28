@@ -35,7 +35,14 @@ u64 os_thread_actual_id() {
     return SDL_ThreadID();
 }
 
+#include <unistd.h>
+
+
 void os_thread_yield() {
+    usleep(0);
+
+    return;
+
 #if defined(CETECH_DARWIN)
     sched_yield();
 #elif defined(CETECH_LINUX)
