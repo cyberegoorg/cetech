@@ -253,8 +253,9 @@ static void _boot_unload() {
 
     if (!cvar_get_int(_G.config.cv_daemon)) {
         stringid64_t core_pkg = stringid64_from_string("core");
-        package_unload(core_pkg);
-        resource_unload(pkg, &core_pkg, 1);
+        resource_load_now(pkg, &core_pkg, 1);
+        package_load(core_pkg);
+        package_flush(core_pkg);
     }
 
 }
@@ -308,9 +309,8 @@ void application_start() {
     _G.is_running = 1;
     log_info("core.ready", "Run main loop");
 
-    float frame_time_accu = 0.0f;
-    float frame_limit = 61.0f;
-    float frame_time = 1.0f / frame_limit;
+    float lag = 0.0f;
+    float frame_time = 1.0f/ 1000.0f;//1.0f / frame_limit;
 
     consolesrv_push_begin();
     while (_G.is_running) {
@@ -322,31 +322,28 @@ void application_start() {
         _G.dt = dt;
         last_tick = now_ticks;
 
-        machine_process();
-        _dump_event();
+        lag += dt;
 
-        consolesrv_update();
 
-        keyboard_process();
-        mouse_process();
-        gamepad_process();
+        while(lag >= frame_time) {
+            machine_process();
+            _dump_event();
+            keyboard_process();
+            mouse_process();
+            gamepad_process();
 
-        _G.game->update(dt);
+            consolesrv_update();
 
-        struct scope_data render_sd = developsys_enter_scope("Game::render()");
-        if (!cvar_get_int(_G.config.cv_daemon)) {
-            if (frame_time_accu < frame_time) {
-                frame_time_accu += _G.dt;
-            } else {
-                frame_time_accu = 0.0f;
-
-            }
+            _G.game->update(frame_time);
+            lag -= frame_time;
         }
 
-        _G.game->render();
-        window_update(_G.main_window);
-
-        developsys_leave_scope("Game::render()", render_sd);
+        if (!cvar_get_int(_G.config.cv_daemon)) {
+            struct scope_data render_sd = developsys_enter_scope("Game::render()");
+            _G.game->render();
+            window_update(_G.main_window);
+            developsys_leave_scope("Game::render()", render_sd);
+        }
 
         developsys_push_record_float("engine.delta_time", dt);
         developsys_leave_scope("Application:update()", application_sd);
