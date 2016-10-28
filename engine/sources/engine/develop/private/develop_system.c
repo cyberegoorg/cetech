@@ -74,7 +74,7 @@ static void _flush_job(void *data) {
 }
 
 static void _flush_all_streams() {
-    const int wc = taskmanager_worker_count() + 1;
+    const int wc = taskmanager_worker_count();
 
     for(int i = 1; i < wc; ++i) {
         atomic_init(&_G.complete_flag[i], 0);
@@ -82,9 +82,18 @@ static void _flush_all_streams() {
 
     _flush_stream_buffer();
 
-    for (int i = 1; i < wc; ++i) {
-        taskmanager_add("flush_worker", _flush_job, NULL, TASK_AFFINITY_WORKER1 + i);
+    struct task_item items[wc];
+
+    for (int i = 0; i < wc; ++i) {
+        items[i] = (struct task_item){
+                .name = "flush_worker",
+                .work = _flush_job,
+                .data = NULL,
+                .affinity = TASK_AFFINITY_WORKER1 + i
+        };
     }
+
+    taskmanager_add(items, wc);
 
     for (int i = 1; i < wc; ++i) {
         taskmanager_wait_atomic(&_G.complete_flag[i], 0);

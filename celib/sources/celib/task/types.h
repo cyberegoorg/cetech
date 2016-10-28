@@ -46,5 +46,11 @@ enum task_affinity {
 
 CE_STATIC_ASSERT(TASK_AFFINITY_MAX == TASK_MAX_WORKERS + 1);
 
+struct task_item {
+    const char* name;
+    task_work_t work;
+    void* data;
+    enum task_affinity affinity;
+};
 
 #endif //CETECH_TASK_TYPES_H

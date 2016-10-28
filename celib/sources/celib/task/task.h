@@ -22,10 +22,7 @@ void taskmanager_shutdown();
 
 int taskmanager_worker_count();
 
-void taskmanager_add(const char *name,
-                     task_work_t work,
-                     void *data,
-                     enum task_affinity affinity);
+void taskmanager_add(struct task_item *items, u32 count);
 
 int taskmanager_do_work();
 

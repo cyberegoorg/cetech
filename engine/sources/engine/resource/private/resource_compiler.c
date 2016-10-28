@@ -46,7 +46,7 @@ struct compile_task_data {
     atomic_int completed;
 };
 
-ARRAY_PROTOTYPE_N(struct compile_task_data*, compile_task_data_ptr);
+ARRAY_PROTOTYPE_N(struct task_item, task_item);
 
 struct G {
     stringid64_t compilator_map_type[MAX_TYPES]; // TODO: MAP
@@ -118,7 +118,7 @@ resource_compilator_t _find_compilator(stringid64_t type) {
     return NULL;
 }
 
-void _compile_dir(ARRAY_T(compile_task_data_ptr) *tasks,
+void _compile_dir(ARRAY_T(task_item) *tasks,
                   struct array_pchar *files,
                   const char *source_dir,
                   const char *build_dir_full) {
@@ -180,12 +180,14 @@ void _compile_dir(ARRAY_T(compile_task_data_ptr) *tasks,
                 .completed = 0
         };
 
-        ARRAY_PUSH_BACK(compile_task_data_ptr, tasks, data);
+        struct task_item item = {
+                .name = "compiler_task",
+                .work = _compile_task,
+                .data = data,
+                .affinity = TASK_AFFINITY_NONE
+        };
 
-        taskmanager_add("compiler_task",
-                        _compile_task,
-                        data,
-                        TASK_AFFINITY_NONE);
+        ARRAY_PUSH_BACK(task_item, tasks, item);
     }
     os_dir_list_free(files, memsys_main_scratch_allocator());
 }
@@ -258,8 +260,8 @@ void resource_compiler_compile_all() {
     struct array_pchar files;
     array_init_pchar(&files, memsys_main_scratch_allocator());
 
-    ARRAY_T(compile_task_data_ptr) tasks;
-    ARRAY_INIT(compile_task_data_ptr, &tasks, memsys_main_allocator());
+    ARRAY_T(task_item) tasks;
+    ARRAY_INIT(task_item, &tasks, memsys_main_allocator());
 
     const char *dirs[] = {source_dir, core_dir};
     for (int i = 0; i < CE_ARRAY_LEN(dirs); ++i) {
@@ -269,12 +271,16 @@ void resource_compiler_compile_all() {
 
     array_destroy_pchar(&files);
 
+    taskmanager_add(tasks.data, tasks.size);
+
     for (int i = 0; i < ARRAY_SIZE(&tasks); ++i) {
-        taskmanager_wait_atomic(&ARRAY_AT(&tasks, i)->completed, 0);
-        CE_DEALLOCATE(memsys_main_allocator(), ARRAY_AT(&tasks, i));
+        struct compile_task_data* data = ARRAY_AT(&tasks, i).data;
+
+        taskmanager_wait_atomic(&data->completed, 0);
+        CE_DEALLOCATE(memsys_main_allocator(), data);
     }
 
-    ARRAY_DESTROY(compile_task_data_ptr, &tasks);
+    ARRAY_DESTROY(task_item, &tasks);
 }
 
 int resource_compiler_get_filename(char *filename,

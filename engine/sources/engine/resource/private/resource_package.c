@@ -141,12 +141,14 @@ void package_load(stringid64_t name) {
 
     task_data->name = name;
 
-    taskmanager_add(
-            "package_task",
-            package_task,
-            task_data,
-            TASK_AFFINITY_NONE
-    );
+    struct task_item item = {
+        .name = "package_task",
+        .work = package_task,
+        .data = task_data,
+        .affinity = TASK_AFFINITY_NONE
+    };
+
+    taskmanager_add(&item, 1);
 }
 
 void package_unload(stringid64_t name) {

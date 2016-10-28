@@ -194,21 +194,19 @@ void taskmanager_shutdown() {
     _G = (struct G) {0};
 }
 
-void taskmanager_add(const char *name,
-                     task_work_t work,
-                     void *data,
-                     enum task_affinity affinity) {
-    task_t task = _new_task();
+void taskmanager_add(struct task_item *items, u32 count) {
+    for(u32 i = 0; i < count; ++i) {
+        task_t task = _new_task();
+        _G._task_pool[task.id] = (struct task) {
+                .name = items[i].name,
+                .task_work = items[i].work,
+                .affinity = items[i].affinity,
+        };
 
-    _G._task_pool[task.id] = (struct task) {
-            .name = name,
-            .task_work = work,
-            .affinity = affinity,
-    };
+        _G._task_pool[task.id].data = items[i].data;
 
-    _G._task_pool[task.id].data = data;
-
-    _push_task(task);
+        _push_task(task);
+    }
 }
 
 int taskmanager_do_work() {
