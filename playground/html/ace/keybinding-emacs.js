@@ -195,7 +195,7 @@ exports.iSearchStartCommands = [{
     name: "iSearch",
     bindKey: {win: "Ctrl-F", mac: "Command-F"},
     exec: function(editor, options) {
-        config.loadModule(["application", "ace/incremental_search"], function(e) {
+        config.loadModule(["core", "ace/incremental_search"], function(e) {
             var iSearch = e.iSearch = e.iSearch || new e.IncrementalSearch();
             iSearch.activate(editor, options.backwards);
             if (options.jumpToFirstMatch) iSearch.next(options);

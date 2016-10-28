@@ -16511,12 +16511,12 @@ var WorkerClient = function(topLevelNamespaces, mod, classname, workerUrl) {
     this.$workerBlob = function(workerUrl) {
         var script = "importScripts('" + net.qualifyURL(workerUrl) + "');";
         try {
-            return new Blob([script], {"type": "application/javascript"});
+            return new Blob([script], {"type": "core/javascript"});
         } catch (e) { // Backwards-compatibility
             var BlobBuilder = window.BlobBuilder || window.WebKitBlobBuilder || window.MozBlobBuilder;
             var blobBuilder = new BlobBuilder();
             blobBuilder.append(script);
-            return blobBuilder.getBlob("application/javascript");
+            return blobBuilder.getBlob("core/javascript");
         }
     };
 

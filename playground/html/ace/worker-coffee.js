@@ -1529,7 +1529,7 @@ this.trace(e)},parse:function(e){function t(){var e;return e=f.lex()||p,"number"
             return null == t && (t = {}), t.bare = !0, t.shiftLine = !0, Function(compile(e, t))()
         }, "undefined" != typeof window && null !== window && ("undefined" != typeof btoa && null !== btoa && "undefined" != typeof JSON && null !== JSON && "undefined" != typeof unescape && null !== unescape && "undefined" != typeof encodeURIComponent && null !== encodeURIComponent && (compile = function (e, t) {
             var n, i, r;
-            return null == t && (t = {}), t.sourceMap = !0, t.inline = !0, i = CoffeeScript.compile(e, t), n = i.js, r = i.v3SourceMap, n + "\n//# sourceMappingURL=data:application/json;base64," + btoa(unescape(encodeURIComponent(r))) + "\n//# sourceURL=coffeescript"
+            return null == t && (t = {}), t.sourceMap = !0, t.inline = !0, i = CoffeeScript.compile(e, t), n = i.js, r = i.v3SourceMap, n + "\n//# sourceMappingURL=data:core/json;base64," + btoa(unescape(encodeURIComponent(r))) + "\n//# sourceURL=coffeescript"
         }), CoffeeScript.load = function (e, t, n, i) {
             var r;
             return null == n && (n = {}), null == i && (i = !1), n.sourceFiles = [e], r = window.ActiveXObject ? new window.ActiveXObject("Microsoft.XMLHTTP") : new window.XMLHttpRequest, r.open("GET", e, !0), "overrideMimeType" in r && r.overrideMimeType("text/plain"), r.onreadystatechange = function () {

@@ -265,7 +265,7 @@ declare namespace AceAjax {
 
     /**
      * Contains the text of the document. Document can be attached to several [[EditSession `EditSession`]]s.
-     * At its application, `Document`s are just an array of strings, with each row in the document matching up to the array index.
+     * At its core, `Document`s are just an array of strings, with each row in the document matching up to the array index.
     **/
     export interface Document {
 

@@ -3282,79 +3282,79 @@ var functionMap = {
     ],
     "dom_characterdata_append_data": [
         "void dom_characterdata_append_data(string arg);",
-        "URL: http:\/\/www.w3.org\/TR\/2003\/WD-DOM-Level-3-Core-20030226\/DOM3-Core.html#application-ID-32791A2F Since:"
+        "URL: http:\/\/www.w3.org\/TR\/2003\/WD-DOM-Level-3-Core-20030226\/DOM3-Core.html#core-ID-32791A2F Since:"
     ],
     "dom_characterdata_delete_data": [
         "void dom_characterdata_delete_data(int offset, int count);",
-        "URL: http:\/\/www.w3.org\/TR\/2003\/WD-DOM-Level-3-Core-20030226\/DOM3-Core.html#application-ID-7C603781 Since:"
+        "URL: http:\/\/www.w3.org\/TR\/2003\/WD-DOM-Level-3-Core-20030226\/DOM3-Core.html#core-ID-7C603781 Since:"
     ],
     "dom_characterdata_insert_data": [
         "void dom_characterdata_insert_data(int offset, string arg);",
-        "URL: http:\/\/www.w3.org\/TR\/2003\/WD-DOM-Level-3-Core-20030226\/DOM3-Core.html#application-ID-3EDB695F Since:"
+        "URL: http:\/\/www.w3.org\/TR\/2003\/WD-DOM-Level-3-Core-20030226\/DOM3-Core.html#core-ID-3EDB695F Since:"
     ],
     "dom_characterdata_replace_data": [
         "void dom_characterdata_replace_data(int offset, int count, string arg);",
-        "URL: http:\/\/www.w3.org\/TR\/2003\/WD-DOM-Level-3-Core-20030226\/DOM3-Core.html#application-ID-E5CBA7FB Since:"
+        "URL: http:\/\/www.w3.org\/TR\/2003\/WD-DOM-Level-3-Core-20030226\/DOM3-Core.html#core-ID-E5CBA7FB Since:"
     ],
     "dom_characterdata_substring_data": [
         "string dom_characterdata_substring_data(int offset, int count);",
-        "URL: http:\/\/www.w3.org\/TR\/2003\/WD-DOM-Level-3-Core-20030226\/DOM3-Core.html#application-ID-6531BCCF Since:"
+        "URL: http:\/\/www.w3.org\/TR\/2003\/WD-DOM-Level-3-Core-20030226\/DOM3-Core.html#core-ID-6531BCCF Since:"
     ],
     "dom_document_adopt_node": [
         "DOMNode dom_document_adopt_node(DOMNode source);",
-        "URL: http:\/\/www.w3.org\/TR\/2003\/WD-DOM-Level-3-Core-20030226\/DOM3-Core.html#application-Document3-adoptNode Since: DOM Level 3"
+        "URL: http:\/\/www.w3.org\/TR\/2003\/WD-DOM-Level-3-Core-20030226\/DOM3-Core.html#core-Document3-adoptNode Since: DOM Level 3"
     ],
     "dom_document_create_attribute": [
         "DOMAttr dom_document_create_attribute(string name);",
-        "URL: http:\/\/www.w3.org\/TR\/2003\/WD-DOM-Level-3-Core-20030226\/DOM3-Core.html#application-ID-1084891198 Since:"
+        "URL: http:\/\/www.w3.org\/TR\/2003\/WD-DOM-Level-3-Core-20030226\/DOM3-Core.html#core-ID-1084891198 Since:"
     ],
     "dom_document_create_attribute_ns": [
         "DOMAttr dom_document_create_attribute_ns(string namespaceURI, string qualifiedName);",
-        "URL: http:\/\/www.w3.org\/TR\/2003\/WD-DOM-Level-3-Core-20030226\/DOM3-Core.html#application-ID-DocCrAttrNS Since: DOM Level 2"
+        "URL: http:\/\/www.w3.org\/TR\/2003\/WD-DOM-Level-3-Core-20030226\/DOM3-Core.html#core-ID-DocCrAttrNS Since: DOM Level 2"
     ],
     "dom_document_create_cdatasection": [
         "DOMCdataSection dom_document_create_cdatasection(string data);",
-        "URL: http:\/\/www.w3.org\/TR\/2003\/WD-DOM-Level-3-Core-20030226\/DOM3-Core.html#application-ID-D26C0AF8 Since:"
+        "URL: http:\/\/www.w3.org\/TR\/2003\/WD-DOM-Level-3-Core-20030226\/DOM3-Core.html#core-ID-D26C0AF8 Since:"
     ],
     "dom_document_create_comment": [
         "DOMComment dom_document_create_comment(string data);",
-        "URL: http:\/\/www.w3.org\/TR\/2003\/WD-DOM-Level-3-Core-20030226\/DOM3-Core.html#application-ID-1334481328 Since:"
+        "URL: http:\/\/www.w3.org\/TR\/2003\/WD-DOM-Level-3-Core-20030226\/DOM3-Core.html#core-ID-1334481328 Since:"
     ],
     "dom_document_create_document_fragment": [
         "DOMDocumentFragment dom_document_create_document_fragment();",
-        "URL: http:\/\/www.w3.org\/TR\/2003\/WD-DOM-Level-3-Core-20030226\/DOM3-Core.html#application-ID-35CB04B5 Since:"
+        "URL: http:\/\/www.w3.org\/TR\/2003\/WD-DOM-Level-3-Core-20030226\/DOM3-Core.html#core-ID-35CB04B5 Since:"
     ],
     "dom_document_create_element": [
         "DOMElement dom_document_create_element(string tagName [, string value]);",
-        "URL: http:\/\/www.w3.org\/TR\/2003\/WD-DOM-Level-3-Core-20030226\/DOM3-Core.html#application-ID-2141741547 Since:"
+        "URL: http:\/\/www.w3.org\/TR\/2003\/WD-DOM-Level-3-Core-20030226\/DOM3-Core.html#core-ID-2141741547 Since:"
     ],
     "dom_document_create_element_ns": [
         "DOMElement dom_document_create_element_ns(string namespaceURI, string qualifiedName [,string value]);",
-        "URL: http:\/\/www.w3.org\/TR\/2003\/WD-DOM-Level-3-Core-20030226\/DOM3-Core.html#application-ID-DocCrElNS Since: DOM Level 2"
+        "URL: http:\/\/www.w3.org\/TR\/2003\/WD-DOM-Level-3-Core-20030226\/DOM3-Core.html#core-ID-DocCrElNS Since: DOM Level 2"
     ],
     "dom_document_create_entity_reference": [
         "DOMEntityReference dom_document_create_entity_reference(string name);",
-        "URL: http:\/\/www.w3.org\/TR\/2003\/WD-DOM-Level-3-Core-20030226\/DOM3-Core.html#application-ID-392B75AE Since:"
+        "URL: http:\/\/www.w3.org\/TR\/2003\/WD-DOM-Level-3-Core-20030226\/DOM3-Core.html#core-ID-392B75AE Since:"
     ],
     "dom_document_create_processing_instruction": [
         "DOMProcessingInstruction dom_document_create_processing_instruction(string target, string data);",
-        "URL: http:\/\/www.w3.org\/TR\/2003\/WD-DOM-Level-3-Core-20030226\/DOM3-Core.html#application-ID-135944439 Since:"
+        "URL: http:\/\/www.w3.org\/TR\/2003\/WD-DOM-Level-3-Core-20030226\/DOM3-Core.html#core-ID-135944439 Since:"
     ],
     "dom_document_create_text_node": [
         "DOMText dom_document_create_text_node(string data);",
-        "URL: http:\/\/www.w3.org\/TR\/2003\/WD-DOM-Level-3-Core-20030226\/DOM3-Core.html#application-ID-1975348127 Since:"
+        "URL: http:\/\/www.w3.org\/TR\/2003\/WD-DOM-Level-3-Core-20030226\/DOM3-Core.html#core-ID-1975348127 Since:"
     ],
     "dom_document_get_element_by_id": [
         "DOMElement dom_document_get_element_by_id(string elementId);",
-        "URL: http:\/\/www.w3.org\/TR\/2003\/WD-DOM-Level-3-Core-20030226\/DOM3-Core.html#application-ID-getElBId Since: DOM Level 2"
+        "URL: http:\/\/www.w3.org\/TR\/2003\/WD-DOM-Level-3-Core-20030226\/DOM3-Core.html#core-ID-getElBId Since: DOM Level 2"
     ],
     "dom_document_get_elements_by_tag_name": [
         "DOMNodeList dom_document_get_elements_by_tag_name(string tagname);",
-        "URL: http:\/\/www.w3.org\/TR\/2003\/WD-DOM-Level-3-Core-20030226\/DOM3-Core.html#application-ID-A6C9094 Since:"
+        "URL: http:\/\/www.w3.org\/TR\/2003\/WD-DOM-Level-3-Core-20030226\/DOM3-Core.html#core-ID-A6C9094 Since:"
     ],
     "dom_document_get_elements_by_tag_name_ns": [
         "DOMNodeList dom_document_get_elements_by_tag_name_ns(string namespaceURI, string localName);",
-        "URL: http:\/\/www.w3.org\/TR\/2003\/WD-DOM-Level-3-Core-20030226\/DOM3-Core.html#application-ID-getElBTNNS Since: DOM Level 2"
+        "URL: http:\/\/www.w3.org\/TR\/2003\/WD-DOM-Level-3-Core-20030226\/DOM3-Core.html#core-ID-getElBTNNS Since: DOM Level 2"
     ],
     "dom_document_import_node": [
         "DOMNode dom_document_import_node(DOMNode importedNode, boolean deep);",
@@ -3378,7 +3378,7 @@ var functionMap = {
     ],
     "dom_document_normalize_document": [
         "void dom_document_normalize_document();",
-        "URL: http:\/\/www.w3.org\/TR\/2003\/WD-DOM-Level-3-Core-20030226\/DOM3-Core.html#application-Document3-normalizeDocument Since: DOM Level 3"
+        "URL: http:\/\/www.w3.org\/TR\/2003\/WD-DOM-Level-3-Core-20030226\/DOM3-Core.html#core-Document3-normalizeDocument Since: DOM Level 3"
     ],
     "dom_document_relaxNG_validate_file": [
         "boolean dom_document_relaxNG_validate_file(string filename); *\/",
@@ -3390,7 +3390,7 @@ var functionMap = {
     ],
     "dom_document_rename_node": [
         "DOMNode dom_document_rename_node(node n, string namespaceURI, string qualifiedName);",
-        "URL: http:\/\/www.w3.org\/TR\/2003\/WD-DOM-Level-3-Core-20030226\/DOM3-Core.html#application-Document3-renameNode Since: DOM Level 3"
+        "URL: http:\/\/www.w3.org\/TR\/2003\/WD-DOM-Level-3-Core-20030226\/DOM3-Core.html#core-Document3-renameNode Since: DOM Level 3"
     ],
     "dom_document_save": [
         "int dom_document_save(string file);",
@@ -3474,75 +3474,75 @@ var functionMap = {
     ],
     "dom_element_get_attribute": [
         "string dom_element_get_attribute(string name);",
-        "URL: http:\/\/www.w3.org\/TR\/2003\/WD-DOM-Level-3-Core-20030226\/DOM3-Core.html#application-ID-666EE0F9 Since:"
+        "URL: http:\/\/www.w3.org\/TR\/2003\/WD-DOM-Level-3-Core-20030226\/DOM3-Core.html#core-ID-666EE0F9 Since:"
     ],
     "dom_element_get_attribute_node": [
         "DOMAttr dom_element_get_attribute_node(string name);",
-        "URL: http:\/\/www.w3.org\/TR\/2003\/WD-DOM-Level-3-Core-20030226\/DOM3-Core.html#application-ID-217A91B8 Since:"
+        "URL: http:\/\/www.w3.org\/TR\/2003\/WD-DOM-Level-3-Core-20030226\/DOM3-Core.html#core-ID-217A91B8 Since:"
     ],
     "dom_element_get_attribute_node_ns": [
         "DOMAttr dom_element_get_attribute_node_ns(string namespaceURI, string localName);",
-        "URL: http:\/\/www.w3.org\/TR\/2003\/WD-DOM-Level-3-Core-20030226\/DOM3-Core.html#application-ID-ElGetAtNodeNS Since: DOM Level 2"
+        "URL: http:\/\/www.w3.org\/TR\/2003\/WD-DOM-Level-3-Core-20030226\/DOM3-Core.html#core-ID-ElGetAtNodeNS Since: DOM Level 2"
     ],
     "dom_element_get_attribute_ns": [
         "string dom_element_get_attribute_ns(string namespaceURI, string localName);",
-        "URL: http:\/\/www.w3.org\/TR\/2003\/WD-DOM-Level-3-Core-20030226\/DOM3-Core.html#application-ID-ElGetAttrNS Since: DOM Level 2"
+        "URL: http:\/\/www.w3.org\/TR\/2003\/WD-DOM-Level-3-Core-20030226\/DOM3-Core.html#core-ID-ElGetAttrNS Since: DOM Level 2"
     ],
     "dom_element_get_elements_by_tag_name": [
         "DOMNodeList dom_element_get_elements_by_tag_name(string name);",
-        "URL: http:\/\/www.w3.org\/TR\/2003\/WD-DOM-Level-3-Core-20030226\/DOM3-Core.html#application-ID-1938918D Since:"
+        "URL: http:\/\/www.w3.org\/TR\/2003\/WD-DOM-Level-3-Core-20030226\/DOM3-Core.html#core-ID-1938918D Since:"
     ],
     "dom_element_get_elements_by_tag_name_ns": [
         "DOMNodeList dom_element_get_elements_by_tag_name_ns(string namespaceURI, string localName);",
-        "URL: http:\/\/www.w3.org\/TR\/2003\/WD-DOM-Level-3-Core-20030226\/DOM3-Core.html#application-ID-A6C90942 Since: DOM Level 2"
+        "URL: http:\/\/www.w3.org\/TR\/2003\/WD-DOM-Level-3-Core-20030226\/DOM3-Core.html#core-ID-A6C90942 Since: DOM Level 2"
     ],
     "dom_element_has_attribute": [
         "boolean dom_element_has_attribute(string name);",
-        "URL: http:\/\/www.w3.org\/TR\/2003\/WD-DOM-Level-3-Core-20030226\/DOM3-Core.html#application-ID-ElHasAttr Since: DOM Level 2"
+        "URL: http:\/\/www.w3.org\/TR\/2003\/WD-DOM-Level-3-Core-20030226\/DOM3-Core.html#core-ID-ElHasAttr Since: DOM Level 2"
     ],
     "dom_element_has_attribute_ns": [
         "boolean dom_element_has_attribute_ns(string namespaceURI, string localName);",
-        "URL: http:\/\/www.w3.org\/TR\/2003\/WD-DOM-Level-3-Core-20030226\/DOM3-Core.html#application-ID-ElHasAttrNS Since: DOM Level 2"
+        "URL: http:\/\/www.w3.org\/TR\/2003\/WD-DOM-Level-3-Core-20030226\/DOM3-Core.html#core-ID-ElHasAttrNS Since: DOM Level 2"
     ],
     "dom_element_remove_attribute": [
         "void dom_element_remove_attribute(string name);",
-        "URL: http:\/\/www.w3.org\/TR\/2003\/WD-DOM-Level-3-Core-20030226\/DOM3-Core.html#application-ID-6D6AC0F9 Since:"
+        "URL: http:\/\/www.w3.org\/TR\/2003\/WD-DOM-Level-3-Core-20030226\/DOM3-Core.html#core-ID-6D6AC0F9 Since:"
     ],
     "dom_element_remove_attribute_node": [
         "DOMAttr dom_element_remove_attribute_node(DOMAttr oldAttr);",
-        "URL: http:\/\/www.w3.org\/TR\/2003\/WD-DOM-Level-3-Core-20030226\/DOM3-Core.html#application-ID-D589198 Since:"
+        "URL: http:\/\/www.w3.org\/TR\/2003\/WD-DOM-Level-3-Core-20030226\/DOM3-Core.html#core-ID-D589198 Since:"
     ],
     "dom_element_remove_attribute_ns": [
         "void dom_element_remove_attribute_ns(string namespaceURI, string localName);",
-        "URL: http:\/\/www.w3.org\/TR\/2003\/WD-DOM-Level-3-Core-20030226\/DOM3-Core.html#application-ID-ElRemAtNS Since: DOM Level 2"
+        "URL: http:\/\/www.w3.org\/TR\/2003\/WD-DOM-Level-3-Core-20030226\/DOM3-Core.html#core-ID-ElRemAtNS Since: DOM Level 2"
     ],
     "dom_element_set_attribute": [
         "void dom_element_set_attribute(string name, string value);",
-        "URL: http:\/\/www.w3.org\/TR\/2003\/WD-DOM-Level-3-Core-20030226\/DOM3-Core.html#application-ID-F68F082 Since:"
+        "URL: http:\/\/www.w3.org\/TR\/2003\/WD-DOM-Level-3-Core-20030226\/DOM3-Core.html#core-ID-F68F082 Since:"
     ],
     "dom_element_set_attribute_node": [
         "DOMAttr dom_element_set_attribute_node(DOMAttr newAttr);",
-        "URL: http:\/\/www.w3.org\/TR\/2003\/WD-DOM-Level-3-Core-20030226\/DOM3-Core.html#application-ID-887236154 Since:"
+        "URL: http:\/\/www.w3.org\/TR\/2003\/WD-DOM-Level-3-Core-20030226\/DOM3-Core.html#core-ID-887236154 Since:"
     ],
     "dom_element_set_attribute_node_ns": [
         "DOMAttr dom_element_set_attribute_node_ns(DOMAttr newAttr);",
-        "URL: http:\/\/www.w3.org\/TR\/2003\/WD-DOM-Level-3-Core-20030226\/DOM3-Core.html#application-ID-ElSetAtNodeNS Since: DOM Level 2"
+        "URL: http:\/\/www.w3.org\/TR\/2003\/WD-DOM-Level-3-Core-20030226\/DOM3-Core.html#core-ID-ElSetAtNodeNS Since: DOM Level 2"
     ],
     "dom_element_set_attribute_ns": [
         "void dom_element_set_attribute_ns(string namespaceURI, string qualifiedName, string value);",
-        "URL: http:\/\/www.w3.org\/TR\/2003\/WD-DOM-Level-3-Core-20030226\/DOM3-Core.html#application-ID-ElSetAttrNS Since: DOM Level 2"
+        "URL: http:\/\/www.w3.org\/TR\/2003\/WD-DOM-Level-3-Core-20030226\/DOM3-Core.html#core-ID-ElSetAttrNS Since: DOM Level 2"
     ],
     "dom_element_set_id_attribute": [
         "void dom_element_set_id_attribute(string name, boolean isId);",
-        "URL: http:\/\/www.w3.org\/TR\/2003\/WD-DOM-Level-3-Core-20030226\/DOM3-Core.html#application-ID-ElSetIdAttr Since: DOM Level 3"
+        "URL: http:\/\/www.w3.org\/TR\/2003\/WD-DOM-Level-3-Core-20030226\/DOM3-Core.html#core-ID-ElSetIdAttr Since: DOM Level 3"
     ],
     "dom_element_set_id_attribute_node": [
         "void dom_element_set_id_attribute_node(attr idAttr, boolean isId);",
-        "URL: http:\/\/www.w3.org\/TR\/2003\/WD-DOM-Level-3-Core-20030226\/DOM3-Core.html#application-ID-ElSetIdAttrNode Since: DOM Level 3"
+        "URL: http:\/\/www.w3.org\/TR\/2003\/WD-DOM-Level-3-Core-20030226\/DOM3-Core.html#core-ID-ElSetIdAttrNode Since: DOM Level 3"
     ],
     "dom_element_set_id_attribute_ns": [
         "void dom_element_set_id_attribute_ns(string namespaceURI, string localName, boolean isId);",
-        "URL: http:\/\/www.w3.org\/TR\/2003\/WD-DOM-Level-3-Core-20030226\/DOM3-Core.html#application-ID-ElSetIdAttrNS Since: DOM Level 3"
+        "URL: http:\/\/www.w3.org\/TR\/2003\/WD-DOM-Level-3-Core-20030226\/DOM3-Core.html#core-ID-ElSetIdAttrNS Since: DOM Level 3"
     ],
     "dom_import_simplexml": [
         "somNode dom_import_simplexml(sxeobject node)",
@@ -3550,31 +3550,31 @@ var functionMap = {
     ],
     "dom_namednodemap_get_named_item": [
         "DOMNode dom_namednodemap_get_named_item(string name);",
-        "URL: http:\/\/www.w3.org\/TR\/2003\/WD-DOM-Level-3-Core-20030226\/DOM3-Core.html#application-ID-1074577549 Since:"
+        "URL: http:\/\/www.w3.org\/TR\/2003\/WD-DOM-Level-3-Core-20030226\/DOM3-Core.html#core-ID-1074577549 Since:"
     ],
     "dom_namednodemap_get_named_item_ns": [
         "DOMNode dom_namednodemap_get_named_item_ns(string namespaceURI, string localName);",
-        "URL: http:\/\/www.w3.org\/TR\/2003\/WD-DOM-Level-3-Core-20030226\/DOM3-Core.html#application-ID-getNamedItemNS Since: DOM Level 2"
+        "URL: http:\/\/www.w3.org\/TR\/2003\/WD-DOM-Level-3-Core-20030226\/DOM3-Core.html#core-ID-getNamedItemNS Since: DOM Level 2"
     ],
     "dom_namednodemap_item": [
         "DOMNode dom_namednodemap_item(int index);",
-        "URL: http:\/\/www.w3.org\/TR\/2003\/WD-DOM-Level-3-Core-20030226\/DOM3-Core.html#application-ID-349467F9 Since:"
+        "URL: http:\/\/www.w3.org\/TR\/2003\/WD-DOM-Level-3-Core-20030226\/DOM3-Core.html#core-ID-349467F9 Since:"
     ],
     "dom_namednodemap_remove_named_item": [
         "DOMNode dom_namednodemap_remove_named_item(string name);",
-        "URL: http:\/\/www.w3.org\/TR\/2003\/WD-DOM-Level-3-Core-20030226\/DOM3-Core.html#application-ID-D58B193 Since:"
+        "URL: http:\/\/www.w3.org\/TR\/2003\/WD-DOM-Level-3-Core-20030226\/DOM3-Core.html#core-ID-D58B193 Since:"
     ],
     "dom_namednodemap_remove_named_item_ns": [
         "DOMNode dom_namednodemap_remove_named_item_ns(string namespaceURI, string localName);",
-        "URL: http:\/\/www.w3.org\/TR\/2003\/WD-DOM-Level-3-Core-20030226\/DOM3-Core.html#application-ID-removeNamedItemNS Since: DOM Level 2"
+        "URL: http:\/\/www.w3.org\/TR\/2003\/WD-DOM-Level-3-Core-20030226\/DOM3-Core.html#core-ID-removeNamedItemNS Since: DOM Level 2"
     ],
     "dom_namednodemap_set_named_item": [
         "DOMNode dom_namednodemap_set_named_item(DOMNode arg);",
-        "URL: http:\/\/www.w3.org\/TR\/2003\/WD-DOM-Level-3-Core-20030226\/DOM3-Core.html#application-ID-1025163788 Since:"
+        "URL: http:\/\/www.w3.org\/TR\/2003\/WD-DOM-Level-3-Core-20030226\/DOM3-Core.html#core-ID-1025163788 Since:"
     ],
     "dom_namednodemap_set_named_item_ns": [
         "DOMNode dom_namednodemap_set_named_item_ns(DOMNode arg);",
-        "URL: http:\/\/www.w3.org\/TR\/2003\/WD-DOM-Level-3-Core-20030226\/DOM3-Core.html#application-ID-setNamedItemNS Since: DOM Level 2"
+        "URL: http:\/\/www.w3.org\/TR\/2003\/WD-DOM-Level-3-Core-20030226\/DOM3-Core.html#core-ID-setNamedItemNS Since: DOM Level 2"
     ],
     "dom_namelist_get_name": [
         "string dom_namelist_get_name(int index);",
@@ -3586,11 +3586,11 @@ var functionMap = {
     ],
     "dom_node_append_child": [
         "DomNode dom_node_append_child(DomNode newChild);",
-        "URL: http:\/\/www.w3.org\/TR\/2003\/WD-DOM-Level-3-Core-20030226\/DOM3-Core.html#application-ID-184E7107 Since:"
+        "URL: http:\/\/www.w3.org\/TR\/2003\/WD-DOM-Level-3-Core-20030226\/DOM3-Core.html#core-ID-184E7107 Since:"
     ],
     "dom_node_clone_node": [
         "DomNode dom_node_clone_node(boolean deep);",
-        "URL: http:\/\/www.w3.org\/TR\/2003\/WD-DOM-Level-3-Core-20030226\/DOM3-Core.html#application-ID-3A0ED0A4 Since:"
+        "URL: http:\/\/www.w3.org\/TR\/2003\/WD-DOM-Level-3-Core-20030226\/DOM3-Core.html#core-ID-3A0ED0A4 Since:"
     ],
     "dom_node_compare_document_position": [
         "short dom_node_compare_document_position(DomNode other);",
@@ -3606,19 +3606,19 @@ var functionMap = {
     ],
     "dom_node_has_attributes": [
         "boolean dom_node_has_attributes();",
-        "URL: http:\/\/www.w3.org\/TR\/2003\/WD-DOM-Level-3-Core-20030226\/DOM3-Core.html#application-ID-NodeHasAttrs Since: DOM Level 2"
+        "URL: http:\/\/www.w3.org\/TR\/2003\/WD-DOM-Level-3-Core-20030226\/DOM3-Core.html#core-ID-NodeHasAttrs Since: DOM Level 2"
     ],
     "dom_node_has_child_nodes": [
         "boolean dom_node_has_child_nodes();",
-        "URL: http:\/\/www.w3.org\/TR\/2003\/WD-DOM-Level-3-Core-20030226\/DOM3-Core.html#application-ID-810594187 Since:"
+        "URL: http:\/\/www.w3.org\/TR\/2003\/WD-DOM-Level-3-Core-20030226\/DOM3-Core.html#core-ID-810594187 Since:"
     ],
     "dom_node_insert_before": [
         "domnode dom_node_insert_before(DomNode newChild, DomNode refChild);",
-        "URL: http:\/\/www.w3.org\/TR\/2003\/WD-DOM-Level-3-Core-20030226\/DOM3-Core.html#application-ID-952280727 Since:"
+        "URL: http:\/\/www.w3.org\/TR\/2003\/WD-DOM-Level-3-Core-20030226\/DOM3-Core.html#core-ID-952280727 Since:"
     ],
     "dom_node_is_default_namespace": [
         "boolean dom_node_is_default_namespace(string namespaceURI);",
-        "URL: http:\/\/www.w3.org\/TR\/DOM-Level-3-Core\/application.html#Node3-isDefaultNamespace Since: DOM Level 3"
+        "URL: http:\/\/www.w3.org\/TR\/DOM-Level-3-Core\/core.html#Node3-isDefaultNamespace Since: DOM Level 3"
     ],
     "dom_node_is_equal_node": [
         "boolean dom_node_is_equal_node(DomNode arg);",
@@ -3630,11 +3630,11 @@ var functionMap = {
     ],
     "dom_node_is_supported": [
         "boolean dom_node_is_supported(string feature, string version);",
-        "URL: http:\/\/www.w3.org\/TR\/2003\/WD-DOM-Level-3-Core-20030226\/DOM3-Core.html#application-Level-2-Core-Node-supports Since: DOM Level 2"
+        "URL: http:\/\/www.w3.org\/TR\/2003\/WD-DOM-Level-3-Core-20030226\/DOM3-Core.html#core-Level-2-Core-Node-supports Since: DOM Level 2"
     ],
     "dom_node_lookup_namespace_uri": [
         "string dom_node_lookup_namespace_uri(string prefix);",
-        "URL: http:\/\/www.w3.org\/TR\/DOM-Level-3-Core\/application.html#Node3-lookupNamespaceURI Since: DOM Level 3"
+        "URL: http:\/\/www.w3.org\/TR\/DOM-Level-3-Core\/core.html#Node3-lookupNamespaceURI Since: DOM Level 3"
     ],
     "dom_node_lookup_prefix": [
         "string dom_node_lookup_prefix(string namespaceURI);",
@@ -3642,15 +3642,15 @@ var functionMap = {
     ],
     "dom_node_normalize": [
         "void dom_node_normalize();",
-        "URL: http:\/\/www.w3.org\/TR\/2003\/WD-DOM-Level-3-Core-20030226\/DOM3-Core.html#application-ID-normalize Since:"
+        "URL: http:\/\/www.w3.org\/TR\/2003\/WD-DOM-Level-3-Core-20030226\/DOM3-Core.html#core-ID-normalize Since:"
     ],
     "dom_node_remove_child": [
         "DomNode dom_node_remove_child(DomNode oldChild);",
-        "URL: http:\/\/www.w3.org\/TR\/2003\/WD-DOM-Level-3-Core-20030226\/DOM3-Core.html#application-ID-1734834066 Since:"
+        "URL: http:\/\/www.w3.org\/TR\/2003\/WD-DOM-Level-3-Core-20030226\/DOM3-Core.html#core-ID-1734834066 Since:"
     ],
     "dom_node_replace_child": [
         "DomNode dom_node_replace_child(DomNode newChild, DomNode oldChild);",
-        "URL: http:\/\/www.w3.org\/TR\/2003\/WD-DOM-Level-3-Core-20030226\/DOM3-Core.html#application-ID-785887307 Since:"
+        "URL: http:\/\/www.w3.org\/TR\/2003\/WD-DOM-Level-3-Core-20030226\/DOM3-Core.html#core-ID-785887307 Since:"
     ],
     "dom_node_set_user_data": [
         "mixed dom_node_set_user_data(string key, mixed data, userdatahandler handler);",
@@ -3670,15 +3670,15 @@ var functionMap = {
     ],
     "dom_text_is_whitespace_in_element_content": [
         "boolean dom_text_is_whitespace_in_element_content();",
-        "URL: http:\/\/www.w3.org\/TR\/2003\/WD-DOM-Level-3-Core-20030226\/DOM3-Core.html#application-Text3-isWhitespaceInElementContent Since: DOM Level 3"
+        "URL: http:\/\/www.w3.org\/TR\/2003\/WD-DOM-Level-3-Core-20030226\/DOM3-Core.html#core-Text3-isWhitespaceInElementContent Since: DOM Level 3"
     ],
     "dom_text_replace_whole_text": [
         "DOMText dom_text_replace_whole_text(string content);",
-        "URL: http:\/\/www.w3.org\/TR\/2003\/WD-DOM-Level-3-Core-20030226\/DOM3-Core.html#application-Text3-replaceWholeText Since: DOM Level 3"
+        "URL: http:\/\/www.w3.org\/TR\/2003\/WD-DOM-Level-3-Core-20030226\/DOM3-Core.html#core-Text3-replaceWholeText Since: DOM Level 3"
     ],
     "dom_text_split_text": [
         "DOMText dom_text_split_text(int offset);",
-        "URL: http:\/\/www.w3.org\/TR\/2003\/WD-DOM-Level-3-Core-20030226\/DOM3-Core.html#application-ID-38853C1D Since:"
+        "URL: http:\/\/www.w3.org\/TR\/2003\/WD-DOM-Level-3-Core-20030226\/DOM3-Core.html#core-ID-38853C1D Since:"
     ],
     "dom_userdatahandler_handle": [
         "dom_void dom_userdatahandler_handle(short operation, string key, domobject data, node src, node dst);",

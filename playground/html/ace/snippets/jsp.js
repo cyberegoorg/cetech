@@ -4,10 +4,10 @@ define("ace/snippets/jsp",["require","exports","module"], function(require, expo
 exports.snippetText = "snippet @page\n\
 	<%@page contentType=\"text/html\" pageEncoding=\"UTF-8\"%>\n\
 snippet jstl\n\
-	<%@ taglib uri=\"http://java.sun.com/jsp/jstl/application\" prefix=\"c\" %>\n\
+	<%@ taglib uri=\"http://java.sun.com/jsp/jstl/core\" prefix=\"c\" %>\n\
 	<%@ taglib uri=\"http://java.sun.com/jsp/jstl/functions\" prefix=\"fn\" %>\n\
 snippet jstl:c\n\
-	<%@ taglib uri=\"http://java.sun.com/jsp/jstl/application\" prefix=\"c\" %>\n\
+	<%@ taglib uri=\"http://java.sun.com/jsp/jstl/core\" prefix=\"c\" %>\n\
 snippet jstl:fn\n\
 	<%@ taglib uri=\"http://java.sun.com/jsp/jstl/functions\" prefix=\"fn\" %>\n\
 snippet cpath\n\

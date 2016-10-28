@@ -1100,7 +1100,7 @@ var JspHighlightRules = function() {
     HtmlHighlightRules.call(this);
 
     var builtinVariables = 'request|response|out|session|' +
-        'application|config|pageContext|page|Exception';
+        'core|config|pageContext|page|Exception';
 
     var keywords = 'page|include|taglib';
 
