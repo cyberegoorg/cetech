@@ -47,7 +47,6 @@ var groups = [
 var timeline = new vis.Timeline(container, items, groups, options);
 
 var Record = false;
-var sample_count = 0;
 
 ws = new WebSocket("ws://localhost:4447", "pub.sp.nanomsg.org");
 ws.binaryType = "arraybuffer";
@@ -58,12 +57,6 @@ ws.onclosed = function () {
     console.log("closed");
 };
 ws.onmessage = function (evt) {
-    if(sample_count < 20 ) {
-        sample_count += 1;
-        return;
-    }
-    sample_count = 0;
-
     var events = msgpack.decode(new Uint8Array(evt.data));
     var data_window = [];
 

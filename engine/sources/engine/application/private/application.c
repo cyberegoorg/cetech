@@ -19,6 +19,8 @@
 #include <engine/resource/resource.h>
 #include <engine/renderer/renderer.h>
 #include <engine/develop/develop_system.h>
+#include <celib/os/thread.h>
+#include <celib/math/fmath.h>
 
 #include "celib/memory/memory.h"
 #include "engine/input/input.h"
@@ -310,7 +312,10 @@ void application_start() {
     log_info("core.ready", "Run main loop");
 
     float lag = 0.0f;
-    float frame_time = 1.0f/ 1000.0f;//1.0f / frame_limit;
+    float frame_limit = 60.0f;
+    float frame_time = (1.0f / frame_limit);
+
+    float time_accum = 0.0f;
 
     consolesrv_push_begin();
     while (_G.is_running) {
@@ -322,21 +327,16 @@ void application_start() {
         _G.dt = dt;
         last_tick = now_ticks;
 
-        lag += dt;
+        consolesrv_update();
 
+        time_accum += dt;
+        machine_process();
+        _dump_event();
+        keyboard_process();
+        mouse_process();
+        gamepad_process();
 
-        while(lag >= frame_time) {
-            machine_process();
-            _dump_event();
-            keyboard_process();
-            mouse_process();
-            gamepad_process();
-
-            consolesrv_update();
-
-            _G.game->update(frame_time);
-            lag -= frame_time;
-        }
+        _G.game->update(dt);
 
         if (!cvar_get_int(_G.config.cv_daemon)) {
             struct scope_data render_sd = developsys_enter_scope("Game::render()");
@@ -344,10 +344,12 @@ void application_start() {
             window_update(_G.main_window);
             developsys_leave_scope("Game::render()", render_sd);
         }
+        developsys_leave_scope("Application:update()", application_sd);
 
         developsys_push_record_float("engine.delta_time", dt);
-        developsys_leave_scope("Application:update()", application_sd);
         developsys_update();
+        //usleep((__useconds_t) f32_round ((frame_time) * 1000.0f * 1000.0f));
+        os_thread_yield();
     }
 
     _G.game->shutdown();
