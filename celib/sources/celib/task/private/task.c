@@ -82,6 +82,10 @@ static void _push_task(task_t t) {
 static task_t _try_pop(struct task_queue *q) {
     u32 poped_task;
 
+    if(!queue_task_size(q)) {
+        return task_null;
+    }
+
     if (queue_task_pop(q, &poped_task, 0)) {
         if (poped_task != 0) {
             return make_task(poped_task);

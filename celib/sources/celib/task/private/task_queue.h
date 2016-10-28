@@ -61,12 +61,12 @@ void queue_task_destroy(struct task_queue *q) {
     CE_DEALLOCATE(q->allocator, q->_sequences);
 }
 
-//u32 queue_mpmc_size(struct queue_task* q) {
-//    u32 e = atomic_load(&q->_enqueuePos) & q->_capacityMask;
-//    u32 d = atomic_load(&q->_dequeuePos) & q->_capacityMask;
-//
-//    return e > d ? e - d : d - e;
-//}
+u32 queue_task_size(struct task_queue* q) {
+    u32 e = atomic_load(&q->_enqueuePos) & q->_capacityMask;
+    u32 d = atomic_load(&q->_dequeuePos) & q->_capacityMask;
+
+    return e > d ? e - d : d - e;
+}
 
 int queue_task_push(struct task_queue *q,
                     u32 value) {

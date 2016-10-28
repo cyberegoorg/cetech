@@ -9,7 +9,7 @@ class ConsoleAPI(ConsoleProxy):
         return self.send_command('lua_system.execute', script=script)
 
     def compile_all(self):
-        return self.lua_execute("cetech.ResourceCompilator.compile_all()")
+        return self.lua_execute("cetech.ResourceManager.compile_all()")
 
     def reload_all(self):
         return self.lua_execute("cetech.ResourceManager.reload_all()")

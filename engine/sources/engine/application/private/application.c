@@ -250,6 +250,13 @@ static void _boot_unload() {
 
     package_unload(boot_pkg);
     resource_unload(pkg, &boot_pkg, 1);
+
+    if (!cvar_get_int(_G.config.cv_daemon)) {
+        stringid64_t core_pkg = stringid64_from_string("core");
+        package_unload(core_pkg);
+        resource_unload(pkg, &core_pkg, 1);
+    }
+
 }
 
 void application_start() {
@@ -326,25 +333,23 @@ void application_start() {
 
         _G.game->update(dt);
 
+        struct scope_data render_sd = developsys_enter_scope("Game::render()");
+        if (!cvar_get_int(_G.config.cv_daemon)) {
+            if (frame_time_accu < frame_time) {
+                frame_time_accu += _G.dt;
+            } else {
+                frame_time_accu = 0.0f;
 
-        if (cvar_get_int(_G.config.cv_daemon)) {
-            return;
-        }
-
-        if (frame_time_accu < frame_time) {
-            frame_time_accu += _G.dt;
-        } else {
-            frame_time_accu = 0.0f;
-            if (!cvar_get_int(_G.config.cv_daemon)) {
-                _G.game->render();
-                window_update(_G.main_window);
             }
         }
 
+        _G.game->render();
+        window_update(_G.main_window);
+
+        developsys_leave_scope("Game::render()", render_sd);
+
         developsys_push_record_float("engine.delta_time", dt);
-
         developsys_leave_scope("Application:update()", application_sd);
-
         developsys_update();
     }
 
