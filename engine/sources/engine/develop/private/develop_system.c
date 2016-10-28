@@ -264,13 +264,9 @@ void developsys_shutdown() {
 }
 
 void developsys_update() {
-    struct scope_data render_sd = developsys_enter_scope("Developsys::update()");
-
     _flush_all_streams();
     _send_events();
     eventstream_clear(&_G.eventstream);
-
-    developsys_leave_scope("Developsys::update()", render_sd);
 }
 
 void developsys_push_record_float(const char *name,
