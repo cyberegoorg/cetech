@@ -35,16 +35,6 @@
 // Globals
 //==============================================================================
 
-struct G {
-    stringid64_t compilator_map_type[MAX_TYPES]; // TODO: MAP
-    resource_compilator_t compilator_map_compilator[MAX_TYPES]; // TODO: MAP
-    cvar_t cv_source_dir;
-    cvar_t cv_core_dir;
-    cvar_t cv_build_dir; // TODO: MOVE TO RESOURCE MANAGER
-    cvar_t cv_external_dir;
-} ResourceCompilerGlobal = {0};
-
-
 struct compile_task_data {
     char *source_filename;
     stringid64_t type;
@@ -53,8 +43,22 @@ struct compile_task_data {
     struct vio *build;
     time_t mtime;
     resource_compilator_t compilator;
+    atomic_int completed;
 };
-CE_STATIC_ASSERT(sizeof(struct compile_task_data) < 64);
+
+ARRAY_PROTOTYPE_N(struct compile_task_data*, compile_task_data_ptr);
+
+struct G {
+    stringid64_t compilator_map_type[MAX_TYPES]; // TODO: MAP
+    resource_compilator_t compilator_map_compilator[MAX_TYPES]; // TODO: MAP
+
+    cvar_t cv_source_dir;
+    cvar_t cv_core_dir;
+    cvar_t cv_build_dir; // TODO: MOVE TO RESOURCE MANAGER
+    cvar_t cv_external_dir;
+} ResourceCompilerGlobal = {0};
+
+//CE_STATIC_ASSERT(sizeof(struct compile_task_data) < 64);
 
 
 //==============================================================================
@@ -74,6 +78,7 @@ void _add_dependency(const char *who_filename,
 static struct compilator_api _compilator_api = {
         .add_dependency = _add_dependency
 };
+
 
 static void _compile_task(void *data) {
     struct compile_task_data *tdata = data;
@@ -97,6 +102,8 @@ static void _compile_task(void *data) {
     CE_DEALLOCATE(memsys_main_scratch_allocator(), tdata->source_filename);
     vio_close(tdata->source);
     vio_close(tdata->build);
+
+    atomic_store_explicit(&tdata->completed, 1, memory_order_release);
 }
 
 resource_compilator_t _find_compilator(stringid64_t type) {
@@ -111,11 +118,13 @@ resource_compilator_t _find_compilator(stringid64_t type) {
     return NULL;
 }
 
-void _compile_dir(task_t root_task,
+void _compile_dir(ARRAY_T(compile_task_data_ptr) *tasks,
                   struct array_pchar *files,
                   const char *source_dir,
                   const char *build_dir_full) {
+
     os_dir_list(source_dir, 1, files, memsys_main_scratch_allocator());
+
     for (int i = 0; i < ARRAY_SIZE(files); ++i) {
         const char *source_filename_full = ARRAY_AT(files, i);
         const char *source_filename_short = ARRAY_AT(files, i) + str_lenght(source_dir) + 1;
@@ -158,22 +167,25 @@ void _compile_dir(task_t root_task,
             continue;
         }
 
-        struct compile_task_data data = {
+        struct compile_task_data* data = CE_ALLOCATE(memsys_main_allocator(), struct compile_task_data, 1);
+
+        *data = (struct compile_task_data){
                 .name = name_id,
                 .type = type_id,
                 .build = build_vio,
                 .source = source_vio,
                 .compilator = compilator,
                 .source_filename = str_duplicate(source_filename_short, memsys_main_scratch_allocator()),
-                .mtime = os_file_mtime(source_filename_full)
+                .mtime = os_file_mtime(source_filename_full),
+                .completed = 0
         };
 
-        task_t t = taskmanager_add_begin("compiler_task",
-                                         _compile_task, &data, sizeof(data),
-                                         task_null, root_task,
-                                         TASK_AFFINITY_NONE);
+        ARRAY_PUSH_BACK(compile_task_data_ptr, tasks, data);
 
-        taskmanager_add_end(&t, 1);
+        taskmanager_add("compiler_task",
+                        _compile_task,
+                        data,
+                        TASK_AFFINITY_NONE);
     }
     os_dir_list_free(files, memsys_main_scratch_allocator());
 }
@@ -243,22 +255,26 @@ void resource_compiler_compile_all() {
     char build_dir_full[1024] = {0};
     os_path_join(build_dir_full, CE_ARRAY_LEN(build_dir_full), build_dir, platform);
 
-    task_t root_task = taskmanager_add_null("compile", task_null, task_null, TASK_AFFINITY_NONE);
-
     struct array_pchar files;
     array_init_pchar(&files, memsys_main_scratch_allocator());
 
+    ARRAY_T(compile_task_data_ptr) tasks;
+    ARRAY_INIT(compile_task_data_ptr, &tasks, memsys_main_allocator());
 
     const char *dirs[] = {source_dir, core_dir};
     for (int i = 0; i < CE_ARRAY_LEN(dirs); ++i) {
         array_resize_pchar(&files, 0);
-        _compile_dir(root_task, &files, dirs[i], build_dir_full);
+        _compile_dir(&tasks, &files, dirs[i], build_dir_full);
     }
 
     array_destroy_pchar(&files);
 
-    taskmanager_add_end(&root_task, 1);
-    taskmanager_wait(root_task);
+    for (int i = 0; i < ARRAY_SIZE(&tasks); ++i) {
+        taskmanager_wait_atomic(&ARRAY_AT(&tasks, i)->completed, 0);
+        CE_DEALLOCATE(memsys_main_allocator(), ARRAY_AT(&tasks, i));
+    }
+
+    ARRAY_DESTROY(compile_task_data_ptr, &tasks);
 }
 
 int resource_compiler_get_filename(char *filename,

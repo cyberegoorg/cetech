@@ -1,8 +1,4 @@
 //==============================================================================
-// !!! REFACTOR THIS SHIT IMPLEMENTATION !!!
-//==============================================================================
-
-//==============================================================================
 // Includes
 //==============================================================================
 
@@ -22,8 +18,6 @@
 #define make_task(i) (task_t){.id = i}
 
 #define MAX_TASK 4096
-#define MAX_CONTINUES 32
-#define MAX_TASK_DATA_SIZE 64
 #define LOG_WHERE "taskmanager"
 
 //==============================================================================
@@ -31,27 +25,19 @@
 //==============================================================================
 
 struct task {
-    task_t continues[MAX_CONTINUES];
-    u8 data[MAX_TASK_DATA_SIZE];
+    void* data;
     task_work_t task_work;
     const char *name;
-    atomic_int job_count;
-    atomic_int continues_count;
-
-    task_t parent;
-    task_t depend_on;
-
     enum task_affinity affinity;
 };
 
 static __thread char _worker_id = 0;
 
 static struct G {
-    struct task _taskPool[MAX_TASK];
-    char _openTasks[MAX_TASK];
-    struct task_queue _gloalQueue;
-    struct task_queue _workersQueue[TASK_MAX_WORKERS];
+    struct task _task_pool[MAX_TASK];
+    struct task_queue _workers_queue[TASK_MAX_WORKERS];
     thread_t _workers[TASK_MAX_WORKERS - 1];
+    struct task_queue _gloalQueue;
     atomic_int _task_pool_idx;
     int _workers_count;
     int _Run;
@@ -76,25 +62,22 @@ static task_t _new_task() {
 static void _push_task(task_t t) {
     CE_ASSERT("", t.id != 0);
 
-    int affinity = _G._taskPool[t.id].affinity;
+    int affinity = _G._task_pool[t.id].affinity;
 
     struct task_queue *q;
-    switch (_G._taskPool[t.id].affinity) {
+    switch (_G._task_pool[t.id].affinity) {
         case TASK_AFFINITY_NONE:
             q = &_G._gloalQueue;
             break;
 
         default:
-            q = &_G._workersQueue[affinity - 1];
+            q = &_G._workers_queue[affinity - 2];
             break;
     }
 
     queue_task_push(q, t.id);
 }
 
-static int _task_is_done(task_t task) {
-    return !_G._openTasks[task.id];
-}
 
 static task_t _try_pop(struct task_queue *q) {
     u32 poped_task;
@@ -109,46 +92,29 @@ static task_t _try_pop(struct task_queue *q) {
 }
 
 static void _mark_task_job_done(task_t task) {
-    _G._openTasks[task.id] = 0;
 
-    task_t parent = _G._taskPool[task.id].parent;
-    if (parent.id != 0) {
-        int count = atomic_fetch_sub(&_G._taskPool[parent.id].job_count, 1);
-        if (count == 2) {
-            _push_task(parent);
-        }
-    }
-
-    int continue_count = atomic_load(&_G._taskPool[task.id].continues_count);
-    for (int i = 0; i < continue_count; ++i) {
-        _push_task(_G._taskPool[task.id].continues[i]);
-    }
-
-    _G._taskPool[task.id].job_count = 0;
 }
 
 static task_t _task_pop_new_work() {
     task_t popedTask;
 
-    for (u32 i = 0; i < 3; ++i) {
-        struct task_queue *qw = &_G._workersQueue[_worker_id];
-        struct task_queue *qg = &_G._gloalQueue;
+    struct task_queue *qw = &_G._workers_queue[_worker_id];
+    struct task_queue *qg = &_G._gloalQueue;
 
-        popedTask = _try_pop(qw);
-        if (popedTask.id != 0) {
-            return popedTask;
-        }
+    popedTask = _try_pop(qw);
+    if (popedTask.id != 0) {
+        return popedTask;
+    }
 
-        popedTask = _try_pop(qg);
-        if (popedTask.id != 0) {
-            return popedTask;
-        }
+    popedTask = _try_pop(qg);
+    if (popedTask.id != 0) {
+        return popedTask;
     }
 
     return task_null;
 }
 
-void taskmanager_do_work();
+int taskmanager_do_work();
 
 static int _task_worker(void *o) {
     // Wait for run signal 0 -> 1
@@ -160,8 +126,9 @@ static int _task_worker(void *o) {
     log_debug("task_worker", "Worker %d init", _worker_id);
 
     while (_G._Run) {
-        taskmanager_do_work();
-        os_thread_yield();
+        if(!taskmanager_do_work()) {
+            os_thread_yield();
+        }
     }
 
     log_debug("task_worker", "Worker %d shutdown", _worker_id);
@@ -179,7 +146,6 @@ int taskmanager_init(int stage) {
 
 
     _G = (struct G) {0};
-    memory_set(_G._openTasks, 0, sizeof(char) * MAX_TASK);
 
     int core_count = os_cpu_count();
 
@@ -190,11 +156,10 @@ int taskmanager_init(int stage) {
 
     _G._workers_count = worker_count;
 
-
     queue_task_init(&_G._gloalQueue, MAX_TASK, memsys_main_allocator());
 
     for (int i = 0; i < worker_count + 1; ++i) {
-        queue_task_init(&_G._workersQueue[i], MAX_TASK, memsys_main_allocator());
+        queue_task_init(&_G._workers_queue[i], MAX_TASK, memsys_main_allocator());
     }
 
     for (int j = 0; j < worker_count; ++j) {
@@ -219,89 +184,49 @@ void taskmanager_shutdown() {
     queue_task_destroy(&_G._gloalQueue);
 
     for (int i = 0; i < _G._workers_count + 1; ++i) {
-        queue_task_destroy(&_G._workersQueue[i]);
+        queue_task_destroy(&_G._workers_queue[i]);
     }
 
     _G = (struct G) {0};
 }
 
-task_t taskmanager_add_begin(const char *name,
-                             task_work_t work,
-                             void *data,
-                             char data_len,
-                             task_t depend,
-                             task_t parent,
-                             enum task_affinity affinity) {
+void taskmanager_add(const char *name,
+                     task_work_t work,
+                     void *data,
+                     enum task_affinity affinity) {
     task_t task = _new_task();
 
-    _G._openTasks[task.id] = 1;
-
-    _G._taskPool[task.id] = (struct task) {
+    _G._task_pool[task.id] = (struct task) {
             .name = name,
             .task_work = work,
-            .job_count = 1,
-            .depend_on = depend,
-            .continues_count = 0,
-            .parent = parent,
             .affinity = affinity,
     };
 
-    CE_ASSERT(LOG_WHERE, data_len < MAX_TASK_DATA_SIZE);
-    memory_copy(_G._taskPool[task.id].data, data, (size_t) data_len);
+    _G._task_pool[task.id].data = data;
 
-    if (parent.id != 0) {
-        atomic_fetch_add(&_G._taskPool[parent.id].job_count, 1);
-    }
-
-    if (depend.id != 0) {
-        int idx = atomic_fetch_add(&_G._taskPool[depend.id].continues_count, 1);
-
-        _G._taskPool[depend.id].continues[idx] = task;
-    }
-
-    return task;
+    _push_task(task);
 }
 
-static void _nullm_task(void *d) {
-}
-
-task_t taskmanager_add_null(const char *name,
-                            task_t depend,
-                            task_t parent,
-                            enum task_affinity affinity) {
-
-    return taskmanager_add_begin(name, _nullm_task, NULL, 0, depend, parent, affinity);
-}
-
-void taskmanager_add_end(const task_t *tasks,
-                         size_t count) {
-    for (u32 i = 0; i < count; ++i) {
-        if (_G._taskPool[tasks[i].id].depend_on.id == 0) {
-            if (atomic_load(&_G._taskPool[tasks[i].id].job_count) == 1) {
-                _push_task(tasks[i]);
-            }
-        }
-    }
-}
-
-void taskmanager_do_work() {
+int taskmanager_do_work() {
     task_t t = _task_pop_new_work();
 
     if (t.id == 0) {
-        return;
+        return 0;
     }
 
-    struct scope_data sd = developsys_enter_scope(_G._taskPool[t.id].name);
+    struct scope_data sd = developsys_enter_scope(_G._task_pool[t.id].name);
 
-    _G._taskPool[t.id].task_work(_G._taskPool[t.id].data);
+    _G._task_pool[t.id].task_work(_G._task_pool[t.id].data);
 
-    developsys_leave_scope(_G._taskPool[t.id].name, sd);
+    developsys_leave_scope(_G._task_pool[t.id].name, sd);
 
     _mark_task_job_done(t);
+
+    return 1;
 }
 
-void taskmanager_wait(task_t task) {
-    while (!_task_is_done(task)) {
+void taskmanager_wait_atomic(atomic_int *signal, u32 value) {
+    while(atomic_load_explicit(signal, memory_order_acquire) == value) {
         taskmanager_do_work();
     }
 }
