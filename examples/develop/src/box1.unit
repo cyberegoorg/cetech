@@ -14,7 +14,6 @@ components:
 
     material: "content/scene/solider/head"
 
-
 children:
   "e432c0ed88dd461e81f50973ffb00263":
       components:

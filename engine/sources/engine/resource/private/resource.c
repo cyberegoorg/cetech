@@ -141,7 +141,7 @@ int resource_init(int stage) {
         return 1;
     }
 
-    _G.cv_build_dir = cvar_find(".build");
+    _G.cv_build_dir = cvar_find("build");
 
     char build_dir_full[4096] = {0};
     os_path_join(build_dir_full,

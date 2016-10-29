@@ -107,11 +107,11 @@ int application_init(int argc,
     _G.config.cv_screen_y = cvar_new_int("screen.y", "Screen height", 768);
     _G.config.cv_fullscreen = cvar_new_int("screen.fullscreen", "Fullscreen", 0);
 
-    _G.config.cv_daemon = cvar_new_int(".daemon", "Daemon mode", 0);
-    _G.config.cv_compile = cvar_new_int(".compile", "Comple", 0);
-    _G.config.cv_continue = cvar_new_int(".continue", "Continue after compile", 0);
-    _G.config.cv_wait = cvar_new_int(".wait", "Wait for client", 0);
-    _G.config.cv_wid = cvar_new_int(".wid", "Wid", 0);
+    _G.config.cv_daemon = cvar_new_int("daemon", "Daemon mode", 0);
+    _G.config.cv_compile = cvar_new_int("compile", "Comple", 0);
+    _G.config.cv_continue = cvar_new_int("continue", "Continue after compile", 0);
+    _G.config.cv_wait = cvar_new_int("wait", "Wait for client", 0);
+    _G.config.cv_wid = cvar_new_int("wid", "Wid", 0);
 
     // Cvar stage
     for (int i = 0; i < STATIC_SYSTEMS_SIZE; ++i) {
@@ -326,12 +326,11 @@ void application_start() {
 
         _G.dt = dt;
         last_tick = now_ticks;
+        time_accum += dt;
 
         consolesrv_update();
 
-        time_accum += dt;
         machine_process();
-        _dump_event();
         keyboard_process();
         mouse_process();
         gamepad_process();
@@ -341,14 +340,13 @@ void application_start() {
         if (!cvar_get_int(_G.config.cv_daemon)) {
             struct scope_data render_sd = developsys_enter_scope("Game::render()");
             _G.game->render();
-            window_update(_G.main_window);
             developsys_leave_scope("Game::render()", render_sd);
         }
         developsys_leave_scope("Application:update()", application_sd);
 
         developsys_push_record_float("engine.delta_time", dt);
         developsys_update();
-        //usleep((__useconds_t) f32_round ((frame_time) * 1000.0f * 1000.0f));
+
         os_thread_yield();
     }
 

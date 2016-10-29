@@ -8,6 +8,7 @@
 #include <engine/renderer/mesh_renderer.h>
 #include <engine/develop/console_server.h>
 #include <mpack/mpack.h>
+#include <engine/application/application.h>
 #include "celib/window/window.h"
 #include "engine/renderer/renderer.h"
 
@@ -61,7 +62,6 @@ int renderer_init(int stage) {
     if (stage == 0) {
         return 1;
     }
-
 
     _G = (struct G) {0};
 
@@ -131,6 +131,7 @@ void renderer_render_world(world_t world,
     mesh_render_all(world);
 
     bgfx_frame(0);
+    window_update(application_get_main_window());
 }
 
 vec2f_t renderer_get_size() {

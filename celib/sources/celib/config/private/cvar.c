@@ -211,73 +211,66 @@ void cvar_load_global() {
     yaml_node_foreach_dict(root, foreach_config_clb, &config_data);
 }
 
-int cvar_parse_args(struct args args) {
-    if (os_cmd_has_argument(args, "cvars", 0)) {
-        for (u64 i = 1; i < MAX_VARIABLES; ++i) {
-            if (_G.name[i][0] == '\0') {
-                continue;
-            }
+void _cvar_from_str(const char* name, const char* value) {
+    union {
+        float f;
+        int i;
+        const char *s;
+    } tmp_var;
 
-            log_info(LOG_WHERE, "%s : %s - %s", _G.name[i], _type_to_str[_G.types[i]], _G.desc[i]);
+    cvar_t cvar = cvar_find(name);
+    if (cvar.idx != 0) {
+        enum cvar_type type = _G.types[cvar.idx];
+        switch (type) {
+            case CV_FLOAT:
+                sscanf(value, "%f", &tmp_var.f);
+                cvar_set_float(cvar, tmp_var.f);
+                break;
 
+            case CV_INT:
+                if(value == NULL) {
+                    tmp_var.i = 1;
+                } else {
+                    sscanf(value, "%d", &tmp_var.i);
+                }
+
+                cvar_set_int(cvar, tmp_var.i);
+                break;
+
+            case CV_STRING:
+                cvar_set_string(cvar, value);
+                break;
+
+            default:
+                log_error(LOG_WHERE, "Invalid type for cvar \"%s\"", name);
+                break;
         }
-        return 0;
-    }
 
+    } else {
+        log_error(LOG_WHERE, "Invalid cvar \"%s\"", name);
+    }
+}
+
+int cvar_parse_args(struct args args) {
     struct args tmp_args = args;
     for (int j = 0; j < tmp_args.argc; ++j) {
-        int idx = os_cmd_find_argument(tmp_args, "set", 's');
-        if (idx == tmp_args.argc) {
-            return 1;
+        if(tmp_args.argv[j][0] != '-') {
+            continue;
         }
 
-        const char *name = os_cmd_get_parameter(tmp_args, "set", 's', 0);
-        const char *value = os_cmd_get_parameter(tmp_args, "set", 's', 1);
+        const char *name = tmp_args.argv[j] + 1;
+        const char *value = (j != tmp_args.argc - 1) ? tmp_args.argv[j + 1] : NULL;
+
+        if(value && (value[0]   == '-')) {
+            value = NULL;
+        } else {
+            ++j;
+        }
 
         log_info(LOG_WHERE, "%s : %s ", name, value);
 
-        union {
-            float f;
-            int i;
-            const char *s;
-        } tmp_var;
-
-        cvar_t cvar = cvar_find(name);
-        if (cvar.idx != 0) {
-            enum cvar_type type = _G.types[cvar.idx];
-            switch (type) {
-                case CV_FLOAT:
-                    sscanf(value, "%f", &tmp_var.f);
-                    cvar_set_float(cvar, tmp_var.f);
-                    break;
-
-                case CV_INT:
-                    sscanf(value, "%d", &tmp_var.i);
-                    cvar_set_int(cvar, tmp_var.i);
-                    break;
-
-                case CV_STRING:
-                    cvar_set_string(cvar, value);
-                    break;
-
-                default:
-                    log_error(LOG_WHERE, "Invalid type for cvar \"%s\"", name);
-                    break;
-            }
-
-        } else {
-            log_error(LOG_WHERE, "Invalid cvar \"%s\"", name);
-        }
-
-        tmp_args.argc -= 1 + 2;
-        tmp_args.argv = tmp_args.argv + idx + 1 + 2;
-        j = 0;
+        _cvar_from_str(name, value);
     }
-
-    if (!os_cmd_has_argument(args, "set", 's')) {
-        return 1;
-    }
-
 
     return 1;
 }
@@ -285,62 +278,27 @@ int cvar_parse_args(struct args args) {
 int cvar_parse_core_args(struct args args) {
     struct args tmp_args = args;
     for (int j = 0; j < tmp_args.argc; ++j) {
-        int idx = os_cmd_find_argument(tmp_args, "set", 's');
-        if (idx == tmp_args.argc) {
-            return 1;
+        if(tmp_args.argv[j][0] != '-') {
+            continue;
         }
 
-        const char *name = os_cmd_get_parameter(tmp_args, "set", 's', 0);
+        const char *name = tmp_args.argv[j] + 1;
 
-        if (!str_compare(name, ".build") ||
-            !str_compare(name, ".compile") ||
-            !str_compare(name, ".src")) {
+        if (!str_compare(name, "build") ||
+            !str_compare(name, "compile") ||
+            !str_compare(name, "src")) {
 
-            const char *value = os_cmd_get_parameter(tmp_args, "set", 's', 1);
+            const char *value = (j != tmp_args.argc - 1) ? tmp_args.argv[j + 1] : NULL;
 
-            union {
-                float f;
-                int i;
-                const char *s;
-            } tmp_var;
-
-            cvar_t cvar = cvar_find(name);
-            if (cvar.idx != 0) {
-                enum cvar_type type = _G.types[cvar.idx];
-                switch (type) {
-                    case CV_FLOAT:
-                        sscanf(value, "%f", &tmp_var.f);
-                        cvar_set_float(cvar, tmp_var.f);
-                        break;
-
-                    case CV_INT:
-                        sscanf(value, "%d", &tmp_var.i);
-                        cvar_set_int(cvar, tmp_var.i);
-                        break;
-
-                    case CV_STRING:
-                        cvar_set_string(cvar, value);
-                        break;
-
-                    default:
-                        log_error(LOG_WHERE, "Invalid type for cvar \"%s\"", name);
-                        break;
-                }
-
+            if(value && (value[0]   == '-')) {
+                value = NULL;
             } else {
-                log_error(LOG_WHERE, "Invalid cvar \"%s\"", name);
+                ++j;
             }
+
+            _cvar_from_str(name, value);
         }
-
-        tmp_args.argc -= 1 + 2;
-        tmp_args.argv = tmp_args.argv + idx + 1 + 2;
-        j = 0;
     }
-
-    if (!os_cmd_has_argument(args, "set", 's')) {
-        return 1;
-    }
-
 
     return 1;
 }

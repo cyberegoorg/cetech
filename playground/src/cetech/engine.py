@@ -72,7 +72,7 @@ class EngineInstance(object):
 
     def run_release(self, build_dir):
         args = [
-            "-s .build %s" % build_dir,
+            "-build %s" % build_dir,
         ]
 
         return self._run(self.BUILD_RELEASE, args, lock=False)
@@ -80,28 +80,28 @@ class EngineInstance(object):
     def run_develop(self, build_dir, source_dir, compile_=False, continue_=False, wait=False, daemon=False,
                     wid=None, core_dir=None, port=None, bootscript=None, bootpkg=None, protocol='ws', check=False, lock=True):
         args = [
-            "-s .build %s" % build_dir,
-            "-s .src %s" % source_dir
+            "-build %s" % build_dir,
+            "-src %s" % source_dir
         ]
 
         if compile_:
-            args.append("-s .compile 1")
-            args.append("-s .external %s" % self.external_dir)
+            args.append("-compile")
+            args.append("-external %s" % self.external_dir)
 
         if continue_:
-            args.append("-s .continue 1")
+            args.append("-continue")
 
         if wait:
-            args.append("-s .wait 1")
+            args.append("-wait")
 
         if bootscript:
-            args.append("-s core.boot_script %s" % bootscript)
+            args.append("-core.boot_script %s" % bootscript)
 
         if bootpkg:
-            args.append("-s core.boot_pkg %s" % bootpkg)
+            args.append("-core.boot_pkg %s" % bootpkg)
 
         if daemon:
-            args.append("-s .daemon 1")
+            args.append("-daemon")
 
         if port:
             self.rpc_url = "%s://localhost:%s" % (protocol, port)
@@ -109,23 +109,23 @@ class EngineInstance(object):
             self.push_url = "%s://*:%s" % (protocol, port + 2)
             self.pub_url = "%s://*:%s" % (protocol, port + 3)
 
-            args.append("-s develop.rpc.port %s" % port)
-            args.append("-s develop.rpc.addr %s://*" % (protocol))
+            args.append("-develop.rpc.port %s" % port)
+            args.append("-develop.rpc.addr %s://*" % (protocol))
 
-            args.append("-s develop.log.port %s" % (port + 1))
-            args.append("-s develop.log.addr %s://*" % (protocol))
+            args.append("-develop.log.port %s" % (port + 1))
+            args.append("-develop.log.addr %s://*" % (protocol))
 
-            args.append("-s develop.pub.port %s" % (port + 3))
-            args.append("-s develop.pub.addr %s://*" % (protocol))
+            args.append("-develop.pub.port %s" % (port + 3))
+            args.append("-develop.pub.addr %s://*" % (protocol))
 
         # TODO bug #114 workaround. Disable create sub engine...
         if wid and platform.system().lower() != 'darwin':
-            args.append("-s .wid %s" % int(wid))
+            args.append("-wid %s" % int(wid))
 
         if core_dir:
-            args.append("-s .core %s" % core_dir)
+            args.append("-core %s" % core_dir)
         else:
-            args.append("-s .core ../core")  # TODO ?
+            args.append("-core ../core")  # TODO ?
 
         self._run(self.BUILD_DEVELOP, args, check=check, lock=lock)
 
@@ -139,7 +139,7 @@ class EngineInstance(object):
 
         if build_type == self.BUILD_DEVELOP:
             self._console_api = ConsoleAPI(self.rpc_url)
-            args.append("-s develop.push.addr %s" % self.push_url.replace("*", "localhost"))
+            args.append("-develop.push.addr %s" % self.push_url.replace("*", "localhost"))
 
         cmd = "%s %s" % (self._get_executable_path(build_type), ' '.join(args))
         print(cmd)

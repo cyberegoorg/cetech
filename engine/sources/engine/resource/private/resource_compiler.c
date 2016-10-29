@@ -200,11 +200,11 @@ void _compile_dir(ARRAY_T(task_item) *tasks,
 int resource_compiler_init(int stage) {
     if (stage == 0) {
         _G = (struct G) {0};
-        _G.cv_source_dir = cvar_new_str(".src", "Resource source dir", "data/src");
-        _G.cv_core_dir = cvar_new_str(".core", "Resource application source dir", "core");
-        _G.cv_external_dir = cvar_new_str(".external", "External build dir", "externals/build");
+        _G.cv_source_dir = cvar_new_str("src", "Resource source dir", "data/src");
+        _G.cv_core_dir = cvar_new_str("core", "Resource application source dir", "core");
+        _G.cv_external_dir = cvar_new_str("external", "External build dir", "externals/build");
 
-        _G.cv_build_dir = cvar_new_str(".build", "Resource build dir", "data/build");
+        _G.cv_build_dir = cvar_new_str("build", "Resource build dir", "data/build");
     } else {
 
         const char *build_dir = cvar_get_string(_G.cv_build_dir);

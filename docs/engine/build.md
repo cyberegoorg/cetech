@@ -20,7 +20,7 @@ $ python3 scripts/build.py
 #### Engine develop build
 
 ```bash
-$ ./bin/linux64/cetech_develop -s .compile 1 -s .continue 1 -s .src ./examples/develop/src -s .build ./examples/develop/build
+$ ./bin/linux64/cetech_develop -compile -continue -src ./examples/develop/src -build ./examples/develop/build
 ```
 
 #### Playground

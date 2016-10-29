@@ -4,9 +4,11 @@
 .vagrant
 .cache
 
-bin
-/build/**
-site
+/bin/
+/build/
+/cmake-build-debug/
+/cmake-build-release/
+/site/
 
 __pycache__
 
