@@ -10,7 +10,6 @@
 #include <celib/string/string.h>
 #include <celib/os/path.h>
 #include <celib/string/stringid.h>
-#include <celib/string/stringid.h>
 #include <celib/task/task.h>
 #include <engine/resource/resource.h>
 #include <engine/application/application.h>

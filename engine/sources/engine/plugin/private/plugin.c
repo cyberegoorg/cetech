@@ -5,9 +5,11 @@
 #include <stdlib.h>
 #include <memory.h>
 #include <celib/os/object.h>
+#include <celib/os/fs.h>
+#include <celib/os/path.h>
 #include "celib/string/string.h"
 
-#include "engine/application/plugin.h"
+#include "engine/plugin/plugin.h"
 
 //==============================================================================
 // Defines
@@ -53,6 +55,7 @@ void _callm_shutdown(get_api_fce_t fce) {
 void _add(const char *path,
           get_api_fce_t fce,
           void *handler) {
+
     for (size_t i = 0; i < MAX_PLUGINS; ++i) {
         if (_G.used[i]) {
             continue;
@@ -79,13 +82,15 @@ void plugin_add_static(get_api_fce_t fce) {
 }
 
 void plugin_load(const char *path) {
+    log_info(LOG_WHERE, "Loading plugin %s", path);
+
     void *obj = os_load_object(path);
-    if (obj != NULL) {
+    if (obj == NULL) {
         return;
     }
 
     void *fce = os_load_function(obj, "get_plugin_api");
-    if (fce != NULL) {
+    if (fce == NULL) {
         return;
     }
 
@@ -137,24 +142,21 @@ void *plugin_get_engine_api(int api,
 }
 
 void plugin_load_dirs(const char *path) {
-//    ALLOCATOR_CREATE_SCOPED(tmp_alloc, mallocator);
-//    ARRAY_T(char_p) files;
-//    ARRAY_INIT(char_p, &files, tmp_alloc);
-//
-//    os_dir_list(path, 0, &files, tmp_alloc);
-//
-//    char buffer[_64B];
-//    for (int k = 0; k < ARRAY_SIZE(&files); ++k) {
-//        str_set(buffer, path);
-//
-//        if (str_startswith(ARRAY_AT(&files, k), PLUGIN_PREFIX)) {
-//            strcpy(buffer + str_lenght(path), ARRAY_AT(&files, k));
-//            plugin_load(buffer);
-//        }
-//    }
-//
-//    os_dir_list_free(&files, tmp_alloc);
-//    ARRAY_DESTROY(char_p, &files);
+    ARRAY_T(pchar) files;
+    ARRAY_INIT(pchar, &files, memsys_main_scratch_allocator());
+
+    os_dir_list(path, 1, &files, memsys_main_scratch_allocator());
+
+    for (int k = 0; k < ARRAY_SIZE(&files); ++k) {
+        const char* filename = os_path_filename(ARRAY_AT(&files, k));
+
+        if (str_startswith(filename, PLUGIN_PREFIX)) {
+            plugin_load(ARRAY_AT(&files, k));
+        }
+    }
+
+    os_dir_list_free(&files, memsys_main_scratch_allocator());
+    ARRAY_DESTROY(pchar, &files);
 }
 
 void plugin_callm_update() {

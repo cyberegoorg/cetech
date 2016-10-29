@@ -129,7 +129,7 @@ set(SOURCE_FILES
         ########################################################################
         # CETECH: Plugin system
         ########################################################################
-        engine/sources/engine/application/private/plugin.c
+        engine/sources/engine/plugin/private/plugin.c
 
         engine/sources/engine/luasys/private/luasys.c
         engine/sources/engine/luasys/private/api/api_keyboard.c
@@ -167,11 +167,11 @@ set(SOURCE_FILES
         engine/sources/engine/world/private/world.c
         engine/sources/engine/world/private/level.c
 
-        engine/sources/engine/machine/private/machine.c
-        engine/sources/engine/machine/private/sdl2/sdl_mouse.c
-        engine/sources/engine/machine/private/sdl2/sdl_keyboard.c
-        engine/sources/engine/machine/private/sdl2/sdl_gamepad.c
-        engine/sources/engine/machine/private/sdl2/sdl_machine.c
+        celib/sources/celib/machine/private/machine.c
+        celib/sources/celib/machine/private/sdl2/sdl_mouse.c
+        celib/sources/celib/machine/private/sdl2/sdl_keyboard.c
+        celib/sources/celib/machine/private/sdl2/sdl_gamepad.c
+        celib/sources/celib/machine/private/sdl2/sdl_machine.c
 
         engine/sources/engine/input/private/keyboard.c
         engine/sources/engine/input/private/mouse.c

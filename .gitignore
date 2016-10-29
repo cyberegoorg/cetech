@@ -1,7 +1,6 @@
 .idea
 .gtm
 .vagrant
-.vagrant
 .cache
 
 /bin/

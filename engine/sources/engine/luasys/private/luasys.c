@@ -16,7 +16,7 @@
 
 #include "engine/luasys/luasys.h"
 #include "engine/develop/console_server.h"
-#include "engine/application/plugin.h"
+#include "engine/plugin/plugin.h"
 
 #include "vectors.h"
 #include "quaternion.h"

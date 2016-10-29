@@ -4,8 +4,8 @@
 
 #include <celib/memory/memory.h>
 #include "celib/containers/array.h"
-#include "engine/machine/machine.h"
-#include "engine/machine/private/sdl2/sdl_parts.h"
+#include "celib/machine/machine.h"
+#include "celib/machine/private/sdl2/sdl_parts.h"
 
 //==============================================================================
 // Defines

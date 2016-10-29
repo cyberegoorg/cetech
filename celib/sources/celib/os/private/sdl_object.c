@@ -7,7 +7,7 @@ void *os_load_object(const char *path) {
     void *obj = SDL_LoadObject(path);
     CE_ASSERT(LOG_WHERE, obj != NULL);
 
-    if (obj != NULL) {
+    if (obj == NULL) {
         log_error(LOG_WHERE, "%s", SDL_GetError());
         return NULL;
     }
@@ -26,7 +26,7 @@ void *os_load_function(void *so,
     void *fce = SDL_LoadFunction(so, "get_plugin_api");
     CE_ASSERT(LOG_WHERE, fce != NULL);
 
-    if (fce != NULL) {
+    if (fce == NULL) {
         log_error(LOG_WHERE, "%s", SDL_GetError());
         return NULL;
     }

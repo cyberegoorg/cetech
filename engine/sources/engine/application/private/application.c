@@ -13,7 +13,7 @@
 
 #include <engine/application/application.h>
 #include <celib/config/cvar.h>
-#include <engine/machine/machine.h>
+#include <celib/machine/machine.h>
 #include <engine/resource/resource.h>
 #include <engine/luasys/luasys.h>
 #include <engine/resource/resource.h>
@@ -21,6 +21,7 @@
 #include <engine/develop/develop_system.h>
 #include <celib/os/thread.h>
 #include <celib/math/fmath.h>
+#include <engine/plugin/plugin.h>
 
 #include "celib/memory/memory.h"
 #include "engine/input/input.h"
@@ -128,6 +129,8 @@ int application_init(int argc,
         resource_compiler_create_build_dir();
         cvar_compile_global();
     }
+
+    plugin_load_dirs("./bin");
 
     cvar_load_global();
 

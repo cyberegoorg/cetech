@@ -29,7 +29,7 @@ int str_compare(const char *s1,
 void str_set(char *result,
              const char *str);
 
-int str_startswith(const char **string,
-                   const char **with);
+int str_startswith(const char *string,
+                   const char *with);
 
 #endif //CETECH_STRING_H
