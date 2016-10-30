@@ -4,7 +4,7 @@
 
 #include <unistd.h>
 
-#include <celib/os/time.h>
+#include <celib/time/time.h>
 #include <celib/window/types.h>
 #include <celib/window/window.h>
 #include <celib/string/stringid.h>
@@ -19,14 +19,14 @@
 #include <engine/resource/resource.h>
 #include <engine/renderer/renderer.h>
 #include <engine/develop/develop_system.h>
-#include <celib/os/thread.h>
+#include <celib/thread/thread.h>
 #include <celib/math/fmath.h>
 #include <engine/plugin/plugin.h>
 
 #include "celib/memory/memory.h"
 #include "engine/input/input.h"
 #include "engine/develop/console_server.h"
-#include "celib/task/task.h"
+#include "celib/thread/task.h"
 
 #define LOG_WHERE "application"
 

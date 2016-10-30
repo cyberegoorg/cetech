@@ -7,7 +7,7 @@
 
 #include <celib/string/stringid.h>
 #include "celib/memory/types.h"
-#include "celib/os/vio_types.h"
+#include "celib/filesystem/vio_types.h"
 
 //==============================================================================
 // Callback typedef

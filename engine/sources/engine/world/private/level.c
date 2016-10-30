@@ -3,7 +3,7 @@
 //==============================================================================
 
 #include <engine/world/world.h>
-#include <celib/os/vio.h>
+#include <celib/filesystem/vio.h>
 #include <engine/resource/resource.h>
 #include <celib/string/stringid.h>
 #include <engine/resource/resource.h>

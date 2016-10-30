@@ -8,7 +8,7 @@
 #include "celib/string/stringid.h"
 #include "celib/containers/array.h"
 #include "celib/types.h"
-#include "celib/os/vio_types.h"
+#include "celib/filesystem/vio_types.h"
 
 //==============================================================================
 // Filesystem Interface

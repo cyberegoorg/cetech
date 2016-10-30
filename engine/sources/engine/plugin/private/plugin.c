@@ -5,8 +5,8 @@
 #include <stdlib.h>
 #include <memory.h>
 #include <celib/os/object.h>
-#include <celib/os/fs.h>
-#include <celib/os/path.h>
+#include <celib/filesystem/fs.h>
+#include <celib/filesystem/path.h>
 #include "celib/string/string.h"
 
 #include "engine/plugin/plugin.h"

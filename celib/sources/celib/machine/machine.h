@@ -7,7 +7,7 @@
 
 #include "celib/math/types.h"
 #include "types.h"
-#include "celib/os/thread_types.h"
+#include "celib/thread/thread_types.h"
 
 typedef int (*machine_part_init_t)();
 

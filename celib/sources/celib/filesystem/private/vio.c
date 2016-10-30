@@ -1,5 +1,5 @@
 #include "celib/containers/eventstream.h"
-#include "celib/os/vio_types.h"
+#include "celib/filesystem/vio_types.h"
 
 #define LOG_WHERE "vio"
 

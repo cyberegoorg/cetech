@@ -2,11 +2,11 @@
 // Includes
 //==============================================================================
 
-#include <celib/os/thread.h>
+#include <celib/thread/thread.h>
 #include <celib/memory/memory.h>
-#include <celib/os/cpu.h>
+#include <celib/cpu/cpu.h>
 #include <engine/develop/develop_system.h>
-#include <celib/task/types.h>
+#include <celib/thread/types.h>
 
 #include "task_queue.h"
 

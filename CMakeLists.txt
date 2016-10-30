@@ -60,15 +60,12 @@ set(EXTERNAL_SOURCE_FILES
         externals/build/${PLATFORM_ID}/release/include/mpack/mpack-node.c
         externals/build/${PLATFORM_ID}/release/include/mpack/mpack-platform.c
         externals/build/${PLATFORM_ID}/release/include/mpack/mpack-reader.c
-        externals/build/${PLATFORM_ID}/release/include/mpack/mpack-writer.c
-        celib/sources/celib/os/thread_types.h)
+        externals/build/${PLATFORM_ID}/release/include/mpack/mpack-writer.c)
 
 set(SOURCE_FILES
         ${EXTERNAL_SOURCE_FILES}
 
-        ########################################################################
-        # CELIB: Containers
-        ########################################################################
+        celib/sources/celib/errors/private/posix_stacktrace.c
 
         ########################################################################
         # CELIB: Memory
@@ -96,10 +93,11 @@ set(SOURCE_FILES
         ########################################################################
         # CELIB: File
         ########################################################################
-        celib/sources/celib/os/private/vio.c
-        celib/sources/celib/os/private/sdl_vio.c
-        celib/sources/celib/os/private/file.c
-        celib/sources/celib/os/private/posix_stacktrace.c
+        celib/sources/celib/filesystem/private/vio.c
+        celib/sources/celib/filesystem/private/sdl_vio.c
+        celib/sources/celib/filesystem/private/file.c
+        celib/sources/celib/filesystem/private/path.c
+
 
         ########################################################################
         # CELIB: Crypto
@@ -116,11 +114,10 @@ set(SOURCE_FILES
         celib/sources/celib/yaml/private/yaml.cc
 
 
-        celib/sources/celib/os/private/sdl_time.c
+        celib/sources/celib/time/private/sdl_time.c
         celib/sources/celib/os/private/sdl_object.c
-        celib/sources/celib/os/private/path.c
-        celib/sources/celib/os/private/sdl_thread.c
-        celib/sources/celib/os/private/sdl_cpu.c
+        celib/sources/celib/thread/private/sdl_thread.c
+        celib/sources/celib/cpu/private/sdl_cpu.c
         celib/sources/celib/string/private/stringid.c
         celib/sources/celib/window/private/sdl_window.c
         celib/sources/celib/log/private/log_system.c
@@ -158,7 +155,7 @@ set(SOURCE_FILES
 
         engine/sources/engine/resource/private/filesystem.c
         engine/sources/engine/application/private/application.c
-        celib/sources/celib/task/private/task.c
+        celib/sources/celib/thread/private/task.c
         engine/sources/engine/resource/private/resource.c
         engine/sources/engine/resource/private/resource_package.c
         engine/sources/engine/resource/private/resource_compiler.c

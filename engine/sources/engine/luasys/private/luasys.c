@@ -5,7 +5,7 @@
 #include <include/mpack/mpack.h>
 #include <celib/string/stringid.h>
 #include <engine/resource/resource.h>
-#include <celib/os/vio.h>
+#include <celib/filesystem/vio.h>
 #include <celib/memory/memory.h>
 #include <engine/resource/resource.h>
 #include <celib/memory/memory.h>

@@ -2,12 +2,12 @@
 // Includes
 //==============================================================================
 
-#include <celib/os/path.h>
+#include <celib/filesystem/path.h>
 #include <celib/memory/memory.h>
-#include "celib/os/fs.h"
+#include "celib/filesystem/fs.h"
 #include "celib/string/string.h"
 
-#include "celib/os/vio.h"
+#include "celib/filesystem/vio.h"
 
 #include "engine/resource/filesystem.h"
 

@@ -7,7 +7,7 @@
 
 #include <stdlib.h>
 #include <stdatomic.h>
-#include "celib/task/types.h"
+#include "celib/thread/types.h"
 
 #define CE_ASSERT_IS_WORKER(where, worker_id)\
     CE_ASSERT_MSG(where, taskmanager_worker_id() == worker_id, "Current worker: %d", taskmanager_worker_id())

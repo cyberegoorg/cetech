@@ -15,9 +15,9 @@
 #include "celib/containers/map.h"
 #include "celib/os/process.h"
 #include "celib/yaml/yaml.h"
-#include "celib/os/path.h"
-#include "celib/os/vio.h"
-#include "celib/os/fs.h"
+#include "celib/filesystem/path.h"
+#include "celib/filesystem/vio.h"
+#include "celib/filesystem/fs.h"
 
 #include "celib/memory/memory.h"
 #include "engine/application/application.h"

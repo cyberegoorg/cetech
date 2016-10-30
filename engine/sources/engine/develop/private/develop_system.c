@@ -3,7 +3,7 @@
 //==============================================================================
 
 #include <stdio.h>
-#include <celib/os/time.h>
+#include <celib/time/time.h>
 #include <celib/containers/map.h>
 
 #include "include/SDL2/SDL_timer.h"
@@ -11,13 +11,13 @@
 #include "include/nanomsg/nn.h"
 #include "include/nanomsg/pubsub.h"
 
-#include "celib/os/thread_types.h"
-#include "celib/os/thread.h"
+#include "celib/thread/thread_types.h"
+#include "celib/thread/thread.h"
 #include "celib/errors/errors.h"
 #include "celib/containers/eventstream.h"
 
 #include "celib/config/cvar.h"
-#include "celib/task/task.h"
+#include "celib/thread/task.h"
 #include "celib/memory/memory.h"
 #include "engine/develop/develop_system.h"
 

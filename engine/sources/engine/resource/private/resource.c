@@ -8,9 +8,9 @@
 #include <celib/string/stringid.h>
 #include <engine/resource/filesystem.h>
 #include <celib/config/cvar.h>
-#include <celib/os/path.h>
+#include <celib/filesystem/path.h>
 #include <engine/application/application.h>
-#include <celib/os/vio.h>
+#include <celib/filesystem/vio.h>
 #include <engine/resource/resource.h>
 #include <mpack/mpack.h>
 #include <engine/develop/console_server.h>

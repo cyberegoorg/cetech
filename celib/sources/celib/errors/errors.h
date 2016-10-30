@@ -8,7 +8,7 @@
 #include <stdlib.h>
 
 #include "../log/log.h"
-#include "../os/stacktrace.h"
+#include "stacktrace.h"
 
 //==============================================================================
 // Iterface

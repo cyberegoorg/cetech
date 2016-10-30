@@ -5,11 +5,11 @@
 #include <celib/memory/memory.h>
 #include <celib/config/cvar.h>
 #include <engine/resource/resource.h>
-#include <celib/os/vio.h>
+#include <celib/filesystem/vio.h>
 #include <engine/resource/resource.h>
 #include <celib/string/stringid.h>
 #include <engine/application/application.h>
-#include <celib/os/path.h>
+#include <celib/filesystem/path.h>
 #include <celib/yaml/yaml.h>
 #include "celib/memory/memory.h"
 #include "celib/config/cvar.h"

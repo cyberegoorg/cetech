@@ -4,7 +4,7 @@
 #include "include/sqlite3/sqlite3.h"
 
 #include "../../errors/errors.h"
-#include "../../os/path.h"
+#include "../../filesystem/path.h"
 
 static int _step(sqlite3 *db,
                  sqlite3_stmt *stmt) {
