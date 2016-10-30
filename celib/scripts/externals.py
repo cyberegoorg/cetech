@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-""" CETech engine external lib build script
+""" External lib build script manager
 """
 
 ###########
@@ -28,7 +28,7 @@ CPU_COUNT_STR = str(CPU_COUNT)
 OS_NAME = platform.system().lower()
 OS_ARCH = 64 if sys.maxsize > 2 ** 32 else 32
 
-ROOT_DIR = os.path.abspath(os.path.join(os.path.dirname(os.path.abspath(__file__)), os.path.pardir))
+ROOT_DIR = os.path.abspath(os.path.join(os.path.dirname(os.path.abspath(__file__)), os.path.pardir, os.path.pardir))
 EXTERNAL_DIR = os.path.join(ROOT_DIR, 'externals')
 EXTERNAL_BUILD_DIR = os.path.join(EXTERNAL_DIR, 'build')
 EXTERNAL_SRC_DIR = os.path.join(EXTERNAL_DIR, 'src')
