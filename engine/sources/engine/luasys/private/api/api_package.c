@@ -1,9 +1,6 @@
 
-#include <engine/world/transform.h>
-#include <celib/math/mat44f.h>
 #include <engine/renderer/mesh_renderer.h>
 #include <engine/resource/resource.h>
-#include <celib/string/stringid.h>
 #include "engine/luasys/luasys.h"
 
 #define API_NAME "Package"

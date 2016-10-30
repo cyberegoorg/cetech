@@ -13,7 +13,6 @@ struct sdl_vio {
     SDL_RWops *rw;
 };
 
-
 int64_t vio_sdl_seek(struct vio *file,
                      int64_t offset,
                      enum vio_seek whence) {

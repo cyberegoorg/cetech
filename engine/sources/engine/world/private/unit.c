@@ -1,15 +1,12 @@
 
 #include <celib/string/stringid.h>
-#include <celib/memory/memory.h>
 #include <celib/filesystem/vio.h>
 #include <engine/resource/resource.h>
 #include <celib/yaml/yaml.h>
-#include <engine/resource/resource.h>
-#include <celib/string/string.h>
 #include <celib/filesystem/path.h>
-#include <celib/memory/memory.h>
 #include <celib/containers/map.h>
 #include <engine/entcom/entcom.h>
+#include <celib/memory/memsys.h>
 
 ARRAY_PROTOTYPE_N(struct array_entity_t, array_entity_t);
 MAP_PROTOTYPE_N(struct array_entity_t, array_entity_t);
@@ -73,7 +70,7 @@ static void preprocess(const char *filename,
 
         char full_path[256] = {0};
         const char *source_dir = resource_compiler_get_source_dir();
-        os_path_join(full_path, CE_ARRAY_LEN(full_path), source_dir, prefab_file);
+        celib_path_join(full_path, CE_ARRAY_LEN(full_path), source_dir, prefab_file);
 
         struct vio *prefab_vio = vio_from_file(full_path, VIO_OPEN_READ, memsys_main_allocator());
 

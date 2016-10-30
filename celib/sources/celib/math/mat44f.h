@@ -1,5 +1,5 @@
-#ifndef CETECH_MAT44F_H
-#define CETECH_MAT44F_H
+#ifndef CELIB_MAT44F_H
+#define CELIB_MAT44F_H
 
 
 //==============================================================================
@@ -293,4 +293,4 @@ CE_FORCE_INLINE void mat44f_set_perspective_fov(mat44f_t *__restrict result,
     result->w.z = near * far / (near - far);
 }
 
-#endif //CETECH_MAT44F_H
+#endif //CELIB_MAT44F_H

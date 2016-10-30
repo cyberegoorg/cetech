@@ -41,7 +41,8 @@ int component_compile(stringid64_t type,
 u32 component_get_spawn_order(stringid64_t type);
 
 
-void component_register_type(stringid64_t type, struct component_clb clb);
+void component_register_type(stringid64_t type,
+                             struct component_clb clb);
 
 void component_spawn(world_t world,
                      stringid64_t type,

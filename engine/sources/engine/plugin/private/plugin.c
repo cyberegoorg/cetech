@@ -7,7 +7,7 @@
 #include <celib/os/object.h>
 #include <celib/filesystem/fs.h>
 #include <celib/filesystem/path.h>
-#include "celib/string/string.h"
+#include <celib/memory/memsys.h>
 
 #include "engine/plugin/plugin.h"
 
@@ -85,12 +85,12 @@ void plugin_add_static(get_api_fce_t fce) {
 void plugin_load(const char *path) {
     log_info(LOG_WHERE, "Loading plugin %s", path);
 
-    void *obj = os_load_object(path);
+    void *obj = celib_load_object(path);
     if (obj == NULL) {
         return;
     }
 
-    void *fce = os_load_function(obj, "get_plugin_api");
+    void *fce = celib_load_function(obj, "get_plugin_api");
     if (fce == NULL) {
         return;
     }
@@ -108,14 +108,14 @@ void plugin_reload(const char *path) {
         struct plugin_api_v0 *api = _G.plugin_api[i];
         void *data = api->reload_begin(plugin_get_engine_api);
 
-        os_unload_object(_G.plugin_handler[i]);
+        celib_unload_object(_G.plugin_handler[i]);
 
-        void *obj = os_load_object(path);
+        void *obj = celib_load_object(path);
         if (obj != NULL) {
             return;
         }
 
-        void *fce = os_load_function(obj, "get_plugin_api");
+        void *fce = celib_load_function(obj, "get_plugin_api");
         if (fce != NULL) {
             return;
         }
@@ -146,17 +146,17 @@ void plugin_load_dirs(const char *path) {
     ARRAY_T(pchar) files;
     ARRAY_INIT(pchar, &files, memsys_main_scratch_allocator());
 
-    os_dir_list(path, 1, &files, memsys_main_scratch_allocator());
+    celib_dir_list(path, 1, &files, memsys_main_scratch_allocator());
 
     for (int k = 0; k < ARRAY_SIZE(&files); ++k) {
-        const char* filename = os_path_filename(ARRAY_AT(&files, k));
+        const char *filename = celib_path_filename(ARRAY_AT(&files, k));
 
         if (str_startswith(filename, PLUGIN_PREFIX)) {
             plugin_load(ARRAY_AT(&files, k));
         }
     }
 
-    os_dir_list_free(&files, memsys_main_scratch_allocator());
+    celib_dir_list_free(&files, memsys_main_scratch_allocator());
     ARRAY_DESTROY(pchar, &files);
 }
 

@@ -1,5 +1,5 @@
-#ifndef CETECH_VEC4F_H
-#define CETECH_VEC4F_H
+#ifndef CELIB_VEC4F_H
+#define CELIB_VEC4F_H
 
 
 //==============================================================================
@@ -113,4 +113,4 @@ CE_FORCE_INLINE void vec4f_lerp(vec4f_t *__restrict result,
     result->f[3] = f32_lerp(a->f[3], b->f[3], t);
 }
 
-#endif //CETECH_VEC4F_H
+#endif //CELIB_VEC4F_H

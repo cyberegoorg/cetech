@@ -13,6 +13,7 @@ include_directories(engine/sources)
 include_directories(celib/sources)
 
 add_definitions(-DCETECH_STATIC_PLUGINS)
+add_definitions(-DCELIB_USE_SDL)
 
 if (CMAKE_BUILD_TYPE STREQUAL "Debug")
     set(CONFIGURATION debug)
@@ -25,19 +26,22 @@ endif ()
 if (APPLE)
     set(PLATFORM_ID darwin64)
 
-    add_definitions(-DCETECH_COLORED_LOG)
+    add_definitions(-DCELIB_COLORED_LOG)
     add_definitions(-DCETECH_DARWIN)
+    add_definitions(-DCELIB_DARWIN)
 
 elseif (UNIX)
     set(PLATFORM_ID linux64)
 
     add_definitions(-DCETECH_LINUX)
-    add_definitions(-DCETECH_COLORED_LOG)
+    add_definitions(-DCELIB_LINUX)
+    add_definitions(-DCELIB_COLORED_LOG)
 
 elseif (WIN32)
     set(PLATFORM_ID windows64)
 
     add_definitions(-DCETECH_WINDOWS)
+    add_definitions(-DCELIB_WINDOWS)
 endif ()
 
 link_directories(externals/build/${PLATFORM_ID}/release/lib/)
@@ -65,21 +69,13 @@ set(EXTERNAL_SOURCE_FILES
 set(SOURCE_FILES
         ${EXTERNAL_SOURCE_FILES}
 
-        celib/sources/celib/errors/private/posix_stacktrace.c
-
         ########################################################################
         # CELIB: Memory
         ########################################################################
         celib/sources/celib/memory/private/allocator.c
         celib/sources/celib/memory/private/allocator_malloc.c
         celib/sources/celib/memory/private/allocator_scratch.c
-        celib/sources/celib/memory/private/memory.c
-
-
-        ########################################################################
-        # CELIB: string
-        ########################################################################
-        celib/sources/celib/string/private/string.c
+        celib/sources/celib/memory/private/memsys.c
 
 
         ########################################################################
@@ -95,14 +91,10 @@ set(SOURCE_FILES
         ########################################################################
         celib/sources/celib/filesystem/private/vio.c
         celib/sources/celib/filesystem/private/sdl_vio.c
-        celib/sources/celib/filesystem/private/file.c
-        celib/sources/celib/filesystem/private/path.c
-
 
         ########################################################################
         # CELIB: Crypto
         ########################################################################
-        celib/sources/celib/crypto/private/hash.c
 
         ########################################################################
         # CELIB: Math
@@ -113,13 +105,6 @@ set(SOURCE_FILES
         ########################################################################
         celib/sources/celib/yaml/private/yaml.cc
 
-
-        celib/sources/celib/time/private/sdl_time.c
-        celib/sources/celib/os/private/sdl_object.c
-        celib/sources/celib/thread/private/sdl_thread.c
-        celib/sources/celib/cpu/private/sdl_cpu.c
-        celib/sources/celib/string/private/stringid.c
-        celib/sources/celib/window/private/sdl_window.c
         celib/sources/celib/log/private/log_system.c
         celib/sources/celib/config/private/cvar.c
 
@@ -280,6 +265,6 @@ target_include_directories(cetech_develop PUBLIC externals/build/${PLATFORM_ID}/
 
 #set_target_properties(plugin_example PROPERTIES PREFIX "")
 
-add_library(plugin_example SHARED engine/sources/engine/plugin_example.c)
+add_library(plugin_example SHARED engine/sources/plugin_example/plugin_example.c)
 set_target_properties(plugin_example PROPERTIES PREFIX "")
 

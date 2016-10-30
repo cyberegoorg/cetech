@@ -4,13 +4,11 @@
 #include <celib/math/mat44f.h>
 #include <celib/string/stringid.h>
 
-#include <celib/memory/memory.h>
 #include <engine/entcom/entcom.h>
 #include <engine/renderer/renderer.h>
 #include <engine/world/transform.h>
-#include <celib/math/types.h>
 
-#include "engine/world/camera.h"
+#include <celib/memory/memsys.h>
 
 struct camera_data {
     f32 near;
@@ -29,6 +27,7 @@ typedef struct {
 } world_data_t;
 
 ARRAY_PROTOTYPE(world_data_t)
+
 MAP_PROTOTYPE(world_data_t)
 
 #define _G CameraGlobal
@@ -132,7 +131,7 @@ int camera_init(int stage) {
     _G.type = stringid64_from_string("camera");
 
     component_register_compiler(_G.type, _camera_component_compiler, 10);
-    component_register_type(_G.type, (struct component_clb){
+    component_register_type(_G.type, (struct component_clb) {
             .spawner=_spawner, .destroyer=_destroyer,
             .on_world_create=_on_world_create, .on_world_destroy=_on_world_destroy
     });

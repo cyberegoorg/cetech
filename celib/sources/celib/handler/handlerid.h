@@ -1,5 +1,5 @@
-#ifndef CETECH_HANDLERID_H
-#define CETECH_HANDLERID_H
+#ifndef CELIB_HANDLERID_H
+#define CELIB_HANDLERID_H
 
 //==============================================================================
 // Includes
@@ -13,9 +13,9 @@
 // Private defines
 //==============================================================================
 
-#define  _GENBITCOUNT   8
-#define  _INDEXBITCOUNT 22
-#define  _MINFREEINDEXS 1024
+#define _GENBITCOUNT   8
+#define _INDEXBITCOUNT 22
+#define _MINFREEINDEXS 1024
 #define _idx(h) ((h).h >> _INDEXBITCOUNT)
 #define _gen(h) ((h.h) & ((1 << _GENBITCOUNT) - 1));
 #define _make_entity(idx, gen) (handler_t){.h = ((idx) << _INDEXBITCOUNT) | (gen)}
@@ -87,4 +87,4 @@ static inline int handlerid_handler_alive(struct handlerid *hid,
 #undef _gen
 #undef _make_entity
 
-#endif //CETECH_HANDLERID_H
+#endif //CELIB_HANDLERID_H

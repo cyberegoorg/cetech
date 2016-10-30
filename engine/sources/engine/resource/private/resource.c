@@ -5,17 +5,15 @@
 #include "include/SDL2/SDL.h"
 
 #include <engine/resource/resource.h>
-#include <celib/string/stringid.h>
 #include <engine/resource/filesystem.h>
 #include <celib/config/cvar.h>
 #include <celib/filesystem/path.h>
 #include <engine/application/application.h>
 #include <celib/filesystem/vio.h>
-#include <engine/resource/resource.h>
 #include <mpack/mpack.h>
 #include <engine/develop/console_server.h>
-#include "celib/memory/memory.h"
 #include "celib/containers/map.h"
+#include <celib/memory/memsys.h>
 
 //==============================================================================
 // Struct and types
@@ -144,10 +142,10 @@ int resource_init(int stage) {
     _G.cv_build_dir = cvar_find("build");
 
     char build_dir_full[4096] = {0};
-    os_path_join(build_dir_full,
-                 CE_ARRAY_LEN(build_dir_full),
-                 cvar_get_string(_G.cv_build_dir),
-                 application_platform());
+    celib_path_join(build_dir_full,
+                    CE_ARRAY_LEN(build_dir_full),
+                    cvar_get_string(_G.cv_build_dir),
+                    application_platform());
 
     filesystem_map_root_dir(stringid64_from_string("build"), build_dir_full);
 

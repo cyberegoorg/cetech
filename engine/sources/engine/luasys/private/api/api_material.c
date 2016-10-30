@@ -1,9 +1,6 @@
 
 #include <engine/world/transform.h>
-#include <celib/math/mat44f.h>
 #include <engine/renderer/mesh_renderer.h>
-#include <engine/renderer/material.h>
-#include <celib/string/stringid.h>
 #include "engine/luasys/luasys.h"
 
 #define API_NAME "Material"
@@ -26,6 +23,7 @@ static int _set_vec4f(lua_State *l) {
     material_set_vec4f(m, slot_name, *v);
     return 0;
 }
+
 void _register_lua_material_api() {
     luasys_add_module_function(API_NAME, "set_texture", _set_texture);
     luasys_add_module_function(API_NAME, "set_vec4f", _set_vec4f);

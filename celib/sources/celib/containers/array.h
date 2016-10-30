@@ -3,8 +3,8 @@
 // git+web: https://bitbucket.org/bitsquid/foundation
 //==============================================================================
 
-#ifndef CETECH_ARRAY_H
-#define CETECH_ARRAY_H
+#ifndef CELIB_ARRAY_H
+#define CELIB_ARRAY_H
 
 //==============================================================================
 // Includes
@@ -190,4 +190,4 @@ ARRAY_PROTOTYPE(f32)
 
 typedef ARRAY_T(pchar) string_array_t;
 
-#endif //CETECH_ARRAY_H
+#endif //CELIB_ARRAY_H

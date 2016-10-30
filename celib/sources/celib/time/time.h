@@ -1,16 +1,35 @@
-#ifndef CETECH_TIME_H
-#define CETECH_TIME_H
+#ifndef CELIB_TIME_H
+#define CELIB_TIME_H
 
 #include "../types.h"
+
+#if defined(CELIB_USE_SDL)
+
+#include "include/SDL2/SDL.h"
+
+#endif
 
 //==============================================================================
 // Time
 // ==============================================================================
 
 
-u32 os_get_ticks();
+static u32 celib_get_ticks() {
+#if defined(CELIB_USE_SDL)
+    return SDL_GetTicks();
+#endif
+}
 
-u64 os_get_perf_counter();
-u64 os_get_perf_freq();
+static u64 celib_get_perf_counter() {
+#if defined(CELIB_USE_SDL)
+    return SDL_GetPerformanceCounter();
+#endif
+}
 
-#endif //CETECH_TIME_H
+static u64 celib_get_perf_freq() {
+#if defined(CELIB_USE_SDL)
+    return SDL_GetPerformanceFrequency();
+#endif
+}
+
+#endif //CELIB_TIME_H

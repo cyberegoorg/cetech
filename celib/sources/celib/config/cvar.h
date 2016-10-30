@@ -1,5 +1,5 @@
-#ifndef CETECH_CONFIG_API_H
-#define CETECH_CONFIG_API_H
+#ifndef CELIB_CONFIG_API_H
+#define CELIB_CONFIG_API_H
 
 //==============================================================================
 // Includes
@@ -64,4 +64,4 @@ void cvar_set_string(cvar_t var,
 
 void cvar_log_all();
 
-#endif //CETECH_CONFIG_API_H
+#endif //CELIB_CONFIG_API_H

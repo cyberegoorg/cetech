@@ -4,9 +4,8 @@
 #include <celib/math/mat44f.h>
 
 #include <engine/entcom/entcom.h>
-#include <celib/memory/memory.h>
-#include <engine/world/world.h>
 #include <engine/world/scenegraph.h>
+#include <celib/memory/memsys.h>
 
 ARRAY_PROTOTYPE(vec3f_t)
 

@@ -3,8 +3,8 @@
 // git+web: https://bitbucket.org/bitsquid/foundation
 //==============================================================================
 
-#ifndef CETECH_ALLOCATOR_MALLOC_H
-#define CETECH_ALLOCATOR_MALLOC_H
+#ifndef CELIB_ALLOCATOR_MALLOC_H
+#define CELIB_ALLOCATOR_MALLOC_H
 
 #include <stdint.h>
 #include "../memory.h"
@@ -30,7 +30,7 @@ void *malloc_allocator_allocate(struct allocator *allocator,
     struct allocator_malloc *a = (struct allocator_malloc *) allocator;
 
     const uint32_t ts = size_with_padding(size, align);
-    struct Header *h = (struct Header *) os_malloc(ts);
+    struct Header *h = (struct Header *) celib_malloc(ts);
 
     void *p = data_pointer(h, align);
     fill(h, p, ts);
@@ -53,7 +53,7 @@ void malloc_allocator_deallocate(struct allocator *allocator,
 
     allocator_stop_trace_pointer(a->trace, MAX_MEM_TRACE, p);
 
-    os_free(h);
+    celib_free(h);
 }
 
 uint32_t malloc_allocator_allocated_size(void *p) {
@@ -67,7 +67,7 @@ uint32_t malloc_allocator_total_allocated(struct allocator *allocator) {
 }
 
 struct allocator *malloc_allocator_create() {
-    struct allocator_malloc *m = os_malloc(sizeof(struct allocator_malloc));
+    struct allocator_malloc *m = celib_malloc(sizeof(struct allocator_malloc));
 
     m->base = (struct allocator) {
             .allocate = malloc_allocator_allocate,
@@ -87,7 +87,7 @@ void malloc_allocator_destroy(struct allocator *a) {
     allocator_check_trace(m->trace, MAX_MEM_TRACE);
 
     CE_ASSERT_MSG("memory.malloc", m->total_allocated == 0, "%d bytes is not deallocate", m->total_allocated);
-    os_free(m);
+    celib_free(m);
 }
 
-#endif //CETECH_ALLOCATOR_MALLOC_H
+#endif //CELIB_ALLOCATOR_MALLOC_H

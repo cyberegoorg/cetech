@@ -9,19 +9,11 @@
 #include <assimp/postprocess.h>
 
 #include <celib/string/stringid.h>
-#include <celib/string/string.h>
 #include <engine/world/scenegraph.h>
-#include "celib/containers/array.h"
-#include "celib/containers/map.h"
-#include "celib/os/process.h"
-#include "celib/yaml/yaml.h"
 #include "celib/filesystem/path.h"
 #include "celib/filesystem/vio.h"
-#include "celib/filesystem/fs.h"
+#include <celib/memory/memsys.h>
 
-#include "celib/memory/memory.h"
-#include "engine/application/application.h"
-#include "engine/resource/resource.h"
 #include "engine/resource/resource.h"
 
 
@@ -459,7 +451,7 @@ int _compile_assimp(const char *filename,
 
     char input_path[128] = {0};
     const char *source_dir = resource_compiler_get_source_dir();
-    os_path_join(input_path, CE_ARRAY_LEN(input_path), source_dir, input_str);
+    celib_path_join(input_path, CE_ARRAY_LEN(input_path), source_dir, input_str);
 
     u32 postprocess_flag = aiProcessPreset_TargetRealtime_MaxQuality;
 

@@ -3,8 +3,8 @@
 // git+web: https://bitbucket.org/bitsquid/foundation
 //==============================================================================
 
-#ifndef CETECH_QUEUE_H
-#define CETECH_QUEUE_H
+#ifndef CELIB_QUEUE_H
+#define CELIB_QUEUE_H
 
 #include <memory.h>
 #include "array.h"
@@ -177,4 +177,4 @@ QUEUE_PROTOTYPE(i32)
 
 QUEUE_PROTOTYPE(i64)
 
-#endif //CETECH_QUEUE_H
+#endif //CELIB_QUEUE_H

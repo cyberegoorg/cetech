@@ -4,7 +4,6 @@ extern "C" {
 #include "../yaml.h"
 #include "../../memory/memory.h"
 #include "../../errors/errors.h"
-#include "../../math/types.h"
 }
 
 #include "include/yaml-cpp/yaml.h"

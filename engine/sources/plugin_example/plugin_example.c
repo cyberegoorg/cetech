@@ -1,6 +1,7 @@
 #include <stdio.h>
 
 #include "engine/plugin/plugin_api.h"
+
 //
 //static struct log_api_v0 *log = 0;
 //static struct memory_api_v0 *mem = 0;
@@ -45,12 +46,14 @@ static void *_reload_begin(get_api_fce_t get_engine_api) {
     return NULL;
 }
 
-static void _reload_end(get_api_fce_t get_engine_api, void *data) {
+static void _reload_end(get_api_fce_t get_engine_api,
+                        void *data) {
     _init_api(get_engine_api);
     _init(get_engine_api);
 }
 
-void *get_plugin_api(int api, int version) {
+void *get_plugin_api(int api,
+                     int version) {
     if (api == PLUGIN_API_ID && version == 0) {
         static struct plugin_api_v0 plugin = {0};
 

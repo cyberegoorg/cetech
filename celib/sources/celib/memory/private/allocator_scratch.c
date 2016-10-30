@@ -3,8 +3,8 @@
 // git+web: https://bitbucket.org/bitsquid/foundation
 //==============================================================================
 
-#ifndef CETECH_ALLOCATOR_SCRATCH_H
-#define CETECH_ALLOCATOR_SCRATCH_H
+#ifndef CELIB_ALLOCATOR_SCRATCH_H
+#define CELIB_ALLOCATOR_SCRATCH_H
 
 #include "../memory.h"
 #include "../../errors/errors.h"
@@ -106,7 +106,7 @@ uint32_t scratch_allocator_total_allocated(struct allocator *allocator) {
 
 struct allocator *scratch_allocator_create(struct allocator *backing,
                                            int size) {
-    struct allocator_scratch *m = os_malloc(sizeof(struct allocator_scratch));
+    struct allocator_scratch *m = celib_malloc(sizeof(struct allocator_scratch));
 
     m->base = (struct allocator) {
             .allocate = scratch_allocator_allocate,
@@ -130,4 +130,4 @@ void scratch_allocator_destroy(struct allocator *a) {
     allocator_deallocate(m->backing, m->begin);
 }
 
-#endif // CETECH_ALLOCATOR_SCRATCH_H
+#endif // CELIB_ALLOCATOR_SCRATCH_H

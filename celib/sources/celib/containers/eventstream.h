@@ -1,5 +1,5 @@
-#ifndef CETECH_EVENTSTREAM_H
-#define CETECH_EVENTSTREAM_H
+#ifndef CELIB_EVENTSTREAM_H
+#define CELIB_EVENTSTREAM_H
 
 //==============================================================================
 // Includes
@@ -48,16 +48,16 @@ static inline struct event_header *eventstream_next(struct event_header *header)
 
 #define event_stream_push(es, type, event) _eventstream_push(es, (struct event_header*)(&event), type, sizeof(event))
 
-static inline void* _eventstream_push(struct eventstream *es,
-                                     struct event_header *header,
-                                     u32 type,
-                                     u64 size) {
+static inline void *_eventstream_push(struct eventstream *es,
+                                      struct event_header *header,
+                                      u32 type,
+                                      u64 size) {
     header->type = type;
     header->size = size;
     size_t s = ARRAY_SIZE(&es->stream);
     array_push_u8(&es->stream, (u8 *) header, size);
 
-    return (void*)(&ARRAY_AT(&es->stream, s));
+    return (void *) (&ARRAY_AT(&es->stream, s));
 }
 
-#endif //CETECH_EVENTSTREAM_H
+#endif //CELIB_EVENTSTREAM_H

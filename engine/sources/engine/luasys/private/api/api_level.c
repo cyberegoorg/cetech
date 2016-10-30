@@ -1,8 +1,6 @@
 
 #include <engine/world/level.h>
-#include "celib/string/stringid.h"
 
-#include "engine/world/world.h"
 #include "engine/luasys/luasys.h"
 
 #define API_NAME "Level"

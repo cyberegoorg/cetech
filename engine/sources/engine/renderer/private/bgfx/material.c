@@ -7,14 +7,11 @@
 #include <celib/string/stringid.h>
 #include <celib/filesystem/path.h>
 #include <engine/renderer/material.h>
-#include <celib/string/string.h>
-#include <celib/math/types.h>
 #include <celib/yaml/yaml.h>
 #include "celib/containers/map.h"
 #include "celib/filesystem/vio.h"
+#include <celib/memory/memsys.h>
 
-#include "celib/memory/memory.h"
-#include "engine/resource/resource.h"
 #include "engine/resource/resource.h"
 #include "texture.h"
 #include "shader.h"
@@ -27,6 +24,7 @@
 ARRAY_PROTOTYPE(bgfx_program_handle_t)
 
 ARRAY_PROTOTYPE(bgfx_uniform_handle_t)
+
 ARRAY_PROTOTYPE(stringid64_t)
 
 MAP_PROTOTYPE(bgfx_program_handle_t)
@@ -104,7 +102,7 @@ static void preprocess(const char *filename,
 
         char full_path[256] = {0};
         const char *source_dir = resource_compiler_get_source_dir();
-        os_path_join(full_path, CE_ARRAY_LEN(full_path), source_dir, prefab_file);
+        celib_path_join(full_path, CE_ARRAY_LEN(full_path), source_dir, prefab_file);
 
         struct vio *prefab_vio = vio_from_file(full_path, VIO_OPEN_READ, memsys_main_allocator());
 

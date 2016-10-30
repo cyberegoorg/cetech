@@ -1,6 +1,5 @@
 
 #include <engine/world/transform.h>
-#include <engine/world/types.h>
 #include "engine/luasys/luasys.h"
 
 #define API_NAME "Transform"

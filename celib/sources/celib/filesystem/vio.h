@@ -1,7 +1,8 @@
-#ifndef CETECH_VIO_H
-#define CETECH_VIO_H
+#ifndef CELIB_VIO_H
+#define CELIB_VIO_H
 
 #include <stdint.h>
+
 #include "../types.h"
 #include "../memory/types.h"
 #include "vio_types.h"
@@ -35,4 +36,4 @@ size_t vio_write(struct vio *file,
                  size_t size,
                  size_t num);
 
-#endif //CETECH_VIO_H
+#endif //CELIB_VIO_H

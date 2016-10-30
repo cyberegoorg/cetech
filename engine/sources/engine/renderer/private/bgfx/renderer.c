@@ -4,10 +4,8 @@
 
 #include <celib/math/types.h>
 #include <engine/world/camera.h>
-#include <celib/string/stringid.h>
 #include <engine/renderer/mesh_renderer.h>
 #include <engine/develop/console_server.h>
-#include <mpack/mpack.h>
 #include <engine/application/application.h>
 #include "celib/window/window.h"
 #include "engine/renderer/renderer.h"
@@ -15,7 +13,6 @@
 #include "bgfx/c99/bgfxplatform.h"
 #include "texture.h"
 #include "shader.h"
-#include "engine/renderer/material.h"
 #include "scene.h"
 
 //==============================================================================

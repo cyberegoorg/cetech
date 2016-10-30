@@ -1,7 +1,6 @@
 
 #include <celib/math/mat44f.h>
 
-#include "engine/entcom/types.h"
 #include "engine/luasys/luasys.h"
 
 #define API_NAME "Mat44f"

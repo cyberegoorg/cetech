@@ -1,5 +1,5 @@
-#ifndef CETECH_VEC2F_H
-#define CETECH_VEC2F_H
+#ifndef CELIB_VEC2F_H
+#define CELIB_VEC2F_H
 
 
 //==============================================================================
@@ -86,4 +86,4 @@ CE_FORCE_INLINE void vec2f_lerp(vec2f_t *__restrict result,
     result->f[1] = f32_lerp(a->f[1], b->f[1], t);
 }
 
-#endif //CETECH_VEC2F_H
+#endif //CELIB_VEC2F_H

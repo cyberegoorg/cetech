@@ -1,5 +1,5 @@
-#ifndef CETECH_QUEUE_MPMC_H
-#define CETECH_QUEUE_MPMC_H
+#ifndef CELIB_QUEUE_MPMC_H
+#define CELIB_QUEUE_MPMC_H
 
 //==============================================================================
 // Includes
@@ -61,7 +61,7 @@ void queue_task_destroy(struct task_queue *q) {
     CE_DEALLOCATE(q->allocator, q->_sequences);
 }
 
-u32 queue_task_size(struct task_queue* q) {
+u32 queue_task_size(struct task_queue *q) {
     u32 e = atomic_load(&q->_enqueuePos) & q->_capacityMask;
     u32 d = atomic_load(&q->_dequeuePos) & q->_capacityMask;
 
@@ -123,4 +123,4 @@ int queue_task_pop(struct task_queue *q,
     return 1;
 }
 
-#endif //CETECH_QUEUE_MPMC_H
+#endif //CELIB_QUEUE_MPMC_H

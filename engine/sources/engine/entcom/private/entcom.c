@@ -3,9 +3,8 @@
 //==============================================================================
 
 #include "celib/containers/map.h"
-
+#include <celib/memory/memsys.h>
 #include "engine/world/world.h"
-#include "celib/memory/memory.h"
 
 #include "engine/entcom/entcom.h"
 
@@ -95,7 +94,8 @@ u32 component_get_spawn_order(stringid64_t type) {
     return MAP_GET(u32, &_G.spawn_order_map, type.id, 0);
 }
 
-void component_register_type(stringid64_t type, struct component_clb clb) {
+void component_register_type(stringid64_t type,
+                             struct component_clb clb) {
     MAP_SET(component_clb_t, &_G.component_clb, type.id, clb);
 
     world_callbacks_t wclb = {

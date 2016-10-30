@@ -1,5 +1,5 @@
-#ifndef CETECH_MACHINE_TYPES_H
-#define CETECH_MACHINE_TYPES_H
+#ifndef CELIB_MACHINE_TYPES_H
+#define CELIB_MACHINE_TYPES_H
 
 #include <stdio.h>
 
@@ -130,4 +130,4 @@ struct gamepad_device_event {
     u8 gamepad_id;
 };
 
-#endif //CETECH_MACHINE_TYPES_H
+#endif //CELIB_MACHINE_TYPES_H

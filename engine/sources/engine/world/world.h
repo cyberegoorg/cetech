@@ -29,7 +29,8 @@ world_t world_create();
 
 void world_destroy(world_t world);
 
-void world_update(world_t world, float dt);
+void world_update(world_t world,
+                  float dt);
 
 level_t world_load_level(world_t world,
                          stringid64_t name);

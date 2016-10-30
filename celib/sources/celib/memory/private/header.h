@@ -3,8 +3,8 @@
 // git+web: https://bitbucket.org/bitsquid/foundation
 //==============================================================================
 
-#ifndef CETECH_HEADER_H
-#define CETECH_HEADER_H
+#ifndef CELIB_HEADER_H
+#define CELIB_HEADER_H
 
 #include <stdint.h>
 #include "../memory.h"
@@ -39,4 +39,4 @@ static void fill(struct Header *header,
         *p++ = HEADER_PAD_VALUE;
 }
 
-#endif //CETECH_HEADER_H
+#endif //CELIB_HEADER_H

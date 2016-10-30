@@ -1,15 +1,14 @@
-#ifndef CETECH_PROCESS_H
-#define CETECH_PROCESS_H
+#ifndef CELIB_PROCESS_H
+#define CELIB_PROCESS_H
 
-#include "../log/log.h"
 #include "stdint.h"
 #include "stdio.h"
+
+#include "../log/log.h"
 #include "../types.h"
 
-#if CETECH_LINUX
-#endif
-
-static int os_exec(const char *argv) {
+static int celib_exec(const char *argv) {
+#if defined(CELIB_LINUX)
     char output[4096];
 
     log_debug("os", "exec %s", argv);
@@ -29,6 +28,7 @@ static int os_exec(const char *argv) {
     }
 
     return status;
+#endif
 }
 
-#endif //CETECH_PROCESS_H
+#endif //CELIB_PROCESS_H

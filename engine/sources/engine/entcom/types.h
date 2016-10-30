@@ -35,7 +35,7 @@ static struct component_clb {
     component_destroyer_t destroyer;
     world_on_created_t on_world_create;
     world_on_destroy_t on_world_destroy;
-    world_on_update_t  on_world_update;
+    world_on_update_t on_world_update;
 } component_clb_null = {0};
 
 

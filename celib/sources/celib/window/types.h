@@ -1,5 +1,5 @@
-#ifndef CETECH_WINDOW_TYPES_H
-#define CETECH_WINDOW_TYPES_H
+#ifndef CELIB_WINDOW_TYPES_H
+#define CELIB_WINDOW_TYPES_H
 
 //==============================================================================
 // Mouse
@@ -20,4 +20,4 @@ enum WindowPos {
     WINDOWPOS_UNDEFINED = 2
 };
 
-#endif //CETECH_WINDOW_TYPES_H
+#endif //CELIB_WINDOW_TYPES_H

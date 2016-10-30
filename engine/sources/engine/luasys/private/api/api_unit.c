@@ -1,8 +1,6 @@
 
 #include <celib/string/stringid.h>
 #include <engine/world/unit.h>
-#include <engine/world/types.h>
-#include <engine/entcom/types.h>
 #include "engine/luasys/luasys.h"
 
 #define API_NAME "Unit"
@@ -24,7 +22,6 @@ static int _unit_destroy(lua_State *l) {
     unit_destroy(w, &unit, 1);
     return 1;
 }
-
 
 
 void _register_lua_unit_api() {

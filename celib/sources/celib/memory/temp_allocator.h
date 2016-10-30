@@ -3,8 +3,8 @@
 // git+web: https://bitbucket.org/bitsquid/foundation
 //==============================================================================
 
-#ifndef CETECH_TEMP_ALLOCATOR_H
-#define CETECH_TEMP_ALLOCATOR_H
+#ifndef CELIB_TEMP_ALLOCATOR_H
+#define CELIB_TEMP_ALLOCATOR_H
 
 //==============================================================================
 // Includes
@@ -115,4 +115,4 @@ TEMP_ALLOCATOR_DEF(2048)
 
 TEMP_ALLOCATOR_DEF(4096)
 
-#endif //CETECH_TEMP_ALLOCATOR_H
+#endif //CELIB_TEMP_ALLOCATOR_H

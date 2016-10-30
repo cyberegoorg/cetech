@@ -5,7 +5,6 @@
 #include <celib/math/types.h>
 #include "celib/machine/machine.h"
 #include "celib/string/string.h"
-#include "celib/math/vec2f.h"
 
 #include "engine/input/input.h"
 

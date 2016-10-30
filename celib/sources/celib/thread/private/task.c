@@ -4,9 +4,9 @@
 
 #include <celib/thread/thread.h>
 #include <celib/memory/memory.h>
+#include <celib/memory/memsys.h>
 #include <celib/cpu/cpu.h>
 #include <engine/develop/develop_system.h>
-#include <celib/thread/types.h>
 
 #include "task_queue.h"
 
@@ -25,7 +25,7 @@
 //==============================================================================
 
 struct task {
-    void* data;
+    void *data;
     task_work_t task_work;
     const char *name;
     enum task_affinity affinity;
@@ -88,7 +88,7 @@ static void _push_task(task_t t) {
 static task_t _try_pop(struct task_queue *q) {
     u32 poped_task;
 
-    if(!queue_task_size(q)) {
+    if (!queue_task_size(q)) {
         return task_null;
     }
 
@@ -136,8 +136,8 @@ static int _task_worker(void *o) {
     log_debug("task_worker", "Worker %d init", _worker_id);
 
     while (_G._Run) {
-        if(!taskmanager_do_work()) {
-            os_thread_yield();
+        if (!taskmanager_do_work()) {
+            celib_thread_yield();
         }
     }
 
@@ -157,7 +157,7 @@ int taskmanager_init(int stage) {
 
     _G = (struct G) {0};
 
-    int core_count = os_cpu_count();
+    int core_count = celib_cpu_count();
 
     static const uint32_t main_threads_count = 1;
     const uint32_t worker_count = core_count - main_threads_count;
@@ -173,7 +173,7 @@ int taskmanager_init(int stage) {
     }
 
     for (int j = 0; j < worker_count; ++j) {
-        _G._workers[j] = os_thread_create((thread_fce_t) _task_worker, "worker", (void *) ((intptr_t) (j + 1)));
+        _G._workers[j] = celib_thread_create((thread_fce_t) _task_worker, "worker", (void *) ((intptr_t) (j + 1)));
     }
 
     _G._Run = 1;
@@ -187,8 +187,8 @@ void taskmanager_shutdown() {
     int status = 0;
 
     for (u32 i = 0; i < _G._workers_count; ++i) {
-        //os_thread_kill(_G._workers[i]);
-        os_thread_wait(_G._workers[i], &status);
+        //celib_thread_kill(_G._workers[i]);
+        celib_thread_wait(_G._workers[i], &status);
     }
 
     queue_task_destroy(&_G._gloalQueue);
@@ -200,8 +200,9 @@ void taskmanager_shutdown() {
     _G = (struct G) {0};
 }
 
-void taskmanager_add(struct task_item *items, u32 count) {
-    for(u32 i = 0; i < count; ++i) {
+void taskmanager_add(struct task_item *items,
+                     u32 count) {
+    for (u32 i = 0; i < count; ++i) {
         task_t task = _new_task();
         _G._task_pool[task.id] = (struct task) {
                 .name = items[i].name,
@@ -233,8 +234,9 @@ int taskmanager_do_work() {
     return 1;
 }
 
-void taskmanager_wait_atomic(atomic_int *signal, u32 value) {
-    while(atomic_load_explicit(signal, memory_order_acquire) == value) {
+void taskmanager_wait_atomic(atomic_int *signal,
+                             u32 value) {
+    while (atomic_load_explicit(signal, memory_order_acquire) == value) {
         taskmanager_do_work();
     }
 }

@@ -6,9 +6,6 @@
 #include <engine/input/input.h>
 #include "celib/machine/machine.h"
 #include "celib/string/string.h"
-#include "celib/math/vec2f.h"
-
-#include "engine/input/input.h"
 
 #include "gamepadstr.h"
 

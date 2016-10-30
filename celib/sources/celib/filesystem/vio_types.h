@@ -1,5 +1,5 @@
-#ifndef CETECH_VIO_TYPES_H
-#define CETECH_VIO_TYPES_H
+#ifndef CELIB_VIO_TYPES_H
+#define CELIB_VIO_TYPES_H
 
 #include <stdio.h>
 #include "../types.h"
@@ -45,4 +45,4 @@ struct vio {
     int (*close)(struct vio *vio);
 };
 
-#endif //CETECH_VIO_TYPES_H
+#endif //CELIB_VIO_TYPES_H

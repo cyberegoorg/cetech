@@ -1,5 +1,5 @@
-#ifndef CETECH_YAML_H
-#define CETECH_YAML_H
+#ifndef CELIB_YAML_H
+#define CELIB_YAML_H
 
 
 //==============================================================================
@@ -123,4 +123,4 @@ int yaml_as_string(yaml_node_t node,
 #undef YAML_NODE_AS_DEF
 #undef YAML_NODE_AS_DEFN
 
-#endif //CETECH_YAML_H
+#endif //CELIB_YAML_H

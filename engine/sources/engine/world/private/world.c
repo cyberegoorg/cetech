@@ -4,7 +4,7 @@
 
 #include "celib/containers/map.h"
 #include <engine/world/world.h>
-#include "celib/memory/memory.h"
+#include <celib/memory/memsys.h>
 
 //==============================================================================
 // Typedefs
@@ -72,9 +72,10 @@ void world_destroy(world_t world) {
     handlerid_handler_destroy(&_G.world_handler, world.h);
 }
 
-void world_update(world_t world, float dt) {
+void world_update(world_t world,
+                  float dt) {
     for (int i = 0; i < ARRAY_SIZE(&_G.callbacks); ++i) {
-        if(ARRAY_AT(&_G.callbacks, i).on_update != NULL) {
+        if (ARRAY_AT(&_G.callbacks, i).on_update != NULL) {
             ARRAY_AT(&_G.callbacks, i).on_update(world, dt);
             return;
         }

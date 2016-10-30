@@ -1,5 +1,5 @@
-#ifndef CETECH_LOG_API_H
-#define CETECH_LOG_API_H
+#ifndef CELIB_LOG_API_H
+#define CELIB_LOG_API_H
 
 //==============================================================================
 // Includes
@@ -139,4 +139,4 @@ void log_debug(const char *where,
 
 int logdb_init_db(const char *log_dir);
 
-#endif //CETECH_LOG_API_H
+#endif //CELIB_LOG_API_H

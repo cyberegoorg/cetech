@@ -118,7 +118,7 @@ void logdb_log(enum log_level level,
 }
 
 int logdb_init_db(const char *log_dir) {
-    os_path_join(_logdb_path, CE_ARRAY_LEN(_logdb_path), log_dir, "log.db");
+    celib_path_join(_logdb_path, CE_ARRAY_LEN(_logdb_path), log_dir, "log.db");
 
     _session_id = time(NULL);
 

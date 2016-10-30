@@ -1,5 +1,5 @@
-#ifndef CETECH_MACHINE_H
-#define CETECH_MACHINE_H
+#ifndef CELIB_MACHINE_H
+#define CELIB_MACHINE_H
 
 //==============================================================================
 // Includes
@@ -7,7 +7,7 @@
 
 #include "celib/math/types.h"
 #include "types.h"
-#include "celib/thread/thread_types.h"
+#include "celib/thread/types.h"
 
 typedef int (*machine_part_init_t)();
 
@@ -42,4 +42,4 @@ void machine_gamepad_play_rumble(int gamepad,
                                  float strength,
                                  u32 length);
 
-#endif //CETECH_MACHINE_H
+#endif //CELIB_MACHINE_H

@@ -1,5 +1,5 @@
-#ifndef CETECH_MATH_TYPES_H
-#define CETECH_MATH_TYPES_H
+#ifndef CELIB_MATH_TYPES_H
+#define CELIB_MATH_TYPES_H
 
 //==============================================================================
 // Includes
@@ -81,4 +81,4 @@ typedef struct {
     };
 } mat44f_t;
 
-#endif //CETECH_MATH_TYPES_H
+#endif //CELIB_MATH_TYPES_H

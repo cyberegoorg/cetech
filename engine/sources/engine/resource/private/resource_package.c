@@ -5,15 +5,11 @@
 #include <celib/string/stringid.h>
 #include <celib/thread/task.h>
 #include <engine/resource/resource.h>
-#include <celib/memory/memory.h>
 #include <celib/filesystem/vio.h>
 #include <celib/yaml/yaml.h>
-#include <celib/log/log.h>
-#include <celib/containers/array.h>
-#include <celib/memory/memory.h>
 #include <celib/thread/thread.h>
+#include <celib/memory/memsys.h>
 
-#include "engine/resource/resource.h"
 #include "resource_package.h"
 
 //==============================================================================
@@ -137,15 +133,15 @@ void package_task(void *data) {
 
 void package_load(stringid64_t name) {
 
-    struct package_task_data *task_data =  CE_ALLOCATE(memsys_main_allocator(), struct package_task_data, 1);
+    struct package_task_data *task_data = CE_ALLOCATE(memsys_main_allocator(), struct package_task_data, 1);
 
     task_data->name = name;
 
     struct task_item item = {
-        .name = "package_task",
-        .work = package_task,
-        .data = task_data,
-        .affinity = TASK_AFFINITY_NONE
+            .name = "package_task",
+            .work = package_task,
+            .data = task_data,
+            .affinity = TASK_AFFINITY_NONE
     };
 
     taskmanager_add(&item, 1);
@@ -156,7 +152,8 @@ void package_unload(stringid64_t name) {
 
     const u32 task_count = package->type_count;
     for (int j = 0; j < task_count; ++j) {
-        resource_unload(package_type(package)[j], &package_name(package)[package_offset(package)[j]], package_name_count(package)[j]);
+        resource_unload(package_type(package)[j], &package_name(package)[package_offset(package)[j]],
+                        package_name_count(package)[j]);
     }
 }
 
@@ -167,7 +164,8 @@ int package_is_loaded(stringid64_t name) {
 
     const u32 task_count = package->type_count;
     for (int i = 0; i < task_count; ++i) {
-        if (!resource_can_get_all(package_type(package)[i], &package_name(package)[package_offset(package)[i]], package_name_count(package)[i])) {
+        if (!resource_can_get_all(package_type(package)[i], &package_name(package)[package_offset(package)[i]],
+                                  package_name_count(package)[i])) {
             return 0;
         }
     }
@@ -177,8 +175,8 @@ int package_is_loaded(stringid64_t name) {
 
 void package_flush(stringid64_t name) {
     while (!package_is_loaded(name)) {
-        if(!taskmanager_do_work()) {
-            os_thread_yield();
+        if (!taskmanager_do_work()) {
+            celib_thread_yield();
         }
     }
 }

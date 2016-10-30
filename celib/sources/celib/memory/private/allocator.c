@@ -24,7 +24,7 @@
 void allocator_trace_pointer(struct allocator_trace_entry *entries,
                              u64 max_entries,
                              void *p) {
-    char *stacktrace_str = os_stacktrace(3);
+    char *stacktrace_str = celib_stacktrace(3);
 
     for (int i = 0; i < max_entries; ++i) {
         if (!entries[i].used) {
@@ -46,7 +46,7 @@ void allocator_stop_trace_pointer(struct allocator_trace_entry *entries,
 
         entries[i].used = 0;
 
-        os_stacktrace_free(entries[i].stacktrace);
+        celib_stacktrace_free(entries[i].stacktrace);
         entries[i].stacktrace = NULL;
     }
 }
@@ -63,6 +63,6 @@ void allocator_check_trace(struct allocator_trace_entry *entries,
 
         //allocator_free(allocator, entries[i].ptr); // TODO: need this?
 
-        os_stacktrace_free(entries[i].stacktrace);
+        celib_stacktrace_free(entries[i].stacktrace);
     }
 }

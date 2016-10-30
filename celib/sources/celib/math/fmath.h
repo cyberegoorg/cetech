@@ -1,5 +1,5 @@
-#ifndef CETECH_FMATH_H
-#define CETECH_FMATH_H
+#ifndef CELIB_FMATH_H
+#define CELIB_FMATH_H
 
 //==============================================================================
 // Includes
@@ -220,4 +220,4 @@ CE_FORCE_INLINE float f32_acos(float f) {
     return f32_PI;
 }
 
-#endif //CETECH_FMATH_H
+#endif //CELIB_FMATH_H

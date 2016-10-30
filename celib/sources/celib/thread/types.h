@@ -1,5 +1,5 @@
-#ifndef CETECH_TASK_TYPES_H
-#define CETECH_TASK_TYPES_H
+#ifndef CELIB_TASK_TYPES_H
+#define CELIB_TASK_TYPES_H
 
 //==============================================================================
 // Includes
@@ -41,10 +41,21 @@ enum task_affinity {
 CE_STATIC_ASSERT(TASK_AFFINITY_MAX == TASK_MAX_WORKERS + 1);
 
 struct task_item {
-    const char* name;
+    const char *name;
     task_work_t work;
-    void* data;
+    void *data;
     enum task_affinity affinity;
 };
 
-#endif //CETECH_TASK_TYPES_H
+typedef int (*thread_fce_t)(void *data);
+
+typedef struct {
+    void *t;
+} thread_t;
+
+typedef struct {
+    int lock;
+} spinlock_t;
+
+
+#endif //CELIB_TASK_TYPES_H

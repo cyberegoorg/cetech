@@ -1,6 +1,5 @@
 
 #include <engine/world/world.h>
-#include <celib/string/stringid.h>
 #include "engine/luasys/luasys.h"
 
 #define API_NAME "World"
@@ -23,7 +22,6 @@ static int _world_update(lua_State *l) {
     world_update(world, dt);
     return 0;
 }
-
 
 
 void _register_lua_world_api() {

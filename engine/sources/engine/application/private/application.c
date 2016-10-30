@@ -8,7 +8,6 @@
 #include <celib/window/types.h>
 #include <celib/window/window.h>
 #include <celib/string/stringid.h>
-#include <celib/os/process.h>
 #include <celib/os/cmd_line.h>
 
 #include <engine/application/application.h>
@@ -16,14 +15,12 @@
 #include <celib/machine/machine.h>
 #include <engine/resource/resource.h>
 #include <engine/luasys/luasys.h>
-#include <engine/resource/resource.h>
 #include <engine/renderer/renderer.h>
 #include <engine/develop/develop_system.h>
 #include <celib/thread/thread.h>
-#include <celib/math/fmath.h>
 #include <engine/plugin/plugin.h>
+#include <celib/memory/memsys.h>
 
-#include "celib/memory/memory.h"
 #include "engine/input/input.h"
 #include "engine/develop/console_server.h"
 #include "celib/thread/task.h"
@@ -251,7 +248,7 @@ void application_start() {
 
     _boot_stage();
 
-    u64 last_tick = os_get_perf_counter();
+    u64 last_tick = celib_get_perf_counter();
     _G.game = luasys_get_game_callbacks();
 
     if (!_G.game->init()) {
@@ -272,8 +269,8 @@ void application_start() {
     while (_G.is_running) {
         struct scope_data application_sd = developsys_enter_scope("Application:update()");
 
-        u64 now_ticks = os_get_perf_counter();
-        float dt = ((float) (now_ticks - last_tick)) / os_get_perf_freq();
+        u64 now_ticks = celib_get_perf_counter();
+        float dt = ((float) (now_ticks - last_tick)) / celib_get_perf_freq();
 
         _G.dt = dt;
         last_tick = now_ticks;
@@ -298,7 +295,7 @@ void application_start() {
         developsys_push_record_float("engine.delta_time", dt);
         developsys_update();
 
-        os_thread_yield();
+        celib_thread_yield();
     }
 
     _G.game->shutdown();

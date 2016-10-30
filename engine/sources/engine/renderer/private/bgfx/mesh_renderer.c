@@ -3,18 +3,16 @@
 #include <celib/containers/map.h>
 #include <celib/string/stringid.h>
 
-#include <celib/memory/memory.h>
 #include <engine/entcom/entcom.h>
 #include <engine/renderer/material.h>
 #include <bgfx/c99/bgfx.h>
 #include <engine/world/transform.h>
 #include <engine/renderer/mesh_renderer.h>
-#include <engine/world/transform.h>
 #include <engine/renderer/private/bgfx/scene.h>
 #include <engine/world/scenegraph.h>
 #include <celib/math/mat44f.h>
 
-#include "engine/renderer/mesh_renderer.h"
+#include <celib/memory/memsys.h>
 
 #define LOG_WHERE "mesh_renderer"
 
@@ -165,7 +163,7 @@ int mesh_init(int stage) {
 
     component_register_compiler(_G.type, _mesh_component_compiler, 10);
 
-    component_register_type(_G.type, (struct component_clb){
+    component_register_type(_G.type, (struct component_clb) {
             .spawner=_spawner, .destroyer=_destroyer,
             .on_world_create=_on_world_create, .on_world_destroy=_on_world_destroy
     });

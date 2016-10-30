@@ -5,14 +5,11 @@
 #include <engine/world/world.h>
 #include <celib/filesystem/vio.h>
 #include <engine/resource/resource.h>
-#include <celib/string/stringid.h>
-#include <engine/resource/resource.h>
 #include <engine/world/unit.h>
 #include <engine/entcom/entcom.h>
 #include <engine/world/transform.h>
 #include <celib/math/quatf.h>
-#include "celib/memory/memory.h"
-#include "celib/containers/map.h"
+#include <celib/memory/memsys.h>
 
 //==============================================================================
 // Typedefs

@@ -1,11 +1,15 @@
-#ifndef CETECH_STRINGID_H
-#define CETECH_STRINGID_H
+#ifndef CELIB_STRINGID_H
+#define CELIB_STRINGID_H
 
 //==============================================================================
 // Includes
 //==============================================================================
 
-#include "celib/types.h"
+#include "string.h"
+#include "../types.h"
+#include "../crypto/hash.h"
+
+#define STRINGID64_SEED 22
 
 typedef struct {
     u64 id;
@@ -15,6 +19,12 @@ typedef struct {
 // Interface
 //==============================================================================
 
-stringid64_t stringid64_from_string(const char *str);
+static stringid64_t stringid64_from_string(const char *str) {
+    const stringid64_t id = {
+            .id = celib_hash_murmur2_64(str, str_lenght(str), STRINGID64_SEED)
+    };
 
-#endif //CETECH_STRINGID_H
+    return id;
+}
+
+#endif //CELIB_STRINGID_H

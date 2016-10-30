@@ -1,5 +1,5 @@
-#ifndef CETECH_MEMORY_TYPES_H
-#define CETECH_MEMORY_TYPES_H
+#ifndef CELIB_MEMORY_TYPES_H
+#define CELIB_MEMORY_TYPES_H
 
 //==============================================================================
 // Includes
@@ -47,4 +47,4 @@ struct allocator_trace_entry {
 };
 
 
-#endif //CETECH_MEMORY_TYPES_H
+#endif //CELIB_MEMORY_TYPES_H

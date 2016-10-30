@@ -1,5 +1,5 @@
-#ifndef CETECH_TASKMANAGER_H
-#define CETECH_TASKMANAGER_H
+#ifndef CELIB_TASKMANAGER_H
+#define CELIB_TASKMANAGER_H
 
 //==============================================================================
 // Includes
@@ -22,12 +22,14 @@ void taskmanager_shutdown();
 
 int taskmanager_worker_count();
 
-void taskmanager_add(struct task_item *items, u32 count);
+void taskmanager_add(struct task_item *items,
+                     u32 count);
 
 int taskmanager_do_work();
 
-void taskmanager_wait_atomic(atomic_int *signal, u32 value);
+void taskmanager_wait_atomic(atomic_int *signal,
+                             u32 value);
 
 char taskmanager_worker_id();
 
-#endif //CETECH_TASKMANAGER_H
+#endif //CELIB_TASKMANAGER_H

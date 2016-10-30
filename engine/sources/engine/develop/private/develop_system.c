@@ -6,19 +6,17 @@
 #include <celib/time/time.h>
 #include <celib/containers/map.h>
 
-#include "include/SDL2/SDL_timer.h"
 #include "include/mpack/mpack.h"
 #include "include/nanomsg/nn.h"
 #include "include/nanomsg/pubsub.h"
 
-#include "celib/thread/thread_types.h"
+#include "celib/thread/types.h"
 #include "celib/thread/thread.h"
-#include "celib/errors/errors.h"
 #include "celib/containers/eventstream.h"
+#include <celib/memory/memsys.h>
 
 #include "celib/config/cvar.h"
 #include "celib/thread/task.h"
-#include "celib/memory/memory.h"
 #include "engine/develop/develop_system.h"
 
 //==============================================================================
@@ -59,24 +57,24 @@ static void _flush_stream_buffer() {
         return;
     }
 
-    os_thread_spin_lock(&_G.flush_lock);
+    celib_thread_spin_lock(&_G.flush_lock);
 
     array_push_u8(&_G.eventstream.stream, _stream_buffer, _stream_buffer_size);
     _stream_buffer_size = 0;
 
-    os_thread_spin_unlock(&_G.flush_lock);
+    celib_thread_spin_unlock(&_G.flush_lock);
 }
 
 static void _flush_job(void *data) {
     _flush_stream_buffer();
 
-   atomic_store_explicit(&_G.complete_flag[taskmanager_worker_id()], 1, memory_order_release);
+    atomic_store_explicit(&_G.complete_flag[taskmanager_worker_id()], 1, memory_order_release);
 }
 
 static void _flush_all_streams() {
     const int wc = taskmanager_worker_count();
 
-    for(int i = 1; i < wc; ++i) {
+    for (int i = 1; i < wc; ++i) {
         atomic_init(&_G.complete_flag[i], 0);
     }
 
@@ -85,7 +83,7 @@ static void _flush_all_streams() {
     struct task_item items[wc];
 
     for (int i = 0; i < wc; ++i) {
-        items[i] = (struct task_item){
+        items[i] = (struct task_item) {
                 .name = "flush_worker",
                 .work = _flush_job,
                 .data = NULL,
@@ -301,8 +299,8 @@ struct scope_data developsys_enter_scope(const char *name) {
     ++_scope_depth;
 
     return (struct scope_data) {
-            .start = os_get_ticks(),
-            .start_timer = os_get_perf_counter()
+            .start = celib_get_ticks(),
+            .start_timer = celib_get_perf_counter()
     };
 }
 
@@ -314,7 +312,7 @@ void developsys_leave_scope(const char *name,
             .name = {0},
             .worker_id = taskmanager_worker_id(),
             .start = scope_data.start,
-            .duration = ((float) (os_get_perf_counter() - scope_data.start_timer) / os_get_perf_freq()) * 1000.0f,
+            .duration = ((float) (celib_get_perf_counter() - scope_data.start_timer) / celib_get_perf_freq()) * 1000.0f,
             .depth = _scope_depth,
     };
 

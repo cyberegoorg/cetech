@@ -5,19 +5,15 @@
 #include <bgfx/c99/bgfx.h>
 
 #include <celib/string/stringid.h>
-#include "celib/containers/array.h"
 #include "celib/containers/map.h"
 #include "celib/os/process.h"
 #include "celib/yaml/yaml.h"
 #include "celib/filesystem/path.h"
 #include "celib/filesystem/vio.h"
 #include "celib/filesystem/fs.h"
-
-#include "celib/memory/memory.h"
+#include <celib/memory/memsys.h>
 #include "engine/application/application.h"
 #include "engine/resource/resource.h"
-#include "engine/resource/resource.h"
-
 
 //==============================================================================
 // Structs
@@ -64,7 +60,7 @@ static int _texturec(const char *input,
         s += snprintf(cmd_line + s, CE_ARRAY_LEN(cmd_line) - s, " --normalmap");
     }
 
-    int status = os_exec(cmd_line);
+    int status = celib_exec(cmd_line);
 
     log_info("application", "STATUS %d", status);
 
@@ -76,10 +72,10 @@ static int _gen_tmp_name(char *tmp_filename,
                          size_t max_len,
                          const char *filename) {
     char dir[4096] = {0};
-    os_path_dir(dir, CE_ARRAY_LEN(dir), filename);
+    celib_path_dir(dir, CE_ARRAY_LEN(dir), filename);
 
-    os_path_join(tmp_filename, max_len, tmp_dir, dir);
-    os_dir_make_path(tmp_filename);
+    celib_path_join(tmp_filename, max_len, tmp_dir, dir);
+    celib_dir_make_path(tmp_filename);
 
     return snprintf(tmp_filename, max_len, "%s/%s.ktx", tmp_dir, filename);
 }
@@ -117,7 +113,7 @@ int _texture_resource_compiler(const char *filename,
 
     yaml_as_string(input, input_str, CE_ARRAY_LEN(input_str));
 
-    os_path_join(input_path, CE_ARRAY_LEN(input_path), source_dir, input_str);
+    celib_path_join(input_path, CE_ARRAY_LEN(input_path), source_dir, input_str);
 
     _gen_tmp_name(output_path, tmp_dir, CE_ARRAY_LEN(tmp_filename), input_str);
 

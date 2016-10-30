@@ -1,5 +1,5 @@
-#ifndef CETECH_SDL_PARTS_H
-#define CETECH_SDL_PARTS_H
+#ifndef CELIB_SDL_PARTS_H
+#define CELIB_SDL_PARTS_H
 
 //==============================================================================
 // Main part
@@ -59,4 +59,4 @@ void sdl_window_shutdown();
 void sdl_window_process(struct eventstream *stream);
 
 
-#endif //CETECH_SDL_PARTS_H
+#endif //CELIB_SDL_PARTS_H

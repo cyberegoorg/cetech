@@ -1,5 +1,5 @@
-#ifndef CETECH_QUATF_H
-#define CETECH_QUATF_H
+#ifndef CELIB_QUATF_H
+#define CELIB_QUATF_H
 
 
 //==============================================================================
@@ -209,4 +209,4 @@ CE_FORCE_INLINE void quatf_invert(quatf_t *__restrict result,
     result->f[3] = a->f[3];
 }
 
-#endif //CETECH_QUATF_H
+#endif //CELIB_QUATF_H

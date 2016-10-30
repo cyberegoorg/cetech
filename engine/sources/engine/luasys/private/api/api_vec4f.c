@@ -2,7 +2,6 @@
 #include <engine/world/transform.h>
 #include <celib/math/vec4f.h>
 #include "engine/luasys/luasys.h"
-#include "engine/entcom/types.h"
 
 #define API_NAME "Vec4f"
 

@@ -3,9 +3,8 @@
 //==============================================================================
 
 #include <celib/filesystem/path.h>
-#include <celib/memory/memory.h>
 #include "celib/filesystem/fs.h"
-#include "celib/string/string.h"
+#include <celib/memory/memsys.h>
 
 #include "celib/filesystem/vio.h"
 
@@ -100,7 +99,7 @@ int filesystem_get_fullpath(stringid64_t root,
                             const char *filename) {
     const char *root_path = filesystem_get_root_dir(root);
 
-    return os_path_join(result, maxlen, root_path, filename) == (str_lenght(root_path) + str_lenght(filename) + 1);
+    return celib_path_join(result, maxlen, root_path, filename) == (str_lenght(root_path) + str_lenght(filename) + 1);
 }
 
 struct vio *filesystem_open(stringid64_t root,
@@ -134,7 +133,7 @@ int filesystem_create_directory(stringid64_t root,
         return 0;
     }
 
-    return os_dir_make_path(fullm_path);
+    return celib_dir_make_path(fullm_path);
 }
 
 
@@ -149,12 +148,12 @@ void filesystem_listdir(stringid64_t root,
         return;
     }
 
-    os_dir_list(fullm_path, 1, files, allocator);
+    celib_dir_list(fullm_path, 1, files, allocator);
 }
 
 void filesystem_listdir_free(string_array_t *files,
                              struct allocator *allocator) {
-    os_dir_list_free(files, allocator);
+    celib_dir_list_free(files, allocator);
 }
 
 
@@ -165,5 +164,5 @@ time_t filesystem_get_file_mtime(stringid64_t root,
         return 0;
     }
 
-    return os_file_mtime(fullm_path);
+    return celib_file_mtime(fullm_path);
 }
