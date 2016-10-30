@@ -15,6 +15,7 @@
 // Defines
 //==============================================================================
 
+#define MAX_PLUGINS 256
 #define MAX_PATH_LEN 256
 #define PLUGIN_PREFIX "plugin_"
 #define LOG_WHERE "plugin_system"
@@ -159,7 +160,7 @@ void plugin_load_dirs(const char *path) {
     ARRAY_DESTROY(pchar, &files);
 }
 
-void plugin_callm_update() {
+void plugin_call_update() {
     for (size_t i = 0; i < MAX_PLUGINS; ++i) {
         if (!_G.used[i] || !_G.plugin_api[i]->update) {
             continue;

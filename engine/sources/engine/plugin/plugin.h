@@ -11,8 +11,6 @@
 // Defines
 //==============================================================================
 
-#define MAX_PLUGINS 256
-
 #define INIT_STATIC_PLUGIN(name)\
     void* name ## _get_plugin_api(int,int); \
     plugin_add_static(name ## _get_plugin_api)\
@@ -29,9 +27,9 @@ void plugin_load_dirs(const char *path);
 
 void plugin_reload(const char *path);
 
-void reload_loaded();
+void plugin_reload_loaded();
 
-void plugin_callm_update();
+void plugin_call_update();
 
 void *plugin_get_engine_api(int api,
                             int version);
