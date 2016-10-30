@@ -1,5 +1,5 @@
-#ifndef CETECH_MEMSYS_H
-#define CETECH_MEMSYS_H
+#ifndef CELIB_MEMSYS_H
+#define CELIB_MEMSYS_H
 
 #include "types.h"
 
@@ -12,4 +12,4 @@ struct allocator *memsys_main_allocator();
 struct allocator *memsys_main_scratch_allocator();
 
 
-#endif //CETECH_MEMSYS_H
+#endif //CELIB_MEMSYS_H

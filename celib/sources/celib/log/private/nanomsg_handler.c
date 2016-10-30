@@ -3,6 +3,7 @@
 ***********************************************************************/
 
 #include <stdio.h>
+
 #include <include/mpack/mpack.h>
 #include <include/nanomsg/nn.h>
 
@@ -57,9 +58,9 @@ void nano_log_handler(enum log_level level,
 
     mpack_finish_map(&writer);
 
+    CE_ASSERT(LOG_WHERE, mpack_writer_destroy(&writer) == mpack_ok);
+
     bytes = nn_send(socket, data, size, 0);
     CE_ASSERT(LOG_WHERE, (size_t) bytes == size);
-
-    CE_ASSERT(LOG_WHERE, mpack_writer_destroy(&writer) == mpack_ok);
     free(data);
 }

@@ -1,5 +1,5 @@
-#ifndef CETECH_ALLOCATOR_H
-#define CETECH_ALLOCATOR_H
+#ifndef CELIB_ALLOCATOR_H
+#define CELIB_ALLOCATOR_H
 
 #include "types.h"
 
@@ -71,4 +71,4 @@ struct allocator *scratch_allocator_create(struct allocator *backing,
 
 void scratch_allocator_destroy(struct allocator *a);
 
-#endif //CETECH_ALLOCATOR_H
+#endif //CELIB_ALLOCATOR_H
