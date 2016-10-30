@@ -50,23 +50,6 @@ PLATFORMS = {
     'linux64',
 }
 
-# Build platform.
-PLATFORMS_SLN = {
-    'windows64': 'CETech.Windows.sln',
-}
-
-
-def make_vs(config, platform_, debug):
-    cmds = [os.path.join('C:\Program Files (x86)\Microsoft Visual Studio 14.0\Common7\IDE', 'devenv'),
-            PLATFORMS_SLN[platform_], '/build']
-
-    if not debug:
-        cmds.append('Release')
-    else:
-        cmds.append('Debug')
-
-    return cmds
-
 
 def make_make(config, platform_, debug):
     if not debug:
@@ -78,7 +61,6 @@ def make_make(config, platform_, debug):
 
 
 PLATFORMS_MAKE = {
-    # 'windows64': make_vs,
     'linux64': make_make
 }
 
