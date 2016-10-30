@@ -211,7 +211,8 @@ void cvar_load_global() {
     yaml_node_foreach_dict(root, foreach_config_clb, &config_data);
 }
 
-void _cvar_from_str(const char* name, const char* value) {
+void _cvar_from_str(const char *name,
+                    const char *value) {
     union {
         float f;
         int i;
@@ -228,7 +229,7 @@ void _cvar_from_str(const char* name, const char* value) {
                 break;
 
             case CV_INT:
-                if(value == NULL) {
+                if (value == NULL) {
                     tmp_var.i = 1;
                 } else {
                     sscanf(value, "%d", &tmp_var.i);
@@ -254,20 +255,18 @@ void _cvar_from_str(const char* name, const char* value) {
 int cvar_parse_args(struct args args) {
     struct args tmp_args = args;
     for (int j = 0; j < tmp_args.argc; ++j) {
-        if(tmp_args.argv[j][0] != '-') {
+        if (tmp_args.argv[j][0] != '-') {
             continue;
         }
 
         const char *name = tmp_args.argv[j] + 1;
         const char *value = (j != tmp_args.argc - 1) ? tmp_args.argv[j + 1] : NULL;
 
-        if(value && (value[0]   == '-')) {
+        if (value && (value[0] == '-')) {
             value = NULL;
         } else {
             ++j;
         }
-
-        log_info(LOG_WHERE, "%s : %s ", name, value);
 
         _cvar_from_str(name, value);
     }
@@ -278,7 +277,7 @@ int cvar_parse_args(struct args args) {
 int cvar_parse_core_args(struct args args) {
     struct args tmp_args = args;
     for (int j = 0; j < tmp_args.argc; ++j) {
-        if(tmp_args.argv[j][0] != '-') {
+        if (tmp_args.argv[j][0] != '-') {
             continue;
         }
 
@@ -290,7 +289,7 @@ int cvar_parse_core_args(struct args args) {
 
             const char *value = (j != tmp_args.argc - 1) ? tmp_args.argv[j + 1] : NULL;
 
-            if(value && (value[0]   == '-')) {
+            if (value && (value[0] == '-')) {
                 value = NULL;
             } else {
                 ++j;
@@ -435,3 +434,26 @@ void cvar_set_string(cvar_t var,
     _G.values[var.idx].s = str_duplicate(s, memsys_main_allocator());
 }
 
+void cvar_log_all() {
+    for (u64 i = 1; i < MAX_VARIABLES; ++i) {
+        if (_G.name[i][0] == '\0') {
+            continue;
+        }
+
+        const char *name = _G.name[i];
+
+        switch (_G.types[i]) {
+            case CV_FLOAT:
+                log_info(LOG_WHERE, "%s = %f", name, _G.values[i].f);
+                break;
+            case CV_INT:
+                log_info(LOG_WHERE, "%s = %d", name, _G.values[i].i);
+                break;
+            case CV_STRING:
+                log_info(LOG_WHERE, "%s = %s", name, _G.values[i].s);
+                break;
+            default:
+                break;
+        }
+    }
+}

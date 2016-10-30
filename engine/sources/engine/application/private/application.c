@@ -138,6 +138,8 @@ int application_init(int argc,
         return 0;
     }
 
+    cvar_log_all();
+
     // main stage
     for (int i = 0; i < STATIC_SYSTEMS_SIZE; ++i) {
         if (!_SYSTEMS[i].init(1)) {
