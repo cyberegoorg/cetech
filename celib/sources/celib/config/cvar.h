@@ -62,4 +62,6 @@ void cvar_set_int(cvar_t var,
 void cvar_set_string(cvar_t var,
                      const char *s);
 
+void cvar_log_all();
+
 #endif //CETECH_CONFIG_API_H
