@@ -16,5 +16,11 @@ typedef struct {
     u32 idx;
 } transform_t;
 
+typedef void (*world_on_created_t)(world_t world);
+
+typedef void (*world_on_destroy_t)(world_t world);
+
+typedef void (*world_on_update_t)(world_t world, float dt);
+
 
 #endif //CETECH_WORLD_TYPES_H

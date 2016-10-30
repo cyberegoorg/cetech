@@ -71,3 +71,12 @@ void world_destroy(world_t world) {
 
     handlerid_handler_destroy(&_G.world_handler, world.h);
 }
+
+void world_update(world_t world, float dt) {
+    for (int i = 0; i < ARRAY_SIZE(&_G.callbacks); ++i) {
+        if(ARRAY_AT(&_G.callbacks, i).on_update != NULL) {
+            ARRAY_AT(&_G.callbacks, i).on_update(world, dt);
+            return;
+        }
+    }
+}

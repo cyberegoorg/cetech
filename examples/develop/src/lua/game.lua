@@ -194,19 +194,7 @@ function Game:update(dt)
         self.fps_camera:update(dt, right_a.x * 1.0, right_a.y * 1.0, left_a.y * 20, left_a.x * 20)
     end
 
-    --
-    --- -    -- local unit1 = World.UnitByName(self.world, self.level, "box1")
-    ---- -- local node = SceneGraph.GetNodeByName(self.world, unit1, "n_geom_0")
-    ---- -- rotator(self.world, node, Quatf.FromAxisAngle(Vec3f.UnitY, 0.05))
-    --
-    -- unit1 = World.UnitByName(self.world, self.level, "box2")
-    -- node = SceneGraph.GetNodeByName(self.world, unit1, "n_cube")
-    --
-    -- rotator(self.world, node, Quatf.FromAxisAngle(Vec3f.UnitZ, 0.1))
-    --
-    -- World.Update(self.world, dt)
-    -- -- print("%f, %f", m_axis.x, m_axis.y)
-    -- -- print(dt)
+    World.update(self.world, dt)
 end
 
 function Game:render()

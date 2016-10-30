@@ -17,7 +17,17 @@ static int _world_destroy(lua_State *l) {
     return 0;
 }
 
+static int _world_update(lua_State *l) {
+    world_t world = {.h = luasys_to_handler(l, 1)};
+    float dt = luasys_to_f32(l, 2);
+    world_update(world, dt);
+    return 0;
+}
+
+
+
 void _register_lua_world_api() {
     luasys_add_module_function(API_NAME, "create", _world_create);
     luasys_add_module_function(API_NAME, "destroy", _world_destroy);
+    luasys_add_module_function(API_NAME, "update", _world_update);
 }

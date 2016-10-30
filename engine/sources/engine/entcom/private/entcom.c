@@ -96,12 +96,12 @@ u32 component_get_spawn_order(stringid64_t type) {
 }
 
 void component_register_type(stringid64_t type, struct component_clb clb) {
-
     MAP_SET(component_clb_t, &_G.component_clb, type.id, clb);
 
     world_callbacks_t wclb = {
             .on_created = clb.on_world_create,
             .on_destroy = clb.on_world_destroy,
+            .on_update = clb.on_world_update,
     };
 
     world_register_callback(wclb);

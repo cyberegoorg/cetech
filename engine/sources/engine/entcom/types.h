@@ -4,6 +4,7 @@
 #include <engine/world/types.h>
 #include <celib/containers/map.h>
 #include <celib/yaml/yaml.h>
+#include <engine/world/types.h>
 
 typedef struct {
     union {
@@ -17,10 +18,6 @@ MAP_PROTOTYPE(entity_t);
 
 typedef int (*component_compiler_t)(yaml_node_t body,
                                     ARRAY_T(u8) *data);
-
-typedef void (*component_on_world_create_t)(world_t world);
-
-typedef void (*component_on_world_destroy_t)(world_t world);
 
 typedef void (*component_destroyer_t)(world_t world,
                                       entity_t *ents,
@@ -36,8 +33,9 @@ typedef void (*component_spawner_t)(world_t world,
 static struct component_clb {
     component_spawner_t spawner;
     component_destroyer_t destroyer;
-    component_on_world_create_t on_world_create;
-    component_on_world_destroy_t on_world_destroy;
+    world_on_created_t on_world_create;
+    world_on_destroy_t on_world_destroy;
+    world_on_update_t  on_world_update;
 } component_clb_null = {0};
 
 

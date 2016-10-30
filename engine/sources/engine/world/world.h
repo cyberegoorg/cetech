@@ -13,17 +13,11 @@
 // Interface
 //==============================================================================
 
-
-typedef void (*world_on_created_t)(world_t world);
-
-typedef void (*world_on_destroy_t)(world_t world);
-
 typedef struct {
     world_on_created_t on_created;
     world_on_destroy_t on_destroy;
+    world_on_update_t on_update;
 } world_callbacks_t;
-
-
 
 int world_init(int stage);
 
@@ -35,6 +29,7 @@ world_t world_create();
 
 void world_destroy(world_t world);
 
+void world_update(world_t world, float dt);
 
 level_t world_load_level(world_t world,
                          stringid64_t name);
