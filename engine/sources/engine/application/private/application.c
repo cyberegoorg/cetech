@@ -124,12 +124,10 @@ int application_init(int argc,
     }
 
     cvar_parse_core_args(_G.args);
-
     if (cvar_get_int(_G.config.cv_compile)) {
         resource_compiler_create_build_dir();
         cvar_compile_global();
     }
-
     plugin_load_dirs("./bin");
 
     cvar_load_global();
@@ -176,58 +174,6 @@ int application_shutdown() {
     log_shutdown();
 
     return !_G.init_error;
-}
-
-static void _dump_event() {
-    struct event_header *event = machine_event_begin();
-
-    u32 size = 0;
-    while (event != machine_event_end()) {
-        size = size + 1;
-        switch (event->type) {
-//            case EVENT_GAMEPAD_DOWN:
-//                log_info(LOG_WHERE, "Gamepad %d btn %d down", ((struct gamepad_btn_event*)event)->gamepad_id, ((struct gamepad_btn_event*)event)->button);
-//                break;
-//
-//            case EVENT_GAMEPAD_UP:
-//                log_info(LOG_WHERE, "Gamepad %d btn %d up", ((struct gamepad_btn_event*)event)->gamepad_id, ((struct gamepad_btn_event*)event)->button);
-//                break;
-//
-//            case EVENT_GAMEPAD_MOVE:
-//                log_info(LOG_WHERE, "Gamepad %d move axis %d [%f, %f]",
-//                         ((struct gamepad_move_event*)event)->gamepad_id,
-//                         ((struct gamepad_move_event*)event)->axis,
-//                         ((struct gamepad_move_event*)event)->position.x,
-//                         ((struct gamepad_move_event*)event)->position.y);
-//                break;
-
-
-//            case EVENT_KEYBOARD_DOWN:
-//                log_info(LOG_WHERE, "Key down %d", ((struct keyboard_event*)event)->button);
-//                break;
-
-//            case EVENT_KEYBOARD_UP:
-//                log_info(LOG_WHERE, "Key up %d", ((struct keyboard_event*)event)->button);
-//                break;
-
-//            case EVENT_MOUSE_UP:
-//                log_info(LOG_WHERE, "mouse down %d", ((struct mouse_event *) event)->button);
-//                break;
-
-//            case EVENT_MOUSE_DOWN:
-//                log_info(LOG_WHERE, "mouse up %d", ((struct mouse_event *) event)->button);
-//                break;
-
-//            case EVENT_MOUSE_MOVE:
-//                log_info(LOG_WHERE, "mouse %f %f", ((struct mouse_move_event *) event)->pos[0],
-//                         ((struct mouse_move_event *) event)->pos[1]);
-//                break;
-
-            default:
-                break;
-        }
-        event = machine_event_next(event);
-    }
 }
 
 static void _boot_stage() {
