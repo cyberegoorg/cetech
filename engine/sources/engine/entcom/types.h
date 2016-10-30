@@ -33,4 +33,12 @@ typedef void (*component_spawner_t)(world_t world,
                                     size_t ent_count,
                                     void *data);
 
+static struct component_clb {
+    component_spawner_t spawner;
+    component_destroyer_t destroyer;
+    component_on_world_create_t on_world_create;
+    component_on_world_destroy_t on_world_destroy;
+} component_clb_null = {0};
+
+
 #endif //CETECH_ENTCOM_TYPES_H

@@ -14,16 +14,11 @@
 //==============================================================================
 
 ARRAY_PROTOTYPE(component_compiler_t);
-ARRAY_PROTOTYPE(component_spawner_t);
-ARRAY_PROTOTYPE(component_destroyer_t);
-ARRAY_PROTOTYPE(component_on_world_create_t);
-ARRAY_PROTOTYPE(component_on_world_destroy_t);
+ARRAY_PROTOTYPE_N(struct component_clb, component_clb_t);
 
 MAP_PROTOTYPE(component_compiler_t);
-MAP_PROTOTYPE(component_spawner_t);
-MAP_PROTOTYPE(component_destroyer_t);
-MAP_PROTOTYPE(component_on_world_create_t);
-MAP_PROTOTYPE(component_on_world_destroy_t);
+MAP_PROTOTYPE_N(struct component_clb, component_clb_t);
+
 
 #define _G EntityMaagerGlobals
 static struct G {
@@ -31,10 +26,7 @@ static struct G {
     MAP_T(component_compiler_t) compiler_map;
     MAP_T(u32) spawn_order_map;
 
-    MAP_T(component_spawner_t) spawner_map;
-    MAP_T(component_destroyer_t) destroyer_map;
-    MAP_T(component_on_world_create_t) on_world_create_map;
-    MAP_T(component_on_world_destroy_t) on_world_destroy_map;
+    MAP_T(component_clb_t) component_clb;
 } _G = {0};
 
 
@@ -52,12 +44,7 @@ int entcom_init(int stage) {
     handlerid_init(&_G.entity_handler, memsys_main_allocator());
     MAP_INIT(component_compiler_t, &_G.compiler_map, memsys_main_allocator());
     MAP_INIT(u32, &_G.spawn_order_map, memsys_main_allocator());
-    MAP_INIT(component_spawner_t, &_G.spawner_map, memsys_main_allocator());
-    MAP_INIT(component_destroyer_t, &_G.destroyer_map, memsys_main_allocator());
-    MAP_INIT(component_on_world_create_t, &_G.on_world_create_map, memsys_main_allocator());
-    MAP_INIT(component_on_world_destroy_t, &_G.on_world_destroy_map, memsys_main_allocator());
-
-//    CE_ASSERT("entcom", handlerid_handler_create(&_G.entity_handler).h == 0);
+    MAP_INIT(component_clb_t, &_G.component_clb, memsys_main_allocator());
 
     return 1;
 }
@@ -66,10 +53,7 @@ void entcom_shutdown() {
     handlerid_destroy(&_G.entity_handler);
     MAP_DESTROY(component_compiler_t, &_G.compiler_map);
     MAP_DESTROY(u32, &_G.spawn_order_map);
-    MAP_DESTROY(component_spawner_t, &_G.spawner_map);
-    MAP_DESTROY(component_destroyer_t, &_G.destroyer_map);
-    MAP_DESTROY(component_on_world_create_t, &_G.on_world_create_map);
-    MAP_DESTROY(component_on_world_destroy_t, &_G.on_world_destroy_map);
+    MAP_DESTROY(component_clb_t, &_G.component_clb);
 
     _G = (struct G) {0};
 }
@@ -111,23 +95,16 @@ u32 component_get_spawn_order(stringid64_t type) {
     return MAP_GET(u32, &_G.spawn_order_map, type.id, 0);
 }
 
-void component_register_type(stringid64_t type,
-                             component_spawner_t spawner,
-                             component_destroyer_t destroyer,
-                             component_on_world_create_t on_world_create,
-                             component_on_world_destroy_t on_world_destroy) {
+void component_register_type(stringid64_t type, struct component_clb clb) {
 
-    MAP_SET(component_spawner_t, &_G.spawner_map, type.id, spawner);
-    MAP_SET(component_destroyer_t, &_G.destroyer_map, type.id, destroyer);
-    MAP_SET(component_on_world_create_t, &_G.on_world_create_map, type.id, on_world_create);
-    MAP_SET(component_on_world_destroy_t, &_G.on_world_destroy_map, type.id, on_world_destroy);
+    MAP_SET(component_clb_t, &_G.component_clb, type.id, clb);
 
-    world_callbacks_t clb = {
-            .on_created = (world_on_created_t) on_world_create,
-            .on_destroy = (world_on_destroy_t) on_world_destroy,
+    world_callbacks_t wclb = {
+            .on_created = clb.on_world_create,
+            .on_destroy = clb.on_world_destroy,
     };
 
-    world_register_callback(clb);
+    world_register_callback(wclb);
 }
 
 void component_spawn(world_t world,
@@ -137,23 +114,24 @@ void component_spawn(world_t world,
                      u32 *ents_parent,
                      u32 ent_count,
                      void *data) {
-    component_spawner_t clb = MAP_GET(component_spawner_t, &_G.spawner_map, type.id, NULL);
 
-    if (clb == NULL) {
+    struct component_clb clb = MAP_GET(component_clb_t, &_G.component_clb, type.id, component_clb_null);
+
+    if (!clb.spawner) {
         return;
     }
 
-    clb(world, ent_ids, cent, ents_parent, ent_count, data);
-
+    clb.spawner(world, ent_ids, cent, ents_parent, ent_count, data);
 }
 
 void component_destroy(world_t world,
                        entity_t *ent,
                        u32 count) {
-    const MAP_ENTRY_T(component_destroyer_t) *ce_it = MAP_BEGIN(component_destroyer_t, &_G.destroyer_map);
-    const MAP_ENTRY_T(component_destroyer_t) *ce_end = MAP_END(component_destroyer_t, &_G.destroyer_map);
+
+    const MAP_ENTRY_T(component_clb_t) *ce_it = MAP_BEGIN(component_clb_t, &_G.component_clb);
+    const MAP_ENTRY_T(component_clb_t) *ce_end = MAP_END(component_clb_t, &_G.component_clb);
     while (ce_it != ce_end) {
-        ce_it->value(world, ent, count);
+        ce_it->value.destroyer(world, ent, count);
         ++ce_it;
     }
 }

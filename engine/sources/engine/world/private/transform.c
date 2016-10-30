@@ -166,7 +166,10 @@ int transform_init(int stage) {
     _G.type = stringid64_from_string("transform");
 
     component_register_compiler(_G.type, _transform_component_compiler, 10);
-    component_register_type(_G.type, _spawner, _destroyer, _on_world_create, _on_world_destroy);
+    component_register_type(_G.type, (struct component_clb){
+            .spawner=_spawner, .destroyer=_destroyer,
+            .on_world_create=_on_world_create, .on_world_destroy=_on_world_destroy
+    });
 
     return 1;
 }
