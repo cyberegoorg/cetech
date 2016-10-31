@@ -63,20 +63,20 @@ static void preprocess(const char *filename,
     if (yaml_is_valid(prefab_node)) {
         char prefab_file[256] = {0};
         char prefab_str[256] = {0};
-        yaml_as_string(prefab_node, prefab_str, CE_ARRAY_LEN(prefab_str));
-        snprintf(prefab_file, CE_ARRAY_LEN(prefab_file), "%s.unit", prefab_str);
+        yaml_as_string(prefab_node, prefab_str, CEL_ARRAY_LEN(prefab_str));
+        snprintf(prefab_file, CEL_ARRAY_LEN(prefab_file), "%s.unit", prefab_str);
 
         capi->add_dependency(filename, prefab_file);
 
         char full_path[256] = {0};
         const char *source_dir = resource_compiler_get_source_dir();
-        celib_path_join(full_path, CE_ARRAY_LEN(full_path), source_dir, prefab_file);
+        cel_path_join(full_path, CEL_ARRAY_LEN(full_path), source_dir, prefab_file);
 
-        struct vio *prefab_vio = vio_from_file(full_path, VIO_OPEN_READ, memsys_main_allocator());
+        struct vio *prefab_vio = cel_vio_from_file(full_path, VIO_OPEN_READ, memsys_main_allocator());
 
-        char prefab_data[vio_size(prefab_vio) + 1];
-        memory_set(prefab_data, 0, vio_size(prefab_vio) + 1);
-        vio_read(prefab_vio, prefab_data, sizeof(char), vio_size(prefab_vio));
+        char prefab_data[cel_vio_size(prefab_vio) + 1];
+        memory_set(prefab_data, 0, cel_vio_size(prefab_vio) + 1);
+        cel_vio_read(prefab_vio, prefab_data, sizeof(char), cel_vio_size(prefab_vio));
 
         yaml_document_t h;
         yaml_node_t prefab_root = yaml_load_str(prefab_data, &h);
@@ -84,7 +84,7 @@ static void preprocess(const char *filename,
         preprocess(filename, prefab_root, capi);
         yaml_merge(root, prefab_root);
 
-        vio_close(prefab_vio);
+        cel_vio_close(prefab_vio);
     }
 }
 
@@ -141,10 +141,10 @@ void foreach_components_clb(yaml_node_t key,
     struct foreach_componets_data *data = _data;
     struct entity_compile_output *output = data->output;
 
-    yaml_as_string(key, uid_str, CE_ARRAY_LEN(uid_str));
+    yaml_as_string(key, uid_str, CEL_ARRAY_LEN(uid_str));
 
     yaml_node_t component_type_node = yaml_get_node(value, "component_type");
-    yaml_as_string(component_type_node, component_type_str, CE_ARRAY_LEN(component_type_str));
+    yaml_as_string(component_type_node, component_type_str, CEL_ARRAY_LEN(component_type_str));
 
     cid = stringid64_from_string(component_type_str);
 
@@ -188,7 +188,7 @@ static void compile_entitity(yaml_node_t rootNode,
     MAP_SET(u32, &output->entity_parent, ent_id, parent);
 
     yaml_node_t components_node = yaml_get_node(rootNode, "components");
-    CE_ASSERT("unit_system", yaml_is_valid(components_node));
+    CEL_ASSERT("unit_system", yaml_is_valid(components_node));
 
     struct foreach_componets_data data = {
             .ent_id = ent_id,
@@ -237,7 +237,7 @@ struct component_data {
 struct entity_compile_output *unit_compiler_create_output() {
     struct allocator *a = memsys_main_allocator();
 
-    struct entity_compile_output *output = CE_ALLOCATE(a, struct entity_compile_output, 1);
+    struct entity_compile_output *output = CEL_ALLOCATE(a, struct entity_compile_output, 1);
     output->ent_counter = 0;
     ARRAY_INIT(u64, &output->component_type, a);
     MAP_INIT(array_u32, &output->component_ent, a);
@@ -270,7 +270,7 @@ void unit_compiler_destroy_output(struct entity_compile_output *output) {
     MAP_DESTROY(array_yaml_node_t, &output->component_body);
 
     struct allocator *a = memsys_main_allocator();
-    CE_DEALLOCATE(a, output);
+    CEL_DEALLOCATE(a, output);
 }
 
 void unit_compiler_compile_unit(struct entity_compile_output *output,
@@ -349,9 +349,9 @@ int _unit_resource_compiler(const char *filename,
                             struct vio *source_vio,
                             struct vio *build_vio,
                             struct compilator_api *compilator_api) {
-    char source_data[vio_size(source_vio) + 1];
-    memory_set(source_data, 0, vio_size(source_vio) + 1);
-    vio_read(source_vio, source_data, sizeof(char), vio_size(source_vio));
+    char source_data[cel_vio_size(source_vio) + 1];
+    memory_set(source_data, 0, cel_vio_size(source_vio) + 1);
+    cel_vio_read(source_vio, source_data, sizeof(char), cel_vio_size(source_vio));
 
     yaml_document_t h;
     yaml_node_t root = yaml_load_str(source_data, &h);
@@ -361,7 +361,7 @@ int _unit_resource_compiler(const char *filename,
 
     unit_resource_compiler(root, filename, &unit_data, compilator_api);
 
-    vio_write(build_vio, &ARRAY_AT(&unit_data, 0), sizeof(u8), ARRAY_SIZE(&unit_data));
+    cel_vio_write(build_vio, &ARRAY_AT(&unit_data, 0), sizeof(u8), ARRAY_SIZE(&unit_data));
 
 
     ARRAY_DESTROY(u8, &unit_data);
@@ -375,16 +375,16 @@ int _unit_resource_compiler(const char *filename,
 
 void *unit_resource_loader(struct vio *input,
                            struct allocator *allocator) {
-    const i64 size = vio_size(input);
-    char *data = CE_ALLOCATE(allocator, char, size);
-    vio_read(input, data, 1, size);
+    const i64 size = cel_vio_size(input);
+    char *data = CEL_ALLOCATE(allocator, char, size);
+    cel_vio_read(input, data, 1, size);
 
     return data;
 }
 
 void unit_resource_unloader(void *new_data,
                             struct allocator *allocator) {
-    CE_DEALLOCATE(allocator, new_data);
+    CEL_DEALLOCATE(allocator, new_data);
 }
 
 void unit_resource_online(stringid64_t name,
@@ -402,7 +402,7 @@ void *unit_resource_reloader(stringid64_t name,
     unit_resource_offline(name, old_data);
     unit_resource_online(name, new_data);
 
-    CE_DEALLOCATE(allocator, old_data);
+    CEL_DEALLOCATE(allocator, old_data);
 
     return new_data;
 }

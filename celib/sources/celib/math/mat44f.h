@@ -29,7 +29,7 @@
 // Interface
 //==============================================================================
 
-CE_FORCE_INLINE void mat44f_identity(mat44f_t *result) {
+CEL_FORCE_INLINE void mat44f_identity(mat44f_t *result) {
     memset(result, 0, sizeof(f32) * 16);
 
     result->f[0] = 1.0f;
@@ -38,7 +38,7 @@ CE_FORCE_INLINE void mat44f_identity(mat44f_t *result) {
     result->f[15] = 1.0f;
 }
 
-CE_FORCE_INLINE void mat44f_translate(mat44f_t *result,
+CEL_FORCE_INLINE void mat44f_translate(mat44f_t *result,
                                       f32 x,
                                       f32 y,
                                       f32 z) {
@@ -49,7 +49,7 @@ CE_FORCE_INLINE void mat44f_translate(mat44f_t *result,
     result->f[14] = z;
 }
 
-CE_FORCE_INLINE void mat44f_scale(mat44f_t *result,
+CEL_FORCE_INLINE void mat44f_scale(mat44f_t *result,
                                   f32 x,
                                   f32 y,
                                   f32 z) {
@@ -61,7 +61,7 @@ CE_FORCE_INLINE void mat44f_scale(mat44f_t *result,
     result->f[15] = 1.0f;
 }
 
-CE_FORCE_INLINE void mat44f_rotate_x(mat44f_t *result,
+CEL_FORCE_INLINE void mat44f_rotate_x(mat44f_t *result,
                                      f32 x) {
     const f32 sx = f32_sin(x);
     const f32 cx = f32_cos(x);
@@ -76,7 +76,7 @@ CE_FORCE_INLINE void mat44f_rotate_x(mat44f_t *result,
     result->f[15] = 1.0f;
 }
 
-CE_FORCE_INLINE void mat44f_rotate_y(mat44f_t *result,
+CEL_FORCE_INLINE void mat44f_rotate_y(mat44f_t *result,
                                      f32 y) {
     const f32 sy = f32_sin(y);
     const f32 cy = f32_cos(y);
@@ -91,7 +91,7 @@ CE_FORCE_INLINE void mat44f_rotate_y(mat44f_t *result,
     result->f[15] = 1.0f;
 }
 
-CE_FORCE_INLINE void mat44f_rotate_z(mat44f_t *result,
+CEL_FORCE_INLINE void mat44f_rotate_z(mat44f_t *result,
                                      f32 z) {
     const f32 sz = f32_sin(z);
     const f32 cz = f32_cos(z);
@@ -106,7 +106,7 @@ CE_FORCE_INLINE void mat44f_rotate_z(mat44f_t *result,
     result->f[15] = 1.0f;
 }
 
-CE_FORCE_INLINE void mat44f_rotate_xy(mat44f_t *result,
+CEL_FORCE_INLINE void mat44f_rotate_xy(mat44f_t *result,
                                       f32 x,
                                       f32 y) {
     const f32 sx = f32_sin(x);
@@ -127,7 +127,7 @@ CE_FORCE_INLINE void mat44f_rotate_xy(mat44f_t *result,
     result->f[15] = 1.0f;
 }
 
-CE_FORCE_INLINE void mat44f_rotate_xyz(mat44f_t *result,
+CEL_FORCE_INLINE void mat44f_rotate_xyz(mat44f_t *result,
                                        f32 x,
                                        f32 y,
                                        f32 z) {
@@ -152,7 +152,7 @@ CE_FORCE_INLINE void mat44f_rotate_xyz(mat44f_t *result,
     result->f[15] = 1.0f;
 }
 
-CE_FORCE_INLINE void mat44f_rotate_zyx(mat44f_t *result,
+CEL_FORCE_INLINE void mat44f_rotate_zyx(mat44f_t *result,
                                        f32 x,
                                        f32 y,
                                        f32 z) {
@@ -177,19 +177,19 @@ CE_FORCE_INLINE void mat44f_rotate_zyx(mat44f_t *result,
     result->f[15] = 1.0f;
 };
 
-CE_FORCE_INLINE int mat44f_eq(const mat44f_t *__restrict a,
+CEL_FORCE_INLINE int mat44f_eq(const mat44f_t *__restrict a,
                               const mat44f_t *__restrict b,
                               const f32 epsilon) {
     return f32_equals(a->f, b->f, 4 * 4, epsilon);
 }
 
-CE_FORCE_INLINE int mat44f_is_identity(const mat44f_t *__restrict a,
+CEL_FORCE_INLINE int mat44f_is_identity(const mat44f_t *__restrict a,
                                        f32 epsilon) {
     static mat44f_t _identity = MAT44F_INIT_IDENTITY;
     return mat44f_eq(a, &_identity, epsilon);
 }
 
-CE_FORCE_INLINE void mat44f_mul(mat44f_t *__restrict result,
+CEL_FORCE_INLINE void mat44f_mul(mat44f_t *__restrict result,
                                 const mat44f_t *__restrict a,
                                 const mat44f_t *__restrict b) {
 
@@ -199,7 +199,7 @@ CE_FORCE_INLINE void mat44f_mul(mat44f_t *__restrict result,
     vec4f_mul_mat44f(&result->w, &a->w, b);
 }
 
-CE_FORCE_INLINE void mat44f_inverse(mat44f_t *__restrict result,
+CEL_FORCE_INLINE void mat44f_inverse(mat44f_t *__restrict result,
                                     const mat44f_t *__restrict a) {
     f32 xx = a->f[0];
     f32 xy = a->f[1];
@@ -247,7 +247,7 @@ CE_FORCE_INLINE void mat44f_inverse(mat44f_t *__restrict result,
     result->f[15] = +(xx * (yy * zz - zy * yz) - xy * (yx * zz - zx * yz) + xz * (yx * zy - zx * yy)) * inv_det;
 }
 
-CE_FORCE_INLINE void mat44f_transpose(mat44f_t *__restrict result,
+CEL_FORCE_INLINE void mat44f_transpose(mat44f_t *__restrict result,
                                       const mat44f_t *__restrict a) {
     result->f[0] = a->f[0];
     result->f[4] = a->f[1];
@@ -270,7 +270,7 @@ CE_FORCE_INLINE void mat44f_transpose(mat44f_t *__restrict result,
     result->f[15] = a->f[15];
 }
 
-CE_FORCE_INLINE void mat44f_set_perspective_fov(mat44f_t *__restrict result,
+CEL_FORCE_INLINE void mat44f_set_perspective_fov(mat44f_t *__restrict result,
                                                 const f32 fov,
                                                 const f32 aspect_ratio,
                                                 f32 near,

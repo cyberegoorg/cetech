@@ -66,7 +66,7 @@ void _dealloc_allm_string() {
             continue;
         }
 
-        CE_DEALLOCATE(memsys_main_allocator(), _G.values[i].s);
+        CEL_DEALLOCATE(memsys_main_allocator(), _G.values[i].s);
     }
 }
 
@@ -108,22 +108,22 @@ void cvar_compile_global() {
     char source_path[1024] = {0};
     char build_path[1024] = {0};
 
-    resource_compiler_get_build_dir(build_dir, CE_ARRAY_LEN(build_dir), application_platform());
-    celib_path_join(build_path, CE_ARRAY_LEN(build_path), build_dir, "global.config");
-    celib_path_join(source_path, CE_ARRAY_LEN(source_path), resource_compiler_get_source_dir(), "global.config");
+    resource_compiler_get_build_dir(build_dir, CEL_ARRAY_LEN(build_dir), application_platform());
+    cel_path_join(build_path, CEL_ARRAY_LEN(build_path), build_dir, "global.config");
+    cel_path_join(source_path, CEL_ARRAY_LEN(source_path), resource_compiler_get_source_dir(), "global.config");
 
-    struct vio *source_vio = vio_from_file(source_path, VIO_OPEN_READ, memsys_main_allocator());
-    char *data = CE_ALLOCATE(memsys_main_allocator(), char, vio_size(source_vio));
+    struct vio *source_vio = cel_vio_from_file(source_path, VIO_OPEN_READ, memsys_main_allocator());
+    char *data = CEL_ALLOCATE(memsys_main_allocator(), char, cel_vio_size(source_vio));
 
-    size_t size = (size_t) vio_size(source_vio);
-    vio_read(source_vio, data, sizeof(char), size);
-    vio_close(source_vio);
+    size_t size = (size_t) cel_vio_size(source_vio);
+    cel_vio_read(source_vio, data, sizeof(char), size);
+    cel_vio_close(source_vio);
 
-    struct vio *build_vio = vio_from_file(build_path, VIO_OPEN_WRITE, memsys_main_allocator());
-    vio_write(build_vio, data, sizeof(char), size);
-    vio_close(build_vio);
+    struct vio *build_vio = cel_vio_from_file(build_path, VIO_OPEN_WRITE, memsys_main_allocator());
+    cel_vio_write(build_vio, data, sizeof(char), size);
+    cel_vio_close(build_vio);
 
-    CE_DEALLOCATE(memsys_main_allocator(), data);
+    CEL_DEALLOCATE(memsys_main_allocator(), data);
 }
 
 
@@ -137,13 +137,13 @@ void foreach_config_clb(yaml_node_t key,
     struct foreach_config_data *output = _data;
 
     char key_str[128] = {0};
-    yaml_as_string(key, key_str, CE_ARRAY_LEN(key_str));
+    yaml_as_string(key, key_str, CEL_ARRAY_LEN(key_str));
 
     char name[1024] = {0};
     if (output->root_name != NULL) {
-        snprintf(name, CE_ARRAY_LEN(name), "%s.%s", output->root_name, key_str);
+        snprintf(name, CEL_ARRAY_LEN(name), "%s.%s", output->root_name, key_str);
     } else {
-        snprintf(name, CE_ARRAY_LEN(name), "%s", key_str);
+        snprintf(name, CEL_ARRAY_LEN(name), "%s", key_str);
     }
 
     enum yaml_node_type type = yaml_node_type(value);
@@ -176,7 +176,7 @@ void foreach_config_clb(yaml_node_t key,
                     cvar_set_int(cvar, tmp_int);
                     break;
                 case CV_STRING:
-                    yaml_as_string(value, tmp_str, CE_ARRAY_LEN(tmp_str));
+                    yaml_as_string(value, tmp_str, CEL_ARRAY_LEN(tmp_str));
                     cvar_set_string(cvar, tmp_str);
                     break;
             }
@@ -188,17 +188,17 @@ void cvar_load_global() {
     char build_dir[1024] = {0};
     char source_path[1024] = {0};
 
-    resource_compiler_get_build_dir(build_dir, CE_ARRAY_LEN(build_dir), application_platform());
-    celib_path_join(source_path, CE_ARRAY_LEN(source_path), build_dir, "global.config");
+    resource_compiler_get_build_dir(build_dir, CEL_ARRAY_LEN(build_dir), application_platform());
+    cel_path_join(source_path, CEL_ARRAY_LEN(source_path), build_dir, "global.config");
 
-    struct vio *source_vio = vio_from_file(source_path, VIO_OPEN_READ, memsys_main_allocator());
-    char *data = CE_ALLOCATE(memsys_main_allocator(), char, vio_size(source_vio));
-    vio_read(source_vio, data, vio_size(source_vio), vio_size(source_vio));
-    vio_close(source_vio);
+    struct vio *source_vio = cel_vio_from_file(source_path, VIO_OPEN_READ, memsys_main_allocator());
+    char *data = CEL_ALLOCATE(memsys_main_allocator(), char, cel_vio_size(source_vio));
+    cel_vio_read(source_vio, data, cel_vio_size(source_vio), cel_vio_size(source_vio));
+    cel_vio_close(source_vio);
 
     yaml_document_t h;
     yaml_node_t root = yaml_load_str(data, &h);
-    CE_DEALLOCATE(memsys_main_allocator(), data);
+    CEL_DEALLOCATE(memsys_main_allocator(), data);
 
     struct foreach_config_data config_data = {
             .root_name = NULL

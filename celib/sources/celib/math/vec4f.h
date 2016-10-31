@@ -20,7 +20,7 @@
 // Functions
 //==============================================================================
 
-CE_FORCE_INLINE void vec4f_move(vec4f_t *__restrict result,
+CEL_FORCE_INLINE void vec4f_move(vec4f_t *__restrict result,
                                 const vec4f_t *__restrict a) {
     result->f[0] = a->f[0];
     result->f[1] = a->f[1];
@@ -28,14 +28,14 @@ CE_FORCE_INLINE void vec4f_move(vec4f_t *__restrict result,
     result->f[3] = a->f[3];
 }
 
-CE_FORCE_INLINE int vec4f_eq(const vec4f_t *__restrict a,
+CEL_FORCE_INLINE int vec4f_eq(const vec4f_t *__restrict a,
                              const vec4f_t *__restrict b,
                              const f32 epsilon) {
     return f32_equals(a->f, b->f, 4, epsilon);
 }
 
 
-CE_FORCE_INLINE void vec4f_add(vec4f_t *__restrict result,
+CEL_FORCE_INLINE void vec4f_add(vec4f_t *__restrict result,
                                const vec4f_t *__restrict a,
                                const vec4f_t *__restrict b) {
     result->f[0] = a->f[0] + b->f[0];
@@ -44,7 +44,7 @@ CE_FORCE_INLINE void vec4f_add(vec4f_t *__restrict result,
     result->f[3] = a->f[3] + b->f[3];
 }
 
-CE_FORCE_INLINE void vec4f_sub(vec4f_t *__restrict result,
+CEL_FORCE_INLINE void vec4f_sub(vec4f_t *__restrict result,
                                const vec4f_t *__restrict a,
                                const vec4f_t *__restrict b) {
     result->f[0] = a->f[0] - b->f[0];
@@ -53,7 +53,7 @@ CE_FORCE_INLINE void vec4f_sub(vec4f_t *__restrict result,
     result->f[3] = a->f[3] - b->f[3];
 }
 
-CE_FORCE_INLINE void vec4f_mul(vec4f_t *__restrict result,
+CEL_FORCE_INLINE void vec4f_mul(vec4f_t *__restrict result,
                                const vec4f_t *__restrict a,
                                const f32 s) {
     result->f[0] = a->f[0] * s;
@@ -62,7 +62,7 @@ CE_FORCE_INLINE void vec4f_mul(vec4f_t *__restrict result,
     result->f[3] = a->f[3] * s;
 }
 
-CE_FORCE_INLINE void vec4f_mul_mat44f(vec4f_t *__restrict result,
+CEL_FORCE_INLINE void vec4f_mul_mat44f(vec4f_t *__restrict result,
                                       const vec4f_t *__restrict v,
                                       const mat44f_t *__restrict m) {
 
@@ -72,7 +72,7 @@ CE_FORCE_INLINE void vec4f_mul_mat44f(vec4f_t *__restrict result,
     result->f[3] = v->f[0] * m->f[3] + v->f[1] * m->f[7] + v->f[2] * m->f[11] + v->f[3] * m->f[15];
 }
 
-CE_FORCE_INLINE void vec4f_div(vec4f_t *__restrict result,
+CEL_FORCE_INLINE void vec4f_div(vec4f_t *__restrict result,
                                const vec4f_t *__restrict a,
                                const f32 s) {
 
@@ -82,27 +82,27 @@ CE_FORCE_INLINE void vec4f_div(vec4f_t *__restrict result,
     result->f[3] = a->f[3] / s;
 }
 
-CE_FORCE_INLINE f32 vec4f_dot(const vec4f_t *__restrict a,
+CEL_FORCE_INLINE f32 vec4f_dot(const vec4f_t *__restrict a,
                               const vec4f_t *__restrict b) {
     return (a->f[0] * b->f[0]) + (a->f[1] * b->f[1]) + (a->f[2] * b->f[2]) + (a->f[3] * b->f[3]);
 }
 
-CE_FORCE_INLINE f32 vec4f_length_squared(const vec4f_t *__restrict a) {
+CEL_FORCE_INLINE f32 vec4f_length_squared(const vec4f_t *__restrict a) {
     return (a->f[0] * a->f[0]) + (a->f[1] * a->f[1]) + (a->f[2] * a->f[2]) + (a->f[3] * a->f[3]);
 }
 
-CE_FORCE_INLINE f32 vec4f_length(const vec4f_t *__restrict a) {
+CEL_FORCE_INLINE f32 vec4f_length(const vec4f_t *__restrict a) {
     return f32_sqrt(vec4f_length_squared(a));
 }
 
-CE_FORCE_INLINE void vec4f_normalized(vec4f_t *__restrict result,
+CEL_FORCE_INLINE void vec4f_normalized(vec4f_t *__restrict result,
                                       const vec4f_t *__restrict a) {
     const f32 inv_length = 1.0f / vec4f_length(a);
 
     vec4f_mul(result, a, inv_length);
 }
 
-CE_FORCE_INLINE void vec4f_lerp(vec4f_t *__restrict result,
+CEL_FORCE_INLINE void vec4f_lerp(vec4f_t *__restrict result,
                                 const vec4f_t *__restrict a,
                                 const vec4f_t *__restrict b,
                                 f32 t) {

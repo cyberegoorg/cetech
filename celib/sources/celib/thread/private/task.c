@@ -66,7 +66,7 @@ static task_t _new_task() {
 }
 
 static void _push_task(task_t t) {
-    CE_ASSERT("", t.id != 0);
+    CEL_ASSERT("", t.id != 0);
 
     int affinity = _G._task_pool[t.id].affinity;
 
@@ -137,7 +137,7 @@ static int _task_worker(void *o) {
 
     while (_G._Run) {
         if (!taskmanager_do_work()) {
-            celib_thread_yield();
+            cel_thread_yield();
         }
     }
 
@@ -157,7 +157,7 @@ int taskmanager_init(int stage) {
 
     _G = (struct G) {0};
 
-    int core_count = celib_cpu_count();
+    int core_count = cel_cpu_count();
 
     static const uint32_t main_threads_count = 1;
     const uint32_t worker_count = core_count - main_threads_count;
@@ -173,7 +173,7 @@ int taskmanager_init(int stage) {
     }
 
     for (int j = 0; j < worker_count; ++j) {
-        _G._workers[j] = celib_thread_create((thread_fce_t) _task_worker, "worker", (void *) ((intptr_t) (j + 1)));
+        _G._workers[j] = cel_thread_create((thread_fce_t) _task_worker, "worker", (void *) ((intptr_t) (j + 1)));
     }
 
     _G._Run = 1;
@@ -187,8 +187,8 @@ void taskmanager_shutdown() {
     int status = 0;
 
     for (u32 i = 0; i < _G._workers_count; ++i) {
-        //celib_thread_kill(_G._workers[i]);
-        celib_thread_wait(_G._workers[i], &status);
+        //cel_thread_kill(_G._workers[i]);
+        cel_thread_wait(_G._workers[i], &status);
     }
 
     queue_task_destroy(&_G._gloalQueue);

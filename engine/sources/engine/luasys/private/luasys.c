@@ -86,27 +86,27 @@ static int require(lua_State *L) {
 }
 
 vec2f_t *_new_tmp_vec2f() {
-    CE_ASSERT("lua_enviroment", _G._temp_vec2f_used < 1024);
+    CEL_ASSERT("lua_enviroment", _G._temp_vec2f_used < 1024);
     return &_G._temp_vec2f_buffer[_G._temp_vec2f_used++];
 }
 
 vec3f_t *_new_tmp_vec3f() {
-    CE_ASSERT("lua_enviroment", _G._temp_vec3f_used < 1024);
+    CEL_ASSERT("lua_enviroment", _G._temp_vec3f_used < 1024);
     return &_G._temp_vec3f_buffer[_G._temp_vec3f_used++];
 }
 
 vec4f_t *_new_tmp_vec4f() {
-    CE_ASSERT("lua_enviroment", _G._temp_vec4f_used < 1024);
+    CEL_ASSERT("lua_enviroment", _G._temp_vec4f_used < 1024);
     return &_G._temp_vec4f_buffer[_G._temp_vec4f_used++];
 }
 
 mat44f_t *_new_tmp_mat44f() {
-    CE_ASSERT("lua_enviroment", _G._temp_mat44f_used < 1024);
+    CEL_ASSERT("lua_enviroment", _G._temp_mat44f_used < 1024);
     return &_G._temp_mat44f_buffer[_G._temp_mat44f_used++];
 }
 
 quatf_t *_new_tmp_quat() {
-    CE_ASSERT("lua_enviroment", _G._temp_quat_used < 1024);
+    CEL_ASSERT("lua_enviroment", _G._temp_quat_used < 1024);
     return &_G._temp_quat_buffer[_G._temp_quat_used++];
 }
 
@@ -116,16 +116,16 @@ quatf_t *_new_tmp_quat() {
 
 void *lua_resource_loader(struct vio *input,
                           struct allocator *allocator) {
-    const i64 size = vio_size(input);
-    char *data = CE_ALLOCATE(allocator, char, size);
-    vio_read(input, data, 1, size);
+    const i64 size = cel_vio_size(input);
+    char *data = CEL_ALLOCATE(allocator, char, size);
+    cel_vio_read(input, data, 1, size);
 
     return data;
 }
 
 void lua_resource_unloader(void *new_data,
                            struct allocator *allocator) {
-    CE_DEALLOCATE(allocator, new_data);
+    CEL_DEALLOCATE(allocator, new_data);
 }
 
 void lua_resource_online(stringid64_t name,
@@ -141,7 +141,7 @@ void *lua_resource_reloader(stringid64_t name,
                             void *old_data,
                             void *new_data,
                             struct allocator *allocator) {
-    CE_DEALLOCATE(allocator, old_data);
+    CEL_DEALLOCATE(allocator, old_data);
 
     struct lua_resource *resource = new_data;
     char *data = (char *) (resource + 1);
@@ -349,10 +349,10 @@ int _lua_compiler(const char *filename,
                   struct vio *build_vio,
                   struct compilator_api *compilator_api) {
 
-    char tmp[vio_size(source_vio) + 1];
-    memory_set(tmp, 0, vio_size(source_vio) + 1);
+    char tmp[cel_vio_size(source_vio) + 1];
+    memory_set(tmp, 0, cel_vio_size(source_vio) + 1);
 
-    vio_read(source_vio, tmp, sizeof(char), vio_size(source_vio));
+    cel_vio_read(source_vio, tmp, sizeof(char), cel_vio_size(source_vio));
 
     lua_State *state = luaL_newstate();
     luaL_openlibs(state);
@@ -394,8 +394,8 @@ int _lua_compiler(const char *filename,
                 .size = bc_len,
         };
 
-        vio_write(build_vio, &resource, sizeof(struct lua_resource), 1);
-        vio_write(build_vio, bc, sizeof(char), bc_len);
+        cel_vio_write(build_vio, &resource, sizeof(struct lua_resource), 1);
+        cel_vio_write(build_vio, bc, sizeof(char), bc_len);
     }
 
     lua_close(state);
@@ -844,7 +844,7 @@ int luasys_init(int stage) {
     log_debug(LOG_WHERE, "Init");
 
     _G.L = luaL_newstate();
-    CE_ASSERT(LOG_WHERE, _G.L != NULL);
+    CEL_ASSERT(LOG_WHERE, _G.L != NULL);
 
     _G.type_id = stringid64_from_string("lua");
 

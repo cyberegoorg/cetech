@@ -56,7 +56,7 @@ void *scratch_allocator_allocate(struct allocator *allocator,
 
     // If the buffer is exhausted use the backing allocator instead.
     if (in_use(a, p))
-        return CE_ALLOCATE_ALIGN(a->backing, void, size, align);
+        return CEL_ALLOCATE_ALIGN(a->backing, void, size, align);
 
     fill(h, data, p - (char *) h);
     a->allocate = p;
@@ -77,7 +77,7 @@ void scratch_allocator_deallocate(struct allocator *allocator,
 
     // Mark this slot as free
     struct Header *h = header(p);
-    CE_ASSERT("scratch", (h->size & 0x80000000u) == 0);
+    CEL_ASSERT("scratch", (h->size & 0x80000000u) == 0);
     h->size = h->size | 0x80000000u;
 
     // Advance the free pointer past all free slots.
@@ -106,7 +106,7 @@ uint32_t scratch_allocator_total_allocated(struct allocator *allocator) {
 
 struct allocator *scratch_allocator_create(struct allocator *backing,
                                            int size) {
-    struct allocator_scratch *m = celib_malloc(sizeof(struct allocator_scratch));
+    struct allocator_scratch *m = cel_malloc(sizeof(struct allocator_scratch));
 
     m->base = (struct allocator) {
             .allocate = scratch_allocator_allocate,
@@ -116,7 +116,7 @@ struct allocator *scratch_allocator_create(struct allocator *backing,
     };
 
     m->backing = backing;
-    m->begin = CE_ALLOCATE(backing, char, size);
+    m->begin = CEL_ALLOCATE(backing, char, size);
     m->end = m->begin + size;
     m->allocate = m->begin;
     m->free = m->begin;

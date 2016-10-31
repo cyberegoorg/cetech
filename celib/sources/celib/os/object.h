@@ -9,10 +9,10 @@
 
 #endif
 
-static void *celib_load_object(const char *path) {
+static void *cel_load_object(const char *path) {
 #if defined(CELIB_USE_SDL)
     void *obj = SDL_LoadObject(path);
-    CE_ASSERT("celib", obj != NULL);
+    CEL_ASSERT("celib", obj != NULL);
 
     if (obj == NULL) {
         log_error("celib", "%s", SDL_GetError());
@@ -23,21 +23,21 @@ static void *celib_load_object(const char *path) {
 #endif
 }
 
-static void celib_unload_object(void *so) {
+static void cel_unload_object(void *so) {
 #if defined(CELIB_USE_SDL)
 
-    CE_ASSERT("celib", so != NULL);
+    CEL_ASSERT("celib", so != NULL);
 
     SDL_UnloadObject(so);
 #endif
 }
 
-static void *celib_load_function(void *so,
+static void *cel_load_function(void *so,
                               void *name) {
 #if defined(CELIB_USE_SDL)
 
     void *fce = SDL_LoadFunction(so, "get_plugin_api");
-    CE_ASSERT("celib", fce != NULL);
+    CEL_ASSERT("celib", fce != NULL);
 
     if (fce == NULL) {
         log_error("celib", "%s", SDL_GetError());

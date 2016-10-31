@@ -25,7 +25,7 @@
 // Interface
 //==============================================================================
 
-CE_FORCE_INLINE void quatf_move(quatf_t *__restrict result,
+CEL_FORCE_INLINE void quatf_move(quatf_t *__restrict result,
                                 const quatf_t *__restrict a) {
     result->f[0] = a->f[0];
     result->f[1] = a->f[1];
@@ -33,14 +33,14 @@ CE_FORCE_INLINE void quatf_move(quatf_t *__restrict result,
     result->f[3] = a->f[3];
 }
 
-CE_FORCE_INLINE int quatf_eq(const quatf_t *__restrict a,
+CEL_FORCE_INLINE int quatf_eq(const quatf_t *__restrict a,
                              const quatf_t *__restrict b,
                              const f32 epsilon) {
     return f32_equals(a->f, b->f, 4, epsilon);
 }
 
 
-CE_FORCE_INLINE void quatf_from_axis_angle(quatf_t *__restrict result,
+CEL_FORCE_INLINE void quatf_from_axis_angle(quatf_t *__restrict result,
                                            const vec3f_t *__restrict axis,
                                            const f32 angle) {
     vec3f_t norm_axis;
@@ -56,7 +56,7 @@ CE_FORCE_INLINE void quatf_from_axis_angle(quatf_t *__restrict result,
     result->f[3] = f32_cos(angle_half);
 }
 
-CE_FORCE_INLINE void quatf_from_euler(quatf_t *__restrict result,
+CEL_FORCE_INLINE void quatf_from_euler(quatf_t *__restrict result,
                                       f32 heading,
                                       f32 attitude,
                                       f32 bank) {
@@ -73,7 +73,7 @@ CE_FORCE_INLINE void quatf_from_euler(quatf_t *__restrict result,
     result->f[3] = cx * cy * cz + sx * sy * sz;
 }
 
-CE_FORCE_INLINE void quatf_to_mat44f(mat44f_t *__restrict result,
+CEL_FORCE_INLINE void quatf_to_mat44f(mat44f_t *__restrict result,
                                      const quatf_t *__restrict a) {
     result->f[0] = 1.0f - 2.0f * a->f[1] * a->f[1] - 2.0f * a->f[2] * a->f[2];
     result->f[1] = 2.0f * a->f[0] * a->f[1] + 2.0f * a->f[3] * a->f[2];
@@ -97,7 +97,7 @@ CE_FORCE_INLINE void quatf_to_mat44f(mat44f_t *__restrict result,
 }
 
 
-CE_FORCE_INLINE void quatf_to_eurel_angle(vec3f_t *__restrict result,
+CEL_FORCE_INLINE void quatf_to_eurel_angle(vec3f_t *__restrict result,
                                           const quatf_t *__restrict a) {
     result->f[0] = f32_atan2(2.0f * (a->f[0] * a->f[3] - a->f[1] * a->f[2]),
                              1.0f - 2.0f * (f32_sq(a->f[0]) + f32_sq(a->f[2])));
@@ -108,13 +108,13 @@ CE_FORCE_INLINE void quatf_to_eurel_angle(vec3f_t *__restrict result,
     result->f[2] = f32_asin(2.0f * (a->f[0] * a->f[1] + a->f[2] * a->f[3]));
 }
 
-CE_FORCE_INLINE int quatf_is_identity(const quatf_t *__restrict a,
+CEL_FORCE_INLINE int quatf_is_identity(const quatf_t *__restrict a,
                                       const f32 epsilon) {
     static quatf_t _identity = QUATF_IDENTITY;
     return quatf_eq(a, &_identity, epsilon);
 }
 
-CE_FORCE_INLINE void quatf_add(quatf_t *__restrict result,
+CEL_FORCE_INLINE void quatf_add(quatf_t *__restrict result,
                                const quatf_t *__restrict a,
                                const quatf_t *__restrict b) {
     result->f[0] = a->f[0] + b->f[0];
@@ -123,7 +123,7 @@ CE_FORCE_INLINE void quatf_add(quatf_t *__restrict result,
     result->f[3] = a->f[3] + b->f[3];
 }
 
-CE_FORCE_INLINE void quatf_sub(quatf_t *__restrict result,
+CEL_FORCE_INLINE void quatf_sub(quatf_t *__restrict result,
                                const quatf_t *__restrict a,
                                const quatf_t *__restrict b) {
     result->f[0] = a->f[0] - b->f[0];
@@ -132,7 +132,7 @@ CE_FORCE_INLINE void quatf_sub(quatf_t *__restrict result,
     result->f[3] = a->f[3] - b->f[3];
 }
 
-CE_FORCE_INLINE void quatf_neg(quatf_t *__restrict result,
+CEL_FORCE_INLINE void quatf_neg(quatf_t *__restrict result,
                                const quatf_t *__restrict a) {
     result->f[0] = -a->f[0];
     result->f[1] = -a->f[1];
@@ -141,7 +141,7 @@ CE_FORCE_INLINE void quatf_neg(quatf_t *__restrict result,
 }
 
 
-CE_FORCE_INLINE void quatf_mul_s(quatf_t *__restrict result,
+CEL_FORCE_INLINE void quatf_mul_s(quatf_t *__restrict result,
                                  const quatf_t *__restrict a,
                                  const f32 s) {
     result->f[0] = a->f[0] * s;
@@ -150,7 +150,7 @@ CE_FORCE_INLINE void quatf_mul_s(quatf_t *__restrict result,
     result->f[3] = a->f[3] * s;
 }
 
-CE_FORCE_INLINE void quatf_div_s(quatf_t *__restrict result,
+CEL_FORCE_INLINE void quatf_div_s(quatf_t *__restrict result,
                                  const quatf_t *__restrict a,
                                  const f32 s) {
     result->f[0] = a->f[0] / s;
@@ -159,7 +159,7 @@ CE_FORCE_INLINE void quatf_div_s(quatf_t *__restrict result,
     result->f[3] = a->f[3] / s;
 }
 
-CE_FORCE_INLINE void quatf_mul(quatf_t *__restrict result,
+CEL_FORCE_INLINE void quatf_mul(quatf_t *__restrict result,
                                const quatf_t *__restrict a,
                                const quatf_t *__restrict b) {
 
@@ -169,7 +169,7 @@ CE_FORCE_INLINE void quatf_mul(quatf_t *__restrict result,
     result->f[3] = a->f[3] * b->f[3] - a->f[0] * b->f[0] - a->f[1] * b->f[1] - a->f[2] * b->f[2];
 }
 
-CE_FORCE_INLINE void quatf_mul_vec3f(vec3f_t *__restrict result,
+CEL_FORCE_INLINE void quatf_mul_vec3f(vec3f_t *__restrict result,
                                      const quatf_t *__restrict a,
                                      const vec3f_t *__restrict b) {
     vec3f_t tmp_vec1, tmp_vec2, tmp_vec3;
@@ -184,24 +184,24 @@ CE_FORCE_INLINE void quatf_mul_vec3f(vec3f_t *__restrict result,
     vec3f_add(result, &tmp_vec2, &tmp_vec3);
 }
 
-CE_FORCE_INLINE f32 quatf_length_squared(const quatf_t *__restrict a) {
+CEL_FORCE_INLINE f32 quatf_length_squared(const quatf_t *__restrict a) {
     return (a->f[0] * a->f[0]) + (a->f[1] * a->f[1]) + (a->f[2] * a->f[2]) + (a->f[3] * a->f[3]);
 }
 
-CE_FORCE_INLINE f32 quatf_length(const quatf_t *__restrict a) {
+CEL_FORCE_INLINE f32 quatf_length(const quatf_t *__restrict a) {
     return f32_fast_sqrt(quatf_length_squared(a));
 }
 
-CE_FORCE_INLINE f32 quatf_inv_length(const quatf_t *__restrict a) {
+CEL_FORCE_INLINE f32 quatf_inv_length(const quatf_t *__restrict a) {
     return f32_fast_inv_sqrt(quatf_length_squared(a));
 }
 
-CE_FORCE_INLINE void quatf_normalized(quatf_t *__restrict result,
+CEL_FORCE_INLINE void quatf_normalized(quatf_t *__restrict result,
                                       const quatf_t *__restrict a) {
     quatf_mul_s(result, a, quatf_inv_length(a));
 }
 
-CE_FORCE_INLINE void quatf_invert(quatf_t *__restrict result,
+CEL_FORCE_INLINE void quatf_invert(quatf_t *__restrict result,
                                   const quatf_t *__restrict a) {
     result->f[0] = -a->f[0];
     result->f[1] = -a->f[1];

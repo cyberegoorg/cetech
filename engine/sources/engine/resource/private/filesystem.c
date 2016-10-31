@@ -62,7 +62,7 @@ void filesystem_shutdown() {
             continue;
         }
 
-        CE_DEALLOCATE(memsys_main_allocator(), _G.rootmap.path[i]);
+        CEL_DEALLOCATE(memsys_main_allocator(), _G.rootmap.path[i]);
     }
 
     _G = (struct G) {0};
@@ -99,7 +99,7 @@ int filesystem_get_fullpath(stringid64_t root,
                             const char *filename) {
     const char *root_path = filesystem_get_root_dir(root);
 
-    return celib_path_join(result, maxlen, root_path, filename) == (str_lenght(root_path) + str_lenght(filename) + 1);
+    return cel_path_join(result, maxlen, root_path, filename) == (str_lenght(root_path) + str_lenght(filename) + 1);
 }
 
 struct vio *filesystem_open(stringid64_t root,
@@ -111,7 +111,7 @@ struct vio *filesystem_open(stringid64_t root,
         return NULL;
     }
 
-    struct vio *file = vio_from_file(fullm_path, mode, memsys_main_allocator());
+    struct vio *file = cel_vio_from_file(fullm_path, mode, memsys_main_allocator());
 
     if (!file) {
         log_error(LOG_WHERE, "Could not load file %s", fullm_path);
@@ -122,7 +122,7 @@ struct vio *filesystem_open(stringid64_t root,
 }
 
 void filesystem_close(struct vio *file) {
-    vio_close(file);
+    cel_vio_close(file);
 }
 
 int filesystem_create_directory(stringid64_t root,
@@ -133,7 +133,7 @@ int filesystem_create_directory(stringid64_t root,
         return 0;
     }
 
-    return celib_dir_make_path(fullm_path);
+    return cel_dir_make_path(fullm_path);
 }
 
 
@@ -148,12 +148,12 @@ void filesystem_listdir(stringid64_t root,
         return;
     }
 
-    celib_dir_list(fullm_path, 1, files, allocator);
+    cel_dir_list(fullm_path, 1, files, allocator);
 }
 
 void filesystem_listdir_free(string_array_t *files,
                              struct allocator *allocator) {
-    celib_dir_list_free(files, allocator);
+    cel_dir_list_free(files, allocator);
 }
 
 
@@ -164,5 +164,5 @@ time_t filesystem_get_file_mtime(stringid64_t root,
         return 0;
     }
 
-    return celib_file_mtime(fullm_path);
+    return cel_file_mtime(fullm_path);
 }

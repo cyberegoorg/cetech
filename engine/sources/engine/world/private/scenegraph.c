@@ -245,7 +245,7 @@ scene_node_t scenegraph_create(world_t world,
                                u32 count) {
     world_data_t *data = _get_world_data(world);
 
-    scene_node_t *nodes = CE_ALLOCATE(memsys_main_allocator(), scene_node_t, count);
+    scene_node_t *nodes = CEL_ALLOCATE(memsys_main_allocator(), scene_node_t, count);
 
     for (int i = 0; i < count; ++i) {
         u32 idx = (u32) ARRAY_SIZE(&data->position);
@@ -293,7 +293,7 @@ scene_node_t scenegraph_create(world_t world,
 
     scene_node_t root = nodes[0];
     MAP_SET(u32, &data->ent_idx_map, entity.h.h, root.idx);
-    CE_DEALLOCATE(memsys_main_allocator(), nodes);
+    CEL_DEALLOCATE(memsys_main_allocator(), nodes);
     return root;
 }
 

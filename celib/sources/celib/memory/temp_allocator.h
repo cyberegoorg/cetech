@@ -40,7 +40,7 @@ static void *temp_allocator_allocate_##S(struct allocator *allocator,          \
                                                                                \
         a->_chunk_size *= 2;                                                   \
                                                                                \
-        void *p = CE_ALLOCATE(a->_backing, to_allocate);                       \
+        void *p = CEL_ALLOCATE(a->_backing, to_allocate);                       \
         *(void **) a->_start = p;                                              \
         a->_p = a->_start = (char *) p;                                        \
         a->_end = a->_start + to_allocate;                                     \
@@ -78,7 +78,7 @@ static void temp_allocator_destroy_##S(struct temp_allocator_64 *allocator) {  \
     while (p) {                                                                \
         void *next = *(void **) p;                                             \
                                                                                \
-        CE_DEALLOCATE(allocator->_backing, p);                                 \
+        CEL_DEALLOCATE(allocator->_backing, p);                                 \
                                                                                \
         p = next;                                                              \
     }                                                                          \
@@ -90,11 +90,11 @@ static void _temp_allocator_deallocate(struct allocator *allocator,
 }
 
 static uint32_t _temp_allocator_total_allocated(struct allocator *allocator) {
-    return CE_SIZE_NOT_TRACKED;
+    return CEL_SIZE_NOT_TRACKED;
 }
 
 static uint32_t _temp_allocator_allocated_size(void *p) {
-    return CE_SIZE_NOT_TRACKED;
+    return CEL_SIZE_NOT_TRACKED;
 }
 
 //==============================================================================

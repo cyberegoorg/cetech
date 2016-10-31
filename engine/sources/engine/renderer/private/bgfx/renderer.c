@@ -108,7 +108,7 @@ void renderer_set_debug(int debug) {
 void renderer_render_world(world_t world,
                            camera_t camera,
                            viewport_t viewport) {
-    if (CE_UNLIKELY(_G.need_reset)) {
+    if (CEL_UNLIKELY(_G.need_reset)) {
         bgfx_reset(_G.size_width, _G.size_height, _get_reset_flags());
     }
 

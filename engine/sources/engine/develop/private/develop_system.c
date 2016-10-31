@@ -57,12 +57,12 @@ static void _flush_stream_buffer() {
         return;
     }
 
-    celib_thread_spin_lock(&_G.flush_lock);
+    cel_thread_spin_lock(&_G.flush_lock);
 
     array_push_u8(&_G.eventstream.stream, _stream_buffer, _stream_buffer_size);
     _stream_buffer_size = 0;
 
-    celib_thread_spin_unlock(&_G.flush_lock);
+    cel_thread_spin_unlock(&_G.flush_lock);
 }
 
 static void _flush_job(void *data) {
@@ -102,7 +102,7 @@ void _developsys_push(struct event_header *header,
                       u32 type,
                       u64 size) {
 
-    if ((_stream_buffer_size + size) >= CE_ARRAY_LEN(_stream_buffer)) {
+    if ((_stream_buffer_size + size) >= CEL_ARRAY_LEN(_stream_buffer)) {
         _flush_stream_buffer();
     }
 
@@ -211,9 +211,9 @@ void _send_events() {
     }
 
     mpack_finish_array(&writer);
-    CE_ASSERT("develop_manager", mpack_writer_destroy(&writer) == mpack_ok);
+    CEL_ASSERT("develop_manager", mpack_writer_destroy(&writer) == mpack_ok);
     int bytes = nn_send(_G.pub_socket, data, size, 0);
-    CE_ASSERT("develop", bytes == size);
+    CEL_ASSERT("develop", bytes == size);
     free(data);
 }
 
@@ -299,8 +299,8 @@ struct scope_data developsys_enter_scope(const char *name) {
     ++_scope_depth;
 
     return (struct scope_data) {
-            .start = celib_get_ticks(),
-            .start_timer = celib_get_perf_counter()
+            .start = cel_get_ticks(),
+            .start_timer = cel_get_perf_counter()
     };
 }
 
@@ -312,7 +312,7 @@ void developsys_leave_scope(const char *name,
             .name = {0},
             .worker_id = taskmanager_worker_id(),
             .start = scope_data.start,
-            .duration = ((float) (celib_get_perf_counter() - scope_data.start_timer) / celib_get_perf_freq()) * 1000.0f,
+            .duration = ((float) (cel_get_perf_counter() - scope_data.start_timer) / cel_get_perf_freq()) * 1000.0f,
             .depth = _scope_depth,
     };
 

@@ -87,22 +87,22 @@ int _mesh_component_compiler(yaml_node_t body,
     char tmp_buffer[64] = {0};
 
     YAML_NODE_SCOPE(scene, body, "scene",
-                    yaml_as_string(scene, tmp_buffer, CE_ARRAY_LEN(tmp_buffer));
+                    yaml_as_string(scene, tmp_buffer, CEL_ARRAY_LEN(tmp_buffer));
                             t_data.scene = stringid64_from_string(tmp_buffer);
     );
     YAML_NODE_SCOPE(mesh, body, "mesh",
-                    yaml_as_string(mesh, tmp_buffer, CE_ARRAY_LEN(tmp_buffer));
+                    yaml_as_string(mesh, tmp_buffer, CEL_ARRAY_LEN(tmp_buffer));
                             t_data.mesh = stringid64_from_string(tmp_buffer);
     );
 
     YAML_NODE_SCOPE(material, body, "material",
-                    yaml_as_string(material, tmp_buffer, CE_ARRAY_LEN(tmp_buffer));
+                    yaml_as_string(material, tmp_buffer, CEL_ARRAY_LEN(tmp_buffer));
                             t_data.material = stringid64_from_string(tmp_buffer);
     );
 
     YAML_NODE_SCOPE(node, body, "node",
                     if (yaml_is_valid(node)) {
-                        yaml_as_string(node, tmp_buffer, CE_ARRAY_LEN(tmp_buffer));
+                        yaml_as_string(node, tmp_buffer, CEL_ARRAY_LEN(tmp_buffer));
                         t_data.node = stringid64_from_string(tmp_buffer);
                     }
     );
@@ -127,7 +127,7 @@ static void _destroyer(world_t world,
 
     // TODO: remove from arrays, swap idx -> last AND change size
     for (int i = 0; i < ent_count; ++i) {
-        CE_ASSERT("mesh_renderer", MAP_HAS(u32, &world_data->ent_idx_map, ents[i].idx));
+        CEL_ASSERT("mesh_renderer", MAP_HAS(u32, &world_data->ent_idx_map, ents[i].idx));
         MAP_REMOVE(u32, &world_data->ent_idx_map, ents[i].idx);
     }
 }
@@ -268,7 +268,7 @@ void mesh_render_all(world_t world) {
 
 material_t mesh_get_material(world_t world,
                              mesh_t mesh) {
-    CE_ASSERT(LOG_WHERE, mesh.idx != UINT32_MAX);
+    CEL_ASSERT(LOG_WHERE, mesh.idx != UINT32_MAX);
     world_data_t *data = _get_world_data(world);
 
     return ARRAY_AT(&data->material, mesh.idx);

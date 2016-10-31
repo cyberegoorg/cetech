@@ -21,7 +21,7 @@
 //! Get file modified time
 //! \param path File path
 //! \return Modified time
-static time_t celib_file_mtime(const char *path) {
+static time_t cel_file_mtime(const char *path) {
 #if defined(CELIB_LINUX)
     struct stat st;
     stat(path, &st);
@@ -38,7 +38,7 @@ static time_t celib_file_mtime(const char *path) {
 //! \param recursive Resucrsive list?
 //! \param files Result files
 //! \param allocator Allocator
-static void celib_dir_list(const char *path,
+static void cel_dir_list(const char *path,
                            int recursive,
                            struct array_pchar *files,
                            struct allocator *allocator) {
@@ -70,10 +70,10 @@ static void celib_dir_list(const char *path,
                 len = snprintf(tmp_path, sizeof(tmp_path) - 1, "%s%s/", path, entry->d_name);
             }
 
-            celib_dir_list(tmp_path, 1, files, allocator);
+            cel_dir_list(tmp_path, 1, files, allocator);
         } else {
             size_t size = strlen(path) + strlen(entry->d_name) + 3;
-            char *new_path = CE_ALLOCATE(allocator, char, sizeof(char) * size);
+            char *new_path = CEL_ALLOCATE(allocator, char, sizeof(char) * size);
 
             if (path[strlen(path) - 1] != '/') {
                 snprintf(new_path, size - 1, "%s/%s", path, entry->d_name);
@@ -92,11 +92,11 @@ static void celib_dir_list(const char *path,
 //! Free list dir array
 //! \param files Files array
 //! \param allocator Allocator
-static void celib_dir_list_free(struct array_pchar *files,
+static void cel_dir_list_free(struct array_pchar *files,
                                 struct allocator *allocator) {
 #if defined(CELIB_LINUX)
     for (int i = 0; i < ARRAY_SIZE(files); ++i) {
-        CE_DEALLOCATE(allocator, ARRAY_AT(files, i));
+        CEL_DEALLOCATE(allocator, ARRAY_AT(files, i));
     }
 #endif
 }
@@ -105,7 +105,7 @@ static void celib_dir_list_free(struct array_pchar *files,
 //! Create dir
 //! \param path Dir path
 //! \return 1 of ok else 0
-static int celib_dir_make(const char *path) {
+static int cel_dir_make(const char *path) {
 #if defined(CELIB_LINUX)
     struct stat st;
     const int mode = 0775;
@@ -126,7 +126,7 @@ static int celib_dir_make(const char *path) {
 //! Create dir path
 //! \param path Path
 //! \return 1 of ok else 0
-static int celib_dir_make_path(const char *path) {
+static int cel_dir_make_path(const char *path) {
 #if defined(CELIB_LINUX)
     char *pp;
     char *sp;
@@ -137,7 +137,7 @@ static int celib_dir_make_path(const char *path) {
     while (status == 1 && (sp = strchr(pp, '/')) != 0) {
         if (sp != pp) {
             *sp = '\0';
-            status = celib_dir_make(copypath);
+            status = cel_dir_make(copypath);
             *sp = '/';
         }
 
@@ -145,7 +145,7 @@ static int celib_dir_make_path(const char *path) {
     }
 
     if (status == 1) {
-        status = celib_dir_make(path);
+        status = cel_dir_make(path);
     }
 
     free(copypath);

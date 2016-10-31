@@ -46,7 +46,7 @@ void forach_clb(yaml_node_t key,
     char type_str[128] = {0};
     char name_str[128] = {0};
 
-    yaml_as_string(key, type_str, CE_ARRAY_LEN(type_str));
+    yaml_as_string(key, type_str, CEL_ARRAY_LEN(type_str));
 
     ARRAY_PUSH_BACK(stringid64_t, &compile_data->types, stringid64_from_string(type_str));
     ARRAY_PUSH_BACK(u32, &compile_data->offset, ARRAY_SIZE(&compile_data->name));
@@ -56,7 +56,7 @@ void forach_clb(yaml_node_t key,
 
     for (int i = 0; i < name_count; ++i) {
         yaml_node_t name_node = yaml_get_seq_node(value, i);
-        yaml_as_string(name_node, name_str, CE_ARRAY_LEN(name_str));
+        yaml_as_string(name_node, name_str, CEL_ARRAY_LEN(name_str));
 
         ARRAY_PUSH_BACK(stringid64_t, &compile_data->name, stringid64_from_string(name_str));
 
@@ -69,9 +69,9 @@ int _package_compiler(const char *filename,
                       struct vio *build_vio,
                       struct compilator_api *compilator_api) {
 
-    char source_data[vio_size(source_vio) + 1];
-    memory_set(source_data, 0, vio_size(source_vio) + 1);
-    vio_read(source_vio, source_data, sizeof(char), vio_size(source_vio));
+    char source_data[cel_vio_size(source_vio) + 1];
+    memory_set(source_data, 0, cel_vio_size(source_vio) + 1);
+    cel_vio_read(source_vio, source_data, sizeof(char), cel_vio_size(source_vio));
 
     yaml_document_t h;
     yaml_node_t root = yaml_load_str(source_data, &h);
@@ -91,11 +91,11 @@ int _package_compiler(const char *filename,
     resource.name_offset = resource.name_count_offset + (sizeof(u32) * ARRAY_SIZE(&compile_data.name_count));
     resource.offset_offset = resource.name_offset + (sizeof(stringid64_t) * ARRAY_SIZE(&compile_data.name));
 
-    vio_write(build_vio, &resource, sizeof(resource), 1);
-    vio_write(build_vio, ARRAY_BEGIN(&compile_data.types), sizeof(stringid64_t), ARRAY_SIZE(&compile_data.types));
-    vio_write(build_vio, ARRAY_BEGIN(&compile_data.name_count), sizeof(u32), ARRAY_SIZE(&compile_data.name_count));
-    vio_write(build_vio, ARRAY_BEGIN(&compile_data.name), sizeof(stringid64_t), ARRAY_SIZE(&compile_data.name));
-    vio_write(build_vio, ARRAY_BEGIN(&compile_data.offset), sizeof(u32), ARRAY_SIZE(&compile_data.offset));
+    cel_vio_write(build_vio, &resource, sizeof(resource), 1);
+    cel_vio_write(build_vio, ARRAY_BEGIN(&compile_data.types), sizeof(stringid64_t), ARRAY_SIZE(&compile_data.types));
+    cel_vio_write(build_vio, ARRAY_BEGIN(&compile_data.name_count), sizeof(u32), ARRAY_SIZE(&compile_data.name_count));
+    cel_vio_write(build_vio, ARRAY_BEGIN(&compile_data.name), sizeof(stringid64_t), ARRAY_SIZE(&compile_data.name));
+    cel_vio_write(build_vio, ARRAY_BEGIN(&compile_data.offset), sizeof(u32), ARRAY_SIZE(&compile_data.offset));
 
     ARRAY_DESTROY(stringid64_t, &compile_data.types);
     ARRAY_DESTROY(stringid64_t, &compile_data.name);
@@ -133,7 +133,7 @@ void package_task(void *data) {
 
 void package_load(stringid64_t name) {
 
-    struct package_task_data *task_data = CE_ALLOCATE(memsys_main_allocator(), struct package_task_data, 1);
+    struct package_task_data *task_data = CEL_ALLOCATE(memsys_main_allocator(), struct package_task_data, 1);
 
     task_data->name = name;
 
@@ -176,7 +176,7 @@ int package_is_loaded(stringid64_t name) {
 void package_flush(stringid64_t name) {
     while (!package_is_loaded(name)) {
         if (!taskmanager_do_work()) {
-            celib_thread_yield();
+            cel_thread_yield();
         }
     }
 }

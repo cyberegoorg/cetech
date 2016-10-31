@@ -7,23 +7,23 @@
 // Defines
 //==============================================================================
 
-#define CE_SIZE_NOT_TRACKED 0xffffffffu
+#define CEL_SIZE_NOT_TRACKED 0xffffffffu
 
 #define allocator_allocate(a, s, align) (a)->allocate(a, s, align)
 #define allocator_deallocate(a, p) (a)->deallocate(a, p)
 #define allocator_total_allocated(a) (a)->total_allocated(a)
 #define allocator_allocated_size(a, p) (a)->allocated_size(a, p)
 
-#define CE_ALLOCATE(a, T, size) (T*) allocator_allocate((a), sizeof(T) * size, CE_ALIGNOF(T))
-#define CE_ALLOCATE_ALIGN(a, T, size, align) (T*) allocator_allocate((a), size, align)
-#define CE_DEALLOCATE(a, p) allocator_deallocate((a), p)
+#define CEL_ALLOCATE(a, T, size) (T*) allocator_allocate((a), sizeof(T) * size, CEL_ALIGNOF(T))
+#define CEL_ALLOCATE_ALIGN(a, T, size, align) (T*) allocator_allocate((a), size, align)
+#define CEL_DEALLOCATE(a, p) allocator_deallocate((a), p)
 
 
 //==============================================================================
 // Malloc/Free
 //==============================================================================
 
-static void *celib_malloc(size_t size) {
+static void *cel_malloc(size_t size) {
     void *mem = malloc(size);
     if (mem == NULL) {
         log_error("malloc", "Malloc return NULL");
@@ -33,7 +33,7 @@ static void *celib_malloc(size_t size) {
     return mem;
 }
 
-static void celib_free(void *ptr) {
+static void cel_free(void *ptr) {
     free(ptr);
 }
 

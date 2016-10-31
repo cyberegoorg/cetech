@@ -38,7 +38,7 @@ enum task_affinity {
     TASK_AFFINITY_MAX
 };
 
-CE_STATIC_ASSERT(TASK_AFFINITY_MAX == TASK_MAX_WORKERS + 1);
+CEL_STATIC_ASSERT(TASK_AFFINITY_MAX == TASK_MAX_WORKERS + 1);
 
 struct task_item {
     const char *name;

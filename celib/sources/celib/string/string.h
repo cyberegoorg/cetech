@@ -21,15 +21,15 @@ typedef ARRAY_T(char) dynstr_t;
 //==============================================================================
 
 static size_t str_lenght(const char *s) {
-    CE_ASSERT("string", s != NULL);
+    CEL_ASSERT("string", s != NULL);
 
     return strlen(s);
 }
 
 static char *str_duplicate(const char *s,
                            struct allocator *allocator) {
-    char *d = (char *) CE_ALLOCATE(allocator, char, str_lenght(s) + 1);
-    CE_ASSERT("string", d != NULL);
+    char *d = (char *) CEL_ALLOCATE(allocator, char, str_lenght(s) + 1);
+    CEL_ASSERT("string", d != NULL);
 
     if (d == NULL) return NULL;
 
@@ -40,8 +40,8 @@ static char *str_duplicate(const char *s,
 
 static int str_compare(const char *s1,
                        const char *s2) {
-    CE_ASSERT("string", s1 != NULL);
-    CE_ASSERT("string", s2 != NULL);
+    CEL_ASSERT("string", s1 != NULL);
+    CEL_ASSERT("string", s2 != NULL);
 
     return strcmp(s1, s2);
 }

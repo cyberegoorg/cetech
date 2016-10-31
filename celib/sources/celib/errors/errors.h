@@ -16,10 +16,10 @@
 
 #ifdef CELIB_DEBUG
 #define _MSG_END "\n  file: %s\n  line: %d\n  stacktrace:\n%s"
-#define CE_ASSERT_MSG(where, condition, msg, ...)                               \
+#define CEL_ASSERT_MSG(where, condition, msg, ...)                               \
     do {                                                                        \
         if (!(condition)) {                                                     \
-            char* st = celib_stacktrace(1);                                        \
+            char* st = cel_stacktrace(1);                                        \
             log_error(where ".assert",                                          \
                        "msg: \"%s, " msg "\"" _MSG_END,                         \
                        #condition,                                              \
@@ -27,16 +27,16 @@
                        __FILE__,                                                \
                        __LINE__,                                                \
                        st);                                                     \
-            celib_stacktrace_free(st);                                             \
+            cel_stacktrace_free(st);                                             \
             abort();                                                            \
             /*exit(1);*/                                                        \
         }                                                                       \
     } while (0)                                                                 \
 
 #else
-#define CE_ASSERT_MSG(condition, msg, ...) do {} while (0)
+#define CEL_ASSERT_MSG(condition, msg, ...) do {} while (0)
 #endif
 
-#define CE_ASSERT(where, condition) CE_ASSERT_MSG(where, condition, "")
+#define CEL_ASSERT(where, condition) CEL_ASSERT_MSG(where, condition, "")
 
 #endif //CELIB_ERRORS_H

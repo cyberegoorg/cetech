@@ -56,8 +56,8 @@ static int _shaderc(const char *input,
                     const char *profile) {
     char cmd_line[4096] = {0};
 
-    int s = resource_compiler_external_join(cmd_line, CE_ARRAY_LEN(cmd_line), "shaderc");
-    s += snprintf(cmd_line + s, CE_ARRAY_LEN(cmd_line) - s,
+    int s = resource_compiler_external_join(cmd_line, CEL_ARRAY_LEN(cmd_line), "shaderc");
+    s += snprintf(cmd_line + s, CEL_ARRAY_LEN(cmd_line) - s,
                   ""
                           " -f %s"
                           " -o %s"
@@ -66,11 +66,11 @@ static int _shaderc(const char *input,
                           " --platform %s"
                           " --profile %s"
 
-                          " 2>&1",  // TODO: move to celib_exec
+                          " 2>&1",  // TODO: move to cel_exec
 
                   input, output, include_path, type, platform, profile);
 
-    int status = celib_exec(cmd_line);
+    int status = cel_exec(cmd_line);
 
     log_debug("shaderc", "STATUS %d", status);
 
@@ -82,10 +82,10 @@ static int _gen_tmp_name(char *tmp_filename,
                          size_t max_len,
                          const char *filename) {
     char dir[1024] = {0};
-    celib_path_dir(dir, CE_ARRAY_LEN(dir), filename);
+    cel_path_dir(dir, CEL_ARRAY_LEN(dir), filename);
 
-    celib_path_join(tmp_filename, max_len, tmp_dir, dir);
-    celib_dir_make_path(tmp_filename);
+    cel_path_join(tmp_filename, max_len, tmp_dir, dir);
+    cel_dir_make_path(tmp_filename);
 
     return snprintf(tmp_filename, max_len, "%s/%s.shaderc", tmp_dir, filename);
 }
@@ -110,9 +110,9 @@ int _shader_resource_compiler(const char *filename,
                               struct vio *build_vio,
                               struct compilator_api *compilator_api) {
 
-    char source_data[vio_size(source_vio) + 1];
-    memory_set(source_data, 0, vio_size(source_vio) + 1);
-    vio_read(source_vio, source_data, sizeof(char), vio_size(source_vio));
+    char source_data[cel_vio_size(source_vio) + 1];
+    memory_set(source_data, 0, cel_vio_size(source_vio) + 1);
+    cel_vio_read(source_vio, source_data, sizeof(char), cel_vio_size(source_vio));
 
     yaml_document_t h;
     yaml_node_t root = yaml_load_str(source_data, &h);
@@ -124,7 +124,7 @@ int _shader_resource_compiler(const char *filename,
     const char *core_dir = resource_compiler_get_core_dir();
 
     char include_dir[1024] = {0};
-    celib_path_join(include_dir, CE_ARRAY_LEN(include_dir), core_dir, "bgfxshaders");
+    cel_path_join(include_dir, CEL_ARRAY_LEN(include_dir), core_dir, "bgfxshaders");
 
     struct shader resource = {0};
 
@@ -136,15 +136,15 @@ int _shader_resource_compiler(const char *filename,
     char output_path[4096] = {0};
     char tmp_filename[4096] = {0};
 
-    resource_compiler_get_build_dir(build_dir, CE_ARRAY_LEN(build_dir), application_platform());
-    resource_compiler_get_tmp_dir(tmp_dir, CE_ARRAY_LEN(tmp_dir), application_platform());
+    resource_compiler_get_build_dir(build_dir, CEL_ARRAY_LEN(build_dir), application_platform());
+    resource_compiler_get_tmp_dir(tmp_dir, CEL_ARRAY_LEN(tmp_dir), application_platform());
 
     //////// VS
-    yaml_as_string(vs_input, input_str, CE_ARRAY_LEN(input_str));
+    yaml_as_string(vs_input, input_str, CEL_ARRAY_LEN(input_str));
     compilator_api->add_dependency(filename, input_str);
-    celib_path_join(input_path, CE_ARRAY_LEN(input_path), source_dir, input_str);
+    cel_path_join(input_path, CEL_ARRAY_LEN(input_path), source_dir, input_str);
 
-    _gen_tmp_name(output_path, tmp_dir, CE_ARRAY_LEN(tmp_filename), input_str);
+    _gen_tmp_name(output_path, tmp_dir, CEL_ARRAY_LEN(tmp_filename), input_str);
 
     int result = _shaderc(input_path, output_path, include_dir, "vertex", platform, vs_profile);
 
@@ -152,19 +152,19 @@ int _shader_resource_compiler(const char *filename,
         return 0;
     }
 
-    struct vio *tmp_file = vio_from_file(output_path, VIO_OPEN_READ, memsys_main_allocator());
-    char *vs_data = CE_ALLOCATE(memsys_main_allocator(), char, vio_size(tmp_file) + 1);
-    vio_read(tmp_file, vs_data, sizeof(char), vio_size(tmp_file));
-    resource.vs_size = vio_size(tmp_file);
-    vio_close(tmp_file);
+    struct vio *tmp_file = cel_vio_from_file(output_path, VIO_OPEN_READ, memsys_main_allocator());
+    char *vs_data = CEL_ALLOCATE(memsys_main_allocator(), char, cel_vio_size(tmp_file) + 1);
+    cel_vio_read(tmp_file, vs_data, sizeof(char), cel_vio_size(tmp_file));
+    resource.vs_size = cel_vio_size(tmp_file);
+    cel_vio_close(tmp_file);
     ///////
 
     //////// FS
-    yaml_as_string(fs_input, input_str, CE_ARRAY_LEN(input_str));
+    yaml_as_string(fs_input, input_str, CEL_ARRAY_LEN(input_str));
     compilator_api->add_dependency(filename, input_str);
-    celib_path_join(input_path, CE_ARRAY_LEN(input_path), source_dir, input_str);
+    cel_path_join(input_path, CEL_ARRAY_LEN(input_path), source_dir, input_str);
 
-    _gen_tmp_name(output_path, tmp_dir, CE_ARRAY_LEN(tmp_filename), input_str);
+    _gen_tmp_name(output_path, tmp_dir, CEL_ARRAY_LEN(tmp_filename), input_str);
 
     result = _shaderc(input_path, output_path, include_dir, "fragment", platform, fs_profile);
 
@@ -172,19 +172,19 @@ int _shader_resource_compiler(const char *filename,
         return 0;
     }
 
-    tmp_file = vio_from_file(output_path, VIO_OPEN_READ, memsys_main_allocator());
-    char *fs_data = CE_ALLOCATE(memsys_main_allocator(), char, vio_size(tmp_file) + 1);
-    vio_read(tmp_file, fs_data, sizeof(char), vio_size(tmp_file));
-    resource.fs_size = vio_size(tmp_file);
-    vio_close(tmp_file);
+    tmp_file = cel_vio_from_file(output_path, VIO_OPEN_READ, memsys_main_allocator());
+    char *fs_data = CEL_ALLOCATE(memsys_main_allocator(), char, cel_vio_size(tmp_file) + 1);
+    cel_vio_read(tmp_file, fs_data, sizeof(char), cel_vio_size(tmp_file));
+    resource.fs_size = cel_vio_size(tmp_file);
+    cel_vio_close(tmp_file);
 
-    vio_write(build_vio, &resource, sizeof(resource), 1);
+    cel_vio_write(build_vio, &resource, sizeof(resource), 1);
 
-    vio_write(build_vio, vs_data, sizeof(char), resource.vs_size);
-    vio_write(build_vio, fs_data, sizeof(char), resource.fs_size);
+    cel_vio_write(build_vio, vs_data, sizeof(char), resource.vs_size);
+    cel_vio_write(build_vio, fs_data, sizeof(char), resource.fs_size);
 
-    CE_DEALLOCATE(memsys_main_allocator(), vs_data);
-    CE_DEALLOCATE(memsys_main_allocator(), fs_data);
+    CEL_DEALLOCATE(memsys_main_allocator(), vs_data);
+    CEL_DEALLOCATE(memsys_main_allocator(), fs_data);
 
     return 1;
 }
@@ -195,16 +195,16 @@ int _shader_resource_compiler(const char *filename,
 
 void *shader_resource_loader(struct vio *input,
                              struct allocator *allocator) {
-    const i64 size = vio_size(input);
-    char *data = CE_ALLOCATE(allocator, char, size);
-    vio_read(input, data, 1, size);
+    const i64 size = cel_vio_size(input);
+    char *data = CEL_ALLOCATE(allocator, char, size);
+    cel_vio_read(input, data, 1, size);
 
     return data;
 }
 
 void shader_resource_unloader(void *new_data,
                               struct allocator *allocator) {
-    CE_DEALLOCATE(allocator, new_data);
+    CEL_DEALLOCATE(allocator, new_data);
 }
 
 void shader_resource_online(stringid64_t name,
@@ -248,7 +248,7 @@ void *shader_resource_reloader(stringid64_t name,
     shader_resource_offline(name, old_data);
     shader_resource_online(name, new_data);
 
-    CE_DEALLOCATE(allocator, old_data);
+    CEL_DEALLOCATE(allocator, old_data);
 
     return new_data;
 }

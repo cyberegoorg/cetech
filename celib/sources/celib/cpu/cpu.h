@@ -11,7 +11,7 @@
 // CPU
 //==============================================================================
 
-int celib_cpu_count() {
+int cel_cpu_count() {
 #if defined(CELIB_USE_SDL)
     return SDL_GetCPUCount();
 #endif
