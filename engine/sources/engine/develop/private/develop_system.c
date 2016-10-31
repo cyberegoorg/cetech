@@ -281,7 +281,7 @@ void developsys_push_record_float(const char *name,
     struct record_float_event ev = {0};
 
     ev.value = value;
-    memory_copy(ev.name, name, str_lenght(name));
+    memory_copy(ev.name, name, cel_strlen(name));
 
     developsys_push(EVENT_RECORD_FLOAT, ev);
 }
@@ -290,7 +290,7 @@ void developsys_push_record_int(const char *name,
                                 int value) {
     struct record_int_event ev = {0};
     ev.value = value;
-    memory_copy(ev.name, name, str_lenght(name));
+    memory_copy(ev.name, name, cel_strlen(name));
 
     developsys_push(EVENT_RECORD_INT, ev);
 }
@@ -316,7 +316,7 @@ void developsys_leave_scope(const char *name,
             .depth = _scope_depth,
     };
 
-    memory_copy(ev.name, name, str_lenght(name));
+    memory_copy(ev.name, name, cel_strlen(name));
 
     developsys_push(EVENT_SCOPE, ev);
 }

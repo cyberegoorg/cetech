@@ -12,7 +12,7 @@ static inline int _cel_cmd_line_is_short(struct args args,
                                         int i,
                                         char shortopt) {
     return (shortopt != '\0' &&
-            str_lenght(args.argv[i]) > 1 &&
+            cel_strlen(args.argv[i]) > 1 &&
             args.argv[i][0] == '-' &&
             args.argv[i][1] == shortopt);
 }
@@ -20,10 +20,10 @@ static inline int _cel_cmd_line_is_short(struct args args,
 static inline int _cel_cmd_line_is_long(struct args args,
                                        const int i,
                                        const char *longopt) {
-    return (str_lenght(args.argv[i]) > 2 &&
+    return (cel_strlen(args.argv[i]) > 2 &&
             args.argv[i][0] == '-' &&
             args.argv[i][1] == '-' &&
-            str_compare(&args.argv[i][2], longopt) == 0);
+            cel_strcmp(&args.argv[i][2], longopt) == 0);
 }
 
 static int cel_cmd_find_argument(struct args args,

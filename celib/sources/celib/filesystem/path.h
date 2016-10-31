@@ -31,7 +31,7 @@ static void cel_path_basename(const char *path,
     const char *ch = strrchr(filename, '.');
 
     if (ch == NULL) {
-        memory_copy(out, filename, str_lenght(filename));
+        memory_copy(out, filename, cel_strlen(filename));
         return;
     }
 

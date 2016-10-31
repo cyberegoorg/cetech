@@ -55,7 +55,7 @@ static struct G {
 
 static console_server_command_t _find_command(const char *name) {
     for (int i = 1; i < MAX_COMMANDS; ++i) {
-        if (_G.name[i][0] == '\0' || str_compare(_G.name[i], name) != 0) {
+        if (_G.name[i][0] == '\0' || cel_strcmp(_G.name[i], name) != 0) {
             continue;
         }
 
@@ -215,7 +215,7 @@ void consolesrv_register_command(const char *name,
             continue;
         }
 
-        str_set(&_G.name[i][0], name);
+        cel_str_set(&_G.name[i][0], name);
         _G.commands[i] = cmd;
         break;
     }

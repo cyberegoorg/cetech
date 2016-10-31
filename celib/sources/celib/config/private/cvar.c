@@ -279,9 +279,9 @@ int cvar_parse_core_args(struct args args) {
 
         const char *name = tmp_args.argv[j] + 1;
 
-        if (!str_compare(name, "build") ||
-            !str_compare(name, "compile") ||
-            !str_compare(name, "src")) {
+        if (!cel_strcmp(name, "build") ||
+            !cel_strcmp(name, "compile") ||
+            !cel_strcmp(name, "src")) {
 
             const char *value = (j != tmp_args.argc - 1) ? tmp_args.argv[j + 1] : NULL;
 
@@ -304,7 +304,7 @@ cvar_t cvar_find(const char *name) {
             continue;
         }
 
-        if (str_compare(_G.name[i], name) != 0) {
+        if (cel_strcmp(_G.name[i], name) != 0) {
             continue;
         }
 
@@ -323,7 +323,7 @@ cvar_t cvar_find_or_create(const char *name,
             continue;
         }
 
-        if (str_compare(_G.name[i], name) != 0) {
+        if (cel_strcmp(_G.name[i], name) != 0) {
             continue;
         }
 
@@ -333,7 +333,7 @@ cvar_t cvar_find_or_create(const char *name,
     const cvar_t var = _find_first_free();
 
     if (var.idx != 0) {
-        str_set(_G.name[var.idx], name);
+        cel_str_set(_G.name[var.idx], name);
 
         if (new) *new = 1;
         return var;
@@ -349,12 +349,12 @@ cvar_t cvar_new_float(const char *name,
     cvar_t find = cvar_find_or_create(name, &new);
 
     if (new) {
-        str_set(_G.name[find.idx], name);
+        cel_str_set(_G.name[find.idx], name);
         _G.types[find.idx] = CV_FLOAT;
         _G.values[find.idx].f = f;
     }
 
-    str_set(_G.desc[find.idx], desc);
+    cel_str_set(_G.desc[find.idx], desc);
 
     return find;
 }
@@ -366,12 +366,12 @@ cvar_t cvar_new_int(const char *name,
     cvar_t find = cvar_find_or_create(name, &new);
 
     if (new) {
-        str_set(_G.name[find.idx], name);
+        cel_str_set(_G.name[find.idx], name);
         _G.types[find.idx] = CV_INT;
         _G.values[find.idx].i = i;
     }
 
-    str_set(_G.desc[find.idx], desc);
+    cel_str_set(_G.desc[find.idx], desc);
 
     return find;
 }
@@ -383,12 +383,12 @@ cvar_t cvar_new_str(const char *name,
     cvar_t find = cvar_find_or_create(name, &new);
 
     if (new) {
-        str_set(_G.name[find.idx], name);
+        cel_str_set(_G.name[find.idx], name);
         _G.types[find.idx] = CV_STRING;
-        _G.values[find.idx].s = str_duplicate(s, memsys_main_allocator());
+        _G.values[find.idx].s = cel_strdup(s, memsys_main_allocator());
     }
 
-    str_set(_G.desc[find.idx], desc);
+    cel_str_set(_G.desc[find.idx], desc);
 
     return find;
 }
@@ -427,7 +427,7 @@ void cvar_set_string(cvar_t var,
         allocator_deallocate(memsys_main_allocator(), _s);
     }
 
-    _G.values[var.idx].s = str_duplicate(s, memsys_main_allocator());
+    _G.values[var.idx].s = cel_strdup(s, memsys_main_allocator());
 }
 
 void cvar_log_all() {

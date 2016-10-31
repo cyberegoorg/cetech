@@ -125,12 +125,12 @@ void _compile_dir(ARRAY_T(task_item) *tasks,
 
     for (int i = 0; i < ARRAY_SIZE(files); ++i) {
         const char *source_filename_full = ARRAY_AT(files, i);
-        const char *source_filename_short = ARRAY_AT(files, i) + str_lenght(source_dir) + 1;
+        const char *source_filename_short = ARRAY_AT(files, i) + cel_strlen(source_dir) + 1;
         const char *resource_type = cel_path_extension(source_filename_short);
 
         char resource_name[128] = {0};
         memory_copy(resource_name, source_filename_short,
-                    str_lenght(source_filename_short) - 1 - str_lenght(resource_type));
+                    cel_strlen(source_filename_short) - 1 - cel_strlen(resource_type));
 
         stringid64_t type_id = stringid64_from_string(resource_type);
         stringid64_t name_id = stringid64_from_string(resource_name);
@@ -173,7 +173,7 @@ void _compile_dir(ARRAY_T(task_item) *tasks,
                 .build = build_vio,
                 .source = source_vio,
                 .compilator = compilator,
-                .source_filename = str_duplicate(source_filename_short, memsys_main_scratch_allocator()),
+                .source_filename = cel_strdup(source_filename_short, memsys_main_scratch_allocator()),
                 .mtime = cel_file_mtime(source_filename_full),
                 .completed = 0
         };

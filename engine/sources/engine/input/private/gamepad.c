@@ -105,7 +105,7 @@ u32 gamepad_button_index(const char *button_name) {
             continue;
         }
 
-        if (str_compare(_btn_to_str[i], button_name)) {
+        if (cel_strcmp(_btn_to_str[i], button_name)) {
             continue;
         }
 
@@ -154,7 +154,7 @@ u32 gamepad_axis_index(const char *axis_name) {
             continue;
         }
 
-        if (str_compare(_axis_to_str[i], axis_name) != 0) {
+        if (cel_strcmp(_axis_to_str[i], axis_name) != 0) {
             continue;
         }
 

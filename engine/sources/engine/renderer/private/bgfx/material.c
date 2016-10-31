@@ -401,7 +401,7 @@ u32 _material_find_slot(struct material_blob *resource,
                         const char *name) {
     const char *u_names = (const char *) (resource + 1);
     for (u32 i = 0; i < resource->uniforms_count; ++i) {
-        if (str_compare(&u_names[i * 32], name) != 0) {
+        if (cel_strcmp(&u_names[i * 32], name) != 0) {
             continue;
         }
 

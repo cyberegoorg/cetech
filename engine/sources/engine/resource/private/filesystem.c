@@ -76,7 +76,7 @@ void filesystem_map_root_dir(stringid64_t root,
         }
 
         _G.rootmap.id[i] = root;
-        _G.rootmap.path[i] = str_duplicate(base_path, memsys_main_allocator());
+        _G.rootmap.path[i] = cel_strdup(base_path, memsys_main_allocator());
         break;
     }
 }
@@ -99,7 +99,7 @@ int filesystem_get_fullpath(stringid64_t root,
                             const char *filename) {
     const char *root_path = filesystem_get_root_dir(root);
 
-    return cel_path_join(result, maxlen, root_path, filename) == (str_lenght(root_path) + str_lenght(filename) + 1);
+    return cel_path_join(result, maxlen, root_path, filename) == (cel_strlen(root_path) + cel_strlen(filename) + 1);
 }
 
 struct vio *filesystem_open(stringid64_t root,

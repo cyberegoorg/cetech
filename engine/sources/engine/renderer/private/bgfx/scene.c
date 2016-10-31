@@ -181,7 +181,7 @@ static void _type_to_attr_type(const char *name,
     };
 
     for (int i = 0; i < CEL_ARRAY_LEN(_tbl); ++i) {
-        if (str_compare(_tbl[i].name, name) != 0) {
+        if (cel_strcmp(_tbl[i].name, name) != 0) {
             continue;
         }
 

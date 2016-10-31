@@ -62,7 +62,7 @@ void _add(const char *path,
             continue;
         }
 
-        str_set(_G.path[i], path);
+        cel_str_set(_G.path[i], path);
         _G.plugin_api[i] = fce(PLUGIN_API_ID, 0);
         _G.get_plugin_api[i] = fce;
         _G.plugin_handler[i] = handler;
@@ -101,7 +101,7 @@ void plugin_load(const char *path) {
 
 void plugin_reload(const char *path) {
     for (size_t i = 0; i < MAX_PLUGINS; ++i) {
-        if ((_G.plugin_handler[i] == NULL) || (str_compare(_G.path[i], path)) != 0) {
+        if ((_G.plugin_handler[i] == NULL) || (cel_strcmp(_G.path[i], path)) != 0) {
             continue;
         }
 
@@ -151,7 +151,7 @@ void plugin_load_dirs(const char *path) {
     for (int k = 0; k < ARRAY_SIZE(&files); ++k) {
         const char *filename = cel_path_filename(ARRAY_AT(&files, k));
 
-        if (str_startswith(filename, PLUGIN_PREFIX)) {
+        if (cel_str_startswith(filename, PLUGIN_PREFIX)) {
             plugin_load(ARRAY_AT(&files, k));
         }
     }

@@ -20,15 +20,15 @@ typedef ARRAY_T(char) dynstr_t;
 // Interface
 //==============================================================================
 
-static size_t str_lenght(const char *s) {
+static size_t cel_strlen(const char *s) {
     CEL_ASSERT("string", s != NULL);
 
     return strlen(s);
 }
 
-static char *str_duplicate(const char *s,
-                           struct allocator *allocator) {
-    char *d = (char *) CEL_ALLOCATE(allocator, char, str_lenght(s) + 1);
+static char *cel_strdup(const char *s,
+                        struct allocator *allocator) {
+    char *d = (char *) CEL_ALLOCATE(allocator, char, cel_strlen(s) + 1);
     CEL_ASSERT("string", d != NULL);
 
     if (d == NULL) return NULL;
@@ -38,22 +38,22 @@ static char *str_duplicate(const char *s,
     return d;
 }
 
-static int str_compare(const char *s1,
-                       const char *s2) {
+static int cel_strcmp(const char *s1,
+                      const char *s2) {
     CEL_ASSERT("string", s1 != NULL);
     CEL_ASSERT("string", s2 != NULL);
 
     return strcmp(s1, s2);
 }
 
-static void str_set(char *result,
-                    const char *__restrict str) {
-    memory_copy(result, str, str_lenght(str));
+static void cel_str_set(char *__restrict result,
+                        const char *__restrict str) {
+    memory_copy(result, str, cel_strlen(str));
 }
 
-static int str_startswith(const char *string,
-                          const char *with) {
-    return !strncmp(string, with, str_lenght(with));
+static int cel_str_startswith(const char *string,
+                              const char *with) {
+    return !strncmp(string, with, cel_strlen(with));
 }
 
 #endif //CELIB_STRING_H
