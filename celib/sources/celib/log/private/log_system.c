@@ -33,7 +33,7 @@ void vlog(const enum log_level level,
     time_t tm = time(NULL);
 
     for (uint32_t i = 0; i < _G.handlers_count; ++i) {
-        CE_ASSERT("log", _G.handlers[i] != NULL);
+        CEL_ASSERT("log", _G.handlers[i] != NULL);
 
         _G.handlers[i](level, tm, _G.get_wid_clb != NULL ? _G.get_wid_clb() : 0, where, msg, _G.handlers_data[i]);
     }

@@ -71,17 +71,17 @@ struct level_instance *_level_instance(level_t level) {
 //==============================================================================
 
 void *level_resource_loader(struct vio *input,
-                            struct allocator *allocator) {
-    const i64 size = vio_size(input);
-    char *data = CE_ALLOCATE(allocator, char, size);
-    vio_read(input, data, 1, size);
+                            struct cel_allocator *allocator) {
+    const i64 size = cel_vio_size(input);
+    char *data = CEL_ALLOCATE(allocator, char, size);
+    cel_vio_read(input, data, 1, size);
 
     return data;
 }
 
 void level_resource_unloader(void *new_data,
-                             struct allocator *allocator) {
-    CE_DEALLOCATE(allocator, new_data);
+                             struct cel_allocator *allocator) {
+    CEL_DEALLOCATE(allocator, new_data);
 }
 
 void level_resource_online(stringid64_t name,
@@ -95,11 +95,11 @@ void level_resource_offline(stringid64_t name,
 void *level_resource_reloader(stringid64_t name,
                               void *old_data,
                               void *new_data,
-                              struct allocator *allocator) {
+                              struct cel_allocator *allocator) {
     level_resource_offline(name, old_data);
     level_resource_online(name, new_data);
 
-    CE_DEALLOCATE(allocator, old_data);
+    CEL_DEALLOCATE(allocator, old_data);
 
     return new_data;
 }
@@ -127,7 +127,7 @@ void forach_units_clb(yaml_node_t key,
     struct foreach_units_data *data = _data;
 
     char name[128] = {0};
-    yaml_as_string(key, name, CE_ARRAY_LEN(name));
+    yaml_as_string(key, name, CEL_ARRAY_LEN(name));
     ARRAY_PUSH_BACK(stringid64_t, data->id, stringid64_from_string(name));
     ARRAY_PUSH_BACK(u32, data->offset, unit_compiler_ent_counter(data->output));
 
@@ -151,9 +151,9 @@ int _level_resource_compiler(const char *filename,
                              struct vio *build_vio,
                              struct compilator_api *compilator_api) {
 
-    char source_data[vio_size(source_vio) + 1];
-    memory_set(source_data, 0, vio_size(source_vio) + 1);
-    vio_read(source_vio, source_data, sizeof(char), vio_size(source_vio));
+    char source_data[cel_vio_size(source_vio) + 1];
+    memory_set(source_data, 0, cel_vio_size(source_vio) + 1);
+    cel_vio_read(source_vio, source_data, sizeof(char), cel_vio_size(source_vio));
 
     yaml_document_t h;
     yaml_node_t root = yaml_load_str(source_data, &h);
@@ -188,10 +188,10 @@ int _level_resource_compiler(const char *filename,
 
     unit_compiler_write_to_build(output, unit_data.data);
 
-    vio_write(build_vio, &res, sizeof(struct level_blob), 1);
-    vio_write(build_vio, &ARRAY_AT(&id, 0), sizeof(stringid64_t), ARRAY_SIZE(&id));
-    vio_write(build_vio, &ARRAY_AT(&offset, 0), sizeof(u32), ARRAY_SIZE(&offset));
-    vio_write(build_vio, &ARRAY_AT(&data, 0), sizeof(u8), ARRAY_SIZE(&data));
+    cel_vio_write(build_vio, &res, sizeof(struct level_blob), 1);
+    cel_vio_write(build_vio, &ARRAY_AT(&id, 0), sizeof(stringid64_t), ARRAY_SIZE(&id));
+    cel_vio_write(build_vio, &ARRAY_AT(&offset, 0), sizeof(u32), ARRAY_SIZE(&offset));
+    cel_vio_write(build_vio, &ARRAY_AT(&data, 0), sizeof(u8), ARRAY_SIZE(&data));
 
     ARRAY_DESTROY(stringid64_t, &id);
     ARRAY_DESTROY(u32, &offset);
@@ -237,8 +237,8 @@ level_t world_load_level(world_t world,
     u8 *data = level_blob_data(res);
 
     entity_t level_ent = entity_manager_create();
-    transform_t t = transform_create(world, level_ent, (entity_t) {UINT32_MAX}, (vec3f_t) {0}, QUATF_IDENTITY,
-                                     (vec3f_t) {{1.0f, 1.0f, 1.0f}});
+    transform_t t = transform_create(world, level_ent, (entity_t) {UINT32_MAX}, (cel_vec3f_t) {0}, QUATF_IDENTITY,
+                                     (cel_vec3f_t) {{1.0f, 1.0f, 1.0f}});
 
     level_t level = _new_level(level_ent);
     struct level_instance *instance = _level_instance(level);

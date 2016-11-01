@@ -18,7 +18,7 @@
 //==============================================================================
 
 
-#define MAT44F_INIT_IDENTITY (mat44f_t)                  \
+#define MAT44F_INIT_IDENTITY (cel_mat44f_t)              \
                              { 1.0f, 0.0f, 0.0f, 0.0f,   \
                                0.0f, 1.0f, 0.0f, 0.0f,   \
                                0.0f, 0.0f, 1.0f, 0.0f,   \
@@ -29,7 +29,7 @@
 // Interface
 //==============================================================================
 
-CE_FORCE_INLINE void mat44f_identity(mat44f_t *result) {
+CEL_FORCE_INLINE void cel_mat44f_identity(cel_mat44f_t *result) {
     memset(result, 0, sizeof(f32) * 16);
 
     result->f[0] = 1.0f;
@@ -38,21 +38,21 @@ CE_FORCE_INLINE void mat44f_identity(mat44f_t *result) {
     result->f[15] = 1.0f;
 }
 
-CE_FORCE_INLINE void mat44f_translate(mat44f_t *result,
-                                      f32 x,
-                                      f32 y,
-                                      f32 z) {
-    mat44f_identity(result);
+CEL_FORCE_INLINE void cel_mat44f_translate(cel_mat44f_t *result,
+                                           f32 x,
+                                           f32 y,
+                                           f32 z) {
+    cel_mat44f_identity(result);
 
     result->f[12] = x;
     result->f[13] = y;
     result->f[14] = z;
 }
 
-CE_FORCE_INLINE void mat44f_scale(mat44f_t *result,
-                                  f32 x,
-                                  f32 y,
-                                  f32 z) {
+CEL_FORCE_INLINE void cel_mat44f_scale(cel_mat44f_t *result,
+                                       f32 x,
+                                       f32 y,
+                                       f32 z) {
     memset(result, 0, sizeof(f32) * 16);
 
     result->f[0] = x;
@@ -61,10 +61,10 @@ CE_FORCE_INLINE void mat44f_scale(mat44f_t *result,
     result->f[15] = 1.0f;
 }
 
-CE_FORCE_INLINE void mat44f_rotate_x(mat44f_t *result,
-                                     f32 x) {
-    const f32 sx = f32_sin(x);
-    const f32 cx = f32_cos(x);
+CEL_FORCE_INLINE void cel_mat44f_rotate_x(cel_mat44f_t *result,
+                                          f32 x) {
+    const f32 sx = cel_f32_sin(x);
+    const f32 cx = cel_f32_cos(x);
 
     memset(result, 0, sizeof(f32) * 16);
 
@@ -76,10 +76,10 @@ CE_FORCE_INLINE void mat44f_rotate_x(mat44f_t *result,
     result->f[15] = 1.0f;
 }
 
-CE_FORCE_INLINE void mat44f_rotate_y(mat44f_t *result,
-                                     f32 y) {
-    const f32 sy = f32_sin(y);
-    const f32 cy = f32_cos(y);
+CEL_FORCE_INLINE void cel_mat44f_rotate_y(cel_mat44f_t *result,
+                                          f32 y) {
+    const f32 sy = cel_f32_sin(y);
+    const f32 cy = cel_f32_cos(y);
 
     memset(result, 0, sizeof(f32) * 16);
 
@@ -91,10 +91,10 @@ CE_FORCE_INLINE void mat44f_rotate_y(mat44f_t *result,
     result->f[15] = 1.0f;
 }
 
-CE_FORCE_INLINE void mat44f_rotate_z(mat44f_t *result,
-                                     f32 z) {
-    const f32 sz = f32_sin(z);
-    const f32 cz = f32_cos(z);
+CEL_FORCE_INLINE void cel_mat44f_rotate_z(cel_mat44f_t *result,
+                                          f32 z) {
+    const f32 sz = cel_f32_sin(z);
+    const f32 cz = cel_f32_cos(z);
 
     memset(result, 0, sizeof(f32) * 16);
 
@@ -106,13 +106,13 @@ CE_FORCE_INLINE void mat44f_rotate_z(mat44f_t *result,
     result->f[15] = 1.0f;
 }
 
-CE_FORCE_INLINE void mat44f_rotate_xy(mat44f_t *result,
-                                      f32 x,
-                                      f32 y) {
-    const f32 sx = f32_sin(x);
-    const f32 cx = f32_cos(x);
-    const f32 sy = f32_sin(y);
-    const f32 cy = f32_cos(y);
+CEL_FORCE_INLINE void cel_mat44f_rotate_xy(cel_mat44f_t *result,
+                                           f32 x,
+                                           f32 y) {
+    const f32 sx = cel_f32_sin(x);
+    const f32 cx = cel_f32_cos(x);
+    const f32 sy = cel_f32_sin(y);
+    const f32 cy = cel_f32_cos(y);
 
     memset(result, 0, sizeof(f32) * 16);
 
@@ -127,16 +127,16 @@ CE_FORCE_INLINE void mat44f_rotate_xy(mat44f_t *result,
     result->f[15] = 1.0f;
 }
 
-CE_FORCE_INLINE void mat44f_rotate_xyz(mat44f_t *result,
-                                       f32 x,
-                                       f32 y,
-                                       f32 z) {
-    const f32 sx = f32_sin(x);
-    const f32 cx = f32_cos(x);
-    const f32 sy = f32_sin(y);
-    const f32 cy = f32_cos(y);
-    const f32 sz = f32_sin(z);
-    const f32 cz = f32_cos(z);
+CEL_FORCE_INLINE void cel_mat44f_rotate_xyz(cel_mat44f_t *result,
+                                            f32 x,
+                                            f32 y,
+                                            f32 z) {
+    const f32 sx = cel_f32_sin(x);
+    const f32 cx = cel_f32_cos(x);
+    const f32 sy = cel_f32_sin(y);
+    const f32 cy = cel_f32_cos(y);
+    const f32 sz = cel_f32_sin(z);
+    const f32 cz = cel_f32_cos(z);
 
     memset(result, 0, sizeof(f32) * 16);
 
@@ -152,16 +152,16 @@ CE_FORCE_INLINE void mat44f_rotate_xyz(mat44f_t *result,
     result->f[15] = 1.0f;
 }
 
-CE_FORCE_INLINE void mat44f_rotate_zyx(mat44f_t *result,
-                                       f32 x,
-                                       f32 y,
-                                       f32 z) {
-    const f32 sx = f32_sin(x);
-    const f32 cx = f32_cos(x);
-    const f32 sy = f32_sin(y);
-    const f32 cy = f32_cos(y);
-    const f32 sz = f32_sin(z);
-    const f32 cz = f32_cos(z);
+CEL_FORCE_INLINE void cel_mat44f_rotate_zyx(cel_mat44f_t *result,
+                                            f32 x,
+                                            f32 y,
+                                            f32 z) {
+    const f32 sx = cel_f32_sin(x);
+    const f32 cx = cel_f32_cos(x);
+    const f32 sy = cel_f32_sin(y);
+    const f32 cy = cel_f32_cos(y);
+    const f32 sz = cel_f32_sin(z);
+    const f32 cz = cel_f32_cos(z);
 
     memset(result, 0, sizeof(f32) * 16);
 
@@ -177,30 +177,30 @@ CE_FORCE_INLINE void mat44f_rotate_zyx(mat44f_t *result,
     result->f[15] = 1.0f;
 };
 
-CE_FORCE_INLINE int mat44f_eq(const mat44f_t *__restrict a,
-                              const mat44f_t *__restrict b,
-                              const f32 epsilon) {
-    return f32_equals(a->f, b->f, 4 * 4, epsilon);
+CEL_FORCE_INLINE int cel_mat44f_eq(const cel_mat44f_t *__restrict a,
+                                   const cel_mat44f_t *__restrict b,
+                                   const f32 epsilon) {
+    return cel_f32_equals(a->f, b->f, 4 * 4, epsilon);
 }
 
-CE_FORCE_INLINE int mat44f_is_identity(const mat44f_t *__restrict a,
-                                       f32 epsilon) {
-    static mat44f_t _identity = MAT44F_INIT_IDENTITY;
-    return mat44f_eq(a, &_identity, epsilon);
+CEL_FORCE_INLINE int cel_mat44f_is_identity(const cel_mat44f_t *__restrict a,
+                                            f32 epsilon) {
+    static cel_mat44f_t _identity = MAT44F_INIT_IDENTITY;
+    return cel_mat44f_eq(a, &_identity, epsilon);
 }
 
-CE_FORCE_INLINE void mat44f_mul(mat44f_t *__restrict result,
-                                const mat44f_t *__restrict a,
-                                const mat44f_t *__restrict b) {
+CEL_FORCE_INLINE void cel_mat44f_mul(cel_mat44f_t *__restrict result,
+                                     const cel_mat44f_t *__restrict a,
+                                     const cel_mat44f_t *__restrict b) {
 
-    vec4f_mul_mat44f(&result->x, &a->x, b);
-    vec4f_mul_mat44f(&result->y, &a->y, b);
-    vec4f_mul_mat44f(&result->z, &a->z, b);
-    vec4f_mul_mat44f(&result->w, &a->w, b);
+    cel_vec4f_mul_mat44f(&result->x, &a->x, b);
+    cel_vec4f_mul_mat44f(&result->y, &a->y, b);
+    cel_vec4f_mul_mat44f(&result->z, &a->z, b);
+    cel_vec4f_mul_mat44f(&result->w, &a->w, b);
 }
 
-CE_FORCE_INLINE void mat44f_inverse(mat44f_t *__restrict result,
-                                    const mat44f_t *__restrict a) {
+CEL_FORCE_INLINE void cel_mat44f_inverse(cel_mat44f_t *__restrict result,
+                                         const cel_mat44f_t *__restrict a) {
     f32 xx = a->f[0];
     f32 xy = a->f[1];
     f32 xz = a->f[2];
@@ -247,8 +247,8 @@ CE_FORCE_INLINE void mat44f_inverse(mat44f_t *__restrict result,
     result->f[15] = +(xx * (yy * zz - zy * yz) - xy * (yx * zz - zx * yz) + xz * (yx * zy - zx * yy)) * inv_det;
 }
 
-CE_FORCE_INLINE void mat44f_transpose(mat44f_t *__restrict result,
-                                      const mat44f_t *__restrict a) {
+CEL_FORCE_INLINE void cel_mat44f_transpose(cel_mat44f_t *__restrict result,
+                                           const cel_mat44f_t *__restrict a) {
     result->f[0] = a->f[0];
     result->f[4] = a->f[1];
     result->f[8] = a->f[2];
@@ -270,13 +270,13 @@ CE_FORCE_INLINE void mat44f_transpose(mat44f_t *__restrict result,
     result->f[15] = a->f[15];
 }
 
-CE_FORCE_INLINE void mat44f_set_perspective_fov(mat44f_t *__restrict result,
-                                                const f32 fov,
-                                                const f32 aspect_ratio,
-                                                f32 near,
-                                                f32 far) {
+CEL_FORCE_INLINE void cel_mat44f_set_perspective_fov(cel_mat44f_t *__restrict result,
+                                                     const f32 fov,
+                                                     const f32 aspect_ratio,
+                                                     f32 near,
+                                                     f32 far) {
 
-    f32 yScale = 1.0f / f32_tan(fov * f32_ToRad * 0.5f);
+    f32 yScale = 1.0f / cel_f32_tan(fov * CEL_F32_TORAD * 0.5f);
     f32 xScale = yScale / aspect_ratio;
 
     result->x.x = xScale;

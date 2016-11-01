@@ -75,7 +75,7 @@ static int _gamepad_axis(lua_State *l) {
     gamepad_t gamepad = {.idx = (luasys_to_int(l, 1))};
     u32 idx = (u32) (luasys_to_int(l, 2));
 
-    vec2f_t pos = gamepad_axis(gamepad, idx);
+    cel_vec2f_t pos = gamepad_axis(gamepad, idx);
 
     luasys_push_vec2f(l, pos);
     return 1;

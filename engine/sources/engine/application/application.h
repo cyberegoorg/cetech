@@ -42,6 +42,6 @@ const char *application_platform();
 
 const char *application_native_platform();
 
-window_t application_get_main_window();
+cel_window_t application_get_main_window();
 
 #endif //CETECH_APPLICATION_H

@@ -25,8 +25,8 @@
 static struct G {
     u8 state[MOUSE_BTN_MAX];
     u8 last_state[MOUSE_BTN_MAX];
-    vec2f_t last_pos;
-    vec2f_t last_delta_pos;
+    cel_vec2f_t last_pos;
+    cel_vec2f_t last_delta_pos;
 } _G = {0};
 
 
@@ -97,7 +97,7 @@ u32 mouse_button_index(const char *button_name) {
             continue;
         }
 
-        if (str_compare(_btn_to_str[i], button_name)) {
+        if (cel_strcmp(_btn_to_str[i], button_name)) {
             continue;
         }
 
@@ -108,31 +108,31 @@ u32 mouse_button_index(const char *button_name) {
 }
 
 const char *mouse_button_name(const u32 button_index) {
-    CE_ASSERT(LOG_WHERE, (button_index >= 0) && (button_index < MOUSE_BTN_MAX));
+    CEL_ASSERT(LOG_WHERE, (button_index >= 0) && (button_index < MOUSE_BTN_MAX));
 
     return _btn_to_str[button_index];
 }
 
 int mouse_button_state(const u32 button_index) {
-    CE_ASSERT(LOG_WHERE, (button_index >= 0) && (button_index < MOUSE_BTN_MAX));
+    CEL_ASSERT(LOG_WHERE, (button_index >= 0) && (button_index < MOUSE_BTN_MAX));
 
     return _G.state[button_index];
 }
 
 int mouse_button_pressed(const u32 button_index) {
-    CE_ASSERT(LOG_WHERE, (button_index >= 0) && (button_index < MOUSE_BTN_MAX));
+    CEL_ASSERT(LOG_WHERE, (button_index >= 0) && (button_index < MOUSE_BTN_MAX));
 
     return _G.state[button_index] && !_G.last_state[button_index];
 }
 
 int mouse_button_released(const u32 button_index) {
-    CE_ASSERT(LOG_WHERE, (button_index >= 0) && (button_index < MOUSE_BTN_MAX));
+    CEL_ASSERT(LOG_WHERE, (button_index >= 0) && (button_index < MOUSE_BTN_MAX));
 
     return !_G.state[button_index] && _G.last_state[button_index];
 }
 
 const char *mouse_axis_name(const u32 axis_index) {
-    CE_ASSERT(LOG_WHERE, (axis_index >= 0) && (axis_index < MOUSE_AXIS_MAX));
+    CEL_ASSERT(LOG_WHERE, (axis_index >= 0) && (axis_index < MOUSE_AXIS_MAX));
 
     return _axis_to_str[axis_index];
 }
@@ -143,7 +143,7 @@ u32 mouse_axis_index(const char *axis_name) {
             continue;
         }
 
-        if (str_compare(_axis_to_str[i], axis_name) != 0) {
+        if (cel_strcmp(_axis_to_str[i], axis_name) != 0) {
             continue;
         }
 
@@ -153,8 +153,8 @@ u32 mouse_axis_index(const char *axis_name) {
     return 0;
 }
 
-vec2f_t mouse_axis(const u32 axis_index) {
-    CE_ASSERT(LOG_WHERE, (axis_index >= 0) && (axis_index < MOUSE_AXIS_MAX));
+cel_vec2f_t mouse_axis(const u32 axis_index) {
+    CEL_ASSERT(LOG_WHERE, (axis_index >= 0) && (axis_index < MOUSE_AXIS_MAX));
 
     switch (axis_index) {
         case MOUSE_AXIS_ABSOULTE:
@@ -164,10 +164,10 @@ vec2f_t mouse_axis(const u32 axis_index) {
             return _G.last_delta_pos;
 
         default:
-            return (vec2f_t) {0};
+            return (cel_vec2f_t) {0};
     }
 }
 
-void mouse_set_cursor_pos(vec2f_t pos) {
+void mouse_set_cursor_pos(cel_vec2f_t pos) {
 
 }

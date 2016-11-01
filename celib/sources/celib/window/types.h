@@ -8,14 +8,14 @@
 
 typedef struct {
     void *w;
-} window_t;
+} cel_window_t;
 
-enum WindowFlags {
+enum cel_window_flags {
     WINDOW_NOFLAG = 0,
     WINDOW_FULLSCREEN = 1,
 };
 
-enum WindowPos {
+enum cel_window_pos {
     WINDOWPOS_CENTERED = 1,
     WINDOWPOS_UNDEFINED = 2
 };

@@ -84,7 +84,7 @@ u32 keyboard_button_index(const char *button_name) {
             continue;
         }
 
-        if (str_compare(_key_to_str[i], button_name)) {
+        if (cel_strcmp(_key_to_str[i], button_name)) {
             continue;
         }
 
@@ -95,25 +95,25 @@ u32 keyboard_button_index(const char *button_name) {
 }
 
 const char *keyboard_button_name(const u32 button_index) {
-    CE_ASSERT(LOG_WHERE, (button_index >= 0) && (button_index < KEY_MAX));
+    CEL_ASSERT(LOG_WHERE, (button_index >= 0) && (button_index < KEY_MAX));
 
     return _key_to_str[button_index];
 }
 
 int keyboard_button_state(const u32 button_index) {
-    CE_ASSERT(LOG_WHERE, (button_index >= 0) && (button_index < KEY_MAX));
+    CEL_ASSERT(LOG_WHERE, (button_index >= 0) && (button_index < KEY_MAX));
 
     return _G.state[button_index];
 }
 
 int keyboard_button_pressed(const u32 button_index) {
-    CE_ASSERT(LOG_WHERE, (button_index >= 0) && (button_index < KEY_MAX));
+    CEL_ASSERT(LOG_WHERE, (button_index >= 0) && (button_index < KEY_MAX));
 
     return _G.state[button_index] && !_G.last_state[button_index];
 }
 
 int keyboard_button_released(const u32 button_index) {
-    CE_ASSERT(LOG_WHERE, (button_index >= 0) && (button_index < KEY_MAX));
+    CEL_ASSERT(LOG_WHERE, (button_index >= 0) && (button_index < KEY_MAX));
 
     return !_G.state[button_index] && _G.last_state[button_index];
 }

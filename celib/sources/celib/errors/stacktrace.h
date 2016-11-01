@@ -11,9 +11,9 @@
 
 #endif
 
-static char *celib_stacktrace(int skip) {
+static char *cel_stacktrace(int skip) {
 #if defined(CELIB_LINUX)
-    char *return_str = (char *) celib_malloc(4096 * 8);
+    char *return_str = (char *) cel_malloc(4096 * 8);
     return_str[0] = '\0';
 
     void *array[50];
@@ -57,13 +57,13 @@ static char *celib_stacktrace(int skip) {
         }
     }
 
-    celib_free(messages);
+    cel_free(messages);
     return return_str;
 #endif
 }
 
-static void celib_stacktrace_free(char *st) {
-    celib_free(st);
+static void cel_stacktrace_free(char *st) {
+    cel_free(st);
 }
 
 #endif //CELIB_STACKTRACE_H

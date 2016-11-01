@@ -14,7 +14,7 @@
 //==============================================================================
 
 typedef void *(*resource_loader_t)(struct vio *input,
-                                   struct allocator *allocator);
+                                   struct cel_allocator *allocator);
 
 typedef void  (*resource_online_t)(stringid64_t name,
                                    void *data);
@@ -23,12 +23,12 @@ typedef void  (*resource_offline_t)(stringid64_t name,
                                     void *data);
 
 typedef void  (*resource_unloader_t)(void *new_data,
-                                     struct allocator *allocator);
+                                     struct cel_allocator *allocator);
 
 typedef void *(*resource_reloader_t)(stringid64_t name,
                                      void *old_data,
                                      void *new_data,
-                                     struct allocator *allocator);
+                                     struct cel_allocator *allocator);
 
 //==============================================================================
 // Structs and typedefs

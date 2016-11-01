@@ -17,11 +17,11 @@ int renderer_init(int stage);
 
 void renderer_shutdown();
 
-void renderer_create(window_t window);
+void renderer_create(cel_window_t window);
 
 void renderer_set_debug(int debug);
 
-vec2f_t renderer_get_size();
+cel_vec2f_t renderer_get_size();
 
 typedef int viewport_t;
 

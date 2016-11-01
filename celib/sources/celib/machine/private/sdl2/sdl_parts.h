@@ -52,11 +52,11 @@ void sdl_gamepad_process_event(SDL_Event *event,
 // Window part
 //==============================================================================
 
-int sdl_window_init();
+int sdl_cel_window_init();
 
-void sdl_window_shutdown();
+void sdl_cel_window_shutdown();
 
-void sdl_window_process(struct eventstream *stream);
+void sdl_cel_window_process(struct eventstream *stream);
 
 
 #endif //CELIB_SDL_PARTS_H

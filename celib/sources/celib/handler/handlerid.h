@@ -41,7 +41,7 @@ struct handlerid {
 static inline handler_t handlerid_handler_create(struct handlerid *hid);
 
 static inline void handlerid_init(struct handlerid *hid,
-                                  struct allocator *allocator) {
+                                  struct cel_allocator *allocator) {
     ARRAY_INIT(u32, &hid->_generation, allocator);
     QUEUE_INIT(u32, &hid->_freeIdx, allocator);
 

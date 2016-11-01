@@ -38,7 +38,7 @@ struct mouse_event {
 
 struct mouse_move_event {
     struct event_header h;
-    vec2f_t pos;
+    cel_vec2f_t pos;
 };
 
 enum {
@@ -116,7 +116,7 @@ struct gamepad_move_event {
     struct event_header h;
     u8 gamepad_id;
     u32 axis;
-    vec2f_t position;
+    cel_vec2f_t position;
 };
 
 struct gamepad_btn_event {

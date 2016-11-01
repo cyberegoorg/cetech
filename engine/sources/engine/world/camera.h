@@ -16,8 +16,8 @@ int camera_is_valid(camera_t camera);
 
 void camera_get_project_view(world_t world,
                              camera_t camera,
-                             mat44f_t *proj,
-                             mat44f_t *view);
+                             cel_mat44f_t *proj,
+                             cel_mat44f_t *view);
 
 int camera_has(world_t world,
                entity_t entity);

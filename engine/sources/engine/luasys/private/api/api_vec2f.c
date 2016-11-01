@@ -10,7 +10,7 @@ static int _ctor(lua_State *l) {
     f32 x = luasys_to_f32(l, 1);
     f32 y = luasys_to_f32(l, 2);
 
-    luasys_push_vec2f(l, (vec2f_t) {.x=x, .y=y});
+    luasys_push_vec2f(l, (cel_vec2f_t) {.x=x, .y=y});
     return 1;
 }
 
@@ -25,35 +25,35 @@ static int _unit_y(lua_State *l) {
 }
 
 static int _length(lua_State *l) {
-    vec2f_t *v = luasys_to_vec2f(l, 1);
-    luasys_push_float(l, vec2f_length(v));
+    cel_vec2f_t *v = luasys_to_vec2f(l, 1);
+    luasys_push_float(l, cel_vec2f_length(v));
     return 1;
 }
 
 static int _length_squared(lua_State *l) {
-    vec2f_t *v = luasys_to_vec2f(l, 1);
-    luasys_push_float(l, vec2f_length_squared(v));
+    cel_vec2f_t *v = luasys_to_vec2f(l, 1);
+    luasys_push_float(l, cel_vec2f_length_squared(v));
     return 1;
 }
 
 static int _normalized(lua_State *l) {
-    vec2f_t *v = luasys_to_vec2f(l, 1);
-    vec2f_t res = {0};
+    cel_vec2f_t *v = luasys_to_vec2f(l, 1);
+    cel_vec2f_t res = {0};
 
-    vec2f_normalized(&res, v);
+    cel_vec2f_normalized(&res, v);
 
     luasys_push_vec2f(l, res);
     return 1;
 }
 
 static int _lerp(lua_State *l) {
-    vec2f_t *from = luasys_to_vec2f(l, 1);
-    vec2f_t *to = luasys_to_vec2f(l, 2);
+    cel_vec2f_t *from = luasys_to_vec2f(l, 1);
+    cel_vec2f_t *to = luasys_to_vec2f(l, 2);
     f32 time = luasys_to_f32(l, 3);
 
-    vec2f_t res = {0};
+    cel_vec2f_t res = {0};
 
-    vec2f_lerp(&res, from, to, time);
+    cel_vec2f_lerp(&res, from, to, time);
 
     luasys_push_vec2f(l, res);
     return 1;
@@ -61,10 +61,10 @@ static int _lerp(lua_State *l) {
 
 
 static int _dot(lua_State *l) {
-    vec2f_t *a = luasys_to_vec2f(l, 1);
-    vec2f_t *b = luasys_to_vec2f(l, 2);
+    cel_vec2f_t *a = luasys_to_vec2f(l, 1);
+    cel_vec2f_t *b = luasys_to_vec2f(l, 2);
 
-    luasys_push_float(l, vec2f_dot(a, b));
+    luasys_push_float(l, cel_vec2f_dot(a, b));
     return 1;
 }
 

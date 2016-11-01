@@ -27,20 +27,20 @@
 // Allocator
 //==============================================================================
 
-struct allocator {
-    void *(*allocate)(struct allocator *allocator,
+struct cel_allocator {
+    void *(*allocate)(struct cel_allocator *allocator,
                       uint32_t size,
                       uint32_t align);
 
-    void (*deallocate)(struct allocator *allocator,
+    void (*deallocate)(struct cel_allocator *allocator,
                        void *p);
 
-    uint32_t (*total_allocated)(struct allocator *allocator);
+    uint32_t (*total_allocated)(struct cel_allocator *allocator);
 
     uint32_t (*allocated_size)(void *p);
 };
 
-struct allocator_trace_entry {
+struct cel_allocator_trace_entry {
     void *ptr;
     char *stacktrace;
     char used;

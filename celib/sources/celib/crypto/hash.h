@@ -16,7 +16,7 @@
 //! \param len Key len
 //! \param seed Seed
 //! \return Hashed value
-static u64 celib_hash_murmur2_64(const void *key,
+static u64 cel_hash_murmur2_64(const void *key,
                                  u64 len,
                                  uint64_t seed) {
 

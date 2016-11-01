@@ -11,7 +11,7 @@
 #include <celib/os/cmd_line.h>
 
 #include <engine/application/application.h>
-#include <celib/config/cvar.h>
+#include <engine/config/cvar.h>
 #include <celib/machine/machine.h>
 #include <engine/resource/resource.h>
 #include <engine/luasys/luasys.h>
@@ -23,7 +23,7 @@
 
 #include "engine/input/input.h"
 #include "engine/develop/console_server.h"
-#include "celib/thread/task.h"
+#include "engine/task/task.h"
 
 #define LOG_WHERE "application"
 
@@ -49,7 +49,7 @@ static struct G {
     } config;
 
     const struct game_callbacks *game;
-    window_t main_window;
+    cel_window_t main_window;
     struct args args;
     int is_running;
     int init_error;
@@ -163,7 +163,7 @@ int application_shutdown() {
             _SYSTEMS[i].shutdown();
         }
 
-        window_destroy(_G.main_window);
+        cel_window_destroy(_G.main_window);
     }
 
     cvar_shutdown();
@@ -229,10 +229,10 @@ void application_start() {
         intptr_t wid = cvar_get_int(_G.config.cv_wid);
 
         char title[128] = {0};
-        snprintf(title, CE_ARRAY_LEN(title), "cetech - %s", cvar_get_string(_G.config.cv_boot_script));
+        snprintf(title, CEL_ARRAY_LEN(title), "cetech - %s", cvar_get_string(_G.config.cv_boot_script));
 
         if (wid == 0) {
-            _G.main_window = window_new(
+            _G.main_window = cel_window_new(
                     title,
                     WINDOWPOS_UNDEFINED,
                     WINDOWPOS_UNDEFINED,
@@ -240,7 +240,7 @@ void application_start() {
                     cvar_get_int(_G.config.cv_fullscreen) ? WINDOW_FULLSCREEN : WINDOW_NOFLAG
             );
         } else {
-            _G.main_window = window_new_from((void *) wid);
+            _G.main_window = cel_window_new_from((void *) wid);
         }
 
         renderer_create(_G.main_window);
@@ -248,7 +248,7 @@ void application_start() {
 
     _boot_stage();
 
-    u64 last_tick = celib_get_perf_counter();
+    u64 last_tick = cel_get_perf_counter();
     _G.game = luasys_get_game_callbacks();
 
     if (!_G.game->init()) {
@@ -269,8 +269,8 @@ void application_start() {
     while (_G.is_running) {
         struct scope_data application_sd = developsys_enter_scope("Application:update()");
 
-        u64 now_ticks = celib_get_perf_counter();
-        float dt = ((float) (now_ticks - last_tick)) / celib_get_perf_freq();
+        u64 now_ticks = cel_get_perf_counter();
+        float dt = ((float) (now_ticks - last_tick)) / cel_get_perf_freq();
 
         _G.dt = dt;
         last_tick = now_ticks;
@@ -295,7 +295,7 @@ void application_start() {
         developsys_push_record_float("engine.delta_time", dt);
         developsys_update();
 
-        celib_thread_yield();
+        cel_thread_yield();
     }
 
     _G.game->shutdown();
@@ -319,6 +319,6 @@ const char *application_platform() {
     return application_native_platform();
 }
 
-window_t application_get_main_window() {
+cel_window_t application_get_main_window() {
     return _G.main_window;
 }

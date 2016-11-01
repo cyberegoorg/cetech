@@ -1,5 +1,5 @@
-#ifndef CELIB_TASKMANAGER_H
-#define CELIB_TASKMANAGER_H
+#ifndef CETECH_TASKMANAGER_H
+#define CETECH_TASKMANAGER_H
 
 //==============================================================================
 // Includes
@@ -7,10 +7,12 @@
 
 #include <stdlib.h>
 #include <stdatomic.h>
-#include "celib/thread/types.h"
 
-#define CE_ASSERT_IS_WORKER(where, worker_id)\
-    CE_ASSERT_MSG(where, taskmanager_worker_id() == worker_id, "Current worker: %d", taskmanager_worker_id())
+#include "celib/thread/types.h"
+#include "types.h"
+
+#define CEL_ASSERT_IS_WORKER(where, worker_id)\
+    CEL_ASSERT_MSG(where, taskmanager_worker_id() == worker_id, "Current worker: %d", taskmanager_worker_id())
 
 //==============================================================================
 // Interface
@@ -32,4 +34,4 @@ void taskmanager_wait_atomic(atomic_int *signal,
 
 char taskmanager_worker_id();
 
-#endif //CELIB_TASKMANAGER_H
+#endif //CETECH_TASKMANAGER_H

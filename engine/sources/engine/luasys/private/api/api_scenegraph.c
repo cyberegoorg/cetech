@@ -50,7 +50,7 @@ static int _scenegraph_get_scale(lua_State *l) {
 static int _scenegraph_set_position(lua_State *l) {
     world_t w = {.h = luasys_to_handler(l, 1)};
     scene_node_t t = {.idx = luasys_to_int(l, 2)};
-    vec3f_t *pos = luasys_to_vec3f(l, 3);
+    cel_vec3f_t *pos = luasys_to_vec3f(l, 3);
 
     scenegraph_set_position(w, t, *pos);
     return 0;
@@ -59,7 +59,7 @@ static int _scenegraph_set_position(lua_State *l) {
 static int _scenegraph_set_scale(lua_State *l) {
     world_t w = {.h = luasys_to_handler(l, 1)};
     scene_node_t t = {.idx = luasys_to_int(l, 2)};
-    vec3f_t *pos = luasys_to_vec3f(l, 3);
+    cel_vec3f_t *pos = luasys_to_vec3f(l, 3);
 
     scenegraph_set_scale(w, t, *pos);
     return 0;
@@ -68,7 +68,7 @@ static int _scenegraph_set_scale(lua_State *l) {
 static int _scenegraph_set_rotation(lua_State *l) {
     world_t w = {.h = luasys_to_handler(l, 1)};
     scene_node_t t = {.idx = luasys_to_int(l, 2)};
-    quatf_t *rot = luasys_to_quat(l, 3);
+    cel_quatf_t *rot = luasys_to_quat(l, 3);
 
     scenegraph_set_rotation(w, t, *rot);
     return 0;
@@ -78,7 +78,7 @@ static int _scenegraph_get_world_matrix(lua_State *l) {
     world_t w = {.h = luasys_to_handler(l, 1)};
     scene_node_t t = {.idx = luasys_to_int(l, 2)};
 
-    mat44f_t *wm = scenegraph_get_world_matrix(w, t);
+    cel_mat44f_t *wm = scenegraph_get_world_matrix(w, t);
 
     luasys_push_mat44f(l, *wm);
     return 1;

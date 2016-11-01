@@ -6,7 +6,7 @@
 
 #include <engine/resource/resource.h>
 #include <engine/resource/filesystem.h>
-#include <celib/config/cvar.h>
+#include <engine/config/cvar.h>
 #include <celib/filesystem/path.h>
 #include <engine/application/application.h>
 #include <celib/filesystem/vio.h>
@@ -82,17 +82,17 @@ static MAP_T(resource_item_t) *_get_resource_map(stringid64_t type) {
 }
 
 void *package_resource_loader(struct vio *input,
-                              struct allocator *allocator) {
-    const i64 size = vio_size(input);
-    char *data = CE_ALLOCATE(allocator, char, size);
-    vio_read(input, data, 1, size);
+                              struct cel_allocator *allocator) {
+    const i64 size = cel_vio_size(input);
+    char *data = CEL_ALLOCATE(allocator, char, size);
+    cel_vio_read(input, data, 1, size);
 
     return data;
 }
 
 void package_resource_unloader(void *new_data,
-                               struct allocator *allocator) {
-    CE_DEALLOCATE(allocator, new_data);
+                               struct cel_allocator *allocator) {
+    CEL_DEALLOCATE(allocator, new_data);
 }
 
 void package_resource_online(stringid64_t name,
@@ -106,8 +106,8 @@ void package_resource_offline(stringid64_t name,
 void *package_resource_reloader(stringid64_t name,
                                 void *old_data,
                                 void *new_data,
-                                struct allocator *allocator) {
-    CE_DEALLOCATE(allocator, old_data);
+                                struct cel_allocator *allocator) {
+    CEL_DEALLOCATE(allocator, old_data);
     return new_data;
 }
 
@@ -142,8 +142,8 @@ int resource_init(int stage) {
     _G.cv_build_dir = cvar_find("build");
 
     char build_dir_full[4096] = {0};
-    celib_path_join(build_dir_full,
-                    CE_ARRAY_LEN(build_dir_full),
+    cel_path_join(build_dir_full,
+                    CEL_ARRAY_LEN(build_dir_full),
                     cvar_get_string(_G.cv_build_dir),
                     application_platform());
 
@@ -289,10 +289,10 @@ void resource_load(void **loaded_data,
         }
 
         char build_name[33] = {0};
-        resource_type_name_string(build_name, CE_ARRAY_LEN(build_name), type, names[i]);
+        resource_type_name_string(build_name, CEL_ARRAY_LEN(build_name), type, names[i]);
 
         char filename[4096] = {0};
-        resource_compiler_get_filename(filename, CE_ARRAY_LEN(filename), type, names[i]);
+        resource_compiler_get_filename(filename, CEL_ARRAY_LEN(filename), type, names[i]);
         log_debug("resource", "Loading resource %s from %s/%s", filename, filesystem_get_root_dir(root_name),
                   build_name);
 
@@ -329,10 +329,10 @@ void resource_unload(stringid64_t type,
 
         if (--item.ref_count == 0) {
             char build_name[33] = {0};
-            resource_type_name_string(build_name, CE_ARRAY_LEN(build_name), type, names[i]);
+            resource_type_name_string(build_name, CEL_ARRAY_LEN(build_name), type, names[i]);
 
             char filename[1024] = {0};
-            resource_compiler_get_filename(filename, CE_ARRAY_LEN(filename), type, names[i]);
+            resource_compiler_get_filename(filename, CEL_ARRAY_LEN(filename), type, names[i]);
             log_debug("resource", "Unload resource %s ", filename);
 
             type_clb.offline(names[i], item.data);
@@ -352,18 +352,18 @@ void *resource_get(stringid64_t type,
     resource_item_t item = MAP_GET(resource_item_t, resource_map, names.id, null_item);
     if (is_item_null(item)) {
         char build_name[33] = {0};
-        resource_type_name_string(build_name, CE_ARRAY_LEN(build_name), type, names);
+        resource_type_name_string(build_name, CEL_ARRAY_LEN(build_name), type, names);
 
         if (_G.autoload_enabled) {
             char filename[1024] = {0};
-            resource_compiler_get_filename(filename, CE_ARRAY_LEN(filename), type, names);
+            resource_compiler_get_filename(filename, CEL_ARRAY_LEN(filename), type, names);
 
             log_warning(LOG_WHERE, "Autoloading resource %s", filename);
             resource_load_now(type, &names, 1);
             item = MAP_GET(resource_item_t, resource_map, names.id, null_item);
         } else {
             // TODO: fallback resource #205
-            CE_ASSERT(LOG_WHERE, false);
+            CEL_ASSERT(LOG_WHERE, false);
         }
     }
 
@@ -382,10 +382,10 @@ void resource_reload(stringid64_t type,
     resource_load(loaded_data, type, names, count, 1);
     for (int i = 0; i < count; ++i) {
 //        char build_name[33] = {0};
-//        resource_type_name_string(build_name, CE_ARRAY_LEN(build_name), type, names[i]);
+//        resource_type_name_string(build_name, CEL_ARRAY_LEN(build_name), type, names[i]);
 
         char filename[1024] = {0};
-        resource_compiler_get_filename(filename, CE_ARRAY_LEN(filename), type, names[i]);
+        resource_compiler_get_filename(filename, CEL_ARRAY_LEN(filename), type, names[i]);
 
         log_debug("resource", "Reload resource %s ", filename);
 

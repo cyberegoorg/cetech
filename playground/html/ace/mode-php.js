@@ -1688,7 +1688,7 @@ var PhpLangHighlightRules = function() {
         'stream_socket_pair|stream_socket_recvfrom|stream_socket_sendto|stream_socket_server|stream_socket_shutdown|stream_supports_lock|' +
         'stream_wrapper_register|stream_wrapper_restore|stream_wrapper_unregister|streamwrapper|strftime|strip_tags|stripcslashes|stripos|' +
         'stripslashes|stristr|strlen|strnatcasecmp|strnatcmp|strncasecmp|strncmp|strpbrk|strpos|strptime|strrchr|strrev|strripos|strrpos|strspn|' +
-        'strstr|strtok|strtolower|strtotime|strtoupper|strtr|strval|substr|substr_compare|substr_count|substr_replace|svm|svmmodel|svn_add|' +
+        'strstr|strtok|strtolower|strtotime|strtoupper|strtr|strval|substr|subcel_strcmp|substr_count|substr_replace|svm|svmmodel|svn_add|' +
         'svn_auth_get_parameter|svn_auth_set_parameter|svn_blame|svn_cat|svn_checkout|svn_cleanup|svn_client_version|svn_commit|svn_delete|' +
         'svn_diff|svn_export|svn_fs_abort_txn|svn_fs_apply_text|svn_fs_begin_txn2|svn_fs_change_node_prop|svn_fs_check_path|' +
         'svn_fs_contents_changed|svn_fs_copy|svn_fs_delete|svn_fs_dir_entries|svn_fs_file_contents|svn_fs_file_length|svn_fs_is_dir|svn_fs_is_file|' +
@@ -10336,8 +10336,8 @@ var functionMap = {
         "string substr(string str, int start [, int length])",
         "Returns part of a string"
     ],
-    "substr_compare": [
-        "int substr_compare(string main_str, string str, int offset [, int length [, bool case_sensitivity]])",
+    "subcel_strcmp": [
+        "int subcel_strcmp(string main_str, string str, int offset [, int length [, bool case_sensitivity]])",
         "Binary safe optionally case insensitive comparison of 2 strings from an offset, up to length characters"
     ],
     "substr_count": [

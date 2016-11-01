@@ -7,7 +7,7 @@
 #include "../log/log.h"
 #include "../types.h"
 
-static int celib_exec(const char *argv) {
+static int cel_exec(const char *argv) {
 #if defined(CELIB_LINUX)
     char output[4096];
 
@@ -17,7 +17,7 @@ static int celib_exec(const char *argv) {
     if (fp == NULL)
         return 0;
 
-    while (fgets(output, CE_ARRAY_LEN(output), fp) != NULL) {
+    while (fgets(output, CEL_ARRAY_LEN(output), fp) != NULL) {
         printf("%s", output);
     }
 

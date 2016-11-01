@@ -65,7 +65,7 @@ static const char *_nocolor_level_format[4] = {
 
 static char *_time_to_str(struct tm *gmtm) {
     char *time_str = asctime(gmtm);
-    time_str[str_lenght(time_str) - 1] = '\0';
+    time_str[cel_strlen(time_str) - 1] = '\0';
     return time_str;
 }
 

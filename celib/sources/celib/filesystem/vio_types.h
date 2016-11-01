@@ -9,17 +9,16 @@
 //==============================================================================
 
 
-enum open_mode {
+enum cel_vio_open_mode {
     VIO_OPEN_READ,
     VIO_OPEN_WRITE,
 };
 
-enum vio_seek {
+enum cel_vio_seek {
     VIO_SEEK_SET,
     VIO_SEEK_CUR,
     VIO_SEEK_END
 };
-
 
 //==============================================================================
 // Structs
@@ -30,7 +29,7 @@ struct vio {
 
     i64 (*seek)(struct vio *vio,
                 i64 offset,
-                enum vio_seek whence);
+                enum cel_vio_seek whence);
 
     size_t (*read)(struct vio *vio,
                    void *ptr,

@@ -8,30 +8,30 @@ struct args {
     const char **argv;
 };
 
-static inline int _celib_cmd_line_is_short(struct args args,
+static inline int _cel_cmd_line_is_short(struct args args,
                                         int i,
                                         char shortopt) {
     return (shortopt != '\0' &&
-            str_lenght(args.argv[i]) > 1 &&
+            cel_strlen(args.argv[i]) > 1 &&
             args.argv[i][0] == '-' &&
             args.argv[i][1] == shortopt);
 }
 
-static inline int _celib_cmd_line_is_long(struct args args,
+static inline int _cel_cmd_line_is_long(struct args args,
                                        const int i,
                                        const char *longopt) {
-    return (str_lenght(args.argv[i]) > 2 &&
+    return (cel_strlen(args.argv[i]) > 2 &&
             args.argv[i][0] == '-' &&
             args.argv[i][1] == '-' &&
-            str_compare(&args.argv[i][2], longopt) == 0);
+            cel_strcmp(&args.argv[i][2], longopt) == 0);
 }
 
-static int celib_cmd_find_argument(struct args args,
+static int cel_cmd_find_argument(struct args args,
                                 const char *longopt,
                                 char shortopt) {
 
     for (int i = 0; i < args.argc; i++) {
-        if (_celib_cmd_line_is_short(args, i, shortopt) || _celib_cmd_line_is_long(args, i, longopt)) {
+        if (_cel_cmd_line_is_short(args, i, shortopt) || _cel_cmd_line_is_long(args, i, longopt)) {
             return i;
         }
     }
@@ -39,12 +39,12 @@ static int celib_cmd_find_argument(struct args args,
     return args.argc;
 }
 
-static const char *celib_cmd_get_parameter(struct args args,
+static const char *cel_cmd_get_parameter(struct args args,
                                         const char *longopt,
                                         char shortopt,
                                         int param) {
 
-    int idx = celib_cmd_find_argument(args, longopt, shortopt);
+    int idx = cel_cmd_find_argument(args, longopt, shortopt);
 
     if (idx < args.argc) {
         return args.argv[idx + 1 + param];
@@ -53,10 +53,10 @@ static const char *celib_cmd_get_parameter(struct args args,
     return NULL;
 }
 
-static int celib_cmd_has_argument(struct args args,
+static int cel_cmd_has_argument(struct args args,
                                const char *longopt,
                                char shortopt) {
-    return celib_cmd_find_argument(args, longopt, shortopt) < args.argc;
+    return cel_cmd_find_argument(args, longopt, shortopt) < args.argc;
 }
 
 #endif //CELIB_CMD_LINE_H

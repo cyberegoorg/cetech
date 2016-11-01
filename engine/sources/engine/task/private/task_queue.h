@@ -1,5 +1,5 @@
-#ifndef CELIB_QUEUE_MPMC_H
-#define CELIB_QUEUE_MPMC_H
+#ifndef CETECH_QUEUE_MPMC_H
+#define CETECH_QUEUE_MPMC_H
 
 //==============================================================================
 // Includes
@@ -29,24 +29,24 @@ struct task_queue {
     cacheline_pad_t _pad5;
     int _capacityMask;
     cacheline_pad_t _pad6;
-    struct allocator *allocator;
+    struct cel_allocator *allocator;
 };
 
 
 void queue_task_init(struct task_queue *q,
                      u32 capacity,
-                     struct allocator *allocator) {
+                     struct cel_allocator *allocator) {
     *q = (struct task_queue) {0};
 
     q->_capacityMask = capacity - 1;
     q->allocator = allocator;
 
-    CE_ASSERT_MSG("QUEUEMPC", 0 == (capacity & q->_capacityMask), "capacity must be power of two");
+    CEL_ASSERT_MSG("QUEUEMPC", 0 == (capacity & q->_capacityMask), "capacity must be power of two");
 
     q->_capacity = capacity;
-    q->_data = CE_ALLOCATE(allocator, u32, capacity);
+    q->_data = CEL_ALLOCATE(allocator, u32, capacity);
 
-    q->_sequences = CE_ALLOCATE(allocator, atomic_int, capacity);
+    q->_sequences = CEL_ALLOCATE(allocator, atomic_int, capacity);
 
     for (u32 i = 0; i < capacity; ++i) {
         atomic_init(q->_sequences + i, i);
@@ -57,8 +57,8 @@ void queue_task_init(struct task_queue *q,
 }
 
 void queue_task_destroy(struct task_queue *q) {
-    CE_DEALLOCATE(q->allocator, q->_data);
-    CE_DEALLOCATE(q->allocator, q->_sequences);
+    CEL_DEALLOCATE(q->allocator, q->_data);
+    CEL_DEALLOCATE(q->allocator, q->_sequences);
 }
 
 u32 queue_task_size(struct task_queue *q) {
@@ -123,4 +123,4 @@ int queue_task_pop(struct task_queue *q,
     return 1;
 }
 
-#endif //CELIB_QUEUE_MPMC_H
+#endif //CETECH_QUEUE_MPMC_H
