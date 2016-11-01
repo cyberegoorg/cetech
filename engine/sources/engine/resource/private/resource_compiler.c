@@ -6,7 +6,7 @@
 
 #include "include/SDL2/SDL.h"
 
-#include <celib/filesystem/fs.h>
+#include <celib/filesystem/filesystem.h>
 #include <celib/string/string.h>
 #include <celib/filesystem/path.h>
 #include <celib/string/stringid.h>

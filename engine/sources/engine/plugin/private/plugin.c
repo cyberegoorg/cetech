@@ -5,7 +5,7 @@
 #include <stdlib.h>
 #include <memory.h>
 #include <celib/os/object.h>
-#include <celib/filesystem/fs.h>
+#include <celib/filesystem/filesystem.h>
 #include <celib/filesystem/path.h>
 #include <celib/memory/memsys.h>
 

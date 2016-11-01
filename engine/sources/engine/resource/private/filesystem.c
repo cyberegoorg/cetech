@@ -3,7 +3,7 @@
 //==============================================================================
 
 #include <celib/filesystem/path.h>
-#include "celib/filesystem/fs.h"
+#include "celib/filesystem/filesystem.h"
 #include <celib/memory/memsys.h>
 
 #include "celib/filesystem/vio.h"
