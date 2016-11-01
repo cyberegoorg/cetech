@@ -101,7 +101,7 @@ const char *mouse_axis_name(const u32 axis_index);
 //! Return axis value
 //! \param axis_index Axis index
 //! \return Axis value
-vec2f_t mouse_axis(const u32 axis_index);
+cel_vec2f_t mouse_axis(const u32 axis_index);
 
 //==============================================================================
 // Gamepad
@@ -163,7 +163,7 @@ const char *gamepad_axis_name(const u32 axis_index);
 //! Return axis value
 //! \param axis_index Axis index
 //! \return Axis value
-vec2f_t gamepad_axis(gamepad_t gamepad,
+cel_vec2f_t gamepad_axis(gamepad_t gamepad,
                      const u32 axis_index);
 
 //! Play rumble

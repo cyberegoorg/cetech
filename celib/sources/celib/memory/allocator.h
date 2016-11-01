@@ -41,15 +41,15 @@ static void cel_free(void *ptr) {
 // Allocator
 //==============================================================================
 
-void allocator_trace_pointer(struct allocator_trace_entry *entries,
+void allocator_trace_pointer(struct cel_allocator_trace_entry *entries,
                              u64 max_entries,
                              void *p);
 
-void allocator_stop_trace_pointer(struct allocator_trace_entry *entries,
+void allocator_stop_trace_pointer(struct cel_allocator_trace_entry *entries,
                                   u64 max_entries,
                                   void *p);
 
-void allocator_check_trace(struct allocator_trace_entry *entries,
+void allocator_check_trace(struct cel_allocator_trace_entry *entries,
                            u64 max_entries);
 
 //==============================================================================
@@ -57,18 +57,18 @@ void allocator_check_trace(struct allocator_trace_entry *entries,
 //==============================================================================
 
 
-struct allocator *malloc_allocator_create();
+struct cel_allocator *malloc_allocator_create();
 
-void malloc_allocator_destroy(struct allocator *a);
+void malloc_allocator_destroy(struct cel_allocator *a);
 
 
 //==============================================================================
 // Scratch allocator
 //==============================================================================
 
-struct allocator *scratch_allocator_create(struct allocator *backing,
+struct cel_allocator *scratch_allocator_create(struct cel_allocator *backing,
                                            int size);
 
-void scratch_allocator_destroy(struct allocator *a);
+void scratch_allocator_destroy(struct cel_allocator *a);
 
 #endif //CELIB_ALLOCATOR_H

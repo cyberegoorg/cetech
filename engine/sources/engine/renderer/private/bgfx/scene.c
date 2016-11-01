@@ -25,7 +25,7 @@ ARRAY_PROTOTYPE(bgfx_texture_handle_t)
 
 ARRAY_PROTOTYPE(bgfx_vertex_buffer_handle_t);
 ARRAY_PROTOTYPE(bgfx_index_buffer_handle_t);
-ARRAY_PROTOTYPE(mat44f_t);
+ARRAY_PROTOTYPE(cel_mat44f_t);
 
 MAP_PROTOTYPE(bgfx_texture_handle_t)
 
@@ -44,7 +44,7 @@ typedef struct scene_blob {
     // u8                 vb[vb_len]
     // stringid64_t       node_name[node_count]
     // u32                node_parent[node_count]
-    // mat44f_t           node_pose[node_count]
+    // cel_mat44f_t           node_pose[node_count]
     // stringid64_t       geom_node[geom_count]
 } scene_blob_t;
 
@@ -58,7 +58,7 @@ typedef struct scene_blob {
 #define scene_blob_vb(r)          ((u8*)                 ((scene_blob_ib(r))          + (r)->ib_len))
 #define scene_blob_node_name(r)   ((stringid64_t*)       ((scene_blob_vb(r))          + (r)->vb_len))
 #define scene_blob_node_parent(r) ((u32*)                ((scene_blob_node_name(r))   + (r)->node_count))
-#define scene_blob_node_pose(r)   ((mat44f_t*)           ((scene_blob_node_parent(r)) + (r)->node_count))
+#define scene_blob_node_pose(r)   ((cel_mat44f_t*)           ((scene_blob_node_parent(r)) + (r)->node_count))
 #define scene_blob_geom_node(r)   ((stringid64_t*)       ((scene_blob_node_pose(r))   + (r)->node_count))
 
 struct scene_instance {
@@ -119,12 +119,12 @@ struct compile_output {
 
     ARRAY_T(stringid64_t) node_name;
     ARRAY_T(u32) node_parent;
-    ARRAY_T(mat44f_t) node_pose;
+    ARRAY_T(cel_mat44f_t) node_pose;
     ARRAY_T(stringid64_t) geom_node;
 };
 
 struct compile_output *_crete_compile_output() {
-    struct allocator *a = memsys_main_allocator();
+    struct cel_allocator *a = memsys_main_allocator();
     struct compile_output *output = CEL_ALLOCATE(a, struct compile_output, 1);
 
     ARRAY_INIT(stringid64_t, &output->geom_name, a);
@@ -139,14 +139,14 @@ struct compile_output *_crete_compile_output() {
     ARRAY_INIT(stringid64_t, &output->node_name, a);
     ARRAY_INIT(stringid64_t, &output->geom_node, a);
     ARRAY_INIT(u32, &output->node_parent, a);
-    ARRAY_INIT(mat44f_t, &output->node_pose, a);
+    ARRAY_INIT(cel_mat44f_t, &output->node_pose, a);
 
 
     return output;
 }
 
 void _destroy_compile_output(struct compile_output *output) {
-    struct allocator *a = memsys_main_allocator();
+    struct cel_allocator *a = memsys_main_allocator();
 
     ARRAY_DESTROY(stringid64_t, &output->geom_name);
     ARRAY_DESTROY(u32, &output->ib_offset);
@@ -160,7 +160,7 @@ void _destroy_compile_output(struct compile_output *output) {
     ARRAY_DESTROY(stringid64_t, &output->node_name);
     ARRAY_DESTROY(stringid64_t, &output->geom_node);
     ARRAY_DESTROY(u32, &output->node_parent);
-    ARRAY_DESTROY(mat44f_t, &output->node_pose);
+    ARRAY_DESTROY(cel_mat44f_t, &output->node_pose);
 
     CEL_DEALLOCATE(a, output);
 }
@@ -360,13 +360,13 @@ void foreach_graph_clb(yaml_node_t key,
     stringid64_t node_name = stringid64_from_string(buffer);
 
     yaml_node_t local_pose = yaml_get_node(value, "local");
-    mat44f_t pose = yaml_as_mat44f_t(local_pose);
+    cel_mat44f_t pose = yaml_as_cel_mat44f_t(local_pose);
 
     u32 idx = (u32) ARRAY_SIZE(&output->output->node_name);
 
     ARRAY_PUSH_BACK(stringid64_t, &output->output->node_name, node_name);
     ARRAY_PUSH_BACK(u32, &output->output->node_parent, output->parent_idx);
-    ARRAY_PUSH_BACK(mat44f_t, &output->output->node_pose, pose);
+    ARRAY_PUSH_BACK(cel_mat44f_t, &output->output->node_pose, pose);
 
     yaml_node_t geometries_n = yaml_get_node(value, "geometries");
     if (yaml_is_valid(geometries_n)) {
@@ -425,7 +425,7 @@ void _compile_assimp_node(struct aiNode *root,
 
     ARRAY_PUSH_BACK(stringid64_t, &output->node_name, name);
     ARRAY_PUSH_BACK(u32, &output->node_parent, parent);
-    ARRAY_PUSH_BACK(mat44f_t, &output->node_pose, *((mat44f_t *) &root->mTransformation));
+    ARRAY_PUSH_BACK(cel_mat44f_t, &output->node_pose, *((cel_mat44f_t *) &root->mTransformation));
 
     for (int i = 0; i < root->mNumChildren; ++i) {
         _compile_assimp_node(root->mChildren[i], idx, output);
@@ -584,7 +584,7 @@ int _scene_resource_compiler(const char *filename,
     cel_vio_write(build_vio, output->vb.data, sizeof(u8), ARRAY_SIZE(&output->vb));
     cel_vio_write(build_vio, output->node_name.data, sizeof(stringid64_t), ARRAY_SIZE(&output->node_name));
     cel_vio_write(build_vio, output->node_parent.data, sizeof(u32), ARRAY_SIZE(&output->node_parent));
-    cel_vio_write(build_vio, output->node_pose.data, sizeof(mat44f_t), ARRAY_SIZE(&output->node_pose));
+    cel_vio_write(build_vio, output->node_pose.data, sizeof(cel_mat44f_t), ARRAY_SIZE(&output->node_pose));
     cel_vio_write(build_vio, output->geom_node.data, sizeof(stringid64_t), ARRAY_SIZE(&output->geom_name));
 
     _destroy_compile_output(output);
@@ -597,7 +597,7 @@ int _scene_resource_compiler(const char *filename,
 //==============================================================================
 
 void *scene_resource_loader(struct vio *input,
-                            struct allocator *allocator) {
+                            struct cel_allocator *allocator) {
     const i64 size = cel_vio_size(input);
     char *data = CEL_ALLOCATE(allocator, char, size);
     cel_vio_read(input, data, 1, size);
@@ -606,7 +606,7 @@ void *scene_resource_loader(struct vio *input,
 }
 
 void scene_resource_unloader(void *new_data,
-                             struct allocator *allocator) {
+                             struct cel_allocator *allocator) {
     CEL_DEALLOCATE(allocator, new_data);
 }
 
@@ -661,7 +661,7 @@ void scene_resource_offline(stringid64_t name,
 void *scene_resource_reloader(stringid64_t name,
                               void *old_data,
                               void *new_data,
-                              struct allocator *allocator) {
+                              struct cel_allocator *allocator) {
     scene_resource_offline(name, old_data);
     scene_resource_online(name, new_data);
 
@@ -727,7 +727,7 @@ void scene_create_graph(world_t world,
 
     stringid64_t *node_name = scene_blob_node_name(res);
     u32 *node_parent = scene_blob_node_parent(res);
-    mat44f_t *node_pose = scene_blob_node_pose(res);
+    cel_mat44f_t *node_pose = scene_blob_node_pose(res);
 
     scenegraph_create(world, entity, node_name, node_parent, node_pose, res->node_count);
 }

@@ -71,7 +71,7 @@ struct level_instance *_level_instance(level_t level) {
 //==============================================================================
 
 void *level_resource_loader(struct vio *input,
-                            struct allocator *allocator) {
+                            struct cel_allocator *allocator) {
     const i64 size = cel_vio_size(input);
     char *data = CEL_ALLOCATE(allocator, char, size);
     cel_vio_read(input, data, 1, size);
@@ -80,7 +80,7 @@ void *level_resource_loader(struct vio *input,
 }
 
 void level_resource_unloader(void *new_data,
-                             struct allocator *allocator) {
+                             struct cel_allocator *allocator) {
     CEL_DEALLOCATE(allocator, new_data);
 }
 
@@ -95,7 +95,7 @@ void level_resource_offline(stringid64_t name,
 void *level_resource_reloader(stringid64_t name,
                               void *old_data,
                               void *new_data,
-                              struct allocator *allocator) {
+                              struct cel_allocator *allocator) {
     level_resource_offline(name, old_data);
     level_resource_online(name, new_data);
 
@@ -237,8 +237,8 @@ level_t world_load_level(world_t world,
     u8 *data = level_blob_data(res);
 
     entity_t level_ent = entity_manager_create();
-    transform_t t = transform_create(world, level_ent, (entity_t) {UINT32_MAX}, (vec3f_t) {0}, QUATF_IDENTITY,
-                                     (vec3f_t) {{1.0f, 1.0f, 1.0f}});
+    transform_t t = transform_create(world, level_ent, (entity_t) {UINT32_MAX}, (cel_vec3f_t) {0}, QUATF_IDENTITY,
+                                     (cel_vec3f_t) {{1.0f, 1.0f, 1.0f}});
 
     level_t level = _new_level(level_ent);
     struct level_instance *instance = _level_instance(level);

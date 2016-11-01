@@ -6,8 +6,8 @@
 #include "vio_types.h"
 
 struct vio *cel_vio_from_file(const char *path,
-                          enum open_mode mode,
-                          struct allocator *allocator);
+                          enum cel_vio_open_mode mode,
+                          struct cel_allocator *allocator);
 
 static int cel_vio_close(struct vio *file) {
     CEL_ASSERT("vio", file != NULL);

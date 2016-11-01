@@ -27,7 +27,7 @@ static size_t cel_strlen(const char *s) {
 }
 
 static char *cel_strdup(const char *s,
-                        struct allocator *allocator) {
+                        struct cel_allocator *allocator) {
     char *d = (char *) CEL_ALLOCATE(allocator, char, cel_strlen(s) + 1);
     CEL_ASSERT("string", d != NULL);
 

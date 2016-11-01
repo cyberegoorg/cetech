@@ -5,23 +5,23 @@
 
 #define LOG_WHERE "allocator"
 
-//void* allocator_allocate(struct allocator* allocator, uint32_t size, uint32_t align) {
+//void* allocator_allocate(struct cel_allocator* allocator, uint32_t size, uint32_t align) {
 //    return allocator->allocate(allocator, size, align);
 //}
 //
-//void allocator_deallocate(struct allocator* allocator, void* p) {
+//void allocator_deallocate(struct cel_allocator* allocator, void* p) {
 //    allocator->deallocate(allocator, p);
 //}
 //
-//uint32_t allocator_total_allocated(struct allocator* allocator){
+//uint32_t allocator_total_allocated(struct cel_allocator* allocator){
 //    return allocator->total_allocated(allocator);
 //}
 //
-//uint32_t allocator_allocated_size(struct allocator* allocator, void* p){
+//uint32_t allocator_allocated_size(struct cel_allocator* allocator, void* p){
 //    return allocator->allocated_size(p);
 //}
 
-void allocator_trace_pointer(struct allocator_trace_entry *entries,
+void allocator_trace_pointer(struct cel_allocator_trace_entry *entries,
                              u64 max_entries,
                              void *p) {
     char *stacktrace_str = cel_stacktrace(3);
@@ -36,7 +36,7 @@ void allocator_trace_pointer(struct allocator_trace_entry *entries,
     }
 }
 
-void allocator_stop_trace_pointer(struct allocator_trace_entry *entries,
+void allocator_stop_trace_pointer(struct cel_allocator_trace_entry *entries,
                                   u64 max_entries,
                                   void *p) {
     for (int i = 0; i < max_entries; ++i) {
@@ -51,7 +51,7 @@ void allocator_stop_trace_pointer(struct allocator_trace_entry *entries,
     }
 }
 
-void allocator_check_trace(struct allocator_trace_entry *entries,
+void allocator_check_trace(struct cel_allocator_trace_entry *entries,
                            u64 max_entries) {
     for (int i = 0; i < max_entries; ++i) {
         if (!entries[i].used) {

@@ -82,7 +82,7 @@ static MAP_T(resource_item_t) *_get_resource_map(stringid64_t type) {
 }
 
 void *package_resource_loader(struct vio *input,
-                              struct allocator *allocator) {
+                              struct cel_allocator *allocator) {
     const i64 size = cel_vio_size(input);
     char *data = CEL_ALLOCATE(allocator, char, size);
     cel_vio_read(input, data, 1, size);
@@ -91,7 +91,7 @@ void *package_resource_loader(struct vio *input,
 }
 
 void package_resource_unloader(void *new_data,
-                               struct allocator *allocator) {
+                               struct cel_allocator *allocator) {
     CEL_DEALLOCATE(allocator, new_data);
 }
 
@@ -106,7 +106,7 @@ void package_resource_offline(stringid64_t name,
 void *package_resource_reloader(stringid64_t name,
                                 void *old_data,
                                 void *new_data,
-                                struct allocator *allocator) {
+                                struct cel_allocator *allocator) {
     CEL_DEALLOCATE(allocator, old_data);
     return new_data;
 }

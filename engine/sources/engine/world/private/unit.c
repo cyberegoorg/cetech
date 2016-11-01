@@ -235,7 +235,7 @@ struct component_data {
 #define component_data_data(cd) ((char*)((component_data_ent(cd) + ((cd)->ent_count))))
 
 struct entity_compile_output *unit_compiler_create_output() {
-    struct allocator *a = memsys_main_allocator();
+    struct cel_allocator *a = memsys_main_allocator();
 
     struct entity_compile_output *output = CEL_ALLOCATE(a, struct entity_compile_output, 1);
     output->ent_counter = 0;
@@ -269,7 +269,7 @@ void unit_compiler_destroy_output(struct entity_compile_output *output) {
     }
     MAP_DESTROY(array_yaml_node_t, &output->component_body);
 
-    struct allocator *a = memsys_main_allocator();
+    struct cel_allocator *a = memsys_main_allocator();
     CEL_DEALLOCATE(a, output);
 }
 
@@ -374,7 +374,7 @@ int _unit_resource_compiler(const char *filename,
 //==============================================================================
 
 void *unit_resource_loader(struct vio *input,
-                           struct allocator *allocator) {
+                           struct cel_allocator *allocator) {
     const i64 size = cel_vio_size(input);
     char *data = CEL_ALLOCATE(allocator, char, size);
     cel_vio_read(input, data, 1, size);
@@ -383,7 +383,7 @@ void *unit_resource_loader(struct vio *input,
 }
 
 void unit_resource_unloader(void *new_data,
-                            struct allocator *allocator) {
+                            struct cel_allocator *allocator) {
     CEL_DEALLOCATE(allocator, new_data);
 }
 
@@ -398,7 +398,7 @@ void unit_resource_offline(stringid64_t name,
 void *unit_resource_reloader(stringid64_t name,
                              void *old_data,
                              void *new_data,
-                             struct allocator *allocator) {
+                             struct cel_allocator *allocator) {
     unit_resource_offline(name, old_data);
     unit_resource_online(name, new_data);
 

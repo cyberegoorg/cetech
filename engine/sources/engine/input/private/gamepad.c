@@ -23,7 +23,7 @@
 
 static struct G {
     int active[GAMEPAD_MAX];
-    vec2f_t position[GAMEPAD_MAX][GAMEPAD_AXIX_MAX];
+    cel_vec2f_t position[GAMEPAD_MAX][GAMEPAD_AXIX_MAX];
     int state[GAMEPAD_MAX][GAMEPAD_BTN_MAX];
     int last_state[GAMEPAD_MAX][GAMEPAD_BTN_MAX];
 } _G = {0};
@@ -164,7 +164,7 @@ u32 gamepad_axis_index(const char *axis_name) {
     return 0;
 }
 
-vec2f_t gamepad_axis(gamepad_t gamepad,
+cel_vec2f_t gamepad_axis(gamepad_t gamepad,
                      const u32 axis_index) {
     CEL_ASSERT(LOG_WHERE, (axis_index >= 0) && (axis_index < GAMEPAD_AXIX_MAX));
 

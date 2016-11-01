@@ -185,10 +185,10 @@ extern "C" int yaml_as_bool(yaml_node_t node) {
     YAML_EX_SCOPE({ return nh->nodes[node.idx].as<bool>(); })
 }
 
-vec3f_t yaml_as_vec3f_t(yaml_node_t body) {
+cel_vec3f_t yaml_as_cel_vec3f_t(yaml_node_t body) {
     CEL_ASSERT("yaml", yaml_is_valid(body));
 
-    vec3f_t v = {0};
+    cel_vec3f_t v = {0};
 
     yaml_node_t x = yaml_get_seq_node(body, 0);
     CEL_ASSERT("yaml", yaml_is_valid(x));
@@ -210,10 +210,10 @@ vec3f_t yaml_as_vec3f_t(yaml_node_t body) {
     return v;
 }
 
-vec4f_t yaml_as_vec4f_t(yaml_node_t body) {
+cel_vec4f_t yaml_as_cel_vec4f_t(yaml_node_t body) {
     CEL_ASSERT("yaml", yaml_is_valid(body));
 
-    vec4f_t v = {0};
+    cel_vec4f_t v = {0};
 
     yaml_node_t x = yaml_get_seq_node(body, 0);
     CEL_ASSERT("yaml", yaml_is_valid(x));
@@ -240,31 +240,31 @@ vec4f_t yaml_as_vec4f_t(yaml_node_t body) {
     return v;
 }
 
-mat44f_t yaml_as_mat44f_t(yaml_node_t body) {
+cel_mat44f_t yaml_as_cel_mat44f_t(yaml_node_t body) {
     CEL_ASSERT("yaml", yaml_is_valid(body));
 
-    mat44f_t m = {0};
+    cel_mat44f_t m = {0};
 
     yaml_node_t x = yaml_get_seq_node(body, 0);
     CEL_ASSERT("yaml", yaml_is_valid(x));
-    m.x = yaml_as_vec4f_t(x);
+    m.x = yaml_as_cel_vec4f_t(x);
     yaml_node_free(x);
 
 
     yaml_node_t y = yaml_get_seq_node(body, 1);
     CEL_ASSERT("yaml", yaml_is_valid(y));
-    m.y = yaml_as_vec4f_t(y);
+    m.y = yaml_as_cel_vec4f_t(y);
     yaml_node_free(y);
 
 
     yaml_node_t z = yaml_get_seq_node(body, 2);
     CEL_ASSERT("yaml", yaml_is_valid(z));
-    m.z = yaml_as_vec4f_t(z);
+    m.z = yaml_as_cel_vec4f_t(z);
     yaml_node_free(z);
 
     yaml_node_t w = yaml_get_seq_node(body, 3);
     CEL_ASSERT("yaml", yaml_is_valid(w));
-    m.z = yaml_as_vec4f_t(w);
+    m.z = yaml_as_cel_vec4f_t(w);
     yaml_node_free(w);
 
     return m;
@@ -277,19 +277,19 @@ mat33f_t yaml_as_mat33f_t(yaml_node_t body) {
 
     yaml_node_t x = yaml_get_seq_node(body, 0);
     CEL_ASSERT("yaml", yaml_is_valid(x));
-    m.x = yaml_as_vec3f_t(x);
+    m.x = yaml_as_cel_vec3f_t(x);
     yaml_node_free(x);
 
 
     yaml_node_t y = yaml_get_seq_node(body, 1);
     CEL_ASSERT("yaml", yaml_is_valid(y));
-    m.y = yaml_as_vec3f_t(y);
+    m.y = yaml_as_cel_vec3f_t(y);
     yaml_node_free(y);
 
 
     yaml_node_t z = yaml_get_seq_node(body, 2);
     CEL_ASSERT("yaml", yaml_is_valid(z));
-    m.z = yaml_as_vec3f_t(z);
+    m.z = yaml_as_cel_vec3f_t(z);
     yaml_node_free(z);
 
     return m;

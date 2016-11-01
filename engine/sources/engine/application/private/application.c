@@ -49,7 +49,7 @@ static struct G {
     } config;
 
     const struct game_callbacks *game;
-    window_t main_window;
+    cel_window_t main_window;
     struct args args;
     int is_running;
     int init_error;
@@ -163,7 +163,7 @@ int application_shutdown() {
             _SYSTEMS[i].shutdown();
         }
 
-        window_destroy(_G.main_window);
+        cel_window_destroy(_G.main_window);
     }
 
     cvar_shutdown();
@@ -232,7 +232,7 @@ void application_start() {
         snprintf(title, CEL_ARRAY_LEN(title), "cetech - %s", cvar_get_string(_G.config.cv_boot_script));
 
         if (wid == 0) {
-            _G.main_window = window_new(
+            _G.main_window = cel_window_new(
                     title,
                     WINDOWPOS_UNDEFINED,
                     WINDOWPOS_UNDEFINED,
@@ -240,7 +240,7 @@ void application_start() {
                     cvar_get_int(_G.config.cv_fullscreen) ? WINDOW_FULLSCREEN : WINDOW_NOFLAG
             );
         } else {
-            _G.main_window = window_new_from((void *) wid);
+            _G.main_window = cel_window_new_from((void *) wid);
         }
 
         renderer_create(_G.main_window);
@@ -319,6 +319,6 @@ const char *application_platform() {
     return application_native_platform();
 }
 
-window_t application_get_main_window() {
+cel_window_t application_get_main_window() {
     return _G.main_window;
 }

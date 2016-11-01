@@ -104,7 +104,7 @@ int filesystem_get_fullpath(stringid64_t root,
 
 struct vio *filesystem_open(stringid64_t root,
                             const char *path,
-                            enum open_mode mode) {
+                            enum cel_vio_open_mode mode) {
     char fullm_path[MAX_PATH_LEN] = {0};
 
     if (!filesystem_get_fullpath(root, fullm_path, sizeof(fullm_path) / sizeof(char), path)) {
@@ -141,7 +141,7 @@ void filesystem_listdir(stringid64_t root,
                         const char *path,
                         const char *filter,
                         string_array_t *files,
-                        struct allocator *allocator) {
+                        struct cel_allocator *allocator) {
 
     char fullm_path[MAX_PATH_LEN] = {0};
     if (!filesystem_get_fullpath(root, fullm_path, sizeof(fullm_path) / sizeof(char), path)) {
@@ -152,7 +152,7 @@ void filesystem_listdir(stringid64_t root,
 }
 
 void filesystem_listdir_free(string_array_t *files,
-                             struct allocator *allocator) {
+                             struct cel_allocator *allocator) {
     cel_dir_list_free(files, allocator);
 }
 

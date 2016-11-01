@@ -152,13 +152,13 @@ int camera_is_valid(camera_t camera) {
 
 void camera_get_project_view(world_t world,
                              camera_t camera,
-                             mat44f_t *proj,
-                             mat44f_t *view) {
+                             cel_mat44f_t *proj,
+                             cel_mat44f_t *view) {
 
     world_data_t *world_data = _get_world_data(world);
 
 
-    vec2f_t size = renderer_get_size(); // TODO, to arg... or viewport?
+    cel_vec2f_t size = renderer_get_size(); // TODO, to arg... or viewport?
     entity_t e = ARRAY_AT(&world_data->entity, camera.idx);
     transform_t t = transform_get(world, e);
 
@@ -166,10 +166,10 @@ void camera_get_project_view(world_t world,
     f32 near = ARRAY_AT(&world_data->near, camera.idx);
     f32 far = ARRAY_AT(&world_data->far, camera.idx);
 
-    mat44f_set_perspective_fov(proj, fov, size.x / size.y, near, far);
+    cel_mat44f_set_perspective_fov(proj, fov, size.x / size.y, near, far);
 
-    mat44f_t *w = transform_get_world_matrix(world, t);
-    mat44f_inverse(view, w);
+    cel_mat44f_t *w = transform_get_world_matrix(world, t);
+    cel_mat44f_inverse(view, w);
 }
 
 int camera_has(world_t world,

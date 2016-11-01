@@ -79,36 +79,36 @@ const char *luasys_to_string_l(lua_State *,
                                int,
                                size_t *);
 
-vec2f_t *luasys_to_vec2f(lua_State *l,
+cel_vec2f_t *luasys_to_vec2f(lua_State *l,
                          int i);
 
-vec3f_t *luasys_to_vec3f(lua_State *l,
+cel_vec3f_t *luasys_to_vec3f(lua_State *l,
                          int i);
 
-vec4f_t *luasys_to_vec4f(lua_State *l,
+cel_vec4f_t *luasys_to_vec4f(lua_State *l,
                          int i);
 
-mat44f_t *luasys_to_mat44f(lua_State *l,
+cel_mat44f_t *luasys_to_mat44f(lua_State *l,
                            int i);
 
-quatf_t *luasys_to_quat(lua_State *l,
+cel_quatf_t *luasys_to_quat(lua_State *l,
                         int i);
 
 void luasys_push_vec2f(lua_State *l,
-                       vec2f_t v);
+                       cel_vec2f_t v);
 
 void luasys_push_vec3f(lua_State *l,
-                       vec3f_t v);
+                       cel_vec3f_t v);
 
 void luasys_push_vec4f(lua_State *l,
-                       vec4f_t v);
+                       cel_vec4f_t v);
 
 void luasys_push_mat44f(lua_State *l,
-                        mat44f_t v);
+                        cel_mat44f_t v);
 
 
 void luasys_push_quat(lua_State *l,
-                      quatf_t v);
+                      cel_quatf_t v);
 
 int luasys_execute_string(const char *str);
 

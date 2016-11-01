@@ -80,7 +80,7 @@ struct map_##N {                                                               \
     ARRAY_T(map_entry_t_##N) _data;                                            \
 };                                                                             \
                                                                                \
-static void map_init_##N(MAP_T(N) *h, struct allocator *allocator) {           \
+static void map_init_##N(MAP_T(N) *h, struct cel_allocator *allocator) {       \
     ARRAY_INIT(u32, &h->_hash, allocator);                                     \
     ARRAY_INIT(map_entry_t_##N, &h->_data, allocator);                         \
 }                                                                              \

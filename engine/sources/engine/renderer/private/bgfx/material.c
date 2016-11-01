@@ -33,22 +33,22 @@ typedef struct material_blob {
     stringid64_t shader_name;
     u32 uniforms_count;
     u32 texture_count;
-    u32 vec4f_count;
+    u32 cel_vec4f_count;
     u32 mat33f_count;
-    u32 mat44f_count;
+    u32 cel_mat44f_count;
     // material_blob + 1                 | char[32]     uniform_names [uniform_count]
     // uniform_names     + uniform_count | stringid64_t texture_names [texture_count]
-    // texture_names     + texture_count | vec4f        vec4f_value [vec4f_count]
-    // vec4f_value       + vec4f_count   | mat44f       mat33f_value [mat33f_count]
-    // mat33f_count      + mat33f_count  | mat33f       mat44f_value [mat44f_count]
+    // texture_names     + texture_count | vec4f        cel_vec4f_value [cel_vec4f_count]
+    // cel_vec4f_value       + cel_vec4f_count   | mat44f       mat33f_value [mat33f_count]
+    // mat33f_count      + mat33f_count  | mat33f       cel_mat44f_value [cel_mat44f_count]
 } material_blob_t;
 
 #define material_blob_uniform_names(r)   ((char*)                  ((r)+1))
 #define material_blob_uniform_texture(r) ((stringid64_t*)          ((material_blob_uniform_names(r)+(32*((r)->uniforms_count)))))
-#define material_blob_uniform_vec4f(r)   ((vec4f_t*)               ((material_blob_uniform_texture(r)+((r)->texture_count))))
-#define material_blob_uniform_mat33f(r)  ((mat33f_t*)              ((material_blob_uniform_vec4f(r)+((r)->vec4f_count))))
-#define material_blob_uniform_mat44f(r)  ((mat44f_t*)              ((material_blob_uniform_mat33f(r)+((r)->mat33f_count))))
-#define material_blob_uniform_bgfx(r)    ((bgfx_uniform_handle_t*) ((material_blob_uniform_vec4f(r)+((r)->vec4f_count))))
+#define material_blob_uniform_vec4f(r)   ((cel_vec4f_t*)               ((material_blob_uniform_texture(r)+((r)->texture_count))))
+#define material_blob_uniform_mat33f(r)  ((mat33f_t*)              ((material_blob_uniform_vec4f(r)+((r)->cel_vec4f_count))))
+#define material_blob_uniform_mat44f(r)  ((cel_mat44f_t*)              ((material_blob_uniform_mat33f(r)+((r)->mat33f_count))))
+#define material_blob_uniform_bgfx(r)    ((bgfx_uniform_handle_t*) ((material_blob_uniform_vec4f(r)+((r)->cel_vec4f_count))))
 
 
 #define _get_resorce(idx) (_G.material_instance_data.data[_G.material_instance_offset.data[(idx)]])
@@ -82,9 +82,9 @@ struct material_compile_output {
     ARRAY_T(char) uniform_names;
     ARRAY_T(u8) data;
     u32 texture_count;
-    u32 vec4f_count;
+    u32 cel_vec4f_count;
     u32 mat33f_count;
-    u32 mat44f_count;
+    u32 cel_mat44f_count;
 };
 
 static void preprocess(const char *filename,
@@ -144,31 +144,31 @@ void forach_vec4fs_clb(yaml_node_t key,
                        void *_data) {
     struct material_compile_output *output = _data;
 
-    output->vec4f_count += 1;
+    output->cel_vec4f_count += 1;
 
     char uniform_name[32] = {0};
     yaml_as_string(key, uniform_name, CEL_ARRAY_LEN(uniform_name) - 1);
 
-    vec4f_t v = yaml_as_vec4f_t(value);
+    cel_vec4f_t v = yaml_as_cel_vec4f_t(value);
 
     ARRAY_PUSH(char, &output->uniform_names, uniform_name, CEL_ARRAY_LEN(uniform_name));
-    ARRAY_PUSH(u8, &output->data, (u8 *) &v, sizeof(vec4f_t));
+    ARRAY_PUSH(u8, &output->data, (u8 *) &v, sizeof(cel_vec4f_t));
 }
 
-void forach_mat44f_clb(yaml_node_t key,
+void forach_cel_mat44f_clb(yaml_node_t key,
                        yaml_node_t value,
                        void *_data) {
     struct material_compile_output *output = _data;
 
-    output->mat44f_count += 1;
+    output->cel_mat44f_count += 1;
 
     char uniform_name[32] = {0};
     yaml_as_string(key, uniform_name, CEL_ARRAY_LEN(uniform_name) - 1);
 
-    mat44f_t m = yaml_as_mat44f_t(value);
+    cel_mat44f_t m = yaml_as_cel_mat44f_t(value);
 
     ARRAY_PUSH(char, &output->uniform_names, uniform_name, CEL_ARRAY_LEN(uniform_name));
-    ARRAY_PUSH(u8, &output->data, (u8 *) &m, sizeof(mat44f_t));
+    ARRAY_PUSH(u8, &output->data, (u8 *) &m, sizeof(cel_mat44f_t));
 }
 
 void forach_mat33f_clb(yaml_node_t key,
@@ -223,7 +223,7 @@ int _material_resource_compiler(const char *filename,
 
     yaml_node_t mat44 = yaml_get_node(root, "mat44f");
     if (yaml_is_valid(mat44)) {
-        yaml_node_foreach_dict(mat44, forach_mat44f_clb, &output);
+        yaml_node_foreach_dict(mat44, forach_cel_mat44f_clb, &output);
     }
 
     yaml_node_t mat33 = yaml_get_node(root, "mat33f");
@@ -235,7 +235,7 @@ int _material_resource_compiler(const char *filename,
     struct material_blob resource = {
             .shader_name = stringid64_from_string(tmp_buffer),
             .texture_count =output.texture_count,
-            .vec4f_count = output.vec4f_count,
+            .cel_vec4f_count = output.cel_vec4f_count,
             .uniforms_count = ARRAY_SIZE(&output.uniform_names) / 32,
     };
 
@@ -254,7 +254,7 @@ int _material_resource_compiler(const char *filename,
 //==============================================================================
 
 void *material_resource_loader(struct vio *input,
-                               struct allocator *allocator) {
+                               struct cel_allocator *allocator) {
     const i64 size = cel_vio_size(input);
     char *data = CEL_ALLOCATE(allocator, char, size);
     cel_vio_read(input, data, 1, size);
@@ -263,7 +263,7 @@ void *material_resource_loader(struct vio *input,
 }
 
 void material_resource_unloader(void *new_data,
-                                struct allocator *allocator) {
+                                struct cel_allocator *allocator) {
     CEL_DEALLOCATE(allocator, new_data);
 }
 
@@ -280,7 +280,7 @@ void material_resource_offline(stringid64_t name,
 void *material_resource_reloader(stringid64_t name,
                                  void *old_data,
                                  void *new_data,
-                                 struct allocator *allocator) {
+                                 struct cel_allocator *allocator) {
     material_resource_offline(name, old_data);
     material_resource_online(name, new_data);
 
@@ -335,8 +335,8 @@ material_t material_resource_create(stringid64_t name) {
     u32 size = sizeof(struct material_blob) +
                (resource->uniforms_count * sizeof(char) * 32) +
                (resource->texture_count * sizeof(stringid64_t)) +
-               (resource->vec4f_count * sizeof(vec4f_t)) +
-               (resource->mat44f_count * sizeof(mat44f_t)) +
+               (resource->cel_vec4f_count * sizeof(cel_vec4f_t)) +
+               (resource->cel_mat44f_count * sizeof(cel_mat44f_t)) +
                (resource->mat33f_count * sizeof(mat33f_t));
 
     handler_t h = handlerid_handler_create(&_G.material_handler);
@@ -361,7 +361,7 @@ material_t material_resource_create(stringid64_t name) {
     }
 
     tmp_off = off;
-    off += resource->vec4f_count;
+    off += resource->cel_vec4f_count;
     for (int i = tmp_off; i < off; ++i) {
         bgfx_uniforms[i] = bgfx_create_uniform(&u_names[i * 32], BGFX_UNIFORM_TYPE_VEC4, 1);
     }
@@ -373,7 +373,7 @@ material_t material_resource_create(stringid64_t name) {
     }
 
     tmp_off = off;
-    off += resource->mat44f_count;
+    off += resource->cel_mat44f_count;
     for (int i = tmp_off; i < off; ++i) {
         bgfx_uniforms[i] = bgfx_create_uniform(&u_names[i * 32], BGFX_UNIFORM_TYPE_MAT4, 1);
     }
@@ -433,7 +433,7 @@ void material_set_texture(material_t material,
 
 void material_set_vec4f(material_t material,
                         const char *slot,
-                        vec4f_t v) {
+                        cel_vec4f_t v) {
 
     u32 idx = MAP_GET(u32, &_G.material_instace_map, material.idx, UINT32_MAX);
 
@@ -443,7 +443,7 @@ void material_set_vec4f(material_t material,
 
     struct material_blob *resource = (struct material_blob *) &_get_resorce(idx);
 
-    vec4f_t *u_vec4f = material_blob_uniform_vec4f(resource);
+    cel_vec4f_t *u_vec4f = material_blob_uniform_vec4f(resource);
 
     int slot_idx = _material_find_slot(resource, slot);
 
@@ -466,12 +466,12 @@ void material_set_mat33f(material_t material,
 
     int slot_idx = _material_find_slot(resource, slot);
 
-    u_mat33f[slot_idx - (resource->texture_count + resource->vec4f_count)] = v;
+    u_mat33f[slot_idx - (resource->texture_count + resource->cel_vec4f_count)] = v;
 }
 
 void material_set_mat44f(material_t material,
                          const char *slot,
-                         mat44f_t v) {
+                         cel_mat44f_t v) {
     u32 idx = MAP_GET(u32, &_G.material_instace_map, material.idx, UINT32_MAX);
 
     if (idx == UINT32_MAX) {
@@ -480,11 +480,11 @@ void material_set_mat44f(material_t material,
 
     struct material_blob *resource = (struct material_blob *) &_get_resorce(idx);
 
-    mat44f_t *u_mat44f = material_blob_uniform_mat44f(resource);
+    cel_mat44f_t *u_mat44f = material_blob_uniform_mat44f(resource);
 
     int slot_idx = _material_find_slot(resource, slot);
 
-    u_mat44f[slot_idx - (resource->texture_count + resource->vec4f_count + resource->mat33f_count)] = v;
+    u_mat44f[slot_idx - (resource->texture_count + resource->cel_vec4f_count + resource->mat33f_count)] = v;
 }
 
 
@@ -498,9 +498,9 @@ void material_use(material_t material) {
     struct material_blob *resource = (struct material_blob *) &_get_resorce(idx);
 
     stringid64_t *u_texture = material_blob_uniform_texture(resource);
-    vec4f_t *u_vec4f = material_blob_uniform_vec4f(resource);
+    cel_vec4f_t *u_vec4f = material_blob_uniform_vec4f(resource);
     mat33f_t *u_mat33f = material_blob_uniform_mat33f(resource);
-    mat44f_t *u_mat44f = material_blob_uniform_mat44f(resource);
+    cel_mat44f_t *u_mat44f = material_blob_uniform_mat44f(resource);
 
     bgfx_uniform_handle_t *u_handler = material_blob_uniform_bgfx(resource);
 
@@ -514,10 +514,10 @@ void material_use(material_t material) {
     offset += resource->texture_count;
 
 
-    for (int i = 0; i < resource->vec4f_count; ++i) {
+    for (int i = 0; i < resource->cel_vec4f_count; ++i) {
         bgfx_set_uniform(u_handler[offset + i], &u_vec4f[i], 1);
     }
-    offset += resource->vec4f_count;
+    offset += resource->cel_vec4f_count;
 
 
     for (int i = 0; i < resource->mat33f_count; ++i) {
@@ -525,10 +525,10 @@ void material_use(material_t material) {
     }
     offset += resource->mat33f_count;
 
-    for (int i = 0; i < resource->mat44f_count; ++i) {
+    for (int i = 0; i < resource->cel_mat44f_count; ++i) {
         bgfx_set_uniform(u_handler[offset + i], &u_mat44f[i], 1);
     }
-    offset += resource->mat44f_count;
+    offset += resource->cel_mat44f_count;
 
 
     u64 state = (0

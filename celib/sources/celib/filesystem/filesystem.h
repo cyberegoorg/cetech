@@ -41,7 +41,7 @@ static time_t cel_file_mtime(const char *path) {
 static void cel_dir_list(const char *path,
                            int recursive,
                            struct array_pchar *files,
-                           struct allocator *allocator) {
+                           struct cel_allocator *allocator) {
 #if defined(CELIB_LINUX)
     DIR *dir;
     struct dirent *entry;
@@ -93,7 +93,7 @@ static void cel_dir_list(const char *path,
 //! \param files Files array
 //! \param allocator Allocator
 static void cel_dir_list_free(struct array_pchar *files,
-                                struct allocator *allocator) {
+                                struct cel_allocator *allocator) {
 #if defined(CELIB_LINUX)
     for (int i = 0; i < ARRAY_SIZE(files); ++i) {
         CEL_DEALLOCATE(allocator, ARRAY_AT(files, i));

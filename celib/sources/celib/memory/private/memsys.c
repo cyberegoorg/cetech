@@ -6,8 +6,8 @@
 
 #define _G MemorySystemGlobals
 struct G {
-    struct allocator *default_allocator;
-    struct allocator *default_scratch_allocator;
+    struct cel_allocator *default_allocator;
+    struct cel_allocator *default_scratch_allocator;
 } MemorySystemGlobals = {0};
 
 void memsys_init(int scratch_buffer_size) {
@@ -24,10 +24,10 @@ void memsys_shutdown() {
     malloc_allocator_destroy(_G.default_allocator);
 }
 
-struct allocator *memsys_main_allocator() {
+struct cel_allocator *memsys_main_allocator() {
     return _G.default_allocator;
 }
 
-struct allocator *memsys_main_scratch_allocator() {
+struct cel_allocator *memsys_main_scratch_allocator() {
     return _G.default_scratch_allocator;
 }

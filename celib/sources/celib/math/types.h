@@ -20,7 +20,7 @@ typedef struct {
             f32 y;
         };
     };
-} vec2f_t;
+} cel_vec2f_t;
 
 
 typedef struct {
@@ -32,7 +32,7 @@ typedef struct {
             f32 z;
         };
     };
-} vec3f_t;
+} cel_vec3f_t;
 
 typedef struct {
     union {
@@ -44,13 +44,13 @@ typedef struct {
             f32 w;
         };
     };
-} vec4f_t;
+} cel_vec4f_t;
 
 //==============================================================================
 // Quaternion
 //==============================================================================
 
-typedef vec4f_t quatf_t;
+typedef cel_vec4f_t cel_quatf_t;
 
 
 //==============================================================================
@@ -61,9 +61,9 @@ typedef struct {
     union {
         f32 f[3 * 3];
         struct {
-            vec3f_t x;
-            vec3f_t y;
-            vec3f_t z;
+            cel_vec3f_t x;
+            cel_vec3f_t y;
+            cel_vec3f_t z;
         };
     };
 } mat33f_t;
@@ -73,12 +73,12 @@ typedef struct {
     union {
         f32 f[4 * 4];
         struct {
-            vec4f_t x;
-            vec4f_t y;
-            vec4f_t z;
-            vec4f_t w;
+            cel_vec4f_t x;
+            cel_vec4f_t y;
+            cel_vec4f_t z;
+            cel_vec4f_t w;
         };
     };
-} mat44f_t;
+} cel_mat44f_t;
 
 #endif //CELIB_MATH_TYPES_H

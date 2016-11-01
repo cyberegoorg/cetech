@@ -38,7 +38,7 @@ const char *filesystem_get_root_dir(stringid64_t root);
 //! \return File or NULL
 struct vio *filesystem_open(stringid64_t root,
                             const char *path,
-                            enum open_mode mode);
+                            enum cel_vio_open_mode mode);
 
 //! Close file
 //! \param file file
@@ -54,13 +54,13 @@ void filesystem_listdir(stringid64_t root,
                         const char *path,
                         const char *filter,
                         string_array_t *files,
-                        struct allocator *allocator);
+                        struct cel_allocator *allocator);
 
 //! Free list directory array
 //! \param files File array
 //! \param allocator Allocator
 void filesystem_listdir_free(string_array_t *files,
-                             struct allocator *allocator);
+                             struct cel_allocator *allocator);
 
 //! Create directory in root
 //! \param root Root

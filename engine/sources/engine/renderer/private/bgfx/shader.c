@@ -194,7 +194,7 @@ int _shader_resource_compiler(const char *filename,
 //==============================================================================
 
 void *shader_resource_loader(struct vio *input,
-                             struct allocator *allocator) {
+                             struct cel_allocator *allocator) {
     const i64 size = cel_vio_size(input);
     char *data = CEL_ALLOCATE(allocator, char, size);
     cel_vio_read(input, data, 1, size);
@@ -203,7 +203,7 @@ void *shader_resource_loader(struct vio *input,
 }
 
 void shader_resource_unloader(void *new_data,
-                              struct allocator *allocator) {
+                              struct cel_allocator *allocator) {
     CEL_DEALLOCATE(allocator, new_data);
 }
 
@@ -244,7 +244,7 @@ void shader_resource_offline(stringid64_t name,
 void *shader_resource_reloader(stringid64_t name,
                                void *old_data,
                                void *new_data,
-                               struct allocator *allocator) {
+                               struct cel_allocator *allocator) {
     shader_resource_offline(name, old_data);
     shader_resource_online(name, new_data);
 

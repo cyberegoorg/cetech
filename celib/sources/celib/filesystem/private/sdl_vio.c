@@ -4,12 +4,11 @@
 #include "../../errors/errors.h"
 #include "../vio.h"
 
-
 #define LOG_WHERE "vio_sdl"
 
 struct sdl_vio {
     struct vio interface;
-    struct allocator *allocator;
+    struct cel_allocator *allocator;
     SDL_RWops *rw;
 };
 
@@ -69,8 +68,8 @@ int cel_vio_sdl_close(struct vio *file) {
 
 
 struct vio *cel_vio_from_file(const char *path,
-                          enum open_mode mode,
-                          struct allocator *allocator) {
+                          enum cel_vio_open_mode mode,
+                          struct cel_allocator *allocator) {
     struct sdl_vio *vf = CEL_ALLOCATE(allocator, struct sdl_vio, sizeof(struct sdl_vio));
     CEL_ASSERT(LOG_WHERE, vf != NULL);
 

@@ -25,8 +25,8 @@
 static struct G {
     u8 state[MOUSE_BTN_MAX];
     u8 last_state[MOUSE_BTN_MAX];
-    vec2f_t last_pos;
-    vec2f_t last_delta_pos;
+    cel_vec2f_t last_pos;
+    cel_vec2f_t last_delta_pos;
 } _G = {0};
 
 
@@ -153,7 +153,7 @@ u32 mouse_axis_index(const char *axis_name) {
     return 0;
 }
 
-vec2f_t mouse_axis(const u32 axis_index) {
+cel_vec2f_t mouse_axis(const u32 axis_index) {
     CEL_ASSERT(LOG_WHERE, (axis_index >= 0) && (axis_index < MOUSE_AXIS_MAX));
 
     switch (axis_index) {
@@ -164,10 +164,10 @@ vec2f_t mouse_axis(const u32 axis_index) {
             return _G.last_delta_pos;
 
         default:
-            return (vec2f_t) {0};
+            return (cel_vec2f_t) {0};
     }
 }
 
-void mouse_set_cursor_pos(vec2f_t pos) {
+void mouse_set_cursor_pos(cel_vec2f_t pos) {
 
 }

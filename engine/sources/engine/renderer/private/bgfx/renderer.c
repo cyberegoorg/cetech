@@ -83,16 +83,16 @@ void renderer_shutdown() {
     _G = (struct G) {0};
 }
 
-void renderer_create(window_t window) {
+void renderer_create(cel_window_t window) {
     bgfx_platform_data_t pd = {0};
-    pd.nwh = window_native_window_ptr(window);
-    pd.ndt = window_native_display_ptr(window);
+    pd.nwh = cel_window_native_cel_window_ptr(window);
+    pd.ndt = cel_window_native_display_ptr(window);
     bgfx_set_platform_data(&pd);
 
     // TODO: from config
     bgfx_init(BGFX_RENDERER_TYPE_OPENGL, 0, 0, NULL, NULL);
 
-    window_get_size(window, &_G.size_width, &_G.size_height);
+    cel_window_get_size(window, &_G.size_width, &_G.size_height);
 
     _G.need_reset = 1;
 }
@@ -114,8 +114,8 @@ void renderer_render_world(world_t world,
 
     bgfx_set_view_clear(0, BGFX_CLEAR_COLOR | BGFX_CLEAR_DEPTH, 0x66CCFFff, 1.0f, 0);
 
-    mat44f_t view_matrix;
-    mat44f_t proj_matrix;
+    cel_mat44f_t view_matrix;
+    cel_mat44f_t proj_matrix;
 
     camera_get_project_view(world, camera, &proj_matrix, &view_matrix);
     bgfx_set_view_transform(0, view_matrix.f, proj_matrix.f);
@@ -128,11 +128,11 @@ void renderer_render_world(world_t world,
     mesh_render_all(world);
 
     bgfx_frame(0);
-    window_update(application_get_main_window());
+    cel_window_update(application_get_main_window());
 }
 
-vec2f_t renderer_get_size() {
-    vec2f_t result;
+cel_vec2f_t renderer_get_size() {
+    cel_vec2f_t result;
 
     result.x = _G.size_width;
     result.y = _G.size_height;

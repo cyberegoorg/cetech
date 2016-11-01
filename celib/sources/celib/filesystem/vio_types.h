@@ -9,7 +9,7 @@
 //==============================================================================
 
 
-enum open_mode {
+enum cel_vio_open_mode {
     VIO_OPEN_READ,
     VIO_OPEN_WRITE,
 };
@@ -19,7 +19,6 @@ enum cel_vio_seek {
     VIO_SEEK_CUR,
     VIO_SEEK_END
 };
-
 
 //==============================================================================
 // Structs
