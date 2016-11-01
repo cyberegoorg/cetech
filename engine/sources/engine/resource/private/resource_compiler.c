@@ -10,13 +10,13 @@
 #include <celib/string/string.h>
 #include <celib/filesystem/path.h>
 #include <celib/string/stringid.h>
-#include <celib/thread/task.h>
+#include <engine/task/task.h>
 #include <engine/resource/resource.h>
 #include <engine/application/application.h>
 #include <celib/memory/memsys.h>
 
 #include "celib/filesystem/vio.h"
-#include "celib/config/cvar.h"
+#include "engine/config/cvar.h"
 
 #include "builddb.h"
 

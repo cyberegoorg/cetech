@@ -1,5 +1,5 @@
-#ifndef CELIB_CONFIG_TYPES_H
-#define CELIB_CONFIG_TYPES_H
+#ifndef CETECH_CONFIG_TYPES_H
+#define CETECH_CONFIG_TYPES_H
 
 typedef struct {
     u64 idx;
@@ -12,4 +12,4 @@ enum cvar_type {
     CV_STRING
 };
 
-#endif //CELIB_CONFIG_TYPES_H
+#endif //CETECH_CONFIG_TYPES_H

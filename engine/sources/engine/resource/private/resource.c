@@ -6,7 +6,7 @@
 
 #include <engine/resource/resource.h>
 #include <engine/resource/filesystem.h>
-#include <celib/config/cvar.h>
+#include <engine/config/cvar.h>
 #include <celib/filesystem/path.h>
 #include <engine/application/application.h>
 #include <celib/filesystem/vio.h>

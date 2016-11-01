@@ -3,7 +3,7 @@
 //==============================================================================
 
 #include <celib/string/stringid.h>
-#include <celib/thread/task.h>
+#include <engine/task/task.h>
 #include <engine/resource/resource.h>
 #include <celib/filesystem/vio.h>
 #include <celib/yaml/yaml.h>

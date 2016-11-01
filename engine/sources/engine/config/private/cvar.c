@@ -3,7 +3,7 @@
 //==============================================================================
 
 #include <celib/memory/memory.h>
-#include <celib/config/cvar.h>
+#include <engine/config/cvar.h>
 #include <engine/resource/resource.h>
 #include <celib/filesystem/vio.h>
 #include <engine/application/application.h>

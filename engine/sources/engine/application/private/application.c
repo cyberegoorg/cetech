@@ -11,7 +11,7 @@
 #include <celib/os/cmd_line.h>
 
 #include <engine/application/application.h>
-#include <celib/config/cvar.h>
+#include <engine/config/cvar.h>
 #include <celib/machine/machine.h>
 #include <engine/resource/resource.h>
 #include <engine/luasys/luasys.h>
@@ -23,7 +23,7 @@
 
 #include "engine/input/input.h"
 #include "engine/develop/console_server.h"
-#include "celib/thread/task.h"
+#include "engine/task/task.h"
 
 #define LOG_WHERE "application"
 

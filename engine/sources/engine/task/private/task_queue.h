@@ -1,5 +1,5 @@
-#ifndef CELIB_QUEUE_MPMC_H
-#define CELIB_QUEUE_MPMC_H
+#ifndef CETECH_QUEUE_MPMC_H
+#define CETECH_QUEUE_MPMC_H
 
 //==============================================================================
 // Includes
@@ -123,4 +123,4 @@ int queue_task_pop(struct task_queue *q,
     return 1;
 }
 
-#endif //CELIB_QUEUE_MPMC_H
+#endif //CETECH_QUEUE_MPMC_H

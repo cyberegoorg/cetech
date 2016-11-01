@@ -107,7 +107,7 @@ set(SOURCE_FILES
         celib/sources/celib/yaml/private/yaml.cc
 
         celib/sources/celib/log/private/log_system.c
-        celib/sources/celib/config/private/cvar.c
+        engine/sources/engine/config/private/cvar.c
 
         ########################################################################
         # CETECH: Plugin system
@@ -141,7 +141,8 @@ set(SOURCE_FILES
 
         engine/sources/engine/resource/private/filesystem.c
         engine/sources/engine/application/private/application.c
-        celib/sources/celib/thread/private/task.c
+        engine/sources/engine/task/private/task.c
+
         engine/sources/engine/resource/private/resource.c
         engine/sources/engine/resource/private/resource_package.c
         engine/sources/engine/resource/private/resource_compiler.c

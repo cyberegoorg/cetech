@@ -15,8 +15,8 @@
 #include "celib/containers/eventstream.h"
 #include <celib/memory/memsys.h>
 
-#include "celib/config/cvar.h"
-#include "celib/thread/task.h"
+#include "engine/config/cvar.h"
+#include "engine/task/task.h"
 #include "engine/develop/develop_system.h"
 
 //==============================================================================
