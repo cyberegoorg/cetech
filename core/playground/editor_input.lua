@@ -4,7 +4,6 @@ function EditorInput:Init()
     self.mouse = {
         dx = 0,
         dy = 0,
-
         left = false,
         right = false,
         midle = false

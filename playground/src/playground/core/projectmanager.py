@@ -1,5 +1,4 @@
 import os
-import platform
 
 from PyQt5.QtCore import QDir
 from PyQt5.QtWidgets import QFileDialog, QMessageBox

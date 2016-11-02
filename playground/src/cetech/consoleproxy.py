@@ -1,5 +1,4 @@
 import msgpack
-import nanomsg
 from nanomsg import Socket, REQ, NanoMsgAPIError
 
 

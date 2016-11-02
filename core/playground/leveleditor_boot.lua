@@ -62,13 +62,13 @@ function init()
 end
 
 function update(dt)
-  Editor:update(dt)
+    Editor:update(dt)
 end
 
 function shutdown()
-  Editor:shutdown()
+    Editor:shutdown()
 end
 
 function render()
-  Editor:render()
+    Editor:render()
 end

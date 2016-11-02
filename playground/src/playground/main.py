@@ -1,9 +1,9 @@
 import sys
 
 from PyQt5.QtWidgets import QApplication
-from playground.core.projectmanagerdialog import ProjectManagerDialog
 
 from playground.core.mainwindow import MainWindow
+from playground.core.projectmanagerdialog import ProjectManagerDialog
 
 
 def main():

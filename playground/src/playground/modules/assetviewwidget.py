@@ -1,8 +1,5 @@
-import platform
-
 from PyQt5.QtCore import Qt
 
-from cetech.consoleapi import ConsoleAPI
 from playground.core.modules import PlaygroundModule
 from playground.core.widget import CETechWiget
 

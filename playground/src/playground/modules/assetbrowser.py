@@ -1,12 +1,11 @@
 import os
 
-from PyQt5.QtCore import QDir, pyqtSignal
+from PyQt5.QtCore import QDir
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QMainWindow, QFileSystemModel
 
 from playground.core.modules import PlaygroundModule
 from playground.ui.assetbrowser import Ui_MainWindow
-
 
 class AssetBrowser(QMainWindow, Ui_MainWindow, PlaygroundModule):
     Name = "asset_browser"

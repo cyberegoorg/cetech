@@ -5,13 +5,13 @@ function init()
 end
 
 function update(dt)
-  Game:update(dt)
+    Game:update(dt)
 end
 
 function shutdown()
-  Game:shutdown()
+    Game:shutdown()
 end
 
 function render()
-  Game:render()
+    Game:render()
 end

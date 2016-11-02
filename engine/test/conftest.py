@@ -1,10 +1,9 @@
+import PyQt5
 import ctypes
 import os
 import platform
-import sys
-
-import PyQt5
 import pytest
+import sys
 from PyQt5.QtWidgets import QApplication
 
 ############
@@ -34,6 +33,7 @@ sys.path.insert(0, os.path.join(ROOT_DIR, "playground", "src"))
 instance_counter = 0
 
 from cetech.engine import EngineInstance
+
 
 @pytest.fixture(scope='function')
 def _build_dir(tmpdir_factory):

@@ -78,7 +78,8 @@ class EngineInstance(object):
         return self._run(self.BUILD_RELEASE, args, lock=False)
 
     def run_develop(self, build_dir, source_dir, compile_=False, continue_=False, wait=False, daemon=False,
-                    wid=None, core_dir=None, port=None, bootscript=None, bootpkg=None, protocol='ws', check=False, lock=True):
+                    wid=None, core_dir=None, port=None, bootscript=None, bootpkg=None, protocol='ws', check=False,
+                    lock=True):
         args = [
             "-build %s" % build_dir,
             "-src %s" % source_dir
