@@ -150,7 +150,8 @@ void _compile_dir(ARRAY_T(task_item) *tasks,
 
         builddb_set_file_hash(source_filename_short, build_name);
 
-        struct vio *source_vio = cel_vio_from_file(source_filename_full, VIO_OPEN_READ, memsys_main_scratch_allocator());
+        struct vio *source_vio = cel_vio_from_file(source_filename_full, VIO_OPEN_READ,
+                                                   memsys_main_scratch_allocator());
         if (source_vio == NULL) {
             cel_vio_close(source_vio);
             continue;

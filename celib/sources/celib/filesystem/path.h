@@ -25,8 +25,8 @@ static const char *cel_path_filename(const char *path) {
 //! \param out Out basename
 //! \param size
 static void cel_path_basename(const char *path,
-                                char *out,
-                                size_t size) {
+                              char *out,
+                              size_t size) {
     const char *filename = cel_path_filename(path);
     const char *ch = strrchr(filename, '.');
 
@@ -40,8 +40,8 @@ static void cel_path_basename(const char *path,
 }
 
 static void cel_path_dir(char *out,
-                           size_t size,
-                           const char *path) {
+                         size_t size,
+                         const char *path) {
 #if defined(CELIB_LINUX)
     char *ch = strrchr(path, DIR_DELIM_CH);
 
@@ -74,9 +74,9 @@ static const char *cel_path_extension(const char *path) {
 //! \param path Path
 //! \return Result path len
 static i64 cel_path_join(char *result,
-                           u64 maxlen,
-                           const char *base_path,
-                           const char *path) {
+                         u64 maxlen,
+                         const char *base_path,
+                         const char *path) {
     return snprintf(result, maxlen, "%s" DIR_DELIM_STR "%s", base_path, path);
 }
 

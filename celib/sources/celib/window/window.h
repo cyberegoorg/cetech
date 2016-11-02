@@ -52,11 +52,11 @@ static uint32_t _sdl_flags(enum cel_window_flags flags) {
 //==============================================================================
 
 static cel_window_t cel_window_new(const char *title,
-                           enum cel_window_pos x,
-                           enum cel_window_pos y,
-                           const i32 width,
-                           const i32 height,
-                           enum cel_window_flags flags) {
+                                   enum cel_window_pos x,
+                                   enum cel_window_pos y,
+                                   const i32 width,
+                                   const i32 height,
+                                   enum cel_window_flags flags) {
 #if defined(CELIB_USE_SDL)
     SDL_Window *w = SDL_CreateWindow(
             title,
@@ -94,7 +94,7 @@ static void cel_window_destroy(cel_window_t w) {
 }
 
 static void cel_window_set_title(cel_window_t w,
-                             const char *title) {
+                                 const char *title) {
 #if defined(CELIB_USE_SDL)
 
     SDL_SetWindowTitle(w.w, title);
@@ -116,8 +116,8 @@ static void cel_window_update(cel_window_t w) {
 }
 
 static void cel_window_resize(cel_window_t w,
-                          uint32_t width,
-                          uint32_t height) {
+                              uint32_t width,
+                              uint32_t height) {
 #if defined(CELIB_USE_SDL)
 
     SDL_SetWindowSize(w.w, width, height);
@@ -125,8 +125,8 @@ static void cel_window_resize(cel_window_t w,
 }
 
 static void cel_window_get_size(cel_window_t window,
-                            uint32_t *width,
-                            uint32_t *height) {
+                                uint32_t *width,
+                                uint32_t *height) {
 #if defined(CELIB_USE_SDL)
 
     int w, h;

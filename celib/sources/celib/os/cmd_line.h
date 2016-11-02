@@ -9,8 +9,8 @@ struct args {
 };
 
 static inline int _cel_cmd_line_is_short(struct args args,
-                                        int i,
-                                        char shortopt) {
+                                         int i,
+                                         char shortopt) {
     return (shortopt != '\0' &&
             cel_strlen(args.argv[i]) > 1 &&
             args.argv[i][0] == '-' &&
@@ -18,8 +18,8 @@ static inline int _cel_cmd_line_is_short(struct args args,
 }
 
 static inline int _cel_cmd_line_is_long(struct args args,
-                                       const int i,
-                                       const char *longopt) {
+                                        const int i,
+                                        const char *longopt) {
     return (cel_strlen(args.argv[i]) > 2 &&
             args.argv[i][0] == '-' &&
             args.argv[i][1] == '-' &&
@@ -27,8 +27,8 @@ static inline int _cel_cmd_line_is_long(struct args args,
 }
 
 static int cel_cmd_find_argument(struct args args,
-                                const char *longopt,
-                                char shortopt) {
+                                 const char *longopt,
+                                 char shortopt) {
 
     for (int i = 0; i < args.argc; i++) {
         if (_cel_cmd_line_is_short(args, i, shortopt) || _cel_cmd_line_is_long(args, i, longopt)) {
@@ -40,9 +40,9 @@ static int cel_cmd_find_argument(struct args args,
 }
 
 static const char *cel_cmd_get_parameter(struct args args,
-                                        const char *longopt,
-                                        char shortopt,
-                                        int param) {
+                                         const char *longopt,
+                                         char shortopt,
+                                         int param) {
 
     int idx = cel_cmd_find_argument(args, longopt, shortopt);
 
@@ -54,8 +54,8 @@ static const char *cel_cmd_get_parameter(struct args args,
 }
 
 static int cel_cmd_has_argument(struct args args,
-                               const char *longopt,
-                               char shortopt) {
+                                const char *longopt,
+                                char shortopt) {
     return cel_cmd_find_argument(args, longopt, shortopt) < args.argc;
 }
 

@@ -165,7 +165,7 @@ u32 gamepad_axis_index(const char *axis_name) {
 }
 
 cel_vec2f_t gamepad_axis(gamepad_t gamepad,
-                     const u32 axis_index) {
+                         const u32 axis_index) {
     CEL_ASSERT(LOG_WHERE, (axis_index >= 0) && (axis_index < GAMEPAD_AXIX_MAX));
 
     return _G.position[gamepad.idx][axis_index];

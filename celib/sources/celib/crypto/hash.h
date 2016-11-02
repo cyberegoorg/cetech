@@ -17,8 +17,8 @@
 //! \param seed Seed
 //! \return Hashed value
 static u64 cel_hash_murmur2_64(const void *key,
-                                 u64 len,
-                                 uint64_t seed) {
+                               u64 len,
+                               uint64_t seed) {
 
     static const u64 m = 0xc6a4a7935bd1e995ULL;
     static const u32 r = 47;

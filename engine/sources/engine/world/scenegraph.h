@@ -22,18 +22,18 @@ void scenegraph_transform(world_t world,
                           cel_mat44f_t *parent);
 
 cel_vec3f_t scenegraph_get_position(world_t world,
-                                scene_node_t transform);
+                                    scene_node_t transform);
 
 cel_quatf_t scenegraph_get_rotation(world_t world,
-                                scene_node_t transform);
+                                    scene_node_t transform);
 
 
 cel_vec3f_t scenegraph_get_scale(world_t world,
-                             scene_node_t transform);
+                                 scene_node_t transform);
 
 
 cel_mat44f_t *scenegraph_get_world_matrix(world_t world,
-                                      scene_node_t transform);
+                                          scene_node_t transform);
 
 
 void scenegraph_set_position(world_t world,

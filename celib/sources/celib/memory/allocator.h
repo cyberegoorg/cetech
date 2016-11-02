@@ -67,7 +67,7 @@ void malloc_allocator_destroy(struct cel_allocator *a);
 //==============================================================================
 
 struct cel_allocator *scratch_allocator_create(struct cel_allocator *backing,
-                                           int size);
+                                               int size);
 
 void scratch_allocator_destroy(struct cel_allocator *a);
 

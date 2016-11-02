@@ -105,7 +105,7 @@ uint32_t scratch_allocator_total_allocated(struct cel_allocator *allocator) {
 }
 
 struct cel_allocator *scratch_allocator_create(struct cel_allocator *backing,
-                                           int size) {
+                                               int size) {
     struct cel_allocator_scratch *m = cel_malloc(sizeof(struct cel_allocator_scratch));
 
     m->base = (struct cel_allocator) {

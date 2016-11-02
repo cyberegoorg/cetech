@@ -21,7 +21,7 @@
 //==============================================================================
 
 CEL_FORCE_INLINE void cel_vec4f_move(cel_vec4f_t *__restrict result,
-                                const cel_vec4f_t *__restrict a) {
+                                     const cel_vec4f_t *__restrict a) {
     result->f[0] = a->f[0];
     result->f[1] = a->f[1];
     result->f[2] = a->f[2];
@@ -29,15 +29,15 @@ CEL_FORCE_INLINE void cel_vec4f_move(cel_vec4f_t *__restrict result,
 }
 
 CEL_FORCE_INLINE int cel_vec4f_eq(const cel_vec4f_t *__restrict a,
-                             const cel_vec4f_t *__restrict b,
-                             const f32 epsilon) {
+                                  const cel_vec4f_t *__restrict b,
+                                  const f32 epsilon) {
     return cel_f32_equals(a->f, b->f, 4, epsilon);
 }
 
 
 CEL_FORCE_INLINE void cel_vec4f_add(cel_vec4f_t *__restrict result,
-                               const cel_vec4f_t *__restrict a,
-                               const cel_vec4f_t *__restrict b) {
+                                    const cel_vec4f_t *__restrict a,
+                                    const cel_vec4f_t *__restrict b) {
     result->f[0] = a->f[0] + b->f[0];
     result->f[1] = a->f[1] + b->f[1];
     result->f[2] = a->f[2] + b->f[2];
@@ -45,8 +45,8 @@ CEL_FORCE_INLINE void cel_vec4f_add(cel_vec4f_t *__restrict result,
 }
 
 CEL_FORCE_INLINE void cel_vec4f_sub(cel_vec4f_t *__restrict result,
-                               const cel_vec4f_t *__restrict a,
-                               const cel_vec4f_t *__restrict b) {
+                                    const cel_vec4f_t *__restrict a,
+                                    const cel_vec4f_t *__restrict b) {
     result->f[0] = a->f[0] - b->f[0];
     result->f[1] = a->f[1] - b->f[1];
     result->f[2] = a->f[2] - b->f[2];
@@ -54,8 +54,8 @@ CEL_FORCE_INLINE void cel_vec4f_sub(cel_vec4f_t *__restrict result,
 }
 
 CEL_FORCE_INLINE void cel_vec4f_mul(cel_vec4f_t *__restrict result,
-                               const cel_vec4f_t *__restrict a,
-                               const f32 s) {
+                                    const cel_vec4f_t *__restrict a,
+                                    const f32 s) {
     result->f[0] = a->f[0] * s;
     result->f[1] = a->f[1] * s;
     result->f[2] = a->f[2] * s;
@@ -63,8 +63,8 @@ CEL_FORCE_INLINE void cel_vec4f_mul(cel_vec4f_t *__restrict result,
 }
 
 CEL_FORCE_INLINE void cel_vec4f_mul_mat44f(cel_vec4f_t *__restrict result,
-                                      const cel_vec4f_t *__restrict v,
-                                      const cel_mat44f_t *__restrict m) {
+                                           const cel_vec4f_t *__restrict v,
+                                           const cel_mat44f_t *__restrict m) {
 
     result->f[0] = v->f[0] * m->f[0] + v->f[1] * m->f[4] + v->f[2] * m->f[8] + v->f[3] * m->f[12];
     result->f[1] = v->f[0] * m->f[1] + v->f[1] * m->f[5] + v->f[2] * m->f[9] + v->f[3] * m->f[13];
@@ -73,8 +73,8 @@ CEL_FORCE_INLINE void cel_vec4f_mul_mat44f(cel_vec4f_t *__restrict result,
 }
 
 CEL_FORCE_INLINE void cel_vec4f_div(cel_vec4f_t *__restrict result,
-                               const cel_vec4f_t *__restrict a,
-                               const f32 s) {
+                                    const cel_vec4f_t *__restrict a,
+                                    const f32 s) {
 
     result->f[0] = a->f[0] / s;
     result->f[1] = a->f[1] / s;
@@ -83,7 +83,7 @@ CEL_FORCE_INLINE void cel_vec4f_div(cel_vec4f_t *__restrict result,
 }
 
 CEL_FORCE_INLINE f32 cel_vec4f_dot(const cel_vec4f_t *__restrict a,
-                              const cel_vec4f_t *__restrict b) {
+                                   const cel_vec4f_t *__restrict b) {
     return (a->f[0] * b->f[0]) + (a->f[1] * b->f[1]) + (a->f[2] * b->f[2]) + (a->f[3] * b->f[3]);
 }
 
@@ -96,16 +96,16 @@ CEL_FORCE_INLINE f32 cel_vec4f_length(const cel_vec4f_t *__restrict a) {
 }
 
 CEL_FORCE_INLINE void cel_vec4f_normalized(cel_vec4f_t *__restrict result,
-                                      const cel_vec4f_t *__restrict a) {
+                                           const cel_vec4f_t *__restrict a) {
     const f32 inv_length = 1.0f / cel_vec4f_length(a);
 
     cel_vec4f_mul(result, a, inv_length);
 }
 
 CEL_FORCE_INLINE void cel_vec4f_lerp(cel_vec4f_t *__restrict result,
-                                const cel_vec4f_t *__restrict a,
-                                const cel_vec4f_t *__restrict b,
-                                f32 t) {
+                                     const cel_vec4f_t *__restrict a,
+                                     const cel_vec4f_t *__restrict b,
+                                     f32 t) {
 
     result->f[0] = cel_f32_lerp(a->f[0], b->f[0], t);
     result->f[1] = cel_f32_lerp(a->f[1], b->f[1], t);

@@ -24,8 +24,8 @@
 //! \param data Thread data
 //! \return new thread
 static thread_t cel_thread_create(thread_fce_t fce,
-                                 const char *name,
-                                 void *data) {
+                                  const char *name,
+                                  void *data) {
 #if defined(CELIB_USE_SDL)
     return (thread_t) {
             .t = (void *) SDL_CreateThread(fce, name, data)
@@ -45,7 +45,7 @@ static void cel_thread_kill(thread_t thread) {
 //! \param thread Thread
 //! \param status Thread exit status
 static void cel_thread_wait(thread_t thread,
-                           int *status) {
+                            int *status) {
 #if defined(CELIB_USE_SDL)
     SDL_WaitThread(thread.t, status);
 #endif

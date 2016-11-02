@@ -164,7 +164,7 @@ const char *gamepad_axis_name(const u32 axis_index);
 //! \param axis_index Axis index
 //! \return Axis value
 cel_vec2f_t gamepad_axis(gamepad_t gamepad,
-                     const u32 axis_index);
+                         const u32 axis_index);
 
 //! Play rumble
 //! \param gamepad Gamepad

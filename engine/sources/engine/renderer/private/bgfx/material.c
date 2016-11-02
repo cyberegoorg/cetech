@@ -156,8 +156,8 @@ void forach_vec4fs_clb(yaml_node_t key,
 }
 
 void forach_cel_mat44f_clb(yaml_node_t key,
-                       yaml_node_t value,
-                       void *_data) {
+                           yaml_node_t value,
+                           void *_data) {
     struct material_compile_output *output = _data;
 
     output->cel_mat44f_count += 1;

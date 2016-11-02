@@ -143,9 +143,9 @@ int resource_init(int stage) {
 
     char build_dir_full[4096] = {0};
     cel_path_join(build_dir_full,
-                    CEL_ARRAY_LEN(build_dir_full),
-                    cvar_get_string(_G.cv_build_dir),
-                    application_platform());
+                  CEL_ARRAY_LEN(build_dir_full),
+                  cvar_get_string(_G.cv_build_dir),
+                  application_platform());
 
     filesystem_map_root_dir(stringid64_from_string("build"), build_dir_full);
 

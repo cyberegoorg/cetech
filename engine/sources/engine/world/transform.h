@@ -16,18 +16,18 @@ void transform_transform(world_t world,
                          cel_mat44f_t *parent);
 
 cel_vec3f_t transform_get_position(world_t world,
-                               transform_t transform);
+                                   transform_t transform);
 
 cel_quatf_t transform_get_rotation(world_t world,
-                               transform_t transform);
+                                   transform_t transform);
 
 
 cel_vec3f_t transform_get_scale(world_t world,
-                            transform_t transform);
+                                transform_t transform);
 
 
 cel_mat44f_t *transform_get_world_matrix(world_t world,
-                                     transform_t transform);
+                                         transform_t transform);
 
 
 void transform_set_position(world_t world,

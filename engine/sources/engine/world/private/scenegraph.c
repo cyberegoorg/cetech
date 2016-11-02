@@ -145,28 +145,28 @@ void scene_node_transform(world_t world,
 }
 
 cel_vec3f_t scenegraph_get_position(world_t world,
-                                scene_node_t transform) {
+                                    scene_node_t transform) {
 
     world_data_t *world_data = _get_world_data(world);
     return ARRAY_AT(&world_data->position, transform.idx);
 }
 
 cel_quatf_t scenegraph_get_rotation(world_t world,
-                                scene_node_t transform) {
+                                    scene_node_t transform) {
 
     world_data_t *world_data = _get_world_data(world);
     return ARRAY_AT(&world_data->rotation, transform.idx);
 }
 
 cel_vec3f_t scenegraph_get_scale(world_t world,
-                             scene_node_t transform) {
+                                 scene_node_t transform) {
 
     world_data_t *world_data = _get_world_data(world);
     return ARRAY_AT(&world_data->scale, transform.idx);
 }
 
 cel_mat44f_t *scenegraph_get_world_matrix(world_t world,
-                                      scene_node_t transform) {
+                                          scene_node_t transform) {
     static cel_mat44f_t _n = MAT44F_INIT_IDENTITY;
     world_data_t *world_data = _get_world_data(world);
     return &ARRAY_AT(&world_data->world_matrix, transform.idx);

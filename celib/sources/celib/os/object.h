@@ -33,7 +33,7 @@ static void cel_unload_object(void *so) {
 }
 
 static void *cel_load_function(void *so,
-                              void *name) {
+                               void *name) {
 #if defined(CELIB_USE_SDL)
 
     void *fce = SDL_LoadFunction(so, "get_plugin_api");

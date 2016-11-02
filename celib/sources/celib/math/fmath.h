@@ -45,24 +45,24 @@ CEL_FORCE_INLINE float cel_f32_round(float f) {
 }
 
 CEL_FORCE_INLINE float cel_f32_min(float a,
-                              float b) {
+                                   float b) {
     return a < b ? a : b;
 }
 
 CEL_FORCE_INLINE float cel_f32_min3(float a,
-                               float b,
-                               float c) {
+                                    float b,
+                                    float c) {
     return cel_f32_min(a, cel_f32_min(b, c));
 }
 
 CEL_FORCE_INLINE float cel_f32_max(float a,
-                              float b) {
+                                   float b) {
     return a > b ? a : b;
 }
 
 CEL_FORCE_INLINE float cel_f32_max3(float a,
-                               float b,
-                               float c) {
+                                    float b,
+                                    float c) {
     return cel_f32_max(a, cel_f32_max(b, c));
 }
 
@@ -71,8 +71,8 @@ CEL_FORCE_INLINE float cel_f32_abs(float a) {
 }
 
 CEL_FORCE_INLINE float cel_f32_clamp(float a,
-                                float min,
-                                float max) {
+                                     float min,
+                                     float max) {
     return cel_f32_min(cel_f32_max(a, min), max);
 }
 
@@ -81,8 +81,8 @@ CEL_FORCE_INLINE float cel_f32_saturate(float a) {
 }
 
 CEL_FORCE_INLINE float cel_f32_lerp(float a,
-                               float b,
-                               float t) {
+                                    float b,
+                                    float t) {
     return a + (b - a) * t;
 }
 
@@ -91,19 +91,19 @@ CEL_FORCE_INLINE float cel_f32_sign(float a) {
 }
 
 CEL_FORCE_INLINE float cel_f32_step(float edge,
-                               float a) {
+                                    float a) {
     return a < edge ? 0.0f : 1.0f;
 }
 
 CEL_FORCE_INLINE float cel_f32_pulse(float a,
-                                float start,
-                                float end) {
+                                     float start,
+                                     float end) {
     return cel_f32_step(a, start) - cel_f32_step(a, end);
 }
 
 CEL_FORCE_INLINE int cel_f32_equal(float a,
-                              float b,
-                              float epsilon) {
+                                   float b,
+                                   float epsilon) {
     // http://realtimecollisiondetection.net/blog/?p=89
     const float lhs = cel_f32_abs(a - b);
     const float rhs = epsilon * cel_f32_max3(1.0f, cel_f32_abs(a), cel_f32_abs(b));
@@ -111,9 +111,9 @@ CEL_FORCE_INLINE int cel_f32_equal(float a,
 }
 
 CEL_FORCE_INLINE int cel_f32_equals(const float *__restrict _a,
-                               const float *__restrict _b,
-                               int _num,
-                               float _epsilon) {
+                                    const float *__restrict _b,
+                                    int _num,
+                                    float _epsilon) {
 
     int equal = cel_f32_equal(_a[0], _b[0], _epsilon);
 
@@ -124,14 +124,14 @@ CEL_FORCE_INLINE int cel_f32_equals(const float *__restrict _a,
 }
 
 CEL_FORCE_INLINE float cel_f32_bias(float time,
-                               float bias) {
+                                    float bias) {
     /// http://blog_demofox.org/2012/09/24/bias-and-gain-are-your-friend/
     return time / ((1.0f / bias - 2.0f) * (1.0f - time) + 1.0f);
 }
 
 
 CEL_FORCE_INLINE float cel_f32_gain(float time,
-                               float gain) {
+                                    float gain) {
     /// http://blog_demofox.org/2012/09/24/bias-and-gain-are-your-friend/
     if (time < 0.5f)
         return cel_f32_bias(time * 2.0f, gain) / 2.0f;
@@ -194,7 +194,7 @@ CEL_FORCE_INLINE float cel_f32_sq(float f) {
 }
 
 CEL_FORCE_INLINE float cel_f32_atan2(float y,
-                                float x) {
+                                     float x) {
     return atan2f(y, x);
 }
 

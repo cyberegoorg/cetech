@@ -217,28 +217,28 @@ void transform_transform(world_t world,
 }
 
 cel_vec3f_t transform_get_position(world_t world,
-                               transform_t transform) {
+                                   transform_t transform) {
 
     world_data_t *world_data = _get_world_data(world);
     return ARRAY_AT(&world_data->position, transform.idx);
 }
 
 cel_quatf_t transform_get_rotation(world_t world,
-                               transform_t transform) {
+                                   transform_t transform) {
 
     world_data_t *world_data = _get_world_data(world);
     return ARRAY_AT(&world_data->rotation, transform.idx);
 }
 
 cel_vec3f_t transform_get_scale(world_t world,
-                            transform_t transform) {
+                                transform_t transform) {
 
     world_data_t *world_data = _get_world_data(world);
     return ARRAY_AT(&world_data->scale, transform.idx);
 }
 
 cel_mat44f_t *transform_get_world_matrix(world_t world,
-                                     transform_t transform) {
+                                         transform_t transform) {
 
     world_data_t *world_data = _get_world_data(world);
     return &ARRAY_AT(&world_data->world_matrix, transform.idx);
