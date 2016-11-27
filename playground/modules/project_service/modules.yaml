@@ -1,0 +1,12 @@
+name: project_service
+description: |
+  Service for project
+
+extensions:
+  service:
+    - name: project_service
+      api:
+        - get_project_dir
+
+      script_file: service.py
+      script_class: ProjectService

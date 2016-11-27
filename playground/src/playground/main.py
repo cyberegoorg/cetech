@@ -2,8 +2,8 @@ import sys
 
 from PyQt5.QtWidgets import QApplication
 
-from playground.core.mainwindow import MainWindow
-from playground.core.projectmanagerdialog import ProjectManagerDialog
+from playground.backend import server
+from playground.frontend.private.projectmanagerdialog import ProjectManagerDialog
 
 
 def main():
@@ -17,18 +17,6 @@ def main():
     if ret == pm.Accepted:
         name, directory = pm.open_project_name, pm.open_project_dir
 
-        mw = MainWindow()
+        server.run(name, directory)
 
-        mw.show()
-        mw.focusWidget()
-        mw.open_project(name, directory)
-
-        try:
-            ret = app.exec_()
-        finally:
-            mw.project.killall()
-
-        sys.exit(ret)
-
-    else:
-        sys.exit(0)
+    sys.exit(0)

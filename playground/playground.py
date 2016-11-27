@@ -8,6 +8,10 @@ import os
 import platform
 import sys
 
+import logging.config
+
+import yaml
+
 _platform = platform.system().lower()
 if _platform == 'windows':
     sys.path.insert(0, 'C:\Python34\lib\site-packages')
@@ -68,6 +72,10 @@ if __name__ == '__main__':
         recurse=True,
         map=compile_map
     )
+
+    with open(os.path.join(PLAYGROUND_DIR, 'logging.yaml')) as f:
+        D = yaml.load(f)
+        logging.config.dictConfig(D)
 
     from playground.main import main
 

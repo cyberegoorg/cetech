@@ -262,8 +262,7 @@ void application_start() {
     float lag = 0.0f;
     float frame_limit = 60.0f;
     float frame_time = (1.0f / frame_limit);
-
-    float time_accum = 0.0f;
+    float frame_time_accum = 0.0f;
 
     consolesrv_push_begin();
     while (_G.is_running) {
@@ -274,7 +273,7 @@ void application_start() {
 
         _G.dt = dt;
         last_tick = now_ticks;
-        time_accum += dt;
+        frame_time_accum += dt;
 
         consolesrv_update();
 
@@ -285,15 +284,20 @@ void application_start() {
 
         _G.game->update(dt);
 
-        if (!cvar_get_int(_G.config.cv_daemon)) {
-            struct scope_data render_sd = developsys_enter_scope("Game::render()");
-            _G.game->render();
-            developsys_leave_scope("Game::render()", render_sd);
+        if(frame_time_accum >= frame_time) {
+            if (!cvar_get_int(_G.config.cv_daemon)) {
+                struct scope_data render_sd = developsys_enter_scope("Game::render()");
+                _G.game->render();
+                developsys_leave_scope("Game::render()", render_sd);
+            }
+
+            frame_time_accum = 0.0f;
         }
+
         developsys_leave_scope("Application:update()", application_sd);
 
         developsys_push_record_float("engine.delta_time", dt);
-        developsys_update();
+        developsys_update(dt);
 
         cel_thread_yield();
     }

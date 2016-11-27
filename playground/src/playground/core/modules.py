@@ -1,71 +1,52 @@
+import glob
+import logging
+import os
 from collections import OrderedDict
 
-from PyQt5.QtWidgets import QDockWidget
+import yaml
 
 
-class PlaygroundModule(object):
-    def __init__(self):
-        self.modules_manager = None
-        self.project_manager = None
+class Manager(object):
+    MOODULE_CONFIG_NAME = "modules.yaml"
 
-    def init_module(self, module_manager):
-        self.modules_manager = module_manager
+    def __init__(self, logger=logging):
+        self.logger = logger
 
+        self.types = OrderedDict()
+        self.loaded_modules = {}
 
-class ModuleManager(object):
-    def __init__(self, main_window):
-        self.modules_instance = OrderedDict()
-        self.modules_dock = OrderedDict()
-        self.main_window = main_window
+    def register_module_type(self, type_name, fce):
+        self.types[type_name] = fce
 
-    def __getitem__(self, item):
-        """Get module instance by name
+    def load_in_path(self, path):
+        types = {type_name: [] for type_name in self.types.keys()}
 
-        :rtype: playground.core.modules.PlaygroundModule
-        """
-        return self.modules_instance[item]
+        for filename in glob.iglob(os.path.join(path, "**", Manager.MOODULE_CONFIG_NAME), recursive=True):
+            with open(filename) as f:
+                data = yaml.load(f.read())
 
-    def new_docked(self, widget, name, title, dock_area, hiden=False):
-        dock = QDockWidget()
-        dock.setWindowTitle(title)
-        dock.setWidget(widget)
+            name = data['name']
+            description = data['description']
 
-        if hiden:
-            dock.hide()
-        else:
-            dock.show()
+            self.logger.info("Loading module '%s' from '%s'", name, filename)
 
-        self.main_window.addDockWidget(dock_area, dock)
-        self.modules_dock[name] = dock
+            self.loaded_modules[name] = {'desc': description}
 
-        return dock
+            if 'extensions' in data:
+                extensions = data['extensions']
 
-    def init_modules(self, modules):
-        for module_cls in modules:
-            instance = module_cls(module_manager=self)
+                if extensions is None:
+                    continue
 
-            self.modules_instance[module_cls.Name] = instance
+                for type_name in types.keys():
+                    lst = extensions.get(type_name, [])
+                    if not lst:
+                        continue
 
-    def show_asset(self, path, name, ext):
-        for k, v in self.modules_instance.items():
-            if hasattr(v, "on_show_asset"):
-                if v.on_show_asset(path, name, ext):
-                    break
+                    for type_item in lst:
+                        type_item['__filename__'] = filename
 
-    def open_asset(self, path, name, ext):
-        for k, v in self.modules_instance.items():
-            if hasattr(v, "on_open_asset"):
-                if v.on_open_asset(path, name, ext):
-                    break
+                    types[type_name].extend(lst)
 
-    def open_project(self, project):
-        for v in self.modules_instance.values():
-            v.project_manager = project
-
-            if hasattr(v, "on_open_project"):
-                v.on_open_project(project)
-
-    def close_project(self):
-        for v in self.modules_instance.values():
-            if hasattr(v, "on_close_project"):
-                v.on_close_project()
+        for k in self.types.keys():
+            self.types[k](types[k])

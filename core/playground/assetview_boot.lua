@@ -7,8 +7,8 @@ ASSET_CREATOR = {
     -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
     -- UNIT
     -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
-    unit = function(self, asset, type)
-        self.actual_asset_unit = Unit.spawn(self.world, asset)
+    unit = function(self, asset_name, type)
+        self.actual_asset_unit = Unit.spawn(self.world, asset_name)
 
         if Transform.has(self.world, self.actual_asset_unit) then
             local transform = Transform.get(self.world, self.actual_asset_unit)
@@ -19,33 +19,33 @@ ASSET_CREATOR = {
     -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
     -- MATERIAL
     -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
-    material = function(self, asset, type)
+    material = function(self, asset_name, type)
         Transform.set_position(self.world, self.camera_transform, Vec3f.make(0.0, 0.0, 20.0))
 
         self.actual_asset_unit = Unit.spawn(self.world, "playground/cube")
 
         local mesh = Mesh.get(self.world, self.actual_asset_unit)
-        Mesh.set_material(self.world, mesh, asset)
+        Mesh.set_material(self.world, mesh, asset_name)
     end,
 
     -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
     -- TEXTURE
     -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
-    texture = function(self, asset, type)
+    texture = function(self, asset_name, type)
         Transform.set_position(self.world, self.camera_transform, Vec3f.make(0.0, 0.0, 20.0))
 
         self.actual_asset_unit = Unit.spawn(self.world, "playground/cube")
 
         local mesh = Mesh.get(self.world, self.actual_asset_unit)
         local material = Mesh.get_material(self.world, mesh)
-        Material.set_texture(material, "u_texColor", asset)
+        Material.set_texture(material, "u_texColor", asset_name)
     end,
 
     -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
     -- LEVEL
     -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
-    level = function(self, asset, type)
-        self.level = Level.load_level(self.world, asset)
+    level = function(self, asset_name, type)
+        self.level = Level.load_level(self.world, asset_name)
     end
 }
 

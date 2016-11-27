@@ -1,0 +1,29 @@
+name: main_window
+description: |
+  Playground main window
+
+extensions:
+  actions:
+    - name: quit
+      text: "&Quit"
+      shortcut: Ctrl+Q
+      type: python
+      script: |
+        def on_triggered(fronted_api):
+          fronted_api.quit()
+
+  menus:
+    - path: "File"
+      text: "&File"
+      window: main_window
+      order: 1
+
+    - path: "File/Quit"
+      window: main_window
+      action: quit
+      order: -1
+
+  windows:
+    - name: main_window
+      title: Playground
+      show: true

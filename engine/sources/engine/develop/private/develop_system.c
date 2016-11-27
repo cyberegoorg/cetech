@@ -40,12 +40,12 @@ MAP_PROTOTYPE(to_mpack_fce_t);
 static struct G {
     struct eventstream eventstream;
     MAP_T(to_mpack_fce_t) to_mpack;
-    cvar_t cv_pub_port;
     cvar_t cv_pub_addr;
     int pub_socket;
 
     spinlock_t flush_lock;
     atomic_int complete_flag[8]; // TODO: dynamic
+    float time_accum;
 } _G = {0};
 
 static __thread u8 _stream_buffer[64 * 1024] = {0};
@@ -225,8 +225,7 @@ int developsys_init(int stage) {
     if (stage == 0) {
         _G = (struct G) {0};
 
-        _G.cv_pub_port = cvar_new_int("develop.pub.port", "Console server rpc port", 4447);
-        _G.cv_pub_addr = cvar_new_str("develop.pub.addr", "Console server rpc addr", "ws://*");
+        _G.cv_pub_addr = cvar_new_str("develop.pub.addr", "Console server rpc addr", "ws://*:4447");
 
         return 1;
     }
@@ -238,7 +237,7 @@ int developsys_init(int stage) {
     _register_to_mpack(EVENT_RECORD_FLOAT, _recordfloat_to_mpack);
     _register_to_mpack(EVENT_RECORD_INT, _recordint_to_mpack);
 
-    char addr[128] = {0};
+    const char* addr = 0;
 
     log_debug(LOG_WHERE, "Init");
 
@@ -247,7 +246,7 @@ int developsys_init(int stage) {
         log_error(LOG_WHERE, "Could not create nanomsg socket: %s", nn_strerror(errno));
         return 0;
     }
-    snprintf(addr, 128, "%s:%d", cvar_get_string(_G.cv_pub_addr), cvar_get_int(_G.cv_pub_port));
+    addr = cvar_get_string(_G.cv_pub_addr);
 
     log_debug(LOG_WHERE, "PUB address: %s", addr);
 
@@ -270,9 +269,16 @@ void developsys_shutdown() {
     nn_close(_G.pub_socket);
 }
 
-void developsys_update() {
+void developsys_update(float dt) {
     _flush_all_streams();
-    _send_events();
+
+    _G.time_accum += dt;
+    if(_G.time_accum >= 10.0f/1000.0f ) {
+        _send_events();
+
+        _G.time_accum = 0.0f;
+    }
+
     eventstream_clear(&_G.eventstream);
 }
 

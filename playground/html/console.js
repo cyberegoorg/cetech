@@ -23,7 +23,6 @@ ConsoleApp = (function () {
             tmp.set(msg, header.byteLength);
 
             this.ws.send(tmp.buffer);
-
         },
 
         init: function () {

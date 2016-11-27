@@ -1,0 +1,16 @@
+name: engine_service
+description: |
+  Engine service
+
+extensions:
+  service:
+    - name: engine_service
+      api:
+        - run_release
+        - run_develop
+        - killall
+        - call
+        - kill
+
+      script_file: service.py
+      script_class: EngineService

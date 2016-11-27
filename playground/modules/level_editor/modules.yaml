@@ -1,0 +1,18 @@
+name: level_editor
+description: |
+  Level editor
+
+extensions:
+  windows:
+    - name: level_editor_window
+      title: Level editor
+      parent: main_window
+      parent_area: top
+      show: true
+
+  window_contents:
+    - name: level_editor_view
+      window: level_editor_window
+      type: qt_content
+      script_file: views.py
+      script_class: LevelEditorView

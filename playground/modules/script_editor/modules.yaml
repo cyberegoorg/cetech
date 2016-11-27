@@ -1,0 +1,9 @@
+name: ScriptEditor
+description: |
+  Script editor
+
+extensions:
+  frontend_contents:
+    - name: script_manager
+      script_file: frontend.py
+      script_class: ScriptManager

@@ -32,12 +32,11 @@ sys.path.insert(0, os.path.join(ROOT_DIR, "playground", "src"))
 
 instance_counter = 0
 
-from cetech.engine import EngineInstance
-
+import cetech.engine as engine
 
 @pytest.fixture(scope='function')
 def _build_dir(tmpdir_factory):
-    instance = EngineInstance("compile test", os.path.join(ROOT_DIR, "bin"), os.path.join(ROOT_DIR, "externals/build"))
+    instance = engine.Instance("compile test", os.path.join(ROOT_DIR, "bin"), os.path.join(ROOT_DIR, "externals/build"))
 
     global instance_counter
 
@@ -61,7 +60,7 @@ def _build_dir(tmpdir_factory):
 
 @pytest.fixture(scope="function")
 def engine_instance(request, _build_dir):
-    instance = EngineInstance("test", os.path.join(ROOT_DIR, "bin"), os.path.join(ROOT_DIR, "externals/build"))
+    instance = engine.Instance("test", os.path.join(ROOT_DIR, "bin"), os.path.join(ROOT_DIR, "externals/build"))
     global instance_counter
 
     port = 4444 + (instance_counter * 2)

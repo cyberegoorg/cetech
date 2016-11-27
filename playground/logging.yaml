@@ -1,0 +1,24 @@
+version: 1
+
+formatters:
+  colored:
+      (): 'colorlog.ColoredFormatter'
+      format: "%(log_color)s---\nlevel: %(levelname)s\nwhere: %(name)s\ntime: %(asctime)s\nworker: %(process)d\nmsg: |\n   %(message)s"
+      log_colors:
+        DEBUG:    'black,bg_green'
+        INFO:     'black,bg_blue'
+        WARNING:  'black,bg_yellow'
+        ERROR:    'black,bg_red'
+        CRITICAL: 'black,bg_red'
+
+handlers:
+    console:
+        class: logging.StreamHandler
+        formatter: colored
+        level: DEBUG
+        stream: ext://sys.stdout
+
+root:
+    level: DEBUG
+    handlers: [console]
+

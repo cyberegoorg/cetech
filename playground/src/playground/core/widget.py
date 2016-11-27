@@ -6,7 +6,10 @@ from PyQt5.QtWidgets import QWidget
 
 
 class CETechWiget(QWidget):
-    def __init__(self):
+    def __init__(self, rpc, instance_name, parent=None):
+        self.rpc = rpc
+        self.instance_name = instance_name
+
         self.last_pos = (0, 0)
         self.instance = None
 
@@ -17,13 +20,17 @@ class CETechWiget(QWidget):
         self.midle = False
         self.right = False
 
-        super(CETechWiget, self).__init__(flags=Qt.ForeignWindow)
+        super(CETechWiget, self).__init__(flags=Qt.ForeignWindow, parent=parent)
 
         self.setFocusPolicy(Qt.ClickFocus)
 
+    def set_instance(self, instance):
+        self.instance = instance
+
     @property
     def ready(self):
-        return self.instance.ready if self.instance is not None else False
+        return True
+        # return self.instance.ready if self.instance is not None else False
 
     @property
     def wid(self):
@@ -31,14 +38,17 @@ class CETechWiget(QWidget):
         if platform.system().lower() == 'darwin':
             return None
         else:
-            return self.winId()
+            return int(self.winId())
 
     def resizeEvent(self, event):
         if not self.ready:
             return
 
         size = event.size()
-        self.instance.console_api.resize(size.width(), size.height())
+
+        self.rpc.call_service("engine_service", "call", instance_name=self.instance_name, fce_name="resize",
+                              w=size.width(),
+                              h=size.height())
 
         event.accept()
 
@@ -46,8 +56,8 @@ class CETechWiget(QWidget):
         if not self.ready:
             return
 
-        self.instance.console_api.lua_execute(
-            script="EditorInput:Move(%d, %d, %s, %s, %s)" % (x, y, left, midle, right))
+        self.rpc.call_service("engine_service", "call", instance_name=self.instance_name, fce_name="lua_execute",
+                              script="EditorInput:Move(%d, %d, %s, %s, %s)" % (x, y, left, midle, right))
 
     def mouseMoveEvent(self, event):
         """ QWidget.mouseMoveEvent(QMouseEvent) 
@@ -74,7 +84,9 @@ class CETechWiget(QWidget):
         if self.start_pos is not None:
             self._move_mouse(self.start_pos.x() - event.globalPos().x(),
                              self.start_pos.y() - event.globalPos().y(),
-                             str(self.left).lower(), str(self.midle).lower(), str(self.right).lower())
+                             str(self.left).lower(),
+                             str(self.midle).lower(),
+                             str(self.right).lower())
 
     def mousePressEvent(self, event):  # real signature unknown; restored from __doc__
         """ QWidget.mousePressEvent(QMouseEvent) """
@@ -110,7 +122,8 @@ class CETechWiget(QWidget):
         }
 
         if btn in btn_map:
-            self.instance.console_api.lua_execute(script="EditorInput.keyboard.%s = true" % (btn_map[btn]))
+            self.rpc.call_service("engine_service", "call", instance_name=self.instance_name, fce_name="lua_execute",
+                                  script="EditorInput.keyboard.%s = true" % (btn_map[btn]))
 
     def keyReleaseEvent(self, event):
         """ QWidget.keyReleaseEvent(QKeyEvent)
@@ -129,7 +142,5 @@ class CETechWiget(QWidget):
         }
 
         if btn in btn_map:
-            self.instance.console_api.lua_execute(script="EditorInput.keyboard.%s = false" % (btn_map[btn]))
-
-    def set_instance(self, instance):
-        self.instance = instance
+            self.rpc.call_service("engine_service", "call", instance_name=self.instance_name, fce_name="lua_execute",
+                                  script="EditorInput.keyboard.%s = false" % (btn_map[btn]))

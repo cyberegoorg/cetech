@@ -1,12 +1,11 @@
-///<reference path="ace.d.ts"/>
+///<reference path="ace/ace.d.ts"/>
 
-import "ace"
-declare var msgpack:any;
+export var msgpack: any;
 
 
-class ConsoleApp {
-    editor:AceAjax.Editor;
-    editor2:AceAjax.Editor;
+export class ConsoleApp {
+    editor: AceAjax.Editor;
+    editor2: AceAjax.Editor;
 
     rpc_ws: WebSocket;
     log_ws: WebSocket;
@@ -29,7 +28,9 @@ class ConsoleApp {
 
         this.editor.commands.addCommand({
             name: "send",
-            exec: () => {this.send_cmd()},
+            exec: () => {
+                this.send_cmd()
+            },
             bindKey: {win: "alt-enter"}
         });
 
@@ -40,21 +41,30 @@ class ConsoleApp {
 
         this.editor2.setFontSize("15px");
 
+        var btn = <HTMLButtonElement>document.getElementById("btn_connect");
+        btn.onclick = () => {
+            this.connect_to_cetech()
+        };
+
+        var btn = <HTMLButtonElement>document.getElementById("btn_send");
+        btn.onclick = () => {
+            this.send_cmd()
+        };
+
     }
 
     send_cmd() {
-        var script = this.editor.getValue();
+        const script = this.editor.getValue();
 
-        var msg = msgpack.encode({
-
+        const msg = msgpack.encode({
             name: "lua_system.execute",
             args: {
                 script: script
             }
         });
 
-        var header = new Uint8Array([255, 255, 255, 255]);
-        var tmp = new Uint8Array(header.byteLength + msg.byteLength);
+        const header = new Uint8Array([255, 255, 255, 255]);
+        const tmp = new Uint8Array(header.byteLength + msg.length);
 
         tmp.set(header, 0);
         tmp.set(msg, header.byteLength);
@@ -62,8 +72,7 @@ class ConsoleApp {
         this.rpc_ws.send(tmp.buffer);
     }
 
-    parse_data(events) {
-        console.log(events);
+    parse_data(events: any) {
         this.editor2.setValue(JSON.stringify(events, null, 2));
     }
 
@@ -76,7 +85,7 @@ class ConsoleApp {
             this.log_ws.close();
         }
 
-        var cetech_url = <HTMLInputElement>document.getElementById("cetech_url");
+        const cetech_url = <HTMLInputElement>document.getElementById("cetech_url");
 
         this.rpc_ws = new WebSocket(cetech_url.value, "rep.sp.nanomsg.org");
 
@@ -90,11 +99,11 @@ class ConsoleApp {
         };
 
         this.rpc_ws.onmessage = (evt): void => {
-            var data = new Uint8Array(evt.data);
+            const data = new Uint8Array(evt.data);
 
-            var msg_data = data.subarray(4);
+            const msg_data = data.subarray(4);
 
-            var events = msgpack.decode(msg_data);
+            const events = msgpack.decode(msg_data);
             this.parse_data(events);
         };
 
@@ -110,37 +119,35 @@ class ConsoleApp {
         };
 
         this.log_ws.onmessage = function (evt) {
-            var data = new Uint8Array(evt.data);
+            const msg_data = new Uint8Array(evt.data);//.subarray(4);
 
-            var msg_data = data;//.subarray(4);
+            const events = msgpack.decode(msg_data);
 
-            var events = msgpack.decode(msg_data);
+            const table = <HTMLTableElement>document.getElementById("log_table");
+            const row = table.insertRow(1);
 
-            var table = <HTMLTableElement>document.getElementById("log_table");
-            var row = table.insertRow(1);
+            const level_to_class =
+                {
+                    info: "info",
+                    warning: "warning",
+                    error: "danger",
+                    debug: "success"
+                };
 
-            var level_to_class =
-            {
-                info: "info",
-                warning: "warning",
-                error: "danger",
-                debug: "success"
-            };
-
-            var level_to_icon =
-            {
-                info: "glyphicon-info-sign",
-                warning: "glyphicon-warning-sign",
-                error: "glyphicon-remove-sign",
-                debug: "glyphicon-ok-sign"
-            };
+            const level_to_icon =
+                {
+                    info: "glyphicon-info-sign",
+                    warning: "glyphicon-warning-sign",
+                    error: "glyphicon-remove-sign",
+                    debug: "glyphicon-ok-sign"
+                };
 
             row.className += level_to_class[events['level']];
 
-            var level = row.insertCell(0);
-            var where = row.insertCell(1);
-            var worker_id = row.insertCell(2);
-            var message = row.insertCell(3);
+            const level = row.insertCell(0);
+            const where = row.insertCell(1);
+            const worker_id = row.insertCell(2);
+            const message = row.insertCell(3);
 
             level.innerHTML = "<span aria-hidden=\"true\" class=\"glyphicon  " + level_to_icon[events['level']] + "\"></span>";
             where.innerHTML = events['where'];

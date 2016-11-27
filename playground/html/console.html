@@ -35,8 +35,8 @@
                 <span class="input-group-addon" id="basic-addon2">Connect to</span>
                 <input id="cetech_url" type="text" class="form-control" value="ws://localhost:4444">
                 <span class="input-group-btn">
-                    <button class="btn btn-default" type="button" onclick="ConsoleApp.connect_to_cetech()">connect</button>
-                    <button type="button" class="btn btn-default" onclick="ConsoleApp.send_cmd()">Send</button>
+                    <button id="btn_connect" class="btn btn-default" type="button">connect</button>
+                    <button id="btn_send" type="button" class="btn btn-default">Send</button>
                 </span>
             </div>
         </div>
@@ -52,12 +52,12 @@
                 </div>
                 <div class="panel-body">
                     <div id="editor">
-local log = cetech.Log
+                        local log = cetech.Log
 
-log.info("web_cosnole", "INFO")
-log.warning("web_cosnole", "WARN")
-log.error("web_cosnole", "ERROR")
-log.debug("web_cosnole", "DEBUG")
+                        log.info("web_cosnole", "INFO")
+                        log.warning("web_cosnole", "WARN")
+                        log.error("web_cosnole", "ERROR")
+                        log.debug("web_cosnole", "DEBUG")
                     </div>
                 </div>
             </div>
@@ -97,12 +97,19 @@ log.debug("web_cosnole", "DEBUG")
 </div>
 
 <script src="bootstrap/js/bootstrap.min.js"></script>
-<!--<script type="text/javascript" src="console.js"></script>-->
-<script type="text/javascript" src="console_app.js"></script>
-<script type="text/javascript">
-//    ConsoleApp.init();
+<script src="system.js"></script>
+<script src="ace/ace.js"></script>
+<script>
+    SystemJS.defaultJSExtensions = true;
+    SystemJS.config({
+        baseURL: '/static',
+    });
 
-    var ConsoleApp = new ConsoleApp();
+    var app;
+    SystemJS.import('console_app').then(function (m) {
+        app = new m.ConsoleApp();
+    });
+
 </script>
 </body>
 </html>
