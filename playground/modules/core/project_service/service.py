@@ -1,3 +1,4 @@
+import functools
 import os
 
 from PyQt5.QtCore import QDir
@@ -5,9 +6,14 @@ from PyQt5.QtWidgets import QMessageBox
 
 
 class ProjectService(object):
+    SERVICE_NAME = "project_service"
+
     def __init__(self, service_manager):
         self.name = None
         self.project_dir = None
+        self._core_dir = None
+
+        self.publish = functools.partial(service_manager.publish, self.SERVICE_NAME, "event")
 
     def close(self):
         pass
@@ -25,6 +31,10 @@ class ProjectService(object):
     @property
     def build_dir(self):
         return os.path.join(self.project_dir, "build")
+
+    @property
+    def core_dir(self):
+        return self._core_dir
 
     @property
     def is_project_opened(self):
@@ -51,7 +61,9 @@ class ProjectService(object):
     def run(self):
         pass
 
-    def open_project(self, name, project_dir):
+    def open_project(self, name, project_dir, core_dir):
+        self._core_dir = core_dir
+
         if project_dir == '':
             return False
 
@@ -67,7 +79,17 @@ class ProjectService(object):
         self.project_dir = project_dir
         self.name = name
 
+        self.publish(dict(msg_type="project_opened", project_dir=project_dir, name=name))
+
         return True
 
     def close_project(self):
         self.project_dir = None
+
+        self.publish(dict(msg_type="project_closed"))
+
+    def api_open_project(self, name, project_dir, core_dir):
+        return self.open_project(name, project_dir, core_dir)
+
+    def api_close_project(self):
+        return self.close_project()

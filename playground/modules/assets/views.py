@@ -2,8 +2,8 @@ from PyQt5.QtCore import QDir
 from PyQt5.QtWidgets import QFileSystemModel
 from PyQt5.QtWidgets import QMainWindow
 
-import playground.core.rpc as rpc
-from playground.core.widget import CETechWiget
+import playground.shared.rpc as rpc
+from playground.frontend.gui_qt import CETechWiget
 from playground.ui.assetbrowser import Ui_MainWindow
 
 
@@ -50,8 +50,7 @@ class AssetPreviewView(CETechWiget):
 
 class AssetBrowserView(QMainWindow, Ui_MainWindow):
     def __init__(self, frontend):
-        self.rpc = rpc.Client(url="ws://localhost:8888", recv_timeout=10 * 1000)
-        self.rpc.connect()
+        self.rpc = frontend.rpc
 
         self.project_service_rpc = self.rpc.partial_call_service("project_service")
         self.asset_service_rpc = self.rpc.partial_call_service("asset_service")

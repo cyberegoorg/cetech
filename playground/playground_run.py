@@ -3,12 +3,15 @@
 ###########
 # IMPORTS #
 ########################################################################################################################
+import argparse
 import ctypes
 import os
 import platform
 import sys
+from multiprocessing import Process
 
 import yaml
+from PyQt5 import QtCore
 
 _platform = platform.system().lower()
 if _platform == 'windows':
@@ -17,7 +20,6 @@ if _platform == 'windows':
 print(sys.path)
 
 import PyQt5
-from PyQt5 import QtCore
 from PyQt5.QtCore import QDir, qInstallMessageHandler
 from PyQt5.QtWidgets import QApplication
 from PyQt5.uic import compileUiDir
@@ -48,23 +50,37 @@ else:
 sys.path.insert(0, os.path.join(PLAYGROUND_DIR, 'src'))
 QDir.setCurrent(PLAYGROUND_DIR)
 
+########
+# ARGS #
+########################################################################################################################
+ARGS_PARSER = argparse.ArgumentParser(description='Playground', formatter_class=argparse.RawTextHelpFormatter)
 
-# QIcon.setThemeSearchPaths([os.path.join(PLAYGROUND_DIR, 'icons', 'breeze')])
-#
-# if _platform == 'windows':
-#     QIcon.setThemeName('Breeze')
-# else:
-#     QIcon.setThemeName('Breeze Dark')
+ARGS_PARSER.add_argument(
+    "--frontend",
+    action='store_true',
+    help='Run frontend',
+)
 
-def compile_map(d, f):
-    return 'src/playground/ui/', f
+ARGS_PARSER.add_argument(
+    "--backend",
+    action='store_true',
+    help='Run backend',
+)
 
 
 ########
 # MAIN #
 ########################################################################################################################
 
-if __name__ == '__main__':
+def run_backend(logging, playground_dir):
+    from playground.backend.main import main
+    main()
+
+
+def run_frontend(logging, playground_dir):
+    def compile_map(d, f):
+        return 'src/playground/ui/', f
+
     # good for develop and first run.
     compileUiDir(
         dir='ui',
@@ -72,12 +88,7 @@ if __name__ == '__main__':
         map=compile_map
     )
 
-    with open(os.path.join(PLAYGROUND_DIR, 'logging.yaml')) as f:
-        D = yaml.load(f)
-
-        import logging.config
-
-        logging.config.dictConfig(D)
+    QDir.setCurrent(playground_dir)
 
     QT_LOGGER = logging.getLogger("Qt5")
     LOGGER_MAP = {
@@ -92,5 +103,53 @@ if __name__ == '__main__':
     from playground.frontend.main import main
 
     main()
+
+
+def main(args=None):
+    """ ENTRY POINT
+    """
+
+    args = ARGS_PARSER.parse_args(args=args)
+
+    with open(os.path.join(PLAYGROUND_DIR, 'logging.yaml')) as f:
+        D = yaml.load(f)
+
+        import logging.config
+
+        logging.config.dictConfig(D)
+
+    if not args.frontend and not args.backend:
+        need_frontend = True
+        need_backend = True
+    else:
+        need_frontend = args.frontend
+        need_backend = args.backend
+
+    if need_backend:
+        backend = Process(target=run_backend, kwargs=dict(logging=logging, playground_dir=PLAYGROUND_DIR))
+        backend.start()
+
+    if need_frontend:
+        frontend = Process(target=run_frontend, kwargs=dict(logging=logging, playground_dir=PLAYGROUND_DIR))
+        frontend.start()
+        frontend.join()
+
+        if need_backend:
+            backend.terminate()
+            backend.join(timeout=1)
+            return
+
+    elif need_backend:
+        backend.join(timeout=1)
+
+
+########
+# MAIN #
+########################################################################################################################
+
+if __name__ == '__main__':
+    main()
+
+########################################################################################################################
 
 ########################################################################################################################

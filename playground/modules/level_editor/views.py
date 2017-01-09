@@ -1,12 +1,11 @@
-import playground.core.rpc as rpc
-from playground.core.widget import CETechWiget
+import playground.shared.rpc as rpc
+from playground.frontend.gui_qt import CETechWiget
 
 
 class LevelEditorView(CETechWiget):
     def __init__(self, frontend, parent=None):
         self.frontend = frontend
-        self.rpc = rpc.Client(url="ws://localhost:8888", recv_timeout=10 * 1000)
-        self.rpc.connect()
+        self.rpc = frontend.rpc
 
         self.frontend.subscribe_service("asset_service", self._subcribe_asset_browser)
 

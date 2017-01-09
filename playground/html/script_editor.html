@@ -11,14 +11,14 @@
     <script src="jquery.min.js"></script>
     <style type="text/css" media="screen">
         #editor {
-            position: absolute;
-            top: 0;
-            right: 0;
-            bottom: 0;
-            left: 0;
+            height: 100vh;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
         }
     </style>
-
 </head>
 <body>
 
@@ -37,7 +37,6 @@
     SystemJS.import('script_editor').then(function (m) {
         app = new m.ScriptEditor();
     });
-
 </script>
 </body>
 </html>

@@ -20,6 +20,8 @@ System.register(["./lib/playground/playground_rpc"], function(exports_1, context
                     };
                     this.path = window.location.search.substr(1);
                     this.rpc = new playground_rpc_1.PlaygroundRPC();
+                    this.sub = new playground_rpc_1.PlaygroundSubscriber();
+                    this.saving_in_progres = false;
                     this.editor = ace.edit("editor");
                     this.editor.$blockScrolling = Infinity;
                     this.editor.setTheme("ace/theme/solarized_dark");
@@ -37,32 +39,55 @@ System.register(["./lib/playground/playground_rpc"], function(exports_1, context
                         bindKey: { win: "ctrl-s" }
                     });
                     this.connect_to_cetech();
+                    this.sub.subcribe_service("filesystem_service", function (msg) {
+                        if (msg.msg_type == 'event') {
+                            msg = msg.msg;
+                            if (msg.msg_type == 'file_modified') {
+                                if (msg.path == _this.path) {
+                                    if (_this.saving_in_progres) {
+                                        _this.saving_in_progres = false;
+                                    }
+                                    else {
+                                        _this.open(_this.path);
+                                    }
+                                }
+                            }
+                        }
+                    });
                 }
                 ScriptEditor.prototype.save = function () {
+                    this.saving_in_progres = true;
                     this.rpc.callService("filesystem_service", "write", {
                         path: this.path,
                         content: this.editor.getValue()
                     }, function (msg) {
                     });
                 };
+                ScriptEditor.prototype.open = function (path) {
+                    var _this = this;
+                    this.rpc.callService("filesystem_service", "read", {
+                        path: this.path
+                    }, function (msg) {
+                        var curent_pos = _this.editor.getCursorPosition();
+                        _this.editor.setValue(msg.response, -1);
+                        var type = path.split(".").pop();
+                        if (_this.SUFIX_2_MODE.hasOwnProperty(type)) {
+                            _this.editor.getSession().setMode(_this.SUFIX_2_MODE[type]);
+                        }
+                        else {
+                            _this.editor.getSession().setMode(_this.SUFIX_2_MODE['']);
+                        }
+                        _this.editor.moveCursorToPosition(curent_pos);
+                    });
+                };
                 ScriptEditor.prototype.connect_to_cetech = function () {
                     var _this = this;
                     this.rpc.close();
+                    this.sub.close();
                     this.rpc.connect("ws://localhost:8888", function () {
-                        _this.rpc.callService("filesystem_service", "read", {
-                            path: _this.path
-                        }, function (msg) {
-                            _this.editor.setValue("");
-                            _this.editor.setValue(msg.response, -1);
-                            var type = _this.path.split(".").pop();
-                            if (_this.SUFIX_2_MODE.hasOwnProperty(type)) {
-                                _this.editor.getSession().setMode(_this.SUFIX_2_MODE[type]);
-                            }
-                            else {
-                                _this.editor.getSession().setMode(_this.SUFIX_2_MODE['']);
-                            }
-                        });
+                        _this.open(_this.path);
                     });
+                    this.sub.connect("ws://localhost:8889");
                 };
                 ;
                 return ScriptEditor;

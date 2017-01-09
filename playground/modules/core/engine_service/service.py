@@ -86,6 +86,15 @@ class EngineService(object):
         fce = getattr(instance.console_api, fce_name)
         return fce(**kwargs)
 
+    def api_call_all(self, fce_name, **kwargs):
+        ret_all = dict()
+
+        for k, v in self.instances.items():
+            ret = self.api_call(k, fce_name=fce_name, **kwargs)
+            ret_all[k] = ret
+
+        return ret_all
+
     def api_kill(self, name):
         if name in self.instances:
             instance = self.instances[name]
@@ -94,7 +103,8 @@ class EngineService(object):
             del self.instances[name]
 
     def api_killall(self, dump=False):
-        for name in self.instances.keys():
+        names = tuple(self.instances.keys())
+        for name in names:
             self.api_kill(name)
 
     def api_run_release(self, name):

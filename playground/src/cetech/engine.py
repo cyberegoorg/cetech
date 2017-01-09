@@ -11,7 +11,7 @@ from cetech.consoleapi import ConsoleAPI
 
 class _ReadyLock(Thread):
     def __init__(self, url, on_ready=None):
-        self.url = url if isinstance(url, bytes) else url.encode()
+        self.url = url  # if isinstance(url, bytes) else url.encode()
         self.on_ready = on_ready
 
         logging.debug('URL %s', self.url)

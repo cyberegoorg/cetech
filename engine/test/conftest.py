@@ -1,9 +1,10 @@
-import PyQt5
 import ctypes
 import os
 import platform
-import pytest
 import sys
+
+import PyQt5
+import pytest
 from PyQt5.QtWidgets import QApplication
 
 ############
@@ -34,15 +35,21 @@ instance_counter = 0
 
 import cetech.engine as engine
 
+
 @pytest.fixture(scope='function')
 def _build_dir(tmpdir_factory):
     instance = engine.Instance("compile test", os.path.join(ROOT_DIR, "bin"), os.path.join(ROOT_DIR, "externals/build"))
 
     global instance_counter
 
-    build_dir = os.path.join(ROOT_DIR, "engine", "test", "data", "build"),
+    build_dir = os.path.join(ROOT_DIR, "engine", "test", "data", "build")
+    build_dir = os.path.abspath(build_dir)
 
-    port = 4444 + (instance_counter * 2)
+    ipc_addr = os.path.join(ROOT_DIR, "engine", "test", "data", "tmp")
+    ipc_addr = os.path.abspath(ipc_addr)
+    if not os.path.exists(ipc_addr):
+        os.makedirs(ipc_addr)
+
     instance_counter += 1
 
     instance.run_develop(
@@ -51,26 +58,35 @@ def _build_dir(tmpdir_factory):
         core_dir=os.path.join(ROOT_DIR, "core"),
         compile_=True,
         check=True,
-        port=port,
+        rpc_addr="ipc://%s/test_compiler%s_rpc.ipc" % (ipc_addr, instance_counter),
+        log_addr="ipc://%s/test_compiler%s_log.ipc" % (ipc_addr, instance_counter),
+        pub_addr="ipc://%s/test_compiler%s_pub.ipc" % (ipc_addr, instance_counter),
+        push_addr="ipc://%s/test_compiler%s_push.ipc" % (ipc_addr, instance_counter),
         lock=False
     )
 
     return build_dir
 
 
-@pytest.fixture(scope="function")
+@pytest.yield_fixture(scope="function")
 def engine_instance(request, _build_dir):
     instance = engine.Instance("test", os.path.join(ROOT_DIR, "bin"), os.path.join(ROOT_DIR, "externals/build"))
     global instance_counter
 
-    port = 4444 + (instance_counter * 2)
+    ipc_addr = os.path.join(ROOT_DIR, "engine", "test", "data", "tmp")
+    ipc_addr = os.path.abspath(ipc_addr)
+
     instance_counter += 1
 
     instance.run_develop(
         os.path.join(ROOT_DIR, "engine", "test", "data", "build"),
         os.path.join(ROOT_DIR, "engine", "test", "data", "src"),
         core_dir=os.path.join(ROOT_DIR, "core"),
-        port=port, protocol="tcp",
+        rpc_addr="ipc://%s/test%s_rpc.ipc" % (ipc_addr, instance_counter),
+        log_addr="ipc://%s/test%s_log.ipc" % (ipc_addr, instance_counter),
+        pub_addr="ipc://%s/test%s_pub.ipc" % (ipc_addr, instance_counter),
+        push_addr="ipc://%s/test%s_push.ipc" % (ipc_addr, instance_counter),
+        lock=True
     )
 
     while not instance.ready:

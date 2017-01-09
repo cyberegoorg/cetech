@@ -1,8 +1,8 @@
-import os
-from asyncio import sleep
-
 import logging
 import logging.config
+import os
+import signal
+from asyncio import sleep
 
 import msgpack
 import nanomsg
@@ -10,15 +10,15 @@ from aiohttp import web
 
 from cetech.consoleproxy import NanoPub
 from playground.backend.service import ServiceManager
-from playground.core.modules import Manager
+from playground.shared.modules import Manager
 
 ROOT_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), os.pardir, os.pardir, os.pardir)
-
 MODULES_DIR = os.path.abspath(os.path.join(ROOT_DIR, "modules"))
+CORE_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), os.pardir, os.pardir, os.pardir, os.pardir, "core"))
 
 
 class Server(object):
-    def __init__(self, name, project_dir, logger=logging):
+    def __init__(self, logger=logging):
         self.logger = logger
 
         self.app = web.Application()
@@ -26,10 +26,6 @@ class Server(object):
         self.app.router.add_static('/static/',
                                    path=str(os.path.join(ROOT_DIR, 'html')),
                                    name='static')
-
-        self.app.router.add_static('/resource/',
-                                   path=str(os.path.join(project_dir, 'src')),
-                                   name='resource')
 
         self.app.on_startup.append(self.start_rpc_task)
         self.app.on_cleanup.append(self.close)
@@ -40,7 +36,6 @@ class Server(object):
         self.service_manager.register_to_module_manager(self.modules_manager)
 
         self.modules_manager.load_in_path(MODULES_DIR)
-        self.service_manager.get_service_instance("project_service").open_project(name, project_dir)
 
         self.pub = NanoPub("ws://*:8889", echo=False)
         self.pub.bind()
@@ -49,6 +44,13 @@ class Server(object):
         self.rpc_quit = False
 
         self.service_manager.run()
+
+        def close_handler(signum, frame):
+            self.logger.info("Close by signal")
+            self.app.shutdown()
+
+        signal.signal(signal.SIGKILL, close_handler)
+        signal.signal(signal.SIGTERM, close_handler)
 
     def publish(self, msg):
         self.pub.publish(msg)
@@ -119,21 +121,20 @@ class Server(object):
         rpc_socket.close()
 
     async def start_rpc_task(self, app):
-        app['rpc_task'] = app.loop.create_task(self.rpc_task(b'ws://*:8888', self._on_msg))
+        app['rpc_task'] = app.loop.create_task(self.rpc_task('ws://*:8888', self._on_msg))
 
     async def cleanup_rpc_task(self, app):
         self.rpc_quit = True
         await app['rpc_task']
 
     def run(self):
-        web.run_app(self.app)
+        web.run_app(self.app, shutdown_timeout=1)
 
     def close(self, app):
         self.service_manager.close()
 
 
-def run(name, project_dir):
+def run():
     logging.info("start")
-
-    server = Server(name=name, project_dir=project_dir, logger=logging)
+    server = Server(logger=logging)
     server.run()

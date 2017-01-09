@@ -109,8 +109,8 @@ function Game:update(dt)
 
     if Keyboard.button_pressed(debug_btn) then
         self.debug = not self.debug;
-        Renderer.set_debug(self.debug)
     end
+        Renderer.set_debug(self.debug)
 
     if Keyboard.button_pressed(capture_btn) then
         self.capture = not self.capture;

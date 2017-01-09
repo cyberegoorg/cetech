@@ -10,7 +10,7 @@ class NanoPub(object):
         self.echo = echo
         self.logger = logger.getLogger("nanopub")
 
-        self.url = url.encode()
+        self.url = url  # .encode()
         self.socket = Socket(PUB)
 
         self.socket.send_timeout = send_timeout
@@ -42,7 +42,7 @@ class NanoSub(object):
         self.echo = echo
         self.logger = logger.getLogger("nanosub")
 
-        self.url = url.encode()
+        self.url = url  #.encode()
         self.socket = Socket(SUB)
         self.socket.set_string_option(SUB, SUB_SUBSCRIBE, b'')
 
@@ -79,7 +79,7 @@ class NanoReq(object):
         self.echo = echo
         self.logger = logger.getLogger("nanoreq")
 
-        self.url = url.encode()
+        self.url = url  #.encode()
         self.socket = Socket(REQ)
 
         self.socket.recv_timeout = recv_timeout

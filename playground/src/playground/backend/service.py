@@ -1,4 +1,5 @@
 import os
+from collections import defaultdict
 
 
 class ServiceManager(object):
@@ -7,6 +8,7 @@ class ServiceManager(object):
 
         self.service_instances = {}
         self.service_api = {}
+        self._service_subscribers = defaultdict(list)
 
     def close(self):
         for service in self.service_instances.values():
@@ -24,6 +26,12 @@ class ServiceManager(object):
 
     def publish(self, service_name, msg_type, msg):
         self.server.publish(dict(msg_type=msg_type, service=service_name, msg=msg))
+
+        for clb in self._service_subscribers[service_name]:
+            clb(msg)
+
+    def subscribe_service(self, service_name, subscribe_clb):
+        self._service_subscribers[service_name].append(subscribe_clb)
 
     def load_services(self, services):
         for service in services:

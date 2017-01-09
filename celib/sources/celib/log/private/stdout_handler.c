@@ -17,12 +17,12 @@
 **** Internals
 ***********************************************************************/
 
-#define FBLACK      "\033[30;"
+#define FBLACK      "\033["
 
-#define BRED        "41m"
-#define BGREEN      "42m"
-#define BYELLOW     "43m"
-#define BBLUE       "44m"
+#define BRED        "31m"
+#define BGREEN      "32m"
+#define BYELLOW     "33m"
+#define BBLUE       "34m"
 
 #define NONE        "\033[0m"
 

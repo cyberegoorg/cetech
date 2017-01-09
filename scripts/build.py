@@ -7,12 +7,12 @@
 # IMPORTS #
 ########################################################################################################################
 
-import os
-import subprocess
 import argparse
+import multiprocessing
+import os
 import platform
 import shutil
-import multiprocessing
+import subprocess
 import sys
 
 ###########
@@ -142,6 +142,7 @@ def clean(config, platform_):
         shutil.rmtree(BIN_DIR)
     except FileNotFoundError:
         pass
+
 
 def main(args=None):
     """ ENTRY POINT

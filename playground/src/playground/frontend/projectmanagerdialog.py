@@ -3,7 +3,7 @@ from PyQt5.QtCore import QSettings
 from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QListWidgetItem, QDialog, QDialogButtonBox
 
-from playground.frontend.private.addexistingdialog import AddExistItemDialog
+from playground.frontend.addexistingdialog import AddExistItemDialog
 from playground.ui.projectmanagerdialog import Ui_Dialog
 
 
@@ -25,7 +25,7 @@ class ProjectManagerDialog(QDialog, Ui_Dialog):
         item = QListWidgetItem()
         item.setText(name)
         item.setData(self._PROJECT_DIR_ROLE, dir)
-        item.setIcon(QIcon.fromTheme("applications-games"))
+        item.setIcon(QIcon().fromTheme("applications-games"))
 
         self.projects_list.addItem(item)
 

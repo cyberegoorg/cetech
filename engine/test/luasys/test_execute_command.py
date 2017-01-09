@@ -3,7 +3,7 @@ from pytest_bdd import scenario, given, when, then
 
 @scenario(
     'execute_command.feature',
-    'Can call lua expresion and recive return value in response',
+    'Can call lua expression and receive return value in response',
     example_converters=dict(cmd=str))
 def test_execute_command():
     pass
@@ -16,7 +16,8 @@ def new_instance(engine_instance):
 
 @when('call lua cmd <cmd>')
 def execute_command(new_instance, cmd):
-    new_instance["cmd_ret_value"] = new_instance["engine"].lua_execute(cmd)['response']
+    response = new_instance["engine"].lua_execute(cmd)
+    new_instance["cmd_ret_value"] = response
 
 
 @then('Response is <response>')

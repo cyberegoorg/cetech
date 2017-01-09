@@ -56,7 +56,7 @@ function AssetView:init()
 
     self.viewport = 0 --Renderer.GetViewport("default")
     self.world = World.create()
-    self.camera_unit = Unit.spawn(self.world, "camera")
+    self.camera_unit = Unit.spawn(self.world, "playground/camera")
 
     self.camera_transform = Transform.get(self.world, self.camera_unit)
 
@@ -73,7 +73,9 @@ end
 function AssetView:update(dt)
     if self.actual_asset_unit then
         if EditorInput.mouse.left then
-            local transform = Transform.get(self.world, self.actual_asset_unit)
+            -- Transform
+            local transform = Transform.get(self.world, self.actual_asset_unit) -- self.camera_transform
+            -- local transform = self.camera_transform
             local rot = Transform.get_rotation(self.world, transform)
             local m_world = Transform.get_world_matrix(self.world, transform)
             local x_dir = m_world.x

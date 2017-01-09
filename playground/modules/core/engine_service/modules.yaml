@@ -8,9 +8,10 @@ extensions:
       api:
         - run_release
         - run_develop
+        - kill
         - killall
         - call
-        - kill
+        - call_all
 
       script_file: service.py
       script_class: EngineService

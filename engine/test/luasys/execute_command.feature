@@ -1,6 +1,6 @@
 Feature: Luasys console server command 'lua_system.execute'
 
-  Scenario Outline: Can call lua expresion and recive return value in response
+  Scenario Outline: Can call lua expression and receive return value in response
     Given New instance
     When call lua cmd <cmd>
     Then Response is <response>

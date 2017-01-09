@@ -1,6 +1,6 @@
-name: Core
+name: Profiler
 description: |
-  Core
+  Profiler
 
 extensions:
   windows:
@@ -9,19 +9,8 @@ extensions:
       title: Window1
       parent: main_window
 
-    - name: window2
-      show: true
-      title: Window2
-      parent: main_window
-      parent_area: top
-
   window_contents:
     - name: content1
       window: window1
       type: web_content
       url: http://localhost:8080/static/profiler2.html
-
-    - name: content2
-      window: window2
-      type: web_content
-      url: http://localhost:8080/static/console2.html
