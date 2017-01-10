@@ -49,7 +49,7 @@ class Server(object):
             self.logger.info("Close by signal")
             self.app.shutdown()
 
-        signal.signal(signal.SIGKILL, close_handler)
+        # signal.signal(signal.SIGKILL, close_handler)
         signal.signal(signal.SIGTERM, close_handler)
 
     def publish(self, msg):
