@@ -2,7 +2,15 @@ site_name: CETech
 site_author: Ondra Voves
 
 repo_url: https://gitlab.com/cyberegoorg/cetech
-theme: readthedocs #slate
+#theme: readthedocs
+theme: alabaster
+
+
+markdown_extensions:
+    - admonition
+    #- codehilite(noclasses=true,pygments_style=tango)
+    - toc:
+        permalink: '#'
 
 pages:
   - CETech: 'index.md'
@@ -53,8 +61,3 @@ pages:
       - cetech.Transform: 'lua_api/Transform.md'
       - cetech.Mesh: 'lua_api/Mesh.md'
 
-markdown_extensions:
-    - admonition
-    - codehilite(noclasses=true,pygments_style=tango)
-    - toc:
-        permalink: '#'

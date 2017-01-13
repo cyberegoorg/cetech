@@ -18,14 +18,14 @@ import yaml
 ###########
 # GLOBALS #
 ########################################################################################################################
-ROOT_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)))
+ROOT_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), os.pardir)
 
 _platform = platform.system().lower()
 LIB_DIR = os.path.join(ROOT_DIR,
-                       'externals',
-                       'build',
+                       'externals', 'build',
                        "%s%s" % (_platform if _platform != 'darwin' else 'osx', platform.architecture()[0][0:2]),
-                       'dynlib')
+                       'release', 'lib')
+
 _original_load = ctypes.cdll.LoadLibrary
 ctypes.cdll.LoadLibrary = lambda x: _original_load(os.path.join(LIB_DIR, x))
 

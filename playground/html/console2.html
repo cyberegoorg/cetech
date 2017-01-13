@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>CETech - console</title>
+
+    <script src="msgpack.min.js"></script>
+    <script src="ace/ace.js" type="text/javascript" charset="utf-8"></script>
+    <script src="ace/ext-language_tools.js"></script>
+    <script src="jquery.min.js"></script>
+
+    <link href="bootstrap/css/bootstrap.min.css" rel="stylesheet">
+
+    <style type="text/css" media="screen">
+        #editor {
+            height: 250px;
+        }
+
+        #editor2 {
+            height: 250px;
+        }
+    </style>
+
+</head>
+<body>
+
+<div class="container-fluid">
+    <br>
+
+    <!-- Connect form -->
+    <div class="row">
+        <div class="col-md-6">
+            <div class="input-group">
+                <span class="input-group-addon" id="basic-addon2">Connect to</span>
+                <input id="cetech_url" type="text" class="form-control" value="ws://localhost:8888">
+                <span class="input-group-btn">
+                    <button id="btn_connect" class="btn btn-default" type="button">connect</button>
+                    <button id="btn_send" type="button" class="btn btn-default">Send</button>
+                </span>
+            </div>
+        </div>
+    </div>
+    <br>
+
+    <!-- Editors -->
+    <div class="row">
+        <div class="col-md-6">
+            <div class="panel panel-primary">
+                <div class="panel-heading">
+                    <h3 class="panel-title">Editor</h3>
+                </div>
+                <div class="panel-body">
+                    <div id="editor">
+                        local log = cetech.Log
+
+                        log.info("web_cosnole", "INFO")
+                        log.warning("web_cosnole", "WARN")
+                        log.error("web_cosnole", "ERROR")
+                        log.debug("web_cosnole", "DEBUG")
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="panel panel-primary">
+                <div class="panel-heading">
+                    <h3 class="panel-title">Output</h3>
+                </div>
+                <div class="panel-body">
+                    <div id="editor2"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Log -->
+    <div class="row">
+        <div class="col-md-12">
+            <div class="panel panel-primary">
+                <div class="panel-heading">
+                    <h3 class="panel-title">Log</h3>
+                </div>
+                <div class="panel-body">
+                    <table id="log_table" class="table">
+                        <tr>
+                            <th>Level</th>
+                            <th>Where</th>
+                            <th>Worker id</th>
+                            <th>Message</th>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="bootstrap/js/bootstrap.min.js"></script>
+<script src="system.js"></script>
+<script src="ace/ace.js"></script>
+
+<script>
+    SystemJS.defaultJSExtensions = true;
+    SystemJS.config({
+        baseURL: '/static'
+    });
+
+    var app;
+    SystemJS.import('console_app2').then(function (m) {
+        app = new m.ConsoleApp2();
+    });
+
+</script>
+</body>
+</html>

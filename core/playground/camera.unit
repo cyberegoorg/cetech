@@ -1,0 +1,31 @@
+components:
+  "5sad4as64d65as4d65as65d4asd":
+    component_type: "transform"
+    position: [0, 0, 0]
+    rotation: [0, 0, 0]
+    scale: [1, 1, 1]
+
+children:
+  "e432c0ed88dd461e81sasadasf50973ffb00263":
+    components:
+      "92fc09cf72984acb9c8d87a429d8c714":
+        component_type: "transform"
+        position: [0, 0, 10]
+        rotation: [0, 0, 0]
+        scale: [1, 1, 1]
+
+    children:
+      "e432c0ed88dd461ed81sasadasf5097asdasd3ffb00263":
+        components:
+          "92fc09cf72984acb9c8d87a429d8c714":
+            component_type: "transform"
+            position: [0, 0, 0]
+            rotation: [0, 0, 0]
+            scale: [1, 1, 1]
+
+          "v5dasdasdasdwqdqdw4zx4v6zx4v6zx54v6zx":
+            component_type: "camera"
+            near: 0.1
+            far: 1000.0
+            fov: 60
+

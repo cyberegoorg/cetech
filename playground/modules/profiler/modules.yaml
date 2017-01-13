@@ -1,0 +1,16 @@
+name: Profiler
+description: |
+  Profiler
+
+extensions:
+  windows:
+    - name: window1
+      show: true
+      title: Window1
+      parent: main_window
+
+  window_contents:
+    - name: content1
+      window: window1
+      type: web_content
+      url: http://localhost:8080/static/profiler2.html

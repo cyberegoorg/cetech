@@ -1,3 +1,6 @@
 pyyaml
 nanomsg
 msgpack-python
+aiohttp
+colorlog
+watchdog

@@ -17,9 +17,21 @@ editor, edit the code, and then just when to pull reload the page loads and just
 
 In the main directory, run the script **playground.py**
 
+## Normal run (backend + frontend)
 ```bash
-$ python3 playground/playground.py
+$ python3 playground/playground_run.py
 ```
+
+## Run backend
+```bash
+$ python3 playground/playground_run.py --backend
+```
+
+## Run frontend
+```bash
+$ python3 playground/playground_run.py --frontend
+```
+
 
 !!! note
 

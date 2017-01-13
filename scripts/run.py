@@ -35,7 +35,7 @@ instance_counter = 0
 if __name__ == '__main__':
     global instance_counter
 
-    from playground.core.project import EngineInstance
+    from playground_run.core.project import EngineInstance
 
     instance = EngineInstance("test", os.path.join(ROOT_DIR, "bin"), os.path.join(ROOT_DIR, "externals/build"))
     port = 4444 + (instance_counter * 2)

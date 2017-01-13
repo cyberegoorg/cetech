@@ -2,5 +2,3 @@ externals/build/** linguist-vendored=true
 playground/icons/** linguist-vendored=true
 playground/html/ace/** linguist-vendored=true
 playground/html/ace/snipets/** linguist-vendored=true
-
-sources.old/** linguist-vendored=true

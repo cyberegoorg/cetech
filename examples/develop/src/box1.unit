@@ -1,8 +1,8 @@
 components:
   "2342343313252":
     component_type: "transform"
-    position: [0, 0, 5]
     rotation: [0, 0, 0]
+    position: [0, 0, 5]
     scale: [1, 1, 1]
 
   "412321322234":

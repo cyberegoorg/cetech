@@ -31,8 +31,8 @@ function Editor:update(dt)
     local dy = 0
 
     if EditorInput.mouse.left then
-        dx = EditorInput.mouse.dx * -0.1
-        dy = EditorInput.mouse.dy * 0.1
+        dx = EditorInput.mouse.dx * -1
+        dy = EditorInput.mouse.dy * 1
     end
 
     local leftdown = 0.0
@@ -54,6 +54,11 @@ end
 
 function Editor:load_level(level)
     Log.info("leveleditor", "load level {0}", level)
+
+    if self.level then
+        Level.destroy(self.world, self.level)
+    end
+
     self.level = Level.load_level(self.world, level)
 end
 
@@ -72,3 +77,14 @@ end
 function render()
     Editor:render()
 end
+
+--cetech.Renderer.set_debug(false)
+--
+--if orig_update == nil then
+--    orig_update = Editor.update
+--end
+--
+--function Editor:update(dt)
+--    orig_update(dt)
+--end
+

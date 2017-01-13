@@ -39,12 +39,8 @@ static struct G {
     int log_socket;
     int push_socket;
 
-    cvar_t cv_rpc_port;
     cvar_t cv_rpc_addr;
-
-    cvar_t cv_log_port;
     cvar_t cv_log_addr;
-
     cvar_t cv_push_addr;
 } ConsoleServerGlobals = {0};
 
@@ -128,18 +124,14 @@ int consolesrv_init(int stage) {
     if (stage == 0) {
         _G = (struct G) {0};
 
-        _G.cv_rpc_port = cvar_new_int("develop.rpc.port", "Console server rpc port", 4444);
-        _G.cv_rpc_addr = cvar_new_str("develop.rpc.addr", "Console server rpc addr", "ws://*");
-
-        _G.cv_log_port = cvar_new_int("develop.log.port", "Console server log port", 4445);
-        _G.cv_log_addr = cvar_new_str("develop.log.addr", "Console server log addr", "ws://*");
-
+        _G.cv_rpc_addr = cvar_new_str("develop.rpc.addr", "Console server rpc addr", "ws://*:4444");
+        _G.cv_log_addr = cvar_new_str("develop.log.addr", "Console server log addr", "ws://*:4445");
         _G.cv_push_addr = cvar_new_str("develop.push.addr", "Push addr", "");
 
         return 1;
     }
 
-    char addr[128] = {0};
+    const char *addr = 0;
 
     log_debug(LOG_WHERE, "Init");
 
@@ -148,7 +140,7 @@ int consolesrv_init(int stage) {
         log_error(LOG_WHERE, "Could not create nanomsg socket: %s", nn_strerror(errno));
         return 0;
     }
-    snprintf(addr, 128, "%s:%d", cvar_get_string(_G.cv_rpc_addr), cvar_get_int(_G.cv_rpc_port));
+    addr = cvar_get_string(_G.cv_rpc_addr);
 
     log_debug(LOG_WHERE, "RPC address: %s", addr);
 
@@ -167,7 +159,8 @@ int consolesrv_init(int stage) {
             return 0;
         }
 
-        snprintf(addr, 128, "%s", cvar_get_string(_G.cv_push_addr));
+        addr = cvar_get_string(_G.cv_push_addr);
+
         log_debug(LOG_WHERE, "Push address: %s", addr);
 
         if (nn_connect(socket, addr) < 0) {
@@ -185,7 +178,8 @@ int consolesrv_init(int stage) {
         return 0;
     }
 
-    snprintf(addr, 128, "%s:%d", cvar_get_string(_G.cv_log_addr), cvar_get_int(_G.cv_log_port));
+    addr = cvar_get_string(_G.cv_log_addr);
+
     log_debug(LOG_WHERE, "LOG address: %s", addr);
 
     if (nn_bind(socket, addr) < 0) {

@@ -1,3 +1,4 @@
 *__pycache__
 **/ui/*.py
 *.autosave
+*_log.yml

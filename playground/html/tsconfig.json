@@ -1,0 +1,15 @@
+{
+  "compilerOptions": {
+    "module": "system",
+    "removeComments": true,
+    "preserveConstEnums": true,
+    "sourceMap": true
+  },
+  "files": [
+    "console_app.ts",
+    "console_app2.ts",
+    "profiler_app.ts",
+    "script_editor.ts",
+    "lib/playground/playground_rpc.ts"
+  ]
+}

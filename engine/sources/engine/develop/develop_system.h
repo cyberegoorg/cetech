@@ -46,7 +46,7 @@ int developsys_init(int stage);
 
 void developsys_shutdown();
 
-void developsys_update();
+void developsys_update(float dt);
 
 #define developsys_push(type, event) _developsys_push((struct event_header*)(&event), type, sizeof(event))
 
