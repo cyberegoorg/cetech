@@ -23,9 +23,14 @@ class Server(object):
 
         self.app = web.Application()
 
-        self.app.router.add_static('/static/',
-                                   path=str(os.path.join(ROOT_DIR, 'html')),
-                                   name='static')
+        #
+        # self.app.router.add_static('/static/',
+        #                            path=str(os.path.join(ROOT_DIR, 'html')),
+        #                            name='static')
+
+        self.app.router.add_static('/modules/',
+                                   path=str(os.path.join(ROOT_DIR, 'modules')),
+                                   name='modules_static')
 
         self.app.on_startup.append(self.start_rpc_task)
         self.app.on_cleanup.append(self.close)
@@ -51,6 +56,9 @@ class Server(object):
 
         # signal.signal(signal.SIGKILL, close_handler)
         signal.signal(signal.SIGTERM, close_handler)
+
+    def add_static(self, prefix, path):
+        self.app.router.add_static(prefix=prefix, path=path)
 
     def publish(self, msg):
         self.pub.publish(msg)

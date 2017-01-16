@@ -1,5 +1,5 @@
-///<reference path="ace/ace.d.ts"/>
-import {PlaygroundRPC, PlaygroundSubscriber} from "./lib/playground/playground_rpc";
+///<reference path="../../lib/static/ace/ace.d.ts"/>
+import {PlaygroundRPC, PlaygroundSubscriber} from "modules/lib/static/playground/playground_rpc";
 
 declare var msgpack: any;
 

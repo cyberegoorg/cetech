@@ -5,12 +5,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>CETech - console</title>
 
-    <script src="msgpack.min.js"></script>
-    <script src="ace/ace.js" type="text/javascript" charset="utf-8"></script>
-    <script src="ace/ext-language_tools.js"></script>
-    <script src="jquery.min.js"></script>
+    <script src="/modules/lib/static/msgpack.min.js"></script>
+    <script src="/modules/lib/static/ace/ace.js" type="text/javascript" charset="utf-8"></script>
+    <script src="/modules/lib/static/ace/ext-language_tools.js"></script>
+    <script src="/modules/lib/static/jquery.min.js"></script>
+    <script src="/modules/console/static/console_app2.js"></script>
+    <script src="/modules/lib/static/playground/playground_rpc.js"></script>
 
-    <link href="bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/modules/lib/static/bootstrap/css/bootstrap.min.css" rel="stylesheet">
 
     <style type="text/css" media="screen">
         #editor {
@@ -96,18 +98,16 @@
     </div>
 </div>
 
-<script src="bootstrap/js/bootstrap.min.js"></script>
-<script src="system.js"></script>
-<script src="ace/ace.js"></script>
-
+<script src="/modules/lib/static/bootstrap/js/bootstrap.min.js"></script>
+<script src="/modules/lib/static/system.js"></script>
 <script>
     SystemJS.defaultJSExtensions = true;
     SystemJS.config({
-        baseURL: '/static'
+        baseURL: '/'
     });
 
     var app;
-    SystemJS.import('console_app2').then(function (m) {
+    SystemJS.import('/modules/console/static/console_app2').then(function (m) {
         app = new m.ConsoleApp2();
     });
 

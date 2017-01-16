@@ -4,6 +4,9 @@ from collections import defaultdict
 
 class ServiceManager(object):
     def __init__(self, server):
+        """
+        :type server: playground.backend.server.Server
+        """
         self.server = server
 
         self.service_instances = {}
@@ -53,5 +56,15 @@ class ServiceManager(object):
             self.service_instances[name] = service_instance
             self.service_api[name] = api
 
+    def load_statics(self, statics):
+        for static in statics:
+            filename = static['__filename__']
+
+            prefix = "/modules/%s" % static['prefix']
+            path = os.path.abspath(os.path.join(os.path.dirname(filename), "static"))
+
+            self.server.add_static(prefix=prefix, path=path)
+
     def register_to_module_manager(self, module_manager):
         module_manager.register_module_type("service", self.load_services)
+        # module_manager.register_module_type("statics", self.load_statics)

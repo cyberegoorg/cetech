@@ -1,4 +1,4 @@
-System.register(["./lib/playground/playground_rpc"], function(exports_1, context_1) {
+System.register(["modules/lib/static/playground/playground_rpc"], function(exports_1, context_1) {
     "use strict";
     var __moduleName = context_1 && context_1.id;
     var playground_rpc_1;

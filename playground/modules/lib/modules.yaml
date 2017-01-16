@@ -1,0 +1,7 @@
+name: lib
+description: |
+  Basic js libs
+
+extensions:
+  statics:
+    - prefix: lib

@@ -52,7 +52,8 @@ class ScriptFrontendService(object):
                 root_w.tabifyDockWidget(d, dock)
 
             self._frontend.create_web_content(window_name, window_name,
-                                              "http://localhost:8080/static/script_editor.html?src/%s.%s" % (
+                                              "http://localhost:8080/modules/script_editor/static/script_editor.html"
+                                              "?src/%s.%s" % (
                                                   asset_name, asset_type)
                                               )
 

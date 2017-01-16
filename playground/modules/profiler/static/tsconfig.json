@@ -1,0 +1,11 @@
+{
+  "compilerOptions": {
+    "module": "system",
+    "removeComments": true,
+    "preserveConstEnums": true,
+    "sourceMap": true
+  },
+  "files": [
+    "profiler_app.ts"
+  ]
+}

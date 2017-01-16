@@ -1,7 +1,7 @@
-///<reference path="ace/ace.d.ts"/>
-///<reference path="vs.d.ts"/>
+///<reference path="../../lib/static/ace/ace.d.ts"/>
+///<reference path="../../lib/static/vs.d.ts"/>
+import {PlaygroundSubscriber} from "modules/lib/static/playground/playground_rpc";
 
-import {PlaygroundSubscriber} from "./lib/playground/playground_rpc";
 import * as vis from "vis";
 
 declare var msgpack: any;

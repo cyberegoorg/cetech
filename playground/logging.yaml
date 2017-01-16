@@ -36,4 +36,3 @@ loggers:
 
   nanoreq:
       level: ERROR
-      
