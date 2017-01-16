@@ -26,6 +26,6 @@ $ ./bin/linux64/cetech_develop -compile -continue -src ./examples/develop/src -b
 #### Playground
 
 ```bash
-$ python3 playground/playground.py
+$ python3 playground/playground_run.py
 ```
 * add folder `examples/develop`
