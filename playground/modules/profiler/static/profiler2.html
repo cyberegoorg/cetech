@@ -5,11 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>CETech - console</title>
 
-    <script src="msgpack.min.js"></script>
-    <script src="jquery.min.js"></script>
+    <script src="/modules/lib/static/msgpack.min.js"></script>
+    <script src="/modules/lib/static/jquery.min.js"></script>
 
-    <link href="bootstrap/css/bootstrap.min.css" rel="stylesheet">
-    <link href="vis.min.css" rel="stylesheet">
+    <link href="/modules/lib/static/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/modules/lib/static/vis.min.css" rel="stylesheet">
 </head>
 <body>
 
@@ -47,16 +47,19 @@
     </div>
 </div>
 
-<script src="bootstrap/js/bootstrap.min.js"></script>
-<script src="system.js"></script>
+<script src="/modules/lib/static/bootstrap/js/bootstrap.min.js"></script>
+<script src="/modules/lib/static/system.js"></script>
 <script>
     SystemJS.defaultJSExtensions = true;
     SystemJS.config({
-        baseURL: '/static'
+        baseURL: '/',
+        map: {
+            vis: '/modules/lib/static/vis.js'
+        }
     });
 
     var app;
-    SystemJS.import('profiler_app').then(function (m) {
+    SystemJS.import('/modules/profiler/static/profiler_app').then(function (m) {
         app = new m.ProfilerApp();
     });
 
