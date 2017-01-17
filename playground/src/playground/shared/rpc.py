@@ -2,7 +2,7 @@ import random
 
 import functools
 
-from cetech.consoleproxy import NanoReq
+from cetech import NanoReq
 
 
 class Client(object):

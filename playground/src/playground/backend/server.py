@@ -8,7 +8,7 @@ import msgpack
 import nanomsg
 from aiohttp import web
 
-from cetech.consoleproxy import NanoPub
+from cetech import NanoPub
 from playground.backend.service import ServiceManager
 from playground.shared.modules import Manager
 

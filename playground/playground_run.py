@@ -73,7 +73,7 @@ ARGS_PARSER.add_argument(
 ########################################################################################################################
 
 def run_backend(logging, playground_dir):
-    from playground.backend.main import main
+    from playground.backend import main
     main()
 
 

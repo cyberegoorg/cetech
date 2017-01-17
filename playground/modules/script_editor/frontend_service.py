@@ -4,8 +4,9 @@ from PyQt5.QtCore import Qt
 class ScriptFrontendService(object):
     def __init__(self, frontend_api):
         """
-        :type frontend_api: playground.frontend.app.FrontendApp
+        :type frontend_api: playground.frontend.FrontendApp
         """
+
         self._frontend = frontend_api
 
         self._frontend.subscribe_service("asset_service", self._subcribe_asset_browser)

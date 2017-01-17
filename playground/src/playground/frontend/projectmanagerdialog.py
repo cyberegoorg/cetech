@@ -3,7 +3,7 @@ from PyQt5.QtCore import QSettings
 from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QListWidgetItem, QDialog, QDialogButtonBox
 
-from playground.frontend.addexistingdialog import AddExistItemDialog
+from playground.frontend import AddExistItemDialog
 from playground.ui.projectmanagerdialog import Ui_Dialog
 
 

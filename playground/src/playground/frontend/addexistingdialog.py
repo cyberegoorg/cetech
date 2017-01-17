@@ -1,6 +1,6 @@
 from PyQt5.QtWidgets import QDialog, QFileDialog, QMessageBox
 
-from playground.shared import projectmanager
+from playground.frontend import projectmanager
 from playground.ui.addexistingdialog import Ui_Dialog
 
 

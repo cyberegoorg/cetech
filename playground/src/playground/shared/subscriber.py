@@ -4,7 +4,7 @@ from time import sleep
 
 from PyQt5 import QtCore
 
-from cetech.consoleproxy import NanoSub
+from cetech import NanoSub
 
 
 class QTSubscriber(QtCore.QThread):
