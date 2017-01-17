@@ -14,7 +14,7 @@ extensions:
     - name: content2
       window: window2
       type: web_content
-      url: http://localhost:8080/modules/console/static/console2.html
+      url: console/static/console.html
 
   statics:
     - prefix: console

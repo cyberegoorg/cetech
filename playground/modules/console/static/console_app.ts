@@ -3,7 +3,7 @@ import {PlaygroundRPC, PlaygroundSubscriber} from "modules/lib/static/playground
 
 declare var msgpack: any;
 
-export class ConsoleApp2 {
+export class ConsoleApp {
     editor: AceAjax.Editor;
     editor2: AceAjax.Editor;
 

@@ -13,4 +13,4 @@ extensions:
     - name: content1
       window: window1
       type: web_content
-      url: http://localhost:8080/modules/profiler/static/profiler2.html
+      url: profiler/static/profiler.html

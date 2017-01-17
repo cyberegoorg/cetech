@@ -62,6 +62,12 @@ class FilesystemService(object):
             self.observer.join()
 
     def api_read(self, path):
+        """
+        :type path: str
+        """
+
+        path = path[:-1] if path.endswith("/") else path
+
         full_path = os.path.join(self._project_service.api_get_project_dir(), path)
 
         self.logger.debug("Read '%s'" % full_path)
@@ -72,6 +78,13 @@ class FilesystemService(object):
         return content
 
     def api_write(self, path, content):
+        """
+        :type path: str
+        :type content: str
+        """
+
+        path = path[:-1] if path.endswith("/") else path
+
         full_path = os.path.join(self._project_service.api_get_project_dir(), path)
 
         self.logger.info("Write '%s'" % full_path)
