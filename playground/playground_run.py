@@ -73,13 +73,13 @@ ARGS_PARSER.add_argument(
 ########################################################################################################################
 
 def run_backend(logging, playground_dir):
-    from playground.backend.main import main
+    from cetech_playground.backend import main
     main()
 
 
 def run_frontend(logging, playground_dir):
     def compile_map(d, f):
-        return 'src/playground/ui/', f
+        return 'src/cetech_playground/ui/', f
 
     # good for develop and first run.
     compileUiDir(
@@ -100,7 +100,7 @@ def run_frontend(logging, playground_dir):
     }
     qInstallMessageHandler(lambda t, c, m: LOGGER_MAP[t](m))
 
-    from playground.frontend.main import main
+    from cetech_playground.frontend.main import main
 
     main()
 

@@ -4,8 +4,8 @@ import sys
 
 from PyQt5.QtWidgets import QApplication
 
-from playground.frontend.app import FrontendApp
-from playground.frontend.projectmanagerdialog import ProjectManagerDialog
+from cetech_playground.frontend import FrontendApp
+from cetech_playground.frontend import ProjectManagerDialog
 
 ROOT_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), os.pardir, os.pardir, os.pardir)
 MODULES_DIR = os.path.abspath(os.path.join(ROOT_DIR, "modules"))

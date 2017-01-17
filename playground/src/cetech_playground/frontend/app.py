@@ -1,7 +1,8 @@
-import playground.shared.modules as modules
-from playground.frontend.gui_qt import QtFrontendGui
-from playground.shared import rpc
-from playground.shared.subscriber import QTSubscriber
+import cetech_playground.shared as modules
+from cetech_playground.shared import rpc
+from cetech_playground.shared import QTSubscriber
+
+from .gui_qt import QtFrontendGui
 
 
 class FrontendApp(object):
