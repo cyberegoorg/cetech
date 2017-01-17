@@ -128,11 +128,13 @@ class QtFrontendGui(object):
         self.docks[name] = dock
 
     def create_web_content(self, name, window_name, url):
+        full_url = "http://localhost:8080/modules/%s/" % url
+
         w = self.windows[window_name]
 
         web_view = QtWebKitWidgets.QWebView(w)
         web_view.page().settings().setAttribute(QWebSettings.DeveloperExtrasEnabled, True)
-        web_view.page().mainFrame().setUrl(QUrl(url))
+        web_view.page().mainFrame().setUrl(QUrl(full_url))
 
         w.setCentralWidget(web_view)
 

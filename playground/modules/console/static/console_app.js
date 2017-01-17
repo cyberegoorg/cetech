@@ -2,15 +2,15 @@ System.register(["modules/lib/static/playground/playground_rpc"], function(expor
     "use strict";
     var __moduleName = context_1 && context_1.id;
     var playground_rpc_1;
-    var ConsoleApp2;
+    var ConsoleApp;
     return {
         setters:[
             function (playground_rpc_1_1) {
                 playground_rpc_1 = playground_rpc_1_1;
             }],
         execute: function() {
-            ConsoleApp2 = (function () {
-                function ConsoleApp2() {
+            ConsoleApp = (function () {
+                function ConsoleApp() {
                     var _this = this;
                     this.level_to_class = {
                         info: "info",
@@ -26,7 +26,7 @@ System.register(["modules/lib/static/playground/playground_rpc"], function(expor
                     };
                     this.rpc = new playground_rpc_1.PlaygroundRPC();
                     this.sub = new playground_rpc_1.PlaygroundSubscriber();
-                    this.sub.subcribe_service("engine_service", function (msg) {
+                    this.sub.subcribeService("engine_service", function (msg) {
                         if (msg.msg_type != 'log') {
                             return;
                         }
@@ -73,7 +73,7 @@ System.register(["modules/lib/static/playground/playground_rpc"], function(expor
                         _this.send_cmd();
                     };
                 }
-                ConsoleApp2.prototype.send_cmd = function () {
+                ConsoleApp.prototype.send_cmd = function () {
                     var _this = this;
                     var script = this.editor.getValue();
                     this.rpc.callService("engine_service", "call", {
@@ -84,7 +84,7 @@ System.register(["modules/lib/static/playground/playground_rpc"], function(expor
                         _this.editor2.setValue(JSON.stringify(msg, null, 2));
                     });
                 };
-                ConsoleApp2.prototype.connect_to_cetech = function () {
+                ConsoleApp.prototype.connect_to_cetech = function () {
                     this.rpc.close();
                     this.sub.close();
                     var cetech_url = document.getElementById("cetech_url");
@@ -92,10 +92,10 @@ System.register(["modules/lib/static/playground/playground_rpc"], function(expor
                     this.sub.connect("ws://localhost:8889");
                 };
                 ;
-                return ConsoleApp2;
+                return ConsoleApp;
             }());
-            exports_1("ConsoleApp2", ConsoleApp2);
+            exports_1("ConsoleApp", ConsoleApp);
         }
     }
 });
-//# sourceMappingURL=console_app2.js.map
+//# sourceMappingURL=console_app.js.map

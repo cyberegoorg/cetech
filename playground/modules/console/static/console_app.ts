@@ -3,7 +3,7 @@ import {PlaygroundRPC, PlaygroundSubscriber} from "modules/lib/static/playground
 
 declare var msgpack: any;
 
-export class ConsoleApp2 {
+export class ConsoleApp {
     editor: AceAjax.Editor;
     editor2: AceAjax.Editor;
 
@@ -27,7 +27,7 @@ export class ConsoleApp2 {
     constructor() {
         this.rpc = new PlaygroundRPC();
         this.sub = new PlaygroundSubscriber();
-        this.sub.subcribe_service("engine_service", (msg): void => {
+        this.sub.subcribeService("engine_service", (msg): void => {
             if (msg.msg_type != 'log') {
                 return;
             }

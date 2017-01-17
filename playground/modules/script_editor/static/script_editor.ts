@@ -46,7 +46,7 @@ export class ScriptEditor {
 
         this.connect_to_cetech();
 
-        this.sub.subcribe_service("filesystem_service", (msg): void => {
+        this.sub.subcribeService("filesystem_service", (msg): void => {
             if (msg.msg_type == 'event') {
                 msg = msg.msg;
 

@@ -8,7 +8,7 @@ System.register([], function(exports_1, context_1) {
             PlaygroundRPC = (function () {
                 function PlaygroundRPC() {
                     this.connected = false;
-                    this.responce_callbacks = {};
+                    this.response_callbacks = {};
                 }
                 PlaygroundRPC.prototype.connect = function (url, onopen) {
                     var _this = this;
@@ -43,7 +43,7 @@ System.register([], function(exports_1, context_1) {
                         args: args,
                         id: Math.random()
                     };
-                    this.responce_callbacks[request.id] = {
+                    this.response_callbacks[request.id] = {
                         on_ok: on_ok
                     };
                     var msg = msgpack.encode(request);
@@ -60,9 +60,9 @@ System.register([], function(exports_1, context_1) {
                         console.error("RPC response error: " + msg);
                     }
                     else {
-                        this.responce_callbacks[msg.id].on_ok(msg);
+                        this.response_callbacks[msg.id].on_ok(msg);
                     }
-                    delete this.responce_callbacks[msg.id];
+                    delete this.response_callbacks[msg.id];
                 };
                 return PlaygroundRPC;
             }());
@@ -95,7 +95,7 @@ System.register([], function(exports_1, context_1) {
                         this.sub_ws.close();
                     }
                 };
-                PlaygroundSubscriber.prototype.subcribe_service = function (service_name, on_msg) {
+                PlaygroundSubscriber.prototype.subcribeService = function (service_name, on_msg) {
                     this.responce_callbacks[service_name] = on_msg;
                 };
                 return PlaygroundSubscriber;

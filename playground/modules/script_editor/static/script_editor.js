@@ -39,7 +39,7 @@ System.register(["modules/lib/static/playground/playground_rpc"], function(expor
                         bindKey: { win: "ctrl-s" }
                     });
                     this.connect_to_cetech();
-                    this.sub.subcribe_service("filesystem_service", function (msg) {
+                    this.sub.subcribeService("filesystem_service", function (msg) {
                         if (msg.msg_type == 'event') {
                             msg = msg.msg;
                             if (msg.msg_type == 'file_modified') {

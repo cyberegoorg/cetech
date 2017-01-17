@@ -3,7 +3,7 @@ declare var msgpack: any;
 export class PlaygroundRPC {
     private rpc_ws: WebSocket;
     private connected: boolean = false;
-    private responce_callbacks = {};
+    private response_callbacks = {};
 
     constructor() {
     }
@@ -25,9 +25,9 @@ export class PlaygroundRPC {
         };
 
         this.rpc_ws.onmessage = (msg): void => {
-            var data = new Uint8Array(msg.data);
-            var msg_data = data.subarray(4);
-            var unpack_msg = msgpack.decode(msg_data);
+            const data = new Uint8Array(msg.data);
+            const msg_data = data.subarray(4);
+            const unpack_msg = msgpack.decode(msg_data);
 
             this._parseMessage(unpack_msg);
         };
@@ -40,21 +40,21 @@ export class PlaygroundRPC {
     }
 
     callService(service_name: string, fce_name: string, args: any, on_ok: (msg: any) => void) {
-        var request = {
+        const request = {
             service: service_name,
             name: fce_name,
             args: args,
             id: Math.random()
         };
 
-        this.responce_callbacks[request.id] = {
+        this.response_callbacks[request.id] = {
             on_ok: on_ok
         };
 
-        var msg = msgpack.encode(request);
+        const msg = msgpack.encode(request);
 
-        var header = new Uint8Array([255, 255, 255, 255]);
-        var tmp = new Uint8Array(header.byteLength + msg.length);
+        const header = new Uint8Array([255, 255, 255, 255]);
+        let tmp = new Uint8Array(header.byteLength + msg.length);
 
         tmp.set(header, 0);
         tmp.set(msg, header.byteLength);
@@ -63,15 +63,15 @@ export class PlaygroundRPC {
     }
 
     private _parseMessage(msg: any) {
-        console.log(msg)
+        console.log(msg);
         if (!msg.hasOwnProperty("response") ||
             ((msg.response != null) && msg.response.hasOwnProperty("error"))) {
             console.error("RPC response error: " + msg);
         } else {
-            this.responce_callbacks[msg.id].on_ok(msg);
+            this.response_callbacks[msg.id].on_ok(msg);
         }
 
-        delete this.responce_callbacks[msg.id];
+        delete this.response_callbacks[msg.id];
     }
 }
 
@@ -95,8 +95,8 @@ export class PlaygroundSubscriber {
         };
 
         this.sub_ws.onmessage = (msg): void => {
-            var msg_data = new Uint8Array(msg.data);
-            var unpack_msg = msgpack.decode(msg_data);
+            const msg_data = new Uint8Array(msg.data);
+            const unpack_msg = msgpack.decode(msg_data);
 
             if (this.responce_callbacks.hasOwnProperty(unpack_msg.service)) {
                 this.responce_callbacks[unpack_msg.service](unpack_msg)
@@ -110,8 +110,7 @@ export class PlaygroundSubscriber {
         }
     }
 
-    subcribe_service(service_name: string, on_msg: (msg: any) => void) {
+    subcribeService(service_name: string, on_msg: (msg: any) => void) {
         this.responce_callbacks[service_name] = on_msg
     }
-
 }
