@@ -70,7 +70,7 @@ export class ProfilerApp {
 
         this.Record = false;
 
-        this.sub.subcribe_service("engine_service", (msg): void => {
+        this.sub.subcribeService("engine_service", (msg): void => {
             if (!this.Record) {
                 return;
             }

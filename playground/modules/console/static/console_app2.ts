@@ -27,7 +27,7 @@ export class ConsoleApp2 {
     constructor() {
         this.rpc = new PlaygroundRPC();
         this.sub = new PlaygroundSubscriber();
-        this.sub.subcribe_service("engine_service", (msg): void => {
+        this.sub.subcribeService("engine_service", (msg): void => {
             if (msg.msg_type != 'log') {
                 return;
             }

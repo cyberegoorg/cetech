@@ -56,7 +56,7 @@ System.register(["modules/lib/static/playground/playground_rpc", "vis"], functio
                     this.items = new vis.DataSet();
                     this.timeline = new vis.Timeline(container, this.items, groups, options);
                     this.Record = false;
-                    this.sub.subcribe_service("engine_service", function (msg) {
+                    this.sub.subcribeService("engine_service", function (msg) {
                         if (!_this.Record) {
                             return;
                         }

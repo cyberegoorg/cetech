@@ -26,7 +26,7 @@ System.register(["modules/lib/static/playground/playground_rpc"], function(expor
                     };
                     this.rpc = new playground_rpc_1.PlaygroundRPC();
                     this.sub = new playground_rpc_1.PlaygroundSubscriber();
-                    this.sub.subcribe_service("engine_service", function (msg) {
+                    this.sub.subcribeService("engine_service", function (msg) {
                         if (msg.msg_type != 'log') {
                             return;
                         }
