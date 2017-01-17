@@ -4,7 +4,7 @@ from PyQt5.QtCore import Qt
 class ScriptFrontendService(object):
     def __init__(self, frontend_api):
         """
-        :type frontend_api: playground.frontend.FrontendApp
+        :type frontend_api: cetech_playground.frontend.FrontendApp
         """
 
         self._frontend = frontend_api

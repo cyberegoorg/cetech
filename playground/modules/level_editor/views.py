@@ -1,5 +1,5 @@
-import playground.shared.rpc as rpc
-from playground.frontend.gui_qt import CETechWiget
+import cetech_playground.shared.rpc as rpc
+from cetech_playground.frontend.gui_qt import CETechWiget
 
 
 class LevelEditorView(CETechWiget):

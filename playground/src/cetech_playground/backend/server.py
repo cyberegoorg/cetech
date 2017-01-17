@@ -9,8 +9,8 @@ import nanomsg
 from aiohttp import web
 
 from cetech import NanoPub
-from playground.backend.service import ServiceManager
-from playground.shared.modules import Manager
+from cetech_playground.backend.service import ServiceManager
+from cetech_playground.shared.modules import Manager
 
 ROOT_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), os.pardir, os.pardir, os.pardir)
 MODULES_DIR = os.path.abspath(os.path.join(ROOT_DIR, "modules"))

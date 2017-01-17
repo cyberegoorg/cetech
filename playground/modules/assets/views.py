@@ -2,9 +2,9 @@ from PyQt5.QtCore import QDir
 from PyQt5.QtWidgets import QFileSystemModel
 from PyQt5.QtWidgets import QMainWindow
 
-import playground.shared.rpc as rpc
-from playground.frontend.gui_qt import CETechWiget
-from playground.ui.assetbrowser import Ui_MainWindow
+import cetech_playground.shared.rpc as rpc
+from cetech_playground.frontend.gui_qt import CETechWiget
+from cetech_playground.ui.assetbrowser import Ui_MainWindow
 
 
 class AssetPreviewView(CETechWiget):

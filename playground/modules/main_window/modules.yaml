@@ -11,7 +11,7 @@ extensions:
       script: |
         def on_triggered(fronted, window_name):
             """
-            :type fronted: playground.frontend.app.FrontendApp
+            :type fronted: cetech_playground.frontend.app.FrontendApp
             :type window_name: str
             """
             #print(window_name)

@@ -2,7 +2,7 @@ import sys
 
 from PyQt5.QtWidgets import QApplication
 
-from playground.backend import server
+from cetech_playground.backend import server
 
 
 def main():

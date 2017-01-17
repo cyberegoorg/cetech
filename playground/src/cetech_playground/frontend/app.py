@@ -1,6 +1,6 @@
-import playground.shared.modules as modules
-from playground.shared import rpc
-from playground.shared.subscriber import QTSubscriber
+import cetech_playground.shared.modules as modules
+from cetech_playground.shared import rpc
+from cetech_playground.shared.subscriber import QTSubscriber
 
 from .gui_qt import QtFrontendGui
 
