@@ -1,8 +1,7 @@
 from PyQt5.QtWidgets import QDialog, QFileDialog, QMessageBox
 
 from cetech_playground.frontend import projectmanager
-
-from cetech_playground.ui.addexistingdialog import Ui_Dialog
+from .ui.addexistingdialog import Ui_Dialog
 
 
 class AddExistItemDialog(QDialog, Ui_Dialog):

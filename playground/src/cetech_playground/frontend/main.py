@@ -8,9 +8,8 @@ from cetech_playground.frontend import FrontendApp
 from cetech_playground.frontend import ProjectManagerDialog
 
 ROOT_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), os.pardir, os.pardir, os.pardir)
-MODULES_DIR = os.path.abspath(os.path.join(ROOT_DIR, "modules"))
+MODULES_DIR = os.path.abspath(os.path.join(ROOT_DIR, 'src', 'cetech_playground_modules'))
 CORE_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), os.pardir, os.pardir, os.pardir, os.pardir, "core"))
-
 
 def main():
     try:
