@@ -22,7 +22,6 @@ print(sys.path)
 import PyQt5
 from PyQt5.QtCore import QDir, qInstallMessageHandler
 from PyQt5.QtWidgets import QApplication
-from PyQt5.uic import compileUiDir
 
 ###########
 # GLOBALS #
@@ -78,15 +77,15 @@ def run_backend(logging, playground_dir):
 
 
 def run_frontend(logging, playground_dir):
-    def compile_map(d, f):
-        return 'src/cetech_playground/ui/', f
+    def compile_ui(dir):
+        from PyQt5.uic import compileUiDir
 
-    # good for develop and first run.
-    compileUiDir(
-        dir='ui',
-        recurse=True,
-        map=compile_map
-    )
+        compileUiDir(
+            dir=dir,
+            recurse=True,
+        )
+
+    compile_ui(os.path.join(PLAYGROUND_DIR, 'src'))
 
     QDir.setCurrent(playground_dir)
 

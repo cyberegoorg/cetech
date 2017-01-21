@@ -13,7 +13,7 @@ from cetech_playground.backend.service import ServiceManager
 from cetech_playground.shared import Manager
 
 ROOT_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), os.pardir, os.pardir, os.pardir)
-MODULES_DIR = os.path.abspath(os.path.join(ROOT_DIR, "modules"))
+MODULES_DIR = os.path.abspath(os.path.join(ROOT_DIR, "src", "cetech_playground_modules"))
 CORE_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), os.pardir, os.pardir, os.pardir, os.pardir, "core"))
 
 
@@ -29,7 +29,7 @@ class Server(object):
         #                            name='static')
 
         self.app.router.add_static('/modules/',
-                                   path=str(os.path.join(ROOT_DIR, 'modules')),
+                                   path=str(MODULES_DIR),
                                    name='modules_static')
 
         self.app.on_startup.append(self.start_rpc_task)
