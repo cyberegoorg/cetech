@@ -42,6 +42,7 @@ class FilesystemService(object):
 
         self.name = None
         self.project_dir = None
+        self.observer = None
 
         self.publish = functools.partial(self.service_manager.publish, self.SERVICE_NAME, "event")
 
@@ -96,8 +97,9 @@ class FilesystemService(object):
         pass
 
     def close(self):
-        self.observer.stop()
-        self.observer.join()
+        if self.observer:
+            self.observer.stop()
+            self.observer.join()
 
     @property
     def _project_service(self):
