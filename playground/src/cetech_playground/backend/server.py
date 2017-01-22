@@ -12,6 +12,14 @@ from cetech import NanoPub
 from cetech_playground.backend.service import ServiceManager
 from cetech_playground.shared import Manager
 
+try:
+    import aiohttp_debugtoolbar
+except ImportError:
+    aiohttp_debugtoolbar = None
+
+if aiohttp_debugtoolbar is not None:
+    from aiohttp_debugtoolbar import toolbar_middleware_factory
+
 ROOT_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), os.pardir, os.pardir, os.pardir)
 MODULES_DIR = os.path.abspath(os.path.join(ROOT_DIR, "src", "cetech_playground_modules"))
 CORE_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), os.pardir, os.pardir, os.pardir, os.pardir, "core"))
@@ -21,9 +29,12 @@ class Server(object):
     def __init__(self, logger=logging):
         self.logger = logger
 
-        self.app = web.Application()
+        if aiohttp_debugtoolbar is not None:
+            self.app = web.Application(middlewares=[toolbar_middleware_factory])
+            aiohttp_debugtoolbar.setup(self.app)
+        else:
+            self.app = web.Application()
 
-        #
         # self.app.router.add_static('/static/',
         #                            path=str(os.path.join(ROOT_DIR, 'html')),
         #                            name='static')
@@ -53,8 +64,8 @@ class Server(object):
         def close_handler(signum, frame):
             self.logger.info("Close by signal")
             self.app.shutdown()
+            raise KeyboardInterrupt
 
-        # signal.signal(signal.SIGKILL, close_handler)
         signal.signal(signal.SIGTERM, close_handler)
 
     def add_static(self, prefix, path):
