@@ -33,7 +33,7 @@ sys.path.insert(0, os.path.join(ROOT_DIR, "playground", "src"))
 
 instance_counter = 0
 
-import cetech.engine as engine
+from cetech import engine as engine
 
 
 @pytest.fixture(scope='function')

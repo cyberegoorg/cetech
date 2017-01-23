@@ -13,6 +13,7 @@ from multiprocessing import Process
 import yaml
 from PyQt5 import QtCore
 
+# SHITCODE
 _platform = platform.system().lower()
 if _platform == 'windows':
     sys.path.insert(0, 'C:\Python34\lib\site-packages')
@@ -26,6 +27,7 @@ from PyQt5.QtWidgets import QApplication
 ###########
 # GLOBALS #
 ########################################################################################################################
+# SHITCODE
 ROOT_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), os.pardir)
 PLAYGROUND_DIR = os.path.abspath(os.path.join(ROOT_DIR, 'playground'))
 
@@ -72,7 +74,7 @@ ARGS_PARSER.add_argument(
 ########################################################################################################################
 
 def run_backend(logging, playground_dir):
-    from cetech_playground.backend import main
+    from cetech.playground.backend import main
     main()
 
 
@@ -99,7 +101,7 @@ def run_frontend(logging, playground_dir):
     }
     qInstallMessageHandler(lambda t, c, m: LOGGER_MAP[t](m))
 
-    from cetech_playground.frontend.main import main
+    from cetech.playground.frontend import main
 
     main()
 
@@ -148,7 +150,5 @@ def main(args=None):
 
 if __name__ == '__main__':
     main()
-
-########################################################################################################################
 
 ########################################################################################################################
