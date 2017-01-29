@@ -56,8 +56,12 @@ struct G {
     MAP_T(u32) type_map;
     ARRAY_T(resource_data) resource_data;
     ARRAY_T(resource_callbacks_t) resource_callbacks;
-    cvar_t cv_build_dir;
     int autoload_enabled;
+
+    struct {
+        cvar_t build_dir;
+    } config;
+
 } _G = {0};
 
 
@@ -139,12 +143,12 @@ int resource_init(int stage) {
         return 1;
     }
 
-    _G.cv_build_dir = cvar_find("build");
+    _G.config.build_dir = cvar_find("build");
 
     char build_dir_full[4096] = {0};
     cel_path_join(build_dir_full,
                   CEL_ARRAY_LEN(build_dir_full),
-                  cvar_get_string(_G.cv_build_dir),
+                  cvar_get_string(_G.config.build_dir),
                   application_platform());
 
     filesystem_map_root_dir(stringid64_from_string("build"), build_dir_full);
