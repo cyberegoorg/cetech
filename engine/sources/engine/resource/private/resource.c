@@ -145,6 +145,7 @@ int resource_init(int stage) {
 
     _G.config.build_dir = cvar_find("build");
 
+
     char build_dir_full[4096] = {0};
     cel_path_join(build_dir_full,
                   CEL_ARRAY_LEN(build_dir_full),
