@@ -35,17 +35,17 @@
 
 static struct G {
     struct {
-        cvar_t cv_boot_pkg;
-        cvar_t cv_boot_script;
-        cvar_t cv_screen_x;
-        cvar_t cv_screen_y;
-        cvar_t cv_fullscreen;
+        cvar_t boot_pkg;
+        cvar_t boot_script;
+        cvar_t screen_x;
+        cvar_t screen_y;
+        cvar_t fullscreen;
 
-        cvar_t cv_daemon;
-        cvar_t cv_compile;
-        cvar_t cv_continue;
-        cvar_t cv_wait;
-        cvar_t cv_wid;
+        cvar_t daemon;
+        cvar_t compile;
+        cvar_t continue_;
+        cvar_t wait;
+        cvar_t wid;
     } config;
 
     const struct game_callbacks *game;
@@ -98,18 +98,18 @@ int application_init(int argc,
     memsys_init(4 * 1024 * 1024);
     cvar_init();
 
-    _G.config.cv_boot_pkg = cvar_new_str("core.boot_pkg", "Boot package", "boot");
-    _G.config.cv_boot_script = cvar_new_str("core.boot_script", "Boot script", "lua/boot");
+    _G.config.boot_pkg = cvar_new_str("core.boot_pkg", "Boot package", "boot");
+    _G.config.boot_script = cvar_new_str("core.boot_script", "Boot script", "lua/boot");
 
-    _G.config.cv_screen_x = cvar_new_int("screen.x", "Screen width", 1024);
-    _G.config.cv_screen_y = cvar_new_int("screen.y", "Screen height", 768);
-    _G.config.cv_fullscreen = cvar_new_int("screen.fullscreen", "Fullscreen", 0);
+    _G.config.screen_x = cvar_new_int("screen.x", "Screen width", 1024);
+    _G.config.screen_y = cvar_new_int("screen.y", "Screen height", 768);
+    _G.config.fullscreen = cvar_new_int("screen.fullscreen", "Fullscreen", 0);
 
-    _G.config.cv_daemon = cvar_new_int("daemon", "Daemon mode", 0);
-    _G.config.cv_compile = cvar_new_int("compile", "Comple", 0);
-    _G.config.cv_continue = cvar_new_int("continue", "Continue after compile", 0);
-    _G.config.cv_wait = cvar_new_int("wait", "Wait for client", 0);
-    _G.config.cv_wid = cvar_new_int("wid", "Wid", 0);
+    _G.config.daemon = cvar_new_int("daemon", "Daemon mode", 0);
+    _G.config.compile = cvar_new_int("compile", "Comple", 0);
+    _G.config.continue_ = cvar_new_int("continue", "Continue after compile", 0);
+    _G.config.wait = cvar_new_int("wait", "Wait for client", 0);
+    _G.config.wid = cvar_new_int("wid", "Wid", 0);
 
     // Cvar stage
     for (int i = 0; i < STATIC_SYSTEMS_SIZE; ++i) {
@@ -121,7 +121,7 @@ int application_init(int argc,
     }
 
     cvar_parse_core_args(_G.args);
-    if (cvar_get_int(_G.config.cv_compile)) {
+    if (cvar_get_int(_G.config.compile)) {
         resource_compiler_create_build_dir();
         cvar_compile_global();
     }
@@ -174,11 +174,11 @@ int application_shutdown() {
 }
 
 static void _boot_stage() {
-    stringid64_t boot_pkg = stringid64_from_string(cvar_get_string(_G.config.cv_boot_pkg));
+    stringid64_t boot_pkg = stringid64_from_string(cvar_get_string(_G.config.boot_pkg));
     stringid64_t pkg = stringid64_from_string("package");
 
     // TODO: remove, this must be done by boot_package and load in boot_script
-    if (!cvar_get_int(_G.config.cv_daemon)) {
+    if (!cvar_get_int(_G.config.daemon)) {
         stringid64_t core_pkg = stringid64_from_string("core");
         resource_load_now(pkg, &core_pkg, 1);
         package_load(core_pkg);
@@ -189,19 +189,19 @@ static void _boot_stage() {
     package_load(boot_pkg);
     package_flush(boot_pkg);
 
-    stringid64_t boot_script = stringid64_from_string(cvar_get_string(_G.config.cv_boot_script));
+    stringid64_t boot_script = stringid64_from_string(cvar_get_string(_G.config.boot_script));
     luasys_execute_boot_script(boot_script);
 }
 
 
 static void _boot_unload() {
-    stringid64_t boot_pkg = stringid64_from_string(cvar_get_string(_G.config.cv_boot_pkg));
+    stringid64_t boot_pkg = stringid64_from_string(cvar_get_string(_G.config.boot_pkg));
     stringid64_t pkg = stringid64_from_string("package");
 
     package_unload(boot_pkg);
     resource_unload(pkg, &boot_pkg, 1);
 
-    if (!cvar_get_int(_G.config.cv_daemon)) {
+    if (!cvar_get_int(_G.config.daemon)) {
         stringid64_t core_pkg = stringid64_from_string("core");
         resource_load_now(pkg, &core_pkg, 1);
         package_load(core_pkg);
@@ -217,27 +217,27 @@ void application_start() {
     resource_set_autoload(0);
 #endif
 
-    if (cvar_get_int(_G.config.cv_compile)) {
+    if (cvar_get_int(_G.config.compile)) {
         resource_compiler_compile_all();
 
-        if (!cvar_get_int(_G.config.cv_continue)) {
+        if (!cvar_get_int(_G.config.continue_)) {
             return;
         }
     }
 
-    if (!cvar_get_int(_G.config.cv_daemon)) {
-        intptr_t wid = cvar_get_int(_G.config.cv_wid);
+    if (!cvar_get_int(_G.config.daemon)) {
+        intptr_t wid = cvar_get_int(_G.config.wid);
 
         char title[128] = {0};
-        snprintf(title, CEL_ARRAY_LEN(title), "cetech - %s", cvar_get_string(_G.config.cv_boot_script));
+        snprintf(title, CEL_ARRAY_LEN(title), "cetech - %s", cvar_get_string(_G.config.boot_script));
 
         if (wid == 0) {
             _G.main_window = cel_window_new(
                     title,
                     WINDOWPOS_UNDEFINED,
                     WINDOWPOS_UNDEFINED,
-                    cvar_get_int(_G.config.cv_screen_x), cvar_get_int(_G.config.cv_screen_y),
-                    cvar_get_int(_G.config.cv_fullscreen) ? WINDOW_FULLSCREEN : WINDOW_NOFLAG
+                    cvar_get_int(_G.config.screen_x), cvar_get_int(_G.config.screen_y),
+                    cvar_get_int(_G.config.fullscreen) ? WINDOW_FULLSCREEN : WINDOW_NOFLAG
             );
         } else {
             _G.main_window = cel_window_new_from((void *) wid);
@@ -285,7 +285,7 @@ void application_start() {
         _G.game->update(dt);
 
         if(frame_time_accum >= frame_time) {
-            if (!cvar_get_int(_G.config.cv_daemon)) {
+            if (!cvar_get_int(_G.config.daemon)) {
                 struct scope_data render_sd = developsys_enter_scope("Game::render()");
                 _G.game->render();
                 developsys_leave_scope("Game::render()", render_sd);
