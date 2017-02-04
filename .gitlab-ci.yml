@@ -6,30 +6,14 @@
 # Stages #
 ###############################################################################
 stages:
-  - docker_image
   - test
   - doc
-
-################
-# Docker image #
-###############################################################################
-docker_image:
-  stage: docker_image
-  image: docker:latest
-
-  services:
-    - docker:dind
-
-  script:
-    - docker login -u gitlab-ci-token -p $CI_BUILD_TOKEN $CI_REGISTRY
-    - docker build -t $CI_REGISTRY_IMAGE:$CI_BUILD_REF_NAME ./scripts/docker/build_ci
-    - docker push $CI_REGISTRY_IMAGE:$CI_BUILD_REF_NAME
 
 ########
 # Test #
 ###############################################################################
 test:
-  image: $CI_REGISTRY_IMAGE:$CI_BUILD_REF_NAME
+  image: $CI_REGISTRY/cyberegoorg/cetech-docker-toolchain:master
   stage: test
   script:
     - python3 scripts/build.py
@@ -39,7 +23,7 @@ test:
 # Gitlab pages  #
 ###############################################################################
 pages:
-  image: $CI_REGISTRY_IMAGE:$CI_BUILD_REF_NAME
+  image: $CI_REGISTRY/cyberegoorg/cetech-docker-toolchain:master
   stage: doc
   script:
     - export LC_ALL=C.UTF-8
