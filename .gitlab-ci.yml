@@ -6,8 +6,24 @@
 # Stages #
 ###############################################################################
 stages:
+  - build
   - test
   - doc
+
+########
+# Build #
+###############################################################################
+build:
+  image: $CI_REGISTRY/cyberegoorg/cetech-docker-toolchain:master
+  stage: build
+
+  artifacts:
+    paths:
+      - bin
+
+  script:
+    - python3 scripts/build.py
+
 
 ########
 # Test #
@@ -18,8 +34,10 @@ test:
   variables:
     SDL_VIDEODRIVER: dummy
 
+  dependencies:
+    - build
+
   script:
-    - python3 scripts/build.py
     - py.test -v --color=yes engine/test
 
 #################
