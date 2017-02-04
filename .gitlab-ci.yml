@@ -6,14 +6,33 @@
 # Stages #
 ###############################################################################
 stages:
- - test
- - doc
+  - docker_build
+  - docker_release
+  - test
+  - doc
+
+################
+# Docker build #
+###############################################################################
+docker_build:
+  stage: docker_build
+  script:
+    - docker build -t $CI_REGISTRY_IMAGE:$CI_BUILD_REF_NAME ./scripts/docker/build_ci
+
+##################
+# Docker release #
+###############################################################################
+docker_release:
+  stage: docker_release
+  script:
+    - docker login -u gitlab-ci-token -p $CI_BUILD_TOKEN $CI_REGISTRY
+    - docker push $CI_REGISTRY_IMAGE:$CI_BUILD_REF_NAME
 
 ########
 # Test #
 ###############################################################################
 test:
-  image: ondravoves/cetech:build_ci
+  image: $CI_REGISTRY/cyberegoorg/cetech:master
   stage: test
   script:
     - python3 scripts/build.py
@@ -23,7 +42,7 @@ test:
 # Gitlab pages  #
 ###############################################################################
 pages:
-  image: ondravoves/cetech:build_ci
+  image: $CI_REGISTRY/cyberegoorg/cetech:master
   stage: doc
   script:
     - export LC_ALL=C.UTF-8
@@ -35,4 +54,4 @@ pages:
 
   artifacts:
     paths:
-    - public
+      - public
