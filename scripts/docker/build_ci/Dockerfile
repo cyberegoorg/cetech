@@ -1,4 +1,4 @@
-FROM python:alpine
+FROM alpine:latest
 
 ENV TZ Europe/Prague
 
@@ -12,7 +12,8 @@ RUN apk add --no-cache \
             mesa-dev \
             zlib-dev \
             build-base \
-            libexecinfo-dev
+            libexecinfo-dev \
+            python3
 
 ADD requirements.txt /tmp/requirements.txt
 ADD dev_requirements.txt /tmp/dev_requirements.txt
