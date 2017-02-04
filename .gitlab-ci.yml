@@ -14,7 +14,7 @@ stages:
 # Docker image #
 ###############################################################################
 docker_image:
-  stage: docker_build
+  stage: docker_image
   image: docker:latest
 
   services:
