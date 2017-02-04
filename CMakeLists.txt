@@ -195,6 +195,7 @@ if (UNIX)
             X11
             GL
             z
+            minizip
             )
 endif ()
 
@@ -206,10 +207,12 @@ endif ()
 
 set(RELEASE_LIBS
         ${RELEASE_LIBS_LINUX}
-        ${RELEASE_LIBS_WINDOWS}
+        #${RELEASE_LIBS_WINDOWS}
 
         nanomsg.a
         bgfxRelease.a
+        bgfxRelease.a
+        bxRelease.a
         yaml-cpp.a
 
         luajit.a

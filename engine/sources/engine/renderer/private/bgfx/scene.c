@@ -311,7 +311,7 @@ void foreach_geometries_clb(yaml_node_t key,
 
     // DECL
     bgfx_vertex_decl_t vertex_decl;
-    bgfx_vertex_decl_begin(&vertex_decl, BGFX_RENDERER_TYPE_NULL);
+    bgfx_vertex_decl_begin(&vertex_decl, BGFX_RENDERER_TYPE_NOOP);
 
     yaml_node_t types = yaml_get_node(value, "types");
     u32 vertex_size = 0;
@@ -490,7 +490,7 @@ int _compile_assimp(const char *filename,
         ARRAY_PUSH_BACK(u32, &output->ib_size, mesh->mNumFaces * 3);
 
         bgfx_vertex_decl_t vertex_decl;
-        bgfx_vertex_decl_begin(&vertex_decl, BGFX_RENDERER_TYPE_NULL);
+        bgfx_vertex_decl_begin(&vertex_decl, BGFX_RENDERER_TYPE_NOOP);
 
         u32 v_size = 0;
         if (mesh->mVertices != NULL) {
