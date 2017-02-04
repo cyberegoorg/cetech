@@ -1,5 +1,0 @@
-cffi
-pytest
-pytest-bdd
-mkdocs
-mkdocs-bootswatch

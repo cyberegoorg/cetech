@@ -6,14 +6,14 @@
 # Stages #
 ###############################################################################
 stages:
- - test
- - doc
+  - test
+  - doc
 
 ########
 # Test #
 ###############################################################################
 test:
-  image: ondravoves/cetech:build_ci
+  image: $CI_REGISTRY/cyberegoorg/cetech-docker-toolchain:master
   stage: test
   script:
     - python3 scripts/build.py
@@ -23,7 +23,7 @@ test:
 # Gitlab pages  #
 ###############################################################################
 pages:
-  image: ondravoves/cetech:build_ci
+  image: $CI_REGISTRY/cyberegoorg/cetech-docker-toolchain:master
   stage: doc
   script:
     - export LC_ALL=C.UTF-8
@@ -35,4 +35,4 @@ pages:
 
   artifacts:
     paths:
-    - public
+      - public
