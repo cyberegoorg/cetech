@@ -3,6 +3,8 @@ FROM python:alpine
 ENV TZ Europe/Prague
 
 RUN apk add --no-cache \
+            gcc \
+            g++ \
             clang \
             cmake \
             libx11-dev \
