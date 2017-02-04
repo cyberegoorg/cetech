@@ -20,7 +20,7 @@ test:
 
   script:
     - python3 scripts/build.py
-    - py.test -v engine/test
+    - py.test -v --color=yes engine/test
 
 #################
 # Gitlab pages  #
