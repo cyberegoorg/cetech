@@ -13,7 +13,8 @@ RUN apk add --no-cache \
             zlib-dev \
             build-base \
             libexecinfo-dev \
-            python3
+            python3 \
+            python3-dev
 
 ADD requirements.txt /tmp/requirements.txt
 ADD dev_requirements.txt /tmp/dev_requirements.txt
