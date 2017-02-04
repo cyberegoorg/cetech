@@ -11,7 +11,8 @@ RUN apk add --no-cache \
             jemalloc-dev \
             mesa-dev \
             zlib-dev \
-            build-base
+            build-base \
+            libexecinfo-dev
 
 ADD requirements.txt /tmp/requirements.txt
 ADD dev_requirements.txt /tmp/dev_requirements.txt
