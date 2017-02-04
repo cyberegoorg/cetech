@@ -178,12 +178,12 @@ static void _boot_stage() {
     stringid64_t pkg = stringid64_from_string("package");
 
     // TODO: remove, this must be done by boot_package and load in boot_script
-    if (!cvar_get_int(_G.config.daemon)) {
+    //if (!cvar_get_int(_G.config.daemon)) {
         stringid64_t core_pkg = stringid64_from_string("core");
         resource_load_now(pkg, &core_pkg, 1);
         package_load(core_pkg);
         package_flush(core_pkg);
-    }
+    //}
 
     resource_load_now(pkg, &boot_pkg, 1);
     package_load(boot_pkg);
@@ -201,12 +201,12 @@ static void _boot_unload() {
     package_unload(boot_pkg);
     resource_unload(pkg, &boot_pkg, 1);
 
-    if (!cvar_get_int(_G.config.daemon)) {
+    //if (!cvar_get_int(_G.config.daemon)) {
         stringid64_t core_pkg = stringid64_from_string("core");
         resource_load_now(pkg, &core_pkg, 1);
         package_load(core_pkg);
         package_flush(core_pkg);
-    }
+    //}
 
 }
 

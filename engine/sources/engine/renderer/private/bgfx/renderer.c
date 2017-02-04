@@ -7,6 +7,8 @@
 #include <engine/renderer/mesh_renderer.h>
 #include <engine/develop/console_server.h>
 #include <engine/application/application.h>
+#include <engine/config/types.h>
+#include <engine/config/cvar.h>
 #include "celib/window/window.h"
 #include "engine/renderer/renderer.h"
 
@@ -62,23 +64,30 @@ int renderer_init(int stage) {
 
     _G = (struct G) {0};
 
-    texture_resource_init();
-    shader_resource_init();
-    material_resource_init();
-    scene_resource_init();
 
-    consolesrv_register_command("renderer.resize", _cmd_resize);
+    cvar_t daemon = cvar_find("daemon");
+    if(!cvar_get_int(daemon)) {
+        texture_resource_init();
+        shader_resource_init();
+        material_resource_init();
+        scene_resource_init();
+
+        consolesrv_register_command("renderer.resize", _cmd_resize);
+    }
 
     return 1;
 }
 
 void renderer_shutdown() {
-    texture_resource_shutdown();
-    shader_resource_shutdown();
-    material_resource_shutdown();
-    scene_resource_shutdown();
+    cvar_t daemon = cvar_find("daemon");
+    if(!cvar_get_int(daemon)) {
+        texture_resource_shutdown();
+        shader_resource_shutdown();
+        material_resource_shutdown();
+        scene_resource_shutdown();
 
-    bgfx_shutdown();
+        bgfx_shutdown();
+    }
 
     _G = (struct G) {0};
 }

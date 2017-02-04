@@ -58,6 +58,7 @@ def _build_dir(tmpdir_factory):
         core_dir=os.path.join(ROOT_DIR, "core"),
         compile_=True,
         check=True,
+        daemon=True,
         rpc_addr="ipc://%s/test_compiler%s_rpc.ipc" % (ipc_addr, instance_counter),
         log_addr="ipc://%s/test_compiler%s_log.ipc" % (ipc_addr, instance_counter),
         pub_addr="ipc://%s/test_compiler%s_pub.ipc" % (ipc_addr, instance_counter),
@@ -86,6 +87,7 @@ def engine_instance(request, _build_dir):
         log_addr="ipc://%s/test%s_log.ipc" % (ipc_addr, instance_counter),
         pub_addr="ipc://%s/test%s_pub.ipc" % (ipc_addr, instance_counter),
         push_addr="ipc://%s/test%s_push.ipc" % (ipc_addr, instance_counter),
+        daemon=True,
         lock=True
     )
 
