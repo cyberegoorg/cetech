@@ -11,14 +11,15 @@ stages:
   - doc
 
 ########
-# Test #
+# Build #
 ###############################################################################
 build:
   image: $CI_REGISTRY/cyberegoorg/cetech-docker-toolchain:master
   stage: build
 
   artifacts:
-    untracked: true
+    paths:
+      - bin
 
   script:
     - python3 scripts/build.py
