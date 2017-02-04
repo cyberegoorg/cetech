@@ -10,7 +10,8 @@ RUN apk add --no-cache \
             libx11-dev \
             jemalloc-dev \
             mesa-dev \
-            zlib-dev
+            zlib-dev \
+            build-base
 
 ADD requirements.txt /tmp/requirements.txt
 ADD dev_requirements.txt /tmp/dev_requirements.txt
