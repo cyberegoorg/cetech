@@ -163,7 +163,8 @@ def build(name, body, platform_, job_count_str, verbose):
                 cmd_lst.append('-G')
                 cmd_lst.append('Visual Studio 14 2015 Win64')
 
-            cmd_lst.append('-DCMAKE_INCLUDE_PATH=%s' % os.path.join(EXTERNAL_BUILD_DIR, platform_, 'include'))
+            cmd_lst.append('-DCMAKE_INCLUDE_PATH=%s' % os.path.join(EXTERNAL_BUILD_DIR, platform_, 'release', 'include'))
+            cmd_lst.append('-DCMAKE_LIBRARY_PATH=%s' % os.path.join(EXTERNAL_BUILD_DIR, platform_, 'release', 'lib'))
             cmd_lst.append(clone_dir)
 
         elif cmd_lst[0] == 'devenv':

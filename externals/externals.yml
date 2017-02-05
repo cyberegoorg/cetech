@@ -5,12 +5,17 @@ bx:
   platforms: [linux64, darwin64, windows64]
   clone: git clone https://github.com/bkaradzic/bx --depth 1
 
+  build:
+    linux64:
+      - make linux-release64
+
   install:
     includes: &bx_install_include
       [include/bx, release/include/bx]
 
     linux64:
       - copytree: *bx_install_include
+      - copyfile: [.build/linux64_gcc/bin/libbxRelease.a, release/lib/libbxRelease.a]
     
     windows64:
       - copytree: *bx_install_include
@@ -23,6 +28,7 @@ bx:
 ########################################################################################################################
 bgfx:
   platforms: [linux64, darwin64, windows64]
+  depend: bx
   clone: git clone https://github.com/bkaradzic/bgfx --depth 1
 
   build:
@@ -124,7 +130,7 @@ nanomsg:
 
   build:
     posix: &nanomsg_build_posix
-      [cmake . -DNN_STATIC_LIB=TRUE, make, cmake . , make]
+      [cmake . -DNN_STATIC_LIB=TRUE, make, cmake . -DNN_STATIC_LIB=FALSE , make]
 
     linux64:  *nanomsg_build_posix
     darwin64: *nanomsg_build_posix
@@ -189,31 +195,6 @@ assimp:
       - copytree: [include/assimp, release/include/assimp]
 
 #########
-# catch #
-########################################################################################################################
-catch:
-  clone: git clone https://github.com/philsquared/Catch.git --depth 1
-
-  install:
-    includes_relese: &catch_install_include_release
-      [single_include/catch.hpp, release/include/catch]
-
-    includes_debug: &catch_install_include_debug
-      [single_include/catch.hpp, debug/include/catch]
-
-    linux64:
-      - copy: *catch_install_include_release
-      - copy: *catch_install_include_debug
-
-    windows64:
-      - copy: *catch_install_include_release
-      - copy: *catch_install_include_debug
-
-    darwin64:
-      - copy: *catch_install_include_debug
-      - copy: *catch_install_include_release
-
-#########
 # MPack #
 ########################################################################################################################
 mpack:
@@ -251,7 +232,9 @@ yaml-cpp:
 
   build:
     linux64:
-      - cmake . -DBUILD_SHARED_LIBS=1
+      - cmake . -DBUILD_SHARED_LIBS=TRUE -DYAML_CPP_BUILD_TOOLS=FALSE
+      - make
+      - cmake . -DBUILD_SHARED_LIBS=FALSE -DYAML_CPP_BUILD_TOOLS=FALSE
       - make
 
   install:
@@ -352,3 +335,16 @@ sqlite3:
       - copy: [sqlite3.h, debug/include/sqlite3]
       - copy: [.libs/libsqlite3.a, debug/lib]
 
+minizip:
+  clone:
+    - git clone https://github.com/nmoinvaz/minizip.git --depth 1
+
+  build:
+    linux64:
+      - cmake .
+      - make
+
+  install:
+    linux64:
+      - copy: [libaes.a, release/lib]
+      - copy: [libminizip.a, release/lib]

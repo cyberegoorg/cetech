@@ -210,12 +210,16 @@ set(RELEASE_LIBS
 
         nanomsg.a
         bgfxRelease.a
+        bgfxRelease.a
+        bxRelease.a
         yaml-cpp.a
 
         luajit.a
         sqlite3.a
         SDL2.a
         assimp.a
+        minizip.a
+        aes.a
         )
 
 set(RELEASE_LIBS2

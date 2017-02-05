@@ -12,7 +12,7 @@
 #include "celib/window/window.h"
 #include "engine/renderer/renderer.h"
 
-#include "bgfx/c99/bgfxplatform.h"
+#include "bgfx/c99/platform.h"
 #include "texture.h"
 #include "shader.h"
 #include "scene.h"
