@@ -335,3 +335,16 @@ sqlite3:
       - copy: [sqlite3.h, debug/include/sqlite3]
       - copy: [.libs/libsqlite3.a, debug/lib]
 
+minizip:
+  clone:
+    - git clone https://github.com/nmoinvaz/minizip.git --depth 1
+
+  build:
+    linux64:
+      - cmake .
+      - make
+
+  install:
+    linux64:
+      - copy: [libaes.a, release/lib]
+      - copy: [libminizip.a, release/lib]

@@ -195,7 +195,6 @@ if (UNIX)
             X11
             GL
             z
-            minizip
             )
 endif ()
 
@@ -207,7 +206,7 @@ endif ()
 
 set(RELEASE_LIBS
         ${RELEASE_LIBS_LINUX}
-        #${RELEASE_LIBS_WINDOWS}
+        ${RELEASE_LIBS_WINDOWS}
 
         nanomsg.a
         bgfxRelease.a
@@ -219,6 +218,8 @@ set(RELEASE_LIBS
         sqlite3.a
         SDL2.a
         assimp.a
+        minizip.a
+        aes.a
         )
 
 set(RELEASE_LIBS2
