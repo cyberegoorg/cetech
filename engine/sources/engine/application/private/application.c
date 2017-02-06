@@ -19,7 +19,7 @@
 #include <engine/develop/develop_system.h>
 #include <celib/thread/thread.h>
 #include <engine/plugin/plugin.h>
-#include <celib/memory/memsys.h>
+#include <engine/memory/memsys.h>
 
 #include "engine/input/input.h"
 #include "engine/develop/console_server.h"

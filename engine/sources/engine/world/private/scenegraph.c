@@ -5,7 +5,7 @@
 
 #include <engine/entcom/entcom.h>
 #include <engine/world/scenegraph.h>
-#include <celib/memory/memsys.h>
+#include <engine/memory/memsys.h>
 
 ARRAY_PROTOTYPE(cel_vec3f_t)
 

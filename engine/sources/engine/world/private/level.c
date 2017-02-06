@@ -9,7 +9,7 @@
 #include <engine/entcom/entcom.h>
 #include <engine/world/transform.h>
 #include <celib/math/quatf.h>
-#include <celib/memory/memsys.h>
+#include <engine/memory/memsys.h>
 
 //==============================================================================
 // Typedefs

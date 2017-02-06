@@ -4,7 +4,7 @@
 #include <celib/math/quatf.h>
 #include <celib/math/mat44f.h>
 #include "engine/world/transform.h"
-#include <celib/memory/memsys.h>
+#include <engine/memory/memsys.h>
 
 struct transform_data {
     cel_vec3f_t position;

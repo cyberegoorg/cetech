@@ -1,7 +1,7 @@
 #ifndef CELIB_MEMSYS_H
 #define CELIB_MEMSYS_H
 
-#include "types.h"
+#include "celib/memory/types.h"
 
 void memsys_init(int scratch_buffer_size);
 

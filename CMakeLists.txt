@@ -77,7 +77,7 @@ set(SOURCE_FILES
         celib/sources/celib/memory/private/allocator.c
         celib/sources/celib/memory/private/allocator_malloc.c
         celib/sources/celib/memory/private/allocator_scratch.c
-        celib/sources/celib/memory/private/memsys.c
+        engine/sources/engine/memory/private/memsys.c
 
 
         ########################################################################

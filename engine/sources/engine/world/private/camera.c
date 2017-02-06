@@ -8,7 +8,7 @@
 #include <engine/renderer/renderer.h>
 #include <engine/world/transform.h>
 
-#include <celib/memory/memsys.h>
+#include <engine/memory/memsys.h>
 
 struct camera_data {
     f32 near;

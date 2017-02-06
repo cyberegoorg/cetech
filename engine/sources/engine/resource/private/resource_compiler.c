@@ -13,7 +13,7 @@
 #include <engine/task/task.h>
 #include <engine/resource/resource.h>
 #include <engine/application/application.h>
-#include <celib/memory/memsys.h>
+#include <engine/memory/memsys.h>
 
 #include "celib/filesystem/vio.h"
 #include "engine/config/cvar.h"

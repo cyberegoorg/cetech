@@ -12,7 +12,7 @@
 #include <engine/world/scenegraph.h>
 #include "celib/filesystem/path.h"
 #include "celib/filesystem/vio.h"
-#include <celib/memory/memsys.h>
+#include <engine/memory/memsys.h>
 
 #include "engine/resource/resource.h"
 

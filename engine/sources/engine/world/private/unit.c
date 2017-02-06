@@ -6,7 +6,7 @@
 #include <celib/filesystem/path.h>
 #include <celib/containers/map.h>
 #include <engine/entcom/entcom.h>
-#include <celib/memory/memsys.h>
+#include <engine/memory/memsys.h>
 
 ARRAY_PROTOTYPE_N(struct array_entity_t, array_entity_t);
 MAP_PROTOTYPE_N(struct array_entity_t, array_entity_t);

@@ -9,7 +9,7 @@
 #include <engine/application/application.h>
 #include <celib/filesystem/path.h>
 #include <celib/yaml/yaml.h>
-#include <celib/memory/memsys.h>
+#include <engine/memory/memsys.h>
 
 //==============================================================================
 // Defines

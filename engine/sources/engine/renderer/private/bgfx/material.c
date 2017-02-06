@@ -10,7 +10,7 @@
 #include <celib/yaml/yaml.h>
 #include "celib/containers/map.h"
 #include "celib/filesystem/vio.h"
-#include <celib/memory/memsys.h>
+#include <engine/memory/memsys.h>
 
 #include "engine/resource/resource.h"
 #include "texture.h"
