@@ -20,8 +20,10 @@
 #include <celib/thread/thread.h>
 #include <engine/plugin/plugin.h>
 #include <engine/memory/memsys.h>
+#include <engine/input/keyboard.h>
+#include <engine/input/mouse.h>
+#include <engine/input/gamepad.h>
 
-#include "engine/input/input.h"
 #include "engine/develop/console_server.h"
 #include "engine/task/task.h"
 

@@ -6,7 +6,7 @@
 #include "celib/machine/machine.h"
 #include "celib/string/string.h"
 
-#include "engine/input/input.h"
+#include "engine/input/keyboard.h"
 
 #include "keystr.h"
 

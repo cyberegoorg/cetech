@@ -3,7 +3,7 @@
 //==============================================================================
 
 #include <celib/math/types.h>
-#include <engine/input/input.h>
+#include <engine/input/gamepad.h>
 #include "celib/machine/machine.h"
 #include "celib/string/string.h"
 
