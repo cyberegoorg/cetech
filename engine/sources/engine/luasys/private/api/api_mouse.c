@@ -2,8 +2,6 @@
 #include "engine/luasys/luasys.h"
 #include "engine/input/mouse.h"
 
-#define API_NAME "Mouse"
-
 static int _mouse_button_index(lua_State *l) {
     const char *name = luasys_to_string(l, 1);
 
@@ -25,7 +23,7 @@ static int _mouse_button_name(lua_State *l) {
 static int _mouse_button_state(lua_State *l) {
     u32 idx = (u32) (luasys_to_f32(l, 1));
 
-    luasys_push_bool(l, MouseApiV1.button_state(idx));
+    luasys_push_bool(l, MouseApiV1.button_state(0, idx));
 
     return 1;
 
@@ -34,7 +32,7 @@ static int _mouse_button_state(lua_State *l) {
 static int _mouse_button_pressed(lua_State *l) {
     u32 idx = (u32) (luasys_to_f32(l, 1));
 
-    luasys_push_bool(l, MouseApiV1.button_pressed(idx));
+    luasys_push_bool(l, MouseApiV1.button_pressed(0,idx));
 
     return 1;
 
@@ -43,7 +41,7 @@ static int _mouse_button_pressed(lua_State *l) {
 static int _mouse_button_released(lua_State *l) {
     u32 idx = (u32) (luasys_to_f32(l, 1));
 
-    luasys_push_bool(l, MouseApiV1.button_released(idx));
+    luasys_push_bool(l, MouseApiV1.button_released(0,idx));
 
     return 1;
 
@@ -70,12 +68,13 @@ static int _mouse_axis_name(lua_State *l) {
 static int _mouse_axis(lua_State *l) {
     u32 idx = (u32) (luasys_to_int(l, 1));
 
-    cel_vec2f_t pos = MouseApiV1.axis(idx);
+    cel_vec2f_t pos = MouseApiV1.axis(0, idx);
 
     luasys_push_vec2f(l, pos);
     return 1;
 }
 
+#define API_NAME "Mouse"
 void _register_lua_mouse_api() {
     luasys_add_module_function(API_NAME, "button_index", _mouse_button_index);
     luasys_add_module_function(API_NAME, "button_name", _mouse_button_name);

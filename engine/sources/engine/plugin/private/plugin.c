@@ -111,12 +111,12 @@ void plugin_reload(const char *path) {
         cel_unload_object(_G.plugin_handler[i]);
 
         void *obj = cel_load_object(path);
-        if (obj != NULL) {
+        if (obj == NULL) {
             return;
         }
 
         void *fce = cel_load_function(obj, "get_plugin_api");
-        if (fce != NULL) {
+        if (fce == NULL) {
             return;
         }
 

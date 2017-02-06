@@ -95,8 +95,8 @@ void gamepad_process() {
     }
 }
 
-int gamepad_is_active(gamepad_t gamepad) {
-    return _G.active[gamepad.idx];
+int gamepad_is_active(u32 idx) {
+    return _G.active[idx];
 }
 
 u32 gamepad_button_index(const char *button_name) {
@@ -121,25 +121,25 @@ const char *gamepad_button_name(const u32 button_index) {
     return _btn_to_str[button_index];
 }
 
-int gamepad_button_state(gamepad_t gamepad,
+int gamepad_button_state(u32 idx,
                          const u32 button_index) {
     CEL_ASSERT(LOG_WHERE, (button_index >= 0) && (button_index < GAMEPAD_BTN_MAX));
 
-    return _G.state[gamepad.idx][button_index];
+    return _G.state[idx][button_index];
 }
 
-int gamepad_button_pressed(gamepad_t gamepad,
+int gamepad_button_pressed(u32 idx,
                            const u32 button_index) {
     CEL_ASSERT(LOG_WHERE, (button_index >= 0) && (button_index < GAMEPAD_BTN_MAX));
 
-    return _G.state[gamepad.idx][button_index] && !_G.last_state[gamepad.idx][button_index];
+    return _G.state[idx][button_index] && !_G.last_state[idx][button_index];
 }
 
-int gamepad_button_released(gamepad_t gamepad,
+int gamepad_button_released(u32 idx,
                             const u32 button_index) {
     CEL_ASSERT(LOG_WHERE, (button_index >= 0) && (button_index < GAMEPAD_BTN_MAX));
 
-    return !_G.state[gamepad.idx][button_index] && _G.last_state[gamepad.idx][button_index];
+    return !_G.state[idx][button_index] && _G.last_state[idx][button_index];
 }
 
 const char *gamepad_axis_name(const u32 axis_index) {
@@ -164,16 +164,16 @@ u32 gamepad_axis_index(const char *axis_name) {
     return 0;
 }
 
-cel_vec2f_t gamepad_axis(gamepad_t gamepad,
+cel_vec2f_t gamepad_axis(u32 idx,
                          const u32 axis_index) {
     CEL_ASSERT(LOG_WHERE, (axis_index >= 0) && (axis_index < GAMEPAD_AXIX_MAX));
 
-    return _G.position[gamepad.idx][axis_index];
+    return _G.position[idx][axis_index];
 }
 
-void gamepad_play_rumble(gamepad_t gamepad,
+void gamepad_play_rumble(u32 idx,
                          float strength,
                          u32 length) {
-    machine_gamepad_play_rumble(gamepad.idx, strength, length);
+    machine_gamepad_play_rumble(idx, strength, length);
 }
 

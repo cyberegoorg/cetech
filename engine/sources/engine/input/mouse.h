@@ -37,17 +37,17 @@ const char *mouse_button_name(const u32 button_index);
 //! Return button state
 //! \param button_index Button index
 //! \return 1 if button is in current frame down else 0
-int mouse_button_state(const u32 button_index);
+int mouse_button_state(u32 idx, const u32 button_index);
 
 //! Is button pressed?
 //! \param button_index Button index
 //! \return 1 if button is in current frame pressed else 0
-int mouse_button_pressed(const u32 button_index);
+int mouse_button_pressed(u32 idx,const u32 button_index);
 
 //! Is button released?
 //! \param button_index Button index
 //! \return 1 if button is in current frame released else 0
-int mouse_button_released(const u32 button_index);
+int mouse_button_released(u32 idx,const u32 button_index);
 
 //! Return axis index
 //! \param axis_name Axis name
@@ -62,20 +62,19 @@ const char *mouse_axis_name(const u32 axis_index);
 //! Return axis value
 //! \param axis_index Axis index
 //! \return Axis value
-cel_vec2f_t mouse_axis(const u32 axis_index);
+cel_vec2f_t mouse_axis(u32 idx, const u32 axis_index);
 
 
 struct MouseApiV1 {
     int (*is_active)();
     u32 (*button_index)(const char *button_name);
     const char *(*button_name)(const u32 button_index);
-    int (*button_state)(const u32 button_index);
-    int (*button_pressed)(const u32 button_index);
-    int (*button_released)(const u32 button_index);
+    int (*button_state)(u32 idx,const u32 button_index);
+    int (*button_pressed)(u32 idx,const u32 button_index);
+    int (*button_released)(u32 idx,const u32 button_index);
     u32 (*axis_index)(const char *axis_name);
     const char *(*axis_name)(const u32 axis_index);
-    cel_vec2f_t (*axis)(const u32 axis_index);
-    void (*play_rumble)(float strength,u32 length);
+    cel_vec2f_t (*axis)(u32 idx,const u32 axis_index);
 };
 
 static const struct MouseApiV1 MouseApiV1 = {

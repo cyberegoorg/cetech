@@ -27,7 +27,7 @@ void gamepad_process();
 //! Is gamepad active?
 //! \param gamepad Gamepad
 //! \return 1 if active else 0
-int gamepad_is_active(gamepad_t gamepad);
+int gamepad_is_active(u32 idx );
 
 //! Return button index
 //! \param button_name Button name
@@ -42,19 +42,19 @@ const char *gamepad_button_name(const u32 button_index);
 //! Return button state
 //! \param button_index Button index
 //! \return 1 if button is in current frame down else 0
-int gamepad_button_state(gamepad_t gamepad,
+int gamepad_button_state(u32 idx ,
                          const u32 button_index);
 
 //! Is button pressed?
 //! \param button_index Button index
 //! \return 1 if button is in current frame pressed else 0
-int gamepad_button_pressed(gamepad_t gamepad,
+int gamepad_button_pressed(u32 idx ,
                            const u32 button_index);
 
 //! Is button released?
 //! \param button_index Button index
 //! \return 1 if button is in current frame released else 0
-int gamepad_button_released(gamepad_t gamepad,
+int gamepad_button_released(u32 idx ,
                             const u32 button_index);
 
 //! Return axis index
@@ -70,41 +70,41 @@ const char *gamepad_axis_name(const u32 axis_index);
 //! Return axis value
 //! \param axis_index Axis index
 //! \return Axis value
-cel_vec2f_t gamepad_axis(gamepad_t gamepad,
+cel_vec2f_t gamepad_axis(u32 idx ,
                          const u32 axis_index);
 
 //! Play rumble
 //! \param gamepad Gamepad
 //! \param strength Rumble strength
 //! \param length Rumble length
-void gamepad_play_rumble(gamepad_t gamepad,
+void gamepad_play_rumble(u32 idx ,
                          float strength,
                          u32 length);
 
 struct GamepadApiV1 {
-    int (*is_active)(gamepad_t gamepad);
+    int (*is_active)(u32 idx);
 
     u32 (*button_index)(const char *button_name);
 
     const char *(*button_name)(const u32 button_index);
 
-    int (*button_state)(gamepad_t gamepad,
+    int (*button_state)(u32 idx,
                         const u32 button_index);
 
-    int (*button_pressed)(gamepad_t gamepad,
+    int (*button_pressed)(u32 idx,
                           const u32 button_index);
 
-    int (*button_released)(gamepad_t gamepad,
+    int (*button_released)(u32 idx,
                            const u32 button_index);
 
     u32 (*axis_index)(const char *axis_name);
 
     const char *(*axis_name)(const u32 axis_index);
 
-    cel_vec2f_t (*axis)(gamepad_t gamepad,
+    cel_vec2f_t (*axis)(u32 idx,
                         const u32 axis_index);
 
-    void (*play_rumble)(gamepad_t gamepad,
+    void (*play_rumble)(u32 idx,
                         float strength,
                         u32 length);
 };
@@ -119,7 +119,7 @@ static const struct GamepadApiV1 GamepadApiV1 = {
         .axis_index = gamepad_axis_index,
         .axis_name = gamepad_axis_name,
         .axis = gamepad_axis,
-        .play_rumble = gamepad_play_rumble
+        .play_rumble = gamepad_play_rumble,
 };
 
 #endif //CETECH_GAMEPAD_H

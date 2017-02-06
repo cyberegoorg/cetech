@@ -100,19 +100,19 @@ const char *keyboard_button_name(const u32 button_index) {
     return _key_to_str[button_index];
 }
 
-int keyboard_button_state(const u32 button_index) {
+int keyboard_button_state(u32 idx,const u32 button_index) {
     CEL_ASSERT(LOG_WHERE, (button_index >= 0) && (button_index < KEY_MAX));
 
     return _G.state[button_index];
 }
 
-int keyboard_button_pressed(const u32 button_index) {
+int keyboard_button_pressed(u32 idx,const u32 button_index) {
     CEL_ASSERT(LOG_WHERE, (button_index >= 0) && (button_index < KEY_MAX));
 
     return _G.state[button_index] && !_G.last_state[button_index];
 }
 
-int keyboard_button_released(const u32 button_index) {
+int keyboard_button_released(u32 idx,const u32 button_index) {
     CEL_ASSERT(LOG_WHERE, (button_index >= 0) && (button_index < KEY_MAX));
 
     return !_G.state[button_index] && _G.last_state[button_index];

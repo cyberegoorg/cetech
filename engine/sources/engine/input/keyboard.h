@@ -37,24 +37,24 @@ const char *keyboard_button_name(const u32 button_index);
 //! Return button state
 //! \param button_index Button index
 //! \return 1 if button is in current frame down else 0
-int keyboard_button_state(const u32 button_index);
+int keyboard_button_state(u32 idx, const u32 button_index);
 
 //! Is button pressed?
 //! \param button_index Button index
 //! \return 1 if button is in current frame pressed else 0
-int keyboard_button_pressed(const u32 button_index);
+int keyboard_button_pressed(u32 idx, const u32 button_index);
 
 //! Is button released?
 //! \param button_index Button index
 //! \return 1 if button is in current frame released else 0
-int keyboard_button_released(const u32 button_index);
+int keyboard_button_released(u32 idx, const u32 button_index);
 
 struct KeyboardApiV1 {
     u32 (*button_index)(const char *button_name);
     const char *(*button_name)(const u32 button_index);
-    int (*button_state)(const u32 button_index);
-    int (*button_pressed)(const u32 button_index);
-    int (*button_released)(const u32 button_index);
+    int (*button_state)(u32 idx,const u32 button_index);
+    int (*button_pressed)(u32 idx,const u32 button_index);
+    int (*button_released)(u32 idx,const u32 button_index);
 };
 
 static const struct KeyboardApiV1 KeyboardApiV1 = {

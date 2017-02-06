@@ -3,7 +3,6 @@
 #include "engine/luasys/luasys.h"
 #include "engine/input/gamepad.h"
 
-#define API_NAME "Gamepad"
 
 static int _gamepad_button_index(lua_State *l) {
     const char *name = luasys_to_string(l, 1);
@@ -24,7 +23,7 @@ static int _gamepad_button_name(lua_State *l) {
 }
 
 static int _gamepad_button_state(lua_State *l) {
-    gamepad_t gamepad = {.idx = (luasys_to_int(l, 1))};
+    u32 gamepad = luasys_to_int(l, 1);
     u32 idx = (u32) (luasys_to_f32(l, 2));
 
     luasys_push_bool(l, GamepadApiV1.button_state(gamepad, idx));
@@ -33,7 +32,7 @@ static int _gamepad_button_state(lua_State *l) {
 }
 
 static int _gamepad_button_pressed(lua_State *l) {
-    gamepad_t gamepad = {.idx = (luasys_to_int(l, 1))};
+    u32 gamepad = luasys_to_int(l, 1);
     u32 idx = (u32) (luasys_to_f32(l, 2));
 
     luasys_push_bool(l, gamepad_button_pressed(gamepad, idx));
@@ -42,7 +41,7 @@ static int _gamepad_button_pressed(lua_State *l) {
 }
 
 static int _gamepad_button_released(lua_State *l) {
-    gamepad_t gamepad = {.idx = (luasys_to_int(l, 1))};
+    u32 gamepad = luasys_to_int(l, 1);
     u32 idx = (u32) (luasys_to_f32(l, 2));
 
     luasys_push_bool(l, gamepad_button_released(gamepad, idx));
@@ -70,7 +69,7 @@ static int _gamepad_axis_name(lua_State *l) {
 }
 
 static int _gamepad_axis(lua_State *l) {
-    gamepad_t gamepad = {.idx = (luasys_to_int(l, 1))};
+    u32 gamepad = luasys_to_int(l, 1);
     u32 idx = (u32) (luasys_to_int(l, 2));
 
     cel_vec2f_t pos = gamepad_axis(gamepad, idx);
@@ -80,7 +79,7 @@ static int _gamepad_axis(lua_State *l) {
 }
 
 static int _gamepad_is_active(lua_State *l) {
-    gamepad_t gamepad = {.idx = (luasys_to_int(l, 1))};
+    u32 gamepad = luasys_to_int(l, 1);
 
 
     luasys_push_bool(l, gamepad_is_active(gamepad));
@@ -88,7 +87,7 @@ static int _gamepad_is_active(lua_State *l) {
 }
 
 static int _gamepad_play_rumble(lua_State *l) {
-    gamepad_t gamepad = {.idx = (luasys_to_int(l, 1))};
+    u32 gamepad = luasys_to_int(l, 1);
     f32 strength = luasys_to_f32(l, 2);
     u32 length = luasys_to_int(l, 3);
 
@@ -96,6 +95,7 @@ static int _gamepad_play_rumble(lua_State *l) {
     return 0;
 }
 
+#define API_NAME "Gamepad"
 
 void _register_lua_gamepad_api() {
     luasys_add_module_function(API_NAME, "is_active", _gamepad_is_active);
