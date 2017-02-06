@@ -12,7 +12,7 @@
 #include <engine/world/scenegraph.h>
 #include <celib/math/mat44f.h>
 
-#include <celib/memory/memsys.h>
+#include <engine/memory/memsys.h>
 
 #define LOG_WHERE "mesh_renderer"
 

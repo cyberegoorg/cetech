@@ -3,7 +3,7 @@
 //==============================================================================
 
 #include "celib/containers/map.h"
-#include <celib/memory/memsys.h>
+#include <engine/memory/memsys.h>
 #include "engine/world/world.h"
 
 #include "engine/entcom/entcom.h"
