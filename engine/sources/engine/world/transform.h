@@ -5,10 +5,6 @@
 #include "celib/math/types.h"
 #include "engine/entcom/types.h"
 
-int transform_init(int stage);
-
-void transform_shutdown();
-
 int transform_is_valid(transform_t transform);
 
 void transform_transform(world_t world,

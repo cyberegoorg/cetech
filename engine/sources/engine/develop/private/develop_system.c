@@ -14,6 +14,7 @@
 #include "celib/thread/thread.h"
 #include "celib/containers/eventstream.h"
 #include <engine/memory/memsys.h>
+#include <engine/plugin/plugin_api.h>
 
 #include "engine/config/cvar.h"
 #include "engine/task/task.h"
@@ -220,16 +221,7 @@ void _send_events() {
 //==============================================================================
 // Interface
 //==============================================================================
-
-int developsys_init(int stage) {
-    if (stage == 0) {
-        _G = (struct G) {0};
-
-        _G.cv_pub_addr = cvar_new_str("develop.pub.addr", "Console server rpc addr", "ws://*:4447");
-
-        return 1;
-    }
-
+static void _init(get_api_fce_t get_engine_api) {
     MAP_INIT(to_mpack_fce_t, &_G.to_mpack, memsys_main_allocator());
     eventstream_create(&_G.eventstream, memsys_main_allocator());
 
@@ -244,7 +236,7 @@ int developsys_init(int stage) {
     int socket = nn_socket(AF_SP, NN_PUB);
     if (socket < 0) {
         log_error(LOG_WHERE, "Could not create nanomsg socket: %s", nn_strerror(errno));
-        return 0;
+        //return 0;
     }
     addr = cvar_get_string(_G.cv_pub_addr);
 
@@ -252,15 +244,18 @@ int developsys_init(int stage) {
 
     if (nn_bind(socket, addr) < 0) {
         log_error(LOG_WHERE, "Could not bind socket to '%s': %s", addr, nn_strerror(errno));
-        return 0;
+        //return 0;
     }
 
     _G.pub_socket = socket;
-
-    return 1;
 }
 
-void developsys_shutdown() {
+static void _init_cvar(struct ConfigApiV1 config) {
+    _G = (struct G) {0};
+    _G.cv_pub_addr = cvar_new_str("develop.pub.addr", "Console server rpc addr", "ws://*:4447");
+}
+
+static void _shutdown() {
     log_debug(LOG_WHERE, "Shutdown");
 
     MAP_DESTROY(to_mpack_fce_t, &_G.to_mpack);
@@ -269,7 +264,7 @@ void developsys_shutdown() {
     nn_close(_G.pub_socket);
 }
 
-void developsys_update(float dt) {
+static void _after_update(float dt) {
     _flush_all_streams();
 
     _G.time_accum += dt;
@@ -280,6 +275,23 @@ void developsys_update(float dt) {
     }
 
     eventstream_clear(&_G.eventstream);
+}
+
+
+void *developsystem_get_plugin_api(int api,
+                                   int version) {
+
+    if (api == PLUGIN_API_ID && version == 0) {
+        static struct plugin_api_v0 plugin = {0};
+
+        plugin.init = _init;
+        plugin.shutdown = _shutdown;
+        plugin.init_cvar = _init_cvar;
+        plugin.after_update = _after_update;
+
+        return &plugin;
+    }
+    return 0;
 }
 
 void developsys_push_record_float(const char *name,

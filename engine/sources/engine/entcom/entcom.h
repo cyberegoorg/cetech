@@ -10,12 +10,6 @@
 #include "celib/containers/array.h"
 #include "celib/containers/map.h"
 
-
-int entcom_init(int stage);
-
-void entcom_shutdown();
-
-
 //==============================================================================
 // Entity interface
 //==============================================================================

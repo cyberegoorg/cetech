@@ -5,6 +5,7 @@
 #include "celib/containers/map.h"
 #include <engine/world/world.h>
 #include <engine/memory/memsys.h>
+#include <engine/plugin/plugin_api.h>
 
 //==============================================================================
 // Typedefs
@@ -29,25 +30,34 @@ static struct G {
 //==============================================================================
 // Public interface
 //==============================================================================
-
-int world_init(int stage) {
-    if (stage == 0) {
-        return 1;
-    }
-
+static void _init(get_api_fce_t get_engine_api) {
     _G = (struct G) {0};
 
     ARRAY_INIT(world_callbacks_t, &_G.callbacks, memsys_main_allocator());
 
     handlerid_init(&_G.world_handler, memsys_main_allocator());
 
-    return 1;
 }
 
-void world_shutdown() {
+static void _shutdown() {
     handlerid_destroy(&_G.world_handler);
     ARRAY_DESTROY(world_callbacks_t, &_G.callbacks);
     _G = (struct G) {0};
+}
+
+void *world_get_plugin_api(int api,
+                           int version) {
+
+    if (api == PLUGIN_API_ID && version == 0) {
+        static struct plugin_api_v0 plugin = {0};
+
+        plugin.init = _init;
+        plugin.shutdown = _shutdown;
+
+        return &plugin;
+    }
+
+    return 0;
 }
 
 void world_register_callback(world_callbacks_t clb) {

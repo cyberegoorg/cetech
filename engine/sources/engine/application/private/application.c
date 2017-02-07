@@ -20,6 +20,7 @@
 #include <celib/thread/thread.h>
 #include <engine/plugin/plugin.h>
 #include <engine/memory/memsys.h>
+#include <engine/static_systems.h>
 #include <engine/input/keyboard.h>
 #include <engine/input/mouse.h>
 #include <engine/input/gamepad.h>
@@ -58,11 +59,6 @@ static struct G {
     float dt;
 } ApplicationGlobals = {0};
 
-//==============================================================================
-// Systems
-//==============================================================================
-
-#include "engine/systems.h"
 
 //==============================================================================
 // Private
@@ -85,6 +81,7 @@ static int _cmd_wait(mpack_node_t args,
                      mpack_writer_t *writer) {
     return 0;
 }
+
 
 int application_init(int argc,
                      const char **argv) {
@@ -113,21 +110,20 @@ int application_init(int argc,
     _G.config.wait = cvar_new_int("wait", "Wait for client", 0);
     _G.config.wid = cvar_new_int("wid", "Wid", 0);
 
+
+    _init_static_plugins();
+
+    plugin_load_dirs("./bin");
+    plugin_call_init_cvar();
+    machine_init(0);
+
     // Cvar stage
-    for (int i = 0; i < STATIC_SYSTEMS_SIZE; ++i) {
-        if (!_SYSTEMS[i].init(0)) {
-            log_error(LOG_WHERE, "Could not init system \"%s\"", _SYSTEMS[i].name);
-            _G.init_error = 1;
-            return 0;
-        }
-    }
 
     cvar_parse_core_args(_G.args);
     if (cvar_get_int(_G.config.compile)) {
         resource_compiler_create_build_dir();
         cvar_compile_global();
     }
-    plugin_load_dirs("./bin");
 
     cvar_load_global();
 
@@ -137,37 +133,22 @@ int application_init(int argc,
 
     cvar_log_all();
 
-    // main stage
-    for (int i = 0; i < STATIC_SYSTEMS_SIZE; ++i) {
-        if (!_SYSTEMS[i].init(1)) {
-            log_error(LOG_WHERE, "Could not init system \"%s\"", _SYSTEMS[i].name);
+    plugin_call_init();
+    machine_init(1);
 
-            for (i = i - 1; i >= 0; --i) {
-                _SYSTEMS[i].shutdown();
-            }
-
-            _G.init_error = 1;
-            return 0;
-        }
-    }
 
     log_set_wid_clb(taskmanager_worker_id);
 
     consolesrv_register_command("wait", _cmd_wait);
+
     return 1;
 }
 
 int application_shutdown() {
     log_debug(LOG_WHERE, "Shutdown");
 
-    if (!_G.init_error) {
-        for (int i = STATIC_SYSTEMS_SIZE - 1; i >= 0; --i) {
-            _SYSTEMS[i].shutdown();
-        }
-
-        cel_window_destroy(_G.main_window);
-    }
-
+    plugin_call_shutdown();
+    machine_shutdown();
     cvar_shutdown();
     memsys_shutdown();
     log_shutdown();
@@ -277,13 +258,10 @@ void application_start() {
         last_tick = now_ticks;
         frame_time_accum += dt;
 
-        consolesrv_update();
 
         machine_process();
-        keyboard_process();
-        mouse_process();
-        gamepad_process();
 
+        plugin_call_update();
         _G.game->update(dt);
 
         if(frame_time_accum >= frame_time) {
@@ -297,11 +275,10 @@ void application_start() {
         }
 
         developsys_leave_scope("Application:update()", application_sd);
-
         developsys_push_record_float("engine.delta_time", dt);
-        developsys_update(dt);
 
-        cel_thread_yield();
+        plugin_call_after_update(dt);
+        //cel_thread_yield();
     }
 
     _G.game->shutdown();

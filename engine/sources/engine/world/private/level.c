@@ -10,6 +10,7 @@
 #include <engine/world/transform.h>
 #include <celib/math/quatf.h>
 #include <engine/memory/memsys.h>
+#include <engine/plugin/plugin_api.h>
 
 //==============================================================================
 // Typedefs
@@ -207,11 +208,8 @@ int _level_resource_compiler(const char *filename,
 // Public interface
 //==============================================================================
 
-int level_init(int stage) {
-    if (stage == 0) {
-        return 1;
-    }
 
+static void _init(get_api_fce_t get_engine_api) {
     _G = (struct G) {0};
     _G.level_type = stringid64_from_string("level");
 
@@ -219,14 +217,27 @@ int level_init(int stage) {
 
     resource_register_type(_G.level_type, _level_resource_defs);
     resource_compiler_register(_G.level_type, _level_resource_compiler);
-
-    return 1;
 }
 
-void level_shutdown() {
+static void _shutdown() {
     ARRAY_DESTROY(level_instance, &_G.level_instance);
     _G = (struct G) {0};
 }
+
+void *level_get_plugin_api(int api,
+                            int version) {
+
+    if (api == PLUGIN_API_ID && version == 0) {
+        static struct plugin_api_v0 plugin = {0};
+
+        plugin.init = _init;
+        plugin.shutdown = _shutdown;
+
+        return &plugin;
+    }
+    return 0;
+}
+
 
 level_t world_load_level(world_t world,
                          stringid64_t name) {

@@ -57,10 +57,6 @@ typedef struct {
 // Resource interface
 //==============================================================================
 
-int resource_init(int stage);
-
-void resource_shutdown();
-
 void resource_set_autoload(int enable);
 
 void resource_register_type(stringid64_t type,

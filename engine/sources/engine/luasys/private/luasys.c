@@ -836,11 +836,7 @@ void _create_lightuserdata() {
     lua_pop(_G.L, 1);
 }
 
-int luasys_init(int stage) {
-    if (stage == 0) {
-        return 1;
-    }
-
+static void _init(get_api_fce_t get_engine_api) {
     log_debug(LOG_WHERE, "Init");
 
     _G.L = luaL_newstate();
@@ -875,14 +871,28 @@ int luasys_init(int stage) {
 
     resource_register_type(_G.type_id, lua_resource_callback);
     resource_compiler_register(_G.type_id, _lua_compiler);
-
-    return 1;
 }
 
-void luasys_shutdown() {
+static void _shutdown() {
     log_debug(LOG_WHERE, "Shutdown");
 
     lua_close(_G.L);
+
+    _G = (struct G) {0};
+}
+
+void *luasys_get_plugin_api(int api,
+                              int version) {
+
+    if (api == PLUGIN_API_ID && version == 0) {
+        static struct plugin_api_v0 plugin = {0};
+
+        plugin.init = _init;
+        plugin.shutdown = _shutdown;
+
+        return &plugin;
+    }
+    return 0;
 }
 
 const struct game_callbacks *luasys_get_game_callbacks() {

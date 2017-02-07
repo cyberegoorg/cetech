@@ -4,6 +4,7 @@
 
 #include <stdio.h>
 #include <include/mpack/mpack.h>
+#include <engine/plugin/plugin_api.h>
 
 #include "include/nanomsg/nn.h"
 #include "include/nanomsg/reqrep.h"
@@ -111,26 +112,12 @@ static void _serve_command(const char *packet,
     free(data);
 }
 
-//==============================================================================
-// Interface
-//==============================================================================
-
 static int _cmd_ready(mpack_node_t args,
                       mpack_writer_t *writer) {
     return 0;
 }
 
-int consolesrv_init(int stage) {
-    if (stage == 0) {
-        _G = (struct G) {0};
-
-        _G.cv_rpc_addr = cvar_new_str("develop.rpc.addr", "Console server rpc addr", "ws://*:4444");
-        _G.cv_log_addr = cvar_new_str("develop.log.addr", "Console server log addr", "ws://*:4445");
-        _G.cv_push_addr = cvar_new_str("develop.push.addr", "Push addr", "");
-
-        return 1;
-    }
-
+static void _init(get_api_fce_t get_engine_api) {
     const char *addr = 0;
 
     log_debug(LOG_WHERE, "Init");
@@ -138,7 +125,7 @@ int consolesrv_init(int stage) {
     int socket = nn_socket(AF_SP, NN_REP);
     if (socket < 0) {
         log_error(LOG_WHERE, "Could not create nanomsg socket: %s", nn_strerror(errno));
-        return 0;
+        return ;// 0;
     }
     addr = cvar_get_string(_G.cv_rpc_addr);
 
@@ -146,7 +133,7 @@ int consolesrv_init(int stage) {
 
     if (nn_bind(socket, addr) < 0) {
         log_error(LOG_WHERE, "Could not bind socket to '%s': %s", addr, nn_strerror(errno));
-        return 0;
+        return ;// 0;
     }
 
     _G.rpc_socket = socket;
@@ -156,7 +143,7 @@ int consolesrv_init(int stage) {
         socket = nn_socket(AF_SP, NN_PUSH);
         if (socket < 0) {
             log_error(LOG_WHERE, "Could not create nanomsg socket: %s", nn_strerror(errno));
-            return 0;
+            return ;// 0;
         }
 
         addr = cvar_get_string(_G.cv_push_addr);
@@ -165,7 +152,7 @@ int consolesrv_init(int stage) {
 
         if (nn_connect(socket, addr) < 0) {
             log_error(LOG_WHERE, "Could not bind socket to '%s': %s", addr, nn_strerror(errno));
-            return 0;
+            return;// 0;
         }
         _G.push_socket = socket;
     }
@@ -175,7 +162,7 @@ int consolesrv_init(int stage) {
     socket = nn_socket(AF_SP, NN_PUB);
     if (socket < 0) {
         log_error(LOG_WHERE, "Could not create nanomsg socket: %s", nn_strerror(errno));
-        return 0;
+        return;// 0;
     }
 
     addr = cvar_get_string(_G.cv_log_addr);
@@ -184,23 +171,69 @@ int consolesrv_init(int stage) {
 
     if (nn_bind(socket, addr) < 0) {
         log_error(LOG_WHERE, "Could not bind socket to '%s': %s", addr, nn_strerror(errno));
-        return 0;
+        return;// 0;
     }
     _G.log_socket = socket;
 
     log_register_handler(nano_log_handler, &_G.log_socket);
 
     consolesrv_register_command("console_server.ready", _cmd_ready);
-    return 1;
 }
 
-void consolesrv_shutdown() {
+static void _init_cvar(struct ConfigApiV1 config) {
+    _G = (struct G) {0};
+
+    _G.cv_rpc_addr = config.new_str("develop.rpc.addr", "Console server rpc addr", "ws://*:4444");
+    _G.cv_log_addr = config.new_str("develop.log.addr", "Console server log addr", "ws://*:4445");
+    _G.cv_push_addr = config.new_str("develop.push.addr", "Push addr", "");
+}
+
+static void _shutdown() {
     log_debug(LOG_WHERE, "Shutdown");
 
     nn_close(_G.push_socket);
     //nn_close(_G.log_socket);
     nn_close(_G.rpc_socket);
 }
+
+static void _update() {
+    char *buf = NULL;
+
+    int max_iteration = 100;
+    int bytes = 0;
+    while (--max_iteration) {
+        bytes = nn_recv(_G.rpc_socket, &buf, NN_MSG, NN_DONTWAIT);
+
+        if (bytes <= 0) {
+            break;
+        }
+
+        _serve_command(buf, bytes);
+        nn_freemsg(buf);
+    }
+}
+
+
+void *consoleserver_get_plugin_api(int api,
+                          int version) {
+
+    if (api == PLUGIN_API_ID && version == 0) {
+        static struct plugin_api_v0 plugin = {0};
+
+        plugin.init = _init;
+        plugin.shutdown = _shutdown;
+        plugin.init_cvar = _init_cvar;
+        plugin.update = _update;
+
+        return &plugin;
+    }
+    return 0;
+}
+
+//==============================================================================
+// Interface
+//==============================================================================
+
 
 void consolesrv_register_command(const char *name,
                                  console_server_command_t cmd) {
@@ -221,19 +254,3 @@ void consolesrv_push_begin() {
     }
 }
 
-void consolesrv_update() {
-    char *buf = NULL;
-
-    int max_iteration = 100;
-    int bytes = 0;
-    while (--max_iteration) {
-        bytes = nn_recv(_G.rpc_socket, &buf, NN_MSG, NN_DONTWAIT);
-
-        if (bytes <= 0) {
-            break;
-        }
-
-        _serve_command(buf, bytes);
-        nn_freemsg(buf);
-    }
-}

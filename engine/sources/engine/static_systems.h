@@ -1,69 +1,35 @@
 //==============================================================================
 // Static engine system configuration
 //==============================================================================
+#include "engine/plugin/plugin.h"
 
-//==============================================================================
-// Core engine systems
-//==============================================================================
+void _init_static_plugins() {
+    ADD_STATIC_PLUGIN(config);
+    ADD_STATIC_PLUGIN(task);
 
-//SYSTEM(cvar)
+    ADD_STATIC_PLUGIN(filesystem);
+    ADD_STATIC_PLUGIN(resourcecompiler);
 
-SYSTEM(machine)
+    ADD_STATIC_PLUGIN(consoleserver);
+    ADD_STATIC_PLUGIN(developsystem);
 
-SYSTEM(taskmanager)
+    ADD_STATIC_PLUGIN(keyboard);
+    ADD_STATIC_PLUGIN(gamepad);
+    ADD_STATIC_PLUGIN(mouse);
 
-SYSTEM(filesystem)
+    ADD_STATIC_PLUGIN(resourcesystem);
+    ADD_STATIC_PLUGIN(entcom);
+    ADD_STATIC_PLUGIN(world);
 
-//==============================================================================
-// Core engine develop systems
-// TODO: only develop develop
-//==============================================================================
+    ADD_STATIC_PLUGIN(unit);
+    ADD_STATIC_PLUGIN(level);
 
-SYSTEM(resource_compiler)
+    ADD_STATIC_PLUGIN(renderer);
+    ADD_STATIC_PLUGIN(luasys);
 
-SYSTEM(consolesrv)
+    ADD_STATIC_PLUGIN(camera);
+    ADD_STATIC_PLUGIN(scenegraph);
+    ADD_STATIC_PLUGIN(transform);
+    ADD_STATIC_PLUGIN(mesh);
+}
 
-SYSTEM(developsys)
-
-//==============================================================================
-
-SYSTEM(resource)
-
-SYSTEM(entcom)
-
-SYSTEM(unit)
-
-SYSTEM(world)
-
-SYSTEM(level)
-
-SYSTEM(renderer)
-
-//==============================================================================
-// Core script language
-//==============================================================================
-
-SYSTEM(luasys)
-
-
-//==============================================================================
-// Input
-//==============================================================================
-
-SYSTEM(keyboard)
-
-SYSTEM(mouse)
-
-SYSTEM(gamepad)
-
-//==============================================================================
-// Components
-//==============================================================================
-
-SYSTEM(transform)
-
-SYSTEM(scenegraph)
-
-SYSTEM(camera)
-
-SYSTEM(mesh)

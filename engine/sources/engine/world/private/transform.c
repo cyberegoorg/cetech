@@ -5,6 +5,7 @@
 #include <celib/math/mat44f.h>
 #include "engine/world/transform.h"
 #include <engine/memory/memsys.h>
+#include <engine/plugin/plugin_api.h>
 
 struct transform_data {
     cel_vec3f_t position;
@@ -150,13 +151,7 @@ static void _spawner(world_t world,
     }
 }
 
-
-int transform_init(int stage) {
-    if (stage == 0) {
-        return 1;
-    }
-
-
+static void _init(get_api_fce_t get_engine_api) {
     _G = (struct G) {0};
 
     MAP_INIT(world_data_t, &_G.world, memsys_main_allocator());
@@ -168,15 +163,27 @@ int transform_init(int stage) {
             .spawner=_spawner, .destroyer=_destroyer,
             .on_world_create=_on_world_create, .on_world_destroy=_on_world_destroy
     });
-
-    return 1;
 }
 
-void transform_shutdown() {
-
+static void _shutdown() {
     MAP_DESTROY(world_data_t, &_G.world);
 
     _G = (struct G) {0};
+}
+
+void *transform_get_plugin_api(int api,
+                           int version) {
+
+    if (api == PLUGIN_API_ID && version == 0) {
+        static struct plugin_api_v0 plugin = {0};
+
+        plugin.init = _init;
+        plugin.shutdown = _shutdown;
+
+        return &plugin;
+    }
+
+    return 0;
 }
 
 int transform_is_valid(transform_t transform) {

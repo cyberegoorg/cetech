@@ -6,6 +6,7 @@
 #include <engine/entcom/entcom.h>
 #include <engine/world/scenegraph.h>
 #include <engine/memory/memsys.h>
+#include <engine/plugin/plugin_api.h>
 
 ARRAY_PROTOTYPE(cel_vec3f_t)
 
@@ -86,26 +87,38 @@ static void _on_world_destroy(world_t world) {
     _destroy_world(world);
 }
 
-int scenegraph_init(int stage) {
-    if (stage == 0) {
-        return 1;
-    }
 
+static void _init(get_api_fce_t get_engine_api) {
     _G = (struct G) {0};
 
     MAP_INIT(world_data_t, &_G.world, memsys_main_allocator());
 
     world_register_callback((world_callbacks_t) {.on_created=_on_world_create, .on_destroy=_on_world_destroy});
 
-    return 1;
 }
 
-void scenegraph_shutdown() {
+static void _shutdown() {
 
     MAP_DESTROY(world_data_t, &_G.world);
 
     _G = (struct G) {0};
 }
+
+void *scenegraph_get_plugin_api(int api,
+                           int version) {
+
+    if (api == PLUGIN_API_ID && version == 0) {
+        static struct plugin_api_v0 plugin = {0};
+
+        plugin.init = _init;
+        plugin.shutdown = _shutdown;
+
+        return &plugin;
+    }
+
+    return 0;
+}
+
 
 int scenegraph_is_valid(scene_node_t transform) {
     return transform.idx != UINT32_MAX;

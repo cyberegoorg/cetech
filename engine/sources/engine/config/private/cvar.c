@@ -10,6 +10,7 @@
 #include <celib/filesystem/path.h>
 #include <celib/yaml/yaml.h>
 #include <engine/memory/memsys.h>
+#include <engine/plugin/plugin_api.h>
 
 //==============================================================================
 // Defines
@@ -83,6 +84,61 @@ cvar_t _find_first_free() {
     log_error(LOG_WHERE, "Could not create new config variable");
 
     return make_cvar(0);
+}
+
+static void _init(get_api_fce_t get_engine_api) {
+}
+
+static void _shutdown() {
+}
+
+static void *_reload_begin(get_api_fce_t get_engine_api) {
+    return NULL;
+}
+
+static void _reload_end(get_api_fce_t get_engine_api,
+                        void *data) {
+    _init(get_engine_api);
+}
+
+
+void *config_get_plugin_api(int api,
+                              int version) {
+
+    if (api == PLUGIN_API_ID && version == 0) {
+        static struct plugin_api_v0 plugin = {0};
+
+        plugin.init = _init;
+        plugin.shutdown = _shutdown;
+        plugin.reload_begin = _reload_begin;
+        plugin.reload_end = _reload_end;
+
+        return &plugin;
+    } else if (api == CONFIG_API_ID && version == 0) {
+        static struct ConfigApiV1 api_v1 = {
+                .load_global = cvar_load_global,
+                .compile_global = cvar_compile_global,
+                .parse_core_args = cvar_parse_core_args,
+                .parse_args = cvar_parse_args,
+                .find = cvar_find,
+                .find_or_create = cvar_find_or_create,
+                .new_float = cvar_new_float,
+                .new_int = cvar_new_int,
+                .new_str = cvar_new_str,
+                .get_float = cvar_get_float,
+                .get_int = cvar_get_int,
+                .get_string = cvar_get_string,
+                .get_type  = cvar_get_type,
+                .set_float = cvar_set_float,
+                .set_int = cvar_set_int,
+                .set_string = cvar_set_string,
+                .log_all = cvar_log_all,
+        };
+
+        return &api_v1;
+    }
+
+    return 0;
 }
 
 //==============================================================================

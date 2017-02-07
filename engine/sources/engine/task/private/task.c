@@ -8,9 +8,11 @@
 #include <celib/cpu/cpu.h>
 
 #include <engine/develop/develop_system.h>
+#include <engine/plugin/plugin_api.h>
 
 #include "../types.h"
 #include "task_queue.h"
+#include "../task.h"
 
 
 //==============================================================================
@@ -147,16 +149,7 @@ static int _task_worker(void *o) {
     return 1;
 }
 
-//==============================================================================
-// Interface
-//==============================================================================
-
-int taskmanager_init(int stage) {
-    if (stage == 0) {
-        return 1;
-    }
-
-
+static void _init(get_api_fce_t get_engine_api) {
     _G = (struct G) {0};
 
     int core_count = cel_cpu_count();
@@ -179,11 +172,9 @@ int taskmanager_init(int stage) {
     }
 
     _G._Run = 1;
-
-    return 1;
 }
 
-void taskmanager_shutdown() {
+static void _shutdown() {
     _G._Run = 0;
 
     int status = 0;
@@ -201,6 +192,36 @@ void taskmanager_shutdown() {
 
     _G = (struct G) {0};
 }
+
+void *task_get_plugin_api(int api,
+                             int version) {
+
+    if (api == PLUGIN_API_ID && version == 0) {
+        static struct plugin_api_v0 plugin = {0};
+
+        plugin.init = _init;
+        plugin.shutdown = _shutdown;
+
+        return &plugin;
+
+    } else if (api == TASK_API_ID && version == 0) {
+        static struct TaskApiV1 api_v1 = {
+                .worker_count = taskmanager_worker_count,
+                .add = taskmanager_add,
+                .do_work = taskmanager_do_work,
+                .wait_atomic = taskmanager_wait_atomic,
+                .worker_id = taskmanager_worker_id
+        };
+
+        return &api_v1;
+    }
+
+    return 0;
+}
+
+//==============================================================================
+// Interface
+//==============================================================================
 
 void taskmanager_add(struct task_item *items,
                      u32 count) {

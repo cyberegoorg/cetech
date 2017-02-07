@@ -1,9 +1,12 @@
 #ifndef CETECH_TASK_TYPES_H
 #define CETECH_TASK_TYPES_H
 
+#include <stdatomic.h>
+
 //==============================================================================
 // Task
 //==============================================================================
+
 
 typedef void (*task_work_t)(void *data);
 
@@ -41,5 +44,13 @@ struct task_item {
     enum task_affinity affinity;
 };
 
+
+struct TaskApiV1 {
+    int   (*worker_count)();
+    void  (*add)(struct task_item *items, u32 count);
+    int   (*do_work)();
+    void  (*wait_atomic)(atomic_int *signal, u32 value);
+    char  (*worker_id)();
+};
 
 #endif //CETECH_TASK_TYPES_H

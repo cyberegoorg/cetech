@@ -13,6 +13,7 @@
 #include <celib/math/mat44f.h>
 
 #include <engine/memory/memsys.h>
+#include <engine/plugin/plugin_api.h>
 
 #define LOG_WHERE "mesh_renderer"
 
@@ -160,6 +161,19 @@ int mesh_init(int stage) {
         return 1;
     }
 
+
+
+    return 1;
+}
+
+void mesh_shutdown() {
+
+
+}
+
+static void _init(get_api_fce_t get_engine_api) {
+    _G = (struct G) {0};
+
     MAP_INIT(world_data_t, &_G.world, memsys_main_allocator());
 
     _G.type = stringid64_from_string("mesh_renderer");
@@ -170,15 +184,26 @@ int mesh_init(int stage) {
             .spawner=_spawner, .destroyer=_destroyer,
             .on_world_create=_on_world_create, .on_world_destroy=_on_world_destroy
     });
-
-    return 1;
 }
 
-void mesh_shutdown() {
-
+static void _shutdown() {
     MAP_DESTROY(world_data_t, &_G.world);
 
     _G = (struct G) {0};
+}
+
+void *mesh_get_plugin_api(int api,
+                            int version) {
+
+    if (api == PLUGIN_API_ID && version == 0) {
+        static struct plugin_api_v0 plugin = {0};
+
+        plugin.init = _init;
+        plugin.shutdown = _shutdown;
+
+        return &plugin;
+    }
+    return 0;
 }
 
 int mesh_is_valid(mesh_t mesh) {

@@ -2,6 +2,10 @@
 
 #include "engine/plugin/plugin_api.h"
 
+static struct KeyboardApiV1 KeyboardApiV1 = {0};
+
+// #includestatic struct KeyboardApiV1 KeyboardApiV1 = {0};
+
 //
 //static struct log_api_v0 *log = 0;
 //static struct memory_api_v0 *mem = 0;
@@ -19,7 +23,10 @@
 //    return 0;
 //}
 //
+
 static void _init_api(get_api_fce_t get_engine_api) {
+    KeyboardApiV1 = *((struct KeyboardApiV1*)get_engine_api(KEYBOARD_API_ID, 0));
+
 //    log = get_engine_api(LOG_API_ID, 0);
 //    mem = get_engine_api(MEMORY_API_ID, 0);
 //    lua = get_engine_api(LUA_API_ID, 0);
@@ -27,6 +34,8 @@ static void _init_api(get_api_fce_t get_engine_api) {
 
 static void _init(get_api_fce_t get_engine_api) {
     _init_api(get_engine_api);
+    u32 i = KeyboardApiV1.button_index("a");
+    printf("FOOOOO: %d", i);
 //
 //    alloc = mem->create_plugin_allocator("example");
 //

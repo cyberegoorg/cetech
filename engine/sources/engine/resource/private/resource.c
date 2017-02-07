@@ -14,6 +14,7 @@
 #include <engine/develop/console_server.h>
 #include "celib/containers/map.h"
 #include <engine/memory/memsys.h>
+#include <engine/plugin/plugin_api.h>
 
 //==============================================================================
 // Struct and types
@@ -123,26 +124,11 @@ static const resource_callbacks_t package_resource_callback = {
         .reloader = package_resource_reloader
 };
 
-
-//==============================================================================
-// Public interface
-//==============================================================================
 extern int package_init();
 
 extern void package_shutdown();
 
-
-int resource_init(int stage) {
-    if (stage == 0) {
-        _G = (struct G) {0};
-
-        ARRAY_INIT(resource_data, &_G.resource_data, memsys_main_allocator());
-        ARRAY_INIT(resource_callbacks_t, &_G.resource_callbacks, memsys_main_allocator());
-        MAP_INIT(u32, &_G.type_map, memsys_main_allocator());
-
-        return 1;
-    }
-
+static void _init(get_api_fce_t get_engine_api) {
     _G.config.build_dir = cvar_find("build");
 
 
@@ -158,11 +144,20 @@ int resource_init(int stage) {
 
     consolesrv_register_command("resource.reload_all", _cmd_reload_all);
 
-    return package_init();
+    package_init();
+    //return package_init();
+
 }
 
-void resource_shutdown() {
+static void _init_cvar(struct ConfigApiV1 config) {
+    _G = (struct G) {0};
 
+    ARRAY_INIT(resource_data, &_G.resource_data, memsys_main_allocator());
+    ARRAY_INIT(resource_callbacks_t, &_G.resource_callbacks, memsys_main_allocator());
+    MAP_INIT(u32, &_G.type_map, memsys_main_allocator());
+}
+
+static void _shutdown() {
     for (int i = 0; i < ARRAY_SIZE(&_G.resource_data); ++i) {
         MAP_DESTROY(resource_item_t, &ARRAY_AT(&_G.resource_data, i));
     }
@@ -172,9 +167,26 @@ void resource_shutdown() {
     MAP_DESTROY(u32, &_G.type_map);
 
     package_shutdown();
-
-    _G = (struct G) {0};
 }
+
+void *resourcesystem_get_plugin_api(int api,
+                                   int version) {
+
+    if (api == PLUGIN_API_ID && version == 0) {
+        static struct plugin_api_v0 plugin = {0};
+
+        plugin.init = _init;
+        plugin.shutdown = _shutdown;
+        plugin.init_cvar = _init_cvar;
+
+        return &plugin;
+    }
+    return 0;
+}
+
+//==============================================================================
+// Public interface
+//==============================================================================
 
 int resource_type_name_string(char *str,
                               size_t max_len,

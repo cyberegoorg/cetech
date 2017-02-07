@@ -8,10 +8,6 @@ typedef struct {
     u32 idx;
 } camera_t;
 
-int camera_init(int stage);
-
-void camera_shutdown();
-
 int camera_is_valid(camera_t camera);
 
 void camera_get_project_view(world_t world,

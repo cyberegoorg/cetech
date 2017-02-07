@@ -12,7 +12,7 @@
 #include "types.h"
 
 #define CEL_ASSERT_IS_WORKER(where, worker_id)\
-    CEL_ASSERT_MSG(where, taskmanager_worker_id() == worker_id, "Current worker: %d", taskmanager_worker_id())
+    CEL_ASSERT_MSG(where, TaskApiV1.worker_id() == worker_id, "Current worker: %d", TaskApiV1.worker_id())
 
 //==============================================================================
 // Interface
@@ -33,5 +33,13 @@ void taskmanager_wait_atomic(atomic_int *signal,
                              u32 value);
 
 char taskmanager_worker_id();
+
+static const struct TaskApiV1 TaskApiV1 = {
+        .worker_count = taskmanager_worker_count,
+        .add = taskmanager_add,
+        .do_work = taskmanager_do_work,
+        .wait_atomic = taskmanager_wait_atomic,
+        .worker_id = taskmanager_worker_id
+};
 
 #endif //CETECH_TASKMANAGER_H

@@ -10,10 +10,9 @@
 //==============================================================================
 // Defines
 //==============================================================================
-
-#define INIT_STATIC_PLUGIN(name)\
-    void* name ## _get_plugin_api(int,int); \
-    plugin_add_static(name ## _get_plugin_api)\
+#define ADD_STATIC_PLUGIN(name)                \
+    void* name ## _get_plugin_api(int,int);   \
+    plugin_add_static(name ## _get_plugin_api)
 
 //==============================================================================
 // Interface
@@ -27,9 +26,17 @@ void plugin_load_dirs(const char *path);
 
 void plugin_reload(const char *path);
 
-void plugin_reload_loaded();
+void plugin_call_update();
+
+void plugin_call_init_cvar();
+
+void plugin_call_init();
 
 void plugin_call_update();
+
+void plugin_call_shutdown();
+
+void plugin_call_after_update(float dt);
 
 void *plugin_get_engine_api(int api,
                             int version);

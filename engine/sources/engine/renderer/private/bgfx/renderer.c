@@ -9,6 +9,7 @@
 #include <engine/application/application.h>
 #include <engine/config/types.h>
 #include <engine/config/cvar.h>
+#include <engine/plugin/plugin_api.h>
 #include "celib/window/window.h"
 #include "engine/renderer/renderer.h"
 
@@ -57,13 +58,8 @@ static int _cmd_resize(mpack_node_t args,
     return 0;
 }
 
-int renderer_init(int stage) {
-    if (stage == 0) {
-        return 1;
-    }
-
+static void _init(get_api_fce_t get_engine_api) {
     _G = (struct G) {0};
-
 
     cvar_t daemon = cvar_find("daemon");
     if(!cvar_get_int(daemon)) {
@@ -74,11 +70,9 @@ int renderer_init(int stage) {
 
         consolesrv_register_command("renderer.resize", _cmd_resize);
     }
-
-    return 1;
 }
 
-void renderer_shutdown() {
+static void _shutdown() {
     cvar_t daemon = cvar_find("daemon");
     if(!cvar_get_int(daemon)) {
         texture_resource_shutdown();
@@ -90,6 +84,20 @@ void renderer_shutdown() {
     }
 
     _G = (struct G) {0};
+}
+
+void *renderer_get_plugin_api(int api,
+                               int version) {
+
+    if (api == PLUGIN_API_ID && version == 0) {
+        static struct plugin_api_v0 plugin = {0};
+
+        plugin.init = _init;
+        plugin.shutdown = _shutdown;
+
+        return &plugin;
+    }
+    return 0;
 }
 
 void renderer_create(cel_window_t window) {

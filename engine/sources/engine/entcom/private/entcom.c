@@ -4,6 +4,7 @@
 
 #include "celib/containers/map.h"
 #include <engine/memory/memsys.h>
+#include <engine/plugin/plugin_api.h>
 #include "engine/world/world.h"
 
 #include "engine/entcom/entcom.h"
@@ -29,26 +30,16 @@ static struct G {
 } _G = {0};
 
 
-//==============================================================================
-// Public interface
-//==============================================================================
-
-int entcom_init(int stage) {
-    if (stage == 0) {
-        return 1;
-    }
-
+static void _init(get_api_fce_t get_engine_api) {
     _G = (struct G) {0};
 
     handlerid_init(&_G.entity_handler, memsys_main_allocator());
     MAP_INIT(component_compiler_t, &_G.compiler_map, memsys_main_allocator());
     MAP_INIT(u32, &_G.spawn_order_map, memsys_main_allocator());
     MAP_INIT(component_clb_t, &_G.component_clb, memsys_main_allocator());
-
-    return 1;
 }
 
-void entcom_shutdown() {
+static void _shutdown() {
     handlerid_destroy(&_G.entity_handler);
     MAP_DESTROY(component_compiler_t, &_G.compiler_map);
     MAP_DESTROY(u32, &_G.spawn_order_map);
@@ -56,6 +47,23 @@ void entcom_shutdown() {
 
     _G = (struct G) {0};
 }
+
+void *entcom_get_plugin_api(int api,
+                                   int version) {
+
+    if (api == PLUGIN_API_ID && version == 0) {
+        static struct plugin_api_v0 plugin = {0};
+
+        plugin.init = _init;
+        plugin.shutdown = _shutdown;
+
+        return &plugin;
+    }
+    return 0;
+}
+//==============================================================================
+// Public interface
+//==============================================================================
 
 entity_t entity_manager_create() {
     return (entity_t) {.idx = handlerid_handler_create(&_G.entity_handler).h};

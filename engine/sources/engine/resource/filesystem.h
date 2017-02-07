@@ -14,12 +14,6 @@
 // Filesystem Interface
 //==============================================================================
 
-//! Init filesystem
-int filesystem_init(int stage);
-
-//! Shutdown filesystem
-void filesystem_shutdown();
-
 //! Map path for root
 //! \param root Root
 //! \param base_path Path

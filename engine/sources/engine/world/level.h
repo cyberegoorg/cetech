@@ -13,9 +13,6 @@
 // Interface
 //==============================================================================
 
-int level_init(int stage);
-
-void level_shutdown();
 
 level_t world_load_level(world_t world,
                          stringid64_t name);

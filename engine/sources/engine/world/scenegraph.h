@@ -11,10 +11,6 @@ typedef struct {
 } scene_node_t;
 
 
-int scenegraph_init(int stage);
-
-void scenegraph_shutdown();
-
 int scenegraph_is_valid(scene_node_t transform);
 
 void scenegraph_transform(world_t world,

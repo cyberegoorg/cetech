@@ -7,6 +7,7 @@
 #include <celib/containers/map.h>
 #include <engine/entcom/entcom.h>
 #include <engine/memory/memsys.h>
+#include <engine/plugin/plugin_api.h>
 
 ARRAY_PROTOTYPE_N(struct array_entity_t, array_entity_t);
 MAP_PROTOTYPE_N(struct array_entity_t, array_entity_t);
@@ -416,11 +417,8 @@ static const resource_callbacks_t unit_resource_callback = {
 };
 
 
-int unit_init(int stage) {
-    if (stage == 0) {
-        return 1;
-    }
 
+static void _init(get_api_fce_t get_engine_api) {
     _G = (struct G) {0};
 
     _G.type = stringid64_from_string("unit");
@@ -430,15 +428,27 @@ int unit_init(int stage) {
 
     resource_register_type(_G.type, unit_resource_callback);
     resource_compiler_register(_G.type, _unit_resource_compiler);
-
-    return 1;
 }
 
-void unit_shutdown() {
+static void _shutdown() {
     MAP_DESTROY(u32, &_G.spawned_map);
     ARRAY_DESTROY(array_entity_t, &_G.spawned_array);
 
     _G = (struct G) {0};
+}
+
+void *unit_get_plugin_api(int api,
+                            int version) {
+
+    if (api == PLUGIN_API_ID && version == 0) {
+        static struct plugin_api_v0 plugin = {0};
+
+        plugin.init = _init;
+        plugin.shutdown = _shutdown;
+
+        return &plugin;
+    }
+    return 0;
 }
 
 ARRAY_T(entity_t) *unit_spawn_from_resource(world_t world,

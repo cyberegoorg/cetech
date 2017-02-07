@@ -19,10 +19,6 @@ typedef struct {
     world_on_update_t on_update;
 } world_callbacks_t;
 
-int world_init(int stage);
-
-void world_shutdown();
-
 void world_register_callback(world_callbacks_t clb);
 
 world_t world_create();

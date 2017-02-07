@@ -5,6 +5,7 @@
 #include <celib/filesystem/path.h>
 #include "celib/filesystem/filesystem.h"
 #include <engine/memory/memsys.h>
+#include <engine/plugin/plugin_api.h>
 
 #include "celib/filesystem/vio.h"
 
@@ -36,25 +37,13 @@ static struct G {
     } rootmap;
 } FilesystemGlobals = {0};
 
-
-//==============================================================================
-// Interface
-//==============================================================================
-
-int filesystem_init(int stage) {
-    if (stage == 0) {
-        return 1;
-    }
-
-
+static void _init(get_api_fce_t get_engine_api) {
     _G = (struct G) {0};
 
     log_debug(LOG_WHERE, "Init");
-
-    return 1;
 }
 
-void filesystem_shutdown() {
+static void _shutdown() {
     log_debug(LOG_WHERE, "Shutdown");
 
     for (int i = 0; i < MAX_ROOTS; ++i) {
@@ -67,6 +56,26 @@ void filesystem_shutdown() {
 
     _G = (struct G) {0};
 }
+
+void *filesystem_get_plugin_api(int api,
+                          int version) {
+
+    if (api == PLUGIN_API_ID && version == 0) {
+        static struct plugin_api_v0 plugin = {0};
+
+        plugin.init = _init;
+        plugin.shutdown = _shutdown;
+
+        return &plugin;
+
+    }
+
+    return 0;
+}
+
+//==============================================================================
+// Interface
+//==============================================================================
 
 void filesystem_map_root_dir(stringid64_t root,
                              const char *base_path) {

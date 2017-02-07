@@ -1,5 +1,5 @@
-#ifndef CETECH_CONFIG_API_H
-#define CETECH_CONFIG_API_H
+#ifndef CETECH_CONFIG_H
+#define CETECH_CONFIG_H
 
 //==============================================================================
 // Includes
@@ -9,6 +9,7 @@
 #include <celib/os/cmd_line.h>
 #include "celib/types.h"
 #include "types.h"
+#include "config_api.h"
 
 //==============================================================================
 // Interface
@@ -17,8 +18,6 @@
 int cvar_init();
 
 void cvar_shutdown();
-
-void cvar_register_resource();
 
 void cvar_load_global();
 
@@ -64,4 +63,25 @@ void cvar_set_string(cvar_t var,
 
 void cvar_log_all();
 
-#endif //CETECH_CONFIG_API_H
+
+static const struct ConfigApiV1 ConfigApiV1 = {
+        .load_global = cvar_load_global,
+        .compile_global = cvar_compile_global,
+        .parse_core_args = cvar_parse_core_args,
+        .parse_args = cvar_parse_args,
+        .find = cvar_find,
+        .find_or_create = cvar_find_or_create,
+        .new_float = cvar_new_float,
+        .new_int = cvar_new_int,
+        .new_str = cvar_new_str,
+        .get_float = cvar_get_float,
+        .get_int = cvar_get_int,
+        .get_string = cvar_get_string,
+        .get_type  = cvar_get_type,
+        .set_float = cvar_set_float,
+        .set_int = cvar_set_int,
+        .set_string = cvar_set_string,
+        .log_all = cvar_log_all,
+};
+
+#endif //CETECH_CONFIG_H

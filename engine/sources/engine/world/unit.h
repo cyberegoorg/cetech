@@ -8,10 +8,6 @@
 #include "types.h"
 
 
-int unit_init(int stage);
-
-void unit_shutdown();
-
 ARRAY_T(entity_t) *unit_spawn_from_resource(world_t world,
                                             void *resource);
 

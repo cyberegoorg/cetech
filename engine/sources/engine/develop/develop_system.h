@@ -3,52 +3,16 @@
 
 #include "celib/types.h"
 #include "celib/containers/eventstream.h"
+#include "types.h"
 
-//==============================================================================
-// Typedefs
-//==============================================================================
-
-
-enum {
-    EVENT_NULL = 0,
-    EVENT_SCOPE,
-    EVENT_RECORD_FLOAT,
-    EVENT_RECORD_INT,
-};
-
-struct record_float_event {
-    struct event_header header;
-    char name[64];
-    float value;
-};
-
-struct record_int_event {
-    struct event_header header;
-    char name[64];
-    i32 value;
-};
-
-struct scope_event {
-    struct event_header header;
-    char name[64];
-    time_t start;
-    float duration;
-    u32 depth;
-    u32 worker_id;
-};
 
 //==============================================================================
 // Interface
 //==============================================================================
 
 
-int developsys_init(int stage);
-
-void developsys_shutdown();
-
 void developsys_update(float dt);
 
-#define developsys_push(type, event) _developsys_push((struct event_header*)(&event), type, sizeof(event))
 
 void _developsys_push(struct event_header *header,
                       u32 type,
@@ -59,11 +23,6 @@ void developsys_push_record_float(const char *name,
 
 void developsys_push_record_int(const char *name,
                                 int value);
-
-struct scope_data {
-    time_t start;
-    u64 start_timer;
-};
 
 struct scope_data developsys_enter_scope(const char *name);
 

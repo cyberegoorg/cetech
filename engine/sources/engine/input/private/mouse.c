@@ -3,6 +3,7 @@
 //==============================================================================
 
 #include <celib/math/types.h>
+#include <engine/plugin/plugin_api.h>
 #include "celib/machine/machine.h"
 #include "celib/string/string.h"
 
@@ -30,30 +31,19 @@ static struct G {
 } _G = {0};
 
 
-//==============================================================================
-// Interface
-//==============================================================================
-
-
-int mouse_init(int stage) {
-    if (stage == 0) {
-        return 1;
-    }
-
+static void _init(get_api_fce_t get_engine_api) {
     _G = (struct G) {0};
 
     log_debug(LOG_WHERE, "Init");
-
-    return 1;
 }
 
-void mouse_shutdown() {
-    _G = (struct G) {0};
-
+static void _shutdown() {
     log_debug(LOG_WHERE, "Shutdown");
+
+    _G = (struct G) {0};
 }
 
-void mouse_process() {
+static void _update() {
     struct event_header *event = machine_event_begin();
 
     memory_copy(_G.last_state, _G.state, MOUSE_BTN_MAX);
@@ -90,6 +80,43 @@ void mouse_process() {
         event = machine_event_next(event);
     }
 }
+
+
+void *mouse_get_plugin_api(int api,
+                              int version) {
+
+    if (api == PLUGIN_API_ID && version == 0) {
+        static struct plugin_api_v0 plugin = {0};
+
+        plugin.init = _init;
+        plugin.shutdown = _shutdown;
+        plugin.update = _update;
+
+        return &plugin;
+
+    } else if (api == MOUSE_API_ID && version == 0) {
+        static struct MouseApiV1 api_v1 = {
+                .button_index = mouse_button_index,
+                .button_name = mouse_button_name,
+                .button_state = mouse_button_state,
+                .button_pressed = mouse_button_pressed,
+                .button_released = mouse_button_released,
+                .axis_index = mouse_axis_index,
+                .axis_name = mouse_axis_name,
+                .axis = mouse_axis,
+        };
+
+        return &api_v1;
+    }
+
+    return 0;
+}
+
+
+
+//==============================================================================
+// Interface
+//==============================================================================
 
 u32 mouse_button_index(const char *button_name) {
     for (u32 i = 0; i < MOUSE_BTN_MAX; ++i) {

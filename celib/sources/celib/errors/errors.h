@@ -28,8 +28,8 @@
                        __LINE__,                                                \
                        st);                                                     \
             cel_stacktrace_free(st);                                             \
-            abort();                                                            \
-            /*exit(1);*/                                                        \
+            /*abort();*/                                                            \
+            exit(1);                                                        \
         }                                                                       \
     } while (0)                                                                 \
 

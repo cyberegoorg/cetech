@@ -14,6 +14,7 @@
 #include <engine/resource/resource.h>
 #include <engine/application/application.h>
 #include <engine/memory/memsys.h>
+#include <engine/plugin/plugin_api.h>
 
 #include "celib/filesystem/vio.h"
 #include "engine/config/cvar.h"
@@ -196,30 +197,48 @@ void _compile_dir(ARRAY_T(task_item) *tasks,
 // Interface
 //==============================================================================
 
-int resource_compiler_init(int stage) {
-    if (stage == 0) {
-        _G = (struct G) {0};
-        _G.cv_source_dir = cvar_new_str("src", "Resource source dir", "data/src");
-        _G.cv_core_dir = cvar_new_str("core", "Resource application source dir", "core");
-        _G.cv_external_dir = cvar_new_str("external", "External build dir", "externals/build");
+static void _init_cvar(struct ConfigApiV1 config) {
+    _G.cv_source_dir = config.new_str("src", "Resource source dir", "data/src");
+    _G.cv_core_dir = config.new_str("core", "Resource application source dir", "core");
+    _G.cv_external_dir = config.new_str("external", "External build dir", "externals/build");
 
-        _G.cv_build_dir = cvar_new_str("build", "Resource build dir", "data/build");
-    } else {
+    _G.cv_build_dir = config.new_str("build", "Resource build dir", "data/build");
+}
 
-        const char *build_dir = cvar_get_string(_G.cv_build_dir);
-        char build_dir_full[1024] = {0};
-        cel_path_join(build_dir_full, CEL_ARRAY_LEN(build_dir_full), build_dir, application_platform());
+static void _init(get_api_fce_t get_engine_api) {
+    const char *build_dir = cvar_get_string(_G.cv_build_dir);
+    char build_dir_full[1024] = {0};
+    cel_path_join(build_dir_full, CEL_ARRAY_LEN(build_dir_full), build_dir, application_platform());
 
-        cel_dir_make_path(build_dir_full);
-        builddb_init_db(build_dir_full);
+    cel_dir_make_path(build_dir_full);
+    builddb_init_db(build_dir_full);
 
-        char tmp_dir_full[1024] = {0};
-        cel_path_join(tmp_dir_full, CEL_ARRAY_LEN(tmp_dir_full), build_dir_full, "tmp");
-        cel_dir_make_path(tmp_dir_full);
+    char tmp_dir_full[1024] = {0};
+    cel_path_join(tmp_dir_full, CEL_ARRAY_LEN(tmp_dir_full), build_dir_full, "tmp");
+    cel_dir_make_path(tmp_dir_full);
+}
+
+static void _shutdown() {
+    _G = (struct G) {0};
+}
+
+void *resourcecompiler_get_plugin_api(int api,
+                                int version) {
+
+    if (api == PLUGIN_API_ID && version == 0) {
+        static struct plugin_api_v0 plugin = {0};
+
+        plugin.init = _init;
+        plugin.init_cvar = _init_cvar;
+        plugin.shutdown = _shutdown;
+
+        return &plugin;
+
     }
 
-    return 1;
+    return 0;
 }
+
 
 void resource_compiler_create_build_dir() {
     const char *build_dir = cvar_get_string(_G.cv_build_dir);
@@ -227,10 +246,6 @@ void resource_compiler_create_build_dir() {
     cel_path_join(build_dir_full, CEL_ARRAY_LEN(build_dir_full), build_dir, application_platform());
 
     cel_dir_make_path(build_dir_full);
-}
-
-void resource_compiler_shutdown() {
-    _G = (struct G) {0};
 }
 
 void resource_compiler_register(stringid64_t type,

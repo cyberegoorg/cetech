@@ -14,16 +14,6 @@
 // Mouse
 //==============================================================================
 
-//! Init mouse keyboard system
-//! \return 1 if init ok else 0
-int mouse_init();
-
-//! Shutdown keyboard system
-void mouse_shutdown();
-
-//! Process mouse
-void mouse_process();
-
 //! Return button index
 //! \param button_name Button name
 //! \return Button index
@@ -63,19 +53,6 @@ const char *mouse_axis_name(const u32 axis_index);
 //! \param axis_index Axis index
 //! \return Axis value
 cel_vec2f_t mouse_axis(u32 idx, const u32 axis_index);
-
-
-struct MouseApiV1 {
-    int (*is_active)();
-    u32 (*button_index)(const char *button_name);
-    const char *(*button_name)(const u32 button_index);
-    int (*button_state)(u32 idx,const u32 button_index);
-    int (*button_pressed)(u32 idx,const u32 button_index);
-    int (*button_released)(u32 idx,const u32 button_index);
-    u32 (*axis_index)(const char *axis_name);
-    const char *(*axis_name)(const u32 axis_index);
-    cel_vec2f_t (*axis)(u32 idx,const u32 axis_index);
-};
 
 static const struct MouseApiV1 MouseApiV1 = {
         .button_index = mouse_button_index,

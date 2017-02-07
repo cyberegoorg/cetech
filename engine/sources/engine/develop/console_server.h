@@ -1,16 +1,7 @@
 #ifndef CETECH_CONSOLE_SERVER_API_H
 #define CETECH_CONSOLE_SERVER_API_H
 
-//==============================================================================
-// Typedefs
-//==============================================================================
-
-
-#include "include/mpack/mpack.h"
-
-typedef int (*console_server_command_t)(mpack_node_t,
-                                        mpack_writer_t *);
-
+#include "types.h"
 
 //==============================================================================
 // Interface
