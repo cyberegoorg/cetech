@@ -3,7 +3,6 @@
 //==============================================================================
 
 #include <engine/plugin/plugin.h>
-#include <nilfs2_fs.h>
 #include "celib/machine/machine.h"
 
 #include "engine/input/keyboard.h"
