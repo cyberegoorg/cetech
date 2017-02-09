@@ -26,6 +26,8 @@ void plugin_load_dirs(const char *path);
 
 void plugin_reload(const char *path);
 
+void plugin_reload_all();
+
 void plugin_call_update();
 
 void plugin_call_init_cvar();

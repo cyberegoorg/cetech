@@ -34,8 +34,8 @@ static void _init_api(get_api_fce_t get_engine_api) {
 
 static void _init(get_api_fce_t get_engine_api) {
     _init_api(get_engine_api);
-    u32 i = KeyboardApiV1.button_index("a");
-    printf("FOOOOO: %d", i);
+
+    printf("FOOOOO: %d", 11561651);
 //
 //    alloc = mem->create_plugin_allocator("example");
 //
@@ -55,6 +55,12 @@ static void *_reload_begin(get_api_fce_t get_engine_api) {
     return NULL;
 }
 
+static void _update() {
+    if(KeyboardApiV1.button_state(0, KeyboardApiV1.button_index("v"))) {
+        printf("dddddddddddddddddddddddddddddddddds 5  5 5 \n");
+    }
+}
+
 static void _reload_end(get_api_fce_t get_engine_api,
                         void *data) {
     _init_api(get_engine_api);
@@ -71,6 +77,7 @@ void *get_plugin_api(int api,
         plugin.shutdown = _shutdown;
         plugin.reload_begin = _reload_begin;
         plugin.reload_end = _reload_end;
+        plugin.update = _update;
 
         return &plugin;
     }

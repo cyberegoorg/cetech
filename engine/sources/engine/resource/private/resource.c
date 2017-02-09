@@ -15,6 +15,7 @@
 #include "celib/containers/map.h"
 #include <engine/memory/memsys.h>
 #include <engine/plugin/plugin_api.h>
+#include <engine/plugin/plugin.h>
 
 //==============================================================================
 // Struct and types
@@ -390,6 +391,8 @@ void *resource_get(stringid64_t type,
 void resource_reload(stringid64_t type,
                      stringid64_t *names,
                      size_t count) {
+    plugin_reload_all();
+
     void *loaded_data[count];
     MAP_T(resource_item_t) *resource_map = _get_resource_map(type);
     const u32 idx = MAP_GET(u32, &_G.type_map, type.id, 0);

@@ -112,13 +112,44 @@ void plugin_reload(const char *path) {
 
         void *data = NULL;
         struct plugin_api_v0 *api = _G.plugin_api[i];
-        if( api != NULL && api->reload_begin) {
+        if (api != NULL && api->reload_begin) {
             data = api->reload_begin(plugin_get_engine_api);
         }
 
         cel_unload_object(_G.plugin_handler[i]);
 
         void *obj = cel_load_object(path);
+        if (obj == NULL) {
+            return;
+        }
+
+        void *fce = cel_load_function(obj, "get_plugin_api");
+        if (fce == NULL) {
+            return;
+        }
+
+        _G.plugin_api[i] = api = ((get_api_fce_t) fce)(PLUGIN_API_ID, 0);
+        if (api != NULL && api->reload_end) {
+            api->reload_end(plugin_get_engine_api, data);
+        }
+    }
+}
+
+void plugin_reload_all() {
+    for (size_t i = 0; i < MAX_PLUGINS; ++i) {
+        if (_G.plugin_handler[i] == NULL) {
+            continue;
+        }
+
+        void *data = NULL;
+        struct plugin_api_v0 *api = _G.plugin_api[i];
+        if (api != NULL && api->reload_begin) {
+            data = api->reload_begin(plugin_get_engine_api);
+        }
+
+        cel_unload_object(_G.plugin_handler[i]);
+
+        void *obj = cel_load_object(_G.path[i]);
         if (obj == NULL) {
             return;
         }

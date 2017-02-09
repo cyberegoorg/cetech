@@ -101,6 +101,7 @@ function Game:update(dt)
     if Keyboard.button_pressed(reload_btn) then
         ResourceManager.compile_all()
         ResourceManager.reload_all()
+        Plugin.reload_all()
     end
 
     if Keyboard.button_pressed(quit_btn) then

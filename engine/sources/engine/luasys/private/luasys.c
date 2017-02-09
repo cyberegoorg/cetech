@@ -203,6 +203,7 @@ static const struct game_callbacks _GameCallbacks = {
 
 static void _register_all_api() {
     REGISTER_LUA_API(log);
+    REGISTER_LUA_API(plugin);
     REGISTER_LUA_API(keyboard);
     REGISTER_LUA_API(mouse);
     REGISTER_LUA_API(gamepad);
