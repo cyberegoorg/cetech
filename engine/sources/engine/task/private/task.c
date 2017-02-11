@@ -10,7 +10,6 @@
 #include <engine/develop/develop_system.h>
 #include <engine/plugin/plugin_api.h>
 
-#include "../types.h"
 #include "task_queue.h"
 #include "../task.h"
 
@@ -193,32 +192,6 @@ static void _shutdown() {
     _G = (struct G) {0};
 }
 
-void *task_get_plugin_api(int api,
-                             int version) {
-
-    if (api == PLUGIN_API_ID && version == 0) {
-        static struct plugin_api_v0 plugin = {0};
-
-        plugin.init = _init;
-        plugin.shutdown = _shutdown;
-
-        return &plugin;
-
-    } else if (api == TASK_API_ID && version == 0) {
-        static struct TaskApiV1 api_v1 = {
-                .worker_count = taskmanager_worker_count,
-                .add = taskmanager_add,
-                .do_work = taskmanager_do_work,
-                .wait_atomic = taskmanager_wait_atomic,
-                .worker_id = taskmanager_worker_id
-        };
-
-        return &api_v1;
-    }
-
-    return 0;
-}
-
 //==============================================================================
 // Interface
 //==============================================================================
@@ -270,4 +243,47 @@ char taskmanager_worker_id() {
 
 int taskmanager_worker_count() {
     return _G._workers_count;
+}
+
+void *task_get_plugin_api(int api,
+                          int version) {
+
+
+    switch (api) {
+        case PLUGIN_API_ID:
+            switch (version) {
+                case 0: {
+                    static struct plugin_api_v0 plugin = {0};
+
+                    plugin.init = _init;
+                    plugin.shutdown = _shutdown;
+
+                    return &plugin;
+                }
+
+                default:
+                    return NULL;
+            };
+        case TASK_API_ID:
+            switch (version) {
+                case 0: {
+                    static struct TaskApiV1 api = {
+                            .worker_count = taskmanager_worker_count,
+                            .add = taskmanager_add,
+                            .do_work = taskmanager_do_work,
+                            .wait_atomic = taskmanager_wait_atomic,
+                            .worker_id = taskmanager_worker_id
+                    };
+
+                    return &api;
+                }
+
+                default:
+                    return NULL;
+            };
+
+        default:
+            return NULL;
+    }
+
 }

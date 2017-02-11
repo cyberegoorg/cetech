@@ -6,6 +6,7 @@
 void _init_static_plugins() {
     ADD_STATIC_PLUGIN(config);
     ADD_STATIC_PLUGIN(task);
+    ADD_STATIC_PLUGIN(luasys);
 
     ADD_STATIC_PLUGIN(filesystem);
     ADD_STATIC_PLUGIN(resourcecompiler);
@@ -25,7 +26,6 @@ void _init_static_plugins() {
     ADD_STATIC_PLUGIN(level);
 
     ADD_STATIC_PLUGIN(renderer);
-    ADD_STATIC_PLUGIN(luasys);
 
     ADD_STATIC_PLUGIN(camera);
     ADD_STATIC_PLUGIN(scenegraph);

@@ -13,11 +13,6 @@
 // Interface
 //==============================================================================
 
-typedef struct {
-    world_on_created_t on_created;
-    world_on_destroy_t on_destroy;
-    world_on_update_t on_update;
-} world_callbacks_t;
 
 void world_register_callback(world_callbacks_t clb);
 

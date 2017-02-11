@@ -4,14 +4,7 @@
 #include <celib/string/stringid.h>
 #include <engine/entcom/types.h>
 #include "engine/renderer/material.h"
-
-typedef struct {
-    u32 idx;
-} mesh_t;
-
-int mesh_init(int stage);
-
-void mesh_shutdown();
+#include "types.h"
 
 int mesh_is_valid(mesh_t mesh);
 

@@ -10,6 +10,7 @@
 
 #include <engine/memory/memsys.h>
 #include <engine/plugin/plugin_api.h>
+#include <engine/world/api.h>
 
 struct camera_data {
     f32 near;
@@ -140,19 +141,6 @@ static void _shutdown() {
     _G = (struct G) {0};
 }
 
-void *camera_get_plugin_api(int api,
-                            int version) {
-
-    if (api == PLUGIN_API_ID && version == 0) {
-        static struct plugin_api_v0 plugin = {0};
-
-        plugin.init = _init;
-        plugin.shutdown = _shutdown;
-
-        return &plugin;
-    }
-    return 0;
-}
 
 int camera_is_valid(camera_t camera) {
     return camera.idx != UINT32_MAX;
@@ -212,4 +200,45 @@ camera_t camera_create(world_t world,
     ARRAY_PUSH_BACK(f32, &data->fov, fov);
 
     return (camera_t) {.idx = idx};
+}
+
+void *camera_get_plugin_api(int api,
+                            int version) {
+
+    switch (api) {
+        case PLUGIN_API_ID:
+            switch (version) {
+                case 0: {
+                    static struct plugin_api_v0 plugin = {0};
+
+                    plugin.init = _init;
+                    plugin.shutdown = _shutdown;
+
+                    return &plugin;
+                }
+
+                default:
+                    return NULL;
+            };
+        case CAMERA_API_ID:
+            switch (version) {
+                case 0: {
+                    static struct CameraApiV1 api = {0};
+
+                    api.is_valid = camera_is_valid;
+                    api.get_project_view = camera_get_project_view;
+                    api.has = camera_has;
+                    api.get = camera_get;
+                    api.create = camera_create;
+
+                    return &api;
+                }
+
+                default:
+                    return NULL;
+            };
+
+        default:
+            return NULL;
+    }
 }

@@ -60,5 +60,13 @@ struct scope_data {
 
 #define developsys_push(type, event) _developsys_push((struct event_header*)(&event), type, sizeof(event))
 
+struct DevelopSystemApiV1 {
+    void (*push)(struct event_header *header, u32 type, u64 size);
+    void (*push_record_float)(const char *name,float value);
+    void (*push_record_int)(const char *name,int value);
+    struct scope_data (*enter_scope)(const char *name);
+    void (*leave_scope)(const char *name, struct scope_data scope_data);
+};
+
 
 #endif //CETECH_DEVELOP_TYPES_H

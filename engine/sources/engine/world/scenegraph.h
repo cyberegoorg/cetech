@@ -6,9 +6,6 @@
 #import "celib/math/types.h"
 #import "celib/string/stringid.h"
 
-typedef struct {
-    u32 idx;
-} scene_node_t;
 
 
 int scenegraph_is_valid(scene_node_t transform);

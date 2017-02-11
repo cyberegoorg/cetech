@@ -6,6 +6,7 @@
 #include <engine/world/world.h>
 #include <engine/memory/memsys.h>
 #include <engine/plugin/plugin_api.h>
+#include <engine/world/api.h>
 
 //==============================================================================
 // Typedefs
@@ -45,20 +46,7 @@ static void _shutdown() {
     _G = (struct G) {0};
 }
 
-void *world_get_plugin_api(int api,
-                           int version) {
 
-    if (api == PLUGIN_API_ID && version == 0) {
-        static struct plugin_api_v0 plugin = {0};
-
-        plugin.init = _init;
-        plugin.shutdown = _shutdown;
-
-        return &plugin;
-    }
-
-    return 0;
-}
 
 void world_register_callback(world_callbacks_t clb) {
     ARRAY_PUSH_BACK(world_callbacks_t, &_G.callbacks, clb);
@@ -89,5 +77,49 @@ void world_update(world_t world,
             ARRAY_AT(&_G.callbacks, i).on_update(world, dt);
             return;
         }
+    }
+}
+
+
+void *world_get_plugin_api(int api,
+                           int version) {
+
+    switch (api) {
+        case PLUGIN_API_ID:
+            switch (version) {
+                case 0: {
+                    static struct plugin_api_v0 plugin = {0};
+
+                    plugin.init = _init;
+                    plugin.shutdown = _shutdown;
+
+                    return &plugin;
+                }
+
+                default:
+                    return NULL;
+            };
+        case WORLD_API_ID:
+            switch (version) {
+                case 0: {
+                    static struct WorldApiV1 api = {0};
+
+                    api.register_callback = world_register_callback;
+                    api.create = world_create;
+                    api.destroy = world_destroy;
+                    api.update = world_update;
+                    api.load_level = world_load_level;
+                    api.unit_by_id = level_unit_by_id;
+                    api.unit = level_unit ;
+
+                    return &api;
+                }
+
+                default:
+                    return NULL;
+            };
+
+        default:
+            return NULL;
     }
 }

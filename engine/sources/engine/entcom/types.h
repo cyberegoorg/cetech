@@ -5,6 +5,7 @@
 #include <celib/containers/map.h>
 #include <celib/yaml/yaml.h>
 #include <engine/world/types.h>
+#include <celib/string/stringid.h>
 
 typedef struct {
     union {
@@ -38,5 +39,18 @@ static struct component_clb {
     world_on_update_t on_world_update;
 } component_clb_null = {0};
 
+
+
+struct EntComSystemApiV1 {
+    entity_t (*entity_manager_create)();
+    void (*entity_manager_destroy)(entity_t entity);
+    int (*entity_manager_alive)(entity_t entity);
+    void (*component_register_compiler)(stringid64_t type, component_compiler_t compiler,u32 spawn_order);
+    int (*component_compile)(stringid64_t type, yaml_node_t body, ARRAY_T(u8) *data);
+    u32 (*component_get_spawn_order)(stringid64_t type);
+    void (*component_register_type)(stringid64_t type, struct component_clb clb);
+    void (*component_spawn)(world_t world, stringid64_t type, entity_t *ent_ids, u32 *cent, u32 *ents_parent, u32 ent_count, void *data);
+    void (*component_destroy)(world_t world, entity_t *ent, u32 count);
+};
 
 #endif //CETECH_ENTCOM_TYPES_H

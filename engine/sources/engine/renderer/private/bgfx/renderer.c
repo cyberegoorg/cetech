@@ -17,6 +17,7 @@
 #include "texture.h"
 #include "shader.h"
 #include "scene.h"
+#include "../../types.h"
 
 //==============================================================================
 // GLobals
@@ -62,7 +63,7 @@ static void _init(get_api_fce_t get_engine_api) {
     _G = (struct G) {0};
 
     cvar_t daemon = cvar_find("daemon");
-    if(!cvar_get_int(daemon)) {
+    if (!cvar_get_int(daemon)) {
         texture_resource_init();
         shader_resource_init();
         material_resource_init();
@@ -74,7 +75,7 @@ static void _init(get_api_fce_t get_engine_api) {
 
 static void _shutdown() {
     cvar_t daemon = cvar_find("daemon");
-    if(!cvar_get_int(daemon)) {
+    if (!cvar_get_int(daemon)) {
         texture_resource_shutdown();
         shader_resource_shutdown();
         material_resource_shutdown();
@@ -86,19 +87,6 @@ static void _shutdown() {
     _G = (struct G) {0};
 }
 
-void *renderer_get_plugin_api(int api,
-                               int version) {
-
-    if (api == PLUGIN_API_ID && version == 0) {
-        static struct plugin_api_v0 plugin = {0};
-
-        plugin.init = _init;
-        plugin.shutdown = _shutdown;
-
-        return &plugin;
-    }
-    return 0;
-}
 
 void renderer_create(cel_window_t window) {
     bgfx_platform_data_t pd = {0};
@@ -155,4 +143,67 @@ cel_vec2f_t renderer_get_size() {
     result.y = _G.size_height;
 
     return result;
+}
+
+
+void *renderer_get_plugin_api(int api,
+                              int version) {
+
+    switch (api) {
+        case PLUGIN_API_ID:
+            switch (version) {
+                case 0: {
+                    static struct plugin_api_v0 plugin = {0};
+
+                    plugin.init = _init;
+                    plugin.shutdown = _shutdown;
+
+                    return &plugin;
+                }
+
+                default:
+                    return NULL;
+            };
+
+        case RENDERER_API_ID:
+            switch (version) {
+                case 0: {
+                    static struct RendererApiV1 api = {0};
+
+                    api.create = renderer_create;
+                    api.set_debug = renderer_set_debug;
+                    api.get_size = renderer_get_size;
+                    api.render_world = renderer_render_world;
+
+                    return &api;
+                }
+
+                default:
+                    return NULL;
+            };
+
+        case MATERIAL_API_ID:
+            switch (version) {
+                case 0: {
+                    static struct MaterialApiV1 api = {0};
+
+                    api.resource_create = material_resource_create;
+                    api.get_texture_count = material_get_texture_count;
+                    api.set_texture = material_set_texture;
+                    api.set_vec4f = material_set_vec4f;
+                    api.set_mat33f = material_set_mat33f;
+                    api.set_mat44f = material_set_mat44f;
+                    api.use = material_use;
+                    api.submit = material_submit;
+
+                    return &api;
+                }
+
+                default:
+                    return NULL;
+            };
+
+        default:
+            return NULL;
+    }
 }

@@ -4,9 +4,6 @@
 #include "world.h"
 
 
-typedef struct {
-    u32 idx;
-} camera_t;
 
 int camera_is_valid(camera_t camera);
 
@@ -26,6 +23,5 @@ camera_t camera_create(world_t world,
                        f32 near,
                        f32 far,
                        f32 fov);
-
 
 #endif //CETECH_CAMERA_H

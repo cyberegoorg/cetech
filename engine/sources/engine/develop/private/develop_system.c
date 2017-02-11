@@ -277,23 +277,6 @@ static void _after_update(float dt) {
     eventstream_clear(&_G.eventstream);
 }
 
-
-void *developsystem_get_plugin_api(int api,
-                                   int version) {
-
-    if (api == PLUGIN_API_ID && version == 0) {
-        static struct plugin_api_v0 plugin = {0};
-
-        plugin.init = _init;
-        plugin.shutdown = _shutdown;
-        plugin.init_cvar = _init_cvar;
-        plugin.after_update = _after_update;
-
-        return &plugin;
-    }
-    return 0;
-}
-
 void developsys_push_record_float(const char *name,
                                   float value) {
     struct record_float_event ev = {0};
@@ -339,3 +322,46 @@ void developsys_leave_scope(const char *name,
     developsys_push(EVENT_SCOPE, ev);
 }
 
+void *developsystem_get_plugin_api(int api,
+                                   int version) {
+    switch (api) {
+        case PLUGIN_API_ID:
+            switch (version) {
+                case 0: {
+                    static struct plugin_api_v0 plugin = {0};
+
+                    plugin.init = _init;
+                    plugin.shutdown = _shutdown;
+                    plugin.init_cvar = _init_cvar;
+                    plugin.after_update = _after_update;
+
+                    return &plugin;
+                }
+
+                default:
+                    return NULL;
+            };
+        case DEVELOP_SERVER_API_ID:
+            switch (version) {
+                case 0: {
+                    static struct DevelopSystemApiV1 api = {0};
+
+                    api.push = _developsys_push;
+                    api.push_record_float = developsys_push_record_float;
+                    api.push_record_int = developsys_push_record_int;
+                    api.leave_scope = developsys_leave_scope;
+                    api.enter_scope = developsys_enter_scope;
+
+                    return &api;
+                }
+
+                default:
+                    return NULL;
+            };
+
+        default:
+            return NULL;
+    }
+
+    return 0;
+}

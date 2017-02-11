@@ -48,19 +48,6 @@ static void _shutdown() {
     _G = (struct G) {0};
 }
 
-void *entcom_get_plugin_api(int api,
-                                   int version) {
-
-    if (api == PLUGIN_API_ID && version == 0) {
-        static struct plugin_api_v0 plugin = {0};
-
-        plugin.init = _init;
-        plugin.shutdown = _shutdown;
-
-        return &plugin;
-    }
-    return 0;
-}
 //==============================================================================
 // Public interface
 //==============================================================================
@@ -141,5 +128,50 @@ void component_destroy(world_t world,
     while (ce_it != ce_end) {
         ce_it->value.destroyer(world, ent, count);
         ++ce_it;
+    }
+}
+
+void *entcom_get_plugin_api(int api,
+                                   int version) {
+    switch (api) {
+        case PLUGIN_API_ID:
+            switch (version) {
+                case 0: {
+                    static struct plugin_api_v0 plugin = {0};
+
+                    plugin.init = _init;
+                    plugin.shutdown = _shutdown;
+
+
+                    return &plugin;
+                }
+
+                default:
+                    return NULL;
+            };
+        case ENTCOM_API_ID:
+            switch (version) {
+                case 0: {
+                    static struct EntComSystemApiV1 api = {0};
+
+                    api.entity_manager_create = entity_manager_create;
+                    api.entity_manager_destroy = entity_manager_destroy;
+                    api.entity_manager_alive = entity_manager_alive;
+                    api.component_register_compiler = component_register_compiler;
+                    api.component_compile = component_compile;
+                    api.component_get_spawn_order = component_get_spawn_order;
+                    api.component_register_type = component_register_type;
+                    api.component_spawn = component_spawn;
+                    api.component_destroy = component_destroy;
+
+                    return &api;
+                }
+
+                default:
+                    return NULL;
+            };
+
+        default:
+            return NULL;
     }
 }

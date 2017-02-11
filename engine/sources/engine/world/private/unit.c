@@ -8,6 +8,8 @@
 #include <engine/entcom/entcom.h>
 #include <engine/memory/memsys.h>
 #include <engine/plugin/plugin_api.h>
+#include <engine/world/api.h>
+#include <engine/world/types.h>
 
 ARRAY_PROTOTYPE_N(struct array_entity_t, array_entity_t);
 MAP_PROTOTYPE_N(struct array_entity_t, array_entity_t);
@@ -437,19 +439,6 @@ static void _shutdown() {
     _G = (struct G) {0};
 }
 
-void *unit_get_plugin_api(int api,
-                            int version) {
-
-    if (api == PLUGIN_API_ID && version == 0) {
-        static struct plugin_api_v0 plugin = {0};
-
-        plugin.init = _init;
-        plugin.shutdown = _shutdown;
-
-        return &plugin;
-    }
-    return 0;
-}
 
 ARRAY_T(entity_t) *unit_spawn_from_resource(world_t world,
                                             void *resource) {
@@ -509,4 +498,49 @@ void unit_destroy(world_t world,
         _destroy_spawned_array(unit[i]);
     }
 
+}
+
+void *unit_get_plugin_api(int api,
+                          int version) {
+
+    switch (api) {
+        case PLUGIN_API_ID:
+            switch (version) {
+                case 0: {
+                    static struct plugin_api_v0 plugin = {0};
+
+                    plugin.init = _init;
+                    plugin.shutdown = _shutdown;
+
+                    return &plugin;
+                }
+
+                default:
+                    return NULL;
+            };
+        case UNIT_API_ID:
+            switch (version) {
+                case 0: {
+                    static struct UnitApiv1 api = {0};
+
+                    api.spawn_from_resource = unit_spawn_from_resource;
+                    api.spawn = unit_spawn;
+                    api.destroy = unit_destroy;
+                    api.compiler_create_output = unit_compiler_create_output;
+                    api.compiler_destroy_output = unit_compiler_destroy_output;
+                    api.compiler_compile_unit = unit_compiler_compile_unit;
+                    api.compiler_ent_counter = unit_compiler_ent_counter;
+                    api.compiler_write_to_build = unit_compiler_write_to_build;
+                    api.resource_compiler = unit_resource_compiler;
+
+                    return &api;
+                }
+
+                default:
+                    return NULL;
+            };
+
+        default:
+            return NULL;
+    }
 }

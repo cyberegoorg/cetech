@@ -11,9 +11,6 @@
 //==============================================================================
 
 
-void developsys_update(float dt);
-
-
 void _developsys_push(struct event_header *header,
                       u32 type,
                       u64 size);

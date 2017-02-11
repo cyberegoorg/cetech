@@ -1,5 +1,7 @@
 #include <celib/memory/memory.h>
 #include <celib/errors/errors.h>
+#include <engine/plugin/plugin_api.h>
+#include "../types.h"
 
 #define LOG_WHERE "memory"
 
@@ -9,6 +11,13 @@ struct G {
     struct cel_allocator *default_allocator;
     struct cel_allocator *default_scratch_allocator;
 } MemorySystemGlobals = {0};
+
+
+static void _init(get_api_fce_t get_engine_api) {
+}
+
+static void _shutdown() {
+}
 
 void memsys_init(int scratch_buffer_size) {
     _G = (struct G) {0};
@@ -30,4 +39,41 @@ struct cel_allocator *memsys_main_allocator() {
 
 struct cel_allocator *memsys_main_scratch_allocator() {
     return _G.default_scratch_allocator;
+}
+
+void *memoryluasys_get_plugin_api(int api,
+                                  int version) {
+    switch (api) {
+        case PLUGIN_API_ID:
+            switch (version) {
+                case 0: {
+                    static struct plugin_api_v0 plugin = {0};
+
+                    plugin.init = _init;
+                    plugin.shutdown = _shutdown;
+
+                    return &plugin;
+                }
+
+                default:
+                    return NULL;
+            };
+        case MEMORY_API_ID:
+            switch (version) {
+                case 0: {
+                    static struct MemSysApiV1 api = {0};
+
+                    api.main_allocator = memsys_main_allocator;
+                    api.main_scratch_allocator = memsys_main_scratch_allocator;
+
+                    return &api;
+                }
+
+                default:
+                    return NULL;
+            };
+
+        default:
+            return NULL;
+    }
 }

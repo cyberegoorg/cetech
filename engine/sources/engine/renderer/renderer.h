@@ -13,9 +13,6 @@
 // Interface
 //==============================================================================
 
-int renderer_init(int stage);
-
-void renderer_shutdown();
 
 void renderer_create(cel_window_t window);
 

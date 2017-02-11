@@ -7,6 +7,7 @@
 #include <engine/world/scenegraph.h>
 #include <engine/memory/memsys.h>
 #include <engine/plugin/plugin_api.h>
+#include <engine/world/api.h>
 
 ARRAY_PROTOTYPE(cel_vec3f_t)
 
@@ -104,20 +105,7 @@ static void _shutdown() {
     _G = (struct G) {0};
 }
 
-void *scenegraph_get_plugin_api(int api,
-                           int version) {
 
-    if (api == PLUGIN_API_ID && version == 0) {
-        static struct plugin_api_v0 plugin = {0};
-
-        plugin.init = _init;
-        plugin.shutdown = _shutdown;
-
-        return &plugin;
-    }
-
-    return 0;
-}
 
 
 int scenegraph_is_valid(scene_node_t transform) {
@@ -357,4 +345,54 @@ scene_node_t scenegraph_node_by_name(world_t world,
     scene_node_t root = scenegraph_get_root(world, entity);
 
     return _scenegraph_node_by_name(data, root, name);
+}
+
+void *scenegraph_get_plugin_api(int api,
+                                int version) {
+
+    switch (api) {
+        case PLUGIN_API_ID:
+            switch (version) {
+                case 0: {
+                    static struct plugin_api_v0 plugin = {0};
+
+                    plugin.init = _init;
+                    plugin.shutdown = _shutdown;
+
+                    return &plugin;
+                }
+
+                default:
+                    return NULL;
+            };
+        case SCENEGRAPH_API_ID:
+            switch (version) {
+                case 0: {
+                    static struct SceneGprahApiV1 api = {0};
+
+                    //api.scenegraph_transform = scenegraph_transform;
+                    api.is_valid = scenegraph_is_valid;
+                    api.get_position = scenegraph_get_position;
+                    api.get_rotation = scenegraph_get_rotation;
+                    api.get_scale = scenegraph_get_scale;
+                    api.get_world_matrix = scenegraph_get_world_matrix;
+                    api.set_position = scenegraph_set_position;
+                    api.set_rotation = scenegraph_set_rotation;
+                    api.set_scale = scenegraph_set_scale;
+                    api.has = scenegraph_has;
+                    api.get_root = scenegraph_get_root;
+                    api.create = scenegraph_create;
+                    api.link = scenegraph_link;
+                    api.node_by_name = scenegraph_node_by_name;
+
+                    return &api;
+                }
+
+                default:
+                    return NULL;
+            };
+
+        default:
+            return NULL;
+    }
 }

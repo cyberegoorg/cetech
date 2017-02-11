@@ -11,6 +11,7 @@
 #include <celib/math/quatf.h>
 #include <engine/memory/memsys.h>
 #include <engine/plugin/plugin_api.h>
+#include <engine/world/api.h>
 
 //==============================================================================
 // Typedefs
@@ -224,19 +225,7 @@ static void _shutdown() {
     _G = (struct G) {0};
 }
 
-void *level_get_plugin_api(int api,
-                            int version) {
 
-    if (api == PLUGIN_API_ID && version == 0) {
-        static struct plugin_api_v0 plugin = {0};
-
-        plugin.init = _init;
-        plugin.shutdown = _shutdown;
-
-        return &plugin;
-    }
-    return 0;
-}
 
 
 level_t world_load_level(world_t world,
@@ -286,4 +275,45 @@ entity_t level_unit_by_id(level_t level,
 entity_t level_unit(level_t level) {
     struct level_instance *instance = _level_instance(level);
     return instance->level_entity;
+}
+
+void *level_get_plugin_api(int api,
+                           int version) {
+
+    switch (api) {
+        case PLUGIN_API_ID:
+            switch (version) {
+                case 0: {
+                    static struct plugin_api_v0 plugin = {0};
+
+                    plugin.init = _init;
+                    plugin.shutdown = _shutdown;
+
+                    return &plugin;
+                }
+
+                default:
+                    return NULL;
+            };
+        case LEVEL_API_ID:
+            switch (version) {
+                case 0: {
+                    static struct LevelApiV1 api = {0};
+
+                    api.load_level = world_load_level;
+                    api.destroy = level_destroy;
+                    api.unit_by_id = level_unit_by_id;
+                    api.unit = level_unit;
+
+
+                    return &api;
+                }
+
+                default:
+                    return NULL;
+            };
+
+        default:
+            return NULL;
+    }
 }

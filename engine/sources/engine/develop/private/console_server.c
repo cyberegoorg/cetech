@@ -12,8 +12,6 @@
 #include "include/nanomsg/pipeline.h"
 
 #include "engine/develop/console_server.h"
-#include "celib/errors/errors.h"
-#include "celib/string/string.h"
 
 #include "engine/config/cvar.h"
 
@@ -125,7 +123,7 @@ static void _init(get_api_fce_t get_engine_api) {
     int socket = nn_socket(AF_SP, NN_REP);
     if (socket < 0) {
         log_error(LOG_WHERE, "Could not create nanomsg socket: %s", nn_strerror(errno));
-        return ;// 0;
+        return;// 0;
     }
     addr = cvar_get_string(_G.cv_rpc_addr);
 
@@ -133,7 +131,7 @@ static void _init(get_api_fce_t get_engine_api) {
 
     if (nn_bind(socket, addr) < 0) {
         log_error(LOG_WHERE, "Could not bind socket to '%s': %s", addr, nn_strerror(errno));
-        return ;// 0;
+        return;// 0;
     }
 
     _G.rpc_socket = socket;
@@ -143,7 +141,7 @@ static void _init(get_api_fce_t get_engine_api) {
         socket = nn_socket(AF_SP, NN_PUSH);
         if (socket < 0) {
             log_error(LOG_WHERE, "Could not create nanomsg socket: %s", nn_strerror(errno));
-            return ;// 0;
+            return;// 0;
         }
 
         addr = cvar_get_string(_G.cv_push_addr);
@@ -213,23 +211,6 @@ static void _update() {
     }
 }
 
-
-void *consoleserver_get_plugin_api(int api,
-                          int version) {
-
-    if (api == PLUGIN_API_ID && version == 0) {
-        static struct plugin_api_v0 plugin = {0};
-
-        plugin.init = _init;
-        plugin.shutdown = _shutdown;
-        plugin.init_cvar = _init_cvar;
-        plugin.update = _update;
-
-        return &plugin;
-    }
-    return 0;
-}
-
 //==============================================================================
 // Interface
 //==============================================================================
@@ -254,3 +235,41 @@ void consolesrv_push_begin() {
     }
 }
 
+void *consoleserver_get_plugin_api(int api,
+                                   int version) {
+    switch (api) {
+        case PLUGIN_API_ID:
+            switch (version) {
+                case 0: {
+                    static struct plugin_api_v0 plugin = {0};
+
+                    plugin.init = _init;
+                    plugin.shutdown = _shutdown;
+                    plugin.init_cvar = _init_cvar;
+                    plugin.update = _update;
+
+                    return &plugin;
+                }
+
+                default:
+                    return NULL;
+            };
+        case CONSOLE_SERVER_API_ID:
+            switch (version) {
+                case 0: {
+                    static struct ConsoleServerApiV1 api = {0};
+
+                    api.consolesrv_push_begin = consolesrv_push_begin;
+                    api.consolesrv_register_command = consolesrv_register_command;
+
+                    return &api;
+                }
+
+                default:
+                    return NULL;
+            };
+
+        default:
+            return NULL;
+    }
+}

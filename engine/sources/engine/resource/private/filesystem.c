@@ -10,6 +10,7 @@
 #include "celib/filesystem/vio.h"
 
 #include "engine/resource/filesystem.h"
+#include "../types.h"
 
 
 //==============================================================================
@@ -57,21 +58,6 @@ static void _shutdown() {
     _G = (struct G) {0};
 }
 
-void *filesystem_get_plugin_api(int api,
-                          int version) {
-
-    if (api == PLUGIN_API_ID && version == 0) {
-        static struct plugin_api_v0 plugin = {0};
-
-        plugin.init = _init;
-        plugin.shutdown = _shutdown;
-
-        return &plugin;
-
-    }
-
-    return 0;
-}
 
 //==============================================================================
 // Interface
@@ -174,4 +160,52 @@ time_t filesystem_get_file_mtime(stringid64_t root,
     }
 
     return cel_file_mtime(fullm_path);
+}
+
+
+void *filesystem_get_plugin_api(int api,
+                                int version) {
+
+    switch (api) {
+        case PLUGIN_API_ID:
+            switch (version) {
+                case 0: {
+                    static struct plugin_api_v0 plugin = {0};
+
+                    plugin.init = _init;
+                    plugin.shutdown = _shutdown;
+
+                    return &plugin;
+                }
+
+                default:
+                    return NULL;
+            };
+
+        case FILESYSTEM_API_ID:
+            switch (version) {
+                case 0: {
+                    static struct FilesystemApiV1 api = {0};
+
+                    api.filesystem_get_root_dir = filesystem_get_root_dir;
+                    api.filesystem_open = filesystem_open;
+                    api.filesystem_map_root_dir = filesystem_map_root_dir;
+                    api.filesystem_close = filesystem_close;
+                    api.filesystem_listdir = filesystem_listdir;
+                    api.filesystem_listdir_free = filesystem_listdir_free;
+                    api.filesystem_create_directory = filesystem_create_directory;
+                    api.filesystem_get_file_mtime = filesystem_get_file_mtime;
+                    api.filesystem_get_fullpath = filesystem_get_fullpath;
+
+                    return &api;
+                }
+
+                default:
+                    return NULL;
+            };
+
+        default:
+            return NULL;
+    }
+
 }

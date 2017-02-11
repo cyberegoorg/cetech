@@ -17,6 +17,8 @@
 #include <engine/plugin/plugin_api.h>
 #include <engine/plugin/plugin.h>
 
+#include "../types.h"
+
 //==============================================================================
 // Struct and types
 //==============================================================================
@@ -170,20 +172,7 @@ static void _shutdown() {
     package_shutdown();
 }
 
-void *resourcesystem_get_plugin_api(int api,
-                                   int version) {
 
-    if (api == PLUGIN_API_ID && version == 0) {
-        static struct plugin_api_v0 plugin = {0};
-
-        plugin.init = _init;
-        plugin.shutdown = _shutdown;
-        plugin.init_cvar = _init_cvar;
-
-        return &plugin;
-    }
-    return 0;
-}
 
 //==============================================================================
 // Public interface
@@ -450,4 +439,79 @@ void resource_reload_all() {
     }
 
     ARRAY_DESTROY(stringid64_t, &name_array);
+}
+
+void *resourcesystem_get_plugin_api(int api,
+                                    int version) {
+    switch (api) {
+        case PLUGIN_API_ID:
+            switch (version) {
+                case 0: {
+                    static struct plugin_api_v0 plugin = {0};
+
+                    plugin.init = _init;
+                    plugin.shutdown = _shutdown;
+                    plugin.init_cvar = _init_cvar;
+
+                    return &plugin;
+                }
+
+                default:
+                    return NULL;
+            };
+        case RESOURCE_API_ID:
+            switch (version) {
+                case 0: {
+                    static struct ResourceApiV1 api = {0};
+
+                    api.set_autoload = resource_set_autoload;
+                    api.register_type = resource_register_type;
+                    api.load = resource_load;
+                    api.add_loaded = resource_add_loaded;
+                    api.load_now = resource_load_now;
+                    api.unload = resource_unload;
+                    api.reload = resource_reload;
+                    api.reload_all = resource_reload_all;
+                    api.can_get = resource_can_get;
+                    api.can_get_all = resource_can_get_all;
+                    api.get = resource_get;
+                    api.type_name_string = resource_type_name_string;
+                    api.compiler_register = resource_compiler_register;
+                    api.compiler_compile_all = resource_compiler_compile_all;
+                    api.compiler_get_filename = resource_compiler_get_filename;
+                    api.compiler_get_build_dir = resource_compiler_get_build_dir;
+                    api.compiler_get_tmp_dir = resource_compiler_get_tmp_dir;
+                    api.compiler_external_join = resource_compiler_external_join;
+                    api.compiler_create_build_dir = resource_compiler_create_build_dir;
+                    api.compiler_get_core_dir = resource_compiler_get_core_dir;
+                    api.compiler_get_source_dir = resource_compiler_get_source_dir;
+
+                    return &api;
+                }
+
+                default:
+                    return NULL;
+            };
+
+        case PACKAGE_API_ID:
+            switch (version) {
+                case 0: {
+                    static struct PackageApiV1 api = {0};
+
+                    api.load = package_load;
+                    api.unload = package_unload;
+                    api.is_loaded = package_is_loaded;
+                    api.flush = package_flush;
+
+                    return &api;
+                }
+
+                default:
+                    return NULL;
+            };
+
+        default:
+            return NULL;
+    }
+
 }

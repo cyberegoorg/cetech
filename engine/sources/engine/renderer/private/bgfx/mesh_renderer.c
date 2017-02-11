@@ -14,6 +14,8 @@
 
 #include <engine/memory/memsys.h>
 #include <engine/plugin/plugin_api.h>
+#include "../../types.h"
+
 
 #define LOG_WHERE "mesh_renderer"
 
@@ -154,23 +156,6 @@ static void _spawner(world_t world,
     }
 }
 
-int mesh_init(int stage) {
-    if (stage == 0) {
-        _G = (struct G) {0};
-
-        return 1;
-    }
-
-
-
-    return 1;
-}
-
-void mesh_shutdown() {
-
-
-}
-
 static void _init(get_api_fce_t get_engine_api) {
     _G = (struct G) {0};
 
@@ -192,19 +177,6 @@ static void _shutdown() {
     _G = (struct G) {0};
 }
 
-void *mesh_get_plugin_api(int api,
-                            int version) {
-
-    if (api == PLUGIN_API_ID && version == 0) {
-        static struct plugin_api_v0 plugin = {0};
-
-        plugin.init = _init;
-        plugin.shutdown = _shutdown;
-
-        return &plugin;
-    }
-    return 0;
-}
 
 int mesh_is_valid(mesh_t mesh) {
     return mesh.idx != UINT32_MAX;
@@ -309,4 +281,48 @@ void mesh_set_material(world_t world,
 
     material_t material_instance = material_resource_create(material);
     ARRAY_AT(&data->material, mesh.idx) = material_instance;
+}
+
+
+void *mesh_get_plugin_api(int api,
+                          int version) {
+
+    switch (api) {
+        case PLUGIN_API_ID:
+            switch (version) {
+                case 0: {
+                    static struct plugin_api_v0 plugin = {0};
+
+                    plugin.init = _init;
+                    plugin.shutdown = _shutdown;
+
+                    return &plugin;
+                }
+
+                default:
+                    return NULL;
+            };
+        case MESH_API_ID:
+            switch (version) {
+                case 0: {
+                    static struct MeshApiV1 api = {0};
+
+                    api.is_valid = mesh_is_valid;
+                    api.has = mesh_has;
+                    api.get = mesh_get;
+                    api.create = mesh_create;
+                    api.get_material = mesh_get_material;
+                    api.set_material = mesh_set_material;
+                    api.render_all = mesh_render_all;
+
+                    return &api;
+                }
+
+                default:
+                    return NULL;
+            };
+
+        default:
+            return NULL;
+    }
 }

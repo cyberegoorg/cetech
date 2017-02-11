@@ -8,50 +8,7 @@
 #include <celib/string/stringid.h>
 #include "celib/memory/types.h"
 #include "celib/filesystem/vio_types.h"
-
-//==============================================================================
-// Callback typedef
-//==============================================================================
-
-typedef void *(*resource_loader_t)(struct vio *input,
-                                   struct cel_allocator *allocator);
-
-typedef void  (*resource_online_t)(stringid64_t name,
-                                   void *data);
-
-typedef void  (*resource_offline_t)(stringid64_t name,
-                                    void *data);
-
-typedef void  (*resource_unloader_t)(void *new_data,
-                                     struct cel_allocator *allocator);
-
-typedef void *(*resource_reloader_t)(stringid64_t name,
-                                     void *old_data,
-                                     void *new_data,
-                                     struct cel_allocator *allocator);
-
-//==============================================================================
-// Structs and typedefs
-//==============================================================================
-
-struct compilator_api {
-    void (*add_dependency)(const char *who_filname,
-                           const char *depend_on_filename);
-};
-
-typedef int (*resource_compilator_t)(
-        const char *filename,
-        struct vio *source_vio,
-        struct vio *build_vio,
-        struct compilator_api *compilator_api);
-
-typedef struct {
-    resource_loader_t loader;
-    resource_unloader_t unloader;
-    resource_online_t online;
-    resource_offline_t offline;
-    resource_reloader_t reloader;
-} resource_callbacks_t;
+#include "types.h"
 
 //==============================================================================
 // Resource interface

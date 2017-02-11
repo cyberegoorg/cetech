@@ -6,6 +6,7 @@
 #include "engine/world/transform.h"
 #include <engine/memory/memsys.h>
 #include <engine/plugin/plugin_api.h>
+#include <engine/world/api.h>
 
 struct transform_data {
     cel_vec3f_t position;
@@ -171,20 +172,7 @@ static void _shutdown() {
     _G = (struct G) {0};
 }
 
-void *transform_get_plugin_api(int api,
-                           int version) {
 
-    if (api == PLUGIN_API_ID && version == 0) {
-        static struct plugin_api_v0 plugin = {0};
-
-        plugin.init = _init;
-        plugin.shutdown = _shutdown;
-
-        return &plugin;
-    }
-
-    return 0;
-}
 
 int transform_is_valid(transform_t transform) {
     return transform.idx != UINT32_MAX;
@@ -387,4 +375,52 @@ void transform_link(world_t world,
 
     transform_transform(world, parent_tr, p);
     transform_transform(world, child_tr, transform_get_world_matrix(world, transform_get(world, parent)));
+}
+
+void *transform_get_plugin_api(int api,
+                               int version) {
+    switch (api) {
+        case PLUGIN_API_ID:
+            switch (version) {
+                case 0: {
+                    static struct plugin_api_v0 plugin = {0};
+
+                    plugin.init = _init;
+                    plugin.shutdown = _shutdown;
+
+                    return &plugin;
+                }
+
+                default:
+                    return NULL;
+            };
+        case TRANSFORM_API_ID:
+            switch (version) {
+                case 0: {
+                    static struct TransformApiV1 api = {0};
+
+                    api.is_valid = transform_is_valid;
+                    api.transform = transform_transform;
+                    api.get_position = transform_get_position;
+                    api.get_rotation = transform_get_rotation;
+                    api.get_scale = transform_get_scale;
+                    api.get_world_matrix = transform_get_world_matrix;
+                    api.set_position = transform_set_position;
+                    api.set_rotation = transform_set_rotation;
+                    api.set_scale = transform_set_scale;
+                    api.has = transform_has;
+                    api.get = transform_get;
+                    api.create = transform_create;
+                    api.link = transform_link;
+
+                    return &api;
+                }
+
+                default:
+                    return NULL;
+            };
+
+        default:
+            return NULL;
+    }
 }
