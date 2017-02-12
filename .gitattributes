@@ -2,3 +2,5 @@ externals/build/** linguist-vendored=true
 playground/icons/** linguist-vendored=true
 playground/html/ace/** linguist-vendored=true
 playground/html/ace/snipets/** linguist-vendored=true
+*.a filter=lfs diff=lfs merge=lfs -text
+*.so filter=lfs diff=lfs merge=lfs -text
