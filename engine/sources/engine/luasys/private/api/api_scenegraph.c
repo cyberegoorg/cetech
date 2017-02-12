@@ -2,6 +2,7 @@
 #include <engine/world/scenegraph.h>
 #include <engine/plugin/plugin.h>
 #include "engine/luasys/luasys.h"
+#include <engine/plugin/plugin_api.h>
 
 #define API_NAME "SceneGraph"
 
@@ -95,8 +96,8 @@ static int _scenegraph_link(lua_State *l) {
     return 0;
 }
 
-void _register_lua_scenegraph_api() {
-    SceneGprahApiV1 = *((struct SceneGprahApiV1*)plugin_get_engine_api(SCENEGRAPH_API_ID, 0));
+void _register_lua_scenegraph_api(get_api_fce_t get_engine_api) {
+    SceneGprahApiV1 = *((struct SceneGprahApiV1*)get_engine_api(SCENEGRAPH_API_ID, 0));
 
     luasys_add_module_function(API_NAME, "has", _scenegraph_has);
     luasys_add_module_function(API_NAME, "node_by_name", _scenegraph_node_by_name);

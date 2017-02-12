@@ -18,6 +18,7 @@
 #include "quaternion.h"
 #include "matrix.h"
 #include "../types.h"
+#include <engine/plugin/plugin_api.h>
 
 //==============================================================================
 // Defines
@@ -26,10 +27,6 @@
 #define LOG_WHERE "lua_system"
 
 #define TEMP_VAR_COUNT 1024
-
-#define REGISTER_LUA_API(name) \
-    void _register_lua_##name##_api();\
-    _register_lua_##name##_api();
 
 
 //==============================================================================
@@ -207,7 +204,11 @@ static const struct game_callbacks _GameCallbacks = {
         .render = _game_render_clb
 };
 
-static void _register_all_api() {
+#define REGISTER_LUA_API(name) \
+    void _register_lua_##name##_api();\
+    _register_lua_##name##_api(get_engine_api);
+
+static void _register_all_api(get_api_fce_t get_engine_api) {
     REGISTER_LUA_API(log);
     REGISTER_LUA_API(plugin);
     REGISTER_LUA_API(keyboard);
@@ -877,7 +878,7 @@ static void _init(get_api_fce_t get_engine_api) {
 
     _create_lightuserdata();
 
-    _register_all_api();
+    _register_all_api(get_engine_api);
 
     luasys_add_module_function("plugin", "reload", _reload_plugin);
     ConsoleServerApiV1.consolesrv_register_command("lua_system.execute", _cmd_execute_string);

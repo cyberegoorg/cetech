@@ -3,6 +3,7 @@
 #include <engine/plugin/plugin.h>
 
 #include "engine/luasys/luasys.h"
+#include <engine/plugin/plugin_api.h>
 
 #define API_NAME "Level"
 
@@ -46,8 +47,8 @@ static int _level_unit(lua_State *l) {
     return 1;
 }
 
-void _register_lua_level_api() {
-    LevelApiV1 = *((struct LevelApiV1*)plugin_get_engine_api(LEVEL_API_ID, 0));
+void _register_lua_level_api(get_api_fce_t get_engine_api) {
+    LevelApiV1 = *((struct LevelApiV1*)get_engine_api(LEVEL_API_ID, 0));
 
     luasys_add_module_function(API_NAME, "load_level", _load_level);
     luasys_add_module_function(API_NAME, "destroy", _destroy_level);

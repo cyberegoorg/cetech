@@ -2,6 +2,7 @@
 #include <engine/world/transform.h>
 #include <celib/math/vec4f.h>
 #include "engine/luasys/luasys.h"
+#include <engine/plugin/plugin_api.h>
 
 #define API_NAME "Vec4f"
 
@@ -80,7 +81,7 @@ static int _dot(lua_State *l) {
     return 1;
 }
 
-void _register_lua_vec4f_api() {
+void _register_lua_vec4f_api(get_api_fce_t get_engine_api) {
     luasys_add_module_function(API_NAME, "make", _ctor);
 
     luasys_add_module_function(API_NAME, "unit_x", _unit_x);

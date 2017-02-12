@@ -2,6 +2,7 @@
 #include <engine/world/world.h>
 #include <engine/plugin/plugin.h>
 #include "engine/luasys/luasys.h"
+#include <engine/plugin/plugin_api.h>
 
 #define API_NAME "World"
 
@@ -27,8 +28,8 @@ static int _world_update(lua_State *l) {
 }
 
 
-void _register_lua_world_api() {
-    WorldApiV1 = *((struct WorldApiV1*)plugin_get_engine_api(WORLD_API_ID, 0));
+void _register_lua_world_api(get_api_fce_t get_engine_api) {
+    WorldApiV1 = *((struct WorldApiV1*)get_engine_api(WORLD_API_ID, 0));
 
 
     luasys_add_module_function(API_NAME, "create", _world_create);

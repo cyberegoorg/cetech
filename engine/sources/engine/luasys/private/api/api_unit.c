@@ -3,6 +3,7 @@
 #include <engine/world/unit.h>
 #include <engine/plugin/plugin.h>
 #include "engine/luasys/luasys.h"
+#include <engine/plugin/plugin_api.h>
 
 #define API_NAME "Unit"
 
@@ -27,8 +28,8 @@ static int _unit_destroy(lua_State *l) {
 }
 
 
-void _register_lua_unit_api() {
-    UnitApiv1 = *((struct UnitApiv1*)plugin_get_engine_api(UNIT_API_ID, 0));
+void _register_lua_unit_api(get_api_fce_t get_engine_api) {
+    UnitApiv1 = *((struct UnitApiv1*)get_engine_api(UNIT_API_ID, 0));
 
     luasys_add_module_function(API_NAME, "spawn", _unit_spawn);
     luasys_add_module_function(API_NAME, "destroy", _unit_destroy);

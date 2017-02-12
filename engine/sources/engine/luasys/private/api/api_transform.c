@@ -2,6 +2,7 @@
 #include <engine/world/transform.h>
 #include <engine/plugin/plugin.h>
 #include "engine/luasys/luasys.h"
+#include <engine/plugin/plugin_api.h>
 
 #define API_NAME "Transform"
 
@@ -96,8 +97,8 @@ static int _transform_link(lua_State *l) {
     return 0;
 }
 
-void _register_lua_transform_api() {
-    TransformApiV1 = *((struct TransformApiV1*)plugin_get_engine_api(TRANSFORM_API_ID, 0));
+void _register_lua_transform_api(get_api_fce_t get_engine_api) {
+    TransformApiV1 = *((struct TransformApiV1*)get_engine_api(TRANSFORM_API_ID, 0));
 
 
     luasys_add_module_function(API_NAME, "get", _transform_get);

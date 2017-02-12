@@ -1,4 +1,5 @@
 #include "engine/luasys/luasys.h"
+#include <engine/plugin/plugin_api.h>
 
 #define API_NAME "Log"
 
@@ -91,7 +92,7 @@ static int _log_debug(lua_State *l) {
     return 0;
 }
 
-void _register_lua_log_api() {
+void _register_lua_log_api(get_api_fce_t get_engine_api) {
     luasys_add_module_function(API_NAME, "info", _log_info);
     luasys_add_module_function(API_NAME, "warning", _log_warning);
     luasys_add_module_function(API_NAME, "error", _log_error);

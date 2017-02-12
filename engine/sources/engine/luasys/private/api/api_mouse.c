@@ -2,6 +2,7 @@
 #include <engine/plugin/plugin.h>
 #include "engine/luasys/luasys.h"
 #include "engine/input/mouse.h"
+#include <engine/plugin/plugin_api.h>
 
 static struct MouseApiV1 MouseApiV1 = {0};
 
@@ -78,8 +79,8 @@ static int _mouse_axis(lua_State *l) {
 }
 
 #define API_NAME "Mouse"
-void _register_lua_mouse_api() {
-    MouseApiV1 = *((struct MouseApiV1*)plugin_get_engine_api(MOUSE_API_ID, 0));
+void _register_lua_mouse_api(get_api_fce_t get_engine_api) {
+    MouseApiV1 = *((struct MouseApiV1*)get_engine_api(MOUSE_API_ID, 0));
 
 
     luasys_add_module_function(API_NAME, "button_index", _mouse_button_index);
