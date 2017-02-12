@@ -88,37 +88,7 @@ static void _update() {
 }
 
 
-void *gamepad_get_plugin_api(int api,
-                             int version) {
 
-    if (api == PLUGIN_EXPORT_API_ID && version == 0) {
-        static struct plugin_api_v0 plugin = {0};
-
-        plugin.init = _init;
-        plugin.shutdown = _shutdown;
-        plugin.update = _update;
-
-        return &plugin;
-
-    } else if (api == GAMEPAD_API_ID && version == 0) {
-        static struct GamepadApiV1 api_v1 = {
-                .is_active = gamepad_is_active,
-                .button_index = gamepad_button_index,
-                .button_name = gamepad_button_name,
-                .button_state = gamepad_button_state,
-                .button_pressed = gamepad_button_pressed,
-                .button_released = gamepad_button_released,
-                .axis_index = gamepad_axis_index,
-                .axis_name = gamepad_axis_name,
-                .axis = gamepad_axis,
-                .play_rumble = gamepad_play_rumble,
-        };
-
-        return &api_v1;
-    }
-
-    return 0;
-}
 
 
 //==============================================================================
@@ -208,3 +178,34 @@ void gamepad_play_rumble(u32 idx,
     machine_gamepad_play_rumble(idx, strength, length);
 }
 
+void *gamepad_get_plugin_api(int api,
+                             int version) {
+
+    if (api == PLUGIN_EXPORT_API_ID && version == 0) {
+        static struct plugin_api_v0 plugin = {0};
+
+        plugin.init = _init;
+        plugin.shutdown = _shutdown;
+        plugin.update = _update;
+
+        return &plugin;
+
+    } else if (api == GAMEPAD_API_ID && version == 0) {
+        static struct GamepadApiV1 api_v1 = {
+                .is_active = gamepad_is_active,
+                .button_index = gamepad_button_index,
+                .button_name = gamepad_button_name,
+                .button_state = gamepad_button_state,
+                .button_pressed = gamepad_button_pressed,
+                .button_released = gamepad_button_released,
+                .axis_index = gamepad_axis_index,
+                .axis_name = gamepad_axis_name,
+                .axis = gamepad_axis,
+                .play_rumble = gamepad_play_rumble,
+        };
+
+        return &api_v1;
+    }
+
+    return 0;
+}

@@ -82,35 +82,6 @@ static void _update() {
 }
 
 
-void *mouse_get_plugin_api(int api,
-                              int version) {
-
-    if (api == PLUGIN_EXPORT_API_ID && version == 0) {
-        static struct plugin_api_v0 plugin = {0};
-
-        plugin.init = _init;
-        plugin.shutdown = _shutdown;
-        plugin.update = _update;
-
-        return &plugin;
-
-    } else if (api == MOUSE_API_ID && version == 0) {
-        static struct MouseApiV1 api_v1 = {
-                .button_index = mouse_button_index,
-                .button_name = mouse_button_name,
-                .button_state = mouse_button_state,
-                .button_pressed = mouse_button_pressed,
-                .button_released = mouse_button_released,
-                .axis_index = mouse_axis_index,
-                .axis_name = mouse_axis_name,
-                .axis = mouse_axis,
-        };
-
-        return &api_v1;
-    }
-
-    return 0;
-}
 
 
 
@@ -197,4 +168,34 @@ cel_vec2f_t mouse_axis(u32 idx,const u32 axis_index) {
 
 void mouse_set_cursor_pos(cel_vec2f_t pos) {
 
+}
+
+void *mouse_get_plugin_api(int api,
+                           int version) {
+
+    if (api == PLUGIN_EXPORT_API_ID && version == 0) {
+        static struct plugin_api_v0 plugin = {0};
+
+        plugin.init = _init;
+        plugin.shutdown = _shutdown;
+        plugin.update = _update;
+
+        return &plugin;
+
+    } else if (api == MOUSE_API_ID && version == 0) {
+        static struct MouseApiV1 api_v1 = {
+                .button_index = mouse_button_index,
+                .button_name = mouse_button_name,
+                .button_state = mouse_button_state,
+                .button_pressed = mouse_button_pressed,
+                .button_released = mouse_button_released,
+                .axis_index = mouse_axis_index,
+                .axis_name = mouse_axis_name,
+                .axis = mouse_axis,
+        };
+
+        return &api_v1;
+    }
+
+    return 0;
 }

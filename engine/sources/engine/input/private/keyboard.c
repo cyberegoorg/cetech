@@ -65,32 +65,7 @@ static void _update() {
 }
 
 
-void *keyboard_get_plugin_api(int api,
-                              int version) {
 
-    if (api == PLUGIN_EXPORT_API_ID && version == 0) {
-        static struct plugin_api_v0 plugin = {0};
-
-        plugin.init = _init;
-        plugin.shutdown = _shutdown;
-        plugin.update = _update;
-
-        return &plugin;
-
-    } else if (api == KEYBOARD_API_ID && version == 0) {
-        static struct KeyboardApiV1 api_v1 = {
-                .button_index = keyboard_button_index,
-                .button_name = keyboard_button_name,
-                .button_state = keyboard_button_state,
-                .button_pressed = keyboard_button_pressed,
-                .button_released = keyboard_button_released,
-        };
-
-        return &api_v1;
-    }
-
-    return 0;
-}
 
 //==============================================================================
 // Interface
@@ -137,4 +112,31 @@ int keyboard_button_released(u32 idx,
     CEL_ASSERT(LOG_WHERE, (button_index >= 0) && (button_index < KEY_MAX));
 
     return !_G.state[button_index] && _G.last_state[button_index];
+}
+
+void *keyboard_get_plugin_api(int api,
+                              int version) {
+
+    if (api == PLUGIN_EXPORT_API_ID && version == 0) {
+        static struct plugin_api_v0 plugin = {0};
+
+        plugin.init = _init;
+        plugin.shutdown = _shutdown;
+        plugin.update = _update;
+
+        return &plugin;
+
+    } else if (api == KEYBOARD_API_ID && version == 0) {
+        static struct KeyboardApiV1 api_v1 = {
+                .button_index = keyboard_button_index,
+                .button_name = keyboard_button_name,
+                .button_state = keyboard_button_state,
+                .button_pressed = keyboard_button_pressed,
+                .button_released = keyboard_button_released,
+        };
+
+        return &api_v1;
+    }
+
+    return 0;
 }

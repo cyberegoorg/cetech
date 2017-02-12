@@ -38,7 +38,7 @@ static int _gamepad_button_pressed(lua_State *l) {
     u32 gamepad = luasys_to_int(l, 1);
     u32 idx = (u32) (luasys_to_f32(l, 2));
 
-    luasys_push_bool(l, gamepad_button_pressed(gamepad, idx));
+    luasys_push_bool(l, GamepadApiV1.button_pressed(gamepad, idx));
 
     return 1;
 }
@@ -47,7 +47,7 @@ static int _gamepad_button_released(lua_State *l) {
     u32 gamepad = luasys_to_int(l, 1);
     u32 idx = (u32) (luasys_to_f32(l, 2));
 
-    luasys_push_bool(l, gamepad_button_released(gamepad, idx));
+    luasys_push_bool(l, GamepadApiV1.button_released(gamepad, idx));
 
     return 1;
 
@@ -57,7 +57,7 @@ static int _gamepad_button_released(lua_State *l) {
 static int _gamepad_axis_index(lua_State *l) {
     const char *name = luasys_to_string(l, 1);
 
-    u32 idx = gamepad_axis_index(name);
+    u32 idx = GamepadApiV1.axis_index(name);
     luasys_push_int(l, idx);
     return 1;
 
@@ -66,7 +66,7 @@ static int _gamepad_axis_index(lua_State *l) {
 static int _gamepad_axis_name(lua_State *l) {
     u32 idx = (u32) (luasys_to_f32(l, 1));
 
-    luasys_push_string(l, gamepad_axis_name(idx));
+    luasys_push_string(l, GamepadApiV1.axis_name(idx));
 
     return 1;
 }
@@ -75,7 +75,7 @@ static int _gamepad_axis(lua_State *l) {
     u32 gamepad = luasys_to_int(l, 1);
     u32 idx = (u32) (luasys_to_int(l, 2));
 
-    cel_vec2f_t pos = gamepad_axis(gamepad, idx);
+    cel_vec2f_t pos = GamepadApiV1.axis(gamepad, idx);
 
     luasys_push_vec2f(l, pos);
     return 1;
@@ -85,7 +85,7 @@ static int _gamepad_is_active(lua_State *l) {
     u32 gamepad = luasys_to_int(l, 1);
 
 
-    luasys_push_bool(l, gamepad_is_active(gamepad));
+    luasys_push_bool(l, GamepadApiV1.is_active(gamepad));
     return 1;
 }
 
@@ -94,7 +94,7 @@ static int _gamepad_play_rumble(lua_State *l) {
     f32 strength = luasys_to_f32(l, 2);
     u32 length = luasys_to_int(l, 3);
 
-    gamepad_play_rumble(gamepad, strength, length);
+    GamepadApiV1.play_rumble(gamepad, strength, length);
     return 0;
 }
 
