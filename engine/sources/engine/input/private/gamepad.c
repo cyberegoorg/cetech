@@ -91,7 +91,7 @@ static void _update() {
 void *gamepad_get_plugin_api(int api,
                              int version) {
 
-    if (api == PLUGIN_API_ID && version == 0) {
+    if (api == PLUGIN_EXPORT_API_ID && version == 0) {
         static struct plugin_api_v0 plugin = {0};
 
         plugin.init = _init;

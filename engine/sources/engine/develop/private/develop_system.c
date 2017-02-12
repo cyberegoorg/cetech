@@ -333,7 +333,7 @@ void developsys_leave_scope(const char *name,
 void *developsystem_get_plugin_api(int api,
                                    int version) {
     switch (api) {
-        case PLUGIN_API_ID:
+        case PLUGIN_EXPORT_API_ID:
             switch (version) {
                 case 0: {
                     static struct plugin_api_v0 plugin = {0};

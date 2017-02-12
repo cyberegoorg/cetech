@@ -3,12 +3,11 @@
 
 #include <stdio.h>
 
-#include "engine/input/types.h"
 #include "engine/config/config_api.h"
 
 
 enum {
-    PLUGIN_API_ID = 1,
+    PLUGIN_EXPORT_API_ID = 1,
     KEYBOARD_API_ID,
     MOUSE_API_ID,
     GAMEPAD_API_ID,

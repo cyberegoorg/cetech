@@ -40,7 +40,7 @@ static struct G {
 //==============================================================================
 
 void _callm_init(get_api_fce_t fce) {
-    struct plugin_api_v0 *api = fce(PLUGIN_API_ID, 0);
+    struct plugin_api_v0 *api = fce(PLUGIN_EXPORT_API_ID, 0);
 
 
     if (api) {
@@ -50,7 +50,7 @@ void _callm_init(get_api_fce_t fce) {
 }
 
 void _callm_shutdown(get_api_fce_t fce) {
-    struct plugin_api_v0 *api = fce(PLUGIN_API_ID, 0);
+    struct plugin_api_v0 *api = fce(PLUGIN_EXPORT_API_ID, 0);
 
     if (api) {
         CEL_ASSERT("plugin", api->shutdown != NULL);
@@ -68,7 +68,7 @@ void _add(const char *path,
         }
 
         cel_str_set(_G.path[i], path);
-        _G.plugin_api[i] = fce(PLUGIN_API_ID, 0);
+        _G.plugin_api[i] = fce(PLUGIN_EXPORT_API_ID, 0);
         _G.get_plugin_api[i] = fce;
         _G.plugin_handler[i] = handler;
         _G.used[i] = 1;
@@ -128,7 +128,7 @@ void plugin_reload(const char *path) {
             return;
         }
 
-        _G.plugin_api[i] = api = ((get_api_fce_t) fce)(PLUGIN_API_ID, 0);
+        _G.plugin_api[i] = api = ((get_api_fce_t) fce)(PLUGIN_EXPORT_API_ID, 0);
         if (api != NULL && api->reload_end) {
             api->reload_end(plugin_get_engine_api, data);
         }
@@ -159,7 +159,7 @@ void plugin_reload_all() {
             return;
         }
 
-        _G.plugin_api[i] = api = ((get_api_fce_t) fce)(PLUGIN_API_ID, 0);
+        _G.plugin_api[i] = api = ((get_api_fce_t) fce)(PLUGIN_EXPORT_API_ID, 0);
         if (api != NULL && api->reload_end) {
             api->reload_end(plugin_get_engine_api, data);
         }

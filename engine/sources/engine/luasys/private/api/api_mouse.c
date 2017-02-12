@@ -1,6 +1,9 @@
 #include <celib/math/types.h>
+#include <engine/plugin/plugin.h>
 #include "engine/luasys/luasys.h"
 #include "engine/input/mouse.h"
+
+static struct MouseApiV1 MouseApiV1 = {0};
 
 static int _mouse_button_index(lua_State *l) {
     const char *name = luasys_to_string(l, 1);
@@ -76,6 +79,9 @@ static int _mouse_axis(lua_State *l) {
 
 #define API_NAME "Mouse"
 void _register_lua_mouse_api() {
+    MouseApiV1 = *((struct MouseApiV1*)plugin_get_engine_api(MOUSE_API_ID, 0));
+
+
     luasys_add_module_function(API_NAME, "button_index", _mouse_button_index);
     luasys_add_module_function(API_NAME, "button_name", _mouse_button_name);
     luasys_add_module_function(API_NAME, "button_state", _mouse_button_state);

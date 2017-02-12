@@ -1,7 +1,11 @@
+#include <engine/plugin/plugin.h>
 #include "engine/luasys/luasys.h"
 #include "engine/input/keyboard.h"
 
 #define API_NAME "Keyboard"
+
+static struct KeyboardApiV1 KeyboardApiV1 = {0};
+
 
 static int _keyboard_button_index(lua_State *l) {
     const char *name = luasys_to_string(l, 1);
@@ -49,6 +53,8 @@ static int _keyboard_button_released(lua_State *l) {
 
 
 void _register_lua_keyboard_api() {
+    KeyboardApiV1 = *((struct KeyboardApiV1*)plugin_get_engine_api(KEYBOARD_API_ID, 0));
+
     luasys_add_module_function(API_NAME, "button_index", _keyboard_button_index);
     luasys_add_module_function(API_NAME, "button_name", _keyboard_button_name);
     luasys_add_module_function(API_NAME, "button_state", _keyboard_button_state);

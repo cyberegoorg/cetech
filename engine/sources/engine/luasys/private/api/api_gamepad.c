@@ -1,8 +1,10 @@
 #include <celib/math/types.h>
+#include <engine/plugin/plugin.h>
 
 #include "engine/luasys/luasys.h"
 #include "engine/input/gamepad.h"
 
+static struct GamepadApiV1 GamepadApiV1 = {0};
 
 static int _gamepad_button_index(lua_State *l) {
     const char *name = luasys_to_string(l, 1);
@@ -98,6 +100,8 @@ static int _gamepad_play_rumble(lua_State *l) {
 #define API_NAME "Gamepad"
 
 void _register_lua_gamepad_api() {
+    GamepadApiV1 = *((struct GamepadApiV1*)plugin_get_engine_api(GAMEPAD_API_ID, 0));
+
     luasys_add_module_function(API_NAME, "is_active", _gamepad_is_active);
 
     luasys_add_module_function(API_NAME, "button_index", _gamepad_button_index);

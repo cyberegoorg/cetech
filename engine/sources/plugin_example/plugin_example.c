@@ -1,6 +1,7 @@
 #include <stdio.h>
 
 #include "engine/plugin/plugin_api.h"
+#include "engine/input/keyboard.h"
 
 static struct KeyboardApiV1 KeyboardApiV1 = {0};
 
@@ -70,7 +71,7 @@ static void _reload_end(get_api_fce_t get_engine_api,
 void *get_plugin_api(int api,
                      int version) {
 
-    if (api == PLUGIN_API_ID && version == 0) {
+    if (api == PLUGIN_EXPORT_API_ID && version == 0) {
         static struct plugin_api_v0 plugin = {0};
 
         plugin.init = _init;

@@ -54,16 +54,29 @@ const char *mouse_axis_name(const u32 axis_index);
 //! \return Axis value
 cel_vec2f_t mouse_axis(u32 idx, const u32 axis_index);
 
-static const struct MouseApiV1 MouseApiV1 = {
-        .button_index = mouse_button_index,
-        .button_name = mouse_button_name,
-        .button_state = mouse_button_state,
-        .button_pressed = mouse_button_pressed,
-        .button_released = mouse_button_released,
-        .axis_index = mouse_axis_index,
-        .axis_name = mouse_axis_name,
-        .axis = mouse_axis,
+struct MouseApiV1 {
+    int (*is_active)();
+    u32 (*button_index)(const char *button_name);
+    const char *(*button_name)(const u32 button_index);
+    int (*button_state)(u32 idx,const u32 button_index);
+    int (*button_pressed)(u32 idx,const u32 button_index);
+    int (*button_released)(u32 idx,const u32 button_index);
+    u32 (*axis_index)(const char *axis_name);
+    const char *(*axis_name)(const u32 axis_index);
+    cel_vec2f_t (*axis)(u32 idx,const u32 axis_index);
 };
+
+
+//static const struct MouseApiV1 MouseApiV1 = {
+//        .button_index = mouse_button_index,
+//        .button_name = mouse_button_name,
+//        .button_state = mouse_button_state,
+//        .button_pressed = mouse_button_pressed,
+//        .button_released = mouse_button_released,
+//        .axis_index = mouse_axis_index,
+//        .axis_name = mouse_axis_name,
+//        .axis = mouse_axis,
+//};
 
 
 #endif //CETECH_MOUSE_H
