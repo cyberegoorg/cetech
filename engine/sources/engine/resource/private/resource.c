@@ -218,13 +218,14 @@ static const resource_callbacks_t package_resource_callback = {
 extern int package_init();
 
 extern void package_shutdown();
+
 void resource_register_type(stringid64_t type,
                             resource_callbacks_t callbacks);
 
 static void _init(get_api_fce_t get_engine_api) {
-    ConsoleServerApiV1 = *((struct ConsoleServerApiV1*)get_engine_api(CONSOLE_SERVER_API_ID, 0));
-    MemSysApiV1 = *(struct MemSysApiV1*)get_engine_api(MEMORY_API_ID, 0);
-    FilesystemApiV1 = *(struct FilesystemApiV1*)get_engine_api(FILESYSTEM_API_ID, 0);
+    ConsoleServerApiV1 = *((struct ConsoleServerApiV1 *) get_engine_api(CONSOLE_SERVER_API_ID, 0));
+    MemSysApiV1 = *(struct MemSysApiV1 *) get_engine_api(MEMORY_API_ID, 0);
+    FilesystemApiV1 = *(struct FilesystemApiV1 *) get_engine_api(FILESYSTEM_API_ID, 0);
 
     ARRAY_INIT(resource_data, &_G.resource_data, MemSysApiV1.main_allocator());
     ARRAY_INIT(resource_callbacks_t, &_G.resource_callbacks, MemSysApiV1.main_allocator());
@@ -400,7 +401,8 @@ void resource_load(void **loaded_data,
 
         char filename[4096] = {0};
         resource_compiler_get_filename(filename, CEL_ARRAY_LEN(filename), type, names[i]);
-        log_debug("resource", "Loading resource %s from %s/%s", filename, FilesystemApiV1.filesystem_get_root_dir(root_name),
+        log_debug("resource", "Loading resource %s from %s/%s", filename,
+                  FilesystemApiV1.filesystem_get_root_dir(root_name),
                   build_name);
 
         struct vio *resource_file = FilesystemApiV1.filesystem_open(root_name, build_name, VIO_OPEN_READ);

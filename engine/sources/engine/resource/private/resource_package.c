@@ -115,9 +115,9 @@ int _package_compiler(const char *filename,
 int package_init() {
     _G = (struct G) {0};
 
-    MemSysApiV1 = *((struct MemSysApiV1*)plugin_get_engine_api(MEMORY_API_ID, 0));
-    ResourceApiV1 = *((struct ResourceApiV1*)plugin_get_engine_api(RESOURCE_API_ID, 0));
-    TaskApiV1 = *((struct TaskApiV1*)plugin_get_engine_api(TASK_API_ID, 0));
+    MemSysApiV1 = *((struct MemSysApiV1 *) plugin_get_engine_api(MEMORY_API_ID, 0));
+    ResourceApiV1 = *((struct ResourceApiV1 *) plugin_get_engine_api(RESOURCE_API_ID, 0));
+    TaskApiV1 = *((struct TaskApiV1 *) plugin_get_engine_api(TASK_API_ID, 0));
 
     _G.package_typel = stringid64_from_string("package");
 
@@ -138,7 +138,7 @@ void package_task(void *data) {
     const u32 task_count = package->type_count;
     for (int j = 0; j < task_count; ++j) {
         ResourceApiV1.load_now(package_type(package)[j], &package_name(package)[package_offset(package)[j]],
-                          package_name_count(package)[j]);
+                               package_name_count(package)[j]);
     }
 }
 
@@ -164,7 +164,7 @@ void package_unload(stringid64_t name) {
     const u32 task_count = package->type_count;
     for (int j = 0; j < task_count; ++j) {
         ResourceApiV1.unload(package_type(package)[j], &package_name(package)[package_offset(package)[j]],
-                        package_name_count(package)[j]);
+                             package_name_count(package)[j]);
     }
 }
 
@@ -176,7 +176,7 @@ int package_is_loaded(stringid64_t name) {
     const u32 task_count = package->type_count;
     for (int i = 0; i < task_count; ++i) {
         if (!ResourceApiV1.can_get_all(package_type(package)[i], &package_name(package)[package_offset(package)[i]],
-                                  package_name_count(package)[i])) {
+                                       package_name_count(package)[i])) {
             return 0;
         }
     }

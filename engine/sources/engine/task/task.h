@@ -55,11 +55,17 @@ struct task_item {
 
 
 struct TaskApiV1 {
-    int   (*worker_count)();
-    void  (*add)(struct task_item *items, u32 count);
-    int   (*do_work)();
-    void  (*wait_atomic)(atomic_int *signal, u32 value);
-    char  (*worker_id)();
+    int (*worker_count)();
+
+    void (*add)(struct task_item *items,
+                u32 count);
+
+    int (*do_work)();
+
+    void (*wait_atomic)(atomic_int *signal,
+                        u32 value);
+
+    char (*worker_id)();
 };
 
 #endif //CETECH_TASKMANAGER_H

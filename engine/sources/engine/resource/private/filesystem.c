@@ -44,7 +44,7 @@ static struct MemSysApiV1 MemSysApiV1;
 static void _init(get_api_fce_t get_engine_api) {
     _G = (struct G) {0};
 
-    MemSysApiV1 = *(struct MemSysApiV1*)get_engine_api(MEMORY_API_ID, 0);
+    MemSysApiV1 = *(struct MemSysApiV1 *) get_engine_api(MEMORY_API_ID, 0);
 
     log_debug(LOG_WHERE, "Init");
 }

@@ -95,8 +95,8 @@ static void _on_world_destroy(world_t world) {
 static void _init(get_api_fce_t get_engine_api) {
     _G = (struct G) {0};
 
-    MemSysApiV1 = *(struct MemSysApiV1*)get_engine_api(MEMORY_API_ID, 0);
-    WorldApiV1 = *(struct WorldApiV1*)get_engine_api(WORLD_API_ID, 0);
+    MemSysApiV1 = *(struct MemSysApiV1 *) get_engine_api(MEMORY_API_ID, 0);
+    WorldApiV1 = *(struct WorldApiV1 *) get_engine_api(WORLD_API_ID, 0);
 
     MAP_INIT(world_data_t, &_G.world, MemSysApiV1.main_allocator());
 
@@ -110,8 +110,6 @@ static void _shutdown() {
 
     _G = (struct G) {0};
 }
-
-
 
 
 int scenegraph_is_valid(scene_node_t transform) {

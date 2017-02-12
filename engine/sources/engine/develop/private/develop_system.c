@@ -227,8 +227,8 @@ void _send_events() {
 // Interface
 //==============================================================================
 static void _init(get_api_fce_t get_engine_api) {
-    MemSysApiV1 = *(struct MemSysApiV1*)get_engine_api(MEMORY_API_ID, 0);
-    TaskApiV1 = *(struct TaskApiV1*)get_engine_api(TASK_API_ID, 0);
+    MemSysApiV1 = *(struct MemSysApiV1 *) get_engine_api(MEMORY_API_ID, 0);
+    TaskApiV1 = *(struct TaskApiV1 *) get_engine_api(TASK_API_ID, 0);
 
     MAP_INIT(to_mpack_fce_t, &_G.to_mpack, MemSysApiV1.main_allocator());
     eventstream_create(&_G.eventstream, MemSysApiV1.main_allocator());
@@ -237,7 +237,7 @@ static void _init(get_api_fce_t get_engine_api) {
     _register_to_mpack(EVENT_RECORD_FLOAT, _recordfloat_to_mpack);
     _register_to_mpack(EVENT_RECORD_INT, _recordint_to_mpack);
 
-    const char* addr = 0;
+    const char *addr = 0;
 
     log_debug(LOG_WHERE, "Init");
 
@@ -276,7 +276,7 @@ static void _after_update(float dt) {
     _flush_all_streams();
 
     _G.time_accum += dt;
-    if(_G.time_accum >= 10.0f/1000.0f ) {
+    if (_G.time_accum >= 10.0f / 1000.0f) {
         _send_events();
 
         _G.time_accum = 0.0f;

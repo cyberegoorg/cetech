@@ -29,7 +29,7 @@ static int _world_update(lua_State *l) {
 
 
 void _register_lua_world_api(get_api_fce_t get_engine_api) {
-    WorldApiV1 = *((struct WorldApiV1*)get_engine_api(WORLD_API_ID, 0));
+    WorldApiV1 = *((struct WorldApiV1 *) get_engine_api(WORLD_API_ID, 0));
 
 
     luasys_add_module_function(API_NAME, "create", _world_create);

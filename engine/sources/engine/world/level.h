@@ -21,12 +21,17 @@ typedef struct {
 } level_t;
 
 struct LevelApiV1 {
-    level_t (*load_level)(world_t world, stringid64_t name);
-    void (*destroy)(world_t world,level_t level);
-    entity_t (*unit_by_id)(level_t level,stringid64_t name);
+    level_t (*load_level)(world_t world,
+                          stringid64_t name);
+
+    void (*destroy)(world_t world,
+                    level_t level);
+
+    entity_t (*unit_by_id)(level_t level,
+                           stringid64_t name);
+
     entity_t (*unit)(level_t level);
 };
-
 
 
 #endif //CETECH_LEVEL_H

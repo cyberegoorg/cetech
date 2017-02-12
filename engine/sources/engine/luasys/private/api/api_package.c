@@ -45,7 +45,7 @@ static int _flush(lua_State *l) {
 
 
 void _register_lua_package_api(get_api_fce_t get_engine_api) {
-    PackageApiV1 = *(struct PackageApiV1*) get_engine_api(PACKAGE_API_ID, 0);
+    PackageApiV1 = *(struct PackageApiV1 *) get_engine_api(PACKAGE_API_ID, 0);
 
     luasys_add_module_function(API_NAME, "load", _load);
     luasys_add_module_function(API_NAME, "unload", _unload);

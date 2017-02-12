@@ -104,7 +104,6 @@ static struct G {
 } _G = {0};
 
 
-
 struct scene_instance *_get_scene_instance(stringid64_t scene) {
     return MAP_GET_PTR(scene_instance, &_G.scene_instance, scene.id);
 }
@@ -695,9 +694,9 @@ static const resource_callbacks_t scene_resource_callback = {
 int scene_resource_init() {
     _G = (struct G) {0};
 
-    MemSysApiV1 = *(struct MemSysApiV1*)plugin_get_engine_api(MEMORY_API_ID, 0);
-    ResourceApiV1 = *(struct ResourceApiV1*)plugin_get_engine_api(RESOURCE_API_ID, 0);
-    SceneGprahApiV1 = *(struct SceneGprahApiV1*)plugin_get_engine_api(SCENEGRAPH_API_ID, 0);
+    MemSysApiV1 = *(struct MemSysApiV1 *) plugin_get_engine_api(MEMORY_API_ID, 0);
+    ResourceApiV1 = *(struct ResourceApiV1 *) plugin_get_engine_api(RESOURCE_API_ID, 0);
+    SceneGprahApiV1 = *(struct SceneGprahApiV1 *) plugin_get_engine_api(SCENEGRAPH_API_ID, 0);
 
     _G.type = stringid64_from_string("scene");
 

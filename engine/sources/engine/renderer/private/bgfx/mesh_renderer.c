@@ -156,22 +156,22 @@ static void _spawner(world_t world,
 
     for (int i = 0; i < ent_count; ++i) {
         MeshApiV1.create(world,
-                    ents[cents[i]],
-                    tdata[i].scene,
-                    tdata[i].mesh,
-                    tdata[i].node,
-                    tdata[i].material);
+                         ents[cents[i]],
+                         tdata[i].scene,
+                         tdata[i].mesh,
+                         tdata[i].node,
+                         tdata[i].material);
     }
 }
 
 
 static void _init(get_api_fce_t get_engine_api) {
-    EntComSystemApiV1 = *((struct EntComSystemApiV1*)get_engine_api(ENTCOM_API_ID, 0));
-    MemSysApiV1 = *(struct MemSysApiV1*)get_engine_api(MEMORY_API_ID, 0);
-    MaterialApiV1 = *((struct MaterialApiV1*)get_engine_api(MATERIAL_API_ID, 0));
-    MeshApiV1 = *(struct MeshApiV1*)get_engine_api(MESH_API_ID, 0);
-    SceneGprahApiV1 = *(struct SceneGprahApiV1*)get_engine_api(SCENEGRAPH_API_ID, 0);
-    TransformApiV1 = *(struct TransformApiV1*)get_engine_api(TRANSFORM_API_ID, 0);
+    EntComSystemApiV1 = *((struct EntComSystemApiV1 *) get_engine_api(ENTCOM_API_ID, 0));
+    MemSysApiV1 = *(struct MemSysApiV1 *) get_engine_api(MEMORY_API_ID, 0);
+    MaterialApiV1 = *((struct MaterialApiV1 *) get_engine_api(MATERIAL_API_ID, 0));
+    MeshApiV1 = *(struct MeshApiV1 *) get_engine_api(MESH_API_ID, 0);
+    SceneGprahApiV1 = *(struct SceneGprahApiV1 *) get_engine_api(SCENEGRAPH_API_ID, 0);
+    TransformApiV1 = *(struct TransformApiV1 *) get_engine_api(TRANSFORM_API_ID, 0);
 
     _G = (struct G) {0};
 

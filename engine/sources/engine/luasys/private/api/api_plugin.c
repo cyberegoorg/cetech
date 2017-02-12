@@ -10,7 +10,7 @@ static int _reload_all(lua_State *l) {
 }
 
 static int _reload(lua_State *l) {
-    const char* path = luasys_to_string(l, 1);
+    const char *path = luasys_to_string(l, 1);
     plugin_reload(path);
     return 0;
 }

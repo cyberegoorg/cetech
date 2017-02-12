@@ -9,7 +9,6 @@
 
 #include "engine/luasys/luasys.h"
 
-
 static int _cel_vec2f_add(lua_State *L) {
     cel_vec2f_t *a = luasys_to_vec2f(L, 1);
     cel_vec2f_t *b = luasys_to_vec2f(L, 2);

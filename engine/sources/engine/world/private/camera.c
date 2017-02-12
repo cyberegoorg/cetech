@@ -110,7 +110,6 @@ void _destroyer(world_t world,
 }
 
 
-
 camera_t camera_create(world_t world,
                        entity_t entity,
                        f32 near,
@@ -137,10 +136,10 @@ void _spawner(world_t world,
 
 
 static void _init(get_api_fce_t get_engine_api) {
-    MemSysApiV1 = *((struct MemSysApiV1*)get_engine_api(MEMORY_API_ID, 0));
-    EntComSystemApiV1 = *((struct EntComSystemApiV1*)get_engine_api(ENTCOM_API_ID, 0));
-    RendererApiV1 = *((struct RendererApiV1*)get_engine_api(RENDERER_API_ID, 0));
-    TransformApiV1 = *((struct TransformApiV1*)get_engine_api(TRANSFORM_API_ID, 0));
+    MemSysApiV1 = *((struct MemSysApiV1 *) get_engine_api(MEMORY_API_ID, 0));
+    EntComSystemApiV1 = *((struct EntComSystemApiV1 *) get_engine_api(ENTCOM_API_ID, 0));
+    RendererApiV1 = *((struct RendererApiV1 *) get_engine_api(RENDERER_API_ID, 0));
+    TransformApiV1 = *((struct TransformApiV1 *) get_engine_api(TRANSFORM_API_ID, 0));
 
     _G = (struct G) {0};
 

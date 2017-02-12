@@ -106,7 +106,7 @@ static void _reload_end(get_api_fce_t get_engine_api,
 
 
 void *config_get_plugin_api(int api,
-                              int version) {
+                            int version) {
 
     if (api == PLUGIN_EXPORT_API_ID && version == 0) {
         static struct plugin_api_v0 plugin = {0};
@@ -151,7 +151,7 @@ void *config_get_plugin_api(int api,
 int cvar_init() {
     log_debug(LOG_WHERE, "Init");
 
-    MemSysApiV1 = *(struct MemSysApiV1*)plugin_get_engine_api(MEMORY_API_ID, 0);
+    MemSysApiV1 = *(struct MemSysApiV1 *) plugin_get_engine_api(MEMORY_API_ID, 0);
 
     _G.type = stringid64_from_string("config");
 
@@ -169,7 +169,7 @@ void cvar_compile_global() {
     char source_path[1024] = {0};
     char build_path[1024] = {0};
 
-    struct ResourceApiV1 ResourceApiV1 = *(struct ResourceApiV1*) plugin_get_engine_api(RESOURCE_API_ID, 0);
+    struct ResourceApiV1 ResourceApiV1 = *(struct ResourceApiV1 *) plugin_get_engine_api(RESOURCE_API_ID, 0);
 
     ResourceApiV1.compiler_get_build_dir(build_dir, CEL_ARRAY_LEN(build_dir), application_platform());
     cel_path_join(build_path, CEL_ARRAY_LEN(build_path), build_dir, "global.config");
@@ -251,7 +251,7 @@ void cvar_load_global() {
     char build_dir[1024] = {0};
     char source_path[1024] = {0};
 
-    struct ResourceApiV1 ResourceApiV1 = *(struct ResourceApiV1*) plugin_get_engine_api(RESOURCE_API_ID, 0);
+    struct ResourceApiV1 ResourceApiV1 = *(struct ResourceApiV1 *) plugin_get_engine_api(RESOURCE_API_ID, 0);
     ResourceApiV1.compiler_get_build_dir(build_dir, CEL_ARRAY_LEN(build_dir), application_platform());
     cel_path_join(source_path, CEL_ARRAY_LEN(source_path), build_dir, "global.config");
 

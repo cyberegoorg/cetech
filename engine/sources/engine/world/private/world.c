@@ -36,9 +36,9 @@ static struct MemSysApiV1 MemSysApiV1;
 //==============================================================================
 static void _init(get_api_fce_t get_engine_api) {
     _G = (struct G) {0};
-    
-    MemSysApiV1 = *(struct MemSysApiV1*)get_engine_api(MEMORY_API_ID, 0);
-    
+
+    MemSysApiV1 = *(struct MemSysApiV1 *) get_engine_api(MEMORY_API_ID, 0);
+
     ARRAY_INIT(world_callbacks_t, &_G.callbacks, MemSysApiV1.main_allocator());
 
     handlerid_init(&_G.world_handler, MemSysApiV1.main_allocator());
@@ -50,7 +50,6 @@ static void _shutdown() {
     ARRAY_DESTROY(world_callbacks_t, &_G.callbacks);
     _G = (struct G) {0};
 }
-
 
 
 void world_register_callback(world_callbacks_t clb) {

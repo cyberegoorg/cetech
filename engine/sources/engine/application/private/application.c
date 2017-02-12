@@ -119,17 +119,16 @@ int application_init(int argc,
     _G.config.wid = cvar_new_int("wid", "Wid", 0);
 
 
-
     plugin_load_dirs("./bin");
     plugin_call_init_cvar();
     machine_init(0);
 
-    ConsoleServerApiV1 = *((struct ConsoleServerApiV1*)plugin_get_engine_api(CONSOLE_SERVER_API_ID, 0));
-    DevelopSystemApiV1 = *((struct DevelopSystemApiV1*)plugin_get_engine_api(DEVELOP_SERVER_API_ID, 0));
-    RendererApiV1 = *((struct RendererApiV1*)plugin_get_engine_api(RENDERER_API_ID, 0));
-    ResourceApiV1 = *((struct ResourceApiV1*)plugin_get_engine_api(RESOURCE_API_ID, 0));
-    PackageApiV1 = *((struct PackageApiV1*)plugin_get_engine_api(PACKAGE_API_ID, 0));
-    TaskApiV1 = *((struct TaskApiV1*)plugin_get_engine_api(TASK_API_ID, 0));
+    ConsoleServerApiV1 = *((struct ConsoleServerApiV1 *) plugin_get_engine_api(CONSOLE_SERVER_API_ID, 0));
+    DevelopSystemApiV1 = *((struct DevelopSystemApiV1 *) plugin_get_engine_api(DEVELOP_SERVER_API_ID, 0));
+    RendererApiV1 = *((struct RendererApiV1 *) plugin_get_engine_api(RENDERER_API_ID, 0));
+    ResourceApiV1 = *((struct ResourceApiV1 *) plugin_get_engine_api(RESOURCE_API_ID, 0));
+    PackageApiV1 = *((struct PackageApiV1 *) plugin_get_engine_api(PACKAGE_API_ID, 0));
+    TaskApiV1 = *((struct TaskApiV1 *) plugin_get_engine_api(TASK_API_ID, 0));
 
     // Cvar stage
 
@@ -176,10 +175,10 @@ static void _boot_stage() {
 
     // TODO: remove, this must be done by boot_package and load in boot_script
     //if (!cvar_get_int(_G.config.daemon)) {
-        stringid64_t core_pkg = stringid64_from_string("core");
-        ResourceApiV1.load_now(pkg, &core_pkg, 1);
-        PackageApiV1.load(core_pkg);
-        PackageApiV1.flush(core_pkg);
+    stringid64_t core_pkg = stringid64_from_string("core");
+    ResourceApiV1.load_now(pkg, &core_pkg, 1);
+    PackageApiV1.load(core_pkg);
+    PackageApiV1.flush(core_pkg);
     //}
 
     ResourceApiV1.load_now(pkg, &boot_pkg, 1);
@@ -278,7 +277,7 @@ void application_start() {
         plugin_call_update();
         _G.game->update(dt);
 
-        if(frame_time_accum >= frame_time) {
+        if (frame_time_accum >= frame_time) {
             if (!cvar_get_int(_G.config.daemon)) {
                 struct scope_data render_sd = DevelopSystemApiV1.enter_scope("Game::render()");
                 _G.game->render();
@@ -303,7 +302,7 @@ void application_start() {
 
 const char *application_native_platform() {
 #if defined(CETECH_LINUX)
-    return  "linux";
+    return "linux";
 #elif defined(CETECH_WINDOWS)
     return "windows";
 #elif defined(CETECH_DARWIN)

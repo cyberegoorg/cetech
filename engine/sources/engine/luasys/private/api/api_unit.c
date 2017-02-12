@@ -29,7 +29,7 @@ static int _unit_destroy(lua_State *l) {
 
 
 void _register_lua_unit_api(get_api_fce_t get_engine_api) {
-    UnitApiv1 = *((struct UnitApiv1*)get_engine_api(UNIT_API_ID, 0));
+    UnitApiv1 = *((struct UnitApiv1 *) get_engine_api(UNIT_API_ID, 0));
 
     luasys_add_module_function(API_NAME, "spawn", _unit_spawn);
     luasys_add_module_function(API_NAME, "destroy", _unit_destroy);

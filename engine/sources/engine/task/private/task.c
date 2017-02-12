@@ -155,8 +155,8 @@ static struct MemSysApiV1 MemSysApiV1;
 static void _init(get_api_fce_t get_engine_api) {
     _G = (struct G) {0};
 
-    DevelopSystemApiV1 = *((struct DevelopSystemApiV1*)get_engine_api(DEVELOP_SERVER_API_ID, 0));
-    MemSysApiV1 = *((struct MemSysApiV1*)get_engine_api(MEMORY_API_ID, 0));
+    DevelopSystemApiV1 = *((struct DevelopSystemApiV1 *) get_engine_api(DEVELOP_SERVER_API_ID, 0));
+    MemSysApiV1 = *((struct MemSysApiV1 *) get_engine_api(MEMORY_API_ID, 0));
 
 
     int core_count = cel_cpu_count();

@@ -219,11 +219,11 @@ static struct ResourceApiV1 ResourceApiV1;
 static struct TransformApiV1 TransformApiV1;
 
 static void _init(get_api_fce_t get_engine_api) {
-    EntComSystemApiV1 = *((struct EntComSystemApiV1*)get_engine_api(ENTCOM_API_ID, 0));
-    MemSysApiV1 = *(struct MemSysApiV1*)get_engine_api(MEMORY_API_ID, 0);
-    ResourceApiV1 = *(struct ResourceApiV1*)get_engine_api(RESOURCE_API_ID, 0);
-    TransformApiV1 = *(struct TransformApiV1*)get_engine_api(TRANSFORM_API_ID, 0);
-    UnitApiv1 = *(struct UnitApiv1*)get_engine_api(UNIT_API_ID, 0);
+    EntComSystemApiV1 = *((struct EntComSystemApiV1 *) get_engine_api(ENTCOM_API_ID, 0));
+    MemSysApiV1 = *(struct MemSysApiV1 *) get_engine_api(MEMORY_API_ID, 0);
+    ResourceApiV1 = *(struct ResourceApiV1 *) get_engine_api(RESOURCE_API_ID, 0);
+    TransformApiV1 = *(struct TransformApiV1 *) get_engine_api(TRANSFORM_API_ID, 0);
+    UnitApiv1 = *(struct UnitApiv1 *) get_engine_api(UNIT_API_ID, 0);
 
     _G = (struct G) {0};
     _G.level_type = stringid64_from_string("level");
@@ -240,8 +240,6 @@ static void _shutdown() {
 }
 
 
-
-
 level_t world_load_level(world_t world,
                          stringid64_t name) {
     struct level_blob *res = ResourceApiV1.get(_G.level_type, name);
@@ -252,7 +250,7 @@ level_t world_load_level(world_t world,
 
     entity_t level_ent = EntComSystemApiV1.entity_manager_create();
     transform_t t = TransformApiV1.create(world, level_ent, (entity_t) {UINT32_MAX}, (cel_vec3f_t) {0}, QUATF_IDENTITY,
-                                     (cel_vec3f_t) {{1.0f, 1.0f, 1.0f}});
+                                          (cel_vec3f_t) {{1.0f, 1.0f, 1.0f}});
 
     level_t level = _new_level(level_ent);
     struct level_instance *instance = _level_instance(level);

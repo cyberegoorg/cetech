@@ -19,18 +19,18 @@
 // Interface
 //==============================================================================
 
-int luasys_get_top(lua_State * l);
+int luasys_get_top(lua_State *l);
 
 void luasys_remove(lua_State *l,
                    int idx);
 
-void luasys_pop(lua_State * l,
+void luasys_pop(lua_State *l,
                 int idx);
 
-int luasys_is_nil(lua_State * l,
+int luasys_is_nil(lua_State *l,
                   int idx);
 
-int luasys_is_number(lua_State * l,
+int luasys_is_number(lua_State *l,
                      int idx);
 
 int luasys_value_type(lua_State *l,

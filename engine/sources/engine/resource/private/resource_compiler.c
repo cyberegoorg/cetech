@@ -212,9 +212,9 @@ static void _init_cvar(struct ConfigApiV1 config) {
 }
 
 static void _init(get_api_fce_t get_engine_api) {
-    MemSysApiV1 = *((struct MemSysApiV1*)get_engine_api(MEMORY_API_ID, 0));
-    ResourceApiV1 = *((struct ResourceApiV1*)get_engine_api(RESOURCE_API_ID, 0));
-    TaskApiV1 = *((struct TaskApiV1*)get_engine_api(TASK_API_ID, 0));
+    MemSysApiV1 = *((struct MemSysApiV1 *) get_engine_api(MEMORY_API_ID, 0));
+    ResourceApiV1 = *((struct ResourceApiV1 *) get_engine_api(RESOURCE_API_ID, 0));
+    TaskApiV1 = *((struct TaskApiV1 *) get_engine_api(TASK_API_ID, 0));
 
     const char *build_dir = cvar_get_string(_G.cv_build_dir);
     char build_dir_full[1024] = {0};
@@ -233,7 +233,7 @@ static void _shutdown() {
 }
 
 void *resourcecompiler_get_plugin_api(int api,
-                                int version) {
+                                      int version) {
 
     if (api == PLUGIN_EXPORT_API_ID && version == 0) {
         static struct plugin_api_v0 plugin = {0};

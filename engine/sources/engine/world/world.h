@@ -30,9 +30,13 @@ typedef struct {
 
 struct WorldApiV1 {
     void (*register_callback)(world_callbacks_t clb);
+
     world_t (*create)();
+
     void (*destroy)(world_t world);
-    void (*update)(world_t world, float dt);
+
+    void (*update)(world_t world,
+                   float dt);
 };
 
 

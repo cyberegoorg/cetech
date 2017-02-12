@@ -425,13 +425,12 @@ static const resource_callbacks_t unit_resource_callback = {
 };
 
 
-
 static void _init(get_api_fce_t get_engine_api) {
     _G = (struct G) {0};
 
-    EntComSystemApiV1 = *((struct EntComSystemApiV1*)get_engine_api(ENTCOM_API_ID, 0));
-    MemSysApiV1 = *(struct MemSysApiV1*)get_engine_api(MEMORY_API_ID, 0);
-    ResourceApiV1 = *(struct ResourceApiV1*)get_engine_api(RESOURCE_API_ID, 0);
+    EntComSystemApiV1 = *((struct EntComSystemApiV1 *) get_engine_api(ENTCOM_API_ID, 0));
+    MemSysApiV1 = *(struct MemSysApiV1 *) get_engine_api(MEMORY_API_ID, 0);
+    ResourceApiV1 = *(struct ResourceApiV1 *) get_engine_api(RESOURCE_API_ID, 0);
 
     _G.type = stringid64_from_string("unit");
 
@@ -472,7 +471,8 @@ ARRAY_T(entity_t) *unit_spawn_from_resource(world_t world,
 
         u32 *c_ent = component_data_ent(comp_data);
         char *c_data = component_data_data(comp_data);
-        EntComSystemApiV1.component_spawn(world, type, &ARRAY_AT(spawned, 0), c_ent, parents, comp_data->ent_count, c_data);
+        EntComSystemApiV1.component_spawn(world, type, &ARRAY_AT(spawned, 0), c_ent, parents, comp_data->ent_count,
+                                          c_data);
 
         comp_data = (struct component_data *) (c_data + comp_data->size);
     }

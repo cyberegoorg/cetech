@@ -18,9 +18,14 @@ typedef int viewport_t;
 
 struct RendererApiV1 {
     void (*create)(cel_window_t window);
+
     void (*set_debug)(int debug);
+
     cel_vec2f_t (*get_size)();
-    void (*render_world)(world_t world, camera_t camera, viewport_t viewport);
+
+    void (*render_world)(world_t world,
+                         camera_t camera,
+                         viewport_t viewport);
 };
 
 

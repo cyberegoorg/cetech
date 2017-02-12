@@ -849,8 +849,8 @@ static struct ConsoleServerApiV1 ConsoleServerApiV1;
 static void _init(get_api_fce_t get_engine_api) {
     log_debug(LOG_WHERE, "Init");
 
-    ConsoleServerApiV1 = *((struct ConsoleServerApiV1*)get_engine_api(CONSOLE_SERVER_API_ID, 0));
-    ResourceApiV1 = *(struct ResourceApiV1*) plugin_get_engine_api(RESOURCE_API_ID, 0);
+    ConsoleServerApiV1 = *((struct ConsoleServerApiV1 *) get_engine_api(CONSOLE_SERVER_API_ID, 0));
+    ResourceApiV1 = *(struct ResourceApiV1 *) plugin_get_engine_api(RESOURCE_API_ID, 0);
 
 
     _G.L = luaL_newstate();

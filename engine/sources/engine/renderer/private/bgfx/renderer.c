@@ -62,9 +62,9 @@ static struct MeshApiV1 MeshApiV1;
 static struct CameraApiV1 CameraApiV1;
 
 static void _init(get_api_fce_t get_engine_api) {
-    ConsoleServerApiV1 = *((struct ConsoleServerApiV1*)get_engine_api(CONSOLE_SERVER_API_ID, 0));
-    MeshApiV1 = *((struct MeshApiV1*)get_engine_api(MESH_API_ID, 0));
-    CameraApiV1 = *((struct CameraApiV1*)get_engine_api(CAMERA_API_ID, 0));
+    ConsoleServerApiV1 = *((struct ConsoleServerApiV1 *) get_engine_api(CONSOLE_SERVER_API_ID, 0));
+    MeshApiV1 = *((struct MeshApiV1 *) get_engine_api(MESH_API_ID, 0));
+    CameraApiV1 = *((struct CameraApiV1 *) get_engine_api(CAMERA_API_ID, 0));
 
     _G = (struct G) {0};
 

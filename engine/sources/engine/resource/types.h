@@ -99,25 +99,76 @@ typedef struct {
 
 struct ResourceApiV1 {
     void (*set_autoload)(int enable);
-    void (*register_type)(stringid64_t type, resource_callbacks_t callbacks);
-    void (*load)(void **loaded_data, stringid64_t type, stringid64_t *names, size_t count, int force);
-    void (*add_loaded)(stringid64_t type, stringid64_t *names, void **resource_data, size_t count);
-    void (*load_now)(stringid64_t type, stringid64_t *names, size_t count);
-    void (*unload)(stringid64_t type, stringid64_t *names, size_t count);
-    void (*reload)(stringid64_t type, stringid64_t *names, size_t count);
+
+    void (*register_type)(stringid64_t type,
+                          resource_callbacks_t callbacks);
+
+    void (*load)(void **loaded_data,
+                 stringid64_t type,
+                 stringid64_t *names,
+                 size_t count,
+                 int force);
+
+    void (*add_loaded)(stringid64_t type,
+                       stringid64_t *names,
+                       void **resource_data,
+                       size_t count);
+
+    void (*load_now)(stringid64_t type,
+                     stringid64_t *names,
+                     size_t count);
+
+    void (*unload)(stringid64_t type,
+                   stringid64_t *names,
+                   size_t count);
+
+    void (*reload)(stringid64_t type,
+                   stringid64_t *names,
+                   size_t count);
+
     void (*reload_all)();
-    int (*can_get)(stringid64_t type,stringid64_t names);
-    int (*can_get_all)(stringid64_t type, stringid64_t *names, size_t count);
-    void *(*get)(stringid64_t type, stringid64_t names);
-    int (*type_name_string)(char *str, size_t max_len,  stringid64_t type, stringid64_t name);
-    void (*compiler_register)(stringid64_t type, resource_compilator_t compilator);
+
+    int (*can_get)(stringid64_t type,
+                   stringid64_t names);
+
+    int (*can_get_all)(stringid64_t type,
+                       stringid64_t *names,
+                       size_t count);
+
+    void *(*get)(stringid64_t type,
+                 stringid64_t names);
+
+    int (*type_name_string)(char *str,
+                            size_t max_len,
+                            stringid64_t type,
+                            stringid64_t name);
+
+    void (*compiler_register)(stringid64_t type,
+                              resource_compilator_t compilator);
+
     void (*compiler_compile_all)();
-    int (*compiler_get_filename)(char *filename, size_t max_ken, stringid64_t type, stringid64_t name);
-    int (*compiler_get_build_dir)(char *build_dir, size_t max_len, const char *platform);
-    int (*compiler_get_tmp_dir)(char *tmp_dir, size_t max_len, const char *platform);
-    int (*compiler_external_join)(char *output, u32 max_len, const char *name);
+
+    int (*compiler_get_filename)(char *filename,
+                                 size_t max_ken,
+                                 stringid64_t type,
+                                 stringid64_t name);
+
+    int (*compiler_get_build_dir)(char *build_dir,
+                                  size_t max_len,
+                                  const char *platform);
+
+    int (*compiler_get_tmp_dir)(char *tmp_dir,
+                                size_t max_len,
+                                const char *platform);
+
+    int (*compiler_external_join)(char *output,
+                                  u32 max_len,
+                                  const char *name);
+
     void (*compiler_create_build_dir)();
+
     const char *(*compiler_get_core_dir)();
+
     const char *(*compiler_get_source_dir)();
 };
 
@@ -127,8 +178,11 @@ struct ResourceApiV1 {
 
 struct PackageApiV1 {
     void (*load)(stringid64_t name);
+
     void (*unload)(stringid64_t name);
+
     int (*is_loaded)(stringid64_t name);
+
     void (*flush)(stringid64_t name);
 };
 

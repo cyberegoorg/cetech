@@ -46,7 +46,7 @@ static int _mesh_set_material(lua_State *l) {
 }
 
 void _register_lua_mesh_api(get_api_fce_t get_engine_api) {
-    MeshApiV1 = *(struct MeshApiV1*)get_engine_api(MESH_API_ID, 0);
+    MeshApiV1 = *(struct MeshApiV1 *) get_engine_api(MESH_API_ID, 0);
 
 
     luasys_add_module_function(API_NAME, "get", _mesh_get);

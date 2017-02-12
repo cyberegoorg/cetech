@@ -36,7 +36,7 @@ static int _mouse_button_state(lua_State *l) {
 static int _mouse_button_pressed(lua_State *l) {
     u32 idx = (u32) (luasys_to_f32(l, 1));
 
-    luasys_push_bool(l, MouseApiV1.button_pressed(0,idx));
+    luasys_push_bool(l, MouseApiV1.button_pressed(0, idx));
 
     return 1;
 
@@ -45,7 +45,7 @@ static int _mouse_button_pressed(lua_State *l) {
 static int _mouse_button_released(lua_State *l) {
     u32 idx = (u32) (luasys_to_f32(l, 1));
 
-    luasys_push_bool(l, MouseApiV1.button_released(0,idx));
+    luasys_push_bool(l, MouseApiV1.button_released(0, idx));
 
     return 1;
 
@@ -79,8 +79,9 @@ static int _mouse_axis(lua_State *l) {
 }
 
 #define API_NAME "Mouse"
+
 void _register_lua_mouse_api(get_api_fce_t get_engine_api) {
-    MouseApiV1 = *((struct MouseApiV1*)get_engine_api(MOUSE_API_ID, 0));
+    MouseApiV1 = *((struct MouseApiV1 *) get_engine_api(MOUSE_API_ID, 0));
 
 
     luasys_add_module_function(API_NAME, "button_index", _mouse_button_index);

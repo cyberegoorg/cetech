@@ -217,8 +217,8 @@ static const resource_callbacks_t texture_resource_callback = {
 int texture_resource_init() {
     _G = (struct G) {0};
 
-    MemSysApiV1 = *(struct MemSysApiV1*)plugin_get_engine_api(MEMORY_API_ID, 0);
-    ResourceApiV1 = *(struct ResourceApiV1*)plugin_get_engine_api(RESOURCE_API_ID, 0);
+    MemSysApiV1 = *(struct MemSysApiV1 *) plugin_get_engine_api(MEMORY_API_ID, 0);
+    ResourceApiV1 = *(struct ResourceApiV1 *) plugin_get_engine_api(RESOURCE_API_ID, 0);
     _G.type = stringid64_from_string("texture");
 
     MAP_INIT(bgfx_texture_handle_t, &_G.handler_map, MemSysApiV1.main_allocator());

@@ -39,8 +39,8 @@ struct WorldApiV1 WorldApiV1;
 static void _init(get_api_fce_t get_engine_api) {
     _G = (struct G) {0};
 
-    MemSysApiV1 = *(struct MemSysApiV1*)get_engine_api(MEMORY_API_ID, 0);
-    WorldApiV1 = *(struct WorldApiV1*)get_engine_api(WORLD_API_ID, 0);
+    MemSysApiV1 = *(struct MemSysApiV1 *) get_engine_api(MEMORY_API_ID, 0);
+    WorldApiV1 = *(struct WorldApiV1 *) get_engine_api(WORLD_API_ID, 0);
 
     handlerid_init(&_G.entity_handler, MemSysApiV1.main_allocator());
     MAP_INIT(component_compiler_t, &_G.compiler_map, MemSysApiV1.main_allocator());
@@ -141,7 +141,7 @@ void component_destroy(world_t world,
 }
 
 void *entcom_get_plugin_api(int api,
-                                   int version) {
+                            int version) {
     switch (api) {
         case PLUGIN_EXPORT_API_ID:
             switch (version) {

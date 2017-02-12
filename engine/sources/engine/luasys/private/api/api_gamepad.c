@@ -101,7 +101,7 @@ static int _gamepad_play_rumble(lua_State *l) {
 #define API_NAME "Gamepad"
 
 void _register_lua_gamepad_api(get_api_fce_t get_engine_api) {
-    GamepadApiV1 = *((struct GamepadApiV1*)get_engine_api(GAMEPAD_API_ID, 0));
+    GamepadApiV1 = *((struct GamepadApiV1 *) get_engine_api(GAMEPAD_API_ID, 0));
 
     luasys_add_module_function(API_NAME, "is_active", _gamepad_is_active);
 

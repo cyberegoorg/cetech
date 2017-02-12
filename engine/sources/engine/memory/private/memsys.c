@@ -42,7 +42,7 @@ struct cel_allocator *_memsys_main_scratch_allocator() {
 }
 
 void *memsys_get_plugin_api(int api,
-                                  int version) {
+                            int version) {
     switch (api) {
         case PLUGIN_EXPORT_API_ID:
             switch (version) {

@@ -15,6 +15,7 @@ struct cel_allocator *_memsys_main_scratch_allocator();
 
 struct MemSysApiV1 {
     struct cel_allocator *(*main_allocator)();
+
     struct cel_allocator *(*main_scratch_allocator)();
 };
 
