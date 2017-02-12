@@ -6,7 +6,8 @@
 #include "engine/world/transform.h"
 #include <engine/memory/memsys.h>
 #include <engine/plugin/plugin_api.h>
-#include <engine/world/api.h>
+#include "engine/memory/memsys.h"
+
 
 struct transform_data {
     cel_vec3f_t position;
@@ -45,20 +46,76 @@ static struct G {
     MAP_T(world_data_t) world;
 } _G = {0};
 
+static struct MemSysApiV1 MemSysApiV1;
+
+int transform_is_valid(transform_t transform);
+
+void transform_transform(world_t world,
+                         transform_t transform,
+                         cel_mat44f_t *parent);
+
+cel_vec3f_t transform_get_position(world_t world,
+                                   transform_t transform);
+
+cel_quatf_t transform_get_rotation(world_t world,
+                                   transform_t transform);
+
+
+cel_vec3f_t transform_get_scale(world_t world,
+                                transform_t transform);
+
+
+cel_mat44f_t *transform_get_world_matrix(world_t world,
+                                         transform_t transform);
+
+
+void transform_set_position(world_t world,
+                            transform_t transform,
+                            cel_vec3f_t pos);
+
+
+void transform_set_rotation(world_t world,
+                            transform_t transform,
+                            cel_quatf_t rot);
+
+
+void transform_set_scale(world_t world,
+                         transform_t transform,
+                         cel_vec3f_t scale);
+
+int transform_has(world_t world,
+                  entity_t entity);
+
+transform_t transform_get(world_t world,
+                          entity_t entity);
+
+transform_t transform_create(world_t world,
+                             entity_t entity,
+                             entity_t parent,
+                             cel_vec3f_t position,
+                             cel_quatf_t rotation,
+                             cel_vec3f_t scale);
+
+
+void transform_link(world_t world,
+                    entity_t parent,
+                    entity_t child);
+
+
 
 static void _new_world(world_t world) {
     world_data_t data = {0};
 
-    MAP_INIT(u32, &data.ent_idx_map, memsys_main_allocator());
+    MAP_INIT(u32, &data.ent_idx_map, MemSysApiV1.main_allocator());
 
-    ARRAY_INIT(u32, &data.first_child, memsys_main_allocator());
-    ARRAY_INIT(u32, &data.next_sibling, memsys_main_allocator());
-    ARRAY_INIT(u32, &data.parent, memsys_main_allocator());
+    ARRAY_INIT(u32, &data.first_child, MemSysApiV1.main_allocator());
+    ARRAY_INIT(u32, &data.next_sibling, MemSysApiV1.main_allocator());
+    ARRAY_INIT(u32, &data.parent, MemSysApiV1.main_allocator());
 
-    ARRAY_INIT(cel_vec3f_t, &data.position, memsys_main_allocator());
-    ARRAY_INIT(cel_quatf_t, &data.rotation, memsys_main_allocator());
-    ARRAY_INIT(cel_vec3f_t, &data.scale, memsys_main_allocator());
-    ARRAY_INIT(cel_mat44f_t, &data.world_matrix, memsys_main_allocator());
+    ARRAY_INIT(cel_vec3f_t, &data.position, MemSysApiV1.main_allocator());
+    ARRAY_INIT(cel_quatf_t, &data.rotation, MemSysApiV1.main_allocator());
+    ARRAY_INIT(cel_vec3f_t, &data.scale, MemSysApiV1.main_allocator());
+    ARRAY_INIT(cel_mat44f_t, &data.world_matrix, MemSysApiV1.main_allocator());
 
     MAP_SET(world_data_t, &_G.world, world.h.h, data);
 }
@@ -151,16 +208,20 @@ static void _spawner(world_t world,
         transform_transform(world, transform_get(world, ents[cents[i]]), &m);
     }
 }
+static struct EntComSystemApiV1 EntComSystemApiV1;
 
 static void _init(get_api_fce_t get_engine_api) {
     _G = (struct G) {0};
 
-    MAP_INIT(world_data_t, &_G.world, memsys_main_allocator());
+    EntComSystemApiV1 = *((struct EntComSystemApiV1*)get_engine_api(ENTCOM_API_ID, 0));
+    MemSysApiV1 = *(struct MemSysApiV1*)get_engine_api(MEMORY_API_ID, 0);
+
+    MAP_INIT(world_data_t, &_G.world, MemSysApiV1.main_allocator());
 
     _G.type = stringid64_from_string("transform");
 
-    component_register_compiler(_G.type, _transform_component_compiler, 10);
-    component_register_type(_G.type, (struct component_clb) {
+    EntComSystemApiV1.component_register_compiler(_G.type, _transform_component_compiler, 10);
+    EntComSystemApiV1.component_register_type(_G.type, (struct component_clb) {
             .spawner=_spawner, .destroyer=_destroyer,
             .on_world_create=_on_world_create, .on_world_destroy=_on_world_destroy
     });

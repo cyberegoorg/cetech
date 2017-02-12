@@ -7,7 +7,8 @@
 #include <engine/world/scenegraph.h>
 #include <engine/memory/memsys.h>
 #include <engine/plugin/plugin_api.h>
-#include <engine/world/api.h>
+#include "engine/memory/memsys.h"
+
 
 ARRAY_PROTOTYPE(cel_vec3f_t)
 
@@ -41,21 +42,23 @@ static struct G {
     MAP_T(world_data_t) world;
 } _G = {0};
 
+static struct MemSysApiV1 MemSysApiV1;
+static struct WorldApiV1 WorldApiV1;
 
 static void _new_world(world_t world) {
     world_data_t data = {0};
 
-    MAP_INIT(u32, &data.ent_idx_map, memsys_main_allocator());
+    MAP_INIT(u32, &data.ent_idx_map, MemSysApiV1.main_allocator());
 
-    ARRAY_INIT(u32, &data.first_child, memsys_main_allocator());
-    ARRAY_INIT(u32, &data.next_sibling, memsys_main_allocator());
-    ARRAY_INIT(u32, &data.parent, memsys_main_allocator());
+    ARRAY_INIT(u32, &data.first_child, MemSysApiV1.main_allocator());
+    ARRAY_INIT(u32, &data.next_sibling, MemSysApiV1.main_allocator());
+    ARRAY_INIT(u32, &data.parent, MemSysApiV1.main_allocator());
 
-    ARRAY_INIT(stringid64_t, &data.name, memsys_main_allocator());
-    ARRAY_INIT(cel_vec3f_t, &data.position, memsys_main_allocator());
-    ARRAY_INIT(cel_quatf_t, &data.rotation, memsys_main_allocator());
-    ARRAY_INIT(cel_vec3f_t, &data.scale, memsys_main_allocator());
-    ARRAY_INIT(cel_mat44f_t, &data.world_matrix, memsys_main_allocator());
+    ARRAY_INIT(stringid64_t, &data.name, MemSysApiV1.main_allocator());
+    ARRAY_INIT(cel_vec3f_t, &data.position, MemSysApiV1.main_allocator());
+    ARRAY_INIT(cel_quatf_t, &data.rotation, MemSysApiV1.main_allocator());
+    ARRAY_INIT(cel_vec3f_t, &data.scale, MemSysApiV1.main_allocator());
+    ARRAY_INIT(cel_mat44f_t, &data.world_matrix, MemSysApiV1.main_allocator());
 
     MAP_SET(world_data_t, &_G.world, world.h.h, data);
 }
@@ -92,9 +95,12 @@ static void _on_world_destroy(world_t world) {
 static void _init(get_api_fce_t get_engine_api) {
     _G = (struct G) {0};
 
-    MAP_INIT(world_data_t, &_G.world, memsys_main_allocator());
+    MemSysApiV1 = *(struct MemSysApiV1*)get_engine_api(MEMORY_API_ID, 0);
+    WorldApiV1 = *(struct WorldApiV1*)get_engine_api(WORLD_API_ID, 0);
 
-    world_register_callback((world_callbacks_t) {.on_created=_on_world_create, .on_destroy=_on_world_destroy});
+    MAP_INIT(world_data_t, &_G.world, MemSysApiV1.main_allocator());
+
+    WorldApiV1.register_callback((world_callbacks_t) {.on_created=_on_world_create, .on_destroy=_on_world_destroy});
 
 }
 
@@ -246,7 +252,7 @@ scene_node_t scenegraph_create(world_t world,
                                u32 count) {
     world_data_t *data = _get_world_data(world);
 
-    scene_node_t *nodes = CEL_ALLOCATE(memsys_main_allocator(), scene_node_t, count);
+    scene_node_t *nodes = CEL_ALLOCATE(MemSysApiV1.main_allocator(), scene_node_t, count);
 
     for (int i = 0; i < count; ++i) {
         u32 idx = (u32) ARRAY_SIZE(&data->position);
@@ -294,7 +300,7 @@ scene_node_t scenegraph_create(world_t world,
 
     scene_node_t root = nodes[0];
     MAP_SET(u32, &data->ent_idx_map, entity.h.h, root.idx);
-    CEL_DEALLOCATE(memsys_main_allocator(), nodes);
+    CEL_DEALLOCATE(MemSysApiV1.main_allocator(), nodes);
     return root;
 }
 

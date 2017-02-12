@@ -1,4 +1,5 @@
 
+#include <engine/plugin/plugin.h>
 #include "engine/renderer/renderer.h"
 #include "engine/luasys/luasys.h"
 
@@ -8,13 +9,18 @@ static int _renderer_render_world(lua_State *l) {
     world_t w = {.h = luasys_to_handler(l, 1)};
     camera_t c = {.idx = luasys_to_handler(l, 2).h};
 
-    renderer_render_world(w, c, 0);
+    struct RendererApiV1 RendererApiV1 = *(struct RendererApiV1*)plugin_get_engine_api(RENDERER_API_ID, 0);
+    RendererApiV1.render_world(w, c, 0);
+
     return 0;
 }
 
 static int _renderer_set_debug(lua_State *l) {
     int debug = luasys_to_bool(l, 1);
-    renderer_set_debug(debug);
+
+    struct RendererApiV1 RendererApiV1 = *(struct RendererApiV1*)plugin_get_engine_api(RENDERER_API_ID, 0);
+
+    RendererApiV1.set_debug(debug);
     return 0;
 }
 

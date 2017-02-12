@@ -18,6 +18,8 @@
 #include <engine/plugin/plugin.h>
 
 #include "../types.h"
+#include "engine/memory/memsys.h"
+
 
 //==============================================================================
 // Struct and types
@@ -68,10 +70,96 @@ struct G {
 
 } _G = {0};
 
+static struct MemSysApiV1 MemSysApiV1;
+static struct ConsoleServerApiV1 ConsoleServerApiV1;
+static struct FilesystemApiV1 FilesystemApiV1;
+
+void resource_set_autoload(int enable);
+
+void resource_register_type(stringid64_t type,
+                            resource_callbacks_t callbacks);
+
+void resource_load(void **loaded_data,
+                   stringid64_t type,
+                   stringid64_t *names,
+                   size_t count,
+                   int force);
+
+void resource_add_loaded(stringid64_t type,
+                         stringid64_t *names,
+                         void **resource_data,
+                         size_t count);
+
+void resource_load_now(stringid64_t type,
+                       stringid64_t *names,
+                       size_t count);
+
+void resource_unload(stringid64_t type,
+                     stringid64_t *names,
+                     size_t count);
+
+void resource_reload(stringid64_t type,
+                     stringid64_t *names,
+                     size_t count);
+
+void resource_reload_all();
+
+int resource_can_get(stringid64_t type,
+                     stringid64_t names);
+
+int resource_can_get_all(stringid64_t type,
+                         stringid64_t *names,
+                         size_t count);
+
+void *resource_get(stringid64_t type,
+                   stringid64_t names);
+
+int resource_type_name_string(char *str,
+                              size_t max_len,
+                              stringid64_t type,
+                              stringid64_t name);
+
+void resource_compiler_register(stringid64_t type,
+                                resource_compilator_t compilator);
+
+void resource_compiler_compile_all();
+
+int resource_compiler_get_filename(char *filename,
+                                   size_t max_ken,
+                                   stringid64_t type,
+                                   stringid64_t name);
+
+const char *resource_compiler_get_source_dir();
+
+const char *resource_compiler_get_core_dir();
+
+int resource_compiler_get_build_dir(char *build_dir,
+                                    size_t max_len,
+                                    const char *platform);
+
+int resource_compiler_get_tmp_dir(char *tmp_dir,
+                                  size_t max_len,
+                                  const char *platform);
+
+int resource_compiler_external_join(char *output,
+                                    u32 max_len,
+                                    const char *name);
+
+void resource_compiler_create_build_dir();
+
+void package_load(stringid64_t name);
+
+void package_unload(stringid64_t name);
+
+int package_is_loaded(stringid64_t name);
+
+void package_flush(stringid64_t name);
 
 //==============================================================================
 // Private
 //==============================================================================
+
+void resource_reload_all();
 
 static int _cmd_reload_all(mpack_node_t args,
                            mpack_writer_t *writer) {
@@ -130,8 +218,18 @@ static const resource_callbacks_t package_resource_callback = {
 extern int package_init();
 
 extern void package_shutdown();
+void resource_register_type(stringid64_t type,
+                            resource_callbacks_t callbacks);
 
 static void _init(get_api_fce_t get_engine_api) {
+    ConsoleServerApiV1 = *((struct ConsoleServerApiV1*)get_engine_api(CONSOLE_SERVER_API_ID, 0));
+    MemSysApiV1 = *(struct MemSysApiV1*)get_engine_api(MEMORY_API_ID, 0);
+    FilesystemApiV1 = *(struct FilesystemApiV1*)get_engine_api(FILESYSTEM_API_ID, 0);
+
+    ARRAY_INIT(resource_data, &_G.resource_data, MemSysApiV1.main_allocator());
+    ARRAY_INIT(resource_callbacks_t, &_G.resource_callbacks, MemSysApiV1.main_allocator());
+    MAP_INIT(u32, &_G.type_map, MemSysApiV1.main_allocator());
+
     _G.config.build_dir = cvar_find("build");
 
 
@@ -141,11 +239,11 @@ static void _init(get_api_fce_t get_engine_api) {
                   cvar_get_string(_G.config.build_dir),
                   application_platform());
 
-    filesystem_map_root_dir(stringid64_from_string("build"), build_dir_full);
+    FilesystemApiV1.filesystem_map_root_dir(stringid64_from_string("build"), build_dir_full);
 
     resource_register_type(stringid64_from_string("package"), package_resource_callback);
 
-    consolesrv_register_command("resource.reload_all", _cmd_reload_all);
+    ConsoleServerApiV1.consolesrv_register_command("resource.reload_all", _cmd_reload_all);
 
     package_init();
     //return package_init();
@@ -154,10 +252,6 @@ static void _init(get_api_fce_t get_engine_api) {
 
 static void _init_cvar(struct ConfigApiV1 config) {
     _G = (struct G) {0};
-
-    ARRAY_INIT(resource_data, &_G.resource_data, memsys_main_allocator());
-    ARRAY_INIT(resource_callbacks_t, &_G.resource_callbacks, memsys_main_allocator());
-    MAP_INIT(u32, &_G.type_map, memsys_main_allocator());
 }
 
 static void _shutdown() {
@@ -198,7 +292,7 @@ void resource_register_type(stringid64_t type,
     ARRAY_PUSH_BACK(resource_data, &_G.resource_data, (MAP_T(resource_item_t)) {0});
     ARRAY_PUSH_BACK(resource_callbacks_t, &_G.resource_callbacks, callbacks);
 
-    MAP_INIT(resource_item_t, &ARRAY_AT(&_G.resource_data, idx), memsys_main_allocator());
+    MAP_INIT(resource_item_t, &ARRAY_AT(&_G.resource_data, idx), MemSysApiV1.main_allocator());
 
     MAP_SET(u32, &_G.type_map, type.id, idx);
 }
@@ -226,6 +320,12 @@ void resource_add_loaded(stringid64_t type,
         ARRAY_AT(&_G.resource_callbacks, idx).online(names[i], resource_data[i]);
     }
 }
+
+void resource_load(void **loaded_data,
+                   stringid64_t type,
+                   stringid64_t *names,
+                   size_t count,
+                   int force);
 
 void resource_load_now(stringid64_t type,
                        stringid64_t *names,
@@ -300,14 +400,14 @@ void resource_load(void **loaded_data,
 
         char filename[4096] = {0};
         resource_compiler_get_filename(filename, CEL_ARRAY_LEN(filename), type, names[i]);
-        log_debug("resource", "Loading resource %s from %s/%s", filename, filesystem_get_root_dir(root_name),
+        log_debug("resource", "Loading resource %s from %s/%s", filename, FilesystemApiV1.filesystem_get_root_dir(root_name),
                   build_name);
 
-        struct vio *resource_file = filesystem_open(root_name, build_name, VIO_OPEN_READ);
+        struct vio *resource_file = FilesystemApiV1.filesystem_open(root_name, build_name, VIO_OPEN_READ);
 
         if (resource_file != NULL) {
-            loaded_data[i] = type_clb.loader(resource_file, memsys_main_allocator());
-            filesystem_close(resource_file);
+            loaded_data[i] = type_clb.loader(resource_file, MemSysApiV1.main_allocator());
+            FilesystemApiV1.filesystem_close(resource_file);
         } else {
             loaded_data[i] = 0;
         }
@@ -343,7 +443,7 @@ void resource_unload(stringid64_t type,
             log_debug("resource", "Unload resource %s ", filename);
 
             type_clb.offline(names[i], item.data);
-            type_clb.unloader(item.data, memsys_main_allocator());
+            type_clb.unloader(item.data, MemSysApiV1.main_allocator());
 
             MAP_REMOVE(resource_item_t, resource_map, names[i].id);
         }
@@ -400,7 +500,7 @@ void resource_reload(stringid64_t type,
 
         void *old_data = resource_get(type, names[i]);
 
-        void *new_data = type_clb.reloader(names[i], old_data, loaded_data[i], memsys_main_allocator());
+        void *new_data = type_clb.reloader(names[i], old_data, loaded_data[i], MemSysApiV1.main_allocator());
 
         resource_item_t item = MAP_GET(resource_item_t, resource_map, names[i].id, null_item);
         item.data = new_data;
@@ -414,7 +514,7 @@ void resource_reload_all() {
     const MAP_ENTRY_T(u32) *type_end = MAP_END(u32, &_G.type_map);
 
     ARRAY_T(stringid64_t) name_array = {0};
-    ARRAY_INIT(stringid64_t, &name_array, memsys_main_allocator());
+    ARRAY_INIT(stringid64_t, &name_array, MemSysApiV1.main_allocator());
 
     while (type_it != type_end) {
         stringid64_t type_id = {.id = type_it->key};

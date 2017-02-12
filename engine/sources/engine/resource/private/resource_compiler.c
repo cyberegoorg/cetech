@@ -20,6 +20,7 @@
 #include "engine/config/cvar.h"
 
 #include "builddb.h"
+#include "engine/memory/memsys.h"
 
 
 //==============================================================================
@@ -57,6 +58,11 @@ struct G {
     cvar_t cv_external_dir;
 } ResourceCompilerGlobal = {0};
 
+static struct MemSysApiV1 MemSysApiV1;
+static struct ResourceApiV1 ResourceApiV1;
+static struct TaskApiV1 TaskApiV1;
+
+
 //CE_STATIC_ASSERT(sizeof(struct compile_task_data) < 64);
 
 
@@ -69,7 +75,7 @@ void _add_dependency(const char *who_filename,
     builddb_set_file_depend(who_filename, depend_on_filename);
 
     char path[1024] = {0};
-    cel_path_join(path, CEL_ARRAY_LEN(path), resource_compiler_get_source_dir(), depend_on_filename);
+    cel_path_join(path, CEL_ARRAY_LEN(path), ResourceApiV1.compiler_get_source_dir(), depend_on_filename);
 
     builddb_set_file(depend_on_filename, cel_file_mtime(path));
 }
@@ -98,7 +104,7 @@ static void _compile_task(void *data) {
                   "Resource \"%s\" compilation fail", tdata->source_filename);
     }
 
-    CEL_DEALLOCATE(memsys_main_scratch_allocator(), tdata->source_filename);
+    CEL_DEALLOCATE(MemSysApiV1.main_scratch_allocator(), tdata->source_filename);
     cel_vio_close(tdata->source);
     cel_vio_close(tdata->build);
 
@@ -122,7 +128,7 @@ void _compile_dir(ARRAY_T(task_item) *tasks,
                   const char *source_dir,
                   const char *build_dir_full) {
 
-    cel_dir_list(source_dir, 1, files, memsys_main_scratch_allocator());
+    cel_dir_list(source_dir, 1, files, MemSysApiV1.main_scratch_allocator());
 
     for (int i = 0; i < ARRAY_SIZE(files); ++i) {
         const char *source_filename_full = ARRAY_AT(files, i);
@@ -152,7 +158,7 @@ void _compile_dir(ARRAY_T(task_item) *tasks,
         builddb_set_file_hash(source_filename_short, build_name);
 
         struct vio *source_vio = cel_vio_from_file(source_filename_full, VIO_OPEN_READ,
-                                                   memsys_main_scratch_allocator());
+                                                   MemSysApiV1.main_scratch_allocator());
         if (source_vio == NULL) {
             cel_vio_close(source_vio);
             continue;
@@ -161,13 +167,13 @@ void _compile_dir(ARRAY_T(task_item) *tasks,
         char build_path[4096] = {0};
         cel_path_join(build_path, CEL_ARRAY_LEN(build_path), build_dir_full, build_name);
 
-        struct vio *build_vio = cel_vio_from_file(build_path, VIO_OPEN_WRITE, memsys_main_scratch_allocator());
+        struct vio *build_vio = cel_vio_from_file(build_path, VIO_OPEN_WRITE, MemSysApiV1.main_scratch_allocator());
         if (build_vio == NULL) {
             cel_vio_close(build_vio);
             continue;
         }
 
-        struct compile_task_data *data = CEL_ALLOCATE(memsys_main_allocator(), struct compile_task_data, 1);
+        struct compile_task_data *data = CEL_ALLOCATE(MemSysApiV1.main_allocator(), struct compile_task_data, 1);
 
         *data = (struct compile_task_data) {
                 .name = name_id,
@@ -175,7 +181,7 @@ void _compile_dir(ARRAY_T(task_item) *tasks,
                 .build = build_vio,
                 .source = source_vio,
                 .compilator = compilator,
-                .source_filename = cel_strdup(source_filename_short, memsys_main_scratch_allocator()),
+                .source_filename = cel_strdup(source_filename_short, MemSysApiV1.main_scratch_allocator()),
                 .mtime = cel_file_mtime(source_filename_full),
                 .completed = 0
         };
@@ -189,7 +195,7 @@ void _compile_dir(ARRAY_T(task_item) *tasks,
 
         ARRAY_PUSH_BACK(task_item, tasks, item);
     }
-    cel_dir_list_free(files, memsys_main_scratch_allocator());
+    cel_dir_list_free(files, MemSysApiV1.main_scratch_allocator());
 }
 
 
@@ -206,6 +212,10 @@ static void _init_cvar(struct ConfigApiV1 config) {
 }
 
 static void _init(get_api_fce_t get_engine_api) {
+    MemSysApiV1 = *((struct MemSysApiV1*)get_engine_api(MEMORY_API_ID, 0));
+    ResourceApiV1 = *((struct ResourceApiV1*)get_engine_api(RESOURCE_API_ID, 0));
+    TaskApiV1 = *((struct TaskApiV1*)get_engine_api(TASK_API_ID, 0));
+
     const char *build_dir = cvar_get_string(_G.cv_build_dir);
     char build_dir_full[1024] = {0};
     cel_path_join(build_dir_full, CEL_ARRAY_LEN(build_dir_full), build_dir, application_platform());
@@ -272,10 +282,10 @@ void resource_compiler_compile_all() {
     cel_path_join(build_dir_full, CEL_ARRAY_LEN(build_dir_full), build_dir, platform);
 
     struct array_pchar files;
-    array_init_pchar(&files, memsys_main_scratch_allocator());
+    array_init_pchar(&files, MemSysApiV1.main_scratch_allocator());
 
     ARRAY_T(task_item) tasks;
-    ARRAY_INIT(task_item, &tasks, memsys_main_allocator());
+    ARRAY_INIT(task_item, &tasks, MemSysApiV1.main_allocator());
 
     const char *dirs[] = {source_dir, core_dir};
     for (int i = 0; i < CEL_ARRAY_LEN(dirs); ++i) {
@@ -285,13 +295,13 @@ void resource_compiler_compile_all() {
 
     array_destroy_pchar(&files);
 
-    taskmanager_add(tasks.data, tasks.size);
+    TaskApiV1.add(tasks.data, tasks.size);
 
     for (int i = 0; i < ARRAY_SIZE(&tasks); ++i) {
         struct compile_task_data *data = ARRAY_AT(&tasks, i).data;
 
-        taskmanager_wait_atomic(&data->completed, 0);
-        CEL_DEALLOCATE(memsys_main_allocator(), data);
+        TaskApiV1.wait_atomic(&data->completed, 0);
+        CEL_DEALLOCATE(MemSysApiV1.main_allocator(), data);
     }
 
     ARRAY_DESTROY(task_item, &tasks);
@@ -302,7 +312,7 @@ int resource_compiler_get_filename(char *filename,
                                    stringid64_t type,
                                    stringid64_t name) {
     char build_name[33] = {0};
-    resource_type_name_string(build_name, CEL_ARRAY_LEN(build_name), type, name);
+    ResourceApiV1.type_name_string(build_name, CEL_ARRAY_LEN(build_name), type, name);
     return builddb_get_filename_by_hash(filename, max_ken, build_name);
 }
 

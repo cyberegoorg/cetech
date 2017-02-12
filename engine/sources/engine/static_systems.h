@@ -4,12 +4,14 @@
 #include "engine/plugin/plugin.h"
 
 void _init_static_plugins() {
+    ADD_STATIC_PLUGIN(memsys);
     ADD_STATIC_PLUGIN(config);
     ADD_STATIC_PLUGIN(task);
-    ADD_STATIC_PLUGIN(luasys);
 
     ADD_STATIC_PLUGIN(filesystem);
+    ADD_STATIC_PLUGIN(resourcesystem);
     ADD_STATIC_PLUGIN(resourcecompiler);
+
 
     ADD_STATIC_PLUGIN(consoleserver);
     ADD_STATIC_PLUGIN(developsystem);
@@ -18,7 +20,6 @@ void _init_static_plugins() {
     ADD_STATIC_PLUGIN(gamepad);
     ADD_STATIC_PLUGIN(mouse);
 
-    ADD_STATIC_PLUGIN(resourcesystem);
     ADD_STATIC_PLUGIN(entcom);
     ADD_STATIC_PLUGIN(world);
 
@@ -31,5 +32,7 @@ void _init_static_plugins() {
     ADD_STATIC_PLUGIN(scenegraph);
     ADD_STATIC_PLUGIN(transform);
     ADD_STATIC_PLUGIN(mesh);
+
+    ADD_STATIC_PLUGIN(luasys);
 }
 

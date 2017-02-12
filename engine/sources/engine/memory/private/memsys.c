@@ -1,7 +1,7 @@
 #include <celib/memory/memory.h>
 #include <celib/errors/errors.h>
 #include <engine/plugin/plugin_api.h>
-#include "../types.h"
+#include "../memsys.h"
 
 #define LOG_WHERE "memory"
 
@@ -33,15 +33,15 @@ void memsys_shutdown() {
     malloc_allocator_destroy(_G.default_allocator);
 }
 
-struct cel_allocator *memsys_main_allocator() {
+struct cel_allocator *_memsys_main_allocator() {
     return _G.default_allocator;
 }
 
-struct cel_allocator *memsys_main_scratch_allocator() {
+struct cel_allocator *_memsys_main_scratch_allocator() {
     return _G.default_scratch_allocator;
 }
 
-void *memoryluasys_get_plugin_api(int api,
+void *memsys_get_plugin_api(int api,
                                   int version) {
     switch (api) {
         case PLUGIN_API_ID:
@@ -63,8 +63,8 @@ void *memoryluasys_get_plugin_api(int api,
                 case 0: {
                     static struct MemSysApiV1 api = {0};
 
-                    api.main_allocator = memsys_main_allocator;
-                    api.main_scratch_allocator = memsys_main_scratch_allocator;
+                    api.main_allocator = _memsys_main_allocator;
+                    api.main_scratch_allocator = _memsys_main_scratch_allocator;
 
                     return &api;
                 }

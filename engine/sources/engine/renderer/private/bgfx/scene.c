@@ -13,13 +13,20 @@
 #include "celib/filesystem/path.h"
 #include "celib/filesystem/vio.h"
 #include <engine/memory/memsys.h>
+#include <engine/plugin/plugin.h>
 
 #include "engine/resource/resource.h"
+#include "engine/memory/memsys.h"
 
+#include "engine/resource/types.h"
 
 //==============================================================================
 // Structs
 //==============================================================================
+
+static struct MemSysApiV1 MemSysApiV1;
+static struct ResourceApiV1 ResourceApiV1;
+static struct SceneGprahApiV1 SceneGprahApiV1;
 
 ARRAY_PROTOTYPE(bgfx_texture_handle_t)
 
@@ -69,10 +76,10 @@ struct scene_instance {
 };
 
 void _init_scene_instance(struct scene_instance *instance) {
-    MAP_INIT(u8, &instance->geom_map, memsys_main_allocator());
-    ARRAY_INIT(u32, &instance->size, memsys_main_allocator());
-    ARRAY_INIT(bgfx_vertex_buffer_handle_t, &instance->vb, memsys_main_allocator());
-    ARRAY_INIT(bgfx_index_buffer_handle_t, &instance->ib, memsys_main_allocator());
+    MAP_INIT(u8, &instance->geom_map, MemSysApiV1.main_allocator());
+    ARRAY_INIT(u32, &instance->size, MemSysApiV1.main_allocator());
+    ARRAY_INIT(bgfx_vertex_buffer_handle_t, &instance->vb, MemSysApiV1.main_allocator());
+    ARRAY_INIT(bgfx_index_buffer_handle_t, &instance->ib, MemSysApiV1.main_allocator());
 }
 
 void _destroy_scene_instance(struct scene_instance *instance) {
@@ -95,6 +102,8 @@ static struct G {
     stringid64_t type;
     MAP_T(scene_instance) scene_instance;
 } _G = {0};
+
+
 
 struct scene_instance *_get_scene_instance(stringid64_t scene) {
     return MAP_GET_PTR(scene_instance, &_G.scene_instance, scene.id);
@@ -124,7 +133,7 @@ struct compile_output {
 };
 
 struct compile_output *_crete_compile_output() {
-    struct cel_allocator *a = memsys_main_allocator();
+    struct cel_allocator *a = MemSysApiV1.main_allocator();
     struct compile_output *output = CEL_ALLOCATE(a, struct compile_output, 1);
 
     ARRAY_INIT(stringid64_t, &output->geom_name, a);
@@ -146,7 +155,7 @@ struct compile_output *_crete_compile_output() {
 }
 
 void _destroy_compile_output(struct compile_output *output) {
-    struct cel_allocator *a = memsys_main_allocator();
+    struct cel_allocator *a = MemSysApiV1.main_allocator();
 
     ARRAY_DESTROY(stringid64_t, &output->geom_name);
     ARRAY_DESTROY(u32, &output->ib_offset);
@@ -450,7 +459,7 @@ int _compile_assimp(const char *filename,
     capi->add_dependency(filename, input_str);
 
     char input_path[128] = {0};
-    const char *source_dir = resource_compiler_get_source_dir();
+    const char *source_dir = ResourceApiV1.compiler_get_source_dir();
     cel_path_join(input_path, CEL_ARRAY_LEN(input_path), source_dir, input_str);
 
     u32 postprocess_flag = aiProcessPreset_TargetRealtime_MaxQuality;
@@ -543,7 +552,7 @@ int _scene_resource_compiler(const char *filename,
                              struct vio *build_vio,
                              struct compilator_api *compilator_api) {
 
-    char *source_data = CEL_ALLOCATE(memsys_main_allocator(), char, cel_vio_size(source_vio) + 1);
+    char *source_data = CEL_ALLOCATE(MemSysApiV1.main_allocator(), char, cel_vio_size(source_vio) + 1);
     memory_set(source_data, 0, cel_vio_size(source_vio) + 1);
     cel_vio_read(source_vio, source_data, sizeof(char), cel_vio_size(source_vio));
 
@@ -562,7 +571,7 @@ int _scene_resource_compiler(const char *filename,
 
     if (!ret) {
         _destroy_compile_output(output);
-        CEL_DEALLOCATE(memsys_main_allocator(), source_data);
+        CEL_DEALLOCATE(MemSysApiV1.main_allocator(), source_data);
         return 0;
     }
 
@@ -588,7 +597,7 @@ int _scene_resource_compiler(const char *filename,
     cel_vio_write(build_vio, output->geom_node.data, sizeof(stringid64_t), ARRAY_SIZE(&output->geom_name));
 
     _destroy_compile_output(output);
-    CEL_DEALLOCATE(memsys_main_allocator(), source_data);
+    CEL_DEALLOCATE(MemSysApiV1.main_allocator(), source_data);
     return 1;
 }
 
@@ -686,12 +695,16 @@ static const resource_callbacks_t scene_resource_callback = {
 int scene_resource_init() {
     _G = (struct G) {0};
 
+    MemSysApiV1 = *(struct MemSysApiV1*)plugin_get_engine_api(MEMORY_API_ID, 0);
+    ResourceApiV1 = *(struct ResourceApiV1*)plugin_get_engine_api(RESOURCE_API_ID, 0);
+    SceneGprahApiV1 = *(struct SceneGprahApiV1*)plugin_get_engine_api(SCENEGRAPH_API_ID, 0);
+
     _G.type = stringid64_from_string("scene");
 
-    MAP_INIT(scene_instance, &_G.scene_instance, memsys_main_allocator());
+    MAP_INIT(scene_instance, &_G.scene_instance, MemSysApiV1.main_allocator());
 
-    resource_compiler_register(_G.type, _scene_resource_compiler);
-    resource_register_type(_G.type, scene_resource_callback);
+    ResourceApiV1.compiler_register(_G.type, _scene_resource_compiler);
+    ResourceApiV1.register_type(_G.type, scene_resource_callback);
 
     return 1;
 }
@@ -703,7 +716,7 @@ void scene_resource_shutdown() {
 
 void scene_resource_submit(stringid64_t scene,
                            stringid64_t geom_name) {
-    resource_get(_G.type, scene);
+    ResourceApiV1.get(_G.type, scene);
     struct scene_instance *instance = _get_scene_instance(scene);
 
     if (instance == NULL) {
@@ -723,18 +736,18 @@ void scene_resource_submit(stringid64_t scene,
 void scene_create_graph(world_t world,
                         entity_t entity,
                         stringid64_t scene) {
-    struct scene_blob *res = resource_get(_G.type, scene);
+    struct scene_blob *res = ResourceApiV1.get(_G.type, scene);
 
     stringid64_t *node_name = scene_blob_node_name(res);
     u32 *node_parent = scene_blob_node_parent(res);
     cel_mat44f_t *node_pose = scene_blob_node_pose(res);
 
-    scenegraph_create(world, entity, node_name, node_parent, node_pose, res->node_count);
+    SceneGprahApiV1.create(world, entity, node_name, node_parent, node_pose, res->node_count);
 }
 
 stringid64_t scene_get_mesh_node(stringid64_t scene,
                                  stringid64_t mesh) {
-    struct scene_blob *res = resource_get(_G.type, scene);
+    struct scene_blob *res = ResourceApiV1.get(_G.type, scene);
 
     stringid64_t *geom_node = scene_blob_geom_node(res);
     stringid64_t *geom_name = scene_blob_geom_name(res);

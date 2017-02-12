@@ -5,9 +5,13 @@
 #include "celib/containers/map.h"
 #include <engine/memory/memsys.h>
 #include <engine/plugin/plugin_api.h>
+#include "engine/memory/memsys.h"
+
 #include "engine/world/world.h"
+#include "engine/entcom/entcom.h"
 
 #include "engine/entcom/entcom.h"
+#include "engine/memory/memsys.h"
 
 //==============================================================================
 // Globals
@@ -29,14 +33,19 @@ static struct G {
     MAP_T(component_clb_t) component_clb;
 } _G = {0};
 
+struct MemSysApiV1 MemSysApiV1;
+struct WorldApiV1 WorldApiV1;
 
 static void _init(get_api_fce_t get_engine_api) {
     _G = (struct G) {0};
 
-    handlerid_init(&_G.entity_handler, memsys_main_allocator());
-    MAP_INIT(component_compiler_t, &_G.compiler_map, memsys_main_allocator());
-    MAP_INIT(u32, &_G.spawn_order_map, memsys_main_allocator());
-    MAP_INIT(component_clb_t, &_G.component_clb, memsys_main_allocator());
+    MemSysApiV1 = *(struct MemSysApiV1*)get_engine_api(MEMORY_API_ID, 0);
+    WorldApiV1 = *(struct WorldApiV1*)get_engine_api(WORLD_API_ID, 0);
+
+    handlerid_init(&_G.entity_handler, MemSysApiV1.main_allocator());
+    MAP_INIT(component_compiler_t, &_G.compiler_map, MemSysApiV1.main_allocator());
+    MAP_INIT(u32, &_G.spawn_order_map, MemSysApiV1.main_allocator());
+    MAP_INIT(component_clb_t, &_G.component_clb, MemSysApiV1.main_allocator());
 }
 
 static void _shutdown() {
@@ -99,7 +108,7 @@ void component_register_type(stringid64_t type,
             .on_update = clb.on_world_update,
     };
 
-    world_register_callback(wclb);
+    WorldApiV1.register_callback(wclb);
 }
 
 void component_spawn(world_t world,

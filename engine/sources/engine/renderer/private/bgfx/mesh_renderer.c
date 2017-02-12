@@ -14,7 +14,7 @@
 
 #include <engine/memory/memsys.h>
 #include <engine/plugin/plugin_api.h>
-#include "../../types.h"
+#include "engine/memory/memsys.h"
 
 
 #define LOG_WHERE "mesh_renderer"
@@ -52,16 +52,23 @@ static struct G {
     MAP_T(world_data_t) world;
 } _G = {0};
 
+static struct MemSysApiV1 MemSysApiV1;
+static struct SceneGprahApiV1 SceneGprahApiV1;
+static struct TransformApiV1 TransformApiV1;
+static struct EntComSystemApiV1 EntComSystemApiV1;
+static struct MaterialApiV1 MaterialApiV1;
+static struct MeshApiV1 MeshApiV1;
+static struct MeshApiV1 MeshApiV1;
 
 static void _new_world(world_t world) {
     world_data_t data = {0};
 
-    MAP_INIT(u32, &data.ent_idx_map, memsys_main_allocator());
+    MAP_INIT(u32, &data.ent_idx_map, MemSysApiV1.main_allocator());
 
-    ARRAY_INIT(stringid64_t, &data.scene, memsys_main_allocator());
-    ARRAY_INIT(stringid64_t, &data.mesh, memsys_main_allocator());
-    ARRAY_INIT(stringid64_t, &data.node, memsys_main_allocator());
-    ARRAY_INIT(material_t, &data.material, memsys_main_allocator());
+    ARRAY_INIT(stringid64_t, &data.scene, MemSysApiV1.main_allocator());
+    ARRAY_INIT(stringid64_t, &data.mesh, MemSysApiV1.main_allocator());
+    ARRAY_INIT(stringid64_t, &data.node, MemSysApiV1.main_allocator());
+    ARRAY_INIT(material_t, &data.material, MemSysApiV1.main_allocator());
 
     MAP_SET(world_data_t, &_G.world, world.h.h, data);
 }
@@ -138,6 +145,7 @@ static void _destroyer(world_t world,
     }
 }
 
+
 static void _spawner(world_t world,
                      entity_t *ents,
                      u32 *cents,
@@ -147,7 +155,7 @@ static void _spawner(world_t world,
     struct mesh_data *tdata = data;
 
     for (int i = 0; i < ent_count; ++i) {
-        mesh_create(world,
+        MeshApiV1.create(world,
                     ents[cents[i]],
                     tdata[i].scene,
                     tdata[i].mesh,
@@ -156,16 +164,24 @@ static void _spawner(world_t world,
     }
 }
 
+
 static void _init(get_api_fce_t get_engine_api) {
+    EntComSystemApiV1 = *((struct EntComSystemApiV1*)get_engine_api(ENTCOM_API_ID, 0));
+    MemSysApiV1 = *(struct MemSysApiV1*)get_engine_api(MEMORY_API_ID, 0);
+    MaterialApiV1 = *((struct MaterialApiV1*)get_engine_api(MATERIAL_API_ID, 0));
+    MeshApiV1 = *(struct MeshApiV1*)get_engine_api(MESH_API_ID, 0);
+    SceneGprahApiV1 = *(struct SceneGprahApiV1*)get_engine_api(SCENEGRAPH_API_ID, 0);
+    TransformApiV1 = *(struct TransformApiV1*)get_engine_api(TRANSFORM_API_ID, 0);
+
     _G = (struct G) {0};
 
-    MAP_INIT(world_data_t, &_G.world, memsys_main_allocator());
+    MAP_INIT(world_data_t, &_G.world, MemSysApiV1.main_allocator());
 
     _G.type = stringid64_from_string("mesh_renderer");
 
-    component_register_compiler(_G.type, _mesh_component_compiler, 10);
+    EntComSystemApiV1.component_register_compiler(_G.type, _mesh_component_compiler, 10);
 
-    component_register_type(_G.type, (struct component_clb) {
+    EntComSystemApiV1.component_register_type(_G.type, (struct component_clb) {
             .spawner=_spawner, .destroyer=_destroyer,
             .on_world_create=_on_world_create, .on_world_destroy=_on_world_destroy
     });
@@ -207,7 +223,7 @@ mesh_t mesh_create(world_t world,
 
     scene_create_graph(world, entity, scene);
 
-    material_t material_instance = material_resource_create(material);
+    material_t material_instance = MaterialApiV1.resource_create(material);
 
     u32 idx = (u32) ARRAY_SIZE(&data->material);
 
@@ -235,22 +251,22 @@ void mesh_render_all(world_t world) {
         stringid64_t scene = ARRAY_AT(&data->scene, ce_it->value);
         stringid64_t geom = ARRAY_AT(&data->mesh, ce_it->value);
 
-        material_use(material);
+        MaterialApiV1.use(material);
 
         entity_t ent = {.idx = ce_it->key};
 
-        transform_t t = transform_get(world, ent);
-        cel_mat44f_t t_w = *transform_get_world_matrix(world, t);
+        transform_t t = TransformApiV1.get(world, ent);
+        cel_mat44f_t t_w = *TransformApiV1.get_world_matrix(world, t);
         //cel_mat44f_t t_w = MAT44F_INIT_IDENTITY;//*transform_get_world_matrix(world, t);
         cel_mat44f_t node_w = MAT44F_INIT_IDENTITY;
         cel_mat44f_t final_w = MAT44F_INIT_IDENTITY;
 
 
-        if (scenegraph_has(world, ent)) {
+        if (SceneGprahApiV1.has(world, ent)) {
             stringid64_t name = scene_get_mesh_node(scene, geom);
             if (name.id != 0) {
-                scene_node_t n = scenegraph_node_by_name(world, ent, name);
-                node_w = *scenegraph_get_world_matrix(world, n);
+                scene_node_t n = SceneGprahApiV1.node_by_name(world, ent, name);
+                node_w = *SceneGprahApiV1.get_world_matrix(world, n);
             }
         }
 
@@ -260,7 +276,7 @@ void mesh_render_all(world_t world) {
 
         scene_resource_submit(scene, geom);
 
-        material_submit(material);
+        MaterialApiV1.submit(material);
 
         ++ce_it;
     }
@@ -279,7 +295,7 @@ void mesh_set_material(world_t world,
                        stringid64_t material) {
     world_data_t *data = _get_world_data(world);
 
-    material_t material_instance = material_resource_create(material);
+    material_t material_instance = MaterialApiV1.resource_create(material);
     ARRAY_AT(&data->material, mesh.idx) = material_instance;
 }
 

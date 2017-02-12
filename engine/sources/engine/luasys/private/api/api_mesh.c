@@ -1,6 +1,7 @@
 
-#include "engine/entcom/types.h"
+#include "engine/entcom/entcom.h"
 #include <engine/renderer/mesh_renderer.h>
+#include <engine/plugin/plugin.h>
 #include "engine/luasys/luasys.h"
 
 #define API_NAME "Mesh"
@@ -9,7 +10,9 @@ static int _mesh_get(lua_State *l) {
     world_t w = {.h = luasys_to_handler(l, 1)};
     entity_t ent = {.h = luasys_to_handler(l, 2)};
 
-    luasys_push_int(l, mesh_get(w, ent).idx);
+    struct MeshApiV1 MeshApiV1 = *(struct MeshApiV1*)plugin_get_engine_api(MESH_API_ID, 0);
+
+    luasys_push_int(l, MeshApiV1.get(w, ent).idx);
     return 1;
 }
 
@@ -18,7 +21,8 @@ static int _mesh_has(lua_State *l) {
     world_t w = {.h = luasys_to_handler(l, 1)};
     entity_t ent = {.h = luasys_to_handler(l, 2)};
 
-    luasys_push_bool(l, mesh_has(w, ent));
+    struct MeshApiV1 MeshApiV1 = *(struct MeshApiV1*)plugin_get_engine_api(MESH_API_ID, 0);
+    luasys_push_bool(l, MeshApiV1.has(w, ent));
     return 1;
 }
 
@@ -27,7 +31,9 @@ static int _mesh_get_material(lua_State *l) {
     world_t w = {.h = luasys_to_handler(l, 1)};
     mesh_t m = {.idx = luasys_to_int(l, 2)};
 
-    luasys_push_handler(l, mesh_get_material(w, m).h);
+    struct MeshApiV1 MeshApiV1 = *(struct MeshApiV1*)plugin_get_engine_api(MESH_API_ID, 0);
+
+    luasys_push_handler(l, MeshApiV1.get_material(w, m).h);
     return 1;
 }
 
@@ -36,7 +42,9 @@ static int _mesh_set_material(lua_State *l) {
     mesh_t m = {.idx = luasys_to_int(l, 2)};
     stringid64_t material = stringid64_from_string(luasys_to_string(l, 3));
 
-    mesh_set_material(w, m, material);
+    struct MeshApiV1 MeshApiV1 = *(struct MeshApiV1*)plugin_get_engine_api(MESH_API_ID, 0);
+    MeshApiV1.set_material(w, m, material);
+
     return 0;
 }
 

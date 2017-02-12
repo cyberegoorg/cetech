@@ -4,31 +4,36 @@
 //==============================================================================
 // Includes
 //==============================================================================
-#include <celib/string/stringid.h>
-#include <engine/entcom/types.h>
-#include "types.h"
 
+#include "celib/handler/handlerid.h"
+
+typedef struct {
+    handler_t h;
+} world_t;
+
+typedef void (*world_on_created_t)(world_t world);
+
+typedef void (*world_on_destroy_t)(world_t world);
+
+typedef void (*world_on_update_t)(world_t world,
+                                  float dt);
+
+typedef struct {
+    world_on_created_t on_created;
+    world_on_destroy_t on_destroy;
+    world_on_update_t on_update;
+} world_callbacks_t;
 
 //==============================================================================
 // Interface
 //==============================================================================
 
+struct WorldApiV1 {
+    void (*register_callback)(world_callbacks_t clb);
+    world_t (*create)();
+    void (*destroy)(world_t world);
+    void (*update)(world_t world, float dt);
+};
 
-void world_register_callback(world_callbacks_t clb);
-
-world_t world_create();
-
-void world_destroy(world_t world);
-
-void world_update(world_t world,
-                  float dt);
-
-level_t world_load_level(world_t world,
-                         stringid64_t name);
-
-entity_t level_unit_by_id(level_t level,
-                          stringid64_t name);
-
-entity_t level_unit(level_t level);
 
 #endif //CETECH_WORLD_SYSTEM_H

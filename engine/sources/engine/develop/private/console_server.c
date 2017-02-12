@@ -44,6 +44,9 @@ static struct G {
 } ConsoleServerGlobals = {0};
 
 
+extern void consolesrv_push_begin();
+extern void consolesrv_register_command(const char *, console_server_command_t);
+
 //==============================================================================
 // Private
 //==============================================================================

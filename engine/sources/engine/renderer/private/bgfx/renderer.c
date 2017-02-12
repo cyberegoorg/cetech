@@ -17,8 +17,6 @@
 #include "texture.h"
 #include "shader.h"
 #include "scene.h"
-#include "../../types.h"
-
 //==============================================================================
 // GLobals
 //==============================================================================
@@ -59,7 +57,15 @@ static int _cmd_resize(mpack_node_t args,
     return 0;
 }
 
+static struct ConsoleServerApiV1 ConsoleServerApiV1;
+static struct MeshApiV1 MeshApiV1;
+static struct CameraApiV1 CameraApiV1;
+
 static void _init(get_api_fce_t get_engine_api) {
+    ConsoleServerApiV1 = *((struct ConsoleServerApiV1*)get_engine_api(CONSOLE_SERVER_API_ID, 0));
+    MeshApiV1 = *((struct MeshApiV1*)get_engine_api(MESH_API_ID, 0));
+    CameraApiV1 = *((struct CameraApiV1*)get_engine_api(CAMERA_API_ID, 0));
+
     _G = (struct G) {0};
 
     cvar_t daemon = cvar_find("daemon");
@@ -69,7 +75,7 @@ static void _init(get_api_fce_t get_engine_api) {
         material_resource_init();
         scene_resource_init();
 
-        consolesrv_register_command("renderer.resize", _cmd_resize);
+        ConsoleServerApiV1.consolesrv_register_command("renderer.resize", _cmd_resize);
     }
 }
 
@@ -122,7 +128,7 @@ void renderer_render_world(world_t world,
     cel_mat44f_t view_matrix;
     cel_mat44f_t proj_matrix;
 
-    camera_get_project_view(world, camera, &proj_matrix, &view_matrix);
+    CameraApiV1.get_project_view(world, camera, &proj_matrix, &view_matrix);
     bgfx_set_view_transform(0, view_matrix.f, proj_matrix.f);
 
     bgfx_set_view_rect(0, 0, 0, (uint16_t) _G.size_width, (uint16_t) _G.size_height);
@@ -130,7 +136,7 @@ void renderer_render_world(world_t world,
     bgfx_touch(0);
     bgfx_dbg_text_clear(0, 0);
 
-    mesh_render_all(world);
+    MeshApiV1.render_all(world);
 
     bgfx_frame(0);
     cel_window_update(application_get_main_window());
@@ -186,6 +192,31 @@ void *renderer_get_plugin_api(int api,
             switch (version) {
                 case 0: {
                     static struct MaterialApiV1 api = {0};
+
+                    material_t material_resource_create(stringid64_t name);
+
+                    u32 material_get_texture_count(material_t material);
+
+                    void material_set_texture(material_t material,
+                                              const char *slot,
+                                              stringid64_t texture);
+
+                    void material_set_vec4f(material_t material,
+                                            const char *slot,
+                                            cel_vec4f_t v);
+
+                    void material_set_mat33f(material_t material,
+                                             const char *slot,
+                                             mat33f_t v);
+
+                    void material_set_mat44f(material_t material,
+                                             const char *slot,
+                                             cel_mat44f_t v);
+
+
+                    void material_use(material_t material);
+
+                    void material_submit(material_t material);
 
                     api.resource_create = material_resource_create;
                     api.get_texture_count = material_get_texture_count;

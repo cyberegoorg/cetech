@@ -82,6 +82,12 @@ static int _cmd_wait(mpack_node_t args,
     return 0;
 }
 
+static struct ConsoleServerApiV1 ConsoleServerApiV1;
+static struct DevelopSystemApiV1 DevelopSystemApiV1;
+static struct RendererApiV1 RendererApiV1;
+static struct ResourceApiV1 ResourceApiV1;
+static struct PackageApiV1 PackageApiV1;
+static struct TaskApiV1 TaskApiV1;
 
 int application_init(int argc,
                      const char **argv) {
@@ -95,6 +101,8 @@ int application_init(int argc,
     log_debug(LOG_WHERE, "Init (global size: %lu)", sizeof(struct G));
 
     memsys_init(4 * 1024 * 1024);
+    _init_static_plugins();
+
     cvar_init();
 
     _G.config.boot_pkg = cvar_new_str("core.boot_pkg", "Boot package", "boot");
@@ -111,17 +119,23 @@ int application_init(int argc,
     _G.config.wid = cvar_new_int("wid", "Wid", 0);
 
 
-    _init_static_plugins();
 
     plugin_load_dirs("./bin");
     plugin_call_init_cvar();
     machine_init(0);
 
+    ConsoleServerApiV1 = *((struct ConsoleServerApiV1*)plugin_get_engine_api(CONSOLE_SERVER_API_ID, 0));
+    DevelopSystemApiV1 = *((struct DevelopSystemApiV1*)plugin_get_engine_api(DEVELOP_SERVER_API_ID, 0));
+    RendererApiV1 = *((struct RendererApiV1*)plugin_get_engine_api(RENDERER_API_ID, 0));
+    ResourceApiV1 = *((struct ResourceApiV1*)plugin_get_engine_api(RESOURCE_API_ID, 0));
+    PackageApiV1 = *((struct PackageApiV1*)plugin_get_engine_api(PACKAGE_API_ID, 0));
+    TaskApiV1 = *((struct TaskApiV1*)plugin_get_engine_api(TASK_API_ID, 0));
+
     // Cvar stage
 
     cvar_parse_core_args(_G.args);
     if (cvar_get_int(_G.config.compile)) {
-        resource_compiler_create_build_dir();
+        ResourceApiV1.compiler_create_build_dir();
         cvar_compile_global();
     }
 
@@ -137,9 +151,9 @@ int application_init(int argc,
     machine_init(1);
 
 
-    log_set_wid_clb(taskmanager_worker_id);
+    log_set_wid_clb(TaskApiV1.worker_id);
 
-    consolesrv_register_command("wait", _cmd_wait);
+    ConsoleServerApiV1.consolesrv_register_command("wait", _cmd_wait);
 
     return 1;
 }
@@ -163,14 +177,14 @@ static void _boot_stage() {
     // TODO: remove, this must be done by boot_package and load in boot_script
     //if (!cvar_get_int(_G.config.daemon)) {
         stringid64_t core_pkg = stringid64_from_string("core");
-        resource_load_now(pkg, &core_pkg, 1);
-        package_load(core_pkg);
-        package_flush(core_pkg);
+        ResourceApiV1.load_now(pkg, &core_pkg, 1);
+        PackageApiV1.load(core_pkg);
+        PackageApiV1.flush(core_pkg);
     //}
 
-    resource_load_now(pkg, &boot_pkg, 1);
-    package_load(boot_pkg);
-    package_flush(boot_pkg);
+    ResourceApiV1.load_now(pkg, &boot_pkg, 1);
+    PackageApiV1.load(boot_pkg);
+    PackageApiV1.flush(boot_pkg);
 
     stringid64_t boot_script = stringid64_from_string(cvar_get_string(_G.config.boot_script));
     luasys_execute_boot_script(boot_script);
@@ -181,27 +195,27 @@ static void _boot_unload() {
     stringid64_t boot_pkg = stringid64_from_string(cvar_get_string(_G.config.boot_pkg));
     stringid64_t pkg = stringid64_from_string("package");
 
-    package_unload(boot_pkg);
-    resource_unload(pkg, &boot_pkg, 1);
+    PackageApiV1.unload(boot_pkg);
+    ResourceApiV1.unload(pkg, &boot_pkg, 1);
 
     //if (!cvar_get_int(_G.config.daemon)) {
-        stringid64_t core_pkg = stringid64_from_string("core");
-        resource_load_now(pkg, &core_pkg, 1);
-        package_load(core_pkg);
-        package_flush(core_pkg);
+    stringid64_t core_pkg = stringid64_from_string("core");
+    ResourceApiV1.load_now(pkg, &core_pkg, 1);
+    PackageApiV1.load(core_pkg);
+    PackageApiV1.flush(core_pkg);
     //}
 
 }
 
 void application_start() {
 #if defined(CETECH_DEVELOP)
-    resource_set_autoload(1);
+    ResourceApiV1.set_autoload(1);
 #else
-    resource_set_autoload(0);
+    ResourceApiV1.set_autoload(0);
 #endif
 
     if (cvar_get_int(_G.config.compile)) {
-        resource_compiler_compile_all();
+        ResourceApiV1.compiler_compile_all();
 
         if (!cvar_get_int(_G.config.continue_)) {
             return;
@@ -226,7 +240,7 @@ void application_start() {
             _G.main_window = cel_window_new_from((void *) wid);
         }
 
-        renderer_create(_G.main_window);
+        RendererApiV1.create(_G.main_window);
     }
 
     _boot_stage();
@@ -247,9 +261,9 @@ void application_start() {
     float frame_time = (1.0f / frame_limit);
     float frame_time_accum = 0.0f;
 
-    consolesrv_push_begin();
+    ConsoleServerApiV1.consolesrv_push_begin();
     while (_G.is_running) {
-        struct scope_data application_sd = developsys_enter_scope("Application:update()");
+        struct scope_data application_sd = DevelopSystemApiV1.enter_scope("Application:update()");
 
         u64 now_ticks = cel_get_perf_counter();
         float dt = ((float) (now_ticks - last_tick)) / cel_get_perf_freq();
@@ -266,16 +280,16 @@ void application_start() {
 
         if(frame_time_accum >= frame_time) {
             if (!cvar_get_int(_G.config.daemon)) {
-                struct scope_data render_sd = developsys_enter_scope("Game::render()");
+                struct scope_data render_sd = DevelopSystemApiV1.enter_scope("Game::render()");
                 _G.game->render();
-                developsys_leave_scope("Game::render()", render_sd);
+                DevelopSystemApiV1.leave_scope("Game::render()", render_sd);
             }
 
             frame_time_accum = 0.0f;
         }
 
-        developsys_leave_scope("Application:update()", application_sd);
-        developsys_push_record_float("engine.delta_time", dt);
+        DevelopSystemApiV1.leave_scope("Application:update()", application_sd);
+        DevelopSystemApiV1.push_record_float("engine.delta_time", dt);
 
         plugin_call_after_update(dt);
         //cel_thread_yield();
@@ -289,7 +303,7 @@ void application_start() {
 
 const char *application_native_platform() {
 #if defined(CETECH_LINUX)
-    return "linux";
+    return  "linux";
 #elif defined(CETECH_WINDOWS)
     return "windows";
 #elif defined(CETECH_DARWIN)

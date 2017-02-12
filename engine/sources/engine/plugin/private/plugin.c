@@ -184,9 +184,9 @@ void *plugin_get_engine_api(int api,
 
 void plugin_load_dirs(const char *path) {
     ARRAY_T(pchar) files;
-    ARRAY_INIT(pchar, &files, memsys_main_scratch_allocator());
+    ARRAY_INIT(pchar, &files, _memsys_main_scratch_allocator());
 
-    cel_dir_list(path, 1, &files, memsys_main_scratch_allocator());
+    cel_dir_list(path, 1, &files, _memsys_main_scratch_allocator());
 
     for (int k = 0; k < ARRAY_SIZE(&files); ++k) {
         const char *filename = cel_path_filename(ARRAY_AT(&files, k));
@@ -196,7 +196,7 @@ void plugin_load_dirs(const char *path) {
         }
     }
 
-    cel_dir_list_free(&files, memsys_main_scratch_allocator());
+    cel_dir_list_free(&files, _memsys_main_scratch_allocator());
     ARRAY_DESTROY(pchar, &files);
 }
 

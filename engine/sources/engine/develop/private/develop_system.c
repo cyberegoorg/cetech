@@ -19,6 +19,8 @@
 #include "engine/config/cvar.h"
 #include "engine/task/task.h"
 #include "engine/develop/develop_system.h"
+#include "engine/memory/memsys.h"
+
 
 //==============================================================================
 // Defines
@@ -49,6 +51,9 @@ static struct G {
     float time_accum;
 } _G = {0};
 
+static struct MemSysApiV1 MemSysApiV1;
+static struct TaskApiV1 TaskApiV1;
+
 static __thread u8 _stream_buffer[64 * 1024] = {0};
 static __thread u32 _stream_buffer_size = 0;
 static __thread u32 _scope_depth = 0;
@@ -69,11 +74,11 @@ static void _flush_stream_buffer() {
 static void _flush_job(void *data) {
     _flush_stream_buffer();
 
-    atomic_store_explicit(&_G.complete_flag[taskmanager_worker_id()], 1, memory_order_release);
+    atomic_store_explicit(&_G.complete_flag[TaskApiV1.worker_id()], 1, memory_order_release);
 }
 
 static void _flush_all_streams() {
-    const int wc = taskmanager_worker_count();
+    const int wc = TaskApiV1.worker_count();
 
     for (int i = 1; i < wc; ++i) {
         atomic_init(&_G.complete_flag[i], 0);
@@ -92,10 +97,10 @@ static void _flush_all_streams() {
         };
     }
 
-    taskmanager_add(items, wc);
+    TaskApiV1.add(items, wc);
 
     for (int i = 1; i < wc; ++i) {
-        taskmanager_wait_atomic(&_G.complete_flag[i], 0);
+        TaskApiV1.wait_atomic(&_G.complete_flag[i], 0);
     }
 }
 
@@ -222,8 +227,11 @@ void _send_events() {
 // Interface
 //==============================================================================
 static void _init(get_api_fce_t get_engine_api) {
-    MAP_INIT(to_mpack_fce_t, &_G.to_mpack, memsys_main_allocator());
-    eventstream_create(&_G.eventstream, memsys_main_allocator());
+    MemSysApiV1 = *(struct MemSysApiV1*)get_engine_api(MEMORY_API_ID, 0);
+    TaskApiV1 = *(struct TaskApiV1*)get_engine_api(TASK_API_ID, 0);
+
+    MAP_INIT(to_mpack_fce_t, &_G.to_mpack, MemSysApiV1.main_allocator());
+    eventstream_create(&_G.eventstream, MemSysApiV1.main_allocator());
 
     _register_to_mpack(EVENT_SCOPE, _scopeevent_to_mpack);
     _register_to_mpack(EVENT_RECORD_FLOAT, _recordfloat_to_mpack);
@@ -311,7 +319,7 @@ void developsys_leave_scope(const char *name,
 
     struct scope_event ev = {
             .name = {0},
-            .worker_id = taskmanager_worker_id(),
+            .worker_id = TaskApiV1.worker_id(),
             .start = scope_data.start,
             .duration = ((float) (cel_get_perf_counter() - scope_data.start_timer) / cel_get_perf_freq()) * 1000.0f,
             .depth = _scope_depth,

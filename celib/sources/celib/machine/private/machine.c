@@ -43,7 +43,7 @@ int machine_init(int stage) {
 
     _G = (struct G) {0};
 
-    eventstream_create(&_G.eventstream, memsys_main_allocator());
+    eventstream_create(&_G.eventstream, _memsys_main_allocator());
 
     machine_register_part("sdl", sdl_init, sdl_shutdown, sdl_process);
     machine_register_part("sdl_keyboard", sdl_keyboard_init, sdl_keyboard_shutdown, sdl_keyboard_process);
