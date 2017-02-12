@@ -9,6 +9,7 @@
 #include "celib/containers/array.h"
 #include "celib/types.h"
 #include "celib/filesystem/vio_types.h"
+#include "engine/config/cvar.h"
 
 //==============================================================================
 // Filesystem Interface
@@ -165,7 +166,7 @@ struct ResourceApiV1 {
                                   u32 max_len,
                                   const char *name);
 
-    void (*compiler_create_build_dir)();
+    void (*compiler_create_build_dir)(struct ConfigApiV1 config);
 
     const char *(*compiler_get_core_dir)();
 

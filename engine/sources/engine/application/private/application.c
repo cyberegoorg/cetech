@@ -89,6 +89,7 @@ static struct ResourceApiV1 ResourceApiV1;
 static struct PackageApiV1 PackageApiV1;
 static struct TaskApiV1 TaskApiV1;
 static struct LuaSysApiV1 LuaSysApiV1;
+static struct ConfigApiV1 ConfigApiV1;
 
 int application_init(int argc,
                      const char **argv) {
@@ -102,24 +103,14 @@ int application_init(int argc,
     log_debug(LOG_WHERE, "Init (global size: %lu)", sizeof(struct G));
 
     memsys_init(4 * 1024 * 1024);
-    _init_static_plugins();
+
+    ADD_STATIC_PLUGIN(memsys);
+    ADD_STATIC_PLUGIN(config);
     cvar_init();
+
+    _init_static_plugins();
+
     plugin_load_dirs("./bin");
-
-    _G.config.boot_pkg = cvar_new_str("core.boot_pkg", "Boot package", "boot");
-    _G.config.boot_script = cvar_new_str("core.boot_script", "Boot script", "lua/boot");
-
-    _G.config.screen_x = cvar_new_int("screen.x", "Screen width", 1024);
-    _G.config.screen_y = cvar_new_int("screen.y", "Screen height", 768);
-    _G.config.fullscreen = cvar_new_int("screen.fullscreen", "Fullscreen", 0);
-
-    _G.config.daemon = cvar_new_int("daemon", "Daemon mode", 0);
-    _G.config.compile = cvar_new_int("compile", "Comple", 0);
-    _G.config.continue_ = cvar_new_int("continue", "Continue after compile", 0);
-    _G.config.wait = cvar_new_int("wait", "Wait for client", 0);
-    _G.config.wid = cvar_new_int("wid", "Wid", 0);
-
-
     plugin_call_init_cvar();
     machine_init(0);
 
@@ -130,24 +121,40 @@ int application_init(int argc,
     PackageApiV1 = *((struct PackageApiV1 *) plugin_get_engine_api(PACKAGE_API_ID, 0));
     TaskApiV1 = *((struct TaskApiV1 *) plugin_get_engine_api(TASK_API_ID, 0));
     LuaSysApiV1 = *((struct LuaSysApiV1 *) plugin_get_engine_api(LUA_API_ID, 0));
+    ConfigApiV1 = *((struct ConfigApiV1 *) plugin_get_engine_api(CONFIG_API_ID, 0));
+
+    _G.config.boot_pkg = ConfigApiV1.new_str("core.boot_pkg", "Boot package", "boot");
+    _G.config.boot_script = ConfigApiV1.new_str("core.boot_script", "Boot script", "lua/boot");
+
+    _G.config.screen_x = ConfigApiV1.new_int("screen.x", "Screen width", 1024);
+    _G.config.screen_y = ConfigApiV1.new_int("screen.y", "Screen height", 768);
+    _G.config.fullscreen = ConfigApiV1.new_int("screen.fullscreen", "Fullscreen", 0);
+
+    _G.config.daemon = ConfigApiV1.new_int("daemon", "Daemon mode", 0);
+    _G.config.compile = ConfigApiV1.new_int("compile", "Comple", 0);
+    _G.config.continue_ = ConfigApiV1.new_int("continue", "Continue after compile", 0);
+    _G.config.wait = ConfigApiV1.new_int("wait", "Wait for client", 0);
+    _G.config.wid = ConfigApiV1.new_int("wid", "Wid", 0);
+
 
     // Cvar stage
 
-    cvar_parse_core_args(_G.args);
-    if (cvar_get_int(_G.config.compile)) {
-        ResourceApiV1.compiler_create_build_dir();
-        cvar_compile_global();
+    ConfigApiV1.parse_core_args(_G.args);
+    if (ConfigApiV1.get_int(_G.config.compile)) {
+        ResourceApiV1.compiler_create_build_dir(ConfigApiV1);
+        ConfigApiV1.compile_global();
     }
 
-    cvar_load_global();
+    ConfigApiV1.load_global();
 
-    if (!cvar_parse_args(_G.args)) {
+    if (!ConfigApiV1.parse_args(_G.args)) {
         return 0;
     }
 
-    cvar_log_all();
+    ConfigApiV1.log_all();
 
     plugin_call_init();
+
     machine_init(1);
 
 
@@ -171,11 +178,11 @@ int application_shutdown() {
 }
 
 static void _boot_stage() {
-    stringid64_t boot_pkg = stringid64_from_string(cvar_get_string(_G.config.boot_pkg));
+    stringid64_t boot_pkg = stringid64_from_string(ConfigApiV1.get_string(_G.config.boot_pkg));
     stringid64_t pkg = stringid64_from_string("package");
 
     // TODO: remove, this must be done by boot_package and load in boot_script
-    //if (!cvar_get_int(_G.config.daemon)) {
+    //if (!ConfigApiV1.get_int(_G.config.daemon)) {
     stringid64_t core_pkg = stringid64_from_string("core");
     ResourceApiV1.load_now(pkg, &core_pkg, 1);
     PackageApiV1.load(core_pkg);
@@ -186,19 +193,19 @@ static void _boot_stage() {
     PackageApiV1.load(boot_pkg);
     PackageApiV1.flush(boot_pkg);
 
-    stringid64_t boot_script = stringid64_from_string(cvar_get_string(_G.config.boot_script));
+    stringid64_t boot_script = stringid64_from_string(ConfigApiV1.get_string(_G.config.boot_script));
     LuaSysApiV1.execute_boot_script(boot_script);
 }
 
 
 static void _boot_unload() {
-    stringid64_t boot_pkg = stringid64_from_string(cvar_get_string(_G.config.boot_pkg));
+    stringid64_t boot_pkg = stringid64_from_string(ConfigApiV1.get_string(_G.config.boot_pkg));
     stringid64_t pkg = stringid64_from_string("package");
 
     PackageApiV1.unload(boot_pkg);
     ResourceApiV1.unload(pkg, &boot_pkg, 1);
 
-    //if (!cvar_get_int(_G.config.daemon)) {
+    //if (!ConfigApiV1.get_int(_G.config.daemon)) {
     stringid64_t core_pkg = stringid64_from_string("core");
     ResourceApiV1.load_now(pkg, &core_pkg, 1);
     PackageApiV1.load(core_pkg);
@@ -214,27 +221,27 @@ void application_start() {
     ResourceApiV1.set_autoload(0);
 #endif
 
-    if (cvar_get_int(_G.config.compile)) {
+    if (ConfigApiV1.get_int(_G.config.compile)) {
         ResourceApiV1.compiler_compile_all();
 
-        if (!cvar_get_int(_G.config.continue_)) {
+        if (!ConfigApiV1.get_int(_G.config.continue_)) {
             return;
         }
     }
 
-    if (!cvar_get_int(_G.config.daemon)) {
-        intptr_t wid = cvar_get_int(_G.config.wid);
+    if (!ConfigApiV1.get_int(_G.config.daemon)) {
+        intptr_t wid = ConfigApiV1.get_int(_G.config.wid);
 
         char title[128] = {0};
-        snprintf(title, CEL_ARRAY_LEN(title), "cetech - %s", cvar_get_string(_G.config.boot_script));
+        snprintf(title, CEL_ARRAY_LEN(title), "cetech - %s", ConfigApiV1.get_string(_G.config.boot_script));
 
         if (wid == 0) {
             _G.main_window = cel_window_new(
                     title,
                     WINDOWPOS_UNDEFINED,
                     WINDOWPOS_UNDEFINED,
-                    cvar_get_int(_G.config.screen_x), cvar_get_int(_G.config.screen_y),
-                    cvar_get_int(_G.config.fullscreen) ? WINDOW_FULLSCREEN : WINDOW_NOFLAG
+                    ConfigApiV1.get_int(_G.config.screen_x), ConfigApiV1.get_int(_G.config.screen_y),
+                    ConfigApiV1.get_int(_G.config.fullscreen) ? WINDOW_FULLSCREEN : WINDOW_NOFLAG
             );
         } else {
             _G.main_window = cel_window_new_from((void *) wid);
@@ -279,7 +286,7 @@ void application_start() {
         _G.game->update(dt);
 
         if (frame_time_accum >= frame_time) {
-            if (!cvar_get_int(_G.config.daemon)) {
+            if (!ConfigApiV1.get_int(_G.config.daemon)) {
                 struct scope_data render_sd = DevelopSystemApiV1.enter_scope("Game::render()");
                 _G.game->render();
                 DevelopSystemApiV1.leave_scope("Game::render()", render_sd);

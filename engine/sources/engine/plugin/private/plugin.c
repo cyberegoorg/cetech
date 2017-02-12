@@ -211,6 +211,8 @@ void plugin_call_init() {
 }
 
 void plugin_call_init_cvar() {
+    struct ConfigApiV1 ConfigApiV1 = *(struct ConfigApiV1*)plugin_get_engine_api(CONFIG_API_ID, 0);
+
     for (size_t i = 0; i < MAX_PLUGINS; ++i) {
         if (!_G.used[i] || !_G.plugin_api[i]->init_cvar) {
             continue;

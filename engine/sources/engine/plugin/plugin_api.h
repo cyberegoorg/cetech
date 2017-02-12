@@ -2,9 +2,7 @@
 #define CETECH_PLUGIN_API_H
 
 #include <stdio.h>
-
-#include "engine/config/config_api.h"
-
+#include "engine/config/cvar.h"
 
 enum {
     PLUGIN_EXPORT_API_ID = 1,

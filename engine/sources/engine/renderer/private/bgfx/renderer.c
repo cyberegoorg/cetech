@@ -7,7 +7,6 @@
 #include <engine/renderer/mesh_renderer.h>
 #include <engine/develop/console_server.h>
 #include <engine/application/application.h>
-#include <engine/config/types.h>
 #include <engine/config/cvar.h>
 #include <engine/plugin/plugin_api.h>
 #include "celib/window/window.h"
@@ -60,16 +59,18 @@ static int _cmd_resize(mpack_node_t args,
 static struct ConsoleServerApiV1 ConsoleServerApiV1;
 static struct MeshApiV1 MeshApiV1;
 static struct CameraApiV1 CameraApiV1;
+static struct ConfigApiV1 ConfigApiV1;
 
 static void _init(get_api_fce_t get_engine_api) {
     ConsoleServerApiV1 = *((struct ConsoleServerApiV1 *) get_engine_api(CONSOLE_SERVER_API_ID, 0));
     MeshApiV1 = *((struct MeshApiV1 *) get_engine_api(MESH_API_ID, 0));
     CameraApiV1 = *((struct CameraApiV1 *) get_engine_api(CAMERA_API_ID, 0));
+    ConfigApiV1 = *((struct ConfigApiV1 *) get_engine_api(CONFIG_API_ID, 0));
 
     _G = (struct G) {0};
 
-    cvar_t daemon = cvar_find("daemon");
-    if (!cvar_get_int(daemon)) {
+    cvar_t daemon = ConfigApiV1.find("daemon");
+    if (!ConfigApiV1.get_int(daemon)) {
         texture_resource_init();
         shader_resource_init();
         material_resource_init();
@@ -80,8 +81,8 @@ static void _init(get_api_fce_t get_engine_api) {
 }
 
 static void _shutdown() {
-    cvar_t daemon = cvar_find("daemon");
-    if (!cvar_get_int(daemon)) {
+    cvar_t daemon = ConfigApiV1.find("daemon");
+    if (!ConfigApiV1.get_int(daemon)) {
         texture_resource_shutdown();
         shader_resource_shutdown();
         material_resource_shutdown();

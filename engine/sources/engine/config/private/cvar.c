@@ -58,6 +58,51 @@ static struct G {
 
 static struct MemSysApiV1 MemSysApiV1;
 
+void cvar_load_global();
+
+void cvar_compile_global();
+
+int cvar_parse_core_args(struct args args);
+
+int cvar_parse_args(struct args args);
+
+cvar_t cvar_find(const char *name);
+
+cvar_t cvar_find_or_create(const char *name,
+                           int *new);
+
+cvar_t cvar_new_float(const char *name,
+                      const char *desc,
+                      float f);
+
+cvar_t cvar_new_int(const char *name,
+                    const char *desc,
+                    int i);
+
+cvar_t cvar_new_str(const char *name,
+                    const char *desc,
+                    const char *s);
+
+float cvar_get_float(cvar_t var);
+
+int cvar_get_int(cvar_t var);
+
+const char *cvar_get_string(cvar_t var);
+
+enum cvar_type cvar_get_type(cvar_t var);
+
+void cvar_set_float(cvar_t var,
+                    float f);
+
+void cvar_set_int(cvar_t var,
+                  int i);
+
+void cvar_set_string(cvar_t var,
+                     const char *s);
+
+void cvar_log_all();
+
+
 //==============================================================================
 // Privates
 //==============================================================================
@@ -105,44 +150,7 @@ static void _reload_end(get_api_fce_t get_engine_api,
 }
 
 
-void *config_get_plugin_api(int api,
-                            int version) {
 
-    if (api == PLUGIN_EXPORT_API_ID && version == 0) {
-        static struct plugin_api_v0 plugin = {0};
-
-        plugin.init = _init;
-        plugin.shutdown = _shutdown;
-        plugin.reload_begin = _reload_begin;
-        plugin.reload_end = _reload_end;
-
-        return &plugin;
-    } else if (api == CONFIG_API_ID && version == 0) {
-        static struct ConfigApiV1 api_v1 = {
-                .load_global = cvar_load_global,
-                .compile_global = cvar_compile_global,
-                .parse_core_args = cvar_parse_core_args,
-                .parse_args = cvar_parse_args,
-                .find = cvar_find,
-                .find_or_create = cvar_find_or_create,
-                .new_float = cvar_new_float,
-                .new_int = cvar_new_int,
-                .new_str = cvar_new_str,
-                .get_float = cvar_get_float,
-                .get_int = cvar_get_int,
-                .get_string = cvar_get_string,
-                .get_type  = cvar_get_type,
-                .set_float = cvar_set_float,
-                .set_int = cvar_set_int,
-                .set_string = cvar_set_string,
-                .log_all = cvar_log_all,
-        };
-
-        return &api_v1;
-    }
-
-    return 0;
-}
 
 //==============================================================================
 // Interface
@@ -189,6 +197,22 @@ void cvar_compile_global() {
     CEL_DEALLOCATE(MemSysApiV1.main_allocator(), data);
 }
 
+
+cvar_t cvar_find(const char *name) {
+    for (u64 i = 1; i < MAX_VARIABLES; ++i) {
+        if (_G.name[i][0] == '\0') {
+            continue;
+        }
+
+        if (cel_strcmp(_G.name[i], name) != 0) {
+            continue;
+        }
+
+        return make_cvar(i);
+    }
+
+    return make_cvar(0);
+}
 
 struct foreach_config_data {
     char *root_name;
@@ -246,6 +270,8 @@ void foreach_config_clb(yaml_node_t key,
         }
     }
 }
+
+
 
 void cvar_load_global() {
     char build_dir[1024] = {0};
@@ -362,21 +388,7 @@ int cvar_parse_core_args(struct args args) {
     return 1;
 }
 
-cvar_t cvar_find(const char *name) {
-    for (u64 i = 1; i < MAX_VARIABLES; ++i) {
-        if (_G.name[i][0] == '\0') {
-            continue;
-        }
 
-        if (cel_strcmp(_G.name[i], name) != 0) {
-            continue;
-        }
-
-        return make_cvar(i);
-    }
-
-    return make_cvar(0);
-}
 
 cvar_t cvar_find_or_create(const char *name,
                            int *new) {
@@ -516,4 +528,43 @@ void cvar_log_all() {
                 break;
         }
     }
+}
+
+void *config_get_plugin_api(int api,
+                            int version) {
+
+    if (api == PLUGIN_EXPORT_API_ID && version == 0) {
+        static struct plugin_api_v0 plugin = {0};
+
+        plugin.init = _init;
+        plugin.shutdown = _shutdown;
+        plugin.reload_begin = _reload_begin;
+        plugin.reload_end = _reload_end;
+
+        return &plugin;
+    } else if (api == CONFIG_API_ID && version == 0) {
+        static struct ConfigApiV1 api_v1 = {
+                .load_global = cvar_load_global,
+                .compile_global = cvar_compile_global,
+                .parse_core_args = cvar_parse_core_args,
+                .parse_args = cvar_parse_args,
+                .find = cvar_find,
+                .find_or_create = cvar_find_or_create,
+                .new_float = cvar_new_float,
+                .new_int = cvar_new_int,
+                .new_str = cvar_new_str,
+                .get_float = cvar_get_float,
+                .get_int = cvar_get_int,
+                .get_string = cvar_get_string,
+                .get_type  = cvar_get_type,
+                .set_float = cvar_set_float,
+                .set_int = cvar_set_int,
+                .set_string = cvar_set_string,
+                .log_all = cvar_log_all,
+        };
+
+        return &api_v1;
+    }
+
+    return 0;
 }

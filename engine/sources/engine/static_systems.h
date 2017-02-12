@@ -4,8 +4,6 @@
 #include "engine/plugin/plugin.h"
 
 void _init_static_plugins() {
-    ADD_STATIC_PLUGIN(memsys);
-    ADD_STATIC_PLUGIN(config);
     ADD_STATIC_PLUGIN(task);
 
     ADD_STATIC_PLUGIN(filesystem);

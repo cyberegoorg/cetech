@@ -73,6 +73,7 @@ struct G {
 static struct MemSysApiV1 MemSysApiV1;
 static struct ConsoleServerApiV1 ConsoleServerApiV1;
 static struct FilesystemApiV1 FilesystemApiV1;
+static struct ConfigApiV1 ConfigApiV1;
 
 void resource_set_autoload(int enable);
 
@@ -226,18 +227,19 @@ static void _init(get_api_fce_t get_engine_api) {
     ConsoleServerApiV1 = *((struct ConsoleServerApiV1 *) get_engine_api(CONSOLE_SERVER_API_ID, 0));
     MemSysApiV1 = *(struct MemSysApiV1 *) get_engine_api(MEMORY_API_ID, 0);
     FilesystemApiV1 = *(struct FilesystemApiV1 *) get_engine_api(FILESYSTEM_API_ID, 0);
+    ConfigApiV1 = *(struct ConfigApiV1 *) get_engine_api(CONFIG_API_ID, 0);
 
     ARRAY_INIT(resource_data, &_G.resource_data, MemSysApiV1.main_allocator());
     ARRAY_INIT(resource_callbacks_t, &_G.resource_callbacks, MemSysApiV1.main_allocator());
     MAP_INIT(u32, &_G.type_map, MemSysApiV1.main_allocator());
 
-    _G.config.build_dir = cvar_find("build");
+    _G.config.build_dir = ConfigApiV1.find("build");
 
 
     char build_dir_full[4096] = {0};
     cel_path_join(build_dir_full,
                   CEL_ARRAY_LEN(build_dir_full),
-                  cvar_get_string(_G.config.build_dir),
+                  ConfigApiV1.get_string(_G.config.build_dir),
                   application_platform());
 
     FilesystemApiV1.filesystem_map_root_dir(stringid64_from_string("build"), build_dir_full);

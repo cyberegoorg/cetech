@@ -53,6 +53,7 @@ static struct G {
 
 static struct MemSysApiV1 MemSysApiV1;
 static struct TaskApiV1 TaskApiV1;
+static struct ConfigApiV1 ConfigApiV1;
 
 static __thread u8 _stream_buffer[64 * 1024] = {0};
 static __thread u32 _stream_buffer_size = 0;
@@ -229,6 +230,7 @@ void _send_events() {
 static void _init(get_api_fce_t get_engine_api) {
     MemSysApiV1 = *(struct MemSysApiV1 *) get_engine_api(MEMORY_API_ID, 0);
     TaskApiV1 = *(struct TaskApiV1 *) get_engine_api(TASK_API_ID, 0);
+    ConfigApiV1 = *(struct ConfigApiV1 *) get_engine_api(CONFIG_API_ID, 0);
 
     MAP_INIT(to_mpack_fce_t, &_G.to_mpack, MemSysApiV1.main_allocator());
     eventstream_create(&_G.eventstream, MemSysApiV1.main_allocator());
@@ -246,7 +248,7 @@ static void _init(get_api_fce_t get_engine_api) {
         log_error(LOG_WHERE, "Could not create nanomsg socket: %s", nn_strerror(errno));
         //return 0;
     }
-    addr = cvar_get_string(_G.cv_pub_addr);
+    addr = ConfigApiV1.get_string(_G.cv_pub_addr);
 
     log_debug(LOG_WHERE, "PUB address: %s", addr);
 
@@ -260,7 +262,7 @@ static void _init(get_api_fce_t get_engine_api) {
 
 static void _init_cvar(struct ConfigApiV1 config) {
     _G = (struct G) {0};
-    _G.cv_pub_addr = cvar_new_str("develop.pub.addr", "Console server rpc addr", "ws://*:4447");
+    _G.cv_pub_addr = config.new_str("develop.pub.addr", "Console server rpc addr", "ws://*:4447");
 }
 
 static void _shutdown() {
