@@ -7,7 +7,7 @@
 #include "celib/math/vec3f.h"
 #include "celib/math/vec4f.h"
 
-#include "engine/luasys/luasys.h"
+#include "luasys.h"
 
 static int _cel_vec2f_add(lua_State *L) {
     cel_vec2f_t *a = luasys_to_vec2f(L, 1);

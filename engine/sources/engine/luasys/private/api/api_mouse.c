@@ -1,6 +1,6 @@
 #include <celib/math/types.h>
 #include <engine/plugin/plugin.h>
-#include "engine/luasys/luasys.h"
+#include "../luasys.h"
 #include "engine/input/mouse.h"
 #include <engine/plugin/plugin_api.h>
 

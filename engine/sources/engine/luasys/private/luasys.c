@@ -10,14 +10,14 @@
 #include <celib/math/types.h>
 #include <celib/math/vec2f.h>
 
-#include "engine/luasys/luasys.h"
 #include "engine/develop/console_server.h"
 #include "engine/plugin/plugin.h"
 
 #include "vectors.h"
 #include "quaternion.h"
 #include "matrix.h"
-#include "../types.h"
+#include "luasys.h"
+#include "engine/luasys/luasys.h"
 #include <engine/plugin/plugin_api.h>
 
 //==============================================================================

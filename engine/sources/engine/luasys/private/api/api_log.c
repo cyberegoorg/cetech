@@ -1,5 +1,5 @@
-#include "engine/luasys/luasys.h"
 #include <engine/plugin/plugin_api.h>
+#include "../luasys.h"
 
 #define API_NAME "Log"
 

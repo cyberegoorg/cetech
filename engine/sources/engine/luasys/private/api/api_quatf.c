@@ -1,6 +1,6 @@
 
 #include <celib/math/quatf.h>
-#include "engine/luasys/luasys.h"
+#include "../luasys.h"
 #include <engine/plugin/plugin_api.h>
 
 #define API_NAME "Quatf"

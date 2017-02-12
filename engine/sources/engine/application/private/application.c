@@ -88,6 +88,7 @@ static struct RendererApiV1 RendererApiV1;
 static struct ResourceApiV1 ResourceApiV1;
 static struct PackageApiV1 PackageApiV1;
 static struct TaskApiV1 TaskApiV1;
+static struct LuaSysApiV1 LuaSysApiV1;
 
 int application_init(int argc,
                      const char **argv) {
@@ -102,8 +103,8 @@ int application_init(int argc,
 
     memsys_init(4 * 1024 * 1024);
     _init_static_plugins();
-
     cvar_init();
+    plugin_load_dirs("./bin");
 
     _G.config.boot_pkg = cvar_new_str("core.boot_pkg", "Boot package", "boot");
     _G.config.boot_script = cvar_new_str("core.boot_script", "Boot script", "lua/boot");
@@ -119,7 +120,6 @@ int application_init(int argc,
     _G.config.wid = cvar_new_int("wid", "Wid", 0);
 
 
-    plugin_load_dirs("./bin");
     plugin_call_init_cvar();
     machine_init(0);
 
@@ -129,6 +129,7 @@ int application_init(int argc,
     ResourceApiV1 = *((struct ResourceApiV1 *) plugin_get_engine_api(RESOURCE_API_ID, 0));
     PackageApiV1 = *((struct PackageApiV1 *) plugin_get_engine_api(PACKAGE_API_ID, 0));
     TaskApiV1 = *((struct TaskApiV1 *) plugin_get_engine_api(TASK_API_ID, 0));
+    LuaSysApiV1 = *((struct LuaSysApiV1 *) plugin_get_engine_api(LUA_API_ID, 0));
 
     // Cvar stage
 
@@ -186,7 +187,7 @@ static void _boot_stage() {
     PackageApiV1.flush(boot_pkg);
 
     stringid64_t boot_script = stringid64_from_string(cvar_get_string(_G.config.boot_script));
-    luasys_execute_boot_script(boot_script);
+    LuaSysApiV1.execute_boot_script(boot_script);
 }
 
 
@@ -245,7 +246,7 @@ void application_start() {
     _boot_stage();
 
     u64 last_tick = cel_get_perf_counter();
-    _G.game = luasys_get_game_callbacks();
+    _G.game = LuaSysApiV1.get_game_callbacks();
 
     if (!_G.game->init()) {
         log_error(LOG_WHERE, "Could not init game.");

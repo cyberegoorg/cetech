@@ -1,7 +1,7 @@
 
 #include <engine/world/transform.h>
 #include <celib/math/vec3f.h>
-#include "engine/luasys/luasys.h"
+#include "../luasys.h"
 #include <engine/plugin/plugin_api.h>
 
 #define API_NAME "Vec3f"

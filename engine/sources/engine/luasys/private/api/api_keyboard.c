@@ -1,5 +1,5 @@
 #include <engine/plugin/plugin.h>
-#include "engine/luasys/luasys.h"
+#include "../luasys.h"
 #include "engine/input/keyboard.h"
 #include <engine/plugin/plugin_api.h>
 
