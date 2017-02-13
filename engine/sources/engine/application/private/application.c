@@ -181,17 +181,16 @@ static void _boot_stage() {
     stringid64_t boot_pkg = stringid64_from_string(ConfigApiV1.get_string(_G.config.boot_pkg));
     stringid64_t pkg = stringid64_from_string("package");
 
-    // TODO: remove, this must be done by boot_package and load in boot_script
-    //if (!ConfigApiV1.get_int(_G.config.daemon)) {
     stringid64_t core_pkg = stringid64_from_string("core");
-    ResourceApiV1.load_now(pkg, &core_pkg, 1);
+    stringid64_t resources[] = {core_pkg, boot_pkg};
+
+    ResourceApiV1.load_now(pkg, resources, 2);
+
     PackageApiV1.load(core_pkg);
     PackageApiV1.flush(core_pkg);
-    //}
-
-    ResourceApiV1.load_now(pkg, &boot_pkg, 1);
     PackageApiV1.load(boot_pkg);
     PackageApiV1.flush(boot_pkg);
+
 
     stringid64_t boot_script = stringid64_from_string(ConfigApiV1.get_string(_G.config.boot_script));
     LuaSysApiV1.execute_boot_script(boot_script);
@@ -200,18 +199,15 @@ static void _boot_stage() {
 
 static void _boot_unload() {
     stringid64_t boot_pkg = stringid64_from_string(ConfigApiV1.get_string(_G.config.boot_pkg));
+    stringid64_t core_pkg = stringid64_from_string("core");
     stringid64_t pkg = stringid64_from_string("package");
 
+    stringid64_t resources[] = {core_pkg, boot_pkg};
+
     PackageApiV1.unload(boot_pkg);
-    ResourceApiV1.unload(pkg, &boot_pkg, 1);
+    PackageApiV1.unload(core_pkg);
 
-    //if (!ConfigApiV1.get_int(_G.config.daemon)) {
-    stringid64_t core_pkg = stringid64_from_string("core");
-    ResourceApiV1.load_now(pkg, &core_pkg, 1);
-    PackageApiV1.load(core_pkg);
-    PackageApiV1.flush(core_pkg);
-    //}
-
+    ResourceApiV1.unload(pkg, resources, 2);
 }
 
 void application_start() {
