@@ -10,7 +10,7 @@ set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -rdynamic")
 
 
 include_directories(engine/sources)
-include_directories(celib/sources)
+include_directories(cebase/sources)
 
 add_definitions(-DCETECH_STATIC_PLUGINS)
 add_definitions(-DCELIB_USE_SDL)
@@ -74,24 +74,24 @@ set(SOURCE_FILES
         ########################################################################
         # CELIB: Memory
         ########################################################################
-        celib/sources/celib/memory/private/allocator.c
-        celib/sources/celib/memory/private/allocator_malloc.c
-        celib/sources/celib/memory/private/allocator_scratch.c
+        cebase/sources/celib/memory/private/allocator.c
+        cebase/sources/celib/memory/private/allocator_malloc.c
+        cebase/sources/celib/memory/private/allocator_scratch.c
         engine/sources/engine/memory/private/memsys.c
 
 
         ########################################################################
         # CELIB: Log
         #######################################################################
-        celib/sources/celib/log/private/stdout_handler.c
-        celib/sources/celib/log/private/nanomsg_handler.c
-        celib/sources/celib/log/private/logdb_handler.c
-        celib/sources/celib/log/private/log_system.c
+        cebase/sources/celib/log/private/stdout_handler.c
+        cebase/sources/celib/log/private/nanomsg_handler.c
+        cebase/sources/celib/log/private/logdb_handler.c
+        cebase/sources/celib/log/private/log_system.c
 
         ########################################################################
         # CELIB: File
         ########################################################################
-        celib/sources/celib/filesystem/private/sdl_vio.c
+        cebase/sources/celib/filesystem/private/sdl_vio.c
 
         ########################################################################
         # CELIB: Crypto
@@ -104,9 +104,9 @@ set(SOURCE_FILES
         ########################################################################
         # CELIB: Yaml
         ########################################################################
-        celib/sources/celib/yaml/private/yaml.cc
+        cebase/sources/celib/yaml/private/yaml.cc
 
-        celib/sources/celib/log/private/log_system.c
+        cebase/sources/celib/log/private/log_system.c
         engine/sources/engine/config/private/cvar.c
 
         ########################################################################
@@ -152,11 +152,11 @@ set(SOURCE_FILES
         engine/sources/engine/world/private/world.c
         engine/sources/engine/world/private/level.c
 
-        celib/sources/celib/machine/private/machine.c
-        celib/sources/celib/machine/private/sdl2/sdl_mouse.c
-        celib/sources/celib/machine/private/sdl2/sdl_keyboard.c
-        celib/sources/celib/machine/private/sdl2/sdl_gamepad.c
-        celib/sources/celib/machine/private/sdl2/sdl_machine.c
+        cebase/sources/celib/machine/private/machine.c
+        cebase/sources/celib/machine/private/sdl2/sdl_mouse.c
+        cebase/sources/celib/machine/private/sdl2/sdl_keyboard.c
+        cebase/sources/celib/machine/private/sdl2/sdl_gamepad.c
+        cebase/sources/celib/machine/private/sdl2/sdl_machine.c
 
         engine/sources/engine/input/private/keyboard.c
         engine/sources/engine/input/private/mouse.c
