@@ -6,6 +6,9 @@
 #include <engine/entcom/entcom.h>
 #include <engine/world/scenegraph.h>
 #include <engine/memory/memsys.h>
+#include <engine/plugin/plugin_api.h>
+#include "engine/memory/memsys.h"
+
 
 ARRAY_PROTOTYPE(cel_vec3f_t)
 
@@ -39,21 +42,23 @@ static struct G {
     MAP_T(world_data_t) world;
 } _G = {0};
 
+static struct MemSysApiV1 MemSysApiV1;
+static struct WorldApiV1 WorldApiV1;
 
 static void _new_world(world_t world) {
     world_data_t data = {0};
 
-    MAP_INIT(u32, &data.ent_idx_map, memsys_main_allocator());
+    MAP_INIT(u32, &data.ent_idx_map, MemSysApiV1.main_allocator());
 
-    ARRAY_INIT(u32, &data.first_child, memsys_main_allocator());
-    ARRAY_INIT(u32, &data.next_sibling, memsys_main_allocator());
-    ARRAY_INIT(u32, &data.parent, memsys_main_allocator());
+    ARRAY_INIT(u32, &data.first_child, MemSysApiV1.main_allocator());
+    ARRAY_INIT(u32, &data.next_sibling, MemSysApiV1.main_allocator());
+    ARRAY_INIT(u32, &data.parent, MemSysApiV1.main_allocator());
 
-    ARRAY_INIT(stringid64_t, &data.name, memsys_main_allocator());
-    ARRAY_INIT(cel_vec3f_t, &data.position, memsys_main_allocator());
-    ARRAY_INIT(cel_quatf_t, &data.rotation, memsys_main_allocator());
-    ARRAY_INIT(cel_vec3f_t, &data.scale, memsys_main_allocator());
-    ARRAY_INIT(cel_mat44f_t, &data.world_matrix, memsys_main_allocator());
+    ARRAY_INIT(stringid64_t, &data.name, MemSysApiV1.main_allocator());
+    ARRAY_INIT(cel_vec3f_t, &data.position, MemSysApiV1.main_allocator());
+    ARRAY_INIT(cel_quatf_t, &data.rotation, MemSysApiV1.main_allocator());
+    ARRAY_INIT(cel_vec3f_t, &data.scale, MemSysApiV1.main_allocator());
+    ARRAY_INIT(cel_mat44f_t, &data.world_matrix, MemSysApiV1.main_allocator());
 
     MAP_SET(world_data_t, &_G.world, world.h.h, data);
 }
@@ -86,26 +91,26 @@ static void _on_world_destroy(world_t world) {
     _destroy_world(world);
 }
 
-int scenegraph_init(int stage) {
-    if (stage == 0) {
-        return 1;
-    }
 
+static void _init(get_api_fce_t get_engine_api) {
     _G = (struct G) {0};
 
-    MAP_INIT(world_data_t, &_G.world, memsys_main_allocator());
+    MemSysApiV1 = *(struct MemSysApiV1 *) get_engine_api(MEMORY_API_ID, 0);
+    WorldApiV1 = *(struct WorldApiV1 *) get_engine_api(WORLD_API_ID, 0);
 
-    world_register_callback((world_callbacks_t) {.on_created=_on_world_create, .on_destroy=_on_world_destroy});
+    MAP_INIT(world_data_t, &_G.world, MemSysApiV1.main_allocator());
 
-    return 1;
+    WorldApiV1.register_callback((world_callbacks_t) {.on_created=_on_world_create, .on_destroy=_on_world_destroy});
+
 }
 
-void scenegraph_shutdown() {
+static void _shutdown() {
 
     MAP_DESTROY(world_data_t, &_G.world);
 
     _G = (struct G) {0};
 }
+
 
 int scenegraph_is_valid(scene_node_t transform) {
     return transform.idx != UINT32_MAX;
@@ -245,7 +250,7 @@ scene_node_t scenegraph_create(world_t world,
                                u32 count) {
     world_data_t *data = _get_world_data(world);
 
-    scene_node_t *nodes = CEL_ALLOCATE(memsys_main_allocator(), scene_node_t, count);
+    scene_node_t *nodes = CEL_ALLOCATE(MemSysApiV1.main_allocator(), scene_node_t, count);
 
     for (int i = 0; i < count; ++i) {
         u32 idx = (u32) ARRAY_SIZE(&data->position);
@@ -293,7 +298,7 @@ scene_node_t scenegraph_create(world_t world,
 
     scene_node_t root = nodes[0];
     MAP_SET(u32, &data->ent_idx_map, entity.h.h, root.idx);
-    CEL_DEALLOCATE(memsys_main_allocator(), nodes);
+    CEL_DEALLOCATE(MemSysApiV1.main_allocator(), nodes);
     return root;
 }
 
@@ -344,4 +349,54 @@ scene_node_t scenegraph_node_by_name(world_t world,
     scene_node_t root = scenegraph_get_root(world, entity);
 
     return _scenegraph_node_by_name(data, root, name);
+}
+
+void *scenegraph_get_plugin_api(int api,
+                                int version) {
+
+    switch (api) {
+        case PLUGIN_EXPORT_API_ID:
+            switch (version) {
+                case 0: {
+                    static struct plugin_api_v0 plugin = {0};
+
+                    plugin.init = _init;
+                    plugin.shutdown = _shutdown;
+
+                    return &plugin;
+                }
+
+                default:
+                    return NULL;
+            };
+        case SCENEGRAPH_API_ID:
+            switch (version) {
+                case 0: {
+                    static struct SceneGprahApiV1 api = {0};
+
+                    //api.scenegraph_transform = scenegraph_transform;
+                    api.is_valid = scenegraph_is_valid;
+                    api.get_position = scenegraph_get_position;
+                    api.get_rotation = scenegraph_get_rotation;
+                    api.get_scale = scenegraph_get_scale;
+                    api.get_world_matrix = scenegraph_get_world_matrix;
+                    api.set_position = scenegraph_set_position;
+                    api.set_rotation = scenegraph_set_rotation;
+                    api.set_scale = scenegraph_set_scale;
+                    api.has = scenegraph_has;
+                    api.get_root = scenegraph_get_root;
+                    api.create = scenegraph_create;
+                    api.link = scenegraph_link;
+                    api.node_by_name = scenegraph_node_by_name;
+
+                    return &api;
+                }
+
+                default:
+                    return NULL;
+            };
+
+        default:
+            return NULL;
+    }
 }

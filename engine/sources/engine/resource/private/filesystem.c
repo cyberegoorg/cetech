@@ -4,11 +4,13 @@
 
 #include <celib/filesystem/path.h>
 #include "celib/filesystem/filesystem.h"
-#include <engine/memory/memsys.h>
+#include <engine/plugin/plugin_api.h>
 
 #include "celib/filesystem/vio.h"
 
 #include "engine/resource/filesystem.h"
+#include "engine/memory/memsys.h"
+#include "../types.h"
 
 
 //==============================================================================
@@ -37,24 +39,17 @@ static struct G {
 } FilesystemGlobals = {0};
 
 
-//==============================================================================
-// Interface
-//==============================================================================
+static struct MemSysApiV1 MemSysApiV1;
 
-int filesystem_init(int stage) {
-    if (stage == 0) {
-        return 1;
-    }
-
-
+static void _init(get_api_fce_t get_engine_api) {
     _G = (struct G) {0};
 
-    log_debug(LOG_WHERE, "Init");
+    MemSysApiV1 = *(struct MemSysApiV1 *) get_engine_api(MEMORY_API_ID, 0);
 
-    return 1;
+    log_debug(LOG_WHERE, "Init");
 }
 
-void filesystem_shutdown() {
+static void _shutdown() {
     log_debug(LOG_WHERE, "Shutdown");
 
     for (int i = 0; i < MAX_ROOTS; ++i) {
@@ -62,11 +57,16 @@ void filesystem_shutdown() {
             continue;
         }
 
-        CEL_DEALLOCATE(memsys_main_allocator(), _G.rootmap.path[i]);
+        CEL_DEALLOCATE(MemSysApiV1.main_allocator(), _G.rootmap.path[i]);
     }
 
     _G = (struct G) {0};
 }
+
+
+//==============================================================================
+// Interface
+//==============================================================================
 
 void filesystem_map_root_dir(stringid64_t root,
                              const char *base_path) {
@@ -76,7 +76,7 @@ void filesystem_map_root_dir(stringid64_t root,
         }
 
         _G.rootmap.id[i] = root;
-        _G.rootmap.path[i] = cel_strdup(base_path, memsys_main_allocator());
+        _G.rootmap.path[i] = cel_strdup(base_path, MemSysApiV1.main_allocator());
         break;
     }
 }
@@ -111,7 +111,7 @@ struct vio *filesystem_open(stringid64_t root,
         return NULL;
     }
 
-    struct vio *file = cel_vio_from_file(fullm_path, mode, memsys_main_allocator());
+    struct vio *file = cel_vio_from_file(fullm_path, mode, MemSysApiV1.main_allocator());
 
     if (!file) {
         log_error(LOG_WHERE, "Could not load file %s", fullm_path);
@@ -165,4 +165,52 @@ time_t filesystem_get_file_mtime(stringid64_t root,
     }
 
     return cel_file_mtime(fullm_path);
+}
+
+
+void *filesystem_get_plugin_api(int api,
+                                int version) {
+
+    switch (api) {
+        case PLUGIN_EXPORT_API_ID:
+            switch (version) {
+                case 0: {
+                    static struct plugin_api_v0 plugin = {0};
+
+                    plugin.init = _init;
+                    plugin.shutdown = _shutdown;
+
+                    return &plugin;
+                }
+
+                default:
+                    return NULL;
+            };
+
+        case FILESYSTEM_API_ID:
+            switch (version) {
+                case 0: {
+                    static struct FilesystemApiV1 api = {0};
+
+                    api.filesystem_get_root_dir = filesystem_get_root_dir;
+                    api.filesystem_open = filesystem_open;
+                    api.filesystem_map_root_dir = filesystem_map_root_dir;
+                    api.filesystem_close = filesystem_close;
+                    api.filesystem_listdir = filesystem_listdir;
+                    api.filesystem_listdir_free = filesystem_listdir_free;
+                    api.filesystem_create_directory = filesystem_create_directory;
+                    api.filesystem_get_file_mtime = filesystem_get_file_mtime;
+                    api.filesystem_get_fullpath = filesystem_get_fullpath;
+
+                    return &api;
+                }
+
+                default:
+                    return NULL;
+            };
+
+        default:
+            return NULL;
+    }
+
 }

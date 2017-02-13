@@ -3,10 +3,11 @@
 //==============================================================================
 
 #include <celib/math/types.h>
+#include <engine/plugin/plugin_api.h>
 #include "celib/machine/machine.h"
 #include "celib/string/string.h"
 
-#include "engine/input/input.h"
+#include "engine/input/mouse.h"
 
 #include "mousebtnstr.h"
 
@@ -30,30 +31,19 @@ static struct G {
 } _G = {0};
 
 
-//==============================================================================
-// Interface
-//==============================================================================
-
-
-int mouse_init(int stage) {
-    if (stage == 0) {
-        return 1;
-    }
-
+static void _init(get_api_fce_t get_engine_api) {
     _G = (struct G) {0};
 
     log_debug(LOG_WHERE, "Init");
-
-    return 1;
 }
 
-void mouse_shutdown() {
-    _G = (struct G) {0};
-
+static void _shutdown() {
     log_debug(LOG_WHERE, "Shutdown");
+
+    _G = (struct G) {0};
 }
 
-void mouse_process() {
+static void _update() {
     struct event_header *event = machine_event_begin();
 
     memory_copy(_G.last_state, _G.state, MOUSE_BTN_MAX);
@@ -91,6 +81,14 @@ void mouse_process() {
     }
 }
 
+
+
+
+
+//==============================================================================
+// Interface
+//==============================================================================
+
 u32 mouse_button_index(const char *button_name) {
     for (u32 i = 0; i < MOUSE_BTN_MAX; ++i) {
         if (!_btn_to_str[i]) {
@@ -113,19 +111,22 @@ const char *mouse_button_name(const u32 button_index) {
     return _btn_to_str[button_index];
 }
 
-int mouse_button_state(const u32 button_index) {
+int mouse_button_state(u32 idx,
+                       const u32 button_index) {
     CEL_ASSERT(LOG_WHERE, (button_index >= 0) && (button_index < MOUSE_BTN_MAX));
 
     return _G.state[button_index];
 }
 
-int mouse_button_pressed(const u32 button_index) {
+int mouse_button_pressed(u32 idx,
+                         const u32 button_index) {
     CEL_ASSERT(LOG_WHERE, (button_index >= 0) && (button_index < MOUSE_BTN_MAX));
 
     return _G.state[button_index] && !_G.last_state[button_index];
 }
 
-int mouse_button_released(const u32 button_index) {
+int mouse_button_released(u32 idx,
+                          const u32 button_index) {
     CEL_ASSERT(LOG_WHERE, (button_index >= 0) && (button_index < MOUSE_BTN_MAX));
 
     return !_G.state[button_index] && _G.last_state[button_index];
@@ -153,7 +154,8 @@ u32 mouse_axis_index(const char *axis_name) {
     return 0;
 }
 
-cel_vec2f_t mouse_axis(const u32 axis_index) {
+cel_vec2f_t mouse_axis(u32 idx,
+                       const u32 axis_index) {
     CEL_ASSERT(LOG_WHERE, (axis_index >= 0) && (axis_index < MOUSE_AXIS_MAX));
 
     switch (axis_index) {
@@ -170,4 +172,34 @@ cel_vec2f_t mouse_axis(const u32 axis_index) {
 
 void mouse_set_cursor_pos(cel_vec2f_t pos) {
 
+}
+
+void *mouse_get_plugin_api(int api,
+                           int version) {
+
+    if (api == PLUGIN_EXPORT_API_ID && version == 0) {
+        static struct plugin_api_v0 plugin = {0};
+
+        plugin.init = _init;
+        plugin.shutdown = _shutdown;
+        plugin.update = _update;
+
+        return &plugin;
+
+    } else if (api == MOUSE_API_ID && version == 0) {
+        static struct MouseApiV1 api_v1 = {
+                .button_index = mouse_button_index,
+                .button_name = mouse_button_name,
+                .button_state = mouse_button_state,
+                .button_pressed = mouse_button_pressed,
+                .button_released = mouse_button_released,
+                .axis_index = mouse_axis_index,
+                .axis_name = mouse_axis_name,
+                .axis = mouse_axis,
+        };
+
+        return &api_v1;
+    }
+
+    return 0;
 }

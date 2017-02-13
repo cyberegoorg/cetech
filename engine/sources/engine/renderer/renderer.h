@@ -13,20 +13,20 @@
 // Interface
 //==============================================================================
 
-int renderer_init(int stage);
-
-void renderer_shutdown();
-
-void renderer_create(cel_window_t window);
-
-void renderer_set_debug(int debug);
-
-cel_vec2f_t renderer_get_size();
 
 typedef int viewport_t;
 
-void renderer_render_world(world_t world,
-                           camera_t camera,
-                           viewport_t viewport);
+struct RendererApiV1 {
+    void (*create)(cel_window_t window);
+
+    void (*set_debug)(int debug);
+
+    cel_vec2f_t (*get_size)();
+
+    void (*render_world)(world_t world,
+                         camera_t camera,
+                         viewport_t viewport);
+};
+
 
 #endif //CETECH_RENDERER_H

@@ -9,6 +9,9 @@
 #include <engine/world/transform.h>
 
 #include <engine/memory/memsys.h>
+#include <engine/plugin/plugin_api.h>
+#include "engine/memory/memsys.h"
+
 
 struct camera_data {
     f32 near;
@@ -26,7 +29,13 @@ typedef struct {
 
 } world_data_t;
 
+static struct MemSysApiV1 MemSysApiV1;
+static struct EntComSystemApiV1 EntComSystemApiV1;
+static struct RendererApiV1 RendererApiV1;
+static struct TransformApiV1 TransformApiV1;
+
 ARRAY_PROTOTYPE(world_data_t)
+
 
 MAP_PROTOTYPE(world_data_t)
 
@@ -41,12 +50,12 @@ static struct G {
 static void _new_world(world_t world) {
     world_data_t data = {0};
 
-    MAP_INIT(u32, &data.ent_idx_map, memsys_main_allocator());
+    MAP_INIT(u32, &data.ent_idx_map, MemSysApiV1.main_allocator());
 
-    ARRAY_INIT(entity_t, &data.entity, memsys_main_allocator());
-    ARRAY_INIT(f32, &data.near, memsys_main_allocator());
-    ARRAY_INIT(f32, &data.far, memsys_main_allocator());
-    ARRAY_INIT(f32, &data.fov, memsys_main_allocator());
+    ARRAY_INIT(entity_t, &data.entity, MemSysApiV1.main_allocator());
+    ARRAY_INIT(f32, &data.near, MemSysApiV1.main_allocator());
+    ARRAY_INIT(f32, &data.far, MemSysApiV1.main_allocator());
+    ARRAY_INIT(f32, &data.fov, MemSysApiV1.main_allocator());
 
     MAP_SET(world_data_t, &_G.world, world.h.h, data);
 }
@@ -100,6 +109,14 @@ void _destroyer(world_t world,
     }
 }
 
+
+camera_t camera_create(world_t world,
+                       entity_t entity,
+                       f32 near,
+                       f32 far,
+                       f32 fov);
+
+
 void _spawner(world_t world,
               entity_t *ents,
               u32 *cents,
@@ -118,33 +135,31 @@ void _spawner(world_t world,
 }
 
 
-int camera_init(int stage) {
-    if (stage == 0) {
-        return 1;
-    }
-
+static void _init(get_api_fce_t get_engine_api) {
+    MemSysApiV1 = *((struct MemSysApiV1 *) get_engine_api(MEMORY_API_ID, 0));
+    EntComSystemApiV1 = *((struct EntComSystemApiV1 *) get_engine_api(ENTCOM_API_ID, 0));
+    RendererApiV1 = *((struct RendererApiV1 *) get_engine_api(RENDERER_API_ID, 0));
+    TransformApiV1 = *((struct TransformApiV1 *) get_engine_api(TRANSFORM_API_ID, 0));
 
     _G = (struct G) {0};
 
-    MAP_INIT(world_data_t, &_G.world, memsys_main_allocator());
+    MAP_INIT(world_data_t, &_G.world, MemSysApiV1.main_allocator());
 
     _G.type = stringid64_from_string("camera");
 
-    component_register_compiler(_G.type, _camera_component_compiler, 10);
-    component_register_type(_G.type, (struct component_clb) {
+    EntComSystemApiV1.component_register_compiler(_G.type, _camera_component_compiler, 10);
+    EntComSystemApiV1.component_register_type(_G.type, (struct component_clb) {
             .spawner=_spawner, .destroyer=_destroyer,
             .on_world_create=_on_world_create, .on_world_destroy=_on_world_destroy
     });
-
-    return 1;
 }
 
-void camera_shutdown() {
-
+static void _shutdown() {
     MAP_DESTROY(world_data_t, &_G.world);
 
     _G = (struct G) {0};
 }
+
 
 int camera_is_valid(camera_t camera) {
     return camera.idx != UINT32_MAX;
@@ -158,9 +173,9 @@ void camera_get_project_view(world_t world,
     world_data_t *world_data = _get_world_data(world);
 
 
-    cel_vec2f_t size = renderer_get_size(); // TODO, to arg... or viewport?
+    cel_vec2f_t size = RendererApiV1.get_size(); // TODO, to arg... or viewport?
     entity_t e = ARRAY_AT(&world_data->entity, camera.idx);
-    transform_t t = transform_get(world, e);
+    transform_t t = TransformApiV1.get(world, e);
 
     f32 fov = ARRAY_AT(&world_data->fov, camera.idx);
     f32 near = ARRAY_AT(&world_data->near, camera.idx);
@@ -168,7 +183,7 @@ void camera_get_project_view(world_t world,
 
     cel_mat44f_set_perspective_fov(proj, fov, size.x / size.y, near, far);
 
-    cel_mat44f_t *w = transform_get_world_matrix(world, t);
+    cel_mat44f_t *w = TransformApiV1.get_world_matrix(world, t);
     cel_mat44f_inverse(view, w);
 }
 
@@ -204,4 +219,45 @@ camera_t camera_create(world_t world,
     ARRAY_PUSH_BACK(f32, &data->fov, fov);
 
     return (camera_t) {.idx = idx};
+}
+
+void *camera_get_plugin_api(int api,
+                            int version) {
+
+    switch (api) {
+        case PLUGIN_EXPORT_API_ID:
+            switch (version) {
+                case 0: {
+                    static struct plugin_api_v0 plugin = {0};
+
+                    plugin.init = _init;
+                    plugin.shutdown = _shutdown;
+
+                    return &plugin;
+                }
+
+                default:
+                    return NULL;
+            };
+        case CAMERA_API_ID:
+            switch (version) {
+                case 0: {
+                    static struct CameraApiV1 api = {0};
+
+                    api.is_valid = camera_is_valid;
+                    api.get_project_view = camera_get_project_view;
+                    api.has = camera_has;
+                    api.get = camera_get;
+                    api.create = camera_create;
+
+                    return &api;
+                }
+
+                default:
+                    return NULL;
+            };
+
+        default:
+            return NULL;
+    }
 }

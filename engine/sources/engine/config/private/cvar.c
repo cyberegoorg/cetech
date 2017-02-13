@@ -10,6 +10,8 @@
 #include <celib/filesystem/path.h>
 #include <celib/yaml/yaml.h>
 #include <engine/memory/memsys.h>
+#include <engine/plugin/plugin_api.h>
+#include <engine/plugin/plugin.h>
 
 //==============================================================================
 // Defines
@@ -54,6 +56,52 @@ static struct G {
     stringid64_t type;
 } _G = {0};
 
+static struct MemSysApiV1 MemSysApiV1;
+
+void cvar_load_global();
+
+void cvar_compile_global();
+
+int cvar_parse_core_args(struct args args);
+
+int cvar_parse_args(struct args args);
+
+cvar_t cvar_find(const char *name);
+
+cvar_t cvar_find_or_create(const char *name,
+                           int *new);
+
+cvar_t cvar_new_float(const char *name,
+                      const char *desc,
+                      float f);
+
+cvar_t cvar_new_int(const char *name,
+                    const char *desc,
+                    int i);
+
+cvar_t cvar_new_str(const char *name,
+                    const char *desc,
+                    const char *s);
+
+float cvar_get_float(cvar_t var);
+
+int cvar_get_int(cvar_t var);
+
+const char *cvar_get_string(cvar_t var);
+
+enum cvar_type cvar_get_type(cvar_t var);
+
+void cvar_set_float(cvar_t var,
+                    float f);
+
+void cvar_set_int(cvar_t var,
+                  int i);
+
+void cvar_set_string(cvar_t var,
+                     const char *s);
+
+void cvar_log_all();
+
 
 //==============================================================================
 // Privates
@@ -66,7 +114,7 @@ void _dealloc_allm_string() {
             continue;
         }
 
-        CEL_DEALLOCATE(memsys_main_allocator(), _G.values[i].s);
+        CEL_DEALLOCATE(MemSysApiV1.main_allocator(), _G.values[i].s);
     }
 }
 
@@ -85,12 +133,33 @@ cvar_t _find_first_free() {
     return make_cvar(0);
 }
 
+static void _init(get_api_fce_t get_engine_api) {
+
+}
+
+static void _shutdown() {
+}
+
+static void *_reload_begin(get_api_fce_t get_engine_api) {
+    return NULL;
+}
+
+static void _reload_end(get_api_fce_t get_engine_api,
+                        void *data) {
+    _init(get_engine_api);
+}
+
+
+
+
 //==============================================================================
 // Interface
 //==============================================================================
 
 int cvar_init() {
     log_debug(LOG_WHERE, "Init");
+
+    MemSysApiV1 = *(struct MemSysApiV1 *) plugin_get_engine_api(MEMORY_API_ID, 0);
 
     _G.type = stringid64_from_string("config");
 
@@ -108,24 +177,42 @@ void cvar_compile_global() {
     char source_path[1024] = {0};
     char build_path[1024] = {0};
 
-    resource_compiler_get_build_dir(build_dir, CEL_ARRAY_LEN(build_dir), application_platform());
-    cel_path_join(build_path, CEL_ARRAY_LEN(build_path), build_dir, "global.config");
-    cel_path_join(source_path, CEL_ARRAY_LEN(source_path), resource_compiler_get_source_dir(), "global.config");
+    struct ResourceApiV1 ResourceApiV1 = *(struct ResourceApiV1 *) plugin_get_engine_api(RESOURCE_API_ID, 0);
 
-    struct vio *source_vio = cel_vio_from_file(source_path, VIO_OPEN_READ, memsys_main_allocator());
-    char *data = CEL_ALLOCATE(memsys_main_allocator(), char, cel_vio_size(source_vio));
+    ResourceApiV1.compiler_get_build_dir(build_dir, CEL_ARRAY_LEN(build_dir), application_platform());
+    cel_path_join(build_path, CEL_ARRAY_LEN(build_path), build_dir, "global.config");
+    cel_path_join(source_path, CEL_ARRAY_LEN(source_path), ResourceApiV1.compiler_get_source_dir(), "global.config");
+
+    struct vio *source_vio = cel_vio_from_file(source_path, VIO_OPEN_READ, MemSysApiV1.main_allocator());
+    char *data = CEL_ALLOCATE(MemSysApiV1.main_allocator(), char, cel_vio_size(source_vio));
 
     size_t size = (size_t) cel_vio_size(source_vio);
     cel_vio_read(source_vio, data, sizeof(char), size);
     cel_vio_close(source_vio);
 
-    struct vio *build_vio = cel_vio_from_file(build_path, VIO_OPEN_WRITE, memsys_main_allocator());
+    struct vio *build_vio = cel_vio_from_file(build_path, VIO_OPEN_WRITE, MemSysApiV1.main_allocator());
     cel_vio_write(build_vio, data, sizeof(char), size);
     cel_vio_close(build_vio);
 
-    CEL_DEALLOCATE(memsys_main_allocator(), data);
+    CEL_DEALLOCATE(MemSysApiV1.main_allocator(), data);
 }
 
+
+cvar_t cvar_find(const char *name) {
+    for (u64 i = 1; i < MAX_VARIABLES; ++i) {
+        if (_G.name[i][0] == '\0') {
+            continue;
+        }
+
+        if (cel_strcmp(_G.name[i], name) != 0) {
+            continue;
+        }
+
+        return make_cvar(i);
+    }
+
+    return make_cvar(0);
+}
 
 struct foreach_config_data {
     char *root_name;
@@ -184,21 +271,24 @@ void foreach_config_clb(yaml_node_t key,
     }
 }
 
+
+
 void cvar_load_global() {
     char build_dir[1024] = {0};
     char source_path[1024] = {0};
 
-    resource_compiler_get_build_dir(build_dir, CEL_ARRAY_LEN(build_dir), application_platform());
+    struct ResourceApiV1 ResourceApiV1 = *(struct ResourceApiV1 *) plugin_get_engine_api(RESOURCE_API_ID, 0);
+    ResourceApiV1.compiler_get_build_dir(build_dir, CEL_ARRAY_LEN(build_dir), application_platform());
     cel_path_join(source_path, CEL_ARRAY_LEN(source_path), build_dir, "global.config");
 
-    struct vio *source_vio = cel_vio_from_file(source_path, VIO_OPEN_READ, memsys_main_allocator());
-    char *data = CEL_ALLOCATE(memsys_main_allocator(), char, cel_vio_size(source_vio));
+    struct vio *source_vio = cel_vio_from_file(source_path, VIO_OPEN_READ, MemSysApiV1.main_allocator());
+    char *data = CEL_ALLOCATE(MemSysApiV1.main_allocator(), char, cel_vio_size(source_vio));
     cel_vio_read(source_vio, data, cel_vio_size(source_vio), cel_vio_size(source_vio));
     cel_vio_close(source_vio);
 
     yaml_document_t h;
     yaml_node_t root = yaml_load_str(data, &h);
-    CEL_DEALLOCATE(memsys_main_allocator(), data);
+    CEL_DEALLOCATE(MemSysApiV1.main_allocator(), data);
 
     struct foreach_config_data config_data = {
             .root_name = NULL
@@ -298,21 +388,7 @@ int cvar_parse_core_args(struct args args) {
     return 1;
 }
 
-cvar_t cvar_find(const char *name) {
-    for (u64 i = 1; i < MAX_VARIABLES; ++i) {
-        if (_G.name[i][0] == '\0') {
-            continue;
-        }
 
-        if (cel_strcmp(_G.name[i], name) != 0) {
-            continue;
-        }
-
-        return make_cvar(i);
-    }
-
-    return make_cvar(0);
-}
 
 cvar_t cvar_find_or_create(const char *name,
                            int *new) {
@@ -385,7 +461,7 @@ cvar_t cvar_new_str(const char *name,
     if (new) {
         cel_str_set(_G.name[find.idx], name);
         _G.types[find.idx] = CV_STRING;
-        _G.values[find.idx].s = cel_strdup(s, memsys_main_allocator());
+        _G.values[find.idx].s = cel_strdup(s, MemSysApiV1.main_allocator());
     }
 
     cel_str_set(_G.desc[find.idx], desc);
@@ -424,10 +500,10 @@ void cvar_set_string(cvar_t var,
     char *_s = _G.values[var.idx].s;
 
     if (_s != NULL) {
-        allocator_deallocate(memsys_main_allocator(), _s);
+        allocator_deallocate(MemSysApiV1.main_allocator(), _s);
     }
 
-    _G.values[var.idx].s = cel_strdup(s, memsys_main_allocator());
+    _G.values[var.idx].s = cel_strdup(s, MemSysApiV1.main_allocator());
 }
 
 void cvar_log_all() {
@@ -452,4 +528,43 @@ void cvar_log_all() {
                 break;
         }
     }
+}
+
+void *config_get_plugin_api(int api,
+                            int version) {
+
+    if (api == PLUGIN_EXPORT_API_ID && version == 0) {
+        static struct plugin_api_v0 plugin = {0};
+
+        plugin.init = _init;
+        plugin.shutdown = _shutdown;
+        plugin.reload_begin = _reload_begin;
+        plugin.reload_end = _reload_end;
+
+        return &plugin;
+    } else if (api == CONFIG_API_ID && version == 0) {
+        static struct ConfigApiV1 api_v1 = {
+                .load_global = cvar_load_global,
+                .compile_global = cvar_compile_global,
+                .parse_core_args = cvar_parse_core_args,
+                .parse_args = cvar_parse_args,
+                .find = cvar_find,
+                .find_or_create = cvar_find_or_create,
+                .new_float = cvar_new_float,
+                .new_int = cvar_new_int,
+                .new_str = cvar_new_str,
+                .get_float = cvar_get_float,
+                .get_int = cvar_get_int,
+                .get_string = cvar_get_string,
+                .get_type  = cvar_get_type,
+                .set_float = cvar_set_float,
+                .set_int = cvar_set_int,
+                .set_string = cvar_set_string,
+                .log_all = cvar_log_all,
+        };
+
+        return &api_v1;
+    }
+
+    return 0;
 }

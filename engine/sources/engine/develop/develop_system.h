@@ -4,10 +4,15 @@
 #include "celib/types.h"
 #include "celib/containers/eventstream.h"
 
+
 //==============================================================================
-// Typedefs
+// Interface
 //==============================================================================
 
+
+//==============================================================================
+// Develop system
+//==============================================================================
 
 enum {
     EVENT_NULL = 0,
@@ -37,38 +42,29 @@ struct scope_event {
     u32 worker_id;
 };
 
-//==============================================================================
-// Interface
-//==============================================================================
-
-
-int developsys_init(int stage);
-
-void developsys_shutdown();
-
-void developsys_update(float dt);
-
-#define developsys_push(type, event) _developsys_push((struct event_header*)(&event), type, sizeof(event))
-
-void _developsys_push(struct event_header *header,
-                      u32 type,
-                      u64 size);
-
-void developsys_push_record_float(const char *name,
-                                  float value);
-
-void developsys_push_record_int(const char *name,
-                                int value);
-
 struct scope_data {
+    const char* name;
     time_t start;
     u64 start_timer;
 };
 
-struct scope_data developsys_enter_scope(const char *name);
+#define developsys_push(type, event) _developsys_push((struct event_header*)(&event), type, sizeof(event))
 
-void developsys_leave_scope(const char *name,
-                            struct scope_data scope_data);
+struct DevelopSystemApiV1 {
+    void (*push)(struct event_header *header,
+                 u32 type,
+                 u64 size);
+
+    void (*push_record_float)(const char *name,
+                              float value);
+
+    void (*push_record_int)(const char *name,
+                            int value);
+
+    struct scope_data (*enter_scope)(const char *name);
+
+    void (*leave_scope)(struct scope_data scope_data);
+};
 
 
 #endif //CETECH_DEVELOP_SYSTEM_H

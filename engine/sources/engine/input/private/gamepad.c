@@ -3,7 +3,8 @@
 //==============================================================================
 
 #include <celib/math/types.h>
-#include <engine/input/input.h>
+#include <engine/input/gamepad.h>
+#include <engine/plugin/plugin_api.h>
 #include "celib/machine/machine.h"
 #include "celib/string/string.h"
 
@@ -29,15 +30,7 @@ static struct G {
 } _G = {0};
 
 
-//==============================================================================
-// Interface
-//==============================================================================
-
-int gamepad_init(int stage) {
-    if (stage == 0) {
-        return 1;
-    }
-
+static void _init(get_api_fce_t get_engine_api) {
     _G = (struct G) {0};
 
     log_debug(LOG_WHERE, "Init");
@@ -46,16 +39,15 @@ int gamepad_init(int stage) {
         _G.active[i] = machine_gamepad_is_active(i);
     }
 
-    return 1;
 }
 
-void gamepad_shutdown() {
-    _G = (struct G) {0};
-
+static void _shutdown() {
     log_debug(LOG_WHERE, "Shutdown");
+
+    _G = (struct G) {0};
 }
 
-void gamepad_process() {
+static void _update() {
     struct event_header *event = machine_event_begin();
 
     memory_copy(_G.last_state, _G.state, sizeof(int) * GAMEPAD_BTN_MAX * GAMEPAD_MAX);
@@ -95,8 +87,17 @@ void gamepad_process() {
     }
 }
 
-int gamepad_is_active(gamepad_t gamepad) {
-    return _G.active[gamepad.idx];
+
+
+
+
+//==============================================================================
+// Interface
+//==============================================================================
+
+
+int gamepad_is_active(u32 idx) {
+    return _G.active[idx];
 }
 
 u32 gamepad_button_index(const char *button_name) {
@@ -121,25 +122,25 @@ const char *gamepad_button_name(const u32 button_index) {
     return _btn_to_str[button_index];
 }
 
-int gamepad_button_state(gamepad_t gamepad,
+int gamepad_button_state(u32 idx,
                          const u32 button_index) {
     CEL_ASSERT(LOG_WHERE, (button_index >= 0) && (button_index < GAMEPAD_BTN_MAX));
 
-    return _G.state[gamepad.idx][button_index];
+    return _G.state[idx][button_index];
 }
 
-int gamepad_button_pressed(gamepad_t gamepad,
+int gamepad_button_pressed(u32 idx,
                            const u32 button_index) {
     CEL_ASSERT(LOG_WHERE, (button_index >= 0) && (button_index < GAMEPAD_BTN_MAX));
 
-    return _G.state[gamepad.idx][button_index] && !_G.last_state[gamepad.idx][button_index];
+    return _G.state[idx][button_index] && !_G.last_state[idx][button_index];
 }
 
-int gamepad_button_released(gamepad_t gamepad,
+int gamepad_button_released(u32 idx,
                             const u32 button_index) {
     CEL_ASSERT(LOG_WHERE, (button_index >= 0) && (button_index < GAMEPAD_BTN_MAX));
 
-    return !_G.state[gamepad.idx][button_index] && _G.last_state[gamepad.idx][button_index];
+    return !_G.state[idx][button_index] && _G.last_state[idx][button_index];
 }
 
 const char *gamepad_axis_name(const u32 axis_index) {
@@ -164,16 +165,47 @@ u32 gamepad_axis_index(const char *axis_name) {
     return 0;
 }
 
-cel_vec2f_t gamepad_axis(gamepad_t gamepad,
+cel_vec2f_t gamepad_axis(u32 idx,
                          const u32 axis_index) {
     CEL_ASSERT(LOG_WHERE, (axis_index >= 0) && (axis_index < GAMEPAD_AXIX_MAX));
 
-    return _G.position[gamepad.idx][axis_index];
+    return _G.position[idx][axis_index];
 }
 
-void gamepad_play_rumble(gamepad_t gamepad,
+void gamepad_play_rumble(u32 idx,
                          float strength,
                          u32 length) {
-    machine_gamepad_play_rumble(gamepad.idx, strength, length);
+    machine_gamepad_play_rumble(idx, strength, length);
 }
 
+void *gamepad_get_plugin_api(int api,
+                             int version) {
+
+    if (api == PLUGIN_EXPORT_API_ID && version == 0) {
+        static struct plugin_api_v0 plugin = {0};
+
+        plugin.init = _init;
+        plugin.shutdown = _shutdown;
+        plugin.update = _update;
+
+        return &plugin;
+
+    } else if (api == GAMEPAD_API_ID && version == 0) {
+        static struct GamepadApiV1 api_v1 = {
+                .is_active = gamepad_is_active,
+                .button_index = gamepad_button_index,
+                .button_name = gamepad_button_name,
+                .button_state = gamepad_button_state,
+                .button_pressed = gamepad_button_pressed,
+                .button_released = gamepad_button_released,
+                .axis_index = gamepad_axis_index,
+                .axis_name = gamepad_axis_name,
+                .axis = gamepad_axis,
+                .play_rumble = gamepad_play_rumble,
+        };
+
+        return &api_v1;
+    }
+
+    return 0;
+}

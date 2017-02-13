@@ -5,7 +5,7 @@
 
 #include "celib/math/mat44f.h"
 
-#include "engine/luasys/luasys.h"
+#include "luasys.h"
 
 static int _cel_mat44f_mul(lua_State *L) {
     cel_mat44f_t *a = luasys_to_mat44f(L, 1);

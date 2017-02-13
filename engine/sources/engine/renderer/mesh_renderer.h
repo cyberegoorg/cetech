@@ -1,41 +1,40 @@
 #ifndef CETECH_MESH_RENDERER_H
 #define CETECH_MESH_RENDERER_H
 
-#include <celib/string/stringid.h>
-#include <engine/entcom/types.h>
+#include "celib/types.h"
+#include "engine/entcom/entcom.h"
+#include "engine/world/world.h"
 #include "engine/renderer/material.h"
 
 typedef struct {
     u32 idx;
 } mesh_t;
 
-int mesh_init(int stage);
+struct MeshApiV1 {
+    int (*is_valid)(mesh_t mesh);
 
-void mesh_shutdown();
+    int (*has)(world_t world,
+               entity_t entity);
 
-int mesh_is_valid(mesh_t mesh);
+    mesh_t (*get)(world_t world,
+                  entity_t entity);
 
-int mesh_has(world_t world,
-             entity_t entity);
+    mesh_t (*create)(world_t world,
+                     entity_t entity,
+                     stringid64_t scene,
+                     stringid64_t mesh,
+                     stringid64_t node,
+                     stringid64_t material);
 
-mesh_t mesh_get(world_t world,
-                entity_t entity);
+    material_t (*get_material)(world_t world,
+                               mesh_t mesh);
 
-mesh_t mesh_create(world_t world,
-                   entity_t entity,
-                   stringid64_t scene,
-                   stringid64_t mesh,
-                   stringid64_t node,
-                   stringid64_t material);
+    void (*set_material)(world_t world,
+                         mesh_t mesh,
+                         stringid64_t material);
 
-material_t mesh_get_material(world_t world,
-                             mesh_t mesh);
-
-void mesh_set_material(world_t world,
-                       mesh_t mesh,
-                       stringid64_t material);
-
-void mesh_render_all(world_t world);
+    void (*render_all)(world_t world);
+};
 
 
 #endif //CETECH_MESH_RENDERER_H

@@ -115,6 +115,7 @@ set(SOURCE_FILES
         engine/sources/engine/plugin/private/plugin.c
 
         engine/sources/engine/luasys/private/luasys.c
+        engine/sources/engine/luasys/private/api/api_plugin.c
         engine/sources/engine/luasys/private/api/api_keyboard.c
         engine/sources/engine/luasys/private/api/api_log.c
         engine/sources/engine/luasys/private/api/api_mouse.c

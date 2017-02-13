@@ -10,13 +10,15 @@
 #include <celib/math/types.h>
 #include <celib/math/vec2f.h>
 
-#include "engine/luasys/luasys.h"
 #include "engine/develop/console_server.h"
 #include "engine/plugin/plugin.h"
 
 #include "vectors.h"
 #include "quaternion.h"
 #include "matrix.h"
+#include "luasys.h"
+#include "engine/luasys/luasys.h"
+#include <engine/plugin/plugin_api.h>
 
 //==============================================================================
 // Defines
@@ -24,9 +26,7 @@
 
 #define LOG_WHERE "lua_system"
 
-#define REGISTER_LUA_API(name) \
-    void _register_lua_##name##_api();\
-    _register_lua_##name##_api();
+#define TEMP_VAR_COUNT 1024
 
 
 //==============================================================================
@@ -44,18 +44,21 @@ static struct G {
     lua_State *L;
     stringid64_t type_id;
 
-    cel_vec2f_t _temp_cel_vec2f_buffer[1024];
-    cel_vec3f_t _temp_cel_vec3f_buffer[1024];
-    cel_vec4f_t _temp_cel_vec4f_buffer[1024];
-    cel_mat44f_t _temp_cel_mat44f_buffer[1024];
-    cel_quatf_t _temp_quat_buffer[1024];
-
     u32 _temp_cel_vec2f_used;
     u32 _temp_cel_vec3f_used;
     u32 _temp_cel_vec4f_used;
     u32 _temp_cel_mat44f_used;
     u32 _temp_quat_used;
+
+    cel_vec2f_t _temp_cel_vec2f_buffer[TEMP_VAR_COUNT];
+    cel_vec3f_t _temp_cel_vec3f_buffer[TEMP_VAR_COUNT];
+    cel_vec4f_t _temp_cel_vec4f_buffer[TEMP_VAR_COUNT];
+    cel_mat44f_t _temp_cel_mat44f_buffer[TEMP_VAR_COUNT];
+    cel_quatf_t _temp_quat_buffer[TEMP_VAR_COUNT];
+
 } LuaGlobals = {0};
+
+struct ResourceApiV1 ResourceApiV1;
 
 
 //==============================================================================
@@ -66,7 +69,7 @@ static int require(lua_State *L) {
     const char *name = lua_tostring(L, 1);
     stringid64_t name_hash = stringid64_from_string(name);
 
-    struct lua_resource *resource = resource_get(_G.type_id, name_hash);
+    struct lua_resource *resource = ResourceApiV1.get(_G.type_id, name_hash);
 
     if (resource == NULL) {
         return 0;
@@ -201,8 +204,13 @@ static const struct game_callbacks _GameCallbacks = {
         .render = _game_render_clb
 };
 
-static void _register_all_api() {
+#define REGISTER_LUA_API(name) \
+    void _register_lua_##name##_api();\
+    _register_lua_##name##_api(get_engine_api);
+
+static void _register_all_api(get_api_fce_t get_engine_api) {
     REGISTER_LUA_API(log);
+    REGISTER_LUA_API(plugin);
     REGISTER_LUA_API(keyboard);
     REGISTER_LUA_API(mouse);
     REGISTER_LUA_API(gamepad);
@@ -576,7 +584,7 @@ int luasys_execute_string(const char *str) {
 }
 
 void luasys_execute_resource(stringid64_t name) {
-    struct lua_resource *resource = resource_get(_G.type_id, name);
+    struct lua_resource *resource = ResourceApiV1.get(_G.type_id, name);
     char *data = (char *) (resource + 1);
 
     luaL_loadbuffer(_G.L, data, resource->size, "<unknown>");
@@ -836,12 +844,14 @@ void _create_lightuserdata() {
     lua_pop(_G.L, 1);
 }
 
-int luasys_init(int stage) {
-    if (stage == 0) {
-        return 1;
-    }
+static struct ConsoleServerApiV1 ConsoleServerApiV1;
 
+static void _init(get_api_fce_t get_engine_api) {
     log_debug(LOG_WHERE, "Init");
+
+    ConsoleServerApiV1 = *((struct ConsoleServerApiV1 *) get_engine_api(CONSOLE_SERVER_API_ID, 0));
+    ResourceApiV1 = *(struct ResourceApiV1 *) plugin_get_engine_api(RESOURCE_API_ID, 0);
+
 
     _G.L = luaL_newstate();
     CEL_ASSERT(LOG_WHERE, _G.L != NULL);
@@ -868,21 +878,21 @@ int luasys_init(int stage) {
 
     _create_lightuserdata();
 
-    _register_all_api();
+    _register_all_api(get_engine_api);
 
     luasys_add_module_function("plugin", "reload", _reload_plugin);
-    consolesrv_register_command("lua_system.execute", _cmd_execute_string);
+    ConsoleServerApiV1.consolesrv_register_command("lua_system.execute", _cmd_execute_string);
 
-    resource_register_type(_G.type_id, lua_resource_callback);
-    resource_compiler_register(_G.type_id, _lua_compiler);
-
-    return 1;
+    ResourceApiV1.register_type(_G.type_id, lua_resource_callback);
+    ResourceApiV1.compiler_register(_G.type_id, _lua_compiler);
 }
 
-void luasys_shutdown() {
+static void _shutdown() {
     log_debug(LOG_WHERE, "Shutdown");
 
     lua_close(_G.L);
+
+    _G = (struct G) {0};
 }
 
 const struct game_callbacks *luasys_get_game_callbacks() {
@@ -937,4 +947,75 @@ void luasys_call_global(const char *func,
     }
 
     lua_pop(_state, -1);
+}
+
+void *luasys_get_plugin_api(int api,
+                            int version) {
+    switch (api) {
+        case PLUGIN_EXPORT_API_ID:
+            switch (version) {
+                case 0: {
+                    static struct plugin_api_v0 plugin = {0};
+
+                    plugin.init = _init;
+                    plugin.shutdown = _shutdown;
+
+                    return &plugin;
+                }
+
+                default:
+                    return NULL;
+            };
+        case LUA_API_ID:
+            switch (version) {
+                case 0: {
+                    static struct LuaSysApiV1 api = {0};
+
+                    //api.get_top = luasys_get_top;
+                    api.remove = luasys_remove;
+                    api.pop = luasys_pop;
+                    api.is_nil = luasys_is_nil;
+                    api.is_number = luasys_is_number;
+                    api.value_type = luasys_value_type;
+                    api.push_nil = luasys_push_nil;
+                    api.push_u64 = luasys_push_u64;
+                    api.push_handler = luasys_push_handler;
+                    api.push_int = luasys_push_int;
+                    api.push_bool = luasys_push_bool;
+                    api.push_float = luasys_push_float;
+                    api.push_string = luasys_push_string;
+                    api.to_bool = luasys_to_bool;
+                    api.to_int = luasys_to_int;
+                    api.to_f32 = luasys_to_f32;
+                    api.to_handler = luasys_to_handler;
+                    api.to_string = luasys_to_string;
+                    api.to_string_l = luasys_to_string_l;
+                    api.to_vec2f = luasys_to_vec2f;
+                    api.to_vec3f = luasys_to_vec3f;
+                    api.to_vec4f = luasys_to_vec4f;
+                    api.to_mat44f = luasys_to_mat44f;
+                    api.to_quat = luasys_to_quat;
+                    api.push_vec2f = luasys_push_vec2f;
+                    api.push_vec3f = luasys_push_vec3f;
+                    api.push_vec4f = luasys_push_vec4f;
+                    api.push_mat44f = luasys_push_mat44f;
+                    api.push_quat = luasys_push_quat;
+                    api.execute_string = luasys_execute_string;
+                    api.add_module_function = luasys_add_module_function;
+                    //api.add_module_constructor = luasys_add_module_constructor;
+                    api.execute_resource = luasys_execute_resource;
+                    api.get_game_callbacks = luasys_get_game_callbacks;
+                    api.execute_boot_script = luasys_execute_boot_script;
+                    api.call_global = luasys_call_global;
+
+                    return &api;
+                }
+
+                default:
+                    return NULL;
+            };
+
+        default:
+            return NULL;
+    }
 }

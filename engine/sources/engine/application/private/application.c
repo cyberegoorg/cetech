@@ -20,8 +20,11 @@
 #include <celib/thread/thread.h>
 #include <engine/plugin/plugin.h>
 #include <engine/memory/memsys.h>
+#include <engine/static_systems.h>
+#include <engine/input/keyboard.h>
+#include <engine/input/mouse.h>
+#include <engine/input/gamepad.h>
 
-#include "engine/input/input.h"
 #include "engine/develop/console_server.h"
 #include "engine/task/task.h"
 
@@ -56,11 +59,6 @@ static struct G {
     float dt;
 } ApplicationGlobals = {0};
 
-//==============================================================================
-// Systems
-//==============================================================================
-
-#include "engine/systems.h"
 
 //==============================================================================
 // Private
@@ -84,6 +82,15 @@ static int _cmd_wait(mpack_node_t args,
     return 0;
 }
 
+static struct ConsoleServerApiV1 ConsoleServerApiV1;
+static struct DevelopSystemApiV1 DevelopSystemApiV1;
+static struct RendererApiV1 RendererApiV1;
+static struct ResourceApiV1 ResourceApiV1;
+static struct PackageApiV1 PackageApiV1;
+static struct TaskApiV1 TaskApiV1;
+static struct LuaSysApiV1 LuaSysApiV1;
+static struct ConfigApiV1 ConfigApiV1;
+
 int application_init(int argc,
                      const char **argv) {
     _G = (struct G) {0};
@@ -96,76 +103,73 @@ int application_init(int argc,
     log_debug(LOG_WHERE, "Init (global size: %lu)", sizeof(struct G));
 
     memsys_init(4 * 1024 * 1024);
+
+    ADD_STATIC_PLUGIN(memsys);
+    ADD_STATIC_PLUGIN(config);
     cvar_init();
 
-    _G.config.boot_pkg = cvar_new_str("core.boot_pkg", "Boot package", "boot");
-    _G.config.boot_script = cvar_new_str("core.boot_script", "Boot script", "lua/boot");
+    _init_static_plugins();
 
-    _G.config.screen_x = cvar_new_int("screen.x", "Screen width", 1024);
-    _G.config.screen_y = cvar_new_int("screen.y", "Screen height", 768);
-    _G.config.fullscreen = cvar_new_int("screen.fullscreen", "Fullscreen", 0);
+    plugin_load_dirs("./bin");
+    plugin_call_init_cvar();
+    machine_init(0);
 
-    _G.config.daemon = cvar_new_int("daemon", "Daemon mode", 0);
-    _G.config.compile = cvar_new_int("compile", "Comple", 0);
-    _G.config.continue_ = cvar_new_int("continue", "Continue after compile", 0);
-    _G.config.wait = cvar_new_int("wait", "Wait for client", 0);
-    _G.config.wid = cvar_new_int("wid", "Wid", 0);
+    ConsoleServerApiV1 = *((struct ConsoleServerApiV1 *) plugin_get_engine_api(CONSOLE_SERVER_API_ID, 0));
+    DevelopSystemApiV1 = *((struct DevelopSystemApiV1 *) plugin_get_engine_api(DEVELOP_SERVER_API_ID, 0));
+    RendererApiV1 = *((struct RendererApiV1 *) plugin_get_engine_api(RENDERER_API_ID, 0));
+    ResourceApiV1 = *((struct ResourceApiV1 *) plugin_get_engine_api(RESOURCE_API_ID, 0));
+    PackageApiV1 = *((struct PackageApiV1 *) plugin_get_engine_api(PACKAGE_API_ID, 0));
+    TaskApiV1 = *((struct TaskApiV1 *) plugin_get_engine_api(TASK_API_ID, 0));
+    LuaSysApiV1 = *((struct LuaSysApiV1 *) plugin_get_engine_api(LUA_API_ID, 0));
+    ConfigApiV1 = *((struct ConfigApiV1 *) plugin_get_engine_api(CONFIG_API_ID, 0));
+
+    _G.config.boot_pkg = ConfigApiV1.new_str("core.boot_pkg", "Boot package", "boot");
+    _G.config.boot_script = ConfigApiV1.new_str("core.boot_script", "Boot script", "lua/boot");
+
+    _G.config.screen_x = ConfigApiV1.new_int("screen.x", "Screen width", 1024);
+    _G.config.screen_y = ConfigApiV1.new_int("screen.y", "Screen height", 768);
+    _G.config.fullscreen = ConfigApiV1.new_int("screen.fullscreen", "Fullscreen", 0);
+
+    _G.config.daemon = ConfigApiV1.new_int("daemon", "Daemon mode", 0);
+    _G.config.compile = ConfigApiV1.new_int("compile", "Comple", 0);
+    _G.config.continue_ = ConfigApiV1.new_int("continue", "Continue after compile", 0);
+    _G.config.wait = ConfigApiV1.new_int("wait", "Wait for client", 0);
+    _G.config.wid = ConfigApiV1.new_int("wid", "Wid", 0);
+
 
     // Cvar stage
-    for (int i = 0; i < STATIC_SYSTEMS_SIZE; ++i) {
-        if (!_SYSTEMS[i].init(0)) {
-            log_error(LOG_WHERE, "Could not init system \"%s\"", _SYSTEMS[i].name);
-            _G.init_error = 1;
-            return 0;
-        }
+
+    ConfigApiV1.parse_core_args(_G.args);
+    if (ConfigApiV1.get_int(_G.config.compile)) {
+        ResourceApiV1.compiler_create_build_dir(ConfigApiV1);
+        ConfigApiV1.compile_global();
     }
 
-    cvar_parse_core_args(_G.args);
-    if (cvar_get_int(_G.config.compile)) {
-        resource_compiler_create_build_dir();
-        cvar_compile_global();
-    }
-    plugin_load_dirs("./bin");
+    ConfigApiV1.load_global();
 
-    cvar_load_global();
-
-    if (!cvar_parse_args(_G.args)) {
+    if (!ConfigApiV1.parse_args(_G.args)) {
         return 0;
     }
 
-    cvar_log_all();
+    ConfigApiV1.log_all();
 
-    // main stage
-    for (int i = 0; i < STATIC_SYSTEMS_SIZE; ++i) {
-        if (!_SYSTEMS[i].init(1)) {
-            log_error(LOG_WHERE, "Could not init system \"%s\"", _SYSTEMS[i].name);
+    plugin_call_init();
 
-            for (i = i - 1; i >= 0; --i) {
-                _SYSTEMS[i].shutdown();
-            }
+    machine_init(1);
 
-            _G.init_error = 1;
-            return 0;
-        }
-    }
 
-    log_set_wid_clb(taskmanager_worker_id);
+    log_set_wid_clb(TaskApiV1.worker_id);
 
-    consolesrv_register_command("wait", _cmd_wait);
+    ConsoleServerApiV1.consolesrv_register_command("wait", _cmd_wait);
+
     return 1;
 }
 
 int application_shutdown() {
     log_debug(LOG_WHERE, "Shutdown");
 
-    if (!_G.init_error) {
-        for (int i = STATIC_SYSTEMS_SIZE - 1; i >= 0; --i) {
-            _SYSTEMS[i].shutdown();
-        }
-
-        cel_window_destroy(_G.main_window);
-    }
-
+    plugin_call_shutdown();
+    machine_shutdown();
     cvar_shutdown();
     memsys_shutdown();
     log_shutdown();
@@ -174,82 +178,78 @@ int application_shutdown() {
 }
 
 static void _boot_stage() {
-    stringid64_t boot_pkg = stringid64_from_string(cvar_get_string(_G.config.boot_pkg));
+    stringid64_t boot_pkg = stringid64_from_string(ConfigApiV1.get_string(_G.config.boot_pkg));
     stringid64_t pkg = stringid64_from_string("package");
 
-    // TODO: remove, this must be done by boot_package and load in boot_script
-    //if (!cvar_get_int(_G.config.daemon)) {
-        stringid64_t core_pkg = stringid64_from_string("core");
-        resource_load_now(pkg, &core_pkg, 1);
-        package_load(core_pkg);
-        package_flush(core_pkg);
-    //}
+    stringid64_t core_pkg = stringid64_from_string("core");
+    stringid64_t resources[] = {core_pkg, boot_pkg};
 
-    resource_load_now(pkg, &boot_pkg, 1);
-    package_load(boot_pkg);
-    package_flush(boot_pkg);
+    ResourceApiV1.load_now(pkg, resources, 2);
 
-    stringid64_t boot_script = stringid64_from_string(cvar_get_string(_G.config.boot_script));
-    luasys_execute_boot_script(boot_script);
+    PackageApiV1.load(core_pkg);
+    PackageApiV1.flush(core_pkg);
+    PackageApiV1.load(boot_pkg);
+    PackageApiV1.flush(boot_pkg);
+
+
+    stringid64_t boot_script = stringid64_from_string(ConfigApiV1.get_string(_G.config.boot_script));
+    LuaSysApiV1.execute_boot_script(boot_script);
 }
 
 
 static void _boot_unload() {
-    stringid64_t boot_pkg = stringid64_from_string(cvar_get_string(_G.config.boot_pkg));
+    stringid64_t boot_pkg = stringid64_from_string(ConfigApiV1.get_string(_G.config.boot_pkg));
+    stringid64_t core_pkg = stringid64_from_string("core");
     stringid64_t pkg = stringid64_from_string("package");
 
-    package_unload(boot_pkg);
-    resource_unload(pkg, &boot_pkg, 1);
+    stringid64_t resources[] = {core_pkg, boot_pkg};
 
-    //if (!cvar_get_int(_G.config.daemon)) {
-        stringid64_t core_pkg = stringid64_from_string("core");
-        resource_load_now(pkg, &core_pkg, 1);
-        package_load(core_pkg);
-        package_flush(core_pkg);
-    //}
+    PackageApiV1.unload(boot_pkg);
+    PackageApiV1.unload(core_pkg);
 
+    ResourceApiV1.unload(pkg, resources, 2);
 }
 
 void application_start() {
 #if defined(CETECH_DEVELOP)
-    resource_set_autoload(1);
+    ResourceApiV1.set_autoload(1);
 #else
-    resource_set_autoload(0);
+    ResourceApiV1.set_autoload(0);
 #endif
 
-    if (cvar_get_int(_G.config.compile)) {
-        resource_compiler_compile_all();
+    if (ConfigApiV1.get_int(_G.config.compile)) {
+        ResourceApiV1.compiler_compile_all();
 
-        if (!cvar_get_int(_G.config.continue_)) {
+        if (!ConfigApiV1.get_int(_G.config.continue_)) {
             return;
         }
     }
 
-    if (!cvar_get_int(_G.config.daemon)) {
-        intptr_t wid = cvar_get_int(_G.config.wid);
+    if (!ConfigApiV1.get_int(_G.config.daemon)) {
+        intptr_t wid = ConfigApiV1.get_int(_G.config.wid);
 
         char title[128] = {0};
-        snprintf(title, CEL_ARRAY_LEN(title), "cetech - %s", cvar_get_string(_G.config.boot_script));
+        snprintf(title, CEL_ARRAY_LEN(title), "cetech - %s", ConfigApiV1.get_string(_G.config.boot_script));
 
         if (wid == 0) {
             _G.main_window = cel_window_new(
                     title,
                     WINDOWPOS_UNDEFINED,
                     WINDOWPOS_UNDEFINED,
-                    cvar_get_int(_G.config.screen_x), cvar_get_int(_G.config.screen_y),
-                    cvar_get_int(_G.config.fullscreen) ? WINDOW_FULLSCREEN : WINDOW_NOFLAG
+                    ConfigApiV1.get_int(_G.config.screen_x), ConfigApiV1.get_int(_G.config.screen_y),
+                    ConfigApiV1.get_int(_G.config.fullscreen) ? WINDOW_FULLSCREEN : WINDOW_NOFLAG
             );
         } else {
             _G.main_window = cel_window_new_from((void *) wid);
         }
 
-        renderer_create(_G.main_window);
+        RendererApiV1.create(_G.main_window);
     }
 
     _boot_stage();
 
     u64 last_tick = cel_get_perf_counter();
-    _G.game = luasys_get_game_callbacks();
+    _G.game = LuaSysApiV1.get_game_callbacks();
 
     if (!_G.game->init()) {
         log_error(LOG_WHERE, "Could not init game.");
@@ -264,9 +264,9 @@ void application_start() {
     float frame_time = (1.0f / frame_limit);
     float frame_time_accum = 0.0f;
 
-    consolesrv_push_begin();
+    ConsoleServerApiV1.consolesrv_push_begin();
     while (_G.is_running) {
-        struct scope_data application_sd = developsys_enter_scope("Application:update()");
+        struct scope_data application_sd = DevelopSystemApiV1.enter_scope("Application:update()");
 
         u64 now_ticks = cel_get_perf_counter();
         float dt = ((float) (now_ticks - last_tick)) / cel_get_perf_freq();
@@ -275,31 +275,27 @@ void application_start() {
         last_tick = now_ticks;
         frame_time_accum += dt;
 
-        consolesrv_update();
 
         machine_process();
-        keyboard_process();
-        mouse_process();
-        gamepad_process();
 
+        plugin_call_update();
         _G.game->update(dt);
 
-        if(frame_time_accum >= frame_time) {
-            if (!cvar_get_int(_G.config.daemon)) {
-                struct scope_data render_sd = developsys_enter_scope("Game::render()");
+        if (frame_time_accum >= frame_time) {
+            if (!ConfigApiV1.get_int(_G.config.daemon)) {
+                struct scope_data render_sd = DevelopSystemApiV1.enter_scope("Game:render()");
                 _G.game->render();
-                developsys_leave_scope("Game::render()", render_sd);
+                DevelopSystemApiV1.leave_scope(render_sd);
             }
 
             frame_time_accum = 0.0f;
         }
 
-        developsys_leave_scope("Application:update()", application_sd);
+        DevelopSystemApiV1.leave_scope(application_sd);
+        DevelopSystemApiV1.push_record_float("engine.delta_time", dt);
 
-        developsys_push_record_float("engine.delta_time", dt);
-        developsys_update(dt);
-
-        cel_thread_yield();
+        plugin_call_after_update(dt);
+        //cel_thread_yield();
     }
 
     _G.game->shutdown();

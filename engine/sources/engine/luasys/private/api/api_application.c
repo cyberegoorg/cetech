@@ -1,5 +1,6 @@
 #include <engine/application/application.h>
-#include "engine/luasys/luasys.h"
+#include <engine/plugin/plugin_api.h>
+#include "../luasys.h"
 
 #define API_NAME "Application"
 
@@ -23,7 +24,7 @@ static int _application_platform(lua_State *l) {
 }
 
 
-void _register_lua_application_api() {
+void _register_lua_application_api(get_api_fce_t get_engine_api) {
     luasys_add_module_function(API_NAME, "quit", _application_quit);
     luasys_add_module_function(API_NAME, "get_native_platform", _application_native_platform);
     luasys_add_module_function(API_NAME, "get_platform", _application_platform);

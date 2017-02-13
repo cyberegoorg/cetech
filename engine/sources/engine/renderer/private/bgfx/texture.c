@@ -12,8 +12,11 @@
 #include "celib/filesystem/vio.h"
 #include "celib/filesystem/filesystem.h"
 #include <engine/memory/memsys.h>
+#include <engine/plugin/plugin.h>
 #include "engine/application/application.h"
 #include "engine/resource/resource.h"
+#include "engine/memory/memsys.h"
+
 
 //==============================================================================
 // Structs
@@ -38,6 +41,8 @@ struct G {
     stringid64_t type;
 } _G = {0};
 
+static struct MemSysApiV1 MemSysApiV1;
+static struct ResourceApiV1 ResourceApiV1;
 
 //==============================================================================
 // Compiler private
@@ -49,7 +54,7 @@ static int _texturec(const char *input,
                      int is_normalmap) {
     char cmd_line[4096] = {0};
 
-    int s = resource_compiler_external_join(cmd_line, CEL_ARRAY_LEN(cmd_line), "texturec");
+    int s = ResourceApiV1.compiler_external_join(cmd_line, CEL_ARRAY_LEN(cmd_line), "texturec");
 
     s += snprintf(cmd_line + s, CEL_ARRAY_LEN(cmd_line) - s, " -f %s -o %s", input, output);
     if (gen_mipmaps) {
@@ -106,10 +111,10 @@ int _texture_resource_compiler(const char *filename,
     int gen_mipmaps = yaml_is_valid(n_gen_mipmaps) ? yaml_as_bool(n_gen_mipmaps) : 0;
     int is_normalmap = yaml_is_valid(n_is_normalmap) ? yaml_as_bool(n_is_normalmap) : 0;
 
-    const char *source_dir = resource_compiler_get_source_dir();
+    const char *source_dir = ResourceApiV1.compiler_get_source_dir();
 
-    resource_compiler_get_build_dir(build_dir, CEL_ARRAY_LEN(build_dir), application_platform());
-    resource_compiler_get_tmp_dir(tmp_dir, CEL_ARRAY_LEN(tmp_dir), application_platform());
+    ResourceApiV1.compiler_get_build_dir(build_dir, CEL_ARRAY_LEN(build_dir), application_platform());
+    ResourceApiV1.compiler_get_tmp_dir(tmp_dir, CEL_ARRAY_LEN(tmp_dir), application_platform());
 
     yaml_as_string(input, input_str, CEL_ARRAY_LEN(input_str));
 
@@ -123,8 +128,8 @@ int _texture_resource_compiler(const char *filename,
         return 0;
     }
 
-    struct vio *tmp_file = cel_vio_from_file(output_path, VIO_OPEN_READ, memsys_main_allocator());
-    char *tmp_data = CEL_ALLOCATE(memsys_main_allocator(), char, cel_vio_size(tmp_file) + 1);
+    struct vio *tmp_file = cel_vio_from_file(output_path, VIO_OPEN_READ, MemSysApiV1.main_allocator());
+    char *tmp_data = CEL_ALLOCATE(MemSysApiV1.main_allocator(), char, cel_vio_size(tmp_file) + 1);
     cel_vio_read(tmp_file, tmp_data, sizeof(char), cel_vio_size(tmp_file));
 
     struct texture resource = {
@@ -135,7 +140,7 @@ int _texture_resource_compiler(const char *filename,
     cel_vio_write(build_vio, tmp_data, sizeof(char), resource.size);
 
     cel_vio_close(tmp_file);
-    CEL_DEALLOCATE(memsys_main_allocator(), tmp_data);
+    CEL_DEALLOCATE(MemSysApiV1.main_allocator(), tmp_data);
 
     compilator_api->add_dependency(filename, input_str);
 
@@ -212,13 +217,15 @@ static const resource_callbacks_t texture_resource_callback = {
 int texture_resource_init() {
     _G = (struct G) {0};
 
+    MemSysApiV1 = *(struct MemSysApiV1 *) plugin_get_engine_api(MEMORY_API_ID, 0);
+    ResourceApiV1 = *(struct ResourceApiV1 *) plugin_get_engine_api(RESOURCE_API_ID, 0);
     _G.type = stringid64_from_string("texture");
 
-    MAP_INIT(bgfx_texture_handle_t, &_G.handler_map, memsys_main_allocator());
+    MAP_INIT(bgfx_texture_handle_t, &_G.handler_map, MemSysApiV1.main_allocator());
 
-    resource_compiler_register(_G.type, _texture_resource_compiler);
+    ResourceApiV1.compiler_register(_G.type, _texture_resource_compiler);
 
-    resource_register_type(_G.type, texture_resource_callback);
+    ResourceApiV1.register_type(_G.type, texture_resource_callback);
 
     return 1;
 }
@@ -230,7 +237,7 @@ void texture_resource_shutdown() {
 }
 
 bgfx_texture_handle_t texture_resource_get(stringid64_t name) {
-    resource_get(_G.type, name); // TODO: only for autoload
+    ResourceApiV1.get(_G.type, name); // TODO: only for autoload
 
     return MAP_GET(bgfx_texture_handle_t, &_G.handler_map, name.id, null_texture);
 }

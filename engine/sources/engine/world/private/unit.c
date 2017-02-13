@@ -7,6 +7,10 @@
 #include <celib/containers/map.h>
 #include <engine/entcom/entcom.h>
 #include <engine/memory/memsys.h>
+#include <engine/plugin/plugin_api.h>
+#include "engine/memory/memsys.h"
+
+#include "engine/world/unit.h"
 
 ARRAY_PROTOTYPE_N(struct array_entity_t, array_entity_t);
 MAP_PROTOTYPE_N(struct array_entity_t, array_entity_t);
@@ -18,13 +22,17 @@ static struct G {
     ARRAY_T(array_entity_t) spawned_array;
 } _G = {0};
 
+static struct EntComSystemApiV1 EntComSystemApiV1;
+static struct MemSysApiV1 MemSysApiV1;
+static struct ResourceApiV1 ResourceApiV1;
+
 u32 _new_spawned_array() {
     u32 idx = ARRAY_SIZE(&_G.spawned_array);
 
     ARRAY_PUSH_BACK(array_entity_t, &_G.spawned_array, (struct array_entity_t) {0});
     ARRAY_T(entity_t) *array = &ARRAY_AT(&_G.spawned_array, idx);
 
-    ARRAY_INIT(entity_t, array, memsys_main_allocator());
+    ARRAY_INIT(entity_t, array, MemSysApiV1.main_allocator());
     return idx;
 }
 
@@ -69,10 +77,10 @@ static void preprocess(const char *filename,
         capi->add_dependency(filename, prefab_file);
 
         char full_path[256] = {0};
-        const char *source_dir = resource_compiler_get_source_dir();
+        const char *source_dir = ResourceApiV1.compiler_get_source_dir();
         cel_path_join(full_path, CEL_ARRAY_LEN(full_path), source_dir, prefab_file);
 
-        struct vio *prefab_vio = cel_vio_from_file(full_path, VIO_OPEN_READ, memsys_main_allocator());
+        struct vio *prefab_vio = cel_vio_from_file(full_path, VIO_OPEN_READ, MemSysApiV1.main_allocator());
 
         char prefab_data[cel_vio_size(prefab_vio) + 1];
         memory_set(prefab_data, 0, cel_vio_size(prefab_vio) + 1);
@@ -160,14 +168,14 @@ void foreach_components_clb(yaml_node_t key,
         ARRAY_PUSH_BACK(u64, &output->component_type, cid.id);
 
         ARRAY_T(u32) tmp_a = {0};
-        ARRAY_INIT(u32, &tmp_a, memsys_main_allocator());
+        ARRAY_INIT(u32, &tmp_a, MemSysApiV1.main_allocator());
 
         MAP_SET(array_u32, &output->component_ent, cid.id, tmp_a);
     }
 
     if (!MAP_HAS(array_yaml_node_t, &output->component_body, cid.id)) {
         ARRAY_T(yaml_node_t) tmp_a = {0};
-        ARRAY_INIT(yaml_node_t, &tmp_a, memsys_main_allocator());
+        ARRAY_INIT(yaml_node_t, &tmp_a, MemSysApiV1.main_allocator());
 
         MAP_SET(array_yaml_node_t, &output->component_body, cid.id, tmp_a);
 
@@ -235,7 +243,7 @@ struct component_data {
 #define component_data_data(cd) ((char*)((component_data_ent(cd) + ((cd)->ent_count))))
 
 struct entity_compile_output *unit_compiler_create_output() {
-    struct cel_allocator *a = memsys_main_allocator();
+    struct cel_allocator *a = MemSysApiV1.main_allocator();
 
     struct entity_compile_output *output = CEL_ALLOCATE(a, struct entity_compile_output, 1);
     output->ent_counter = 0;
@@ -269,7 +277,7 @@ void unit_compiler_destroy_output(struct entity_compile_output *output) {
     }
     MAP_DESTROY(array_yaml_node_t, &output->component_body);
 
-    struct cel_allocator *a = memsys_main_allocator();
+    struct cel_allocator *a = MemSysApiV1.main_allocator();
     CEL_DEALLOCATE(a, output);
 }
 
@@ -318,10 +326,10 @@ void unit_compiler_write_to_build(struct entity_compile_output *output,
 
         ARRAY_T(yaml_node_t) *body = MAP_GET_PTR(array_yaml_node_t, &output->component_body, cid);
         ARRAY_T(u8) comp_data = {0};
-        ARRAY_INIT(u8, &comp_data, memsys_main_allocator());
+        ARRAY_INIT(u8, &comp_data, MemSysApiV1.main_allocator());
 
         for (int i = 0; i < cdata.ent_count; ++i) {
-            component_compile(id, ARRAY_AT(body, i), &comp_data);
+            EntComSystemApiV1.component_compile(id, ARRAY_AT(body, i), &comp_data);
         }
 
         cdata.size = ARRAY_SIZE(&comp_data);
@@ -357,7 +365,7 @@ int _unit_resource_compiler(const char *filename,
     yaml_node_t root = yaml_load_str(source_data, &h);
 
     ARRAY_T(u8) unit_data;
-    ARRAY_INIT(u8, &unit_data, memsys_main_allocator());
+    ARRAY_INIT(u8, &unit_data, MemSysApiV1.main_allocator());
 
     unit_resource_compiler(root, filename, &unit_data, compilator_api);
 
@@ -386,6 +394,7 @@ void unit_resource_unloader(void *new_data,
                             struct cel_allocator *allocator) {
     CEL_DEALLOCATE(allocator, new_data);
 }
+
 
 void unit_resource_online(stringid64_t name,
                           void *data) {
@@ -416,30 +425,29 @@ static const resource_callbacks_t unit_resource_callback = {
 };
 
 
-int unit_init(int stage) {
-    if (stage == 0) {
-        return 1;
-    }
-
+static void _init(get_api_fce_t get_engine_api) {
     _G = (struct G) {0};
+
+    EntComSystemApiV1 = *((struct EntComSystemApiV1 *) get_engine_api(ENTCOM_API_ID, 0));
+    MemSysApiV1 = *(struct MemSysApiV1 *) get_engine_api(MEMORY_API_ID, 0);
+    ResourceApiV1 = *(struct ResourceApiV1 *) get_engine_api(RESOURCE_API_ID, 0);
 
     _G.type = stringid64_from_string("unit");
 
-    MAP_INIT(u32, &_G.spawned_map, memsys_main_allocator());
-    ARRAY_INIT(array_entity_t, &_G.spawned_array, memsys_main_allocator());
+    MAP_INIT(u32, &_G.spawned_map, MemSysApiV1.main_allocator());
+    ARRAY_INIT(array_entity_t, &_G.spawned_array, MemSysApiV1.main_allocator());
 
-    resource_register_type(_G.type, unit_resource_callback);
-    resource_compiler_register(_G.type, _unit_resource_compiler);
-
-    return 1;
+    ResourceApiV1.register_type(_G.type, unit_resource_callback);
+    ResourceApiV1.compiler_register(_G.type, _unit_resource_compiler);
 }
 
-void unit_shutdown() {
+static void _shutdown() {
     MAP_DESTROY(u32, &_G.spawned_map);
     ARRAY_DESTROY(array_entity_t, &_G.spawned_array);
 
     _G = (struct G) {0};
 }
+
 
 ARRAY_T(entity_t) *unit_spawn_from_resource(world_t world,
                                             void *resource) {
@@ -449,7 +457,7 @@ ARRAY_T(entity_t) *unit_spawn_from_resource(world_t world,
     ARRAY_T(entity_t) *spawned = _get_spawned_array_by_idx(idx);
 
     for (int j = 0; j < res->ent_count; ++j) {
-        ARRAY_PUSH_BACK(entity_t, spawned, entity_manager_create());
+        ARRAY_PUSH_BACK(entity_t, spawned, EntComSystemApiV1.entity_manager_create());
     }
 
     entity_t root = ARRAY_AT(spawned, 0);
@@ -463,7 +471,8 @@ ARRAY_T(entity_t) *unit_spawn_from_resource(world_t world,
 
         u32 *c_ent = component_data_ent(comp_data);
         char *c_data = component_data_data(comp_data);
-        component_spawn(world, type, &ARRAY_AT(spawned, 0), c_ent, parents, comp_data->ent_count, c_data);
+        EntComSystemApiV1.component_spawn(world, type, &ARRAY_AT(spawned, 0), c_ent, parents, comp_data->ent_count,
+                                          c_data);
 
         comp_data = (struct component_data *) (c_data + comp_data->size);
     }
@@ -475,7 +484,7 @@ ARRAY_T(entity_t) *unit_spawn_from_resource(world_t world,
 
 entity_t unit_spawn(world_t world,
                     stringid64_t name) {
-    void *res = resource_get(_G.type, name);
+    void *res = ResourceApiV1.get(_G.type, name);
 
     if (res == NULL) {
         log_error("unit", "Could not spawn unit.");
@@ -494,9 +503,54 @@ void unit_destroy(world_t world,
     for (int i = 0; i < count; ++i) {
         ARRAY_T(entity_t) *spawned = _get_spawned_array(unit[i]);
 
-        component_destroy(world, spawned->data, spawned->size);
+        EntComSystemApiV1.component_destroy(world, spawned->data, spawned->size);
 
         _destroy_spawned_array(unit[i]);
     }
 
+}
+
+void *unit_get_plugin_api(int api,
+                          int version) {
+
+    switch (api) {
+        case PLUGIN_EXPORT_API_ID:
+            switch (version) {
+                case 0: {
+                    static struct plugin_api_v0 plugin = {0};
+
+                    plugin.init = _init;
+                    plugin.shutdown = _shutdown;
+
+                    return &plugin;
+                }
+
+                default:
+                    return NULL;
+            };
+        case UNIT_API_ID:
+            switch (version) {
+                case 0: {
+                    static struct UnitApiv1 api = {0};
+
+                    api.spawn_from_resource = unit_spawn_from_resource;
+                    api.spawn = unit_spawn;
+                    api.destroy = unit_destroy;
+                    api.compiler_create_output = unit_compiler_create_output;
+                    api.compiler_destroy_output = unit_compiler_destroy_output;
+                    api.compiler_compile_unit = unit_compiler_compile_unit;
+                    api.compiler_ent_counter = unit_compiler_ent_counter;
+                    api.compiler_write_to_build = unit_compiler_write_to_build;
+                    api.resource_compiler = unit_resource_compiler;
+
+                    return &api;
+                }
+
+                default:
+                    return NULL;
+            };
+
+        default:
+            return NULL;
+    }
 }

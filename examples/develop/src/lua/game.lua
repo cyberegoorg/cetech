@@ -73,18 +73,18 @@ function transform_rotator(world, unit, delta_rot)
     Transform.set_rotation(world, lt, rot)
 end
 
-TEXTURE_CYCLE = { "texture2", "content/texture1", "content/scene/m4a1/m4_diff" }
+TEXTURE_CYCLE = { "content/scene/m4a1/m4_diff", "content/uv_checker", "content/texture1" }
 TEXTURE_CYCLE_IT = 1
 
-L = 0
+L = 2
 function Game:update(dt)
-    --    local mesh = Mesh.get(self.world, self.unit)
-    --    local material = Mesh.get_material(self.world, mesh)
-    --
-    --    L = L + dt * 0.1
-    --    if (L >= 1.0) then L = 0; end
-    --
-    --    Material.set_vec4f(material, "u_vec4", Vec4f.make(L, 0.0, 0.0, 0.0))
+        local mesh = Mesh.get(self.world, self.unit)
+        local material = Mesh.get_material(self.world, mesh)
+
+--    L = L + dt * 0.1
+--    if (L >= 1.0) then L = 0; end
+
+    Material.set_vec4f(material, "u_vec4", Vec4f.make(L, L, L, 1.0))
 
     if Keyboard.button_pressed(Keyboard.button_index("t")) then
         Material.set_texture(material, "u_texColor", TEXTURE_CYCLE[(TEXTURE_CYCLE_IT % #TEXTURE_CYCLE) + 1])
@@ -101,6 +101,7 @@ function Game:update(dt)
     if Keyboard.button_pressed(reload_btn) then
         ResourceManager.compile_all()
         ResourceManager.reload_all()
+        Plugin.reload_all()
     end
 
     if Keyboard.button_pressed(quit_btn) then

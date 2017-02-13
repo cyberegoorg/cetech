@@ -1,7 +1,8 @@
 
 #include <celib/math/mat44f.h>
 
-#include "engine/luasys/luasys.h"
+#include "../luasys.h"
+#include <engine/plugin/plugin_api.h>
 
 #define API_NAME "Mat44f"
 
@@ -130,7 +131,7 @@ static int _perspective_fov(lua_State *l) {
     return 1;
 }
 
-void _register_lua_mat44f_api() {
+void _register_lua_mat44f_api(get_api_fce_t get_engine_api) {
     luasys_add_module_function(API_NAME, "identity", _identity);
 
     luasys_add_module_function(API_NAME, "make", _ctor);

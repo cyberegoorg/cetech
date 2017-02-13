@@ -1,69 +1,36 @@
 //==============================================================================
 // Static engine system configuration
 //==============================================================================
+#include "engine/plugin/plugin.h"
 
-//==============================================================================
-// Core engine systems
-//==============================================================================
+void _init_static_plugins() {
+    ADD_STATIC_PLUGIN(task);
 
-//SYSTEM(cvar)
-
-SYSTEM(machine)
-
-SYSTEM(taskmanager)
-
-SYSTEM(filesystem)
-
-//==============================================================================
-// Core engine develop systems
-// TODO: only develop develop
-//==============================================================================
-
-SYSTEM(resource_compiler)
-
-SYSTEM(consolesrv)
-
-SYSTEM(developsys)
-
-//==============================================================================
-
-SYSTEM(resource)
-
-SYSTEM(entcom)
-
-SYSTEM(unit)
-
-SYSTEM(world)
-
-SYSTEM(level)
-
-SYSTEM(renderer)
-
-//==============================================================================
-// Core script language
-//==============================================================================
-
-SYSTEM(luasys)
+    ADD_STATIC_PLUGIN(filesystem);
+    ADD_STATIC_PLUGIN(resourcesystem);
+    ADD_STATIC_PLUGIN(resourcecompiler);
 
 
-//==============================================================================
-// Input
-//==============================================================================
+    ADD_STATIC_PLUGIN(consoleserver);
+    ADD_STATIC_PLUGIN(developsystem);
 
-SYSTEM(keyboard)
+    ADD_STATIC_PLUGIN(keyboard);
+    ADD_STATIC_PLUGIN(gamepad);
+    ADD_STATIC_PLUGIN(mouse);
 
-SYSTEM(mouse)
+    ADD_STATIC_PLUGIN(entcom);
+    ADD_STATIC_PLUGIN(world);
 
-SYSTEM(gamepad)
+    ADD_STATIC_PLUGIN(unit);
+    ADD_STATIC_PLUGIN(level);
 
-//==============================================================================
-// Components
-//==============================================================================
+    ADD_STATIC_PLUGIN(renderer);
 
-SYSTEM(transform)
+    ADD_STATIC_PLUGIN(camera);
+    ADD_STATIC_PLUGIN(scenegraph);
+    ADD_STATIC_PLUGIN(transform);
+    ADD_STATIC_PLUGIN(mesh);
 
-SYSTEM(scenegraph)
+    ADD_STATIC_PLUGIN(luasys);
+}
 
-SYSTEM(camera)
-
-SYSTEM(mesh)

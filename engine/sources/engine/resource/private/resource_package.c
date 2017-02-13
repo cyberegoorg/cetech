@@ -9,8 +9,11 @@
 #include <celib/yaml/yaml.h>
 #include <celib/thread/thread.h>
 #include <engine/memory/memsys.h>
+#include <engine/plugin/plugin.h>
 
 #include "resource_package.h"
+#include "engine/memory/memsys.h"
+
 
 //==============================================================================
 // Public interface
@@ -24,6 +27,10 @@ struct package_task_data {
 struct G {
     stringid64_t package_typel;
 } _G = {0};
+
+static struct MemSysApiV1 MemSysApiV1;
+static struct ResourceApiV1 ResourceApiV1;
+static struct TaskApiV1 TaskApiV1;
 
 //==============================================================================
 // Resource compiler
@@ -77,10 +84,10 @@ int _package_compiler(const char *filename,
     yaml_node_t root = yaml_load_str(source_data, &h);
 
     struct package_compile_data compile_data = {0};
-    ARRAY_INIT(stringid64_t, &compile_data.types, memsys_main_allocator());
-    ARRAY_INIT(stringid64_t, &compile_data.name, memsys_main_allocator());
-    ARRAY_INIT(u32, &compile_data.offset, memsys_main_allocator());
-    ARRAY_INIT(u32, &compile_data.name_count, memsys_main_allocator());
+    ARRAY_INIT(stringid64_t, &compile_data.types, MemSysApiV1.main_allocator());
+    ARRAY_INIT(stringid64_t, &compile_data.name, MemSysApiV1.main_allocator());
+    ARRAY_INIT(u32, &compile_data.offset, MemSysApiV1.main_allocator());
+    ARRAY_INIT(u32, &compile_data.name_count, MemSysApiV1.main_allocator());
 
     yaml_node_foreach_dict(root, forach_clb, &compile_data);
 
@@ -108,9 +115,13 @@ int _package_compiler(const char *filename,
 int package_init() {
     _G = (struct G) {0};
 
+    MemSysApiV1 = *((struct MemSysApiV1 *) plugin_get_engine_api(MEMORY_API_ID, 0));
+    ResourceApiV1 = *((struct ResourceApiV1 *) plugin_get_engine_api(RESOURCE_API_ID, 0));
+    TaskApiV1 = *((struct TaskApiV1 *) plugin_get_engine_api(TASK_API_ID, 0));
+
     _G.package_typel = stringid64_from_string("package");
 
-    resource_compiler_register(_G.package_typel, _package_compiler);
+    ResourceApiV1.compiler_register(_G.package_typel, _package_compiler);
 
     return 1;
 }
@@ -122,18 +133,18 @@ void package_shutdown() {
 
 void package_task(void *data) {
     struct package_task_data *task_data = data;
-    struct package_resource *package = resource_get(_G.package_typel, task_data->name);
+    struct package_resource *package = ResourceApiV1.get(_G.package_typel, task_data->name);
 
     const u32 task_count = package->type_count;
     for (int j = 0; j < task_count; ++j) {
-        resource_load_now(package_type(package)[j], &package_name(package)[package_offset(package)[j]],
-                          package_name_count(package)[j]);
+        ResourceApiV1.load_now(package_type(package)[j], &package_name(package)[package_offset(package)[j]],
+                               package_name_count(package)[j]);
     }
 }
 
 void package_load(stringid64_t name) {
 
-    struct package_task_data *task_data = CEL_ALLOCATE(memsys_main_allocator(), struct package_task_data, 1);
+    struct package_task_data *task_data = CEL_ALLOCATE(MemSysApiV1.main_allocator(), struct package_task_data, 1);
 
     task_data->name = name;
 
@@ -144,28 +155,28 @@ void package_load(stringid64_t name) {
             .affinity = TASK_AFFINITY_NONE
     };
 
-    taskmanager_add(&item, 1);
+    TaskApiV1.add(&item, 1);
 }
 
 void package_unload(stringid64_t name) {
-    struct package_resource *package = resource_get(_G.package_typel, name);
+    struct package_resource *package = ResourceApiV1.get(_G.package_typel, name);
 
     const u32 task_count = package->type_count;
     for (int j = 0; j < task_count; ++j) {
-        resource_unload(package_type(package)[j], &package_name(package)[package_offset(package)[j]],
-                        package_name_count(package)[j]);
+        ResourceApiV1.unload(package_type(package)[j], &package_name(package)[package_offset(package)[j]],
+                             package_name_count(package)[j]);
     }
 }
 
 int package_is_loaded(stringid64_t name) {
     const stringid64_t package_type = stringid64_from_string("package");
 
-    struct package_resource *package = resource_get(package_type, name);
+    struct package_resource *package = ResourceApiV1.get(package_type, name);
 
     const u32 task_count = package->type_count;
     for (int i = 0; i < task_count; ++i) {
-        if (!resource_can_get_all(package_type(package)[i], &package_name(package)[package_offset(package)[i]],
-                                  package_name_count(package)[i])) {
+        if (!ResourceApiV1.can_get_all(package_type(package)[i], &package_name(package)[package_offset(package)[i]],
+                                       package_name_count(package)[i])) {
             return 0;
         }
     }
@@ -175,7 +186,7 @@ int package_is_loaded(stringid64_t name) {
 
 void package_flush(stringid64_t name) {
     while (!package_is_loaded(name)) {
-        if (!taskmanager_do_work()) {
+        if (!TaskApiV1.do_work()) {
             cel_thread_yield();
         }
     }

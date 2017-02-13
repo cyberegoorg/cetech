@@ -14,6 +14,12 @@
 #include <engine/develop/console_server.h>
 #include "celib/containers/map.h"
 #include <engine/memory/memsys.h>
+#include <engine/plugin/plugin_api.h>
+#include <engine/plugin/plugin.h>
+
+#include "../types.h"
+#include "engine/memory/memsys.h"
+
 
 //==============================================================================
 // Struct and types
@@ -64,10 +70,97 @@ struct G {
 
 } _G = {0};
 
+static struct MemSysApiV1 MemSysApiV1;
+static struct ConsoleServerApiV1 ConsoleServerApiV1;
+static struct FilesystemApiV1 FilesystemApiV1;
+static struct ConfigApiV1 ConfigApiV1;
+
+void resource_set_autoload(int enable);
+
+void resource_register_type(stringid64_t type,
+                            resource_callbacks_t callbacks);
+
+void resource_load(void **loaded_data,
+                   stringid64_t type,
+                   stringid64_t *names,
+                   size_t count,
+                   int force);
+
+void resource_add_loaded(stringid64_t type,
+                         stringid64_t *names,
+                         void **resource_data,
+                         size_t count);
+
+void resource_load_now(stringid64_t type,
+                       stringid64_t *names,
+                       size_t count);
+
+void resource_unload(stringid64_t type,
+                     stringid64_t *names,
+                     size_t count);
+
+void resource_reload(stringid64_t type,
+                     stringid64_t *names,
+                     size_t count);
+
+void resource_reload_all();
+
+int resource_can_get(stringid64_t type,
+                     stringid64_t names);
+
+int resource_can_get_all(stringid64_t type,
+                         stringid64_t *names,
+                         size_t count);
+
+void *resource_get(stringid64_t type,
+                   stringid64_t names);
+
+int resource_type_name_string(char *str,
+                              size_t max_len,
+                              stringid64_t type,
+                              stringid64_t name);
+
+void resource_compiler_register(stringid64_t type,
+                                resource_compilator_t compilator);
+
+void resource_compiler_compile_all();
+
+int resource_compiler_get_filename(char *filename,
+                                   size_t max_ken,
+                                   stringid64_t type,
+                                   stringid64_t name);
+
+const char *resource_compiler_get_source_dir();
+
+const char *resource_compiler_get_core_dir();
+
+int resource_compiler_get_build_dir(char *build_dir,
+                                    size_t max_len,
+                                    const char *platform);
+
+int resource_compiler_get_tmp_dir(char *tmp_dir,
+                                  size_t max_len,
+                                  const char *platform);
+
+int resource_compiler_external_join(char *output,
+                                    u32 max_len,
+                                    const char *name);
+
+void resource_compiler_create_build_dir();
+
+void package_load(stringid64_t name);
+
+void package_unload(stringid64_t name);
+
+int package_is_loaded(stringid64_t name);
+
+void package_flush(stringid64_t name);
 
 //==============================================================================
 // Private
 //==============================================================================
+
+void resource_reload_all();
 
 static int _cmd_reload_all(mpack_node_t args,
                            mpack_writer_t *writer) {
@@ -123,46 +216,48 @@ static const resource_callbacks_t package_resource_callback = {
         .reloader = package_resource_reloader
 };
 
-
-//==============================================================================
-// Public interface
-//==============================================================================
 extern int package_init();
 
 extern void package_shutdown();
 
+void resource_register_type(stringid64_t type,
+                            resource_callbacks_t callbacks);
 
-int resource_init(int stage) {
-    if (stage == 0) {
-        _G = (struct G) {0};
+static void _init(get_api_fce_t get_engine_api) {
+    ConsoleServerApiV1 = *((struct ConsoleServerApiV1 *) get_engine_api(CONSOLE_SERVER_API_ID, 0));
+    MemSysApiV1 = *(struct MemSysApiV1 *) get_engine_api(MEMORY_API_ID, 0);
+    FilesystemApiV1 = *(struct FilesystemApiV1 *) get_engine_api(FILESYSTEM_API_ID, 0);
+    ConfigApiV1 = *(struct ConfigApiV1 *) get_engine_api(CONFIG_API_ID, 0);
 
-        ARRAY_INIT(resource_data, &_G.resource_data, memsys_main_allocator());
-        ARRAY_INIT(resource_callbacks_t, &_G.resource_callbacks, memsys_main_allocator());
-        MAP_INIT(u32, &_G.type_map, memsys_main_allocator());
+    ARRAY_INIT(resource_data, &_G.resource_data, MemSysApiV1.main_allocator());
+    ARRAY_INIT(resource_callbacks_t, &_G.resource_callbacks, MemSysApiV1.main_allocator());
+    MAP_INIT(u32, &_G.type_map, MemSysApiV1.main_allocator());
 
-        return 1;
-    }
-
-    _G.config.build_dir = cvar_find("build");
+    _G.config.build_dir = ConfigApiV1.find("build");
 
 
     char build_dir_full[4096] = {0};
     cel_path_join(build_dir_full,
                   CEL_ARRAY_LEN(build_dir_full),
-                  cvar_get_string(_G.config.build_dir),
+                  ConfigApiV1.get_string(_G.config.build_dir),
                   application_platform());
 
-    filesystem_map_root_dir(stringid64_from_string("build"), build_dir_full);
+    FilesystemApiV1.filesystem_map_root_dir(stringid64_from_string("build"), build_dir_full);
 
     resource_register_type(stringid64_from_string("package"), package_resource_callback);
 
-    consolesrv_register_command("resource.reload_all", _cmd_reload_all);
+    ConsoleServerApiV1.consolesrv_register_command("resource.reload_all", _cmd_reload_all);
 
-    return package_init();
+    package_init();
+    //return package_init();
+
 }
 
-void resource_shutdown() {
+static void _init_cvar(struct ConfigApiV1 config) {
+    _G = (struct G) {0};
+}
 
+static void _shutdown() {
     for (int i = 0; i < ARRAY_SIZE(&_G.resource_data); ++i) {
         MAP_DESTROY(resource_item_t, &ARRAY_AT(&_G.resource_data, i));
     }
@@ -172,9 +267,13 @@ void resource_shutdown() {
     MAP_DESTROY(u32, &_G.type_map);
 
     package_shutdown();
-
-    _G = (struct G) {0};
 }
+
+
+
+//==============================================================================
+// Public interface
+//==============================================================================
 
 int resource_type_name_string(char *str,
                               size_t max_len,
@@ -196,7 +295,7 @@ void resource_register_type(stringid64_t type,
     ARRAY_PUSH_BACK(resource_data, &_G.resource_data, (MAP_T(resource_item_t)) {0});
     ARRAY_PUSH_BACK(resource_callbacks_t, &_G.resource_callbacks, callbacks);
 
-    MAP_INIT(resource_item_t, &ARRAY_AT(&_G.resource_data, idx), memsys_main_allocator());
+    MAP_INIT(resource_item_t, &ARRAY_AT(&_G.resource_data, idx), MemSysApiV1.main_allocator());
 
     MAP_SET(u32, &_G.type_map, type.id, idx);
 }
@@ -224,6 +323,12 @@ void resource_add_loaded(stringid64_t type,
         ARRAY_AT(&_G.resource_callbacks, idx).online(names[i], resource_data[i]);
     }
 }
+
+void resource_load(void **loaded_data,
+                   stringid64_t type,
+                   stringid64_t *names,
+                   size_t count,
+                   int force);
 
 void resource_load_now(stringid64_t type,
                        stringid64_t *names,
@@ -298,14 +403,15 @@ void resource_load(void **loaded_data,
 
         char filename[4096] = {0};
         resource_compiler_get_filename(filename, CEL_ARRAY_LEN(filename), type, names[i]);
-        log_debug("resource", "Loading resource %s from %s/%s", filename, filesystem_get_root_dir(root_name),
+        log_debug("resource", "Loading resource %s from %s/%s", filename,
+                  FilesystemApiV1.filesystem_get_root_dir(root_name),
                   build_name);
 
-        struct vio *resource_file = filesystem_open(root_name, build_name, VIO_OPEN_READ);
+        struct vio *resource_file = FilesystemApiV1.filesystem_open(root_name, build_name, VIO_OPEN_READ);
 
         if (resource_file != NULL) {
-            loaded_data[i] = type_clb.loader(resource_file, memsys_main_allocator());
-            filesystem_close(resource_file);
+            loaded_data[i] = type_clb.loader(resource_file, MemSysApiV1.main_allocator());
+            FilesystemApiV1.filesystem_close(resource_file);
         } else {
             loaded_data[i] = 0;
         }
@@ -341,7 +447,7 @@ void resource_unload(stringid64_t type,
             log_debug("resource", "Unload resource %s ", filename);
 
             type_clb.offline(names[i], item.data);
-            type_clb.unloader(item.data, memsys_main_allocator());
+            type_clb.unloader(item.data, MemSysApiV1.main_allocator());
 
             MAP_REMOVE(resource_item_t, resource_map, names[i].id);
         }
@@ -378,6 +484,8 @@ void *resource_get(stringid64_t type,
 void resource_reload(stringid64_t type,
                      stringid64_t *names,
                      size_t count) {
+    plugin_reload_all();
+
     void *loaded_data[count];
     MAP_T(resource_item_t) *resource_map = _get_resource_map(type);
     const u32 idx = MAP_GET(u32, &_G.type_map, type.id, 0);
@@ -396,7 +504,7 @@ void resource_reload(stringid64_t type,
 
         void *old_data = resource_get(type, names[i]);
 
-        void *new_data = type_clb.reloader(names[i], old_data, loaded_data[i], memsys_main_allocator());
+        void *new_data = type_clb.reloader(names[i], old_data, loaded_data[i], MemSysApiV1.main_allocator());
 
         resource_item_t item = MAP_GET(resource_item_t, resource_map, names[i].id, null_item);
         item.data = new_data;
@@ -410,7 +518,7 @@ void resource_reload_all() {
     const MAP_ENTRY_T(u32) *type_end = MAP_END(u32, &_G.type_map);
 
     ARRAY_T(stringid64_t) name_array = {0};
-    ARRAY_INIT(stringid64_t, &name_array, memsys_main_allocator());
+    ARRAY_INIT(stringid64_t, &name_array, MemSysApiV1.main_allocator());
 
     while (type_it != type_end) {
         stringid64_t type_id = {.id = type_it->key};
@@ -435,4 +543,79 @@ void resource_reload_all() {
     }
 
     ARRAY_DESTROY(stringid64_t, &name_array);
+}
+
+void *resourcesystem_get_plugin_api(int api,
+                                    int version) {
+    switch (api) {
+        case PLUGIN_EXPORT_API_ID:
+            switch (version) {
+                case 0: {
+                    static struct plugin_api_v0 plugin = {0};
+
+                    plugin.init = _init;
+                    plugin.shutdown = _shutdown;
+                    plugin.init_cvar = _init_cvar;
+
+                    return &plugin;
+                }
+
+                default:
+                    return NULL;
+            };
+        case RESOURCE_API_ID:
+            switch (version) {
+                case 0: {
+                    static struct ResourceApiV1 api = {0};
+
+                    api.set_autoload = resource_set_autoload;
+                    api.register_type = resource_register_type;
+                    api.load = resource_load;
+                    api.add_loaded = resource_add_loaded;
+                    api.load_now = resource_load_now;
+                    api.unload = resource_unload;
+                    api.reload = resource_reload;
+                    api.reload_all = resource_reload_all;
+                    api.can_get = resource_can_get;
+                    api.can_get_all = resource_can_get_all;
+                    api.get = resource_get;
+                    api.type_name_string = resource_type_name_string;
+                    api.compiler_register = resource_compiler_register;
+                    api.compiler_compile_all = resource_compiler_compile_all;
+                    api.compiler_get_filename = resource_compiler_get_filename;
+                    api.compiler_get_build_dir = resource_compiler_get_build_dir;
+                    api.compiler_get_tmp_dir = resource_compiler_get_tmp_dir;
+                    api.compiler_external_join = resource_compiler_external_join;
+                    api.compiler_create_build_dir = resource_compiler_create_build_dir;
+                    api.compiler_get_core_dir = resource_compiler_get_core_dir;
+                    api.compiler_get_source_dir = resource_compiler_get_source_dir;
+
+                    return &api;
+                }
+
+                default:
+                    return NULL;
+            };
+
+        case PACKAGE_API_ID:
+            switch (version) {
+                case 0: {
+                    static struct PackageApiV1 api = {0};
+
+                    api.load = package_load;
+                    api.unload = package_unload;
+                    api.is_loaded = package_is_loaded;
+                    api.flush = package_flush;
+
+                    return &api;
+                }
+
+                default:
+                    return NULL;
+            };
+
+        default:
+            return NULL;
+    }
+
 }

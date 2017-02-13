@@ -14,10 +14,13 @@
 #include "celib/thread/thread.h"
 #include "celib/containers/eventstream.h"
 #include <engine/memory/memsys.h>
+#include <engine/plugin/plugin_api.h>
 
 #include "engine/config/cvar.h"
 #include "engine/task/task.h"
 #include "engine/develop/develop_system.h"
+#include "engine/memory/memsys.h"
+
 
 //==============================================================================
 // Defines
@@ -48,6 +51,10 @@ static struct G {
     float time_accum;
 } _G = {0};
 
+static struct MemSysApiV1 MemSysApiV1;
+static struct TaskApiV1 TaskApiV1;
+static struct ConfigApiV1 ConfigApiV1;
+
 static __thread u8 _stream_buffer[64 * 1024] = {0};
 static __thread u32 _stream_buffer_size = 0;
 static __thread u32 _scope_depth = 0;
@@ -68,11 +75,11 @@ static void _flush_stream_buffer() {
 static void _flush_job(void *data) {
     _flush_stream_buffer();
 
-    atomic_store_explicit(&_G.complete_flag[taskmanager_worker_id()], 1, memory_order_release);
+    atomic_store_explicit(&_G.complete_flag[TaskApiV1.worker_id()], 1, memory_order_release);
 }
 
 static void _flush_all_streams() {
-    const int wc = taskmanager_worker_count();
+    const int wc = TaskApiV1.worker_count();
 
     for (int i = 1; i < wc; ++i) {
         atomic_init(&_G.complete_flag[i], 0);
@@ -91,10 +98,10 @@ static void _flush_all_streams() {
         };
     }
 
-    taskmanager_add(items, wc);
+    TaskApiV1.add(items, wc);
 
     for (int i = 1; i < wc; ++i) {
-        taskmanager_wait_atomic(&_G.complete_flag[i], 0);
+        TaskApiV1.wait_atomic(&_G.complete_flag[i], 0);
     }
 }
 
@@ -220,47 +227,45 @@ void _send_events() {
 //==============================================================================
 // Interface
 //==============================================================================
+static void _init(get_api_fce_t get_engine_api) {
+    MemSysApiV1 = *(struct MemSysApiV1 *) get_engine_api(MEMORY_API_ID, 0);
+    TaskApiV1 = *(struct TaskApiV1 *) get_engine_api(TASK_API_ID, 0);
+    ConfigApiV1 = *(struct ConfigApiV1 *) get_engine_api(CONFIG_API_ID, 0);
 
-int developsys_init(int stage) {
-    if (stage == 0) {
-        _G = (struct G) {0};
-
-        _G.cv_pub_addr = cvar_new_str("develop.pub.addr", "Console server rpc addr", "ws://*:4447");
-
-        return 1;
-    }
-
-    MAP_INIT(to_mpack_fce_t, &_G.to_mpack, memsys_main_allocator());
-    eventstream_create(&_G.eventstream, memsys_main_allocator());
+    MAP_INIT(to_mpack_fce_t, &_G.to_mpack, MemSysApiV1.main_allocator());
+    eventstream_create(&_G.eventstream, MemSysApiV1.main_allocator());
 
     _register_to_mpack(EVENT_SCOPE, _scopeevent_to_mpack);
     _register_to_mpack(EVENT_RECORD_FLOAT, _recordfloat_to_mpack);
     _register_to_mpack(EVENT_RECORD_INT, _recordint_to_mpack);
 
-    const char* addr = 0;
+    const char *addr = 0;
 
     log_debug(LOG_WHERE, "Init");
 
     int socket = nn_socket(AF_SP, NN_PUB);
     if (socket < 0) {
         log_error(LOG_WHERE, "Could not create nanomsg socket: %s", nn_strerror(errno));
-        return 0;
+        //return 0;
     }
-    addr = cvar_get_string(_G.cv_pub_addr);
+    addr = ConfigApiV1.get_string(_G.cv_pub_addr);
 
     log_debug(LOG_WHERE, "PUB address: %s", addr);
 
     if (nn_bind(socket, addr) < 0) {
         log_error(LOG_WHERE, "Could not bind socket to '%s': %s", addr, nn_strerror(errno));
-        return 0;
+        //return 0;
     }
 
     _G.pub_socket = socket;
-
-    return 1;
 }
 
-void developsys_shutdown() {
+static void _init_cvar(struct ConfigApiV1 config) {
+    _G = (struct G) {0};
+    _G.cv_pub_addr = config.new_str("develop.pub.addr", "Console server rpc addr", "ws://*:4447");
+}
+
+static void _shutdown() {
     log_debug(LOG_WHERE, "Shutdown");
 
     MAP_DESTROY(to_mpack_fce_t, &_G.to_mpack);
@@ -269,11 +274,11 @@ void developsys_shutdown() {
     nn_close(_G.pub_socket);
 }
 
-void developsys_update(float dt) {
+static void _after_update(float dt) {
     _flush_all_streams();
 
     _G.time_accum += dt;
-    if(_G.time_accum >= 10.0f/1000.0f ) {
+    if (_G.time_accum >= 10.0f / 1000.0f) {
         _send_events();
 
         _G.time_accum = 0.0f;
@@ -305,25 +310,69 @@ struct scope_data developsys_enter_scope(const char *name) {
     ++_scope_depth;
 
     return (struct scope_data) {
+            .name = name,
             .start = cel_get_ticks(),
             .start_timer = cel_get_perf_counter()
     };
 }
 
-void developsys_leave_scope(const char *name,
-                            struct scope_data scope_data) {
+void developsys_leave_scope(struct scope_data scope_data) {
+    CEL_ASSERT(LOG_WHERE, _scope_depth > 0);
     --_scope_depth;
 
     struct scope_event ev = {
             .name = {0},
-            .worker_id = taskmanager_worker_id(),
+            .worker_id = TaskApiV1.worker_id(),
             .start = scope_data.start,
             .duration = ((float) (cel_get_perf_counter() - scope_data.start_timer) / cel_get_perf_freq()) * 1000.0f,
             .depth = _scope_depth,
     };
 
-    memory_copy(ev.name, name, cel_strlen(name));
+    memory_copy(ev.name, scope_data.name, cel_strlen(scope_data.name));
 
     developsys_push(EVENT_SCOPE, ev);
 }
 
+void *developsystem_get_plugin_api(int api,
+                                   int version) {
+    switch (api) {
+        case PLUGIN_EXPORT_API_ID:
+            switch (version) {
+                case 0: {
+                    static struct plugin_api_v0 plugin = {0};
+
+                    plugin.init = _init;
+                    plugin.shutdown = _shutdown;
+                    plugin.init_cvar = _init_cvar;
+                    plugin.after_update = _after_update;
+
+                    return &plugin;
+                }
+
+                default:
+                    return NULL;
+            };
+        case DEVELOP_SERVER_API_ID:
+            switch (version) {
+                case 0: {
+                    static struct DevelopSystemApiV1 api = {0};
+
+                    api.push = _developsys_push;
+                    api.push_record_float = developsys_push_record_float;
+                    api.push_record_int = developsys_push_record_int;
+                    api.leave_scope = developsys_leave_scope;
+                    api.enter_scope = developsys_enter_scope;
+
+                    return &api;
+                }
+
+                default:
+                    return NULL;
+            };
+
+        default:
+            return NULL;
+    }
+
+    return 0;
+}
