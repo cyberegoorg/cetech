@@ -231,7 +231,7 @@ int taskmanager_do_work() {
 
     _G._task_pool[t.id].task_work(_G._task_pool[t.id].data);
 
-    DevelopSystemApiV1.leave_scope(_G._task_pool[t.id].name, sd);
+    DevelopSystemApiV1.leave_scope(sd);
 
     _mark_task_job_done(t);
 

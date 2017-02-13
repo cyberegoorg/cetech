@@ -287,15 +287,15 @@ void application_start() {
 
         if (frame_time_accum >= frame_time) {
             if (!ConfigApiV1.get_int(_G.config.daemon)) {
-                struct scope_data render_sd = DevelopSystemApiV1.enter_scope("Game::render()");
+                struct scope_data render_sd = DevelopSystemApiV1.enter_scope("Game:render()");
                 _G.game->render();
-                DevelopSystemApiV1.leave_scope("Game::render()", render_sd);
+                DevelopSystemApiV1.leave_scope(render_sd);
             }
 
             frame_time_accum = 0.0f;
         }
 
-        DevelopSystemApiV1.leave_scope("Application:update()", application_sd);
+        DevelopSystemApiV1.leave_scope(application_sd);
         DevelopSystemApiV1.push_record_float("engine.delta_time", dt);
 
         plugin_call_after_update(dt);

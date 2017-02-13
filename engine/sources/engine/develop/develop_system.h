@@ -43,6 +43,7 @@ struct scope_event {
 };
 
 struct scope_data {
+    const char* name;
     time_t start;
     u64 start_timer;
 };
@@ -62,8 +63,7 @@ struct DevelopSystemApiV1 {
 
     struct scope_data (*enter_scope)(const char *name);
 
-    void (*leave_scope)(const char *name,
-                        struct scope_data scope_data);
+    void (*leave_scope)(struct scope_data scope_data);
 };
 
 

@@ -310,13 +310,14 @@ struct scope_data developsys_enter_scope(const char *name) {
     ++_scope_depth;
 
     return (struct scope_data) {
+            .name = name,
             .start = cel_get_ticks(),
             .start_timer = cel_get_perf_counter()
     };
 }
 
-void developsys_leave_scope(const char *name,
-                            struct scope_data scope_data) {
+void developsys_leave_scope(struct scope_data scope_data) {
+    CEL_ASSERT(LOG_WHERE, _scope_depth > 0);
     --_scope_depth;
 
     struct scope_event ev = {
@@ -327,7 +328,7 @@ void developsys_leave_scope(const char *name,
             .depth = _scope_depth,
     };
 
-    memory_copy(ev.name, name, cel_strlen(name));
+    memory_copy(ev.name, scope_data.name, cel_strlen(scope_data.name));
 
     developsys_push(EVENT_SCOPE, ev);
 }
