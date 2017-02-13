@@ -656,14 +656,9 @@ static const bgfx_texture_handle_t null_texture = {0};
 
 void scene_resource_offline(stringid64_t name,
                             void *data) {
-//    bgfx_texture_handle_t texture = MAP_GET(bgfx_texture_handle_t, &_G.handler_map, name.id, null_texture);
-//
-//    if (texture.idx == null_texture.idx) {
-//        return;
-//    }
-//
-//    bgfx_destroy_texture(texture);
-
+    struct scene_instance instance = MAP_GET(scene_instance, &_G.scene_instance, name.id, (struct scene_instance){0});
+    _destroy_scene_instance(&instance);
+    MAP_REMOVE(scene_instance, &_G.scene_instance, name.id);
 }
 
 void *scene_resource_reloader(stringid64_t name,
