@@ -28,11 +28,14 @@ CPU_COUNT_STR = str(CPU_COUNT)
 OS_NAME = platform.system().lower()
 OS_ARCH = 64 if sys.maxsize > 2 ** 32 else 32
 
-ROOT_DIR = os.path.abspath(os.path.join(os.path.dirname(os.path.abspath(__file__)), os.path.pardir, os.path.pardir))
+CEBASE_DIR = os.path.abspath(os.path.join(os.path.dirname(os.path.abspath(__file__)), os.path.pardir))
+
+ROOT_DIR = os.path.abspath(CEBASE_DIR, os.path.pardir)
 EXTERNAL_DIR = os.path.join(ROOT_DIR, 'externals')
 EXTERNAL_BUILD_DIR = os.path.join(EXTERNAL_DIR, 'build')
 EXTERNAL_SRC_DIR = os.path.join(EXTERNAL_DIR, 'src')
 DEFAULT_BUILD = "%s%s" % (OS_NAME, OS_ARCH)
+TOOLS_DIR = os.path.join(CEBASE_DIR, "tools")
 
 ##########
 # CONFIG #
@@ -171,7 +174,7 @@ def build(name, body, platform_, job_count_str, verbose):
             cmd_lst[0] = os.path.join('C:\Program Files (x86)\Microsoft Visual Studio 14.0\Common7\IDE', 'devenv')
 
         elif cmd_lst[0] == 'extract':
-            cmd_lst[0] = os.path.join(EXTERNAL_DIR, 'tools', 'windows64', '7zip', '7za.exe')
+            cmd_lst[0] = os.path.join(TOOLS_DIR, 'windows64', '7zip', '7za.exe')
             cmd_lst.insert(1, 'e')
             cmd_lst.insert(2, '-aoa')
 
