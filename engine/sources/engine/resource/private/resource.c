@@ -3,19 +3,20 @@
 //==============================================================================
 
 #include "include/SDL2/SDL.h"
+#include "include/mpack/mpack.h"
 
-#include <engine/resource/resource.h>
-#include <engine/resource/filesystem.h>
-#include <engine/config/cvar.h>
-#include <celib/filesystem/path.h>
-#include <engine/application/application.h>
-#include <celib/filesystem/vio.h>
-#include <mpack/mpack.h>
-#include <engine/develop/console_server.h>
 #include "celib/containers/map.h"
+#include <celib/filesystem/vio.h>
+#include <celib/filesystem/path.h>
+
+#include "engine/resource/types.h"
+#include <engine/config/cvar.h>
+#include <engine/application/application.h>
+#include <engine/develop/console_server.h>
 #include <engine/memory/memsys.h>
 #include <engine/plugin/plugin_api.h>
 #include <engine/plugin/plugin.h>
+#include <engine/filesystem/types.h>
 
 #include "../types.h"
 #include "engine/memory/memsys.h"

@@ -4,7 +4,7 @@
 
 #include <celib/string/stringid.h>
 #include <engine/task/task.h>
-#include <engine/resource/resource.h>
+#include "engine/resource/types.h"
 #include <celib/filesystem/vio.h>
 #include <celib/yaml/yaml.h>
 #include <celib/thread/thread.h>

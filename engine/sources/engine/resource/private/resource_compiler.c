@@ -11,7 +11,7 @@
 #include <celib/filesystem/path.h>
 #include <celib/string/stringid.h>
 #include <engine/task/task.h>
-#include <engine/resource/resource.h>
+#include "engine/resource/types.h"
 #include <engine/application/application.h>
 #include <engine/memory/memsys.h>
 #include <engine/plugin/plugin_api.h>

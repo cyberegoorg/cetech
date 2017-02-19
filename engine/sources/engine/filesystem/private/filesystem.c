@@ -8,7 +8,6 @@
 
 #include "celib/filesystem/vio.h"
 
-#include "engine/resource/filesystem.h"
 #include "engine/memory/memsys.h"
 #include "../types.h"
 

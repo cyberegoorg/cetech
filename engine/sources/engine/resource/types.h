@@ -1,5 +1,8 @@
-#ifndef CETECH_FILESYSTEM_TYPES_H
-#define CETECH_FILESYSTEM_TYPES_H
+//! \defgroup Resource
+//! Resource system
+//! \{
+#ifndef CETECH_RESOURCE_TYPES_H
+#define CETECH_RESOURCE_TYPES_H
 
 //==============================================================================
 // Includes
@@ -10,44 +13,6 @@
 #include "celib/types.h"
 #include "celib/filesystem/vio_types.h"
 #include "engine/config/cvar.h"
-
-//==============================================================================
-// Filesystem Interface
-//==============================================================================
-
-struct FilesystemApiV1 {
-    const char *(*filesystem_get_root_dir)(stringid64_t root);
-
-    struct vio *(*filesystem_open)(stringid64_t root,
-                                   const char *path,
-                                   enum cel_vio_open_mode mode);
-
-    void (*filesystem_map_root_dir)(stringid64_t root,
-                                    const char *base_path);
-
-    void (*filesystem_close)(struct vio *file);
-
-    void (*filesystem_listdir)(stringid64_t root,
-                               const char *path,
-                               const char *filter,
-                               string_array_t *files,
-                               struct cel_allocator *allocator);
-
-    void (*filesystem_listdir_free)(string_array_t *files,
-                                    struct cel_allocator *allocator);
-
-    int (*filesystem_create_directory)(stringid64_t root,
-                                       const char *path);
-
-    i64 (*filesystem_get_file_mtime)(stringid64_t root,
-                                     const char *path);
-
-    int (*filesystem_get_fullpath)(stringid64_t root,
-                                   char *result,
-                                   u64 maxlen,
-                                   const char *filename);
-};
-
 
 
 //==============================================================================
@@ -187,4 +152,5 @@ struct PackageApiV1 {
     void (*flush)(stringid64_t name);
 };
 
-#endif //CETECH_FILESYSTEM_TYPES_H
+#endif //CETECH_RESOURCE_TYPES_H
+//! |}
