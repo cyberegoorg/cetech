@@ -3,8 +3,7 @@
 //==============================================================================
 
 #include <engine/plugin/plugin.h>
-#include "celib/machine/machine.h"
-
+#include "engine/machine/machine.h"
 #include "engine/input/keyboard.h"
 
 #include "keystr.h"
@@ -63,8 +62,6 @@ static void _update() {
         event = machine_event_next(event);
     }
 }
-
-
 
 
 //==============================================================================

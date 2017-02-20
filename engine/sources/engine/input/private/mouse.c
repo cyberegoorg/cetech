@@ -4,7 +4,7 @@
 
 #include <celib/math/types.h>
 #include <engine/plugin/plugin_api.h>
-#include "celib/machine/machine.h"
+#include "engine/machine/machine.h"
 #include "celib/string/string.h"
 
 #include "engine/input/mouse.h"

@@ -5,7 +5,7 @@
 #include <celib/math/types.h>
 #include <engine/input/gamepad.h>
 #include <engine/plugin/plugin_api.h>
-#include "celib/machine/machine.h"
+#include "engine/machine/machine.h"
 #include "celib/string/string.h"
 
 #include "gamepadstr.h"

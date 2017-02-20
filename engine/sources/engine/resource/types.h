@@ -8,6 +8,7 @@
 // Includes
 //==============================================================================
 
+#include <engine/application/application.h>
 #include "celib/string/stringid.h"
 #include "celib/containers/array.h"
 #include "celib/types.h"
@@ -131,7 +132,7 @@ struct ResourceApiV1 {
                                   u32 max_len,
                                   const char *name);
 
-    void (*compiler_create_build_dir)(struct ConfigApiV1 config);
+    void (*compiler_create_build_dir)(struct ConfigApiV1 config, struct ApplicationApiV1 app);
 
     const char *(*compiler_get_core_dir)();
 
