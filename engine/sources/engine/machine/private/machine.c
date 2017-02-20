@@ -21,6 +21,13 @@
 // Globals
 //==============================================================================
 
+typedef int (*machine_part_init_t)(get_api_fce_t);
+
+typedef void (*machine_part_shutdown_t)();
+
+typedef void (*machine_part_process_t)(struct eventstream *stream);
+
+
 static struct G {
     machine_part_init_t init[MAX_PARTS];
     machine_part_shutdown_t shutdown[MAX_PARTS];
@@ -35,6 +42,19 @@ static struct G {
 //==============================================================================
 // Interface
 //==============================================================================
+
+void machine_register_part(const char *name,
+                           machine_part_init_t init,
+                           machine_part_shutdown_t shutdown,
+                           machine_part_process_t process) {
+
+    const int idx = _G.parts_count++;
+
+    _G.name[idx] = name;
+    _G.init[idx] = init;
+    _G.shutdown[idx] = shutdown;
+    _G.process[idx] = process;
+}
 
 static void _init(get_api_fce_t get_engine_api) {
     _G = (struct G) {0};
@@ -92,18 +112,11 @@ struct event_header *machine_event_next(struct event_header *header) {
     return eventstream_next(header);
 }
 
-void machine_register_part(const char *name,
-                           machine_part_init_t init,
-                           machine_part_shutdown_t shutdown,
-                           machine_part_process_t process) {
+int machine_gamepad_is_active(int idx);
 
-    const int idx = _G.parts_count++;
-
-    _G.name[idx] = name;
-    _G.init[idx] = init;
-    _G.shutdown[idx] = shutdown;
-    _G.process[idx] = process;
-}
+void machine_gamepad_play_rumble(int gamepad,
+                                 float strength,
+                                 u32 length);
 
 void *machine_get_plugin_api(int api,
                              int version) {
@@ -116,24 +129,18 @@ void *machine_get_plugin_api(int api,
         plugin.update = _update;
 
         return &plugin;
-    }
 
-//    } else if (api == GAMEPAD_API_ID && version == 0) {
-//        static struct GamepadApiV1 api_v1 = {
-//                .is_active = gamepad_is_active,
-//                .button_index = gamepad_button_index,
-//                .button_name = gamepad_button_name,
-//                .button_state = gamepad_button_state,
-//                .button_pressed = gamepad_button_pressed,
-//                .button_released = gamepad_button_released,
-//                .axis_index = gamepad_axis_index,
-//                .axis_name = gamepad_axis_name,
-//                .axis = gamepad_axis,
-//                .play_rumble = gamepad_play_rumble,
-//        };
-//
-//        return &api_v1;
-//    }
+    } else if (api == MACHINE_API_ID && version == 0) {
+        static struct MachineApiV1 api_v1 = {
+                .event_begin = machine_event_begin,
+                .event_end = machine_event_end,
+                .event_next = machine_event_next,
+                .gamepad_is_active = machine_gamepad_is_active,
+                .gamepad_play_rumble = machine_gamepad_play_rumble,
+        };
+
+        return &api_v1;
+    }
 
     return 0;
 }
