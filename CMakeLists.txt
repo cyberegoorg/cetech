@@ -140,23 +140,23 @@ set(SOURCE_FILES
         engine/sources/engine/develop/private/console_server.c
         engine/sources/engine/develop/private/develop_system.c
 
-        engine/sources/engine/resource/private/filesystem.c
         engine/sources/engine/application/private/application.c
         engine/sources/engine/task/private/task.c
 
         engine/sources/engine/resource/private/resource.c
         engine/sources/engine/resource/private/resource_package.c
         engine/sources/engine/resource/private/resource_compiler.c
+        engine/sources/engine/filesystem/private/filesystem.c
         engine/sources/engine/world/private/unit.c
         engine/sources/engine/entcom/private/entcom.c
         engine/sources/engine/world/private/world.c
         engine/sources/engine/world/private/level.c
 
-        cebase/sources/celib/machine/private/machine.c
-        cebase/sources/celib/machine/private/sdl2/sdl_mouse.c
-        cebase/sources/celib/machine/private/sdl2/sdl_keyboard.c
-        cebase/sources/celib/machine/private/sdl2/sdl_gamepad.c
-        cebase/sources/celib/machine/private/sdl2/sdl_machine.c
+        engine/sources/engine/machine/private/machine.c
+        engine/sources/engine/machine/private/sdl2/sdl_mouse.c
+        engine/sources/engine/machine/private/sdl2/sdl_keyboard.c
+        engine/sources/engine/machine/private/sdl2/sdl_gamepad.c
+        engine/sources/engine/machine/private/sdl2/sdl_machine.c
 
         engine/sources/engine/input/private/keyboard.c
         engine/sources/engine/input/private/mouse.c

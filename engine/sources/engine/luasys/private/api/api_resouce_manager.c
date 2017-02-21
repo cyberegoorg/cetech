@@ -1,7 +1,7 @@
 #include <engine/plugin/plugin.h>
-#include "engine/resource/resource.h"
 #include "../luasys.h"
 #include <engine/plugin/plugin_api.h>
+#include <engine/resource/types.h>
 
 #define API_NAME "ResourceManager"
 

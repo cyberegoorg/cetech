@@ -1,3 +1,6 @@
+//! \defgroup Lua
+//! Lua system
+//! \{
 #ifndef CETECH_LUA_TYPES_H
 #define CETECH_LUA_TYPES_H
 
@@ -127,3 +130,4 @@ struct LuaSysApiV1 {
 };
 
 #endif //CETECH_LUA_TYPES_H
+//! \}

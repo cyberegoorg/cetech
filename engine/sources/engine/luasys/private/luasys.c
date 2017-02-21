@@ -4,7 +4,6 @@
 
 #include <include/mpack/mpack.h>
 #include <celib/string/stringid.h>
-#include <engine/resource/resource.h>
 #include <celib/filesystem/vio.h>
 #include <engine/application/application.h>
 #include <celib/math/types.h>
@@ -19,6 +18,7 @@
 #include "luasys.h"
 #include "engine/luasys/luasys.h"
 #include <engine/plugin/plugin_api.h>
+#include "engine/resource/types.h"
 
 //==============================================================================
 // Defines
