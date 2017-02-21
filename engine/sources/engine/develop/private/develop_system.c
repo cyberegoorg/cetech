@@ -33,6 +33,7 @@
 //==============================================================================
 
 #define _G DevelopSystemGlobals
+#define developsys_push(type, event) _developsys_push((struct event_header*)(&event), type, sizeof(event))
 
 typedef void (*to_mpack_fce_t)(const struct event_header *event,
                                mpack_writer_t *writer);
