@@ -13,7 +13,7 @@
 #include "celib/filesystem/filesystem.h"
 
 #include "engine/application/application.h"
-#include "engine/resource/resource.h"
+#include "engine/resource/types.h"
 #include <engine/memory/memsys.h>
 #include <engine/plugin/plugin.h>
 #include "engine/memory/memsys.h"
@@ -47,6 +47,7 @@ struct G {
 
 static struct MemSysApiV1 MemSysApiV1;
 static struct ResourceApiV1 ResourceApiV1;
+static struct ApplicationApiV1 ApplicationApiV1;
 
 //==============================================================================
 // Compiler private
@@ -141,8 +142,8 @@ int _shader_resource_compiler(const char *filename,
     char output_path[4096] = {0};
     char tmp_filename[4096] = {0};
 
-    ResourceApiV1.compiler_get_build_dir(build_dir, CEL_ARRAY_LEN(build_dir), application_platform());
-    ResourceApiV1.compiler_get_tmp_dir(tmp_dir, CEL_ARRAY_LEN(tmp_dir), application_platform());
+    ResourceApiV1.compiler_get_build_dir(build_dir, CEL_ARRAY_LEN(build_dir), ApplicationApiV1.platform());
+    ResourceApiV1.compiler_get_tmp_dir(tmp_dir, CEL_ARRAY_LEN(tmp_dir), ApplicationApiV1.platform());
 
     //////// VS
     yaml_as_string(vs_input, input_str, CEL_ARRAY_LEN(input_str));
@@ -276,6 +277,7 @@ int shader_resource_init() {
 
     MemSysApiV1 = *(struct MemSysApiV1 *) plugin_get_engine_api(MEMORY_API_ID, 0);
     ResourceApiV1 = *(struct ResourceApiV1 *) plugin_get_engine_api(RESOURCE_API_ID, 0);
+    ApplicationApiV1 = *(struct ApplicationApiV1 *) plugin_get_engine_api(APPLICATION_API_ID, 0);
 
     _G.type = stringid64_from_string("shader");
 

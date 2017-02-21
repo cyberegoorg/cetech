@@ -15,7 +15,7 @@
 #include <engine/memory/memsys.h>
 #include <engine/plugin/plugin.h>
 
-#include "engine/resource/resource.h"
+#include "engine/resource/types.h"
 #include "engine/memory/memsys.h"
 
 #include "engine/resource/types.h"
