@@ -12,8 +12,8 @@
 
 #include <engine/application/application.h>
 #include <engine/config/cvar.h>
-#include <celib/machine/machine.h>
-#include <engine/resource/resource.h>
+#include <engine/machine/machine.h>
+#include "engine/resource/types.h"
 #include <engine/luasys/luasys.h>
 #include <engine/renderer/renderer.h>
 #include <engine/develop/develop_system.h>
@@ -72,6 +72,12 @@ static char _get_worker_id() {
 // Interface
 //==============================================================================
 
+const char *application_platform();
+
+const char *application_native_platform();
+
+cel_window_t application_get_main_window();
+
 void application_quit() {
     _G.is_running = 0;
     _G.init_error = 0;
@@ -91,6 +97,13 @@ static struct TaskApiV1 TaskApiV1;
 static struct LuaSysApiV1 LuaSysApiV1;
 static struct ConfigApiV1 ConfigApiV1;
 
+static struct ApplicationApiV1 api_v1 = {
+        .quit = application_quit,
+        .platform =  application_platform,
+        .native_platform =  application_native_platform,
+        .main_window =  application_get_main_window,
+};
+
 int application_init(int argc,
                      const char **argv) {
     _G = (struct G) {0};
@@ -106,13 +119,14 @@ int application_init(int argc,
 
     ADD_STATIC_PLUGIN(memsys);
     ADD_STATIC_PLUGIN(config);
+    ADD_STATIC_PLUGIN(application);
+
     cvar_init();
 
     _init_static_plugins();
 
     plugin_load_dirs("./bin");
     plugin_call_init_cvar();
-    machine_init(0);
 
     ConsoleServerApiV1 = *((struct ConsoleServerApiV1 *) plugin_get_engine_api(CONSOLE_SERVER_API_ID, 0));
     DevelopSystemApiV1 = *((struct DevelopSystemApiV1 *) plugin_get_engine_api(DEVELOP_SERVER_API_ID, 0));
@@ -141,7 +155,7 @@ int application_init(int argc,
 
     ConfigApiV1.parse_core_args(_G.args);
     if (ConfigApiV1.get_int(_G.config.compile)) {
-        ResourceApiV1.compiler_create_build_dir(ConfigApiV1);
+        ResourceApiV1.compiler_create_build_dir(ConfigApiV1, api_v1);
         ConfigApiV1.compile_global();
     }
 
@@ -155,9 +169,6 @@ int application_init(int argc,
 
     plugin_call_init();
 
-    machine_init(1);
-
-
     log_set_wid_clb(TaskApiV1.worker_id);
 
     ConsoleServerApiV1.consolesrv_register_command("wait", _cmd_wait);
@@ -169,7 +180,6 @@ int application_shutdown() {
     log_debug(LOG_WHERE, "Shutdown");
 
     plugin_call_shutdown();
-    machine_shutdown();
     cvar_shutdown();
     memsys_shutdown();
     log_shutdown();
@@ -275,9 +285,6 @@ void application_start() {
         last_tick = now_ticks;
         frame_time_accum += dt;
 
-
-        machine_process();
-
         plugin_call_update();
         _G.game->update(dt);
 
@@ -321,4 +328,18 @@ const char *application_platform() {
 
 cel_window_t application_get_main_window() {
     return _G.main_window;
+}
+
+
+void *application_get_plugin_api(int api,
+                                 int version) {
+
+    if (api == PLUGIN_EXPORT_API_ID && version == 0) {
+        static struct plugin_api_v0 plugin = {0};
+        return &plugin;
+    } else if (api == APPLICATION_API_ID && version == 0) {
+        return &api_v1;
+    }
+
+    return 0;
 }

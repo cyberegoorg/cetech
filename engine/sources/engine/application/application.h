@@ -1,21 +1,16 @@
+//! \defgroup Application
+//! Main application
+//! \{
 #ifndef CETECH_APPLICATION_H
 #define CETECH_APPLICATION_H
 
 #include "celib/window/types.h"
 
-typedef int(*game_init_clb_t)();
-
-typedef void(*game_shutdown_clb_t)();
-
-typedef void(*game_update_clb_t)(float dt);
-
-typedef void(*game_render_clb_t)();
-
 struct game_callbacks {
-    game_init_clb_t init;
-    game_shutdown_clb_t shutdown;
-    game_update_clb_t update;
-    game_render_clb_t render;
+    int(*init)();
+    void(*shutdown)();
+    void(*update)(float dt);
+    void(*render)();
 };
 
 //==============================================================================
@@ -35,13 +30,23 @@ int application_shutdown();
 //! Start application main loop
 void application_start();
 
-//! Stop main loop and quit.
-void application_quit();
+//! Application API V1
+struct ApplicationApiV1 {
+    //! Stop main loop and quit.
+    void (*quit)();
 
-const char *application_platform();
+    //! Get platform
+    //! \return Platform platfrom
+    const char *(*platform)();
 
-const char *application_native_platform();
+    //! Get native platform
+    //! \return Native platfrom
+    const char *(*native_platform)();
 
-cel_window_t application_get_main_window();
+    //! Get main window
+    //! \return Main window
+    cel_window_t (*main_window)();
+};
 
 #endif //CETECH_APPLICATION_H
+// \}
