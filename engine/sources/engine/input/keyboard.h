@@ -1,3 +1,5 @@
+//! \ingroup Input
+//! \{
 #ifndef CETECH_KEYBOARD_H
 #define CETECH_KEYBOARD_H
 
@@ -8,13 +10,13 @@
 #include "celib/types.h"
 #include "celib/math/types.h"
 
-#include "engine/input/types.h"
+#include "engine/input/_group.h"
 
 //==============================================================================
 // Keyboard
 //==============================================================================
 
-
+//! Keyboard API V1
 struct KeyboardApiV1 {
     //! Return button index
     //! \param button_name Button name
@@ -44,5 +46,5 @@ struct KeyboardApiV1 {
     int (*button_released)(u32 idx,
                            const u32 button_index);
 };
-
+//! \}
 #endif //CETECH_KEYBOARD_H
