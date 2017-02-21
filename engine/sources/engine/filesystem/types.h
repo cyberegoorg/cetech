@@ -15,9 +15,11 @@
 #include "engine/config/cvar.h"
 
 //==============================================================================
-// Filesystem Interface
+// Interface
 //==============================================================================
 
+
+//! Filesystem API V1
 struct FilesystemApiV1 {
     //! Return root dir
     //! \param root Root
