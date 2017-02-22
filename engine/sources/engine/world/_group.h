@@ -1,0 +1,2 @@
+//! \defgroup World
+//! Game world

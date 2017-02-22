@@ -4,7 +4,7 @@
 
 #include <engine/world/world.h>
 #include <celib/filesystem/vio.h>
-#include <engine/resource/resource.h>
+#include "engine/resource/types.h"
 #include <engine/world/unit.h>
 #include <engine/entcom/entcom.h>
 #include <engine/world/transform.h>
