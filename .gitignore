@@ -3,6 +3,7 @@
 .vagrant
 .cache
 
+/docs/doxygen/
 /bin/
 /build/
 /cmake-build-debug/
