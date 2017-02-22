@@ -223,7 +223,7 @@ void plugin_call_init_cvar() {
 }
 
 void plugin_call_shutdown() {
-    for (size_t i = 0; i < MAX_PLUGINS; ++i) {
+    for (int i = MAX_PLUGINS - 1; i >= 0; --i) {
         if (!_G.used[i] || !_G.plugin_api[i]->shutdown) {
             continue;
         }

@@ -3,8 +3,7 @@
 //==============================================================================
 
 #include <engine/plugin/plugin.h>
-#include "celib/machine/machine.h"
-
+#include "engine/machine/machine.h"
 #include "engine/input/keyboard.h"
 
 #include "keystr.h"
@@ -26,8 +25,12 @@ static struct G {
     u8 last_state[512];
 } _G = {0};
 
+static struct MachineApiV1 MachineApiV1 = {0};
+
 static void _init(get_api_fce_t get_engine_api) {
     _G = (struct G) {0};
+
+    MachineApiV1 = *(struct MachineApiV1*) get_engine_api(MACHINE_API_ID, 0);
 
     log_debug(LOG_WHERE, "Init");
 }
@@ -39,12 +42,12 @@ static void _shutdown() {
 }
 
 static void _update() {
-    struct event_header *event = machine_event_begin();
+    struct event_header *event = MachineApiV1.event_begin();
 
     memory_copy(_G.last_state, _G.state, 512);
 
     u32 size = 0;
-    while (event != machine_event_end()) {
+    while (event != MachineApiV1.event_end()) {
         size = size + 1;
 
         switch (event->type) {
@@ -60,11 +63,9 @@ static void _update() {
                 break;
         }
 
-        event = machine_event_next(event);
+        event = MachineApiV1.event_next(event);
     }
 }
-
-
 
 
 //==============================================================================

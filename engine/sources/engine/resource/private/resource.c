@@ -3,19 +3,20 @@
 //==============================================================================
 
 #include "include/SDL2/SDL.h"
+#include "include/mpack/mpack.h"
 
-#include <engine/resource/resource.h>
-#include <engine/resource/filesystem.h>
-#include <engine/config/cvar.h>
-#include <celib/filesystem/path.h>
-#include <engine/application/application.h>
-#include <celib/filesystem/vio.h>
-#include <mpack/mpack.h>
-#include <engine/develop/console_server.h>
 #include "celib/containers/map.h"
+#include <celib/filesystem/vio.h>
+#include <celib/filesystem/path.h>
+
+#include "engine/resource/types.h"
+#include <engine/config/cvar.h>
+#include <engine/application/application.h>
+#include <engine/develop/console_server.h>
 #include <engine/memory/memsys.h>
 #include <engine/plugin/plugin_api.h>
 #include <engine/plugin/plugin.h>
+#include <engine/filesystem/types.h>
 
 #include "../types.h"
 #include "engine/memory/memsys.h"
@@ -74,6 +75,7 @@ static struct MemSysApiV1 MemSysApiV1;
 static struct ConsoleServerApiV1 ConsoleServerApiV1;
 static struct FilesystemApiV1 FilesystemApiV1;
 static struct ConfigApiV1 ConfigApiV1;
+static struct ApplicationApiV1 ApplicationApiV1;
 
 void resource_set_autoload(int enable);
 
@@ -228,6 +230,7 @@ static void _init(get_api_fce_t get_engine_api) {
     MemSysApiV1 = *(struct MemSysApiV1 *) get_engine_api(MEMORY_API_ID, 0);
     FilesystemApiV1 = *(struct FilesystemApiV1 *) get_engine_api(FILESYSTEM_API_ID, 0);
     ConfigApiV1 = *(struct ConfigApiV1 *) get_engine_api(CONFIG_API_ID, 0);
+    ApplicationApiV1 = *(struct ApplicationApiV1 *) get_engine_api(APPLICATION_API_ID, 0);
 
     ARRAY_INIT(resource_data, &_G.resource_data, MemSysApiV1.main_allocator());
     ARRAY_INIT(resource_callbacks_t, &_G.resource_callbacks, MemSysApiV1.main_allocator());
@@ -240,7 +243,7 @@ static void _init(get_api_fce_t get_engine_api) {
     cel_path_join(build_dir_full,
                   CEL_ARRAY_LEN(build_dir_full),
                   ConfigApiV1.get_string(_G.config.build_dir),
-                  application_platform());
+                  ApplicationApiV1.platform());
 
     FilesystemApiV1.filesystem_map_root_dir(stringid64_from_string("build"), build_dir_full);
 

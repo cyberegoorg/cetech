@@ -31,6 +31,9 @@ static struct G {
 } _G = {0};
 
 
+int material_resource_init();
+void material_resource_shutdown();
+
 //==============================================================================
 // Private
 //==============================================================================
@@ -60,12 +63,14 @@ static struct ConsoleServerApiV1 ConsoleServerApiV1;
 static struct MeshApiV1 MeshApiV1;
 static struct CameraApiV1 CameraApiV1;
 static struct ConfigApiV1 ConfigApiV1;
+static struct ApplicationApiV1 ApplicationApiV1;
 
 static void _init(get_api_fce_t get_engine_api) {
     ConsoleServerApiV1 = *((struct ConsoleServerApiV1 *) get_engine_api(CONSOLE_SERVER_API_ID, 0));
     MeshApiV1 = *((struct MeshApiV1 *) get_engine_api(MESH_API_ID, 0));
     CameraApiV1 = *((struct CameraApiV1 *) get_engine_api(CAMERA_API_ID, 0));
     ConfigApiV1 = *((struct ConfigApiV1 *) get_engine_api(CONFIG_API_ID, 0));
+    ApplicationApiV1 = *((struct ApplicationApiV1 *) get_engine_api(APPLICATION_API_ID, 0));
 
     _G = (struct G) {0};
 
@@ -140,7 +145,7 @@ void renderer_render_world(world_t world,
     MeshApiV1.render_all(world);
 
     bgfx_frame(0);
-    cel_window_update(application_get_main_window());
+    cel_window_update(ApplicationApiV1.main_window());
 }
 
 cel_vec2f_t renderer_get_size() {

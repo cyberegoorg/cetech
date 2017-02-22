@@ -4,8 +4,8 @@
 
 #include <include/SDL2/SDL.h>
 #include <celib/math/types.h>
-#include "celib/machine/types.h"
-
+#include <engine/plugin/plugin_api.h>
+#include "engine/machine/machine.h"
 
 //==============================================================================
 // Defines
@@ -75,7 +75,7 @@ int _create_controler(int i) {
 // Interface
 //==============================================================================
 
-int sdl_gamepad_init() {
+int sdl_gamepad_init(get_api_fce_t get_engine_api) {
     _G = (struct G) {0};
 
     int num_joy = SDL_NumJoysticks();

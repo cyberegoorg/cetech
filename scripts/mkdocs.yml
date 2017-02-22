@@ -32,6 +32,8 @@ pages:
   - Examples:
     - 00-minimal: 'examples/00-minimal.md'
 
+  - Doxygen: 'doxygen/html/index.html'
+
   - Lua API:
     - Core:
       - cetech.Log: 'lua_api/Log.md'

@@ -14,7 +14,7 @@
 #include <engine/plugin/plugin_api.h>
 #include <engine/plugin/plugin.h>
 
-#include "engine/resource/resource.h"
+#include "engine/resource/types.h"
 #include "texture.h"
 #include "shader.h"
 #include "engine/memory/memsys.h"

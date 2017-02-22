@@ -10,10 +10,10 @@ void _init_static_plugins() {
     ADD_STATIC_PLUGIN(resourcesystem);
     ADD_STATIC_PLUGIN(resourcecompiler);
 
-
     ADD_STATIC_PLUGIN(consoleserver);
     ADD_STATIC_PLUGIN(developsystem);
 
+    ADD_STATIC_PLUGIN(machine);
     ADD_STATIC_PLUGIN(keyboard);
     ADD_STATIC_PLUGIN(gamepad);
     ADD_STATIC_PLUGIN(mouse);
@@ -33,4 +33,3 @@ void _init_static_plugins() {
 
     ADD_STATIC_PLUGIN(luasys);
 }
-

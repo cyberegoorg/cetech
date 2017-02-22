@@ -1,3 +1,5 @@
+//! \ingroup Input
+//! \{
 #ifndef CETECH_GAMEPAD_H
 #define CETECH_GAMEPAD_H
 
@@ -8,12 +10,13 @@
 #include "celib/types.h"
 #include "celib/math/types.h"
 
-#include "engine/input/types.h"
+#include "engine/input/_group.h"
 
 //==============================================================================
 // Gamepad
 //==============================================================================
 
+//! Gamepad API V1
 struct GamepadApiV1 {
     //! Is gamepad active?
     //! \param gamepad Gamepad
@@ -75,3 +78,4 @@ struct GamepadApiV1 {
 
 
 #endif //CETECH_GAMEPAD_H
+//! \}

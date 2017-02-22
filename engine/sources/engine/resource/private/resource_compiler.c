@@ -11,7 +11,7 @@
 #include <celib/filesystem/path.h>
 #include <celib/string/stringid.h>
 #include <engine/task/task.h>
-#include <engine/resource/resource.h>
+#include "engine/resource/types.h"
 #include <engine/application/application.h>
 #include <engine/memory/memsys.h>
 #include <engine/plugin/plugin_api.h>
@@ -62,6 +62,7 @@ static struct MemSysApiV1 MemSysApiV1;
 static struct ResourceApiV1 ResourceApiV1;
 static struct TaskApiV1 TaskApiV1;
 static struct ConfigApiV1 ConfigApiV1;
+static struct ApplicationApiV1 ApplicationApiV1;
 
 
 //CE_STATIC_ASSERT(sizeof(struct compile_task_data) < 64);
@@ -218,10 +219,11 @@ static void _init(get_api_fce_t get_engine_api) {
     MemSysApiV1 = *((struct MemSysApiV1 *) get_engine_api(MEMORY_API_ID, 0));
     ResourceApiV1 = *((struct ResourceApiV1 *) get_engine_api(RESOURCE_API_ID, 0));
     TaskApiV1 = *((struct TaskApiV1 *) get_engine_api(TASK_API_ID, 0));
+    ApplicationApiV1 = *((struct ApplicationApiV1 *) get_engine_api(APPLICATION_API_ID, 0));
 
     const char *build_dir = ConfigApiV1.get_string(_G.cv_build_dir);
     char build_dir_full[1024] = {0};
-    cel_path_join(build_dir_full, CEL_ARRAY_LEN(build_dir_full), build_dir, application_platform());
+    cel_path_join(build_dir_full, CEL_ARRAY_LEN(build_dir_full), build_dir, ApplicationApiV1.platform());
 
     cel_dir_make_path(build_dir_full);
     builddb_init_db(build_dir_full);
@@ -253,10 +255,11 @@ void *resourcecompiler_get_plugin_api(int api,
 }
 
 
-void resource_compiler_create_build_dir(struct ConfigApiV1 config) {
+void resource_compiler_create_build_dir(struct ConfigApiV1 config, struct ApplicationApiV1 app) {
     const char *build_dir = config.get_string(_G.cv_build_dir);
     char build_dir_full[1024] = {0};
-    cel_path_join(build_dir_full, CEL_ARRAY_LEN(build_dir_full), build_dir, application_platform());
+
+    cel_path_join(build_dir_full, CEL_ARRAY_LEN(build_dir_full), build_dir, app.platform());
 
     cel_dir_make_path(build_dir_full);
 }
@@ -279,7 +282,7 @@ void resource_compiler_compile_all() {
     const char *core_dir = ConfigApiV1.get_string(_G.cv_core_dir);
     const char *build_dir = ConfigApiV1.get_string(_G.cv_build_dir);
     const char *source_dir = ConfigApiV1.get_string(_G.cv_source_dir);
-    const char *platform = application_platform();
+    const char *platform = ApplicationApiV1.platform();
 
     char build_dir_full[1024] = {0};
     cel_path_join(build_dir_full, CEL_ARRAY_LEN(build_dir_full), build_dir, platform);
@@ -351,7 +354,7 @@ int resource_compiler_external_join(char *output,
     char tmp_dir2[1024] = {0};
 
     const char *external_dir_str = ConfigApiV1.get_string(_G.cv_external_dir);
-    cel_path_join(tmp_dir, CEL_ARRAY_LEN(tmp_dir), external_dir_str, application_native_platform());
+    cel_path_join(tmp_dir, CEL_ARRAY_LEN(tmp_dir), external_dir_str, ApplicationApiV1.native_platform());
     strncat(tmp_dir, "64", CEL_ARRAY_LEN(tmp_dir));
     cel_path_join(tmp_dir2, CEL_ARRAY_LEN(tmp_dir2), tmp_dir, "release/bin");
 

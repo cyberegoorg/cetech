@@ -4,7 +4,6 @@
 
 #include <celib/memory/memory.h>
 #include <engine/config/cvar.h>
-#include <engine/resource/resource.h>
 #include <celib/filesystem/vio.h>
 #include <engine/application/application.h>
 #include <celib/filesystem/path.h>
@@ -12,7 +11,8 @@
 #include <engine/memory/memsys.h>
 #include <engine/plugin/plugin_api.h>
 #include <engine/plugin/plugin.h>
-
+#include <celib/string/stringid.h>
+#include "engine/resource/types.h"
 //==============================================================================
 // Defines
 //==============================================================================
@@ -178,8 +178,9 @@ void cvar_compile_global() {
     char build_path[1024] = {0};
 
     struct ResourceApiV1 ResourceApiV1 = *(struct ResourceApiV1 *) plugin_get_engine_api(RESOURCE_API_ID, 0);
+    struct ApplicationApiV1 ApplicationApiV1 = *(struct ApplicationApiV1 *) plugin_get_engine_api(APPLICATION_API_ID, 0);
 
-    ResourceApiV1.compiler_get_build_dir(build_dir, CEL_ARRAY_LEN(build_dir), application_platform());
+    ResourceApiV1.compiler_get_build_dir(build_dir, CEL_ARRAY_LEN(build_dir), ApplicationApiV1.platform());
     cel_path_join(build_path, CEL_ARRAY_LEN(build_path), build_dir, "global.config");
     cel_path_join(source_path, CEL_ARRAY_LEN(source_path), ResourceApiV1.compiler_get_source_dir(), "global.config");
 
@@ -278,7 +279,8 @@ void cvar_load_global() {
     char source_path[1024] = {0};
 
     struct ResourceApiV1 ResourceApiV1 = *(struct ResourceApiV1 *) plugin_get_engine_api(RESOURCE_API_ID, 0);
-    ResourceApiV1.compiler_get_build_dir(build_dir, CEL_ARRAY_LEN(build_dir), application_platform());
+    struct ApplicationApiV1 ApplicationApiV1 = *(struct ApplicationApiV1 *) plugin_get_engine_api(APPLICATION_API_ID, 0);
+    ResourceApiV1.compiler_get_build_dir(build_dir, CEL_ARRAY_LEN(build_dir), ApplicationApiV1.platform());
     cel_path_join(source_path, CEL_ARRAY_LEN(source_path), build_dir, "global.config");
 
     struct vio *source_vio = cel_vio_from_file(source_path, VIO_OPEN_READ, MemSysApiV1.main_allocator());

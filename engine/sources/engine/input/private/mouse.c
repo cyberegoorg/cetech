@@ -4,7 +4,7 @@
 
 #include <celib/math/types.h>
 #include <engine/plugin/plugin_api.h>
-#include "celib/machine/machine.h"
+#include "engine/machine/machine.h"
 #include "celib/string/string.h"
 
 #include "engine/input/mouse.h"
@@ -30,9 +30,13 @@ static struct G {
     cel_vec2f_t last_delta_pos;
 } _G = {0};
 
+static struct MachineApiV1 MachineApiV1 = {0};
+
 
 static void _init(get_api_fce_t get_engine_api) {
     _G = (struct G) {0};
+
+    MachineApiV1 = *(struct MachineApiV1*) get_engine_api(MACHINE_API_ID, 0);
 
     log_debug(LOG_WHERE, "Init");
 }
@@ -44,13 +48,13 @@ static void _shutdown() {
 }
 
 static void _update() {
-    struct event_header *event = machine_event_begin();
+    struct event_header *event = MachineApiV1.event_begin();
 
     memory_copy(_G.last_state, _G.state, MOUSE_BTN_MAX);
 //    _G.last_delta_pos.x = 0;
 //    _G.last_delta_pos.y = 0;
 
-    while (event != machine_event_end()) {
+    while (event != MachineApiV1.event_end()) {
         struct mouse_move_event *move_event;
 
         switch (event->type) {
@@ -77,7 +81,7 @@ static void _update() {
                 break;
         }
 
-        event = machine_event_next(event);
+        event = MachineApiV1.event_next(event);
     }
 }
 

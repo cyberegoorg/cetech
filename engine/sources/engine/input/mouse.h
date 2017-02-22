@@ -1,3 +1,6 @@
+//! \ingroup Input
+//! \{
+
 #ifndef CETECH_MOUSE_H
 #define CETECH_MOUSE_H
 
@@ -8,12 +11,13 @@
 #include "celib/types.h"
 #include "celib/math/types.h"
 
-#include "engine/input/types.h"
+#include "engine/input/_group.h"
 
 //==============================================================================
 // Mouse
 //==============================================================================
 
+//! Mouse API V1
 struct MouseApiV1 {
     //! Return button index
     //! \param button_name Button name
@@ -62,3 +66,4 @@ struct MouseApiV1 {
 
 
 #endif //CETECH_MOUSE_H
+//! \}

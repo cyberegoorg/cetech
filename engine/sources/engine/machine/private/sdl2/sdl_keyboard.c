@@ -3,16 +3,14 @@
 //==============================================================================
 
 #include <include/SDL2/SDL.h>
-#include "celib/containers/array.h"
-#include "celib/containers/eventstream.h"
-#include "engine/application/application.h"
-#include "sdl_parts.h"
-
+#include <engine/plugin/plugin_api.h>
+#include "engine/machine/machine.h"
 //==============================================================================
 // Defines
 //==============================================================================
 
-#define LOG_WHERE "machine.sdl"
+#define is_button_down(now, last) ((now) && !(last))
+#define is_button_up(now, last)   (!(now) && (last))
 
 
 //==============================================================================
@@ -20,7 +18,7 @@
 //==============================================================================
 
 static struct G {
-    int _;
+    u8 state[KEY_MAX];
 } _G = {0};
 
 
@@ -28,40 +26,31 @@ static struct G {
 // Interface
 //==============================================================================
 
-int sdl_init() {
+int sdl_keyboard_init(get_api_fce_t get_engine_api) {
     _G = (struct G) {0};
-
-    if (SDL_Init(SDL_INIT_EVERYTHING) != 0) {
-        log_error(LOG_WHERE, "Could not init sdl - %s", SDL_GetError());
-        return 0;
-    }
 
     return 1;
 }
 
-void sdl_shutdown() {
+void sdl_keyboard_shutdown() {
     _G = (struct G) {0};
-
-    SDL_Quit();
 }
 
-void sdl_process(struct eventstream *stream) {
-    SDL_Event e;
+void sdl_keyboard_process(struct eventstream *stream) {
+    const u8 *state = SDL_GetKeyboardState(NULL);
+    struct keyboard_event keyboard_ev;
 
-    while (SDL_PollEvent(&e) > 0) {
-        switch (e.type) {
-            case SDL_QUIT:
-                application_quit();
-                break;
+    for (u32 i = 0; i < KEY_MAX; ++i) {
+        if (is_button_down(state[i], _G.state[i])) {
+            keyboard_ev.keycode = i;
+            event_stream_push(stream, EVENT_KEYBOARD_DOWN, keyboard_ev);
 
-            case SDL_CONTROLLERDEVICEADDED:
-            case SDL_CONTROLLERDEVICEREMOVED:
-                sdl_gamepad_process_event(&e, stream);
-                break;
+        } else if (is_button_up(state[i], _G.state[i])) {
+            keyboard_ev.keycode = i;
+            event_stream_push(stream, EVENT_KEYBOARD_UP, keyboard_ev);
 
-            default:
-                break;
         }
+
+        _G.state[i] = state[i];
     }
 }
-

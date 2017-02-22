@@ -5,7 +5,8 @@
 #include <include/SDL2/SDL.h>
 #include <engine/application/application.h>
 #include <celib/window/window.h>
-#include "celib/machine/types.h"
+#include <engine/plugin/plugin_api.h>
+#include "engine/machine/machine.h"
 
 
 //==============================================================================
@@ -26,12 +27,16 @@ static struct G {
 } _G = {0};
 
 
+static struct ApplicationApiV1 ApplicationApiV1;
+
 //==============================================================================
 // Interface
 //==============================================================================
 
-int sdl_mouse_init() {
+int sdl_mouse_init(get_api_fce_t get_engine_api) {
     _G = (struct G) {0};
+
+    ApplicationApiV1 = *(struct ApplicationApiV1*) get_engine_api(APPLICATION_API_ID, 0);
 
     return 1;
 }
@@ -52,7 +57,7 @@ void sdl_mouse_process(struct eventstream *stream) {
     curent_state[MOUSE_BTN_MIDLE] = (u8) (state & SDL_BUTTON_MMASK);
 
     if ((pos[0] != _G.position[0]) || (pos[1] != _G.position[1])) {
-        cel_window_t main_window = application_get_main_window();
+        cel_window_t main_window = ApplicationApiV1.main_window();
         u32 cel_window_size[2] = {0};
         cel_window_get_size(main_window, &cel_window_size[0], &cel_window_size[1]);
 
