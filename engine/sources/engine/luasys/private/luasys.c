@@ -58,7 +58,7 @@ static struct G {
 
 } LuaGlobals = {0};
 
-struct ResourceApiV1 ResourceApiV1;
+struct ResourceApiV0 ResourceApiV0;
 
 
 //==============================================================================
@@ -69,7 +69,7 @@ static int require(lua_State *L) {
     const char *name = lua_tostring(L, 1);
     stringid64_t name_hash = stringid64_from_string(name);
 
-    struct lua_resource *resource = ResourceApiV1.get(_G.type_id, name_hash);
+    struct lua_resource *resource = ResourceApiV0.get(_G.type_id, name_hash);
 
     if (resource == NULL) {
         return 0;
@@ -584,7 +584,7 @@ int luasys_execute_string(const char *str) {
 }
 
 void luasys_execute_resource(stringid64_t name) {
-    struct lua_resource *resource = ResourceApiV1.get(_G.type_id, name);
+    struct lua_resource *resource = ResourceApiV0.get(_G.type_id, name);
     char *data = (char *) (resource + 1);
 
     luaL_loadbuffer(_G.L, data, resource->size, "<unknown>");
@@ -844,13 +844,13 @@ void _create_lightuserdata() {
     lua_pop(_G.L, 1);
 }
 
-static struct ConsoleServerApiV1 ConsoleServerApiV1;
+static struct ConsoleServerApiV0 ConsoleServerApiV0;
 
 static void _init(get_api_fce_t get_engine_api) {
     log_debug(LOG_WHERE, "Init");
 
-    ConsoleServerApiV1 = *((struct ConsoleServerApiV1 *) get_engine_api(CONSOLE_SERVER_API_ID, 0));
-    ResourceApiV1 = *(struct ResourceApiV1 *) plugin_get_engine_api(RESOURCE_API_ID, 0);
+    ConsoleServerApiV0 = *((struct ConsoleServerApiV0 *) get_engine_api(CONSOLE_SERVER_API_ID, 0));
+    ResourceApiV0 = *(struct ResourceApiV0 *) plugin_get_engine_api(RESOURCE_API_ID, 0);
 
 
     _G.L = luaL_newstate();
@@ -881,10 +881,10 @@ static void _init(get_api_fce_t get_engine_api) {
     _register_all_api(get_engine_api);
 
     luasys_add_module_function("plugin", "reload", _reload_plugin);
-    ConsoleServerApiV1.consolesrv_register_command("lua_system.execute", _cmd_execute_string);
+    ConsoleServerApiV0.consolesrv_register_command("lua_system.execute", _cmd_execute_string);
 
-    ResourceApiV1.register_type(_G.type_id, lua_resource_callback);
-    ResourceApiV1.compiler_register(_G.type_id, _lua_compiler);
+    ResourceApiV0.register_type(_G.type_id, lua_resource_callback);
+    ResourceApiV0.compiler_register(_G.type_id, _lua_compiler);
 }
 
 static void _shutdown() {
@@ -969,7 +969,7 @@ void *luasys_get_plugin_api(int api,
         case LUA_API_ID:
             switch (version) {
                 case 0: {
-                    static struct LuaSysApiV1 api = {0};
+                    static struct LuaSysApiV0 api = {0};
 
                     //api.get_top = luasys_get_top;
                     api.remove = luasys_remove;

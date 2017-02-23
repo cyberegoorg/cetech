@@ -30,13 +30,13 @@ static struct G {
     cel_vec2f_t last_delta_pos;
 } _G = {0};
 
-static struct MachineApiV1 MachineApiV1 = {0};
+static struct MachineApiV0 MachineApiV0 = {0};
 
 
 static void _init(get_api_fce_t get_engine_api) {
     _G = (struct G) {0};
 
-    MachineApiV1 = *(struct MachineApiV1*) get_engine_api(MACHINE_API_ID, 0);
+    MachineApiV0 = *(struct MachineApiV0*) get_engine_api(MACHINE_API_ID, 0);
 
     log_debug(LOG_WHERE, "Init");
 }
@@ -48,13 +48,13 @@ static void _shutdown() {
 }
 
 static void _update() {
-    struct event_header *event = MachineApiV1.event_begin();
+    struct event_header *event = MachineApiV0.event_begin();
 
     memory_copy(_G.last_state, _G.state, MOUSE_BTN_MAX);
 //    _G.last_delta_pos.x = 0;
 //    _G.last_delta_pos.y = 0;
 
-    while (event != MachineApiV1.event_end()) {
+    while (event != MachineApiV0.event_end()) {
         struct mouse_move_event *move_event;
 
         switch (event->type) {
@@ -81,7 +81,7 @@ static void _update() {
                 break;
         }
 
-        event = MachineApiV1.event_next(event);
+        event = MachineApiV0.event_next(event);
     }
 }
 
@@ -191,7 +191,7 @@ void *mouse_get_plugin_api(int api,
         return &plugin;
 
     } else if (api == MOUSE_API_ID && version == 0) {
-        static struct MouseApiV1 api_v1 = {
+        static struct MouseApiV0 api_v1 = {
                 .button_index = mouse_button_index,
                 .button_name = mouse_button_name,
                 .button_state = mouse_button_state,

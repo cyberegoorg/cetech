@@ -11,8 +11,8 @@ typedef struct {
     u32 idx;
 } transform_t;
 
-//! Transform API V1
-struct TransformApiV1 {
+//! Transform API V0
+struct TransformApiV0 {
     //! Is transform valid?
     //! \param transform transform
     //! \return 1 if is oK else 0

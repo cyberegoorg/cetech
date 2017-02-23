@@ -34,8 +34,8 @@ int cvar_init();
 
 void cvar_shutdown();
 
-//! Config API V1
-struct ConfigApiV1 {
+//! Config API V0
+struct ConfigApiV0 {
     void (*load_global)();
 
     void (*compile_global)();

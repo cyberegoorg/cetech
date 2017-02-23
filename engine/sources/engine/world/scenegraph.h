@@ -14,8 +14,8 @@ typedef struct {
 } scene_node_t;
 
 
-//! Scene-graph API V1
-struct SceneGprahApiV1 {
+//! Scene-graph API V0
+struct SceneGprahApiV0 {
 
     //! Is node valid?
     //! \param node Node

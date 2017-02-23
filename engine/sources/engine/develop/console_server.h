@@ -13,8 +13,8 @@
 typedef int (*console_server_command_t)(mpack_node_t,
                                         mpack_writer_t *);
 
-//! Console server API V1
-struct ConsoleServerApiV1 {
+//! Console server API V0
+struct ConsoleServerApiV0 {
     //! Push begin signal to clients
     void (*consolesrv_push_begin)();
 

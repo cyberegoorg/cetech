@@ -59,35 +59,35 @@ static int _cmd_resize(mpack_node_t args,
     return 0;
 }
 
-static struct ConsoleServerApiV1 ConsoleServerApiV1;
-static struct MeshApiV1 MeshApiV1;
-static struct CameraApiV1 CameraApiV1;
-static struct ConfigApiV1 ConfigApiV1;
-static struct ApplicationApiV1 ApplicationApiV1;
+static struct ConsoleServerApiV0 ConsoleServerApiV0;
+static struct MeshApiV0 MeshApiV0;
+static struct CameraApiV0 CameraApiV0;
+static struct ConfigApiV0 ConfigApiV0;
+static struct ApplicationApiV0 ApplicationApiV0;
 
 static void _init(get_api_fce_t get_engine_api) {
-    ConsoleServerApiV1 = *((struct ConsoleServerApiV1 *) get_engine_api(CONSOLE_SERVER_API_ID, 0));
-    MeshApiV1 = *((struct MeshApiV1 *) get_engine_api(MESH_API_ID, 0));
-    CameraApiV1 = *((struct CameraApiV1 *) get_engine_api(CAMERA_API_ID, 0));
-    ConfigApiV1 = *((struct ConfigApiV1 *) get_engine_api(CONFIG_API_ID, 0));
-    ApplicationApiV1 = *((struct ApplicationApiV1 *) get_engine_api(APPLICATION_API_ID, 0));
+    ConsoleServerApiV0 = *((struct ConsoleServerApiV0 *) get_engine_api(CONSOLE_SERVER_API_ID, 0));
+    MeshApiV0 = *((struct MeshApiV0 *) get_engine_api(MESH_API_ID, 0));
+    CameraApiV0 = *((struct CameraApiV0 *) get_engine_api(CAMERA_API_ID, 0));
+    ConfigApiV0 = *((struct ConfigApiV0 *) get_engine_api(CONFIG_API_ID, 0));
+    ApplicationApiV0 = *((struct ApplicationApiV0 *) get_engine_api(APPLICATION_API_ID, 0));
 
     _G = (struct G) {0};
 
-    cvar_t daemon = ConfigApiV1.find("daemon");
-    if (!ConfigApiV1.get_int(daemon)) {
+    cvar_t daemon = ConfigApiV0.find("daemon");
+    if (!ConfigApiV0.get_int(daemon)) {
         texture_resource_init();
         shader_resource_init();
         material_resource_init();
         scene_resource_init();
 
-        ConsoleServerApiV1.consolesrv_register_command("renderer.resize", _cmd_resize);
+        ConsoleServerApiV0.consolesrv_register_command("renderer.resize", _cmd_resize);
     }
 }
 
 static void _shutdown() {
-    cvar_t daemon = ConfigApiV1.find("daemon");
-    if (!ConfigApiV1.get_int(daemon)) {
+    cvar_t daemon = ConfigApiV0.find("daemon");
+    if (!ConfigApiV0.get_int(daemon)) {
         texture_resource_shutdown();
         shader_resource_shutdown();
         material_resource_shutdown();
@@ -134,7 +134,7 @@ void renderer_render_world(world_t world,
     cel_mat44f_t view_matrix;
     cel_mat44f_t proj_matrix;
 
-    CameraApiV1.get_project_view(world, camera, &proj_matrix, &view_matrix);
+    CameraApiV0.get_project_view(world, camera, &proj_matrix, &view_matrix);
     bgfx_set_view_transform(0, view_matrix.f, proj_matrix.f);
 
     bgfx_set_view_rect(0, 0, 0, (uint16_t) _G.size_width, (uint16_t) _G.size_height);
@@ -142,10 +142,10 @@ void renderer_render_world(world_t world,
     bgfx_touch(0);
     bgfx_dbg_text_clear(0, 0);
 
-    MeshApiV1.render_all(world);
+    MeshApiV0.render_all(world);
 
     bgfx_frame(0);
-    cel_window_update(ApplicationApiV1.main_window());
+    cel_window_update(ApplicationApiV0.main_window());
 }
 
 cel_vec2f_t renderer_get_size() {
@@ -180,7 +180,7 @@ void *renderer_get_plugin_api(int api,
         case RENDERER_API_ID:
             switch (version) {
                 case 0: {
-                    static struct RendererApiV1 api = {0};
+                    static struct RendererApiV0 api = {0};
 
                     api.create = renderer_create;
                     api.set_debug = renderer_set_debug;
@@ -197,7 +197,7 @@ void *renderer_get_plugin_api(int api,
         case MATERIAL_API_ID:
             switch (version) {
                 case 0: {
-                    static struct MaterialApiV1 api = {0};
+                    static struct MaterialApiV0 api = {0};
 
                     material_t material_resource_create(stringid64_t name);
 

@@ -29,18 +29,18 @@ static struct G {
     int last_state[GAMEPAD_MAX][GAMEPAD_BTN_MAX];
 } _G = {0};
 
-static struct MachineApiV1 MachineApiV1 = {0};
+static struct MachineApiV0 MachineApiV0 = {0};
 
 
 static void _init(get_api_fce_t get_engine_api) {
     _G = (struct G) {0};
 
-    MachineApiV1 = *(struct MachineApiV1*) get_engine_api(MACHINE_API_ID, 0);
+    MachineApiV0 = *(struct MachineApiV0*) get_engine_api(MACHINE_API_ID, 0);
 
     log_debug(LOG_WHERE, "Init");
 
     for (int i = 0; i < GAMEPAD_MAX; ++i) {
-        _G.active[i] = MachineApiV1.gamepad_is_active(i);
+        _G.active[i] = MachineApiV0.gamepad_is_active(i);
     }
 
 }
@@ -52,11 +52,11 @@ static void _shutdown() {
 }
 
 static void _update() {
-    struct event_header *event = MachineApiV1.event_begin();
+    struct event_header *event = MachineApiV0.event_begin();
 
     memory_copy(_G.last_state, _G.state, sizeof(int) * GAMEPAD_BTN_MAX * GAMEPAD_MAX);
 
-    while (event != MachineApiV1.event_end()) {
+    while (event != MachineApiV0.event_end()) {
         struct gamepad_move_event *move_event = (struct gamepad_move_event *) event;
         struct gamepad_btn_event *btn_event = (struct gamepad_btn_event *) event;
         struct gamepad_device_event *device_event = (struct gamepad_device_event *) event;
@@ -87,7 +87,7 @@ static void _update() {
                 break;
         }
 
-        event = MachineApiV1.event_next(event);
+        event = MachineApiV0.event_next(event);
     }
 }
 
@@ -179,7 +179,7 @@ cel_vec2f_t gamepad_axis(u32 idx,
 void gamepad_play_rumble(u32 idx,
                          float strength,
                          u32 length) {
-    MachineApiV1.gamepad_play_rumble(idx, strength, length);
+    MachineApiV0.gamepad_play_rumble(idx, strength, length);
 }
 
 void *gamepad_get_plugin_api(int api,
@@ -195,7 +195,7 @@ void *gamepad_get_plugin_api(int api,
         return &plugin;
 
     } else if (api == GAMEPAD_API_ID && version == 0) {
-        static struct GamepadApiV1 api_v1 = {
+        static struct GamepadApiV0 api_v1 = {
                 .is_active = gamepad_is_active,
                 .button_index = gamepad_button_index,
                 .button_name = gamepad_button_name,

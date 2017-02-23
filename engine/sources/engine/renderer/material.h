@@ -16,8 +16,8 @@ typedef struct {
 } material_t;
 
 
-//! Material API V1
-struct MaterialApiV1 {
+//! Material API V0
+struct MaterialApiV0 {
 
     //! Create new material
     //! \param name Material resource name

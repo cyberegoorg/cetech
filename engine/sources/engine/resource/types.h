@@ -92,8 +92,8 @@ typedef struct {
 // Resource interface
 //==============================================================================
 
-//! Resource API V1
-struct ResourceApiV1 {
+//! Resource API V0
+struct ResourceApiV0 {
     //! Enable autoload feature
     //! \param enable Enable
     void (*set_autoload)(int enable);
@@ -238,8 +238,8 @@ struct ResourceApiV1 {
     //! Create build dir
     //! \param config Config API
     //! \param app Application API
-    void (*compiler_create_build_dir)(struct ConfigApiV1 config,
-                                      struct ApplicationApiV1 app);
+    void (*compiler_create_build_dir)(struct ConfigApiV0 config,
+                                      struct ApplicationApiV0 app);
 
     //! Get core dir
     //! \return Core dir
@@ -255,7 +255,7 @@ struct ResourceApiV1 {
 //==============================================================================
 
 //! Package API V!
-struct PackageApiV1 {
+struct PackageApiV0 {
     //! Load package
     //! \param name Package name
     void (*load)(stringid64_t name);

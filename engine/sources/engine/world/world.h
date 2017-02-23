@@ -39,8 +39,8 @@ typedef struct {
 // Interface
 //==============================================================================
 
-//! World API V1
-struct WorldApiV1 {
+//! World API V0
+struct WorldApiV0 {
 
     //! Register world calbacks
     //! \param clb Callbacks

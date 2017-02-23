@@ -38,12 +38,12 @@ static struct G {
 } FilesystemGlobals = {0};
 
 
-static struct MemSysApiV1 MemSysApiV1;
+static struct MemSysApiV0 MemSysApiV0;
 
 static void _init(get_api_fce_t get_engine_api) {
     _G = (struct G) {0};
 
-    MemSysApiV1 = *(struct MemSysApiV1 *) get_engine_api(MEMORY_API_ID, 0);
+    MemSysApiV0 = *(struct MemSysApiV0 *) get_engine_api(MEMORY_API_ID, 0);
 
     log_debug(LOG_WHERE, "Init");
 }
@@ -56,7 +56,7 @@ static void _shutdown() {
             continue;
         }
 
-        CEL_DEALLOCATE(MemSysApiV1.main_allocator(), _G.rootmap.path[i]);
+        CEL_DEALLOCATE(MemSysApiV0.main_allocator(), _G.rootmap.path[i]);
     }
 
     _G = (struct G) {0};
@@ -75,7 +75,7 @@ void filesystem_map_root_dir(stringid64_t root,
         }
 
         _G.rootmap.id[i] = root;
-        _G.rootmap.path[i] = cel_strdup(base_path, MemSysApiV1.main_allocator());
+        _G.rootmap.path[i] = cel_strdup(base_path, MemSysApiV0.main_allocator());
         break;
     }
 }
@@ -110,7 +110,7 @@ struct vio *filesystem_open(stringid64_t root,
         return NULL;
     }
 
-    struct vio *file = cel_vio_from_file(fullm_path, mode, MemSysApiV1.main_allocator());
+    struct vio *file = cel_vio_from_file(fullm_path, mode, MemSysApiV0.main_allocator());
 
     if (!file) {
         log_error(LOG_WHERE, "Could not load file %s", fullm_path);
@@ -189,7 +189,7 @@ void *filesystem_get_plugin_api(int api,
         case FILESYSTEM_API_ID:
             switch (version) {
                 case 0: {
-                    static struct FilesystemApiV1 api = {0};
+                    static struct FilesystemApiV0 api = {0};
 
                     api.filesystem_get_root_dir = filesystem_get_root_dir;
                     api.filesystem_open = filesystem_open;

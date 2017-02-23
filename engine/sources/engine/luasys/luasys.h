@@ -22,8 +22,8 @@
 // Interface
 //==============================================================================
 
-//! Lua system api V1
-struct LuaSysApiV1 {
+//! Lua system api V0
+struct LuaSysApiV0 {
 
     //! Return number of elements in the stack, which is also the index of the top element.
     //! Notice that a negative index -x is equivalent to the positive index gettop - x + 1.
