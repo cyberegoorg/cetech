@@ -13,8 +13,8 @@ typedef struct {
     u32 idx;
 } mesh_t;
 
-//! Mesh API V1
-struct MeshApiV1 {
+//! Mesh API V0
+struct MeshApiV0 {
 
     //! Is mesh valid
     //! \param mesh Mesh

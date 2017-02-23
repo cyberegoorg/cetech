@@ -29,7 +29,7 @@ static struct G {
     struct handlerid world_handler;
 } _G = {0};
 
-static struct MemSysApiV1 MemSysApiV1;
+static struct MemSysApiV0 MemSysApiV0;
 
 //==============================================================================
 // Public interface
@@ -37,11 +37,11 @@ static struct MemSysApiV1 MemSysApiV1;
 static void _init(get_api_fce_t get_engine_api) {
     _G = (struct G) {0};
 
-    MemSysApiV1 = *(struct MemSysApiV1 *) get_engine_api(MEMORY_API_ID, 0);
+    MemSysApiV0 = *(struct MemSysApiV0 *) get_engine_api(MEMORY_API_ID, 0);
 
-    ARRAY_INIT(world_callbacks_t, &_G.callbacks, MemSysApiV1.main_allocator());
+    ARRAY_INIT(world_callbacks_t, &_G.callbacks, MemSysApiV0.main_allocator());
 
-    handlerid_init(&_G.world_handler, MemSysApiV1.main_allocator());
+    handlerid_init(&_G.world_handler, MemSysApiV0.main_allocator());
 
 }
 
@@ -106,7 +106,7 @@ void *world_get_plugin_api(int api,
         case WORLD_API_ID:
             switch (version) {
                 case 0: {
-                    static struct WorldApiV1 api = {0};
+                    static struct WorldApiV0 api = {0};
 
                     api.register_callback = world_register_callback;
                     api.create = world_create;

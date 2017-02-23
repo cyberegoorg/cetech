@@ -16,8 +16,8 @@
 // Gamepad
 //==============================================================================
 
-//! Gamepad API V1
-struct GamepadApiV1 {
+//! Gamepad API V0
+struct GamepadApiV0 {
     //! Is gamepad active?
     //! \param gamepad Gamepad
     //! \return 1 if active else 0

@@ -61,7 +61,7 @@ void *memsys_get_plugin_api(int api,
         case MEMORY_API_ID:
             switch (version) {
                 case 0: {
-                    static struct MemSysApiV1 api = {0};
+                    static struct MemSysApiV0 api = {0};
 
                     api.main_allocator = _memsys_main_allocator;
                     api.main_scratch_allocator = _memsys_main_scratch_allocator;

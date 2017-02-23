@@ -16,8 +16,8 @@
 // Keyboard
 //==============================================================================
 
-//! Keyboard API V1
-struct KeyboardApiV1 {
+//! Keyboard API V0
+struct KeyboardApiV0 {
     //! Return button index
     //! \param button_name Button name
     //! \return Button index

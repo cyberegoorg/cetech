@@ -149,14 +149,14 @@ static int _task_worker(void *o) {
     return 1;
 }
 
-static struct DevelopSystemApiV1 DevelopSystemApiV1;
-static struct MemSysApiV1 MemSysApiV1;
+static struct DevelopSystemApiV0 DevelopSystemApiV0;
+static struct MemSysApiV0 MemSysApiV0;
 
 static void _init(get_api_fce_t get_engine_api) {
     _G = (struct G) {0};
 
-    DevelopSystemApiV1 = *((struct DevelopSystemApiV1 *) get_engine_api(DEVELOP_SERVER_API_ID, 0));
-    MemSysApiV1 = *((struct MemSysApiV1 *) get_engine_api(MEMORY_API_ID, 0));
+    DevelopSystemApiV0 = *((struct DevelopSystemApiV0 *) get_engine_api(DEVELOP_SERVER_API_ID, 0));
+    MemSysApiV0 = *((struct MemSysApiV0 *) get_engine_api(MEMORY_API_ID, 0));
 
 
     int core_count = cel_cpu_count();
@@ -168,10 +168,10 @@ static void _init(get_api_fce_t get_engine_api) {
 
     _G._workers_count = worker_count;
 
-    queue_task_init(&_G._gloalQueue, MAX_TASK, MemSysApiV1.main_allocator());
+    queue_task_init(&_G._gloalQueue, MAX_TASK, MemSysApiV0.main_allocator());
 
     for (int i = 0; i < worker_count + 1; ++i) {
-        queue_task_init(&_G._workers_queue[i], MAX_TASK, MemSysApiV1.main_allocator());
+        queue_task_init(&_G._workers_queue[i], MAX_TASK, MemSysApiV0.main_allocator());
     }
 
     for (int j = 0; j < worker_count; ++j) {
@@ -227,11 +227,11 @@ int taskmanager_do_work() {
         return 0;
     }
 
-    struct scope_data sd = DevelopSystemApiV1.enter_scope(_G._task_pool[t.id].name);
+    struct scope_data sd = DevelopSystemApiV0.enter_scope(_G._task_pool[t.id].name);
 
     _G._task_pool[t.id].task_work(_G._task_pool[t.id].data);
 
-    DevelopSystemApiV1.leave_scope(sd);
+    DevelopSystemApiV0.leave_scope(sd);
 
     _mark_task_job_done(t);
 
@@ -275,7 +275,7 @@ void *task_get_plugin_api(int api,
         case TASK_API_ID:
             switch (version) {
                 case 0: {
-                    static struct TaskApiV1 api = {
+                    static struct TaskApiV0 api = {
                             .worker_count = taskmanager_worker_count,
                             .add = taskmanager_add,
                             .do_work = taskmanager_do_work,

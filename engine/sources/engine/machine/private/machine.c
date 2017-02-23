@@ -131,7 +131,7 @@ void *machine_get_plugin_api(int api,
         return &plugin;
 
     } else if (api == MACHINE_API_ID && version == 0) {
-        static struct MachineApiV1 api_v1 = {
+        static struct MachineApiV0 api_v1 = {
                 .event_begin = machine_event_begin,
                 .event_end = machine_event_end,
                 .event_next = machine_event_next,

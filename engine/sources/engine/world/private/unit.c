@@ -22,9 +22,9 @@ static struct G {
     ARRAY_T(array_entity_t) spawned_array;
 } _G = {0};
 
-static struct EntComSystemApiV1 EntComSystemApiV1;
-static struct MemSysApiV1 MemSysApiV1;
-static struct ResourceApiV1 ResourceApiV1;
+static struct EntComSystemApiV0 EntComSystemApiV0;
+static struct MemSysApiV0 MemSysApiV0;
+static struct ResourceApiV0 ResourceApiV0;
 
 u32 _new_spawned_array() {
     u32 idx = ARRAY_SIZE(&_G.spawned_array);
@@ -32,7 +32,7 @@ u32 _new_spawned_array() {
     ARRAY_PUSH_BACK(array_entity_t, &_G.spawned_array, (struct array_entity_t) {0});
     ARRAY_T(entity_t) *array = &ARRAY_AT(&_G.spawned_array, idx);
 
-    ARRAY_INIT(entity_t, array, MemSysApiV1.main_allocator());
+    ARRAY_INIT(entity_t, array, MemSysApiV0.main_allocator());
     return idx;
 }
 
@@ -77,10 +77,10 @@ static void preprocess(const char *filename,
         capi->add_dependency(filename, prefab_file);
 
         char full_path[256] = {0};
-        const char *source_dir = ResourceApiV1.compiler_get_source_dir();
+        const char *source_dir = ResourceApiV0.compiler_get_source_dir();
         cel_path_join(full_path, CEL_ARRAY_LEN(full_path), source_dir, prefab_file);
 
-        struct vio *prefab_vio = cel_vio_from_file(full_path, VIO_OPEN_READ, MemSysApiV1.main_allocator());
+        struct vio *prefab_vio = cel_vio_from_file(full_path, VIO_OPEN_READ, MemSysApiV0.main_allocator());
 
         char prefab_data[cel_vio_size(prefab_vio) + 1];
         memory_set(prefab_data, 0, cel_vio_size(prefab_vio) + 1);
@@ -168,14 +168,14 @@ void foreach_components_clb(yaml_node_t key,
         ARRAY_PUSH_BACK(u64, &output->component_type, cid.id);
 
         ARRAY_T(u32) tmp_a = {0};
-        ARRAY_INIT(u32, &tmp_a, MemSysApiV1.main_allocator());
+        ARRAY_INIT(u32, &tmp_a, MemSysApiV0.main_allocator());
 
         MAP_SET(array_u32, &output->component_ent, cid.id, tmp_a);
     }
 
     if (!MAP_HAS(array_yaml_node_t, &output->component_body, cid.id)) {
         ARRAY_T(yaml_node_t) tmp_a = {0};
-        ARRAY_INIT(yaml_node_t, &tmp_a, MemSysApiV1.main_allocator());
+        ARRAY_INIT(yaml_node_t, &tmp_a, MemSysApiV0.main_allocator());
 
         MAP_SET(array_yaml_node_t, &output->component_body, cid.id, tmp_a);
 
@@ -243,7 +243,7 @@ struct component_data {
 #define component_data_data(cd) ((char*)((component_data_ent(cd) + ((cd)->ent_count))))
 
 struct entity_compile_output *unit_compiler_create_output() {
-    struct cel_allocator *a = MemSysApiV1.main_allocator();
+    struct cel_allocator *a = MemSysApiV0.main_allocator();
 
     struct entity_compile_output *output = CEL_ALLOCATE(a, struct entity_compile_output, 1);
     output->ent_counter = 0;
@@ -277,7 +277,7 @@ void unit_compiler_destroy_output(struct entity_compile_output *output) {
     }
     MAP_DESTROY(array_yaml_node_t, &output->component_body);
 
-    struct cel_allocator *a = MemSysApiV1.main_allocator();
+    struct cel_allocator *a = MemSysApiV0.main_allocator();
     CEL_DEALLOCATE(a, output);
 }
 
@@ -326,10 +326,10 @@ void unit_compiler_write_to_build(struct entity_compile_output *output,
 
         ARRAY_T(yaml_node_t) *body = MAP_GET_PTR(array_yaml_node_t, &output->component_body, cid);
         ARRAY_T(u8) comp_data = {0};
-        ARRAY_INIT(u8, &comp_data, MemSysApiV1.main_allocator());
+        ARRAY_INIT(u8, &comp_data, MemSysApiV0.main_allocator());
 
         for (int i = 0; i < cdata.ent_count; ++i) {
-            EntComSystemApiV1.component_compile(id, ARRAY_AT(body, i), &comp_data);
+            EntComSystemApiV0.component_compile(id, ARRAY_AT(body, i), &comp_data);
         }
 
         cdata.size = ARRAY_SIZE(&comp_data);
@@ -365,7 +365,7 @@ int _unit_resource_compiler(const char *filename,
     yaml_node_t root = yaml_load_str(source_data, &h);
 
     ARRAY_T(u8) unit_data;
-    ARRAY_INIT(u8, &unit_data, MemSysApiV1.main_allocator());
+    ARRAY_INIT(u8, &unit_data, MemSysApiV0.main_allocator());
 
     unit_resource_compiler(root, filename, &unit_data, compilator_api);
 
@@ -428,17 +428,17 @@ static const resource_callbacks_t unit_resource_callback = {
 static void _init(get_api_fce_t get_engine_api) {
     _G = (struct G) {0};
 
-    EntComSystemApiV1 = *((struct EntComSystemApiV1 *) get_engine_api(ENTCOM_API_ID, 0));
-    MemSysApiV1 = *(struct MemSysApiV1 *) get_engine_api(MEMORY_API_ID, 0);
-    ResourceApiV1 = *(struct ResourceApiV1 *) get_engine_api(RESOURCE_API_ID, 0);
+    EntComSystemApiV0 = *((struct EntComSystemApiV0 *) get_engine_api(ENTCOM_API_ID, 0));
+    MemSysApiV0 = *(struct MemSysApiV0 *) get_engine_api(MEMORY_API_ID, 0);
+    ResourceApiV0 = *(struct ResourceApiV0 *) get_engine_api(RESOURCE_API_ID, 0);
 
     _G.type = stringid64_from_string("unit");
 
-    MAP_INIT(u32, &_G.spawned_map, MemSysApiV1.main_allocator());
-    ARRAY_INIT(array_entity_t, &_G.spawned_array, MemSysApiV1.main_allocator());
+    MAP_INIT(u32, &_G.spawned_map, MemSysApiV0.main_allocator());
+    ARRAY_INIT(array_entity_t, &_G.spawned_array, MemSysApiV0.main_allocator());
 
-    ResourceApiV1.register_type(_G.type, unit_resource_callback);
-    ResourceApiV1.compiler_register(_G.type, _unit_resource_compiler);
+    ResourceApiV0.register_type(_G.type, unit_resource_callback);
+    ResourceApiV0.compiler_register(_G.type, _unit_resource_compiler);
 }
 
 static void _shutdown() {
@@ -457,7 +457,7 @@ ARRAY_T(entity_t) *unit_spawn_from_resource(world_t world,
     ARRAY_T(entity_t) *spawned = _get_spawned_array_by_idx(idx);
 
     for (int j = 0; j < res->ent_count; ++j) {
-        ARRAY_PUSH_BACK(entity_t, spawned, EntComSystemApiV1.entity_manager_create());
+        ARRAY_PUSH_BACK(entity_t, spawned, EntComSystemApiV0.entity_manager_create());
     }
 
     entity_t root = ARRAY_AT(spawned, 0);
@@ -471,7 +471,7 @@ ARRAY_T(entity_t) *unit_spawn_from_resource(world_t world,
 
         u32 *c_ent = component_data_ent(comp_data);
         char *c_data = component_data_data(comp_data);
-        EntComSystemApiV1.component_spawn(world, type, &ARRAY_AT(spawned, 0), c_ent, parents, comp_data->ent_count,
+        EntComSystemApiV0.component_spawn(world, type, &ARRAY_AT(spawned, 0), c_ent, parents, comp_data->ent_count,
                                           c_data);
 
         comp_data = (struct component_data *) (c_data + comp_data->size);
@@ -484,7 +484,7 @@ ARRAY_T(entity_t) *unit_spawn_from_resource(world_t world,
 
 entity_t unit_spawn(world_t world,
                     stringid64_t name) {
-    void *res = ResourceApiV1.get(_G.type, name);
+    void *res = ResourceApiV0.get(_G.type, name);
 
     if (res == NULL) {
         log_error("unit", "Could not spawn unit.");
@@ -503,7 +503,7 @@ void unit_destroy(world_t world,
     for (int i = 0; i < count; ++i) {
         ARRAY_T(entity_t) *spawned = _get_spawned_array(unit[i]);
 
-        EntComSystemApiV1.component_destroy(world, spawned->data, spawned->size);
+        EntComSystemApiV0.component_destroy(world, spawned->data, spawned->size);
 
         _destroy_spawned_array(unit[i]);
     }

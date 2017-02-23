@@ -44,7 +44,7 @@ static struct G {
 } ConsoleServerGlobals = {0};
 
 
-static struct ConfigApiV1 ConfigApiV1;
+static struct ConfigApiV0 ConfigApiV0;
 
 extern void consolesrv_push_begin();
 
@@ -125,7 +125,7 @@ static int _cmd_ready(mpack_node_t args,
 static void _init(get_api_fce_t get_engine_api) {
     const char *addr = 0;
 
-    ConfigApiV1 = *(struct ConfigApiV1 *) get_engine_api(CONFIG_API_ID, 0);
+    ConfigApiV0 = *(struct ConfigApiV0 *) get_engine_api(CONFIG_API_ID, 0);
 
     log_debug(LOG_WHERE, "Init");
 
@@ -134,7 +134,7 @@ static void _init(get_api_fce_t get_engine_api) {
         log_error(LOG_WHERE, "Could not create nanomsg socket: %s", nn_strerror(errno));
         return;// 0;
     }
-    addr = ConfigApiV1.get_string(_G.cv_rpc_addr);
+    addr = ConfigApiV0.get_string(_G.cv_rpc_addr);
 
     log_debug(LOG_WHERE, "RPC address: %s", addr);
 
@@ -146,14 +146,14 @@ static void _init(get_api_fce_t get_engine_api) {
     _G.rpc_socket = socket;
 ////
 
-    if (ConfigApiV1.get_string(_G.cv_push_addr)[0] != '\0') {
+    if (ConfigApiV0.get_string(_G.cv_push_addr)[0] != '\0') {
         socket = nn_socket(AF_SP, NN_PUSH);
         if (socket < 0) {
             log_error(LOG_WHERE, "Could not create nanomsg socket: %s", nn_strerror(errno));
             return;// 0;
         }
 
-        addr = ConfigApiV1.get_string(_G.cv_push_addr);
+        addr = ConfigApiV0.get_string(_G.cv_push_addr);
 
         log_debug(LOG_WHERE, "Push address: %s", addr);
 
@@ -172,7 +172,7 @@ static void _init(get_api_fce_t get_engine_api) {
         return;// 0;
     }
 
-    addr = ConfigApiV1.get_string(_G.cv_log_addr);
+    addr = ConfigApiV0.get_string(_G.cv_log_addr);
 
     log_debug(LOG_WHERE, "LOG address: %s", addr);
 
@@ -187,7 +187,7 @@ static void _init(get_api_fce_t get_engine_api) {
     consolesrv_register_command("console_server.ready", _cmd_ready);
 }
 
-static void _init_cvar(struct ConfigApiV1 config) {
+static void _init_cvar(struct ConfigApiV0 config) {
     _G = (struct G) {0};
 
     _G.cv_rpc_addr = config.new_str("develop.rpc.addr", "Console server rpc addr", "ws://*:4444");
@@ -266,7 +266,7 @@ void *consoleserver_get_plugin_api(int api,
         case CONSOLE_SERVER_API_ID:
             switch (version) {
                 case 0: {
-                    static struct ConsoleServerApiV1 api = {0};
+                    static struct ConsoleServerApiV0 api = {0};
 
                     api.consolesrv_push_begin = consolesrv_push_begin;
                     api.consolesrv_register_command = consolesrv_register_command;

@@ -30,8 +30,8 @@ int application_shutdown();
 //! Start application main loop
 void application_start();
 
-//! Application API V1
-struct ApplicationApiV1 {
+//! Application API V0
+struct ApplicationApiV0 {
     //! Stop main loop and quit.
     void (*quit)();
 

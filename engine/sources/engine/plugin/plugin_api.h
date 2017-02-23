@@ -37,12 +37,12 @@ enum {
 typedef void *(*get_api_fce_t)(int api,
                                int version);
 
-//! Plugin expot api struct V1
+//! Plugin expot api struct V0
 struct plugin_api_v0 {
 
     //! Init cvars
     //! \param Init cvars
-    void (*init_cvar       )(struct ConfigApiV1);
+    void (*init_cvar       )(struct ConfigApiV0);
 
     //! Init
     //! \param get_api_fce_t Get engine api

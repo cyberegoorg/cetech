@@ -50,8 +50,8 @@ struct scope_data {
     u64 start_timer;  //!< Timer
 };
 
-//! Develop system API V1
-struct DevelopSystemApiV1 {
+//! Develop system API V0
+struct DevelopSystemApiV0 {
 
     //! Push event
     //! \param header Header

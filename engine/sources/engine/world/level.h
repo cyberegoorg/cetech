@@ -22,8 +22,8 @@ typedef struct {
     u32 idx;
 } level_t;
 
-//! Level API V1
-struct LevelApiV1 {
+//! Level API V0
+struct LevelApiV0 {
 
     //! Load level from resource
     //! \param world World

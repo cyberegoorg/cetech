@@ -12,8 +12,8 @@ typedef struct {
     u32 idx;
 } camera_t;
 
-//! Camera API V1
-struct CameraApiV1 {
+//! Camera API V0
+struct CameraApiV0 {
 
     //! Has entity camera component?
     //! \param world World

@@ -76,8 +76,8 @@ struct G {
 } _G = {0};
 
 
-static struct MemSysApiV1 MemSysApiV1;
-static struct ResourceApiV1 ResourceApiV1;
+static struct MemSysApiV0 MemSysApiV0;
+static struct ResourceApiV0 ResourceApiV0;
 
 //==============================================================================
 // Compiler private
@@ -106,10 +106,10 @@ static void preprocess(const char *filename,
         capi->add_dependency(filename, prefab_file);
 
         char full_path[256] = {0};
-        const char *source_dir = ResourceApiV1.compiler_get_source_dir();
+        const char *source_dir = ResourceApiV0.compiler_get_source_dir();
         cel_path_join(full_path, CEL_ARRAY_LEN(full_path), source_dir, prefab_file);
 
-        struct vio *prefab_vio = cel_vio_from_file(full_path, VIO_OPEN_READ, MemSysApiV1.main_allocator());
+        struct vio *prefab_vio = cel_vio_from_file(full_path, VIO_OPEN_READ, MemSysApiV0.main_allocator());
 
         char prefab_data[cel_vio_size(prefab_vio) + 1];
         memory_set(prefab_data, 0, cel_vio_size(prefab_vio) + 1);
@@ -195,7 +195,7 @@ int _material_resource_compiler(const char *filename,
                                 struct vio *source_vio,
                                 struct vio *build_vio,
                                 struct compilator_api *compilator_api) {
-    char *source_data = CEL_ALLOCATE(MemSysApiV1.main_allocator(), char, cel_vio_size(source_vio) + 1);
+    char *source_data = CEL_ALLOCATE(MemSysApiV0.main_allocator(), char, cel_vio_size(source_vio) + 1);
     memory_set(source_data, 0, cel_vio_size(source_vio) + 1);
 
     cel_vio_read(source_vio, source_data, sizeof(char), cel_vio_size(source_vio));
@@ -212,8 +212,8 @@ int _material_resource_compiler(const char *filename,
     yaml_as_string(shader_node, tmp_buffer, CEL_ARRAY_LEN(tmp_buffer));
 
     struct material_compile_output output = {0};
-    ARRAY_INIT(char, &output.uniform_names, MemSysApiV1.main_allocator());
-    ARRAY_INIT(u8, &output.data, MemSysApiV1.main_allocator());
+    ARRAY_INIT(char, &output.uniform_names, MemSysApiV0.main_allocator());
+    ARRAY_INIT(u8, &output.data, MemSysApiV0.main_allocator());
 
     yaml_node_t textures = yaml_get_node(root, "textures");
     if (yaml_is_valid(textures)) {
@@ -249,7 +249,7 @@ int _material_resource_compiler(const char *filename,
 
     ARRAY_DESTROY(char, &output.uniform_names);
     ARRAY_DESTROY(u8, &output.data);
-    CEL_DEALLOCATE(MemSysApiV1.main_allocator(), source_data);
+    CEL_DEALLOCATE(MemSysApiV0.main_allocator(), source_data);
     return 1;
 }
 
@@ -307,19 +307,19 @@ static const resource_callbacks_t material_resource_callback = {
 int material_resource_init() {
     _G = (struct G) {0};
 
-    MemSysApiV1 = *(struct MemSysApiV1 *) plugin_get_engine_api(MEMORY_API_ID, 0);
-    ResourceApiV1 = *(struct ResourceApiV1 *) plugin_get_engine_api(RESOURCE_API_ID, 0);
+    MemSysApiV0 = *(struct MemSysApiV0 *) plugin_get_engine_api(MEMORY_API_ID, 0);
+    ResourceApiV0 = *(struct ResourceApiV0 *) plugin_get_engine_api(RESOURCE_API_ID, 0);
 
     _G.type = stringid64_from_string("material");
 
-    handlerid_init(&_G.material_handler, MemSysApiV1.main_allocator());
+    handlerid_init(&_G.material_handler, MemSysApiV0.main_allocator());
 
-    MAP_INIT(u32, &_G.material_instace_map, MemSysApiV1.main_allocator());
-    ARRAY_INIT(u32, &_G.material_instance_offset, MemSysApiV1.main_allocator());
-    ARRAY_INIT(u8, &_G.material_instance_data, MemSysApiV1.main_allocator());
+    MAP_INIT(u32, &_G.material_instace_map, MemSysApiV0.main_allocator());
+    ARRAY_INIT(u32, &_G.material_instance_offset, MemSysApiV0.main_allocator());
+    ARRAY_INIT(u8, &_G.material_instance_data, MemSysApiV0.main_allocator());
 
-    ResourceApiV1.compiler_register(_G.type, _material_resource_compiler);
-    ResourceApiV1.register_type(_G.type, material_resource_callback);
+    ResourceApiV0.compiler_register(_G.type, _material_resource_compiler);
+    ResourceApiV0.register_type(_G.type, material_resource_callback);
 
     return 1;
 }
@@ -337,7 +337,7 @@ void material_resource_shutdown() {
 static const material_t null_material = {0};
 
 material_t material_resource_create(stringid64_t name) {
-    struct material_blob *resource = ResourceApiV1.get(_G.type, name);
+    struct material_blob *resource = ResourceApiV0.get(_G.type, name);
 
     u32 size = sizeof(struct material_blob) +
                (resource->uniforms_count * sizeof(char) * 32) +

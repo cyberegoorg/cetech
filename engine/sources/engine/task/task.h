@@ -15,7 +15,7 @@
 #include "celib/thread/types.h"
 
 #define CEL_ASSERT_IS_WORKER(where, worker_id)\
-    CEL_ASSERT_MSG(where, TaskApiV1.worker_id() == worker_id, "Current worker: %d", TaskApiV1.worker_id())
+    CEL_ASSERT_MSG(where, TaskApiV0.worker_id() == worker_id, "Current worker: %d", TaskApiV0.worker_id())
 
 //==============================================================================
 // Interface
@@ -62,8 +62,8 @@ struct task_item {
 };
 
 
-//! Task API V1
-struct TaskApiV1 {
+//! Task API V0
+struct TaskApiV0 {
     //! Workers count
     //! \return Workers count
     int (*worker_count)();

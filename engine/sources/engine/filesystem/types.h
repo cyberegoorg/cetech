@@ -19,8 +19,8 @@
 //==============================================================================
 
 
-//! Filesystem API V1
-struct FilesystemApiV1 {
+//! Filesystem API V0
+struct FilesystemApiV0 {
     //! Return root dir
     //! \param root Root
     //! \return Root dir or NULL if root is invalid.

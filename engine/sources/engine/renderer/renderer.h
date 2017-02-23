@@ -19,8 +19,8 @@
 
 typedef int viewport_t;
 
-//! Render API V1
-struct RendererApiV1 {
+//! Render API V0
+struct RendererApiV0 {
     //! Create renderer.
     //! \param window Window
     void (*create)(cel_window_t window);

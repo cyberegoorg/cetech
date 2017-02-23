@@ -33,19 +33,19 @@ static struct G {
     MAP_T(component_clb_t) component_clb;
 } _G = {0};
 
-struct MemSysApiV1 MemSysApiV1;
-struct WorldApiV1 WorldApiV1;
+struct MemSysApiV0 MemSysApiV0;
+struct WorldApiV0 WorldApiV0;
 
 static void _init(get_api_fce_t get_engine_api) {
     _G = (struct G) {0};
 
-    MemSysApiV1 = *(struct MemSysApiV1 *) get_engine_api(MEMORY_API_ID, 0);
-    WorldApiV1 = *(struct WorldApiV1 *) get_engine_api(WORLD_API_ID, 0);
+    MemSysApiV0 = *(struct MemSysApiV0 *) get_engine_api(MEMORY_API_ID, 0);
+    WorldApiV0 = *(struct WorldApiV0 *) get_engine_api(WORLD_API_ID, 0);
 
-    handlerid_init(&_G.entity_handler, MemSysApiV1.main_allocator());
-    MAP_INIT(component_compiler_t, &_G.compiler_map, MemSysApiV1.main_allocator());
-    MAP_INIT(u32, &_G.spawn_order_map, MemSysApiV1.main_allocator());
-    MAP_INIT(component_clb_t, &_G.component_clb, MemSysApiV1.main_allocator());
+    handlerid_init(&_G.entity_handler, MemSysApiV0.main_allocator());
+    MAP_INIT(component_compiler_t, &_G.compiler_map, MemSysApiV0.main_allocator());
+    MAP_INIT(u32, &_G.spawn_order_map, MemSysApiV0.main_allocator());
+    MAP_INIT(component_clb_t, &_G.component_clb, MemSysApiV0.main_allocator());
 }
 
 static void _shutdown() {
@@ -108,7 +108,7 @@ void component_register_type(stringid64_t type,
             .on_update = clb.on_world_update,
     };
 
-    WorldApiV1.register_callback(wclb);
+    WorldApiV0.register_callback(wclb);
 }
 
 void component_spawn(world_t world,
@@ -161,7 +161,7 @@ void *entcom_get_plugin_api(int api,
         case ENTCOM_API_ID:
             switch (version) {
                 case 0: {
-                    static struct EntComSystemApiV1 api = {0};
+                    static struct EntComSystemApiV0 api = {0};
 
                     api.entity_manager_create = entity_manager_create;
                     api.entity_manager_destroy = entity_manager_destroy;

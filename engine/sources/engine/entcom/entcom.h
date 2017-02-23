@@ -63,8 +63,8 @@ static struct component_clb {
 } component_clb_null = {0};
 
 
-//! Entity component system API V1
-struct EntComSystemApiV1 {
+//! Entity component system API V0
+struct EntComSystemApiV0 {
     //! Create new entity
     //! \return New entity
     entity_t (*entity_manager_create)();

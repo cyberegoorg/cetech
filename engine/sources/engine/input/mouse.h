@@ -17,8 +17,8 @@
 // Mouse
 //==============================================================================
 
-//! Mouse API V1
-struct MouseApiV1 {
+//! Mouse API V0
+struct MouseApiV0 {
     //! Return button index
     //! \param button_name Button name
     //! \return Button index
