@@ -3,4 +3,4 @@
 	url = https://gitlab.com/cyberegoorg/CETech-externals.git
 [submodule "playground/icons/breeze"]
 	path = playground/icons/breeze
-	url = http://github.com/DarkknightAK/breeze-icon-theme.git
+	url = https://gitlab.com/cyberegoorg/CETech-icons-breeze.git
