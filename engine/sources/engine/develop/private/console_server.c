@@ -43,8 +43,7 @@ static struct G {
     cvar_t cv_push_addr;
 } ConsoleServerGlobals = {0};
 
-
-static struct ConfigApiV0 ConfigApiV0;
+IMPORT_API(ConfigApi, 0);
 
 extern void consolesrv_push_begin();
 
@@ -123,9 +122,9 @@ static int _cmd_ready(mpack_node_t args,
 }
 
 static void _init(get_api_fce_t get_engine_api) {
-    const char *addr = 0;
+    INIT_API(ConfigApi, CONFIG_API_ID, 0);
 
-    ConfigApiV0 = *(struct ConfigApiV0 *) get_engine_api(CONFIG_API_ID, 0);
+    const char *addr = 0;
 
     log_debug(LOG_WHERE, "Init");
 

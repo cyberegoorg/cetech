@@ -149,15 +149,14 @@ static int _task_worker(void *o) {
     return 1;
 }
 
-static struct DevelopSystemApiV0 DevelopSystemApiV0;
-static struct MemSysApiV0 MemSysApiV0;
+IMPORT_API(DevelopSystemApi, 0);
+IMPORT_API(MemSysApi, 0);
 
 static void _init(get_api_fce_t get_engine_api) {
+    INIT_API(DevelopSystemApi, DEVELOP_SERVER_API_ID, 0);
+    INIT_API(MemSysApi, MEMORY_API_ID, 0);
+
     _G = (struct G) {0};
-
-    DevelopSystemApiV0 = *((struct DevelopSystemApiV0 *) get_engine_api(DEVELOP_SERVER_API_ID, 0));
-    MemSysApiV0 = *((struct MemSysApiV0 *) get_engine_api(MEMORY_API_ID, 0));
-
 
     int core_count = cel_cpu_count();
 

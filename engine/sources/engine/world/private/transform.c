@@ -46,7 +46,7 @@ static struct G {
     MAP_T(world_data_t) world;
 } _G = {0};
 
-static struct MemSysApiV0 MemSysApiV0;
+IMPORT_API(MemSysApi, 0);
 
 int transform_is_valid(transform_t transform);
 
@@ -208,13 +208,13 @@ static void _spawner(world_t world,
     }
 }
 
-static struct EntComSystemApiV0 EntComSystemApiV0;
+IMPORT_API(EntComSystemApi, 0);
 
 static void _init(get_api_fce_t get_engine_api) {
-    _G = (struct G) {0};
+    INIT_API(EntComSystemApi, ENTCOM_API_ID, 0);
+    INIT_API(MemSysApi, MEMORY_API_ID, 0);
 
-    EntComSystemApiV0 = *((struct EntComSystemApiV0 *) get_engine_api(ENTCOM_API_ID, 0));
-    MemSysApiV0 = *(struct MemSysApiV0 *) get_engine_api(MEMORY_API_ID, 0);
+    _G = (struct G) {0};
 
     MAP_INIT(world_data_t, &_G.world, MemSysApiV0.main_allocator());
 

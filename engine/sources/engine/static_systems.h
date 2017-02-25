@@ -3,7 +3,8 @@
 //==============================================================================
 #include "engine/plugin/plugin.h"
 
-void _init_static_plugins() {
+static void _init_static_plugins() {
+    ADD_STATIC_PLUGIN(machine);
     ADD_STATIC_PLUGIN(task);
 
     ADD_STATIC_PLUGIN(filesystem);
@@ -13,18 +14,18 @@ void _init_static_plugins() {
     ADD_STATIC_PLUGIN(consoleserver);
     ADD_STATIC_PLUGIN(developsystem);
 
-    ADD_STATIC_PLUGIN(machine);
-    ADD_STATIC_PLUGIN(keyboard);
-    ADD_STATIC_PLUGIN(gamepad);
-    ADD_STATIC_PLUGIN(mouse);
-
     ADD_STATIC_PLUGIN(entcom);
     ADD_STATIC_PLUGIN(world);
 
     ADD_STATIC_PLUGIN(unit);
     ADD_STATIC_PLUGIN(level);
 
+    ADD_STATIC_PLUGIN(keyboard);
+    ADD_STATIC_PLUGIN(gamepad);
+    ADD_STATIC_PLUGIN(mouse);
+
     ADD_STATIC_PLUGIN(renderer);
+
 
     ADD_STATIC_PLUGIN(camera);
     ADD_STATIC_PLUGIN(scenegraph);

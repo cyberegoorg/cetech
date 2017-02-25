@@ -6,6 +6,11 @@
 #include <stdio.h>
 #include "engine/config/cvar.h"
 
+#define _NAME(name, version) name##V##version
+#define IMPORT_API(name, version) static struct _NAME(name, version) _NAME(name, version)
+#define INIT_API(name, api_id, version) _NAME(name, version) = *(struct _NAME(name, version) *) get_engine_api(api_id, version)
+
+//! Core engine plugin api ids
 enum {
     PLUGIN_EXPORT_API_ID = 1,
     APPLICATION_API_ID,

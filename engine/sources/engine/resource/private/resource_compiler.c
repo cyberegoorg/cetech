@@ -58,12 +58,11 @@ struct G {
     cvar_t cv_external_dir;
 } ResourceCompilerGlobal = {0};
 
-static struct MemSysApiV0 MemSysApiV0;
-static struct ResourceApiV0 ResourceApiV0;
-static struct TaskApiV0 TaskApiV0;
-static struct ConfigApiV0 ConfigApiV0;
-static struct ApplicationApiV0 ApplicationApiV0;
-
+IMPORT_API(MemSysApi, 0);
+IMPORT_API(ResourceApi, 0);
+IMPORT_API(TaskApi, 0);
+IMPORT_API(ConfigApi, 0);
+IMPORT_API(ApplicationApi, 0);
 
 //CE_STATIC_ASSERT(sizeof(struct compile_task_data) < 64);
 
@@ -216,10 +215,10 @@ static void _init_cvar(struct ConfigApiV0 config) {
 }
 
 static void _init(get_api_fce_t get_engine_api) {
-    MemSysApiV0 = *((struct MemSysApiV0 *) get_engine_api(MEMORY_API_ID, 0));
-    ResourceApiV0 = *((struct ResourceApiV0 *) get_engine_api(RESOURCE_API_ID, 0));
-    TaskApiV0 = *((struct TaskApiV0 *) get_engine_api(TASK_API_ID, 0));
-    ApplicationApiV0 = *((struct ApplicationApiV0 *) get_engine_api(APPLICATION_API_ID, 0));
+    INIT_API(MemSysApi, MEMORY_API_ID, 0);
+    INIT_API(ResourceApi, RESOURCE_API_ID, 0);
+    INIT_API(TaskApi, TASK_API_ID, 0);
+    INIT_API(ApplicationApi, APPLICATION_API_ID, 0);
 
     const char *build_dir = ConfigApiV0.get_string(_G.cv_build_dir);
     char build_dir_full[1024] = {0};

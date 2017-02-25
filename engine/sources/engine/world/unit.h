@@ -11,7 +11,7 @@
 #include "engine/world/world.h"
 
 //! Unit API V!
-struct UnitApiv1 {
+struct UnitApiV0 {
 
     //! Spawn unit from resource data
     //! \param world World

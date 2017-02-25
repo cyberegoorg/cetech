@@ -22,9 +22,9 @@ static struct G {
     ARRAY_T(array_entity_t) spawned_array;
 } _G = {0};
 
-static struct EntComSystemApiV0 EntComSystemApiV0;
-static struct MemSysApiV0 MemSysApiV0;
-static struct ResourceApiV0 ResourceApiV0;
+IMPORT_API(EntComSystemApi, 0);
+IMPORT_API(MemSysApi, 0);
+IMPORT_API(ResourceApi, 0);
 
 u32 _new_spawned_array() {
     u32 idx = ARRAY_SIZE(&_G.spawned_array);
@@ -426,11 +426,11 @@ static const resource_callbacks_t unit_resource_callback = {
 
 
 static void _init(get_api_fce_t get_engine_api) {
-    _G = (struct G) {0};
+    INIT_API(EntComSystemApi, ENTCOM_API_ID, 0);
+    INIT_API(MemSysApi, MEMORY_API_ID, 0);
+    INIT_API(ResourceApi, RESOURCE_API_ID, 0);
 
-    EntComSystemApiV0 = *((struct EntComSystemApiV0 *) get_engine_api(ENTCOM_API_ID, 0));
-    MemSysApiV0 = *(struct MemSysApiV0 *) get_engine_api(MEMORY_API_ID, 0);
-    ResourceApiV0 = *(struct ResourceApiV0 *) get_engine_api(RESOURCE_API_ID, 0);
+    _G = (struct G) {0};
 
     _G.type = stringid64_from_string("unit");
 
@@ -531,7 +531,7 @@ void *unit_get_plugin_api(int api,
         case UNIT_API_ID:
             switch (version) {
                 case 0: {
-                    static struct UnitApiv1 api = {0};
+                    static struct UnitApiV0 api = {0};
 
                     api.spawn_from_resource = unit_spawn_from_resource;
                     api.spawn = unit_spawn;
