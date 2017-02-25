@@ -20,6 +20,25 @@
 
 #include "../types.h"
 #include "engine/memory/memsys.h"
+#include "include/SDL2/SDL.h"
+#include "include/mpack/mpack.h"
+
+#include "celib/containers/map.h"
+#include <celib/filesystem/vio.h>
+#include <celib/filesystem/path.h>
+
+#include "engine/resource/types.h"
+#include <engine/config/cvar.h>
+#include <engine/application/application.h>
+#include <engine/develop/console_server.h>
+#include <engine/memory/memsys.h>
+#include <engine/plugin/plugin_api.h>
+#include <engine/plugin/plugin.h>
+#include <engine/filesystem/types.h>
+
+#include "../types.h"
+#include "engine/memory/memsys.h"
+#include "resource.h"
 
 
 //==============================================================================
@@ -71,92 +90,12 @@ struct G {
 
 } _G = {0};
 
-static struct MemSysApiV0 MemSysApiV0;
-static struct ConsoleServerApiV0 ConsoleServerApiV0;
-static struct FilesystemApiV0 FilesystemApiV0;
-static struct ConfigApiV0 ConfigApiV0;
-static struct ApplicationApiV0 ApplicationApiV0;
+IMPORT_API(MemSysApi, 0);
+IMPORT_API(ConsoleServerApi, 0);
+IMPORT_API(FilesystemApi, 0);
+IMPORT_API(ConfigApi, 0);
+IMPORT_API(ApplicationApi, 0);
 
-void resource_set_autoload(int enable);
-
-void resource_register_type(stringid64_t type,
-                            resource_callbacks_t callbacks);
-
-void resource_load(void **loaded_data,
-                   stringid64_t type,
-                   stringid64_t *names,
-                   size_t count,
-                   int force);
-
-void resource_add_loaded(stringid64_t type,
-                         stringid64_t *names,
-                         void **resource_data,
-                         size_t count);
-
-void resource_load_now(stringid64_t type,
-                       stringid64_t *names,
-                       size_t count);
-
-void resource_unload(stringid64_t type,
-                     stringid64_t *names,
-                     size_t count);
-
-void resource_reload(stringid64_t type,
-                     stringid64_t *names,
-                     size_t count);
-
-void resource_reload_all();
-
-int resource_can_get(stringid64_t type,
-                     stringid64_t names);
-
-int resource_can_get_all(stringid64_t type,
-                         stringid64_t *names,
-                         size_t count);
-
-void *resource_get(stringid64_t type,
-                   stringid64_t names);
-
-int resource_type_name_string(char *str,
-                              size_t max_len,
-                              stringid64_t type,
-                              stringid64_t name);
-
-void resource_compiler_register(stringid64_t type,
-                                resource_compilator_t compilator);
-
-void resource_compiler_compile_all();
-
-int resource_compiler_get_filename(char *filename,
-                                   size_t max_ken,
-                                   stringid64_t type,
-                                   stringid64_t name);
-
-const char *resource_compiler_get_source_dir();
-
-const char *resource_compiler_get_core_dir();
-
-int resource_compiler_get_build_dir(char *build_dir,
-                                    size_t max_len,
-                                    const char *platform);
-
-int resource_compiler_get_tmp_dir(char *tmp_dir,
-                                  size_t max_len,
-                                  const char *platform);
-
-int resource_compiler_external_join(char *output,
-                                    u32 max_len,
-                                    const char *name);
-
-void resource_compiler_create_build_dir();
-
-void package_load(stringid64_t name);
-
-void package_unload(stringid64_t name);
-
-int package_is_loaded(stringid64_t name);
-
-void package_flush(stringid64_t name);
 
 //==============================================================================
 // Private
@@ -226,11 +165,11 @@ void resource_register_type(stringid64_t type,
                             resource_callbacks_t callbacks);
 
 static void _init(get_api_fce_t get_engine_api) {
-    ConsoleServerApiV0 = *((struct ConsoleServerApiV0 *) get_engine_api(CONSOLE_SERVER_API_ID, 0));
-    MemSysApiV0 = *(struct MemSysApiV0 *) get_engine_api(MEMORY_API_ID, 0);
-    FilesystemApiV0 = *(struct FilesystemApiV0 *) get_engine_api(FILESYSTEM_API_ID, 0);
-    ConfigApiV0 = *(struct ConfigApiV0 *) get_engine_api(CONFIG_API_ID, 0);
-    ApplicationApiV0 = *(struct ApplicationApiV0 *) get_engine_api(APPLICATION_API_ID, 0);
+    INIT_API(ConsoleServerApi, CONSOLE_SERVER_API_ID, 0);
+    INIT_API(MemSysApi, MEMORY_API_ID, 0);
+    INIT_API(FilesystemApi, FILESYSTEM_API_ID, 0);
+    INIT_API(ConfigApi, CONFIG_API_ID, 0);
+    INIT_API(ApplicationApi, APPLICATION_API_ID, 0);
 
     ARRAY_INIT(resource_data, &_G.resource_data, MemSysApiV0.main_allocator());
     ARRAY_INIT(resource_callbacks_t, &_G.resource_callbacks, MemSysApiV0.main_allocator());
@@ -251,7 +190,7 @@ static void _init(get_api_fce_t get_engine_api) {
 
     ConsoleServerApiV0.consolesrv_register_command("resource.reload_all", _cmd_reload_all);
 
-    package_init();
+    package_init(get_engine_api);
     //return package_init();
 
 }

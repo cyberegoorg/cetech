@@ -75,9 +75,8 @@ struct G {
     stringid64_t type;
 } _G = {0};
 
-
-static struct MemSysApiV0 MemSysApiV0;
-static struct ResourceApiV0 ResourceApiV0;
+IMPORT_API(MemSysApi, 0);
+IMPORT_API(ResourceApi, 0);
 
 //==============================================================================
 // Compiler private
@@ -304,11 +303,11 @@ static const resource_callbacks_t material_resource_callback = {
 // Interface
 //==============================================================================
 
-int material_resource_init() {
+int material_resource_init(get_api_fce_t get_engine_api) {
     _G = (struct G) {0};
 
-    MemSysApiV0 = *(struct MemSysApiV0 *) plugin_get_engine_api(MEMORY_API_ID, 0);
-    ResourceApiV0 = *(struct ResourceApiV0 *) plugin_get_engine_api(RESOURCE_API_ID, 0);
+    INIT_API(MemSysApi, MEMORY_API_ID, 0);
+    INIT_API(ResourceApi, RESOURCE_API_ID, 0);
 
     _G.type = stringid64_from_string("material");
 

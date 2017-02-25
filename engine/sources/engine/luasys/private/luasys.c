@@ -20,6 +20,10 @@
 #include <engine/plugin/plugin_api.h>
 #include "engine/resource/types.h"
 
+
+IMPORT_API(ResourceApi, 0);
+IMPORT_API(ConsoleServerApi, 0);
+
 //==============================================================================
 // Defines
 //==============================================================================
@@ -57,9 +61,6 @@ static struct G {
     cel_quatf_t _temp_quat_buffer[TEMP_VAR_COUNT];
 
 } LuaGlobals = {0};
-
-struct ResourceApiV0 ResourceApiV0;
-
 
 //==============================================================================
 // Private
@@ -343,8 +344,6 @@ static int _execute_string(lua_State *_L,
 
     return 1;
 }
-
-
 
 
 
@@ -844,14 +843,12 @@ void _create_lightuserdata() {
     lua_pop(_G.L, 1);
 }
 
-static struct ConsoleServerApiV0 ConsoleServerApiV0;
 
 static void _init(get_api_fce_t get_engine_api) {
     log_debug(LOG_WHERE, "Init");
 
-    ConsoleServerApiV0 = *((struct ConsoleServerApiV0 *) get_engine_api(CONSOLE_SERVER_API_ID, 0));
-    ResourceApiV0 = *(struct ResourceApiV0 *) plugin_get_engine_api(RESOURCE_API_ID, 0);
-
+    INIT_API(ConsoleServerApi, CONSOLE_SERVER_API_ID, 0);
+    INIT_API(ResourceApi, RESOURCE_API_ID, 0);
 
     _G.L = luaL_newstate();
     CEL_ASSERT(LOG_WHERE, _G.L != NULL);

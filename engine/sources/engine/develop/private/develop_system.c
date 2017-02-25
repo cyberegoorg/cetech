@@ -52,9 +52,9 @@ static struct G {
     float time_accum;
 } _G = {0};
 
-static struct MemSysApiV0 MemSysApiV0;
-static struct TaskApiV0 TaskApiV0;
-static struct ConfigApiV0 ConfigApiV0;
+IMPORT_API(MemSysApi, 0);
+IMPORT_API(TaskApi, 0);
+IMPORT_API(ConfigApi, 0);
 
 static __thread u8 _stream_buffer[64 * 1024] = {0};
 static __thread u32 _stream_buffer_size = 0;
@@ -229,9 +229,9 @@ void _send_events() {
 // Interface
 //==============================================================================
 static void _init(get_api_fce_t get_engine_api) {
-    MemSysApiV0 = *(struct MemSysApiV0 *) get_engine_api(MEMORY_API_ID, 0);
-    TaskApiV0 = *(struct TaskApiV0 *) get_engine_api(TASK_API_ID, 0);
-    ConfigApiV0 = *(struct ConfigApiV0 *) get_engine_api(CONFIG_API_ID, 0);
+    INIT_API(MemSysApi, MEMORY_API_ID, 0);
+    INIT_API(TaskApi, TASK_API_ID, 0);
+    INIT_API(ConfigApi, CONFIG_API_ID, 0);
 
     MAP_INIT(to_mpack_fce_t, &_G.to_mpack, MemSysApiV0.main_allocator());
     eventstream_create(&_G.eventstream, MemSysApiV0.main_allocator());

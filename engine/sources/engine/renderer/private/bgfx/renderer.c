@@ -16,6 +16,14 @@
 #include "texture.h"
 #include "shader.h"
 #include "scene.h"
+
+
+IMPORT_API(ConsoleServerApi, 0);
+IMPORT_API(MeshApi, 0);
+IMPORT_API(CameraApi, 0);
+IMPORT_API(ConfigApi, 0);
+IMPORT_API(ApplicationApi, 0);
+
 //==============================================================================
 // GLobals
 //==============================================================================
@@ -31,7 +39,8 @@ static struct G {
 } _G = {0};
 
 
-int material_resource_init();
+int material_resource_init(get_api_fce_t get_engine_api);
+
 void material_resource_shutdown();
 
 //==============================================================================
@@ -59,18 +68,12 @@ static int _cmd_resize(mpack_node_t args,
     return 0;
 }
 
-static struct ConsoleServerApiV0 ConsoleServerApiV0;
-static struct MeshApiV0 MeshApiV0;
-static struct CameraApiV0 CameraApiV0;
-static struct ConfigApiV0 ConfigApiV0;
-static struct ApplicationApiV0 ApplicationApiV0;
-
 static void _init(get_api_fce_t get_engine_api) {
-    ConsoleServerApiV0 = *((struct ConsoleServerApiV0 *) get_engine_api(CONSOLE_SERVER_API_ID, 0));
-    MeshApiV0 = *((struct MeshApiV0 *) get_engine_api(MESH_API_ID, 0));
-    CameraApiV0 = *((struct CameraApiV0 *) get_engine_api(CAMERA_API_ID, 0));
-    ConfigApiV0 = *((struct ConfigApiV0 *) get_engine_api(CONFIG_API_ID, 0));
-    ApplicationApiV0 = *((struct ApplicationApiV0 *) get_engine_api(APPLICATION_API_ID, 0));
+    INIT_API(ConsoleServerApi, CONSOLE_SERVER_API_ID, 0);
+    INIT_API(MeshApi, MESH_API_ID, 0);
+    INIT_API(CameraApi, CAMERA_API_ID, 0);
+    INIT_API(ConfigApi, CONFIG_API_ID, 0);
+    INIT_API(ApplicationApi, APPLICATION_API_ID, 0);
 
     _G = (struct G) {0};
 
@@ -78,7 +81,7 @@ static void _init(get_api_fce_t get_engine_api) {
     if (!ConfigApiV0.get_int(daemon)) {
         texture_resource_init();
         shader_resource_init();
-        material_resource_init();
+        material_resource_init(get_engine_api);
         scene_resource_init();
 
         ConsoleServerApiV0.consolesrv_register_command("renderer.resize", _cmd_resize);

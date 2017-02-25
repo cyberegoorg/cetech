@@ -29,7 +29,7 @@ static struct G {
     struct handlerid world_handler;
 } _G = {0};
 
-static struct MemSysApiV0 MemSysApiV0;
+IMPORT_API(MemSysApi, 0);
 
 //==============================================================================
 // Public interface
@@ -37,7 +37,7 @@ static struct MemSysApiV0 MemSysApiV0;
 static void _init(get_api_fce_t get_engine_api) {
     _G = (struct G) {0};
 
-    MemSysApiV0 = *(struct MemSysApiV0 *) get_engine_api(MEMORY_API_ID, 0);
+    INIT_API(MemSysApi, MEMORY_API_ID, 0);
 
     ARRAY_INIT(world_callbacks_t, &_G.callbacks, MemSysApiV0.main_allocator());
 

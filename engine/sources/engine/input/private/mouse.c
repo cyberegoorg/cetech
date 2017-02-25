@@ -30,13 +30,13 @@ static struct G {
     cel_vec2f_t last_delta_pos;
 } _G = {0};
 
-static struct MachineApiV0 MachineApiV0 = {0};
 
+IMPORT_API(MachineApi, 0);
 
 static void _init(get_api_fce_t get_engine_api) {
-    _G = (struct G) {0};
+    INIT_API(MachineApi, MACHINE_API_ID, 0);
 
-    MachineApiV0 = *(struct MachineApiV0*) get_engine_api(MACHINE_API_ID, 0);
+    _G = (struct G) {0};
 
     log_debug(LOG_WHERE, "Init");
 }

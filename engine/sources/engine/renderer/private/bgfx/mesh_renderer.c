@@ -17,10 +17,17 @@
 #include "engine/memory/memsys.h"
 
 
+IMPORT_API(MemSysApi, 0);
+IMPORT_API(SceneGprahApi, 0);
+IMPORT_API(TransformApi, 0);
+IMPORT_API(EntComSystemApi, 0);
+IMPORT_API(MaterialApi, 0);
+IMPORT_API(MeshApi, 0);
+
+
 #define LOG_WHERE "mesh_renderer"
 
 ARRAY_PROTOTYPE(stringid64_t)
-
 ARRAY_PROTOTYPE(material_t)
 
 
@@ -51,14 +58,6 @@ static struct G {
 
     MAP_T(world_data_t) world;
 } _G = {0};
-
-static struct MemSysApiV0 MemSysApiV0;
-static struct SceneGprahApiV0 SceneGprahApiV0;
-static struct TransformApiV0 TransformApiV0;
-static struct EntComSystemApiV0 EntComSystemApiV0;
-static struct MaterialApiV0 MaterialApiV0;
-static struct MeshApiV0 MeshApiV0;
-static struct MeshApiV0 MeshApiV0;
 
 static void _new_world(world_t world) {
     world_data_t data = {0};
@@ -166,12 +165,12 @@ static void _spawner(world_t world,
 
 
 static void _init(get_api_fce_t get_engine_api) {
-    EntComSystemApiV0 = *((struct EntComSystemApiV0 *) get_engine_api(ENTCOM_API_ID, 0));
-    MemSysApiV0 = *(struct MemSysApiV0 *) get_engine_api(MEMORY_API_ID, 0);
-    MaterialApiV0 = *((struct MaterialApiV0 *) get_engine_api(MATERIAL_API_ID, 0));
-    MeshApiV0 = *(struct MeshApiV0 *) get_engine_api(MESH_API_ID, 0);
-    SceneGprahApiV0 = *(struct SceneGprahApiV0 *) get_engine_api(SCENEGRAPH_API_ID, 0);
-    TransformApiV0 = *(struct TransformApiV0 *) get_engine_api(TRANSFORM_API_ID, 0);
+    INIT_API(EntComSystemApi, ENTCOM_API_ID, 0);
+    INIT_API(MemSysApi, MEMORY_API_ID, 0);
+    INIT_API(MaterialApi, MATERIAL_API_ID, 0);
+    INIT_API(MeshApi, MESH_API_ID, 0);
+    INIT_API(SceneGprahApi, SCENEGRAPH_API_ID, 0);
+    INIT_API(TransformApi, TRANSFORM_API_ID, 0);
 
     _G = (struct G) {0};
 
@@ -182,8 +181,10 @@ static void _init(get_api_fce_t get_engine_api) {
     EntComSystemApiV0.component_register_compiler(_G.type, _mesh_component_compiler, 10);
 
     EntComSystemApiV0.component_register_type(_G.type, (struct component_clb) {
-            .spawner=_spawner, .destroyer=_destroyer,
-            .on_world_create=_on_world_create, .on_world_destroy=_on_world_destroy
+            .spawner=_spawner,
+            .destroyer=_destroyer,
+            .on_world_create=_on_world_create,
+            .on_world_destroy=_on_world_destroy
     });
 }
 

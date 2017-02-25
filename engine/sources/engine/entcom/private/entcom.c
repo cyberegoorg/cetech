@@ -33,14 +33,14 @@ static struct G {
     MAP_T(component_clb_t) component_clb;
 } _G = {0};
 
-struct MemSysApiV0 MemSysApiV0;
-struct WorldApiV0 WorldApiV0;
+IMPORT_API(MemSysApi, 0);
+IMPORT_API(WorldApi, 0);
 
 static void _init(get_api_fce_t get_engine_api) {
-    _G = (struct G) {0};
+    INIT_API(MemSysApi, MEMORY_API_ID, 0);
+    INIT_API(WorldApi, WORLD_API_ID, 0);
 
-    MemSysApiV0 = *(struct MemSysApiV0 *) get_engine_api(MEMORY_API_ID, 0);
-    WorldApiV0 = *(struct WorldApiV0 *) get_engine_api(WORLD_API_ID, 0);
+    _G = (struct G) {0};
 
     handlerid_init(&_G.entity_handler, MemSysApiV0.main_allocator());
     MAP_INIT(component_compiler_t, &_G.compiler_map, MemSysApiV0.main_allocator());

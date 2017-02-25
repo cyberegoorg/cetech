@@ -10,6 +10,8 @@
 
 #include "gamepadstr.h"
 
+IMPORT_API(MachineApi, 0);
+
 //==============================================================================
 // Defines
 //==============================================================================
@@ -21,7 +23,6 @@
 // Globals
 //==============================================================================
 
-
 static struct G {
     int active[GAMEPAD_MAX];
     cel_vec2f_t position[GAMEPAD_MAX][GAMEPAD_AXIX_MAX];
@@ -29,13 +30,12 @@ static struct G {
     int last_state[GAMEPAD_MAX][GAMEPAD_BTN_MAX];
 } _G = {0};
 
-static struct MachineApiV0 MachineApiV0 = {0};
 
 
 static void _init(get_api_fce_t get_engine_api) {
-    _G = (struct G) {0};
+    INIT_API(MachineApi, MACHINE_API_ID, 0);
 
-    MachineApiV0 = *(struct MachineApiV0*) get_engine_api(MACHINE_API_ID, 0);
+    _G = (struct G) {0};
 
     log_debug(LOG_WHERE, "Init");
 

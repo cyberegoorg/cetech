@@ -30,6 +30,16 @@
 
 #define LOG_WHERE "application"
 
+
+IMPORT_API(ConsoleServerApi, 0);
+IMPORT_API(DevelopSystemApi, 0);
+IMPORT_API(RendererApi, 0);
+IMPORT_API(ResourceApi, 0);
+IMPORT_API(PackageApi, 0);
+IMPORT_API(TaskApi, 0);
+IMPORT_API(LuaSysApi, 0);
+IMPORT_API(ConfigApi, 0);
+
 //==============================================================================
 // Globals
 //==============================================================================
@@ -87,15 +97,6 @@ static int _cmd_wait(mpack_node_t args,
                      mpack_writer_t *writer) {
     return 0;
 }
-
-static struct ConsoleServerApiV0 ConsoleServerApiV0;
-static struct DevelopSystemApiV0 DevelopSystemApiV0;
-static struct RendererApiV0 RendererApiV0;
-static struct ResourceApiV0 ResourceApiV0;
-static struct PackageApiV0 PackageApiV0;
-static struct TaskApiV0 TaskApiV0;
-static struct LuaSysApiV0 LuaSysApiV0;
-static struct ConfigApiV0 ConfigApiV0;
 
 static struct ApplicationApiV0 api_v1 = {
         .quit = application_quit,
@@ -180,6 +181,7 @@ int application_shutdown() {
     log_debug(LOG_WHERE, "Shutdown");
 
     plugin_call_shutdown();
+
     cvar_shutdown();
     memsys_shutdown();
     log_shutdown();

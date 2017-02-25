@@ -37,13 +37,12 @@ static struct G {
     } rootmap;
 } FilesystemGlobals = {0};
 
-
-static struct MemSysApiV0 MemSysApiV0;
+IMPORT_API(MemSysApi, 0);
 
 static void _init(get_api_fce_t get_engine_api) {
-    _G = (struct G) {0};
+    INIT_API(MemSysApi, MEMORY_API_ID, 0);
 
-    MemSysApiV0 = *(struct MemSysApiV0 *) get_engine_api(MEMORY_API_ID, 0);
+    _G = (struct G) {0};
 
     log_debug(LOG_WHERE, "Init");
 }

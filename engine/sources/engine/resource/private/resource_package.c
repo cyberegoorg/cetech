@@ -28,9 +28,10 @@ struct G {
     stringid64_t package_typel;
 } _G = {0};
 
-static struct MemSysApiV0 MemSysApiV0;
-static struct ResourceApiV0 ResourceApiV0;
-static struct TaskApiV0 TaskApiV0;
+
+IMPORT_API(MemSysApi, 0);
+IMPORT_API(ResourceApi, 0);
+IMPORT_API(TaskApi, 0);
 
 //==============================================================================
 // Resource compiler
@@ -112,12 +113,12 @@ int _package_compiler(const char *filename,
     return 1;
 }
 
-int package_init() {
-    _G = (struct G) {0};
+int package_init(get_api_fce_t get_engine_api) {
+    INIT_API(MemSysApi, MEMORY_API_ID, 0);
+    INIT_API(ResourceApi, RESOURCE_API_ID, 0);
+    INIT_API(TaskApi, TASK_API_ID, 0);
 
-    MemSysApiV0 = *((struct MemSysApiV0 *) plugin_get_engine_api(MEMORY_API_ID, 0));
-    ResourceApiV0 = *((struct ResourceApiV0 *) plugin_get_engine_api(RESOURCE_API_ID, 0));
-    TaskApiV0 = *((struct TaskApiV0 *) plugin_get_engine_api(TASK_API_ID, 0));
+    _G = (struct G) {0};
 
     _G.package_typel = stringid64_from_string("package");
 

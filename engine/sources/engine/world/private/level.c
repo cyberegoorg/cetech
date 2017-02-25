@@ -15,6 +15,12 @@
 
 #include "engine/world/level.h"
 
+IMPORT_API(EntComSystemApi, 0);
+IMPORT_API(ResourceApi, 0);
+IMPORT_API(TransformApi, 0);
+IMPORT_API(MemSysApi, 0);
+IMPORT_API(UnitApi, 0);
+
 //==============================================================================
 // Typedefs
 //==============================================================================
@@ -42,9 +48,6 @@ static struct G {
 
     ARRAY_T(level_instance) level_instance;
 } _G = {0};
-
-static struct MemSysApiV0 MemSysApiV0;
-static struct UnitApiv1 UnitApiv1;
 
 void _init_level_instance(struct level_instance *instance,
                           entity_t level_entity) {
@@ -136,9 +139,9 @@ void forach_units_clb(yaml_node_t key,
     char name[128] = {0};
     yaml_as_string(key, name, CEL_ARRAY_LEN(name));
     ARRAY_PUSH_BACK(stringid64_t, data->id, stringid64_from_string(name));
-    ARRAY_PUSH_BACK(u32, data->offset, UnitApiv1.compiler_ent_counter(data->output));
+    ARRAY_PUSH_BACK(u32, data->offset, UnitApiV0.compiler_ent_counter(data->output));
 
-    UnitApiv1.compiler_compile_unit(data->output, value, data->filename, data->capi);
+    UnitApiV0.compiler_compile_unit(data->output, value, data->filename, data->capi);
 }
 
 struct level_blob {
@@ -175,7 +178,7 @@ int _level_resource_compiler(const char *filename,
     ARRAY_INIT(u32, &offset, MemSysApiV0.main_allocator());
     ARRAY_INIT(u8, &data, MemSysApiV0.main_allocator());
 
-    struct entity_compile_output *output = UnitApiv1.compiler_create_output();
+    struct entity_compile_output *output = UnitApiV0.compiler_create_output();
 
 
     struct foreach_units_data unit_data = {
@@ -193,7 +196,7 @@ int _level_resource_compiler(const char *filename,
             .units_count = ARRAY_SIZE(&id)
     };
 
-    UnitApiv1.compiler_write_to_build(output, unit_data.data);
+    UnitApiV0.compiler_write_to_build(output, unit_data.data);
 
     cel_vio_write(build_vio, &res, sizeof(struct level_blob), 1);
     cel_vio_write(build_vio, &ARRAY_AT(&id, 0), sizeof(stringid64_t), ARRAY_SIZE(&id));
@@ -204,7 +207,7 @@ int _level_resource_compiler(const char *filename,
     ARRAY_DESTROY(u32, &offset);
     ARRAY_DESTROY(u8, &data);
 
-    UnitApiv1.compiler_destroy_output(output);
+    UnitApiV0.compiler_destroy_output(output);
 
     return 1;
 }
@@ -214,16 +217,12 @@ int _level_resource_compiler(const char *filename,
 // Public interface
 //==============================================================================
 
-static struct EntComSystemApiV0 EntComSystemApiV0;
-static struct ResourceApiV0 ResourceApiV0;
-static struct TransformApiV0 TransformApiV0;
-
 static void _init(get_api_fce_t get_engine_api) {
-    EntComSystemApiV0 = *((struct EntComSystemApiV0 *) get_engine_api(ENTCOM_API_ID, 0));
-    MemSysApiV0 = *(struct MemSysApiV0 *) get_engine_api(MEMORY_API_ID, 0);
-    ResourceApiV0 = *(struct ResourceApiV0 *) get_engine_api(RESOURCE_API_ID, 0);
-    TransformApiV0 = *(struct TransformApiV0 *) get_engine_api(TRANSFORM_API_ID, 0);
-    UnitApiv1 = *(struct UnitApiv1 *) get_engine_api(UNIT_API_ID, 0);
+    INIT_API(EntComSystemApi, ENTCOM_API_ID, 0);
+    INIT_API(MemSysApi, MEMORY_API_ID, 0);
+    INIT_API(ResourceApi, RESOURCE_API_ID, 0);
+    INIT_API(TransformApi, TRANSFORM_API_ID, 0);
+    INIT_API(UnitApi, UNIT_API_ID, 0);
 
     _G = (struct G) {0};
     _G.level_type = stringid64_from_string("level");
@@ -255,7 +254,7 @@ level_t world_load_level(world_t world,
     level_t level = _new_level(level_ent);
     struct level_instance *instance = _level_instance(level);
 
-    ARRAY_T(entity_t) *spawned = UnitApiv1.spawn_from_resource(world, data);
+    ARRAY_T(entity_t) *spawned = UnitApiV0.spawn_from_resource(world, data);
     instance->spawned_entity = spawned;
 
     for (int i = 0; i < res->units_count; ++i) {
@@ -274,7 +273,7 @@ void level_destroy(world_t world,
                    level_t level) {
     struct level_instance *instance = _level_instance(level);
 
-    UnitApiv1.destroy(world, &instance->spawned_entity->data[0], 1);
+    UnitApiV0.destroy(world, &instance->spawned_entity->data[0], 1);
     EntComSystemApiV0.entity_manager_destroy(instance->level_entity);
 }
 
