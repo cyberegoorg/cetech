@@ -11,7 +11,7 @@
 #include "engine/plugin/plugin.h"
 
 //==============================================================================
-// Base events
+// Enums
 //==============================================================================
 
 //! Machine event type enum
@@ -30,21 +30,6 @@ enum event {
     EVENT_GAMEPAD_DOWN,       //!< Gamepad button down
     EVENT_GAMEPAD_CONNECT,    //!< Gamepad connected
     EVENT_GAMEPAD_DISCONNECT, //!< Gamepad disconected
-};
-
-//==============================================================================
-// Mouse events
-//==============================================================================
-
-//! Mouse button status
-struct mouse_event {
-    struct event_header h; //!< Event header
-    u32 button;            //!< Button state
-};
-
-struct mouse_move_event {
-    struct event_header h; //!< Event header
-    cel_vec2f_t pos;       //!< Actual position
 };
 
 //! Mouse button enum
@@ -67,22 +52,6 @@ enum {
 
     MOUSE_AXIS_MAX = 8 //!< Max axis
 };
-
-//==============================================================================
-// Keyboarad events
-//==============================================================================
-
-#include "_key.h"
-
-//! Keyboard event
-struct keyboard_event {
-    struct event_header h; //!< Event header
-    u32 keycode; //!< Key code
-};
-
-//==============================================================================
-// Gamepad events
-//==============================================================================
 
 //! Gampead id enum
 enum {
@@ -124,6 +93,31 @@ enum {
     GAMEPAD_AXIX_MAX          //!< Max axis
 };
 
+
+#include "_key.h"
+
+//==============================================================================
+// Structs
+//==============================================================================
+
+//! Mouse button status
+struct mouse_event {
+    struct event_header h; //!< Event header
+    u32 button;            //!< Button state
+};
+
+struct mouse_move_event {
+    struct event_header h; //!< Event header
+    cel_vec2f_t pos;       //!< Actual position
+};
+
+//! Keyboard event
+struct keyboard_event {
+    struct event_header h; //!< Event header
+    u32 keycode; //!< Key code
+};
+
+
 //! Gamepad move event
 struct gamepad_move_event {
     struct event_header h; //!< Event header
@@ -146,7 +140,7 @@ struct gamepad_device_event {
 };
 
 //==============================================================================
-// Machine interface
+// Api
 //==============================================================================
 
 //! Machine API V0

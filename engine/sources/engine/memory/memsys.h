@@ -5,7 +5,16 @@
 #ifndef CELIB_MEMSYS_H
 #define CELIB_MEMSYS_H
 
+//==============================================================================
+// Includes
+//==============================================================================
+
 #include "celib/memory/types.h"
+
+
+//==============================================================================
+// Interface
+//==============================================================================
 
 //! Init memory system
 //! \param scratch_buffer_size Main scratch buffer size
@@ -22,6 +31,10 @@ struct cel_allocator *_memsys_main_allocator();
 //! \return Main scratch alocator
 struct cel_allocator *_memsys_main_scratch_allocator();
 
+
+//==============================================================================
+// Api
+//==============================================================================
 
 //! Memory system API V0
 struct MemSysApiV0 {

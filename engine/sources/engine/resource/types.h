@@ -17,7 +17,7 @@
 
 
 //==============================================================================
-// Callback typedef
+// Typedefs
 //==============================================================================
 
 //! Resource loader
@@ -55,19 +55,6 @@ typedef void *(*resource_reloader_t)(stringid64_t name,
                                      void *new_data,
                                      struct cel_allocator *allocator);
 
-//==============================================================================
-// Structs and typedefs
-//==============================================================================
-
-//! Compilator api
-struct compilator_api {
-    //! Add dependency
-    //! \param who_filname Source filename
-    //! \param depend_on_filename Depend on this file
-    void (*add_dependency)(const char *who_filname,
-                           const char *depend_on_filename);
-};
-
 //! Resource compilator fce
 //! \param filename Source filename
 //! \param source_vio Source vio
@@ -79,6 +66,11 @@ typedef int (*resource_compilator_t)(
         struct vio *build_vio,
         struct compilator_api *compilator_api);
 
+
+//==============================================================================
+// Structs
+//==============================================================================
+
 //! Resource callbacks
 typedef struct {
     resource_loader_t loader;     //!< Loader
@@ -88,8 +80,19 @@ typedef struct {
     resource_reloader_t reloader; //!< Reloader
 } resource_callbacks_t;
 
+
+//! Compilator api
+struct compilator_api {
+    //! Add dependency
+    //! \param who_filname Source filename
+    //! \param depend_on_filename Depend on this file
+    void (*add_dependency)(const char *who_filname,
+                           const char *depend_on_filename);
+};
+
+
 //==============================================================================
-// Resource interface
+// Api
 //==============================================================================
 
 //! Resource API V0
@@ -249,10 +252,6 @@ struct ResourceApiV0 {
     //! \return Source dir
     const char *(*compiler_get_source_dir)();
 };
-
-//==============================================================================
-// Package interface
-//==============================================================================
 
 //! Package API V!
 struct PackageApiV0 {

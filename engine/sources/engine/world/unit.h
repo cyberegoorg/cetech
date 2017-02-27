@@ -4,11 +4,20 @@
 #ifndef CETECH_UNIT_SYSTEM_H
 #define CETECH_UNIT_SYSTEM_H
 
+//==============================================================================
+// Includes
+//==============================================================================
+
 #include <celib/containers/array.h>
 #include <engine/entcom/entcom.h>
 #include <celib/yaml/yaml.h>
 #include "engine/resource/types.h"
 #include "engine/world/world.h"
+
+
+//==============================================================================
+// Api
+//==============================================================================
 
 //! Unit API V!
 struct UnitApiV0 {
