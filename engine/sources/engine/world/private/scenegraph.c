@@ -7,7 +7,6 @@
 #include <engine/world/scenegraph.h>
 #include <engine/memory/memsys.h>
 #include <engine/plugin/plugin_api.h>
-#include "engine/memory/memsys.h"
 
 
 ARRAY_PROTOTYPE(cel_vec3f_t)
@@ -101,7 +100,8 @@ static void _init(get_api_fce_t get_engine_api) {
 
     MAP_INIT(world_data_t, &_G.world, MemSysApiV0.main_allocator());
 
-    WorldApiV0.register_callback((world_callbacks_t) {.on_created=_on_world_create, .on_destroy=_on_world_destroy});
+    WorldApiV0.register_callback(
+            (world_callbacks_t) {.on_created=_on_world_create, .on_destroy=_on_world_destroy});
 
 }
 
@@ -138,15 +138,19 @@ void scene_node_transform(world_t world,
     m.w.y = pos.y;
     m.w.z = pos.z;
 
-    cel_mat44f_mul(&ARRAY_AT(&world_data->world_matrix, transform.idx), &m, parent);
+    cel_mat44f_mul(&ARRAY_AT(&world_data->world_matrix, transform.idx), &m,
+                   parent);
 
     u32 child = ARRAY_AT(&world_data->first_child, transform.idx);
 
     scene_node_t child_transform = {.idx = child};
 
     while (scenegraph_is_valid(child_transform)) {
-        scene_node_transform(world, child_transform, &ARRAY_AT(&world_data->world_matrix, transform.idx));
-        child_transform.idx = ARRAY_AT(&world_data->next_sibling, child_transform.idx);
+        scene_node_transform(world, child_transform,
+                             &ARRAY_AT(&world_data->world_matrix,
+                                       transform.idx));
+        child_transform.idx = ARRAY_AT(&world_data->next_sibling,
+                                       child_transform.idx);
     }
 }
 
@@ -187,7 +191,9 @@ void scenegraph_set_position(world_t world,
     scene_node_t pt = {.idx = parent_idx};
 
     cel_mat44f_t m = MAT44F_INIT_IDENTITY;
-    cel_mat44f_t *p = parent_idx != UINT32_MAX ? scenegraph_get_world_matrix(world, pt) : &m;
+    cel_mat44f_t *p =
+            parent_idx != UINT32_MAX ? scenegraph_get_world_matrix(world, pt)
+                                     : &m;
 
     ARRAY_AT(&world_data->position, transform.idx) = pos;
 
@@ -203,7 +209,9 @@ void scenegraph_set_rotation(world_t world,
     scene_node_t pt = {.idx = parent_idx};
 
     cel_mat44f_t m = MAT44F_INIT_IDENTITY;
-    cel_mat44f_t *p = parent_idx != UINT32_MAX ? scenegraph_get_world_matrix(world, pt) : &m;
+    cel_mat44f_t *p =
+            parent_idx != UINT32_MAX ? scenegraph_get_world_matrix(world, pt)
+                                     : &m;
 
     cel_quatf_t nq = {0};
     cel_quatf_normalized(&nq, &rot);
@@ -222,7 +230,9 @@ void scenegraph_set_scale(world_t world,
     scene_node_t pt = {.idx = parent_idx};
 
     cel_mat44f_t m = MAT44F_INIT_IDENTITY;
-    cel_mat44f_t *p = parent_idx != UINT32_MAX ? scenegraph_get_world_matrix(world, pt) : &m;
+    cel_mat44f_t *p =
+            parent_idx != UINT32_MAX ? scenegraph_get_world_matrix(world, pt)
+                                     : &m;
 
     ARRAY_AT(&world_data->scale, transform.idx) = scale;
 
@@ -251,7 +261,8 @@ scene_node_t scenegraph_create(world_t world,
                                u32 count) {
     world_data_t *data = _get_world_data(world);
 
-    scene_node_t *nodes = CEL_ALLOCATE(MemSysApiV0.main_allocator(), scene_node_t, count);
+    scene_node_t *nodes = CEL_ALLOCATE(MemSysApiV0.main_allocator(),
+                                       scene_node_t, count);
 
     for (int i = 0; i < count; ++i) {
         u32 idx = (u32) ARRAY_SIZE(&data->position);
@@ -277,7 +288,10 @@ scene_node_t scenegraph_create(world_t world,
 
         scene_node_t t = {.idx = idx};
         scene_node_transform(world, t,
-                             parent[i] != UINT32_MAX ? scenegraph_get_world_matrix(world, nodes[parent[i]]) : &m);
+                             parent[i] != UINT32_MAX
+                             ? scenegraph_get_world_matrix(world,
+                                                           nodes[parent[i]])
+                             : &m);
 
         if (parent[i] != UINT32_MAX) {
             u32 parent_idx = nodes[parent[i]].idx;
@@ -317,10 +331,13 @@ void scenegraph_link(world_t world,
 
     cel_mat44f_t m = MAT44F_INIT_IDENTITY;
 
-    cel_mat44f_t *p = parent.idx != UINT32_MAX ? scenegraph_get_world_matrix(world, parent) : &m;
+    cel_mat44f_t *p =
+            parent.idx != UINT32_MAX ? scenegraph_get_world_matrix(world,
+                                                                   parent) : &m;
 
     scene_node_transform(world, parent, p);
-    scene_node_transform(world, child, scenegraph_get_world_matrix(world, parent));
+    scene_node_transform(world, child,
+                         scenegraph_get_world_matrix(world, parent));
 }
 
 scene_node_t _scenegraph_node_by_name(world_data_t *data,

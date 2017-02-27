@@ -159,7 +159,8 @@ static void _reload_end(get_api_fce_t get_engine_api,
 int cvar_init() {
     log_debug(LOG_WHERE, "Init");
 
-    MemSysApiV0 = *(struct MemSysApiV0 *) plugin_get_engine_api(MEMORY_API_ID, 0);
+    MemSysApiV0 = *(struct MemSysApiV0 *) plugin_get_engine_api(MEMORY_API_ID,
+                                                                0);
 
     _G.type = stringid64_from_string("config");
 
@@ -177,21 +178,30 @@ void cvar_compile_global() {
     char source_path[1024] = {0};
     char build_path[1024] = {0};
 
-    struct ResourceApiV0 ResourceApiV0 = *(struct ResourceApiV0 *) plugin_get_engine_api(RESOURCE_API_ID, 0);
-    struct ApplicationApiV0 ApplicationApiV0 = *(struct ApplicationApiV0 *) plugin_get_engine_api(APPLICATION_API_ID, 0);
+    struct ResourceApiV0 ResourceApiV0 = *(struct ResourceApiV0 *) plugin_get_engine_api(
+            RESOURCE_API_ID, 0);
+    struct ApplicationApiV0 ApplicationApiV0 = *(struct ApplicationApiV0 *) plugin_get_engine_api(
+            APPLICATION_API_ID,
+            0);
 
-    ResourceApiV0.compiler_get_build_dir(build_dir, CEL_ARRAY_LEN(build_dir), ApplicationApiV0.platform());
-    cel_path_join(build_path, CEL_ARRAY_LEN(build_path), build_dir, "global.config");
-    cel_path_join(source_path, CEL_ARRAY_LEN(source_path), ResourceApiV0.compiler_get_source_dir(), "global.config");
+    ResourceApiV0.compiler_get_build_dir(build_dir, CEL_ARRAY_LEN(build_dir),
+                                         ApplicationApiV0.platform());
+    cel_path_join(build_path, CEL_ARRAY_LEN(build_path), build_dir,
+                  "global.config");
+    cel_path_join(source_path, CEL_ARRAY_LEN(source_path),
+                  ResourceApiV0.compiler_get_source_dir(), "global.config");
 
-    struct vio *source_vio = cel_vio_from_file(source_path, VIO_OPEN_READ, MemSysApiV0.main_allocator());
-    char *data = CEL_ALLOCATE(MemSysApiV0.main_allocator(), char, cel_vio_size(source_vio));
+    struct vio *source_vio = cel_vio_from_file(source_path, VIO_OPEN_READ,
+                                               MemSysApiV0.main_allocator());
+    char *data = CEL_ALLOCATE(MemSysApiV0.main_allocator(), char,
+                              cel_vio_size(source_vio));
 
     size_t size = (size_t) cel_vio_size(source_vio);
     cel_vio_read(source_vio, data, sizeof(char), size);
     cel_vio_close(source_vio);
 
-    struct vio *build_vio = cel_vio_from_file(build_path, VIO_OPEN_WRITE, MemSysApiV0.main_allocator());
+    struct vio *build_vio = cel_vio_from_file(build_path, VIO_OPEN_WRITE,
+                                              MemSysApiV0.main_allocator());
     cel_vio_write(build_vio, data, sizeof(char), size);
     cel_vio_close(build_vio);
 
@@ -229,7 +239,8 @@ void foreach_config_clb(yaml_node_t key,
 
     char name[1024] = {0};
     if (output->root_name != NULL) {
-        snprintf(name, CEL_ARRAY_LEN(name), "%s.%s", output->root_name, key_str);
+        snprintf(name, CEL_ARRAY_LEN(name), "%s.%s", output->root_name,
+                 key_str);
     } else {
         snprintf(name, CEL_ARRAY_LEN(name), "%s", key_str);
     }
@@ -273,19 +284,26 @@ void foreach_config_clb(yaml_node_t key,
 }
 
 
-
 void cvar_load_global() {
     char build_dir[1024] = {0};
     char source_path[1024] = {0};
 
-    struct ResourceApiV0 ResourceApiV0 = *(struct ResourceApiV0 *) plugin_get_engine_api(RESOURCE_API_ID, 0);
-    struct ApplicationApiV0 ApplicationApiV0 = *(struct ApplicationApiV0 *) plugin_get_engine_api(APPLICATION_API_ID, 0);
-    ResourceApiV0.compiler_get_build_dir(build_dir, CEL_ARRAY_LEN(build_dir), ApplicationApiV0.platform());
-    cel_path_join(source_path, CEL_ARRAY_LEN(source_path), build_dir, "global.config");
+    struct ResourceApiV0 ResourceApiV0 = *(struct ResourceApiV0 *) plugin_get_engine_api(
+            RESOURCE_API_ID, 0);
+    struct ApplicationApiV0 ApplicationApiV0 = *(struct ApplicationApiV0 *) plugin_get_engine_api(
+            APPLICATION_API_ID,
+            0);
+    ResourceApiV0.compiler_get_build_dir(build_dir, CEL_ARRAY_LEN(build_dir),
+                                         ApplicationApiV0.platform());
+    cel_path_join(source_path, CEL_ARRAY_LEN(source_path), build_dir,
+                  "global.config");
 
-    struct vio *source_vio = cel_vio_from_file(source_path, VIO_OPEN_READ, MemSysApiV0.main_allocator());
-    char *data = CEL_ALLOCATE(MemSysApiV0.main_allocator(), char, cel_vio_size(source_vio));
-    cel_vio_read(source_vio, data, cel_vio_size(source_vio), cel_vio_size(source_vio));
+    struct vio *source_vio = cel_vio_from_file(source_path, VIO_OPEN_READ,
+                                               MemSysApiV0.main_allocator());
+    char *data = CEL_ALLOCATE(MemSysApiV0.main_allocator(), char,
+                              cel_vio_size(source_vio));
+    cel_vio_read(source_vio, data, cel_vio_size(source_vio),
+                 cel_vio_size(source_vio));
     cel_vio_close(source_vio);
 
     yaml_document_t h;
@@ -348,7 +366,8 @@ int cvar_parse_args(struct args args) {
         }
 
         const char *name = tmp_args.argv[j] + 1;
-        const char *value = (j != tmp_args.argc - 1) ? tmp_args.argv[j + 1] : NULL;
+        const char *value = (j != tmp_args.argc - 1) ? tmp_args.argv[j + 1]
+                                                     : NULL;
 
         if (value && (value[0] == '-')) {
             value = NULL;
@@ -375,7 +394,8 @@ int cvar_parse_core_args(struct args args) {
             !cel_strcmp(name, "compile") ||
             !cel_strcmp(name, "src")) {
 
-            const char *value = (j != tmp_args.argc - 1) ? tmp_args.argv[j + 1] : NULL;
+            const char *value = (j != tmp_args.argc - 1) ? tmp_args.argv[j + 1]
+                                                         : NULL;
 
             if (value && (value[0] == '-')) {
                 value = NULL;
@@ -389,7 +409,6 @@ int cvar_parse_core_args(struct args args) {
 
     return 1;
 }
-
 
 
 cvar_t cvar_find_or_create(const char *name,

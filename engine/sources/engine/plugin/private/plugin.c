@@ -10,7 +10,6 @@
 #include <engine/memory/memsys.h>
 
 #include "engine/plugin/plugin.h"
-#include "engine/config/cvar.h"
 
 //==============================================================================
 // Defines
@@ -106,7 +105,8 @@ void plugin_load(const char *path) {
 
 void plugin_reload(const char *path) {
     for (size_t i = 0; i < MAX_PLUGINS; ++i) {
-        if ((_G.plugin_handler[i] == NULL) || (cel_strcmp(_G.path[i], path)) != 0) {
+        if ((_G.plugin_handler[i] == NULL) ||
+            (cel_strcmp(_G.path[i], path)) != 0) {
             continue;
         }
 
@@ -211,7 +211,8 @@ void plugin_call_init() {
 }
 
 void plugin_call_init_cvar() {
-    struct ConfigApiV0 ConfigApiV0 = *(struct ConfigApiV0*)plugin_get_engine_api(CONFIG_API_ID, 0);
+    struct ConfigApiV0 ConfigApiV0 = *(struct ConfigApiV0 *) plugin_get_engine_api(
+            CONFIG_API_ID, 0);
 
     for (size_t i = 0; i < MAX_PLUGINS; ++i) {
         if (!_G.used[i] || !_G.plugin_api[i]->init_cvar) {

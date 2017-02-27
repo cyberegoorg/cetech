@@ -7,7 +7,6 @@
 #include <engine/memory/memsys.h>
 #include <engine/plugin/plugin_api.h>
 #include <celib/string/stringid.h>
-#include "engine/memory/memsys.h"
 
 
 //==============================================================================

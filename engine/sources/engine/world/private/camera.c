@@ -10,7 +10,6 @@
 
 #include <engine/memory/memsys.h>
 #include <engine/plugin/plugin_api.h>
-#include "engine/memory/memsys.h"
 
 
 struct camera_data {
@@ -147,7 +146,9 @@ static void _init(get_api_fce_t get_engine_api) {
 
     _G.type = stringid64_from_string("camera");
 
-    EntComSystemApiV0.component_register_compiler(_G.type, _camera_component_compiler, 10);
+    EntComSystemApiV0.component_register_compiler(_G.type,
+                                                  _camera_component_compiler,
+                                                  10);
     EntComSystemApiV0.component_register_type(_G.type, (struct component_clb) {
             .spawner=_spawner, .destroyer=_destroyer,
             .on_world_create=_on_world_create, .on_world_destroy=_on_world_destroy

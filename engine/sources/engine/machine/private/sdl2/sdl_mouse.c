@@ -36,7 +36,8 @@ static struct ApplicationApiV0 ApplicationApiV0;
 int sdl_mouse_init(get_api_fce_t get_engine_api) {
     _G = (struct G) {0};
 
-    ApplicationApiV0 = *(struct ApplicationApiV0*) get_engine_api(APPLICATION_API_ID, 0);
+    ApplicationApiV0 = *(struct ApplicationApiV0 *) get_engine_api(
+            APPLICATION_API_ID, 0);
 
     return 1;
 }
@@ -59,7 +60,8 @@ void sdl_mouse_process(struct eventstream *stream) {
     if ((pos[0] != _G.position[0]) || (pos[1] != _G.position[1])) {
         cel_window_t main_window = ApplicationApiV0.main_window();
         u32 cel_window_size[2] = {0};
-        cel_window_get_size(main_window, &cel_window_size[0], &cel_window_size[1]);
+        cel_window_get_size(main_window, &cel_window_size[0],
+                            &cel_window_size[1]);
 
         _G.position[0] = pos[0];
         _G.position[1] = cel_window_size[1] - pos[1];

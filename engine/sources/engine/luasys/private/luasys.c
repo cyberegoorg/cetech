@@ -15,9 +15,7 @@
 #include "vectors.h"
 #include "quaternion.h"
 #include "matrix.h"
-#include "luasys.h"
 #include "engine/luasys/luasys.h"
-#include <engine/plugin/plugin_api.h>
 #include "engine/resource/types.h"
 
 
@@ -309,7 +307,8 @@ static int _cmd_execute_string(mpack_node_t args,
 
     int top = lua_gettop(_G.L);
 
-    if ((luaL_loadbuffer(_G.L, str, str_len, "console") || lua_pcall(_G.L, 0, LUA_MULTRET, 0))) {
+    if ((luaL_loadbuffer(_G.L, str, str_len, "console") ||
+         lua_pcall(_G.L, 0, LUA_MULTRET, 0))) {
 
         const char *last_error = lua_tostring(_G.L, -1);
         lua_pop(_G.L, 1);
@@ -630,17 +629,20 @@ void luasys_add_module_function(const char *module,
 
 static int _is_vec2f(lua_State *L,
                      cel_vec2f_t *p) {
-    return (p >= _G._temp_cel_vec2f_buffer) && (p < (_G._temp_cel_vec2f_buffer + 1024));
+    return (p >= _G._temp_cel_vec2f_buffer) &&
+           (p < (_G._temp_cel_vec2f_buffer + 1024));
 }
 
 static int _is_vec3f(lua_State *L,
                      cel_vec3f_t *p) {
-    return (p >= _G._temp_cel_vec3f_buffer) && (p < (_G._temp_cel_vec3f_buffer + 1024));
+    return (p >= _G._temp_cel_vec3f_buffer) &&
+           (p < (_G._temp_cel_vec3f_buffer + 1024));
 }
 
 static int _is_vec4f(lua_State *L,
                      cel_vec4f_t *p) {
-    return (p >= _G._temp_cel_vec4f_buffer) && (p < (_G._temp_cel_vec4f_buffer + 1024));
+    return (p >= _G._temp_cel_vec4f_buffer) &&
+           (p < (_G._temp_cel_vec4f_buffer + 1024));
 }
 
 static int _is_quat(lua_State *L,
@@ -650,7 +652,8 @@ static int _is_quat(lua_State *L,
 
 static int _is_mat44f(lua_State *L,
                       cel_mat44f_t *p) {
-    return (p >= _G._temp_cel_mat44f_buffer) && (p < (_G._temp_cel_mat44f_buffer + 1024));
+    return (p >= _G._temp_cel_mat44f_buffer) &&
+           (p < (_G._temp_cel_mat44f_buffer + 1024));
 }
 
 
@@ -834,8 +837,10 @@ void _create_lightuserdata() {
     luasys_add_module_function("lightuserdata_mt", "__sub", lightuserdata_sub);
     luasys_add_module_function("lightuserdata_mt", "__mul", lightuserdata_mul);
     luasys_add_module_function("lightuserdata_mt", "__unm", lightuserdata_unm);
-    luasys_add_module_function("lightuserdata_mt", "__index", lightuserdata_index);
-    luasys_add_module_function("lightuserdata_mt", "__newindex", lightuserdata_newindex);
+    luasys_add_module_function("lightuserdata_mt", "__index",
+                               lightuserdata_index);
+    luasys_add_module_function("lightuserdata_mt", "__newindex",
+                               lightuserdata_newindex);
 
     lua_pushlightuserdata(_G.L, 0);
     lua_getfield(_G.L, LUA_REGISTRYINDEX, "lightuserdata_mt");
@@ -878,7 +883,8 @@ static void _init(get_api_fce_t get_engine_api) {
     _register_all_api(get_engine_api);
 
     luasys_add_module_function("plugin", "reload", _reload_plugin);
-    ConsoleServerApiV0.consolesrv_register_command("lua_system.execute", _cmd_execute_string);
+    ConsoleServerApiV0.consolesrv_register_command("lua_system.execute",
+                                                   _cmd_execute_string);
 
     ResourceApiV0.register_type(_G.type_id, lua_resource_callback);
     ResourceApiV0.compiler_register(_G.type_id, _lua_compiler);

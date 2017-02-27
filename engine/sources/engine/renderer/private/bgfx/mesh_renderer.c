@@ -14,7 +14,6 @@
 
 #include <engine/memory/memsys.h>
 #include <engine/plugin/plugin_api.h>
-#include "engine/memory/memsys.h"
 
 
 IMPORT_API(MemSysApi, 0);
@@ -28,6 +27,7 @@ IMPORT_API(MeshApi, 0);
 #define LOG_WHERE "mesh_renderer"
 
 ARRAY_PROTOTYPE(stringid64_t)
+
 ARRAY_PROTOTYPE(material_t)
 
 
@@ -96,7 +96,8 @@ int _mesh_component_compiler(yaml_node_t body,
     char tmp_buffer[64] = {0};
 
     YAML_NODE_SCOPE(scene, body, "scene",
-                    yaml_as_string(scene, tmp_buffer, CEL_ARRAY_LEN(tmp_buffer));
+                    yaml_as_string(scene, tmp_buffer,
+                                   CEL_ARRAY_LEN(tmp_buffer));
                             t_data.scene = stringid64_from_string(tmp_buffer);
     );
     YAML_NODE_SCOPE(mesh, body, "mesh",
@@ -105,13 +106,16 @@ int _mesh_component_compiler(yaml_node_t body,
     );
 
     YAML_NODE_SCOPE(material, body, "material",
-                    yaml_as_string(material, tmp_buffer, CEL_ARRAY_LEN(tmp_buffer));
-                            t_data.material = stringid64_from_string(tmp_buffer);
+                    yaml_as_string(material, tmp_buffer,
+                                   CEL_ARRAY_LEN(tmp_buffer));
+                            t_data.material = stringid64_from_string(
+                                    tmp_buffer);
     );
 
     YAML_NODE_SCOPE(node, body, "node",
                     if (yaml_is_valid(node)) {
-                        yaml_as_string(node, tmp_buffer, CEL_ARRAY_LEN(tmp_buffer));
+                        yaml_as_string(node, tmp_buffer,
+                                       CEL_ARRAY_LEN(tmp_buffer));
                         t_data.node = stringid64_from_string(tmp_buffer);
                     }
     );
@@ -178,7 +182,8 @@ static void _init(get_api_fce_t get_engine_api) {
 
     _G.type = stringid64_from_string("mesh_renderer");
 
-    EntComSystemApiV0.component_register_compiler(_G.type, _mesh_component_compiler, 10);
+    EntComSystemApiV0.component_register_compiler(_G.type,
+                                                  _mesh_component_compiler, 10);
 
     EntComSystemApiV0.component_register_type(_G.type, (struct component_clb) {
             .spawner=_spawner,

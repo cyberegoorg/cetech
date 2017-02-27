@@ -17,13 +17,8 @@
 #include <engine/luasys/luasys.h>
 #include <engine/renderer/renderer.h>
 #include <engine/develop/develop_system.h>
-#include <celib/thread/thread.h>
-#include <engine/plugin/plugin.h>
 #include <engine/memory/memsys.h>
 #include <engine/static_systems.h>
-#include <engine/input/keyboard.h>
-#include <engine/input/mouse.h>
-#include <engine/input/gamepad.h>
 
 #include "engine/develop/console_server.h"
 #include "engine/task/task.h"
@@ -105,6 +100,19 @@ static struct ApplicationApiV0 api_v1 = {
         .main_window =  application_get_main_window,
 };
 
+void _init_api() {
+#define get_engine_api plugin_get_engine_api
+    INIT_API(ConsoleServerApi, CONSOLE_SERVER_API_ID, 0);
+    INIT_API(DevelopSystemApi, DEVELOP_SERVER_API_ID, 0);
+    INIT_API(RendererApi, RENDERER_API_ID, 0);
+    INIT_API(ResourceApi, RESOURCE_API_ID, 0);
+    INIT_API(PackageApi, PACKAGE_API_ID, 0);
+    INIT_API(TaskApi, TASK_API_ID, 0);
+    INIT_API(LuaSysApi, LUA_API_ID, 0);
+    INIT_API(ConfigApi, CONFIG_API_ID, 0);
+#undef get_engine_api
+}
+
 int application_init(int argc,
                      const char **argv) {
     _G = (struct G) {0};
@@ -129,25 +137,22 @@ int application_init(int argc,
     plugin_load_dirs("./bin");
     plugin_call_init_cvar();
 
-    ConsoleServerApiV0 = *((struct ConsoleServerApiV0 *) plugin_get_engine_api(CONSOLE_SERVER_API_ID, 0));
-    DevelopSystemApiV0 = *((struct DevelopSystemApiV0 *) plugin_get_engine_api(DEVELOP_SERVER_API_ID, 0));
-    RendererApiV0 = *((struct RendererApiV0 *) plugin_get_engine_api(RENDERER_API_ID, 0));
-    ResourceApiV0 = *((struct ResourceApiV0 *) plugin_get_engine_api(RESOURCE_API_ID, 0));
-    PackageApiV0 = *((struct PackageApiV0 *) plugin_get_engine_api(PACKAGE_API_ID, 0));
-    TaskApiV0 = *((struct TaskApiV0 *) plugin_get_engine_api(TASK_API_ID, 0));
-    LuaSysApiV0 = *((struct LuaSysApiV0 *) plugin_get_engine_api(LUA_API_ID, 0));
-    ConfigApiV0 = *((struct ConfigApiV0 *) plugin_get_engine_api(CONFIG_API_ID, 0));
+    _init_api();
 
-    _G.config.boot_pkg = ConfigApiV0.new_str("core.boot_pkg", "Boot package", "boot");
-    _G.config.boot_script = ConfigApiV0.new_str("core.boot_script", "Boot script", "lua/boot");
+    _G.config.boot_pkg = ConfigApiV0.new_str("core.boot_pkg", "Boot package",
+                                             "boot");
+    _G.config.boot_script = ConfigApiV0.new_str("core.boot_script",
+                                                "Boot script", "lua/boot");
 
     _G.config.screen_x = ConfigApiV0.new_int("screen.x", "Screen width", 1024);
     _G.config.screen_y = ConfigApiV0.new_int("screen.y", "Screen height", 768);
-    _G.config.fullscreen = ConfigApiV0.new_int("screen.fullscreen", "Fullscreen", 0);
+    _G.config.fullscreen = ConfigApiV0.new_int("screen.fullscreen",
+                                               "Fullscreen", 0);
 
     _G.config.daemon = ConfigApiV0.new_int("daemon", "Daemon mode", 0);
     _G.config.compile = ConfigApiV0.new_int("compile", "Comple", 0);
-    _G.config.continue_ = ConfigApiV0.new_int("continue", "Continue after compile", 0);
+    _G.config.continue_ = ConfigApiV0.new_int("continue",
+                                              "Continue after compile", 0);
     _G.config.wait = ConfigApiV0.new_int("wait", "Wait for client", 0);
     _G.config.wid = ConfigApiV0.new_int("wid", "Wid", 0);
 
@@ -190,7 +195,8 @@ int application_shutdown() {
 }
 
 static void _boot_stage() {
-    stringid64_t boot_pkg = stringid64_from_string(ConfigApiV0.get_string(_G.config.boot_pkg));
+    stringid64_t boot_pkg = stringid64_from_string(
+            ConfigApiV0.get_string(_G.config.boot_pkg));
     stringid64_t pkg = stringid64_from_string("package");
 
     stringid64_t core_pkg = stringid64_from_string("core");
@@ -204,13 +210,15 @@ static void _boot_stage() {
     PackageApiV0.flush(boot_pkg);
 
 
-    stringid64_t boot_script = stringid64_from_string(ConfigApiV0.get_string(_G.config.boot_script));
+    stringid64_t boot_script = stringid64_from_string(
+            ConfigApiV0.get_string(_G.config.boot_script));
     LuaSysApiV0.execute_boot_script(boot_script);
 }
 
 
 static void _boot_unload() {
-    stringid64_t boot_pkg = stringid64_from_string(ConfigApiV0.get_string(_G.config.boot_pkg));
+    stringid64_t boot_pkg = stringid64_from_string(
+            ConfigApiV0.get_string(_G.config.boot_pkg));
     stringid64_t core_pkg = stringid64_from_string("core");
     stringid64_t pkg = stringid64_from_string("package");
 
@@ -241,15 +249,18 @@ void application_start() {
         intptr_t wid = ConfigApiV0.get_int(_G.config.wid);
 
         char title[128] = {0};
-        snprintf(title, CEL_ARRAY_LEN(title), "cetech - %s", ConfigApiV0.get_string(_G.config.boot_script));
+        snprintf(title, CEL_ARRAY_LEN(title), "cetech - %s",
+                 ConfigApiV0.get_string(_G.config.boot_script));
 
         if (wid == 0) {
             _G.main_window = cel_window_new(
                     title,
                     WINDOWPOS_UNDEFINED,
                     WINDOWPOS_UNDEFINED,
-                    ConfigApiV0.get_int(_G.config.screen_x), ConfigApiV0.get_int(_G.config.screen_y),
-                    ConfigApiV0.get_int(_G.config.fullscreen) ? WINDOW_FULLSCREEN : WINDOW_NOFLAG
+                    ConfigApiV0.get_int(_G.config.screen_x),
+                    ConfigApiV0.get_int(_G.config.screen_y),
+                    ConfigApiV0.get_int(_G.config.fullscreen)
+                    ? WINDOW_FULLSCREEN : WINDOW_NOFLAG
             );
         } else {
             _G.main_window = cel_window_new_from((void *) wid);
@@ -278,7 +289,8 @@ void application_start() {
 
     ConsoleServerApiV0.consolesrv_push_begin();
     while (_G.is_running) {
-        struct scope_data application_sd = DevelopSystemApiV0.enter_scope("Application:update()");
+        struct scope_data application_sd = DevelopSystemApiV0.enter_scope(
+                "Application:update()");
 
         u64 now_ticks = cel_get_perf_counter();
         float dt = ((float) (now_ticks - last_tick)) / cel_get_perf_freq();
@@ -292,7 +304,8 @@ void application_start() {
 
         if (frame_time_accum >= frame_time) {
             if (!ConfigApiV0.get_int(_G.config.daemon)) {
-                struct scope_data render_sd = DevelopSystemApiV0.enter_scope("Game:render()");
+                struct scope_data render_sd = DevelopSystemApiV0.enter_scope(
+                        "Game:render()");
                 _G.game->render();
                 DevelopSystemApiV0.leave_scope(render_sd);
             }

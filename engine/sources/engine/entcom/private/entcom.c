@@ -5,13 +5,9 @@
 #include "celib/containers/map.h"
 #include <engine/memory/memsys.h>
 #include <engine/plugin/plugin_api.h>
-#include "engine/memory/memsys.h"
 
 #include "engine/world/world.h"
 #include "engine/entcom/entcom.h"
-
-#include "engine/entcom/entcom.h"
-#include "engine/memory/memsys.h"
 
 //==============================================================================
 // Globals
@@ -43,7 +39,8 @@ static void _init(get_api_fce_t get_engine_api) {
     _G = (struct G) {0};
 
     handlerid_init(&_G.entity_handler, MemSysApiV0.main_allocator());
-    MAP_INIT(component_compiler_t, &_G.compiler_map, MemSysApiV0.main_allocator());
+    MAP_INIT(component_compiler_t, &_G.compiler_map,
+             MemSysApiV0.main_allocator());
     MAP_INIT(u32, &_G.spawn_order_map, MemSysApiV0.main_allocator());
     MAP_INIT(component_clb_t, &_G.component_clb, MemSysApiV0.main_allocator());
 }
@@ -85,7 +82,8 @@ int component_compile(stringid64_t type,
                       yaml_node_t body,
                       ARRAY_T(u8) *data) {
 
-    component_compiler_t compiler = MAP_GET(component_compiler_t, &_G.compiler_map, type.id, NULL);
+    component_compiler_t compiler = MAP_GET(component_compiler_t,
+                                            &_G.compiler_map, type.id, NULL);
 
     if (!compiler) {
         return 0;
@@ -119,7 +117,8 @@ void component_spawn(world_t world,
                      u32 ent_count,
                      void *data) {
 
-    struct component_clb clb = MAP_GET(component_clb_t, &_G.component_clb, type.id, component_clb_null);
+    struct component_clb clb = MAP_GET(component_clb_t, &_G.component_clb,
+                                       type.id, component_clb_null);
 
     if (!clb.spawner) {
         return;
@@ -132,8 +131,10 @@ void component_destroy(world_t world,
                        entity_t *ent,
                        u32 count) {
 
-    const MAP_ENTRY_T(component_clb_t) *ce_it = MAP_BEGIN(component_clb_t, &_G.component_clb);
-    const MAP_ENTRY_T(component_clb_t) *ce_end = MAP_END(component_clb_t, &_G.component_clb);
+    const MAP_ENTRY_T(component_clb_t) *ce_it = MAP_BEGIN(component_clb_t,
+                                                          &_G.component_clb);
+    const MAP_ENTRY_T(component_clb_t) *ce_end = MAP_END(component_clb_t,
+                                                         &_G.component_clb);
     while (ce_it != ce_end) {
         ce_it->value.destroyer(world, ent, count);
         ++ce_it;

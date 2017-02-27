@@ -12,12 +12,10 @@
 #include "celib/filesystem/vio.h"
 #include <engine/memory/memsys.h>
 #include <engine/plugin/plugin_api.h>
-#include <engine/plugin/plugin.h>
 
 #include "engine/resource/types.h"
 #include "texture.h"
 #include "shader.h"
-#include "engine/memory/memsys.h"
 
 
 //==============================================================================
@@ -100,19 +98,23 @@ static void preprocess(const char *filename,
         char prefab_file[256] = {0};
         char prefab_str[256] = {0};
         yaml_as_string(parent_node, prefab_str, CEL_ARRAY_LEN(prefab_str));
-        snprintf(prefab_file, CEL_ARRAY_LEN(prefab_file), "%s.material", prefab_str);
+        snprintf(prefab_file, CEL_ARRAY_LEN(prefab_file), "%s.material",
+                 prefab_str);
 
         capi->add_dependency(filename, prefab_file);
 
         char full_path[256] = {0};
         const char *source_dir = ResourceApiV0.compiler_get_source_dir();
-        cel_path_join(full_path, CEL_ARRAY_LEN(full_path), source_dir, prefab_file);
+        cel_path_join(full_path, CEL_ARRAY_LEN(full_path), source_dir,
+                      prefab_file);
 
-        struct vio *prefab_vio = cel_vio_from_file(full_path, VIO_OPEN_READ, MemSysApiV0.main_allocator());
+        struct vio *prefab_vio = cel_vio_from_file(full_path, VIO_OPEN_READ,
+                                                   MemSysApiV0.main_allocator());
 
         char prefab_data[cel_vio_size(prefab_vio) + 1];
         memory_set(prefab_data, 0, cel_vio_size(prefab_vio) + 1);
-        cel_vio_read(prefab_vio, prefab_data, sizeof(char), cel_vio_size(prefab_vio));
+        cel_vio_read(prefab_vio, prefab_data, sizeof(char),
+                     cel_vio_size(prefab_vio));
         cel_vio_close(prefab_vio);
 
         yaml_document_t h;
@@ -138,7 +140,8 @@ void forach_texture_clb(yaml_node_t key,
     yaml_as_string(value, tmp_buffer, CEL_ARRAY_LEN(tmp_buffer));
     stringid64_t texture_name = stringid64_from_string(tmp_buffer);
 
-    ARRAY_PUSH(char, &output->uniform_names, uniform_name, CEL_ARRAY_LEN(uniform_name));
+    ARRAY_PUSH(char, &output->uniform_names, uniform_name,
+               CEL_ARRAY_LEN(uniform_name));
     ARRAY_PUSH(u8, &output->data, (u8 *) &texture_name, sizeof(stringid64_t));
 }
 
@@ -154,7 +157,8 @@ void forach_vec4fs_clb(yaml_node_t key,
 
     cel_vec4f_t v = yaml_as_cel_vec4f_t(value);
 
-    ARRAY_PUSH(char, &output->uniform_names, uniform_name, CEL_ARRAY_LEN(uniform_name));
+    ARRAY_PUSH(char, &output->uniform_names, uniform_name,
+               CEL_ARRAY_LEN(uniform_name));
     ARRAY_PUSH(u8, &output->data, (u8 *) &v, sizeof(cel_vec4f_t));
 }
 
@@ -170,7 +174,8 @@ void forach_cel_mat44f_clb(yaml_node_t key,
 
     cel_mat44f_t m = yaml_as_cel_mat44f_t(value);
 
-    ARRAY_PUSH(char, &output->uniform_names, uniform_name, CEL_ARRAY_LEN(uniform_name));
+    ARRAY_PUSH(char, &output->uniform_names, uniform_name,
+               CEL_ARRAY_LEN(uniform_name));
     ARRAY_PUSH(u8, &output->data, (u8 *) &m, sizeof(cel_mat44f_t));
 }
 
@@ -186,7 +191,8 @@ void forach_mat33f_clb(yaml_node_t key,
 
     mat33f_t m = yaml_as_mat33f_t(value);
 
-    ARRAY_PUSH(char, &output->uniform_names, uniform_name, CEL_ARRAY_LEN(uniform_name));
+    ARRAY_PUSH(char, &output->uniform_names, uniform_name,
+               CEL_ARRAY_LEN(uniform_name));
     ARRAY_PUSH(u8, &output->data, (u8 *) &m, sizeof(mat33f_t));
 }
 
@@ -194,10 +200,12 @@ int _material_resource_compiler(const char *filename,
                                 struct vio *source_vio,
                                 struct vio *build_vio,
                                 struct compilator_api *compilator_api) {
-    char *source_data = CEL_ALLOCATE(MemSysApiV0.main_allocator(), char, cel_vio_size(source_vio) + 1);
+    char *source_data = CEL_ALLOCATE(MemSysApiV0.main_allocator(), char,
+                                     cel_vio_size(source_vio) + 1);
     memory_set(source_data, 0, cel_vio_size(source_vio) + 1);
 
-    cel_vio_read(source_vio, source_data, sizeof(char), cel_vio_size(source_vio));
+    cel_vio_read(source_vio, source_data, sizeof(char),
+                 cel_vio_size(source_vio));
 
     yaml_document_t h;
     yaml_node_t root = yaml_load_str(source_data, &h);
@@ -243,8 +251,10 @@ int _material_resource_compiler(const char *filename,
     };
 
     cel_vio_write(build_vio, &resource, sizeof(resource), 1);
-    cel_vio_write(build_vio, output.uniform_names.data, sizeof(char), ARRAY_SIZE(&output.uniform_names));
-    cel_vio_write(build_vio, output.data.data, sizeof(u8), ARRAY_SIZE(&output.data));
+    cel_vio_write(build_vio, output.uniform_names.data, sizeof(char),
+                  ARRAY_SIZE(&output.uniform_names));
+    cel_vio_write(build_vio, output.data.data, sizeof(u8),
+                  ARRAY_SIZE(&output.data));
 
     ARRAY_DESTROY(char, &output.uniform_names);
     ARRAY_DESTROY(u8, &output.data);
@@ -363,25 +373,29 @@ material_t material_resource_create(stringid64_t name) {
     u32 tmp_off = 0;
     off += resource->texture_count;
     for (int i = 0; i < resource->texture_count; ++i) {
-        bgfx_uniforms[i] = bgfx_create_uniform(&u_names[i * 32], BGFX_UNIFORM_TYPE_INT1, 1);
+        bgfx_uniforms[i] = bgfx_create_uniform(&u_names[i * 32],
+                                               BGFX_UNIFORM_TYPE_INT1, 1);
     }
 
     tmp_off = off;
     off += resource->cel_vec4f_count;
     for (int i = tmp_off; i < off; ++i) {
-        bgfx_uniforms[i] = bgfx_create_uniform(&u_names[i * 32], BGFX_UNIFORM_TYPE_VEC4, 1);
+        bgfx_uniforms[i] = bgfx_create_uniform(&u_names[i * 32],
+                                               BGFX_UNIFORM_TYPE_VEC4, 1);
     }
 
     tmp_off = off;
     off += resource->mat33f_count;
     for (int i = tmp_off; i < off; ++i) {
-        bgfx_uniforms[i] = bgfx_create_uniform(&u_names[i * 32], BGFX_UNIFORM_TYPE_MAT3, 1);
+        bgfx_uniforms[i] = bgfx_create_uniform(&u_names[i * 32],
+                                               BGFX_UNIFORM_TYPE_MAT3, 1);
     }
 
     tmp_off = off;
     off += resource->cel_mat44f_count;
     for (int i = tmp_off; i < off; ++i) {
-        bgfx_uniforms[i] = bgfx_create_uniform(&u_names[i * 32], BGFX_UNIFORM_TYPE_MAT4, 1);
+        bgfx_uniforms[i] = bgfx_create_uniform(&u_names[i * 32],
+                                               BGFX_UNIFORM_TYPE_MAT4, 1);
     }
 
     ARRAY_PUSH(u8, &_G.material_instance_data, (u8 *) bgfx_uniforms,
@@ -398,7 +412,8 @@ u32 material_get_texture_count(material_t material) {
         return 0;
     }
 
-    struct material_blob *resource = (struct material_blob *) &_get_resorce(idx);
+    struct material_blob *resource = (struct material_blob *) &_get_resorce(
+            idx);
 
     return resource->texture_count;
 }
@@ -427,7 +442,8 @@ void material_set_texture(material_t material,
         return;
     }
 
-    struct material_blob *resource = (struct material_blob *) &_get_resorce(idx);
+    struct material_blob *resource = (struct material_blob *) &_get_resorce(
+            idx);
 
 
     stringid64_t *u_texture = material_blob_uniform_texture(resource);
@@ -447,7 +463,8 @@ void material_set_vec4f(material_t material,
         return;
     }
 
-    struct material_blob *resource = (struct material_blob *) &_get_resorce(idx);
+    struct material_blob *resource = (struct material_blob *) &_get_resorce(
+            idx);
 
     cel_vec4f_t *u_vec4f = material_blob_uniform_vec4f(resource);
 
@@ -466,13 +483,15 @@ void material_set_mat33f(material_t material,
         return;
     }
 
-    struct material_blob *resource = (struct material_blob *) &_get_resorce(idx);
+    struct material_blob *resource = (struct material_blob *) &_get_resorce(
+            idx);
 
     mat33f_t *u_mat33f = material_blob_uniform_mat33f(resource);
 
     int slot_idx = _material_find_slot(resource, slot);
 
-    u_mat33f[slot_idx - (resource->texture_count + resource->cel_vec4f_count)] = v;
+    u_mat33f[slot_idx -
+             (resource->texture_count + resource->cel_vec4f_count)] = v;
 }
 
 void material_set_mat44f(material_t material,
@@ -484,13 +503,15 @@ void material_set_mat44f(material_t material,
         return;
     }
 
-    struct material_blob *resource = (struct material_blob *) &_get_resorce(idx);
+    struct material_blob *resource = (struct material_blob *) &_get_resorce(
+            idx);
 
     cel_mat44f_t *u_mat44f = material_blob_uniform_mat44f(resource);
 
     int slot_idx = _material_find_slot(resource, slot);
 
-    u_mat44f[slot_idx - (resource->texture_count + resource->cel_vec4f_count + resource->mat33f_count)] = v;
+    u_mat44f[slot_idx - (resource->texture_count + resource->cel_vec4f_count +
+                         resource->mat33f_count)] = v;
 }
 
 
@@ -501,7 +522,8 @@ void material_use(material_t material) {
         return;
     }
 
-    struct material_blob *resource = (struct material_blob *) &_get_resorce(idx);
+    struct material_blob *resource = (struct material_blob *) &_get_resorce(
+            idx);
 
     stringid64_t *u_texture = material_blob_uniform_texture(resource);
     cel_vec4f_t *u_vec4f = material_blob_uniform_vec4f(resource);
@@ -553,6 +575,7 @@ void material_submit(material_t material) {
     u32 idx = MAP_GET(u32, &_G.material_instace_map, material.idx, UINT32_MAX);
     CEL_ASSERT(LOG_WHERE, idx != UINT32_MAX);
 
-    struct material_blob *resource = (struct material_blob *) &_get_resorce(idx);
+    struct material_blob *resource = (struct material_blob *) &_get_resorce(
+            idx);
     bgfx_submit(0, shader_resource_get(resource->shader_name), 0, 0);
 }

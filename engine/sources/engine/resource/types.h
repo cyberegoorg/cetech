@@ -55,6 +55,8 @@ typedef void *(*resource_reloader_t)(stringid64_t name,
                                      void *new_data,
                                      struct cel_allocator *allocator);
 
+struct compilator_api;
+
 //! Resource compilator fce
 //! \param filename Source filename
 //! \param source_vio Source vio

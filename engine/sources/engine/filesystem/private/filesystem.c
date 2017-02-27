@@ -74,7 +74,8 @@ void filesystem_map_root_dir(stringid64_t root,
         }
 
         _G.rootmap.id[i] = root;
-        _G.rootmap.path[i] = cel_strdup(base_path, MemSysApiV0.main_allocator());
+        _G.rootmap.path[i] = cel_strdup(base_path,
+                                        MemSysApiV0.main_allocator());
         break;
     }
 }
@@ -97,7 +98,8 @@ int filesystem_get_fullpath(stringid64_t root,
                             const char *filename) {
     const char *root_path = filesystem_get_root_dir(root);
 
-    return cel_path_join(result, maxlen, root_path, filename) == (cel_strlen(root_path) + cel_strlen(filename) + 1);
+    return cel_path_join(result, maxlen, root_path, filename) ==
+           (cel_strlen(root_path) + cel_strlen(filename) + 1);
 }
 
 struct vio *filesystem_open(stringid64_t root,
@@ -105,11 +107,13 @@ struct vio *filesystem_open(stringid64_t root,
                             enum cel_vio_open_mode mode) {
     char fullm_path[MAX_PATH_LEN] = {0};
 
-    if (!filesystem_get_fullpath(root, fullm_path, sizeof(fullm_path) / sizeof(char), path)) {
+    if (!filesystem_get_fullpath(root, fullm_path,
+                                 sizeof(fullm_path) / sizeof(char), path)) {
         return NULL;
     }
 
-    struct vio *file = cel_vio_from_file(fullm_path, mode, MemSysApiV0.main_allocator());
+    struct vio *file = cel_vio_from_file(fullm_path, mode,
+                                         MemSysApiV0.main_allocator());
 
     if (!file) {
         log_error(LOG_WHERE, "Could not load file %s", fullm_path);
@@ -127,7 +131,8 @@ int filesystem_create_directory(stringid64_t root,
                                 const char *path) {
     char fullm_path[MAX_PATH_LEN] = {0};
 
-    if (!filesystem_get_fullpath(root, fullm_path, sizeof(fullm_path) / sizeof(char), path)) {
+    if (!filesystem_get_fullpath(root, fullm_path,
+                                 sizeof(fullm_path) / sizeof(char), path)) {
         return 0;
     }
 
@@ -142,7 +147,8 @@ void filesystem_listdir(stringid64_t root,
                         struct cel_allocator *allocator) {
 
     char fullm_path[MAX_PATH_LEN] = {0};
-    if (!filesystem_get_fullpath(root, fullm_path, sizeof(fullm_path) / sizeof(char), path)) {
+    if (!filesystem_get_fullpath(root, fullm_path,
+                                 sizeof(fullm_path) / sizeof(char), path)) {
         return;
     }
 
@@ -158,7 +164,8 @@ void filesystem_listdir_free(string_array_t *files,
 time_t filesystem_get_file_mtime(stringid64_t root,
                                  const char *path) {
     char fullm_path[MAX_PATH_LEN] = {0};
-    if (!filesystem_get_fullpath(root, fullm_path, sizeof(fullm_path) / sizeof(char), path)) {
+    if (!filesystem_get_fullpath(root, fullm_path,
+                                 sizeof(fullm_path) / sizeof(char), path)) {
         return 0;
     }
 

@@ -13,8 +13,6 @@
 
 #include "engine/develop/console_server.h"
 
-#include "engine/config/cvar.h"
-
 //==============================================================================
 // Defines
 //==============================================================================
@@ -130,7 +128,8 @@ static void _init(get_api_fce_t get_engine_api) {
 
     int socket = nn_socket(AF_SP, NN_REP);
     if (socket < 0) {
-        log_error(LOG_WHERE, "Could not create nanomsg socket: %s", nn_strerror(errno));
+        log_error(LOG_WHERE, "Could not create nanomsg socket: %s",
+                  nn_strerror(errno));
         return;// 0;
     }
     addr = ConfigApiV0.get_string(_G.cv_rpc_addr);
@@ -138,7 +137,8 @@ static void _init(get_api_fce_t get_engine_api) {
     log_debug(LOG_WHERE, "RPC address: %s", addr);
 
     if (nn_bind(socket, addr) < 0) {
-        log_error(LOG_WHERE, "Could not bind socket to '%s': %s", addr, nn_strerror(errno));
+        log_error(LOG_WHERE, "Could not bind socket to '%s': %s", addr,
+                  nn_strerror(errno));
         return;// 0;
     }
 
@@ -148,7 +148,8 @@ static void _init(get_api_fce_t get_engine_api) {
     if (ConfigApiV0.get_string(_G.cv_push_addr)[0] != '\0') {
         socket = nn_socket(AF_SP, NN_PUSH);
         if (socket < 0) {
-            log_error(LOG_WHERE, "Could not create nanomsg socket: %s", nn_strerror(errno));
+            log_error(LOG_WHERE, "Could not create nanomsg socket: %s",
+                      nn_strerror(errno));
             return;// 0;
         }
 
@@ -157,7 +158,8 @@ static void _init(get_api_fce_t get_engine_api) {
         log_debug(LOG_WHERE, "Push address: %s", addr);
 
         if (nn_connect(socket, addr) < 0) {
-            log_error(LOG_WHERE, "Could not bind socket to '%s': %s", addr, nn_strerror(errno));
+            log_error(LOG_WHERE, "Could not bind socket to '%s': %s", addr,
+                      nn_strerror(errno));
             return;// 0;
         }
         _G.push_socket = socket;
@@ -167,7 +169,8 @@ static void _init(get_api_fce_t get_engine_api) {
 ////
     socket = nn_socket(AF_SP, NN_PUB);
     if (socket < 0) {
-        log_error(LOG_WHERE, "Could not create nanomsg socket: %s", nn_strerror(errno));
+        log_error(LOG_WHERE, "Could not create nanomsg socket: %s",
+                  nn_strerror(errno));
         return;// 0;
     }
 
@@ -176,7 +179,8 @@ static void _init(get_api_fce_t get_engine_api) {
     log_debug(LOG_WHERE, "LOG address: %s", addr);
 
     if (nn_bind(socket, addr) < 0) {
-        log_error(LOG_WHERE, "Could not bind socket to '%s': %s", addr, nn_strerror(errno));
+        log_error(LOG_WHERE, "Could not bind socket to '%s': %s", addr,
+                  nn_strerror(errno));
         return;// 0;
     }
     _G.log_socket = socket;
@@ -189,8 +193,10 @@ static void _init(get_api_fce_t get_engine_api) {
 static void _init_cvar(struct ConfigApiV0 config) {
     _G = (struct G) {0};
 
-    _G.cv_rpc_addr = config.new_str("develop.rpc.addr", "Console server rpc addr", "ws://*:4444");
-    _G.cv_log_addr = config.new_str("develop.log.addr", "Console server log addr", "ws://*:4445");
+    _G.cv_rpc_addr = config.new_str("develop.rpc.addr",
+                                    "Console server rpc addr", "ws://*:4444");
+    _G.cv_log_addr = config.new_str("develop.log.addr",
+                                    "Console server log addr", "ws://*:4445");
     _G.cv_push_addr = config.new_str("develop.push.addr", "Push addr", "");
 }
 

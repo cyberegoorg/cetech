@@ -28,9 +28,11 @@ static int _application_platform(lua_State *l) {
 
 
 void _register_lua_application_api(get_api_fce_t get_engine_api) {
-    ApplicationApiV0 = *(struct ApplicationApiV0 *) get_engine_api(APPLICATION_API_ID, 0);
+    ApplicationApiV0 = *(struct ApplicationApiV0 *) get_engine_api(
+            APPLICATION_API_ID, 0);
 
     luasys_add_module_function(API_NAME, "quit", _application_quit);
-    luasys_add_module_function(API_NAME, "get_native_platform", _application_native_platform);
+    luasys_add_module_function(API_NAME, "get_native_platform",
+                               _application_native_platform);
     luasys_add_module_function(API_NAME, "get_platform", _application_platform);
 }

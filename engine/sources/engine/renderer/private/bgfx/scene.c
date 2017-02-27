@@ -16,9 +16,6 @@
 #include <engine/plugin/plugin.h>
 
 #include "engine/resource/types.h"
-#include "engine/memory/memsys.h"
-
-#include "engine/resource/types.h"
 
 //==============================================================================
 // Structs
@@ -78,8 +75,10 @@ struct scene_instance {
 void _init_scene_instance(struct scene_instance *instance) {
     MAP_INIT(u8, &instance->geom_map, MemSysApiV0.main_allocator());
     ARRAY_INIT(u32, &instance->size, MemSysApiV0.main_allocator());
-    ARRAY_INIT(bgfx_vertex_buffer_handle_t, &instance->vb, MemSysApiV0.main_allocator());
-    ARRAY_INIT(bgfx_index_buffer_handle_t, &instance->ib, MemSysApiV0.main_allocator());
+    ARRAY_INIT(bgfx_vertex_buffer_handle_t, &instance->vb,
+               MemSysApiV0.main_allocator());
+    ARRAY_INIT(bgfx_index_buffer_handle_t, &instance->ib,
+               MemSysApiV0.main_allocator());
 }
 
 void _destroy_scene_instance(struct scene_instance *instance) {
@@ -220,7 +219,8 @@ void _parse_vertex_decl(bgfx_vertex_decl_t *decl,
 
     *vertex_size += yaml_as_int(size_n) * v_size;
 
-    bgfx_vertex_decl_add(decl, type, (uint8_t) yaml_as_int(size_n), attrib_type, 0, 0);
+    bgfx_vertex_decl_add(decl, type, (uint8_t) yaml_as_int(size_n), attrib_type,
+                         0, 0);
 }
 
 static const struct {
@@ -251,7 +251,9 @@ static void _parese_types(bgfx_vertex_decl_t *decl,
 
     for (int i = 0; i < CEL_ARRAY_LEN(_chanel_types); ++i) {
         YAML_NODE_SCOPE(node, types, _chanel_types[i].name,
-                        if (yaml_is_valid(node)) _parse_vertex_decl(decl, vertex_size, _chanel_types[i].attrib, node););
+                        if (yaml_is_valid(node))
+                            _parse_vertex_decl(decl, vertex_size,
+                                               _chanel_types[i].attrib, node););
 
     }
 }
@@ -344,7 +346,9 @@ void foreach_geometries_clb(yaml_node_t key,
             const char *name = _chanel_types[j].name;
 
             YAML_NODE_SCOPE(node, indices_n, name,
-                            if (yaml_is_valid(node))_write_chanel(node, types, i, name, chanels_n, output););
+                            if (yaml_is_valid(node))
+                                _write_chanel(node, types, i, name, chanels_n,
+                                              output););
         }
 
         ARRAY_PUSH_BACK(u32, &output->ib, i);
@@ -386,7 +390,8 @@ void foreach_graph_clb(yaml_node_t key,
 
             stringid64_t geom_name = stringid64_from_string(buffer);
             for (int j = 0; j < ARRAY_SIZE(&output->output->geom_name); ++j) {
-                if (geom_name.id != ARRAY_AT(&output->output->geom_name, j).id) {
+                if (geom_name.id !=
+                    ARRAY_AT(&output->output->geom_name, j).id) {
                     continue;
                 }
 
@@ -433,7 +438,8 @@ void _compile_assimp_node(struct aiNode *root,
 
     ARRAY_PUSH_BACK(stringid64_t, &output->node_name, name);
     ARRAY_PUSH_BACK(u32, &output->node_parent, parent);
-    ARRAY_PUSH_BACK(cel_mat44f_t, &output->node_pose, *((cel_mat44f_t *) &root->mTransformation));
+    ARRAY_PUSH_BACK(cel_mat44f_t, &output->node_pose,
+                    *((cel_mat44f_t *) &root->mTransformation));
 
     for (int i = 0; i < root->mNumChildren; ++i) {
         _compile_assimp_node(root->mChildren[i], idx, output);
@@ -465,10 +471,13 @@ int _compile_assimp(const char *filename,
 
     if (yaml_is_valid(postprocess_n)) {
         YAML_NODE_SCOPE(node, postprocess_n, "flip_uvs",
-                        if (yaml_is_valid(node) && yaml_as_bool(node)) postprocess_flag |= aiProcess_FlipUVs;);
+                        if (yaml_is_valid(node) &&
+                            yaml_as_bool(node))
+                            postprocess_flag |= aiProcess_FlipUVs;);
     }
 
-    const struct aiScene *scene = aiImportFile(input_path, postprocess_flag | aiProcess_MakeLeftHanded);
+    const struct aiScene *scene = aiImportFile(input_path, postprocess_flag |
+                                                           aiProcess_MakeLeftHanded);
 
     char tmp_buffer[1024] = {0};
     char tmp_buffer2[1024] = {0};
@@ -485,14 +494,18 @@ int _compile_assimp(const char *filename,
         stringid64_t name_id = stringid64_from_string(tmp_buffer);
         for (int k = 0; k < ARRAY_SIZE(&output->geom_name); ++k) {
             if (name_id.id == ARRAY_AT(&output->geom_name, k).id) {
-                snprintf(tmp_buffer2, CEL_ARRAY_LEN(tmp_buffer2), "%s%d", tmp_buffer, ++unique);
-                snprintf(tmp_buffer, CEL_ARRAY_LEN(tmp_buffer), "%s", tmp_buffer2);
+                snprintf(tmp_buffer2, CEL_ARRAY_LEN(tmp_buffer2), "%s%d",
+                         tmp_buffer, ++unique);
+                snprintf(tmp_buffer, CEL_ARRAY_LEN(tmp_buffer), "%s",
+                         tmp_buffer2);
                 break;
             }
         }
 
-        ARRAY_PUSH_BACK(stringid64_t, &output->geom_name, stringid64_from_string(tmp_buffer));
-        ARRAY_PUSH_BACK(stringid64_t, &output->geom_node, (stringid64_t) {.id = 0});
+        ARRAY_PUSH_BACK(stringid64_t, &output->geom_name,
+                        stringid64_from_string(tmp_buffer));
+        ARRAY_PUSH_BACK(stringid64_t, &output->geom_node,
+                        (stringid64_t) {.id = 0});
         ARRAY_PUSH_BACK(u32, &output->ib_offset, ARRAY_SIZE(&output->ib));
         ARRAY_PUSH_BACK(u32, &output->vb_offset, ARRAY_SIZE(&output->vb));
         ARRAY_PUSH_BACK(u32, &output->ib_size, mesh->mNumFaces * 3);
@@ -502,17 +515,20 @@ int _compile_assimp(const char *filename,
 
         u32 v_size = 0;
         if (mesh->mVertices != NULL) {
-            bgfx_vertex_decl_add(&vertex_decl, BGFX_ATTRIB_POSITION, 3, BGFX_ATTRIB_TYPE_FLOAT, 0, 0);
+            bgfx_vertex_decl_add(&vertex_decl, BGFX_ATTRIB_POSITION, 3,
+                                 BGFX_ATTRIB_TYPE_FLOAT, 0, 0);
             v_size += 3 * sizeof(f32);
         }
 
         if (mesh->mNormals != NULL) {
-            bgfx_vertex_decl_add(&vertex_decl, BGFX_ATTRIB_NORMAL, 3, BGFX_ATTRIB_TYPE_FLOAT, 0, 0);
+            bgfx_vertex_decl_add(&vertex_decl, BGFX_ATTRIB_NORMAL, 3,
+                                 BGFX_ATTRIB_TYPE_FLOAT, 0, 0);
             v_size += 3 * sizeof(f32);
         }
 
         if (mesh->mTextureCoords[0] != NULL) {
-            bgfx_vertex_decl_add(&vertex_decl, BGFX_ATTRIB_TEXCOORD0, 2, BGFX_ATTRIB_TYPE_FLOAT, 0, 0);
+            bgfx_vertex_decl_add(&vertex_decl, BGFX_ATTRIB_TEXCOORD0, 2,
+                                 BGFX_ATTRIB_TYPE_FLOAT, 0, 0);
             v_size += 2 * sizeof(f32);
         }
         bgfx_vertex_decl_end(&vertex_decl);
@@ -521,15 +537,18 @@ int _compile_assimp(const char *filename,
 
         for (int j = 0; j < mesh->mNumVertices; ++j) {
             if (mesh->mVertices != NULL) {
-                ARRAY_PUSH(u8, &output->vb, (u8 *) &mesh->mVertices[j], sizeof(f32) * 3);
+                ARRAY_PUSH(u8, &output->vb, (u8 *) &mesh->mVertices[j],
+                           sizeof(f32) * 3);
             }
 
             if (mesh->mNormals != NULL) {
-                ARRAY_PUSH(u8, &output->vb, (u8 *) &mesh->mNormals[j], sizeof(f32) * 3);
+                ARRAY_PUSH(u8, &output->vb, (u8 *) &mesh->mNormals[j],
+                           sizeof(f32) * 3);
             }
 
             if (mesh->mTextureCoords[0] != NULL) {
-                ARRAY_PUSH(u8, &output->vb, (u8 *) &mesh->mTextureCoords[0][j], sizeof(f32) * 2);
+                ARRAY_PUSH(u8, &output->vb, (u8 *) &mesh->mTextureCoords[0][j],
+                           sizeof(f32) * 2);
             }
         }
 
@@ -551,9 +570,11 @@ int _scene_resource_compiler(const char *filename,
                              struct vio *build_vio,
                              struct compilator_api *compilator_api) {
 
-    char *source_data = CEL_ALLOCATE(MemSysApiV0.main_allocator(), char, cel_vio_size(source_vio) + 1);
+    char *source_data = CEL_ALLOCATE(MemSysApiV0.main_allocator(), char,
+                                     cel_vio_size(source_vio) + 1);
     memory_set(source_data, 0, cel_vio_size(source_vio) + 1);
-    cel_vio_read(source_vio, source_data, sizeof(char), cel_vio_size(source_vio));
+    cel_vio_read(source_vio, source_data, sizeof(char),
+                 cel_vio_size(source_vio));
 
     yaml_document_t h;
     yaml_node_t root = yaml_load_str(source_data, &h);
@@ -582,18 +603,30 @@ int _scene_resource_compiler(const char *filename,
     };
 
     cel_vio_write(build_vio, &res, sizeof(res), 1);
-    cel_vio_write(build_vio, output->geom_name.data, sizeof(stringid64_t), ARRAY_SIZE(&output->geom_name));
-    cel_vio_write(build_vio, output->ib_offset.data, sizeof(u32), ARRAY_SIZE(&output->ib_offset));
-    cel_vio_write(build_vio, output->vb_offset.data, sizeof(u32), ARRAY_SIZE(&output->vb_offset));
-    cel_vio_write(build_vio, output->vb_decl.data, sizeof(bgfx_vertex_decl_t), ARRAY_SIZE(&output->vb_decl));
-    cel_vio_write(build_vio, output->ib_size.data, sizeof(u32), ARRAY_SIZE(&output->ib_size));
-    cel_vio_write(build_vio, output->vb_size.data, sizeof(u32), ARRAY_SIZE(&output->vb_size));
-    cel_vio_write(build_vio, output->ib.data, sizeof(u32), ARRAY_SIZE(&output->ib));
-    cel_vio_write(build_vio, output->vb.data, sizeof(u8), ARRAY_SIZE(&output->vb));
-    cel_vio_write(build_vio, output->node_name.data, sizeof(stringid64_t), ARRAY_SIZE(&output->node_name));
-    cel_vio_write(build_vio, output->node_parent.data, sizeof(u32), ARRAY_SIZE(&output->node_parent));
-    cel_vio_write(build_vio, output->node_pose.data, sizeof(cel_mat44f_t), ARRAY_SIZE(&output->node_pose));
-    cel_vio_write(build_vio, output->geom_node.data, sizeof(stringid64_t), ARRAY_SIZE(&output->geom_name));
+    cel_vio_write(build_vio, output->geom_name.data, sizeof(stringid64_t),
+                  ARRAY_SIZE(&output->geom_name));
+    cel_vio_write(build_vio, output->ib_offset.data, sizeof(u32),
+                  ARRAY_SIZE(&output->ib_offset));
+    cel_vio_write(build_vio, output->vb_offset.data, sizeof(u32),
+                  ARRAY_SIZE(&output->vb_offset));
+    cel_vio_write(build_vio, output->vb_decl.data, sizeof(bgfx_vertex_decl_t),
+                  ARRAY_SIZE(&output->vb_decl));
+    cel_vio_write(build_vio, output->ib_size.data, sizeof(u32),
+                  ARRAY_SIZE(&output->ib_size));
+    cel_vio_write(build_vio, output->vb_size.data, sizeof(u32),
+                  ARRAY_SIZE(&output->vb_size));
+    cel_vio_write(build_vio, output->ib.data, sizeof(u32),
+                  ARRAY_SIZE(&output->ib));
+    cel_vio_write(build_vio, output->vb.data, sizeof(u8),
+                  ARRAY_SIZE(&output->vb));
+    cel_vio_write(build_vio, output->node_name.data, sizeof(stringid64_t),
+                  ARRAY_SIZE(&output->node_name));
+    cel_vio_write(build_vio, output->node_parent.data, sizeof(u32),
+                  ARRAY_SIZE(&output->node_parent));
+    cel_vio_write(build_vio, output->node_pose.data, sizeof(cel_mat44f_t),
+                  ARRAY_SIZE(&output->node_pose));
+    cel_vio_write(build_vio, output->geom_node.data, sizeof(stringid64_t),
+                  ARRAY_SIZE(&output->geom_name));
 
     _destroy_compile_output(output);
     CEL_DEALLOCATE(MemSysApiV0.main_allocator(), source_data);
@@ -636,10 +669,12 @@ void scene_resource_online(stringid64_t name,
 
     for (int i = 0; i < resource->geom_count; ++i) {
         bgfx_vertex_buffer_handle_t bvb = bgfx_create_vertex_buffer(
-                bgfx_make_ref((const void *) &vb[vb_offset[i]], vb_size[i]), &vb_decl[i], BGFX_BUFFER_NONE);
+                bgfx_make_ref((const void *) &vb[vb_offset[i]], vb_size[i]),
+                &vb_decl[i], BGFX_BUFFER_NONE);
 
         bgfx_index_buffer_handle_t bib = bgfx_create_index_buffer(
-                bgfx_make_ref((const void *) &ib[ib_offset[i]], sizeof(u32) * ib_size[i]), BGFX_BUFFER_INDEX32);
+                bgfx_make_ref((const void *) &ib[ib_offset[i]],
+                              sizeof(u32) * ib_size[i]), BGFX_BUFFER_INDEX32);
 
         u32 idx = ARRAY_SIZE(&instance.vb);
         MAP_SET(u8, &instance.geom_map, geom_name[i].id, idx);
@@ -656,7 +691,9 @@ static const bgfx_texture_handle_t null_texture = {0};
 
 void scene_resource_offline(stringid64_t name,
                             void *data) {
-    struct scene_instance instance = MAP_GET(scene_instance, &_G.scene_instance, name.id, (struct scene_instance){0});
+    struct scene_instance instance = MAP_GET(scene_instance, &_G.scene_instance,
+                                             name.id,
+                                             (struct scene_instance) {0});
     _destroy_scene_instance(&instance);
     MAP_REMOVE(scene_instance, &_G.scene_instance, name.id);
 }
@@ -689,9 +726,12 @@ static const resource_callbacks_t scene_resource_callback = {
 int scene_resource_init() {
     _G = (struct G) {0};
 
-    MemSysApiV0 = *(struct MemSysApiV0 *) plugin_get_engine_api(MEMORY_API_ID, 0);
-    ResourceApiV0 = *(struct ResourceApiV0 *) plugin_get_engine_api(RESOURCE_API_ID, 0);
-    SceneGprahApiV0 = *(struct SceneGprahApiV0 *) plugin_get_engine_api(SCENEGRAPH_API_ID, 0);
+    MemSysApiV0 = *(struct MemSysApiV0 *) plugin_get_engine_api(MEMORY_API_ID,
+                                                                0);
+    ResourceApiV0 = *(struct ResourceApiV0 *) plugin_get_engine_api(
+            RESOURCE_API_ID, 0);
+    SceneGprahApiV0 = *(struct SceneGprahApiV0 *) plugin_get_engine_api(
+            SCENEGRAPH_API_ID, 0);
 
     _G.type = stringid64_from_string("scene");
 
@@ -736,7 +776,8 @@ void scene_create_graph(world_t world,
     u32 *node_parent = scene_blob_node_parent(res);
     cel_mat44f_t *node_pose = scene_blob_node_pose(res);
 
-    SceneGprahApiV0.create(world, entity, node_name, node_parent, node_pose, res->node_count);
+    SceneGprahApiV0.create(world, entity, node_name, node_parent, node_pose,
+                           res->node_count);
 }
 
 stringid64_t scene_get_mesh_node(stringid64_t scene,

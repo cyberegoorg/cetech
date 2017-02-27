@@ -6,7 +6,6 @@
 #include "engine/world/transform.h"
 #include <engine/memory/memsys.h>
 #include <engine/plugin/plugin_api.h>
-#include "engine/memory/memsys.h"
 
 
 struct transform_data {
@@ -143,8 +142,10 @@ int _transform_component_compiler(yaml_node_t body,
 
     struct transform_data t_data;
 
-    YAML_NODE_SCOPE(scale, body, "scale", t_data.scale = yaml_as_cel_vec3f_t(scale););
-    YAML_NODE_SCOPE(position, body, "position", t_data.position = yaml_as_cel_vec3f_t(position););
+    YAML_NODE_SCOPE(scale, body, "scale",
+                    t_data.scale = yaml_as_cel_vec3f_t(scale););
+    YAML_NODE_SCOPE(position, body, "position",
+                    t_data.position = yaml_as_cel_vec3f_t(position););
 
     {
         yaml_node_t rotation = yaml_get_node(body, "rotation");
@@ -179,7 +180,8 @@ static void _destroyer(world_t world,
 
     // TODO: remove from arrays, swap idx -> last AND change size
     for (int i = 0; i < ent_count; i++) {
-        CEL_ASSERT("transform", MAP_HAS(u32, &world_data->ent_idx_map, ents[i].idx));
+        CEL_ASSERT("transform",
+                   MAP_HAS(u32, &world_data->ent_idx_map, ents[i].idx));
         MAP_REMOVE(u32, &world_data->ent_idx_map, ents[i].idx);
     }
 }
@@ -195,8 +197,9 @@ static void _spawner(world_t world,
     for (int i = 0; i < ent_count; ++i) {
         transform_create(world,
                          ents[cents[i]],
-                         ents_parent[cents[i]] != UINT32_MAX ? ents[ents_parent[cents[i]]]
-                                                             : (entity_t) {.idx = UINT32_MAX},
+                         ents_parent[cents[i]] != UINT32_MAX
+                         ? ents[ents_parent[cents[i]]]
+                         : (entity_t) {.idx = UINT32_MAX},
                          tdata[i].position,
                          tdata[i].rotation,
                          tdata[i].scale);
@@ -220,7 +223,9 @@ static void _init(get_api_fce_t get_engine_api) {
 
     _G.type = stringid64_from_string("transform");
 
-    EntComSystemApiV0.component_register_compiler(_G.type, _transform_component_compiler, 10);
+    EntComSystemApiV0.component_register_compiler(_G.type,
+                                                  _transform_component_compiler,
+                                                  10);
     EntComSystemApiV0.component_register_type(_G.type, (struct component_clb) {
             .spawner=_spawner, .destroyer=_destroyer,
             .on_world_create=_on_world_create, .on_world_destroy=_on_world_destroy
@@ -259,15 +264,19 @@ void transform_transform(world_t world,
     m.w.y = pos.y;
     m.w.z = pos.z;
 
-    cel_mat44f_mul(&ARRAY_AT(&world_data->world_matrix, transform.idx), &m, parent);
+    cel_mat44f_mul(&ARRAY_AT(&world_data->world_matrix, transform.idx), &m,
+                   parent);
 
     u32 child = ARRAY_AT(&world_data->first_child, transform.idx);
 
     transform_t child_transform = {.idx = child};
 
     while (transform_is_valid(child_transform)) {
-        transform_transform(world, child_transform, &ARRAY_AT(&world_data->world_matrix, transform.idx));
-        child_transform.idx = ARRAY_AT(&world_data->next_sibling, child_transform.idx);
+        transform_transform(world, child_transform,
+                            &ARRAY_AT(&world_data->world_matrix,
+                                      transform.idx));
+        child_transform.idx = ARRAY_AT(&world_data->next_sibling,
+                                       child_transform.idx);
     }
 }
 
@@ -308,7 +317,9 @@ void transform_set_position(world_t world,
     transform_t pt = {.idx = parent_idx};
 
     cel_mat44f_t m = MAT44F_INIT_IDENTITY;
-    cel_mat44f_t *p = parent_idx != UINT32_MAX ? transform_get_world_matrix(world, pt) : &m;
+    cel_mat44f_t *p =
+            parent_idx != UINT32_MAX ? transform_get_world_matrix(world, pt)
+                                     : &m;
 
     ARRAY_AT(&world_data->position, transform.idx) = pos;
 
@@ -324,7 +335,9 @@ void transform_set_rotation(world_t world,
     transform_t pt = {.idx = parent_idx};
 
     cel_mat44f_t m = MAT44F_INIT_IDENTITY;
-    cel_mat44f_t *p = parent_idx != UINT32_MAX ? transform_get_world_matrix(world, pt) : &m;
+    cel_mat44f_t *p =
+            parent_idx != UINT32_MAX ? transform_get_world_matrix(world, pt)
+                                     : &m;
 
     cel_quatf_t nq = {0};
     cel_quatf_normalized(&nq, &rot);
@@ -343,7 +356,9 @@ void transform_set_scale(world_t world,
     transform_t pt = {.idx = parent_idx};
 
     cel_mat44f_t m = MAT44F_INIT_IDENTITY;
-    cel_mat44f_t *p = parent_idx != UINT32_MAX ? transform_get_world_matrix(world, pt) : &m;
+    cel_mat44f_t *p =
+            parent_idx != UINT32_MAX ? transform_get_world_matrix(world, pt)
+                                     : &m;
 
     ARRAY_AT(&world_data->scale, transform.idx) = scale;
 
@@ -388,13 +403,15 @@ transform_t transform_create(world_t world,
 
     transform_t t = {.idx = idx};
     transform_transform(world, t,
-                        parent.h.h != UINT32_MAX ? transform_get_world_matrix(world, transform_get(world, parent))
+                        parent.h.h != UINT32_MAX ? transform_get_world_matrix(
+                                world, transform_get(world, parent))
                                                  : &m);
 
     MAP_SET(u32, &data->ent_idx_map, entity.h.h, idx);
 
     if (parent.h.h != UINT32_MAX) {
-        u32 parent_idx = MAP_GET(u32, &data->ent_idx_map, parent.h.h, UINT32_MAX);
+        u32 parent_idx = MAP_GET(u32, &data->ent_idx_map, parent.h.h,
+                                 UINT32_MAX);
 
         ARRAY_AT(&data->parent, idx) = parent_idx;
 
@@ -431,10 +448,16 @@ void transform_link(world_t world,
 
     cel_mat44f_t m = MAT44F_INIT_IDENTITY;
 
-    cel_mat44f_t *p = parent_tr.idx != UINT32_MAX ? transform_get_world_matrix(world, parent_tr) : &m;
+    cel_mat44f_t *p =
+            parent_tr.idx != UINT32_MAX ? transform_get_world_matrix(world,
+                                                                     parent_tr)
+                                        : &m;
 
     transform_transform(world, parent_tr, p);
-    transform_transform(world, child_tr, transform_get_world_matrix(world, transform_get(world, parent)));
+    transform_transform(world, child_tr, transform_get_world_matrix(world,
+                                                                    transform_get(
+                                                                            world,
+                                                                            parent)));
 }
 
 void *transform_get_plugin_api(int api,

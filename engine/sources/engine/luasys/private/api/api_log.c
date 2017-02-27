@@ -25,19 +25,22 @@ static int _log_format(lua_State *l,
         int n = 0;
         switch (frmt[i]) {
             case 'f':
-                n = snprintf(buffer_it, buffer_write_len, "%f", luasys_to_f32(l, arg_idx));
+                n = snprintf(buffer_it, buffer_write_len, "%f",
+                             luasys_to_f32(l, arg_idx));
                 buffer_it += n;
                 ++arg_idx;
                 break;
 
             case 'd':
-                n = snprintf(buffer_it, buffer_write_len, "%d", luasys_to_int(l, arg_idx));
+                n = snprintf(buffer_it, buffer_write_len, "%d",
+                             luasys_to_int(l, arg_idx));
                 buffer_it += n;
                 ++arg_idx;
                 break;
 
             case 's':
-                n = snprintf(buffer_it, buffer_write_len, "%s", luasys_to_string(l, arg_idx));
+                n = snprintf(buffer_it, buffer_write_len, "%s",
+                             luasys_to_string(l, arg_idx));
                 buffer_it += n;
                 ++arg_idx;
                 break;

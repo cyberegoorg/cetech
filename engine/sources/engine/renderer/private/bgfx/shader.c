@@ -16,7 +16,6 @@
 #include "engine/resource/types.h"
 #include <engine/memory/memsys.h>
 #include <engine/plugin/plugin.h>
-#include "engine/memory/memsys.h"
 
 
 //==============================================================================
@@ -62,7 +61,9 @@ static int _shaderc(const char *input,
                     const char *profile) {
     char cmd_line[4096] = {0};
 
-    int s = ResourceApiV0.compiler_external_join(cmd_line, CEL_ARRAY_LEN(cmd_line), "shaderc");
+    int s = ResourceApiV0.compiler_external_join(cmd_line,
+                                                 CEL_ARRAY_LEN(cmd_line),
+                                                 "shaderc");
     s += snprintf(cmd_line + s, CEL_ARRAY_LEN(cmd_line) - s,
                   ""
                           " -f %s"
@@ -118,7 +119,8 @@ int _shader_resource_compiler(const char *filename,
 
     char source_data[cel_vio_size(source_vio) + 1];
     memory_set(source_data, 0, cel_vio_size(source_vio) + 1);
-    cel_vio_read(source_vio, source_data, sizeof(char), cel_vio_size(source_vio));
+    cel_vio_read(source_vio, source_data, sizeof(char),
+                 cel_vio_size(source_vio));
 
     yaml_document_t h;
     yaml_node_t root = yaml_load_str(source_data, &h);
@@ -130,7 +132,8 @@ int _shader_resource_compiler(const char *filename,
     const char *core_dir = ResourceApiV0.compiler_get_core_dir();
 
     char include_dir[1024] = {0};
-    cel_path_join(include_dir, CEL_ARRAY_LEN(include_dir), core_dir, "bgfxshaders");
+    cel_path_join(include_dir, CEL_ARRAY_LEN(include_dir), core_dir,
+                  "bgfxshaders");
 
     struct shader resource = {0};
 
@@ -142,8 +145,10 @@ int _shader_resource_compiler(const char *filename,
     char output_path[4096] = {0};
     char tmp_filename[4096] = {0};
 
-    ResourceApiV0.compiler_get_build_dir(build_dir, CEL_ARRAY_LEN(build_dir), ApplicationApiV0.platform());
-    ResourceApiV0.compiler_get_tmp_dir(tmp_dir, CEL_ARRAY_LEN(tmp_dir), ApplicationApiV0.platform());
+    ResourceApiV0.compiler_get_build_dir(build_dir, CEL_ARRAY_LEN(build_dir),
+                                         ApplicationApiV0.platform());
+    ResourceApiV0.compiler_get_tmp_dir(tmp_dir, CEL_ARRAY_LEN(tmp_dir),
+                                       ApplicationApiV0.platform());
 
     //////// VS
     yaml_as_string(vs_input, input_str, CEL_ARRAY_LEN(input_str));
@@ -152,14 +157,17 @@ int _shader_resource_compiler(const char *filename,
 
     _gen_tmp_name(output_path, tmp_dir, CEL_ARRAY_LEN(tmp_filename), input_str);
 
-    int result = _shaderc(input_path, output_path, include_dir, "vertex", platform, vs_profile);
+    int result = _shaderc(input_path, output_path, include_dir, "vertex",
+                          platform, vs_profile);
 
     if (result != 0) {
         return 0;
     }
 
-    struct vio *tmp_file = cel_vio_from_file(output_path, VIO_OPEN_READ, MemSysApiV0.main_allocator());
-    char *vs_data = CEL_ALLOCATE(MemSysApiV0.main_allocator(), char, cel_vio_size(tmp_file) + 1);
+    struct vio *tmp_file = cel_vio_from_file(output_path, VIO_OPEN_READ,
+                                             MemSysApiV0.main_allocator());
+    char *vs_data = CEL_ALLOCATE(MemSysApiV0.main_allocator(), char,
+                                 cel_vio_size(tmp_file) + 1);
     cel_vio_read(tmp_file, vs_data, sizeof(char), cel_vio_size(tmp_file));
     resource.vs_size = cel_vio_size(tmp_file);
     cel_vio_close(tmp_file);
@@ -172,14 +180,17 @@ int _shader_resource_compiler(const char *filename,
 
     _gen_tmp_name(output_path, tmp_dir, CEL_ARRAY_LEN(tmp_filename), input_str);
 
-    result = _shaderc(input_path, output_path, include_dir, "fragment", platform, fs_profile);
+    result = _shaderc(input_path, output_path, include_dir, "fragment",
+                      platform, fs_profile);
 
     if (result != 0) {
         return 0;
     }
 
-    tmp_file = cel_vio_from_file(output_path, VIO_OPEN_READ, MemSysApiV0.main_allocator());
-    char *fs_data = CEL_ALLOCATE(MemSysApiV0.main_allocator(), char, cel_vio_size(tmp_file) + 1);
+    tmp_file = cel_vio_from_file(output_path, VIO_OPEN_READ,
+                                 MemSysApiV0.main_allocator());
+    char *fs_data = CEL_ALLOCATE(MemSysApiV0.main_allocator(), char,
+                                 cel_vio_size(tmp_file) + 1);
     cel_vio_read(tmp_file, fs_data, sizeof(char), cel_vio_size(tmp_file));
     resource.fs_size = cel_vio_size(tmp_file);
     cel_vio_close(tmp_file);
@@ -221,12 +232,14 @@ void shader_resource_online(stringid64_t name,
     const bgfx_memory_t *fs_mem = bgfx_alloc(resource->fs_size);
 
     memory_copy(vs_mem->data, (resource + 1), resource->vs_size);
-    memory_copy(fs_mem->data, ((char *) (resource + 1)) + resource->vs_size, resource->fs_size);
+    memory_copy(fs_mem->data, ((char *) (resource + 1)) + resource->vs_size,
+                resource->fs_size);
 
     bgfx_shader_handle_t vs_shader = bgfx_create_shader(vs_mem);
     bgfx_shader_handle_t fs_shader = bgfx_create_shader(fs_mem);
 
-    bgfx_program_handle_t program = bgfx_create_program(vs_shader, fs_shader, 1);
+    bgfx_program_handle_t program = bgfx_create_program(vs_shader, fs_shader,
+                                                        1);
 
     MAP_SET(bgfx_program_handle_t, &_G.handler_map, name.id, program);
 }
@@ -236,7 +249,9 @@ static const bgfx_program_handle_t null_program = {0};
 void shader_resource_offline(stringid64_t name,
                              void *data) {
 
-    bgfx_program_handle_t program = MAP_GET(bgfx_program_handle_t, &_G.handler_map, name.id, null_program);
+    bgfx_program_handle_t program = MAP_GET(bgfx_program_handle_t,
+                                            &_G.handler_map, name.id,
+                                            null_program);
 
     if (program.idx == null_program.idx) {
         return;
@@ -275,13 +290,17 @@ static const resource_callbacks_t shader_resource_callback = {
 int shader_resource_init() {
     _G = (struct G) {0};
 
-    MemSysApiV0 = *(struct MemSysApiV0 *) plugin_get_engine_api(MEMORY_API_ID, 0);
-    ResourceApiV0 = *(struct ResourceApiV0 *) plugin_get_engine_api(RESOURCE_API_ID, 0);
-    ApplicationApiV0 = *(struct ApplicationApiV0 *) plugin_get_engine_api(APPLICATION_API_ID, 0);
+    MemSysApiV0 = *(struct MemSysApiV0 *) plugin_get_engine_api(MEMORY_API_ID,
+                                                                0);
+    ResourceApiV0 = *(struct ResourceApiV0 *) plugin_get_engine_api(
+            RESOURCE_API_ID, 0);
+    ApplicationApiV0 = *(struct ApplicationApiV0 *) plugin_get_engine_api(
+            APPLICATION_API_ID, 0);
 
     _G.type = stringid64_from_string("shader");
 
-    MAP_INIT(bgfx_program_handle_t, &_G.handler_map, MemSysApiV0.main_allocator());
+    MAP_INIT(bgfx_program_handle_t, &_G.handler_map,
+             MemSysApiV0.main_allocator());
 
     ResourceApiV0.compiler_register(_G.type, _shader_resource_compiler);
     ResourceApiV0.register_type(_G.type, shader_resource_callback);
@@ -296,5 +315,6 @@ void shader_resource_shutdown() {
 
 bgfx_program_handle_t shader_resource_get(stringid64_t name) {
     struct shader *resource = ResourceApiV0.get(_G.type, name);
-    return MAP_GET(bgfx_program_handle_t, &_G.handler_map, name.id, null_program);
+    return MAP_GET(bgfx_program_handle_t, &_G.handler_map, name.id,
+                   null_program);
 }
