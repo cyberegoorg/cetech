@@ -114,10 +114,14 @@ static SDL_GameControllerButton _btn_to_sdl[GAMEPAD_BTN_MAX] = {
 };
 
 static SDL_GameControllerAxis _axis_to_sdl[GAMEPAD_AXIX_MAX][2] = {
-        [GAMEPAD_AXIS_INVALID] = {SDL_CONTROLLER_AXIS_INVALID, SDL_CONTROLLER_AXIS_INVALID},
-        [GAMEPAD_AXIS_LEFT] = {SDL_CONTROLLER_AXIS_LEFTX, SDL_CONTROLLER_AXIS_LEFTY},
-        [GAMEPAD_AXIS_RIGHT] = {SDL_CONTROLLER_AXIS_RIGHTX, SDL_CONTROLLER_AXIS_RIGHTY},
-        [GAMEPAD_AXIS_TRIGER] = {SDL_CONTROLLER_AXIS_TRIGGERLEFT, SDL_CONTROLLER_AXIS_TRIGGERRIGHT},
+        [GAMEPAD_AXIS_INVALID] = {SDL_CONTROLLER_AXIS_INVALID,
+                                  SDL_CONTROLLER_AXIS_INVALID},
+        [GAMEPAD_AXIS_LEFT] = {SDL_CONTROLLER_AXIS_LEFTX,
+                               SDL_CONTROLLER_AXIS_LEFTY},
+        [GAMEPAD_AXIS_RIGHT] = {SDL_CONTROLLER_AXIS_RIGHTX,
+                                SDL_CONTROLLER_AXIS_RIGHTY},
+        [GAMEPAD_AXIS_TRIGER] = {SDL_CONTROLLER_AXIS_TRIGGERLEFT,
+                                 SDL_CONTROLLER_AXIS_TRIGGERRIGHT},
 };
 
 void sdl_gamepad_process(struct eventstream *stream) {
@@ -130,12 +134,15 @@ void sdl_gamepad_process(struct eventstream *stream) {
         }
 
         for (int j = 0; j < GAMEPAD_BTN_MAX; ++j) {
-            curent_state[i][j] = SDL_GameControllerGetButton(_G.controller[i], _btn_to_sdl[j]);
+            curent_state[i][j] = SDL_GameControllerGetButton(_G.controller[i],
+                                                             _btn_to_sdl[j]);
         }
 
         for (int j = 0; j < GAMEPAD_AXIX_MAX; ++j) {
-            i16 x = SDL_GameControllerGetAxis(_G.controller[i], _axis_to_sdl[j][0]);
-            i16 y = SDL_GameControllerGetAxis(_G.controller[i], _axis_to_sdl[j][1]);
+            i16 x = SDL_GameControllerGetAxis(_G.controller[i],
+                                              _axis_to_sdl[j][0]);
+            i16 y = SDL_GameControllerGetAxis(_G.controller[i],
+                                              _axis_to_sdl[j][1]);
 
             f32 coef = 1.0f / INT16_MAX;
             f32 x_norm = x * coef;
@@ -205,7 +212,8 @@ void sdl_gamepad_process_event(SDL_Event *event,
             struct gamepad_device_event ev;
 
             for (int i = 0; i < GAMEPAD_MAX; ++i) {
-                SDL_GameController *controller = SDL_GameControllerFromInstanceID(event->cdevice.which);
+                SDL_GameController *controller = SDL_GameControllerFromInstanceID(
+                        event->cdevice.which);
                 if (_G.controller[i] != controller) {
                     continue;
                 }

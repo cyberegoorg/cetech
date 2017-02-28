@@ -6,12 +6,10 @@
 #include <celib/filesystem/vio.h>
 #include "engine/resource/types.h"
 #include <engine/world/unit.h>
-#include <engine/entcom/entcom.h>
 #include <engine/world/transform.h>
 #include <celib/math/quatf.h>
 #include <engine/memory/memsys.h>
 #include <engine/plugin/plugin_api.h>
-#include "engine/memory/memsys.h"
 
 #include "engine/world/level.h"
 
@@ -52,7 +50,8 @@ static struct G {
 void _init_level_instance(struct level_instance *instance,
                           entity_t level_entity) {
     instance->level_entity = level_entity;
-    MAP_INIT(entity_t, &instance->spawned_entity_map, MemSysApiV0.main_allocator());
+    MAP_INIT(entity_t, &instance->spawned_entity_map,
+             MemSysApiV0.main_allocator());
 }
 
 void _destroy_level_instance(struct level_instance *instance) {
@@ -63,7 +62,8 @@ void _destroy_level_instance(struct level_instance *instance) {
 level_t _new_level(entity_t level_entity) {
     u32 idx = ARRAY_SIZE(&_G.level_instance);
 
-    ARRAY_PUSH_BACK(level_instance, &_G.level_instance, (struct level_instance) {0});
+    ARRAY_PUSH_BACK(level_instance, &_G.level_instance,
+                    (struct level_instance) {0});
 
     struct level_instance *instance = &ARRAY_AT(&_G.level_instance, idx);
 
@@ -139,9 +139,11 @@ void forach_units_clb(yaml_node_t key,
     char name[128] = {0};
     yaml_as_string(key, name, CEL_ARRAY_LEN(name));
     ARRAY_PUSH_BACK(stringid64_t, data->id, stringid64_from_string(name));
-    ARRAY_PUSH_BACK(u32, data->offset, UnitApiV0.compiler_ent_counter(data->output));
+    ARRAY_PUSH_BACK(u32, data->offset,
+                    UnitApiV0.compiler_ent_counter(data->output));
 
-    UnitApiV0.compiler_compile_unit(data->output, value, data->filename, data->capi);
+    UnitApiV0.compiler_compile_unit(data->output, value, data->filename,
+                                    data->capi);
 }
 
 struct level_blob {
@@ -163,7 +165,8 @@ int _level_resource_compiler(const char *filename,
 
     char source_data[cel_vio_size(source_vio) + 1];
     memory_set(source_data, 0, cel_vio_size(source_vio) + 1);
-    cel_vio_read(source_vio, source_data, sizeof(char), cel_vio_size(source_vio));
+    cel_vio_read(source_vio, source_data, sizeof(char),
+                 cel_vio_size(source_vio));
 
     yaml_document_t h;
     yaml_node_t root = yaml_load_str(source_data, &h);
@@ -199,9 +202,12 @@ int _level_resource_compiler(const char *filename,
     UnitApiV0.compiler_write_to_build(output, unit_data.data);
 
     cel_vio_write(build_vio, &res, sizeof(struct level_blob), 1);
-    cel_vio_write(build_vio, &ARRAY_AT(&id, 0), sizeof(stringid64_t), ARRAY_SIZE(&id));
-    cel_vio_write(build_vio, &ARRAY_AT(&offset, 0), sizeof(u32), ARRAY_SIZE(&offset));
-    cel_vio_write(build_vio, &ARRAY_AT(&data, 0), sizeof(u8), ARRAY_SIZE(&data));
+    cel_vio_write(build_vio, &ARRAY_AT(&id, 0), sizeof(stringid64_t),
+                  ARRAY_SIZE(&id));
+    cel_vio_write(build_vio, &ARRAY_AT(&offset, 0), sizeof(u32),
+                  ARRAY_SIZE(&offset));
+    cel_vio_write(build_vio, &ARRAY_AT(&data, 0), sizeof(u8),
+                  ARRAY_SIZE(&data));
 
     ARRAY_DESTROY(stringid64_t, &id);
     ARRAY_DESTROY(u32, &offset);
@@ -227,7 +233,8 @@ static void _init(get_api_fce_t get_engine_api) {
     _G = (struct G) {0};
     _G.level_type = stringid64_from_string("level");
 
-    ARRAY_INIT(level_instance, &_G.level_instance, MemSysApiV0.main_allocator());
+    ARRAY_INIT(level_instance, &_G.level_instance,
+               MemSysApiV0.main_allocator());
 
     ResourceApiV0.register_type(_G.level_type, _level_resource_defs);
     ResourceApiV0.compiler_register(_G.level_type, _level_resource_compiler);
@@ -248,7 +255,9 @@ level_t world_load_level(world_t world,
     u8 *data = level_blob_data(res);
 
     entity_t level_ent = EntComSystemApiV0.entity_manager_create();
-    transform_t t = TransformApiV0.create(world, level_ent, (entity_t) {UINT32_MAX}, (cel_vec3f_t) {0}, QUATF_IDENTITY,
+    transform_t t = TransformApiV0.create(world, level_ent,
+                                          (entity_t) {UINT32_MAX},
+                                          (cel_vec3f_t) {0}, QUATF_IDENTITY,
                                           (cel_vec3f_t) {{1.0f, 1.0f, 1.0f}});
 
     level_t level = _new_level(level_ent);
@@ -280,7 +289,8 @@ void level_destroy(world_t world,
 entity_t level_unit_by_id(level_t level,
                           stringid64_t id) {
     struct level_instance *instance = _level_instance(level);
-    return MAP_GET(entity_t, &instance->spawned_entity_map, id.id, (entity_t) {0});
+    return MAP_GET(entity_t, &instance->spawned_entity_map, id.id,
+                   (entity_t) {0});
 }
 
 entity_t level_unit(level_t level) {

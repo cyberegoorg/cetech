@@ -3,12 +3,16 @@
 #ifndef CETECH_DEVELOP_SYSTEM_H
 #define CETECH_DEVELOP_SYSTEM_H
 
+//==============================================================================
+// Includes
+//==============================================================================
+
 #include "celib/types.h"
 #include "celib/containers/eventstream.h"
 
 
 //==============================================================================
-// Interface
+// Enums
 //==============================================================================
 
 //! Event type enum
@@ -18,6 +22,10 @@ enum {
     EVENT_RECORD_FLOAT, //! Record float event
     EVENT_RECORD_INT,   //! Record int event
 };
+
+//==============================================================================
+// Structs
+//==============================================================================
 
 //! Record float event struct
 struct record_float_event {
@@ -49,6 +57,10 @@ struct scope_data {
     time_t start;     //!< Start time
     u64 start_timer;  //!< Timer
 };
+
+//==============================================================================
+// Api
+//==============================================================================
 
 //! Develop system API V0
 struct DevelopSystemApiV0 {

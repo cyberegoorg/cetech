@@ -84,7 +84,8 @@ static void _init(get_api_fce_t get_engine_api) {
         material_resource_init(get_engine_api);
         scene_resource_init();
 
-        ConsoleServerApiV0.consolesrv_register_command("renderer.resize", _cmd_resize);
+        ConsoleServerApiV0.consolesrv_register_command("renderer.resize",
+                                                       _cmd_resize);
     }
 }
 
@@ -132,7 +133,8 @@ void renderer_render_world(world_t world,
         bgfx_reset(_G.size_width, _G.size_height, _get_reset_flags());
     }
 
-    bgfx_set_view_clear(0, BGFX_CLEAR_COLOR | BGFX_CLEAR_DEPTH, 0x66CCFFff, 1.0f, 0);
+    bgfx_set_view_clear(0, BGFX_CLEAR_COLOR | BGFX_CLEAR_DEPTH, 0x66CCFFff,
+                        1.0f, 0);
 
     cel_mat44f_t view_matrix;
     cel_mat44f_t proj_matrix;
@@ -140,7 +142,8 @@ void renderer_render_world(world_t world,
     CameraApiV0.get_project_view(world, camera, &proj_matrix, &view_matrix);
     bgfx_set_view_transform(0, view_matrix.f, proj_matrix.f);
 
-    bgfx_set_view_rect(0, 0, 0, (uint16_t) _G.size_width, (uint16_t) _G.size_height);
+    bgfx_set_view_rect(0, 0, 0, (uint16_t) _G.size_width,
+                       (uint16_t) _G.size_height);
 
     bgfx_touch(0);
     bgfx_dbg_text_clear(0, 0);

@@ -3,12 +3,26 @@
 #ifndef CETECH_PLUGIN_API_H
 #define CETECH_PLUGIN_API_H
 
+//==============================================================================
+// Includes
+//==============================================================================
+
 #include <stdio.h>
 #include "engine/config/cvar.h"
+
+
+//==============================================================================
+// Defines
+//==============================================================================
 
 #define _NAME(name, version) name##V##version
 #define IMPORT_API(name, version) static struct _NAME(name, version) _NAME(name, version)
 #define INIT_API(name, api_id, version) _NAME(name, version) = *(struct _NAME(name, version) *) get_engine_api(api_id, version)
+
+
+//==============================================================================
+// Enums
+//==============================================================================
 
 //! Core engine plugin api ids
 enum {
@@ -39,8 +53,18 @@ enum {
     WORLD_API_ID,
 };
 
+
+//==============================================================================
+// Typedefs
+//==============================================================================
+
 typedef void *(*get_api_fce_t)(int api,
                                int version);
+
+
+//==============================================================================
+// Api
+//==============================================================================
 
 //! Plugin expot api struct V0
 struct plugin_api_v0 {

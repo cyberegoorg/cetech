@@ -6,7 +6,6 @@
 #include <engine/input/gamepad.h>
 #include <engine/plugin/plugin_api.h>
 #include "engine/machine/machine.h"
-#include "celib/string/string.h"
 
 #include "gamepadstr.h"
 
@@ -31,7 +30,6 @@ static struct G {
 } _G = {0};
 
 
-
 static void _init(get_api_fce_t get_engine_api) {
     INIT_API(MachineApi, MACHINE_API_ID, 0);
 
@@ -54,7 +52,8 @@ static void _shutdown() {
 static void _update() {
     struct event_header *event = MachineApiV0.event_begin();
 
-    memory_copy(_G.last_state, _G.state, sizeof(int) * GAMEPAD_BTN_MAX * GAMEPAD_MAX);
+    memory_copy(_G.last_state, _G.state,
+                sizeof(int) * GAMEPAD_BTN_MAX * GAMEPAD_MAX);
 
     while (event != MachineApiV0.event_end()) {
         struct gamepad_move_event *move_event = (struct gamepad_move_event *) event;
@@ -121,28 +120,32 @@ u32 gamepad_button_index(const char *button_name) {
 }
 
 const char *gamepad_button_name(const u32 button_index) {
-    CEL_ASSERT(LOG_WHERE, (button_index >= 0) && (button_index < GAMEPAD_BTN_MAX));
+    CEL_ASSERT(LOG_WHERE,
+               (button_index >= 0) && (button_index < GAMEPAD_BTN_MAX));
 
     return _btn_to_str[button_index];
 }
 
 int gamepad_button_state(u32 idx,
                          const u32 button_index) {
-    CEL_ASSERT(LOG_WHERE, (button_index >= 0) && (button_index < GAMEPAD_BTN_MAX));
+    CEL_ASSERT(LOG_WHERE,
+               (button_index >= 0) && (button_index < GAMEPAD_BTN_MAX));
 
     return _G.state[idx][button_index];
 }
 
 int gamepad_button_pressed(u32 idx,
                            const u32 button_index) {
-    CEL_ASSERT(LOG_WHERE, (button_index >= 0) && (button_index < GAMEPAD_BTN_MAX));
+    CEL_ASSERT(LOG_WHERE,
+               (button_index >= 0) && (button_index < GAMEPAD_BTN_MAX));
 
     return _G.state[idx][button_index] && !_G.last_state[idx][button_index];
 }
 
 int gamepad_button_released(u32 idx,
                             const u32 button_index) {
-    CEL_ASSERT(LOG_WHERE, (button_index >= 0) && (button_index < GAMEPAD_BTN_MAX));
+    CEL_ASSERT(LOG_WHERE,
+               (button_index >= 0) && (button_index < GAMEPAD_BTN_MAX));
 
     return !_G.state[idx][button_index] && _G.last_state[idx][button_index];
 }

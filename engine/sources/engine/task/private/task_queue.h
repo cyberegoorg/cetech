@@ -41,7 +41,8 @@ void queue_task_init(struct task_queue *q,
     q->_capacityMask = capacity - 1;
     q->allocator = allocator;
 
-    CEL_ASSERT_MSG("QUEUEMPC", 0 == (capacity & q->_capacityMask), "capacity must be power of two");
+    CEL_ASSERT_MSG("QUEUEMPC", 0 == (capacity & q->_capacityMask),
+                   "capacity must be power of two");
 
     q->_capacity = capacity;
     q->_data = CEL_ALLOCATE(allocator, u32, capacity);
@@ -73,12 +74,15 @@ int queue_task_push(struct task_queue *q,
     int pos = atomic_load_explicit(&q->_enqueuePos, memory_order_relaxed);
 
     for (;;) {
-        int seq = atomic_load_explicit(q->_sequences + (pos & q->_capacityMask), memory_order_acquire);
+        int seq = atomic_load_explicit(q->_sequences + (pos & q->_capacityMask),
+                                       memory_order_acquire);
 
         intptr_t dif = (intptr_t) seq - (intptr_t) pos;
 
         if (dif == 0) {
-            if (atomic_compare_exchange_weak_explicit(&q->_enqueuePos, &pos, pos + 1, memory_order_relaxed,
+            if (atomic_compare_exchange_weak_explicit(&q->_enqueuePos, &pos,
+                                                      pos + 1,
+                                                      memory_order_relaxed,
                                                       memory_order_relaxed)) {
                 break;
             }
@@ -90,7 +94,8 @@ int queue_task_push(struct task_queue *q,
     }
 
     q->_data[pos & q->_capacityMask] = value;
-    atomic_store_explicit(&q->_sequences[pos & q->_capacityMask], pos + 1, memory_order_release);
+    atomic_store_explicit(&q->_sequences[pos & q->_capacityMask], pos + 1,
+                          memory_order_release);
 
     return 1;
 }
@@ -101,12 +106,15 @@ int queue_task_pop(struct task_queue *q,
     int pos = atomic_load_explicit(&q->_dequeuePos, memory_order_relaxed);
 
     for (;;) {
-        int seq = atomic_load_explicit(q->_sequences + (pos & q->_capacityMask), memory_order_acquire);
+        int seq = atomic_load_explicit(q->_sequences + (pos & q->_capacityMask),
+                                       memory_order_acquire);
 
         intptr_t dif = (intptr_t) seq - (intptr_t) (pos + 1);
 
         if (dif == 0) {
-            if (atomic_compare_exchange_weak_explicit(&q->_dequeuePos, &pos, pos + 1, memory_order_relaxed,
+            if (atomic_compare_exchange_weak_explicit(&q->_dequeuePos, &pos,
+                                                      pos + 1,
+                                                      memory_order_relaxed,
                                                       memory_order_relaxed)) {
                 break;
             }
@@ -119,7 +127,8 @@ int queue_task_pop(struct task_queue *q,
     }
 
     *value = q->_data[pos & q->_capacityMask];
-    atomic_store_explicit(&q->_sequences[pos & q->_capacityMask], pos + q->_capacityMask + 1, memory_order_release);
+    atomic_store_explicit(&q->_sequences[pos & q->_capacityMask],
+                          pos + q->_capacityMask + 1, memory_order_release);
     return 1;
 }
 

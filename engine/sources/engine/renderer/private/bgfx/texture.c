@@ -15,7 +15,6 @@
 #include <engine/plugin/plugin.h>
 #include "engine/application/application.h"
 #include "engine/resource/types.h"
-#include "engine/memory/memsys.h"
 
 
 //==============================================================================
@@ -55,15 +54,19 @@ static int _texturec(const char *input,
                      int is_normalmap) {
     char cmd_line[4096] = {0};
 
-    int s = ResourceApiV0.compiler_external_join(cmd_line, CEL_ARRAY_LEN(cmd_line), "texturec");
+    int s = ResourceApiV0.compiler_external_join(cmd_line,
+                                                 CEL_ARRAY_LEN(cmd_line),
+                                                 "texturec");
 
-    s += snprintf(cmd_line + s, CEL_ARRAY_LEN(cmd_line) - s, " -f %s -o %s", input, output);
+    s += snprintf(cmd_line + s, CEL_ARRAY_LEN(cmd_line) - s, " -f %s -o %s",
+                  input, output);
     if (gen_mipmaps) {
         s += snprintf(cmd_line + s, CEL_ARRAY_LEN(cmd_line) - s, " --mips");
     }
 
     if (is_normalmap) {
-        s += snprintf(cmd_line + s, CEL_ARRAY_LEN(cmd_line) - s, " --normalmap");
+        s += snprintf(cmd_line + s, CEL_ARRAY_LEN(cmd_line) - s,
+                      " --normalmap");
     }
 
     int status = cel_exec(cmd_line);
@@ -100,7 +103,8 @@ int _texture_resource_compiler(const char *filename,
 
     char source_data[cel_vio_size(source_vio) + 1];
     memory_set(source_data, 0, cel_vio_size(source_vio) + 1);
-    cel_vio_read(source_vio, source_data, sizeof(char), cel_vio_size(source_vio));
+    cel_vio_read(source_vio, source_data, sizeof(char),
+                 cel_vio_size(source_vio));
 
     yaml_document_t h;
     yaml_node_t root = yaml_load_str(source_data, &h);
@@ -109,13 +113,17 @@ int _texture_resource_compiler(const char *filename,
     yaml_node_t n_gen_mipmaps = yaml_get_node(root, "gen_mipmaps");
     yaml_node_t n_is_normalmap = yaml_get_node(root, "is_normalmap");
 
-    int gen_mipmaps = yaml_is_valid(n_gen_mipmaps) ? yaml_as_bool(n_gen_mipmaps) : 0;
-    int is_normalmap = yaml_is_valid(n_is_normalmap) ? yaml_as_bool(n_is_normalmap) : 0;
+    int gen_mipmaps = yaml_is_valid(n_gen_mipmaps) ? yaml_as_bool(n_gen_mipmaps)
+                                                   : 0;
+    int is_normalmap = yaml_is_valid(n_is_normalmap) ? yaml_as_bool(
+            n_is_normalmap) : 0;
 
     const char *source_dir = ResourceApiV0.compiler_get_source_dir();
 
-    ResourceApiV0.compiler_get_build_dir(build_dir, CEL_ARRAY_LEN(build_dir), ApplicationApiV0.platform());
-    ResourceApiV0.compiler_get_tmp_dir(tmp_dir, CEL_ARRAY_LEN(tmp_dir), ApplicationApiV0.platform());
+    ResourceApiV0.compiler_get_build_dir(build_dir, CEL_ARRAY_LEN(build_dir),
+                                         ApplicationApiV0.platform());
+    ResourceApiV0.compiler_get_tmp_dir(tmp_dir, CEL_ARRAY_LEN(tmp_dir),
+                                       ApplicationApiV0.platform());
 
     yaml_as_string(input, input_str, CEL_ARRAY_LEN(input_str));
 
@@ -129,8 +137,10 @@ int _texture_resource_compiler(const char *filename,
         return 0;
     }
 
-    struct vio *tmp_file = cel_vio_from_file(output_path, VIO_OPEN_READ, MemSysApiV0.main_allocator());
-    char *tmp_data = CEL_ALLOCATE(MemSysApiV0.main_allocator(), char, cel_vio_size(tmp_file) + 1);
+    struct vio *tmp_file = cel_vio_from_file(output_path, VIO_OPEN_READ,
+                                             MemSysApiV0.main_allocator());
+    char *tmp_data = CEL_ALLOCATE(MemSysApiV0.main_allocator(), char,
+                                  cel_vio_size(tmp_file) + 1);
     cel_vio_read(tmp_file, tmp_data, sizeof(char), cel_vio_size(tmp_file));
 
     struct texture resource = {
@@ -171,7 +181,8 @@ void texture_resource_online(stringid64_t name,
     struct texture *resource = data;
 
     const bgfx_memory_t *mem = bgfx_copy((resource + 1), resource->size);
-    bgfx_texture_handle_t texture = bgfx_create_texture(mem, BGFX_TEXTURE_NONE, 0, NULL);
+    bgfx_texture_handle_t texture = bgfx_create_texture(mem, BGFX_TEXTURE_NONE,
+                                                        0, NULL);
 
     MAP_SET(bgfx_texture_handle_t, &_G.handler_map, name.id, texture);
 }
@@ -180,7 +191,9 @@ static const bgfx_texture_handle_t null_texture = {0};
 
 void texture_resource_offline(stringid64_t name,
                               void *data) {
-    bgfx_texture_handle_t texture = MAP_GET(bgfx_texture_handle_t, &_G.handler_map, name.id, null_texture);
+    bgfx_texture_handle_t texture = MAP_GET(bgfx_texture_handle_t,
+                                            &_G.handler_map, name.id,
+                                            null_texture);
 
     if (texture.idx == null_texture.idx) {
         return;
@@ -218,13 +231,17 @@ static const resource_callbacks_t texture_resource_callback = {
 int texture_resource_init() {
     _G = (struct G) {0};
 
-    MemSysApiV0 = *(struct MemSysApiV0 *) plugin_get_engine_api(MEMORY_API_ID, 0);
-    ResourceApiV0 = *(struct ResourceApiV0 *) plugin_get_engine_api(RESOURCE_API_ID, 0);
-    ApplicationApiV0 = *(struct ApplicationApiV0 *) plugin_get_engine_api(APPLICATION_API_ID, 0);
+    MemSysApiV0 = *(struct MemSysApiV0 *) plugin_get_engine_api(MEMORY_API_ID,
+                                                                0);
+    ResourceApiV0 = *(struct ResourceApiV0 *) plugin_get_engine_api(
+            RESOURCE_API_ID, 0);
+    ApplicationApiV0 = *(struct ApplicationApiV0 *) plugin_get_engine_api(
+            APPLICATION_API_ID, 0);
 
     _G.type = stringid64_from_string("texture");
 
-    MAP_INIT(bgfx_texture_handle_t, &_G.handler_map, MemSysApiV0.main_allocator());
+    MAP_INIT(bgfx_texture_handle_t, &_G.handler_map,
+             MemSysApiV0.main_allocator());
 
     ResourceApiV0.compiler_register(_G.type, _texture_resource_compiler);
 
@@ -242,5 +259,6 @@ void texture_resource_shutdown() {
 bgfx_texture_handle_t texture_resource_get(stringid64_t name) {
     ResourceApiV0.get(_G.type, name); // TODO: only for autoload
 
-    return MAP_GET(bgfx_texture_handle_t, &_G.handler_map, name.id, null_texture);
+    return MAP_GET(bgfx_texture_handle_t, &_G.handler_map, name.id,
+                   null_texture);
 }

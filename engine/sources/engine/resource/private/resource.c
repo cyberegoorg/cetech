@@ -10,34 +10,12 @@
 #include <celib/filesystem/path.h>
 
 #include "engine/resource/types.h"
-#include <engine/config/cvar.h>
-#include <engine/application/application.h>
 #include <engine/develop/console_server.h>
 #include <engine/memory/memsys.h>
 #include <engine/plugin/plugin_api.h>
 #include <engine/plugin/plugin.h>
 #include <engine/filesystem/types.h>
 
-#include "../types.h"
-#include "engine/memory/memsys.h"
-#include "include/SDL2/SDL.h"
-#include "include/mpack/mpack.h"
-
-#include "celib/containers/map.h"
-#include <celib/filesystem/vio.h>
-#include <celib/filesystem/path.h>
-
-#include "engine/resource/types.h"
-#include <engine/config/cvar.h>
-#include <engine/application/application.h>
-#include <engine/develop/console_server.h>
-#include <engine/memory/memsys.h>
-#include <engine/plugin/plugin_api.h>
-#include <engine/plugin/plugin.h>
-#include <engine/filesystem/types.h>
-
-#include "../types.h"
-#include "engine/memory/memsys.h"
 #include "resource.h"
 
 
@@ -172,7 +150,8 @@ static void _init(get_api_fce_t get_engine_api) {
     INIT_API(ApplicationApi, APPLICATION_API_ID, 0);
 
     ARRAY_INIT(resource_data, &_G.resource_data, MemSysApiV0.main_allocator());
-    ARRAY_INIT(resource_callbacks_t, &_G.resource_callbacks, MemSysApiV0.main_allocator());
+    ARRAY_INIT(resource_callbacks_t, &_G.resource_callbacks,
+               MemSysApiV0.main_allocator());
     MAP_INIT(u32, &_G.type_map, MemSysApiV0.main_allocator());
 
     _G.config.build_dir = ConfigApiV0.find("build");
@@ -184,11 +163,14 @@ static void _init(get_api_fce_t get_engine_api) {
                   ConfigApiV0.get_string(_G.config.build_dir),
                   ApplicationApiV0.platform());
 
-    FilesystemApiV0.filesystem_map_root_dir(stringid64_from_string("build"), build_dir_full);
+    FilesystemApiV0.filesystem_map_root_dir(stringid64_from_string("build"),
+                                            build_dir_full);
 
-    resource_register_type(stringid64_from_string("package"), package_resource_callback);
+    resource_register_type(stringid64_from_string("package"),
+                           package_resource_callback);
 
-    ConsoleServerApiV0.consolesrv_register_command("resource.reload_all", _cmd_reload_all);
+    ConsoleServerApiV0.consolesrv_register_command("resource.reload_all",
+                                                   _cmd_reload_all);
 
     package_init(get_engine_api);
     //return package_init();
@@ -221,7 +203,8 @@ int resource_type_name_string(char *str,
                               size_t max_len,
                               stringid64_t type,
                               stringid64_t name) {
-    return snprintf(str, max_len, "%" SDL_PRIX64 "%" SDL_PRIX64, type.id, name.id);
+    return snprintf(str, max_len, "%" SDL_PRIX64 "%" SDL_PRIX64, type.id,
+                    name.id);
 }
 
 
@@ -234,10 +217,12 @@ void resource_register_type(stringid64_t type,
 
     const u32 idx = ARRAY_SIZE(&_G.resource_data);
 
-    ARRAY_PUSH_BACK(resource_data, &_G.resource_data, (MAP_T(resource_item_t)) {0});
+    ARRAY_PUSH_BACK(resource_data, &_G.resource_data,
+                    (MAP_T(resource_item_t)) {0});
     ARRAY_PUSH_BACK(resource_callbacks_t, &_G.resource_callbacks, callbacks);
 
-    MAP_INIT(resource_item_t, &ARRAY_AT(&_G.resource_data, idx), MemSysApiV0.main_allocator());
+    MAP_INIT(resource_item_t, &ARRAY_AT(&_G.resource_data, idx),
+             MemSysApiV0.main_allocator());
 
     MAP_SET(u32, &_G.type_map, type.id, idx);
 }
@@ -262,7 +247,8 @@ void resource_add_loaded(stringid64_t type,
         if (resource_data[i] == 0) {
             continue;
         }
-        ARRAY_AT(&_G.resource_callbacks, idx).online(names[i], resource_data[i]);
+        ARRAY_AT(&_G.resource_callbacks, idx).online(names[i],
+                                                     resource_data[i]);
     }
 }
 
@@ -331,7 +317,8 @@ void resource_load(void **loaded_data,
 
 
     for (int i = 0; i < count; ++i) {
-        resource_item_t item = MAP_GET(resource_item_t, resource_map, names[i].id, null_item);
+        resource_item_t item = MAP_GET(resource_item_t, resource_map,
+                                       names[i].id, null_item);
 
         if (!force && (item.ref_count > 0)) {
             ++item.ref_count;
@@ -341,18 +328,23 @@ void resource_load(void **loaded_data,
         }
 
         char build_name[33] = {0};
-        resource_type_name_string(build_name, CEL_ARRAY_LEN(build_name), type, names[i]);
+        resource_type_name_string(build_name, CEL_ARRAY_LEN(build_name), type,
+                                  names[i]);
 
         char filename[4096] = {0};
-        resource_compiler_get_filename(filename, CEL_ARRAY_LEN(filename), type, names[i]);
+        resource_compiler_get_filename(filename, CEL_ARRAY_LEN(filename), type,
+                                       names[i]);
         log_debug("resource", "Loading resource %s from %s/%s", filename,
                   FilesystemApiV0.filesystem_get_root_dir(root_name),
                   build_name);
 
-        struct vio *resource_file = FilesystemApiV0.filesystem_open(root_name, build_name, VIO_OPEN_READ);
+        struct vio *resource_file = FilesystemApiV0.filesystem_open(root_name,
+                                                                    build_name,
+                                                                    VIO_OPEN_READ);
 
         if (resource_file != NULL) {
-            loaded_data[i] = type_clb.loader(resource_file, MemSysApiV0.main_allocator());
+            loaded_data[i] = type_clb.loader(resource_file,
+                                             MemSysApiV0.main_allocator());
             FilesystemApiV0.filesystem_close(resource_file);
         } else {
             loaded_data[i] = 0;
@@ -374,7 +366,8 @@ void resource_unload(stringid64_t type,
     resource_callbacks_t type_clb = ARRAY_AT(&_G.resource_callbacks, idx);
 
     for (int i = 0; i < count; ++i) {
-        resource_item_t item = MAP_GET(resource_item_t, resource_map, names[i].id, null_item);
+        resource_item_t item = MAP_GET(resource_item_t, resource_map,
+                                       names[i].id, null_item);
 
         if (item.ref_count == 0) {
             continue;
@@ -382,10 +375,12 @@ void resource_unload(stringid64_t type,
 
         if (--item.ref_count == 0) {
             char build_name[33] = {0};
-            resource_type_name_string(build_name, CEL_ARRAY_LEN(build_name), type, names[i]);
+            resource_type_name_string(build_name, CEL_ARRAY_LEN(build_name),
+                                      type, names[i]);
 
             char filename[1024] = {0};
-            resource_compiler_get_filename(filename, CEL_ARRAY_LEN(filename), type, names[i]);
+            resource_compiler_get_filename(filename, CEL_ARRAY_LEN(filename),
+                                           type, names[i]);
             log_debug("resource", "Unload resource %s ", filename);
 
             type_clb.offline(names[i], item.data);
@@ -402,14 +397,17 @@ void *resource_get(stringid64_t type,
                    stringid64_t names) {
     MAP_T(resource_item_t) *resource_map = _get_resource_map(type);
 
-    resource_item_t item = MAP_GET(resource_item_t, resource_map, names.id, null_item);
+    resource_item_t item = MAP_GET(resource_item_t, resource_map, names.id,
+                                   null_item);
     if (is_item_null(item)) {
         char build_name[33] = {0};
-        resource_type_name_string(build_name, CEL_ARRAY_LEN(build_name), type, names);
+        resource_type_name_string(build_name, CEL_ARRAY_LEN(build_name), type,
+                                  names);
 
         if (_G.autoload_enabled) {
             char filename[1024] = {0};
-            resource_compiler_get_filename(filename, CEL_ARRAY_LEN(filename), type, names);
+            resource_compiler_get_filename(filename, CEL_ARRAY_LEN(filename),
+                                           type, names);
 
             log_warning(LOG_WHERE, "Autoloading resource %s", filename);
             resource_load_now(type, &names, 1);
@@ -440,15 +438,18 @@ void resource_reload(stringid64_t type,
 //        resource_type_name_string(build_name, CEL_ARRAY_LEN(build_name), type, names[i]);
 
         char filename[1024] = {0};
-        resource_compiler_get_filename(filename, CEL_ARRAY_LEN(filename), type, names[i]);
+        resource_compiler_get_filename(filename, CEL_ARRAY_LEN(filename), type,
+                                       names[i]);
 
         log_debug("resource", "Reload resource %s ", filename);
 
         void *old_data = resource_get(type, names[i]);
 
-        void *new_data = type_clb.reloader(names[i], old_data, loaded_data[i], MemSysApiV0.main_allocator());
+        void *new_data = type_clb.reloader(names[i], old_data, loaded_data[i],
+                                           MemSysApiV0.main_allocator());
 
-        resource_item_t item = MAP_GET(resource_item_t, resource_map, names[i].id, null_item);
+        resource_item_t item = MAP_GET(resource_item_t, resource_map,
+                                       names[i].id, null_item);
         item.data = new_data;
         //--item.ref_count; // Load call increase item.ref_count, because is loaded
         MAP_SET(resource_item_t, resource_map, names[i].id, item);
@@ -467,8 +468,10 @@ void resource_reload_all() {
 
         MAP_T(resource_item_t) *resource_map = _get_resource_map(type_id);
 
-        const MAP_ENTRY_T(resource_item_t) *name_it = MAP_BEGIN(resource_item_t, resource_map);
-        const MAP_ENTRY_T(resource_item_t) *name_end = MAP_END(resource_item_t, resource_map);
+        const MAP_ENTRY_T(resource_item_t) *name_it = MAP_BEGIN(resource_item_t,
+                                                                resource_map);
+        const MAP_ENTRY_T(resource_item_t) *name_end = MAP_END(resource_item_t,
+                                                               resource_map);
 
         ARRAY_RESIZE(stringid64_t, &name_array, 0);
         while (name_it != name_end) {
@@ -479,7 +482,8 @@ void resource_reload_all() {
             ++name_it;
         }
 
-        resource_reload(type_id, &ARRAY_AT(&name_array, 0), ARRAY_SIZE(&name_array));
+        resource_reload(type_id, &ARRAY_AT(&name_array, 0),
+                        ARRAY_SIZE(&name_array));
 
         ++type_it;
     }

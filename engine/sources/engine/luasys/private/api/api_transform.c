@@ -2,7 +2,6 @@
 #include <engine/world/transform.h>
 #include <engine/plugin/plugin.h>
 #include "../luasys.h"
-#include <engine/plugin/plugin_api.h>
 
 #define API_NAME "Transform"
 
@@ -98,19 +97,25 @@ static int _transform_link(lua_State *l) {
 }
 
 void _register_lua_transform_api(get_api_fce_t get_engine_api) {
-    TransformApiV0 = *((struct TransformApiV0 *) get_engine_api(TRANSFORM_API_ID, 0));
+    TransformApiV0 = *((struct TransformApiV0 *) get_engine_api(
+            TRANSFORM_API_ID, 0));
 
 
     luasys_add_module_function(API_NAME, "get", _transform_get);
     luasys_add_module_function(API_NAME, "has", _transform_has);
 
-    luasys_add_module_function(API_NAME, "get_position", _transform_get_position);
-    luasys_add_module_function(API_NAME, "get_rotation", _transform_get_rotation);
+    luasys_add_module_function(API_NAME, "get_position",
+                               _transform_get_position);
+    luasys_add_module_function(API_NAME, "get_rotation",
+                               _transform_get_rotation);
     luasys_add_module_function(API_NAME, "get_scale", _transform_get_scale);
-    luasys_add_module_function(API_NAME, "get_world_matrix", _transform_get_world_matrix);
+    luasys_add_module_function(API_NAME, "get_world_matrix",
+                               _transform_get_world_matrix);
 
-    luasys_add_module_function(API_NAME, "set_position", _transform_set_position);
-    luasys_add_module_function(API_NAME, "set_rotation", _transform_set_rotation);
+    luasys_add_module_function(API_NAME, "set_position",
+                               _transform_set_position);
+    luasys_add_module_function(API_NAME, "set_rotation",
+                               _transform_set_rotation);
     luasys_add_module_function(API_NAME, "set_scale", _transform_set_scale);
     luasys_add_module_function(API_NAME, "link", _transform_link);
 }

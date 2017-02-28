@@ -3,7 +3,6 @@
 
 #include "../luasys.h"
 #include "engine/input/gamepad.h"
-#include <engine/plugin/plugin_api.h>
 
 static struct GamepadApiV0 GamepadApiV0 = {0};
 
@@ -108,8 +107,10 @@ void _register_lua_gamepad_api(get_api_fce_t get_engine_api) {
     luasys_add_module_function(API_NAME, "button_index", _gamepad_button_index);
     luasys_add_module_function(API_NAME, "button_name", _gamepad_button_name);
     luasys_add_module_function(API_NAME, "button_state", _gamepad_button_state);
-    luasys_add_module_function(API_NAME, "button_pressed", _gamepad_button_pressed);
-    luasys_add_module_function(API_NAME, "button_released", _gamepad_button_released);
+    luasys_add_module_function(API_NAME, "button_pressed",
+                               _gamepad_button_pressed);
+    luasys_add_module_function(API_NAME, "button_released",
+                               _gamepad_button_released);
 
     luasys_add_module_function(API_NAME, "axis_index", _gamepad_axis_index);
     luasys_add_module_function(API_NAME, "axis_name", _gamepad_axis_name);

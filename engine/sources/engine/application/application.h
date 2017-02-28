@@ -4,14 +4,27 @@
 #ifndef CETECH_APPLICATION_H
 #define CETECH_APPLICATION_H
 
+//==============================================================================
+// Include
+//==============================================================================
+
 #include "celib/window/types.h"
 
+
+//==============================================================================
+// Struct
+//==============================================================================
+
 struct game_callbacks {
-    int(*init)();
-    void(*shutdown)();
-    void(*update)(float dt);
-    void(*render)();
+    int (*init)();
+
+    void (*shutdown)();
+
+    void (*update)(float dt);
+
+    void (*render)();
 };
+
 
 //==============================================================================
 // Interface
@@ -29,6 +42,11 @@ int application_shutdown();
 
 //! Start application main loop
 void application_start();
+
+
+//==============================================================================
+// Api
+//==============================================================================
 
 //! Application API V0
 struct ApplicationApiV0 {

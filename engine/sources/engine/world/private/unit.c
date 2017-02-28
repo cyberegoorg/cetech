@@ -8,7 +8,6 @@
 #include <engine/entcom/entcom.h>
 #include <engine/memory/memsys.h>
 #include <engine/plugin/plugin_api.h>
-#include "engine/memory/memsys.h"
 
 #include "engine/world/unit.h"
 
@@ -29,7 +28,8 @@ IMPORT_API(ResourceApi, 0);
 u32 _new_spawned_array() {
     u32 idx = ARRAY_SIZE(&_G.spawned_array);
 
-    ARRAY_PUSH_BACK(array_entity_t, &_G.spawned_array, (struct array_entity_t) {0});
+    ARRAY_PUSH_BACK(array_entity_t, &_G.spawned_array,
+                    (struct array_entity_t) {0});
     ARRAY_T(entity_t) *array = &ARRAY_AT(&_G.spawned_array, idx);
 
     ARRAY_INIT(entity_t, array, MemSysApiV0.main_allocator());
@@ -72,19 +72,23 @@ static void preprocess(const char *filename,
         char prefab_file[256] = {0};
         char prefab_str[256] = {0};
         yaml_as_string(prefab_node, prefab_str, CEL_ARRAY_LEN(prefab_str));
-        snprintf(prefab_file, CEL_ARRAY_LEN(prefab_file), "%s.unit", prefab_str);
+        snprintf(prefab_file, CEL_ARRAY_LEN(prefab_file), "%s.unit",
+                 prefab_str);
 
         capi->add_dependency(filename, prefab_file);
 
         char full_path[256] = {0};
         const char *source_dir = ResourceApiV0.compiler_get_source_dir();
-        cel_path_join(full_path, CEL_ARRAY_LEN(full_path), source_dir, prefab_file);
+        cel_path_join(full_path, CEL_ARRAY_LEN(full_path), source_dir,
+                      prefab_file);
 
-        struct vio *prefab_vio = cel_vio_from_file(full_path, VIO_OPEN_READ, MemSysApiV0.main_allocator());
+        struct vio *prefab_vio = cel_vio_from_file(full_path, VIO_OPEN_READ,
+                                                   MemSysApiV0.main_allocator());
 
         char prefab_data[cel_vio_size(prefab_vio) + 1];
         memory_set(prefab_data, 0, cel_vio_size(prefab_vio) + 1);
-        cel_vio_read(prefab_vio, prefab_data, sizeof(char), cel_vio_size(prefab_vio));
+        cel_vio_read(prefab_vio, prefab_data, sizeof(char),
+                     cel_vio_size(prefab_vio));
 
         yaml_document_t h;
         yaml_node_t prefab_root = yaml_load_str(prefab_data, &h);
@@ -152,7 +156,8 @@ void foreach_components_clb(yaml_node_t key,
     yaml_as_string(key, uid_str, CEL_ARRAY_LEN(uid_str));
 
     yaml_node_t component_type_node = yaml_get_node(value, "component_type");
-    yaml_as_string(component_type_node, component_type_str, CEL_ARRAY_LEN(component_type_str));
+    yaml_as_string(component_type_node, component_type_str,
+                   CEL_ARRAY_LEN(component_type_str));
 
     cid = stringid64_from_string(component_type_str);
 
@@ -180,10 +185,12 @@ void foreach_components_clb(yaml_node_t key,
         MAP_SET(array_yaml_node_t, &output->component_body, cid.id, tmp_a);
 
     }
-    ARRAY_T(u32) *tmp_a = MAP_GET_PTR(array_u32, &output->component_ent, cid.id);
+    ARRAY_T(u32) *tmp_a = MAP_GET_PTR(array_u32, &output->component_ent,
+                                      cid.id);
     ARRAY_PUSH_BACK(u32, tmp_a, data->ent_id);
 
-    ARRAY_T(yaml_node_t) *tmp_b = MAP_GET_PTR(array_yaml_node_t, &output->component_body, cid.id);
+    ARRAY_T(yaml_node_t) *tmp_b = MAP_GET_PTR(array_yaml_node_t,
+                                              &output->component_body, cid.id);
     ARRAY_PUSH_BACK(yaml_node_t, tmp_b, value);
 }
 
@@ -245,7 +252,9 @@ struct component_data {
 struct entity_compile_output *unit_compiler_create_output() {
     struct cel_allocator *a = MemSysApiV0.main_allocator();
 
-    struct entity_compile_output *output = CEL_ALLOCATE(a, struct entity_compile_output, 1);
+    struct entity_compile_output *output = CEL_ALLOCATE(a,
+                                                        struct entity_compile_output,
+                                                        1);
     output->ent_counter = 0;
     ARRAY_INIT(u64, &output->component_type, a);
     MAP_INIT(array_u32, &output->component_ent, a);
@@ -260,8 +269,10 @@ void unit_compiler_destroy_output(struct entity_compile_output *output) {
     MAP_DESTROY(u32, &output->entity_parent);
 
     // clean inner array
-    const MAP_ENTRY_T(array_u32) *ce_it = MAP_BEGIN(array_u32, &output->component_ent);
-    const MAP_ENTRY_T(array_u32) *ce_end = MAP_END(array_u32, &output->component_ent);
+    const MAP_ENTRY_T(array_u32) *ce_it = MAP_BEGIN(array_u32,
+                                                    &output->component_ent);
+    const MAP_ENTRY_T(array_u32) *ce_end = MAP_END(array_u32,
+                                                   &output->component_ent);
     while (ce_it != ce_end) {
         ARRAY_DESTROY(u32, (struct array_u32 *) &ce_it->value);
         ++ce_it;
@@ -269,8 +280,10 @@ void unit_compiler_destroy_output(struct entity_compile_output *output) {
     MAP_DESTROY(array_u32, &output->component_ent);
 
     // clean inner array
-    const MAP_ENTRY_T(array_yaml_node_t) *cb_it = MAP_BEGIN(array_yaml_node_t, &output->component_body);
-    const MAP_ENTRY_T(array_yaml_node_t) *cb_end = MAP_END(array_yaml_node_t, &output->component_body);
+    const MAP_ENTRY_T(array_yaml_node_t) *cb_it = MAP_BEGIN(array_yaml_node_t,
+                                                            &output->component_body);
+    const MAP_ENTRY_T(array_yaml_node_t) *cb_end = MAP_END(array_yaml_node_t,
+                                                           &output->component_body);
     while (cb_it != cb_end) {
         ARRAY_DESTROY(yaml_node_t, (struct array_yaml_node_t *) &cb_it->value);
         ++cb_it;
@@ -318,25 +331,30 @@ void unit_compiler_write_to_build(struct entity_compile_output *output,
         u64 cid = ARRAY_AT(&output->component_type, j);
         stringid64_t id = {.id = cid};
 
-        ARRAY_T(u32) *ent_arr = MAP_GET_PTR(array_u32, &output->component_ent, cid);
+        ARRAY_T(u32) *ent_arr = MAP_GET_PTR(array_u32, &output->component_ent,
+                                            cid);
 
         struct component_data cdata = {
                 .ent_count = ARRAY_SIZE(ent_arr)
         };
 
-        ARRAY_T(yaml_node_t) *body = MAP_GET_PTR(array_yaml_node_t, &output->component_body, cid);
+        ARRAY_T(yaml_node_t) *body = MAP_GET_PTR(array_yaml_node_t,
+                                                 &output->component_body, cid);
         ARRAY_T(u8) comp_data = {0};
         ARRAY_INIT(u8, &comp_data, MemSysApiV0.main_allocator());
 
         for (int i = 0; i < cdata.ent_count; ++i) {
-            EntComSystemApiV0.component_compile(id, ARRAY_AT(body, i), &comp_data);
+            EntComSystemApiV0.component_compile(id, ARRAY_AT(body, i),
+                                                &comp_data);
         }
 
         cdata.size = ARRAY_SIZE(&comp_data);
 
         ARRAY_PUSH(u8, build, (u8 *) &cdata, sizeof(cdata));
-        ARRAY_PUSH(u8, build, (u8 *) ARRAY_BEGIN(ent_arr), sizeof(u32) * cdata.ent_count);
-        ARRAY_PUSH(u8, build, ARRAY_BEGIN(&comp_data), sizeof(u8) * ARRAY_SIZE(&comp_data));
+        ARRAY_PUSH(u8, build, (u8 *) ARRAY_BEGIN(ent_arr),
+                   sizeof(u32) * cdata.ent_count);
+        ARRAY_PUSH(u8, build, ARRAY_BEGIN(&comp_data),
+                   sizeof(u8) * ARRAY_SIZE(&comp_data));
 
         ARRAY_DESTROY(u8, &comp_data);
     }
@@ -359,7 +377,8 @@ int _unit_resource_compiler(const char *filename,
                             struct compilator_api *compilator_api) {
     char source_data[cel_vio_size(source_vio) + 1];
     memory_set(source_data, 0, cel_vio_size(source_vio) + 1);
-    cel_vio_read(source_vio, source_data, sizeof(char), cel_vio_size(source_vio));
+    cel_vio_read(source_vio, source_data, sizeof(char),
+                 cel_vio_size(source_vio));
 
     yaml_document_t h;
     yaml_node_t root = yaml_load_str(source_data, &h);
@@ -369,7 +388,8 @@ int _unit_resource_compiler(const char *filename,
 
     unit_resource_compiler(root, filename, &unit_data, compilator_api);
 
-    cel_vio_write(build_vio, &ARRAY_AT(&unit_data, 0), sizeof(u8), ARRAY_SIZE(&unit_data));
+    cel_vio_write(build_vio, &ARRAY_AT(&unit_data, 0), sizeof(u8),
+                  ARRAY_SIZE(&unit_data));
 
 
     ARRAY_DESTROY(u8, &unit_data);
@@ -457,7 +477,8 @@ ARRAY_T(entity_t) *unit_spawn_from_resource(world_t world,
     ARRAY_T(entity_t) *spawned = _get_spawned_array_by_idx(idx);
 
     for (int j = 0; j < res->ent_count; ++j) {
-        ARRAY_PUSH_BACK(entity_t, spawned, EntComSystemApiV0.entity_manager_create());
+        ARRAY_PUSH_BACK(entity_t, spawned,
+                        EntComSystemApiV0.entity_manager_create());
     }
 
     entity_t root = ARRAY_AT(spawned, 0);
@@ -471,7 +492,8 @@ ARRAY_T(entity_t) *unit_spawn_from_resource(world_t world,
 
         u32 *c_ent = component_data_ent(comp_data);
         char *c_data = component_data_data(comp_data);
-        EntComSystemApiV0.component_spawn(world, type, &ARRAY_AT(spawned, 0), c_ent, parents, comp_data->ent_count,
+        EntComSystemApiV0.component_spawn(world, type, &ARRAY_AT(spawned, 0),
+                                          c_ent, parents, comp_data->ent_count,
                                           c_data);
 
         comp_data = (struct component_data *) (c_data + comp_data->size);
@@ -503,7 +525,8 @@ void unit_destroy(world_t world,
     for (int i = 0; i < count; ++i) {
         ARRAY_T(entity_t) *spawned = _get_spawned_array(unit[i]);
 
-        EntComSystemApiV0.component_destroy(world, spawned->data, spawned->size);
+        EntComSystemApiV0.component_destroy(world, spawned->data,
+                                            spawned->size);
 
         _destroy_spawned_array(unit[i]);
     }

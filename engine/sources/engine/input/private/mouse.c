@@ -5,7 +5,6 @@
 #include <celib/math/types.h>
 #include <engine/plugin/plugin_api.h>
 #include "engine/machine/machine.h"
-#include "celib/string/string.h"
 
 #include "engine/input/mouse.h"
 
@@ -110,28 +109,32 @@ u32 mouse_button_index(const char *button_name) {
 }
 
 const char *mouse_button_name(const u32 button_index) {
-    CEL_ASSERT(LOG_WHERE, (button_index >= 0) && (button_index < MOUSE_BTN_MAX));
+    CEL_ASSERT(LOG_WHERE,
+               (button_index >= 0) && (button_index < MOUSE_BTN_MAX));
 
     return _btn_to_str[button_index];
 }
 
 int mouse_button_state(u32 idx,
                        const u32 button_index) {
-    CEL_ASSERT(LOG_WHERE, (button_index >= 0) && (button_index < MOUSE_BTN_MAX));
+    CEL_ASSERT(LOG_WHERE,
+               (button_index >= 0) && (button_index < MOUSE_BTN_MAX));
 
     return _G.state[button_index];
 }
 
 int mouse_button_pressed(u32 idx,
                          const u32 button_index) {
-    CEL_ASSERT(LOG_WHERE, (button_index >= 0) && (button_index < MOUSE_BTN_MAX));
+    CEL_ASSERT(LOG_WHERE,
+               (button_index >= 0) && (button_index < MOUSE_BTN_MAX));
 
     return _G.state[button_index] && !_G.last_state[button_index];
 }
 
 int mouse_button_released(u32 idx,
                           const u32 button_index) {
-    CEL_ASSERT(LOG_WHERE, (button_index >= 0) && (button_index < MOUSE_BTN_MAX));
+    CEL_ASSERT(LOG_WHERE,
+               (button_index >= 0) && (button_index < MOUSE_BTN_MAX));
 
     return !_G.state[button_index] && _G.last_state[button_index];
 }

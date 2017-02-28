@@ -12,7 +12,6 @@
 
 #include "task_queue.h"
 #include "../task.h"
-#include "engine/memory/memsys.h"
 
 
 //==============================================================================
@@ -163,18 +162,22 @@ static void _init(get_api_fce_t get_engine_api) {
     static const uint32_t main_threads_count = 1;
     const uint32_t worker_count = core_count - main_threads_count;
 
-    log_info("task", "Core/Main/Worker: %d, %d, %d", core_count, main_threads_count, worker_count);
+    log_info("task", "Core/Main/Worker: %d, %d, %d", core_count,
+             main_threads_count, worker_count);
 
     _G._workers_count = worker_count;
 
     queue_task_init(&_G._gloalQueue, MAX_TASK, MemSysApiV0.main_allocator());
 
     for (int i = 0; i < worker_count + 1; ++i) {
-        queue_task_init(&_G._workers_queue[i], MAX_TASK, MemSysApiV0.main_allocator());
+        queue_task_init(&_G._workers_queue[i], MAX_TASK,
+                        MemSysApiV0.main_allocator());
     }
 
     for (int j = 0; j < worker_count; ++j) {
-        _G._workers[j] = cel_thread_create((thread_fce_t) _task_worker, "worker", (void *) ((intptr_t) (j + 1)));
+        _G._workers[j] = cel_thread_create((thread_fce_t) _task_worker,
+                                           "worker",
+                                           (void *) ((intptr_t) (j + 1)));
     }
 
     _G._Run = 1;
@@ -226,7 +229,8 @@ int taskmanager_do_work() {
         return 0;
     }
 
-    struct scope_data sd = DevelopSystemApiV0.enter_scope(_G._task_pool[t.id].name);
+    struct scope_data sd = DevelopSystemApiV0.enter_scope(
+            _G._task_pool[t.id].name);
 
     _G._task_pool[t.id].task_work(_G._task_pool[t.id].data);
 

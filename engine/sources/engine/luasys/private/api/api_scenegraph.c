@@ -2,7 +2,6 @@
 #include <engine/world/scenegraph.h>
 #include <engine/plugin/plugin.h>
 #include "../luasys.h"
-#include <engine/plugin/plugin_api.h>
 
 #define API_NAME "SceneGraph"
 
@@ -97,17 +96,24 @@ static int _scenegraph_link(lua_State *l) {
 }
 
 void _register_lua_scenegraph_api(get_api_fce_t get_engine_api) {
-    SceneGprahApiV0 = *((struct SceneGprahApiV0 *) get_engine_api(SCENEGRAPH_API_ID, 0));
+    SceneGprahApiV0 = *((struct SceneGprahApiV0 *) get_engine_api(
+            SCENEGRAPH_API_ID, 0));
 
     luasys_add_module_function(API_NAME, "has", _scenegraph_has);
-    luasys_add_module_function(API_NAME, "node_by_name", _scenegraph_node_by_name);
+    luasys_add_module_function(API_NAME, "node_by_name",
+                               _scenegraph_node_by_name);
 
-    luasys_add_module_function(API_NAME, "get_position", _scenegraph_get_position);
-    luasys_add_module_function(API_NAME, "get_rotation", _scenegraph_get_rotation);
+    luasys_add_module_function(API_NAME, "get_position",
+                               _scenegraph_get_position);
+    luasys_add_module_function(API_NAME, "get_rotation",
+                               _scenegraph_get_rotation);
     luasys_add_module_function(API_NAME, "get_scale", _scenegraph_get_scale);
-    luasys_add_module_function(API_NAME, "get_world_matrix", _scenegraph_get_world_matrix);
+    luasys_add_module_function(API_NAME, "get_world_matrix",
+                               _scenegraph_get_world_matrix);
 
-    luasys_add_module_function(API_NAME, "set_position", _scenegraph_set_position);
-    luasys_add_module_function(API_NAME, "set_rotation", _scenegraph_set_rotation);
+    luasys_add_module_function(API_NAME, "set_position",
+                               _scenegraph_set_position);
+    luasys_add_module_function(API_NAME, "set_rotation",
+                               _scenegraph_set_rotation);
     luasys_add_module_function(API_NAME, "set_scale", _scenegraph_set_scale);
 }

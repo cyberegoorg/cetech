@@ -7,12 +7,17 @@
 //==============================================================================
 // Includes
 //==============================================================================
+
 #include <celib/containers/map.h>
 #include <celib/yaml/yaml.h>
 #include <celib/string/stringid.h>
 #include <celib/handler/handlerid.h>
 #include <engine/world/world.h>
 
+
+//==============================================================================
+// Typedefs
+//==============================================================================
 
 //! Entity typedef
 typedef struct {
@@ -53,6 +58,11 @@ typedef void (*component_spawner_t)(world_t world,
                                     size_t ent_count,
                                     void *data);
 
+
+//==============================================================================
+// Structs
+//==============================================================================
+
 //! Component callbacks
 static struct component_clb {
     component_spawner_t spawner;         //!< Spawner
@@ -62,6 +72,10 @@ static struct component_clb {
     world_on_update_t on_world_update;   //!< On world update
 } component_clb_null = {0};
 
+
+//==============================================================================
+// Api
+//==============================================================================
 
 //! Entity component system API V0
 struct EntComSystemApiV0 {

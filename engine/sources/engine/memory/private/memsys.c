@@ -24,8 +24,9 @@ void memsys_init(int scratch_buffer_size) {
 
     _G.default_allocator = malloc_allocator_create();
 
-    _G.default_scratch_allocator = scratch_allocator_create(_G.default_allocator,
-                                                            scratch_buffer_size);
+    _G.default_scratch_allocator = scratch_allocator_create(
+            _G.default_allocator,
+            scratch_buffer_size);
 }
 
 void memsys_shutdown() {

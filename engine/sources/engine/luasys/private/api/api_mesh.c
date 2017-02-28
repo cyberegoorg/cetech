@@ -3,7 +3,6 @@
 #include <engine/renderer/mesh_renderer.h>
 #include <engine/plugin/plugin.h>
 #include "../luasys.h"
-#include <engine/plugin/plugin_api.h>
 
 #define API_NAME "Mesh"
 

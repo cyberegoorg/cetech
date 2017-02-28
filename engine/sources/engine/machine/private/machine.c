@@ -7,7 +7,6 @@
 #include "../machine.h"
 #include "sdl2/sdl_parts.h"
 #include <engine/memory/memsys.h>
-#include <engine/plugin/plugin_api.h>
 
 //==============================================================================
 // Defines
@@ -62,13 +61,17 @@ static void _init(get_api_fce_t get_engine_api) {
     eventstream_create(&_G.eventstream, _memsys_main_allocator());
 
     machine_register_part("sdl", sdl_init, sdl_shutdown, sdl_process);
-    machine_register_part("sdl_keyboard", sdl_keyboard_init, sdl_keyboard_shutdown, sdl_keyboard_process);
-    machine_register_part("sdl_mouse", sdl_mouse_init, sdl_mouse_shutdown, sdl_mouse_process);
-    machine_register_part("sdl_gamepad", sdl_gamepad_init, sdl_gamepad_shutdown, sdl_gamepad_process);
+    machine_register_part("sdl_keyboard", sdl_keyboard_init,
+                          sdl_keyboard_shutdown, sdl_keyboard_process);
+    machine_register_part("sdl_mouse", sdl_mouse_init, sdl_mouse_shutdown,
+                          sdl_mouse_process);
+    machine_register_part("sdl_gamepad", sdl_gamepad_init, sdl_gamepad_shutdown,
+                          sdl_gamepad_process);
 
     for (int i = 0; i < _G.parts_count; ++i) {
         if (!_G.init[i](get_engine_api)) {
-            log_error(LOG_WHERE, "Could not init machine part \"%s\"", _G.name[i]);
+            log_error(LOG_WHERE, "Could not init machine part \"%s\"",
+                      _G.name[i]);
 
             for (i = i - 1; i >= 0; --i) {
                 _G.shutdown[i]();
