@@ -19,7 +19,7 @@
 
 
 IMPORT_API(ConsoleServerApi, 0);
-IMPORT_API(MeshApi, 0);
+IMPORT_API(MeshRendererApi, 0);
 IMPORT_API(CameraApi, 0);
 IMPORT_API(ConfigApi, 0);
 IMPORT_API(ApplicationApi, 0);
@@ -70,7 +70,7 @@ static int _cmd_resize(mpack_node_t args,
 
 static void _init(get_api_fce_t get_engine_api) {
     INIT_API(ConsoleServerApi, CONSOLE_SERVER_API_ID, 0);
-    INIT_API(MeshApi, MESH_API_ID, 0);
+    INIT_API(MeshRendererApi, MESH_API_ID, 0);
     INIT_API(CameraApi, CAMERA_API_ID, 0);
     INIT_API(ConfigApi, CONFIG_API_ID, 0);
     INIT_API(ApplicationApi, APPLICATION_API_ID, 0);
@@ -148,7 +148,7 @@ void renderer_render_world(world_t world,
     bgfx_touch(0);
     bgfx_dbg_text_clear(0, 0);
 
-    MeshApiV0.render_all(world);
+    MeshRendererApiV0.render_all(world);
 
     bgfx_frame(0);
     cel_window_update(ApplicationApiV0.main_window());

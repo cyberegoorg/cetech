@@ -36,10 +36,15 @@ IMPORT_API(LuaSysApi, 0);
 IMPORT_API(ConfigApi, 0);
 
 //==============================================================================
-// Globals
+// Definess
 //==============================================================================
 
 #define _G ApplicationGlobals
+
+
+//==============================================================================
+// Globals
+//==============================================================================
 
 static struct G {
     struct {
@@ -62,7 +67,7 @@ static struct G {
     int is_running;
     int init_error;
     float dt;
-} ApplicationGlobals = {0};
+} _G = {0};
 
 
 //==============================================================================
@@ -70,6 +75,11 @@ static struct G {
 //==============================================================================
 
 static char _get_worker_id() {
+    return 0;
+}
+
+static int _cmd_wait(mpack_node_t args,
+                     mpack_writer_t *writer) {
     return 0;
 }
 
@@ -88,10 +98,6 @@ void application_quit() {
     _G.init_error = 0;
 }
 
-static int _cmd_wait(mpack_node_t args,
-                     mpack_writer_t *writer) {
-    return 0;
-}
 
 static struct ApplicationApiV0 api_v1 = {
         .quit = application_quit,
@@ -113,32 +119,7 @@ void _init_api() {
 #undef get_engine_api
 }
 
-int application_init(int argc,
-                     const char **argv) {
-    _G = (struct G) {0};
-    _G.args = (struct args) {.argc = argc, .argv = argv};
-
-    log_init(_get_worker_id);
-    log_register_handler(log_stdout_handler, NULL);
-    logdb_init_db(".");
-
-    log_debug(LOG_WHERE, "Init (global size: %lu)", sizeof(struct G));
-
-    memsys_init(4 * 1024 * 1024);
-
-    ADD_STATIC_PLUGIN(memsys);
-    ADD_STATIC_PLUGIN(config);
-    ADD_STATIC_PLUGIN(application);
-
-    cvar_init();
-
-    _init_static_plugins();
-
-    plugin_load_dirs("./bin");
-    plugin_call_init_cvar();
-
-    _init_api();
-
+int _init_config() {
     _G.config.boot_pkg = ConfigApiV0.new_str("core.boot_pkg", "Boot package",
                                              "boot");
     _G.config.boot_script = ConfigApiV0.new_str("core.boot_script",
@@ -172,6 +153,39 @@ int application_init(int argc,
     }
 
     ConfigApiV0.log_all();
+
+    return 1;
+}
+
+int application_init(int argc,
+                     const char **argv) {
+    _G = (struct G) {0};
+    _G.args = (struct args) {.argc = argc, .argv = argv};
+
+    log_init(_get_worker_id);
+    log_register_handler(log_stdout_handler, NULL);
+    logdb_init_db(".");
+
+    log_debug(LOG_WHERE, "Init (global size: %lu)", sizeof(struct G));
+
+    memsys_init(4 * 1024 * 1024);
+
+    ADD_STATIC_PLUGIN(memsys);
+    ADD_STATIC_PLUGIN(config);
+    ADD_STATIC_PLUGIN(application);
+
+    cvar_init();
+
+    _init_static_plugins();
+
+    plugin_load_dirs("./bin");
+    plugin_call_init_cvar();
+
+    _init_api();
+
+    if( !_init_config()) {
+        return 0;
+    };
 
     plugin_call_init();
 
@@ -324,7 +338,6 @@ void application_start() {
 
     _boot_unload();
 }
-
 
 const char *application_native_platform() {
 #if defined(CETECH_LINUX)

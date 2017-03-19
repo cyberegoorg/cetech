@@ -20,7 +20,7 @@
 //! Mesh typedef
 typedef struct {
     u32 idx;
-} mesh_t;
+} mesh_renderer_t;
 
 
 //==============================================================================
@@ -28,12 +28,12 @@ typedef struct {
 //==============================================================================
 
 //! Mesh API V0
-struct MeshApiV0 {
+struct MeshRendererApiV0 {
 
     //! Is mesh valid
     //! \param mesh Mesh
     //! \return 1 if is valid else 0
-    int (*is_valid)(mesh_t mesh);
+    int (*is_valid)(mesh_renderer_t mesh);
 
     //! Has entity mesh renderer?
     //! \param world World
@@ -46,7 +46,7 @@ struct MeshApiV0 {
     //! \param world World
     //! \param entity Entity
     //! \return Mesh renderer
-    mesh_t (*get)(world_t world,
+    mesh_renderer_t (*get)(world_t world,
                   entity_t entity);
 
     //! Create new mesh render
@@ -57,7 +57,7 @@ struct MeshApiV0 {
     //! \param node Node
     //! \param material Material
     //! \return Mesh renderer
-    mesh_t (*create)(world_t world,
+    mesh_renderer_t (*create)(world_t world,
                      entity_t entity,
                      stringid64_t scene,
                      stringid64_t mesh,
@@ -69,14 +69,14 @@ struct MeshApiV0 {
     //! \param mesh Mesh
     //! \return Material
     material_t (*get_material)(world_t world,
-                               mesh_t mesh);
+                               mesh_renderer_t mesh);
 
     //! Set material
     //! \param world World
     //! \param mesh Mesh
     //! \param material Material
     void (*set_material)(world_t world,
-                         mesh_t mesh,
+                         mesh_renderer_t mesh,
                          stringid64_t material);
 
     //! Render all mesh in world
