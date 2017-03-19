@@ -1,9 +1,9 @@
 //==============================================================================
 // Static engine system configuration
 //==============================================================================
-#include "engine/plugin/plugin.h"
+#include "engine/module/module.h"
 
-static void _init_static_plugins() {
+static void _init_static_modules() {
     ADD_STATIC_PLUGIN(machine);
     ADD_STATIC_PLUGIN(task);
 

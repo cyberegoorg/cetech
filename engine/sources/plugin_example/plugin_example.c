@@ -1,6 +1,6 @@
 #include <stdio.h>
 
-#include "engine/plugin/plugin_api.h"
+#include "engine/module/module_api.h"
 #include "engine/input/keyboard.h"
 
 static struct KeyboardApiV0 KeyboardApiV0 = {0};
@@ -38,7 +38,7 @@ static void _init(get_api_fce_t get_engine_api) {
 
     printf("FOOOOO: %d", 11561651);
 //
-//    alloc = mem->create_plugin_allocator("example");
+//    alloc = mem->create_module_allocator("example");
 //
 //    lua->add_module_function("example", "foo", _foo);
 //    lua->add_module_function("example", "foo2", _foo2);
@@ -47,11 +47,11 @@ static void _init(get_api_fce_t get_engine_api) {
 }
 
 static void _shutdown() {
-    //mem->destroy_plugin_allocator(alloc);
+    //mem->destroy_module_allocator(alloc);
 }
 
 static void *_reload_begin(get_api_fce_t get_engine_api) {
-    //log->info("plugin_example", "Reload begin");
+    //log->info("module_example", "Reload begin");
 
     return NULL;
 }
@@ -68,19 +68,19 @@ static void _reload_end(get_api_fce_t get_engine_api,
     _init(get_engine_api);
 }
 
-void *get_plugin_api(int api,
+void *get_module_api(int api,
                      int version) {
 
     if (api == PLUGIN_EXPORT_API_ID && version == 0) {
-        static struct plugin_api_v0 plugin = {0};
+        static struct module_api_v0 module = {0};
 
-        plugin.init = _init;
-        plugin.shutdown = _shutdown;
-        plugin.reload_begin = _reload_begin;
-        plugin.reload_end = _reload_end;
-        plugin.update = _update;
+        module.init = _init;
+        module.shutdown = _shutdown;
+        module.reload_begin = _reload_begin;
+        module.reload_end = _reload_end;
+        module.update = _update;
 
-        return &plugin;
+        return &module;
     }
 
     return 0;

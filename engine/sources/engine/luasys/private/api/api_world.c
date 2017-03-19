@@ -1,6 +1,6 @@
 
 #include <engine/world/world.h>
-#include <engine/plugin/plugin.h>
+#include <engine/module/module.h>
 #include "../luasys.h"
 
 #define API_NAME "World"

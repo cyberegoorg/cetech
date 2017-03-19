@@ -4,7 +4,7 @@
 
 #include <celib/math/types.h>
 #include <engine/input/gamepad.h>
-#include <engine/plugin/plugin_api.h>
+#include <engine/module/module_api.h>
 #include "engine/machine/machine.h"
 
 #include "gamepadstr.h"
@@ -185,17 +185,17 @@ void gamepad_play_rumble(u32 idx,
     MachineApiV0.gamepad_play_rumble(idx, strength, length);
 }
 
-void *gamepad_get_plugin_api(int api,
+void *gamepad_get_module_api(int api,
                              int version) {
 
     if (api == PLUGIN_EXPORT_API_ID && version == 0) {
-        static struct plugin_api_v0 plugin = {0};
+        static struct module_api_v0 module = {0};
 
-        plugin.init = _init;
-        plugin.shutdown = _shutdown;
-        plugin.update = _update;
+        module.init = _init;
+        module.shutdown = _shutdown;
+        module.update = _update;
 
-        return &plugin;
+        return &module;
 
     } else if (api == GAMEPAD_API_ID && version == 0) {
         static struct GamepadApiV0 api_v1 = {

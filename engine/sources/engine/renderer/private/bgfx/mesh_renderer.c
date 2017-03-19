@@ -13,7 +13,7 @@
 #include <celib/math/mat44f.h>
 
 #include <engine/memory/memsys.h>
-#include <engine/plugin/plugin_api.h>
+#include <engine/module/module_api.h>
 
 
 IMPORT_API(MemSysApi, 0);
@@ -21,7 +21,7 @@ IMPORT_API(SceneGprahApi, 0);
 IMPORT_API(TransformApi, 0);
 IMPORT_API(EntComSystemApi, 0);
 IMPORT_API(MaterialApi, 0);
-IMPORT_API(MeshApi, 0);
+IMPORT_API(MeshRendererApi, 0);
 
 
 #define LOG_WHERE "mesh_renderer"
@@ -29,7 +29,6 @@ IMPORT_API(MeshApi, 0);
 ARRAY_PROTOTYPE(stringid64_t)
 
 ARRAY_PROTOTYPE(material_t)
-
 
 struct mesh_data {
     stringid64_t scene;
@@ -158,7 +157,7 @@ static void _spawner(world_t world,
     struct mesh_data *tdata = data;
 
     for (int i = 0; i < ent_count; ++i) {
-        MeshApiV0.create(world,
+        MeshRendererApiV0.create(world,
                          ents[cents[i]],
                          tdata[i].scene,
                          tdata[i].mesh,
@@ -172,7 +171,7 @@ static void _init(get_api_fce_t get_engine_api) {
     INIT_API(EntComSystemApi, ENTCOM_API_ID, 0);
     INIT_API(MemSysApi, MEMORY_API_ID, 0);
     INIT_API(MaterialApi, MATERIAL_API_ID, 0);
-    INIT_API(MeshApi, MESH_API_ID, 0);
+    INIT_API(MeshRendererApi, MESH_API_ID, 0);
     INIT_API(SceneGprahApi, SCENEGRAPH_API_ID, 0);
     INIT_API(TransformApi, TRANSFORM_API_ID, 0);
 
@@ -200,7 +199,7 @@ static void _shutdown() {
 }
 
 
-int mesh_is_valid(mesh_t mesh) {
+int mesh_is_valid(mesh_renderer_t mesh) {
     return mesh.idx != UINT32_MAX;
 }
 
@@ -210,15 +209,15 @@ int mesh_has(world_t world,
     return MAP_HAS(u32, &world_data->ent_idx_map, entity.h.h);
 }
 
-mesh_t mesh_get(world_t world,
+mesh_renderer_t mesh_get(world_t world,
                 entity_t entity) {
 
     world_data_t *world_data = _get_world_data(world);
     u32 idx = MAP_GET(u32, &world_data->ent_idx_map, entity.h.h, UINT32_MAX);
-    return (mesh_t) {.idx = idx};
+    return (mesh_renderer_t) {.idx = idx};
 }
 
-mesh_t mesh_create(world_t world,
+mesh_renderer_t mesh_create(world_t world,
                    entity_t entity,
                    stringid64_t scene,
                    stringid64_t mesh,
@@ -244,7 +243,7 @@ mesh_t mesh_create(world_t world,
     ARRAY_PUSH_BACK(stringid64_t, &data->node, node);
     ARRAY_PUSH_BACK(material_t, &data->material, material_instance);
 
-    return (mesh_t) {.idx = idx};
+    return (mesh_renderer_t) {.idx = idx};
 }
 
 void mesh_render_all(world_t world) {
@@ -289,7 +288,7 @@ void mesh_render_all(world_t world) {
 }
 
 material_t mesh_get_material(world_t world,
-                             mesh_t mesh) {
+                             mesh_renderer_t mesh) {
     CEL_ASSERT(LOG_WHERE, mesh.idx != UINT32_MAX);
     world_data_t *data = _get_world_data(world);
 
@@ -297,7 +296,7 @@ material_t mesh_get_material(world_t world,
 }
 
 void mesh_set_material(world_t world,
-                       mesh_t mesh,
+                       mesh_renderer_t mesh,
                        stringid64_t material) {
     world_data_t *data = _get_world_data(world);
 
@@ -306,19 +305,19 @@ void mesh_set_material(world_t world,
 }
 
 
-void *mesh_get_plugin_api(int api,
+void *mesh_get_module_api(int api,
                           int version) {
 
     switch (api) {
         case PLUGIN_EXPORT_API_ID:
             switch (version) {
                 case 0: {
-                    static struct plugin_api_v0 plugin = {0};
+                    static struct module_api_v0 module = {0};
 
-                    plugin.init = _init;
-                    plugin.shutdown = _shutdown;
+                    module.init = _init;
+                    module.shutdown = _shutdown;
 
-                    return &plugin;
+                    return &module;
                 }
 
                 default:
@@ -327,7 +326,7 @@ void *mesh_get_plugin_api(int api,
         case MESH_API_ID:
             switch (version) {
                 case 0: {
-                    static struct MeshApiV0 api = {0};
+                    static struct MeshRendererApiV0 api = {0};
 
                     api.is_valid = mesh_is_valid;
                     api.has = mesh_has;

@@ -3,7 +3,7 @@
 //==============================================================================
 
 #include <celib/math/types.h>
-#include <engine/plugin/plugin_api.h>
+#include <engine/module/module_api.h>
 #include "engine/machine/machine.h"
 
 #include "engine/input/mouse.h"
@@ -181,17 +181,17 @@ void mouse_set_cursor_pos(cel_vec2f_t pos) {
 
 }
 
-void *mouse_get_plugin_api(int api,
+void *mouse_get_module_api(int api,
                            int version) {
 
     if (api == PLUGIN_EXPORT_API_ID && version == 0) {
-        static struct plugin_api_v0 plugin = {0};
+        static struct module_api_v0 module = {0};
 
-        plugin.init = _init;
-        plugin.shutdown = _shutdown;
-        plugin.update = _update;
+        module.init = _init;
+        module.shutdown = _shutdown;
+        module.update = _update;
 
-        return &plugin;
+        return &module;
 
     } else if (api == MOUSE_API_ID && version == 0) {
         static struct MouseApiV0 api_v1 = {

@@ -1,4 +1,4 @@
-#include <engine/plugin/plugin.h>
+#include <engine/module/module.h>
 #include "../luasys.h"
 #include "engine/input/keyboard.h"
 

@@ -10,7 +10,7 @@
 #include <celib/math/vec2f.h>
 
 #include "engine/develop/console_server.h"
-#include "engine/plugin/plugin.h"
+#include "engine/module/module.h"
 
 #include "vectors.h"
 #include "quaternion.h"
@@ -115,58 +115,7 @@ cel_quatf_t *_new_tmp_quat() {
 //==============================================================================
 // Lua resource
 //==============================================================================
-
-void *lua_resource_loader(struct vio *input,
-                          struct cel_allocator *allocator) {
-    const i64 size = cel_vio_size(input);
-    char *data = CEL_ALLOCATE(allocator, char, size);
-    cel_vio_read(input, data, 1, size);
-
-    return data;
-}
-
-void lua_resource_unloader(void *new_data,
-                           struct cel_allocator *allocator) {
-    CEL_DEALLOCATE(allocator, new_data);
-}
-
-void lua_resource_online(stringid64_t name,
-                         void *data) {
-}
-
-void lua_resource_offline(stringid64_t name,
-                          void *data) {
-
-}
-
-void *lua_resource_reloader(stringid64_t name,
-                            void *old_data,
-                            void *new_data,
-                            struct cel_allocator *allocator) {
-    CEL_DEALLOCATE(allocator, old_data);
-
-    struct lua_resource *resource = new_data;
-    char *data = (char *) (resource + 1);
-
-    luaL_loadbuffer(_G.L, data, resource->size, "<unknown>");
-
-    if (lua_pcall(_G.L, 0, 0, 0)) {
-        const char *last_error = lua_tostring(_G.L, -1);
-        lua_pop(_G.L, 1);
-        log_error(LOG_WHERE, "%s", last_error);
-    }
-
-    return new_data;
-}
-
-static const resource_callbacks_t lua_resource_callback = {
-        .loader = lua_resource_loader,
-        .unloader =lua_resource_unloader,
-        .online =lua_resource_online,
-        .offline =lua_resource_offline,
-        .reloader = lua_resource_reloader
-};
-
+#include "lua_resource.h"
 
 //==============================================================================
 // Game
@@ -209,7 +158,7 @@ static const struct game_callbacks _GameCallbacks = {
 
 static void _register_all_api(get_api_fce_t get_engine_api) {
     REGISTER_LUA_API(log);
-    REGISTER_LUA_API(plugin);
+    REGISTER_LUA_API(module);
     REGISTER_LUA_API(keyboard);
     REGISTER_LUA_API(mouse);
     REGISTER_LUA_API(gamepad);
@@ -231,10 +180,10 @@ static void _register_all_api(get_api_fce_t get_engine_api) {
     REGISTER_LUA_API(scenegraph);
 }
 
-static int _reload_plugin(lua_State *l) {
+static int _reload_module(lua_State *l) {
     size_t len;
     const char *name = luasys_to_string_l(l, 1, &len);
-    plugin_reload(name);
+    module_reload(name);
     return 0;
 }
 
@@ -882,7 +831,7 @@ static void _init(get_api_fce_t get_engine_api) {
 
     _register_all_api(get_engine_api);
 
-    luasys_add_module_function("plugin", "reload", _reload_plugin);
+    luasys_add_module_function("module", "reload", _reload_module);
     ConsoleServerApiV0.consolesrv_register_command("lua_system.execute",
                                                    _cmd_execute_string);
 
@@ -952,18 +901,18 @@ void luasys_call_global(const char *func,
     lua_pop(_state, -1);
 }
 
-void *luasys_get_plugin_api(int api,
+void *luasys_get_module_api(int api,
                             int version) {
     switch (api) {
         case PLUGIN_EXPORT_API_ID:
             switch (version) {
                 case 0: {
-                    static struct plugin_api_v0 plugin = {0};
+                    static struct module_api_v0 module = {0};
 
-                    plugin.init = _init;
-                    plugin.shutdown = _shutdown;
+                    module.init = _init;
+                    module.shutdown = _shutdown;
 
-                    return &plugin;
+                    return &module;
                 }
 
                 default:

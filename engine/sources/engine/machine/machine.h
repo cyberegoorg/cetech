@@ -8,7 +8,7 @@
 #include "celib/math/types.h"
 #include "celib/thread/types.h"
 #include "celib/containers/eventstream.h"
-#include "engine/plugin/plugin.h"
+#include "engine/module/module.h"
 
 //==============================================================================
 // Enums

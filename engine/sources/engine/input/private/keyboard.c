@@ -2,7 +2,7 @@
 // Includes
 //==============================================================================
 
-#include <engine/plugin/plugin.h>
+#include <engine/module/module.h>
 #include "engine/machine/machine.h"
 #include "engine/input/keyboard.h"
 
@@ -115,17 +115,17 @@ int keyboard_button_released(u32 idx,
     return !_G.state[button_index] && _G.last_state[button_index];
 }
 
-void *keyboard_get_plugin_api(int api,
+void *keyboard_get_module_api(int api,
                               int version) {
 
     if (api == PLUGIN_EXPORT_API_ID && version == 0) {
-        static struct plugin_api_v0 plugin = {0};
+        static struct module_api_v0 module = {0};
 
-        plugin.init = _init;
-        plugin.shutdown = _shutdown;
-        plugin.update = _update;
+        module.init = _init;
+        module.shutdown = _shutdown;
+        module.update = _update;
 
-        return &plugin;
+        return &module;
 
     } else if (api == KEYBOARD_API_ID && version == 0) {
         static struct KeyboardApiV0 api_v1 = {

@@ -1,10 +1,9 @@
+import PyQt5
 import ctypes
 import os
 import platform
-import sys
-
-import PyQt5
 import pytest
+import sys
 from PyQt5.QtWidgets import QApplication
 
 ############

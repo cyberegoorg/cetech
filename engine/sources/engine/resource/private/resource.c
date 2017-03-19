@@ -12,8 +12,8 @@
 #include "engine/resource/types.h"
 #include <engine/develop/console_server.h>
 #include <engine/memory/memsys.h>
-#include <engine/plugin/plugin_api.h>
-#include <engine/plugin/plugin.h>
+#include <engine/module/module_api.h>
+#include <engine/module/module.h>
 #include <engine/filesystem/types.h>
 
 #include "resource.h"
@@ -424,7 +424,7 @@ void *resource_get(stringid64_t type,
 void resource_reload(stringid64_t type,
                      stringid64_t *names,
                      size_t count) {
-    plugin_reload_all();
+    module_reload_all();
 
     void *loaded_data[count];
     MAP_T(resource_item_t) *resource_map = _get_resource_map(type);
@@ -491,19 +491,19 @@ void resource_reload_all() {
     ARRAY_DESTROY(stringid64_t, &name_array);
 }
 
-void *resourcesystem_get_plugin_api(int api,
+void *resourcesystem_get_module_api(int api,
                                     int version) {
     switch (api) {
         case PLUGIN_EXPORT_API_ID:
             switch (version) {
                 case 0: {
-                    static struct plugin_api_v0 plugin = {0};
+                    static struct module_api_v0 module = {0};
 
-                    plugin.init = _init;
-                    plugin.shutdown = _shutdown;
-                    plugin.init_cvar = _init_cvar;
+                    module.init = _init;
+                    module.shutdown = _shutdown;
+                    module.init_cvar = _init_cvar;
 
-                    return &plugin;
+                    return &module;
                 }
 
                 default:

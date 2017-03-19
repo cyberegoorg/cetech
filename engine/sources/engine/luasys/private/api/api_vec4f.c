@@ -2,7 +2,7 @@
 #include <engine/world/transform.h>
 #include <celib/math/vec4f.h>
 #include "../luasys.h"
-#include <engine/plugin/plugin_api.h>
+#include <engine/module/module_api.h>
 
 #define API_NAME "Vec4f"
 

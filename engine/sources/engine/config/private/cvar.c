@@ -9,8 +9,8 @@
 #include <celib/filesystem/path.h>
 #include <celib/yaml/yaml.h>
 #include <engine/memory/memsys.h>
-#include <engine/plugin/plugin_api.h>
-#include <engine/plugin/plugin.h>
+#include <engine/module/module_api.h>
+#include <engine/module/module.h>
 #include <celib/string/stringid.h>
 #include "engine/resource/types.h"
 //==============================================================================
@@ -159,7 +159,7 @@ static void _reload_end(get_api_fce_t get_engine_api,
 int cvar_init() {
     log_debug(LOG_WHERE, "Init");
 
-    MemSysApiV0 = *(struct MemSysApiV0 *) plugin_get_engine_api(MEMORY_API_ID,
+    MemSysApiV0 = *(struct MemSysApiV0 *) module_get_engine_api(MEMORY_API_ID,
                                                                 0);
 
     _G.type = stringid64_from_string("config");
@@ -178,9 +178,9 @@ void cvar_compile_global() {
     char source_path[1024] = {0};
     char build_path[1024] = {0};
 
-    struct ResourceApiV0 ResourceApiV0 = *(struct ResourceApiV0 *) plugin_get_engine_api(
+    struct ResourceApiV0 ResourceApiV0 = *(struct ResourceApiV0 *) module_get_engine_api(
             RESOURCE_API_ID, 0);
-    struct ApplicationApiV0 ApplicationApiV0 = *(struct ApplicationApiV0 *) plugin_get_engine_api(
+    struct ApplicationApiV0 ApplicationApiV0 = *(struct ApplicationApiV0 *) module_get_engine_api(
             APPLICATION_API_ID,
             0);
 
@@ -288,9 +288,9 @@ void cvar_load_global() {
     char build_dir[1024] = {0};
     char source_path[1024] = {0};
 
-    struct ResourceApiV0 ResourceApiV0 = *(struct ResourceApiV0 *) plugin_get_engine_api(
+    struct ResourceApiV0 ResourceApiV0 = *(struct ResourceApiV0 *) module_get_engine_api(
             RESOURCE_API_ID, 0);
-    struct ApplicationApiV0 ApplicationApiV0 = *(struct ApplicationApiV0 *) plugin_get_engine_api(
+    struct ApplicationApiV0 ApplicationApiV0 = *(struct ApplicationApiV0 *) module_get_engine_api(
             APPLICATION_API_ID,
             0);
     ResourceApiV0.compiler_get_build_dir(build_dir, CEL_ARRAY_LEN(build_dir),
@@ -551,18 +551,18 @@ void cvar_log_all() {
     }
 }
 
-void *config_get_plugin_api(int api,
+void *config_get_module_api(int api,
                             int version) {
 
     if (api == PLUGIN_EXPORT_API_ID && version == 0) {
-        static struct plugin_api_v0 plugin = {0};
+        static struct module_api_v0 module = {0};
 
-        plugin.init = _init;
-        plugin.shutdown = _shutdown;
-        plugin.reload_begin = _reload_begin;
-        plugin.reload_end = _reload_end;
+        module.init = _init;
+        module.shutdown = _shutdown;
+        module.reload_begin = _reload_begin;
+        module.reload_end = _reload_end;
 
-        return &plugin;
+        return &module;
     } else if (api == CONFIG_API_ID && version == 0) {
         static struct ConfigApiV0 api_v1 = {
                 .load_global = cvar_load_global,

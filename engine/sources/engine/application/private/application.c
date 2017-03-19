@@ -36,10 +36,15 @@ IMPORT_API(LuaSysApi, 0);
 IMPORT_API(ConfigApi, 0);
 
 //==============================================================================
-// Globals
+// Definess
 //==============================================================================
 
 #define _G ApplicationGlobals
+
+
+//==============================================================================
+// Globals
+//==============================================================================
 
 static struct G {
     struct {
@@ -62,7 +67,7 @@ static struct G {
     int is_running;
     int init_error;
     float dt;
-} ApplicationGlobals = {0};
+} _G = {0};
 
 
 //==============================================================================
@@ -70,6 +75,11 @@ static struct G {
 //==============================================================================
 
 static char _get_worker_id() {
+    return 0;
+}
+
+static int _cmd_wait(mpack_node_t args,
+                     mpack_writer_t *writer) {
     return 0;
 }
 
@@ -88,10 +98,6 @@ void application_quit() {
     _G.init_error = 0;
 }
 
-static int _cmd_wait(mpack_node_t args,
-                     mpack_writer_t *writer) {
-    return 0;
-}
 
 static struct ApplicationApiV0 api_v1 = {
         .quit = application_quit,
@@ -101,7 +107,7 @@ static struct ApplicationApiV0 api_v1 = {
 };
 
 void _init_api() {
-#define get_engine_api plugin_get_engine_api
+#define get_engine_api module_get_engine_api
     INIT_API(ConsoleServerApi, CONSOLE_SERVER_API_ID, 0);
     INIT_API(DevelopSystemApi, DEVELOP_SERVER_API_ID, 0);
     INIT_API(RendererApi, RENDERER_API_ID, 0);
@@ -113,32 +119,7 @@ void _init_api() {
 #undef get_engine_api
 }
 
-int application_init(int argc,
-                     const char **argv) {
-    _G = (struct G) {0};
-    _G.args = (struct args) {.argc = argc, .argv = argv};
-
-    log_init(_get_worker_id);
-    log_register_handler(log_stdout_handler, NULL);
-    logdb_init_db(".");
-
-    log_debug(LOG_WHERE, "Init (global size: %lu)", sizeof(struct G));
-
-    memsys_init(4 * 1024 * 1024);
-
-    ADD_STATIC_PLUGIN(memsys);
-    ADD_STATIC_PLUGIN(config);
-    ADD_STATIC_PLUGIN(application);
-
-    cvar_init();
-
-    _init_static_plugins();
-
-    plugin_load_dirs("./bin");
-    plugin_call_init_cvar();
-
-    _init_api();
-
+int _init_config() {
     _G.config.boot_pkg = ConfigApiV0.new_str("core.boot_pkg", "Boot package",
                                              "boot");
     _G.config.boot_script = ConfigApiV0.new_str("core.boot_script",
@@ -173,7 +154,40 @@ int application_init(int argc,
 
     ConfigApiV0.log_all();
 
-    plugin_call_init();
+    return 1;
+}
+
+int application_init(int argc,
+                     const char **argv) {
+    _G = (struct G) {0};
+    _G.args = (struct args) {.argc = argc, .argv = argv};
+
+    log_init(_get_worker_id);
+    log_register_handler(log_stdout_handler, NULL);
+    logdb_init_db(".");
+
+    log_debug(LOG_WHERE, "Init (global size: %lu)", sizeof(struct G));
+
+    memsys_init(4 * 1024 * 1024);
+
+    ADD_STATIC_PLUGIN(memsys);
+    ADD_STATIC_PLUGIN(config);
+    ADD_STATIC_PLUGIN(application);
+
+    cvar_init();
+
+    _init_static_modules();
+
+    module_load_dirs("./bin");
+    module_call_init_cvar();
+
+    _init_api();
+
+    if( !_init_config()) {
+        return 0;
+    };
+
+    module_call_init();
 
     log_set_wid_clb(TaskApiV0.worker_id);
 
@@ -185,7 +199,7 @@ int application_init(int argc,
 int application_shutdown() {
     log_debug(LOG_WHERE, "Shutdown");
 
-    plugin_call_shutdown();
+    module_call_shutdown();
 
     cvar_shutdown();
     memsys_shutdown();
@@ -299,7 +313,7 @@ void application_start() {
         last_tick = now_ticks;
         frame_time_accum += dt;
 
-        plugin_call_update();
+        module_call_update();
         _G.game->update(dt);
 
         if (frame_time_accum >= frame_time) {
@@ -316,7 +330,7 @@ void application_start() {
         DevelopSystemApiV0.leave_scope(application_sd);
         DevelopSystemApiV0.push_record_float("engine.delta_time", dt);
 
-        plugin_call_after_update(dt);
+        module_call_after_update(dt);
         //cel_thread_yield();
     }
 
@@ -324,7 +338,6 @@ void application_start() {
 
     _boot_unload();
 }
-
 
 const char *application_native_platform() {
 #if defined(CETECH_LINUX)
@@ -346,12 +359,12 @@ cel_window_t application_get_main_window() {
 }
 
 
-void *application_get_plugin_api(int api,
+void *application_get_module_api(int api,
                                  int version) {
 
     if (api == PLUGIN_EXPORT_API_ID && version == 0) {
-        static struct plugin_api_v0 plugin = {0};
-        return &plugin;
+        static struct module_api_v0 module = {0};
+        return &module;
     } else if (api == APPLICATION_API_ID && version == 0) {
         return &api_v1;
     }

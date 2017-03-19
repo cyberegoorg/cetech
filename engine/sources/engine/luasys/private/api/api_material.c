@@ -1,7 +1,7 @@
 
 #include <engine/world/transform.h>
 #include <engine/renderer/mesh_renderer.h>
-#include <engine/plugin/plugin.h>
+#include <engine/module/module.h>
 #include "../luasys.h"
 
 #define API_NAME "Material"

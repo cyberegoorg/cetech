@@ -8,7 +8,7 @@
 #include <celib/cpu/cpu.h>
 
 #include <engine/develop/develop_system.h>
-#include <engine/plugin/plugin_api.h>
+#include <engine/module/module_api.h>
 
 #include "task_queue.h"
 #include "../task.h"
@@ -256,7 +256,7 @@ int taskmanager_worker_count() {
     return _G._workers_count;
 }
 
-void *task_get_plugin_api(int api,
+void *task_get_module_api(int api,
                           int version) {
 
 
@@ -264,12 +264,12 @@ void *task_get_plugin_api(int api,
         case PLUGIN_EXPORT_API_ID:
             switch (version) {
                 case 0: {
-                    static struct plugin_api_v0 plugin = {0};
+                    static struct module_api_v0 module = {0};
 
-                    plugin.init = _init;
-                    plugin.shutdown = _shutdown;
+                    module.init = _init;
+                    module.shutdown = _shutdown;
 
-                    return &plugin;
+                    return &module;
                 }
 
                 default:

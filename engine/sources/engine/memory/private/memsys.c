@@ -1,6 +1,6 @@
 #include <celib/memory/memory.h>
 #include <celib/errors/errors.h>
-#include <engine/plugin/plugin_api.h>
+#include <engine/module/module_api.h>
 #include "../memsys.h"
 
 #define LOG_WHERE "memory"
@@ -42,18 +42,18 @@ struct cel_allocator *_memsys_main_scratch_allocator() {
     return _G.default_scratch_allocator;
 }
 
-void *memsys_get_plugin_api(int api,
+void *memsys_get_module_api(int api,
                             int version) {
     switch (api) {
         case PLUGIN_EXPORT_API_ID:
             switch (version) {
                 case 0: {
-                    static struct plugin_api_v0 plugin = {0};
+                    static struct module_api_v0 module = {0};
 
-                    plugin.init = _init;
-                    plugin.shutdown = _shutdown;
+                    module.init = _init;
+                    module.shutdown = _shutdown;
 
-                    return &plugin;
+                    return &module;
                 }
 
                 default:

@@ -4,7 +4,7 @@
 
 #include <include/SDL2/SDL.h>
 #include <celib/math/types.h>
-#include <engine/plugin/plugin_api.h>
+#include <engine/module/module_api.h>
 #include "engine/machine/machine.h"
 
 //==============================================================================
