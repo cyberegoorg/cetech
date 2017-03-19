@@ -16,7 +16,7 @@
 #include "engine/resource/types.h"
 #include "texture.h"
 #include "shader.h"
-
+#include "material_blob.h"
 
 //==============================================================================
 // Structs
@@ -30,26 +30,7 @@ ARRAY_PROTOTYPE(stringid64_t)
 
 MAP_PROTOTYPE(bgfx_program_handle_t)
 
-typedef struct material_blob {
-    stringid64_t shader_name;
-    u32 uniforms_count;
-    u32 texture_count;
-    u32 cel_vec4f_count;
-    u32 mat33f_count;
-    u32 cel_mat44f_count;
-    // material_blob + 1                 | char[32]     uniform_names [uniform_count]
-    // uniform_names     + uniform_count | stringid64_t texture_names [texture_count]
-    // texture_names     + texture_count | vec4f        cel_vec4f_value [cel_vec4f_count]
-    // cel_vec4f_value       + cel_vec4f_count   | mat44f       mat33f_value [mat33f_count]
-    // mat33f_count      + mat33f_count  | mat33f       cel_mat44f_value [cel_mat44f_count]
-} material_blob_t;
 
-#define material_blob_uniform_names(r)   ((char*)                  ((r)+1))
-#define material_blob_uniform_texture(r) ((stringid64_t*)          ((material_blob_uniform_names(r)+(32*((r)->uniforms_count)))))
-#define material_blob_uniform_vec4f(r)   ((cel_vec4f_t*)               ((material_blob_uniform_texture(r)+((r)->texture_count))))
-#define material_blob_uniform_mat33f(r)  ((mat33f_t*)              ((material_blob_uniform_vec4f(r)+((r)->cel_vec4f_count))))
-#define material_blob_uniform_mat44f(r)  ((cel_mat44f_t*)              ((material_blob_uniform_mat33f(r)+((r)->mat33f_count))))
-#define material_blob_uniform_bgfx(r)    ((bgfx_uniform_handle_t*) ((material_blob_uniform_vec4f(r)+((r)->cel_vec4f_count))))
 
 #define _get_resorce(idx) (_G.material_instance_data.data[_G.material_instance_offset.data[(idx)]])
 
@@ -79,188 +60,7 @@ IMPORT_API(ResourceApi, 0);
 //==============================================================================
 // Compiler private
 //==============================================================================
-
-struct material_compile_output {
-    ARRAY_T(char) uniform_names;
-    ARRAY_T(u8) data;
-    u32 texture_count;
-    u32 cel_vec4f_count;
-    u32 mat33f_count;
-    u32 cel_mat44f_count;
-};
-
-static void preprocess(const char *filename,
-                       yaml_node_t root,
-                       struct compilator_api *capi) {
-    yaml_node_t parent_node = yaml_get_node(root, "parent");
-
-    if (yaml_is_valid(parent_node)) {
-        char prefab_file[256] = {0};
-        char prefab_str[256] = {0};
-        yaml_as_string(parent_node, prefab_str, CEL_ARRAY_LEN(prefab_str));
-        snprintf(prefab_file, CEL_ARRAY_LEN(prefab_file), "%s.material",
-                 prefab_str);
-
-        capi->add_dependency(filename, prefab_file);
-
-        char full_path[256] = {0};
-        const char *source_dir = ResourceApiV0.compiler_get_source_dir();
-        cel_path_join(full_path, CEL_ARRAY_LEN(full_path), source_dir,
-                      prefab_file);
-
-        struct vio *prefab_vio = cel_vio_from_file(full_path, VIO_OPEN_READ,
-                                                   MemSysApiV0.main_allocator());
-
-        char prefab_data[cel_vio_size(prefab_vio) + 1];
-        memory_set(prefab_data, 0, cel_vio_size(prefab_vio) + 1);
-        cel_vio_read(prefab_vio, prefab_data, sizeof(char),
-                     cel_vio_size(prefab_vio));
-        cel_vio_close(prefab_vio);
-
-        yaml_document_t h;
-        yaml_node_t prefab_root = yaml_load_str(prefab_data, &h);
-
-        preprocess(filename, prefab_root, capi);
-        yaml_merge(root, prefab_root);
-    }
-}
-
-void forach_texture_clb(yaml_node_t key,
-                        yaml_node_t value,
-                        void *_data) {
-    struct material_compile_output *output = _data;
-
-    output->texture_count += 1;
-
-    char tmp_buffer[512] = {0};
-    char uniform_name[32] = {0};
-
-    yaml_as_string(key, uniform_name, CEL_ARRAY_LEN(uniform_name) - 1);
-
-    yaml_as_string(value, tmp_buffer, CEL_ARRAY_LEN(tmp_buffer));
-    stringid64_t texture_name = stringid64_from_string(tmp_buffer);
-
-    ARRAY_PUSH(char, &output->uniform_names, uniform_name,
-               CEL_ARRAY_LEN(uniform_name));
-    ARRAY_PUSH(u8, &output->data, (u8 *) &texture_name, sizeof(stringid64_t));
-}
-
-void forach_vec4fs_clb(yaml_node_t key,
-                       yaml_node_t value,
-                       void *_data) {
-    struct material_compile_output *output = _data;
-
-    output->cel_vec4f_count += 1;
-
-    char uniform_name[32] = {0};
-    yaml_as_string(key, uniform_name, CEL_ARRAY_LEN(uniform_name) - 1);
-
-    cel_vec4f_t v = yaml_as_cel_vec4f_t(value);
-
-    ARRAY_PUSH(char, &output->uniform_names, uniform_name,
-               CEL_ARRAY_LEN(uniform_name));
-    ARRAY_PUSH(u8, &output->data, (u8 *) &v, sizeof(cel_vec4f_t));
-}
-
-void forach_cel_mat44f_clb(yaml_node_t key,
-                           yaml_node_t value,
-                           void *_data) {
-    struct material_compile_output *output = _data;
-
-    output->cel_mat44f_count += 1;
-
-    char uniform_name[32] = {0};
-    yaml_as_string(key, uniform_name, CEL_ARRAY_LEN(uniform_name) - 1);
-
-    cel_mat44f_t m = yaml_as_cel_mat44f_t(value);
-
-    ARRAY_PUSH(char, &output->uniform_names, uniform_name,
-               CEL_ARRAY_LEN(uniform_name));
-    ARRAY_PUSH(u8, &output->data, (u8 *) &m, sizeof(cel_mat44f_t));
-}
-
-void forach_mat33f_clb(yaml_node_t key,
-                       yaml_node_t value,
-                       void *_data) {
-    struct material_compile_output *output = _data;
-
-    output->mat33f_count += 1;
-
-    char uniform_name[32] = {0};
-    yaml_as_string(key, uniform_name, CEL_ARRAY_LEN(uniform_name) - 1);
-
-    mat33f_t m = yaml_as_mat33f_t(value);
-
-    ARRAY_PUSH(char, &output->uniform_names, uniform_name,
-               CEL_ARRAY_LEN(uniform_name));
-    ARRAY_PUSH(u8, &output->data, (u8 *) &m, sizeof(mat33f_t));
-}
-
-int _material_resource_compiler(const char *filename,
-                                struct vio *source_vio,
-                                struct vio *build_vio,
-                                struct compilator_api *compilator_api) {
-    char *source_data = CEL_ALLOCATE(MemSysApiV0.main_allocator(), char,
-                                     cel_vio_size(source_vio) + 1);
-    memory_set(source_data, 0, cel_vio_size(source_vio) + 1);
-
-    cel_vio_read(source_vio, source_data, sizeof(char),
-                 cel_vio_size(source_vio));
-
-    yaml_document_t h;
-    yaml_node_t root = yaml_load_str(source_data, &h);
-
-    preprocess(filename, root, compilator_api);
-
-    yaml_node_t shader_node = yaml_get_node(root, "shader");
-    CEL_ASSERT("material", yaml_is_valid(shader_node));
-
-    char tmp_buffer[256] = {0};
-    yaml_as_string(shader_node, tmp_buffer, CEL_ARRAY_LEN(tmp_buffer));
-
-    struct material_compile_output output = {0};
-    ARRAY_INIT(char, &output.uniform_names, MemSysApiV0.main_allocator());
-    ARRAY_INIT(u8, &output.data, MemSysApiV0.main_allocator());
-
-    yaml_node_t textures = yaml_get_node(root, "textures");
-    if (yaml_is_valid(textures)) {
-        yaml_node_foreach_dict(textures, forach_texture_clb, &output);
-    }
-
-    yaml_node_t vec4 = yaml_get_node(root, "vec4f");
-    if (yaml_is_valid(vec4)) {
-        yaml_node_foreach_dict(vec4, forach_vec4fs_clb, &output);
-    }
-
-    yaml_node_t mat44 = yaml_get_node(root, "mat44f");
-    if (yaml_is_valid(mat44)) {
-        yaml_node_foreach_dict(mat44, forach_cel_mat44f_clb, &output);
-    }
-
-    yaml_node_t mat33 = yaml_get_node(root, "mat33f");
-    if (yaml_is_valid(mat33)) {
-        yaml_node_foreach_dict(mat33, forach_mat33f_clb, &output);
-    }
-
-
-    struct material_blob resource = {
-            .shader_name = stringid64_from_string(tmp_buffer),
-            .texture_count =output.texture_count,
-            .cel_vec4f_count = output.cel_vec4f_count,
-            .uniforms_count = ARRAY_SIZE(&output.uniform_names) / 32,
-    };
-
-    cel_vio_write(build_vio, &resource, sizeof(resource), 1);
-    cel_vio_write(build_vio, output.uniform_names.data, sizeof(char),
-                  ARRAY_SIZE(&output.uniform_names));
-    cel_vio_write(build_vio, output.data.data, sizeof(u8),
-                  ARRAY_SIZE(&output.data));
-
-    ARRAY_DESTROY(char, &output.uniform_names);
-    ARRAY_DESTROY(u8, &output.data);
-    CEL_DEALLOCATE(MemSysApiV0.main_allocator(), source_data);
-    return 1;
-}
+#include "material_compiler.h"
 
 //==============================================================================
 // Resource
