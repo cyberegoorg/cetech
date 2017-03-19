@@ -1,5 +1,5 @@
 #include <celib/math/types.h>
-#include <engine/plugin/plugin.h>
+#include <engine/module/module.h>
 #include "../luasys.h"
 #include "engine/input/mouse.h"
 

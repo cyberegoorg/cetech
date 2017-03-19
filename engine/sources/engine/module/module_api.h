@@ -24,7 +24,7 @@
 // Enums
 //==============================================================================
 
-//! Core engine plugin api ids
+//! Core engine module api ids
 enum {
     PLUGIN_EXPORT_API_ID = 1,
     APPLICATION_API_ID,
@@ -67,7 +67,7 @@ typedef void *(*get_api_fce_t)(int api,
 //==============================================================================
 
 //! Plugin expot api struct V0
-struct plugin_api_v0 {
+struct module_api_v0 {
 
     //! Init cvars
     //! \param Init cvars

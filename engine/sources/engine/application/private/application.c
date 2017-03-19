@@ -107,7 +107,7 @@ static struct ApplicationApiV0 api_v1 = {
 };
 
 void _init_api() {
-#define get_engine_api plugin_get_engine_api
+#define get_engine_api module_get_engine_api
     INIT_API(ConsoleServerApi, CONSOLE_SERVER_API_ID, 0);
     INIT_API(DevelopSystemApi, DEVELOP_SERVER_API_ID, 0);
     INIT_API(RendererApi, RENDERER_API_ID, 0);
@@ -176,10 +176,10 @@ int application_init(int argc,
 
     cvar_init();
 
-    _init_static_plugins();
+    _init_static_modules();
 
-    plugin_load_dirs("./bin");
-    plugin_call_init_cvar();
+    module_load_dirs("./bin");
+    module_call_init_cvar();
 
     _init_api();
 
@@ -187,7 +187,7 @@ int application_init(int argc,
         return 0;
     };
 
-    plugin_call_init();
+    module_call_init();
 
     log_set_wid_clb(TaskApiV0.worker_id);
 
@@ -199,7 +199,7 @@ int application_init(int argc,
 int application_shutdown() {
     log_debug(LOG_WHERE, "Shutdown");
 
-    plugin_call_shutdown();
+    module_call_shutdown();
 
     cvar_shutdown();
     memsys_shutdown();
@@ -313,7 +313,7 @@ void application_start() {
         last_tick = now_ticks;
         frame_time_accum += dt;
 
-        plugin_call_update();
+        module_call_update();
         _G.game->update(dt);
 
         if (frame_time_accum >= frame_time) {
@@ -330,7 +330,7 @@ void application_start() {
         DevelopSystemApiV0.leave_scope(application_sd);
         DevelopSystemApiV0.push_record_float("engine.delta_time", dt);
 
-        plugin_call_after_update(dt);
+        module_call_after_update(dt);
         //cel_thread_yield();
     }
 
@@ -359,12 +359,12 @@ cel_window_t application_get_main_window() {
 }
 
 
-void *application_get_plugin_api(int api,
+void *application_get_module_api(int api,
                                  int version) {
 
     if (api == PLUGIN_EXPORT_API_ID && version == 0) {
-        static struct plugin_api_v0 plugin = {0};
-        return &plugin;
+        static struct module_api_v0 module = {0};
+        return &module;
     } else if (api == APPLICATION_API_ID && version == 0) {
         return &api_v1;
     }

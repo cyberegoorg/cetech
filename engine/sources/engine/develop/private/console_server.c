@@ -4,7 +4,7 @@
 
 #include <stdio.h>
 #include <include/mpack/mpack.h>
-#include <engine/plugin/plugin_api.h>
+#include <engine/module/module_api.h>
 
 #include "include/nanomsg/nn.h"
 #include "include/nanomsg/reqrep.h"
@@ -249,20 +249,20 @@ void consolesrv_push_begin() {
     }
 }
 
-void *consoleserver_get_plugin_api(int api,
+void *consoleserver_get_module_api(int api,
                                    int version) {
     switch (api) {
         case PLUGIN_EXPORT_API_ID:
             switch (version) {
                 case 0: {
-                    static struct plugin_api_v0 plugin = {0};
+                    static struct module_api_v0 module = {0};
 
-                    plugin.init = _init;
-                    plugin.shutdown = _shutdown;
-                    plugin.init_cvar = _init_cvar;
-                    plugin.update = _update;
+                    module.init = _init;
+                    module.shutdown = _shutdown;
+                    module.init_cvar = _init_cvar;
+                    module.update = _update;
 
-                    return &plugin;
+                    return &module;
                 }
 
                 default:

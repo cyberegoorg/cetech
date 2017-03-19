@@ -10,7 +10,7 @@
 #include <celib/math/vec2f.h>
 
 #include "engine/develop/console_server.h"
-#include "engine/plugin/plugin.h"
+#include "engine/module/module.h"
 
 #include "vectors.h"
 #include "quaternion.h"
@@ -209,7 +209,7 @@ static const struct game_callbacks _GameCallbacks = {
 
 static void _register_all_api(get_api_fce_t get_engine_api) {
     REGISTER_LUA_API(log);
-    REGISTER_LUA_API(plugin);
+    REGISTER_LUA_API(module);
     REGISTER_LUA_API(keyboard);
     REGISTER_LUA_API(mouse);
     REGISTER_LUA_API(gamepad);
@@ -231,10 +231,10 @@ static void _register_all_api(get_api_fce_t get_engine_api) {
     REGISTER_LUA_API(scenegraph);
 }
 
-static int _reload_plugin(lua_State *l) {
+static int _reload_module(lua_State *l) {
     size_t len;
     const char *name = luasys_to_string_l(l, 1, &len);
-    plugin_reload(name);
+    module_reload(name);
     return 0;
 }
 
@@ -882,7 +882,7 @@ static void _init(get_api_fce_t get_engine_api) {
 
     _register_all_api(get_engine_api);
 
-    luasys_add_module_function("plugin", "reload", _reload_plugin);
+    luasys_add_module_function("module", "reload", _reload_module);
     ConsoleServerApiV0.consolesrv_register_command("lua_system.execute",
                                                    _cmd_execute_string);
 
@@ -952,18 +952,18 @@ void luasys_call_global(const char *func,
     lua_pop(_state, -1);
 }
 
-void *luasys_get_plugin_api(int api,
+void *luasys_get_module_api(int api,
                             int version) {
     switch (api) {
         case PLUGIN_EXPORT_API_ID:
             switch (version) {
                 case 0: {
-                    static struct plugin_api_v0 plugin = {0};
+                    static struct module_api_v0 module = {0};
 
-                    plugin.init = _init;
-                    plugin.shutdown = _shutdown;
+                    module.init = _init;
+                    module.shutdown = _shutdown;
 
-                    return &plugin;
+                    return &module;
                 }
 
                 default:

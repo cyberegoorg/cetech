@@ -14,7 +14,7 @@
 #include "celib/thread/thread.h"
 #include "celib/containers/eventstream.h"
 #include <engine/memory/memsys.h>
-#include <engine/plugin/plugin_api.h>
+#include <engine/module/module_api.h>
 
 #include "engine/task/task.h"
 #include "engine/develop/develop_system.h"
@@ -339,20 +339,20 @@ void developsys_leave_scope(struct scope_data scope_data) {
     developsys_push(EVENT_SCOPE, ev);
 }
 
-void *developsystem_get_plugin_api(int api,
+void *developsystem_get_module_api(int api,
                                    int version) {
     switch (api) {
         case PLUGIN_EXPORT_API_ID:
             switch (version) {
                 case 0: {
-                    static struct plugin_api_v0 plugin = {0};
+                    static struct module_api_v0 module = {0};
 
-                    plugin.init = _init;
-                    plugin.shutdown = _shutdown;
-                    plugin.init_cvar = _init_cvar;
-                    plugin.after_update = _after_update;
+                    module.init = _init;
+                    module.shutdown = _shutdown;
+                    module.init_cvar = _init_cvar;
+                    module.after_update = _after_update;
 
-                    return &plugin;
+                    return &module;
                 }
 
                 default:

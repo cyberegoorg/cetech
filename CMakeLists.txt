@@ -112,7 +112,7 @@ set(SOURCE_FILES
         ########################################################################
         # CETECH: Plugin system
         ########################################################################
-        engine/sources/engine/plugin/private/plugin.c
+        engine/sources/engine/module/private/module.c
 
         engine/sources/engine/luasys/private/luasys.c
         engine/sources/engine/luasys/private/api/api_plugin.c

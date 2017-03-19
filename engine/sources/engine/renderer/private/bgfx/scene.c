@@ -13,7 +13,7 @@
 #include "celib/filesystem/path.h"
 #include "celib/filesystem/vio.h"
 #include <engine/memory/memsys.h>
-#include <engine/plugin/plugin.h>
+#include <engine/module/module.h>
 
 #include "engine/resource/types.h"
 #include "scene_blob.h"
@@ -173,11 +173,11 @@ static const resource_callbacks_t scene_resource_callback = {
 int scene_resource_init() {
     _G = (struct G) {0};
 
-    MemSysApiV0 = *(struct MemSysApiV0 *) plugin_get_engine_api(MEMORY_API_ID,
+    MemSysApiV0 = *(struct MemSysApiV0 *) module_get_engine_api(MEMORY_API_ID,
                                                                 0);
-    ResourceApiV0 = *(struct ResourceApiV0 *) plugin_get_engine_api(
+    ResourceApiV0 = *(struct ResourceApiV0 *) module_get_engine_api(
             RESOURCE_API_ID, 0);
-    SceneGprahApiV0 = *(struct SceneGprahApiV0 *) plugin_get_engine_api(
+    SceneGprahApiV0 = *(struct SceneGprahApiV0 *) module_get_engine_api(
             SCENEGRAPH_API_ID, 0);
 
     _G.type = stringid64_from_string("scene");

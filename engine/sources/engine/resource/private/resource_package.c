@@ -9,7 +9,7 @@
 #include <celib/yaml/yaml.h>
 #include <celib/thread/thread.h>
 #include <engine/memory/memsys.h>
-#include <engine/plugin/plugin.h>
+#include <engine/module/module.h>
 
 #include "resource_package.h"
 

@@ -12,7 +12,7 @@
 #include "celib/filesystem/vio.h"
 #include "celib/filesystem/filesystem.h"
 #include <engine/memory/memsys.h>
-#include <engine/plugin/plugin.h>
+#include <engine/module/module.h>
 #include "engine/application/application.h"
 #include "engine/resource/types.h"
 
@@ -122,11 +122,11 @@ static const resource_callbacks_t texture_resource_callback = {
 int texture_resource_init() {
     _G = (struct G) {0};
 
-    MemSysApiV0 = *(struct MemSysApiV0 *) plugin_get_engine_api(MEMORY_API_ID,
+    MemSysApiV0 = *(struct MemSysApiV0 *) module_get_engine_api(MEMORY_API_ID,
                                                                 0);
-    ResourceApiV0 = *(struct ResourceApiV0 *) plugin_get_engine_api(
+    ResourceApiV0 = *(struct ResourceApiV0 *) module_get_engine_api(
             RESOURCE_API_ID, 0);
-    ApplicationApiV0 = *(struct ApplicationApiV0 *) plugin_get_engine_api(
+    ApplicationApiV0 = *(struct ApplicationApiV0 *) module_get_engine_api(
             APPLICATION_API_ID, 0);
 
     _G.type = stringid64_from_string("texture");

@@ -4,7 +4,7 @@
 
 #include <celib/filesystem/path.h>
 #include "celib/filesystem/filesystem.h"
-#include <engine/plugin/plugin_api.h>
+#include <engine/module/module_api.h>
 
 #include "celib/filesystem/vio.h"
 
@@ -173,19 +173,19 @@ time_t filesystem_get_file_mtime(stringid64_t root,
 }
 
 
-void *filesystem_get_plugin_api(int api,
+void *filesystem_get_module_api(int api,
                                 int version) {
 
     switch (api) {
         case PLUGIN_EXPORT_API_ID:
             switch (version) {
                 case 0: {
-                    static struct plugin_api_v0 plugin = {0};
+                    static struct module_api_v0 module = {0};
 
-                    plugin.init = _init;
-                    plugin.shutdown = _shutdown;
+                    module.init = _init;
+                    module.shutdown = _shutdown;
 
-                    return &plugin;
+                    return &module;
                 }
 
                 default:
