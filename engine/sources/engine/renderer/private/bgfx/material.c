@@ -6,14 +6,14 @@
 
 #include <celib/string/stringid.h>
 #include <celib/filesystem/path.h>
-#include <engine/renderer/material.h>
+#include <engine/renderer/api.h>
 #include <celib/yaml/yaml.h>
 #include "celib/containers/map.h"
 #include "celib/filesystem/vio.h"
-#include <engine/memory/memsys.h>
-#include <engine/module/module_api.h>
+#include <engine/memory/api.h>
+#include <engine/module/api.h>
 
-#include "engine/resource/types.h"
+#include "engine/resource/api.h"
 #include "texture.h"
 #include "shader.h"
 #include "material_blob.h"

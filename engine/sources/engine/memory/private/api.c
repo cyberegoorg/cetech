@@ -1,7 +1,7 @@
 #include <celib/memory/memory.h>
 #include <celib/errors/errors.h>
-#include <engine/module/module_api.h>
-#include "../memsys.h"
+#include <engine/module/api.h>
+#include "engine/memory/api.h"
 
 #define LOG_WHERE "memory"
 

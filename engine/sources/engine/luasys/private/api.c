@@ -9,14 +9,14 @@
 #include <celib/math/types.h>
 #include <celib/math/vec2f.h>
 
-#include "engine/develop/console_server.h"
+#include "engine/develop/api.h"
 #include "engine/module/module.h"
 
 #include "vectors.h"
 #include "quaternion.h"
 #include "matrix.h"
-#include "engine/luasys/luasys.h"
-#include "engine/resource/types.h"
+#include "engine/luasys/api.h"
+#include "engine/resource/api.h"
 
 
 IMPORT_API(ResourceApi, 0);

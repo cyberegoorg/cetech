@@ -1,6 +1,6 @@
 #include <engine/module/module.h>
 #include "../luasys.h"
-#include <engine/resource/types.h>
+#include <engine/resource/api.h>
 
 #define API_NAME "ResourceManager"
 

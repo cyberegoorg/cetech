@@ -3,10 +3,10 @@
 #include <celib/math/quatf.h>
 #include <celib/math/mat44f.h>
 
-#include <engine/entcom/entcom.h>
+#include <engine/entcom/api.h>
 #include <engine/world/scenegraph.h>
-#include <engine/memory/memsys.h>
-#include <engine/module/module_api.h>
+#include <engine/memory/api.h>
+#include <engine/module/api.h>
 
 
 ARRAY_PROTOTYPE(cel_vec3f_t)

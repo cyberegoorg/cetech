@@ -1,14 +1,41 @@
-//! \ingroup Develop
-//! \{
-#ifndef CETECH_DEVELOP_SYSTEM_H
-#define CETECH_DEVELOP_SYSTEM_H
+//! \defgroup Develop
+//! Console server, develop system
+
+#ifndef CETECH_CONSOLE_SERVER_API_H
+#define CETECH_CONSOLE_SERVER_API_H
 
 //==============================================================================
 // Includes
 //==============================================================================
 
+#include "include/mpack/mpack.h"
+
 #include "celib/types.h"
 #include "celib/containers/eventstream.h"
+
+//==============================================================================
+// Typedefs
+//==============================================================================
+
+//! Console server command function
+typedef int (*console_server_command_t)(mpack_node_t,
+                                        mpack_writer_t *);
+
+//==============================================================================
+// Api
+//==============================================================================
+
+//! Console server API V0
+struct ConsoleServerApiV0 {
+    //! Push begin signal to clients
+    void (*consolesrv_push_begin)();
+
+    //! Register consoleserver command
+    //! \param name Command name ex.: "lua.execute"
+    //! \param command Command fce
+    void (*consolesrv_register_command)(const char *name,
+                                        console_server_command_t command);
+};
 
 
 //==============================================================================
@@ -95,6 +122,5 @@ struct DevelopSystemApiV0 {
     void (*leave_scope)(struct scope_data scope_data);
 };
 
-
-#endif //CETECH_DEVELOP_SYSTEM_H
-//! \}
+#endif //CETECH_CONSOLE_SERVER_API_H
+// \}

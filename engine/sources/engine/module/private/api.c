@@ -7,7 +7,7 @@
 #include <celib/os/object.h>
 #include <celib/filesystem/filesystem.h>
 #include <celib/filesystem/path.h>
-#include <engine/memory/memsys.h>
+#include <engine/memory/api.h>
 
 #include "engine/module/module.h"
 

@@ -2,7 +2,7 @@
 #define CETECH_RESOURCE_H
 
 #include <celib/string/stringid.h>
-#include <engine/resource/types.h>
+#include <engine/resource/api.h>
 
 void resource_set_autoload(int enable);
 

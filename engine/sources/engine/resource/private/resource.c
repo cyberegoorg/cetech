@@ -9,12 +9,12 @@
 #include <celib/filesystem/vio.h>
 #include <celib/filesystem/path.h>
 
-#include "engine/resource/types.h"
-#include <engine/develop/console_server.h>
-#include <engine/memory/memsys.h>
-#include <engine/module/module_api.h>
+#include "engine/resource/api.h"
+#include <engine/develop/api.h>
+#include <engine/memory/api.h>
+#include <engine/module/api.h>
 #include <engine/module/module.h>
-#include <engine/filesystem/types.h>
+#include <engine/filesystem/api.h>
 
 #include "resource.h"
 

@@ -1,6 +1,6 @@
 #include <engine/module/module.h>
 #include "../luasys.h"
-#include "engine/input/keyboard.h"
+#include "engine/input/api.h"
 
 #define API_NAME "Keyboard"
 

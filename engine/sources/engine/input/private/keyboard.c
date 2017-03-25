@@ -3,8 +3,8 @@
 //==============================================================================
 
 #include <engine/module/module.h>
-#include "engine/machine/machine.h"
-#include "engine/input/keyboard.h"
+#include "engine/machine/api.h"
+#include "engine/input/api.h"
 
 #include "keystr.h"
 

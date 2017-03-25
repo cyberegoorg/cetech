@@ -3,17 +3,17 @@
 #include <celib/containers/map.h>
 #include <celib/string/stringid.h>
 
-#include <engine/entcom/entcom.h>
-#include <engine/renderer/material.h>
+#include <engine/entcom/api.h>
+#include <engine/renderer/api.h>
 #include <bgfx/c99/bgfx.h>
 #include <engine/world/transform.h>
-#include <engine/renderer/mesh_renderer.h>
+#include <engine/renderer/api.h>
 #include <engine/renderer/private/bgfx/scene.h>
 #include <engine/world/scenegraph.h>
 #include <celib/math/mat44f.h>
 
-#include <engine/memory/memsys.h>
-#include <engine/module/module_api.h>
+#include <engine/memory/api.h>
+#include <engine/module/api.h>
 
 
 IMPORT_API(MemSysApi, 0);

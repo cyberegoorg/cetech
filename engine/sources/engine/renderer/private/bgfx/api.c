@@ -4,13 +4,13 @@
 
 #include <celib/math/types.h>
 #include <engine/world/camera.h>
-#include <engine/renderer/mesh_renderer.h>
-#include <engine/develop/console_server.h>
-#include <engine/application/application.h>
-#include <engine/config/cvar.h>
-#include <engine/module/module_api.h>
+#include <engine/renderer/api.h>
+#include <engine/develop/api.h>
+#include <engine/application/api.h>
+#include <engine/config/api.h>
+#include <engine/module/api.h>
 #include "celib/window/window.h"
-#include "engine/renderer/renderer.h"
+#include "engine/renderer/api.h"
 
 #include "bgfx/c99/platform.h"
 #include "texture.h"

@@ -7,7 +7,7 @@
 // Includes
 //==============================================================================
 
-#import "engine/entcom/entcom.h"
+#import "engine/entcom/api.h"
 #import "engine/world/world.h"
 #import "celib/math/types.h"
 #import "celib/string/stringid.h"

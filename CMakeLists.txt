@@ -77,7 +77,7 @@ set(SOURCE_FILES
         cebase/sources/celib/memory/private/allocator.c
         cebase/sources/celib/memory/private/allocator_malloc.c
         cebase/sources/celib/memory/private/allocator_scratch.c
-        engine/sources/engine/memory/private/memsys.c
+        engine/sources/engine/memory/private/api.c
 
 
         ########################################################################
@@ -107,14 +107,14 @@ set(SOURCE_FILES
         cebase/sources/celib/yaml/private/yaml.cc
 
         cebase/sources/celib/log/private/log_system.c
-        engine/sources/engine/config/private/cvar.c
+        engine/sources/engine/config/private/api.c
 
         ########################################################################
         # CETECH: Plugin system
         ########################################################################
-        engine/sources/engine/module/private/module.c
+        engine/sources/engine/module/private/api.c
 
-        engine/sources/engine/luasys/private/luasys.c
+        engine/sources/engine/luasys/private/api.c
         engine/sources/engine/luasys/private/api/api_plugin.c
         engine/sources/engine/luasys/private/api/api_keyboard.c
         engine/sources/engine/luasys/private/api/api_log.c
@@ -137,22 +137,22 @@ set(SOURCE_FILES
         engine/sources/engine/luasys/private/api/api_level.c
         engine/sources/engine/luasys/private/api/api_scenegraph.c
 
-        engine/sources/engine/develop/private/console_server.c
+        engine/sources/engine/develop/private/api.c
         engine/sources/engine/develop/private/develop_system.c
 
         engine/sources/engine/application/private/application.c
-        engine/sources/engine/task/private/task.c
+        engine/sources/engine/task/private/api.c
 
         engine/sources/engine/resource/private/resource.c
         engine/sources/engine/resource/private/resource_package.c
         engine/sources/engine/resource/private/resource_compiler.c
         engine/sources/engine/filesystem/private/filesystem.c
         engine/sources/engine/world/private/unit.c
-        engine/sources/engine/entcom/private/entcom.c
+        engine/sources/engine/entcom/private/module.c
         engine/sources/engine/world/private/world.c
         engine/sources/engine/world/private/level.c
 
-        engine/sources/engine/machine/private/machine.c
+        engine/sources/engine/machine/private/api.c
         engine/sources/engine/machine/private/sdl2/sdl_mouse.c
         engine/sources/engine/machine/private/sdl2/sdl_keyboard.c
         engine/sources/engine/machine/private/sdl2/sdl_gamepad.c
@@ -160,10 +160,10 @@ set(SOURCE_FILES
 
         engine/sources/engine/input/private/keyboard.c
         engine/sources/engine/input/private/mouse.c
-        engine/sources/engine/input/private/gamepad.c
+        engine/sources/engine/input/private/api.c
 
 
-        engine/sources/engine/renderer/private/bgfx/renderer.c
+        engine/sources/engine/renderer/private/bgfx/api.c
         engine/sources/engine/renderer/private/bgfx/texture.c
         engine/sources/engine/renderer/private/bgfx/shader.c
         engine/sources/engine/renderer/private/bgfx/material.c

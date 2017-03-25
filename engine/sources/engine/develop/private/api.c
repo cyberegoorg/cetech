@@ -4,14 +4,14 @@
 
 #include <stdio.h>
 #include <include/mpack/mpack.h>
-#include <engine/module/module_api.h>
+#include <engine/module/api.h>
 
 #include "include/nanomsg/nn.h"
 #include "include/nanomsg/reqrep.h"
 #include "include/nanomsg/pubsub.h"
 #include "include/nanomsg/pipeline.h"
 
-#include "engine/develop/console_server.h"
+#include "engine/develop/api.h"
 
 //==============================================================================
 // Defines

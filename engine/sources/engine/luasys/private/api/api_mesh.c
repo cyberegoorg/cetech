@@ -1,6 +1,6 @@
 
-#include "engine/entcom/entcom.h"
-#include <engine/renderer/mesh_renderer.h>
+#include "engine/entcom/api.h"
+#include <engine/renderer/api.h>
 #include <engine/module/module.h>
 #include "../luasys.h"
 

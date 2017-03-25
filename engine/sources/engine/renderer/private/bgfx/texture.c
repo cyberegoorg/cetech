@@ -11,10 +11,10 @@
 #include "celib/filesystem/path.h"
 #include "celib/filesystem/vio.h"
 #include "celib/filesystem/filesystem.h"
-#include <engine/memory/memsys.h>
+#include <engine/memory/api.h>
 #include <engine/module/module.h>
 #include "engine/application/application.h"
-#include "engine/resource/types.h"
+#include "engine/resource/api.h"
 
 
 //==============================================================================

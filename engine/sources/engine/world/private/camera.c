@@ -4,12 +4,12 @@
 #include <celib/math/mat44f.h>
 #include <celib/string/stringid.h>
 
-#include <engine/entcom/entcom.h>
-#include <engine/renderer/renderer.h>
+#include <engine/entcom/api.h>
+#include <engine/renderer/api.h>
 #include <engine/world/transform.h>
 
-#include <engine/memory/memsys.h>
-#include <engine/module/module_api.h>
+#include <engine/memory/api.h>
+#include <engine/module/api.h>
 
 
 struct camera_data {
