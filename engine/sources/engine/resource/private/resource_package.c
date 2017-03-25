@@ -160,7 +160,8 @@ void package_task(void *data) {
 
 void package_load(stringid64_t name) {
 
-    struct package_task_data *task_data = CEL_ALLOCATE(
+    struct package_task_data *task_data =
+    CEL_ALLOCATE(
             MemSysApiV0.main_allocator(), struct package_task_data, 1);
 
     task_data->name = name;

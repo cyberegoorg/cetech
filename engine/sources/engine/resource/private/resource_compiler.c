@@ -180,7 +180,8 @@ void _compile_dir(ARRAY_T(task_item) *tasks,
             continue;
         }
 
-        struct compile_task_data *data = CEL_ALLOCATE(
+        struct compile_task_data *data =
+        CEL_ALLOCATE(
                 MemSysApiV0.main_allocator(), struct compile_task_data, 1);
 
         *data = (struct compile_task_data) {

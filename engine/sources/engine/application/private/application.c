@@ -20,7 +20,6 @@
 #include <engine/memory/api.h>
 #include "static_systems.h"
 
-#include "engine/develop/api.h"
 #include "engine/task/api.h"
 
 #define LOG_WHERE "application"
@@ -183,7 +182,7 @@ int application_init(int argc,
 
     _init_api();
 
-    if( !_init_config()) {
+    if (!_init_config()) {
         return 0;
     };
 

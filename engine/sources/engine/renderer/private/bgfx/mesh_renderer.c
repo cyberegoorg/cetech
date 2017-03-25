@@ -7,7 +7,6 @@
 #include <engine/renderer/api.h>
 #include <bgfx/c99/bgfx.h>
 #include <engine/world/transform.h>
-#include <engine/renderer/api.h>
 #include <engine/renderer/private/bgfx/scene.h>
 #include <engine/world/scenegraph.h>
 #include <celib/math/mat44f.h>
@@ -158,11 +157,11 @@ static void _spawner(world_t world,
 
     for (int i = 0; i < ent_count; ++i) {
         MeshRendererApiV0.create(world,
-                         ents[cents[i]],
-                         tdata[i].scene,
-                         tdata[i].mesh,
-                         tdata[i].node,
-                         tdata[i].material);
+                                 ents[cents[i]],
+                                 tdata[i].scene,
+                                 tdata[i].mesh,
+                                 tdata[i].node,
+                                 tdata[i].material);
     }
 }
 
@@ -210,7 +209,7 @@ int mesh_has(world_t world,
 }
 
 mesh_renderer_t mesh_get(world_t world,
-                entity_t entity) {
+                         entity_t entity) {
 
     world_data_t *world_data = _get_world_data(world);
     u32 idx = MAP_GET(u32, &world_data->ent_idx_map, entity.h.h, UINT32_MAX);
@@ -218,11 +217,11 @@ mesh_renderer_t mesh_get(world_t world,
 }
 
 mesh_renderer_t mesh_create(world_t world,
-                   entity_t entity,
-                   stringid64_t scene,
-                   stringid64_t mesh,
-                   stringid64_t node,
-                   stringid64_t material) {
+                            entity_t entity,
+                            stringid64_t scene,
+                            stringid64_t mesh,
+                            stringid64_t node,
+                            stringid64_t material) {
 
     world_data_t *data = _get_world_data(world);
 

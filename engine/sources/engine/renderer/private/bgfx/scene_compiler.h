@@ -1,6 +1,10 @@
 #ifndef CETECH_SCENE_COMPILER_H
 #define CETECH_SCENE_COMPILER_H
 
+#include <include/assimp/scene.h>
+#include <include/assimp/postprocess.h>
+#include <celib/filesystem/path.h>
+
 ARRAY_PROTOTYPE(bgfx_vertex_decl_t);
 ARRAY_PROTOTYPE(stringid64_t);
 
@@ -460,8 +464,9 @@ int _scene_resource_compiler(const char *filename,
                              struct vio *build_vio,
                              struct compilator_api *compilator_api) {
 
-    char *source_data = CEL_ALLOCATE(MemSysApiV0.main_allocator(), char,
-                                     cel_vio_size(source_vio) + 1);
+    char *source_data =
+    CEL_ALLOCATE(MemSysApiV0.main_allocator(), char,
+                 cel_vio_size(source_vio) + 1);
     memory_set(source_data, 0, cel_vio_size(source_vio) + 1);
     cel_vio_read(source_vio, source_data, sizeof(char),
                  cel_vio_size(source_vio));

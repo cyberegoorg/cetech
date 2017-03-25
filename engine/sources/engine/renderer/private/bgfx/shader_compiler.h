@@ -2,6 +2,11 @@
 #define CETECH_SHADER_COMPILER_H
 
 
+#include <celib/filesystem/path.h>
+#include <celib/filesystem/filesystem.h>
+#include <celib/os/process.h>
+#include <celib/yaml/yaml.h>
+
 static int _shaderc(const char *input,
                     const char *output,
                     const char *include_path,
@@ -62,9 +67,9 @@ const char* fs_profile = "ps_4_0";
 #endif
 
 static int _shader_resource_compiler(const char *filename,
-                              struct vio *source_vio,
-                              struct vio *build_vio,
-                              struct compilator_api *compilator_api) {
+                                     struct vio *source_vio,
+                                     struct vio *build_vio,
+                                     struct compilator_api *compilator_api) {
 
     char source_data[cel_vio_size(source_vio) + 1];
     memory_set(source_data, 0, cel_vio_size(source_vio) + 1);

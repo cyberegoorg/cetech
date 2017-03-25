@@ -4,19 +4,17 @@
 
 #include <bgfx/c99/bgfx.h>
 
-#include <assimp/cimport.h>
-#include <assimp/scene.h>
-#include <assimp/postprocess.h>
+#include <include/assimp/cimport.h>
 
 #include <celib/string/stringid.h>
 #include <engine/world/scenegraph.h>
-#include "celib/filesystem/path.h"
 #include "celib/filesystem/vio.h"
 #include <engine/memory/api.h>
 #include <engine/module/module.h>
 
 #include "engine/resource/api.h"
 #include "scene_blob.h"
+
 //==============================================================================
 // Structs
 //==============================================================================

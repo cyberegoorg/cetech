@@ -252,9 +252,10 @@ struct component_data {
 struct entity_compile_output *unit_compiler_create_output() {
     struct cel_allocator *a = MemSysApiV0.main_allocator();
 
-    struct entity_compile_output *output = CEL_ALLOCATE(a,
-                                                        struct entity_compile_output,
-                                                        1);
+    struct entity_compile_output *output =
+    CEL_ALLOCATE(a,
+                 struct entity_compile_output,
+                 1);
     output->ent_counter = 0;
     ARRAY_INIT(u64, &output->component_type, a);
     MAP_INIT(array_u32, &output->component_ent, a);

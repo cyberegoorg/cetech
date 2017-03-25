@@ -193,8 +193,9 @@ void cvar_compile_global() {
 
     struct vio *source_vio = cel_vio_from_file(source_path, VIO_OPEN_READ,
                                                MemSysApiV0.main_allocator());
-    char *data = CEL_ALLOCATE(MemSysApiV0.main_allocator(), char,
-                              cel_vio_size(source_vio));
+    char *data =
+    CEL_ALLOCATE(MemSysApiV0.main_allocator(), char,
+                 cel_vio_size(source_vio));
 
     size_t size = (size_t) cel_vio_size(source_vio);
     cel_vio_read(source_vio, data, sizeof(char), size);
@@ -300,8 +301,9 @@ void cvar_load_global() {
 
     struct vio *source_vio = cel_vio_from_file(source_path, VIO_OPEN_READ,
                                                MemSysApiV0.main_allocator());
-    char *data = CEL_ALLOCATE(MemSysApiV0.main_allocator(), char,
-                              cel_vio_size(source_vio));
+    char *data =
+    CEL_ALLOCATE(MemSysApiV0.main_allocator(), char,
+                 cel_vio_size(source_vio));
     cel_vio_read(source_vio, data, cel_vio_size(source_vio),
                  cel_vio_size(source_vio));
     cel_vio_close(source_vio);

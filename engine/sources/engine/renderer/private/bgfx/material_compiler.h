@@ -1,6 +1,8 @@
 #ifndef CETECH_MATERIAL_COMPILER_H
 #define CETECH_MATERIAL_COMPILER_H
 
+#include <celib/filesystem/path.h>
+
 struct material_compile_output {
     ARRAY_T(char) uniform_names;
     ARRAY_T(u8) data;
@@ -47,8 +49,8 @@ static void _preprocess(const char *filename,
 }
 
 static void _forach_texture_clb(yaml_node_t key,
-                         yaml_node_t value,
-                         void *_data) {
+                                yaml_node_t value,
+                                void *_data) {
     struct material_compile_output *output = _data;
 
     output->texture_count += 1;
@@ -67,8 +69,8 @@ static void _forach_texture_clb(yaml_node_t key,
 }
 
 static void _forach_vec4fs_clb(yaml_node_t key,
-                        yaml_node_t value,
-                        void *_data) {
+                               yaml_node_t value,
+                               void *_data) {
     struct material_compile_output *output = _data;
 
     output->cel_vec4f_count += 1;
@@ -84,8 +86,8 @@ static void _forach_vec4fs_clb(yaml_node_t key,
 }
 
 static void _forach_cel_mat44f_clb(yaml_node_t key,
-                            yaml_node_t value,
-                            void *_data) {
+                                   yaml_node_t value,
+                                   void *_data) {
     struct material_compile_output *output = _data;
 
     output->cel_mat44f_count += 1;
@@ -101,8 +103,8 @@ static void _forach_cel_mat44f_clb(yaml_node_t key,
 }
 
 static void _forach_mat33f_clb(yaml_node_t key,
-                        yaml_node_t value,
-                        void *_data) {
+                               yaml_node_t value,
+                               void *_data) {
     struct material_compile_output *output = _data;
 
     output->mat33f_count += 1;
@@ -118,9 +120,9 @@ static void _forach_mat33f_clb(yaml_node_t key,
 }
 
 static int _material_resource_compiler(const char *filename,
-                                struct vio *source_vio,
-                                struct vio *build_vio,
-                                struct compilator_api *compilator_api) {
+                                       struct vio *source_vio,
+                                       struct vio *build_vio,
+                                       struct compilator_api *compilator_api) {
     char *source_data =
     CEL_ALLOCATE(MemSysApiV0.main_allocator(), char,
                  cel_vio_size(source_vio) + 1);

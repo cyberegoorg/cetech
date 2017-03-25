@@ -5,7 +5,6 @@
 #include <include/mpack/mpack.h>
 #include <celib/string/stringid.h>
 #include <celib/filesystem/vio.h>
-#include <engine/application/application.h>
 #include <celib/math/types.h>
 #include <celib/math/vec2f.h>
 

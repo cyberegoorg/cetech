@@ -5,10 +5,7 @@
 #include <bgfx/c99/bgfx.h>
 
 #include <celib/string/stringid.h>
-#include <celib/filesystem/path.h>
 #include <engine/renderer/api.h>
-#include <celib/yaml/yaml.h>
-#include "celib/containers/map.h"
 #include "celib/filesystem/vio.h"
 #include <engine/memory/api.h>
 #include <engine/module/api.h>
@@ -29,7 +26,6 @@ ARRAY_PROTOTYPE(bgfx_uniform_handle_t)
 ARRAY_PROTOTYPE(stringid64_t)
 
 MAP_PROTOTYPE(bgfx_program_handle_t)
-
 
 
 #define _get_resorce(idx) (_G.material_instance_data.data[_G.material_instance_offset.data[(idx)]])

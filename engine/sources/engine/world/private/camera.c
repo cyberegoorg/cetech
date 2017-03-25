@@ -34,6 +34,7 @@ IMPORT_API(RendererApi, 0);
 IMPORT_API(TransformApi, 0);
 
 ARRAY_PROTOTYPE(world_data_t)
+
 MAP_PROTOTYPE(world_data_t)
 
 #define _G CameraGlobal

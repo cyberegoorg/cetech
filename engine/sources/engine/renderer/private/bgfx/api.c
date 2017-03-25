@@ -10,7 +10,6 @@
 #include <engine/config/api.h>
 #include <engine/module/api.h>
 #include "celib/window/window.h"
-#include "engine/renderer/api.h"
 
 #include "bgfx/c99/platform.h"
 #include "texture.h"

@@ -2,6 +2,11 @@
 #define CETECH_TEXTURE_COMPILER_H
 
 
+#include <celib/filesystem/path.h>
+#include <celib/filesystem/filesystem.h>
+#include <celib/os/process.h>
+#include <celib/yaml/yaml.h>
+
 static int _texturec(const char *input,
                      const char *output,
                      int gen_mipmaps,
@@ -44,9 +49,9 @@ static int _gen_tmp_name(char *tmp_filename,
 }
 
 static int _texture_resource_compiler(const char *filename,
-                               struct vio *source_vio,
-                               struct vio *build_vio,
-                               struct compilator_api *compilator_api) {
+                                      struct vio *source_vio,
+                                      struct vio *build_vio,
+                                      struct compilator_api *compilator_api) {
     // TODO: temp allocator?
     char build_dir[4096] = {0};
     char tmp_dir[4096] = {0};
@@ -93,8 +98,9 @@ static int _texture_resource_compiler(const char *filename,
 
     struct vio *tmp_file = cel_vio_from_file(output_path, VIO_OPEN_READ,
                                              MemSysApiV0.main_allocator());
-    char *tmp_data = CEL_ALLOCATE(MemSysApiV0.main_allocator(), char,
-                                  cel_vio_size(tmp_file) + 1);
+    char *tmp_data =
+    CEL_ALLOCATE(MemSysApiV0.main_allocator(), char,
+                 cel_vio_size(tmp_file) + 1);
     cel_vio_read(tmp_file, tmp_data, sizeof(char), cel_vio_size(tmp_file));
 
     struct texture resource = {
