@@ -1,7 +1,7 @@
 #include <celib/math/types.h>
 #include <engine/module/module.h>
 #include "../luasys.h"
-#include "engine/input/mouse.h"
+#include "engine/input/api.h"
 
 static struct MouseApiV0 MouseApiV0 = {0};
 

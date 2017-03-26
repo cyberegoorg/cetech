@@ -3,10 +3,10 @@
 //==============================================================================
 
 #include <celib/math/types.h>
-#include <engine/module/module_api.h>
-#include "engine/machine/machine.h"
+#include <engine/module/api.h>
+#include "engine/machine/api.h"
 
-#include "engine/input/mouse.h"
+#include "engine/input/api.h"
 
 #include "mousebtnstr.h"
 

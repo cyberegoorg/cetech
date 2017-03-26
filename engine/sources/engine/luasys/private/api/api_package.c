@@ -1,6 +1,6 @@
 
-#include <engine/renderer/mesh_renderer.h>
-#include "engine/resource/types.h"
+#include <engine/renderer/api.h>
+#include "engine/resource/api.h"
 #include <engine/module/module.h>
 #include "../luasys.h"
 

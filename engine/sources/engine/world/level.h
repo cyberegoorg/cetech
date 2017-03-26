@@ -10,7 +10,7 @@
 #include <celib/types.h>
 #include <celib/string/stringid.h>
 #include "world.h"
-#include "engine/entcom/entcom.h"
+#include "engine/entcom/api.h"
 
 
 //==============================================================================

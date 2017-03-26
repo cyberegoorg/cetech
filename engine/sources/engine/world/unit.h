@@ -9,9 +9,9 @@
 //==============================================================================
 
 #include <celib/containers/array.h>
-#include <engine/entcom/entcom.h>
+#include <engine/entcom/api.h>
 #include <celib/yaml/yaml.h>
-#include "engine/resource/types.h"
+#include "engine/resource/api.h"
 #include "engine/world/world.h"
 
 

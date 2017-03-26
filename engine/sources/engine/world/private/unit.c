@@ -1,13 +1,13 @@
 
 #include <celib/string/stringid.h>
 #include <celib/filesystem/vio.h>
-#include "engine/resource/types.h"
+#include "engine/resource/api.h"
 #include <celib/yaml/yaml.h>
 #include <celib/filesystem/path.h>
 #include <celib/containers/map.h>
-#include <engine/entcom/entcom.h>
-#include <engine/memory/memsys.h>
-#include <engine/module/module_api.h>
+#include <engine/entcom/api.h>
+#include <engine/memory/api.h>
+#include <engine/module/api.h>
 
 #include "engine/world/unit.h"
 
@@ -252,9 +252,10 @@ struct component_data {
 struct entity_compile_output *unit_compiler_create_output() {
     struct cel_allocator *a = MemSysApiV0.main_allocator();
 
-    struct entity_compile_output *output = CEL_ALLOCATE(a,
-                                                        struct entity_compile_output,
-                                                        1);
+    struct entity_compile_output *output =
+    CEL_ALLOCATE(a,
+                 struct entity_compile_output,
+                 1);
     output->ent_counter = 0;
     ARRAY_INIT(u64, &output->component_type, a);
     MAP_INIT(array_u32, &output->component_ent, a);

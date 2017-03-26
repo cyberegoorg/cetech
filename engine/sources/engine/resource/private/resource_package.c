@@ -3,12 +3,12 @@
 //==============================================================================
 
 #include <celib/string/stringid.h>
-#include <engine/task/task.h>
-#include "engine/resource/types.h"
+#include <engine/task/api.h>
+#include "engine/resource/api.h"
 #include <celib/filesystem/vio.h>
 #include <celib/yaml/yaml.h>
 #include <celib/thread/thread.h>
-#include <engine/memory/memsys.h>
+#include <engine/memory/api.h>
 #include <engine/module/module.h>
 
 #include "resource_package.h"
@@ -160,7 +160,8 @@ void package_task(void *data) {
 
 void package_load(stringid64_t name) {
 
-    struct package_task_data *task_data = CEL_ALLOCATE(
+    struct package_task_data *task_data =
+    CEL_ALLOCATE(
             MemSysApiV0.main_allocator(), struct package_task_data, 1);
 
     task_data->name = name;

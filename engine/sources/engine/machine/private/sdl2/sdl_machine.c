@@ -6,8 +6,8 @@
 #include "celib/containers/array.h"
 #include "celib/containers/eventstream.h"
 
-#include <engine/module/module_api.h>
-#include "engine/application/application.h"
+#include <engine/module/api.h>
+#include "engine/application/api.h"
 
 #include "sdl_parts.h"
 

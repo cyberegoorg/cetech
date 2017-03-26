@@ -4,12 +4,12 @@
 
 #include <engine/world/world.h>
 #include <celib/filesystem/vio.h>
-#include "engine/resource/types.h"
+#include "engine/resource/api.h"
 #include <engine/world/unit.h>
 #include <engine/world/transform.h>
 #include <celib/math/quatf.h>
-#include <engine/memory/memsys.h>
-#include <engine/module/module_api.h>
+#include <engine/memory/api.h>
+#include <engine/module/api.h>
 
 #include "engine/world/level.h"
 

@@ -2,7 +2,7 @@
 #include <engine/module/module.h>
 
 #include "../luasys.h"
-#include "engine/input/gamepad.h"
+#include "engine/input/api.h"
 
 static struct GamepadApiV0 GamepadApiV0 = {0};
 

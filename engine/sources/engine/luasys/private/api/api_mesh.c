@@ -1,6 +1,6 @@
 
-#include "engine/entcom/entcom.h"
-#include <engine/renderer/mesh_renderer.h>
+#include "engine/entcom/api.h"
+#include <engine/renderer/api.h>
 #include <engine/module/module.h>
 #include "../luasys.h"
 
@@ -45,7 +45,8 @@ static int _mesh_set_material(lua_State *l) {
 }
 
 void _register_lua_mesh_api(get_api_fce_t get_engine_api) {
-    MeshRendererApiV0 = *(struct MeshRendererApiV0 *) get_engine_api(MESH_API_ID, 0);
+    MeshRendererApiV0 = *(struct MeshRendererApiV0 *) get_engine_api(
+            MESH_API_ID, 0);
 
 
     luasys_add_module_function(API_NAME, "get", _mesh_get);

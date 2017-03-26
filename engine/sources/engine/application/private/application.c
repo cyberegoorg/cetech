@@ -11,17 +11,16 @@
 #include <celib/os/cmd_line.h>
 
 #include <engine/application/application.h>
-#include <engine/config/cvar.h>
-#include <engine/machine/machine.h>
-#include "engine/resource/types.h"
-#include <engine/luasys/luasys.h>
-#include <engine/renderer/renderer.h>
-#include <engine/develop/develop_system.h>
-#include <engine/memory/memsys.h>
-#include <engine/static_systems.h>
+#include <engine/config/api.h>
+#include <engine/machine/api.h>
+#include "engine/resource/api.h"
+#include <engine/luasys/api.h>
+#include <engine/renderer/api.h>
+#include <engine/develop/api.h>
+#include <engine/memory/api.h>
+#include "static_systems.h"
 
-#include "engine/develop/console_server.h"
-#include "engine/task/task.h"
+#include "engine/task/api.h"
 
 #define LOG_WHERE "application"
 
@@ -183,7 +182,7 @@ int application_init(int argc,
 
     _init_api();
 
-    if( !_init_config()) {
+    if (!_init_config()) {
         return 0;
     };
 

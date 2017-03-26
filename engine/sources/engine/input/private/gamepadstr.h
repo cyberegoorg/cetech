@@ -2,7 +2,7 @@
 // Includes
 //==============================================================================
 
-#include "engine/machine/machine.h"
+#include "engine/machine/api.h"
 
 static const char *_btn_to_str[GAMEPAD_BTN_MAX] = {
         [GAMEPAD_BTN_INVALID] = "invalid",
