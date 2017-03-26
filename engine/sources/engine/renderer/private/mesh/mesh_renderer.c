@@ -7,7 +7,7 @@
 #include <engine/renderer/api.h>
 #include <bgfx/c99/bgfx.h>
 #include <engine/world/transform.h>
-#include <engine/renderer/private/bgfx/scene.h>
+#include <engine/renderer/private/scene/scene.h>
 #include <engine/world/scenegraph.h>
 #include <celib/math/mat44f.h>
 
@@ -278,7 +278,7 @@ void mesh_render_all(world_t world) {
 
         bgfx_set_transform(&final_w, 1);
 
-        scene_resource_submit(scene, geom);
+        scene_submit(scene, geom);
 
         MaterialApiV0.submit(material);
 

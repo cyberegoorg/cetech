@@ -81,94 +81,13 @@ struct scene_instance *_get_scene_instance(stringid64_t scene) {
 //==============================================================================
 // Resource
 //==============================================================================
-
-void *scene_resource_loader(struct vio *input,
-                            struct cel_allocator *allocator) {
-    const i64 size = cel_vio_size(input);
-    char *data = CEL_ALLOCATE(allocator, char, size);
-    cel_vio_read(input, data, 1, size);
-
-    return data;
-}
-
-void scene_resource_unloader(void *new_data,
-                             struct cel_allocator *allocator) {
-    CEL_DEALLOCATE(allocator, new_data);
-}
-
-void scene_resource_online(stringid64_t name,
-                           void *data) {
-    struct scene_blob *resource = data;
-
-    stringid64_t *geom_name = scene_blob_geom_name(resource);
-    u32 *ib_offset = scene_blob_ib_offset(resource);
-    u32 *vb_offset = scene_blob_vb_offset(resource);
-    bgfx_vertex_decl_t *vb_decl = scene_blob_vb_decl(resource);
-    u32 *ib_size = scene_blob_ib_size(resource);
-    u32 *vb_size = scene_blob_vb_size(resource);
-    u32 *ib = scene_blob_ib(resource);
-    u8 *vb = scene_blob_vb(resource);
-
-    struct scene_instance instance = {0};
-    _init_scene_instance(&instance);
-
-    for (int i = 0; i < resource->geom_count; ++i) {
-        bgfx_vertex_buffer_handle_t bvb = bgfx_create_vertex_buffer(
-                bgfx_make_ref((const void *) &vb[vb_offset[i]], vb_size[i]),
-                &vb_decl[i], BGFX_BUFFER_NONE);
-
-        bgfx_index_buffer_handle_t bib = bgfx_create_index_buffer(
-                bgfx_make_ref((const void *) &ib[ib_offset[i]],
-                              sizeof(u32) * ib_size[i]), BGFX_BUFFER_INDEX32);
-
-        u32 idx = ARRAY_SIZE(&instance.vb);
-        MAP_SET(u8, &instance.geom_map, geom_name[i].id, idx);
-
-        ARRAY_PUSH_BACK(u32, &instance.size, ib_size[i]);
-        ARRAY_PUSH_BACK(bgfx_vertex_buffer_handle_t, &instance.vb, bvb);
-        ARRAY_PUSH_BACK(bgfx_index_buffer_handle_t, &instance.ib, bib);
-    }
-
-    MAP_SET(scene_instance, &_G.scene_instance, name.id, instance);
-}
-
-static const bgfx_texture_handle_t null_texture = {0};
-
-void scene_resource_offline(stringid64_t name,
-                            void *data) {
-    struct scene_instance instance = MAP_GET(scene_instance, &_G.scene_instance,
-                                             name.id,
-                                             (struct scene_instance) {0});
-    _destroy_scene_instance(&instance);
-    MAP_REMOVE(scene_instance, &_G.scene_instance, name.id);
-}
-
-void *scene_resource_reloader(stringid64_t name,
-                              void *old_data,
-                              void *new_data,
-                              struct cel_allocator *allocator) {
-    scene_resource_offline(name, old_data);
-    scene_resource_online(name, new_data);
-
-    CEL_DEALLOCATE(allocator, old_data);
-
-    return new_data;
-}
-
-static const resource_callbacks_t scene_resource_callback = {
-        .loader = scene_resource_loader,
-        .unloader =scene_resource_unloader,
-        .online =scene_resource_online,
-        .offline =scene_resource_offline,
-        .reloader = scene_resource_reloader
-};
-
+#include "scene_resource.h"
 
 //==============================================================================
 // Interface
 //==============================================================================
 
-int scene_resource_init() {
+int scene_init() {
     _G = (struct G) {0};
 
     MemSysApiV0 = *(struct MemSysApiV0 *) module_get_engine_api(MEMORY_API_ID,
@@ -188,13 +107,13 @@ int scene_resource_init() {
     return 1;
 }
 
-void scene_resource_shutdown() {
+void scene_shutdown() {
     MAP_DESTROY(scene_instance, &_G.scene_instance);
     _G = (struct G) {0};
 }
 
-void scene_resource_submit(stringid64_t scene,
-                           stringid64_t geom_name) {
+void scene_submit(stringid64_t scene,
+                  stringid64_t geom_name) {
     ResourceApiV0.get(_G.type, scene);
     struct scene_instance *instance = _get_scene_instance(scene);
 

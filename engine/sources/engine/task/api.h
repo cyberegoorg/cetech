@@ -19,8 +19,10 @@
 // Defines
 //==============================================================================
 
-#define CEL_ASSERT_IS_WORKER(where, worker_id)\
-    CEL_ASSERT_MSG(where, TaskApiV0.worker_id() == worker_id, "Current worker: %d", TaskApiV0.worker_id())
+#define CEL_ASSERT_IS_WORKER(where, worker_id)                  \
+    CEL_ASSERT_MSG(where,                                       \
+                   TaskApiV0.worker_id() == worker_id,          \
+                   "Current worker: %d", TaskApiV0.worker_id())
 
 
 //==============================================================================

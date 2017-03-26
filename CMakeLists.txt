@@ -163,12 +163,12 @@ set(SOURCE_FILES
         engine/sources/engine/input/private/api.c
 
 
-        engine/sources/engine/renderer/private/bgfx/api.c
-        engine/sources/engine/renderer/private/bgfx/texture.c
-        engine/sources/engine/renderer/private/bgfx/shader.c
-        engine/sources/engine/renderer/private/bgfx/material.c
-        engine/sources/engine/renderer/private/bgfx/scene.c
-        engine/sources/engine/renderer/private/bgfx/mesh_renderer.c
+        engine/sources/engine/renderer/private/api.c
+        engine/sources/engine/renderer/private/texture/texture.c
+        engine/sources/engine/renderer/private/shader/shader.c
+        engine/sources/engine/renderer/private/material/material.c
+        engine/sources/engine/renderer/private/scene/scene.c
+        engine/sources/engine/renderer/private/mesh/mesh_renderer.c
 
         engine/sources/engine/world/private/transform.c
         engine/sources/engine/world/private/scenegraph.c

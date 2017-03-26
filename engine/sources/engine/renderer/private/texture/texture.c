@@ -47,74 +47,13 @@ static struct ApplicationApiV0 ApplicationApiV0;
 //==============================================================================
 // Resource
 //==============================================================================
-
-void *texture_resource_loader(struct vio *input,
-                              struct cel_allocator *allocator) {
-    const i64 size = cel_vio_size(input);
-    char *data = CEL_ALLOCATE(allocator, char, size);
-    cel_vio_read(input, data, 1, size);
-
-    return data;
-}
-
-void texture_resource_unloader(void *new_data,
-                               struct cel_allocator *allocator) {
-    CEL_DEALLOCATE(allocator, new_data);
-}
-
-void texture_resource_online(stringid64_t name,
-                             void *data) {
-    struct texture *resource = data;
-
-    const bgfx_memory_t *mem = bgfx_copy((resource + 1), resource->size);
-    bgfx_texture_handle_t texture = bgfx_create_texture(mem, BGFX_TEXTURE_NONE,
-                                                        0, NULL);
-
-    MAP_SET(bgfx_texture_handle_t, &_G.handler_map, name.id, texture);
-}
-
-static const bgfx_texture_handle_t null_texture = {0};
-
-void texture_resource_offline(stringid64_t name,
-                              void *data) {
-    bgfx_texture_handle_t texture = MAP_GET(bgfx_texture_handle_t,
-                                            &_G.handler_map, name.id,
-                                            null_texture);
-
-    if (texture.idx == null_texture.idx) {
-        return;
-    }
-
-    bgfx_destroy_texture(texture);
-
-}
-
-void *texture_resource_reloader(stringid64_t name,
-                                void *old_data,
-                                void *new_data,
-                                struct cel_allocator *allocator) {
-    texture_resource_offline(name, old_data);
-    texture_resource_online(name, new_data);
-
-    CEL_DEALLOCATE(allocator, old_data);
-
-    return new_data;
-}
-
-static const resource_callbacks_t texture_resource_callback = {
-        .loader = texture_resource_loader,
-        .unloader =texture_resource_unloader,
-        .online =texture_resource_online,
-        .offline =texture_resource_offline,
-        .reloader = texture_resource_reloader
-};
-
+#include "texture_resource.h"
 
 //==============================================================================
 // Interface
 //==============================================================================
 
-int texture_resource_init() {
+int texture_init() {
     _G = (struct G) {0};
 
     MemSysApiV0 = *(struct MemSysApiV0 *) module_get_engine_api(MEMORY_API_ID,
@@ -136,13 +75,13 @@ int texture_resource_init() {
     return 1;
 }
 
-void texture_resource_shutdown() {
+void texture_shutdown() {
     MAP_DESTROY(bgfx_texture_handle_t, &_G.handler_map);
 
     _G = (struct G) {0};
 }
 
-bgfx_texture_handle_t texture_resource_get(stringid64_t name) {
+bgfx_texture_handle_t texture_get(stringid64_t name) {
     ResourceApiV0.get(_G.type, name); // TODO: only for autoload
 
     return MAP_GET(bgfx_texture_handle_t, &_G.handler_map, name.id,

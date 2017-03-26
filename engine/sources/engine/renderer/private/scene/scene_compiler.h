@@ -8,6 +8,40 @@
 ARRAY_PROTOTYPE(bgfx_vertex_decl_t);
 ARRAY_PROTOTYPE(stringid64_t);
 
+static const struct {
+    const char *name;
+    bgfx_attrib_t attrib;
+} _chanel_types[] = {
+        {.name="position", .attrib=BGFX_ATTRIB_POSITION},
+        {.name="normal", .attrib=BGFX_ATTRIB_NORMAL},
+        {.name="tangent", .attrib=BGFX_ATTRIB_TANGENT},
+        {.name="bitangent", .attrib=BGFX_ATTRIB_BITANGENT},
+        {.name="color0", .attrib=BGFX_ATTRIB_COLOR0},
+        {.name="color1", .attrib=BGFX_ATTRIB_COLOR1},
+        {.name="indices", .attrib=BGFX_ATTRIB_INDICES},
+        {.name="weight", .attrib=BGFX_ATTRIB_WEIGHT},
+        {.name="texcoord0", .attrib=BGFX_ATTRIB_TEXCOORD0},
+        {.name="texcoord1", .attrib=BGFX_ATTRIB_TEXCOORD1},
+        {.name="texcoord2", .attrib=BGFX_ATTRIB_TEXCOORD2},
+        {.name="texcoord3", .attrib=BGFX_ATTRIB_TEXCOORD3},
+        {.name="texcoord4", .attrib=BGFX_ATTRIB_TEXCOORD4},
+        {.name="texcoord5", .attrib=BGFX_ATTRIB_TEXCOORD5},
+        {.name="texcoord6", .attrib=BGFX_ATTRIB_TEXCOORD6},
+        {.name="texcoord7", .attrib=BGFX_ATTRIB_TEXCOORD7},
+};
+
+static const struct {
+    const char *name;
+    bgfx_attrib_type_t attrib_type;
+    size_t size;
+} _attrin_tbl[] = {
+        {.name="f32", .size=sizeof(f32), .attrib_type=BGFX_ATTRIB_TYPE_FLOAT},
+        {.name="i16", .size=sizeof(i16), .attrib_type=BGFX_ATTRIB_TYPE_INT16},
+        {.name="u8", .size=sizeof(u8), .attrib_type=BGFX_ATTRIB_TYPE_UINT8},
+        // TODO: {.name="f16", .size=sizeof(f16), .attrib_type=BGFX_ATTRIB_TYPE_HALF},
+        // TODO: {.name="u10", .size=sizeof(u10), .attrib_type=BGFX_ATTRIB_TYPE_UINT10},
+};
+
 struct compile_output {
     ARRAY_T(stringid64_t) geom_name;
     ARRAY_T(u32) ib_offset;
@@ -69,26 +103,15 @@ void _destroy_compile_output(struct compile_output *output) {
 static void _type_to_attr_type(const char *name,
                                bgfx_attrib_type_t *attr_type,
                                size_t *size) {
-    static const struct {
-        const char *name;
-        bgfx_attrib_type_t attrib_type;
-        size_t size;
-    } _tbl[] = {
-            {.name="f32", .size=sizeof(f32), .attrib_type=BGFX_ATTRIB_TYPE_FLOAT},
-            {.name="i16", .size=sizeof(i16), .attrib_type=BGFX_ATTRIB_TYPE_INT16},
-            {.name="u8", .size=sizeof(u8), .attrib_type=BGFX_ATTRIB_TYPE_UINT8},
-            // TODO: {.name="f16", .size=sizeof(f16), .attrib_type=BGFX_ATTRIB_TYPE_HALF},
-            // TODO: {.name="u10", .size=sizeof(u10), .attrib_type=BGFX_ATTRIB_TYPE_UINT10},
-    };
 
-    for (int i = 0; i < CEL_ARRAY_LEN(_tbl); ++i) {
-        if (cel_strcmp(_tbl[i].name, name) != 0) {
+    for (int i = 0; i < CEL_ARRAY_LEN(_attrin_tbl); ++i) {
+        if (cel_strcmp(_attrin_tbl[i].name, name) != 0) {
             continue;
         }
 
 
-        *attr_type = _tbl[i].attrib_type;
-        *size = _tbl[i].size;
+        *attr_type = _attrin_tbl[i].attrib_type;
+        *size = _attrin_tbl[i].size;
         return;
     }
 
@@ -117,27 +140,6 @@ void _parse_vertex_decl(bgfx_vertex_decl_t *decl,
                          0, 0);
 }
 
-static const struct {
-    const char *name;
-    bgfx_attrib_t attrib;
-} _chanel_types[] = {
-        {.name="position", .attrib=BGFX_ATTRIB_POSITION},
-        {.name="normal", .attrib=BGFX_ATTRIB_NORMAL},
-        {.name="tangent", .attrib=BGFX_ATTRIB_TANGENT},
-        {.name="bitangent", .attrib=BGFX_ATTRIB_BITANGENT},
-        {.name="color0", .attrib=BGFX_ATTRIB_COLOR0},
-        {.name="color1", .attrib=BGFX_ATTRIB_COLOR1},
-        {.name="indices", .attrib=BGFX_ATTRIB_INDICES},
-        {.name="weight", .attrib=BGFX_ATTRIB_WEIGHT},
-        {.name="texcoord0", .attrib=BGFX_ATTRIB_TEXCOORD0},
-        {.name="texcoord1", .attrib=BGFX_ATTRIB_TEXCOORD1},
-        {.name="texcoord2", .attrib=BGFX_ATTRIB_TEXCOORD2},
-        {.name="texcoord3", .attrib=BGFX_ATTRIB_TEXCOORD3},
-        {.name="texcoord4", .attrib=BGFX_ATTRIB_TEXCOORD4},
-        {.name="texcoord5", .attrib=BGFX_ATTRIB_TEXCOORD5},
-        {.name="texcoord6", .attrib=BGFX_ATTRIB_TEXCOORD6},
-        {.name="texcoord7", .attrib=BGFX_ATTRIB_TEXCOORD7},
-};
 
 static void _parese_types(bgfx_vertex_decl_t *decl,
                           yaml_node_t types,
@@ -254,7 +256,6 @@ struct foreach_graph_data {
     struct compile_output *output;
     u32 parent_idx;
 };
-
 
 void foreach_graph_clb(yaml_node_t key,
                        yaml_node_t value,

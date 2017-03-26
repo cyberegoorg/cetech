@@ -12,9 +12,10 @@
 #include "celib/window/window.h"
 
 #include "bgfx/c99/platform.h"
-#include "texture.h"
-#include "shader.h"
-#include "scene.h"
+#include "engine/renderer/private/texture/texture.h"
+#include "engine/renderer/private/shader/shader.h"
+#include "engine/renderer/private/scene/scene.h"
+#include "engine/renderer/private/material/material.h"
 
 
 IMPORT_API(ConsoleServerApi, 0);
@@ -38,9 +39,9 @@ static struct G {
 } _G = {0};
 
 
-int material_resource_init(get_api_fce_t get_engine_api);
+int material_init(get_api_fce_t get_engine_api);
 
-void material_resource_shutdown();
+void material_shutdown();
 
 //==============================================================================
 // Private
@@ -78,10 +79,10 @@ static void _init(get_api_fce_t get_engine_api) {
 
     cvar_t daemon = ConfigApiV0.find("daemon");
     if (!ConfigApiV0.get_int(daemon)) {
-        texture_resource_init();
-        shader_resource_init();
-        material_resource_init(get_engine_api);
-        scene_resource_init();
+        texture_init();
+        shader_init();
+        material_init(get_engine_api);
+        scene_init();
 
         ConsoleServerApiV0.consolesrv_register_command("renderer.resize",
                                                        _cmd_resize);
@@ -91,10 +92,10 @@ static void _init(get_api_fce_t get_engine_api) {
 static void _shutdown() {
     cvar_t daemon = ConfigApiV0.find("daemon");
     if (!ConfigApiV0.get_int(daemon)) {
-        texture_resource_shutdown();
-        shader_resource_shutdown();
-        material_resource_shutdown();
-        scene_resource_shutdown();
+        texture_shutdown();
+        shader_shutdown();
+        material_shutdown();
+        scene_shutdown();
 
         bgfx_shutdown();
     }
@@ -204,32 +205,7 @@ void *renderer_get_module_api(int api,
                 case 0: {
                     static struct MaterialApiV0 api = {0};
 
-                    material_t material_resource_create(stringid64_t name);
-
-                    u32 material_get_texture_count(material_t material);
-
-                    void material_set_texture(material_t material,
-                                              const char *slot,
-                                              stringid64_t texture);
-
-                    void material_set_vec4f(material_t material,
-                                            const char *slot,
-                                            cel_vec4f_t v);
-
-                    void material_set_mat33f(material_t material,
-                                             const char *slot,
-                                             mat33f_t v);
-
-                    void material_set_mat44f(material_t material,
-                                             const char *slot,
-                                             cel_mat44f_t v);
-
-
-                    void material_use(material_t material);
-
-                    void material_submit(material_t material);
-
-                    api.resource_create = material_resource_create;
+                    api.resource_create = material_create;
                     api.get_texture_count = material_get_texture_count;
                     api.set_texture = material_set_texture;
                     api.set_vec4f = material_set_vec4f;

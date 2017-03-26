@@ -26,7 +26,6 @@ static void _init_static_modules() {
 
     ADD_STATIC_PLUGIN(renderer);
 
-
     ADD_STATIC_PLUGIN(camera);
     ADD_STATIC_PLUGIN(scenegraph);
     ADD_STATIC_PLUGIN(transform);

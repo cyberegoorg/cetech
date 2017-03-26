@@ -11,8 +11,8 @@
 #include <engine/module/api.h>
 
 #include "engine/resource/api.h"
-#include "texture.h"
-#include "shader.h"
+#include "engine/renderer/private/texture/texture.h"
+#include "engine/renderer/private/shader/shader.h"
 #include "material_blob.h"
 
 //==============================================================================
@@ -61,55 +61,13 @@ IMPORT_API(ResourceApi, 0);
 //==============================================================================
 // Resource
 //==============================================================================
-
-void *material_resource_loader(struct vio *input,
-                               struct cel_allocator *allocator) {
-    const i64 size = cel_vio_size(input);
-    char *data = CEL_ALLOCATE(allocator, char, size);
-    cel_vio_read(input, data, 1, size);
-
-    return data;
-}
-
-void material_resource_unloader(void *new_data,
-                                struct cel_allocator *allocator) {
-    CEL_DEALLOCATE(allocator, new_data);
-}
-
-void material_resource_online(stringid64_t name,
-                              void *data) {
-}
-
-static const bgfx_program_handle_t null_program = {0};
-
-void material_resource_offline(stringid64_t name,
-                               void *data) {
-}
-
-void *material_resource_reloader(stringid64_t name,
-                                 void *old_data,
-                                 void *new_data,
-                                 struct cel_allocator *allocator) {
-    material_resource_offline(name, old_data);
-    material_resource_online(name, new_data);
-
-    CEL_DEALLOCATE(allocator, old_data);
-    return new_data;
-}
-
-static const resource_callbacks_t material_resource_callback = {
-        .loader = material_resource_loader,
-        .unloader =material_resource_unloader,
-        .online =material_resource_online,
-        .offline =material_resource_offline,
-        .reloader = material_resource_reloader
-};
+#include "material_resource.h"
 
 //==============================================================================
 // Interface
 //==============================================================================
 
-int material_resource_init(get_api_fce_t get_engine_api) {
+int material_init(get_api_fce_t get_engine_api) {
     _G = (struct G) {0};
 
     INIT_API(MemSysApi, MEMORY_API_ID, 0);
@@ -129,7 +87,7 @@ int material_resource_init(get_api_fce_t get_engine_api) {
     return 1;
 }
 
-void material_resource_shutdown() {
+void material_shutdown() {
     handlerid_destroy(&_G.material_handler);
 
     MAP_DESTROY(u32, &_G.material_instace_map);
@@ -141,7 +99,7 @@ void material_resource_shutdown() {
 
 static const material_t null_material = {0};
 
-material_t material_resource_create(stringid64_t name) {
+material_t material_create(stringid64_t name) {
     struct material_blob *resource = ResourceApiV0.get(_G.type, name);
 
     u32 size = sizeof(struct material_blob) +
@@ -238,8 +196,7 @@ void material_set_texture(material_t material,
         return;
     }
 
-    struct material_blob *resource = (struct material_blob *) &_get_resorce(
-            idx);
+    struct material_blob *resource = (struct material_blob *) &_get_resorce(idx);
 
 
     stringid64_t *u_texture = material_blob_uniform_texture(resource);
@@ -332,7 +289,7 @@ void material_use(material_t material) {
     // TODO: refactor: one loop
     u32 offset = 0;
     for (int i = 0; i < resource->texture_count; ++i) {
-        bgfx_texture_handle_t texture = texture_resource_get(u_texture[i]);
+        bgfx_texture_handle_t texture = texture_get(u_texture[i]);
         bgfx_set_texture(i, u_handler[offset + i], texture, 0);
     }
     offset += resource->texture_count;
@@ -373,5 +330,5 @@ void material_submit(material_t material) {
 
     struct material_blob *resource = (struct material_blob *) &_get_resorce(
             idx);
-    bgfx_submit(0, shader_resource_get(resource->shader_name), 0, 0);
+    bgfx_submit(0, shader_get(resource->shader_name), 0, 0);
 }

@@ -3,10 +3,10 @@
 
 #include <bgfx/c99/bgfx.h>
 
-int shader_resource_init();
+int shader_init();
 
-void shader_resource_shutdown();
+void shader_shutdown();
 
-bgfx_program_handle_t shader_resource_get(stringid64_t name);
+bgfx_program_handle_t shader_get(stringid64_t name);
 
 #endif //CETECH_BGFX_SHADER_RESOURCE_H
