@@ -9,7 +9,7 @@
 #include <celib/yaml/yaml.h>
 #include <engine/memory/api.h>
 #include <engine/module/api.h>
-#include <engine/module/module.h>
+#include <engine/module/component.h>
 #include <celib/string/stringid.h>
 #include "engine/resource/api.h"
 

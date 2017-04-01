@@ -1,4 +1,4 @@
-#include <engine/module/module.h>
+#include <engine/module/component.h>
 #include "../luasys.h"
 #include "engine/input/api.h"
 

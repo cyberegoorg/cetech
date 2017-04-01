@@ -9,7 +9,7 @@
 #include <celib/yaml/yaml.h>
 #include <celib/thread/thread.h>
 #include <engine/memory/api.h>
-#include <engine/module/module.h>
+#include <engine/module/component.h>
 
 #include "resource_package.h"
 

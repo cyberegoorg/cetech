@@ -1,8 +1,8 @@
-//! \defgroup EntityComponent
-//! Entity-Component system
+//! \defgroup Component
+//! Component system
 //! \{
-#ifndef CETECH_ENTITY_MANAGER_H
-#define CETECH_ENTITY_MANAGER_H
+#ifndef CETECH_COMPONENT_MANAGER_H
+#define CETECH_COMPONENT_MANAGER_H
 
 //==============================================================================
 // Includes
@@ -13,22 +13,13 @@
 #include <celib/string/stringid.h>
 #include <celib/handler/handlerid.h>
 #include <engine/world/world.h>
+#include <engine/entity/api.h>
 
 
 //==============================================================================
 // Typedefs
 //==============================================================================
 
-//! Entity typedef
-typedef struct {
-    union {
-        handler_t h;
-        u32 idx;
-    };
-} entity_t;
-
-ARRAY_PROTOTYPE(entity_t);
-MAP_PROTOTYPE(entity_t);
 
 //! Component compiler
 //! \param body Component body yaml
@@ -77,21 +68,8 @@ static struct component_clb {
 // Api
 //==============================================================================
 
-//! Entity component system API V0
-struct EntComSystemApiV0 {
-    //! Create new entity
-    //! \return New entity
-    entity_t (*entity_manager_create)();
-
-    //! Destoy entity
-    //! \param entity Entity to destroy
-    void (*entity_manager_destroy)(entity_t entity);
-
-    //! Is entity alive?
-    //! \param entity Entity
-    //! \return 1 if entity is alive else 0
-    int (*entity_manager_alive)(entity_t entity);
-
+//! Component system API V0
+struct ComponentSystemApiV0 {
     //! Register component compiler
     //! \param type Component type
     //! \param compiler Compiler fce
@@ -145,6 +123,5 @@ struct EntComSystemApiV0 {
                               u32 count);
 };
 
-
-#endif //CETECH_ENTITY_MANAGER_H
+#endif //CETECH_COMPONENT_MANAGER_H
 //! \}

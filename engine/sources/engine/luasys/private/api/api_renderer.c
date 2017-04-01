@@ -1,5 +1,5 @@
 
-#include <engine/module/module.h>
+#include <engine/module/component.h>
 #include "engine/renderer/api.h"
 #include "../luasys.h"
 

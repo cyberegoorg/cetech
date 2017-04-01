@@ -148,7 +148,8 @@ set(SOURCE_FILES
         engine/sources/engine/resource/private/resource_compiler.c
         engine/sources/engine/filesystem/private/filesystem.c
         engine/sources/engine/world/private/unit.c
-        engine/sources/engine/entcom/private/module.c
+        engine/sources/engine/component/private/component.c
+        engine/sources/engine/entity/private/entity.c
         engine/sources/engine/world/private/world.c
         engine/sources/engine/world/private/level.c
 

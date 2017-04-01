@@ -5,7 +5,8 @@
 #include <celib/yaml/yaml.h>
 #include <celib/filesystem/path.h>
 #include <celib/containers/map.h>
-#include <engine/entcom/api.h>
+#include <engine/entity/api.h>
+#include <engine/component/api.h>
 #include <engine/memory/api.h>
 #include <engine/module/api.h>
 
@@ -21,7 +22,8 @@ static struct G {
     ARRAY_T(array_entity_t) spawned_array;
 } _G = {0};
 
-IMPORT_API(EntComSystemApi, 0);
+IMPORT_API(EntitySystemApi, 0);
+IMPORT_API(ComponentSystemApi, 0);
 IMPORT_API(MemSysApi, 0);
 IMPORT_API(ResourceApi, 0);
 
@@ -345,7 +347,7 @@ void unit_compiler_write_to_build(struct entity_compile_output *output,
         ARRAY_INIT(u8, &comp_data, MemSysApiV0.main_allocator());
 
         for (int i = 0; i < cdata.ent_count; ++i) {
-            EntComSystemApiV0.component_compile(id, ARRAY_AT(body, i),
+            ComponentSystemApiV0.component_compile(id, ARRAY_AT(body, i),
                                                 &comp_data);
         }
 
@@ -447,7 +449,8 @@ static const resource_callbacks_t unit_resource_callback = {
 
 
 static void _init(get_api_fce_t get_engine_api) {
-    INIT_API(EntComSystemApi, ENTCOM_API_ID, 0);
+    INIT_API(EntitySystemApi, ENTITY_API_ID, 0);
+    INIT_API(ComponentSystemApi, COMPONENT_API_ID, 0);
     INIT_API(MemSysApi, MEMORY_API_ID, 0);
     INIT_API(ResourceApi, RESOURCE_API_ID, 0);
 
@@ -479,7 +482,7 @@ ARRAY_T(entity_t) *unit_spawn_from_resource(world_t world,
 
     for (int j = 0; j < res->ent_count; ++j) {
         ARRAY_PUSH_BACK(entity_t, spawned,
-                        EntComSystemApiV0.entity_manager_create());
+                        EntitySystemApiV0.entity_manager_create());
     }
 
     entity_t root = ARRAY_AT(spawned, 0);
@@ -493,7 +496,7 @@ ARRAY_T(entity_t) *unit_spawn_from_resource(world_t world,
 
         u32 *c_ent = component_data_ent(comp_data);
         char *c_data = component_data_data(comp_data);
-        EntComSystemApiV0.component_spawn(world, type, &ARRAY_AT(spawned, 0),
+        ComponentSystemApiV0.component_spawn(world, type, &ARRAY_AT(spawned, 0),
                                           c_ent, parents, comp_data->ent_count,
                                           c_data);
 
@@ -526,7 +529,7 @@ void unit_destroy(world_t world,
     for (int i = 0; i < count; ++i) {
         ARRAY_T(entity_t) *spawned = _get_spawned_array(unit[i]);
 
-        EntComSystemApiV0.component_destroy(world, spawned->data,
+        ComponentSystemApiV0.component_destroy(world, spawned->data,
                                             spawned->size);
 
         _destroy_spawned_array(unit[i]);

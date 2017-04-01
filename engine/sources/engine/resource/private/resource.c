@@ -13,7 +13,7 @@
 #include <engine/develop/api.h>
 #include <engine/memory/api.h>
 #include <engine/module/api.h>
-#include <engine/module/module.h>
+#include <engine/module/component.h>
 #include <engine/filesystem/api.h>
 
 #include "resource.h"

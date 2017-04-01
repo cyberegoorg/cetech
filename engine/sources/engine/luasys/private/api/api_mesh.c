@@ -1,7 +1,7 @@
 
-#include "engine/entcom/api.h"
+#include "engine/entity/api.h"
 #include <engine/renderer/api.h>
-#include <engine/module/module.h>
+#include <engine/module/component.h>
 #include "../luasys.h"
 
 #define API_NAME "Mesh"

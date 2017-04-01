@@ -1,6 +1,7 @@
 #include <celib/containers/array.h>
 #include <celib/yaml/yaml.h>
-#include <engine/entcom/api.h>
+#include <engine/entity/api.h>
+#include <engine/component/api.h>
 #include <celib/math/quatf.h>
 #include <celib/math/mat44f.h>
 #include "engine/world/transform.h"
@@ -211,10 +212,10 @@ static void _spawner(world_t world,
     }
 }
 
-IMPORT_API(EntComSystemApi, 0);
+IMPORT_API(ComponentSystemApi, 0);
 
 static void _init(get_api_fce_t get_engine_api) {
-    INIT_API(EntComSystemApi, ENTCOM_API_ID, 0);
+    INIT_API(ComponentSystemApi, COMPONENT_API_ID, 0);
     INIT_API(MemSysApi, MEMORY_API_ID, 0);
 
     _G = (struct G) {0};
@@ -223,10 +224,10 @@ static void _init(get_api_fce_t get_engine_api) {
 
     _G.type = stringid64_from_string("transform");
 
-    EntComSystemApiV0.component_register_compiler(_G.type,
+    ComponentSystemApiV0.component_register_compiler(_G.type,
                                                   _transform_component_compiler,
                                                   10);
-    EntComSystemApiV0.component_register_type(_G.type, (struct component_clb) {
+    ComponentSystemApiV0.component_register_type(_G.type, (struct component_clb) {
             .spawner=_spawner, .destroyer=_destroyer,
             .on_world_create=_on_world_create, .on_world_destroy=_on_world_destroy
     });
