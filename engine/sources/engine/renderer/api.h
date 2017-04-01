@@ -8,7 +8,7 @@
 // Includes
 //==============================================================================
 
-#include <engine/world/camera.h>
+#include <engine/camera/camera.h>
 #include "celib/window/types.h"
 #include "celib/math/types.h"
 

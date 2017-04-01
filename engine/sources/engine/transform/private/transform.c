@@ -4,7 +4,7 @@
 #include <engine/component/api.h>
 #include <celib/math/quatf.h>
 #include <celib/math/mat44f.h>
-#include "engine/world/transform.h"
+#include "engine/transform/transform.h"
 #include <engine/memory/api.h>
 #include <engine/module/api.h>
 

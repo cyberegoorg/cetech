@@ -7,7 +7,7 @@
 #include <include/assimp/cimport.h>
 
 #include <celib/string/stringid.h>
-#include <engine/world/scenegraph.h>
+#include <engine/scenegraph/scenegraph.h>
 #include "celib/filesystem/vio.h"
 #include <engine/memory/api.h>
 #include <engine/module/component.h>

@@ -1,5 +1,6 @@
-//! \addtogroup World
-//! \{
+//! \defgroup World
+//! Game world
+
 #ifndef CETECH_WORLD_SYSTEM_H
 #define CETECH_WORLD_SYSTEM_H
 

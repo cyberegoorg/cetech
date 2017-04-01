@@ -7,9 +7,9 @@
 #include <engine/component/api.h>
 #include <engine/renderer/api.h>
 #include <bgfx/c99/bgfx.h>
-#include <engine/world/transform.h>
+#include <engine/transform/transform.h>
 #include <engine/renderer/private/scene/scene.h>
-#include <engine/world/scenegraph.h>
+#include <engine/scenegraph/scenegraph.h>
 #include <celib/math/mat44f.h>
 
 #include <engine/memory/api.h>

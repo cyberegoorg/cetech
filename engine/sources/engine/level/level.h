@@ -9,7 +9,7 @@
 
 #include <celib/types.h>
 #include <celib/string/stringid.h>
-#include "world.h"
+#include "engine/world/world.h"
 #include "engine/entity/api.h"
 
 

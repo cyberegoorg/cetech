@@ -147,11 +147,11 @@ set(SOURCE_FILES
         engine/sources/engine/resource/private/resource_package.c
         engine/sources/engine/resource/private/resource_compiler.c
         engine/sources/engine/filesystem/private/filesystem.c
-        engine/sources/engine/world/private/unit.c
+        engine/sources/engine/unit/private/unit.c
         engine/sources/engine/component/private/component.c
         engine/sources/engine/entity/private/entity.c
         engine/sources/engine/world/private/world.c
-        engine/sources/engine/world/private/level.c
+        engine/sources/engine/level/private/level.c
 
         engine/sources/engine/machine/private/api.c
         engine/sources/engine/machine/private/sdl2/sdl_mouse.c
@@ -171,9 +171,9 @@ set(SOURCE_FILES
         engine/sources/engine/renderer/private/scene/scene.c
         engine/sources/engine/renderer/private/mesh/mesh_renderer.c
 
-        engine/sources/engine/world/private/transform.c
-        engine/sources/engine/world/private/scenegraph.c
-        engine/sources/engine/world/private/camera.c
+        engine/sources/engine/transform/private/transform.c
+        engine/sources/engine/scenegraph/private/scenegraph.c
+        engine/sources/engine/camera/private/camera.c
 
         )
 

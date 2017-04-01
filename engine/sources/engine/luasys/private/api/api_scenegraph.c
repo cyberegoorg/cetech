@@ -1,5 +1,5 @@
 
-#include <engine/world/scenegraph.h>
+#include <engine/scenegraph/scenegraph.h>
 #include <engine/module/component.h>
 #include "../luasys.h"
 

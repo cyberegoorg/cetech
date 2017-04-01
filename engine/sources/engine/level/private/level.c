@@ -5,13 +5,13 @@
 #include <engine/world/world.h>
 #include <celib/filesystem/vio.h>
 #include "engine/resource/api.h"
-#include <engine/world/unit.h>
-#include <engine/world/transform.h>
+#include <engine/unit/unit.h>
+#include <engine/transform/transform.h>
 #include <celib/math/quatf.h>
 #include <engine/memory/api.h>
 #include <engine/module/api.h>
 
-#include "engine/world/level.h"
+#include "engine/level/level.h"
 #include "level_blob.h"
 
 IMPORT_API(EntitySystemApi, 0);

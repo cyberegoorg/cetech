@@ -3,7 +3,7 @@
 //==============================================================================
 
 #include <celib/math/types.h>
-#include <engine/world/camera.h>
+#include <engine/camera/camera.h>
 #include <engine/renderer/api.h>
 #include <engine/develop/api.h>
 #include <engine/application/api.h>

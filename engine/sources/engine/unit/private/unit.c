@@ -10,7 +10,7 @@
 #include <engine/memory/api.h>
 #include <engine/module/api.h>
 
-#include "engine/world/unit.h"
+#include "engine/unit/unit.h"
 
 ARRAY_PROTOTYPE_N(struct array_entity_t, array_entity_t);
 MAP_PROTOTYPE_N(struct array_entity_t, array_entity_t);

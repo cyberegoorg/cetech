@@ -4,7 +4,7 @@
 #include <celib/math/mat44f.h>
 
 #include <engine/entity/api.h>
-#include <engine/world/scenegraph.h>
+#include <engine/scenegraph/scenegraph.h>
 #include <engine/memory/api.h>
 #include <engine/module/api.h>
 
