@@ -1,7 +1,7 @@
 //==============================================================================
 // Static engine system configuration
 //==============================================================================
-#include "engine/module/module.h"
+#include "engine/module/component.h"
 
 static void _init_static_modules() {
     ADD_STATIC_PLUGIN(machine);
@@ -14,7 +14,8 @@ static void _init_static_modules() {
     ADD_STATIC_PLUGIN(consoleserver);
     ADD_STATIC_PLUGIN(developsystem);
 
-    ADD_STATIC_PLUGIN(entcom);
+    ADD_STATIC_PLUGIN(entity);
+    ADD_STATIC_PLUGIN(component);
     ADD_STATIC_PLUGIN(world);
 
     ADD_STATIC_PLUGIN(unit);

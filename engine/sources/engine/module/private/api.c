@@ -9,7 +9,7 @@
 #include <celib/filesystem/path.h>
 #include <engine/memory/api.h>
 
-#include "engine/module/module.h"
+#include "engine/module/component.h"
 
 //==============================================================================
 // Defines

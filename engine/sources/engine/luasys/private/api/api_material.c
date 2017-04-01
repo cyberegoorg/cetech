@@ -1,7 +1,7 @@
 
 #include <engine/world/transform.h>
 #include <engine/renderer/api.h>
-#include <engine/module/module.h>
+#include <engine/module/component.h>
 #include "../luasys.h"
 
 #define API_NAME "Material"

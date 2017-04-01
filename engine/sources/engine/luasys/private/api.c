@@ -9,7 +9,7 @@
 #include <celib/math/vec2f.h>
 
 #include "engine/develop/api.h"
-#include "engine/module/module.h"
+#include "engine/module/component.h"
 
 #include "vectors.h"
 #include "quaternion.h"

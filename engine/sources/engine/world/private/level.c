@@ -14,7 +14,7 @@
 #include "engine/world/level.h"
 #include "level_blob.h"
 
-IMPORT_API(EntComSystemApi, 0);
+IMPORT_API(EntitySystemApi, 0);
 IMPORT_API(ResourceApi, 0);
 IMPORT_API(TransformApi, 0);
 IMPORT_API(MemSysApi, 0);
@@ -213,7 +213,7 @@ int _level_resource_compiler(const char *filename,
 //==============================================================================
 
 static void _init(get_api_fce_t get_engine_api) {
-    INIT_API(EntComSystemApi, ENTCOM_API_ID, 0);
+    INIT_API(EntitySystemApi, ENTITY_API_ID, 0);
     INIT_API(MemSysApi, MEMORY_API_ID, 0);
     INIT_API(ResourceApi, RESOURCE_API_ID, 0);
     INIT_API(TransformApi, TRANSFORM_API_ID, 0);
@@ -243,7 +243,7 @@ level_t world_load_level(world_t world,
     u32 *offset = level_blob_offset(res);
     u8 *data = level_blob_data(res);
 
-    entity_t level_ent = EntComSystemApiV0.entity_manager_create();
+    entity_t level_ent = EntitySystemApiV0.entity_manager_create();
     transform_t t = TransformApiV0.create(world, level_ent,
                                           (entity_t) {UINT32_MAX},
                                           (cel_vec3f_t) {0}, QUATF_IDENTITY,
@@ -272,7 +272,7 @@ void level_destroy(world_t world,
     struct level_instance *instance = _level_instance(level);
 
     UnitApiV0.destroy(world, &instance->spawned_entity->data[0], 1);
-    EntComSystemApiV0.entity_manager_destroy(instance->level_entity);
+    EntitySystemApiV0.entity_manager_destroy(instance->level_entity);
 }
 
 entity_t level_unit_by_id(level_t level,

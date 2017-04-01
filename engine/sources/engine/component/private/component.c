@@ -7,7 +7,7 @@
 #include <engine/module/api.h>
 
 #include "engine/world/world.h"
-#include "engine/entcom/api.h"
+#include "../api.h"
 
 //==============================================================================
 // Globals
@@ -20,9 +20,8 @@ MAP_PROTOTYPE(component_compiler_t);
 MAP_PROTOTYPE_N(struct component_clb, component_clb_t);
 
 
-#define _G EntityMaagerGlobals
+#define _G ComponentMaagerGlobals
 static struct G {
-    struct handlerid entity_handler;
     MAP_T(component_compiler_t) compiler_map;
     MAP_T(u32) spawn_order_map;
 
@@ -38,7 +37,6 @@ static void _init(get_api_fce_t get_engine_api) {
 
     _G = (struct G) {0};
 
-    handlerid_init(&_G.entity_handler, MemSysApiV0.main_allocator());
     MAP_INIT(component_compiler_t, &_G.compiler_map,
              MemSysApiV0.main_allocator());
     MAP_INIT(u32, &_G.spawn_order_map, MemSysApiV0.main_allocator());
@@ -46,7 +44,6 @@ static void _init(get_api_fce_t get_engine_api) {
 }
 
 static void _shutdown() {
-    handlerid_destroy(&_G.entity_handler);
     MAP_DESTROY(component_compiler_t, &_G.compiler_map);
     MAP_DESTROY(u32, &_G.spawn_order_map);
     MAP_DESTROY(component_clb_t, &_G.component_clb);
@@ -57,19 +54,6 @@ static void _shutdown() {
 //==============================================================================
 // Public interface
 //==============================================================================
-
-entity_t entity_manager_create() {
-    return (entity_t) {.idx = handlerid_handler_create(&_G.entity_handler).h};
-}
-
-void entity_manager_destroy(entity_t entity) {
-    handlerid_handler_destroy(&_G.entity_handler, entity.h);
-}
-
-int entity_manager_alive(entity_t entity) {
-    return handlerid_handler_alive(&_G.entity_handler, entity.h);
-}
-
 
 void component_register_compiler(stringid64_t type,
                                  component_compiler_t compiler,
@@ -141,7 +125,7 @@ void component_destroy(world_t world,
     }
 }
 
-void *entcom_get_module_api(int api,
+void *component_get_module_api(int api,
                             int version) {
     switch (api) {
         case PLUGIN_EXPORT_API_ID:
@@ -159,14 +143,11 @@ void *entcom_get_module_api(int api,
                 default:
                     return NULL;
             };
-        case ENTCOM_API_ID:
+
+        case COMPONENT_API_ID:
             switch (version) {
                 case 0: {
-                    static struct EntComSystemApiV0 api = {0};
-
-                    api.entity_manager_create = entity_manager_create;
-                    api.entity_manager_destroy = entity_manager_destroy;
-                    api.entity_manager_alive = entity_manager_alive;
+                    static struct ComponentSystemApiV0 api = {0};
                     api.component_register_compiler = component_register_compiler;
                     api.component_compile = component_compile;
                     api.component_get_spawn_order = component_get_spawn_order;

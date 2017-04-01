@@ -1,6 +1,6 @@
 
 #include <engine/world/scenegraph.h>
-#include <engine/module/module.h>
+#include <engine/module/component.h>
 #include "../luasys.h"
 
 #define API_NAME "SceneGraph"

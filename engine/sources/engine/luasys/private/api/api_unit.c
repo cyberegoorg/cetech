@@ -1,7 +1,7 @@
 
 #include <celib/string/stringid.h>
 #include <engine/world/unit.h>
-#include <engine/module/module.h>
+#include <engine/module/component.h>
 #include "../luasys.h"
 
 #define API_NAME "Unit"

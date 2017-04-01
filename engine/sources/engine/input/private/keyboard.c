@@ -2,7 +2,7 @@
 // Includes
 //==============================================================================
 
-#include <engine/module/module.h>
+#include <engine/module/component.h>
 #include "engine/machine/api.h"
 #include "engine/input/api.h"
 

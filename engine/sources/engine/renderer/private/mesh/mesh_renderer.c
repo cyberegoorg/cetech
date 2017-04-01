@@ -3,7 +3,8 @@
 #include <celib/containers/map.h>
 #include <celib/string/stringid.h>
 
-#include <engine/entcom/api.h>
+#include <engine/entity/api.h>
+#include <engine/component/api.h>
 #include <engine/renderer/api.h>
 #include <bgfx/c99/bgfx.h>
 #include <engine/world/transform.h>
@@ -18,7 +19,7 @@
 IMPORT_API(MemSysApi, 0);
 IMPORT_API(SceneGprahApi, 0);
 IMPORT_API(TransformApi, 0);
-IMPORT_API(EntComSystemApi, 0);
+IMPORT_API(ComponentSystemApi, 0);
 IMPORT_API(MaterialApi, 0);
 IMPORT_API(MeshRendererApi, 0);
 
@@ -167,7 +168,7 @@ static void _spawner(world_t world,
 
 
 static void _init(get_api_fce_t get_engine_api) {
-    INIT_API(EntComSystemApi, ENTCOM_API_ID, 0);
+    INIT_API(ComponentSystemApi, COMPONENT_API_ID, 0);
     INIT_API(MemSysApi, MEMORY_API_ID, 0);
     INIT_API(MaterialApi, MATERIAL_API_ID, 0);
     INIT_API(MeshRendererApi, MESH_API_ID, 0);
@@ -180,10 +181,10 @@ static void _init(get_api_fce_t get_engine_api) {
 
     _G.type = stringid64_from_string("mesh_renderer");
 
-    EntComSystemApiV0.component_register_compiler(_G.type,
+    ComponentSystemApiV0.component_register_compiler(_G.type,
                                                   _mesh_component_compiler, 10);
 
-    EntComSystemApiV0.component_register_type(_G.type, (struct component_clb) {
+    ComponentSystemApiV0.component_register_type(_G.type, (struct component_clb) {
             .spawner=_spawner,
             .destroyer=_destroyer,
             .on_world_create=_on_world_create,
