@@ -89,70 +89,70 @@ set(SOURCE_FILES
         ########################################################################
         # CETECH
         ########################################################################
-        engine/sources/engine/module/private/module.c
-        engine/sources/engine/config/private/config.c
-        engine/sources/engine/memory/private/memory.c
+        engine/sources/cetech/module/private/module.c
+        engine/sources/cetech/config/private/config.c
+        engine/sources/cetech/memory/private/memory.c
 
-        engine/sources/engine/luasys/private/luasys.c
-        engine/sources/engine/luasys/private/api/api_plugin.c
-        engine/sources/engine/luasys/private/api/api_keyboard.c
-        engine/sources/engine/luasys/private/api/api_log.c
-        engine/sources/engine/luasys/private/api/api_mouse.c
-        engine/sources/engine/luasys/private/api/api_gamepad.c
-        engine/sources/engine/luasys/private/api/api_application.c
-        engine/sources/engine/luasys/private/api/api_resouce_manager.c
-        engine/sources/engine/luasys/private/api/api_renderer.c
-        engine/sources/engine/luasys/private/api/api_world.c
-        engine/sources/engine/luasys/private/api/api_unit.c
-        engine/sources/engine/luasys/private/api/api_transform.c
-        engine/sources/engine/luasys/private/api/api_vec2f.c
-        engine/sources/engine/luasys/private/api/api_vec3f.c
-        engine/sources/engine/luasys/private/api/api_vec4f.c
-        engine/sources/engine/luasys/private/api/api_quatf.c
-        engine/sources/engine/luasys/private/api/api_mat44f.c
-        engine/sources/engine/luasys/private/api/api_mesh.c
-        engine/sources/engine/luasys/private/api/api_material.c
-        engine/sources/engine/luasys/private/api/api_package.c
-        engine/sources/engine/luasys/private/api/api_level.c
-        engine/sources/engine/luasys/private/api/api_scenegraph.c
+        engine/sources/cetech/luasys/private/luasys.c
+        engine/sources/cetech/luasys/private/api/api_plugin.c
+        engine/sources/cetech/luasys/private/api/api_keyboard.c
+        engine/sources/cetech/luasys/private/api/api_log.c
+        engine/sources/cetech/luasys/private/api/api_mouse.c
+        engine/sources/cetech/luasys/private/api/api_gamepad.c
+        engine/sources/cetech/luasys/private/api/api_application.c
+        engine/sources/cetech/luasys/private/api/api_resouce_manager.c
+        engine/sources/cetech/luasys/private/api/api_renderer.c
+        engine/sources/cetech/luasys/private/api/api_world.c
+        engine/sources/cetech/luasys/private/api/api_unit.c
+        engine/sources/cetech/luasys/private/api/api_transform.c
+        engine/sources/cetech/luasys/private/api/api_vec2f.c
+        engine/sources/cetech/luasys/private/api/api_vec3f.c
+        engine/sources/cetech/luasys/private/api/api_vec4f.c
+        engine/sources/cetech/luasys/private/api/api_quatf.c
+        engine/sources/cetech/luasys/private/api/api_mat44f.c
+        engine/sources/cetech/luasys/private/api/api_mesh.c
+        engine/sources/cetech/luasys/private/api/api_material.c
+        engine/sources/cetech/luasys/private/api/api_package.c
+        engine/sources/cetech/luasys/private/api/api_level.c
+        engine/sources/cetech/luasys/private/api/api_scenegraph.c
 
-        engine/sources/engine/develop/private/console_server.c
-        engine/sources/engine/develop/private/develop_system.c
+        engine/sources/cetech/develop/private/console_server.c
+        engine/sources/cetech/develop/private/develop_system.c
 
-        engine/sources/engine/application/private/application.c
-        engine/sources/engine/task/private/task.c
+        engine/sources/cetech/application/private/app.c
+        engine/sources/cetech/task/private/task.c
 
-        engine/sources/engine/resource/private/resource.c
-        engine/sources/engine/resource/private/resource_package.c
-        engine/sources/engine/resource/private/resource_compiler.c
-        engine/sources/engine/filesystem/private/filesystem.c
-        engine/sources/engine/unit/private/unit.c
-        engine/sources/engine/component/private/component.c
-        engine/sources/engine/entity/private/entity.c
-        engine/sources/engine/world/private/world.c
-        engine/sources/engine/level/private/level.c
+        engine/sources/cetech/resource/private/resource.c
+        engine/sources/cetech/resource/private/resource_package.c
+        engine/sources/cetech/resource/private/resource_compiler.c
+        engine/sources/cetech/filesystem/private/filesystem.c
+        engine/sources/cetech/unit/private/unit.c
+        engine/sources/cetech/component/private/component.c
+        engine/sources/cetech/entity/private/entity.c
+        engine/sources/cetech/world/private/world.c
+        engine/sources/cetech/level/private/level.c
 
-        engine/sources/engine/machine/private/machine.c
-        engine/sources/engine/machine/private/sdl2/sdl_mouse.c
-        engine/sources/engine/machine/private/sdl2/sdl_keyboard.c
-        engine/sources/engine/machine/private/sdl2/sdl_gamepad.c
-        engine/sources/engine/machine/private/sdl2/sdl_machine.c
+        engine/sources/cetech/machine/private/machine.c
+        engine/sources/cetech/machine/private/sdl2/sdl_mouse.c
+        engine/sources/cetech/machine/private/sdl2/sdl_keyboard.c
+        engine/sources/cetech/machine/private/sdl2/sdl_gamepad.c
+        engine/sources/cetech/machine/private/sdl2/sdl_machine.c
 
-        engine/sources/engine/input/private/keyboard.c
-        engine/sources/engine/input/private/mouse.c
-        engine/sources/engine/input/private/input.c
+        engine/sources/cetech/input/private/keyboard.c
+        engine/sources/cetech/input/private/mouse.c
+        engine/sources/cetech/input/private/input.c
 
 
-        engine/sources/engine/renderer/private/renderer.c
-        engine/sources/engine/renderer/private/texture/texture.c
-        engine/sources/engine/renderer/private/shader/shader.c
-        engine/sources/engine/renderer/private/material/material.c
-        engine/sources/engine/renderer/private/scene/scene.c
-        engine/sources/engine/renderer/private/mesh/mesh_renderer.c
+        engine/sources/cetech/renderer/private/renderer.c
+        engine/sources/cetech/renderer/private/texture/texture.c
+        engine/sources/cetech/renderer/private/shader/shader.c
+        engine/sources/cetech/renderer/private/material/material.c
+        engine/sources/cetech/renderer/private/scene/scene.c
+        engine/sources/cetech/renderer/private/mesh/mesh_renderer.c
 
-        engine/sources/engine/transform/private/transform.c
-        engine/sources/engine/scenegraph/private/scenegraph.c
-        engine/sources/engine/camera/private/camera.c
+        engine/sources/cetech/transform/private/transform.c
+        engine/sources/cetech/scenegraph/private/scenegraph.c
+        engine/sources/cetech/camera/private/camera.c
 
         )
 
@@ -161,7 +161,7 @@ set(SOURCE_FILES
 ################################################################################
 set(MAIN_SOURCE_FILES
         ${SOURCE_FILES}
-        engine/sources/engine/application/private/main.c)
+        engine/sources/cetech/application/private/main.c)
 
 ################################################################################
 # Release sources
