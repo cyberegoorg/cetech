@@ -72,49 +72,28 @@ set(SOURCE_FILES
         ${EXTERNAL_SOURCE_FILES}
 
         ########################################################################
-        # CELIB: Memory
+        # CELIB
         ########################################################################
         cebase/sources/celib/memory/private/allocator.c
         cebase/sources/celib/memory/private/allocator_malloc.c
         cebase/sources/celib/memory/private/allocator_scratch.c
-        engine/sources/engine/memory/private/api.c
-
-
-        ########################################################################
-        # CELIB: Log
-        #######################################################################
         cebase/sources/celib/log/private/stdout_handler.c
         cebase/sources/celib/log/private/nanomsg_handler.c
         cebase/sources/celib/log/private/logdb_handler.c
         cebase/sources/celib/log/private/log_system.c
-
-        ########################################################################
-        # CELIB: File
-        ########################################################################
         cebase/sources/celib/filesystem/private/sdl_vio.c
-
-        ########################################################################
-        # CELIB: Crypto
-        ########################################################################
-
-        ########################################################################
-        # CELIB: Math
-        ########################################################################
-
-        ########################################################################
-        # CELIB: Yaml
-        ########################################################################
         cebase/sources/celib/yaml/private/yaml.cc
-
         cebase/sources/celib/log/private/log_system.c
-        engine/sources/engine/config/private/api.c
+
 
         ########################################################################
-        # CETECH: Plugin system
+        # CETECH
         ########################################################################
-        engine/sources/engine/module/private/api.c
+        engine/sources/engine/module/private/module.c
+        engine/sources/engine/config/private/config.c
+        engine/sources/engine/memory/private/memory.c
 
-        engine/sources/engine/luasys/private/api.c
+        engine/sources/engine/luasys/private/luasys.c
         engine/sources/engine/luasys/private/api/api_plugin.c
         engine/sources/engine/luasys/private/api/api_keyboard.c
         engine/sources/engine/luasys/private/api/api_log.c
@@ -137,11 +116,11 @@ set(SOURCE_FILES
         engine/sources/engine/luasys/private/api/api_level.c
         engine/sources/engine/luasys/private/api/api_scenegraph.c
 
-        engine/sources/engine/develop/private/api.c
+        engine/sources/engine/develop/private/console_server.c
         engine/sources/engine/develop/private/develop_system.c
 
         engine/sources/engine/application/private/application.c
-        engine/sources/engine/task/private/api.c
+        engine/sources/engine/task/private/task.c
 
         engine/sources/engine/resource/private/resource.c
         engine/sources/engine/resource/private/resource_package.c
@@ -153,7 +132,7 @@ set(SOURCE_FILES
         engine/sources/engine/world/private/world.c
         engine/sources/engine/level/private/level.c
 
-        engine/sources/engine/machine/private/api.c
+        engine/sources/engine/machine/private/machine.c
         engine/sources/engine/machine/private/sdl2/sdl_mouse.c
         engine/sources/engine/machine/private/sdl2/sdl_keyboard.c
         engine/sources/engine/machine/private/sdl2/sdl_gamepad.c
@@ -161,10 +140,10 @@ set(SOURCE_FILES
 
         engine/sources/engine/input/private/keyboard.c
         engine/sources/engine/input/private/mouse.c
-        engine/sources/engine/input/private/api.c
+        engine/sources/engine/input/private/input.c
 
 
-        engine/sources/engine/renderer/private/api.c
+        engine/sources/engine/renderer/private/renderer.c
         engine/sources/engine/renderer/private/texture/texture.c
         engine/sources/engine/renderer/private/shader/shader.c
         engine/sources/engine/renderer/private/material/material.c
@@ -182,7 +161,7 @@ set(SOURCE_FILES
 ################################################################################
 set(MAIN_SOURCE_FILES
         ${SOURCE_FILES}
-        engine/sources/engine/main.c)
+        engine/sources/engine/application/private/main.c)
 
 ################################################################################
 # Release sources

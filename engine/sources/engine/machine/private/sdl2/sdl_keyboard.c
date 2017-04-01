@@ -3,8 +3,8 @@
 //==============================================================================
 
 #include <include/SDL2/SDL.h>
-#include <engine/module/api.h>
-#include "engine/machine/api.h"
+#include <engine/module/module.h>
+#include "engine/machine/machine.h"
 //==============================================================================
 // Defines
 //==============================================================================

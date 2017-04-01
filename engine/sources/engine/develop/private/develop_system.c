@@ -13,11 +13,11 @@
 #include "celib/thread/types.h"
 #include "celib/thread/thread.h"
 #include "celib/containers/eventstream.h"
-#include <engine/memory/api.h>
-#include <engine/module/api.h>
+#include <engine/memory/memory.h>
+#include <engine/module/module.h>
 
-#include "engine/task/api.h"
-#include "engine/develop/api.h"
+#include "engine/task/task.h"
+#include "engine/develop/develop.h"
 
 
 //==============================================================================

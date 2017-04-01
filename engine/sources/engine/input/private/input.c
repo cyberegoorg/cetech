@@ -3,9 +3,9 @@
 //==============================================================================
 
 #include <celib/math/types.h>
-#include <engine/input/api.h>
-#include <engine/module/api.h>
-#include "engine/machine/api.h"
+#include <engine/input/input.h>
+#include <engine/module/module.h>
+#include "engine/machine/machine.h"
 
 #include "gamepadstr.h"
 

@@ -4,8 +4,8 @@
 
 #include "celib/containers/map.h"
 #include <engine/world/world.h>
-#include <engine/memory/api.h>
-#include <engine/module/api.h>
+#include <engine/memory/memory.h>
+#include <engine/module/module.h>
 #include <celib/string/stringid.h>
 
 

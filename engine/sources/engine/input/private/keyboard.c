@@ -2,9 +2,9 @@
 // Includes
 //==============================================================================
 
-#include <engine/module/component.h>
-#include "engine/machine/api.h"
-#include "engine/input/api.h"
+#include <engine/application/private/module.h>
+#include "engine/machine/machine.h"
+#include "engine/input/input.h"
 
 #include "keystr.h"
 

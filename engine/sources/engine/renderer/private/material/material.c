@@ -5,12 +5,12 @@
 #include <bgfx/c99/bgfx.h>
 
 #include <celib/string/stringid.h>
-#include <engine/renderer/api.h>
+#include <engine/renderer/renderer.h>
 #include "celib/filesystem/vio.h"
-#include <engine/memory/api.h>
-#include <engine/module/api.h>
+#include <engine/memory/memory.h>
+#include <engine/module/module.h>
 
-#include "engine/resource/api.h"
+#include "engine/resource/resource.h"
 #include "engine/renderer/private/texture/texture.h"
 #include "engine/renderer/private/shader/shader.h"
 #include "material_blob.h"

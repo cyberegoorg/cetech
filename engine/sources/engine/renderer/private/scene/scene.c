@@ -9,10 +9,10 @@
 #include <celib/string/stringid.h>
 #include <engine/scenegraph/scenegraph.h>
 #include "celib/filesystem/vio.h"
-#include <engine/memory/api.h>
-#include <engine/module/component.h>
+#include <engine/memory/memory.h>
+#include <engine/application/private/module.h>
 
-#include "engine/resource/api.h"
+#include "engine/resource/resource.h"
 #include "scene_blob.h"
 
 //==============================================================================

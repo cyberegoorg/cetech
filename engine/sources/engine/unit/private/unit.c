@@ -1,14 +1,14 @@
 
 #include <celib/string/stringid.h>
 #include <celib/filesystem/vio.h>
-#include "engine/resource/api.h"
+#include "engine/resource/resource.h"
 #include <celib/yaml/yaml.h>
 #include <celib/filesystem/path.h>
 #include <celib/containers/map.h>
-#include <engine/entity/api.h>
-#include <engine/component/api.h>
-#include <engine/memory/api.h>
-#include <engine/module/api.h>
+#include <engine/entity/entity.h>
+#include <engine/component/component.h>
+#include <engine/memory/memory.h>
+#include <engine/module/module.h>
 
 #include "engine/unit/unit.h"
 

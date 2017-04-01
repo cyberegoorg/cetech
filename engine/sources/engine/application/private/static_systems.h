@@ -1,7 +1,7 @@
 //==============================================================================
 // Static engine system configuration
 //==============================================================================
-#include "engine/module/component.h"
+#include "module.h"
 
 static void _init_static_modules() {
     ADD_STATIC_PLUGIN(machine);

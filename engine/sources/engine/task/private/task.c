@@ -4,14 +4,14 @@
 
 #include <celib/thread/thread.h>
 #include <celib/memory/memory.h>
-#include <engine/memory/api.h>
+#include <engine/memory/memory.h>
 #include <celib/cpu/cpu.h>
 
-#include <engine/develop/api.h>
-#include <engine/module/api.h>
+#include <engine/develop/develop.h>
+#include <engine/module/module.h>
 
 #include "task_queue.h"
-#include "engine/task/api.h"
+#include "engine/task/task.h"
 
 
 //==============================================================================

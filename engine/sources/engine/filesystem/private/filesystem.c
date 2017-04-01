@@ -4,12 +4,12 @@
 
 #include <celib/filesystem/path.h>
 #include "celib/filesystem/filesystem.h"
-#include <engine/module/api.h>
+#include <engine/module/module.h>
 
 #include "celib/filesystem/vio.h"
 
-#include "engine/memory/api.h"
-#include "engine/filesystem/api.h"
+#include "engine/memory/memory.h"
+#include "engine/filesystem/filesystem.h"
 
 
 //==============================================================================

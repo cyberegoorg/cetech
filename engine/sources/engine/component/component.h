@@ -13,7 +13,7 @@
 #include <celib/string/stringid.h>
 #include <celib/handler/handlerid.h>
 #include <engine/world/world.h>
-#include <engine/entity/api.h>
+#include <engine/entity/entity.h>
 
 
 //==============================================================================

@@ -10,10 +10,10 @@
 #include <celib/string/string.h>
 #include <celib/filesystem/path.h>
 #include <celib/string/stringid.h>
-#include <engine/task/api.h>
-#include "engine/resource/api.h"
-#include <engine/memory/api.h>
-#include <engine/module/api.h>
+#include <engine/task/task.h>
+#include "engine/resource/resource.h"
+#include <engine/memory/memory.h>
+#include <engine/module/module.h>
 
 #include "celib/filesystem/vio.h"
 

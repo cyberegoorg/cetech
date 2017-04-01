@@ -1,4 +1,4 @@
-#include <engine/module/component.h>
+#include <engine/application/private/module.h>
 #include "../luasys.h"
 
 #define API_NAME "Plugin"

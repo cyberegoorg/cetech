@@ -9,9 +9,9 @@
 //==============================================================================
 
 #include <celib/containers/array.h>
-#include <engine/entity/api.h>
+#include <engine/entity/entity.h>
 #include <celib/yaml/yaml.h>
-#include "engine/resource/api.h"
+#include "engine/resource/resource.h"
 #include "engine/world/world.h"
 
 

@@ -1,7 +1,7 @@
 
-#include "engine/entity/api.h"
-#include <engine/renderer/api.h>
-#include <engine/module/component.h>
+#include "engine/entity/entity.h"
+#include <engine/renderer/renderer.h>
+#include <engine/application/private/module.h>
 #include "../luasys.h"
 
 #define API_NAME "Mesh"

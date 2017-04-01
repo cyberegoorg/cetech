@@ -1,6 +1,6 @@
 
-#include <engine/module/component.h>
-#include "engine/renderer/api.h"
+#include <engine/application/private/module.h>
+#include "engine/renderer/renderer.h"
 #include "../luasys.h"
 
 #define API_NAME "Renderer"

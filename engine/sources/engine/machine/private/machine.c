@@ -4,9 +4,9 @@
 
 #include <celib/memory/memory.h>
 #include "celib/containers/array.h"
-#include "engine/machine/api.h"
+#include "engine/machine/machine.h"
 #include "sdl2/sdl_parts.h"
-#include <engine/memory/api.h>
+#include <engine/memory/memory.h>
 
 //==============================================================================
 // Defines

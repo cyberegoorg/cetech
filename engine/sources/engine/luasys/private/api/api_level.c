@@ -1,6 +1,6 @@
 
 #include <engine/level/level.h>
-#include <engine/module/component.h>
+#include <engine/application/private/module.h>
 
 #include "../luasys.h"
 

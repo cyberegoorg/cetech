@@ -7,9 +7,9 @@
 #include <celib/string/stringid.h>
 #include "celib/containers/map.h"
 #include "celib/filesystem/vio.h"
-#include <engine/memory/api.h>
-#include <engine/module/component.h>
-#include "engine/resource/api.h"
+#include <engine/memory/memory.h>
+#include <engine/application/private/module.h>
+#include "engine/resource/resource.h"
 
 
 //==============================================================================

@@ -1,7 +1,7 @@
 
-#include <engine/renderer/api.h>
-#include "engine/resource/api.h"
-#include <engine/module/component.h>
+#include <engine/renderer/renderer.h>
+#include "engine/resource/resource.h"
+#include <engine/application/private/module.h>
 #include "../luasys.h"
 
 #define API_NAME "Package"

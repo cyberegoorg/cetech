@@ -10,17 +10,17 @@
 #include <celib/string/stringid.h>
 #include <celib/os/cmd_line.h>
 
-#include <engine/application/application.h>
-#include <engine/config/api.h>
-#include <engine/machine/api.h>
-#include "engine/resource/api.h"
-#include <engine/luasys/api.h>
-#include <engine/renderer/api.h>
-#include <engine/develop/api.h>
-#include <engine/memory/api.h>
+#include <engine/application/private/application.h>
+#include <engine/config/config.h>
+#include <engine/machine/machine.h>
+#include "engine/resource/resource.h"
+#include <engine/luasys/luasys.h>
+#include <engine/renderer/renderer.h>
+#include <engine/develop/develop.h>
+#include <engine/memory/memory.h>
 #include "static_systems.h"
 
-#include "engine/task/api.h"
+#include "engine/task/task.h"
 
 #define LOG_WHERE "application"
 

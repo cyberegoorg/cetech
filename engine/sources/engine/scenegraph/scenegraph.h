@@ -7,7 +7,7 @@
 // Includes
 //==============================================================================
 
-#import "engine/entity/api.h"
+#import "engine/entity/entity.h"
 #import "engine/world/world.h"
 #import "celib/math/types.h"
 #import "celib/string/stringid.h"

@@ -3,15 +3,15 @@
 //==============================================================================
 
 #include <celib/memory/memory.h>
-#include <engine/config/api.h>
+#include <engine/config/config.h>
 #include <celib/filesystem/vio.h>
 #include <celib/filesystem/path.h>
 #include <celib/yaml/yaml.h>
-#include <engine/memory/api.h>
-#include <engine/module/api.h>
-#include <engine/module/component.h>
+#include <engine/memory/memory.h>
+#include <engine/module/module.h>
+#include <engine/application/private/module.h>
 #include <celib/string/stringid.h>
-#include "engine/resource/api.h"
+#include "engine/resource/resource.h"
 
 //==============================================================================
 // Defines

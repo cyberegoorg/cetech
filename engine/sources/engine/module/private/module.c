@@ -7,9 +7,9 @@
 #include <celib/os/object.h>
 #include <celib/filesystem/filesystem.h>
 #include <celib/filesystem/path.h>
-#include <engine/memory/api.h>
+#include <engine/memory/memory.h>
 
-#include "engine/module/component.h"
+#include "engine/application/private/module.h"
 
 //==============================================================================
 // Defines
