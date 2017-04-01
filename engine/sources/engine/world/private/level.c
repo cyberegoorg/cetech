@@ -12,6 +12,7 @@
 #include <engine/module/api.h>
 
 #include "engine/world/level.h"
+#include "level_blob.h"
 
 IMPORT_API(EntComSystemApi, 0);
 IMPORT_API(ResourceApi, 0);
@@ -146,18 +147,6 @@ void forach_units_clb(yaml_node_t key,
                                     data->capi);
 }
 
-struct level_blob {
-    u32 units_count;
-    // res  + 1             : stringid64_t names[units_count]
-    // names  + units_count : u32 offset[units_count]
-    // offset + units_count : u8 data[*]
-};
-
-
-#define level_blob_id(r) ((stringid64_t*) ((r) + 1))
-#define level_blob_offset(r) ((u32*) ((level_blob_id(r)) + (r)->units_count))
-#define level_blob_data(r)   ((u8*) ((level_blob_offset(r)) + (r)->units_count))
-
 int _level_resource_compiler(const char *filename,
                              struct vio *source_vio,
                              struct vio *build_vio,
@@ -250,7 +239,7 @@ level_t world_load_level(world_t world,
                          stringid64_t name) {
     struct level_blob *res = ResourceApiV0.get(_G.level_type, name);
 
-    stringid64_t *id = level_blob_id(res);
+    stringid64_t *id = level_blob_names(res);
     u32 *offset = level_blob_offset(res);
     u8 *data = level_blob_data(res);
 

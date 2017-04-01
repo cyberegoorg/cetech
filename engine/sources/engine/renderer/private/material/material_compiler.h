@@ -170,7 +170,7 @@ static int _material_resource_compiler(const char *filename,
     struct material_blob resource = {
             .shader_name = stringid64_from_string(tmp_buffer),
             .texture_count =output.texture_count,
-            .cel_vec4f_count = output.cel_vec4f_count,
+            .vec4f_count = output.cel_vec4f_count,
             .uniforms_count = ARRAY_SIZE(&output.uniform_names) / 32,
     };
 
