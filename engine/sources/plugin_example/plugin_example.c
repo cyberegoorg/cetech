@@ -1,7 +1,7 @@
 #include <stdio.h>
 
-#include "engine/module/api.h"
-#include "engine/input/api.h"
+#include "cetech/module/module.h"
+#include "cetech/input/input.h"
 
 static struct KeyboardApiV0 KeyboardApiV0 = {0};
 
