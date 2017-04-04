@@ -51,26 +51,26 @@ struct EntitySystemApiV0 {
     int (*entity_manager_alive)(entity_t entity);
 
 
-    //! Spawn unit from resource data
+    //! Spawn entity from resource data
     //! \param world World
     //! \param resource Resource data
-    //! \return Spawne unit array
+    //! \return Spawne entity array
     ARRAY_T(entity_t) *(*spawn_from_resource)(world_t world,
                                               void *resource);
 
-    //! Spawn unit
+    //! Spawn entity
     //! \param world World
     //! \param name Resource name
-    //! \return New unit
+    //! \return New entity
     entity_t (*spawn)(world_t world,
                       stringid64_t name);
 
-    //! Destroy units
+    //! Destroy entities
     //! \param world World
-    //! \param unit Units
-    //! \param count Unit count
+    //! \param entity entities
+    //! \param count entity count
     void (*destroy)(world_t world,
-                    entity_t *unit,
+                    entity_t *entity,
                     u32 count);
 
     //! Create compiler output structure
@@ -81,12 +81,12 @@ struct EntitySystemApiV0 {
     //! \param output Compiler output
     void (*compiler_destroy_output)(struct entity_compile_output *output);
 
-    //! Compile unit
+    //! Compile entity
     //! \param output Compile output
     //! \param root Yaml root node
     //! \param filename Resource filename
     //! \param compilator_api Compilator api
-    void (*compiler_compile_unit)(struct entity_compile_output *output,
+    void (*compiler_compile_entity)(struct entity_compile_output *output,
                                   yaml_node_t root,
                                   const char *filename,
                                   struct compilator_api *compilator_api);

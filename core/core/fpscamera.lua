@@ -5,11 +5,11 @@ local Transform, Mat4f, Vec3f, Quatf, Log = cetech.Transform, cetech.Mat4f, cete
 
 FPSCamera = class(FPSCamera)
 
-function FPSCamera:init(world, camera_unit, fly_mode)
+function FPSCamera:init(world, camera_entity, fly_mode)
     self.world = world
-    self.unit = camera_unit
-    --  self.camera = Camera.get(world, camera_unit)
-    self.transform = Transform.get(world, camera_unit)
+    self.entity = camera_entity
+    --  self.camera = Camera.get(world, camera_entity)
+    self.transform = Transform.get(world, camera_entity)
 
     self.fly_mode = fly_mode or false
 end

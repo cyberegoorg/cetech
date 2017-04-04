@@ -15,10 +15,10 @@ Module contain functions for world  manager.
 
 * Level
     * [load_level( world, name, position?, rotation?, scale? ) : Level](#load_level-world-name-position-rotation-scale-level)
-    * [level_unit( world, level) : Unit](#level_unit-world-level-unit)
+    * [level_entity( world, level) : Entity](#level_entity-world-level-unit)
 
-* Unit
-    * [unit_by_name( world, level, name ) : Unit](#unit_by_name-world-level-name-unit)
+* Entity
+    * [unit_by_name( world, level, name ) : Entity](#unit_by_name-world-level-name-unit)
 
 ------------------------------------------------------------------------------------------------------------------------
 
@@ -67,7 +67,7 @@ Load level from resource to world and return levelID
 
 ------------------------------------------------------------------------------------------------------------------------
 
-## level_unit( world, level) : Unit
+## level_entity( world, level) : Entity
 
 Return level unit.
 
@@ -80,14 +80,14 @@ Return level unit.
 
 ------------------------------------------------------------------------------------------------------------------------
 
-## unit_by_name( world, level, name ) : Unit
+## unit_by_name( world, level, name ) : Entity
 
 Find unit in level by name and return it.
 
 ### Returns
-* Unit
+* Entity
 
 ### Arguments
 * `world` : **world**   - World
 * `level` : **level**   - Level
-* `name` : **string**   - Unit name
+* `name` : **string**   - Entity name

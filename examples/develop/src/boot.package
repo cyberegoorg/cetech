@@ -15,14 +15,14 @@ texture:
 package:
   - "core"
 
-unit:
+entity:
   - "camera"
   - "box1"
   - "box2"
   - "m4a1"
-  - "unit1"
-  - "unit10"
-  - "unit11"
+  - "entity1"
+  - "entity10"
+  - "entity11"
 
 material:
   - "material1"

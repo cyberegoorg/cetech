@@ -5,13 +5,13 @@ require 'core/fpscamera'
 
 ASSET_CREATOR = {
     -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
-    -- UNIT
+    -- Entity
     -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
-    unit = function(self, asset_name, type)
-        self.actual_asset_unit = Unit.spawn(self.world, asset_name)
+    entity = function(self, asset_name, type)
+        self.actual_asset_entity = Entity.spawn(self.world, asset_name)
 
-        if Transform.has(self.world, self.actual_asset_unit) then
-            local transform = Transform.get(self.world, self.actual_asset_unit)
+        if Transform.has(self.world, self.actual_asset_entity) then
+            local transform = Transform.get(self.world, self.actual_asset_entity)
             Transform.set_position(self.world, transform, Vec3f.make(0.0, 0.0, 0.0))
         end
     end,
@@ -22,9 +22,9 @@ ASSET_CREATOR = {
     material = function(self, asset_name, type)
         Transform.set_position(self.world, self.camera_transform, Vec3f.make(0.0, 0.0, 20.0))
 
-        self.actual_asset_unit = Unit.spawn(self.world, "playground/cube")
+        self.actual_asset_entity = Entity.spawn(self.world, "playground/cube")
 
-        local mesh = Mesh.get(self.world, self.actual_asset_unit)
+        local mesh = Mesh.get(self.world, self.actual_asset_entity)
         Mesh.set_material(self.world, mesh, asset_name)
     end,
 
@@ -34,9 +34,9 @@ ASSET_CREATOR = {
     texture = function(self, asset_name, type)
         Transform.set_position(self.world, self.camera_transform, Vec3f.make(0.0, 0.0, 20.0))
 
-        self.actual_asset_unit = Unit.spawn(self.world, "playground/cube")
+        self.actual_asset_entity = Entity.spawn(self.world, "playground/cube")
 
-        local mesh = Mesh.get(self.world, self.actual_asset_unit)
+        local mesh = Mesh.get(self.world, self.actual_asset_entity)
         local material = Mesh.get_material(self.world, mesh)
         Material.set_texture(material, "u_texColor", asset_name)
     end,
@@ -56,13 +56,13 @@ function AssetView:init()
 
     self.viewport = 0 --Renderer.GetViewport("default")
     self.world = World.create()
-    self.camera_unit = Unit.spawn(self.world, "playground/camera")
+    self.camera_entity = Entity.spawn(self.world, "playground/camera")
 
-    self.camera_transform = Transform.get(self.world, self.camera_unit)
+    self.camera_transform = Transform.get(self.world, self.camera_entity)
 
     Transform.set_position(self.world, self.camera_transform, Vec3f.make(0.0, 0.0, 20.0))
 
-    self.actual_asset_unit = nil
+    self.actual_asset_entity = nil
     self.level = nil
 end
 
@@ -71,10 +71,10 @@ function AssetView:shutdown()
 end
 
 function AssetView:update(dt)
-    if self.actual_asset_unit then
+    if self.actual_asset_entity then
         if EditorInput.mouse.left then
             -- Transform
-            local transform = Transform.get(self.world, self.actual_asset_unit) -- self.camera_transform
+            local transform = Transform.get(self.world, self.actual_asset_entity) -- self.camera_transform
             -- local transform = self.camera_transform
             local rot = Transform.get_rotation(self.world, transform)
             local m_world = Transform.get_world_matrix(self.world, transform)
@@ -119,9 +119,9 @@ function AssetView:destroy_actual_asset()
         Level.destroy(self.world, self.level)
         self.level = nil
 
-    elseif self.actual_asset_unit then
-        Unit.destroy(self.world, self.actual_asset_unit)
-        self.actual_asset_unit = nil
+    elseif self.actual_asset_entity then
+        Entity.destroy(self.world, self.actual_asset_entity)
+        self.actual_asset_entity = nil
     end
 end
 

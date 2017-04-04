@@ -122,7 +122,7 @@ static const resource_callbacks_t _level_resource_defs = {
         .reloader = level_resource_reloader
 };
 
-struct foreach_units_data {
+struct foreach_entities_data {
     const char *filename;
     struct compilator_api *capi;
     ARRAY_T(stringid64_t) *id;
@@ -131,10 +131,10 @@ struct foreach_units_data {
     struct entity_compile_output *output;
 };
 
-void forach_units_clb(yaml_node_t key,
+void forach_entities_clb(yaml_node_t key,
                       yaml_node_t value,
                       void *_data) {
-    struct foreach_units_data *data = _data;
+    struct foreach_entities_data *data = _data;
 
     char name[128] = {0};
     yaml_as_string(key, name, CEL_ARRAY_LEN(name));
@@ -142,7 +142,7 @@ void forach_units_clb(yaml_node_t key,
     ARRAY_PUSH_BACK(u32, data->offset,
                     EntitySystemApiV0.compiler_ent_counter(data->output));
 
-    EntitySystemApiV0.compiler_compile_unit(data->output, value, data->filename,
+    EntitySystemApiV0.compiler_compile_entity(data->output, value, data->filename,
                                     data->capi);
 }
 
@@ -159,7 +159,7 @@ int _level_resource_compiler(const char *filename,
     yaml_document_t h;
     yaml_node_t root = yaml_load_str(source_data, &h);
 
-    yaml_node_t units = yaml_get_node(root, "units");
+    yaml_node_t entities = yaml_get_node(root, "entities");
 
     ARRAY_T(stringid64_t) id;
     ARRAY_T(u32) offset;
@@ -172,7 +172,7 @@ int _level_resource_compiler(const char *filename,
     struct entity_compile_output *output = EntitySystemApiV0.compiler_create_output();
 
 
-    struct foreach_units_data unit_data = {
+    struct foreach_entities_data entity_data = {
             .id = &id,
             .offset = &offset,
             .data = &data,
@@ -181,13 +181,13 @@ int _level_resource_compiler(const char *filename,
             .output = output
     };
 
-    yaml_node_foreach_dict(units, forach_units_clb, &unit_data);
+    yaml_node_foreach_dict(entities, forach_entities_clb, &entity_data);
 
     struct level_blob res = {
-            .units_count = ARRAY_SIZE(&id)
+            .entities_count = ARRAY_SIZE(&id)
     };
 
-    EntitySystemApiV0.compiler_write_to_build(output, unit_data.data);
+    EntitySystemApiV0.compiler_write_to_build(output, entity_data.data);
 
     cel_vio_write(build_vio, &res, sizeof(struct level_blob), 1);
     cel_vio_write(build_vio, &ARRAY_AT(&id, 0), sizeof(stringid64_t),
@@ -253,7 +253,7 @@ level_t world_load_level(world_t world,
     ARRAY_T(entity_t) *spawned = EntitySystemApiV0.spawn_from_resource(world, data);
     instance->spawned_entity = spawned;
 
-    for (int i = 0; i < res->units_count; ++i) {
+    for (int i = 0; i < res->entities_count; ++i) {
         entity_t e = ARRAY_AT(spawned, offset[i]);
         MAP_SET(entity_t, &instance->spawned_entity_map, id[i].id, e);
 
@@ -273,14 +273,14 @@ void level_destroy(world_t world,
     EntitySystemApiV0.entity_manager_destroy(instance->level_entity);
 }
 
-entity_t level_unit_by_id(level_t level,
+entity_t level_entity_by_id(level_t level,
                           stringid64_t id) {
     struct level_instance *instance = _level_instance(level);
     return MAP_GET(entity_t, &instance->spawned_entity_map, id.id,
                    (entity_t) {0});
 }
 
-entity_t level_unit(level_t level) {
+entity_t level_entity(level_t level) {
     struct level_instance *instance = _level_instance(level);
     return instance->level_entity;
 }
@@ -310,8 +310,8 @@ void *level_get_module_api(int api,
 
                     api.load_level = world_load_level;
                     api.destroy = level_destroy;
-                    api.unit_by_id = level_unit_by_id;
-                    api.unit = level_unit;
+                    api.entity_by_id = level_entity_by_id;
+                    api.entity = level_entity;
 
 
                     return &api;

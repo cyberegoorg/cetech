@@ -43,17 +43,17 @@ struct LevelApiV0 {
     void (*destroy)(world_t world,
                     level_t level);
 
-    //! Get unit in level by name
+    //! Get entity in level by name
     //! \param level Level
     //! \param name Name
     //! \return Entity
-    entity_t (*unit_by_id)(level_t level,
+    entity_t (*entity_by_id)(level_t level,
                            stringid64_t name);
 
-    //! Get level unit
+    //! Get level entity
     //! \param level Level
-    //! \return Level unit
-    entity_t (*unit)(level_t level);
+    //! \return Level entity
+    entity_t (*entity)(level_t level);
 };
 
 

@@ -23,11 +23,11 @@ Module contain functions for mesh component.
 
 ## get( world, entity ) : mesh
 
-Get mesh from entity or unit.
+Get mesh from Entity.
 
 ### Arguments
 * `world`  : **world**          - World
-* `entity` : **entity, unit**   - Entity or unit
+* `entity` : **entity**   - Entity
 
 ------------------------------------------------------------------------------------------------------------------------
 
@@ -37,7 +37,7 @@ Return true if entity has mesh component.
 
 ### Arguments
 * `world` : **world**           - World
-* `entity` : **entity, unit**   - Entity or unit
+* `entity` : **entity**   - Entity
 
 ----------------------------------------------------------------------------------------------------------------------
 

@@ -79,7 +79,7 @@ static void preprocess(const char *filename,
         char prefab_file[256] = {0};
         char prefab_str[256] = {0};
         yaml_as_string(prefab_node, prefab_str, CEL_ARRAY_LEN(prefab_str));
-        snprintf(prefab_file, CEL_ARRAY_LEN(prefab_file), "%s.unit",
+        snprintf(prefab_file, CEL_ARRAY_LEN(prefab_file), "%s.entity",
                  prefab_str);
 
         capi->add_dependency(filename, prefab_file);
@@ -210,7 +210,7 @@ static void compile_entitity(yaml_node_t rootNode,
     MAP_SET(u32, &output->entity_parent, ent_id, parent);
 
     yaml_node_t components_node = yaml_get_node(rootNode, "components");
-    CEL_ASSERT("unit_system", yaml_is_valid(components_node));
+    CEL_ASSERT("entity_system", yaml_is_valid(components_node));
 
     struct foreach_componets_data data = {
             .ent_id = ent_id,
@@ -234,7 +234,7 @@ static void compile_entitity(yaml_node_t rootNode,
     }
 }
 
-struct unit_resource {
+struct entity_resource {
     u32 ent_count;
     u32 comp_type_count;
     //u64 parents [ent_count]
@@ -249,14 +249,14 @@ struct component_data {
     // char data[ent_count];
 };
 
-#define unit_resource_parents(r) ((u32*)((r) + 1))
-#define unit_resource_comp_types(r) ((u64*)(unit_resource_parents(r) + ((r)->ent_count)))
-#define unit_resource_comp_data(r) ((struct component_data*)(unit_resource_comp_types(r) + ((r)->comp_type_count)))
+#define entity_resource_parents(r) ((u32*)((r) + 1))
+#define entity_resource_comp_types(r) ((u64*)(entity_resource_parents(r) + ((r)->ent_count)))
+#define entity_resource_comp_data(r) ((struct component_data*)(entity_resource_comp_types(r) + ((r)->comp_type_count)))
 
 #define component_data_ent(cd) ((u32*)((cd) + 1))
 #define component_data_data(cd) ((char*)((component_data_ent(cd) + ((cd)->ent_count))))
 
-struct entity_compile_output *unit_compiler_create_output() {
+struct entity_compile_output *entity_compiler_create_output() {
     struct cel_allocator *a = MemSysApiV0.main_allocator();
 
     struct entity_compile_output *output =
@@ -272,7 +272,7 @@ struct entity_compile_output *unit_compiler_create_output() {
     return output;
 }
 
-void unit_compiler_destroy_output(struct entity_compile_output *output) {
+void entity_compiler_destroy_output(struct entity_compile_output *output) {
     ARRAY_DESTROY(u64, &output->component_type);
     MAP_DESTROY(u32, &output->entity_parent);
 
@@ -302,7 +302,7 @@ void unit_compiler_destroy_output(struct entity_compile_output *output) {
     CEL_DEALLOCATE(a, output);
 }
 
-void unit_compiler_compile_unit(struct entity_compile_output *output,
+void entity_compiler_compile_entity(struct entity_compile_output *output,
                                 yaml_node_t root,
                                 const char *filename,
                                 struct compilator_api *compilator_api) {
@@ -311,17 +311,17 @@ void unit_compiler_compile_unit(struct entity_compile_output *output,
     compile_entitity(root, UINT32_MAX, output);
 }
 
-u32 unit_compiler_ent_counter(struct entity_compile_output *output) {
+u32 entity_compiler_ent_counter(struct entity_compile_output *output) {
     return output->ent_counter;
 }
 
-void unit_compiler_write_to_build(struct entity_compile_output *output,
+void entity_compiler_write_to_build(struct entity_compile_output *output,
                                   ARRAY_T(u8) *build) {
-    struct unit_resource res = {0};
+    struct entity_resource res = {0};
     res.ent_count = (u32) (output->ent_counter);
     res.comp_type_count = (u32) ARRAY_SIZE(&output->component_type);
 
-    ARRAY_PUSH(u8, build, (u8 *) &res, sizeof(struct unit_resource));
+    ARRAY_PUSH(u8, build, (u8 *) &res, sizeof(struct entity_resource));
 
     //write parents
     for (int i = 0; i < res.ent_count; ++i) {
@@ -368,18 +368,18 @@ void unit_compiler_write_to_build(struct entity_compile_output *output,
     }
 }
 
-void unit_resource_compiler(yaml_node_t root,
+void entity_resource_compiler(yaml_node_t root,
                             const char *filename,
                             ARRAY_T(u8) *build,
                             struct compilator_api *compilator_api) {
-    struct entity_compile_output *output = unit_compiler_create_output();
-    unit_compiler_compile_unit(output, root, filename, compilator_api);
-    unit_compiler_write_to_build(output, build);
+    struct entity_compile_output *output = entity_compiler_create_output();
+    entity_compiler_compile_entity(output, root, filename, compilator_api);
+    entity_compiler_write_to_build(output, build);
 
-    unit_compiler_destroy_output(output);
+    entity_compiler_destroy_output(output);
 }
 
-int _unit_resource_compiler(const char *filename,
+int _entity_resource_compiler(const char *filename,
                             struct vio *source_vio,
                             struct vio *build_vio,
                             struct compilator_api *compilator_api) {
@@ -391,16 +391,16 @@ int _unit_resource_compiler(const char *filename,
     yaml_document_t h;
     yaml_node_t root = yaml_load_str(source_data, &h);
 
-    ARRAY_T(u8) unit_data;
-    ARRAY_INIT(u8, &unit_data, MemSysApiV0.main_allocator());
+    ARRAY_T(u8) entity_data;
+    ARRAY_INIT(u8, &entity_data, MemSysApiV0.main_allocator());
 
-    unit_resource_compiler(root, filename, &unit_data, compilator_api);
+    entity_resource_compiler(root, filename, &entity_data, compilator_api);
 
-    cel_vio_write(build_vio, &ARRAY_AT(&unit_data, 0), sizeof(u8),
-                  ARRAY_SIZE(&unit_data));
+    cel_vio_write(build_vio, &ARRAY_AT(&entity_data, 0), sizeof(u8),
+                  ARRAY_SIZE(&entity_data));
 
 
-    ARRAY_DESTROY(u8, &unit_data);
+    ARRAY_DESTROY(u8, &entity_data);
     return 1;
 }
 
@@ -409,7 +409,7 @@ int _unit_resource_compiler(const char *filename,
 // Resource
 //==============================================================================
 
-void *unit_resource_loader(struct vio *input,
+void *entity_resource_loader(struct vio *input,
                            struct cel_allocator *allocator) {
     const i64 size = cel_vio_size(input);
     char *data = CEL_ALLOCATE(allocator, char, size);
@@ -418,38 +418,38 @@ void *unit_resource_loader(struct vio *input,
     return data;
 }
 
-void unit_resource_unloader(void *new_data,
+void entity_resource_unloader(void *new_data,
                             struct cel_allocator *allocator) {
     CEL_DEALLOCATE(allocator, new_data);
 }
 
 
-void unit_resource_online(stringid64_t name,
+void entity_resource_online(stringid64_t name,
                           void *data) {
 }
 
-void unit_resource_offline(stringid64_t name,
+void entity_resource_offline(stringid64_t name,
                            void *data) {
 }
 
-void *unit_resource_reloader(stringid64_t name,
+void *entity_resource_reloader(stringid64_t name,
                              void *old_data,
                              void *new_data,
                              struct cel_allocator *allocator) {
-    unit_resource_offline(name, old_data);
-    unit_resource_online(name, new_data);
+    entity_resource_offline(name, old_data);
+    entity_resource_online(name, new_data);
 
     CEL_DEALLOCATE(allocator, old_data);
 
     return new_data;
 }
 
-static const resource_callbacks_t unit_resource_callback = {
-        .loader = unit_resource_loader,
-        .unloader =unit_resource_unloader,
-        .online =unit_resource_online,
-        .offline =unit_resource_offline,
-        .reloader = unit_resource_reloader
+static const resource_callbacks_t entity_resource_callback = {
+        .loader = entity_resource_loader,
+        .unloader =entity_resource_unloader,
+        .online =entity_resource_online,
+        .offline =entity_resource_offline,
+        .reloader = entity_resource_reloader
 };
 
 
@@ -461,13 +461,13 @@ static void _init(get_api_fce_t get_engine_api) {
 
     _G = (struct G) {0};
 
-    _G.type = stringid64_from_string("unit");
+    _G.type = stringid64_from_string("entity");
 
     MAP_INIT(u32, &_G.spawned_map, MemSysApiV0.main_allocator());
     ARRAY_INIT(array_entity_t, &_G.spawned_array, MemSysApiV0.main_allocator());
 
-    ResourceApiV0.register_type(_G.type, unit_resource_callback);
-    ResourceApiV0.compiler_register(_G.type, _unit_resource_compiler);
+    ResourceApiV0.register_type(_G.type, entity_resource_callback);
+    ResourceApiV0.compiler_register(_G.type, _entity_resource_compiler);
 
     handlerid_init(&_G.entity_handler, MemSysApiV0.main_allocator());
 }
@@ -497,9 +497,9 @@ int entity_manager_alive(entity_t entity) {
 }
 
 
-ARRAY_T(entity_t) *unit_spawn_from_resource(world_t world,
+ARRAY_T(entity_t) *entity_spawn_from_resource(world_t world,
                                             void *resource) {
-    struct unit_resource *res = resource;
+    struct entity_resource *res = resource;
 
     u32 idx = _new_spawned_array();
     ARRAY_T(entity_t) *spawned = _get_spawned_array_by_idx(idx);
@@ -511,10 +511,10 @@ ARRAY_T(entity_t) *unit_spawn_from_resource(world_t world,
 
     entity_t root = ARRAY_AT(spawned, 0);
 
-    u32 *parents = unit_resource_parents(res);
-    u64 *comp_types = unit_resource_comp_types(res);
+    u32 *parents = entity_resource_parents(res);
+    u64 *comp_types = entity_resource_comp_types(res);
 
-    struct component_data *comp_data = unit_resource_comp_data(res);
+    struct component_data *comp_data = entity_resource_comp_data(res);
     for (int i = 0; i < res->comp_type_count; ++i) {
         stringid64_t type = {.id = comp_types[i]};
 
@@ -532,31 +532,31 @@ ARRAY_T(entity_t) *unit_spawn_from_resource(world_t world,
     return spawned;
 }
 
-entity_t unit_spawn(world_t world,
+entity_t entity_spawn(world_t world,
                     stringid64_t name) {
     void *res = ResourceApiV0.get(_G.type, name);
 
     if (res == NULL) {
-        log_error("unit", "Could not spawn unit.");
+        log_error("entity", "Could not spawn entity.");
         return (entity_t) {.idx = 0};
     }
 
-    ARRAY_T(entity_t) *spawned = unit_spawn_from_resource(world, res);
+    ARRAY_T(entity_t) *spawned = entity_spawn_from_resource(world, res);
 
     return spawned->data[0];
 }
 
-void unit_destroy(world_t world,
-                  entity_t *unit,
+void entity_destroy(world_t world,
+                  entity_t *entity,
                   u32 count) {
 
     for (int i = 0; i < count; ++i) {
-        ARRAY_T(entity_t) *spawned = _get_spawned_array(unit[i]);
+        ARRAY_T(entity_t) *spawned = _get_spawned_array(entity[i]);
 
         ComponentSystemApiV0.component_destroy(world, spawned->data,
                                                spawned->size);
 
-        _destroy_spawned_array(unit[i]);
+        _destroy_spawned_array(entity[i]);
     }
 
 }
@@ -588,15 +588,15 @@ void *entity_get_module_api(int api,
                     api.entity_manager_destroy = entity_manager_destroy;
                     api.entity_manager_alive = entity_manager_alive;
 
-                    api.spawn_from_resource = unit_spawn_from_resource;
-                    api.spawn = unit_spawn;
-                    api.destroy = unit_destroy;
-                    api.compiler_create_output = unit_compiler_create_output;
-                    api.compiler_destroy_output = unit_compiler_destroy_output;
-                    api.compiler_compile_unit = unit_compiler_compile_unit;
-                    api.compiler_ent_counter = unit_compiler_ent_counter;
-                    api.compiler_write_to_build = unit_compiler_write_to_build;
-                    api.resource_compiler = unit_resource_compiler;
+                    api.spawn_from_resource = entity_spawn_from_resource;
+                    api.spawn = entity_spawn;
+                    api.destroy = entity_destroy;
+                    api.compiler_create_output = entity_compiler_create_output;
+                    api.compiler_destroy_output = entity_compiler_destroy_output;
+                    api.compiler_compile_entity = entity_compiler_compile_entity;
+                    api.compiler_ent_counter = entity_compiler_ent_counter;
+                    api.compiler_write_to_build = entity_compiler_write_to_build;
+                    api.resource_compiler = entity_resource_compiler;
                     return &api;
                 }
 

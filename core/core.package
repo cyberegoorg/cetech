@@ -9,5 +9,5 @@ material:
 scene:
   - playground/cube
 
-unit:
+entity:
   - playground/cube

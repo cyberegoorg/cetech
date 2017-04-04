@@ -23,9 +23,9 @@ function Game:init()
     --    self.viewport = Renderer.GetViewport("default")
     self.world = World.create()
 
-    --    self.unit = Unit.
-    -- -- (self.world, "unit1");
-    --    local t = Transform.get(self.world, self.unit)
+    --    self.entity = Entity.
+    -- -- (self.world, "entity1");
+    --    local t = Transform.get(self.world, self.entity)
     --    local p = Transform.get_scale(self.world, t)
     --    Log.debug("lua", "%f %f %f", p.x, p.y, p.z)
 
@@ -34,23 +34,23 @@ function Game:init()
     --                 Vec3f.make(2, 5.0, 0.0),
     --                 Quatf.Identity, Vec3f.Unit);
 
-    --    self.level_unit = World.LevelUnit(self.world, self.level)
+    --    self.level_entity = World.LevelEntity(self.world, self.level)
 
-    --    self.unit2 = World.UnitByName(self.world, self.level, "box2")
-    --    self.unit = self.unit1
+    --    self.entity2 = World.EntityByName(self.world, self.level, "box2")
+    --    self.entity = self.entity1
 
-    self.camera_unit = Unit.spawn(self.world, "camera");
-    self.camera = 0; --Camera.GetCamera(self.world, self.camera_unit);
-    self.fps_camera = FPSCamera(self.world, self.camera_unit)
-    --Unit.spawn(self.world, "unit11");
+    self.camera_entity = Entity.spawn(self.world, "camera");
+    self.camera = 0; --Camera.GetCamera(self.world, self.camera_entity);
+    self.fps_camera = FPSCamera(self.world, self.camera_entity)
+    --Entity.spawn(self.world, "entity11");
 
     self.debug = false
     self.capture = false
-    self.switch_unit = false
+    self.switch_entity = false
 
     self.level = Level.load_level(self.world, "level1")
-    self.unit = Level.unit_by_id(self.level, "55643423443313252");
-    --Unit.destroy(self.world, self.unit)
+    self.entity = Level.entity_by_id(self.level, "55643423443313252");
+    --Entity.destroy(self.world, self.entity)
 end
 
 function Game:shutdown()
@@ -58,15 +58,15 @@ function Game:shutdown()
     World.destroy(self.world);
 end
 
-function rotator(world, unit, node_name, delta_rot)
-    local node = SceneGraph.node_by_name(world, unit, node_name)
+function rotator(world, entity, node_name, delta_rot)
+    local node = SceneGraph.node_by_name(world, entity, node_name)
     local rot = SceneGraph.get_rotation(world, node)
     rot = rot * delta_rot
     SceneGraph.set_rotation(world, node, rot)
 end
 
-function transform_rotator(world, unit, delta_rot)
-    local lt = Transform.get(world, unit)
+function transform_rotator(world, entity, delta_rot)
+    local lt = Transform.get(world, entity)
     local rot = Transform.get_rotation(world, lt)
     rot = rot * delta_rot
 
@@ -78,7 +78,7 @@ TEXTURE_CYCLE_IT = 1
 
 L = 2
 function Game:update(dt)
-        local mesh = Mesh.get(self.world, self.unit)
+        local mesh = Mesh.get(self.world, self.entity)
         local material = Mesh.get_material(self.world, mesh)
 
 --    L = L + dt * 0.1
@@ -93,10 +93,10 @@ function Game:update(dt)
         TEXTURE_CYCLE_IT = TEXTURE_CYCLE_IT + 1
     end
 
-    local level_unit = Level.unit(self.level)
-    --    transform_rotator(self.world, level_unit, Quatf.from_axis_angle(Vec3f.unit_y(), 0.02))
-    rotator(self.world, Level.unit_by_id(self.level, "55643433135454252"), "n_cube", Quatf.from_axis_angle(Vec3f.unit_x(), 0.05))
-    --transform_rotator(self.world, self.unit, Quatf.from_axis_angle(Vec3f.unit_z(), 0.08))
+    local level_entity = Level.entity(self.level)
+    --    transform_rotator(self.world, level_entity, Quatf.from_axis_angle(Vec3f.unit_y(), 0.02))
+    rotator(self.world, Level.entity_by_id(self.level, "55643433135454252"), "n_cube", Quatf.from_axis_angle(Vec3f.unit_x(), 0.05))
+    --transform_rotator(self.world, self.entity, Quatf.from_axis_angle(Vec3f.unit_z(), 0.08))
 
     if Keyboard.button_pressed(reload_btn) then
         ResourceManager.compile_all()
@@ -128,11 +128,11 @@ function Game:update(dt)
     end
 
     if Keyboard.button_pressed(Keyboard.button_index('f8')) then
-        self.switch_unit = not self.switch_unit
-        if self.switch_unit then
-            self.unit = self.level_unit
+        self.switch_entity = not self.switch_entity
+        if self.switch_entity then
+            self.entity = self.level_entity
         else
-            self.unit = self.unit1
+            self.entity = self.entity1
         end
     end
 
