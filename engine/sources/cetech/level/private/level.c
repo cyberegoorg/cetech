@@ -5,7 +5,7 @@
 #include <cetech/world/world.h>
 #include <celib/filesystem/vio.h>
 #include <cetech/resource/resource.h>
-#include <cetech/unit/unit.h>
+#include <cetech/entity/entity.h>
 #include <cetech/transform/transform.h>
 #include <celib/math/quatf.h>
 #include <cetech/memory/memory.h>
@@ -18,7 +18,6 @@ IMPORT_API(EntitySystemApi, 0);
 IMPORT_API(ResourceApi, 0);
 IMPORT_API(TransformApi, 0);
 IMPORT_API(MemSysApi, 0);
-IMPORT_API(UnitApi, 0);
 
 //==============================================================================
 // Typedefs
@@ -141,9 +140,9 @@ void forach_units_clb(yaml_node_t key,
     yaml_as_string(key, name, CEL_ARRAY_LEN(name));
     ARRAY_PUSH_BACK(stringid64_t, data->id, stringid64_from_string(name));
     ARRAY_PUSH_BACK(u32, data->offset,
-                    UnitApiV0.compiler_ent_counter(data->output));
+                    EntitySystemApiV0.compiler_ent_counter(data->output));
 
-    UnitApiV0.compiler_compile_unit(data->output, value, data->filename,
+    EntitySystemApiV0.compiler_compile_unit(data->output, value, data->filename,
                                     data->capi);
 }
 
@@ -170,7 +169,7 @@ int _level_resource_compiler(const char *filename,
     ARRAY_INIT(u32, &offset, MemSysApiV0.main_allocator());
     ARRAY_INIT(u8, &data, MemSysApiV0.main_allocator());
 
-    struct entity_compile_output *output = UnitApiV0.compiler_create_output();
+    struct entity_compile_output *output = EntitySystemApiV0.compiler_create_output();
 
 
     struct foreach_units_data unit_data = {
@@ -188,7 +187,7 @@ int _level_resource_compiler(const char *filename,
             .units_count = ARRAY_SIZE(&id)
     };
 
-    UnitApiV0.compiler_write_to_build(output, unit_data.data);
+    EntitySystemApiV0.compiler_write_to_build(output, unit_data.data);
 
     cel_vio_write(build_vio, &res, sizeof(struct level_blob), 1);
     cel_vio_write(build_vio, &ARRAY_AT(&id, 0), sizeof(stringid64_t),
@@ -202,7 +201,7 @@ int _level_resource_compiler(const char *filename,
     ARRAY_DESTROY(u32, &offset);
     ARRAY_DESTROY(u8, &data);
 
-    UnitApiV0.compiler_destroy_output(output);
+    EntitySystemApiV0.compiler_destroy_output(output);
 
     return 1;
 }
@@ -217,7 +216,6 @@ static void _init(get_api_fce_t get_engine_api) {
     INIT_API(MemSysApi, MEMORY_API_ID, 0);
     INIT_API(ResourceApi, RESOURCE_API_ID, 0);
     INIT_API(TransformApi, TRANSFORM_API_ID, 0);
-    INIT_API(UnitApi, UNIT_API_ID, 0);
 
     _G = (struct G) {0};
     _G.level_type = stringid64_from_string("level");
@@ -252,7 +250,7 @@ level_t world_load_level(world_t world,
     level_t level = _new_level(level_ent);
     struct level_instance *instance = _level_instance(level);
 
-    ARRAY_T(entity_t) *spawned = UnitApiV0.spawn_from_resource(world, data);
+    ARRAY_T(entity_t) *spawned = EntitySystemApiV0.spawn_from_resource(world, data);
     instance->spawned_entity = spawned;
 
     for (int i = 0; i < res->units_count; ++i) {
@@ -271,7 +269,7 @@ void level_destroy(world_t world,
                    level_t level) {
     struct level_instance *instance = _level_instance(level);
 
-    UnitApiV0.destroy(world, &instance->spawned_entity->data[0], 1);
+    EntitySystemApiV0.destroy(world, &instance->spawned_entity->data[0], 1);
     EntitySystemApiV0.entity_manager_destroy(instance->level_entity);
 }
 
