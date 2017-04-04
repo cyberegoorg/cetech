@@ -40,7 +40,7 @@ pages:
       - cetech.Application: 'lua_api/Application.md'
       - cetech.Package: 'lua_api/Package.md'
       - cetech.World: 'lua_api/World.md'
-      - cetech.Unit: 'lua_api/Unit.md'
+      - cetech.Entity: 'lua_api/Entity.md'
 
     - Renderer:
       - cetech.Renderer: 'lua_api/Renderer.md'
