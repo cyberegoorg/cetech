@@ -50,7 +50,6 @@ enum {
     LEVEL_API_ID,
     SCENEGRAPH_API_ID,
     TRANSFORM_API_ID,
-    UNIT_API_ID,
     WORLD_API_ID,
 };
 

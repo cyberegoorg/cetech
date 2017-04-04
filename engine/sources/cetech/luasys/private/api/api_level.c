@@ -27,20 +27,20 @@ static int _destroy_level(lua_State *l) {
     return 0;
 }
 
-static int _level_unit_by_id(lua_State *l) {
+static int _level_entity_by_id(lua_State *l) {
     level_t level = {.idx = luasys_to_int(l, 1)};
     stringid64_t name = stringid64_from_string(luasys_to_string(l, 2));
 
-    entity_t ent = LevelApiV0.unit_by_id(level, name);
+    entity_t ent = LevelApiV0.entity_by_id(level, name);
 
     luasys_push_int(l, ent.idx);
     return 1;
 }
 
-static int _level_unit(lua_State *l) {
+static int _level_entity(lua_State *l) {
     level_t level = {.idx = luasys_to_int(l, 1)};
 
-    entity_t ent = LevelApiV0.unit(level);
+    entity_t ent = LevelApiV0.entity(level);
 
     luasys_push_int(l, ent.idx);
     return 1;
@@ -52,6 +52,6 @@ void _register_lua_level_api(get_api_fce_t get_engine_api) {
     luasys_add_module_function(API_NAME, "load_level", _load_level);
     luasys_add_module_function(API_NAME, "destroy", _destroy_level);
 
-    luasys_add_module_function(API_NAME, "unit_by_id", _level_unit_by_id);
-    luasys_add_module_function(API_NAME, "unit", _level_unit);
+    luasys_add_module_function(API_NAME, "entity_by_id", _level_entity_by_id);
+    luasys_add_module_function(API_NAME, "entity", _level_entity);
 }

@@ -112,8 +112,8 @@ void *world_get_module_api(int api,
                     api.destroy = world_destroy;
                     api.update = world_update;
 //                    api.load_level = world_load_level;
-//                    api.unit_by_id = level_unit_by_id;
-//                    api.unit = level_unit ;
+//                    api.entity_by_id = level_entity_by_id;
+//                    api.entity = level_entity ;
 
                     return &api;
                 }

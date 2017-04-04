@@ -18,7 +18,6 @@ static void _init_static_modules() {
     ADD_STATIC_PLUGIN(component);
     ADD_STATIC_PLUGIN(world);
 
-    ADD_STATIC_PLUGIN(unit);
     ADD_STATIC_PLUGIN(level);
 
     ADD_STATIC_PLUGIN(keyboard);

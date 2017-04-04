@@ -103,7 +103,7 @@ set(SOURCE_FILES
         engine/sources/cetech/luasys/private/api/api_resouce_manager.c
         engine/sources/cetech/luasys/private/api/api_renderer.c
         engine/sources/cetech/luasys/private/api/api_world.c
-        engine/sources/cetech/luasys/private/api/api_unit.c
+        engine/sources/cetech/luasys/private/api/api_entity.c
         engine/sources/cetech/luasys/private/api/api_transform.c
         engine/sources/cetech/luasys/private/api/api_vec2f.c
         engine/sources/cetech/luasys/private/api/api_vec3f.c
@@ -126,7 +126,6 @@ set(SOURCE_FILES
         engine/sources/cetech/resource/private/resource_package.c
         engine/sources/cetech/resource/private/resource_compiler.c
         engine/sources/cetech/filesystem/private/filesystem.c
-        engine/sources/cetech/unit/private/unit.c
         engine/sources/cetech/component/private/component.c
         engine/sources/cetech/entity/private/entity.c
         engine/sources/cetech/world/private/world.c

@@ -165,7 +165,7 @@ static void _register_all_api(get_api_fce_t get_engine_api) {
     REGISTER_LUA_API(resource_manager);
     REGISTER_LUA_API(renderer);
     REGISTER_LUA_API(world);
-    REGISTER_LUA_API(unit);
+    REGISTER_LUA_API(entity);
     REGISTER_LUA_API(transform);
     REGISTER_LUA_API(vec2f);
     REGISTER_LUA_API(vec3f);

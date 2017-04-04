@@ -28,11 +28,11 @@ Module contain functions for transformation
 
 ## get( world, entity ) : tranform
 
-Get transform from entity or unit.
+Get transform from Entity.
 
 ### Arguments
 * `world` : **world**   - World
-* `entity` : **entity, unit**   - Entity or unit
+* `entity` : **entity**   - Entity
 
 ------------------------------------------------------------------------------------------------------------------------
 
@@ -42,7 +42,7 @@ Return true if entity has transfom component.
 
 ### Arguments
 * `world` : **world**   - World
-* `entity` : **entity, unit**   - Entity or unit
+* `entity` : **entity**   - Entity
 
 ----------------------------------------------------------------------------------------------------------------------
 

@@ -6,7 +6,7 @@ blobs:
         - <celib/string/stringid.h>
         - <celib/math/types.h>
       values:
-        - u32 units_count
-        - stringid64_t names[units_count]
-        - u32 offset[units_count]
+        - u32 entities_count
+        - stringid64_t names[entities_count]
+        - u32 offset[entities_count]
         - u8 data[*]

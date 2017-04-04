@@ -15,12 +15,12 @@ Module contain functions for camera manager.
 
 ## get(world, entity) : camera
 
-Get camera component from entity or unit.
+Get camera component from Entity.
 
 ### Returns
 * Camera
 
 ### Arguments
 * `world` : **world**   - World
-* `entity` : **entity, unit**   - Entity or unit
+* `entity` : **entity**   - Entity
 

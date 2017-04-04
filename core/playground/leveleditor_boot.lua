@@ -10,10 +10,10 @@ function Editor:init()
 
     self.viewport = 0 --Renderer.GetViewport("default")
     self.world = World.create()
-    self.camera_unit = Unit.spawn(self.world, "camera")
-    --self.camera = Camera.get(self.world, self.camera_unit)
-    self.camera_transform = Transform.get(self.world, self.camera_unit)
-    self.fps_camera = FPSCamera(self.world, self.camera_unit, true)
+    self.camera_entity = Entity.spawn(self.world, "camera")
+    --self.camera = Camera.get(self.world, self.camera_entity)
+    self.camera_transform = Transform.get(self.world, self.camera_entity)
+    self.fps_camera = FPSCamera(self.world, self.camera_entity, true)
 
     Transform.set_position(self.world, self.camera_transform, Vec3f.make(0.0, 0.0, 10))
 
