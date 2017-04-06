@@ -1,14 +1,14 @@
-System.register(["../../lib/static/playground/playground_rpc"], function(exports_1, context_1) {
+System.register(["../../lib/static/playground/playground_rpc"], function (exports_1, context_1) {
     "use strict";
     var __moduleName = context_1 && context_1.id;
-    var playground_rpc_1;
-    var ScriptEditor;
+    var playground_rpc_1, ScriptEditor;
     return {
-        setters:[
+        setters: [
             function (playground_rpc_1_1) {
                 playground_rpc_1 = playground_rpc_1_1;
-            }],
-        execute: function() {
+            }
+        ],
+        execute: function () {
             ScriptEditor = (function () {
                 function ScriptEditor() {
                     var _this = this;
@@ -94,6 +94,6 @@ System.register(["../../lib/static/playground/playground_rpc"], function(exports
             }());
             exports_1("ScriptEditor", ScriptEditor);
         }
-    }
+    };
 });
 //# sourceMappingURL=script_editor.js.map

@@ -14,6 +14,7 @@ class LevelEditorView(CETechWiget):
 
     def _subcribe_asset_browser(self, msg):
         msg_type = msg['msg_type']
+
         name = msg['name']
         type = msg['type']
 

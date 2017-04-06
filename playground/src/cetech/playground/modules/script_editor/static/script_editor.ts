@@ -89,8 +89,6 @@ export class ScriptEditor {
 
             this.editor.moveCursorToPosition(curent_pos);
         });
-
-
     }
 
     private connect_to_cetech() {

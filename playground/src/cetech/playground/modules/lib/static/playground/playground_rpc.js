@@ -1,10 +1,10 @@
-System.register([], function(exports_1, context_1) {
+System.register([], function (exports_1, context_1) {
     "use strict";
     var __moduleName = context_1 && context_1.id;
     var PlaygroundRPC, PlaygroundSubscriber;
     return {
-        setters:[],
-        execute: function() {
+        setters: [],
+        execute: function () {
             PlaygroundRPC = (function () {
                 function PlaygroundRPC() {
                     this.connected = false;
@@ -102,6 +102,6 @@ System.register([], function(exports_1, context_1) {
             }());
             exports_1("PlaygroundSubscriber", PlaygroundSubscriber);
         }
-    }
+    };
 });
 //# sourceMappingURL=playground_rpc.js.map

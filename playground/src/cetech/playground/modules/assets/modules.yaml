@@ -29,8 +29,8 @@ extensions:
     ####################################################################################################################
     - name: asset_preview_window
       title: Asset preview
-      parent: main_window
-      parent_area: bottom
+      parent: asset_browser_window
+      parent_area: right
       show: true
 
 
