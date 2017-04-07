@@ -18,7 +18,7 @@ export class ProfilerApp {
     constructor() {
         this.sub = new PlaygroundSubscriber();
         // TODO: dynamic or static? (N=64)
-        var groups = [
+        const groups = [
             {
                 id: 0,
                 content: 'Worker 0'
@@ -37,7 +37,7 @@ export class ProfilerApp {
             }
         ];
 
-        var options = {
+        const options = {
             timeAxis: {scale: <vis.TimelineTimeAxisScaleType>'millisecond', step: 0.01},
             showMajorLabels: false,
 
@@ -56,14 +56,10 @@ export class ProfilerApp {
             }
         };
 
-        var data_window = [];
-
-
         this.last_now = performance.now();
         this.time_acum = 0.0;
 
-
-        var container = <HTMLDivElement>document.getElementById('vizu');
+        const container = <HTMLDivElement>document.getElementById('vizu');
         this.items = new vis.DataSet();
         this.timeline = new vis.Timeline(container, this.items, groups, options);
 
@@ -83,16 +79,16 @@ export class ProfilerApp {
             }
 
 
-            var events = msg.msg.pub;
+            const events = msg.msg.pub;
 
-            for (var i = 0; i < events.length; ++i) {
-                var event = events[i];
+            for (let i = 0; i < events.length; ++i) {
+                const event = events[i];
 
                 if (event.etype == "EVENT_SCOPE") {
 
-                    var label = event.name + ": " + (event.duration) + "ms,\n depth: " + event.depth;
+                    const label = event.name + ": " + (event.duration) + "ms,\n depth: " + event.depth;
 
-                    var item = {
+                    const item = {
                         content: label,
                         title: label,
                         start: event.start,
@@ -116,12 +112,12 @@ export class ProfilerApp {
             }
         });
 
-        var btn = <HTMLButtonElement>document.getElementById("btn_connect");
+        let btn = <HTMLButtonElement>document.getElementById("btn_connect");
         btn.onclick = () => {
             this.connect_to_cetech()
         };
 
-        var btn = <HTMLButtonElement>document.getElementById("btn_send");
+        btn = <HTMLButtonElement>document.getElementById("btn_send");
         btn.onclick = () => {
             if (!this.Record) {
                 this.items.clear();
@@ -137,8 +133,8 @@ export class ProfilerApp {
     connect_to_cetech() {
         this.sub.close();
 
-        var cetech_url = <HTMLInputElement>document.getElementById("cetech_url");
+        let cetech_url = <HTMLInputElement>document.getElementById("cetech_url");
 
-        this.sub.connect("ws://localhost:8889")
+        this.sub.connect(cetech_url.value)
     };
 }

@@ -45,7 +45,7 @@ extensions:
     - name: asset_browsser_view
       window: asset_browser_window
       type: qt_content
-      script_file: views.py
+      script_file: asset_views.py
       script_class: AssetBrowserView
 
     ######################
@@ -54,7 +54,7 @@ extensions:
     - name: asset_preview_view
       window: asset_preview_window
       type: qt_content
-      script_file: views.py
+      script_file: asset_views.py
       script_class: AssetPreviewView
 
 
@@ -67,7 +67,7 @@ extensions:
         - asset_click
         - asset_dclick
 
-      script_file: service.py
+      script_file: asset_service.py
       script_class: AssetService
 
   _menus:

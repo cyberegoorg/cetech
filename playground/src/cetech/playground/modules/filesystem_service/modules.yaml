@@ -23,5 +23,5 @@ extensions:
         - read
         - write
 
-      script_file: service.py
+      script_file: filesystem_service.py
       script_class: FilesystemService

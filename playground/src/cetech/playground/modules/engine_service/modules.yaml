@@ -13,5 +13,5 @@ extensions:
         - call
         - call_all
 
-      script_file: service.py
+      script_file: engine_service.py
       script_class: EngineService

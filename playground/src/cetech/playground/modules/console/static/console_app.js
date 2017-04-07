@@ -1,14 +1,14 @@
-System.register(["../../lib/static/playground/playground_rpc"], function(exports_1, context_1) {
+System.register(["../../lib/static/playground/playground_rpc"], function (exports_1, context_1) {
     "use strict";
     var __moduleName = context_1 && context_1.id;
-    var playground_rpc_1;
-    var ConsoleApp;
+    var playground_rpc_1, ConsoleApp;
     return {
-        setters:[
+        setters: [
             function (playground_rpc_1_1) {
                 playground_rpc_1 = playground_rpc_1_1;
-            }],
-        execute: function() {
+            }
+        ],
+        execute: function () {
             ConsoleApp = (function () {
                 function ConsoleApp() {
                     var _this = this;
@@ -96,6 +96,6 @@ System.register(["../../lib/static/playground/playground_rpc"], function(exports
             }());
             exports_1("ConsoleApp", ConsoleApp);
         }
-    }
+    };
 });
 //# sourceMappingURL=console_app.js.map

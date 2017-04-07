@@ -1,17 +1,17 @@
-System.register(["../../lib/static/playground/playground_rpc", "vis"], function(exports_1, context_1) {
+System.register(["../../lib/static/playground/playground_rpc", "vis"], function (exports_1, context_1) {
     "use strict";
     var __moduleName = context_1 && context_1.id;
-    var playground_rpc_1, vis;
-    var ProfilerApp;
+    var playground_rpc_1, vis, ProfilerApp;
     return {
-        setters:[
+        setters: [
             function (playground_rpc_1_1) {
                 playground_rpc_1 = playground_rpc_1_1;
             },
             function (vis_1) {
                 vis = vis_1;
-            }],
-        execute: function() {
+            }
+        ],
+        execute: function () {
             ProfilerApp = (function () {
                 function ProfilerApp() {
                     var _this = this;
@@ -49,7 +49,6 @@ System.register(["../../lib/static/playground/playground_rpc", "vis"], function(
                             return 0;
                         }
                     };
-                    var data_window = [];
                     this.last_now = performance.now();
                     this.time_acum = 0.0;
                     var container = document.getElementById('vizu');
@@ -68,16 +67,16 @@ System.register(["../../lib/static/playground/playground_rpc", "vis"], function(
                         }
                         var events = msg.msg.pub;
                         for (var i = 0; i < events.length; ++i) {
-                            var event = events[i];
-                            if (event.etype == "EVENT_SCOPE") {
-                                var label = event.name + ": " + (event.duration) + "ms,\n depth: " + event.depth;
+                            var event_1 = events[i];
+                            if (event_1.etype == "EVENT_SCOPE") {
+                                var label = event_1.name + ": " + (event_1.duration) + "ms,\n depth: " + event_1.depth;
                                 var item = {
                                     content: label,
                                     title: label,
-                                    start: event.start,
-                                    end: event.start + (event.duration),
-                                    group: event.worker_id,
-                                    depth: event.depth
+                                    start: event_1.start,
+                                    end: event_1.start + (event_1.duration),
+                                    group: event_1.worker_id,
+                                    depth: event_1.depth
                                 };
                                 _this.items.add(item);
                             }
@@ -93,7 +92,7 @@ System.register(["../../lib/static/playground/playground_rpc", "vis"], function(
                     btn.onclick = function () {
                         _this.connect_to_cetech();
                     };
-                    var btn = document.getElementById("btn_send");
+                    btn = document.getElementById("btn_send");
                     btn.onclick = function () {
                         if (!_this.Record) {
                             _this.items.clear();
@@ -107,13 +106,13 @@ System.register(["../../lib/static/playground/playground_rpc", "vis"], function(
                 ProfilerApp.prototype.connect_to_cetech = function () {
                     this.sub.close();
                     var cetech_url = document.getElementById("cetech_url");
-                    this.sub.connect("ws://localhost:8889");
+                    this.sub.connect(cetech_url.value);
                 };
                 ;
                 return ProfilerApp;
             }());
             exports_1("ProfilerApp", ProfilerApp);
         }
-    }
+    };
 });
 //# sourceMappingURL=profiler_app.js.map

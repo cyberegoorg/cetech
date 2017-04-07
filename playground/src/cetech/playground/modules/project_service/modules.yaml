@@ -10,5 +10,5 @@ extensions:
         - open_project
         - close_project
 
-      script_file: service.py
+      script_file: project_service.py
       script_class: ProjectService

@@ -20,9 +20,16 @@ extensions:
     ############################################################################
     - name: level_inspect_window
       title: Level inspect
-      parent: level_editor_window
+      parent: main_window
       parent_area: right
       show: true
+
+    - name: level_editor_window
+      title: Level editor
+      parent: main_window
+      parent_area: top
+      show: true
+
 
   ##################
   # Window content #
@@ -35,5 +42,11 @@ extensions:
     - name: level_inspect_view
       window: level_inspect_window
       type: qt_content
-      script_file: views.py
+      script_file: level_views.py
       script_class: LevelInspectorView
+
+    - name: level_editor_view
+      window: level_editor_window
+      type: qt_content
+      script_file: level_views.py
+      script_class: LevelEditorView
