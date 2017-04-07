@@ -4,7 +4,7 @@ from PyQt5.QtWidgets import QMainWindow
 
 import cetech.playground.shared.rpc as rpc
 from cetech.playground.frontend import CETechWiget
-from cetech.playground.modules.assets.ui.assetbrowser import Ui_MainWindow
+from modules.assets.ui.assetbrowser import Ui_MainWindow
 
 
 class AssetPreviewView(CETechWiget):

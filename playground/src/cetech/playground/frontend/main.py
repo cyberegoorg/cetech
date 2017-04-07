@@ -1,10 +1,9 @@
 import logging
 import os
 import sys
-
 from PyQt5.QtWidgets import QApplication
 
-import cetech.playground.modules as _modules
+import modules as _modules
 from cetech.playground.frontend import FrontendApp
 from .projectmanagerdialog import ProjectManagerDialog
 

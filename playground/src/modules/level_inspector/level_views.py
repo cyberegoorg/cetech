@@ -4,8 +4,7 @@ from PyQt5.QtGui import QStandardItemModel, QStandardItem
 from PyQt5.QtWidgets import QMainWindow
 
 from cetech.playground.frontend import CETechWiget
-from cetech.playground.modules.level_inspector.ui.levelinspector import \
-    Ui_MainWindow
+from modules.level_inspector.ui.levelinspector import Ui_MainWindow
 
 
 class LevelEditorView(CETechWiget):

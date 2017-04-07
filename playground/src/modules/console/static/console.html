@@ -5,11 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>CETech - console</title>
 
-    <script src="/cetech/playground/modules/lib/static/msgpack.min.js"></script>
-    <script src="/cetech/playground/modules/lib/static/ace/ace.js" type="text/javascript" charset="utf-8"></script>
-    <script src="/cetech/playground/modules/lib/static/ace/ext-language_tools.js"></script>
-    <script src="/cetech/playground/modules/lib/static/jquery.min.js"></script>
-        <link href="/cetech/playground/modules/lib/static/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    <script src="/modules/lib/static/msgpack.min.js"></script>
+    <script src="/modules/lib/static/ace/ace.js" type="text/javascript" charset="utf-8"></script>
+    <script src="/modules/lib/static/ace/ext-language_tools.js"></script>
+    <script src="/modules/lib/static/jquery.min.js"></script>
+    <link href="/modules/lib/static/bootstrap/css/bootstrap.min.css" rel="stylesheet">
 
     <style type="text/css" media="screen">
         #editor {
@@ -95,9 +95,9 @@
     </div>
 </div>
 
-<script src="/cetech/playground/modules/lib/static/bootstrap/js/bootstrap.min.js"></script>
-<script src="/cetech/playground/modules/lib/static/system.js"></script>
-<script src="/cetech/playground/modules/lib/static/playground/playground_rpc.js"></script>
+<script src="/modules/lib/static/bootstrap/js/bootstrap.min.js"></script>
+<script src="/modules/lib/static/system-polyfills.js"></script>
+<script src="/modules/lib/static/system.js"></script>
 <script>
     SystemJS.defaultJSExtensions = true;
     SystemJS.config({
@@ -105,7 +105,7 @@
     });
 
     var app;
-    SystemJS.import('/cetech/playground/modules/console/static/console_app').then(function (m) {
+    SystemJS.import('/modules/console/static/console_app').then(function (m) {
         app = new m.ConsoleApp();
     });
 

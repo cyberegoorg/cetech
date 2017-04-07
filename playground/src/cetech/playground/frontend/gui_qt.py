@@ -128,7 +128,7 @@ class QtFrontendGui(object):
         self.docks[name] = dock
 
     def create_web_content(self, name, window_name, url):
-        full_url = "http://localhost:8080/cetech/playground/modules/%s/" % url
+        full_url = "http://localhost:8080/modules/%s/" % url
 
         w = self.windows[window_name]
 
