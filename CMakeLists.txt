@@ -104,6 +104,7 @@ set(SOURCE_FILES
         engine/sources/cetech/luasys/private/api/api_renderer.c
         engine/sources/cetech/luasys/private/api/api_world.c
         engine/sources/cetech/luasys/private/api/api_entity.c
+        engine/sources/cetech/luasys/private/api/api_component.c
         engine/sources/cetech/luasys/private/api/api_transform.c
         engine/sources/cetech/luasys/private/api/api_vec2f.c
         engine/sources/cetech/luasys/private/api/api_vec3f.c

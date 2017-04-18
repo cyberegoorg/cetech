@@ -7,6 +7,8 @@
 #include <cetech/transform/transform.h>
 #include <cetech/memory/memory.h>
 #include <cetech/module/module.h>
+#include <celib/string/stringid.h>
+#include <celib/math/types.h>
 
 
 struct transform_data {
@@ -212,6 +214,71 @@ static void _spawner(world_t world,
     }
 }
 
+void _set_property(world_t world,
+                     entity_t entity,
+                     stringid64_t key,
+                     struct property_value value) {
+
+    stringid64_t position = stringid64_from_string("position");
+    stringid64_t rotation = stringid64_from_string("rotation");
+    stringid64_t scale = stringid64_from_string("scale");
+
+    transform_t transform = transform_get(world, entity);
+
+    if(key.id == position.id){
+        transform_set_position(world, transform, value.value.vec3f);
+
+    } else if (key.id == rotation.id) {
+        cel_quatf_t rot = {0};
+        cel_vec3f_t euler_rot = value.value.vec3f;
+        cel_vec3f_t euler_rot_rad = {0};
+
+        cel_vec3f_mul(&euler_rot_rad, &euler_rot, CEL_F32_TORAD);
+        cel_quatf_from_euler(&rot, euler_rot_rad.x, euler_rot_rad.y, euler_rot_rad.z);
+
+        transform_set_rotation(world, transform, rot);
+
+    } else if (key.id == scale.id) {
+        transform_set_scale(world, transform, value.value.vec3f);
+    }
+
+}
+
+struct property_value _get_property(world_t world,
+                                    entity_t entity,
+                                    stringid64_t key) {
+    stringid64_t position = stringid64_from_string("position");
+    stringid64_t rotation = stringid64_from_string("rotation");
+    stringid64_t scale = stringid64_from_string("scale");
+
+    transform_t transform = transform_get(world, entity);
+
+    if(key.id == position.id){
+        return  (struct property_value){
+                .type= PROPERTY_VEC3,
+                .value.vec3f = transform_get_position(world, transform)
+        };
+    } else if (key.id == rotation.id) {
+        cel_vec3f_t euler_rot = {0};
+        cel_vec3f_t euler_rot_rad = {0};
+        cel_quatf_t rot = transform_get_rotation(world, transform);
+        cel_quatf_to_eurel_angle(&euler_rot_rad, &rot);
+        cel_vec3f_mul(&euler_rot, &euler_rot_rad, CEL_F32_TODEG);
+
+        return  (struct property_value){
+                .type= PROPERTY_VEC3,
+                .value.vec3f = euler_rot
+        };
+    } else if (key.id == scale.id) {
+        return  (struct property_value){
+                .type= PROPERTY_VEC3,
+                .value.vec3f = transform_get_scale(world, transform)
+        };
+    }
+
+    return (struct property_value){.type= PROPERTY_INVALID};
+}
+
 IMPORT_API(ComponentSystemApi, 0);
 
 static void _init(get_api_fce_t get_engine_api) {
@@ -225,12 +292,16 @@ static void _init(get_api_fce_t get_engine_api) {
     _G.type = stringid64_from_string("transform");
 
     ComponentSystemApiV0.component_register_compiler(_G.type,
-                                                  _transform_component_compiler,
-                                                  10);
-    ComponentSystemApiV0.component_register_type(_G.type, (struct component_clb) {
-            .spawner=_spawner, .destroyer=_destroyer,
-            .on_world_create=_on_world_create, .on_world_destroy=_on_world_destroy
-    });
+                                                     _transform_component_compiler,
+                                                     10);
+    ComponentSystemApiV0.component_register_type(
+            _G.type,
+            (struct component_clb) {
+                    .spawner=_spawner, .destroyer=_destroyer,
+                    .on_world_create=_on_world_create, .on_world_destroy=_on_world_destroy,
+                    .set_property=_set_property, .get_property=_get_property
+            }
+    );
 }
 
 static void _shutdown() {

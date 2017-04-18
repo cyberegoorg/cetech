@@ -166,6 +166,7 @@ static void _register_all_api(get_api_fce_t get_engine_api) {
     REGISTER_LUA_API(renderer);
     REGISTER_LUA_API(world);
     REGISTER_LUA_API(entity);
+    REGISTER_LUA_API(component);
     REGISTER_LUA_API(transform);
     REGISTER_LUA_API(vec2f);
     REGISTER_LUA_API(vec3f);
@@ -434,6 +435,12 @@ int luasys_to_int(lua_State *_L,
     return (int) lua_tointeger(_L, i);
 }
 
+u64 luasys_to_u64(lua_State *_L,
+                  int i) {
+    return (u64) lua_tointeger(_L, i);
+}
+
+
 f32 luasys_to_f32(lua_State *_L,
                   int i) {
     return (f32) lua_tonumber(_L, i);
@@ -576,51 +583,54 @@ void luasys_add_module_function(const char *module,
 
 
 static int _is_vec2f(lua_State *L,
-                     cel_vec2f_t *p) {
+                     int idx) {
+    cel_vec2f_t *p = lua_touserdata(L, idx);
+
     return (p >= _G._temp_cel_vec2f_buffer) &&
            (p < (_G._temp_cel_vec2f_buffer + 1024));
 }
 
 static int _is_vec3f(lua_State *L,
-                     cel_vec3f_t *p) {
+                     int idx) {
+    cel_vec3f_t *p = lua_touserdata(L, idx);
     return (p >= _G._temp_cel_vec3f_buffer) &&
            (p < (_G._temp_cel_vec3f_buffer + 1024));
 }
 
 static int _is_vec4f(lua_State *L,
-                     cel_vec4f_t *p) {
+                     int idx) {
+    cel_vec4f_t *p = lua_touserdata(L, idx);
     return (p >= _G._temp_cel_vec4f_buffer) &&
            (p < (_G._temp_cel_vec4f_buffer + 1024));
 }
 
 static int _is_quat(lua_State *L,
-                    cel_quatf_t *p) {
+                    int idx) {
+    cel_quatf_t *p = lua_touserdata(L, idx);
     return (p >= _G._temp_quat_buffer) && (p < (_G._temp_quat_buffer + 1024));
 }
 
 static int _is_mat44f(lua_State *L,
-                      cel_mat44f_t *p) {
+                      int idx) {
+    cel_mat44f_t *p = lua_touserdata(L, idx);
     return (p >= _G._temp_cel_mat44f_buffer) &&
            (p < (_G._temp_cel_mat44f_buffer + 1024));
 }
 
-
 static int lightuserdata_add(lua_State *L) {
-    void *p = lua_touserdata(L, 1);
-
-    if (_is_vec2f(L, p)) {
+    if (_is_vec2f(L, 1)) {
         return _cel_vec2f_add(L);
     }
 
-    if (_is_vec3f(L, p)) {
+    if (_is_vec3f(L, 1)) {
         return _cel_vec3f_add(L);
     }
 
-    if (_is_vec4f(L, p)) {
+    if (_is_vec4f(L, 1)) {
         return _cel_vec4f_add(L);
     }
 
-    if (_is_quat(L, p)) {
+    if (_is_quat(L, 1)) {
         return _quat_add(L);
     }
 
@@ -628,21 +638,19 @@ static int lightuserdata_add(lua_State *L) {
 }
 
 static int lightuserdata_sub(lua_State *L) {
-    void *p = lua_touserdata(L, 1);
-
-    if (_is_vec2f(L, p)) {
+    if (_is_vec2f(L, 1)) {
         return _cel_vec2f_sub(L);
     }
 
-    if (_is_vec3f(L, p)) {
+    if (_is_vec3f(L, 1)) {
         return _cel_vec3f_sub(L);
     }
 
-    if (_is_vec4f(L, p)) {
+    if (_is_vec4f(L, 1)) {
         return _cel_vec4f_sub(L);
     }
 
-    if (_is_quat(L, p)) {
+    if (_is_quat(L, 1)) {
         return _quat_sub(L);
     }
 
@@ -655,44 +663,42 @@ static int lightuserdata_sub(lua_State *L) {
 static int lightuserdata_mul(lua_State *L) {
     void *p = lua_touserdata(L, 1);
 
-    if (_is_vec2f(L, p)) {
+    if (_is_vec2f(L, 1)) {
         return _cel_vec2f_mul(L);
     }
 
-    if (_is_vec3f(L, p)) {
+    if (_is_vec3f(L, 1)) {
         return _cel_vec3f_mul(L);
     }
 
-    if (_is_vec4f(L, p)) {
+    if (_is_vec4f(L, 1)) {
         return _cel_vec4f_mul(L);
     }
 
-    if (_is_quat(L, p)) {
+    if (_is_quat(L, 1)) {
         return _quat_mul(L);
     }
 
-    if (_is_mat44f(L, p)) {
+    if (_is_mat44f(L, 1)) {
         return _cel_mat44f_mul(L);
     }
     return 0;
 }
 
 static int lightuserdata_div(lua_State *L) {
-    void *p = lua_touserdata(L, 1);
-
-    if (_is_vec2f(L, p)) {
+    if (_is_vec2f(L, 1)) {
         return _cel_vec2f_div(L);
     }
 
-    if (_is_vec3f(L, p)) {
+    if (_is_vec3f(L, 1)) {
         return _cel_vec3f_div(L);
     }
 
-    if (_is_vec4f(L, p)) {
+    if (_is_vec4f(L, 1)) {
         return _cel_vec4f_div(L);
     }
 
-    if (_is_quat(L, p)) {
+    if (_is_quat(L, 1)) {
         return _quat_div(L);
     }
 
@@ -703,25 +709,23 @@ static int lightuserdata_div(lua_State *L) {
 }
 
 static int lightuserdata_unm(lua_State *L) {
-    void *p = lua_touserdata(L, 1);
-
-    if (_is_vec2f(L, p)) {
+    if (_is_vec2f(L, 1)) {
         return _cel_vec2f_unm(L);
     }
 
-    if (_is_vec3f(L, p)) {
+    if (_is_vec3f(L, 1)) {
         return _cel_vec3f_unm(L);
     }
 
-    if (_is_vec4f(L, p)) {
+    if (_is_vec4f(L, 1)) {
         return _cel_vec4f_unm(L);
     }
 
-    if (_is_quat(L, p)) {
+    if (_is_quat(L, 1)) {
         return _quat_unm(L);
     }
 
-    if (_is_mat44f(L, p)) {
+    if (_is_mat44f(L, 1)) {
         return _cel_mat44f_unm(L);
     }
 
@@ -729,25 +733,23 @@ static int lightuserdata_unm(lua_State *L) {
 }
 
 static int lightuserdata_index(lua_State *L) {
-    void *p = lua_touserdata(L, 1);
-
-    if (_is_vec2f(L, p)) {
+    if (_is_vec2f(L, 1)) {
         return _cel_vec2f_index(L);
     }
 
-    if (_is_vec3f(L, p)) {
+    if (_is_vec3f(L, 1)) {
         return _cel_vec3f_index(L);
     }
 
-    if (_is_vec4f(L, p)) {
+    if (_is_vec4f(L, 1)) {
         return _cel_vec4f_index(L);
     }
 
-    if (_is_quat(L, p)) {
+    if (_is_quat(L, 1)) {
         return _quat_index(L);
     }
 
-    if (_is_mat44f(L, p)) {
+    if (_is_mat44f(L, 1)) {
         return _cel_mat44f_index(L);
     }
 
@@ -755,25 +757,23 @@ static int lightuserdata_index(lua_State *L) {
 }
 
 static int lightuserdata_newindex(lua_State *L) {
-    void *p = lua_touserdata(L, 1);
-
-    if (_is_vec2f(L, p)) {
+    if (_is_vec2f(L, 1)) {
         return _cel_vec2f_newindex(L);
     }
 
-    if (_is_vec3f(L, p)) {
+    if (_is_vec3f(L, 1)) {
         return _cel_vec3f_newindex(L);
     }
 
-    if (_is_vec4f(L, p)) {
+    if (_is_vec4f(L, 1)) {
         return _cel_vec4f_newindex(L);
     }
 
-    if (_is_quat(L, p)) {
+    if (_is_quat(L, 1)) {
         return _quat_newindex(L);
     }
 
-    if (_is_mat44f(L, p)) {
+    if (_is_mat44f(L, 1)) {
         return _cel_mat44f_newindex(L);
     }
 
@@ -958,6 +958,12 @@ void *luasys_get_module_api(int api,
                     api.get_game_callbacks = luasys_get_game_callbacks;
                     api.execute_boot_script = luasys_execute_boot_script;
                     api.call_global = luasys_call_global;
+                    api.to_u64= luasys_to_u64;
+                    api.is_vec2f = _is_vec2f;
+                    api.is_vec3f = _is_vec3f;
+                    api.is_vec4f = _is_vec4f;
+                    api.is_quat = _is_quat;
+                    api.is_mat44f = _is_mat44f;
 
                     return &api;
                 }

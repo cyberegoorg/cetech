@@ -15,6 +15,27 @@
 #include <cetech/world/world.h>
 #include <cetech/entity/entity.h>
 
+enum property_type {
+    PROPERTY_INVALID = 0,
+    PROPERTY_BOOL,
+    PROPERTY_FLOAT,
+    PROPERTY_STRING,
+    PROPERTY_STRINGID64,
+    PROPERTY_VEC3,
+    PROPERTY_QUATF,
+};
+
+struct property_value {
+    enum property_type type;
+    union {
+        int b;
+        float f;
+        const char *str;
+        cel_vec3f_t vec3f;
+        cel_quatf_t quatf;
+        stringid64_t strid_64;
+    } value;
+};
 
 //==============================================================================
 // Typedefs
@@ -49,6 +70,14 @@ typedef void (*component_spawner_t)(world_t world,
                                     size_t ent_count,
                                     void *data);
 
+typedef void (*component_set_property_t)(world_t world,
+                                         entity_t entity,
+                                         stringid64_t key,
+                                         struct property_value value);
+
+typedef struct property_value (*component_get_property_t)(world_t world,
+                                                          entity_t entity,
+                                                          stringid64_t key);
 
 //==============================================================================
 // Structs
@@ -61,7 +90,11 @@ static struct component_clb {
     world_on_created_t on_world_create;  //!< On world create
     world_on_destroy_t on_world_destroy; //!< On world destroy
     world_on_update_t on_world_update;   //!< On world update
+    component_set_property_t set_property;
+    component_get_property_t get_property;
 } component_clb_null = {0};
+
+
 
 
 //==============================================================================
@@ -121,6 +154,17 @@ struct ComponentSystemApiV0 {
     void (*component_destroy)(world_t world,
                               entity_t *ent,
                               u32 count);
+
+    void (*set_property)(stringid64_t type,
+                         world_t world,
+                         entity_t entity,
+                         stringid64_t key,
+                         struct property_value value);
+
+    struct property_value (*get_property)(stringid64_t type,
+                                          world_t world,
+                                          entity_t entity,
+                                          stringid64_t key);
 };
 
 #endif //CETECH_COMPONENT_MANAGER_H

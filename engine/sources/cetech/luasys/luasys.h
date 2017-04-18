@@ -57,6 +57,21 @@ struct LuaSysApiV0 {
     int (*is_number)(lua_State *l,
                      int idx);
 
+    int (*is_vec2f)(lua_State *L,
+                        int idx);
+
+    int (*is_vec3f)(lua_State *L,
+                        int idx);
+
+    int (*is_vec4f)(lua_State *L,
+                        int idx);
+
+    int (*is_quat)(lua_State *L,
+                       int idx);
+
+    int (*is_mat44f)(lua_State *L,
+                         int idx);
+
     //! Get element type
     //! \param l Lua state
     //! \param idx Element idx
@@ -116,6 +131,12 @@ struct LuaSysApiV0 {
     //! \param i Element idx
     //! \return Int value
     int (*to_int)(lua_State *l,
+                  int i);
+    //! Get element value as u64
+    //! \param l
+    //! \param i Element idx
+    //! \return sInt value
+    u64 (*to_u64)(lua_State *l,
                   int i);
 
     //! Get element value as float

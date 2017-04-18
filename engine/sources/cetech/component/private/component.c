@@ -125,8 +125,41 @@ void component_destroy(world_t world,
     }
 }
 
+static void _set_property(stringid64_t type,
+                   world_t world,
+                   entity_t entity,
+                   stringid64_t key,
+                   struct property_value value) {
+
+    struct component_clb clb = MAP_GET(component_clb_t, &_G.component_clb,
+                                       type.id, component_clb_null);
+
+    if(!clb.set_property){
+        return;
+    }
+
+    clb.set_property(world, entity, key, value);
+}
+
+static struct property_value _get_property(stringid64_t type,
+                                    world_t world,
+                                    entity_t entity,
+                                    stringid64_t key) {
+
+    struct property_value value = {PROPERTY_INVALID};
+
+    struct component_clb clb = MAP_GET(component_clb_t, &_G.component_clb,
+                                       type.id, component_clb_null);
+
+    if(!clb.get_property){
+        return (struct property_value){PROPERTY_INVALID};
+    }
+
+    return clb.get_property(world, entity, key);
+}
+
 void *component_get_module_api(int api,
-                            int version) {
+                               int version) {
     switch (api) {
         case PLUGIN_EXPORT_API_ID:
             switch (version) {
@@ -148,12 +181,15 @@ void *component_get_module_api(int api,
             switch (version) {
                 case 0: {
                     static struct ComponentSystemApiV0 api = {0};
+
                     api.component_register_compiler = component_register_compiler;
                     api.component_compile = component_compile;
                     api.component_get_spawn_order = component_get_spawn_order;
                     api.component_register_type = component_register_type;
                     api.component_spawn = component_spawn;
                     api.component_destroy = component_destroy;
+                    api.set_property = _set_property;
+                    api.get_property = _get_property;
 
                     return &api;
                 }
