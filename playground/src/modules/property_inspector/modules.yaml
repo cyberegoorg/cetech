@@ -1,0 +1,40 @@
+######################
+# Module information #
+################################################################################
+name: LevelInspector
+description: |
+  Level entities inspector
+
+####################
+# Module extension #
+################################################################################
+extensions:
+
+  ###########
+  # Windows #
+  ##############################################################################
+  windows:
+
+    ########################
+    # Asset browser window #
+    ############################################################################
+    - name: property_inspect_window
+      title: Property inspect
+      parent: main_window
+      parent_area: right
+      show: true
+
+
+  ##################
+  # Window content #
+  ##############################################################################
+  window_contents:
+
+    ######################
+    # Asset browser view #
+    ############################################################################
+    - name: property_inspect_view
+      window: property_inspect_window
+      type: qt_content
+      script_file: property_inspector_views.py
+      script_class: PropertyInspectorView
