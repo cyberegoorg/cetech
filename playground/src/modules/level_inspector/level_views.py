@@ -1,7 +1,7 @@
+import logging
+
 import yaml
-from PyQt5.QtCore import Qt
-from PyQt5.QtGui import QStandardItemModel, QStandardItem
-from PyQt5.QtWidgets import QMainWindow
+from PyQt5.QtWidgets import QMainWindow, QTreeWidgetItem
 
 from cetech.playground.frontend import CETechWiget
 from modules.level_inspector.ui.levelinspector import Ui_MainWindow
@@ -43,6 +43,7 @@ class LevelEditorView(CETechWiget):
                                   pub_addr="ipc:///tmp/cetech_level_editor_pub.ipc",
                                   push_addr="ipc:///tmp/cetech_level_editor_push.ipc",
                                   bootscript="playground/leveleditor_boot")
+
             self.created = True
 
         event.accept()
@@ -54,24 +55,33 @@ class LevelEditorView(CETechWiget):
 
 class LevelInspectorView(QMainWindow, Ui_MainWindow):
     NAME = 0
+    GUID = 1
 
     def __init__(self, frontend):
         self.frontend = frontend
         self.rpc = frontend.rpc
         self.path = None
+        self.name = None
 
-        self.project_service_rpc = self.rpc.partial_call_service(
-            "project_service")
+        self.project_service_rpc = self.rpc.partial_call_service("project_service")
 
         self.asset_service_rpc = self.rpc.partial_call_service("asset_service")
-        self.filesystem_service_rpc = self.rpc.partial_call_service(
-            "filesystem_service")
+        self.filesystem_service_rpc = self.rpc.partial_call_service("filesystem_service")
+        self.frontend_service_rpc = self.rpc.partial_call_service("frontend_service")
 
         super(LevelInspectorView, self).__init__()
         self.setupUi(self)
 
-        self.frontend.subscribe_service("asset_service",
-                                        self._subcribe_asset_browser)
+        self.frontend.subscribe_service("asset_service", self._subcribe_asset_browser)
+
+    def entities_dclicked(self, item: QTreeWidgetItem, column: int):
+        if item.parent() is not None:
+            guid = item.text(self.GUID)
+
+            self.frontend_service_rpc("publish",
+                                      service_name="level_inspector",
+                                      msg_type="event",
+                                      msg=dict(type='entity_selected', guid=guid, level_name=self.name))
 
     def _subcribe_asset_browser(self, msg):
         msg_type = msg['msg_type']
@@ -84,37 +94,32 @@ class LevelInspectorView(QMainWindow, Ui_MainWindow):
 
         if msg_type == 'dclick' and type == 'level':
             self.path = path
-            self.model = self._create_entities_model(self)
-            self.entities_tree.setModel(self.model)
+            self.name = name
 
             content = self.filesystem_service_rpc("read", path=path)
             data = yaml.load(content)
             self._parse_data(data)
 
+            self.asset_service_rpc = self.rpc.partial_call_service("asset_service")
+
     def _parse_data(self, data):
+        self.entities_tree.clear()
         for group_name, group_entities in data.items():
-            parent = self._add_groups(self.model, group_name)
+            parent = self._add_groups(group_name)
 
             for entity_guid, entity_body in group_entities.items():
                 ent_name = entity_body['name']
 
-                self._add_entities(self.model,
-                                   "%s (%s)" % (ent_name, entity_guid), parent)
+                self._add_entities(ent_name, entity_guid, parent)
 
         self.entities_tree.expandAll()
 
-    def _create_entities_model(self, parent):
-        model = QStandardItemModel(0, 1, parent)
-        model.setHeaderData(self.NAME, Qt.Horizontal, "Name")
+    def _add_groups(self, name):
+        item = QTreeWidgetItem([name, ])
+        self.entities_tree.addTopLevelItem(item)
+        return item
 
-        return model
-
-    def _add_groups(self, model, name):
-        row = QStandardItem(name)
-        model.appendRow(row)
-        return row
-
-    def _add_entities(self, model, name, parent):
-        row = QStandardItem(name)
-        parent.appendRow(row)
-        return row
+    def _add_entities(self, name, entity_guid, parent):
+        item = QTreeWidgetItem([name, entity_guid])
+        parent.addChild(item)
+        return item

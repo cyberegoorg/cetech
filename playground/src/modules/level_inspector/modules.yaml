@@ -21,13 +21,13 @@ extensions:
     - name: level_inspect_window
       title: Level inspect
       parent: main_window
-      parent_area: right
+      parent_area: 1
       show: true
 
     - name: level_editor_window
       title: Level editor
       parent: main_window
-      parent_area: top
+      parent_area: 2
       show: true
 
 

@@ -1,0 +1,12 @@
+name: frontend_service
+description: |
+  Service for frontend
+
+extensions:
+  service:
+    - name: frontend_service
+      api:
+        - publish
+
+      script_file: frontend_service.py
+      script_class: FrontendService

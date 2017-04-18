@@ -22,16 +22,45 @@
   <widget class="QWidget" name="centralwidget">
    <layout class="QHBoxLayout" name="horizontalLayout">
     <item>
-     <widget class="QTreeView" name="entities_tree"/>
+     <widget class="QTreeWidget" name="entities_tree">
+      <property name="editTriggers">
+       <set>QAbstractItemView::NoEditTriggers</set>
+      </property>
+      <column>
+       <property name="text">
+        <string>Name</string>
+       </property>
+      </column>
+      <column>
+       <property name="text">
+        <string>GUID</string>
+       </property>
+      </column>
+     </widget>
     </item>
    </layout>
   </widget>
  </widget>
  <resources/>
- <connections/>
+ <connections>
+  <connection>
+   <sender>entities_tree</sender>
+   <signal>itemActivated(QTreeWidgetItem*,int)</signal>
+   <receiver>MainWindow</receiver>
+   <slot>entities_dclicked(QTreeWidgetItem*,int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>409</x>
+     <y>173</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>409</x>
+     <y>173</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
  <slots>
-  <slot>dir_clicked(QModelIndex)</slot>
-  <slot>file_doubleclicked(QModelIndex)</slot>
-  <slot>file_clicked(QModelIndex)</slot>
+  <slot>entities_dclicked(QTreeWidgetItem*,int)</slot>
  </slots>
 </ui>
