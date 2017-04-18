@@ -108,7 +108,11 @@ class QtFrontendGui(object):
             if show:
                 dock.show()
 
-            self.windows[parent].addDockWidget(QT_AREA_MAP[parent_area], dock)
+            if isinstance(parent_area, str):
+                self.windows[parent].addDockWidget(QT_AREA_MAP[parent_area], dock)
+            elif isinstance(parent_area, int):
+                self.windows[parent].addDockWidget(Qt.DockWidgetArea(parent_area), dock)
+
             self.docks[name] = dock
 
         if menu is not None:
@@ -366,7 +370,7 @@ class CETechWiget(QWidget):
                              str(self.midle).lower(),
                              str(self.right).lower())
 
-    def mousePressEvent(self, event):  # real signature unknown; restored from __doc__
+    def mousePressEvent(self, event):
         """ QWidget.mousePressEvent(QMouseEvent) """
 
         buttons = event.buttons()

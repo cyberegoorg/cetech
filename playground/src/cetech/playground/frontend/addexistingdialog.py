@@ -27,7 +27,5 @@ class AddExistItemDialog(QDialog, Ui_Dialog):
 
             if not projectmanager.validate_project(self.project_dir_edit.text()):
                 return
-            else:
-                super(AddExistItemDialog, self).done(r)
 
         super(AddExistItemDialog, self).done(r)
