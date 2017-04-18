@@ -66,6 +66,7 @@ extensions:
       api:
         - asset_click
         - asset_dclick
+        - get_assets
 
       script_file: asset_service.py
       script_class: AssetService

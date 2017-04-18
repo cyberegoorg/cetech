@@ -1,6 +1,9 @@
 import functools
 
 import logging
+import os
+
+import sqlite3
 
 
 class AssetService(object):
@@ -48,6 +51,13 @@ class AssetService(object):
         """
         return self.service_manager.get_service_instance("engine_service")
 
+    @property
+    def _project_service(self):
+        """
+        :rtype: modules.project_service.project_service.ProjectService
+        """
+        return self.service_manager.get_service_instance("project_service")
+
     def run(self):
         pass
 
@@ -67,3 +77,19 @@ class AssetService(object):
     def api_reload_all(self):
         self.logger.debug("Reload all assets")
         self._engine_service.api_call_all(fce_name="reload_all")
+
+    def api_get_assets(self, asset_type):
+        builddb_path = os.path.join(self._project_service.build_dir, 'linux', "build.db")
+
+        assets = []
+
+        conn = sqlite3.connect(builddb_path)
+
+        c = conn.cursor()
+        c.execute("SELECT filename FROM files WHERE filename LIKE " + "'%%.%s'" % asset_type)
+
+        for row in c.fetchall():
+            filename = row[0]
+            assets.append(filename.split('.')[0])
+
+        return assets
