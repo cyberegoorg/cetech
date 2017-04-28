@@ -1,3 +1,5 @@
+#include "celib/allocator.h"
+#include <celib/vio.h>
 
 #include <cetech/application/private/module.h>
 #include <cetech/renderer/renderer.h>

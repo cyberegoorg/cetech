@@ -5,9 +5,9 @@
 // Includes
 //==============================================================================
 
-#include "celib/math/types.h"
-#include "celib/thread/types.h"
-#include "celib/containers/eventstream.h"
+#include "celib/math_types.h"
+#include "celib/thread.h"
+#include "celib/eventstream.h"
 #include <cetech/application/private/module.h>
 
 //==============================================================================

@@ -1,6 +1,9 @@
+#include "celib/allocator.h"
+#include <celib/vio.h>
+
 #include <cetech/application/private/module.h>
-#include "../luasys.h"
 #include <cetech/resource/resource.h>
+#include "../luasys.h"
 
 #define API_NAME "ResourceManager"
 

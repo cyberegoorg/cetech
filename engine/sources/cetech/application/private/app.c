@@ -4,11 +4,10 @@
 
 #include <unistd.h>
 
-#include <celib/time/time.h>
-#include <celib/window/types.h>
-#include <celib/window/window.h>
-#include <celib/string/stringid.h>
-#include <celib/os/cmd_line.h>
+#include <celib/time.h>
+#include <celib/window.h>
+#include <celib/stringid.h>
+#include <celib/cmd_line.h>
 
 #include <cetech/application/private/app.h>
 #include <cetech/config/config.h>

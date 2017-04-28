@@ -1,8 +1,8 @@
 #ifndef CETECH_SCENE_BLOB_H
 #define CETECH_SCENE_BLOB_H
 
-#include <celib/string/stringid.h>
-#include <celib/math/types.h>
+#include <celib/stringid.h>
+#include <celib/math_types.h>
 
 typedef struct scene_blob {
     u32 geom_count;

@@ -1,5 +1,7 @@
-#include <celib/memory/memory.h>
-#include <celib/errors/errors.h>
+#include <celib/memory.h>
+#include <celib/allocator.h>
+#include <celib/errors.h>
+
 #include <cetech/module/module.h>
 #include <cetech/memory/memory.h>
 

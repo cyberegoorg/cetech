@@ -1,7 +1,7 @@
 #ifndef CETECH_MATERIAL_COMPILER_H
 #define CETECH_MATERIAL_COMPILER_H
 
-#include <celib/filesystem/path.h>
+#include <celib/path.h>
 
 struct material_compile_output {
     ARRAY_T(char) uniform_names;

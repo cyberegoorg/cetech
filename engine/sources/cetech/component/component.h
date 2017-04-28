@@ -8,10 +8,10 @@
 // Includes
 //==============================================================================
 
-#include <celib/containers/map.h>
-#include <celib/yaml/yaml.h>
-#include <celib/string/stringid.h>
-#include <celib/handler/handlerid.h>
+#include <celib/map.h>
+#include <celib/yaml.h>
+#include <celib/stringid.h>
+#include <celib/handlerid.h>
 #include <cetech/world/world.h>
 #include <cetech/entity/entity.h>
 

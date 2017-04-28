@@ -5,6 +5,7 @@
 #include <cetech/application/private/module.h>
 #include <cetech/machine/machine.h>
 #include <cetech/input/input.h>
+#include <celib/string.h>
 
 #include "keystr.h"
 

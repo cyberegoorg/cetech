@@ -1,8 +1,8 @@
 #ifndef CETECH_MATERIAL_BLOB_H
 #define CETECH_MATERIAL_BLOB_H
 
-#include <celib/string/stringid.h>
-#include <celib/math/types.h>
+#include <celib/stringid.h>
+#include <celib/math_types.h>
 
 typedef struct material_blob {
     stringid64_t shader_name;

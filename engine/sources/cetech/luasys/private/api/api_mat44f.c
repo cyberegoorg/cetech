@@ -1,5 +1,5 @@
 
-#include <celib/math/mat44f.h>
+#include <celib/math_mat44f.inl>
 
 #include "../luasys.h"
 #include <cetech/module/module.h>

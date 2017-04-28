@@ -10,7 +10,7 @@ set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -rdynamic")
 
 
 include_directories(engine/sources)
-include_directories(cebase/sources)
+include_directories(cebase/includes)
 
 add_definitions(-DCETECH_STATIC_PLUGINS)
 add_definitions(-DCELIB_USE_SDL)
@@ -74,17 +74,31 @@ set(SOURCE_FILES
         ########################################################################
         # CELIB
         ########################################################################
-        cebase/sources/celib/memory/private/allocator.c
-        cebase/sources/celib/memory/private/allocator_malloc.c
-        cebase/sources/celib/memory/private/allocator_scratch.c
-        cebase/sources/celib/log/private/stdout_handler.c
-        cebase/sources/celib/log/private/nanomsg_handler.c
-        cebase/sources/celib/log/private/logdb_handler.c
-        cebase/sources/celib/log/private/log_system.c
-        cebase/sources/celib/filesystem/private/sdl_vio.c
-        cebase/sources/celib/yaml/private/yaml.cc
-        cebase/sources/celib/log/private/log_system.c
-
+        cebase/sources/celib/allocator.c
+        cebase/sources/celib/allocator_malloc.c
+        cebase/sources/celib/allocator_scratch.c
+        cebase/sources/celib/log_stdout_handler.c
+        cebase/sources/celib/log_nanomsg_handler.c
+        cebase/sources/celib/log_db_handler.c
+        cebase/sources/celib/log_system.c
+        cebase/sources/celib/vio_sdl.c
+        cebase/sources/celib/yaml.cc
+        cebase/sources/celib/log_system.c
+        cebase/sources/celib/cmd_line.c
+        cebase/sources/celib/cpu.c
+        cebase/sources/celib/filesystem.c
+        cebase/sources/celib/handlerid.c
+        cebase/sources/celib/memory.c
+        cebase/sources/celib/object.c
+        cebase/sources/celib/path.c
+        cebase/sources/celib/process.c
+        cebase/sources/celib/stacktrace.c
+        cebase/sources/celib/string.c
+        cebase/sources/celib/stringid.c
+        cebase/sources/celib/thread.c
+        cebase/sources/celib/time.c
+        cebase/sources/celib/vio.c
+        cebase/sources/celib/window.c
 
         ########################################################################
         # CETECH

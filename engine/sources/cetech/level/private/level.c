@@ -3,11 +3,11 @@
 //==============================================================================
 
 #include <cetech/world/world.h>
-#include <celib/filesystem/vio.h>
+#include <celib/vio.h>
 #include <cetech/resource/resource.h>
 #include <cetech/entity/entity.h>
 #include <cetech/transform/transform.h>
-#include <celib/math/quatf.h>
+#include <celib/math_quatf.h>
 #include <cetech/memory/memory.h>
 #include <cetech/module/module.h>
 

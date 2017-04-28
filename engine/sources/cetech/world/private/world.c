@@ -2,11 +2,11 @@
 // Includes
 //==============================================================================
 
-#include "celib/containers/map.h"
+#include "celib/map.h"
 #include <cetech/world/world.h>
 #include <cetech/memory/memory.h>
 #include <cetech/module/module.h>
-#include <celib/string/stringid.h>
+#include <celib/stringid.h>
 
 
 //==============================================================================

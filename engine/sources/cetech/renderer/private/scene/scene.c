@@ -6,9 +6,9 @@
 
 #include <include/assimp/cimport.h>
 
-#include <celib/string/stringid.h>
+#include <celib/stringid.h>
 #include <cetech/scenegraph/scenegraph.h>
-#include "celib/filesystem/vio.h"
+#include "celib/vio.h"
 #include <cetech/memory/memory.h>
 #include <cetech/application/private/module.h>
 

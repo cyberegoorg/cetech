@@ -2,14 +2,14 @@
 // includes
 //==============================================================================
 
-#include <celib/math/types.h>
+#include <celib/math_types.h>
 #include <cetech/camera/camera.h>
 #include <cetech/renderer/renderer.h>
 #include <cetech/develop/develop.h>
 #include <cetech/application/application.h>
 #include <cetech/config/config.h>
 #include <cetech/module/module.h>
-#include "celib/window/window.h"
+#include "celib/window.h"
 
 #include "bgfx/c99/platform.h"
 #include <cetech/renderer/private/texture/texture.h>

@@ -3,10 +3,10 @@
 //==============================================================================
 
 #include <include/mpack/mpack.h>
-#include <celib/string/stringid.h>
-#include <celib/filesystem/vio.h>
-#include <celib/math/types.h>
-#include <celib/math/vec2f.h>
+#include <celib/stringid.h>
+#include <celib/vio.h>
+#include <celib/math_types.h>
+#include <celib/math_vec2f.inl>
 
 #include <cetech/develop/develop.h>
 #include <cetech/application/private/module.h>

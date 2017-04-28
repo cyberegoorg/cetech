@@ -2,11 +2,12 @@
 // Includes
 //==============================================================================
 
-#include <celib/math/types.h>
+#include <celib/math_types.h>
 #include <cetech/module/module.h>
 #include <cetech/machine/machine.h>
 
 #include <cetech/input/input.h>
+#include <celib/string.h>
 
 #include "mousebtnstr.h"
 

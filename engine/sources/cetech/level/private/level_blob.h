@@ -1,8 +1,8 @@
 #ifndef CETECH_LEVEL_BLOB_H
 #define CETECH_LEVEL_BLOB_H
 
-#include <celib/string/stringid.h>
-#include <celib/math/types.h>
+#include <celib/stringid.h>
+#include <celib/math_types.h>
 
 typedef struct level_blob {
     u32 entities_count;

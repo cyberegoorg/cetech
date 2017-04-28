@@ -1,4 +1,4 @@
-#include "celib/math/vec2f.h"
+#include "celib/math_vec2f.inl"
 
 #include "../luasys.h"
 #include <cetech/module/module.h>

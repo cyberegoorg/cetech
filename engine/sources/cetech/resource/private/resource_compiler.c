@@ -6,16 +6,16 @@
 
 #include "include/SDL2/SDL.h"
 
-#include <celib/filesystem/filesystem.h>
-#include <celib/string/string.h>
-#include <celib/filesystem/path.h>
-#include <celib/string/stringid.h>
+#include <celib/filesystem.h>
+#include <celib/string.h>
+#include <celib/path.h>
+#include <celib/stringid.h>
 #include <cetech/task/task.h>
 #include <cetech/resource/resource.h>
 #include <cetech/memory/memory.h>
 #include <cetech/module/module.h>
 
-#include "celib/filesystem/vio.h"
+#include "celib/vio.h"
 
 #include "builddb.h"
 

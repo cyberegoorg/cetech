@@ -2,12 +2,12 @@
 // Includes
 //==============================================================================
 
-#include <celib/string/stringid.h>
+#include <celib/stringid.h>
 #include <cetech/task/task.h>
 #include <cetech/resource/resource.h>
-#include <celib/filesystem/vio.h>
-#include <celib/yaml/yaml.h>
-#include <celib/thread/thread.h>
+#include <celib/vio.h>
+#include <celib/yaml.h>
+#include <celib/thread.h>
 #include <cetech/memory/memory.h>
 #include <cetech/application/private/module.h>
 

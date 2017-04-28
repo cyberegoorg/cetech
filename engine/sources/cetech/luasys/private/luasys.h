@@ -11,9 +11,9 @@
 #include "include/luajit/lauxlib.h"
 #include "include/luajit/lualib.h"
 
-#include "celib/math/types.h"
-#include <celib/handler/handlerid.h>
-#include <celib/string/stringid.h>
+#include "celib/math_types.h"
+#include <celib/handlerid.h>
+#include <celib/stringid.h>
 
 //==============================================================================
 // Interface

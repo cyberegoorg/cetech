@@ -4,9 +4,9 @@
 
 #include <bgfx/c99/bgfx.h>
 
-#include <celib/string/stringid.h>
+#include <celib/stringid.h>
 #include <cetech/renderer/renderer.h>
-#include "celib/filesystem/vio.h"
+#include "celib/vio.h"
 #include <cetech/memory/memory.h>
 #include <cetech/module/module.h>
 

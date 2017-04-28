@@ -2,10 +2,10 @@
 // Includes
 //==============================================================================
 
-#include <celib/thread/thread.h>
-#include <celib/memory/memory.h>
+#include <celib/thread.h>
+#include <celib/memory.h>
 #include <cetech/memory/memory.h>
-#include <celib/cpu/cpu.h>
+#include <celib/cpu.h>
 
 #include <cetech/develop/develop.h>
 #include <cetech/module/module.h>

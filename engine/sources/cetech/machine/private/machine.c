@@ -2,8 +2,8 @@
 // Includes
 //==============================================================================
 
-#include <celib/memory/memory.h>
-#include "celib/containers/array.h"
+#include <celib/memory.h>
+#include "celib/array.h"
 #include <cetech/machine/machine.h>
 #include "sdl2/sdl_parts.h"
 #include <cetech/memory/memory.h>

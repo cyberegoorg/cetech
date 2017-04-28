@@ -11,7 +11,7 @@
 #include "include/mpack/mpack.h"
 
 #include "celib/types.h"
-#include "celib/containers/eventstream.h"
+#include "celib/eventstream.h"
 
 //==============================================================================
 // Typedefs
