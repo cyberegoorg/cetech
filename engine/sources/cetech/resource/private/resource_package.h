@@ -4,15 +4,15 @@
 #include <celib/types.h>
 
 struct package_resource {
-    u32 type_count;
-    u32 name_count_offset;
-    u32 type_offset;
-    u32 name_offset;
-    u32 offset_offset;
+    uint32_t type_count;
+    uint32_t name_count_offset;
+    uint32_t type_offset;
+    uint32_t name_offset;
+    uint32_t offset_offset;
 };
 
-#define package_name_count(resource_ptr) ((u32*)((void*)(((char*)(resource_ptr)) + (resource_ptr)->name_count_offset)))
-#define package_offset(resource_ptr) ((u32*)((void*)(((char*)(resource_ptr)) + (resource_ptr)->offset_offset)))
+#define package_name_count(resource_ptr) ((uint32_t*)((void*)(((char*)(resource_ptr)) + (resource_ptr)->name_count_offset)))
+#define package_offset(resource_ptr) ((uint32_t*)((void*)(((char*)(resource_ptr)) + (resource_ptr)->offset_offset)))
 #define package_type(resource_ptr) ((stringid64_t*)((void*)(((char*)(resource_ptr)) + (resource_ptr)->type_offset)))
 #define package_name(resource_ptr) ((stringid64_t*)((void*)(((char*)(resource_ptr)) + (resource_ptr)->name_offset)))
 

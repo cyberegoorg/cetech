@@ -8,10 +8,10 @@
 // Includes
 //==============================================================================
 
-#include "celib/string/stringid.h"
-#include "celib/containers/array.h"
+#include "celib/stringid.h"
+#include "celib/array.inl"
 #include "celib/types.h"
-#include "celib/filesystem/vio_types.h"
+#include "celib/vio.h"
 #include <cetech/config/config.h>
 
 
@@ -73,7 +73,7 @@ struct FilesystemApiV0 {
     //! \param root Root
     //! \param path File path
     //! \return Modified time
-    i64 (*filesystem_get_file_mtime)(stringid64_t root,
+    int64_t (*filesystem_get_file_mtime)(stringid64_t root,
                                      const char *path);
 
     //! Get full path
@@ -84,7 +84,7 @@ struct FilesystemApiV0 {
     //! \return 1 if ok else 0
     int (*filesystem_get_fullpath)(stringid64_t root,
                                    char *result,
-                                   u64 maxlen,
+                                   uint64_t maxlen,
                                    const char *filename);
 };
 

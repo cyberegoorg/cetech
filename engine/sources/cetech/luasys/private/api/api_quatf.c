@@ -1,5 +1,6 @@
-
-#include <celib/math/quatf.h>
+#include <stddef.h>
+#include <celib/allocator.h>
+#include <celib/math_quatf.h>
 #include "../luasys.h"
 #include <cetech/module/module.h>
 
@@ -9,7 +10,7 @@ static int _from_axis_angle(lua_State *l) {
     cel_quatf_t result = {0};
 
     const cel_vec3f_t *axis = luasys_to_vec3f(l, 1);
-    f32 angle = luasys_to_f32(l, 2);
+    float angle = luasys_to_float(l, 2);
 
     cel_quatf_from_axis_angle(&result, axis, angle);
 
@@ -20,9 +21,9 @@ static int _from_axis_angle(lua_State *l) {
 static int _from_euler(lua_State *l) {
     cel_quatf_t result = {0};
 
-    const f32 heading = luasys_to_f32(l, 1);
-    const f32 attitude = luasys_to_f32(l, 2);
-    const f32 bank = luasys_to_f32(l, 3);
+    const float heading = luasys_to_float(l, 1);
+    const float attitude = luasys_to_float(l, 2);
+    const float bank = luasys_to_float(l, 3);
 
     cel_quatf_from_euler(&result, heading, attitude, bank);
 

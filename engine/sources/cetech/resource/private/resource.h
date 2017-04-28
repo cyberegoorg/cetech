@@ -1,7 +1,7 @@
 #ifndef CETECH_RESOURCE_H
 #define CETECH_RESOURCE_H
 
-#include <celib/string/stringid.h>
+#include <celib/stringid.h>
 #include <cetech/resource/resource.h>
 
 void resource_set_autoload(int enable);
@@ -72,7 +72,7 @@ int resource_compiler_get_tmp_dir(char *tmp_dir,
                                   const char *platform);
 
 int resource_compiler_external_join(char *output,
-                                    u32 max_len,
+                                    uint32_t max_len,
                                     const char *name);
 
 void resource_compiler_create_build_dir();

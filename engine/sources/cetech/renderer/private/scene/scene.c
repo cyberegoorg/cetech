@@ -6,9 +6,10 @@
 
 #include <include/assimp/cimport.h>
 
-#include <celib/string/stringid.h>
+#include <celib/allocator.h>
+#include <celib/stringid.h>
 #include <cetech/scenegraph/scenegraph.h>
-#include "celib/filesystem/vio.h"
+#include "celib/vio.h"
 #include <cetech/memory/memory.h>
 #include <cetech/application/private/module.h>
 
@@ -32,15 +33,15 @@ ARRAY_PROTOTYPE(cel_mat44f_t);
 MAP_PROTOTYPE(bgfx_texture_handle_t)
 
 struct scene_instance {
-    MAP_T(u8) geom_map;
-    ARRAY_T(u32) size;
+    MAP_T(uint8_t) geom_map;
+    ARRAY_T(uint32_t) size;
     ARRAY_T(bgfx_vertex_buffer_handle_t) vb;
     ARRAY_T(bgfx_index_buffer_handle_t) ib;
 };
 
 void _init_scene_instance(struct scene_instance *instance) {
-    MAP_INIT(u8, &instance->geom_map, MemSysApiV0.main_allocator());
-    ARRAY_INIT(u32, &instance->size, MemSysApiV0.main_allocator());
+    MAP_INIT(uint8_t, &instance->geom_map, MemSysApiV0.main_allocator());
+    ARRAY_INIT(uint32_t, &instance->size, MemSysApiV0.main_allocator());
     ARRAY_INIT(bgfx_vertex_buffer_handle_t, &instance->vb,
                MemSysApiV0.main_allocator());
     ARRAY_INIT(bgfx_index_buffer_handle_t, &instance->ib,
@@ -48,8 +49,8 @@ void _init_scene_instance(struct scene_instance *instance) {
 }
 
 void _destroy_scene_instance(struct scene_instance *instance) {
-    MAP_DESTROY(u8, &instance->geom_map);
-    ARRAY_DESTROY(u32, &instance->size);
+    MAP_DESTROY(uint8_t, &instance->geom_map);
+    ARRAY_DESTROY(uint32_t, &instance->size);
     ARRAY_DESTROY(bgfx_vertex_buffer_handle_t, &instance->vb);
     ARRAY_DESTROY(bgfx_index_buffer_handle_t, &instance->ib);
 }
@@ -121,7 +122,7 @@ void scene_submit(stringid64_t scene,
         return;
     }
 
-    u8 idx = MAP_GET(u8, &instance->geom_map, geom_name.id, UINT8_MAX);
+    uint8_t idx = MAP_GET(uint8_t, &instance->geom_map, geom_name.id, UINT8_MAX);
 
     if (idx == UINT8_MAX) {
         return;
@@ -137,7 +138,7 @@ void scene_create_graph(world_t world,
     struct scene_blob *res = ResourceApiV0.get(_G.type, scene);
 
     stringid64_t *node_name = scene_blob_node_name(res);
-    u32 *node_parent = scene_blob_node_parent(res);
+    uint32_t *node_parent = scene_blob_node_parent(res);
     cel_mat44f_t *node_pose = scene_blob_node_pose(res);
 
     SceneGprahApiV0.create(world, entity, node_name, node_parent, node_pose,

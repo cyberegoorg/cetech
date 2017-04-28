@@ -9,8 +9,8 @@
 
 #import <cetech/entity/entity.h>
 #import <cetech/world/world.h>
-#import "celib/math/types.h"
-#import "celib/string/stringid.h"
+#import "celib/math_types.h"
+#import "celib/stringid.h"
 
 
 //==============================================================================
@@ -19,7 +19,7 @@
 
 //! Scene node struct
 typedef struct {
-    u32 idx;
+    uint32_t idx;
 } scene_node_t;
 
 
@@ -112,9 +112,9 @@ struct SceneGprahApiV0 {
     scene_node_t (*create)(world_t world,
                            entity_t entity,
                            stringid64_t *names,
-                           u32 *parent,
+                           uint32_t *parent,
                            cel_mat44f_t *pose,
-                           u32 count);
+                           uint32_t count);
 
     //! Link two node
     //! \param world World

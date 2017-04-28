@@ -7,7 +7,7 @@ static const bgfx_texture_handle_t null_texture = {0};
 
 void *_scene_resource_loader(struct vio *input,
                              struct cel_allocator *allocator) {
-    const i64 size = cel_vio_size(input);
+    const int64_t size = cel_vio_size(input);
     char *data = CEL_ALLOCATE(allocator, char, size);
     cel_vio_read(input, data, 1, size);
 
@@ -24,13 +24,13 @@ void _scene_resource_online(stringid64_t name,
     struct scene_blob *resource = data;
 
     stringid64_t *geom_name = scene_blob_geom_name(resource);
-    u32 *ib_offset = scene_blob_ib_offset(resource);
-    u32 *vb_offset = scene_blob_vb_offset(resource);
+    uint32_t *ib_offset = scene_blob_ib_offset(resource);
+    uint32_t *vb_offset = scene_blob_vb_offset(resource);
     bgfx_vertex_decl_t *vb_decl = scene_blob_vb_decl(resource);
-    u32 *ib_size = scene_blob_ib_size(resource);
-    u32 *vb_size = scene_blob_vb_size(resource);
-    u32 *ib = scene_blob_ib(resource);
-    u8 *vb = scene_blob_vb(resource);
+    uint32_t *ib_size = scene_blob_ib_size(resource);
+    uint32_t *vb_size = scene_blob_vb_size(resource);
+    uint32_t *ib = scene_blob_ib(resource);
+    uint8_t *vb = scene_blob_vb(resource);
 
     struct scene_instance instance = {0};
     _init_scene_instance(&instance);
@@ -42,12 +42,12 @@ void _scene_resource_online(stringid64_t name,
 
         bgfx_index_buffer_handle_t bib = bgfx_create_index_buffer(
                 bgfx_make_ref((const void *) &ib[ib_offset[i]],
-                              sizeof(u32) * ib_size[i]), BGFX_BUFFER_INDEX32);
+                              sizeof(uint32_t) * ib_size[i]), BGFX_BUFFER_INDEX32);
 
-        u32 idx = ARRAY_SIZE(&instance.vb);
-        MAP_SET(u8, &instance.geom_map, geom_name[i].id, idx);
+        uint32_t idx = ARRAY_SIZE(&instance.vb);
+        MAP_SET(uint8_t, &instance.geom_map, geom_name[i].id, idx);
 
-        ARRAY_PUSH_BACK(u32, &instance.size, ib_size[i]);
+        ARRAY_PUSH_BACK(uint32_t, &instance.size, ib_size[i]);
         ARRAY_PUSH_BACK(bgfx_vertex_buffer_handle_t, &instance.vb, bvb);
         ARRAY_PUSH_BACK(bgfx_index_buffer_handle_t, &instance.ib, bib);
     }

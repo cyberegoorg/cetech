@@ -7,7 +7,7 @@
 // Includes
 //==============================================================================
 
-#include "celib/math/types.h"
+#include "celib/math_types.h"
 #include <cetech/entity/entity.h>
 
 
@@ -17,7 +17,7 @@
 
 //! Transform component
 typedef struct {
-    u32 idx;
+    uint32_t idx;
 } transform_t;
 
 

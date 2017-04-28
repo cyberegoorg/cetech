@@ -6,16 +6,16 @@
 
 #include "include/SDL2/SDL.h"
 
-#include <celib/filesystem/filesystem.h>
-#include <celib/string/string.h>
-#include <celib/filesystem/path.h>
-#include <celib/string/stringid.h>
+#include <celib/filesystem.h>
+#include <celib/string.h>
+#include <celib/path.h>
+#include <celib/stringid.h>
 #include <cetech/task/task.h>
 #include <cetech/resource/resource.h>
 #include <cetech/memory/memory.h>
 #include <cetech/module/module.h>
 
-#include "celib/filesystem/vio.h"
+#include "celib/vio.h"
 
 #include "builddb.h"
 
@@ -366,7 +366,7 @@ int resource_compiler_get_tmp_dir(char *tmp_dir,
 }
 
 int resource_compiler_external_join(char *output,
-                                    u32 max_len,
+                                    uint32_t max_len,
                                     const char *name) {
     char tmp_dir[1024] = {0};
     char tmp_dir2[1024] = {0};

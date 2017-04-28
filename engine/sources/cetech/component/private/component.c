@@ -2,7 +2,7 @@
 // Includes
 //==============================================================================
 
-#include "celib/containers/map.h"
+#include "celib/map.inl"
 #include <cetech/memory/memory.h>
 #include <cetech/module/module.h>
 
@@ -23,7 +23,7 @@ MAP_PROTOTYPE_N(struct component_clb, component_clb_t);
 #define _G ComponentMaagerGlobals
 static struct G {
     MAP_T(component_compiler_t) compiler_map;
-    MAP_T(u32) spawn_order_map;
+    MAP_T(uint32_t) spawn_order_map;
 
     MAP_T(component_clb_t) component_clb;
 } _G = {0};
@@ -39,13 +39,13 @@ static void _init(get_api_fce_t get_engine_api) {
 
     MAP_INIT(component_compiler_t, &_G.compiler_map,
              MemSysApiV0.main_allocator());
-    MAP_INIT(u32, &_G.spawn_order_map, MemSysApiV0.main_allocator());
+    MAP_INIT(uint32_t, &_G.spawn_order_map, MemSysApiV0.main_allocator());
     MAP_INIT(component_clb_t, &_G.component_clb, MemSysApiV0.main_allocator());
 }
 
 static void _shutdown() {
     MAP_DESTROY(component_compiler_t, &_G.compiler_map);
-    MAP_DESTROY(u32, &_G.spawn_order_map);
+    MAP_DESTROY(uint32_t, &_G.spawn_order_map);
     MAP_DESTROY(component_clb_t, &_G.component_clb);
 
     _G = (struct G) {0};
@@ -57,14 +57,14 @@ static void _shutdown() {
 
 void component_register_compiler(stringid64_t type,
                                  component_compiler_t compiler,
-                                 u32 spawn_order) {
+                                 uint32_t spawn_order) {
     MAP_SET(component_compiler_t, &_G.compiler_map, type.id, compiler);
-    MAP_SET(u32, &_G.spawn_order_map, type.id, spawn_order);
+    MAP_SET(uint32_t, &_G.spawn_order_map, type.id, spawn_order);
 }
 
 int component_compile(stringid64_t type,
                       yaml_node_t body,
-                      ARRAY_T(u8) *data) {
+                      ARRAY_T(uint8_t) *data) {
 
     component_compiler_t compiler = MAP_GET(component_compiler_t,
                                             &_G.compiler_map, type.id, NULL);
@@ -76,8 +76,8 @@ int component_compile(stringid64_t type,
     return compiler(body, data);
 }
 
-u32 component_get_spawn_order(stringid64_t type) {
-    return MAP_GET(u32, &_G.spawn_order_map, type.id, 0);
+uint32_t component_get_spawn_order(stringid64_t type) {
+    return MAP_GET(uint32_t, &_G.spawn_order_map, type.id, 0);
 }
 
 void component_register_type(stringid64_t type,
@@ -96,9 +96,9 @@ void component_register_type(stringid64_t type,
 void component_spawn(world_t world,
                      stringid64_t type,
                      entity_t *ent_ids,
-                     u32 *cent,
-                     u32 *ents_parent,
-                     u32 ent_count,
+                     uint32_t *cent,
+                     uint32_t *ents_parent,
+                     uint32_t ent_count,
                      void *data) {
 
     struct component_clb clb = MAP_GET(component_clb_t, &_G.component_clb,
@@ -113,7 +113,7 @@ void component_spawn(world_t world,
 
 void component_destroy(world_t world,
                        entity_t *ent,
-                       u32 count) {
+                       uint32_t count) {
 
     const MAP_ENTRY_T(component_clb_t) *ce_it = MAP_BEGIN(component_clb_t,
                                                           &_G.component_clb);

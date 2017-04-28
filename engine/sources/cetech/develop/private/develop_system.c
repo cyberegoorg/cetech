@@ -3,21 +3,21 @@
 //==============================================================================
 
 #include <stdio.h>
-#include <celib/time/time.h>
-#include <celib/containers/map.h>
+#include <celib/time.h>
+#include <celib/map.inl>
 
 #include "include/mpack/mpack.h"
 #include "include/nanomsg/nn.h"
 #include "include/nanomsg/pubsub.h"
 
-#include "celib/thread/types.h"
-#include "celib/thread/thread.h"
-#include "celib/containers/eventstream.h"
+#include "celib/thread.h"
+#include "celib/eventstream.h"
 #include <cetech/memory/memory.h>
 #include <cetech/module/module.h>
 
 #include <cetech/task/task.h>
 #include <cetech/develop/develop.h>
+#include <celib/string.h>
 
 
 //==============================================================================
@@ -54,9 +54,9 @@ IMPORT_API(MemSysApi, 0);
 IMPORT_API(TaskApi, 0);
 IMPORT_API(ConfigApi, 0);
 
-static __thread u8 _stream_buffer[64 * 1024] = {0};
-static __thread u32 _stream_buffer_size = 0;
-static __thread u32 _scope_depth = 0;
+static __thread uint8_t _stream_buffer[64 * 1024] = {0};
+static __thread uint32_t _stream_buffer_size = 0;
+static __thread uint32_t _scope_depth = 0;
 
 static void _flush_stream_buffer() {
     if (_stream_buffer_size == 0) {
@@ -65,7 +65,7 @@ static void _flush_stream_buffer() {
 
     cel_thread_spin_lock(&_G.flush_lock);
 
-    array_push_u8(&_G.eventstream.stream, _stream_buffer, _stream_buffer_size);
+    array_push_uint8_t(&_G.eventstream.stream, _stream_buffer, _stream_buffer_size);
     _stream_buffer_size = 0;
 
     cel_thread_spin_unlock(&_G.flush_lock);
@@ -106,14 +106,14 @@ static void _flush_all_streams() {
 }
 
 void _developsys_push(struct event_header *header,
-                      u32 type,
-                      u64 size) {
+                      uint32_t type,
+                      uint64_t size) {
 
     if ((_stream_buffer_size + size) >= CEL_ARRAY_LEN(_stream_buffer)) {
         _flush_stream_buffer();
     }
 
-    u8 *p = _stream_buffer + _stream_buffer_size;
+    uint8_t *p = _stream_buffer + _stream_buffer_size;
 
     header->type = type;
     header->size = size;
@@ -122,7 +122,7 @@ void _developsys_push(struct event_header *header,
     _stream_buffer_size += size;
 }
 
-void _register_to_mpack(u64 type,
+void _register_to_mpack(uint64_t type,
                         to_mpack_fce_t fce) {
     MAP_SET(to_mpack_fce_t, &_G.to_mpack, type, fce);
 }

@@ -2,8 +2,8 @@
 // Includes
 //==============================================================================
 
-#include <celib/memory/memory.h>
-#include "celib/containers/array.h"
+#include <celib/memory.h>
+#include "celib/array.inl"
 #include <cetech/machine/machine.h>
 #include "sdl2/sdl_parts.h"
 #include <cetech/memory/memory.h>
@@ -119,7 +119,7 @@ int machine_gamepad_is_active(int idx);
 
 void machine_gamepad_play_rumble(int gamepad,
                                  float strength,
-                                 u32 length);
+                                 uint32_t length);
 
 void *machine_get_module_api(int api,
                              int version) {

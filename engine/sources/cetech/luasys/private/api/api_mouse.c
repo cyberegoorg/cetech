@@ -1,4 +1,6 @@
-#include <celib/math/types.h>
+#include <stddef.h>
+#include <celib/allocator.h>
+#include <celib/math_types.h>
 #include <cetech/application/private/module.h>
 #include "../luasys.h"
 #include <cetech/input/input.h>
@@ -8,14 +10,14 @@ static struct MouseApiV0 MouseApiV0 = {0};
 static int _mouse_button_index(lua_State *l) {
     const char *name = luasys_to_string(l, 1);
 
-    u32 idx = MouseApiV0.button_index(name);
+    uint32_t idx = MouseApiV0.button_index(name);
     luasys_push_float(l, idx);
 
     return 1;
 }
 
 static int _mouse_button_name(lua_State *l) {
-    u32 idx = (u32) (luasys_to_f32(l, 1));
+    uint32_t idx = (uint32_t) (luasys_to_float(l, 1));
 
     luasys_push_string(l, MouseApiV0.button_name(idx));
 
@@ -24,7 +26,7 @@ static int _mouse_button_name(lua_State *l) {
 }
 
 static int _mouse_button_state(lua_State *l) {
-    u32 idx = (u32) (luasys_to_f32(l, 1));
+    uint32_t idx = (uint32_t) (luasys_to_float(l, 1));
 
     luasys_push_bool(l, MouseApiV0.button_state(0, idx));
 
@@ -33,7 +35,7 @@ static int _mouse_button_state(lua_State *l) {
 }
 
 static int _mouse_button_pressed(lua_State *l) {
-    u32 idx = (u32) (luasys_to_f32(l, 1));
+    uint32_t idx = (uint32_t) (luasys_to_float(l, 1));
 
     luasys_push_bool(l, MouseApiV0.button_pressed(0, idx));
 
@@ -42,7 +44,7 @@ static int _mouse_button_pressed(lua_State *l) {
 }
 
 static int _mouse_button_released(lua_State *l) {
-    u32 idx = (u32) (luasys_to_f32(l, 1));
+    uint32_t idx = (uint32_t) (luasys_to_float(l, 1));
 
     luasys_push_bool(l, MouseApiV0.button_released(0, idx));
 
@@ -54,14 +56,14 @@ static int _mouse_button_released(lua_State *l) {
 static int _mouse_axis_index(lua_State *l) {
     const char *name = luasys_to_string(l, 1);
 
-    u32 idx = MouseApiV0.axis_index(name);
+    uint32_t idx = MouseApiV0.axis_index(name);
     luasys_push_int(l, idx);
     return 1;
 
 }
 
 static int _mouse_axis_name(lua_State *l) {
-    u32 idx = (u32) (luasys_to_f32(l, 1));
+    uint32_t idx = (uint32_t) (luasys_to_float(l, 1));
 
     luasys_push_string(l, MouseApiV0.axis_name(idx));
 
@@ -69,7 +71,7 @@ static int _mouse_axis_name(lua_State *l) {
 }
 
 static int _mouse_axis(lua_State *l) {
-    u32 idx = (u32) (luasys_to_int(l, 1));
+    uint32_t idx = (uint32_t) (luasys_to_int(l, 1));
 
     cel_vec2f_t pos = MouseApiV0.axis(0, idx);
 

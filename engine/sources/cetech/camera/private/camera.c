@@ -1,8 +1,8 @@
-#include <celib/containers/array.h>
-#include <celib/yaml/yaml.h>
-#include <celib/containers/map.h>
-#include <celib/math/mat44f.h>
-#include <celib/string/stringid.h>
+#include <celib/array.inl>
+#include <celib/yaml.h>
+#include <celib/map.inl>
+#include <celib/math_mat44f.inl>
+#include <celib/stringid.h>
 
 #include <cetech/entity/entity.h>
 #include <cetech/component/component.h>
@@ -14,18 +14,18 @@
 
 
 struct camera_data {
-    f32 near;
-    f32 far;
-    f32 fov;
+    float near;
+    float far;
+    float fov;
 };
 
 typedef struct {
-    MAP_T(u32) ent_idx_map;
+    MAP_T(uint32_t) ent_idx_map;
 
     ARRAY_T(entity_t) entity;
-    ARRAY_T(f32) near;
-    ARRAY_T(f32) far;
-    ARRAY_T(f32) fov;
+    ARRAY_T(float) near;
+    ARRAY_T(float) far;
+    ARRAY_T(float) fov;
 
 } world_data_t;
 
@@ -49,12 +49,12 @@ static struct G {
 static void _new_world(world_t world) {
     world_data_t data = {0};
 
-    MAP_INIT(u32, &data.ent_idx_map, MemSysApiV0.main_allocator());
+    MAP_INIT(uint32_t, &data.ent_idx_map, MemSysApiV0.main_allocator());
 
     ARRAY_INIT(entity_t, &data.entity, MemSysApiV0.main_allocator());
-    ARRAY_INIT(f32, &data.near, MemSysApiV0.main_allocator());
-    ARRAY_INIT(f32, &data.far, MemSysApiV0.main_allocator());
-    ARRAY_INIT(f32, &data.fov, MemSysApiV0.main_allocator());
+    ARRAY_INIT(float, &data.near, MemSysApiV0.main_allocator());
+    ARRAY_INIT(float, &data.far, MemSysApiV0.main_allocator());
+    ARRAY_INIT(float, &data.fov, MemSysApiV0.main_allocator());
 
     MAP_SET(world_data_t, &_G.world, world.h.h, data);
 }
@@ -66,17 +66,17 @@ static world_data_t *_get_world_data(world_t world) {
 static void _destroy_world(world_t world) {
     world_data_t *data = _get_world_data(world);
 
-    MAP_DESTROY(u32, &data->ent_idx_map);
+    MAP_DESTROY(uint32_t, &data->ent_idx_map);
 
     ARRAY_DESTROY(entity_t, &data->entity);
-    ARRAY_DESTROY(f32, &data->near);
-    ARRAY_DESTROY(f32, &data->far);
-    ARRAY_DESTROY(f32, &data->fov);
+    ARRAY_DESTROY(float, &data->near);
+    ARRAY_DESTROY(float, &data->far);
+    ARRAY_DESTROY(float, &data->fov);
 
 }
 
 int _camera_component_compiler(yaml_node_t body,
-                               ARRAY_T(u8) *data) {
+                               ARRAY_T(uint8_t) *data) {
 
     struct camera_data t_data;
 
@@ -84,7 +84,7 @@ int _camera_component_compiler(yaml_node_t body,
     YAML_NODE_SCOPE(far, body, "far", t_data.far = yaml_as_float(far););
     YAML_NODE_SCOPE(fov, body, "fov", t_data.fov = yaml_as_float(fov););
 
-    ARRAY_PUSH(u8, data, (u8 *) &t_data, sizeof(t_data));
+    ARRAY_PUSH(uint8_t, data, (uint8_t *) &t_data, sizeof(t_data));
 
     return 1;
 }
@@ -104,22 +104,22 @@ void _destroyer(world_t world,
 
     // TODO: remove from arrays, swap idx -> last AND change size
     for (int i = 0; i < ent_count; i++) {
-        MAP_REMOVE(u32, &world_data->ent_idx_map, ents[i].idx);
+        MAP_REMOVE(uint32_t, &world_data->ent_idx_map, ents[i].idx);
     }
 }
 
 
 camera_t camera_create(world_t world,
                        entity_t entity,
-                       f32 near,
-                       f32 far,
-                       f32 fov);
+                       float near,
+                       float far,
+                       float fov);
 
 
 void _spawner(world_t world,
               entity_t *ents,
-              u32 *cents,
-              u32 *ents_parent,
+              uint32_t *cents,
+              uint32_t *ents_parent,
               size_t ent_count,
               void *data) {
     struct camera_data *tdata = data;
@@ -178,9 +178,9 @@ void camera_get_project_view(world_t world,
     entity_t e = ARRAY_AT(&world_data->entity, camera.idx);
     transform_t t = TransformApiV0.get(world, e);
 
-    f32 fov = ARRAY_AT(&world_data->fov, camera.idx);
-    f32 near = ARRAY_AT(&world_data->near, camera.idx);
-    f32 far = ARRAY_AT(&world_data->far, camera.idx);
+    float fov = ARRAY_AT(&world_data->fov, camera.idx);
+    float near = ARRAY_AT(&world_data->near, camera.idx);
+    float far = ARRAY_AT(&world_data->far, camera.idx);
 
     cel_mat44f_set_perspective_fov(proj, fov, size.x / size.y, near, far);
 
@@ -191,33 +191,33 @@ void camera_get_project_view(world_t world,
 int camera_has(world_t world,
                entity_t entity) {
     world_data_t *world_data = _get_world_data(world);
-    return MAP_HAS(u32, &world_data->ent_idx_map, entity.h.h);
+    return MAP_HAS(uint32_t, &world_data->ent_idx_map, entity.h.h);
 }
 
 camera_t camera_get(world_t world,
                     entity_t entity) {
 
     world_data_t *world_data = _get_world_data(world);
-    u32 idx = MAP_GET(u32, &world_data->ent_idx_map, entity.h.h, UINT32_MAX);
+    uint32_t idx = MAP_GET(uint32_t, &world_data->ent_idx_map, entity.h.h, UINT32_MAX);
     return (camera_t) {.idx = idx};
 }
 
 camera_t camera_create(world_t world,
                        entity_t entity,
-                       f32 near,
-                       f32 far,
-                       f32 fov) {
+                       float near,
+                       float far,
+                       float fov) {
 
     world_data_t *data = _get_world_data(world);
 
-    u32 idx = (u32) ARRAY_SIZE(&data->near);
+    uint32_t idx = (uint32_t) ARRAY_SIZE(&data->near);
 
-    MAP_SET(u32, &data->ent_idx_map, entity.h.h, idx);
+    MAP_SET(uint32_t, &data->ent_idx_map, entity.h.h, idx);
 
     ARRAY_PUSH_BACK(entity_t, &data->entity, entity);
-    ARRAY_PUSH_BACK(f32, &data->near, near);
-    ARRAY_PUSH_BACK(f32, &data->far, far);
-    ARRAY_PUSH_BACK(f32, &data->fov, fov);
+    ARRAY_PUSH_BACK(float, &data->near, near);
+    ARRAY_PUSH_BACK(float, &data->far, far);
+    ARRAY_PUSH_BACK(float, &data->fov, fov);
 
     return (camera_t) {.idx = idx};
 }

@@ -3,7 +3,7 @@
 
 #include <include/assimp/scene.h>
 #include <include/assimp/postprocess.h>
-#include <celib/filesystem/path.h>
+#include <celib/path.h>
 
 ARRAY_PROTOTYPE(bgfx_vertex_decl_t);
 ARRAY_PROTOTYPE(stringid64_t);
@@ -35,25 +35,25 @@ static const struct {
     bgfx_attrib_type_t attrib_type;
     size_t size;
 } _attrin_tbl[] = {
-        {.name="f32", .size=sizeof(f32), .attrib_type=BGFX_ATTRIB_TYPE_FLOAT},
-        {.name="i16", .size=sizeof(i16), .attrib_type=BGFX_ATTRIB_TYPE_INT16},
-        {.name="u8", .size=sizeof(u8), .attrib_type=BGFX_ATTRIB_TYPE_UINT8},
+        {.name="float", .size=sizeof(float), .attrib_type=BGFX_ATTRIB_TYPE_FLOAT},
+        {.name="int16_t", .size=sizeof(int16_t), .attrib_type=BGFX_ATTRIB_TYPE_INT16},
+        {.name="uint8_t", .size=sizeof(uint8_t), .attrib_type=BGFX_ATTRIB_TYPE_UINT8},
         // TODO: {.name="f16", .size=sizeof(f16), .attrib_type=BGFX_ATTRIB_TYPE_HALF},
         // TODO: {.name="u10", .size=sizeof(u10), .attrib_type=BGFX_ATTRIB_TYPE_UINT10},
 };
 
 struct compile_output {
     ARRAY_T(stringid64_t) geom_name;
-    ARRAY_T(u32) ib_offset;
-    ARRAY_T(u32) vb_offset;
+    ARRAY_T(uint32_t) ib_offset;
+    ARRAY_T(uint32_t) vb_offset;
     ARRAY_T(bgfx_vertex_decl_t) vb_decl;
-    ARRAY_T(u32) ib_size;
-    ARRAY_T(u32) vb_size;
-    ARRAY_T(u32) ib;
-    ARRAY_T(u8) vb;
+    ARRAY_T(uint32_t) ib_size;
+    ARRAY_T(uint32_t) vb_size;
+    ARRAY_T(uint32_t) ib;
+    ARRAY_T(uint8_t) vb;
 
     ARRAY_T(stringid64_t) node_name;
-    ARRAY_T(u32) node_parent;
+    ARRAY_T(uint32_t) node_parent;
     ARRAY_T(cel_mat44f_t) node_pose;
     ARRAY_T(stringid64_t) geom_node;
 };
@@ -63,17 +63,17 @@ struct compile_output *_crete_compile_output() {
     struct compile_output *output = CEL_ALLOCATE(a, struct compile_output, 1);
 
     ARRAY_INIT(stringid64_t, &output->geom_name, a);
-    ARRAY_INIT(u32, &output->ib_offset, a);
-    ARRAY_INIT(u32, &output->vb_offset, a);
+    ARRAY_INIT(uint32_t, &output->ib_offset, a);
+    ARRAY_INIT(uint32_t, &output->vb_offset, a);
     ARRAY_INIT(bgfx_vertex_decl_t, &output->vb_decl, a);
-    ARRAY_INIT(u32, &output->ib_size, a);
-    ARRAY_INIT(u32, &output->vb_size, a);
-    ARRAY_INIT(u32, &output->ib, a);
-    ARRAY_INIT(u8, &output->vb, a);
+    ARRAY_INIT(uint32_t, &output->ib_size, a);
+    ARRAY_INIT(uint32_t, &output->vb_size, a);
+    ARRAY_INIT(uint32_t, &output->ib, a);
+    ARRAY_INIT(uint8_t, &output->vb, a);
 
     ARRAY_INIT(stringid64_t, &output->node_name, a);
     ARRAY_INIT(stringid64_t, &output->geom_node, a);
-    ARRAY_INIT(u32, &output->node_parent, a);
+    ARRAY_INIT(uint32_t, &output->node_parent, a);
     ARRAY_INIT(cel_mat44f_t, &output->node_pose, a);
 
 
@@ -84,17 +84,17 @@ void _destroy_compile_output(struct compile_output *output) {
     struct cel_allocator *a = MemSysApiV0.main_allocator();
 
     ARRAY_DESTROY(stringid64_t, &output->geom_name);
-    ARRAY_DESTROY(u32, &output->ib_offset);
-    ARRAY_DESTROY(u32, &output->vb_offset);
+    ARRAY_DESTROY(uint32_t, &output->ib_offset);
+    ARRAY_DESTROY(uint32_t, &output->vb_offset);
     ARRAY_DESTROY(bgfx_vertex_decl_t, &output->vb_decl);
-    ARRAY_DESTROY(u32, &output->ib_size);
-    ARRAY_DESTROY(u32, &output->vb_size);
-    ARRAY_DESTROY(u32, &output->ib);
-    ARRAY_DESTROY(u8, &output->vb);
+    ARRAY_DESTROY(uint32_t, &output->ib_size);
+    ARRAY_DESTROY(uint32_t, &output->vb_size);
+    ARRAY_DESTROY(uint32_t, &output->ib);
+    ARRAY_DESTROY(uint8_t, &output->vb);
 
     ARRAY_DESTROY(stringid64_t, &output->node_name);
     ARRAY_DESTROY(stringid64_t, &output->geom_node);
-    ARRAY_DESTROY(u32, &output->node_parent);
+    ARRAY_DESTROY(uint32_t, &output->node_parent);
     ARRAY_DESTROY(cel_mat44f_t, &output->node_pose);
 
     CEL_DEALLOCATE(a, output);
@@ -120,7 +120,7 @@ static void _type_to_attr_type(const char *name,
 }
 
 void _parse_vertex_decl(bgfx_vertex_decl_t *decl,
-                        u32 *vertex_size,
+                        uint32_t *vertex_size,
                         bgfx_attrib_t type,
                         yaml_node_t decl_node) {
     yaml_node_t type_n = yaml_get_node(decl_node, "type");
@@ -143,7 +143,7 @@ void _parse_vertex_decl(bgfx_vertex_decl_t *decl,
 
 static void _parese_types(bgfx_vertex_decl_t *decl,
                           yaml_node_t types,
-                          u32 *vertex_size) {
+                          uint32_t *vertex_size) {
 
     for (int i = 0; i < CEL_ARRAY_LEN(_chanel_types); ++i) {
         YAML_NODE_SCOPE(node, types, _chanel_types[i].name,
@@ -165,10 +165,10 @@ void _write_chanel(yaml_node_t node,
     size_t v_size;
 
     yaml_node_t idx_n = yaml_get_seq_node(node, i);
-    u32 idx = yaml_as_int(idx_n);
+    uint32_t idx = yaml_as_int(idx_n);
     yaml_node_free(idx_n);
 
-    u32 size = 0;
+    uint32_t size = 0;
 
     {
         yaml_node_t chan_def_n = yaml_get_node(types, name);
@@ -190,12 +190,12 @@ void _write_chanel(yaml_node_t node,
         yaml_node_t n = yaml_get_seq_node(chanel_data_n, (idx * size) + k);
 
         // TODO: type
-        f32 v = yaml_as_float(n);
+        float v = yaml_as_float(n);
         yaml_node_free(n);
 
         //log_debug("casdsadsa", "%s:%d -  %f", name, k, v);
 
-        ARRAY_PUSH(u8, &output->vb, (u8 *) &v, sizeof(v));
+        ARRAY_PUSH(uint8_t, &output->vb, (uint8_t *) &v, sizeof(v));
     }
     yaml_node_free(chanel_data_n);
 }
@@ -212,15 +212,15 @@ void foreach_geometries_clb(yaml_node_t key,
 
     ARRAY_PUSH_BACK(stringid64_t, &output->geom_name, name);
     ARRAY_PUSH_BACK(stringid64_t, &output->geom_node, (stringid64_t) {.id = 0});
-    ARRAY_PUSH_BACK(u32, &output->ib_offset, ARRAY_SIZE(&output->ib));
-    ARRAY_PUSH_BACK(u32, &output->vb_offset, ARRAY_SIZE(&output->vb));
+    ARRAY_PUSH_BACK(uint32_t, &output->ib_offset, ARRAY_SIZE(&output->ib));
+    ARRAY_PUSH_BACK(uint32_t, &output->vb_offset, ARRAY_SIZE(&output->vb));
 
     // DECL
     bgfx_vertex_decl_t vertex_decl;
     bgfx_vertex_decl_begin(&vertex_decl, BGFX_RENDERER_TYPE_NOOP);
 
     yaml_node_t types = yaml_get_node(value, "types");
-    u32 vertex_size = 0;
+    uint32_t vertex_size = 0;
     _parese_types(&vertex_decl, types, &vertex_size);
 
     bgfx_vertex_decl_end(&vertex_decl);
@@ -232,10 +232,10 @@ void foreach_geometries_clb(yaml_node_t key,
     yaml_node_t indices_n = yaml_get_node(value, "indices");
     yaml_node_t i_size = yaml_get_node(indices_n, "size");
 
-    u32 vertex_count = yaml_as_int(i_size);
+    uint32_t vertex_count = yaml_as_int(i_size);
 
-    ARRAY_PUSH_BACK(u32, &output->ib_size, vertex_count);
-    ARRAY_PUSH_BACK(u32, &output->vb_size, vertex_size * vertex_count);
+    ARRAY_PUSH_BACK(uint32_t, &output->ib_size, vertex_count);
+    ARRAY_PUSH_BACK(uint32_t, &output->vb_size, vertex_size * vertex_count);
 
     for (int i = 0; i < vertex_count; ++i) {
         for (int j = 0; j < CEL_ARRAY_LEN(_chanel_types); ++j) {
@@ -247,14 +247,14 @@ void foreach_geometries_clb(yaml_node_t key,
                                               output););
         }
 
-        ARRAY_PUSH_BACK(u32, &output->ib, i);
+        ARRAY_PUSH_BACK(uint32_t, &output->ib, i);
     }
 }
 
 
 struct foreach_graph_data {
     struct compile_output *output;
-    u32 parent_idx;
+    uint32_t parent_idx;
 };
 
 void foreach_graph_clb(yaml_node_t key,
@@ -269,10 +269,10 @@ void foreach_graph_clb(yaml_node_t key,
     yaml_node_t local_pose = yaml_get_node(value, "local");
     cel_mat44f_t pose = yaml_as_cel_mat44f_t(local_pose);
 
-    u32 idx = (u32) ARRAY_SIZE(&output->output->node_name);
+    uint32_t idx = (uint32_t) ARRAY_SIZE(&output->output->node_name);
 
     ARRAY_PUSH_BACK(stringid64_t, &output->output->node_name, node_name);
-    ARRAY_PUSH_BACK(u32, &output->output->node_parent, output->parent_idx);
+    ARRAY_PUSH_BACK(uint32_t, &output->output->node_parent, output->parent_idx);
     ARRAY_PUSH_BACK(cel_mat44f_t, &output->output->node_pose, pose);
 
     yaml_node_t geometries_n = yaml_get_node(value, "geometries");
@@ -325,14 +325,14 @@ int _compile_yaml(yaml_node_t root,
 }
 
 void _compile_assimp_node(struct aiNode *root,
-                          u32 parent,
+                          uint32_t parent,
                           struct compile_output *output) {
     stringid64_t name = stringid64_from_string(root->mName.data);
 
-    u32 idx = ARRAY_SIZE(&output->node_name);
+    uint32_t idx = ARRAY_SIZE(&output->node_name);
 
     ARRAY_PUSH_BACK(stringid64_t, &output->node_name, name);
-    ARRAY_PUSH_BACK(u32, &output->node_parent, parent);
+    ARRAY_PUSH_BACK(uint32_t, &output->node_parent, parent);
     ARRAY_PUSH_BACK(cel_mat44f_t, &output->node_pose,
                     *((cel_mat44f_t *) &root->mTransformation));
 
@@ -362,7 +362,7 @@ int _compile_assimp(const char *filename,
     const char *source_dir = ResourceApiV0.compiler_get_source_dir();
     cel_path_join(input_path, CEL_ARRAY_LEN(input_path), source_dir, input_str);
 
-    u32 postprocess_flag = aiProcessPreset_TargetRealtime_MaxQuality;
+    uint32_t postprocess_flag = aiProcessPreset_TargetRealtime_MaxQuality;
 
     if (yaml_is_valid(postprocess_n)) {
         YAML_NODE_SCOPE(node, postprocess_n, "flip_uvs",
@@ -376,7 +376,7 @@ int _compile_assimp(const char *filename,
 
     char tmp_buffer[1024] = {0};
     char tmp_buffer2[1024] = {0};
-    u32 unique = 0;
+    uint32_t unique = 0;
     for (int i = 0; i < scene->mNumMeshes; ++i) {
         struct aiMesh *mesh = scene->mMeshes[i];
 
@@ -401,56 +401,56 @@ int _compile_assimp(const char *filename,
                         stringid64_from_string(tmp_buffer));
         ARRAY_PUSH_BACK(stringid64_t, &output->geom_node,
                         (stringid64_t) {.id = 0});
-        ARRAY_PUSH_BACK(u32, &output->ib_offset, ARRAY_SIZE(&output->ib));
-        ARRAY_PUSH_BACK(u32, &output->vb_offset, ARRAY_SIZE(&output->vb));
-        ARRAY_PUSH_BACK(u32, &output->ib_size, mesh->mNumFaces * 3);
+        ARRAY_PUSH_BACK(uint32_t, &output->ib_offset, ARRAY_SIZE(&output->ib));
+        ARRAY_PUSH_BACK(uint32_t, &output->vb_offset, ARRAY_SIZE(&output->vb));
+        ARRAY_PUSH_BACK(uint32_t, &output->ib_size, mesh->mNumFaces * 3);
 
         bgfx_vertex_decl_t vertex_decl;
         bgfx_vertex_decl_begin(&vertex_decl, BGFX_RENDERER_TYPE_NOOP);
 
-        u32 v_size = 0;
+        uint32_t v_size = 0;
         if (mesh->mVertices != NULL) {
             bgfx_vertex_decl_add(&vertex_decl, BGFX_ATTRIB_POSITION, 3,
                                  BGFX_ATTRIB_TYPE_FLOAT, 0, 0);
-            v_size += 3 * sizeof(f32);
+            v_size += 3 * sizeof(float);
         }
 
         if (mesh->mNormals != NULL) {
             bgfx_vertex_decl_add(&vertex_decl, BGFX_ATTRIB_NORMAL, 3,
                                  BGFX_ATTRIB_TYPE_FLOAT, 0, 0);
-            v_size += 3 * sizeof(f32);
+            v_size += 3 * sizeof(float);
         }
 
         if (mesh->mTextureCoords[0] != NULL) {
             bgfx_vertex_decl_add(&vertex_decl, BGFX_ATTRIB_TEXCOORD0, 2,
                                  BGFX_ATTRIB_TYPE_FLOAT, 0, 0);
-            v_size += 2 * sizeof(f32);
+            v_size += 2 * sizeof(float);
         }
         bgfx_vertex_decl_end(&vertex_decl);
         ARRAY_PUSH_BACK(bgfx_vertex_decl_t, &output->vb_decl, vertex_decl);
-        ARRAY_PUSH_BACK(u32, &output->vb_size, v_size * mesh->mNumVertices);
+        ARRAY_PUSH_BACK(uint32_t, &output->vb_size, v_size * mesh->mNumVertices);
 
         for (int j = 0; j < mesh->mNumVertices; ++j) {
             if (mesh->mVertices != NULL) {
-                ARRAY_PUSH(u8, &output->vb, (u8 *) &mesh->mVertices[j],
-                           sizeof(f32) * 3);
+                ARRAY_PUSH(uint8_t, &output->vb, (uint8_t *) &mesh->mVertices[j],
+                           sizeof(float) * 3);
             }
 
             if (mesh->mNormals != NULL) {
-                ARRAY_PUSH(u8, &output->vb, (u8 *) &mesh->mNormals[j],
-                           sizeof(f32) * 3);
+                ARRAY_PUSH(uint8_t, &output->vb, (uint8_t *) &mesh->mNormals[j],
+                           sizeof(float) * 3);
             }
 
             if (mesh->mTextureCoords[0] != NULL) {
-                ARRAY_PUSH(u8, &output->vb, (u8 *) &mesh->mTextureCoords[0][j],
-                           sizeof(f32) * 2);
+                ARRAY_PUSH(uint8_t, &output->vb, (uint8_t *) &mesh->mTextureCoords[0][j],
+                           sizeof(float) * 2);
             }
         }
 
         for (int j = 0; j < mesh->mNumFaces; ++j) {
-            ARRAY_PUSH_BACK(u32, &output->ib, mesh->mFaces[j].mIndices[0]);
-            ARRAY_PUSH_BACK(u32, &output->ib, mesh->mFaces[j].mIndices[1]);
-            ARRAY_PUSH_BACK(u32, &output->ib, mesh->mFaces[j].mIndices[2]);
+            ARRAY_PUSH_BACK(uint32_t, &output->ib, mesh->mFaces[j].mIndices[0]);
+            ARRAY_PUSH_BACK(uint32_t, &output->ib, mesh->mFaces[j].mIndices[1]);
+            ARRAY_PUSH_BACK(uint32_t, &output->ib, mesh->mFaces[j].mIndices[2]);
         }
     }
 
@@ -492,32 +492,32 @@ int _scene_resource_compiler(const char *filename,
     }
 
     struct scene_blob res = {
-            .geom_count = (u32) ARRAY_SIZE(&output->geom_name),
-            .node_count = (u32) ARRAY_SIZE(&output->node_name),
-            .ib_len = (u32) ARRAY_SIZE(&output->ib),
-            .vb_len = (u32) ARRAY_SIZE(&output->vb),
+            .geom_count = (uint32_t) ARRAY_SIZE(&output->geom_name),
+            .node_count = (uint32_t) ARRAY_SIZE(&output->node_name),
+            .ib_len = (uint32_t) ARRAY_SIZE(&output->ib),
+            .vb_len = (uint32_t) ARRAY_SIZE(&output->vb),
     };
 
     cel_vio_write(build_vio, &res, sizeof(res), 1);
     cel_vio_write(build_vio, output->geom_name.data, sizeof(stringid64_t),
                   ARRAY_SIZE(&output->geom_name));
-    cel_vio_write(build_vio, output->ib_offset.data, sizeof(u32),
+    cel_vio_write(build_vio, output->ib_offset.data, sizeof(uint32_t),
                   ARRAY_SIZE(&output->ib_offset));
-    cel_vio_write(build_vio, output->vb_offset.data, sizeof(u32),
+    cel_vio_write(build_vio, output->vb_offset.data, sizeof(uint32_t),
                   ARRAY_SIZE(&output->vb_offset));
     cel_vio_write(build_vio, output->vb_decl.data, sizeof(bgfx_vertex_decl_t),
                   ARRAY_SIZE(&output->vb_decl));
-    cel_vio_write(build_vio, output->ib_size.data, sizeof(u32),
+    cel_vio_write(build_vio, output->ib_size.data, sizeof(uint32_t),
                   ARRAY_SIZE(&output->ib_size));
-    cel_vio_write(build_vio, output->vb_size.data, sizeof(u32),
+    cel_vio_write(build_vio, output->vb_size.data, sizeof(uint32_t),
                   ARRAY_SIZE(&output->vb_size));
-    cel_vio_write(build_vio, output->ib.data, sizeof(u32),
+    cel_vio_write(build_vio, output->ib.data, sizeof(uint32_t),
                   ARRAY_SIZE(&output->ib));
-    cel_vio_write(build_vio, output->vb.data, sizeof(u8),
+    cel_vio_write(build_vio, output->vb.data, sizeof(uint8_t),
                   ARRAY_SIZE(&output->vb));
     cel_vio_write(build_vio, output->node_name.data, sizeof(stringid64_t),
                   ARRAY_SIZE(&output->node_name));
-    cel_vio_write(build_vio, output->node_parent.data, sizeof(u32),
+    cel_vio_write(build_vio, output->node_parent.data, sizeof(uint32_t),
                   ARRAY_SIZE(&output->node_parent));
     cel_vio_write(build_vio, output->node_pose.data, sizeof(cel_mat44f_t),
                   ARRAY_SIZE(&output->node_pose));

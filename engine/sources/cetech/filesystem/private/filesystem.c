@@ -2,11 +2,11 @@
 // Includes
 //==============================================================================
 
-#include <celib/filesystem/path.h>
-#include "celib/filesystem/filesystem.h"
+#include <celib/path.h>
+#include "celib/filesystem.h"
 #include <cetech/module/module.h>
 
-#include "celib/filesystem/vio.h"
+#include "celib/vio.h"
 
 #include <cetech/memory/memory.h>
 #include <cetech/filesystem/filesystem.h>
@@ -94,7 +94,7 @@ const char *filesystem_get_root_dir(stringid64_t root) {
 
 int filesystem_get_fullpath(stringid64_t root,
                             char *result,
-                            u64 maxlen,
+                            uint64_t maxlen,
                             const char *filename) {
     const char *root_path = filesystem_get_root_dir(root);
 

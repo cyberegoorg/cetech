@@ -9,10 +9,10 @@
 //==============================================================================
 
 #include <cetech/application/application.h>
-#include "celib/string/stringid.h"
-#include "celib/containers/array.h"
+#include "celib/stringid.h"
+#include "celib/array.inl"
 #include "celib/types.h"
-#include "celib/filesystem/vio_types.h"
+#include "celib/vio.h"
 #include <cetech/config/config.h>
 
 
@@ -237,7 +237,7 @@ struct ResourceApiV0 {
     //! \param name Tool name
     //! \return 1 if ok else 0
     int (*compiler_external_join)(char *output,
-                                  u32 max_len,
+                                  uint32_t max_len,
                                   const char *name);
 
     //! Create build dir

@@ -4,11 +4,12 @@
 
 #include <unistd.h>
 
-#include <celib/time/time.h>
-#include <celib/window/types.h>
-#include <celib/window/window.h>
-#include <celib/string/stringid.h>
-#include <celib/os/cmd_line.h>
+#include <celib/allocator.h>
+
+#include <celib/time.h>
+#include <celib/window.h>
+#include <celib/stringid.h>
+#include <celib/cmd_line.h>
 
 #include <cetech/application/private/app.h>
 #include <cetech/config/config.h>
@@ -284,7 +285,7 @@ void application_start() {
 
     _boot_stage();
 
-    u64 last_tick = cel_get_perf_counter();
+    uint64_t last_tick = cel_get_perf_counter();
     _G.game = LuaSysApiV0.get_game_callbacks();
 
     if (!_G.game->init()) {
@@ -305,7 +306,7 @@ void application_start() {
         struct scope_data application_sd = DevelopSystemApiV0.enter_scope(
                 "Application:update()");
 
-        u64 now_ticks = cel_get_perf_counter();
+        uint64_t now_ticks = cel_get_perf_counter();
         float dt = ((float) (now_ticks - last_tick)) / cel_get_perf_freq();
 
         _G.dt = dt;

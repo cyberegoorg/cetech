@@ -1,15 +1,15 @@
 #ifndef CETECH_MATERIAL_COMPILER_H
 #define CETECH_MATERIAL_COMPILER_H
 
-#include <celib/filesystem/path.h>
+#include <celib/path.h>
 
 struct material_compile_output {
     ARRAY_T(char) uniform_names;
-    ARRAY_T(u8) data;
-    u32 texture_count;
-    u32 cel_vec4f_count;
-    u32 mat33f_count;
-    u32 cel_mat44f_count;
+    ARRAY_T(uint8_t) data;
+    uint32_t texture_count;
+    uint32_t cel_vec4f_count;
+    uint32_t mat33f_count;
+    uint32_t cel_mat44f_count;
 };
 
 static void _preprocess(const char *filename,
@@ -65,7 +65,7 @@ static void _forach_texture_clb(yaml_node_t key,
 
     ARRAY_PUSH(char, &output->uniform_names, uniform_name,
                CEL_ARRAY_LEN(uniform_name));
-    ARRAY_PUSH(u8, &output->data, (u8 *) &texture_name, sizeof(stringid64_t));
+    ARRAY_PUSH(uint8_t, &output->data, (uint8_t *) &texture_name, sizeof(stringid64_t));
 }
 
 static void _forach_vec4fs_clb(yaml_node_t key,
@@ -82,7 +82,7 @@ static void _forach_vec4fs_clb(yaml_node_t key,
 
     ARRAY_PUSH(char, &output->uniform_names, uniform_name,
                CEL_ARRAY_LEN(uniform_name));
-    ARRAY_PUSH(u8, &output->data, (u8 *) &v, sizeof(cel_vec4f_t));
+    ARRAY_PUSH(uint8_t, &output->data, (uint8_t *) &v, sizeof(cel_vec4f_t));
 }
 
 static void _forach_cel_mat44f_clb(yaml_node_t key,
@@ -99,7 +99,7 @@ static void _forach_cel_mat44f_clb(yaml_node_t key,
 
     ARRAY_PUSH(char, &output->uniform_names, uniform_name,
                CEL_ARRAY_LEN(uniform_name));
-    ARRAY_PUSH(u8, &output->data, (u8 *) &m, sizeof(cel_mat44f_t));
+    ARRAY_PUSH(uint8_t, &output->data, (uint8_t *) &m, sizeof(cel_mat44f_t));
 }
 
 static void _forach_mat33f_clb(yaml_node_t key,
@@ -116,7 +116,7 @@ static void _forach_mat33f_clb(yaml_node_t key,
 
     ARRAY_PUSH(char, &output->uniform_names, uniform_name,
                CEL_ARRAY_LEN(uniform_name));
-    ARRAY_PUSH(u8, &output->data, (u8 *) &m, sizeof(mat33f_t));
+    ARRAY_PUSH(uint8_t, &output->data, (uint8_t *) &m, sizeof(mat33f_t));
 }
 
 static int _material_resource_compiler(const char *filename,
@@ -144,7 +144,7 @@ static int _material_resource_compiler(const char *filename,
 
     struct material_compile_output output = {0};
     ARRAY_INIT(char, &output.uniform_names, MemSysApiV0.main_allocator());
-    ARRAY_INIT(u8, &output.data, MemSysApiV0.main_allocator());
+    ARRAY_INIT(uint8_t, &output.data, MemSysApiV0.main_allocator());
 
     yaml_node_t textures = yaml_get_node(root, "textures");
     if (yaml_is_valid(textures)) {
@@ -177,11 +177,11 @@ static int _material_resource_compiler(const char *filename,
     cel_vio_write(build_vio, &resource, sizeof(resource), 1);
     cel_vio_write(build_vio, output.uniform_names.data, sizeof(char),
                   ARRAY_SIZE(&output.uniform_names));
-    cel_vio_write(build_vio, output.data.data, sizeof(u8),
+    cel_vio_write(build_vio, output.data.data, sizeof(uint8_t),
                   ARRAY_SIZE(&output.data));
 
     ARRAY_DESTROY(char, &output.uniform_names);
-    ARRAY_DESTROY(u8, &output.data);
+    ARRAY_DESTROY(uint8_t, &output.data);
     CEL_DEALLOCATE(MemSysApiV0.main_allocator(), source_data);
     return 1;
 }

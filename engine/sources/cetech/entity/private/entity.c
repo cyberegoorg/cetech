@@ -2,7 +2,7 @@
 // Includes
 //==============================================================================
 
-#include "celib/containers/map.h"
+#include "celib/map.inl"
 #include <cetech/memory/memory.h>
 #include <cetech/module/module.h>
 #include <cetech/resource/resource.h>
@@ -10,8 +10,8 @@
 
 #include <cetech/world/world.h>
 #include <cetech/entity/entity.h>
-#include <celib/filesystem/path.h>
-#include <celib/filesystem/vio.h>
+#include <celib/path.h>
+#include <celib/vio.h>
 
 //==============================================================================
 // Globals
@@ -22,8 +22,8 @@ MAP_PROTOTYPE_N(struct array_entity_t, array_entity_t);
 
 #define _G EntityMaagerGlobals
 static struct G {
-    struct handlerid entity_handler;
-    MAP_T(u32) spawned_map;
+    struct handler_gen* entity_handler;
+    MAP_T(uint32_t) spawned_map;
     ARRAY_T(array_entity_t) spawned_array;
     stringid64_t type;
 } _G = {0};
@@ -32,8 +32,8 @@ IMPORT_API(MemSysApi, 0);
 IMPORT_API(ComponentSystemApi, 0);
 IMPORT_API(ResourceApi, 0);
 
-u32 _new_spawned_array() {
-    u32 idx = ARRAY_SIZE(&_G.spawned_array);
+uint32_t _new_spawned_array() {
+    uint32_t idx = ARRAY_SIZE(&_G.spawned_array);
 
     ARRAY_PUSH_BACK(array_entity_t, &_G.spawned_array,
                     (struct array_entity_t) {0});
@@ -44,23 +44,23 @@ u32 _new_spawned_array() {
 }
 
 void _map_spawned_array(entity_t root,
-                        u32 idx) {
-    MAP_SET(u32, &_G.spawned_map, root.idx, idx);
+                        uint32_t idx) {
+    MAP_SET(uint32_t, &_G.spawned_map, root.idx, idx);
 }
 
-ARRAY_T(entity_t) *_get_spawned_array_by_idx(u32 idx) {
+ARRAY_T(entity_t) *_get_spawned_array_by_idx(uint32_t idx) {
     return &ARRAY_AT(&_G.spawned_array, idx);
 }
 
 ARRAY_T(entity_t) *_get_spawned_array(entity_t entity) {
-    u32 idx = MAP_GET(u32, &_G.spawned_map, entity.idx, UINT32_MAX);
+    uint32_t idx = MAP_GET(uint32_t, &_G.spawned_map, entity.idx, UINT32_MAX);
     return &ARRAY_AT(&_G.spawned_array, idx);
 }
 
 
 void _destroy_spawned_array(entity_t entity) {
-    u32 idx = MAP_GET(u32, &_G.spawned_map, entity.idx, UINT32_MAX);
-    MAP_REMOVE(u32, &_G.spawned_map, entity.idx);
+    uint32_t idx = MAP_GET(uint32_t, &_G.spawned_map, entity.idx, UINT32_MAX);
+    MAP_REMOVE(uint32_t, &_G.spawned_map, entity.idx);
 
     ARRAY_T(entity_t) *array = &ARRAY_AT(&_G.spawned_array, idx);
     ARRAY_DESTROY(entity_t, array);
@@ -111,18 +111,18 @@ ARRAY_PROTOTYPE(yaml_node_t)
 
 ARRAY_PROTOTYPE_N(struct array_yaml_node_t, array_yaml_node_t)
 
-ARRAY_PROTOTYPE_N(struct array_u32, array_u32)
+ARRAY_PROTOTYPE_N(struct array_uint32_t, array_uint32_t)
 
 MAP_PROTOTYPE_N(struct array_yaml_node_t, array_yaml_node_t)
 
-MAP_PROTOTYPE_N(struct array_u32, array_u32)
+MAP_PROTOTYPE_N(struct array_uint32_t, array_uint32_t)
 
 struct entity_compile_output {
-    MAP_T(array_u32) component_ent;
-    MAP_T(u32) entity_parent;
+    MAP_T(array_uint32_t) component_ent;
+    MAP_T(uint32_t) entity_parent;
     MAP_T(array_yaml_node_t) component_body;
-    ARRAY_T(u64) component_type;
-    u32 ent_counter;
+    ARRAY_T(uint64_t) component_type;
+    uint32_t ent_counter;
 };
 
 struct foreach_children_data {
@@ -177,12 +177,12 @@ void foreach_components_clb(yaml_node_t key,
     }
 
     if (!contain_cid) {
-        ARRAY_PUSH_BACK(u64, &output->component_type, cid.id);
+        ARRAY_PUSH_BACK(uint64_t, &output->component_type, cid.id);
 
-        ARRAY_T(u32) tmp_a = {0};
-        ARRAY_INIT(u32, &tmp_a, MemSysApiV0.main_allocator());
+        ARRAY_T(uint32_t) tmp_a = {0};
+        ARRAY_INIT(uint32_t, &tmp_a, MemSysApiV0.main_allocator());
 
-        MAP_SET(array_u32, &output->component_ent, cid.id, tmp_a);
+        MAP_SET(array_uint32_t, &output->component_ent, cid.id, tmp_a);
     }
 
     if (!MAP_HAS(array_yaml_node_t, &output->component_body, cid.id)) {
@@ -192,9 +192,9 @@ void foreach_components_clb(yaml_node_t key,
         MAP_SET(array_yaml_node_t, &output->component_body, cid.id, tmp_a);
 
     }
-    ARRAY_T(u32) *tmp_a = MAP_GET_PTR(array_u32, &output->component_ent,
+    ARRAY_T(uint32_t) *tmp_a = MAP_GET_PTR(array_uint32_t, &output->component_ent,
                                       cid.id);
-    ARRAY_PUSH_BACK(u32, tmp_a, data->ent_id);
+    ARRAY_PUSH_BACK(uint32_t, tmp_a, data->ent_id);
 
     ARRAY_T(yaml_node_t) *tmp_b = MAP_GET_PTR(array_yaml_node_t,
                                               &output->component_body, cid.id);
@@ -205,9 +205,9 @@ static void compile_entitity(yaml_node_t rootNode,
                              int parent,
                              struct entity_compile_output *output) {
 
-    u32 ent_id = output->ent_counter++;
+    uint32_t ent_id = output->ent_counter++;
 
-    MAP_SET(u32, &output->entity_parent, ent_id, parent);
+    MAP_SET(uint32_t, &output->entity_parent, ent_id, parent);
 
     yaml_node_t components_node = yaml_get_node(rootNode, "components");
     CEL_ASSERT("entity_system", yaml_is_valid(components_node));
@@ -235,25 +235,25 @@ static void compile_entitity(yaml_node_t rootNode,
 }
 
 struct entity_resource {
-    u32 ent_count;
-    u32 comp_type_count;
-    //u64 parents [ent_count]
-    //u64 comp_types [comp_type_count]
+    uint32_t ent_count;
+    uint32_t comp_type_count;
+    //uint64_t parents [ent_count]
+    //uint64_t comp_types [comp_type_count]
     //component_data cdata[comp_type_count]
 };
 
 struct component_data {
-    u32 ent_count;
-    u32 size;
-    // u32 ent[ent_count];
+    uint32_t ent_count;
+    uint32_t size;
+    // uint32_t ent[ent_count];
     // char data[ent_count];
 };
 
-#define entity_resource_parents(r) ((u32*)((r) + 1))
-#define entity_resource_comp_types(r) ((u64*)(entity_resource_parents(r) + ((r)->ent_count)))
+#define entity_resource_parents(r) ((uint32_t*)((r) + 1))
+#define entity_resource_comp_types(r) ((uint64_t*)(entity_resource_parents(r) + ((r)->ent_count)))
 #define entity_resource_comp_data(r) ((struct component_data*)(entity_resource_comp_types(r) + ((r)->comp_type_count)))
 
-#define component_data_ent(cd) ((u32*)((cd) + 1))
+#define component_data_ent(cd) ((uint32_t*)((cd) + 1))
 #define component_data_data(cd) ((char*)((component_data_ent(cd) + ((cd)->ent_count))))
 
 struct entity_compile_output *entity_compiler_create_output() {
@@ -264,28 +264,28 @@ struct entity_compile_output *entity_compiler_create_output() {
                  struct entity_compile_output,
                  1);
     output->ent_counter = 0;
-    ARRAY_INIT(u64, &output->component_type, a);
-    MAP_INIT(array_u32, &output->component_ent, a);
-    MAP_INIT(u32, &output->entity_parent, a);
+    ARRAY_INIT(uint64_t, &output->component_type, a);
+    MAP_INIT(array_uint32_t, &output->component_ent, a);
+    MAP_INIT(uint32_t, &output->entity_parent, a);
     MAP_INIT(array_yaml_node_t, &output->component_body, a);
 
     return output;
 }
 
 void entity_compiler_destroy_output(struct entity_compile_output *output) {
-    ARRAY_DESTROY(u64, &output->component_type);
-    MAP_DESTROY(u32, &output->entity_parent);
+    ARRAY_DESTROY(uint64_t, &output->component_type);
+    MAP_DESTROY(uint32_t, &output->entity_parent);
 
     // clean inner array
-    const MAP_ENTRY_T(array_u32) *ce_it = MAP_BEGIN(array_u32,
+    const MAP_ENTRY_T(array_uint32_t) *ce_it = MAP_BEGIN(array_uint32_t,
                                                     &output->component_ent);
-    const MAP_ENTRY_T(array_u32) *ce_end = MAP_END(array_u32,
+    const MAP_ENTRY_T(array_uint32_t) *ce_end = MAP_END(array_uint32_t,
                                                    &output->component_ent);
     while (ce_it != ce_end) {
-        ARRAY_DESTROY(u32, (struct array_u32 *) &ce_it->value);
+        ARRAY_DESTROY(uint32_t, (struct array_uint32_t *) &ce_it->value);
         ++ce_it;
     }
-    MAP_DESTROY(array_u32, &output->component_ent);
+    MAP_DESTROY(array_uint32_t, &output->component_ent);
 
     // clean inner array
     const MAP_ENTRY_T(array_yaml_node_t) *cb_it = MAP_BEGIN(array_yaml_node_t,
@@ -311,35 +311,35 @@ void entity_compiler_compile_entity(struct entity_compile_output *output,
     compile_entitity(root, UINT32_MAX, output);
 }
 
-u32 entity_compiler_ent_counter(struct entity_compile_output *output) {
+uint32_t entity_compiler_ent_counter(struct entity_compile_output *output) {
     return output->ent_counter;
 }
 
 void entity_compiler_write_to_build(struct entity_compile_output *output,
-                                  ARRAY_T(u8) *build) {
+                                  ARRAY_T(uint8_t) *build) {
     struct entity_resource res = {0};
-    res.ent_count = (u32) (output->ent_counter);
-    res.comp_type_count = (u32) ARRAY_SIZE(&output->component_type);
+    res.ent_count = (uint32_t) (output->ent_counter);
+    res.comp_type_count = (uint32_t) ARRAY_SIZE(&output->component_type);
 
-    ARRAY_PUSH(u8, build, (u8 *) &res, sizeof(struct entity_resource));
+    ARRAY_PUSH(uint8_t, build, (uint8_t *) &res, sizeof(struct entity_resource));
 
     //write parents
     for (int i = 0; i < res.ent_count; ++i) {
-        u32 id = MAP_GET(u32, &output->entity_parent, i, UINT32_MAX);
+        uint32_t id = MAP_GET(uint32_t, &output->entity_parent, i, UINT32_MAX);
 
-        ARRAY_PUSH(u8, build, (u8 *) &id, sizeof(id));
+        ARRAY_PUSH(uint8_t, build, (uint8_t *) &id, sizeof(id));
     }
 
     //write comp types
-    ARRAY_PUSH(u8, build, (u8 *) ARRAY_BEGIN(&output->component_type),
-               sizeof(u64) * ARRAY_SIZE(&output->component_type));
+    ARRAY_PUSH(uint8_t, build, (uint8_t *) ARRAY_BEGIN(&output->component_type),
+               sizeof(uint64_t) * ARRAY_SIZE(&output->component_type));
 
     //write comp data
     for (int j = 0; j < res.comp_type_count; ++j) {
-        u64 cid = ARRAY_AT(&output->component_type, j);
+        uint64_t cid = ARRAY_AT(&output->component_type, j);
         stringid64_t id = {.id = cid};
 
-        ARRAY_T(u32) *ent_arr = MAP_GET_PTR(array_u32, &output->component_ent,
+        ARRAY_T(uint32_t) *ent_arr = MAP_GET_PTR(array_uint32_t, &output->component_ent,
                                             cid);
 
         struct component_data cdata = {
@@ -348,8 +348,8 @@ void entity_compiler_write_to_build(struct entity_compile_output *output,
 
         ARRAY_T(yaml_node_t) *body = MAP_GET_PTR(array_yaml_node_t,
                                                  &output->component_body, cid);
-        ARRAY_T(u8) comp_data = {0};
-        ARRAY_INIT(u8, &comp_data, MemSysApiV0.main_allocator());
+        ARRAY_T(uint8_t) comp_data = {0};
+        ARRAY_INIT(uint8_t, &comp_data, MemSysApiV0.main_allocator());
 
         for (int i = 0; i < cdata.ent_count; ++i) {
             ComponentSystemApiV0.component_compile(id, ARRAY_AT(body, i),
@@ -358,19 +358,19 @@ void entity_compiler_write_to_build(struct entity_compile_output *output,
 
         cdata.size = ARRAY_SIZE(&comp_data);
 
-        ARRAY_PUSH(u8, build, (u8 *) &cdata, sizeof(cdata));
-        ARRAY_PUSH(u8, build, (u8 *) ARRAY_BEGIN(ent_arr),
-                   sizeof(u32) * cdata.ent_count);
-        ARRAY_PUSH(u8, build, ARRAY_BEGIN(&comp_data),
-                   sizeof(u8) * ARRAY_SIZE(&comp_data));
+        ARRAY_PUSH(uint8_t, build, (uint8_t *) &cdata, sizeof(cdata));
+        ARRAY_PUSH(uint8_t, build, (uint8_t *) ARRAY_BEGIN(ent_arr),
+                   sizeof(uint32_t) * cdata.ent_count);
+        ARRAY_PUSH(uint8_t, build, ARRAY_BEGIN(&comp_data),
+                   sizeof(uint8_t) * ARRAY_SIZE(&comp_data));
 
-        ARRAY_DESTROY(u8, &comp_data);
+        ARRAY_DESTROY(uint8_t, &comp_data);
     }
 }
 
 void entity_resource_compiler(yaml_node_t root,
                             const char *filename,
-                            ARRAY_T(u8) *build,
+                            ARRAY_T(uint8_t) *build,
                             struct compilator_api *compilator_api) {
     struct entity_compile_output *output = entity_compiler_create_output();
     entity_compiler_compile_entity(output, root, filename, compilator_api);
@@ -391,16 +391,16 @@ int _entity_resource_compiler(const char *filename,
     yaml_document_t h;
     yaml_node_t root = yaml_load_str(source_data, &h);
 
-    ARRAY_T(u8) entity_data;
-    ARRAY_INIT(u8, &entity_data, MemSysApiV0.main_allocator());
+    ARRAY_T(uint8_t) entity_data;
+    ARRAY_INIT(uint8_t, &entity_data, MemSysApiV0.main_allocator());
 
     entity_resource_compiler(root, filename, &entity_data, compilator_api);
 
-    cel_vio_write(build_vio, &ARRAY_AT(&entity_data, 0), sizeof(u8),
+    cel_vio_write(build_vio, &ARRAY_AT(&entity_data, 0), sizeof(uint8_t),
                   ARRAY_SIZE(&entity_data));
 
 
-    ARRAY_DESTROY(u8, &entity_data);
+    ARRAY_DESTROY(uint8_t, &entity_data);
     return 1;
 }
 
@@ -411,7 +411,7 @@ int _entity_resource_compiler(const char *filename,
 
 void *entity_resource_loader(struct vio *input,
                            struct cel_allocator *allocator) {
-    const i64 size = cel_vio_size(input);
+    const int64_t size = cel_vio_size(input);
     char *data = CEL_ALLOCATE(allocator, char, size);
     cel_vio_read(input, data, 1, size);
 
@@ -463,20 +463,20 @@ static void _init(get_api_fce_t get_engine_api) {
 
     _G.type = stringid64_from_string("entity");
 
-    MAP_INIT(u32, &_G.spawned_map, MemSysApiV0.main_allocator());
+    MAP_INIT(uint32_t, &_G.spawned_map, MemSysApiV0.main_allocator());
     ARRAY_INIT(array_entity_t, &_G.spawned_array, MemSysApiV0.main_allocator());
 
     ResourceApiV0.register_type(_G.type, entity_resource_callback);
     ResourceApiV0.compiler_register(_G.type, _entity_resource_compiler);
 
-    handlerid_init(&_G.entity_handler, MemSysApiV0.main_allocator());
+    _G.entity_handler = handlerid_create(MemSysApiV0.main_allocator());
 }
 
 static void _shutdown() {
-    MAP_DESTROY(u32, &_G.spawned_map);
+    MAP_DESTROY(uint32_t, &_G.spawned_map);
     ARRAY_DESTROY(array_entity_t, &_G.spawned_array);
 
-    handlerid_destroy(&_G.entity_handler);
+    handlerid_destroy(_G.entity_handler);
     _G = (struct G) {0};
 }
 
@@ -485,15 +485,15 @@ static void _shutdown() {
 //==============================================================================
 
 entity_t entity_manager_create() {
-    return (entity_t) {.idx = handlerid_handler_create(&_G.entity_handler).h};
+    return (entity_t) {.idx = handlerid_handler_create(_G.entity_handler).h};
 }
 
 void entity_manager_destroy(entity_t entity) {
-    handlerid_handler_destroy(&_G.entity_handler, entity.h);
+    handlerid_handler_destroy(_G.entity_handler, entity.h);
 }
 
 int entity_manager_alive(entity_t entity) {
-    return handlerid_handler_alive(&_G.entity_handler, entity.h);
+    return handlerid_handler_alive(_G.entity_handler, entity.h);
 }
 
 
@@ -501,7 +501,7 @@ ARRAY_T(entity_t) *entity_spawn_from_resource(world_t world,
                                             void *resource) {
     struct entity_resource *res = resource;
 
-    u32 idx = _new_spawned_array();
+    uint32_t idx = _new_spawned_array();
     ARRAY_T(entity_t) *spawned = _get_spawned_array_by_idx(idx);
 
     for (int j = 0; j < res->ent_count; ++j) {
@@ -511,14 +511,14 @@ ARRAY_T(entity_t) *entity_spawn_from_resource(world_t world,
 
     entity_t root = ARRAY_AT(spawned, 0);
 
-    u32 *parents = entity_resource_parents(res);
-    u64 *comp_types = entity_resource_comp_types(res);
+    uint32_t *parents = entity_resource_parents(res);
+    uint64_t *comp_types = entity_resource_comp_types(res);
 
     struct component_data *comp_data = entity_resource_comp_data(res);
     for (int i = 0; i < res->comp_type_count; ++i) {
         stringid64_t type = {.id = comp_types[i]};
 
-        u32 *c_ent = component_data_ent(comp_data);
+        uint32_t *c_ent = component_data_ent(comp_data);
         char *c_data = component_data_data(comp_data);
         ComponentSystemApiV0.component_spawn(world, type, &ARRAY_AT(spawned, 0),
                                              c_ent, parents, comp_data->ent_count,
@@ -548,7 +548,7 @@ entity_t entity_spawn(world_t world,
 
 void entity_destroy(world_t world,
                   entity_t *entity,
-                  u32 count) {
+                  uint32_t count) {
 
     for (int i = 0; i < count; ++i) {
         ARRAY_T(entity_t) *spawned = _get_spawned_array(entity[i]);

@@ -1,3 +1,5 @@
+#include <stddef.h>
+#include <celib/allocator.h>
 
 #include <cetech/world/world.h>
 #include <cetech/application/private/module.h>
@@ -21,7 +23,7 @@ static int _world_destroy(lua_State *l) {
 
 static int _world_update(lua_State *l) {
     world_t world = {.h = luasys_to_handler(l, 1)};
-    float dt = luasys_to_f32(l, 2);
+    float dt = luasys_to_float(l, 2);
     WorldApiV0.update(world, dt);
     return 0;
 }

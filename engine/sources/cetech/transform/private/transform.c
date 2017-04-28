@@ -1,9 +1,9 @@
-#include <celib/containers/array.h>
-#include <celib/yaml/yaml.h>
+#include <celib/array.inl>
+#include <celib/yaml.h>
 #include <cetech/entity/entity.h>
 #include <cetech/component/component.h>
-#include <celib/math/quatf.h>
-#include <celib/math/mat44f.h>
+#include <celib/math_quatf.h>
+#include <celib/math_mat44f.inl>
 #include <cetech/transform/transform.h>
 #include <cetech/memory/memory.h>
 #include <cetech/module/module.h>
@@ -24,11 +24,11 @@ ARRAY_PROTOTYPE(cel_mat44f_t)
 ARRAY_PROTOTYPE(cel_quatf_t)
 
 typedef struct {
-    MAP_T(u32) ent_idx_map;
+    MAP_T(uint32_t) ent_idx_map;
 
-    ARRAY_T(u32) first_child;
-    ARRAY_T(u32) next_sibling;
-    ARRAY_T(u32) parent;
+    ARRAY_T(uint32_t) first_child;
+    ARRAY_T(uint32_t) next_sibling;
+    ARRAY_T(uint32_t) parent;
 
     ARRAY_T(cel_vec3f_t) position;
     ARRAY_T(cel_quatf_t) rotation;
@@ -107,11 +107,11 @@ void transform_link(world_t world,
 static void _new_world(world_t world) {
     world_data_t data = {0};
 
-    MAP_INIT(u32, &data.ent_idx_map, MemSysApiV0.main_allocator());
+    MAP_INIT(uint32_t, &data.ent_idx_map, MemSysApiV0.main_allocator());
 
-    ARRAY_INIT(u32, &data.first_child, MemSysApiV0.main_allocator());
-    ARRAY_INIT(u32, &data.next_sibling, MemSysApiV0.main_allocator());
-    ARRAY_INIT(u32, &data.parent, MemSysApiV0.main_allocator());
+    ARRAY_INIT(uint32_t, &data.first_child, MemSysApiV0.main_allocator());
+    ARRAY_INIT(uint32_t, &data.next_sibling, MemSysApiV0.main_allocator());
+    ARRAY_INIT(uint32_t, &data.parent, MemSysApiV0.main_allocator());
 
     ARRAY_INIT(cel_vec3f_t, &data.position, MemSysApiV0.main_allocator());
     ARRAY_INIT(cel_quatf_t, &data.rotation, MemSysApiV0.main_allocator());
@@ -128,11 +128,11 @@ static world_data_t *_get_world_data(world_t world) {
 static void _destroy_world(world_t world) {
     world_data_t *data = _get_world_data(world);
 
-    MAP_DESTROY(u32, &data->ent_idx_map);
+    MAP_DESTROY(uint32_t, &data->ent_idx_map);
 
-    ARRAY_DESTROY(u32, &data->first_child);
-    ARRAY_DESTROY(u32, &data->next_sibling);
-    ARRAY_DESTROY(u32, &data->parent);
+    ARRAY_DESTROY(uint32_t, &data->first_child);
+    ARRAY_DESTROY(uint32_t, &data->next_sibling);
+    ARRAY_DESTROY(uint32_t, &data->parent);
 
     ARRAY_DESTROY(cel_vec3f_t, &data->position);
     ARRAY_DESTROY(cel_quatf_t, &data->rotation);
@@ -141,7 +141,7 @@ static void _destroy_world(world_t world) {
 }
 
 int _transform_component_compiler(yaml_node_t body,
-                                  ARRAY_T(u8) *data) {
+                                  ARRAY_T(uint8_t) *data) {
 
     struct transform_data t_data;
 
@@ -155,7 +155,7 @@ int _transform_component_compiler(yaml_node_t body,
         cel_vec3f_t v_rad = {0};
 
         cel_vec3f_t v = yaml_as_cel_vec3f_t(rotation);
-        cel_vec3f_mul(&v_rad, &v, CEL_F32_TORAD);
+        cel_vec3f_mul(&v_rad, &v, CEL_float_TORAD);
 
         cel_quatf_from_euler(&t_data.rotation, v_rad.x, v_rad.y, v_rad.z);
 
@@ -163,7 +163,7 @@ int _transform_component_compiler(yaml_node_t body,
     };
 
 
-    ARRAY_PUSH(u8, data, (u8 *) &t_data, sizeof(t_data));
+    ARRAY_PUSH(uint8_t, data, (uint8_t *) &t_data, sizeof(t_data));
 
     return 1;
 }
@@ -184,15 +184,15 @@ static void _destroyer(world_t world,
     // TODO: remove from arrays, swap idx -> last AND change size
     for (int i = 0; i < ent_count; i++) {
         CEL_ASSERT("transform",
-                   MAP_HAS(u32, &world_data->ent_idx_map, ents[i].idx));
-        MAP_REMOVE(u32, &world_data->ent_idx_map, ents[i].idx);
+                   MAP_HAS(uint32_t, &world_data->ent_idx_map, ents[i].idx));
+        MAP_REMOVE(uint32_t, &world_data->ent_idx_map, ents[i].idx);
     }
 }
 
 static void _spawner(world_t world,
                      entity_t *ents,
-                     u32 *cents,
-                     u32 *ents_parent,
+                     uint32_t *cents,
+                     uint32_t *ents_parent,
                      size_t ent_count,
                      void *data) {
     struct transform_data *tdata = data;
@@ -339,7 +339,7 @@ void transform_transform(world_t world,
     cel_mat44f_mul(&ARRAY_AT(&world_data->world_matrix, transform.idx), &m,
                    parent);
 
-    u32 child = ARRAY_AT(&world_data->first_child, transform.idx);
+    uint32_t child = ARRAY_AT(&world_data->first_child, transform.idx);
 
     transform_t child_transform = {.idx = child};
 
@@ -384,7 +384,7 @@ void transform_set_position(world_t world,
                             transform_t transform,
                             cel_vec3f_t pos) {
     world_data_t *world_data = _get_world_data(world);
-    u32 parent_idx = ARRAY_AT(&world_data->parent, transform.idx);
+    uint32_t parent_idx = ARRAY_AT(&world_data->parent, transform.idx);
 
     transform_t pt = {.idx = parent_idx};
 
@@ -402,7 +402,7 @@ void transform_set_rotation(world_t world,
                             transform_t transform,
                             cel_quatf_t rot) {
     world_data_t *world_data = _get_world_data(world);
-    u32 parent_idx = ARRAY_AT(&world_data->parent, transform.idx);
+    uint32_t parent_idx = ARRAY_AT(&world_data->parent, transform.idx);
 
     transform_t pt = {.idx = parent_idx};
 
@@ -423,7 +423,7 @@ void transform_set_scale(world_t world,
                          transform_t transform,
                          cel_vec3f_t scale) {
     world_data_t *world_data = _get_world_data(world);
-    u32 parent_idx = ARRAY_AT(&world_data->parent, transform.idx);
+    uint32_t parent_idx = ARRAY_AT(&world_data->parent, transform.idx);
 
     transform_t pt = {.idx = parent_idx};
 
@@ -440,14 +440,14 @@ void transform_set_scale(world_t world,
 int transform_has(world_t world,
                   entity_t entity) {
     world_data_t *world_data = _get_world_data(world);
-    return MAP_HAS(u32, &world_data->ent_idx_map, entity.h.h);
+    return MAP_HAS(uint32_t, &world_data->ent_idx_map, entity.h.h);
 }
 
 transform_t transform_get(world_t world,
                           entity_t entity) {
 
     world_data_t *world_data = _get_world_data(world);
-    u32 idx = MAP_GET(u32, &world_data->ent_idx_map, entity.h.h, UINT32_MAX);
+    uint32_t idx = MAP_GET(uint32_t, &world_data->ent_idx_map, entity.h.h, UINT32_MAX);
     return (transform_t) {.idx = idx};
 }
 
@@ -460,15 +460,15 @@ transform_t transform_create(world_t world,
 
     world_data_t *data = _get_world_data(world);
 
-    u32 idx = (u32) ARRAY_SIZE(&data->position);
+    uint32_t idx = (uint32_t) ARRAY_SIZE(&data->position);
 
     ARRAY_PUSH_BACK(cel_vec3f_t, &data->position, position);
     ARRAY_PUSH_BACK(cel_quatf_t, &data->rotation, rotation);
     ARRAY_PUSH_BACK(cel_vec3f_t, &data->scale, scale);
 
-    ARRAY_PUSH_BACK(u32, &data->parent, UINT32_MAX);
-    ARRAY_PUSH_BACK(u32, &data->first_child, UINT32_MAX);
-    ARRAY_PUSH_BACK(u32, &data->next_sibling, UINT32_MAX);
+    ARRAY_PUSH_BACK(uint32_t, &data->parent, UINT32_MAX);
+    ARRAY_PUSH_BACK(uint32_t, &data->first_child, UINT32_MAX);
+    ARRAY_PUSH_BACK(uint32_t, &data->next_sibling, UINT32_MAX);
 
     cel_mat44f_t m = MAT44F_INIT_IDENTITY;
     ARRAY_PUSH_BACK(cel_mat44f_t, &data->world_matrix, m);
@@ -479,10 +479,10 @@ transform_t transform_create(world_t world,
                                 world, transform_get(world, parent))
                                                  : &m);
 
-    MAP_SET(u32, &data->ent_idx_map, entity.h.h, idx);
+    MAP_SET(uint32_t, &data->ent_idx_map, entity.h.h, idx);
 
     if (parent.h.h != UINT32_MAX) {
-        u32 parent_idx = MAP_GET(u32, &data->ent_idx_map, parent.h.h,
+        uint32_t parent_idx = MAP_GET(uint32_t, &data->ent_idx_map, parent.h.h,
                                  UINT32_MAX);
 
         ARRAY_AT(&data->parent, idx) = parent_idx;
@@ -490,7 +490,7 @@ transform_t transform_create(world_t world,
         if (ARRAY_AT(&data->first_child, parent_idx) == UINT32_MAX) {
             ARRAY_AT(&data->first_child, parent_idx) = idx;
         } else {
-            u32 first_child_idx = ARRAY_AT(&data->first_child, parent_idx);
+            uint32_t first_child_idx = ARRAY_AT(&data->first_child, parent_idx);
             ARRAY_AT(&data->first_child, parent_idx) = idx;
             ARRAY_AT(&data->next_sibling, idx) = first_child_idx;
         }
@@ -513,7 +513,7 @@ void transform_link(world_t world,
 
     ARRAY_AT(&data->parent, child_tr.idx) = parent_tr.idx;
 
-    u32 tmp = ARRAY_AT(&data->first_child, parent_tr.idx);
+    uint32_t tmp = ARRAY_AT(&data->first_child, parent_tr.idx);
 
     ARRAY_AT(&data->first_child, parent_tr.idx) = child_tr.idx;
     ARRAY_AT(&data->next_sibling, child_tr.idx) = tmp;

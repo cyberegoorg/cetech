@@ -4,9 +4,10 @@
 
 #include <bgfx/c99/bgfx.h>
 
-#include <celib/string/stringid.h>
-#include "celib/containers/map.h"
-#include "celib/filesystem/vio.h"
+#include <celib/allocator.h>
+#include <celib/stringid.h>
+#include <celib/map.inl>
+#include <celib/vio.h>
 #include <cetech/memory/memory.h>
 #include <cetech/application/private/module.h>
 #include <cetech/resource/resource.h>
@@ -21,7 +22,7 @@ ARRAY_PROTOTYPE(bgfx_texture_handle_t)
 MAP_PROTOTYPE(bgfx_texture_handle_t)
 
 struct texture {
-    u64 size;
+    uint64_t size;
 };
 
 

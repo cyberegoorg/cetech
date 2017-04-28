@@ -3,10 +3,11 @@
 //==============================================================================
 
 #include <include/mpack/mpack.h>
-#include <celib/string/stringid.h>
-#include <celib/filesystem/vio.h>
-#include <celib/math/types.h>
-#include <celib/math/vec2f.h>
+#include <celib/allocator.h>
+#include <celib/stringid.h>
+#include <celib/vio.h>
+#include <celib/math_types.h>
+#include <celib/math_vec2f.inl>
 
 #include <cetech/develop/develop.h>
 #include <cetech/application/private/module.h>
@@ -35,8 +36,8 @@ IMPORT_API(ConsoleServerApi, 0);
 //==============================================================================
 
 struct lua_resource {
-    u32 version;
-    u32 size;
+    uint32_t version;
+    uint32_t size;
 };
 
 #define _G LuaGlobals
@@ -45,11 +46,11 @@ static struct G {
     lua_State *L;
     stringid64_t type_id;
 
-    u32 _temp_cel_vec2f_used;
-    u32 _temp_cel_vec3f_used;
-    u32 _temp_cel_vec4f_used;
-    u32 _temp_cel_mat44f_used;
-    u32 _temp_quat_used;
+    uint32_t _temp_cel_vec2f_used;
+    uint32_t _temp_cel_vec3f_used;
+    uint32_t _temp_cel_vec4f_used;
+    uint32_t _temp_cel_mat44f_used;
+    uint32_t _temp_quat_used;
 
     cel_vec2f_t _temp_cel_vec2f_buffer[TEMP_VAR_COUNT];
     cel_vec3f_t _temp_cel_vec3f_buffer[TEMP_VAR_COUNT];
@@ -399,8 +400,8 @@ void luasys_push_int(lua_State *_L,
     lua_pushinteger(_L, value);
 }
 
-void luasys_push_u64(lua_State *_L,
-                     u64 value) {
+void luasys_push_uint64_t(lua_State *_L,
+                     uint64_t value) {
     lua_pushinteger(_L, value);
 }
 
@@ -441,9 +442,9 @@ u64 luasys_to_u64(lua_State *_L,
 }
 
 
-f32 luasys_to_f32(lua_State *_L,
+float luasys_to_float(lua_State *_L,
                   int i) {
-    return (f32) lua_tonumber(_L, i);
+    return (float) lua_tonumber(_L, i);
 }
 
 handler_t luasys_to_handler(lua_State *l,
@@ -872,7 +873,7 @@ void luasys_call_global(const char *func,
         while (*it != '\0') {
             switch (*it) {
                 case 'i':
-                    luasys_push_int(_state, va_arg(vl, i32));
+                    luasys_push_int(_state, va_arg(vl, int32_t));
                     break;
 
 //                case 'u':
@@ -929,7 +930,7 @@ void *luasys_get_module_api(int api,
                     api.is_number = luasys_is_number;
                     api.value_type = luasys_value_type;
                     api.push_nil = luasys_push_nil;
-                    api.push_u64 = luasys_push_u64;
+                    api.push_uint64_t = luasys_push_uint64_t;
                     api.push_handler = luasys_push_handler;
                     api.push_int = luasys_push_int;
                     api.push_bool = luasys_push_bool;
@@ -937,7 +938,7 @@ void *luasys_get_module_api(int api,
                     api.push_string = luasys_push_string;
                     api.to_bool = luasys_to_bool;
                     api.to_int = luasys_to_int;
-                    api.to_f32 = luasys_to_f32;
+                    api.to_float = luasys_to_float;
                     api.to_handler = luasys_to_handler;
                     api.to_string = luasys_to_string;
                     api.to_string_l = luasys_to_string_l;

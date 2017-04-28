@@ -1,5 +1,5 @@
 
-#include <celib/math/mat44f.h>
+#include <celib/math_mat44f.inl>
 
 #include "../luasys.h"
 #include <cetech/module/module.h>
@@ -44,7 +44,7 @@ static int _scale(lua_State *l) {
 
 static int _rotate_x(lua_State *l) {
     cel_mat44f_t m = {0};
-    f32 x = luasys_to_f32(l, 1);
+    float x = luasys_to_float(l, 1);
 
     cel_mat44f_rotate_x(&m, x);
 
@@ -54,7 +54,7 @@ static int _rotate_x(lua_State *l) {
 
 static int _rotate_y(lua_State *l) {
     cel_mat44f_t m = {0};
-    f32 y = luasys_to_f32(l, 1);
+    float y = luasys_to_float(l, 1);
 
     cel_mat44f_rotate_y(&m, y);
 
@@ -64,7 +64,7 @@ static int _rotate_y(lua_State *l) {
 
 static int _rotate_z(lua_State *l) {
     cel_mat44f_t m = {0};
-    f32 z = luasys_to_f32(l, 1);
+    float z = luasys_to_float(l, 1);
 
     cel_mat44f_rotate_z(&m, z);
 
@@ -74,8 +74,8 @@ static int _rotate_z(lua_State *l) {
 
 static int _rotate_xy(lua_State *l) {
     cel_mat44f_t m = {0};
-    f32 x = luasys_to_f32(l, 1);
-    f32 y = luasys_to_f32(l, 2);
+    float x = luasys_to_float(l, 1);
+    float y = luasys_to_float(l, 2);
 
     cel_mat44f_rotate_xy(&m, x, y);
 
@@ -85,9 +85,9 @@ static int _rotate_xy(lua_State *l) {
 
 static int _rotate_xyz(lua_State *l) {
     cel_mat44f_t m = {0};
-    f32 x = luasys_to_f32(l, 1);
-    f32 y = luasys_to_f32(l, 2);
-    f32 z = luasys_to_f32(l, 3);
+    float x = luasys_to_float(l, 1);
+    float y = luasys_to_float(l, 2);
+    float z = luasys_to_float(l, 3);
 
     cel_mat44f_rotate_xyz(&m, x, y, z);
 
@@ -97,9 +97,9 @@ static int _rotate_xyz(lua_State *l) {
 
 static int _rotate_zyx(lua_State *l) {
     cel_mat44f_t m = {0};
-    f32 x = luasys_to_f32(l, 1);
-    f32 y = luasys_to_f32(l, 2);
-    f32 z = luasys_to_f32(l, 3);
+    float x = luasys_to_float(l, 1);
+    float y = luasys_to_float(l, 2);
+    float z = luasys_to_float(l, 3);
 
     cel_mat44f_rotate_zyx(&m, x, y, z);
 
@@ -120,10 +120,10 @@ static int _transpose(lua_State *l) {
 static int _perspective_fov(lua_State *l) {
     cel_mat44f_t m = {0};
 
-    f32 fov = luasys_to_f32(l, 1);
-    f32 ar = luasys_to_f32(l, 2);
-    f32 near = luasys_to_f32(l, 3);
-    f32 far = luasys_to_f32(l, 4);
+    float fov = luasys_to_float(l, 1);
+    float ar = luasys_to_float(l, 2);
+    float near = luasys_to_float(l, 3);
+    float far = luasys_to_float(l, 4);
 
     cel_mat44f_set_perspective_fov(&m, fov, ar, near, far);
 

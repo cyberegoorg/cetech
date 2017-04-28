@@ -2,14 +2,16 @@
 // includes
 //==============================================================================
 
-#include <celib/math/types.h>
+#include <celib/math_types.h>
+#include <celib/allocator.h>
+
 #include <cetech/camera/camera.h>
 #include <cetech/renderer/renderer.h>
 #include <cetech/develop/develop.h>
 #include <cetech/application/application.h>
 #include <cetech/config/config.h>
 #include <cetech/module/module.h>
-#include "celib/window/window.h"
+#include "celib/window.h"
 
 #include "bgfx/c99/platform.h"
 #include <cetech/renderer/private/texture/texture.h>
@@ -31,8 +33,8 @@ IMPORT_API(ApplicationApi, 0);
 #define _G RendererGlobals
 static struct G {
     stringid64_t type;
-    u32 size_width;
-    u32 size_height;
+    uint32_t size_width;
+    uint32_t size_height;
     int capture;
     int vsync;
     int need_reset;
@@ -47,7 +49,7 @@ void material_shutdown();
 // Private
 //==============================================================================
 
-static u32 _get_reset_flags() {
+static uint32_t _get_reset_flags() {
     return (_G.capture ? BGFX_RESET_CAPTURE : 0) |
            (_G.vsync ? BGFX_RESET_VSYNC : 0);
 }
@@ -61,8 +63,8 @@ static int _cmd_resize(mpack_node_t args,
     mpack_node_t width = mpack_node_map_cstr(args, "width");
     mpack_node_t height = mpack_node_map_cstr(args, "height");
 
-    _G.size_width = (u32) mpack_node_int(width);
-    _G.size_height = (u32) mpack_node_int(height);
+    _G.size_width = (uint32_t) mpack_node_int(width);
+    _G.size_height = (uint32_t) mpack_node_int(height);
     _G.need_reset = 1;
 
     return 0;

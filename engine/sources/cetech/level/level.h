@@ -8,7 +8,7 @@
 //==============================================================================
 
 #include <celib/types.h>
-#include <celib/string/stringid.h>
+#include <celib/stringid.h>
 #include <cetech/world/world.h>
 #include <cetech/entity/entity.h>
 
@@ -19,7 +19,7 @@
 
 //! Level idx
 typedef struct {
-    u32 idx;
+    uint32_t idx;
 } level_t;
 
 

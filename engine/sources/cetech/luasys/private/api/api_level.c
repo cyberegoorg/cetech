@@ -1,4 +1,6 @@
+#include <stddef.h>
 
+#include <celib/allocator.h>
 #include <cetech/level/level.h>
 #include <cetech/application/private/module.h>
 

@@ -1,4 +1,7 @@
+#include <stddef.h>
+#include <celib/allocator.h>
 #include <cetech/module/module.h>
+#include <celib/log.h>
 #include "../luasys.h"
 
 #define API_NAME "Log"
@@ -26,7 +29,7 @@ static int _log_format(lua_State *l,
         switch (frmt[i]) {
             case 'f':
                 n = snprintf(buffer_it, buffer_write_len, "%f",
-                             luasys_to_f32(l, arg_idx));
+                             luasys_to_float(l, arg_idx));
                 buffer_it += n;
                 ++arg_idx;
                 break;

@@ -9,7 +9,7 @@
 //==============================================================================
 
 #include <stdio.h>
-#include <celib/os/cmd_line.h>
+#include <celib/cmd_line.h>
 #include "celib/types.h"
 
 //==============================================================================
@@ -18,7 +18,7 @@
 
 //! Cvar type
 typedef struct {
-    u64 idx; //!< Idx
+    uint64_t idx; //!< Idx
 } cvar_t;
 
 

@@ -1,16 +1,16 @@
 #ifndef CETECH_MATERIAL_BLOB_H
 #define CETECH_MATERIAL_BLOB_H
 
-#include <celib/string/stringid.h>
-#include <celib/math/types.h>
+#include <celib/stringid.h>
+#include <celib/math_types.h>
 
 typedef struct material_blob {
     stringid64_t shader_name;
-    u32 uniforms_count;
-    u32 texture_count;
-    u32 vec4f_count;
-    u32 mat33f_count;
-    u32 mat44f_count;
+    uint32_t uniforms_count;
+    uint32_t texture_count;
+    uint32_t vec4f_count;
+    uint32_t mat33f_count;
+    uint32_t mat44f_count;
     // char[32] uniform_names[uniforms_count];
     // stringid64_t texture_names[texture_count];
     // cel_vec4f_t vec4f_value[vec4f_count];

@@ -5,9 +5,9 @@
 // Includes
 //==============================================================================
 
-#include "celib/math/types.h"
-#include "celib/thread/types.h"
-#include "celib/containers/eventstream.h"
+#include "celib/math_types.h"
+#include "celib/thread.h"
+#include "celib/eventstream.h"
 #include <cetech/application/private/module.h>
 
 //==============================================================================
@@ -366,7 +366,7 @@ enum key {
 //! Mouse button status
 struct mouse_event {
     struct event_header h; //!< Event header
-    u32 button;            //!< Button state
+    uint32_t button;            //!< Button state
 };
 
 struct mouse_move_event {
@@ -377,29 +377,29 @@ struct mouse_move_event {
 //! Keyboard event
 struct keyboard_event {
     struct event_header h; //!< Event header
-    u32 keycode; //!< Key code
+    uint32_t keycode; //!< Key code
 };
 
 
 //! Gamepad move event
 struct gamepad_move_event {
     struct event_header h; //!< Event header
-    u8 gamepad_id;         //!< Gamepad id
-    u32 axis;              //!< Axis id
+    uint8_t gamepad_id;         //!< Gamepad id
+    uint32_t axis;              //!< Axis id
     cel_vec2f_t position;  //!< Position
 };
 
 //! Gamepad button event
 struct gamepad_btn_event {
     struct event_header h; //!< Event header
-    u8 gamepad_id;         //!< Gamepad id
-    u32 button;            //!< Button state
+    uint8_t gamepad_id;         //!< Gamepad id
+    uint32_t button;            //!< Button state
 };
 
 //! Gamepad device event
 struct gamepad_device_event {
     struct event_header h; //!< Event header
-    u8 gamepad_id;         //!< Gamepad id
+    uint8_t gamepad_id;         //!< Gamepad id
 };
 
 //==============================================================================
@@ -433,7 +433,7 @@ struct MachineApiV0 {
     //! \param length
     void (*gamepad_play_rumble)(int gamepad,
                                 float strength,
-                                u32 length);
+                                uint32_t length);
 };
 
 #endif //CELIB_MACHINE_H

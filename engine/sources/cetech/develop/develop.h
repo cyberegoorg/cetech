@@ -11,7 +11,7 @@
 #include "include/mpack/mpack.h"
 
 #include "celib/types.h"
-#include "celib/containers/eventstream.h"
+#include "celib/eventstream.h"
 
 //==============================================================================
 // Typedefs
@@ -65,7 +65,7 @@ struct record_float_event {
 struct record_int_event {
     struct event_header header; //!< Event header
     char name[64];              //!< Entry name
-    i32 value;                  //!< Entry value
+    int32_t value;                  //!< Entry value
 };
 
 //! Scope event struct
@@ -74,15 +74,15 @@ struct scope_event {
     char name[64];              //!< Scope name
     time_t start;               //!< Scope create time
     float duration;             //!< Scope duration
-    u32 depth;                  //!< Scope depth
-    u32 worker_id;              //!< Worker id
+    uint32_t depth;                  //!< Scope depth
+    uint32_t worker_id;              //!< Worker id
 };
 
 //! Scope data struct
 struct scope_data {
     const char *name; //!< Scope name
     time_t start;     //!< Start time
-    u64 start_timer;  //!< Timer
+    uint64_t start_timer;  //!< Timer
 };
 
 //==============================================================================
@@ -97,8 +97,8 @@ struct DevelopSystemApiV0 {
     //! \param type Event type
     //! \param size Event size
     void (*push)(struct event_header *header,
-                 u32 type,
-                 u64 size);
+                 uint32_t type,
+                 uint64_t size);
 
     //! Push float value
     //! \param name Value name

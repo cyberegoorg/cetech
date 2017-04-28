@@ -3,7 +3,7 @@
 //==============================================================================
 
 #include <include/SDL2/SDL.h>
-#include <celib/math/types.h>
+#include <celib/math_types.h>
 #include <cetech/module/module.h>
 #include <cetech/machine/machine.h>
 
@@ -20,7 +20,7 @@
 //==============================================================================
 
 static struct G {
-    //u8 state[MOUSE_BTN_MAX];
+    //uint8_t state[MOUSE_BTN_MAX];
     //int position[2];
 
     SDL_GameController *controller[GAMEPAD_MAX];
@@ -139,14 +139,14 @@ void sdl_gamepad_process(struct eventstream *stream) {
         }
 
         for (int j = 0; j < GAMEPAD_AXIX_MAX; ++j) {
-            i16 x = SDL_GameControllerGetAxis(_G.controller[i],
+            int16_t x = SDL_GameControllerGetAxis(_G.controller[i],
                                               _axis_to_sdl[j][0]);
-            i16 y = SDL_GameControllerGetAxis(_G.controller[i],
+            int16_t y = SDL_GameControllerGetAxis(_G.controller[i],
                                               _axis_to_sdl[j][1]);
 
-            f32 coef = 1.0f / INT16_MAX;
-            f32 x_norm = x * coef;
-            f32 y_norm = y * coef;
+            float coef = 1.0f / INT16_MAX;
+            float x_norm = x * coef;
+            float y_norm = y * coef;
 
             curent_pos[i][j] = (cel_vec2f_t) {
                     .x = x_norm,
@@ -240,7 +240,7 @@ int machine_gamepad_is_active(int idx) {
 
 void machine_gamepad_play_rumble(int gamepad,
                                  float strength,
-                                 u32 length) {
+                                 uint32_t length) {
     SDL_Haptic *h = _G.haptic[gamepad];
 
     SDL_HapticRumblePlay(h, strength, length);
