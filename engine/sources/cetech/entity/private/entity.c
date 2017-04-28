@@ -2,7 +2,7 @@
 // Includes
 //==============================================================================
 
-#include "celib/map.inl"
+#include "cetech/containers/map.inl"
 #include <cetech/memory/memory.h>
 #include <cetech/module/module.h>
 #include <cetech/resource/resource.h>
@@ -10,8 +10,8 @@
 
 #include <cetech/world/world.h>
 #include <cetech/entity/entity.h>
-#include <celib/path.h>
-#include <celib/vio.h>
+#include <cetech/os/path.h>
+#include <cetech/filesystem/vio.h>
 
 //==============================================================================
 // Globals

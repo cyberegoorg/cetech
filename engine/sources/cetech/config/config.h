@@ -9,8 +9,8 @@
 //==============================================================================
 
 #include <stdio.h>
-#include <celib/cmd_line.h>
-#include "celib/types.h"
+#include <cetech/os/cmd_line.h>
+#include "cetech/types.h"
 
 //==============================================================================
 // Typedefs

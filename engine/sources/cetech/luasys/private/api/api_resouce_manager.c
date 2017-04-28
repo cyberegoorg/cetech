@@ -1,6 +1,6 @@
 #include <stddef.h>
-#include "celib/allocator.h"
-#include <celib/vio.h>
+#include "cetech/memory/allocator.h"
+#include <cetech/filesystem/vio.h>
 
 #include <cetech/application/private/module.h>
 #include <cetech/resource/resource.h>

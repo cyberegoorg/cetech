@@ -2,11 +2,11 @@
 // Includes
 //==============================================================================
 
-#include <celib/math_types.h>
+#include <cetech/math/math_types.h>
 #include <cetech/input/input.h>
 #include <cetech/module/module.h>
 #include <cetech/machine/machine.h>
-#include <celib/string.h>
+#include <cetech/string/string.h>
 
 #include "gamepadstr.h"
 

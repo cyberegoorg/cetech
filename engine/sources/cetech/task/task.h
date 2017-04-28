@@ -12,7 +12,7 @@
 #include <stdlib.h>
 #include <stdatomic.h>
 
-#include "celib/thread.h"
+#include "cetech/os/thread.h"
 
 
 //==============================================================================

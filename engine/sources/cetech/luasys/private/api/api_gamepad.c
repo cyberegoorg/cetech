@@ -1,6 +1,6 @@
 #include <stddef.h>
-#include <celib/allocator.h>
-#include <celib/math_types.h>
+#include <cetech/memory/allocator.h>
+#include <cetech/math/math_types.h>
 #include <cetech/application/private/module.h>
 
 #include "../luasys.h"

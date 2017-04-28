@@ -12,7 +12,7 @@
 #include "include/nanomsg/pipeline.h"
 
 #include <cetech/develop/develop.h>
-#include <celib/string.h>
+#include <cetech/string/string.h>
 
 //==============================================================================
 // Defines

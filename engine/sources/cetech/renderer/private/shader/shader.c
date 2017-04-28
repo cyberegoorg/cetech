@@ -5,10 +5,10 @@
 
 #include <bgfx/c99/bgfx.h>
 
-#include <celib/allocator.h>
-#include <celib/stringid.h>
-#include "celib/map.inl"
-#include "celib/vio.h"
+#include <cetech/memory/allocator.h>
+#include <cetech/string/stringid.h>
+#include "cetech/containers/map.inl"
+#include "cetech/filesystem/vio.h"
 
 #include <cetech/resource/resource.h>
 #include <cetech/memory/memory.h>

@@ -3,11 +3,11 @@
 //==============================================================================
 
 #include <include/mpack/mpack.h>
-#include <celib/allocator.h>
-#include <celib/stringid.h>
-#include <celib/vio.h>
-#include <celib/math_types.h>
-#include <celib/math_vec2f.inl>
+#include <cetech/memory/allocator.h>
+#include <cetech/string/stringid.h>
+#include <cetech/filesystem/vio.h>
+#include <cetech/math/math_types.h>
+#include <cetech/math/math_vec2f.inl>
 
 #include <cetech/develop/develop.h>
 #include <cetech/application/private/module.h>

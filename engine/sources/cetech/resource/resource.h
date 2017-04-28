@@ -9,10 +9,10 @@
 //==============================================================================
 
 #include <cetech/application/application.h>
-#include "celib/stringid.h"
-#include "celib/array.inl"
-#include "celib/types.h"
-#include "celib/vio.h"
+#include "cetech/string/stringid.h"
+#include "cetech/containers/array.inl"
+#include "cetech/types.h"
+#include "cetech/filesystem/vio.h"
 #include <cetech/config/config.h>
 
 

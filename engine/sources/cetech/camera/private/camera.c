@@ -1,8 +1,8 @@
-#include <celib/array.inl>
-#include <celib/yaml.h>
-#include <celib/map.inl>
-#include <celib/math_mat44f.inl>
-#include <celib/stringid.h>
+#include <cetech/containers/array.inl>
+#include <cetech/yaml/yaml.h>
+#include <cetech/containers/map.inl>
+#include <cetech/math/math_mat44f.inl>
+#include <cetech/string/stringid.h>
 
 #include <cetech/entity/entity.h>
 #include <cetech/component/component.h>

@@ -2,8 +2,7 @@
 // Includes
 //==============================================================================
 
-#include <celib/memory.h>
-#include "celib/array.inl"
+#include "cetech/containers/array.inl"
 #include <cetech/machine/machine.h>
 #include "sdl2/sdl_parts.h"
 #include <cetech/memory/memory.h>

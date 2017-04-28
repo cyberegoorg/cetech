@@ -4,7 +4,7 @@
 
 #include <include/SDL2/SDL.h>
 #include <cetech/application/application.h>
-#include <celib/window.h>
+#include <cetech/os/window.h>
 #include <cetech/module/module.h>
 #include <cetech/machine/machine.h>
 

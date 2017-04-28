@@ -11,11 +11,11 @@
 #include "include/luajit/lauxlib.h"
 #include "include/luajit/lualib.h"
 
-#include "celib/math_types.h"
-#include <celib/stringid.h>
+#include "cetech/math/math_types.h"
+#include <cetech/string/stringid.h>
 
 #include <stdint.h>
-#include <celib/handlerid.h>
+#include <cetech/handler/handlerid.h>
 
 
 //==============================================================================

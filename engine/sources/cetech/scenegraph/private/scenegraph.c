@@ -1,7 +1,7 @@
-#include <celib/array.inl>
-#include <celib/yaml.h>
-#include <celib/math_quatf.h>
-#include <celib/math_mat44f.inl>
+#include <cetech/containers/array.inl>
+#include <cetech/yaml/yaml.h>
+#include <cetech/math/math_quatf.h>
+#include <cetech/math/math_mat44f.inl>
 
 #include <cetech/entity/entity.h>
 #include <cetech/scenegraph/scenegraph.h>

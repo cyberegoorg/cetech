@@ -4,12 +4,12 @@
 
 #include <unistd.h>
 
-#include <celib/allocator.h>
+#include <cetech/memory/allocator.h>
 
-#include <celib/time.h>
-#include <celib/window.h>
-#include <celib/stringid.h>
-#include <celib/cmd_line.h>
+#include <cetech/os/time.h>
+#include <cetech/os/window.h>
+#include <cetech/string/stringid.h>
+#include <cetech/os/cmd_line.h>
 
 #include <cetech/application/private/app.h>
 #include <cetech/config/config.h>

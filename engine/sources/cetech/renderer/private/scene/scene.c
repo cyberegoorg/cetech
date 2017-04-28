@@ -6,10 +6,10 @@
 
 #include <include/assimp/cimport.h>
 
-#include <celib/allocator.h>
-#include <celib/stringid.h>
+#include <cetech/memory/allocator.h>
+#include <cetech/string/stringid.h>
 #include <cetech/scenegraph/scenegraph.h>
-#include "celib/vio.h"
+#include "cetech/filesystem/vio.h"
 #include <cetech/memory/memory.h>
 #include <cetech/application/private/module.h>
 

@@ -74,31 +74,30 @@ set(SOURCE_FILES
         ########################################################################
         # CELIB
         ########################################################################
-        cebase/sources/celib/allocator.c
-        cebase/sources/celib/allocator_malloc.c
-        cebase/sources/celib/allocator_scratch.c
-        cebase/sources/celib/log_stdout_handler.c
-        cebase/sources/celib/log_nanomsg_handler.c
-        cebase/sources/celib/log_db_handler.c
-        cebase/sources/celib/log_system.c
-        cebase/sources/celib/vio_sdl.c
-        cebase/sources/celib/yaml.cc
-        cebase/sources/celib/log_system.c
-        cebase/sources/celib/cmd_line.c
-        cebase/sources/celib/cpu.c
-        cebase/sources/celib/filesystem.c
-        cebase/sources/celib/handler_gen.c
-        cebase/sources/celib/memory.c
-        cebase/sources/celib/object.c
-        cebase/sources/celib/path.c
-        cebase/sources/celib/process.c
-        cebase/sources/celib/stacktrace.c
-        cebase/sources/celib/string.c
-        cebase/sources/celib/stringid.c
-        cebase/sources/celib/thread.c
-        cebase/sources/celib/time.c
-        cebase/sources/celib/vio.c
-        cebase/sources/celib/window.c
+        engine/sources/cetech/memory/private/allocator.c
+        engine/sources/cetech/memory/private/allocator_malloc.c
+        engine/sources/cetech/memory/private/allocator_scratch.c
+        engine/sources/cetech/log/private/log_stdout_handler.c
+        engine/sources/cetech/log/private/log_nanomsg_handler.c
+        engine/sources/cetech/log/private/log_db_handler.c
+        engine/sources/cetech/log/private/log_system.c
+        engine/sources/cetech/filesystem/private/vio_sdl.c
+        engine/sources/cetech/yaml/private/yaml.cc
+        engine/sources/cetech/log/private/log_system.c
+        engine/sources/cetech/os/private/cmd_line.c
+        engine/sources/cetech/os/private/cpu.c
+        engine/sources/cetech/filesystem/private/fs.c
+        engine/sources/cetech/handler/private/handler_gen.c
+        engine/sources/cetech/os/private/object.c
+        engine/sources/cetech/os/private/path.c
+        engine/sources/cetech/os/private/process.c
+        engine/sources/cetech/os/private/stacktrace.c
+        engine/sources/cetech/string/private/string.c
+        engine/sources/cetech/string/private/stringid.c
+        engine/sources/cetech/os/private/thread.c
+        engine/sources/cetech/os/private/time.c
+        engine/sources/cetech/filesystem/private/vio.c
+        engine/sources/cetech/os/private/window.c
 
         ########################################################################
         # CETECH
@@ -167,7 +166,7 @@ set(SOURCE_FILES
         engine/sources/cetech/scenegraph/private/scenegraph.c
         engine/sources/cetech/camera/private/camera.c
 
-        cebase/sources/celib/hash.c)
+        engine/sources/cetech/hash/private/hash.c)
 
 ################################################################################
 # Main sources

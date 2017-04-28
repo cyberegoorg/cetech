@@ -3,21 +3,21 @@
 //==============================================================================
 
 #include <stdio.h>
-#include <celib/time.h>
-#include <celib/map.inl>
+#include <cetech/os/time.h>
+#include <cetech/containers/map.inl>
 
 #include "include/mpack/mpack.h"
 #include "include/nanomsg/nn.h"
 #include "include/nanomsg/pubsub.h"
 
-#include "celib/thread.h"
-#include "celib/eventstream.h"
+#include "cetech/os/thread.h"
+#include "cetech/containers/eventstream.h"
 #include <cetech/memory/memory.h>
 #include <cetech/module/module.h>
 
 #include <cetech/task/task.h>
 #include <cetech/develop/develop.h>
-#include <celib/string.h>
+#include <cetech/string/string.h>
 
 
 //==============================================================================

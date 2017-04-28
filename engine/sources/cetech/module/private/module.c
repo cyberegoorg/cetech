@@ -4,13 +4,13 @@
 
 #include <stdlib.h>
 #include <memory.h>
-#include <celib/object.h>
-#include <celib/filesystem.h>
-#include <celib/path.h>
+#include <cetech/os/object.h>
+#include <cetech/filesystem/fs.h>
+#include <cetech/os/path.h>
 #include <cetech/memory/memory.h>
 
 #include <cetech/application/private/module.h>
-#include <celib/string.h>
+#include <cetech/string/string.h>
 
 //==============================================================================
 // Defines

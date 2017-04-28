@@ -1,9 +1,9 @@
-#include <celib/memory.h>
-#include <celib/allocator.h>
-#include <celib/errors.h>
+#include <cetech/memory/allocator.h>
+#include <cetech/os/errors.h>
 
 #include <cetech/module/module.h>
 #include <cetech/memory/memory.h>
+#include <memory.h>
 
 #define LOG_WHERE "memory"
 
@@ -13,6 +13,40 @@ struct G {
     struct cel_allocator *default_allocator;
     struct cel_allocator *default_scratch_allocator;
 } MemorySystemGlobals = {0};
+
+
+
+void *memory_copy(void *__restrict dest,
+                  const void *__restrict src,
+                  size_t n) {
+    return memcpy(dest, src, n);
+}
+
+void *memory_set(void *__restrict dest,
+                 int c,
+                 size_t n) {
+    return memset(dest, c, n);
+}
+
+const void *pointer_align_forward(const void *p,
+                                  uint32_t align) {
+    uintptr_t pi = (uintptr_t) p;
+    const uint32_t mod = pi % align;
+    if (mod)
+        pi += (align - mod);
+    return (void *) pi;
+}
+
+const void *pointer_add(const void *p,
+                        uint32_t bytes) {
+    return (const void *) ((const char *) p + bytes);
+}
+
+
+const void *pointer_sub(const void *p,
+                        uint32_t bytes) {
+    return (const void *) ((const char *) p - bytes);
+}
 
 
 static void _init(get_api_fce_t get_engine_api) {

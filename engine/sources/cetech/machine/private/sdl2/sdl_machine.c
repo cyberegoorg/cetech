@@ -3,8 +3,8 @@
 //==============================================================================
 
 #include <include/SDL2/SDL.h>
-#include "celib/array.inl"
-#include "celib/eventstream.h"
+#include "cetech/containers/array.inl"
+#include "cetech/containers/eventstream.h"
 
 #include <cetech/module/module.h>
 #include <cetech/application/application.h>

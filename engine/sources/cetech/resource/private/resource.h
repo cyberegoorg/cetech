@@ -1,7 +1,7 @@
 #ifndef CETECH_RESOURCE_H
 #define CETECH_RESOURCE_H
 
-#include <celib/stringid.h>
+#include <cetech/string/stringid.h>
 #include <cetech/resource/resource.h>
 
 void resource_set_autoload(int enable);

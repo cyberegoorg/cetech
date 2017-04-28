@@ -1,5 +1,5 @@
 #include <stddef.h>
-#include <celib/allocator.h>
+#include <cetech/memory/allocator.h>
 #include <cetech/application/private/module.h>
 #include "../luasys.h"
 #include <cetech/input/input.h>

@@ -5,9 +5,9 @@
 #include "include/SDL2/SDL.h"
 #include "include/mpack/mpack.h"
 
-#include "celib/map.inl"
-#include <celib/vio.h>
-#include <celib/path.h>
+#include "cetech/containers/map.inl"
+#include <cetech/filesystem/vio.h>
+#include <cetech/os/path.h>
 
 #include <cetech/resource/resource.h>
 #include <cetech/develop/develop.h>

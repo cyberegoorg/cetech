@@ -2,16 +2,15 @@
 // Includes
 //==============================================================================
 
-#include <celib/memory.h>
-#include <celib/allocator.h>
+#include <cetech/memory/allocator.h>
 #include <cetech/config/config.h>
-#include <celib/vio.h>
-#include <celib/path.h>
-#include <celib/yaml.h>
+#include <cetech/filesystem/vio.h>
+#include <cetech/os/path.h>
+#include <cetech/yaml/yaml.h>
 #include <cetech/memory/memory.h>
 #include <cetech/module/module.h>
 #include <cetech/application/private/module.h>
-#include <celib/stringid.h>
+#include <cetech/string/stringid.h>
 #include <cetech/resource/resource.h>
 
 //==============================================================================

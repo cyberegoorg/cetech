@@ -1,7 +1,7 @@
-#include <celib/array.inl>
-#include <celib/yaml.h>
-#include <celib/map.inl>
-#include <celib/stringid.h>
+#include <cetech/containers/array.inl>
+#include <cetech/yaml/yaml.h>
+#include <cetech/containers/map.inl>
+#include <cetech/string/stringid.h>
 
 #include <cetech/entity/entity.h>
 #include <cetech/component/component.h>
@@ -10,7 +10,7 @@
 #include <cetech/transform/transform.h>
 #include <cetech/renderer/private/scene/scene.h>
 #include <cetech/scenegraph/scenegraph.h>
-#include <celib/math_mat44f.inl>
+#include <cetech/math/math_mat44f.inl>
 
 #include <cetech/memory/memory.h>
 #include <cetech/module/module.h>
