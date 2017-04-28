@@ -1,4 +1,4 @@
-#include <celib/array.h>
+#include <celib/array.inl>
 #include <celib/yaml.h>
 #include <cetech/entity/entity.h>
 #include <cetech/component/component.h>

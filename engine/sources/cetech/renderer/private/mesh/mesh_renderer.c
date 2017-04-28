@@ -1,6 +1,6 @@
-#include <celib/array.h>
+#include <celib/array.inl>
 #include <celib/yaml.h>
-#include <celib/map.h>
+#include <celib/map.inl>
 #include <celib/stringid.h>
 
 #include <cetech/entity/entity.h>

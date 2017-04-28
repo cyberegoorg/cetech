@@ -2,10 +2,12 @@
 // Include
 //==============================================================================
 
+
 #include <bgfx/c99/bgfx.h>
 
+#include <celib/allocator.h>
 #include <celib/stringid.h>
-#include "celib/map.h"
+#include "celib/map.inl"
 #include "celib/vio.h"
 
 #include <cetech/resource/resource.h>

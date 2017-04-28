@@ -1,3 +1,4 @@
+#include <celib/log.h>
 #include "celib/memory.h"
 #include "include/SDL2/SDL.h"
 

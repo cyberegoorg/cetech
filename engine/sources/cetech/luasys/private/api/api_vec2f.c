@@ -1,3 +1,5 @@
+#include <stddef.h>
+#include <celib/allocator.h>
 #include "celib/math_vec2f.inl"
 
 #include "../luasys.h"

@@ -1,3 +1,5 @@
+#include <stddef.h>
+#include <celib/allocator.h>
 
 #include <cetech/world/world.h>
 #include <cetech/application/private/module.h>

@@ -1,4 +1,5 @@
 
+#include <celib/allocator.h>
 #include <celib/math_mat44f.inl>
 
 #include "../luasys.h"

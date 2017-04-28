@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <memory.h>
+#include <celib/allocator.h>
 #include <celib/string.h>
 
 #include "celib/memory.h"

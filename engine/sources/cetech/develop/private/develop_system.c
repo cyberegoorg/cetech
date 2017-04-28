@@ -4,7 +4,7 @@
 
 #include <stdio.h>
 #include <celib/time.h>
-#include <celib/map.h>
+#include <celib/map.inl>
 
 #include "include/mpack/mpack.h"
 #include "include/nanomsg/nn.h"

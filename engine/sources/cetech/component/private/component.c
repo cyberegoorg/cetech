@@ -2,7 +2,7 @@
 // Includes
 //==============================================================================
 
-#include "celib/map.h"
+#include "celib/map.inl"
 #include <cetech/memory/memory.h>
 #include <cetech/module/module.h>
 

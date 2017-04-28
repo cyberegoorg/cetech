@@ -5,7 +5,7 @@
 // Includes
 //==============================================================================
 
-#include "array.h"
+#include "array.inl"
 #include "types.h"
 
 struct event_header {

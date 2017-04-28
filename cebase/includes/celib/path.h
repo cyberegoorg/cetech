@@ -1,8 +1,8 @@
 #ifndef CELIB_PATH_H
 #define CELIB_PATH_H
 
-#include <memory.h>
-#include "celib/types.h"
+#include <stdint.h>
+#include <stddef.h>
 
 //! Get filename from path
 //! \param path Path

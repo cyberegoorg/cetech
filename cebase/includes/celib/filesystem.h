@@ -1,10 +1,7 @@
 #ifndef CELIB_FS_H
 #define CELIB_FS_H
 
-#include <time.h>
-
-#include "memory.h"
-#include "celib/array.h"
+#include "celib/array.inl"
 
 //==============================================================================
 // File Interface
@@ -13,7 +10,7 @@
 //! Get file modified time
 //! \param path File path
 //! \return Modified time
-time_t cel_file_mtime(const char *path);
+uint32_t cel_file_mtime(const char *path);
 
 //==============================================================================
 // Path Interface

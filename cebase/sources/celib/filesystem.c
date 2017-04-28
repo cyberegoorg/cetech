@@ -1,7 +1,9 @@
 #include <time.h>
 
 #include "memory.h"
-#include "celib/array.h"
+
+#include "celib/errors.h"
+#include "celib/array.inl"
 #include "celib/filesystem.h"
 
 #if defined(CELIB_LINUX)
@@ -9,6 +11,7 @@
 #include <dirent.h>
 #include <sys/stat.h>
 #include <errno.h>
+#include <stdio.h>
 
 #endif
 
@@ -19,7 +22,7 @@
 //! Get file modified time
 //! \param path File path
 //! \return Modified time
-time_t cel_file_mtime(const char *path) {
+uint32_t cel_file_mtime(const char *path) {
 #if defined(CELIB_LINUX)
     struct stat st;
     stat(path, &st);

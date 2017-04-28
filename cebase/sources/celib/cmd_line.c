@@ -1,5 +1,10 @@
+#include <stddef.h>
+
+#include <celib/allocator.h>
+#include <celib/errors.h>
+#include <celib/log.h>
 #include <celib/string.h>
-#include "celib/cmd_line.h"
+#include <celib/cmd_line.h>
 
 
 static int _cel_cmd_line_is_short(struct args args,

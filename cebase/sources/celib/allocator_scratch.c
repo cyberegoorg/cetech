@@ -11,6 +11,8 @@
 #include "celib/allocator.h"
 
 #include "header.h"
+#include <celib/log.h>
+#include <celib/errors.h>
 
 struct cel_allocator_scratch {
     struct cel_allocator base;

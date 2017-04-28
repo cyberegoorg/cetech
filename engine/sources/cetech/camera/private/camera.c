@@ -1,6 +1,6 @@
-#include <celib/array.h>
+#include <celib/array.inl>
 #include <celib/yaml.h>
-#include <celib/map.h>
+#include <celib/map.inl>
 #include <celib/math_mat44f.inl>
 #include <celib/stringid.h>
 

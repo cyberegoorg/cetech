@@ -1,4 +1,8 @@
-#include "celib/queue.h"
+#include <stddef.h>
+
+#include <celib/allocator.h>
+#include <celib/handlerid.h>
+#include <celib/queue.inl>
 
 //==============================================================================
 // Private defines
@@ -16,11 +20,8 @@
 // Typedef and struct
 //==============================================================================
 
-typedef struct handler {
-    uint32_t h;
-} handler_t;
-
-struct handlerid {
+struct handler_gen {
+    struct cel_allocator * alloc;
     QUEUE_T(uint32_t) _freeIdx;
     ARRAY_T(uint32_t) _generation;
 };
@@ -29,22 +30,25 @@ struct handlerid {
 // Public interface
 //==============================================================================
 
-handler_t handlerid_handler_create(struct handlerid *hid);
+struct handler_gen *handlerid_create(struct cel_allocator *allocator) {
+    struct handler_gen* hid = CEL_ALLOCATE(allocator, struct handler_gen, sizeof(struct handler_gen));
 
-void handlerid_init(struct handlerid *hid,
-                    struct cel_allocator *allocator) {
+    hid->alloc = allocator;
     ARRAY_INIT(uint32_t, &hid->_generation, allocator);
     QUEUE_INIT(uint32_t, &hid->_freeIdx, allocator);
 
     handlerid_handler_create(hid);
+
+    return hid;
 }
 
-void handlerid_destroy(struct handlerid *hid) {
+void handlerid_destroy(struct handler_gen *hid) {
     ARRAY_DESTROY(uint32_t, &hid->_generation);
     QUEUE_DESTROY(uint32_t, &hid->_freeIdx);
+    CEL_DEALLOCATE(hid->alloc, hid);
 }
 
-handler_t handlerid_handler_create(struct handlerid *hid) {
+handler_t handlerid_handler_create(struct handler_gen *hid) {
     uint32_t idx;
 
     if (QUEUE_SIZE(uint32_t, &hid->_freeIdx) > _MINFREEINDEXS) {
@@ -58,7 +62,7 @@ handler_t handlerid_handler_create(struct handlerid *hid) {
     return _make_entity(idx, ARRAY_AT(&hid->_generation, idx));
 }
 
-void handlerid_handler_destroy(struct handlerid *hid,
+void handlerid_handler_destroy(struct handler_gen *hid,
                                handler_t h) {
     uint32_t id = _idx(h);
 
@@ -66,7 +70,7 @@ void handlerid_handler_destroy(struct handlerid *hid,
     QUEUE_PUSH_BACK(uint32_t, &hid->_freeIdx, id);
 }
 
-int handlerid_handler_alive(struct handlerid *hid,
+int handlerid_handler_alive(struct handler_gen *hid,
                             handler_t h) {
     return ARRAY_AT(&hid->_generation, _idx(h)) == _gen(h);
 }

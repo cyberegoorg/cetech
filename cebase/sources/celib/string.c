@@ -1,7 +1,7 @@
 
 #include <string.h>
 
-#include "celib/array.h"
+#include "celib/array.inl"
 
 
 //==============================================================================

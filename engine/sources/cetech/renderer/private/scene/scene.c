@@ -6,6 +6,7 @@
 
 #include <include/assimp/cimport.h>
 
+#include <celib/allocator.h>
 #include <celib/stringid.h>
 #include <cetech/scenegraph/scenegraph.h>
 #include "celib/vio.h"

@@ -8,7 +8,6 @@
 #include <stdlib.h>
 
 #include "log.h"
-#include "stacktrace.h"
 
 //==============================================================================
 // Iterface
@@ -38,5 +37,11 @@
 #endif
 
 #define CEL_ASSERT(where, condition) CEL_ASSERT_MSG(where, condition, "")
+
+
+char *cel_stacktrace(int skip);
+
+void cel_stacktrace_free(char *st);
+
 
 #endif //CELIB_ERRORS_H

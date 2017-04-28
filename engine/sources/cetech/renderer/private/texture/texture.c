@@ -4,9 +4,10 @@
 
 #include <bgfx/c99/bgfx.h>
 
+#include <celib/allocator.h>
 #include <celib/stringid.h>
-#include "celib/map.h"
-#include "celib/vio.h"
+#include <celib/map.inl>
+#include <celib/vio.h>
 #include <cetech/memory/memory.h>
 #include <cetech/application/private/module.h>
 #include <cetech/resource/resource.h>

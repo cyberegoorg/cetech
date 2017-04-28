@@ -1,4 +1,7 @@
+#include <stddef.h>
+#include <celib/allocator.h>
 #include <cetech/module/module.h>
+#include <celib/log.h>
 #include "../luasys.h"
 
 #define API_NAME "Log"

@@ -2,7 +2,7 @@
 // Includes
 //==============================================================================
 
-#include "celib/map.h"
+#include "celib/map.inl"
 #include <cetech/memory/memory.h>
 #include <cetech/module/module.h>
 #include <cetech/resource/resource.h>
@@ -22,7 +22,7 @@ MAP_PROTOTYPE_N(struct array_entity_t, array_entity_t);
 
 #define _G EntityMaagerGlobals
 static struct G {
-    struct handlerid entity_handler;
+    struct handler_gen* entity_handler;
     MAP_T(uint32_t) spawned_map;
     ARRAY_T(array_entity_t) spawned_array;
     stringid64_t type;
@@ -469,14 +469,14 @@ static void _init(get_api_fce_t get_engine_api) {
     ResourceApiV0.register_type(_G.type, entity_resource_callback);
     ResourceApiV0.compiler_register(_G.type, _entity_resource_compiler);
 
-    handlerid_init(&_G.entity_handler, MemSysApiV0.main_allocator());
+    _G.entity_handler = handlerid_create(MemSysApiV0.main_allocator());
 }
 
 static void _shutdown() {
     MAP_DESTROY(uint32_t, &_G.spawned_map);
     ARRAY_DESTROY(array_entity_t, &_G.spawned_array);
 
-    handlerid_destroy(&_G.entity_handler);
+    handlerid_destroy(_G.entity_handler);
     _G = (struct G) {0};
 }
 
@@ -485,15 +485,15 @@ static void _shutdown() {
 //==============================================================================
 
 entity_t entity_manager_create() {
-    return (entity_t) {.idx = handlerid_handler_create(&_G.entity_handler).h};
+    return (entity_t) {.idx = handlerid_handler_create(_G.entity_handler).h};
 }
 
 void entity_manager_destroy(entity_t entity) {
-    handlerid_handler_destroy(&_G.entity_handler, entity.h);
+    handlerid_handler_destroy(_G.entity_handler, entity.h);
 }
 
 int entity_manager_alive(entity_t entity) {
-    return handlerid_handler_alive(&_G.entity_handler, entity.h);
+    return handlerid_handler_alive(_G.entity_handler, entity.h);
 }
 
 

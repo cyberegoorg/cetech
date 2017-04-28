@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdint.h>
+#include <celib/log.h>
 
 #include "celib/errors.h"
 
