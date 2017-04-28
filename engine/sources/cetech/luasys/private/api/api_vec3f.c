@@ -7,9 +7,9 @@
 #define API_NAME "Vec3f"
 
 static int _ctor(lua_State *l) {
-    f32 x = luasys_to_f32(l, 1);
-    f32 y = luasys_to_f32(l, 2);
-    f32 z = luasys_to_f32(l, 3);
+    float x = luasys_to_float(l, 1);
+    float y = luasys_to_float(l, 2);
+    float z = luasys_to_float(l, 3);
 
     luasys_push_vec3f(l, (cel_vec3f_t) {.x=x, .y=y, .z=z});
     return 1;
@@ -55,7 +55,7 @@ static int _normalized(lua_State *l) {
 static int _lerp(lua_State *l) {
     cel_vec3f_t *from = luasys_to_vec3f(l, 1);
     cel_vec3f_t *to = luasys_to_vec3f(l, 2);
-    f32 time = luasys_to_f32(l, 3);
+    float time = luasys_to_float(l, 3);
 
     cel_vec3f_t res = {0};
 

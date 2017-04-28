@@ -41,10 +41,10 @@ ARRAY_PROTOTYPE(material_blob_t)
 
 #define _G MaterialGlobals
 struct G {
-    MAP_T(u32) material_instace_map;
-    ARRAY_T(u32) material_instance_offset;
-    ARRAY_T(u8) material_instance_data;
-    ARRAY_T(u32) material_instance_uniform_data;
+    MAP_T(uint32_t) material_instace_map;
+    ARRAY_T(uint32_t) material_instance_offset;
+    ARRAY_T(uint8_t) material_instance_data;
+    ARRAY_T(uint32_t) material_instance_uniform_data;
 
     struct handlerid material_handler;
     stringid64_t type;
@@ -79,9 +79,9 @@ int material_init(get_api_fce_t get_engine_api) {
 
     handlerid_init(&_G.material_handler, MemSysApiV0.main_allocator());
 
-    MAP_INIT(u32, &_G.material_instace_map, MemSysApiV0.main_allocator());
-    ARRAY_INIT(u32, &_G.material_instance_offset, MemSysApiV0.main_allocator());
-    ARRAY_INIT(u8, &_G.material_instance_data, MemSysApiV0.main_allocator());
+    MAP_INIT(uint32_t, &_G.material_instace_map, MemSysApiV0.main_allocator());
+    ARRAY_INIT(uint32_t, &_G.material_instance_offset, MemSysApiV0.main_allocator());
+    ARRAY_INIT(uint8_t, &_G.material_instance_data, MemSysApiV0.main_allocator());
 
     ResourceApiV0.compiler_register(_G.type, _material_resource_compiler);
     ResourceApiV0.register_type(_G.type, material_resource_callback);
@@ -92,9 +92,9 @@ int material_init(get_api_fce_t get_engine_api) {
 void material_shutdown() {
     handlerid_destroy(&_G.material_handler);
 
-    MAP_DESTROY(u32, &_G.material_instace_map);
-    ARRAY_DESTROY(u32, &_G.material_instance_offset);
-    ARRAY_DESTROY(u8, &_G.material_instance_data);
+    MAP_DESTROY(uint32_t, &_G.material_instace_map);
+    ARRAY_DESTROY(uint32_t, &_G.material_instance_offset);
+    ARRAY_DESTROY(uint8_t, &_G.material_instance_data);
 
     _G = (struct G) {0};
 }
@@ -104,7 +104,7 @@ static const material_t null_material = {0};
 material_t material_create(stringid64_t name) {
     struct material_blob *resource = ResourceApiV0.get(_G.type, name);
 
-    u32 size = sizeof(struct material_blob) +
+    uint32_t size = sizeof(struct material_blob) +
                (resource->uniforms_count * sizeof(char) * 32) +
                (resource->texture_count * sizeof(stringid64_t)) +
                (resource->vec4f_count * sizeof(cel_vec4f_t)) +
@@ -113,20 +113,20 @@ material_t material_create(stringid64_t name) {
 
     handler_t h = handlerid_handler_create(&_G.material_handler);
 
-    u32 idx = (u32) ARRAY_SIZE(&_G.material_instance_offset);
+    uint32_t idx = (uint32_t) ARRAY_SIZE(&_G.material_instance_offset);
 
-    MAP_SET(u32, &_G.material_instace_map, h.h, idx);
+    MAP_SET(uint32_t, &_G.material_instace_map, h.h, idx);
 
-    u32 offset = ARRAY_SIZE(&_G.material_instance_data);
-    ARRAY_PUSH(u8, &_G.material_instance_data, (u8 *) resource, size);
-    ARRAY_PUSH_BACK(u32, &_G.material_instance_offset, offset);
+    uint32_t offset = ARRAY_SIZE(&_G.material_instance_data);
+    ARRAY_PUSH(uint8_t, &_G.material_instance_data, (uint8_t *) resource, size);
+    ARRAY_PUSH_BACK(uint32_t, &_G.material_instance_offset, offset);
 
     // write bgfx uniform handlers
     bgfx_uniform_handle_t bgfx_uniforms[resource->uniforms_count];
     const char *u_names = (const char *) (resource + 1);
 
-    u32 off = 0;
-    u32 tmp_off = 0;
+    uint32_t off = 0;
+    uint32_t tmp_off = 0;
     off += resource->texture_count;
     for (int i = 0; i < resource->texture_count; ++i) {
         bgfx_uniforms[i] = bgfx_create_uniform(&u_names[i * 32],
@@ -154,15 +154,15 @@ material_t material_create(stringid64_t name) {
                                                BGFX_UNIFORM_TYPE_MAT4, 1);
     }
 
-    ARRAY_PUSH(u8, &_G.material_instance_data, (u8 *) bgfx_uniforms,
+    ARRAY_PUSH(uint8_t, &_G.material_instance_data, (uint8_t *) bgfx_uniforms,
                sizeof(bgfx_uniform_handle_t) * resource->uniforms_count);
 
     return (material_t) {.h=h};
 }
 
 
-u32 material_get_texture_count(material_t material) {
-    u32 idx = MAP_GET(u32, &_G.material_instace_map, material.idx, UINT32_MAX);
+uint32_t material_get_texture_count(material_t material) {
+    uint32_t idx = MAP_GET(uint32_t, &_G.material_instace_map, material.idx, UINT32_MAX);
 
     if (idx == UINT32_MAX) {
         return 0;
@@ -174,10 +174,10 @@ u32 material_get_texture_count(material_t material) {
     return resource->texture_count;
 }
 
-u32 _material_find_slot(struct material_blob *resource,
+uint32_t _material_find_slot(struct material_blob *resource,
                         const char *name) {
     const char *u_names = (const char *) (resource + 1);
-    for (u32 i = 0; i < resource->uniforms_count; ++i) {
+    for (uint32_t i = 0; i < resource->uniforms_count; ++i) {
         if (cel_strcmp(&u_names[i * 32], name) != 0) {
             continue;
         }
@@ -192,7 +192,7 @@ void material_set_texture(material_t material,
                           const char *slot,
                           stringid64_t texture) {
 
-    u32 idx = MAP_GET(u32, &_G.material_instace_map, material.idx, UINT32_MAX);
+    uint32_t idx = MAP_GET(uint32_t, &_G.material_instace_map, material.idx, UINT32_MAX);
 
     if (idx == UINT32_MAX) {
         return;
@@ -212,7 +212,7 @@ void material_set_vec4f(material_t material,
                         const char *slot,
                         cel_vec4f_t v) {
 
-    u32 idx = MAP_GET(u32, &_G.material_instace_map, material.idx, UINT32_MAX);
+    uint32_t idx = MAP_GET(uint32_t, &_G.material_instace_map, material.idx, UINT32_MAX);
 
     if (idx == UINT32_MAX) {
         return;
@@ -232,7 +232,7 @@ void material_set_mat33f(material_t material,
                          const char *slot,
                          mat33f_t v) {
 
-    u32 idx = MAP_GET(u32, &_G.material_instace_map, material.idx, UINT32_MAX);
+    uint32_t idx = MAP_GET(uint32_t, &_G.material_instace_map, material.idx, UINT32_MAX);
 
     if (idx == UINT32_MAX) {
         return;
@@ -252,7 +252,7 @@ void material_set_mat33f(material_t material,
 void material_set_mat44f(material_t material,
                          const char *slot,
                          cel_mat44f_t v) {
-    u32 idx = MAP_GET(u32, &_G.material_instace_map, material.idx, UINT32_MAX);
+    uint32_t idx = MAP_GET(uint32_t, &_G.material_instace_map, material.idx, UINT32_MAX);
 
     if (idx == UINT32_MAX) {
         return;
@@ -271,7 +271,7 @@ void material_set_mat44f(material_t material,
 
 
 void material_use(material_t material) {
-    u32 idx = MAP_GET(u32, &_G.material_instace_map, material.idx, UINT32_MAX);
+    uint32_t idx = MAP_GET(uint32_t, &_G.material_instace_map, material.idx, UINT32_MAX);
 
     if (idx == UINT32_MAX) {
         return;
@@ -289,7 +289,7 @@ void material_use(material_t material) {
 
 
     // TODO: refactor: one loop
-    u32 offset = 0;
+    uint32_t offset = 0;
     for (int i = 0; i < resource->texture_count; ++i) {
         bgfx_texture_handle_t texture = texture_get(u_texture[i]);
         bgfx_set_texture(i, u_handler[offset + i], texture, 0);
@@ -314,7 +314,7 @@ void material_use(material_t material) {
     offset += resource->mat44f_count;
 
 
-    u64 state = (0
+    uint64_t state = (0
                  | BGFX_STATE_RGB_WRITE
                  | BGFX_STATE_ALPHA_WRITE
                  | BGFX_STATE_DEPTH_TEST_LESS
@@ -327,7 +327,7 @@ void material_use(material_t material) {
 }
 
 void material_submit(material_t material) {
-    u32 idx = MAP_GET(u32, &_G.material_instace_map, material.idx, UINT32_MAX);
+    uint32_t idx = MAP_GET(uint32_t, &_G.material_instace_map, material.idx, UINT32_MAX);
     CEL_ASSERT(LOG_WHERE, idx != UINT32_MAX);
 
     struct material_blob *resource = (struct material_blob *) &_get_resorce(

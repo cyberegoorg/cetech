@@ -45,7 +45,7 @@ static int _quat_mul(lua_State *L) {
 
 static int _quat_div(lua_State *L) {
     cel_quatf_t *a = luasys_to_quat(L, 1);
-    float b = luasys_to_f32(L, 2);
+    float b = luasys_to_float(L, 2);
 
     cel_quatf_t res = {0};
     cel_quatf_div_s(&res, a, b);
@@ -93,7 +93,7 @@ static int _quat_newindex(lua_State *L) {
     cel_quatf_t *a = luasys_to_quat(L, 1);
 
     const char *s = luasys_to_string(L, 2);
-    const float value = luasys_to_f32(L, 3);
+    const float value = luasys_to_float(L, 3);
 
     switch (s[0]) {
         case 'x':

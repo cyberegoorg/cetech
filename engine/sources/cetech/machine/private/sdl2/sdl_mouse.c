@@ -22,7 +22,7 @@
 //==============================================================================
 
 static struct G {
-    u8 state[MOUSE_BTN_MAX];
+    uint8_t state[MOUSE_BTN_MAX];
     int position[2];
 } _G = {0};
 
@@ -49,17 +49,17 @@ void sdl_mouse_shutdown() {
 void sdl_mouse_process(struct eventstream *stream) {
     int pos[2] = {0};
 
-    u32 state = SDL_GetMouseState(&pos[0], &pos[1]);
+    uint32_t state = SDL_GetMouseState(&pos[0], &pos[1]);
 
-    u8 curent_state[MOUSE_BTN_MAX] = {0};
+    uint8_t curent_state[MOUSE_BTN_MAX] = {0};
 
-    curent_state[MOUSE_BTN_LEFT] = (u8) (state & SDL_BUTTON_LMASK);
-    curent_state[MOUSE_BTN_RIGHT] = (u8) (state & SDL_BUTTON_RMASK);
-    curent_state[MOUSE_BTN_MIDLE] = (u8) (state & SDL_BUTTON_MMASK);
+    curent_state[MOUSE_BTN_LEFT] = (uint8_t) (state & SDL_BUTTON_LMASK);
+    curent_state[MOUSE_BTN_RIGHT] = (uint8_t) (state & SDL_BUTTON_RMASK);
+    curent_state[MOUSE_BTN_MIDLE] = (uint8_t) (state & SDL_BUTTON_MMASK);
 
     if ((pos[0] != _G.position[0]) || (pos[1] != _G.position[1])) {
         cel_window_t main_window = ApplicationApiV0.main_window();
-        u32 cel_window_size[2] = {0};
+        uint32_t cel_window_size[2] = {0};
         cel_window_get_size(main_window, &cel_window_size[0],
                             &cel_window_size[1]);
 
@@ -73,7 +73,7 @@ void sdl_mouse_process(struct eventstream *stream) {
         event_stream_push(stream, EVENT_MOUSE_MOVE, event);
     }
 
-    for (u32 i = 0; i < MOUSE_BTN_MAX; ++i) {
+    for (uint32_t i = 0; i < MOUSE_BTN_MAX; ++i) {
         struct mouse_event event;
         event.button = i;
 

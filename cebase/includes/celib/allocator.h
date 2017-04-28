@@ -67,15 +67,15 @@ struct cel_allocator_trace_entry {
 //==============================================================================
 
 void allocator_trace_pointer(struct cel_allocator_trace_entry *entries,
-                             u64 max_entries,
+                             uint64_t max_entries,
                              void *p);
 
 void allocator_stop_trace_pointer(struct cel_allocator_trace_entry *entries,
-                                  u64 max_entries,
+                                  uint64_t max_entries,
                                   void *p);
 
 void allocator_check_trace(struct cel_allocator_trace_entry *entries,
-                           u64 max_entries);
+                           uint64_t max_entries);
 
 //==============================================================================
 // Malloc allocator

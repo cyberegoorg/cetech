@@ -21,7 +21,7 @@ ARRAY_PROTOTYPE(bgfx_texture_handle_t)
 MAP_PROTOTYPE(bgfx_texture_handle_t)
 
 struct texture {
-    u64 size;
+    uint64_t size;
 };
 
 

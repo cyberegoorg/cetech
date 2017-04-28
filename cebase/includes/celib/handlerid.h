@@ -13,12 +13,12 @@
 //==============================================================================
 
 typedef struct handler {
-    u32 h;
+    uint32_t h;
 } handler_t;
 
 struct handlerid {
-    QUEUE_T(u32) _freeIdx;
-    ARRAY_T(u32) _generation;
+    QUEUE_T(uint32_t) _freeIdx;
+    ARRAY_T(uint32_t) _generation;
 };
 
 //==============================================================================

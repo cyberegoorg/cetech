@@ -5,7 +5,7 @@ static const bgfx_program_handle_t null_program = {0};
 
 void *_material_resource_loader(struct vio *input,
                                 struct cel_allocator *allocator) {
-    const i64 size = cel_vio_size(input);
+    const int64_t size = cel_vio_size(input);
     char *data = CEL_ALLOCATE(allocator, char, size);
     cel_vio_read(input, data, 1, size);
 

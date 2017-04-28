@@ -5,7 +5,7 @@
 #define STRINGID64_SEED 22
 
 typedef struct {
-    u64 id;
+    uint64_t id;
 } stringid64_t;
 
 //==============================================================================

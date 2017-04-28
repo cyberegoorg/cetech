@@ -21,7 +21,7 @@
 typedef struct {
     union {
         handler_t h;
-        u32 idx;
+        uint32_t idx;
     };
 } material_t;
 
@@ -40,7 +40,7 @@ struct MaterialApiV0 {
     //! Get texture count in material
     //! \param material Material
     //! \return Texture count
-    u32 (*get_texture_count)(material_t material);
+    uint32_t (*get_texture_count)(material_t material);
 
     //! Set texture value
     //! \param material Material
@@ -87,7 +87,7 @@ struct MaterialApiV0 {
 
 //! Mesh typedef
 typedef struct {
-    u32 idx;
+    uint32_t idx;
 } mesh_renderer_t;
 
 

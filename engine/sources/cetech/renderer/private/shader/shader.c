@@ -22,10 +22,10 @@ ARRAY_PROTOTYPE(bgfx_program_handle_t)
 MAP_PROTOTYPE(bgfx_program_handle_t)
 
 struct shader {
-    u64 vs_size;
-    u64 fs_size;
-    // u8 vs [vs_size]
-    // u8 fs [fs_size]
+    uint64_t vs_size;
+    uint64_t fs_size;
+    // uint8_t vs [vs_size]
+    // uint8_t fs [fs_size]
 };
 
 

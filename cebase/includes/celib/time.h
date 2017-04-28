@@ -14,10 +14,10 @@
 // ==============================================================================
 
 
-u32 cel_get_ticks();
+uint32_t cel_get_ticks();
 
-u64 cel_get_perf_counter();
+uint64_t cel_get_perf_counter();
 
-u64 cel_get_perf_freq();
+uint64_t cel_get_perf_freq();
 
 #endif //CELIB_TIME_H

@@ -38,7 +38,7 @@ struct mesh_data {
 };
 
 typedef struct {
-    MAP_T(u32) ent_idx_map;
+    MAP_T(uint32_t) ent_idx_map;
 
     ARRAY_T(stringid64_t) scene;
     ARRAY_T(stringid64_t) mesh;
@@ -61,7 +61,7 @@ static struct G {
 static void _new_world(world_t world) {
     world_data_t data = {0};
 
-    MAP_INIT(u32, &data.ent_idx_map, MemSysApiV0.main_allocator());
+    MAP_INIT(uint32_t, &data.ent_idx_map, MemSysApiV0.main_allocator());
 
     ARRAY_INIT(stringid64_t, &data.scene, MemSysApiV0.main_allocator());
     ARRAY_INIT(stringid64_t, &data.mesh, MemSysApiV0.main_allocator());
@@ -78,7 +78,7 @@ static world_data_t *_get_world_data(world_t world) {
 static void _destroy_world(world_t world) {
     world_data_t *data = _get_world_data(world);
 
-    MAP_DESTROY(u32, &data->ent_idx_map);
+    MAP_DESTROY(uint32_t, &data->ent_idx_map);
 
     ARRAY_DESTROY(stringid64_t, &data->scene);
     ARRAY_DESTROY(stringid64_t, &data->mesh);
@@ -88,7 +88,7 @@ static void _destroy_world(world_t world) {
 }
 
 int _mesh_component_compiler(yaml_node_t body,
-                             ARRAY_T(u8) *data) {
+                             ARRAY_T(uint8_t) *data) {
 
     struct mesh_data t_data;
 
@@ -119,7 +119,7 @@ int _mesh_component_compiler(yaml_node_t body,
                     }
     );
 
-    ARRAY_PUSH(u8, data, (u8 *) &t_data, sizeof(t_data));
+    ARRAY_PUSH(uint8_t, data, (uint8_t *) &t_data, sizeof(t_data));
 
     return 1;
 }
@@ -139,19 +139,19 @@ static void _destroyer(world_t world,
 
     // TODO: remove from arrays, swap idx -> last AND change size
     for (int i = 0; i < ent_count; ++i) {
-        if (MAP_HAS(u32, &world_data->ent_idx_map, ents[i].idx)) {
-            MAP_REMOVE(u32, &world_data->ent_idx_map, ents[i].idx);
+        if (MAP_HAS(uint32_t, &world_data->ent_idx_map, ents[i].idx)) {
+            MAP_REMOVE(uint32_t, &world_data->ent_idx_map, ents[i].idx);
         }
 
-        //CEL_ASSERT("mesh_renderer", MAP_HAS(u32, &world_data->ent_idx_map, ents[i].idx));
+        //CEL_ASSERT("mesh_renderer", MAP_HAS(uint32_t, &world_data->ent_idx_map, ents[i].idx));
     }
 }
 
 
 static void _spawner(world_t world,
                      entity_t *ents,
-                     u32 *cents,
-                     u32 *ents_parent,
+                     uint32_t *cents,
+                     uint32_t *ents_parent,
                      size_t ent_count,
                      void *data) {
     struct mesh_data *tdata = data;
@@ -206,14 +206,14 @@ int mesh_is_valid(mesh_renderer_t mesh) {
 int mesh_has(world_t world,
              entity_t entity) {
     world_data_t *world_data = _get_world_data(world);
-    return MAP_HAS(u32, &world_data->ent_idx_map, entity.h.h);
+    return MAP_HAS(uint32_t, &world_data->ent_idx_map, entity.h.h);
 }
 
 mesh_renderer_t mesh_get(world_t world,
                          entity_t entity) {
 
     world_data_t *world_data = _get_world_data(world);
-    u32 idx = MAP_GET(u32, &world_data->ent_idx_map, entity.h.h, UINT32_MAX);
+    uint32_t idx = MAP_GET(uint32_t, &world_data->ent_idx_map, entity.h.h, UINT32_MAX);
     return (mesh_renderer_t) {.idx = idx};
 }
 
@@ -230,9 +230,9 @@ mesh_renderer_t mesh_create(world_t world,
 
     material_t material_instance = MaterialApiV0.resource_create(material);
 
-    u32 idx = (u32) ARRAY_SIZE(&data->material);
+    uint32_t idx = (uint32_t) ARRAY_SIZE(&data->material);
 
-    MAP_SET(u32, &data->ent_idx_map, entity.h.h, idx);
+    MAP_SET(uint32_t, &data->ent_idx_map, entity.h.h, idx);
 
     if (node.id == 0) {
         node = scene_get_mesh_node(scene, mesh);
@@ -249,8 +249,8 @@ mesh_renderer_t mesh_create(world_t world,
 void mesh_render_all(world_t world) {
     world_data_t *data = _get_world_data(world);
 
-    const MAP_ENTRY_T(u32) *ce_it = MAP_BEGIN(u32, &data->ent_idx_map);
-    const MAP_ENTRY_T(u32) *ce_end = MAP_END(u32, &data->ent_idx_map);
+    const MAP_ENTRY_T(uint32_t) *ce_it = MAP_BEGIN(uint32_t, &data->ent_idx_map);
+    const MAP_ENTRY_T(uint32_t) *ce_end = MAP_END(uint32_t, &data->ent_idx_map);
     while (ce_it != ce_end) {
         material_t material = ARRAY_AT(&data->material, ce_it->value);
         stringid64_t scene = ARRAY_AT(&data->scene, ce_it->value);

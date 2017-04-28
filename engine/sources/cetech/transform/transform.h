@@ -17,7 +17,7 @@
 
 //! Transform component
 typedef struct {
-    u32 idx;
+    uint32_t idx;
 } transform_t;
 
 

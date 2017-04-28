@@ -3,7 +3,7 @@
 
 material_t material_create(stringid64_t name);
 
-u32 material_get_texture_count(material_t material);
+uint32_t material_get_texture_count(material_t material);
 
 void material_set_texture(material_t material,
                           const char *slot,

@@ -68,11 +68,11 @@ struct LuaSysApiV0 {
     //! \param l Lua state
     void (*push_nil)(lua_State *l);
 
-    //! Push u64
+    //! Push uint64_t
     //! \param l Lua state
     //! \param value Value
-    void (*push_u64)(lua_State *l,
-                     u64 value);
+    void (*push_uint64_t)(lua_State *l,
+                     uint64_t value);
 
     //! Push handler
     //! \param l
@@ -122,7 +122,7 @@ struct LuaSysApiV0 {
     //! \param l
     //! \param i Element idx
     //! \return Float value
-    f32 (*to_f32)(lua_State *l,
+    float (*to_float)(lua_State *l,
                   int i);
 
     //! Get element value as hadler

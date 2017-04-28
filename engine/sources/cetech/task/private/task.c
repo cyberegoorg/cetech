@@ -53,7 +53,7 @@ static struct G {
 //==============================================================================
 
 typedef struct {
-    u32 id;
+    uint32_t id;
 } task_t;
 
 static const task_t task_null = (task_t) {.id = 0};
@@ -89,7 +89,7 @@ static void _push_task(task_t t) {
 
 
 static task_t _try_pop(struct task_queue *q) {
-    u32 poped_task;
+    uint32_t poped_task;
 
     if (!queue_task_size(q)) {
         return task_null;
@@ -188,7 +188,7 @@ static void _shutdown() {
 
     int status = 0;
 
-    for (u32 i = 0; i < _G._workers_count; ++i) {
+    for (uint32_t i = 0; i < _G._workers_count; ++i) {
         //cel_thread_kill(_G._workers[i]);
         cel_thread_wait(_G._workers[i], &status);
     }
@@ -207,8 +207,8 @@ static void _shutdown() {
 //==============================================================================
 
 void taskmanager_add(struct task_item *items,
-                     u32 count) {
-    for (u32 i = 0; i < count; ++i) {
+                     uint32_t count) {
+    for (uint32_t i = 0; i < count; ++i) {
         task_t task = _new_task();
         _G._task_pool[task.id] = (struct task) {
                 .name = items[i].name,
@@ -242,7 +242,7 @@ int taskmanager_do_work() {
 }
 
 void taskmanager_wait_atomic(atomic_int *signal,
-                             u32 value) {
+                             uint32_t value) {
     while (atomic_load_explicit(signal, memory_order_acquire) == value) {
         taskmanager_do_work();
     }

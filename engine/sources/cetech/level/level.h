@@ -19,7 +19,7 @@
 
 //! Level idx
 typedef struct {
-    u32 idx;
+    uint32_t idx;
 } level_t;
 
 

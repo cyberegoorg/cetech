@@ -22,8 +22,8 @@
 
 
 static struct G {
-    u8 state[512];
-    u8 last_state[512];
+    uint8_t state[512];
+    uint8_t last_state[512];
 } _G = {0};
 
 IMPORT_API(MachineApi, 0);
@@ -47,7 +47,7 @@ static void _update() {
 
     memory_copy(_G.last_state, _G.state, 512);
 
-    u32 size = 0;
+    uint32_t size = 0;
     while (event != MachineApiV0.event_end()) {
         size = size + 1;
 
@@ -73,8 +73,8 @@ static void _update() {
 // Interface
 //==============================================================================
 
-u32 keyboard_button_index(const char *button_name) {
-    for (u32 i = 0; i < KEY_MAX; ++i) {
+uint32_t keyboard_button_index(const char *button_name) {
+    for (uint32_t i = 0; i < KEY_MAX; ++i) {
         if (!_key_to_str[i]) {
             continue;
         }
@@ -89,28 +89,28 @@ u32 keyboard_button_index(const char *button_name) {
     return 0;
 }
 
-const char *keyboard_button_name(const u32 button_index) {
+const char *keyboard_button_name(const uint32_t button_index) {
     CEL_ASSERT(LOG_WHERE, (button_index >= 0) && (button_index < KEY_MAX));
 
     return _key_to_str[button_index];
 }
 
-int keyboard_button_state(u32 idx,
-                          const u32 button_index) {
+int keyboard_button_state(uint32_t idx,
+                          const uint32_t button_index) {
     CEL_ASSERT(LOG_WHERE, (button_index >= 0) && (button_index < KEY_MAX));
 
     return _G.state[button_index];
 }
 
-int keyboard_button_pressed(u32 idx,
-                            const u32 button_index) {
+int keyboard_button_pressed(uint32_t idx,
+                            const uint32_t button_index) {
     CEL_ASSERT(LOG_WHERE, (button_index >= 0) && (button_index < KEY_MAX));
 
     return _G.state[button_index] && !_G.last_state[button_index];
 }
 
-int keyboard_button_released(u32 idx,
-                             const u32 button_index) {
+int keyboard_button_released(uint32_t idx,
+                             const uint32_t button_index) {
     CEL_ASSERT(LOG_WHERE, (button_index >= 0) && (button_index < KEY_MAX));
 
     return !_G.state[button_index] && _G.last_state[button_index];

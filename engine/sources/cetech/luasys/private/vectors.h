@@ -33,7 +33,7 @@ static int _cel_vec2f_sub(lua_State *L) {
 
 static int _cel_vec2f_mul(lua_State *L) {
     cel_vec2f_t *a = luasys_to_vec2f(L, 1);
-    float b = luasys_to_f32(L, 2);
+    float b = luasys_to_float(L, 2);
 
     cel_vec2f_t res = {0};
     cel_vec2f_mul(&res, a, b);
@@ -44,7 +44,7 @@ static int _cel_vec2f_mul(lua_State *L) {
 
 static int _cel_vec2f_div(lua_State *L) {
     cel_vec2f_t *a = luasys_to_vec2f(L, 1);
-    float b = luasys_to_f32(L, 2);
+    float b = luasys_to_float(L, 2);
 
     cel_vec2f_t res = {0};
     cel_vec2f_div(&res, a, b);
@@ -86,7 +86,7 @@ static int _cel_vec2f_newindex(lua_State *L) {
     cel_vec2f_t *a = luasys_to_vec2f(L, 1);
 
     const char *s = luasys_to_string(L, 2);
-    const float value = luasys_to_f32(L, 3);
+    const float value = luasys_to_float(L, 3);
 
     switch (s[0]) {
         case 'x':
@@ -127,7 +127,7 @@ static int _cel_vec3f_sub(lua_State *L) {
 
 static int _cel_vec3f_mul(lua_State *L) {
     cel_vec3f_t *a = luasys_to_vec3f(L, 1);
-    float b = luasys_to_f32(L, 2);
+    float b = luasys_to_float(L, 2);
 
     cel_vec3f_t res = {0};
     cel_vec3f_mul(&res, a, b);
@@ -138,7 +138,7 @@ static int _cel_vec3f_mul(lua_State *L) {
 
 static int _cel_vec3f_div(lua_State *L) {
     cel_vec3f_t *a = luasys_to_vec3f(L, 1);
-    float b = luasys_to_f32(L, 2);
+    float b = luasys_to_float(L, 2);
 
     cel_vec3f_t res = {0};
     cel_vec3f_div(&res, a, b);
@@ -183,7 +183,7 @@ static int _cel_vec3f_newindex(lua_State *L) {
     cel_vec3f_t *a = luasys_to_vec3f(L, 1);
 
     const char *s = luasys_to_string(L, 2);
-    const float value = luasys_to_f32(L, 3);
+    const float value = luasys_to_float(L, 3);
 
     switch (s[0]) {
         case 'x':
@@ -227,7 +227,7 @@ static int _cel_vec4f_sub(lua_State *L) {
 
 static int _cel_vec4f_mul(lua_State *L) {
     cel_vec4f_t *a = luasys_to_vec4f(L, 1);
-    float b = luasys_to_f32(L, 2);
+    float b = luasys_to_float(L, 2);
 
     cel_vec4f_t res = {0};
     cel_vec4f_mul(&res, a, b);
@@ -238,7 +238,7 @@ static int _cel_vec4f_mul(lua_State *L) {
 
 static int _cel_vec4f_div(lua_State *L) {
     cel_vec4f_t *a = luasys_to_vec4f(L, 1);
-    float b = luasys_to_f32(L, 2);
+    float b = luasys_to_float(L, 2);
 
     cel_vec4f_t res = {0};
     cel_vec4f_div(&res, a, b);
@@ -286,7 +286,7 @@ static int _cel_vec4f_newindex(lua_State *L) {
     cel_vec4f_t *a = luasys_to_vec4f(L, 1);
 
     const char *s = luasys_to_string(L, 2);
-    const float value = luasys_to_f32(L, 3);
+    const float value = luasys_to_float(L, 3);
 
     switch (s[0]) {
         case 'x':

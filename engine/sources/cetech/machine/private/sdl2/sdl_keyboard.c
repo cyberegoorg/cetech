@@ -18,7 +18,7 @@
 //==============================================================================
 
 static struct G {
-    u8 state[KEY_MAX];
+    uint8_t state[KEY_MAX];
 } _G = {0};
 
 
@@ -37,10 +37,10 @@ void sdl_keyboard_shutdown() {
 }
 
 void sdl_keyboard_process(struct eventstream *stream) {
-    const u8 *state = SDL_GetKeyboardState(NULL);
+    const uint8_t *state = SDL_GetKeyboardState(NULL);
     struct keyboard_event keyboard_ev;
 
-    for (u32 i = 0; i < KEY_MAX; ++i) {
+    for (uint32_t i = 0; i < KEY_MAX; ++i) {
         if (is_button_down(state[i], _G.state[i])) {
             keyboard_ev.keycode = i;
             event_stream_push(stream, EVENT_KEYBOARD_DOWN, keyboard_ev);

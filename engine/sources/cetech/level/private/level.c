@@ -60,7 +60,7 @@ void _destroy_level_instance(struct level_instance *instance) {
 
 
 level_t _new_level(entity_t level_entity) {
-    u32 idx = ARRAY_SIZE(&_G.level_instance);
+    uint32_t idx = ARRAY_SIZE(&_G.level_instance);
 
     ARRAY_PUSH_BACK(level_instance, &_G.level_instance,
                     (struct level_instance) {0});
@@ -82,7 +82,7 @@ struct level_instance *_level_instance(level_t level) {
 
 void *level_resource_loader(struct vio *input,
                             struct cel_allocator *allocator) {
-    const i64 size = cel_vio_size(input);
+    const int64_t size = cel_vio_size(input);
     char *data = CEL_ALLOCATE(allocator, char, size);
     cel_vio_read(input, data, 1, size);
 
@@ -126,8 +126,8 @@ struct foreach_entities_data {
     const char *filename;
     struct compilator_api *capi;
     ARRAY_T(stringid64_t) *id;
-    ARRAY_T(u32) *offset;
-    ARRAY_T(u8) *data;
+    ARRAY_T(uint32_t) *offset;
+    ARRAY_T(uint8_t) *data;
     struct entity_compile_output *output;
 };
 
@@ -139,7 +139,7 @@ void forach_entities_clb(yaml_node_t key,
     char name[128] = {0};
     yaml_as_string(key, name, CEL_ARRAY_LEN(name));
     ARRAY_PUSH_BACK(stringid64_t, data->id, stringid64_from_string(name));
-    ARRAY_PUSH_BACK(u32, data->offset,
+    ARRAY_PUSH_BACK(uint32_t, data->offset,
                     EntitySystemApiV0.compiler_ent_counter(data->output));
 
     EntitySystemApiV0.compiler_compile_entity(data->output, value, data->filename,
@@ -162,12 +162,12 @@ int _level_resource_compiler(const char *filename,
     yaml_node_t entities = yaml_get_node(root, "entities");
 
     ARRAY_T(stringid64_t) id;
-    ARRAY_T(u32) offset;
-    ARRAY_T(u8) data;
+    ARRAY_T(uint32_t) offset;
+    ARRAY_T(uint8_t) data;
 
     ARRAY_INIT(stringid64_t, &id, MemSysApiV0.main_allocator());
-    ARRAY_INIT(u32, &offset, MemSysApiV0.main_allocator());
-    ARRAY_INIT(u8, &data, MemSysApiV0.main_allocator());
+    ARRAY_INIT(uint32_t, &offset, MemSysApiV0.main_allocator());
+    ARRAY_INIT(uint8_t, &data, MemSysApiV0.main_allocator());
 
     struct entity_compile_output *output = EntitySystemApiV0.compiler_create_output();
 
@@ -192,14 +192,14 @@ int _level_resource_compiler(const char *filename,
     cel_vio_write(build_vio, &res, sizeof(struct level_blob), 1);
     cel_vio_write(build_vio, &ARRAY_AT(&id, 0), sizeof(stringid64_t),
                   ARRAY_SIZE(&id));
-    cel_vio_write(build_vio, &ARRAY_AT(&offset, 0), sizeof(u32),
+    cel_vio_write(build_vio, &ARRAY_AT(&offset, 0), sizeof(uint32_t),
                   ARRAY_SIZE(&offset));
-    cel_vio_write(build_vio, &ARRAY_AT(&data, 0), sizeof(u8),
+    cel_vio_write(build_vio, &ARRAY_AT(&data, 0), sizeof(uint8_t),
                   ARRAY_SIZE(&data));
 
     ARRAY_DESTROY(stringid64_t, &id);
-    ARRAY_DESTROY(u32, &offset);
-    ARRAY_DESTROY(u8, &data);
+    ARRAY_DESTROY(uint32_t, &offset);
+    ARRAY_DESTROY(uint8_t, &data);
 
     EntitySystemApiV0.compiler_destroy_output(output);
 
@@ -238,8 +238,8 @@ level_t world_load_level(world_t world,
     struct level_blob *res = ResourceApiV0.get(_G.level_type, name);
 
     stringid64_t *id = level_blob_names(res);
-    u32 *offset = level_blob_offset(res);
-    u8 *data = level_blob_data(res);
+    uint32_t *offset = level_blob_offset(res);
+    uint8_t *data = level_blob_data(res);
 
     entity_t level_ent = EntitySystemApiV0.entity_manager_create();
     transform_t t = TransformApiV0.create(world, level_ent,

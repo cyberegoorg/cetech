@@ -100,12 +100,12 @@ static void _update() {
 //==============================================================================
 
 
-int gamepad_is_active(u32 idx) {
+int gamepad_is_active(uint32_t idx) {
     return _G.active[idx];
 }
 
-u32 gamepad_button_index(const char *button_name) {
-    for (u32 i = 0; i < GAMEPAD_BTN_MAX; ++i) {
+uint32_t gamepad_button_index(const char *button_name) {
+    for (uint32_t i = 0; i < GAMEPAD_BTN_MAX; ++i) {
         if (!_btn_to_str[i]) {
             continue;
         }
@@ -120,45 +120,45 @@ u32 gamepad_button_index(const char *button_name) {
     return 0;
 }
 
-const char *gamepad_button_name(const u32 button_index) {
+const char *gamepad_button_name(const uint32_t button_index) {
     CEL_ASSERT(LOG_WHERE,
                (button_index >= 0) && (button_index < GAMEPAD_BTN_MAX));
 
     return _btn_to_str[button_index];
 }
 
-int gamepad_button_state(u32 idx,
-                         const u32 button_index) {
+int gamepad_button_state(uint32_t idx,
+                         const uint32_t button_index) {
     CEL_ASSERT(LOG_WHERE,
                (button_index >= 0) && (button_index < GAMEPAD_BTN_MAX));
 
     return _G.state[idx][button_index];
 }
 
-int gamepad_button_pressed(u32 idx,
-                           const u32 button_index) {
+int gamepad_button_pressed(uint32_t idx,
+                           const uint32_t button_index) {
     CEL_ASSERT(LOG_WHERE,
                (button_index >= 0) && (button_index < GAMEPAD_BTN_MAX));
 
     return _G.state[idx][button_index] && !_G.last_state[idx][button_index];
 }
 
-int gamepad_button_released(u32 idx,
-                            const u32 button_index) {
+int gamepad_button_released(uint32_t idx,
+                            const uint32_t button_index) {
     CEL_ASSERT(LOG_WHERE,
                (button_index >= 0) && (button_index < GAMEPAD_BTN_MAX));
 
     return !_G.state[idx][button_index] && _G.last_state[idx][button_index];
 }
 
-const char *gamepad_axis_name(const u32 axis_index) {
+const char *gamepad_axis_name(const uint32_t axis_index) {
     CEL_ASSERT(LOG_WHERE, (axis_index >= 0) && (axis_index < GAMEPAD_AXIX_MAX));
 
     return _axis_to_str[axis_index];
 }
 
-u32 gamepad_axis_index(const char *axis_name) {
-    for (u32 i = 0; i < GAMEPAD_AXIX_MAX; ++i) {
+uint32_t gamepad_axis_index(const char *axis_name) {
+    for (uint32_t i = 0; i < GAMEPAD_AXIX_MAX; ++i) {
         if (!_axis_to_str[i]) {
             continue;
         }
@@ -173,16 +173,16 @@ u32 gamepad_axis_index(const char *axis_name) {
     return 0;
 }
 
-cel_vec2f_t gamepad_axis(u32 idx,
-                         const u32 axis_index) {
+cel_vec2f_t gamepad_axis(uint32_t idx,
+                         const uint32_t axis_index) {
     CEL_ASSERT(LOG_WHERE, (axis_index >= 0) && (axis_index < GAMEPAD_AXIX_MAX));
 
     return _G.position[idx][axis_index];
 }
 
-void gamepad_play_rumble(u32 idx,
+void gamepad_play_rumble(uint32_t idx,
                          float strength,
-                         u32 length) {
+                         uint32_t length) {
     MachineApiV0.gamepad_play_rumble(idx, strength, length);
 }
 

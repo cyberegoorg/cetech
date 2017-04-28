@@ -41,14 +41,14 @@ typedef struct {
 
 typedef struct {
     yaml_document_t doc;
-    u32 idx;
+    uint32_t idx;
 } yaml_node_t;
 
 typedef void(*yaml_foreach_map_clb_t)(yaml_node_t key,
                                       yaml_node_t value,
                                       void *data);
 
-typedef void(*yaml_foreach_seq_clb_t)(u32 idx,
+typedef void(*yaml_foreach_seq_clb_t)(uint32_t idx,
                                       yaml_node_t value,
                                       void *data);
 

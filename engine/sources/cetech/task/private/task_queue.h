@@ -17,11 +17,11 @@
 
 typedef char cacheline_pad_t[64];
 struct task_queue {
-    u32 *_data;
+    uint32_t *_data;
     cacheline_pad_t _pad1;
     atomic_int *_sequences;
     cacheline_pad_t _pad2;
-    u32 _capacity;
+    uint32_t _capacity;
     cacheline_pad_t _pad3;
     atomic_int _dequeuePos;
     cacheline_pad_t _pad4;
@@ -34,7 +34,7 @@ struct task_queue {
 
 
 void queue_task_init(struct task_queue *q,
-                     u32 capacity,
+                     uint32_t capacity,
                      struct cel_allocator *allocator) {
     *q = (struct task_queue) {0};
 
@@ -45,11 +45,11 @@ void queue_task_init(struct task_queue *q,
                    "capacity must be power of two");
 
     q->_capacity = capacity;
-    q->_data = CEL_ALLOCATE(allocator, u32, capacity);
+    q->_data = CEL_ALLOCATE(allocator, uint32_t, capacity);
 
     q->_sequences = CEL_ALLOCATE(allocator, atomic_int, capacity);
 
-    for (u32 i = 0; i < capacity; ++i) {
+    for (uint32_t i = 0; i < capacity; ++i) {
         atomic_init(q->_sequences + i, i);
     }
 
@@ -62,15 +62,15 @@ void queue_task_destroy(struct task_queue *q) {
     CEL_DEALLOCATE(q->allocator, q->_sequences);
 }
 
-u32 queue_task_size(struct task_queue *q) {
-    u32 e = atomic_load(&q->_enqueuePos) & q->_capacityMask;
-    u32 d = atomic_load(&q->_dequeuePos) & q->_capacityMask;
+uint32_t queue_task_size(struct task_queue *q) {
+    uint32_t e = atomic_load(&q->_enqueuePos) & q->_capacityMask;
+    uint32_t d = atomic_load(&q->_dequeuePos) & q->_capacityMask;
 
     return e > d ? e - d : d - e;
 }
 
 int queue_task_push(struct task_queue *q,
-                    u32 value) {
+                    uint32_t value) {
     int pos = atomic_load_explicit(&q->_enqueuePos, memory_order_relaxed);
 
     for (;;) {
@@ -101,8 +101,8 @@ int queue_task_push(struct task_queue *q,
 }
 
 int queue_task_pop(struct task_queue *q,
-                   u32 *value,
-                   u32 defaultt) {
+                   uint32_t *value,
+                   uint32_t defaultt) {
     int pos = atomic_load_explicit(&q->_dequeuePos, memory_order_relaxed);
 
     for (;;) {

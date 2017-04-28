@@ -24,7 +24,7 @@
 typedef struct {
     union {
         handler_t h;
-        u32 idx;
+        uint32_t idx;
     };
 } entity_t;
 
@@ -71,7 +71,7 @@ struct EntitySystemApiV0 {
     //! \param count entity count
     void (*destroy)(world_t world,
                     entity_t *entity,
-                    u32 count);
+                    uint32_t count);
 
     //! Create compiler output structure
     //! \return New compiler output structure
@@ -94,13 +94,13 @@ struct EntitySystemApiV0 {
     //! Get entity counter from output
     //! \param output Compiler output
     //! \return Entity counter
-    u32 (*compiler_ent_counter)(struct entity_compile_output *output);
+    uint32_t (*compiler_ent_counter)(struct entity_compile_output *output);
 
     //! Write output to build
     //! \param output Output
     //! \param build Build
     void (*compiler_write_to_build)(struct entity_compile_output *output,
-                                    ARRAY_T(u8) *build);
+                                    ARRAY_T(uint8_t) *build);
 
     //! Resource compile
     //! \param root Root yaml node
@@ -109,7 +109,7 @@ struct EntitySystemApiV0 {
     //! \param compilator_api Compilator api
     void (*resource_compiler)(yaml_node_t root,
                               const char *filename,
-                              ARRAY_T(u8) *build,
+                              ARRAY_T(uint8_t) *build,
                               struct compilator_api *compilator_api);
 };
 

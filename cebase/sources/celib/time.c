@@ -10,19 +10,19 @@
 // ==============================================================================
 
 
-u32 cel_get_ticks() {
+uint32_t cel_get_ticks() {
 #if defined(CELIB_USE_SDL)
     return SDL_GetTicks();
 #endif
 }
 
-u64 cel_get_perf_counter() {
+uint64_t cel_get_perf_counter() {
 #if defined(CELIB_USE_SDL)
     return SDL_GetPerformanceCounter();
 #endif
 }
 
-u64 cel_get_perf_freq() {
+uint64_t cel_get_perf_freq() {
 #if defined(CELIB_USE_SDL)
     return SDL_GetPerformanceFrequency();
 #endif

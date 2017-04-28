@@ -121,7 +121,7 @@ void _dealloc_allm_string() {
 
 cvar_t _find_first_free() {
 
-    for (u64 i = 1; i < MAX_VARIABLES; ++i) {
+    for (uint64_t i = 1; i < MAX_VARIABLES; ++i) {
         if (_G.name[i][0] != '\0') {
             continue;
         }
@@ -212,7 +212,7 @@ void cvar_compile_global() {
 
 
 cvar_t cvar_find(const char *name) {
-    for (u64 i = 1; i < MAX_VARIABLES; ++i) {
+    for (uint64_t i = 1; i < MAX_VARIABLES; ++i) {
         if (_G.name[i][0] == '\0') {
             continue;
         }
@@ -418,7 +418,7 @@ cvar_t cvar_find_or_create(const char *name,
                            int *new) {
     if (new) *new = 0;
 
-    for (u64 i = 1; i < MAX_VARIABLES; ++i) {
+    for (uint64_t i = 1; i < MAX_VARIABLES; ++i) {
         if (_G.name[i][0] == '\0') {
             continue;
         }
@@ -531,7 +531,7 @@ void cvar_set_string(cvar_t var,
 }
 
 void cvar_log_all() {
-    for (u64 i = 1; i < MAX_VARIABLES; ++i) {
+    for (uint64_t i = 1; i < MAX_VARIABLES; ++i) {
         if (_G.name[i][0] == '\0') {
             continue;
         }

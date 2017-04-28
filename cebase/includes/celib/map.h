@@ -68,25 +68,25 @@ struct map_find_result {
 #define MAP_PROTOTYPE_N(T, N)                                                  \
                                                                                \
 struct map_entry_##N {                                                         \
-    u64 key;                                                                   \
-    u32 next;                                                                  \
+    uint64_t key;                                                                   \
+    uint32_t next;                                                                  \
     T value;                                                                   \
 };                                                                             \
                                                                                \
 typedef struct map_entry_##N map_entry_t_##N;                                  \
 ARRAY_PROTOTYPE(map_entry_t_##N);                                              \
 struct map_##N {                                                               \
-    ARRAY_T(u32) _hash;                                                        \
+    ARRAY_T(uint32_t) _hash;                                                        \
     ARRAY_T(map_entry_t_##N) _data;                                            \
 };                                                                             \
                                                                                \
 static void map_init_##N(MAP_T(N) *h, struct cel_allocator *allocator) {       \
-    ARRAY_INIT(u32, &h->_hash, allocator);                                     \
+    ARRAY_INIT(uint32_t, &h->_hash, allocator);                                     \
     ARRAY_INIT(map_entry_t_##N, &h->_data, allocator);                         \
 }                                                                              \
                                                                                \
 static void map_destroy_##N(MAP_T(N) *h) {                                     \
-    ARRAY_DESTROY(u32, &h->_hash);                                             \
+    ARRAY_DESTROY(uint32_t, &h->_hash);                                             \
     ARRAY_DESTROY(map_entry_t_##N, &h->_data);                                 \
 }                                                                              \
                                                                                \
@@ -217,7 +217,7 @@ static void _map_remap_##N(MAP_T(N) *h, uint32_t new_size) {                   \
     MAP_T(N) nh;                                                               \
     map_init_##N(&nh, h->_hash.allocator);                                     \
                                                                                \
-    ARRAY_RESIZE(u32, &nh._hash, new_size);                                    \
+    ARRAY_RESIZE(uint32_t, &nh._hash, new_size);                                    \
     ARRAY_RESERVE(map_entry_t_##N, &nh._data, ARRAY_SIZE(&h->_data));          \
                                                                                \
     for (uint32_t i = 0; i < new_size; ++i)                                    \
@@ -280,7 +280,7 @@ static void map_reserve_##N(MAP_T(N) *h, uint32_t size) {                      \
 }                                                                              \
                                                                                \
 static void map_clear_##N(MAP_T(N) *h) {                                       \
-    ARRAY_RESIZE(u32, &h->_hash, 0);                                           \
+    ARRAY_RESIZE(uint32_t, &h->_hash, 0);                                           \
     ARRAY_RESIZE(map_entry_t_##N, &h->_data, 0);                               \
 }                                                                              \
                                                                                \
@@ -359,20 +359,20 @@ MAP_PROTOTYPE(char)
 
 MAP_PROTOTYPE(int)
 
-MAP_PROTOTYPE(u8)
+MAP_PROTOTYPE(uint8_t)
 
-MAP_PROTOTYPE(u16)
+MAP_PROTOTYPE(uint16_t)
 
-MAP_PROTOTYPE(u32)
+MAP_PROTOTYPE(uint32_t)
 
-MAP_PROTOTYPE(u64)
+MAP_PROTOTYPE(uint64_t)
 
-MAP_PROTOTYPE(i8)
+MAP_PROTOTYPE(int8_t)
 
-MAP_PROTOTYPE(i16)
+MAP_PROTOTYPE(int16_t)
 
-MAP_PROTOTYPE(i32)
+MAP_PROTOTYPE(int32_t)
 
-MAP_PROTOTYPE(i64)
+MAP_PROTOTYPE(int64_t)
 
 #endif //CELIB_CONTAINERS_MAP_H

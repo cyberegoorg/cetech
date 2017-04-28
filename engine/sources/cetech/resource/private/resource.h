@@ -72,7 +72,7 @@ int resource_compiler_get_tmp_dir(char *tmp_dir,
                                   const char *platform);
 
 int resource_compiler_external_join(char *output,
-                                    u32 max_len,
+                                    uint32_t max_len,
                                     const char *name);
 
 void resource_compiler_create_build_dir();

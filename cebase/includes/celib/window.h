@@ -30,8 +30,8 @@ enum cel_window_pos {
 cel_window_t cel_window_new(const char *title,
                             enum cel_window_pos x,
                             enum cel_window_pos y,
-                            const i32 width,
-                            const i32 height,
+                            const int32_t width,
+                            const int32_t height,
                             enum cel_window_flags flags);
 
 cel_window_t cel_window_new_from(void *hndl);

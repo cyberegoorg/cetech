@@ -40,8 +40,8 @@
 #define QUEUE_PROTOTYPE_N(T, N)                                                                             \
     struct queue_##N {                                                                                      \
         ARRAY_T(N) _data;                                                                                   \
-        u32 _size;                                                                                          \
-        u32 _offset;                                                                                        \
+        uint32_t _size;                                                                                          \
+        uint32_t _offset;                                                                                        \
     };                                                                                                      \
     static inline void queue_init_##N(QUEUE_T(N) *q,                                                        \
                                       struct cel_allocator* allocator) {                                        \
@@ -64,7 +64,7 @@
         q->_offset = 0;                                                                                     \
     }                                                                                                       \
                                                                                                             \
-    static inline void queue_increase_capacity_##N( QUEUE_T(N) *q, u32 new_capacity) {                      \
+    static inline void queue_increase_capacity_##N( QUEUE_T(N) *q, uint32_t new_capacity) {                      \
         uint32_t end = ARRAY_SIZE(&q->_data);                                                               \
                                                                                                             \
         ARRAY_RESIZE(N, &q->_data, new_capacity);                                                           \
@@ -161,20 +161,20 @@ QUEUE_PROTOTYPE(char)
 
 QUEUE_PROTOTYPE(int)
 
-QUEUE_PROTOTYPE(u8)
+QUEUE_PROTOTYPE(uint8_t)
 
-QUEUE_PROTOTYPE(u16)
+QUEUE_PROTOTYPE(uint16_t)
 
-QUEUE_PROTOTYPE(u32)
+QUEUE_PROTOTYPE(uint32_t)
 
-QUEUE_PROTOTYPE(u64)
+QUEUE_PROTOTYPE(uint64_t)
 
-QUEUE_PROTOTYPE(i8)
+QUEUE_PROTOTYPE(int8_t)
 
-QUEUE_PROTOTYPE(i16)
+QUEUE_PROTOTYPE(int16_t)
 
-QUEUE_PROTOTYPE(i32)
+QUEUE_PROTOTYPE(int32_t)
 
-QUEUE_PROTOTYPE(i64)
+QUEUE_PROTOTYPE(int64_t)
 
 #endif //CELIB_QUEUE_H

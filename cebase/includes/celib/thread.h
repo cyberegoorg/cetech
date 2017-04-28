@@ -36,11 +36,11 @@ void cel_thread_wait(thread_t thread,
 //! Get id for thread
 //! \param thread Thread
 //! \return ID
-u64 cel_thread_get_id(thread_t thread);
+uint64_t cel_thread_get_id(thread_t thread);
 
 //! Get actual thread id
 //! \return Thread id
-u64 cel_thread_actual_id();
+uint64_t cel_thread_actual_id();
 
 void cel_thread_yield();
 

@@ -94,7 +94,7 @@ const char *filesystem_get_root_dir(stringid64_t root) {
 
 int filesystem_get_fullpath(stringid64_t root,
                             char *result,
-                            u64 maxlen,
+                            uint64_t maxlen,
                             const char *filename) {
     const char *root_path = filesystem_get_root_dir(root);
 

@@ -9,12 +9,12 @@
 #include "types.h"
 
 struct event_header {
-    u32 type;
-    u64 size;
+    uint32_t type;
+    uint64_t size;
 };
 
 struct eventstream {
-    struct array_u8 stream;
+    struct array_uint8_t stream;
 };
 
 //==============================================================================
@@ -23,15 +23,15 @@ struct eventstream {
 
 static inline void eventstream_create(struct eventstream *es,
                                       struct cel_allocator *allocator) {
-    ARRAY_INIT(u8, &es->stream, allocator);
+    ARRAY_INIT(uint8_t, &es->stream, allocator);
 }
 
 static inline void eventstream_destroy(struct eventstream *es) {
-    ARRAY_DESTROY(u8, &es->stream);
+    ARRAY_DESTROY(uint8_t, &es->stream);
 }
 
 static inline void eventstream_clear(struct eventstream *es) {
-    ARRAY_RESIZE(u8, &es->stream, 0);
+    ARRAY_RESIZE(uint8_t, &es->stream, 0);
 }
 
 static inline struct event_header *eventstream_begin(struct eventstream *es) {
@@ -50,12 +50,12 @@ static inline struct event_header *eventstream_next(struct event_header *header)
 
 static inline void *_eventstream_push(struct eventstream *es,
                                       struct event_header *header,
-                                      u32 type,
-                                      u64 size) {
+                                      uint32_t type,
+                                      uint64_t size) {
     header->type = type;
     header->size = size;
     size_t s = ARRAY_SIZE(&es->stream);
-    array_push_u8(&es->stream, (u8 *) header, size);
+    array_push_uint8_t(&es->stream, (uint8_t *) header, size);
 
     return (void *) (&ARRAY_AT(&es->stream, s));
 }

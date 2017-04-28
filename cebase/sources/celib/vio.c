@@ -31,7 +31,7 @@ void cel_vio_seek_to_end(struct vio *file) {
 }
 
 int64_t cel_vio_skip(struct vio *file,
-                     i64 bytes) {
+                     int64_t bytes) {
     CEL_ASSERT("vio", file != NULL);
 
     return cel_vio_seek(file, bytes, VIO_SEEK_CUR);

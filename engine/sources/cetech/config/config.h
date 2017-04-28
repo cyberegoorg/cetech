@@ -18,7 +18,7 @@
 
 //! Cvar type
 typedef struct {
-    u64 idx; //!< Idx
+    uint64_t idx; //!< Idx
 } cvar_t;
 
 

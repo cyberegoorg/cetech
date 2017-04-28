@@ -25,7 +25,7 @@
 
 typedef struct {
     void *data;
-    u8 ref_count;
+    uint8_t ref_count;
 } resource_item_t;
 
 ARRAY_PROTOTYPE(resource_item_t)
@@ -57,7 +57,7 @@ static const resource_item_t null_item = {.data=NULL, .ref_count=0};
 
 #define _G ResourceManagerGlobals
 struct G {
-    MAP_T(u32) type_map;
+    MAP_T(uint32_t) type_map;
     ARRAY_T(resource_data) resource_data;
     ARRAY_T(resource_callbacks_t) resource_callbacks;
     int autoload_enabled;
@@ -88,7 +88,7 @@ static int _cmd_reload_all(mpack_node_t args,
 }
 
 static MAP_T(resource_item_t) *_get_resource_map(stringid64_t type) {
-    const u32 idx = MAP_GET(u32, &_G.type_map, type.id, UINT32_MAX);
+    const uint32_t idx = MAP_GET(uint32_t, &_G.type_map, type.id, UINT32_MAX);
 
     if (idx == UINT32_MAX) {
         return NULL;
@@ -99,7 +99,7 @@ static MAP_T(resource_item_t) *_get_resource_map(stringid64_t type) {
 
 void *package_resource_loader(struct vio *input,
                               struct cel_allocator *allocator) {
-    const i64 size = cel_vio_size(input);
+    const int64_t size = cel_vio_size(input);
     char *data = CEL_ALLOCATE(allocator, char, size);
     cel_vio_read(input, data, 1, size);
 
@@ -152,7 +152,7 @@ static void _init(get_api_fce_t get_engine_api) {
     ARRAY_INIT(resource_data, &_G.resource_data, MemSysApiV0.main_allocator());
     ARRAY_INIT(resource_callbacks_t, &_G.resource_callbacks,
                MemSysApiV0.main_allocator());
-    MAP_INIT(u32, &_G.type_map, MemSysApiV0.main_allocator());
+    MAP_INIT(uint32_t, &_G.type_map, MemSysApiV0.main_allocator());
 
     _G.config.build_dir = ConfigApiV0.find("build");
 
@@ -188,7 +188,7 @@ static void _shutdown() {
 
     ARRAY_DESTROY(resource_data, &_G.resource_data);
     ARRAY_DESTROY(resource_callbacks_t, &_G.resource_callbacks);
-    MAP_DESTROY(u32, &_G.type_map);
+    MAP_DESTROY(uint32_t, &_G.type_map);
 
     package_shutdown();
 }
@@ -215,7 +215,7 @@ void resource_set_autoload(int enable) {
 void resource_register_type(stringid64_t type,
                             resource_callbacks_t callbacks) {
 
-    const u32 idx = ARRAY_SIZE(&_G.resource_data);
+    const uint32_t idx = ARRAY_SIZE(&_G.resource_data);
 
     ARRAY_PUSH_BACK(resource_data, &_G.resource_data,
                     (MAP_T(resource_item_t)) {0});
@@ -224,14 +224,14 @@ void resource_register_type(stringid64_t type,
     MAP_INIT(resource_item_t, &ARRAY_AT(&_G.resource_data, idx),
              MemSysApiV0.main_allocator());
 
-    MAP_SET(u32, &_G.type_map, type.id, idx);
+    MAP_SET(uint32_t, &_G.type_map, type.id, idx);
 }
 
 void resource_add_loaded(stringid64_t type,
                          stringid64_t *names,
                          void **resource_data,
                          size_t count) {
-    const u32 idx = MAP_GET(u32, &_G.type_map, type.id, UINT32_MAX);
+    const uint32_t idx = MAP_GET(uint32_t, &_G.type_map, type.id, UINT32_MAX);
 
     if (idx == UINT32_MAX) {
         return;
@@ -301,7 +301,7 @@ void resource_load(void **loaded_data,
                    stringid64_t *names,
                    size_t count,
                    int force) {
-    const u32 idx = MAP_GET(u32, &_G.type_map, type.id, UINT32_MAX);
+    const uint32_t idx = MAP_GET(uint32_t, &_G.type_map, type.id, UINT32_MAX);
 
     if (idx == UINT32_MAX) {
         log_error(LOG_WHERE, "Loader for resource is not is not registred");
@@ -355,7 +355,7 @@ void resource_load(void **loaded_data,
 void resource_unload(stringid64_t type,
                      stringid64_t *names,
                      size_t count) {
-    const u32 idx = MAP_GET(u32, &_G.type_map, type.id, UINT32_MAX);
+    const uint32_t idx = MAP_GET(uint32_t, &_G.type_map, type.id, UINT32_MAX);
 
     if (idx == UINT32_MAX) {
         return;
@@ -428,7 +428,7 @@ void resource_reload(stringid64_t type,
 
     void *loaded_data[count];
     MAP_T(resource_item_t) *resource_map = _get_resource_map(type);
-    const u32 idx = MAP_GET(u32, &_G.type_map, type.id, 0);
+    const uint32_t idx = MAP_GET(uint32_t, &_G.type_map, type.id, 0);
 
     resource_callbacks_t type_clb = ARRAY_AT(&_G.resource_callbacks, idx);
 
@@ -457,8 +457,8 @@ void resource_reload(stringid64_t type,
 }
 
 void resource_reload_all() {
-    const MAP_ENTRY_T(u32) *type_it = MAP_BEGIN(u32, &_G.type_map);
-    const MAP_ENTRY_T(u32) *type_end = MAP_END(u32, &_G.type_map);
+    const MAP_ENTRY_T(uint32_t) *type_it = MAP_BEGIN(uint32_t, &_G.type_map);
+    const MAP_ENTRY_T(uint32_t) *type_end = MAP_END(uint32_t, &_G.type_map);
 
     ARRAY_T(stringid64_t) name_array = {0};
     ARRAY_INIT(stringid64_t, &name_array, MemSysApiV0.main_allocator());

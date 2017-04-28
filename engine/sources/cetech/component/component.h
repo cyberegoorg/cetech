@@ -25,7 +25,7 @@
 //! \param body Component body yaml
 //! \param data Compiled compoent data
 typedef int (*component_compiler_t)(yaml_node_t body,
-                                    ARRAY_T(u8) *data);
+                                    ARRAY_T(uint8_t) *data);
 
 //! Component destoryer
 //! \param world World where is component
@@ -44,8 +44,8 @@ typedef void (*component_destroyer_t)(world_t world,
 //! \param data Component data
 typedef void (*component_spawner_t)(world_t world,
                                     entity_t *ents,
-                                    u32 *cent,
-                                    u32 *ents_parent,
+                                    uint32_t *cent,
+                                    uint32_t *ents_parent,
                                     size_t ent_count,
                                     void *data);
 
@@ -76,7 +76,7 @@ struct ComponentSystemApiV0 {
     //! \param spawn_order Spawn order number
     void (*component_register_compiler)(stringid64_t type,
                                         component_compiler_t compiler,
-                                        u32 spawn_order);
+                                        uint32_t spawn_order);
 
     //! Compile component
     //! \param type Component type
@@ -85,12 +85,12 @@ struct ComponentSystemApiV0 {
     //! \return 1 if compile is ok else 0
     int (*component_compile)(stringid64_t type,
                              yaml_node_t body,
-                             ARRAY_T(u8) *data);
+                             ARRAY_T(uint8_t) *data);
 
     //! Get component spawn order
     //! \param type Component type
     //! \return Spawn order
-    u32 (*component_get_spawn_order)(stringid64_t type);
+    uint32_t (*component_get_spawn_order)(stringid64_t type);
 
     //! Register new component type
     //! \param type Component type
@@ -109,9 +109,9 @@ struct ComponentSystemApiV0 {
     void (*component_spawn)(world_t world,
                             stringid64_t type,
                             entity_t *ent_ids,
-                            u32 *cent,
-                            u32 *ents_parent,
-                            u32 ent_count,
+                            uint32_t *cent,
+                            uint32_t *ents_parent,
+                            uint32_t ent_count,
                             void *data);
 
     //! Destroy components
@@ -120,7 +120,7 @@ struct ComponentSystemApiV0 {
     //! \param count Entities count
     void (*component_destroy)(world_t world,
                               entity_t *ent,
-                              u32 count);
+                              uint32_t count);
 };
 
 #endif //CETECH_COMPONENT_MANAGER_H

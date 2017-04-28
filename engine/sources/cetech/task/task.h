@@ -93,7 +93,7 @@ struct TaskApiV0 {
     //! \param items Task item array
     //! \param count Task item count
     void (*add)(struct task_item *items,
-                u32 count);
+                uint32_t count);
 
     //! Do work for task system.
     //! \return 1 if make some work else 0
@@ -103,7 +103,7 @@ struct TaskApiV0 {
     //! \param signal Signal ptr
     //! \param value Signal value
     void (*wait_atomic)(atomic_int *signal,
-                        u32 value);
+                        uint32_t value);
 
     //! Curent worker id
     //! \return Worker id

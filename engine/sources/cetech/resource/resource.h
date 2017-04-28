@@ -237,7 +237,7 @@ struct ResourceApiV0 {
     //! \param name Tool name
     //! \return 1 if ok else 0
     int (*compiler_external_join)(char *output,
-                                  u32 max_len,
+                                  uint32_t max_len,
                                   const char *name);
 
     //! Create build dir

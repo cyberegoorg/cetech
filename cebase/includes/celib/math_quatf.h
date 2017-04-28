@@ -35,37 +35,37 @@ CEL_FORCE_INLINE void cel_quatf_move(cel_quatf_t *__restrict result,
 
 CEL_FORCE_INLINE int cel_quatf_eq(const cel_quatf_t *__restrict a,
                                   const cel_quatf_t *__restrict b,
-                                  const f32 epsilon) {
-    return cel_f32_equals(a->f, b->f, 4, epsilon);
+                                  const float epsilon) {
+    return cel_float_equals(a->f, b->f, 4, epsilon);
 }
 
 
 CEL_FORCE_INLINE void cel_quatf_from_axis_angle(cel_quatf_t *__restrict result,
                                                 const cel_vec3f_t *__restrict axis,
-                                                const f32 angle) {
+                                                const float angle) {
     cel_vec3f_t norm_axis;
     cel_vec3f_normalized(&norm_axis, axis);
 
-    const f32 angle_half = angle * 0.5f * CEL_F32_TORAD;
-    const f32 sin = cel_f32_sin(angle_half);
+    const float angle_half = angle * 0.5f * CEL_float_TORAD;
+    const float sin = cel_float_sin(angle_half);
 
     result->f[0] = sin * norm_axis.x;
     result->f[1] = sin * norm_axis.y;
     result->f[2] = sin * norm_axis.z;
 
-    result->f[3] = cel_f32_cos(angle_half);
+    result->f[3] = cel_float_cos(angle_half);
 }
 
 CEL_FORCE_INLINE void cel_quatf_from_euler(cel_quatf_t *__restrict result,
-                                           f32 heading,
-                                           f32 attitude,
-                                           f32 bank) {
-    const f32 sx = cel_f32_sin(heading * 0.5f);
-    const f32 sy = cel_f32_sin(attitude * 0.5f);
-    const f32 sz = cel_f32_sin(bank * 0.5f);
-    const f32 cx = cel_f32_cos(heading * 0.5f);
-    const f32 cy = cel_f32_cos(attitude * 0.5f);
-    const f32 cz = cel_f32_cos(bank * 0.5f);
+                                           float heading,
+                                           float attitude,
+                                           float bank) {
+    const float sx = cel_float_sin(heading * 0.5f);
+    const float sy = cel_float_sin(attitude * 0.5f);
+    const float sz = cel_float_sin(bank * 0.5f);
+    const float cx = cel_float_cos(heading * 0.5f);
+    const float cy = cel_float_cos(attitude * 0.5f);
+    const float cz = cel_float_cos(bank * 0.5f);
 
     result->f[0] = sx * cy * cz - cx * sy * sz;
     result->f[1] = cx * sy * cz + sx * cy * sz;
@@ -99,17 +99,17 @@ CEL_FORCE_INLINE void cel_quatf_to_mat44f(cel_mat44f_t *__restrict result,
 
 CEL_FORCE_INLINE void cel_quatf_to_eurel_angle(cel_vec3f_t *__restrict result,
                                                const cel_quatf_t *__restrict a) {
-    result->f[0] = cel_f32_atan2(2.0f * (a->f[0] * a->f[3] - a->f[1] * a->f[2]),
-                                 1.0f - 2.0f * (cel_f32_sq(a->f[0]) + cel_f32_sq(a->f[2])));
+    result->f[0] = cel_float_atan2(2.0f * (a->f[0] * a->f[3] - a->f[1] * a->f[2]),
+                                 1.0f - 2.0f * (cel_float_sq(a->f[0]) + cel_float_sq(a->f[2])));
 
-    result->f[1] = cel_f32_atan2(2.0f * (a->f[1] * a->f[3] + a->f[0] * a->f[2]),
-                                 1.0f - 2.0f * (cel_f32_sq(a->f[1]) + cel_f32_sq(a->f[2])));
+    result->f[1] = cel_float_atan2(2.0f * (a->f[1] * a->f[3] + a->f[0] * a->f[2]),
+                                 1.0f - 2.0f * (cel_float_sq(a->f[1]) + cel_float_sq(a->f[2])));
 
-    result->f[2] = cel_f32_asin(2.0f * (a->f[0] * a->f[1] + a->f[2] * a->f[3]));
+    result->f[2] = cel_float_asin(2.0f * (a->f[0] * a->f[1] + a->f[2] * a->f[3]));
 }
 
 CEL_FORCE_INLINE int cel_quatf_is_identity(const cel_quatf_t *__restrict a,
-                                           const f32 epsilon) {
+                                           const float epsilon) {
     static cel_quatf_t _identity = QUATF_IDENTITY;
     return cel_quatf_eq(a, &_identity, epsilon);
 }
@@ -143,7 +143,7 @@ CEL_FORCE_INLINE void cel_quatf_neg(cel_quatf_t *__restrict result,
 
 CEL_FORCE_INLINE void cel_quatf_mul_s(cel_quatf_t *__restrict result,
                                       const cel_quatf_t *__restrict a,
-                                      const f32 s) {
+                                      const float s) {
     result->f[0] = a->f[0] * s;
     result->f[1] = a->f[1] * s;
     result->f[2] = a->f[2] * s;
@@ -152,7 +152,7 @@ CEL_FORCE_INLINE void cel_quatf_mul_s(cel_quatf_t *__restrict result,
 
 CEL_FORCE_INLINE void cel_quatf_div_s(cel_quatf_t *__restrict result,
                                       const cel_quatf_t *__restrict a,
-                                      const f32 s) {
+                                      const float s) {
     result->f[0] = a->f[0] / s;
     result->f[1] = a->f[1] / s;
     result->f[2] = a->f[2] / s;
@@ -177,23 +177,23 @@ CEL_FORCE_INLINE void cel_quatf_mul_vec3f(cel_vec3f_t *__restrict result,
     cel_vec3f_cross(&tmp_vec1, (const cel_vec3f_t *) a, b);
     cel_vec3f_mul(&tmp_vec3, &tmp_vec1, 2.0f * a->f[3]);
 
-    cel_vec3f_mul(&tmp_vec1, b, cel_f32_sq(a->f[3]) - cel_vec3f_dot((cel_vec3f_t *) a, (cel_vec3f_t *) a));
+    cel_vec3f_mul(&tmp_vec1, b, cel_float_sq(a->f[3]) - cel_vec3f_dot((cel_vec3f_t *) a, (cel_vec3f_t *) a));
     cel_vec3f_add(&tmp_vec2, &tmp_vec1, &tmp_vec3);
 
     cel_vec3f_mul(&tmp_vec3, (const cel_vec3f_t *) a, 2.0f * cel_vec3f_dot((cel_vec3f_t *) a, b));
     cel_vec3f_add(result, &tmp_vec2, &tmp_vec3);
 }
 
-CEL_FORCE_INLINE f32 cel_quatf_length_squared(const cel_quatf_t *__restrict a) {
+CEL_FORCE_INLINE float cel_quatf_length_squared(const cel_quatf_t *__restrict a) {
     return (a->f[0] * a->f[0]) + (a->f[1] * a->f[1]) + (a->f[2] * a->f[2]) + (a->f[3] * a->f[3]);
 }
 
-CEL_FORCE_INLINE f32 cel_quatf_length(const cel_quatf_t *__restrict a) {
-    return cel_f32_fast_sqrt(cel_quatf_length_squared(a));
+CEL_FORCE_INLINE float cel_quatf_length(const cel_quatf_t *__restrict a) {
+    return cel_float_fast_sqrt(cel_quatf_length_squared(a));
 }
 
-CEL_FORCE_INLINE f32 cel_quatf_inv_length(const cel_quatf_t *__restrict a) {
-    return cel_f32_fast_inv_sqrt(cel_quatf_length_squared(a));
+CEL_FORCE_INLINE float cel_quatf_inv_length(const cel_quatf_t *__restrict a) {
+    return cel_float_fast_inv_sqrt(cel_quatf_length_squared(a));
 }
 
 CEL_FORCE_INLINE void cel_quatf_normalized(cel_quatf_t *__restrict result,

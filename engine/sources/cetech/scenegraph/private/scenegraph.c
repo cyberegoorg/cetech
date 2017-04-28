@@ -18,11 +18,11 @@ ARRAY_PROTOTYPE(cel_mat44f_t)
 ARRAY_PROTOTYPE(cel_quatf_t)
 
 typedef struct {
-    MAP_T(u32) ent_idx_map;
+    MAP_T(uint32_t) ent_idx_map;
 
-    ARRAY_T(u32) first_child;
-    ARRAY_T(u32) next_sibling;
-    ARRAY_T(u32) parent;
+    ARRAY_T(uint32_t) first_child;
+    ARRAY_T(uint32_t) next_sibling;
+    ARRAY_T(uint32_t) parent;
 
     ARRAY_T(stringid64_t) name;
     ARRAY_T(cel_vec3f_t) position;
@@ -47,11 +47,11 @@ IMPORT_API(WorldApi, 0);
 static void _new_world(world_t world) {
     world_data_t data = {0};
 
-    MAP_INIT(u32, &data.ent_idx_map, MemSysApiV0.main_allocator());
+    MAP_INIT(uint32_t, &data.ent_idx_map, MemSysApiV0.main_allocator());
 
-    ARRAY_INIT(u32, &data.first_child, MemSysApiV0.main_allocator());
-    ARRAY_INIT(u32, &data.next_sibling, MemSysApiV0.main_allocator());
-    ARRAY_INIT(u32, &data.parent, MemSysApiV0.main_allocator());
+    ARRAY_INIT(uint32_t, &data.first_child, MemSysApiV0.main_allocator());
+    ARRAY_INIT(uint32_t, &data.next_sibling, MemSysApiV0.main_allocator());
+    ARRAY_INIT(uint32_t, &data.parent, MemSysApiV0.main_allocator());
 
     ARRAY_INIT(stringid64_t, &data.name, MemSysApiV0.main_allocator());
     ARRAY_INIT(cel_vec3f_t, &data.position, MemSysApiV0.main_allocator());
@@ -69,11 +69,11 @@ static world_data_t *_get_world_data(world_t world) {
 static void _destroy_world(world_t world) {
     world_data_t *data = _get_world_data(world);
 
-    MAP_DESTROY(u32, &data->ent_idx_map);
+    MAP_DESTROY(uint32_t, &data->ent_idx_map);
 
-    ARRAY_DESTROY(u32, &data->first_child);
-    ARRAY_DESTROY(u32, &data->next_sibling);
-    ARRAY_DESTROY(u32, &data->parent);
+    ARRAY_DESTROY(uint32_t, &data->first_child);
+    ARRAY_DESTROY(uint32_t, &data->next_sibling);
+    ARRAY_DESTROY(uint32_t, &data->parent);
 
     ARRAY_DESTROY(stringid64_t, &data->name);
     ARRAY_DESTROY(cel_vec3f_t, &data->position);
@@ -141,7 +141,7 @@ void scene_node_transform(world_t world,
     cel_mat44f_mul(&ARRAY_AT(&world_data->world_matrix, transform.idx), &m,
                    parent);
 
-    u32 child = ARRAY_AT(&world_data->first_child, transform.idx);
+    uint32_t child = ARRAY_AT(&world_data->first_child, transform.idx);
 
     scene_node_t child_transform = {.idx = child};
 
@@ -186,7 +186,7 @@ void scenegraph_set_position(world_t world,
                              scene_node_t transform,
                              cel_vec3f_t pos) {
     world_data_t *world_data = _get_world_data(world);
-    u32 parent_idx = ARRAY_AT(&world_data->parent, transform.idx);
+    uint32_t parent_idx = ARRAY_AT(&world_data->parent, transform.idx);
 
     scene_node_t pt = {.idx = parent_idx};
 
@@ -204,7 +204,7 @@ void scenegraph_set_rotation(world_t world,
                              scene_node_t transform,
                              cel_quatf_t rot) {
     world_data_t *world_data = _get_world_data(world);
-    u32 parent_idx = ARRAY_AT(&world_data->parent, transform.idx);
+    uint32_t parent_idx = ARRAY_AT(&world_data->parent, transform.idx);
 
     scene_node_t pt = {.idx = parent_idx};
 
@@ -225,7 +225,7 @@ void scenegraph_set_scale(world_t world,
                           scene_node_t transform,
                           cel_vec3f_t scale) {
     world_data_t *world_data = _get_world_data(world);
-    u32 parent_idx = ARRAY_AT(&world_data->parent, transform.idx);
+    uint32_t parent_idx = ARRAY_AT(&world_data->parent, transform.idx);
 
     scene_node_t pt = {.idx = parent_idx};
 
@@ -242,30 +242,30 @@ void scenegraph_set_scale(world_t world,
 int scenegraph_has(world_t world,
                    entity_t entity) {
     world_data_t *world_data = _get_world_data(world);
-    return MAP_HAS(u32, &world_data->ent_idx_map, entity.h.h);
+    return MAP_HAS(uint32_t, &world_data->ent_idx_map, entity.h.h);
 }
 
 scene_node_t scenegraph_get_root(world_t world,
                                  entity_t entity) {
 
     world_data_t *world_data = _get_world_data(world);
-    u32 idx = MAP_GET(u32, &world_data->ent_idx_map, entity.h.h, UINT32_MAX);
+    uint32_t idx = MAP_GET(uint32_t, &world_data->ent_idx_map, entity.h.h, UINT32_MAX);
     return (scene_node_t) {.idx = idx};
 }
 
 scene_node_t scenegraph_create(world_t world,
                                entity_t entity,
                                stringid64_t *names,
-                               u32 *parent,
+                               uint32_t *parent,
                                cel_mat44f_t *pose,
-                               u32 count) {
+                               uint32_t count) {
     world_data_t *data = _get_world_data(world);
 
     scene_node_t *nodes = CEL_ALLOCATE(MemSysApiV0.main_allocator(),
                                        scene_node_t, count);
 
     for (int i = 0; i < count; ++i) {
-        u32 idx = (u32) ARRAY_SIZE(&data->position);
+        uint32_t idx = (uint32_t) ARRAY_SIZE(&data->position);
         nodes[i] = (scene_node_t) {.idx = idx};
 
         cel_mat44f_t local_pose = pose[i];
@@ -279,9 +279,9 @@ scene_node_t scenegraph_create(world_t world,
         ARRAY_PUSH_BACK(cel_vec3f_t, &data->scale, scale);
 
         ARRAY_PUSH_BACK(stringid64_t, &data->name, names[i]);
-        ARRAY_PUSH_BACK(u32, &data->parent, UINT32_MAX);
-        ARRAY_PUSH_BACK(u32, &data->first_child, UINT32_MAX);
-        ARRAY_PUSH_BACK(u32, &data->next_sibling, UINT32_MAX);
+        ARRAY_PUSH_BACK(uint32_t, &data->parent, UINT32_MAX);
+        ARRAY_PUSH_BACK(uint32_t, &data->first_child, UINT32_MAX);
+        ARRAY_PUSH_BACK(uint32_t, &data->next_sibling, UINT32_MAX);
 
         cel_mat44f_t m = MAT44F_INIT_IDENTITY;
         ARRAY_PUSH_BACK(cel_mat44f_t, &data->world_matrix, m);
@@ -294,14 +294,14 @@ scene_node_t scenegraph_create(world_t world,
                              : &m);
 
         if (parent[i] != UINT32_MAX) {
-            u32 parent_idx = nodes[parent[i]].idx;
+            uint32_t parent_idx = nodes[parent[i]].idx;
 
             ARRAY_AT(&data->parent, idx) = parent_idx;
 
             if (ARRAY_AT(&data->first_child, parent_idx) == UINT32_MAX) {
                 ARRAY_AT(&data->first_child, parent_idx) = idx;
             } else {
-                u32 first_child_idx = ARRAY_AT(&data->first_child, parent_idx);
+                uint32_t first_child_idx = ARRAY_AT(&data->first_child, parent_idx);
                 ARRAY_AT(&data->first_child, parent_idx) = idx;
                 ARRAY_AT(&data->next_sibling, idx) = first_child_idx;
             }
@@ -312,7 +312,7 @@ scene_node_t scenegraph_create(world_t world,
     }
 
     scene_node_t root = nodes[0];
-    MAP_SET(u32, &data->ent_idx_map, entity.h.h, root.idx);
+    MAP_SET(uint32_t, &data->ent_idx_map, entity.h.h, root.idx);
     CEL_DEALLOCATE(MemSysApiV0.main_allocator(), nodes);
     return root;
 }
@@ -324,7 +324,7 @@ void scenegraph_link(world_t world,
 
     ARRAY_AT(&data->parent, child.idx) = parent.idx;
 
-    u32 tmp = ARRAY_AT(&data->first_child, parent.idx);
+    uint32_t tmp = ARRAY_AT(&data->first_child, parent.idx);
 
     ARRAY_AT(&data->first_child, parent.idx) = child.idx;
     ARRAY_AT(&data->next_sibling, child.idx) = tmp;

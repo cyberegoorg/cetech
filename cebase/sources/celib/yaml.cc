@@ -50,7 +50,7 @@ static yaml_node_t new_node(yaml_document_t handler,
                             const YAML::Node &node) {
     struct yamlcpp_handler *yaml_handler = (yamlcpp_handler *) handler.d;
 
-    for (u32 i = 1; i < CEL_ARRAY_LEN(yaml_handler->nodes); ++i) {
+    for (uint32_t i = 1; i < CEL_ARRAY_LEN(yaml_handler->nodes); ++i) {
         if (yaml_handler->used[i]) {
             continue;
         }

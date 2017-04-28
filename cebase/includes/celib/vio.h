@@ -26,10 +26,10 @@ enum cel_vio_seek {
 //==============================================================================
 
 struct vio {
-    i64 (*size)(struct vio *vio);
+    int64_t (*size)(struct vio *vio);
 
-    i64 (*seek)(struct vio *vio,
-                i64 offset,
+    int64_t (*seek)(struct vio *vio,
+                int64_t offset,
                 enum cel_vio_seek whence);
 
     size_t (*read)(struct vio *vio,
@@ -59,7 +59,7 @@ int64_t cel_vio_seek(struct vio *file,
 void cel_vio_seek_to_end(struct vio *file);
 
 int64_t cel_vio_skip(struct vio *file,
-                     i64 bytes);
+                     int64_t bytes);
 
 int64_t cel_vio_position(struct vio *file);
 

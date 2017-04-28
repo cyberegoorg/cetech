@@ -41,8 +41,8 @@ ARRAY_PROTOTYPE(stringid64_t);
 struct package_compile_data {
     ARRAY_T(stringid64_t) types;
     ARRAY_T(stringid64_t) name;
-    ARRAY_T(u32) name_count;
-    ARRAY_T(u32) offset;
+    ARRAY_T(uint32_t) name_count;
+    ARRAY_T(uint32_t) offset;
 };
 
 void forach_clb(yaml_node_t key,
@@ -57,11 +57,11 @@ void forach_clb(yaml_node_t key,
 
     ARRAY_PUSH_BACK(stringid64_t, &compile_data->types,
                     stringid64_from_string(type_str));
-    ARRAY_PUSH_BACK(u32, &compile_data->offset,
+    ARRAY_PUSH_BACK(uint32_t, &compile_data->offset,
                     ARRAY_SIZE(&compile_data->name));
 
     const size_t name_count = yaml_node_size(value);
-    ARRAY_PUSH_BACK(u32, &compile_data->name_count, name_count);
+    ARRAY_PUSH_BACK(uint32_t, &compile_data->name_count, name_count);
 
     for (int i = 0; i < name_count; ++i) {
         yaml_node_t name_node = yaml_get_seq_node(value, i);
@@ -90,8 +90,8 @@ int _package_compiler(const char *filename,
     struct package_compile_data compile_data = {0};
     ARRAY_INIT(stringid64_t, &compile_data.types, MemSysApiV0.main_allocator());
     ARRAY_INIT(stringid64_t, &compile_data.name, MemSysApiV0.main_allocator());
-    ARRAY_INIT(u32, &compile_data.offset, MemSysApiV0.main_allocator());
-    ARRAY_INIT(u32, &compile_data.name_count, MemSysApiV0.main_allocator());
+    ARRAY_INIT(uint32_t, &compile_data.offset, MemSysApiV0.main_allocator());
+    ARRAY_INIT(uint32_t, &compile_data.name_count, MemSysApiV0.main_allocator());
 
     yaml_node_foreach_dict(root, forach_clb, &compile_data);
 
@@ -102,7 +102,7 @@ int _package_compiler(const char *filename,
                                                          ARRAY_SIZE(
                                                                  &compile_data.types));
     resource.name_offset = resource.name_count_offset +
-                           (sizeof(u32) * ARRAY_SIZE(&compile_data.name_count));
+                           (sizeof(uint32_t) * ARRAY_SIZE(&compile_data.name_count));
     resource.offset_offset = resource.name_offset + (sizeof(stringid64_t) *
                                                      ARRAY_SIZE(
                                                              &compile_data.name));
@@ -110,17 +110,17 @@ int _package_compiler(const char *filename,
     cel_vio_write(build_vio, &resource, sizeof(resource), 1);
     cel_vio_write(build_vio, ARRAY_BEGIN(&compile_data.types),
                   sizeof(stringid64_t), ARRAY_SIZE(&compile_data.types));
-    cel_vio_write(build_vio, ARRAY_BEGIN(&compile_data.name_count), sizeof(u32),
+    cel_vio_write(build_vio, ARRAY_BEGIN(&compile_data.name_count), sizeof(uint32_t),
                   ARRAY_SIZE(&compile_data.name_count));
     cel_vio_write(build_vio, ARRAY_BEGIN(&compile_data.name),
                   sizeof(stringid64_t), ARRAY_SIZE(&compile_data.name));
-    cel_vio_write(build_vio, ARRAY_BEGIN(&compile_data.offset), sizeof(u32),
+    cel_vio_write(build_vio, ARRAY_BEGIN(&compile_data.offset), sizeof(uint32_t),
                   ARRAY_SIZE(&compile_data.offset));
 
     ARRAY_DESTROY(stringid64_t, &compile_data.types);
     ARRAY_DESTROY(stringid64_t, &compile_data.name);
-    ARRAY_DESTROY(u32, &compile_data.offset);
-    ARRAY_DESTROY(u32, &compile_data.name_count);
+    ARRAY_DESTROY(uint32_t, &compile_data.offset);
+    ARRAY_DESTROY(uint32_t, &compile_data.name_count);
 
     return 1;
 }
@@ -149,7 +149,7 @@ void package_task(void *data) {
     struct package_resource *package = ResourceApiV0.get(_G.package_typel,
                                                          task_data->name);
 
-    const u32 task_count = package->type_count;
+    const uint32_t task_count = package->type_count;
     for (int j = 0; j < task_count; ++j) {
         ResourceApiV0.load_now(package_type(package)[j],
                                &package_name(package)[package_offset(
@@ -180,7 +180,7 @@ void package_unload(stringid64_t name) {
     struct package_resource *package = ResourceApiV0.get(_G.package_typel,
                                                          name);
 
-    const u32 task_count = package->type_count;
+    const uint32_t task_count = package->type_count;
     for (int j = 0; j < task_count; ++j) {
         ResourceApiV0.unload(package_type(package)[j],
                              &package_name(package)[package_offset(package)[j]],
@@ -193,7 +193,7 @@ int package_is_loaded(stringid64_t name) {
 
     struct package_resource *package = ResourceApiV0.get(package_type, name);
 
-    const u32 task_count = package->type_count;
+    const uint32_t task_count = package->type_count;
     for (int i = 0; i < task_count; ++i) {
         if (!ResourceApiV0.can_get_all(package_type(package)[i],
                                        &package_name(package)[package_offset(

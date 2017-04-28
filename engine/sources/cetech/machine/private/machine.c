@@ -119,7 +119,7 @@ int machine_gamepad_is_active(int idx);
 
 void machine_gamepad_play_rumble(int gamepad,
                                  float strength,
-                                 u32 length);
+                                 uint32_t length);
 
 void *machine_get_module_api(int api,
                              int version) {

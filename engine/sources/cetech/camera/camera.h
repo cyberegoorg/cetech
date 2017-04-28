@@ -17,7 +17,7 @@
 
 //! Camera struct
 typedef struct {
-    u32 idx;
+    uint32_t idx;
 } camera_t;
 
 
@@ -68,9 +68,9 @@ struct CameraApiV0 {
     //! \return New camera
     camera_t (*create)(world_t world,
                        entity_t entity,
-                       f32 near,
-                       f32 far,
-                       f32 fov);
+                       float near,
+                       float far,
+                       float fov);
 };
 
 #endif //CETECH_CAMERA_H

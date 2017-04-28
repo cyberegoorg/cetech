@@ -32,8 +32,8 @@ const char *cel_path_extension(const char *path);
 //! \param base_path Base path
 //! \param path Path
 //! \return Result path len
-i64 cel_path_join(char *result,
-                  u64 maxlen,
+int64_t cel_path_join(char *result,
+                  uint64_t maxlen,
                   const char *base_path,
                   const char *path);
 

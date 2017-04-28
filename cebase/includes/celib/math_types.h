@@ -14,10 +14,10 @@
 
 typedef struct {
     union {
-        f32 f[2];
+        float f[2];
         struct {
-            f32 x;
-            f32 y;
+            float x;
+            float y;
         };
     };
 } cel_vec2f_t;
@@ -25,23 +25,23 @@ typedef struct {
 
 typedef struct {
     union {
-        f32 f[3];
+        float f[3];
         struct {
-            f32 x;
-            f32 y;
-            f32 z;
+            float x;
+            float y;
+            float z;
         };
     };
 } cel_vec3f_t;
 
 typedef struct {
     union {
-        f32 f[4];
+        float f[4];
         struct {
-            f32 x;
-            f32 y;
-            f32 z;
-            f32 w;
+            float x;
+            float y;
+            float z;
+            float w;
         };
     };
 } cel_vec4f_t;
@@ -59,7 +59,7 @@ typedef cel_vec4f_t cel_quatf_t;
 
 typedef struct {
     union {
-        f32 f[3 * 3];
+        float f[3 * 3];
         struct {
             cel_vec3f_t x;
             cel_vec3f_t y;
@@ -71,7 +71,7 @@ typedef struct {
 
 typedef struct {
     union {
-        f32 f[4 * 4];
+        float f[4 * 4];
         struct {
             cel_vec4f_t x;
             cel_vec4f_t y;

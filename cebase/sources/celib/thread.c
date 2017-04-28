@@ -49,7 +49,7 @@
 //! Get id for thread
 //! \param thread Thread
 //! \return ID
- u64 cel_thread_get_id(thread_t thread) {
+ uint64_t cel_thread_get_id(thread_t thread) {
 #if defined(CELIB_USE_SDL)
     return SDL_GetThreadID(thread.t);
 #endif
@@ -57,7 +57,7 @@
 
 //! Get actual thread id
 //! \return Thread id
- u64 cel_thread_actual_id() {
+ uint64_t cel_thread_actual_id() {
 #if defined(CELIB_USE_SDL)
     return SDL_ThreadID();
 #endif

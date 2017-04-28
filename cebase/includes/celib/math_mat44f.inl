@@ -30,7 +30,7 @@
 //==============================================================================
 
 CEL_FORCE_INLINE void cel_mat44f_identity(cel_mat44f_t *result) {
-    memset(result, 0, sizeof(f32) * 16);
+    memset(result, 0, sizeof(float) * 16);
 
     result->f[0] = 1.0f;
     result->f[5] = 1.0f;
@@ -39,9 +39,9 @@ CEL_FORCE_INLINE void cel_mat44f_identity(cel_mat44f_t *result) {
 }
 
 CEL_FORCE_INLINE void cel_mat44f_translate(cel_mat44f_t *result,
-                                           f32 x,
-                                           f32 y,
-                                           f32 z) {
+                                           float x,
+                                           float y,
+                                           float z) {
     cel_mat44f_identity(result);
 
     result->f[12] = x;
@@ -50,10 +50,10 @@ CEL_FORCE_INLINE void cel_mat44f_translate(cel_mat44f_t *result,
 }
 
 CEL_FORCE_INLINE void cel_mat44f_scale(cel_mat44f_t *result,
-                                       f32 x,
-                                       f32 y,
-                                       f32 z) {
-    memset(result, 0, sizeof(f32) * 16);
+                                       float x,
+                                       float y,
+                                       float z) {
+    memset(result, 0, sizeof(float) * 16);
 
     result->f[0] = x;
     result->f[5] = y;
@@ -62,11 +62,11 @@ CEL_FORCE_INLINE void cel_mat44f_scale(cel_mat44f_t *result,
 }
 
 CEL_FORCE_INLINE void cel_mat44f_rotate_x(cel_mat44f_t *result,
-                                          f32 x) {
-    const f32 sx = cel_f32_sin(x);
-    const f32 cx = cel_f32_cos(x);
+                                          float x) {
+    const float sx = cel_float_sin(x);
+    const float cx = cel_float_cos(x);
 
-    memset(result, 0, sizeof(f32) * 16);
+    memset(result, 0, sizeof(float) * 16);
 
     result->f[0] = 1.0f;
     result->f[5] = cx;
@@ -77,11 +77,11 @@ CEL_FORCE_INLINE void cel_mat44f_rotate_x(cel_mat44f_t *result,
 }
 
 CEL_FORCE_INLINE void cel_mat44f_rotate_y(cel_mat44f_t *result,
-                                          f32 y) {
-    const f32 sy = cel_f32_sin(y);
-    const f32 cy = cel_f32_cos(y);
+                                          float y) {
+    const float sy = cel_float_sin(y);
+    const float cy = cel_float_cos(y);
 
-    memset(result, 0, sizeof(f32) * 16);
+    memset(result, 0, sizeof(float) * 16);
 
     result->f[0] = cy;
     result->f[2] = sy;
@@ -92,11 +92,11 @@ CEL_FORCE_INLINE void cel_mat44f_rotate_y(cel_mat44f_t *result,
 }
 
 CEL_FORCE_INLINE void cel_mat44f_rotate_z(cel_mat44f_t *result,
-                                          f32 z) {
-    const f32 sz = cel_f32_sin(z);
-    const f32 cz = cel_f32_cos(z);
+                                          float z) {
+    const float sz = cel_float_sin(z);
+    const float cz = cel_float_cos(z);
 
-    memset(result, 0, sizeof(f32) * 16);
+    memset(result, 0, sizeof(float) * 16);
 
     result->f[0] = cz;
     result->f[1] = -sz;
@@ -107,14 +107,14 @@ CEL_FORCE_INLINE void cel_mat44f_rotate_z(cel_mat44f_t *result,
 }
 
 CEL_FORCE_INLINE void cel_mat44f_rotate_xy(cel_mat44f_t *result,
-                                           f32 x,
-                                           f32 y) {
-    const f32 sx = cel_f32_sin(x);
-    const f32 cx = cel_f32_cos(x);
-    const f32 sy = cel_f32_sin(y);
-    const f32 cy = cel_f32_cos(y);
+                                           float x,
+                                           float y) {
+    const float sx = cel_float_sin(x);
+    const float cx = cel_float_cos(x);
+    const float sy = cel_float_sin(y);
+    const float cy = cel_float_cos(y);
 
-    memset(result, 0, sizeof(f32) * 16);
+    memset(result, 0, sizeof(float) * 16);
 
     result->f[0] = cy;
     result->f[2] = sy;
@@ -128,17 +128,17 @@ CEL_FORCE_INLINE void cel_mat44f_rotate_xy(cel_mat44f_t *result,
 }
 
 CEL_FORCE_INLINE void cel_mat44f_rotate_xyz(cel_mat44f_t *result,
-                                            f32 x,
-                                            f32 y,
-                                            f32 z) {
-    const f32 sx = cel_f32_sin(x);
-    const f32 cx = cel_f32_cos(x);
-    const f32 sy = cel_f32_sin(y);
-    const f32 cy = cel_f32_cos(y);
-    const f32 sz = cel_f32_sin(z);
-    const f32 cz = cel_f32_cos(z);
+                                            float x,
+                                            float y,
+                                            float z) {
+    const float sx = cel_float_sin(x);
+    const float cx = cel_float_cos(x);
+    const float sy = cel_float_sin(y);
+    const float cy = cel_float_cos(y);
+    const float sz = cel_float_sin(z);
+    const float cz = cel_float_cos(z);
 
-    memset(result, 0, sizeof(f32) * 16);
+    memset(result, 0, sizeof(float) * 16);
 
     result->f[0] = cy * cz;
     result->f[1] = -cy * sz;
@@ -153,17 +153,17 @@ CEL_FORCE_INLINE void cel_mat44f_rotate_xyz(cel_mat44f_t *result,
 }
 
 CEL_FORCE_INLINE void cel_mat44f_rotate_zyx(cel_mat44f_t *result,
-                                            f32 x,
-                                            f32 y,
-                                            f32 z) {
-    const f32 sx = cel_f32_sin(x);
-    const f32 cx = cel_f32_cos(x);
-    const f32 sy = cel_f32_sin(y);
-    const f32 cy = cel_f32_cos(y);
-    const f32 sz = cel_f32_sin(z);
-    const f32 cz = cel_f32_cos(z);
+                                            float x,
+                                            float y,
+                                            float z) {
+    const float sx = cel_float_sin(x);
+    const float cx = cel_float_cos(x);
+    const float sy = cel_float_sin(y);
+    const float cy = cel_float_cos(y);
+    const float sz = cel_float_sin(z);
+    const float cz = cel_float_cos(z);
 
-    memset(result, 0, sizeof(f32) * 16);
+    memset(result, 0, sizeof(float) * 16);
 
     result->f[0] = cy * cz;
     result->f[1] = cz * sx * sy - cx * sz;
@@ -179,12 +179,12 @@ CEL_FORCE_INLINE void cel_mat44f_rotate_zyx(cel_mat44f_t *result,
 
 CEL_FORCE_INLINE int cel_mat44f_eq(const cel_mat44f_t *__restrict a,
                                    const cel_mat44f_t *__restrict b,
-                                   const f32 epsilon) {
-    return cel_f32_equals(a->f, b->f, 4 * 4, epsilon);
+                                   const float epsilon) {
+    return cel_float_equals(a->f, b->f, 4 * 4, epsilon);
 }
 
 CEL_FORCE_INLINE int cel_mat44f_is_identity(const cel_mat44f_t *__restrict a,
-                                            f32 epsilon) {
+                                            float epsilon) {
     static cel_mat44f_t _identity = MAT44F_INIT_IDENTITY;
     return cel_mat44f_eq(a, &_identity, epsilon);
 }
@@ -201,30 +201,30 @@ CEL_FORCE_INLINE void cel_mat44f_mul(cel_mat44f_t *__restrict result,
 
 CEL_FORCE_INLINE void cel_mat44f_inverse(cel_mat44f_t *__restrict result,
                                          const cel_mat44f_t *__restrict a) {
-    f32 xx = a->f[0];
-    f32 xy = a->f[1];
-    f32 xz = a->f[2];
-    f32 xw = a->f[3];
-    f32 yx = a->f[4];
-    f32 yy = a->f[5];
-    f32 yz = a->f[6];
-    f32 yw = a->f[7];
-    f32 zx = a->f[8];
-    f32 zy = a->f[9];
-    f32 zz = a->f[10];
-    f32 zw = a->f[11];
-    f32 wx = a->f[12];
-    f32 wy = a->f[13];
-    f32 wz = a->f[14];
-    f32 ww = a->f[15];
+    float xx = a->f[0];
+    float xy = a->f[1];
+    float xz = a->f[2];
+    float xw = a->f[3];
+    float yx = a->f[4];
+    float yy = a->f[5];
+    float yz = a->f[6];
+    float yw = a->f[7];
+    float zx = a->f[8];
+    float zy = a->f[9];
+    float zz = a->f[10];
+    float zw = a->f[11];
+    float wx = a->f[12];
+    float wy = a->f[13];
+    float wz = a->f[14];
+    float ww = a->f[15];
 
-    f32 det = 0.0f;
+    float det = 0.0f;
     det += xx * (yy * (zz * ww - zw * wz) - yz * (zy * ww - zw * wy) + yw * (zy * wz - zz * wy));
     det -= xy * (yx * (zz * ww - zw * wz) - yz * (zx * ww - zw * wx) + yw * (zx * wz - zz * wx));
     det += xz * (yx * (zy * ww - zw * wy) - yy * (zx * ww - zw * wx) + yw * (zx * wy - zy * wx));
     det -= xw * (yx * (zy * wz - zz * wy) - yy * (zx * wz - zz * wx) + yz * (zx * wy - zy * wx));
 
-    f32 inv_det = 1.0f / det;
+    float inv_det = 1.0f / det;
 
     result->f[0] = +(yy * (zz * ww - wz * zw) - yz * (zy * ww - wy * zw) + yw * (zy * wz - wy * zz)) * inv_det;
     result->f[1] = -(xy * (zz * ww - wz * zw) - xz * (zy * ww - wy * zw) + xw * (zy * wz - wy * zz)) * inv_det;
@@ -271,13 +271,13 @@ CEL_FORCE_INLINE void cel_mat44f_transpose(cel_mat44f_t *__restrict result,
 }
 
 CEL_FORCE_INLINE void cel_mat44f_set_perspective_fov(cel_mat44f_t *__restrict result,
-                                                     const f32 fov,
-                                                     const f32 aspect_ratio,
-                                                     f32 near,
-                                                     f32 far) {
+                                                     const float fov,
+                                                     const float aspect_ratio,
+                                                     float near,
+                                                     float far) {
 
-    f32 yScale = 1.0f / cel_f32_tan(fov * CEL_F32_TORAD * 0.5f);
-    f32 xScale = yScale / aspect_ratio;
+    float yScale = 1.0f / cel_float_tan(fov * CEL_float_TORAD * 0.5f);
+    float xScale = yScale / aspect_ratio;
 
     result->x.x = xScale;
     result->x.y = result->x.z = result->x.w = 0.0f;
