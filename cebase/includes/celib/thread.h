@@ -13,7 +13,6 @@ typedef struct {
     int lock;
 } spinlock_t;
 
-
 //! Create new thread
 //! \param fce Thread fce
 //! \param name Thread name

@@ -4,6 +4,7 @@
 
 #include <bgfx/c99/bgfx.h>
 
+#include <celib/allocator.h>
 #include <celib/stringid.h>
 #include <cetech/renderer/renderer.h>
 #include "celib/vio.h"
@@ -46,7 +47,7 @@ struct G {
     ARRAY_T(uint8_t) material_instance_data;
     ARRAY_T(uint32_t) material_instance_uniform_data;
 
-    struct handlerid material_handler;
+    struct handler_gen* material_handler;
     stringid64_t type;
 } _G = {0};
 
@@ -77,7 +78,7 @@ int material_init(get_api_fce_t get_engine_api) {
 
     _G.type = stringid64_from_string("material");
 
-    handlerid_init(&_G.material_handler, MemSysApiV0.main_allocator());
+    _G.material_handler = handlerid_create(MemSysApiV0.main_allocator());
 
     MAP_INIT(uint32_t, &_G.material_instace_map, MemSysApiV0.main_allocator());
     ARRAY_INIT(uint32_t, &_G.material_instance_offset, MemSysApiV0.main_allocator());
@@ -90,7 +91,7 @@ int material_init(get_api_fce_t get_engine_api) {
 }
 
 void material_shutdown() {
-    handlerid_destroy(&_G.material_handler);
+    handlerid_destroy(_G.material_handler);
 
     MAP_DESTROY(uint32_t, &_G.material_instace_map);
     ARRAY_DESTROY(uint32_t, &_G.material_instance_offset);
@@ -111,7 +112,7 @@ material_t material_create(stringid64_t name) {
                (resource->mat44f_count * sizeof(cel_mat44f_t)) +
                (resource->mat33f_count * sizeof(mat33f_t));
 
-    handler_t h = handlerid_handler_create(&_G.material_handler);
+    handler_t h = handlerid_handler_create(_G.material_handler);
 
     uint32_t idx = (uint32_t) ARRAY_SIZE(&_G.material_instance_offset);
 

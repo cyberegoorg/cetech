@@ -3,6 +3,7 @@
 //==============================================================================
 
 #include <include/mpack/mpack.h>
+#include <celib/allocator.h>
 #include <celib/stringid.h>
 #include <celib/vio.h>
 #include <celib/math_types.h>

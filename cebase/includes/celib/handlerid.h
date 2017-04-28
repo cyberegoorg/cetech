@@ -5,8 +5,7 @@
 // Includes
 //==============================================================================
 
-#include "celib/queue.h"
-#include "types.h"
+#include <stdint.h>
 
 //==============================================================================
 // Typedef and struct
@@ -16,29 +15,21 @@ typedef struct handler {
     uint32_t h;
 } handler_t;
 
-struct handlerid {
-    QUEUE_T(uint32_t) _freeIdx;
-    ARRAY_T(uint32_t) _generation;
-};
-
 //==============================================================================
 // Public interface
 //==============================================================================
 
-handler_t handlerid_handler_create(struct handlerid *hid);
+struct handler_gen* handlerid_create(struct cel_allocator *allocator);
 
-void handlerid_init(struct handlerid *hid,
-                    struct cel_allocator *allocator);
+void handlerid_destroy(struct handler_gen *hid);
 
-void handlerid_destroy(struct handlerid *hid);
-
-handler_t handlerid_handler_create(struct handlerid *hid);
+handler_t handlerid_handler_create(struct handler_gen *hid);
 
 
-void handlerid_handler_destroy(struct handlerid *hid,
+void handlerid_handler_destroy(struct handler_gen *hid,
                                handler_t h);
 
-int handlerid_handler_alive(struct handlerid *hid,
+int handlerid_handler_alive(struct handler_gen *hid,
                             handler_t h);
 
 

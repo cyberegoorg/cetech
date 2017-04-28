@@ -1,4 +1,6 @@
+#include <stddef.h>
 
+#include <celib/allocator.h>
 #include "celib/string.h"
 #include "celib/hash.h"
 

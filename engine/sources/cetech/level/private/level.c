@@ -2,6 +2,7 @@
 // Includes
 //==============================================================================
 
+#include <celib/allocator.h>
 #include <cetech/world/world.h>
 #include <celib/vio.h>
 #include <cetech/resource/resource.h>

@@ -4,6 +4,8 @@
 
 #include <unistd.h>
 
+#include <celib/allocator.h>
+
 #include <celib/time.h>
 #include <celib/window.h>
 #include <celib/stringid.h>

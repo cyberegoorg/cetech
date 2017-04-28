@@ -2,6 +2,9 @@
 // Includes
 //==============================================================================
 
+#include <stddef.h>
+
+#include <celib/allocator.h>
 #include <celib/stringid.h>
 #include <cetech/task/task.h>
 #include <cetech/resource/resource.h>

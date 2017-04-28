@@ -1,3 +1,4 @@
+#include <stddef.h>
 #include "celib/allocator.h"
 #include <celib/vio.h>
 

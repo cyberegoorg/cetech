@@ -1,4 +1,5 @@
-
+#include <stddef.h>
+#include <celib/allocator.h>
 #include <celib/math_quatf.h>
 #include "../luasys.h"
 #include <cetech/module/module.h>

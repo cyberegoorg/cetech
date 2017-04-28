@@ -3,7 +3,7 @@
 //==============================================================================
 
 #include <include/SDL2/SDL.h>
-#include "celib/array.h"
+#include "celib/array.inl"
 #include "celib/eventstream.h"
 
 #include <cetech/module/module.h>

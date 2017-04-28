@@ -1,5 +1,6 @@
 
 #include <time.h>
+#include <celib/log.h>
 
 #include "include/sqlite3/sqlite3.h"
 

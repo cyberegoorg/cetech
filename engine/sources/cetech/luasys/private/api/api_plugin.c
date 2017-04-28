@@ -1,4 +1,8 @@
+#include <stddef.h>
+#include <celib/allocator.h>
+
 #include <cetech/application/private/module.h>
+
 #include "../luasys.h"
 
 #define API_NAME "Plugin"

@@ -9,7 +9,7 @@
 //==============================================================================
 
 #include "celib/stringid.h"
-#include "celib/array.h"
+#include "celib/array.inl"
 #include "celib/types.h"
 #include "celib/vio.h"
 #include <cetech/config/config.h>

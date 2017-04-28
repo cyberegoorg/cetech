@@ -1,6 +1,7 @@
 #include <string>
 
 extern "C" {
+#include <celib/allocator.h>
 #include "celib/yaml.h"
 #include "celib/memory.h"
 #include "celib/errors.h"

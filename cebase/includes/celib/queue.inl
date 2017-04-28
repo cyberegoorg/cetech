@@ -7,7 +7,7 @@
 #define CELIB_QUEUE_H
 
 #include <memory.h>
-#include "array.h"
+#include "array.inl"
 
 //==============================================================================
 // Interface macros

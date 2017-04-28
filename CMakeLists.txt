@@ -87,7 +87,7 @@ set(SOURCE_FILES
         cebase/sources/celib/cmd_line.c
         cebase/sources/celib/cpu.c
         cebase/sources/celib/filesystem.c
-        cebase/sources/celib/handlerid.c
+        cebase/sources/celib/handler_gen.c
         cebase/sources/celib/memory.c
         cebase/sources/celib/object.c
         cebase/sources/celib/path.c
@@ -167,7 +167,7 @@ set(SOURCE_FILES
         engine/sources/cetech/scenegraph/private/scenegraph.c
         engine/sources/cetech/camera/private/camera.c
 
-        )
+        cebase/sources/celib/hash.c)
 
 ################################################################################
 # Main sources

@@ -8,7 +8,7 @@
 // Includes
 //==============================================================================
 
-#include <celib/map.h>
+#include <celib/map.inl>
 #include <celib/yaml.h>
 #include <celib/stringid.h>
 #include <celib/handlerid.h>

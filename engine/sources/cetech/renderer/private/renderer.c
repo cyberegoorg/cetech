@@ -3,6 +3,8 @@
 //==============================================================================
 
 #include <celib/math_types.h>
+#include <celib/allocator.h>
+
 #include <cetech/camera/camera.h>
 #include <cetech/renderer/renderer.h>
 #include <cetech/develop/develop.h>

@@ -11,6 +11,9 @@
 #endif
 
 #include "celib/log.h"
+#include "celib/errors.h"
+#include "celib/memory.h"
+#include "celib/allocator.h"
 #include "celib/string.h"
 
 /***********************************************************************

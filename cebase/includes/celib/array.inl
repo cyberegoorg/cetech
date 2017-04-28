@@ -10,11 +10,14 @@
 // Includes
 //==============================================================================
 
-#include "types.h"
-#include "errors.h"
 
-#include "memory.h"
+#include <stdint.h>
+#include <stddef.h>
+
+#include "log.h"
+#include "errors.h"
 #include "allocator.h"
+#include "memory.h"
 
 //==============================================================================
 // Interface macros

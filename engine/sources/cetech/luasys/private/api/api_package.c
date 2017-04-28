@@ -1,3 +1,5 @@
+#include <stddef.h>
+#include <celib/allocator.h>
 
 #include <cetech/renderer/renderer.h>
 #include <cetech/resource/resource.h>

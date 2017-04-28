@@ -1,4 +1,6 @@
+#include <stddef.h>
 
+#include <celib/allocator.h>
 #include <celib/stringid.h>
 #include <cetech/entity/entity.h>
 #include <cetech/application/private/module.h>

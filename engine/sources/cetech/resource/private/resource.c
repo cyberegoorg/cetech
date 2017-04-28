@@ -5,7 +5,7 @@
 #include "include/SDL2/SDL.h"
 #include "include/mpack/mpack.h"
 
-#include "celib/map.h"
+#include "celib/map.inl"
 #include <celib/vio.h>
 #include <celib/path.h>
 

@@ -1,4 +1,4 @@
-#include <celib/array.h>
+#include <celib/array.inl>
 #include <celib/yaml.h>
 #include <celib/math_quatf.h>
 #include <celib/math_mat44f.inl>
