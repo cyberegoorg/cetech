@@ -10,6 +10,10 @@
 #include "cetech/containers/eventstream.h"
 #include <cetech/application/private/module.h>
 
+enum {
+    MACHINE_API_ID = 6,
+};
+
 //==============================================================================
 // Enums
 //==============================================================================

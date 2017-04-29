@@ -15,6 +15,9 @@
 #include <cetech/world/world.h>
 #include <cetech/resource/resource.h>
 
+enum {
+    ENTITY_API_ID = 11,
+};
 
 //==============================================================================
 // Typedefs

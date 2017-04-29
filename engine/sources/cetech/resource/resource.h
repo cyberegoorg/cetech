@@ -15,6 +15,10 @@
 #include "cetech/filesystem/vio.h"
 #include <cetech/config/config.h>
 
+enum {
+    RESOURCE_API_ID = 19,
+    PACKAGE_API_ID = 20,
+};
 
 //==============================================================================
 // Typedefs

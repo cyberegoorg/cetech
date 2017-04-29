@@ -12,6 +12,9 @@
 #import "cetech/math/math_types.h"
 #import "cetech/string/stringid.h"
 
+enum {
+    SCENEGRAPH_API_ID = 24,
+};
 
 //==============================================================================
 // Typedefs

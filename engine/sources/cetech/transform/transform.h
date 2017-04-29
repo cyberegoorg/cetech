@@ -10,6 +10,9 @@
 #include "cetech/math/math_types.h"
 #include <cetech/entity/entity.h>
 
+enum {
+    TRANSFORM_API_ID = 25,
+};
 
 //==============================================================================
 // Typedefs
