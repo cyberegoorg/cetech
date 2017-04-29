@@ -51,6 +51,7 @@ static struct G {
 } _G = {0};
 
 IMPORT_API(memory_api_v0);
+IMPORT_API(thread_api_v0);
 IMPORT_API(task_api_v0);
 IMPORT_API(config_api_v0);
 
@@ -63,12 +64,12 @@ static void _flush_stream_buffer() {
         return;
     }
 
-    cel_thread_spin_lock(&_G.flush_lock);
+    thread_api_v0.spin_lock(&_G.flush_lock);
 
     array_push_uint8_t(&_G.eventstream.stream, _stream_buffer, _stream_buffer_size);
     _stream_buffer_size = 0;
 
-    cel_thread_spin_unlock(&_G.flush_lock);
+    thread_api_v0.spin_unlock(&_G.flush_lock);
 }
 
 static void _flush_job(void *data) {
@@ -232,6 +233,7 @@ static void _init(get_api_fce_t get_engine_api) {
     INIT_API(get_engine_api, memory_api_v0, MEMORY_API_ID);
     INIT_API(get_engine_api, task_api_v0, TASK_API_ID);
     INIT_API(get_engine_api, config_api_v0, CONFIG_API_ID);
+    INIT_API(get_engine_api, thread_api_v0, OS_THREAD_API_ID);
 
     MAP_INIT(to_mpack_fce_t, &_G.to_mpack, memory_api_v0.main_allocator());
     eventstream_create(&_G.eventstream, memory_api_v0.main_allocator());

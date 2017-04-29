@@ -5,6 +5,7 @@
 
 static void _init_static_modules() {
     ADD_STATIC_PLUGIN(handler);
+    ADD_STATIC_PLUGIN(sdl);
     ADD_STATIC_PLUGIN(machine);
     ADD_STATIC_PLUGIN(task);
 

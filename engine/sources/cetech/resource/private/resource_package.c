@@ -34,6 +34,7 @@ struct G {
 IMPORT_API(memory_api_v0);
 IMPORT_API(resource_api_v0);
 IMPORT_API(task_api_v0);
+IMPORT_API(thread_api_v0);
 
 //==============================================================================
 // Resource compiler
@@ -132,6 +133,7 @@ int package_init(get_api_fce_t get_engine_api) {
     INIT_API(get_engine_api, memory_api_v0, MEMORY_API_ID);
     INIT_API(get_engine_api, resource_api_v0, RESOURCE_API_ID);
     INIT_API(get_engine_api, task_api_v0, TASK_API_ID);
+    INIT_API(get_engine_api, thread_api_v0, OS_THREAD_API_ID);
 
     _G = (struct G) {0};
 
@@ -211,7 +213,7 @@ int package_is_loaded(stringid64_t name) {
 void package_flush(stringid64_t name) {
     while (!package_is_loaded(name)) {
         if (!task_api_v0.do_work()) {
-            cel_thread_yield();
+            thread_api_v0.yield();
         }
     }
 }

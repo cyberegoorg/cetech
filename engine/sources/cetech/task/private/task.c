@@ -47,6 +47,11 @@ static struct G {
 
 #define _G TaskManagerGlobal
 
+
+IMPORT_API(develop_api_v0);
+IMPORT_API(memory_api_v0);
+IMPORT_API(thread_api_v0);
+
 //==============================================================================
 // Private
 //==============================================================================
@@ -139,7 +144,7 @@ static int _task_worker(void *o) {
 
     while (_G._Run) {
         if (!taskmanager_do_work()) {
-            cel_thread_yield();
+            thread_api_v0.yield();
         }
     }
 
@@ -147,12 +152,11 @@ static int _task_worker(void *o) {
     return 1;
 }
 
-IMPORT_API(develop_api_v0);
-IMPORT_API(memory_api_v0);
 
 static void _init(get_api_fce_t get_engine_api) {
     INIT_API(get_engine_api, develop_api_v0, DEVELOP_SERVER_API_ID);
     INIT_API(get_engine_api, memory_api_v0, MEMORY_API_ID);
+    INIT_API(get_engine_api, thread_api_v0, OS_THREAD_API_ID);
 
     _G = (struct G) {0};
 
@@ -174,7 +178,7 @@ static void _init(get_api_fce_t get_engine_api) {
     }
 
     for (int j = 0; j < worker_count; ++j) {
-        _G._workers[j] = cel_thread_create((thread_fce_t) _task_worker,
+        _G._workers[j] = thread_api_v0.create((thread_fce_t) _task_worker,
                                            "worker",
                                            (void *) ((intptr_t) (j + 1)));
     }
@@ -189,7 +193,7 @@ static void _shutdown() {
 
     for (uint32_t i = 0; i < _G._workers_count; ++i) {
         //cel_thread_kill(_G._workers[i]);
-        cel_thread_wait(_G._workers[i], &status);
+        thread_api_v0.wait(_G._workers[i], &status);
     }
 
     queue_task_destroy(&_G._gloalQueue);

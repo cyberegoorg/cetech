@@ -94,7 +94,7 @@ set(SOURCE_FILES
         engine/sources/cetech/os/private/stacktrace.c
         engine/sources/cetech/string/private/string.c
         engine/sources/cetech/string/private/stringid.c
-        engine/sources/cetech/os/private/thread.c
+        engine/sources/cetech/sdl2/private/sdl_thread.h
         engine/sources/cetech/os/private/time.c
         engine/sources/cetech/filesystem/private/vio.c
         engine/sources/cetech/os/private/window.c
@@ -167,7 +167,7 @@ set(SOURCE_FILES
         engine/sources/cetech/scenegraph/private/scenegraph.c
         engine/sources/cetech/camera/private/camera.c
 
-        engine/sources/cetech/hash/private/hash.c)
+        engine/sources/cetech/hash/private/hash.c engine/sources/cetech/sdl2/private/sdl2.c)
 
 ################################################################################
 # Main sources
