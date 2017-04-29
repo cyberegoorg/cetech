@@ -31,7 +31,7 @@ typedef struct {
 
 IMPORT_API(memory_api_v0);
 IMPORT_API(component_api_v0);
-IMPORT_API(RendererApiV0);
+IMPORT_API(renderer_api_v0);
 IMPORT_API(transform_api_v0);
 
 ARRAY_PROTOTYPE(world_data_t)
@@ -137,7 +137,7 @@ void _spawner(world_t world,
 static void _init(get_api_fce_t get_engine_api) {
     INIT_API(get_engine_api, memory_api_v0, MEMORY_API_ID);
     INIT_API(get_engine_api, component_api_v0, COMPONENT_API_ID);
-    INIT_API(get_engine_api, RendererApiV0, RENDERER_API_ID);
+    INIT_API(get_engine_api, renderer_api_v0, RENDERER_API_ID);
     INIT_API(get_engine_api, transform_api_v0, TRANSFORM_API_ID);
 
     _G = (struct G) {0};
@@ -174,7 +174,7 @@ void camera_get_project_view(world_t world,
     world_data_t *world_data = _get_world_data(world);
 
 
-    cel_vec2f_t size = RendererApiV0.get_size(); // TODO, to arg... or viewport?
+    cel_vec2f_t size = renderer_api_v0.get_size(); // TODO, to arg... or viewport?
     entity_t e = ARRAY_AT(&world_data->entity, camera.idx);
     transform_t t = transform_api_v0.get(world, e);
 

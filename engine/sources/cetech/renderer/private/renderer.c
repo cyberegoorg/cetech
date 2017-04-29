@@ -20,7 +20,7 @@
 #include <cetech/renderer/private/material/material.h>
 
 
-IMPORT_API(ConsoleServerApiV0);
+IMPORT_API(cnsole_srv_api_v0);
 IMPORT_API(mesh_renderer_api_v0);
 IMPORT_API(camera_api_v0);
 IMPORT_API(config_api_v0);
@@ -71,7 +71,7 @@ static int _cmd_resize(mpack_node_t args,
 }
 
 static void _init(get_api_fce_t get_engine_api) {
-    INIT_API(get_engine_api, ConsoleServerApiV0, CONSOLE_SERVER_API_ID);
+    INIT_API(get_engine_api, cnsole_srv_api_v0, CONSOLE_SERVER_API_ID);
     INIT_API(get_engine_api, mesh_renderer_api_v0, MESH_API_ID);
     INIT_API(get_engine_api, camera_api_v0, CAMERA_API_ID);
     INIT_API(get_engine_api, config_api_v0, CONFIG_API_ID);
@@ -86,7 +86,7 @@ static void _init(get_api_fce_t get_engine_api) {
         material_init(get_engine_api);
         scene_init();
 
-        ConsoleServerApiV0.consolesrv_register_command("renderer.resize",
+        cnsole_srv_api_v0.consolesrv_register_command("renderer.resize",
                                                        _cmd_resize);
     }
 }
@@ -181,7 +181,7 @@ void *renderer_get_module_api(int api) {
 
         case RENDERER_API_ID:
                 {
-                    static struct RendererApiV0 api = {0};
+                    static struct renderer_api_v0 api = {0};
 
                     api.create = renderer_create;
                     api.set_debug = renderer_set_debug;

@@ -26,9 +26,9 @@
 #define LOG_WHERE "application"
 
 
-IMPORT_API(ConsoleServerApiV0);
+IMPORT_API(cnsole_srv_api_v0);
 IMPORT_API(develop_api_v0);
-IMPORT_API(RendererApiV0);
+IMPORT_API(renderer_api_v0);
 IMPORT_API(resource_api_v0);
 IMPORT_API(package_api_v0);
 IMPORT_API(task_api_v0);
@@ -104,9 +104,9 @@ static struct app_api_v0 api_v1 = {
 };
 
 void _init_api() {
-    INIT_API(module_get_engine_api,ConsoleServerApiV0, CONSOLE_SERVER_API_ID);
+    INIT_API(module_get_engine_api,cnsole_srv_api_v0, CONSOLE_SERVER_API_ID);
     INIT_API(module_get_engine_api,develop_api_v0, DEVELOP_SERVER_API_ID);
-    INIT_API(module_get_engine_api,RendererApiV0, RENDERER_API_ID);
+    INIT_API(module_get_engine_api,renderer_api_v0, RENDERER_API_ID);
     INIT_API(module_get_engine_api,resource_api_v0, RESOURCE_API_ID);
     INIT_API(module_get_engine_api,package_api_v0, PACKAGE_API_ID);
     INIT_API(module_get_engine_api,task_api_v0, TASK_API_ID);
@@ -186,7 +186,7 @@ int application_init(int argc,
 
     log_set_wid_clb(task_api_v0.worker_id);
 
-    ConsoleServerApiV0.consolesrv_register_command("wait", _cmd_wait);
+    cnsole_srv_api_v0.consolesrv_register_command("wait", _cmd_wait);
 
     return 1;
 }
@@ -275,7 +275,7 @@ void application_start() {
             _G.main_window = cel_window_new_from((void *) wid);
         }
 
-        RendererApiV0.create(_G.main_window);
+        renderer_api_v0.create(_G.main_window);
     }
 
     _boot_stage();
@@ -296,7 +296,7 @@ void application_start() {
     float frame_time = (1.0f / frame_limit);
     float frame_time_accum = 0.0f;
 
-    ConsoleServerApiV0.consolesrv_push_begin();
+    cnsole_srv_api_v0.consolesrv_push_begin();
     while (_G.is_running) {
         struct scope_data application_sd = develop_api_v0.enter_scope(
                 "Application:update()");

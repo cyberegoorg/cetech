@@ -20,7 +20,7 @@
 
 
 IMPORT_API(resource_api_v0);
-IMPORT_API(ConsoleServerApiV0);
+IMPORT_API(cnsole_srv_api_v0);
 
 //==============================================================================
 // Defines
@@ -801,7 +801,7 @@ void _create_lightuserdata() {
 static void _init(get_api_fce_t get_engine_api) {
     log_debug(LOG_WHERE, "Init");
 
-    INIT_API(get_engine_api, ConsoleServerApiV0, CONSOLE_SERVER_API_ID);
+    INIT_API(get_engine_api, cnsole_srv_api_v0, CONSOLE_SERVER_API_ID);
     INIT_API(get_engine_api, resource_api_v0, RESOURCE_API_ID);
 
     _G.L = luaL_newstate();
@@ -832,7 +832,7 @@ static void _init(get_api_fce_t get_engine_api) {
     _register_all_api(get_engine_api);
 
     luasys_add_module_function("module", "reload", _reload_module);
-    ConsoleServerApiV0.consolesrv_register_command("lua_system.execute",
+    cnsole_srv_api_v0.consolesrv_register_command("lua_system.execute",
                                                    _cmd_execute_string);
 
     resource_api_v0.register_type(_G.type_id, lua_resource_callback);

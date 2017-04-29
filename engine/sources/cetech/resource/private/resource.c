@@ -69,7 +69,7 @@ struct G {
 } _G = {0};
 
 IMPORT_API(memory_api_v0);
-IMPORT_API(ConsoleServerApiV0);
+IMPORT_API(cnsole_srv_api_v0);
 IMPORT_API(filesystem_api_v0);
 IMPORT_API(config_api_v0);
 IMPORT_API(app_api_v0);
@@ -143,7 +143,7 @@ void resource_register_type(stringid64_t type,
                             resource_callbacks_t callbacks);
 
 static void _init(get_api_fce_t get_engine_api) {
-    INIT_API(get_engine_api, ConsoleServerApiV0, CONSOLE_SERVER_API_ID);
+    INIT_API(get_engine_api, cnsole_srv_api_v0, CONSOLE_SERVER_API_ID);
     INIT_API(get_engine_api, memory_api_v0, MEMORY_API_ID);
     INIT_API(get_engine_api, filesystem_api_v0, FILESYSTEM_API_ID);
     INIT_API(get_engine_api, config_api_v0, CONFIG_API_ID);
@@ -169,7 +169,7 @@ static void _init(get_api_fce_t get_engine_api) {
     resource_register_type(stringid64_from_string("package"),
                            package_resource_callback);
 
-    ConsoleServerApiV0.consolesrv_register_command("resource.reload_all",
+    cnsole_srv_api_v0.consolesrv_register_command("resource.reload_all",
                                                    _cmd_reload_all);
 
     package_init(get_engine_api);

@@ -265,7 +265,7 @@ void *consoleserver_get_module_api(int api) {
 
 
         case CONSOLE_SERVER_API_ID: {
-            static struct ConsoleServerApiV0 api = {0};
+            static struct cnsole_srv_api_v0 api = {0};
 
             api.consolesrv_push_begin = consolesrv_push_begin;
             api.consolesrv_register_command = consolesrv_register_command;
