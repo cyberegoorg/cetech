@@ -15,12 +15,16 @@
 #include <cetech/config/config.h>
 
 
+enum {
+    FILESYSTEM_API_ID = 18,
+};
+
 //==============================================================================
 // Api
 //==============================================================================
 
 //! Filesystem API V0
-struct FilesystemApiV0 {
+struct filesystem_api_v0 {
     //! Return root dir
     //! \param root Root
     //! \return Root dir or NULL if root is invalid.

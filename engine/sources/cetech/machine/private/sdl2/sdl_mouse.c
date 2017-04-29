@@ -27,7 +27,7 @@ static struct G {
 } _G = {0};
 
 
-static struct ApplicationApiV0 ApplicationApiV0;
+static struct app_api_v0 app_api_v0;
 
 //==============================================================================
 // Interface
@@ -36,7 +36,7 @@ static struct ApplicationApiV0 ApplicationApiV0;
 int sdl_mouse_init(get_api_fce_t get_engine_api) {
     _G = (struct G) {0};
 
-    ApplicationApiV0 = *(struct ApplicationApiV0 *) get_engine_api(
+    app_api_v0 = *(struct app_api_v0 *) get_engine_api(
             APPLICATION_API_ID);
 
     return 1;
@@ -58,7 +58,7 @@ void sdl_mouse_process(struct eventstream *stream) {
     curent_state[MOUSE_BTN_MIDLE] = (uint8_t) (state & SDL_BUTTON_MMASK);
 
     if ((pos[0] != _G.position[0]) || (pos[1] != _G.position[1])) {
-        cel_window_t main_window = ApplicationApiV0.main_window();
+        cel_window_t main_window = app_api_v0.main_window();
         uint32_t cel_window_size[2] = {0};
         cel_window_get_size(main_window, &cel_window_size[0],
                             &cel_window_size[1]);

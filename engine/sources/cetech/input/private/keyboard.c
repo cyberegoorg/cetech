@@ -26,10 +26,10 @@ static struct G {
     uint8_t last_state[512];
 } _G = {0};
 
-IMPORT_API(MachineApi, 0);
+IMPORT_API(machine_api_v0);
 
 static void _init(get_api_fce_t get_engine_api) {
-    INIT_API(MachineApi, MACHINE_API_ID, 0);
+    INIT_API(get_engine_api, machine_api_v0, MACHINE_API_ID);
 
     _G = (struct G) {0};
 
@@ -43,12 +43,12 @@ static void _shutdown() {
 }
 
 static void _update() {
-    struct event_header *event = MachineApiV0.event_begin();
+    struct event_header *event = machine_api_v0.event_begin();
 
     memory_copy(_G.last_state, _G.state, 512);
 
     uint32_t size = 0;
-    while (event != MachineApiV0.event_end()) {
+    while (event != machine_api_v0.event_end()) {
         size = size + 1;
 
         switch (event->type) {
@@ -64,7 +64,7 @@ static void _update() {
                 break;
         }
 
-        event = MachineApiV0.event_next(event);
+        event = machine_api_v0.event_next(event);
     }
 }
 
@@ -128,7 +128,7 @@ void *keyboard_get_module_api(int api) {
         return &module;
 
     } else if (api == KEYBOARD_API_ID) {
-        static struct KeyboardApiV0 api_v1 = {
+        static struct keyboard_api_v0 api_v1 = {
                 .button_index = keyboard_button_index,
                 .button_name = keyboard_button_name,
                 .button_state = keyboard_button_state,

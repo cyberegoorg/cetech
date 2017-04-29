@@ -41,9 +41,10 @@ struct G {
     stringid64_t type;
 } _G = {0};
 
-static struct MemSysApiV0 MemSysApiV0;
-static struct ResourceApiV0 ResourceApiV0;
-static struct ApplicationApiV0 ApplicationApiV0;
+
+IMPORT_API(memory_api_v0)
+IMPORT_API(resource_api_v0)
+IMPORT_API(app_api_v0)
 
 //==============================================================================
 // Compiler private
@@ -62,18 +63,18 @@ static struct ApplicationApiV0 ApplicationApiV0;
 int shader_init() {
     _G = (struct G) {0};
 
-    MemSysApiV0 = *(struct MemSysApiV0 *) module_get_engine_api(MEMORY_API_ID);
-    ResourceApiV0 = *(struct ResourceApiV0 *) module_get_engine_api(RESOURCE_API_ID);
-    ApplicationApiV0 = *(struct ApplicationApiV0 *) module_get_engine_api(
+    memory_api_v0 = *(struct memory_api_v0 *) module_get_engine_api(MEMORY_API_ID);
+    resource_api_v0 = *(struct resource_api_v0 *) module_get_engine_api(RESOURCE_API_ID);
+    app_api_v0 = *(struct app_api_v0 *) module_get_engine_api(
             APPLICATION_API_ID);
 
     _G.type = stringid64_from_string("shader");
 
     MAP_INIT(bgfx_program_handle_t, &_G.handler_map,
-             MemSysApiV0.main_allocator());
+             memory_api_v0.main_allocator());
 
-    ResourceApiV0.compiler_register(_G.type, _shader_resource_compiler);
-    ResourceApiV0.register_type(_G.type, shader_resource_callback);
+    resource_api_v0.compiler_register(_G.type, _shader_resource_compiler);
+    resource_api_v0.register_type(_G.type, shader_resource_callback);
 
     return 1;
 }
@@ -84,7 +85,7 @@ void shader_shutdown() {
 }
 
 bgfx_program_handle_t shader_get(stringid64_t name) {
-    struct shader *resource = ResourceApiV0.get(_G.type, name);
+    struct shader *resource = resource_api_v0.get(_G.type, name);
     return MAP_GET(bgfx_program_handle_t, &_G.handler_map, name.id,
                    null_program);
 }

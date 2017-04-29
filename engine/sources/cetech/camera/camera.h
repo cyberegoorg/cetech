@@ -21,12 +21,16 @@ typedef struct {
 } camera_t;
 
 
+enum {
+    CAMERA_API_ID = 21,
+};
+
 //==============================================================================
 // Api
 //==============================================================================
 
 //! Camera API V0
-struct CameraApiV0 {
+struct camera_api_v0 {
 
     //! Has entity camera component?
     //! \param world World

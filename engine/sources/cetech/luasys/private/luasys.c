@@ -19,8 +19,8 @@
 #include <cetech/resource/resource.h>
 
 
-IMPORT_API(ResourceApi, 0);
-IMPORT_API(ConsoleServerApi, 0);
+IMPORT_API(resource_api_v0);
+IMPORT_API(cnsole_srv_api_v0);
 
 //==============================================================================
 // Defines
@@ -68,7 +68,7 @@ static int require(lua_State *L) {
     const char *name = lua_tostring(L, 1);
     stringid64_t name_hash = stringid64_from_string(name);
 
-    struct lua_resource *resource = ResourceApiV0.get(_G.type_id, name_hash);
+    struct lua_resource *resource = resource_api_v0.get(_G.type_id, name_hash);
 
     if (resource == NULL) {
         return 0;
@@ -406,8 +406,8 @@ void luasys_push_uint64_t(lua_State *_L,
 }
 
 void luasys_push_handler(lua_State *_L,
-                         handler_t value) {
-    lua_pushinteger(_L, value.h);
+                         handler32_t value) {
+    lua_pushinteger(_L, value.id);
 }
 
 void luasys_push_bool(lua_State *_L,
@@ -447,9 +447,9 @@ float luasys_to_float(lua_State *_L,
     return (float) lua_tonumber(_L, i);
 }
 
-handler_t luasys_to_handler(lua_State *l,
+handler32_t luasys_to_handler(lua_State *l,
                             int i) {
-    return (handler_t) {.h = lua_tonumber(l, i)};
+    return (handler32_t) {.id = lua_tonumber(l, i)};
 }
 
 const char *luasys_to_string(lua_State *_L,
@@ -538,7 +538,7 @@ int luasys_execute_string(const char *str) {
 }
 
 void luasys_execute_resource(stringid64_t name) {
-    struct lua_resource *resource = ResourceApiV0.get(_G.type_id, name);
+    struct lua_resource *resource = resource_api_v0.get(_G.type_id, name);
     char *data = (char *) (resource + 1);
 
     luaL_loadbuffer(_G.L, data, resource->size, "<unknown>");
@@ -801,8 +801,8 @@ void _create_lightuserdata() {
 static void _init(get_api_fce_t get_engine_api) {
     log_debug(LOG_WHERE, "Init");
 
-    INIT_API(ConsoleServerApi, CONSOLE_SERVER_API_ID, 0);
-    INIT_API(ResourceApi, RESOURCE_API_ID, 0);
+    INIT_API(get_engine_api, cnsole_srv_api_v0, CONSOLE_SERVER_API_ID);
+    INIT_API(get_engine_api, resource_api_v0, RESOURCE_API_ID);
 
     _G.L = luaL_newstate();
     CEL_ASSERT(LOG_WHERE, _G.L != NULL);
@@ -832,11 +832,11 @@ static void _init(get_api_fce_t get_engine_api) {
     _register_all_api(get_engine_api);
 
     luasys_add_module_function("module", "reload", _reload_module);
-    ConsoleServerApiV0.consolesrv_register_command("lua_system.execute",
+    cnsole_srv_api_v0.consolesrv_register_command("lua_system.execute",
                                                    _cmd_execute_string);
 
-    ResourceApiV0.register_type(_G.type_id, lua_resource_callback);
-    ResourceApiV0.compiler_register(_G.type_id, _lua_compiler);
+    resource_api_v0.register_type(_G.type_id, lua_resource_callback);
+    resource_api_v0.compiler_register(_G.type_id, _lua_compiler);
 }
 
 static void _shutdown() {
@@ -914,7 +914,7 @@ void *luasys_get_module_api(int api) {
 
 
         case LUA_API_ID: {
-            static struct LuaSysApiV0 api = {0};
+            static struct lua_api_v0 api = {0};
 
             //api.get_top = luasys_get_top;
             api.remove = luasys_remove;

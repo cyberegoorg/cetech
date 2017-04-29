@@ -3,7 +3,7 @@
 #include "cetech/module/module.h"
 #include "cetech/input/input.h"
 
-static struct KeyboardApiV0 KeyboardApiV0 = {0};
+IMPORT_API(keyboard_api_v0)
 
 // #includestatic struct KeyboardApiV0 KeyboardApiV0 = {0};
 
@@ -26,7 +26,7 @@ static struct KeyboardApiV0 KeyboardApiV0 = {0};
 //
 
 static void _init_api(get_api_fce_t get_engine_api) {
-    KeyboardApiV0 = *((struct KeyboardApiV0 *) get_engine_api(KEYBOARD_API_ID));
+    keyboard_api_v0 = *((struct keyboard_api_v0 *) get_engine_api(KEYBOARD_API_ID));
 
 //    log = get_engine_api(LOG_API_ID, 0);
 //    mem = get_engine_api(MEMORY_API_ID, 0);
@@ -57,7 +57,7 @@ static void *_reload_begin(get_api_fce_t get_engine_api) {
 }
 
 static void _update() {
-    if (KeyboardApiV0.button_state(0, KeyboardApiV0.button_index("v"))) {
+    if (keyboard_api_v0.button_state(0, keyboard_api_v0.button_index("v"))) {
         printf("dddddddddddddddddddddddddddddddddds 5  5 5 \n");
     }
 }

@@ -8,7 +8,11 @@
 // Includes
 //==============================================================================
 
-#include "cetech/handler/handlerid.h"
+#include "cetech/handler/handler.h"
+
+enum {
+    WORLD_API_ID = 26,
+};
 
 
 //==============================================================================
@@ -17,7 +21,7 @@
 
 //! World handler
 typedef struct {
-    handler_t h;
+    handler32_t h;
 } world_t;
 
 //! On world create callback
@@ -47,7 +51,7 @@ typedef struct {
 //==============================================================================
 
 //! World API V0
-struct WorldApiV0 {
+struct world_api_v0 {
 
     //! Register world calbacks
     //! \param clb Callbacks

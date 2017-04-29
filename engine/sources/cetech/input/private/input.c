@@ -10,7 +10,7 @@
 
 #include "gamepadstr.h"
 
-IMPORT_API(MachineApi, 0);
+IMPORT_API(machine_api_v0);
 
 //==============================================================================
 // Defines
@@ -32,14 +32,14 @@ static struct G {
 
 
 static void _init(get_api_fce_t get_engine_api) {
-    INIT_API(MachineApi, MACHINE_API_ID, 0);
+    INIT_API(get_engine_api, machine_api_v0, MACHINE_API_ID);
 
     _G = (struct G) {0};
 
     log_debug(LOG_WHERE, "Init");
 
     for (int i = 0; i < GAMEPAD_MAX; ++i) {
-        _G.active[i] = MachineApiV0.gamepad_is_active(i);
+        _G.active[i] = machine_api_v0.gamepad_is_active(i);
     }
 
 }
@@ -51,12 +51,12 @@ static void _shutdown() {
 }
 
 static void _update() {
-    struct event_header *event = MachineApiV0.event_begin();
+    struct event_header *event = machine_api_v0.event_begin();
 
     memory_copy(_G.last_state, _G.state,
                 sizeof(int) * GAMEPAD_BTN_MAX * GAMEPAD_MAX);
 
-    while (event != MachineApiV0.event_end()) {
+    while (event != machine_api_v0.event_end()) {
         struct gamepad_move_event *move_event = (struct gamepad_move_event *) event;
         struct gamepad_btn_event *btn_event = (struct gamepad_btn_event *) event;
         struct gamepad_device_event *device_event = (struct gamepad_device_event *) event;
@@ -87,7 +87,7 @@ static void _update() {
                 break;
         }
 
-        event = MachineApiV0.event_next(event);
+        event = machine_api_v0.event_next(event);
     }
 }
 
@@ -183,7 +183,7 @@ cel_vec2f_t gamepad_axis(uint32_t idx,
 void gamepad_play_rumble(uint32_t idx,
                          float strength,
                          uint32_t length) {
-    MachineApiV0.gamepad_play_rumble(idx, strength, length);
+    machine_api_v0.gamepad_play_rumble(idx, strength, length);
 }
 
 void *gamepad_get_module_api(int api) {
@@ -198,7 +198,7 @@ void *gamepad_get_module_api(int api) {
         return &module;
 
     } else if (api == GAMEPAD_API_ID) {
-        static struct GamepadApiV0 api_v1 = {
+        static struct gamepad_api_v0 api_v1 = {
                 .is_active = gamepad_is_active,
                 .button_index = gamepad_button_index,
                 .button_name = gamepad_button_name,

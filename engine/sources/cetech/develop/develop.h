@@ -13,6 +13,11 @@
 #include "cetech/types.h"
 #include "cetech/containers/eventstream.h"
 
+enum {
+    CONSOLE_SERVER_API_ID = 9,
+    DEVELOP_SERVER_API_ID = 10
+};
+
 //==============================================================================
 // Typedefs
 //==============================================================================
@@ -26,7 +31,7 @@ typedef int (*console_server_command_t)(mpack_node_t,
 //==============================================================================
 
 //! Console server API V0
-struct ConsoleServerApiV0 {
+struct cnsole_srv_api_v0 {
     //! Push begin signal to clients
     void (*consolesrv_push_begin)();
 
@@ -90,7 +95,7 @@ struct scope_data {
 //==============================================================================
 
 //! Develop system API V0
-struct DevelopSystemApiV0 {
+struct develop_api_v0 {
 
     //! Push event
     //! \param header Header

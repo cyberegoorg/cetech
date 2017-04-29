@@ -87,7 +87,7 @@ set(SOURCE_FILES
         engine/sources/cetech/os/private/cmd_line.c
         engine/sources/cetech/os/private/cpu.c
         engine/sources/cetech/filesystem/private/fs.c
-        engine/sources/cetech/handler/private/handler_gen.c
+        engine/sources/cetech/handler/private/handler.c
         engine/sources/cetech/os/private/object.c
         engine/sources/cetech/os/private/path.c
         engine/sources/cetech/os/private/process.c

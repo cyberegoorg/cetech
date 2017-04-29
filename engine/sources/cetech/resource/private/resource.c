@@ -68,11 +68,11 @@ struct G {
 
 } _G = {0};
 
-IMPORT_API(MemSysApi, 0);
-IMPORT_API(ConsoleServerApi, 0);
-IMPORT_API(FilesystemApi, 0);
-IMPORT_API(ConfigApi, 0);
-IMPORT_API(ApplicationApi, 0);
+IMPORT_API(memory_api_v0);
+IMPORT_API(cnsole_srv_api_v0);
+IMPORT_API(filesystem_api_v0);
+IMPORT_API(config_api_v0);
+IMPORT_API(app_api_v0);
 
 
 //==============================================================================
@@ -143,33 +143,33 @@ void resource_register_type(stringid64_t type,
                             resource_callbacks_t callbacks);
 
 static void _init(get_api_fce_t get_engine_api) {
-    INIT_API(ConsoleServerApi, CONSOLE_SERVER_API_ID, 0);
-    INIT_API(MemSysApi, MEMORY_API_ID, 0);
-    INIT_API(FilesystemApi, FILESYSTEM_API_ID, 0);
-    INIT_API(ConfigApi, CONFIG_API_ID, 0);
-    INIT_API(ApplicationApi, APPLICATION_API_ID, 0);
+    INIT_API(get_engine_api, cnsole_srv_api_v0, CONSOLE_SERVER_API_ID);
+    INIT_API(get_engine_api, memory_api_v0, MEMORY_API_ID);
+    INIT_API(get_engine_api, filesystem_api_v0, FILESYSTEM_API_ID);
+    INIT_API(get_engine_api, config_api_v0, CONFIG_API_ID);
+    INIT_API(get_engine_api, app_api_v0, APPLICATION_API_ID);
 
-    ARRAY_INIT(resource_data, &_G.resource_data, MemSysApiV0.main_allocator());
+    ARRAY_INIT(resource_data, &_G.resource_data, memory_api_v0.main_allocator());
     ARRAY_INIT(resource_callbacks_t, &_G.resource_callbacks,
-               MemSysApiV0.main_allocator());
-    MAP_INIT(uint32_t, &_G.type_map, MemSysApiV0.main_allocator());
+               memory_api_v0.main_allocator());
+    MAP_INIT(uint32_t, &_G.type_map, memory_api_v0.main_allocator());
 
-    _G.config.build_dir = ConfigApiV0.find("build");
+    _G.config.build_dir = config_api_v0.find("build");
 
 
     char build_dir_full[4096] = {0};
     cel_path_join(build_dir_full,
                   CEL_ARRAY_LEN(build_dir_full),
-                  ConfigApiV0.get_string(_G.config.build_dir),
-                  ApplicationApiV0.platform());
+                  config_api_v0.get_string(_G.config.build_dir),
+                  app_api_v0.platform());
 
-    FilesystemApiV0.filesystem_map_root_dir(stringid64_from_string("build"),
+    filesystem_api_v0.filesystem_map_root_dir(stringid64_from_string("build"),
                                             build_dir_full);
 
     resource_register_type(stringid64_from_string("package"),
                            package_resource_callback);
 
-    ConsoleServerApiV0.consolesrv_register_command("resource.reload_all",
+    cnsole_srv_api_v0.consolesrv_register_command("resource.reload_all",
                                                    _cmd_reload_all);
 
     package_init(get_engine_api);
@@ -177,7 +177,7 @@ static void _init(get_api_fce_t get_engine_api) {
 
 }
 
-static void _init_cvar(struct ConfigApiV0 config) {
+static void _init_cvar(struct config_api_v0 config) {
     _G = (struct G) {0};
 }
 
@@ -222,7 +222,7 @@ void resource_register_type(stringid64_t type,
     ARRAY_PUSH_BACK(resource_callbacks_t, &_G.resource_callbacks, callbacks);
 
     MAP_INIT(resource_item_t, &ARRAY_AT(&_G.resource_data, idx),
-             MemSysApiV0.main_allocator());
+             memory_api_v0.main_allocator());
 
     MAP_SET(uint32_t, &_G.type_map, type.id, idx);
 }
@@ -335,17 +335,17 @@ void resource_load(void **loaded_data,
         resource_compiler_get_filename(filename, CEL_ARRAY_LEN(filename), type,
                                        names[i]);
         log_debug("resource", "Loading resource %s from %s/%s", filename,
-                  FilesystemApiV0.filesystem_get_root_dir(root_name),
+                  filesystem_api_v0.filesystem_get_root_dir(root_name),
                   build_name);
 
-        struct vio *resource_file = FilesystemApiV0.filesystem_open(root_name,
+        struct vio *resource_file = filesystem_api_v0.filesystem_open(root_name,
                                                                     build_name,
                                                                     VIO_OPEN_READ);
 
         if (resource_file != NULL) {
             loaded_data[i] = type_clb.loader(resource_file,
-                                             MemSysApiV0.main_allocator());
-            FilesystemApiV0.filesystem_close(resource_file);
+                                             memory_api_v0.main_allocator());
+            filesystem_api_v0.filesystem_close(resource_file);
         } else {
             loaded_data[i] = 0;
         }
@@ -384,7 +384,7 @@ void resource_unload(stringid64_t type,
             log_debug("resource", "Unload resource %s ", filename);
 
             type_clb.offline(names[i], item.data);
-            type_clb.unloader(item.data, MemSysApiV0.main_allocator());
+            type_clb.unloader(item.data, memory_api_v0.main_allocator());
 
             MAP_REMOVE(resource_item_t, resource_map, names[i].id);
         }
@@ -446,7 +446,7 @@ void resource_reload(stringid64_t type,
         void *old_data = resource_get(type, names[i]);
 
         void *new_data = type_clb.reloader(names[i], old_data, loaded_data[i],
-                                           MemSysApiV0.main_allocator());
+                                           memory_api_v0.main_allocator());
 
         resource_item_t item = MAP_GET(resource_item_t, resource_map,
                                        names[i].id, null_item);
@@ -461,7 +461,7 @@ void resource_reload_all() {
     const MAP_ENTRY_T(uint32_t) *type_end = MAP_END(uint32_t, &_G.type_map);
 
     ARRAY_T(stringid64_t) name_array = {0};
-    ARRAY_INIT(stringid64_t, &name_array, MemSysApiV0.main_allocator());
+    ARRAY_INIT(stringid64_t, &name_array, memory_api_v0.main_allocator());
 
     while (type_it != type_end) {
         stringid64_t type_id = {.id = type_it->key};
@@ -506,7 +506,7 @@ void *resourcesystem_get_module_api(int api) {
 
         case RESOURCE_API_ID:
                 {
-                    static struct ResourceApiV0 api = {0};
+                    static struct resource_api_v0 api = {0};
 
                     api.set_autoload = resource_set_autoload;
                     api.register_type = resource_register_type;
@@ -535,7 +535,7 @@ void *resourcesystem_get_module_api(int api) {
 
         case PACKAGE_API_ID:
                 {
-                    static struct PackageApiV0 api = {0};
+                    static struct package_api_v0 api = {0};
 
                     api.load = package_load;
                     api.unload = package_unload;

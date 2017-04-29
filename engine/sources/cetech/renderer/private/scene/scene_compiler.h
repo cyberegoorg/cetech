@@ -59,7 +59,7 @@ struct compile_output {
 };
 
 struct compile_output *_crete_compile_output() {
-    struct cel_allocator *a = MemSysApiV0.main_allocator();
+    struct cel_allocator *a = memory_api_v0.main_allocator();
     struct compile_output *output = CEL_ALLOCATE(a, struct compile_output, 1);
 
     ARRAY_INIT(stringid64_t, &output->geom_name, a);
@@ -81,7 +81,7 @@ struct compile_output *_crete_compile_output() {
 }
 
 void _destroy_compile_output(struct compile_output *output) {
-    struct cel_allocator *a = MemSysApiV0.main_allocator();
+    struct cel_allocator *a = memory_api_v0.main_allocator();
 
     ARRAY_DESTROY(stringid64_t, &output->geom_name);
     ARRAY_DESTROY(uint32_t, &output->ib_offset);
@@ -359,7 +359,7 @@ int _compile_assimp(const char *filename,
     capi->add_dependency(filename, input_str);
 
     char input_path[128] = {0};
-    const char *source_dir = ResourceApiV0.compiler_get_source_dir();
+    const char *source_dir = resource_api_v0.compiler_get_source_dir();
     cel_path_join(input_path, CEL_ARRAY_LEN(input_path), source_dir, input_str);
 
     uint32_t postprocess_flag = aiProcessPreset_TargetRealtime_MaxQuality;
@@ -466,7 +466,7 @@ int _scene_resource_compiler(const char *filename,
                              struct compilator_api *compilator_api) {
 
     char *source_data =
-    CEL_ALLOCATE(MemSysApiV0.main_allocator(), char,
+    CEL_ALLOCATE(memory_api_v0.main_allocator(), char,
                  cel_vio_size(source_vio) + 1);
     memory_set(source_data, 0, cel_vio_size(source_vio) + 1);
     cel_vio_read(source_vio, source_data, sizeof(char),
@@ -487,7 +487,7 @@ int _scene_resource_compiler(const char *filename,
 
     if (!ret) {
         _destroy_compile_output(output);
-        CEL_DEALLOCATE(MemSysApiV0.main_allocator(), source_data);
+        CEL_DEALLOCATE(memory_api_v0.main_allocator(), source_data);
         return 0;
     }
 
@@ -525,7 +525,7 @@ int _scene_resource_compiler(const char *filename,
                   ARRAY_SIZE(&output->geom_name));
 
     _destroy_compile_output(output);
-    CEL_DEALLOCATE(MemSysApiV0.main_allocator(), source_data);
+    CEL_DEALLOCATE(memory_api_v0.main_allocator(), source_data);
     return 1;
 }
 

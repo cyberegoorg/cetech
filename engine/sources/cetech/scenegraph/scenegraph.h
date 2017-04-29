@@ -12,6 +12,9 @@
 #import "cetech/math/math_types.h"
 #import "cetech/string/stringid.h"
 
+enum {
+    SCENEGRAPH_API_ID = 24,
+};
 
 //==============================================================================
 // Typedefs
@@ -28,7 +31,7 @@ typedef struct {
 //==============================================================================
 
 //! Scene-graph API V0
-struct SceneGprahApiV0 {
+struct scenegprah_api_v0 {
 
     //! Is node valid?
     //! \param node Node

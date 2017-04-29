@@ -25,10 +25,11 @@ ARRAY_PROTOTYPE(stringid64_t);
 #define _G WorldGlobals
 static struct G {
     ARRAY_T(world_callbacks_t) callbacks;
-    struct handler_gen* world_handler;
+    struct handler32gen* world_handler;
 } _G = {0};
 
-IMPORT_API(MemSysApi, 0);
+IMPORT_API(memory_api_v0);
+IMPORT_API(handler_api_v0);
 
 //==============================================================================
 // Public interface
@@ -36,15 +37,16 @@ IMPORT_API(MemSysApi, 0);
 static void _init(get_api_fce_t get_engine_api) {
     _G = (struct G) {0};
 
-    INIT_API(MemSysApi, MEMORY_API_ID, 0);
+    INIT_API(get_engine_api, memory_api_v0, MEMORY_API_ID);
+    INIT_API(get_engine_api, handler_api_v0, HANDLER_API_ID);
 
-    ARRAY_INIT(world_callbacks_t, &_G.callbacks, MemSysApiV0.main_allocator());
+    ARRAY_INIT(world_callbacks_t, &_G.callbacks, memory_api_v0.main_allocator());
 
-    _G.world_handler = handlerid_create(MemSysApiV0.main_allocator());
+    _G.world_handler = handler_api_v0.handler32gen_create(memory_api_v0.main_allocator());
 }
 
 static void _shutdown() {
-    handlerid_destroy(_G.world_handler);
+    handler_api_v0.handler32gen_destroy(_G.world_handler);
     ARRAY_DESTROY(world_callbacks_t, &_G.callbacks);
     _G = (struct G) {0};
 }
@@ -55,7 +57,7 @@ void world_register_callback(world_callbacks_t clb) {
 }
 
 world_t world_create() {
-    world_t w = {.h = handlerid_handler_create(_G.world_handler)};
+    world_t w = {.h = handler_api_v0.handler32_create(_G.world_handler)};
 
     for (int i = 0; i < ARRAY_SIZE(&_G.callbacks); ++i) {
         ARRAY_AT(&_G.callbacks, i).on_created(w);
@@ -69,7 +71,7 @@ void world_destroy(world_t world) {
         ARRAY_AT(&_G.callbacks, i).on_destroy(world);
     }
 
-    handlerid_handler_destroy(_G.world_handler, world.h);
+    handler_api_v0.handler32_destroy(_G.world_handler, world.h);
 }
 
 void world_update(world_t world,
@@ -99,7 +101,7 @@ void *world_get_module_api(int api) {
 
         case WORLD_API_ID:
             {
-                    static struct WorldApiV0 api = {0};
+                    static struct world_api_v0 api = {0};
 
                     api.register_callback = world_register_callback;
                     api.create = world_create;

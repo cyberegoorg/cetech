@@ -20,11 +20,11 @@
 #include <cetech/renderer/private/material/material.h>
 
 
-IMPORT_API(ConsoleServerApi, 0);
-IMPORT_API(MeshRendererApi, 0);
-IMPORT_API(CameraApi, 0);
-IMPORT_API(ConfigApi, 0);
-IMPORT_API(ApplicationApi, 0);
+IMPORT_API(cnsole_srv_api_v0);
+IMPORT_API(mesh_renderer_api_v0);
+IMPORT_API(camera_api_v0);
+IMPORT_API(config_api_v0);
+IMPORT_API(app_api_v0);
 
 //==============================================================================
 // GLobals
@@ -71,29 +71,29 @@ static int _cmd_resize(mpack_node_t args,
 }
 
 static void _init(get_api_fce_t get_engine_api) {
-    INIT_API(ConsoleServerApi, CONSOLE_SERVER_API_ID, 0);
-    INIT_API(MeshRendererApi, MESH_API_ID, 0);
-    INIT_API(CameraApi, CAMERA_API_ID, 0);
-    INIT_API(ConfigApi, CONFIG_API_ID, 0);
-    INIT_API(ApplicationApi, APPLICATION_API_ID, 0);
+    INIT_API(get_engine_api, cnsole_srv_api_v0, CONSOLE_SERVER_API_ID);
+    INIT_API(get_engine_api, mesh_renderer_api_v0, MESH_API_ID);
+    INIT_API(get_engine_api, camera_api_v0, CAMERA_API_ID);
+    INIT_API(get_engine_api, config_api_v0, CONFIG_API_ID);
+    INIT_API(get_engine_api, app_api_v0, APPLICATION_API_ID);
 
     _G = (struct G) {0};
 
-    cvar_t daemon = ConfigApiV0.find("daemon");
-    if (!ConfigApiV0.get_int(daemon)) {
+    cvar_t daemon = config_api_v0.find("daemon");
+    if (!config_api_v0.get_int(daemon)) {
         texture_init();
         shader_init();
         material_init(get_engine_api);
         scene_init();
 
-        ConsoleServerApiV0.consolesrv_register_command("renderer.resize",
+        cnsole_srv_api_v0.consolesrv_register_command("renderer.resize",
                                                        _cmd_resize);
     }
 }
 
 static void _shutdown() {
-    cvar_t daemon = ConfigApiV0.find("daemon");
-    if (!ConfigApiV0.get_int(daemon)) {
+    cvar_t daemon = config_api_v0.find("daemon");
+    if (!config_api_v0.get_int(daemon)) {
         texture_shutdown();
         shader_shutdown();
         material_shutdown();
@@ -141,7 +141,7 @@ void renderer_render_world(world_t world,
     cel_mat44f_t view_matrix;
     cel_mat44f_t proj_matrix;
 
-    CameraApiV0.get_project_view(world, camera, &proj_matrix, &view_matrix);
+    camera_api_v0.get_project_view(world, camera, &proj_matrix, &view_matrix);
     bgfx_set_view_transform(0, view_matrix.f, proj_matrix.f);
 
     bgfx_set_view_rect(0, 0, 0, (uint16_t) _G.size_width,
@@ -150,10 +150,10 @@ void renderer_render_world(world_t world,
     bgfx_touch(0);
     bgfx_dbg_text_clear(0, 0);
 
-    MeshRendererApiV0.render_all(world);
+    mesh_renderer_api_v0.render_all(world);
 
     bgfx_frame(0);
-    cel_window_update(ApplicationApiV0.main_window());
+    cel_window_update(app_api_v0.main_window());
 }
 
 cel_vec2f_t renderer_get_size() {
@@ -181,7 +181,7 @@ void *renderer_get_module_api(int api) {
 
         case RENDERER_API_ID:
                 {
-                    static struct RendererApiV0 api = {0};
+                    static struct renderer_api_v0 api = {0};
 
                     api.create = renderer_create;
                     api.set_debug = renderer_set_debug;
@@ -194,7 +194,7 @@ void *renderer_get_module_api(int api) {
 
         case MATERIAL_API_ID:
                 {
-                    static struct MaterialApiV0 api = {0};
+                    static struct material_api_v0 api = {0};
 
                     api.resource_create = material_create;
                     api.get_texture_count = material_get_texture_count;

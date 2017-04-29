@@ -15,15 +15,19 @@
 #include "include/luajit/lualib.h"
 
 #include "cetech/math/math_types.h"
-#include <cetech/handler/handlerid.h>
+#include <cetech/handler/handler.h>
 #include <cetech/string/stringid.h>
 
+
+enum {
+    LUA_API_ID = 13,
+};
 //==============================================================================
 // Api
 //==============================================================================
 
 //! Lua system api V0
-struct LuaSysApiV0 {
+struct lua_api_v0 {
 
     //! Return number of elements in the stack, which is also the index of the top element.
     //! Notice that a negative index -x is equivalent to the positive index gettop - x + 1.
@@ -93,7 +97,7 @@ struct LuaSysApiV0 {
     //! \param l
     //! \param value
     void (*push_handler)(lua_State *l,
-                         handler_t value);
+                         handler32_t value);
 
     //! Push int
     //! \param l
@@ -150,7 +154,7 @@ struct LuaSysApiV0 {
     //! \param l
     //! \param i Element idx
     //! \return Handler value
-    handler_t (*to_handler)(lua_State *l,
+    handler32_t (*to_handler)(lua_State *l,
                             int i);
 
     //! Get element value as string

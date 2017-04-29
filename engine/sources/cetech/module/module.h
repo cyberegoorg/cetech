@@ -15,42 +15,16 @@
 // Defines
 //==============================================================================
 
-#define _NAME(name, version) name##V##version
-#define IMPORT_API(name, version) static struct _NAME(name, version) _NAME(name, version)
-#define INIT_API(name, api_id, version) _NAME(name, version) = *(struct _NAME(name, version) *) get_engine_api(api_id)
+#define IMPORT_API(name) static struct name name;
+#define INIT_API(get_api, name, api_id) name = *(struct name*) get_api(api_id)
 
 
 //==============================================================================
 // Enums
 //==============================================================================
 
-//! Core engine module api ids
 enum {
     PLUGIN_EXPORT_API_ID = 1,
-    APPLICATION_API_ID,
-    KEYBOARD_API_ID,
-    MOUSE_API_ID,
-    GAMEPAD_API_ID,
-    MACHINE_API_ID,
-    CONFIG_API_ID,
-    TASK_API_ID,
-    CONSOLE_SERVER_API_ID,
-    DEVELOP_SERVER_API_ID,
-    ENTITY_API_ID,
-    COMPONENT_API_ID,
-    LUA_API_ID,
-    MEMORY_API_ID,
-    RENDERER_API_ID,
-    MATERIAL_API_ID,
-    MESH_API_ID,
-    FILESYSTEM_API_ID,
-    RESOURCE_API_ID,
-    PACKAGE_API_ID,
-    CAMERA_API_ID,
-    LEVEL_API_ID,
-    SCENEGRAPH_API_ID,
-    TRANSFORM_API_ID,
-    WORLD_API_ID,
 };
 
 
@@ -70,7 +44,7 @@ struct module_api_v0 {
 
     //! Init cvars
     //! \param Init cvars
-    void (*init_cvar       )(struct ConfigApiV0);
+    void (*init_cvar       )(struct config_api_v0);
 
     //! Init
     //! \param get_api_fce_t Get engine api

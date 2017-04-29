@@ -20,17 +20,23 @@
 //! Material typedef
 typedef struct {
     union {
-        handler_t h;
+        handler32_t h;
         uint32_t idx;
     };
 } material_t;
+
+enum {
+    RENDERER_API_ID = 15,
+    MATERIAL_API_ID = 16,
+    MESH_API_ID = 17,
+};
 
 //==============================================================================
 // Api
 //==============================================================================
 
 //! Material API V0
-struct MaterialApiV0 {
+struct material_api_v0 {
 
     //! Create new material
     //! \param name Material resource name
@@ -96,7 +102,7 @@ typedef struct {
 //==============================================================================
 
 //! Mesh API V0
-struct MeshRendererApiV0 {
+struct mesh_renderer_api_v0 {
 
     //! Is mesh valid
     //! \param mesh Mesh
@@ -165,7 +171,7 @@ typedef int viewport_t;
 //==============================================================================
 
 //! Render API V0
-struct RendererApiV0 {
+struct renderer_api_v0 {
     //! Create renderer.
     //! \param window Window
     void (*create)(cel_window_t window);

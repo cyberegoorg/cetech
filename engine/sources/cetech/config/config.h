@@ -12,6 +12,11 @@
 #include <cetech/os/cmd_line.h>
 #include "cetech/types.h"
 
+
+enum {
+    CONFIG_API_ID = 7,
+};
+
 //==============================================================================
 // Typedefs
 //==============================================================================
@@ -49,7 +54,7 @@ void cvar_shutdown();
 //==============================================================================
 
 //! Config API V0
-struct ConfigApiV0 {
+struct config_api_v0 {
     void (*load_global)();
 
     void (*compile_global)();

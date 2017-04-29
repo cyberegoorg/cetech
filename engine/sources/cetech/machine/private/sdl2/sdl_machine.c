@@ -26,7 +26,7 @@ static struct G {
     int _;
 } _G = {0};
 
-static struct ApplicationApiV0 ApplicationApiV0;
+static struct app_api_v0 app_api_v0;
 
 //==============================================================================
 // Interface
@@ -35,7 +35,7 @@ static struct ApplicationApiV0 ApplicationApiV0;
 int sdl_init(get_api_fce_t get_engine_api) {
     _G = (struct G) {0};
 
-    ApplicationApiV0 = *(struct ApplicationApiV0 *) get_engine_api(
+    app_api_v0 = *(struct app_api_v0 *) get_engine_api(
             APPLICATION_API_ID);
 
     if (SDL_Init(SDL_INIT_EVERYTHING) != 0) {
@@ -58,7 +58,7 @@ void sdl_process(struct eventstream *stream) {
     while (SDL_PollEvent(&e) > 0) {
         switch (e.type) {
             case SDL_QUIT:
-                ApplicationApiV0.quit();
+                app_api_v0.quit();
                 break;
 
             case SDL_CONTROLLERDEVICEADDED:

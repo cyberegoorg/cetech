@@ -15,7 +15,7 @@
 #include <cetech/string/stringid.h>
 
 #include <stdint.h>
-#include <cetech/handler/handlerid.h>
+#include <cetech/handler/handler.h>
 
 
 //==============================================================================
@@ -45,7 +45,7 @@ void luasys_push_uint64_t(lua_State *l,
                      uint64_t value);
 
 void luasys_push_handler(lua_State *l,
-                         handler_t value);
+                         handler32_t value);
 
 void luasys_push_int(lua_State *l,
                      int value);
@@ -68,7 +68,7 @@ int luasys_to_int(lua_State *l,
 float luasys_to_float(lua_State *l,
                   int i);
 
-handler_t luasys_to_handler(lua_State *l,
+handler32_t luasys_to_handler(lua_State *l,
                             int i);
 
 const char *luasys_to_string(lua_State *,

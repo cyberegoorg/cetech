@@ -56,7 +56,7 @@ static struct G {
     stringid64_t type;
 } _G = {0};
 
-static struct MemSysApiV0 MemSysApiV0;
+IMPORT_API(memory_api_v0);
 
 void cvar_load_global();
 
@@ -114,7 +114,7 @@ void _dealloc_allm_string() {
             continue;
         }
 
-        CEL_DEALLOCATE(MemSysApiV0.main_allocator(), _G.values[i].s);
+        CEL_DEALLOCATE(memory_api_v0.main_allocator(), _G.values[i].s);
     }
 }
 
@@ -159,7 +159,7 @@ static void _reload_end(get_api_fce_t get_engine_api,
 int cvar_init() {
     log_debug(LOG_WHERE, "Init");
 
-    MemSysApiV0 = *(struct MemSysApiV0 *) module_get_engine_api(MEMORY_API_ID);
+    memory_api_v0 = *(struct memory_api_v0 *) module_get_engine_api(MEMORY_API_ID);
 
     _G.type = stringid64_from_string("config");
 
@@ -177,22 +177,22 @@ void cvar_compile_global() {
     char source_path[1024] = {0};
     char build_path[1024] = {0};
 
-    struct ResourceApiV0 ResourceApiV0 = *(struct ResourceApiV0 *) module_get_engine_api(
+    struct resource_api_v0 ResourceApiV0 = *(struct resource_api_v0 *) module_get_engine_api(
             RESOURCE_API_ID);
-    struct ApplicationApiV0 ApplicationApiV0 = *(struct ApplicationApiV0 *) module_get_engine_api(
+    struct app_api_v0 app_api_v0 = *(struct app_api_v0 *) module_get_engine_api(
             APPLICATION_API_ID);
 
     ResourceApiV0.compiler_get_build_dir(build_dir, CEL_ARRAY_LEN(build_dir),
-                                         ApplicationApiV0.platform());
+                                         app_api_v0.platform());
     cel_path_join(build_path, CEL_ARRAY_LEN(build_path), build_dir,
                   "global.config");
     cel_path_join(source_path, CEL_ARRAY_LEN(source_path),
                   ResourceApiV0.compiler_get_source_dir(), "global.config");
 
     struct vio *source_vio = cel_vio_from_file(source_path, VIO_OPEN_READ,
-                                               MemSysApiV0.main_allocator());
+                                               memory_api_v0.main_allocator());
     char *data =
-    CEL_ALLOCATE(MemSysApiV0.main_allocator(), char,
+    CEL_ALLOCATE(memory_api_v0.main_allocator(), char,
                  cel_vio_size(source_vio));
 
     size_t size = (size_t) cel_vio_size(source_vio);
@@ -200,11 +200,11 @@ void cvar_compile_global() {
     cel_vio_close(source_vio);
 
     struct vio *build_vio = cel_vio_from_file(build_path, VIO_OPEN_WRITE,
-                                              MemSysApiV0.main_allocator());
+                                              memory_api_v0.main_allocator());
     cel_vio_write(build_vio, data, sizeof(char), size);
     cel_vio_close(build_vio);
 
-    CEL_DEALLOCATE(MemSysApiV0.main_allocator(), data);
+    CEL_DEALLOCATE(memory_api_v0.main_allocator(), data);
 }
 
 
@@ -287,19 +287,19 @@ void cvar_load_global() {
     char build_dir[1024] = {0};
     char source_path[1024] = {0};
 
-    struct ResourceApiV0 ResourceApiV0 = *(struct ResourceApiV0 *) module_get_engine_api(
+    struct resource_api_v0 ResourceApiV0 = *(struct resource_api_v0 *) module_get_engine_api(
             RESOURCE_API_ID);
-    struct ApplicationApiV0 ApplicationApiV0 = *(struct ApplicationApiV0 *) module_get_engine_api(
+    struct app_api_v0 app_api_v0 = *(struct app_api_v0 *) module_get_engine_api(
             APPLICATION_API_ID);
     ResourceApiV0.compiler_get_build_dir(build_dir, CEL_ARRAY_LEN(build_dir),
-                                         ApplicationApiV0.platform());
+                                         app_api_v0.platform());
     cel_path_join(source_path, CEL_ARRAY_LEN(source_path), build_dir,
                   "global.config");
 
     struct vio *source_vio = cel_vio_from_file(source_path, VIO_OPEN_READ,
-                                               MemSysApiV0.main_allocator());
+                                               memory_api_v0.main_allocator());
     char *data =
-    CEL_ALLOCATE(MemSysApiV0.main_allocator(), char,
+    CEL_ALLOCATE(memory_api_v0.main_allocator(), char,
                  cel_vio_size(source_vio));
     cel_vio_read(source_vio, data, cel_vio_size(source_vio),
                  cel_vio_size(source_vio));
@@ -307,7 +307,7 @@ void cvar_load_global() {
 
     yaml_document_t h;
     yaml_node_t root = yaml_load_str(data, &h);
-    CEL_DEALLOCATE(MemSysApiV0.main_allocator(), data);
+    CEL_DEALLOCATE(memory_api_v0.main_allocator(), data);
 
     struct foreach_config_data config_data = {
             .root_name = NULL
@@ -481,7 +481,7 @@ cvar_t cvar_new_str(const char *name,
     if (new) {
         cel_str_set(_G.name[find.idx], name);
         _G.types[find.idx] = CV_STRING;
-        _G.values[find.idx].s = cel_strdup(s, MemSysApiV0.main_allocator());
+        _G.values[find.idx].s = cel_strdup(s, memory_api_v0.main_allocator());
     }
 
     cel_str_set(_G.desc[find.idx], desc);
@@ -520,10 +520,10 @@ void cvar_set_string(cvar_t var,
     char *_s = _G.values[var.idx].s;
 
     if (_s != NULL) {
-        allocator_deallocate(MemSysApiV0.main_allocator(), _s);
+        allocator_deallocate(memory_api_v0.main_allocator(), _s);
     }
 
-    _G.values[var.idx].s = cel_strdup(s, MemSysApiV0.main_allocator());
+    _G.values[var.idx].s = cel_strdup(s, memory_api_v0.main_allocator());
 }
 
 void cvar_log_all() {
@@ -562,7 +562,7 @@ void *config_get_module_api(int api) {
 
         return &module;
     } else if (api == CONFIG_API_ID) {
-        static struct ConfigApiV0 api_v1 = {
+        static struct config_api_v0 api_v1 = {
                 .load_global = cvar_load_global,
                 .compile_global = cvar_compile_global,
                 .parse_core_args = cvar_parse_core_args,

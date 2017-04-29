@@ -11,7 +11,7 @@
 #include <cetech/containers/map.inl>
 #include <cetech/yaml/yaml.h>
 #include <cetech/string/stringid.h>
-#include <cetech/handler/handlerid.h>
+#include <cetech/handler/handler.h>
 #include <cetech/world/world.h>
 #include <cetech/entity/entity.h>
 
@@ -35,6 +35,10 @@ struct property_value {
         cel_quatf_t quatf;
         stringid64_t strid_64;
     } value;
+};
+
+enum {
+    COMPONENT_API_ID = 12
 };
 
 //==============================================================================
@@ -102,7 +106,7 @@ static struct component_clb {
 //==============================================================================
 
 //! Component system API V0
-struct ComponentSystemApiV0 {
+struct component_api_v0 {
     //! Register component compiler
     //! \param type Component type
     //! \param compiler Compiler fce

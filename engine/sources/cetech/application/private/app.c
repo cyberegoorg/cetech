@@ -26,14 +26,14 @@
 #define LOG_WHERE "application"
 
 
-IMPORT_API(ConsoleServerApi, 0);
-IMPORT_API(DevelopSystemApi, 0);
-IMPORT_API(RendererApi, 0);
-IMPORT_API(ResourceApi, 0);
-IMPORT_API(PackageApi, 0);
-IMPORT_API(TaskApi, 0);
-IMPORT_API(LuaSysApi, 0);
-IMPORT_API(ConfigApi, 0);
+IMPORT_API(cnsole_srv_api_v0);
+IMPORT_API(develop_api_v0);
+IMPORT_API(renderer_api_v0);
+IMPORT_API(resource_api_v0);
+IMPORT_API(package_api_v0);
+IMPORT_API(task_api_v0);
+IMPORT_API(lua_api_v0);
+IMPORT_API(config_api_v0);
 
 //==============================================================================
 // Definess
@@ -96,7 +96,7 @@ void application_quit() {
 }
 
 
-static struct ApplicationApiV0 api_v1 = {
+static struct app_api_v0 api_v1 = {
         .quit = application_quit,
         .platform =  application_platform,
         .native_platform =  application_native_platform,
@@ -104,52 +104,50 @@ static struct ApplicationApiV0 api_v1 = {
 };
 
 void _init_api() {
-#define get_engine_api module_get_engine_api
-    INIT_API(ConsoleServerApi, CONSOLE_SERVER_API_ID, 0);
-    INIT_API(DevelopSystemApi, DEVELOP_SERVER_API_ID, 0);
-    INIT_API(RendererApi, RENDERER_API_ID, 0);
-    INIT_API(ResourceApi, RESOURCE_API_ID, 0);
-    INIT_API(PackageApi, PACKAGE_API_ID, 0);
-    INIT_API(TaskApi, TASK_API_ID, 0);
-    INIT_API(LuaSysApi, LUA_API_ID, 0);
-    INIT_API(ConfigApi, CONFIG_API_ID, 0);
-#undef get_engine_api
+    INIT_API(module_get_engine_api,cnsole_srv_api_v0, CONSOLE_SERVER_API_ID);
+    INIT_API(module_get_engine_api,develop_api_v0, DEVELOP_SERVER_API_ID);
+    INIT_API(module_get_engine_api,renderer_api_v0, RENDERER_API_ID);
+    INIT_API(module_get_engine_api,resource_api_v0, RESOURCE_API_ID);
+    INIT_API(module_get_engine_api,package_api_v0, PACKAGE_API_ID);
+    INIT_API(module_get_engine_api,task_api_v0, TASK_API_ID);
+    INIT_API(module_get_engine_api,lua_api_v0, LUA_API_ID);
+    INIT_API(module_get_engine_api,config_api_v0, CONFIG_API_ID);
 }
 
 int _init_config() {
-    _G.config.boot_pkg = ConfigApiV0.new_str("core.boot_pkg", "Boot package",
+    _G.config.boot_pkg = config_api_v0.new_str("core.boot_pkg", "Boot package",
                                              "boot");
-    _G.config.boot_script = ConfigApiV0.new_str("core.boot_script",
+    _G.config.boot_script = config_api_v0.new_str("core.boot_script",
                                                 "Boot script", "lua/boot");
 
-    _G.config.screen_x = ConfigApiV0.new_int("screen.x", "Screen width", 1024);
-    _G.config.screen_y = ConfigApiV0.new_int("screen.y", "Screen height", 768);
-    _G.config.fullscreen = ConfigApiV0.new_int("screen.fullscreen",
+    _G.config.screen_x = config_api_v0.new_int("screen.x", "Screen width", 1024);
+    _G.config.screen_y = config_api_v0.new_int("screen.y", "Screen height", 768);
+    _G.config.fullscreen = config_api_v0.new_int("screen.fullscreen",
                                                "Fullscreen", 0);
 
-    _G.config.daemon = ConfigApiV0.new_int("daemon", "Daemon mode", 0);
-    _G.config.compile = ConfigApiV0.new_int("compile", "Comple", 0);
-    _G.config.continue_ = ConfigApiV0.new_int("continue",
+    _G.config.daemon = config_api_v0.new_int("daemon", "Daemon mode", 0);
+    _G.config.compile = config_api_v0.new_int("compile", "Comple", 0);
+    _G.config.continue_ = config_api_v0.new_int("continue",
                                               "Continue after compile", 0);
-    _G.config.wait = ConfigApiV0.new_int("wait", "Wait for client", 0);
-    _G.config.wid = ConfigApiV0.new_int("wid", "Wid", 0);
+    _G.config.wait = config_api_v0.new_int("wait", "Wait for client", 0);
+    _G.config.wid = config_api_v0.new_int("wid", "Wid", 0);
 
 
     // Cvar stage
 
-    ConfigApiV0.parse_core_args(_G.args);
-    if (ConfigApiV0.get_int(_G.config.compile)) {
-        ResourceApiV0.compiler_create_build_dir(ConfigApiV0, api_v1);
-        ConfigApiV0.compile_global();
+    config_api_v0.parse_core_args(_G.args);
+    if (config_api_v0.get_int(_G.config.compile)) {
+        resource_api_v0.compiler_create_build_dir(config_api_v0, api_v1);
+        config_api_v0.compile_global();
     }
 
-    ConfigApiV0.load_global();
+    config_api_v0.load_global();
 
-    if (!ConfigApiV0.parse_args(_G.args)) {
+    if (!config_api_v0.parse_args(_G.args)) {
         return 0;
     }
 
-    ConfigApiV0.log_all();
+    config_api_v0.log_all();
 
     return 1;
 }
@@ -186,9 +184,9 @@ int application_init(int argc,
 
     module_call_init();
 
-    log_set_wid_clb(TaskApiV0.worker_id);
+    log_set_wid_clb(task_api_v0.worker_id);
 
-    ConsoleServerApiV0.consolesrv_register_command("wait", _cmd_wait);
+    cnsole_srv_api_v0.consolesrv_register_command("wait", _cmd_wait);
 
     return 1;
 }
@@ -207,83 +205,83 @@ int application_shutdown() {
 
 static void _boot_stage() {
     stringid64_t boot_pkg = stringid64_from_string(
-            ConfigApiV0.get_string(_G.config.boot_pkg));
+            config_api_v0.get_string(_G.config.boot_pkg));
     stringid64_t pkg = stringid64_from_string("package");
 
     stringid64_t core_pkg = stringid64_from_string("core");
     stringid64_t resources[] = {core_pkg, boot_pkg};
 
-    ResourceApiV0.load_now(pkg, resources, 2);
+    resource_api_v0.load_now(pkg, resources, 2);
 
-    PackageApiV0.load(core_pkg);
-    PackageApiV0.flush(core_pkg);
-    PackageApiV0.load(boot_pkg);
-    PackageApiV0.flush(boot_pkg);
+    package_api_v0.load(core_pkg);
+    package_api_v0.flush(core_pkg);
+    package_api_v0.load(boot_pkg);
+    package_api_v0.flush(boot_pkg);
 
 
     stringid64_t boot_script = stringid64_from_string(
-            ConfigApiV0.get_string(_G.config.boot_script));
-    LuaSysApiV0.execute_boot_script(boot_script);
+            config_api_v0.get_string(_G.config.boot_script));
+    lua_api_v0.execute_boot_script(boot_script);
 }
 
 
 static void _boot_unload() {
     stringid64_t boot_pkg = stringid64_from_string(
-            ConfigApiV0.get_string(_G.config.boot_pkg));
+            config_api_v0.get_string(_G.config.boot_pkg));
     stringid64_t core_pkg = stringid64_from_string("core");
     stringid64_t pkg = stringid64_from_string("package");
 
     stringid64_t resources[] = {core_pkg, boot_pkg};
 
-    PackageApiV0.unload(boot_pkg);
-    PackageApiV0.unload(core_pkg);
+    package_api_v0.unload(boot_pkg);
+    package_api_v0.unload(core_pkg);
 
-    ResourceApiV0.unload(pkg, resources, 2);
+    resource_api_v0.unload(pkg, resources, 2);
 }
 
 void application_start() {
 #if defined(CETECH_DEVELOP)
-    ResourceApiV0.set_autoload(1);
+    resource_api_v0.set_autoload(1);
 #else
-    ResourceApiV0.set_autoload(0);
+    resource_api_v0.set_autoload(0);
 #endif
 
-    if (ConfigApiV0.get_int(_G.config.compile)) {
-        ResourceApiV0.compiler_compile_all();
+    if (config_api_v0.get_int(_G.config.compile)) {
+        resource_api_v0.compiler_compile_all();
 
-        if (!ConfigApiV0.get_int(_G.config.continue_)) {
+        if (!config_api_v0.get_int(_G.config.continue_)) {
             return;
         }
     }
 
-    if (!ConfigApiV0.get_int(_G.config.daemon)) {
-        intptr_t wid = ConfigApiV0.get_int(_G.config.wid);
+    if (!config_api_v0.get_int(_G.config.daemon)) {
+        intptr_t wid = config_api_v0.get_int(_G.config.wid);
 
         char title[128] = {0};
         snprintf(title, CEL_ARRAY_LEN(title), "cetech - %s",
-                 ConfigApiV0.get_string(_G.config.boot_script));
+                 config_api_v0.get_string(_G.config.boot_script));
 
         if (wid == 0) {
             _G.main_window = cel_window_new(
                     title,
                     WINDOWPOS_UNDEFINED,
                     WINDOWPOS_UNDEFINED,
-                    ConfigApiV0.get_int(_G.config.screen_x),
-                    ConfigApiV0.get_int(_G.config.screen_y),
-                    ConfigApiV0.get_int(_G.config.fullscreen)
+                    config_api_v0.get_int(_G.config.screen_x),
+                    config_api_v0.get_int(_G.config.screen_y),
+                    config_api_v0.get_int(_G.config.fullscreen)
                     ? WINDOW_FULLSCREEN : WINDOW_NOFLAG
             );
         } else {
             _G.main_window = cel_window_new_from((void *) wid);
         }
 
-        RendererApiV0.create(_G.main_window);
+        renderer_api_v0.create(_G.main_window);
     }
 
     _boot_stage();
 
     uint64_t last_tick = cel_get_perf_counter();
-    _G.game = LuaSysApiV0.get_game_callbacks();
+    _G.game = lua_api_v0.get_game_callbacks();
 
     if (!_G.game->init()) {
         log_error(LOG_WHERE, "Could not init game.");
@@ -298,9 +296,9 @@ void application_start() {
     float frame_time = (1.0f / frame_limit);
     float frame_time_accum = 0.0f;
 
-    ConsoleServerApiV0.consolesrv_push_begin();
+    cnsole_srv_api_v0.consolesrv_push_begin();
     while (_G.is_running) {
-        struct scope_data application_sd = DevelopSystemApiV0.enter_scope(
+        struct scope_data application_sd = develop_api_v0.enter_scope(
                 "Application:update()");
 
         uint64_t now_ticks = cel_get_perf_counter();
@@ -314,18 +312,18 @@ void application_start() {
         _G.game->update(dt);
 
         if (frame_time_accum >= frame_time) {
-            if (!ConfigApiV0.get_int(_G.config.daemon)) {
-                struct scope_data render_sd = DevelopSystemApiV0.enter_scope(
+            if (!config_api_v0.get_int(_G.config.daemon)) {
+                struct scope_data render_sd = develop_api_v0.enter_scope(
                         "Game:render()");
                 _G.game->render();
-                DevelopSystemApiV0.leave_scope(render_sd);
+                develop_api_v0.leave_scope(render_sd);
             }
 
             frame_time_accum = 0.0f;
         }
 
-        DevelopSystemApiV0.leave_scope(application_sd);
-        DevelopSystemApiV0.push_record_float("engine.delta_time", dt);
+        develop_api_v0.leave_scope(application_sd);
+        develop_api_v0.push_record_float("engine.delta_time", dt);
 
         module_call_after_update(dt);
         //cel_thread_yield();

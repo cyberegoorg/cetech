@@ -210,7 +210,7 @@ void module_call_init() {
 }
 
 void module_call_init_cvar() {
-    struct ConfigApiV0 ConfigApiV0 = *(struct ConfigApiV0 *) module_get_engine_api(CONFIG_API_ID);
+    struct config_api_v0 ConfigApiV0 = *(struct config_api_v0 *) module_get_engine_api(CONFIG_API_ID);
 
     for (size_t i = 0; i < MAX_PLUGINS; ++i) {
         if (!_G.used[i] || !_G.module_api[i]->init_cvar) {

@@ -7,22 +7,22 @@
 #define API_NAME "Application"
 
 
-static struct ApplicationApiV0 ApplicationApiV0;
+IMPORT_API(app_api_v0);
 
 static int _application_quit(lua_State *l) {
-    ApplicationApiV0.quit();
+    app_api_v0.quit();
     return 0;
 }
 
 static int _application_native_platform(lua_State *l) {
-    const char *platform = ApplicationApiV0.native_platform();
+    const char *platform = app_api_v0.native_platform();
 
     luasys_push_string(l, platform);
     return 1;
 }
 
 static int _application_platform(lua_State *l) {
-    const char *platform = ApplicationApiV0.platform();
+    const char *platform = app_api_v0.platform();
 
     luasys_push_string(l, platform);
     return 1;
@@ -30,7 +30,7 @@ static int _application_platform(lua_State *l) {
 
 
 void _register_lua_application_api(get_api_fce_t get_engine_api) {
-    ApplicationApiV0 = *(struct ApplicationApiV0 *) get_engine_api(APPLICATION_API_ID);
+    INIT_API(get_engine_api,app_api_v0, APPLICATION_API_ID);
 
     luasys_add_module_function(API_NAME, "quit", _application_quit);
     luasys_add_module_function(API_NAME, "get_native_platform",

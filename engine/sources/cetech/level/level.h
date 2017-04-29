@@ -13,6 +13,10 @@
 #include <cetech/entity/entity.h>
 
 
+enum {
+    LEVEL_API_ID = 23,
+};
+
 //==============================================================================
 // Typedefs
 //==============================================================================
@@ -28,7 +32,7 @@ typedef struct {
 //==============================================================================
 
 //! Level API V0
-struct LevelApiV0 {
+struct level_api_v0 {
 
     //! Load level from resource
     //! \param world World

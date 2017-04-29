@@ -42,7 +42,7 @@ static struct G {
     cvar_t cv_push_addr;
 } ConsoleServerGlobals = {0};
 
-IMPORT_API(ConfigApi, 0);
+IMPORT_API(config_api_v0);
 
 extern void consolesrv_push_begin();
 
@@ -121,7 +121,7 @@ static int _cmd_ready(mpack_node_t args,
 }
 
 static void _init(get_api_fce_t get_engine_api) {
-    INIT_API(ConfigApi, CONFIG_API_ID, 0);
+    INIT_API(get_engine_api, config_api_v0, CONFIG_API_ID);
 
     const char *addr = 0;
 
@@ -133,7 +133,7 @@ static void _init(get_api_fce_t get_engine_api) {
                   nn_strerror(errno));
         return;// 0;
     }
-    addr = ConfigApiV0.get_string(_G.cv_rpc_addr);
+    addr = config_api_v0.get_string(_G.cv_rpc_addr);
 
     log_debug(LOG_WHERE, "RPC address: %s", addr);
 
@@ -146,7 +146,7 @@ static void _init(get_api_fce_t get_engine_api) {
     _G.rpc_socket = socket;
 ////
 
-    if (ConfigApiV0.get_string(_G.cv_push_addr)[0] != '\0') {
+    if (config_api_v0.get_string(_G.cv_push_addr)[0] != '\0') {
         socket = nn_socket(AF_SP, NN_PUSH);
         if (socket < 0) {
             log_error(LOG_WHERE, "Could not create nanomsg socket: %s",
@@ -154,7 +154,7 @@ static void _init(get_api_fce_t get_engine_api) {
             return;// 0;
         }
 
-        addr = ConfigApiV0.get_string(_G.cv_push_addr);
+        addr = config_api_v0.get_string(_G.cv_push_addr);
 
         log_debug(LOG_WHERE, "Push address: %s", addr);
 
@@ -175,7 +175,7 @@ static void _init(get_api_fce_t get_engine_api) {
         return;// 0;
     }
 
-    addr = ConfigApiV0.get_string(_G.cv_log_addr);
+    addr = config_api_v0.get_string(_G.cv_log_addr);
 
     log_debug(LOG_WHERE, "LOG address: %s", addr);
 
@@ -191,7 +191,7 @@ static void _init(get_api_fce_t get_engine_api) {
     consolesrv_register_command("console_server.ready", _cmd_ready);
 }
 
-static void _init_cvar(struct ConfigApiV0 config) {
+static void _init_cvar(struct config_api_v0 config) {
     _G = (struct G) {0};
 
     _G.cv_rpc_addr = config.new_str("develop.rpc.addr",
@@ -265,7 +265,7 @@ void *consoleserver_get_module_api(int api) {
 
 
         case CONSOLE_SERVER_API_ID: {
-            static struct ConsoleServerApiV0 api = {0};
+            static struct cnsole_srv_api_v0 api = {0};
 
             api.consolesrv_push_begin = consolesrv_push_begin;
             api.consolesrv_register_command = consolesrv_register_command;

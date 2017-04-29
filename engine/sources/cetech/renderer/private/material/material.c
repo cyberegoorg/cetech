@@ -47,12 +47,13 @@ struct G {
     ARRAY_T(uint8_t) material_instance_data;
     ARRAY_T(uint32_t) material_instance_uniform_data;
 
-    struct handler_gen* material_handler;
+    struct handler32gen* material_handler;
     stringid64_t type;
 } _G = {0};
 
-IMPORT_API(MemSysApi, 0);
-IMPORT_API(ResourceApi, 0);
+IMPORT_API(memory_api_v0);
+IMPORT_API(resource_api_v0);
+IMPORT_API(handler_api_v0);
 
 #define material_blob_uniform_bgfx(r)    ((bgfx_uniform_handle_t*) ((material_blob_vec4f_value(r)+((r)->vec4f_count))))
 
@@ -73,25 +74,26 @@ IMPORT_API(ResourceApi, 0);
 int material_init(get_api_fce_t get_engine_api) {
     _G = (struct G) {0};
 
-    INIT_API(MemSysApi, MEMORY_API_ID, 0);
-    INIT_API(ResourceApi, RESOURCE_API_ID, 0);
+    INIT_API(get_engine_api, memory_api_v0, MEMORY_API_ID);
+    INIT_API(get_engine_api, resource_api_v0, RESOURCE_API_ID);
+    INIT_API(get_engine_api, handler_api_v0, HANDLER_API_ID);
 
     _G.type = stringid64_from_string("material");
 
-    _G.material_handler = handlerid_create(MemSysApiV0.main_allocator());
+    _G.material_handler = handler_api_v0.handler32gen_create(memory_api_v0.main_allocator());
 
-    MAP_INIT(uint32_t, &_G.material_instace_map, MemSysApiV0.main_allocator());
-    ARRAY_INIT(uint32_t, &_G.material_instance_offset, MemSysApiV0.main_allocator());
-    ARRAY_INIT(uint8_t, &_G.material_instance_data, MemSysApiV0.main_allocator());
+    MAP_INIT(uint32_t, &_G.material_instace_map, memory_api_v0.main_allocator());
+    ARRAY_INIT(uint32_t, &_G.material_instance_offset, memory_api_v0.main_allocator());
+    ARRAY_INIT(uint8_t, &_G.material_instance_data, memory_api_v0.main_allocator());
 
-    ResourceApiV0.compiler_register(_G.type, _material_resource_compiler);
-    ResourceApiV0.register_type(_G.type, material_resource_callback);
+    resource_api_v0.compiler_register(_G.type, _material_resource_compiler);
+    resource_api_v0.register_type(_G.type, material_resource_callback);
 
     return 1;
 }
 
 void material_shutdown() {
-    handlerid_destroy(_G.material_handler);
+    handler_api_v0.handler32gen_destroy(_G.material_handler);
 
     MAP_DESTROY(uint32_t, &_G.material_instace_map);
     ARRAY_DESTROY(uint32_t, &_G.material_instance_offset);
@@ -103,7 +105,7 @@ void material_shutdown() {
 static const material_t null_material = {0};
 
 material_t material_create(stringid64_t name) {
-    struct material_blob *resource = ResourceApiV0.get(_G.type, name);
+    struct material_blob *resource = resource_api_v0.get(_G.type, name);
 
     uint32_t size = sizeof(struct material_blob) +
                (resource->uniforms_count * sizeof(char) * 32) +
@@ -112,11 +114,11 @@ material_t material_create(stringid64_t name) {
                (resource->mat44f_count * sizeof(cel_mat44f_t)) +
                (resource->mat33f_count * sizeof(mat33f_t));
 
-    handler_t h = handlerid_handler_create(_G.material_handler);
+    handler32_t h = handler_api_v0.handler32_create(_G.material_handler);
 
     uint32_t idx = (uint32_t) ARRAY_SIZE(&_G.material_instance_offset);
 
-    MAP_SET(uint32_t, &_G.material_instace_map, h.h, idx);
+    MAP_SET(uint32_t, &_G.material_instace_map, h.id, idx);
 
     uint32_t offset = ARRAY_SIZE(&_G.material_instance_data);
     ARRAY_PUSH(uint8_t, &_G.material_instance_data, (uint8_t *) resource, size);

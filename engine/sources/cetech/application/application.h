@@ -11,6 +11,10 @@
 #include "cetech/os/window.h"
 
 
+enum {
+    APPLICATION_API_ID = 2,
+};
+
 //==============================================================================
 // Struct
 //==============================================================================
@@ -31,7 +35,7 @@ struct game_callbacks {
 //==============================================================================
 
 //! Application API V0
-struct ApplicationApiV0 {
+struct app_api_v0 {
     //! Stop main loop and quit.
     void (*quit)();
 

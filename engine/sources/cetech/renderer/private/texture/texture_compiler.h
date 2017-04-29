@@ -13,7 +13,7 @@ static int _texturec(const char *input,
                      int is_normalmap) {
     char cmd_line[4096] = {0};
 
-    int s = ResourceApiV0.compiler_external_join(cmd_line,
+    int s = resource_api_v0.compiler_external_join(cmd_line,
                                                  CEL_ARRAY_LEN(cmd_line),
                                                  "texturec");
 
@@ -77,12 +77,12 @@ static int _texture_resource_compiler(const char *filename,
     int is_normalmap = yaml_is_valid(n_is_normalmap) ? yaml_as_bool(
             n_is_normalmap) : 0;
 
-    const char *source_dir = ResourceApiV0.compiler_get_source_dir();
+    const char *source_dir = resource_api_v0.compiler_get_source_dir();
 
-    ResourceApiV0.compiler_get_build_dir(build_dir, CEL_ARRAY_LEN(build_dir),
-                                         ApplicationApiV0.platform());
-    ResourceApiV0.compiler_get_tmp_dir(tmp_dir, CEL_ARRAY_LEN(tmp_dir),
-                                       ApplicationApiV0.platform());
+    resource_api_v0.compiler_get_build_dir(build_dir, CEL_ARRAY_LEN(build_dir),
+                                         app_api_v0.platform());
+    resource_api_v0.compiler_get_tmp_dir(tmp_dir, CEL_ARRAY_LEN(tmp_dir),
+                                       app_api_v0.platform());
 
     yaml_as_string(input, input_str, CEL_ARRAY_LEN(input_str));
 
@@ -97,9 +97,9 @@ static int _texture_resource_compiler(const char *filename,
     }
 
     struct vio *tmp_file = cel_vio_from_file(output_path, VIO_OPEN_READ,
-                                             MemSysApiV0.main_allocator());
+                                             memory_api_v0.main_allocator());
     char *tmp_data =
-    CEL_ALLOCATE(MemSysApiV0.main_allocator(), char,
+    CEL_ALLOCATE(memory_api_v0.main_allocator(), char,
                  cel_vio_size(tmp_file) + 1);
     cel_vio_read(tmp_file, tmp_data, sizeof(char), cel_vio_size(tmp_file));
 
@@ -111,7 +111,7 @@ static int _texture_resource_compiler(const char *filename,
     cel_vio_write(build_vio, tmp_data, sizeof(char), resource.size);
 
     cel_vio_close(tmp_file);
-    CEL_DEALLOCATE(MemSysApiV0.main_allocator(), tmp_data);
+    CEL_DEALLOCATE(memory_api_v0.main_allocator(), tmp_data);
 
     compilator_api->add_dependency(filename, input_str);
 
