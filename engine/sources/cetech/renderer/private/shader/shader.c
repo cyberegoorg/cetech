@@ -5,10 +5,10 @@
 
 #include <bgfx/c99/bgfx.h>
 
-#include <celib/allocator.h>
-#include <celib/stringid.h>
-#include "celib/map.inl"
-#include "celib/vio.h"
+#include <cetech/memory/allocator.h>
+#include <cetech/string/stringid.h>
+#include "cetech/containers/map.inl"
+#include "cetech/filesystem/vio.h"
 
 #include <cetech/resource/resource.h>
 #include <cetech/memory/memory.h>
@@ -62,12 +62,10 @@ static struct ApplicationApiV0 ApplicationApiV0;
 int shader_init() {
     _G = (struct G) {0};
 
-    MemSysApiV0 = *(struct MemSysApiV0 *) module_get_engine_api(MEMORY_API_ID,
-                                                                0);
-    ResourceApiV0 = *(struct ResourceApiV0 *) module_get_engine_api(
-            RESOURCE_API_ID, 0);
+    MemSysApiV0 = *(struct MemSysApiV0 *) module_get_engine_api(MEMORY_API_ID);
+    ResourceApiV0 = *(struct ResourceApiV0 *) module_get_engine_api(RESOURCE_API_ID);
     ApplicationApiV0 = *(struct ApplicationApiV0 *) module_get_engine_api(
-            APPLICATION_API_ID, 0);
+            APPLICATION_API_ID);
 
     _G.type = stringid64_from_string("shader");
 

@@ -1,5 +1,5 @@
 #include <stddef.h>
-#include <celib/allocator.h>
+#include <cetech/memory/allocator.h>
 
 #include <cetech/renderer/renderer.h>
 #include <cetech/resource/resource.h>
@@ -46,7 +46,7 @@ static int _flush(lua_State *l) {
 
 
 void _register_lua_package_api(get_api_fce_t get_engine_api) {
-    PackageApiV0 = *(struct PackageApiV0 *) get_engine_api(PACKAGE_API_ID, 0);
+    PackageApiV0 = *(struct PackageApiV0 *) get_engine_api(PACKAGE_API_ID);
 
     luasys_add_module_function(API_NAME, "load", _load);
     luasys_add_module_function(API_NAME, "unload", _unload);

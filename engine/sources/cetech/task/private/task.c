@@ -2,10 +2,9 @@
 // Includes
 //==============================================================================
 
-#include <celib/thread.h>
-#include <celib/memory.h>
+#include <cetech/os/thread.h>
 #include <cetech/memory/memory.h>
-#include <celib/cpu.h>
+#include <cetech/os/cpu.h>
 
 #include <cetech/develop/develop.h>
 #include <cetech/module/module.h>
@@ -256,14 +255,12 @@ int taskmanager_worker_count() {
     return _G._workers_count;
 }
 
-void *task_get_module_api(int api,
-                          int version) {
+void *task_get_module_api(int api) {
 
 
     switch (api) {
         case PLUGIN_EXPORT_API_ID:
-            switch (version) {
-                case 0: {
+{
                     static struct module_api_v0 module = {0};
 
                     module.init = _init;
@@ -272,12 +269,8 @@ void *task_get_module_api(int api,
                     return &module;
                 }
 
-                default:
-                    return NULL;
-            };
         case TASK_API_ID:
-            switch (version) {
-                case 0: {
+                {
                     static struct TaskApiV0 api = {
                             .worker_count = taskmanager_worker_count,
                             .add = taskmanager_add,
@@ -289,9 +282,6 @@ void *task_get_module_api(int api,
                     return &api;
                 }
 
-                default:
-                    return NULL;
-            };
 
         default:
             return NULL;

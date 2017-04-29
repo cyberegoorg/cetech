@@ -8,8 +8,8 @@
 // Includes
 //==============================================================================
 
-#include "celib/types.h"
-#include "celib/math_types.h"
+#include "cetech/types.h"
+#include "cetech/math/math_types.h"
 
 //==============================================================================
 // Api

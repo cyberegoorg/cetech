@@ -1,6 +1,6 @@
 #include <stddef.h>
-#include <celib/allocator.h>
-#include <celib/math_types.h>
+#include <cetech/memory/allocator.h>
+#include <cetech/math/math_types.h>
 #include <cetech/application/private/module.h>
 #include "../luasys.h"
 #include <cetech/input/input.h>
@@ -82,7 +82,7 @@ static int _mouse_axis(lua_State *l) {
 #define API_NAME "Mouse"
 
 void _register_lua_mouse_api(get_api_fce_t get_engine_api) {
-    MouseApiV0 = *((struct MouseApiV0 *) get_engine_api(MOUSE_API_ID, 0));
+    MouseApiV0 = *((struct MouseApiV0 *) get_engine_api(MOUSE_API_ID));
 
 
     luasys_add_module_function(API_NAME, "button_index", _mouse_button_index);

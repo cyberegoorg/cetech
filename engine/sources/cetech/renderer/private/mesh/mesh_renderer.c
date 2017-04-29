@@ -1,7 +1,7 @@
-#include <celib/array.inl>
-#include <celib/yaml.h>
-#include <celib/map.inl>
-#include <celib/stringid.h>
+#include <cetech/containers/array.inl>
+#include <cetech/yaml/yaml.h>
+#include <cetech/containers/map.inl>
+#include <cetech/string/stringid.h>
 
 #include <cetech/entity/entity.h>
 #include <cetech/component/component.h>
@@ -10,7 +10,7 @@
 #include <cetech/transform/transform.h>
 #include <cetech/renderer/private/scene/scene.h>
 #include <cetech/scenegraph/scenegraph.h>
-#include <celib/math_mat44f.inl>
+#include <cetech/math/math_mat44f.inl>
 
 #include <cetech/memory/memory.h>
 #include <cetech/module/module.h>
@@ -390,13 +390,11 @@ static void _init(get_api_fce_t get_engine_api) {
 }
 
 
-void *mesh_get_module_api(int api,
-                          int version) {
+void *mesh_get_module_api(int api) {
 
     switch (api) {
         case PLUGIN_EXPORT_API_ID:
-            switch (version) {
-                case 0: {
+                {
                     static struct module_api_v0 module = {0};
 
                     module.init = _init;
@@ -405,12 +403,8 @@ void *mesh_get_module_api(int api,
                     return &module;
                 }
 
-                default:
-                    return NULL;
-            };
         case MESH_API_ID:
-            switch (version) {
-                case 0: {
+                {
                     static struct MeshRendererApiV0 api = {0};
 
                     api.is_valid = mesh_is_valid;
@@ -425,10 +419,6 @@ void *mesh_get_module_api(int api,
 
                     return &api;
                 }
-
-                default:
-                    return NULL;
-            };
 
         default:
             return NULL;

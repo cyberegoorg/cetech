@@ -1,9 +1,9 @@
-#include <celib/array.inl>
-#include <celib/yaml.h>
+#include <cetech/containers/array.inl>
+#include <cetech/yaml/yaml.h>
 #include <cetech/entity/entity.h>
 #include <cetech/component/component.h>
-#include <celib/math_quatf.h>
-#include <celib/math_mat44f.inl>
+#include <cetech/math/math_quatf.h>
+#include <cetech/math/math_mat44f.inl>
 #include <cetech/transform/transform.h>
 #include <cetech/memory/memory.h>
 #include <cetech/module/module.h>
@@ -532,12 +532,10 @@ void transform_link(world_t world,
                                                                             parent)));
 }
 
-void *transform_get_module_api(int api,
-                               int version) {
+void *transform_get_module_api(int api) {
     switch (api) {
         case PLUGIN_EXPORT_API_ID:
-            switch (version) {
-                case 0: {
+                {
                     static struct module_api_v0 module = {0};
 
                     module.init = _init;
@@ -546,12 +544,8 @@ void *transform_get_module_api(int api,
                     return &module;
                 }
 
-                default:
-                    return NULL;
-            };
         case TRANSFORM_API_ID:
-            switch (version) {
-                case 0: {
+                 {
                     static struct TransformApiV0 api = {0};
 
                     api.is_valid = transform_is_valid;
@@ -571,9 +565,6 @@ void *transform_get_module_api(int api,
                     return &api;
                 }
 
-                default:
-                    return NULL;
-            };
 
         default:
             return NULL;

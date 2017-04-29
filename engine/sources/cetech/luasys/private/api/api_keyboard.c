@@ -1,5 +1,5 @@
 #include <stddef.h>
-#include <celib/allocator.h>
+#include <cetech/memory/allocator.h>
 #include <cetech/application/private/module.h>
 #include "../luasys.h"
 #include <cetech/input/input.h>
@@ -55,8 +55,7 @@ static int _keyboard_button_released(lua_State *l) {
 
 
 void _register_lua_keyboard_api(get_api_fce_t get_engine_api) {
-    KeyboardApiV0 = *((struct KeyboardApiV0 *) get_engine_api(KEYBOARD_API_ID,
-                                                              0));
+    KeyboardApiV0 = *((struct KeyboardApiV0 *) get_engine_api(KEYBOARD_API_ID));
 
     luasys_add_module_function(API_NAME, "button_index",
                                _keyboard_button_index);

@@ -2,8 +2,8 @@
 // includes
 //==============================================================================
 
-#include <celib/math_types.h>
-#include <celib/allocator.h>
+#include <cetech/math/math_types.h>
+#include <cetech/memory/allocator.h>
 
 #include <cetech/camera/camera.h>
 #include <cetech/renderer/renderer.h>
@@ -11,7 +11,7 @@
 #include <cetech/application/application.h>
 #include <cetech/config/config.h>
 #include <cetech/module/module.h>
-#include "celib/window.h"
+#include "cetech/os/window.h"
 
 #include "bgfx/c99/platform.h"
 #include <cetech/renderer/private/texture/texture.h>
@@ -166,13 +166,11 @@ cel_vec2f_t renderer_get_size() {
 }
 
 
-void *renderer_get_module_api(int api,
-                              int version) {
+void *renderer_get_module_api(int api) {
 
     switch (api) {
         case PLUGIN_EXPORT_API_ID:
-            switch (version) {
-                case 0: {
+                {
                     static struct module_api_v0 module = {0};
 
                     module.init = _init;
@@ -181,13 +179,8 @@ void *renderer_get_module_api(int api,
                     return &module;
                 }
 
-                default:
-                    return NULL;
-            };
-
         case RENDERER_API_ID:
-            switch (version) {
-                case 0: {
+                {
                     static struct RendererApiV0 api = {0};
 
                     api.create = renderer_create;
@@ -198,13 +191,9 @@ void *renderer_get_module_api(int api,
                     return &api;
                 }
 
-                default:
-                    return NULL;
-            };
 
         case MATERIAL_API_ID:
-            switch (version) {
-                case 0: {
+                {
                     static struct MaterialApiV0 api = {0};
 
                     api.resource_create = material_create;
@@ -219,9 +208,6 @@ void *renderer_get_module_api(int api,
                     return &api;
                 }
 
-                default:
-                    return NULL;
-            };
 
         default:
             return NULL;

@@ -1,5 +1,5 @@
 #include <stddef.h>
-#include <celib/allocator.h>
+#include <cetech/memory/allocator.h>
 #include <cetech/application/application.h>
 #include <cetech/module/module.h>
 #include "../luasys.h"
@@ -30,8 +30,7 @@ static int _application_platform(lua_State *l) {
 
 
 void _register_lua_application_api(get_api_fce_t get_engine_api) {
-    ApplicationApiV0 = *(struct ApplicationApiV0 *) get_engine_api(
-            APPLICATION_API_ID, 0);
+    ApplicationApiV0 = *(struct ApplicationApiV0 *) get_engine_api(APPLICATION_API_ID);
 
     luasys_add_module_function(API_NAME, "quit", _application_quit);
     luasys_add_module_function(API_NAME, "get_native_platform",

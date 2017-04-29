@@ -2,12 +2,12 @@
 // Includes
 //==============================================================================
 
-#include <celib/math_types.h>
+#include <cetech/math/math_types.h>
 #include <cetech/module/module.h>
 #include <cetech/machine/machine.h>
 
 #include <cetech/input/input.h>
-#include <celib/string.h>
+#include <cetech/string/string.h>
 
 #include "mousebtnstr.h"
 
@@ -182,10 +182,9 @@ void mouse_set_cursor_pos(cel_vec2f_t pos) {
 
 }
 
-void *mouse_get_module_api(int api,
-                           int version) {
+void *mouse_get_module_api(int api) {
 
-    if (api == PLUGIN_EXPORT_API_ID && version == 0) {
+    if (api == PLUGIN_EXPORT_API_ID ) {
         static struct module_api_v0 module = {0};
 
         module.init = _init;
@@ -194,7 +193,7 @@ void *mouse_get_module_api(int api,
 
         return &module;
 
-    } else if (api == MOUSE_API_ID && version == 0) {
+    } else if (api == MOUSE_API_ID) {
         static struct MouseApiV0 api_v1 = {
                 .button_index = mouse_button_index,
                 .button_name = mouse_button_name,

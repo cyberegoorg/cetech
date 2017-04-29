@@ -9,8 +9,8 @@
 //==============================================================================
 
 #include <cetech/camera/camera.h>
-#include "celib/window.h"
-#include "celib/math_types.h"
+#include "cetech/os/window.h"
+#include "cetech/math/math_types.h"
 
 
 //==============================================================================

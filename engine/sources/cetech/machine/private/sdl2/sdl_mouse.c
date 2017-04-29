@@ -4,7 +4,7 @@
 
 #include <include/SDL2/SDL.h>
 #include <cetech/application/application.h>
-#include <celib/window.h>
+#include <cetech/os/window.h>
 #include <cetech/module/module.h>
 #include <cetech/machine/machine.h>
 
@@ -37,7 +37,7 @@ int sdl_mouse_init(get_api_fce_t get_engine_api) {
     _G = (struct G) {0};
 
     ApplicationApiV0 = *(struct ApplicationApiV0 *) get_engine_api(
-            APPLICATION_API_ID, 0);
+            APPLICATION_API_ID);
 
     return 1;
 }

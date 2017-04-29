@@ -2,11 +2,11 @@
 // Includes
 //==============================================================================
 
-#include <celib/path.h>
-#include "celib/filesystem.h"
+#include <cetech/os/path.h>
+#include "cetech/filesystem/fs.h"
 #include <cetech/module/module.h>
 
-#include "celib/vio.h"
+#include "cetech/filesystem/vio.h"
 
 #include <cetech/memory/memory.h>
 #include <cetech/filesystem/filesystem.h>
@@ -173,13 +173,11 @@ time_t filesystem_get_file_mtime(stringid64_t root,
 }
 
 
-void *filesystem_get_module_api(int api,
-                                int version) {
+void *filesystem_get_module_api(int api) {
 
     switch (api) {
         case PLUGIN_EXPORT_API_ID:
-            switch (version) {
-                case 0: {
+                {
                     static struct module_api_v0 module = {0};
 
                     module.init = _init;
@@ -188,13 +186,8 @@ void *filesystem_get_module_api(int api,
                     return &module;
                 }
 
-                default:
-                    return NULL;
-            };
-
         case FILESYSTEM_API_ID:
-            switch (version) {
-                case 0: {
+                {
                     static struct FilesystemApiV0 api = {0};
 
                     api.filesystem_get_root_dir = filesystem_get_root_dir;
@@ -209,10 +202,6 @@ void *filesystem_get_module_api(int api,
 
                     return &api;
                 }
-
-                default:
-                    return NULL;
-            };
 
         default:
             return NULL;

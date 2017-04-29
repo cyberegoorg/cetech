@@ -1,6 +1,6 @@
 
 #include <cetech/transform/transform.h>
-#include <celib/math_vec4f.inl>
+#include <cetech/math/math_vec4f.inl>
 #include "../luasys.h"
 #include <cetech/module/module.h>
 

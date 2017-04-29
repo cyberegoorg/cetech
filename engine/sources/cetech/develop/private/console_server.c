@@ -12,7 +12,7 @@
 #include "include/nanomsg/pipeline.h"
 
 #include <cetech/develop/develop.h>
-#include <celib/string.h>
+#include <cetech/string/string.h>
 
 //==============================================================================
 // Defines
@@ -250,39 +250,28 @@ void consolesrv_push_begin() {
     }
 }
 
-void *consoleserver_get_module_api(int api,
-                                   int version) {
+void *consoleserver_get_module_api(int api) {
     switch (api) {
-        case PLUGIN_EXPORT_API_ID:
-            switch (version) {
-                case 0: {
-                    static struct module_api_v0 module = {0};
+        case PLUGIN_EXPORT_API_ID: {
+            static struct module_api_v0 module = {0};
 
-                    module.init = _init;
-                    module.shutdown = _shutdown;
-                    module.init_cvar = _init_cvar;
-                    module.update = _update;
+            module.init = _init;
+            module.shutdown = _shutdown;
+            module.init_cvar = _init_cvar;
+            module.update = _update;
 
-                    return &module;
-                }
+            return &module;
+        }
 
-                default:
-                    return NULL;
-            };
-        case CONSOLE_SERVER_API_ID:
-            switch (version) {
-                case 0: {
-                    static struct ConsoleServerApiV0 api = {0};
 
-                    api.consolesrv_push_begin = consolesrv_push_begin;
-                    api.consolesrv_register_command = consolesrv_register_command;
+        case CONSOLE_SERVER_API_ID: {
+            static struct ConsoleServerApiV0 api = {0};
 
-                    return &api;
-                }
+            api.consolesrv_push_begin = consolesrv_push_begin;
+            api.consolesrv_register_command = consolesrv_register_command;
 
-                default:
-                    return NULL;
-            };
+            return &api;
+        }
 
         default:
             return NULL;

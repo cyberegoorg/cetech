@@ -7,8 +7,8 @@
 // Includes
 //==============================================================================
 
-#include <celib/types.h>
-#include <celib/stringid.h>
+#include <cetech/types.h>
+#include <cetech/string/stringid.h>
 #include <cetech/world/world.h>
 #include <cetech/entity/entity.h>
 

@@ -5,7 +5,7 @@
 #include <cetech/application/private/module.h>
 #include <cetech/machine/machine.h>
 #include <cetech/input/input.h>
-#include <celib/string.h>
+#include <cetech/string/string.h>
 
 #include "keystr.h"
 
@@ -116,10 +116,9 @@ int keyboard_button_released(uint32_t idx,
     return !_G.state[button_index] && _G.last_state[button_index];
 }
 
-void *keyboard_get_module_api(int api,
-                              int version) {
+void *keyboard_get_module_api(int api) {
 
-    if (api == PLUGIN_EXPORT_API_ID && version == 0) {
+    if (api == PLUGIN_EXPORT_API_ID) {
         static struct module_api_v0 module = {0};
 
         module.init = _init;
@@ -128,7 +127,7 @@ void *keyboard_get_module_api(int api,
 
         return &module;
 
-    } else if (api == KEYBOARD_API_ID && version == 0) {
+    } else if (api == KEYBOARD_API_ID) {
         static struct KeyboardApiV0 api_v1 = {
                 .button_index = keyboard_button_index,
                 .button_name = keyboard_button_name,

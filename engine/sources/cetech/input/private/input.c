@@ -2,11 +2,11 @@
 // Includes
 //==============================================================================
 
-#include <celib/math_types.h>
+#include <cetech/math/math_types.h>
 #include <cetech/input/input.h>
 #include <cetech/module/module.h>
 #include <cetech/machine/machine.h>
-#include <celib/string.h>
+#include <cetech/string/string.h>
 
 #include "gamepadstr.h"
 
@@ -186,10 +186,9 @@ void gamepad_play_rumble(uint32_t idx,
     MachineApiV0.gamepad_play_rumble(idx, strength, length);
 }
 
-void *gamepad_get_module_api(int api,
-                             int version) {
+void *gamepad_get_module_api(int api) {
 
-    if (api == PLUGIN_EXPORT_API_ID && version == 0) {
+    if (api == PLUGIN_EXPORT_API_ID) {
         static struct module_api_v0 module = {0};
 
         module.init = _init;
@@ -198,7 +197,7 @@ void *gamepad_get_module_api(int api,
 
         return &module;
 
-    } else if (api == GAMEPAD_API_ID && version == 0) {
+    } else if (api == GAMEPAD_API_ID) {
         static struct GamepadApiV0 api_v1 = {
                 .is_active = gamepad_is_active,
                 .button_index = gamepad_button_index,

@@ -30,8 +30,7 @@ static int _set_vec4f(lua_State *l) {
 }
 
 void _register_lua_material_api(get_api_fce_t get_engine_api) {
-    MaterialApiV0 = *((struct MaterialApiV0 *) get_engine_api(MATERIAL_API_ID,
-                                                              0));
+    MaterialApiV0 = *((struct MaterialApiV0 *) get_engine_api(MATERIAL_API_ID));
 
     luasys_add_module_function(API_NAME, "set_texture", _set_texture);
     luasys_add_module_function(API_NAME, "set_vec4f", _set_vec4f);

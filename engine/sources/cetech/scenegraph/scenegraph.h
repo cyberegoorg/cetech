@@ -9,8 +9,8 @@
 
 #import <cetech/entity/entity.h>
 #import <cetech/world/world.h>
-#import "celib/math_types.h"
-#import "celib/stringid.h"
+#import "cetech/math/math_types.h"
+#import "cetech/string/stringid.h"
 
 
 //==============================================================================

@@ -2,10 +2,10 @@
 #define CETECH_SHADER_COMPILER_H
 
 
-#include <celib/path.h>
-#include <celib/filesystem.h>
-#include <celib/process.h>
-#include <celib/yaml.h>
+#include <cetech/os/path.h>
+#include <cetech/filesystem/fs.h>
+#include <cetech/os/process.h>
+#include <cetech/yaml/yaml.h>
 
 static int _shaderc(const char *input,
                     const char *output,

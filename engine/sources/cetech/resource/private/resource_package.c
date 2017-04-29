@@ -4,13 +4,13 @@
 
 #include <stddef.h>
 
-#include <celib/allocator.h>
-#include <celib/stringid.h>
+#include <cetech/memory/allocator.h>
+#include <cetech/string/stringid.h>
 #include <cetech/task/task.h>
 #include <cetech/resource/resource.h>
-#include <celib/vio.h>
-#include <celib/yaml.h>
-#include <celib/thread.h>
+#include <cetech/filesystem/vio.h>
+#include <cetech/yaml/yaml.h>
+#include <cetech/os/thread.h>
 #include <cetech/memory/memory.h>
 #include <cetech/application/private/module.h>
 

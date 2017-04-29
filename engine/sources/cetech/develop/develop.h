@@ -10,8 +10,8 @@
 
 #include "include/mpack/mpack.h"
 
-#include "celib/types.h"
-#include "celib/eventstream.h"
+#include "cetech/types.h"
+#include "cetech/containers/eventstream.h"
 
 //==============================================================================
 // Typedefs

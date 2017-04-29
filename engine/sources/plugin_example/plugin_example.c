@@ -26,8 +26,7 @@ static struct KeyboardApiV0 KeyboardApiV0 = {0};
 //
 
 static void _init_api(get_api_fce_t get_engine_api) {
-    KeyboardApiV0 = *((struct KeyboardApiV0 *) get_engine_api(KEYBOARD_API_ID,
-                                                              0));
+    KeyboardApiV0 = *((struct KeyboardApiV0 *) get_engine_api(KEYBOARD_API_ID));
 
 //    log = get_engine_api(LOG_API_ID, 0);
 //    mem = get_engine_api(MEMORY_API_ID, 0);

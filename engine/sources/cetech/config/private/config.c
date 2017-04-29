@@ -2,16 +2,15 @@
 // Includes
 //==============================================================================
 
-#include <celib/memory.h>
-#include <celib/allocator.h>
+#include <cetech/memory/allocator.h>
 #include <cetech/config/config.h>
-#include <celib/vio.h>
-#include <celib/path.h>
-#include <celib/yaml.h>
+#include <cetech/filesystem/vio.h>
+#include <cetech/os/path.h>
+#include <cetech/yaml/yaml.h>
 #include <cetech/memory/memory.h>
 #include <cetech/module/module.h>
 #include <cetech/application/private/module.h>
-#include <celib/stringid.h>
+#include <cetech/string/stringid.h>
 #include <cetech/resource/resource.h>
 
 //==============================================================================
@@ -160,8 +159,7 @@ static void _reload_end(get_api_fce_t get_engine_api,
 int cvar_init() {
     log_debug(LOG_WHERE, "Init");
 
-    MemSysApiV0 = *(struct MemSysApiV0 *) module_get_engine_api(MEMORY_API_ID,
-                                                                0);
+    MemSysApiV0 = *(struct MemSysApiV0 *) module_get_engine_api(MEMORY_API_ID);
 
     _G.type = stringid64_from_string("config");
 
@@ -180,10 +178,9 @@ void cvar_compile_global() {
     char build_path[1024] = {0};
 
     struct ResourceApiV0 ResourceApiV0 = *(struct ResourceApiV0 *) module_get_engine_api(
-            RESOURCE_API_ID, 0);
+            RESOURCE_API_ID);
     struct ApplicationApiV0 ApplicationApiV0 = *(struct ApplicationApiV0 *) module_get_engine_api(
-            APPLICATION_API_ID,
-            0);
+            APPLICATION_API_ID);
 
     ResourceApiV0.compiler_get_build_dir(build_dir, CEL_ARRAY_LEN(build_dir),
                                          ApplicationApiV0.platform());
@@ -291,10 +288,9 @@ void cvar_load_global() {
     char source_path[1024] = {0};
 
     struct ResourceApiV0 ResourceApiV0 = *(struct ResourceApiV0 *) module_get_engine_api(
-            RESOURCE_API_ID, 0);
+            RESOURCE_API_ID);
     struct ApplicationApiV0 ApplicationApiV0 = *(struct ApplicationApiV0 *) module_get_engine_api(
-            APPLICATION_API_ID,
-            0);
+            APPLICATION_API_ID);
     ResourceApiV0.compiler_get_build_dir(build_dir, CEL_ARRAY_LEN(build_dir),
                                          ApplicationApiV0.platform());
     cel_path_join(source_path, CEL_ARRAY_LEN(source_path), build_dir,
@@ -554,10 +550,9 @@ void cvar_log_all() {
     }
 }
 
-void *config_get_module_api(int api,
-                            int version) {
+void *config_get_module_api(int api) {
 
-    if (api == PLUGIN_EXPORT_API_ID && version == 0) {
+    if (api == PLUGIN_EXPORT_API_ID) {
         static struct module_api_v0 module = {0};
 
         module.init = _init;
@@ -566,7 +561,7 @@ void *config_get_module_api(int api,
         module.reload_end = _reload_end;
 
         return &module;
-    } else if (api == CONFIG_API_ID && version == 0) {
+    } else if (api == CONFIG_API_ID) {
         static struct ConfigApiV0 api_v1 = {
                 .load_global = cvar_load_global,
                 .compile_global = cvar_compile_global,

@@ -17,7 +17,7 @@
 //! Add static module
 //! \param name Plugin name
 #define ADD_STATIC_PLUGIN(name)                \
-    void* name ## _get_module_api(int,int);    \
+    void* name ## _get_module_api(int);        \
     module_add_static(name ## _get_module_api)
 
 //==============================================================================
@@ -58,8 +58,7 @@ void module_call_shutdown();
 void module_call_after_update(float dt);
 
 //! Plugin get engine api
-void *module_get_engine_api(int api,
-                            int version);
+void *module_get_engine_api(int api);
 
 
 #endif //CETECH_PLUGIN_SYSTEM_H
