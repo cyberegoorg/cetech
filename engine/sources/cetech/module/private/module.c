@@ -39,6 +39,12 @@ static struct G {
 // Private
 //==============================================================================
 
+
+void *cel_load_object(const char *path);
+void cel_unload_object(void *so);
+void *cel_load_function(void *so,
+                        void *name);
+
 void _callm_init(get_api_fce_t fce) {
     struct module_api_v0 *api = fce(PLUGIN_EXPORT_API_ID);
 

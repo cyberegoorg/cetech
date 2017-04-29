@@ -1,12 +1,14 @@
 #include <cetech/module/module.h>
 #include <cetech/os/thread.h>
 #include <cetech/os/window.h>
+#include <cetech/os/object.h>
 
-#include "sdl_thread.h"
+#include "sdl_cpu.h"
 #include "sdl_window.h"
+#include "sdl_thread.h"
+#include "sdl2_object.h"
 
 void *sdl_get_module_api(int api) {
-
     switch (api) {
         case PLUGIN_EXPORT_API_ID: {
             static struct module_api_v0 module = {0};
@@ -44,6 +46,22 @@ void *sdl_get_module_api(int api) {
             return &api;
         }
 
+        case CPU_API_ID: {
+            static struct cpu_api_v0 api = {
+                    .count = cel_cpu_count
+            };
+            return &api;
+        }
+
+
+        case OBJECT_API_ID: {
+            static struct object_api_v0 api = {
+                    .load  = cel_load_object,
+                    .unload  = cel_unload_object,
+                    .load_function  = cel_load_function
+            };
+            return &api;
+        }
 
         default:
             return NULL;

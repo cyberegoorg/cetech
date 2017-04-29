@@ -1,18 +1,12 @@
-#include <cetech/os/window.h>
-#include "cetech/log/log.h"
-
-#if defined(CELIB_USE_SDL)
-
 #include "include/SDL2/SDL.h"
 #include "include/SDL2/SDL_syswm.h"
 
-#endif
+#include <cetech/os/window.h>
+#include "cetech/log/log.h"
 
 //==============================================================================
 // Private
 //==============================================================================
-
-#if defined(CELIB_USE_SDL)
 
 static uint32_t _sdl_pos(const uint32_t pos) {
     switch (pos) {
@@ -37,8 +31,6 @@ static uint32_t _sdl_flags(enum cel_window_flags flags) {
     return sdl_flags;
 }
 
-#endif
-
 //==============================================================================
 // Interface
 //==============================================================================
@@ -49,7 +41,7 @@ cel_window_t cel_window_new(const char *title,
                             const int32_t width,
                             const int32_t height,
                             enum cel_window_flags flags) {
-#if defined(CELIB_USE_SDL)
+
     SDL_Window *w = SDL_CreateWindow(
             title,
             _sdl_pos(x), _sdl_pos(y),
@@ -62,12 +54,9 @@ cel_window_t cel_window_new(const char *title,
     }
 
     return (cel_window_t) {.w = w};
-#endif
 }
 
 cel_window_t cel_window_new_from(void *hndl) {
-#if defined(CELIB_USE_SDL)
-
     SDL_Window *w = SDL_CreateWindowFrom(hndl);
 
     if (w == NULL) {
@@ -75,52 +64,34 @@ cel_window_t cel_window_new_from(void *hndl) {
     }
 
     return (cel_window_t) {.w = w};
-#endif
 }
 
 void cel_window_destroy(cel_window_t w) {
-#if defined(CELIB_USE_SDL)
-
     SDL_DestroyWindow(w.w);
-#endif
 }
 
 void cel_window_set_title(cel_window_t w,
                           const char *title) {
-#if defined(CELIB_USE_SDL)
-
     SDL_SetWindowTitle(w.w, title);
-#endif
 }
 
 const char *cel_window_get_title(cel_window_t w) {
-#if defined(CELIB_USE_SDL)
-
     return SDL_GetWindowTitle(w.w);
-#endif
 }
 
 void cel_window_update(cel_window_t w) {
-#if defined(CELIB_USE_SDL)
-
     SDL_UpdateWindowSurface(w.w);
-#endif
 }
 
 void cel_window_resize(cel_window_t w,
                        uint32_t width,
                        uint32_t height) {
-#if defined(CELIB_USE_SDL)
-
     SDL_SetWindowSize(w.w, width, height);
-#endif
 }
 
 void cel_window_get_size(cel_window_t window,
                          uint32_t *width,
                          uint32_t *height) {
-#if defined(CELIB_USE_SDL)
-
     int w, h;
     w = h = 0;
 
@@ -128,12 +99,9 @@ void cel_window_get_size(cel_window_t window,
 
     *width = (uint32_t) w;
     *height = (uint32_t) h;
-#endif
 }
 
 void *cel_window_native_cel_window_ptr(cel_window_t w) {
-#if defined(CELIB_USE_SDL)
-
     SDL_SysWMinfo wmi;
 
     SDL_VERSION(&wmi.version);
@@ -149,12 +117,9 @@ void *cel_window_native_cel_window_ptr(cel_window_t w) {
 #elif CELIB_DARWIN
     return (void *) wmi.info.cocoa.window;
 #endif
-#endif
 }
 
 void *cel_window_native_display_ptr(cel_window_t w) {
-#if defined(CELIB_USE_SDL)
-
     SDL_SysWMinfo wmi;
 
     SDL_VERSION(&wmi.version);
@@ -169,6 +134,5 @@ void *cel_window_native_display_ptr(cel_window_t w) {
     return (void *) wmi.info.x11.display;
 #elif CELIB_DARWIN
     return (0);
-#endif
 #endif
 }

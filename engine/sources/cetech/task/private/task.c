@@ -51,6 +51,7 @@ static struct G {
 IMPORT_API(develop_api_v0);
 IMPORT_API(memory_api_v0);
 IMPORT_API(thread_api_v0);
+IMPORT_API(cpu_api_v0);
 
 //==============================================================================
 // Private
@@ -157,10 +158,11 @@ static void _init(get_api_fce_t get_engine_api) {
     INIT_API(get_engine_api, develop_api_v0, DEVELOP_SERVER_API_ID);
     INIT_API(get_engine_api, memory_api_v0, MEMORY_API_ID);
     INIT_API(get_engine_api, thread_api_v0, OS_THREAD_API_ID);
+    INIT_API(get_engine_api, cpu_api_v0, CPU_API_ID);
 
     _G = (struct G) {0};
 
-    int core_count = cel_cpu_count();
+    int core_count = cpu_api_v0.count();
 
     static const uint32_t main_threads_count = 1;
     const uint32_t worker_count = core_count - main_threads_count;

@@ -85,19 +85,16 @@ set(SOURCE_FILES
         engine/sources/cetech/yaml/private/yaml.cc
         engine/sources/cetech/log/private/log_system.c
         engine/sources/cetech/os/private/cmd_line.c
-        engine/sources/cetech/os/private/cpu.c
         engine/sources/cetech/filesystem/private/fs.c
         engine/sources/cetech/handler/private/handler.c
-        engine/sources/cetech/os/private/object.c
+        engine/sources/cetech/sdl2/private/sdl2_object.h
         engine/sources/cetech/os/private/path.c
         engine/sources/cetech/os/private/process.c
         engine/sources/cetech/os/private/stacktrace.c
         engine/sources/cetech/string/private/string.c
         engine/sources/cetech/string/private/stringid.c
-        engine/sources/cetech/sdl2/private/sdl_thread.h
         engine/sources/cetech/os/private/time.c
         engine/sources/cetech/filesystem/private/vio.c
-        engine/sources/cetech/sdl2/private/sdl_window.h
 
         ########################################################################
         # CETECH
@@ -167,7 +164,8 @@ set(SOURCE_FILES
         engine/sources/cetech/scenegraph/private/scenegraph.c
         engine/sources/cetech/camera/private/camera.c
 
-        engine/sources/cetech/hash/private/hash.c engine/sources/cetech/sdl2/private/sdl2.c)
+        engine/sources/cetech/hash/private/hash.c
+        engine/sources/cetech/sdl2/private/sdl2.c)
 
 ################################################################################
 # Main sources

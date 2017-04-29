@@ -5,6 +5,12 @@
 // CPU
 //==============================================================================
 
-int cel_cpu_count();
+enum {
+    CPU_API_ID = 448453211
+};
+
+struct cpu_api_v0 {
+    int (*count)();
+};
 
 #endif //CELIB_CPU_H

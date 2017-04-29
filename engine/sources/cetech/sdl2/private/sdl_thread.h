@@ -1,4 +1,4 @@
-#include <cetech/os/thread.h>
+#include "cetech/os/thread.h"
 
 #include "include/SDL2/SDL.h"
 

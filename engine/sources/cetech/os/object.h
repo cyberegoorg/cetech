@@ -1,11 +1,18 @@
 #ifndef CELIB_OBJECT_H
 #define CELIB_OBJECT_H
 
-void *cel_load_object(const char *path);
+enum {
+    OBJECT_API_ID = 2223344
+};
 
-void cel_unload_object(void *so);
 
-void *cel_load_function(void *so,
-                        void *name);
+struct object_api_v0 {
+    void *(*load)(const char *path);
+
+    void (*unload)(void *so);
+
+    void *(*load_function)(void *so,
+                               void *name);
+};
 
 #endif //CELIB_OBJECT_H
