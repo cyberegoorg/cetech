@@ -436,9 +436,9 @@ int luasys_to_int(lua_State *_L,
     return (int) lua_tointeger(_L, i);
 }
 
-u64 luasys_to_u64(lua_State *_L,
+uint64_t luasys_to_u64(lua_State *_L,
                   int i) {
-    return (u64) lua_tointeger(_L, i);
+    return (uint64_t) lua_tointeger(_L, i);
 }
 
 

@@ -140,7 +140,7 @@ struct lua_api_v0 {
     //! \param l
     //! \param i Element idx
     //! \return sInt value
-    u64 (*to_u64)(lua_State *l,
+    uint64_t (*to_u64)(lua_State *l,
                   int i);
 
     //! Get element value as float

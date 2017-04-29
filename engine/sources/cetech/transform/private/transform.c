@@ -7,8 +7,8 @@
 #include <cetech/transform/transform.h>
 #include <cetech/memory/memory.h>
 #include <cetech/module/module.h>
-#include <celib/string/stringid.h>
-#include <celib/math/types.h>
+#include <cetech/string/stringid.h>
+#include <cetech/math/math_types.h>
 
 
 struct transform_data {
@@ -233,7 +233,7 @@ void _set_property(world_t world,
         cel_vec3f_t euler_rot = value.value.vec3f;
         cel_vec3f_t euler_rot_rad = {0};
 
-        cel_vec3f_mul(&euler_rot_rad, &euler_rot, CEL_F32_TORAD);
+        cel_vec3f_mul(&euler_rot_rad, &euler_rot, CEL_float_TORAD);
         cel_quatf_from_euler(&rot, euler_rot_rad.x, euler_rot_rad.y, euler_rot_rad.z);
 
         transform_set_rotation(world, transform, rot);
@@ -263,7 +263,7 @@ struct property_value _get_property(world_t world,
         cel_vec3f_t euler_rot_rad = {0};
         cel_quatf_t rot = transform_get_rotation(world, transform);
         cel_quatf_to_eurel_angle(&euler_rot_rad, &rot);
-        cel_vec3f_mul(&euler_rot, &euler_rot_rad, CEL_F32_TODEG);
+        cel_vec3f_mul(&euler_rot, &euler_rot_rad, CEL_float_TODEG);
 
         return  (struct property_value){
                 .type= PROPERTY_VEC3,

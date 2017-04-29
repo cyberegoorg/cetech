@@ -8,8 +8,7 @@
 
 #define API_NAME "Renderer"
 
-struct renderer_api_v0 RendererApiV0;
-
+IMPORT_API(renderer_api_v0)
 
 static int _renderer_render_world(lua_State *l) {
     world_t w = {.h = luasys_to_handler(l, 1)};
