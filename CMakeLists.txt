@@ -93,7 +93,7 @@ set(SOURCE_FILES
         engine/sources/cetech/os/private/stacktrace.c
         engine/sources/cetech/string/private/string.c
         engine/sources/cetech/string/private/stringid.c
-        engine/sources/cetech/os/private/time.c
+        engine/sources/cetech/sdl2/private/sdl_time.h
         engine/sources/cetech/filesystem/private/vio.c
 
         ########################################################################

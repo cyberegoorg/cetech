@@ -2,11 +2,13 @@
 #include <cetech/os/thread.h>
 #include <cetech/os/window.h>
 #include <cetech/os/object.h>
+#include <cetech/os/time.h>
 
 #include "sdl_cpu.h"
 #include "sdl_window.h"
 #include "sdl_thread.h"
 #include "sdl2_object.h"
+#include "sdl_time.h"
 
 void *sdl_get_module_api(int api) {
     switch (api) {
@@ -59,6 +61,15 @@ void *sdl_get_module_api(int api) {
                     .load  = cel_load_object,
                     .unload  = cel_unload_object,
                     .load_function  = cel_load_function
+            };
+            return &api;
+        }
+
+        case TIME_API_ID: {
+            static struct time_api_v0 api = {
+                    .get_ticks =cel_get_ticks,
+                    .get_perf_counter =cel_get_perf_counter,
+                    .get_perf_freq =cel_get_perf_freq
             };
             return &api;
         }

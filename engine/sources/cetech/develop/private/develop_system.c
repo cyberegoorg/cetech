@@ -54,6 +54,7 @@ IMPORT_API(memory_api_v0);
 IMPORT_API(thread_api_v0);
 IMPORT_API(task_api_v0);
 IMPORT_API(config_api_v0);
+IMPORT_API(time_api_v0);
 
 static __thread uint8_t _stream_buffer[64 * 1024] = {0};
 static __thread uint32_t _stream_buffer_size = 0;
@@ -234,6 +235,7 @@ static void _init(get_api_fce_t get_engine_api) {
     INIT_API(get_engine_api, task_api_v0, TASK_API_ID);
     INIT_API(get_engine_api, config_api_v0, CONFIG_API_ID);
     INIT_API(get_engine_api, thread_api_v0, OS_THREAD_API_ID);
+    INIT_API(get_engine_api, time_api_v0, TIME_API_ID);
 
     MAP_INIT(to_mpack_fce_t, &_G.to_mpack, memory_api_v0.main_allocator());
     eventstream_create(&_G.eventstream, memory_api_v0.main_allocator());
@@ -317,8 +319,8 @@ struct scope_data developsys_enter_scope(const char *name) {
 
     return (struct scope_data) {
             .name = name,
-            .start = cel_get_ticks(),
-            .start_timer = cel_get_perf_counter()
+            .start = time_api_v0.get_ticks(),
+            .start_timer = time_api_v0.get_perf_counter()
     };
 }
 
@@ -331,8 +333,8 @@ void developsys_leave_scope(struct scope_data scope_data) {
             .worker_id = task_api_v0.worker_id(),
             .start = scope_data.start,
             .duration =
-            ((float) (cel_get_perf_counter() - scope_data.start_timer) /
-             cel_get_perf_freq()) * 1000.0f,
+            ((float) (time_api_v0.get_perf_counter() - scope_data.start_timer) /
+                    time_api_v0.get_perf_freq()) * 1000.0f,
             .depth = _scope_depth,
     };
 

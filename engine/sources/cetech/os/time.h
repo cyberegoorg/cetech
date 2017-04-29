@@ -1,23 +1,20 @@
 #ifndef CELIB_TIME_H
 #define CELIB_TIME_H
 
-#include "cetech/types.h"
+#include <stdint.h>
 
-#if defined(CELIB_USE_SDL)
-
-#include "include/SDL2/SDL.h"
-
-#endif
+enum {
+    TIME_API_ID = 394952
+};
 
 //==============================================================================
 // Time
 // ==============================================================================
 
-
-uint32_t cel_get_ticks();
-
-uint64_t cel_get_perf_counter();
-
-uint64_t cel_get_perf_freq();
+struct time_api_v0 {
+    uint32_t (*get_ticks)();
+    uint64_t (*get_perf_counter)();
+    uint64_t (*get_perf_freq)();
+};
 
 #endif //CELIB_TIME_H

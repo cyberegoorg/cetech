@@ -35,6 +35,7 @@ IMPORT_API(task_api_v0);
 IMPORT_API(lua_api_v0);
 IMPORT_API(config_api_v0);
 IMPORT_API(window_api_v0);
+IMPORT_API(time_api_v0);
 
 //==============================================================================
 // Definess
@@ -114,6 +115,7 @@ void _init_api() {
     INIT_API(module_get_engine_api,lua_api_v0, LUA_API_ID);
     INIT_API(module_get_engine_api,config_api_v0, CONFIG_API_ID);
     INIT_API(module_get_engine_api,window_api_v0, WINDOW_API_ID);
+    INIT_API(module_get_engine_api,time_api_v0, TIME_API_ID);
 }
 
 int _init_config() {
@@ -282,7 +284,7 @@ void application_start() {
 
     _boot_stage();
 
-    uint64_t last_tick = cel_get_perf_counter();
+    uint64_t last_tick = time_api_v0.get_perf_counter();
     _G.game = lua_api_v0.get_game_callbacks();
 
     if (!_G.game->init()) {
@@ -303,8 +305,8 @@ void application_start() {
         struct scope_data application_sd = develop_api_v0.enter_scope(
                 "Application:update()");
 
-        uint64_t now_ticks = cel_get_perf_counter();
-        float dt = ((float) (now_ticks - last_tick)) / cel_get_perf_freq();
+        uint64_t now_ticks = time_api_v0.get_perf_counter();
+        float dt = ((float) (now_ticks - last_tick)) / time_api_v0.get_perf_freq();
 
         _G.dt = dt;
         last_tick = now_ticks;
