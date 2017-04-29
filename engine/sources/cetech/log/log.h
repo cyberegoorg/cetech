@@ -63,8 +63,7 @@ typedef char (*log_get_wid_clb_t)();
 //==============================================================================
 
 //! Init log system
-//! \param get_wid_clb Get worker id callback
-void log_init(log_get_wid_clb_t get_wid_clb);
+void log_init();
 
 //! Shutdown log system
 void log_shutdown();

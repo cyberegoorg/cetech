@@ -491,12 +491,10 @@ void resource_reload_all() {
     ARRAY_DESTROY(stringid64_t, &name_array);
 }
 
-void *resourcesystem_get_module_api(int api,
-                                    int version) {
+void *resourcesystem_get_module_api(int api) {
     switch (api) {
         case PLUGIN_EXPORT_API_ID:
-            switch (version) {
-                case 0: {
+                {
                     static struct module_api_v0 module = {0};
 
                     module.init = _init;
@@ -506,12 +504,8 @@ void *resourcesystem_get_module_api(int api,
                     return &module;
                 }
 
-                default:
-                    return NULL;
-            };
         case RESOURCE_API_ID:
-            switch (version) {
-                case 0: {
+                {
                     static struct ResourceApiV0 api = {0};
 
                     api.set_autoload = resource_set_autoload;
@@ -539,13 +533,8 @@ void *resourcesystem_get_module_api(int api,
                     return &api;
                 }
 
-                default:
-                    return NULL;
-            };
-
         case PACKAGE_API_ID:
-            switch (version) {
-                case 0: {
+                {
                     static struct PackageApiV0 api = {0};
 
                     api.load = package_load;
@@ -556,9 +545,6 @@ void *resourcesystem_get_module_api(int api,
                     return &api;
                 }
 
-                default:
-                    return NULL;
-            };
 
         default:
             return NULL;

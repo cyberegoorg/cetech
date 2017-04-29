@@ -120,10 +120,9 @@ void machine_gamepad_play_rumble(int gamepad,
                                  float strength,
                                  uint32_t length);
 
-void *machine_get_module_api(int api,
-                             int version) {
+void *machine_get_module_api(int api) {
 
-    if (api == PLUGIN_EXPORT_API_ID && version == 0) {
+    if (api == PLUGIN_EXPORT_API_ID) {
         static struct module_api_v0 module = {0};
 
         module.init = _init;
@@ -132,7 +131,7 @@ void *machine_get_module_api(int api,
 
         return &module;
 
-    } else if (api == MACHINE_API_ID && version == 0) {
+    } else if (api == MACHINE_API_ID) {
         static struct MachineApiV0 api_v1 = {
                 .event_begin = machine_event_begin,
                 .event_end = machine_event_end,

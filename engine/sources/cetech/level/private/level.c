@@ -286,13 +286,11 @@ entity_t level_entity(level_t level) {
     return instance->level_entity;
 }
 
-void *level_get_module_api(int api,
-                           int version) {
+void *level_get_module_api(int api) {
 
     switch (api) {
         case PLUGIN_EXPORT_API_ID:
-            switch (version) {
-                case 0: {
+                {
                     static struct module_api_v0 module = {0};
 
                     module.init = _init;
@@ -301,12 +299,9 @@ void *level_get_module_api(int api,
                     return &module;
                 }
 
-                default:
-                    return NULL;
-            };
+
         case LEVEL_API_ID:
-            switch (version) {
-                case 0: {
+                {
                     static struct LevelApiV0 api = {0};
 
                     api.load_level = world_load_level;
@@ -318,9 +313,6 @@ void *level_get_module_api(int api,
                     return &api;
                 }
 
-                default:
-                    return NULL;
-            };
 
         default:
             return NULL;

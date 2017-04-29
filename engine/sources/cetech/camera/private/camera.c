@@ -222,13 +222,11 @@ camera_t camera_create(world_t world,
     return (camera_t) {.idx = idx};
 }
 
-void *camera_get_module_api(int api,
-                            int version) {
+void *camera_get_module_api(int api) {
 
     switch (api) {
         case PLUGIN_EXPORT_API_ID:
-            switch (version) {
-                case 0: {
+                {
                     static struct module_api_v0 module = {0};
 
                     module.init = _init;
@@ -237,12 +235,8 @@ void *camera_get_module_api(int api,
                     return &module;
                 }
 
-                default:
-                    return NULL;
-            };
         case CAMERA_API_ID:
-            switch (version) {
-                case 0: {
+             {
                     static struct CameraApiV0 api = {0};
 
                     api.is_valid = camera_is_valid;
@@ -253,10 +247,6 @@ void *camera_get_module_api(int api,
 
                     return &api;
                 }
-
-                default:
-                    return NULL;
-            };
 
         default:
             return NULL;

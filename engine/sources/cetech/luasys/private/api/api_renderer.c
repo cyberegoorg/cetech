@@ -28,8 +28,7 @@ static int _renderer_set_debug(lua_State *l) {
 }
 
 void _register_lua_renderer_api(get_api_fce_t get_engine_api) {
-    RendererApiV0 = *(struct RendererApiV0 *) get_engine_api(RENDERER_API_ID,
-                                                             0);
+    RendererApiV0 = *(struct RendererApiV0 *) get_engine_api(RENDERER_API_ID);
 
     luasys_add_module_function(API_NAME, "render_world",
                                _renderer_render_world);

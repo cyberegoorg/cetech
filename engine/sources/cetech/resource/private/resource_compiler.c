@@ -250,10 +250,9 @@ static void _shutdown() {
     _G = (struct G) {0};
 }
 
-void *resourcecompiler_get_module_api(int api,
-                                      int version) {
+void *resourcecompiler_get_module_api(int api) {
 
-    if (api == PLUGIN_EXPORT_API_ID && version == 0) {
+    if (api == PLUGIN_EXPORT_API_ID) {
         static struct module_api_v0 module = {0};
 
         module.init = _init;

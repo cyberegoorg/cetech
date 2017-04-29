@@ -369,13 +369,11 @@ scene_node_t scenegraph_node_by_name(world_t world,
     return _scenegraph_node_by_name(data, root, name);
 }
 
-void *scenegraph_get_module_api(int api,
-                                int version) {
+void *scenegraph_get_module_api(int api) {
 
     switch (api) {
         case PLUGIN_EXPORT_API_ID:
-            switch (version) {
-                case 0: {
+                {
                     static struct module_api_v0 module = {0};
 
                     module.init = _init;
@@ -384,12 +382,9 @@ void *scenegraph_get_module_api(int api,
                     return &module;
                 }
 
-                default:
-                    return NULL;
-            };
+
         case SCENEGRAPH_API_ID:
-            switch (version) {
-                case 0: {
+{
                     static struct SceneGprahApiV0 api = {0};
 
                     //api.scenegraph_transform = scenegraph_transform;
@@ -410,9 +405,6 @@ void *scenegraph_get_module_api(int api,
                     return &api;
                 }
 
-                default:
-                    return NULL;
-            };
 
         default:
             return NULL;

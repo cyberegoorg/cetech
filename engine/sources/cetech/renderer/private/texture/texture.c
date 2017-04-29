@@ -57,12 +57,11 @@ static struct ApplicationApiV0 ApplicationApiV0;
 int texture_init() {
     _G = (struct G) {0};
 
-    MemSysApiV0 = *(struct MemSysApiV0 *) module_get_engine_api(MEMORY_API_ID,
-                                                                0);
+    MemSysApiV0 = *(struct MemSysApiV0 *) module_get_engine_api(MEMORY_API_ID);
     ResourceApiV0 = *(struct ResourceApiV0 *) module_get_engine_api(
-            RESOURCE_API_ID, 0);
+            RESOURCE_API_ID);
     ApplicationApiV0 = *(struct ApplicationApiV0 *) module_get_engine_api(
-            APPLICATION_API_ID, 0);
+            APPLICATION_API_ID);
 
     _G.type = stringid64_from_string("texture");
 

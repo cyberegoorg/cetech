@@ -40,8 +40,7 @@ static struct G {
 //==============================================================================
 
 void _callm_init(get_api_fce_t fce) {
-    struct module_api_v0 *api = fce(PLUGIN_EXPORT_API_ID, 0);
-
+    struct module_api_v0 *api = fce(PLUGIN_EXPORT_API_ID);
 
     if (api) {
         CEL_ASSERT("module", api->init != NULL);
@@ -50,7 +49,7 @@ void _callm_init(get_api_fce_t fce) {
 }
 
 void _callm_shutdown(get_api_fce_t fce) {
-    struct module_api_v0 *api = fce(PLUGIN_EXPORT_API_ID, 0);
+    struct module_api_v0 *api = fce(PLUGIN_EXPORT_API_ID);
 
     if (api) {
         CEL_ASSERT("module", api->shutdown != NULL);
@@ -68,7 +67,7 @@ void _add(const char *path,
         }
 
         cel_str_set(_G.path[i], path);
-        _G.module_api[i] = fce(PLUGIN_EXPORT_API_ID, 0);
+        _G.module_api[i] = fce(PLUGIN_EXPORT_API_ID);
         _G.get_module_api[i] = fce;
         _G.module_handler[i] = handler;
         _G.used[i] = 1;
@@ -129,7 +128,7 @@ void module_reload(const char *path) {
             return;
         }
 
-        _G.module_api[i] = api = ((get_api_fce_t) fce)(PLUGIN_EXPORT_API_ID, 0);
+        _G.module_api[i] = api = ((get_api_fce_t) fce)(PLUGIN_EXPORT_API_ID);
         if (api != NULL && api->reload_end) {
             api->reload_end(module_get_engine_api, data);
         }
@@ -160,21 +159,20 @@ void module_reload_all() {
             return;
         }
 
-        _G.module_api[i] = api = ((get_api_fce_t) fce)(PLUGIN_EXPORT_API_ID, 0);
+        _G.module_api[i] = api = ((get_api_fce_t) fce)(PLUGIN_EXPORT_API_ID);
         if (api != NULL && api->reload_end) {
             api->reload_end(module_get_engine_api, data);
         }
     }
 }
 
-void *module_get_engine_api(int api,
-                            int version) {
+void *module_get_engine_api(int api) {
     for (size_t i = 0; i < MAX_PLUGINS; ++i) {
         if (!_G.used[i]) {
             continue;
         }
 
-        void *p_api = _G.get_module_api[i](api, version);
+        void *p_api = _G.get_module_api[i](api);
         if (p_api != NULL) {
             return p_api;
         }
@@ -212,8 +210,7 @@ void module_call_init() {
 }
 
 void module_call_init_cvar() {
-    struct ConfigApiV0 ConfigApiV0 = *(struct ConfigApiV0 *) module_get_engine_api(
-            CONFIG_API_ID, 0);
+    struct ConfigApiV0 ConfigApiV0 = *(struct ConfigApiV0 *) module_get_engine_api(CONFIG_API_ID);
 
     for (size_t i = 0; i < MAX_PLUGINS; ++i) {
         if (!_G.used[i] || !_G.module_api[i]->init_cvar) {

@@ -461,12 +461,10 @@ void transform_link(world_t world,
                                                                             parent)));
 }
 
-void *transform_get_module_api(int api,
-                               int version) {
+void *transform_get_module_api(int api) {
     switch (api) {
         case PLUGIN_EXPORT_API_ID:
-            switch (version) {
-                case 0: {
+                {
                     static struct module_api_v0 module = {0};
 
                     module.init = _init;
@@ -475,12 +473,8 @@ void *transform_get_module_api(int api,
                     return &module;
                 }
 
-                default:
-                    return NULL;
-            };
         case TRANSFORM_API_ID:
-            switch (version) {
-                case 0: {
+                 {
                     static struct TransformApiV0 api = {0};
 
                     api.is_valid = transform_is_valid;
@@ -500,9 +494,6 @@ void *transform_get_module_api(int api,
                     return &api;
                 }
 
-                default:
-                    return NULL;
-            };
 
         default:
             return NULL;

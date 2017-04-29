@@ -83,13 +83,11 @@ void world_update(world_t world,
 }
 
 
-void *world_get_module_api(int api,
-                           int version) {
+void *world_get_module_api(int api) {
 
     switch (api) {
         case PLUGIN_EXPORT_API_ID:
-            switch (version) {
-                case 0: {
+                {
                     static struct module_api_v0 module = {0};
 
                     module.init = _init;
@@ -98,12 +96,9 @@ void *world_get_module_api(int api,
                     return &module;
                 }
 
-                default:
-                    return NULL;
-            };
+
         case WORLD_API_ID:
-            switch (version) {
-                case 0: {
+            {
                     static struct WorldApiV0 api = {0};
 
                     api.register_callback = world_register_callback;
@@ -117,9 +112,6 @@ void *world_get_module_api(int api,
                     return &api;
                 }
 
-                default:
-                    return NULL;
-            };
 
         default:
             return NULL;

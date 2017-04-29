@@ -78,12 +78,10 @@ struct cel_allocator *_memsys_main_scratch_allocator() {
     return _G.default_scratch_allocator;
 }
 
-void *memsys_get_module_api(int api,
-                            int version) {
+void *memsys_get_module_api(int api) {
     switch (api) {
         case PLUGIN_EXPORT_API_ID:
-            switch (version) {
-                case 0: {
+                {
                     static struct module_api_v0 module = {0};
 
                     module.init = _init;
@@ -92,12 +90,8 @@ void *memsys_get_module_api(int api,
                     return &module;
                 }
 
-                default:
-                    return NULL;
-            };
         case MEMORY_API_ID:
-            switch (version) {
-                case 0: {
+                {
                     static struct MemSysApiV0 api = {0};
 
                     api.main_allocator = _memsys_main_allocator;
@@ -105,10 +99,6 @@ void *memsys_get_module_api(int api,
 
                     return &api;
                 }
-
-                default:
-                    return NULL;
-            };
 
         default:
             return NULL;

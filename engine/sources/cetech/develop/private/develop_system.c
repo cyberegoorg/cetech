@@ -339,12 +339,10 @@ void developsys_leave_scope(struct scope_data scope_data) {
     developsys_push(EVENT_SCOPE, ev);
 }
 
-void *developsystem_get_module_api(int api,
-                                   int version) {
+void *developsystem_get_module_api(int api) {
     switch (api) {
         case PLUGIN_EXPORT_API_ID:
-            switch (version) {
-                case 0: {
+                {
                     static struct module_api_v0 module = {0};
 
                     module.init = _init;
@@ -355,12 +353,9 @@ void *developsystem_get_module_api(int api,
                     return &module;
                 }
 
-                default:
-                    return NULL;
-            };
         case DEVELOP_SERVER_API_ID:
-            switch (version) {
-                case 0: {
+
+                {
                     static struct DevelopSystemApiV0 api = {0};
 
                     api.push = _developsys_push;
@@ -372,9 +367,6 @@ void *developsystem_get_module_api(int api,
                     return &api;
                 }
 
-                default:
-                    return NULL;
-            };
 
         default:
             return NULL;

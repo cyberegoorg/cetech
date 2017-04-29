@@ -561,12 +561,10 @@ void entity_destroy(world_t world,
 
 }
 
-void *entity_get_module_api(int api,
-                            int version) {
+void *entity_get_module_api(int api) {
     switch (api) {
         case PLUGIN_EXPORT_API_ID:
-            switch (version) {
-                case 0: {
+                {
                     static struct module_api_v0 module = {0};
 
                     module.init = _init;
@@ -576,12 +574,8 @@ void *entity_get_module_api(int api,
                     return &module;
                 }
 
-                default:
-                    return NULL;
-            };
         case ENTITY_API_ID:
-            switch (version) {
-                case 0: {
+                {
                     static struct EntitySystemApiV0 api = {0};
 
                     api.entity_manager_create = entity_manager_create;
@@ -599,10 +593,6 @@ void *entity_get_module_api(int api,
                     api.resource_compiler = entity_resource_compiler;
                     return &api;
                 }
-
-                default:
-                    return NULL;
-            };
 
         default:
             return NULL;

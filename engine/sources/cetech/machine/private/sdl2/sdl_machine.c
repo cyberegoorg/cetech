@@ -36,7 +36,7 @@ int sdl_init(get_api_fce_t get_engine_api) {
     _G = (struct G) {0};
 
     ApplicationApiV0 = *(struct ApplicationApiV0 *) get_engine_api(
-            APPLICATION_API_ID, 0);
+            APPLICATION_API_ID);
 
     if (SDL_Init(SDL_INIT_EVERYTHING) != 0) {
         log_error(LOG_WHERE, "Could not init sdl - %s", SDL_GetError());

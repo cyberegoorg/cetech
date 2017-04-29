@@ -98,7 +98,7 @@ static int _transform_link(lua_State *l) {
 
 void _register_lua_transform_api(get_api_fce_t get_engine_api) {
     TransformApiV0 = *((struct TransformApiV0 *) get_engine_api(
-            TRANSFORM_API_ID, 0));
+            TRANSFORM_API_ID));
 
 
     luasys_add_module_function(API_NAME, "get", _transform_get);

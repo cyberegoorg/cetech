@@ -17,7 +17,7 @@
 
 #define _NAME(name, version) name##V##version
 #define IMPORT_API(name, version) static struct _NAME(name, version) _NAME(name, version)
-#define INIT_API(name, api_id, version) _NAME(name, version) = *(struct _NAME(name, version) *) get_engine_api(api_id, version)
+#define INIT_API(name, api_id, version) _NAME(name, version) = *(struct _NAME(name, version) *) get_engine_api(api_id)
 
 
 //==============================================================================
@@ -58,8 +58,7 @@ enum {
 // Typedefs
 //==============================================================================
 
-typedef void *(*get_api_fce_t)(int api,
-                               int version);
+typedef void *(*get_api_fce_t)(int api);
 
 
 //==============================================================================

@@ -125,12 +125,10 @@ void component_destroy(world_t world,
     }
 }
 
-void *component_get_module_api(int api,
-                            int version) {
+void *component_get_module_api(int api) {
     switch (api) {
         case PLUGIN_EXPORT_API_ID:
-            switch (version) {
-                case 0: {
+                {
                     static struct module_api_v0 module = {0};
 
                     module.init = _init;
@@ -140,13 +138,8 @@ void *component_get_module_api(int api,
                     return &module;
                 }
 
-                default:
-                    return NULL;
-            };
-
         case COMPONENT_API_ID:
-            switch (version) {
-                case 0: {
+                {
                     static struct ComponentSystemApiV0 api = {0};
                     api.component_register_compiler = component_register_compiler;
                     api.component_compile = component_compile;
@@ -157,10 +150,6 @@ void *component_get_module_api(int api,
 
                     return &api;
                 }
-
-                default:
-                    return NULL;
-            };
 
         default:
             return NULL;

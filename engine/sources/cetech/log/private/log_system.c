@@ -40,7 +40,7 @@ void vlog(const enum log_level level,
     }
 }
 
-void log_init(log_get_wid_clb_t get_wid_clb) {
+void log_init() {
     _G = (struct global) G_INIT;
 }
 

@@ -400,7 +400,7 @@ void luasys_push_int(lua_State *_L,
 }
 
 void luasys_push_uint64_t(lua_State *_L,
-                     uint64_t value) {
+                          uint64_t value) {
     lua_pushinteger(_L, value);
 }
 
@@ -436,7 +436,7 @@ int luasys_to_int(lua_State *_L,
 }
 
 float luasys_to_float(lua_State *_L,
-                  int i) {
+                      int i) {
     return (float) lua_tonumber(_L, i);
 }
 
@@ -901,71 +901,60 @@ void luasys_call_global(const char *func,
     lua_pop(_state, -1);
 }
 
-void *luasys_get_module_api(int api,
-                            int version) {
+void *luasys_get_module_api(int api) {
     switch (api) {
-        case PLUGIN_EXPORT_API_ID:
-            switch (version) {
-                case 0: {
-                    static struct module_api_v0 module = {0};
+        case PLUGIN_EXPORT_API_ID: {
+            static struct module_api_v0 module = {0};
 
-                    module.init = _init;
-                    module.shutdown = _shutdown;
+            module.init = _init;
+            module.shutdown = _shutdown;
 
-                    return &module;
-                }
+            return &module;
+        }
 
-                default:
-                    return NULL;
-            };
-        case LUA_API_ID:
-            switch (version) {
-                case 0: {
-                    static struct LuaSysApiV0 api = {0};
 
-                    //api.get_top = luasys_get_top;
-                    api.remove = luasys_remove;
-                    api.pop = luasys_pop;
-                    api.is_nil = luasys_is_nil;
-                    api.is_number = luasys_is_number;
-                    api.value_type = luasys_value_type;
-                    api.push_nil = luasys_push_nil;
-                    api.push_uint64_t = luasys_push_uint64_t;
-                    api.push_handler = luasys_push_handler;
-                    api.push_int = luasys_push_int;
-                    api.push_bool = luasys_push_bool;
-                    api.push_float = luasys_push_float;
-                    api.push_string = luasys_push_string;
-                    api.to_bool = luasys_to_bool;
-                    api.to_int = luasys_to_int;
-                    api.to_float = luasys_to_float;
-                    api.to_handler = luasys_to_handler;
-                    api.to_string = luasys_to_string;
-                    api.to_string_l = luasys_to_string_l;
-                    api.to_vec2f = luasys_to_vec2f;
-                    api.to_vec3f = luasys_to_vec3f;
-                    api.to_vec4f = luasys_to_vec4f;
-                    api.to_mat44f = luasys_to_mat44f;
-                    api.to_quat = luasys_to_quat;
-                    api.push_vec2f = luasys_push_vec2f;
-                    api.push_vec3f = luasys_push_vec3f;
-                    api.push_vec4f = luasys_push_vec4f;
-                    api.push_mat44f = luasys_push_mat44f;
-                    api.push_quat = luasys_push_quat;
-                    api.execute_string = luasys_execute_string;
-                    api.add_module_function = luasys_add_module_function;
-                    //api.add_module_constructor = luasys_add_module_constructor;
-                    api.execute_resource = luasys_execute_resource;
-                    api.get_game_callbacks = luasys_get_game_callbacks;
-                    api.execute_boot_script = luasys_execute_boot_script;
-                    api.call_global = luasys_call_global;
+        case LUA_API_ID: {
+            static struct LuaSysApiV0 api = {0};
 
-                    return &api;
-                }
+            //api.get_top = luasys_get_top;
+            api.remove = luasys_remove;
+            api.pop = luasys_pop;
+            api.is_nil = luasys_is_nil;
+            api.is_number = luasys_is_number;
+            api.value_type = luasys_value_type;
+            api.push_nil = luasys_push_nil;
+            api.push_uint64_t = luasys_push_uint64_t;
+            api.push_handler = luasys_push_handler;
+            api.push_int = luasys_push_int;
+            api.push_bool = luasys_push_bool;
+            api.push_float = luasys_push_float;
+            api.push_string = luasys_push_string;
+            api.to_bool = luasys_to_bool;
+            api.to_int = luasys_to_int;
+            api.to_float = luasys_to_float;
+            api.to_handler = luasys_to_handler;
+            api.to_string = luasys_to_string;
+            api.to_string_l = luasys_to_string_l;
+            api.to_vec2f = luasys_to_vec2f;
+            api.to_vec3f = luasys_to_vec3f;
+            api.to_vec4f = luasys_to_vec4f;
+            api.to_mat44f = luasys_to_mat44f;
+            api.to_quat = luasys_to_quat;
+            api.push_vec2f = luasys_push_vec2f;
+            api.push_vec3f = luasys_push_vec3f;
+            api.push_vec4f = luasys_push_vec4f;
+            api.push_mat44f = luasys_push_mat44f;
+            api.push_quat = luasys_push_quat;
+            api.execute_string = luasys_execute_string;
+            api.add_module_function = luasys_add_module_function;
+            //api.add_module_constructor = luasys_add_module_constructor;
+            api.execute_resource = luasys_execute_resource;
+            api.get_game_callbacks = luasys_get_game_callbacks;
+            api.execute_boot_script = luasys_execute_boot_script;
+            api.call_global = luasys_call_global;
 
-                default:
-                    return NULL;
-            };
+            return &api;
+        }
 
         default:
             return NULL;

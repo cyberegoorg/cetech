@@ -74,9 +74,6 @@ static struct G {
 // Private
 //==============================================================================
 
-static char _get_worker_id() {
-    return 0;
-}
 
 static int _cmd_wait(mpack_node_t args,
                      mpack_writer_t *writer) {
@@ -162,7 +159,7 @@ int application_init(int argc,
     _G = (struct G) {0};
     _G.args = (struct args) {.argc = argc, .argv = argv};
 
-    log_init(_get_worker_id);
+    log_init();
     log_register_handler(log_stdout_handler, NULL);
     logdb_init_db(".");
 
@@ -359,13 +356,12 @@ cel_window_t application_get_main_window() {
 }
 
 
-void *application_get_module_api(int api,
-                                 int version) {
+void *application_get_module_api(int api) {
 
-    if (api == PLUGIN_EXPORT_API_ID && version == 0) {
+    if (api == PLUGIN_EXPORT_API_ID) {
         static struct module_api_v0 module = {0};
         return &module;
-    } else if (api == APPLICATION_API_ID && version == 0) {
+    } else if (api == APPLICATION_API_ID) {
         return &api_v1;
     }
 
