@@ -41,8 +41,8 @@ static struct G {
     MAP_T(world_data_t) world;
 } _G = {0};
 
-IMPORT_API(MemSysApi, 0);
-IMPORT_API(WorldApi, 0);
+IMPORT_API(MemSysApiV0);
+IMPORT_API(WorldApiV0);
 
 static void _new_world(world_t world) {
     world_data_t data = {0};
@@ -92,8 +92,8 @@ static void _on_world_destroy(world_t world) {
 
 
 static void _init(get_api_fce_t get_engine_api) {
-    INIT_API(MemSysApi, MEMORY_API_ID, 0);
-    INIT_API(WorldApi, WORLD_API_ID, 0);
+    INIT_API(get_engine_api, MemSysApiV0, MEMORY_API_ID);
+    INIT_API(get_engine_api, WorldApiV0, WORLD_API_ID);
 
     _G = (struct G) {0};
 

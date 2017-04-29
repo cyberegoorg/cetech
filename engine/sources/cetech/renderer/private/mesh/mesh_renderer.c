@@ -16,12 +16,12 @@
 #include <cetech/module/module.h>
 
 
-IMPORT_API(MemSysApi, 0);
-IMPORT_API(SceneGprahApi, 0);
-IMPORT_API(TransformApi, 0);
-IMPORT_API(ComponentSystemApi, 0);
-IMPORT_API(MaterialApi, 0);
-IMPORT_API(MeshRendererApi, 0);
+IMPORT_API(MemSysApiV0);
+IMPORT_API(SceneGprahApiV0);
+IMPORT_API(TransformApiV0);
+IMPORT_API(ComponentSystemApiV0);
+IMPORT_API(MaterialApiV0);
+IMPORT_API(MeshRendererApiV0);
 
 
 #define LOG_WHERE "mesh_renderer"
@@ -168,12 +168,12 @@ static void _spawner(world_t world,
 
 
 static void _init(get_api_fce_t get_engine_api) {
-    INIT_API(ComponentSystemApi, COMPONENT_API_ID, 0);
-    INIT_API(MemSysApi, MEMORY_API_ID, 0);
-    INIT_API(MaterialApi, MATERIAL_API_ID, 0);
-    INIT_API(MeshRendererApi, MESH_API_ID, 0);
-    INIT_API(SceneGprahApi, SCENEGRAPH_API_ID, 0);
-    INIT_API(TransformApi, TRANSFORM_API_ID, 0);
+    INIT_API(get_engine_api, ComponentSystemApiV0, COMPONENT_API_ID);
+    INIT_API(get_engine_api, MemSysApiV0, MEMORY_API_ID);
+    INIT_API(get_engine_api, MaterialApiV0, MATERIAL_API_ID);
+    INIT_API(get_engine_api, MeshRendererApiV0, MESH_API_ID);
+    INIT_API(get_engine_api, SceneGprahApiV0, SCENEGRAPH_API_ID);
+    INIT_API(get_engine_api, TransformApiV0, TRANSFORM_API_ID);
 
     _G = (struct G) {0};
 

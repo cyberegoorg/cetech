@@ -28,9 +28,9 @@ static struct G {
     stringid64_t type;
 } _G = {0};
 
-IMPORT_API(MemSysApi, 0);
-IMPORT_API(ComponentSystemApi, 0);
-IMPORT_API(ResourceApi, 0);
+IMPORT_API(MemSysApiV0);
+IMPORT_API(ComponentSystemApiV0);
+IMPORT_API(ResourceApiV0);
 
 uint32_t _new_spawned_array() {
     uint32_t idx = ARRAY_SIZE(&_G.spawned_array);
@@ -454,10 +454,10 @@ static const resource_callbacks_t entity_resource_callback = {
 
 
 static void _init(get_api_fce_t get_engine_api) {
-    INIT_API(MemSysApi, MEMORY_API_ID, 0);
-    INIT_API(ComponentSystemApi, COMPONENT_API_ID, 0);
-    INIT_API(MemSysApi, MEMORY_API_ID, 0);
-    INIT_API(ResourceApi, RESOURCE_API_ID, 0);
+    INIT_API(get_engine_api, MemSysApiV0, MEMORY_API_ID);
+    INIT_API(get_engine_api, ComponentSystemApiV0, COMPONENT_API_ID);
+    INIT_API(get_engine_api, MemSysApiV0, MEMORY_API_ID);
+    INIT_API(get_engine_api, ResourceApiV0, RESOURCE_API_ID);
 
     _G = (struct G) {0};
 

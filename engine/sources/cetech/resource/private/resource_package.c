@@ -31,9 +31,9 @@ struct G {
 } _G = {0};
 
 
-IMPORT_API(MemSysApi, 0);
-IMPORT_API(ResourceApi, 0);
-IMPORT_API(TaskApi, 0);
+IMPORT_API(MemSysApiV0);
+IMPORT_API(ResourceApiV0);
+IMPORT_API(TaskApiV0);
 
 //==============================================================================
 // Resource compiler
@@ -129,9 +129,9 @@ int _package_compiler(const char *filename,
 }
 
 int package_init(get_api_fce_t get_engine_api) {
-    INIT_API(MemSysApi, MEMORY_API_ID, 0);
-    INIT_API(ResourceApi, RESOURCE_API_ID, 0);
-    INIT_API(TaskApi, TASK_API_ID, 0);
+    INIT_API(get_engine_api, MemSysApiV0, MEMORY_API_ID);
+    INIT_API(get_engine_api, ResourceApiV0, RESOURCE_API_ID);
+    INIT_API(get_engine_api, TaskApiV0, TASK_API_ID);
 
     _G = (struct G) {0};
 

@@ -20,11 +20,11 @@
 #include <cetech/renderer/private/material/material.h>
 
 
-IMPORT_API(ConsoleServerApi, 0);
-IMPORT_API(MeshRendererApi, 0);
-IMPORT_API(CameraApi, 0);
-IMPORT_API(ConfigApi, 0);
-IMPORT_API(ApplicationApi, 0);
+IMPORT_API(ConsoleServerApiV0);
+IMPORT_API(MeshRendererApiV0);
+IMPORT_API(CameraApiV0);
+IMPORT_API(ConfigApiV0);
+IMPORT_API(ApplicationApiV0);
 
 //==============================================================================
 // GLobals
@@ -71,11 +71,11 @@ static int _cmd_resize(mpack_node_t args,
 }
 
 static void _init(get_api_fce_t get_engine_api) {
-    INIT_API(ConsoleServerApi, CONSOLE_SERVER_API_ID, 0);
-    INIT_API(MeshRendererApi, MESH_API_ID, 0);
-    INIT_API(CameraApi, CAMERA_API_ID, 0);
-    INIT_API(ConfigApi, CONFIG_API_ID, 0);
-    INIT_API(ApplicationApi, APPLICATION_API_ID, 0);
+    INIT_API(get_engine_api, ConsoleServerApiV0, CONSOLE_SERVER_API_ID);
+    INIT_API(get_engine_api, MeshRendererApiV0, MESH_API_ID);
+    INIT_API(get_engine_api, CameraApiV0, CAMERA_API_ID);
+    INIT_API(get_engine_api, ConfigApiV0, CONFIG_API_ID);
+    INIT_API(get_engine_api, ApplicationApiV0, APPLICATION_API_ID);
 
     _G = (struct G) {0};
 

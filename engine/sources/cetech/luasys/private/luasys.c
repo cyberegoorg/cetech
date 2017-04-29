@@ -19,8 +19,8 @@
 #include <cetech/resource/resource.h>
 
 
-IMPORT_API(ResourceApi, 0);
-IMPORT_API(ConsoleServerApi, 0);
+IMPORT_API(ResourceApiV0);
+IMPORT_API(ConsoleServerApiV0);
 
 //==============================================================================
 // Defines
@@ -801,8 +801,8 @@ void _create_lightuserdata() {
 static void _init(get_api_fce_t get_engine_api) {
     log_debug(LOG_WHERE, "Init");
 
-    INIT_API(ConsoleServerApi, CONSOLE_SERVER_API_ID, 0);
-    INIT_API(ResourceApi, RESOURCE_API_ID, 0);
+    INIT_API(get_engine_api, ConsoleServerApiV0, CONSOLE_SERVER_API_ID);
+    INIT_API(get_engine_api, ResourceApiV0, RESOURCE_API_ID);
 
     _G.L = luaL_newstate();
     CEL_ASSERT(LOG_WHERE, _G.L != NULL);

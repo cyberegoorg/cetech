@@ -10,7 +10,7 @@
 
 #include "gamepadstr.h"
 
-IMPORT_API(MachineApi, 0);
+IMPORT_API(MachineApiV0);
 
 //==============================================================================
 // Defines
@@ -32,7 +32,7 @@ static struct G {
 
 
 static void _init(get_api_fce_t get_engine_api) {
-    INIT_API(MachineApi, MACHINE_API_ID, 0);
+    INIT_API(get_engine_api, MachineApiV0, MACHINE_API_ID);
 
     _G = (struct G) {0};
 

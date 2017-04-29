@@ -29,10 +29,10 @@ typedef struct {
 
 } world_data_t;
 
-IMPORT_API(MemSysApi, 0);
-IMPORT_API(ComponentSystemApi, 0);
-IMPORT_API(RendererApi, 0);
-IMPORT_API(TransformApi, 0);
+IMPORT_API(MemSysApiV0);
+IMPORT_API(ComponentSystemApiV0);
+IMPORT_API(RendererApiV0);
+IMPORT_API(TransformApiV0);
 
 ARRAY_PROTOTYPE(world_data_t)
 
@@ -135,10 +135,10 @@ void _spawner(world_t world,
 
 
 static void _init(get_api_fce_t get_engine_api) {
-    INIT_API(MemSysApi, MEMORY_API_ID, 0);
-    INIT_API(ComponentSystemApi, COMPONENT_API_ID, 0);
-    INIT_API(RendererApi, RENDERER_API_ID, 0);
-    INIT_API(TransformApi, TRANSFORM_API_ID, 0);
+    INIT_API(get_engine_api, MemSysApiV0, MEMORY_API_ID);
+    INIT_API(get_engine_api, ComponentSystemApiV0, COMPONENT_API_ID);
+    INIT_API(get_engine_api, RendererApiV0, RENDERER_API_ID);
+    INIT_API(get_engine_api, TransformApiV0, TRANSFORM_API_ID);
 
     _G = (struct G) {0};
 

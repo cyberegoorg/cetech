@@ -15,10 +15,10 @@
 #include <cetech/level/level.h>
 #include "level_blob.h"
 
-IMPORT_API(EntitySystemApi, 0);
-IMPORT_API(ResourceApi, 0);
-IMPORT_API(TransformApi, 0);
-IMPORT_API(MemSysApi, 0);
+IMPORT_API(EntitySystemApiV0);
+IMPORT_API(ResourceApiV0);
+IMPORT_API(TransformApiV0);
+IMPORT_API(MemSysApiV0);
 
 //==============================================================================
 // Typedefs
@@ -213,10 +213,10 @@ int _level_resource_compiler(const char *filename,
 //==============================================================================
 
 static void _init(get_api_fce_t get_engine_api) {
-    INIT_API(EntitySystemApi, ENTITY_API_ID, 0);
-    INIT_API(MemSysApi, MEMORY_API_ID, 0);
-    INIT_API(ResourceApi, RESOURCE_API_ID, 0);
-    INIT_API(TransformApi, TRANSFORM_API_ID, 0);
+    INIT_API(get_engine_api, EntitySystemApiV0, ENTITY_API_ID);
+    INIT_API(get_engine_api, MemSysApiV0, MEMORY_API_ID);
+    INIT_API(get_engine_api, ResourceApiV0, RESOURCE_API_ID);
+    INIT_API(get_engine_api, TransformApiV0, TRANSFORM_API_ID);
 
     _G = (struct G) {0};
     _G.level_type = stringid64_from_string("level");

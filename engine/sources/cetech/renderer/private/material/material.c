@@ -51,8 +51,8 @@ struct G {
     stringid64_t type;
 } _G = {0};
 
-IMPORT_API(MemSysApi, 0);
-IMPORT_API(ResourceApi, 0);
+IMPORT_API(MemSysApiV0);
+IMPORT_API(ResourceApiV0);
 
 #define material_blob_uniform_bgfx(r)    ((bgfx_uniform_handle_t*) ((material_blob_vec4f_value(r)+((r)->vec4f_count))))
 
@@ -73,8 +73,8 @@ IMPORT_API(ResourceApi, 0);
 int material_init(get_api_fce_t get_engine_api) {
     _G = (struct G) {0};
 
-    INIT_API(MemSysApi, MEMORY_API_ID, 0);
-    INIT_API(ResourceApi, RESOURCE_API_ID, 0);
+    INIT_API(get_engine_api, MemSysApiV0, MEMORY_API_ID);
+    INIT_API(get_engine_api, ResourceApiV0, RESOURCE_API_ID);
 
     _G.type = stringid64_from_string("material");
 

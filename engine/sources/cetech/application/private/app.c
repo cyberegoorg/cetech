@@ -26,14 +26,14 @@
 #define LOG_WHERE "application"
 
 
-IMPORT_API(ConsoleServerApi, 0);
-IMPORT_API(DevelopSystemApi, 0);
-IMPORT_API(RendererApi, 0);
-IMPORT_API(ResourceApi, 0);
-IMPORT_API(PackageApi, 0);
-IMPORT_API(TaskApi, 0);
-IMPORT_API(LuaSysApi, 0);
-IMPORT_API(ConfigApi, 0);
+IMPORT_API(ConsoleServerApiV0);
+IMPORT_API(DevelopSystemApiV0);
+IMPORT_API(RendererApiV0);
+IMPORT_API(ResourceApiV0);
+IMPORT_API(PackageApiV0);
+IMPORT_API(TaskApiV0);
+IMPORT_API(LuaSysApiV0);
+IMPORT_API(ConfigApiV0);
 
 //==============================================================================
 // Definess
@@ -104,16 +104,14 @@ static struct ApplicationApiV0 api_v1 = {
 };
 
 void _init_api() {
-#define get_engine_api module_get_engine_api
-    INIT_API(ConsoleServerApi, CONSOLE_SERVER_API_ID, 0);
-    INIT_API(DevelopSystemApi, DEVELOP_SERVER_API_ID, 0);
-    INIT_API(RendererApi, RENDERER_API_ID, 0);
-    INIT_API(ResourceApi, RESOURCE_API_ID, 0);
-    INIT_API(PackageApi, PACKAGE_API_ID, 0);
-    INIT_API(TaskApi, TASK_API_ID, 0);
-    INIT_API(LuaSysApi, LUA_API_ID, 0);
-    INIT_API(ConfigApi, CONFIG_API_ID, 0);
-#undef get_engine_api
+    INIT_API(module_get_engine_api,ConsoleServerApiV0, CONSOLE_SERVER_API_ID);
+    INIT_API(module_get_engine_api,DevelopSystemApiV0, DEVELOP_SERVER_API_ID);
+    INIT_API(module_get_engine_api,RendererApiV0, RENDERER_API_ID);
+    INIT_API(module_get_engine_api,ResourceApiV0, RESOURCE_API_ID);
+    INIT_API(module_get_engine_api,PackageApiV0, PACKAGE_API_ID);
+    INIT_API(module_get_engine_api,TaskApiV0, TASK_API_ID);
+    INIT_API(module_get_engine_api,LuaSysApiV0, LUA_API_ID);
+    INIT_API(module_get_engine_api,ConfigApiV0, CONFIG_API_ID);
 }
 
 int _init_config() {

@@ -147,12 +147,12 @@ static int _task_worker(void *o) {
     return 1;
 }
 
-IMPORT_API(DevelopSystemApi, 0);
-IMPORT_API(MemSysApi, 0);
+IMPORT_API(DevelopSystemApiV0);
+IMPORT_API(MemSysApiV0);
 
 static void _init(get_api_fce_t get_engine_api) {
-    INIT_API(DevelopSystemApi, DEVELOP_SERVER_API_ID, 0);
-    INIT_API(MemSysApi, MEMORY_API_ID, 0);
+    INIT_API(get_engine_api, DevelopSystemApiV0, DEVELOP_SERVER_API_ID);
+    INIT_API(get_engine_api, MemSysApiV0, MEMORY_API_ID);
 
     _G = (struct G) {0};
 

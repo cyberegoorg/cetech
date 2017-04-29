@@ -28,12 +28,12 @@ static struct G {
     MAP_T(component_clb_t) component_clb;
 } _G = {0};
 
-IMPORT_API(MemSysApi, 0);
-IMPORT_API(WorldApi, 0);
+IMPORT_API(MemSysApiV0);
+IMPORT_API(WorldApiV0);
 
 static void _init(get_api_fce_t get_engine_api) {
-    INIT_API(MemSysApi, MEMORY_API_ID, 0);
-    INIT_API(WorldApi, WORLD_API_ID, 0);
+    INIT_API(get_engine_api, MemSysApiV0, MEMORY_API_ID);
+    INIT_API(get_engine_api, WorldApiV0, WORLD_API_ID);
 
     _G = (struct G) {0};
 

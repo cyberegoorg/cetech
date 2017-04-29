@@ -68,11 +68,11 @@ struct G {
 
 } _G = {0};
 
-IMPORT_API(MemSysApi, 0);
-IMPORT_API(ConsoleServerApi, 0);
-IMPORT_API(FilesystemApi, 0);
-IMPORT_API(ConfigApi, 0);
-IMPORT_API(ApplicationApi, 0);
+IMPORT_API(MemSysApiV0);
+IMPORT_API(ConsoleServerApiV0);
+IMPORT_API(FilesystemApiV0);
+IMPORT_API(ConfigApiV0);
+IMPORT_API(ApplicationApiV0);
 
 
 //==============================================================================
@@ -143,11 +143,11 @@ void resource_register_type(stringid64_t type,
                             resource_callbacks_t callbacks);
 
 static void _init(get_api_fce_t get_engine_api) {
-    INIT_API(ConsoleServerApi, CONSOLE_SERVER_API_ID, 0);
-    INIT_API(MemSysApi, MEMORY_API_ID, 0);
-    INIT_API(FilesystemApi, FILESYSTEM_API_ID, 0);
-    INIT_API(ConfigApi, CONFIG_API_ID, 0);
-    INIT_API(ApplicationApi, APPLICATION_API_ID, 0);
+    INIT_API(get_engine_api, ConsoleServerApiV0, CONSOLE_SERVER_API_ID);
+    INIT_API(get_engine_api, MemSysApiV0, MEMORY_API_ID);
+    INIT_API(get_engine_api, FilesystemApiV0, FILESYSTEM_API_ID);
+    INIT_API(get_engine_api, ConfigApiV0, CONFIG_API_ID);
+    INIT_API(get_engine_api, ApplicationApiV0, APPLICATION_API_ID);
 
     ARRAY_INIT(resource_data, &_G.resource_data, MemSysApiV0.main_allocator());
     ARRAY_INIT(resource_callbacks_t, &_G.resource_callbacks,
