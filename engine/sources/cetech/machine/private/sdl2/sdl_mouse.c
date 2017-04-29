@@ -4,7 +4,6 @@
 
 #include <include/SDL2/SDL.h>
 #include <cetech/application/application.h>
-#include <cetech/os/window.h>
 #include <cetech/module/module.h>
 #include <cetech/machine/machine.h>
 
@@ -27,7 +26,8 @@ static struct G {
 } _G = {0};
 
 
-static struct app_api_v0 app_api_v0;
+IMPORT_API(app_api_v0);
+IMPORT_API(window_api_v0);
 
 //==============================================================================
 // Interface
@@ -36,8 +36,8 @@ static struct app_api_v0 app_api_v0;
 int sdl_mouse_init(get_api_fce_t get_engine_api) {
     _G = (struct G) {0};
 
-    app_api_v0 = *(struct app_api_v0 *) get_engine_api(
-            APPLICATION_API_ID);
+    INIT_API(get_engine_api, app_api_v0, APPLICATION_API_ID);
+    INIT_API(get_engine_api, window_api_v0, WINDOW_API_ID);
 
     return 1;
 }
@@ -60,8 +60,8 @@ void sdl_mouse_process(struct eventstream *stream) {
     if ((pos[0] != _G.position[0]) || (pos[1] != _G.position[1])) {
         cel_window_t main_window = app_api_v0.main_window();
         uint32_t cel_window_size[2] = {0};
-        cel_window_get_size(main_window, &cel_window_size[0],
-                            &cel_window_size[1]);
+        window_api_v0.get_size(main_window, &cel_window_size[0],
+                                          &cel_window_size[1]);
 
         _G.position[0] = pos[0];
         _G.position[1] = cel_window_size[1] - pos[1];

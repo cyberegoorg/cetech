@@ -25,6 +25,7 @@ IMPORT_API(mesh_renderer_api_v0);
 IMPORT_API(camera_api_v0);
 IMPORT_API(config_api_v0);
 IMPORT_API(app_api_v0);
+IMPORT_API(window_api_v0);
 
 //==============================================================================
 // GLobals
@@ -76,6 +77,7 @@ static void _init(get_api_fce_t get_engine_api) {
     INIT_API(get_engine_api, camera_api_v0, CAMERA_API_ID);
     INIT_API(get_engine_api, config_api_v0, CONFIG_API_ID);
     INIT_API(get_engine_api, app_api_v0, APPLICATION_API_ID);
+    INIT_API(get_engine_api, window_api_v0, WINDOW_API_ID);
 
     _G = (struct G) {0};
 
@@ -108,14 +110,14 @@ static void _shutdown() {
 
 void renderer_create(cel_window_t window) {
     bgfx_platform_data_t pd = {0};
-    pd.nwh = cel_window_native_cel_window_ptr(window);
-    pd.ndt = cel_window_native_display_ptr(window);
+    pd.nwh = window_api_v0.native_window_ptr(window);
+    pd.ndt = window_api_v0.native_display_ptr(window);
     bgfx_set_platform_data(&pd);
 
     // TODO: from config
     bgfx_init(BGFX_RENDERER_TYPE_OPENGL, 0, 0, NULL, NULL);
 
-    cel_window_get_size(window, &_G.size_width, &_G.size_height);
+    window_api_v0.get_size(window, &_G.size_width, &_G.size_height);
 
     _G.need_reset = 1;
 }
@@ -153,7 +155,8 @@ void renderer_render_world(world_t world,
     mesh_renderer_api_v0.render_all(world);
 
     bgfx_frame(0);
-    cel_window_update(app_api_v0.main_window());
+
+    window_api_v0.update(app_api_v0.main_window());
 }
 
 cel_vec2f_t renderer_get_size() {

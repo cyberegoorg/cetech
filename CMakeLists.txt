@@ -97,7 +97,7 @@ set(SOURCE_FILES
         engine/sources/cetech/sdl2/private/sdl_thread.h
         engine/sources/cetech/os/private/time.c
         engine/sources/cetech/filesystem/private/vio.c
-        engine/sources/cetech/os/private/window.c
+        engine/sources/cetech/sdl2/private/sdl_window.h
 
         ########################################################################
         # CETECH

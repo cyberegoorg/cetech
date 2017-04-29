@@ -34,6 +34,7 @@ IMPORT_API(package_api_v0);
 IMPORT_API(task_api_v0);
 IMPORT_API(lua_api_v0);
 IMPORT_API(config_api_v0);
+IMPORT_API(window_api_v0);
 
 //==============================================================================
 // Definess
@@ -112,6 +113,7 @@ void _init_api() {
     INIT_API(module_get_engine_api,task_api_v0, TASK_API_ID);
     INIT_API(module_get_engine_api,lua_api_v0, LUA_API_ID);
     INIT_API(module_get_engine_api,config_api_v0, CONFIG_API_ID);
+    INIT_API(module_get_engine_api,window_api_v0, WINDOW_API_ID);
 }
 
 int _init_config() {
@@ -262,7 +264,7 @@ void application_start() {
                  config_api_v0.get_string(_G.config.boot_script));
 
         if (wid == 0) {
-            _G.main_window = cel_window_new(
+            _G.main_window = window_api_v0.create(
                     title,
                     WINDOWPOS_UNDEFINED,
                     WINDOWPOS_UNDEFINED,
@@ -272,7 +274,7 @@ void application_start() {
                     ? WINDOW_FULLSCREEN : WINDOW_NOFLAG
             );
         } else {
-            _G.main_window = cel_window_new_from((void *) wid);
+            _G.main_window = window_api_v0.create_from((void *) wid);
         }
 
         renderer_api_v0.create(_G.main_window);
