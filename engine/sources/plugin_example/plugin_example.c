@@ -1,7 +1,7 @@
 #include <stdio.h>
 
-#include "cetech/module/module.h"
-#include "cetech/input/input.h"
+#include "cetech/module.h"
+#include "cetech/input.h"
 
 IMPORT_API(keyboard_api_v0)
 
