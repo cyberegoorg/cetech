@@ -20,7 +20,7 @@
 //! Material typedef
 typedef struct {
     union {
-        handler_t h;
+        handler32_t h;
         uint32_t idx;
     };
 } material_t;

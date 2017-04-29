@@ -89,8 +89,8 @@ static int _transform_get_world_matrix(lua_State *l) {
 
 static int _transform_link(lua_State *l) {
     world_t w = {.h = luasys_to_handler(l, 1)};
-    entity_t root = {.idx = luasys_to_int(l, 2)};
-    entity_t child = {.idx = luasys_to_int(l, 3)};
+    entity_t root = {.h = luasys_to_handler(l, 2)};
+    entity_t child = {.h = luasys_to_handler(l, 3)};
 
     transform_api_v0.link(w, root, child);
     return 0;

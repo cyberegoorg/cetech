@@ -15,7 +15,7 @@
 #include "include/luajit/lualib.h"
 
 #include "cetech/math/math_types.h"
-#include <cetech/handler/handlerid.h>
+#include <cetech/handler/handler.h>
 #include <cetech/string/stringid.h>
 
 //==============================================================================
@@ -78,7 +78,7 @@ struct lua_api_v0 {
     //! \param l
     //! \param value
     void (*push_handler)(lua_State *l,
-                         handler_t value);
+                         handler32_t value);
 
     //! Push int
     //! \param l
@@ -129,7 +129,7 @@ struct lua_api_v0 {
     //! \param l
     //! \param i Element idx
     //! \return Handler value
-    handler_t (*to_handler)(lua_State *l,
+    handler32_t (*to_handler)(lua_State *l,
                             int i);
 
     //! Get element value as string

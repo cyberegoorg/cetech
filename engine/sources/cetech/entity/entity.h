@@ -11,7 +11,7 @@
 #include <cetech/containers/map.inl>
 #include <cetech/yaml/yaml.h>
 #include <cetech/string/stringid.h>
-#include <cetech/handler/handlerid.h>
+#include <cetech/handler/handler.h>
 #include <cetech/world/world.h>
 #include <cetech/resource/resource.h>
 
@@ -22,10 +22,7 @@
 
 //! Entity typedef
 typedef struct {
-    union {
-        handler_t h;
-        uint32_t idx;
-    };
+    handler32_t h;
 } entity_t;
 
 ARRAY_PROTOTYPE(entity_t);

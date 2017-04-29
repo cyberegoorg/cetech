@@ -13,7 +13,7 @@ struct RendererApiV0 RendererApiV0;
 
 static int _renderer_render_world(lua_State *l) {
     world_t w = {.h = luasys_to_handler(l, 1)};
-    camera_t c = {.idx = luasys_to_handler(l, 2).h};
+    camera_t c = {.idx = luasys_to_handler(l, 2).id};
 
     RendererApiV0.render_world(w, c, 0);
 

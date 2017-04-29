@@ -405,8 +405,8 @@ void luasys_push_uint64_t(lua_State *_L,
 }
 
 void luasys_push_handler(lua_State *_L,
-                         handler_t value) {
-    lua_pushinteger(_L, value.h);
+                         handler32_t value) {
+    lua_pushinteger(_L, value.id);
 }
 
 void luasys_push_bool(lua_State *_L,
@@ -440,9 +440,9 @@ float luasys_to_float(lua_State *_L,
     return (float) lua_tonumber(_L, i);
 }
 
-handler_t luasys_to_handler(lua_State *l,
+handler32_t luasys_to_handler(lua_State *l,
                             int i) {
-    return (handler_t) {.h = lua_tonumber(l, i)};
+    return (handler32_t) {.id = lua_tonumber(l, i)};
 }
 
 const char *luasys_to_string(lua_State *_L,

@@ -4,6 +4,7 @@
 #include "module.h"
 
 static void _init_static_modules() {
+    ADD_STATIC_PLUGIN(handler);
     ADD_STATIC_PLUGIN(machine);
     ADD_STATIC_PLUGIN(task);
 

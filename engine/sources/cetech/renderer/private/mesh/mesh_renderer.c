@@ -68,11 +68,11 @@ static void _new_world(world_t world) {
     ARRAY_INIT(stringid64_t, &data.node, memory_api_v0.main_allocator());
     ARRAY_INIT(material_t, &data.material, memory_api_v0.main_allocator());
 
-    MAP_SET(world_data_t, &_G.world, world.h.h, data);
+    MAP_SET(world_data_t, &_G.world, world.h.id, data);
 }
 
 static world_data_t *_get_world_data(world_t world) {
-    return MAP_GET_PTR(world_data_t, &_G.world, world.h.h);
+    return MAP_GET_PTR(world_data_t, &_G.world, world.h.id);
 }
 
 static void _destroy_world(world_t world) {
@@ -139,8 +139,8 @@ static void _destroyer(world_t world,
 
     // TODO: remove from arrays, swap idx -> last AND change size
     for (int i = 0; i < ent_count; ++i) {
-        if (MAP_HAS(uint32_t, &world_data->ent_idx_map, ents[i].idx)) {
-            MAP_REMOVE(uint32_t, &world_data->ent_idx_map, ents[i].idx);
+        if (MAP_HAS(uint32_t, &world_data->ent_idx_map, ents[i].h.id)) {
+            MAP_REMOVE(uint32_t, &world_data->ent_idx_map, ents[i].h.id);
         }
 
         //CEL_ASSERT("mesh_renderer", MAP_HAS(uint32_t, &world_data->ent_idx_map, ents[i].idx));
@@ -206,14 +206,14 @@ int mesh_is_valid(mesh_renderer_t mesh) {
 int mesh_has(world_t world,
              entity_t entity) {
     world_data_t *world_data = _get_world_data(world);
-    return MAP_HAS(uint32_t, &world_data->ent_idx_map, entity.h.h);
+    return MAP_HAS(uint32_t, &world_data->ent_idx_map, entity.h.id);
 }
 
 mesh_renderer_t mesh_get(world_t world,
                          entity_t entity) {
 
     world_data_t *world_data = _get_world_data(world);
-    uint32_t idx = MAP_GET(uint32_t, &world_data->ent_idx_map, entity.h.h, UINT32_MAX);
+    uint32_t idx = MAP_GET(uint32_t, &world_data->ent_idx_map, entity.h.id, UINT32_MAX);
     return (mesh_renderer_t) {.idx = idx};
 }
 
@@ -232,7 +232,7 @@ mesh_renderer_t mesh_create(world_t world,
 
     uint32_t idx = (uint32_t) ARRAY_SIZE(&data->material);
 
-    MAP_SET(uint32_t, &data->ent_idx_map, entity.h.h, idx);
+    MAP_SET(uint32_t, &data->ent_idx_map, entity.h.id, idx);
 
     if (node.id == 0) {
         node = scene_get_mesh_node(scene, mesh);
@@ -258,7 +258,7 @@ void mesh_render_all(world_t world) {
 
         material_api_v0.use(material);
 
-        entity_t ent = {.idx = ce_it->key};
+        entity_t ent = {.h.id = ce_it->key};
 
         transform_t t = transform_api_v0.get(world, ent);
         cel_mat44f_t t_w = *transform_api_v0.get_world_matrix(world, t);

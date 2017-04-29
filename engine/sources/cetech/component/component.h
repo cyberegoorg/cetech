@@ -11,7 +11,7 @@
 #include <cetech/containers/map.inl>
 #include <cetech/yaml/yaml.h>
 #include <cetech/string/stringid.h>
-#include <cetech/handler/handlerid.h>
+#include <cetech/handler/handler.h>
 #include <cetech/world/world.h>
 #include <cetech/entity/entity.h>
 

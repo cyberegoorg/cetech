@@ -35,7 +35,7 @@ static int _level_entity_by_id(lua_State *l) {
 
     entity_t ent = level_api_v0.entity_by_id(level, name);
 
-    luasys_push_int(l, ent.idx);
+    luasys_push_handler(l, ent.h);
     return 1;
 }
 
@@ -44,7 +44,7 @@ static int _level_entity(lua_State *l) {
 
     entity_t ent = level_api_v0.entity(level);
 
-    luasys_push_int(l, ent.idx);
+    luasys_push_handler(l, ent.h);
     return 1;
 }
 

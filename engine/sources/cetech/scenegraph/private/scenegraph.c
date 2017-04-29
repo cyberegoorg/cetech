@@ -59,11 +59,11 @@ static void _new_world(world_t world) {
     ARRAY_INIT(cel_vec3f_t, &data.scale, memory_api_v0.main_allocator());
     ARRAY_INIT(cel_mat44f_t, &data.world_matrix, memory_api_v0.main_allocator());
 
-    MAP_SET(world_data_t, &_G.world, world.h.h, data);
+    MAP_SET(world_data_t, &_G.world, world.h.id, data);
 }
 
 static world_data_t *_get_world_data(world_t world) {
-    return MAP_GET_PTR(world_data_t, &_G.world, world.h.h);
+    return MAP_GET_PTR(world_data_t, &_G.world, world.h.id);
 }
 
 static void _destroy_world(world_t world) {
@@ -242,14 +242,14 @@ void scenegraph_set_scale(world_t world,
 int scenegraph_has(world_t world,
                    entity_t entity) {
     world_data_t *world_data = _get_world_data(world);
-    return MAP_HAS(uint32_t, &world_data->ent_idx_map, entity.h.h);
+    return MAP_HAS(uint32_t, &world_data->ent_idx_map, entity.h.id);
 }
 
 scene_node_t scenegraph_get_root(world_t world,
                                  entity_t entity) {
 
     world_data_t *world_data = _get_world_data(world);
-    uint32_t idx = MAP_GET(uint32_t, &world_data->ent_idx_map, entity.h.h, UINT32_MAX);
+    uint32_t idx = MAP_GET(uint32_t, &world_data->ent_idx_map, entity.h.id, UINT32_MAX);
     return (scene_node_t) {.idx = idx};
 }
 
@@ -312,7 +312,7 @@ scene_node_t scenegraph_create(world_t world,
     }
 
     scene_node_t root = nodes[0];
-    MAP_SET(uint32_t, &data->ent_idx_map, entity.h.h, root.idx);
+    MAP_SET(uint32_t, &data->ent_idx_map, entity.h.id, root.idx);
     CEL_DEALLOCATE(memory_api_v0.main_allocator(), nodes);
     return root;
 }

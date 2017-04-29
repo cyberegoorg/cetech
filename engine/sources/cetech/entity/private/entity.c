@@ -12,6 +12,7 @@
 #include <cetech/entity/entity.h>
 #include <cetech/os/path.h>
 #include <cetech/filesystem/vio.h>
+#include <cetech/handler/handler.h>
 
 //==============================================================================
 // Globals
@@ -22,7 +23,7 @@ MAP_PROTOTYPE_N(struct array_entity_t, array_entity_t);
 
 #define _G EntityMaagerGlobals
 static struct G {
-    struct handler_gen* entity_handler;
+    struct handler32gen* entity_handler;
     MAP_T(uint32_t) spawned_map;
     ARRAY_T(array_entity_t) spawned_array;
     stringid64_t type;
@@ -31,6 +32,7 @@ static struct G {
 IMPORT_API(memory_api_v0);
 IMPORT_API(component_api_v0);
 IMPORT_API(resource_api_v0);
+IMPORT_API(handler_api_v0);
 
 uint32_t _new_spawned_array() {
     uint32_t idx = ARRAY_SIZE(&_G.spawned_array);
@@ -45,7 +47,7 @@ uint32_t _new_spawned_array() {
 
 void _map_spawned_array(entity_t root,
                         uint32_t idx) {
-    MAP_SET(uint32_t, &_G.spawned_map, root.idx, idx);
+    MAP_SET(uint32_t, &_G.spawned_map, root.h.id, idx);
 }
 
 ARRAY_T(entity_t) *_get_spawned_array_by_idx(uint32_t idx) {
@@ -53,14 +55,14 @@ ARRAY_T(entity_t) *_get_spawned_array_by_idx(uint32_t idx) {
 }
 
 ARRAY_T(entity_t) *_get_spawned_array(entity_t entity) {
-    uint32_t idx = MAP_GET(uint32_t, &_G.spawned_map, entity.idx, UINT32_MAX);
+    uint32_t idx = MAP_GET(uint32_t, &_G.spawned_map, entity.h.id, UINT32_MAX);
     return &ARRAY_AT(&_G.spawned_array, idx);
 }
 
 
 void _destroy_spawned_array(entity_t entity) {
-    uint32_t idx = MAP_GET(uint32_t, &_G.spawned_map, entity.idx, UINT32_MAX);
-    MAP_REMOVE(uint32_t, &_G.spawned_map, entity.idx);
+    uint32_t idx = MAP_GET(uint32_t, &_G.spawned_map, entity.h.id, UINT32_MAX);
+    MAP_REMOVE(uint32_t, &_G.spawned_map, entity.h.id);
 
     ARRAY_T(entity_t) *array = &ARRAY_AT(&_G.spawned_array, idx);
     ARRAY_DESTROY(entity_t, array);
@@ -458,6 +460,7 @@ static void _init(get_api_fce_t get_engine_api) {
     INIT_API(get_engine_api, component_api_v0, COMPONENT_API_ID);
     INIT_API(get_engine_api, memory_api_v0, MEMORY_API_ID);
     INIT_API(get_engine_api, resource_api_v0, RESOURCE_API_ID);
+    INIT_API(get_engine_api, handler_api_v0, HANDLER_API_ID);
 
     _G = (struct G) {0};
 
@@ -469,14 +472,14 @@ static void _init(get_api_fce_t get_engine_api) {
     resource_api_v0.register_type(_G.type, entity_resource_callback);
     resource_api_v0.compiler_register(_G.type, _entity_resource_compiler);
 
-    _G.entity_handler = handlerid_create(memory_api_v0.main_allocator());
+    _G.entity_handler = handler_api_v0.handler32gen_create(memory_api_v0.main_allocator());
 }
 
 static void _shutdown() {
     MAP_DESTROY(uint32_t, &_G.spawned_map);
     ARRAY_DESTROY(array_entity_t, &_G.spawned_array);
 
-    handlerid_destroy(_G.entity_handler);
+    handler_api_v0.handler32gen_destroy(_G.entity_handler);
     _G = (struct G) {0};
 }
 
@@ -485,15 +488,15 @@ static void _shutdown() {
 //==============================================================================
 
 entity_t entity_manager_create() {
-    return (entity_t) {.idx = handlerid_handler_create(_G.entity_handler).h};
+    return (entity_t) {.h = handler_api_v0.handler32_create(_G.entity_handler)};
 }
 
 void entity_manager_destroy(entity_t entity) {
-    handlerid_handler_destroy(_G.entity_handler, entity.h);
+    handler_api_v0.handler32_destroy(_G.entity_handler, entity.h);
 }
 
 int entity_manager_alive(entity_t entity) {
-    return handlerid_handler_alive(_G.entity_handler, entity.h);
+    return handler_api_v0.handler32_alive(_G.entity_handler, entity.h);
 }
 
 
@@ -538,7 +541,7 @@ entity_t entity_spawn(world_t world,
 
     if (res == NULL) {
         log_error("entity", "Could not spawn entity.");
-        return (entity_t) {.idx = 0};
+        return (entity_t) {.h = {0}};
     }
 
     ARRAY_T(entity_t) *spawned = entity_spawn_from_resource(world, res);

@@ -8,7 +8,7 @@
 // Includes
 //==============================================================================
 
-#include "cetech/handler/handlerid.h"
+#include "cetech/handler/handler.h"
 
 
 //==============================================================================
@@ -17,7 +17,7 @@
 
 //! World handler
 typedef struct {
-    handler_t h;
+    handler32_t h;
 } world_t;
 
 //! On world create callback
