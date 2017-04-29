@@ -69,7 +69,7 @@ struct module_api_v0 {
 
     //! Init cvars
     //! \param Init cvars
-    void (*init_cvar       )(struct ConfigApiV0);
+    void (*init_cvar       )(struct config_api_v0);
 
     //! Init
     //! \param get_api_fce_t Get engine api

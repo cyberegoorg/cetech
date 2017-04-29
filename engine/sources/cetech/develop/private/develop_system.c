@@ -50,9 +50,9 @@ static struct G {
     float time_accum;
 } _G = {0};
 
-IMPORT_API(MemSysApiV0);
-IMPORT_API(TaskApiV0);
-IMPORT_API(ConfigApiV0);
+IMPORT_API(memory_api_v0);
+IMPORT_API(task_api_v0);
+IMPORT_API(config_api_v0);
 
 static __thread uint8_t _stream_buffer[64 * 1024] = {0};
 static __thread uint32_t _stream_buffer_size = 0;
@@ -74,12 +74,12 @@ static void _flush_stream_buffer() {
 static void _flush_job(void *data) {
     _flush_stream_buffer();
 
-    atomic_store_explicit(&_G.complete_flag[TaskApiV0.worker_id()], 1,
+    atomic_store_explicit(&_G.complete_flag[task_api_v0.worker_id()], 1,
                           memory_order_release);
 }
 
 static void _flush_all_streams() {
-    const int wc = TaskApiV0.worker_count();
+    const int wc = task_api_v0.worker_count();
 
     for (int i = 1; i < wc; ++i) {
         atomic_init(&_G.complete_flag[i], 0);
@@ -98,10 +98,10 @@ static void _flush_all_streams() {
         };
     }
 
-    TaskApiV0.add(items, wc);
+    task_api_v0.add(items, wc);
 
     for (int i = 1; i < wc; ++i) {
-        TaskApiV0.wait_atomic(&_G.complete_flag[i], 0);
+        task_api_v0.wait_atomic(&_G.complete_flag[i], 0);
     }
 }
 
@@ -229,12 +229,12 @@ void _send_events() {
 // Interface
 //==============================================================================
 static void _init(get_api_fce_t get_engine_api) {
-    INIT_API(get_engine_api, MemSysApiV0, MEMORY_API_ID);
-    INIT_API(get_engine_api, TaskApiV0, TASK_API_ID);
-    INIT_API(get_engine_api, ConfigApiV0, CONFIG_API_ID);
+    INIT_API(get_engine_api, memory_api_v0, MEMORY_API_ID);
+    INIT_API(get_engine_api, task_api_v0, TASK_API_ID);
+    INIT_API(get_engine_api, config_api_v0, CONFIG_API_ID);
 
-    MAP_INIT(to_mpack_fce_t, &_G.to_mpack, MemSysApiV0.main_allocator());
-    eventstream_create(&_G.eventstream, MemSysApiV0.main_allocator());
+    MAP_INIT(to_mpack_fce_t, &_G.to_mpack, memory_api_v0.main_allocator());
+    eventstream_create(&_G.eventstream, memory_api_v0.main_allocator());
 
     _register_to_mpack(EVENT_SCOPE, _scopeevent_to_mpack);
     _register_to_mpack(EVENT_RECORD_FLOAT, _recordfloat_to_mpack);
@@ -250,7 +250,7 @@ static void _init(get_api_fce_t get_engine_api) {
                   nn_strerror(errno));
         //return 0;
     }
-    addr = ConfigApiV0.get_string(_G.cv_pub_addr);
+    addr = config_api_v0.get_string(_G.cv_pub_addr);
 
     log_debug(LOG_WHERE, "PUB address: %s", addr);
 
@@ -263,7 +263,7 @@ static void _init(get_api_fce_t get_engine_api) {
     _G.pub_socket = socket;
 }
 
-static void _init_cvar(struct ConfigApiV0 config) {
+static void _init_cvar(struct config_api_v0 config) {
     _G = (struct G) {0};
     _G.cv_pub_addr = config.new_str("develop.pub.addr",
                                     "Console server rpc addr", "ws://*:4447");
@@ -326,7 +326,7 @@ void developsys_leave_scope(struct scope_data scope_data) {
 
     struct scope_event ev = {
             .name = {0},
-            .worker_id = TaskApiV0.worker_id(),
+            .worker_id = task_api_v0.worker_id(),
             .start = scope_data.start,
             .duration =
             ((float) (cel_get_perf_counter() - scope_data.start_timer) /
@@ -356,7 +356,7 @@ void *developsystem_get_module_api(int api) {
         case DEVELOP_SERVER_API_ID:
 
                 {
-                    static struct DevelopSystemApiV0 api = {0};
+                    static struct develop_api_v0 api = {0};
 
                     api.push = _developsys_push;
                     api.push_record_float = developsys_push_record_float;

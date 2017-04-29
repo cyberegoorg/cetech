@@ -51,8 +51,8 @@ struct G {
     stringid64_t type;
 } _G = {0};
 
-IMPORT_API(MemSysApiV0);
-IMPORT_API(ResourceApiV0);
+IMPORT_API(memory_api_v0);
+IMPORT_API(resource_api_v0);
 
 #define material_blob_uniform_bgfx(r)    ((bgfx_uniform_handle_t*) ((material_blob_vec4f_value(r)+((r)->vec4f_count))))
 
@@ -73,19 +73,19 @@ IMPORT_API(ResourceApiV0);
 int material_init(get_api_fce_t get_engine_api) {
     _G = (struct G) {0};
 
-    INIT_API(get_engine_api, MemSysApiV0, MEMORY_API_ID);
-    INIT_API(get_engine_api, ResourceApiV0, RESOURCE_API_ID);
+    INIT_API(get_engine_api, memory_api_v0, MEMORY_API_ID);
+    INIT_API(get_engine_api, resource_api_v0, RESOURCE_API_ID);
 
     _G.type = stringid64_from_string("material");
 
-    _G.material_handler = handlerid_create(MemSysApiV0.main_allocator());
+    _G.material_handler = handlerid_create(memory_api_v0.main_allocator());
 
-    MAP_INIT(uint32_t, &_G.material_instace_map, MemSysApiV0.main_allocator());
-    ARRAY_INIT(uint32_t, &_G.material_instance_offset, MemSysApiV0.main_allocator());
-    ARRAY_INIT(uint8_t, &_G.material_instance_data, MemSysApiV0.main_allocator());
+    MAP_INIT(uint32_t, &_G.material_instace_map, memory_api_v0.main_allocator());
+    ARRAY_INIT(uint32_t, &_G.material_instance_offset, memory_api_v0.main_allocator());
+    ARRAY_INIT(uint8_t, &_G.material_instance_data, memory_api_v0.main_allocator());
 
-    ResourceApiV0.compiler_register(_G.type, _material_resource_compiler);
-    ResourceApiV0.register_type(_G.type, material_resource_callback);
+    resource_api_v0.compiler_register(_G.type, _material_resource_compiler);
+    resource_api_v0.register_type(_G.type, material_resource_callback);
 
     return 1;
 }
@@ -103,7 +103,7 @@ void material_shutdown() {
 static const material_t null_material = {0};
 
 material_t material_create(stringid64_t name) {
-    struct material_blob *resource = ResourceApiV0.get(_G.type, name);
+    struct material_blob *resource = resource_api_v0.get(_G.type, name);
 
     uint32_t size = sizeof(struct material_blob) +
                (resource->uniforms_count * sizeof(char) * 32) +

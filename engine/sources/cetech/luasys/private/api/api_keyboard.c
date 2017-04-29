@@ -6,13 +6,12 @@
 
 #define API_NAME "Keyboard"
 
-static struct KeyboardApiV0 KeyboardApiV0 = {0};
-
+IMPORT_API(keyboard_api_v0);
 
 static int _keyboard_button_index(lua_State *l) {
     const char *name = luasys_to_string(l, 1);
 
-    uint32_t idx = KeyboardApiV0.button_index(name);
+    uint32_t idx = keyboard_api_v0.button_index(name);
     luasys_push_float(l, idx);
 
     return 1;
@@ -21,7 +20,7 @@ static int _keyboard_button_index(lua_State *l) {
 static int _keyboard_button_name(lua_State *l) {
     uint32_t idx = (uint32_t) (luasys_to_float(l, 1));
 
-    luasys_push_string(l, KeyboardApiV0.button_name(idx));
+    luasys_push_string(l, keyboard_api_v0.button_name(idx));
 
     return 1;
 
@@ -30,7 +29,7 @@ static int _keyboard_button_name(lua_State *l) {
 static int _keyboard_button_state(lua_State *l) {
     uint32_t idx = (uint32_t) (luasys_to_float(l, 1));
 
-    luasys_push_bool(l, KeyboardApiV0.button_state(0, idx));
+    luasys_push_bool(l, keyboard_api_v0.button_state(0, idx));
 
     return 1;
 }
@@ -38,7 +37,7 @@ static int _keyboard_button_state(lua_State *l) {
 static int _keyboard_button_pressed(lua_State *l) {
     uint32_t idx = (uint32_t) (luasys_to_float(l, 1));
 
-    luasys_push_bool(l, KeyboardApiV0.button_pressed(0, idx));
+    luasys_push_bool(l, keyboard_api_v0.button_pressed(0, idx));
 
     return 1;
 
@@ -47,7 +46,7 @@ static int _keyboard_button_pressed(lua_State *l) {
 static int _keyboard_button_released(lua_State *l) {
     uint32_t idx = (uint32_t) (luasys_to_float(l, 1));
 
-    luasys_push_bool(l, KeyboardApiV0.button_released(0, idx));
+    luasys_push_bool(l, keyboard_api_v0.button_released(0, idx));
 
     return 1;
 
@@ -55,7 +54,7 @@ static int _keyboard_button_released(lua_State *l) {
 
 
 void _register_lua_keyboard_api(get_api_fce_t get_engine_api) {
-    KeyboardApiV0 = *((struct KeyboardApiV0 *) get_engine_api(KEYBOARD_API_ID));
+    keyboard_api_v0 = *((struct keyboard_api_v0 *) get_engine_api(KEYBOARD_API_ID));
 
     luasys_add_module_function(API_NAME, "button_index",
                                _keyboard_button_index);

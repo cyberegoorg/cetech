@@ -28,19 +28,19 @@ static struct G {
     MAP_T(component_clb_t) component_clb;
 } _G = {0};
 
-IMPORT_API(MemSysApiV0);
-IMPORT_API(WorldApiV0);
+IMPORT_API(memory_api_v0);
+IMPORT_API(world_api_v0);
 
 static void _init(get_api_fce_t get_engine_api) {
-    INIT_API(get_engine_api, MemSysApiV0, MEMORY_API_ID);
-    INIT_API(get_engine_api, WorldApiV0, WORLD_API_ID);
+    INIT_API(get_engine_api, memory_api_v0, MEMORY_API_ID);
+    INIT_API(get_engine_api, world_api_v0, WORLD_API_ID);
 
     _G = (struct G) {0};
 
     MAP_INIT(component_compiler_t, &_G.compiler_map,
-             MemSysApiV0.main_allocator());
-    MAP_INIT(uint32_t, &_G.spawn_order_map, MemSysApiV0.main_allocator());
-    MAP_INIT(component_clb_t, &_G.component_clb, MemSysApiV0.main_allocator());
+             memory_api_v0.main_allocator());
+    MAP_INIT(uint32_t, &_G.spawn_order_map, memory_api_v0.main_allocator());
+    MAP_INIT(component_clb_t, &_G.component_clb, memory_api_v0.main_allocator());
 }
 
 static void _shutdown() {
@@ -90,7 +90,7 @@ void component_register_type(stringid64_t type,
             .on_update = clb.on_world_update,
     };
 
-    WorldApiV0.register_callback(wclb);
+    world_api_v0.register_callback(wclb);
 }
 
 void component_spawn(world_t world,
@@ -140,7 +140,7 @@ void *component_get_module_api(int api) {
 
         case COMPONENT_API_ID:
                 {
-                    static struct ComponentSystemApiV0 api = {0};
+                    static struct component_api_v0 api = {0};
                     api.component_register_compiler = component_register_compiler;
                     api.component_compile = component_compile;
                     api.component_get_spawn_order = component_get_spawn_order;

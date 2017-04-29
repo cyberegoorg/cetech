@@ -19,7 +19,7 @@
 #include <cetech/resource/resource.h>
 
 
-IMPORT_API(ResourceApiV0);
+IMPORT_API(resource_api_v0);
 IMPORT_API(ConsoleServerApiV0);
 
 //==============================================================================
@@ -68,7 +68,7 @@ static int require(lua_State *L) {
     const char *name = lua_tostring(L, 1);
     stringid64_t name_hash = stringid64_from_string(name);
 
-    struct lua_resource *resource = ResourceApiV0.get(_G.type_id, name_hash);
+    struct lua_resource *resource = resource_api_v0.get(_G.type_id, name_hash);
 
     if (resource == NULL) {
         return 0;
@@ -531,7 +531,7 @@ int luasys_execute_string(const char *str) {
 }
 
 void luasys_execute_resource(stringid64_t name) {
-    struct lua_resource *resource = ResourceApiV0.get(_G.type_id, name);
+    struct lua_resource *resource = resource_api_v0.get(_G.type_id, name);
     char *data = (char *) (resource + 1);
 
     luaL_loadbuffer(_G.L, data, resource->size, "<unknown>");
@@ -802,7 +802,7 @@ static void _init(get_api_fce_t get_engine_api) {
     log_debug(LOG_WHERE, "Init");
 
     INIT_API(get_engine_api, ConsoleServerApiV0, CONSOLE_SERVER_API_ID);
-    INIT_API(get_engine_api, ResourceApiV0, RESOURCE_API_ID);
+    INIT_API(get_engine_api, resource_api_v0, RESOURCE_API_ID);
 
     _G.L = luaL_newstate();
     CEL_ASSERT(LOG_WHERE, _G.L != NULL);
@@ -835,8 +835,8 @@ static void _init(get_api_fce_t get_engine_api) {
     ConsoleServerApiV0.consolesrv_register_command("lua_system.execute",
                                                    _cmd_execute_string);
 
-    ResourceApiV0.register_type(_G.type_id, lua_resource_callback);
-    ResourceApiV0.compiler_register(_G.type_id, _lua_compiler);
+    resource_api_v0.register_type(_G.type_id, lua_resource_callback);
+    resource_api_v0.compiler_register(_G.type_id, _lua_compiler);
 }
 
 static void _shutdown() {
@@ -914,7 +914,7 @@ void *luasys_get_module_api(int api) {
 
 
         case LUA_API_ID: {
-            static struct LuaSysApiV0 api = {0};
+            static struct lua_api_v0 api = {0};
 
             //api.get_top = luasys_get_top;
             api.remove = luasys_remove;

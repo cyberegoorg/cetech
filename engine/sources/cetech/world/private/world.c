@@ -28,7 +28,7 @@ static struct G {
     struct handler_gen* world_handler;
 } _G = {0};
 
-IMPORT_API(MemSysApiV0);
+IMPORT_API(memory_api_v0);
 
 //==============================================================================
 // Public interface
@@ -36,11 +36,11 @@ IMPORT_API(MemSysApiV0);
 static void _init(get_api_fce_t get_engine_api) {
     _G = (struct G) {0};
 
-    INIT_API(get_engine_api, MemSysApiV0, MEMORY_API_ID);
+    INIT_API(get_engine_api, memory_api_v0, MEMORY_API_ID);
 
-    ARRAY_INIT(world_callbacks_t, &_G.callbacks, MemSysApiV0.main_allocator());
+    ARRAY_INIT(world_callbacks_t, &_G.callbacks, memory_api_v0.main_allocator());
 
-    _G.world_handler = handlerid_create(MemSysApiV0.main_allocator());
+    _G.world_handler = handlerid_create(memory_api_v0.main_allocator());
 }
 
 static void _shutdown() {
@@ -99,7 +99,7 @@ void *world_get_module_api(int api) {
 
         case WORLD_API_ID:
             {
-                    static struct WorldApiV0 api = {0};
+                    static struct world_api_v0 api = {0};
 
                     api.register_callback = world_register_callback;
                     api.create = world_create;

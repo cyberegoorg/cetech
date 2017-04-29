@@ -84,7 +84,7 @@ struct task_item {
 //==============================================================================
 
 //! Task API V0
-struct TaskApiV0 {
+struct task_api_v0 {
     //! Workers count
     //! \return Workers count
     int (*worker_count)();

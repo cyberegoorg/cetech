@@ -55,11 +55,11 @@ struct G {
     cvar_t cv_external_dir;
 } ResourceCompilerGlobal = {0};
 
-IMPORT_API(MemSysApiV0);
-IMPORT_API(ResourceApiV0);
-IMPORT_API(TaskApiV0);
-IMPORT_API(ConfigApiV0);
-IMPORT_API(ApplicationApiV0);
+IMPORT_API(memory_api_v0);
+IMPORT_API(resource_api_v0);
+IMPORT_API(task_api_v0);
+IMPORT_API(config_api_v0);
+IMPORT_API(app_api_v0);
 
 //CE_STATIC_ASSERT(sizeof(struct compile_task_data) < 64);
 
@@ -74,7 +74,7 @@ void _add_dependency(const char *who_filename,
 
     char path[1024] = {0};
     cel_path_join(path, CEL_ARRAY_LEN(path),
-                  ResourceApiV0.compiler_get_source_dir(), depend_on_filename);
+                  resource_api_v0.compiler_get_source_dir(), depend_on_filename);
 
     builddb_set_file(depend_on_filename, cel_file_mtime(path));
 }
@@ -104,7 +104,7 @@ static void _compile_task(void *data) {
                   "Resource \"%s\" compilation fail", tdata->source_filename);
     }
 
-    CEL_DEALLOCATE(MemSysApiV0.main_scratch_allocator(),
+    CEL_DEALLOCATE(memory_api_v0.main_scratch_allocator(),
                    tdata->source_filename);
     cel_vio_close(tdata->source);
     cel_vio_close(tdata->build);
@@ -129,7 +129,7 @@ void _compile_dir(ARRAY_T(task_item) *tasks,
                   const char *source_dir,
                   const char *build_dir_full) {
 
-    cel_dir_list(source_dir, 1, files, MemSysApiV0.main_scratch_allocator());
+    cel_dir_list(source_dir, 1, files, memory_api_v0.main_scratch_allocator());
 
     for (int i = 0; i < ARRAY_SIZE(files); ++i) {
         const char *source_filename_full = ARRAY_AT(files, i);
@@ -163,7 +163,7 @@ void _compile_dir(ARRAY_T(task_item) *tasks,
 
         struct vio *source_vio = cel_vio_from_file(source_filename_full,
                                                    VIO_OPEN_READ,
-                                                   MemSysApiV0.main_scratch_allocator());
+                                                   memory_api_v0.main_scratch_allocator());
         if (source_vio == NULL) {
             cel_vio_close(source_vio);
             continue;
@@ -174,7 +174,7 @@ void _compile_dir(ARRAY_T(task_item) *tasks,
                       build_name);
 
         struct vio *build_vio = cel_vio_from_file(build_path, VIO_OPEN_WRITE,
-                                                  MemSysApiV0.main_scratch_allocator());
+                                                  memory_api_v0.main_scratch_allocator());
         if (build_vio == NULL) {
             cel_vio_close(build_vio);
             continue;
@@ -182,7 +182,7 @@ void _compile_dir(ARRAY_T(task_item) *tasks,
 
         struct compile_task_data *data =
         CEL_ALLOCATE(
-                MemSysApiV0.main_allocator(), struct compile_task_data, 1);
+                memory_api_v0.main_allocator(), struct compile_task_data, 1);
 
         *data = (struct compile_task_data) {
                 .name = name_id,
@@ -191,7 +191,7 @@ void _compile_dir(ARRAY_T(task_item) *tasks,
                 .source = source_vio,
                 .compilator = compilator,
                 .source_filename = cel_strdup(source_filename_short,
-                                              MemSysApiV0.main_scratch_allocator()),
+                                              memory_api_v0.main_scratch_allocator()),
                 .mtime = cel_file_mtime(source_filename_full),
                 .completed = 0
         };
@@ -205,7 +205,7 @@ void _compile_dir(ARRAY_T(task_item) *tasks,
 
         ARRAY_PUSH_BACK(task_item, tasks, item);
     }
-    cel_dir_list_free(files, MemSysApiV0.main_scratch_allocator());
+    cel_dir_list_free(files, memory_api_v0.main_scratch_allocator());
 }
 
 
@@ -213,8 +213,8 @@ void _compile_dir(ARRAY_T(task_item) *tasks,
 // Interface
 //==============================================================================
 
-static void _init_cvar(struct ConfigApiV0 config) {
-    ConfigApiV0 = config;
+static void _init_cvar(struct config_api_v0 config) {
+    config_api_v0 = config;
 
     _G.cv_source_dir = config.new_str("src", "Resource source dir", "data/src");
     _G.cv_core_dir = config.new_str("core", "Resource application source dir",
@@ -227,15 +227,15 @@ static void _init_cvar(struct ConfigApiV0 config) {
 }
 
 static void _init(get_api_fce_t get_engine_api) {
-    INIT_API(get_engine_api, MemSysApiV0, MEMORY_API_ID);
-    INIT_API(get_engine_api, ResourceApiV0, RESOURCE_API_ID);
-    INIT_API(get_engine_api, TaskApiV0, TASK_API_ID);
-    INIT_API(get_engine_api, ApplicationApiV0, APPLICATION_API_ID);
+    INIT_API(get_engine_api, memory_api_v0, MEMORY_API_ID);
+    INIT_API(get_engine_api, resource_api_v0, RESOURCE_API_ID);
+    INIT_API(get_engine_api, task_api_v0, TASK_API_ID);
+    INIT_API(get_engine_api, app_api_v0, APPLICATION_API_ID);
 
-    const char *build_dir = ConfigApiV0.get_string(_G.cv_build_dir);
+    const char *build_dir = config_api_v0.get_string(_G.cv_build_dir);
     char build_dir_full[1024] = {0};
     cel_path_join(build_dir_full, CEL_ARRAY_LEN(build_dir_full), build_dir,
-                  ApplicationApiV0.platform());
+                  app_api_v0.platform());
 
     cel_dir_make_path(build_dir_full);
     builddb_init_db(build_dir_full);
@@ -267,8 +267,8 @@ void *resourcecompiler_get_module_api(int api) {
 }
 
 
-void resource_compiler_create_build_dir(struct ConfigApiV0 config,
-                                        struct ApplicationApiV0 app) {
+void resource_compiler_create_build_dir(struct config_api_v0 config,
+                                        struct app_api_v0 app) {
     const char *build_dir = config.get_string(_G.cv_build_dir);
     char build_dir_full[1024] = {0};
 
@@ -293,20 +293,20 @@ void resource_compiler_register(stringid64_t type,
 
 
 void resource_compiler_compile_all() {
-    const char *core_dir = ConfigApiV0.get_string(_G.cv_core_dir);
-    const char *build_dir = ConfigApiV0.get_string(_G.cv_build_dir);
-    const char *source_dir = ConfigApiV0.get_string(_G.cv_source_dir);
-    const char *platform = ApplicationApiV0.platform();
+    const char *core_dir = config_api_v0.get_string(_G.cv_core_dir);
+    const char *build_dir = config_api_v0.get_string(_G.cv_build_dir);
+    const char *source_dir = config_api_v0.get_string(_G.cv_source_dir);
+    const char *platform = app_api_v0.platform();
 
     char build_dir_full[1024] = {0};
     cel_path_join(build_dir_full, CEL_ARRAY_LEN(build_dir_full), build_dir,
                   platform);
 
     struct array_pchar files;
-    array_init_pchar(&files, MemSysApiV0.main_scratch_allocator());
+    array_init_pchar(&files, memory_api_v0.main_scratch_allocator());
 
     ARRAY_T(task_item) tasks;
-    ARRAY_INIT(task_item, &tasks, MemSysApiV0.main_allocator());
+    ARRAY_INIT(task_item, &tasks, memory_api_v0.main_allocator());
 
     const char *dirs[] = {source_dir, core_dir};
     for (int i = 0; i < CEL_ARRAY_LEN(dirs); ++i) {
@@ -316,13 +316,13 @@ void resource_compiler_compile_all() {
 
     array_destroy_pchar(&files);
 
-    TaskApiV0.add(tasks.data, tasks.size);
+    task_api_v0.add(tasks.data, tasks.size);
 
     for (int i = 0; i < ARRAY_SIZE(&tasks); ++i) {
         struct compile_task_data *data = ARRAY_AT(&tasks, i).data;
 
-        TaskApiV0.wait_atomic(&data->completed, 0);
-        CEL_DEALLOCATE(MemSysApiV0.main_allocator(), data);
+        task_api_v0.wait_atomic(&data->completed, 0);
+        CEL_DEALLOCATE(memory_api_v0.main_allocator(), data);
     }
 
     ARRAY_DESTROY(task_item, &tasks);
@@ -333,24 +333,24 @@ int resource_compiler_get_filename(char *filename,
                                    stringid64_t type,
                                    stringid64_t name) {
     char build_name[33] = {0};
-    ResourceApiV0.type_name_string(build_name, CEL_ARRAY_LEN(build_name), type,
+    resource_api_v0.type_name_string(build_name, CEL_ARRAY_LEN(build_name), type,
                                    name);
     return builddb_get_filename_by_hash(filename, max_ken, build_name);
 }
 
 const char *resource_compiler_get_source_dir() {
-    return ConfigApiV0.get_string(_G.cv_source_dir);
+    return config_api_v0.get_string(_G.cv_source_dir);
 }
 
 const char *resource_compiler_get_core_dir() {
-    return ConfigApiV0.get_string(_G.cv_core_dir);
+    return config_api_v0.get_string(_G.cv_core_dir);
 }
 
 
 int resource_compiler_get_build_dir(char *build_dir,
                                     size_t max_len,
                                     const char *platform) {
-    const char *build_dir_str = ConfigApiV0.get_string(_G.cv_build_dir);
+    const char *build_dir_str = config_api_v0.get_string(_G.cv_build_dir);
     return cel_path_join(build_dir, max_len, build_dir_str, platform);
 }
 
@@ -370,9 +370,9 @@ int resource_compiler_external_join(char *output,
     char tmp_dir[1024] = {0};
     char tmp_dir2[1024] = {0};
 
-    const char *external_dir_str = ConfigApiV0.get_string(_G.cv_external_dir);
+    const char *external_dir_str = config_api_v0.get_string(_G.cv_external_dir);
     cel_path_join(tmp_dir, CEL_ARRAY_LEN(tmp_dir), external_dir_str,
-                  ApplicationApiV0.native_platform());
+                  app_api_v0.native_platform());
     strncat(tmp_dir, "64", CEL_ARRAY_LEN(tmp_dir));
     cel_path_join(tmp_dir2, CEL_ARRAY_LEN(tmp_dir2), tmp_dir, "release/bin");
 

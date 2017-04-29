@@ -69,7 +69,7 @@ static struct component_clb {
 //==============================================================================
 
 //! Component system API V0
-struct ComponentSystemApiV0 {
+struct component_api_v0 {
     //! Register component compiler
     //! \param type Component type
     //! \param compiler Compiler fce

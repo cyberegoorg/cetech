@@ -36,7 +36,7 @@ MAP_PROTOTYPE(entity_t);
 //==============================================================================
 
 //! Entity system API V0
-struct EntitySystemApiV0 {
+struct entity_api_v0 {
     //! Create new entity
     //! \return New entity
     entity_t (*entity_manager_create)();

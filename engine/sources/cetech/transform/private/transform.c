@@ -46,7 +46,7 @@ static struct G {
     MAP_T(world_data_t) world;
 } _G = {0};
 
-IMPORT_API(MemSysApiV0);
+IMPORT_API(memory_api_v0);
 
 int transform_is_valid(transform_t transform);
 
@@ -105,16 +105,16 @@ void transform_link(world_t world,
 static void _new_world(world_t world) {
     world_data_t data = {0};
 
-    MAP_INIT(uint32_t, &data.ent_idx_map, MemSysApiV0.main_allocator());
+    MAP_INIT(uint32_t, &data.ent_idx_map, memory_api_v0.main_allocator());
 
-    ARRAY_INIT(uint32_t, &data.first_child, MemSysApiV0.main_allocator());
-    ARRAY_INIT(uint32_t, &data.next_sibling, MemSysApiV0.main_allocator());
-    ARRAY_INIT(uint32_t, &data.parent, MemSysApiV0.main_allocator());
+    ARRAY_INIT(uint32_t, &data.first_child, memory_api_v0.main_allocator());
+    ARRAY_INIT(uint32_t, &data.next_sibling, memory_api_v0.main_allocator());
+    ARRAY_INIT(uint32_t, &data.parent, memory_api_v0.main_allocator());
 
-    ARRAY_INIT(cel_vec3f_t, &data.position, MemSysApiV0.main_allocator());
-    ARRAY_INIT(cel_quatf_t, &data.rotation, MemSysApiV0.main_allocator());
-    ARRAY_INIT(cel_vec3f_t, &data.scale, MemSysApiV0.main_allocator());
-    ARRAY_INIT(cel_mat44f_t, &data.world_matrix, MemSysApiV0.main_allocator());
+    ARRAY_INIT(cel_vec3f_t, &data.position, memory_api_v0.main_allocator());
+    ARRAY_INIT(cel_quatf_t, &data.rotation, memory_api_v0.main_allocator());
+    ARRAY_INIT(cel_vec3f_t, &data.scale, memory_api_v0.main_allocator());
+    ARRAY_INIT(cel_mat44f_t, &data.world_matrix, memory_api_v0.main_allocator());
 
     MAP_SET(world_data_t, &_G.world, world.h.h, data);
 }
@@ -212,22 +212,22 @@ static void _spawner(world_t world,
     }
 }
 
-IMPORT_API(ComponentSystemApiV0);
+IMPORT_API(component_api_v0);
 
 static void _init(get_api_fce_t get_engine_api) {
-    INIT_API(get_engine_api, ComponentSystemApiV0, COMPONENT_API_ID);
-    INIT_API(get_engine_api, MemSysApiV0, MEMORY_API_ID);
+    INIT_API(get_engine_api, component_api_v0, COMPONENT_API_ID);
+    INIT_API(get_engine_api, memory_api_v0, MEMORY_API_ID);
 
     _G = (struct G) {0};
 
-    MAP_INIT(world_data_t, &_G.world, MemSysApiV0.main_allocator());
+    MAP_INIT(world_data_t, &_G.world, memory_api_v0.main_allocator());
 
     _G.type = stringid64_from_string("transform");
 
-    ComponentSystemApiV0.component_register_compiler(_G.type,
+    component_api_v0.component_register_compiler(_G.type,
                                                   _transform_component_compiler,
                                                   10);
-    ComponentSystemApiV0.component_register_type(_G.type, (struct component_clb) {
+    component_api_v0.component_register_type(_G.type, (struct component_clb) {
             .spawner=_spawner, .destroyer=_destroyer,
             .on_world_create=_on_world_create, .on_world_destroy=_on_world_destroy
     });
@@ -475,7 +475,7 @@ void *transform_get_module_api(int api) {
 
         case TRANSFORM_API_ID:
                  {
-                    static struct TransformApiV0 api = {0};
+                    static struct transform_api_v0 api = {0};
 
                     api.is_valid = transform_is_valid;
                     api.transform = transform_transform;

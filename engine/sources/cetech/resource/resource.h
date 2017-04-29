@@ -98,7 +98,7 @@ struct compilator_api {
 //==============================================================================
 
 //! Resource API V0
-struct ResourceApiV0 {
+struct resource_api_v0 {
     //! Enable autoload feature
     //! \param enable Enable
     void (*set_autoload)(int enable);
@@ -243,8 +243,8 @@ struct ResourceApiV0 {
     //! Create build dir
     //! \param config Config API
     //! \param app Application API
-    void (*compiler_create_build_dir)(struct ConfigApiV0 config,
-                                      struct ApplicationApiV0 app);
+    void (*compiler_create_build_dir)(struct config_api_v0 config,
+                                      struct app_api_v0 app);
 
     //! Get core dir
     //! \return Core dir
@@ -256,7 +256,7 @@ struct ResourceApiV0 {
 };
 
 //! Package API V!
-struct PackageApiV0 {
+struct package_api_v0 {
     //! Load package
     //! \param name Package name
     void (*load)(stringid64_t name);

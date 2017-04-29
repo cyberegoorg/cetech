@@ -41,23 +41,23 @@ static struct G {
     MAP_T(world_data_t) world;
 } _G = {0};
 
-IMPORT_API(MemSysApiV0);
-IMPORT_API(WorldApiV0);
+IMPORT_API(memory_api_v0);
+IMPORT_API(world_api_v0);
 
 static void _new_world(world_t world) {
     world_data_t data = {0};
 
-    MAP_INIT(uint32_t, &data.ent_idx_map, MemSysApiV0.main_allocator());
+    MAP_INIT(uint32_t, &data.ent_idx_map, memory_api_v0.main_allocator());
 
-    ARRAY_INIT(uint32_t, &data.first_child, MemSysApiV0.main_allocator());
-    ARRAY_INIT(uint32_t, &data.next_sibling, MemSysApiV0.main_allocator());
-    ARRAY_INIT(uint32_t, &data.parent, MemSysApiV0.main_allocator());
+    ARRAY_INIT(uint32_t, &data.first_child, memory_api_v0.main_allocator());
+    ARRAY_INIT(uint32_t, &data.next_sibling, memory_api_v0.main_allocator());
+    ARRAY_INIT(uint32_t, &data.parent, memory_api_v0.main_allocator());
 
-    ARRAY_INIT(stringid64_t, &data.name, MemSysApiV0.main_allocator());
-    ARRAY_INIT(cel_vec3f_t, &data.position, MemSysApiV0.main_allocator());
-    ARRAY_INIT(cel_quatf_t, &data.rotation, MemSysApiV0.main_allocator());
-    ARRAY_INIT(cel_vec3f_t, &data.scale, MemSysApiV0.main_allocator());
-    ARRAY_INIT(cel_mat44f_t, &data.world_matrix, MemSysApiV0.main_allocator());
+    ARRAY_INIT(stringid64_t, &data.name, memory_api_v0.main_allocator());
+    ARRAY_INIT(cel_vec3f_t, &data.position, memory_api_v0.main_allocator());
+    ARRAY_INIT(cel_quatf_t, &data.rotation, memory_api_v0.main_allocator());
+    ARRAY_INIT(cel_vec3f_t, &data.scale, memory_api_v0.main_allocator());
+    ARRAY_INIT(cel_mat44f_t, &data.world_matrix, memory_api_v0.main_allocator());
 
     MAP_SET(world_data_t, &_G.world, world.h.h, data);
 }
@@ -92,15 +92,15 @@ static void _on_world_destroy(world_t world) {
 
 
 static void _init(get_api_fce_t get_engine_api) {
-    INIT_API(get_engine_api, MemSysApiV0, MEMORY_API_ID);
-    INIT_API(get_engine_api, WorldApiV0, WORLD_API_ID);
+    INIT_API(get_engine_api, memory_api_v0, MEMORY_API_ID);
+    INIT_API(get_engine_api, world_api_v0, WORLD_API_ID);
 
     _G = (struct G) {0};
 
 
-    MAP_INIT(world_data_t, &_G.world, MemSysApiV0.main_allocator());
+    MAP_INIT(world_data_t, &_G.world, memory_api_v0.main_allocator());
 
-    WorldApiV0.register_callback(
+    world_api_v0.register_callback(
             (world_callbacks_t) {.on_created=_on_world_create, .on_destroy=_on_world_destroy});
 
 }
@@ -261,7 +261,7 @@ scene_node_t scenegraph_create(world_t world,
                                uint32_t count) {
     world_data_t *data = _get_world_data(world);
 
-    scene_node_t *nodes = CEL_ALLOCATE(MemSysApiV0.main_allocator(),
+    scene_node_t *nodes = CEL_ALLOCATE(memory_api_v0.main_allocator(),
                                        scene_node_t, count);
 
     for (int i = 0; i < count; ++i) {
@@ -313,7 +313,7 @@ scene_node_t scenegraph_create(world_t world,
 
     scene_node_t root = nodes[0];
     MAP_SET(uint32_t, &data->ent_idx_map, entity.h.h, root.idx);
-    CEL_DEALLOCATE(MemSysApiV0.main_allocator(), nodes);
+    CEL_DEALLOCATE(memory_api_v0.main_allocator(), nodes);
     return root;
 }
 
@@ -385,7 +385,7 @@ void *scenegraph_get_module_api(int api) {
 
         case SCENEGRAPH_API_ID:
 {
-                    static struct SceneGprahApiV0 api = {0};
+                    static struct scenegprah_api_v0 api = {0};
 
                     //api.scenegraph_transform = scenegraph_transform;
                     api.is_valid = scenegraph_is_valid;

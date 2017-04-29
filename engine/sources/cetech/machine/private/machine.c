@@ -132,7 +132,7 @@ void *machine_get_module_api(int api) {
         return &module;
 
     } else if (api == MACHINE_API_ID) {
-        static struct MachineApiV0 api_v1 = {
+        static struct machine_api_v0 api_v1 = {
                 .event_begin = machine_event_begin,
                 .event_end = machine_event_end,
                 .event_next = machine_event_next,

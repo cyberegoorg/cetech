@@ -27,12 +27,12 @@ static void _preprocess(const char *filename,
         capi->add_dependency(filename, prefab_file);
 
         char full_path[256] = {0};
-        const char *source_dir = ResourceApiV0.compiler_get_source_dir();
+        const char *source_dir = resource_api_v0.compiler_get_source_dir();
         cel_path_join(full_path, CEL_ARRAY_LEN(full_path), source_dir,
                       prefab_file);
 
         struct vio *prefab_vio = cel_vio_from_file(full_path, VIO_OPEN_READ,
-                                                   MemSysApiV0.main_allocator());
+                                                   memory_api_v0.main_allocator());
 
         char prefab_data[cel_vio_size(prefab_vio) + 1];
         memory_set(prefab_data, 0, cel_vio_size(prefab_vio) + 1);
@@ -124,7 +124,7 @@ static int _material_resource_compiler(const char *filename,
                                        struct vio *build_vio,
                                        struct compilator_api *compilator_api) {
     char *source_data =
-    CEL_ALLOCATE(MemSysApiV0.main_allocator(), char,
+    CEL_ALLOCATE(memory_api_v0.main_allocator(), char,
                  cel_vio_size(source_vio) + 1);
     memory_set(source_data, 0, cel_vio_size(source_vio) + 1);
 
@@ -143,8 +143,8 @@ static int _material_resource_compiler(const char *filename,
     yaml_as_string(shader_node, tmp_buffer, CEL_ARRAY_LEN(tmp_buffer));
 
     struct material_compile_output output = {0};
-    ARRAY_INIT(char, &output.uniform_names, MemSysApiV0.main_allocator());
-    ARRAY_INIT(uint8_t, &output.data, MemSysApiV0.main_allocator());
+    ARRAY_INIT(char, &output.uniform_names, memory_api_v0.main_allocator());
+    ARRAY_INIT(uint8_t, &output.data, memory_api_v0.main_allocator());
 
     yaml_node_t textures = yaml_get_node(root, "textures");
     if (yaml_is_valid(textures)) {
@@ -182,7 +182,7 @@ static int _material_resource_compiler(const char *filename,
 
     ARRAY_DESTROY(char, &output.uniform_names);
     ARRAY_DESTROY(uint8_t, &output.data);
-    CEL_DEALLOCATE(MemSysApiV0.main_allocator(), source_data);
+    CEL_DEALLOCATE(memory_api_v0.main_allocator(), source_data);
     return 1;
 }
 

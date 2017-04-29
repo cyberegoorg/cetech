@@ -30,7 +30,7 @@ typedef struct {
 //==============================================================================
 
 //! Material API V0
-struct MaterialApiV0 {
+struct material_api_v0 {
 
     //! Create new material
     //! \param name Material resource name
@@ -96,7 +96,7 @@ typedef struct {
 //==============================================================================
 
 //! Mesh API V0
-struct MeshRendererApiV0 {
+struct mesh_renderer_api_v0 {
 
     //! Is mesh valid
     //! \param mesh Mesh

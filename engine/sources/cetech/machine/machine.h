@@ -407,7 +407,7 @@ struct gamepad_device_event {
 //==============================================================================
 
 //! Machine API V0
-struct MachineApiV0 {
+struct machine_api_v0 {
 
     //! Get eventstream begin
     //! \return Begin

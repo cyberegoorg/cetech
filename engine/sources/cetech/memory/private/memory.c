@@ -92,7 +92,7 @@ void *memsys_get_module_api(int api) {
 
         case MEMORY_API_ID:
                 {
-                    static struct MemSysApiV0 api = {0};
+                    static struct memory_api_v0 api = {0};
 
                     api.main_allocator = _memsys_main_allocator;
                     api.main_scratch_allocator = _memsys_main_scratch_allocator;

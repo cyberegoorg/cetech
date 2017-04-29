@@ -28,9 +28,9 @@ static struct G {
     stringid64_t type;
 } _G = {0};
 
-IMPORT_API(MemSysApiV0);
-IMPORT_API(ComponentSystemApiV0);
-IMPORT_API(ResourceApiV0);
+IMPORT_API(memory_api_v0);
+IMPORT_API(component_api_v0);
+IMPORT_API(resource_api_v0);
 
 uint32_t _new_spawned_array() {
     uint32_t idx = ARRAY_SIZE(&_G.spawned_array);
@@ -39,7 +39,7 @@ uint32_t _new_spawned_array() {
                     (struct array_entity_t) {0});
     ARRAY_T(entity_t) *array = &ARRAY_AT(&_G.spawned_array, idx);
 
-    ARRAY_INIT(entity_t, array, MemSysApiV0.main_allocator());
+    ARRAY_INIT(entity_t, array, memory_api_v0.main_allocator());
     return idx;
 }
 
@@ -85,12 +85,12 @@ static void preprocess(const char *filename,
         capi->add_dependency(filename, prefab_file);
 
         char full_path[256] = {0};
-        const char *source_dir = ResourceApiV0.compiler_get_source_dir();
+        const char *source_dir = resource_api_v0.compiler_get_source_dir();
         cel_path_join(full_path, CEL_ARRAY_LEN(full_path), source_dir,
                       prefab_file);
 
         struct vio *prefab_vio = cel_vio_from_file(full_path, VIO_OPEN_READ,
-                                                   MemSysApiV0.main_allocator());
+                                                   memory_api_v0.main_allocator());
 
         char prefab_data[cel_vio_size(prefab_vio) + 1];
         memory_set(prefab_data, 0, cel_vio_size(prefab_vio) + 1);
@@ -180,14 +180,14 @@ void foreach_components_clb(yaml_node_t key,
         ARRAY_PUSH_BACK(uint64_t, &output->component_type, cid.id);
 
         ARRAY_T(uint32_t) tmp_a = {0};
-        ARRAY_INIT(uint32_t, &tmp_a, MemSysApiV0.main_allocator());
+        ARRAY_INIT(uint32_t, &tmp_a, memory_api_v0.main_allocator());
 
         MAP_SET(array_uint32_t, &output->component_ent, cid.id, tmp_a);
     }
 
     if (!MAP_HAS(array_yaml_node_t, &output->component_body, cid.id)) {
         ARRAY_T(yaml_node_t) tmp_a = {0};
-        ARRAY_INIT(yaml_node_t, &tmp_a, MemSysApiV0.main_allocator());
+        ARRAY_INIT(yaml_node_t, &tmp_a, memory_api_v0.main_allocator());
 
         MAP_SET(array_yaml_node_t, &output->component_body, cid.id, tmp_a);
 
@@ -257,7 +257,7 @@ struct component_data {
 #define component_data_data(cd) ((char*)((component_data_ent(cd) + ((cd)->ent_count))))
 
 struct entity_compile_output *entity_compiler_create_output() {
-    struct cel_allocator *a = MemSysApiV0.main_allocator();
+    struct cel_allocator *a = memory_api_v0.main_allocator();
 
     struct entity_compile_output *output =
     CEL_ALLOCATE(a,
@@ -298,7 +298,7 @@ void entity_compiler_destroy_output(struct entity_compile_output *output) {
     }
     MAP_DESTROY(array_yaml_node_t, &output->component_body);
 
-    struct cel_allocator *a = MemSysApiV0.main_allocator();
+    struct cel_allocator *a = memory_api_v0.main_allocator();
     CEL_DEALLOCATE(a, output);
 }
 
@@ -349,10 +349,10 @@ void entity_compiler_write_to_build(struct entity_compile_output *output,
         ARRAY_T(yaml_node_t) *body = MAP_GET_PTR(array_yaml_node_t,
                                                  &output->component_body, cid);
         ARRAY_T(uint8_t) comp_data = {0};
-        ARRAY_INIT(uint8_t, &comp_data, MemSysApiV0.main_allocator());
+        ARRAY_INIT(uint8_t, &comp_data, memory_api_v0.main_allocator());
 
         for (int i = 0; i < cdata.ent_count; ++i) {
-            ComponentSystemApiV0.component_compile(id, ARRAY_AT(body, i),
+            component_api_v0.component_compile(id, ARRAY_AT(body, i),
                                                    &comp_data);
         }
 
@@ -392,7 +392,7 @@ int _entity_resource_compiler(const char *filename,
     yaml_node_t root = yaml_load_str(source_data, &h);
 
     ARRAY_T(uint8_t) entity_data;
-    ARRAY_INIT(uint8_t, &entity_data, MemSysApiV0.main_allocator());
+    ARRAY_INIT(uint8_t, &entity_data, memory_api_v0.main_allocator());
 
     entity_resource_compiler(root, filename, &entity_data, compilator_api);
 
@@ -454,22 +454,22 @@ static const resource_callbacks_t entity_resource_callback = {
 
 
 static void _init(get_api_fce_t get_engine_api) {
-    INIT_API(get_engine_api, MemSysApiV0, MEMORY_API_ID);
-    INIT_API(get_engine_api, ComponentSystemApiV0, COMPONENT_API_ID);
-    INIT_API(get_engine_api, MemSysApiV0, MEMORY_API_ID);
-    INIT_API(get_engine_api, ResourceApiV0, RESOURCE_API_ID);
+    INIT_API(get_engine_api, memory_api_v0, MEMORY_API_ID);
+    INIT_API(get_engine_api, component_api_v0, COMPONENT_API_ID);
+    INIT_API(get_engine_api, memory_api_v0, MEMORY_API_ID);
+    INIT_API(get_engine_api, resource_api_v0, RESOURCE_API_ID);
 
     _G = (struct G) {0};
 
     _G.type = stringid64_from_string("entity");
 
-    MAP_INIT(uint32_t, &_G.spawned_map, MemSysApiV0.main_allocator());
-    ARRAY_INIT(array_entity_t, &_G.spawned_array, MemSysApiV0.main_allocator());
+    MAP_INIT(uint32_t, &_G.spawned_map, memory_api_v0.main_allocator());
+    ARRAY_INIT(array_entity_t, &_G.spawned_array, memory_api_v0.main_allocator());
 
-    ResourceApiV0.register_type(_G.type, entity_resource_callback);
-    ResourceApiV0.compiler_register(_G.type, _entity_resource_compiler);
+    resource_api_v0.register_type(_G.type, entity_resource_callback);
+    resource_api_v0.compiler_register(_G.type, _entity_resource_compiler);
 
-    _G.entity_handler = handlerid_create(MemSysApiV0.main_allocator());
+    _G.entity_handler = handlerid_create(memory_api_v0.main_allocator());
 }
 
 static void _shutdown() {
@@ -520,7 +520,7 @@ ARRAY_T(entity_t) *entity_spawn_from_resource(world_t world,
 
         uint32_t *c_ent = component_data_ent(comp_data);
         char *c_data = component_data_data(comp_data);
-        ComponentSystemApiV0.component_spawn(world, type, &ARRAY_AT(spawned, 0),
+        component_api_v0.component_spawn(world, type, &ARRAY_AT(spawned, 0),
                                              c_ent, parents, comp_data->ent_count,
                                              c_data);
 
@@ -534,7 +534,7 @@ ARRAY_T(entity_t) *entity_spawn_from_resource(world_t world,
 
 entity_t entity_spawn(world_t world,
                     stringid64_t name) {
-    void *res = ResourceApiV0.get(_G.type, name);
+    void *res = resource_api_v0.get(_G.type, name);
 
     if (res == NULL) {
         log_error("entity", "Could not spawn entity.");
@@ -553,7 +553,7 @@ void entity_destroy(world_t world,
     for (int i = 0; i < count; ++i) {
         ARRAY_T(entity_t) *spawned = _get_spawned_array(entity[i]);
 
-        ComponentSystemApiV0.component_destroy(world, spawned->data,
+        component_api_v0.component_destroy(world, spawned->data,
                                                spawned->size);
 
         _destroy_spawned_array(entity[i]);
@@ -576,7 +576,7 @@ void *entity_get_module_api(int api) {
 
         case ENTITY_API_ID:
                 {
-                    static struct EntitySystemApiV0 api = {0};
+                    static struct entity_api_v0 api = {0};
 
                     api.entity_manager_create = entity_manager_create;
                     api.entity_manager_destroy = entity_manager_destroy;

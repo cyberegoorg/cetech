@@ -7,30 +7,30 @@
 
 #define API_NAME "World"
 
-static struct WorldApiV0 WorldApiV0;
+IMPORT_API(world_api_v0);
 
 static int _world_create(lua_State *l) {
-    world_t world = WorldApiV0.create();
+    world_t world = world_api_v0.create();
     luasys_push_handler(l, world.h);
     return 1;
 }
 
 static int _world_destroy(lua_State *l) {
     world_t world = {.h = luasys_to_handler(l, 1)};
-    WorldApiV0.destroy(world);
+    world_api_v0.destroy(world);
     return 0;
 }
 
 static int _world_update(lua_State *l) {
     world_t world = {.h = luasys_to_handler(l, 1)};
     float dt = luasys_to_float(l, 2);
-    WorldApiV0.update(world, dt);
+    world_api_v0.update(world, dt);
     return 0;
 }
 
 
 void _register_lua_world_api(get_api_fce_t get_engine_api) {
-    WorldApiV0 = *((struct WorldApiV0 *) get_engine_api(WORLD_API_ID));
+    world_api_v0 = *((struct world_api_v0 *) get_engine_api(WORLD_API_ID));
 
 
     luasys_add_module_function(API_NAME, "create", _world_create);

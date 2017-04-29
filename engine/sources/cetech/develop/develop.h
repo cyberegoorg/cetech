@@ -90,7 +90,7 @@ struct scope_data {
 //==============================================================================
 
 //! Develop system API V0
-struct DevelopSystemApiV0 {
+struct develop_api_v0 {
 
     //! Push event
     //! \param header Header

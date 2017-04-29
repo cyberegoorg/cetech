@@ -37,7 +37,7 @@ struct cel_allocator *_memsys_main_scratch_allocator();
 //==============================================================================
 
 //! Memory system API V0
-struct MemSysApiV0 {
+struct memory_api_v0 {
     //! Main allcator
     //! \return Main alocator
     struct cel_allocator *(*main_allocator)();

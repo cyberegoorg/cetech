@@ -47,7 +47,7 @@ typedef struct {
 //==============================================================================
 
 //! World API V0
-struct WorldApiV0 {
+struct world_api_v0 {
 
     //! Register world calbacks
     //! \param clb Callbacks

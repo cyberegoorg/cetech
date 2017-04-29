@@ -29,10 +29,10 @@ typedef struct {
 
 } world_data_t;
 
-IMPORT_API(MemSysApiV0);
-IMPORT_API(ComponentSystemApiV0);
+IMPORT_API(memory_api_v0);
+IMPORT_API(component_api_v0);
 IMPORT_API(RendererApiV0);
-IMPORT_API(TransformApiV0);
+IMPORT_API(transform_api_v0);
 
 ARRAY_PROTOTYPE(world_data_t)
 
@@ -49,12 +49,12 @@ static struct G {
 static void _new_world(world_t world) {
     world_data_t data = {0};
 
-    MAP_INIT(uint32_t, &data.ent_idx_map, MemSysApiV0.main_allocator());
+    MAP_INIT(uint32_t, &data.ent_idx_map, memory_api_v0.main_allocator());
 
-    ARRAY_INIT(entity_t, &data.entity, MemSysApiV0.main_allocator());
-    ARRAY_INIT(float, &data.near, MemSysApiV0.main_allocator());
-    ARRAY_INIT(float, &data.far, MemSysApiV0.main_allocator());
-    ARRAY_INIT(float, &data.fov, MemSysApiV0.main_allocator());
+    ARRAY_INIT(entity_t, &data.entity, memory_api_v0.main_allocator());
+    ARRAY_INIT(float, &data.near, memory_api_v0.main_allocator());
+    ARRAY_INIT(float, &data.far, memory_api_v0.main_allocator());
+    ARRAY_INIT(float, &data.fov, memory_api_v0.main_allocator());
 
     MAP_SET(world_data_t, &_G.world, world.h.h, data);
 }
@@ -135,21 +135,21 @@ void _spawner(world_t world,
 
 
 static void _init(get_api_fce_t get_engine_api) {
-    INIT_API(get_engine_api, MemSysApiV0, MEMORY_API_ID);
-    INIT_API(get_engine_api, ComponentSystemApiV0, COMPONENT_API_ID);
+    INIT_API(get_engine_api, memory_api_v0, MEMORY_API_ID);
+    INIT_API(get_engine_api, component_api_v0, COMPONENT_API_ID);
     INIT_API(get_engine_api, RendererApiV0, RENDERER_API_ID);
-    INIT_API(get_engine_api, TransformApiV0, TRANSFORM_API_ID);
+    INIT_API(get_engine_api, transform_api_v0, TRANSFORM_API_ID);
 
     _G = (struct G) {0};
 
-    MAP_INIT(world_data_t, &_G.world, MemSysApiV0.main_allocator());
+    MAP_INIT(world_data_t, &_G.world, memory_api_v0.main_allocator());
 
     _G.type = stringid64_from_string("camera");
 
-    ComponentSystemApiV0.component_register_compiler(_G.type,
+    component_api_v0.component_register_compiler(_G.type,
                                                   _camera_component_compiler,
                                                   10);
-    ComponentSystemApiV0.component_register_type(_G.type, (struct component_clb) {
+    component_api_v0.component_register_type(_G.type, (struct component_clb) {
             .spawner=_spawner, .destroyer=_destroyer,
             .on_world_create=_on_world_create, .on_world_destroy=_on_world_destroy
     });
@@ -176,7 +176,7 @@ void camera_get_project_view(world_t world,
 
     cel_vec2f_t size = RendererApiV0.get_size(); // TODO, to arg... or viewport?
     entity_t e = ARRAY_AT(&world_data->entity, camera.idx);
-    transform_t t = TransformApiV0.get(world, e);
+    transform_t t = transform_api_v0.get(world, e);
 
     float fov = ARRAY_AT(&world_data->fov, camera.idx);
     float near = ARRAY_AT(&world_data->near, camera.idx);
@@ -184,7 +184,7 @@ void camera_get_project_view(world_t world,
 
     cel_mat44f_set_perspective_fov(proj, fov, size.x / size.y, near, far);
 
-    cel_mat44f_t *w = TransformApiV0.get_world_matrix(world, t);
+    cel_mat44f_t *w = transform_api_v0.get_world_matrix(world, t);
     cel_mat44f_inverse(view, w);
 }
 
@@ -237,7 +237,7 @@ void *camera_get_module_api(int api) {
 
         case CAMERA_API_ID:
              {
-                    static struct CameraApiV0 api = {0};
+                    static struct camera_api_v0 api = {0};
 
                     api.is_valid = camera_is_valid;
                     api.get_project_view = camera_get_project_view;

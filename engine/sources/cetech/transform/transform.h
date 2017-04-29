@@ -26,7 +26,7 @@ typedef struct {
 //==============================================================================
 
 //! Transform API V0
-struct TransformApiV0 {
+struct transform_api_v0 {
     //! Is transform valid?
     //! \param transform transform
     //! \return 1 if is oK else 0

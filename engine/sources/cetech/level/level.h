@@ -28,7 +28,7 @@ typedef struct {
 //==============================================================================
 
 //! Level API V0
-struct LevelApiV0 {
+struct level_api_v0 {
 
     //! Load level from resource
     //! \param world World

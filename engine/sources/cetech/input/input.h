@@ -16,7 +16,7 @@
 //==============================================================================
 
 //! Gamepad API V0
-struct GamepadApiV0 {
+struct gamepad_api_v0 {
     //! Is gamepad active?
     //! \param gamepad Gamepad
     //! \return 1 if active else 0
@@ -80,7 +80,7 @@ struct GamepadApiV0 {
 //==============================================================================
 
 //! Keyboard API V0
-struct KeyboardApiV0 {
+struct keyboard_api_v0 {
     //! Return button index
     //! \param button_name Button name
     //! \return Button index
@@ -115,7 +115,7 @@ struct KeyboardApiV0 {
 //==============================================================================
 
 //! Mouse API V0
-struct MouseApiV0 {
+struct mouse_api_v0 {
     //! Return button index
     //! \param button_name Button name
     //! \return Button index
