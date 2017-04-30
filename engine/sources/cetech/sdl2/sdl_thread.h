@@ -2,7 +2,7 @@
 
 #include "include/SDL2/SDL.h"
 
-#if defined(CELIB_LINUX)
+#if defined(CETECH_LINUX)
 
 #include <unistd.h>
 #include <sched.h>
@@ -50,9 +50,9 @@ uint64_t thread_actual_id() {
 }
 
 void thread_yield() {
-#if defined(CELIB_DARWIN)
+#if defined(CETECH_DARWIN)
     sched_yield();
-#elif defined(CELIB_LINUX)
+#elif defined(CETECH_LINUX)
     sched_yield();
 #endif
 }

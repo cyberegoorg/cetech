@@ -4,7 +4,7 @@
 
 #include <stdio.h>
 
-#if defined(CELIB_LINUX)
+#if defined(CETECH_LINUX)
 
 #include <sys/file.h>
 
@@ -38,7 +38,7 @@
     "msg: |\n  %s\n"
 
 
-#ifdef CELIB_COLORED_LOG
+#ifdef CETECH_COLORED_LOG
 #define COLORED_TEXT(color, text) FBLACK color text NONE
 #else
 #define COLORED_TEXT(color, text) text
@@ -89,7 +89,7 @@ void log_stdout_handler(enum log_level level,
     struct tm *gmtm = gmtime(&time);
     const char *time_str = _time_to_str(gmtm);
 
-#if defined(CELIB_LINUX)
+#if defined(CETECH_LINUX)
     flock(out->_fileno, LOCK_EX);
 #endif
 
@@ -98,7 +98,7 @@ void log_stdout_handler(enum log_level level,
 
     fflush_unlocked(out);
 
-#if defined(CELIB_LINUX)
+#if defined(CETECH_LINUX)
     flock(out->_fileno, LOCK_UN);
 #endif
 }

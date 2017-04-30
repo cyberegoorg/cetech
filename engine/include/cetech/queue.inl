@@ -3,8 +3,8 @@
 // git+web: https://bitbucket.org/bitsquid/foundation
 //==============================================================================
 
-#ifndef CELIB_QUEUE_H
-#define CELIB_QUEUE_H
+#ifndef CETECH_QUEUE_H
+#define CETECH_QUEUE_H
 
 #include <memory.h>
 #include "array.inl"
@@ -45,8 +45,8 @@
     };                                                                                                      \
     static inline void queue_init_##N(QUEUE_T(N) *q,                                                        \
                                       struct allocator* allocator) {                                        \
-        CEL_ASSERT("queue_"#T, q != NULL);                                                                   \
-        CEL_ASSERT("queue_"#T, allocator != NULL);                                                           \
+        CETECH_ASSERT("queue_"#T, q != NULL);                                                                   \
+        CETECH_ASSERT("queue_"#T, allocator != NULL);                                                           \
         ARRAY_INIT(N, &q->_data, allocator);                                                                \
         q->_size = 0;                                                                                       \
         q->_offset = 0;                                                                                     \
@@ -58,7 +58,7 @@
                                                                                                             \
                                                                                                             \
     static inline  void queue_destroy_##N(QUEUE_T(N) *q) {                                                  \
-        CEL_ASSERT("queue_"#T, q != NULL);                                                                   \
+        CETECH_ASSERT("queue_"#T, q != NULL);                                                                   \
         ARRAY_DESTROY(N, &q->_data);                                                                        \
         q->_size = 0;                                                                                       \
         q->_offset = 0;                                                                                     \
@@ -177,4 +177,4 @@ QUEUE_PROTOTYPE(int32_t)
 
 QUEUE_PROTOTYPE(int64_t)
 
-#endif //CELIB_QUEUE_H
+#endif //CETECH_QUEUE_H

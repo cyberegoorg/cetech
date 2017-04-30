@@ -73,7 +73,7 @@ void _add_dependency(const char *who_filename,
     builddb_set_file_depend(who_filename, depend_on_filename);
 
     char path[1024] = {0};
-    path_join(path, CEL_ARRAY_LEN(path),
+    path_join(path, CETECH_ARRAY_LEN(path),
                   resource_api_v0.compiler_get_source_dir(), depend_on_filename);
 
     builddb_set_file(depend_on_filename, file_mtime(path));
@@ -104,7 +104,7 @@ static void _compile_task(void *data) {
                   "Resource \"%s\" compilation fail", tdata->source_filename);
     }
 
-    CEL_DEALLOCATE(memory_api_v0.main_scratch_allocator(),
+    CETECH_DEALLOCATE(memory_api_v0.main_scratch_allocator(),
                    tdata->source_filename);
     vio_close(tdata->source);
     vio_close(tdata->build);
@@ -156,7 +156,7 @@ void _compile_dir(ARRAY_T(task_item) *tasks,
         }
 
         char build_name[33] = {0};
-        snprintf(build_name, CEL_ARRAY_LEN(build_name),
+        snprintf(build_name, CETECH_ARRAY_LEN(build_name),
                  "%" SDL_PRIX64 "%" SDL_PRIX64, type_id.id, name_id.id);
 
         builddb_set_file_hash(source_filename_short, build_name);
@@ -170,7 +170,7 @@ void _compile_dir(ARRAY_T(task_item) *tasks,
         }
 
         char build_path[4096] = {0};
-        path_join(build_path, CEL_ARRAY_LEN(build_path), build_dir_full,
+        path_join(build_path, CETECH_ARRAY_LEN(build_path), build_dir_full,
                       build_name);
 
         struct vio *build_vio = vio_from_file(build_path, VIO_OPEN_WRITE,
@@ -181,7 +181,7 @@ void _compile_dir(ARRAY_T(task_item) *tasks,
         }
 
         struct compile_task_data *data =
-        CEL_ALLOCATE(
+        CETECH_ALLOCATE(
                 memory_api_v0.main_allocator(), struct compile_task_data, 1);
 
         *data = (struct compile_task_data) {
@@ -234,14 +234,14 @@ static void _init(get_api_fce_t get_engine_api) {
 
     const char *build_dir = config_api_v0.get_string(_G.cv_build_dir);
     char build_dir_full[1024] = {0};
-    path_join(build_dir_full, CEL_ARRAY_LEN(build_dir_full), build_dir,
+    path_join(build_dir_full, CETECH_ARRAY_LEN(build_dir_full), build_dir,
                   app_api_v0.platform());
 
     dir_make_path(build_dir_full);
     builddb_init_db(build_dir_full);
 
     char tmp_dir_full[1024] = {0};
-    path_join(tmp_dir_full, CEL_ARRAY_LEN(tmp_dir_full), build_dir_full,
+    path_join(tmp_dir_full, CETECH_ARRAY_LEN(tmp_dir_full), build_dir_full,
                   "tmp");
     dir_make_path(tmp_dir_full);
 }
@@ -272,7 +272,7 @@ void resource_compiler_create_build_dir(struct config_api_v0 config,
     const char *build_dir = config.get_string(_G.cv_build_dir);
     char build_dir_full[1024] = {0};
 
-    path_join(build_dir_full, CEL_ARRAY_LEN(build_dir_full), build_dir,
+    path_join(build_dir_full, CETECH_ARRAY_LEN(build_dir_full), build_dir,
                   app.platform());
 
     dir_make_path(build_dir_full);
@@ -299,7 +299,7 @@ void resource_compiler_compile_all() {
     const char *platform = app_api_v0.platform();
 
     char build_dir_full[1024] = {0};
-    path_join(build_dir_full, CEL_ARRAY_LEN(build_dir_full), build_dir,
+    path_join(build_dir_full, CETECH_ARRAY_LEN(build_dir_full), build_dir,
                   platform);
 
     struct array_pchar files;
@@ -309,7 +309,7 @@ void resource_compiler_compile_all() {
     ARRAY_INIT(task_item, &tasks, memory_api_v0.main_allocator());
 
     const char *dirs[] = {source_dir, core_dir};
-    for (int i = 0; i < CEL_ARRAY_LEN(dirs); ++i) {
+    for (int i = 0; i < CETECH_ARRAY_LEN(dirs); ++i) {
         array_resize_pchar(&files, 0);
         _compile_dir(&tasks, &files, dirs[i], build_dir_full);
     }
@@ -322,7 +322,7 @@ void resource_compiler_compile_all() {
         struct compile_task_data *data = ARRAY_AT(&tasks, i).data;
 
         task_api_v0.wait_atomic(&data->completed, 0);
-        CEL_DEALLOCATE(memory_api_v0.main_allocator(), data);
+        CETECH_DEALLOCATE(memory_api_v0.main_allocator(), data);
     }
 
     ARRAY_DESTROY(task_item, &tasks);
@@ -333,7 +333,7 @@ int resource_compiler_get_filename(char *filename,
                                    stringid64_t type,
                                    stringid64_t name) {
     char build_name[33] = {0};
-    resource_api_v0.type_name_string(build_name, CEL_ARRAY_LEN(build_name), type,
+    resource_api_v0.type_name_string(build_name, CETECH_ARRAY_LEN(build_name), type,
                                    name);
     return builddb_get_filename_by_hash(filename, max_ken, build_name);
 }
@@ -358,7 +358,7 @@ int resource_compiler_get_tmp_dir(char *tmp_dir,
                                   size_t max_len,
                                   const char *platform) {
     char build_dir[1024] = {0};
-    resource_compiler_get_build_dir(build_dir, CEL_ARRAY_LEN(build_dir),
+    resource_compiler_get_build_dir(build_dir, CETECH_ARRAY_LEN(build_dir),
                                     platform);
 
     return path_join(tmp_dir, max_len, build_dir, "tmp");
@@ -371,10 +371,10 @@ int resource_compiler_external_join(char *output,
     char tmp_dir2[1024] = {0};
 
     const char *external_dir_str = config_api_v0.get_string(_G.cv_external_dir);
-    path_join(tmp_dir, CEL_ARRAY_LEN(tmp_dir), external_dir_str,
+    path_join(tmp_dir, CETECH_ARRAY_LEN(tmp_dir), external_dir_str,
                   app_api_v0.native_platform());
-    strncat(tmp_dir, "64", CEL_ARRAY_LEN(tmp_dir));
-    path_join(tmp_dir2, CEL_ARRAY_LEN(tmp_dir2), tmp_dir, "release/bin");
+    strncat(tmp_dir, "64", CETECH_ARRAY_LEN(tmp_dir));
+    path_join(tmp_dir2, CETECH_ARRAY_LEN(tmp_dir2), tmp_dir, "release/bin");
 
     return path_join(output, max_len, tmp_dir2, name);
 }

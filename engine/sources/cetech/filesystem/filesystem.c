@@ -55,7 +55,7 @@ static void _shutdown() {
             continue;
         }
 
-        CEL_DEALLOCATE(memory_api_v0.main_allocator(), _G.rootmap.path[i]);
+        CETECH_DEALLOCATE(memory_api_v0.main_allocator(), _G.rootmap.path[i]);
     }
 
     _G = (struct G) {0};

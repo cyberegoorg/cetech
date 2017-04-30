@@ -14,7 +14,7 @@ uint64_t hash_murmur2_64(const void *key,
 
     while (data != end) {
 
-#ifdef CELIB_BIG_ENDIAN
+#ifdef CETECH_BIG_ENDIAN
         uint64_t k = *data++;
         char* p = (char*)&k;
         char c;

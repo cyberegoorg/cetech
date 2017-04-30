@@ -3,8 +3,8 @@
 // git+web: https://bitbucket.org/bitsquid/foundation
 //==============================================================================
 
-#ifndef CELIB_ALLOCATOR_SCRATCH_H
-#define CELIB_ALLOCATOR_SCRATCH_H
+#ifndef CETECH_ALLOCATOR_SCRATCH_H
+#define CETECH_ALLOCATOR_SCRATCH_H
 
 
 #include "cetech/errors.h"
@@ -59,7 +59,7 @@ void *scratch_allocator_allocate(struct allocator *allocator,
 
     // If the buffer is exhausted use the backing allocator instead.
     if (in_use(a, p))
-        return CEL_ALLOCATE_ALIGN(a->backing, void, size, align);
+        return CETECH_ALLOCATE_ALIGN(a->backing, void, size, align);
 
     fill(h, data, p - (char *) h);
     a->allocate = p;
@@ -80,7 +80,7 @@ void scratch_allocator_deallocate(struct allocator *allocator,
 
     // Mark this slot as free
     struct Header *h = header(p);
-    CEL_ASSERT("scratch", (h->size & 0x80000000u) == 0);
+    CETECH_ASSERT("scratch", (h->size & 0x80000000u) == 0);
     h->size = h->size | 0x80000000u;
 
     // Advance the free pointer past all free slots.
@@ -119,7 +119,7 @@ struct allocator *scratch_allocator_create(struct allocator *backing,
     };
 
     m->backing = backing;
-    m->begin = CEL_ALLOCATE(backing, char, size);
+    m->begin = CETECH_ALLOCATE(backing, char, size);
     m->end = m->begin + size;
     m->allocate = m->begin;
     m->free = m->begin;
@@ -133,4 +133,4 @@ void scratch_allocator_destroy(struct allocator *a) {
     allocator_deallocate(m->backing, m->begin);
 }
 
-#endif // CELIB_ALLOCATOR_SCRATCH_H
+#endif // CETECH_ALLOCATOR_SCRATCH_H

@@ -108,10 +108,10 @@ static void _serve_command(const char *packet,
     }
 
     mpack_finish_map(&writer);
-    CEL_ASSERT(LOG_WHERE, mpack_writer_destroy(&writer) == mpack_ok);
+    CETECH_ASSERT(LOG_WHERE, mpack_writer_destroy(&writer) == mpack_ok);
 
     int bytes = nn_send(_G.rpc_socket, data, size, 0);
-    CEL_ASSERT(LOG_WHERE, (size_t) bytes == size);
+    CETECH_ASSERT(LOG_WHERE, (size_t) bytes == size);
     memory_free(data);
 }
 

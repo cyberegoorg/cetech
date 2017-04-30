@@ -84,7 +84,7 @@ struct level_instance *_level_instance(level_t level) {
 void *level_resource_loader(struct vio *input,
                             struct allocator *allocator) {
     const int64_t size = vio_size(input);
-    char *data = CEL_ALLOCATE(allocator, char, size);
+    char *data = CETECH_ALLOCATE(allocator, char, size);
     vio_read(input, data, 1, size);
 
     return data;
@@ -92,7 +92,7 @@ void *level_resource_loader(struct vio *input,
 
 void level_resource_unloader(void *new_data,
                              struct allocator *allocator) {
-    CEL_DEALLOCATE(allocator, new_data);
+    CETECH_DEALLOCATE(allocator, new_data);
 }
 
 void level_resource_online(stringid64_t name,
@@ -110,7 +110,7 @@ void *level_resource_reloader(stringid64_t name,
     level_resource_offline(name, old_data);
     level_resource_online(name, new_data);
 
-    CEL_DEALLOCATE(allocator, old_data);
+    CETECH_DEALLOCATE(allocator, old_data);
 
     return new_data;
 }
@@ -138,7 +138,7 @@ void forach_entities_clb(yaml_node_t key,
     struct foreach_entities_data *data = _data;
 
     char name[128] = {0};
-    yaml_as_string(key, name, CEL_ARRAY_LEN(name));
+    yaml_as_string(key, name, CETECH_ARRAY_LEN(name));
     ARRAY_PUSH_BACK(stringid64_t, data->id, stringid64_from_string(name));
     ARRAY_PUSH_BACK(uint32_t, data->offset,
                     entity_api_v0.compiler_ent_counter(data->output));

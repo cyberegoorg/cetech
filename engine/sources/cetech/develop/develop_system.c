@@ -111,7 +111,7 @@ void _developsys_push(struct event_header *header,
                       uint32_t type,
                       uint64_t size) {
 
-    if ((_stream_buffer_size + size) >= CEL_ARRAY_LEN(_stream_buffer)) {
+    if ((_stream_buffer_size + size) >= CETECH_ARRAY_LEN(_stream_buffer)) {
         _flush_stream_buffer();
     }
 
@@ -221,9 +221,9 @@ void _send_events() {
     }
 
     mpack_finish_array(&writer);
-    CEL_ASSERT("develop_manager", mpack_writer_destroy(&writer) == mpack_ok);
+    CETECH_ASSERT("develop_manager", mpack_writer_destroy(&writer) == mpack_ok);
     int bytes = nn_send(_G.pub_socket, data, size, 0);
-    CEL_ASSERT("develop", bytes == size);
+    CETECH_ASSERT("develop", bytes == size);
     memory_free(data);
 }
 
@@ -325,7 +325,7 @@ struct scope_data developsys_enter_scope(const char *name) {
 }
 
 void developsys_leave_scope(struct scope_data scope_data) {
-    CEL_ASSERT(LOG_WHERE, _scope_depth > 0);
+    CETECH_ASSERT(LOG_WHERE, _scope_depth > 0);
     --_scope_depth;
 
     struct scope_event ev = {

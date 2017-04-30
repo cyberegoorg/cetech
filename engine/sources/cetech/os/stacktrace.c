@@ -3,7 +3,7 @@
 
 #include "cetech/allocator.h"
 
-#if defined(CELIB_LINUX)
+#if defined(CETECH_LINUX)
 
 #include <execinfo.h>
 #include <stdio.h>
@@ -11,7 +11,7 @@
 #endif
 
 char *stacktrace(int skip) {
-#if defined(CELIB_LINUX)
+#if defined(CETECH_LINUX)
     char *return_str = (char *) memory_malloc(4096 * 8);
     return_str[0] = '\0';
 

@@ -1,5 +1,5 @@
-#ifndef CELIB_FS_H
-#define CELIB_FS_H
+#ifndef CETECH_FS_H
+#define CETECH_FS_H
 
 #include "array.inl"
 
@@ -43,4 +43,4 @@ int dir_make(const char *path);
 int dir_make_path(const char *path);
 
 
-#endif //CELIB_FS_H
+#endif //CETECH_FS_H

@@ -1,5 +1,5 @@
-#ifndef CELIB_STRING_H
-#define CELIB_STRING_H
+#ifndef CETECH_STRING_H
+#define CETECH_STRING_H
 
 #include <stddef.h>
 
@@ -21,4 +21,4 @@ void str_set(char *__restrict result,
 int str_startswith(const char *string,
                        const char *with);
 
-#endif //CELIB_STRING_H
+#endif //CETECH_STRING_H

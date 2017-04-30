@@ -1,5 +1,5 @@
-#ifndef CELIB_VIO_H
-#define CELIB_VIO_H
+#ifndef CETECH_VIO_H
+#define CETECH_VIO_H
 
 #include <memory.h>
 
@@ -75,4 +75,4 @@ size_t vio_write(struct vio *file,
                      size_t size,
                      size_t num);
 
-#endif //CELIB_VIO_H
+#endif //CETECH_VIO_H

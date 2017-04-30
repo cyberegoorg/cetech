@@ -1,5 +1,5 @@
-#ifndef CELIB_THREAD_H
-#define CELIB_THREAD_H
+#ifndef CETECH_THREAD_H
+#define CETECH_THREAD_H
 
 #include "cetech/types.h"
 
@@ -54,4 +54,4 @@ struct thread_api_v0 {
 
 };
 
-#endif //CELIB_THREAD_H
+#endif //CETECH_THREAD_H

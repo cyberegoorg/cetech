@@ -1,5 +1,5 @@
-#ifndef CELIB_CPU_H
-#define CELIB_CPU_H
+#ifndef CETECH_CPU_H
+#define CETECH_CPU_H
 
 //==============================================================================
 // CPU
@@ -13,4 +13,4 @@ struct cpu_api_v0 {
     int (*count)();
 };
 
-#endif //CELIB_CPU_H
+#endif //CETECH_CPU_H

@@ -3,8 +3,8 @@
 // git+web: https://bitbucket.org/bitsquid/foundation
 //==============================================================================
 
-#ifndef CELIB_ALLOCATOR_MALLOC_H
-#define CELIB_ALLOCATOR_MALLOC_H
+#ifndef CETECH_ALLOCATOR_MALLOC_H
+#define CETECH_ALLOCATOR_MALLOC_H
 
 #include <stdint.h>
 #include <cetech/log.h>
@@ -91,8 +91,8 @@ void malloc_allocator_destroy(struct allocator *a) {
 
     allocator_check_trace(m->trace, MAX_MEM_TRACE);
 
-    //CEL_ASSERT_MSG("memory.malloc", m->total_allocated == 0, "%d bytes is not deallocate", m->total_allocated);
+    //CETECH_ASSERT_MSG("memory.malloc", m->total_allocated == 0, "%d bytes is not deallocate", m->total_allocated);
     memory_free(m);
 }
 
-#endif //CELIB_ALLOCATOR_MALLOC_H
+#endif //CETECH_ALLOCATOR_MALLOC_H

@@ -1,5 +1,5 @@
-#ifndef CELIB_EVENTSTREAM_H
-#define CELIB_EVENTSTREAM_H
+#ifndef CETECH_EVENTSTREAM_H
+#define CETECH_EVENTSTREAM_H
 
 //==============================================================================
 // Includes
@@ -60,4 +60,4 @@ static inline void *_eventstream_push(struct eventstream *es,
     return (void *) (&ARRAY_AT(&es->stream, s));
 }
 
-#endif //CELIB_EVENTSTREAM_H
+#endif //CETECH_EVENTSTREAM_H

@@ -1,5 +1,5 @@
-#ifndef CELIB_HANDLERID_H
-#define CELIB_HANDLERID_H
+#ifndef CETECH_HANDLERID_H
+#define CETECH_HANDLERID_H
 
 //==============================================================================
 // Includes
@@ -38,4 +38,4 @@ struct handler_api_v0 {
                            handler32_t h);
 };
 
-#endif //CELIB_HANDLERID_H
+#endif //CETECH_HANDLERID_H

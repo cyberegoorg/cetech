@@ -1,5 +1,5 @@
-#ifndef CELIB_MAT44F_H
-#define CELIB_MAT44F_H
+#ifndef CETECH_MAT44F_H
+#define CETECH_MAT44F_H
 
 
 //==============================================================================
@@ -29,7 +29,7 @@
 // Interface
 //==============================================================================
 
-CEL_FORCE_INLINE void mat44f_identity(mat44f_t *result) {
+CETECH_FORCE_INLINE void mat44f_identity(mat44f_t *result) {
     memset(result, 0, sizeof(float) * 16);
 
     result->f[0] = 1.0f;
@@ -38,7 +38,7 @@ CEL_FORCE_INLINE void mat44f_identity(mat44f_t *result) {
     result->f[15] = 1.0f;
 }
 
-CEL_FORCE_INLINE void mat44f_translate(mat44f_t *result,
+CETECH_FORCE_INLINE void mat44f_translate(mat44f_t *result,
                                            float x,
                                            float y,
                                            float z) {
@@ -49,7 +49,7 @@ CEL_FORCE_INLINE void mat44f_translate(mat44f_t *result,
     result->f[14] = z;
 }
 
-CEL_FORCE_INLINE void mat44f_scale(mat44f_t *result,
+CETECH_FORCE_INLINE void mat44f_scale(mat44f_t *result,
                                        float x,
                                        float y,
                                        float z) {
@@ -61,7 +61,7 @@ CEL_FORCE_INLINE void mat44f_scale(mat44f_t *result,
     result->f[15] = 1.0f;
 }
 
-CEL_FORCE_INLINE void mat44f_rotate_x(mat44f_t *result,
+CETECH_FORCE_INLINE void mat44f_rotate_x(mat44f_t *result,
                                           float x) {
     const float sx = float_sin(x);
     const float cx = float_cos(x);
@@ -76,7 +76,7 @@ CEL_FORCE_INLINE void mat44f_rotate_x(mat44f_t *result,
     result->f[15] = 1.0f;
 }
 
-CEL_FORCE_INLINE void mat44f_rotate_y(mat44f_t *result,
+CETECH_FORCE_INLINE void mat44f_rotate_y(mat44f_t *result,
                                           float y) {
     const float sy = float_sin(y);
     const float cy = float_cos(y);
@@ -91,7 +91,7 @@ CEL_FORCE_INLINE void mat44f_rotate_y(mat44f_t *result,
     result->f[15] = 1.0f;
 }
 
-CEL_FORCE_INLINE void mat44f_rotate_z(mat44f_t *result,
+CETECH_FORCE_INLINE void mat44f_rotate_z(mat44f_t *result,
                                           float z) {
     const float sz = float_sin(z);
     const float cz = float_cos(z);
@@ -106,7 +106,7 @@ CEL_FORCE_INLINE void mat44f_rotate_z(mat44f_t *result,
     result->f[15] = 1.0f;
 }
 
-CEL_FORCE_INLINE void mat44f_rotate_xy(mat44f_t *result,
+CETECH_FORCE_INLINE void mat44f_rotate_xy(mat44f_t *result,
                                            float x,
                                            float y) {
     const float sx = float_sin(x);
@@ -127,7 +127,7 @@ CEL_FORCE_INLINE void mat44f_rotate_xy(mat44f_t *result,
     result->f[15] = 1.0f;
 }
 
-CEL_FORCE_INLINE void mat44f_rotate_xyz(mat44f_t *result,
+CETECH_FORCE_INLINE void mat44f_rotate_xyz(mat44f_t *result,
                                             float x,
                                             float y,
                                             float z) {
@@ -152,7 +152,7 @@ CEL_FORCE_INLINE void mat44f_rotate_xyz(mat44f_t *result,
     result->f[15] = 1.0f;
 }
 
-CEL_FORCE_INLINE void mat44f_rotate_zyx(mat44f_t *result,
+CETECH_FORCE_INLINE void mat44f_rotate_zyx(mat44f_t *result,
                                             float x,
                                             float y,
                                             float z) {
@@ -177,19 +177,19 @@ CEL_FORCE_INLINE void mat44f_rotate_zyx(mat44f_t *result,
     result->f[15] = 1.0f;
 };
 
-CEL_FORCE_INLINE int mat44f_eq(const mat44f_t *__restrict a,
+CETECH_FORCE_INLINE int mat44f_eq(const mat44f_t *__restrict a,
                                    const mat44f_t *__restrict b,
                                    const float epsilon) {
     return float_equals(a->f, b->f, 4 * 4, epsilon);
 }
 
-CEL_FORCE_INLINE int mat44f_is_identity(const mat44f_t *__restrict a,
+CETECH_FORCE_INLINE int mat44f_is_identity(const mat44f_t *__restrict a,
                                             float epsilon) {
     static mat44f_t _identity = MAT44F_INIT_IDENTITY;
     return mat44f_eq(a, &_identity, epsilon);
 }
 
-CEL_FORCE_INLINE void mat44f_mul(mat44f_t *__restrict result,
+CETECH_FORCE_INLINE void mat44f_mul(mat44f_t *__restrict result,
                                      const mat44f_t *__restrict a,
                                      const mat44f_t *__restrict b) {
 
@@ -199,7 +199,7 @@ CEL_FORCE_INLINE void mat44f_mul(mat44f_t *__restrict result,
     vec4f_mul_mat44f(&result->w, &a->w, b);
 }
 
-CEL_FORCE_INLINE void mat44f_inverse(mat44f_t *__restrict result,
+CETECH_FORCE_INLINE void mat44f_inverse(mat44f_t *__restrict result,
                                          const mat44f_t *__restrict a) {
     float xx = a->f[0];
     float xy = a->f[1];
@@ -247,7 +247,7 @@ CEL_FORCE_INLINE void mat44f_inverse(mat44f_t *__restrict result,
     result->f[15] = +(xx * (yy * zz - zy * yz) - xy * (yx * zz - zx * yz) + xz * (yx * zy - zx * yy)) * inv_det;
 }
 
-CEL_FORCE_INLINE void mat44f_transpose(mat44f_t *__restrict result,
+CETECH_FORCE_INLINE void mat44f_transpose(mat44f_t *__restrict result,
                                            const mat44f_t *__restrict a) {
     result->f[0] = a->f[0];
     result->f[4] = a->f[1];
@@ -270,13 +270,13 @@ CEL_FORCE_INLINE void mat44f_transpose(mat44f_t *__restrict result,
     result->f[15] = a->f[15];
 }
 
-CEL_FORCE_INLINE void mat44f_set_perspective_fov(mat44f_t *__restrict result,
+CETECH_FORCE_INLINE void mat44f_set_perspective_fov(mat44f_t *__restrict result,
                                                      const float fov,
                                                      const float aspect_ratio,
                                                      float near,
                                                      float far) {
 
-    float yScale = 1.0f / float_tan(fov * CEL_float_TORAD * 0.5f);
+    float yScale = 1.0f / float_tan(fov * CETECH_float_TORAD * 0.5f);
     float xScale = yScale / aspect_ratio;
 
     result->x.x = xScale;
@@ -293,4 +293,4 @@ CEL_FORCE_INLINE void mat44f_set_perspective_fov(mat44f_t *__restrict result,
     result->w.z = near * far / (near - far);
 }
 
-#endif //CELIB_MAT44F_H
+#endif //CETECH_MAT44F_H

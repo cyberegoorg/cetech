@@ -1,5 +1,5 @@
-#ifndef CELIB_STRINGID_H
-#define CELIB_STRINGID_H
+#ifndef CETECH_STRINGID_H
+#define CETECH_STRINGID_H
 
 //==============================================================================
 // Includes
@@ -19,4 +19,4 @@ typedef struct {
 
 stringid64_t stringid64_from_string(const char *str);
 
-#endif //CELIB_STRINGID_H
+#endif //CETECH_STRINGID_H

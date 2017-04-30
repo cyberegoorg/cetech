@@ -9,15 +9,15 @@
 //==============================================================================
 
 size_t strlen(const char *s) {
-    CEL_ASSERT("string", s != NULL);
+    CETECH_ASSERT("string", s != NULL);
 
     return strlen(s);
 }
 
 char *str_dup(const char *s,
                  struct allocator *allocator) {
-    char *d = (char *) CEL_ALLOCATE(allocator, char, strlen(s) + 1);
-    CEL_ASSERT("string", d != NULL);
+    char *d = (char *) CETECH_ALLOCATE(allocator, char, strlen(s) + 1);
+    CETECH_ASSERT("string", d != NULL);
 
     if (d == NULL) return NULL;
 
@@ -28,8 +28,8 @@ char *str_dup(const char *s,
 
 int strcmp(const char *s1,
                const char *s2) {
-    CEL_ASSERT("string", s1 != NULL);
-    CEL_ASSERT("string", s2 != NULL);
+    CETECH_ASSERT("string", s1 != NULL);
+    CETECH_ASSERT("string", s2 != NULL);
 
     return strcmp(s1, s2);
 }

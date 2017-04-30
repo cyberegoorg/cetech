@@ -3,8 +3,8 @@
 // git+web: https://bitbucket.org/bitsquid/foundation
 //==============================================================================
 
-#ifndef CELIB_CONTAINERS_MAP_H
-#define CELIB_CONTAINERS_MAP_H
+#ifndef CETECH_CONTAINERS_MAP_H
+#define CETECH_CONTAINERS_MAP_H
 
 //==============================================================================
 // Includes
@@ -375,4 +375,4 @@ MAP_PROTOTYPE(int32_t)
 
 MAP_PROTOTYPE(int64_t)
 
-#endif //CELIB_CONTAINERS_MAP_H
+#endif //CETECH_CONTAINERS_MAP_H

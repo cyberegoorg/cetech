@@ -262,7 +262,7 @@ void application_start() {
         intptr_t wid = config_api_v0.get_int(_G.config.wid);
 
         char title[128] = {0};
-        snprintf(title, CEL_ARRAY_LEN(title), "cetech - %s",
+        snprintf(title, CETECH_ARRAY_LEN(title), "cetech - %s",
                  config_api_v0.get_string(_G.config.boot_script));
 
         if (wid == 0) {

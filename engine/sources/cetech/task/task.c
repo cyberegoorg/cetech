@@ -74,7 +74,7 @@ static task_t _new_task() {
 }
 
 static void _push_task(task_t t) {
-    CEL_ASSERT("", t.id != 0);
+    CETECH_ASSERT("", t.id != 0);
 
     int affinity = _G._task_pool[t.id].affinity;
 

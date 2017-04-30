@@ -110,7 +110,7 @@ uint32_t mouse_button_index(const char *button_name) {
 }
 
 const char *mouse_button_name(const uint32_t button_index) {
-    CEL_ASSERT(LOG_WHERE,
+    CETECH_ASSERT(LOG_WHERE,
                (button_index >= 0) && (button_index < MOUSE_BTN_MAX));
 
     return _btn_to_str[button_index];
@@ -118,7 +118,7 @@ const char *mouse_button_name(const uint32_t button_index) {
 
 int mouse_button_state(uint32_t idx,
                        const uint32_t button_index) {
-    CEL_ASSERT(LOG_WHERE,
+    CETECH_ASSERT(LOG_WHERE,
                (button_index >= 0) && (button_index < MOUSE_BTN_MAX));
 
     return _G.state[button_index];
@@ -126,7 +126,7 @@ int mouse_button_state(uint32_t idx,
 
 int mouse_button_pressed(uint32_t idx,
                          const uint32_t button_index) {
-    CEL_ASSERT(LOG_WHERE,
+    CETECH_ASSERT(LOG_WHERE,
                (button_index >= 0) && (button_index < MOUSE_BTN_MAX));
 
     return _G.state[button_index] && !_G.last_state[button_index];
@@ -134,14 +134,14 @@ int mouse_button_pressed(uint32_t idx,
 
 int mouse_button_released(uint32_t idx,
                           const uint32_t button_index) {
-    CEL_ASSERT(LOG_WHERE,
+    CETECH_ASSERT(LOG_WHERE,
                (button_index >= 0) && (button_index < MOUSE_BTN_MAX));
 
     return !_G.state[button_index] && _G.last_state[button_index];
 }
 
 const char *mouse_axis_name(const uint32_t axis_index) {
-    CEL_ASSERT(LOG_WHERE, (axis_index >= 0) && (axis_index < MOUSE_AXIS_MAX));
+    CETECH_ASSERT(LOG_WHERE, (axis_index >= 0) && (axis_index < MOUSE_AXIS_MAX));
 
     return _axis_to_str[axis_index];
 }
@@ -164,7 +164,7 @@ uint32_t mouse_axis_index(const char *axis_name) {
 
 vec2f_t mouse_axis(uint32_t idx,
                        const uint32_t axis_index) {
-    CEL_ASSERT(LOG_WHERE, (axis_index >= 0) && (axis_index < MOUSE_AXIS_MAX));
+    CETECH_ASSERT(LOG_WHERE, (axis_index >= 0) && (axis_index < MOUSE_AXIS_MAX));
 
     switch (axis_index) {
         case MOUSE_AXIS_ABSOULTE:

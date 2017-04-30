@@ -3,8 +3,8 @@
 // git+web: https://bitbucket.org/bitsquid/foundation
 //==============================================================================
 
-#ifndef CELIB_ARRAY_H
-#define CELIB_ARRAY_H
+#ifndef CETECH_ARRAY_H
+#define CETECH_ARRAY_H
 
 //==============================================================================
 // Includes
@@ -56,8 +56,8 @@
                                                                                  \
     static inline void array_init_##N(struct array_##N *array,                   \
                                       struct allocator* allocator) {         \
-        CEL_ASSERT("array_"#T, array != NULL);                                   \
-        CEL_ASSERT("array_"#T, allocator != NULL);                               \
+        CETECH_ASSERT("array_"#T, array != NULL);                                   \
+        CETECH_ASSERT("array_"#T, allocator != NULL);                               \
         array->data = NULL;                                                      \
         array->size = 0;                                                         \
         array->capacity = 0;                                                     \
@@ -65,8 +65,8 @@
     }                                                                            \
                                                                                  \
     static inline  void array_destroy_##N(struct array_##N *a) {                 \
-        CEL_ASSERT("array_"#T, a != NULL);                                       \
-        CEL_ASSERT("array_"#T, a->allocator != NULL);                            \
+        CETECH_ASSERT("array_"#T, a != NULL);                                       \
+        CETECH_ASSERT("array_"#T, a->allocator != NULL);                            \
         allocator_deallocate(a->allocator, a->data);                             \
         a->data = NULL;                                                          \
         a->size = 0;                                                             \
@@ -79,8 +79,8 @@
                                                                                  \
     static inline  void array_setcapacity_##N(struct array_##N *a,               \
                                               size_t  newcapacity) {             \
-        CEL_ASSERT("array_"#T, a != NULL);                                       \
-        CEL_ASSERT("array_"#T, a->allocator != NULL);                            \
+        CETECH_ASSERT("array_"#T, a != NULL);                                       \
+        CETECH_ASSERT("array_"#T, a->allocator != NULL);                            \
                                                                                  \
         if (newcapacity == a->capacity) {                                        \
             return;                                                              \
@@ -92,9 +92,9 @@
                                                                                  \
         T* newdata = 0;                                                          \
         if (newcapacity > 0) {                                                   \
-            newdata = (T*) CEL_ALLOCATE(a->allocator, T,                         \
+            newdata = (T*) CETECH_ALLOCATE(a->allocator, T,                         \
                                        sizeof(T) * newcapacity);                 \
-            CEL_ASSERT("array_"#T, newdata !=NULL);                              \
+            CETECH_ASSERT("array_"#T, newdata !=NULL);                              \
             memory_copy(newdata, a->data, sizeof(T) * a->size);                  \
         }                                                                        \
                                                                                  \
@@ -106,7 +106,7 @@
                                                                                  \
     static inline  void array_grow_##N(struct array_##N *a,                      \
                                        size_t mincapacity) {                     \
-        CEL_ASSERT("array_"#T, a != NULL);                                       \
+        CETECH_ASSERT("array_"#T, a != NULL);                                       \
         size_t newcapacity = a->capacity * 2 + 8;                                \
                                                                                  \
         if (newcapacity < mincapacity) {                                         \
@@ -117,7 +117,7 @@
     }                                                                            \
                                                                                  \
     static inline  void array_resize_##N(struct array_##N *a, size_t newsize) {  \
-        CEL_ASSERT("array_"#T, a != NULL);                                       \
+        CETECH_ASSERT("array_"#T, a != NULL);                                       \
         if (newsize > a->capacity) {                                             \
             array_grow_##N(a, newsize);                                          \
         }                                                                        \
@@ -127,14 +127,14 @@
                                                                                  \
     static inline  void array_reserve_##N(struct array_##N *a,                   \
                                           size_t new_capacity) {                 \
-        CEL_ASSERT("array_"#T, a != NULL);                                       \
+        CETECH_ASSERT("array_"#T, a != NULL);                                       \
         if (new_capacity > a->capacity) {                                        \
             array_setcapacity_##N(a, new_capacity);                              \
         }                                                                        \
     }                                                                            \
                                                                                  \
     static inline  void array_push_back_##N(struct array_##N *a, T item) {       \
-        CEL_ASSERT("array_"#T, a != NULL);                                       \
+        CETECH_ASSERT("array_"#T, a != NULL);                                       \
         if (a->size + 1 > a->capacity) {                                         \
             array_grow_##N(a, 0);                                                \
         }                                                                        \
@@ -144,7 +144,7 @@
     static inline  void array_push_##N(struct array_##N *a,                      \
                                        T* items,                                 \
                                        size_t count) {                           \
-        CEL_ASSERT("array_"#T, a != NULL);                                       \
+        CETECH_ASSERT("array_"#T, a != NULL);                                       \
         if (a->capacity <= a->size + count) {                                    \
             array_grow_##N(a, a->size + count);                                  \
         }                                                                        \
@@ -154,8 +154,8 @@
     }                                                                            \
                                                                                  \
     static inline  void array_pop_back_##N(struct array_##N *a) {                \
-        CEL_ASSERT("array_"#T, a != NULL);                                       \
-        CEL_ASSERT("array_"#T, a->size != 0);                                    \
+        CETECH_ASSERT("array_"#T, a != NULL);                                       \
+        CETECH_ASSERT("array_"#T, a->size != 0);                                    \
                                                                                  \
         --a->size;                                                               \
     }                                                                            \
@@ -193,4 +193,4 @@ ARRAY_PROTOTYPE(float)
 
 typedef ARRAY_T(pchar) string_array_t;
 
-#endif //CELIB_ARRAY_H
+#endif //CETECH_ARRAY_H

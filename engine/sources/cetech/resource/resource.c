@@ -100,7 +100,7 @@ static MAP_T(resource_item_t) *_get_resource_map(stringid64_t type) {
 void *package_resource_loader(struct vio *input,
                               struct allocator *allocator) {
     const int64_t size = vio_size(input);
-    char *data = CEL_ALLOCATE(allocator, char, size);
+    char *data = CETECH_ALLOCATE(allocator, char, size);
     vio_read(input, data, 1, size);
 
     return data;
@@ -108,7 +108,7 @@ void *package_resource_loader(struct vio *input,
 
 void package_resource_unloader(void *new_data,
                                struct allocator *allocator) {
-    CEL_DEALLOCATE(allocator, new_data);
+    CETECH_DEALLOCATE(allocator, new_data);
 }
 
 void package_resource_online(stringid64_t name,
@@ -123,7 +123,7 @@ void *package_resource_reloader(stringid64_t name,
                                 void *old_data,
                                 void *new_data,
                                 struct allocator *allocator) {
-    CEL_DEALLOCATE(allocator, old_data);
+    CETECH_DEALLOCATE(allocator, old_data);
     return new_data;
 }
 
@@ -159,7 +159,7 @@ static void _init(get_api_fce_t get_engine_api) {
 
     char build_dir_full[4096] = {0};
     path_join(build_dir_full,
-                  CEL_ARRAY_LEN(build_dir_full),
+                  CETECH_ARRAY_LEN(build_dir_full),
                   config_api_v0.get_string(_G.config.build_dir),
                   app_api_v0.platform());
 
@@ -328,11 +328,11 @@ void resource_load(void **loaded_data,
         }
 
         char build_name[33] = {0};
-        resource_type_name_string(build_name, CEL_ARRAY_LEN(build_name), type,
+        resource_type_name_string(build_name, CETECH_ARRAY_LEN(build_name), type,
                                   names[i]);
 
         char filename[4096] = {0};
-        resource_compiler_get_filename(filename, CEL_ARRAY_LEN(filename), type,
+        resource_compiler_get_filename(filename, CETECH_ARRAY_LEN(filename), type,
                                        names[i]);
         log_debug("resource", "Loading resource %s from %s/%s", filename,
                   filesystem_api_v0.filesystem_get_root_dir(root_name),
@@ -375,11 +375,11 @@ void resource_unload(stringid64_t type,
 
         if (--item.ref_count == 0) {
             char build_name[33] = {0};
-            resource_type_name_string(build_name, CEL_ARRAY_LEN(build_name),
+            resource_type_name_string(build_name, CETECH_ARRAY_LEN(build_name),
                                       type, names[i]);
 
             char filename[1024] = {0};
-            resource_compiler_get_filename(filename, CEL_ARRAY_LEN(filename),
+            resource_compiler_get_filename(filename, CETECH_ARRAY_LEN(filename),
                                            type, names[i]);
             log_debug("resource", "Unload resource %s ", filename);
 
@@ -401,12 +401,12 @@ void *resource_get(stringid64_t type,
                                    null_item);
     if (is_item_null(item)) {
         char build_name[33] = {0};
-        resource_type_name_string(build_name, CEL_ARRAY_LEN(build_name), type,
+        resource_type_name_string(build_name, CETECH_ARRAY_LEN(build_name), type,
                                   names);
 
         if (_G.autoload_enabled) {
             char filename[1024] = {0};
-            resource_compiler_get_filename(filename, CEL_ARRAY_LEN(filename),
+            resource_compiler_get_filename(filename, CETECH_ARRAY_LEN(filename),
                                            type, names);
 
             log_warning(LOG_WHERE, "Autoloading resource %s", filename);
@@ -414,7 +414,7 @@ void *resource_get(stringid64_t type,
             item = MAP_GET(resource_item_t, resource_map, names.id, null_item);
         } else {
             // TODO: fallback resource #205
-            CEL_ASSERT(LOG_WHERE, false);
+            CETECH_ASSERT(LOG_WHERE, false);
         }
     }
 
@@ -435,10 +435,10 @@ void resource_reload(stringid64_t type,
     resource_load(loaded_data, type, names, count, 1);
     for (int i = 0; i < count; ++i) {
 //        char build_name[33] = {0};
-//        resource_type_name_string(build_name, CEL_ARRAY_LEN(build_name), type, names[i]);
+//        resource_type_name_string(build_name, CETECH_ARRAY_LEN(build_name), type, names[i]);
 
         char filename[1024] = {0};
-        resource_compiler_get_filename(filename, CEL_ARRAY_LEN(filename), type,
+        resource_compiler_get_filename(filename, CETECH_ARRAY_LEN(filename), type,
                                        names[i]);
 
         log_debug("resource", "Reload resource %s ", filename);

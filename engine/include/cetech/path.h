@@ -1,5 +1,5 @@
-#ifndef CELIB_PATH_H
-#define CELIB_PATH_H
+#ifndef CETECH_PATH_H
+#define CETECH_PATH_H
 
 #include <stdint.h>
 #include <stddef.h>
@@ -37,4 +37,4 @@ int64_t path_join(char *result,
                   const char *base_path,
                   const char *path);
 
-#endif //CELIB_PATH_H
+#endif //CETECH_PATH_H

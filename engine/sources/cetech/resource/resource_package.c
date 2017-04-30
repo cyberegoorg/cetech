@@ -57,7 +57,7 @@ void forach_clb(yaml_node_t key,
     char type_str[128] = {0};
     char name_str[128] = {0};
 
-    yaml_as_string(key, type_str, CEL_ARRAY_LEN(type_str));
+    yaml_as_string(key, type_str, CETECH_ARRAY_LEN(type_str));
 
     ARRAY_PUSH_BACK(stringid64_t, &compile_data->types,
                     stringid64_from_string(type_str));
@@ -69,7 +69,7 @@ void forach_clb(yaml_node_t key,
 
     for (int i = 0; i < name_count; ++i) {
         yaml_node_t name_node = yaml_get_seq_node(value, i);
-        yaml_as_string(name_node, name_str, CEL_ARRAY_LEN(name_str));
+        yaml_as_string(name_node, name_str, CETECH_ARRAY_LEN(name_str));
 
         ARRAY_PUSH_BACK(stringid64_t, &compile_data->name,
                         stringid64_from_string(name_str));
@@ -166,7 +166,7 @@ void package_task(void *data) {
 void package_load(stringid64_t name) {
 
     struct package_task_data *task_data =
-    CEL_ALLOCATE(memory_api_v0.main_allocator(), struct package_task_data, 1);
+    CETECH_ALLOCATE(memory_api_v0.main_allocator(), struct package_task_data, 1);
 
     task_data->name = name;
 

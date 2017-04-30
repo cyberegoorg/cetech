@@ -6,7 +6,7 @@
 
 #include "cetech/types.h"
 
-#if defined(CELIB_LINUX)
+#if defined(CETECH_LINUX)
 #define DIR_DELIM_CH '/'
 #define DIR_DELIM_STR "/"
 #endif
@@ -41,7 +41,7 @@ void path_basename(const char *path,
 void path_dir(char *out,
                   size_t size,
                   const char *path) {
-#if defined(CELIB_LINUX)
+#if defined(CETECH_LINUX)
     char *ch = strrchr(path, DIR_DELIM_CH);
 
     if (ch != NULL) {

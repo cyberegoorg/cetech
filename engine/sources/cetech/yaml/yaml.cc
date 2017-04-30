@@ -26,7 +26,7 @@ struct yamlcpp_handler {
     char used[4096];
 
     yamlcpp_handler() {
-        memory_set(used, 0, CEL_ARRAY_LEN(used));
+        memory_set(used, 0, CETECH_ARRAY_LEN(used));
     }
 };
 
@@ -51,7 +51,7 @@ static yaml_node_t new_node(yaml_document_t handler,
                             const YAML::Node &node) {
     struct yamlcpp_handler *yaml_handler = (yamlcpp_handler *) handler.d;
 
-    for (uint32_t i = 1; i < CEL_ARRAY_LEN(yaml_handler->nodes); ++i) {
+    for (uint32_t i = 1; i < CETECH_ARRAY_LEN(yaml_handler->nodes); ++i) {
         if (yaml_handler->used[i]) {
             continue;
         }
@@ -62,7 +62,7 @@ static yaml_node_t new_node(yaml_document_t handler,
         return (yaml_node_t) {.doc = handler, .idx = i};
     }
 
-    CEL_ASSERT_MSG("yaml", false, "Node pool overflow");
+    CETECH_ASSERT_MSG("yaml", false, "Node pool overflow");
     return (yaml_node_t) {0};
 }
 
@@ -187,24 +187,24 @@ extern "C" int yaml_as_bool(yaml_node_t node) {
 }
 
 vec3f_t yaml_as_vec3f_t(yaml_node_t body) {
-    CEL_ASSERT("yaml", yaml_is_valid(body));
+    CETECH_ASSERT("yaml", yaml_is_valid(body));
 
     vec3f_t v = {0};
 
     yaml_node_t x = yaml_get_seq_node(body, 0);
-    CEL_ASSERT("yaml", yaml_is_valid(x));
+    CETECH_ASSERT("yaml", yaml_is_valid(x));
     v.x = yaml_as_float(x);
     yaml_node_free(x);
 
 
     yaml_node_t y = yaml_get_seq_node(body, 1);
-    CEL_ASSERT("yaml", yaml_is_valid(y));
+    CETECH_ASSERT("yaml", yaml_is_valid(y));
     v.y = yaml_as_float(y);
     yaml_node_free(y);
 
 
     yaml_node_t z = yaml_get_seq_node(body, 2);
-    CEL_ASSERT("yaml", yaml_is_valid(z));
+    CETECH_ASSERT("yaml", yaml_is_valid(z));
     v.z = yaml_as_float(z);
     yaml_node_free(z);
 
@@ -212,29 +212,29 @@ vec3f_t yaml_as_vec3f_t(yaml_node_t body) {
 }
 
 vec4f_t yaml_as_vec4f_t(yaml_node_t body) {
-    CEL_ASSERT("yaml", yaml_is_valid(body));
+    CETECH_ASSERT("yaml", yaml_is_valid(body));
 
     vec4f_t v = {0};
 
     yaml_node_t x = yaml_get_seq_node(body, 0);
-    CEL_ASSERT("yaml", yaml_is_valid(x));
+    CETECH_ASSERT("yaml", yaml_is_valid(x));
     v.x = yaml_as_float(x);
     yaml_node_free(x);
 
 
     yaml_node_t y = yaml_get_seq_node(body, 1);
-    CEL_ASSERT("yaml", yaml_is_valid(y));
+    CETECH_ASSERT("yaml", yaml_is_valid(y));
     v.y = yaml_as_float(y);
     yaml_node_free(y);
 
 
     yaml_node_t z = yaml_get_seq_node(body, 2);
-    CEL_ASSERT("yaml", yaml_is_valid(z));
+    CETECH_ASSERT("yaml", yaml_is_valid(z));
     v.z = yaml_as_float(z);
     yaml_node_free(z);
 
     yaml_node_t w = yaml_get_seq_node(body, 3);
-    CEL_ASSERT("yaml", yaml_is_valid(w));
+    CETECH_ASSERT("yaml", yaml_is_valid(w));
     v.w = yaml_as_float(w);
     yaml_node_free(w);
 
@@ -242,29 +242,29 @@ vec4f_t yaml_as_vec4f_t(yaml_node_t body) {
 }
 
 mat44f_t yaml_as_mat44f_t(yaml_node_t body) {
-    CEL_ASSERT("yaml", yaml_is_valid(body));
+    CETECH_ASSERT("yaml", yaml_is_valid(body));
 
     mat44f_t m = {0};
 
     yaml_node_t x = yaml_get_seq_node(body, 0);
-    CEL_ASSERT("yaml", yaml_is_valid(x));
+    CETECH_ASSERT("yaml", yaml_is_valid(x));
     m.x = yaml_as_vec4f_t(x);
     yaml_node_free(x);
 
 
     yaml_node_t y = yaml_get_seq_node(body, 1);
-    CEL_ASSERT("yaml", yaml_is_valid(y));
+    CETECH_ASSERT("yaml", yaml_is_valid(y));
     m.y = yaml_as_vec4f_t(y);
     yaml_node_free(y);
 
 
     yaml_node_t z = yaml_get_seq_node(body, 2);
-    CEL_ASSERT("yaml", yaml_is_valid(z));
+    CETECH_ASSERT("yaml", yaml_is_valid(z));
     m.z = yaml_as_vec4f_t(z);
     yaml_node_free(z);
 
     yaml_node_t w = yaml_get_seq_node(body, 3);
-    CEL_ASSERT("yaml", yaml_is_valid(w));
+    CETECH_ASSERT("yaml", yaml_is_valid(w));
     m.z = yaml_as_vec4f_t(w);
     yaml_node_free(w);
 
@@ -272,24 +272,24 @@ mat44f_t yaml_as_mat44f_t(yaml_node_t body) {
 }
 
 mat33f_t yaml_as_mat33f_t(yaml_node_t body) {
-    CEL_ASSERT("yaml", yaml_is_valid(body));
+    CETECH_ASSERT("yaml", yaml_is_valid(body));
 
     mat33f_t m = {0};
 
     yaml_node_t x = yaml_get_seq_node(body, 0);
-    CEL_ASSERT("yaml", yaml_is_valid(x));
+    CETECH_ASSERT("yaml", yaml_is_valid(x));
     m.x = yaml_as_vec3f_t(x);
     yaml_node_free(x);
 
 
     yaml_node_t y = yaml_get_seq_node(body, 1);
-    CEL_ASSERT("yaml", yaml_is_valid(y));
+    CETECH_ASSERT("yaml", yaml_is_valid(y));
     m.y = yaml_as_vec3f_t(y);
     yaml_node_free(y);
 
 
     yaml_node_t z = yaml_get_seq_node(body, 2);
-    CEL_ASSERT("yaml", yaml_is_valid(z));
+    CETECH_ASSERT("yaml", yaml_is_valid(z));
     m.z = yaml_as_vec3f_t(z);
     yaml_node_free(z);
 

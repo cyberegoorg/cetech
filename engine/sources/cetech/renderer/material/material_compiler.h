@@ -20,15 +20,15 @@ static void _preprocess(const char *filename,
     if (yaml_is_valid(parent_node)) {
         char prefab_file[256] = {0};
         char prefab_str[256] = {0};
-        yaml_as_string(parent_node, prefab_str, CEL_ARRAY_LEN(prefab_str));
-        snprintf(prefab_file, CEL_ARRAY_LEN(prefab_file), "%s.material",
+        yaml_as_string(parent_node, prefab_str, CETECH_ARRAY_LEN(prefab_str));
+        snprintf(prefab_file, CETECH_ARRAY_LEN(prefab_file), "%s.material",
                  prefab_str);
 
         capi->add_dependency(filename, prefab_file);
 
         char full_path[256] = {0};
         const char *source_dir = resource_api_v0.compiler_get_source_dir();
-        path_join(full_path, CEL_ARRAY_LEN(full_path), source_dir,
+        path_join(full_path, CETECH_ARRAY_LEN(full_path), source_dir,
                       prefab_file);
 
         struct vio *prefab_vio = vio_from_file(full_path, VIO_OPEN_READ,
@@ -58,13 +58,13 @@ static void _forach_texture_clb(yaml_node_t key,
     char tmp_buffer[512] = {0};
     char uniform_name[32] = {0};
 
-    yaml_as_string(key, uniform_name, CEL_ARRAY_LEN(uniform_name) - 1);
+    yaml_as_string(key, uniform_name, CETECH_ARRAY_LEN(uniform_name) - 1);
 
-    yaml_as_string(value, tmp_buffer, CEL_ARRAY_LEN(tmp_buffer));
+    yaml_as_string(value, tmp_buffer, CETECH_ARRAY_LEN(tmp_buffer));
     stringid64_t texture_name = stringid64_from_string(tmp_buffer);
 
     ARRAY_PUSH(char, &output->uniform_names, uniform_name,
-               CEL_ARRAY_LEN(uniform_name));
+               CETECH_ARRAY_LEN(uniform_name));
     ARRAY_PUSH(uint8_t, &output->data, (uint8_t *) &texture_name, sizeof(stringid64_t));
 }
 
@@ -76,12 +76,12 @@ static void _forach_vec4fs_clb(yaml_node_t key,
     output->vec4f_count += 1;
 
     char uniform_name[32] = {0};
-    yaml_as_string(key, uniform_name, CEL_ARRAY_LEN(uniform_name) - 1);
+    yaml_as_string(key, uniform_name, CETECH_ARRAY_LEN(uniform_name) - 1);
 
     vec4f_t v = yaml_as_vec4f_t(value);
 
     ARRAY_PUSH(char, &output->uniform_names, uniform_name,
-               CEL_ARRAY_LEN(uniform_name));
+               CETECH_ARRAY_LEN(uniform_name));
     ARRAY_PUSH(uint8_t, &output->data, (uint8_t *) &v, sizeof(vec4f_t));
 }
 
@@ -93,12 +93,12 @@ static void _forach_mat44f_clb(yaml_node_t key,
     output->mat44f_count += 1;
 
     char uniform_name[32] = {0};
-    yaml_as_string(key, uniform_name, CEL_ARRAY_LEN(uniform_name) - 1);
+    yaml_as_string(key, uniform_name, CETECH_ARRAY_LEN(uniform_name) - 1);
 
     mat44f_t m = yaml_as_mat44f_t(value);
 
     ARRAY_PUSH(char, &output->uniform_names, uniform_name,
-               CEL_ARRAY_LEN(uniform_name));
+               CETECH_ARRAY_LEN(uniform_name));
     ARRAY_PUSH(uint8_t, &output->data, (uint8_t *) &m, sizeof(mat44f_t));
 }
 
@@ -110,12 +110,12 @@ static void _forach_mat33f_clb(yaml_node_t key,
     output->mat33f_count += 1;
 
     char uniform_name[32] = {0};
-    yaml_as_string(key, uniform_name, CEL_ARRAY_LEN(uniform_name) - 1);
+    yaml_as_string(key, uniform_name, CETECH_ARRAY_LEN(uniform_name) - 1);
 
     mat33f_t m = yaml_as_mat33f_t(value);
 
     ARRAY_PUSH(char, &output->uniform_names, uniform_name,
-               CEL_ARRAY_LEN(uniform_name));
+               CETECH_ARRAY_LEN(uniform_name));
     ARRAY_PUSH(uint8_t, &output->data, (uint8_t *) &m, sizeof(mat33f_t));
 }
 
@@ -124,7 +124,7 @@ static int _material_resource_compiler(const char *filename,
                                        struct vio *build_vio,
                                        struct compilator_api *compilator_api) {
     char *source_data =
-    CEL_ALLOCATE(memory_api_v0.main_allocator(), char,
+    CETECH_ALLOCATE(memory_api_v0.main_allocator(), char,
                  vio_size(source_vio) + 1);
     memory_set(source_data, 0, vio_size(source_vio) + 1);
 
@@ -137,10 +137,10 @@ static int _material_resource_compiler(const char *filename,
     _preprocess(filename, root, compilator_api);
 
     yaml_node_t shader_node = yaml_get_node(root, "shader");
-    CEL_ASSERT("material", yaml_is_valid(shader_node));
+    CETECH_ASSERT("material", yaml_is_valid(shader_node));
 
     char tmp_buffer[256] = {0};
-    yaml_as_string(shader_node, tmp_buffer, CEL_ARRAY_LEN(tmp_buffer));
+    yaml_as_string(shader_node, tmp_buffer, CETECH_ARRAY_LEN(tmp_buffer));
 
     struct material_compile_output output = {0};
     ARRAY_INIT(char, &output.uniform_names, memory_api_v0.main_allocator());
@@ -182,7 +182,7 @@ static int _material_resource_compiler(const char *filename,
 
     ARRAY_DESTROY(char, &output.uniform_names);
     ARRAY_DESTROY(uint8_t, &output.data);
-    CEL_DEALLOCATE(memory_api_v0.main_allocator(), source_data);
+    CETECH_DEALLOCATE(memory_api_v0.main_allocator(), source_data);
     return 1;
 }
 

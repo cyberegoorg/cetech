@@ -41,13 +41,13 @@ void queue_task_init(struct task_queue *q,
     q->_capacityMask = capacity - 1;
     q->allocator = allocator;
 
-    CEL_ASSERT_MSG("QUEUEMPC", 0 == (capacity & q->_capacityMask),
+    CETECH_ASSERT_MSG("QUEUEMPC", 0 == (capacity & q->_capacityMask),
                    "capacity must be power of two");
 
     q->_capacity = capacity;
-    q->_data = CEL_ALLOCATE(allocator, uint32_t, capacity);
+    q->_data = CETECH_ALLOCATE(allocator, uint32_t, capacity);
 
-    q->_sequences = CEL_ALLOCATE(allocator, atomic_int, capacity);
+    q->_sequences = CETECH_ALLOCATE(allocator, atomic_int, capacity);
 
     for (uint32_t i = 0; i < capacity; ++i) {
         atomic_init(q->_sequences + i, i);
@@ -58,8 +58,8 @@ void queue_task_init(struct task_queue *q,
 }
 
 void queue_task_destroy(struct task_queue *q) {
-    CEL_DEALLOCATE(q->allocator, q->_data);
-    CEL_DEALLOCATE(q->allocator, q->_sequences);
+    CETECH_DEALLOCATE(q->allocator, q->_data);
+    CETECH_DEALLOCATE(q->allocator, q->_sequences);
 }
 
 uint32_t queue_task_size(struct task_queue *q) {

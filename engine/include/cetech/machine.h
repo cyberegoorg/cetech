@@ -1,5 +1,5 @@
-#ifndef CELIB_MACHINE_H
-#define CELIB_MACHINE_H
+#ifndef CETECH_MACHINE_H
+#define CETECH_MACHINE_H
 
 //==============================================================================
 // Includes
@@ -440,4 +440,4 @@ struct machine_api_v0 {
                                 uint32_t length);
 };
 
-#endif //CELIB_MACHINE_H
+#endif //CETECH_MACHINE_H

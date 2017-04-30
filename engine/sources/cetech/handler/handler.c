@@ -32,7 +32,7 @@ struct handler32gen {
 //==============================================================================
 
 struct handler32gen *handler32gen_create(struct allocator *allocator) {
-    struct handler32gen *hid = CEL_ALLOCATE(allocator, struct handler32gen, 1);
+    struct handler32gen *hid = CETECH_ALLOCATE(allocator, struct handler32gen, 1);
 
     hid->alloc = allocator;
     ARRAY_INIT(uint32_t, &hid->_generation, allocator);
@@ -47,7 +47,7 @@ struct handler32gen *handler32gen_create(struct allocator *allocator) {
 void handler32gen_destroy(struct handler32gen *hid) {
     ARRAY_DESTROY(uint32_t, &hid->_generation);
     QUEUE_DESTROY(uint32_t, &hid->_freeIdx);
-    CEL_DEALLOCATE(hid->alloc, hid);
+    CETECH_DEALLOCATE(hid->alloc, hid);
 }
 
 handler32_t handler32_create(struct handler32gen *hid) {

@@ -114,7 +114,7 @@ void _dealloc_allm_string() {
             continue;
         }
 
-        CEL_DEALLOCATE(memory_api_v0.main_allocator(), _G.values[i].s);
+        CETECH_DEALLOCATE(memory_api_v0.main_allocator(), _G.values[i].s);
     }
 }
 
@@ -182,17 +182,17 @@ void cvar_compile_global() {
     struct app_api_v0 app_api_v0 = *(struct app_api_v0 *) module_get_engine_api(
             APPLICATION_API_ID);
 
-    ResourceApiV0.compiler_get_build_dir(build_dir, CEL_ARRAY_LEN(build_dir),
+    ResourceApiV0.compiler_get_build_dir(build_dir, CETECH_ARRAY_LEN(build_dir),
                                          app_api_v0.platform());
-    path_join(build_path, CEL_ARRAY_LEN(build_path), build_dir,
+    path_join(build_path, CETECH_ARRAY_LEN(build_path), build_dir,
                   "global.config");
-    path_join(source_path, CEL_ARRAY_LEN(source_path),
+    path_join(source_path, CETECH_ARRAY_LEN(source_path),
                   ResourceApiV0.compiler_get_source_dir(), "global.config");
 
     struct vio *source_vio = vio_from_file(source_path, VIO_OPEN_READ,
                                                memory_api_v0.main_allocator());
     char *data =
-    CEL_ALLOCATE(memory_api_v0.main_allocator(), char,
+    CETECH_ALLOCATE(memory_api_v0.main_allocator(), char,
                  vio_size(source_vio));
 
     size_t size = (size_t) vio_size(source_vio);
@@ -204,7 +204,7 @@ void cvar_compile_global() {
     vio_write(build_vio, data, sizeof(char), size);
     vio_close(build_vio);
 
-    CEL_DEALLOCATE(memory_api_v0.main_allocator(), data);
+    CETECH_DEALLOCATE(memory_api_v0.main_allocator(), data);
 }
 
 
@@ -234,14 +234,14 @@ void foreach_config_clb(yaml_node_t key,
     struct foreach_config_data *output = _data;
 
     char key_str[128] = {0};
-    yaml_as_string(key, key_str, CEL_ARRAY_LEN(key_str));
+    yaml_as_string(key, key_str, CETECH_ARRAY_LEN(key_str));
 
     char name[1024] = {0};
     if (output->root_name != NULL) {
-        snprintf(name, CEL_ARRAY_LEN(name), "%s.%s", output->root_name,
+        snprintf(name, CETECH_ARRAY_LEN(name), "%s.%s", output->root_name,
                  key_str);
     } else {
-        snprintf(name, CEL_ARRAY_LEN(name), "%s", key_str);
+        snprintf(name, CETECH_ARRAY_LEN(name), "%s", key_str);
     }
 
     enum yaml_node_type type = yaml_node_type(value);
@@ -274,7 +274,7 @@ void foreach_config_clb(yaml_node_t key,
                     cvar_set_int(cvar, tmp_int);
                     break;
                 case CV_STRING:
-                    yaml_as_string(value, tmp_str, CEL_ARRAY_LEN(tmp_str));
+                    yaml_as_string(value, tmp_str, CETECH_ARRAY_LEN(tmp_str));
                     cvar_set_string(cvar, tmp_str);
                     break;
             }
@@ -291,15 +291,15 @@ void cvar_load_global() {
             RESOURCE_API_ID);
     struct app_api_v0 app_api_v0 = *(struct app_api_v0 *) module_get_engine_api(
             APPLICATION_API_ID);
-    ResourceApiV0.compiler_get_build_dir(build_dir, CEL_ARRAY_LEN(build_dir),
+    ResourceApiV0.compiler_get_build_dir(build_dir, CETECH_ARRAY_LEN(build_dir),
                                          app_api_v0.platform());
-    path_join(source_path, CEL_ARRAY_LEN(source_path), build_dir,
+    path_join(source_path, CETECH_ARRAY_LEN(source_path), build_dir,
                   "global.config");
 
     struct vio *source_vio = vio_from_file(source_path, VIO_OPEN_READ,
                                                memory_api_v0.main_allocator());
     char *data =
-    CEL_ALLOCATE(memory_api_v0.main_allocator(), char,
+    CETECH_ALLOCATE(memory_api_v0.main_allocator(), char,
                  vio_size(source_vio));
     vio_read(source_vio, data, vio_size(source_vio),
                  vio_size(source_vio));
@@ -307,7 +307,7 @@ void cvar_load_global() {
 
     yaml_document_t h;
     yaml_node_t root = yaml_load_str(data, &h);
-    CEL_DEALLOCATE(memory_api_v0.main_allocator(), data);
+    CETECH_DEALLOCATE(memory_api_v0.main_allocator(), data);
 
     struct foreach_config_data config_data = {
             .root_name = NULL

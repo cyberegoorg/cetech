@@ -1,5 +1,5 @@
-#ifndef CELIB_OBJECT_H
-#define CELIB_OBJECT_H
+#ifndef CETECH_OBJECT_H
+#define CETECH_OBJECT_H
 
 enum {
     OBJECT_API_ID = 2223344
@@ -15,4 +15,4 @@ struct object_api_v0 {
                                void *name);
 };
 
-#endif //CELIB_OBJECT_H
+#endif //CETECH_OBJECT_H

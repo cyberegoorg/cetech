@@ -1,5 +1,5 @@
-#ifndef CELIB_WINDOW_H
-#define CELIB_WINDOW_H
+#ifndef CETECH_WINDOW_H
+#define CETECH_WINDOW_H
 
 #include "cetech/types.h"
 
@@ -63,4 +63,4 @@ struct window_api_v0 {
     void *(*native_display_ptr)(window_t w);
 };
 
-#endif //CELIB_WINDOW_H
+#endif //CETECH_WINDOW_H

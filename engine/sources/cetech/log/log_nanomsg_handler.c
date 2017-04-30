@@ -31,7 +31,7 @@ void nano_log_handler(enum log_level level,
                       const char *msg,
                       void *_data) {
 
-    CEL_STATIC_ASSERT_MSG(sizeof(void *) >= sizeof(int), "AUTHOR IS IDIOT");
+    CETECH_STATIC_ASSERT_MSG(sizeof(void *) >= sizeof(int), "AUTHOR IS IDIOT");
 
     int socket = *((int *) _data); // TODO: problem if sizeof(void*) < int
 
@@ -59,9 +59,9 @@ void nano_log_handler(enum log_level level,
 
     mpack_finish_map(&writer);
 
-    CEL_ASSERT(LOG_WHERE, mpack_writer_destroy(&writer) == mpack_ok);
+    CETECH_ASSERT(LOG_WHERE, mpack_writer_destroy(&writer) == mpack_ok);
 
     bytes = nn_send(socket, data, size, 0);
-    CEL_ASSERT(LOG_WHERE, (size_t) bytes == size);
+    CETECH_ASSERT(LOG_WHERE, (size_t) bytes == size);
     memory_free(data);
 }

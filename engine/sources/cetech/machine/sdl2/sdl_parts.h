@@ -1,5 +1,5 @@
-#ifndef CELIB_SDL_PARTS_H
-#define CELIB_SDL_PARTS_H
+#ifndef CETECH_SDL_PARTS_H
+#define CETECH_SDL_PARTS_H
 
 //==============================================================================
 // Main part
@@ -48,4 +48,4 @@ void sdl_gamepad_process(struct eventstream *stream);
 void sdl_gamepad_process_event(SDL_Event *event,
                                struct eventstream *stream);
 
-#endif //CELIB_SDL_PARTS_H
+#endif //CETECH_SDL_PARTS_H

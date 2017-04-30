@@ -110,11 +110,11 @@ void *window_native_window_ptr(window_t w) {
         return 0;
     }
 
-#if CELIB_WINDOWS
+#if CETECH_WINDOWS
     return (void *) wmi.info.win.window;
-#elif CELIB_LINUX
+#elif CETECH_LINUX
     return (void *) wmi.info.x11.window;
-#elif CELIB_DARWIN
+#elif CETECH_DARWIN
     return (void *) wmi.info.cocoa.window;
 #endif
 }
@@ -128,11 +128,11 @@ void *window_native_display_ptr(window_t w) {
         return 0;
     }
 
-#if CELIB_WINDOWS
+#if CETECH_WINDOWS
     return (void *) wmi.info.win.hdc;
-#elif CELIB_LINUX
+#elif CETECH_LINUX
     return (void *) wmi.info.x11.display;
-#elif CELIB_DARWIN
+#elif CETECH_DARWIN
     return (0);
 #endif
 }

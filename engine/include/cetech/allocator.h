@@ -1,5 +1,5 @@
-#ifndef CELIB_ALLOCATOR_H
-#define CELIB_ALLOCATOR_H
+#ifndef CETECH_ALLOCATOR_H
+#define CETECH_ALLOCATOR_H
 
 #include <stdint.h>
 #include <stddef.h>
@@ -8,16 +8,16 @@
 // Defines
 //==============================================================================
 
-#define CEL_SIZE_NOT_TRACKED 0xffffffffu
+#define CETECH_SIZE_NOT_TRACKED 0xffffffffu
 
 #define allocator_allocate(a, s, align) (a)->allocate(a, s, align)
 #define allocator_deallocate(a, p) (a)->deallocate(a, p)
 #define allocator_total_allocated(a) (a)->total_allocated(a)
 #define allocator_allocated_size(a, p) (a)->allocated_size(a, p)
 
-#define CEL_ALLOCATE(a, T, size) (T*) allocator_allocate((a), sizeof(T) * size, CEL_ALIGNOF(T))
-#define CEL_ALLOCATE_ALIGN(a, T, size, align) (T*) allocator_allocate((a), size, align)
-#define CEL_DEALLOCATE(a, p) allocator_deallocate((a), p)
+#define CETECH_ALLOCATE(a, T, size) (T*) allocator_allocate((a), sizeof(T) * size, CETECH_ALIGNOF(T))
+#define CETECH_ALLOCATE_ALIGN(a, T, size, align) (T*) allocator_allocate((a), size, align)
+#define CETECH_DEALLOCATE(a, p) allocator_deallocate((a), p)
 
 //==============================================================================
 // Defines
@@ -116,4 +116,4 @@ const void *pointer_add(const void *p,
 const void *pointer_sub(const void *p,
                         uint32_t bytes);
 
-#endif //CELIB_ALLOCATOR_H
+#endif //CETECH_ALLOCATOR_H

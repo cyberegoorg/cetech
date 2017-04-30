@@ -1,5 +1,5 @@
-#ifndef CELIB_CMD_LINE_H
-#define CELIB_CMD_LINE_H
+#ifndef CETECH_CMD_LINE_H
+#define CETECH_CMD_LINE_H
 
 struct args {
     int argc;
@@ -19,4 +19,4 @@ int cmd_has_argument(struct args args,
                          const char *longopt,
                          char shortopt);
 
-#endif //CELIB_CMD_LINE_H
+#endif //CETECH_CMD_LINE_H

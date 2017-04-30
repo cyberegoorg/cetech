@@ -88,27 +88,27 @@ static int require(lua_State *L) {
 }
 
 vec2f_t *_new_tmp_vec2f() {
-    CEL_ASSERT("lua_enviroment", _G._temp_vec2f_used < 1024);
+    CETECH_ASSERT("lua_enviroment", _G._temp_vec2f_used < 1024);
     return &_G._temp_vec2f_buffer[_G._temp_vec2f_used++];
 }
 
 vec3f_t *_new_tmp_vec3f() {
-    CEL_ASSERT("lua_enviroment", _G._temp_vec3f_used < 1024);
+    CETECH_ASSERT("lua_enviroment", _G._temp_vec3f_used < 1024);
     return &_G._temp_vec3f_buffer[_G._temp_vec3f_used++];
 }
 
 vec4f_t *_new_tmp_vec4f() {
-    CEL_ASSERT("lua_enviroment", _G._temp_vec4f_used < 1024);
+    CETECH_ASSERT("lua_enviroment", _G._temp_vec4f_used < 1024);
     return &_G._temp_vec4f_buffer[_G._temp_vec4f_used++];
 }
 
 mat44f_t *_new_tmp_mat44f() {
-    CEL_ASSERT("lua_enviroment", _G._temp_mat44f_used < 1024);
+    CETECH_ASSERT("lua_enviroment", _G._temp_mat44f_used < 1024);
     return &_G._temp_mat44f_buffer[_G._temp_mat44f_used++];
 }
 
 quatf_t *_new_tmp_quat() {
-    CEL_ASSERT("lua_enviroment", _G._temp_quat_used < 1024);
+    CETECH_ASSERT("lua_enviroment", _G._temp_quat_used < 1024);
     return &_G._temp_quat_buffer[_G._temp_quat_used++];
 }
 
@@ -805,7 +805,7 @@ static void _init(get_api_fce_t get_engine_api) {
     INIT_API(get_engine_api, resource_api_v0, RESOURCE_API_ID);
 
     _G.L = luaL_newstate();
-    CEL_ASSERT(LOG_WHERE, _G.L != NULL);
+    CETECH_ASSERT(LOG_WHERE, _G.L != NULL);
 
     _G.type_id = stringid64_from_string("lua");
 

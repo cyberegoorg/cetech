@@ -17,7 +17,7 @@ struct vio_sdl {
 int64_t vio_sdl_seek(struct vio *file,
                          int64_t offset,
                          enum vio_seek whence) {
-    CEL_ASSERT(LOG_WHERE, file != NULL);
+    CETECH_ASSERT(LOG_WHERE, file != NULL);
 
     static enum vio_seek _whence[3] = {
             [VIO_SEEK_SET] = RW_SEEK_SET,
@@ -34,7 +34,7 @@ size_t vio_sdl_read(struct vio *file,
                         void *buffer,
                         size_t size,
                         size_t maxnum) {
-    CEL_ASSERT(LOG_WHERE, file != NULL);
+    CETECH_ASSERT(LOG_WHERE, file != NULL);
     struct vio_sdl *vf = (struct vio_sdl *) file;
 
     return SDL_RWread(vf->rw, buffer, size, maxnum);
@@ -44,21 +44,21 @@ size_t vio_sdl_write(struct vio *file,
                          const void *buffer,
                          size_t size,
                          size_t maxnum) {
-    CEL_ASSERT(LOG_WHERE, file != NULL);
+    CETECH_ASSERT(LOG_WHERE, file != NULL);
     struct vio_sdl *vf = (struct vio_sdl *) file;
 
     return SDL_RWwrite(vf->rw, buffer, size, maxnum);
 };
 
 int64_t vio_sdl_size(struct vio *file) {
-    CEL_ASSERT(LOG_WHERE, file != NULL);
+    CETECH_ASSERT(LOG_WHERE, file != NULL);
     struct vio_sdl *vf = (struct vio_sdl *) file;
 
     return SDL_RWsize(vf->rw);
 };
 
 int vio_sdl_close(struct vio *file) {
-    CEL_ASSERT(LOG_WHERE, file != NULL);
+    CETECH_ASSERT(LOG_WHERE, file != NULL);
     struct vio_sdl *vf = (struct vio_sdl *) file;
 
     SDL_RWclose(vf->rw);
@@ -72,8 +72,8 @@ int vio_sdl_close(struct vio *file) {
 struct vio *vio_from_file(const char *path,
                               enum vio_open_mode mode,
                               struct allocator *allocator) {
-    struct vio_sdl *vf = CEL_ALLOCATE(allocator, struct vio_sdl, sizeof(struct vio_sdl));
-    CEL_ASSERT(LOG_WHERE, vf != NULL);
+    struct vio_sdl *vf = CETECH_ALLOCATE(allocator, struct vio_sdl, sizeof(struct vio_sdl));
+    CETECH_ASSERT(LOG_WHERE, vf != NULL);
 
     if (!vf) {
         return NULL;

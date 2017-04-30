@@ -80,15 +80,15 @@ static void preprocess(const char *filename,
     if (yaml_is_valid(prefab_node)) {
         char prefab_file[256] = {0};
         char prefab_str[256] = {0};
-        yaml_as_string(prefab_node, prefab_str, CEL_ARRAY_LEN(prefab_str));
-        snprintf(prefab_file, CEL_ARRAY_LEN(prefab_file), "%s.entity",
+        yaml_as_string(prefab_node, prefab_str, CETECH_ARRAY_LEN(prefab_str));
+        snprintf(prefab_file, CETECH_ARRAY_LEN(prefab_file), "%s.entity",
                  prefab_str);
 
         capi->add_dependency(filename, prefab_file);
 
         char full_path[256] = {0};
         const char *source_dir = resource_api_v0.compiler_get_source_dir();
-        path_join(full_path, CEL_ARRAY_LEN(full_path), source_dir,
+        path_join(full_path, CETECH_ARRAY_LEN(full_path), source_dir,
                       prefab_file);
 
         struct vio *prefab_vio = vio_from_file(full_path, VIO_OPEN_READ,
@@ -162,11 +162,11 @@ void foreach_components_clb(yaml_node_t key,
     struct foreach_componets_data *data = _data;
     struct entity_compile_output *output = data->output;
 
-    yaml_as_string(key, uid_str, CEL_ARRAY_LEN(uid_str));
+    yaml_as_string(key, uid_str, CETECH_ARRAY_LEN(uid_str));
 
     yaml_node_t component_type_node = yaml_get_node(value, "component_type");
     yaml_as_string(component_type_node, component_type_str,
-                   CEL_ARRAY_LEN(component_type_str));
+                   CETECH_ARRAY_LEN(component_type_str));
 
     cid = stringid64_from_string(component_type_str);
 
@@ -212,7 +212,7 @@ static void compile_entitity(yaml_node_t rootNode,
     MAP_SET(uint32_t, &output->entity_parent, ent_id, parent);
 
     yaml_node_t components_node = yaml_get_node(rootNode, "components");
-    CEL_ASSERT("entity_system", yaml_is_valid(components_node));
+    CETECH_ASSERT("entity_system", yaml_is_valid(components_node));
 
     struct foreach_componets_data data = {
             .ent_id = ent_id,
@@ -262,7 +262,7 @@ struct entity_compile_output *entity_compiler_create_output() {
     struct allocator *a = memory_api_v0.main_allocator();
 
     struct entity_compile_output *output =
-    CEL_ALLOCATE(a,
+    CETECH_ALLOCATE(a,
                  struct entity_compile_output,
                  1);
     output->ent_counter = 0;
@@ -301,7 +301,7 @@ void entity_compiler_destroy_output(struct entity_compile_output *output) {
     MAP_DESTROY(array_yaml_node_t, &output->component_body);
 
     struct allocator *a = memory_api_v0.main_allocator();
-    CEL_DEALLOCATE(a, output);
+    CETECH_DEALLOCATE(a, output);
 }
 
 void entity_compiler_compile_entity(struct entity_compile_output *output,
@@ -414,7 +414,7 @@ int _entity_resource_compiler(const char *filename,
 void *entity_resource_loader(struct vio *input,
                            struct allocator *allocator) {
     const int64_t size = vio_size(input);
-    char *data = CEL_ALLOCATE(allocator, char, size);
+    char *data = CETECH_ALLOCATE(allocator, char, size);
     vio_read(input, data, 1, size);
 
     return data;
@@ -422,7 +422,7 @@ void *entity_resource_loader(struct vio *input,
 
 void entity_resource_unloader(void *new_data,
                             struct allocator *allocator) {
-    CEL_DEALLOCATE(allocator, new_data);
+    CETECH_DEALLOCATE(allocator, new_data);
 }
 
 
@@ -441,7 +441,7 @@ void *entity_resource_reloader(stringid64_t name,
     entity_resource_offline(name, old_data);
     entity_resource_online(name, new_data);
 
-    CEL_DEALLOCATE(allocator, old_data);
+    CETECH_DEALLOCATE(allocator, old_data);
 
     return new_data;
 }

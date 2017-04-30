@@ -60,7 +60,7 @@ struct compile_output {
 
 struct compile_output *_crete_compile_output() {
     struct allocator *a = memory_api_v0.main_allocator();
-    struct compile_output *output = CEL_ALLOCATE(a, struct compile_output, 1);
+    struct compile_output *output = CETECH_ALLOCATE(a, struct compile_output, 1);
 
     ARRAY_INIT(stringid64_t, &output->geom_name, a);
     ARRAY_INIT(uint32_t, &output->ib_offset, a);
@@ -97,14 +97,14 @@ void _destroy_compile_output(struct compile_output *output) {
     ARRAY_DESTROY(uint32_t, &output->node_parent);
     ARRAY_DESTROY(mat44f_t, &output->node_pose);
 
-    CEL_DEALLOCATE(a, output);
+    CETECH_DEALLOCATE(a, output);
 }
 
 static void _type_to_attr_type(const char *name,
                                bgfx_attrib_type_t *attr_type,
                                size_t *size) {
 
-    for (int i = 0; i < CEL_ARRAY_LEN(_attrin_tbl); ++i) {
+    for (int i = 0; i < CETECH_ARRAY_LEN(_attrin_tbl); ++i) {
         if (strcmp(_attrin_tbl[i].name, name) != 0) {
             continue;
         }
@@ -127,7 +127,7 @@ void _parse_vertex_decl(bgfx_vertex_decl_t *decl,
     yaml_node_t size_n = yaml_get_node(decl_node, "size");
 
     char type_str[64] = {0};
-    yaml_as_string(type_n, type_str, CEL_ARRAY_LEN(type_str));
+    yaml_as_string(type_n, type_str, CETECH_ARRAY_LEN(type_str));
 
     bgfx_attrib_type_t attrib_type;
     size_t v_size;
@@ -145,7 +145,7 @@ static void _parese_types(bgfx_vertex_decl_t *decl,
                           yaml_node_t types,
                           uint32_t *vertex_size) {
 
-    for (int i = 0; i < CEL_ARRAY_LEN(_chanel_types); ++i) {
+    for (int i = 0; i < CETECH_ARRAY_LEN(_chanel_types); ++i) {
         YAML_NODE_SCOPE(node, types, _chanel_types[i].name,
                         if (yaml_is_valid(node))
                             _parse_vertex_decl(decl, vertex_size,
@@ -175,7 +175,7 @@ void _write_chanel(yaml_node_t node,
         yaml_node_t type_n = yaml_get_node(chan_def_n, "type");
         yaml_node_t size_n = yaml_get_node(chan_def_n, "size");
 
-        yaml_as_string(type_n, tmp_buff, CEL_ARRAY_LEN(tmp_buff));
+        yaml_as_string(type_n, tmp_buff, CETECH_ARRAY_LEN(tmp_buff));
         size = yaml_as_int(size_n);
 
         yaml_node_free(chan_def_n);
@@ -206,7 +206,7 @@ void foreach_geometries_clb(yaml_node_t key,
     struct compile_output *output = _data;
 
     char name_str[64] = {0};
-    yaml_as_string(key, name_str, CEL_ARRAY_LEN(name_str));
+    yaml_as_string(key, name_str, CETECH_ARRAY_LEN(name_str));
 
     stringid64_t name = stringid64_from_string(name_str);
 
@@ -238,7 +238,7 @@ void foreach_geometries_clb(yaml_node_t key,
     ARRAY_PUSH_BACK(uint32_t, &output->vb_size, vertex_size * vertex_count);
 
     for (int i = 0; i < vertex_count; ++i) {
-        for (int j = 0; j < CEL_ARRAY_LEN(_chanel_types); ++j) {
+        for (int j = 0; j < CETECH_ARRAY_LEN(_chanel_types); ++j) {
             const char *name = _chanel_types[j].name;
 
             YAML_NODE_SCOPE(node, indices_n, name,
@@ -263,7 +263,7 @@ void foreach_graph_clb(yaml_node_t key,
     char buffer[128] = {0};
     struct foreach_graph_data *output = _data;
 
-    yaml_as_string(key, buffer, CEL_ARRAY_LEN(buffer));
+    yaml_as_string(key, buffer, CETECH_ARRAY_LEN(buffer));
     stringid64_t node_name = stringid64_from_string(buffer);
 
     yaml_node_t local_pose = yaml_get_node(value, "local");
@@ -280,7 +280,7 @@ void foreach_graph_clb(yaml_node_t key,
         const size_t name_count = yaml_node_size(geometries_n);
         for (int i = 0; i < name_count; ++i) {
             yaml_node_t name_node = yaml_get_seq_node(geometries_n, i);
-            yaml_as_string(name_node, buffer, CEL_ARRAY_LEN(buffer));
+            yaml_as_string(name_node, buffer, CETECH_ARRAY_LEN(buffer));
             yaml_node_free(name_node);
 
             stringid64_t geom_name = stringid64_from_string(buffer);
@@ -355,12 +355,12 @@ int _compile_assimp(const char *filename,
     yaml_node_t postprocess_n = yaml_get_node(import_n, "postprocess");
 
     char input_str[64] = {0};
-    yaml_as_string(input_n, input_str, CEL_ARRAY_LEN(input_str));
+    yaml_as_string(input_n, input_str, CETECH_ARRAY_LEN(input_str));
     capi->add_dependency(filename, input_str);
 
     char input_path[128] = {0};
     const char *source_dir = resource_api_v0.compiler_get_source_dir();
-    path_join(input_path, CEL_ARRAY_LEN(input_path), source_dir, input_str);
+    path_join(input_path, CETECH_ARRAY_LEN(input_path), source_dir, input_str);
 
     uint32_t postprocess_flag = aiProcessPreset_TargetRealtime_MaxQuality;
 
@@ -381,7 +381,7 @@ int _compile_assimp(const char *filename,
         struct aiMesh *mesh = scene->mMeshes[i];
 
         if (mesh->mName.length == 0) {
-            snprintf(tmp_buffer, CEL_ARRAY_LEN(tmp_buffer), "geom_%d", i);
+            snprintf(tmp_buffer, CETECH_ARRAY_LEN(tmp_buffer), "geom_%d", i);
         } else {
             memory_copy(tmp_buffer, mesh->mName.data, mesh->mName.length);
         }
@@ -389,9 +389,9 @@ int _compile_assimp(const char *filename,
         stringid64_t name_id = stringid64_from_string(tmp_buffer);
         for (int k = 0; k < ARRAY_SIZE(&output->geom_name); ++k) {
             if (name_id.id == ARRAY_AT(&output->geom_name, k).id) {
-                snprintf(tmp_buffer2, CEL_ARRAY_LEN(tmp_buffer2), "%s%d",
+                snprintf(tmp_buffer2, CETECH_ARRAY_LEN(tmp_buffer2), "%s%d",
                          tmp_buffer, ++unique);
-                snprintf(tmp_buffer, CEL_ARRAY_LEN(tmp_buffer), "%s",
+                snprintf(tmp_buffer, CETECH_ARRAY_LEN(tmp_buffer), "%s",
                          tmp_buffer2);
                 break;
             }
@@ -466,7 +466,7 @@ int _scene_resource_compiler(const char *filename,
                              struct compilator_api *compilator_api) {
 
     char *source_data =
-    CEL_ALLOCATE(memory_api_v0.main_allocator(), char,
+    CETECH_ALLOCATE(memory_api_v0.main_allocator(), char,
                  vio_size(source_vio) + 1);
     memory_set(source_data, 0, vio_size(source_vio) + 1);
     vio_read(source_vio, source_data, sizeof(char),
@@ -487,7 +487,7 @@ int _scene_resource_compiler(const char *filename,
 
     if (!ret) {
         _destroy_compile_output(output);
-        CEL_DEALLOCATE(memory_api_v0.main_allocator(), source_data);
+        CETECH_DEALLOCATE(memory_api_v0.main_allocator(), source_data);
         return 0;
     }
 
@@ -525,7 +525,7 @@ int _scene_resource_compiler(const char *filename,
                   ARRAY_SIZE(&output->geom_name));
 
     _destroy_compile_output(output);
-    CEL_DEALLOCATE(memory_api_v0.main_allocator(), source_data);
+    CETECH_DEALLOCATE(memory_api_v0.main_allocator(), source_data);
     return 1;
 }
 

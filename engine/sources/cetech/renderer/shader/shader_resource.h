@@ -8,7 +8,7 @@ static const bgfx_program_handle_t null_program = {0};
 void *_shader_resource_loader(struct vio *input,
                               struct allocator *allocator) {
     const int64_t size = vio_size(input);
-    char *data = CEL_ALLOCATE(allocator, char, size);
+    char *data = CETECH_ALLOCATE(allocator, char, size);
     vio_read(input, data, 1, size);
 
     return data;
@@ -16,7 +16,7 @@ void *_shader_resource_loader(struct vio *input,
 
 void _shader_resource_unloader(void *new_data,
                                struct allocator *allocator) {
-    CEL_DEALLOCATE(allocator, new_data);
+    CETECH_DEALLOCATE(allocator, new_data);
 }
 
 void _shader_resource_online(stringid64_t name,
@@ -62,7 +62,7 @@ void *_shader_resource_reloader(stringid64_t name,
     _shader_resource_offline(name, old_data);
     _shader_resource_online(name, new_data);
 
-    CEL_DEALLOCATE(allocator, old_data);
+    CETECH_DEALLOCATE(allocator, old_data);
 
     return new_data;
 }

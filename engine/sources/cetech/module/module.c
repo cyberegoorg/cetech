@@ -49,7 +49,7 @@ void _callm_init(get_api_fce_t fce) {
     struct module_api_v0 *api = fce(PLUGIN_EXPORT_API_ID);
 
     if (api) {
-        CEL_ASSERT("module", api->init != NULL);
+        CETECH_ASSERT("module", api->init != NULL);
         api->init(module_get_engine_api);
     }
 }
@@ -58,7 +58,7 @@ void _callm_shutdown(get_api_fce_t fce) {
     struct module_api_v0 *api = fce(PLUGIN_EXPORT_API_ID);
 
     if (api) {
-        CEL_ASSERT("module", api->shutdown != NULL);
+        CETECH_ASSERT("module", api->shutdown != NULL);
         api->shutdown();
     }
 }

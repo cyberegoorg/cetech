@@ -1,6 +1,6 @@
-#ifndef CELIB_PROCESS_H
-#define CELIB_PROCESS_H
+#ifndef CETECH_PROCESS_H
+#define CETECH_PROCESS_H
 
 int exec(const char *argv);
 
-#endif //CELIB_PROCESS_H
+#endif //CETECH_PROCESS_H

@@ -155,7 +155,7 @@ int _transform_component_compiler(yaml_node_t body,
         vec3f_t v_rad = {0};
 
         vec3f_t v = yaml_as_vec3f_t(rotation);
-        vec3f_mul(&v_rad, &v, CEL_float_TORAD);
+        vec3f_mul(&v_rad, &v, CETECH_float_TORAD);
 
         quatf_from_euler(&t_data.rotation, v_rad.x, v_rad.y, v_rad.z);
 
@@ -183,7 +183,7 @@ static void _destroyer(world_t world,
 
     // TODO: remove from arrays, swap idx -> last AND change size
     for (int i = 0; i < ent_count; i++) {
-        CEL_ASSERT("transform",
+        CETECH_ASSERT("transform",
                    MAP_HAS(uint32_t, &world_data->ent_idx_map, ents[i].h.id));
         MAP_REMOVE(uint32_t, &world_data->ent_idx_map, ents[i].h.id);
     }
@@ -233,7 +233,7 @@ void _set_property(world_t world,
         vec3f_t euler_rot = value.value.vec3f;
         vec3f_t euler_rot_rad = {0};
 
-        vec3f_mul(&euler_rot_rad, &euler_rot, CEL_float_TORAD);
+        vec3f_mul(&euler_rot_rad, &euler_rot, CETECH_float_TORAD);
         quatf_from_euler(&rot, euler_rot_rad.x, euler_rot_rad.y, euler_rot_rad.z);
 
         transform_set_rotation(world, transform, rot);
@@ -263,7 +263,7 @@ struct property_value _get_property(world_t world,
         vec3f_t euler_rot_rad = {0};
         quatf_t rot = transform_get_rotation(world, transform);
         quatf_to_eurel_angle(&euler_rot_rad, &rot);
-        vec3f_mul(&euler_rot, &euler_rot_rad, CEL_float_TODEG);
+        vec3f_mul(&euler_rot, &euler_rot_rad, CETECH_float_TODEG);
 
         return  (struct property_value){
                 .type= PROPERTY_VEC3,

@@ -2,8 +2,8 @@
 //! Memory system
 //! \{
 
-#ifndef CELIB_MEMSYS_H
-#define CELIB_MEMSYS_H
+#ifndef CETECH_MEMSYS_H
+#define CETECH_MEMSYS_H
 
 //==============================================================================
 // Includes
@@ -51,6 +51,6 @@ struct memory_api_v0 {
 };
 
 
-#endif //CELIB_MEMSYS_H
+#endif //CETECH_MEMSYS_H
 
 //! \}

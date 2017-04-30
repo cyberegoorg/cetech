@@ -3,8 +3,8 @@
 // git+web: https://bitbucket.org/bitsquid/foundation
 //==============================================================================
 
-#ifndef CELIB_TEMP_ALLOCATOR_H
-#define CELIB_TEMP_ALLOCATOR_H
+#ifndef CETECH_TEMP_ALLOCATOR_H
+#define CETECH_TEMP_ALLOCATOR_H
 
 //==============================================================================
 // Includes
@@ -39,7 +39,7 @@ static void *temp_allocator_allocate_##S(struct allocator *allocator,          \
                                                                                \
         a->_chunk_size *= 2;                                                   \
                                                                                \
-        void *p = CEL_ALLOCATE(a->_backing, to_allocate);                       \
+        void *p = CETECH_ALLOCATE(a->_backing, to_allocate);                       \
         *(void **) a->_start = p;                                              \
         a->_p = a->_start = (char *) p;                                        \
         a->_end = a->_start + to_allocate;                                     \
@@ -77,7 +77,7 @@ static void temp_allocator_destroy_##S(struct temp_allocator_64 *allocator) {  \
     while (p) {                                                                \
         void *next = *(void **) p;                                             \
                                                                                \
-        CEL_DEALLOCATE(allocator->_backing, p);                                 \
+        CETECH_DEALLOCATE(allocator->_backing, p);                                 \
                                                                                \
         p = next;                                                              \
     }                                                                          \
@@ -89,11 +89,11 @@ static void _temp_allocator_deallocate(struct allocator *allocator,
 }
 
 static uint32_t _temp_allocator_total_allocated(struct allocator *allocator) {
-    return CEL_SIZE_NOT_TRACKED;
+    return CETECH_SIZE_NOT_TRACKED;
 }
 
 static uint32_t _temp_allocator_allocated_size(void *p) {
-    return CEL_SIZE_NOT_TRACKED;
+    return CETECH_SIZE_NOT_TRACKED;
 }
 
 //==============================================================================
@@ -114,4 +114,4 @@ TEMP_ALLOCATOR_DEF(2048)
 
 TEMP_ALLOCATOR_DEF(4096)
 
-#endif //CELIB_TEMP_ALLOCATOR_H
+#endif //CETECH_TEMP_ALLOCATOR_H

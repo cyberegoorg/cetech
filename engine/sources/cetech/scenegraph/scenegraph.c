@@ -261,7 +261,7 @@ scene_node_t scenegraph_create(world_t world,
                                uint32_t count) {
     world_data_t *data = _get_world_data(world);
 
-    scene_node_t *nodes = CEL_ALLOCATE(memory_api_v0.main_allocator(),
+    scene_node_t *nodes = CETECH_ALLOCATE(memory_api_v0.main_allocator(),
                                        scene_node_t, count);
 
     for (int i = 0; i < count; ++i) {
@@ -313,7 +313,7 @@ scene_node_t scenegraph_create(world_t world,
 
     scene_node_t root = nodes[0];
     MAP_SET(uint32_t, &data->ent_idx_map, entity.h.id, root.idx);
-    CEL_DEALLOCATE(memory_api_v0.main_allocator(), nodes);
+    CETECH_DEALLOCATE(memory_api_v0.main_allocator(), nodes);
     return root;
 }
 

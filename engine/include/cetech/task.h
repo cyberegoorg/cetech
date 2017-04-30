@@ -23,8 +23,8 @@ enum {
 // Defines
 //==============================================================================
 
-#define CEL_ASSERT_IS_WORKER(where, worker_id)                  \
-    CEL_ASSERT_MSG(where,                                       \
+#define CETECH_ASSERT_IS_WORKER(where, worker_id)                  \
+    CETECH_ASSERT_MSG(where,                                       \
                    TaskApiV0.worker_id() == worker_id,          \
                    "Current worker: %d", TaskApiV0.worker_id())
 
@@ -60,7 +60,7 @@ enum task_affinity {
     TASK_AFFINITY_MAX
 };
 
-CEL_STATIC_ASSERT(TASK_AFFINITY_MAX == TASK_MAX_WORKERS + 1);
+CETECH_STATIC_ASSERT(TASK_AFFINITY_MAX == TASK_MAX_WORKERS + 1);
 
 
 //==============================================================================

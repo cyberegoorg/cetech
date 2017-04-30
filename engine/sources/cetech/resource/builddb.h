@@ -27,7 +27,7 @@ static int _step(sqlite3 *db,
                 break;
 
             default:
-                CEL_ASSERT_MSG("builddb", 0, "SQL error '%s' (%d): %s",
+                CETECH_ASSERT_MSG("builddb", 0, "SQL error '%s' (%d): %s",
                                sqlite3_sql(stmt), rc, sqlite3_errmsg(db));
 
                 run = 0;
@@ -75,7 +75,7 @@ static int _do_sql(const char *sql) {
 }
 
 static int builddb_init_db(const char *build_dir) {
-    path_join(_logdb_path, CEL_ARRAY_LEN(_logdb_path), build_dir,
+    path_join(_logdb_path, CETECH_ARRAY_LEN(_logdb_path), build_dir,
                   "build.db");
 
 
@@ -205,7 +205,7 @@ static int builddb_need_compile(const char *source_dir,
 
         char full_path[1024] = {0};
         const char *dep_file = (const char *) sqlite3_column_text(stmt, 0);
-        path_join(full_path, CEL_ARRAY_LEN(full_path), source_dir,
+        path_join(full_path, CETECH_ARRAY_LEN(full_path), source_dir,
                       dep_file);
 
         time_t actual_mtime = file_mtime(full_path);

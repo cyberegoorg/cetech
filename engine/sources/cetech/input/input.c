@@ -121,7 +121,7 @@ uint32_t gamepad_button_index(const char *button_name) {
 }
 
 const char *gamepad_button_name(const uint32_t button_index) {
-    CEL_ASSERT(LOG_WHERE,
+    CETECH_ASSERT(LOG_WHERE,
                (button_index >= 0) && (button_index < GAMEPAD_BTN_MAX));
 
     return _btn_to_str[button_index];
@@ -129,7 +129,7 @@ const char *gamepad_button_name(const uint32_t button_index) {
 
 int gamepad_button_state(uint32_t idx,
                          const uint32_t button_index) {
-    CEL_ASSERT(LOG_WHERE,
+    CETECH_ASSERT(LOG_WHERE,
                (button_index >= 0) && (button_index < GAMEPAD_BTN_MAX));
 
     return _G.state[idx][button_index];
@@ -137,7 +137,7 @@ int gamepad_button_state(uint32_t idx,
 
 int gamepad_button_pressed(uint32_t idx,
                            const uint32_t button_index) {
-    CEL_ASSERT(LOG_WHERE,
+    CETECH_ASSERT(LOG_WHERE,
                (button_index >= 0) && (button_index < GAMEPAD_BTN_MAX));
 
     return _G.state[idx][button_index] && !_G.last_state[idx][button_index];
@@ -145,14 +145,14 @@ int gamepad_button_pressed(uint32_t idx,
 
 int gamepad_button_released(uint32_t idx,
                             const uint32_t button_index) {
-    CEL_ASSERT(LOG_WHERE,
+    CETECH_ASSERT(LOG_WHERE,
                (button_index >= 0) && (button_index < GAMEPAD_BTN_MAX));
 
     return !_G.state[idx][button_index] && _G.last_state[idx][button_index];
 }
 
 const char *gamepad_axis_name(const uint32_t axis_index) {
-    CEL_ASSERT(LOG_WHERE, (axis_index >= 0) && (axis_index < GAMEPAD_AXIX_MAX));
+    CETECH_ASSERT(LOG_WHERE, (axis_index >= 0) && (axis_index < GAMEPAD_AXIX_MAX));
 
     return _axis_to_str[axis_index];
 }
@@ -175,7 +175,7 @@ uint32_t gamepad_axis_index(const char *axis_name) {
 
 vec2f_t gamepad_axis(uint32_t idx,
                          const uint32_t axis_index) {
-    CEL_ASSERT(LOG_WHERE, (axis_index >= 0) && (axis_index < GAMEPAD_AXIX_MAX));
+    CETECH_ASSERT(LOG_WHERE, (axis_index >= 0) && (axis_index < GAMEPAD_AXIX_MAX));
 
     return _G.position[idx][axis_index];
 }

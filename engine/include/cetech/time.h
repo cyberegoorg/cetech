@@ -1,5 +1,5 @@
-#ifndef CELIB_TIME_H
-#define CELIB_TIME_H
+#ifndef CETECH_TIME_H
+#define CETECH_TIME_H
 
 #include <stdint.h>
 
@@ -17,4 +17,4 @@ struct time_api_v0 {
     uint64_t (*get_perf_freq)();
 };
 
-#endif //CELIB_TIME_H
+#endif //CETECH_TIME_H

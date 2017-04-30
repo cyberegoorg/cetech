@@ -30,7 +30,7 @@ static int _step(sqlite3 *db,
                 break;
 
             default:
-                CEL_ASSERT_MSG("builddb", 0, "SQL error '%s' (%d): %s",
+                CETECH_ASSERT_MSG("builddb", 0, "SQL error '%s' (%d): %s",
                                sqlite3_sql(stmt), rc, sqlite3_errmsg(db));
 
                 run = 0;
@@ -119,7 +119,7 @@ void logdb_log(enum log_level level,
 }
 
 int logdb_init_db(const char *log_dir) {
-    path_join(_logdb_path, CEL_ARRAY_LEN(_logdb_path), log_dir, "log.db");
+    path_join(_logdb_path, CETECH_ARRAY_LEN(_logdb_path), log_dir, "log.db");
 
     _session_id = time(NULL);
 

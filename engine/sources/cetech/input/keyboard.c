@@ -90,28 +90,28 @@ uint32_t keyboard_button_index(const char *button_name) {
 }
 
 const char *keyboard_button_name(const uint32_t button_index) {
-    CEL_ASSERT(LOG_WHERE, (button_index >= 0) && (button_index < KEY_MAX));
+    CETECH_ASSERT(LOG_WHERE, (button_index >= 0) && (button_index < KEY_MAX));
 
     return _key_to_str[button_index];
 }
 
 int keyboard_button_state(uint32_t idx,
                           const uint32_t button_index) {
-    CEL_ASSERT(LOG_WHERE, (button_index >= 0) && (button_index < KEY_MAX));
+    CETECH_ASSERT(LOG_WHERE, (button_index >= 0) && (button_index < KEY_MAX));
 
     return _G.state[button_index];
 }
 
 int keyboard_button_pressed(uint32_t idx,
                             const uint32_t button_index) {
-    CEL_ASSERT(LOG_WHERE, (button_index >= 0) && (button_index < KEY_MAX));
+    CETECH_ASSERT(LOG_WHERE, (button_index >= 0) && (button_index < KEY_MAX));
 
     return _G.state[button_index] && !_G.last_state[button_index];
 }
 
 int keyboard_button_released(uint32_t idx,
                              const uint32_t button_index) {
-    CEL_ASSERT(LOG_WHERE, (button_index >= 0) && (button_index < KEY_MAX));
+    CETECH_ASSERT(LOG_WHERE, (button_index >= 0) && (button_index < KEY_MAX));
 
     return !_G.state[button_index] && _G.last_state[button_index];
 }

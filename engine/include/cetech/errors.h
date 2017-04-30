@@ -1,5 +1,5 @@
-#ifndef CELIB_ERRORS_H
-#define CELIB_ERRORS_H
+#ifndef CETECH_ERRORS_H
+#define CETECH_ERRORS_H
 
 //==============================================================================
 // Includes
@@ -13,9 +13,9 @@
 // Iterface
 //==============================================================================
 
-#ifdef CELIB_DEBUG
+#ifdef CETECH_DEBUG
 #define _MSG_END "\n  file: %s\n  line: %d\n  stacktrace:\n%s"
-#define CEL_ASSERT_MSG(where, condition, msg, ...)                             \
+#define CETECH_ASSERT_MSG(where, condition, msg, ...)                             \
     do {                                                                       \
         if (!(condition)) {                                                    \
             char* st = stacktrace(1);                                      \
@@ -33,10 +33,10 @@
     } while (0)                                                                \
 
 #else
-#define CEL_ASSERT_MSG(condition, msg, ...) do {} while (0)
+#define CETECH_ASSERT_MSG(condition, msg, ...) do {} while (0)
 #endif
 
-#define CEL_ASSERT(where, condition) CEL_ASSERT_MSG(where, condition, "")
+#define CETECH_ASSERT(where, condition) CETECH_ASSERT_MSG(where, condition, "")
 
 
 char *stacktrace(int skip);
@@ -44,4 +44,4 @@ char *stacktrace(int skip);
 void stacktrace_free(char *st);
 
 
-#endif //CELIB_ERRORS_H
+#endif //CETECH_ERRORS_H

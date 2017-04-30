@@ -331,7 +331,7 @@ void material_use(material_t material) {
 
 void material_submit(material_t material) {
     uint32_t idx = MAP_GET(uint32_t, &_G.material_instace_map, material.idx, UINT32_MAX);
-    CEL_ASSERT(LOG_WHERE, idx != UINT32_MAX);
+    CETECH_ASSERT(LOG_WHERE, idx != UINT32_MAX);
 
     struct material_blob *resource = (struct material_blob *) &_get_resorce(
             idx);
