@@ -48,14 +48,14 @@
 #define ARRAY_PROTOTYPE(T)  ARRAY_PROTOTYPE_N(T, T)
 #define ARRAY_PROTOTYPE_N(T, N)                                                  \
     struct array_##N {                                                           \
-        struct cel_allocator* allocator;                                         \
+        struct allocator* allocator;                                         \
         T *data;                                                                 \
         size_t size;                                                             \
         size_t capacity;                                                         \
     };                                                                           \
                                                                                  \
     static inline void array_init_##N(struct array_##N *array,                   \
-                                      struct cel_allocator* allocator) {         \
+                                      struct allocator* allocator) {         \
         CEL_ASSERT("array_"#T, array != NULL);                                   \
         CEL_ASSERT("array_"#T, allocator != NULL);                               \
         array->data = NULL;                                                      \

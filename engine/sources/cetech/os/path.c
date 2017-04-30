@@ -14,7 +14,7 @@
 //! Get filename from path
 //! \param path Path
 //! \return Filename
-const char *cel_path_filename(const char *path) {
+const char *path_filename(const char *path) {
     char *ch = strrchr(path, DIR_DELIM_CH);
     return ch != NULL ? ch + 1 : path;
 }
@@ -23,14 +23,14 @@ const char *cel_path_filename(const char *path) {
 //! \param path Path
 //! \param out Out basename
 //! \param size
-void cel_path_basename(const char *path,
+void path_basename(const char *path,
                        char *out,
                        size_t size) {
-    const char *filename = cel_path_filename(path);
+    const char *filename = path_filename(path);
     const char *ch = strrchr(filename, '.');
 
     if (ch == NULL) {
-        memory_copy(out, filename, cel_strlen(filename));
+        memory_copy(out, filename, strlen(filename));
         return;
     }
 
@@ -38,7 +38,7 @@ void cel_path_basename(const char *path,
     memory_copy(out, filename, basename_len);
 }
 
-void cel_path_dir(char *out,
+void path_dir(char *out,
                   size_t size,
                   const char *path) {
 #if defined(CELIB_LINUX)
@@ -55,8 +55,8 @@ void cel_path_dir(char *out,
 //! Get file extension
 //! \param path Path
 //! \return file extension
-const char *cel_path_extension(const char *path) {
-    const char *filename = cel_path_filename(path);
+const char *path_extension(const char *path) {
+    const char *filename = path_filename(path);
     const char *ch = strrchr(filename, '.');
 
     if (ch == NULL) {
@@ -72,7 +72,7 @@ const char *cel_path_extension(const char *path) {
 //! \param base_path Base path
 //! \param path Path
 //! \return Result path len
-int64_t cel_path_join(char *result,
+int64_t path_join(char *result,
                   uint64_t maxlen,
                   const char *base_path,
                   const char *path) {

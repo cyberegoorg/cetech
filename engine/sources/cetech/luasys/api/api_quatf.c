@@ -7,67 +7,67 @@
 #define API_NAME "Quatf"
 
 static int _from_axis_angle(lua_State *l) {
-    cel_quatf_t result = {0};
+    quatf_t result = {0};
 
-    const cel_vec3f_t *axis = luasys_to_vec3f(l, 1);
+    const vec3f_t *axis = luasys_to_vec3f(l, 1);
     float angle = luasys_to_float(l, 2);
 
-    cel_quatf_from_axis_angle(&result, axis, angle);
+    quatf_from_axis_angle(&result, axis, angle);
 
     luasys_push_quat(l, result);
     return 1;
 }
 
 static int _from_euler(lua_State *l) {
-    cel_quatf_t result = {0};
+    quatf_t result = {0};
 
     const float heading = luasys_to_float(l, 1);
     const float attitude = luasys_to_float(l, 2);
     const float bank = luasys_to_float(l, 3);
 
-    cel_quatf_from_euler(&result, heading, attitude, bank);
+    quatf_from_euler(&result, heading, attitude, bank);
 
     luasys_push_quat(l, result);
     return 1;
 }
 
 static int _to_mat44f(lua_State *l) {
-    const cel_quatf_t *q = luasys_to_quat(l, 1);
-    cel_mat44f_t result = {0};
+    const quatf_t *q = luasys_to_quat(l, 1);
+    mat44f_t result = {0};
 
-    cel_quatf_to_mat44f(&result, q);
+    quatf_to_mat44f(&result, q);
 
     luasys_push_mat44f(l, result);
     return 1;
 }
 
 static int _to_euler_angle(lua_State *l) {
-    const cel_quatf_t *q = luasys_to_quat(l, 1);
-    cel_vec3f_t result = {0};
+    const quatf_t *q = luasys_to_quat(l, 1);
+    vec3f_t result = {0};
 
-    cel_quatf_to_eurel_angle(&result, q);
+    quatf_to_eurel_angle(&result, q);
 
     luasys_push_vec3f(l, result);
     return 1;
 }
 
 static int _length(lua_State *l) {
-    cel_quatf_t *v = luasys_to_quat(l, 1);
-    luasys_push_float(l, cel_quatf_length(v));
+    quatf_t *v = luasys_to_quat(l, 1);
+    luasys_push_float(l, quatf_length(v));
     return 1;
 }
 
 static int _length_squared(lua_State *l) {
-    cel_quatf_t *v = luasys_to_quat(l, 1);
-    luasys_push_float(l, cel_quatf_length_squared(v));
+    quatf_t *v = luasys_to_quat(l, 1);
+    luasys_push_float(l, quatf_length_squared(v));
     return 1;
 }
 
 static int _normalized(lua_State *l) {
-    cel_quatf_t *v = luasys_to_quat(l, 1);
-    cel_quatf_t res = {0};
+    quatf_t *v = luasys_to_quat(l, 1);
+    quatf_t res = {0};
 
-    cel_quatf_normalized(&res, v);
+    quatf_normalized(&res, v);
 
     luasys_push_quat(l, res);
     return 1;

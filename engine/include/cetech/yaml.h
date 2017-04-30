@@ -108,11 +108,11 @@ YAML_NODE_AS_DEF(int);
 
 YAML_NODE_AS_DEF(float);
 
-YAML_NODE_AS_DEF(cel_vec3f_t);
+YAML_NODE_AS_DEF(vec3f_t);
 
-YAML_NODE_AS_DEF(cel_vec4f_t);
+YAML_NODE_AS_DEF(vec4f_t);
 
-YAML_NODE_AS_DEF(cel_mat44f_t);
+YAML_NODE_AS_DEF(mat44f_t);
 
 YAML_NODE_AS_DEF(mat33f_t);
 

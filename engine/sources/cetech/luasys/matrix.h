@@ -7,29 +7,29 @@
 
 #include "luasys.h"
 
-static int _cel_mat44f_mul(lua_State *L) {
-    cel_mat44f_t *a = luasys_to_mat44f(L, 1);
-    cel_mat44f_t *b = luasys_to_mat44f(L, 2);
+static int _mat44f_mul(lua_State *L) {
+    mat44f_t *a = luasys_to_mat44f(L, 1);
+    mat44f_t *b = luasys_to_mat44f(L, 2);
 
-    cel_mat44f_t res = {0};
-    cel_mat44f_mul(&res, a, b);
-
-    luasys_push_mat44f(L, res);
-    return 1;
-}
-
-static int _cel_mat44f_unm(lua_State *L) {
-    cel_mat44f_t *a = luasys_to_mat44f(L, 1);
-
-    cel_mat44f_t res = {0};
-    cel_mat44f_inverse(&res, a);
+    mat44f_t res = {0};
+    mat44f_mul(&res, a, b);
 
     luasys_push_mat44f(L, res);
     return 1;
 }
 
-static int _cel_mat44f_index(lua_State *L) {
-    cel_mat44f_t *a = luasys_to_mat44f(L, 1);
+static int _mat44f_unm(lua_State *L) {
+    mat44f_t *a = luasys_to_mat44f(L, 1);
+
+    mat44f_t res = {0};
+    mat44f_inverse(&res, a);
+
+    luasys_push_mat44f(L, res);
+    return 1;
+}
+
+static int _mat44f_index(lua_State *L) {
+    mat44f_t *a = luasys_to_mat44f(L, 1);
     const char *s = luasys_to_string(L, 2);
 
     switch (s[0]) {
@@ -57,11 +57,11 @@ static int _cel_mat44f_index(lua_State *L) {
     return 0;
 }
 
-static int _cel_mat44f_newindex(lua_State *L) {
-    cel_mat44f_t *a = luasys_to_mat44f(L, 1);
+static int _mat44f_newindex(lua_State *L) {
+    mat44f_t *a = luasys_to_mat44f(L, 1);
 
     const char *s = luasys_to_string(L, 2);
-    cel_vec4f_t *value = luasys_to_vec4f(L, 3);
+    vec4f_t *value = luasys_to_vec4f(L, 3);
 
     switch (s[0]) {
         case 'x':

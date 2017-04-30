@@ -9,22 +9,22 @@
 
 
 static int _quat_add(lua_State *L) {
-    cel_quatf_t *a = luasys_to_quat(L, 1);
-    cel_quatf_t *b = luasys_to_quat(L, 2);
+    quatf_t *a = luasys_to_quat(L, 1);
+    quatf_t *b = luasys_to_quat(L, 2);
 
-    cel_quatf_t res = {0};
-    cel_quatf_add(&res, a, b);
+    quatf_t res = {0};
+    quatf_add(&res, a, b);
 
     luasys_push_quat(L, res);
     return 1;
 }
 
 static int _quat_sub(lua_State *L) {
-    cel_quatf_t *a = luasys_to_quat(L, 1);
-    cel_quatf_t *b = luasys_to_quat(L, 2);
+    quatf_t *a = luasys_to_quat(L, 1);
+    quatf_t *b = luasys_to_quat(L, 2);
 
-    cel_quatf_t res = {0};
-    cel_quatf_sub(&res, a, b);
+    quatf_t res = {0};
+    quatf_sub(&res, a, b);
 
     luasys_push_quat(L, res);
     return 1;
@@ -33,39 +33,39 @@ static int _quat_sub(lua_State *L) {
 
 //TODO: mul_s
 static int _quat_mul(lua_State *L) {
-    cel_quatf_t *a = luasys_to_quat(L, 1);
-    cel_quatf_t *b = luasys_to_quat(L, 2);
+    quatf_t *a = luasys_to_quat(L, 1);
+    quatf_t *b = luasys_to_quat(L, 2);
 
-    cel_quatf_t res = {0};
-    cel_quatf_mul(&res, a, b);
+    quatf_t res = {0};
+    quatf_mul(&res, a, b);
 
     luasys_push_quat(L, res);
     return 1;
 }
 
 static int _quat_div(lua_State *L) {
-    cel_quatf_t *a = luasys_to_quat(L, 1);
+    quatf_t *a = luasys_to_quat(L, 1);
     float b = luasys_to_float(L, 2);
 
-    cel_quatf_t res = {0};
-    cel_quatf_div_s(&res, a, b);
+    quatf_t res = {0};
+    quatf_div_s(&res, a, b);
 
     luasys_push_vec4f(L, res);
     return 1;
 }
 
 static int _quat_unm(lua_State *L) {
-    cel_quatf_t *a = luasys_to_quat(L, 1);
+    quatf_t *a = luasys_to_quat(L, 1);
 
-    cel_quatf_t res = {0};
-    cel_quatf_invert(&res, a);
+    quatf_t res = {0};
+    quatf_invert(&res, a);
 
     luasys_push_vec4f(L, res);
     return 1;
 }
 
 static int _quat_index(lua_State *L) {
-    cel_quatf_t *a = luasys_to_quat(L, 1);
+    quatf_t *a = luasys_to_quat(L, 1);
     const char *s = luasys_to_string(L, 2);
 
     switch (s[0]) {
@@ -90,7 +90,7 @@ static int _quat_index(lua_State *L) {
 }
 
 static int _quat_newindex(lua_State *L) {
-    cel_quatf_t *a = luasys_to_quat(L, 1);
+    quatf_t *a = luasys_to_quat(L, 1);
 
     const char *s = luasys_to_string(L, 2);
     const float value = luasys_to_float(L, 3);

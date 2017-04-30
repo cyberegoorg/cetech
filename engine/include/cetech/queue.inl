@@ -44,7 +44,7 @@
         uint32_t _offset;                                                                                        \
     };                                                                                                      \
     static inline void queue_init_##N(QUEUE_T(N) *q,                                                        \
-                                      struct cel_allocator* allocator) {                                        \
+                                      struct allocator* allocator) {                                        \
         CEL_ASSERT("queue_"#T, q != NULL);                                                                   \
         CEL_ASSERT("queue_"#T, allocator != NULL);                                                           \
         ARRAY_INIT(N, &q->_data, allocator);                                                                \

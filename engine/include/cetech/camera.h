@@ -52,8 +52,8 @@ struct camera_api_v0 {
     //! \param view View Matrix
     void (*get_project_view)(world_t world,
                              camera_t camera,
-                             cel_mat44f_t *proj,
-                             cel_mat44f_t *view);
+                             mat44f_t *proj,
+                             mat44f_t *view);
 
 
     //! Get camera component

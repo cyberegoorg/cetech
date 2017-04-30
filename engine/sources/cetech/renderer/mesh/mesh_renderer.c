@@ -261,10 +261,10 @@ void mesh_render_all(world_t world) {
         entity_t ent = {.h.id = ce_it->key};
 
         transform_t t = transform_api_v0.get(world, ent);
-        cel_mat44f_t t_w = *transform_api_v0.get_world_matrix(world, t);
-        //cel_mat44f_t t_w = MAT44F_INIT_IDENTITY;//*transform_get_world_matrix(world, t);
-        cel_mat44f_t node_w = MAT44F_INIT_IDENTITY;
-        cel_mat44f_t final_w = MAT44F_INIT_IDENTITY;
+        mat44f_t t_w = *transform_api_v0.get_world_matrix(world, t);
+        //mat44f_t t_w = MAT44F_INIT_IDENTITY;//*transform_get_world_matrix(world, t);
+        mat44f_t node_w = MAT44F_INIT_IDENTITY;
+        mat44f_t final_w = MAT44F_INIT_IDENTITY;
 
 
         if (scenegprah_api_v0.has(world, ent)) {
@@ -275,7 +275,7 @@ void mesh_render_all(world_t world) {
             }
         }
 
-        cel_mat44f_mul(&final_w, &node_w, &t_w);
+        mat44f_mul(&final_w, &node_w, &t_w);
 
         bgfx_set_transform(&final_w, 1);
 

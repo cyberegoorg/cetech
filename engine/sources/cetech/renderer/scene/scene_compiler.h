@@ -54,12 +54,12 @@ struct compile_output {
 
     ARRAY_T(stringid64_t) node_name;
     ARRAY_T(uint32_t) node_parent;
-    ARRAY_T(cel_mat44f_t) node_pose;
+    ARRAY_T(mat44f_t) node_pose;
     ARRAY_T(stringid64_t) geom_node;
 };
 
 struct compile_output *_crete_compile_output() {
-    struct cel_allocator *a = memory_api_v0.main_allocator();
+    struct allocator *a = memory_api_v0.main_allocator();
     struct compile_output *output = CEL_ALLOCATE(a, struct compile_output, 1);
 
     ARRAY_INIT(stringid64_t, &output->geom_name, a);
@@ -74,14 +74,14 @@ struct compile_output *_crete_compile_output() {
     ARRAY_INIT(stringid64_t, &output->node_name, a);
     ARRAY_INIT(stringid64_t, &output->geom_node, a);
     ARRAY_INIT(uint32_t, &output->node_parent, a);
-    ARRAY_INIT(cel_mat44f_t, &output->node_pose, a);
+    ARRAY_INIT(mat44f_t, &output->node_pose, a);
 
 
     return output;
 }
 
 void _destroy_compile_output(struct compile_output *output) {
-    struct cel_allocator *a = memory_api_v0.main_allocator();
+    struct allocator *a = memory_api_v0.main_allocator();
 
     ARRAY_DESTROY(stringid64_t, &output->geom_name);
     ARRAY_DESTROY(uint32_t, &output->ib_offset);
@@ -95,7 +95,7 @@ void _destroy_compile_output(struct compile_output *output) {
     ARRAY_DESTROY(stringid64_t, &output->node_name);
     ARRAY_DESTROY(stringid64_t, &output->geom_node);
     ARRAY_DESTROY(uint32_t, &output->node_parent);
-    ARRAY_DESTROY(cel_mat44f_t, &output->node_pose);
+    ARRAY_DESTROY(mat44f_t, &output->node_pose);
 
     CEL_DEALLOCATE(a, output);
 }
@@ -105,7 +105,7 @@ static void _type_to_attr_type(const char *name,
                                size_t *size) {
 
     for (int i = 0; i < CEL_ARRAY_LEN(_attrin_tbl); ++i) {
-        if (cel_strcmp(_attrin_tbl[i].name, name) != 0) {
+        if (strcmp(_attrin_tbl[i].name, name) != 0) {
             continue;
         }
 
@@ -267,13 +267,13 @@ void foreach_graph_clb(yaml_node_t key,
     stringid64_t node_name = stringid64_from_string(buffer);
 
     yaml_node_t local_pose = yaml_get_node(value, "local");
-    cel_mat44f_t pose = yaml_as_cel_mat44f_t(local_pose);
+    mat44f_t pose = yaml_as_mat44f_t(local_pose);
 
     uint32_t idx = (uint32_t) ARRAY_SIZE(&output->output->node_name);
 
     ARRAY_PUSH_BACK(stringid64_t, &output->output->node_name, node_name);
     ARRAY_PUSH_BACK(uint32_t, &output->output->node_parent, output->parent_idx);
-    ARRAY_PUSH_BACK(cel_mat44f_t, &output->output->node_pose, pose);
+    ARRAY_PUSH_BACK(mat44f_t, &output->output->node_pose, pose);
 
     yaml_node_t geometries_n = yaml_get_node(value, "geometries");
     if (yaml_is_valid(geometries_n)) {
@@ -333,8 +333,8 @@ void _compile_assimp_node(struct aiNode *root,
 
     ARRAY_PUSH_BACK(stringid64_t, &output->node_name, name);
     ARRAY_PUSH_BACK(uint32_t, &output->node_parent, parent);
-    ARRAY_PUSH_BACK(cel_mat44f_t, &output->node_pose,
-                    *((cel_mat44f_t *) &root->mTransformation));
+    ARRAY_PUSH_BACK(mat44f_t, &output->node_pose,
+                    *((mat44f_t *) &root->mTransformation));
 
     for (int i = 0; i < root->mNumChildren; ++i) {
         _compile_assimp_node(root->mChildren[i], idx, output);
@@ -360,7 +360,7 @@ int _compile_assimp(const char *filename,
 
     char input_path[128] = {0};
     const char *source_dir = resource_api_v0.compiler_get_source_dir();
-    cel_path_join(input_path, CEL_ARRAY_LEN(input_path), source_dir, input_str);
+    path_join(input_path, CEL_ARRAY_LEN(input_path), source_dir, input_str);
 
     uint32_t postprocess_flag = aiProcessPreset_TargetRealtime_MaxQuality;
 
@@ -467,10 +467,10 @@ int _scene_resource_compiler(const char *filename,
 
     char *source_data =
     CEL_ALLOCATE(memory_api_v0.main_allocator(), char,
-                 cel_vio_size(source_vio) + 1);
-    memory_set(source_data, 0, cel_vio_size(source_vio) + 1);
-    cel_vio_read(source_vio, source_data, sizeof(char),
-                 cel_vio_size(source_vio));
+                 vio_size(source_vio) + 1);
+    memory_set(source_data, 0, vio_size(source_vio) + 1);
+    vio_read(source_vio, source_data, sizeof(char),
+                 vio_size(source_vio));
 
     yaml_document_t h;
     yaml_node_t root = yaml_load_str(source_data, &h);
@@ -498,30 +498,30 @@ int _scene_resource_compiler(const char *filename,
             .vb_len = (uint32_t) ARRAY_SIZE(&output->vb),
     };
 
-    cel_vio_write(build_vio, &res, sizeof(res), 1);
-    cel_vio_write(build_vio, output->geom_name.data, sizeof(stringid64_t),
+    vio_write(build_vio, &res, sizeof(res), 1);
+    vio_write(build_vio, output->geom_name.data, sizeof(stringid64_t),
                   ARRAY_SIZE(&output->geom_name));
-    cel_vio_write(build_vio, output->ib_offset.data, sizeof(uint32_t),
+    vio_write(build_vio, output->ib_offset.data, sizeof(uint32_t),
                   ARRAY_SIZE(&output->ib_offset));
-    cel_vio_write(build_vio, output->vb_offset.data, sizeof(uint32_t),
+    vio_write(build_vio, output->vb_offset.data, sizeof(uint32_t),
                   ARRAY_SIZE(&output->vb_offset));
-    cel_vio_write(build_vio, output->vb_decl.data, sizeof(bgfx_vertex_decl_t),
+    vio_write(build_vio, output->vb_decl.data, sizeof(bgfx_vertex_decl_t),
                   ARRAY_SIZE(&output->vb_decl));
-    cel_vio_write(build_vio, output->ib_size.data, sizeof(uint32_t),
+    vio_write(build_vio, output->ib_size.data, sizeof(uint32_t),
                   ARRAY_SIZE(&output->ib_size));
-    cel_vio_write(build_vio, output->vb_size.data, sizeof(uint32_t),
+    vio_write(build_vio, output->vb_size.data, sizeof(uint32_t),
                   ARRAY_SIZE(&output->vb_size));
-    cel_vio_write(build_vio, output->ib.data, sizeof(uint32_t),
+    vio_write(build_vio, output->ib.data, sizeof(uint32_t),
                   ARRAY_SIZE(&output->ib));
-    cel_vio_write(build_vio, output->vb.data, sizeof(uint8_t),
+    vio_write(build_vio, output->vb.data, sizeof(uint8_t),
                   ARRAY_SIZE(&output->vb));
-    cel_vio_write(build_vio, output->node_name.data, sizeof(stringid64_t),
+    vio_write(build_vio, output->node_name.data, sizeof(stringid64_t),
                   ARRAY_SIZE(&output->node_name));
-    cel_vio_write(build_vio, output->node_parent.data, sizeof(uint32_t),
+    vio_write(build_vio, output->node_parent.data, sizeof(uint32_t),
                   ARRAY_SIZE(&output->node_parent));
-    cel_vio_write(build_vio, output->node_pose.data, sizeof(cel_mat44f_t),
+    vio_write(build_vio, output->node_pose.data, sizeof(mat44f_t),
                   ARRAY_SIZE(&output->node_pose));
-    cel_vio_write(build_vio, output->geom_node.data, sizeof(stringid64_t),
+    vio_write(build_vio, output->geom_node.data, sizeof(stringid64_t),
                   ARRAY_SIZE(&output->geom_name));
 
     _destroy_compile_output(output);

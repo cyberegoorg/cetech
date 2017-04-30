@@ -58,17 +58,17 @@ void sdl_mouse_process(struct eventstream *stream) {
     curent_state[MOUSE_BTN_MIDLE] = (uint8_t) (state & SDL_BUTTON_MMASK);
 
     if ((pos[0] != _G.position[0]) || (pos[1] != _G.position[1])) {
-        cel_window_t main_window = app_api_v0.main_window();
-        uint32_t cel_window_size[2] = {0};
-        window_api_v0.get_size(main_window, &cel_window_size[0],
-                                          &cel_window_size[1]);
+        window_t main_window = app_api_v0.main_window();
+        uint32_t window_size[2] = {0};
+        window_api_v0.get_size(main_window, &window_size[0],
+                                          &window_size[1]);
 
         _G.position[0] = pos[0];
-        _G.position[1] = cel_window_size[1] - pos[1];
+        _G.position[1] = window_size[1] - pos[1];
 
         struct mouse_move_event event;
         event.pos.x = pos[0];
-        event.pos.y = cel_window_size[1] - pos[1];
+        event.pos.y = window_size[1] - pos[1];
 
         event_stream_push(stream, EVENT_MOUSE_MOVE, event);
     }

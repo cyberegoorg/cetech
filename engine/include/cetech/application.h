@@ -49,7 +49,7 @@ struct app_api_v0 {
 
     //! Get main window
     //! \return Main window
-    cel_window_t (*main_window)();
+    window_t (*main_window)();
 };
 
 #endif //CETECH_APPLICATION_H

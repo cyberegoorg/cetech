@@ -25,7 +25,7 @@ IMPORT_API(machine_api_v0);
 
 static struct G {
     int active[GAMEPAD_MAX];
-    cel_vec2f_t position[GAMEPAD_MAX][GAMEPAD_AXIX_MAX];
+    vec2f_t position[GAMEPAD_MAX][GAMEPAD_AXIX_MAX];
     int state[GAMEPAD_MAX][GAMEPAD_BTN_MAX];
     int last_state[GAMEPAD_MAX][GAMEPAD_BTN_MAX];
 } _G = {0};
@@ -110,7 +110,7 @@ uint32_t gamepad_button_index(const char *button_name) {
             continue;
         }
 
-        if (cel_strcmp(_btn_to_str[i], button_name)) {
+        if (strcmp(_btn_to_str[i], button_name)) {
             continue;
         }
 
@@ -163,7 +163,7 @@ uint32_t gamepad_axis_index(const char *axis_name) {
             continue;
         }
 
-        if (cel_strcmp(_axis_to_str[i], axis_name) != 0) {
+        if (strcmp(_axis_to_str[i], axis_name) != 0) {
             continue;
         }
 
@@ -173,7 +173,7 @@ uint32_t gamepad_axis_index(const char *axis_name) {
     return 0;
 }
 
-cel_vec2f_t gamepad_axis(uint32_t idx,
+vec2f_t gamepad_axis(uint32_t idx,
                          const uint32_t axis_index) {
     CEL_ASSERT(LOG_WHERE, (axis_index >= 0) && (axis_index < GAMEPAD_AXIX_MAX));
 

@@ -22,7 +22,7 @@
 //==============================================================================
 
 struct handler32gen {
-    struct cel_allocator *alloc;
+    struct allocator *alloc;
     QUEUE_T(uint32_t) _freeIdx;
     ARRAY_T(uint32_t) _generation;
 };
@@ -31,7 +31,7 @@ struct handler32gen {
 // Public interface
 //==============================================================================
 
-struct handler32gen *handler32gen_create(struct cel_allocator *allocator) {
+struct handler32gen *handler32gen_create(struct allocator *allocator) {
     struct handler32gen *hid = CEL_ALLOCATE(allocator, struct handler32gen, 1);
 
     hid->alloc = allocator;

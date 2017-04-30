@@ -3,16 +3,16 @@
 
 
 void *lua_resource_loader(struct vio *input,
-                          struct cel_allocator *allocator) {
-    const int64_t size = cel_vio_size(input);
+                          struct allocator *allocator) {
+    const int64_t size = vio_size(input);
     char *data = CEL_ALLOCATE(allocator, char, size);
-    cel_vio_read(input, data, 1, size);
+    vio_read(input, data, 1, size);
 
     return data;
 }
 
 void lua_resource_unloader(void *new_data,
-                           struct cel_allocator *allocator) {
+                           struct allocator *allocator) {
     CEL_DEALLOCATE(allocator, new_data);
 }
 
@@ -28,7 +28,7 @@ void lua_resource_offline(stringid64_t name,
 void *lua_resource_reloader(stringid64_t name,
                             void *old_data,
                             void *new_data,
-                            struct cel_allocator *allocator) {
+                            struct allocator *allocator) {
     CEL_DEALLOCATE(allocator, old_data);
 
     struct lua_resource *resource = new_data;

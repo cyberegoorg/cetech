@@ -21,7 +21,7 @@ static uint32_t _sdl_pos(const uint32_t pos) {
     }
 }
 
-static uint32_t _sdl_flags(enum cel_window_flags flags) {
+static uint32_t _sdl_flags(enum window_flags flags) {
     uint32_t sdl_flags = 0;
 
     if (flags & WINDOW_FULLSCREEN) {
@@ -35,12 +35,12 @@ static uint32_t _sdl_flags(enum cel_window_flags flags) {
 // Interface
 //==============================================================================
 
-cel_window_t cel_window_new(const char *title,
-                            enum cel_window_pos x,
-                            enum cel_window_pos y,
+window_t window_new(const char *title,
+                            enum window_pos x,
+                            enum window_pos y,
                             const int32_t width,
                             const int32_t height,
-                            enum cel_window_flags flags) {
+                            enum window_flags flags) {
 
     SDL_Window *w = SDL_CreateWindow(
             title,
@@ -53,43 +53,43 @@ cel_window_t cel_window_new(const char *title,
         log_error("sys", "Could not create window: %s", SDL_GetError());
     }
 
-    return (cel_window_t) {.w = w};
+    return (window_t) {.w = w};
 }
 
-cel_window_t cel_window_new_from(void *hndl) {
+window_t window_new_from(void *hndl) {
     SDL_Window *w = SDL_CreateWindowFrom(hndl);
 
     if (w == NULL) {
         log_error("sys", "Could not create window: %s", SDL_GetError());
     }
 
-    return (cel_window_t) {.w = w};
+    return (window_t) {.w = w};
 }
 
-void cel_window_destroy(cel_window_t w) {
+void window_destroy(window_t w) {
     SDL_DestroyWindow(w.w);
 }
 
-void cel_window_set_title(cel_window_t w,
+void window_set_title(window_t w,
                           const char *title) {
     SDL_SetWindowTitle(w.w, title);
 }
 
-const char *cel_window_get_title(cel_window_t w) {
+const char *window_get_title(window_t w) {
     return SDL_GetWindowTitle(w.w);
 }
 
-void cel_window_update(cel_window_t w) {
+void window_update(window_t w) {
     SDL_UpdateWindowSurface(w.w);
 }
 
-void cel_window_resize(cel_window_t w,
+void window_resize(window_t w,
                        uint32_t width,
                        uint32_t height) {
     SDL_SetWindowSize(w.w, width, height);
 }
 
-void cel_window_get_size(cel_window_t window,
+void window_get_size(window_t window,
                          uint32_t *width,
                          uint32_t *height) {
     int w, h;
@@ -101,7 +101,7 @@ void cel_window_get_size(cel_window_t window,
     *height = (uint32_t) h;
 }
 
-void *cel_window_native_cel_window_ptr(cel_window_t w) {
+void *window_native_window_ptr(window_t w) {
     SDL_SysWMinfo wmi;
 
     SDL_VERSION(&wmi.version);
@@ -119,7 +119,7 @@ void *cel_window_native_cel_window_ptr(cel_window_t w) {
 #endif
 }
 
-void *cel_window_native_display_ptr(cel_window_t w) {
+void *window_native_display_ptr(window_t w) {
     SDL_SysWMinfo wmi;
 
     SDL_VERSION(&wmi.version);

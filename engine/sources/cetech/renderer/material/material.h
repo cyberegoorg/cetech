@@ -11,7 +11,7 @@ void material_set_texture(material_t material,
 
 void material_set_vec4f(material_t material,
                         const char *slot,
-                        cel_vec4f_t v);
+                        vec4f_t v);
 
 void material_set_mat33f(material_t material,
                          const char *slot,
@@ -19,7 +19,7 @@ void material_set_mat33f(material_t material,
 
 void material_set_mat44f(material_t material,
                          const char *slot,
-                         cel_mat44f_t v);
+                         mat44f_t v);
 
 
 void material_use(material_t material);

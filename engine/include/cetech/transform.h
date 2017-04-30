@@ -41,34 +41,34 @@ struct transform_api_v0 {
     //! \param parent Parent matrix
     void (*transform)(world_t world,
                       transform_t transform,
-                      cel_mat44f_t *parent);
+                      mat44f_t *parent);
 
     //! Get transform position
     //! \param world World
     //! \param transform transform
     //! \return Position
-    cel_vec3f_t (*get_position)(world_t world,
+    vec3f_t (*get_position)(world_t world,
                                 transform_t transform);
 
     //! Get transform rotation
     //! \param world World
     //! \param transform transform
     //! \return Rotation
-    cel_quatf_t (*get_rotation)(world_t world,
+    quatf_t (*get_rotation)(world_t world,
                                 transform_t transform);
 
     //! Get transform scale
     //! \param world World
     //! \param transform transform
     //! \return Scale
-    cel_vec3f_t (*get_scale)(world_t world,
+    vec3f_t (*get_scale)(world_t world,
                              transform_t transform);
 
     //! Get world matrix
     //! \param world World
     //! \param transform transform
     //! \return World matrix
-    cel_mat44f_t *(*get_world_matrix)(world_t world,
+    mat44f_t *(*get_world_matrix)(world_t world,
                                       transform_t transform);
 
     //! Set position
@@ -77,7 +77,7 @@ struct transform_api_v0 {
     //! \param pos Position
     void (*set_position)(world_t world,
                          transform_t transform,
-                         cel_vec3f_t pos);
+                         vec3f_t pos);
 
     //! Set rotation
     //! \param world World
@@ -85,7 +85,7 @@ struct transform_api_v0 {
     //! \param rot Rotation
     void (*set_rotation)(world_t world,
                          transform_t transform,
-                         cel_quatf_t rot);
+                         quatf_t rot);
 
     //! Set scale
     //! \param world World
@@ -93,7 +93,7 @@ struct transform_api_v0 {
     //! \param scale Scale
     void (*set_scale)(world_t world,
                       transform_t transform,
-                      cel_vec3f_t scale);
+                      vec3f_t scale);
 
     //! Has entity scene-graph component?
     //! \param world World
@@ -120,9 +120,9 @@ struct transform_api_v0 {
     transform_t (*create)(world_t world,
                           entity_t entity,
                           entity_t parent,
-                          cel_vec3f_t position,
-                          cel_quatf_t rotation,
-                          cel_vec3f_t scale);
+                          vec3f_t position,
+                          quatf_t rotation,
+                          vec3f_t scale);
 
     //! Link two transform
     //! \param world World

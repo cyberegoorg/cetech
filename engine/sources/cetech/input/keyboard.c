@@ -79,7 +79,7 @@ uint32_t keyboard_button_index(const char *button_name) {
             continue;
         }
 
-        if (cel_strcmp(_key_to_str[i], button_name)) {
+        if (strcmp(_key_to_str[i], button_name)) {
             continue;
         }
 

@@ -108,7 +108,7 @@ static void _shutdown() {
 }
 
 
-void renderer_create(cel_window_t window) {
+void renderer_create(window_t window) {
     bgfx_platform_data_t pd = {0};
     pd.nwh = window_api_v0.native_window_ptr(window);
     pd.ndt = window_api_v0.native_display_ptr(window);
@@ -140,8 +140,8 @@ void renderer_render_world(world_t world,
     bgfx_set_view_clear(0, BGFX_CLEAR_COLOR | BGFX_CLEAR_DEPTH, 0x66CCFFff,
                         1.0f, 0);
 
-    cel_mat44f_t view_matrix;
-    cel_mat44f_t proj_matrix;
+    mat44f_t view_matrix;
+    mat44f_t proj_matrix;
 
     camera_api_v0.get_project_view(world, camera, &proj_matrix, &view_matrix);
     bgfx_set_view_transform(0, view_matrix.f, proj_matrix.f);
@@ -159,8 +159,8 @@ void renderer_render_world(world_t world,
     window_api_v0.update(app_api_v0.main_window());
 }
 
-cel_vec2f_t renderer_get_size() {
-    cel_vec2f_t result;
+vec2f_t renderer_get_size() {
+    vec2f_t result;
 
     result.x = _G.size_width;
     result.y = _G.size_height;

@@ -10,9 +10,9 @@
 
 #endif
 
-char *cel_stacktrace(int skip) {
+char *stacktrace(int skip) {
 #if defined(CELIB_LINUX)
-    char *return_str = (char *) cel_malloc(4096 * 8);
+    char *return_str = (char *) memory_malloc(4096 * 8);
     return_str[0] = '\0';
 
     void *array[50];
@@ -56,11 +56,11 @@ char *cel_stacktrace(int skip) {
         }
     }
 
-    cel_free(messages);
+    memory_free(messages);
     return return_str;
 #endif
 }
 
-void cel_stacktrace_free(char *st) {
-    cel_free(st);
+void stacktrace_free(char *st) {
+    memory_free(st);
 }

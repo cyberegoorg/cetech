@@ -6,16 +6,16 @@ struct args {
     const char **argv;
 };
 
-int cel_cmd_find_argument(struct args args,
+int cmd_find_argument(struct args args,
                           const char *longopt,
                           char shortopt);
 
-const char *cel_cmd_get_parameter(struct args args,
+const char *cmd_get_parameter(struct args args,
                                   const char *longopt,
                                   char shortopt,
                                   int param);
 
-int cel_cmd_has_argument(struct args args,
+int cmd_has_argument(struct args args,
                          const char *longopt,
                          char shortopt);
 

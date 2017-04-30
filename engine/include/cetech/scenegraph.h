@@ -42,28 +42,28 @@ struct scenegprah_api_v0 {
     //! \param world World
     //! \param node Node
     //! \return Position
-    cel_vec3f_t (*get_position)(world_t world,
+    vec3f_t (*get_position)(world_t world,
                                 scene_node_t node);
 
     //! Get node rotation
     //! \param world World
     //! \param node Node
     //! \return Rotation
-    cel_quatf_t (*get_rotation)(world_t world,
+    quatf_t (*get_rotation)(world_t world,
                                 scene_node_t node);
 
     //! Get node scale
     //! \param world World
     //! \param node Node
     //! \return Scale
-    cel_vec3f_t (*get_scale)(world_t world,
+    vec3f_t (*get_scale)(world_t world,
                              scene_node_t node);
 
     //! Get world matrix
     //! \param world World
     //! \param node Node
     //! \return World matrix
-    cel_mat44f_t *(*get_world_matrix)(world_t world,
+    mat44f_t *(*get_world_matrix)(world_t world,
                                       scene_node_t node);
 
     //! Set position
@@ -72,7 +72,7 @@ struct scenegprah_api_v0 {
     //! \param pos Position
     void (*set_position)(world_t world,
                          scene_node_t node,
-                         cel_vec3f_t pos);
+                         vec3f_t pos);
 
     //! Set rotation
     //! \param world World
@@ -80,7 +80,7 @@ struct scenegprah_api_v0 {
     //! \param rot Rotation
     void (*set_rotation)(world_t world,
                          scene_node_t node,
-                         cel_quatf_t rot);
+                         quatf_t rot);
 
     //! Set scale
     //! \param world World
@@ -88,7 +88,7 @@ struct scenegprah_api_v0 {
     //! \param scale Scale
     void (*set_scale)(world_t world,
                       scene_node_t node,
-                      cel_vec3f_t scale);
+                      vec3f_t scale);
 
     //! Has entity scene-graph component?
     //! \param world World
@@ -116,7 +116,7 @@ struct scenegprah_api_v0 {
                            entity_t entity,
                            stringid64_t *names,
                            uint32_t *parent,
-                           cel_mat44f_t *pose,
+                           mat44f_t *pose,
                            uint32_t count);
 
     //! Link two node

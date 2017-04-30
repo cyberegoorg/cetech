@@ -5,14 +5,14 @@
 // Time
 // ==============================================================================
 
-uint32_t cel_get_ticks() {
+uint32_t get_ticks() {
     return SDL_GetTicks();
 }
 
-uint64_t cel_get_perf_counter() {
+uint64_t get_perf_counter() {
     return SDL_GetPerformanceCounter();
 }
 
-uint64_t cel_get_perf_freq() {
+uint64_t get_perf_freq() {
     return SDL_GetPerformanceFrequency();
 }

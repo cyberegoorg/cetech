@@ -20,37 +20,37 @@ void *sdl_get_module_api(int api) {
 
         case OS_THREAD_API_ID: {
             static struct thread_api_v0 api = {
-                    .create = cel_thread_create,
-                    .kill = cel_thread_kill,
-                    .wait = cel_thread_wait,
-                    .get_id = cel_thread_get_id,
-                    .actual_id = cel_thread_actual_id,
-                    .yield = cel_thread_yield,
-                    .spin_lock = cel_thread_spin_lock,
-                    .spin_unlock = cel_thread_spin_unlock
+                    .create = thread_create,
+                    .kill = thread_kill,
+                    .wait = thread_wait,
+                    .get_id = thread_get_id,
+                    .actual_id = thread_actual_id,
+                    .yield = thread_yield,
+                    .spin_lock = thread_spin_lock,
+                    .spin_unlock = thread_spin_unlock
             };
             return &api;
         }
 
         case WINDOW_API_ID: {
             static struct window_api_v0 api = {
-                    .create = cel_window_new,
-                    .create_from = cel_window_new_from,
-                    .destroy = cel_window_destroy,
-                    .set_title = cel_window_set_title,
-                    .get_title = cel_window_get_title,
-                    .update = cel_window_update,
-                    .resize = cel_window_resize,
-                    .get_size = cel_window_get_size,
-                    .native_window_ptr = cel_window_native_cel_window_ptr,
-                    .native_display_ptr = cel_window_native_display_ptr
+                    .create = window_new,
+                    .create_from = window_new_from,
+                    .destroy = window_destroy,
+                    .set_title = window_set_title,
+                    .get_title = window_get_title,
+                    .update = window_update,
+                    .resize = window_resize,
+                    .get_size = window_get_size,
+                    .native_window_ptr = window_native_window_ptr,
+                    .native_display_ptr = window_native_display_ptr
             };
             return &api;
         }
 
         case CPU_API_ID: {
             static struct cpu_api_v0 api = {
-                    .count = cel_cpu_count
+                    .count = cpu_count
             };
             return &api;
         }
@@ -58,18 +58,18 @@ void *sdl_get_module_api(int api) {
 
         case OBJECT_API_ID: {
             static struct object_api_v0 api = {
-                    .load  = cel_load_object,
-                    .unload  = cel_unload_object,
-                    .load_function  = cel_load_function
+                    .load  = load_object,
+                    .unload  = unload_object,
+                    .load_function  = load_function
             };
             return &api;
         }
 
         case TIME_API_ID: {
             static struct time_api_v0 api = {
-                    .get_ticks =cel_get_ticks,
-                    .get_perf_counter =cel_get_perf_counter,
-                    .get_perf_freq =cel_get_perf_freq
+                    .get_ticks =get_ticks,
+                    .get_perf_counter =get_perf_counter,
+                    .get_perf_freq =get_perf_freq
             };
             return &api;
         }

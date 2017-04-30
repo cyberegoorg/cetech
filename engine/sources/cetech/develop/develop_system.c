@@ -224,7 +224,7 @@ void _send_events() {
     CEL_ASSERT("develop_manager", mpack_writer_destroy(&writer) == mpack_ok);
     int bytes = nn_send(_G.pub_socket, data, size, 0);
     CEL_ASSERT("develop", bytes == size);
-    free(data);
+    memory_free(data);
 }
 
 //==============================================================================
@@ -300,7 +300,7 @@ void developsys_push_record_float(const char *name,
     struct record_float_event ev = {0};
 
     ev.value = value;
-    memory_copy(ev.name, name, cel_strlen(name));
+    memory_copy(ev.name, name, strlen(name));
 
     developsys_push(EVENT_RECORD_FLOAT, ev);
 }
@@ -309,7 +309,7 @@ void developsys_push_record_int(const char *name,
                                 int value) {
     struct record_int_event ev = {0};
     ev.value = value;
-    memory_copy(ev.name, name, cel_strlen(name));
+    memory_copy(ev.name, name, strlen(name));
 
     developsys_push(EVENT_RECORD_INT, ev);
 }
@@ -338,7 +338,7 @@ void developsys_leave_scope(struct scope_data scope_data) {
             .depth = _scope_depth,
     };
 
-    memory_copy(ev.name, scope_data.name, cel_strlen(scope_data.name));
+    memory_copy(ev.name, scope_data.name, strlen(scope_data.name));
 
     developsys_push(EVENT_SCOPE, ev);
 }

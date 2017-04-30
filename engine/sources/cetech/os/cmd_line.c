@@ -7,31 +7,31 @@
 #include <cetech/cmd_line.h>
 
 
-static int _cel_cmd_line_is_short(struct args args,
+static int _cmd_line_is_short(struct args args,
                                   int i,
                                   char shortopt) {
     return (shortopt != '\0' &&
-            cel_strlen(args.argv[i]) > 1 &&
+            strlen(args.argv[i]) > 1 &&
             args.argv[i][0] == '-' &&
             args.argv[i][1] == shortopt);
 }
 
-static int _cel_cmd_line_is_long(struct args args,
+static int _cmd_line_is_long(struct args args,
                                  const int i,
                                  const char *longopt) {
-    return (cel_strlen(args.argv[i]) > 2 &&
+    return (strlen(args.argv[i]) > 2 &&
             args.argv[i][0] == '-' &&
             args.argv[i][1] == '-' &&
-            cel_strcmp(&args.argv[i][2], longopt) == 0);
+            strcmp(&args.argv[i][2], longopt) == 0);
 }
 
-int cel_cmd_find_argument(struct args args,
+int cmd_find_argument(struct args args,
                           const char *longopt,
                           char shortopt) {
 
     for (int i = 0; i < args.argc; i++) {
-        if (_cel_cmd_line_is_short(args, i, shortopt) ||
-            _cel_cmd_line_is_long(args, i, longopt)) {
+        if (_cmd_line_is_short(args, i, shortopt) ||
+            _cmd_line_is_long(args, i, longopt)) {
             return i;
         }
     }
@@ -39,12 +39,12 @@ int cel_cmd_find_argument(struct args args,
     return args.argc;
 }
 
-const char *cel_cmd_get_parameter(struct args args,
+const char *cmd_get_parameter(struct args args,
                                   const char *longopt,
                                   char shortopt,
                                   int param) {
 
-    int idx = cel_cmd_find_argument(args, longopt, shortopt);
+    int idx = cmd_find_argument(args, longopt, shortopt);
 
     if (idx < args.argc) {
         return args.argv[idx + 1 + param];
@@ -53,8 +53,8 @@ const char *cel_cmd_get_parameter(struct args args,
     return NULL;
 }
 
-int cel_cmd_has_argument(struct args args,
+int cmd_has_argument(struct args args,
                          const char *longopt,
                          char shortopt) {
-    return cel_cmd_find_argument(args, longopt, shortopt) < args.argc;
+    return cmd_find_argument(args, longopt, shortopt) < args.argc;
 }

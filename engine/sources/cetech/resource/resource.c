@@ -98,16 +98,16 @@ static MAP_T(resource_item_t) *_get_resource_map(stringid64_t type) {
 }
 
 void *package_resource_loader(struct vio *input,
-                              struct cel_allocator *allocator) {
-    const int64_t size = cel_vio_size(input);
+                              struct allocator *allocator) {
+    const int64_t size = vio_size(input);
     char *data = CEL_ALLOCATE(allocator, char, size);
-    cel_vio_read(input, data, 1, size);
+    vio_read(input, data, 1, size);
 
     return data;
 }
 
 void package_resource_unloader(void *new_data,
-                               struct cel_allocator *allocator) {
+                               struct allocator *allocator) {
     CEL_DEALLOCATE(allocator, new_data);
 }
 
@@ -122,7 +122,7 @@ void package_resource_offline(stringid64_t name,
 void *package_resource_reloader(stringid64_t name,
                                 void *old_data,
                                 void *new_data,
-                                struct cel_allocator *allocator) {
+                                struct allocator *allocator) {
     CEL_DEALLOCATE(allocator, old_data);
     return new_data;
 }
@@ -158,7 +158,7 @@ static void _init(get_api_fce_t get_engine_api) {
 
 
     char build_dir_full[4096] = {0};
-    cel_path_join(build_dir_full,
+    path_join(build_dir_full,
                   CEL_ARRAY_LEN(build_dir_full),
                   config_api_v0.get_string(_G.config.build_dir),
                   app_api_v0.platform());

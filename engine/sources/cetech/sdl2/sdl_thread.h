@@ -14,7 +14,7 @@
 //! \param name Thread name
 //! \param data Thread data
 //! \return new thread
-thread_t cel_thread_create(thread_fce_t fce,
+thread_t thread_create(thread_fce_t fce,
                            const char *name,
                            void *data) {
     return (thread_t) {
@@ -24,14 +24,14 @@ thread_t cel_thread_create(thread_fce_t fce,
 
 //! Kill thread
 //! \param thread thread
-void cel_thread_kill(thread_t thread) {
+void thread_kill(thread_t thread) {
     SDL_DetachThread(thread.t);
 }
 
 //! Wait for thread
 //! \param thread Thread
 //! \param status Thread exit status
-void cel_thread_wait(thread_t thread,
+void thread_wait(thread_t thread,
                      int *status) {
     SDL_WaitThread(thread.t, status);
 }
@@ -39,17 +39,17 @@ void cel_thread_wait(thread_t thread,
 //! Get id for thread
 //! \param thread Thread
 //! \return ID
-uint64_t cel_thread_get_id(thread_t thread) {
+uint64_t thread_get_id(thread_t thread) {
     return SDL_GetThreadID(thread.t);
 }
 
 //! Get actual thread id
 //! \return Thread id
-uint64_t cel_thread_actual_id() {
+uint64_t thread_actual_id() {
     return SDL_ThreadID();
 }
 
-void cel_thread_yield() {
+void thread_yield() {
 #if defined(CELIB_DARWIN)
     sched_yield();
 #elif defined(CELIB_LINUX)
@@ -57,10 +57,10 @@ void cel_thread_yield() {
 #endif
 }
 
-void cel_thread_spin_lock(spinlock_t *lock) {
+void thread_spin_lock(spinlock_t *lock) {
     SDL_AtomicLock((SDL_SpinLock *) lock);
 }
 
-void cel_thread_spin_unlock(spinlock_t *lock) {
+void thread_spin_unlock(spinlock_t *lock) {
     SDL_AtomicUnlock((SDL_SpinLock *) lock);
 }

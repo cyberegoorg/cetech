@@ -177,66 +177,66 @@ struct lua_api_v0 {
     //! \param l
     //! \param i Element idx
     //! \return Vec2f
-    cel_vec2f_t *(*to_vec2f)(lua_State *l,
+    vec2f_t *(*to_vec2f)(lua_State *l,
                              int i);
 
     //! Get element value as vec3f
     //! \param l
     //! \param i Element idx
     //! \return Vec3f
-    cel_vec3f_t *(*to_vec3f)(lua_State *l,
+    vec3f_t *(*to_vec3f)(lua_State *l,
                              int i);
 
     //! Get element value as vec4f
     //! \param l
     //! \param i Element idx
     //! \return Vec4f
-    cel_vec4f_t *(*to_vec4f)(lua_State *l,
+    vec4f_t *(*to_vec4f)(lua_State *l,
                              int i);
 
     //! Get element value as mat44f
     //! \param l
     //! \param i Element idx
     //! \return Mat44f
-    cel_mat44f_t *(*to_mat44f)(lua_State *l,
+    mat44f_t *(*to_mat44f)(lua_State *l,
                                int i);
 
     //! Get element value as quat
     //! \param l
     //! \param i Element idx
     //! \return Quatf
-    cel_quatf_t *(*to_quat)(lua_State *l,
+    quatf_t *(*to_quat)(lua_State *l,
                             int i);
 
     //! Push vec2f
     //! \param l
     //! \param v Value
     void (*push_vec2f)(lua_State *l,
-                       cel_vec2f_t v);
+                       vec2f_t v);
 
     //! Push vec3f
     //! \param l
     //! \param v Value
     void (*push_vec3f)(lua_State *l,
-                       cel_vec3f_t v);
+                       vec3f_t v);
 
     //! Push vec4f
     //! \param l
     //! \param v Value
     void (*push_vec4f)(lua_State *l,
-                       cel_vec4f_t v);
+                       vec4f_t v);
 
     //! Push mat44f
     //! \param l
     //! \param v Value
     void (*push_mat44f)(lua_State *l,
-                        cel_mat44f_t v);
+                        mat44f_t v);
 
     //! Push quatf
     //! \param l
     //! \param v Value
     void (*push_quat)(lua_State *l,
-                      cel_quatf_t v);
+                      quatf_t v);
 
     //! Execute lua code
     //! \param str Lua code

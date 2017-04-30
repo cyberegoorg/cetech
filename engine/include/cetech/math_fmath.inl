@@ -32,134 +32,134 @@
 // Interface
 //==============================================================================
 
-CEL_FORCE_INLINE float cel_float_floor(float f) {
+CEL_FORCE_INLINE float float_floor(float f) {
     return floorf(f);
 }
 
-CEL_FORCE_INLINE float cel_float_ceil(float f) {
+CEL_FORCE_INLINE float float_ceil(float f) {
     return ceilf(f);
 }
 
-CEL_FORCE_INLINE float cel_float_round(float f) {
-    return cel_float_floor(f + 0.5f);
+CEL_FORCE_INLINE float float_round(float f) {
+    return float_floor(f + 0.5f);
 }
 
-CEL_FORCE_INLINE float cel_float_min(float a,
+CEL_FORCE_INLINE float float_min(float a,
                                    float b) {
     return a < b ? a : b;
 }
 
-CEL_FORCE_INLINE float cel_float_min3(float a,
+CEL_FORCE_INLINE float float_min3(float a,
                                     float b,
                                     float c) {
-    return cel_float_min(a, cel_float_min(b, c));
+    return float_min(a, float_min(b, c));
 }
 
-CEL_FORCE_INLINE float cel_float_max(float a,
+CEL_FORCE_INLINE float float_max(float a,
                                    float b) {
     return a > b ? a : b;
 }
 
-CEL_FORCE_INLINE float cel_float_max3(float a,
+CEL_FORCE_INLINE float float_max3(float a,
                                     float b,
                                     float c) {
-    return cel_float_max(a, cel_float_max(b, c));
+    return float_max(a, float_max(b, c));
 }
 
-CEL_FORCE_INLINE float cel_float_abs(float a) {
+CEL_FORCE_INLINE float float_abs(float a) {
     return a < 0.0f ? -a : a;
 }
 
-CEL_FORCE_INLINE float cel_float_clamp(float a,
+CEL_FORCE_INLINE float float_clamp(float a,
                                      float min,
                                      float max) {
-    return cel_float_min(cel_float_max(a, min), max);
+    return float_min(float_max(a, min), max);
 }
 
-CEL_FORCE_INLINE float cel_float_saturate(float a) {
-    return cel_float_clamp(a, 0.0f, 1.0f);
+CEL_FORCE_INLINE float float_saturate(float a) {
+    return float_clamp(a, 0.0f, 1.0f);
 }
 
-CEL_FORCE_INLINE float cel_float_lerp(float a,
+CEL_FORCE_INLINE float float_lerp(float a,
                                     float b,
                                     float t) {
     return a + (b - a) * t;
 }
 
-CEL_FORCE_INLINE float cel_float_sign(float a) {
+CEL_FORCE_INLINE float float_sign(float a) {
     return a < 0.0f ? -1.0f : 1.0f;
 }
 
-CEL_FORCE_INLINE float cel_float_step(float edge,
+CEL_FORCE_INLINE float float_step(float edge,
                                     float a) {
     return a < edge ? 0.0f : 1.0f;
 }
 
-CEL_FORCE_INLINE float cel_float_pulse(float a,
+CEL_FORCE_INLINE float float_pulse(float a,
                                      float start,
                                      float end) {
-    return cel_float_step(a, start) - cel_float_step(a, end);
+    return float_step(a, start) - float_step(a, end);
 }
 
-CEL_FORCE_INLINE int cel_float_equal(float a,
+CEL_FORCE_INLINE int float_equal(float a,
                                    float b,
                                    float epsilon) {
     // http://realtimecollisiondetection.net/blog/?p=89
-    const float lhs = cel_float_abs(a - b);
-    const float rhs = epsilon * cel_float_max3(1.0f, cel_float_abs(a), cel_float_abs(b));
+    const float lhs = float_abs(a - b);
+    const float rhs = epsilon * float_max3(1.0f, float_abs(a), float_abs(b));
     return lhs <= rhs;
 }
 
-CEL_FORCE_INLINE int cel_float_equals(const float *__restrict _a,
+CEL_FORCE_INLINE int float_equals(const float *__restrict _a,
                                     const float *__restrict _b,
                                     int _num,
                                     float _epsilon) {
 
-    int equal = cel_float_equal(_a[0], _b[0], _epsilon);
+    int equal = float_equal(_a[0], _b[0], _epsilon);
 
     for (int i = 1; equal && i < _num; ++i) {
-        equal = cel_float_equal(_a[i], _b[i], _epsilon);
+        equal = float_equal(_a[i], _b[i], _epsilon);
     }
     return equal;
 }
 
-CEL_FORCE_INLINE float cel_float_bias(float time,
+CEL_FORCE_INLINE float float_bias(float time,
                                     float bias) {
     /// http://blog_demofox.org/2012/09/24/bias-and-gain-are-your-friend/
     return time / ((1.0f / bias - 2.0f) * (1.0f - time) + 1.0f);
 }
 
 
-CEL_FORCE_INLINE float cel_float_gain(float time,
+CEL_FORCE_INLINE float float_gain(float time,
                                     float gain) {
     /// http://blog_demofox.org/2012/09/24/bias-and-gain-are-your-friend/
     if (time < 0.5f)
-        return cel_float_bias(time * 2.0f, gain) / 2.0f;
+        return float_bias(time * 2.0f, gain) / 2.0f;
 
-    return cel_float_bias(time * 2.0f - 1.0f, 1.0f - gain) / 2.0f + 0.5f;
+    return float_bias(time * 2.0f - 1.0f, 1.0f - gain) / 2.0f + 0.5f;
 }
 
-CEL_FORCE_INLINE float cel_float_to_rad(float angle) {
+CEL_FORCE_INLINE float float_to_rad(float angle) {
     return angle * CEL_float_TORAD;
 }
 
-CEL_FORCE_INLINE float cel_float_to_deg(float angle) {
+CEL_FORCE_INLINE float float_to_deg(float angle) {
     return angle * CEL_float_TODEG;
 }
 
-CEL_FORCE_INLINE float cel_float_sin(float angle) {
+CEL_FORCE_INLINE float float_sin(float angle) {
     return sinf(angle);
 }
 
-CEL_FORCE_INLINE float cel_float_cos(float angle) {
+CEL_FORCE_INLINE float float_cos(float angle) {
     return cosf(angle);
 }
 
-CEL_FORCE_INLINE float cel_float_tan(float angle) {
+CEL_FORCE_INLINE float float_tan(float angle) {
     return tanf(angle);
 }
 
-CEL_FORCE_INLINE float cel_float_fast_inv_sqrt(float number) {
+CEL_FORCE_INLINE float float_fast_inv_sqrt(float number) {
     // QUAKE3 fast inverse TODO: URL here
 
     //return (float) (1.0f/Math.Sqrt(number));
@@ -181,24 +181,24 @@ CEL_FORCE_INLINE float cel_float_fast_inv_sqrt(float number) {
     return fl.f;
 }
 
-CEL_FORCE_INLINE float cel_float_fast_sqrt(float number) {
-    return cel_float_fast_inv_sqrt(number) * number;
+CEL_FORCE_INLINE float float_fast_sqrt(float number) {
+    return float_fast_inv_sqrt(number) * number;
 }
 
-CEL_FORCE_INLINE float cel_float_sqrt(float number) {
+CEL_FORCE_INLINE float float_sqrt(float number) {
     return sqrtf(number);
 }
 
-CEL_FORCE_INLINE float cel_float_sq(float f) {
+CEL_FORCE_INLINE float float_sq(float f) {
     return f * f;
 }
 
-CEL_FORCE_INLINE float cel_float_atan2(float y,
+CEL_FORCE_INLINE float float_atan2(float y,
                                      float x) {
     return atan2f(y, x);
 }
 
-CEL_FORCE_INLINE float cel_float_asin(float f) {
+CEL_FORCE_INLINE float float_asin(float f) {
     if (-1.0f < f) {
         if (f < 1.0f)
             return asinf(f);
@@ -209,7 +209,7 @@ CEL_FORCE_INLINE float cel_float_asin(float f) {
     return -CEL_float_HALFPI;
 }
 
-CEL_FORCE_INLINE float cel_float_acos(float f) {
+CEL_FORCE_INLINE float float_acos(float f) {
     if (-1.0f < f) {
         if (f < 1.0f)
             return acosf(f);

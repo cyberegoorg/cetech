@@ -19,7 +19,7 @@ typedef struct scene_blob {
     // uint8_t vb[vb_len];
     // stringid64_t node_name[node_count];
     // uint32_t node_parent[node_count];
-    // cel_mat44f_t node_pose[node_count];
+    // mat44f_t node_pose[node_count];
     // stringid64_t geom_node[geom_count];
 } scene_blob_t;
 
@@ -33,7 +33,7 @@ typedef struct scene_blob {
 #define scene_blob_vb(r) ((uint8_t*) (scene_blob_ib(r) + ((r)->ib_len)))
 #define scene_blob_node_name(r) ((stringid64_t*) (scene_blob_vb(r) + ((r)->vb_len)))
 #define scene_blob_node_parent(r) ((uint32_t*) (scene_blob_node_name(r) + ((r)->node_count)))
-#define scene_blob_node_pose(r) ((cel_mat44f_t*) (scene_blob_node_parent(r) + ((r)->node_count)))
+#define scene_blob_node_pose(r) ((mat44f_t*) (scene_blob_node_parent(r) + ((r)->node_count)))
 #define scene_blob_geom_node(r) ((stringid64_t*) (scene_blob_node_pose(r) + ((r)->node_count)))
 
 #endif // CETECH_SCENE_BLOB_H

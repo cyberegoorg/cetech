@@ -28,7 +28,7 @@ ARRAY_PROTOTYPE(bgfx_texture_handle_t)
 
 ARRAY_PROTOTYPE(bgfx_vertex_buffer_handle_t);
 ARRAY_PROTOTYPE(bgfx_index_buffer_handle_t);
-ARRAY_PROTOTYPE(cel_mat44f_t);
+ARRAY_PROTOTYPE(mat44f_t);
 
 MAP_PROTOTYPE(bgfx_texture_handle_t)
 
@@ -138,7 +138,7 @@ void scene_create_graph(world_t world,
 
     stringid64_t *node_name = scene_blob_node_name(res);
     uint32_t *node_parent = scene_blob_node_parent(res);
-    cel_mat44f_t *node_pose = scene_blob_node_pose(res);
+    mat44f_t *node_pose = scene_blob_node_pose(res);
 
     scenegprah_api_v0.create(world, entity, node_name, node_parent, node_pose,
                            res->node_count);

@@ -26,8 +26,8 @@
 static struct G {
     uint8_t state[MOUSE_BTN_MAX];
     uint8_t last_state[MOUSE_BTN_MAX];
-    cel_vec2f_t last_pos;
-    cel_vec2f_t last_delta_pos;
+    vec2f_t last_pos;
+    vec2f_t last_delta_pos;
 } _G = {0};
 
 
@@ -99,7 +99,7 @@ uint32_t mouse_button_index(const char *button_name) {
             continue;
         }
 
-        if (cel_strcmp(_btn_to_str[i], button_name)) {
+        if (strcmp(_btn_to_str[i], button_name)) {
             continue;
         }
 
@@ -152,7 +152,7 @@ uint32_t mouse_axis_index(const char *axis_name) {
             continue;
         }
 
-        if (cel_strcmp(_axis_to_str[i], axis_name) != 0) {
+        if (strcmp(_axis_to_str[i], axis_name) != 0) {
             continue;
         }
 
@@ -162,7 +162,7 @@ uint32_t mouse_axis_index(const char *axis_name) {
     return 0;
 }
 
-cel_vec2f_t mouse_axis(uint32_t idx,
+vec2f_t mouse_axis(uint32_t idx,
                        const uint32_t axis_index) {
     CEL_ASSERT(LOG_WHERE, (axis_index >= 0) && (axis_index < MOUSE_AXIS_MAX));
 
@@ -174,11 +174,11 @@ cel_vec2f_t mouse_axis(uint32_t idx,
             return _G.last_delta_pos;
 
         default:
-            return (cel_vec2f_t) {0};
+            return (vec2f_t) {0};
     }
 }
 
-void mouse_set_cursor_pos(cel_vec2f_t pos) {
+void mouse_set_cursor_pos(vec2f_t pos) {
 
 }
 

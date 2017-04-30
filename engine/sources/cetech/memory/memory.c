@@ -10,8 +10,8 @@
 
 #define _G MemorySystemGlobals
 struct G {
-    struct cel_allocator *default_allocator;
-    struct cel_allocator *default_scratch_allocator;
+    struct allocator *default_allocator;
+    struct allocator *default_scratch_allocator;
 } MemorySystemGlobals = {0};
 
 
@@ -70,11 +70,11 @@ void memsys_shutdown() {
     malloc_allocator_destroy(_G.default_allocator);
 }
 
-struct cel_allocator *_memsys_main_allocator() {
+struct allocator *_memsys_main_allocator() {
     return _G.default_allocator;
 }
 
-struct cel_allocator *_memsys_main_scratch_allocator() {
+struct allocator *_memsys_main_scratch_allocator() {
     return _G.default_scratch_allocator;
 }
 

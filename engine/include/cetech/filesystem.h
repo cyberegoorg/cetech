@@ -37,7 +37,7 @@ struct filesystem_api_v0 {
     //! \return File or NULL
     struct vio *(*filesystem_open)(stringid64_t root,
                                    const char *path,
-                                   enum cel_vio_open_mode mode);
+                                   enum vio_open_mode mode);
 
     //! Map path for root
     //! \param root Root
@@ -58,13 +58,13 @@ struct filesystem_api_v0 {
                                const char *path,
                                const char *filter,
                                string_array_t *files,
-                               struct cel_allocator *allocator);
+                               struct allocator *allocator);
 
     //! Free list directory array
     //! \param files File array
     //! \param allocator Allocator
     void (*filesystem_listdir_free)(string_array_t *files,
-                                    struct cel_allocator *allocator);
+                                    struct allocator *allocator);
 
     //! Create directory in root
     //! \param root Root

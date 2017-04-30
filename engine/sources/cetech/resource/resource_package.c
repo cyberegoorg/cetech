@@ -83,10 +83,10 @@ int _package_compiler(const char *filename,
                       struct vio *build_vio,
                       struct compilator_api *compilator_api) {
 
-    char source_data[cel_vio_size(source_vio) + 1];
-    memory_set(source_data, 0, cel_vio_size(source_vio) + 1);
-    cel_vio_read(source_vio, source_data, sizeof(char),
-                 cel_vio_size(source_vio));
+    char source_data[vio_size(source_vio) + 1];
+    memory_set(source_data, 0, vio_size(source_vio) + 1);
+    vio_read(source_vio, source_data, sizeof(char),
+                 vio_size(source_vio));
 
     yaml_document_t h;
     yaml_node_t root = yaml_load_str(source_data, &h);
@@ -111,14 +111,14 @@ int _package_compiler(const char *filename,
                                                      ARRAY_SIZE(
                                                              &compile_data.name));
 
-    cel_vio_write(build_vio, &resource, sizeof(resource), 1);
-    cel_vio_write(build_vio, ARRAY_BEGIN(&compile_data.types),
+    vio_write(build_vio, &resource, sizeof(resource), 1);
+    vio_write(build_vio, ARRAY_BEGIN(&compile_data.types),
                   sizeof(stringid64_t), ARRAY_SIZE(&compile_data.types));
-    cel_vio_write(build_vio, ARRAY_BEGIN(&compile_data.name_count), sizeof(uint32_t),
+    vio_write(build_vio, ARRAY_BEGIN(&compile_data.name_count), sizeof(uint32_t),
                   ARRAY_SIZE(&compile_data.name_count));
-    cel_vio_write(build_vio, ARRAY_BEGIN(&compile_data.name),
+    vio_write(build_vio, ARRAY_BEGIN(&compile_data.name),
                   sizeof(stringid64_t), ARRAY_SIZE(&compile_data.name));
-    cel_vio_write(build_vio, ARRAY_BEGIN(&compile_data.offset), sizeof(uint32_t),
+    vio_write(build_vio, ARRAY_BEGIN(&compile_data.offset), sizeof(uint32_t),
                   ARRAY_SIZE(&compile_data.offset));
 
     ARRAY_DESTROY(stringid64_t, &compile_data.types);

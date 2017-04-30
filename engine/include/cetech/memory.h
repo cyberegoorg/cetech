@@ -28,11 +28,11 @@ void memsys_shutdown();
 
 //! Main allcator
 //! \return Main alocator
-struct cel_allocator *_memsys_main_allocator();
+struct allocator *_memsys_main_allocator();
 
 //! Main scratch allocator
 //! \return Main scratch alocator
-struct cel_allocator *_memsys_main_scratch_allocator();
+struct allocator *_memsys_main_scratch_allocator();
 
 
 //==============================================================================
@@ -43,11 +43,11 @@ struct cel_allocator *_memsys_main_scratch_allocator();
 struct memory_api_v0 {
     //! Main allcator
     //! \return Main alocator
-    struct cel_allocator *(*main_allocator)();
+    struct allocator *(*main_allocator)();
 
     //! Main scratch allocator
     //! \return Main scratch alocator
-    struct cel_allocator *(*main_scratch_allocator)();
+    struct allocator *(*main_scratch_allocator)();
 };
 
 

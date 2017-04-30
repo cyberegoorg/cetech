@@ -194,7 +194,7 @@ static void _shutdown() {
     int status = 0;
 
     for (uint32_t i = 0; i < _G._workers_count; ++i) {
-        //cel_thread_kill(_G._workers[i]);
+        //thread_kill(_G._workers[i]);
         thread_api_v0.wait(_G._workers[i], &status);
     }
 

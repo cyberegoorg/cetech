@@ -3,7 +3,7 @@
 
 #include "cetech/log.h"
 
-int cel_exec(const char *argv) {
+int exec(const char *argv) {
 #if defined(CELIB_LINUX)
     char output[4096];
 

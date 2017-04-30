@@ -31,8 +31,8 @@ struct property_value {
         int b;
         float f;
         const char *str;
-        cel_vec3f_t vec3f;
-        cel_quatf_t quatf;
+        vec3f_t vec3f;
+        quatf_t quatf;
         stringid64_t strid_64;
     } value;
 };

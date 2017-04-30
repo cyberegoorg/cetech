@@ -46,17 +46,17 @@ static struct G {
     lua_State *L;
     stringid64_t type_id;
 
-    uint32_t _temp_cel_vec2f_used;
-    uint32_t _temp_cel_vec3f_used;
-    uint32_t _temp_cel_vec4f_used;
-    uint32_t _temp_cel_mat44f_used;
+    uint32_t _temp_vec2f_used;
+    uint32_t _temp_vec3f_used;
+    uint32_t _temp_vec4f_used;
+    uint32_t _temp_mat44f_used;
     uint32_t _temp_quat_used;
 
-    cel_vec2f_t _temp_cel_vec2f_buffer[TEMP_VAR_COUNT];
-    cel_vec3f_t _temp_cel_vec3f_buffer[TEMP_VAR_COUNT];
-    cel_vec4f_t _temp_cel_vec4f_buffer[TEMP_VAR_COUNT];
-    cel_mat44f_t _temp_cel_mat44f_buffer[TEMP_VAR_COUNT];
-    cel_quatf_t _temp_quat_buffer[TEMP_VAR_COUNT];
+    vec2f_t _temp_vec2f_buffer[TEMP_VAR_COUNT];
+    vec3f_t _temp_vec3f_buffer[TEMP_VAR_COUNT];
+    vec4f_t _temp_vec4f_buffer[TEMP_VAR_COUNT];
+    mat44f_t _temp_mat44f_buffer[TEMP_VAR_COUNT];
+    quatf_t _temp_quat_buffer[TEMP_VAR_COUNT];
 
 } LuaGlobals = {0};
 
@@ -87,27 +87,27 @@ static int require(lua_State *L) {
     return 1;
 }
 
-cel_vec2f_t *_new_tmp_vec2f() {
-    CEL_ASSERT("lua_enviroment", _G._temp_cel_vec2f_used < 1024);
-    return &_G._temp_cel_vec2f_buffer[_G._temp_cel_vec2f_used++];
+vec2f_t *_new_tmp_vec2f() {
+    CEL_ASSERT("lua_enviroment", _G._temp_vec2f_used < 1024);
+    return &_G._temp_vec2f_buffer[_G._temp_vec2f_used++];
 }
 
-cel_vec3f_t *_new_tmp_vec3f() {
-    CEL_ASSERT("lua_enviroment", _G._temp_cel_vec3f_used < 1024);
-    return &_G._temp_cel_vec3f_buffer[_G._temp_cel_vec3f_used++];
+vec3f_t *_new_tmp_vec3f() {
+    CEL_ASSERT("lua_enviroment", _G._temp_vec3f_used < 1024);
+    return &_G._temp_vec3f_buffer[_G._temp_vec3f_used++];
 }
 
-cel_vec4f_t *_new_tmp_vec4f() {
-    CEL_ASSERT("lua_enviroment", _G._temp_cel_vec4f_used < 1024);
-    return &_G._temp_cel_vec4f_buffer[_G._temp_cel_vec4f_used++];
+vec4f_t *_new_tmp_vec4f() {
+    CEL_ASSERT("lua_enviroment", _G._temp_vec4f_used < 1024);
+    return &_G._temp_vec4f_buffer[_G._temp_vec4f_used++];
 }
 
-cel_mat44f_t *_new_tmp_mat44f() {
-    CEL_ASSERT("lua_enviroment", _G._temp_cel_mat44f_used < 1024);
-    return &_G._temp_cel_mat44f_buffer[_G._temp_cel_mat44f_used++];
+mat44f_t *_new_tmp_mat44f() {
+    CEL_ASSERT("lua_enviroment", _G._temp_mat44f_used < 1024);
+    return &_G._temp_mat44f_buffer[_G._temp_mat44f_used++];
 }
 
-cel_quatf_t *_new_tmp_quat() {
+quatf_t *_new_tmp_quat() {
     CEL_ASSERT("lua_enviroment", _G._temp_quat_used < 1024);
     return &_G._temp_quat_buffer[_G._temp_quat_used++];
 }
@@ -132,10 +132,10 @@ void _game_shutdown_clb() {
 }
 
 void _game_update_clb(float dt) {
-    _G._temp_cel_vec2f_used = 0;
-    _G._temp_cel_vec3f_used = 0;
-    _G._temp_cel_vec4f_used = 0;
-    _G._temp_cel_mat44f_used = 0;
+    _G._temp_vec2f_used = 0;
+    _G._temp_vec3f_used = 0;
+    _G._temp_vec4f_used = 0;
+    _G._temp_mat44f_used = 0;
     _G._temp_quat_used = 0;
 
     luasys_call_global("update", "f", dt);
@@ -305,10 +305,10 @@ int _lua_compiler(const char *filename,
                   struct vio *build_vio,
                   struct compilator_api *compilator_api) {
 
-    char tmp[cel_vio_size(source_vio) + 1];
-    memory_set(tmp, 0, cel_vio_size(source_vio) + 1);
+    char tmp[vio_size(source_vio) + 1];
+    memory_set(tmp, 0, vio_size(source_vio) + 1);
 
-    cel_vio_read(source_vio, tmp, sizeof(char), cel_vio_size(source_vio));
+    vio_read(source_vio, tmp, sizeof(char), vio_size(source_vio));
 
     lua_State *state = luaL_newstate();
     luaL_openlibs(state);
@@ -350,8 +350,8 @@ int _lua_compiler(const char *filename,
                 .size = bc_len,
         };
 
-        cel_vio_write(build_vio, &resource, sizeof(struct lua_resource), 1);
-        cel_vio_write(build_vio, bc, sizeof(char), bc_len);
+        vio_write(build_vio, &resource, sizeof(struct lua_resource), 1);
+        vio_write(build_vio, bc, sizeof(char), bc_len);
     }
 
     lua_close(state);
@@ -463,71 +463,71 @@ const char *luasys_to_string_l(lua_State *_L,
     return lua_tolstring(_L, i, len);
 }
 
-cel_vec2f_t *luasys_to_vec2f(lua_State *l,
+vec2f_t *luasys_to_vec2f(lua_State *l,
                              int i) {
     void *v = lua_touserdata(l, i);
-    return (cel_vec2f_t *) v;
+    return (vec2f_t *) v;
 }
 
-cel_vec3f_t *luasys_to_vec3f(lua_State *l,
+vec3f_t *luasys_to_vec3f(lua_State *l,
                              int i) {
     void *v = lua_touserdata(l, i);
-    return (cel_vec3f_t *) v;
+    return (vec3f_t *) v;
 }
 
-cel_vec4f_t *luasys_to_vec4f(lua_State *l,
+vec4f_t *luasys_to_vec4f(lua_State *l,
                              int i) {
     void *v = lua_touserdata(l, i);
-    return (cel_vec4f_t *) v;
+    return (vec4f_t *) v;
 }
 
-cel_quatf_t *luasys_to_quat(lua_State *l,
+quatf_t *luasys_to_quat(lua_State *l,
                             int i) {
     void *v = lua_touserdata(l, i);
-    return (cel_quatf_t *) v;
+    return (quatf_t *) v;
 }
 
 void luasys_push_vec2f(lua_State *l,
-                       cel_vec2f_t v) {
-    cel_vec2f_t *tmp_v = _new_tmp_vec2f();
+                       vec2f_t v) {
+    vec2f_t *tmp_v = _new_tmp_vec2f();
     *tmp_v = v;
 
     lua_pushlightuserdata(l, tmp_v);
 }
 
 void luasys_push_vec3f(lua_State *l,
-                       cel_vec3f_t v) {
-    cel_vec3f_t *tmp_v = _new_tmp_vec3f();
+                       vec3f_t v) {
+    vec3f_t *tmp_v = _new_tmp_vec3f();
     *tmp_v = v;
 
     lua_pushlightuserdata(l, tmp_v);
 }
 
 void luasys_push_vec4f(lua_State *l,
-                       cel_vec4f_t v) {
-    cel_vec4f_t *tmp_v = _new_tmp_vec4f();
+                       vec4f_t v) {
+    vec4f_t *tmp_v = _new_tmp_vec4f();
     *tmp_v = v;
 
     lua_pushlightuserdata(l, tmp_v);
 }
 
 void luasys_push_quat(lua_State *l,
-                      cel_quatf_t v) {
-    cel_quatf_t *tmp_v = _new_tmp_quat();
+                      quatf_t v) {
+    quatf_t *tmp_v = _new_tmp_quat();
     *tmp_v = v;
 
     lua_pushlightuserdata(l, tmp_v);
 }
 
-cel_mat44f_t *luasys_to_mat44f(lua_State *l,
+mat44f_t *luasys_to_mat44f(lua_State *l,
                                int i) {
     void *v = lua_touserdata(l, i);
-    return (cel_mat44f_t *) v;
+    return (mat44f_t *) v;
 }
 
 void luasys_push_mat44f(lua_State *l,
-                        cel_mat44f_t v) {
-    cel_mat44f_t *tmp_v = _new_tmp_mat44f();
+                        mat44f_t v) {
+    mat44f_t *tmp_v = _new_tmp_mat44f();
     *tmp_v = v;
 
     lua_pushlightuserdata(l, tmp_v);
@@ -585,50 +585,50 @@ void luasys_add_module_function(const char *module,
 
 static int _is_vec2f(lua_State *L,
                      int idx) {
-    cel_vec2f_t *p = lua_touserdata(L, idx);
+    vec2f_t *p = lua_touserdata(L, idx);
 
-    return (p >= _G._temp_cel_vec2f_buffer) &&
-           (p < (_G._temp_cel_vec2f_buffer + 1024));
+    return (p >= _G._temp_vec2f_buffer) &&
+           (p < (_G._temp_vec2f_buffer + 1024));
 }
 
 static int _is_vec3f(lua_State *L,
                      int idx) {
-    cel_vec3f_t *p = lua_touserdata(L, idx);
-    return (p >= _G._temp_cel_vec3f_buffer) &&
-           (p < (_G._temp_cel_vec3f_buffer + 1024));
+    vec3f_t *p = lua_touserdata(L, idx);
+    return (p >= _G._temp_vec3f_buffer) &&
+           (p < (_G._temp_vec3f_buffer + 1024));
 }
 
 static int _is_vec4f(lua_State *L,
                      int idx) {
-    cel_vec4f_t *p = lua_touserdata(L, idx);
-    return (p >= _G._temp_cel_vec4f_buffer) &&
-           (p < (_G._temp_cel_vec4f_buffer + 1024));
+    vec4f_t *p = lua_touserdata(L, idx);
+    return (p >= _G._temp_vec4f_buffer) &&
+           (p < (_G._temp_vec4f_buffer + 1024));
 }
 
 static int _is_quat(lua_State *L,
                     int idx) {
-    cel_quatf_t *p = lua_touserdata(L, idx);
+    quatf_t *p = lua_touserdata(L, idx);
     return (p >= _G._temp_quat_buffer) && (p < (_G._temp_quat_buffer + 1024));
 }
 
 static int _is_mat44f(lua_State *L,
                       int idx) {
-    cel_mat44f_t *p = lua_touserdata(L, idx);
-    return (p >= _G._temp_cel_mat44f_buffer) &&
-           (p < (_G._temp_cel_mat44f_buffer + 1024));
+    mat44f_t *p = lua_touserdata(L, idx);
+    return (p >= _G._temp_mat44f_buffer) &&
+           (p < (_G._temp_mat44f_buffer + 1024));
 }
 
 static int lightuserdata_add(lua_State *L) {
     if (_is_vec2f(L, 1)) {
-        return _cel_vec2f_add(L);
+        return _vec2f_add(L);
     }
 
     if (_is_vec3f(L, 1)) {
-        return _cel_vec3f_add(L);
+        return _vec3f_add(L);
     }
 
     if (_is_vec4f(L, 1)) {
-        return _cel_vec4f_add(L);
+        return _vec4f_add(L);
     }
 
     if (_is_quat(L, 1)) {
@@ -640,15 +640,15 @@ static int lightuserdata_add(lua_State *L) {
 
 static int lightuserdata_sub(lua_State *L) {
     if (_is_vec2f(L, 1)) {
-        return _cel_vec2f_sub(L);
+        return _vec2f_sub(L);
     }
 
     if (_is_vec3f(L, 1)) {
-        return _cel_vec3f_sub(L);
+        return _vec3f_sub(L);
     }
 
     if (_is_vec4f(L, 1)) {
-        return _cel_vec4f_sub(L);
+        return _vec4f_sub(L);
     }
 
     if (_is_quat(L, 1)) {
@@ -656,7 +656,7 @@ static int lightuserdata_sub(lua_State *L) {
     }
 
 //    if( _is_mat44f(L, p)) {
-//        return _cel_mat44f_add(L);
+//        return _mat44f_add(L);
 //    }
     return 0;
 }
@@ -665,15 +665,15 @@ static int lightuserdata_mul(lua_State *L) {
     void *p = lua_touserdata(L, 1);
 
     if (_is_vec2f(L, 1)) {
-        return _cel_vec2f_mul(L);
+        return _vec2f_mul(L);
     }
 
     if (_is_vec3f(L, 1)) {
-        return _cel_vec3f_mul(L);
+        return _vec3f_mul(L);
     }
 
     if (_is_vec4f(L, 1)) {
-        return _cel_vec4f_mul(L);
+        return _vec4f_mul(L);
     }
 
     if (_is_quat(L, 1)) {
@@ -681,22 +681,22 @@ static int lightuserdata_mul(lua_State *L) {
     }
 
     if (_is_mat44f(L, 1)) {
-        return _cel_mat44f_mul(L);
+        return _mat44f_mul(L);
     }
     return 0;
 }
 
 static int lightuserdata_div(lua_State *L) {
     if (_is_vec2f(L, 1)) {
-        return _cel_vec2f_div(L);
+        return _vec2f_div(L);
     }
 
     if (_is_vec3f(L, 1)) {
-        return _cel_vec3f_div(L);
+        return _vec3f_div(L);
     }
 
     if (_is_vec4f(L, 1)) {
-        return _cel_vec4f_div(L);
+        return _vec4f_div(L);
     }
 
     if (_is_quat(L, 1)) {
@@ -704,22 +704,22 @@ static int lightuserdata_div(lua_State *L) {
     }
 
 //    if( _is_mat44f(L, p)) {
-//        return _cel_mat44f_add(L);
+//        return _mat44f_add(L);
 //    }}
     return 0;
 }
 
 static int lightuserdata_unm(lua_State *L) {
     if (_is_vec2f(L, 1)) {
-        return _cel_vec2f_unm(L);
+        return _vec2f_unm(L);
     }
 
     if (_is_vec3f(L, 1)) {
-        return _cel_vec3f_unm(L);
+        return _vec3f_unm(L);
     }
 
     if (_is_vec4f(L, 1)) {
-        return _cel_vec4f_unm(L);
+        return _vec4f_unm(L);
     }
 
     if (_is_quat(L, 1)) {
@@ -727,7 +727,7 @@ static int lightuserdata_unm(lua_State *L) {
     }
 
     if (_is_mat44f(L, 1)) {
-        return _cel_mat44f_unm(L);
+        return _mat44f_unm(L);
     }
 
     return 0;
@@ -735,15 +735,15 @@ static int lightuserdata_unm(lua_State *L) {
 
 static int lightuserdata_index(lua_State *L) {
     if (_is_vec2f(L, 1)) {
-        return _cel_vec2f_index(L);
+        return _vec2f_index(L);
     }
 
     if (_is_vec3f(L, 1)) {
-        return _cel_vec3f_index(L);
+        return _vec3f_index(L);
     }
 
     if (_is_vec4f(L, 1)) {
-        return _cel_vec4f_index(L);
+        return _vec4f_index(L);
     }
 
     if (_is_quat(L, 1)) {
@@ -751,7 +751,7 @@ static int lightuserdata_index(lua_State *L) {
     }
 
     if (_is_mat44f(L, 1)) {
-        return _cel_mat44f_index(L);
+        return _mat44f_index(L);
     }
 
     return 0;
@@ -759,15 +759,15 @@ static int lightuserdata_index(lua_State *L) {
 
 static int lightuserdata_newindex(lua_State *L) {
     if (_is_vec2f(L, 1)) {
-        return _cel_vec2f_newindex(L);
+        return _vec2f_newindex(L);
     }
 
     if (_is_vec3f(L, 1)) {
-        return _cel_vec3f_newindex(L);
+        return _vec3f_newindex(L);
     }
 
     if (_is_vec4f(L, 1)) {
-        return _cel_vec4f_newindex(L);
+        return _vec4f_newindex(L);
     }
 
     if (_is_quat(L, 1)) {
@@ -775,7 +775,7 @@ static int lightuserdata_newindex(lua_State *L) {
     }
 
     if (_is_mat44f(L, 1)) {
-        return _cel_mat44f_newindex(L);
+        return _mat44f_newindex(L);
     }
 
     return 0;

@@ -64,7 +64,7 @@ static struct G {
     } config;
 
     const struct game_callbacks *game;
-    cel_window_t main_window;
+    window_t main_window;
     struct args args;
     int is_running;
     int init_error;
@@ -90,7 +90,7 @@ const char *application_platform();
 
 const char *application_native_platform();
 
-cel_window_t application_get_main_window();
+window_t application_get_main_window();
 
 void application_quit() {
     _G.is_running = 0;
@@ -330,7 +330,7 @@ void application_start() {
         develop_api_v0.push_record_float("engine.delta_time", dt);
 
         module_call_after_update(dt);
-        //cel_thread_yield();
+        //thread_yield();
     }
 
     _G.game->shutdown();
@@ -353,7 +353,7 @@ const char *application_platform() {
     return application_native_platform();
 }
 
-cel_window_t application_get_main_window() {
+window_t application_get_main_window() {
     return _G.main_window;
 }
 

@@ -52,7 +52,7 @@ static int _transform_get_scale(lua_State *l) {
 static int _transform_set_position(lua_State *l) {
     world_t w = {.h = luasys_to_handler(l, 1)};
     transform_t t = {.idx = luasys_to_int(l, 2)};
-    cel_vec3f_t *pos = luasys_to_vec3f(l, 3);
+    vec3f_t *pos = luasys_to_vec3f(l, 3);
 
     transform_api_v0.set_position(w, t, *pos);
     return 0;
@@ -61,7 +61,7 @@ static int _transform_set_position(lua_State *l) {
 static int _transform_set_scale(lua_State *l) {
     world_t w = {.h = luasys_to_handler(l, 1)};
     transform_t t = {.idx = luasys_to_int(l, 2)};
-    cel_vec3f_t *pos = luasys_to_vec3f(l, 3);
+    vec3f_t *pos = luasys_to_vec3f(l, 3);
 
     transform_api_v0.set_scale(w, t, *pos);
     return 0;
@@ -70,7 +70,7 @@ static int _transform_set_scale(lua_State *l) {
 static int _transform_set_rotation(lua_State *l) {
     world_t w = {.h = luasys_to_handler(l, 1)};
     transform_t t = {.idx = luasys_to_int(l, 2)};
-    cel_quatf_t *rot = luasys_to_quat(l, 3);
+    quatf_t *rot = luasys_to_quat(l, 3);
 
     transform_api_v0.set_rotation(w, t, *rot);
     return 0;
@@ -80,7 +80,7 @@ static int _transform_get_world_matrix(lua_State *l) {
     world_t w = {.h = luasys_to_handler(l, 1)};
     transform_t t = {.idx = luasys_to_int(l, 2)};
 
-    cel_mat44f_t *wm = transform_api_v0.get_world_matrix(w, t);
+    mat44f_t *wm = transform_api_v0.get_world_matrix(w, t);
 
     luasys_push_mat44f(l, *wm);
     return 1;

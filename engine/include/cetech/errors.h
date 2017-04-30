@@ -18,7 +18,7 @@
 #define CEL_ASSERT_MSG(where, condition, msg, ...)                             \
     do {                                                                       \
         if (!(condition)) {                                                    \
-            char* st = cel_stacktrace(1);                                      \
+            char* st = stacktrace(1);                                      \
             log_error(where ".assert",                                         \
                        "msg: \"%s, " msg "\"" _MSG_END,                        \
                        #condition,                                             \
@@ -26,7 +26,7 @@
                        __FILE__,                                               \
                        __LINE__,                                               \
                        st);                                                    \
-            cel_stacktrace_free(st);                                           \
+            stacktrace_free(st);                                           \
             abort();                                                           \
             /*exit(1);*/                                                       \
         }                                                                      \
@@ -39,9 +39,9 @@
 #define CEL_ASSERT(where, condition) CEL_ASSERT_MSG(where, condition, "")
 
 
-char *cel_stacktrace(int skip);
+char *stacktrace(int skip);
 
-void cel_stacktrace_free(char *st);
+void stacktrace_free(char *st);
 
 
 #endif //CELIB_ERRORS_H

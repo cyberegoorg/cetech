@@ -6,6 +6,7 @@
 
 #include <include/mpack/mpack.h>
 #include <include/nanomsg/nn.h>
+#include <cetech/allocator.h>
 
 #include "cetech/log.h"
 #include "cetech/errors.h"
@@ -62,5 +63,5 @@ void nano_log_handler(enum log_level level,
 
     bytes = nn_send(socket, data, size, 0);
     CEL_ASSERT(LOG_WHERE, (size_t) bytes == size);
-    free(data);
+    memory_free(data);
 }

@@ -29,7 +29,7 @@ enum {
 //! \param allocator Allocator
 //! \return Resource data
 typedef void *(*resource_loader_t)(struct vio *input,
-                                   struct cel_allocator *allocator);
+                                   struct allocator *allocator);
 
 //! Resource online callback
 //! \param name Resource name
@@ -47,7 +47,7 @@ typedef void  (*resource_offline_t)(stringid64_t name,
 //! \param new_data Resource data
 //! \param allocator Allocator
 typedef void  (*resource_unloader_t)(void *new_data,
-                                     struct cel_allocator *allocator);
+                                     struct allocator *allocator);
 
 //! Resource reloader
 //! \param name Resource name
@@ -57,7 +57,7 @@ typedef void  (*resource_unloader_t)(void *new_data,
 typedef void *(*resource_reloader_t)(stringid64_t name,
                                      void *old_data,
                                      void *new_data,
-                                     struct cel_allocator *allocator);
+                                     struct allocator *allocator);
 
 struct compilator_api;
 

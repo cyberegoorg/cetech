@@ -9,13 +9,13 @@
 #include <cetech/module.h>
 
 
-ARRAY_PROTOTYPE(cel_vec3f_t)
+ARRAY_PROTOTYPE(vec3f_t)
 
 ARRAY_PROTOTYPE(stringid64_t)
 
-ARRAY_PROTOTYPE(cel_mat44f_t)
+ARRAY_PROTOTYPE(mat44f_t)
 
-ARRAY_PROTOTYPE(cel_quatf_t)
+ARRAY_PROTOTYPE(quatf_t)
 
 typedef struct {
     MAP_T(uint32_t) ent_idx_map;
@@ -25,10 +25,10 @@ typedef struct {
     ARRAY_T(uint32_t) parent;
 
     ARRAY_T(stringid64_t) name;
-    ARRAY_T(cel_vec3f_t) position;
-    ARRAY_T(cel_quatf_t) rotation;
-    ARRAY_T(cel_vec3f_t) scale;
-    ARRAY_T(cel_mat44f_t) world_matrix;
+    ARRAY_T(vec3f_t) position;
+    ARRAY_T(quatf_t) rotation;
+    ARRAY_T(vec3f_t) scale;
+    ARRAY_T(mat44f_t) world_matrix;
 } world_data_t;
 
 ARRAY_PROTOTYPE(world_data_t)
@@ -54,10 +54,10 @@ static void _new_world(world_t world) {
     ARRAY_INIT(uint32_t, &data.parent, memory_api_v0.main_allocator());
 
     ARRAY_INIT(stringid64_t, &data.name, memory_api_v0.main_allocator());
-    ARRAY_INIT(cel_vec3f_t, &data.position, memory_api_v0.main_allocator());
-    ARRAY_INIT(cel_quatf_t, &data.rotation, memory_api_v0.main_allocator());
-    ARRAY_INIT(cel_vec3f_t, &data.scale, memory_api_v0.main_allocator());
-    ARRAY_INIT(cel_mat44f_t, &data.world_matrix, memory_api_v0.main_allocator());
+    ARRAY_INIT(vec3f_t, &data.position, memory_api_v0.main_allocator());
+    ARRAY_INIT(quatf_t, &data.rotation, memory_api_v0.main_allocator());
+    ARRAY_INIT(vec3f_t, &data.scale, memory_api_v0.main_allocator());
+    ARRAY_INIT(mat44f_t, &data.world_matrix, memory_api_v0.main_allocator());
 
     MAP_SET(world_data_t, &_G.world, world.h.id, data);
 }
@@ -76,10 +76,10 @@ static void _destroy_world(world_t world) {
     ARRAY_DESTROY(uint32_t, &data->parent);
 
     ARRAY_DESTROY(stringid64_t, &data->name);
-    ARRAY_DESTROY(cel_vec3f_t, &data->position);
-    ARRAY_DESTROY(cel_quatf_t, &data->rotation);
-    ARRAY_DESTROY(cel_vec3f_t, &data->scale);
-    ARRAY_DESTROY(cel_mat44f_t, &data->world_matrix);
+    ARRAY_DESTROY(vec3f_t, &data->position);
+    ARRAY_DESTROY(quatf_t, &data->rotation);
+    ARRAY_DESTROY(vec3f_t, &data->scale);
+    ARRAY_DESTROY(mat44f_t, &data->world_matrix);
 }
 
 static void _on_world_create(world_t world) {
@@ -119,26 +119,26 @@ int scenegraph_is_valid(scene_node_t transform) {
 
 void scene_node_transform(world_t world,
                           scene_node_t transform,
-                          cel_mat44f_t *parent) {
+                          mat44f_t *parent) {
     world_data_t *world_data = _get_world_data(world);
 
-    cel_vec3f_t pos = ARRAY_AT(&world_data->position, transform.idx);
-    cel_quatf_t rot = ARRAY_AT(&world_data->rotation, transform.idx);
-    cel_vec3f_t sca = ARRAY_AT(&world_data->scale, transform.idx);
+    vec3f_t pos = ARRAY_AT(&world_data->position, transform.idx);
+    quatf_t rot = ARRAY_AT(&world_data->rotation, transform.idx);
+    vec3f_t sca = ARRAY_AT(&world_data->scale, transform.idx);
 
-    cel_mat44f_t rm = {0};
-    cel_mat44f_t sm = {0};
-    cel_mat44f_t m = {0};
+    mat44f_t rm = {0};
+    mat44f_t sm = {0};
+    mat44f_t m = {0};
 
-    cel_quatf_to_mat44f(&rm, &rot);
-    cel_mat44f_scale(&sm, sca.x, sca.y, sca.z);
-    cel_mat44f_mul(&m, &sm, &rm);
+    quatf_to_mat44f(&rm, &rot);
+    mat44f_scale(&sm, sca.x, sca.y, sca.z);
+    mat44f_mul(&m, &sm, &rm);
 
     m.w.x = pos.x;
     m.w.y = pos.y;
     m.w.z = pos.z;
 
-    cel_mat44f_mul(&ARRAY_AT(&world_data->world_matrix, transform.idx), &m,
+    mat44f_mul(&ARRAY_AT(&world_data->world_matrix, transform.idx), &m,
                    parent);
 
     uint32_t child = ARRAY_AT(&world_data->first_child, transform.idx);
@@ -154,44 +154,44 @@ void scene_node_transform(world_t world,
     }
 }
 
-cel_vec3f_t scenegraph_get_position(world_t world,
+vec3f_t scenegraph_get_position(world_t world,
                                     scene_node_t transform) {
 
     world_data_t *world_data = _get_world_data(world);
     return ARRAY_AT(&world_data->position, transform.idx);
 }
 
-cel_quatf_t scenegraph_get_rotation(world_t world,
+quatf_t scenegraph_get_rotation(world_t world,
                                     scene_node_t transform) {
 
     world_data_t *world_data = _get_world_data(world);
     return ARRAY_AT(&world_data->rotation, transform.idx);
 }
 
-cel_vec3f_t scenegraph_get_scale(world_t world,
+vec3f_t scenegraph_get_scale(world_t world,
                                  scene_node_t transform) {
 
     world_data_t *world_data = _get_world_data(world);
     return ARRAY_AT(&world_data->scale, transform.idx);
 }
 
-cel_mat44f_t *scenegraph_get_world_matrix(world_t world,
+mat44f_t *scenegraph_get_world_matrix(world_t world,
                                           scene_node_t transform) {
-    static cel_mat44f_t _n = MAT44F_INIT_IDENTITY;
+    static mat44f_t _n = MAT44F_INIT_IDENTITY;
     world_data_t *world_data = _get_world_data(world);
     return &ARRAY_AT(&world_data->world_matrix, transform.idx);
 }
 
 void scenegraph_set_position(world_t world,
                              scene_node_t transform,
-                             cel_vec3f_t pos) {
+                             vec3f_t pos) {
     world_data_t *world_data = _get_world_data(world);
     uint32_t parent_idx = ARRAY_AT(&world_data->parent, transform.idx);
 
     scene_node_t pt = {.idx = parent_idx};
 
-    cel_mat44f_t m = MAT44F_INIT_IDENTITY;
-    cel_mat44f_t *p =
+    mat44f_t m = MAT44F_INIT_IDENTITY;
+    mat44f_t *p =
             parent_idx != UINT32_MAX ? scenegraph_get_world_matrix(world, pt)
                                      : &m;
 
@@ -202,19 +202,19 @@ void scenegraph_set_position(world_t world,
 
 void scenegraph_set_rotation(world_t world,
                              scene_node_t transform,
-                             cel_quatf_t rot) {
+                             quatf_t rot) {
     world_data_t *world_data = _get_world_data(world);
     uint32_t parent_idx = ARRAY_AT(&world_data->parent, transform.idx);
 
     scene_node_t pt = {.idx = parent_idx};
 
-    cel_mat44f_t m = MAT44F_INIT_IDENTITY;
-    cel_mat44f_t *p =
+    mat44f_t m = MAT44F_INIT_IDENTITY;
+    mat44f_t *p =
             parent_idx != UINT32_MAX ? scenegraph_get_world_matrix(world, pt)
                                      : &m;
 
-    cel_quatf_t nq = {0};
-    cel_quatf_normalized(&nq, &rot);
+    quatf_t nq = {0};
+    quatf_normalized(&nq, &rot);
 
     ARRAY_AT(&world_data->rotation, transform.idx) = nq;
 
@@ -223,14 +223,14 @@ void scenegraph_set_rotation(world_t world,
 
 void scenegraph_set_scale(world_t world,
                           scene_node_t transform,
-                          cel_vec3f_t scale) {
+                          vec3f_t scale) {
     world_data_t *world_data = _get_world_data(world);
     uint32_t parent_idx = ARRAY_AT(&world_data->parent, transform.idx);
 
     scene_node_t pt = {.idx = parent_idx};
 
-    cel_mat44f_t m = MAT44F_INIT_IDENTITY;
-    cel_mat44f_t *p =
+    mat44f_t m = MAT44F_INIT_IDENTITY;
+    mat44f_t *p =
             parent_idx != UINT32_MAX ? scenegraph_get_world_matrix(world, pt)
                                      : &m;
 
@@ -257,7 +257,7 @@ scene_node_t scenegraph_create(world_t world,
                                entity_t entity,
                                stringid64_t *names,
                                uint32_t *parent,
-                               cel_mat44f_t *pose,
+                               mat44f_t *pose,
                                uint32_t count) {
     world_data_t *data = _get_world_data(world);
 
@@ -268,23 +268,23 @@ scene_node_t scenegraph_create(world_t world,
         uint32_t idx = (uint32_t) ARRAY_SIZE(&data->position);
         nodes[i] = (scene_node_t) {.idx = idx};
 
-        cel_mat44f_t local_pose = pose[i];
+        mat44f_t local_pose = pose[i];
 
-        cel_vec3f_t position = {0};
-        cel_quatf_t rotation = QUATF_IDENTITY;
-        cel_vec3f_t scale = {.x = 1.0f, .y = 1.0f, .z = 1.0f};
+        vec3f_t position = {0};
+        quatf_t rotation = QUATF_IDENTITY;
+        vec3f_t scale = {.x = 1.0f, .y = 1.0f, .z = 1.0f};
 
-        ARRAY_PUSH_BACK(cel_vec3f_t, &data->position, position);
-        ARRAY_PUSH_BACK(cel_quatf_t, &data->rotation, rotation);
-        ARRAY_PUSH_BACK(cel_vec3f_t, &data->scale, scale);
+        ARRAY_PUSH_BACK(vec3f_t, &data->position, position);
+        ARRAY_PUSH_BACK(quatf_t, &data->rotation, rotation);
+        ARRAY_PUSH_BACK(vec3f_t, &data->scale, scale);
 
         ARRAY_PUSH_BACK(stringid64_t, &data->name, names[i]);
         ARRAY_PUSH_BACK(uint32_t, &data->parent, UINT32_MAX);
         ARRAY_PUSH_BACK(uint32_t, &data->first_child, UINT32_MAX);
         ARRAY_PUSH_BACK(uint32_t, &data->next_sibling, UINT32_MAX);
 
-        cel_mat44f_t m = MAT44F_INIT_IDENTITY;
-        ARRAY_PUSH_BACK(cel_mat44f_t, &data->world_matrix, m);
+        mat44f_t m = MAT44F_INIT_IDENTITY;
+        ARRAY_PUSH_BACK(mat44f_t, &data->world_matrix, m);
 
         scene_node_t t = {.idx = idx};
         scene_node_transform(world, t,
@@ -329,9 +329,9 @@ void scenegraph_link(world_t world,
     ARRAY_AT(&data->first_child, parent.idx) = child.idx;
     ARRAY_AT(&data->next_sibling, child.idx) = tmp;
 
-    cel_mat44f_t m = MAT44F_INIT_IDENTITY;
+    mat44f_t m = MAT44F_INIT_IDENTITY;
 
-    cel_mat44f_t *p =
+    mat44f_t *p =
             parent.idx != UINT32_MAX ? scenegraph_get_world_matrix(world,
                                                                    parent) : &m;
 

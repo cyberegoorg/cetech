@@ -16,7 +16,7 @@ typedef struct {
 
 stringid64_t stringid64_from_string(const char *str) {
     const stringid64_t id = {
-            .id = cel_hash_murmur2_64(str, cel_strlen(str), STRINGID64_SEED)
+            .id = hash_murmur2_64(str, strlen(str), STRINGID64_SEED)
     };
 
     return id;

@@ -1,6 +1,6 @@
 #include <stdint.h>
 
-uint64_t cel_hash_murmur2_64(const void *key,
+uint64_t hash_murmur2_64(const void *key,
                              uint64_t len,
                              uint64_t seed) {
 

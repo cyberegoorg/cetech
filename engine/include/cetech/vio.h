@@ -10,12 +10,12 @@
 //==============================================================================
 
 
-enum cel_vio_open_mode {
+enum vio_open_mode {
     VIO_OPEN_READ,
     VIO_OPEN_WRITE,
 };
 
-enum cel_vio_seek {
+enum vio_seek {
     VIO_SEEK_SET,
     VIO_SEEK_CUR,
     VIO_SEEK_END
@@ -30,7 +30,7 @@ struct vio {
 
     int64_t (*seek)(struct vio *vio,
                 int64_t offset,
-                enum cel_vio_seek whence);
+                enum vio_seek whence);
 
     size_t (*read)(struct vio *vio,
                    void *ptr,
@@ -45,32 +45,32 @@ struct vio {
     int (*close)(struct vio *vio);
 };
 
-struct vio *cel_vio_from_file(const char *path,
-                              enum cel_vio_open_mode mode,
-                              struct cel_allocator *allocator);
+struct vio *vio_from_file(const char *path,
+                              enum vio_open_mode mode,
+                              struct allocator *allocator);
 
-int cel_vio_close(struct vio *file);
+int vio_close(struct vio *file);
 
 
-int64_t cel_vio_seek(struct vio *file,
+int64_t vio_seek(struct vio *file,
                      int64_t offset,
-                     enum cel_vio_seek whence);
+                     enum vio_seek whence);
 
-void cel_vio_seek_to_end(struct vio *file);
+void vio_seek_to_end(struct vio *file);
 
-int64_t cel_vio_skip(struct vio *file,
+int64_t vio_skip(struct vio *file,
                      int64_t bytes);
 
-int64_t cel_vio_position(struct vio *file);
+int64_t vio_position(struct vio *file);
 
-int64_t cel_vio_size(struct vio *file);
+int64_t vio_size(struct vio *file);
 
-size_t cel_vio_read(struct vio *file,
+size_t vio_read(struct vio *file,
                     void *buffer,
                     size_t size,
                     size_t maxnum);
 
-size_t cel_vio_write(struct vio *file,
+size_t vio_write(struct vio *file,
                      const void *buffer,
                      size_t size,
                      size_t num);

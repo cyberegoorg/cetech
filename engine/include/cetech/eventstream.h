@@ -22,7 +22,7 @@ struct eventstream {
 //==============================================================================
 
 static inline void eventstream_create(struct eventstream *es,
-                                      struct cel_allocator *allocator) {
+                                      struct allocator *allocator) {
     ARRAY_INIT(uint8_t, &es->stream, allocator);
 }
 

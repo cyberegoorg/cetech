@@ -26,7 +26,7 @@ static struct G {
     SDL_GameController *controller[GAMEPAD_MAX];
     SDL_Haptic *haptic[GAMEPAD_MAX];
 
-    cel_vec2f_t position[GAMEPAD_MAX][GAMEPAD_AXIX_MAX];
+    vec2f_t position[GAMEPAD_MAX][GAMEPAD_AXIX_MAX];
     int state[GAMEPAD_MAX][GAMEPAD_BTN_MAX];
 } _G = {0};
 
@@ -126,7 +126,7 @@ static SDL_GameControllerAxis _axis_to_sdl[GAMEPAD_AXIX_MAX][2] = {
 
 void sdl_gamepad_process(struct eventstream *stream) {
     int curent_state[GAMEPAD_MAX][GAMEPAD_AXIX_MAX] = {0};
-    cel_vec2f_t curent_pos[GAMEPAD_MAX][GAMEPAD_BTN_MAX] = {0};
+    vec2f_t curent_pos[GAMEPAD_MAX][GAMEPAD_BTN_MAX] = {0};
 
     for (int i = 0; i < GAMEPAD_MAX; ++i) {
         if (_G.controller[i] == NULL) {
@@ -148,7 +148,7 @@ void sdl_gamepad_process(struct eventstream *stream) {
             float x_norm = x * coef;
             float y_norm = y * coef;
 
-            curent_pos[i][j] = (cel_vec2f_t) {
+            curent_pos[i][j] = (vec2f_t) {
                     .x = x_norm,
                     .y = -y_norm,
             };
@@ -179,7 +179,7 @@ void sdl_gamepad_process(struct eventstream *stream) {
             event.gamepad_id = i;
             event.axis = j;
 
-            cel_vec2f_t pos = curent_pos[i][j];
+            vec2f_t pos = curent_pos[i][j];
 
 
             if ((pos.x != _G.position[i][j].x) ||

@@ -55,14 +55,14 @@ static int _set_property(lua_State *l) {
 
         default:
             if (lua_api_v0.is_vec3f(l, 5)) {
-                cel_vec3f_t *v = lua_api_v0.to_vec3f(l, 5);
+                vec3f_t *v = lua_api_v0.to_vec3f(l, 5);
 
                 value = (struct property_value) {
                         .type = PROPERTY_VEC3,
                         .value.vec3f = *v
                 };
             } else if (lua_api_v0.is_quat(l, 5)) {
-                cel_quatf_t *q = lua_api_v0.to_quat(l, 5);
+                quatf_t *q = lua_api_v0.to_quat(l, 5);
 
                 value = (struct property_value) {
                         .type = PROPERTY_VEC3,

@@ -69,7 +69,7 @@ struct gamepad_api_v0 {
     //! Return axis value
     //! \param axis_index Axis index
     //! \return Axis value
-    cel_vec2f_t (*axis)(uint32_t idx,
+    vec2f_t (*axis)(uint32_t idx,
                         const uint32_t axis_index);
 
     //! Play rumble
@@ -163,7 +163,7 @@ struct mouse_api_v0 {
     //! Return axis value
     //! \param axis_index Axis index
     //! \return Axis value
-    cel_vec2f_t (*axis)(uint32_t idx,
+    vec2f_t (*axis)(uint32_t idx,
                         const uint32_t axis_index);
 };
 

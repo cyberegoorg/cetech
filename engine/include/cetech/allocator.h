@@ -39,20 +39,20 @@
 // Allocator
 //==============================================================================
 
-struct cel_allocator {
-    void *(*allocate)(struct cel_allocator *allocator,
+struct allocator {
+    void *(*allocate)(struct allocator *allocator,
                       uint32_t size,
                       uint32_t align);
 
-    void (*deallocate)(struct cel_allocator *allocator,
+    void (*deallocate)(struct allocator *allocator,
                        void *p);
 
-    uint32_t (*total_allocated)(struct cel_allocator *allocator);
+    uint32_t (*total_allocated)(struct allocator *allocator);
 
     uint32_t (*allocated_size)(void *p);
 };
 
-struct cel_allocator_trace_entry {
+struct allocator_trace_entry {
     void *ptr;
     char *stacktrace;
     char used;
@@ -65,15 +65,15 @@ struct cel_allocator_trace_entry {
 // Allocator
 //==============================================================================
 
-void allocator_trace_pointer(struct cel_allocator_trace_entry *entries,
+void allocator_trace_pointer(struct allocator_trace_entry *entries,
                              uint64_t max_entries,
                              void *p);
 
-void allocator_stop_trace_pointer(struct cel_allocator_trace_entry *entries,
+void allocator_stop_trace_pointer(struct allocator_trace_entry *entries,
                                   uint64_t max_entries,
                                   void *p);
 
-void allocator_check_trace(struct cel_allocator_trace_entry *entries,
+void allocator_check_trace(struct allocator_trace_entry *entries,
                            uint64_t max_entries);
 
 //==============================================================================
@@ -81,22 +81,22 @@ void allocator_check_trace(struct cel_allocator_trace_entry *entries,
 //==============================================================================
 
 
-struct cel_allocator *malloc_allocator_create();
+struct allocator *malloc_allocator_create();
 
-void malloc_allocator_destroy(struct cel_allocator *a);
+void malloc_allocator_destroy(struct allocator *a);
 
 
 //==============================================================================
 // Scratch allocator
 //==============================================================================
 
-struct cel_allocator *scratch_allocator_create(struct cel_allocator *backing,
+struct allocator *scratch_allocator_create(struct allocator *backing,
                                                int size);
 
-void scratch_allocator_destroy(struct cel_allocator *a);
+void scratch_allocator_destroy(struct allocator *a);
 
-void *cel_malloc(size_t size);
-void cel_free(void *ptr);
+void *memory_malloc(size_t size);
+void memory_free(void *ptr);
 
 void *memory_copy(void *__restrict dest,
                   const void *__restrict src,

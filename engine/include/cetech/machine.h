@@ -375,7 +375,7 @@ struct mouse_event {
 
 struct mouse_move_event {
     struct event_header h; //!< Event header
-    cel_vec2f_t pos;       //!< Actual position
+    vec2f_t pos;       //!< Actual position
 };
 
 //! Keyboard event
@@ -390,7 +390,7 @@ struct gamepad_move_event {
     struct event_header h; //!< Event header
     uint8_t gamepad_id;         //!< Gamepad id
     uint32_t axis;              //!< Axis id
-    cel_vec2f_t position;  //!< Position
+    vec2f_t position;  //!< Position
 };
 
 //! Gamepad button event

@@ -25,7 +25,7 @@ typedef struct {
 
 struct handler_api_v0 {
     struct handler32gen *
-    (*handler32gen_create)(struct cel_allocator *allocator);
+    (*handler32gen_create)(struct allocator *allocator);
 
     void (*handler32gen_destroy)(struct handler32gen *hid);
 

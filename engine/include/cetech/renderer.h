@@ -62,7 +62,7 @@ struct material_api_v0 {
     //! \param v Value
     void (*set_vec4f)(material_t material,
                       const char *slot,
-                      cel_vec4f_t v);
+                      vec4f_t v);
 
     //! Set mat33f value
     //! \param material Material
@@ -78,7 +78,7 @@ struct material_api_v0 {
     //! \param v Value
     void (*set_mat44f)(material_t material,
                        const char *slot,
-                       cel_mat44f_t v);
+                       mat44f_t v);
 
     //! Use material for actual render
     void (*use)(material_t material);
@@ -174,7 +174,7 @@ typedef int viewport_t;
 struct renderer_api_v0 {
     //! Create renderer.
     //! \param window Window
-    void (*create)(cel_window_t window);
+    void (*create)(window_t window);
 
     //! Set debug mode on/off
     //! \param debug True/False
@@ -182,7 +182,7 @@ struct renderer_api_v0 {
 
     //! Get renderer window size
     //! \return Renderer window size
-    cel_vec2f_t (*get_size)();
+    vec2f_t (*get_size)();
 
     //! Render world
     //! \param world World

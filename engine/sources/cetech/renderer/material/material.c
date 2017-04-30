@@ -110,8 +110,8 @@ material_t material_create(stringid64_t name) {
     uint32_t size = sizeof(struct material_blob) +
                (resource->uniforms_count * sizeof(char) * 32) +
                (resource->texture_count * sizeof(stringid64_t)) +
-               (resource->vec4f_count * sizeof(cel_vec4f_t)) +
-               (resource->mat44f_count * sizeof(cel_mat44f_t)) +
+               (resource->vec4f_count * sizeof(vec4f_t)) +
+               (resource->mat44f_count * sizeof(mat44f_t)) +
                (resource->mat33f_count * sizeof(mat33f_t));
 
     handler32_t h = handler_api_v0.handler32_create(_G.material_handler);
@@ -181,7 +181,7 @@ uint32_t _material_find_slot(struct material_blob *resource,
                         const char *name) {
     const char *u_names = (const char *) (resource + 1);
     for (uint32_t i = 0; i < resource->uniforms_count; ++i) {
-        if (cel_strcmp(&u_names[i * 32], name) != 0) {
+        if (strcmp(&u_names[i * 32], name) != 0) {
             continue;
         }
 
@@ -213,7 +213,7 @@ void material_set_texture(material_t material,
 
 void material_set_vec4f(material_t material,
                         const char *slot,
-                        cel_vec4f_t v) {
+                        vec4f_t v) {
 
     uint32_t idx = MAP_GET(uint32_t, &_G.material_instace_map, material.idx, UINT32_MAX);
 
@@ -224,7 +224,7 @@ void material_set_vec4f(material_t material,
     struct material_blob *resource = (struct material_blob *) &_get_resorce(
             idx);
 
-    cel_vec4f_t *u_vec4f = material_blob_vec4f_value(resource);
+    vec4f_t *u_vec4f = material_blob_vec4f_value(resource);
 
     int slot_idx = _material_find_slot(resource, slot);
 
@@ -254,7 +254,7 @@ void material_set_mat33f(material_t material,
 
 void material_set_mat44f(material_t material,
                          const char *slot,
-                         cel_mat44f_t v) {
+                         mat44f_t v) {
     uint32_t idx = MAP_GET(uint32_t, &_G.material_instace_map, material.idx, UINT32_MAX);
 
     if (idx == UINT32_MAX) {
@@ -264,7 +264,7 @@ void material_set_mat44f(material_t material,
     struct material_blob *resource = (struct material_blob *) &_get_resorce(
             idx);
 
-    cel_mat44f_t *u_mat44f = material_blob_mat44f_value(resource);
+    mat44f_t *u_mat44f = material_blob_mat44f_value(resource);
 
     int slot_idx = _material_find_slot(resource, slot);
 
@@ -284,9 +284,9 @@ void material_use(material_t material) {
             idx);
 
     stringid64_t *u_texture = material_blob_texture_names(resource);
-    cel_vec4f_t *u_vec4f = material_blob_vec4f_value(resource);
+    vec4f_t *u_vec4f = material_blob_vec4f_value(resource);
     mat33f_t *u_mat33f = material_blob_mat33f_value(resource);
-    cel_mat44f_t *u_mat44f = material_blob_mat44f_value(resource);
+    mat44f_t *u_mat44f = material_blob_mat44f_value(resource);
 
     bgfx_uniform_handle_t *u_handler = material_blob_uniform_bgfx(resource);
 

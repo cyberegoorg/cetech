@@ -73,7 +73,7 @@ static int _mouse_axis_name(lua_State *l) {
 static int _mouse_axis(lua_State *l) {
     uint32_t idx = (uint32_t) (luasys_to_int(l, 1));
 
-    cel_vec2f_t pos = mouse_api_v0.axis(0, idx);
+    vec2f_t pos = mouse_api_v0.axis(0, idx);
 
     luasys_push_vec2f(l, pos);
     return 1;

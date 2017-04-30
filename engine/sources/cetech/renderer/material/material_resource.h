@@ -4,16 +4,16 @@
 static const bgfx_program_handle_t null_program = {0};
 
 void *_material_resource_loader(struct vio *input,
-                                struct cel_allocator *allocator) {
-    const int64_t size = cel_vio_size(input);
+                                struct allocator *allocator) {
+    const int64_t size = vio_size(input);
     char *data = CEL_ALLOCATE(allocator, char, size);
-    cel_vio_read(input, data, 1, size);
+    vio_read(input, data, 1, size);
 
     return data;
 }
 
 void _material_resource_unloader(void *new_data,
-                                 struct cel_allocator *allocator) {
+                                 struct allocator *allocator) {
     CEL_DEALLOCATE(allocator, new_data);
 }
 
@@ -28,7 +28,7 @@ void _material_resource_offline(stringid64_t name,
 void *_material_resource_reloader(stringid64_t name,
                                   void *old_data,
                                   void *new_data,
-                                  struct cel_allocator *allocator) {
+                                  struct allocator *allocator) {
     _material_resource_offline(name, old_data);
     _material_resource_online(name, new_data);
 

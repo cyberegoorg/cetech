@@ -88,16 +88,16 @@ static void preprocess(const char *filename,
 
         char full_path[256] = {0};
         const char *source_dir = resource_api_v0.compiler_get_source_dir();
-        cel_path_join(full_path, CEL_ARRAY_LEN(full_path), source_dir,
+        path_join(full_path, CEL_ARRAY_LEN(full_path), source_dir,
                       prefab_file);
 
-        struct vio *prefab_vio = cel_vio_from_file(full_path, VIO_OPEN_READ,
+        struct vio *prefab_vio = vio_from_file(full_path, VIO_OPEN_READ,
                                                    memory_api_v0.main_allocator());
 
-        char prefab_data[cel_vio_size(prefab_vio) + 1];
-        memory_set(prefab_data, 0, cel_vio_size(prefab_vio) + 1);
-        cel_vio_read(prefab_vio, prefab_data, sizeof(char),
-                     cel_vio_size(prefab_vio));
+        char prefab_data[vio_size(prefab_vio) + 1];
+        memory_set(prefab_data, 0, vio_size(prefab_vio) + 1);
+        vio_read(prefab_vio, prefab_data, sizeof(char),
+                     vio_size(prefab_vio));
 
         yaml_document_t h;
         yaml_node_t prefab_root = yaml_load_str(prefab_data, &h);
@@ -105,7 +105,7 @@ static void preprocess(const char *filename,
         preprocess(filename, prefab_root, capi);
         yaml_merge(root, prefab_root);
 
-        cel_vio_close(prefab_vio);
+        vio_close(prefab_vio);
     }
 }
 
@@ -259,7 +259,7 @@ struct component_data {
 #define component_data_data(cd) ((char*)((component_data_ent(cd) + ((cd)->ent_count))))
 
 struct entity_compile_output *entity_compiler_create_output() {
-    struct cel_allocator *a = memory_api_v0.main_allocator();
+    struct allocator *a = memory_api_v0.main_allocator();
 
     struct entity_compile_output *output =
     CEL_ALLOCATE(a,
@@ -300,7 +300,7 @@ void entity_compiler_destroy_output(struct entity_compile_output *output) {
     }
     MAP_DESTROY(array_yaml_node_t, &output->component_body);
 
-    struct cel_allocator *a = memory_api_v0.main_allocator();
+    struct allocator *a = memory_api_v0.main_allocator();
     CEL_DEALLOCATE(a, output);
 }
 
@@ -385,10 +385,10 @@ int _entity_resource_compiler(const char *filename,
                             struct vio *source_vio,
                             struct vio *build_vio,
                             struct compilator_api *compilator_api) {
-    char source_data[cel_vio_size(source_vio) + 1];
-    memory_set(source_data, 0, cel_vio_size(source_vio) + 1);
-    cel_vio_read(source_vio, source_data, sizeof(char),
-                 cel_vio_size(source_vio));
+    char source_data[vio_size(source_vio) + 1];
+    memory_set(source_data, 0, vio_size(source_vio) + 1);
+    vio_read(source_vio, source_data, sizeof(char),
+                 vio_size(source_vio));
 
     yaml_document_t h;
     yaml_node_t root = yaml_load_str(source_data, &h);
@@ -398,7 +398,7 @@ int _entity_resource_compiler(const char *filename,
 
     entity_resource_compiler(root, filename, &entity_data, compilator_api);
 
-    cel_vio_write(build_vio, &ARRAY_AT(&entity_data, 0), sizeof(uint8_t),
+    vio_write(build_vio, &ARRAY_AT(&entity_data, 0), sizeof(uint8_t),
                   ARRAY_SIZE(&entity_data));
 
 
@@ -412,16 +412,16 @@ int _entity_resource_compiler(const char *filename,
 //==============================================================================
 
 void *entity_resource_loader(struct vio *input,
-                           struct cel_allocator *allocator) {
-    const int64_t size = cel_vio_size(input);
+                           struct allocator *allocator) {
+    const int64_t size = vio_size(input);
     char *data = CEL_ALLOCATE(allocator, char, size);
-    cel_vio_read(input, data, 1, size);
+    vio_read(input, data, 1, size);
 
     return data;
 }
 
 void entity_resource_unloader(void *new_data,
-                            struct cel_allocator *allocator) {
+                            struct allocator *allocator) {
     CEL_DEALLOCATE(allocator, new_data);
 }
 
@@ -437,7 +437,7 @@ void entity_resource_offline(stringid64_t name,
 void *entity_resource_reloader(stringid64_t name,
                              void *old_data,
                              void *new_data,
-                             struct cel_allocator *allocator) {
+                             struct allocator *allocator) {
     entity_resource_offline(name, old_data);
     entity_resource_online(name, new_data);
 

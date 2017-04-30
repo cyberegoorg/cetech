@@ -10,7 +10,7 @@
 //! Get file modified time
 //! \param path File path
 //! \return Modified time
-uint32_t cel_file_mtime(const char *path);
+uint32_t file_mtime(const char *path);
 
 //==============================================================================
 // Path Interface
@@ -21,26 +21,26 @@ uint32_t cel_file_mtime(const char *path);
 //! \param recursive Resucrsive list?
 //! \param files Result files
 //! \param allocator Allocator
-void cel_dir_list(const char *path,
+void dir_list(const char *path,
                          int recursive,
                          struct array_pchar *files,
-                         struct cel_allocator *allocator);
+                         struct allocator *allocator);
 
 //! Free list dir array
 //! \param files Files array
 //! \param allocator Allocator
-void cel_dir_list_free(struct array_pchar *files,
-                              struct cel_allocator *allocator);
+void dir_list_free(struct array_pchar *files,
+                              struct allocator *allocator);
 
 //! Create dir
 //! \param path Dir path
 //! \return 1 of ok else 0
-int cel_dir_make(const char *path);
+int dir_make(const char *path);
 
 //! Create dir path
 //! \param path Path
 //! \return 1 of ok else 0
-int cel_dir_make_path(const char *path);
+int dir_make_path(const char *path);
 
 
 #endif //CELIB_FS_H
