@@ -35,7 +35,7 @@ static const struct {
     bgfx_attrib_type_t attrib_type;
     size_t size;
 } _attrin_tbl[] = {
-        {.name="float", .size=sizeof(float), .attrib_type=BGFX_ATTRIB_TYPE_FLOAT},
+        {.name="f32", .size=sizeof(float), .attrib_type=BGFX_ATTRIB_TYPE_FLOAT},
         {.name="int16_t", .size=sizeof(int16_t), .attrib_type=BGFX_ATTRIB_TYPE_INT16},
         {.name="uint8_t", .size=sizeof(uint8_t), .attrib_type=BGFX_ATTRIB_TYPE_UINT8},
         // TODO: {.name="f16", .size=sizeof(f16), .attrib_type=BGFX_ATTRIB_TYPE_HALF},
