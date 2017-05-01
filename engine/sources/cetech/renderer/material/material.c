@@ -114,11 +114,11 @@ material_t material_create(stringid64_t name) {
                (resource->mat44f_count * sizeof(mat44f_t)) +
                (resource->mat33f_count * sizeof(mat33f_t));
 
-    handler32_t h = handler_api_v0.handler32_create(_G.material_handler);
+    uint32_t h = handler_api_v0.handler32_create(_G.material_handler);
 
     uint32_t idx = (uint32_t) ARRAY_SIZE(&_G.material_instance_offset);
 
-    MAP_SET(uint32_t, &_G.material_instace_map, h.id, idx);
+    MAP_SET(uint32_t, &_G.material_instace_map, h, idx);
 
     uint32_t offset = ARRAY_SIZE(&_G.material_instance_data);
     ARRAY_PUSH(uint8_t, &_G.material_instance_data, (uint8_t *) resource, size);
@@ -160,7 +160,7 @@ material_t material_create(stringid64_t name) {
     ARRAY_PUSH(uint8_t, &_G.material_instance_data, (uint8_t *) bgfx_uniforms,
                sizeof(bgfx_uniform_handle_t) * resource->uniforms_count);
 
-    return (material_t) {.h=h};
+    return (material_t) {.idx=h};
 }
 
 

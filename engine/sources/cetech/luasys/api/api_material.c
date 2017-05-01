@@ -10,7 +10,7 @@
 IMPORT_API(material_api_v0);
 
 static int _set_texture(lua_State *l) {
-    material_t m = {.h = luasys_to_handler(l, 1)};
+    material_t m = {.idx = luasys_to_handler(l, 1)};
     const char *slot_name = luasys_to_string(l, 2);
     const char *texture_name = luasys_to_string(l, 3);
 
@@ -21,7 +21,7 @@ static int _set_texture(lua_State *l) {
 
 
 static int _set_vec4f(lua_State *l) {
-    material_t m = {.h = luasys_to_handler(l, 1)};
+    material_t m = {.idx = luasys_to_handler(l, 1)};
     const char *slot_name = luasys_to_string(l, 2);
     vec4f_t *v = luasys_to_vec4f(l, 3);
 

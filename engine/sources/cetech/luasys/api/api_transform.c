@@ -11,7 +11,7 @@ IMPORT_API(transform_api_v0);
 
 static int _transform_get(lua_State *l) {
     world_t w = {.h = luasys_to_handler(l, 1)};
-    entity_t ent = {.h = luasys_to_handler(l, 2).id};
+    entity_t ent = {.h = luasys_to_handler(l, 2)};
 
     luasys_push_int(l, transform_api_v0.get(w, ent).idx);
     return 1;
@@ -20,7 +20,7 @@ static int _transform_get(lua_State *l) {
 
 static int _transform_has(lua_State *l) {
     world_t w = {.h = luasys_to_handler(l, 1)};
-    entity_t ent = {.h = luasys_to_handler(l, 2).id};
+    entity_t ent = {.h = luasys_to_handler(l, 2)};
 
     luasys_push_bool(l, transform_api_v0.has(w, ent));
     return 1;
@@ -91,8 +91,8 @@ static int _transform_get_world_matrix(lua_State *l) {
 
 static int _transform_link(lua_State *l) {
     world_t w = {.h = luasys_to_handler(l, 1)};
-    entity_t root = {.h = luasys_to_handler(l, 2).id};
-    entity_t child = {.h = luasys_to_handler(l, 3).id};
+    entity_t root = {.h = luasys_to_handler(l, 2)};
+    entity_t child = {.h = luasys_to_handler(l, 3)};
 
     transform_api_v0.link(w, root, child);
     return 0;

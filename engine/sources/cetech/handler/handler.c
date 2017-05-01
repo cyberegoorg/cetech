@@ -12,9 +12,9 @@
 #define _GENBITCOUNT   8
 #define _INDEXBITCOUNT 24
 #define _MINFREEINDEXS 1024
-#define _idx(h) ((h).id >> _INDEXBITCOUNT)
-#define _gen(h) ((h.id) & ((1 << _GENBITCOUNT) - 1));
-#define _make_entity(idx, gen) (handler32_t){.id = ((idx) << _INDEXBITCOUNT) | (gen)}
+#define _idx(h) ((h) >> _INDEXBITCOUNT)
+#define _gen(h) ((h) & ((1 << _GENBITCOUNT) - 1));
+#define _make_entity(idx, gen) (uint32_t)(((idx) << _INDEXBITCOUNT) | (gen))
 
 
 //==============================================================================
@@ -38,7 +38,7 @@ struct handler32gen *handler32gen_create(struct allocator *allocator) {
     ARRAY_INIT(uint32_t, &hid->_generation, allocator);
     QUEUE_INIT(uint32_t, &hid->_freeIdx, allocator);
 
-    handler32_t handler32_create(struct handler32gen *hid);
+    uint32_t handler32_create(struct handler32gen *hid);
     handler32_create(hid);
 
     return hid;
@@ -50,7 +50,7 @@ void handler32gen_destroy(struct handler32gen *hid) {
     CETECH_DEALLOCATE(hid->alloc, hid);
 }
 
-handler32_t handler32_create(struct handler32gen *hid) {
+uint32_t handler32_create(struct handler32gen *hid) {
     uint32_t idx;
 
     if (QUEUE_SIZE(uint32_t, &hid->_freeIdx) > _MINFREEINDEXS) {
@@ -65,7 +65,7 @@ handler32_t handler32_create(struct handler32gen *hid) {
 }
 
 void handler32_destroy(struct handler32gen *hid,
-                       handler32_t h) {
+                       uint32_t h) {
     uint32_t id = _idx(h);
 
     ARRAY_AT(&hid->_generation, id) += 1;
@@ -73,7 +73,7 @@ void handler32_destroy(struct handler32gen *hid,
 }
 
 int handler32_alive(struct handler32gen *hid,
-                    handler32_t h) {
+                    uint32_t h) {
     return ARRAY_AT(&hid->_generation, _idx(h)) == _gen(h);
 }
 

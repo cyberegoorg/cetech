@@ -31,7 +31,7 @@ static int _mesh_get_material(lua_State *l) {
     world_t w = {.h = luasys_to_handler(l, 1)};
     mesh_renderer_t m = {.idx = luasys_to_int(l, 2)};
 
-    luasys_push_handler(l, mesh_renderer_api_v0.get_material(w, m).h);
+    luasys_push_handler(l, mesh_renderer_api_v0.get_material(w, m).idx);
     return 1;
 }
 

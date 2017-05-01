@@ -19,10 +19,7 @@
 
 //! Material typedef
 typedef struct {
-    union {
-        handler32_t h;
-        uint32_t idx;
-    };
+    uint32_t idx;
 } material_t;
 
 enum {

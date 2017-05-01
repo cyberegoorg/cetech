@@ -18,13 +18,13 @@ static int _entity_spawn(lua_State *l) {
 
     stringid64_t nameid = stringid64_from_string(name);
 
-    luasys_push_handler(l, (handler32_t){.id = entity_api_v0.spawn(w, nameid).h});
+    luasys_push_handler(l, entity_api_v0.spawn(w, nameid).h);
     return 1;
 }
 
 static int _entity_destroy(lua_State *l) {
     world_t w = {.h = luasys_to_handler(l, 1)};
-    entity_t entity = {.h = luasys_to_handler(l, 2).id};
+    entity_t entity = {.h = luasys_to_handler(l, 2)};
 
     entity_api_v0.destroy(w, &entity, 1);
     return 1;

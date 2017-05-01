@@ -11,7 +11,7 @@ IMPORT_API(scenegprah_api_v0);
 
 static int _scenegraph_node_by_name(lua_State *l) {
     world_t w = {.h = luasys_to_handler(l, 1)};
-    entity_t ent = {.h = luasys_to_handler(l, 2).id};
+    entity_t ent = {.h = luasys_to_handler(l, 2)};
     stringid64_t name = stringid64_from_string(luasys_to_string(l, 3));
 
     luasys_push_int(l, scenegprah_api_v0.node_by_name(w, ent, name).idx);
@@ -20,7 +20,7 @@ static int _scenegraph_node_by_name(lua_State *l) {
 
 static int _scenegraph_has(lua_State *l) {
     world_t w = {.h = luasys_to_handler(l, 1)};
-    entity_t ent = {.h = luasys_to_handler(l, 2).id};
+    entity_t ent = {.h = luasys_to_handler(l, 2)};
 
     luasys_push_bool(l, scenegprah_api_v0.has(w, ent));
     return 1;

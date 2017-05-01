@@ -490,15 +490,15 @@ static void _shutdown() {
 //==============================================================================
 
 entity_t entity_manager_create() {
-    return (entity_t) {.h = handler_api_v0.handler32_create(_G.entity_handler).id};
+    return (entity_t) {.h = handler_api_v0.handler32_create(_G.entity_handler)};
 }
 
 void entity_manager_destroy(entity_t entity) {
-    handler_api_v0.handler32_destroy(_G.entity_handler, (handler32_t){.id = entity.h});
+    handler_api_v0.handler32_destroy(_G.entity_handler, entity.h);
 }
 
 int entity_manager_alive(entity_t entity) {
-    return handler_api_v0.handler32_alive(_G.entity_handler, (handler32_t){.id = entity.h});
+    return handler_api_v0.handler32_alive(_G.entity_handler, entity.h);
 }
 
 

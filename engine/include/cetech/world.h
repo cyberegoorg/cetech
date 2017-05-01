@@ -21,7 +21,7 @@ enum {
 
 //! World handler
 typedef struct {
-    handler32_t h;
+    uint32_t h;
 } world_t;
 
 //! On world create callback

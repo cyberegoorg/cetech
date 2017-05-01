@@ -61,11 +61,11 @@ static void _new_world(world_t world) {
     ARRAY_INIT(float, &data.far, memory_api_v0.main_allocator());
     ARRAY_INIT(float, &data.fov, memory_api_v0.main_allocator());
 
-    MAP_SET(world_data_t, &_G.world, world.h.id, data);
+    MAP_SET(world_data_t, &_G.world, world.h, data);
 }
 
 static world_data_t *_get_world_data(world_t world) {
-    return MAP_GET_PTR(world_data_t, &_G.world, world.h.id);
+    return MAP_GET_PTR(world_data_t, &_G.world, world.h);
 }
 
 static void _destroy_world(world_t world) {

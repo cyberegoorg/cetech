@@ -9,6 +9,7 @@
 #include <cetech/module.h>
 #include <cetech/stringid.h>
 #include <cetech/math_types.h>
+#include <cetech/world.h>
 
 
 struct transform_data {
@@ -118,11 +119,11 @@ static void _new_world(world_t world) {
     ARRAY_INIT(vec3f_t, &data.scale, memory_api_v0.main_allocator());
     ARRAY_INIT(mat44f_t, &data.world_matrix, memory_api_v0.main_allocator());
 
-    MAP_SET(world_data_t, &_G.world, world.h.id, data);
+    MAP_SET(world_data_t, &_G.world, world.h, data);
 }
 
 static world_data_t *_get_world_data(world_t world) {
-    return MAP_GET_PTR(world_data_t, &_G.world, world.h.id);
+    return MAP_GET_PTR(world_data_t, &_G.world, world.h);
 }
 
 static void _destroy_world(world_t world) {

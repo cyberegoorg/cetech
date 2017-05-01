@@ -16,7 +16,7 @@ IMPORT_API(lua_api_v0)
 
 static int _set_property(lua_State *l) {
     world_t w = {.h = luasys_to_handler(l, 1)};
-    entity_t entity = {.h = luasys_to_handler(l, 2).id};
+    entity_t entity = {.h = luasys_to_handler(l, 2)};
     const char *type = luasys_to_string(l, 3);
     const char *key = luasys_to_string(l, 4);
 
@@ -83,7 +83,7 @@ static int _set_property(lua_State *l) {
 
 static int _get_property(lua_State *l) {
     world_t w = {.h = luasys_to_handler(l, 1)};
-    entity_t entity = {.h = luasys_to_handler(l, 2).id};
+    entity_t entity = {.h = luasys_to_handler(l, 2)};
     const char *type = luasys_to_string(l, 3);
     const char *key = luasys_to_string(l, 4);
 

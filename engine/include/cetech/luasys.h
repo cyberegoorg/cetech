@@ -97,7 +97,7 @@ struct lua_api_v0 {
     //! \param l
     //! \param value
     void (*push_handler)(lua_State *l,
-                         handler32_t value);
+                         uint32_t value);
 
     //! Push int
     //! \param l
@@ -154,7 +154,7 @@ struct lua_api_v0 {
     //! \param l
     //! \param i Element idx
     //! \return Handler value
-    handler32_t (*to_handler)(lua_State *l,
+    uint32_t (*to_handler)(lua_State *l,
                             int i);
 
     //! Get element value as string

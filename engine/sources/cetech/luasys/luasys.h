@@ -45,7 +45,7 @@ void luasys_push_uint64_t(lua_State *l,
                      uint64_t value);
 
 void luasys_push_handler(lua_State *l,
-                         handler32_t value);
+                         uint32_t value);
 
 void luasys_push_int(lua_State *l,
                      int value);
@@ -75,7 +75,7 @@ uint32_t luasys_to_uin32_t(lua_State *l,
 float luasys_to_float(lua_State *l,
                   int i);
 
-handler32_t luasys_to_handler(lua_State *l,
+uint32_t luasys_to_handler(lua_State *l,
                             int i);
 
 const char *luasys_to_string(lua_State *,
