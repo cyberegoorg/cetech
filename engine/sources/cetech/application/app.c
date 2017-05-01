@@ -13,7 +13,12 @@
 
 #include "app.h"
 #include <cetech/config.h>
+#include <cetech/eventstream.h>
+#include <cetech/application.h>
 #include <cetech/machine.h>
+#include <cetech/config.h>
+
+#include <cetech/vio.h>
 #include <cetech/resource.h>
 #include <cetech/luasys.h>
 #include <cetech/renderer.h>
@@ -139,7 +144,7 @@ int _init_config() {
 
     // Cvar stage
 
-    config_api_v0.parse_core_args(_G.args);
+    config_api_v0.parse_core_args(_G.args.argc, _G.args.argv);
     if (config_api_v0.get_int(_G.config.compile)) {
         resource_api_v0.compiler_create_build_dir(config_api_v0, api_v1);
         config_api_v0.compile_global();
@@ -147,7 +152,7 @@ int _init_config() {
 
     config_api_v0.load_global();
 
-    if (!config_api_v0.parse_args(_G.args)) {
+    if (!config_api_v0.parse_args(_G.args.argc, _G.args.argv)) {
         return 0;
     }
 

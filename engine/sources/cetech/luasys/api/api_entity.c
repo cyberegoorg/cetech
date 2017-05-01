@@ -2,6 +2,12 @@
 
 #include <cetech/allocator.h>
 #include <cetech/stringid.h>
+#include <cetech/world.h>
+#include <cetech/yaml.h>
+#include <cetech/vio.h>
+#include <cetech/config.h>
+#include <cetech/application.h>
+#include <cetech/resource.h>
 #include <cetech/entity.h>
 #include <cetech/module.h>
 #include <cetech/handler.h>

@@ -3,10 +3,19 @@
 #include <cetech/map.inl>
 #include <cetech/math_mat44f.inl>
 #include <cetech/stringid.h>
-
+#include <cetech/application.h>
+#include <cetech/config.h>
+#include <cetech/vio.h>
+#include <cetech/renderer.h>
+#include <cetech/application.h>
+#include <cetech/config.h>
+#include <cetech/vio.h>
+#include <cetech/resource.h>
 #include <cetech/entity.h>
+#include <cetech/world.h>
 #include <cetech/component.h>
 #include <cetech/renderer.h>
+#include <cetech/camera.h>
 #include <cetech/transform.h>
 
 #include <cetech/memory.h>

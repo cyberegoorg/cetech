@@ -4,6 +4,9 @@
 
 #include "cetech/luasys.h"
 #include "../luasys.h"
+#include <cetech/config.h>
+#include <cetech/application.h>
+
 #include <cetech/module.h>
 
 #define API_NAME "Mat44f"

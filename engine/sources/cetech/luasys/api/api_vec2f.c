@@ -3,8 +3,11 @@
 #include "cetech/math_vec2f.inl"
 
 #include "cetech/luasys.h"
-#include "../luasys.h"
+#include <cetech/config.h>
+#include <cetech/application.h>
 #include <cetech/module.h>
+
+#include "../luasys.h"
 
 #define API_NAME "Vec2f"
 

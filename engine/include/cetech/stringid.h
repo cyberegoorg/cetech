@@ -5,11 +5,7 @@
 // Includes
 //==============================================================================
 
-#include "string.h"
-#include "cetech/types.h"
-#include "cetech/hash.h"
-
-typedef struct {
+typedef struct stringid64_s {
     uint64_t id;
 } stringid64_t;
 

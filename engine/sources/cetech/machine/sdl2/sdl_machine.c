@@ -6,8 +6,9 @@
 #include "cetech/array.inl"
 #include "cetech/eventstream.h"
 
-#include <cetech/module.h>
 #include <cetech/application.h>
+#include <cetech/config.h>
+#include <cetech/module.h>
 
 #include "sdl_parts.h"
 

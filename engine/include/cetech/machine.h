@@ -5,10 +5,8 @@
 // Includes
 //==============================================================================
 
-#include "math_types.h"
-#include "thread.h"
-#include "eventstream.h"
-#include <cetech/module.h>
+#include <stdint.h>
+#include <cetech/math_types.h>
 
 enum {
     MACHINE_API_ID = 6,

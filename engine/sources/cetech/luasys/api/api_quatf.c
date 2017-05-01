@@ -3,6 +3,9 @@
 #include <cetech/math_quatf.h>
 #include "cetech/luasys.h"
 #include "../luasys.h"
+#include <cetech/config.h>
+#include <cetech/application.h>
+
 #include <cetech/module.h>
 
 #define API_NAME "Quatf"

@@ -8,8 +8,7 @@
 // Include
 //==============================================================================
 
-#include "window.h"
-
+typedef struct window_s window_t;
 
 enum {
     APPLICATION_API_ID = 2,

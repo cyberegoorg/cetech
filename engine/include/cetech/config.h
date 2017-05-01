@@ -8,10 +8,7 @@
 // Includes
 //==============================================================================
 
-#include <stdio.h>
-#include <cetech/cmd_line.h>
-#include "cetech/types.h"
-
+#include <stdint.h>
 
 enum {
     CONFIG_API_ID = 7,
@@ -59,12 +56,12 @@ struct config_api_v0 {
 
     void (*compile_global)();
 
-    int (*parse_core_args)(struct args args);
+    int (*parse_core_args)(int argc, const char** argv);
 
     //! Parse commandline arguments.
     //! \param args Arguments
     //! \return 1 if ok else 0
-    int (*parse_args)(struct args args);
+    int (*parse_args)(int argc, const char** argv);
 
     //! Find cvar
     //! \param name Cvar name

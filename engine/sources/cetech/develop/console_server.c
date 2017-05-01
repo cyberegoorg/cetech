@@ -4,6 +4,11 @@
 
 #include <stdio.h>
 #include <include/mpack/mpack.h>
+#include <cetech/allocator.h>
+#include <cetech/config.h>
+#include <cetech/application.h>
+#include <cetech/vio.h>
+#include <cetech/resource.h>
 #include <cetech/module.h>
 
 #include "include/nanomsg/nn.h"

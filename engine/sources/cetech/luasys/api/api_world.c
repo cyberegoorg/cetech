@@ -2,6 +2,7 @@
 #include <cetech/allocator.h>
 
 #include <cetech/world.h>
+#include <cetech/config.h>
 #include <cetech/module.h>
 #include "cetech/luasys.h"
 #include "../luasys.h"

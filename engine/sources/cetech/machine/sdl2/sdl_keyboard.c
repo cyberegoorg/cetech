@@ -3,6 +3,13 @@
 //==============================================================================
 
 #include <include/SDL2/SDL.h>
+#include <cetech/allocator.h>
+#include <cetech/application.h>
+#include <cetech/config.h>
+#include <cetech/vio.h>
+#include <cetech/resource.h>
+#include <cetech/eventstream.h>
+
 #include <cetech/module.h>
 #include <cetech/machine.h>
 //==============================================================================

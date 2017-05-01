@@ -2,7 +2,10 @@
 #include "cetech/allocator.h"
 #include <cetech/vio.h>
 
+#include <cetech/config.h>
 #include <cetech/module.h>
+#include <cetech/world.h>
+#include <cetech/camera.h>
 #include <cetech/renderer.h>
 #include "cetech/luasys.h"
 #include "../luasys.h"

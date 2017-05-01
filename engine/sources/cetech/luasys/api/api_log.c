@@ -1,5 +1,6 @@
 #include <stddef.h>
 #include <cetech/allocator.h>
+#include <cetech/config.h>
 #include <cetech/module.h>
 #include <cetech/log.h>
 #include "cetech/luasys.h"

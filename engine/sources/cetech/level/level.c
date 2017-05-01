@@ -5,6 +5,11 @@
 #include <cetech/allocator.h>
 #include <cetech/world.h>
 #include <cetech/vio.h>
+#include <cetech/application.h>
+#include <cetech/config.h>
+#include <cetech/vio.h>
+#include <cetech/resource.h>
+
 #include <cetech/resource.h>
 #include <cetech/entity.h>
 #include <cetech/transform.h>
@@ -13,6 +18,8 @@
 #include <cetech/module.h>
 
 #include <cetech/level.h>
+#include <cetech/map.inl>
+#include <cetech/yaml.h>
 #include "level_blob.h"
 
 IMPORT_API(entity_api_v0);

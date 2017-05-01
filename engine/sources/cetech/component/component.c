@@ -3,11 +3,21 @@
 //==============================================================================
 
 #include "cetech/map.inl"
+#include "cetech/math_vec3f.inl"
+
 #include <cetech/memory.h>
+#include <cetech/application.h>
+#include <cetech/config.h>
+#include <cetech/vio.h>
+#include <cetech/resource.h>
+
 #include <cetech/module.h>
+#include <cetech/stringid.h>
 
 #include <cetech/world.h>
+#include <cetech/entity.h>
 #include <cetech/component.h>
+#include <cetech/yaml.h>
 
 //==============================================================================
 // Globals

@@ -8,8 +8,7 @@
 // Includes
 //==============================================================================
 
-#include "cetech/types.h"
-#include "math_types.h"
+#include "cetech/math_types.h"
 
 enum {
     KEYBOARD_API_ID = 3,

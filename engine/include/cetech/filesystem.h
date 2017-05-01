@@ -8,12 +8,7 @@
 // Includes
 //==============================================================================
 
-#include "stringid.h"
-#include "array.inl"
-#include "cetech/types.h"
-#include "vio.h"
-#include <cetech/config.h>
-
+typedef struct stringid64_s stringid64_t;
 
 enum {
     FILESYSTEM_API_ID = 18,

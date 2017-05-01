@@ -8,12 +8,12 @@
 // Includes
 //==============================================================================
 
-#include <cetech/map.inl>
-#include <cetech/yaml.h>
-#include <cetech/stringid.h>
-#include <cetech/handler.h>
-#include <cetech/world.h>
-#include <cetech/entity.h>
+#include "cetech/math_types.h"
+
+typedef struct world_s world_t;
+typedef struct entity_s entity_t;
+typedef struct stringid64_s stringid64_t;
+typedef struct yaml_node_s yaml_node_t;
 
 enum property_type {
     PROPERTY_INVALID = 0,
@@ -97,9 +97,6 @@ static struct component_clb {
     component_set_property_t set_property;
     component_get_property_t get_property;
 } component_clb_null = {0};
-
-
-
 
 //==============================================================================
 // Api

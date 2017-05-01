@@ -2,10 +2,18 @@
 // Includes
 //==============================================================================
 
+#include <cetech/allocator.h>
+#include <cetech/application.h>
+#include <cetech/config.h>
+#include <cetech/vio.h>
+#include <cetech/resource.h>
 #include <cetech/module.h>
+#include <cetech/eventstream.h>
 #include <cetech/machine.h>
 #include <cetech/input.h>
 #include <cetech/string.h>
+#include <cetech/log.h>
+#include <cetech/allocator.h>
 
 #include "keystr.h"
 

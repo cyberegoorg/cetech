@@ -9,6 +9,10 @@
 #include <cetech/map.inl>
 #include <cetech/vio.h>
 #include <cetech/memory.h>
+#include <cetech/application.h>
+#include <cetech/config.h>
+#include <cetech/vio.h>
+
 #include <cetech/module.h>
 #include <cetech/resource.h>
 

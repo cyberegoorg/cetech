@@ -1,5 +1,14 @@
 
+#include <cetech/allocator.h>
+#include <cetech/world.h>
+#include <cetech/config.h>
+#include <cetech/application.h>
+#include <cetech/vio.h>
+#include <cetech/resource.h>
 #include <cetech/entity.h>
+#include <cetech/resource.h>
+#include <cetech/vio.h>
+#include <cetech/resource.h>
 #include <cetech/renderer.h>
 #include <cetech/module.h>
 #include "cetech/luasys.h"

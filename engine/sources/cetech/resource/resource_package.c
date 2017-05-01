@@ -7,12 +7,17 @@
 #include <cetech/allocator.h>
 #include <cetech/stringid.h>
 #include <cetech/task.h>
+#include <cetech/vio.h>
+#include <cetech/config.h>
+#include <cetech/application.h>
+#include <cetech/vio.h>
 #include <cetech/resource.h>
 #include <cetech/vio.h>
 #include <cetech/yaml.h>
 #include <cetech/thread.h>
 #include <cetech/memory.h>
 #include <cetech/module.h>
+#include <cetech/array.inl>
 
 #include "resource_package.h"
 

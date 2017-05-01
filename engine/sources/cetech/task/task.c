@@ -7,6 +7,10 @@
 #include <cetech/cpu.h>
 
 #include <cetech/develop.h>
+#include <cetech/config.h>
+#include <cetech/application.h>
+#include <cetech/vio.h>
+#include <cetech/resource.h>
 #include <cetech/module.h>
 
 #include "task_queue.h"

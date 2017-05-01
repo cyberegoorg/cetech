@@ -4,6 +4,8 @@
 #include <include/assimp/scene.h>
 #include <include/assimp/postprocess.h>
 #include <cetech/path.h>
+#include <cetech/yaml.h>
+#include <stdio.h>
 
 ARRAY_PROTOTYPE(bgfx_vertex_decl_t);
 ARRAY_PROTOTYPE(stringid64_t);

@@ -1,8 +1,6 @@
 #ifndef CETECH_WINDOW_H
 #define CETECH_WINDOW_H
 
-#include "cetech/types.h"
-
 
 //==============================================================================
 // Window
@@ -12,7 +10,7 @@ enum {
     WINDOW_API_ID = 231515643
 };
 
-typedef struct {
+typedef struct window_s {
     void *w;
 } window_t;
 

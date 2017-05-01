@@ -1,6 +1,7 @@
 #include <stddef.h>
 #include <cetech/allocator.h>
 
+#include <cetech/config.h>
 #include <cetech/module.h>
 
 #include "../../application/module.h"

@@ -11,6 +11,11 @@
 #include <cetech/path.h>
 #include <cetech/stringid.h>
 #include <cetech/task.h>
+#include <cetech/vio.h>
+#include <cetech/application.h>
+#include <cetech/config.h>
+#include <cetech/vio.h>
+#include <cetech/resource.h>
 #include <cetech/resource.h>
 #include <cetech/memory.h>
 #include <cetech/module.h>

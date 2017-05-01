@@ -3,10 +3,18 @@
 #include <cetech/math_quatf.h>
 #include <cetech/math_mat44f.inl>
 
+#include <cetech/application.h>
+#include <cetech/config.h>
+#include <cetech/vio.h>
+#include <cetech/stringid.h>
+#include <cetech/resource.h>
+
 #include <cetech/entity.h>
 #include <cetech/scenegraph.h>
 #include <cetech/memory.h>
 #include <cetech/module.h>
+#include <cetech/map.inl>
+#include <cetech/world.h>
 
 
 ARRAY_PROTOTYPE(vec3f_t)

@@ -4,12 +4,19 @@
 
 #include <cetech/path.h>
 #include "cetech/fs.h"
-#include <cetech/module.h>
+
 
 #include "cetech/vio.h"
 
 #include <cetech/memory.h>
 #include <cetech/filesystem.h>
+#include <cetech/stringid.h>
+#include <cetech/config.h>
+#include <cetech/application.h>
+#include <cetech/vio.h>
+#include <cetech/resource.h>
+#include <cetech/module.h>
+#include <cetech/string.h>
 
 
 //==============================================================================
@@ -99,7 +106,7 @@ int filesystem_get_fullpath(stringid64_t root,
     const char *root_path = filesystem_get_root_dir(root);
 
     return path_join(result, maxlen, root_path, filename) ==
-           (strlen(root_path) + strlen(filename) + 1);
+           (str_len(root_path) + str_len(filename) + 1);
 }
 
 struct vio *filesystem_open(stringid64_t root,

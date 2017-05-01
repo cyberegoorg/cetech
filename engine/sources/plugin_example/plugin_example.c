@@ -1,5 +1,7 @@
 #include <stdio.h>
 
+#include "cetech/application.h"
+#include "cetech/config.h"
 #include "cetech/module.h"
 #include "cetech/input.h"
 

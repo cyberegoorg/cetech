@@ -2,7 +2,6 @@
 // Includes
 //==============================================================================
 
-#include <include/mpack/mpack.h>
 #include <cetech/allocator.h>
 #include <cetech/stringid.h>
 #include <cetech/vio.h>
@@ -10,14 +9,17 @@
 #include <cetech/math_vec2f.inl>
 
 #include <cetech/develop.h>
+#include <cetech/config.h>
+#include <cetech/application.h>
 #include <cetech/module.h>
+#include <cetech/luasys.h>
+#include <cetech/resource.h>
+
+#include <include/mpack/mpack.h>
 
 #include "vectors.h"
 #include "quaternion.h"
 #include "matrix.h"
-#include <cetech/luasys.h>
-#include <cetech/resource.h>
-
 
 IMPORT_API(resource_api_v0);
 IMPORT_API(cnsole_srv_api_v0);

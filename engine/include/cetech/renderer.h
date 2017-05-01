@@ -8,19 +8,27 @@
 // Includes
 //==============================================================================
 
-#include <cetech/camera.h>
-#include "window.h"
-#include "math_types.h"
-
 
 //==============================================================================
 // Typedefs
 //==============================================================================
 
+typedef struct stringid64_s stringid64_t;
+typedef struct world_s world_t;
+typedef struct entity_s entity_t;
+typedef struct mat33f_s mat33f_t;
+typedef struct mat44f_s mat44f_t;
+typedef struct camera_s camera_t;
+typedef struct vec2f_s vec2f_t;
+typedef struct vec3f_s vec3f_t;
+typedef struct vec4f_s vec4f_t;
+typedef struct window_s window_t;
+
 //! Material typedef
-typedef struct {
+typedef struct material_s{
     uint32_t idx;
 } material_t;
+
 
 enum {
     RENDERER_API_ID = 15,

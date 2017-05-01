@@ -7,8 +7,11 @@
 // Includes
 //==============================================================================
 
-#include "math_types.h"
-#include <cetech/entity.h>
+#include <stdint.h>
+#include <cetech/math_types.h>
+
+typedef struct world_s world_t;
+typedef struct entity_s entity_t;
 
 enum {
     TRANSFORM_API_ID = 25,

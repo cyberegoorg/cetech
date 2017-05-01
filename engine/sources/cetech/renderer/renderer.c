@@ -8,9 +8,11 @@
 #include <cetech/camera.h>
 #include <cetech/renderer.h>
 #include <cetech/develop.h>
+#include <cetech/stringid.h>
 #include <cetech/application.h>
 #include <cetech/config.h>
 #include <cetech/module.h>
+#include <cetech/world.h>
 #include "cetech/window.h"
 
 #include "bgfx/c99/platform.h"

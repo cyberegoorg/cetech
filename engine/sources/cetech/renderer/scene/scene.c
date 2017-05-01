@@ -11,9 +11,18 @@
 #include <cetech/scenegraph.h>
 #include "cetech/vio.h"
 #include <cetech/memory.h>
+#include <cetech/application.h>
+#include <cetech/config.h>
+#include <cetech/vio.h>
+#include <cetech/resource.h>
+#include <cetech/entity.h>
+#include <cetech/world.h>
+
 #include <cetech/module.h>
 
 #include <cetech/resource.h>
+#include <cetech/array.inl>
+#include <cetech/map.inl>
 #include "scene_blob.h"
 
 //==============================================================================

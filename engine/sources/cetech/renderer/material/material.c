@@ -9,9 +9,16 @@
 #include <cetech/renderer.h>
 #include "cetech/vio.h"
 #include <cetech/memory.h>
+#include <cetech/application.h>
+#include <cetech/config.h>
+#include <cetech/vio.h>
+
 #include <cetech/module.h>
 
 #include <cetech/resource.h>
+#include <cetech/map.inl>
+#include <cetech/handler.h>
+#include <cetech/string.h>
 #include "../texture/texture.h"
 #include "../shader/shader.h"
 #include "material_blob.h"
@@ -181,7 +188,7 @@ uint32_t _material_find_slot(struct material_blob *resource,
                         const char *name) {
     const char *u_names = (const char *) (resource + 1);
     for (uint32_t i = 0; i < resource->uniforms_count; ++i) {
-        if (strcmp(&u_names[i * 32], name) != 0) {
+        if (str_cmp(&u_names[i * 32], name) != 0) {
             continue;
         }
 

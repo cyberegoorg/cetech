@@ -3,16 +3,21 @@
 //==============================================================================
 
 #include <cetech/allocator.h>
-#include <cetech/config.h>
 #include <cetech/vio.h>
 #include <cetech/path.h>
 #include <cetech/yaml.h>
 #include <cetech/memory.h>
-#include <cetech/module.h>
+#include <cetech/cmd_line.h>
+#include <cetech/config.h>
 #include <cetech/module.h>
 #include <cetech/stringid.h>
+#include <cetech/application.h>
 #include <cetech/resource.h>
+#include <cetech/log.h>
+#include <stdio.h>
+#include <cetech/string.h>
 #include "../application/module.h"
+
 
 //==============================================================================
 // Defines
@@ -63,9 +68,9 @@ void cvar_load_global();
 
 void cvar_compile_global();
 
-int cvar_parse_core_args(struct args args);
+int cvar_parse_core_args(int argc, const char** argv);
 
-int cvar_parse_args(struct args args);
+int cvar_parse_args(int argc, const char** argv);
 
 cvar_t cvar_find(const char *name);
 
@@ -215,7 +220,7 @@ cvar_t cvar_find(const char *name) {
             continue;
         }
 
-        if (strcmp(_G.name[i], name) != 0) {
+        if (str_cmp(_G.name[i], name) != 0) {
             continue;
         }
 
@@ -358,8 +363,8 @@ void _cvar_from_str(const char *name,
     }
 }
 
-int cvar_parse_args(struct args args) {
-    struct args tmp_args = args;
+int cvar_parse_args(int argc, const char** argv) {
+    struct args tmp_args = {.argc = argc, .argv = argv};
     for (int j = 0; j < tmp_args.argc; ++j) {
         if (tmp_args.argv[j][0] != '-') {
             continue;
@@ -381,8 +386,8 @@ int cvar_parse_args(struct args args) {
     return 1;
 }
 
-int cvar_parse_core_args(struct args args) {
-    struct args tmp_args = args;
+int cvar_parse_core_args(int argc, const char** argv) {
+    struct args tmp_args = {.argc = argc, .argv = argv};
     for (int j = 0; j < tmp_args.argc; ++j) {
         if (tmp_args.argv[j][0] != '-') {
             continue;
@@ -390,9 +395,9 @@ int cvar_parse_core_args(struct args args) {
 
         const char *name = tmp_args.argv[j] + 1;
 
-        if (!strcmp(name, "build") ||
-            !strcmp(name, "compile") ||
-            !strcmp(name, "src")) {
+        if (!str_cmp(name, "build") ||
+            !str_cmp(name, "compile") ||
+            !str_cmp(name, "src")) {
 
             const char *value = (j != tmp_args.argc - 1) ? tmp_args.argv[j + 1]
                                                          : NULL;
@@ -420,7 +425,7 @@ cvar_t cvar_find_or_create(const char *name,
             continue;
         }
 
-        if (strcmp(_G.name[i], name) != 0) {
+        if (str_cmp(_G.name[i], name) != 0) {
             continue;
         }
 

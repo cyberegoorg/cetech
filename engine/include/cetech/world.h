@@ -8,7 +8,7 @@
 // Includes
 //==============================================================================
 
-#include "cetech/handler.h"
+#include <stdint.h>
 
 enum {
     WORLD_API_ID = 26,
@@ -20,7 +20,7 @@ enum {
 //==============================================================================
 
 //! World handler
-typedef struct {
+typedef struct world_s {
     uint32_t h;
 } world_t;
 

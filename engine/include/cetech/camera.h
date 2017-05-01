@@ -7,16 +7,18 @@
 // Includes
 //==============================================================================
 
-#include <cetech/world.h>
-#include <cetech/entity.h>
-
+#include <stddef.h>
 
 //==============================================================================
 // Typedefs
 //==============================================================================
 
+typedef struct world_s world_t;
+typedef struct entity_s entity_t;
+typedef struct mat44f_s mat44f_t;
+
 //! Camera struct
-typedef struct {
+typedef struct camera_s {
     uint32_t idx;
 } camera_t;
 

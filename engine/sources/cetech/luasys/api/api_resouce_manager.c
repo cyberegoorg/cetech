@@ -2,6 +2,8 @@
 #include "cetech/allocator.h"
 #include <cetech/vio.h>
 
+#include <cetech/config.h>
+#include <cetech/application.h>
 #include <cetech/module.h>
 #include <cetech/resource.h>
 #include "cetech/luasys.h"

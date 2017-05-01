@@ -8,17 +8,12 @@
 // Includes
 //==============================================================================
 
-#include <cetech/application.h>
-#include "stringid.h"
-#include "array.inl"
-#include "cetech/types.h"
-#include "cetech/vio.h"
-#include <cetech/config.h>
-
 enum {
     RESOURCE_API_ID = 19,
     PACKAGE_API_ID = 20,
 };
+
+typedef struct stringid64_s stringid64_t;
 
 //==============================================================================
 // Typedefs

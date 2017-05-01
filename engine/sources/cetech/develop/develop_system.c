@@ -13,6 +13,7 @@
 #include "cetech/thread.h"
 #include "cetech/eventstream.h"
 #include <cetech/memory.h>
+#include <cetech/config.h>
 #include <cetech/module.h>
 
 #include <cetech/task.h>

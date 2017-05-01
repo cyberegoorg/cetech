@@ -9,11 +9,7 @@
 // Includes
 //==============================================================================
 
-#include <stdlib.h>
 #include <stdatomic.h>
-
-#include "thread.h"
-
 
 enum {
     TASK_API_ID = 8,
@@ -60,7 +56,7 @@ enum task_affinity {
     TASK_AFFINITY_MAX
 };
 
-CETECH_STATIC_ASSERT(TASK_AFFINITY_MAX == TASK_MAX_WORKERS + 1);
+//CETECH_STATIC_ASSERT(TASK_AFFINITY_MAX == TASK_MAX_WORKERS + 1);
 
 
 //==============================================================================

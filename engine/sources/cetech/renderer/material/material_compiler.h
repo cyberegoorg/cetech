@@ -2,6 +2,8 @@
 #define CETECH_MATERIAL_COMPILER_H
 
 #include <cetech/path.h>
+#include <cetech/yaml.h>
+#include <stdio.h>
 
 struct material_compile_output {
     ARRAY_T(char) uniform_names;

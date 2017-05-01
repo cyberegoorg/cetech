@@ -1,7 +1,7 @@
 #ifndef CETECH_THREAD_H
 #define CETECH_THREAD_H
 
-#include "cetech/types.h"
+#include <stdint.h>
 
 enum {
     OS_THREAD_API_ID = 971401

@@ -1,9 +1,13 @@
 
+#include <cetech/allocator.h>
 #include <cetech/transform.h>
 #include <cetech/math_vec3f.inl>
-#include "cetech/luasys.h"
-#include "../luasys.h"
+#include <cetech/config.h>
+#include <cetech/application.h>
 #include <cetech/module.h>
+#include "cetech/luasys.h"
+
+#include "../luasys.h"
 
 #define API_NAME "Vec3f"
 

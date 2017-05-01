@@ -1,9 +1,13 @@
 #include <cetech/allocator.h>
 #include <cetech/errors.h>
+#include <cetech/application.h>
 
+
+#include <memory.h>
+#include <cetech/config.h>
 #include <cetech/module.h>
 #include <cetech/memory.h>
-#include <memory.h>
+
 
 #define LOG_WHERE "memory"
 

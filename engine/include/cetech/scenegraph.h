@@ -7,18 +7,20 @@
 // Includes
 //==============================================================================
 
-#import <cetech/entity.h>
-#import <cetech/world.h>
-#import "math_types.h"
-#import "stringid.h"
-
 enum {
     SCENEGRAPH_API_ID = 24,
 };
 
+#include "stdint.h"
+#include "cetech/math_types.h"
+
 //==============================================================================
 // Typedefs
 //==============================================================================
+
+typedef struct world_s world_t;
+typedef struct entity_s entity_t;
+typedef struct stringid64_s stringid64_t;
 
 //! Scene node struct
 typedef struct {

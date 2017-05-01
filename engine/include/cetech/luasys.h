@@ -8,20 +8,22 @@
 // Includes
 //==============================================================================
 
-#include <stdio.h>
+#include <stddef.h>
+#include <cetech/math_types.h>
 
-#include "include/luajit/lua.h"
-#include "include/luajit/lauxlib.h"
-#include "include/luajit/lualib.h"
+//#include "include/luajit/lua.h"
+//#include "include/luajit/lauxlib.h"
+//#include "include/luajit/lualib.h"
 
-#include "math_types.h"
-#include <cetech/handler.h>
-#include <cetech/stringid.h>
+typedef struct stringid64_s stringid64_t;
 
+typedef struct lua_State lua_State;
+typedef int (*lua_CFunction) (lua_State *L);
 
 enum {
     LUA_API_ID = 13,
 };
+
 //==============================================================================
 // Api
 //==============================================================================

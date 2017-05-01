@@ -3,7 +3,13 @@
 //==============================================================================
 
 #include "cetech/array.inl"
+#include <cetech/eventstream.h>
 #include <cetech/machine.h>
+#include <cetech/application.h>
+#include <cetech/config.h>
+#include <cetech/vio.h>
+#include <cetech/resource.h>
+#include <cetech/module.h>
 #include "./sdl2/sdl_parts.h"
 #include <cetech/memory.h>
 

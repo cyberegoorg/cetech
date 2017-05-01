@@ -2,9 +2,8 @@
 
 extern "C" {
 #include <cetech/allocator.h>
-#include "cetech/yaml.h"
-
-#include "cetech/errors.h"
+#include <cetech/yaml.h>
+#include <cetech/errors.h>
 }
 
 #include "include/yaml-cpp/yaml.h"

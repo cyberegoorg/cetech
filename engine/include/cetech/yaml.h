@@ -7,9 +7,12 @@
 //==============================================================================
 
 #include <stdbool.h>
+#include <cetech/math_types.h>
 
-#include "cetech/types.h"
-#include "math_types.h"
+typedef struct vec3f_s vec3f_t;
+typedef struct vec4f_s vec4f_t;
+typedef struct mat33f_s mat33f_t;
+typedef struct mat44f_s mat44f_t;
 
 //==============================================================================
 // Defines
@@ -35,11 +38,11 @@
 // Typedefs
 //==============================================================================
 
-typedef struct {
+typedef struct yaml_document_s {
     void *d;
 } yaml_document_t;
 
-typedef struct {
+typedef struct yaml_node_s {
     yaml_document_t doc;
     uint32_t idx;
 } yaml_node_t;

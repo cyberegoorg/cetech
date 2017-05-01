@@ -1,6 +1,10 @@
 
+#include <cetech/allocator.h>
 #include <cetech/transform.h>
 #include <cetech/renderer.h>
+#include <cetech/config.h>
+#include <cetech/application.h>
+
 #include <cetech/module.h>
 #include "cetech/luasys.h"
 #include "../luasys.h"

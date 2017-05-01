@@ -4,13 +4,16 @@
 
 #include <stdlib.h>
 #include <memory.h>
-#include <cetech/object.h>
 #include <cetech/fs.h>
 #include <cetech/path.h>
 #include <cetech/memory.h>
 
-#include <cetech/module.h>
 #include <cetech/string.h>
+
+#include <cetech/config.h>
+#include <cetech/application.h>
+
+#include <cetech/module.h>
 
 //==============================================================================
 // Defines
@@ -41,9 +44,12 @@ static struct G {
 
 
 void *load_object(const char *path);
+
 void unload_object(void *so);
+
 void *load_function(void *so,
-                        void *name);
+                    void *name);
+
 void *module_get_engine_api(int api);
 
 void _callm_init(get_api_fce_t fce) {
@@ -217,7 +223,8 @@ void module_call_init() {
 }
 
 void module_call_init_cvar() {
-    struct config_api_v0 ConfigApiV0 = *(struct config_api_v0 *) module_get_engine_api(CONFIG_API_ID);
+    struct config_api_v0 ConfigApiV0 = *(struct config_api_v0 *) module_get_engine_api(
+            CONFIG_API_ID);
 
     for (size_t i = 0; i < MAX_PLUGINS; ++i) {
         if (!_G.used[i] || !_G.module_api[i]->init_cvar) {

@@ -6,6 +6,7 @@
 #include <cetech/fs.h>
 #include <cetech/process.h>
 #include <cetech/yaml.h>
+#include <stdio.h>
 
 static int _shaderc(const char *input,
                     const char *output,

@@ -4,16 +4,16 @@
 #ifndef CETECH_ENTITY_MANAGER_H
 #define CETECH_ENTITY_MANAGER_H
 
+
 //==============================================================================
 // Includes
 //==============================================================================
 
-#include <cetech/map.inl>
-#include <cetech/yaml.h>
-#include <cetech/stringid.h>
-#include <cetech/handler.h>
-#include <cetech/world.h>
-#include <cetech/resource.h>
+#include "cetech/array.inl"
+
+typedef struct yaml_node_s yaml_node_t;
+typedef struct stringid64_s stringid64_t;
+typedef struct world_s world_t;
 
 enum {
     ENTITY_API_ID = 11,
@@ -24,7 +24,7 @@ enum {
 //==============================================================================
 
 //! Entity typedef
-typedef struct {
+typedef struct entity_s {
     uint32_t h;
 } entity_t;
 
