@@ -242,14 +242,14 @@ void scenegraph_set_scale(world_t world,
 int scenegraph_has(world_t world,
                    entity_t entity) {
     world_data_t *world_data = _get_world_data(world);
-    return MAP_HAS(uint32_t, &world_data->ent_idx_map, entity.h.id);
+    return MAP_HAS(uint32_t, &world_data->ent_idx_map, entity.h);
 }
 
 scene_node_t scenegraph_get_root(world_t world,
                                  entity_t entity) {
 
     world_data_t *world_data = _get_world_data(world);
-    uint32_t idx = MAP_GET(uint32_t, &world_data->ent_idx_map, entity.h.id, UINT32_MAX);
+    uint32_t idx = MAP_GET(uint32_t, &world_data->ent_idx_map, entity.h, UINT32_MAX);
     return (scene_node_t) {.idx = idx};
 }
 
@@ -312,7 +312,7 @@ scene_node_t scenegraph_create(world_t world,
     }
 
     scene_node_t root = nodes[0];
-    MAP_SET(uint32_t, &data->ent_idx_map, entity.h.id, root.idx);
+    MAP_SET(uint32_t, &data->ent_idx_map, entity.h, root.idx);
     CETECH_DEALLOCATE(memory_api_v0.main_allocator(), nodes);
     return root;
 }

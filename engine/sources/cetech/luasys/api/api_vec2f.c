@@ -2,7 +2,8 @@
 #include <cetech/allocator.h>
 #include "cetech/math_vec2f.inl"
 
-#include "cetech/luasys/luasys.h"
+#include "cetech/luasys.h"
+#include "../luasys.h"
 #include <cetech/module.h>
 
 #define API_NAME "Vec2f"

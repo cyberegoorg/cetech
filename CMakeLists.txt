@@ -9,17 +9,15 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -Werror")
 set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -rdynamic")
 
 
-include_directories(engine/sources)
+#include_directories(engine/sources)
 include_directories(engine/include)
 
 add_definitions(-DCETECH_STATIC_PLUGINS)
-add_definitions(-DCELIB_USE_SDL)
+add_definitions(-DCETECH_USE_SDL)
 
 if (CMAKE_BUILD_TYPE STREQUAL "Debug")
     set(CONFIGURATION debug)
     add_definitions(-DCETECH_DEBUG)
-    add_definitions(-DCELIB_DEBUG)
-    add_definitions(-DCELIB_DEBUG)
 else ()
     set(CONFIGURATION release)
 endif ()
@@ -28,22 +26,20 @@ endif ()
 if (APPLE)
     set(PLATFORM_ID darwin64)
 
-    add_definitions(-DCELIB_COLORED_LOG)
+    add_definitions(-DCETECH_COLORED_LOG)
     add_definitions(-DCETECH_DARWIN)
-    add_definitions(-DCELIB_DARWIN)
 
 elseif (UNIX)
     set(PLATFORM_ID linux64)
 
     add_definitions(-DCETECH_LINUX)
-    add_definitions(-DCELIB_LINUX)
-    add_definitions(-DCELIB_COLORED_LOG)
+    add_definitions(-DCETECH_COLORED_LOG)
 
 elseif (WIN32)
     set(PLATFORM_ID windows64)
 
     add_definitions(-DCETECH_WINDOWS)
-    add_definitions(-DCELIB_WINDOWS)
+    add_definitions(-DCETECH_WINDOWS)
 endif ()
 
 link_directories(externals/build/${PLATFORM_ID}/release/lib/)
@@ -72,29 +68,38 @@ set(SOURCE_FILES
         ${EXTERNAL_SOURCE_FILES}
 
         ########################################################################
-        # CELIB
+        # CETECH
         ########################################################################
         engine/sources/cetech/memory/allocator.c
         engine/sources/cetech/memory/allocator_malloc.c
         engine/sources/cetech/memory/allocator_scratch.c
+
         engine/sources/cetech/log/log_stdout_handler.c
         engine/sources/cetech/log/log_nanomsg_handler.c
         engine/sources/cetech/log/log_db_handler.c
         engine/sources/cetech/log/log_system.c
+
+        engine/sources/cetech/filesystem/vio.c
         engine/sources/cetech/filesystem/vio_sdl.c
-        engine/sources/cetech/yaml/yaml.cc
-        engine/sources/cetech/log/log_system.c
-        engine/sources/cetech/os/cmd_line.c
         engine/sources/cetech/filesystem/fs.c
-        engine/sources/cetech/handler/handler.c
-        engine/sources/cetech/sdl2/sdl2_object.h
+
+        engine/sources/cetech/os/cmd_line.c
         engine/sources/cetech/os/path.c
         engine/sources/cetech/os/process.c
         engine/sources/cetech/os/stacktrace.c
+
+        engine/sources/cetech/sdl2/sdl2_object.h
+        engine/sources/cetech/sdl2/sdl_time.h
+
         engine/sources/cetech/string/string.c
         engine/sources/cetech/string/stringid.c
-        engine/sources/cetech/sdl2/sdl_time.h
-        engine/sources/cetech/filesystem/vio.c
+
+        engine/sources/cetech/log/log_system.c
+
+        engine/sources/cetech/yaml/yaml.cc
+
+        engine/sources/cetech/handler/handler.c
+
 
         ########################################################################
         # CETECH

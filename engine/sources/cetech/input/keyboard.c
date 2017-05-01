@@ -2,7 +2,7 @@
 // Includes
 //==============================================================================
 
-#include <cetech/application/module.h>
+#include <cetech/module.h>
 #include <cetech/machine.h>
 #include <cetech/input.h>
 #include <cetech/string.h>
@@ -79,7 +79,7 @@ uint32_t keyboard_button_index(const char *button_name) {
             continue;
         }
 
-        if (strcmp(_key_to_str[i], button_name)) {
+        if (str_cmp(_key_to_str[i], button_name)) {
             continue;
         }
 

@@ -25,11 +25,8 @@ enum {
 
 //! Entity typedef
 typedef struct {
-    handler32_t h;
+    uint32_t h;
 } entity_t;
-
-ARRAY_PROTOTYPE(entity_t);
-MAP_PROTOTYPE(entity_t);
 
 //==============================================================================
 // Api

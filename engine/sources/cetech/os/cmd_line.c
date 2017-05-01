@@ -11,7 +11,7 @@ static int _cmd_line_is_short(struct args args,
                                   int i,
                                   char shortopt) {
     return (shortopt != '\0' &&
-            strlen(args.argv[i]) > 1 &&
+            str_len(args.argv[i]) > 1 &&
             args.argv[i][0] == '-' &&
             args.argv[i][1] == shortopt);
 }
@@ -19,10 +19,10 @@ static int _cmd_line_is_short(struct args args,
 static int _cmd_line_is_long(struct args args,
                                  const int i,
                                  const char *longopt) {
-    return (strlen(args.argv[i]) > 2 &&
+    return (str_len(args.argv[i]) > 2 &&
             args.argv[i][0] == '-' &&
             args.argv[i][1] == '-' &&
-            strcmp(&args.argv[i][2], longopt) == 0);
+            str_cmp(&args.argv[i][2], longopt) == 0);
 }
 
 int cmd_find_argument(struct args args,

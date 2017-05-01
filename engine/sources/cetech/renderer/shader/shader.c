@@ -12,7 +12,7 @@
 
 #include <cetech/resource.h>
 #include <cetech/memory.h>
-#include <cetech/application/module.h>
+#include <cetech/module.h>
 
 
 //==============================================================================
@@ -55,6 +55,7 @@ IMPORT_API(app_api_v0)
 // Resource
 //==============================================================================
 #include "shader_resource.h"
+#include "../../application/module.h"
 
 //==============================================================================
 // Interface

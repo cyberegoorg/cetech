@@ -8,7 +8,7 @@
 #include "math_types.h"
 #include "thread.h"
 #include "eventstream.h"
-#include <cetech/application/module.h>
+#include <cetech/module.h>
 
 enum {
     MACHINE_API_ID = 6,

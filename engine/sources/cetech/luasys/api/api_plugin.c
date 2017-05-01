@@ -1,13 +1,15 @@
 #include <stddef.h>
 #include <cetech/allocator.h>
 
-#include <cetech/application/module.h>
+#include <cetech/module.h>
 
-#include "cetech/luasys/luasys.h"
+#include "../../application/module.h"
+#include "../luasys.h"
 
 #define API_NAME "Plugin"
 
 static int _reload_all(lua_State *l) {
+
     module_reload_all();
     return 0;
 }

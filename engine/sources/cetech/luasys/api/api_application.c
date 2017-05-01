@@ -2,7 +2,8 @@
 #include <cetech/allocator.h>
 #include <cetech/application.h>
 #include <cetech/module.h>
-#include "cetech/luasys/luasys.h"
+#include "cetech/luasys.h"
+#include "../luasys.h"
 
 #define API_NAME "Application"
 

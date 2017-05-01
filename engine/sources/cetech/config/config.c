@@ -9,9 +9,10 @@
 #include <cetech/yaml.h>
 #include <cetech/memory.h>
 #include <cetech/module.h>
-#include <cetech/application/module.h>
+#include <cetech/module.h>
 #include <cetech/stringid.h>
 #include <cetech/resource.h>
+#include "../application/module.h"
 
 //==============================================================================
 // Defines

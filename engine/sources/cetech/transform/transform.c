@@ -184,8 +184,8 @@ static void _destroyer(world_t world,
     // TODO: remove from arrays, swap idx -> last AND change size
     for (int i = 0; i < ent_count; i++) {
         CETECH_ASSERT("transform",
-                   MAP_HAS(uint32_t, &world_data->ent_idx_map, ents[i].h.id));
-        MAP_REMOVE(uint32_t, &world_data->ent_idx_map, ents[i].h.id);
+                   MAP_HAS(uint32_t, &world_data->ent_idx_map, ents[i].h));
+        MAP_REMOVE(uint32_t, &world_data->ent_idx_map, ents[i].h);
     }
 }
 
@@ -202,7 +202,7 @@ static void _spawner(world_t world,
                          ents[cents[i]],
                          ents_parent[cents[i]] != UINT32_MAX
                          ? ents[ents_parent[cents[i]]]
-                         : (entity_t) {.h.id = UINT32_MAX},
+                         : (entity_t) {.h = UINT32_MAX},
                          tdata[i].position,
                          tdata[i].rotation,
                          tdata[i].scale);
@@ -440,14 +440,14 @@ void transform_set_scale(world_t world,
 int transform_has(world_t world,
                   entity_t entity) {
     world_data_t *world_data = _get_world_data(world);
-    return MAP_HAS(uint32_t, &world_data->ent_idx_map, entity.h.id);
+    return MAP_HAS(uint32_t, &world_data->ent_idx_map, entity.h);
 }
 
 transform_t transform_get(world_t world,
                           entity_t entity) {
 
     world_data_t *world_data = _get_world_data(world);
-    uint32_t idx = MAP_GET(uint32_t, &world_data->ent_idx_map, entity.h.id, UINT32_MAX);
+    uint32_t idx = MAP_GET(uint32_t, &world_data->ent_idx_map, entity.h, UINT32_MAX);
     return (transform_t) {.idx = idx};
 }
 
@@ -475,14 +475,14 @@ transform_t transform_create(world_t world,
 
     transform_t t = {.idx = idx};
     transform_transform(world, t,
-                        parent.h.id != UINT32_MAX ? transform_get_world_matrix(
+                        parent.h != UINT32_MAX ? transform_get_world_matrix(
                                 world, transform_get(world, parent))
                                                  : &m);
 
-    MAP_SET(uint32_t, &data->ent_idx_map, entity.h.id, idx);
+    MAP_SET(uint32_t, &data->ent_idx_map, entity.h, idx);
 
-    if (parent.h.id != UINT32_MAX) {
-        uint32_t parent_idx = MAP_GET(uint32_t, &data->ent_idx_map, parent.h.id,
+    if (parent.h != UINT32_MAX) {
+        uint32_t parent_idx = MAP_GET(uint32_t, &data->ent_idx_map, parent.h,
                                  UINT32_MAX);
 
         ARRAY_AT(&data->parent, idx) = parent_idx;

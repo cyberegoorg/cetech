@@ -1,7 +1,9 @@
 
 #include <cetech/transform.h>
-#include <cetech/application/module.h>
-#include "cetech/luasys/luasys.h"
+#include <cetech/module.h>
+#include <cetech/handler.h>
+#include "cetech/luasys.h"
+#include "../luasys.h"
 
 #define API_NAME "Transform"
 
@@ -9,7 +11,7 @@ IMPORT_API(transform_api_v0);
 
 static int _transform_get(lua_State *l) {
     world_t w = {.h = luasys_to_handler(l, 1)};
-    entity_t ent = {.h = luasys_to_handler(l, 2)};
+    entity_t ent = {.h = luasys_to_handler(l, 2).id};
 
     luasys_push_int(l, transform_api_v0.get(w, ent).idx);
     return 1;
@@ -18,7 +20,7 @@ static int _transform_get(lua_State *l) {
 
 static int _transform_has(lua_State *l) {
     world_t w = {.h = luasys_to_handler(l, 1)};
-    entity_t ent = {.h = luasys_to_handler(l, 2)};
+    entity_t ent = {.h = luasys_to_handler(l, 2).id};
 
     luasys_push_bool(l, transform_api_v0.has(w, ent));
     return 1;
@@ -89,8 +91,8 @@ static int _transform_get_world_matrix(lua_State *l) {
 
 static int _transform_link(lua_State *l) {
     world_t w = {.h = luasys_to_handler(l, 1)};
-    entity_t root = {.h = luasys_to_handler(l, 2)};
-    entity_t child = {.h = luasys_to_handler(l, 3)};
+    entity_t root = {.h = luasys_to_handler(l, 2).id};
+    entity_t child = {.h = luasys_to_handler(l, 3).id};
 
     transform_api_v0.link(w, root, child);
     return 0;

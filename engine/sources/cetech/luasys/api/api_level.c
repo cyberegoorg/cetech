@@ -2,9 +2,10 @@
 
 #include <cetech/allocator.h>
 #include <cetech/level.h>
-#include <cetech/application/module.h>
+#include <cetech/module.h>
 
-#include "cetech/luasys/luasys.h"
+#include "cetech/luasys.h"
+#include "../luasys.h"
 
 #define API_NAME "Level"
 
@@ -35,7 +36,7 @@ static int _level_entity_by_id(lua_State *l) {
 
     entity_t ent = level_api_v0.entity_by_id(level, name);
 
-    luasys_push_handler(l, ent.h);
+    luasys_push_uint32_t(l, ent.h);
     return 1;
 }
 
@@ -44,7 +45,7 @@ static int _level_entity(lua_State *l) {
 
     entity_t ent = level_api_v0.entity(level);
 
-    luasys_push_handler(l, ent.h);
+    luasys_push_uint32_t(l, ent.h);
     return 1;
 }
 

@@ -50,6 +50,9 @@ void luasys_push_handler(lua_State *l,
 void luasys_push_int(lua_State *l,
                      int value);
 
+void luasys_push_uint32_t(lua_State *l,
+                          uint32_t value);
+
 void luasys_push_bool(lua_State *l,
                       int value);
 
@@ -64,6 +67,10 @@ int luasys_to_bool(lua_State *l,
 
 int luasys_to_int(lua_State *l,
                   int i);
+
+uint32_t luasys_to_uin32_t(lua_State *l,
+                  int i);
+
 
 float luasys_to_float(lua_State *l,
                   int i);

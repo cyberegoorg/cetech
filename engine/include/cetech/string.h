@@ -7,12 +7,12 @@
 // Interface
 //==============================================================================
 
-size_t strlen(const char *s);
+size_t str_len(const char *s);
 
 char *str_dup(const char *s,
                  struct allocator *allocator);
 
-int strcmp(const char *s1,
+int str_cmp(const char *s1,
                const char *s2);
 
 void str_set(char *__restrict result,

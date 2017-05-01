@@ -13,11 +13,21 @@
 #include <cetech/module.h>
 
 
+IMPORT_API(memory_api_v0);
+IMPORT_API(component_api_v0);
+IMPORT_API(renderer_api_v0);
+IMPORT_API(transform_api_v0);
+
+
 struct camera_data {
     float near;
     float far;
     float fov;
 };
+
+ARRAY_PROTOTYPE(entity_t);
+MAP_PROTOTYPE(entity_t);
+
 
 typedef struct {
     MAP_T(uint32_t) ent_idx_map;
@@ -28,15 +38,10 @@ typedef struct {
     ARRAY_T(float) fov;
 
 } world_data_t;
-
-IMPORT_API(memory_api_v0);
-IMPORT_API(component_api_v0);
-IMPORT_API(renderer_api_v0);
-IMPORT_API(transform_api_v0);
-
 ARRAY_PROTOTYPE(world_data_t)
 
 MAP_PROTOTYPE(world_data_t)
+
 
 #define _G CameraGlobal
 static struct G {
@@ -104,7 +109,7 @@ void _destroyer(world_t world,
 
     // TODO: remove from arrays, swap idx -> last AND change size
     for (int i = 0; i < ent_count; i++) {
-        MAP_REMOVE(uint32_t, &world_data->ent_idx_map, ents[i].h.id);
+        MAP_REMOVE(uint32_t, &world_data->ent_idx_map, ents[i].h);
     }
 }
 
@@ -147,8 +152,8 @@ static void _init(get_api_fce_t get_engine_api) {
     _G.type = stringid64_from_string("camera");
 
     component_api_v0.component_register_compiler(_G.type,
-                                                  _camera_component_compiler,
-                                                  10);
+                                                 _camera_component_compiler,
+                                                 10);
     component_api_v0.component_register_type(_G.type, (struct component_clb) {
             .spawner=_spawner, .destroyer=_destroyer,
             .on_world_create=_on_world_create, .on_world_destroy=_on_world_destroy
@@ -191,14 +196,15 @@ void camera_get_project_view(world_t world,
 int camera_has(world_t world,
                entity_t entity) {
     world_data_t *world_data = _get_world_data(world);
-    return MAP_HAS(uint32_t, &world_data->ent_idx_map, entity.h.id);
+    return MAP_HAS(uint32_t, &world_data->ent_idx_map, entity.h);
 }
 
 camera_t camera_get(world_t world,
                     entity_t entity) {
 
     world_data_t *world_data = _get_world_data(world);
-    uint32_t idx = MAP_GET(uint32_t, &world_data->ent_idx_map, entity.h.id, UINT32_MAX);
+    uint32_t idx = MAP_GET(uint32_t, &world_data->ent_idx_map, entity.h,
+                           UINT32_MAX);
     return (camera_t) {.idx = idx};
 }
 
@@ -212,7 +218,7 @@ camera_t camera_create(world_t world,
 
     uint32_t idx = (uint32_t) ARRAY_SIZE(&data->near);
 
-    MAP_SET(uint32_t, &data->ent_idx_map, entity.h.id, idx);
+    MAP_SET(uint32_t, &data->ent_idx_map, entity.h, idx);
 
     ARRAY_PUSH_BACK(entity_t, &data->entity, entity);
     ARRAY_PUSH_BACK(float, &data->near, near);
@@ -225,28 +231,26 @@ camera_t camera_create(world_t world,
 void *camera_get_module_api(int api) {
 
     switch (api) {
-        case PLUGIN_EXPORT_API_ID:
-                {
-                    static struct module_api_v0 module = {0};
+        case PLUGIN_EXPORT_API_ID: {
+            static struct module_api_v0 module = {0};
 
-                    module.init = _init;
-                    module.shutdown = _shutdown;
+            module.init = _init;
+            module.shutdown = _shutdown;
 
-                    return &module;
-                }
+            return &module;
+        }
 
-        case CAMERA_API_ID:
-             {
-                    static struct camera_api_v0 api = {0};
+        case CAMERA_API_ID: {
+            static struct camera_api_v0 api = {0};
 
-                    api.is_valid = camera_is_valid;
-                    api.get_project_view = camera_get_project_view;
-                    api.has = camera_has;
-                    api.get = camera_get;
-                    api.create = camera_create;
+            api.is_valid = camera_is_valid;
+            api.get_project_view = camera_get_project_view;
+            api.has = camera_has;
+            api.get = camera_get;
+            api.create = camera_create;
 
-                    return &api;
-                }
+            return &api;
+        }
 
         default:
             return NULL;

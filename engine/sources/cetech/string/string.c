@@ -8,7 +8,7 @@
 // Interface
 //==============================================================================
 
-size_t strlen(const char *s) {
+size_t str_len(const char *s) {
     CETECH_ASSERT("string", s != NULL);
 
     return strlen(s);
@@ -26,7 +26,7 @@ char *str_dup(const char *s,
     return d;
 }
 
-int strcmp(const char *s1,
+int str_cmp(const char *s1,
                const char *s2) {
     CETECH_ASSERT("string", s1 != NULL);
     CETECH_ASSERT("string", s2 != NULL);

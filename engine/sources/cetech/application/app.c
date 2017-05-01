@@ -11,7 +11,7 @@
 #include <cetech/stringid.h>
 #include <cetech/cmd_line.h>
 
-#include <cetech/application/app.h>
+#include "app.h"
 #include <cetech/config.h>
 #include <cetech/machine.h>
 #include <cetech/resource.h>

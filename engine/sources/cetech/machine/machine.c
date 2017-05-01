@@ -4,7 +4,7 @@
 
 #include "cetech/array.inl"
 #include <cetech/machine.h>
-#include "cetech/machine/sdl2/sdl_parts.h"
+#include "./sdl2/sdl_parts.h"
 #include <cetech/memory.h>
 
 //==============================================================================

@@ -12,7 +12,7 @@
 #include <cetech/yaml.h>
 #include <cetech/thread.h>
 #include <cetech/memory.h>
-#include <cetech/application/module.h>
+#include <cetech/module.h>
 
 #include "resource_package.h"
 

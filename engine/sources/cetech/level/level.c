@@ -27,10 +27,14 @@ IMPORT_API(memory_api_v0);
 ARRAY_T(world_t);
 ARRAY_PROTOTYPE(world_callbacks_t);
 ARRAY_PROTOTYPE(stringid64_t);
+ARRAY_PROTOTYPE(entity_t);
+MAP_PROTOTYPE(entity_t);
 
 //==============================================================================
 // Globals
 //==============================================================================
+
+
 
 struct level_instance {
     entity_t level_entity;

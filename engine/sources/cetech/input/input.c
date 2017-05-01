@@ -110,7 +110,7 @@ uint32_t gamepad_button_index(const char *button_name) {
             continue;
         }
 
-        if (strcmp(_btn_to_str[i], button_name)) {
+        if (str_cmp(_btn_to_str[i], button_name)) {
             continue;
         }
 
@@ -163,7 +163,7 @@ uint32_t gamepad_axis_index(const char *axis_name) {
             continue;
         }
 
-        if (strcmp(_axis_to_str[i], axis_name) != 0) {
+        if (str_cmp(_axis_to_str[i], axis_name) != 0) {
             continue;
         }
 

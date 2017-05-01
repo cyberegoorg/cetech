@@ -11,7 +11,7 @@
 #include <cetech/scenegraph.h>
 #include "cetech/vio.h"
 #include <cetech/memory.h>
-#include <cetech/application/module.h>
+#include <cetech/module.h>
 
 #include <cetech/resource.h>
 #include "scene_blob.h"
@@ -83,6 +83,7 @@ struct scene_instance *_get_scene_instance(stringid64_t scene) {
 // Resource
 //==============================================================================
 #include "scene_resource.h"
+#include "../../application/module.h"
 
 //==============================================================================
 // Interface

@@ -10,7 +10,7 @@
 #include <cetech/math_vec2f.inl>
 
 #include <cetech/develop.h>
-#include <cetech/application/module.h>
+#include <cetech/module.h>
 
 #include "vectors.h"
 #include "quaternion.h"
@@ -116,6 +116,7 @@ quatf_t *_new_tmp_quat() {
 // Lua resource
 //==============================================================================
 #include "lua_resource.h"
+#include "../application/module.h"
 
 //==============================================================================
 // Game
@@ -410,6 +411,12 @@ void luasys_push_handler(lua_State *_L,
     lua_pushinteger(_L, value.id);
 }
 
+void luasys_push_uint32_t(lua_State *_L,
+                         uint32_t value) {
+    lua_pushinteger(_L, value);
+}
+
+
 void luasys_push_bool(lua_State *_L,
                       int value) {
     lua_pushboolean(_L, value);
@@ -435,6 +442,13 @@ int luasys_to_int(lua_State *_L,
                   int i) {
     return (int) lua_tointeger(_L, i);
 }
+
+
+uint32_t luasys_to_uin32_t(lua_State *_L,
+                  int i) {
+    return (uint32_t) lua_tointeger(_L, i);
+}
+
 
 uint64_t luasys_to_u64(lua_State *_L,
                   int i) {

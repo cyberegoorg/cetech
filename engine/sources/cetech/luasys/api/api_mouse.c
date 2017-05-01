@@ -1,8 +1,9 @@
 #include <stddef.h>
 #include <cetech/allocator.h>
 #include <cetech/math_types.h>
-#include <cetech/application/module.h>
-#include "cetech/luasys/luasys.h"
+#include <cetech/module.h>
+#include "cetech/luasys.h"
+#include "../luasys.h"
 #include <cetech/input.h>
 
 IMPORT_API(mouse_api_v0);

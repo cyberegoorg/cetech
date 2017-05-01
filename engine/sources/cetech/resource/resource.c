@@ -13,10 +13,11 @@
 #include <cetech/develop.h>
 #include <cetech/memory.h>
 #include <cetech/module.h>
-#include <cetech/application/module.h>
+#include <cetech/module.h>
 #include <cetech/filesystem.h>
 
 #include "resource.h"
+#include "../application/module.h"
 
 
 //==============================================================================

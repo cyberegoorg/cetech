@@ -18,6 +18,8 @@
 // Globals
 //==============================================================================
 
+ARRAY_PROTOTYPE(entity_t);
+MAP_PROTOTYPE(entity_t);
 ARRAY_PROTOTYPE_N(struct array_entity_t, array_entity_t);
 MAP_PROTOTYPE_N(struct array_entity_t, array_entity_t);
 
@@ -47,7 +49,7 @@ uint32_t _new_spawned_array() {
 
 void _map_spawned_array(entity_t root,
                         uint32_t idx) {
-    MAP_SET(uint32_t, &_G.spawned_map, root.h.id, idx);
+    MAP_SET(uint32_t, &_G.spawned_map, root.h, idx);
 }
 
 ARRAY_T(entity_t) *_get_spawned_array_by_idx(uint32_t idx) {
@@ -55,14 +57,14 @@ ARRAY_T(entity_t) *_get_spawned_array_by_idx(uint32_t idx) {
 }
 
 ARRAY_T(entity_t) *_get_spawned_array(entity_t entity) {
-    uint32_t idx = MAP_GET(uint32_t, &_G.spawned_map, entity.h.id, UINT32_MAX);
+    uint32_t idx = MAP_GET(uint32_t, &_G.spawned_map, entity.h, UINT32_MAX);
     return &ARRAY_AT(&_G.spawned_array, idx);
 }
 
 
 void _destroy_spawned_array(entity_t entity) {
-    uint32_t idx = MAP_GET(uint32_t, &_G.spawned_map, entity.h.id, UINT32_MAX);
-    MAP_REMOVE(uint32_t, &_G.spawned_map, entity.h.id);
+    uint32_t idx = MAP_GET(uint32_t, &_G.spawned_map, entity.h, UINT32_MAX);
+    MAP_REMOVE(uint32_t, &_G.spawned_map, entity.h);
 
     ARRAY_T(entity_t) *array = &ARRAY_AT(&_G.spawned_array, idx);
     ARRAY_DESTROY(entity_t, array);
@@ -488,15 +490,15 @@ static void _shutdown() {
 //==============================================================================
 
 entity_t entity_manager_create() {
-    return (entity_t) {.h = handler_api_v0.handler32_create(_G.entity_handler)};
+    return (entity_t) {.h = handler_api_v0.handler32_create(_G.entity_handler).id};
 }
 
 void entity_manager_destroy(entity_t entity) {
-    handler_api_v0.handler32_destroy(_G.entity_handler, entity.h);
+    handler_api_v0.handler32_destroy(_G.entity_handler, (handler32_t){.id = entity.h});
 }
 
 int entity_manager_alive(entity_t entity) {
-    return handler_api_v0.handler32_alive(_G.entity_handler, entity.h);
+    return handler_api_v0.handler32_alive(_G.entity_handler, (handler32_t){.id = entity.h});
 }
 
 
@@ -541,7 +543,7 @@ entity_t entity_spawn(world_t world,
 
     if (res == NULL) {
         log_error("entity", "Could not spawn entity.");
-        return (entity_t) {.h = {0}};
+        return (entity_t) {.h = 0};
     }
 
     ARRAY_T(entity_t) *spawned = entity_spawn_from_resource(world, res);

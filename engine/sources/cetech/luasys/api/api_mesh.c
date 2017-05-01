@@ -1,8 +1,9 @@
 
 #include <cetech/entity.h>
 #include <cetech/renderer.h>
-#include <cetech/application/module.h>
-#include "cetech/luasys/luasys.h"
+#include <cetech/module.h>
+#include "cetech/luasys.h"
+#include "../luasys.h"
 
 #define API_NAME "Mesh"
 
@@ -10,7 +11,7 @@ IMPORT_API(mesh_renderer_api_v0);
 
 static int _mesh_get(lua_State *l) {
     world_t w = {.h = luasys_to_handler(l, 1)};
-    entity_t ent = {.h = luasys_to_handler(l, 2)};
+    entity_t ent = {.h = luasys_to_uin32_t(l, 2)};
 
     luasys_push_int(l, mesh_renderer_api_v0.get(w, ent).idx);
     return 1;
@@ -19,7 +20,7 @@ static int _mesh_get(lua_State *l) {
 
 static int _mesh_has(lua_State *l) {
     world_t w = {.h = luasys_to_handler(l, 1)};
-    entity_t ent = {.h = luasys_to_handler(l, 2)};
+    entity_t ent = {.h = luasys_to_uin32_t(l, 2)};
 
     luasys_push_bool(l, mesh_renderer_api_v0.has(w, ent));
     return 1;

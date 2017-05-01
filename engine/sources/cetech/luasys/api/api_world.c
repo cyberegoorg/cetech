@@ -2,8 +2,9 @@
 #include <cetech/allocator.h>
 
 #include <cetech/world.h>
-#include <cetech/application/module.h>
-#include "cetech/luasys/luasys.h"
+#include <cetech/module.h>
+#include "cetech/luasys.h"
+#include "../luasys.h"
 
 #define API_NAME "World"
 

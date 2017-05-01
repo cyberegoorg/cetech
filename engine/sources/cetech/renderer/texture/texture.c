@@ -9,7 +9,7 @@
 #include <cetech/map.inl>
 #include <cetech/vio.h>
 #include <cetech/memory.h>
-#include <cetech/application/module.h>
+#include <cetech/module.h>
 #include <cetech/resource.h>
 
 
@@ -50,6 +50,7 @@ IMPORT_API(app_api_v0);
 // Resource
 //==============================================================================
 #include "texture_resource.h"
+#include "../../application/module.h"
 
 //==============================================================================
 // Interface

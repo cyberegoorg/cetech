@@ -14,10 +14,10 @@
 #include "cetech/window.h"
 
 #include "bgfx/c99/platform.h"
-#include <cetech/renderer/texture/texture.h>
-#include <cetech/renderer/shader/shader.h>
-#include <cetech/renderer/scene/scene.h>
-#include <cetech/renderer/material/material.h>
+#include "texture/texture.h"
+#include "shader/shader.h"
+#include "scene/scene.h"
+#include "material/material.h"
 
 
 IMPORT_API(cnsole_srv_api_v0);

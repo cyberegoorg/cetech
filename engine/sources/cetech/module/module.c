@@ -9,7 +9,7 @@
 #include <cetech/path.h>
 #include <cetech/memory.h>
 
-#include <cetech/application/module.h>
+#include <cetech/module.h>
 #include <cetech/string.h>
 
 //==============================================================================
@@ -44,6 +44,7 @@ void *load_object(const char *path);
 void unload_object(void *so);
 void *load_function(void *so,
                         void *name);
+void *module_get_engine_api(int api);
 
 void _callm_init(get_api_fce_t fce) {
     struct module_api_v0 *api = fce(PLUGIN_EXPORT_API_ID);

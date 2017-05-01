@@ -2,10 +2,12 @@
 #include <cetech/allocator.h>
 #include <cetech/stringid.h>
 #include <cetech/entity.h>
-#include <cetech/application/module.h>
+#include <cetech/module.h>
 #include <cetech/component.h>
-#include "cetech/luasys/luasys.h"
+#include "cetech/luasys.h"
+#include "../luasys.h"
 #include <cetech/luasys.h>
+#include <cetech/handler.h>
 
 #define API_NAME "Component"
 
@@ -14,7 +16,7 @@ IMPORT_API(lua_api_v0)
 
 static int _set_property(lua_State *l) {
     world_t w = {.h = luasys_to_handler(l, 1)};
-    entity_t entity = {.h = luasys_to_handler(l, 2)};
+    entity_t entity = {.h = luasys_to_handler(l, 2).id};
     const char *type = luasys_to_string(l, 3);
     const char *key = luasys_to_string(l, 4);
 
@@ -81,7 +83,7 @@ static int _set_property(lua_State *l) {
 
 static int _get_property(lua_State *l) {
     world_t w = {.h = luasys_to_handler(l, 1)};
-    entity_t entity = {.h = luasys_to_handler(l, 2)};
+    entity_t entity = {.h = luasys_to_handler(l, 2).id};
     const char *type = luasys_to_string(l, 3);
     const char *key = luasys_to_string(l, 4);
 

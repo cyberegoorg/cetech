@@ -12,8 +12,8 @@
 #include <cetech/module.h>
 
 #include <cetech/resource.h>
-#include <cetech/renderer/texture/texture.h>
-#include <cetech/renderer/shader/shader.h>
+#include "../texture/texture.h"
+#include "../shader/shader.h"
 #include "material_blob.h"
 
 //==============================================================================

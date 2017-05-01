@@ -1,7 +1,8 @@
 
 #include <cetech/transform.h>
 #include <cetech/math_vec4f.inl>
-#include "cetech/luasys/luasys.h"
+#include "cetech/luasys.h"
+#include "../luasys.h"
 #include <cetech/module.h>
 
 #define API_NAME "Vec4f"
