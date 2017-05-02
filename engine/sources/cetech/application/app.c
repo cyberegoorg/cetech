@@ -14,11 +14,9 @@
 #include "app.h"
 #include <cetech/config.h>
 #include <cetech/eventstream.h>
-#include <cetech/application.h>
-#include <cetech/machine.h>
-#include <cetech/config.h>
-
 #include <cetech/vio.h>
+#include <cetech/application.h>
+
 #include <cetech/resource.h>
 #include <cetech/luasys.h>
 #include <cetech/renderer.h>
@@ -53,20 +51,22 @@ IMPORT_API(time_api_v0);
 // Globals
 //==============================================================================
 
-static struct G {
-    struct {
-        cvar_t boot_pkg;
-        cvar_t boot_script;
-        cvar_t screen_x;
-        cvar_t screen_y;
-        cvar_t fullscreen;
+struct GConfig {
+    cvar_t boot_pkg;
+    cvar_t boot_script;
+    cvar_t screen_x;
+    cvar_t screen_y;
+    cvar_t fullscreen;
 
-        cvar_t daemon;
-        cvar_t compile;
-        cvar_t continue_;
-        cvar_t wait;
-        cvar_t wid;
-    } config;
+    cvar_t daemon;
+    cvar_t compile;
+    cvar_t continue_;
+    cvar_t wait;
+    cvar_t wid;
+};
+
+struct G {
+    struct GConfig config;
 
     const struct game_callbacks *game;
     window_t main_window;
@@ -111,35 +111,39 @@ static struct app_api_v0 api_v1 = {
 };
 
 void _init_api() {
-    INIT_API(module_get_engine_api,cnsole_srv_api_v0, CONSOLE_SERVER_API_ID);
-    INIT_API(module_get_engine_api,develop_api_v0, DEVELOP_SERVER_API_ID);
-    INIT_API(module_get_engine_api,renderer_api_v0, RENDERER_API_ID);
-    INIT_API(module_get_engine_api,resource_api_v0, RESOURCE_API_ID);
-    INIT_API(module_get_engine_api,package_api_v0, PACKAGE_API_ID);
-    INIT_API(module_get_engine_api,task_api_v0, TASK_API_ID);
-    INIT_API(module_get_engine_api,lua_api_v0, LUA_API_ID);
-    INIT_API(module_get_engine_api,config_api_v0, CONFIG_API_ID);
-    INIT_API(module_get_engine_api,window_api_v0, WINDOW_API_ID);
-    INIT_API(module_get_engine_api,time_api_v0, TIME_API_ID);
+    INIT_API(module_get_engine_api, cnsole_srv_api_v0, CONSOLE_SERVER_API_ID);
+    INIT_API(module_get_engine_api, develop_api_v0, DEVELOP_SERVER_API_ID);
+    INIT_API(module_get_engine_api, renderer_api_v0, RENDERER_API_ID);
+    INIT_API(module_get_engine_api, resource_api_v0, RESOURCE_API_ID);
+    INIT_API(module_get_engine_api, package_api_v0, PACKAGE_API_ID);
+    INIT_API(module_get_engine_api, task_api_v0, TASK_API_ID);
+    INIT_API(module_get_engine_api, lua_api_v0, LUA_API_ID);
+    INIT_API(module_get_engine_api, config_api_v0, CONFIG_API_ID);
+    INIT_API(module_get_engine_api, window_api_v0, WINDOW_API_ID);
+    INIT_API(module_get_engine_api, time_api_v0, TIME_API_ID);
 }
 
 int _init_config() {
-    _G.config.boot_pkg = config_api_v0.new_str("core.boot_pkg", "Boot package",
-                                             "boot");
-    _G.config.boot_script = config_api_v0.new_str("core.boot_script",
-                                                "Boot script", "lua/boot");
+    _G.config = (struct GConfig) {
+        .boot_pkg = config_api_v0.new_str("core.boot_pkg", "Boot package",
+                                          "boot"),
 
-    _G.config.screen_x = config_api_v0.new_int("screen.x", "Screen width", 1024);
-    _G.config.screen_y = config_api_v0.new_int("screen.y", "Screen height", 768);
-    _G.config.fullscreen = config_api_v0.new_int("screen.fullscreen",
-                                               "Fullscreen", 0);
+        .boot_script = config_api_v0.new_str("core.boot_script",
+                                             "Boot script", "lua/boot"),
 
-    _G.config.daemon = config_api_v0.new_int("daemon", "Daemon mode", 0);
-    _G.config.compile = config_api_v0.new_int("compile", "Comple", 0);
-    _G.config.continue_ = config_api_v0.new_int("continue",
-                                              "Continue after compile", 0);
-    _G.config.wait = config_api_v0.new_int("wait", "Wait for client", 0);
-    _G.config.wid = config_api_v0.new_int("wid", "Wid", 0);
+        .screen_x = config_api_v0.new_int("screen.x", "Screen width", 1024),
+        .screen_y = config_api_v0.new_int("screen.y", "Screen height", 768),
+        .fullscreen = config_api_v0.new_int("screen.fullscreen",
+                                            "Fullscreen", 0),
+
+        .daemon = config_api_v0.new_int("daemon", "Daemon mode", 0),
+        .compile = config_api_v0.new_int("compile", "Comple", 0),
+        .continue_ = config_api_v0.new_int("continue",
+                                           "Continue after compile", 0),
+        .wait = config_api_v0.new_int("wait", "Wait for client", 0),
+        .wid = config_api_v0.new_int("wid", "Wid", 0)
+    };
+
 
 
     // Cvar stage
@@ -213,8 +217,8 @@ int application_shutdown() {
 }
 
 static void _boot_stage() {
-    stringid64_t boot_pkg = stringid64_from_string(
-            config_api_v0.get_string(_G.config.boot_pkg));
+    const char *boot_pkg_str = config_api_v0.get_string(_G.config.boot_pkg);
+    stringid64_t boot_pkg = stringid64_from_string(boot_pkg_str);
     stringid64_t pkg = stringid64_from_string("package");
 
     stringid64_t core_pkg = stringid64_from_string("core");
@@ -311,7 +315,8 @@ void application_start() {
                 "Application:update()");
 
         uint64_t now_ticks = time_api_v0.get_perf_counter();
-        float dt = ((float) (now_ticks - last_tick)) / time_api_v0.get_perf_freq();
+        float dt =
+                ((float) (now_ticks - last_tick)) / time_api_v0.get_perf_freq();
 
         _G.dt = dt;
         last_tick = now_ticks;

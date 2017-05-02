@@ -7,7 +7,7 @@
 //==============================================================================
 
 #include "cetech/types.h"
-#include "math_fmath.inl"
+#include "fmath.inl"
 #include "math_types.h"
 
 #define VEC3F_UNIT_X (vec3f_t){1.0f, 0.0f, 0.0f}

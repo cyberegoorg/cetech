@@ -13,7 +13,7 @@
 #include <cetech/resource.h>
 #include <cetech/entity.h>
 #include <cetech/transform.h>
-#include <cetech/math_quatf.h>
+#include <cetech/quatf.h>
 #include <cetech/memory.h>
 #include <cetech/module.h>
 

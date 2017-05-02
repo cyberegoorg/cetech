@@ -8,10 +8,10 @@
 
 #include "cetech/types.h"
 
-#include "math_fmath.inl"
+#include "fmath.inl"
 #include "math_types.h"
-#include "math_vec3f.inl"
-#include "math_vec4f.inl"
+#include "vec3f.inl"
+#include "vec4f.inl"
 
 
 //==============================================================================

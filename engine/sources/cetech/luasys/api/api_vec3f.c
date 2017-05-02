@@ -1,7 +1,7 @@
 
 #include <cetech/allocator.h>
 #include <cetech/transform.h>
-#include <cetech/math_vec3f.inl>
+#include <cetech/vec3f.inl>
 #include <cetech/config.h>
 #include <cetech/application.h>
 #include <cetech/module.h>

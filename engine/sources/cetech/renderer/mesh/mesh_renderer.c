@@ -15,7 +15,7 @@
 #include <cetech/transform.h>
 #include "../scene/scene.h"
 #include <cetech/scenegraph.h>
-#include <cetech/math_mat44f.inl>
+#include <cetech/mat44f.inl>
 
 #include <cetech/memory.h>
 #include <cetech/module.h>

@@ -9,8 +9,8 @@
 #include <string.h>
 
 #include "cetech/types.h"
-#include "math_fmath.inl"
-#include "math_vec4f.inl"
+#include "fmath.inl"
+#include "vec4f.inl"
 #include "math_types.h"
 
 //==============================================================================

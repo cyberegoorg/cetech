@@ -3,9 +3,9 @@
 
 #include "include/luajit/luajit.h"
 
-#include "cetech/math_vec2f.inl"
-#include "cetech/math_vec3f.inl"
-#include "cetech/math_vec4f.inl"
+#include "cetech/vec2f.inl"
+#include "cetech/vec3f.inl"
+#include "cetech/vec4f.inl"
 
 #include "luasys.h"
 

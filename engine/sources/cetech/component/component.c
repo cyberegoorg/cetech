@@ -3,7 +3,7 @@
 //==============================================================================
 
 #include "cetech/map.inl"
-#include "cetech/math_vec3f.inl"
+#include "cetech/vec3f.inl"
 
 #include <cetech/memory.h>
 #include <cetech/application.h>

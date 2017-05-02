@@ -1,6 +1,6 @@
 #include <stddef.h>
 #include <cetech/allocator.h>
-#include "cetech/math_vec2f.inl"
+#include "cetech/vec2f.inl"
 
 #include "cetech/luasys.h"
 #include <cetech/config.h>

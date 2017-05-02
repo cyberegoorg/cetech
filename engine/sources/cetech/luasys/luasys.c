@@ -6,7 +6,7 @@
 #include <cetech/stringid.h>
 #include <cetech/vio.h>
 #include <cetech/math_types.h>
-#include <cetech/math_vec2f.inl>
+#include <cetech/vec2f.inl>
 
 #include <cetech/develop.h>
 #include <cetech/config.h>
@@ -14,8 +14,6 @@
 #include <cetech/module.h>
 #include <cetech/luasys.h>
 #include <cetech/resource.h>
-
-#include <include/mpack/mpack.h>
 
 #include "vectors.h"
 #include "quaternion.h"
@@ -414,7 +412,7 @@ void luasys_push_handler(lua_State *_L,
 }
 
 void luasys_push_uint32_t(lua_State *_L,
-                         uint32_t value) {
+                          uint32_t value) {
     lua_pushinteger(_L, value);
 }
 
@@ -447,13 +445,13 @@ int luasys_to_int(lua_State *_L,
 
 
 uint32_t luasys_to_uin32_t(lua_State *_L,
-                  int i) {
+                           int i) {
     return (uint32_t) lua_tointeger(_L, i);
 }
 
 
 uint64_t luasys_to_u64(lua_State *_L,
-                  int i) {
+                       int i) {
     return (uint64_t) lua_tointeger(_L, i);
 }
 
@@ -464,8 +462,8 @@ float luasys_to_float(lua_State *_L,
 }
 
 uint32_t luasys_to_handler(lua_State *l,
-                            int i) {
-    return (uint32_t)lua_tonumber(l, i);
+                           int i) {
+    return (uint32_t) lua_tonumber(l, i);
 }
 
 const char *luasys_to_string(lua_State *_L,
@@ -480,25 +478,25 @@ const char *luasys_to_string_l(lua_State *_L,
 }
 
 vec2f_t *luasys_to_vec2f(lua_State *l,
-                             int i) {
+                         int i) {
     void *v = lua_touserdata(l, i);
     return (vec2f_t *) v;
 }
 
 vec3f_t *luasys_to_vec3f(lua_State *l,
-                             int i) {
+                         int i) {
     void *v = lua_touserdata(l, i);
     return (vec3f_t *) v;
 }
 
 vec4f_t *luasys_to_vec4f(lua_State *l,
-                             int i) {
+                         int i) {
     void *v = lua_touserdata(l, i);
     return (vec4f_t *) v;
 }
 
 quatf_t *luasys_to_quat(lua_State *l,
-                            int i) {
+                        int i) {
     void *v = lua_touserdata(l, i);
     return (quatf_t *) v;
 }
@@ -536,7 +534,7 @@ void luasys_push_quat(lua_State *l,
 }
 
 mat44f_t *luasys_to_mat44f(lua_State *l,
-                               int i) {
+                           int i) {
     void *v = lua_touserdata(l, i);
     return (mat44f_t *) v;
 }
@@ -849,7 +847,7 @@ static void _init(get_api_fce_t get_engine_api) {
 
     luasys_add_module_function("module", "reload", _reload_module);
     cnsole_srv_api_v0.consolesrv_register_command("lua_system.execute",
-                                                   _cmd_execute_string);
+                                                  _cmd_execute_string);
 
     resource_api_v0.register_type(_G.type_id, lua_resource_callback);
     resource_api_v0.compiler_register(_G.type_id, _lua_compiler);
@@ -968,12 +966,12 @@ void *luasys_get_module_api(int api) {
             api.get_game_callbacks = luasys_get_game_callbacks;
             api.execute_boot_script = luasys_execute_boot_script;
             api.call_global = luasys_call_global;
-                    api.to_u64= luasys_to_u64;
-                    api.is_vec2f = _is_vec2f;
-                    api.is_vec3f = _is_vec3f;
-                    api.is_vec4f = _is_vec4f;
-                    api.is_quat = _is_quat;
-                    api.is_mat44f = _is_mat44f;
+            api.to_u64 = luasys_to_u64;
+            api.is_vec2f = _is_vec2f;
+            api.is_vec3f = _is_vec3f;
+            api.is_vec4f = _is_vec4f;
+            api.is_quat = _is_quat;
+            api.is_mat44f = _is_mat44f;
 
             return &api;
         }

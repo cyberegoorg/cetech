@@ -8,8 +8,8 @@
 #include <cetech/stringid.h>
 #include <cetech/world.h>
 #include <cetech/component.h>
-#include <cetech/math_quatf.h>
-#include <cetech/math_mat44f.inl>
+#include <cetech/quatf.h>
+#include <cetech/mat44f.inl>
 #include <cetech/transform.h>
 #include <cetech/memory.h>
 #include <cetech/module.h>

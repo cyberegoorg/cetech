@@ -32,7 +32,6 @@ struct allocator *_memsys_main_allocator();
 //! \return Main scratch alocator
 struct allocator *_memsys_main_scratch_allocator();
 
-
 //==============================================================================
 // Api
 //==============================================================================

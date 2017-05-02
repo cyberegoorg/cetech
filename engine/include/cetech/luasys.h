@@ -266,6 +266,7 @@ struct lua_api_v0 {
     void (*execute_boot_script)(stringid64_t name);
 
     //! Call global function
+    //! \example lua_api_v0.call_global("print", "if", 1, 2.0f);
     //! \param func Function name
     //! \param args Function args format string ('i' = int, 'f' = float)
     //! \param ... Args value

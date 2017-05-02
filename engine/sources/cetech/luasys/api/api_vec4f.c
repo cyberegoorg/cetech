@@ -1,7 +1,7 @@
 
 #include <cetech/allocator.h>
 #include <cetech/transform.h>
-#include <cetech/math_vec4f.inl>
+#include <cetech/vec4f.inl>
 #include "cetech/luasys.h"
 #include <cetech/config.h>
 #include <cetech/application.h>

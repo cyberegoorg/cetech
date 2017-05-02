@@ -1,7 +1,7 @@
 #include <cetech/array.inl>
 #include <cetech/yaml.h>
-#include <cetech/math_quatf.h>
-#include <cetech/math_mat44f.inl>
+#include <cetech/quatf.h>
+#include <cetech/mat44f.inl>
 
 #include <cetech/application.h>
 #include <cetech/config.h>

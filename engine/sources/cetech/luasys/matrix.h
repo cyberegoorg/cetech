@@ -3,7 +3,7 @@
 
 #include "include/luajit/luajit.h"
 
-#include "cetech/math_mat44f.inl"
+#include "cetech/mat44f.inl"
 
 #include "luasys.h"
 

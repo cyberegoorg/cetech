@@ -1,6 +1,6 @@
 #include <stddef.h>
 #include <cetech/allocator.h>
-#include <cetech/math_quatf.h>
+#include <cetech/quatf.h>
 #include "cetech/luasys.h"
 #include "../luasys.h"
 #include <cetech/config.h>
