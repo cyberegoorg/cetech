@@ -1,3 +1,4 @@
+
 #ifndef CETECH_ERRORS_H
 #define CETECH_ERRORS_H
 
@@ -14,7 +15,7 @@
 //==============================================================================
 
 #ifdef CETECH_DEBUG
-#define _MSG_END "\n  file: %s\n  line: %d\n  stacktrace:\n%s"
+#define _MSG_END "\n  file: %s:%d\n  stacktrace:\n%s"
 #define CETECH_ASSERT_MSG(where, condition, msg, ...)                             \
     do {                                                                       \
         if (!(condition)) {                                                    \
