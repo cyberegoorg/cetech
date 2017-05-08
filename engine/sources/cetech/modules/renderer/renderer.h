@@ -8,6 +8,7 @@
 // Includes
 //==============================================================================
 
+#include <stdint.h>
 
 //==============================================================================
 // Typedefs
@@ -25,7 +26,7 @@ typedef struct vec4f_s vec4f_t;
 typedef struct window_s window_t;
 
 //! Material typedef
-typedef struct material_s{
+typedef struct material_s {
     uint32_t idx;
 } material_t;
 

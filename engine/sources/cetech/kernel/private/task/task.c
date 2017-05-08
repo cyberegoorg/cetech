@@ -2,18 +2,17 @@
 // Includes
 //==============================================================================
 
-#include "../../../core/thread.h"
-#include "../../../core/memory.h"
-#include "../../../core/os.h"
+#include <cetech/core/thread.h>
+#include <cetech/core/memory.h>
+#include <cetech/core/os.h>
 
-#include "../../develop.h"
-#include "../../config.h"
-#include "../../application.h"
-#include "../../resource.h"
-#include "../../../core/module.h"
+#include <cetech/kernel/develop.h>
+#include <cetech/kernel/config.h>
+#include <cetech/kernel/resource.h>
+#include <cetech/core/module.h>
 
 #include "task_queue.h"
-#include "../../task.h"
+#include <cetech/kernel/task.h>
 
 
 //==============================================================================
@@ -184,8 +183,8 @@ static void _init(get_api_fce_t get_engine_api) {
 
     for (int j = 0; j < worker_count; ++j) {
         _G._workers[j] = thread_api_v0.create((thread_fce_t) _task_worker,
-                                           "worker",
-                                           (void *) ((intptr_t) (j + 1)));
+                                              "worker",
+                                              (void *) ((intptr_t) (j + 1)));
     }
 
     _G._Run = 1;
@@ -268,28 +267,26 @@ void *task_get_module_api(int api) {
 
 
     switch (api) {
-        case PLUGIN_EXPORT_API_ID:
-{
-                    static struct module_api_v0 module = {0};
+        case PLUGIN_EXPORT_API_ID: {
+            static struct module_api_v0 module = {0};
 
-                    module.init = _init;
-                    module.shutdown = _shutdown;
+            module.init = _init;
+            module.shutdown = _shutdown;
 
-                    return &module;
-                }
+            return &module;
+        }
 
-        case TASK_API_ID:
-                {
-                    static struct task_api_v0 api = {
-                            .worker_count = taskmanager_worker_count,
-                            .add = taskmanager_add,
-                            .do_work = taskmanager_do_work,
-                            .wait_atomic = taskmanager_wait_atomic,
-                            .worker_id = taskmanager_worker_id
-                    };
+        case TASK_API_ID: {
+            static struct task_api_v0 api = {
+                    .worker_count = taskmanager_worker_count,
+                    .add = taskmanager_add,
+                    .do_work = taskmanager_do_work,
+                    .wait_atomic = taskmanager_wait_atomic,
+                    .worker_id = taskmanager_worker_id
+            };
 
-                    return &api;
-                }
+            return &api;
+        }
 
 
         default:

@@ -1,24 +1,21 @@
-#include "../../../core/array.inl"
-#include "../../../core/yaml.h"
-#include "../../../core/map.inl"
-#include "../../../core/mat44f.inl"
-#include "../../../core/hash.h"
-#include "../../../kernel/application.h"
-#include "../../../kernel/config.h"
-#include "../../renderer/renderer.h"
-#include "../../../kernel/application.h"
-#include "../../../kernel/config.h"
-#include "../../../kernel/resource.h"
-#include "../../../kernel/entity.h"
-#include "../../../kernel/world.h"
-#include "../../../kernel/component.h"
-#include "../../renderer/renderer.h"
+#include <cetech/core/array.inl>
+#include <cetech/core/yaml.h>
+#include <cetech/core/map.inl>
+#include <cetech/core/mat44f.inl>
+#include <cetech/core/hash.h>
+#include <cetech/kernel/config.h>
+#include <cetech/kernel/resource.h>
+#include <cetech/kernel/entity.h>
+#include <cetech/kernel/world.h>
+#include <cetech/kernel/component.h>
+
+#include <cetech/modules/renderer/renderer.h>
+#include <cetech/modules/transform/transform.h>
+
+#include <cetech/core/memory.h>
+#include <cetech/core/module.h>
+
 #include "../camera.h"
-#include "../../transform/transform.h"
-
-#include "../../../core/memory.h"
-#include "../../../core/module.h"
-
 
 IMPORT_API(memory_api_v0);
 IMPORT_API(component_api_v0);

@@ -1,8 +1,8 @@
 #include "include/SDL2/SDL.h"
 #include "include/SDL2/SDL_syswm.h"
 
-#include "../../window.h"
-#include "../../log.h"
+#include <cetech/core/window.h>
+#include <cetech/core/log.h>
 
 //==============================================================================
 // Private
@@ -36,11 +36,11 @@ static uint32_t _sdl_flags(enum window_flags flags) {
 //==============================================================================
 
 window_t window_new(const char *title,
-                            enum window_pos x,
-                            enum window_pos y,
-                            const int32_t width,
-                            const int32_t height,
-                            enum window_flags flags) {
+                    enum window_pos x,
+                    enum window_pos y,
+                    const int32_t width,
+                    const int32_t height,
+                    enum window_flags flags) {
 
     SDL_Window *w = SDL_CreateWindow(
             title,
@@ -71,7 +71,7 @@ void window_destroy(window_t w) {
 }
 
 void window_set_title(window_t w,
-                          const char *title) {
+                      const char *title) {
     SDL_SetWindowTitle(w.w, title);
 }
 
@@ -84,14 +84,14 @@ void window_update(window_t w) {
 }
 
 void window_resize(window_t w,
-                       uint32_t width,
-                       uint32_t height) {
+                   uint32_t width,
+                   uint32_t height) {
     SDL_SetWindowSize(w.w, width, height);
 }
 
 void window_get_size(window_t window,
-                         uint32_t *width,
-                         uint32_t *height) {
+                     uint32_t *width,
+                     uint32_t *height) {
     int w, h;
     w = h = 0;
 

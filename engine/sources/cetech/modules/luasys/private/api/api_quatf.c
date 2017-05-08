@@ -1,12 +1,8 @@
-#include <stddef.h>
-#include "../../../../core/allocator.h"
-#include "../../../../core/quatf.inl"
-#include "../../luasys.h"
-#include "../luasys.h"
-#include "../../../../kernel/config.h"
-#include "../../../../kernel/application.h"
 
-#include "../../../../core/module.h"
+#include <cetech/core/quatf.inl>
+#include <cetech/modules/luasys/luasys.h>
+
+#include <cetech/core/module.h>
 
 #define API_NAME "Quatf"
 

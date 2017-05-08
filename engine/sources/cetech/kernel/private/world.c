@@ -2,15 +2,14 @@
 // Includes
 //==============================================================================
 
-#include "../../core/map.inl"
-#include "../world.h"
-#include "../../core/memory.h"
-#include "../application.h"
-#include "../config.h"
-#include "../resource.h"
-#include "../../core/module.h"
-#include "../../core/hash.h"
-#include "../../core/handler.h"
+#include <cetech/core/map.inl>
+#include <cetech/kernel/world.h>
+#include <cetech/core/memory.h>
+#include <cetech/kernel/config.h>
+#include <cetech/kernel/resource.h>
+#include <cetech/core/module.h>
+#include <cetech/core/hash.h>
+#include <cetech/core/handler.h>
 
 
 //==============================================================================
@@ -29,7 +28,7 @@ ARRAY_PROTOTYPE(stringid64_t);
 #define _G WorldGlobals
 static struct G {
     ARRAY_T(world_callbacks_t) callbacks;
-    struct handler32gen* world_handler;
+    struct handler32gen *world_handler;
 } _G = {0};
 
 IMPORT_API(memory_api_v0);
@@ -44,9 +43,11 @@ static void _init(get_api_fce_t get_engine_api) {
     INIT_API(get_engine_api, memory_api_v0, MEMORY_API_ID);
     INIT_API(get_engine_api, handler_api_v0, HANDLER_API_ID);
 
-    ARRAY_INIT(world_callbacks_t, &_G.callbacks, memory_api_v0.main_allocator());
+    ARRAY_INIT(world_callbacks_t, &_G.callbacks,
+               memory_api_v0.main_allocator());
 
-    _G.world_handler = handler_api_v0.handler32gen_create(memory_api_v0.main_allocator());
+    _G.world_handler = handler_api_v0.handler32gen_create(
+            memory_api_v0.main_allocator());
 }
 
 static void _shutdown() {
@@ -92,31 +93,29 @@ void world_update(world_t world,
 void *world_get_module_api(int api) {
 
     switch (api) {
-        case PLUGIN_EXPORT_API_ID:
-                {
-                    static struct module_api_v0 module = {0};
+        case PLUGIN_EXPORT_API_ID: {
+            static struct module_api_v0 module = {0};
 
-                    module.init = _init;
-                    module.shutdown = _shutdown;
+            module.init = _init;
+            module.shutdown = _shutdown;
 
-                    return &module;
-                }
+            return &module;
+        }
 
 
-        case WORLD_API_ID:
-            {
-                    static struct world_api_v0 api = {0};
+        case WORLD_API_ID: {
+            static struct world_api_v0 api = {0};
 
-                    api.register_callback = world_register_callback;
-                    api.create = world_create;
-                    api.destroy = world_destroy;
-                    api.update = world_update;
+            api.register_callback = world_register_callback;
+            api.create = world_create;
+            api.destroy = world_destroy;
+            api.update = world_update;
 //                    api.load_level = world_load_level;
 //                    api.entity_by_id = level_entity_by_id;
 //                    api.entity = level_entity ;
 
-                    return &api;
-                }
+            return &api;
+        }
 
 
         default:

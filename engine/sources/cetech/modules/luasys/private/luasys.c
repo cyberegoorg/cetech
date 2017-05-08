@@ -1,18 +1,22 @@
 //==============================================================================
 // Includes
 //==============================================================================
+#include <include/luajit/lua.h>
+#include <include/luajit/lualib.h>
+#include <include/luajit/lauxlib.h>
 
-#include "../../../core/allocator.h"
-#include "../../../core/hash.h"
-#include "../../../core/math_types.h"
-#include "../../../core/vec2f.inl"
+#include <cetech/core/allocator.h>
+#include <cetech/core/hash.h>
+#include <cetech/core/math_types.h>
+#include <cetech/core/vec2f.inl>
+#include <cetech/core/module.h>
 
-#include "../../../kernel/develop.h"
-#include "../../../kernel/config.h"
-#include "../../../kernel/application.h"
-#include "../../../core/module.h"
-#include "../luasys.h"
-#include "../../../kernel/resource.h"
+#include <cetech/kernel/develop.h>
+#include <cetech/kernel/config.h>
+#include <cetech/kernel/application.h>
+#include <cetech/kernel/resource.h>
+
+#include <cetech/modules/luasys/luasys.h>
 
 #include "vectors.h"
 #include "quaternion.h"
@@ -115,7 +119,7 @@ quatf_t *_new_tmp_quat() {
 // Lua resource
 //==============================================================================
 #include "lua_resource.h"
-#include "../../../kernel/private/module.h"
+#include <cetech/core/module.h>
 
 //==============================================================================
 // Game

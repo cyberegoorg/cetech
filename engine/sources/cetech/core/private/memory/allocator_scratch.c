@@ -7,12 +7,10 @@
 #define CETECH_ALLOCATOR_SCRATCH_H
 
 
-#include "../../errors.h"
-#include "../../allocator.h"
+#include <cetech/core/errors.h>
+#include <cetech/core/allocator.h>
 
 #include "header.h"
-#include "../../log.h"
-#include "../../errors.h"
 
 struct allocator_scratch {
     struct allocator base;
@@ -108,8 +106,9 @@ uint32_t scratch_allocator_total_allocated(struct allocator *allocator) {
 }
 
 struct allocator *scratch_allocator_create(struct allocator *backing,
-                                               int size) {
-    struct allocator_scratch *m = memory_malloc(sizeof(struct allocator_scratch));
+                                           int size) {
+    struct allocator_scratch *m = memory_malloc(
+            sizeof(struct allocator_scratch));
 
     m->base = (struct allocator) {
             .allocate = scratch_allocator_allocate,

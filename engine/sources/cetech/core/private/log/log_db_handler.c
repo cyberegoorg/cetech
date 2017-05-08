@@ -1,11 +1,11 @@
 
 #include <time.h>
-#include "../../log.h"
 
 #include "include/sqlite3/sqlite3.h"
 
-#include "../../errors.h"
-#include "../../fs.h"
+#include <cetech/core/log.h>
+#include <cetech/core/errors.h>
+#include <cetech/core/fs.h>
 
 static int _step(sqlite3 *db,
                  sqlite3_stmt *stmt) {
@@ -31,7 +31,7 @@ static int _step(sqlite3 *db,
 
             default:
                 CETECH_ASSERT_MSG("builddb", 0, "SQL error '%s' (%d): %s",
-                               sqlite3_sql(stmt), rc, sqlite3_errmsg(db));
+                                  sqlite3_sql(stmt), rc, sqlite3_errmsg(db));
 
                 run = 0;
                 break;
@@ -53,7 +53,8 @@ static sqlite3 *_opendb(char worker_id) {
     sqlite3 *_db;
     sqlite3_open_v2(_logdb_path,
                     &_db,
-                    SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE | SQLITE_OPEN_SHAREDCACHE,
+                    SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE |
+                    SQLITE_OPEN_SHAREDCACHE,
                     NULL);
 
     // thanks http://stackoverflow.com/questions/1711631/improve-insert-per-second-performance-of-sqlite

@@ -3,14 +3,13 @@
 //==============================================================================
 
 #include <include/SDL2/SDL.h>
-#include "../../math_types.h"
-#include "../../allocator.h"
-#include "../../../kernel/application.h"
-#include "../../../kernel/config.h"
-#include "../../../kernel/resource.h"
-#include "../../module.h"
-#include "../../eventstream.inl"
-#include "../../../kernel/machine.h"
+
+#include <cetech/core/math_types.h>
+#include <cetech/core/allocator.h>
+#include <cetech/core/module.h>
+#include <cetech/core/eventstream.inl>
+
+#include <cetech/kernel/machine.h>
 
 //==============================================================================
 // Defines
@@ -145,9 +144,9 @@ void sdl_gamepad_process(struct eventstream *stream) {
 
         for (int j = 0; j < GAMEPAD_AXIX_MAX; ++j) {
             int16_t x = SDL_GameControllerGetAxis(_G.controller[i],
-                                              _axis_to_sdl[j][0]);
+                                                  _axis_to_sdl[j][0]);
             int16_t y = SDL_GameControllerGetAxis(_G.controller[i],
-                                              _axis_to_sdl[j][1]);
+                                                  _axis_to_sdl[j][1]);
 
             float coef = 1.0f / INT16_MAX;
             float x_norm = x * coef;

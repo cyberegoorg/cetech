@@ -2,23 +2,23 @@
 // Includes
 //==============================================================================
 
-#include "../../../core/allocator.h"
-#include "../../../kernel/world.h"
-#include "../../../kernel/config.h"
-#include "../../../kernel/resource.h"
+#include <cetech/core/allocator.h>
+#include <cetech/kernel/world.h>
+#include <cetech/kernel/config.h>
+#include <cetech/kernel/resource.h>
 
-#include "../../../kernel/entity.h"
-#include "../../transform/transform.h"
-#include "../../../core/quatf.inl"
-#include "../../../core/memory.h"
-#include "../../../core/module.h"
+#include <cetech/kernel/entity.h>
+#include <cetech/modules/transform/transform.h>
+#include <cetech/core/quatf.inl>
+#include <cetech/core/memory.h>
+#include <cetech/core/module.h>
 
 #include "../level.h"
-#include "../../../core/map.inl"
-#include "../../../core/yaml.h"
+#include <cetech/core/map.inl>
+#include <cetech/core/yaml.h>
 #include "level_blob.h"
-#include "../../../core/fs.h"
-#include "../../../core/hash.h"
+#include <cetech/core/fs.h>
+#include <cetech/core/hash.h>
 
 IMPORT_API(entity_api_v0);
 IMPORT_API(resource_api_v0);

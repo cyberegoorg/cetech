@@ -24,8 +24,8 @@ struct thread_api_v0 {
     //! \param data Thread data
     //! \return new thread
     thread_t (*create)(thread_fce_t fce,
-                               const char *name,
-                               void *data);
+                       const char *name,
+                       void *data);
 
     //! Kill thread
     //! \param thread thread
@@ -35,7 +35,7 @@ struct thread_api_v0 {
     //! \param thread Thread
     //! \param status Thread exit status
     void (*wait)(thread_t thread,
-                         int *status);
+                 int *status);
 
     //! Get id for thread
     //! \param thread Thread

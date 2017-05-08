@@ -1,9 +1,9 @@
 #include <string>
 
 extern "C" {
-#include "../allocator.h"
-#include "../yaml.h"
-#include "../errors.h"
+#include <cetech/core/allocator.h>
+#include <cetech/core/yaml.h>
+#include <cetech/core/errors.h>
 }
 
 #include "include/yaml-cpp/yaml.h"
@@ -133,7 +133,8 @@ yaml_node_foreach_dict(yaml_node_t node,
 
     auto cpp_node = nh->nodes[node.idx];
 
-    for (YAML::const_iterator it = cpp_node.begin(); it != cpp_node.end(); ++it) {
+    for (YAML::const_iterator it = cpp_node.begin();
+         it != cpp_node.end(); ++it) {
         yaml_node_t key = new_node(node.doc, it->first);
         yaml_node_t value = new_node(node.doc, it->second);
 
@@ -165,7 +166,10 @@ extern "C" int yaml_as_string(yaml_node_t node,
                               size_t max_len) {
     yamlcpp_handler *nh = (yamlcpp_handler *) node.doc.d;
 
-    YAML_EX_SCOPE({ return snprintf(output, max_len, "%s", nh->nodes[node.idx].as<std::string>().c_str()); })
+    YAML_EX_SCOPE({
+                      return snprintf(output, max_len, "%s",
+                                      nh->nodes[node.idx].as<std::string>().c_str());
+                  })
 }
 
 extern "C" void yaml_merge(yaml_node_t root,

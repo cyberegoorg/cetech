@@ -1,12 +1,9 @@
-#include <stddef.h>
-#include "../../../../core/allocator.h"
 
-#include "../../../../kernel/config.h"
-#include "../../../../core/module.h"
+#include <cetech/core/allocator.h>
+#include <cetech/core/module.h>
+
+#include <cetech/kernel/input.h>
 #include "../../luasys.h"
-#include "../../../../kernel/input.h"
-
-#include "../luasys.h"
 
 #define API_NAME "Keyboard"
 
@@ -58,7 +55,8 @@ static int _keyboard_button_released(lua_State *l) {
 
 
 void _register_lua_keyboard_api(get_api_fce_t get_engine_api) {
-    keyboard_api_v0 = *((struct keyboard_api_v0 *) get_engine_api(KEYBOARD_API_ID));
+    keyboard_api_v0 = *((struct keyboard_api_v0 *) get_engine_api(
+            KEYBOARD_API_ID));
 
     luasys_add_module_function(API_NAME, "button_index",
                                _keyboard_button_index);

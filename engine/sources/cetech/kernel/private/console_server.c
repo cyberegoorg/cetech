@@ -4,19 +4,18 @@
 
 #include <stdio.h>
 #include <include/mpack/mpack.h>
-#include "../../core/allocator.h"
-#include "../config.h"
-#include "../application.h"
-#include "../resource.h"
-#include "../../core/module.h"
+#include <cetech/core/allocator.h>
+#include <cetech/kernel/config.h>
+#include <cetech/kernel/resource.h>
+#include <cetech/core/module.h>
 
 #include "include/nanomsg/nn.h"
 #include "include/nanomsg/reqrep.h"
 #include "include/nanomsg/pubsub.h"
 #include "include/nanomsg/pipeline.h"
 
-#include "../develop.h"
-#include "../../core/string.h"
+#include <cetech/kernel/develop.h>
+#include <cetech/core/string.h>
 
 //==============================================================================
 // Defines

@@ -1,19 +1,18 @@
-#include "../../../core/array.inl"
-#include "../../../core/yaml.h"
-#include "../../../core/quatf.inl"
-#include "../../../core/mat44f.inl"
+#include <cetech/core/array.inl>
+#include <cetech/core/yaml.h>
+#include <cetech/core/quatf.inl>
+#include <cetech/core/mat44f.inl>
 
-#include "../../../kernel/application.h"
-#include "../../../kernel/config.h"
-#include "../../../core/hash.h"
-#include "../../../kernel/resource.h"
+#include <cetech/kernel/config.h>
+#include <cetech/core/hash.h>
+#include <cetech/kernel/resource.h>
 
-#include "../../../kernel/entity.h"
+#include <cetech/kernel/entity.h>
 #include "../scenegraph.h"
-#include "../../../core/memory.h"
-#include "../../../core/module.h"
-#include "../../../core/map.inl"
-#include "../../../kernel/world.h"
+#include <cetech/core/memory.h>
+#include <cetech/core/module.h>
+#include <cetech/core/map.inl>
+#include <cetech/kernel/world.h>
 
 
 ARRAY_PROTOTYPE(vec3f_t)
@@ -146,7 +145,7 @@ void scene_node_transform(world_t world,
     m.w.z = pos.z;
 
     mat44f_mul(&ARRAY_AT(&world_data->world_matrix, transform.idx), &m,
-                   parent);
+               parent);
 
     uint32_t child = ARRAY_AT(&world_data->first_child, transform.idx);
 
@@ -162,28 +161,28 @@ void scene_node_transform(world_t world,
 }
 
 vec3f_t scenegraph_get_position(world_t world,
-                                    scene_node_t transform) {
+                                scene_node_t transform) {
 
     world_data_t *world_data = _get_world_data(world);
     return ARRAY_AT(&world_data->position, transform.idx);
 }
 
 quatf_t scenegraph_get_rotation(world_t world,
-                                    scene_node_t transform) {
+                                scene_node_t transform) {
 
     world_data_t *world_data = _get_world_data(world);
     return ARRAY_AT(&world_data->rotation, transform.idx);
 }
 
 vec3f_t scenegraph_get_scale(world_t world,
-                                 scene_node_t transform) {
+                             scene_node_t transform) {
 
     world_data_t *world_data = _get_world_data(world);
     return ARRAY_AT(&world_data->scale, transform.idx);
 }
 
 mat44f_t *scenegraph_get_world_matrix(world_t world,
-                                          scene_node_t transform) {
+                                      scene_node_t transform) {
     static mat44f_t _n = MAT44F_INIT_IDENTITY;
     world_data_t *world_data = _get_world_data(world);
     return &ARRAY_AT(&world_data->world_matrix, transform.idx);
@@ -256,7 +255,8 @@ scene_node_t scenegraph_get_root(world_t world,
                                  entity_t entity) {
 
     world_data_t *world_data = _get_world_data(world);
-    uint32_t idx = MAP_GET(uint32_t, &world_data->ent_idx_map, entity.h, UINT32_MAX);
+    uint32_t idx = MAP_GET(uint32_t, &world_data->ent_idx_map, entity.h,
+                           UINT32_MAX);
     return (scene_node_t) {.idx = idx};
 }
 
@@ -269,7 +269,7 @@ scene_node_t scenegraph_create(world_t world,
     world_data_t *data = _get_world_data(world);
 
     scene_node_t *nodes = CETECH_ALLOCATE(memory_api_v0.main_allocator(),
-                                       scene_node_t, count);
+                                          scene_node_t, count);
 
     for (int i = 0; i < count; ++i) {
         uint32_t idx = (uint32_t) ARRAY_SIZE(&data->position);
@@ -308,7 +308,8 @@ scene_node_t scenegraph_create(world_t world,
             if (ARRAY_AT(&data->first_child, parent_idx) == UINT32_MAX) {
                 ARRAY_AT(&data->first_child, parent_idx) = idx;
             } else {
-                uint32_t first_child_idx = ARRAY_AT(&data->first_child, parent_idx);
+                uint32_t first_child_idx = ARRAY_AT(&data->first_child,
+                                                    parent_idx);
                 ARRAY_AT(&data->first_child, parent_idx) = idx;
                 ARRAY_AT(&data->next_sibling, idx) = first_child_idx;
             }
@@ -379,38 +380,36 @@ scene_node_t scenegraph_node_by_name(world_t world,
 void *scenegraph_get_module_api(int api) {
 
     switch (api) {
-        case PLUGIN_EXPORT_API_ID:
-                {
-                    static struct module_api_v0 module = {0};
+        case PLUGIN_EXPORT_API_ID: {
+            static struct module_api_v0 module = {0};
 
-                    module.init = _init;
-                    module.shutdown = _shutdown;
+            module.init = _init;
+            module.shutdown = _shutdown;
 
-                    return &module;
-                }
+            return &module;
+        }
 
 
-        case SCENEGRAPH_API_ID:
-{
-                    static struct scenegprah_api_v0 api = {0};
+        case SCENEGRAPH_API_ID: {
+            static struct scenegprah_api_v0 api = {0};
 
-                    //api.scenegraph_transform = scenegraph_transform;
-                    api.is_valid = scenegraph_is_valid;
-                    api.get_position = scenegraph_get_position;
-                    api.get_rotation = scenegraph_get_rotation;
-                    api.get_scale = scenegraph_get_scale;
-                    api.get_world_matrix = scenegraph_get_world_matrix;
-                    api.set_position = scenegraph_set_position;
-                    api.set_rotation = scenegraph_set_rotation;
-                    api.set_scale = scenegraph_set_scale;
-                    api.has = scenegraph_has;
-                    api.get_root = scenegraph_get_root;
-                    api.create = scenegraph_create;
-                    api.link = scenegraph_link;
-                    api.node_by_name = scenegraph_node_by_name;
+            //api.scenegraph_transform = scenegraph_transform;
+            api.is_valid = scenegraph_is_valid;
+            api.get_position = scenegraph_get_position;
+            api.get_rotation = scenegraph_get_rotation;
+            api.get_scale = scenegraph_get_scale;
+            api.get_world_matrix = scenegraph_get_world_matrix;
+            api.set_position = scenegraph_set_position;
+            api.set_rotation = scenegraph_set_rotation;
+            api.set_scale = scenegraph_set_scale;
+            api.has = scenegraph_has;
+            api.get_root = scenegraph_get_root;
+            api.create = scenegraph_create;
+            api.link = scenegraph_link;
+            api.node_by_name = scenegraph_node_by_name;
 
-                    return &api;
-                }
+            return &api;
+        }
 
 
         default:

@@ -22,15 +22,15 @@ uint32_t file_mtime(const char *path);
 //! \param files Result files
 //! \param allocator Allocator
 void dir_list(const char *path,
-                         int recursive,
-                         struct array_pchar *files,
-                         struct allocator *allocator);
+              int recursive,
+              struct array_pchar *files,
+              struct allocator *allocator);
 
 //! Free list dir array
 //! \param files Files array
 //! \param allocator Allocator
 void dir_list_free(struct array_pchar *files,
-                              struct allocator *allocator);
+                   struct allocator *allocator);
 
 //! Create dir
 //! \param path Dir path

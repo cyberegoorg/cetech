@@ -1,11 +1,14 @@
 #ifndef CETECH_SCENE_COMPILER_H
 #define CETECH_SCENE_COMPILER_H
 
+#include <stdio.h>
+
 #include <include/assimp/scene.h>
 #include <include/assimp/postprocess.h>
-#include "../../../../core/yaml.h"
-#include "../../../../core/fs.h"
-#include <stdio.h>
+#include <include/assimp/cimport.h>
+
+#include <cetech/core/yaml.h>
+#include <cetech/core/fs.h>
 
 ARRAY_PROTOTYPE(bgfx_vertex_decl_t);
 ARRAY_PROTOTYPE(stringid64_t);
@@ -62,7 +65,8 @@ struct compile_output {
 
 struct compile_output *_crete_compile_output() {
     struct allocator *a = memory_api_v0.main_allocator();
-    struct compile_output *output = CETECH_ALLOCATE(a, struct compile_output, 1);
+    struct compile_output *output = CETECH_ALLOCATE(a, struct compile_output,
+                                                    1);
 
     ARRAY_INIT(stringid64_t, &output->geom_name, a);
     ARRAY_INIT(uint32_t, &output->ib_offset, a);
@@ -373,8 +377,9 @@ int _compile_assimp(const char *filename,
                             postprocess_flag |= aiProcess_FlipUVs;);
     }
 
-    const struct aiScene *scene = aiImportFile(input_path, postprocess_flag |
-                                                           aiProcess_MakeLeftHanded);
+    const struct aiScene *scene = aiImportFile(input_path,
+                                               postprocess_flag |
+                                               aiProcess_MakeLeftHanded);
 
     char tmp_buffer[1024] = {0};
     char tmp_buffer2[1024] = {0};
@@ -430,11 +435,13 @@ int _compile_assimp(const char *filename,
         }
         bgfx_vertex_decl_end(&vertex_decl);
         ARRAY_PUSH_BACK(bgfx_vertex_decl_t, &output->vb_decl, vertex_decl);
-        ARRAY_PUSH_BACK(uint32_t, &output->vb_size, v_size * mesh->mNumVertices);
+        ARRAY_PUSH_BACK(uint32_t, &output->vb_size,
+                        v_size * mesh->mNumVertices);
 
         for (int j = 0; j < mesh->mNumVertices; ++j) {
             if (mesh->mVertices != NULL) {
-                ARRAY_PUSH(uint8_t, &output->vb, (uint8_t *) &mesh->mVertices[j],
+                ARRAY_PUSH(uint8_t, &output->vb,
+                           (uint8_t *) &mesh->mVertices[j],
                            sizeof(float) * 3);
             }
 
@@ -444,7 +451,8 @@ int _compile_assimp(const char *filename,
             }
 
             if (mesh->mTextureCoords[0] != NULL) {
-                ARRAY_PUSH(uint8_t, &output->vb, (uint8_t *) &mesh->mTextureCoords[0][j],
+                ARRAY_PUSH(uint8_t, &output->vb,
+                           (uint8_t *) &mesh->mTextureCoords[0][j],
                            sizeof(float) * 2);
             }
         }
@@ -469,10 +477,10 @@ int _scene_resource_compiler(const char *filename,
 
     char *source_data =
     CETECH_ALLOCATE(memory_api_v0.main_allocator(), char,
-                 vio_size(source_vio) + 1);
+                    vio_size(source_vio) + 1);
     memory_set(source_data, 0, vio_size(source_vio) + 1);
     vio_read(source_vio, source_data, sizeof(char),
-                 vio_size(source_vio));
+             vio_size(source_vio));
 
     yaml_document_t h;
     yaml_node_t root = yaml_load_str(source_data, &h);
@@ -502,29 +510,29 @@ int _scene_resource_compiler(const char *filename,
 
     vio_write(build_vio, &res, sizeof(res), 1);
     vio_write(build_vio, output->geom_name.data, sizeof(stringid64_t),
-                  ARRAY_SIZE(&output->geom_name));
+              ARRAY_SIZE(&output->geom_name));
     vio_write(build_vio, output->ib_offset.data, sizeof(uint32_t),
-                  ARRAY_SIZE(&output->ib_offset));
+              ARRAY_SIZE(&output->ib_offset));
     vio_write(build_vio, output->vb_offset.data, sizeof(uint32_t),
-                  ARRAY_SIZE(&output->vb_offset));
+              ARRAY_SIZE(&output->vb_offset));
     vio_write(build_vio, output->vb_decl.data, sizeof(bgfx_vertex_decl_t),
-                  ARRAY_SIZE(&output->vb_decl));
+              ARRAY_SIZE(&output->vb_decl));
     vio_write(build_vio, output->ib_size.data, sizeof(uint32_t),
-                  ARRAY_SIZE(&output->ib_size));
+              ARRAY_SIZE(&output->ib_size));
     vio_write(build_vio, output->vb_size.data, sizeof(uint32_t),
-                  ARRAY_SIZE(&output->vb_size));
+              ARRAY_SIZE(&output->vb_size));
     vio_write(build_vio, output->ib.data, sizeof(uint32_t),
-                  ARRAY_SIZE(&output->ib));
+              ARRAY_SIZE(&output->ib));
     vio_write(build_vio, output->vb.data, sizeof(uint8_t),
-                  ARRAY_SIZE(&output->vb));
+              ARRAY_SIZE(&output->vb));
     vio_write(build_vio, output->node_name.data, sizeof(stringid64_t),
-                  ARRAY_SIZE(&output->node_name));
+              ARRAY_SIZE(&output->node_name));
     vio_write(build_vio, output->node_parent.data, sizeof(uint32_t),
-                  ARRAY_SIZE(&output->node_parent));
+              ARRAY_SIZE(&output->node_parent));
     vio_write(build_vio, output->node_pose.data, sizeof(mat44f_t),
-                  ARRAY_SIZE(&output->node_pose));
+              ARRAY_SIZE(&output->node_pose));
     vio_write(build_vio, output->geom_node.data, sizeof(stringid64_t),
-                  ARRAY_SIZE(&output->geom_name));
+              ARRAY_SIZE(&output->geom_name));
 
     _destroy_compile_output(output);
     CETECH_DEALLOCATE(memory_api_v0.main_allocator(), source_data);

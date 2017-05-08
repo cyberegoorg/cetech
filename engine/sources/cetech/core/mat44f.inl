@@ -39,9 +39,9 @@ CETECH_FORCE_INLINE void mat44f_identity(mat44f_t *result) {
 }
 
 CETECH_FORCE_INLINE void mat44f_translate(mat44f_t *result,
-                                           float x,
-                                           float y,
-                                           float z) {
+                                          float x,
+                                          float y,
+                                          float z) {
     mat44f_identity(result);
 
     result->f[12] = x;
@@ -50,9 +50,9 @@ CETECH_FORCE_INLINE void mat44f_translate(mat44f_t *result,
 }
 
 CETECH_FORCE_INLINE void mat44f_scale(mat44f_t *result,
-                                       float x,
-                                       float y,
-                                       float z) {
+                                      float x,
+                                      float y,
+                                      float z) {
     memset(result, 0, sizeof(float) * 16);
 
     result->f[0] = x;
@@ -62,7 +62,7 @@ CETECH_FORCE_INLINE void mat44f_scale(mat44f_t *result,
 }
 
 CETECH_FORCE_INLINE void mat44f_rotate_x(mat44f_t *result,
-                                          float x) {
+                                         float x) {
     const float sx = float_sin(x);
     const float cx = float_cos(x);
 
@@ -77,7 +77,7 @@ CETECH_FORCE_INLINE void mat44f_rotate_x(mat44f_t *result,
 }
 
 CETECH_FORCE_INLINE void mat44f_rotate_y(mat44f_t *result,
-                                          float y) {
+                                         float y) {
     const float sy = float_sin(y);
     const float cy = float_cos(y);
 
@@ -92,7 +92,7 @@ CETECH_FORCE_INLINE void mat44f_rotate_y(mat44f_t *result,
 }
 
 CETECH_FORCE_INLINE void mat44f_rotate_z(mat44f_t *result,
-                                          float z) {
+                                         float z) {
     const float sz = float_sin(z);
     const float cz = float_cos(z);
 
@@ -107,8 +107,8 @@ CETECH_FORCE_INLINE void mat44f_rotate_z(mat44f_t *result,
 }
 
 CETECH_FORCE_INLINE void mat44f_rotate_xy(mat44f_t *result,
-                                           float x,
-                                           float y) {
+                                          float x,
+                                          float y) {
     const float sx = float_sin(x);
     const float cx = float_cos(x);
     const float sy = float_sin(y);
@@ -128,9 +128,9 @@ CETECH_FORCE_INLINE void mat44f_rotate_xy(mat44f_t *result,
 }
 
 CETECH_FORCE_INLINE void mat44f_rotate_xyz(mat44f_t *result,
-                                            float x,
-                                            float y,
-                                            float z) {
+                                           float x,
+                                           float y,
+                                           float z) {
     const float sx = float_sin(x);
     const float cx = float_cos(x);
     const float sy = float_sin(y);
@@ -153,9 +153,9 @@ CETECH_FORCE_INLINE void mat44f_rotate_xyz(mat44f_t *result,
 }
 
 CETECH_FORCE_INLINE void mat44f_rotate_zyx(mat44f_t *result,
-                                            float x,
-                                            float y,
-                                            float z) {
+                                           float x,
+                                           float y,
+                                           float z) {
     const float sx = float_sin(x);
     const float cx = float_cos(x);
     const float sy = float_sin(y);
@@ -178,20 +178,20 @@ CETECH_FORCE_INLINE void mat44f_rotate_zyx(mat44f_t *result,
 };
 
 CETECH_FORCE_INLINE int mat44f_eq(const mat44f_t *__restrict a,
-                                   const mat44f_t *__restrict b,
-                                   const float epsilon) {
+                                  const mat44f_t *__restrict b,
+                                  const float epsilon) {
     return float_equals(a->f, b->f, 4 * 4, epsilon);
 }
 
 CETECH_FORCE_INLINE int mat44f_is_identity(const mat44f_t *__restrict a,
-                                            float epsilon) {
+                                           float epsilon) {
     static mat44f_t _identity = MAT44F_INIT_IDENTITY;
     return mat44f_eq(a, &_identity, epsilon);
 }
 
 CETECH_FORCE_INLINE void mat44f_mul(mat44f_t *__restrict result,
-                                     const mat44f_t *__restrict a,
-                                     const mat44f_t *__restrict b) {
+                                    const mat44f_t *__restrict a,
+                                    const mat44f_t *__restrict b) {
 
     vec4f_mul_mat44f(&result->x, &a->x, b);
     vec4f_mul_mat44f(&result->y, &a->y, b);
@@ -200,7 +200,7 @@ CETECH_FORCE_INLINE void mat44f_mul(mat44f_t *__restrict result,
 }
 
 CETECH_FORCE_INLINE void mat44f_inverse(mat44f_t *__restrict result,
-                                         const mat44f_t *__restrict a) {
+                                        const mat44f_t *__restrict a) {
     float xx = a->f[0];
     float xy = a->f[1];
     float xz = a->f[2];
@@ -219,36 +219,56 @@ CETECH_FORCE_INLINE void mat44f_inverse(mat44f_t *__restrict result,
     float ww = a->f[15];
 
     float det = 0.0f;
-    det += xx * (yy * (zz * ww - zw * wz) - yz * (zy * ww - zw * wy) + yw * (zy * wz - zz * wy));
-    det -= xy * (yx * (zz * ww - zw * wz) - yz * (zx * ww - zw * wx) + yw * (zx * wz - zz * wx));
-    det += xz * (yx * (zy * ww - zw * wy) - yy * (zx * ww - zw * wx) + yw * (zx * wy - zy * wx));
-    det -= xw * (yx * (zy * wz - zz * wy) - yy * (zx * wz - zz * wx) + yz * (zx * wy - zy * wx));
+    det += xx * (yy * (zz * ww - zw * wz) - yz * (zy * ww - zw * wy) +
+                 yw * (zy * wz - zz * wy));
+    det -= xy * (yx * (zz * ww - zw * wz) - yz * (zx * ww - zw * wx) +
+                 yw * (zx * wz - zz * wx));
+    det += xz * (yx * (zy * ww - zw * wy) - yy * (zx * ww - zw * wx) +
+                 yw * (zx * wy - zy * wx));
+    det -= xw * (yx * (zy * wz - zz * wy) - yy * (zx * wz - zz * wx) +
+                 yz * (zx * wy - zy * wx));
 
     float inv_det = 1.0f / det;
 
-    result->f[0] = +(yy * (zz * ww - wz * zw) - yz * (zy * ww - wy * zw) + yw * (zy * wz - wy * zz)) * inv_det;
-    result->f[1] = -(xy * (zz * ww - wz * zw) - xz * (zy * ww - wy * zw) + xw * (zy * wz - wy * zz)) * inv_det;
-    result->f[2] = +(xy * (yz * ww - wz * yw) - xz * (yy * ww - wy * yw) + xw * (yy * wz - wy * yz)) * inv_det;
-    result->f[3] = -(xy * (yz * zw - zz * yw) - xz * (yy * zw - zy * yw) + xw * (yy * zz - zy * yz)) * inv_det;
+    result->f[0] = +(yy * (zz * ww - wz * zw) - yz * (zy * ww - wy * zw) +
+                     yw * (zy * wz - wy * zz)) * inv_det;
+    result->f[1] = -(xy * (zz * ww - wz * zw) - xz * (zy * ww - wy * zw) +
+                     xw * (zy * wz - wy * zz)) * inv_det;
+    result->f[2] = +(xy * (yz * ww - wz * yw) - xz * (yy * ww - wy * yw) +
+                     xw * (yy * wz - wy * yz)) * inv_det;
+    result->f[3] = -(xy * (yz * zw - zz * yw) - xz * (yy * zw - zy * yw) +
+                     xw * (yy * zz - zy * yz)) * inv_det;
 
-    result->f[4] = -(yx * (zz * ww - wz * zw) - yz * (zx * ww - wx * zw) + yw * (zx * wz - wx * zz)) * inv_det;
-    result->f[5] = +(xx * (zz * ww - wz * zw) - xz * (zx * ww - wx * zw) + xw * (zx * wz - wx * zz)) * inv_det;
-    result->f[6] = -(xx * (yz * ww - wz * yw) - xz * (yx * ww - wx * yw) + xw * (yx * wz - wx * yz)) * inv_det;
-    result->f[7] = +(xx * (yz * zw - zz * yw) - xz * (yx * zw - zx * yw) + xw * (yx * zz - zx * yz)) * inv_det;
+    result->f[4] = -(yx * (zz * ww - wz * zw) - yz * (zx * ww - wx * zw) +
+                     yw * (zx * wz - wx * zz)) * inv_det;
+    result->f[5] = +(xx * (zz * ww - wz * zw) - xz * (zx * ww - wx * zw) +
+                     xw * (zx * wz - wx * zz)) * inv_det;
+    result->f[6] = -(xx * (yz * ww - wz * yw) - xz * (yx * ww - wx * yw) +
+                     xw * (yx * wz - wx * yz)) * inv_det;
+    result->f[7] = +(xx * (yz * zw - zz * yw) - xz * (yx * zw - zx * yw) +
+                     xw * (yx * zz - zx * yz)) * inv_det;
 
-    result->f[8] = +(yx * (zy * ww - wy * zw) - yy * (zx * ww - wx * zw) + yw * (zx * wy - wx * zy)) * inv_det;
-    result->f[9] = -(xx * (zy * ww - wy * zw) - xy * (zx * ww - wx * zw) + xw * (zx * wy - wx * zy)) * inv_det;
-    result->f[10] = +(xx * (yy * ww - wy * yw) - xy * (yx * ww - wx * yw) + xw * (yx * wy - wx * yy)) * inv_det;
-    result->f[11] = -(xx * (yy * zw - zy * yw) - xy * (yx * zw - zx * yw) + xw * (yx * zy - zx * yy)) * inv_det;
+    result->f[8] = +(yx * (zy * ww - wy * zw) - yy * (zx * ww - wx * zw) +
+                     yw * (zx * wy - wx * zy)) * inv_det;
+    result->f[9] = -(xx * (zy * ww - wy * zw) - xy * (zx * ww - wx * zw) +
+                     xw * (zx * wy - wx * zy)) * inv_det;
+    result->f[10] = +(xx * (yy * ww - wy * yw) - xy * (yx * ww - wx * yw) +
+                      xw * (yx * wy - wx * yy)) * inv_det;
+    result->f[11] = -(xx * (yy * zw - zy * yw) - xy * (yx * zw - zx * yw) +
+                      xw * (yx * zy - zx * yy)) * inv_det;
 
-    result->f[12] = -(yx * (zy * wz - wy * zz) - yy * (zx * wz - wx * zz) + yz * (zx * wy - wx * zy)) * inv_det;
-    result->f[13] = +(xx * (zy * wz - wy * zz) - xy * (zx * wz - wx * zz) + xz * (zx * wy - wx * zy)) * inv_det;
-    result->f[14] = -(xx * (yy * wz - wy * yz) - xy * (yx * wz - wx * yz) + xz * (yx * wy - wx * yy)) * inv_det;
-    result->f[15] = +(xx * (yy * zz - zy * yz) - xy * (yx * zz - zx * yz) + xz * (yx * zy - zx * yy)) * inv_det;
+    result->f[12] = -(yx * (zy * wz - wy * zz) - yy * (zx * wz - wx * zz) +
+                      yz * (zx * wy - wx * zy)) * inv_det;
+    result->f[13] = +(xx * (zy * wz - wy * zz) - xy * (zx * wz - wx * zz) +
+                      xz * (zx * wy - wx * zy)) * inv_det;
+    result->f[14] = -(xx * (yy * wz - wy * yz) - xy * (yx * wz - wx * yz) +
+                      xz * (yx * wy - wx * yy)) * inv_det;
+    result->f[15] = +(xx * (yy * zz - zy * yz) - xy * (yx * zz - zx * yz) +
+                      xz * (yx * zy - zx * yy)) * inv_det;
 }
 
 CETECH_FORCE_INLINE void mat44f_transpose(mat44f_t *__restrict result,
-                                           const mat44f_t *__restrict a) {
+                                          const mat44f_t *__restrict a) {
     result->f[0] = a->f[0];
     result->f[4] = a->f[1];
     result->f[8] = a->f[2];
@@ -271,10 +291,10 @@ CETECH_FORCE_INLINE void mat44f_transpose(mat44f_t *__restrict result,
 }
 
 CETECH_FORCE_INLINE void mat44f_set_perspective_fov(mat44f_t *__restrict result,
-                                                     const float fov,
-                                                     const float aspect_ratio,
-                                                     float near,
-                                                     float far) {
+                                                    const float fov,
+                                                    const float aspect_ratio,
+                                                    float near,
+                                                    float far) {
 
     float yScale = 1.0f / float_tan(fov * CETECH_float_TORAD * 0.5f);
     float xScale = yScale / aspect_ratio;

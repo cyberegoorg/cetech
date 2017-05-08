@@ -2,17 +2,14 @@
 // Includes
 //==============================================================================
 
-#include "../../../core/allocator.h"
-#include "../../application.h"
-#include "../../config.h"
-#include "../../resource.h"
-#include "../../../core/module.h"
-#include "../../../core/eventstream.inl"
-#include "../../machine.h"
-#include "../../input.h"
-#include "../../../core/string.h"
-#include "../../../core/log.h"
-#include "../../../core/allocator.h"
+#include <cetech/core/allocator.h>
+#include <cetech/kernel/config.h>
+#include <cetech/kernel/resource.h>
+#include <cetech/core/module.h>
+#include <cetech/core/eventstream.inl>
+#include <cetech/kernel/machine.h>
+#include <cetech/kernel/input.h>
+#include <cetech/core/string.h>
 
 #include "keystr.h"
 

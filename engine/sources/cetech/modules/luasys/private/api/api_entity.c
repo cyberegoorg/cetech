@@ -1,17 +1,12 @@
-#include <stddef.h>
 
-#include "../../../../core/allocator.h"
-#include "../../../../core/hash.h"
-#include "../../../../kernel/world.h"
-#include "../../../../core/yaml.h"
-#include "../../../../kernel/config.h"
-#include "../../../../kernel/application.h"
-#include "../../../../kernel/resource.h"
-#include "../../../../kernel/entity.h"
-#include "../../../../core/module.h"
-#include "../../../../core/handler.h"
-#include "../../luasys.h"
-#include "../luasys.h"
+
+#include <cetech/core/allocator.h>
+#include <cetech/core/hash.h>
+#include <cetech/kernel/world.h>
+#include <cetech/kernel/resource.h>
+#include <cetech/kernel/entity.h>
+#include <cetech/core/module.h>
+#include <cetech/modules/luasys/luasys.h>
 
 #define API_NAME "Entity"
 

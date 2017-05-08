@@ -1,13 +1,11 @@
-#include <stddef.h>
-#include "../../../../core/allocator.h"
 
-#include "../../../../kernel/config.h"
-#include "../../../../core/module.h"
-#include "../../../../kernel/world.h"
+#include <cetech/core/allocator.h>
+
+#include <cetech/core/module.h>
+#include <cetech/kernel/world.h>
 #include "../../../camera/camera.h"
 #include "../../../renderer/renderer.h"
-#include "../../luasys.h"
-#include "../luasys.h"
+#include <cetech/modules/luasys/luasys.h>
 
 #define API_NAME "Renderer"
 
@@ -30,7 +28,8 @@ static int _renderer_set_debug(lua_State *l) {
 }
 
 void _register_lua_renderer_api(get_api_fce_t get_engine_api) {
-    renderer_api_v0 = *(struct renderer_api_v0 *) get_engine_api(RENDERER_API_ID);
+    renderer_api_v0 = *(struct renderer_api_v0 *) get_engine_api(
+            RENDERER_API_ID);
 
     luasys_add_module_function(API_NAME, "render_world",
                                _renderer_render_world);

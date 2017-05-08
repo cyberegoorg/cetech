@@ -4,18 +4,17 @@
 
 #include <bgfx/c99/bgfx.h>
 
-#include "../../../../core/allocator.h"
-#include "../../../../core/hash.h"
+#include <cetech/core/allocator.h>
+#include <cetech/core/hash.h>
 #include "../../renderer.h"
-#include "../../../../core/memory.h"
+#include <cetech/core/memory.h>
 
-#include "../../../../kernel/config.h"
-#include "../../../../core/module.h"
+#include <cetech/core/module.h>
 
-#include "../../../../kernel/resource.h"
-#include "../../../../core/map.inl"
-#include "../../../../core/handler.h"
-#include "../../../../core/string.h"
+#include <cetech/kernel/resource.h>
+#include <cetech/core/map.inl>
+#include <cetech/core/handler.h>
+#include <cetech/core/string.h>
 #include "../texture/texture.h"
 #include "../shader/shader.h"
 #include "material_blob.h"

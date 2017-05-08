@@ -6,7 +6,7 @@
 //==============================================================================
 
 #include <stdint.h>
-#include "../core/math_types.h"
+#include <cetech/core/math_types.h>
 
 enum {
     MACHINE_API_ID = 6,

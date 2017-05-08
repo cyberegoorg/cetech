@@ -3,22 +3,22 @@
 //==============================================================================
 
 #include <stdio.h>
-#include "../../core/os.h"
-#include "../../core/map.inl"
+#include <cetech/core/os.h>
+#include <cetech/core/map.inl>
 
 #include "include/mpack/mpack.h"
 #include "include/nanomsg/nn.h"
 #include "include/nanomsg/pubsub.h"
 
-#include "../../core/thread.h"
-#include "../../core/eventstream.inl"
-#include "../../core/memory.h"
-#include "../config.h"
-#include "../../core/module.h"
+#include <cetech/core/thread.h>
+#include <cetech/core/eventstream.inl>
+#include <cetech/core/memory.h>
+#include <cetech/kernel/config.h>
+#include <cetech/core/module.h>
 
-#include "../task.h"
-#include "../develop.h"
-#include "../../core/string.h"
+#include <cetech/kernel/task.h>
+#include <cetech/kernel/develop.h>
+#include <cetech/core/string.h>
 
 
 //==============================================================================
@@ -68,7 +68,8 @@ static void _flush_stream_buffer() {
 
     thread_api_v0.spin_lock(&_G.flush_lock);
 
-    array_push_uint8_t(&_G.eventstream.stream, _stream_buffer, _stream_buffer_size);
+    array_push_uint8_t(&_G.eventstream.stream, _stream_buffer,
+                       _stream_buffer_size);
     _stream_buffer_size = 0;
 
     thread_api_v0.spin_unlock(&_G.flush_lock);
@@ -335,7 +336,7 @@ void developsys_leave_scope(struct scope_data scope_data) {
             .start = scope_data.start,
             .duration =
             ((float) (time_api_v0.get_perf_counter() - scope_data.start_timer) /
-                    time_api_v0.get_perf_freq()) * 1000.0f,
+             time_api_v0.get_perf_freq()) * 1000.0f,
             .depth = _scope_depth,
     };
 
@@ -346,31 +347,28 @@ void developsys_leave_scope(struct scope_data scope_data) {
 
 void *developsystem_get_module_api(int api) {
     switch (api) {
-        case PLUGIN_EXPORT_API_ID:
-                {
-                    static struct module_api_v0 module = {0};
+        case PLUGIN_EXPORT_API_ID: {
+            static struct module_api_v0 module = {0};
 
-                    module.init = _init;
-                    module.shutdown = _shutdown;
-                    module.init_cvar = _init_cvar;
-                    module.after_update = _after_update;
+            module.init = _init;
+            module.shutdown = _shutdown;
+            module.init_cvar = _init_cvar;
+            module.after_update = _after_update;
 
-                    return &module;
-                }
+            return &module;
+        }
 
-        case DEVELOP_SERVER_API_ID:
+        case DEVELOP_SERVER_API_ID: {
+            static struct develop_api_v0 api = {0};
 
-                {
-                    static struct develop_api_v0 api = {0};
+            api.push = _developsys_push;
+            api.push_record_float = developsys_push_record_float;
+            api.push_record_int = developsys_push_record_int;
+            api.leave_scope = developsys_leave_scope;
+            api.enter_scope = developsys_enter_scope;
 
-                    api.push = _developsys_push;
-                    api.push_record_float = developsys_push_record_float;
-                    api.push_record_int = developsys_push_record_int;
-                    api.leave_scope = developsys_leave_scope;
-                    api.enter_scope = developsys_enter_scope;
-
-                    return &api;
-                }
+            return &api;
+        }
 
 
         default:

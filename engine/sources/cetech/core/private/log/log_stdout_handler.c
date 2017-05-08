@@ -10,11 +10,8 @@
 
 #endif
 
-#include "../../log.h"
-#include "../../errors.h"
-
-#include "../../allocator.h"
-#include "../../string.h"
+#include <cetech/core/log.h>
+#include <cetech/core/string.h>
 
 /***********************************************************************
 **** Internals

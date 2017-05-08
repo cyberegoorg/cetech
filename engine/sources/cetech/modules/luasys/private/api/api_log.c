@@ -1,10 +1,10 @@
 #include <stddef.h>
-#include "../../../../core/allocator.h"
-#include "../../../../kernel/config.h"
-#include "../../../../core/module.h"
-#include "../../../../core/log.h"
-#include "../../luasys.h"
-#include "../luasys.h"
+#include <cetech/core/allocator.h>
+#include <cetech/core/module.h>
+#include <cetech/core/log.h>
+#include <cetech/modules/luasys/luasys.h>
+#include <stdio.h>
+
 
 #define API_NAME "Log"
 

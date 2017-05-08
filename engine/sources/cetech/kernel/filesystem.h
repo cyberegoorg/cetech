@@ -74,7 +74,7 @@ struct filesystem_api_v0 {
     //! \param path File path
     //! \return Modified time
     int64_t (*filesystem_get_file_mtime)(stringid64_t root,
-                                     const char *path);
+                                         const char *path);
 
     //! Get full path
     //! \param root Root

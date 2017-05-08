@@ -2,20 +2,20 @@
 // Includes
 //==============================================================================
 
-#include "../../core/allocator.h"
-#include "../../core/yaml.h"
-#include "../../core/memory.h"
-#include "../../core/cmd_line.h"
-#include "../config.h"
-#include "../../core/module.h"
-#include "../../core/hash.h"
-#include "../application.h"
-#include "../resource.h"
-#include "../../core/log.h"
+#include <cetech/core/allocator.h>
+#include <cetech/core/yaml.h>
+#include <cetech/core/memory.h>
+#include <cetech/core/cmd_line.h>
+#include <cetech/kernel/config.h>
+#include <cetech/core/module.h>
+#include <cetech/core/hash.h>
+#include <cetech/kernel/application.h>
+#include <cetech/kernel/resource.h>
+#include <cetech/core/log.h>
 #include <stdio.h>
-#include "../../core/string.h"
+#include <cetech/core/string.h>
 #include "module.h"
-#include "../../core/fs.h"
+#include <cetech/core/fs.h>
 
 
 //==============================================================================

@@ -1,16 +1,15 @@
-#include <stddef.h>
 
-#include "../../../../core/allocator.h"
-#include "../../../../kernel/world.h"
+
+#include <cetech/core/allocator.h>
+#include <cetech/kernel/world.h>
+#include <cetech/kernel/resource.h>
+#include <cetech/kernel/entity.h>
+#include <cetech/core/module.h>
+
+#include <cetech/modules/luasys/luasys.h>
+#include <cetech/core/hash.h>
+
 #include "../../../level/level.h"
-#include "../../../../kernel/config.h"
-#include "../../../../kernel/application.h"
-#include "../../../../kernel/resource.h"
-#include "../../../../kernel/entity.h"
-#include "../../../../core/module.h"
-
-#include "../../luasys.h"
-#include "../luasys.h"
 
 #define API_NAME "Level"
 

@@ -2,16 +2,15 @@
 // Includes
 //==============================================================================
 
-#include "../../../core/math_types.h"
-#include "../../../core/allocator.h"
-#include "../../application.h"
-#include "../../config.h"
-#include "../../resource.h"
-#include "../../../core/eventstream.inl"
-#include "../../input.h"
-#include "../../../core/module.h"
-#include "../../machine.h"
-#include "../../../core/string.h"
+#include <cetech/core/math_types.h>
+#include <cetech/core/allocator.h>
+#include <cetech/kernel/config.h>
+#include <cetech/kernel/resource.h>
+#include <cetech/core/eventstream.inl>
+#include <cetech/kernel/input.h>
+#include <cetech/core/module.h>
+#include <cetech/kernel/machine.h>
+#include <cetech/core/string.h>
 
 #include "gamepadstr.h"
 
@@ -127,7 +126,7 @@ uint32_t gamepad_button_index(const char *button_name) {
 
 const char *gamepad_button_name(const uint32_t button_index) {
     CETECH_ASSERT(LOG_WHERE,
-               (button_index >= 0) && (button_index < GAMEPAD_BTN_MAX));
+                  (button_index >= 0) && (button_index < GAMEPAD_BTN_MAX));
 
     return _btn_to_str[button_index];
 }
@@ -135,7 +134,7 @@ const char *gamepad_button_name(const uint32_t button_index) {
 int gamepad_button_state(uint32_t idx,
                          const uint32_t button_index) {
     CETECH_ASSERT(LOG_WHERE,
-               (button_index >= 0) && (button_index < GAMEPAD_BTN_MAX));
+                  (button_index >= 0) && (button_index < GAMEPAD_BTN_MAX));
 
     return _G.state[idx][button_index];
 }
@@ -143,7 +142,7 @@ int gamepad_button_state(uint32_t idx,
 int gamepad_button_pressed(uint32_t idx,
                            const uint32_t button_index) {
     CETECH_ASSERT(LOG_WHERE,
-               (button_index >= 0) && (button_index < GAMEPAD_BTN_MAX));
+                  (button_index >= 0) && (button_index < GAMEPAD_BTN_MAX));
 
     return _G.state[idx][button_index] && !_G.last_state[idx][button_index];
 }
@@ -151,13 +150,14 @@ int gamepad_button_pressed(uint32_t idx,
 int gamepad_button_released(uint32_t idx,
                             const uint32_t button_index) {
     CETECH_ASSERT(LOG_WHERE,
-               (button_index >= 0) && (button_index < GAMEPAD_BTN_MAX));
+                  (button_index >= 0) && (button_index < GAMEPAD_BTN_MAX));
 
     return !_G.state[idx][button_index] && _G.last_state[idx][button_index];
 }
 
 const char *gamepad_axis_name(const uint32_t axis_index) {
-    CETECH_ASSERT(LOG_WHERE, (axis_index >= 0) && (axis_index < GAMEPAD_AXIX_MAX));
+    CETECH_ASSERT(LOG_WHERE,
+                  (axis_index >= 0) && (axis_index < GAMEPAD_AXIX_MAX));
 
     return _axis_to_str[axis_index];
 }
@@ -179,8 +179,9 @@ uint32_t gamepad_axis_index(const char *axis_name) {
 }
 
 vec2f_t gamepad_axis(uint32_t idx,
-                         const uint32_t axis_index) {
-    CETECH_ASSERT(LOG_WHERE, (axis_index >= 0) && (axis_index < GAMEPAD_AXIX_MAX));
+                     const uint32_t axis_index) {
+    CETECH_ASSERT(LOG_WHERE,
+                  (axis_index >= 0) && (axis_index < GAMEPAD_AXIX_MAX));
 
     return _G.position[idx][axis_index];
 }

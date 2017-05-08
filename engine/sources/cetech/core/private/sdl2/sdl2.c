@@ -1,11 +1,10 @@
-#include "../../../kernel/application.h"
-#include "../../allocator.h"
-#include "../../../kernel/config.h"
+#include <cetech/kernel/application.h>
+#include <cetech/kernel/config.h>
 
-#include "../../module.h"
-#include "../../thread.h"
-#include "../../window.h"
-#include "../../os.h"
+#include <cetech/core/module.h>
+#include <cetech/core/thread.h>
+#include <cetech/core/window.h>
+#include <cetech/core/os.h>
 
 #include "sdl_cpu.h"
 #include "sdl_window.h"

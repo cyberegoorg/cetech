@@ -1,15 +1,15 @@
 
-#include "../../../../core/allocator.h"
-#include "../../../../kernel/world.h"
-#include "../../../../kernel/config.h"
-#include "../../../../kernel/application.h"
-#include "../../../../kernel/resource.h"
-#include "../../../../kernel/entity.h"
-#include "../../../../kernel/resource.h"
+#include <cetech/core/allocator.h>
+#include <cetech/core/module.h>
+
+#include <cetech/kernel/world.h>
+#include <cetech/kernel/resource.h>
+#include <cetech/kernel/entity.h>
+
+#include <cetech/modules/luasys/luasys.h>
+#include <cetech/core/hash.h>
+
 #include "../../../renderer/renderer.h"
-#include "../../../../core/module.h"
-#include "../../luasys.h"
-#include "../luasys.h"
 
 #define API_NAME "Mesh"
 
@@ -52,7 +52,8 @@ static int _mesh_set_material(lua_State *l) {
 }
 
 void _register_lua_mesh_api(get_api_fce_t get_engine_api) {
-    mesh_renderer_api_v0 = *(struct mesh_renderer_api_v0 *) get_engine_api(MESH_API_ID);
+    mesh_renderer_api_v0 = *(struct mesh_renderer_api_v0 *) get_engine_api(
+            MESH_API_ID);
 
 
     luasys_add_module_function(API_NAME, "get", _mesh_get);

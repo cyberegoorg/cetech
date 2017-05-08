@@ -4,15 +4,14 @@
 
 #include <bgfx/c99/bgfx.h>
 
-#include "../../../../core/allocator.h"
-#include "../../../../core/hash.h"
-#include "../../../../core/map.inl"
-#include "../../../../core/memory.h"
-#include "../../../../kernel/application.h"
-#include "../../../../kernel/config.h"
+#include <cetech/core/allocator.h>
+#include <cetech/core/hash.h>
+#include <cetech/core/map.inl>
+#include <cetech/core/memory.h>
+#include <cetech/kernel/application.h>
 
-#include "../../../../core/module.h"
-#include "../../../../kernel/resource.h"
+#include <cetech/core/module.h>
+#include <cetech/kernel/resource.h>
 
 
 //==============================================================================
@@ -54,7 +53,7 @@ IMPORT_API(app_api_v0);
 // Resource
 //==============================================================================
 #include "texture_resource.h"
-#include "../../../../kernel/private/module.h"
+#include <cetech/core/module.h>
 
 //==============================================================================
 // Interface
@@ -63,7 +62,8 @@ IMPORT_API(app_api_v0);
 int texture_init() {
     _G = (struct G) {0};
 
-    memory_api_v0 = *(struct memory_api_v0 *) module_get_engine_api(MEMORY_API_ID);
+    memory_api_v0 = *(struct memory_api_v0 *) module_get_engine_api(
+            MEMORY_API_ID);
     resource_api_v0 = *(struct resource_api_v0 *) module_get_engine_api(
             RESOURCE_API_ID);
     app_api_v0 = *(struct app_api_v0 *) module_get_engine_api(

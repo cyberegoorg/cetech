@@ -1,12 +1,10 @@
-#include <stddef.h>
-#include "../../../../core/allocator.h"
-#include "../../../../core/math_types.h"
-#include "../../../../kernel/config.h"
-#include "../../../../core/module.h"
 
-#include "../../luasys.h"
-#include "../luasys.h"
-#include "../../../../kernel/input.h"
+#include <cetech/core/allocator.h>
+#include <cetech/core/math_types.h>
+#include <cetech/core/module.h>
+
+#include <cetech/modules/luasys/luasys.h>
+#include <cetech/kernel/input.h>
 
 IMPORT_API(gamepad_api_v0);
 
@@ -104,7 +102,8 @@ static int _gamepad_play_rumble(lua_State *l) {
 #define API_NAME "Gamepad"
 
 void _register_lua_gamepad_api(get_api_fce_t get_engine_api) {
-    gamepad_api_v0 = *((struct gamepad_api_v0 *) get_engine_api(GAMEPAD_API_ID));
+    gamepad_api_v0 = *((struct gamepad_api_v0 *) get_engine_api(
+            GAMEPAD_API_ID));
 
     luasys_add_module_function(API_NAME, "is_active", _gamepad_is_active);
 

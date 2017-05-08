@@ -8,15 +8,22 @@
 // Includes
 //==============================================================================
 
+#include <stddef.h>
+#include <stdint.h>
+
 enum {
     RESOURCE_API_ID = 19,
     PACKAGE_API_ID = 20,
 };
 
 struct vio;
-typedef struct stringid64_s stringid64_t;
+struct allocator;
+struct compilator_api;
+
 struct config_api_v0;
 struct app_api_v0;
+
+typedef struct stringid64_s stringid64_t;
 
 //==============================================================================
 // Typedefs
@@ -195,6 +202,7 @@ struct resource_api_v0 {
                             size_t max_len,
                             stringid64_t type,
                             stringid64_t name);
+
 #ifdef CETECH_CAN_COMPILE
     //! Register resource compiler
     //! \param type Type

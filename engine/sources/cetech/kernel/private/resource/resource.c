@@ -5,22 +5,22 @@
 #include "include/SDL2/SDL.h"
 #include "include/mpack/mpack.h"
 
-#include "../../../core/map.inl"
-#include "../../../core/hash.h"
+#include <cetech/core/map.inl>
+#include <cetech/core/hash.h>
 
-#include "../../application.h"
-#include "../../config.h"
-#include "../../resource.h"
+#include <cetech/kernel/application.h>
+#include <cetech/kernel/config.h>
+#include <cetech/kernel/resource.h>
 
-#include "../../develop.h"
-#include "../../../core/memory.h"
-#include "../../../core/module.h"
-#include "../../filesystem.h"
+#include <cetech/kernel/develop.h>
+#include <cetech/core/memory.h>
+#include <cetech/core/module.h>
+#include <cetech/kernel/filesystem.h>
 
 #include "resource.h"
-#include "../module.h"
-#include "../../../core/fs.h"
+#include <cetech/core/fs.h>
 
+#include "../module.h"
 
 //==============================================================================
 // Struct and types
@@ -70,7 +70,6 @@ struct G {
     } config;
 
 } _G = {0};
-
 
 
 IMPORT_API(memory_api_v0);
@@ -194,7 +193,7 @@ static void _init_cvar(struct config_api_v0 config) {
     _G = (struct G) {0};
 
     _G.config.build_dir = config.new_str("build", "Resource build dir",
-                                     "data/build");
+                                         "data/build");
 }
 
 static void _shutdown() {
@@ -470,9 +469,10 @@ void resource_reload(stringid64_t type,
                                        names[i]);
 #else
         char build_name[33] = {0};
-        resource_type_name_string(build_name, CETECH_ARRAY_LEN(build_name), type, names[i]);
+        resource_type_name_string(build_name, CETECH_ARRAY_LEN(build_name),
+                                  type, names[i]);
 
-        char* filename = build_name;
+        char *filename = build_name;
 #endif
         log_debug("resource", "Reload resource %s ", filename);
 

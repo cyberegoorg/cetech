@@ -42,7 +42,8 @@ static inline struct event_header *eventstream_end(struct eventstream *es) {
     return (struct event_header *) ARRAY_END(&es->stream);
 }
 
-static inline struct event_header *eventstream_next(struct event_header *header) {
+static inline struct event_header *
+eventstream_next(struct event_header *header) {
     return (struct event_header *) (((char *) header) + header->size);
 }
 

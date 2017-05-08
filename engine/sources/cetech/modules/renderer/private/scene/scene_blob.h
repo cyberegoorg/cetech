@@ -1,8 +1,8 @@
 #ifndef CETECH_SCENE_BLOB_H
 #define CETECH_SCENE_BLOB_H
 
-#include "../../../../core/hash.h"
-#include "../../../../core/math_types.h"
+#include <cetech/core/hash.h>
+#include <cetech/core/math_types.h>
 
 typedef struct scene_blob {
     uint32_t geom_count;

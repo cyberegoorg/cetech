@@ -50,7 +50,7 @@ struct level_api_v0 {
     //! \param name Name
     //! \return Entity
     entity_t (*entity_by_id)(level_t level,
-                           stringid64_t name);
+                             stringid64_t name);
 
     //! Get level entity
     //! \param level Level

@@ -31,11 +31,11 @@ enum window_pos {
 
 struct window_api_v0 {
     window_t (*create)(const char *title,
-                           enum window_pos x,
-                           enum window_pos y,
-                           const int32_t width,
-                           const int32_t height,
-                           enum window_flags flags);
+                       enum window_pos x,
+                       enum window_pos y,
+                       const int32_t width,
+                       const int32_t height,
+                       enum window_flags flags);
 
     window_t (*create_from)(void *hndl);
 

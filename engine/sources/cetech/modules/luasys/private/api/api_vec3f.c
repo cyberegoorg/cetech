@@ -1,13 +1,9 @@
 
-#include "../../../../core/allocator.h"
 #include "../../../transform/transform.h"
-#include "../../../../core/vec3f.inl"
-#include "../../../../kernel/config.h"
-#include "../../../../kernel/application.h"
-#include "../../../../core/module.h"
-#include "../../luasys.h"
+#include <cetech/core/vec3f.inl>
+#include <cetech/core/module.h>
 
-#include "../luasys.h"
+#include <cetech/modules/luasys/luasys.h>
 
 #define API_NAME "Vec3f"
 

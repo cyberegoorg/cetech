@@ -3,9 +3,9 @@
 
 #include "include/luajit/luajit.h"
 
-#include "../../../core/quatf.inl"
+#include <cetech/core/quatf.inl>
 
-#include "luasys.h"
+#include <cetech/modules/luasys/luasys.h>
 
 
 static int _quat_add(lua_State *L) {

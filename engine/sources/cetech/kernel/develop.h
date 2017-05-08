@@ -10,8 +10,8 @@
 
 #include "include/mpack/mpack.h"
 
-#include "../core/types.h"
-#include "../core/eventstream.inl"
+#include <cetech/core/types.h>
+#include <cetech/core/eventstream.inl>
 
 enum {
     CONSOLE_SERVER_API_ID = 9,

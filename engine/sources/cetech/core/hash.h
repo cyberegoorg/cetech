@@ -21,8 +21,8 @@ typedef struct stringid64_s {
 //! \param seed Seed
 //! \return Hashed value
 uint64_t hash_murmur2_64(const void *key,
-                               uint64_t len,
-                               uint64_t seed);
+                         uint64_t len,
+                         uint64_t seed);
 
 stringid64_t stringid64_from_string(const char *str);
 

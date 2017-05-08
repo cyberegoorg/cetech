@@ -23,6 +23,7 @@ void material_set_mat44f(material_t material,
 
 
 void material_use(material_t material);
+
 void material_submit(material_t material);
 
 #endif //CETECH_MATERIAL_H

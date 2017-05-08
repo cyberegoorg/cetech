@@ -1,8 +1,8 @@
 #ifndef CETECH_RESOURCE_H
 #define CETECH_RESOURCE_H
 
-#include "../../../core/hash.h"
-#include "../../resource.h"
+#include <cetech/core/hash.h>
+#include <cetech/kernel/resource.h>
 
 void resource_set_autoload(int enable);
 

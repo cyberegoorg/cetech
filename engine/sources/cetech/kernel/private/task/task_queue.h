@@ -39,7 +39,7 @@ void queue_task_init(struct task_queue *q,
     q->allocator = allocator;
 
     CETECH_ASSERT_MSG("QUEUEMPC", 0 == (capacity & q->_capacityMask),
-                   "capacity must be power of two");
+                      "capacity must be power of two");
 
     q->_capacity = capacity;
     q->_data = CETECH_ALLOCATE(allocator, uint32_t, capacity);

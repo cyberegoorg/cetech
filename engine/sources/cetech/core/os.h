@@ -47,7 +47,9 @@ enum {
 
 struct time_api_v0 {
     uint32_t (*get_ticks)();
+
     uint64_t (*get_perf_counter)();
+
     uint64_t (*get_perf_freq)();
 };
 

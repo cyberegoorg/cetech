@@ -7,13 +7,11 @@
 #define CETECH_ALLOCATOR_MALLOC_H
 
 #include <stdint.h>
-#include "../../log.h"
 
+#include <cetech/core/log.h>
+#include <cetech/core/allocator.h>
 
-#include "../../errors.h"
-#include "../../allocator.h"
 #include "header.h"
-
 
 
 #define MAX_MEM_TRACE 1024

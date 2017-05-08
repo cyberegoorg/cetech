@@ -1,10 +1,9 @@
 #include <stddef.h>
 
-#include "../allocator.h"
-#include "../queue.inl"
-#include "../../kernel/config.h"
-#include "../module.h"
-#include "../handler.h"
+#include <cetech/core/allocator.h>
+#include <cetech/core/queue.inl>
+#include <cetech/core/module.h>
+#include <cetech/core/handler.h>
 
 //==============================================================================
 // Private defines
@@ -33,7 +32,8 @@ struct handler32gen {
 //==============================================================================
 
 struct handler32gen *handler32gen_create(struct allocator *allocator) {
-    struct handler32gen *hid = CETECH_ALLOCATE(allocator, struct handler32gen, 1);
+    struct handler32gen *hid = CETECH_ALLOCATE(allocator, struct handler32gen,
+                                               1);
 
     hid->alloc = allocator;
     ARRAY_INIT(uint32_t, &hid->_generation, allocator);

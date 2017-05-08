@@ -8,7 +8,7 @@
 //==============================================================================
 
 #include <stdint.h>
-#include "../../core/math_types.h"
+#include <cetech/core/math_types.h>
 
 typedef struct world_s world_t;
 typedef struct entity_s entity_t;
@@ -51,28 +51,28 @@ struct transform_api_v0 {
     //! \param transform transform
     //! \return Position
     vec3f_t (*get_position)(world_t world,
-                                transform_t transform);
+                            transform_t transform);
 
     //! Get transform rotation
     //! \param world World
     //! \param transform transform
     //! \return Rotation
     quatf_t (*get_rotation)(world_t world,
-                                transform_t transform);
+                            transform_t transform);
 
     //! Get transform scale
     //! \param world World
     //! \param transform transform
     //! \return Scale
     vec3f_t (*get_scale)(world_t world,
-                             transform_t transform);
+                         transform_t transform);
 
     //! Get world matrix
     //! \param world World
     //! \param transform transform
     //! \return World matrix
     mat44f_t *(*get_world_matrix)(world_t world,
-                                      transform_t transform);
+                                  transform_t transform);
 
     //! Set position
     //! \param world World

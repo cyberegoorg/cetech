@@ -7,16 +7,16 @@
 
 #include "include/SDL2/SDL.h"
 
-#include "../../../core/fs.h"
-#include "../../../core/string.h"
-#include "../../../core/hash.h"
-#include "../../task.h"
-#include "../../application.h"
-#include "../../config.h"
-#include "../../resource.h"
-#include "../../resource.h"
-#include "../../../core/memory.h"
-#include "../../../core/module.h"
+#include <cetech/core/fs.h>
+#include <cetech/core/string.h>
+#include <cetech/core/hash.h>
+#include <cetech/kernel/task.h>
+#include <cetech/kernel/application.h>
+#include <cetech/kernel/config.h>
+#include <cetech/kernel/resource.h>
+#include <cetech/kernel/resource.h>
+#include <cetech/core/memory.h>
+#include <cetech/core/module.h>
 
 #include "builddb.h"
 #include "resource.h"

@@ -41,6 +41,7 @@
 
 
 char *stacktrace(int skip);
+
 void stacktrace_free(char *st);
 
 

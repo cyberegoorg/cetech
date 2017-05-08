@@ -2,26 +2,22 @@
 // Includes
 //==============================================================================
 
-#include "../../core/map.inl"
-#include "../../core/vec3f.inl"
-
-#include "../../core/memory.h"
-#include "../application.h"
-#include "../config.h"
-#include "../resource.h"
-
-#include "../resource.h"
-#include "../../core/module.h"
-#include "../resource.h"
-
-#include "../world.h"
-#include "../entity.h"
-#include "../../core/hash.h"
-#include "../component.h"
-#include "../../core/handler.h"
-#include "../../core/yaml.h"
-#include "../../core/fs.h"
+#include <cetech/core/map.inl>
+#include <cetech/core/module.h>
+#include <cetech/core/memory.h>
+#include <cetech/core/memory.h>
+#include <cetech/core/yaml.h>
+#include <cetech/core/hash.h>
+#include <cetech/core/handler.h>
+#include <cetech/core/fs.h>
 #include <stdio.h>
+
+#include <cetech/kernel/config.h>
+#include <cetech/kernel/resource.h>
+#include <cetech/kernel/world.h>
+#include <cetech/kernel/entity.h>
+#include <cetech/kernel/component.h>
+
 
 //==============================================================================
 // Globals
@@ -34,7 +30,7 @@ MAP_PROTOTYPE_N(struct array_entity_t, array_entity_t);
 
 #define _G EntityMaagerGlobals
 static struct G {
-    struct handler32gen* entity_handler;
+    struct handler32gen *entity_handler;
     MAP_T(uint32_t) spawned_map;
     ARRAY_T(array_entity_t) spawned_array;
     stringid64_t type;
@@ -427,7 +423,7 @@ int _entity_resource_compiler(const char *filename,
 //==============================================================================
 
 void *entity_resource_loader(struct vio *input,
-                           struct allocator *allocator) {
+                             struct allocator *allocator) {
     const int64_t size = vio_size(input);
     char *data = CETECH_ALLOCATE(allocator, char, size);
     vio_read(input, data, 1, size);
@@ -436,23 +432,23 @@ void *entity_resource_loader(struct vio *input,
 }
 
 void entity_resource_unloader(void *new_data,
-                            struct allocator *allocator) {
+                              struct allocator *allocator) {
     CETECH_DEALLOCATE(allocator, new_data);
 }
 
 
 void entity_resource_online(stringid64_t name,
-                          void *data) {
+                            void *data) {
 }
 
 void entity_resource_offline(stringid64_t name,
-                           void *data) {
+                             void *data) {
 }
 
 void *entity_resource_reloader(stringid64_t name,
-                             void *old_data,
-                             void *new_data,
-                             struct allocator *allocator) {
+                               void *old_data,
+                               void *new_data,
+                               struct allocator *allocator) {
     entity_resource_offline(name, old_data);
     entity_resource_online(name, new_data);
 
@@ -482,7 +478,8 @@ static void _init(get_api_fce_t get_engine_api) {
     _G.type = stringid64_from_string("entity");
 
     MAP_INIT(uint32_t, &_G.spawned_map, memory_api_v0.main_allocator());
-    ARRAY_INIT(array_entity_t, &_G.spawned_array, memory_api_v0.main_allocator());
+    ARRAY_INIT(array_entity_t, &_G.spawned_array,
+               memory_api_v0.main_allocator());
 
     resource_api_v0.register_type(_G.type, entity_resource_callback);
 
@@ -490,7 +487,8 @@ static void _init(get_api_fce_t get_engine_api) {
     resource_api_v0.compiler_register(_G.type, _entity_resource_compiler);
 #endif
 
-    _G.entity_handler = handler_api_v0.handler32gen_create(memory_api_v0.main_allocator());
+    _G.entity_handler = handler_api_v0.handler32gen_create(
+            memory_api_v0.main_allocator());
 }
 
 static void _shutdown() {
@@ -519,7 +517,7 @@ int entity_manager_alive(entity_t entity) {
 
 
 ARRAY_T(entity_t) *entity_spawn_from_resource(world_t world,
-                                            void *resource) {
+                                              void *resource) {
     struct entity_resource *res = resource;
 
     uint32_t idx = _new_spawned_array();
@@ -542,8 +540,8 @@ ARRAY_T(entity_t) *entity_spawn_from_resource(world_t world,
         uint32_t *c_ent = component_data_ent(comp_data);
         char *c_data = component_data_data(comp_data);
         component_api_v0.component_spawn(world, type, &ARRAY_AT(spawned, 0),
-                                             c_ent, parents, comp_data->ent_count,
-                                             c_data);
+                                         c_ent, parents, comp_data->ent_count,
+                                         c_data);
 
         comp_data = (struct component_data *) (c_data + comp_data->size);
     }
@@ -554,7 +552,7 @@ ARRAY_T(entity_t) *entity_spawn_from_resource(world_t world,
 }
 
 entity_t entity_spawn(world_t world,
-                    stringid64_t name) {
+                      stringid64_t name) {
     void *res = resource_api_v0.get(_G.type, name);
 
     if (res == NULL) {
@@ -568,14 +566,14 @@ entity_t entity_spawn(world_t world,
 }
 
 void entity_destroy(world_t world,
-                  entity_t *entity,
-                  uint32_t count) {
+                    entity_t *entity,
+                    uint32_t count) {
 
     for (int i = 0; i < count; ++i) {
         ARRAY_T(entity_t) *spawned = _get_spawned_array(entity[i]);
 
         component_api_v0.component_destroy(world, spawned->data,
-                                               spawned->size);
+                                           spawned->size);
 
         _destroy_spawned_array(entity[i]);
     }
@@ -584,39 +582,37 @@ void entity_destroy(world_t world,
 
 void *entity_get_module_api(int api) {
     switch (api) {
-        case PLUGIN_EXPORT_API_ID:
-                {
-                    static struct module_api_v0 module = {0};
+        case PLUGIN_EXPORT_API_ID: {
+            static struct module_api_v0 module = {0};
 
-                    module.init = _init;
-                    module.shutdown = _shutdown;
+            module.init = _init;
+            module.shutdown = _shutdown;
 
 
-                    return &module;
-                }
+            return &module;
+        }
 
-        case ENTITY_API_ID:
-                {
-                    static struct entity_api_v0 api = {0};
+        case ENTITY_API_ID: {
+            static struct entity_api_v0 api = {0};
 
-                    api.entity_manager_create = entity_manager_create;
-                    api.entity_manager_destroy = entity_manager_destroy;
-                    api.entity_manager_alive = entity_manager_alive;
+            api.entity_manager_create = entity_manager_create;
+            api.entity_manager_destroy = entity_manager_destroy;
+            api.entity_manager_alive = entity_manager_alive;
 
-                    api.spawn_from_resource = entity_spawn_from_resource;
-                    api.spawn = entity_spawn;
-                    api.destroy = entity_destroy;
+            api.spawn_from_resource = entity_spawn_from_resource;
+            api.spawn = entity_spawn;
+            api.destroy = entity_destroy;
 
 #ifdef CETECH_CAN_COMPILE
-                    api.compiler_create_output = entity_compiler_create_output;
-                    api.compiler_destroy_output = entity_compiler_destroy_output;
-                    api.compiler_compile_entity = entity_compiler_compile_entity;
-                    api.compiler_ent_counter = entity_compiler_ent_counter;
-                    api.compiler_write_to_build = entity_compiler_write_to_build;
-                    api.resource_compiler = entity_resource_compiler;
+            api.compiler_create_output = entity_compiler_create_output;
+            api.compiler_destroy_output = entity_compiler_destroy_output;
+            api.compiler_compile_entity = entity_compiler_compile_entity;
+            api.compiler_ent_counter = entity_compiler_ent_counter;
+            api.compiler_write_to_build = entity_compiler_write_to_build;
+            api.resource_compiler = entity_resource_compiler;
 #endif
-                    return &api;
-                }
+            return &api;
+        }
 
         default:
             return NULL;

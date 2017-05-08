@@ -6,10 +6,10 @@
 
 #include <include/mpack/mpack.h>
 #include <include/nanomsg/nn.h>
-#include "../../allocator.h"
 
-#include "../../log.h"
-#include "../../errors.h"
+#include <cetech/core/allocator.h>
+#include <cetech/core/log.h>
+#include <cetech/core/errors.h>
 
 /***********************************************************************
 **** Internals
@@ -35,7 +35,7 @@ void nano_log_handler(enum log_level level,
 
     int socket = *((int *) _data); // TODO: problem if sizeof(void*) < int
 
-    if(!socket) {
+    if (!socket) {
         return;
     }
 

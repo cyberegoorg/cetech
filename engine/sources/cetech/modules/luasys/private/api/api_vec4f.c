@@ -1,13 +1,10 @@
 
-#include "../../../../core/allocator.h"
 #include "../../../transform/transform.h"
-#include "../../../../core/vec4f.inl"
-#include "../../luasys.h"
-#include "../../../../kernel/config.h"
-#include "../../../../kernel/application.h"
-#include "../../../../core/module.h"
+#include <cetech/core/vec4f.inl>
+#include <cetech/core/module.h>
 
-#include "../luasys.h"
+#include <cetech/modules/luasys/luasys.h>
+
 
 #define API_NAME "Vec4f"
 

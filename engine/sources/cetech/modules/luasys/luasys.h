@@ -9,7 +9,9 @@
 //==============================================================================
 
 #include <stddef.h>
-#include "../../core/math_types.h"
+#include <stdint.h>
+
+#include <cetech/core/math_types.h>
 
 //#include "include/luajit/lua.h"
 //#include "include/luajit/lauxlib.h"
@@ -18,7 +20,8 @@
 typedef struct stringid64_s stringid64_t;
 
 typedef struct lua_State lua_State;
-typedef int (*lua_CFunction) (lua_State *L);
+
+typedef int (*lua_CFunction)(lua_State *L);
 
 enum {
     LUA_API_ID = 13,
@@ -64,19 +67,19 @@ struct lua_api_v0 {
                      int idx);
 
     int (*is_vec2f)(lua_State *L,
-                        int idx);
+                    int idx);
 
     int (*is_vec3f)(lua_State *L,
-                        int idx);
+                    int idx);
 
     int (*is_vec4f)(lua_State *L,
-                        int idx);
+                    int idx);
 
     int (*is_quat)(lua_State *L,
-                       int idx);
+                   int idx);
 
     int (*is_mat44f)(lua_State *L,
-                         int idx);
+                     int idx);
 
     //! Get element type
     //! \param l Lua state
@@ -93,7 +96,7 @@ struct lua_api_v0 {
     //! \param l Lua state
     //! \param value Value
     void (*push_uint64_t)(lua_State *l,
-                     uint64_t value);
+                          uint64_t value);
 
     //! Push handler
     //! \param l
@@ -138,26 +141,27 @@ struct lua_api_v0 {
     //! \return Int value
     int (*to_int)(lua_State *l,
                   int i);
+
     //! Get element value as u64
     //! \param l
     //! \param i Element idx
     //! \return sInt value
     uint64_t (*to_u64)(lua_State *l,
-                  int i);
+                       int i);
 
     //! Get element value as float
     //! \param l
     //! \param i Element idx
     //! \return Float value
     float (*to_float)(lua_State *l,
-                  int i);
+                      int i);
 
     //! Get element value as hadler
     //! \param l
     //! \param i Element idx
     //! \return Handler value
     uint32_t (*to_handler)(lua_State *l,
-                            int i);
+                           int i);
 
     //! Get element value as string
     //! \param l
@@ -180,35 +184,35 @@ struct lua_api_v0 {
     //! \param i Element idx
     //! \return Vec2f
     vec2f_t *(*to_vec2f)(lua_State *l,
-                             int i);
+                         int i);
 
     //! Get element value as vec3f
     //! \param l
     //! \param i Element idx
     //! \return Vec3f
     vec3f_t *(*to_vec3f)(lua_State *l,
-                             int i);
+                         int i);
 
     //! Get element value as vec4f
     //! \param l
     //! \param i Element idx
     //! \return Vec4f
     vec4f_t *(*to_vec4f)(lua_State *l,
-                             int i);
+                         int i);
 
     //! Get element value as mat44f
     //! \param l
     //! \param i Element idx
     //! \return Mat44f
     mat44f_t *(*to_mat44f)(lua_State *l,
-                               int i);
+                           int i);
 
     //! Get element value as quat
     //! \param l
     //! \param i Element idx
     //! \return Quatf
     quatf_t *(*to_quat)(lua_State *l,
-                            int i);
+                        int i);
 
     //! Push vec2f
     //! \param l
@@ -274,6 +278,122 @@ struct lua_api_v0 {
                         const char *args,
                         ...);
 };
+
+/// REMOVE
+
+int luasys_get_top(lua_State *l);
+
+void luasys_remove(lua_State *l,
+                   int idx);
+
+void luasys_pop(lua_State *l,
+                int idx);
+
+int luasys_is_nil(lua_State *l,
+                  int idx);
+
+int luasys_is_number(lua_State *l,
+                     int idx);
+
+int luasys_value_type(lua_State *l,
+                      int idx);
+
+void luasys_push_nil(lua_State *l);
+
+void luasys_push_uint64_t(lua_State *l,
+                          uint64_t value);
+
+void luasys_push_handler(lua_State *l,
+                         uint32_t value);
+
+void luasys_push_int(lua_State *l,
+                     int value);
+
+void luasys_push_uint32_t(lua_State *l,
+                          uint32_t value);
+
+void luasys_push_bool(lua_State *l,
+                      int value);
+
+void luasys_push_float(lua_State *l,
+                       float value);
+
+void luasys_push_string(lua_State *l,
+                        const char *value);
+
+int luasys_to_bool(lua_State *l,
+                   int i);
+
+int luasys_to_int(lua_State *l,
+                  int i);
+
+uint32_t luasys_to_uin32_t(lua_State *l,
+                           int i);
+
+
+float luasys_to_float(lua_State *l,
+                      int i);
+
+uint32_t luasys_to_handler(lua_State *l,
+                           int i);
+
+const char *luasys_to_string(lua_State *,
+                             int i);
+
+const char *luasys_to_string_l(lua_State *,
+                               int,
+                               size_t *);
+
+vec2f_t *luasys_to_vec2f(lua_State *l,
+                         int i);
+
+vec3f_t *luasys_to_vec3f(lua_State *l,
+                         int i);
+
+vec4f_t *luasys_to_vec4f(lua_State *l,
+                         int i);
+
+mat44f_t *luasys_to_mat44f(lua_State *l,
+                           int i);
+
+quatf_t *luasys_to_quat(lua_State *l,
+                        int i);
+
+void luasys_push_vec2f(lua_State *l,
+                       vec2f_t v);
+
+void luasys_push_vec3f(lua_State *l,
+                       vec3f_t v);
+
+void luasys_push_vec4f(lua_State *l,
+                       vec4f_t v);
+
+void luasys_push_mat44f(lua_State *l,
+                        mat44f_t v);
+
+
+void luasys_push_quat(lua_State *l,
+                      quatf_t v);
+
+int luasys_execute_string(const char *str);
+
+void luasys_add_module_function(const char *module,
+                                const char *name,
+                                const lua_CFunction func);
+
+void luasys_add_module_constructor(const char *module,
+                                   const lua_CFunction func);
+
+void luasys_execute_resource(stringid64_t name);
+
+const struct game_callbacks *luasys_get_game_callbacks();
+
+void luasys_execute_boot_script(stringid64_t name);
+
+void luasys_call_global(const char *func,
+                        const char *args,
+                        ...);
+
 
 #endif //CETECH_LUA_TYPES_H
 //! \}

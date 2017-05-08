@@ -1,11 +1,11 @@
 #include <stddef.h>
-#include "../../../../core/allocator.h"
+#include <cetech/core/allocator.h>
 
-#include "../../../../kernel/config.h"
-#include "../../../../core/module.h"
+#include <cetech/kernel/config.h>
+#include <cetech/core/module.h>
+#include <cetech/core/module.h>
+#include <cetech/modules/luasys/luasys.h>
 
-#include "../../../../kernel/private/module.h"
-#include "../luasys.h"
 
 #define API_NAME "Plugin"
 

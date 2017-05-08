@@ -1,5 +1,5 @@
-#include "../../types.h"
 #include "include/SDL2/SDL.h"
+#include <cetech/core/types.h>
 
 //==============================================================================
 // Time

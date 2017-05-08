@@ -1,15 +1,13 @@
 #include <stddef.h>
 
-#include "../allocator.h"
-#include "../errors.h"
-#include "../log.h"
-#include "../string.h"
-#include "../cmd_line.h"
+#include <cetech/core/errors.h>
+#include <cetech/core/string.h>
+#include <cetech/core/cmd_line.h>
 
 
 static int _cmd_line_is_short(struct args args,
-                                  int i,
-                                  char shortopt) {
+                              int i,
+                              char shortopt) {
     return (shortopt != '\0' &&
             str_len(args.argv[i]) > 1 &&
             args.argv[i][0] == '-' &&
@@ -17,8 +15,8 @@ static int _cmd_line_is_short(struct args args,
 }
 
 static int _cmd_line_is_long(struct args args,
-                                 const int i,
-                                 const char *longopt) {
+                             const int i,
+                             const char *longopt) {
     return (str_len(args.argv[i]) > 2 &&
             args.argv[i][0] == '-' &&
             args.argv[i][1] == '-' &&
@@ -26,8 +24,8 @@ static int _cmd_line_is_long(struct args args,
 }
 
 int cmd_find_argument(struct args args,
-                          const char *longopt,
-                          char shortopt) {
+                      const char *longopt,
+                      char shortopt) {
 
     for (int i = 0; i < args.argc; i++) {
         if (_cmd_line_is_short(args, i, shortopt) ||
@@ -40,9 +38,9 @@ int cmd_find_argument(struct args args,
 }
 
 const char *cmd_get_parameter(struct args args,
-                                  const char *longopt,
-                                  char shortopt,
-                                  int param) {
+                              const char *longopt,
+                              char shortopt,
+                              int param) {
 
     int idx = cmd_find_argument(args, longopt, shortopt);
 
@@ -54,7 +52,7 @@ const char *cmd_get_parameter(struct args args,
 }
 
 int cmd_has_argument(struct args args,
-                         const char *longopt,
-                         char shortopt) {
+                     const char *longopt,
+                     char shortopt) {
     return cmd_find_argument(args, longopt, shortopt) < args.argc;
 }

@@ -3,9 +3,9 @@
 
 #include "include/luajit/luajit.h"
 
-#include "../../../core/mat44f.inl"
+#include <cetech/core/mat44f.inl>
 
-#include "luasys.h"
+#include <cetech/modules/luasys/luasys.h>
 
 static int _mat44f_mul(lua_State *L) {
     mat44f_t *a = luasys_to_mat44f(L, 1);

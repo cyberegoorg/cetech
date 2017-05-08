@@ -2,15 +2,16 @@
 // Includes
 //==============================================================================
 
-#include "../array.inl"
-#include "../eventstream.inl"
-#include "../../kernel/machine.h"
-#include "../../kernel/application.h"
-#include "../../kernel/config.h"
-#include "../../kernel/resource.h"
-#include "../module.h"
+#include <cetech/core/array.inl>
+#include <cetech/core/eventstream.inl>
+#include <cetech/core/module.h>
+#include <cetech/core/memory.h>
+
+#include <cetech/kernel/machine.h>
+#include <cetech/kernel/config.h>
+#include <cetech/kernel/resource.h>
+
 #include "sdl2/sdl_parts.h"
-#include "../memory.h"
 
 //==============================================================================
 // Defines

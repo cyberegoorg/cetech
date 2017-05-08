@@ -2,18 +2,16 @@
 // Includes
 //==============================================================================
 
-#include "../../../core/math_types.h"
-#include "../../../core/allocator.h"
-#include "../../application.h"
-#include "../../config.h"
-#include "../../resource.h"
-#include "../../../core/module.h"
-#include "../../../core/eventstream.inl"
-#include "../../machine.h"
+#include <cetech/core/math_types.h>
+#include <cetech/core/allocator.h>
+#include <cetech/kernel/config.h>
+#include <cetech/kernel/resource.h>
+#include <cetech/core/module.h>
+#include <cetech/core/eventstream.inl>
+#include <cetech/kernel/machine.h>
 
-#include "../../input.h"
-#include "../../../core/string.h"
-#include "../../../core/log.h"
+#include <cetech/kernel/input.h>
+#include <cetech/core/string.h>
 
 #include "mousebtnstr.h"
 
@@ -117,7 +115,7 @@ uint32_t mouse_button_index(const char *button_name) {
 
 const char *mouse_button_name(const uint32_t button_index) {
     CETECH_ASSERT(LOG_WHERE,
-               (button_index >= 0) && (button_index < MOUSE_BTN_MAX));
+                  (button_index >= 0) && (button_index < MOUSE_BTN_MAX));
 
     return _btn_to_str[button_index];
 }
@@ -125,7 +123,7 @@ const char *mouse_button_name(const uint32_t button_index) {
 int mouse_button_state(uint32_t idx,
                        const uint32_t button_index) {
     CETECH_ASSERT(LOG_WHERE,
-               (button_index >= 0) && (button_index < MOUSE_BTN_MAX));
+                  (button_index >= 0) && (button_index < MOUSE_BTN_MAX));
 
     return _G.state[button_index];
 }
@@ -133,7 +131,7 @@ int mouse_button_state(uint32_t idx,
 int mouse_button_pressed(uint32_t idx,
                          const uint32_t button_index) {
     CETECH_ASSERT(LOG_WHERE,
-               (button_index >= 0) && (button_index < MOUSE_BTN_MAX));
+                  (button_index >= 0) && (button_index < MOUSE_BTN_MAX));
 
     return _G.state[button_index] && !_G.last_state[button_index];
 }
@@ -141,13 +139,14 @@ int mouse_button_pressed(uint32_t idx,
 int mouse_button_released(uint32_t idx,
                           const uint32_t button_index) {
     CETECH_ASSERT(LOG_WHERE,
-               (button_index >= 0) && (button_index < MOUSE_BTN_MAX));
+                  (button_index >= 0) && (button_index < MOUSE_BTN_MAX));
 
     return !_G.state[button_index] && _G.last_state[button_index];
 }
 
 const char *mouse_axis_name(const uint32_t axis_index) {
-    CETECH_ASSERT(LOG_WHERE, (axis_index >= 0) && (axis_index < MOUSE_AXIS_MAX));
+    CETECH_ASSERT(LOG_WHERE,
+                  (axis_index >= 0) && (axis_index < MOUSE_AXIS_MAX));
 
     return _axis_to_str[axis_index];
 }
@@ -169,8 +168,9 @@ uint32_t mouse_axis_index(const char *axis_name) {
 }
 
 vec2f_t mouse_axis(uint32_t idx,
-                       const uint32_t axis_index) {
-    CETECH_ASSERT(LOG_WHERE, (axis_index >= 0) && (axis_index < MOUSE_AXIS_MAX));
+                   const uint32_t axis_index) {
+    CETECH_ASSERT(LOG_WHERE,
+                  (axis_index >= 0) && (axis_index < MOUSE_AXIS_MAX));
 
     switch (axis_index) {
         case MOUSE_AXIS_ABSOULTE:
@@ -190,7 +190,7 @@ void mouse_set_cursor_pos(vec2f_t pos) {
 
 void *mouse_get_module_api(int api) {
 
-    if (api == PLUGIN_EXPORT_API_ID ) {
+    if (api == PLUGIN_EXPORT_API_ID) {
         static struct module_api_v0 module = {0};
 
         module.init = _init;

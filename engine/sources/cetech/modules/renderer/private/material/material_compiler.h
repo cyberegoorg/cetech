@@ -2,8 +2,8 @@
 #define CETECH_MATERIAL_COMPILER_H
 
 #include <stdio.h>
-#include "../../../../core/yaml.h"
-#include "../../../../core/fs.h"
+#include <cetech/core/yaml.h>
+#include <cetech/core/fs.h>
 
 struct material_compile_output {
     ARRAY_T(char) uniform_names;
@@ -31,15 +31,15 @@ static void _preprocess(const char *filename,
         char full_path[256] = {0};
         const char *source_dir = resource_api_v0.compiler_get_source_dir();
         path_join(full_path, CETECH_ARRAY_LEN(full_path), source_dir,
-                      prefab_file);
+                  prefab_file);
 
         struct vio *prefab_vio = vio_from_file(full_path, VIO_OPEN_READ,
-                                                   memory_api_v0.main_allocator());
+                                               memory_api_v0.main_allocator());
 
         char prefab_data[vio_size(prefab_vio) + 1];
         memory_set(prefab_data, 0, vio_size(prefab_vio) + 1);
         vio_read(prefab_vio, prefab_data, sizeof(char),
-                     vio_size(prefab_vio));
+                 vio_size(prefab_vio));
         vio_close(prefab_vio);
 
         yaml_document_t h;
@@ -67,7 +67,8 @@ static void _forach_texture_clb(yaml_node_t key,
 
     ARRAY_PUSH(char, &output->uniform_names, uniform_name,
                CETECH_ARRAY_LEN(uniform_name));
-    ARRAY_PUSH(uint8_t, &output->data, (uint8_t *) &texture_name, sizeof(stringid64_t));
+    ARRAY_PUSH(uint8_t, &output->data, (uint8_t *) &texture_name,
+               sizeof(stringid64_t));
 }
 
 static void _forach_vec4fs_clb(yaml_node_t key,
@@ -88,8 +89,8 @@ static void _forach_vec4fs_clb(yaml_node_t key,
 }
 
 static void _forach_mat44f_clb(yaml_node_t key,
-                                   yaml_node_t value,
-                                   void *_data) {
+                               yaml_node_t value,
+                               void *_data) {
     struct material_compile_output *output = _data;
 
     output->mat44f_count += 1;
@@ -127,11 +128,11 @@ static int _material_resource_compiler(const char *filename,
                                        struct compilator_api *compilator_api) {
     char *source_data =
     CETECH_ALLOCATE(memory_api_v0.main_allocator(), char,
-                 vio_size(source_vio) + 1);
+                    vio_size(source_vio) + 1);
     memory_set(source_data, 0, vio_size(source_vio) + 1);
 
     vio_read(source_vio, source_data, sizeof(char),
-                 vio_size(source_vio));
+             vio_size(source_vio));
 
     yaml_document_t h;
     yaml_node_t root = yaml_load_str(source_data, &h);
@@ -178,9 +179,9 @@ static int _material_resource_compiler(const char *filename,
 
     vio_write(build_vio, &resource, sizeof(resource), 1);
     vio_write(build_vio, output.uniform_names.data, sizeof(char),
-                  ARRAY_SIZE(&output.uniform_names));
+              ARRAY_SIZE(&output.uniform_names));
     vio_write(build_vio, output.data.data, sizeof(uint8_t),
-                  ARRAY_SIZE(&output.data));
+              ARRAY_SIZE(&output.data));
 
     ARRAY_DESTROY(char, &output.uniform_names);
     ARRAY_DESTROY(uint8_t, &output.data);

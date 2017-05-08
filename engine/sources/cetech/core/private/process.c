@@ -1,7 +1,7 @@
 
 #include <stdio.h>
 
-#include "../log.h"
+#include <cetech/core/log.h>
 
 int exec(const char *argv) {
 #if defined(CETECH_LINUX)

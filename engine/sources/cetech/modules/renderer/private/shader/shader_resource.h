@@ -78,5 +78,4 @@ static const resource_callbacks_t shader_resource_callback = {
 };
 
 
-
 #endif //CETECH_SHADER_RESOURCE_H

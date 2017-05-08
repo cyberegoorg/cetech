@@ -91,11 +91,12 @@ void malloc_allocator_destroy(struct allocator *a);
 //==============================================================================
 
 struct allocator *scratch_allocator_create(struct allocator *backing,
-                                               int size);
+                                           int size);
 
 void scratch_allocator_destroy(struct allocator *a);
 
 void *memory_malloc(size_t size);
+
 void memory_free(void *ptr);
 
 void *memory_copy(void *__restrict dest,

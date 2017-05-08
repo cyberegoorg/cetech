@@ -9,11 +9,14 @@
 // Includes
 //==============================================================================
 
-#include "../core/array.inl"
+#include <cetech/core/array.inl>
 
 typedef struct yaml_node_s yaml_node_t;
 typedef struct stringid64_s stringid64_t;
 typedef struct world_s world_t;
+
+struct entity_compile_output;
+struct compilator_api;
 
 enum {
     ENTITY_API_ID = 11,

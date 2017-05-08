@@ -3,15 +3,14 @@
 //==============================================================================
 
 #include <include/SDL2/SDL.h>
-#include "../../allocator.h"
-#include "../../../kernel/application.h"
-#include "../../../kernel/config.h"
-#include "../../../kernel/resource.h"
 
-#include "../../module.h"
-#include "../../eventstream.inl"
-#include "../../../kernel/machine.h"
-#include "../../window.h"
+#include <cetech/core/module.h>
+#include <cetech/core/eventstream.inl>
+#include <cetech/core/window.h>
+
+#include <cetech/kernel/application.h>
+#include <cetech/kernel/resource.h>
+#include <cetech/kernel/machine.h>
 
 
 //==============================================================================
@@ -67,7 +66,7 @@ void sdl_mouse_process(struct eventstream *stream) {
         window_t main_window = app_api_v0.main_window();
         uint32_t window_size[2] = {0};
         window_api_v0.get_size(main_window, &window_size[0],
-                                          &window_size[1]);
+                               &window_size[1]);
 
         _G.position[0] = pos[0];
         _G.position[1] = window_size[1] - pos[1];

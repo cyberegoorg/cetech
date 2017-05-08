@@ -8,7 +8,7 @@
 // Includes
 //==============================================================================
 
-#include "../core/math_types.h"
+#include <cetech/core/math_types.h>
 
 enum {
     KEYBOARD_API_ID = 3,
@@ -69,7 +69,7 @@ struct gamepad_api_v0 {
     //! \param axis_index Axis index
     //! \return Axis value
     vec2f_t (*axis)(uint32_t idx,
-                        const uint32_t axis_index);
+                    const uint32_t axis_index);
 
     //! Play rumble
     //! \param gamepad Gamepad
@@ -163,7 +163,7 @@ struct mouse_api_v0 {
     //! \param axis_index Axis index
     //! \return Axis value
     vec2f_t (*axis)(uint32_t idx,
-                        const uint32_t axis_index);
+                    const uint32_t axis_index);
 };
 
 

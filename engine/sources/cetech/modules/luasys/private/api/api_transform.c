@@ -1,16 +1,11 @@
 
-#include "../../../../kernel/world.h"
-#include "../../../transform/transform.h"
-#include "../../../../core/allocator.h"
-#include "../../../../kernel/config.h"
-#include "../../../../kernel/application.h"
-#include "../../../../kernel/resource.h"
+#include <cetech/kernel/world.h>
 
-#include "../../../../core/module.h"
-#include "../../../../core/handler.h"
-#include "../../../../kernel/entity.h"
-#include "../../luasys.h"
-#include "../luasys.h"
+#include "../../../transform/transform.h"
+#include <cetech/core/module.h>
+#include <cetech/modules/luasys/luasys.h>
+
+#include <cetech/kernel/entity.h>
 
 #define API_NAME "Transform"
 

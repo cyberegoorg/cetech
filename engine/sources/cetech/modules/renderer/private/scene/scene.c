@@ -4,23 +4,18 @@
 
 #include <bgfx/c99/bgfx.h>
 
-#include <include/assimp/cimport.h>
+#include <cetech/core/allocator.h>
+#include <cetech/core/hash.h>
+#include <cetech/core/memory.h>
+#include <cetech/core/module.h>
+#include <cetech/core/map.inl>
 
-#include "../../../../core/allocator.h"
-#include "../../../../core/hash.h"
+#include <cetech/kernel/resource.h>
+#include <cetech/kernel/entity.h>
+#include <cetech/kernel/world.h>
+
 #include "../../../scenegraph/scenegraph.h"
-#include "../../../../core/memory.h"
-#include "../../../../kernel/application.h"
-#include "../../../../kernel/config.h"
-#include "../../../../kernel/resource.h"
-#include "../../../../kernel/entity.h"
-#include "../../../../kernel/world.h"
 
-#include "../../../../core/module.h"
-
-#include "../../../../kernel/resource.h"
-#include "../../../../core/array.inl"
-#include "../../../../core/map.inl"
 #include "scene_blob.h"
 
 //==============================================================================
@@ -92,7 +87,7 @@ struct scene_instance *_get_scene_instance(stringid64_t scene) {
 // Resource
 //==============================================================================
 #include "scene_resource.h"
-#include "../../../../kernel/private/module.h"
+#include <cetech/core/module.h>
 
 //==============================================================================
 // Interface
@@ -101,7 +96,8 @@ struct scene_instance *_get_scene_instance(stringid64_t scene) {
 int scene_init() {
     _G = (struct G) {0};
 
-    memory_api_v0 = *(struct memory_api_v0 *) module_get_engine_api(MEMORY_API_ID);
+    memory_api_v0 = *(struct memory_api_v0 *) module_get_engine_api(
+            MEMORY_API_ID);
     resource_api_v0 = *(struct resource_api_v0 *) module_get_engine_api(
             RESOURCE_API_ID);
     scenegprah_api_v0 = *(struct scenegprah_api_v0 *) module_get_engine_api(
@@ -109,7 +105,8 @@ int scene_init() {
 
     _G.type = stringid64_from_string("scene");
 
-    MAP_INIT(scene_instance, &_G.scene_instance, memory_api_v0.main_allocator());
+    MAP_INIT(scene_instance, &_G.scene_instance,
+             memory_api_v0.main_allocator());
 
     resource_api_v0.register_type(_G.type, scene_resource_callback);
 
@@ -134,7 +131,8 @@ void scene_submit(stringid64_t scene,
         return;
     }
 
-    uint8_t idx = MAP_GET(uint8_t, &instance->geom_map, geom_name.id, UINT8_MAX);
+    uint8_t idx = MAP_GET(uint8_t, &instance->geom_map, geom_name.id,
+                          UINT8_MAX);
 
     if (idx == UINT8_MAX) {
         return;
@@ -154,7 +152,7 @@ void scene_create_graph(world_t world,
     mat44f_t *node_pose = scene_blob_node_pose(res);
 
     scenegprah_api_v0.create(world, entity, node_name, node_parent, node_pose,
-                           res->node_count);
+                             res->node_count);
 }
 
 stringid64_t scene_get_mesh_node(stringid64_t scene,

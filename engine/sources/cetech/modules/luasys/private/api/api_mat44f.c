@@ -1,13 +1,9 @@
 
-#include "../../../../core/allocator.h"
-#include "../../../../core/mat44f.inl"
+#include <cetech/core/mat44f.inl>
 
-#include "../../luasys.h"
-#include "../luasys.h"
-#include "../../../../kernel/config.h"
-#include "../../../../kernel/application.h"
+#include <cetech/modules/luasys/luasys.h>
 
-#include "../../../../core/module.h"
+#include <cetech/core/module.h>
 
 #define API_NAME "Mat44f"
 

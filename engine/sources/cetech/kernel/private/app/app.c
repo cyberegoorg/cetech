@@ -4,26 +4,26 @@
 
 #include <unistd.h>
 
-#include "../../../core/allocator.h"
+#include <cetech/core/allocator.h>
 
-#include "../../../core/os.h"
-#include "../../../core/window.h"
-#include "../../../core/hash.h"
-#include "../../../core/cmd_line.h"
+#include <cetech/core/os.h>
+#include <cetech/core/window.h>
+#include <cetech/core/hash.h>
+#include <cetech/core/cmd_line.h>
+#include <cetech/core/eventstream.inl>
+#include <cetech/core/memory.h>
 
 #include "app.h"
-#include "../../config.h"
-#include "../../../core/eventstream.inl"
-#include "../../application.h"
+#include <cetech/kernel/config.h>
+#include <cetech/kernel/application.h>
+#include <cetech/kernel/resource.h>
+#include <cetech/kernel/develop.h>
+#include <cetech/kernel/task.h>
 
-#include "../../resource.h"
-#include "../../../modules/luasys/luasys.h"
-#include "../../../modules/renderer/renderer.h"
-#include "../../develop.h"
-#include "../../../core/memory.h"
 #include "../static_systems.h"
 
-#include "../../task.h"
+#include <cetech/modules/luasys/luasys.h>
+#include <cetech/modules/renderer/renderer.h>
 
 #define LOG_WHERE "application"
 
@@ -124,23 +124,23 @@ void _init_api() {
 
 int _init_config() {
     _G.config = (struct GConfig) {
-        .boot_pkg = config_api_v0.new_str("core.boot_pkg", "Boot package",
-                                          "boot"),
+            .boot_pkg = config_api_v0.new_str("core.boot_pkg", "Boot package",
+                                              "boot"),
 
-        .boot_script = config_api_v0.new_str("core.boot_script",
-                                             "Boot script", "lua/boot"),
+            .boot_script = config_api_v0.new_str("core.boot_script",
+                                                 "Boot script", "lua/boot"),
 
-        .screen_x = config_api_v0.new_int("screen.x", "Screen width", 1024),
-        .screen_y = config_api_v0.new_int("screen.y", "Screen height", 768),
-        .fullscreen = config_api_v0.new_int("screen.fullscreen",
-                                            "Fullscreen", 0),
+            .screen_x = config_api_v0.new_int("screen.x", "Screen width", 1024),
+            .screen_y = config_api_v0.new_int("screen.y", "Screen height", 768),
+            .fullscreen = config_api_v0.new_int("screen.fullscreen",
+                                                "Fullscreen", 0),
 
-        .daemon = config_api_v0.new_int("daemon", "Daemon mode", 0),
-        .compile = config_api_v0.new_int("compile", "Comple", 0),
-        .continue_ = config_api_v0.new_int("continue",
-                                           "Continue after compile", 0),
-        .wait = config_api_v0.new_int("wait", "Wait for client", 0),
-        .wid = config_api_v0.new_int("wid", "Wid", 0)
+            .daemon = config_api_v0.new_int("daemon", "Daemon mode", 0),
+            .compile = config_api_v0.new_int("compile", "Comple", 0),
+            .continue_ = config_api_v0.new_int("continue",
+                                               "Continue after compile", 0),
+            .wait = config_api_v0.new_int("wait", "Wait for client", 0),
+            .wid = config_api_v0.new_int("wid", "Wid", 0)
     };
 
 
@@ -196,7 +196,6 @@ int application_init(int argc,
 #ifdef CETECH_CAN_COMPILE
     ADD_STATIC_PLUGIN(resourcecompiler);
 #endif
-
 
 
     cvar_init();

@@ -1,13 +1,9 @@
-#include <stddef.h>
-#include "../../../../core/allocator.h"
-#include "../../../../core/vec2f.inl"
 
-#include "../../luasys.h"
-#include "../../../../kernel/config.h"
-#include "../../../../kernel/application.h"
-#include "../../../../core/module.h"
+#include <cetech/core/vec2f.inl>
+#include <cetech/core/module.h>
 
-#include "../luasys.h"
+#include <cetech/modules/luasys/luasys.h>
+
 
 #define API_NAME "Vec2f"
 

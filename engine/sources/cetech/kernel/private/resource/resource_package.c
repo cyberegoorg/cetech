@@ -4,20 +4,18 @@
 
 #include <stddef.h>
 
-#include "../../../core/allocator.h"
-#include "../../../core/hash.h"
-#include "../../task.h"
-#include "../../config.h"
-#include "../../application.h"
-#include "../../resource.h"
-#include "../../../core/yaml.h"
-#include "../../../core/thread.h"
-#include "../../../core/memory.h"
-#include "../../../core/module.h"
-#include "../../../core/array.inl"
+#include <cetech/core/allocator.h>
+#include <cetech/core/hash.h>
+#include <cetech/kernel/task.h>
+#include <cetech/kernel/resource.h>
+#include <cetech/core/yaml.h>
+#include <cetech/core/thread.h>
+#include <cetech/core/memory.h>
+#include <cetech/core/module.h>
+#include <cetech/core/array.inl>
 
 #include "resource_package.h"
-#include "../../../core/fs.h"
+#include <cetech/core/fs.h>
 
 
 //==============================================================================
@@ -89,16 +87,19 @@ int _package_compiler(const char *filename,
     char source_data[vio_size(source_vio) + 1];
     memory_set(source_data, 0, vio_size(source_vio) + 1);
     vio_read(source_vio, source_data, sizeof(char),
-                 vio_size(source_vio));
+             vio_size(source_vio));
 
     yaml_document_t h;
     yaml_node_t root = yaml_load_str(source_data, &h);
 
     struct package_compile_data compile_data = {0};
-    ARRAY_INIT(stringid64_t, &compile_data.types, memory_api_v0.main_allocator());
-    ARRAY_INIT(stringid64_t, &compile_data.name, memory_api_v0.main_allocator());
+    ARRAY_INIT(stringid64_t, &compile_data.types,
+               memory_api_v0.main_allocator());
+    ARRAY_INIT(stringid64_t, &compile_data.name,
+               memory_api_v0.main_allocator());
     ARRAY_INIT(uint32_t, &compile_data.offset, memory_api_v0.main_allocator());
-    ARRAY_INIT(uint32_t, &compile_data.name_count, memory_api_v0.main_allocator());
+    ARRAY_INIT(uint32_t, &compile_data.name_count,
+               memory_api_v0.main_allocator());
 
     yaml_node_foreach_dict(root, forach_clb, &compile_data);
 
@@ -109,20 +110,22 @@ int _package_compiler(const char *filename,
                                                          ARRAY_SIZE(
                                                                  &compile_data.types));
     resource.name_offset = resource.name_count_offset +
-                           (sizeof(uint32_t) * ARRAY_SIZE(&compile_data.name_count));
+                           (sizeof(uint32_t) *
+                            ARRAY_SIZE(&compile_data.name_count));
     resource.offset_offset = resource.name_offset + (sizeof(stringid64_t) *
                                                      ARRAY_SIZE(
                                                              &compile_data.name));
 
     vio_write(build_vio, &resource, sizeof(resource), 1);
     vio_write(build_vio, ARRAY_BEGIN(&compile_data.types),
-                  sizeof(stringid64_t), ARRAY_SIZE(&compile_data.types));
-    vio_write(build_vio, ARRAY_BEGIN(&compile_data.name_count), sizeof(uint32_t),
-                  ARRAY_SIZE(&compile_data.name_count));
+              sizeof(stringid64_t), ARRAY_SIZE(&compile_data.types));
+    vio_write(build_vio, ARRAY_BEGIN(&compile_data.name_count),
+              sizeof(uint32_t),
+              ARRAY_SIZE(&compile_data.name_count));
     vio_write(build_vio, ARRAY_BEGIN(&compile_data.name),
-                  sizeof(stringid64_t), ARRAY_SIZE(&compile_data.name));
+              sizeof(stringid64_t), ARRAY_SIZE(&compile_data.name));
     vio_write(build_vio, ARRAY_BEGIN(&compile_data.offset), sizeof(uint32_t),
-                  ARRAY_SIZE(&compile_data.offset));
+              ARRAY_SIZE(&compile_data.offset));
 
     ARRAY_DESTROY(stringid64_t, &compile_data.types);
     ARRAY_DESTROY(stringid64_t, &compile_data.name);
@@ -157,21 +160,22 @@ void package_shutdown() {
 void package_task(void *data) {
     struct package_task_data *task_data = data;
     struct package_resource *package = resource_api_v0.get(_G.package_typel,
-                                                         task_data->name);
+                                                           task_data->name);
 
     const uint32_t task_count = package->type_count;
     for (int j = 0; j < task_count; ++j) {
         resource_api_v0.load_now(package_type(package)[j],
-                               &package_name(package)[package_offset(
-                                       package)[j]],
-                               package_name_count(package)[j]);
+                                 &package_name(package)[package_offset(
+                                         package)[j]],
+                                 package_name_count(package)[j]);
     }
 }
 
 void package_load(stringid64_t name) {
 
     struct package_task_data *task_data =
-    CETECH_ALLOCATE(memory_api_v0.main_allocator(), struct package_task_data, 1);
+    CETECH_ALLOCATE(memory_api_v0.main_allocator(), struct package_task_data,
+                    1);
 
     task_data->name = name;
 
@@ -187,13 +191,14 @@ void package_load(stringid64_t name) {
 
 void package_unload(stringid64_t name) {
     struct package_resource *package = resource_api_v0.get(_G.package_typel,
-                                                         name);
+                                                           name);
 
     const uint32_t task_count = package->type_count;
     for (int j = 0; j < task_count; ++j) {
         resource_api_v0.unload(package_type(package)[j],
-                             &package_name(package)[package_offset(package)[j]],
-                             package_name_count(package)[j]);
+                               &package_name(package)[package_offset(
+                                       package)[j]],
+                               package_name_count(package)[j]);
     }
 }
 
@@ -205,9 +210,9 @@ int package_is_loaded(stringid64_t name) {
     const uint32_t task_count = package->type_count;
     for (int i = 0; i < task_count; ++i) {
         if (!resource_api_v0.can_get_all(package_type(package)[i],
-                                       &package_name(package)[package_offset(
-                                               package)[i]],
-                                       package_name_count(package)[i])) {
+                                         &package_name(package)[package_offset(
+                                                 package)[i]],
+                                         package_name_count(package)[i])) {
             return 0;
         }
     }

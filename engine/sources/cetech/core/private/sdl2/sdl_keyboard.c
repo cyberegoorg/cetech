@@ -3,14 +3,11 @@
 //==============================================================================
 
 #include <include/SDL2/SDL.h>
-#include "../../allocator.h"
-#include "../../../kernel/application.h"
-#include "../../../kernel/config.h"
-#include "../../../kernel/resource.h"
-#include "../../eventstream.inl"
 
-#include "../../module.h"
-#include "../../../kernel/machine.h"
+#include <cetech/core/eventstream.inl>
+#include <cetech/core/module.h>
+
+#include <cetech/kernel/machine.h>
 //==============================================================================
 // Defines
 //==============================================================================

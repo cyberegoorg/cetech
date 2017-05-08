@@ -2,9 +2,9 @@
 #define CETECH_SHADER_COMPILER_H
 
 
-#include "../../../../core/fs.h"
-#include "../../../../core/os.h"
-#include "../../../../core/yaml.h"
+#include <cetech/core/fs.h>
+#include <cetech/core/os.h>
+#include <cetech/core/yaml.h>
 #include <stdio.h>
 
 static int _shaderc(const char *input,
@@ -16,8 +16,8 @@ static int _shaderc(const char *input,
     char cmd_line[4096] = {0};
 
     int s = resource_api_v0.compiler_external_join(cmd_line,
-                                                 CETECH_ARRAY_LEN(cmd_line),
-                                                 "shaderc");
+                                                   CETECH_ARRAY_LEN(cmd_line),
+                                                   "shaderc");
     s += snprintf(cmd_line + s, CETECH_ARRAY_LEN(cmd_line) - s,
                   ""
                           " -f %s"
@@ -74,7 +74,7 @@ static int _shader_resource_compiler(const char *filename,
     char source_data[vio_size(source_vio) + 1];
     memory_set(source_data, 0, vio_size(source_vio) + 1);
     vio_read(source_vio, source_data, sizeof(char),
-                 vio_size(source_vio));
+             vio_size(source_vio));
 
     yaml_document_t h;
     yaml_node_t root = yaml_load_str(source_data, &h);
@@ -87,7 +87,7 @@ static int _shader_resource_compiler(const char *filename,
 
     char include_dir[1024] = {0};
     path_join(include_dir, CETECH_ARRAY_LEN(include_dir), core_dir,
-                  "bgfxshaders");
+              "bgfxshaders");
 
     struct shader resource = {0};
 
@@ -99,17 +99,19 @@ static int _shader_resource_compiler(const char *filename,
     char output_path[4096] = {0};
     char tmp_filename[4096] = {0};
 
-    resource_api_v0.compiler_get_build_dir(build_dir, CETECH_ARRAY_LEN(build_dir),
-                                         app_api_v0.platform());
+    resource_api_v0.compiler_get_build_dir(build_dir,
+                                           CETECH_ARRAY_LEN(build_dir),
+                                           app_api_v0.platform());
     resource_api_v0.compiler_get_tmp_dir(tmp_dir, CETECH_ARRAY_LEN(tmp_dir),
-                                       app_api_v0.platform());
+                                         app_api_v0.platform());
 
     //////// VS
     yaml_as_string(vs_input, input_str, CETECH_ARRAY_LEN(input_str));
     compilator_api->add_dependency(filename, input_str);
     path_join(input_path, CETECH_ARRAY_LEN(input_path), source_dir, input_str);
 
-    _gen_tmp_name(output_path, tmp_dir, CETECH_ARRAY_LEN(tmp_filename), input_str);
+    _gen_tmp_name(output_path, tmp_dir, CETECH_ARRAY_LEN(tmp_filename),
+                  input_str);
 
     int result = _shaderc(input_path, output_path, include_dir, "vertex",
                           platform, vs_profile);
@@ -119,10 +121,10 @@ static int _shader_resource_compiler(const char *filename,
     }
 
     struct vio *tmp_file = vio_from_file(output_path, VIO_OPEN_READ,
-                                             memory_api_v0.main_allocator());
+                                         memory_api_v0.main_allocator());
     char *vs_data =
-    CETECH_ALLOCATE(memory_api_v0.main_allocator(), char,
-                 vio_size(tmp_file) + 1);
+            CETECH_ALLOCATE(memory_api_v0.main_allocator(), char,
+                            vio_size(tmp_file) + 1);
     vio_read(tmp_file, vs_data, sizeof(char), vio_size(tmp_file));
     resource.vs_size = vio_size(tmp_file);
     vio_close(tmp_file);
@@ -133,7 +135,8 @@ static int _shader_resource_compiler(const char *filename,
     compilator_api->add_dependency(filename, input_str);
     path_join(input_path, CETECH_ARRAY_LEN(input_path), source_dir, input_str);
 
-    _gen_tmp_name(output_path, tmp_dir, CETECH_ARRAY_LEN(tmp_filename), input_str);
+    _gen_tmp_name(output_path, tmp_dir, CETECH_ARRAY_LEN(tmp_filename),
+                  input_str);
 
     result = _shaderc(input_path, output_path, include_dir, "fragment",
                       platform, fs_profile);
@@ -143,10 +146,10 @@ static int _shader_resource_compiler(const char *filename,
     }
 
     tmp_file = vio_from_file(output_path, VIO_OPEN_READ,
-                                 memory_api_v0.main_allocator());
+                             memory_api_v0.main_allocator());
     char *fs_data =
-    CETECH_ALLOCATE(memory_api_v0.main_allocator(), char,
-                 vio_size(tmp_file) + 1);
+            CETECH_ALLOCATE(memory_api_v0.main_allocator(), char,
+                            vio_size(tmp_file) + 1);
     vio_read(tmp_file, fs_data, sizeof(char), vio_size(tmp_file));
     resource.fs_size = vio_size(tmp_file);
     vio_close(tmp_file);

@@ -21,7 +21,7 @@ typedef struct vec2f_s {
 } vec2f_t;
 
 
-typedef struct vec3f_s{
+typedef struct vec3f_s {
     union {
         float f[3];
         struct {
@@ -55,7 +55,7 @@ typedef vec4f_t quatf_t;
 // Matrix
 //==============================================================================
 
-typedef struct mat33f_s{
+typedef struct mat33f_s {
     union {
         float f[3 * 3];
         struct {
@@ -67,7 +67,7 @@ typedef struct mat33f_s{
 } mat33f_t;
 
 
-typedef struct mat44f_s{
+typedef struct mat44f_s {
     union {
         float f[4 * 4];
         struct {

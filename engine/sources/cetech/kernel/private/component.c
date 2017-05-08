@@ -2,21 +2,20 @@
 // Includes
 //==============================================================================
 
-#include "../../core/map.inl"
-#include "../../core/vec3f.inl"
+#include <cetech/core/map.inl>
+#include <cetech/core/vec3f.inl>
 
-#include "../../core/memory.h"
-#include "../application.h"
-#include "../config.h"
-#include "../resource.h"
+#include <cetech/core/memory.h>
+#include <cetech/kernel/config.h>
+#include <cetech/kernel/resource.h>
 
-#include "../../core/module.h"
-#include "../../core/hash.h"
+#include <cetech/core/module.h>
+#include <cetech/core/hash.h>
 
-#include "../world.h"
-#include "../entity.h"
-#include "../component.h"
-#include "../../core/yaml.h"
+#include <cetech/kernel/world.h>
+#include <cetech/kernel/entity.h>
+#include <cetech/kernel/component.h>
+#include <cetech/core/yaml.h>
 
 //==============================================================================
 // Globals
@@ -49,7 +48,8 @@ static void _init(get_api_fce_t get_engine_api) {
     MAP_INIT(component_compiler_t, &_G.compiler_map,
              memory_api_v0.main_allocator());
     MAP_INIT(uint32_t, &_G.spawn_order_map, memory_api_v0.main_allocator());
-    MAP_INIT(component_clb_t, &_G.component_clb, memory_api_v0.main_allocator());
+    MAP_INIT(component_clb_t, &_G.component_clb,
+             memory_api_v0.main_allocator());
 }
 
 static void _shutdown() {
@@ -135,15 +135,15 @@ void component_destroy(world_t world,
 }
 
 static void _set_property(stringid64_t type,
-                   world_t world,
-                   entity_t entity,
-                   stringid64_t key,
-                   struct property_value value) {
+                          world_t world,
+                          entity_t entity,
+                          stringid64_t key,
+                          struct property_value value) {
 
     struct component_clb clb = MAP_GET(component_clb_t, &_G.component_clb,
                                        type.id, component_clb_null);
 
-    if(!clb.set_property){
+    if (!clb.set_property) {
         return;
     }
 
@@ -151,47 +151,47 @@ static void _set_property(stringid64_t type,
 }
 
 static struct property_value _get_property(stringid64_t type,
-                                    world_t world,
-                                    entity_t entity,
-                                    stringid64_t key) {
+                                           world_t world,
+                                           entity_t entity,
+                                           stringid64_t key) {
 
     struct property_value value = {PROPERTY_INVALID};
 
     struct component_clb clb = MAP_GET(component_clb_t, &_G.component_clb,
                                        type.id, component_clb_null);
 
-    if(!clb.get_property){
-        return (struct property_value){PROPERTY_INVALID};
+    if (!clb.get_property) {
+        return (struct property_value) {PROPERTY_INVALID};
     }
 
     return clb.get_property(world, entity, key);
-}void *component_get_module_api(int api) {
+}
+
+void *component_get_module_api(int api) {
     switch (api) {
-        case PLUGIN_EXPORT_API_ID:
-                {
-                    static struct module_api_v0 module = {0};
+        case PLUGIN_EXPORT_API_ID: {
+            static struct module_api_v0 module = {0};
 
-                    module.init = _init;
-                    module.shutdown = _shutdown;
+            module.init = _init;
+            module.shutdown = _shutdown;
 
 
-                    return &module;
-                }
+            return &module;
+        }
 
-        case COMPONENT_API_ID:
-                {
-                    static struct component_api_v0 api = {0};
-                    api.component_register_compiler = component_register_compiler;
-                    api.component_compile = component_compile;
-                    api.component_get_spawn_order = component_get_spawn_order;
-                    api.component_register_type = component_register_type;
-                    api.component_spawn = component_spawn;
-                    api.component_destroy = component_destroy;
-                    api.set_property = _set_property;
-                    api.get_property = _get_property;
+        case COMPONENT_API_ID: {
+            static struct component_api_v0 api = {0};
+            api.component_register_compiler = component_register_compiler;
+            api.component_compile = component_compile;
+            api.component_get_spawn_order = component_get_spawn_order;
+            api.component_register_type = component_register_type;
+            api.component_spawn = component_spawn;
+            api.component_destroy = component_destroy;
+            api.set_property = _set_property;
+            api.get_property = _get_property;
 
-                    return &api;
-                }
+            return &api;
+        }
 
         default:
             return NULL;

@@ -1,10 +1,8 @@
 #include <stdio.h>
 #include <memory.h>
-#include "../../allocator.h"
-#include "../../string.h"
 
-
-#include "../../types.h"
+#include <cetech/core/types.h>
+#include <cetech/core/allocator.h>
 
 #if defined(CETECH_LINUX)
 #define DIR_DELIM_CH '/'
@@ -24,8 +22,8 @@ const char *path_filename(const char *path) {
 //! \param out Out basename
 //! \param size
 void path_basename(const char *path,
-                       char *out,
-                       size_t size) {
+                   char *out,
+                   size_t size) {
     const char *filename = path_filename(path);
     const char *ch = strrchr(filename, '.');
 
@@ -39,8 +37,8 @@ void path_basename(const char *path,
 }
 
 void path_dir(char *out,
-                  size_t size,
-                  const char *path) {
+              size_t size,
+              const char *path) {
 #if defined(CETECH_LINUX)
     char *ch = strrchr(path, DIR_DELIM_CH);
 

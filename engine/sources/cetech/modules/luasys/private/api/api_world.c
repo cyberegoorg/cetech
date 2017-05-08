@@ -1,11 +1,9 @@
-#include <stddef.h>
-#include "../../../../core/allocator.h"
 
-#include "../../../../kernel/world.h"
-#include "../../../../kernel/config.h"
-#include "../../../../core/module.h"
-#include "../../luasys.h"
-#include "../luasys.h"
+#include <cetech/core/allocator.h>
+
+#include <cetech/kernel/world.h>
+#include <cetech/core/module.h>
+#include <cetech/modules/luasys/luasys.h>
 
 #define API_NAME "World"
 

@@ -44,7 +44,8 @@ void _scene_resource_online(stringid64_t name,
 
         bgfx_index_buffer_handle_t bib = bgfx_create_index_buffer(
                 bgfx_make_ref((const void *) &ib[ib_offset[i]],
-                              sizeof(uint32_t) * ib_size[i]), BGFX_BUFFER_INDEX32);
+                              sizeof(uint32_t) * ib_size[i]),
+                BGFX_BUFFER_INDEX32);
 
         uint32_t idx = ARRAY_SIZE(&instance.vb);
         MAP_SET(uint8_t, &instance.geom_map, geom_name[i].id, idx);

@@ -1,14 +1,11 @@
-#include <stddef.h>
-#include "../../../../core/allocator.h"
+
 
 #include "../../../renderer/renderer.h"
-#include "../../../../kernel/config.h"
-#include "../../../../kernel/application.h"
-#include "../../../../kernel/resource.h"
+#include <cetech/kernel/resource.h>
 
-#include "../../../../core/module.h"
-#include "../../luasys.h"
-#include "../luasys.h"
+#include <cetech/core/module.h>
+#include <cetech/modules/luasys/luasys.h>
+#include <cetech/core/hash.h>
 
 #define API_NAME "Package"
 

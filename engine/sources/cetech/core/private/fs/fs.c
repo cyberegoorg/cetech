@@ -1,17 +1,18 @@
 #include <time.h>
+#include <errno.h>
+#include <stdio.h>
+#include <memory.h>
 
-#include "memory.h"
-
-#include "../../errors.h"
-#include "../../array.inl"
-#include "../../fs.h"
+#include <cetech/core/memory.h>
+#include <cetech/core/errors.h>
+#include <cetech/core/array.inl>
+#include <cetech/core/string.h>
+#include <cetech/core/fs.h>
 
 #if defined(CETECH_LINUX)
 
 #include <dirent.h>
 #include <sys/stat.h>
-#include <errno.h>
-#include <stdio.h>
 
 #endif
 
@@ -40,9 +41,9 @@ uint32_t file_mtime(const char *path) {
 //! \param files Result files
 //! \param allocator Allocator
 void dir_list(const char *path,
-                  int recursive,
-                  struct array_pchar *files,
-                  struct allocator *allocator) {
+              int recursive,
+              struct array_pchar *files,
+              struct allocator *allocator) {
 #if defined(CETECH_LINUX)
     DIR *dir;
     struct dirent *entry;
@@ -58,15 +59,15 @@ void dir_list(const char *path,
 
     do {
         if (recursive && (entry->d_type == 4)) {
-            if (strcmp(entry->d_name, ".") == 0 ||
-                strcmp(entry->d_name, "..") == 0) {
+            if (str_cmp(entry->d_name, ".") == 0 ||
+                str_cmp(entry->d_name, "..") == 0) {
                 continue;
             }
 
             char tmp_path[1024] = {0};
             int len = 0;
 
-            if (path[strlen(path) - 1] != '/') {
+            if (path[str_len(path) - 1] != '/') {
                 len = snprintf(tmp_path, sizeof(tmp_path) - 1, "%s/%s/", path,
                                entry->d_name);
             } else {
@@ -76,10 +77,11 @@ void dir_list(const char *path,
 
             dir_list(tmp_path, 1, files, allocator);
         } else {
-            size_t size = strlen(path) + strlen(entry->d_name) + 3;
-            char *new_path = CETECH_ALLOCATE(allocator, char, sizeof(char) * size);
+            size_t size = str_len(path) + str_len(entry->d_name) + 3;
+            char *new_path = CETECH_ALLOCATE(allocator, char,
+                                             sizeof(char) * size);
 
-            if (path[strlen(path) - 1] != '/') {
+            if (path[str_len(path) - 1] != '/') {
                 snprintf(new_path, size - 1, "%s/%s", path, entry->d_name);
             } else {
                 snprintf(new_path, size - 1, "%s%s", path, entry->d_name);
@@ -97,7 +99,7 @@ void dir_list(const char *path,
 //! \param files Files array
 //! \param allocator Allocator
 void dir_list_free(struct array_pchar *files,
-                       struct allocator *allocator) {
+                   struct allocator *allocator) {
 #if defined(CETECH_LINUX)
     for (int i = 0; i < ARRAY_SIZE(files); ++i) {
         CETECH_DEALLOCATE(allocator, ARRAY_AT(files, i));

@@ -1,10 +1,10 @@
 #include "include/SDL2/SDL.h"
 
 
-#include "../../log.h"
-#include "../../errors.h"
-#include "../../allocator.h"
-#include "../../fs.h"
+#include <cetech/core/log.h>
+#include <cetech/core/errors.h>
+#include <cetech/core/allocator.h>
+#include <cetech/core/fs.h>
 
 #define LOG_WHERE "vio_sdl"
 
@@ -15,8 +15,8 @@ struct vio_sdl {
 };
 
 int64_t vio_sdl_seek(struct vio *file,
-                         int64_t offset,
-                         enum vio_seek whence) {
+                     int64_t offset,
+                     enum vio_seek whence) {
     CETECH_ASSERT(LOG_WHERE, file != NULL);
 
     static enum vio_seek _whence[3] = {
@@ -31,9 +31,9 @@ int64_t vio_sdl_seek(struct vio *file,
 }
 
 size_t vio_sdl_read(struct vio *file,
-                        void *buffer,
-                        size_t size,
-                        size_t maxnum) {
+                    void *buffer,
+                    size_t size,
+                    size_t maxnum) {
     CETECH_ASSERT(LOG_WHERE, file != NULL);
     struct vio_sdl *vf = (struct vio_sdl *) file;
 
@@ -41,9 +41,9 @@ size_t vio_sdl_read(struct vio *file,
 };
 
 size_t vio_sdl_write(struct vio *file,
-                         const void *buffer,
-                         size_t size,
-                         size_t maxnum) {
+                     const void *buffer,
+                     size_t size,
+                     size_t maxnum) {
     CETECH_ASSERT(LOG_WHERE, file != NULL);
     struct vio_sdl *vf = (struct vio_sdl *) file;
 
@@ -70,9 +70,10 @@ int vio_sdl_close(struct vio *file) {
 
 
 struct vio *vio_from_file(const char *path,
-                              enum vio_open_mode mode,
-                              struct allocator *allocator) {
-    struct vio_sdl *vf = CETECH_ALLOCATE(allocator, struct vio_sdl, sizeof(struct vio_sdl));
+                          enum vio_open_mode mode,
+                          struct allocator *allocator) {
+    struct vio_sdl *vf = CETECH_ALLOCATE(allocator, struct vio_sdl,
+                                         sizeof(struct vio_sdl));
     CETECH_ASSERT(LOG_WHERE, vf != NULL);
 
     if (!vf) {

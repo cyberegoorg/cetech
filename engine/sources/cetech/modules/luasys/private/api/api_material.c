@@ -1,13 +1,12 @@
 
-#include "../../../../core/allocator.h"
+#include <cetech/core/allocator.h>
+#include <cetech/core/module.h>
+
 #include "../../../transform/transform.h"
 #include "../../../renderer/renderer.h"
-#include "../../../../kernel/config.h"
-#include "../../../../kernel/application.h"
 
-#include "../../../../core/module.h"
-#include "../../luasys.h"
-#include "../luasys.h"
+#include <cetech/modules/luasys/luasys.h>
+#include <cetech/core/hash.h>
 
 #define API_NAME "Material"
 
@@ -19,7 +18,7 @@ static int _set_texture(lua_State *l) {
     const char *texture_name = luasys_to_string(l, 3);
 
     material_api_v0.set_texture(m, slot_name,
-                              stringid64_from_string(texture_name));
+                                stringid64_from_string(texture_name));
     return 0;
 }
 
@@ -35,7 +34,8 @@ static int _set_vec4f(lua_State *l) {
 }
 
 void _register_lua_material_api(get_api_fce_t get_engine_api) {
-    material_api_v0 = *((struct material_api_v0 *) get_engine_api(MATERIAL_API_ID));
+    material_api_v0 = *((struct material_api_v0 *) get_engine_api(
+            MATERIAL_API_ID));
 
     luasys_add_module_function(API_NAME, "set_texture", _set_texture);
     luasys_add_module_function(API_NAME, "set_vec4f", _set_vec4f);

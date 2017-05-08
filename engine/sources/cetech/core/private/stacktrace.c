@@ -1,7 +1,7 @@
 
 #include <string.h>
 
-#include "../allocator.h"
+#include <cetech/core/allocator.h>
 
 #if defined(CETECH_LINUX)
 
@@ -36,7 +36,8 @@ char *stacktrace(int skip) {
             }
         }
 
-        if (mangled_name && offset_begin && offset_end && mangled_name < offset_begin) {
+        if (mangled_name && offset_begin && offset_end &&
+            mangled_name < offset_begin) {
             *mangled_name++ = '\0';
             *offset_begin++ = '\0';
             *offset_end++ = '\0';

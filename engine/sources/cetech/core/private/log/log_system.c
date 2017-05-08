@@ -1,8 +1,8 @@
 #include <stdio.h>
 #include <stdint.h>
-#include "../../log.h"
 
-#include "../../errors.h"
+#include <cetech/core/log.h>
+#include <cetech/core/errors.h>
 
 #define LOG_WHERE "log_system"
 
@@ -36,7 +36,8 @@ void vlog(const enum log_level level,
     for (uint32_t i = 0; i < _G.handlers_count; ++i) {
         CETECH_ASSERT("log", _G.handlers[i] != NULL);
 
-        _G.handlers[i](level, tm, _G.get_wid_clb != NULL ? _G.get_wid_clb() : 0, where, msg, _G.handlers_data[i]);
+        _G.handlers[i](level, tm, _G.get_wid_clb != NULL ? _G.get_wid_clb() : 0,
+                       where, msg, _G.handlers_data[i]);
     }
 }
 

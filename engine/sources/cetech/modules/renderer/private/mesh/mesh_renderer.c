@@ -1,23 +1,22 @@
-#include "../../../../core/array.inl"
-#include "../../../../core/yaml.h"
-#include "../../../../core/map.inl"
-#include "../../../../core/hash.h"
-#include "../../../../kernel/application.h"
-#include "../../../../kernel/config.h"
-#include "../../../../kernel/resource.h"
+#include <cetech/core/array.inl>
+#include <cetech/core/yaml.h>
+#include <cetech/core/map.inl>
+#include <cetech/core/hash.h>
+#include <cetech/kernel/config.h>
+#include <cetech/kernel/resource.h>
 
-#include "../../../../kernel/world.h"
-#include "../../../../kernel/entity.h"
-#include "../../../../kernel/component.h"
+#include <cetech/kernel/world.h>
+#include <cetech/kernel/entity.h>
+#include <cetech/kernel/component.h>
 #include "../../renderer.h"
 #include <bgfx/c99/bgfx.h>
 #include "../../../transform/transform.h"
 #include "../scene/scene.h"
 #include "../../../scenegraph/scenegraph.h"
-#include "../../../../core/mat44f.inl"
+#include <cetech/core/mat44f.inl>
 
-#include "../../../../core/memory.h"
-#include "../../../../core/module.h"
+#include <cetech/core/memory.h>
+#include <cetech/core/module.h>
 
 
 IMPORT_API(memory_api_v0);
@@ -104,7 +103,8 @@ int _mesh_component_compiler(yaml_node_t body,
                             t_data.scene = stringid64_from_string(tmp_buffer);
     );
     YAML_NODE_SCOPE(mesh, body, "mesh",
-                    yaml_as_string(mesh, tmp_buffer, CETECH_ARRAY_LEN(tmp_buffer));
+                    yaml_as_string(mesh, tmp_buffer,
+                                   CETECH_ARRAY_LEN(tmp_buffer));
                             t_data.mesh = stringid64_from_string(tmp_buffer);
     );
 
@@ -162,11 +162,11 @@ static void _spawner(world_t world,
 
     for (int i = 0; i < ent_count; ++i) {
         mesh_renderer_api_v0.create(world,
-                                 ents[cents[i]],
-                                 tdata[i].scene,
-                                 tdata[i].mesh,
-                                 tdata[i].node,
-                                 tdata[i].material);
+                                    ents[cents[i]],
+                                    tdata[i].scene,
+                                    tdata[i].mesh,
+                                    tdata[i].node,
+                                    tdata[i].material);
     }
 }
 
@@ -186,7 +186,7 @@ static void _init(get_api_fce_t get_engine_api) {
     _G.type = stringid64_from_string("mesh_renderer");
 
     component_api_v0.component_register_compiler(_G.type,
-                                                  _mesh_component_compiler, 10);
+                                                 _mesh_component_compiler, 10);
 
     component_api_v0.component_register_type(_G.type, (struct component_clb) {
             .spawner=_spawner,
@@ -217,7 +217,8 @@ mesh_renderer_t mesh_get(world_t world,
                          entity_t entity) {
 
     world_data_t *world_data = _get_world_data(world);
-    uint32_t idx = MAP_GET(uint32_t, &world_data->ent_idx_map, entity.h, UINT32_MAX);
+    uint32_t idx = MAP_GET(uint32_t, &world_data->ent_idx_map, entity.h,
+                           UINT32_MAX);
     return (mesh_renderer_t) {.idx = idx};
 }
 
@@ -253,7 +254,8 @@ mesh_renderer_t mesh_create(world_t world,
 void mesh_render_all(world_t world) {
     world_data_t *data = _get_world_data(world);
 
-    const MAP_ENTRY_T(uint32_t) *ce_it = MAP_BEGIN(uint32_t, &data->ent_idx_map);
+    const MAP_ENTRY_T(uint32_t) *ce_it = MAP_BEGIN(uint32_t,
+                                                   &data->ent_idx_map);
     const MAP_ENTRY_T(uint32_t) *ce_end = MAP_END(uint32_t, &data->ent_idx_map);
     while (ce_it != ce_end) {
         material_t material = ARRAY_AT(&data->material, ce_it->value);
@@ -274,7 +276,8 @@ void mesh_render_all(world_t world) {
         if (scenegprah_api_v0.has(world, ent)) {
             stringid64_t name = scene_get_mesh_node(scene, geom);
             if (name.id != 0) {
-                scene_node_t n = scenegprah_api_v0.node_by_name(world, ent, name);
+                scene_node_t n = scenegprah_api_v0.node_by_name(world, ent,
+                                                                name);
                 node_w = *scenegprah_api_v0.get_world_matrix(world, n);
             }
         }
@@ -312,30 +315,28 @@ void mesh_set_material(world_t world,
 void *mesh_get_module_api(int api) {
 
     switch (api) {
-        case PLUGIN_EXPORT_API_ID:
-                {
-                    static struct module_api_v0 module = {0};
+        case PLUGIN_EXPORT_API_ID: {
+            static struct module_api_v0 module = {0};
 
-                    module.init = _init;
-                    module.shutdown = _shutdown;
+            module.init = _init;
+            module.shutdown = _shutdown;
 
-                    return &module;
-                }
+            return &module;
+        }
 
-        case MESH_API_ID:
-                {
-                    static struct mesh_renderer_api_v0 api = {0};
+        case MESH_API_ID: {
+            static struct mesh_renderer_api_v0 api = {0};
 
-                    api.is_valid = mesh_is_valid;
-                    api.has = mesh_has;
-                    api.get = mesh_get;
-                    api.create = mesh_create;
-                    api.get_material = mesh_get_material;
-                    api.set_material = mesh_set_material;
-                    api.render_all = mesh_render_all;
+            api.is_valid = mesh_is_valid;
+            api.has = mesh_has;
+            api.get = mesh_get;
+            api.create = mesh_create;
+            api.get_material = mesh_get_material;
+            api.set_material = mesh_set_material;
+            api.render_all = mesh_render_all;
 
-                    return &api;
-                }
+            return &api;
+        }
 
         default:
             return NULL;

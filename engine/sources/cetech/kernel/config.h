@@ -58,12 +58,14 @@ struct config_api_v0 {
     void (*compile_global)();
 #endif
 
-    int (*parse_core_args)(int argc, const char** argv);
+    int (*parse_core_args)(int argc,
+                           const char **argv);
 
     //! Parse commandline arguments.
     //! \param args Arguments
     //! \return 1 if ok else 0
-    int (*parse_args)(int argc, const char** argv);
+    int (*parse_args)(int argc,
+                      const char **argv);
 
     //! Find cvar
     //! \param name Cvar name

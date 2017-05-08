@@ -2,9 +2,9 @@
 #define CETECH_TEXTURE_COMPILER_H
 
 
-#include "../../../../core/fs.h"
-#include "../../../../core/os.h"
-#include "../../../../core/yaml.h"
+#include <cetech/core/fs.h>
+#include <cetech/core/os.h>
+#include <cetech/core/yaml.h>
 #include <stdio.h>
 
 static int _texturec(const char *input,
@@ -14,8 +14,8 @@ static int _texturec(const char *input,
     char cmd_line[4096] = {0};
 
     int s = resource_api_v0.compiler_external_join(cmd_line,
-                                                 CETECH_ARRAY_LEN(cmd_line),
-                                                 "texturec");
+                                                   CETECH_ARRAY_LEN(cmd_line),
+                                                   "texturec");
 
     s += snprintf(cmd_line + s, CETECH_ARRAY_LEN(cmd_line) - s, " -f %s -o %s",
                   input, output);
@@ -63,7 +63,7 @@ static int _texture_resource_compiler(const char *filename,
     char source_data[vio_size(source_vio) + 1];
     memory_set(source_data, 0, vio_size(source_vio) + 1);
     vio_read(source_vio, source_data, sizeof(char),
-                 vio_size(source_vio));
+             vio_size(source_vio));
 
     yaml_document_t h;
     yaml_node_t root = yaml_load_str(source_data, &h);
@@ -79,16 +79,18 @@ static int _texture_resource_compiler(const char *filename,
 
     const char *source_dir = resource_api_v0.compiler_get_source_dir();
 
-    resource_api_v0.compiler_get_build_dir(build_dir, CETECH_ARRAY_LEN(build_dir),
-                                         app_api_v0.platform());
+    resource_api_v0.compiler_get_build_dir(build_dir,
+                                           CETECH_ARRAY_LEN(build_dir),
+                                           app_api_v0.platform());
     resource_api_v0.compiler_get_tmp_dir(tmp_dir, CETECH_ARRAY_LEN(tmp_dir),
-                                       app_api_v0.platform());
+                                         app_api_v0.platform());
 
     yaml_as_string(input, input_str, CETECH_ARRAY_LEN(input_str));
 
     path_join(input_path, CETECH_ARRAY_LEN(input_path), source_dir, input_str);
 
-    _gen_tmp_name(output_path, tmp_dir, CETECH_ARRAY_LEN(tmp_filename), input_str);
+    _gen_tmp_name(output_path, tmp_dir, CETECH_ARRAY_LEN(tmp_filename),
+                  input_str);
 
     int result = _texturec(input_path, output_path, gen_mipmaps, is_normalmap);
 
@@ -97,10 +99,10 @@ static int _texture_resource_compiler(const char *filename,
     }
 
     struct vio *tmp_file = vio_from_file(output_path, VIO_OPEN_READ,
-                                             memory_api_v0.main_allocator());
+                                         memory_api_v0.main_allocator());
     char *tmp_data =
-    CETECH_ALLOCATE(memory_api_v0.main_allocator(), char,
-                 vio_size(tmp_file) + 1);
+            CETECH_ALLOCATE(memory_api_v0.main_allocator(), char,
+                            vio_size(tmp_file) + 1);
     vio_read(tmp_file, tmp_data, sizeof(char), vio_size(tmp_file));
 
     struct texture resource = {

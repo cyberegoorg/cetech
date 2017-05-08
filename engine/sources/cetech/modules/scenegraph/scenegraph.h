@@ -12,7 +12,7 @@ enum {
 };
 
 #include "stdint.h"
-#include "../../core/math_types.h"
+#include <cetech/core/math_types.h>
 
 //==============================================================================
 // Typedefs
@@ -45,28 +45,28 @@ struct scenegprah_api_v0 {
     //! \param node Node
     //! \return Position
     vec3f_t (*get_position)(world_t world,
-                                scene_node_t node);
+                            scene_node_t node);
 
     //! Get node rotation
     //! \param world World
     //! \param node Node
     //! \return Rotation
     quatf_t (*get_rotation)(world_t world,
-                                scene_node_t node);
+                            scene_node_t node);
 
     //! Get node scale
     //! \param world World
     //! \param node Node
     //! \return Scale
     vec3f_t (*get_scale)(world_t world,
-                             scene_node_t node);
+                         scene_node_t node);
 
     //! Get world matrix
     //! \param world World
     //! \param node Node
     //! \return World matrix
     mat44f_t *(*get_world_matrix)(world_t world,
-                                      scene_node_t node);
+                                  scene_node_t node);
 
     //! Set position
     //! \param world World

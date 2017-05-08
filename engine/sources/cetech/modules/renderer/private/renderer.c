@@ -2,18 +2,18 @@
 // includes
 //==============================================================================
 
-#include "../../../core/math_types.h"
-#include "../../../core/allocator.h"
+#include <cetech/core/math_types.h>
+#include <cetech/core/allocator.h>
 
-#include "../../camera/camera.h"
+#include <cetech/modules/camera/camera.h>
 #include "../renderer.h"
-#include "../../../kernel/develop.h"
-#include "../../../core/hash.h"
-#include "../../../kernel/application.h"
-#include "../../../kernel/config.h"
-#include "../../../core/module.h"
-#include "../../../kernel/world.h"
-#include "../../../core/window.h"
+#include <cetech/kernel/develop.h>
+#include <cetech/core/hash.h>
+#include <cetech/kernel/application.h>
+#include <cetech/kernel/config.h>
+#include <cetech/core/module.h>
+#include <cetech/kernel/world.h>
+#include <cetech/core/window.h>
 
 #include "bgfx/c99/platform.h"
 #include "texture/texture.h"
@@ -91,7 +91,7 @@ static void _init(get_api_fce_t get_engine_api) {
         scene_init();
 
         cnsole_srv_api_v0.consolesrv_register_command("renderer.resize",
-                                                       _cmd_resize);
+                                                      _cmd_resize);
     }
 }
 
@@ -174,44 +174,41 @@ vec2f_t renderer_get_size() {
 void *renderer_get_module_api(int api) {
 
     switch (api) {
-        case PLUGIN_EXPORT_API_ID:
-                {
-                    static struct module_api_v0 module = {0};
+        case PLUGIN_EXPORT_API_ID: {
+            static struct module_api_v0 module = {0};
 
-                    module.init = _init;
-                    module.shutdown = _shutdown;
+            module.init = _init;
+            module.shutdown = _shutdown;
 
-                    return &module;
-                }
+            return &module;
+        }
 
-        case RENDERER_API_ID:
-                {
-                    static struct renderer_api_v0 api = {0};
+        case RENDERER_API_ID: {
+            static struct renderer_api_v0 api = {0};
 
-                    api.create = renderer_create;
-                    api.set_debug = renderer_set_debug;
-                    api.get_size = renderer_get_size;
-                    api.render_world = renderer_render_world;
+            api.create = renderer_create;
+            api.set_debug = renderer_set_debug;
+            api.get_size = renderer_get_size;
+            api.render_world = renderer_render_world;
 
-                    return &api;
-                }
+            return &api;
+        }
 
 
-        case MATERIAL_API_ID:
-                {
-                    static struct material_api_v0 api = {0};
+        case MATERIAL_API_ID: {
+            static struct material_api_v0 api = {0};
 
-                    api.resource_create = material_create;
-                    api.get_texture_count = material_get_texture_count;
-                    api.set_texture = material_set_texture;
-                    api.set_vec4f = material_set_vec4f;
-                    api.set_mat33f = material_set_mat33f;
-                    api.set_mat44f = material_set_mat44f;
-                    api.use = material_use;
-                    api.submit = material_submit;
+            api.resource_create = material_create;
+            api.get_texture_count = material_get_texture_count;
+            api.set_texture = material_set_texture;
+            api.set_vec4f = material_set_vec4f;
+            api.set_mat33f = material_set_mat33f;
+            api.set_mat44f = material_set_mat44f;
+            api.use = material_use;
+            api.submit = material_submit;
 
-                    return &api;
-                }
+            return &api;
+        }
 
 
         default:

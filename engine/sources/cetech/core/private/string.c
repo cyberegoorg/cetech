@@ -1,7 +1,7 @@
 
 #include <string.h>
 
-#include "../array.inl"
+#include <cetech/core/array.inl>
 
 
 //==============================================================================
@@ -15,7 +15,7 @@ size_t str_len(const char *s) {
 }
 
 char *str_dup(const char *s,
-                 struct allocator *allocator) {
+              struct allocator *allocator) {
     char *d = (char *) CETECH_ALLOCATE(allocator, char, strlen(s) + 1);
     CETECH_ASSERT("string", d != NULL);
 
@@ -27,7 +27,7 @@ char *str_dup(const char *s,
 }
 
 int str_cmp(const char *s1,
-               const char *s2) {
+            const char *s2) {
     CETECH_ASSERT("string", s1 != NULL);
     CETECH_ASSERT("string", s2 != NULL);
 
@@ -35,11 +35,11 @@ int str_cmp(const char *s1,
 }
 
 void str_set(char *__restrict result,
-                 const char *__restrict str) {
+             const char *__restrict str) {
     memory_copy(result, str, strlen(str));
 }
 
 int str_startswith(const char *string,
-                       const char *with) {
+                   const char *with) {
     return !strncmp(string, with, strlen(with));
 }

@@ -3,11 +3,11 @@
 
 #include "include/luajit/luajit.h"
 
-#include "../../../core/vec2f.inl"
-#include "../../../core/vec3f.inl"
-#include "../../../core/vec4f.inl"
+#include <cetech/core/vec2f.inl>
+#include <cetech/core/vec3f.inl>
+#include <cetech/core/vec4f.inl>
 
-#include "luasys.h"
+#include <cetech/modules/luasys/luasys.h>
 
 static int _vec2f_add(lua_State *L) {
     vec2f_t *a = luasys_to_vec2f(L, 1);

@@ -1,4 +1,4 @@
-#include "../../thread.h"
+#include <cetech/core/thread.h>
 
 #include "include/SDL2/SDL.h"
 
@@ -15,8 +15,8 @@
 //! \param data Thread data
 //! \return new thread
 thread_t thread_create(thread_fce_t fce,
-                           const char *name,
-                           void *data) {
+                       const char *name,
+                       void *data) {
     return (thread_t) {
             .t = (void *) SDL_CreateThread(fce, name, data)
     };
@@ -32,7 +32,7 @@ void thread_kill(thread_t thread) {
 //! \param thread Thread
 //! \param status Thread exit status
 void thread_wait(thread_t thread,
-                     int *status) {
+                 int *status) {
     SDL_WaitThread(thread.t, status);
 }
 

@@ -4,15 +4,14 @@
 
 #include <stdlib.h>
 #include <memory.h>
-#include "../fs.h"
-#include "../memory.h"
 
-#include "../string.h"
+#include <cetech/core/fs.h>
+#include <cetech/core/memory.h>
+#include <cetech/core/string.h>
+#include <cetech/core/module.h>
 
-#include "../../kernel/config.h"
-#include "../../kernel/application.h"
+#include <cetech/kernel/config.h>
 
-#include "../module.h"
 
 //==============================================================================
 // Defines

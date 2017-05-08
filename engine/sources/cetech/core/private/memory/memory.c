@@ -1,12 +1,9 @@
-#include "../../allocator.h"
-#include "../../errors.h"
-#include "../../../kernel/application.h"
-
-
 #include <memory.h>
-#include "../../../kernel/config.h"
-#include "../../module.h"
-#include "../../memory.h"
+
+#include <cetech/core/allocator.h>
+#include <cetech/core/errors.h>
+#include <cetech/core/module.h>
+#include <cetech/core/memory.h>
 
 
 #define LOG_WHERE "memory"
@@ -17,7 +14,6 @@ struct G {
     struct allocator *default_allocator;
     struct allocator *default_scratch_allocator;
 } MemorySystemGlobals = {0};
-
 
 
 void *memory_copy(void *__restrict dest,
@@ -84,25 +80,23 @@ struct allocator *_memsys_main_scratch_allocator() {
 
 void *memsys_get_module_api(int api) {
     switch (api) {
-        case PLUGIN_EXPORT_API_ID:
-                {
-                    static struct module_api_v0 module = {0};
+        case PLUGIN_EXPORT_API_ID: {
+            static struct module_api_v0 module = {0};
 
-                    module.init = _init;
-                    module.shutdown = _shutdown;
+            module.init = _init;
+            module.shutdown = _shutdown;
 
-                    return &module;
-                }
+            return &module;
+        }
 
-        case MEMORY_API_ID:
-                {
-                    static struct memory_api_v0 api = {0};
+        case MEMORY_API_ID: {
+            static struct memory_api_v0 api = {0};
 
-                    api.main_allocator = _memsys_main_allocator;
-                    api.main_scratch_allocator = _memsys_main_scratch_allocator;
+            api.main_allocator = _memsys_main_allocator;
+            api.main_scratch_allocator = _memsys_main_scratch_allocator;
 
-                    return &api;
-                }
+            return &api;
+        }
 
         default:
             return NULL;

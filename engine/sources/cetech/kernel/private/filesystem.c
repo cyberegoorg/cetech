@@ -2,16 +2,15 @@
 // Includes
 //==============================================================================
 
-#include "../../core/fs.h"
+#include <cetech/core/fs.h>
 
-#include "../../core/memory.h"
-#include "../filesystem.h"
-#include "../../core/hash.h"
-#include "../config.h"
-#include "../application.h"
-#include "../resource.h"
-#include "../../core/module.h"
-#include "../../core/string.h"
+#include <cetech/core/memory.h>
+#include <cetech/kernel/filesystem.h>
+#include <cetech/core/hash.h>
+#include <cetech/kernel/config.h>
+#include <cetech/kernel/resource.h>
+#include <cetech/core/module.h>
+#include <cetech/core/string.h>
 
 
 //==============================================================================
@@ -77,7 +76,7 @@ void filesystem_map_root_dir(stringid64_t root,
 
         _G.rootmap.id[i] = root;
         _G.rootmap.path[i] = str_dup(base_path,
-                                        memory_api_v0.main_allocator());
+                                     memory_api_v0.main_allocator());
         break;
     }
 }
@@ -115,7 +114,7 @@ struct vio *filesystem_open(stringid64_t root,
     }
 
     struct vio *file = vio_from_file(fullm_path, mode,
-                                         memory_api_v0.main_allocator());
+                                     memory_api_v0.main_allocator());
 
     if (!file) {
         log_error(LOG_WHERE, "Could not load file %s", fullm_path);
@@ -178,32 +177,30 @@ time_t filesystem_get_file_mtime(stringid64_t root,
 void *filesystem_get_module_api(int api) {
 
     switch (api) {
-        case PLUGIN_EXPORT_API_ID:
-                {
-                    static struct module_api_v0 module = {0};
+        case PLUGIN_EXPORT_API_ID: {
+            static struct module_api_v0 module = {0};
 
-                    module.init = _init;
-                    module.shutdown = _shutdown;
+            module.init = _init;
+            module.shutdown = _shutdown;
 
-                    return &module;
-                }
+            return &module;
+        }
 
-        case FILESYSTEM_API_ID:
-                {
-                    static struct filesystem_api_v0 api = {0};
+        case FILESYSTEM_API_ID: {
+            static struct filesystem_api_v0 api = {0};
 
-                    api.filesystem_get_root_dir = filesystem_get_root_dir;
-                    api.filesystem_open = filesystem_open;
-                    api.filesystem_map_root_dir = filesystem_map_root_dir;
-                    api.filesystem_close = filesystem_close;
-                    api.filesystem_listdir = filesystem_listdir;
-                    api.filesystem_listdir_free = filesystem_listdir_free;
-                    api.filesystem_create_directory = filesystem_create_directory;
-                    api.filesystem_get_file_mtime = filesystem_get_file_mtime;
-                    api.filesystem_get_fullpath = filesystem_get_fullpath;
+            api.filesystem_get_root_dir = filesystem_get_root_dir;
+            api.filesystem_open = filesystem_open;
+            api.filesystem_map_root_dir = filesystem_map_root_dir;
+            api.filesystem_close = filesystem_close;
+            api.filesystem_listdir = filesystem_listdir;
+            api.filesystem_listdir_free = filesystem_listdir_free;
+            api.filesystem_create_directory = filesystem_create_directory;
+            api.filesystem_get_file_mtime = filesystem_get_file_mtime;
+            api.filesystem_get_fullpath = filesystem_get_fullpath;
 
-                    return &api;
-                }
+            return &api;
+        }
 
         default:
             return NULL;

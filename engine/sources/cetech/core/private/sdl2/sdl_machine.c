@@ -3,12 +3,12 @@
 //==============================================================================
 
 #include <include/SDL2/SDL.h>
-#include "../../array.inl"
-#include "../../eventstream.inl"
 
-#include "../../../kernel/application.h"
-#include "../../../kernel/config.h"
-#include "../../module.h"
+#include <cetech/core/array.inl>
+#include <cetech/core/eventstream.inl>
+#include <cetech/core/module.h>
+
+#include <cetech/kernel/application.h>
 
 #include "sdl_parts.h"
 

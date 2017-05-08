@@ -45,24 +45,24 @@ CETECH_FORCE_INLINE float float_round(float f) {
 }
 
 CETECH_FORCE_INLINE float float_min(float a,
-                                   float b) {
+                                    float b) {
     return a < b ? a : b;
 }
 
 CETECH_FORCE_INLINE float float_min3(float a,
-                                    float b,
-                                    float c) {
+                                     float b,
+                                     float c) {
     return float_min(a, float_min(b, c));
 }
 
 CETECH_FORCE_INLINE float float_max(float a,
-                                   float b) {
+                                    float b) {
     return a > b ? a : b;
 }
 
 CETECH_FORCE_INLINE float float_max3(float a,
-                                    float b,
-                                    float c) {
+                                     float b,
+                                     float c) {
     return float_max(a, float_max(b, c));
 }
 
@@ -71,8 +71,8 @@ CETECH_FORCE_INLINE float float_abs(float a) {
 }
 
 CETECH_FORCE_INLINE float float_clamp(float a,
-                                     float min,
-                                     float max) {
+                                      float min,
+                                      float max) {
     return float_min(float_max(a, min), max);
 }
 
@@ -81,8 +81,8 @@ CETECH_FORCE_INLINE float float_saturate(float a) {
 }
 
 CETECH_FORCE_INLINE float float_lerp(float a,
-                                    float b,
-                                    float t) {
+                                     float b,
+                                     float t) {
     return a + (b - a) * t;
 }
 
@@ -91,19 +91,19 @@ CETECH_FORCE_INLINE float float_sign(float a) {
 }
 
 CETECH_FORCE_INLINE float float_step(float edge,
-                                    float a) {
+                                     float a) {
     return a < edge ? 0.0f : 1.0f;
 }
 
 CETECH_FORCE_INLINE float float_pulse(float a,
-                                     float start,
-                                     float end) {
+                                      float start,
+                                      float end) {
     return float_step(a, start) - float_step(a, end);
 }
 
 CETECH_FORCE_INLINE int float_equal(float a,
-                                   float b,
-                                   float epsilon) {
+                                    float b,
+                                    float epsilon) {
     // http://realtimecollisiondetection.net/blog/?p=89
     const float lhs = float_abs(a - b);
     const float rhs = epsilon * float_max3(1.0f, float_abs(a), float_abs(b));
@@ -111,9 +111,9 @@ CETECH_FORCE_INLINE int float_equal(float a,
 }
 
 CETECH_FORCE_INLINE int float_equals(const float *__restrict _a,
-                                    const float *__restrict _b,
-                                    int _num,
-                                    float _epsilon) {
+                                     const float *__restrict _b,
+                                     int _num,
+                                     float _epsilon) {
 
     int equal = float_equal(_a[0], _b[0], _epsilon);
 
@@ -124,14 +124,14 @@ CETECH_FORCE_INLINE int float_equals(const float *__restrict _a,
 }
 
 CETECH_FORCE_INLINE float float_bias(float time,
-                                    float bias) {
+                                     float bias) {
     /// http://blog_demofox.org/2012/09/24/bias-and-gain-are-your-friend/
     return time / ((1.0f / bias - 2.0f) * (1.0f - time) + 1.0f);
 }
 
 
 CETECH_FORCE_INLINE float float_gain(float time,
-                                    float gain) {
+                                     float gain) {
     /// http://blog_demofox.org/2012/09/24/bias-and-gain-are-your-friend/
     if (time < 0.5f)
         return float_bias(time * 2.0f, gain) / 2.0f;
@@ -194,7 +194,7 @@ CETECH_FORCE_INLINE float float_sq(float f) {
 }
 
 CETECH_FORCE_INLINE float float_atan2(float y,
-                                     float x) {
+                                      float x) {
     return atan2f(y, x);
 }
 
