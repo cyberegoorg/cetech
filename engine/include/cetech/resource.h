@@ -13,7 +13,10 @@ enum {
     PACKAGE_API_ID = 20,
 };
 
+struct vio;
 typedef struct stringid64_s stringid64_t;
+struct config_api_v0;
+struct app_api_v0;
 
 //==============================================================================
 // Typedefs
@@ -53,6 +56,7 @@ typedef void *(*resource_reloader_t)(stringid64_t name,
                                      void *old_data,
                                      void *new_data,
                                      struct allocator *allocator);
+
 
 struct compilator_api;
 
@@ -191,7 +195,7 @@ struct resource_api_v0 {
                             size_t max_len,
                             stringid64_t type,
                             stringid64_t name);
-
+#ifdef CETECH_CAN_COMPILE
     //! Register resource compiler
     //! \param type Type
     //! \param compilator Compilator fce
@@ -212,14 +216,6 @@ struct resource_api_v0 {
                                  stringid64_t type,
                                  stringid64_t name);
 
-    //! Get build dir
-    //! \param build_dir Build dir
-    //! \param max_len Max build dir len
-    //! \param platform Platform
-    //! \return 1 if ok else 0
-    int (*compiler_get_build_dir)(char *build_dir,
-                                  size_t max_len,
-                                  const char *platform);
 
     //! Get build tmp dir
     //! \param tmp_dir Tmp dir
@@ -245,13 +241,24 @@ struct resource_api_v0 {
     void (*compiler_create_build_dir)(struct config_api_v0 config,
                                       struct app_api_v0 app);
 
-    //! Get core dir
-    //! \return Core dir
-    const char *(*compiler_get_core_dir)();
 
     //! Get source dir
     //! \return Source dir
     const char *(*compiler_get_source_dir)();
+
+    //! Get core dir
+    //! \return Core dir
+    const char *(*compiler_get_core_dir)();
+#endif
+
+    //! Get build dir
+    //! \param build_dir Build dir
+    //! \param max_len Max build dir len
+    //! \param platform Platform
+    //! \return 1 if ok else 0
+    int (*compiler_get_build_dir)(char *build_dir,
+                                  size_t max_len,
+                                  const char *platform);
 };
 
 //! Package API V!

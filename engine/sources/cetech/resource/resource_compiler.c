@@ -1,3 +1,4 @@
+#ifdef CETECH_CAN_COMPILE
 //==============================================================================
 // Includes
 //==============================================================================
@@ -23,6 +24,7 @@
 #include "cetech/vio.h"
 
 #include "builddb.h"
+#include "resource.h"
 
 
 //==============================================================================
@@ -56,7 +58,6 @@ struct G {
 
     cvar_t cv_source_dir;
     cvar_t cv_core_dir;
-    cvar_t cv_build_dir; // TODO: MOVE TO RESOURCE MANAGER
     cvar_t cv_external_dir;
 } ResourceCompilerGlobal = {0};
 
@@ -226,9 +227,6 @@ static void _init_cvar(struct config_api_v0 config) {
                                     "core");
     _G.cv_external_dir = config.new_str("external", "External build dir",
                                         "externals/build");
-
-    _G.cv_build_dir = config.new_str("build", "Resource build dir",
-                                     "data/build");
 }
 
 static void _init(get_api_fce_t get_engine_api) {
@@ -237,10 +235,8 @@ static void _init(get_api_fce_t get_engine_api) {
     INIT_API(get_engine_api, task_api_v0, TASK_API_ID);
     INIT_API(get_engine_api, app_api_v0, APPLICATION_API_ID);
 
-    const char *build_dir = config_api_v0.get_string(_G.cv_build_dir);
     char build_dir_full[1024] = {0};
-    path_join(build_dir_full, CETECH_ARRAY_LEN(build_dir_full), build_dir,
-                  app_api_v0.platform());
+    resource_api_v0.compiler_get_build_dir(build_dir_full, CETECH_ARRAY_LEN(build_dir_full), app_api_v0.platform());
 
     dir_make_path(build_dir_full);
     builddb_init_db(build_dir_full);
@@ -274,11 +270,9 @@ void *resourcecompiler_get_module_api(int api) {
 
 void resource_compiler_create_build_dir(struct config_api_v0 config,
                                         struct app_api_v0 app) {
-    const char *build_dir = config.get_string(_G.cv_build_dir);
     char build_dir_full[1024] = {0};
 
-    path_join(build_dir_full, CETECH_ARRAY_LEN(build_dir_full), build_dir,
-                  app.platform());
+    resource_api_v0.compiler_get_build_dir(build_dir_full, CETECH_ARRAY_LEN(build_dir_full), app_api_v0.platform());
 
     dir_make_path(build_dir_full);
 }
@@ -299,13 +293,11 @@ void resource_compiler_register(stringid64_t type,
 
 void resource_compiler_compile_all() {
     const char *core_dir = config_api_v0.get_string(_G.cv_core_dir);
-    const char *build_dir = config_api_v0.get_string(_G.cv_build_dir);
     const char *source_dir = config_api_v0.get_string(_G.cv_source_dir);
     const char *platform = app_api_v0.platform();
 
     char build_dir_full[1024] = {0};
-    path_join(build_dir_full, CETECH_ARRAY_LEN(build_dir_full), build_dir,
-                  platform);
+    resource_api_v0.compiler_get_build_dir(build_dir_full, CETECH_ARRAY_LEN(build_dir_full), app_api_v0.platform());
 
     struct array_pchar files;
     array_init_pchar(&files, memory_api_v0.main_scratch_allocator());
@@ -351,14 +343,6 @@ const char *resource_compiler_get_core_dir() {
     return config_api_v0.get_string(_G.cv_core_dir);
 }
 
-
-int resource_compiler_get_build_dir(char *build_dir,
-                                    size_t max_len,
-                                    const char *platform) {
-    const char *build_dir_str = config_api_v0.get_string(_G.cv_build_dir);
-    return path_join(build_dir, max_len, build_dir_str, platform);
-}
-
 int resource_compiler_get_tmp_dir(char *tmp_dir,
                                   size_t max_len,
                                   const char *platform) {
@@ -383,3 +367,4 @@ int resource_compiler_external_join(char *output,
 
     return path_join(output, max_len, tmp_dir2, name);
 }
+#endif

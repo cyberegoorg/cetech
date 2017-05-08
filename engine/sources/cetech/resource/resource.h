@@ -49,6 +49,7 @@ int resource_type_name_string(char *str,
                               stringid64_t type,
                               stringid64_t name);
 
+#ifdef CETECH_CAN_COMPILE
 void resource_compiler_register(stringid64_t type,
                                 resource_compilator_t compilator);
 
@@ -61,11 +62,6 @@ int resource_compiler_get_filename(char *filename,
 
 const char *resource_compiler_get_source_dir();
 
-const char *resource_compiler_get_core_dir();
-
-int resource_compiler_get_build_dir(char *build_dir,
-                                    size_t max_len,
-                                    const char *platform);
 
 int resource_compiler_get_tmp_dir(char *tmp_dir,
                                   size_t max_len,
@@ -76,6 +72,13 @@ int resource_compiler_external_join(char *output,
                                     const char *name);
 
 void resource_compiler_create_build_dir();
+const char *resource_compiler_get_core_dir();
+#endif
+
+
+int resource_compiler_get_build_dir(char *build_dir,
+                                    size_t max_len,
+                                    const char *platform);
 
 void package_load(stringid64_t name);
 

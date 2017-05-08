@@ -48,7 +48,9 @@ IMPORT_API(app_api_v0);
 //==============================================================================
 // Compiler private
 //==============================================================================
+#ifdef CETECH_CAN_COMPILE
 #include "texture_compiler.h"
+#endif
 
 //==============================================================================
 // Resource
@@ -74,7 +76,9 @@ int texture_init() {
     MAP_INIT(bgfx_texture_handle_t, &_G.handler_map,
              memory_api_v0.main_allocator());
 
+#ifdef CETECH_CAN_COMPILE
     resource_api_v0.compiler_register(_G.type, _texture_resource_compiler);
+#endif
 
     resource_api_v0.register_type(_G.type, texture_resource_callback);
 

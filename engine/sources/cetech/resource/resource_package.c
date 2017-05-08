@@ -144,7 +144,9 @@ int package_init(get_api_fce_t get_engine_api) {
 
     _G.package_typel = stringid64_from_string("package");
 
+#ifdef CETECH_CAN_COMPILE
     resource_api_v0.compiler_register(_G.package_typel, _package_compiler);
+#endif
 
     return 1;
 }

@@ -4,6 +4,7 @@
 #include <cetech/path.h>
 #include <cetech/yaml.h>
 #include <stdio.h>
+#include <cetech/vio.h>
 
 struct material_compile_output {
     ARRAY_T(char) uniform_names;

@@ -70,6 +70,8 @@ struct entity_api_v0 {
                     entity_t *entity,
                     uint32_t count);
 
+#ifdef CETECH_CAN_COMPILE
+
     //! Create compiler output structure
     //! \return New compiler output structure
     struct entity_compile_output *(*compiler_create_output)();
@@ -108,6 +110,7 @@ struct entity_api_v0 {
                               const char *filename,
                               ARRAY_T(uint8_t) *build,
                               struct compilator_api *compilator_api);
+#endif
 };
 
 #endif //CETECH_ENTITY_MANAGER_H

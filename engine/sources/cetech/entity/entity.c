@@ -47,6 +47,29 @@ IMPORT_API(component_api_v0);
 IMPORT_API(resource_api_v0);
 IMPORT_API(handler_api_v0);
 
+
+struct entity_resource {
+    uint32_t ent_count;
+    uint32_t comp_type_count;
+    //uint64_t parents [ent_count]
+    //uint64_t comp_types [comp_type_count]
+    //component_data cdata[comp_type_count]
+};
+
+struct component_data {
+    uint32_t ent_count;
+    uint32_t size;
+    // uint32_t ent[ent_count];
+    // char data[ent_count];
+};
+
+#define entity_resource_parents(r) ((uint32_t*)((r) + 1))
+#define entity_resource_comp_types(r) ((uint64_t*)(entity_resource_parents(r) + ((r)->ent_count)))
+#define entity_resource_comp_data(r) ((struct component_data*)(entity_resource_comp_types(r) + ((r)->comp_type_count)))
+
+#define component_data_ent(cd) ((uint32_t*)((cd) + 1))
+#define component_data_data(cd) ((char*)((component_data_ent(cd) + ((cd)->ent_count))))
+
 uint32_t _new_spawned_array() {
     uint32_t idx = ARRAY_SIZE(&_G.spawned_array);
 
@@ -84,7 +107,7 @@ void _destroy_spawned_array(entity_t entity) {
 //==============================================================================
 // Compiler private
 //==============================================================================
-
+#ifdef CETECH_CAN_COMPILE
 static void preprocess(const char *filename,
                        yaml_node_t root,
                        struct compilator_api *capi) {
@@ -249,27 +272,7 @@ static void compile_entitity(yaml_node_t rootNode,
     }
 }
 
-struct entity_resource {
-    uint32_t ent_count;
-    uint32_t comp_type_count;
-    //uint64_t parents [ent_count]
-    //uint64_t comp_types [comp_type_count]
-    //component_data cdata[comp_type_count]
-};
 
-struct component_data {
-    uint32_t ent_count;
-    uint32_t size;
-    // uint32_t ent[ent_count];
-    // char data[ent_count];
-};
-
-#define entity_resource_parents(r) ((uint32_t*)((r) + 1))
-#define entity_resource_comp_types(r) ((uint64_t*)(entity_resource_parents(r) + ((r)->ent_count)))
-#define entity_resource_comp_data(r) ((struct component_data*)(entity_resource_comp_types(r) + ((r)->comp_type_count)))
-
-#define component_data_ent(cd) ((uint32_t*)((cd) + 1))
-#define component_data_data(cd) ((char*)((component_data_ent(cd) + ((cd)->ent_count))))
 
 struct entity_compile_output *entity_compiler_create_output() {
     struct allocator *a = memory_api_v0.main_allocator();
@@ -419,6 +422,7 @@ int _entity_resource_compiler(const char *filename,
     return 1;
 }
 
+#endif
 
 //==============================================================================
 // Resource
@@ -483,7 +487,10 @@ static void _init(get_api_fce_t get_engine_api) {
     ARRAY_INIT(array_entity_t, &_G.spawned_array, memory_api_v0.main_allocator());
 
     resource_api_v0.register_type(_G.type, entity_resource_callback);
+
+#ifdef CETECH_CAN_COMPILE
     resource_api_v0.compiler_register(_G.type, _entity_resource_compiler);
+#endif
 
     _G.entity_handler = handler_api_v0.handler32gen_create(memory_api_v0.main_allocator());
 }
@@ -601,12 +608,15 @@ void *entity_get_module_api(int api) {
                     api.spawn_from_resource = entity_spawn_from_resource;
                     api.spawn = entity_spawn;
                     api.destroy = entity_destroy;
+
+#ifdef CETECH_CAN_COMPILE
                     api.compiler_create_output = entity_compiler_create_output;
                     api.compiler_destroy_output = entity_compiler_destroy_output;
                     api.compiler_compile_entity = entity_compiler_compile_entity;
                     api.compiler_ent_counter = entity_compiler_ent_counter;
                     api.compiler_write_to_build = entity_compiler_write_to_build;
                     api.resource_compiler = entity_resource_compiler;
+#endif
                     return &api;
                 }
 

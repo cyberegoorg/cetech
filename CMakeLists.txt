@@ -255,7 +255,7 @@ target_include_directories(cetech PUBLIC externals/build/${PLATFORM_ID}/${CONFIG
 # Cetech DEVELOP
 ################################################################################
 add_executable(cetech_develop ${MAIN_SOURCE_FILES})
-target_compile_definitions(cetech_develop PUBLIC -DCETECH_DEVELOP)
+target_compile_definitions(cetech_develop PUBLIC -DCETECH_DEVELOP -DCETECH_CAN_COMPILE=1)
 target_link_libraries(cetech_develop ${DEVELOP_LIBS})
 target_include_directories(cetech_develop PUBLIC externals/build/${PLATFORM_ID}/${CONFIGURATION}/)
 target_include_directories(cetech_develop PUBLIC externals/build/${PLATFORM_ID}/${CONFIGURATION}/include)

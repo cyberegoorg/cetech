@@ -1,6 +1,8 @@
 #ifndef CETECH_MATERIAL_RESORCE_H
 #define CETECH_MATERIAL_RESORCE_H
 
+#include <cetech/vio.h>
+
 static const bgfx_program_handle_t null_program = {0};
 
 void *_material_resource_loader(struct vio *input,

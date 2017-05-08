@@ -86,7 +86,9 @@ struct scene_instance *_get_scene_instance(stringid64_t scene) {
 //==============================================================================
 // Compiler private
 //==============================================================================
+#ifdef CETECH_CAN_COMPILE
 #include "scene_compiler.h"
+#endif
 
 //==============================================================================
 // Resource
@@ -111,8 +113,11 @@ int scene_init() {
 
     MAP_INIT(scene_instance, &_G.scene_instance, memory_api_v0.main_allocator());
 
-    resource_api_v0.compiler_register(_G.type, _scene_resource_compiler);
     resource_api_v0.register_type(_G.type, scene_resource_callback);
+
+#ifdef CETECH_CAN_COMPILE
+    resource_api_v0.compiler_register(_G.type, _scene_resource_compiler);
+#endif
 
     return 1;
 }

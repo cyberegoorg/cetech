@@ -149,10 +149,12 @@ int _init_config() {
     // Cvar stage
 
     config_api_v0.parse_core_args(_G.args.argc, _G.args.argv);
+#ifdef CETECH_CAN_COMPILE
     if (config_api_v0.get_int(_G.config.compile)) {
         resource_api_v0.compiler_create_build_dir(config_api_v0, api_v1);
         config_api_v0.compile_global();
     }
+#endif
 
     config_api_v0.load_global();
 
@@ -181,8 +183,26 @@ int application_init(int argc,
     ADD_STATIC_PLUGIN(memsys);
     ADD_STATIC_PLUGIN(config);
     ADD_STATIC_PLUGIN(application);
+    ADD_STATIC_PLUGIN(handler);
+
+    ADD_STATIC_PLUGIN(sdl);
+    ADD_STATIC_PLUGIN(machine);
+    ADD_STATIC_PLUGIN(consoleserver);
+    ADD_STATIC_PLUGIN(developsystem);
+    ADD_STATIC_PLUGIN(task);
+
+    ADD_STATIC_PLUGIN(filesystem);
+    ADD_STATIC_PLUGIN(resourcesystem);
+
+#ifdef CETECH_CAN_COMPILE
+    ADD_STATIC_PLUGIN(resourcecompiler);
+#endif
+
+
 
     cvar_init();
+    module_call_init_cvar();
+    module_call_init();
 
     _init_static_modules();
 
@@ -259,6 +279,7 @@ void application_start() {
     resource_api_v0.set_autoload(0);
 #endif
 
+#ifdef CETECH_CAN_COMPILE
     if (config_api_v0.get_int(_G.config.compile)) {
         resource_api_v0.compiler_compile_all();
 
@@ -266,6 +287,7 @@ void application_start() {
             return;
         }
     }
+#endif
 
     if (!config_api_v0.get_int(_G.config.daemon)) {
         intptr_t wid = config_api_v0.get_int(_G.config.wid);

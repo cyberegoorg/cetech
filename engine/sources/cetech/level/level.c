@@ -5,12 +5,9 @@
 #include <cetech/allocator.h>
 #include <cetech/world.h>
 #include <cetech/vio.h>
-#include <cetech/application.h>
 #include <cetech/config.h>
-#include <cetech/vio.h>
 #include <cetech/resource.h>
 
-#include <cetech/resource.h>
 #include <cetech/entity.h>
 #include <cetech/transform.h>
 #include <cetech/quatf.h>
@@ -134,6 +131,7 @@ static const resource_callbacks_t _level_resource_defs = {
         .reloader = level_resource_reloader
 };
 
+#ifdef CETECH_CAN_COMPILE
 struct foreach_entities_data {
     const char *filename;
     struct compilator_api *capi;
@@ -144,8 +142,8 @@ struct foreach_entities_data {
 };
 
 void forach_entities_clb(yaml_node_t key,
-                      yaml_node_t value,
-                      void *_data) {
+                         yaml_node_t value,
+                         void *_data) {
     struct foreach_entities_data *data = _data;
 
     char name[128] = {0};
@@ -155,7 +153,7 @@ void forach_entities_clb(yaml_node_t key,
                     entity_api_v0.compiler_ent_counter(data->output));
 
     entity_api_v0.compiler_compile_entity(data->output, value, data->filename,
-                                    data->capi);
+                                          data->capi);
 }
 
 int _level_resource_compiler(const char *filename,
@@ -166,7 +164,7 @@ int _level_resource_compiler(const char *filename,
     char source_data[vio_size(source_vio) + 1];
     memory_set(source_data, 0, vio_size(source_vio) + 1);
     vio_read(source_vio, source_data, sizeof(char),
-                 vio_size(source_vio));
+             vio_size(source_vio));
 
     yaml_document_t h;
     yaml_node_t root = yaml_load_str(source_data, &h);
@@ -203,11 +201,11 @@ int _level_resource_compiler(const char *filename,
 
     vio_write(build_vio, &res, sizeof(struct level_blob), 1);
     vio_write(build_vio, &ARRAY_AT(&id, 0), sizeof(stringid64_t),
-                  ARRAY_SIZE(&id));
+              ARRAY_SIZE(&id));
     vio_write(build_vio, &ARRAY_AT(&offset, 0), sizeof(uint32_t),
-                  ARRAY_SIZE(&offset));
+              ARRAY_SIZE(&offset));
     vio_write(build_vio, &ARRAY_AT(&data, 0), sizeof(uint8_t),
-                  ARRAY_SIZE(&data));
+              ARRAY_SIZE(&data));
 
     ARRAY_DESTROY(stringid64_t, &id);
     ARRAY_DESTROY(uint32_t, &offset);
@@ -218,6 +216,7 @@ int _level_resource_compiler(const char *filename,
     return 1;
 }
 
+#endif
 
 //==============================================================================
 // Public interface
@@ -236,7 +235,11 @@ static void _init(get_api_fce_t get_engine_api) {
                memory_api_v0.main_allocator());
 
     resource_api_v0.register_type(_G.level_type, _level_resource_defs);
+
+#ifdef CETECH_CAN_COMPILE
     resource_api_v0.compiler_register(_G.level_type, _level_resource_compiler);
+#endif
+
 }
 
 static void _shutdown() {
@@ -255,9 +258,9 @@ level_t world_load_level(world_t world,
 
     entity_t level_ent = entity_api_v0.entity_manager_create();
     transform_t t = transform_api_v0.create(world, level_ent,
-                                          (entity_t) {UINT32_MAX},
-                                          (vec3f_t) {0}, QUATF_IDENTITY,
-                                          (vec3f_t) {{1.0f, 1.0f, 1.0f}});
+                                            (entity_t) {UINT32_MAX},
+                                            (vec3f_t) {0}, QUATF_IDENTITY,
+                                            (vec3f_t) {{1.0f, 1.0f, 1.0f}});
 
     level_t level = _new_level(level_ent);
     struct level_instance *instance = _level_instance(level);
@@ -286,7 +289,7 @@ void level_destroy(world_t world,
 }
 
 entity_t level_entity_by_id(level_t level,
-                          stringid64_t id) {
+                            stringid64_t id) {
     struct level_instance *instance = _level_instance(level);
     return MAP_GET(entity_t, &instance->spawned_entity_map, id.id,
                    (entity_t) {0});
@@ -300,29 +303,27 @@ entity_t level_entity(level_t level) {
 void *level_get_module_api(int api) {
 
     switch (api) {
-        case PLUGIN_EXPORT_API_ID:
-                {
-                    static struct module_api_v0 module = {0};
+        case PLUGIN_EXPORT_API_ID: {
+            static struct module_api_v0 module = {0};
 
-                    module.init = _init;
-                    module.shutdown = _shutdown;
+            module.init = _init;
+            module.shutdown = _shutdown;
 
-                    return &module;
-                }
-
-
-        case LEVEL_API_ID:
-                {
-                    static struct level_api_v0 api = {0};
-
-                    api.load_level = world_load_level;
-                    api.destroy = level_destroy;
-                    api.entity_by_id = level_entity_by_id;
-                    api.entity = level_entity;
+            return &module;
+        }
 
 
-                    return &api;
-                }
+        case LEVEL_API_ID: {
+            static struct level_api_v0 api = {0};
+
+            api.load_level = world_load_level;
+            api.destroy = level_destroy;
+            api.entity_by_id = level_entity_by_id;
+            api.entity = level_entity;
+
+
+            return &api;
+        }
 
 
         default:

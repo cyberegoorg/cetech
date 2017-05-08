@@ -68,9 +68,11 @@ void cvar_load_global();
 
 void cvar_compile_global();
 
-int cvar_parse_core_args(int argc, const char** argv);
+int cvar_parse_core_args(int argc,
+                         const char **argv);
 
-int cvar_parse_args(int argc, const char** argv);
+int cvar_parse_args(int argc,
+                    const char **argv);
 
 cvar_t cvar_find(const char *name);
 
@@ -165,7 +167,8 @@ static void _reload_end(get_api_fce_t get_engine_api,
 int cvar_init() {
     log_debug(LOG_WHERE, "Init");
 
-    memory_api_v0 = *(struct memory_api_v0 *) module_get_engine_api(MEMORY_API_ID);
+    memory_api_v0 = *(struct memory_api_v0 *) module_get_engine_api(
+            MEMORY_API_ID);
 
     _G.type = stringid64_from_string("config");
 
@@ -178,6 +181,7 @@ void cvar_shutdown() {
     _dealloc_allm_string();
 }
 
+#ifdef CETECH_CAN_COMPILE
 void cvar_compile_global() {
     char build_dir[1024] = {0};
     char source_path[1024] = {0};
@@ -212,7 +216,7 @@ void cvar_compile_global() {
 
     CETECH_DEALLOCATE(memory_api_v0.main_allocator(), data);
 }
-
+#endif
 
 cvar_t cvar_find(const char *name) {
     for (uint64_t i = 1; i < MAX_VARIABLES; ++i) {
@@ -300,15 +304,15 @@ void cvar_load_global() {
     ResourceApiV0.compiler_get_build_dir(build_dir, CETECH_ARRAY_LEN(build_dir),
                                          app_api_v0.platform());
     path_join(source_path, CETECH_ARRAY_LEN(source_path), build_dir,
-                  "global.config");
+              "global.config");
 
     struct vio *source_vio = vio_from_file(source_path, VIO_OPEN_READ,
-                                               memory_api_v0.main_allocator());
+                                           memory_api_v0.main_allocator());
     char *data =
     CETECH_ALLOCATE(memory_api_v0.main_allocator(), char,
-                 vio_size(source_vio));
+                    vio_size(source_vio));
     vio_read(source_vio, data, vio_size(source_vio),
-                 vio_size(source_vio));
+             vio_size(source_vio));
     vio_close(source_vio);
 
     yaml_document_t h;
@@ -363,7 +367,8 @@ void _cvar_from_str(const char *name,
     }
 }
 
-int cvar_parse_args(int argc, const char** argv) {
+int cvar_parse_args(int argc,
+                    const char **argv) {
     struct args tmp_args = {.argc = argc, .argv = argv};
     for (int j = 0; j < tmp_args.argc; ++j) {
         if (tmp_args.argv[j][0] != '-') {
@@ -386,7 +391,8 @@ int cvar_parse_args(int argc, const char** argv) {
     return 1;
 }
 
-int cvar_parse_core_args(int argc, const char** argv) {
+int cvar_parse_core_args(int argc,
+                         const char **argv) {
     struct args tmp_args = {.argc = argc, .argv = argv};
     for (int j = 0; j < tmp_args.argc; ++j) {
         if (tmp_args.argv[j][0] != '-') {
@@ -570,7 +576,9 @@ void *config_get_module_api(int api) {
     } else if (api == CONFIG_API_ID) {
         static struct config_api_v0 api_v1 = {
                 .load_global = cvar_load_global,
+#ifdef CETECH_CAN_COMPILE
                 .compile_global = cvar_compile_global,
+#endif
                 .parse_core_args = cvar_parse_core_args,
                 .parse_args = cvar_parse_args,
                 .find = cvar_find,

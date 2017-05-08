@@ -35,6 +35,10 @@ void nano_log_handler(enum log_level level,
 
     int socket = *((int *) _data); // TODO: problem if sizeof(void*) < int
 
+    if(!socket) {
+        return;
+    }
+
     int bytes;
     char *data;
     size_t size;

@@ -53,7 +53,9 @@ IMPORT_API(app_api_v0)
 //==============================================================================
 // Compiler private
 //==============================================================================
+#ifdef CETECH_CAN_COMPILE
 #include "shader_compiler.h"
+#endif
 
 //==============================================================================
 // Resource
@@ -78,9 +80,10 @@ int shader_init() {
     MAP_INIT(bgfx_program_handle_t, &_G.handler_map,
              memory_api_v0.main_allocator());
 
-    resource_api_v0.compiler_register(_G.type, _shader_resource_compiler);
     resource_api_v0.register_type(_G.type, shader_resource_callback);
-
+#ifdef CETECH_CAN_COMPILE
+    resource_api_v0.compiler_register(_G.type, _shader_resource_compiler);
+#endif
     return 1;
 }
 

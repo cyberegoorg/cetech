@@ -7,12 +7,9 @@
 #include <cetech/allocator.h>
 #include <cetech/stringid.h>
 #include <cetech/renderer.h>
-#include "cetech/vio.h"
 #include <cetech/memory.h>
-#include <cetech/application.h>
-#include <cetech/config.h>
-#include <cetech/vio.h>
 
+#include <cetech/config.h>
 #include <cetech/module.h>
 
 #include <cetech/resource.h>
@@ -54,7 +51,7 @@ struct G {
     ARRAY_T(uint8_t) material_instance_data;
     ARRAY_T(uint32_t) material_instance_uniform_data;
 
-    struct handler32gen* material_handler;
+    struct handler32gen *material_handler;
     stringid64_t type;
 } _G = {0};
 
@@ -67,7 +64,9 @@ IMPORT_API(handler_api_v0);
 //==============================================================================
 // Compiler private
 //==============================================================================
+#ifdef CETECH_CAN_COMPILE
 #include "material_compiler.h"
+#endif
 
 //==============================================================================
 // Resource
@@ -87,15 +86,20 @@ int material_init(get_api_fce_t get_engine_api) {
 
     _G.type = stringid64_from_string("material");
 
-    _G.material_handler = handler_api_v0.handler32gen_create(memory_api_v0.main_allocator());
+    _G.material_handler = handler_api_v0.handler32gen_create(
+            memory_api_v0.main_allocator());
 
-    MAP_INIT(uint32_t, &_G.material_instace_map, memory_api_v0.main_allocator());
-    ARRAY_INIT(uint32_t, &_G.material_instance_offset, memory_api_v0.main_allocator());
-    ARRAY_INIT(uint8_t, &_G.material_instance_data, memory_api_v0.main_allocator());
+    MAP_INIT(uint32_t, &_G.material_instace_map,
+             memory_api_v0.main_allocator());
+    ARRAY_INIT(uint32_t, &_G.material_instance_offset,
+               memory_api_v0.main_allocator());
+    ARRAY_INIT(uint8_t, &_G.material_instance_data,
+               memory_api_v0.main_allocator());
 
-    resource_api_v0.compiler_register(_G.type, _material_resource_compiler);
     resource_api_v0.register_type(_G.type, material_resource_callback);
-
+#ifdef CETECH_CAN_COMPILE
+    resource_api_v0.compiler_register(_G.type, _material_resource_compiler);
+#endif
     return 1;
 }
 
@@ -115,11 +119,11 @@ material_t material_create(stringid64_t name) {
     struct material_blob *resource = resource_api_v0.get(_G.type, name);
 
     uint32_t size = sizeof(struct material_blob) +
-               (resource->uniforms_count * sizeof(char) * 32) +
-               (resource->texture_count * sizeof(stringid64_t)) +
-               (resource->vec4f_count * sizeof(vec4f_t)) +
-               (resource->mat44f_count * sizeof(mat44f_t)) +
-               (resource->mat33f_count * sizeof(mat33f_t));
+                    (resource->uniforms_count * sizeof(char) * 32) +
+                    (resource->texture_count * sizeof(stringid64_t)) +
+                    (resource->vec4f_count * sizeof(vec4f_t)) +
+                    (resource->mat44f_count * sizeof(mat44f_t)) +
+                    (resource->mat33f_count * sizeof(mat33f_t));
 
     uint32_t h = handler_api_v0.handler32_create(_G.material_handler);
 
@@ -172,7 +176,8 @@ material_t material_create(stringid64_t name) {
 
 
 uint32_t material_get_texture_count(material_t material) {
-    uint32_t idx = MAP_GET(uint32_t, &_G.material_instace_map, material.idx, UINT32_MAX);
+    uint32_t idx = MAP_GET(uint32_t, &_G.material_instace_map, material.idx,
+                           UINT32_MAX);
 
     if (idx == UINT32_MAX) {
         return 0;
@@ -185,7 +190,7 @@ uint32_t material_get_texture_count(material_t material) {
 }
 
 uint32_t _material_find_slot(struct material_blob *resource,
-                        const char *name) {
+                             const char *name) {
     const char *u_names = (const char *) (resource + 1);
     for (uint32_t i = 0; i < resource->uniforms_count; ++i) {
         if (str_cmp(&u_names[i * 32], name) != 0) {
@@ -202,13 +207,15 @@ void material_set_texture(material_t material,
                           const char *slot,
                           stringid64_t texture) {
 
-    uint32_t idx = MAP_GET(uint32_t, &_G.material_instace_map, material.idx, UINT32_MAX);
+    uint32_t idx = MAP_GET(uint32_t, &_G.material_instace_map, material.idx,
+                           UINT32_MAX);
 
     if (idx == UINT32_MAX) {
         return;
     }
 
-    struct material_blob *resource = (struct material_blob *) &_get_resorce(idx);
+    struct material_blob *resource = (struct material_blob *) &_get_resorce(
+            idx);
 
 
     stringid64_t *u_texture = material_blob_texture_names(resource);
@@ -222,7 +229,8 @@ void material_set_vec4f(material_t material,
                         const char *slot,
                         vec4f_t v) {
 
-    uint32_t idx = MAP_GET(uint32_t, &_G.material_instace_map, material.idx, UINT32_MAX);
+    uint32_t idx = MAP_GET(uint32_t, &_G.material_instace_map, material.idx,
+                           UINT32_MAX);
 
     if (idx == UINT32_MAX) {
         return;
@@ -242,7 +250,8 @@ void material_set_mat33f(material_t material,
                          const char *slot,
                          mat33f_t v) {
 
-    uint32_t idx = MAP_GET(uint32_t, &_G.material_instace_map, material.idx, UINT32_MAX);
+    uint32_t idx = MAP_GET(uint32_t, &_G.material_instace_map, material.idx,
+                           UINT32_MAX);
 
     if (idx == UINT32_MAX) {
         return;
@@ -262,7 +271,8 @@ void material_set_mat33f(material_t material,
 void material_set_mat44f(material_t material,
                          const char *slot,
                          mat44f_t v) {
-    uint32_t idx = MAP_GET(uint32_t, &_G.material_instace_map, material.idx, UINT32_MAX);
+    uint32_t idx = MAP_GET(uint32_t, &_G.material_instace_map, material.idx,
+                           UINT32_MAX);
 
     if (idx == UINT32_MAX) {
         return;
@@ -281,7 +291,8 @@ void material_set_mat44f(material_t material,
 
 
 void material_use(material_t material) {
-    uint32_t idx = MAP_GET(uint32_t, &_G.material_instace_map, material.idx, UINT32_MAX);
+    uint32_t idx = MAP_GET(uint32_t, &_G.material_instace_map, material.idx,
+                           UINT32_MAX);
 
     if (idx == UINT32_MAX) {
         return;
@@ -325,19 +336,20 @@ void material_use(material_t material) {
 
 
     uint64_t state = (0
-                 | BGFX_STATE_RGB_WRITE
-                 | BGFX_STATE_ALPHA_WRITE
-                 | BGFX_STATE_DEPTH_TEST_LESS
-                 | BGFX_STATE_DEPTH_WRITE
-                 | BGFX_STATE_CULL_CCW
-                 | BGFX_STATE_MSAA
+                      | BGFX_STATE_RGB_WRITE
+                      | BGFX_STATE_ALPHA_WRITE
+                      | BGFX_STATE_DEPTH_TEST_LESS
+                      | BGFX_STATE_DEPTH_WRITE
+                      | BGFX_STATE_CULL_CCW
+                      | BGFX_STATE_MSAA
     );
 
     bgfx_set_state(state, 0);
 }
 
 void material_submit(material_t material) {
-    uint32_t idx = MAP_GET(uint32_t, &_G.material_instace_map, material.idx, UINT32_MAX);
+    uint32_t idx = MAP_GET(uint32_t, &_G.material_instace_map, material.idx,
+                           UINT32_MAX);
     CETECH_ASSERT(LOG_WHERE, idx != UINT32_MAX);
 
     struct material_blob *resource = (struct material_blob *) &_get_resorce(

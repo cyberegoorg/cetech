@@ -850,7 +850,9 @@ static void _init(get_api_fce_t get_engine_api) {
                                                   _cmd_execute_string);
 
     resource_api_v0.register_type(_G.type_id, lua_resource_callback);
+#ifdef CETECH_CAN_COMPILE
     resource_api_v0.compiler_register(_G.type_id, _lua_compiler);
+#endif
 }
 
 static void _shutdown() {

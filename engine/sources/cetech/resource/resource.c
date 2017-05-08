@@ -12,12 +12,10 @@
 
 #include <cetech/application.h>
 #include <cetech/config.h>
-#include <cetech/vio.h>
 #include <cetech/resource.h>
 
 #include <cetech/develop.h>
 #include <cetech/memory.h>
-#include <cetech/module.h>
 #include <cetech/module.h>
 #include <cetech/filesystem.h>
 
@@ -74,12 +72,21 @@ struct G {
 
 } _G = {0};
 
+
+
 IMPORT_API(memory_api_v0);
 IMPORT_API(cnsole_srv_api_v0);
 IMPORT_API(filesystem_api_v0);
 IMPORT_API(config_api_v0);
 IMPORT_API(app_api_v0);
 
+
+int resource_compiler_get_build_dir(char *build_dir,
+                                    size_t max_len,
+                                    const char *platform) {
+    const char *build_dir_str = config_api_v0.get_string(_G.config.build_dir);
+    return path_join(build_dir, max_len, build_dir_str, platform);
+}
 
 //==============================================================================
 // Private
@@ -155,28 +162,29 @@ static void _init(get_api_fce_t get_engine_api) {
     INIT_API(get_engine_api, config_api_v0, CONFIG_API_ID);
     INIT_API(get_engine_api, app_api_v0, APPLICATION_API_ID);
 
-    ARRAY_INIT(resource_data, &_G.resource_data, memory_api_v0.main_allocator());
+    ARRAY_INIT(resource_data, &_G.resource_data,
+               memory_api_v0.main_allocator());
     ARRAY_INIT(resource_callbacks_t, &_G.resource_callbacks,
                memory_api_v0.main_allocator());
     MAP_INIT(uint32_t, &_G.type_map, memory_api_v0.main_allocator());
 
-    _G.config.build_dir = config_api_v0.find("build");
+//    _G.config.build_dir = config_api_v0.find("build");
 
 
     char build_dir_full[4096] = {0};
     path_join(build_dir_full,
-                  CETECH_ARRAY_LEN(build_dir_full),
-                  config_api_v0.get_string(_G.config.build_dir),
-                  app_api_v0.platform());
+              CETECH_ARRAY_LEN(build_dir_full),
+              config_api_v0.get_string(_G.config.build_dir),
+              app_api_v0.platform());
 
     filesystem_api_v0.filesystem_map_root_dir(stringid64_from_string("build"),
-                                            build_dir_full);
+                                              build_dir_full);
 
     resource_register_type(stringid64_from_string("package"),
                            package_resource_callback);
 
     cnsole_srv_api_v0.consolesrv_register_command("resource.reload_all",
-                                                   _cmd_reload_all);
+                                                  _cmd_reload_all);
 
     package_init(get_engine_api);
     //return package_init();
@@ -185,6 +193,9 @@ static void _init(get_api_fce_t get_engine_api) {
 
 static void _init_cvar(struct config_api_v0 config) {
     _G = (struct G) {0};
+
+    _G.config.build_dir = config.new_str("build", "Resource build dir",
+                                     "data/build");
 }
 
 static void _shutdown() {
@@ -334,19 +345,24 @@ void resource_load(void **loaded_data,
         }
 
         char build_name[33] = {0};
-        resource_type_name_string(build_name, CETECH_ARRAY_LEN(build_name), type,
+        resource_type_name_string(build_name, CETECH_ARRAY_LEN(build_name),
+                                  type,
                                   names[i]);
 
+#ifdef CETECH_CAN_COMPILE
         char filename[4096] = {0};
         resource_compiler_get_filename(filename, CETECH_ARRAY_LEN(filename), type,
                                        names[i]);
+#else
+        char *filename = build_name;
+#endif
         log_debug("resource", "Loading resource %s from %s/%s", filename,
                   filesystem_api_v0.filesystem_get_root_dir(root_name),
                   build_name);
 
         struct vio *resource_file = filesystem_api_v0.filesystem_open(root_name,
-                                                                    build_name,
-                                                                    VIO_OPEN_READ);
+                                                                      build_name,
+                                                                      VIO_OPEN_READ);
 
         if (resource_file != NULL) {
             loaded_data[i] = type_clb.loader(resource_file,
@@ -384,9 +400,14 @@ void resource_unload(stringid64_t type,
             resource_type_name_string(build_name, CETECH_ARRAY_LEN(build_name),
                                       type, names[i]);
 
-            char filename[1024] = {0};
-            resource_compiler_get_filename(filename, CETECH_ARRAY_LEN(filename),
-                                           type, names[i]);
+#ifdef CETECH_CAN_COMPILE
+            char filename[4096] = {0};
+            resource_compiler_get_filename(filename, CETECH_ARRAY_LEN(filename), type,
+                                       names[i]);
+#else
+            char *filename = build_name;
+#endif
+
             log_debug("resource", "Unload resource %s ", filename);
 
             type_clb.offline(names[i], item.data);
@@ -407,14 +428,18 @@ void *resource_get(stringid64_t type,
                                    null_item);
     if (is_item_null(item)) {
         char build_name[33] = {0};
-        resource_type_name_string(build_name, CETECH_ARRAY_LEN(build_name), type,
+        resource_type_name_string(build_name, CETECH_ARRAY_LEN(build_name),
+                                  type,
                                   names);
 
         if (_G.autoload_enabled) {
-            char filename[1024] = {0};
-            resource_compiler_get_filename(filename, CETECH_ARRAY_LEN(filename),
-                                           type, names);
-
+#ifdef CETECH_CAN_COMPILE
+            char filename[4096] = {0};
+        resource_compiler_get_filename(filename, CETECH_ARRAY_LEN(filename), type,
+                                       names);
+#else
+            char *filename = build_name;
+#endif
             log_warning(LOG_WHERE, "Autoloading resource %s", filename);
             resource_load_now(type, &names, 1);
             item = MAP_GET(resource_item_t, resource_map, names.id, null_item);
@@ -440,13 +465,16 @@ void resource_reload(stringid64_t type,
 
     resource_load(loaded_data, type, names, count, 1);
     for (int i = 0; i < count; ++i) {
-//        char build_name[33] = {0};
-//        resource_type_name_string(build_name, CETECH_ARRAY_LEN(build_name), type, names[i]);
-
-        char filename[1024] = {0};
+#ifdef CETECH_CAN_COMPILE
+        char filename[4096] = {0};
         resource_compiler_get_filename(filename, CETECH_ARRAY_LEN(filename), type,
                                        names[i]);
+#else
+        char build_name[33] = {0};
+        resource_type_name_string(build_name, CETECH_ARRAY_LEN(build_name), type, names[i]);
 
+        char* filename = build_name;
+#endif
         log_debug("resource", "Reload resource %s ", filename);
 
         void *old_data = resource_get(type, names[i]);
@@ -499,57 +527,56 @@ void resource_reload_all() {
 
 void *resourcesystem_get_module_api(int api) {
     switch (api) {
-        case PLUGIN_EXPORT_API_ID:
-                {
-                    static struct module_api_v0 module = {0};
+        case PLUGIN_EXPORT_API_ID: {
+            static struct module_api_v0 module = {0};
 
-                    module.init = _init;
-                    module.shutdown = _shutdown;
-                    module.init_cvar = _init_cvar;
+            module.init = _init;
+            module.shutdown = _shutdown;
+            module.init_cvar = _init_cvar;
 
-                    return &module;
-                }
+            return &module;
+        }
 
-        case RESOURCE_API_ID:
-                {
-                    static struct resource_api_v0 api = {0};
+        case RESOURCE_API_ID: {
+            static struct resource_api_v0 api = {0};
 
-                    api.set_autoload = resource_set_autoload;
-                    api.register_type = resource_register_type;
-                    api.load = resource_load;
-                    api.add_loaded = resource_add_loaded;
-                    api.load_now = resource_load_now;
-                    api.unload = resource_unload;
-                    api.reload = resource_reload;
-                    api.reload_all = resource_reload_all;
-                    api.can_get = resource_can_get;
-                    api.can_get_all = resource_can_get_all;
-                    api.get = resource_get;
-                    api.type_name_string = resource_type_name_string;
-                    api.compiler_register = resource_compiler_register;
-                    api.compiler_compile_all = resource_compiler_compile_all;
-                    api.compiler_get_filename = resource_compiler_get_filename;
-                    api.compiler_get_build_dir = resource_compiler_get_build_dir;
-                    api.compiler_get_tmp_dir = resource_compiler_get_tmp_dir;
-                    api.compiler_external_join = resource_compiler_external_join;
-                    api.compiler_create_build_dir = resource_compiler_create_build_dir;
-                    api.compiler_get_core_dir = resource_compiler_get_core_dir;
-                    api.compiler_get_source_dir = resource_compiler_get_source_dir;
+            api.set_autoload = resource_set_autoload;
+            api.register_type = resource_register_type;
+            api.load = resource_load;
+            api.add_loaded = resource_add_loaded;
+            api.load_now = resource_load_now;
+            api.unload = resource_unload;
+            api.reload = resource_reload;
+            api.reload_all = resource_reload_all;
+            api.can_get = resource_can_get;
+            api.can_get_all = resource_can_get_all;
+            api.get = resource_get;
+            api.type_name_string = resource_type_name_string;
+            api.compiler_get_build_dir = resource_compiler_get_build_dir;
 
-                    return &api;
-                }
+#ifdef CETECH_CAN_COMPILE
+            api.compiler_get_core_dir = resource_compiler_get_core_dir;
+            api.compiler_register = resource_compiler_register;
+            api.compiler_compile_all = resource_compiler_compile_all;
+            api.compiler_get_filename = resource_compiler_get_filename;
+            api.compiler_get_tmp_dir = resource_compiler_get_tmp_dir;
+            api.compiler_external_join = resource_compiler_external_join;
+            api.compiler_create_build_dir = resource_compiler_create_build_dir;
+            api.compiler_get_source_dir = resource_compiler_get_source_dir;
+#endif
+            return &api;
+        }
 
-        case PACKAGE_API_ID:
-                {
-                    static struct package_api_v0 api = {0};
+        case PACKAGE_API_ID: {
+            static struct package_api_v0 api = {0};
 
-                    api.load = package_load;
-                    api.unload = package_unload;
-                    api.is_loaded = package_is_loaded;
-                    api.flush = package_flush;
+            api.load = package_load;
+            api.unload = package_unload;
+            api.is_loaded = package_is_loaded;
+            api.flush = package_flush;
 
-                    return &api;
-                }
+            return &api;
+        }
 
 
         default:
