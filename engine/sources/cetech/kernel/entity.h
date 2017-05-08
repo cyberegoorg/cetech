@@ -89,9 +89,9 @@ struct entity_api_v0 {
     //! \param filename Resource filename
     //! \param compilator_api Compilator api
     void (*compiler_compile_entity)(struct entity_compile_output *output,
-                                  yaml_node_t root,
-                                  const char *filename,
-                                  struct compilator_api *compilator_api);
+                                    yaml_node_t root,
+                                    const char *filename,
+                                    struct compilator_api *compilator_api);
 
     //! Get entity counter from output
     //! \param output Compiler output
@@ -113,6 +113,7 @@ struct entity_api_v0 {
                               const char *filename,
                               ARRAY_T(uint8_t) *build,
                               struct compilator_api *compilator_api);
+
 #endif
 };
 

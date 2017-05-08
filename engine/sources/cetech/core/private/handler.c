@@ -32,8 +32,9 @@ struct handler32gen {
 //==============================================================================
 
 struct handler32gen *handler32gen_create(struct allocator *allocator) {
-    struct handler32gen *hid = CETECH_ALLOCATE(allocator, struct handler32gen,
-                                               1);
+    struct handler32gen *hid =
+    CETECH_ALLOCATE(allocator, struct handler32gen,
+                    1);
 
     hid->alloc = allocator;
     ARRAY_INIT(uint32_t, &hid->_generation, allocator);

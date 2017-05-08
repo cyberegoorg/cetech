@@ -80,14 +80,15 @@ struct scene_instance *_get_scene_instance(stringid64_t scene) {
 // Compiler private
 //==============================================================================
 #ifdef CETECH_CAN_COMPILE
+
 #include "scene_compiler.h"
+
 #endif
 
 //==============================================================================
 // Resource
 //==============================================================================
 #include "scene_resource.h"
-#include <cetech/core/module.h>
 
 //==============================================================================
 // Interface

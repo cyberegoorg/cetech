@@ -20,8 +20,6 @@
 #include "resource.h"
 #include <cetech/core/fs.h>
 
-#include "../module.h"
-
 //==============================================================================
 // Struct and types
 //==============================================================================
@@ -349,7 +347,8 @@ void resource_load(void **loaded_data,
 
 #ifdef CETECH_CAN_COMPILE
         char filename[4096] = {0};
-        resource_compiler_get_filename(filename, CETECH_ARRAY_LEN(filename), type,
+        resource_compiler_get_filename(filename, CETECH_ARRAY_LEN(filename),
+                                       type,
                                        names[i]);
 #else
         char *filename = build_name;
@@ -400,8 +399,9 @@ void resource_unload(stringid64_t type,
 
 #ifdef CETECH_CAN_COMPILE
             char filename[4096] = {0};
-            resource_compiler_get_filename(filename, CETECH_ARRAY_LEN(filename), type,
-                                       names[i]);
+            resource_compiler_get_filename(filename, CETECH_ARRAY_LEN(filename),
+                                           type,
+                                           names[i]);
 #else
             char *filename = build_name;
 #endif
@@ -433,8 +433,9 @@ void *resource_get(stringid64_t type,
         if (_G.autoload_enabled) {
 #ifdef CETECH_CAN_COMPILE
             char filename[4096] = {0};
-        resource_compiler_get_filename(filename, CETECH_ARRAY_LEN(filename), type,
-                                       names);
+            resource_compiler_get_filename(filename, CETECH_ARRAY_LEN(filename),
+                                           type,
+                                           names);
 #else
             char *filename = build_name;
 #endif
@@ -465,7 +466,8 @@ void resource_reload(stringid64_t type,
     for (int i = 0; i < count; ++i) {
 #ifdef CETECH_CAN_COMPILE
         char filename[4096] = {0};
-        resource_compiler_get_filename(filename, CETECH_ARRAY_LEN(filename), type,
+        resource_compiler_get_filename(filename, CETECH_ARRAY_LEN(filename),
+                                       type,
                                        names[i]);
 #else
         char build_name[33] = {0};

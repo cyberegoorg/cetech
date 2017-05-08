@@ -14,7 +14,6 @@
 #include <cetech/core/log.h>
 #include <stdio.h>
 #include <cetech/core/string.h>
-#include "module.h"
 #include <cetech/core/fs.h>
 
 
@@ -181,6 +180,7 @@ void cvar_shutdown() {
 }
 
 #ifdef CETECH_CAN_COMPILE
+
 void cvar_compile_global() {
     char build_dir[1024] = {0};
     char source_path[1024] = {0};
@@ -194,27 +194,28 @@ void cvar_compile_global() {
     ResourceApiV0.compiler_get_build_dir(build_dir, CETECH_ARRAY_LEN(build_dir),
                                          app_api_v0.platform());
     path_join(build_path, CETECH_ARRAY_LEN(build_path), build_dir,
-                  "global.config");
+              "global.config");
     path_join(source_path, CETECH_ARRAY_LEN(source_path),
-                  ResourceApiV0.compiler_get_source_dir(), "global.config");
+              ResourceApiV0.compiler_get_source_dir(), "global.config");
 
     struct vio *source_vio = vio_from_file(source_path, VIO_OPEN_READ,
-                                               memory_api_v0.main_allocator());
+                                           memory_api_v0.main_allocator());
     char *data =
     CETECH_ALLOCATE(memory_api_v0.main_allocator(), char,
-                 vio_size(source_vio));
+                    vio_size(source_vio));
 
     size_t size = (size_t) vio_size(source_vio);
     vio_read(source_vio, data, sizeof(char), size);
     vio_close(source_vio);
 
     struct vio *build_vio = vio_from_file(build_path, VIO_OPEN_WRITE,
-                                              memory_api_v0.main_allocator());
+                                          memory_api_v0.main_allocator());
     vio_write(build_vio, data, sizeof(char), size);
     vio_close(build_vio);
 
     CETECH_DEALLOCATE(memory_api_v0.main_allocator(), data);
 }
+
 #endif
 
 cvar_t cvar_find(const char *name) {

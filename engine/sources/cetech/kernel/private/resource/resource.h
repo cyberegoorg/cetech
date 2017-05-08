@@ -50,6 +50,7 @@ int resource_type_name_string(char *str,
                               stringid64_t name);
 
 #ifdef CETECH_CAN_COMPILE
+
 void resource_compiler_register(stringid64_t type,
                                 resource_compilator_t compilator);
 
@@ -72,7 +73,9 @@ int resource_compiler_external_join(char *output,
                                     const char *name);
 
 void resource_compiler_create_build_dir();
+
 const char *resource_compiler_get_core_dir();
+
 #endif
 
 

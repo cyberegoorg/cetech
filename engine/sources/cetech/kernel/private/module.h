@@ -12,8 +12,6 @@
 #include <cetech/core/module.h>
 
 
-
-
 #endif //CETECH_PLUGIN_SYSTEM_H
 
 //! \}

@@ -64,7 +64,9 @@ IMPORT_API(handler_api_v0);
 // Compiler private
 //==============================================================================
 #ifdef CETECH_CAN_COMPILE
+
 #include "material_compiler.h"
+
 #endif
 
 //==============================================================================

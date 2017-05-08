@@ -78,8 +78,9 @@ void dir_list(const char *path,
             dir_list(tmp_path, 1, files, allocator);
         } else {
             size_t size = str_len(path) + str_len(entry->d_name) + 3;
-            char *new_path = CETECH_ALLOCATE(allocator, char,
-                                             sizeof(char) * size);
+            char *new_path =
+            CETECH_ALLOCATE(allocator, char,
+                            sizeof(char) * size);
 
             if (path[str_len(path) - 1] != '/') {
                 snprintf(new_path, size - 1, "%s/%s", path, entry->d_name);

@@ -5,7 +5,6 @@
 #include <cetech/core/map.inl>
 #include <cetech/core/module.h>
 #include <cetech/core/memory.h>
-#include <cetech/core/memory.h>
 #include <cetech/core/yaml.h>
 #include <cetech/core/hash.h>
 #include <cetech/core/handler.h>
@@ -102,6 +101,7 @@ void _destroy_spawned_array(entity_t entity) {
 // Compiler private
 //==============================================================================
 #ifdef CETECH_CAN_COMPILE
+
 static void preprocess(const char *filename,
                        yaml_node_t root,
                        struct compilator_api *capi) {
@@ -119,15 +119,15 @@ static void preprocess(const char *filename,
         char full_path[256] = {0};
         const char *source_dir = resource_api_v0.compiler_get_source_dir();
         path_join(full_path, CETECH_ARRAY_LEN(full_path), source_dir,
-                      prefab_file);
+                  prefab_file);
 
         struct vio *prefab_vio = vio_from_file(full_path, VIO_OPEN_READ,
-                                                   memory_api_v0.main_allocator());
+                                               memory_api_v0.main_allocator());
 
         char prefab_data[vio_size(prefab_vio) + 1];
         memory_set(prefab_data, 0, vio_size(prefab_vio) + 1);
         vio_read(prefab_vio, prefab_data, sizeof(char),
-                     vio_size(prefab_vio));
+                 vio_size(prefab_vio));
 
         yaml_document_t h;
         yaml_node_t prefab_root = yaml_load_str(prefab_data, &h);
@@ -224,8 +224,9 @@ void foreach_components_clb(yaml_node_t key,
         MAP_SET(array_yaml_node_t, &output->component_body, cid.id, tmp_a);
 
     }
-    ARRAY_T(uint32_t) *tmp_a = MAP_GET_PTR(array_uint32_t, &output->component_ent,
-                                      cid.id);
+    ARRAY_T(uint32_t) *tmp_a = MAP_GET_PTR(array_uint32_t,
+                                           &output->component_ent,
+                                           cid.id);
     ARRAY_PUSH_BACK(uint32_t, tmp_a, data->ent_id);
 
     ARRAY_T(yaml_node_t) *tmp_b = MAP_GET_PTR(array_yaml_node_t,
@@ -267,14 +268,13 @@ static void compile_entitity(yaml_node_t rootNode,
 }
 
 
-
 struct entity_compile_output *entity_compiler_create_output() {
     struct allocator *a = memory_api_v0.main_allocator();
 
     struct entity_compile_output *output =
     CETECH_ALLOCATE(a,
-                 struct entity_compile_output,
-                 1);
+                    struct entity_compile_output,
+                    1);
     output->ent_counter = 0;
     ARRAY_INIT(uint64_t, &output->component_type, a);
     MAP_INIT(array_uint32_t, &output->component_ent, a);
@@ -290,9 +290,9 @@ void entity_compiler_destroy_output(struct entity_compile_output *output) {
 
     // clean inner array
     const MAP_ENTRY_T(array_uint32_t) *ce_it = MAP_BEGIN(array_uint32_t,
-                                                    &output->component_ent);
+                                                         &output->component_ent);
     const MAP_ENTRY_T(array_uint32_t) *ce_end = MAP_END(array_uint32_t,
-                                                   &output->component_ent);
+                                                        &output->component_ent);
     while (ce_it != ce_end) {
         ARRAY_DESTROY(uint32_t, (struct array_uint32_t *) &ce_it->value);
         ++ce_it;
@@ -315,9 +315,9 @@ void entity_compiler_destroy_output(struct entity_compile_output *output) {
 }
 
 void entity_compiler_compile_entity(struct entity_compile_output *output,
-                                yaml_node_t root,
-                                const char *filename,
-                                struct compilator_api *compilator_api) {
+                                    yaml_node_t root,
+                                    const char *filename,
+                                    struct compilator_api *compilator_api) {
 
     preprocess(filename, root, compilator_api);
     compile_entitity(root, UINT32_MAX, output);
@@ -328,12 +328,13 @@ uint32_t entity_compiler_ent_counter(struct entity_compile_output *output) {
 }
 
 void entity_compiler_write_to_build(struct entity_compile_output *output,
-                                  ARRAY_T(uint8_t) *build) {
+                                    ARRAY_T(uint8_t) *build) {
     struct entity_resource res = {0};
     res.ent_count = (uint32_t) (output->ent_counter);
     res.comp_type_count = (uint32_t) ARRAY_SIZE(&output->component_type);
 
-    ARRAY_PUSH(uint8_t, build, (uint8_t *) &res, sizeof(struct entity_resource));
+    ARRAY_PUSH(uint8_t, build, (uint8_t *) &res,
+               sizeof(struct entity_resource));
 
     //write parents
     for (int i = 0; i < res.ent_count; ++i) {
@@ -351,8 +352,9 @@ void entity_compiler_write_to_build(struct entity_compile_output *output,
         uint64_t cid = ARRAY_AT(&output->component_type, j);
         stringid64_t id = {.id = cid};
 
-        ARRAY_T(uint32_t) *ent_arr = MAP_GET_PTR(array_uint32_t, &output->component_ent,
-                                            cid);
+        ARRAY_T(uint32_t) *ent_arr = MAP_GET_PTR(array_uint32_t,
+                                                 &output->component_ent,
+                                                 cid);
 
         struct component_data cdata = {
                 .ent_count = ARRAY_SIZE(ent_arr)
@@ -365,7 +367,7 @@ void entity_compiler_write_to_build(struct entity_compile_output *output,
 
         for (int i = 0; i < cdata.ent_count; ++i) {
             component_api_v0.component_compile(id, ARRAY_AT(body, i),
-                                                   &comp_data);
+                                               &comp_data);
         }
 
         cdata.size = ARRAY_SIZE(&comp_data);
@@ -381,9 +383,9 @@ void entity_compiler_write_to_build(struct entity_compile_output *output,
 }
 
 void entity_resource_compiler(yaml_node_t root,
-                            const char *filename,
-                            ARRAY_T(uint8_t) *build,
-                            struct compilator_api *compilator_api) {
+                              const char *filename,
+                              ARRAY_T(uint8_t) *build,
+                              struct compilator_api *compilator_api) {
     struct entity_compile_output *output = entity_compiler_create_output();
     entity_compiler_compile_entity(output, root, filename, compilator_api);
     entity_compiler_write_to_build(output, build);
@@ -392,13 +394,13 @@ void entity_resource_compiler(yaml_node_t root,
 }
 
 int _entity_resource_compiler(const char *filename,
-                            struct vio *source_vio,
-                            struct vio *build_vio,
-                            struct compilator_api *compilator_api) {
+                              struct vio *source_vio,
+                              struct vio *build_vio,
+                              struct compilator_api *compilator_api) {
     char source_data[vio_size(source_vio) + 1];
     memory_set(source_data, 0, vio_size(source_vio) + 1);
     vio_read(source_vio, source_data, sizeof(char),
-                 vio_size(source_vio));
+             vio_size(source_vio));
 
     yaml_document_t h;
     yaml_node_t root = yaml_load_str(source_data, &h);
@@ -409,7 +411,7 @@ int _entity_resource_compiler(const char *filename,
     entity_resource_compiler(root, filename, &entity_data, compilator_api);
 
     vio_write(build_vio, &ARRAY_AT(&entity_data, 0), sizeof(uint8_t),
-                  ARRAY_SIZE(&entity_data));
+              ARRAY_SIZE(&entity_data));
 
 
     ARRAY_DESTROY(uint8_t, &entity_data);

@@ -204,6 +204,7 @@ struct resource_api_v0 {
                             stringid64_t name);
 
 #ifdef CETECH_CAN_COMPILE
+
     //! Register resource compiler
     //! \param type Type
     //! \param compilator Compilator fce
@@ -257,6 +258,7 @@ struct resource_api_v0 {
     //! Get core dir
     //! \return Core dir
     const char *(*compiler_get_core_dir)();
+
 #endif
 
     //! Get build dir

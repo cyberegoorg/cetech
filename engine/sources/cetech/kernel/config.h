@@ -55,7 +55,9 @@ struct config_api_v0 {
     void (*load_global)();
 
 #ifdef CETECH_CAN_COMPILE
+
     void (*compile_global)();
+
 #endif
 
     int (*parse_core_args)(int argc,

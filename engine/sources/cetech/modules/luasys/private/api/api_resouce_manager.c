@@ -16,10 +16,12 @@ static int _reload_all(lua_State *l) {
 }
 
 #ifdef CETECH_CAN_COMPILE
+
 static int _compile_all(lua_State *l) {
     resource_api_v0.compiler_compile_all();
     return 0;
 }
+
 #endif
 
 void _register_lua_resource_manager_api(get_api_fce_t get_engine_api) {

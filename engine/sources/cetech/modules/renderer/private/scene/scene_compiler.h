@@ -65,8 +65,9 @@ struct compile_output {
 
 struct compile_output *_crete_compile_output() {
     struct allocator *a = memory_api_v0.main_allocator();
-    struct compile_output *output = CETECH_ALLOCATE(a, struct compile_output,
-                                                    1);
+    struct compile_output *output =
+    CETECH_ALLOCATE(a, struct compile_output,
+                    1);
 
     ARRAY_INIT(stringid64_t, &output->geom_name, a);
     ARRAY_INIT(uint32_t, &output->ib_offset, a);
