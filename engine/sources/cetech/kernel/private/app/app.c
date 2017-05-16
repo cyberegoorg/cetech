@@ -102,7 +102,6 @@ void application_quit() {
     _G.init_error = 0;
 }
 
-
 static struct app_api_v0 api_v1 = {
         .quit = application_quit,
         .platform =  application_platform,
@@ -149,6 +148,7 @@ int _init_config() {
     // Cvar stage
 
     config_api_v0.parse_core_args(_G.args.argc, _G.args.argv);
+
 #ifdef CETECH_CAN_COMPILE
     if (config_api_v0.get_int(_G.config.compile)) {
         char build_dir_full[1024] = {0};
@@ -193,7 +193,8 @@ int application_init(int argc,
 
     cvar_init();
     module_call_init_cvar();
-    module_call_init();
+
+    //module_call_init();
 
     ADD_STATIC_PLUGIN(sdl);
     ADD_STATIC_PLUGIN(machine);
@@ -209,7 +210,6 @@ int application_init(int argc,
 #endif
 
     _init_static_modules();
-
     module_load_dirs("./bin");
     module_call_init_cvar();
 
@@ -260,7 +260,6 @@ static void _boot_stage() {
             config_api_v0.get_string(_G.config.boot_script));
     lua_api_v0.execute_boot_script(boot_script);
 }
-
 
 static void _boot_unload() {
     stringid64_t boot_pkg = stringid64_from_string(

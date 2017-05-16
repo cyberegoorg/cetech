@@ -204,7 +204,6 @@ void package_unload(stringid64_t name) {
 
 int package_is_loaded(stringid64_t name) {
     const stringid64_t package_type = stringid64_from_string("package");
-
     struct package_resource *package = resource_api_v0.get(package_type, name);
 
     const uint32_t task_count = package->type_count;

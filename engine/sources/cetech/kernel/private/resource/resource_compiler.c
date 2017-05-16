@@ -267,10 +267,8 @@ void *resourcecompiler_get_module_api(int api) {
 void resource_compiler_create_build_dir(struct config_api_v0 config,
                                         struct app_api_v0 app) {
     char build_dir_full[1024] = {0};
-
-    resource_api_v0.compiler_get_build_dir(build_dir_full,
-                                           CETECH_ARRAY_LEN(build_dir_full),
-                                           app_api_v0.platform());
+    const char* platform = app_api_v0.platform();
+    resource_compiler_get_build_dir(build_dir_full, CETECH_ARRAY_LEN(build_dir_full), platform);
 
     dir_make_path(build_dir_full);
 }

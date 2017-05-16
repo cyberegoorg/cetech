@@ -165,9 +165,7 @@ static void _reload_end(get_api_fce_t get_engine_api,
 int cvar_init() {
     log_debug(LOG_WHERE, "Init");
 
-    memory_api_v0 = *(struct memory_api_v0 *) module_get_engine_api(
-            MEMORY_API_ID);
-
+    INIT_API(module_get_engine_api, memory_api_v0, MEMORY_API_ID);
     _G.type = stringid64_from_string("config");
 
     return 1;
