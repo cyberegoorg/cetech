@@ -1,11 +1,11 @@
 "use strict";
 exports.__esModule = true;
-var PlaygroundRPC = (function () {
-    function PlaygroundRPC() {
+var EngineRPC = (function () {
+    function EngineRPC() {
         this.connected = false;
         this.response_callbacks = {};
     }
-    PlaygroundRPC.prototype.connect = function (url, onopen) {
+    EngineRPC.prototype.connect = function (url, onopen) {
         var _this = this;
         if (onopen === void 0) { onopen = null; }
         this.rpc_ws = new WebSocket(url, "rep.sp.nanomsg.org");
@@ -26,14 +26,14 @@ var PlaygroundRPC = (function () {
             _this._parseMessage(unpack_msg);
         };
     };
-    PlaygroundRPC.prototype.close = function () {
+    EngineRPC.prototype.close = function () {
         if (this.rpc_ws) {
             this.rpc_ws.close();
+            this.rpc_ws = null;
         }
     };
-    PlaygroundRPC.prototype.callService = function (service_name, fce_name, args, on_ok) {
+    EngineRPC.prototype.call = function (fce_name, args, on_ok) {
         var request = {
-            service: service_name,
             name: fce_name,
             args: args,
             id: Math.random()
@@ -48,7 +48,7 @@ var PlaygroundRPC = (function () {
         tmp.set(msg, header.byteLength);
         this.rpc_ws.send(tmp.buffer);
     };
-    PlaygroundRPC.prototype._parseMessage = function (msg) {
+    EngineRPC.prototype._parseMessage = function (msg) {
         console.log(msg);
         if (!msg.hasOwnProperty("response") ||
             ((msg.response != null) && msg.response.hasOwnProperty("error"))) {
@@ -59,15 +59,15 @@ var PlaygroundRPC = (function () {
         }
         delete this.response_callbacks[msg.id];
     };
-    return PlaygroundRPC;
+    return EngineRPC;
 }());
-exports.PlaygroundRPC = PlaygroundRPC;
-var PlaygroundSubscriber = (function () {
-    function PlaygroundSubscriber() {
+exports.EngineRPC = EngineRPC;
+var EngineSubscriber = (function () {
+    function EngineSubscriber() {
         this.connected = false;
-        this.responce_callbacks = {};
+        this.on_log = null;
     }
-    PlaygroundSubscriber.prototype.connect = function (url) {
+    EngineSubscriber.prototype.connect = function (url) {
         var _this = this;
         this.sub_ws = new WebSocket(url, "pub.sp.nanomsg.org");
         this.sub_ws.binaryType = "arraybuffer";
@@ -78,22 +78,23 @@ var PlaygroundSubscriber = (function () {
             _this.connected = false;
         };
         this.sub_ws.onmessage = function (msg) {
+            if (_this.on_log == null) {
+                return;
+            }
             var msg_data = new Uint8Array(msg.data);
             var unpack_msg = msgpack.decode(msg_data);
-            if (_this.responce_callbacks.hasOwnProperty(unpack_msg.service)) {
-                _this.responce_callbacks[unpack_msg.service](unpack_msg);
-            }
+            _this.on_log(unpack_msg);
         };
     };
-    PlaygroundSubscriber.prototype.close = function () {
+    EngineSubscriber.prototype.close = function () {
         if (this.sub_ws) {
             this.sub_ws.close();
         }
     };
-    PlaygroundSubscriber.prototype.subcribeService = function (service_name, on_msg) {
-        this.responce_callbacks[service_name] = on_msg;
+    EngineSubscriber.prototype.subscribe = function (on_log) {
+        this.on_log = on_log;
     };
-    return PlaygroundSubscriber;
+    return EngineSubscriber;
 }());
-exports.PlaygroundSubscriber = PlaygroundSubscriber;
-//# sourceMappingURL=playground_rpc.js.map
+exports.EngineSubscriber = EngineSubscriber;
+//# sourceMappingURL=engine_rpc.js.map

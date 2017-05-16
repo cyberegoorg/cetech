@@ -91,14 +91,20 @@ static void _serve_command(const char *packet,
 
     console_server_command_t rpc_command = _find_command(cmd_name);
 
+    mpack_node_t id_node = mpack_node_map_cstr(root, "id");
+    double id = mpack_node_double(id_node);
+
     char *data;
     size_t size;
     mpack_writer_t writer;
     mpack_writer_init_growable(&writer, &data, &size);
 
-    mpack_start_map(&writer, 1);
-    mpack_write_cstr(&writer, "response");
+    mpack_start_map(&writer, 2);
 
+    mpack_write_cstr(&writer, "id");
+    mpack_write_double(&writer, id);
+
+    mpack_write_cstr(&writer, "response");
     int ret_n = 0;
     if (rpc_command != NULL) {
         //log_debug(LOG_WHERE, "call: %s", cmd_name);

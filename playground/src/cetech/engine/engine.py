@@ -97,6 +97,8 @@ class Instance(object):
             ("src", source_dir),
         ]
 
+        port = 4444
+
         if compile_:
             args.append(("compile", None))
             args.append(("external", self.external_dir))

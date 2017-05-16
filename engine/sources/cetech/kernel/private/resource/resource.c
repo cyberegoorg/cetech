@@ -190,8 +190,9 @@ static void _init(get_api_fce_t get_engine_api) {
 static void _init_cvar(struct config_api_v0 config) {
     _G = (struct G) {0};
 
-    _G.config.build_dir = config.new_str("build", "Resource build dir",
-                                         "data/build");
+    config_api_v0 = config;
+
+    _G.config.build_dir = config.new_str("build", "Resource build dir", "data/build");
 }
 
 static void _shutdown() {

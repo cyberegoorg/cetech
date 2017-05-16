@@ -24,6 +24,7 @@
 
 #include <cetech/modules/luasys/luasys.h>
 #include <cetech/modules/renderer/renderer.h>
+#include <cetech/core/fs.h>
 
 #define LOG_WHERE "application"
 
@@ -150,7 +151,13 @@ int _init_config() {
     config_api_v0.parse_core_args(_G.args.argc, _G.args.argv);
 #ifdef CETECH_CAN_COMPILE
     if (config_api_v0.get_int(_G.config.compile)) {
-        resource_api_v0.compiler_create_build_dir(config_api_v0, api_v1);
+        char build_dir_full[1024] = {0};
+        resource_api_v0.compiler_get_build_dir(build_dir_full,
+                                               CETECH_ARRAY_LEN(build_dir_full),
+                                               application_platform());
+
+        dir_make_path(build_dir_full);
+
         config_api_v0.compile_global();
     }
 #endif
@@ -181,14 +188,18 @@ int application_init(int argc,
 
     ADD_STATIC_PLUGIN(memsys);
     ADD_STATIC_PLUGIN(config);
-    ADD_STATIC_PLUGIN(application);
     ADD_STATIC_PLUGIN(handler);
+    ADD_STATIC_PLUGIN(application);
+
+    cvar_init();
+    module_call_init_cvar();
+    module_call_init();
 
     ADD_STATIC_PLUGIN(sdl);
     ADD_STATIC_PLUGIN(machine);
+    ADD_STATIC_PLUGIN(task);
     ADD_STATIC_PLUGIN(consoleserver);
     ADD_STATIC_PLUGIN(developsystem);
-    ADD_STATIC_PLUGIN(task);
 
     ADD_STATIC_PLUGIN(filesystem);
     ADD_STATIC_PLUGIN(resourcesystem);
@@ -196,11 +207,6 @@ int application_init(int argc,
 #ifdef CETECH_CAN_COMPILE
     ADD_STATIC_PLUGIN(resourcecompiler);
 #endif
-
-
-    cvar_init();
-    module_call_init_cvar();
-    module_call_init();
 
     _init_static_modules();
 
