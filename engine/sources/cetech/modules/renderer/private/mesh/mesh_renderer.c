@@ -171,36 +171,6 @@ static void _spawner(world_t world,
 }
 
 
-static void _init(get_api_fce_t get_engine_api) {
-    INIT_API(get_engine_api, component_api_v0, COMPONENT_API_ID);
-    INIT_API(get_engine_api, memory_api_v0, MEMORY_API_ID);
-    INIT_API(get_engine_api, material_api_v0, MATERIAL_API_ID);
-    INIT_API(get_engine_api, mesh_renderer_api_v0, MESH_API_ID);
-    INIT_API(get_engine_api, scenegprah_api_v0, SCENEGRAPH_API_ID);
-    INIT_API(get_engine_api, transform_api_v0, TRANSFORM_API_ID);
-
-    _G = (struct G) {0};
-
-    MAP_INIT(world_data_t, &_G.world, memory_api_v0.main_allocator());
-
-    _G.type = stringid64_from_string("mesh_renderer");
-
-    component_api_v0.component_register_compiler(_G.type,
-                                                 _mesh_component_compiler, 10);
-
-    component_api_v0.component_register_type(_G.type, (struct component_clb) {
-            .spawner=_spawner,
-            .destroyer=_destroyer,
-            .on_world_create=_on_world_create,
-            .on_world_destroy=_on_world_destroy
-    });
-}
-
-static void _shutdown() {
-    MAP_DESTROY(world_data_t, &_G.world);
-
-    _G = (struct G) {0};
-}
 
 
 int mesh_is_valid(mesh_renderer_t mesh) {
@@ -311,6 +281,108 @@ void mesh_set_material(world_t world,
     ARRAY_AT(&data->material, mesh.idx) = material_instance;
 }
 
+
+static void _set_property(world_t world,
+                          entity_t entity,
+                          stringid64_t key,
+                          struct property_value value) {
+
+    stringid64_t scene = stringid64_from_string("scene");
+    stringid64_t mesh = stringid64_from_string("mesh");
+    stringid64_t node = stringid64_from_string("node");
+    stringid64_t material = stringid64_from_string("material");
+
+    mesh_renderer_t mesh_renderer = mesh_get(world, entity);
+
+    if (key.id == material.id) {
+        mesh_set_material(world, mesh_renderer,
+                          stringid64_from_string(value.value.str));
+    }
+}
+
+static struct property_value _get_property(world_t world,
+                                           entity_t entity,
+                                           stringid64_t key) {
+    stringid64_t scene = stringid64_from_string("scene");
+    stringid64_t mesh = stringid64_from_string("mesh");
+    stringid64_t node = stringid64_from_string("node");
+    stringid64_t material = stringid64_from_string("material");
+
+    mesh_renderer_t mesh_r = mesh_get(world, entity);
+    world_data_t *data = _get_world_data(world);
+
+    char name_buff[256] = {0};
+
+//    if (key.id == scene.id) {
+//        ResourceApiV0.get_filename(name_buff, CEL_ARRAY_LEN(name_buff), scene, ARRAY_AT(&data->scene, mesh_r.idx));
+//        char* name = cel_strdup(name_buff, MemSysApiV0.main_scratch_allocator());
+//
+//        return (struct property_value) {
+//                .type= PROPERTY_STRING,
+//                .value.str = name
+//        };
+//    } else if (key.id == mesh.id) {
+//        ResourceApiV0.compiler_get_filename(name_buff, CEL_ARRAY_LEN(name_buff), scene, ARRAY_AT(&data->mesh, mesh_r.idx));
+//        char* name = cel_strdup(name_buff, MemSysApiV0.main_scratch_allocator());
+//
+//        return (struct property_value) {
+//                .type= PROPERTY_STRING,
+//                .value.str = name
+//        };
+//    } else if (key.id == node.id) {
+//        ResourceApiV0.compiler_get_filename(name_buff, CEL_ARRAY_LEN(name_buff), scene, ARRAY_AT(&data->node, mesh_r.idx));
+//        char* name = cel_strdup(name_buff, MemSysApiV0.main_scratch_allocator());
+//
+//        return (struct property_value) {
+//                .type= PROPERTY_STRING,
+//                .value.str = name
+//        };
+//    } else if (key.id == material.id) {
+//        ResourceApiV0.compiler_get_filename(name_buff, CEL_ARRAY_LEN(name_buff), scene, ARRAY_AT(&data->scene, mesh_r.idx));
+//        char* name = cel_strdup(name_buff, MemSysApiV0.main_scratch_allocator());
+//
+//        return (struct property_value) {
+//                .type= PROPERTY_STRING,
+//                .value.str = name
+//        };
+//    }
+
+    return (struct property_value) {.type= PROPERTY_INVALID};
+}
+
+
+
+static void _init(get_api_fce_t get_engine_api) {
+    INIT_API(get_engine_api, component_api_v0, COMPONENT_API_ID);
+    INIT_API(get_engine_api, memory_api_v0, MEMORY_API_ID);
+    INIT_API(get_engine_api, material_api_v0, MATERIAL_API_ID);
+    INIT_API(get_engine_api, mesh_renderer_api_v0, MESH_API_ID);
+    INIT_API(get_engine_api, scenegprah_api_v0, SCENEGRAPH_API_ID);
+    INIT_API(get_engine_api, transform_api_v0, TRANSFORM_API_ID);
+
+    _G = (struct G) {0};
+
+    MAP_INIT(world_data_t, &_G.world, memory_api_v0.main_allocator());
+
+    _G.type = stringid64_from_string("mesh_renderer");
+
+    component_api_v0.component_register_compiler(_G.type,
+                                                 _mesh_component_compiler, 10);
+
+    component_api_v0.component_register_type(_G.type, (struct component_clb) {
+            .spawner=_spawner,
+            .destroyer=_destroyer,
+            .on_world_create=_on_world_create,
+            .on_world_destroy=_on_world_destroy,
+            .set_property=_set_property, .get_property=_get_property
+    });
+}
+
+static void _shutdown() {
+    MAP_DESTROY(world_data_t, &_G.world);
+
+    _G = (struct G) {0};
+}
 
 void *mesh_get_module_api(int api) {
 
