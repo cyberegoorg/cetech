@@ -1,14 +1,14 @@
-import logging
-import logging.config
-import os
-import signal
 from asyncio import sleep
 
+import logging
+import logging.config
 import msgpack
 import nanomsg
+import os
+import signal
 from aiohttp import web
 
-import cetech.playground.modules as _modules
+import modules as _modules
 from cetech.engine import NanoPub
 from cetech.playground.backend import ServiceManager
 from cetech.playground.shared import Manager
@@ -40,7 +40,7 @@ class Server(object):
         #                            path=str(os.path.join(ROOT_DIR, 'html')),
         #                            name='static')
 
-        self.app.router.add_static('/cetech/playground/modules/',
+        self.app.router.add_static('/modules/',
                                    path=str(MODULES_DIR),
                                    name='modules_static')
 

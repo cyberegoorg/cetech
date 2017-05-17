@@ -27,7 +27,7 @@ handlers:
         when: d
 
 root:
-    level: INFO
+    level: DEBUG
     handlers: [console, file]
 
 loggers:

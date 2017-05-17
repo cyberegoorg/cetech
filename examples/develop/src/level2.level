@@ -1,0 +1,21 @@
+entities:
+  # 3
+  "5564343313252":
+    name: "box1"
+    prefab: box1
+
+  # 2
+#  "55643423443313252":
+#    name: "m4a1"
+#    prefab: m4a1
+
+blabla_group:
+  # 3
+  "5564343313252":
+    name: "box1"
+    prefab: box1
+
+  # 2
+#  "55643423443313252":
+#    name: "m4a1"
+#    prefab: m4a1

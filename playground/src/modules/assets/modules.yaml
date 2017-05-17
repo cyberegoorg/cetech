@@ -1,0 +1,77 @@
+######################
+# Module information #
+########################################################################################################################
+name: Asset
+description: |
+  Module for asset manipulation, preview, browse
+
+####################
+# Module extension #
+########################################################################################################################
+extensions:
+
+  ###########
+  # Windows #
+  ######################################################################################################################
+  windows:
+
+    ########################
+    # Asset browser window #
+    ####################################################################################################################
+    - name: asset_browser_window
+      title: Asset browser
+      parent: main_window
+      parent_area: bottom
+      show: true
+
+    ########################
+    # Asset preview window #
+    ####################################################################################################################
+    - name: asset_preview_window
+      title: Asset preview
+      parent: asset_browser_window
+      parent_area: right
+      show: true
+
+
+  ##################
+  # Window content #
+  ######################################################################################################################
+  window_contents:
+
+    ######################
+    # Asset browser view #
+    ####################################################################################################################
+    - name: asset_browsser_view
+      window: asset_browser_window
+      type: qt_content
+      script_file: asset_views.py
+      script_class: AssetBrowserView
+
+    ######################
+    # Asset preview view #
+    ####################################################################################################################
+    - name: asset_preview_view
+      window: asset_preview_window
+      type: qt_content
+      script_file: asset_views.py
+      script_class: AssetPreviewView
+
+
+  ###########
+  # Service #
+  ######################################################################################################################
+  service:
+    - name: asset_service
+      api:
+        - asset_click
+        - asset_dclick
+        - get_assets
+
+      script_file: asset_service.py
+      script_class: AssetService
+
+  _menus:
+    - path: "Assets"
+      text: "&Assets"
+      order: 10

@@ -1,4 +1,5 @@
 import logging
+import random
 
 import msgpack
 import nanomsg
@@ -125,6 +126,7 @@ class NanoReq(object):
 class ConsoleProxy(NanoReq):
     def send_command(self, cmd_name, **kwargs):
         command = {
+            "id": random.random(),
             "name": cmd_name,
             "args": kwargs
         }

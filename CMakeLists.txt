@@ -10,16 +10,13 @@ set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -rdynamic")
 
 
 include_directories(engine/sources)
-include_directories(cebase/includes)
 
 add_definitions(-DCETECH_STATIC_PLUGINS)
-add_definitions(-DCELIB_USE_SDL)
+add_definitions(-DCETECH_USE_SDL)
 
 if (CMAKE_BUILD_TYPE STREQUAL "Debug")
     set(CONFIGURATION debug)
     add_definitions(-DCETECH_DEBUG)
-    add_definitions(-DCELIB_DEBUG)
-    add_definitions(-DCELIB_DEBUG)
 else ()
     set(CONFIGURATION release)
 endif ()
@@ -28,22 +25,20 @@ endif ()
 if (APPLE)
     set(PLATFORM_ID darwin64)
 
-    add_definitions(-DCELIB_COLORED_LOG)
+    add_definitions(-DCETECH_COLORED_LOG)
     add_definitions(-DCETECH_DARWIN)
-    add_definitions(-DCELIB_DARWIN)
 
 elseif (UNIX)
     set(PLATFORM_ID linux64)
 
     add_definitions(-DCETECH_LINUX)
-    add_definitions(-DCELIB_LINUX)
-    add_definitions(-DCELIB_COLORED_LOG)
+    add_definitions(-DCETECH_COLORED_LOG)
 
 elseif (WIN32)
     set(PLATFORM_ID windows64)
 
     add_definitions(-DCETECH_WINDOWS)
-    add_definitions(-DCELIB_WINDOWS)
+    add_definitions(-DCETECH_WINDOWS)
 endif ()
 
 link_directories(externals/build/${PLATFORM_ID}/release/lib/)
@@ -72,109 +67,115 @@ set(SOURCE_FILES
         ${EXTERNAL_SOURCE_FILES}
 
         ########################################################################
-        # CELIB
+        # CETECH
         ########################################################################
-        cebase/sources/celib/allocator.c
-        cebase/sources/celib/allocator_malloc.c
-        cebase/sources/celib/allocator_scratch.c
-        cebase/sources/celib/log_stdout_handler.c
-        cebase/sources/celib/log_nanomsg_handler.c
-        cebase/sources/celib/log_db_handler.c
-        cebase/sources/celib/log_system.c
-        cebase/sources/celib/vio_sdl.c
-        cebase/sources/celib/yaml.cc
-        cebase/sources/celib/log_system.c
-        cebase/sources/celib/cmd_line.c
-        cebase/sources/celib/cpu.c
-        cebase/sources/celib/filesystem.c
-        cebase/sources/celib/handler_gen.c
-        cebase/sources/celib/memory.c
-        cebase/sources/celib/object.c
-        cebase/sources/celib/path.c
-        cebase/sources/celib/process.c
-        cebase/sources/celib/stacktrace.c
-        cebase/sources/celib/string.c
-        cebase/sources/celib/stringid.c
-        cebase/sources/celib/thread.c
-        cebase/sources/celib/time.c
-        cebase/sources/celib/vio.c
-        cebase/sources/celib/window.c
+        engine/sources/cetech/core/private/memory/allocator.c
+        engine/sources/cetech/core/private/memory/allocator_malloc.c
+        engine/sources/cetech/core/private/memory/allocator_scratch.c
+
+        engine/sources/cetech/core/private/log/log_stdout_handler.c
+        engine/sources/cetech/core/private/log/log_nanomsg_handler.c
+        engine/sources/cetech/core/private/log/log_db_handler.c
+        engine/sources/cetech/core/private/log/log_system.c
+
+        engine/sources/cetech/core/private/fs/vio.c
+        engine/sources/cetech/core/private/fs/vio_sdl.c
+        engine/sources/cetech/core/private/fs/fs.c
+
+        engine/sources/cetech/core/private/cmd_line.c
+        engine/sources/cetech/core/private/fs/path.c
+        engine/sources/cetech/core/private/process.c
+        engine/sources/cetech/core/private/stacktrace.c
+
+        engine/sources/cetech/core/private/sdl2/sdl2_object.h
+        engine/sources/cetech/core/private/sdl2/sdl_time.h
+
+        engine/sources/cetech/core/private/string.c
+
+        engine/sources/cetech/core/private/log/log_system.c
+
+        engine/sources/cetech/core/private/yaml.cc
+
+        engine/sources/cetech/core/private/handler.c
+
 
         ########################################################################
         # CETECH
         ########################################################################
-        engine/sources/cetech/module/private/module.c
-        engine/sources/cetech/config/private/config.c
-        engine/sources/cetech/memory/private/memory.c
+        engine/sources/cetech/core/private/module.c
+        engine/sources/cetech/kernel/private/config.c
+        engine/sources/cetech/core/private/memory/memory.c
 
-        engine/sources/cetech/luasys/private/luasys.c
-        engine/sources/cetech/luasys/private/api/api_plugin.c
-        engine/sources/cetech/luasys/private/api/api_keyboard.c
-        engine/sources/cetech/luasys/private/api/api_log.c
-        engine/sources/cetech/luasys/private/api/api_mouse.c
-        engine/sources/cetech/luasys/private/api/api_gamepad.c
-        engine/sources/cetech/luasys/private/api/api_application.c
-        engine/sources/cetech/luasys/private/api/api_resouce_manager.c
-        engine/sources/cetech/luasys/private/api/api_renderer.c
-        engine/sources/cetech/luasys/private/api/api_world.c
-        engine/sources/cetech/luasys/private/api/api_entity.c
-        engine/sources/cetech/luasys/private/api/api_transform.c
-        engine/sources/cetech/luasys/private/api/api_vec2f.c
-        engine/sources/cetech/luasys/private/api/api_vec3f.c
-        engine/sources/cetech/luasys/private/api/api_vec4f.c
-        engine/sources/cetech/luasys/private/api/api_quatf.c
-        engine/sources/cetech/luasys/private/api/api_mat44f.c
-        engine/sources/cetech/luasys/private/api/api_mesh.c
-        engine/sources/cetech/luasys/private/api/api_material.c
-        engine/sources/cetech/luasys/private/api/api_package.c
-        engine/sources/cetech/luasys/private/api/api_level.c
-        engine/sources/cetech/luasys/private/api/api_scenegraph.c
+        engine/sources/cetech/modules/luasys/private/luasys.c
+        engine/sources/cetech/modules/luasys/private/api/api_plugin.c
+        engine/sources/cetech/modules/luasys/private/api/api_keyboard.c
+        engine/sources/cetech/modules/luasys/private/api/api_log.c
+        engine/sources/cetech/modules/luasys/private/api/api_mouse.c
+        engine/sources/cetech/modules/luasys/private/api/api_gamepad.c
+        engine/sources/cetech/modules/luasys/private/api/api_application.c
+        engine/sources/cetech/modules/luasys/private/api/api_resouce_manager.c
+        engine/sources/cetech/modules/luasys/private/api/api_renderer.c
+        engine/sources/cetech/modules/luasys/private/api/api_world.c
+        engine/sources/cetech/modules/luasys/private/api/api_entity.c
+        engine/sources/cetech/modules/luasys/private/api/api_component.c
+        engine/sources/cetech/modules/luasys/private/api/api_transform.c
+        engine/sources/cetech/modules/luasys/private/api/api_vec2f.c
+        engine/sources/cetech/modules/luasys/private/api/api_vec3f.c
+        engine/sources/cetech/modules/luasys/private/api/api_vec4f.c
+        engine/sources/cetech/modules/luasys/private/api/api_quatf.c
+        engine/sources/cetech/modules/luasys/private/api/api_mat44f.c
+        engine/sources/cetech/modules/luasys/private/api/api_mesh.c
+        engine/sources/cetech/modules/luasys/private/api/api_material.c
+        engine/sources/cetech/modules/luasys/private/api/api_package.c
+        engine/sources/cetech/modules/luasys/private/api/api_level.c
+        engine/sources/cetech/modules/luasys/private/api/api_scenegraph.c
 
-        engine/sources/cetech/develop/private/console_server.c
-        engine/sources/cetech/develop/private/develop_system.c
+        engine/sources/cetech/kernel/private/console_server.c
+        engine/sources/cetech/kernel/private/develop_system.c
 
-        engine/sources/cetech/application/private/app.c
-        engine/sources/cetech/task/private/task.c
+        engine/sources/cetech/kernel/private/app/app.c
+        engine/sources/cetech/kernel/private/task/task.c
 
-        engine/sources/cetech/resource/private/resource.c
-        engine/sources/cetech/resource/private/resource_package.c
-        engine/sources/cetech/resource/private/resource_compiler.c
-        engine/sources/cetech/filesystem/private/filesystem.c
-        engine/sources/cetech/component/private/component.c
-        engine/sources/cetech/entity/private/entity.c
-        engine/sources/cetech/world/private/world.c
-        engine/sources/cetech/level/private/level.c
+        engine/sources/cetech/kernel/private/resource/resource.c
+        engine/sources/cetech/kernel/private/resource/resource_package.c
+        engine/sources/cetech/kernel/private/resource/resource_compiler.c
+        engine/sources/cetech/kernel/private/filesystem.c
+        engine/sources/cetech/kernel/private/component.c
+        engine/sources/cetech/kernel/private/entity.c
+        engine/sources/cetech/kernel/private/world.c
+        engine/sources/cetech/modules/level/private/level.c
 
-        engine/sources/cetech/machine/private/machine.c
-        engine/sources/cetech/machine/private/sdl2/sdl_mouse.c
-        engine/sources/cetech/machine/private/sdl2/sdl_keyboard.c
-        engine/sources/cetech/machine/private/sdl2/sdl_gamepad.c
-        engine/sources/cetech/machine/private/sdl2/sdl_machine.c
+        engine/sources/cetech/core/private/machine.c
+        engine/sources/cetech/core/private/sdl2/sdl_mouse.c
+        engine/sources/cetech/core/private/sdl2/sdl_keyboard.c
+        engine/sources/cetech/core/private/sdl2/sdl_gamepad.c
+        engine/sources/cetech/core/private/sdl2/sdl_machine.c
 
-        engine/sources/cetech/input/private/keyboard.c
-        engine/sources/cetech/input/private/mouse.c
-        engine/sources/cetech/input/private/input.c
+        engine/sources/cetech/kernel/private/input/keyboard.c
+        engine/sources/cetech/kernel/private/input/mouse.c
+        engine/sources/cetech/kernel/private/input/input.c
 
 
-        engine/sources/cetech/renderer/private/renderer.c
-        engine/sources/cetech/renderer/private/texture/texture.c
-        engine/sources/cetech/renderer/private/shader/shader.c
-        engine/sources/cetech/renderer/private/material/material.c
-        engine/sources/cetech/renderer/private/scene/scene.c
-        engine/sources/cetech/renderer/private/mesh/mesh_renderer.c
+        engine/sources/cetech/modules/renderer/private/renderer.c
+        engine/sources/cetech/modules/renderer/private/texture/texture.c
+        engine/sources/cetech/modules/renderer/private/shader/shader.c
+        engine/sources/cetech/modules/renderer/private/material/material.c
+        engine/sources/cetech/modules/renderer/private/scene/scene.c
+        engine/sources/cetech/modules/renderer/private/mesh/mesh_renderer.c
 
-        engine/sources/cetech/transform/private/transform.c
-        engine/sources/cetech/scenegraph/private/scenegraph.c
-        engine/sources/cetech/camera/private/camera.c
+        engine/sources/cetech/modules/transform/private/transform.c
+        engine/sources/cetech/modules/scenegraph/private/scenegraph.c
+        engine/sources/cetech/modules/camera/private/camera.c
 
-        cebase/sources/celib/hash.c)
+        engine/sources/cetech/core/private/hash.c
+        engine/sources/cetech/core/private/sdl2/sdl2.c)
 
 ################################################################################
 # Main sources
 ################################################################################
 set(MAIN_SOURCE_FILES
         ${SOURCE_FILES}
-        engine/sources/cetech/application/private/main.c)
+        engine/sources/cetech/kernel/private/main.c)
 
 ################################################################################
 # Release sources
@@ -252,7 +253,7 @@ target_include_directories(cetech PUBLIC externals/build/${PLATFORM_ID}/${CONFIG
 # Cetech DEVELOP
 ################################################################################
 add_executable(cetech_develop ${MAIN_SOURCE_FILES})
-target_compile_definitions(cetech_develop PUBLIC -DCETECH_DEVELOP)
+target_compile_definitions(cetech_develop PUBLIC -DCETECH_DEVELOP -DCETECH_CAN_COMPILE=1)
 target_link_libraries(cetech_develop ${DEVELOP_LIBS})
 target_include_directories(cetech_develop PUBLIC externals/build/${PLATFORM_ID}/${CONFIGURATION}/)
 target_include_directories(cetech_develop PUBLIC externals/build/${PLATFORM_ID}/${CONFIGURATION}/include)
