@@ -12,10 +12,10 @@
 #include "include/luajit/lualib.h"
 
 #include <cetech/core/math_types.h>
-#include <cetech/core/hash.h>
+#include <cetech/kernel/hash.h>
 
 #include <stdint.h>
-#include <cetech/core/handler.h>
+#include <cetech/kernel/handler.h>
 
 
 //==============================================================================

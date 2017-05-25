@@ -1,6 +1,6 @@
 
 #include <cetech/core/vec2f.inl>
-#include <cetech/core/module.h>
+#include <cetech/kernel/module.h>
 
 #include <cetech/modules/luasys/luasys.h>
 

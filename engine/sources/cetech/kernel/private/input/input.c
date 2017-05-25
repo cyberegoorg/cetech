@@ -5,13 +5,13 @@
 #include <cetech/core/math_types.h>
 #include <cetech/core/allocator.h>
 #include <cetech/kernel/config.h>
-#include <cetech/kernel/resource.h>
+#include <cetech/modules/resource/resource.h>
 #include <cetech/core/eventstream.inl>
 #include <cetech/kernel/input.h>
-#include <cetech/core/module.h>
+#include <cetech/kernel/module.h>
 #include <cetech/kernel/machine.h>
-#include <cetech/core/string.h>
-#include <cetech/core/api.h>
+#include <cetech/kernel/string.h>
+#include <cetech/kernel/api.h>
 
 #include "gamepadstr.h"
 
@@ -36,12 +36,10 @@ static struct G {
 } _G = {0};
 
 
-
-
 static void _update() {
     struct event_header *event = machine_api_v0.event_begin();
 
-    memory_copy(_G.last_state, _G.state,
+    memcpy(_G.last_state, _G.state,
                 sizeof(int) * GAMEPAD_BTN_MAX * GAMEPAD_MAX);
 
     while (event != machine_api_v0.event_end()) {
@@ -98,7 +96,7 @@ uint32_t gamepad_button_index(const char *button_name) {
             continue;
         }
 
-        if (str_cmp(_btn_to_str[i], button_name)) {
+        if (strcmp(_btn_to_str[i], button_name)) {
             continue;
         }
 
@@ -152,7 +150,7 @@ uint32_t gamepad_axis_index(const char *axis_name) {
             continue;
         }
 
-        if (str_cmp(_axis_to_str[i], axis_name) != 0) {
+        if (strcmp(_axis_to_str[i], axis_name) != 0) {
             continue;
         }
 

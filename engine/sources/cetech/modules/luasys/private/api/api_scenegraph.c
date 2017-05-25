@@ -1,13 +1,13 @@
 
 #include <cetech/core/allocator.h>
-#include <cetech/core/module.h>
-#include <cetech/kernel/resource.h>
-#include <cetech/kernel/world.h>
-#include <cetech/kernel/entity.h>
+#include <cetech/kernel/module.h>
+#include <cetech/modules/resource/resource.h>
+#include <cetech/modules/world/world.h>
+#include <cetech/modules/entity/entity.h>
 
 #include <cetech/modules/luasys/luasys.h>
-#include <cetech/core/hash.h>
-#include <cetech/core/api.h>
+#include <cetech/kernel/hash.h>
+#include <cetech/kernel/api.h>
 
 #include "../../../scenegraph/scenegraph.h"
 

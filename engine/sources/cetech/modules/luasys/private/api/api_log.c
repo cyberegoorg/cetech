@@ -1,7 +1,7 @@
 #include <stddef.h>
 #include <cetech/core/allocator.h>
-#include <cetech/core/module.h>
-#include <cetech/core/log.h>
+#include <cetech/kernel/module.h>
+#include <cetech/kernel/log.h>
 #include <cetech/modules/luasys/luasys.h>
 #include <stdio.h>
 

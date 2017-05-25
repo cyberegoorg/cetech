@@ -7,8 +7,8 @@
 #include <include/assimp/postprocess.h>
 #include <include/assimp/cimport.h>
 
-#include <cetech/core/yaml.h>
-#include <cetech/core/fs.h>
+#include <cetech/kernel/yaml.h>
+#include <cetech/kernel/fs.h>
 
 ARRAY_PROTOTYPE(bgfx_vertex_decl_t);
 ARRAY_PROTOTYPE(stringid64_t);
@@ -391,7 +391,7 @@ int _compile_assimp(const char *filename,
         if (mesh->mName.length == 0) {
             snprintf(tmp_buffer, CETECH_ARRAY_LEN(tmp_buffer), "geom_%d", i);
         } else {
-            memory_copy(tmp_buffer, mesh->mName.data, mesh->mName.length);
+            memcpy(tmp_buffer, mesh->mName.data, mesh->mName.length);
         }
 
         stringid64_t name_id = stringid64_from_string(tmp_buffer);
@@ -479,7 +479,7 @@ int _scene_resource_compiler(const char *filename,
     char *source_data =
     CETECH_ALLOCATE(memory_api_v0.main_allocator(), char,
                     vio_size(source_vio) + 1);
-    memory_set(source_data, 0, vio_size(source_vio) + 1);
+    memset(source_data, 0, vio_size(source_vio) + 1);
     vio_read(source_vio, source_data, sizeof(char),
              vio_size(source_vio));
 

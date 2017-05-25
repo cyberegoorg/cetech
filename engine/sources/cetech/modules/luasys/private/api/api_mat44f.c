@@ -3,7 +3,7 @@
 
 #include <cetech/modules/luasys/luasys.h>
 
-#include <cetech/core/module.h>
+#include <cetech/kernel/module.h>
 
 #define API_NAME "Mat44f"
 

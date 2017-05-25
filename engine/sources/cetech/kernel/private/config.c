@@ -3,19 +3,19 @@
 //==============================================================================
 
 #include <cetech/core/allocator.h>
-#include <cetech/core/yaml.h>
-#include <cetech/core/memory.h>
-#include <cetech/core/cmd_line.h>
+#include <cetech/kernel/yaml.h>
+#include <cetech/kernel/memory.h>
+#include <cetech/kernel/cmd_line.h>
 #include <cetech/kernel/config.h>
-#include <cetech/core/module.h>
-#include <cetech/core/hash.h>
+#include <cetech/kernel/module.h>
+#include <cetech/kernel/hash.h>
 #include <cetech/kernel/application.h>
-#include <cetech/kernel/resource.h>
-#include <cetech/core/log.h>
+#include <cetech/modules/resource/resource.h>
+#include <cetech/kernel/log.h>
 #include <stdio.h>
-#include <cetech/core/string.h>
-#include <cetech/core/fs.h>
-#include <cetech/core/api.h>
+#include <cetech/kernel/string.h>
+#include <cetech/kernel/fs.h>
+#include <cetech/kernel/api.h>
 
 
 //==============================================================================
@@ -28,6 +28,8 @@
 #define LOG_WHERE "cvar"
 
 #define make_cvar(i) (cvar_t){.idx = i}
+
+#define str_set(result, str) memcpy(result, str, strlen(str))
 
 //==============================================================================
 // Enums
@@ -251,7 +253,7 @@ cvar_t cvar_find(const char *name) {
             continue;
         }
 
-        if (str_cmp(_G.name[i], name) != 0) {
+        if (strcmp(_G.name[i], name) != 0) {
             continue;
         }
 
@@ -429,9 +431,9 @@ int cvar_parse_core_args(int argc,
 
         const char *name = tmp_args.argv[j] + 1;
 
-        if (!str_cmp(name, "build") ||
-            !str_cmp(name, "compile") ||
-            !str_cmp(name, "src")) {
+        if (!strcmp(name, "build") ||
+            !strcmp(name, "compile") ||
+            !strcmp(name, "src")) {
 
             const char *value = (j != tmp_args.argc - 1) ? tmp_args.argv[j + 1]
                                                          : NULL;
@@ -459,7 +461,7 @@ cvar_t cvar_find_or_create(const char *name,
             continue;
         }
 
-        if (str_cmp(_G.name[i], name) != 0) {
+        if (strcmp(_G.name[i], name) != 0) {
             continue;
         }
 

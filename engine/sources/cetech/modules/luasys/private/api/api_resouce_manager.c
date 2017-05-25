@@ -1,10 +1,10 @@
 
 
-#include <cetech/core/module.h>
+#include <cetech/kernel/module.h>
 #include <cetech/modules/luasys/luasys.h>
 
-#include <cetech/kernel/resource.h>
-#include <cetech/core/api.h>
+#include <cetech/modules/resource/resource.h>
+#include <cetech/kernel/api.h>
 
 #define API_NAME "ResourceManager"
 

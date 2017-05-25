@@ -2,7 +2,7 @@
 #define CETECH_LUA_RESOURCE_H
 
 
-#include <cetech/core/fs.h>
+#include <cetech/kernel/fs.h>
 
 void *lua_resource_loader(struct vio *input,
                           struct allocator *allocator) {

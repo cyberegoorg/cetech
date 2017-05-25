@@ -5,17 +5,17 @@
 #include <bgfx/c99/bgfx.h>
 
 #include <cetech/core/allocator.h>
-#include <cetech/core/hash.h>
+#include <cetech/kernel/hash.h>
 #include "../../renderer.h"
-#include <cetech/core/memory.h>
+#include <cetech/kernel/memory.h>
 
-#include <cetech/core/module.h>
+#include <cetech/kernel/module.h>
 
-#include <cetech/kernel/resource.h>
+#include <cetech/modules/resource/resource.h>
 #include <cetech/core/map.inl>
-#include <cetech/core/handler.h>
-#include <cetech/core/string.h>
-#include <cetech/core/api.h>
+#include <cetech/kernel/handler.h>
+#include <cetech/kernel/string.h>
+#include <cetech/kernel/api.h>
 #include "../texture/texture.h"
 #include "../shader/shader.h"
 #include "material_blob.h"
@@ -195,7 +195,7 @@ uint32_t _material_find_slot(struct material_blob *resource,
                              const char *name) {
     const char *u_names = (const char *) (resource + 1);
     for (uint32_t i = 0; i < resource->uniforms_count; ++i) {
-        if (str_cmp(&u_names[i * 32], name) != 0) {
+        if (strcmp(&u_names[i * 32], name) != 0) {
             continue;
         }
 

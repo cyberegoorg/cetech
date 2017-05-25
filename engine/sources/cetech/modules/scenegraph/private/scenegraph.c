@@ -1,19 +1,19 @@
 #include <cetech/core/array.inl>
-#include <cetech/core/yaml.h>
+#include <cetech/kernel/yaml.h>
 #include <cetech/core/quatf.inl>
 #include <cetech/core/mat44f.inl>
 
 #include <cetech/kernel/config.h>
-#include <cetech/core/hash.h>
-#include <cetech/kernel/resource.h>
+#include <cetech/kernel/hash.h>
+#include <cetech/modules/resource/resource.h>
 
-#include <cetech/kernel/entity.h>
+#include <cetech/modules/entity/entity.h>
 #include "../scenegraph.h"
-#include <cetech/core/memory.h>
-#include <cetech/core/module.h>
+#include <cetech/kernel/memory.h>
+#include <cetech/kernel/module.h>
 #include <cetech/core/map.inl>
-#include <cetech/kernel/world.h>
-#include <cetech/core/api.h>
+#include <cetech/modules/world/world.h>
+#include <cetech/kernel/api.h>
 
 
 ARRAY_PROTOTYPE(vec3f_t)

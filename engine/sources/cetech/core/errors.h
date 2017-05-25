@@ -8,7 +8,7 @@
 
 #include <stdlib.h>
 
-#include "log.h"
+#include "cetech/kernel/log.h"
 
 //==============================================================================
 // Iterface
@@ -38,7 +38,6 @@
 #endif
 
 #define CETECH_ASSERT(where, condition) CETECH_ASSERT_MSG(where, condition, "")
-
 
 char *stacktrace(int skip);
 

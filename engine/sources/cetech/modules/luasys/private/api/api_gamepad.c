@@ -1,11 +1,11 @@
 
 #include <cetech/core/allocator.h>
 #include <cetech/core/math_types.h>
-#include <cetech/core/module.h>
+#include <cetech/kernel/module.h>
 
 #include <cetech/modules/luasys/luasys.h>
 #include <cetech/kernel/input.h>
-#include <cetech/core/api.h>
+#include <cetech/kernel/api.h>
 
 IMPORT_API(gamepad_api_v0);
 

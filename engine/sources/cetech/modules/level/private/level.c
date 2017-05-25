@@ -3,23 +3,23 @@
 //==============================================================================
 
 #include <cetech/core/allocator.h>
-#include <cetech/kernel/world.h>
+#include <cetech/modules/world/world.h>
 #include <cetech/kernel/config.h>
-#include <cetech/kernel/resource.h>
+#include <cetech/modules/resource/resource.h>
 
-#include <cetech/kernel/entity.h>
+#include <cetech/modules/entity/entity.h>
 #include <cetech/modules/transform/transform.h>
 #include <cetech/core/quatf.inl>
-#include <cetech/core/memory.h>
-#include <cetech/core/module.h>
+#include <cetech/kernel/memory.h>
+#include <cetech/kernel/module.h>
 
 #include "../level.h"
 #include <cetech/core/map.inl>
-#include <cetech/core/yaml.h>
+#include <cetech/kernel/yaml.h>
 #include "level_blob.h"
-#include <cetech/core/fs.h>
-#include <cetech/core/hash.h>
-#include <cetech/core/api.h>
+#include <cetech/kernel/fs.h>
+#include <cetech/kernel/hash.h>
+#include <cetech/kernel/api.h>
 
 IMPORT_API(entity_api_v0);
 IMPORT_API(resource_api_v0);
@@ -164,7 +164,7 @@ int _level_resource_compiler(const char *filename,
                              struct compilator_api *compilator_api) {
 
     char source_data[vio_size(source_vio) + 1];
-    memory_set(source_data, 0, vio_size(source_vio) + 1);
+    memset(source_data, 0, vio_size(source_vio) + 1);
     vio_read(source_vio, source_data, sizeof(char),
              vio_size(source_vio));
 

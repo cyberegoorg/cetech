@@ -7,14 +7,14 @@
 
 #include <cetech/modules/camera/camera.h>
 #include "../renderer.h"
-#include <cetech/kernel/develop.h>
-#include <cetech/core/hash.h>
+#include <cetech/modules/develop_system/develop.h>
+#include <cetech/kernel/hash.h>
 #include <cetech/kernel/application.h>
 #include <cetech/kernel/config.h>
-#include <cetech/core/module.h>
-#include <cetech/kernel/world.h>
-#include <cetech/core/window.h>
-#include <cetech/core/api.h>
+#include <cetech/kernel/module.h>
+#include <cetech/modules/world/world.h>
+#include <cetech/kernel/window.h>
+#include <cetech/kernel/api.h>
 
 #include "bgfx/c99/platform.h"
 #include "texture/texture.h"

@@ -1,9 +1,9 @@
 
 #include <cetech/core/allocator.h>
-#include <cetech/core/module.h>
+#include <cetech/kernel/module.h>
 
 #include <cetech/kernel/input.h>
-#include <cetech/core/api.h>
+#include <cetech/kernel/api.h>
 #include "../../luasys.h"
 
 #define API_NAME "Keyboard"

@@ -233,8 +233,8 @@ static void _map_remap_##N(MAP_T(N) *h, uint32_t new_size) {                   \
     map_init_##N(&empty, h->_hash.allocator);                                  \
                                                                                \
     map_destroy_##N(h);                                                        \
-    memory_copy(h, &nh, sizeof(MAP_T(N)));                                     \
-    memory_copy(&nh, &empty, sizeof(MAP_T(N)));                                \
+    memcpy(h, &nh, sizeof(MAP_T(N)));                                     \
+    memcpy(&nh, &empty, sizeof(MAP_T(N)));                                \
 }                                                                              \
                                                                                \
 static int _map_full_##N(MAP_T(N) *h) {                                        \

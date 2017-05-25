@@ -5,14 +5,14 @@
 #include <cetech/core/math_types.h>
 #include <cetech/core/allocator.h>
 #include <cetech/kernel/config.h>
-#include <cetech/kernel/resource.h>
-#include <cetech/core/module.h>
+#include <cetech/modules/resource/resource.h>
+#include <cetech/kernel/module.h>
 #include <cetech/core/eventstream.inl>
 #include <cetech/kernel/machine.h>
 
 #include <cetech/kernel/input.h>
-#include <cetech/core/string.h>
-#include <cetech/core/api.h>
+#include <cetech/kernel/string.h>
+#include <cetech/kernel/api.h>
 
 #include "mousebtnstr.h"
 
@@ -43,7 +43,7 @@ IMPORT_API(machine_api_v0);
 static void _update() {
     struct event_header *event = machine_api_v0.event_begin();
 
-    memory_copy(_G.last_state, _G.state, MOUSE_BTN_MAX);
+    memcpy(_G.last_state, _G.state, MOUSE_BTN_MAX);
 //    _G.last_delta_pos.x = 0;
 //    _G.last_delta_pos.y = 0;
 
@@ -92,7 +92,7 @@ uint32_t mouse_button_index(const char *button_name) {
             continue;
         }
 
-        if (str_cmp(_btn_to_str[i], button_name)) {
+        if (strcmp(_btn_to_str[i], button_name)) {
             continue;
         }
 
@@ -146,7 +146,7 @@ uint32_t mouse_axis_index(const char *axis_name) {
             continue;
         }
 
-        if (str_cmp(_axis_to_str[i], axis_name) != 0) {
+        if (strcmp(_axis_to_str[i], axis_name) != 0) {
             continue;
         }
 

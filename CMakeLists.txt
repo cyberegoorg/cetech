@@ -69,43 +69,43 @@ set(SOURCE_FILES
         ########################################################################
         # CETECH
         ########################################################################
-        engine/sources/cetech/core/private/memory/allocator.c
-        engine/sources/cetech/core/private/memory/allocator_malloc.c
-        engine/sources/cetech/core/private/memory/allocator_scratch.c
+        engine/sources/cetech/kernel/private/memory/allocator.c
+        engine/sources/cetech/kernel/private/memory/allocator_malloc.c
+        engine/sources/cetech/kernel/private/memory/allocator_scratch.c
 
-        engine/sources/cetech/core/private/log/log_stdout_handler.c
-        engine/sources/cetech/core/private/log/log_nanomsg_handler.c
-        engine/sources/cetech/core/private/log/log_db_handler.c
-        engine/sources/cetech/core/private/log/log_system.c
+        engine/sources/cetech/kernel/private/log/log_stdout_handler.c
+        engine/sources/cetech/kernel/private/log/log_nanomsg_handler.c
+        engine/sources/cetech/kernel/private/log/log_db_handler.c
+        engine/sources/cetech/kernel/private/log/log_system.c
 
-        engine/sources/cetech/core/private/fs/vio.c
-        engine/sources/cetech/core/private/fs/vio_sdl.c
-        engine/sources/cetech/core/private/fs/fs.c
+        engine/sources/cetech/kernel/private/fs/vio.c
+        engine/sources/cetech/kernel/private/fs/vio_sdl.c
+        engine/sources/cetech/kernel/private/fs/fs.c
 
-        engine/sources/cetech/core/private/cmd_line.c
-        engine/sources/cetech/core/private/fs/path.c
-        engine/sources/cetech/core/private/process.c
-        engine/sources/cetech/core/private/stacktrace.c
-        engine/sources/cetech/core/private/api.c
+        engine/sources/cetech/kernel/private/cmd_line.c
+        engine/sources/cetech/kernel/private/fs/path.c
+        engine/sources/cetech/kernel/private/process.c
+        engine/sources/cetech/kernel/private/stacktrace.c
+        engine/sources/cetech/kernel/private/api.c
 
-        engine/sources/cetech/core/private/sdl2/sdl2_object.h
-        engine/sources/cetech/core/private/sdl2/sdl_time.h
+        engine/sources/cetech/kernel/private/sdl2/sdl2_object.h
+        engine/sources/cetech/kernel/private/sdl2/sdl_time.h
 
-        engine/sources/cetech/core/private/string.c
+        engine/sources/cetech/kernel/private/string.c
 
-        engine/sources/cetech/core/private/log/log_system.c
+        engine/sources/cetech/kernel/private/log/log_system.c
 
-        engine/sources/cetech/core/private/yaml.cc
+        engine/sources/cetech/kernel/private/yaml.cc
 
-        engine/sources/cetech/core/private/handler.c
+        engine/sources/cetech/kernel/private/handler.c
 
 
         ########################################################################
         # CETECH
         ########################################################################
-        engine/sources/cetech/core/private/module.c
+        engine/sources/cetech/kernel/private/module.c
         engine/sources/cetech/kernel/private/config.c
-        engine/sources/cetech/core/private/memory/memory.c
+        engine/sources/cetech/kernel/private/memory/memory.c
 
         engine/sources/cetech/modules/luasys/private/luasys.c
         engine/sources/cetech/modules/luasys/private/api/api_plugin.c
@@ -131,26 +131,26 @@ set(SOURCE_FILES
         engine/sources/cetech/modules/luasys/private/api/api_level.c
         engine/sources/cetech/modules/luasys/private/api/api_scenegraph.c
 
-        engine/sources/cetech/kernel/private/console_server.c
-        engine/sources/cetech/kernel/private/develop_system.c
+        engine/sources/cetech/modules/console_server/private/console_server.c
+        engine/sources/cetech/modules/develop_system/private/develop_system.c
 
-        engine/sources/cetech/kernel/private/app/app.c
-        engine/sources/cetech/kernel/private/task/task.c
+        engine/sources/cetech/kernel/private/app/_app.c
+        engine/sources/cetech/kernel/task/private/task.c
 
-        engine/sources/cetech/kernel/private/resource/resource.c
-        engine/sources/cetech/kernel/private/resource/resource_package.c
-        engine/sources/cetech/kernel/private/resource/resource_compiler.c
-        engine/sources/cetech/kernel/private/filesystem.c
-        engine/sources/cetech/kernel/private/component.c
-        engine/sources/cetech/kernel/private/entity.c
-        engine/sources/cetech/kernel/private/world.c
+        engine/sources/cetech/kernel/resource/private/resource.c
+        engine/sources/cetech/kernel/resource/private/resource_package.c
+        engine/sources/cetech/kernel/resource/private/resource_compiler.c
+        engine/sources/cetech/modules/filesystem/private/filesystem.c
+        engine/sources/cetech/modules/component/private/component.c
+        engine/sources/cetech/modules/entity/private/entity.c
+        engine/sources/cetech/modules/world/private/world.c
         engine/sources/cetech/modules/level/private/level.c
 
-        engine/sources/cetech/core/private/machine.c
-        engine/sources/cetech/core/private/sdl2/sdl_mouse.c
-        engine/sources/cetech/core/private/sdl2/sdl_keyboard.c
-        engine/sources/cetech/core/private/sdl2/sdl_gamepad.c
-        engine/sources/cetech/core/private/sdl2/sdl_machine.c
+        engine/sources/cetech/kernel/private/machine.c
+        engine/sources/cetech/kernel/private/sdl2/sdl_mouse.c
+        engine/sources/cetech/kernel/private/sdl2/sdl_keyboard.c
+        engine/sources/cetech/kernel/private/sdl2/sdl_gamepad.c
+        engine/sources/cetech/kernel/private/sdl2/sdl_machine.c
 
         engine/sources/cetech/kernel/private/input/keyboard.c
         engine/sources/cetech/kernel/private/input/mouse.c
@@ -168,8 +168,8 @@ set(SOURCE_FILES
         engine/sources/cetech/modules/scenegraph/private/scenegraph.c
         engine/sources/cetech/modules/camera/private/camera.c
 
-        engine/sources/cetech/core/private/hash.c
-        engine/sources/cetech/core/private/sdl2/sdl2.c)
+        engine/sources/cetech/kernel/private/hash.c
+        engine/sources/cetech/kernel/private/sdl2/sdl2.c)
 
 ################################################################################
 # Main sources

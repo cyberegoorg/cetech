@@ -1,7 +1,7 @@
 #ifndef CETECH_MATERIAL_RESORCE_H
 #define CETECH_MATERIAL_RESORCE_H
 
-#include <cetech/core/fs.h>
+#include <cetech/kernel/fs.h>
 
 static const bgfx_program_handle_t null_program = {0};
 

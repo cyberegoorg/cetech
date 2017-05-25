@@ -6,18 +6,18 @@
 #include <include/luajit/lauxlib.h>
 
 #include <cetech/core/allocator.h>
-#include <cetech/core/hash.h>
+#include <cetech/kernel/hash.h>
 #include <cetech/core/math_types.h>
 #include <cetech/core/vec2f.inl>
-#include <cetech/core/module.h>
+#include <cetech/kernel/module.h>
 
-#include <cetech/kernel/develop.h>
+#include <cetech/modules/develop_system/develop.h>
 #include <cetech/kernel/config.h>
 #include <cetech/kernel/application.h>
-#include <cetech/kernel/resource.h>
+#include <cetech/modules/resource/resource.h>
 
 #include <cetech/modules/luasys/luasys.h>
-#include <cetech/core/api.h>
+#include <cetech/kernel/api.h>
 
 #include "vectors.h"
 #include "quaternion.h"
@@ -256,12 +256,12 @@ static int _cmd_execute_string(mpack_node_t args,
                                mpack_writer_t *writer) {
     mpack_node_t node = mpack_node_map_cstr(args, "script");
 
-    size_t str_len = mpack_node_strlen(node);
+    size_t strlen = mpack_node_strlen(node);
     const char *str = mpack_node_str(node);
 
     int top = lua_gettop(_G.L);
 
-    if ((luaL_loadbuffer(_G.L, str, str_len, "console") ||
+    if ((luaL_loadbuffer(_G.L, str, strlen, "console") ||
          lua_pcall(_G.L, 0, LUA_MULTRET, 0))) {
 
         const char *last_error = lua_tostring(_G.L, -1);
@@ -310,7 +310,7 @@ int _lua_compiler(const char *filename,
                   struct compilator_api *compilator_api) {
 
     char tmp[vio_size(source_vio) + 1];
-    memory_set(tmp, 0, vio_size(source_vio) + 1);
+    memset(tmp, 0, vio_size(source_vio) + 1);
 
     vio_read(source_vio, tmp, sizeof(char), vio_size(source_vio));
 

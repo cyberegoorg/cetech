@@ -2,8 +2,8 @@
 #define CETECH_MATERIAL_COMPILER_H
 
 #include <stdio.h>
-#include <cetech/core/yaml.h>
-#include <cetech/core/fs.h>
+#include <cetech/kernel/yaml.h>
+#include <cetech/kernel/fs.h>
 
 struct material_compile_output {
     ARRAY_T(char) uniform_names;
@@ -37,7 +37,7 @@ static void _preprocess(const char *filename,
                                                memory_api_v0.main_allocator());
 
         char prefab_data[vio_size(prefab_vio) + 1];
-        memory_set(prefab_data, 0, vio_size(prefab_vio) + 1);
+        memset(prefab_data, 0, vio_size(prefab_vio) + 1);
         vio_read(prefab_vio, prefab_data, sizeof(char),
                  vio_size(prefab_vio));
         vio_close(prefab_vio);
@@ -129,7 +129,7 @@ static int _material_resource_compiler(const char *filename,
     char *source_data =
     CETECH_ALLOCATE(memory_api_v0.main_allocator(), char,
                     vio_size(source_vio) + 1);
-    memory_set(source_data, 0, vio_size(source_vio) + 1);
+    memset(source_data, 0, vio_size(source_vio) + 1);
 
     vio_read(source_vio, source_data, sizeof(char),
              vio_size(source_vio));

@@ -1,13 +1,13 @@
 #include <cetech/core/array.inl>
-#include <cetech/core/yaml.h>
+#include <cetech/kernel/yaml.h>
 #include <cetech/core/map.inl>
-#include <cetech/core/hash.h>
+#include <cetech/kernel/hash.h>
 #include <cetech/kernel/config.h>
-#include <cetech/kernel/resource.h>
+#include <cetech/modules/resource/resource.h>
 
-#include <cetech/kernel/world.h>
-#include <cetech/kernel/entity.h>
-#include <cetech/kernel/component.h>
+#include <cetech/modules/world/world.h>
+#include <cetech/modules/entity/entity.h>
+#include <cetech/modules/component/component.h>
 #include "../../renderer.h"
 #include <bgfx/c99/bgfx.h>
 #include "../../../transform/transform.h"
@@ -15,9 +15,9 @@
 #include "../../../scenegraph/scenegraph.h"
 #include <cetech/core/mat44f.inl>
 
-#include <cetech/core/memory.h>
-#include <cetech/core/module.h>
-#include <cetech/core/api.h>
+#include <cetech/kernel/memory.h>
+#include <cetech/kernel/module.h>
+#include <cetech/kernel/api.h>
 
 
 IMPORT_API(memory_api_v0);

@@ -1,8 +1,8 @@
 
 #include <cetech/kernel/application.h>
-#include <cetech/core/module.h>
+#include <cetech/kernel/module.h>
 #include <cetech/modules/luasys/luasys.h>
-#include <cetech/core/api.h>
+#include <cetech/kernel/api.h>
 
 
 #define API_NAME "Application"

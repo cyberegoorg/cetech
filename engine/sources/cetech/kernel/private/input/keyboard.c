@@ -4,13 +4,13 @@
 
 #include <cetech/core/allocator.h>
 #include <cetech/kernel/config.h>
-#include <cetech/kernel/resource.h>
-#include <cetech/core/module.h>
+#include <cetech/modules/resource/resource.h>
+#include <cetech/kernel/module.h>
 #include <cetech/core/eventstream.inl>
 #include <cetech/kernel/machine.h>
 #include <cetech/kernel/input.h>
-#include <cetech/core/string.h>
-#include <cetech/core/api.h>
+#include <cetech/kernel/string.h>
+#include <cetech/kernel/api.h>
 
 #include "keystr.h"
 
@@ -37,7 +37,7 @@ IMPORT_API(machine_api_v0);
 static void _update() {
     struct event_header *event = machine_api_v0.event_begin();
 
-    memory_copy(_G.last_state, _G.state, 512);
+    memcpy(_G.last_state, _G.state, 512);
 
     uint32_t size = 0;
     while (event != machine_api_v0.event_end()) {
@@ -71,7 +71,7 @@ uint32_t keyboard_button_index(const char *button_name) {
             continue;
         }
 
-        if (str_cmp(_key_to_str[i], button_name)) {
+        if (strcmp(_key_to_str[i], button_name)) {
             continue;
         }
 

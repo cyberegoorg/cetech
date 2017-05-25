@@ -2,9 +2,9 @@
 #define CETECH_SHADER_COMPILER_H
 
 
-#include <cetech/core/fs.h>
-#include <cetech/core/os.h>
-#include <cetech/core/yaml.h>
+#include <cetech/kernel/fs.h>
+#include <cetech/kernel/os.h>
+#include <cetech/kernel/yaml.h>
 #include <stdio.h>
 
 static int _shaderc(const char *input,
@@ -72,7 +72,7 @@ static int _shader_resource_compiler(const char *filename,
                                      struct compilator_api *compilator_api) {
 
     char source_data[vio_size(source_vio) + 1];
-    memory_set(source_data, 0, vio_size(source_vio) + 1);
+    memset(source_data, 0, vio_size(source_vio) + 1);
     vio_read(source_vio, source_data, sizeof(char),
              vio_size(source_vio));
 
