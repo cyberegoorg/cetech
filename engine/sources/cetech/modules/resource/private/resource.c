@@ -10,7 +10,7 @@
 
 #include <cetech/kernel/application.h>
 #include <cetech/kernel/config.h>
-#include <cetech/kernel/resource/resource.h>
+#include <cetech/modules/resource/resource.h>
 
 #include <cetech/modules/develop_system/develop.h>
 #include <cetech/kernel/memory.h>

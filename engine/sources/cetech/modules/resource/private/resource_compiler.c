@@ -10,10 +10,10 @@
 #include <cetech/kernel/fs.h>
 #include <cetech/kernel/string.h>
 #include <cetech/kernel/hash.h>
-#include <cetech/kernel/task/task.h>
+#include <cetech/modules/task/task.h>
 #include <cetech/kernel/application.h>
 #include <cetech/kernel/config.h>
-#include <cetech/kernel/resource/resource.h>
+#include <cetech/modules/resource/resource.h>
 #include <cetech/kernel/memory.h>
 #include <cetech/kernel/module.h>
 #include <cetech/kernel/api.h>

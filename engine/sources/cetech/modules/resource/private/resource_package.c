@@ -6,8 +6,8 @@
 
 #include <cetech/core/allocator.h>
 #include <cetech/kernel/hash.h>
-#include <cetech/kernel/task/task.h>
-#include <cetech/kernel/resource/resource.h>
+#include <cetech/modules/task/task.h>
+#include <cetech/modules/resource/resource.h>
 #include <cetech/kernel/yaml.h>
 #include <cetech/kernel/thread.h>
 #include <cetech/kernel/memory.h>

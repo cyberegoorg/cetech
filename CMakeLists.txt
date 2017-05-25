@@ -135,11 +135,11 @@ set(SOURCE_FILES
         engine/sources/cetech/modules/develop_system/private/develop_system.c
 
         engine/sources/cetech/kernel/private/app/_app.c
-        engine/sources/cetech/kernel/task/private/task.c
+        engine/sources/cetech/modules/task/private/task.c
 
-        engine/sources/cetech/kernel/resource/private/resource.c
-        engine/sources/cetech/kernel/resource/private/resource_package.c
-        engine/sources/cetech/kernel/resource/private/resource_compiler.c
+        engine/sources/cetech/modules/resource/private/resource.c
+        engine/sources/cetech/modules/resource/private/resource_package.c
+        engine/sources/cetech/modules/resource/private/resource_compiler.c
         engine/sources/cetech/modules/filesystem/private/filesystem.c
         engine/sources/cetech/modules/component/private/component.c
         engine/sources/cetech/modules/entity/private/entity.c

@@ -2,7 +2,7 @@
 #define CETECH_RESOURCE_H
 
 #include <cetech/kernel/hash.h>
-#include <cetech/kernel/resource/resource.h>
+#include <cetech/modules/resource/resource.h>
 
 void resource_set_autoload(int enable);
 

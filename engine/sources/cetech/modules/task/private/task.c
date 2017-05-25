@@ -8,11 +8,11 @@
 
 #include <cetech/modules/develop_system/develop.h>
 #include <cetech/kernel/config.h>
-#include <cetech/kernel/resource/resource.h>
+#include <cetech/modules/resource/resource.h>
 #include <cetech/kernel/module.h>
 
 #include "task_queue.h"
-#include <cetech/kernel/task/task.h>
+#include <cetech/modules/task/task.h>
 #include <cetech/kernel/api.h>
 
 
