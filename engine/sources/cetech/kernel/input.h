@@ -10,11 +10,7 @@
 
 #include <cetech/core/math_types.h>
 
-enum {
-    KEYBOARD_API_ID = 3,
-    MOUSE_API_ID = 4,
-    GAMEPAD_API_ID = 5,
-};
+
 
 //==============================================================================
 // Api

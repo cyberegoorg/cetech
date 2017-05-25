@@ -406,8 +406,6 @@ void *application_get_module_api(int api) {
     if (api == PLUGIN_EXPORT_API_ID) {
         static struct module_api_v0 module = {0};
         return &module;
-    } else if (api == APPLICATION_API_ID) {
-        return &api_v1;
     }
 
     return 0;

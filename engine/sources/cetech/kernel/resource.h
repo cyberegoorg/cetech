@@ -11,10 +11,6 @@
 #include <stddef.h>
 #include <stdint.h>
 
-enum {
-    RESOURCE_API_ID = 19,
-    PACKAGE_API_ID = 20,
-};
 
 struct vio;
 struct allocator;

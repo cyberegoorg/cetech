@@ -3,9 +3,6 @@
 
 #include <stdint.h>
 
-enum {
-    OS_THREAD_API_ID = 971401
-};
 
 typedef int (*thread_fce_t)(void *data);
 

@@ -18,9 +18,6 @@ typedef struct world_s world_t;
 struct entity_compile_output;
 struct compilator_api;
 
-enum {
-    ENTITY_API_ID = 11,
-};
 
 //==============================================================================
 // Typedefs

@@ -13,10 +13,6 @@
 #include <cetech/core/types.h>
 #include <cetech/core/eventstream.inl>
 
-enum {
-    CONSOLE_SERVER_API_ID = 9,
-    DEVELOP_SERVER_API_ID = 10
-};
 
 //==============================================================================
 // Typedefs

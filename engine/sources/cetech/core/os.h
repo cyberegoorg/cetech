@@ -11,17 +11,11 @@
 // CPU
 //==============================================================================
 
-enum {
-    CPU_API_ID = 448453211
-};
 
 struct cpu_api_v0 {
     int (*count)();
 };
 
-enum {
-    OBJECT_API_ID = 2223344
-};
 
 
 struct object_api_v0 {
@@ -37,9 +31,6 @@ struct object_api_v0 {
 int exec(const char *argv);
 
 
-enum {
-    TIME_API_ID = 394952
-};
 
 //==============================================================================
 // Time

@@ -39,9 +39,6 @@ struct property_value {
     } value;
 };
 
-enum {
-    COMPONENT_API_ID = 12
-};
 
 //==============================================================================
 // Typedefs

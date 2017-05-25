@@ -261,12 +261,6 @@ void *camera_get_module_api(int api) {
             return &module;
         }
 
-        case CAMERA_API_ID: {
-
-
-            return &camera_api;
-        }
-
         default:
             return NULL;
     }

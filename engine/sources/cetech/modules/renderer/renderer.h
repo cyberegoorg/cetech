@@ -31,11 +31,6 @@ typedef struct material_s {
 } material_t;
 
 
-enum {
-    RENDERER_API_ID = 15,
-    MATERIAL_API_ID = 16,
-    MESH_API_ID = 17,
-};
 
 //==============================================================================
 // Api

@@ -7,9 +7,6 @@
 // Includes
 //==============================================================================
 
-enum {
-    SCENEGRAPH_API_ID = 24,
-};
 
 #include "stdint.h"
 #include <cetech/core/math_types.h>
