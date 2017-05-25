@@ -12,6 +12,7 @@
 
 #include <cetech/kernel/input.h>
 #include <cetech/core/string.h>
+#include <cetech/core/api.h>
 
 #include "mousebtnstr.h"
 
@@ -37,19 +38,7 @@ static struct G {
 
 IMPORT_API(machine_api_v0);
 
-static void _init(get_api_fce_t get_engine_api) {
-    INIT_API(get_engine_api, machine_api_v0, MACHINE_API_ID);
 
-    _G = (struct G) {0};
-
-    log_debug(LOG_WHERE, "Init");
-}
-
-static void _shutdown() {
-    log_debug(LOG_WHERE, "Shutdown");
-
-    _G = (struct G) {0};
-}
 
 static void _update() {
     struct event_header *event = machine_api_v0.event_begin();
@@ -188,30 +177,48 @@ void mouse_set_cursor_pos(vec2f_t pos) {
 
 }
 
+static void _init_api(struct api_v0* api){
+    static struct mouse_api_v0 api_v1 = {
+            .button_index = mouse_button_index,
+            .button_name = mouse_button_name,
+            .button_state = mouse_button_state,
+            .button_pressed = mouse_button_pressed,
+            .button_released = mouse_button_released,
+            .axis_index = mouse_axis_index,
+            .axis_name = mouse_axis_name,
+            .axis = mouse_axis,
+    };
+    api->register_api("mouse_api_v0", &api_v1);
+}
+
+static void _init( struct api_v0* api) {
+    USE_API(api, machine_api_v0);
+
+
+
+    _G = (struct G) {0};
+
+    log_debug(LOG_WHERE, "Init");
+}
+
+static void _shutdown() {
+    log_debug(LOG_WHERE, "Shutdown");
+
+    _G = (struct G) {0};
+}
+
 void *mouse_get_module_api(int api) {
 
     if (api == PLUGIN_EXPORT_API_ID) {
         static struct module_api_v0 module = {0};
 
         module.init = _init;
+        module.init_api = _init_api;
         module.shutdown = _shutdown;
         module.update = _update;
 
         return &module;
 
-    } else if (api == MOUSE_API_ID) {
-        static struct mouse_api_v0 api_v1 = {
-                .button_index = mouse_button_index,
-                .button_name = mouse_button_name,
-                .button_state = mouse_button_state,
-                .button_pressed = mouse_button_pressed,
-                .button_released = mouse_button_released,
-                .axis_index = mouse_axis_index,
-                .axis_name = mouse_axis_name,
-                .axis = mouse_axis,
-        };
-
-        return &api_v1;
     }
 
     return 0;

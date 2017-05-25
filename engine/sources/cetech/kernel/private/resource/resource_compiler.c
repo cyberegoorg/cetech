@@ -16,6 +16,7 @@
 #include <cetech/kernel/resource.h>
 #include <cetech/core/memory.h>
 #include <cetech/core/module.h>
+#include <cetech/core/api.h>
 
 #include "builddb.h"
 #include "resource.h"
@@ -223,11 +224,11 @@ static void _init_cvar(struct config_api_v0 config) {
                                         "externals/build");
 }
 
-static void _init(get_api_fce_t get_engine_api) {
-    INIT_API(get_engine_api, memory_api_v0, MEMORY_API_ID);
-    INIT_API(get_engine_api, resource_api_v0, RESOURCE_API_ID);
-    INIT_API(get_engine_api, task_api_v0, TASK_API_ID);
-    INIT_API(get_engine_api, app_api_v0, APPLICATION_API_ID);
+static void _init( struct api_v0* api) {
+    USE_API(api, memory_api_v0);
+    USE_API(api, resource_api_v0);
+    USE_API(api, task_api_v0);
+    USE_API(api, app_api_v0);
 
     char build_dir_full[1024] = {0};
     resource_api_v0.compiler_get_build_dir(build_dir_full,

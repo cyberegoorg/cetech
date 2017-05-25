@@ -16,6 +16,7 @@
 #include <cetech/kernel/entity.h>
 #include <cetech/kernel/component.h>
 #include <cetech/core/yaml.h>
+#include <cetech/core/api.h>
 
 //==============================================================================
 // Globals
@@ -39,26 +40,6 @@ static struct G {
 IMPORT_API(memory_api_v0);
 IMPORT_API(world_api_v0);
 
-static void _init(get_api_fce_t get_engine_api) {
-    INIT_API(get_engine_api, memory_api_v0, MEMORY_API_ID);
-    INIT_API(get_engine_api, world_api_v0, WORLD_API_ID);
-
-    _G = (struct G) {0};
-
-    MAP_INIT(component_compiler_t, &_G.compiler_map,
-             memory_api_v0.main_allocator());
-    MAP_INIT(uint32_t, &_G.spawn_order_map, memory_api_v0.main_allocator());
-    MAP_INIT(component_clb_t, &_G.component_clb,
-             memory_api_v0.main_allocator());
-}
-
-static void _shutdown() {
-    MAP_DESTROY(component_compiler_t, &_G.compiler_map);
-    MAP_DESTROY(uint32_t, &_G.spawn_order_map);
-    MAP_DESTROY(component_clb_t, &_G.component_clb);
-
-    _G = (struct G) {0};
-}
 
 //==============================================================================
 // Public interface
@@ -167,30 +148,54 @@ static struct property_value _get_property(stringid64_t type,
     return clb.get_property(world, entity, key);
 }
 
+static void _init_api(struct api_v0* api_v0){
+    static struct component_api_v0 api = {0};
+    api.component_register_compiler = component_register_compiler;
+    api.component_compile = component_compile;
+    api.component_get_spawn_order = component_get_spawn_order;
+    api.component_register_type = component_register_type;
+    api.component_spawn = component_spawn;
+    api.component_destroy = component_destroy;
+    api.set_property = _set_property;
+    api.get_property = _get_property;
+
+
+    api_v0->register_api("component_api_v0", &api);
+}
+
+static void _init( struct api_v0* api_v0) {
+    USE_API(api_v0, memory_api_v0);
+    USE_API(api_v0, world_api_v0);
+
+
+    _G = (struct G) {0};
+
+    MAP_INIT(component_compiler_t, &_G.compiler_map,
+             memory_api_v0.main_allocator());
+    MAP_INIT(uint32_t, &_G.spawn_order_map, memory_api_v0.main_allocator());
+    MAP_INIT(component_clb_t, &_G.component_clb,
+             memory_api_v0.main_allocator());
+}
+
+static void _shutdown() {
+    MAP_DESTROY(component_compiler_t, &_G.compiler_map);
+    MAP_DESTROY(uint32_t, &_G.spawn_order_map);
+    MAP_DESTROY(component_clb_t, &_G.component_clb);
+
+    _G = (struct G) {0};
+}
+
 void *component_get_module_api(int api) {
     switch (api) {
         case PLUGIN_EXPORT_API_ID: {
             static struct module_api_v0 module = {0};
 
             module.init = _init;
+            module.init_api = _init_api;
             module.shutdown = _shutdown;
 
 
             return &module;
-        }
-
-        case COMPONENT_API_ID: {
-            static struct component_api_v0 api = {0};
-            api.component_register_compiler = component_register_compiler;
-            api.component_compile = component_compile;
-            api.component_get_spawn_order = component_get_spawn_order;
-            api.component_register_type = component_register_type;
-            api.component_spawn = component_spawn;
-            api.component_destroy = component_destroy;
-            api.set_property = _set_property;
-            api.get_property = _get_property;
-
-            return &api;
         }
 
         default:

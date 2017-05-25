@@ -19,6 +19,7 @@
 #include "level_blob.h"
 #include <cetech/core/fs.h>
 #include <cetech/core/hash.h>
+#include <cetech/core/api.h>
 
 IMPORT_API(entity_api_v0);
 IMPORT_API(resource_api_v0);
@@ -223,30 +224,6 @@ int _level_resource_compiler(const char *filename,
 // Public interface
 //==============================================================================
 
-static void _init(get_api_fce_t get_engine_api) {
-    INIT_API(get_engine_api, entity_api_v0, ENTITY_API_ID);
-    INIT_API(get_engine_api, memory_api_v0, MEMORY_API_ID);
-    INIT_API(get_engine_api, resource_api_v0, RESOURCE_API_ID);
-    INIT_API(get_engine_api, transform_api_v0, TRANSFORM_API_ID);
-
-    _G = (struct G) {0};
-    _G.level_type = stringid64_from_string("level");
-
-    ARRAY_INIT(level_instance, &_G.level_instance,
-               memory_api_v0.main_allocator());
-
-    resource_api_v0.register_type(_G.level_type, _level_resource_defs);
-
-#ifdef CETECH_CAN_COMPILE
-    resource_api_v0.compiler_register(_G.level_type, _level_resource_compiler);
-#endif
-
-}
-
-static void _shutdown() {
-    ARRAY_DESTROY(level_instance, &_G.level_instance);
-    _G = (struct G) {0};
-}
 
 
 level_t world_load_level(world_t world,
@@ -301,6 +278,44 @@ entity_t level_entity(level_t level) {
     return instance->level_entity;
 }
 
+static void _init_api(struct api_v0* api){
+    static struct level_api_v0 _api = {0};
+
+    _api.load_level = world_load_level;
+    _api.destroy = level_destroy;
+    _api.entity_by_id = level_entity_by_id;
+    _api.entity = level_entity;
+
+    api->register_api("level_api_v0", &_api);
+}
+
+
+static void _init( struct api_v0* api) {
+    USE_API(api, entity_api_v0);
+    USE_API(api, memory_api_v0);
+    USE_API(api, resource_api_v0);
+    USE_API(api, transform_api_v0);
+
+    _G = (struct G) {0};
+    _G.level_type = stringid64_from_string("level");
+
+    ARRAY_INIT(level_instance, &_G.level_instance,
+               memory_api_v0.main_allocator());
+
+    resource_api_v0.register_type(_G.level_type, _level_resource_defs);
+
+#ifdef CETECH_CAN_COMPILE
+    resource_api_v0.compiler_register(_G.level_type, _level_resource_compiler);
+#endif
+
+}
+
+static void _shutdown() {
+    ARRAY_DESTROY(level_instance, &_G.level_instance);
+    _G = (struct G) {0};
+}
+
+
 void *level_get_module_api(int api) {
 
     switch (api) {
@@ -308,24 +323,11 @@ void *level_get_module_api(int api) {
             static struct module_api_v0 module = {0};
 
             module.init = _init;
+            module.init_api = _init_api;
             module.shutdown = _shutdown;
 
             return &module;
         }
-
-
-        case LEVEL_API_ID: {
-            static struct level_api_v0 api = {0};
-
-            api.load_level = world_load_level;
-            api.destroy = level_destroy;
-            api.entity_by_id = level_entity_by_id;
-            api.entity = level_entity;
-
-
-            return &api;
-        }
-
 
         default:
             return NULL;

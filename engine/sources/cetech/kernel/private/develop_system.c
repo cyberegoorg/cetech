@@ -19,6 +19,7 @@
 #include <cetech/kernel/task.h>
 #include <cetech/kernel/develop.h>
 #include <cetech/core/string.h>
+#include <cetech/core/api.h>
 
 
 //==============================================================================
@@ -232,57 +233,15 @@ void _send_events() {
 //==============================================================================
 // Interface
 //==============================================================================
-static void _init(get_api_fce_t get_engine_api) {
-    INIT_API(get_engine_api, memory_api_v0, MEMORY_API_ID);
-    INIT_API(get_engine_api, task_api_v0, TASK_API_ID);
-    INIT_API(get_engine_api, config_api_v0, CONFIG_API_ID);
-    INIT_API(get_engine_api, thread_api_v0, OS_THREAD_API_ID);
-    INIT_API(get_engine_api, time_api_v0, TIME_API_ID);
-
-    MAP_INIT(to_mpack_fce_t, &_G.to_mpack, memory_api_v0.main_allocator());
-    eventstream_create(&_G.eventstream, memory_api_v0.main_allocator());
-
-    _register_to_mpack(EVENT_SCOPE, _scopeevent_to_mpack);
-    _register_to_mpack(EVENT_RECORD_FLOAT, _recordfloat_to_mpack);
-    _register_to_mpack(EVENT_RECORD_INT, _recordint_to_mpack);
-
-    const char *addr = 0;
-
-    log_debug(LOG_WHERE, "Init");
-
-    int socket = nn_socket(AF_SP, NN_PUB);
-    if (socket < 0) {
-        log_error(LOG_WHERE, "Could not create nanomsg socket: %s",
-                  nn_strerror(errno));
-        //return 0;
-    }
-    addr = config_api_v0.get_string(_G.cv_pub_addr);
-
-    log_debug(LOG_WHERE, "PUB address: %s", addr);
-
-    if (nn_bind(socket, addr) < 0) {
-        log_error(LOG_WHERE, "Could not bind socket to '%s': %s", addr,
-                  nn_strerror(errno));
-        //return 0;
-    }
-
-    _G.pub_socket = socket;
-}
 
 static void _init_cvar(struct config_api_v0 config) {
     _G = (struct G) {0};
     _G.cv_pub_addr = config.new_str("develop.pub.addr",
                                     "Console server rpc addr", "ws://*:4447");
+
+
 }
 
-static void _shutdown() {
-    log_debug(LOG_WHERE, "Shutdown");
-
-    MAP_DESTROY(to_mpack_fce_t, &_G.to_mpack);
-
-    eventstream_destroy(&_G.eventstream);
-    nn_close(_G.pub_socket);
-}
 
 static void _after_update(float dt) {
     _flush_all_streams();
@@ -345,29 +304,77 @@ void developsys_leave_scope(struct scope_data scope_data) {
     developsys_push(EVENT_SCOPE, ev);
 }
 
+static void _init_api(struct api_v0* api){
+    static struct develop_api_v0 _api = {0};
+
+    _api.push = _developsys_push;
+    _api.push_record_float = developsys_push_record_float;
+    _api.push_record_int = developsys_push_record_int;
+    _api.leave_scope = developsys_leave_scope;
+    _api.enter_scope = developsys_enter_scope;
+
+    api->register_api("develop_api_v0", &_api);
+}
+
+static void _init( struct api_v0* api) {
+    USE_API(api, memory_api_v0);
+    USE_API(api, task_api_v0);
+    USE_API(api, config_api_v0);
+    USE_API(api, thread_api_v0);
+    USE_API(api, time_api_v0);
+
+    MAP_INIT(to_mpack_fce_t, &_G.to_mpack, memory_api_v0.main_allocator());
+    eventstream_create(&_G.eventstream, memory_api_v0.main_allocator());
+
+    _register_to_mpack(EVENT_SCOPE, _scopeevent_to_mpack);
+    _register_to_mpack(EVENT_RECORD_FLOAT, _recordfloat_to_mpack);
+    _register_to_mpack(EVENT_RECORD_INT, _recordint_to_mpack);
+
+    const char *addr = 0;
+
+    log_debug(LOG_WHERE, "Init");
+
+    int socket = nn_socket(AF_SP, NN_PUB);
+    if (socket < 0) {
+        log_error(LOG_WHERE, "Could not create nanomsg socket: %s",
+                  nn_strerror(errno));
+        //return 0;
+    }
+    addr = config_api_v0.get_string(_G.cv_pub_addr);
+
+    log_debug(LOG_WHERE, "PUB address: %s", addr);
+
+    if (nn_bind(socket, addr) < 0) {
+        log_error(LOG_WHERE, "Could not bind socket to '%s': %s", addr,
+                  nn_strerror(errno));
+        //return 0;
+    }
+
+    _G.pub_socket = socket;
+}
+
+static void _shutdown() {
+    log_debug(LOG_WHERE, "Shutdown");
+
+    MAP_DESTROY(to_mpack_fce_t, &_G.to_mpack);
+
+    eventstream_destroy(&_G.eventstream);
+    nn_close(_G.pub_socket);
+}
+
+
 void *developsystem_get_module_api(int api) {
     switch (api) {
         case PLUGIN_EXPORT_API_ID: {
             static struct module_api_v0 module = {0};
 
             module.init = _init;
+            module.init_api = _init_api;
             module.shutdown = _shutdown;
             module.init_cvar = _init_cvar;
             module.after_update = _after_update;
 
             return &module;
-        }
-
-        case DEVELOP_SERVER_API_ID: {
-            static struct develop_api_v0 api = {0};
-
-            api.push = _developsys_push;
-            api.push_record_float = developsys_push_record_float;
-            api.push_record_int = developsys_push_record_int;
-            api.leave_scope = developsys_leave_scope;
-            api.enter_scope = developsys_enter_scope;
-
-            return &api;
         }
 
 

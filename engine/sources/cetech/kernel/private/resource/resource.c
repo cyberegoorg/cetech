@@ -19,6 +19,7 @@
 
 #include "resource.h"
 #include <cetech/core/fs.h>
+#include <cetech/core/api.h>
 
 //==============================================================================
 // Struct and types
@@ -144,19 +145,61 @@ static const resource_callbacks_t package_resource_callback = {
         .reloader = package_resource_reloader
 };
 
-extern int package_init();
+extern int package_init( struct api_v0 *api);
 
 extern void package_shutdown();
 
 void resource_register_type(stringid64_t type,
                             resource_callbacks_t callbacks);
 
-static void _init(get_api_fce_t get_engine_api) {
-    INIT_API(get_engine_api, cnsole_srv_api_v0, CONSOLE_SERVER_API_ID);
-    INIT_API(get_engine_api, memory_api_v0, MEMORY_API_ID);
-    INIT_API(get_engine_api, filesystem_api_v0, FILESYSTEM_API_ID);
-    INIT_API(get_engine_api, config_api_v0, CONFIG_API_ID);
-    INIT_API(get_engine_api, app_api_v0, APPLICATION_API_ID);
+static void _init_api(struct api_v0* api){
+
+    static struct resource_api_v0 resource_api = {0};
+
+    resource_api.set_autoload = resource_set_autoload;
+    resource_api.register_type = resource_register_type;
+    resource_api.load = resource_load;
+    resource_api.add_loaded = resource_add_loaded;
+    resource_api.load_now = resource_load_now;
+    resource_api.unload = resource_unload;
+    resource_api.reload = resource_reload;
+    resource_api.reload_all = resource_reload_all;
+    resource_api.can_get = resource_can_get;
+    resource_api.can_get_all = resource_can_get_all;
+    resource_api.get = resource_get;
+    resource_api.type_name_string = resource_type_name_string;
+    resource_api.compiler_get_build_dir = resource_compiler_get_build_dir;
+
+#ifdef CETECH_CAN_COMPILE
+    resource_api.compiler_get_core_dir = resource_compiler_get_core_dir;
+        resource_api.compiler_register = resource_compiler_register;
+        resource_api.compiler_compile_all = resource_compiler_compile_all;
+        resource_api.compiler_get_filename = resource_compiler_get_filename;
+        resource_api.compiler_get_tmp_dir = resource_compiler_get_tmp_dir;
+        resource_api.compiler_external_join = resource_compiler_external_join;
+        resource_api.compiler_create_build_dir = resource_compiler_create_build_dir;
+        resource_api.compiler_get_source_dir = resource_compiler_get_source_dir;
+#endif
+
+    api->register_api("resource_api_v0", &resource_api);
+
+    static struct package_api_v0 package_api = {0};
+
+    package_api.load = package_load;
+    package_api.unload = package_unload;
+    package_api.is_loaded = package_is_loaded;
+    package_api.flush = package_flush;
+
+    api->register_api("package_api_v0", &package_api);
+}
+
+
+static void _init( struct api_v0* api) {
+    USE_API(api, cnsole_srv_api_v0);
+    USE_API(api, memory_api_v0);
+    USE_API(api, filesystem_api_v0);
+    USE_API(api, config_api_v0);
+    USE_API(api, app_api_v0);
 
     ARRAY_INIT(resource_data, &_G.resource_data,
                memory_api_v0.main_allocator());
@@ -182,7 +225,7 @@ static void _init(get_api_fce_t get_engine_api) {
     cnsole_srv_api_v0.consolesrv_register_command("resource.reload_all",
                                                   _cmd_reload_all);
 
-    package_init(get_engine_api);
+    package_init(api);
     //return package_init();
 
 }
@@ -533,51 +576,11 @@ void *resourcesystem_get_module_api(int api) {
             static struct module_api_v0 module = {0};
 
             module.init = _init;
+            module.init_api = _init_api;
             module.shutdown = _shutdown;
             module.init_cvar = _init_cvar;
 
             return &module;
-        }
-
-        case RESOURCE_API_ID: {
-            static struct resource_api_v0 api = {0};
-
-            api.set_autoload = resource_set_autoload;
-            api.register_type = resource_register_type;
-            api.load = resource_load;
-            api.add_loaded = resource_add_loaded;
-            api.load_now = resource_load_now;
-            api.unload = resource_unload;
-            api.reload = resource_reload;
-            api.reload_all = resource_reload_all;
-            api.can_get = resource_can_get;
-            api.can_get_all = resource_can_get_all;
-            api.get = resource_get;
-            api.type_name_string = resource_type_name_string;
-            api.compiler_get_build_dir = resource_compiler_get_build_dir;
-
-#ifdef CETECH_CAN_COMPILE
-            api.compiler_get_core_dir = resource_compiler_get_core_dir;
-            api.compiler_register = resource_compiler_register;
-            api.compiler_compile_all = resource_compiler_compile_all;
-            api.compiler_get_filename = resource_compiler_get_filename;
-            api.compiler_get_tmp_dir = resource_compiler_get_tmp_dir;
-            api.compiler_external_join = resource_compiler_external_join;
-            api.compiler_create_build_dir = resource_compiler_create_build_dir;
-            api.compiler_get_source_dir = resource_compiler_get_source_dir;
-#endif
-            return &api;
-        }
-
-        case PACKAGE_API_ID: {
-            static struct package_api_v0 api = {0};
-
-            api.load = package_load;
-            api.unload = package_unload;
-            api.is_loaded = package_is_loaded;
-            api.flush = package_flush;
-
-            return &api;
         }
 
 

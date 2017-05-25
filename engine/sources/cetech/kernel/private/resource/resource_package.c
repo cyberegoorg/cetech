@@ -16,6 +16,7 @@
 
 #include "resource_package.h"
 #include <cetech/core/fs.h>
+#include <cetech/core/api.h>
 
 
 //==============================================================================
@@ -135,11 +136,11 @@ int _package_compiler(const char *filename,
     return 1;
 }
 
-int package_init(get_api_fce_t get_engine_api) {
-    INIT_API(get_engine_api, memory_api_v0, MEMORY_API_ID);
-    INIT_API(get_engine_api, resource_api_v0, RESOURCE_API_ID);
-    INIT_API(get_engine_api, task_api_v0, TASK_API_ID);
-    INIT_API(get_engine_api, thread_api_v0, OS_THREAD_API_ID);
+int package_init( struct api_v0 *api) {
+    USE_API(api, memory_api_v0);
+    USE_API(api, resource_api_v0);
+    USE_API(api, task_api_v0);
+    USE_API(api, thread_api_v0);
 
     _G = (struct G) {0};
 

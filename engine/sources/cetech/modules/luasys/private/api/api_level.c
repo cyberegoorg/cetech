@@ -8,6 +8,7 @@
 
 #include <cetech/modules/luasys/luasys.h>
 #include <cetech/core/hash.h>
+#include <cetech/core/api.h>
 
 #include "../../../level/level.h"
 
@@ -53,8 +54,8 @@ static int _level_entity(lua_State *l) {
     return 1;
 }
 
-void _register_lua_level_api(get_api_fce_t get_engine_api) {
-    level_api_v0 = *((struct level_api_v0 *) get_engine_api(LEVEL_API_ID));
+void _register_lua_level_api( struct api_v0* api) {
+    USE_API(api, level_api_v0);
 
     luasys_add_module_function(API_NAME, "load_level", _load_level);
     luasys_add_module_function(API_NAME, "destroy", _destroy_level);

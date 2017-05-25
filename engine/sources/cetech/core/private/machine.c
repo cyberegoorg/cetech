@@ -10,6 +10,7 @@
 #include <cetech/kernel/machine.h>
 #include <cetech/kernel/config.h>
 #include <cetech/kernel/resource.h>
+#include <cetech/core/api.h>
 
 #include "sdl2/sdl_parts.h"
 
@@ -25,7 +26,7 @@
 // Globals
 //==============================================================================
 
-typedef int (*machine_part_init_t)(get_api_fce_t);
+typedef int (*machine_part_init_t)(struct api_v0*);
 
 typedef void (*machine_part_shutdown_t)();
 
@@ -60,44 +61,7 @@ void machine_register_part(const char *name,
     _G.process[idx] = process;
 }
 
-static void _init(get_api_fce_t get_engine_api) {
-    _G = (struct G) {0};
 
-    eventstream_create(&_G.eventstream, _memsys_main_allocator());
-
-    machine_register_part("sdl", sdl_init, sdl_shutdown, sdl_process);
-    machine_register_part("sdl_keyboard", sdl_keyboard_init,
-                          sdl_keyboard_shutdown, sdl_keyboard_process);
-    machine_register_part("sdl_mouse", sdl_mouse_init, sdl_mouse_shutdown,
-                          sdl_mouse_process);
-    machine_register_part("sdl_gamepad", sdl_gamepad_init, sdl_gamepad_shutdown,
-                          sdl_gamepad_process);
-
-    for (int i = 0; i < _G.parts_count; ++i) {
-        if (!_G.init[i](get_engine_api)) {
-            log_error(LOG_WHERE, "Could not init machine part \"%s\"",
-                      _G.name[i]);
-
-            for (i = i - 1; i >= 0; --i) {
-                _G.shutdown[i]();
-            }
-
-            return; //return 0;
-        };
-    }
-
-    //return 1;
-}
-
-static void _shutdown() {
-    eventstream_destroy(&_G.eventstream);
-
-    for (int i = 0; i < _G.parts_count; ++i) {
-        _G.shutdown[i]();
-    }
-
-    _G = (struct G) {0};
-}
 
 void _update() {
     eventstream_clear(&_G.eventstream);
@@ -126,27 +90,68 @@ void machine_gamepad_play_rumble(int gamepad,
                                  float strength,
                                  uint32_t length);
 
+static void _init_api(struct api_v0* api){
+    static struct machine_api_v0 api_v1 = {
+            .event_begin = machine_event_begin,
+            .event_end = machine_event_end,
+            .event_next = machine_event_next,
+            .gamepad_is_active = machine_gamepad_is_active,
+            .gamepad_play_rumble = machine_gamepad_play_rumble,
+    };
+    api->register_api("machine_api_v0", &api_v1);
+}
+
+
+static void _init( struct api_v0* api) {
+    _G = (struct G) {0};
+
+    eventstream_create(&_G.eventstream, _memsys_main_allocator());
+
+    machine_register_part("sdl", sdl_init, sdl_shutdown, sdl_process);
+    machine_register_part("sdl_keyboard", sdl_keyboard_init,
+                          sdl_keyboard_shutdown, sdl_keyboard_process);
+    machine_register_part("sdl_mouse", sdl_mouse_init, sdl_mouse_shutdown,
+                          sdl_mouse_process);
+    machine_register_part("sdl_gamepad", sdl_gamepad_init, sdl_gamepad_shutdown,
+                          sdl_gamepad_process);
+
+    for (int i = 0; i < _G.parts_count; ++i) {
+        if (!_G.init[i](api)) {
+            log_error(LOG_WHERE, "Could not init machine part \"%s\"",
+                      _G.name[i]);
+
+            for (i = i - 1; i >= 0; --i) {
+                _G.shutdown[i]();
+            }
+
+            return; //return 0;
+        };
+    }
+
+    //return 1;
+}
+
+static void _shutdown() {
+    eventstream_destroy(&_G.eventstream);
+
+    for (int i = 0; i < _G.parts_count; ++i) {
+        _G.shutdown[i]();
+    }
+
+    _G = (struct G) {0};
+}
 void *machine_get_module_api(int api) {
 
     if (api == PLUGIN_EXPORT_API_ID) {
         static struct module_api_v0 module = {0};
 
         module.init = _init;
+        module.init_api = _init_api;
         module.shutdown = _shutdown;
         module.update = _update;
 
         return &module;
 
-    } else if (api == MACHINE_API_ID) {
-        static struct machine_api_v0 api_v1 = {
-                .event_begin = machine_event_begin,
-                .event_end = machine_event_end,
-                .event_next = machine_event_next,
-                .gamepad_is_active = machine_gamepad_is_active,
-                .gamepad_play_rumble = machine_gamepad_play_rumble,
-        };
-
-        return &api_v1;
     }
 
     return 0;

@@ -16,6 +16,7 @@
 #include <cetech/kernel/world.h>
 #include <cetech/kernel/entity.h>
 #include <cetech/kernel/component.h>
+#include <cetech/core/api.h>
 
 
 //==============================================================================
@@ -468,38 +469,6 @@ static const resource_callbacks_t entity_resource_callback = {
 };
 
 
-static void _init(get_api_fce_t get_engine_api) {
-    INIT_API(get_engine_api, memory_api_v0, MEMORY_API_ID);
-    INIT_API(get_engine_api, component_api_v0, COMPONENT_API_ID);
-    INIT_API(get_engine_api, memory_api_v0, MEMORY_API_ID);
-    INIT_API(get_engine_api, resource_api_v0, RESOURCE_API_ID);
-    INIT_API(get_engine_api, handler_api_v0, HANDLER_API_ID);
-
-    _G = (struct G) {0};
-
-    _G.type = stringid64_from_string("entity");
-
-    MAP_INIT(uint32_t, &_G.spawned_map, memory_api_v0.main_allocator());
-    ARRAY_INIT(array_entity_t, &_G.spawned_array,
-               memory_api_v0.main_allocator());
-
-    resource_api_v0.register_type(_G.type, entity_resource_callback);
-
-#ifdef CETECH_CAN_COMPILE
-    resource_api_v0.compiler_register(_G.type, _entity_resource_compiler);
-#endif
-
-    _G.entity_handler = handler_api_v0.handler32gen_create(
-            memory_api_v0.main_allocator());
-}
-
-static void _shutdown() {
-    MAP_DESTROY(uint32_t, &_G.spawned_map);
-    ARRAY_DESTROY(array_entity_t, &_G.spawned_array);
-
-    handler_api_v0.handler32gen_destroy(_G.entity_handler);
-    _G = (struct G) {0};
-}
 
 //==============================================================================
 // Public interface
@@ -582,38 +551,75 @@ void entity_destroy(world_t world,
 
 }
 
+static void _init_api(struct api_v0* api){
+    static struct entity_api_v0 _api = {0};
+    _api.entity_manager_create = entity_manager_create;
+    _api.entity_manager_destroy = entity_manager_destroy;
+    _api.entity_manager_alive = entity_manager_alive;
+
+    _api.spawn_from_resource = entity_spawn_from_resource;
+    _api.spawn = entity_spawn;
+    _api.destroy = entity_destroy;
+
+#ifdef CETECH_CAN_COMPILE
+    _api.compiler_create_output = entity_compiler_create_output;
+    _api.compiler_destroy_output = entity_compiler_destroy_output;
+    _api.compiler_compile_entity = entity_compiler_compile_entity;
+    _api.compiler_ent_counter = entity_compiler_ent_counter;
+    _api.compiler_write_to_build = entity_compiler_write_to_build;
+    _api.resource_compiler = entity_resource_compiler;
+#endif
+    api->register_api("entity_api_v0", &_api);
+
+}
+
+static void _init( struct api_v0* api) {
+    USE_API(api, memory_api_v0);
+    USE_API(api, component_api_v0);
+    USE_API(api, memory_api_v0);
+    USE_API(api, resource_api_v0);
+    USE_API(api, handler_api_v0);
+
+
+
+    _G = (struct G) {0};
+
+    _G.type = stringid64_from_string("entity");
+
+    MAP_INIT(uint32_t, &_G.spawned_map, memory_api_v0.main_allocator());
+    ARRAY_INIT(array_entity_t, &_G.spawned_array,
+               memory_api_v0.main_allocator());
+
+    resource_api_v0.register_type(_G.type, entity_resource_callback);
+
+#ifdef CETECH_CAN_COMPILE
+    resource_api_v0.compiler_register(_G.type, _entity_resource_compiler);
+#endif
+
+    _G.entity_handler = handler_api_v0.handler32gen_create(
+            memory_api_v0.main_allocator());
+}
+
+static void _shutdown() {
+    MAP_DESTROY(uint32_t, &_G.spawned_map);
+    ARRAY_DESTROY(array_entity_t, &_G.spawned_array);
+
+    handler_api_v0.handler32gen_destroy(_G.entity_handler);
+    _G = (struct G) {0};
+}
+
+
 void *entity_get_module_api(int api) {
     switch (api) {
         case PLUGIN_EXPORT_API_ID: {
             static struct module_api_v0 module = {0};
 
             module.init = _init;
+            module.init_api = _init_api;
             module.shutdown = _shutdown;
 
 
             return &module;
-        }
-
-        case ENTITY_API_ID: {
-            static struct entity_api_v0 api = {0};
-
-            api.entity_manager_create = entity_manager_create;
-            api.entity_manager_destroy = entity_manager_destroy;
-            api.entity_manager_alive = entity_manager_alive;
-
-            api.spawn_from_resource = entity_spawn_from_resource;
-            api.spawn = entity_spawn;
-            api.destroy = entity_destroy;
-
-#ifdef CETECH_CAN_COMPILE
-            api.compiler_create_output = entity_compiler_create_output;
-            api.compiler_destroy_output = entity_compiler_destroy_output;
-            api.compiler_compile_entity = entity_compiler_compile_entity;
-            api.compiler_ent_counter = entity_compiler_ent_counter;
-            api.compiler_write_to_build = entity_compiler_write_to_build;
-            api.resource_compiler = entity_resource_compiler;
-#endif
-            return &api;
         }
 
         default:

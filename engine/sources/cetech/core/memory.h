@@ -9,6 +9,8 @@
 // Includes
 //==============================================================================
 
+struct api_v0;
+
 enum {
     MEMORY_API_ID = 14,
 };
@@ -20,6 +22,8 @@ enum {
 //! Init memory system
 //! \param scratch_buffer_size Main scratch buffer size
 void memsys_init(int scratch_buffer_size);
+
+void memsys_init_api(struct api_v0* api);
 
 //! Shutdown memory system
 void memsys_shutdown();

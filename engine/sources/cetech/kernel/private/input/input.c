@@ -11,6 +11,7 @@
 #include <cetech/core/module.h>
 #include <cetech/kernel/machine.h>
 #include <cetech/core/string.h>
+#include <cetech/core/api.h>
 
 #include "gamepadstr.h"
 
@@ -35,24 +36,7 @@ static struct G {
 } _G = {0};
 
 
-static void _init(get_api_fce_t get_engine_api) {
-    INIT_API(get_engine_api, machine_api_v0, MACHINE_API_ID);
 
-    _G = (struct G) {0};
-
-    log_debug(LOG_WHERE, "Init");
-
-    for (int i = 0; i < GAMEPAD_MAX; ++i) {
-        _G.active[i] = machine_api_v0.gamepad_is_active(i);
-    }
-
-}
-
-static void _shutdown() {
-    log_debug(LOG_WHERE, "Shutdown");
-
-    _G = (struct G) {0};
-}
 
 static void _update() {
     struct event_header *event = machine_api_v0.event_begin();
@@ -192,33 +176,55 @@ void gamepad_play_rumble(uint32_t idx,
     machine_api_v0.gamepad_play_rumble(idx, strength, length);
 }
 
+static void _init_api(struct api_v0* api){
+    static struct gamepad_api_v0 api_v1 = {
+            .is_active = gamepad_is_active,
+            .button_index = gamepad_button_index,
+            .button_name = gamepad_button_name,
+            .button_state = gamepad_button_state,
+            .button_pressed = gamepad_button_pressed,
+            .button_released = gamepad_button_released,
+            .axis_index = gamepad_axis_index,
+            .axis_name = gamepad_axis_name,
+            .axis = gamepad_axis,
+            .play_rumble = gamepad_play_rumble,
+    };
+    api->register_api("gamepad_api_v0", &api_v1);
+}
+
+static void _init( struct api_v0* api) {
+    USE_API(api, machine_api_v0);
+
+
+
+    _G = (struct G) {0};
+
+    log_debug(LOG_WHERE, "Init");
+
+    for (int i = 0; i < GAMEPAD_MAX; ++i) {
+        _G.active[i] = machine_api_v0.gamepad_is_active(i);
+    }
+
+}
+
+static void _shutdown() {
+    log_debug(LOG_WHERE, "Shutdown");
+
+    _G = (struct G) {0};
+}
+
 void *gamepad_get_module_api(int api) {
 
     if (api == PLUGIN_EXPORT_API_ID) {
         static struct module_api_v0 module = {0};
 
         module.init = _init;
+        module.init_api = _init_api;
         module.shutdown = _shutdown;
         module.update = _update;
 
         return &module;
 
-    } else if (api == GAMEPAD_API_ID) {
-        static struct gamepad_api_v0 api_v1 = {
-                .is_active = gamepad_is_active,
-                .button_index = gamepad_button_index,
-                .button_name = gamepad_button_name,
-                .button_state = gamepad_button_state,
-                .button_pressed = gamepad_button_pressed,
-                .button_released = gamepad_button_released,
-                .axis_index = gamepad_axis_index,
-                .axis_name = gamepad_axis_name,
-                .axis = gamepad_axis,
-                .play_rumble = gamepad_play_rumble,
-        };
-
-        return &api_v1;
     }
-
     return 0;
 }

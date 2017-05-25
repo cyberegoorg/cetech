@@ -30,6 +30,8 @@ enum {
 };
 
 struct config_api_v0;
+struct api_v0;
+struct allocator;
 
 //==============================================================================
 // Typedefs
@@ -49,20 +51,22 @@ struct module_api_v0 {
     //! \param Init cvars
     void (*init_cvar       )(struct config_api_v0);
 
+    void (*init_api       )(struct api_v0*);
+
     //! Init
     //! \param get_api_fce_t Get engine api
-    void (*init            )(get_api_fce_t);
+    void (*init            )(struct api_v0*);
 
     //! Shutdown
     void (*shutdown        )(void);
 
     //! Reload begin
     //! \param get_api_fce_t Get engine api
-    void *(*reload_begin   )(get_api_fce_t);
+    void *(*reload_begin   )(struct api_v0*);
 
     //! Reload end
     //! \param get_api_fce_t Get engine api
-    void (*reload_end      )(get_api_fce_t,
+    void (*reload_end      )(struct api_v0*,
                              void *);
 
     //! Call update
@@ -76,6 +80,9 @@ struct module_api_v0 {
 //==============================================================================
 // Interface
 //==============================================================================
+
+void module_init(struct allocator *allocator, struct api_v0* api_v0);
+void module_shutdown();
 
 //! Add static modules
 //! \param fce get api module fce
@@ -101,6 +108,9 @@ void module_call_update();
 //! Call init cvar
 void module_call_init_cvar();
 
+//! Call init api
+void module_call_init_api();
+
 //! Call init
 void module_call_init();
 
@@ -110,8 +120,6 @@ void module_call_shutdown();
 //! Call after update
 void module_call_after_update(float dt);
 
-//! Plugin get engine api
-void *module_get_engine_api(int api);
 
 #endif //CETECH_PLUGIN_API_H
 //! \}

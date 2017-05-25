@@ -6,6 +6,7 @@
 #include "../../../camera/camera.h"
 #include "../../../renderer/renderer.h"
 #include <cetech/modules/luasys/luasys.h>
+#include <cetech/core/api.h>
 
 #define API_NAME "Renderer"
 
@@ -27,9 +28,8 @@ static int _renderer_set_debug(lua_State *l) {
     return 0;
 }
 
-void _register_lua_renderer_api(get_api_fce_t get_engine_api) {
-    renderer_api_v0 = *(struct renderer_api_v0 *) get_engine_api(
-            RENDERER_API_ID);
+void _register_lua_renderer_api( struct api_v0* api) {
+    USE_API(api, renderer_api_v0);
 
     luasys_add_module_function(API_NAME, "render_world",
                                _renderer_render_world);

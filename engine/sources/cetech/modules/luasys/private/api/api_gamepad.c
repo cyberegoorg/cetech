@@ -5,6 +5,7 @@
 
 #include <cetech/modules/luasys/luasys.h>
 #include <cetech/kernel/input.h>
+#include <cetech/core/api.h>
 
 IMPORT_API(gamepad_api_v0);
 
@@ -101,9 +102,8 @@ static int _gamepad_play_rumble(lua_State *l) {
 
 #define API_NAME "Gamepad"
 
-void _register_lua_gamepad_api(get_api_fce_t get_engine_api) {
-    gamepad_api_v0 = *((struct gamepad_api_v0 *) get_engine_api(
-            GAMEPAD_API_ID));
+void _register_lua_gamepad_api( struct api_v0* api) {
+    USE_API(api, gamepad_api_v0);
 
     luasys_add_module_function(API_NAME, "is_active", _gamepad_is_active);
 

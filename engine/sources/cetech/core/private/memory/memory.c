@@ -4,6 +4,7 @@
 #include <cetech/core/errors.h>
 #include <cetech/core/module.h>
 #include <cetech/core/memory.h>
+#include <cetech/core/api.h>
 
 
 #define LOG_WHERE "memory"
@@ -49,7 +50,17 @@ const void *pointer_sub(const void *p,
 }
 
 
-static void _init(get_api_fce_t get_engine_api) {
+void memsys_init_api(struct api_v0* api) {
+    static struct memory_api_v0 _api = {0};
+
+    _api.main_allocator = _memsys_main_allocator;
+    _api.main_scratch_allocator = _memsys_main_scratch_allocator;
+
+    api->register_api("memory_api_v0", &_api);
+}
+
+static void _init( struct api_v0* api) {
+
 }
 
 static void _shutdown() {
@@ -89,16 +100,8 @@ void *memsys_get_module_api(int api) {
             return &module;
         }
 
-        case MEMORY_API_ID: {
-            static struct memory_api_v0 api = {0};
-
-            api.main_allocator = _memsys_main_allocator;
-            api.main_scratch_allocator = _memsys_main_scratch_allocator;
-
-            return &api;
-        }
-
         default:
             return NULL;
     }
 }
+

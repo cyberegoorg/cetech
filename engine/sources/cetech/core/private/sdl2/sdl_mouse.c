@@ -11,6 +11,7 @@
 #include <cetech/kernel/application.h>
 #include <cetech/kernel/resource.h>
 #include <cetech/kernel/machine.h>
+#include <cetech/core/api.h>
 
 
 //==============================================================================
@@ -38,11 +39,11 @@ IMPORT_API(window_api_v0);
 // Interface
 //==============================================================================
 
-int sdl_mouse_init(get_api_fce_t get_engine_api) {
+int sdl_mouse_init( struct api_v0 *api) {
     _G = (struct G) {0};
 
-    INIT_API(get_engine_api, app_api_v0, APPLICATION_API_ID);
-    INIT_API(get_engine_api, window_api_v0, WINDOW_API_ID);
+    USE_API(api, app_api_v0);
+    USE_API(api, window_api_v0);
 
     return 1;
 }

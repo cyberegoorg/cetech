@@ -8,6 +8,7 @@
 
 #include <cetech/modules/luasys/luasys.h>
 #include <cetech/core/hash.h>
+#include <cetech/core/api.h>
 
 #include "../../../renderer/renderer.h"
 
@@ -51,10 +52,8 @@ static int _mesh_set_material(lua_State *l) {
     return 0;
 }
 
-void _register_lua_mesh_api(get_api_fce_t get_engine_api) {
-    mesh_renderer_api_v0 = *(struct mesh_renderer_api_v0 *) get_engine_api(
-            MESH_API_ID);
-
+void _register_lua_mesh_api( struct api_v0* api) {
+    USE_API(api, mesh_renderer_api_v0);
 
     luasys_add_module_function(API_NAME, "get", _mesh_get);
     luasys_add_module_function(API_NAME, "has", _mesh_has);

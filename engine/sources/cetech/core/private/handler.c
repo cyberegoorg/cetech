@@ -4,6 +4,7 @@
 #include <cetech/core/queue.inl>
 #include <cetech/core/module.h>
 #include <cetech/core/handler.h>
+#include <cetech/core/api.h>
 
 //==============================================================================
 // Private defines
@@ -79,24 +80,29 @@ int handler32_alive(struct handler32gen *hid,
     return ARRAY_AT(&hid->_generation, _idx(h)) == _gen(h);
 }
 
+static void _init_api(struct api_v0* api){
+    static struct handler_api_v0 _api = {
+            .handler32gen_create =  handler32gen_create,
+            .handler32gen_destroy =  handler32gen_destroy,
+            .handler32_create =  handler32_create,
+            .handler32_destroy =  handler32_destroy,
+            .handler32_alive =  handler32_alive
+    };
+    api->register_api("handler_api_v0", &_api);
+}
+
+static void _init( struct api_v0* api) {
+
+}
+
 void *handler_get_module_api(int api) {
 
     switch (api) {
         case PLUGIN_EXPORT_API_ID: {
             static struct module_api_v0 module = {0};
+            module.init_api = _init_api;
+            module.init = _init;
             return &module;
-        }
-
-
-        case HANDLER_API_ID: {
-            static struct handler_api_v0 api = {
-                    .handler32gen_create =  handler32gen_create,
-                    .handler32gen_destroy =  handler32gen_destroy,
-                    .handler32_create =  handler32_create,
-                    .handler32_destroy =  handler32_destroy,
-                    .handler32_alive =  handler32_alive
-            };
-            return &api;
         }
 
 

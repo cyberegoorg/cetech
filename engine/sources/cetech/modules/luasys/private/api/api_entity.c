@@ -7,6 +7,7 @@
 #include <cetech/kernel/entity.h>
 #include <cetech/core/module.h>
 #include <cetech/modules/luasys/luasys.h>
+#include <cetech/core/api.h>
 
 #define API_NAME "Entity"
 
@@ -31,8 +32,8 @@ static int _entity_destroy(lua_State *l) {
 }
 
 
-void _register_lua_entity_api(get_api_fce_t get_engine_api) {
-    entity_api_v0 = *((struct entity_api_v0 *) get_engine_api(ENTITY_API_ID));
+void _register_lua_entity_api( struct api_v0* api) {
+    USE_API(api, entity_api_v0);
 
     luasys_add_module_function(API_NAME, "spawn", _entity_spawn);
     luasys_add_module_function(API_NAME, "destroy", _entity_destroy);

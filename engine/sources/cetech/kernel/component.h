@@ -10,6 +10,8 @@
 
 #include <cetech/core/math_types.h>
 
+struct stringid64_s;
+
 typedef struct world_s world_t;
 typedef struct entity_s entity_t;
 typedef struct stringid64_s stringid64_t;

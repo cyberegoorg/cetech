@@ -2,6 +2,7 @@
 #include <cetech/kernel/application.h>
 #include <cetech/core/module.h>
 #include <cetech/modules/luasys/luasys.h>
+#include <cetech/core/api.h>
 
 
 #define API_NAME "Application"
@@ -29,8 +30,8 @@ static int _application_platform(lua_State *l) {
 }
 
 
-void _register_lua_application_api(get_api_fce_t get_engine_api) {
-    INIT_API(get_engine_api, app_api_v0, APPLICATION_API_ID);
+void _register_lua_application_api( struct api_v0* api) {
+    USE_API(api, app_api_v0);
 
     luasys_add_module_function(API_NAME, "quit", _application_quit);
     luasys_add_module_function(API_NAME, "get_native_platform",

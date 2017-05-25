@@ -14,6 +14,7 @@
 #include <cetech/kernel/resource.h>
 #include <cetech/core/memory.h>
 #include <cetech/core/module.h>
+#include <cetech/core/api.h>
 
 
 //==============================================================================
@@ -65,15 +66,12 @@ IMPORT_API(app_api_v0)
 // Interface
 //==============================================================================
 
-int shader_init() {
+int shader_init(struct api_v0 *api) {
     _G = (struct G) {0};
 
-    memory_api_v0 = *(struct memory_api_v0 *) module_get_engine_api(
-            MEMORY_API_ID);
-    resource_api_v0 = *(struct resource_api_v0 *) module_get_engine_api(
-            RESOURCE_API_ID);
-    app_api_v0 = *(struct app_api_v0 *) module_get_engine_api(
-            APPLICATION_API_ID);
+    USE_API(api, memory_api_v0);
+    USE_API(api, resource_api_v0);
+    USE_API(api, app_api_v0);
 
     _G.type = stringid64_from_string("shader");
 

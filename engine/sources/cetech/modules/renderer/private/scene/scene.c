@@ -13,6 +13,7 @@
 #include <cetech/kernel/resource.h>
 #include <cetech/kernel/entity.h>
 #include <cetech/kernel/world.h>
+#include <cetech/core/api.h>
 
 #include "../../../scenegraph/scenegraph.h"
 
@@ -94,15 +95,13 @@ struct scene_instance *_get_scene_instance(stringid64_t scene) {
 // Interface
 //==============================================================================
 
-int scene_init() {
+int scene_init(struct api_v0 *api) {
     _G = (struct G) {0};
 
-    memory_api_v0 = *(struct memory_api_v0 *) module_get_engine_api(
-            MEMORY_API_ID);
-    resource_api_v0 = *(struct resource_api_v0 *) module_get_engine_api(
-            RESOURCE_API_ID);
-    scenegprah_api_v0 = *(struct scenegprah_api_v0 *) module_get_engine_api(
-            SCENEGRAPH_API_ID);
+    USE_API(api, memory_api_v0);
+    USE_API(api, resource_api_v0);
+    USE_API(api, scenegprah_api_v0);
+
 
     _G.type = stringid64_from_string("scene");
 

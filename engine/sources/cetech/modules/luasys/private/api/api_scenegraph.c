@@ -7,6 +7,7 @@
 
 #include <cetech/modules/luasys/luasys.h>
 #include <cetech/core/hash.h>
+#include <cetech/core/api.h>
 
 #include "../../../scenegraph/scenegraph.h"
 
@@ -102,9 +103,8 @@ static int _scenegraph_link(lua_State *l) {
     return 0;
 }
 
-void _register_lua_scenegraph_api(get_api_fce_t get_engine_api) {
-    scenegprah_api_v0 = *((struct scenegprah_api_v0 *) get_engine_api(
-            SCENEGRAPH_API_ID));
+void _register_lua_scenegraph_api( struct api_v0* api) {
+    USE_API(api, scenegprah_api_v0);
 
     luasys_add_module_function(API_NAME, "has", _scenegraph_has);
     luasys_add_module_function(API_NAME, "node_by_name",

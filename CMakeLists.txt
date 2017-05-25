@@ -86,6 +86,7 @@ set(SOURCE_FILES
         engine/sources/cetech/core/private/fs/path.c
         engine/sources/cetech/core/private/process.c
         engine/sources/cetech/core/private/stacktrace.c
+        engine/sources/cetech/core/private/api.c
 
         engine/sources/cetech/core/private/sdl2/sdl2_object.h
         engine/sources/cetech/core/private/sdl2/sdl_time.h

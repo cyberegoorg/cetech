@@ -11,6 +11,7 @@
 #include <cetech/core/module.h>
 
 #include <cetech/kernel/config.h>
+#include <cetech/core/api.h>
 
 
 //==============================================================================
@@ -34,6 +35,7 @@ static struct G {
     void *module_handler[MAX_PLUGINS];
     char used[MAX_PLUGINS];
     char path[MAX_PLUGINS][MAX_PATH_LEN];
+    struct api_v0 *api_v0;
 } PluginSystemGlobals = {0};
 
 //==============================================================================
@@ -55,7 +57,7 @@ void _callm_init(get_api_fce_t fce) {
 
     if (api) {
         CETECH_ASSERT("module", api->init != NULL);
-        api->init(module_get_engine_api);
+        api->init(_G.api_v0);
     }
 }
 
@@ -124,7 +126,7 @@ void module_reload(const char *path) {
         void *data = NULL;
         struct module_api_v0 *api = _G.module_api[i];
         if (api != NULL && api->reload_begin) {
-            data = api->reload_begin(module_get_engine_api);
+            data = api->reload_begin(_G.api_v0);
         }
 
         unload_object(_G.module_handler[i]);
@@ -141,7 +143,7 @@ void module_reload(const char *path) {
 
         _G.module_api[i] = api = ((get_api_fce_t) fce)(PLUGIN_EXPORT_API_ID);
         if (api != NULL && api->reload_end) {
-            api->reload_end(module_get_engine_api, data);
+            api->reload_end(_G.api_v0, data);
         }
     }
 }
@@ -155,7 +157,7 @@ void module_reload_all() {
         void *data = NULL;
         struct module_api_v0 *api = _G.module_api[i];
         if (api != NULL && api->reload_begin) {
-            data = api->reload_begin(module_get_engine_api);
+            data = api->reload_begin(_G.api_v0);
         }
 
         unload_object(_G.module_handler[i]);
@@ -172,7 +174,7 @@ void module_reload_all() {
 
         _G.module_api[i] = api = ((get_api_fce_t) fce)(PLUGIN_EXPORT_API_ID);
         if (api != NULL && api->reload_end) {
-            api->reload_end(module_get_engine_api, data);
+            api->reload_end(_G.api_v0, data);
         }
     }
 }
@@ -216,13 +218,12 @@ void module_call_init() {
             continue;
         }
 
-        _G.module_api[i]->init(module_get_engine_api);
+        _G.module_api[i]->init(_G.api_v0);
     }
 }
 
 void module_call_init_cvar() {
-    struct config_api_v0 ConfigApiV0 = *(struct config_api_v0 *) module_get_engine_api(
-            CONFIG_API_ID);
+    struct config_api_v0 ConfigApiV0 = *(struct config_api_v0*) _G.api_v0->first("config_api_v0");
 
     for (size_t i = 0; i < MAX_PLUGINS; ++i) {
         if (!_G.used[i] || !_G.module_api[i]->init_cvar) {
@@ -253,6 +254,16 @@ void module_call_update() {
     }
 }
 
+void module_call_init_api() {
+    for (size_t i = 0; i < MAX_PLUGINS; ++i) {
+        if (!_G.used[i] || !_G.module_api[i]->init_api) {
+            continue;
+        }
+
+        _G.module_api[i]->init_api(_G.api_v0);
+    }
+}
+
 void module_call_after_update(float dt) {
     for (size_t i = 0; i < MAX_PLUGINS; ++i) {
         if (!_G.used[i] || !_G.module_api[i]->after_update) {
@@ -261,4 +272,15 @@ void module_call_after_update(float dt) {
 
         _G.module_api[i]->after_update(dt);
     }
+}
+
+void module_init(struct allocator *allocator, struct api_v0* api_v0) {
+    _G = (struct G){0};
+
+    _G.api_v0 = api_v0;
+
+}
+
+void module_shutdown() {
+    _G = (struct G){0};
 }

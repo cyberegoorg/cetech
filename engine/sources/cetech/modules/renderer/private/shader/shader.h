@@ -3,7 +3,7 @@
 
 #include <bgfx/c99/bgfx.h>
 
-int shader_init();
+int shader_init(struct api_v0 *api);
 
 void shader_shutdown();
 

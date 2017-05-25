@@ -13,6 +13,7 @@
 
 #include "task_queue.h"
 #include <cetech/kernel/task.h>
+#include <cetech/core/api.h>
 
 
 //==============================================================================
@@ -156,58 +157,7 @@ static int _task_worker(void *o) {
 }
 
 
-static void _init(get_api_fce_t get_engine_api) {
-    INIT_API(get_engine_api, develop_api_v0, DEVELOP_SERVER_API_ID);
-    INIT_API(get_engine_api, memory_api_v0, MEMORY_API_ID);
-    INIT_API(get_engine_api, thread_api_v0, OS_THREAD_API_ID);
-    INIT_API(get_engine_api, cpu_api_v0, CPU_API_ID);
 
-    _G = (struct G) {0};
-
-    int core_count = cpu_api_v0.count();
-
-    static const uint32_t main_threads_count = 1;
-    const uint32_t worker_count = core_count - main_threads_count;
-
-    log_info("task", "Core/Main/Worker: %d, %d, %d", core_count,
-             main_threads_count, worker_count);
-
-    _G._workers_count = worker_count;
-
-    queue_task_init(&_G._gloalQueue, MAX_TASK, memory_api_v0.main_allocator());
-
-    for (int i = 0; i < worker_count + 1; ++i) {
-        queue_task_init(&_G._workers_queue[i], MAX_TASK,
-                        memory_api_v0.main_allocator());
-    }
-
-    for (int j = 0; j < worker_count; ++j) {
-        _G._workers[j] = thread_api_v0.create((thread_fce_t) _task_worker,
-                                              "worker",
-                                              (void *) ((intptr_t) (j + 1)));
-    }
-
-    _G._Run = 1;
-}
-
-static void _shutdown() {
-    _G._Run = 0;
-
-    int status = 0;
-
-    for (uint32_t i = 0; i < _G._workers_count; ++i) {
-        //thread_kill(_G._workers[i]);
-        thread_api_v0.wait(_G._workers[i], &status);
-    }
-
-    queue_task_destroy(&_G._gloalQueue);
-
-    for (int i = 0; i < _G._workers_count + 1; ++i) {
-        queue_task_destroy(&_G._workers_queue[i]);
-    }
-
-    _G = (struct G) {0};
-}
 
 //==============================================================================
 // Interface
@@ -263,6 +213,73 @@ int taskmanager_worker_count() {
     return _G._workers_count;
 }
 
+static void _init_api(struct api_v0* api){
+    static struct task_api_v0 _api = {
+            .worker_count = taskmanager_worker_count,
+            .add = taskmanager_add,
+            .do_work = taskmanager_do_work,
+            .wait_atomic = taskmanager_wait_atomic,
+            .worker_id = taskmanager_worker_id
+    };
+
+    api->register_api("task_api_v0", &_api);
+}
+
+static void _init( struct api_v0* api) {
+    USE_API(api, develop_api_v0);
+    USE_API(api, memory_api_v0);
+    USE_API(api, thread_api_v0);
+    USE_API(api, cpu_api_v0);
+
+
+
+    _G = (struct G) {0};
+
+    int core_count = cpu_api_v0.count();
+
+    static const uint32_t main_threads_count = 1;
+    const uint32_t worker_count = core_count - main_threads_count;
+
+    log_info("task", "Core/Main/Worker: %d, %d, %d", core_count,
+             main_threads_count, worker_count);
+
+    _G._workers_count = worker_count;
+
+    queue_task_init(&_G._gloalQueue, MAX_TASK, memory_api_v0.main_allocator());
+
+    for (int i = 0; i < worker_count + 1; ++i) {
+        queue_task_init(&_G._workers_queue[i], MAX_TASK,
+                        memory_api_v0.main_allocator());
+    }
+
+    for (int j = 0; j < worker_count; ++j) {
+        _G._workers[j] = thread_api_v0.create((thread_fce_t) _task_worker,
+                                              "worker",
+                                              (void *) ((intptr_t) (j + 1)));
+    }
+
+    _G._Run = 1;
+}
+
+static void _shutdown() {
+    _G._Run = 0;
+
+    int status = 0;
+
+    for (uint32_t i = 0; i < _G._workers_count; ++i) {
+        //thread_kill(_G._workers[i]);
+        thread_api_v0.wait(_G._workers[i], &status);
+    }
+
+    queue_task_destroy(&_G._gloalQueue);
+
+    for (int i = 0; i < _G._workers_count + 1; ++i) {
+        queue_task_destroy(&_G._workers_queue[i]);
+    }
+
+    _G = (struct G) {0};
+}
+
 void *task_get_module_api(int api) {
 
 
@@ -271,23 +288,11 @@ void *task_get_module_api(int api) {
             static struct module_api_v0 module = {0};
 
             module.init = _init;
+            module.init_api = _init_api;
             module.shutdown = _shutdown;
 
             return &module;
         }
-
-        case TASK_API_ID: {
-            static struct task_api_v0 api = {
-                    .worker_count = taskmanager_worker_count,
-                    .add = taskmanager_add,
-                    .do_work = taskmanager_do_work,
-                    .wait_atomic = taskmanager_wait_atomic,
-                    .worker_id = taskmanager_worker_id
-            };
-
-            return &api;
-        }
-
 
         default:
             return NULL;

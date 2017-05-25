@@ -16,6 +16,7 @@
 
 #include <cetech/kernel/develop.h>
 #include <cetech/core/string.h>
+#include <cetech/core/api.h>
 
 //==============================================================================
 // Defines
@@ -129,8 +130,16 @@ static int _cmd_ready(mpack_node_t args,
     return 0;
 }
 
-static void _init(get_api_fce_t get_engine_api) {
-    INIT_API(get_engine_api, config_api_v0, CONFIG_API_ID);
+static void _init_api(struct api_v0* api){
+    static struct cnsole_srv_api_v0 console_api = {0};
+    console_api.consolesrv_push_begin = consolesrv_push_begin;
+    console_api.consolesrv_register_command = consolesrv_register_command;
+    api->register_api("cnsole_srv_api_v0", &console_api);
+}
+
+static void _init( struct api_v0* api) {
+    USE_API(api, config_api_v0);
+
 
     const char *addr = 0;
 
@@ -265,21 +274,12 @@ void *consoleserver_get_module_api(int api) {
             static struct module_api_v0 module = {0};
 
             module.init = _init;
+            module.init_api = _init_api;
             module.shutdown = _shutdown;
             module.init_cvar = _init_cvar;
             module.update = _update;
 
             return &module;
-        }
-
-
-        case CONSOLE_SERVER_API_ID: {
-            static struct cnsole_srv_api_v0 api = {0};
-
-            api.consolesrv_push_begin = consolesrv_push_begin;
-            api.consolesrv_register_command = consolesrv_register_command;
-
-            return &api;
         }
 
         default:

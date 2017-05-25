@@ -10,6 +10,7 @@
 
 #include <cetech/modules/luasys/luasys.h>
 #include <include/luajit/lua.h>
+#include <cetech/core/api.h>
 
 #define API_NAME "Component"
 
@@ -124,12 +125,9 @@ static int _get_property(lua_State *l) {
 }
 
 
-void _register_lua_component_api(get_api_fce_t get_engine_api) {
-    component_api_v0 = *((struct component_api_v0 *) get_engine_api(
-            COMPONENT_API_ID));
-
-    lua_api_v0 = *((struct lua_api_v0 *) get_engine_api(
-            LUA_API_ID));
+void _register_lua_component_api( struct api_v0* api) {
+    USE_API(api, component_api_v0);
+    USE_API(api, lua_api_v0);
 
     luasys_add_module_function(API_NAME, "set_property", _set_property);
     luasys_add_module_function(API_NAME, "get_property", _get_property);

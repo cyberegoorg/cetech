@@ -10,6 +10,10 @@
 
 #include <stdint.h>
 
+struct api_v0;
+struct memory_api_v0;
+struct app_api_v0;
+
 enum {
     CONFIG_API_ID = 7,
 };
@@ -41,7 +45,7 @@ enum cvar_type {
 // Interface
 //==============================================================================
 
-int cvar_init();
+int cvar_init(struct api_v0* api);
 
 void cvar_shutdown();
 
@@ -52,11 +56,11 @@ void cvar_shutdown();
 
 //! Config API V0
 struct config_api_v0 {
-    void (*load_global)();
+    void (*load_global)(struct app_api_v0 *app_api);
 
 #ifdef CETECH_CAN_COMPILE
 
-    void (*compile_global)();
+    void (*compile_global)(struct app_api_v0 *app_api);
 
 #endif
 

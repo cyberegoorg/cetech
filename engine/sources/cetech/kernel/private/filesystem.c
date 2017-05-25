@@ -11,6 +11,7 @@
 #include <cetech/kernel/resource.h>
 #include <cetech/core/module.h>
 #include <cetech/core/string.h>
+#include <cetech/core/api.h>
 
 
 //==============================================================================
@@ -40,27 +41,6 @@ static struct G {
 
 IMPORT_API(memory_api_v0);
 
-static void _init(get_api_fce_t get_engine_api) {
-    INIT_API(get_engine_api, memory_api_v0, MEMORY_API_ID);
-
-    _G = (struct G) {0};
-
-    log_debug(LOG_WHERE, "Init");
-}
-
-static void _shutdown() {
-    log_debug(LOG_WHERE, "Shutdown");
-
-    for (int i = 0; i < MAX_ROOTS; ++i) {
-        if (_G.rootmap.path[i] == 0) {
-            continue;
-        }
-
-        CETECH_DEALLOCATE(memory_api_v0.main_allocator(), _G.rootmap.path[i]);
-    }
-
-    _G = (struct G) {0};
-}
 
 
 //==============================================================================
@@ -173,6 +153,44 @@ time_t filesystem_get_file_mtime(stringid64_t root,
     return file_mtime(fullm_path);
 }
 
+static void _init_api(struct api_v0* api){
+    static struct filesystem_api_v0 _api = {0};
+    _api.filesystem_get_root_dir = filesystem_get_root_dir;
+    _api.filesystem_open = filesystem_open;
+    _api.filesystem_map_root_dir = filesystem_map_root_dir;
+    _api.filesystem_close = filesystem_close;
+    _api.filesystem_listdir = filesystem_listdir;
+    _api.filesystem_listdir_free = filesystem_listdir_free;
+    _api.filesystem_create_directory = filesystem_create_directory;
+    _api.filesystem_get_file_mtime = filesystem_get_file_mtime;
+    _api.filesystem_get_fullpath = filesystem_get_fullpath;
+
+    api->register_api("filesystem_api_v0", &_api);
+}
+
+
+static void _init( struct api_v0* api) {
+    USE_API(api, memory_api_v0);
+
+    _G = (struct G) {0};
+
+    log_debug(LOG_WHERE, "Init");
+}
+
+static void _shutdown() {
+    log_debug(LOG_WHERE, "Shutdown");
+
+    for (int i = 0; i < MAX_ROOTS; ++i) {
+        if (_G.rootmap.path[i] == 0) {
+            continue;
+        }
+
+        CETECH_DEALLOCATE(memory_api_v0.main_allocator(), _G.rootmap.path[i]);
+    }
+
+    _G = (struct G) {0};
+}
+
 
 void *filesystem_get_module_api(int api) {
 
@@ -181,25 +199,10 @@ void *filesystem_get_module_api(int api) {
             static struct module_api_v0 module = {0};
 
             module.init = _init;
+            module.init_api = _init_api;
             module.shutdown = _shutdown;
 
             return &module;
-        }
-
-        case FILESYSTEM_API_ID: {
-            static struct filesystem_api_v0 api = {0};
-
-            api.filesystem_get_root_dir = filesystem_get_root_dir;
-            api.filesystem_open = filesystem_open;
-            api.filesystem_map_root_dir = filesystem_map_root_dir;
-            api.filesystem_close = filesystem_close;
-            api.filesystem_listdir = filesystem_listdir;
-            api.filesystem_listdir_free = filesystem_listdir_free;
-            api.filesystem_create_directory = filesystem_create_directory;
-            api.filesystem_get_file_mtime = filesystem_get_file_mtime;
-            api.filesystem_get_fullpath = filesystem_get_fullpath;
-
-            return &api;
         }
 
         default:

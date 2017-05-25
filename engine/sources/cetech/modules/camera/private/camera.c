@@ -14,6 +14,7 @@
 
 #include <cetech/core/memory.h>
 #include <cetech/core/module.h>
+#include <cetech/core/api.h>
 
 #include "../camera.h"
 
@@ -143,34 +144,6 @@ void _spawner(world_t world,
 }
 
 
-static void _init(get_api_fce_t get_engine_api) {
-    INIT_API(get_engine_api, memory_api_v0, MEMORY_API_ID);
-    INIT_API(get_engine_api, component_api_v0, COMPONENT_API_ID);
-    INIT_API(get_engine_api, renderer_api_v0, RENDERER_API_ID);
-    INIT_API(get_engine_api, transform_api_v0, TRANSFORM_API_ID);
-
-    _G = (struct G) {0};
-
-    MAP_INIT(world_data_t, &_G.world, memory_api_v0.main_allocator());
-
-    _G.type = stringid64_from_string("camera");
-
-    component_api_v0.component_register_compiler(_G.type,
-                                                 _camera_component_compiler,
-                                                 10);
-    component_api_v0.component_register_type(_G.type, (struct component_clb) {
-            .spawner=_spawner, .destroyer=_destroyer,
-            .on_world_create=_on_world_create, .on_world_destroy=_on_world_destroy
-    });
-}
-
-static void _shutdown() {
-    MAP_DESTROY(world_data_t, &_G.world);
-
-    _G = (struct G) {0};
-}
-
-
 int camera_is_valid(camera_t camera) {
     return camera.idx != UINT32_MAX;
 }
@@ -232,6 +205,49 @@ camera_t camera_create(world_t world,
     return (camera_t) {.idx = idx};
 }
 
+
+static struct camera_api_v0 camera_api = {
+        .is_valid = camera_is_valid,
+        .get_project_view = camera_get_project_view,
+        .has = camera_has,
+        .get = camera_get,
+        .create = camera_create
+};
+
+static void _init( struct api_v0* api_v0) {
+    USE_API(api_v0, memory_api_v0);
+    USE_API(api_v0, component_api_v0);
+    USE_API(api_v0, renderer_api_v0);
+    USE_API(api_v0, transform_api_v0);
+
+
+    _G = (struct G) {0};
+
+    MAP_INIT(world_data_t, &_G.world, memory_api_v0.main_allocator());
+
+    _G.type = stringid64_from_string("camera");
+
+    component_api_v0.component_register_compiler(_G.type,
+                                                 _camera_component_compiler,
+                                                 10);
+    component_api_v0.component_register_type(_G.type, (struct component_clb) {
+            .spawner=_spawner, .destroyer=_destroyer,
+            .on_world_create=_on_world_create, .on_world_destroy=_on_world_destroy
+    });
+
+}
+
+static void _shutdown() {
+    MAP_DESTROY(world_data_t, &_G.world);
+
+    _G = (struct G) {0};
+}
+
+
+static void _init_api(struct api_v0* api){
+    api->register_api("camera_api_v0", &camera_api);
+}
+
 void *camera_get_module_api(int api) {
 
     switch (api) {
@@ -239,21 +255,16 @@ void *camera_get_module_api(int api) {
             static struct module_api_v0 module = {0};
 
             module.init = _init;
+            module.init_api = _init_api;
             module.shutdown = _shutdown;
 
             return &module;
         }
 
         case CAMERA_API_ID: {
-            static struct camera_api_v0 api = {0};
 
-            api.is_valid = camera_is_valid;
-            api.get_project_view = camera_get_project_view;
-            api.has = camera_has;
-            api.get = camera_get;
-            api.create = camera_create;
 
-            return &api;
+            return &camera_api;
         }
 
         default:

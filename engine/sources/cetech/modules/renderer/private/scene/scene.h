@@ -1,7 +1,7 @@
 #ifndef CETECH_BGFX_SCENE_RESOURCE_H
 #define CETECH_BGFX_SCENE_RESOURCE_H
 
-int scene_init();
+int scene_init(struct api_v0 *api);
 
 void scene_shutdown();
 

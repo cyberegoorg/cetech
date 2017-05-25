@@ -25,6 +25,7 @@
 #include <cetech/modules/luasys/luasys.h>
 #include <cetech/modules/renderer/renderer.h>
 #include <cetech/core/fs.h>
+#include <cetech/core/api.h>
 
 #define LOG_WHERE "application"
 
@@ -109,66 +110,67 @@ static struct app_api_v0 api_v1 = {
         .main_window =  application_get_main_window,
 };
 
-void _init_api() {
-    INIT_API(module_get_engine_api, cnsole_srv_api_v0, CONSOLE_SERVER_API_ID);
-    INIT_API(module_get_engine_api, develop_api_v0, DEVELOP_SERVER_API_ID);
-    INIT_API(module_get_engine_api, renderer_api_v0, RENDERER_API_ID);
-    INIT_API(module_get_engine_api, resource_api_v0, RESOURCE_API_ID);
-    INIT_API(module_get_engine_api, package_api_v0, PACKAGE_API_ID);
-    INIT_API(module_get_engine_api, task_api_v0, TASK_API_ID);
-    INIT_API(module_get_engine_api, lua_api_v0, LUA_API_ID);
-    INIT_API(module_get_engine_api, config_api_v0, CONFIG_API_ID);
-    INIT_API(module_get_engine_api, window_api_v0, WINDOW_API_ID);
-    INIT_API(module_get_engine_api, time_api_v0, TIME_API_ID);
+void _init_api(struct api_v0 *api) {
+    USE_API(api, cnsole_srv_api_v0);
+    USE_API(api, develop_api_v0);
+    USE_API(api, renderer_api_v0);
+    USE_API(api, resource_api_v0);
+    USE_API(api, package_api_v0);
+    USE_API(api, task_api_v0);
+    USE_API(api, lua_api_v0);
+    USE_API(api, config_api_v0);
+    USE_API(api, window_api_v0);
+    USE_API(api, time_api_v0);
 }
 
-int _init_config() {
+int _init_config(struct api_v0* api) {
+    struct config_api_v0 config = *(struct config_api_v0*)api->first("config_api_v0");
+
     _G.config = (struct GConfig) {
-            .boot_pkg = config_api_v0.new_str("core.boot_pkg", "Boot package",
+            .boot_pkg = config.new_str("core.boot_pkg", "Boot package",
                                               "boot"),
 
-            .boot_script = config_api_v0.new_str("core.boot_script",
+            .boot_script = config.new_str("core.boot_script",
                                                  "Boot script", "lua/boot"),
 
-            .screen_x = config_api_v0.new_int("screen.x", "Screen width", 1024),
-            .screen_y = config_api_v0.new_int("screen.y", "Screen height", 768),
-            .fullscreen = config_api_v0.new_int("screen.fullscreen",
+            .screen_x = config.new_int("screen.x", "Screen width", 1024),
+            .screen_y = config.new_int("screen.y", "Screen height", 768),
+            .fullscreen = config.new_int("screen.fullscreen",
                                                 "Fullscreen", 0),
 
-            .daemon = config_api_v0.new_int("daemon", "Daemon mode", 0),
-            .compile = config_api_v0.new_int("compile", "Comple", 0),
-            .continue_ = config_api_v0.new_int("continue",
+            .daemon = config.new_int("daemon", "Daemon mode", 0),
+            .compile = config.new_int("compile", "Comple", 0),
+            .continue_ = config.new_int("continue",
                                                "Continue after compile", 0),
-            .wait = config_api_v0.new_int("wait", "Wait for client", 0),
-            .wid = config_api_v0.new_int("wid", "Wid", 0)
+            .wait = config.new_int("wait", "Wait for client", 0),
+            .wid = config.new_int("wid", "Wid", 0)
     };
 
 
 
     // Cvar stage
 
-    config_api_v0.parse_core_args(_G.args.argc, _G.args.argv);
+    config.parse_core_args(_G.args.argc, _G.args.argv);
 
 #ifdef CETECH_CAN_COMPILE
-    if (config_api_v0.get_int(_G.config.compile)) {
+    if (config.get_int(_G.config.compile)) {
         char build_dir_full[1024] = {0};
-        resource_api_v0.compiler_get_build_dir(build_dir_full,
-                                               CETECH_ARRAY_LEN(build_dir_full),
-                                               application_platform());
+        cvar_t bd = config.find("build");
 
+        const char *build_dir_str = config.get_string(bd);
+        path_join(build_dir_full, 1024, build_dir_str, application_platform());
         dir_make_path(build_dir_full);
-
-        config_api_v0.compile_global();
+        config.compile_global(&api_v1);
     }
 #endif
 
-    config_api_v0.load_global();
+    config.load_global(&api_v1);
 
-    if (!config_api_v0.parse_args(_G.args.argc, _G.args.argv)) {
+    if (!config.parse_args(_G.args.argc, _G.args.argv)) {
         return 0;
     }
 
-    config_api_v0.log_all();
+    config.log_all();
 
     return 1;
 }
@@ -185,22 +187,21 @@ int application_init(int argc,
     log_debug(LOG_WHERE, "Init (global size: %lu)", sizeof(struct G));
 
     memsys_init(4 * 1024 * 1024);
+    api_init(_memsys_main_allocator());
+    api_get_v0()->register_api("app_api_v0", &api_v1);
+    memsys_init_api(api_get_v0());
+    module_init(_memsys_main_allocator(), api_get_v0());
+    cvar_init(api_get_v0());
 
     ADD_STATIC_PLUGIN(memsys);
     ADD_STATIC_PLUGIN(config);
     ADD_STATIC_PLUGIN(handler);
     ADD_STATIC_PLUGIN(application);
-
-    cvar_init();
-    module_call_init_cvar();
-
-    //module_call_init();
-
     ADD_STATIC_PLUGIN(sdl);
     ADD_STATIC_PLUGIN(machine);
+    ADD_STATIC_PLUGIN(developsystem);
     ADD_STATIC_PLUGIN(task);
     ADD_STATIC_PLUGIN(consoleserver);
-    ADD_STATIC_PLUGIN(developsystem);
 
     ADD_STATIC_PLUGIN(filesystem);
     ADD_STATIC_PLUGIN(resourcesystem);
@@ -210,16 +211,22 @@ int application_init(int argc,
 #endif
 
     _init_static_modules();
+
+    module_call_init_api();
     module_load_dirs("./bin");
     module_call_init_cvar();
 
-    _init_api();
+    //module_call_init();
+//
+//    module_call_init_cvar();
 
-    if (!_init_config()) {
+    if (!_init_config(api_get_v0())) {
         return 0;
     };
 
     module_call_init();
+
+    _init_api(api_get_v0());
 
     log_set_wid_clb(task_api_v0.worker_id);
 
@@ -232,8 +239,9 @@ int application_shutdown() {
     log_debug(LOG_WHERE, "Shutdown");
 
     module_call_shutdown();
-
     cvar_shutdown();
+    module_shutdown();
+    api_shutdown();
     memsys_shutdown();
     log_shutdown();
 

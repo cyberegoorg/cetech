@@ -15,6 +15,7 @@
 #include <cetech/core/map.inl>
 #include <cetech/core/handler.h>
 #include <cetech/core/string.h>
+#include <cetech/core/api.h>
 #include "../texture/texture.h"
 #include "../shader/shader.h"
 #include "material_blob.h"
@@ -78,12 +79,12 @@ IMPORT_API(handler_api_v0);
 // Interface
 //==============================================================================
 
-int material_init(get_api_fce_t get_engine_api) {
+int material_init( struct api_v0* api) {
     _G = (struct G) {0};
 
-    INIT_API(get_engine_api, memory_api_v0, MEMORY_API_ID);
-    INIT_API(get_engine_api, resource_api_v0, RESOURCE_API_ID);
-    INIT_API(get_engine_api, handler_api_v0, HANDLER_API_ID);
+    USE_API(api, memory_api_v0);
+    USE_API(api, resource_api_v0);
+    USE_API(api, handler_api_v0);
 
     _G.type = stringid64_from_string("material");
 
