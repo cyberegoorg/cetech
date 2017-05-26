@@ -83,7 +83,7 @@ static int _mouse_axis(lua_State *l) {
 #define API_NAME "Mouse"
 
 void _register_lua_mouse_api( struct api_v0* api) {
-    USE_API(api, mouse_api_v0);
+    GET_API(api, mouse_api_v0);
 
 
     luasys_add_module_function(API_NAME, "button_index", _mouse_button_index);

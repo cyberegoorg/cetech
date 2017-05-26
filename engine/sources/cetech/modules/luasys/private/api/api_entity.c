@@ -33,7 +33,7 @@ static int _entity_destroy(lua_State *l) {
 
 
 void _register_lua_entity_api( struct api_v0* api) {
-    USE_API(api, entity_api_v0);
+    GET_API(api, entity_api_v0);
 
     luasys_add_module_function(API_NAME, "spawn", _entity_spawn);
     luasys_add_module_function(API_NAME, "destroy", _entity_destroy);

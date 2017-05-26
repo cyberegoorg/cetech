@@ -280,7 +280,7 @@ void module_call_after_update(float dt) {
 void module_init(struct allocator *allocator, struct api_v0* api) {
     _G = (struct G){0};
 
-    USE_API(api, memory_api_v0);
+    GET_API(api, memory_api_v0);
 
     _G.api_v0 = api;
 

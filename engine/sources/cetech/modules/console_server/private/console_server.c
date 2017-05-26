@@ -138,7 +138,7 @@ static void _init_api(struct api_v0* api){
 }
 
 static void _init( struct api_v0* api) {
-    USE_API(api, config_api_v0);
+    GET_API(api, config_api_v0);
 
 
     const char *addr = 0;

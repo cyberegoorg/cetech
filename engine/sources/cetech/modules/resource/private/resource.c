@@ -195,11 +195,11 @@ static void _init_api(struct api_v0* api){
 
 
 static void _init( struct api_v0* api) {
-    USE_API(api, cnsole_srv_api_v0);
-    USE_API(api, memory_api_v0);
-    USE_API(api, filesystem_api_v0);
-    USE_API(api, config_api_v0);
-    USE_API(api, app_api_v0);
+    GET_API(api, cnsole_srv_api_v0);
+    GET_API(api, memory_api_v0);
+    GET_API(api, filesystem_api_v0);
+    GET_API(api, config_api_v0);
+    GET_API(api, app_api_v0);
 
     ARRAY_INIT(resource_data, &_G.resource_data,
                memory_api_v0.main_allocator());

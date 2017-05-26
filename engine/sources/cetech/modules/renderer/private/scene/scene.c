@@ -98,9 +98,9 @@ struct scene_instance *_get_scene_instance(stringid64_t scene) {
 int scene_init(struct api_v0 *api) {
     _G = (struct G) {0};
 
-    USE_API(api, memory_api_v0);
-    USE_API(api, resource_api_v0);
-    USE_API(api, scenegprah_api_v0);
+    GET_API(api, memory_api_v0);
+    GET_API(api, resource_api_v0);
+    GET_API(api, scenegprah_api_v0);
 
 
     _G.type = stringid64_from_string("scene");

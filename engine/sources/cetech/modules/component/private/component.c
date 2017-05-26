@@ -164,8 +164,8 @@ static void _init_api(struct api_v0* api_v0){
 }
 
 static void _init( struct api_v0* api_v0) {
-    USE_API(api_v0, memory_api_v0);
-    USE_API(api_v0, world_api_v0);
+    GET_API(api_v0, memory_api_v0);
+    GET_API(api_v0, world_api_v0);
 
 
     _G = (struct G) {0};

@@ -225,10 +225,10 @@ static void _init_cvar(struct config_api_v0 config) {
 }
 
 static void _init( struct api_v0* api) {
-    USE_API(api, memory_api_v0);
-    USE_API(api, resource_api_v0);
-    USE_API(api, task_api_v0);
-    USE_API(api, app_api_v0);
+    GET_API(api, memory_api_v0);
+    GET_API(api, resource_api_v0);
+    GET_API(api, task_api_v0);
+    GET_API(api, app_api_v0);
 
     char build_dir_full[1024] = {0};
     resource_api_v0.compiler_get_build_dir(build_dir_full,

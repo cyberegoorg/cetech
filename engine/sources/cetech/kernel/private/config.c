@@ -171,7 +171,7 @@ static void _reload_end(
 int cvar_init(struct api_v0 *api) {
     log_debug(LOG_WHERE, "Init");
 
-    USE_API(api, memory_api_v0);
+    GET_API(api, memory_api_v0);
 
     static struct config_api_v0 api_v1 = {
             .load_global = cvar_load_global,

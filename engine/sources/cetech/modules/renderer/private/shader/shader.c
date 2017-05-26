@@ -69,9 +69,9 @@ IMPORT_API(app_api_v0)
 int shader_init(struct api_v0 *api) {
     _G = (struct G) {0};
 
-    USE_API(api, memory_api_v0);
-    USE_API(api, resource_api_v0);
-    USE_API(api, app_api_v0);
+    GET_API(api, memory_api_v0);
+    GET_API(api, resource_api_v0);
+    GET_API(api, app_api_v0);
 
     _G.type = stringid64_from_string("shader");
 

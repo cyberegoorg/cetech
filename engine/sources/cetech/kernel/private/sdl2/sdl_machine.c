@@ -37,7 +37,7 @@ static struct app_api_v0 app_api_v0;
 int sdl_init( struct api_v0 *api) {
     _G = (struct G) {0};
 
-    USE_API(api, app_api_v0);
+    GET_API(api, app_api_v0);
 
 
     if (SDL_Init(SDL_INIT_EVERYTHING) != 0) {

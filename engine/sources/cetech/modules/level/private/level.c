@@ -291,10 +291,10 @@ static void _init_api(struct api_v0* api){
 
 
 static void _init( struct api_v0* api) {
-    USE_API(api, entity_api_v0);
-    USE_API(api, memory_api_v0);
-    USE_API(api, resource_api_v0);
-    USE_API(api, transform_api_v0);
+    GET_API(api, entity_api_v0);
+    GET_API(api, memory_api_v0);
+    GET_API(api, resource_api_v0);
+    GET_API(api, transform_api_v0);
 
     _G = (struct G) {0};
     _G.level_type = stringid64_from_string("level");

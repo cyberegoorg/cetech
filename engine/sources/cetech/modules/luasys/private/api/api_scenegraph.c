@@ -104,7 +104,7 @@ static int _scenegraph_link(lua_State *l) {
 }
 
 void _register_lua_scenegraph_api( struct api_v0* api) {
-    USE_API(api, scenegprah_api_v0);
+    GET_API(api, scenegprah_api_v0);
 
     luasys_add_module_function(API_NAME, "has", _scenegraph_has);
     luasys_add_module_function(API_NAME, "node_by_name",

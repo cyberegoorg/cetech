@@ -215,10 +215,10 @@ static struct camera_api_v0 camera_api = {
 };
 
 static void _init( struct api_v0* api_v0) {
-    USE_API(api_v0, memory_api_v0);
-    USE_API(api_v0, component_api_v0);
-    USE_API(api_v0, renderer_api_v0);
-    USE_API(api_v0, transform_api_v0);
+    GET_API(api_v0, memory_api_v0);
+    GET_API(api_v0, component_api_v0);
+    GET_API(api_v0, renderer_api_v0);
+    GET_API(api_v0, transform_api_v0);
 
 
     _G = (struct G) {0};

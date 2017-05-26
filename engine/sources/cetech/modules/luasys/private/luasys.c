@@ -867,8 +867,8 @@ static void _init_api(struct api_v0* api){
 static void _init( struct api_v0* api_v0) {
     log_debug(LOG_WHERE, "Init");
 
-    USE_API(api_v0, cnsole_srv_api_v0);
-    USE_API(api_v0, resource_api_v0);
+    GET_API(api_v0, cnsole_srv_api_v0);
+    GET_API(api_v0, resource_api_v0);
 
 
     _G.L = luaL_newstate();

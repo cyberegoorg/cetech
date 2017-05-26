@@ -53,7 +53,7 @@ static int _mesh_set_material(lua_State *l) {
 }
 
 void _register_lua_mesh_api( struct api_v0* api) {
-    USE_API(api, mesh_renderer_api_v0);
+    GET_API(api, mesh_renderer_api_v0);
 
     luasys_add_module_function(API_NAME, "get", _mesh_get);
     luasys_add_module_function(API_NAME, "has", _mesh_has);

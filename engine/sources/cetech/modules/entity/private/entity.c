@@ -574,11 +574,11 @@ static void _init_api(struct api_v0* api){
 }
 
 static void _init( struct api_v0* api) {
-    USE_API(api, memory_api_v0);
-    USE_API(api, component_api_v0);
-    USE_API(api, memory_api_v0);
-    USE_API(api, resource_api_v0);
-    USE_API(api, handler_api_v0);
+    GET_API(api, memory_api_v0);
+    GET_API(api, component_api_v0);
+    GET_API(api, memory_api_v0);
+    GET_API(api, resource_api_v0);
+    GET_API(api, handler_api_v0);
 
 
 

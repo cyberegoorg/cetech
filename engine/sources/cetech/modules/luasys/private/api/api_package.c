@@ -47,7 +47,7 @@ static int _flush(lua_State *l) {
 
 
 void _register_lua_package_api( struct api_v0* api) {
-    USE_API(api, package_api_v0);
+    GET_API(api, package_api_v0);
 
     luasys_add_module_function(API_NAME, "load", _load);
     luasys_add_module_function(API_NAME, "unload", _unload);

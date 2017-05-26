@@ -137,10 +137,10 @@ int _package_compiler(const char *filename,
 }
 
 int package_init( struct api_v0 *api) {
-    USE_API(api, memory_api_v0);
-    USE_API(api, resource_api_v0);
-    USE_API(api, task_api_v0);
-    USE_API(api, thread_api_v0);
+    GET_API(api, memory_api_v0);
+    GET_API(api, resource_api_v0);
+    GET_API(api, task_api_v0);
+    GET_API(api, thread_api_v0);
 
     _G = (struct G) {0};
 

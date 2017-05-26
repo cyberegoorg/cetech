@@ -55,7 +55,7 @@ static int _level_entity(lua_State *l) {
 }
 
 void _register_lua_level_api( struct api_v0* api) {
-    USE_API(api, level_api_v0);
+    GET_API(api, level_api_v0);
 
     luasys_add_module_function(API_NAME, "load_level", _load_level);
     luasys_add_module_function(API_NAME, "destroy", _destroy_level);

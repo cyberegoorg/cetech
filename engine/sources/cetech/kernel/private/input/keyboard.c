@@ -121,7 +121,7 @@ static void _init_api(struct api_v0* api){
 }
 
 static void _init( struct api_v0* api) {
-    USE_API(api, machine_api_v0);
+    GET_API(api, machine_api_v0);
 
 
 

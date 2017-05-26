@@ -31,7 +31,7 @@ static int _application_platform(lua_State *l) {
 
 
 void _register_lua_application_api( struct api_v0* api) {
-    USE_API(api, app_api_v0);
+    GET_API(api, app_api_v0);
 
     luasys_add_module_function(API_NAME, "quit", _application_quit);
     luasys_add_module_function(API_NAME, "get_native_platform",

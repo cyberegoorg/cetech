@@ -56,7 +56,7 @@ static int _keyboard_button_released(lua_State *l) {
 
 
 void _register_lua_keyboard_api( struct api_v0* api) {
-    USE_API(api, keyboard_api_v0);
+    GET_API(api, keyboard_api_v0);
 
     luasys_add_module_function(API_NAME, "button_index",
                                _keyboard_button_index);

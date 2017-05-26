@@ -29,7 +29,7 @@ IMPORT_API(keyboard_api_v0)
 //
 
 static void _init_api(struct api_v0* api) {
-    USE_API(api, keyboard_api_v0);
+    GET_API(api, keyboard_api_v0);
 
 //    log = get_engine_api(LOG_API_ID, 0);
 //    mem = get_engine_api(MEMORY_API_ID, 0);

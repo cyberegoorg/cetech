@@ -29,7 +29,7 @@ static int _renderer_set_debug(lua_State *l) {
 }
 
 void _register_lua_renderer_api( struct api_v0* api) {
-    USE_API(api, renderer_api_v0);
+    GET_API(api, renderer_api_v0);
 
     luasys_add_module_function(API_NAME, "render_world",
                                _renderer_render_world);
