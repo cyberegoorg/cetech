@@ -1,13 +1,13 @@
 #include <cetech/core/array.inl>
-#include <cetech/core/yaml.h>
+#include <cetech/kernel/yaml.h>
 #include <cetech/core/map.inl>
-#include <cetech/core/hash.h>
+#include <cetech/kernel/hash.h>
 #include <cetech/kernel/config.h>
-#include <cetech/kernel/resource.h>
+#include <cetech/modules/resource/resource.h>
 
-#include <cetech/kernel/world.h>
-#include <cetech/kernel/entity.h>
-#include <cetech/kernel/component.h>
+#include <cetech/modules/world/world.h>
+#include <cetech/modules/entity/entity.h>
+#include <cetech/modules/component/component.h>
 #include "../../renderer.h"
 #include <bgfx/c99/bgfx.h>
 #include "../../../transform/transform.h"
@@ -15,8 +15,9 @@
 #include "../../../scenegraph/scenegraph.h"
 #include <cetech/core/mat44f.inl>
 
-#include <cetech/core/memory.h>
-#include <cetech/core/module.h>
+#include <cetech/kernel/memory.h>
+#include <cetech/kernel/module.h>
+#include <cetech/kernel/api.h>
 
 
 IMPORT_API(memory_api_v0);
@@ -351,14 +352,30 @@ static struct property_value _get_property(world_t world,
 }
 
 
+static void _init_api(struct api_v0* api){
+    static struct mesh_renderer_api_v0 _api = {0};
 
-static void _init(get_api_fce_t get_engine_api) {
-    INIT_API(get_engine_api, component_api_v0, COMPONENT_API_ID);
-    INIT_API(get_engine_api, memory_api_v0, MEMORY_API_ID);
-    INIT_API(get_engine_api, material_api_v0, MATERIAL_API_ID);
-    INIT_API(get_engine_api, mesh_renderer_api_v0, MESH_API_ID);
-    INIT_API(get_engine_api, scenegprah_api_v0, SCENEGRAPH_API_ID);
-    INIT_API(get_engine_api, transform_api_v0, TRANSFORM_API_ID);
+    _api.is_valid = mesh_is_valid;
+    _api.has = mesh_has;
+    _api.get = mesh_get;
+    _api.create = mesh_create;
+    _api.get_material = mesh_get_material;
+    _api.set_material = mesh_set_material;
+    _api.render_all = mesh_render_all;
+
+    api->register_api("mesh_renderer_api_v0", &_api);
+}
+
+
+static void _init( struct api_v0* api) {
+    USE_API(api, component_api_v0);
+    USE_API(api, memory_api_v0);
+    USE_API(api, material_api_v0);
+    USE_API(api, mesh_renderer_api_v0);
+    USE_API(api, scenegprah_api_v0);
+    USE_API(api, transform_api_v0);
+
+
 
     _G = (struct G) {0};
 
@@ -391,23 +408,10 @@ void *mesh_get_module_api(int api) {
             static struct module_api_v0 module = {0};
 
             module.init = _init;
+            module.init_api = _init_api;
             module.shutdown = _shutdown;
 
             return &module;
-        }
-
-        case MESH_API_ID: {
-            static struct mesh_renderer_api_v0 api = {0};
-
-            api.is_valid = mesh_is_valid;
-            api.has = mesh_has;
-            api.get = mesh_get;
-            api.create = mesh_create;
-            api.get_material = mesh_get_material;
-            api.set_material = mesh_set_material;
-            api.render_all = mesh_render_all;
-
-            return &api;
         }
 
         default:

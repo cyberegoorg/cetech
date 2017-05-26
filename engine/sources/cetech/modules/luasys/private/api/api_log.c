@@ -1,7 +1,7 @@
 #include <stddef.h>
 #include <cetech/core/allocator.h>
-#include <cetech/core/module.h>
-#include <cetech/core/log.h>
+#include <cetech/kernel/module.h>
+#include <cetech/kernel/log.h>
 #include <cetech/modules/luasys/luasys.h>
 #include <stdio.h>
 
@@ -100,7 +100,7 @@ static int _log_debug(lua_State *l) {
     return 0;
 }
 
-void _register_lua_log_api(get_api_fce_t get_engine_api) {
+void _register_lua_log_api( struct api_v0* api) {
     luasys_add_module_function(API_NAME, "info", _log_info);
     luasys_add_module_function(API_NAME, "warning", _log_warning);
     luasys_add_module_function(API_NAME, "error", _log_error);

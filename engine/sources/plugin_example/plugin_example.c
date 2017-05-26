@@ -1,8 +1,9 @@
 #include <stdio.h>
+#include <cetech/kernel/api.h>
 
 #include "cetech/kernel/application.h"
 #include "cetech/kernel/config.h"
-#include "cetech/core/module.h"
+#include "cetech/kernel/module.h"
 #include "cetech/kernel/input.h"
 
 IMPORT_API(keyboard_api_v0)
@@ -27,16 +28,16 @@ IMPORT_API(keyboard_api_v0)
 //}
 //
 
-static void _init_api(get_api_fce_t get_engine_api) {
-    keyboard_api_v0 = *((struct keyboard_api_v0 *) get_engine_api(KEYBOARD_API_ID));
+static void _init_api(struct api_v0* api) {
+    USE_API(api, keyboard_api_v0);
 
 //    log = get_engine_api(LOG_API_ID, 0);
 //    mem = get_engine_api(MEMORY_API_ID, 0);
 //    lua = get_engine_api(LUA_API_ID, 0);
 }
 
-static void _init(get_api_fce_t get_engine_api) {
-    _init_api(get_engine_api);
+static void _init( struct api_v0* api) {
+    _init_api(api);
 
     printf("FOOOOO: %d", 11561651);
 //
@@ -52,7 +53,7 @@ static void _shutdown() {
     //mem->destroy_module_allocator(alloc);
 }
 
-static void *_reload_begin(get_api_fce_t get_engine_api) {
+static void *_reload_begin( struct api_v0* api_v0) {
     //log->info("module_example", "Reload begin");
 
     return NULL;
@@ -64,10 +65,10 @@ static void _update() {
     }
 }
 
-static void _reload_end(get_api_fce_t get_engine_api,
+static void _reload_end( struct api_v0* api,
                         void *data) {
-    _init_api(get_engine_api);
-    _init(get_engine_api);
+    _init_api(api);
+    _init(api);
 }
 
 void *get_module_api(int api,

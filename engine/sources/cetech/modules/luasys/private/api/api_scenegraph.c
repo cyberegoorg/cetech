@@ -1,12 +1,13 @@
 
 #include <cetech/core/allocator.h>
-#include <cetech/core/module.h>
-#include <cetech/kernel/resource.h>
-#include <cetech/kernel/world.h>
-#include <cetech/kernel/entity.h>
+#include <cetech/kernel/module.h>
+#include <cetech/modules/resource/resource.h>
+#include <cetech/modules/world/world.h>
+#include <cetech/modules/entity/entity.h>
 
 #include <cetech/modules/luasys/luasys.h>
-#include <cetech/core/hash.h>
+#include <cetech/kernel/hash.h>
+#include <cetech/kernel/api.h>
 
 #include "../../../scenegraph/scenegraph.h"
 
@@ -102,9 +103,8 @@ static int _scenegraph_link(lua_State *l) {
     return 0;
 }
 
-void _register_lua_scenegraph_api(get_api_fce_t get_engine_api) {
-    scenegprah_api_v0 = *((struct scenegprah_api_v0 *) get_engine_api(
-            SCENEGRAPH_API_ID));
+void _register_lua_scenegraph_api( struct api_v0* api) {
+    USE_API(api, scenegprah_api_v0);
 
     luasys_add_module_function(API_NAME, "has", _scenegraph_has);
     luasys_add_module_function(API_NAME, "node_by_name",

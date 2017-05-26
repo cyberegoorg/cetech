@@ -3,18 +3,19 @@
 //==============================================================================
 
 #include <cetech/core/allocator.h>
-#include <cetech/core/yaml.h>
-#include <cetech/core/memory.h>
-#include <cetech/core/cmd_line.h>
+#include <cetech/kernel/yaml.h>
+#include <cetech/kernel/memory.h>
+#include <cetech/kernel/cmd_line.h>
 #include <cetech/kernel/config.h>
-#include <cetech/core/module.h>
-#include <cetech/core/hash.h>
+#include <cetech/kernel/module.h>
+#include <cetech/kernel/hash.h>
 #include <cetech/kernel/application.h>
-#include <cetech/kernel/resource.h>
-#include <cetech/core/log.h>
+#include <cetech/modules/resource/resource.h>
+#include <cetech/kernel/log.h>
 #include <stdio.h>
-#include <cetech/core/string.h>
-#include <cetech/core/fs.h>
+#include <cetech/kernel/string.h>
+#include <cetech/kernel/fs.h>
+#include <cetech/kernel/api.h>
 
 
 //==============================================================================
@@ -27,6 +28,8 @@
 #define LOG_WHERE "cvar"
 
 #define make_cvar(i) (cvar_t){.idx = i}
+
+#define str_set(result, str) memcpy(result, str, strlen(str))
 
 //==============================================================================
 // Enums
@@ -64,7 +67,7 @@ IMPORT_API(memory_api_v0);
 
 void cvar_load_global();
 
-void cvar_compile_global();
+void cvar_compile_global(struct app_api_v0 *app_api);
 
 int cvar_parse_core_args(int argc,
                          const char **argv);
@@ -139,20 +142,23 @@ cvar_t _find_first_free() {
     return make_cvar(0);
 }
 
-static void _init(get_api_fce_t get_engine_api) {
+static void _init(
+                  struct api_v0 *api_v0) {
 
 }
 
 static void _shutdown() {
 }
 
-static void *_reload_begin(get_api_fce_t get_engine_api) {
+static void *_reload_begin(
+                           struct api_v0 *api_v0) {
     return NULL;
 }
 
-static void _reload_end(get_api_fce_t get_engine_api,
+static void _reload_end(
+                        struct api_v0 *api,
                         void *data) {
-    _init(get_engine_api);
+    _init(api);
 }
 
 
@@ -162,10 +168,35 @@ static void _reload_end(get_api_fce_t get_engine_api,
 // Interface
 //==============================================================================
 
-int cvar_init() {
+int cvar_init(struct api_v0 *api) {
     log_debug(LOG_WHERE, "Init");
 
-    INIT_API(module_get_engine_api, memory_api_v0, MEMORY_API_ID);
+    USE_API(api, memory_api_v0);
+
+    static struct config_api_v0 api_v1 = {
+            .load_global = cvar_load_global,
+#ifdef CETECH_CAN_COMPILE
+            .compile_global = cvar_compile_global,
+#endif
+            .parse_core_args = cvar_parse_core_args,
+            .parse_args = cvar_parse_args,
+            .find = cvar_find,
+            .find_or_create = cvar_find_or_create,
+            .new_float = cvar_new_float,
+            .new_int = cvar_new_int,
+            .new_str = cvar_new_str,
+            .get_float = cvar_get_float,
+            .get_int = cvar_get_int,
+            .get_string = cvar_get_string,
+            .get_type  = cvar_get_type,
+            .set_float = cvar_set_float,
+            .set_int = cvar_set_int,
+            .set_string = cvar_set_string,
+            .log_all = cvar_log_all,
+    };
+
+    api->register_api("config_api_v0", &api_v1);
+
     _G.type = stringid64_from_string("config");
 
     return 1;
@@ -179,28 +210,28 @@ void cvar_shutdown() {
 
 #ifdef CETECH_CAN_COMPILE
 
-void cvar_compile_global() {
+void cvar_compile_global(struct app_api_v0 *app_api) {
     char build_dir[1024] = {0};
     char source_path[1024] = {0};
     char build_path[1024] = {0};
 
-    struct resource_api_v0 ResourceApiV0 = *(struct resource_api_v0 *) module_get_engine_api(
-            RESOURCE_API_ID);
-    struct app_api_v0 app_api_v0 = *(struct app_api_v0 *) module_get_engine_api(
-            APPLICATION_API_ID);
+    cvar_t bd = cvar_find("build");
+    cvar_t source_dir = cvar_find("src");
 
-    ResourceApiV0.compiler_get_build_dir(build_dir, CETECH_ARRAY_LEN(build_dir),
-                                         app_api_v0.platform());
+    const char *build_dir_str = cvar_get_string(bd);
+    path_join(build_dir, 1024, build_dir_str, app_api->platform());
+
     path_join(build_path, CETECH_ARRAY_LEN(build_path), build_dir,
               "global.config");
+
+
     path_join(source_path, CETECH_ARRAY_LEN(source_path),
-              ResourceApiV0.compiler_get_source_dir(), "global.config");
+              cvar_get_string(source_dir), "global.config");
 
     struct vio *source_vio = vio_from_file(source_path, VIO_OPEN_READ,
                                            memory_api_v0.main_allocator());
     char *data =
-    CETECH_ALLOCATE(memory_api_v0.main_allocator(), char,
-                    vio_size(source_vio));
+    CETECH_ALLOCATE(memory_api_v0.main_allocator(), char, vio_size(source_vio));
 
     size_t size = (size_t) vio_size(source_vio);
     vio_read(source_vio, data, sizeof(char), size);
@@ -222,7 +253,7 @@ cvar_t cvar_find(const char *name) {
             continue;
         }
 
-        if (str_cmp(_G.name[i], name) != 0) {
+        if (strcmp(_G.name[i], name) != 0) {
             continue;
         }
 
@@ -291,16 +322,17 @@ void foreach_config_clb(yaml_node_t key,
 }
 
 
-void cvar_load_global() {
+void cvar_load_global(struct app_api_v0 *app_api) {
     char build_dir[1024] = {0};
     char source_path[1024] = {0};
 
-    struct resource_api_v0 ResourceApiV0 = *(struct resource_api_v0 *) module_get_engine_api(
-            RESOURCE_API_ID);
-    struct app_api_v0 app_api_v0 = *(struct app_api_v0 *) module_get_engine_api(
-            APPLICATION_API_ID);
-    ResourceApiV0.compiler_get_build_dir(build_dir, CETECH_ARRAY_LEN(build_dir),
-                                         app_api_v0.platform());
+    cvar_t bd = cvar_find("build");
+    cvar_t source_dir = cvar_find("src");
+
+    const char *build_dir_str = cvar_get_string(bd);
+    path_join(build_dir, 1024, build_dir_str, app_api->platform());
+
+
     path_join(source_path, CETECH_ARRAY_LEN(source_path), build_dir,
               "global.config");
 
@@ -399,9 +431,9 @@ int cvar_parse_core_args(int argc,
 
         const char *name = tmp_args.argv[j] + 1;
 
-        if (!str_cmp(name, "build") ||
-            !str_cmp(name, "compile") ||
-            !str_cmp(name, "src")) {
+        if (!strcmp(name, "build") ||
+            !strcmp(name, "compile") ||
+            !strcmp(name, "src")) {
 
             const char *value = (j != tmp_args.argc - 1) ? tmp_args.argv[j + 1]
                                                          : NULL;
@@ -429,7 +461,7 @@ cvar_t cvar_find_or_create(const char *name,
             continue;
         }
 
-        if (str_cmp(_G.name[i], name) != 0) {
+        if (strcmp(_G.name[i], name) != 0) {
             continue;
         }
 
@@ -566,35 +598,12 @@ void *config_get_module_api(int api) {
         static struct module_api_v0 module = {0};
 
         module.init = _init;
+//        module.init_api = _init_api;
         module.shutdown = _shutdown;
         module.reload_begin = _reload_begin;
         module.reload_end = _reload_end;
 
         return &module;
-    } else if (api == CONFIG_API_ID) {
-        static struct config_api_v0 api_v1 = {
-                .load_global = cvar_load_global,
-#ifdef CETECH_CAN_COMPILE
-                .compile_global = cvar_compile_global,
-#endif
-                .parse_core_args = cvar_parse_core_args,
-                .parse_args = cvar_parse_args,
-                .find = cvar_find,
-                .find_or_create = cvar_find_or_create,
-                .new_float = cvar_new_float,
-                .new_int = cvar_new_int,
-                .new_str = cvar_new_str,
-                .get_float = cvar_get_float,
-                .get_int = cvar_get_int,
-                .get_string = cvar_get_string,
-                .get_type  = cvar_get_type,
-                .set_float = cvar_set_float,
-                .set_int = cvar_set_int,
-                .set_string = cvar_set_string,
-                .log_all = cvar_log_all,
-        };
-
-        return &api_v1;
     }
 
     return 0;

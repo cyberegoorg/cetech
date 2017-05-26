@@ -1,9 +1,10 @@
 
 #include <cetech/core/allocator.h>
 #include <cetech/core/math_types.h>
-#include <cetech/core/module.h>
+#include <cetech/kernel/module.h>
 #include <cetech/modules/luasys/luasys.h>
 #include <cetech/kernel/input.h>
+#include <cetech/kernel/api.h>
 
 IMPORT_API(mouse_api_v0);
 
@@ -81,8 +82,8 @@ static int _mouse_axis(lua_State *l) {
 
 #define API_NAME "Mouse"
 
-void _register_lua_mouse_api(get_api_fce_t get_engine_api) {
-    mouse_api_v0 = *((struct mouse_api_v0 *) get_engine_api(MOUSE_API_ID));
+void _register_lua_mouse_api( struct api_v0* api) {
+    USE_API(api, mouse_api_v0);
 
 
     luasys_add_module_function(API_NAME, "button_index", _mouse_button_index);

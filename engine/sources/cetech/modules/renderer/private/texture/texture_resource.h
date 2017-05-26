@@ -1,7 +1,7 @@
 #ifndef CETECH_TEXTURE_RESOURCE_H
 #define CETECH_TEXTURE_RESOURCE_H
 
-#include <cetech/core/fs.h>
+#include <cetech/kernel/fs.h>
 
 static const bgfx_texture_handle_t null_texture = {0};
 

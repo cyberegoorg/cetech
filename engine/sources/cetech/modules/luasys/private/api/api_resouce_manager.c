@@ -1,9 +1,10 @@
 
 
-#include <cetech/core/module.h>
+#include <cetech/kernel/module.h>
 #include <cetech/modules/luasys/luasys.h>
 
-#include <cetech/kernel/resource.h>
+#include <cetech/modules/resource/resource.h>
+#include <cetech/kernel/api.h>
 
 #define API_NAME "ResourceManager"
 
@@ -24,9 +25,8 @@ static int _compile_all(lua_State *l) {
 
 #endif
 
-void _register_lua_resource_manager_api(get_api_fce_t get_engine_api) {
-    resource_api_v0 = *(struct resource_api_v0 *) get_engine_api(
-            RESOURCE_API_ID);
+void _register_lua_resource_manager_api( struct api_v0* api) {
+    USE_API(api, resource_api_v0);
 
     luasys_add_module_function(API_NAME, "reload_all", _reload_all);
 

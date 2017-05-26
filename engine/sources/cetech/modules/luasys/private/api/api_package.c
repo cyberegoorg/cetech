@@ -1,11 +1,12 @@
 
 
 #include "../../../renderer/renderer.h"
-#include <cetech/kernel/resource.h>
+#include <cetech/modules/resource/resource.h>
 
-#include <cetech/core/module.h>
+#include <cetech/kernel/module.h>
 #include <cetech/modules/luasys/luasys.h>
-#include <cetech/core/hash.h>
+#include <cetech/kernel/hash.h>
+#include <cetech/kernel/api.h>
 
 #define API_NAME "Package"
 
@@ -45,8 +46,8 @@ static int _flush(lua_State *l) {
 }
 
 
-void _register_lua_package_api(get_api_fce_t get_engine_api) {
-    package_api_v0 = *(struct package_api_v0 *) get_engine_api(PACKAGE_API_ID);
+void _register_lua_package_api( struct api_v0* api) {
+    USE_API(api, package_api_v0);
 
     luasys_add_module_function(API_NAME, "load", _load);
     luasys_add_module_function(API_NAME, "unload", _unload);

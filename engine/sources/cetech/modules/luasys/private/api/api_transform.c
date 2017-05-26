@@ -1,11 +1,12 @@
 
-#include <cetech/kernel/world.h>
+#include <cetech/modules/world/world.h>
 
 #include "../../../transform/transform.h"
-#include <cetech/core/module.h>
+#include <cetech/kernel/module.h>
 #include <cetech/modules/luasys/luasys.h>
 
-#include <cetech/kernel/entity.h>
+#include <cetech/modules/entity/entity.h>
+#include <cetech/kernel/api.h>
 
 #define API_NAME "Transform"
 
@@ -100,10 +101,8 @@ static int _transform_link(lua_State *l) {
     return 0;
 }
 
-void _register_lua_transform_api(get_api_fce_t get_engine_api) {
-    transform_api_v0 = *((struct transform_api_v0 *) get_engine_api(
-            TRANSFORM_API_ID));
-
+void _register_lua_transform_api( struct api_v0* api) {
+    USE_API(api, transform_api_v0);
 
     luasys_add_module_function(API_NAME, "get", _transform_get);
     luasys_add_module_function(API_NAME, "has", _transform_has);

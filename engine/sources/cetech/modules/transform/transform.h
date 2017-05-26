@@ -13,9 +13,6 @@
 typedef struct world_s world_t;
 typedef struct entity_s entity_t;
 
-enum {
-    TRANSFORM_API_ID = 25,
-};
 
 //==============================================================================
 // Typedefs

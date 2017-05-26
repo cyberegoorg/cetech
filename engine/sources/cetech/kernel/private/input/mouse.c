@@ -5,13 +5,14 @@
 #include <cetech/core/math_types.h>
 #include <cetech/core/allocator.h>
 #include <cetech/kernel/config.h>
-#include <cetech/kernel/resource.h>
-#include <cetech/core/module.h>
+#include <cetech/modules/resource/resource.h>
+#include <cetech/kernel/module.h>
 #include <cetech/core/eventstream.inl>
 #include <cetech/kernel/machine.h>
 
 #include <cetech/kernel/input.h>
-#include <cetech/core/string.h>
+#include <cetech/kernel/string.h>
+#include <cetech/kernel/api.h>
 
 #include "mousebtnstr.h"
 
@@ -37,24 +38,12 @@ static struct G {
 
 IMPORT_API(machine_api_v0);
 
-static void _init(get_api_fce_t get_engine_api) {
-    INIT_API(get_engine_api, machine_api_v0, MACHINE_API_ID);
 
-    _G = (struct G) {0};
-
-    log_debug(LOG_WHERE, "Init");
-}
-
-static void _shutdown() {
-    log_debug(LOG_WHERE, "Shutdown");
-
-    _G = (struct G) {0};
-}
 
 static void _update() {
     struct event_header *event = machine_api_v0.event_begin();
 
-    memory_copy(_G.last_state, _G.state, MOUSE_BTN_MAX);
+    memcpy(_G.last_state, _G.state, MOUSE_BTN_MAX);
 //    _G.last_delta_pos.x = 0;
 //    _G.last_delta_pos.y = 0;
 
@@ -103,7 +92,7 @@ uint32_t mouse_button_index(const char *button_name) {
             continue;
         }
 
-        if (str_cmp(_btn_to_str[i], button_name)) {
+        if (strcmp(_btn_to_str[i], button_name)) {
             continue;
         }
 
@@ -157,7 +146,7 @@ uint32_t mouse_axis_index(const char *axis_name) {
             continue;
         }
 
-        if (str_cmp(_axis_to_str[i], axis_name) != 0) {
+        if (strcmp(_axis_to_str[i], axis_name) != 0) {
             continue;
         }
 
@@ -188,30 +177,48 @@ void mouse_set_cursor_pos(vec2f_t pos) {
 
 }
 
+static void _init_api(struct api_v0* api){
+    static struct mouse_api_v0 api_v1 = {
+            .button_index = mouse_button_index,
+            .button_name = mouse_button_name,
+            .button_state = mouse_button_state,
+            .button_pressed = mouse_button_pressed,
+            .button_released = mouse_button_released,
+            .axis_index = mouse_axis_index,
+            .axis_name = mouse_axis_name,
+            .axis = mouse_axis,
+    };
+    api->register_api("mouse_api_v0", &api_v1);
+}
+
+static void _init( struct api_v0* api) {
+    USE_API(api, machine_api_v0);
+
+
+
+    _G = (struct G) {0};
+
+    log_debug(LOG_WHERE, "Init");
+}
+
+static void _shutdown() {
+    log_debug(LOG_WHERE, "Shutdown");
+
+    _G = (struct G) {0};
+}
+
 void *mouse_get_module_api(int api) {
 
     if (api == PLUGIN_EXPORT_API_ID) {
         static struct module_api_v0 module = {0};
 
         module.init = _init;
+        module.init_api = _init_api;
         module.shutdown = _shutdown;
         module.update = _update;
 
         return &module;
 
-    } else if (api == MOUSE_API_ID) {
-        static struct mouse_api_v0 api_v1 = {
-                .button_index = mouse_button_index,
-                .button_name = mouse_button_name,
-                .button_state = mouse_button_state,
-                .button_pressed = mouse_button_pressed,
-                .button_released = mouse_button_released,
-                .axis_index = mouse_axis_index,
-                .axis_name = mouse_axis_name,
-                .axis = mouse_axis,
-        };
-
-        return &api_v1;
     }
 
     return 0;

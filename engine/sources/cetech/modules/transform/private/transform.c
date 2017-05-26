@@ -1,17 +1,18 @@
 #include <cetech/core/array.inl>
-#include <cetech/core/yaml.h>
+#include <cetech/kernel/yaml.h>
 #include <cetech/kernel/config.h>
-#include <cetech/kernel/resource.h>
-#include <cetech/kernel/entity.h>
-#include <cetech/core/hash.h>
-#include <cetech/kernel/world.h>
-#include <cetech/kernel/component.h>
+#include <cetech/modules/resource/resource.h>
+#include <cetech/modules/entity/entity.h>
+#include <cetech/kernel/hash.h>
+#include <cetech/modules/world/world.h>
+#include <cetech/modules/component/component.h>
 #include <cetech/core/quatf.inl>
 #include <cetech/core/mat44f.inl>
 #include "../transform.h"
-#include <cetech/core/memory.h>
-#include <cetech/core/module.h>
+#include <cetech/kernel/memory.h>
+#include <cetech/kernel/module.h>
 #include <cetech/core/map.inl>
+#include <cetech/kernel/api.h>
 
 
 struct transform_data {
@@ -285,9 +286,30 @@ struct property_value _get_property(world_t world,
 
 IMPORT_API(component_api_v0);
 
-static void _init(get_api_fce_t get_engine_api) {
-    INIT_API(get_engine_api, component_api_v0, COMPONENT_API_ID);
-    INIT_API(get_engine_api, memory_api_v0, MEMORY_API_ID);
+static void _init_api(struct api_v0* api){
+    static struct transform_api_v0 _api = {0};
+
+    _api.is_valid = transform_is_valid;
+    _api.transform = transform_transform;
+    _api.get_position = transform_get_position;
+    _api.get_rotation = transform_get_rotation;
+    _api.get_scale = transform_get_scale;
+    _api.get_world_matrix = transform_get_world_matrix;
+    _api.set_position = transform_set_position;
+    _api.set_rotation = transform_set_rotation;
+    _api.set_scale = transform_set_scale;
+    _api.has = transform_has;
+    _api.get = transform_get;
+    _api.create = transform_create;
+    _api.link = transform_link;
+
+    api->register_api("transform_api_v0", &_api);
+}
+
+static void _init( struct api_v0* api) {
+    USE_API(api, component_api_v0);
+    USE_API(api, memory_api_v0);
+
 
     _G = (struct G) {0};
 
@@ -543,31 +565,11 @@ void *transform_get_module_api(int api) {
             static struct module_api_v0 module = {0};
 
             module.init = _init;
+            module.init_api = _init_api;
             module.shutdown = _shutdown;
 
             return &module;
         }
-
-        case TRANSFORM_API_ID: {
-            static struct transform_api_v0 api = {0};
-
-            api.is_valid = transform_is_valid;
-            api.transform = transform_transform;
-            api.get_position = transform_get_position;
-            api.get_rotation = transform_get_rotation;
-            api.get_scale = transform_get_scale;
-            api.get_world_matrix = transform_get_world_matrix;
-            api.set_position = transform_set_position;
-            api.set_rotation = transform_set_rotation;
-            api.set_scale = transform_set_scale;
-            api.has = transform_has;
-            api.get = transform_get;
-            api.create = transform_create;
-            api.link = transform_link;
-
-            return &api;
-        }
-
 
         default:
             return NULL;

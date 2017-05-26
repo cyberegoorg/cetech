@@ -1,7 +1,7 @@
 #ifndef CETECH_MATERIAL_BLOB_H
 #define CETECH_MATERIAL_BLOB_H
 
-#include <cetech/core/hash.h>
+#include <cetech/kernel/hash.h>
 #include <cetech/core/math_types.h>
 
 typedef struct material_blob {

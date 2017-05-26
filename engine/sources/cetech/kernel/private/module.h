@@ -9,7 +9,7 @@
 // Includes
 //==============================================================================
 
-#include <cetech/core/module.h>
+#include <cetech/kernel/module.h>
 
 
 #endif //CETECH_PLUGIN_SYSTEM_H

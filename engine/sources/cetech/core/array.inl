@@ -13,8 +13,9 @@
 
 #include <stdint.h>
 #include <stddef.h>
+#include <memory.h>
 
-#include "log.h"
+#include "cetech/kernel/log.h"
 #include "errors.h"
 #include "allocator.h"
 
@@ -95,7 +96,7 @@
             newdata = (T*) CETECH_ALLOCATE(a->allocator, T,                         \
                                        sizeof(T) * newcapacity);                 \
             CETECH_ASSERT("array_"#T, newdata !=NULL);                              \
-            memory_copy(newdata, a->data, sizeof(T) * a->size);                  \
+            memcpy(newdata, a->data, sizeof(T) * a->size);                  \
         }                                                                        \
                                                                                  \
         allocator_deallocate(a->allocator, a->data);                             \
@@ -149,7 +150,7 @@
             array_grow_##N(a, a->size + count);                                  \
         }                                                                        \
                                                                                  \
-        memory_copy(&a->data[a->size], items, sizeof(T) * count);                \
+        memcpy(&a->data[a->size], items, sizeof(T) * count);                \
         a->size += count;                                                        \
     }                                                                            \
                                                                                  \

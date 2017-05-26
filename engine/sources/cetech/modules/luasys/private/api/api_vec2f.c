@@ -1,6 +1,6 @@
 
 #include <cetech/core/vec2f.inl>
-#include <cetech/core/module.h>
+#include <cetech/kernel/module.h>
 
 #include <cetech/modules/luasys/luasys.h>
 
@@ -69,7 +69,7 @@ static int _dot(lua_State *l) {
     return 1;
 }
 
-void _register_lua_vec2f_api(get_api_fce_t get_engine_api) {
+void _register_lua_vec2f_api( struct api_v0* api) {
     luasys_add_module_function(API_NAME, "make", _ctor);
 
     luasys_add_module_function(API_NAME, "unit_x", _unit_x);

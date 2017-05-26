@@ -5,14 +5,15 @@
 #include <bgfx/c99/bgfx.h>
 
 #include <cetech/core/allocator.h>
-#include <cetech/core/hash.h>
-#include <cetech/core/memory.h>
-#include <cetech/core/module.h>
+#include <cetech/kernel/hash.h>
+#include <cetech/kernel/memory.h>
+#include <cetech/kernel/module.h>
 #include <cetech/core/map.inl>
 
-#include <cetech/kernel/resource.h>
-#include <cetech/kernel/entity.h>
-#include <cetech/kernel/world.h>
+#include <cetech/modules/resource/resource.h>
+#include <cetech/modules/entity/entity.h>
+#include <cetech/modules/world/world.h>
+#include <cetech/kernel/api.h>
 
 #include "../../../scenegraph/scenegraph.h"
 
@@ -94,15 +95,13 @@ struct scene_instance *_get_scene_instance(stringid64_t scene) {
 // Interface
 //==============================================================================
 
-int scene_init() {
+int scene_init(struct api_v0 *api) {
     _G = (struct G) {0};
 
-    memory_api_v0 = *(struct memory_api_v0 *) module_get_engine_api(
-            MEMORY_API_ID);
-    resource_api_v0 = *(struct resource_api_v0 *) module_get_engine_api(
-            RESOURCE_API_ID);
-    scenegprah_api_v0 = *(struct scenegprah_api_v0 *) module_get_engine_api(
-            SCENEGRAPH_API_ID);
+    USE_API(api, memory_api_v0);
+    USE_API(api, resource_api_v0);
+    USE_API(api, scenegprah_api_v0);
+
 
     _G.type = stringid64_from_string("scene");
 

@@ -1,7 +1,7 @@
 #ifndef CETECH_SCENE_BLOB_H
 #define CETECH_SCENE_BLOB_H
 
-#include <cetech/core/hash.h>
+#include <cetech/kernel/hash.h>
 #include <cetech/core/math_types.h>
 
 typedef struct scene_blob {

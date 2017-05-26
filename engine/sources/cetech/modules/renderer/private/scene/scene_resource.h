@@ -2,7 +2,7 @@
 #define CETECH_SCENE_RESOURCE_H
 
 
-#include <cetech/core/fs.h>
+#include <cetech/kernel/fs.h>
 
 static const bgfx_texture_handle_t null_texture = {0};
 

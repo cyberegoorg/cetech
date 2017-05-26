@@ -1,6 +1,6 @@
 
 
-#include <cetech/core/module.h>
+#include <cetech/kernel/module.h>
 #include <cetech/modules/luasys/luasys.h>
 
 
@@ -19,7 +19,7 @@ static int _reload(lua_State *l) {
 }
 
 
-void _register_lua_module_api(get_api_fce_t get_engine_api) {
+void _register_lua_module_api( struct api_v0* api) {
     luasys_add_module_function(API_NAME, "reload_all", _reload_all);
     luasys_add_module_function(API_NAME, "_reload", _reload);
 }

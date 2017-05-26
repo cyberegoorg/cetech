@@ -2,7 +2,7 @@
 #define CETECH_SHADER_RESOURCE_H
 
 
-#include <cetech/core/fs.h>
+#include <cetech/kernel/fs.h>
 
 static const bgfx_program_handle_t null_program = {0};
 
@@ -28,8 +28,8 @@ void _shader_resource_online(stringid64_t name,
     const bgfx_memory_t *vs_mem = bgfx_alloc(resource->vs_size);
     const bgfx_memory_t *fs_mem = bgfx_alloc(resource->fs_size);
 
-    memory_copy(vs_mem->data, (resource + 1), resource->vs_size);
-    memory_copy(fs_mem->data, ((char *) (resource + 1)) + resource->vs_size,
+    memcpy(vs_mem->data, (resource + 1), resource->vs_size);
+    memcpy(fs_mem->data, ((char *) (resource + 1)) + resource->vs_size,
                 resource->fs_size);
 
     bgfx_shader_handle_t vs_shader = bgfx_create_shader(vs_mem);

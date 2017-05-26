@@ -1,12 +1,13 @@
 
 #include <cetech/core/allocator.h>
-#include <cetech/core/module.h>
+#include <cetech/kernel/module.h>
 
 #include "../../../transform/transform.h"
 #include "../../../renderer/renderer.h"
 
 #include <cetech/modules/luasys/luasys.h>
-#include <cetech/core/hash.h>
+#include <cetech/kernel/hash.h>
+#include <cetech/kernel/api.h>
 
 #define API_NAME "Material"
 
@@ -33,9 +34,8 @@ static int _set_vec4f(lua_State *l) {
     return 0;
 }
 
-void _register_lua_material_api(get_api_fce_t get_engine_api) {
-    material_api_v0 = *((struct material_api_v0 *) get_engine_api(
-            MATERIAL_API_ID));
+void _register_lua_material_api( struct api_v0* api) {
+    USE_API(api, material_api_v0);
 
     luasys_add_module_function(API_NAME, "set_texture", _set_texture);
     luasys_add_module_function(API_NAME, "set_vec4f", _set_vec4f);
