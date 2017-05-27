@@ -6,6 +6,7 @@
 #include <cetech/kernel/log.h>
 #include <cetech/core/errors.h>
 #include <cetech/kernel/fs.h>
+#include <cetech/kernel/api.h>
 
 static int _step(sqlite3 *db,
                  sqlite3_stmt *stmt) {
@@ -119,8 +120,10 @@ void logdb_log(enum log_level level,
     //sqlite3_closeq_v2(_db);
 }
 
-int logdb_init_db(const char *log_dir) {
-    path_join(_logdb_path, CETECH_ARRAY_LEN(_logdb_path), log_dir, "log.db");
+int logdb_init_db(const char *log_dir, struct api_v0* api) {
+    struct path_v0 *path = api->first("path_v0");
+
+    path->path_join(_logdb_path, CETECH_ARRAY_LEN(_logdb_path), log_dir, "log.db");
 
     _session_id = time(NULL);
 

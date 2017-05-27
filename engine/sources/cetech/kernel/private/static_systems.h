@@ -1,7 +1,7 @@
 //==============================================================================
 // Static engine system configuration
 //==============================================================================
-#include "module.h"
+#include <cetech/kernel/module.h>
 
 static void _init_static_modules() {
     ADD_STATIC_PLUGIN(entity);

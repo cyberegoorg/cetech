@@ -15,7 +15,7 @@
 #include <cetech/modules/world/world.h>
 #include <cetech/modules/entity/entity.h>
 #include <cetech/modules/component/component.h>
-#include <cetech/kernel/yaml.h>
+#include <cetech/core/yaml.h>
 #include <cetech/kernel/api.h>
 
 //==============================================================================

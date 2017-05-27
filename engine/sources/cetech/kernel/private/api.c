@@ -60,6 +60,7 @@ void api_init(struct allocator *allocator) {
     MAP_INIT(void, &_G.api_map, allocator);
 
     _register_api("api_v0", &api_v0);
+
 }
 
 void api_shutdown(){

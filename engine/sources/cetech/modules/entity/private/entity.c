@@ -5,9 +5,9 @@
 #include <cetech/core/map.inl>
 #include <cetech/kernel/module.h>
 #include <cetech/kernel/memory.h>
-#include <cetech/kernel/yaml.h>
+#include <cetech/core/yaml.h>
 #include <cetech/kernel/hash.h>
-#include <cetech/kernel/handler.h>
+#include <cetech/core/handler.h>
 #include <cetech/kernel/fs.h>
 #include <stdio.h>
 
@@ -40,6 +40,8 @@ IMPORT_API(memory_api_v0);
 IMPORT_API(component_api_v0);
 IMPORT_API(resource_api_v0);
 IMPORT_API(handler_api_v0);
+IMPORT_API(path_v0);
+IMPORT_API(vio_api_v0);
 
 
 struct entity_resource {
@@ -119,16 +121,16 @@ static void preprocess(const char *filename,
 
         char full_path[256] = {0};
         const char *source_dir = resource_api_v0.compiler_get_source_dir();
-        path_join(full_path, CETECH_ARRAY_LEN(full_path), source_dir,
+        path_v0.path_join(full_path, CETECH_ARRAY_LEN(full_path), source_dir,
                   prefab_file);
 
-        struct vio *prefab_vio = vio_from_file(full_path, VIO_OPEN_READ,
+        struct vio *prefab_vio = vio_api_v0.from_file(full_path, VIO_OPEN_READ,
                                                memory_api_v0.main_allocator());
 
-        char prefab_data[vio_size(prefab_vio) + 1];
-        memset(prefab_data, 0, vio_size(prefab_vio) + 1);
-        vio_read(prefab_vio, prefab_data, sizeof(char),
-                 vio_size(prefab_vio));
+        char prefab_data[vio_api_v0.size(prefab_vio) + 1];
+        memset(prefab_data, 0, vio_api_v0.size(prefab_vio) + 1);
+        vio_api_v0.read(prefab_vio, prefab_data, sizeof(char),
+                            vio_api_v0.size(prefab_vio));
 
         yaml_document_t h;
         yaml_node_t prefab_root = yaml_load_str(prefab_data, &h);
@@ -136,7 +138,7 @@ static void preprocess(const char *filename,
         preprocess(filename, prefab_root, capi);
         yaml_merge(root, prefab_root);
 
-        vio_close(prefab_vio);
+        vio_api_v0.close(prefab_vio);
     }
 }
 
@@ -398,10 +400,10 @@ int _entity_resource_compiler(const char *filename,
                               struct vio *source_vio,
                               struct vio *build_vio,
                               struct compilator_api *compilator_api) {
-    char source_data[vio_size(source_vio) + 1];
-    memset(source_data, 0, vio_size(source_vio) + 1);
-    vio_read(source_vio, source_data, sizeof(char),
-             vio_size(source_vio));
+    char source_data[vio_api_v0.size(source_vio) + 1];
+    memset(source_data, 0, vio_api_v0.size(source_vio) + 1);
+    vio_api_v0.read(source_vio, source_data, sizeof(char),
+             vio_api_v0.size(source_vio));
 
     yaml_document_t h;
     yaml_node_t root = yaml_load_str(source_data, &h);
@@ -411,7 +413,7 @@ int _entity_resource_compiler(const char *filename,
 
     entity_resource_compiler(root, filename, &entity_data, compilator_api);
 
-    vio_write(build_vio, &ARRAY_AT(&entity_data, 0), sizeof(uint8_t),
+    vio_api_v0.write(build_vio, &ARRAY_AT(&entity_data, 0), sizeof(uint8_t),
               ARRAY_SIZE(&entity_data));
 
 
@@ -427,9 +429,9 @@ int _entity_resource_compiler(const char *filename,
 
 void *entity_resource_loader(struct vio *input,
                              struct allocator *allocator) {
-    const int64_t size = vio_size(input);
+    const int64_t size = vio_api_v0.size(input);
     char *data = CETECH_ALLOCATE(allocator, char, size);
-    vio_read(input, data, 1, size);
+    vio_api_v0.read(input, data, 1, size);
 
     return data;
 }
@@ -579,6 +581,8 @@ static void _init( struct api_v0* api) {
     GET_API(api, memory_api_v0);
     GET_API(api, resource_api_v0);
     GET_API(api, handler_api_v0);
+    GET_API(api, path_v0);
+    GET_API(api, vio_api_v0);
 
 
 

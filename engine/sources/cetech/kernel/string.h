@@ -9,8 +9,6 @@ struct allocator;
 // Interface
 //==============================================================================
 
-//size_t strlen(const char *s);
-
 char *str_dup(const char *s,
               struct allocator *allocator);
 

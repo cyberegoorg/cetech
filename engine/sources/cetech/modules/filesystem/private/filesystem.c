@@ -40,7 +40,8 @@ static struct G {
 } FilesystemGlobals = {0};
 
 IMPORT_API(memory_api_v0);
-
+IMPORT_API(path_v0);
+IMPORT_API(vio_api_v0);
 
 
 //==============================================================================
@@ -79,7 +80,7 @@ int filesystem_get_fullpath(stringid64_t root,
                             const char *filename) {
     const char *root_path = filesystem_get_root_dir(root);
 
-    return path_join(result, maxlen, root_path, filename) ==
+    return path_v0.path_join(result, maxlen, root_path, filename) ==
            (strlen(root_path) + strlen(filename) + 1);
 }
 
@@ -93,7 +94,7 @@ struct vio *filesystem_open(stringid64_t root,
         return NULL;
     }
 
-    struct vio *file = vio_from_file(fullm_path, mode,
+    struct vio *file = vio_api_v0.from_file(fullm_path, mode,
                                      memory_api_v0.main_allocator());
 
     if (!file) {
@@ -105,7 +106,7 @@ struct vio *filesystem_open(stringid64_t root,
 }
 
 void filesystem_close(struct vio *file) {
-    vio_close(file);
+    vio_api_v0.close(file);
 }
 
 int filesystem_create_directory(stringid64_t root,
@@ -117,7 +118,7 @@ int filesystem_create_directory(stringid64_t root,
         return 0;
     }
 
-    return dir_make_path(fullm_path);
+    return path_v0.dir_make_path(fullm_path);
 }
 
 
@@ -133,12 +134,12 @@ void filesystem_listdir(stringid64_t root,
         return;
     }
 
-    dir_list(fullm_path, 1, files, allocator);
+    path_v0.dir_list(fullm_path, 1, files, allocator);
 }
 
 void filesystem_listdir_free(string_array_t *files,
                              struct allocator *allocator) {
-    dir_list_free(files, allocator);
+    path_v0.dir_list_free(files, allocator);
 }
 
 
@@ -171,6 +172,8 @@ static void _init_api(struct api_v0* api){
 
 static void _init( struct api_v0* api) {
     GET_API(api, memory_api_v0);
+    GET_API(api, path_v0);
+    GET_API(api, vio_api_v0);
 
     _G = (struct G) {0};
 

@@ -8,7 +8,6 @@
 #include <stdint.h>
 #include <cetech/core/math_types.h>
 
-
 //==============================================================================
 // Enums
 //==============================================================================
@@ -378,7 +377,6 @@ struct keyboard_event {
     struct event_header h; //!< Event header
     uint32_t keycode; //!< Key code
 };
-
 
 //! Gamepad move event
 struct gamepad_move_event {

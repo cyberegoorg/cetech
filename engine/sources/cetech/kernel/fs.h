@@ -12,68 +12,61 @@
 //! \return Modified time
 uint32_t file_mtime(const char *path);
 
-//==============================================================================
-// Path Interface
-//==============================================================================
+struct path_v0 {
+    //! List dir
+    //! \param path Dir path
+    //! \param recursive Resucrsive list?
+    //! \param files Result files
+    //! \param allocator Allocator
+    void (*dir_list)(const char *path,
+                     int recursive,
+                     struct array_pchar *files,
+                     struct allocator *allocator);
 
-//! List dir
-//! \param path Dir path
-//! \param recursive Resucrsive list?
-//! \param files Result files
-//! \param allocator Allocator
-void dir_list(const char *path,
-              int recursive,
-              struct array_pchar *files,
-              struct allocator *allocator);
+    //! Free list dir array
+    //! \param files Files array
+    //! \param allocator Allocator
+    void (*dir_list_free)(struct array_pchar *files,
+                          struct allocator *allocator);
 
-//! Free list dir array
-//! \param files Files array
-//! \param allocator Allocator
-void dir_list_free(struct array_pchar *files,
-                   struct allocator *allocator);
+    //! Create dir path
+    //! \param path Path
+    //! \return 1 of ok else 0
+    int (*dir_make_path)(const char *path);
 
-//! Create dir
-//! \param path Dir path
-//! \return 1 of ok else 0
-int dir_make(const char *path);
+    //! Get filename from path
+    //! \param path Path
+    //! \return Filename
+    const char *(*path_filename)(const char *path);
 
-//! Create dir path
-//! \param path Path
-//! \return 1 of ok else 0
-int dir_make_path(const char *path);
+    //! Get file basename (filename without extension)
+    //! \param path Path
+    //! \param out Out basename
+    //! \param size
+    void (*path_basename)(const char *path,
+                          char *out,
+                          size_t size);
 
-//! Get filename from path
-//! \param path Path
-//! \return Filename
-const char *path_filename(const char *path);
+    void (*path_dir)(char *out,
+                     size_t size,
+                     const char *path);
 
-//! Get file basename (filename without extension)
-//! \param path Path
-//! \param out Out basename
-//! \param size
-void path_basename(const char *path,
-                   char *out,
-                   size_t size);
+    //! Get file extension
+    //! \param path Path
+    //! \return file extension
+    const char *(*path_extension)(const char *path);
 
-void path_dir(char *out,
-              size_t size,
-              const char *path);
-
-//! Get file extension
-//! \param path Path
-//! \return file extension
-const char *path_extension(const char *path);
-
-//! Join path
-//! \param result Output path
-//! \param maxlen Result len
-//! \param base_path Base path
-//! \param path Path
-//! \return Result path len
-int64_t path_join(char *result,
-                  uint64_t maxlen,
-                  const char *base_path,
-                  const char *path);
+    //! Join path
+    //! \param result Output path
+    //! \param maxlen Result len
+    //! \param base_path Base path
+    //! \param path Path
+    //! \return Result path len
+    int64_t (*path_join)(char *result,
+                         uint64_t maxlen,
+                         const char *base_path,
+                         const char *path);
+};
 
 enum vio_open_mode {
     VIO_OPEN_READ,
@@ -110,34 +103,38 @@ struct vio {
     int (*close)(struct vio *vio);
 };
 
-struct vio *vio_from_file(const char *path,
-                          enum vio_open_mode mode,
-                          struct allocator *allocator);
+struct vio_api_v0 {
+    struct vio *(*from_file)(const char *path,
+                              enum vio_open_mode mode,
+                              struct allocator *allocator);
 
-int vio_close(struct vio *file);
+    int (*close)(struct vio *file);
 
 
-int64_t vio_seek(struct vio *file,
-                 int64_t offset,
-                 enum vio_seek whence);
+    int64_t (*seek)(struct vio *file,
+                     int64_t offset,
+                     enum vio_seek whence);
 
-void vio_seek_to_end(struct vio *file);
+    void (*seek_to_end)(struct vio *file);
 
-int64_t vio_skip(struct vio *file,
-                 int64_t bytes);
+    int64_t (*skip)(struct vio *file,
+                     int64_t bytes);
 
-int64_t vio_position(struct vio *file);
+    int64_t (*position)(struct vio *file);
 
-int64_t vio_size(struct vio *file);
+    int64_t (*size)(struct vio *file);
 
-size_t vio_read(struct vio *file,
-                void *buffer,
-                size_t size,
-                size_t maxnum);
+    size_t (*read)(struct vio *file,
+                    void *buffer,
+                    size_t size,
+                    size_t maxnum);
 
-size_t vio_write(struct vio *file,
-                 const void *buffer,
-                 size_t size,
-                 size_t num);
+    size_t (*write)(struct vio *file,
+                     const void *buffer,
+                     size_t size,
+                     size_t num);
+
+};
+
 
 #endif //CETECH_FS_H

@@ -5,19 +5,22 @@
 #include <bgfx/c99/bgfx.h>
 
 #include <cetech/core/allocator.h>
-#include <cetech/kernel/hash.h>
-#include "../../renderer.h"
-#include <cetech/kernel/memory.h>
-
-#include <cetech/kernel/module.h>
-
-#include <cetech/modules/resource/resource.h>
 #include <cetech/core/map.inl>
-#include <cetech/kernel/handler.h>
+#include <cetech/core/handler.h>
+
+#include <cetech/kernel/hash.h>
+#include <cetech/kernel/memory.h>
+#include <cetech/kernel/module.h>
 #include <cetech/kernel/string.h>
 #include <cetech/kernel/api.h>
+#include <cetech/kernel/fs.h>
+
+#include <cetech/modules/resource/resource.h>
+
+#include "../../renderer.h"
 #include "../texture/texture.h"
 #include "../shader/shader.h"
+
 #include "material_blob.h"
 
 //==============================================================================
@@ -58,6 +61,8 @@ struct G {
 IMPORT_API(memory_api_v0);
 IMPORT_API(resource_api_v0);
 IMPORT_API(handler_api_v0);
+IMPORT_API(path_v0);
+IMPORT_API(vio_api_v0);
 
 #define material_blob_uniform_bgfx(r)    ((bgfx_uniform_handle_t*) ((material_blob_vec4f_value(r)+((r)->vec4f_count))))
 
@@ -85,6 +90,8 @@ int material_init( struct api_v0* api) {
     GET_API(api, memory_api_v0);
     GET_API(api, resource_api_v0);
     GET_API(api, handler_api_v0);
+    GET_API(api, path_v0);
+    GET_API(api, vio_api_v0);
 
     _G.type = stringid64_from_string("material");
 

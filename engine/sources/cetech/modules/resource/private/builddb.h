@@ -74,8 +74,8 @@ static int _do_sql(const char *sql) {
     return 0;
 }
 
-static int builddb_init_db(const char *build_dir) {
-    path_join(_logdb_path, CETECH_ARRAY_LEN(_logdb_path), build_dir,
+static int builddb_init_db(const char *build_dir, struct path_v0 *path) {
+    path->path_join(_logdb_path, CETECH_ARRAY_LEN(_logdb_path), build_dir,
               "build.db");
 
 
@@ -182,7 +182,7 @@ static int builddb_get_filename_by_hash(char *filename,
 }
 
 static int builddb_need_compile(const char *source_dir,
-                                const char *filename) {
+                                const char *filename, struct path_v0* path) {
     static const char *sql = "SELECT\n"
             "    file_dependency.depend_on, files.mtime\n"
             "FROM\n"
@@ -205,7 +205,7 @@ static int builddb_need_compile(const char *source_dir,
 
         char full_path[1024] = {0};
         const char *dep_file = (const char *) sqlite3_column_text(stmt, 0);
-        path_join(full_path, CETECH_ARRAY_LEN(full_path), source_dir,
+        path->path_join(full_path, CETECH_ARRAY_LEN(full_path), source_dir,
                   dep_file);
 
         time_t actual_mtime = file_mtime(full_path);

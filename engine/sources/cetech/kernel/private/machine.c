@@ -102,7 +102,6 @@ static void _init_api(struct api_v0* api){
     api->register_api("machine_api_v0", &api_v1);
 }
 
-
 static void _init( struct api_v0* api) {
     GET_API(api,memory_api_v0);
 

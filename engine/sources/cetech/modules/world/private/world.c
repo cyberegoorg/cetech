@@ -9,7 +9,7 @@
 #include <cetech/modules/resource/resource.h>
 #include <cetech/kernel/module.h>
 #include <cetech/kernel/hash.h>
-#include <cetech/kernel/handler.h>
+#include <cetech/core/handler.h>
 #include <cetech/kernel/api.h>
 
 

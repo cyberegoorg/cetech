@@ -1,5 +1,5 @@
 #include <cetech/core/array.inl>
-#include <cetech/kernel/yaml.h>
+#include <cetech/core/yaml.h>
 #include <cetech/core/map.inl>
 #include <cetech/kernel/hash.h>
 #include <cetech/kernel/config.h>

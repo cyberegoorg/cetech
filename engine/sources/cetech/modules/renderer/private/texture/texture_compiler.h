@@ -4,7 +4,7 @@
 
 #include <cetech/kernel/fs.h>
 #include <cetech/kernel/os.h>
-#include <cetech/kernel/yaml.h>
+#include <cetech/core/yaml.h>
 #include <stdio.h>
 
 static int _texturec(const char *input,
@@ -40,10 +40,10 @@ static int _gen_tmp_name(char *tmp_filename,
                          size_t max_len,
                          const char *filename) {
     char dir[4096] = {0};
-    path_dir(dir, CETECH_ARRAY_LEN(dir), filename);
+    path_v0.path_dir(dir, CETECH_ARRAY_LEN(dir), filename);
 
-    path_join(tmp_filename, max_len, tmp_dir, dir);
-    dir_make_path(tmp_filename);
+    path_v0.path_join(tmp_filename, max_len, tmp_dir, dir);
+    path_v0.dir_make_path(tmp_filename);
 
     return snprintf(tmp_filename, max_len, "%s/%s.ktx", tmp_dir, filename);
 }
@@ -60,10 +60,10 @@ static int _texture_resource_compiler(const char *filename,
     char output_path[4096] = {0};
     char tmp_filename[4096] = {0};
 
-    char source_data[vio_size(source_vio) + 1];
-    memset(source_data, 0, vio_size(source_vio) + 1);
-    vio_read(source_vio, source_data, sizeof(char),
-             vio_size(source_vio));
+    char source_data[vio_api_v0.size(source_vio) + 1];
+    memset(source_data, 0, vio_api_v0.size(source_vio) + 1);
+    vio_api_v0.read(source_vio, source_data, sizeof(char),
+                        vio_api_v0.size(source_vio));
 
     yaml_document_t h;
     yaml_node_t root = yaml_load_str(source_data, &h);
@@ -87,7 +87,7 @@ static int _texture_resource_compiler(const char *filename,
 
     yaml_as_string(input, input_str, CETECH_ARRAY_LEN(input_str));
 
-    path_join(input_path, CETECH_ARRAY_LEN(input_path), source_dir, input_str);
+    path_v0.path_join(input_path, CETECH_ARRAY_LEN(input_path), source_dir, input_str);
 
     _gen_tmp_name(output_path, tmp_dir, CETECH_ARRAY_LEN(tmp_filename),
                   input_str);
@@ -98,21 +98,21 @@ static int _texture_resource_compiler(const char *filename,
         return 0;
     }
 
-    struct vio *tmp_file = vio_from_file(output_path, VIO_OPEN_READ,
+    struct vio *tmp_file = vio_api_v0.from_file(output_path, VIO_OPEN_READ,
                                          memory_api_v0.main_allocator());
     char *tmp_data =
             CETECH_ALLOCATE(memory_api_v0.main_allocator(), char,
-                            vio_size(tmp_file) + 1);
-    vio_read(tmp_file, tmp_data, sizeof(char), vio_size(tmp_file));
+                            vio_api_v0.size(tmp_file) + 1);
+    vio_api_v0.read(tmp_file, tmp_data, sizeof(char), vio_api_v0.size(tmp_file));
 
     struct texture resource = {
-            .size = vio_size(tmp_file)
+            .size = vio_api_v0.size(tmp_file)
     };
 
-    vio_write(build_vio, &resource, sizeof(resource), 1);
-    vio_write(build_vio, tmp_data, sizeof(char), resource.size);
+    vio_api_v0.write(build_vio, &resource, sizeof(resource), 1);
+    vio_api_v0.write(build_vio, tmp_data, sizeof(char), resource.size);
 
-    vio_close(tmp_file);
+    vio_api_v0.close(tmp_file);
     CETECH_DEALLOCATE(memory_api_v0.main_allocator(), tmp_data);
 
     compilator_api->add_dependency(filename, input_str);

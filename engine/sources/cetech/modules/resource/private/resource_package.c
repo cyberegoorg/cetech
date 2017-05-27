@@ -8,7 +8,7 @@
 #include <cetech/kernel/hash.h>
 #include <cetech/modules/task/task.h>
 #include <cetech/modules/resource/resource.h>
-#include <cetech/kernel/yaml.h>
+#include <cetech/core/yaml.h>
 #include <cetech/kernel/thread.h>
 #include <cetech/kernel/memory.h>
 #include <cetech/kernel/module.h>
@@ -37,6 +37,7 @@ IMPORT_API(memory_api_v0);
 IMPORT_API(resource_api_v0);
 IMPORT_API(task_api_v0);
 IMPORT_API(thread_api_v0);
+IMPORT_API(vio_api_v0);
 
 //==============================================================================
 // Resource compiler
@@ -85,10 +86,10 @@ int _package_compiler(const char *filename,
                       struct vio *build_vio,
                       struct compilator_api *compilator_api) {
 
-    char source_data[vio_size(source_vio) + 1];
-    memset(source_data, 0, vio_size(source_vio) + 1);
-    vio_read(source_vio, source_data, sizeof(char),
-             vio_size(source_vio));
+    char source_data[vio_api_v0.size(source_vio) + 1];
+    memset(source_data, 0, vio_api_v0.size(source_vio) + 1);
+    vio_api_v0.read(source_vio, source_data, sizeof(char),
+                        vio_api_v0.size(source_vio));
 
     yaml_document_t h;
     yaml_node_t root = yaml_load_str(source_data, &h);
@@ -117,15 +118,15 @@ int _package_compiler(const char *filename,
                                                      ARRAY_SIZE(
                                                              &compile_data.name));
 
-    vio_write(build_vio, &resource, sizeof(resource), 1);
-    vio_write(build_vio, ARRAY_BEGIN(&compile_data.types),
+    vio_api_v0.write(build_vio, &resource, sizeof(resource), 1);
+    vio_api_v0.write(build_vio, ARRAY_BEGIN(&compile_data.types),
               sizeof(stringid64_t), ARRAY_SIZE(&compile_data.types));
-    vio_write(build_vio, ARRAY_BEGIN(&compile_data.name_count),
+    vio_api_v0.write(build_vio, ARRAY_BEGIN(&compile_data.name_count),
               sizeof(uint32_t),
               ARRAY_SIZE(&compile_data.name_count));
-    vio_write(build_vio, ARRAY_BEGIN(&compile_data.name),
+    vio_api_v0.write(build_vio, ARRAY_BEGIN(&compile_data.name),
               sizeof(stringid64_t), ARRAY_SIZE(&compile_data.name));
-    vio_write(build_vio, ARRAY_BEGIN(&compile_data.offset), sizeof(uint32_t),
+    vio_api_v0.write(build_vio, ARRAY_BEGIN(&compile_data.offset), sizeof(uint32_t),
               ARRAY_SIZE(&compile_data.offset));
 
     ARRAY_DESTROY(stringid64_t, &compile_data.types);
@@ -141,6 +142,7 @@ int package_init( struct api_v0 *api) {
     GET_API(api, resource_api_v0);
     GET_API(api, task_api_v0);
     GET_API(api, thread_api_v0);
+    GET_API(api, vio_api_v0);
 
     _G = (struct G) {0};
 

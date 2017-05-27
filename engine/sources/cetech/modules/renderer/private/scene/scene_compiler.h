@@ -7,7 +7,7 @@
 #include <include/assimp/postprocess.h>
 #include <include/assimp/cimport.h>
 
-#include <cetech/kernel/yaml.h>
+#include <cetech/core/yaml.h>
 #include <cetech/kernel/fs.h>
 
 ARRAY_PROTOTYPE(bgfx_vertex_decl_t);
@@ -367,7 +367,7 @@ int _compile_assimp(const char *filename,
 
     char input_path[128] = {0};
     const char *source_dir = resource_api_v0.compiler_get_source_dir();
-    path_join(input_path, CETECH_ARRAY_LEN(input_path), source_dir, input_str);
+    path_v0.path_join(input_path, CETECH_ARRAY_LEN(input_path), source_dir, input_str);
 
     uint32_t postprocess_flag = aiProcessPreset_TargetRealtime_MaxQuality;
 
@@ -478,10 +478,10 @@ int _scene_resource_compiler(const char *filename,
 
     char *source_data =
     CETECH_ALLOCATE(memory_api_v0.main_allocator(), char,
-                    vio_size(source_vio) + 1);
-    memset(source_data, 0, vio_size(source_vio) + 1);
-    vio_read(source_vio, source_data, sizeof(char),
-             vio_size(source_vio));
+                    vio_api_v0.size(source_vio) + 1);
+    memset(source_data, 0, vio_api_v0.size(source_vio) + 1);
+    vio_api_v0.read(source_vio, source_data, sizeof(char),
+                        vio_api_v0.size(source_vio));
 
     yaml_document_t h;
     yaml_node_t root = yaml_load_str(source_data, &h);
@@ -509,30 +509,30 @@ int _scene_resource_compiler(const char *filename,
             .vb_len = (uint32_t) ARRAY_SIZE(&output->vb),
     };
 
-    vio_write(build_vio, &res, sizeof(res), 1);
-    vio_write(build_vio, output->geom_name.data, sizeof(stringid64_t),
+    vio_api_v0.write(build_vio, &res, sizeof(res), 1);
+    vio_api_v0.write(build_vio, output->geom_name.data, sizeof(stringid64_t),
               ARRAY_SIZE(&output->geom_name));
-    vio_write(build_vio, output->ib_offset.data, sizeof(uint32_t),
+    vio_api_v0.write(build_vio, output->ib_offset.data, sizeof(uint32_t),
               ARRAY_SIZE(&output->ib_offset));
-    vio_write(build_vio, output->vb_offset.data, sizeof(uint32_t),
+    vio_api_v0.write(build_vio, output->vb_offset.data, sizeof(uint32_t),
               ARRAY_SIZE(&output->vb_offset));
-    vio_write(build_vio, output->vb_decl.data, sizeof(bgfx_vertex_decl_t),
+    vio_api_v0.write(build_vio, output->vb_decl.data, sizeof(bgfx_vertex_decl_t),
               ARRAY_SIZE(&output->vb_decl));
-    vio_write(build_vio, output->ib_size.data, sizeof(uint32_t),
+    vio_api_v0.write(build_vio, output->ib_size.data, sizeof(uint32_t),
               ARRAY_SIZE(&output->ib_size));
-    vio_write(build_vio, output->vb_size.data, sizeof(uint32_t),
+    vio_api_v0.write(build_vio, output->vb_size.data, sizeof(uint32_t),
               ARRAY_SIZE(&output->vb_size));
-    vio_write(build_vio, output->ib.data, sizeof(uint32_t),
+    vio_api_v0.write(build_vio, output->ib.data, sizeof(uint32_t),
               ARRAY_SIZE(&output->ib));
-    vio_write(build_vio, output->vb.data, sizeof(uint8_t),
+    vio_api_v0.write(build_vio, output->vb.data, sizeof(uint8_t),
               ARRAY_SIZE(&output->vb));
-    vio_write(build_vio, output->node_name.data, sizeof(stringid64_t),
+    vio_api_v0.write(build_vio, output->node_name.data, sizeof(stringid64_t),
               ARRAY_SIZE(&output->node_name));
-    vio_write(build_vio, output->node_parent.data, sizeof(uint32_t),
+    vio_api_v0.write(build_vio, output->node_parent.data, sizeof(uint32_t),
               ARRAY_SIZE(&output->node_parent));
-    vio_write(build_vio, output->node_pose.data, sizeof(mat44f_t),
+    vio_api_v0.write(build_vio, output->node_pose.data, sizeof(mat44f_t),
               ARRAY_SIZE(&output->node_pose));
-    vio_write(build_vio, output->geom_node.data, sizeof(stringid64_t),
+    vio_api_v0.write(build_vio, output->geom_node.data, sizeof(stringid64_t),
               ARRAY_SIZE(&output->geom_name));
 
     _destroy_compile_output(output);

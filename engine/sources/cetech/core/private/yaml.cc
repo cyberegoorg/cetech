@@ -3,7 +3,7 @@
 
 extern "C" {
 #include <cetech/core/allocator.h>
-#include <cetech/kernel/yaml.h>
+#include <cetech/core/yaml.h>
 #include <cetech/core/errors.h>
 }
 

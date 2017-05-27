@@ -78,3 +78,23 @@ stringid64_t stringid64_from_string(const char *str) {
 
     return id;
 }
+
+//string.h
+//hash.h
+//
+//application.h
+//
+//log.h
+//api.h
+//memory.h
+//config.h
+//module.h
+//
+//machine.h
+//
+//fs.h
+//input.h
+//os.h
+//thread.h
+//window.h
+//yaml.h

@@ -39,6 +39,7 @@ static struct G {
 } PluginSystemGlobals = {0};
 
 IMPORT_API(memory_api_v0);
+IMPORT_API(path_v0);
 
 //==============================================================================
 // Private
@@ -201,17 +202,17 @@ void module_load_dirs(const char *path) {
     ARRAY_T(pchar) files;
     ARRAY_INIT(pchar, &files, memory_api_v0.main_scratch_allocator());
 
-    dir_list(path, 1, &files, memory_api_v0.main_scratch_allocator());
+    path_v0.dir_list(path, 1, &files, memory_api_v0.main_scratch_allocator());
 
     for (int k = 0; k < ARRAY_SIZE(&files); ++k) {
-        const char *filename = path_filename(ARRAY_AT(&files, k));
+        const char *filename = path_v0.path_filename(ARRAY_AT(&files, k));
 
         if (str_startswith(filename, PLUGIN_PREFIX)) {
             module_load(ARRAY_AT(&files, k));
         }
     }
 
-    dir_list_free(&files, memory_api_v0.main_scratch_allocator());
+    path_v0.dir_list_free(&files, memory_api_v0.main_scratch_allocator());
     ARRAY_DESTROY(pchar, &files);
 }
 
@@ -281,9 +282,9 @@ void module_init(struct allocator *allocator, struct api_v0* api) {
     _G = (struct G){0};
 
     GET_API(api, memory_api_v0);
+    GET_API(api, path_v0);
 
     _G.api_v0 = api;
-
 }
 
 void module_shutdown() {

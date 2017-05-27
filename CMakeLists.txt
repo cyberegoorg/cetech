@@ -78,26 +78,24 @@ set(SOURCE_FILES
         engine/sources/cetech/kernel/private/log/log_db_handler.c
         engine/sources/cetech/kernel/private/log/log_system.c
 
-        engine/sources/cetech/kernel/private/fs/vio.c
-        engine/sources/cetech/kernel/private/fs/vio_sdl.c
-        engine/sources/cetech/kernel/private/fs/fs.c
+        engine/sources/cetech/kernel/private/os/_vio.h
+        engine/sources/cetech/kernel/private/os/sdl2_vio.h
+        engine/sources/cetech/kernel/private/os/path.h
 
-        engine/sources/cetech/kernel/private/cmd_line.c
-        engine/sources/cetech/kernel/private/fs/path.c
-        engine/sources/cetech/kernel/private/process.c
-        engine/sources/cetech/kernel/private/stacktrace.c
+        engine/sources/cetech/kernel/private/os/process.c
+        engine/sources/cetech/kernel/private/os/stacktrace.c
         engine/sources/cetech/kernel/private/api.c
 
-        engine/sources/cetech/kernel/private/sdl2/sdl2_object.h
-        engine/sources/cetech/kernel/private/sdl2/sdl_time.h
+        engine/sources/cetech/kernel/private/os/sdl2_object.h
+        engine/sources/cetech/kernel/private/os/sdl2_time.h
 
-        engine/sources/cetech/kernel/private/string.c
+        engine/sources/cetech/kernel/private/os/string.c
 
         engine/sources/cetech/kernel/private/log/log_system.c
 
-        engine/sources/cetech/kernel/private/yaml.cc
+        engine/sources/cetech/core/private/yaml.cc
 
-        engine/sources/cetech/kernel/private/handler.c
+        engine/sources/cetech/core/private/handler.c
 
 
         ########################################################################
@@ -168,8 +166,8 @@ set(SOURCE_FILES
         engine/sources/cetech/modules/scenegraph/private/scenegraph.c
         engine/sources/cetech/modules/camera/private/camera.c
 
-        engine/sources/cetech/kernel/private/hash.c
-        engine/sources/cetech/kernel/private/sdl2/sdl2.c)
+        engine/sources/cetech/kernel/private/os/hash.c
+        engine/sources/cetech/kernel/private/os/os.c)
 
 ################################################################################
 # Main sources

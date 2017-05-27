@@ -135,6 +135,5 @@ void log_debug(const char *where,
                const char *format,
                ...) ATTR_FORMAT(2, 3);
 
-int logdb_init_db(const char *log_dir);
 
 #endif //CETECH_LOG_API_H

@@ -5,15 +5,17 @@
 #include <bgfx/c99/bgfx.h>
 
 #include <cetech/core/allocator.h>
+#include <cetech/core/map.inl>
+
 #include <cetech/kernel/hash.h>
 #include <cetech/kernel/memory.h>
 #include <cetech/kernel/module.h>
-#include <cetech/core/map.inl>
+#include <cetech/kernel/api.h>
+#include <cetech/kernel/fs.h>
 
 #include <cetech/modules/resource/resource.h>
 #include <cetech/modules/entity/entity.h>
 #include <cetech/modules/world/world.h>
-#include <cetech/kernel/api.h>
 
 #include "../../../scenegraph/scenegraph.h"
 
@@ -26,6 +28,8 @@
 IMPORT_API(memory_api_v0);
 IMPORT_API(resource_api_v0);
 IMPORT_API(scenegprah_api_v0);
+IMPORT_API(path_v0);
+IMPORT_API(vio_api_v0);
 
 ARRAY_PROTOTYPE(bgfx_texture_handle_t)
 
@@ -101,6 +105,8 @@ int scene_init(struct api_v0 *api) {
     GET_API(api, memory_api_v0);
     GET_API(api, resource_api_v0);
     GET_API(api, scenegprah_api_v0);
+    GET_API(api, path_v0);
+    GET_API(api, vio_api_v0);
 
 
     _G.type = stringid64_from_string("scene");

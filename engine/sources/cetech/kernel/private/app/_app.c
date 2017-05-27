@@ -9,7 +9,6 @@
 #include <cetech/kernel/os.h>
 #include <cetech/kernel/window.h>
 #include <cetech/kernel/hash.h>
-#include <cetech/kernel/cmd_line.h>
 #include <cetech/core/eventstream.inl>
 #include <cetech/kernel/memory.h>
 
@@ -40,6 +39,7 @@ IMPORT_API(lua_api_v0);
 IMPORT_API(config_api_v0);
 IMPORT_API(window_api_v0);
 IMPORT_API(time_api_v0);
+IMPORT_API(path_v0);
 
 //==============================================================================
 // Definess
@@ -51,6 +51,11 @@ IMPORT_API(time_api_v0);
 //==============================================================================
 // Globals
 //==============================================================================
+
+struct args {
+    int argc;
+    const char **argv;
+};
 
 struct GConfig {
     cvar_t boot_pkg;
@@ -95,7 +100,11 @@ static int _cmd_wait(mpack_node_t args,
 const char *application_platform();
 const char *application_native_platform();
 window_t application_get_main_window();
-
+int cvar_init(struct api_v0* api);
+void cvar_shutdown();
+void memsys_init(int scratch_buffer_size);
+void memsys_init_api(struct api_v0* api);
+void memsys_shutdown();
 struct allocator *_memsys_main_allocator();
 struct allocator *_memsys_main_scratch_allocator();
 void api_init(struct allocator *allocator);
@@ -125,6 +134,7 @@ void _init_api(struct api_v0 *api) {
     GET_API(api, config_api_v0);
     GET_API(api, window_api_v0);
     GET_API(api, time_api_v0);
+    GET_API(api, path_v0);
 }
 
 int _init_config(struct api_v0* api) {
@@ -162,8 +172,8 @@ int _init_config(struct api_v0* api) {
         cvar_t bd = config.find("build");
 
         const char *build_dir_str = config.get_string(bd);
-        path_join(build_dir_full, 1024, build_dir_str, application_platform());
-        dir_make_path(build_dir_full);
+        path_v0.path_join(build_dir_full, 1024, build_dir_str, application_platform());
+        path_v0.dir_make_path(build_dir_full);
         config.compile_global(&api_v1);
     }
 #endif
@@ -179,6 +189,9 @@ int _init_config(struct api_v0* api) {
     return 1;
 }
 
+extern void os_register_api(struct api_v0 *api);
+extern int logdb_init_db(const char *log_dir, struct api_v0* api);
+
 int application_init(int argc,
                      const char **argv) {
     _G = (struct G) {0};
@@ -186,7 +199,6 @@ int application_init(int argc,
 
     log_init();
     log_register_handler(log_stdout_handler, NULL);
-    logdb_init_db(".");
 
     log_debug(LOG_WHERE, "Init (global size: %lu)", sizeof(struct G));
 
@@ -194,8 +206,12 @@ int application_init(int argc,
     api_init(_memsys_main_allocator());
     api_get_v0()->register_api("app_api_v0", &api_v1);
     memsys_init_api(api_get_v0());
+    os_register_api(api_get_v0());
+
     module_init(_memsys_main_allocator(), api_get_v0());
     cvar_init(api_get_v0());
+
+    logdb_init_db(".", api_get_v0());
 
     ADD_STATIC_PLUGIN(memsys);
     ADD_STATIC_PLUGIN(config);
@@ -215,8 +231,8 @@ int application_init(int argc,
 #endif
 
     _init_static_modules();
-
     module_call_init_api();
+    _init_api(api_get_v0());
     module_load_dirs("./bin");
     module_call_init_cvar();
 
@@ -230,7 +246,7 @@ int application_init(int argc,
 
     module_call_init();
 
-    _init_api(api_get_v0());
+
 
     log_set_wid_clb(task_api_v0.worker_id);
 

@@ -15,7 +15,7 @@
 #include <cetech/kernel/hash.h>
 
 #include <stdint.h>
-#include <cetech/kernel/handler.h>
+#include <cetech/core/handler.h>
 
 
 //==============================================================================

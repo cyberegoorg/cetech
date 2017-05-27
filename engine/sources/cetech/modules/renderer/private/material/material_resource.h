@@ -7,9 +7,9 @@ static const bgfx_program_handle_t null_program = {0};
 
 void *_material_resource_loader(struct vio *input,
                                 struct allocator *allocator) {
-    const int64_t size = vio_size(input);
+    const int64_t size = vio_api_v0.size(input);
     char *data = CETECH_ALLOCATE(allocator, char, size);
-    vio_read(input, data, 1, size);
+    vio_api_v0.read(input, data, 1, size);
 
     return data;
 }

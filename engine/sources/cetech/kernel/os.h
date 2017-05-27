@@ -11,7 +11,6 @@
 // CPU
 //==============================================================================
 
-
 struct cpu_api_v0 {
     int (*count)();
 };
@@ -40,6 +39,5 @@ struct time_api_v0 {
 
     uint64_t (*get_perf_freq)();
 };
-
 
 #endif //CETECH_OS_H

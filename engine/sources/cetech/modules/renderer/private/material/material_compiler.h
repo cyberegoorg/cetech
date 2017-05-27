@@ -2,7 +2,7 @@
 #define CETECH_MATERIAL_COMPILER_H
 
 #include <stdio.h>
-#include <cetech/kernel/yaml.h>
+#include <cetech/core/yaml.h>
 #include <cetech/kernel/fs.h>
 
 struct material_compile_output {
@@ -30,17 +30,17 @@ static void _preprocess(const char *filename,
 
         char full_path[256] = {0};
         const char *source_dir = resource_api_v0.compiler_get_source_dir();
-        path_join(full_path, CETECH_ARRAY_LEN(full_path), source_dir,
+        path_v0.path_join(full_path, CETECH_ARRAY_LEN(full_path), source_dir,
                   prefab_file);
 
-        struct vio *prefab_vio = vio_from_file(full_path, VIO_OPEN_READ,
+        struct vio *prefab_vio = vio_api_v0.from_file(full_path, VIO_OPEN_READ,
                                                memory_api_v0.main_allocator());
 
-        char prefab_data[vio_size(prefab_vio) + 1];
-        memset(prefab_data, 0, vio_size(prefab_vio) + 1);
-        vio_read(prefab_vio, prefab_data, sizeof(char),
-                 vio_size(prefab_vio));
-        vio_close(prefab_vio);
+        char prefab_data[vio_api_v0.size(prefab_vio) + 1];
+        memset(prefab_data, 0, vio_api_v0.size(prefab_vio) + 1);
+        vio_api_v0.read(prefab_vio, prefab_data, sizeof(char),
+                 vio_api_v0.size(prefab_vio));
+        vio_api_v0.close(prefab_vio);
 
         yaml_document_t h;
         yaml_node_t prefab_root = yaml_load_str(prefab_data, &h);
@@ -128,11 +128,11 @@ static int _material_resource_compiler(const char *filename,
                                        struct compilator_api *compilator_api) {
     char *source_data =
     CETECH_ALLOCATE(memory_api_v0.main_allocator(), char,
-                    vio_size(source_vio) + 1);
-    memset(source_data, 0, vio_size(source_vio) + 1);
+                    vio_api_v0.size(source_vio) + 1);
+    memset(source_data, 0, vio_api_v0.size(source_vio) + 1);
 
-    vio_read(source_vio, source_data, sizeof(char),
-             vio_size(source_vio));
+    vio_api_v0.read(source_vio, source_data, sizeof(char),
+             vio_api_v0.size(source_vio));
 
     yaml_document_t h;
     yaml_node_t root = yaml_load_str(source_data, &h);
@@ -177,10 +177,10 @@ static int _material_resource_compiler(const char *filename,
             .uniforms_count = ARRAY_SIZE(&output.uniform_names) / 32,
     };
 
-    vio_write(build_vio, &resource, sizeof(resource), 1);
-    vio_write(build_vio, output.uniform_names.data, sizeof(char),
+    vio_api_v0.write(build_vio, &resource, sizeof(resource), 1);
+    vio_api_v0.write(build_vio, output.uniform_names.data, sizeof(char),
               ARRAY_SIZE(&output.uniform_names));
-    vio_write(build_vio, output.data.data, sizeof(uint8_t),
+    vio_api_v0.write(build_vio, output.data.data, sizeof(uint8_t),
               ARRAY_SIZE(&output.data));
 
     ARRAY_DESTROY(char, &output.uniform_names);

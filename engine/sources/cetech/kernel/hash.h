@@ -17,7 +17,6 @@ typedef struct stringid64_s {
 
 //! 64bit murmur 2 hash
 //! \param key Key
-//! \param len Key len
 //! \param seed Seed
 //! \return Hashed value
 uint64_t hash_murmur2_64(const void *key,
@@ -26,4 +25,5 @@ uint64_t hash_murmur2_64(const void *key,
 
 stringid64_t stringid64_from_string(const char *str);
 
+//! \param len Key len
 #endif //CETECH_HASH_H

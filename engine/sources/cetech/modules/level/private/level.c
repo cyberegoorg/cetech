@@ -15,7 +15,7 @@
 
 #include "../level.h"
 #include <cetech/core/map.inl>
-#include <cetech/kernel/yaml.h>
+#include <cetech/core/yaml.h>
 #include "level_blob.h"
 #include <cetech/kernel/fs.h>
 #include <cetech/kernel/hash.h>
@@ -25,6 +25,7 @@ IMPORT_API(entity_api_v0);
 IMPORT_API(resource_api_v0);
 IMPORT_API(transform_api_v0);
 IMPORT_API(memory_api_v0);
+IMPORT_API(vio_api_v0);
 
 //==============================================================================
 // Typedefs
@@ -93,9 +94,9 @@ struct level_instance *_level_instance(level_t level) {
 
 void *level_resource_loader(struct vio *input,
                             struct allocator *allocator) {
-    const int64_t size = vio_size(input);
+    const int64_t size = vio_api_v0.size(input);
     char *data = CETECH_ALLOCATE(allocator, char, size);
-    vio_read(input, data, 1, size);
+    vio_api_v0.read(input, data, 1, size);
 
     return data;
 }
@@ -163,10 +164,10 @@ int _level_resource_compiler(const char *filename,
                              struct vio *build_vio,
                              struct compilator_api *compilator_api) {
 
-    char source_data[vio_size(source_vio) + 1];
-    memset(source_data, 0, vio_size(source_vio) + 1);
-    vio_read(source_vio, source_data, sizeof(char),
-             vio_size(source_vio));
+    char source_data[vio_api_v0.size(source_vio) + 1];
+    memset(source_data, 0, vio_api_v0.size(source_vio) + 1);
+    vio_api_v0.read(source_vio, source_data, sizeof(char),
+                        vio_api_v0.size(source_vio));
 
     yaml_document_t h;
     yaml_node_t root = yaml_load_str(source_data, &h);
@@ -201,12 +202,12 @@ int _level_resource_compiler(const char *filename,
 
     entity_api_v0.compiler_write_to_build(output, entity_data.data);
 
-    vio_write(build_vio, &res, sizeof(struct level_blob), 1);
-    vio_write(build_vio, &ARRAY_AT(&id, 0), sizeof(stringid64_t),
+    vio_api_v0.write(build_vio, &res, sizeof(struct level_blob), 1);
+    vio_api_v0.write(build_vio, &ARRAY_AT(&id, 0), sizeof(stringid64_t),
               ARRAY_SIZE(&id));
-    vio_write(build_vio, &ARRAY_AT(&offset, 0), sizeof(uint32_t),
+    vio_api_v0.write(build_vio, &ARRAY_AT(&offset, 0), sizeof(uint32_t),
               ARRAY_SIZE(&offset));
-    vio_write(build_vio, &ARRAY_AT(&data, 0), sizeof(uint8_t),
+    vio_api_v0.write(build_vio, &ARRAY_AT(&data, 0), sizeof(uint8_t),
               ARRAY_SIZE(&data));
 
     ARRAY_DESTROY(stringid64_t, &id);
@@ -295,6 +296,7 @@ static void _init( struct api_v0* api) {
     GET_API(api, memory_api_v0);
     GET_API(api, resource_api_v0);
     GET_API(api, transform_api_v0);
+    GET_API(api, vio_api_v0);
 
     _G = (struct G) {0};
     _G.level_type = stringid64_from_string("level");

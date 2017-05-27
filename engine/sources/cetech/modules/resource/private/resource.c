@@ -76,13 +76,15 @@ IMPORT_API(cnsole_srv_api_v0);
 IMPORT_API(filesystem_api_v0);
 IMPORT_API(config_api_v0);
 IMPORT_API(app_api_v0);
+IMPORT_API(path_v0);
+IMPORT_API(vio_api_v0);
 
 
 int resource_compiler_get_build_dir(char *build_dir,
                                     size_t max_len,
                                     const char *platform) {
     const char *build_dir_str = config_api_v0.get_string(_G.config.build_dir);
-    return path_join(build_dir, max_len, build_dir_str, platform);
+    return path_v0.path_join(build_dir, max_len, build_dir_str, platform);
 }
 
 //==============================================================================
@@ -109,9 +111,9 @@ static MAP_T(resource_item_t) *_get_resource_map(stringid64_t type) {
 
 void *package_resource_loader(struct vio *input,
                               struct allocator *allocator) {
-    const int64_t size = vio_size(input);
+    const int64_t size = vio_api_v0.size(input);
     char *data = CETECH_ALLOCATE(allocator, char, size);
-    vio_read(input, data, 1, size);
+    vio_api_v0.read(input, data, 1, size);
 
     return data;
 }
@@ -200,6 +202,8 @@ static void _init( struct api_v0* api) {
     GET_API(api, filesystem_api_v0);
     GET_API(api, config_api_v0);
     GET_API(api, app_api_v0);
+    GET_API(api, path_v0);
+    GET_API(api, vio_api_v0);
 
     ARRAY_INIT(resource_data, &_G.resource_data,
                memory_api_v0.main_allocator());
@@ -211,7 +215,7 @@ static void _init( struct api_v0* api) {
 
 
     char build_dir_full[4096] = {0};
-    path_join(build_dir_full,
+    path_v0.path_join(build_dir_full,
               CETECH_ARRAY_LEN(build_dir_full),
               config_api_v0.get_string(_G.config.build_dir),
               app_api_v0.platform());

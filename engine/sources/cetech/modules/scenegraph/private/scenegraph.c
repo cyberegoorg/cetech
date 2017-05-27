@@ -1,5 +1,5 @@
 #include <cetech/core/array.inl>
-#include <cetech/kernel/yaml.h>
+#include <cetech/core/yaml.h>
 #include <cetech/core/quatf.inl>
 #include <cetech/core/mat44f.inl>
 

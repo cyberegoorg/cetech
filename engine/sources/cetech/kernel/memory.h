@@ -6,27 +6,6 @@
 #define CETECH_MEMSYS_H
 
 //==============================================================================
-// Includes
-//==============================================================================
-
-struct api_v0;
-
-
-//==============================================================================
-// Interface
-//==============================================================================
-
-//! Init memory system
-//! \param scratch_buffer_size Main scratch buffer size
-void memsys_init(int scratch_buffer_size);
-
-void memsys_init_api(struct api_v0* api);
-
-//! Shutdown memory system
-void memsys_shutdown();
-
-
-//==============================================================================
 // Api
 //==============================================================================
 
@@ -40,7 +19,6 @@ struct memory_api_v0 {
     //! \return Main scratch alocator
     struct allocator *(*main_scratch_allocator)();
 };
-
 
 #endif //CETECH_MEMSYS_H
 

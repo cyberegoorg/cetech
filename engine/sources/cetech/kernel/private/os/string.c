@@ -8,7 +8,6 @@
 // Interface
 //==============================================================================
 
-
 char *str_dup(const char *s,
               struct allocator *allocator) {
     char *d = (char *) CETECH_ALLOCATE(allocator, char, strlen(s) + 1);

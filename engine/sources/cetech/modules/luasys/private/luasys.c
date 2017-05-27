@@ -18,6 +18,7 @@
 
 #include <cetech/modules/luasys/luasys.h>
 #include <cetech/kernel/api.h>
+#include <cetech/kernel/fs.h>
 
 #include "vectors.h"
 #include "quaternion.h"
@@ -25,6 +26,7 @@
 
 IMPORT_API(resource_api_v0);
 IMPORT_API(cnsole_srv_api_v0);
+IMPORT_API(vio_api_v0);
 
 //==============================================================================
 // Defines
@@ -309,10 +311,10 @@ int _lua_compiler(const char *filename,
                   struct vio *build_vio,
                   struct compilator_api *compilator_api) {
 
-    char tmp[vio_size(source_vio) + 1];
-    memset(tmp, 0, vio_size(source_vio) + 1);
+    char tmp[vio_api_v0.size(source_vio) + 1];
+    memset(tmp, 0, vio_api_v0.size(source_vio) + 1);
 
-    vio_read(source_vio, tmp, sizeof(char), vio_size(source_vio));
+    vio_api_v0.read(source_vio, tmp, sizeof(char), vio_api_v0.size(source_vio));
 
     lua_State *state = luaL_newstate();
     luaL_openlibs(state);
@@ -354,8 +356,8 @@ int _lua_compiler(const char *filename,
                 .size = bc_len,
         };
 
-        vio_write(build_vio, &resource, sizeof(struct lua_resource), 1);
-        vio_write(build_vio, bc, sizeof(char), bc_len);
+        vio_api_v0.write(build_vio, &resource, sizeof(struct lua_resource), 1);
+        vio_api_v0.write(build_vio, bc, sizeof(char), bc_len);
     }
 
     lua_close(state);
@@ -869,6 +871,7 @@ static void _init( struct api_v0* api_v0) {
 
     GET_API(api_v0, cnsole_srv_api_v0);
     GET_API(api_v0, resource_api_v0);
+    GET_API(api_v0, vio_api_v0);
 
 
     _G.L = luaL_newstate();

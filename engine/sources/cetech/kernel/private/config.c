@@ -1,18 +1,17 @@
 //==============================================================================
 // Includes
 //==============================================================================
+#include <stdio.h>
 
 #include <cetech/core/allocator.h>
-#include <cetech/kernel/yaml.h>
+#include <cetech/core/yaml.h>
 #include <cetech/kernel/memory.h>
-#include <cetech/kernel/cmd_line.h>
 #include <cetech/kernel/config.h>
 #include <cetech/kernel/module.h>
 #include <cetech/kernel/hash.h>
 #include <cetech/kernel/application.h>
 #include <cetech/modules/resource/resource.h>
 #include <cetech/kernel/log.h>
-#include <stdio.h>
 #include <cetech/kernel/string.h>
 #include <cetech/kernel/fs.h>
 #include <cetech/kernel/api.h>
@@ -64,6 +63,8 @@ static struct G {
 } _G = {0};
 
 IMPORT_API(memory_api_v0);
+IMPORT_API(path_v0);
+IMPORT_API(vio_api_v0);
 
 void cvar_load_global();
 
@@ -172,6 +173,8 @@ int cvar_init(struct api_v0 *api) {
     log_debug(LOG_WHERE, "Init");
 
     GET_API(api, memory_api_v0);
+    GET_API(api, path_v0);
+    GET_API(api, vio_api_v0);
 
     static struct config_api_v0 api_v1 = {
             .load_global = cvar_load_global,
@@ -219,28 +222,28 @@ void cvar_compile_global(struct app_api_v0 *app_api) {
     cvar_t source_dir = cvar_find("src");
 
     const char *build_dir_str = cvar_get_string(bd);
-    path_join(build_dir, 1024, build_dir_str, app_api->platform());
+    path_v0.path_join(build_dir, 1024, build_dir_str, app_api->platform());
 
-    path_join(build_path, CETECH_ARRAY_LEN(build_path), build_dir,
+    path_v0.path_join(build_path, CETECH_ARRAY_LEN(build_path), build_dir,
               "global.config");
 
 
-    path_join(source_path, CETECH_ARRAY_LEN(source_path),
+    path_v0.path_join(source_path, CETECH_ARRAY_LEN(source_path),
               cvar_get_string(source_dir), "global.config");
 
-    struct vio *source_vio = vio_from_file(source_path, VIO_OPEN_READ,
+    struct vio *source_vio = vio_api_v0.from_file(source_path, VIO_OPEN_READ,
                                            memory_api_v0.main_allocator());
     char *data =
-    CETECH_ALLOCATE(memory_api_v0.main_allocator(), char, vio_size(source_vio));
+    CETECH_ALLOCATE(memory_api_v0.main_allocator(), char, vio_api_v0.size(source_vio));
 
-    size_t size = (size_t) vio_size(source_vio);
-    vio_read(source_vio, data, sizeof(char), size);
-    vio_close(source_vio);
+    size_t size = (size_t) vio_api_v0.size(source_vio);
+    vio_api_v0.read(source_vio, data, sizeof(char), size);
+    vio_api_v0.close(source_vio);
 
-    struct vio *build_vio = vio_from_file(build_path, VIO_OPEN_WRITE,
+    struct vio *build_vio = vio_api_v0.from_file(build_path, VIO_OPEN_WRITE,
                                           memory_api_v0.main_allocator());
-    vio_write(build_vio, data, sizeof(char), size);
-    vio_close(build_vio);
+    vio_api_v0.write(build_vio, data, sizeof(char), size);
+    vio_api_v0.close(build_vio);
 
     CETECH_DEALLOCATE(memory_api_v0.main_allocator(), data);
 }
@@ -330,20 +333,20 @@ void cvar_load_global(struct app_api_v0 *app_api) {
     cvar_t source_dir = cvar_find("src");
 
     const char *build_dir_str = cvar_get_string(bd);
-    path_join(build_dir, 1024, build_dir_str, app_api->platform());
+    path_v0.path_join(build_dir, 1024, build_dir_str, app_api->platform());
 
 
-    path_join(source_path, CETECH_ARRAY_LEN(source_path), build_dir,
+    path_v0.path_join(source_path, CETECH_ARRAY_LEN(source_path), build_dir,
               "global.config");
 
-    struct vio *source_vio = vio_from_file(source_path, VIO_OPEN_READ,
+    struct vio *source_vio = vio_api_v0.from_file(source_path, VIO_OPEN_READ,
                                            memory_api_v0.main_allocator());
     char *data =
     CETECH_ALLOCATE(memory_api_v0.main_allocator(), char,
-                    vio_size(source_vio));
-    vio_read(source_vio, data, vio_size(source_vio),
-             vio_size(source_vio));
-    vio_close(source_vio);
+                    vio_api_v0.size(source_vio));
+    vio_api_v0.read(source_vio, data, vio_api_v0.size(source_vio),
+             vio_api_v0.size(source_vio));
+    vio_api_v0.close(source_vio);
 
     yaml_document_t h;
     yaml_node_t root = yaml_load_str(data, &h);
@@ -396,6 +399,11 @@ void _cvar_from_str(const char *name,
         log_error(LOG_WHERE, "Invalid cvar \"%s\"", name);
     }
 }
+
+struct args {
+    int argc;
+    const char **argv;
+};
 
 int cvar_parse_args(int argc,
                     const char **argv) {
