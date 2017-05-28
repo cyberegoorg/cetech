@@ -7,7 +7,7 @@
 
 #include <cetech/core/memory/memory.h>
 #include <cetech/core/config.h>
-#include <cetech/modules/resource/resource.h>
+#include <cetech/core/resource/resource.h>
 
 #include <cetech/core/module.h>
 

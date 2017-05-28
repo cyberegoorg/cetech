@@ -15,7 +15,7 @@
 #include <cetech/core/os/path.h>
 #include <cetech/core/os/vio.h>
 
-#include <cetech/modules/resource/resource.h>
+#include <cetech/core/resource/resource.h>
 #include <cetech/core/os/process.h>
 
 

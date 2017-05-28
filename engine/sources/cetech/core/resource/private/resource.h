@@ -2,7 +2,7 @@
 #define CETECH_RESOURCE_H
 
 #include <cetech/core/hash.h>
-#include <cetech/modules/resource/resource.h>
+#include <cetech/core/resource/resource.h>
 
 void resource_set_autoload(int enable);
 
@@ -72,7 +72,8 @@ int resource_compiler_external_join(char *output,
                                     uint32_t max_len,
                                     const char *name);
 
-void resource_compiler_create_build_dir();
+void resource_compiler_create_build_dir(struct config_api_v0 config,
+                                        struct app_api_v0 app);
 
 const char *resource_compiler_get_core_dir();
 
@@ -82,6 +83,9 @@ const char *resource_compiler_get_core_dir();
 int resource_compiler_get_build_dir(char *build_dir,
                                     size_t max_len,
                                     const char *platform);
+
+
+void package_load(uint64_t name);
 
 void package_load(uint64_t name);
 

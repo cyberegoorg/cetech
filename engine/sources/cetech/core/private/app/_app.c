@@ -13,9 +13,9 @@
 #include "_app.h"
 #include <cetech/core/config.h>
 #include <cetech/core/application.h>
-#include <cetech/modules/resource/resource.h>
-#include <cetech/modules/develop_system/develop.h>
-#include <cetech/modules/task/task.h>
+#include <cetech/core/resource/resource.h>
+#include <cetech/core/develop_system/develop.h>
+#include <cetech/core/task/task.h>
 
 #include "cetech/core/private/static_systems.h"
 

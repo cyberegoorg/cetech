@@ -5,7 +5,7 @@
 #include <cetech/core/memory/allocator.h>
 #include <cetech/modules/world/world.h>
 #include <cetech/core/config.h>
-#include <cetech/modules/resource/resource.h>
+#include <cetech/core/resource/resource.h>
 #include <cetech/core/os/vio.h>
 #include <cetech/modules/entity/entity.h>
 #include <cetech/modules/transform/transform.h>

@@ -1,7 +1,7 @@
 #include <cetech/core/container/array.inl>
 #include <cetech/core/yaml.h>
 #include <cetech/core/config.h>
-#include <cetech/modules/resource/resource.h>
+#include <cetech/core/resource/resource.h>
 #include <cetech/modules/entity/entity.h>
 #include <cetech/core/hash.h>
 #include <cetech/modules/world/world.h>

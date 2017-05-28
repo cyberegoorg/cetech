@@ -5,7 +5,7 @@
 #include <cetech/core/math/math_types.h>
 #include <cetech/core/memory/allocator.h>
 #include <cetech/core/config.h>
-#include <cetech/modules/resource/resource.h>
+#include <cetech/core/resource/resource.h>
 #include <cetech/core/module.h>
 #include <cetech/core/container/eventstream.inl>
 #include <cetech/core/machine.h>

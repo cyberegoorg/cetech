@@ -9,7 +9,7 @@
 #include <cetech/core/os/window.h>
 
 #include <cetech/core/application.h>
-#include <cetech/modules/resource/resource.h>
+#include <cetech/core/resource/resource.h>
 #include <cetech/core/machine.h>
 #include <cetech/core/api.h>
 

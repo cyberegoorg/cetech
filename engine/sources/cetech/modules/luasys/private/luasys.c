@@ -16,8 +16,8 @@
 #include <cetech/core/module.h>
 #include <cetech/core/application.h>
 
-#include <cetech/modules/develop_system/develop.h>
-#include <cetech/modules/resource/resource.h>
+#include <cetech/core/develop_system/develop.h>
+#include <cetech/core/resource/resource.h>
 #include <cetech/modules/luasys/luasys.h>
 
 

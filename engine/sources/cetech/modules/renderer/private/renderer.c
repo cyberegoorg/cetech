@@ -7,7 +7,7 @@
 
 #include <cetech/modules/camera/camera.h>
 #include "../renderer.h"
-#include <cetech/modules/develop_system/develop.h>
+#include <cetech/core/develop_system/develop.h>
 #include <cetech/core/application.h>
 #include <cetech/core/config.h>
 #include <cetech/core/module.h>

@@ -15,8 +15,8 @@
 #include <cetech/core/os/vio.h>
 #include <cetech/core/api.h>
 
-#include <cetech/modules/task/task.h>
-#include <cetech/modules/resource/resource.h>
+#include <cetech/core/task/task.h>
+#include <cetech/core/resource/resource.h>
 
 #include "resource_package.h"
 

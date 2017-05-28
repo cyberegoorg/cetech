@@ -5,9 +5,9 @@
 #include <cetech/core/os/path.h>
 
 #include <cetech/core/memory/memory.h>
-#include <cetech/modules/filesystem/filesystem.h>
+#include <cetech/core/filesystem/filesystem.h>
 #include <cetech/core/config.h>
-#include <cetech/modules/resource/resource.h>
+#include <cetech/core/resource/resource.h>
 #include <cetech/core/module.h>
 #include <cetech/core/api.h>
 #include <cetech/core/os/vio.h>

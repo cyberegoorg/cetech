@@ -5,12 +5,12 @@
 #include <cetech/core/os/thread.h>
 #include <cetech/core/memory/memory.h>
 
-#include <cetech/modules/develop_system/develop.h>
+#include <cetech/core/develop_system/develop.h>
 #include <cetech/core/config.h>
-#include <cetech/modules/resource/resource.h>
+#include <cetech/core/resource/resource.h>
 #include <cetech/core/module.h>
 
-#include <cetech/modules/task/task.h>
+#include <cetech/core/task/task.h>
 #include <cetech/core/api.h>
 #include <cetech/core/os/cpu.h>
 

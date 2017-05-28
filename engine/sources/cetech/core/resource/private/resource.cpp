@@ -2,11 +2,17 @@
 // Includes
 //==============================================================================
 
+
+#include <cetech/core/container/container_types.inl>
+#include <cetech/core/container/array2.inl>
+#include <cetech/core/container/map2.inl>
+
 #include "include/SDL2/SDL.h"
 #include "include/mpack/mpack.h"
 
-#include <cetech/core/container/map.inl>
 
+extern "C" {
+//#include <cetech/core/container/map.inl>
 #include <cetech/core/hash.h>
 #include <cetech/core/application.h>
 #include <cetech/core/config.h>
@@ -15,13 +21,13 @@
 #include <cetech/core/os/path.h>
 #include <cetech/core/os/vio.h>
 #include <cetech/core/api.h>
-
-#include <cetech/modules/resource/resource.h>
-#include <cetech/modules/develop_system/develop.h>
-#include <cetech/modules/filesystem/filesystem.h>
-
-
+#include <cetech/core/resource/resource.h>
+#include <cetech/core/develop_system/develop.h>
+#include <cetech/core/filesystem/filesystem.h>
 #include "resource.h"
+}
+
+using namespace cetech;
 
 //==============================================================================
 // Struct and types
@@ -31,17 +37,6 @@ typedef struct {
     void *data;
     uint8_t ref_count;
 } resource_item_t;
-
-ARRAY_PROTOTYPE(resource_item_t)
-
-ARRAY_PROTOTYPE_N(const char*, cstring)
-
-MAP_PROTOTYPE(resource_item_t)
-
-ARRAY_PROTOTYPE_N(MAP_T(resource_item_t), resource_data)
-
-ARRAY_PROTOTYPE(resource_callbacks_t)
-
 
 //==============================================================================
 // Gloals
@@ -59,9 +54,11 @@ static const resource_item_t null_item = {.data=NULL, .ref_count=0};
 
 #define _G ResourceManagerGlobals
 struct G {
-    MAP_T(uint32_t) type_map;
-    ARRAY_T(resource_data) resource_data;
-    ARRAY_T(resource_callbacks_t) resource_callbacks;
+    Map<uint32_t> type_map;
+
+    Array<Map<resource_item_t>> resource_data;
+    Array<resource_callbacks_t> resource_callbacks;
+
     int autoload_enabled;
 
     struct {
@@ -101,14 +98,14 @@ static int _cmd_reload_all(mpack_node_t args,
     return 0;
 }
 
-static MAP_T(resource_item_t) *_get_resource_map(uint64_t type) {
-    const uint32_t idx = MAP_GET(uint32_t, &_G.type_map, type, UINT32_MAX);
+static Map<resource_item_t> *_get_resource_map(uint64_t type) {
+    const uint32_t idx = map::get(_G.type_map, type, UINT32_MAX);
 
     if (idx == UINT32_MAX) {
         return NULL;
     }
 
-    return &ARRAY_AT(&_G.resource_data, idx);
+    return &_G.resource_data[idx];
 }
 
 void *package_resource_loader(struct vio *input,
@@ -149,9 +146,8 @@ static const resource_callbacks_t package_resource_callback = {
         .reloader = package_resource_reloader
 };
 
-extern int package_init(struct api_v0 *api);
-
-extern void package_shutdown();
+extern "C" int package_init(struct api_v0 *api);
+extern "C" void package_shutdown();
 
 void resource_register_type(uint64_t type,
                             resource_callbacks_t callbacks);
@@ -197,7 +193,6 @@ static void _init_api(struct api_v0 *api) {
     api->register_api("package_api_v0", &package_api);
 }
 
-
 static void _init(struct api_v0 *api) {
     GET_API(api, cnsole_srv_api_v0);
     GET_API(api, memory_api_v0);
@@ -209,14 +204,9 @@ static void _init(struct api_v0 *api) {
     GET_API(api, log_api_v0);
     GET_API(api, hash_api_v0);
 
-    ARRAY_INIT(resource_data, &_G.resource_data,
-               memory_api_v0.main_allocator());
-    ARRAY_INIT(resource_callbacks_t, &_G.resource_callbacks,
-               memory_api_v0.main_allocator());
-    MAP_INIT(uint32_t, &_G.type_map, memory_api_v0.main_allocator());
-
-//    _G.config.build_dir = config_api_v0.find("build");
-
+    _G.type_map.init(memory_api_v0.main_allocator());
+    _G.resource_data.init(memory_api_v0.main_allocator());
+    _G.resource_callbacks.init(memory_api_v0.main_allocator());
 
     char build_dir_full[4096] = {0};
     path_v0.path_join(build_dir_full,
@@ -249,15 +239,13 @@ static void _init_cvar(struct config_api_v0 config) {
 }
 
 static void _shutdown() {
-    for (int i = 0; i < ARRAY_SIZE(&_G.resource_data); ++i) {
-        MAP_DESTROY(resource_item_t, &ARRAY_AT(&_G.resource_data, i));
+    for (int i = 0; i < array::size(_G.resource_data); ++i) {
+        _G.resource_data[i].destroy();
     }
 
-    ARRAY_DESTROY(resource_data, &_G.resource_data);
-    ARRAY_DESTROY(resource_callbacks_t, &_G.resource_callbacks);
-    MAP_DESTROY(uint32_t, &_G.type_map);
-
     package_shutdown();
+
+    _G = (struct G) {0};
 }
 
 
@@ -282,40 +270,40 @@ void resource_set_autoload(int enable) {
 void resource_register_type(uint64_t type,
                             resource_callbacks_t callbacks) {
 
-    const uint32_t idx = ARRAY_SIZE(&_G.resource_data);
+    const uint32_t idx = array::size(_G.resource_data);
 
-    ARRAY_PUSH_BACK(resource_data, &_G.resource_data,
-                    (MAP_T(resource_item_t)) {0});
-    ARRAY_PUSH_BACK(resource_callbacks_t, &_G.resource_callbacks, callbacks);
 
-    MAP_INIT(resource_item_t, &ARRAY_AT(&_G.resource_data, idx),
-             memory_api_v0.main_allocator());
+    array::push_back(_G.resource_data, Map<resource_item_t>());
+    array::push_back(_G.resource_callbacks, callbacks);
 
-    MAP_SET(uint32_t, &_G.type_map, type, idx);
+    _G.resource_data[idx].init(memory_api_v0.main_allocator());
+
+    map::set(_G.type_map, type, idx);
 }
 
 void resource_add_loaded(uint64_t type,
                          uint64_t *names,
                          void **resource_data,
                          size_t count) {
-    const uint32_t idx = MAP_GET(uint32_t, &_G.type_map, type, UINT32_MAX);
+    const uint32_t idx = map::get(_G.type_map, type, UINT32_MAX);
 
     if (idx == UINT32_MAX) {
         return;
     }
 
-    MAP_T(resource_item_t) *resource_map = &ARRAY_AT(&_G.resource_data, idx);
+    Map<resource_item_t> *resource_map = &_G.resource_data[idx];
 
     resource_item_t item = {.ref_count=1};
     for (size_t i = 0; i < count; i++) {
         item.data = resource_data[i];
-        MAP_SET(resource_item_t, resource_map, names[i], item);
+        map::set(*resource_map, names[i], item);
 
         if (resource_data[i] == 0) {
             continue;
         }
-        ARRAY_AT(&_G.resource_callbacks, idx).online(names[i],
-                                                     resource_data[i]);
+
+        _G.resource_callbacks[idx].online(names[i],
+                                          resource_data[i]);
     }
 }
 
@@ -336,26 +324,26 @@ void resource_load_now(uint64_t type,
 
 int resource_can_get(uint64_t type,
                      uint64_t names) {
-    MAP_T(resource_item_t) *resource_map = _get_resource_map(type);
+    Map<resource_item_t> *resource_map = _get_resource_map(type);
 
     if (resource_map == NULL) {
         return 1;
     }
 
-    return MAP_HAS(resource_item_t, resource_map, names);
+    return map::has(*resource_map, names);
 }
 
 int resource_can_get_all(uint64_t type,
                          uint64_t *names,
                          size_t count) {
-    MAP_T(resource_item_t) *resource_map = _get_resource_map(type);
+    Map<resource_item_t> *resource_map = _get_resource_map(type);
 
     if (resource_map == NULL) {
         return 1;
     }
 
     for (size_t i = 0; i < count; ++i) {
-        if (!MAP_HAS(resource_item_t, resource_map, names[i])) {
+        if (!map::has(*resource_map, names[i])) {
             return 0;
         }
     }
@@ -368,7 +356,7 @@ void resource_load(void **loaded_data,
                    uint64_t *names,
                    size_t count,
                    int force) {
-    const uint32_t idx = MAP_GET(uint32_t, &_G.type_map, type, UINT32_MAX);
+    const uint32_t idx = map::get(_G.type_map, type, UINT32_MAX);
 
     if (idx == UINT32_MAX) {
         log_api_v0.log_error(LOG_WHERE,
@@ -379,18 +367,17 @@ void resource_load(void **loaded_data,
 
     const uint64_t root_name = hash_api_v0.id64_from_str("build");
 
-    MAP_T(resource_item_t) *resource_map = &ARRAY_AT(&_G.resource_data, idx);
+    Map<resource_item_t> *resource_map = &_G.resource_data[idx];
 
-    resource_callbacks_t type_clb = ARRAY_AT(&_G.resource_callbacks, idx);
+    resource_callbacks_t type_clb = _G.resource_callbacks[idx];
 
 
     for (int i = 0; i < count; ++i) {
-        resource_item_t item = MAP_GET(resource_item_t, resource_map,
-                                       names[i], null_item);
+        resource_item_t item = map::get(*resource_map,names[i], null_item);
 
         if (!force && (item.ref_count > 0)) {
             ++item.ref_count;
-            MAP_SET(resource_item_t, resource_map, names[i], item);
+            map::set(*resource_map, names[i], item);
             loaded_data[i] = 0;
             continue;
         }
@@ -431,19 +418,18 @@ void resource_load(void **loaded_data,
 void resource_unload(uint64_t type,
                      uint64_t *names,
                      size_t count) {
-    const uint32_t idx = MAP_GET(uint32_t, &_G.type_map, type, UINT32_MAX);
+    const uint32_t idx = map::get(_G.type_map, type, UINT32_MAX);
 
     if (idx == UINT32_MAX) {
         return;
     }
 
-    MAP_T(resource_item_t) *resource_map = _get_resource_map(type);
+    Map<resource_item_t> *resource_map = _get_resource_map(type);
 
-    resource_callbacks_t type_clb = ARRAY_AT(&_G.resource_callbacks, idx);
+    resource_callbacks_t type_clb = _G.resource_callbacks[idx];
 
     for (int i = 0; i < count; ++i) {
-        resource_item_t item = MAP_GET(resource_item_t, resource_map,
-                                       names[i], null_item);
+        resource_item_t item = map::get(*resource_map, names[i], null_item);
 
         if (item.ref_count == 0) {
             continue;
@@ -468,19 +454,19 @@ void resource_unload(uint64_t type,
             type_clb.offline(names[i], item.data);
             type_clb.unloader(item.data, memory_api_v0.main_allocator());
 
-            MAP_REMOVE(resource_item_t, resource_map, names[i]);
+            map::remove(*resource_map, names[i]);
         }
 
-        MAP_SET(resource_item_t, resource_map, names[i], item);
+        map::set(*resource_map, names[i], item);
     }
 }
 
 void *resource_get(uint64_t type,
                    uint64_t names) {
-    MAP_T(resource_item_t) *resource_map = _get_resource_map(type);
 
-    resource_item_t item = MAP_GET(resource_item_t, resource_map, names,
-                                   null_item);
+    Map<resource_item_t> *resource_map = _get_resource_map(type);
+
+    resource_item_t item = map::get(*resource_map, names, null_item);
     if (is_item_null(item)) {
         char build_name[33] = {0};
         resource_type_name_string(build_name, CETECH_ARRAY_LEN(build_name),
@@ -499,7 +485,7 @@ void *resource_get(uint64_t type,
             log_api_v0.log_warning(LOG_WHERE, "Autoloading resource %s",
                                    filename);
             resource_load_now(type, &names, 1);
-            item = MAP_GET(resource_item_t, resource_map, names, null_item);
+            item = map::get(*resource_map, names, null_item);
         } else {
             // TODO: fallback resource #205
             CETECH_ASSERT(LOG_WHERE, false);
@@ -515,10 +501,11 @@ void resource_reload(uint64_t type,
     module_reload_all();
 
     void *loaded_data[count];
-    MAP_T(resource_item_t) *resource_map = _get_resource_map(type);
-    const uint32_t idx = MAP_GET(uint32_t, &_G.type_map, type, 0);
+    Map<resource_item_t> *resource_map = _get_resource_map(type);
 
-    resource_callbacks_t type_clb = ARRAY_AT(&_G.resource_callbacks, idx);
+    const uint32_t idx = map::get<uint32_t>(_G.type_map, type, 0);
+
+    resource_callbacks_t type_clb = _G.resource_callbacks[idx];
 
     resource_load(loaded_data, type, names, count, 1);
     for (int i = 0; i < count; ++i) {
@@ -541,49 +528,44 @@ void resource_reload(uint64_t type,
         void *new_data = type_clb.reloader(names[i], old_data, loaded_data[i],
                                            memory_api_v0.main_allocator());
 
-        resource_item_t item = MAP_GET(resource_item_t, resource_map,
-                                       names[i], null_item);
+        resource_item_t item = map::get(*resource_map, names[i], null_item);
+
         item.data = new_data;
         //--item.ref_count; // Load call increase item.ref_count, because is loaded
-        MAP_SET(resource_item_t, resource_map, names[i], item);
+        map::set(*resource_map, names[i], item);
     }
 }
 
 void resource_reload_all() {
-    const MAP_ENTRY_T(uint32_t) *type_it = MAP_BEGIN(uint32_t, &_G.type_map);
-    const MAP_ENTRY_T(uint32_t) *type_end = MAP_END(uint32_t, &_G.type_map);
+    const Map<uint32_t>::Entry *type_it = map::begin(_G.type_map);
+    const Map<uint32_t>::Entry *type_end = map::end(_G.type_map);
 
-    ARRAY_T(uint64_t) name_array = {0};
-    ARRAY_INIT(uint64_t, &name_array, memory_api_v0.main_allocator());
+    Array<uint64_t> name_array(memory_api_v0.main_allocator());
 
     while (type_it != type_end) {
         uint64_t type_id = type_it->key;
 
-        MAP_T(resource_item_t) *resource_map = _get_resource_map(type_id);
+        Map<resource_item_t> *resource_map = _get_resource_map(type_id);
 
-        const MAP_ENTRY_T(resource_item_t) *name_it = MAP_BEGIN(resource_item_t,
-                                                                resource_map);
-        const MAP_ENTRY_T(resource_item_t) *name_end = MAP_END(resource_item_t,
-                                                               resource_map);
+        const Map<resource_item_t>::Entry *name_it = map::begin(*resource_map);
+        const Map<resource_item_t>::Entry *name_end = map::end(*resource_map);
 
-        ARRAY_RESIZE(uint64_t, &name_array, 0);
+        array::resize(name_array, 0);
         while (name_it != name_end) {
             uint64_t name_id = name_it->key;
 
-            ARRAY_PUSH_BACK(uint64_t, &name_array, name_id);
+            array::push_back(name_array, name_id);
 
             ++name_it;
         }
 
-        resource_reload(type_id, &ARRAY_AT(&name_array, 0),
-                        ARRAY_SIZE(&name_array));
+        resource_reload(type_id, &name_array[0], array::size(name_array));
 
         ++type_it;
     }
-
-    ARRAY_DESTROY(uint64_t, &name_array);
 }
 
+extern "C" {
 void *resourcesystem_get_module_api(int api) {
     switch (api) {
         case PLUGIN_EXPORT_API_ID: {
@@ -602,4 +584,5 @@ void *resourcesystem_get_module_api(int api) {
             return NULL;
     }
 
+}
 }

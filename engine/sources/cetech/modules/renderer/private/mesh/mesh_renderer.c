@@ -3,7 +3,7 @@
 #include <cetech/core/container/map.inl>
 #include <cetech/core/hash.h>
 #include <cetech/core/config.h>
-#include <cetech/modules/resource/resource.h>
+#include <cetech/core/resource/resource.h>
 
 #include <cetech/modules/world/world.h>
 #include <cetech/modules/entity/entity.h>

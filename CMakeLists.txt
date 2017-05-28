@@ -110,16 +110,16 @@ set(SOURCE_FILES
         engine/sources/cetech/modules/luasys/private/api/api_level.c
         engine/sources/cetech/modules/luasys/private/api/api_scenegraph.c
 
-        engine/sources/cetech/modules/console_server/private/console_server.c
-        engine/sources/cetech/modules/develop_system/private/develop_system.c
+        engine/sources/cetech/core/develop_system/private/console_server.c
+        engine/sources/cetech/core/develop_system/private/develop_system.c
 
         engine/sources/cetech/core/private/app/_app.c
-        engine/sources/cetech/modules/task/private/task.c
+        engine/sources/cetech/core/task/private/task.c
 
-        engine/sources/cetech/modules/resource/private/resource.c
-        engine/sources/cetech/modules/resource/private/resource_package.c
-        engine/sources/cetech/modules/resource/private/resource_compiler.c
-        engine/sources/cetech/modules/filesystem/private/filesystem.c
+        engine/sources/cetech/core/resource/private/resource.cpp
+        engine/sources/cetech/core/resource/private/resource_package.c
+        engine/sources/cetech/core/resource/private/resource_compiler.c
+        engine/sources/cetech/core/filesystem/private/filesystem.c
         engine/sources/cetech/modules/component/private/component.c
         engine/sources/cetech/modules/entity/private/entity.c
         engine/sources/cetech/modules/world/private/world.c

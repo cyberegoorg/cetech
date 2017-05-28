@@ -4,7 +4,7 @@
 #include <cetech/core/math/mat44f.inl>
 
 #include <cetech/core/config.h>
-#include <cetech/modules/resource/resource.h>
+#include <cetech/core/resource/resource.h>
 
 #include <cetech/modules/entity/entity.h>
 #include "../scenegraph.h"

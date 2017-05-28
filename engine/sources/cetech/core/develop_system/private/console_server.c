@@ -5,7 +5,7 @@
 #include <stdio.h>
 #include <include/mpack/mpack.h>
 #include <cetech/core/config.h>
-#include <cetech/modules/resource/resource.h>
+#include <cetech/core/resource/resource.h>
 #include <cetech/core/module.h>
 
 #include "include/nanomsg/nn.h"
@@ -13,7 +13,7 @@
 #include "include/nanomsg/pubsub.h"
 #include "include/nanomsg/pipeline.h"
 
-#include <cetech/modules/develop_system/develop.h>
+#include <cetech/core/develop_system/develop.h>
 #include <cetech/core/api.h>
 
 //==============================================================================

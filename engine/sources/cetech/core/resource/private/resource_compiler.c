@@ -9,10 +9,10 @@
 
 #include <cetech/core/os/path.h>
 #include <cetech/core/hash.h>
-#include <cetech/modules/task/task.h>
+#include <cetech/core/task/task.h>
 #include <cetech/core/application.h>
 #include <cetech/core/config.h>
-#include <cetech/modules/resource/resource.h>
+#include <cetech/core/resource/resource.h>
 #include <cetech/core/memory/memory.h>
 #include <cetech/core/module.h>
 #include <cetech/core/api.h>

@@ -15,7 +15,7 @@
 #include <cetech/core/api.h>
 #include <cetech/core/os/path.h>
 
-#include <cetech/modules/resource/resource.h>
+#include <cetech/core/resource/resource.h>
 
 #include "../../renderer.h"
 #include "../texture/texture.h"
