@@ -4,6 +4,10 @@
 #ifndef CETECH_GAMEPAD_H
 #define CETECH_GAMEPAD_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 //==============================================================================
 // Includes
 //==============================================================================
@@ -162,6 +166,9 @@ struct mouse_api_v0 {
                     const uint32_t axis_index);
 };
 
+#ifdef __cplusplus
+}
+#endif
 
 #endif //CETECH_GAMEPAD_H
 //! \}

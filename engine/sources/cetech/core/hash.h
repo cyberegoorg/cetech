@@ -1,6 +1,10 @@
 #ifndef CETECH_HASH_H
 #define CETECH_HASH_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 //==============================================================================
 // Include
 //==============================================================================
@@ -22,5 +26,9 @@ struct hash_api_v0 {
 
     uint64_t (*id64_from_str)(const char *str);
 };
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif //CETECH_HASH_H

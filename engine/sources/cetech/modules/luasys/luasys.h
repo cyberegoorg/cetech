@@ -4,6 +4,10 @@
 #ifndef CETECH_LUA_TYPES_H
 #define CETECH_LUA_TYPES_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 //==============================================================================
 // Includes
 //==============================================================================
@@ -384,6 +388,9 @@ void luasys_call_global(const char *func,
                         const char *args,
                         ...);
 
+#ifdef __cplusplus
+}
+#endif
 
 #endif //CETECH_LUA_TYPES_H
 //! \}

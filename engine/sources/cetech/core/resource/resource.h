@@ -4,6 +4,10 @@
 #ifndef CETECH_RESOURCE_TYPES_H
 #define CETECH_RESOURCE_TYPES_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 //==============================================================================
 // Includes
 //==============================================================================
@@ -283,6 +287,10 @@ struct package_api_v0 {
     //! \param name Package name
     void (*flush)(uint64_t name);
 };
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif //CETECH_RESOURCE_TYPES_H
 //! |}

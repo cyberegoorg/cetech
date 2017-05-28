@@ -5,6 +5,10 @@
 #ifndef CETECH_TASKMANAGER_H
 #define CETECH_TASKMANAGER_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 //==============================================================================
 // Includes
 //==============================================================================
@@ -108,5 +112,9 @@ struct task_api_v0 {
 };
 
 #endif //CETECH_TASKMANAGER_H
+
+#ifdef __cplusplus
+}
+#endif
 
 //! \}

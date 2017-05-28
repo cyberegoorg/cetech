@@ -4,6 +4,10 @@
 #ifndef CETECH_CONSOLE_SERVER_API_H
 #define CETECH_CONSOLE_SERVER_API_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 //==============================================================================
 // Includes
 //==============================================================================
@@ -122,6 +126,10 @@ struct develop_api_v0 {
     //! \param scope_data Scope data
     void (*leave_scope)(struct scope_data scope_data);
 };
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif //CETECH_CONSOLE_SERVER_API_H
 // \}

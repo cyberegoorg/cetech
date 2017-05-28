@@ -1,6 +1,9 @@
 #ifndef CETECH_YAML_H
 #define CETECH_YAML_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 //==============================================================================
 // Includes
@@ -125,5 +128,9 @@ int yaml_as_string(yaml_node_t node,
 
 #undef YAML_NODE_AS_DEF
 #undef YAML_NODE_AS_DEFN
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif //CETECH_YAML_H

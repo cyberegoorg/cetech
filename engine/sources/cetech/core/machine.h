@@ -1,6 +1,10 @@
 #ifndef CETECH_MACHINE_H
 #define CETECH_MACHINE_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 //==============================================================================
 // Includes
 //==============================================================================
@@ -432,5 +436,9 @@ struct machine_api_v0 {
                                 float strength,
                                 uint32_t length);
 };
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif //CETECH_MACHINE_H
