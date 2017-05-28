@@ -11,7 +11,7 @@
 #include "include/mpack/mpack.h"
 
 #include <cetech/core/types.h>
-#include <cetech/core/eventstream.inl>
+#include <cetech/core/container/eventstream.inl>
 
 
 //==============================================================================

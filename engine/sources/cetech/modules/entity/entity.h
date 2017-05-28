@@ -9,10 +9,9 @@
 // Includes
 //==============================================================================
 
-#include <cetech/core/array.inl>
+#include <cetech/core/container/array.inl>
 
 typedef struct yaml_node_s yaml_node_t;
-typedef struct stringid64_s stringid64_t;
 typedef struct world_s world_t;
 
 struct entity_compile_output;
@@ -60,7 +59,7 @@ struct entity_api_v0 {
     //! \param name Resource name
     //! \return New entity
     entity_t (*spawn)(world_t world,
-                      stringid64_t name);
+                      uint64_t name);
 
     //! Destroy entities
     //! \param world World

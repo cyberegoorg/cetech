@@ -2,19 +2,18 @@
 // includes
 //==============================================================================
 
-#include <cetech/core/math_types.h>
-#include <cetech/core/allocator.h>
+#include <cetech/core/math/math_types.h>
+#include <cetech/core/memory/allocator.h>
 
 #include <cetech/modules/camera/camera.h>
 #include "../renderer.h"
 #include <cetech/modules/develop_system/develop.h>
-#include <cetech/kernel/hash.h>
-#include <cetech/kernel/application.h>
-#include <cetech/kernel/config.h>
-#include <cetech/kernel/module.h>
+#include <cetech/core/application.h>
+#include <cetech/core/config.h>
+#include <cetech/core/module.h>
 #include <cetech/modules/world/world.h>
-#include <cetech/kernel/window.h>
-#include <cetech/kernel/api.h>
+#include <cetech/core/os/window.h>
+#include <cetech/core/api.h>
 
 #include "bgfx/c99/platform.h"
 #include "texture/texture.h"
@@ -36,7 +35,7 @@ IMPORT_API(window_api_v0);
 
 #define _G RendererGlobals
 static struct G {
-    stringid64_t type;
+    uint64_t type;
     uint32_t size_width;
     uint32_t size_height;
     int capture;
@@ -45,7 +44,7 @@ static struct G {
 } _G = {0};
 
 
-int material_init( struct api_v0 *api);
+int material_init(struct api_v0 *api);
 
 void material_shutdown();
 
@@ -73,7 +72,6 @@ static int _cmd_resize(mpack_node_t args,
 
     return 0;
 }
-
 
 
 void renderer_create(window_t window) {
@@ -136,7 +134,7 @@ vec2f_t renderer_get_size() {
     return result;
 }
 
-static void _init_api(struct api_v0* api){
+static void _init_api(struct api_v0 *api) {
     static struct renderer_api_v0 rendderer_api = {0};
 
     rendderer_api.create = renderer_create;
@@ -160,13 +158,13 @@ static void _init_api(struct api_v0* api){
 }
 
 
-static void _init( struct api_v0* api) {
-    USE_API(api, cnsole_srv_api_v0);
-    USE_API(api, mesh_renderer_api_v0);
-    USE_API(api, camera_api_v0);
-    USE_API(api, config_api_v0);
-    USE_API(api, app_api_v0);
-    USE_API(api, window_api_v0);
+static void _init(struct api_v0 *api) {
+    GET_API(api, cnsole_srv_api_v0);
+    GET_API(api, mesh_renderer_api_v0);
+    GET_API(api, camera_api_v0);
+    GET_API(api, config_api_v0);
+    GET_API(api, app_api_v0);
+    GET_API(api, window_api_v0);
 
     _G = (struct G) {0};
 
@@ -209,7 +207,6 @@ void *renderer_get_module_api(int api) {
 
             return &module;
         }
-
 
 
         default:

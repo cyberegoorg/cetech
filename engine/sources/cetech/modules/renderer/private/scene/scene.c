@@ -4,16 +4,18 @@
 
 #include <bgfx/c99/bgfx.h>
 
-#include <cetech/core/allocator.h>
-#include <cetech/kernel/hash.h>
-#include <cetech/kernel/memory.h>
-#include <cetech/kernel/module.h>
-#include <cetech/core/map.inl>
+#include <cetech/core/memory/allocator.h>
+#include <cetech/core/container/map.inl>
 
+#include <cetech/core/hash.h>
+#include <cetech/core/memory/memory.h>
+#include <cetech/core/module.h>
+#include <cetech/core/api.h>
+#include <cetech/core/os/path.h>
+#include <cetech/core/os/vio.h>
 #include <cetech/modules/resource/resource.h>
 #include <cetech/modules/entity/entity.h>
 #include <cetech/modules/world/world.h>
-#include <cetech/kernel/api.h>
 
 #include "../../../scenegraph/scenegraph.h"
 
@@ -26,6 +28,9 @@
 IMPORT_API(memory_api_v0);
 IMPORT_API(resource_api_v0);
 IMPORT_API(scenegprah_api_v0);
+IMPORT_API(path_v0);
+IMPORT_API(vio_api_v0);
+IMPORT_API(hash_api_v0);
 
 ARRAY_PROTOTYPE(bgfx_texture_handle_t)
 
@@ -68,13 +73,13 @@ MAP_PROTOTYPE_N(struct scene_instance, scene_instance);
 
 #define _G SceneResourceGlobals
 static struct G {
-    stringid64_t type;
+    uint64_t type;
     MAP_T(scene_instance) scene_instance;
 } _G = {0};
 
 
-struct scene_instance *_get_scene_instance(stringid64_t scene) {
-    return MAP_GET_PTR(scene_instance, &_G.scene_instance, scene.id);
+struct scene_instance *_get_scene_instance(uint64_t scene) {
+    return MAP_GET_PTR(scene_instance, &_G.scene_instance, scene);
 }
 
 //==============================================================================
@@ -98,12 +103,15 @@ struct scene_instance *_get_scene_instance(stringid64_t scene) {
 int scene_init(struct api_v0 *api) {
     _G = (struct G) {0};
 
-    USE_API(api, memory_api_v0);
-    USE_API(api, resource_api_v0);
-    USE_API(api, scenegprah_api_v0);
+    GET_API(api, memory_api_v0);
+    GET_API(api, resource_api_v0);
+    GET_API(api, scenegprah_api_v0);
+    GET_API(api, path_v0);
+    GET_API(api, vio_api_v0);
+    GET_API(api, hash_api_v0);
 
 
-    _G.type = stringid64_from_string("scene");
+    _G.type = hash_api_v0.id64_from_str("scene");
 
     MAP_INIT(scene_instance, &_G.scene_instance,
              memory_api_v0.main_allocator());
@@ -122,8 +130,8 @@ void scene_shutdown() {
     _G = (struct G) {0};
 }
 
-void scene_submit(stringid64_t scene,
-                  stringid64_t geom_name) {
+void scene_submit(uint64_t scene,
+                  uint64_t geom_name) {
     resource_api_v0.get(_G.type, scene);
     struct scene_instance *instance = _get_scene_instance(scene);
 
@@ -131,7 +139,7 @@ void scene_submit(stringid64_t scene,
         return;
     }
 
-    uint8_t idx = MAP_GET(uint8_t, &instance->geom_map, geom_name.id,
+    uint8_t idx = MAP_GET(uint8_t, &instance->geom_map, geom_name,
                           UINT8_MAX);
 
     if (idx == UINT8_MAX) {
@@ -144,10 +152,10 @@ void scene_submit(stringid64_t scene,
 
 void scene_create_graph(world_t world,
                         entity_t entity,
-                        stringid64_t scene) {
+                        uint64_t scene) {
     struct scene_blob *res = resource_api_v0.get(_G.type, scene);
 
-    stringid64_t *node_name = scene_blob_node_name(res);
+    uint64_t *node_name = scene_blob_node_name(res);
     uint32_t *node_parent = scene_blob_node_parent(res);
     mat44f_t *node_pose = scene_blob_node_pose(res);
 
@@ -155,20 +163,20 @@ void scene_create_graph(world_t world,
                              res->node_count);
 }
 
-stringid64_t scene_get_mesh_node(stringid64_t scene,
-                                 stringid64_t mesh) {
+uint64_t scene_get_mesh_node(uint64_t scene,
+                             uint64_t mesh) {
     struct scene_blob *res = resource_api_v0.get(_G.type, scene);
 
-    stringid64_t *geom_node = scene_blob_geom_node(res);
-    stringid64_t *geom_name = scene_blob_geom_name(res);
+    uint64_t *geom_node = scene_blob_geom_node(res);
+    uint64_t *geom_name = scene_blob_geom_name(res);
 
     for (int i = 0; i < res->geom_count; ++i) {
-        if (geom_name[i].id != mesh.id) {
+        if (geom_name[i] != mesh) {
             continue;
         }
 
         return geom_node[i];
     }
 
-    return (stringid64_t) {0};
+    return (uint64_t) {0};
 }

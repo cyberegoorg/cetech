@@ -1,7 +1,7 @@
 
 #include "../../../transform/transform.h"
-#include <cetech/core/vec3f.inl>
-#include <cetech/kernel/module.h>
+#include <cetech/core/math/vec3f.inl>
+#include <cetech/core/module.h>
 
 #include <cetech/modules/luasys/luasys.h>
 
@@ -86,7 +86,7 @@ static int _dot(lua_State *l) {
     return 1;
 }
 
-void _register_lua_vec3f_api( struct api_v0* api) {
+void _register_lua_vec3f_api(struct api_v0 *api) {
     luasys_add_module_function(API_NAME, "make", _ctor);
 
     luasys_add_module_function(API_NAME, "unit_x", _unit_x);

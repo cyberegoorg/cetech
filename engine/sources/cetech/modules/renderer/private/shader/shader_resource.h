@@ -2,16 +2,16 @@
 #define CETECH_SHADER_RESOURCE_H
 
 
-#include <cetech/kernel/fs.h>
+#include <cetech/core/os/path.h>
 
 static const bgfx_program_handle_t null_program = {0};
 
 
 void *_shader_resource_loader(struct vio *input,
                               struct allocator *allocator) {
-    const int64_t size = vio_size(input);
+    const int64_t size = vio_api_v0.size(input);
     char *data = CETECH_ALLOCATE(allocator, char, size);
-    vio_read(input, data, 1, size);
+    vio_api_v0.read(input, data, 1, size);
 
     return data;
 }
@@ -21,7 +21,7 @@ void _shader_resource_unloader(void *new_data,
     CETECH_DEALLOCATE(allocator, new_data);
 }
 
-void _shader_resource_online(stringid64_t name,
+void _shader_resource_online(uint64_t name,
                              void *data) {
     struct shader *resource = data;
 
@@ -30,7 +30,7 @@ void _shader_resource_online(stringid64_t name,
 
     memcpy(vs_mem->data, (resource + 1), resource->vs_size);
     memcpy(fs_mem->data, ((char *) (resource + 1)) + resource->vs_size,
-                resource->fs_size);
+           resource->fs_size);
 
     bgfx_shader_handle_t vs_shader = bgfx_create_shader(vs_mem);
     bgfx_shader_handle_t fs_shader = bgfx_create_shader(fs_mem);
@@ -38,14 +38,14 @@ void _shader_resource_online(stringid64_t name,
     bgfx_program_handle_t program = bgfx_create_program(vs_shader, fs_shader,
                                                         1);
 
-    MAP_SET(bgfx_program_handle_t, &_G.handler_map, name.id, program);
+    MAP_SET(bgfx_program_handle_t, &_G.handler_map, name, program);
 }
 
-void _shader_resource_offline(stringid64_t name,
+void _shader_resource_offline(uint64_t name,
                               void *data) {
 
     bgfx_program_handle_t program = MAP_GET(bgfx_program_handle_t,
-                                            &_G.handler_map, name.id,
+                                            &_G.handler_map, name,
                                             null_program);
 
     if (program.idx == null_program.idx) {
@@ -54,10 +54,10 @@ void _shader_resource_offline(stringid64_t name,
 
     bgfx_destroy_program(program);
 
-    MAP_REMOVE(bgfx_program_handle_t, &_G.handler_map, name.id);
+    MAP_REMOVE(bgfx_program_handle_t, &_G.handler_map, name);
 }
 
-void *_shader_resource_reloader(stringid64_t name,
+void *_shader_resource_reloader(uint64_t name,
                                 void *old_data,
                                 void *new_data,
                                 struct allocator *allocator) {

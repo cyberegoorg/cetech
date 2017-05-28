@@ -2,29 +2,30 @@
 // Includes
 //==============================================================================
 
-#include <cetech/core/allocator.h>
+#include <cetech/core/memory/allocator.h>
 #include <cetech/modules/world/world.h>
-#include <cetech/kernel/config.h>
+#include <cetech/core/config.h>
 #include <cetech/modules/resource/resource.h>
-
+#include <cetech/core/os/vio.h>
 #include <cetech/modules/entity/entity.h>
 #include <cetech/modules/transform/transform.h>
-#include <cetech/core/quatf.inl>
-#include <cetech/kernel/memory.h>
-#include <cetech/kernel/module.h>
+#include <cetech/core/math/quatf.inl>
+#include <cetech/core/memory/memory.h>
+#include <cetech/core/module.h>
 
 #include "../level.h"
-#include <cetech/core/map.inl>
-#include <cetech/kernel/yaml.h>
+#include <cetech/core/container/map.inl>
+#include <cetech/core/yaml.h>
 #include "level_blob.h"
-#include <cetech/kernel/fs.h>
-#include <cetech/kernel/hash.h>
-#include <cetech/kernel/api.h>
+#include <cetech/core/hash.h>
+#include <cetech/core/api.h>
 
 IMPORT_API(entity_api_v0);
 IMPORT_API(resource_api_v0);
 IMPORT_API(transform_api_v0);
 IMPORT_API(memory_api_v0);
+IMPORT_API(vio_api_v0);
+IMPORT_API(hash_api_v0);
 
 //==============================================================================
 // Typedefs
@@ -32,7 +33,6 @@ IMPORT_API(memory_api_v0);
 
 ARRAY_T(world_t);
 ARRAY_PROTOTYPE(world_callbacks_t);
-ARRAY_PROTOTYPE(stringid64_t);
 ARRAY_PROTOTYPE(entity_t);
 MAP_PROTOTYPE(entity_t);
 
@@ -53,7 +53,7 @@ MAP_PROTOTYPE_N(struct level_instance, level_instance);
 
 #define _G WorldGlobals
 static struct G {
-    stringid64_t level_type;
+    uint64_t level_type;
 
     ARRAY_T(level_instance) level_instance;
 } _G = {0};
@@ -93,9 +93,9 @@ struct level_instance *_level_instance(level_t level) {
 
 void *level_resource_loader(struct vio *input,
                             struct allocator *allocator) {
-    const int64_t size = vio_size(input);
+    const int64_t size = vio_api_v0.size(input);
     char *data = CETECH_ALLOCATE(allocator, char, size);
-    vio_read(input, data, 1, size);
+    vio_api_v0.read(input, data, 1, size);
 
     return data;
 }
@@ -105,15 +105,15 @@ void level_resource_unloader(void *new_data,
     CETECH_DEALLOCATE(allocator, new_data);
 }
 
-void level_resource_online(stringid64_t name,
+void level_resource_online(uint64_t name,
                            void *data) {
 }
 
-void level_resource_offline(stringid64_t name,
+void level_resource_offline(uint64_t name,
                             void *data) {
 }
 
-void *level_resource_reloader(stringid64_t name,
+void *level_resource_reloader(uint64_t name,
                               void *old_data,
                               void *new_data,
                               struct allocator *allocator) {
@@ -137,7 +137,7 @@ static const resource_callbacks_t _level_resource_defs = {
 struct foreach_entities_data {
     const char *filename;
     struct compilator_api *capi;
-    ARRAY_T(stringid64_t) *id;
+    ARRAY_T(uint64_t) *id;
     ARRAY_T(uint32_t) *offset;
     ARRAY_T(uint8_t) *data;
     struct entity_compile_output *output;
@@ -150,7 +150,7 @@ void forach_entities_clb(yaml_node_t key,
 
     char name[128] = {0};
     yaml_as_string(key, name, CETECH_ARRAY_LEN(name));
-    ARRAY_PUSH_BACK(stringid64_t, data->id, stringid64_from_string(name));
+    ARRAY_PUSH_BACK(uint64_t, data->id, hash_api_v0.id64_from_str(name));
     ARRAY_PUSH_BACK(uint32_t, data->offset,
                     entity_api_v0.compiler_ent_counter(data->output));
 
@@ -163,21 +163,21 @@ int _level_resource_compiler(const char *filename,
                              struct vio *build_vio,
                              struct compilator_api *compilator_api) {
 
-    char source_data[vio_size(source_vio) + 1];
-    memset(source_data, 0, vio_size(source_vio) + 1);
-    vio_read(source_vio, source_data, sizeof(char),
-             vio_size(source_vio));
+    char source_data[vio_api_v0.size(source_vio) + 1];
+    memset(source_data, 0, vio_api_v0.size(source_vio) + 1);
+    vio_api_v0.read(source_vio, source_data, sizeof(char),
+                    vio_api_v0.size(source_vio));
 
     yaml_document_t h;
     yaml_node_t root = yaml_load_str(source_data, &h);
 
     yaml_node_t entities = yaml_get_node(root, "entities");
 
-    ARRAY_T(stringid64_t) id;
+    ARRAY_T(uint64_t) id;
     ARRAY_T(uint32_t) offset;
     ARRAY_T(uint8_t) data;
 
-    ARRAY_INIT(stringid64_t, &id, memory_api_v0.main_allocator());
+    ARRAY_INIT(uint64_t, &id, memory_api_v0.main_allocator());
     ARRAY_INIT(uint32_t, &offset, memory_api_v0.main_allocator());
     ARRAY_INIT(uint8_t, &data, memory_api_v0.main_allocator());
 
@@ -201,15 +201,15 @@ int _level_resource_compiler(const char *filename,
 
     entity_api_v0.compiler_write_to_build(output, entity_data.data);
 
-    vio_write(build_vio, &res, sizeof(struct level_blob), 1);
-    vio_write(build_vio, &ARRAY_AT(&id, 0), sizeof(stringid64_t),
-              ARRAY_SIZE(&id));
-    vio_write(build_vio, &ARRAY_AT(&offset, 0), sizeof(uint32_t),
-              ARRAY_SIZE(&offset));
-    vio_write(build_vio, &ARRAY_AT(&data, 0), sizeof(uint8_t),
-              ARRAY_SIZE(&data));
+    vio_api_v0.write(build_vio, &res, sizeof(struct level_blob), 1);
+    vio_api_v0.write(build_vio, &ARRAY_AT(&id, 0), sizeof(uint64_t),
+                     ARRAY_SIZE(&id));
+    vio_api_v0.write(build_vio, &ARRAY_AT(&offset, 0), sizeof(uint32_t),
+                     ARRAY_SIZE(&offset));
+    vio_api_v0.write(build_vio, &ARRAY_AT(&data, 0), sizeof(uint8_t),
+                     ARRAY_SIZE(&data));
 
-    ARRAY_DESTROY(stringid64_t, &id);
+    ARRAY_DESTROY(uint64_t, &id);
     ARRAY_DESTROY(uint32_t, &offset);
     ARRAY_DESTROY(uint8_t, &data);
 
@@ -227,10 +227,10 @@ int _level_resource_compiler(const char *filename,
 
 
 level_t world_load_level(world_t world,
-                         stringid64_t name) {
+                         uint64_t name) {
     struct level_blob *res = resource_api_v0.get(_G.level_type, name);
 
-    stringid64_t *id = level_blob_names(res);
+    uint64_t *id = level_blob_names(res);
     uint32_t *offset = level_blob_offset(res);
     uint8_t *data = level_blob_data(res);
 
@@ -248,7 +248,7 @@ level_t world_load_level(world_t world,
 
     for (int i = 0; i < res->entities_count; ++i) {
         entity_t e = ARRAY_AT(spawned, offset[i]);
-        MAP_SET(entity_t, &instance->spawned_entity_map, id[i].id, e);
+        MAP_SET(entity_t, &instance->spawned_entity_map, id[i], e);
 
         if (transform_api_v0.has(world, e)) {
             transform_api_v0.link(world, level_ent, e);
@@ -267,9 +267,9 @@ void level_destroy(world_t world,
 }
 
 entity_t level_entity_by_id(level_t level,
-                            stringid64_t id) {
+                            uint64_t id) {
     struct level_instance *instance = _level_instance(level);
-    return MAP_GET(entity_t, &instance->spawned_entity_map, id.id,
+    return MAP_GET(entity_t, &instance->spawned_entity_map, id,
                    (entity_t) {0});
 }
 
@@ -278,7 +278,7 @@ entity_t level_entity(level_t level) {
     return instance->level_entity;
 }
 
-static void _init_api(struct api_v0* api){
+static void _init_api(struct api_v0 *api) {
     static struct level_api_v0 _api = {0};
 
     _api.load_level = world_load_level;
@@ -290,14 +290,16 @@ static void _init_api(struct api_v0* api){
 }
 
 
-static void _init( struct api_v0* api) {
-    USE_API(api, entity_api_v0);
-    USE_API(api, memory_api_v0);
-    USE_API(api, resource_api_v0);
-    USE_API(api, transform_api_v0);
+static void _init(struct api_v0 *api) {
+    GET_API(api, entity_api_v0);
+    GET_API(api, memory_api_v0);
+    GET_API(api, resource_api_v0);
+    GET_API(api, transform_api_v0);
+    GET_API(api, vio_api_v0);
+    GET_API(api, hash_api_v0);
 
     _G = (struct G) {0};
-    _G.level_type = stringid64_from_string("level");
+    _G.level_type = hash_api_v0.id64_from_str("level");
 
     ARRAY_INIT(level_instance, &_G.level_instance,
                memory_api_v0.main_allocator());

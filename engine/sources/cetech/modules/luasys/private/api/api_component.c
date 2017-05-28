@@ -1,21 +1,21 @@
 
-#include <cetech/core/allocator.h>
-#include <cetech/kernel/hash.h>
-#include <cetech/kernel/module.h>
+#include <cetech/core/memory/allocator.h>
+#include <cetech/core/hash.h>
+#include <cetech/core/module.h>
 
 #include <cetech/modules/world/world.h>
-#include <cetech/modules/resource/resource.h>
 #include <cetech/modules/entity/entity.h>
 #include <cetech/modules/component/component.h>
 
 #include <cetech/modules/luasys/luasys.h>
 #include <include/luajit/lua.h>
-#include <cetech/kernel/api.h>
+#include <cetech/core/api.h>
 
 #define API_NAME "Component"
 
 IMPORT_API(component_api_v0)
 IMPORT_API(lua_api_v0)
+IMPORT_API(hash_api_v0)
 
 static int _set_property(lua_State *l) {
     world_t w = {.h = luasys_to_handler(l, 1)};
@@ -23,8 +23,8 @@ static int _set_property(lua_State *l) {
     const char *type = luasys_to_string(l, 3);
     const char *key = luasys_to_string(l, 4);
 
-    stringid64_t component_type = stringid64_from_string(type);
-    stringid64_t key_id = stringid64_from_string(key);
+    uint64_t component_type = hash_api_v0.id64_from_str(type);
+    uint64_t key_id = hash_api_v0.id64_from_str(key);
 
     int val_type = luasys_value_type(l, 5);
 
@@ -90,8 +90,8 @@ static int _get_property(lua_State *l) {
     const char *type = luasys_to_string(l, 3);
     const char *key = luasys_to_string(l, 4);
 
-    stringid64_t component_type = stringid64_from_string(type);
-    stringid64_t key_id = stringid64_from_string(key);
+    uint64_t component_type = hash_api_v0.id64_from_str(type);
+    uint64_t key_id = hash_api_v0.id64_from_str(key);
 
     struct property_value value = component_api_v0.get_property(
             component_type, w, entity, key_id);
@@ -125,9 +125,10 @@ static int _get_property(lua_State *l) {
 }
 
 
-void _register_lua_component_api( struct api_v0* api) {
-    USE_API(api, component_api_v0);
-    USE_API(api, lua_api_v0);
+void _register_lua_component_api(struct api_v0 *api) {
+    GET_API(api, component_api_v0);
+    GET_API(api, lua_api_v0);
+    GET_API(api, hash_api_v0);
 
     luasys_add_module_function(API_NAME, "set_property", _set_property);
     luasys_add_module_function(API_NAME, "get_property", _get_property);

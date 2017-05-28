@@ -4,15 +4,19 @@
 
 #include <bgfx/c99/bgfx.h>
 
-#include <cetech/core/allocator.h>
-#include <cetech/kernel/hash.h>
-#include <cetech/core/map.inl>
-#include <cetech/kernel/memory.h>
-#include <cetech/kernel/application.h>
+#include <cetech/core/memory/allocator.h>
+#include <cetech/core/container/map.inl>
 
-#include <cetech/kernel/module.h>
+#include <cetech/core/hash.h>
+#include <cetech/core/memory/memory.h>
+#include <cetech/core/application.h>
+#include <cetech/core/module.h>
+#include <cetech/core/api.h>
+#include <cetech/core/os/path.h>
+#include <cetech/core/os/vio.h>
+
 #include <cetech/modules/resource/resource.h>
-#include <cetech/kernel/api.h>
+#include <cetech/core/os/process.h>
 
 
 //==============================================================================
@@ -35,13 +39,18 @@ struct texture {
 #define _G TextureResourceGlobals
 struct G {
     MAP_T(bgfx_texture_handle_t) handler_map;
-    stringid64_t type;
+    uint64_t type;
 } _G = {0};
 
 
 IMPORT_API(memory_api_v0);
 IMPORT_API(resource_api_v0);
 IMPORT_API(app_api_v0);
+IMPORT_API(path_v0);
+IMPORT_API(vio_api_v0);
+IMPORT_API(process_api_v0);
+IMPORT_API(log_api_v0);
+IMPORT_API(hash_api_v0);
 
 //==============================================================================
 // Compiler private
@@ -64,11 +73,16 @@ IMPORT_API(app_api_v0);
 int texture_init(struct api_v0 *api) {
     _G = (struct G) {0};
 
-    USE_API(api, memory_api_v0 );
-    USE_API(api, resource_api_v0 );
-    USE_API(api, app_api_v0 );
+    GET_API(api, memory_api_v0);
+    GET_API(api, resource_api_v0);
+    GET_API(api, app_api_v0);
+    GET_API(api, path_v0);
+    GET_API(api, vio_api_v0);
+    GET_API(api, process_api_v0);
+    GET_API(api, log_api_v0);
+    GET_API(api, hash_api_v0);
 
-    _G.type = stringid64_from_string("texture");
+    _G.type = hash_api_v0.id64_from_str("texture");
 
     MAP_INIT(bgfx_texture_handle_t, &_G.handler_map,
              memory_api_v0.main_allocator());
@@ -88,9 +102,9 @@ void texture_shutdown() {
     _G = (struct G) {0};
 }
 
-bgfx_texture_handle_t texture_get(stringid64_t name) {
+bgfx_texture_handle_t texture_get(uint64_t name) {
     resource_api_v0.get(_G.type, name); // TODO: only for autoload
 
-    return MAP_GET(bgfx_texture_handle_t, &_G.handler_map, name.id,
+    return MAP_GET(bgfx_texture_handle_t, &_G.handler_map, name,
                    null_texture);
 }

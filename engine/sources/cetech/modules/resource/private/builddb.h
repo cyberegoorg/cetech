@@ -27,8 +27,8 @@ static int _step(sqlite3 *db,
                 break;
 
             default:
-                CETECH_ASSERT_MSG("builddb", 0, "SQL error '%s' (%d): %s",
-                                  sqlite3_sql(stmt), rc, sqlite3_errmsg(db));
+                log_api_v0.log_error("builddb", "SQL error '%s' (%d): %s",
+                                     sqlite3_sql(stmt), rc, sqlite3_errmsg(db));
 
                 run = 0;
                 break;
@@ -74,9 +74,10 @@ static int _do_sql(const char *sql) {
     return 0;
 }
 
-static int builddb_init_db(const char *build_dir) {
-    path_join(_logdb_path, CETECH_ARRAY_LEN(_logdb_path), build_dir,
-              "build.db");
+static int builddb_init_db(const char *build_dir,
+                           struct path_v0 *path) {
+    path->path_join(_logdb_path, CETECH_ARRAY_LEN(_logdb_path), build_dir,
+                    "build.db");
 
 
     if (!_do_sql("CREATE TABLE IF NOT EXISTS files (\n"
@@ -182,7 +183,8 @@ static int builddb_get_filename_by_hash(char *filename,
 }
 
 static int builddb_need_compile(const char *source_dir,
-                                const char *filename) {
+                                const char *filename,
+                                struct path_v0 *path) {
     static const char *sql = "SELECT\n"
             "    file_dependency.depend_on, files.mtime\n"
             "FROM\n"
@@ -205,10 +207,10 @@ static int builddb_need_compile(const char *source_dir,
 
         char full_path[1024] = {0};
         const char *dep_file = (const char *) sqlite3_column_text(stmt, 0);
-        path_join(full_path, CETECH_ARRAY_LEN(full_path), source_dir,
-                  dep_file);
+        path->path_join(full_path, CETECH_ARRAY_LEN(full_path), source_dir,
+                        dep_file);
 
-        time_t actual_mtime = file_mtime(full_path);
+        time_t actual_mtime = path->file_mtime(full_path);
         time_t last_mtime = sqlite3_column_int64(stmt, 1);
 
         if (actual_mtime != last_mtime) {

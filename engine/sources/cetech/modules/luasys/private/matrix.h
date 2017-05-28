@@ -3,7 +3,7 @@
 
 #include "include/luajit/luajit.h"
 
-#include <cetech/core/mat44f.inl>
+#include <cetech/core/math/mat44f.inl>
 
 #include <cetech/modules/luasys/luasys.h>
 
@@ -50,7 +50,7 @@ static int _mat44f_index(lua_State *L) {
             return 1;
 
         default:
-            log_error("lua", "Mat44f bad index '%c'", s[0]);
+            log_api_v0.log_error("lua", "Mat44f bad index '%c'", s[0]);
             break;
     }
 
@@ -81,7 +81,7 @@ static int _mat44f_newindex(lua_State *L) {
             break;
 
         default:
-            log_error("lua", "Mat44f bad index '%c'", s[0]);
+            log_api_v0.log_error("lua", "Mat44f bad index '%c'", s[0]);
             break;
     }
 

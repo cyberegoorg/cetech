@@ -9,8 +9,6 @@
 
 typedef struct world_s world_t;
 typedef struct entity_s entity_t;
-typedef struct stringid64_s stringid64_t;
-
 
 //==============================================================================
 // Typedefs
@@ -34,7 +32,7 @@ struct level_api_v0 {
     //! \param name Resource name
     //! \return New level
     level_t (*load_level)(world_t world,
-                          stringid64_t name);
+                          uint64_t name);
 
     //! Destroy level
     //! \param world World
@@ -47,7 +45,7 @@ struct level_api_v0 {
     //! \param name Name
     //! \return Entity
     entity_t (*entity_by_id)(level_t level,
-                             stringid64_t name);
+                             uint64_t name);
 
     //! Get level entity
     //! \param level Level

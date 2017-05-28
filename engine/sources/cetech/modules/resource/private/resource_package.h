@@ -13,7 +13,7 @@ struct package_resource {
 
 #define package_name_count(resource_ptr) ((uint32_t*)((void*)(((char*)(resource_ptr)) + (resource_ptr)->name_count_offset)))
 #define package_offset(resource_ptr) ((uint32_t*)((void*)(((char*)(resource_ptr)) + (resource_ptr)->offset_offset)))
-#define package_type(resource_ptr) ((stringid64_t*)((void*)(((char*)(resource_ptr)) + (resource_ptr)->type_offset)))
-#define package_name(resource_ptr) ((stringid64_t*)((void*)(((char*)(resource_ptr)) + (resource_ptr)->name_offset)))
+#define package_type(resource_ptr) ((uint64_t*)((void*)(((char*)(resource_ptr)) + (resource_ptr)->type_offset)))
+#define package_name(resource_ptr) ((uint64_t*)((void*)(((char*)(resource_ptr)) + (resource_ptr)->name_offset)))
 
 #endif //CETECH_PACKAGE_H

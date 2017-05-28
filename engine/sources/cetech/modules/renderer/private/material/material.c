@@ -4,20 +4,23 @@
 
 #include <bgfx/c99/bgfx.h>
 
-#include <cetech/core/allocator.h>
-#include <cetech/kernel/hash.h>
-#include "../../renderer.h"
-#include <cetech/kernel/memory.h>
+#include <cetech/core/memory/allocator.h>
+#include <cetech/core/container/map.inl>
+#include <cetech/core/handler.h>
 
-#include <cetech/kernel/module.h>
+#include <cetech/core/hash.h>
+#include <cetech/core/memory/memory.h>
+#include <cetech/core/module.h>
+#include <cetech/core/os/vio.h>
+#include <cetech/core/api.h>
+#include <cetech/core/os/path.h>
 
 #include <cetech/modules/resource/resource.h>
-#include <cetech/core/map.inl>
-#include <cetech/kernel/handler.h>
-#include <cetech/kernel/string.h>
-#include <cetech/kernel/api.h>
+
+#include "../../renderer.h"
 #include "../texture/texture.h"
 #include "../shader/shader.h"
+
 #include "material_blob.h"
 
 //==============================================================================
@@ -27,8 +30,6 @@
 ARRAY_PROTOTYPE(bgfx_program_handle_t)
 
 ARRAY_PROTOTYPE(bgfx_uniform_handle_t)
-
-ARRAY_PROTOTYPE(stringid64_t)
 
 MAP_PROTOTYPE(bgfx_program_handle_t)
 
@@ -52,12 +53,15 @@ struct G {
     ARRAY_T(uint32_t) material_instance_uniform_data;
 
     struct handler32gen *material_handler;
-    stringid64_t type;
+    uint64_t type;
 } _G = {0};
 
 IMPORT_API(memory_api_v0);
 IMPORT_API(resource_api_v0);
 IMPORT_API(handler_api_v0);
+IMPORT_API(path_v0);
+IMPORT_API(vio_api_v0);
+IMPORT_API(hash_api_v0);
 
 #define material_blob_uniform_bgfx(r)    ((bgfx_uniform_handle_t*) ((material_blob_vec4f_value(r)+((r)->vec4f_count))))
 
@@ -79,14 +83,17 @@ IMPORT_API(handler_api_v0);
 // Interface
 //==============================================================================
 
-int material_init( struct api_v0* api) {
+int material_init(struct api_v0 *api) {
     _G = (struct G) {0};
 
-    USE_API(api, memory_api_v0);
-    USE_API(api, resource_api_v0);
-    USE_API(api, handler_api_v0);
+    GET_API(api, memory_api_v0);
+    GET_API(api, resource_api_v0);
+    GET_API(api, handler_api_v0);
+    GET_API(api, path_v0);
+    GET_API(api, vio_api_v0);
+    GET_API(api, hash_api_v0);
 
-    _G.type = stringid64_from_string("material");
+    _G.type = hash_api_v0.id64_from_str("material");
 
     _G.material_handler = handler_api_v0.handler32gen_create(
             memory_api_v0.main_allocator());
@@ -117,12 +124,12 @@ void material_shutdown() {
 
 static const material_t null_material = {0};
 
-material_t material_create(stringid64_t name) {
+material_t material_create(uint64_t name) {
     struct material_blob *resource = resource_api_v0.get(_G.type, name);
 
     uint32_t size = sizeof(struct material_blob) +
                     (resource->uniforms_count * sizeof(char) * 32) +
-                    (resource->texture_count * sizeof(stringid64_t)) +
+                    (resource->texture_count * sizeof(uint64_t)) +
                     (resource->vec4f_count * sizeof(vec4f_t)) +
                     (resource->mat44f_count * sizeof(mat44f_t)) +
                     (resource->mat33f_count * sizeof(mat33f_t));
@@ -207,7 +214,7 @@ uint32_t _material_find_slot(struct material_blob *resource,
 
 void material_set_texture(material_t material,
                           const char *slot,
-                          stringid64_t texture) {
+                          uint64_t texture) {
 
     uint32_t idx = MAP_GET(uint32_t, &_G.material_instace_map, material.idx,
                            UINT32_MAX);
@@ -220,7 +227,7 @@ void material_set_texture(material_t material,
             idx);
 
 
-    stringid64_t *u_texture = material_blob_texture_names(resource);
+    uint64_t *u_texture = material_blob_texture_names(resource);
 
     int slot_idx = _material_find_slot(resource, slot);
 
@@ -303,7 +310,7 @@ void material_use(material_t material) {
     struct material_blob *resource = (struct material_blob *) &_get_resorce(
             idx);
 
-    stringid64_t *u_texture = material_blob_texture_names(resource);
+    uint64_t *u_texture = material_blob_texture_names(resource);
     vec4f_t *u_vec4f = material_blob_vec4f_value(resource);
     mat33f_t *u_mat33f = material_blob_mat33f_value(resource);
     mat44f_t *u_mat44f = material_blob_mat44f_value(resource);

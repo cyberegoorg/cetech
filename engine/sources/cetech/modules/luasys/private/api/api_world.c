@@ -1,10 +1,10 @@
 
-#include <cetech/core/allocator.h>
+#include <cetech/core/memory/allocator.h>
 
 #include <cetech/modules/world/world.h>
-#include <cetech/kernel/module.h>
+#include <cetech/core/module.h>
 #include <cetech/modules/luasys/luasys.h>
-#include <cetech/kernel/api.h>
+#include <cetech/core/api.h>
 
 #define API_NAME "World"
 
@@ -30,8 +30,8 @@ static int _world_update(lua_State *l) {
 }
 
 
-void _register_lua_world_api( struct api_v0* api) {
-    USE_API(api, world_api_v0);
+void _register_lua_world_api(struct api_v0 *api) {
+    GET_API(api, world_api_v0);
 
     luasys_add_module_function(API_NAME, "create", _world_create);
     luasys_add_module_function(API_NAME, "destroy", _world_destroy);

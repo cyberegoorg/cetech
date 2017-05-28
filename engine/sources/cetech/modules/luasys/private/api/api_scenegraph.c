@@ -1,24 +1,24 @@
 
-#include <cetech/core/allocator.h>
-#include <cetech/kernel/module.h>
-#include <cetech/modules/resource/resource.h>
+#include <cetech/core/memory/allocator.h>
+#include <cetech/core/module.h>
 #include <cetech/modules/world/world.h>
 #include <cetech/modules/entity/entity.h>
 
 #include <cetech/modules/luasys/luasys.h>
-#include <cetech/kernel/hash.h>
-#include <cetech/kernel/api.h>
+#include <cetech/core/hash.h>
+#include <cetech/core/api.h>
 
 #include "../../../scenegraph/scenegraph.h"
 
 #define API_NAME "SceneGraph"
 
 IMPORT_API(scenegprah_api_v0);
+IMPORT_API(hash_api_v0);
 
 static int _scenegraph_node_by_name(lua_State *l) {
     world_t w = {.h = luasys_to_handler(l, 1)};
     entity_t ent = {.h = luasys_to_handler(l, 2)};
-    stringid64_t name = stringid64_from_string(luasys_to_string(l, 3));
+    uint64_t name = hash_api_v0.id64_from_str(luasys_to_string(l, 3));
 
     luasys_push_int(l, scenegprah_api_v0.node_by_name(w, ent, name).idx);
     return 1;
@@ -103,8 +103,9 @@ static int _scenegraph_link(lua_State *l) {
     return 0;
 }
 
-void _register_lua_scenegraph_api( struct api_v0* api) {
-    USE_API(api, scenegprah_api_v0);
+void _register_lua_scenegraph_api(struct api_v0 *api) {
+    GET_API(api, scenegprah_api_v0);
+    GET_API(api, hash_api_v0);
 
     luasys_add_module_function(API_NAME, "has", _scenegraph_has);
     luasys_add_module_function(API_NAME, "node_by_name",

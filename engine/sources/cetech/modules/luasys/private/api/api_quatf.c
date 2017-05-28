@@ -1,8 +1,8 @@
 
-#include <cetech/core/quatf.inl>
+#include <cetech/core/math/quatf.inl>
 #include <cetech/modules/luasys/luasys.h>
 
-#include <cetech/kernel/module.h>
+#include <cetech/core/module.h>
 
 #define API_NAME "Quatf"
 
@@ -73,7 +73,7 @@ static int _normalized(lua_State *l) {
     return 1;
 }
 
-void _register_lua_quatf_api( struct api_v0* api) {
+void _register_lua_quatf_api(struct api_v0 *api) {
     luasys_add_module_function(API_NAME, "from_axis_angle", _from_axis_angle);
     luasys_add_module_function(API_NAME, "from_euler", _from_euler);
 

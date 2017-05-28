@@ -1,16 +1,16 @@
 #ifndef CETECH_TEXTURE_RESOURCE_H
 #define CETECH_TEXTURE_RESOURCE_H
 
-#include <cetech/kernel/fs.h>
+#include <cetech/core/os/path.h>
 
 static const bgfx_texture_handle_t null_texture = {0};
 
 
 void *_texture_resource_loader(struct vio *input,
                                struct allocator *allocator) {
-    const int64_t size = vio_size(input);
+    const int64_t size = vio_api_v0.size(input);
     char *data = CETECH_ALLOCATE(allocator, char, size);
-    vio_read(input, data, 1, size);
+    vio_api_v0.read(input, data, 1, size);
 
     return data;
 }
@@ -20,7 +20,7 @@ void _texture_resource_unloader(void *new_data,
     CETECH_DEALLOCATE(allocator, new_data);
 }
 
-void _texture_resource_online(stringid64_t name,
+void _texture_resource_online(uint64_t name,
                               void *data) {
     struct texture *resource = data;
 
@@ -28,14 +28,14 @@ void _texture_resource_online(stringid64_t name,
     bgfx_texture_handle_t texture = bgfx_create_texture(mem, BGFX_TEXTURE_NONE,
                                                         0, NULL);
 
-    MAP_SET(bgfx_texture_handle_t, &_G.handler_map, name.id, texture);
+    MAP_SET(bgfx_texture_handle_t, &_G.handler_map, name, texture);
 }
 
 
-void _texture_resource_offline(stringid64_t name,
+void _texture_resource_offline(uint64_t name,
                                void *data) {
     bgfx_texture_handle_t texture = MAP_GET(bgfx_texture_handle_t,
-                                            &_G.handler_map, name.id,
+                                            &_G.handler_map, name,
                                             null_texture);
 
     if (texture.idx == null_texture.idx) {
@@ -46,7 +46,7 @@ void _texture_resource_offline(stringid64_t name,
 
 }
 
-void *_texture_resource_reloader(stringid64_t name,
+void *_texture_resource_reloader(uint64_t name,
                                  void *old_data,
                                  void *new_data,
                                  struct allocator *allocator) {

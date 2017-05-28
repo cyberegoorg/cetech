@@ -2,16 +2,16 @@
 #define CETECH_SCENE_RESOURCE_H
 
 
-#include <cetech/kernel/fs.h>
+#include <cetech/core/os/path.h>
 
 static const bgfx_texture_handle_t null_texture = {0};
 
 
 void *_scene_resource_loader(struct vio *input,
                              struct allocator *allocator) {
-    const int64_t size = vio_size(input);
+    const int64_t size = vio_api_v0.size(input);
     char *data = CETECH_ALLOCATE(allocator, char, size);
-    vio_read(input, data, 1, size);
+    vio_api_v0.read(input, data, 1, size);
 
     return data;
 }
@@ -21,11 +21,11 @@ void _scene_resource_unloader(void *new_data,
     CETECH_DEALLOCATE(allocator, new_data);
 }
 
-void _scene_resource_online(stringid64_t name,
+void _scene_resource_online(uint64_t name,
                             void *data) {
     struct scene_blob *resource = data;
 
-    stringid64_t *geom_name = scene_blob_geom_name(resource);
+    uint64_t *geom_name = scene_blob_geom_name(resource);
     uint32_t *ib_offset = scene_blob_ib_offset(resource);
     uint32_t *vb_offset = scene_blob_vb_offset(resource);
     bgfx_vertex_decl_t *vb_decl = scene_blob_vb_decl(resource);
@@ -48,26 +48,26 @@ void _scene_resource_online(stringid64_t name,
                 BGFX_BUFFER_INDEX32);
 
         uint32_t idx = ARRAY_SIZE(&instance.vb);
-        MAP_SET(uint8_t, &instance.geom_map, geom_name[i].id, idx);
+        MAP_SET(uint8_t, &instance.geom_map, geom_name[i], idx);
 
         ARRAY_PUSH_BACK(uint32_t, &instance.size, ib_size[i]);
         ARRAY_PUSH_BACK(bgfx_vertex_buffer_handle_t, &instance.vb, bvb);
         ARRAY_PUSH_BACK(bgfx_index_buffer_handle_t, &instance.ib, bib);
     }
 
-    MAP_SET(scene_instance, &_G.scene_instance, name.id, instance);
+    MAP_SET(scene_instance, &_G.scene_instance, name, instance);
 }
 
-void _scene_resource_offline(stringid64_t name,
+void _scene_resource_offline(uint64_t name,
                              void *data) {
     struct scene_instance instance = MAP_GET(scene_instance, &_G.scene_instance,
-                                             name.id,
+                                             name,
                                              (struct scene_instance) {0});
     _destroy_scene_instance(&instance);
-    MAP_REMOVE(scene_instance, &_G.scene_instance, name.id);
+    MAP_REMOVE(scene_instance, &_G.scene_instance, name);
 }
 
-void *_scene_resource_reloader(stringid64_t name,
+void *_scene_resource_reloader(uint64_t name,
                                void *old_data,
                                void *new_data,
                                struct allocator *allocator) {

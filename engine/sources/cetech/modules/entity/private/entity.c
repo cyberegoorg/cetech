@@ -2,21 +2,23 @@
 // Includes
 //==============================================================================
 
-#include <cetech/core/map.inl>
-#include <cetech/kernel/module.h>
-#include <cetech/kernel/memory.h>
-#include <cetech/kernel/yaml.h>
-#include <cetech/kernel/hash.h>
-#include <cetech/kernel/handler.h>
-#include <cetech/kernel/fs.h>
 #include <stdio.h>
 
-#include <cetech/kernel/config.h>
+#include <cetech/core/container/map.inl>
+#include <cetech/core/module.h>
+#include <cetech/core/memory/memory.h>
+#include <cetech/core/yaml.h>
+#include <cetech/core/hash.h>
+#include <cetech/core/handler.h>
+#include <cetech/core/os/path.h>
+#include <cetech/core/os/vio.h>
+
+#include <cetech/core/config.h>
 #include <cetech/modules/resource/resource.h>
 #include <cetech/modules/world/world.h>
 #include <cetech/modules/entity/entity.h>
 #include <cetech/modules/component/component.h>
-#include <cetech/kernel/api.h>
+#include <cetech/core/api.h>
 
 
 //==============================================================================
@@ -33,13 +35,17 @@ static struct G {
     struct handler32gen *entity_handler;
     MAP_T(uint32_t) spawned_map;
     ARRAY_T(array_entity_t) spawned_array;
-    stringid64_t type;
+    uint64_t type;
 } _G = {0};
 
 IMPORT_API(memory_api_v0);
 IMPORT_API(component_api_v0);
 IMPORT_API(resource_api_v0);
 IMPORT_API(handler_api_v0);
+IMPORT_API(path_v0);
+IMPORT_API(log_api_v0);
+IMPORT_API(vio_api_v0);
+IMPORT_API(hash_api_v0);
 
 
 struct entity_resource {
@@ -119,16 +125,16 @@ static void preprocess(const char *filename,
 
         char full_path[256] = {0};
         const char *source_dir = resource_api_v0.compiler_get_source_dir();
-        path_join(full_path, CETECH_ARRAY_LEN(full_path), source_dir,
-                  prefab_file);
+        path_v0.path_join(full_path, CETECH_ARRAY_LEN(full_path), source_dir,
+                          prefab_file);
 
-        struct vio *prefab_vio = vio_from_file(full_path, VIO_OPEN_READ,
-                                               memory_api_v0.main_allocator());
+        struct vio *prefab_vio = vio_api_v0.from_file(full_path, VIO_OPEN_READ,
+                                                      memory_api_v0.main_allocator());
 
-        char prefab_data[vio_size(prefab_vio) + 1];
-        memset(prefab_data, 0, vio_size(prefab_vio) + 1);
-        vio_read(prefab_vio, prefab_data, sizeof(char),
-                 vio_size(prefab_vio));
+        char prefab_data[vio_api_v0.size(prefab_vio) + 1];
+        memset(prefab_data, 0, vio_api_v0.size(prefab_vio) + 1);
+        vio_api_v0.read(prefab_vio, prefab_data, sizeof(char),
+                        vio_api_v0.size(prefab_vio));
 
         yaml_document_t h;
         yaml_node_t prefab_root = yaml_load_str(prefab_data, &h);
@@ -136,7 +142,7 @@ static void preprocess(const char *filename,
         preprocess(filename, prefab_root, capi);
         yaml_merge(root, prefab_root);
 
-        vio_close(prefab_vio);
+        vio_api_v0.close(prefab_vio);
     }
 }
 
@@ -187,7 +193,7 @@ void foreach_components_clb(yaml_node_t key,
                             void *_data) {
     char uid_str[256] = {0};
     char component_type_str[256] = {0};
-    stringid64_t cid;
+    uint64_t cid;
     int contain_cid = 0;
 
     struct foreach_componets_data *data = _data;
@@ -199,10 +205,10 @@ void foreach_components_clb(yaml_node_t key,
     yaml_as_string(component_type_node, component_type_str,
                    CETECH_ARRAY_LEN(component_type_str));
 
-    cid = stringid64_from_string(component_type_str);
+    cid = hash_api_v0.id64_from_str(component_type_str);
 
     for (int i = 0; i < ARRAY_SIZE(&output->component_type); ++i) {
-        if (ARRAY_AT(&output->component_type, i) != cid.id) {
+        if (ARRAY_AT(&output->component_type, i) != cid) {
             continue;
         }
 
@@ -210,28 +216,28 @@ void foreach_components_clb(yaml_node_t key,
     }
 
     if (!contain_cid) {
-        ARRAY_PUSH_BACK(uint64_t, &output->component_type, cid.id);
+        ARRAY_PUSH_BACK(uint64_t, &output->component_type, cid);
 
         ARRAY_T(uint32_t) tmp_a = {0};
         ARRAY_INIT(uint32_t, &tmp_a, memory_api_v0.main_allocator());
 
-        MAP_SET(array_uint32_t, &output->component_ent, cid.id, tmp_a);
+        MAP_SET(array_uint32_t, &output->component_ent, cid, tmp_a);
     }
 
-    if (!MAP_HAS(array_yaml_node_t, &output->component_body, cid.id)) {
+    if (!MAP_HAS(array_yaml_node_t, &output->component_body, cid)) {
         ARRAY_T(yaml_node_t) tmp_a = {0};
         ARRAY_INIT(yaml_node_t, &tmp_a, memory_api_v0.main_allocator());
 
-        MAP_SET(array_yaml_node_t, &output->component_body, cid.id, tmp_a);
+        MAP_SET(array_yaml_node_t, &output->component_body, cid, tmp_a);
 
     }
     ARRAY_T(uint32_t) *tmp_a = MAP_GET_PTR(array_uint32_t,
                                            &output->component_ent,
-                                           cid.id);
+                                           cid);
     ARRAY_PUSH_BACK(uint32_t, tmp_a, data->ent_id);
 
     ARRAY_T(yaml_node_t) *tmp_b = MAP_GET_PTR(array_yaml_node_t,
-                                              &output->component_body, cid.id);
+                                              &output->component_body, cid);
     ARRAY_PUSH_BACK(yaml_node_t, tmp_b, value);
 }
 
@@ -351,7 +357,7 @@ void entity_compiler_write_to_build(struct entity_compile_output *output,
     //write comp data
     for (int j = 0; j < res.comp_type_count; ++j) {
         uint64_t cid = ARRAY_AT(&output->component_type, j);
-        stringid64_t id = {.id = cid};
+        uint64_t id = cid;
 
         ARRAY_T(uint32_t) *ent_arr = MAP_GET_PTR(array_uint32_t,
                                                  &output->component_ent,
@@ -398,10 +404,10 @@ int _entity_resource_compiler(const char *filename,
                               struct vio *source_vio,
                               struct vio *build_vio,
                               struct compilator_api *compilator_api) {
-    char source_data[vio_size(source_vio) + 1];
-    memset(source_data, 0, vio_size(source_vio) + 1);
-    vio_read(source_vio, source_data, sizeof(char),
-             vio_size(source_vio));
+    char source_data[vio_api_v0.size(source_vio) + 1];
+    memset(source_data, 0, vio_api_v0.size(source_vio) + 1);
+    vio_api_v0.read(source_vio, source_data, sizeof(char),
+                    vio_api_v0.size(source_vio));
 
     yaml_document_t h;
     yaml_node_t root = yaml_load_str(source_data, &h);
@@ -411,8 +417,8 @@ int _entity_resource_compiler(const char *filename,
 
     entity_resource_compiler(root, filename, &entity_data, compilator_api);
 
-    vio_write(build_vio, &ARRAY_AT(&entity_data, 0), sizeof(uint8_t),
-              ARRAY_SIZE(&entity_data));
+    vio_api_v0.write(build_vio, &ARRAY_AT(&entity_data, 0), sizeof(uint8_t),
+                     ARRAY_SIZE(&entity_data));
 
 
     ARRAY_DESTROY(uint8_t, &entity_data);
@@ -427,9 +433,9 @@ int _entity_resource_compiler(const char *filename,
 
 void *entity_resource_loader(struct vio *input,
                              struct allocator *allocator) {
-    const int64_t size = vio_size(input);
+    const int64_t size = vio_api_v0.size(input);
     char *data = CETECH_ALLOCATE(allocator, char, size);
-    vio_read(input, data, 1, size);
+    vio_api_v0.read(input, data, 1, size);
 
     return data;
 }
@@ -440,15 +446,15 @@ void entity_resource_unloader(void *new_data,
 }
 
 
-void entity_resource_online(stringid64_t name,
+void entity_resource_online(uint64_t name,
                             void *data) {
 }
 
-void entity_resource_offline(stringid64_t name,
+void entity_resource_offline(uint64_t name,
                              void *data) {
 }
 
-void *entity_resource_reloader(stringid64_t name,
+void *entity_resource_reloader(uint64_t name,
                                void *old_data,
                                void *new_data,
                                struct allocator *allocator) {
@@ -506,7 +512,7 @@ ARRAY_T(entity_t) *entity_spawn_from_resource(world_t world,
 
     struct component_data *comp_data = entity_resource_comp_data(res);
     for (int i = 0; i < res->comp_type_count; ++i) {
-        stringid64_t type = {.id = comp_types[i]};
+        uint64_t type = comp_types[i];
 
         uint32_t *c_ent = component_data_ent(comp_data);
         char *c_data = component_data_data(comp_data);
@@ -523,11 +529,11 @@ ARRAY_T(entity_t) *entity_spawn_from_resource(world_t world,
 }
 
 entity_t entity_spawn(world_t world,
-                      stringid64_t name) {
+                      uint64_t name) {
     void *res = resource_api_v0.get(_G.type, name);
 
     if (res == NULL) {
-        log_error("entity", "Could not spawn entity.");
+        log_api_v0.log_error("entity", "Could not spawn entity.");
         return (entity_t) {.h = 0};
     }
 
@@ -551,7 +557,7 @@ void entity_destroy(world_t world,
 
 }
 
-static void _init_api(struct api_v0* api){
+static void _init_api(struct api_v0 *api) {
     static struct entity_api_v0 _api = {0};
     _api.entity_manager_create = entity_manager_create;
     _api.entity_manager_destroy = entity_manager_destroy;
@@ -573,18 +579,20 @@ static void _init_api(struct api_v0* api){
 
 }
 
-static void _init( struct api_v0* api) {
-    USE_API(api, memory_api_v0);
-    USE_API(api, component_api_v0);
-    USE_API(api, memory_api_v0);
-    USE_API(api, resource_api_v0);
-    USE_API(api, handler_api_v0);
-
+static void _init(struct api_v0 *api) {
+    GET_API(api, memory_api_v0);
+    GET_API(api, component_api_v0);
+    GET_API(api, memory_api_v0);
+    GET_API(api, resource_api_v0);
+    GET_API(api, handler_api_v0);
+    GET_API(api, path_v0);
+    GET_API(api, vio_api_v0);
+    GET_API(api, hash_api_v0);
 
 
     _G = (struct G) {0};
 
-    _G.type = stringid64_from_string("entity");
+    _G.type = hash_api_v0.id64_from_str("entity");
 
     MAP_INIT(uint32_t, &_G.spawned_map, memory_api_v0.main_allocator());
     ARRAY_INIT(array_entity_t, &_G.spawned_array,

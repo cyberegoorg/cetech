@@ -9,7 +9,7 @@
 
 
 #include "stdint.h"
-#include <cetech/core/math_types.h>
+#include <cetech/core/math/math_types.h>
 
 //==============================================================================
 // Typedefs
@@ -17,7 +17,6 @@
 
 typedef struct world_s world_t;
 typedef struct entity_s entity_t;
-typedef struct stringid64_s stringid64_t;
 
 //! Scene node struct
 typedef struct {
@@ -113,7 +112,7 @@ struct scenegprah_api_v0 {
     //! \return Root scene node
     scene_node_t (*create)(world_t world,
                            entity_t entity,
-                           stringid64_t *names,
+                           uint64_t *names,
                            uint32_t *parent,
                            mat44f_t *pose,
                            uint32_t count);
@@ -133,7 +132,7 @@ struct scenegprah_api_v0 {
     //! \return Node
     scene_node_t (*node_by_name)(world_t world,
                                  entity_t entity,
-                                 stringid64_t name);
+                                 uint64_t name);
 };
 
 

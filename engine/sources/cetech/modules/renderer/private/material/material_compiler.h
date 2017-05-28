@@ -2,8 +2,8 @@
 #define CETECH_MATERIAL_COMPILER_H
 
 #include <stdio.h>
-#include <cetech/kernel/yaml.h>
-#include <cetech/kernel/fs.h>
+#include <cetech/core/yaml.h>
+#include <cetech/core/os/path.h>
 
 struct material_compile_output {
     ARRAY_T(char) uniform_names;
@@ -30,17 +30,17 @@ static void _preprocess(const char *filename,
 
         char full_path[256] = {0};
         const char *source_dir = resource_api_v0.compiler_get_source_dir();
-        path_join(full_path, CETECH_ARRAY_LEN(full_path), source_dir,
-                  prefab_file);
+        path_v0.path_join(full_path, CETECH_ARRAY_LEN(full_path), source_dir,
+                          prefab_file);
 
-        struct vio *prefab_vio = vio_from_file(full_path, VIO_OPEN_READ,
-                                               memory_api_v0.main_allocator());
+        struct vio *prefab_vio = vio_api_v0.from_file(full_path, VIO_OPEN_READ,
+                                                      memory_api_v0.main_allocator());
 
-        char prefab_data[vio_size(prefab_vio) + 1];
-        memset(prefab_data, 0, vio_size(prefab_vio) + 1);
-        vio_read(prefab_vio, prefab_data, sizeof(char),
-                 vio_size(prefab_vio));
-        vio_close(prefab_vio);
+        char prefab_data[vio_api_v0.size(prefab_vio) + 1];
+        memset(prefab_data, 0, vio_api_v0.size(prefab_vio) + 1);
+        vio_api_v0.read(prefab_vio, prefab_data, sizeof(char),
+                        vio_api_v0.size(prefab_vio));
+        vio_api_v0.close(prefab_vio);
 
         yaml_document_t h;
         yaml_node_t prefab_root = yaml_load_str(prefab_data, &h);
@@ -63,12 +63,12 @@ static void _forach_texture_clb(yaml_node_t key,
     yaml_as_string(key, uniform_name, CETECH_ARRAY_LEN(uniform_name) - 1);
 
     yaml_as_string(value, tmp_buffer, CETECH_ARRAY_LEN(tmp_buffer));
-    stringid64_t texture_name = stringid64_from_string(tmp_buffer);
+    uint64_t texture_name = hash_api_v0.id64_from_str(tmp_buffer);
 
     ARRAY_PUSH(char, &output->uniform_names, uniform_name,
                CETECH_ARRAY_LEN(uniform_name));
     ARRAY_PUSH(uint8_t, &output->data, (uint8_t *) &texture_name,
-               sizeof(stringid64_t));
+               sizeof(uint64_t));
 }
 
 static void _forach_vec4fs_clb(yaml_node_t key,
@@ -128,11 +128,11 @@ static int _material_resource_compiler(const char *filename,
                                        struct compilator_api *compilator_api) {
     char *source_data =
     CETECH_ALLOCATE(memory_api_v0.main_allocator(), char,
-                    vio_size(source_vio) + 1);
-    memset(source_data, 0, vio_size(source_vio) + 1);
+                    vio_api_v0.size(source_vio) + 1);
+    memset(source_data, 0, vio_api_v0.size(source_vio) + 1);
 
-    vio_read(source_vio, source_data, sizeof(char),
-             vio_size(source_vio));
+    vio_api_v0.read(source_vio, source_data, sizeof(char),
+                    vio_api_v0.size(source_vio));
 
     yaml_document_t h;
     yaml_node_t root = yaml_load_str(source_data, &h);
@@ -171,17 +171,17 @@ static int _material_resource_compiler(const char *filename,
 
 
     struct material_blob resource = {
-            .shader_name = stringid64_from_string(tmp_buffer),
+            .shader_name = hash_api_v0.id64_from_str(tmp_buffer),
             .texture_count =output.texture_count,
             .vec4f_count = output.vec4f_count,
             .uniforms_count = ARRAY_SIZE(&output.uniform_names) / 32,
     };
 
-    vio_write(build_vio, &resource, sizeof(resource), 1);
-    vio_write(build_vio, output.uniform_names.data, sizeof(char),
-              ARRAY_SIZE(&output.uniform_names));
-    vio_write(build_vio, output.data.data, sizeof(uint8_t),
-              ARRAY_SIZE(&output.data));
+    vio_api_v0.write(build_vio, &resource, sizeof(resource), 1);
+    vio_api_v0.write(build_vio, output.uniform_names.data, sizeof(char),
+                     ARRAY_SIZE(&output.uniform_names));
+    vio_api_v0.write(build_vio, output.data.data, sizeof(uint8_t),
+                     ARRAY_SIZE(&output.data));
 
     ARRAY_DESTROY(char, &output.uniform_names);
     ARRAY_DESTROY(uint8_t, &output.data);

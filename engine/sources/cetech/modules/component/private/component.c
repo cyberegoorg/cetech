@@ -2,21 +2,20 @@
 // Includes
 //==============================================================================
 
-#include <cetech/core/map.inl>
-#include <cetech/core/vec3f.inl>
+#include <cetech/core/container/map.inl>
+#include <cetech/core/math/vec3f.inl>
 
-#include <cetech/kernel/memory.h>
-#include <cetech/kernel/config.h>
+#include <cetech/core/memory/memory.h>
+#include <cetech/core/config.h>
 #include <cetech/modules/resource/resource.h>
 
-#include <cetech/kernel/module.h>
-#include <cetech/kernel/hash.h>
+#include <cetech/core/module.h>
 
 #include <cetech/modules/world/world.h>
 #include <cetech/modules/entity/entity.h>
 #include <cetech/modules/component/component.h>
-#include <cetech/kernel/yaml.h>
-#include <cetech/kernel/api.h>
+#include <cetech/core/yaml.h>
+#include <cetech/core/api.h>
 
 //==============================================================================
 // Globals
@@ -45,19 +44,19 @@ IMPORT_API(world_api_v0);
 // Public interface
 //==============================================================================
 
-void component_register_compiler(stringid64_t type,
+void component_register_compiler(uint64_t type,
                                  component_compiler_t compiler,
                                  uint32_t spawn_order) {
-    MAP_SET(component_compiler_t, &_G.compiler_map, type.id, compiler);
-    MAP_SET(uint32_t, &_G.spawn_order_map, type.id, spawn_order);
+    MAP_SET(component_compiler_t, &_G.compiler_map, type, compiler);
+    MAP_SET(uint32_t, &_G.spawn_order_map, type, spawn_order);
 }
 
-int component_compile(stringid64_t type,
+int component_compile(uint64_t type,
                       yaml_node_t body,
                       ARRAY_T(uint8_t) *data) {
 
     component_compiler_t compiler = MAP_GET(component_compiler_t,
-                                            &_G.compiler_map, type.id, NULL);
+                                            &_G.compiler_map, type, NULL);
 
     if (!compiler) {
         return 0;
@@ -66,13 +65,13 @@ int component_compile(stringid64_t type,
     return compiler(body, data);
 }
 
-uint32_t component_get_spawn_order(stringid64_t type) {
-    return MAP_GET(uint32_t, &_G.spawn_order_map, type.id, 0);
+uint32_t component_get_spawn_order(uint64_t type) {
+    return MAP_GET(uint32_t, &_G.spawn_order_map, type, 0);
 }
 
-void component_register_type(stringid64_t type,
+void component_register_type(uint64_t type,
                              struct component_clb clb) {
-    MAP_SET(component_clb_t, &_G.component_clb, type.id, clb);
+    MAP_SET(component_clb_t, &_G.component_clb, type, clb);
 
     world_callbacks_t wclb = {
             .on_created = clb.on_world_create,
@@ -84,7 +83,7 @@ void component_register_type(stringid64_t type,
 }
 
 void component_spawn(world_t world,
-                     stringid64_t type,
+                     uint64_t type,
                      entity_t *ent_ids,
                      uint32_t *cent,
                      uint32_t *ents_parent,
@@ -92,7 +91,7 @@ void component_spawn(world_t world,
                      void *data) {
 
     struct component_clb clb = MAP_GET(component_clb_t, &_G.component_clb,
-                                       type.id, component_clb_null);
+                                       type, component_clb_null);
 
     if (!clb.spawner) {
         return;
@@ -115,14 +114,14 @@ void component_destroy(world_t world,
     }
 }
 
-static void _set_property(stringid64_t type,
+static void _set_property(uint64_t type,
                           world_t world,
                           entity_t entity,
-                          stringid64_t key,
+                          uint64_t key,
                           struct property_value value) {
 
     struct component_clb clb = MAP_GET(component_clb_t, &_G.component_clb,
-                                       type.id, component_clb_null);
+                                       type, component_clb_null);
 
     if (!clb.set_property) {
         return;
@@ -131,15 +130,15 @@ static void _set_property(stringid64_t type,
     clb.set_property(world, entity, key, value);
 }
 
-static struct property_value _get_property(stringid64_t type,
+static struct property_value _get_property(uint64_t type,
                                            world_t world,
                                            entity_t entity,
-                                           stringid64_t key) {
+                                           uint64_t key) {
 
     struct property_value value = {PROPERTY_INVALID};
 
     struct component_clb clb = MAP_GET(component_clb_t, &_G.component_clb,
-                                       type.id, component_clb_null);
+                                       type, component_clb_null);
 
     if (!clb.get_property) {
         return (struct property_value) {PROPERTY_INVALID};
@@ -148,7 +147,7 @@ static struct property_value _get_property(stringid64_t type,
     return clb.get_property(world, entity, key);
 }
 
-static void _init_api(struct api_v0* api_v0){
+static void _init_api(struct api_v0 *api_v0) {
     static struct component_api_v0 api = {0};
     api.component_register_compiler = component_register_compiler;
     api.component_compile = component_compile;
@@ -163,9 +162,9 @@ static void _init_api(struct api_v0* api_v0){
     api_v0->register_api("component_api_v0", &api);
 }
 
-static void _init( struct api_v0* api_v0) {
-    USE_API(api_v0, memory_api_v0);
-    USE_API(api_v0, world_api_v0);
+static void _init(struct api_v0 *api_v0) {
+    GET_API(api_v0, memory_api_v0);
+    GET_API(api_v0, world_api_v0);
 
 
     _G = (struct G) {0};
