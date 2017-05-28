@@ -1,6 +1,10 @@
 #ifndef CETECH_LOG_API_H
 #define CETECH_LOG_API_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 //==============================================================================
 // Includes
 //==============================================================================
@@ -134,5 +138,8 @@ struct log_api_v0 {
 
 };
 
+#ifdef __cplusplus
+}
+#endif
 
 #endif //CETECH_LOG_API_H

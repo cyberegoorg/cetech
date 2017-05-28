@@ -4,6 +4,10 @@
 #ifndef CETECH_RENDERER_H
 #define CETECH_RENDERER_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 //==============================================================================
 // Includes
 //==============================================================================
@@ -193,6 +197,9 @@ struct renderer_api_v0 {
                          viewport_t viewport);
 };
 
+#ifdef __cplusplus
+}
+#endif
 
 #endif //CETECH_RENDERER_H
 //! \}

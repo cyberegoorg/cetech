@@ -3,6 +3,10 @@
 #ifndef CETECH_API_H
 #define CETECH_API_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 //==============================================================================
 // Defines
 //==============================================================================
@@ -21,6 +25,10 @@ struct api_v0 {
 
     void *(*first)(const char *name);
 };
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif //CETECH_API_H
 //! \}

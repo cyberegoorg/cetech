@@ -1,6 +1,10 @@
 #ifndef CETECH_HANDLERID_H
 #define CETECH_HANDLERID_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 //==============================================================================
 // Includes
 //==============================================================================
@@ -32,5 +36,9 @@ struct handler_api_v0 {
     int (*handler32_alive)(struct handler32gen *hid,
                            uint32_t h);
 };
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif //CETECH_HANDLERID_H

@@ -3,6 +3,10 @@
 #ifndef CETECH_CAMERA_H
 #define CETECH_CAMERA_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 //==============================================================================
 // Includes
 //==============================================================================
@@ -75,6 +79,10 @@ struct camera_api_v0 {
                        float far,
                        float fov);
 };
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif //CETECH_CAMERA_H
 

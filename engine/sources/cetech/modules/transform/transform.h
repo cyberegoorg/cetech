@@ -3,6 +3,10 @@
 #ifndef CETECH_TRANSFORM_H
 #define CETECH_TRANSFORM_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 //==============================================================================
 // Includes
 //==============================================================================
@@ -132,6 +136,10 @@ struct transform_api_v0 {
                  entity_t parent,
                  entity_t child);
 };
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif //CETECH_TRANSFORM_H
 //! |}
