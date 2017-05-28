@@ -1,6 +1,10 @@
 #ifndef CETECH_VIO_H
 #define CETECH_VIO_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include <stdint.h>
 #include <stddef.h>
 
@@ -76,5 +80,8 @@ struct vio_api_v0 {
 
 };
 
+#ifdef __cplusplus
+}
+#endif
 
 #endif //CETECH_VIO_H

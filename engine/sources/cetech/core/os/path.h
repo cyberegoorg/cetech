@@ -1,6 +1,10 @@
 #ifndef CETECH_PATH_H
 #define CETECH_PATH_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include "cetech/core/container/array.inl"
 
 //==============================================================================
@@ -67,5 +71,10 @@ struct path_v0 {
                     const char *base_path,
                     const char *path);
 };
+
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif //CETECH_PATH_H

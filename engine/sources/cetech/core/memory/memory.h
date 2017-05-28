@@ -5,6 +5,10 @@
 #ifndef CETECH_MEMSYS_H
 #define CETECH_MEMSYS_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 //==============================================================================
 // Api
 //==============================================================================
@@ -22,6 +26,10 @@ struct memory_api_v0 {
     char *(*str_dup)(const char *s,
                      struct allocator *allocator);
 };
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif //CETECH_MEMSYS_H
 
