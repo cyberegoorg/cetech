@@ -77,7 +77,7 @@ void error_assert(const char *where,
                   const char *filename,
                   int line) {
     char *st = stacktrace(1);
-    log_api_v0.log_error(where,
+    log_api_v0.error(where,
                          "msg: \"%s\n  file: %s:%d\n  stacktrace:\n%s",
                          condition,
                          filename,

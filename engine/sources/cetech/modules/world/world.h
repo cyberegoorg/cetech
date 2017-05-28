@@ -4,6 +4,10 @@
 #ifndef CETECH_WORLD_SYSTEM_H
 #define CETECH_WORLD_SYSTEM_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 //==============================================================================
 // Includes
 //==============================================================================
@@ -67,6 +71,9 @@ struct world_api_v0 {
                    float dt);
 };
 
+#ifdef __cplusplus
+}
+#endif
 
 #endif //CETECH_WORLD_SYSTEM_H
 //! |}

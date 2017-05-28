@@ -30,7 +30,7 @@ static void _preprocess(const char *filename,
 
         char full_path[256] = {0};
         const char *source_dir = resource_api_v0.compiler_get_source_dir();
-        path_v0.path_join(full_path, CETECH_ARRAY_LEN(full_path), source_dir,
+        path_v0.join(full_path, CETECH_ARRAY_LEN(full_path), source_dir,
                           prefab_file);
 
         struct vio *prefab_vio = vio_api_v0.from_file(full_path, VIO_OPEN_READ,

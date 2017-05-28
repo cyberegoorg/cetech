@@ -49,9 +49,9 @@ struct window_api_v0 {
                    uint32_t width,
                    uint32_t height);
 
-    void (*get_size)(window_t window,
-                     uint32_t *width,
-                     uint32_t *height);
+    void (*size)(window_t window,
+                 uint32_t *width,
+                 uint32_t *height);
 
     void *(*native_window_ptr)(window_t w);
 

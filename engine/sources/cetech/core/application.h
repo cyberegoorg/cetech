@@ -4,6 +4,10 @@
 #ifndef CETECH_APPLICATION_API_H
 #define CETECH_APPLICATION_API_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 //==============================================================================
 // Include
 //==============================================================================
@@ -46,6 +50,10 @@ struct app_api_v0 {
     //! \return Main window
     window_t (*main_window)();
 };
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif //CETECH_APPLICATION_H
 // \}

@@ -4,6 +4,9 @@
 #ifndef CETECH_ENTITY_MANAGER_H
 #define CETECH_ENTITY_MANAGER_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 //==============================================================================
 // Includes
@@ -35,16 +38,20 @@ typedef struct entity_s {
 struct entity_api_v0 {
     //! Create new entity
     //! \return New entity
-    entity_t (*entity_manager_create)();
+    entity_t (*create)();
 
-    //! Destoy entity
-    //! \param entity Entity to destroy
-    void (*entity_manager_destroy)(entity_t entity);
+    //! Destroy entities
+    //! \param world World
+    //! \param entity entities
+    //! \param count entity count
+    void (*destroy)(world_t world,
+                    entity_t *entity,
+                    uint32_t count);
 
     //! Is entity alive?
     //! \param entity Entity
     //! \return 1 if entity is alive else 0
-    int (*entity_manager_alive)(entity_t entity);
+    int (*alive)(entity_t entity);
 
 
     //! Spawn entity from resource data
@@ -60,14 +67,6 @@ struct entity_api_v0 {
     //! \return New entity
     entity_t (*spawn)(world_t world,
                       uint64_t name);
-
-    //! Destroy entities
-    //! \param world World
-    //! \param entity entities
-    //! \param count entity count
-    void (*destroy)(world_t world,
-                    entity_t *entity,
-                    uint32_t count);
 
 #ifdef CETECH_CAN_COMPILE
 
@@ -112,6 +111,10 @@ struct entity_api_v0 {
 
 #endif
 };
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif //CETECH_ENTITY_MANAGER_H
 //! \}

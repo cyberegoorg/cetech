@@ -80,7 +80,7 @@ int filesystem_get_fullpath(uint64_t root,
                             const char *filename) {
     const char *root_path = filesystem_get_root_dir(root);
 
-    return path_v0.path_join(result, maxlen, root_path, filename) ==
+    return path_v0.join(result, maxlen, root_path, filename) ==
            (strlen(root_path) + strlen(filename) + 1);
 }
 
@@ -98,7 +98,7 @@ struct vio *filesystem_open(uint64_t root,
                                             memory_api_v0.main_allocator());
 
     if (!file) {
-        log_api_v0.log_error(LOG_WHERE, "Could not load file %s", fullm_path);
+        log_api_v0.error(LOG_WHERE, "Could not load file %s", fullm_path);
         return NULL;
     }
 
@@ -118,7 +118,7 @@ int filesystem_create_directory(uint64_t root,
         return 0;
     }
 
-    return path_v0.dir_make_path(fullm_path);
+    return path_v0.make_path(fullm_path);
 }
 
 
@@ -134,12 +134,12 @@ void filesystem_listdir(uint64_t root,
         return;
     }
 
-    path_v0.dir_list(fullm_path, 1, files, allocator);
+    path_v0.list(fullm_path, 1, files, allocator);
 }
 
 void filesystem_listdir_free(string_array_t *files,
                              struct allocator *allocator) {
-    path_v0.dir_list_free(files, allocator);
+    path_v0.list_free(files, allocator);
 }
 
 
@@ -156,15 +156,15 @@ time_t filesystem_get_file_mtime(uint64_t root,
 
 static void _init_api(struct api_v0 *api) {
     static struct filesystem_api_v0 _api = {0};
-    _api.filesystem_get_root_dir = filesystem_get_root_dir;
-    _api.filesystem_open = filesystem_open;
-    _api.filesystem_map_root_dir = filesystem_map_root_dir;
-    _api.filesystem_close = filesystem_close;
-    _api.filesystem_listdir = filesystem_listdir;
-    _api.filesystem_listdir_free = filesystem_listdir_free;
-    _api.filesystem_create_directory = filesystem_create_directory;
-    _api.filesystem_get_file_mtime = filesystem_get_file_mtime;
-    _api.filesystem_get_fullpath = filesystem_get_fullpath;
+    _api.root_dir = filesystem_get_root_dir;
+    _api.open = filesystem_open;
+    _api.map_root_dir = filesystem_map_root_dir;
+    _api.close = filesystem_close;
+    _api.listdir = filesystem_listdir;
+    _api.listdir_free = filesystem_listdir_free;
+    _api.create_directory = filesystem_create_directory;
+    _api.file_mtime = filesystem_get_file_mtime;
+    _api.fullpath = filesystem_get_fullpath;
 
     api->register_api("filesystem_api_v0", &_api);
 }
@@ -178,11 +178,11 @@ static void _init(struct api_v0 *api) {
 
     _G = (struct G) {0};
 
-    log_api_v0.log_debug(LOG_WHERE, "Init");
+    log_api_v0.debug(LOG_WHERE, "Init");
 }
 
 static void _shutdown() {
-    log_api_v0.log_debug(LOG_WHERE, "Shutdown");
+    log_api_v0.debug(LOG_WHERE, "Shutdown");
 
     for (int i = 0; i < MAX_ROOTS; ++i) {
         if (_G.rootmap.path[i] == 0) {

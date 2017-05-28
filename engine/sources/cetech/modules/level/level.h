@@ -3,6 +3,9 @@
 #ifndef CETECH_LEVEL_H
 #define CETECH_LEVEL_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 //==============================================================================
 // Includes
 //==============================================================================
@@ -53,6 +56,9 @@ struct level_api_v0 {
     entity_t (*entity)(level_t level);
 };
 
+#ifdef __cplusplus
+}
+#endif
 
 #endif //CETECH_LEVEL_H
 //! |}

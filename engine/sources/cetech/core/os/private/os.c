@@ -45,7 +45,7 @@ static struct window_api_v0 window_api = {
         .get_title = window_get_title,
         .update = window_update,
         .resize = window_resize,
-        .get_size = window_get_size,
+        .size = window_get_size,
         .native_window_ptr = window_native_window_ptr,
         .native_display_ptr = window_native_display_ptr
 };
@@ -61,20 +61,20 @@ static struct object_api_v0 object_api = {
 };
 
 static struct time_api_v0 time_api = {
-        .get_ticks =get_ticks,
-        .get_perf_counter =get_perf_counter,
-        .get_perf_freq =get_perf_freq
+        .ticks =get_ticks,
+        .perf_counter =get_perf_counter,
+        .perf_freq =get_perf_freq
 };
 
 static struct path_v0 path_api = {
-        .dir_list = dir_list,
-        .dir_list_free = dir_list_free,
-        .dir_make_path = dir_make_path,
-        .path_filename = path_filename,
-        .path_basename = path_basename,
-        .path_dir = path_dir,
-        .path_extension = path_extension,
-        .path_join = path_join,
+        .list = dir_list,
+        .list_free = dir_list_free,
+        .make_path = dir_make_path,
+        .filename = path_filename,
+        .basename = path_basename,
+        .dir = path_dir,
+        .extension = path_extension,
+        .join = path_join,
         .file_mtime = file_mtime
 };
 

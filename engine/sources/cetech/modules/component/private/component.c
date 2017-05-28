@@ -149,12 +149,12 @@ static struct property_value _get_property(uint64_t type,
 
 static void _init_api(struct api_v0 *api_v0) {
     static struct component_api_v0 api = {0};
-    api.component_register_compiler = component_register_compiler;
-    api.component_compile = component_compile;
-    api.component_get_spawn_order = component_get_spawn_order;
-    api.component_register_type = component_register_type;
-    api.component_spawn = component_spawn;
-    api.component_destroy = component_destroy;
+    api.register_compiler = component_register_compiler;
+    api.compile = component_compile;
+    api.spawn_order = component_get_spawn_order;
+    api.register_type = component_register_type;
+    api.spawn = component_spawn;
+    api.destroy = component_destroy;
     api.set_property = _set_property;
     api.get_property = _get_property;
 

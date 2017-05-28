@@ -1,6 +1,10 @@
 #ifndef CETECH_LOG_API_H
 #define CETECH_LOG_API_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 //==============================================================================
 // Includes
 //==============================================================================
@@ -64,26 +68,26 @@ typedef char (*log_get_wid_clb_t)();
 //==============================================================================
 
 struct log_api_v0 {
-    void (*log_set_wid_clb)(log_get_wid_clb_t get_wid_clb);
+    void (*set_wid_clb)(log_get_wid_clb_t get_wid_clb);
 
     //! Register log handler
     //! \param handler Handler
     //! \param data Handler data
-    void (*log_register_handler)(log_handler_t handler,
+    void (*register_handler)(log_handler_t handler,
                                  void *data);
 
     //! Log info
     //! \param where Where
     //! \param format Format
     //! \param va va args
-    void (*log_info_va)(const char *where,
+    void (*info_va)(const char *where,
                         const char *format,
                         va_list va);
 
     //! Log info
     //! \param where Where
     //! \param format Format
-    void (*log_info)(const char *where,
+    void (*info)(const char *where,
                      const char *format,
                      ...) ATTR_FORMAT(2, 3);
 
@@ -91,14 +95,14 @@ struct log_api_v0 {
     //! \param where Where
     //! \param format Format
     //! \param va va args
-    void (*log_warning_va)(const char *where,
+    void (*warning_va)(const char *where,
                            const char *format,
                            va_list va);
 
     //! Log warning
     //! \param where Where
     //! \param format Format
-    void (*log_warning)(const char *where,
+    void (*warning)(const char *where,
                         const char *format,
                         ...) ATTR_FORMAT(2, 3);
 
@@ -106,14 +110,14 @@ struct log_api_v0 {
     //! \param where Where
     //! \param format Format
     //! \param va va args
-    void (*log_error_va)(const char *where,
+    void (*error_va)(const char *where,
                          const char *format,
                          va_list va);
 
     //! Log error
     //! \param where Where
     //! \param format Format
-    void (*log_error)(const char *where,
+    void (*error)(const char *where,
                       const char *format,
                       ...) ATTR_FORMAT(2, 3);
 
@@ -121,18 +125,21 @@ struct log_api_v0 {
     //! \param where Where
     //! \param format Format
     //! \param va va args
-    void (*log_debug_va)(const char *where,
+    void (*debug_va)(const char *where,
                          const char *format,
                          va_list va);
 
     //! Log debug
     //! \param where Where
     //! \param format Format
-    void (*log_debug)(const char *where,
+    void (*debug)(const char *where,
                       const char *format,
                       ...) ATTR_FORMAT(2, 3);
 
 };
 
+#ifdef __cplusplus
+}
+#endif
 
 #endif //CETECH_LOG_API_H

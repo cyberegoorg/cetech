@@ -3,6 +3,10 @@
 #ifndef CETECH_PLUGIN_API_H
 #define CETECH_PLUGIN_API_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 //==============================================================================
 // Includes
 //==============================================================================
@@ -118,6 +122,9 @@ void module_call_shutdown();
 //! Call after update
 void module_call_after_update(float dt);
 
+#ifdef __cplusplus
+}
+#endif
 
 #endif //CETECH_PLUGIN_API_H
 //! \}

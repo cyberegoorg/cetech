@@ -70,7 +70,7 @@ int _create_controler(int i) {
         SDL_HapticRumbleInit(haptic);
         _G.haptic[idx] = haptic;
 
-        log_api_v0.log_info("input.gamepad", "Gamepad %d has haptic support",
+        log_api_v0.info("input.gamepad", "Gamepad %d has haptic support",
                             i);
     } else {
         _G.haptic[idx] = NULL;

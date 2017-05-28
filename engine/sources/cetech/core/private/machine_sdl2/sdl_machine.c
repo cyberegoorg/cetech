@@ -75,7 +75,7 @@ int _machine_init_impl(struct api_v0 *api) {
 
 
     if (SDL_Init(SDL_INIT_EVERYTHING) != 0) {
-        log_api_v0.log_error(LOG_WHERE, "Could not init sdl - %s",
+        log_api_v0.error(LOG_WHERE, "Could not init sdl - %s",
                              SDL_GetError());
         return 0;
     }

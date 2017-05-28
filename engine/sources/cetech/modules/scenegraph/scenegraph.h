@@ -3,6 +3,10 @@
 #ifndef CETECH_SCENE_GAPH_H
 #define CETECH_SCENE_GAPH_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 //==============================================================================
 // Includes
 //==============================================================================
@@ -135,6 +139,9 @@ struct scenegprah_api_v0 {
                                  uint64_t name);
 };
 
+#ifdef __cplusplus
+}
+#endif
 
 #endif //CETECH_SCENE_GAPH_H
 //! |}

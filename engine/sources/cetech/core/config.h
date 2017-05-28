@@ -4,6 +4,10 @@
 #ifndef CETECH_CONFIG_H
 #define CETECH_CONFIG_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 //==============================================================================
 // Includes
 //==============================================================================
@@ -139,6 +143,10 @@ struct config_api_v0 {
     //! Dump all variables to log
     void (*log_all)();
 };
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif //CETECH_CONFIG_H
 //! \}

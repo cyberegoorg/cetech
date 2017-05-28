@@ -66,7 +66,7 @@ void sdl_mouse_process(struct eventstream *stream) {
     if ((pos[0] != _G.position[0]) || (pos[1] != _G.position[1])) {
         window_t main_window = app_api_v0.main_window();
         uint32_t window_size[2] = {0};
-        window_api_v0.get_size(main_window, &window_size[0],
+        window_api_v0.size(main_window, &window_size[0],
                                &window_size[1]);
 
         _G.position[0] = pos[0];

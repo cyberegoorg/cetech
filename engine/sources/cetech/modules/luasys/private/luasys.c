@@ -271,7 +271,7 @@ static int _cmd_execute_string(mpack_node_t args,
 
         const char *last_error = lua_tostring(_G.L, -1);
         lua_pop(_G.L, 1);
-        log_api_v0.log_error(LOG_WHERE, "%s", last_error);
+        log_api_v0.error(LOG_WHERE, "%s", last_error);
 
         mpack_start_map(writer, 1);
         mpack_write_cstr(writer, "error_msg");
@@ -296,7 +296,7 @@ static int _execute_string(lua_State *_L,
     if (luaL_dostring(_L, str)) {
         const char *last_error = lua_tostring(_L, -1);
         lua_pop(_L, 1);
-        log_api_v0.log_error(LOG_WHERE, "%s", last_error);
+        log_api_v0.error(LOG_WHERE, "%s", last_error);
         return 0;
     }
 
@@ -345,7 +345,7 @@ int _lua_compiler(const char *filename,
     lua_pcall(state, 3, 2, 0);
     if (lua_isnil(state, 1)) {
         const char *err = luasys_to_string(state, 2);
-        log_api_v0.log_error("resource_compiler.lua", "[%s] %s", filename, err);
+        log_api_v0.error("resource_compiler.lua", "[%s] %s", filename, err);
 
         lua_close(state);
         return 0;
@@ -568,7 +568,7 @@ void luasys_execute_resource(uint64_t name) {
     if (lua_pcall(_G.L, 0, 0, 0)) {
         const char *last_error = lua_tostring(_G.L, -1);
         lua_pop(_G.L, 1);
-        log_api_v0.log_error(LOG_WHERE, "%s", last_error);
+        log_api_v0.error(LOG_WHERE, "%s", last_error);
     }
 }
 
@@ -877,7 +877,7 @@ static void _init(struct api_v0 *api_v0) {
     GET_API(api_v0, log_api_v0);
     GET_API(api_v0, hash_api_v0);
 
-    log_api_v0.log_debug(LOG_WHERE, "Init");
+    log_api_v0.debug(LOG_WHERE, "Init");
 
     _G.L = luaL_newstate();
     CETECH_ASSERT(LOG_WHERE, _G.L != NULL);
@@ -917,7 +917,7 @@ static void _init(struct api_v0 *api_v0) {
 }
 
 static void _shutdown() {
-    log_api_v0.log_debug(LOG_WHERE, "Shutdown");
+    log_api_v0.debug(LOG_WHERE, "Shutdown");
 
     lua_close(_G.L);
 
@@ -972,7 +972,7 @@ void luasys_call_global(const char *func,
     if (lua_pcall(_G.L, argc, 0, 0)) {
         const char *last_error = lua_tostring(_G.L, -1);
         lua_pop(_G.L, 1);
-        log_api_v0.log_error(LOG_WHERE, "%s", last_error);
+        log_api_v0.error(LOG_WHERE, "%s", last_error);
     }
 
     lua_pop(_state, -1);
