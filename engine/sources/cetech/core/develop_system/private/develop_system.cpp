@@ -3,11 +3,12 @@
 //==============================================================================
 
 #include <stdio.h>
-#include <cetech/core/container/map.inl>
 
 #include "include/mpack/mpack.h"
 #include "include/nanomsg/nn.h"
 #include "include/nanomsg/pubsub.h"
+
+#include <cetech/core/container/map2.inl>
 
 #include <cetech/core/os/thread.h>
 #include <cetech/core/container/eventstream.inl>
@@ -21,6 +22,7 @@
 #include <cetech/core/api.h>
 #include <cetech/core/os/time.h>
 
+using namespace cetech;
 
 //==============================================================================
 // Defines
@@ -38,12 +40,10 @@
 typedef void (*to_mpack_fce_t)(const struct event_header *event,
                                mpack_writer_t *writer);
 
-ARRAY_PROTOTYPE(to_mpack_fce_t);
-MAP_PROTOTYPE(to_mpack_fce_t);
-
 static struct G {
     struct eventstream eventstream;
-    MAP_T(to_mpack_fce_t) to_mpack;
+    Map<to_mpack_fce_t> to_mpack;
+
     cvar_t cv_pub_addr;
     int pub_socket;
 
@@ -100,7 +100,7 @@ static void _flush_all_streams() {
                 .name = "flush_worker",
                 .work = _flush_job,
                 .data = NULL,
-                .affinity = TASK_AFFINITY_WORKER1 + i
+                .affinity = task_affinity(TASK_AFFINITY_WORKER1 + i)
         };
     }
 
@@ -130,7 +130,7 @@ void _developsys_push(struct event_header *header,
 
 void _register_to_mpack(uint64_t type,
                         to_mpack_fce_t fce) {
-    MAP_SET(to_mpack_fce_t, &_G.to_mpack, type, fce);
+    map::set(_G.to_mpack, type, fce);
 }
 
 static void _scopeevent_to_mpack(const struct event_header *event,
@@ -214,8 +214,7 @@ void _send_events() {
 
     event = eventstream_begin(&_G.eventstream);
     while (event != eventstream_end(&_G.eventstream)) {
-        to_mpack_fce_t to_mpack_fce = MAP_GET(to_mpack_fce_t, &_G.to_mpack,
-                                              event->type, NULL);
+        to_mpack_fce_t to_mpack_fce = map::get<to_mpack_fce_t>(_G.to_mpack, event->type, NULL);
 
         if (to_mpack_fce != NULL) {
             to_mpack_fce(event, &writer);
@@ -292,7 +291,7 @@ void developsys_leave_scope(struct scope_data scope_data) {
 
     struct scope_event ev = {
             .name = {0},
-            .worker_id = task_api_v0.worker_id(),
+            .worker_id = (uint32_t) task_api_v0.worker_id(),
             .start = scope_data.start,
             .duration =
             ((float) (time_api_v0.get_perf_counter() - scope_data.start_timer) /
@@ -325,7 +324,10 @@ static void _init(struct api_v0 *api) {
     GET_API(api, time_api_v0);
     GET_API(api, log_api_v0);
 
-    MAP_INIT(to_mpack_fce_t, &_G.to_mpack, memory_api_v0.main_allocator());
+    _G = (G){0};
+
+    _G.to_mpack.init(memory_api_v0.main_allocator());
+
     eventstream_create(&_G.eventstream, memory_api_v0.main_allocator());
 
     _register_to_mpack(EVENT_SCOPE, _scopeevent_to_mpack);
@@ -358,14 +360,13 @@ static void _init(struct api_v0 *api) {
 
 static void _shutdown() {
     log_api_v0.log_debug(LOG_WHERE, "Shutdown");
-
-    MAP_DESTROY(to_mpack_fce_t, &_G.to_mpack);
-
     eventstream_destroy(&_G.eventstream);
     nn_close(_G.pub_socket);
+
+    _G = (G){0};
 }
 
-
+extern "C" {
 void *developsystem_get_module_api(int api) {
     switch (api) {
         case PLUGIN_EXPORT_API_ID: {
@@ -386,4 +387,5 @@ void *developsystem_get_module_api(int api) {
     }
 
     return 0;
+}
 }

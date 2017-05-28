@@ -111,7 +111,7 @@ set(SOURCE_FILES
         engine/sources/cetech/modules/luasys/private/api/api_scenegraph.c
 
         engine/sources/cetech/core/develop_system/private/console_server.c
-        engine/sources/cetech/core/develop_system/private/develop_system.c
+        engine/sources/cetech/core/develop_system/private/develop_system.cpp
 
         engine/sources/cetech/core/private/app/_app.c
         engine/sources/cetech/core/task/private/task.c
