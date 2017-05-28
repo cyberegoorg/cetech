@@ -145,7 +145,7 @@ static int _task_worker(void *o) {
 
     _worker_id = (char) o;
 
-    log_api_v0.log_debug("task_worker", "Worker %d init", _worker_id);
+    log_api_v0.debug("task_worker", "Worker %d init", _worker_id);
 
     while (_G._Run) {
         if (!taskmanager_do_work()) {
@@ -153,7 +153,7 @@ static int _task_worker(void *o) {
         }
     }
 
-    log_api_v0.log_debug("task_worker", "Worker %d shutdown", _worker_id);
+    log_api_v0.debug("task_worker", "Worker %d shutdown", _worker_id);
     return 1;
 }
 
@@ -241,7 +241,7 @@ static void _init(struct api_v0 *api) {
     static const uint32_t main_threads_count = 1;
     const uint32_t worker_count = core_count - main_threads_count;
 
-    log_api_v0.log_info("task", "Core/Main/Worker: %d, %d, %d", core_count,
+    log_api_v0.info("task", "Core/Main/Worker: %d, %d, %d", core_count,
                         main_threads_count, worker_count);
 
     _G._workers_count = worker_count;

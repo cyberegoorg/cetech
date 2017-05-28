@@ -110,7 +110,7 @@ struct component_api_v0 {
     //! \param type Component type
     //! \param compiler Compiler fce
     //! \param spawn_order Spawn order number
-    void (*component_register_compiler)(uint64_t type,
+    void (*register_compiler)(uint64_t type,
                                         component_compiler_t compiler,
                                         uint32_t spawn_order);
 
@@ -119,19 +119,19 @@ struct component_api_v0 {
     //! \param body Component yaml body
     //! \param data Compiled data
     //! \return 1 if compile is ok else 0
-    int (*component_compile)(uint64_t type,
+    int (*compile)(uint64_t type,
                              yaml_node_t body,
                              ARRAY_T(uint8_t) *data);
 
     //! Get component spawn order
     //! \param type Component type
     //! \return Spawn order
-    uint32_t (*component_get_spawn_order)(uint64_t type);
+    uint32_t (*spawn_order)(uint64_t type);
 
     //! Register new component type
     //! \param type Component type
     //! \param clb Callbacks
-    void (*component_register_type)(uint64_t type,
+    void (*register_type)(uint64_t type,
                                     struct component_clb clb);
 
     //! Spawn components
@@ -142,7 +142,7 @@ struct component_api_v0 {
     //! \param ents_parent Parent map
     //! \param ent_count Entity count
     //! \param data Component data
-    void (*component_spawn)(world_t world,
+    void (*spawn)(world_t world,
                             uint64_t type,
                             entity_t *ent_ids,
                             uint32_t *cent,
@@ -154,7 +154,7 @@ struct component_api_v0 {
     //! \param world World where component live
     //! \param ent Destroy component for this entities
     //! \param count Entities count
-    void (*component_destroy)(world_t world,
+    void (*destroy)(world_t world,
                               entity_t *ent,
                               uint32_t count);
 

@@ -319,10 +319,10 @@ static void _init(struct api_v0 *api) {
 
     _G.type = hash_api_v0.id64_from_str("transform");
 
-    component_api_v0.component_register_compiler(_G.type,
+    component_api_v0.register_compiler(_G.type,
                                                  _transform_component_compiler,
                                                  10);
-    component_api_v0.component_register_type(
+    component_api_v0.register_type(
             _G.type,
             (struct component_clb) {
                     .spawner=_spawner, .destroyer=_destroyer,

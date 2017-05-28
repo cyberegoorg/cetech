@@ -125,7 +125,7 @@ static void preprocess(const char *filename,
 
         char full_path[256] = {0};
         const char *source_dir = resource_api_v0.compiler_get_source_dir();
-        path_v0.path_join(full_path, CETECH_ARRAY_LEN(full_path), source_dir,
+        path_v0.join(full_path, CETECH_ARRAY_LEN(full_path), source_dir,
                           prefab_file);
 
         struct vio *prefab_vio = vio_api_v0.from_file(full_path, VIO_OPEN_READ,
@@ -373,7 +373,7 @@ void entity_compiler_write_to_build(struct entity_compile_output *output,
         ARRAY_INIT(uint8_t, &comp_data, memory_api_v0.main_allocator());
 
         for (int i = 0; i < cdata.ent_count; ++i) {
-            component_api_v0.component_compile(id, ARRAY_AT(body, i),
+            component_api_v0.compile(id, ARRAY_AT(body, i),
                                                &comp_data);
         }
 
@@ -516,7 +516,7 @@ ARRAY_T(entity_t) *entity_spawn_from_resource(world_t world,
 
         uint32_t *c_ent = component_data_ent(comp_data);
         char *c_data = component_data_data(comp_data);
-        component_api_v0.component_spawn(world, type, &ARRAY_AT(spawned, 0),
+        component_api_v0.spawn(world, type, &ARRAY_AT(spawned, 0),
                                          c_ent, parents, comp_data->ent_count,
                                          c_data);
 
@@ -533,7 +533,7 @@ entity_t entity_spawn(world_t world,
     void *res = resource_api_v0.get(_G.type, name);
 
     if (res == NULL) {
-        log_api_v0.log_error("entity", "Could not spawn entity.");
+        log_api_v0.error("entity", "Could not spawn entity.");
         return (entity_t) {.h = 0};
     }
 
@@ -549,7 +549,7 @@ void entity_destroy(world_t world,
     for (int i = 0; i < count; ++i) {
         ARRAY_T(entity_t) *spawned = _get_spawned_array(entity[i]);
 
-        component_api_v0.component_destroy(world, spawned->data,
+        component_api_v0.destroy(world, spawned->data,
                                            spawned->size);
 
         _destroy_spawned_array(entity[i]);
@@ -559,9 +559,8 @@ void entity_destroy(world_t world,
 
 static void _init_api(struct api_v0 *api) {
     static struct entity_api_v0 _api = {0};
-    _api.entity_manager_create = entity_manager_create;
-    _api.entity_manager_destroy = entity_manager_destroy;
-    _api.entity_manager_alive = entity_manager_alive;
+    _api.create = entity_manager_create;
+    _api.alive = entity_manager_alive;
 
     _api.spawn_from_resource = entity_spawn_from_resource;
     _api.spawn = entity_spawn;

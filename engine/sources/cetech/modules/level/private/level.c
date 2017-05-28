@@ -234,7 +234,7 @@ level_t world_load_level(world_t world,
     uint32_t *offset = level_blob_offset(res);
     uint8_t *data = level_blob_data(res);
 
-    entity_t level_ent = entity_api_v0.entity_manager_create();
+    entity_t level_ent = entity_api_v0.create();
     transform_t t = transform_api_v0.create(world, level_ent,
                                             (entity_t) {UINT32_MAX},
                                             (vec3f_t) {0}, QUATF_IDENTITY,
@@ -263,7 +263,7 @@ void level_destroy(world_t world,
     struct level_instance *instance = _level_instance(level);
 
     entity_api_v0.destroy(world, &instance->spawned_entity->data[0], 1);
-    entity_api_v0.entity_manager_destroy(instance->level_entity);
+    entity_api_v0.destroy(world, &instance->level_entity, 1);
 }
 
 entity_t level_entity_by_id(level_t level,

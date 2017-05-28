@@ -7,7 +7,7 @@ void *load_object(const char *path) {
     CETECH_ASSERT("cebase", obj != NULL);
 
     if (obj == NULL) {
-        log_api_v0.log_error("cebase", "%s", SDL_GetError());
+        log_api_v0.error("cebase", "%s", SDL_GetError());
         return NULL;
     }
 
@@ -26,7 +26,7 @@ void *load_function(void *so,
     CETECH_ASSERT("cebase", fce != NULL);
 
     if (fce == NULL) {
-        log_api_v0.log_error("cebase", "%s", SDL_GetError());
+        log_api_v0.error("cebase", "%s", SDL_GetError());
         return NULL;
     }
 

@@ -78,7 +78,7 @@ void _add_dependency(const char *who_filename,
     builddb_set_file_depend(who_filename, depend_on_filename);
 
     char path[1024] = {0};
-    path_v0.path_join(path, CETECH_ARRAY_LEN(path),
+    path_v0.join(path, CETECH_ARRAY_LEN(path),
                       resource_api_v0.compiler_get_source_dir(),
                       depend_on_filename);
 
@@ -93,7 +93,7 @@ static struct compilator_api _compilator_api = {
 static void _compile_task(void *data) {
     struct compile_task_data *tdata = data;
 
-    log_api_v0.log_info("resource_compiler.task",
+    log_api_v0.info("resource_compiler.task",
                         "Compile resource \"%s\" to \"" "%" SDL_PRIX64 "%" SDL_PRIX64 "\"",
                         tdata->source_filename, tdata->type, tdata->name);
 
@@ -103,10 +103,10 @@ static void _compile_task(void *data) {
         builddb_set_file(tdata->source_filename, tdata->mtime);
         builddb_set_file_depend(tdata->source_filename, tdata->source_filename);
 
-        log_api_v0.log_info("resource_compiler.task",
+        log_api_v0.info("resource_compiler.task",
                             "Resource \"%s\" compiled", tdata->source_filename);
     } else {
-        log_api_v0.log_error("resource_compiler.task",
+        log_api_v0.error("resource_compiler.task",
                              "Resource \"%s\" compilation fail",
                              tdata->source_filename);
     }
@@ -136,14 +136,14 @@ void _compile_dir(ARRAY_T(task_item) *tasks,
                   const char *source_dir,
                   const char *build_dir_full) {
 
-    path_v0.dir_list(source_dir, 1, files,
+    path_v0.list(source_dir, 1, files,
                      memory_api_v0.main_scratch_allocator());
 
     for (int i = 0; i < ARRAY_SIZE(files); ++i) {
         const char *source_filename_full = ARRAY_AT(files, i);
         const char *source_filename_short =
                 ARRAY_AT(files, i) + strlen(source_dir) + 1;
-        const char *resource_type = path_v0.path_extension(
+        const char *resource_type = path_v0.extension(
                 source_filename_short);
 
         char resource_name[128] = {0};
@@ -180,7 +180,7 @@ void _compile_dir(ARRAY_T(task_item) *tasks,
         }
 
         char build_path[4096] = {0};
-        path_v0.path_join(build_path, CETECH_ARRAY_LEN(build_path),
+        path_v0.join(build_path, CETECH_ARRAY_LEN(build_path),
                           build_dir_full,
                           build_name);
 
@@ -216,7 +216,7 @@ void _compile_dir(ARRAY_T(task_item) *tasks,
 
         ARRAY_PUSH_BACK(task_item, tasks, item);
     }
-    path_v0.dir_list_free(files, memory_api_v0.main_scratch_allocator());
+    path_v0.list_free(files, memory_api_v0.main_scratch_allocator());
 }
 
 
@@ -249,14 +249,14 @@ static void _init(struct api_v0 *api) {
                                            CETECH_ARRAY_LEN(build_dir_full),
                                            app_api_v0.platform());
 
-    path_v0.dir_make_path(build_dir_full);
+    path_v0.make_path(build_dir_full);
     builddb_init_db(build_dir_full, &path_v0);
 
     char tmp_dir_full[1024] = {0};
-    path_v0.path_join(tmp_dir_full, CETECH_ARRAY_LEN(tmp_dir_full),
+    path_v0.join(tmp_dir_full, CETECH_ARRAY_LEN(tmp_dir_full),
                       build_dir_full,
                       "tmp");
-    path_v0.dir_make_path(tmp_dir_full);
+    path_v0.make_path(tmp_dir_full);
 }
 
 static void _shutdown() {
@@ -287,7 +287,7 @@ void resource_compiler_create_build_dir(struct config_api_v0 config,
     resource_compiler_get_build_dir(build_dir_full,
                                     CETECH_ARRAY_LEN(build_dir_full), platform);
 
-    path_v0.dir_make_path(build_dir_full);
+    path_v0.make_path(build_dir_full);
 }
 
 void resource_compiler_register(uint64_t type,
@@ -366,7 +366,7 @@ int resource_compiler_get_tmp_dir(char *tmp_dir,
     resource_compiler_get_build_dir(build_dir, CETECH_ARRAY_LEN(build_dir),
                                     platform);
 
-    return path_v0.path_join(tmp_dir, max_len, build_dir, "tmp");
+    return path_v0.join(tmp_dir, max_len, build_dir, "tmp");
 }
 
 int resource_compiler_external_join(char *output,
@@ -376,13 +376,13 @@ int resource_compiler_external_join(char *output,
     char tmp_dir2[1024] = {0};
 
     const char *external_dir_str = config_api_v0.get_string(_G.cv_external_dir);
-    path_v0.path_join(tmp_dir, CETECH_ARRAY_LEN(tmp_dir), external_dir_str,
+    path_v0.join(tmp_dir, CETECH_ARRAY_LEN(tmp_dir), external_dir_str,
                       app_api_v0.native_platform());
     strncat(tmp_dir, "64", CETECH_ARRAY_LEN(tmp_dir));
-    path_v0.path_join(tmp_dir2, CETECH_ARRAY_LEN(tmp_dir2), tmp_dir,
+    path_v0.join(tmp_dir2, CETECH_ARRAY_LEN(tmp_dir2), tmp_dir,
                       "release/bin");
 
-    return path_v0.path_join(output, max_len, tmp_dir2, name);
+    return path_v0.join(output, max_len, tmp_dir2, name);
 }
 
 #endif

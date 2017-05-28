@@ -280,8 +280,8 @@ struct scope_data developsys_enter_scope(const char *name) {
 
     return (struct scope_data) {
             .name = name,
-            .start = time_api_v0.get_ticks(),
-            .start_timer = time_api_v0.get_perf_counter()
+            .start = time_api_v0.ticks(),
+            .start_timer = time_api_v0.perf_counter()
     };
 }
 
@@ -294,8 +294,8 @@ void developsys_leave_scope(struct scope_data scope_data) {
             .worker_id = (uint32_t) task_api_v0.worker_id(),
             .start = scope_data.start,
             .duration =
-            ((float) (time_api_v0.get_perf_counter() - scope_data.start_timer) /
-             time_api_v0.get_perf_freq()) * 1000.0f,
+            ((float) (time_api_v0.perf_counter() - scope_data.start_timer) /
+             time_api_v0.perf_freq()) * 1000.0f,
             .depth = _scope_depth,
     };
 
@@ -336,20 +336,20 @@ static void _init(struct api_v0 *api) {
 
     const char *addr = 0;
 
-    log_api_v0.log_debug(LOG_WHERE, "Init");
+    log_api_v0.debug(LOG_WHERE, "Init");
 
     int socket = nn_socket(AF_SP, NN_PUB);
     if (socket < 0) {
-        log_api_v0.log_error(LOG_WHERE, "Could not create nanomsg socket: %s",
+        log_api_v0.error(LOG_WHERE, "Could not create nanomsg socket: %s",
                              nn_strerror(errno));
         //return 0;
     }
     addr = config_api_v0.get_string(_G.cv_pub_addr);
 
-    log_api_v0.log_debug(LOG_WHERE, "PUB address: %s", addr);
+    log_api_v0.debug(LOG_WHERE, "PUB address: %s", addr);
 
     if (nn_bind(socket, addr) < 0) {
-        log_api_v0.log_error(LOG_WHERE, "Could not bind socket to '%s': %s",
+        log_api_v0.error(LOG_WHERE, "Could not bind socket to '%s': %s",
                              addr,
                              nn_strerror(errno));
         //return 0;
@@ -359,7 +359,7 @@ static void _init(struct api_v0 *api) {
 }
 
 static void _shutdown() {
-    log_api_v0.log_debug(LOG_WHERE, "Shutdown");
+    log_api_v0.debug(LOG_WHERE, "Shutdown");
     eventstream_destroy(&_G.eventstream);
     nn_close(_G.pub_socket);
 

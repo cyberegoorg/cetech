@@ -200,9 +200,9 @@ int _init_config(struct api_v0 *api) {
         cvar_t bd = config.find("build");
 
         const char *build_dir_str = config.get_string(bd);
-        path_v0.path_join(build_dir_full, 1024, build_dir_str,
+        path_v0.join(build_dir_full, 1024, build_dir_str,
                           application_platform());
-        path_v0.dir_make_path(build_dir_full);
+        path_v0.make_path(build_dir_full);
         config.compile_global(&api_v1);
     }
 #endif
@@ -275,7 +275,7 @@ int application_init(int argc,
     module_call_init();
 
 
-    log_api_v0.log_set_wid_clb(task_api_v0.worker_id);
+    log_api_v0.set_wid_clb(task_api_v0.worker_id);
 
     cnsole_srv_api_v0.consolesrv_register_command("wait", _cmd_wait);
 
@@ -283,7 +283,7 @@ int application_init(int argc,
 }
 
 int application_shutdown() {
-    log_api_v0.log_debug(LOG_WHERE, "Shutdown");
+    log_api_v0.debug(LOG_WHERE, "Shutdown");
 
     module_call_shutdown();
     cvar_shutdown();
@@ -373,16 +373,16 @@ void application_start() {
 
     _boot_stage();
 
-    uint64_t last_tick = time_api_v0.get_perf_counter();
+    uint64_t last_tick = time_api_v0.perf_counter();
     _G.game = lua_api_v0.get_game_callbacks();
 
     if (!_G.game->init()) {
-        log_api_v0.log_error(LOG_WHERE, "Could not init game.");
+        log_api_v0.error(LOG_WHERE, "Could not init game.");
         return;
     };
 
     _G.is_running = 1;
-    log_api_v0.log_info("core.ready", "Run main loop");
+    log_api_v0.info("core.ready", "Run main loop");
 
     float lag = 0.0f;
     float frame_limit = 60.0f;
@@ -394,9 +394,9 @@ void application_start() {
         struct scope_data application_sd = develop_api_v0.enter_scope(
                 "Application:update()");
 
-        uint64_t now_ticks = time_api_v0.get_perf_counter();
+        uint64_t now_ticks = time_api_v0.perf_counter();
         float dt =
-                ((float) (now_ticks - last_tick)) / time_api_v0.get_perf_freq();
+                ((float) (now_ticks - last_tick)) / time_api_v0.perf_freq();
 
         _G.dt = dt;
         last_tick = now_ticks;

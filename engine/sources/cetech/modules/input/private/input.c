@@ -197,7 +197,7 @@ static void _init(struct api_v0 *api) {
 
     _G = (struct G) {0};
 
-    log_api_v0.log_debug(LOG_WHERE, "Init");
+    log_api_v0.debug(LOG_WHERE, "Init");
 
     for (int i = 0; i < GAMEPAD_MAX; ++i) {
         _G.active[i] = machine_api_v0.gamepad_is_active(i);
@@ -206,7 +206,7 @@ static void _init(struct api_v0 *api) {
 }
 
 static void _shutdown() {
-    log_api_v0.log_debug(LOG_WHERE, "Shutdown");
+    log_api_v0.debug(LOG_WHERE, "Shutdown");
 
     _G = (struct G) {0};
 }

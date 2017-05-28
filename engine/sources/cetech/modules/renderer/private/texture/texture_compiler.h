@@ -28,7 +28,7 @@ static int _texturec(const char *input,
 
     int status = process_api_v0.exec(cmd_line);
 
-    log_api_v0.log_info("application", "STATUS %d", status);
+    log_api_v0.info("application", "STATUS %d", status);
 
     return status;
 }
@@ -38,10 +38,10 @@ static int _gen_tmp_name(char *tmp_filename,
                          size_t max_len,
                          const char *filename) {
     char dir[4096] = {0};
-    path_v0.path_dir(dir, CETECH_ARRAY_LEN(dir), filename);
+    path_v0.dir(dir, CETECH_ARRAY_LEN(dir), filename);
 
-    path_v0.path_join(tmp_filename, max_len, tmp_dir, dir);
-    path_v0.dir_make_path(tmp_filename);
+    path_v0.join(tmp_filename, max_len, tmp_dir, dir);
+    path_v0.make_path(tmp_filename);
 
     return snprintf(tmp_filename, max_len, "%s/%s.ktx", tmp_dir, filename);
 }
@@ -85,7 +85,7 @@ static int _texture_resource_compiler(const char *filename,
 
     yaml_as_string(input, input_str, CETECH_ARRAY_LEN(input_str));
 
-    path_v0.path_join(input_path, CETECH_ARRAY_LEN(input_path), source_dir,
+    path_v0.join(input_path, CETECH_ARRAY_LEN(input_path), source_dir,
                       input_str);
 
     _gen_tmp_name(output_path, tmp_dir, CETECH_ARRAY_LEN(tmp_filename),

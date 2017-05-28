@@ -130,16 +130,16 @@ void log_debug(const char *where,
 }
 
 static struct log_api_v0 log_api_v0 = {
-        .log_set_wid_clb = log_set_wid_clb,
-        .log_register_handler = log_register_handler,
-        .log_info_va = log_info_va,
-        .log_info = log_info,
-        .log_warning_va = log_warning_va,
-        .log_warning = log_warning,
-        .log_error_va = log_error_va,
-        .log_error = log_error,
-        .log_debug_va = log_debug_va,
-        .log_debug = log_debug
+        .set_wid_clb = log_set_wid_clb,
+        .register_handler = log_register_handler,
+        .info_va = log_info_va,
+        .info = log_info,
+        .warning_va = log_warning_va,
+        .warning = log_warning,
+        .error_va = log_error_va,
+        .error = log_error,
+        .debug_va = log_debug_va,
+        .debug = log_debug
 };
 
 #include "log_stdout_handler.inl"

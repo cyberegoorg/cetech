@@ -31,7 +31,7 @@ static int _step(sqlite3 *db,
                 break;
 
             default:
-                log_api_v0.log_error("builddb", "SQL error '%s' (%d): %s",
+                log_api_v0.error("builddb", "SQL error '%s' (%d): %s",
                                      sqlite3_sql(stmt), rc, sqlite3_errmsg(db));
 
                 run = 0;
@@ -126,7 +126,7 @@ int logdb_init_db(const char *log_dir,
                   struct api_v0 *api) {
     struct path_v0 *path = api->first("path_v0");
 
-    path->path_join(_logdb_path, CETECH_ARRAY_LEN(_logdb_path), log_dir,
+    path->join(_logdb_path, CETECH_ARRAY_LEN(_logdb_path), log_dir,
                     "log.db");
 
     _session_id = time(NULL);
