@@ -12,7 +12,7 @@
 #include <cetech/modules/renderer/renderer.h>
 #include <cetech/modules/transform/transform.h>
 
-#include <cetech/core/memory.h>
+#include <cetech/core/memory/memory.h>
 #include <cetech/core/module.h>
 #include <cetech/core/api.h>
 
@@ -215,7 +215,7 @@ static struct camera_api_v0 camera_api = {
         .create = camera_create
 };
 
-static void _init( struct api_v0* api_v0) {
+static void _init(struct api_v0 *api_v0) {
     GET_API(api_v0, memory_api_v0);
     GET_API(api_v0, component_api_v0);
     GET_API(api_v0, renderer_api_v0);
@@ -246,7 +246,7 @@ static void _shutdown() {
 }
 
 
-static void _init_api(struct api_v0* api){
+static void _init_api(struct api_v0 *api) {
     api->register_api("camera_api_v0", &camera_api);
 }
 

@@ -3,7 +3,7 @@
 //==============================================================================
 
 #include <cetech/core/os/thread.h>
-#include <cetech/core/memory.h>
+#include <cetech/core/memory/memory.h>
 
 #include <cetech/modules/develop_system/develop.h>
 #include <cetech/core/config.h>
@@ -214,7 +214,7 @@ int taskmanager_worker_count() {
     return _G._workers_count;
 }
 
-static void _init_api(struct api_v0* api){
+static void _init_api(struct api_v0 *api) {
     static struct task_api_v0 _api = {
             .worker_count = taskmanager_worker_count,
             .add = taskmanager_add,
@@ -226,13 +226,12 @@ static void _init_api(struct api_v0* api){
     api->register_api("task_api_v0", &_api);
 }
 
-static void _init( struct api_v0* api) {
+static void _init(struct api_v0 *api) {
     GET_API(api, develop_api_v0);
     GET_API(api, memory_api_v0);
     GET_API(api, thread_api_v0);
     GET_API(api, log_api_v0);
     GET_API(api, cpu_api_v0);
-
 
 
     _G = (struct G) {0};
@@ -243,7 +242,7 @@ static void _init( struct api_v0* api) {
     const uint32_t worker_count = core_count - main_threads_count;
 
     log_api_v0.log_info("task", "Core/Main/Worker: %d, %d, %d", core_count,
-             main_threads_count, worker_count);
+                        main_threads_count, worker_count);
 
     _G._workers_count = worker_count;
 

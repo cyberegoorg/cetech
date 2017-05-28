@@ -11,7 +11,7 @@
 
 #include <cetech/core/os/thread.h>
 #include <cetech/core/container/eventstream.inl>
-#include <cetech/core/memory.h>
+#include <cetech/core/memory/memory.h>
 #include <cetech/core/config.h>
 #include <cetech/core/module.h>
 
@@ -305,7 +305,7 @@ void developsys_leave_scope(struct scope_data scope_data) {
     developsys_push(EVENT_SCOPE, ev);
 }
 
-static void _init_api(struct api_v0* api){
+static void _init_api(struct api_v0 *api) {
     static struct develop_api_v0 _api = {0};
 
     _api.push = _developsys_push;
@@ -317,7 +317,7 @@ static void _init_api(struct api_v0* api){
     api->register_api("develop_api_v0", &_api);
 }
 
-static void _init( struct api_v0* api) {
+static void _init(struct api_v0 *api) {
     GET_API(api, memory_api_v0);
     GET_API(api, task_api_v0);
     GET_API(api, config_api_v0);
@@ -339,7 +339,7 @@ static void _init( struct api_v0* api) {
     int socket = nn_socket(AF_SP, NN_PUB);
     if (socket < 0) {
         log_api_v0.log_error(LOG_WHERE, "Could not create nanomsg socket: %s",
-                  nn_strerror(errno));
+                             nn_strerror(errno));
         //return 0;
     }
     addr = config_api_v0.get_string(_G.cv_pub_addr);
@@ -347,8 +347,9 @@ static void _init( struct api_v0* api) {
     log_api_v0.log_debug(LOG_WHERE, "PUB address: %s", addr);
 
     if (nn_bind(socket, addr) < 0) {
-        log_api_v0.log_error(LOG_WHERE, "Could not bind socket to '%s': %s", addr,
-                  nn_strerror(errno));
+        log_api_v0.log_error(LOG_WHERE, "Could not bind socket to '%s': %s",
+                             addr,
+                             nn_strerror(errno));
         //return 0;
     }
 

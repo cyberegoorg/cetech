@@ -5,12 +5,12 @@
 
 #include <bgfx/c99/bgfx.h>
 
-#include <cetech/core/allocator.h>
+#include <cetech/core/memory/allocator.h>
 #include <cetech/core/container/map.inl>
 
 #include <cetech/core/hash.h>
 #include <cetech/core/application.h>
-#include <cetech/core/memory.h>
+#include <cetech/core/memory/memory.h>
 #include <cetech/core/os/path.h>
 #include <cetech/core/module.h>
 #include <cetech/core/api.h>

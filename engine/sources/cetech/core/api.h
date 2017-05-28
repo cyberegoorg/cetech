@@ -16,8 +16,10 @@
 
 //! Plugin expot api struct V0
 struct api_v0 {
-    void (*register_api)(const char* name, void* api);
-    void* (*first)(const char* name);
+    void (*register_api)(const char *name,
+                         void *api);
+
+    void *(*first)(const char *name);
 };
 
 #endif //CETECH_API_H

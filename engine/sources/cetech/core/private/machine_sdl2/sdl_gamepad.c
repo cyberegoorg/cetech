@@ -5,7 +5,6 @@
 #include <include/SDL2/SDL.h>
 
 #include <cetech/core/math/math_types.h>
-#include <cetech/core/allocator.h>
 #include <cetech/core/module.h>
 #include <cetech/core/container/eventstream.inl>
 
@@ -71,7 +70,8 @@ int _create_controler(int i) {
         SDL_HapticRumbleInit(haptic);
         _G.haptic[idx] = haptic;
 
-        log_api_v0.log_info("input.gamepad", "Gamepad %d has haptic support", i);
+        log_api_v0.log_info("input.gamepad", "Gamepad %d has haptic support",
+                            i);
     } else {
         _G.haptic[idx] = NULL;
     }
@@ -83,7 +83,7 @@ int _create_controler(int i) {
 // Interface
 //==============================================================================
 
-int sdl_gamepad_init(struct api_v0* api) {
+int sdl_gamepad_init(struct api_v0 *api) {
     GET_API(api, log_api_v0);
 
     _G = (struct G) {0};

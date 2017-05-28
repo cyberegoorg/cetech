@@ -39,7 +39,7 @@ IMPORT_API(window_api_v0);
 // Interface
 //==============================================================================
 
-int sdl_mouse_init( struct api_v0 *api) {
+int sdl_mouse_init(struct api_v0 *api) {
     _G = (struct G) {0};
 
     GET_API(api, app_api_v0);

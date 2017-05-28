@@ -11,7 +11,7 @@
 //#include "_allocator.h"
 
 static const void *pointer_align_forward(const void *p,
-                                  uint32_t align) {
+                                         uint32_t align) {
     uintptr_t pi = (uintptr_t) p;
     const uint32_t mod = pi % align;
     if (mod)

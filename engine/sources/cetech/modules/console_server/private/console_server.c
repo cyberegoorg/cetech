@@ -4,7 +4,6 @@
 
 #include <stdio.h>
 #include <include/mpack/mpack.h>
-#include <cetech/core/allocator.h>
 #include <cetech/core/config.h>
 #include <cetech/modules/resource/resource.h>
 #include <cetech/core/module.h>
@@ -130,14 +129,14 @@ static int _cmd_ready(mpack_node_t args,
     return 0;
 }
 
-static void _init_api(struct api_v0* api){
+static void _init_api(struct api_v0 *api) {
     static struct cnsole_srv_api_v0 console_api = {0};
     console_api.consolesrv_push_begin = consolesrv_push_begin;
     console_api.consolesrv_register_command = consolesrv_register_command;
     api->register_api("cnsole_srv_api_v0", &console_api);
 }
 
-static void _init( struct api_v0* api) {
+static void _init(struct api_v0 *api) {
     GET_API(api, config_api_v0);
     GET_API(api, log_api_v0);
 
@@ -149,7 +148,7 @@ static void _init( struct api_v0* api) {
     int socket = nn_socket(AF_SP, NN_REP);
     if (socket < 0) {
         log_api_v0.log_error(LOG_WHERE, "Could not create nanomsg socket: %s",
-                  nn_strerror(errno));
+                             nn_strerror(errno));
         return;// 0;
     }
     addr = config_api_v0.get_string(_G.cv_rpc_addr);
@@ -157,8 +156,9 @@ static void _init( struct api_v0* api) {
     log_api_v0.log_debug(LOG_WHERE, "RPC address: %s", addr);
 
     if (nn_bind(socket, addr) < 0) {
-        log_api_v0.log_error(LOG_WHERE, "Could not bind socket to '%s': %s", addr,
-                  nn_strerror(errno));
+        log_api_v0.log_error(LOG_WHERE, "Could not bind socket to '%s': %s",
+                             addr,
+                             nn_strerror(errno));
         return;// 0;
     }
 
@@ -168,8 +168,9 @@ static void _init( struct api_v0* api) {
     if (config_api_v0.get_string(_G.cv_push_addr)[0] != '\0') {
         socket = nn_socket(AF_SP, NN_PUSH);
         if (socket < 0) {
-            log_api_v0.log_error(LOG_WHERE, "Could not create nanomsg socket: %s",
-                      nn_strerror(errno));
+            log_api_v0.log_error(LOG_WHERE,
+                                 "Could not create nanomsg socket: %s",
+                                 nn_strerror(errno));
             return;// 0;
         }
 
@@ -178,8 +179,9 @@ static void _init( struct api_v0* api) {
         log_api_v0.log_debug(LOG_WHERE, "Push address: %s", addr);
 
         if (nn_connect(socket, addr) < 0) {
-            log_api_v0.log_error(LOG_WHERE, "Could not bind socket to '%s': %s", addr,
-                      nn_strerror(errno));
+            log_api_v0.log_error(LOG_WHERE, "Could not bind socket to '%s': %s",
+                                 addr,
+                                 nn_strerror(errno));
             return;// 0;
         }
         _G.push_socket = socket;
@@ -190,7 +192,7 @@ static void _init( struct api_v0* api) {
     socket = nn_socket(AF_SP, NN_PUB);
     if (socket < 0) {
         log_api_v0.log_error(LOG_WHERE, "Could not create nanomsg socket: %s",
-                  nn_strerror(errno));
+                             nn_strerror(errno));
         return;// 0;
     }
 
@@ -199,8 +201,9 @@ static void _init( struct api_v0* api) {
     log_api_v0.log_debug(LOG_WHERE, "LOG address: %s", addr);
 
     if (nn_bind(socket, addr) < 0) {
-        log_api_v0.log_error(LOG_WHERE, "Could not bind socket to '%s': %s", addr,
-                  nn_strerror(errno));
+        log_api_v0.log_error(LOG_WHERE, "Could not bind socket to '%s': %s",
+                             addr,
+                             nn_strerror(errno));
         return;// 0;
     }
     _G.log_socket = socket;

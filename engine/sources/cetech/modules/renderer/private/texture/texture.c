@@ -4,11 +4,11 @@
 
 #include <bgfx/c99/bgfx.h>
 
-#include <cetech/core/allocator.h>
+#include <cetech/core/memory/allocator.h>
 #include <cetech/core/container/map.inl>
 
 #include <cetech/core/hash.h>
-#include <cetech/core/memory.h>
+#include <cetech/core/memory/memory.h>
 #include <cetech/core/application.h>
 #include <cetech/core/module.h>
 #include <cetech/core/api.h>
@@ -79,8 +79,8 @@ int texture_init(struct api_v0 *api) {
     GET_API(api, path_v0);
     GET_API(api, vio_api_v0);
     GET_API(api, process_api_v0);
-    GET_API(api, log_api_v0 );
-    GET_API(api, hash_api_v0 );
+    GET_API(api, log_api_v0);
+    GET_API(api, hash_api_v0);
 
     _G.type = hash_api_v0.id64_from_str("texture");
 

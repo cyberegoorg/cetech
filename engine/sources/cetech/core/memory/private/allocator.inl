@@ -2,7 +2,7 @@
 
 #include <cetech/core/log.h>
 #include <cetech/core/errors.h>
-#include <cetech/core/allocator.h>
+#include <cetech/core/memory/allocator.h>
 #include "_allocator.h"
 
 #define ALLOCATOR_WHERE "allocator"
@@ -16,8 +16,9 @@ void memory_free(void *ptr) {
     free(ptr);
 }
 
-extern char* stacktrace(int);
-extern void stacktrace_free(char*);
+extern char *stacktrace(int);
+
+extern void stacktrace_free(char *);
 
 void allocator_trace_pointer(struct allocator_trace_entry *entries,
                              uint64_t max_entries,
@@ -56,8 +57,9 @@ void allocator_check_trace(struct allocator_trace_entry *entries,
             continue;
         }
 
-        log_api_v0.log_error(ALLOCATOR_WHERE, "memory_leak: %p\n  stacktrace:\n%s\n",
-                  entries[i].ptr, entries[i].stacktrace);
+        log_api_v0.log_error(ALLOCATOR_WHERE,
+                             "memory_leak: %p\n  stacktrace:\n%s\n",
+                             entries[i].ptr, entries[i].stacktrace);
 
         //allocator_free(allocator, entries[i].ptr); // TODO: need this?
 

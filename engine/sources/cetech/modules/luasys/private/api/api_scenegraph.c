@@ -1,7 +1,6 @@
 
-#include <cetech/core/allocator.h>
+#include <cetech/core/memory/allocator.h>
 #include <cetech/core/module.h>
-#include <cetech/modules/resource/resource.h>
 #include <cetech/modules/world/world.h>
 #include <cetech/modules/entity/entity.h>
 
@@ -104,7 +103,7 @@ static int _scenegraph_link(lua_State *l) {
     return 0;
 }
 
-void _register_lua_scenegraph_api( struct api_v0* api) {
+void _register_lua_scenegraph_api(struct api_v0 *api) {
     GET_API(api, scenegprah_api_v0);
     GET_API(api, hash_api_v0);
 

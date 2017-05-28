@@ -1,5 +1,5 @@
 
-#include <cetech/core/allocator.h>
+#include <cetech/core/memory/allocator.h>
 
 #include <cetech/modules/world/world.h>
 #include <cetech/core/module.h>
@@ -30,7 +30,7 @@ static int _world_update(lua_State *l) {
 }
 
 
-void _register_lua_world_api( struct api_v0* api) {
+void _register_lua_world_api(struct api_v0 *api) {
     GET_API(api, world_api_v0);
 
     luasys_add_module_function(API_NAME, "create", _world_create);

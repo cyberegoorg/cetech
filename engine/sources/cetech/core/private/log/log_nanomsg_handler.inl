@@ -7,7 +7,7 @@
 #include <include/mpack/mpack.h>
 #include <include/nanomsg/nn.h>
 
-#include <cetech/core/allocator.h>
+#include <cetech/core/memory/allocator.h>
 #include <cetech/core/log.h>
 #include <cetech/core/errors.h>
 

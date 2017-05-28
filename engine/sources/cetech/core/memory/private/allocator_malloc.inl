@@ -4,7 +4,7 @@
 #include <stdint.h>
 
 #include <cetech/core/log.h>
-#include <cetech/core/allocator.h>
+#include <cetech/core/memory/allocator.h>
 
 #include "header.h"
 

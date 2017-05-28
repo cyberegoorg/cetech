@@ -3,7 +3,7 @@
 //==============================================================================
 
 #include <cetech/core/math/math_types.h>
-#include <cetech/core/allocator.h>
+#include <cetech/core/memory/allocator.h>
 #include <cetech/core/config.h>
 #include <cetech/modules/resource/resource.h>
 #include <cetech/core/module.h>
@@ -37,7 +37,6 @@ static struct G {
 
 IMPORT_API(machine_api_v0);
 IMPORT_API(log_api_v0);
-
 
 
 static void _update() {
@@ -177,7 +176,7 @@ void mouse_set_cursor_pos(vec2f_t pos) {
 
 }
 
-static void _init_api(struct api_v0* api){
+static void _init_api(struct api_v0 *api) {
     static struct mouse_api_v0 api_v1 = {
             .button_index = mouse_button_index,
             .button_name = mouse_button_name,
@@ -191,7 +190,7 @@ static void _init_api(struct api_v0* api){
     api->register_api("mouse_api_v0", &api_v1);
 }
 
-static void _init( struct api_v0* api) {
+static void _init(struct api_v0 *api) {
     GET_API(api, machine_api_v0);
     GET_API(api, log_api_v0);
 

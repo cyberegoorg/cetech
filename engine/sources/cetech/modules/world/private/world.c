@@ -4,11 +4,10 @@
 
 #include <cetech/core/container/map.inl>
 #include <cetech/modules/world/world.h>
-#include <cetech/core/memory.h>
+#include <cetech/core/memory/memory.h>
 #include <cetech/core/config.h>
 #include <cetech/modules/resource/resource.h>
 #include <cetech/core/module.h>
-#include <cetech/core/hash.h>
 #include <cetech/core/handler.h>
 #include <cetech/core/api.h>
 
@@ -70,7 +69,7 @@ void world_update(world_t world,
     }
 }
 
-static void _init_api(struct api_v0* api){
+static void _init_api(struct api_v0 *api) {
     static struct world_api_v0 _api = {0};
 
     _api.register_callback = world_register_callback;
@@ -85,12 +84,11 @@ static void _init_api(struct api_v0* api){
 }
 
 
-static void _init( struct api_v0* api) {
+static void _init(struct api_v0 *api) {
     _G = (struct G) {0};
 
-    GET_API(api, memory_api_v0 );
-    GET_API(api, handler_api_v0 );
-
+    GET_API(api, memory_api_v0);
+    GET_API(api, handler_api_v0);
 
 
     ARRAY_INIT(world_callbacks_t, &_G.callbacks,

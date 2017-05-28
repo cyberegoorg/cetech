@@ -13,7 +13,7 @@ void scene_create_graph(world_t world,
                         uint64_t scene);
 
 uint64_t scene_get_mesh_node(uint64_t scene,
-                                 uint64_t mesh);
+                             uint64_t mesh);
 
 
 #endif //CETECH_BGFX_SCENE_RESOURCE_H

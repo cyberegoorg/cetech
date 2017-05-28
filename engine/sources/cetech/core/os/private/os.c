@@ -67,31 +67,31 @@ static struct time_api_v0 time_api = {
 };
 
 static struct path_v0 path_api = {
-    .dir_list = dir_list,
-    .dir_list_free = dir_list_free,
-    .dir_make_path = dir_make_path,
-    .path_filename = path_filename,
-    .path_basename = path_basename,
-    .path_dir = path_dir,
-    .path_extension = path_extension,
-    .path_join = path_join,
-    .file_mtime = file_mtime
+        .dir_list = dir_list,
+        .dir_list_free = dir_list_free,
+        .dir_make_path = dir_make_path,
+        .path_filename = path_filename,
+        .path_basename = path_basename,
+        .path_dir = path_dir,
+        .path_extension = path_extension,
+        .path_join = path_join,
+        .file_mtime = file_mtime
 };
 
 static struct vio_api_v0 vio_api = {
-    .from_file = vio_from_file,
-    .close = vio_close,
-    .seek = vio_seek,
-    .seek_to_end = vio_seek_to_end,
-    .skip = vio_skip,
-    .position = vio_position,
-    .size = vio_size,
-    .read = vio_read,
-    .write = vio_write
+        .from_file = vio_from_file,
+        .close = vio_close,
+        .seek = vio_seek,
+        .seek_to_end = vio_seek_to_end,
+        .skip = vio_skip,
+        .position = vio_position,
+        .size = vio_size,
+        .read = vio_read,
+        .write = vio_write
 };
 
 struct process_api_v0 process_api = {
-    .exec = exec
+        .exec = exec
 };
 
 struct hash_api_v0 hash_api = {

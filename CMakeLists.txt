@@ -84,7 +84,7 @@ set(SOURCE_FILES
         ########################################################################
         engine/sources/cetech/core/private/module.c
         engine/sources/cetech/core/private/config.c
-        engine/sources/cetech/core/private/memory/memory.c
+        engine/sources/cetech/core/memory/private/memory.c
 
         engine/sources/cetech/modules/luasys/private/luasys.c
         engine/sources/cetech/modules/luasys/private/api/api_plugin.c

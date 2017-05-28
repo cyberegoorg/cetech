@@ -1,4 +1,4 @@
-#include <cetech/core/allocator.h>
+#include <cetech/core/memory/allocator.h>
 
 #include <cetech/core/module.h>
 #include <cetech/core/api.h>
@@ -29,7 +29,7 @@ static int _renderer_set_debug(lua_State *l) {
     return 0;
 }
 
-void _register_lua_renderer_api( struct api_v0* api) {
+void _register_lua_renderer_api(struct api_v0 *api) {
     GET_API(api, renderer_api_v0);
 
     luasys_add_module_function(API_NAME, "render_world",

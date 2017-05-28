@@ -42,7 +42,6 @@
 #endif
 
 
-
 static char *_time_to_str(struct tm *gmtm) {
     char *time_str = asctime(gmtm);
     time_str[strlen(time_str) - 1] = '\0';

@@ -5,12 +5,11 @@
 #include <cetech/core/container/map.inl>
 #include <cetech/core/math/vec3f.inl>
 
-#include <cetech/core/memory.h>
+#include <cetech/core/memory/memory.h>
 #include <cetech/core/config.h>
 #include <cetech/modules/resource/resource.h>
 
 #include <cetech/core/module.h>
-#include <cetech/core/hash.h>
 
 #include <cetech/modules/world/world.h>
 #include <cetech/modules/entity/entity.h>
@@ -148,7 +147,7 @@ static struct property_value _get_property(uint64_t type,
     return clb.get_property(world, entity, key);
 }
 
-static void _init_api(struct api_v0* api_v0){
+static void _init_api(struct api_v0 *api_v0) {
     static struct component_api_v0 api = {0};
     api.component_register_compiler = component_register_compiler;
     api.component_compile = component_compile;
@@ -163,7 +162,7 @@ static void _init_api(struct api_v0* api_v0){
     api_v0->register_api("component_api_v0", &api);
 }
 
-static void _init( struct api_v0* api_v0) {
+static void _init(struct api_v0 *api_v0) {
     GET_API(api_v0, memory_api_v0);
     GET_API(api_v0, world_api_v0);
 

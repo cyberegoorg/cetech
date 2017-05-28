@@ -1,9 +1,9 @@
 #include <memory.h>
 
-#include <cetech/core/allocator.h>
+#include <cetech/core/memory/allocator.h>
 #include <cetech/core/errors.h>
 #include <cetech/core/module.h>
-#include <cetech/core/memory.h>
+#include <cetech/core/memory/memory.h>
 #include <cetech/core/api.h>
 #include <cetech/core/log.h>
 
@@ -44,7 +44,7 @@ char *str_dup(const char *s,
     return d;
 }
 
-void memsys_init_api(struct api_v0* api) {
+void memsys_init_api(struct api_v0 *api) {
     GET_API(api, log_api_v0);
 
     static struct memory_api_v0 _api = {0};
@@ -56,7 +56,7 @@ void memsys_init_api(struct api_v0* api) {
     api->register_api("memory_api_v0", &_api);
 }
 
-static void _init( struct api_v0* api) {
+static void _init(struct api_v0 *api) {
 
 }
 

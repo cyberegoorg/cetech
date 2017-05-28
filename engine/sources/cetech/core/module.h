@@ -47,22 +47,22 @@ struct module_api_v0 {
     //! \param Init cvars
     void (*init_cvar       )(struct config_api_v0);
 
-    void (*init_api       )(struct api_v0*);
+    void (*init_api       )(struct api_v0 *);
 
     //! Init
     //! \param get_api_fce_t Get engine api
-    void (*init            )(struct api_v0*);
+    void (*init            )(struct api_v0 *);
 
     //! Shutdown
     void (*shutdown        )(void);
 
     //! Reload begin
     //! \param get_api_fce_t Get engine api
-    void *(*reload_begin   )(struct api_v0*);
+    void *(*reload_begin   )(struct api_v0 *);
 
     //! Reload end
     //! \param get_api_fce_t Get engine api
-    void (*reload_end      )(struct api_v0*,
+    void (*reload_end      )(struct api_v0 *,
                              void *);
 
     //! Call update
@@ -77,7 +77,9 @@ struct module_api_v0 {
 // Interface
 //==============================================================================
 
-void module_init(struct allocator *allocator, struct api_v0* api_v0);
+void module_init(struct allocator *allocator,
+                 struct api_v0 *api_v0);
+
 void module_shutdown();
 
 //! Add static modules

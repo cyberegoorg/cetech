@@ -1,5 +1,5 @@
 
-#include <cetech/core/allocator.h>
+#include <cetech/core/memory/allocator.h>
 #include <cetech/core/math/math_types.h>
 #include <cetech/core/module.h>
 
@@ -102,7 +102,7 @@ static int _gamepad_play_rumble(lua_State *l) {
 
 #define API_NAME "Gamepad"
 
-void _register_lua_gamepad_api( struct api_v0* api) {
+void _register_lua_gamepad_api(struct api_v0 *api) {
     GET_API(api, gamepad_api_v0);
 
     luasys_add_module_function(API_NAME, "is_active", _gamepad_is_active);

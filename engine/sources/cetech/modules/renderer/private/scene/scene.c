@@ -4,11 +4,11 @@
 
 #include <bgfx/c99/bgfx.h>
 
-#include <cetech/core/allocator.h>
+#include <cetech/core/memory/allocator.h>
 #include <cetech/core/container/map.inl>
 
 #include <cetech/core/hash.h>
-#include <cetech/core/memory.h>
+#include <cetech/core/memory/memory.h>
 #include <cetech/core/module.h>
 #include <cetech/core/api.h>
 #include <cetech/core/os/path.h>
@@ -164,7 +164,7 @@ void scene_create_graph(world_t world,
 }
 
 uint64_t scene_get_mesh_node(uint64_t scene,
-                                 uint64_t mesh) {
+                             uint64_t mesh) {
     struct scene_blob *res = resource_api_v0.get(_G.type, scene);
 
     uint64_t *geom_node = scene_blob_geom_node(res);

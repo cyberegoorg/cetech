@@ -4,8 +4,8 @@
 #include <memory.h>
 
 static uint64_t hash_murmur2_64(const void *key,
-                         uint64_t len,
-                         uint64_t seed) {
+                                uint64_t len,
+                                uint64_t seed) {
 
     static const uint64_t m = 0xc6a4a7935bd1e995ULL;
     static const uint32_t r = 47;

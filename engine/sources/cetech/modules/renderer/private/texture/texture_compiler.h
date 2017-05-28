@@ -61,7 +61,7 @@ static int _texture_resource_compiler(const char *filename,
     char source_data[vio_api_v0.size(source_vio) + 1];
     memset(source_data, 0, vio_api_v0.size(source_vio) + 1);
     vio_api_v0.read(source_vio, source_data, sizeof(char),
-                        vio_api_v0.size(source_vio));
+                    vio_api_v0.size(source_vio));
 
     yaml_document_t h;
     yaml_node_t root = yaml_load_str(source_data, &h);
@@ -85,7 +85,8 @@ static int _texture_resource_compiler(const char *filename,
 
     yaml_as_string(input, input_str, CETECH_ARRAY_LEN(input_str));
 
-    path_v0.path_join(input_path, CETECH_ARRAY_LEN(input_path), source_dir, input_str);
+    path_v0.path_join(input_path, CETECH_ARRAY_LEN(input_path), source_dir,
+                      input_str);
 
     _gen_tmp_name(output_path, tmp_dir, CETECH_ARRAY_LEN(tmp_filename),
                   input_str);
@@ -97,11 +98,12 @@ static int _texture_resource_compiler(const char *filename,
     }
 
     struct vio *tmp_file = vio_api_v0.from_file(output_path, VIO_OPEN_READ,
-                                         memory_api_v0.main_allocator());
+                                                memory_api_v0.main_allocator());
     char *tmp_data =
-            CETECH_ALLOCATE(memory_api_v0.main_allocator(), char,
-                            vio_api_v0.size(tmp_file) + 1);
-    vio_api_v0.read(tmp_file, tmp_data, sizeof(char), vio_api_v0.size(tmp_file));
+    CETECH_ALLOCATE(memory_api_v0.main_allocator(), char,
+                    vio_api_v0.size(tmp_file) + 1);
+    vio_api_v0.read(tmp_file, tmp_data, sizeof(char),
+                    vio_api_v0.size(tmp_file));
 
     struct texture resource = {
             .size = vio_api_v0.size(tmp_file)

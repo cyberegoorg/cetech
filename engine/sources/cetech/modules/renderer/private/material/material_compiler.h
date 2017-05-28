@@ -31,15 +31,15 @@ static void _preprocess(const char *filename,
         char full_path[256] = {0};
         const char *source_dir = resource_api_v0.compiler_get_source_dir();
         path_v0.path_join(full_path, CETECH_ARRAY_LEN(full_path), source_dir,
-                  prefab_file);
+                          prefab_file);
 
         struct vio *prefab_vio = vio_api_v0.from_file(full_path, VIO_OPEN_READ,
-                                               memory_api_v0.main_allocator());
+                                                      memory_api_v0.main_allocator());
 
         char prefab_data[vio_api_v0.size(prefab_vio) + 1];
         memset(prefab_data, 0, vio_api_v0.size(prefab_vio) + 1);
         vio_api_v0.read(prefab_vio, prefab_data, sizeof(char),
-                 vio_api_v0.size(prefab_vio));
+                        vio_api_v0.size(prefab_vio));
         vio_api_v0.close(prefab_vio);
 
         yaml_document_t h;
@@ -132,7 +132,7 @@ static int _material_resource_compiler(const char *filename,
     memset(source_data, 0, vio_api_v0.size(source_vio) + 1);
 
     vio_api_v0.read(source_vio, source_data, sizeof(char),
-             vio_api_v0.size(source_vio));
+                    vio_api_v0.size(source_vio));
 
     yaml_document_t h;
     yaml_node_t root = yaml_load_str(source_data, &h);
@@ -179,9 +179,9 @@ static int _material_resource_compiler(const char *filename,
 
     vio_api_v0.write(build_vio, &resource, sizeof(resource), 1);
     vio_api_v0.write(build_vio, output.uniform_names.data, sizeof(char),
-              ARRAY_SIZE(&output.uniform_names));
+                     ARRAY_SIZE(&output.uniform_names));
     vio_api_v0.write(build_vio, output.data.data, sizeof(uint8_t),
-              ARRAY_SIZE(&output.data));
+                     ARRAY_SIZE(&output.data));
 
     ARRAY_DESTROY(char, &output.uniform_names);
     ARRAY_DESTROY(uint8_t, &output.data);

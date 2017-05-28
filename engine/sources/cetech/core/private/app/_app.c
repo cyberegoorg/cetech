@@ -4,12 +4,11 @@
 
 #include <unistd.h>
 
-#include <cetech/core/allocator.h>
+#include <cetech/core/memory/allocator.h>
 
 #include <cetech/core/os/window.h>
 #include <cetech/core/hash.h>
 #include <cetech/core/container/eventstream.inl>
-#include <cetech/core/memory.h>
 
 #include "_app.h"
 #include <cetech/core/config.h>
@@ -100,24 +99,43 @@ static int _cmd_wait(mpack_node_t args,
 //==============================================================================
 
 extern const char *application_platform();
+
 extern const char *application_native_platform();
+
 extern window_t application_get_main_window();
-extern int cvar_init(struct api_v0* api);
+
+extern int cvar_init(struct api_v0 *api);
+
 extern void cvar_shutdown();
+
 extern void memsys_init(int scratch_buffer_size);
-extern void memsys_init_api(struct api_v0* api);
+
+extern void memsys_init_api(struct api_v0 *api);
+
 extern void memsys_shutdown();
+
 extern struct allocator *_memsys_main_allocator();
+
 extern struct allocator *_memsys_main_scratch_allocator();
+
 extern void api_init(struct allocator *allocator);
+
 extern void api_shutdown();
-extern struct api_v0* api_get_v0();
+
+extern struct api_v0 *api_get_v0();
+
 extern void os_register_api(struct api_v0 *api);
-extern void log_register_api(struct api_v0* api);
-extern int logdb_init_db(const char *log_dir, struct api_v0* api);
+
+extern void log_register_api(struct api_v0 *api);
+
+extern int logdb_init_db(const char *log_dir,
+                         struct api_v0 *api);
+
 extern void log_init();
+
 extern void log_shutdown();
-extern void log_register_api(struct api_v0* api);
+
+extern void log_register_api(struct api_v0 *api);
 
 
 void application_quit() {
@@ -148,25 +166,26 @@ void _init_api(struct api_v0 *api) {
     GET_API(api, hash_api_v0);
 }
 
-int _init_config(struct api_v0* api) {
-    struct config_api_v0 config = *(struct config_api_v0*)api->first("config_api_v0");
+int _init_config(struct api_v0 *api) {
+    struct config_api_v0 config = *(struct config_api_v0 *) api->first(
+            "config_api_v0");
 
     _G.config = (struct GConfig) {
             .boot_pkg = config.new_str("core.boot_pkg", "Boot package",
-                                              "boot"),
+                                       "boot"),
 
             .boot_script = config.new_str("core.boot_script",
-                                                 "Boot script", "lua/boot"),
+                                          "Boot script", "lua/boot"),
 
             .screen_x = config.new_int("screen.x", "Screen width", 1024),
             .screen_y = config.new_int("screen.y", "Screen height", 768),
             .fullscreen = config.new_int("screen.fullscreen",
-                                                "Fullscreen", 0),
+                                         "Fullscreen", 0),
 
             .daemon = config.new_int("daemon", "Daemon mode", 0),
             .compile = config.new_int("compile", "Comple", 0),
             .continue_ = config.new_int("continue",
-                                               "Continue after compile", 0),
+                                        "Continue after compile", 0),
             .wait = config.new_int("wait", "Wait for client", 0),
             .wid = config.new_int("wid", "Wid", 0)
     };
@@ -181,7 +200,8 @@ int _init_config(struct api_v0* api) {
         cvar_t bd = config.find("build");
 
         const char *build_dir_str = config.get_string(bd);
-        path_v0.path_join(build_dir_full, 1024, build_dir_str, application_platform());
+        path_v0.path_join(build_dir_full, 1024, build_dir_str,
+                          application_platform());
         path_v0.dir_make_path(build_dir_full);
         config.compile_global(&api_v1);
     }
@@ -198,7 +218,7 @@ int _init_config(struct api_v0* api) {
     return 1;
 }
 
-extern void error_init(struct api_v0* api);
+extern void error_init(struct api_v0 *api);
 
 int application_init(int argc,
                      const char **argv) {
@@ -253,7 +273,6 @@ int application_init(int argc,
     };
 
     module_call_init();
-
 
 
     log_api_v0.log_set_wid_clb(task_api_v0.worker_id);

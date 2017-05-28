@@ -2,7 +2,7 @@
 // Includes
 //==============================================================================
 
-#include <cetech/core/allocator.h>
+#include <cetech/core/memory/allocator.h>
 #include <cetech/modules/world/world.h>
 #include <cetech/core/config.h>
 #include <cetech/modules/resource/resource.h>
@@ -10,14 +10,13 @@
 #include <cetech/modules/entity/entity.h>
 #include <cetech/modules/transform/transform.h>
 #include <cetech/core/math/quatf.inl>
-#include <cetech/core/memory.h>
+#include <cetech/core/memory/memory.h>
 #include <cetech/core/module.h>
 
 #include "../level.h"
 #include <cetech/core/container/map.inl>
 #include <cetech/core/yaml.h>
 #include "level_blob.h"
-#include <cetech/core/os/path.h>
 #include <cetech/core/hash.h>
 #include <cetech/core/api.h>
 
@@ -167,7 +166,7 @@ int _level_resource_compiler(const char *filename,
     char source_data[vio_api_v0.size(source_vio) + 1];
     memset(source_data, 0, vio_api_v0.size(source_vio) + 1);
     vio_api_v0.read(source_vio, source_data, sizeof(char),
-                        vio_api_v0.size(source_vio));
+                    vio_api_v0.size(source_vio));
 
     yaml_document_t h;
     yaml_node_t root = yaml_load_str(source_data, &h);
@@ -204,11 +203,11 @@ int _level_resource_compiler(const char *filename,
 
     vio_api_v0.write(build_vio, &res, sizeof(struct level_blob), 1);
     vio_api_v0.write(build_vio, &ARRAY_AT(&id, 0), sizeof(uint64_t),
-              ARRAY_SIZE(&id));
+                     ARRAY_SIZE(&id));
     vio_api_v0.write(build_vio, &ARRAY_AT(&offset, 0), sizeof(uint32_t),
-              ARRAY_SIZE(&offset));
+                     ARRAY_SIZE(&offset));
     vio_api_v0.write(build_vio, &ARRAY_AT(&data, 0), sizeof(uint8_t),
-              ARRAY_SIZE(&data));
+                     ARRAY_SIZE(&data));
 
     ARRAY_DESTROY(uint64_t, &id);
     ARRAY_DESTROY(uint32_t, &offset);
@@ -279,7 +278,7 @@ entity_t level_entity(level_t level) {
     return instance->level_entity;
 }
 
-static void _init_api(struct api_v0* api){
+static void _init_api(struct api_v0 *api) {
     static struct level_api_v0 _api = {0};
 
     _api.load_level = world_load_level;
@@ -291,7 +290,7 @@ static void _init_api(struct api_v0* api){
 }
 
 
-static void _init( struct api_v0* api) {
+static void _init(struct api_v0 *api) {
     GET_API(api, entity_api_v0);
     GET_API(api, memory_api_v0);
     GET_API(api, resource_api_v0);

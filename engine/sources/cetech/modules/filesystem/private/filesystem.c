@@ -4,9 +4,8 @@
 
 #include <cetech/core/os/path.h>
 
-#include <cetech/core/memory.h>
+#include <cetech/core/memory/memory.h>
 #include <cetech/modules/filesystem/filesystem.h>
-#include <cetech/core/hash.h>
 #include <cetech/core/config.h>
 #include <cetech/modules/resource/resource.h>
 #include <cetech/core/module.h>

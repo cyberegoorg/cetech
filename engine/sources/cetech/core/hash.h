@@ -17,8 +17,8 @@ struct hash_api_v0 {
     //! \param seed Seed
     //! \return Hashed value
     uint64_t (*hash_murmur2_64)(const void *key,
-                             uint64_t len,
-                             uint64_t seed);
+                                uint64_t len,
+                                uint64_t seed);
 
     uint64_t (*id64_from_str)(const char *str);
 };

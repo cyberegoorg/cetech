@@ -25,7 +25,7 @@ static int _compile_all(lua_State *l) {
 
 #endif
 
-void _register_lua_resource_manager_api( struct api_v0* api) {
+void _register_lua_resource_manager_api(struct api_v0 *api) {
     GET_API(api, resource_api_v0);
 
     luasys_add_module_function(API_NAME, "reload_all", _reload_all);

@@ -3,7 +3,7 @@
 //==============================================================================
 
 #include <cetech/core/math/math_types.h>
-#include <cetech/core/allocator.h>
+#include <cetech/core/memory/allocator.h>
 #include <cetech/core/config.h>
 #include <cetech/modules/resource/resource.h>
 #include <cetech/core/container/eventstream.inl>
@@ -40,7 +40,7 @@ static void _update() {
     struct event_header *event = machine_api_v0.event_begin();
 
     memcpy(_G.last_state, _G.state,
-                sizeof(int) * GAMEPAD_BTN_MAX * GAMEPAD_MAX);
+           sizeof(int) * GAMEPAD_BTN_MAX * GAMEPAD_MAX);
 
     while (event != machine_api_v0.event_end()) {
         struct gamepad_move_event *move_event = (struct gamepad_move_event *) event;
@@ -174,7 +174,7 @@ void gamepad_play_rumble(uint32_t idx,
     machine_api_v0.gamepad_play_rumble(idx, strength, length);
 }
 
-static void _init_api(struct api_v0* api){
+static void _init_api(struct api_v0 *api) {
     static struct gamepad_api_v0 api_v1 = {
             .is_active = gamepad_is_active,
             .button_index = gamepad_button_index,
@@ -190,10 +190,9 @@ static void _init_api(struct api_v0* api){
     api->register_api("gamepad_api_v0", &api_v1);
 }
 
-static void _init( struct api_v0* api) {
+static void _init(struct api_v0 *api) {
     GET_API(api, machine_api_v0);
     GET_API(api, log_api_v0);
-
 
 
     _G = (struct G) {0};

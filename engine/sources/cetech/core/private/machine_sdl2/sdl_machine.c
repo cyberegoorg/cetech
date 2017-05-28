@@ -15,7 +15,7 @@
 // Keyboard part
 //==============================================================================
 
-extern int sdl_keyboard_init( struct api_v0 *api);
+extern int sdl_keyboard_init(struct api_v0 *api);
 
 extern void sdl_keyboard_shutdown();
 
@@ -26,7 +26,7 @@ extern void sdl_keyboard_process(struct eventstream *stream);
 // Mouse part
 //==============================================================================
 
-extern int sdl_mouse_init( struct api_v0* api);
+extern int sdl_mouse_init(struct api_v0 *api);
 
 extern void sdl_mouse_shutdown();
 
@@ -36,14 +36,14 @@ extern void sdl_mouse_process(struct eventstream *stream);
 // Gamepad part
 //==============================================================================
 
-extern int sdl_gamepad_init( struct api_v0 *api);
+extern int sdl_gamepad_init(struct api_v0 *api);
 
 extern void sdl_gamepad_shutdown();
 
 extern void sdl_gamepad_process(struct eventstream *stream);
 
 extern void sdl_gamepad_process_event(SDL_Event *event,
-                               struct eventstream *stream);
+                                      struct eventstream *stream);
 
 //==============================================================================
 // Defines
@@ -67,7 +67,7 @@ IMPORT_API(log_api_v0);
 // Interface
 //==============================================================================
 
-int _machine_init_impl( struct api_v0 *api) {
+int _machine_init_impl(struct api_v0 *api) {
     _G = (struct G) {0};
 
     GET_API(api, app_api_v0);
@@ -75,7 +75,8 @@ int _machine_init_impl( struct api_v0 *api) {
 
 
     if (SDL_Init(SDL_INIT_EVERYTHING) != 0) {
-        log_api_v0.log_error(LOG_WHERE, "Could not init sdl - %s", SDL_GetError());
+        log_api_v0.log_error(LOG_WHERE, "Could not init sdl - %s",
+                             SDL_GetError());
         return 0;
     }
 

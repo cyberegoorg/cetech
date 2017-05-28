@@ -1,9 +1,8 @@
 
 
-#include <cetech/core/allocator.h>
+#include <cetech/core/memory/allocator.h>
 #include <cetech/core/hash.h>
 #include <cetech/modules/world/world.h>
-#include <cetech/modules/resource/resource.h>
 #include <cetech/modules/entity/entity.h>
 #include <cetech/core/module.h>
 #include <cetech/modules/luasys/luasys.h>
@@ -33,7 +32,7 @@ static int _entity_destroy(lua_State *l) {
 }
 
 
-void _register_lua_entity_api( struct api_v0* api) {
+void _register_lua_entity_api(struct api_v0 *api) {
     GET_API(api, entity_api_v0);
     GET_API(api, hash_api_v0);
 

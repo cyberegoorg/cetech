@@ -1,8 +1,7 @@
 
 
-#include <cetech/core/allocator.h>
+#include <cetech/core/memory/allocator.h>
 #include <cetech/modules/world/world.h>
-#include <cetech/modules/resource/resource.h>
 #include <cetech/modules/entity/entity.h>
 #include <cetech/core/module.h>
 
@@ -55,7 +54,7 @@ static int _level_entity(lua_State *l) {
     return 1;
 }
 
-void _register_lua_level_api( struct api_v0* api) {
+void _register_lua_level_api(struct api_v0 *api) {
     GET_API(api, level_api_v0);
     GET_API(api, hash_api_v0);
 

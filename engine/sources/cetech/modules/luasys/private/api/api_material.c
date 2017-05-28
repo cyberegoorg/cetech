@@ -1,5 +1,5 @@
 
-#include <cetech/core/allocator.h>
+#include <cetech/core/memory/allocator.h>
 #include <cetech/core/module.h>
 
 #include "../../../transform/transform.h"
@@ -35,7 +35,7 @@ static int _set_vec4f(lua_State *l) {
     return 0;
 }
 
-void _register_lua_material_api( struct api_v0* api) {
+void _register_lua_material_api(struct api_v0 *api) {
     GET_API(api, material_api_v0);
     GET_API(api, hash_api_v0);
 

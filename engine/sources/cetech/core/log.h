@@ -70,67 +70,67 @@ struct log_api_v0 {
     //! \param handler Handler
     //! \param data Handler data
     void (*log_register_handler)(log_handler_t handler,
-                              void *data);
+                                 void *data);
 
     //! Log info
     //! \param where Where
     //! \param format Format
     //! \param va va args
     void (*log_info_va)(const char *where,
-                     const char *format,
-                     va_list va);
+                        const char *format,
+                        va_list va);
 
     //! Log info
     //! \param where Where
     //! \param format Format
     void (*log_info)(const char *where,
-                  const char *format,
-                  ...) ATTR_FORMAT(2, 3);
+                     const char *format,
+                     ...) ATTR_FORMAT(2, 3);
 
     //! Log warnig
     //! \param where Where
     //! \param format Format
     //! \param va va args
     void (*log_warning_va)(const char *where,
-                        const char *format,
-                        va_list va);
+                           const char *format,
+                           va_list va);
 
     //! Log warning
     //! \param where Where
     //! \param format Format
     void (*log_warning)(const char *where,
-                     const char *format,
-                     ...) ATTR_FORMAT(2, 3);
+                        const char *format,
+                        ...) ATTR_FORMAT(2, 3);
 
     //! Log error
     //! \param where Where
     //! \param format Format
     //! \param va va args
     void (*log_error_va)(const char *where,
-                      const char *format,
-                      va_list va);
+                         const char *format,
+                         va_list va);
 
     //! Log error
     //! \param where Where
     //! \param format Format
     void (*log_error)(const char *where,
-                   const char *format,
-                   ...) ATTR_FORMAT(2, 3);
+                      const char *format,
+                      ...) ATTR_FORMAT(2, 3);
 
     //! Log debug
     //! \param where Where
     //! \param format Format
     //! \param va va args
     void (*log_debug_va)(const char *where,
-                      const char *format,
-                      va_list va);
+                         const char *format,
+                         va_list va);
 
     //! Log debug
     //! \param where Where
     //! \param format Format
     void (*log_debug)(const char *where,
-                   const char *format,
-                   ...) ATTR_FORMAT(2, 3);
+                      const char *format,
+                      ...) ATTR_FORMAT(2, 3);
 
 };
 

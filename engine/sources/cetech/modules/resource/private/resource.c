@@ -10,7 +10,7 @@
 #include <cetech/core/hash.h>
 #include <cetech/core/application.h>
 #include <cetech/core/config.h>
-#include <cetech/core/memory.h>
+#include <cetech/core/memory/memory.h>
 #include <cetech/core/module.h>
 #include <cetech/core/os/path.h>
 #include <cetech/core/os/vio.h>
@@ -149,14 +149,14 @@ static const resource_callbacks_t package_resource_callback = {
         .reloader = package_resource_reloader
 };
 
-extern int package_init( struct api_v0 *api);
+extern int package_init(struct api_v0 *api);
 
 extern void package_shutdown();
 
 void resource_register_type(uint64_t type,
                             resource_callbacks_t callbacks);
 
-static void _init_api(struct api_v0* api){
+static void _init_api(struct api_v0 *api) {
 
     static struct resource_api_v0 resource_api = {0};
 
@@ -176,13 +176,13 @@ static void _init_api(struct api_v0* api){
 
 #ifdef CETECH_CAN_COMPILE
     resource_api.compiler_get_core_dir = resource_compiler_get_core_dir;
-        resource_api.compiler_register = resource_compiler_register;
-        resource_api.compiler_compile_all = resource_compiler_compile_all;
-        resource_api.compiler_get_filename = resource_compiler_get_filename;
-        resource_api.compiler_get_tmp_dir = resource_compiler_get_tmp_dir;
-        resource_api.compiler_external_join = resource_compiler_external_join;
-        resource_api.compiler_create_build_dir = resource_compiler_create_build_dir;
-        resource_api.compiler_get_source_dir = resource_compiler_get_source_dir;
+    resource_api.compiler_register = resource_compiler_register;
+    resource_api.compiler_compile_all = resource_compiler_compile_all;
+    resource_api.compiler_get_filename = resource_compiler_get_filename;
+    resource_api.compiler_get_tmp_dir = resource_compiler_get_tmp_dir;
+    resource_api.compiler_external_join = resource_compiler_external_join;
+    resource_api.compiler_create_build_dir = resource_compiler_create_build_dir;
+    resource_api.compiler_get_source_dir = resource_compiler_get_source_dir;
 #endif
 
     api->register_api("resource_api_v0", &resource_api);
@@ -198,7 +198,7 @@ static void _init_api(struct api_v0* api){
 }
 
 
-static void _init( struct api_v0* api) {
+static void _init(struct api_v0 *api) {
     GET_API(api, cnsole_srv_api_v0);
     GET_API(api, memory_api_v0);
     GET_API(api, filesystem_api_v0);
@@ -220,12 +220,13 @@ static void _init( struct api_v0* api) {
 
     char build_dir_full[4096] = {0};
     path_v0.path_join(build_dir_full,
-              CETECH_ARRAY_LEN(build_dir_full),
-              config_api_v0.get_string(_G.config.build_dir),
-              app_api_v0.platform());
+                      CETECH_ARRAY_LEN(build_dir_full),
+                      config_api_v0.get_string(_G.config.build_dir),
+                      app_api_v0.platform());
 
-    filesystem_api_v0.filesystem_map_root_dir(hash_api_v0.id64_from_str("build"),
-                                              build_dir_full);
+    filesystem_api_v0.filesystem_map_root_dir(
+            hash_api_v0.id64_from_str("build"),
+            build_dir_full);
 
     resource_register_type(hash_api_v0.id64_from_str("package"),
                            package_resource_callback);
@@ -243,7 +244,8 @@ static void _init_cvar(struct config_api_v0 config) {
 
     config_api_v0 = config;
 
-    _G.config.build_dir = config.new_str("build", "Resource build dir", "data/build");
+    _G.config.build_dir = config.new_str("build", "Resource build dir",
+                                         "data/build");
 }
 
 static void _shutdown() {
@@ -369,7 +371,8 @@ void resource_load(void **loaded_data,
     const uint32_t idx = MAP_GET(uint32_t, &_G.type_map, type, UINT32_MAX);
 
     if (idx == UINT32_MAX) {
-        log_api_v0.log_error(LOG_WHERE, "Loader for resource is not is not registred");
+        log_api_v0.log_error(LOG_WHERE,
+                             "Loader for resource is not is not registred");
         memset(loaded_data, sizeof(void *), count);
         return;
     }
@@ -405,9 +408,11 @@ void resource_load(void **loaded_data,
 #else
         char *filename = build_name;
 #endif
-        log_api_v0.log_debug("resource", "Loading resource %s from %s/%s", filename,
-                  filesystem_api_v0.filesystem_get_root_dir(root_name),
-                  build_name);
+        log_api_v0.log_debug("resource", "Loading resource %s from %s/%s",
+                             filename,
+                             filesystem_api_v0.filesystem_get_root_dir(
+                                     root_name),
+                             build_name);
 
         struct vio *resource_file = filesystem_api_v0.filesystem_open(root_name,
                                                                       build_name,
@@ -491,7 +496,8 @@ void *resource_get(uint64_t type,
 #else
             char *filename = build_name;
 #endif
-            log_api_v0.log_warning(LOG_WHERE, "Autoloading resource %s", filename);
+            log_api_v0.log_warning(LOG_WHERE, "Autoloading resource %s",
+                                   filename);
             resource_load_now(type, &names, 1);
             item = MAP_GET(resource_item_t, resource_map, names, null_item);
         } else {

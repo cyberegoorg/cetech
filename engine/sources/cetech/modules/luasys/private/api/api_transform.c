@@ -101,7 +101,7 @@ static int _transform_link(lua_State *l) {
     return 0;
 }
 
-void _register_lua_transform_api( struct api_v0* api) {
+void _register_lua_transform_api(struct api_v0 *api) {
     GET_API(api, transform_api_v0);
 
     luasys_add_module_function(API_NAME, "get", _transform_get);

@@ -20,7 +20,7 @@ struct memory_api_v0 {
     struct allocator *(*main_scratch_allocator)();
 
     char *(*str_dup)(const char *s,
-                  struct allocator *allocator);
+                     struct allocator *allocator);
 };
 
 #endif //CETECH_MEMSYS_H

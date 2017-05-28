@@ -1,10 +1,9 @@
 
-#include <cetech/core/allocator.h>
+#include <cetech/core/memory/allocator.h>
 #include <cetech/core/hash.h>
 #include <cetech/core/module.h>
 
 #include <cetech/modules/world/world.h>
-#include <cetech/modules/resource/resource.h>
 #include <cetech/modules/entity/entity.h>
 #include <cetech/modules/component/component.h>
 
@@ -126,7 +125,7 @@ static int _get_property(lua_State *l) {
 }
 
 
-void _register_lua_component_api( struct api_v0* api) {
+void _register_lua_component_api(struct api_v0 *api) {
     GET_API(api, component_api_v0);
     GET_API(api, lua_api_v0);
     GET_API(api, hash_api_v0);

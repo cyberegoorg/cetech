@@ -6,7 +6,7 @@
 
 #include <cetech/core/container/map.inl>
 #include <cetech/core/module.h>
-#include <cetech/core/memory.h>
+#include <cetech/core/memory/memory.h>
 #include <cetech/core/yaml.h>
 #include <cetech/core/hash.h>
 #include <cetech/core/handler.h>
@@ -126,15 +126,15 @@ static void preprocess(const char *filename,
         char full_path[256] = {0};
         const char *source_dir = resource_api_v0.compiler_get_source_dir();
         path_v0.path_join(full_path, CETECH_ARRAY_LEN(full_path), source_dir,
-                  prefab_file);
+                          prefab_file);
 
         struct vio *prefab_vio = vio_api_v0.from_file(full_path, VIO_OPEN_READ,
-                                               memory_api_v0.main_allocator());
+                                                      memory_api_v0.main_allocator());
 
         char prefab_data[vio_api_v0.size(prefab_vio) + 1];
         memset(prefab_data, 0, vio_api_v0.size(prefab_vio) + 1);
         vio_api_v0.read(prefab_vio, prefab_data, sizeof(char),
-                            vio_api_v0.size(prefab_vio));
+                        vio_api_v0.size(prefab_vio));
 
         yaml_document_t h;
         yaml_node_t prefab_root = yaml_load_str(prefab_data, &h);
@@ -407,7 +407,7 @@ int _entity_resource_compiler(const char *filename,
     char source_data[vio_api_v0.size(source_vio) + 1];
     memset(source_data, 0, vio_api_v0.size(source_vio) + 1);
     vio_api_v0.read(source_vio, source_data, sizeof(char),
-             vio_api_v0.size(source_vio));
+                    vio_api_v0.size(source_vio));
 
     yaml_document_t h;
     yaml_node_t root = yaml_load_str(source_data, &h);
@@ -418,7 +418,7 @@ int _entity_resource_compiler(const char *filename,
     entity_resource_compiler(root, filename, &entity_data, compilator_api);
 
     vio_api_v0.write(build_vio, &ARRAY_AT(&entity_data, 0), sizeof(uint8_t),
-              ARRAY_SIZE(&entity_data));
+                     ARRAY_SIZE(&entity_data));
 
 
     ARRAY_DESTROY(uint8_t, &entity_data);
@@ -557,7 +557,7 @@ void entity_destroy(world_t world,
 
 }
 
-static void _init_api(struct api_v0* api){
+static void _init_api(struct api_v0 *api) {
     static struct entity_api_v0 _api = {0};
     _api.entity_manager_create = entity_manager_create;
     _api.entity_manager_destroy = entity_manager_destroy;
@@ -579,7 +579,7 @@ static void _init_api(struct api_v0* api){
 
 }
 
-static void _init( struct api_v0* api) {
+static void _init(struct api_v0 *api) {
     GET_API(api, memory_api_v0);
     GET_API(api, component_api_v0);
     GET_API(api, memory_api_v0);
@@ -588,7 +588,6 @@ static void _init( struct api_v0* api) {
     GET_API(api, path_v0);
     GET_API(api, vio_api_v0);
     GET_API(api, hash_api_v0);
-
 
 
     _G = (struct G) {0};

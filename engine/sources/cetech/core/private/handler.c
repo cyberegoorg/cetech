@@ -1,6 +1,6 @@
 #include <stddef.h>
 
-#include <cetech/core/allocator.h>
+#include <cetech/core/memory/allocator.h>
 #include <cetech/core/container/queue.inl>
 #include <cetech/core/module.h>
 #include <cetech/core/handler.h>
@@ -80,7 +80,7 @@ int handler32_alive(struct handler32gen *hid,
     return ARRAY_AT(&hid->_generation, _idx(h)) == _gen(h);
 }
 
-static void _init_api(struct api_v0* api){
+static void _init_api(struct api_v0 *api) {
     static struct handler_api_v0 _api = {
             .handler32gen_create =  handler32gen_create,
             .handler32gen_destroy =  handler32gen_destroy,
@@ -91,7 +91,7 @@ static void _init_api(struct api_v0* api){
     api->register_api("handler_api_v0", &_api);
 }
 
-static void _init( struct api_v0* api) {
+static void _init(struct api_v0 *api) {
 
 }
 

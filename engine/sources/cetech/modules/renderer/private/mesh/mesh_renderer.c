@@ -15,7 +15,7 @@
 #include "../../../scenegraph/scenegraph.h"
 #include <cetech/core/math/mat44f.inl>
 
-#include <cetech/core/memory.h>
+#include <cetech/core/memory/memory.h>
 #include <cetech/core/module.h>
 #include <cetech/core/api.h>
 
@@ -100,7 +100,8 @@ int _mesh_component_compiler(yaml_node_t body,
     YAML_NODE_SCOPE(scene, body, "scene",
                     yaml_as_string(scene, tmp_buffer,
                                    CETECH_ARRAY_LEN(tmp_buffer));
-                            t_data.scene = hash_api_v0.id64_from_str(tmp_buffer);
+                            t_data.scene = hash_api_v0.id64_from_str(
+                                    tmp_buffer);
     );
     YAML_NODE_SCOPE(mesh, body, "mesh",
                     yaml_as_string(mesh, tmp_buffer,
@@ -169,8 +170,6 @@ static void _spawner(world_t world,
                                     tdata[i].material);
     }
 }
-
-
 
 
 int mesh_is_valid(mesh_renderer_t mesh) {
@@ -351,7 +350,7 @@ static struct property_value _get_property(world_t world,
 }
 
 
-static void _init_api(struct api_v0* api){
+static void _init_api(struct api_v0 *api) {
     static struct mesh_renderer_api_v0 _api = {0};
 
     _api.is_valid = mesh_is_valid;
@@ -366,7 +365,7 @@ static void _init_api(struct api_v0* api){
 }
 
 
-static void _init( struct api_v0* api) {
+static void _init(struct api_v0 *api) {
     GET_API(api, component_api_v0);
     GET_API(api, memory_api_v0);
     GET_API(api, material_api_v0);
@@ -374,7 +373,6 @@ static void _init( struct api_v0* api) {
     GET_API(api, scenegprah_api_v0);
     GET_API(api, transform_api_v0);
     GET_API(api, hash_api_v0);
-
 
 
     _G = (struct G) {0};

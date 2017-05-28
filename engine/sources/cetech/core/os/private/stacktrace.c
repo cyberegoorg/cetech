@@ -1,7 +1,7 @@
 
 #include <string.h>
 
-#include "cetech/core/private/memory/_allocator.h"
+#include "cetech/core/memory/private/_allocator.h"
 
 #if defined(CETECH_LINUX)
 
@@ -72,8 +72,11 @@ void stacktrace_free(char *st) {
 
 IMPORT_API(log_api_v0);
 
-void error_assert(const char* where, const char* condition, const char* filename, int line) {
-    char* st = stacktrace(1);
+void error_assert(const char *where,
+                  const char *condition,
+                  const char *filename,
+                  int line) {
+    char *st = stacktrace(1);
     log_api_v0.log_error(where,
                          "msg: \"%s\n  file: %s:%d\n  stacktrace:\n%s",
                          condition,
@@ -88,7 +91,7 @@ static struct error_api_v0 error_api = {
         .assert = error_assert
 };
 
-void error_init(struct api_v0* api){
+void error_init(struct api_v0 *api) {
     GET_API(api, log_api_v0);
 
     api->register_api("error_api_v0", &error_api);

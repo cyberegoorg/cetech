@@ -30,7 +30,7 @@ static int _application_platform(lua_State *l) {
 }
 
 
-void _register_lua_application_api( struct api_v0* api) {
+void _register_lua_application_api(struct api_v0 *api) {
     GET_API(api, app_api_v0);
 
     luasys_add_module_function(API_NAME, "quit", _application_quit);

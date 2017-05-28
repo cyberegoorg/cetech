@@ -29,7 +29,7 @@ static struct G {
 // Interface
 //==============================================================================
 
-int sdl_keyboard_init(struct api_v0* api) {
+int sdl_keyboard_init(struct api_v0 *api) {
     _G = (struct G) {0};
 
     return 1;

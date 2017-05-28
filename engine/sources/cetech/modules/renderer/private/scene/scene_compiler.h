@@ -217,7 +217,7 @@ void foreach_geometries_clb(yaml_node_t key,
     uint64_t name = hash_api_v0.id64_from_str(name_str);
 
     ARRAY_PUSH_BACK(uint64_t, &output->geom_name, name);
-    ARRAY_PUSH_BACK(uint64_t, &output->geom_node,  0);
+    ARRAY_PUSH_BACK(uint64_t, &output->geom_node, 0);
     ARRAY_PUSH_BACK(uint32_t, &output->ib_offset, ARRAY_SIZE(&output->ib));
     ARRAY_PUSH_BACK(uint32_t, &output->vb_offset, ARRAY_SIZE(&output->vb));
 
@@ -366,7 +366,8 @@ int _compile_assimp(const char *filename,
 
     char input_path[128] = {0};
     const char *source_dir = resource_api_v0.compiler_get_source_dir();
-    path_v0.path_join(input_path, CETECH_ARRAY_LEN(input_path), source_dir, input_str);
+    path_v0.path_join(input_path, CETECH_ARRAY_LEN(input_path), source_dir,
+                      input_str);
 
     uint32_t postprocess_flag = aiProcessPreset_TargetRealtime_MaxQuality;
 
@@ -480,7 +481,7 @@ int _scene_resource_compiler(const char *filename,
                     vio_api_v0.size(source_vio) + 1);
     memset(source_data, 0, vio_api_v0.size(source_vio) + 1);
     vio_api_v0.read(source_vio, source_data, sizeof(char),
-                        vio_api_v0.size(source_vio));
+                    vio_api_v0.size(source_vio));
 
     yaml_document_t h;
     yaml_node_t root = yaml_load_str(source_data, &h);
@@ -510,29 +511,30 @@ int _scene_resource_compiler(const char *filename,
 
     vio_api_v0.write(build_vio, &res, sizeof(res), 1);
     vio_api_v0.write(build_vio, output->geom_name.data, sizeof(uint64_t),
-              ARRAY_SIZE(&output->geom_name));
+                     ARRAY_SIZE(&output->geom_name));
     vio_api_v0.write(build_vio, output->ib_offset.data, sizeof(uint32_t),
-              ARRAY_SIZE(&output->ib_offset));
+                     ARRAY_SIZE(&output->ib_offset));
     vio_api_v0.write(build_vio, output->vb_offset.data, sizeof(uint32_t),
-              ARRAY_SIZE(&output->vb_offset));
-    vio_api_v0.write(build_vio, output->vb_decl.data, sizeof(bgfx_vertex_decl_t),
-              ARRAY_SIZE(&output->vb_decl));
+                     ARRAY_SIZE(&output->vb_offset));
+    vio_api_v0.write(build_vio, output->vb_decl.data,
+                     sizeof(bgfx_vertex_decl_t),
+                     ARRAY_SIZE(&output->vb_decl));
     vio_api_v0.write(build_vio, output->ib_size.data, sizeof(uint32_t),
-              ARRAY_SIZE(&output->ib_size));
+                     ARRAY_SIZE(&output->ib_size));
     vio_api_v0.write(build_vio, output->vb_size.data, sizeof(uint32_t),
-              ARRAY_SIZE(&output->vb_size));
+                     ARRAY_SIZE(&output->vb_size));
     vio_api_v0.write(build_vio, output->ib.data, sizeof(uint32_t),
-              ARRAY_SIZE(&output->ib));
+                     ARRAY_SIZE(&output->ib));
     vio_api_v0.write(build_vio, output->vb.data, sizeof(uint8_t),
-              ARRAY_SIZE(&output->vb));
+                     ARRAY_SIZE(&output->vb));
     vio_api_v0.write(build_vio, output->node_name.data, sizeof(uint64_t),
-              ARRAY_SIZE(&output->node_name));
+                     ARRAY_SIZE(&output->node_name));
     vio_api_v0.write(build_vio, output->node_parent.data, sizeof(uint32_t),
-              ARRAY_SIZE(&output->node_parent));
+                     ARRAY_SIZE(&output->node_parent));
     vio_api_v0.write(build_vio, output->node_pose.data, sizeof(mat44f_t),
-              ARRAY_SIZE(&output->node_pose));
+                     ARRAY_SIZE(&output->node_pose));
     vio_api_v0.write(build_vio, output->geom_node.data, sizeof(uint64_t),
-              ARRAY_SIZE(&output->geom_name));
+                     ARRAY_SIZE(&output->geom_name));
 
     _destroy_compile_output(output);
     CETECH_DEALLOCATE(memory_api_v0.main_allocator(), source_data);

@@ -30,7 +30,7 @@ void _shader_resource_online(uint64_t name,
 
     memcpy(vs_mem->data, (resource + 1), resource->vs_size);
     memcpy(fs_mem->data, ((char *) (resource + 1)) + resource->vs_size,
-                resource->fs_size);
+           resource->fs_size);
 
     bgfx_shader_handle_t vs_shader = bgfx_create_shader(vs_mem);
     bgfx_shader_handle_t fs_shader = bgfx_create_shader(fs_mem);

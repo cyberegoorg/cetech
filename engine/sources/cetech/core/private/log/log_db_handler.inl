@@ -122,10 +122,12 @@ void logdb_log(enum log_level level,
     //sqlite3_closeq_v2(_db);
 }
 
-int logdb_init_db(const char *log_dir, struct api_v0* api) {
+int logdb_init_db(const char *log_dir,
+                  struct api_v0 *api) {
     struct path_v0 *path = api->first("path_v0");
 
-    path->path_join(_logdb_path, CETECH_ARRAY_LEN(_logdb_path), log_dir, "log.db");
+    path->path_join(_logdb_path, CETECH_ARRAY_LEN(_logdb_path), log_dir,
+                    "log.db");
 
     _session_id = time(NULL);
 

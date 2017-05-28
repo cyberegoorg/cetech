@@ -50,7 +50,8 @@ window_t window_new(const char *title,
     );
 
     if (w == NULL) {
-        log_api_v0.log_error("sys", "Could not create window: %s", SDL_GetError());
+        log_api_v0.log_error("sys", "Could not create window: %s",
+                             SDL_GetError());
     }
 
     return (window_t) {.w = w};
@@ -60,7 +61,8 @@ window_t window_new_from(void *hndl) {
     SDL_Window *w = SDL_CreateWindowFrom(hndl);
 
     if (w == NULL) {
-        log_api_v0.log_error("sys", "Could not create window: %s", SDL_GetError());
+        log_api_v0.log_error("sys", "Could not create window: %s",
+                             SDL_GetError());
     }
 
     return (window_t) {.w = w};

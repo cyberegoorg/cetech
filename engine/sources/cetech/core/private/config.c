@@ -3,11 +3,11 @@
 //==============================================================================
 #include <stdio.h>
 
-#include <cetech/core/allocator.h>
+#include <cetech/core/memory/allocator.h>
 #include <cetech/core/yaml.h>
 
 #include <cetech/core/application.h>
-#include <cetech/core/memory.h>
+#include <cetech/core/memory/memory.h>
 #include <cetech/core/config.h>
 #include <cetech/core/module.h>
 #include <cetech/core/hash.h>
@@ -147,7 +147,7 @@ cvar_t _find_first_free() {
 }
 
 static void _init(
-                  struct api_v0 *api_v0) {
+        struct api_v0 *api_v0) {
 
 }
 
@@ -155,13 +155,13 @@ static void _shutdown() {
 }
 
 static void *_reload_begin(
-                           struct api_v0 *api_v0) {
+        struct api_v0 *api_v0) {
     return NULL;
 }
 
 static void _reload_end(
-                        struct api_v0 *api,
-                        void *data) {
+        struct api_v0 *api,
+        void *data) {
     _init(api);
 }
 
@@ -231,23 +231,24 @@ void cvar_compile_global(struct app_api_v0 *app_api) {
     path_v0.path_join(build_dir, 1024, build_dir_str, app_api->platform());
 
     path_v0.path_join(build_path, CETECH_ARRAY_LEN(build_path), build_dir,
-              "global.config");
+                      "global.config");
 
 
     path_v0.path_join(source_path, CETECH_ARRAY_LEN(source_path),
-              cvar_get_string(source_dir), "global.config");
+                      cvar_get_string(source_dir), "global.config");
 
     struct vio *source_vio = vio_api_v0.from_file(source_path, VIO_OPEN_READ,
-                                           memory_api_v0.main_allocator());
+                                                  memory_api_v0.main_allocator());
     char *data =
-    CETECH_ALLOCATE(memory_api_v0.main_allocator(), char, vio_api_v0.size(source_vio));
+    CETECH_ALLOCATE(memory_api_v0.main_allocator(), char,
+                    vio_api_v0.size(source_vio));
 
     size_t size = (size_t) vio_api_v0.size(source_vio);
     vio_api_v0.read(source_vio, data, sizeof(char), size);
     vio_api_v0.close(source_vio);
 
     struct vio *build_vio = vio_api_v0.from_file(build_path, VIO_OPEN_WRITE,
-                                          memory_api_v0.main_allocator());
+                                                 memory_api_v0.main_allocator());
     vio_api_v0.write(build_vio, data, sizeof(char), size);
     vio_api_v0.close(build_vio);
 
@@ -343,15 +344,15 @@ void cvar_load_global(struct app_api_v0 *app_api) {
 
 
     path_v0.path_join(source_path, CETECH_ARRAY_LEN(source_path), build_dir,
-              "global.config");
+                      "global.config");
 
     struct vio *source_vio = vio_api_v0.from_file(source_path, VIO_OPEN_READ,
-                                           memory_api_v0.main_allocator());
+                                                  memory_api_v0.main_allocator());
     char *data =
     CETECH_ALLOCATE(memory_api_v0.main_allocator(), char,
                     vio_api_v0.size(source_vio));
     vio_api_v0.read(source_vio, data, vio_api_v0.size(source_vio),
-             vio_api_v0.size(source_vio));
+                    vio_api_v0.size(source_vio));
     vio_api_v0.close(source_vio);
 
     yaml_document_t h;
@@ -397,7 +398,8 @@ void _cvar_from_str(const char *name,
                 break;
 
             default:
-                log_api_v0.log_error(LOG_WHERE, "Invalid type for cvar \"%s\"", name);
+                log_api_v0.log_error(LOG_WHERE, "Invalid type for cvar \"%s\"",
+                                     name);
                 break;
         }
 
@@ -537,7 +539,8 @@ cvar_t cvar_new_str(const char *name,
     if (new) {
         str_set(_G.name[find.idx], name);
         _G.types[find.idx] = CV_STRING;
-        _G.values[find.idx].s = memory_api_v0.str_dup(s, memory_api_v0.main_allocator());
+        _G.values[find.idx].s = memory_api_v0.str_dup(s,
+                                                      memory_api_v0.main_allocator());
     }
 
     str_set(_G.desc[find.idx], desc);
@@ -579,7 +582,8 @@ void cvar_set_string(cvar_t var,
         allocator_deallocate(memory_api_v0.main_allocator(), _s);
     }
 
-    _G.values[var.idx].s = memory_api_v0.str_dup(s, memory_api_v0.main_allocator());
+    _G.values[var.idx].s = memory_api_v0.str_dup(s,
+                                                 memory_api_v0.main_allocator());
 }
 
 void cvar_log_all() {

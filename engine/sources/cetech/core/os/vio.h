@@ -45,34 +45,34 @@ struct vio {
 
 struct vio_api_v0 {
     struct vio *(*from_file)(const char *path,
-                              enum vio_open_mode mode,
-                              struct allocator *allocator);
+                             enum vio_open_mode mode,
+                             struct allocator *allocator);
 
     int (*close)(struct vio *file);
 
 
     int64_t (*seek)(struct vio *file,
-                     int64_t offset,
-                     enum vio_seek whence);
+                    int64_t offset,
+                    enum vio_seek whence);
 
     void (*seek_to_end)(struct vio *file);
 
     int64_t (*skip)(struct vio *file,
-                     int64_t bytes);
+                    int64_t bytes);
 
     int64_t (*position)(struct vio *file);
 
     int64_t (*size)(struct vio *file);
 
     size_t (*read)(struct vio *file,
-                    void *buffer,
-                    size_t size,
-                    size_t maxnum);
+                   void *buffer,
+                   size_t size,
+                   size_t maxnum);
 
     size_t (*write)(struct vio *file,
-                     const void *buffer,
-                     size_t size,
-                     size_t num);
+                    const void *buffer,
+                    size_t size,
+                    size_t num);
 
 };
 

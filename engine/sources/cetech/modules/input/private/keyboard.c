@@ -2,7 +2,7 @@
 // Includes
 //==============================================================================
 
-#include <cetech/core/allocator.h>
+#include <cetech/core/memory/allocator.h>
 #include <cetech/core/config.h>
 #include <cetech/modules/resource/resource.h>
 #include <cetech/core/module.h>
@@ -108,7 +108,7 @@ int keyboard_button_released(uint32_t idx,
     return !_G.state[button_index] && _G.last_state[button_index];
 }
 
-static void _init_api(struct api_v0* api){
+static void _init_api(struct api_v0 *api) {
     static struct keyboard_api_v0 api_v1 = {
             .button_index = keyboard_button_index,
             .button_name = keyboard_button_name,
@@ -120,7 +120,7 @@ static void _init_api(struct api_v0* api){
     api->register_api("keyboard_api_v0", &api_v1);
 }
 
-static void _init( struct api_v0* api) {
+static void _init(struct api_v0 *api) {
     GET_API(api, machine_api_v0);
     GET_API(api, log_api_v0);
 

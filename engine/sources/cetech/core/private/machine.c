@@ -5,7 +5,7 @@
 #include <cetech/core/container/array.inl>
 #include <cetech/core/container/eventstream.inl>
 #include <cetech/core/module.h>
-#include <cetech/core/memory.h>
+#include <cetech/core/memory/memory.h>
 
 #include <cetech/core/machine.h>
 #include <cetech/core/config.h>

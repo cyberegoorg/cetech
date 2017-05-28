@@ -4,13 +4,13 @@
 
 #include <stddef.h>
 
-#include <cetech/core/allocator.h>
+#include <cetech/core/memory/allocator.h>
 #include <cetech/core/yaml.h>
 #include <cetech/core/container/array.inl>
 
 #include <cetech/core/hash.h>
 #include <cetech/core/os/thread.h>
-#include <cetech/core/memory.h>
+#include <cetech/core/memory/memory.h>
 #include <cetech/core/module.h>
 #include <cetech/core/os/vio.h>
 #include <cetech/core/api.h>
@@ -89,7 +89,7 @@ int _package_compiler(const char *filename,
     char source_data[vio_api_v0.size(source_vio) + 1];
     memset(source_data, 0, vio_api_v0.size(source_vio) + 1);
     vio_api_v0.read(source_vio, source_data, sizeof(char),
-                        vio_api_v0.size(source_vio));
+                    vio_api_v0.size(source_vio));
 
     yaml_document_t h;
     yaml_node_t root = yaml_load_str(source_data, &h);
@@ -120,14 +120,15 @@ int _package_compiler(const char *filename,
 
     vio_api_v0.write(build_vio, &resource, sizeof(resource), 1);
     vio_api_v0.write(build_vio, ARRAY_BEGIN(&compile_data.types),
-              sizeof(uint64_t), ARRAY_SIZE(&compile_data.types));
+                     sizeof(uint64_t), ARRAY_SIZE(&compile_data.types));
     vio_api_v0.write(build_vio, ARRAY_BEGIN(&compile_data.name_count),
-              sizeof(uint32_t),
-              ARRAY_SIZE(&compile_data.name_count));
+                     sizeof(uint32_t),
+                     ARRAY_SIZE(&compile_data.name_count));
     vio_api_v0.write(build_vio, ARRAY_BEGIN(&compile_data.name),
-              sizeof(uint64_t), ARRAY_SIZE(&compile_data.name));
-    vio_api_v0.write(build_vio, ARRAY_BEGIN(&compile_data.offset), sizeof(uint32_t),
-              ARRAY_SIZE(&compile_data.offset));
+                     sizeof(uint64_t), ARRAY_SIZE(&compile_data.name));
+    vio_api_v0.write(build_vio, ARRAY_BEGIN(&compile_data.offset),
+                     sizeof(uint32_t),
+                     ARRAY_SIZE(&compile_data.offset));
 
     ARRAY_DESTROY(uint64_t, &compile_data.types);
     ARRAY_DESTROY(uint64_t, &compile_data.name);
@@ -137,7 +138,7 @@ int _package_compiler(const char *filename,
     return 1;
 }
 
-int package_init( struct api_v0 *api) {
+int package_init(struct api_v0 *api) {
     GET_API(api, memory_api_v0);
     GET_API(api, resource_api_v0);
     GET_API(api, task_api_v0);

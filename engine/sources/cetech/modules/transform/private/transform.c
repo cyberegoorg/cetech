@@ -9,7 +9,7 @@
 #include <cetech/core/math/quatf.inl>
 #include <cetech/core/math/mat44f.inl>
 #include "../transform.h"
-#include <cetech/core/memory.h>
+#include <cetech/core/memory/memory.h>
 #include <cetech/core/module.h>
 #include <cetech/core/container/map.inl>
 #include <cetech/core/api.h>
@@ -287,7 +287,7 @@ struct property_value _get_property(world_t world,
 
 IMPORT_API(component_api_v0);
 
-static void _init_api(struct api_v0* api){
+static void _init_api(struct api_v0 *api) {
     static struct transform_api_v0 _api = {0};
 
     _api.is_valid = transform_is_valid;
@@ -307,7 +307,7 @@ static void _init_api(struct api_v0* api){
     api->register_api("transform_api_v0", &_api);
 }
 
-static void _init( struct api_v0* api) {
+static void _init(struct api_v0 *api) {
     GET_API(api, component_api_v0);
     GET_API(api, memory_api_v0);
     GET_API(api, hash_api_v0);

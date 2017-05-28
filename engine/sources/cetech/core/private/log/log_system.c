@@ -39,6 +39,7 @@ void vlog(const enum log_level level,
                        where, msg, _G.handlers_data[i]);
     }
 }
+
 void log_register_handler(log_handler_t handler,
                           void *data) {
     const char idx = _G.handlers_count++;
@@ -57,11 +58,9 @@ void log_shutdown() {
 }
 
 
-
 void log_set_wid_clb(log_get_wid_clb_t get_wid_clb) {
     _G.get_wid_clb = get_wid_clb;
 }
-
 
 
 void log_info_va(const char *where,
@@ -143,10 +142,10 @@ static struct log_api_v0 log_api_v0 = {
         .log_debug = log_debug
 };
 
+#include "log_stdout_handler.inl"
 #include "log_db_handler.inl"
 #include "log_nanomsg_handler.inl"
-#include "log_stdout_handler.inl"
 
-void log_register_api(struct api_v0* api) {
+void log_register_api(struct api_v0 *api) {
     api->register_api("log_api_v0", &log_api_v0);
 }

@@ -1,7 +1,7 @@
 #include <stddef.h>
 #include <stdio.h>
 
-#include <cetech/core/allocator.h>
+#include <cetech/core/memory/allocator.h>
 
 #include <cetech/core/module.h>
 #include <cetech/core/log.h>
@@ -105,7 +105,7 @@ static int _log_debug(lua_State *l) {
     return 0;
 }
 
-void _register_lua_log_api( struct api_v0* api) {
+void _register_lua_log_api(struct api_v0 *api) {
     GET_API(api, log_api_v0);
 
     luasys_add_module_function(API_NAME, "info", _log_info);

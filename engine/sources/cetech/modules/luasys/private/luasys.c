@@ -5,7 +5,7 @@
 #include <include/luajit/lualib.h>
 #include <include/luajit/lauxlib.h>
 
-#include <cetech/core/allocator.h>
+#include <cetech/core/memory/allocator.h>
 #include <cetech/core/math/math_types.h>
 #include <cetech/core/math/vec2f.inl>
 
@@ -19,7 +19,6 @@
 #include <cetech/modules/develop_system/develop.h>
 #include <cetech/modules/resource/resource.h>
 #include <cetech/modules/luasys/luasys.h>
-
 
 
 IMPORT_API(resource_api_v0);
@@ -166,7 +165,7 @@ static const struct game_callbacks _GameCallbacks = {
     void _register_lua_##name##_api();\
     _register_lua_##name##_api(api);
 
-static void _register_all_api( struct api_v0 *api) {
+static void _register_all_api(struct api_v0 *api) {
     REGISTER_LUA_API(log, api);
     REGISTER_LUA_API(module, api);
     REGISTER_LUA_API(keyboard, api);
@@ -820,7 +819,7 @@ void _create_lightuserdata() {
     lua_pop(_G.L, 1);
 }
 
-static void _init_api(struct api_v0* api){
+static void _init_api(struct api_v0 *api) {
     static struct lua_api_v0 _api = {0};
 
     //api.get_top = luasys_get_top;
@@ -870,7 +869,7 @@ static void _init_api(struct api_v0* api){
 }
 
 
-static void _init( struct api_v0* api_v0) {
+static void _init(struct api_v0 *api_v0) {
 
     GET_API(api_v0, cnsole_srv_api_v0);
     GET_API(api_v0, resource_api_v0);
@@ -905,7 +904,7 @@ static void _init( struct api_v0* api_v0) {
 
     _create_lightuserdata();
 
-    _register_all_api( api_v0);
+    _register_all_api(api_v0);
 
     luasys_add_module_function("module", "reload", _reload_module);
     cnsole_srv_api_v0.consolesrv_register_command("lua_system.execute",

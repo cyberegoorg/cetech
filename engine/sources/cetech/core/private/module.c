@@ -6,7 +6,7 @@
 #include <memory.h>
 
 #include <cetech/core/os/path.h>
-#include <cetech/core/memory.h>
+#include <cetech/core/memory/memory.h>
 #include <cetech/core/module.h>
 
 #include <cetech/core/config.h>
@@ -227,7 +227,8 @@ void module_call_init() {
 }
 
 void module_call_init_cvar() {
-    struct config_api_v0 ConfigApiV0 = *(struct config_api_v0*) _G.api_v0->first("config_api_v0");
+    struct config_api_v0 ConfigApiV0 = *(struct config_api_v0 *) _G.api_v0->first(
+            "config_api_v0");
 
     for (size_t i = 0; i < MAX_PLUGINS; ++i) {
         if (!_G.used[i] || !_G.module_api[i]->init_cvar) {
@@ -278,8 +279,9 @@ void module_call_after_update(float dt) {
     }
 }
 
-void module_init(struct allocator *allocator, struct api_v0* api) {
-    _G = (struct G){0};
+void module_init(struct allocator *allocator,
+                 struct api_v0 *api) {
+    _G = (struct G) {0};
 
     GET_API(api, memory_api_v0);
     GET_API(api, path_v0);
@@ -289,5 +291,5 @@ void module_init(struct allocator *allocator, struct api_v0* api) {
 }
 
 void module_shutdown() {
-    _G = (struct G){0};
+    _G = (struct G) {0};
 }

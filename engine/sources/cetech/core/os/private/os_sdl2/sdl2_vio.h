@@ -3,7 +3,7 @@
 
 #include <cetech/core/log.h>
 #include <cetech/core/errors.h>
-#include <cetech/core/allocator.h>
+#include <cetech/core/memory/allocator.h>
 #include <cetech/core/os/path.h>
 
 #define LOG_WHERE "vio_sdl"

@@ -26,9 +26,15 @@
 
 
 struct error_api_v0 {
-    void (*assert)(const char* where, const char* condition, const char* filename, int line);
+    void (*assert)(const char *where,
+                   const char *condition,
+                   const char *filename,
+                   int line);
 };
 
-void error_assert(const char* where, const char* condition, const char* filename, int line);
+void error_assert(const char *where,
+                  const char *condition,
+                  const char *filename,
+                  int line);
 
 #endif //CETECH_ERRORS_H

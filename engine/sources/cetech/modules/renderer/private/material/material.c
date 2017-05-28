@@ -4,12 +4,12 @@
 
 #include <bgfx/c99/bgfx.h>
 
-#include <cetech/core/allocator.h>
+#include <cetech/core/memory/allocator.h>
 #include <cetech/core/container/map.inl>
 #include <cetech/core/handler.h>
 
 #include <cetech/core/hash.h>
-#include <cetech/core/memory.h>
+#include <cetech/core/memory/memory.h>
 #include <cetech/core/module.h>
 #include <cetech/core/os/vio.h>
 #include <cetech/core/api.h>
@@ -83,7 +83,7 @@ IMPORT_API(hash_api_v0);
 // Interface
 //==============================================================================
 
-int material_init( struct api_v0* api) {
+int material_init(struct api_v0 *api) {
     _G = (struct G) {0};
 
     GET_API(api, memory_api_v0);

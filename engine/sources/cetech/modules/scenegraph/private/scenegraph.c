@@ -4,12 +4,11 @@
 #include <cetech/core/math/mat44f.inl>
 
 #include <cetech/core/config.h>
-#include <cetech/core/hash.h>
 #include <cetech/modules/resource/resource.h>
 
 #include <cetech/modules/entity/entity.h>
 #include "../scenegraph.h"
-#include <cetech/core/memory.h>
+#include <cetech/core/memory/memory.h>
 #include <cetech/core/module.h>
 #include <cetech/core/container/map.inl>
 #include <cetech/modules/world/world.h>
@@ -95,7 +94,6 @@ static void _on_world_create(world_t world) {
 static void _on_world_destroy(world_t world) {
     _destroy_world(world);
 }
-
 
 
 int scenegraph_is_valid(scene_node_t transform) {
@@ -356,7 +354,7 @@ scene_node_t scenegraph_node_by_name(world_t world,
     return _scenegraph_node_by_name(data, root, name);
 }
 
-static void _init_api(struct api_v0* api){
+static void _init_api(struct api_v0 *api) {
     static struct scenegprah_api_v0 _api = {0};
 
     //api.scenegraph_transform = scenegraph_transform;
@@ -379,7 +377,7 @@ static void _init_api(struct api_v0* api){
 }
 
 
-static void _init( struct api_v0* api) {
+static void _init(struct api_v0 *api) {
     GET_API(api, memory_api_v0);
     GET_API(api, world_api_v0);
 
