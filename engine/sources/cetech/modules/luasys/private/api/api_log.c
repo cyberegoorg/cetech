@@ -71,7 +71,7 @@ static int _log_info(lua_State *l) {
     const char *where = luasys_to_string(l, 1);
     _log_format(l, buffer, _4KiB);
 
-    log_api_v0.log_info(where, "%s", buffer);
+    log_api_v0.info(where, "%s", buffer);
     return 0;
 }
 
@@ -81,7 +81,7 @@ static int _log_warning(lua_State *l) {
     const char *where = luasys_to_string(l, 1);
     _log_format(l, buffer, _4KiB);
 
-    log_api_v0.log_warning(where, "%s", buffer);
+    log_api_v0.warning(where, "%s", buffer);
     return 0;
 }
 
@@ -91,7 +91,7 @@ static int _log_error(lua_State *l) {
     const char *where = luasys_to_string(l, 1);
     _log_format(l, buffer, _4KiB);
 
-    log_api_v0.log_error(where, "%s", buffer);
+    log_api_v0.error(where, "%s", buffer);
     return 0;
 }
 
@@ -101,7 +101,7 @@ static int _log_debug(lua_State *l) {
     const char *where = luasys_to_string(l, 1);
     _log_format(l, buffer, _4KiB);
 
-    log_api_v0.log_debug(where, "%s", buffer);
+    log_api_v0.debug(where, "%s", buffer);
     return 0;
 }
 

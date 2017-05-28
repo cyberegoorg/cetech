@@ -41,7 +41,7 @@ void *lua_resource_reloader(uint64_t name,
     if (lua_pcall(_G.L, 0, 0, 0)) {
         const char *last_error = lua_tostring(_G.L, -1);
         lua_pop(_G.L, 1);
-        log_api_v0.log_error(LOG_WHERE, "%s", last_error);
+        log_api_v0.error(LOG_WHERE, "%s", last_error);
     }
 
     return new_data;

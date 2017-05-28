@@ -83,7 +83,7 @@ void renderer_create(window_t window) {
     // TODO: from config
     bgfx_init(BGFX_RENDERER_TYPE_OPENGL, 0, 0, NULL, NULL);
 
-    window_api_v0.get_size(window, &_G.size_width, &_G.size_height);
+    window_api_v0.size(window, &_G.size_width, &_G.size_height);
 
     _G.need_reset = 1;
 }

@@ -31,7 +31,7 @@ static int _shaderc(const char *input,
 
     int status = process_api_v0.exec(cmd_line);
 
-    log_api_v0.log_debug("shaderc", "STATUS %d", status);
+    log_api_v0.debug("shaderc", "STATUS %d", status);
 
     return status;
 }
@@ -41,10 +41,10 @@ static int _gen_tmp_name(char *tmp_filename,
                          size_t max_len,
                          const char *filename) {
     char dir[1024] = {0};
-    path_v0.path_dir(dir, CETECH_ARRAY_LEN(dir), filename);
+    path_v0.dir(dir, CETECH_ARRAY_LEN(dir), filename);
 
-    path_v0.path_join(tmp_filename, max_len, tmp_dir, dir);
-    path_v0.dir_make_path(tmp_filename);
+    path_v0.join(tmp_filename, max_len, tmp_dir, dir);
+    path_v0.make_path(tmp_filename);
 
     return snprintf(tmp_filename, max_len, "%s/%s.shaderc", tmp_dir, filename);
 }
@@ -84,7 +84,7 @@ static int _shader_resource_compiler(const char *filename,
     const char *core_dir = resource_api_v0.compiler_get_core_dir();
 
     char include_dir[1024] = {0};
-    path_v0.path_join(include_dir, CETECH_ARRAY_LEN(include_dir), core_dir,
+    path_v0.join(include_dir, CETECH_ARRAY_LEN(include_dir), core_dir,
                       "bgfxshaders");
 
     struct shader resource = {0};
@@ -106,7 +106,7 @@ static int _shader_resource_compiler(const char *filename,
     //////// VS
     yaml_as_string(vs_input, input_str, CETECH_ARRAY_LEN(input_str));
     compilator_api->add_dependency(filename, input_str);
-    path_v0.path_join(input_path, CETECH_ARRAY_LEN(input_path), source_dir,
+    path_v0.join(input_path, CETECH_ARRAY_LEN(input_path), source_dir,
                       input_str);
 
     _gen_tmp_name(output_path, tmp_dir, CETECH_ARRAY_LEN(tmp_filename),
@@ -132,7 +132,7 @@ static int _shader_resource_compiler(const char *filename,
     //////// FS
     yaml_as_string(fs_input, input_str, CETECH_ARRAY_LEN(input_str));
     compilator_api->add_dependency(filename, input_str);
-    path_v0.path_join(input_path, CETECH_ARRAY_LEN(input_path), source_dir,
+    path_v0.join(input_path, CETECH_ARRAY_LEN(input_path), source_dir,
                       input_str);
 
     _gen_tmp_name(output_path, tmp_dir, CETECH_ARRAY_LEN(tmp_filename),

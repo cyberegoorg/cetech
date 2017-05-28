@@ -2,6 +2,7 @@
 #define CETECH_BUILDDB_H
 
 #include <time.h>
+#include <cetech/core/types.h>
 #include "include/sqlite3/sqlite3.h"
 
 static int _step(sqlite3 *db,
@@ -27,7 +28,7 @@ static int _step(sqlite3 *db,
                 break;
 
             default:
-                log_api_v0.log_error("builddb", "SQL error '%s' (%d): %s",
+                log_api_v0.error("builddb", "SQL error '%s' (%d): %s",
                                      sqlite3_sql(stmt), rc, sqlite3_errmsg(db));
 
                 run = 0;
@@ -76,7 +77,7 @@ static int _do_sql(const char *sql) {
 
 static int builddb_init_db(const char *build_dir,
                            struct path_v0 *path) {
-    path->path_join(_logdb_path, CETECH_ARRAY_LEN(_logdb_path), build_dir,
+    path->join(_logdb_path, CETECH_ARRAY_LEN(_logdb_path), build_dir,
                     "build.db");
 
 
@@ -207,7 +208,7 @@ static int builddb_need_compile(const char *source_dir,
 
         char full_path[1024] = {0};
         const char *dep_file = (const char *) sqlite3_column_text(stmt, 0);
-        path->path_join(full_path, CETECH_ARRAY_LEN(full_path), source_dir,
+        path->join(full_path, CETECH_ARRAY_LEN(full_path), source_dir,
                         dep_file);
 
         time_t actual_mtime = path->file_mtime(full_path);

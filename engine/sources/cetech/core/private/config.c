@@ -141,7 +141,7 @@ cvar_t _find_first_free() {
         return make_cvar(i);
     }
 
-    log_api_v0.log_error(LOG_WHERE, "Could not create new config variable");
+    log_api_v0.error(LOG_WHERE, "Could not create new config variable");
 
     return make_cvar(0);
 }
@@ -180,7 +180,7 @@ int cvar_init(struct api_v0 *api) {
     GET_API(api, log_api_v0);
     GET_API(api, hash_api_v0);
 
-    log_api_v0.log_debug(LOG_WHERE, "Init");
+    log_api_v0.debug(LOG_WHERE, "Init");
 
     static struct config_api_v0 api_v1 = {
             .load_global = cvar_load_global,
@@ -212,7 +212,7 @@ int cvar_init(struct api_v0 *api) {
 }
 
 void cvar_shutdown() {
-    log_api_v0.log_debug(LOG_WHERE, "Shutdown");
+    log_api_v0.debug(LOG_WHERE, "Shutdown");
 
     _dealloc_allm_string();
 }
@@ -228,13 +228,13 @@ void cvar_compile_global(struct app_api_v0 *app_api) {
     cvar_t source_dir = cvar_find("src");
 
     const char *build_dir_str = cvar_get_string(bd);
-    path_v0.path_join(build_dir, 1024, build_dir_str, app_api->platform());
+    path_v0.join(build_dir, 1024, build_dir_str, app_api->platform());
 
-    path_v0.path_join(build_path, CETECH_ARRAY_LEN(build_path), build_dir,
+    path_v0.join(build_path, CETECH_ARRAY_LEN(build_path), build_dir,
                       "global.config");
 
 
-    path_v0.path_join(source_path, CETECH_ARRAY_LEN(source_path),
+    path_v0.join(source_path, CETECH_ARRAY_LEN(source_path),
                       cvar_get_string(source_dir), "global.config");
 
     struct vio *source_vio = vio_api_v0.from_file(source_path, VIO_OPEN_READ,
@@ -340,10 +340,10 @@ void cvar_load_global(struct app_api_v0 *app_api) {
     cvar_t source_dir = cvar_find("src");
 
     const char *build_dir_str = cvar_get_string(bd);
-    path_v0.path_join(build_dir, 1024, build_dir_str, app_api->platform());
+    path_v0.join(build_dir, 1024, build_dir_str, app_api->platform());
 
 
-    path_v0.path_join(source_path, CETECH_ARRAY_LEN(source_path), build_dir,
+    path_v0.join(source_path, CETECH_ARRAY_LEN(source_path), build_dir,
                       "global.config");
 
     struct vio *source_vio = vio_api_v0.from_file(source_path, VIO_OPEN_READ,
@@ -398,13 +398,13 @@ void _cvar_from_str(const char *name,
                 break;
 
             default:
-                log_api_v0.log_error(LOG_WHERE, "Invalid type for cvar \"%s\"",
+                log_api_v0.error(LOG_WHERE, "Invalid type for cvar \"%s\"",
                                      name);
                 break;
         }
 
     } else {
-        log_api_v0.log_error(LOG_WHERE, "Invalid cvar \"%s\"", name);
+        log_api_v0.error(LOG_WHERE, "Invalid cvar \"%s\"", name);
     }
 }
 
@@ -596,13 +596,13 @@ void cvar_log_all() {
 
         switch (_G.types[i]) {
             case CV_FLOAT:
-                log_api_v0.log_info(LOG_WHERE, "%s = %f", name, _G.values[i].f);
+                log_api_v0.info(LOG_WHERE, "%s = %f", name, _G.values[i].f);
                 break;
             case CV_INT:
-                log_api_v0.log_info(LOG_WHERE, "%s = %d", name, _G.values[i].i);
+                log_api_v0.info(LOG_WHERE, "%s = %d", name, _G.values[i].i);
                 break;
             case CV_STRING:
-                log_api_v0.log_info(LOG_WHERE, "%s = %s", name, _G.values[i].s);
+                log_api_v0.info(LOG_WHERE, "%s = %s", name, _G.values[i].s);
                 break;
             default:
                 break;

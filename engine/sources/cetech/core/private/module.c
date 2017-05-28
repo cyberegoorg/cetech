@@ -104,7 +104,7 @@ void module_add_static(get_api_fce_t fce) {
 }
 
 void module_load(const char *path) {
-    log_api_v0.log_info(LOG_WHERE, "Loading module %s", path);
+    log_api_v0.info(LOG_WHERE, "Loading module %s", path);
 
     void *obj = load_object(path);
     if (obj == NULL) {
@@ -202,17 +202,17 @@ void module_load_dirs(const char *path) {
     ARRAY_T(pchar) files;
     ARRAY_INIT(pchar, &files, memory_api_v0.main_scratch_allocator());
 
-    path_v0.dir_list(path, 1, &files, memory_api_v0.main_scratch_allocator());
+    path_v0.list(path, 1, &files, memory_api_v0.main_scratch_allocator());
 
     for (int k = 0; k < ARRAY_SIZE(&files); ++k) {
-        const char *filename = path_v0.path_filename(ARRAY_AT(&files, k));
+        const char *filename = path_v0.filename(ARRAY_AT(&files, k));
 
         if (!strncmp(filename, PLUGIN_PREFIX, strlen(PLUGIN_PREFIX))) {
             module_load(ARRAY_AT(&files, k));
         }
     }
 
-    path_v0.dir_list_free(&files, memory_api_v0.main_scratch_allocator());
+    path_v0.list_free(&files, memory_api_v0.main_scratch_allocator());
     ARRAY_DESTROY(pchar, &files);
 }
 

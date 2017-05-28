@@ -75,7 +75,7 @@ static int _vec2f_index(lua_State *L) {
             luasys_push_float(L, a->y);
             return 1;
         default:
-            log_api_v0.log_error("lua", "Vector2 bad index '%c'", s[0]);
+            log_api_v0.error("lua", "Vector2 bad index '%c'", s[0]);
             break;
     }
 
@@ -96,7 +96,7 @@ static int _vec2f_newindex(lua_State *L) {
             a->y = value;
             break;
         default:
-            log_api_v0.log_error("lua", "Vector2 bad index '%c'", s[0]);
+            log_api_v0.error("lua", "Vector2 bad index '%c'", s[0]);
             break;
     }
 
@@ -172,7 +172,7 @@ static int _vec3f_index(lua_State *L) {
             luasys_push_float(L, a->z);
             return 1;
         default:
-            log_api_v0.log_error("lua", "Vector3 bad index '%c'", s[0]);
+            log_api_v0.error("lua", "Vector3 bad index '%c'", s[0]);
             break;
     }
 
@@ -196,7 +196,7 @@ static int _vec3f_newindex(lua_State *L) {
             a->z = value;
             break;
         default:
-            log_api_v0.log_error("lua", "Vector3 bad index '%c'", s[0]);
+            log_api_v0.error("lua", "Vector3 bad index '%c'", s[0]);
             break;
     }
 
@@ -275,7 +275,7 @@ static int _vec4f_index(lua_State *L) {
             luasys_push_float(L, a->w);
             return 1;
         default:
-            log_api_v0.log_error("lua", "Vector4 bad index '%c'", s[0]);
+            log_api_v0.error("lua", "Vector4 bad index '%c'", s[0]);
             break;
     }
 
@@ -302,7 +302,7 @@ static int _vec4f_newindex(lua_State *L) {
             a->w = value;
             break;
         default:
-            log_api_v0.log_error("lua", "Vector4 bad index '%c'", s[0]);
+            log_api_v0.error("lua", "Vector4 bad index '%c'", s[0]);
             break;
     }
 

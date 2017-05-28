@@ -86,7 +86,7 @@ int resource_compiler_get_build_dir(char *build_dir,
                                     size_t max_len,
                                     const char *platform) {
     const char *build_dir_str = config_api_v0.get_string(_G.config.build_dir);
-    return path_v0.path_join(build_dir, max_len, build_dir_str, platform);
+    return path_v0.join(build_dir, max_len, build_dir_str, platform);
 }
 
 //==============================================================================
@@ -219,12 +219,12 @@ static void _init(struct api_v0 *api) {
 
 
     char build_dir_full[4096] = {0};
-    path_v0.path_join(build_dir_full,
+    path_v0.join(build_dir_full,
                       CETECH_ARRAY_LEN(build_dir_full),
                       config_api_v0.get_string(_G.config.build_dir),
                       app_api_v0.platform());
 
-    filesystem_api_v0.filesystem_map_root_dir(
+    filesystem_api_v0.map_root_dir(
             hash_api_v0.id64_from_str("build"),
             build_dir_full);
 
@@ -371,7 +371,7 @@ void resource_load(void **loaded_data,
     const uint32_t idx = MAP_GET(uint32_t, &_G.type_map, type, UINT32_MAX);
 
     if (idx == UINT32_MAX) {
-        log_api_v0.log_error(LOG_WHERE,
+        log_api_v0.error(LOG_WHERE,
                              "Loader for resource is not is not registred");
         memset(loaded_data, sizeof(void *), count);
         return;
@@ -408,20 +408,20 @@ void resource_load(void **loaded_data,
 #else
         char *filename = build_name;
 #endif
-        log_api_v0.log_debug("resource", "Loading resource %s from %s/%s",
+        log_api_v0.debug("resource", "Loading resource %s from %s/%s",
                              filename,
-                             filesystem_api_v0.filesystem_get_root_dir(
+                             filesystem_api_v0.root_dir(
                                      root_name),
                              build_name);
 
-        struct vio *resource_file = filesystem_api_v0.filesystem_open(root_name,
+        struct vio *resource_file = filesystem_api_v0.open(root_name,
                                                                       build_name,
                                                                       VIO_OPEN_READ);
 
         if (resource_file != NULL) {
             loaded_data[i] = type_clb.loader(resource_file,
                                              memory_api_v0.main_allocator());
-            filesystem_api_v0.filesystem_close(resource_file);
+            filesystem_api_v0.close(resource_file);
         } else {
             loaded_data[i] = 0;
         }
@@ -463,7 +463,7 @@ void resource_unload(uint64_t type,
             char *filename = build_name;
 #endif
 
-            log_api_v0.log_debug("resource", "Unload resource %s ", filename);
+            log_api_v0.debug("resource", "Unload resource %s ", filename);
 
             type_clb.offline(names[i], item.data);
             type_clb.unloader(item.data, memory_api_v0.main_allocator());
@@ -496,7 +496,7 @@ void *resource_get(uint64_t type,
 #else
             char *filename = build_name;
 #endif
-            log_api_v0.log_warning(LOG_WHERE, "Autoloading resource %s",
+            log_api_v0.warning(LOG_WHERE, "Autoloading resource %s",
                                    filename);
             resource_load_now(type, &names, 1);
             item = MAP_GET(resource_item_t, resource_map, names, null_item);
@@ -534,7 +534,7 @@ void resource_reload(uint64_t type,
 
         char *filename = build_name;
 #endif
-        log_api_v0.log_debug("resource", "Reload resource %s ", filename);
+        log_api_v0.debug("resource", "Reload resource %s ", filename);
 
         void *old_data = resource_get(type, names[i]);
 

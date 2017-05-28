@@ -366,7 +366,7 @@ int _compile_assimp(const char *filename,
 
     char input_path[128] = {0};
     const char *source_dir = resource_api_v0.compiler_get_source_dir();
-    path_v0.path_join(input_path, CETECH_ARRAY_LEN(input_path), source_dir,
+    path_v0.join(input_path, CETECH_ARRAY_LEN(input_path), source_dir,
                       input_str);
 
     uint32_t postprocess_flag = aiProcessPreset_TargetRealtime_MaxQuality;

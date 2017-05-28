@@ -57,7 +57,7 @@ void allocator_check_trace(struct allocator_trace_entry *entries,
             continue;
         }
 
-        log_api_v0.log_error(ALLOCATOR_WHERE,
+        log_api_v0.error(ALLOCATOR_WHERE,
                              "memory_leak: %p\n  stacktrace:\n%s\n",
                              entries[i].ptr, entries[i].stacktrace);
 
