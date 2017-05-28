@@ -2,19 +2,19 @@
 // Includes
 //==============================================================================
 
-#include <cetech/kernel/thread.h>
-#include <cetech/kernel/memory.h>
-#include <cetech/kernel/os.h>
+#include <cetech/core/os/thread.h>
+#include <cetech/core/memory.h>
 
 #include <cetech/modules/develop_system/develop.h>
-#include <cetech/kernel/config.h>
+#include <cetech/core/config.h>
 #include <cetech/modules/resource/resource.h>
-#include <cetech/kernel/module.h>
+#include <cetech/core/module.h>
+
+#include <cetech/modules/task/task.h>
+#include <cetech/core/api.h>
+#include <cetech/core/os/cpu.h>
 
 #include "task_queue.h"
-#include <cetech/modules/task/task.h>
-#include <cetech/kernel/api.h>
-
 
 //==============================================================================
 // Defines
@@ -55,6 +55,7 @@ IMPORT_API(develop_api_v0);
 IMPORT_API(memory_api_v0);
 IMPORT_API(thread_api_v0);
 IMPORT_API(cpu_api_v0);
+IMPORT_API(log_api_v0);
 
 //==============================================================================
 // Private
@@ -144,7 +145,7 @@ static int _task_worker(void *o) {
 
     _worker_id = (char) o;
 
-    log_debug("task_worker", "Worker %d init", _worker_id);
+    log_api_v0.log_debug("task_worker", "Worker %d init", _worker_id);
 
     while (_G._Run) {
         if (!taskmanager_do_work()) {
@@ -152,7 +153,7 @@ static int _task_worker(void *o) {
         }
     }
 
-    log_debug("task_worker", "Worker %d shutdown", _worker_id);
+    log_api_v0.log_debug("task_worker", "Worker %d shutdown", _worker_id);
     return 1;
 }
 
@@ -229,6 +230,7 @@ static void _init( struct api_v0* api) {
     GET_API(api, develop_api_v0);
     GET_API(api, memory_api_v0);
     GET_API(api, thread_api_v0);
+    GET_API(api, log_api_v0);
     GET_API(api, cpu_api_v0);
 
 
@@ -240,7 +242,7 @@ static void _init( struct api_v0* api) {
     static const uint32_t main_threads_count = 1;
     const uint32_t worker_count = core_count - main_threads_count;
 
-    log_info("task", "Core/Main/Worker: %d, %d, %d", core_count,
+    log_api_v0.log_info("task", "Core/Main/Worker: %d, %d, %d", core_count,
              main_threads_count, worker_count);
 
     _G._workers_count = worker_count;

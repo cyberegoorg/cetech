@@ -7,19 +7,16 @@
 
 #include "include/SDL2/SDL.h"
 
-#include <cetech/kernel/fs.h>
-#include <cetech/kernel/string.h>
-#include <cetech/kernel/hash.h>
+#include <cetech/core/os/path.h>
+#include <cetech/core/hash.h>
 #include <cetech/modules/task/task.h>
-#include <cetech/kernel/application.h>
-#include <cetech/kernel/config.h>
+#include <cetech/core/application.h>
+#include <cetech/core/config.h>
 #include <cetech/modules/resource/resource.h>
-#include <cetech/kernel/memory.h>
-#include <cetech/kernel/module.h>
-#include <cetech/kernel/api.h>
-
-#include "builddb.h"
-#include "resource.h"
+#include <cetech/core/memory.h>
+#include <cetech/core/module.h>
+#include <cetech/core/api.h>
+#include <cetech/core/os/vio.h>
 
 
 //==============================================================================
@@ -36,8 +33,8 @@
 
 struct compile_task_data {
     char *source_filename;
-    stringid64_t type;
-    stringid64_t name;
+    uint64_t type;
+    uint64_t name;
     struct vio *source;
     struct vio *build;
     time_t mtime;
@@ -48,7 +45,7 @@ struct compile_task_data {
 ARRAY_PROTOTYPE_N(struct task_item, task_item);
 
 struct G {
-    stringid64_t compilator_map_type[MAX_TYPES]; // TODO: MAP
+    uint64_t compilator_map_type[MAX_TYPES]; // TODO: MAP
     resource_compilator_t compilator_map_compilator[MAX_TYPES]; // TODO: MAP
 
     cvar_t cv_source_dir;
@@ -63,6 +60,11 @@ IMPORT_API(config_api_v0);
 IMPORT_API(app_api_v0);
 IMPORT_API(path_v0);
 IMPORT_API(vio_api_v0);
+IMPORT_API(log_api_v0);
+IMPORT_API(hash_api_v0);
+
+#include "builddb.h"
+#include "resource.h"
 
 //CE_STATIC_ASSERT(sizeof(struct compile_task_data) < 64);
 
@@ -79,7 +81,7 @@ void _add_dependency(const char *who_filename,
     path_v0.path_join(path, CETECH_ARRAY_LEN(path),
               resource_api_v0.compiler_get_source_dir(), depend_on_filename);
 
-    builddb_set_file(depend_on_filename, file_mtime(path));
+    builddb_set_file(depend_on_filename, path_v0.file_mtime(path));
 }
 
 static struct compilator_api _compilator_api = {
@@ -90,9 +92,9 @@ static struct compilator_api _compilator_api = {
 static void _compile_task(void *data) {
     struct compile_task_data *tdata = data;
 
-    log_info("resource_compiler.task",
+    log_api_v0.log_info("resource_compiler.task",
              "Compile resource \"%s\" to \"" "%" SDL_PRIX64 "%" SDL_PRIX64 "\"",
-             tdata->source_filename, tdata->type.id, tdata->name.id);
+             tdata->source_filename, tdata->type, tdata->name);
 
 
     if (tdata->compilator(tdata->source_filename, tdata->source, tdata->build,
@@ -100,10 +102,10 @@ static void _compile_task(void *data) {
         builddb_set_file(tdata->source_filename, tdata->mtime);
         builddb_set_file_depend(tdata->source_filename, tdata->source_filename);
 
-        log_info("resource_compiler.task",
+        log_api_v0.log_info("resource_compiler.task",
                  "Resource \"%s\" compiled", tdata->source_filename);
     } else {
-        log_error("resource_compiler.task",
+        log_api_v0.log_error("resource_compiler.task",
                   "Resource \"%s\" compilation fail", tdata->source_filename);
     }
 
@@ -115,9 +117,9 @@ static void _compile_task(void *data) {
     atomic_store_explicit(&tdata->completed, 1, memory_order_release);
 }
 
-resource_compilator_t _find_compilator(stringid64_t type) {
+resource_compilator_t _find_compilator(uint64_t type) {
     for (int i = 0; i < MAX_TYPES; ++i) {
-        if (_G.compilator_map_type[i].id != type.id) {
+        if (_G.compilator_map_type[i] != type) {
             continue;
         }
 
@@ -145,8 +147,8 @@ void _compile_dir(ARRAY_T(task_item) *tasks,
                     strlen(source_filename_short) - 1 -
                     strlen(resource_type));
 
-        stringid64_t type_id = stringid64_from_string(resource_type);
-        stringid64_t name_id = stringid64_from_string(resource_name);
+        uint64_t type_id = hash_api_v0.id64_from_str(resource_type);
+        uint64_t name_id = hash_api_v0.id64_from_str(resource_name);
 
         resource_compilator_t compilator = _find_compilator(type_id);
         if (compilator == NULL) {
@@ -160,7 +162,7 @@ void _compile_dir(ARRAY_T(task_item) *tasks,
 
         char build_name[33] = {0};
         snprintf(build_name, CETECH_ARRAY_LEN(build_name),
-                 "%" SDL_PRIX64 "%" SDL_PRIX64, type_id.id, name_id.id);
+                 "%" SDL_PRIX64 "%" SDL_PRIX64, type_id, name_id);
 
         builddb_set_file_hash(source_filename_short, build_name);
 
@@ -193,9 +195,9 @@ void _compile_dir(ARRAY_T(task_item) *tasks,
                 .build = build_vio,
                 .source = source_vio,
                 .compilator = compilator,
-                .source_filename = str_dup(source_filename_short,
+                .source_filename = memory_api_v0.str_dup(source_filename_short,
                                            memory_api_v0.main_scratch_allocator()),
-                .mtime = file_mtime(source_filename_full),
+                .mtime = path_v0.file_mtime(source_filename_full),
                 .completed = 0
         };
 
@@ -233,6 +235,8 @@ static void _init( struct api_v0* api) {
     GET_API(api, app_api_v0);
     GET_API(api, path_v0);
     GET_API(api, vio_api_v0);
+    GET_API(api, log_api_v0);
+    GET_API(api, hash_api_v0);
 
     char build_dir_full[1024] = {0};
     resource_api_v0.compiler_get_build_dir(build_dir_full,
@@ -278,14 +282,14 @@ void resource_compiler_create_build_dir(struct config_api_v0 config,
     path_v0.dir_make_path(build_dir_full);
 }
 
-void resource_compiler_register(stringid64_t type,
+void resource_compiler_register(uint64_t type,
                                 resource_compilator_t compilator) {
     for (int i = 0; i < MAX_TYPES; ++i) {
-        if (_G.compilator_map_type[i].id != 0) {
+        if (_G.compilator_map_type[i] != 0) {
             continue;
         }
 
-        _G.compilator_map_type[i].id = type.id;
+        _G.compilator_map_type[i] = type;
         _G.compilator_map_compilator[i] = compilator;
         return;
     }
@@ -330,8 +334,8 @@ void resource_compiler_compile_all() {
 
 int resource_compiler_get_filename(char *filename,
                                    size_t max_ken,
-                                   stringid64_t type,
-                                   stringid64_t name) {
+                                   uint64_t type,
+                                   uint64_t name) {
     char build_name[33] = {0};
     resource_api_v0.type_name_string(build_name, CETECH_ARRAY_LEN(build_name),
                                      type,

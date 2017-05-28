@@ -1,9 +1,9 @@
-#include <cetech/core/array.inl>
+#include <cetech/core/container/array.inl>
 #include <cetech/core/yaml.h>
-#include <cetech/core/map.inl>
-#include <cetech/core/mat44f.inl>
-#include <cetech/kernel/hash.h>
-#include <cetech/kernel/config.h>
+#include <cetech/core/container/map.inl>
+#include <cetech/core/math/mat44f.inl>
+#include <cetech/core/hash.h>
+#include <cetech/core/config.h>
 #include <cetech/modules/resource/resource.h>
 #include <cetech/modules/entity/entity.h>
 #include <cetech/modules/world/world.h>
@@ -12,9 +12,9 @@
 #include <cetech/modules/renderer/renderer.h>
 #include <cetech/modules/transform/transform.h>
 
-#include <cetech/kernel/memory.h>
-#include <cetech/kernel/module.h>
-#include <cetech/kernel/api.h>
+#include <cetech/core/memory.h>
+#include <cetech/core/module.h>
+#include <cetech/core/api.h>
 
 #include "../camera.h"
 
@@ -22,6 +22,7 @@ IMPORT_API(memory_api_v0);
 IMPORT_API(component_api_v0);
 IMPORT_API(renderer_api_v0);
 IMPORT_API(transform_api_v0);
+IMPORT_API(hash_api_v0);
 
 
 struct camera_data {
@@ -50,7 +51,7 @@ MAP_PROTOTYPE(world_data_t)
 
 #define _G CameraGlobal
 static struct G {
-    stringid64_t type;
+    uint64_t type;
 
     MAP_T(world_data_t) world;
 } _G = {0};
@@ -219,13 +220,14 @@ static void _init( struct api_v0* api_v0) {
     GET_API(api_v0, component_api_v0);
     GET_API(api_v0, renderer_api_v0);
     GET_API(api_v0, transform_api_v0);
+    GET_API(api_v0, hash_api_v0);
 
 
     _G = (struct G) {0};
 
     MAP_INIT(world_data_t, &_G.world, memory_api_v0.main_allocator());
 
-    _G.type = stringid64_from_string("camera");
+    _G.type = hash_api_v0.id64_from_str("camera");
 
     component_api_v0.component_register_compiler(_G.type,
                                                  _camera_component_compiler,

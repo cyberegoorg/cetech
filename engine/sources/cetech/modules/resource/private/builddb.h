@@ -27,7 +27,7 @@ static int _step(sqlite3 *db,
                 break;
 
             default:
-                CETECH_ASSERT_MSG("builddb", 0, "SQL error '%s' (%d): %s",
+                log_api_v0.log_error("builddb", "SQL error '%s' (%d): %s",
                                   sqlite3_sql(stmt), rc, sqlite3_errmsg(db));
 
                 run = 0;
@@ -208,7 +208,7 @@ static int builddb_need_compile(const char *source_dir,
         path->path_join(full_path, CETECH_ARRAY_LEN(full_path), source_dir,
                   dep_file);
 
-        time_t actual_mtime = file_mtime(full_path);
+        time_t actual_mtime = path->file_mtime(full_path);
         time_t last_mtime = sqlite3_column_int64(stmt, 1);
 
         if (actual_mtime != last_mtime) {

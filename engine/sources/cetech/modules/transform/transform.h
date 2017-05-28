@@ -8,7 +8,7 @@
 //==============================================================================
 
 #include <stdint.h>
-#include <cetech/core/math_types.h>
+#include <cetech/core/math/math_types.h>
 
 typedef struct world_s world_t;
 typedef struct entity_s entity_t;

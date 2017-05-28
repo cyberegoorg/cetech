@@ -1,5 +1,6 @@
 #include <string>
 #include <cstring>
+#include <cetech/core/types.h>
 
 extern "C" {
 #include <cetech/core/allocator.h>
@@ -12,7 +13,6 @@ extern "C" {
 #define YAML_EX_BEGIN try {
 #define YAML_EX_END \
     } catch (const YAML::Exception& e) {\
-        log_error("yaml", "%s", e.what()); \
         ::abort();\
     }
 
@@ -62,7 +62,7 @@ static yaml_node_t new_node(yaml_document_t handler,
         return (yaml_node_t) {.doc = handler, .idx = i};
     }
 
-    CETECH_ASSERT_MSG("yaml", false, "Node pool overflow");
+    CETECH_ASSERT("yaml", false);
     return (yaml_node_t) {0};
 }
 

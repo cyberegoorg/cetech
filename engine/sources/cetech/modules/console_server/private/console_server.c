@@ -5,9 +5,9 @@
 #include <stdio.h>
 #include <include/mpack/mpack.h>
 #include <cetech/core/allocator.h>
-#include <cetech/kernel/config.h>
+#include <cetech/core/config.h>
 #include <cetech/modules/resource/resource.h>
-#include <cetech/kernel/module.h>
+#include <cetech/core/module.h>
 
 #include "include/nanomsg/nn.h"
 #include "include/nanomsg/reqrep.h"
@@ -15,8 +15,7 @@
 #include "include/nanomsg/pipeline.h"
 
 #include <cetech/modules/develop_system/develop.h>
-#include <cetech/kernel/string.h>
-#include <cetech/kernel/api.h>
+#include <cetech/core/api.h>
 
 //==============================================================================
 // Defines
@@ -47,6 +46,7 @@ static struct G {
 } ConsoleServerGlobals = {0};
 
 IMPORT_API(config_api_v0);
+IMPORT_API(log_api_v0);
 
 extern void consolesrv_push_begin();
 
@@ -66,7 +66,7 @@ static console_server_command_t _find_command(const char *name) {
         return _G.commands[i];
     }
 
-    log_error(LOG_WHERE, "Invalid command \"%s\"", name);
+    log_api_v0.log_error(LOG_WHERE, "Invalid command \"%s\"", name);
 
     return 0;
 }
@@ -79,7 +79,7 @@ static void _serve_command(const char *packet,
     mpack_error_t errort = mpack_tree_error(&tree);
 
     if (errort != mpack_ok) {
-        log_error(LOG_WHERE, "%s", mpack_error_to_string(errort));
+        log_api_v0.log_error(LOG_WHERE, "%s", mpack_error_to_string(errort));
         return;
     }
 
@@ -139,24 +139,25 @@ static void _init_api(struct api_v0* api){
 
 static void _init( struct api_v0* api) {
     GET_API(api, config_api_v0);
+    GET_API(api, log_api_v0);
 
 
     const char *addr = 0;
 
-    log_debug(LOG_WHERE, "Init");
+    log_api_v0.log_debug(LOG_WHERE, "Init");
 
     int socket = nn_socket(AF_SP, NN_REP);
     if (socket < 0) {
-        log_error(LOG_WHERE, "Could not create nanomsg socket: %s",
+        log_api_v0.log_error(LOG_WHERE, "Could not create nanomsg socket: %s",
                   nn_strerror(errno));
         return;// 0;
     }
     addr = config_api_v0.get_string(_G.cv_rpc_addr);
 
-    log_debug(LOG_WHERE, "RPC address: %s", addr);
+    log_api_v0.log_debug(LOG_WHERE, "RPC address: %s", addr);
 
     if (nn_bind(socket, addr) < 0) {
-        log_error(LOG_WHERE, "Could not bind socket to '%s': %s", addr,
+        log_api_v0.log_error(LOG_WHERE, "Could not bind socket to '%s': %s", addr,
                   nn_strerror(errno));
         return;// 0;
     }
@@ -167,17 +168,17 @@ static void _init( struct api_v0* api) {
     if (config_api_v0.get_string(_G.cv_push_addr)[0] != '\0') {
         socket = nn_socket(AF_SP, NN_PUSH);
         if (socket < 0) {
-            log_error(LOG_WHERE, "Could not create nanomsg socket: %s",
+            log_api_v0.log_error(LOG_WHERE, "Could not create nanomsg socket: %s",
                       nn_strerror(errno));
             return;// 0;
         }
 
         addr = config_api_v0.get_string(_G.cv_push_addr);
 
-        log_debug(LOG_WHERE, "Push address: %s", addr);
+        log_api_v0.log_debug(LOG_WHERE, "Push address: %s", addr);
 
         if (nn_connect(socket, addr) < 0) {
-            log_error(LOG_WHERE, "Could not bind socket to '%s': %s", addr,
+            log_api_v0.log_error(LOG_WHERE, "Could not bind socket to '%s': %s", addr,
                       nn_strerror(errno));
             return;// 0;
         }
@@ -188,23 +189,23 @@ static void _init( struct api_v0* api) {
 ////
     socket = nn_socket(AF_SP, NN_PUB);
     if (socket < 0) {
-        log_error(LOG_WHERE, "Could not create nanomsg socket: %s",
+        log_api_v0.log_error(LOG_WHERE, "Could not create nanomsg socket: %s",
                   nn_strerror(errno));
         return;// 0;
     }
 
     addr = config_api_v0.get_string(_G.cv_log_addr);
 
-    log_debug(LOG_WHERE, "LOG address: %s", addr);
+    log_api_v0.log_debug(LOG_WHERE, "LOG address: %s", addr);
 
     if (nn_bind(socket, addr) < 0) {
-        log_error(LOG_WHERE, "Could not bind socket to '%s': %s", addr,
+        log_api_v0.log_error(LOG_WHERE, "Could not bind socket to '%s': %s", addr,
                   nn_strerror(errno));
         return;// 0;
     }
     _G.log_socket = socket;
 
-    log_register_handler(nano_log_handler, &_G.log_socket);
+    log_api_v0.log_register_handler(nano_log_handler, &_G.log_socket);
 
     consolesrv_register_command("console_server.ready", _cmd_ready);
 }
@@ -220,7 +221,7 @@ static void _init_cvar(struct config_api_v0 config) {
 }
 
 static void _shutdown() {
-    log_debug(LOG_WHERE, "Shutdown");
+    log_api_v0.log_debug(LOG_WHERE, "Shutdown");
 
     nn_close(_G.push_socket);
     //nn_close(_G.log_socket);

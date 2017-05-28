@@ -11,8 +11,8 @@
 #include "include/luajit/lauxlib.h"
 #include "include/luajit/lualib.h"
 
-#include <cetech/core/math_types.h>
-#include <cetech/kernel/hash.h>
+#include <cetech/core/math/math_types.h>
+#include <cetech/core/hash.h>
 
 #include <stdint.h>
 #include <cetech/core/handler.h>

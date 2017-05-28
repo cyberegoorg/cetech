@@ -1,13 +1,13 @@
 #ifndef CETECH_MATERIAL_H
 #define CETECH_MATERIAL_H
 
-material_t material_create(stringid64_t name);
+material_t material_create(uint64_t name);
 
 uint32_t material_get_texture_count(material_t material);
 
 void material_set_texture(material_t material,
                           const char *slot,
-                          stringid64_t texture);
+                          uint64_t texture);
 
 void material_set_vec4f(material_t material,
                         const char *slot,

@@ -3,23 +3,23 @@
 //==============================================================================
 
 #include <stdio.h>
-#include <cetech/kernel/os.h>
-#include <cetech/core/map.inl>
+#include <cetech/core/container/map.inl>
 
 #include "include/mpack/mpack.h"
 #include "include/nanomsg/nn.h"
 #include "include/nanomsg/pubsub.h"
 
-#include <cetech/kernel/thread.h>
-#include <cetech/core/eventstream.inl>
-#include <cetech/kernel/memory.h>
-#include <cetech/kernel/config.h>
-#include <cetech/kernel/module.h>
+#include <cetech/core/os/thread.h>
+#include <cetech/core/container/eventstream.inl>
+#include <cetech/core/memory.h>
+#include <cetech/core/config.h>
+#include <cetech/core/module.h>
 
 #include <cetech/modules/task/task.h>
 #include <cetech/modules/develop_system/develop.h>
-#include <cetech/kernel/string.h>
-#include <cetech/kernel/api.h>
+
+#include <cetech/core/api.h>
+#include <cetech/core/os/time.h>
 
 
 //==============================================================================
@@ -57,6 +57,7 @@ IMPORT_API(thread_api_v0);
 IMPORT_API(task_api_v0);
 IMPORT_API(config_api_v0);
 IMPORT_API(time_api_v0);
+IMPORT_API(log_api_v0);
 
 static __thread uint8_t _stream_buffer[64 * 1024] = {0};
 static __thread uint32_t _stream_buffer_size = 0;
@@ -322,6 +323,7 @@ static void _init( struct api_v0* api) {
     GET_API(api, config_api_v0);
     GET_API(api, thread_api_v0);
     GET_API(api, time_api_v0);
+    GET_API(api, log_api_v0);
 
     MAP_INIT(to_mpack_fce_t, &_G.to_mpack, memory_api_v0.main_allocator());
     eventstream_create(&_G.eventstream, memory_api_v0.main_allocator());
@@ -332,20 +334,20 @@ static void _init( struct api_v0* api) {
 
     const char *addr = 0;
 
-    log_debug(LOG_WHERE, "Init");
+    log_api_v0.log_debug(LOG_WHERE, "Init");
 
     int socket = nn_socket(AF_SP, NN_PUB);
     if (socket < 0) {
-        log_error(LOG_WHERE, "Could not create nanomsg socket: %s",
+        log_api_v0.log_error(LOG_WHERE, "Could not create nanomsg socket: %s",
                   nn_strerror(errno));
         //return 0;
     }
     addr = config_api_v0.get_string(_G.cv_pub_addr);
 
-    log_debug(LOG_WHERE, "PUB address: %s", addr);
+    log_api_v0.log_debug(LOG_WHERE, "PUB address: %s", addr);
 
     if (nn_bind(socket, addr) < 0) {
-        log_error(LOG_WHERE, "Could not bind socket to '%s': %s", addr,
+        log_api_v0.log_error(LOG_WHERE, "Could not bind socket to '%s': %s", addr,
                   nn_strerror(errno));
         //return 0;
     }
@@ -354,7 +356,7 @@ static void _init( struct api_v0* api) {
 }
 
 static void _shutdown() {
-    log_debug(LOG_WHERE, "Shutdown");
+    log_api_v0.log_debug(LOG_WHERE, "Shutdown");
 
     MAP_DESTROY(to_mpack_fce_t, &_G.to_mpack);
 

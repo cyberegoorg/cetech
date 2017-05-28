@@ -1,9 +1,7 @@
 #ifndef CETECH_SHADER_COMPILER_H
 #define CETECH_SHADER_COMPILER_H
 
-
-#include <cetech/kernel/fs.h>
-#include <cetech/kernel/os.h>
+#include <cetech/core/os/path.h>
 #include <cetech/core/yaml.h>
 #include <stdio.h>
 
@@ -31,9 +29,9 @@ static int _shaderc(const char *input,
 
                   input, output, include_path, type, platform, profile);
 
-    int status = exec(cmd_line);
+    int status = process_api_v0.exec(cmd_line);
 
-    log_debug("shaderc", "STATUS %d", status);
+    log_api_v0.log_debug("shaderc", "STATUS %d", status);
 
     return status;
 }

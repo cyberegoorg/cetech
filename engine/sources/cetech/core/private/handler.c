@@ -1,10 +1,10 @@
 #include <stddef.h>
 
 #include <cetech/core/allocator.h>
-#include <cetech/core/queue.inl>
-#include <cetech/kernel/module.h>
+#include <cetech/core/container/queue.inl>
+#include <cetech/core/module.h>
 #include <cetech/core/handler.h>
-#include <cetech/kernel/api.h>
+#include <cetech/core/api.h>
 
 //==============================================================================
 // Private defines

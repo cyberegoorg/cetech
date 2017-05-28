@@ -1,9 +1,7 @@
 #ifndef CETECH_TEXTURE_COMPILER_H
 #define CETECH_TEXTURE_COMPILER_H
 
-
-#include <cetech/kernel/fs.h>
-#include <cetech/kernel/os.h>
+#include <cetech/core/os/path.h>
 #include <cetech/core/yaml.h>
 #include <stdio.h>
 
@@ -28,9 +26,9 @@ static int _texturec(const char *input,
                       " --normalmap");
     }
 
-    int status = exec(cmd_line);
+    int status = process_api_v0.exec(cmd_line);
 
-    log_info("application", "STATUS %d", status);
+    log_api_v0.log_info("application", "STATUS %d", status);
 
     return status;
 }
@@ -119,6 +117,5 @@ static int _texture_resource_compiler(const char *filename,
 
     return 1;
 }
-
 
 #endif //CETECH_TEXTURE_COMPILER_H

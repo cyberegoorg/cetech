@@ -14,7 +14,6 @@
 // Typedefs
 //==============================================================================
 
-typedef struct stringid64_s stringid64_t;
 typedef struct world_s world_t;
 typedef struct entity_s entity_t;
 typedef struct mat33f_s mat33f_t;
@@ -42,7 +41,7 @@ struct material_api_v0 {
     //! Create new material
     //! \param name Material resource name
     //! \return Material
-    material_t (*resource_create)(stringid64_t name);
+    material_t (*resource_create)(uint64_t name);
 
     //! Get texture count in material
     //! \param material Material
@@ -55,7 +54,7 @@ struct material_api_v0 {
     //! \param texture Texture name
     void (*set_texture)(material_t material,
                         const char *slot,
-                        stringid64_t texture);
+                        uint64_t texture);
 
     //! Set vec4f value
     //! \param material Material
@@ -134,10 +133,10 @@ struct mesh_renderer_api_v0 {
     //! \return Mesh renderer
     mesh_renderer_t (*create)(world_t world,
                               entity_t entity,
-                              stringid64_t scene,
-                              stringid64_t mesh,
-                              stringid64_t node,
-                              stringid64_t material);
+                              uint64_t scene,
+                              uint64_t mesh,
+                              uint64_t node,
+                              uint64_t material);
 
     //! Get mesh renderer material
     //! \param world World
@@ -152,7 +151,7 @@ struct mesh_renderer_api_v0 {
     //! \param material Material
     void (*set_material)(world_t world,
                          mesh_renderer_t mesh,
-                         stringid64_t material);
+                         uint64_t material);
 
     //! Render all mesh in world
     //! \param world Word

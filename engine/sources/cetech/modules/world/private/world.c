@@ -2,15 +2,15 @@
 // Includes
 //==============================================================================
 
-#include <cetech/core/map.inl>
+#include <cetech/core/container/map.inl>
 #include <cetech/modules/world/world.h>
-#include <cetech/kernel/memory.h>
-#include <cetech/kernel/config.h>
+#include <cetech/core/memory.h>
+#include <cetech/core/config.h>
 #include <cetech/modules/resource/resource.h>
-#include <cetech/kernel/module.h>
-#include <cetech/kernel/hash.h>
+#include <cetech/core/module.h>
+#include <cetech/core/hash.h>
 #include <cetech/core/handler.h>
-#include <cetech/kernel/api.h>
+#include <cetech/core/api.h>
 
 
 //==============================================================================
@@ -19,7 +19,6 @@
 
 ARRAY_T(world_t);
 ARRAY_PROTOTYPE(world_callbacks_t);
-ARRAY_PROTOTYPE(stringid64_t);
 
 
 //==============================================================================

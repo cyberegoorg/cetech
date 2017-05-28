@@ -1,12 +1,13 @@
-
 #include <cetech/core/allocator.h>
 
-#include <cetech/kernel/module.h>
+#include <cetech/core/module.h>
+#include <cetech/core/api.h>
+
 #include <cetech/modules/world/world.h>
+#include <cetech/modules/luasys/luasys.h>
+
 #include "../../../camera/camera.h"
 #include "../../../renderer/renderer.h"
-#include <cetech/modules/luasys/luasys.h>
-#include <cetech/kernel/api.h>
 
 #define API_NAME "Renderer"
 

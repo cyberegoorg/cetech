@@ -2,16 +2,16 @@
 // Includes
 //==============================================================================
 
-#include <cetech/kernel/fs.h>
+#include <cetech/core/os/path.h>
 
-#include <cetech/kernel/memory.h>
+#include <cetech/core/memory.h>
 #include <cetech/modules/filesystem/filesystem.h>
-#include <cetech/kernel/hash.h>
-#include <cetech/kernel/config.h>
+#include <cetech/core/hash.h>
+#include <cetech/core/config.h>
 #include <cetech/modules/resource/resource.h>
-#include <cetech/kernel/module.h>
-#include <cetech/kernel/string.h>
-#include <cetech/kernel/api.h>
+#include <cetech/core/module.h>
+#include <cetech/core/api.h>
+#include <cetech/core/os/vio.h>
 
 
 //==============================================================================
@@ -34,7 +34,7 @@
 
 static struct G {
     struct {
-        stringid64_t id[MAX_ROOTS];
+        uint64_t id[MAX_ROOTS];
         char *path[MAX_ROOTS];
     } rootmap;
 } FilesystemGlobals = {0};
@@ -42,13 +42,14 @@ static struct G {
 IMPORT_API(memory_api_v0);
 IMPORT_API(path_v0);
 IMPORT_API(vio_api_v0);
+IMPORT_API(log_api_v0);
 
 
 //==============================================================================
 // Interface
 //==============================================================================
 
-void filesystem_map_root_dir(stringid64_t root,
+void filesystem_map_root_dir(uint64_t root,
                              const char *base_path) {
     for (int i = 0; i < MAX_ROOTS; ++i) {
         if (_G.rootmap.path[i] != 0) {
@@ -56,15 +57,15 @@ void filesystem_map_root_dir(stringid64_t root,
         }
 
         _G.rootmap.id[i] = root;
-        _G.rootmap.path[i] = str_dup(base_path,
-                                     memory_api_v0.main_allocator());
+        _G.rootmap.path[i] = memory_api_v0.str_dup(base_path,
+                                                   memory_api_v0.main_allocator());
         break;
     }
 }
 
-const char *filesystem_get_root_dir(stringid64_t root) {
+const char *filesystem_get_root_dir(uint64_t root) {
     for (int i = 0; i < MAX_ROOTS; ++i) {
-        if (_G.rootmap.id[i].id != root.id) {
+        if (_G.rootmap.id[i] != root) {
             continue;
         }
 
@@ -74,7 +75,7 @@ const char *filesystem_get_root_dir(stringid64_t root) {
     return NULL;
 }
 
-int filesystem_get_fullpath(stringid64_t root,
+int filesystem_get_fullpath(uint64_t root,
                             char *result,
                             uint64_t maxlen,
                             const char *filename) {
@@ -84,7 +85,7 @@ int filesystem_get_fullpath(stringid64_t root,
            (strlen(root_path) + strlen(filename) + 1);
 }
 
-struct vio *filesystem_open(stringid64_t root,
+struct vio *filesystem_open(uint64_t root,
                             const char *path,
                             enum vio_open_mode mode) {
     char fullm_path[MAX_PATH_LEN] = {0};
@@ -95,10 +96,10 @@ struct vio *filesystem_open(stringid64_t root,
     }
 
     struct vio *file = vio_api_v0.from_file(fullm_path, mode,
-                                     memory_api_v0.main_allocator());
+                                            memory_api_v0.main_allocator());
 
     if (!file) {
-        log_error(LOG_WHERE, "Could not load file %s", fullm_path);
+        log_api_v0.log_error(LOG_WHERE, "Could not load file %s", fullm_path);
         return NULL;
     }
 
@@ -109,7 +110,7 @@ void filesystem_close(struct vio *file) {
     vio_api_v0.close(file);
 }
 
-int filesystem_create_directory(stringid64_t root,
+int filesystem_create_directory(uint64_t root,
                                 const char *path) {
     char fullm_path[MAX_PATH_LEN] = {0};
 
@@ -122,7 +123,7 @@ int filesystem_create_directory(stringid64_t root,
 }
 
 
-void filesystem_listdir(stringid64_t root,
+void filesystem_listdir(uint64_t root,
                         const char *path,
                         const char *filter,
                         string_array_t *files,
@@ -143,7 +144,7 @@ void filesystem_listdir_free(string_array_t *files,
 }
 
 
-time_t filesystem_get_file_mtime(stringid64_t root,
+time_t filesystem_get_file_mtime(uint64_t root,
                                  const char *path) {
     char fullm_path[MAX_PATH_LEN] = {0};
     if (!filesystem_get_fullpath(root, fullm_path,
@@ -151,10 +152,10 @@ time_t filesystem_get_file_mtime(stringid64_t root,
         return 0;
     }
 
-    return file_mtime(fullm_path);
+    return path_v0.file_mtime(fullm_path);
 }
 
-static void _init_api(struct api_v0* api){
+static void _init_api(struct api_v0 *api) {
     static struct filesystem_api_v0 _api = {0};
     _api.filesystem_get_root_dir = filesystem_get_root_dir;
     _api.filesystem_open = filesystem_open;
@@ -170,18 +171,19 @@ static void _init_api(struct api_v0* api){
 }
 
 
-static void _init( struct api_v0* api) {
+static void _init(struct api_v0 *api) {
     GET_API(api, memory_api_v0);
     GET_API(api, path_v0);
     GET_API(api, vio_api_v0);
+    GET_API(api, log_api_v0);
 
     _G = (struct G) {0};
 
-    log_debug(LOG_WHERE, "Init");
+    log_api_v0.log_debug(LOG_WHERE, "Init");
 }
 
 static void _shutdown() {
-    log_debug(LOG_WHERE, "Shutdown");
+    log_api_v0.log_debug(LOG_WHERE, "Shutdown");
 
     for (int i = 0; i < MAX_ROOTS; ++i) {
         if (_G.rootmap.path[i] == 0) {

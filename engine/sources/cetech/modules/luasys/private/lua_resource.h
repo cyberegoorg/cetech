@@ -2,7 +2,7 @@
 #define CETECH_LUA_RESOURCE_H
 
 
-#include <cetech/kernel/fs.h>
+#include <cetech/core/os/path.h>
 
 void *lua_resource_loader(struct vio *input,
                           struct allocator *allocator) {
@@ -18,16 +18,16 @@ void lua_resource_unloader(void *new_data,
     CETECH_DEALLOCATE(allocator, new_data);
 }
 
-void lua_resource_online(stringid64_t name,
+void lua_resource_online(uint64_t name,
                          void *data) {
 }
 
-void lua_resource_offline(stringid64_t name,
+void lua_resource_offline(uint64_t name,
                           void *data) {
 
 }
 
-void *lua_resource_reloader(stringid64_t name,
+void *lua_resource_reloader(uint64_t name,
                             void *old_data,
                             void *new_data,
                             struct allocator *allocator) {
@@ -41,7 +41,7 @@ void *lua_resource_reloader(stringid64_t name,
     if (lua_pcall(_G.L, 0, 0, 0)) {
         const char *last_error = lua_tostring(_G.L, -1);
         lua_pop(_G.L, 1);
-        log_error(LOG_WHERE, "%s", last_error);
+        log_api_v0.log_error(LOG_WHERE, "%s", last_error);
     }
 
     return new_data;

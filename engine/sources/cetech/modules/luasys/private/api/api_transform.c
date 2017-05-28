@@ -2,11 +2,11 @@
 #include <cetech/modules/world/world.h>
 
 #include "../../../transform/transform.h"
-#include <cetech/kernel/module.h>
+#include <cetech/core/module.h>
 #include <cetech/modules/luasys/luasys.h>
 
 #include <cetech/modules/entity/entity.h>
-#include <cetech/kernel/api.h>
+#include <cetech/core/api.h>
 
 #define API_NAME "Transform"
 

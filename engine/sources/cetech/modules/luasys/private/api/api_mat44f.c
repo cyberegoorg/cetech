@@ -1,9 +1,9 @@
 
-#include <cetech/core/mat44f.inl>
+#include <cetech/core/math/mat44f.inl>
 
 #include <cetech/modules/luasys/luasys.h>
 
-#include <cetech/kernel/module.h>
+#include <cetech/core/module.h>
 
 #define API_NAME "Mat44f"
 

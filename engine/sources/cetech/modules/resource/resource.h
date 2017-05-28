@@ -19,8 +19,6 @@ struct compilator_api;
 struct config_api_v0;
 struct app_api_v0;
 
-typedef struct stringid64_s stringid64_t;
-
 //==============================================================================
 // Typedefs
 //==============================================================================
@@ -35,13 +33,13 @@ typedef void *(*resource_loader_t)(struct vio *input,
 //! Resource online callback
 //! \param name Resource name
 //! \param data Resource data
-typedef void  (*resource_online_t)(stringid64_t name,
+typedef void  (*resource_online_t)(uint64_t name,
                                    void *data);
 
 //! Resource offline callback
 //! \param name Resource name
 //! \param data Resource data
-typedef void  (*resource_offline_t)(stringid64_t name,
+typedef void  (*resource_offline_t)(uint64_t name,
                                     void *data);
 
 //! Resource unload callback
@@ -55,7 +53,7 @@ typedef void  (*resource_unloader_t)(void *new_data,
 //! \param old_data Resource old data
 //! \param new_data Resource new data
 //! \param allocator Allocator
-typedef void *(*resource_reloader_t)(stringid64_t name,
+typedef void *(*resource_reloader_t)(uint64_t name,
                                      void *old_data,
                                      void *new_data,
                                      struct allocator *allocator);
@@ -112,7 +110,7 @@ struct resource_api_v0 {
     //! Register resource type
     //! \param type Type
     //! \param callbacks Callbacks
-    void (*register_type)(stringid64_t type,
+    void (*register_type)(uint64_t type,
                           resource_callbacks_t callbacks);
 
     //! Load resources
@@ -122,8 +120,8 @@ struct resource_api_v0 {
     //! \param count Names count
     //! \param force Force load
     void (*load)(void **loaded_data,
-                 stringid64_t type,
-                 stringid64_t *names,
+                 uint64_t type,
+                 uint64_t *names,
                  size_t count,
                  int force);
 
@@ -132,8 +130,8 @@ struct resource_api_v0 {
     //! \param names Names
     //! \param resource_data Resource data array
     //! \param count Resouce count
-    void (*add_loaded)(stringid64_t type,
-                       stringid64_t *names,
+    void (*add_loaded)(uint64_t type,
+                       uint64_t *names,
                        void **resource_data,
                        size_t count);
 
@@ -142,24 +140,24 @@ struct resource_api_v0 {
     //! \param type Type
     //! \param names Names
     //! \param count Resource count
-    void (*load_now)(stringid64_t type,
-                     stringid64_t *names,
+    void (*load_now)(uint64_t type,
+                     uint64_t *names,
                      size_t count);
 
     //! Unload resources
     //! \param type Type
     //! \param names Names
     //! \param count Resource count
-    void (*unload)(stringid64_t type,
-                   stringid64_t *names,
+    void (*unload)(uint64_t type,
+                   uint64_t *names,
                    size_t count);
 
     //! Reload resources
     //! \param type Type
     //! \param names Names
     //! \param count Resource count
-    void (*reload)(stringid64_t type,
-                   stringid64_t *names,
+    void (*reload)(uint64_t type,
+                   uint64_t *names,
                    size_t count);
 
     //! Reload all loaded resource
@@ -169,24 +167,24 @@ struct resource_api_v0 {
     //! \param type Type
     //! \param names Name
     //! \return 1 if is loaded else 0
-    int (*can_get)(stringid64_t type,
-                   stringid64_t names);
+    int (*can_get)(uint64_t type,
+                   uint64_t names);
 
     //! Is all resorces loaded?
     //! \param type Type
     //! \param names Names
     //! \param count Resource count
     //! \return 1 if is loaded else 0
-    int (*can_get_all)(stringid64_t type,
-                       stringid64_t *names,
+    int (*can_get_all)(uint64_t type,
+                       uint64_t *names,
                        size_t count);
 
     //! Get resouce data
     //! \param type Type
     //! \param names Name
     //! \return Resource data or NULL if resource is not loaded
-    void *(*get)(stringid64_t type,
-                 stringid64_t names);
+    void *(*get)(uint64_t type,
+                 uint64_t names);
 
     //! Type, Name => string
     //! \param str Result string
@@ -196,15 +194,15 @@ struct resource_api_v0 {
     //! \return 1 if ok else 0
     int (*type_name_string)(char *str,
                             size_t max_len,
-                            stringid64_t type,
-                            stringid64_t name);
+                            uint64_t type,
+                            uint64_t name);
 
 #ifdef CETECH_CAN_COMPILE
 
     //! Register resource compiler
     //! \param type Type
     //! \param compilator Compilator fce
-    void (*compiler_register)(stringid64_t type,
+    void (*compiler_register)(uint64_t type,
                               resource_compilator_t compilator);
 
     //! Compile all resource in source dir
@@ -218,8 +216,8 @@ struct resource_api_v0 {
     //! \return 1 if ok else 0
     int (*compiler_get_filename)(char *filename,
                                  size_t max_ken,
-                                 stringid64_t type,
-                                 stringid64_t name);
+                                 uint64_t type,
+                                 uint64_t name);
 
 
     //! Get build tmp dir
@@ -271,19 +269,19 @@ struct resource_api_v0 {
 struct package_api_v0 {
     //! Load package
     //! \param name Package name
-    void (*load)(stringid64_t name);
+    void (*load)(uint64_t name);
 
     //! Unload package
     //! \param name Package name
-    void (*unload)(stringid64_t name);
+    void (*unload)(uint64_t name);
 
     //! Is package loaded
     //! \param name Package name
-    int (*is_loaded)(stringid64_t name);
+    int (*is_loaded)(uint64_t name);
 
     //! Wait while not package loaded.
     //! \param name Package name
-    void (*flush)(stringid64_t name);
+    void (*flush)(uint64_t name);
 };
 
 #endif //CETECH_RESOURCE_TYPES_H

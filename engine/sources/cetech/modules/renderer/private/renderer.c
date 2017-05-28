@@ -2,19 +2,19 @@
 // includes
 //==============================================================================
 
-#include <cetech/core/math_types.h>
+#include <cetech/core/math/math_types.h>
 #include <cetech/core/allocator.h>
 
 #include <cetech/modules/camera/camera.h>
 #include "../renderer.h"
 #include <cetech/modules/develop_system/develop.h>
-#include <cetech/kernel/hash.h>
-#include <cetech/kernel/application.h>
-#include <cetech/kernel/config.h>
-#include <cetech/kernel/module.h>
+#include <cetech/core/hash.h>
+#include <cetech/core/application.h>
+#include <cetech/core/config.h>
+#include <cetech/core/module.h>
 #include <cetech/modules/world/world.h>
-#include <cetech/kernel/window.h>
-#include <cetech/kernel/api.h>
+#include <cetech/core/os/window.h>
+#include <cetech/core/api.h>
 
 #include "bgfx/c99/platform.h"
 #include "texture/texture.h"
@@ -36,7 +36,7 @@ IMPORT_API(window_api_v0);
 
 #define _G RendererGlobals
 static struct G {
-    stringid64_t type;
+    uint64_t type;
     uint32_t size_width;
     uint32_t size_height;
     int capture;

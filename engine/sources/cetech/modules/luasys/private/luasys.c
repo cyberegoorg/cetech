@@ -6,27 +6,31 @@
 #include <include/luajit/lauxlib.h>
 
 #include <cetech/core/allocator.h>
-#include <cetech/kernel/hash.h>
-#include <cetech/core/math_types.h>
-#include <cetech/core/vec2f.inl>
-#include <cetech/kernel/module.h>
+#include <cetech/core/math/math_types.h>
+#include <cetech/core/math/vec2f.inl>
+
+#include <cetech/core/api.h>
+#include <cetech/core/os/vio.h>
+#include <cetech/core/config.h>
+#include <cetech/core/hash.h>
+#include <cetech/core/module.h>
+#include <cetech/core/application.h>
 
 #include <cetech/modules/develop_system/develop.h>
-#include <cetech/kernel/config.h>
-#include <cetech/kernel/application.h>
 #include <cetech/modules/resource/resource.h>
-
 #include <cetech/modules/luasys/luasys.h>
-#include <cetech/kernel/api.h>
-#include <cetech/kernel/fs.h>
 
-#include "vectors.h"
-#include "quaternion.h"
-#include "matrix.h"
+
 
 IMPORT_API(resource_api_v0);
 IMPORT_API(cnsole_srv_api_v0);
 IMPORT_API(vio_api_v0);
+IMPORT_API(log_api_v0);
+IMPORT_API(hash_api_v0);
+
+#include "vectors.h"
+#include "quaternion.h"
+#include "matrix.h"
 
 //==============================================================================
 // Defines
@@ -50,7 +54,7 @@ struct lua_resource {
 
 static struct G {
     lua_State *L;
-    stringid64_t type_id;
+    uint64_t type_id;
 
     uint32_t _temp_vec2f_used;
     uint32_t _temp_vec3f_used;
@@ -72,7 +76,7 @@ static struct G {
 
 static int require(lua_State *L) {
     const char *name = lua_tostring(L, 1);
-    stringid64_t name_hash = stringid64_from_string(name);
+    uint64_t name_hash = hash_api_v0.id64_from_str(name);
 
     struct lua_resource *resource = resource_api_v0.get(_G.type_id, name_hash);
 
@@ -268,7 +272,7 @@ static int _cmd_execute_string(mpack_node_t args,
 
         const char *last_error = lua_tostring(_G.L, -1);
         lua_pop(_G.L, 1);
-        log_error(LOG_WHERE, "%s", last_error);
+        log_api_v0.log_error(LOG_WHERE, "%s", last_error);
 
         mpack_start_map(writer, 1);
         mpack_write_cstr(writer, "error_msg");
@@ -293,7 +297,7 @@ static int _execute_string(lua_State *_L,
     if (luaL_dostring(_L, str)) {
         const char *last_error = lua_tostring(_L, -1);
         lua_pop(_L, 1);
-        log_error(LOG_WHERE, "%s", last_error);
+        log_api_v0.log_error(LOG_WHERE, "%s", last_error);
         return 0;
     }
 
@@ -342,7 +346,7 @@ int _lua_compiler(const char *filename,
     lua_pcall(state, 3, 2, 0);
     if (lua_isnil(state, 1)) {
         const char *err = luasys_to_string(state, 2);
-        log_error("resource_compiler.lua", "[%s] %s", filename, err);
+        log_api_v0.log_error("resource_compiler.lua", "[%s] %s", filename, err);
 
         lua_close(state);
         return 0;
@@ -556,7 +560,7 @@ int luasys_execute_string(const char *str) {
     return _execute_string(_G.L, str);
 }
 
-void luasys_execute_resource(stringid64_t name) {
+void luasys_execute_resource(uint64_t name) {
     struct lua_resource *resource = resource_api_v0.get(_G.type_id, name);
     char *data = (char *) (resource + 1);
 
@@ -565,7 +569,7 @@ void luasys_execute_resource(stringid64_t name) {
     if (lua_pcall(_G.L, 0, 0, 0)) {
         const char *last_error = lua_tostring(_G.L, -1);
         lua_pop(_G.L, 1);
-        log_error(LOG_WHERE, "%s", last_error);
+        log_api_v0.log_error(LOG_WHERE, "%s", last_error);
     }
 }
 
@@ -867,17 +871,19 @@ static void _init_api(struct api_v0* api){
 
 
 static void _init( struct api_v0* api_v0) {
-    log_debug(LOG_WHERE, "Init");
 
     GET_API(api_v0, cnsole_srv_api_v0);
     GET_API(api_v0, resource_api_v0);
     GET_API(api_v0, vio_api_v0);
+    GET_API(api_v0, log_api_v0);
+    GET_API(api_v0, hash_api_v0);
 
+    log_api_v0.log_debug(LOG_WHERE, "Init");
 
     _G.L = luaL_newstate();
     CETECH_ASSERT(LOG_WHERE, _G.L != NULL);
 
-    _G.type_id = stringid64_from_string("lua");
+    _G.type_id = hash_api_v0.id64_from_str("lua");
 
     luaL_openlibs(_G.L);
 
@@ -912,7 +918,7 @@ static void _init( struct api_v0* api_v0) {
 }
 
 static void _shutdown() {
-    log_debug(LOG_WHERE, "Shutdown");
+    log_api_v0.log_debug(LOG_WHERE, "Shutdown");
 
     lua_close(_G.L);
 
@@ -923,7 +929,7 @@ const struct game_callbacks *luasys_get_game_callbacks() {
     return &_GameCallbacks;
 }
 
-void luasys_execute_boot_script(stringid64_t name) {
+void luasys_execute_boot_script(uint64_t name) {
     luasys_execute_resource(name);
 }
 
@@ -967,7 +973,7 @@ void luasys_call_global(const char *func,
     if (lua_pcall(_G.L, argc, 0, 0)) {
         const char *last_error = lua_tostring(_G.L, -1);
         lua_pop(_G.L, 1);
-        log_error(LOG_WHERE, "%s", last_error);
+        log_api_v0.log_error(LOG_WHERE, "%s", last_error);
     }
 
     lua_pop(_state, -1);

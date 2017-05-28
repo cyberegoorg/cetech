@@ -1,10 +1,10 @@
 
 #include <cetech/core/allocator.h>
-#include <cetech/core/math_types.h>
-#include <cetech/kernel/module.h>
+#include <cetech/core/math/math_types.h>
+#include <cetech/core/module.h>
 #include <cetech/modules/luasys/luasys.h>
-#include <cetech/kernel/input.h>
-#include <cetech/kernel/api.h>
+#include <cetech/modules/input/input.h>
+#include <cetech/core/api.h>
 
 IMPORT_API(mouse_api_v0);
 

@@ -1,24 +1,23 @@
-#include <cetech/core/array.inl>
+#include <cetech/core/container/array.inl>
 #include <cetech/core/yaml.h>
-#include <cetech/core/quatf.inl>
-#include <cetech/core/mat44f.inl>
+#include <cetech/core/math/quatf.inl>
+#include <cetech/core/math/mat44f.inl>
 
-#include <cetech/kernel/config.h>
-#include <cetech/kernel/hash.h>
+#include <cetech/core/config.h>
+#include <cetech/core/hash.h>
 #include <cetech/modules/resource/resource.h>
 
 #include <cetech/modules/entity/entity.h>
 #include "../scenegraph.h"
-#include <cetech/kernel/memory.h>
-#include <cetech/kernel/module.h>
-#include <cetech/core/map.inl>
+#include <cetech/core/memory.h>
+#include <cetech/core/module.h>
+#include <cetech/core/container/map.inl>
 #include <cetech/modules/world/world.h>
-#include <cetech/kernel/api.h>
+#include <cetech/core/api.h>
 
 
 ARRAY_PROTOTYPE(vec3f_t)
 
-ARRAY_PROTOTYPE(stringid64_t)
 
 ARRAY_PROTOTYPE(mat44f_t)
 
@@ -31,7 +30,7 @@ typedef struct {
     ARRAY_T(uint32_t) next_sibling;
     ARRAY_T(uint32_t) parent;
 
-    ARRAY_T(stringid64_t) name;
+    ARRAY_T(uint64_t) name;
     ARRAY_T(vec3f_t) position;
     ARRAY_T(quatf_t) rotation;
     ARRAY_T(vec3f_t) scale;
@@ -60,7 +59,7 @@ static void _new_world(world_t world) {
     ARRAY_INIT(uint32_t, &data.next_sibling, memory_api_v0.main_allocator());
     ARRAY_INIT(uint32_t, &data.parent, memory_api_v0.main_allocator());
 
-    ARRAY_INIT(stringid64_t, &data.name, memory_api_v0.main_allocator());
+    ARRAY_INIT(uint64_t, &data.name, memory_api_v0.main_allocator());
     ARRAY_INIT(vec3f_t, &data.position, memory_api_v0.main_allocator());
     ARRAY_INIT(quatf_t, &data.rotation, memory_api_v0.main_allocator());
     ARRAY_INIT(vec3f_t, &data.scale, memory_api_v0.main_allocator());
@@ -82,7 +81,7 @@ static void _destroy_world(world_t world) {
     ARRAY_DESTROY(uint32_t, &data->next_sibling);
     ARRAY_DESTROY(uint32_t, &data->parent);
 
-    ARRAY_DESTROY(stringid64_t, &data->name);
+    ARRAY_DESTROY(uint64_t, &data->name);
     ARRAY_DESTROY(vec3f_t, &data->position);
     ARRAY_DESTROY(quatf_t, &data->rotation);
     ARRAY_DESTROY(vec3f_t, &data->scale);
@@ -242,7 +241,7 @@ scene_node_t scenegraph_get_root(world_t world,
 
 scene_node_t scenegraph_create(world_t world,
                                entity_t entity,
-                               stringid64_t *names,
+                               uint64_t *names,
                                uint32_t *parent,
                                mat44f_t *pose,
                                uint32_t count) {
@@ -265,7 +264,7 @@ scene_node_t scenegraph_create(world_t world,
         ARRAY_PUSH_BACK(quatf_t, &data->rotation, rotation);
         ARRAY_PUSH_BACK(vec3f_t, &data->scale, scale);
 
-        ARRAY_PUSH_BACK(stringid64_t, &data->name, names[i]);
+        ARRAY_PUSH_BACK(uint64_t, &data->name, names[i]);
         ARRAY_PUSH_BACK(uint32_t, &data->parent, UINT32_MAX);
         ARRAY_PUSH_BACK(uint32_t, &data->first_child, UINT32_MAX);
         ARRAY_PUSH_BACK(uint32_t, &data->next_sibling, UINT32_MAX);
@@ -330,8 +329,8 @@ void scenegraph_link(world_t world,
 
 scene_node_t _scenegraph_node_by_name(world_data_t *data,
                                       scene_node_t root,
-                                      stringid64_t name) {
-    if (ARRAY_AT(&data->name, root.idx).id == name.id) {
+                                      uint64_t name) {
+    if (ARRAY_AT(&data->name, root.idx) == name) {
         return root;
     }
 
@@ -350,7 +349,7 @@ scene_node_t _scenegraph_node_by_name(world_data_t *data,
 
 scene_node_t scenegraph_node_by_name(world_t world,
                                      entity_t entity,
-                                     stringid64_t name) {
+                                     uint64_t name) {
     world_data_t *data = _get_world_data(world);
     scene_node_t root = scenegraph_get_root(world, entity);
 

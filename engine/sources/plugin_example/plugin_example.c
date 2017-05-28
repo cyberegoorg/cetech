@@ -1,10 +1,10 @@
 #include <stdio.h>
-#include <cetech/kernel/api.h>
+#include <cetech/core/api.h>
 
-#include "cetech/kernel/application.h"
-#include "cetech/kernel/config.h"
-#include "cetech/kernel/module.h"
-#include "cetech/kernel/input.h"
+#include "cetech/core/application.h"
+#include "cetech/core/config.h"
+#include "cetech/core/module.h"
+#include "cetech/modules/input/input.h"
 
 IMPORT_API(keyboard_api_v0)
 

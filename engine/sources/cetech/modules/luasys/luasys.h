@@ -11,13 +11,7 @@
 #include <stddef.h>
 #include <stdint.h>
 
-#include <cetech/core/math_types.h>
-
-//#include "include/luajit/lua.h"
-//#include "include/luajit/lauxlib.h"
-//#include "include/luajit/lualib.h"
-
-typedef struct stringid64_s stringid64_t;
+#include <cetech/core/math/math_types.h>
 
 typedef struct lua_State lua_State;
 
@@ -247,7 +241,7 @@ struct lua_api_v0 {
 
     //! Execute resource
     //! \param name Resource name
-    void (*execute_resource)(stringid64_t name);
+    void (*execute_resource)(uint64_t name);
 
     //! Add module function
     //! \param module Module name
@@ -263,7 +257,7 @@ struct lua_api_v0 {
 
     //! Execute boot script
     //! \param Boot script name
-    void (*execute_boot_script)(stringid64_t name);
+    void (*execute_boot_script)(uint64_t name);
 
     //! Call global function
     //! \example lua_api_v0.call_global("print", "if", 1, 2.0f);
@@ -380,11 +374,11 @@ void luasys_add_module_function(const char *module,
 void luasys_add_module_constructor(const char *module,
                                    const lua_CFunction func);
 
-void luasys_execute_resource(stringid64_t name);
+void luasys_execute_resource(uint64_t name);
 
 const struct game_callbacks *luasys_get_game_callbacks();
 
-void luasys_execute_boot_script(stringid64_t name);
+void luasys_execute_boot_script(uint64_t name);
 
 void luasys_call_global(const char *func,
                         const char *args,

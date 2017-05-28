@@ -1,18 +1,18 @@
-#include <cetech/core/array.inl>
+#include <cetech/core/container/array.inl>
 #include <cetech/core/yaml.h>
-#include <cetech/kernel/config.h>
+#include <cetech/core/config.h>
 #include <cetech/modules/resource/resource.h>
 #include <cetech/modules/entity/entity.h>
-#include <cetech/kernel/hash.h>
+#include <cetech/core/hash.h>
 #include <cetech/modules/world/world.h>
 #include <cetech/modules/component/component.h>
-#include <cetech/core/quatf.inl>
-#include <cetech/core/mat44f.inl>
+#include <cetech/core/math/quatf.inl>
+#include <cetech/core/math/mat44f.inl>
 #include "../transform.h"
-#include <cetech/kernel/memory.h>
-#include <cetech/kernel/module.h>
-#include <cetech/core/map.inl>
-#include <cetech/kernel/api.h>
+#include <cetech/core/memory.h>
+#include <cetech/core/module.h>
+#include <cetech/core/container/map.inl>
+#include <cetech/core/api.h>
 
 
 struct transform_data {
@@ -47,12 +47,13 @@ MAP_PROTOTYPE(world_data_t)
 
 #define _G TransformGlobal
 static struct G {
-    stringid64_t type;
+    uint64_t type;
 
     MAP_T(world_data_t) world;
 } _G = {0};
 
 IMPORT_API(memory_api_v0);
+IMPORT_API(hash_api_v0);
 
 int transform_is_valid(transform_t transform);
 
@@ -220,19 +221,19 @@ static void _spawner(world_t world,
 
 void _set_property(world_t world,
                    entity_t entity,
-                   stringid64_t key,
+                   uint64_t key,
                    struct property_value value) {
 
-    stringid64_t position = stringid64_from_string("position");
-    stringid64_t rotation = stringid64_from_string("rotation");
-    stringid64_t scale = stringid64_from_string("scale");
+    uint64_t position = hash_api_v0.id64_from_str("position");
+    uint64_t rotation = hash_api_v0.id64_from_str("rotation");
+    uint64_t scale = hash_api_v0.id64_from_str("scale");
 
     transform_t transform = transform_get(world, entity);
 
-    if (key.id == position.id) {
+    if (key == position) {
         transform_set_position(world, transform, value.value.vec3f);
 
-    } else if (key.id == rotation.id) {
+    } else if (key == rotation) {
         quatf_t rot = {0};
         vec3f_t euler_rot = value.value.vec3f;
         vec3f_t euler_rot_rad = {0};
@@ -243,7 +244,7 @@ void _set_property(world_t world,
 
         transform_set_rotation(world, transform, rot);
 
-    } else if (key.id == scale.id) {
+    } else if (key == scale) {
         transform_set_scale(world, transform, value.value.vec3f);
     }
 
@@ -251,19 +252,19 @@ void _set_property(world_t world,
 
 struct property_value _get_property(world_t world,
                                     entity_t entity,
-                                    stringid64_t key) {
-    stringid64_t position = stringid64_from_string("position");
-    stringid64_t rotation = stringid64_from_string("rotation");
-    stringid64_t scale = stringid64_from_string("scale");
+                                    uint64_t key) {
+    uint64_t position = hash_api_v0.id64_from_str("position");
+    uint64_t rotation = hash_api_v0.id64_from_str("rotation");
+    uint64_t scale = hash_api_v0.id64_from_str("scale");
 
     transform_t transform = transform_get(world, entity);
 
-    if (key.id == position.id) {
+    if (key == position) {
         return (struct property_value) {
                 .type= PROPERTY_VEC3,
                 .value.vec3f = transform_get_position(world, transform)
         };
-    } else if (key.id == rotation.id) {
+    } else if (key == rotation) {
         vec3f_t euler_rot = {0};
         vec3f_t euler_rot_rad = {0};
         quatf_t rot = transform_get_rotation(world, transform);
@@ -274,7 +275,7 @@ struct property_value _get_property(world_t world,
                 .type= PROPERTY_VEC3,
                 .value.vec3f = euler_rot
         };
-    } else if (key.id == scale.id) {
+    } else if (key == scale) {
         return (struct property_value) {
                 .type= PROPERTY_VEC3,
                 .value.vec3f = transform_get_scale(world, transform)
@@ -309,13 +310,14 @@ static void _init_api(struct api_v0* api){
 static void _init( struct api_v0* api) {
     GET_API(api, component_api_v0);
     GET_API(api, memory_api_v0);
+    GET_API(api, hash_api_v0);
 
 
     _G = (struct G) {0};
 
     MAP_INIT(world_data_t, &_G.world, memory_api_v0.main_allocator());
 
-    _G.type = stringid64_from_string("transform");
+    _G.type = hash_api_v0.id64_from_str("transform");
 
     component_api_v0.component_register_compiler(_G.type,
                                                  _transform_component_compiler,

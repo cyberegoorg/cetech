@@ -7,7 +7,7 @@
 //==============================================================================
 
 #include <stdbool.h>
-#include "cetech/core/math_types.h"
+#include "cetech/core/math/math_types.h"
 
 typedef struct vec3f_s vec3f_t;
 typedef struct vec4f_s vec4f_t;

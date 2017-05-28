@@ -3,7 +3,7 @@
 
 #include <stdio.h>
 #include <cetech/core/yaml.h>
-#include <cetech/kernel/fs.h>
+#include <cetech/core/os/path.h>
 
 struct material_compile_output {
     ARRAY_T(char) uniform_names;
@@ -63,12 +63,12 @@ static void _forach_texture_clb(yaml_node_t key,
     yaml_as_string(key, uniform_name, CETECH_ARRAY_LEN(uniform_name) - 1);
 
     yaml_as_string(value, tmp_buffer, CETECH_ARRAY_LEN(tmp_buffer));
-    stringid64_t texture_name = stringid64_from_string(tmp_buffer);
+    uint64_t texture_name = hash_api_v0.id64_from_str(tmp_buffer);
 
     ARRAY_PUSH(char, &output->uniform_names, uniform_name,
                CETECH_ARRAY_LEN(uniform_name));
     ARRAY_PUSH(uint8_t, &output->data, (uint8_t *) &texture_name,
-               sizeof(stringid64_t));
+               sizeof(uint64_t));
 }
 
 static void _forach_vec4fs_clb(yaml_node_t key,
@@ -171,7 +171,7 @@ static int _material_resource_compiler(const char *filename,
 
 
     struct material_blob resource = {
-            .shader_name = stringid64_from_string(tmp_buffer),
+            .shader_name = hash_api_v0.id64_from_str(tmp_buffer),
             .texture_count =output.texture_count,
             .vec4f_count = output.vec4f_count,
             .uniforms_count = ARRAY_SIZE(&output.uniform_names) / 32,
