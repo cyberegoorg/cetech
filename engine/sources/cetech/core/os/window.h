@@ -1,6 +1,9 @@
 #ifndef CETECH_WINDOW_H
 #define CETECH_WINDOW_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 //==============================================================================
 // Window
@@ -57,5 +60,9 @@ struct window_api_v0 {
 
     void *(*native_display_ptr)(window_t w);
 };
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif //CETECH_WINDOW_H

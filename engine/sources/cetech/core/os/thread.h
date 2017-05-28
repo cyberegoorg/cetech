@@ -1,8 +1,11 @@
 #ifndef CETECH_THREAD_H
 #define CETECH_THREAD_H
 
-#include <stdint.h>
+#ifdef __cplusplus
+extern "C" {
+#endif
 
+#include <stdint.h>
 
 typedef int (*thread_fce_t)(void *data);
 
@@ -49,5 +52,9 @@ struct thread_api_v0 {
 
     void (*spin_unlock)(spinlock_t *lock);
 };
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif //CETECH_THREAD_H
