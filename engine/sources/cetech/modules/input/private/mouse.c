@@ -43,8 +43,8 @@ static void _update() {
     struct event_header *event = machine_api_v0.event_begin();
 
     memcpy(_G.last_state, _G.state, MOUSE_BTN_MAX);
-//    _G.last_delta_pos.x = 0;
-//    _G.last_delta_pos.y = 0;
+    _G.last_delta_pos.x = 0;
+    _G.last_delta_pos.y = 0;
 
     while (event != machine_api_v0.event_end()) {
         struct mouse_move_event *move_event;
