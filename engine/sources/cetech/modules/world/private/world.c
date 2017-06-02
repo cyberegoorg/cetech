@@ -85,11 +85,10 @@ static void _init_api(struct api_v0 *api) {
 
 
 static void _init(struct api_v0 *api) {
-    _G = (struct G) {0};
-
     GET_API(api, memory_api_v0);
     GET_API(api, handler_api_v0);
 
+    _G = (struct G) {0};
 
     ARRAY_INIT(world_callbacks_t, &_G.callbacks,
                memory_api_v0.main_allocator());

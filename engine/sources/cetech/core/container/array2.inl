@@ -232,6 +232,7 @@ namespace cetech {
     template<typename T>
     Array<T> &Array<T>::operator=(const Array<T> &other) {
         const uint32_t n = other._size;
+        _allocator = other._allocator;
         array::resize(*this, n);
         memcpy(_data, other._data, sizeof(T) * n);
         return *this;

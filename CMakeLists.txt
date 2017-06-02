@@ -73,7 +73,7 @@ set(SOURCE_FILES
 
 
         engine/sources/cetech/core/os/private/stacktrace.c
-        engine/sources/cetech/core/private/api.c
+        engine/sources/cetech/core/private/api.cpp
         engine/sources/cetech/core/private/log/log_system.c
         engine/sources/cetech/core/private/yaml.cc
         engine/sources/cetech/core/private/handler.c
@@ -117,10 +117,10 @@ set(SOURCE_FILES
         engine/sources/cetech/core/task/private/task.c
 
         engine/sources/cetech/core/resource/private/resource.cpp
-        engine/sources/cetech/core/resource/private/resource_package.c
-        engine/sources/cetech/core/resource/private/resource_compiler.c
+        engine/sources/cetech/core/resource/private/resource_package.cpp
+        engine/sources/cetech/core/resource/private/resource_compiler.cpp
         engine/sources/cetech/core/filesystem/private/filesystem.c
-        engine/sources/cetech/modules/component/private/component.c
+        engine/sources/cetech/modules/component/private/component.cpp
         engine/sources/cetech/modules/entity/private/entity.c
         engine/sources/cetech/modules/world/private/world.c
         engine/sources/cetech/modules/level/private/level.c
@@ -143,9 +143,9 @@ set(SOURCE_FILES
         engine/sources/cetech/modules/renderer/private/scene/scene.c
         engine/sources/cetech/modules/renderer/private/mesh/mesh_renderer.c
 
-        engine/sources/cetech/modules/transform/private/transform.c
-        engine/sources/cetech/modules/scenegraph/private/scenegraph.c
-        engine/sources/cetech/modules/camera/private/camera.c
+        engine/sources/cetech/modules/transform/private/transform.cpp
+        engine/sources/cetech/modules/scenegraph/private/scenegraph.cpp
+        engine/sources/cetech/modules/camera/private/camera.cpp
 
         engine/sources/cetech/core/os/private/os.c)
 

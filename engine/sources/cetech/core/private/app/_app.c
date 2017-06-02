@@ -168,7 +168,7 @@ void _init_api(struct api_v0 *api) {
 
 int _init_config(struct api_v0 *api) {
     struct config_api_v0 config = *(struct config_api_v0 *) api->first(
-            "config_api_v0");
+            "config_api_v0").api;
 
     _G.config = (struct GConfig) {
             .boot_pkg = config.new_str("core.boot_pkg", "Boot package",
@@ -252,6 +252,7 @@ int application_init(int argc,
     ADD_STATIC_PLUGIN(consoleserver);
 
     ADD_STATIC_PLUGIN(filesystem);
+
     ADD_STATIC_PLUGIN(resourcesystem);
 
 #ifdef CETECH_CAN_COMPILE

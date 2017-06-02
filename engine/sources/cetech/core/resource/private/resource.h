@@ -1,6 +1,10 @@
 #ifndef CETECH_RESOURCE_H
 #define CETECH_RESOURCE_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include <cetech/core/hash.h>
 #include <cetech/core/resource/resource.h>
 
@@ -84,6 +88,13 @@ int resource_compiler_get_build_dir(char *build_dir,
                                     size_t max_len,
                                     const char *platform);
 
+#ifdef __cplusplus
+}
+#endif
+
+int package_init(struct api_v0 *api);
+
+void package_shutdown();
 
 void package_load(uint64_t name);
 

@@ -47,10 +47,10 @@ static struct G {
 IMPORT_API(config_api_v0);
 IMPORT_API(log_api_v0);
 
-extern void consolesrv_push_begin();
+void consolesrv_push_begin();
 
-extern void consolesrv_register_command(const char *,
-                                        console_server_command_t);
+void consolesrv_register_command(const char *,
+                                 console_server_command_t);
 
 //==============================================================================
 // Private
@@ -148,7 +148,7 @@ static void _init(struct api_v0 *api) {
     int socket = nn_socket(AF_SP, NN_REP);
     if (socket < 0) {
         log_api_v0.error(LOG_WHERE, "Could not create nanomsg socket: %s",
-                             nn_strerror(errno));
+                         nn_strerror(errno));
         return;// 0;
     }
     addr = config_api_v0.get_string(_G.cv_rpc_addr);
@@ -157,8 +157,8 @@ static void _init(struct api_v0 *api) {
 
     if (nn_bind(socket, addr) < 0) {
         log_api_v0.error(LOG_WHERE, "Could not bind socket to '%s': %s",
-                             addr,
-                             nn_strerror(errno));
+                         addr,
+                         nn_strerror(errno));
         return;// 0;
     }
 
@@ -169,8 +169,8 @@ static void _init(struct api_v0 *api) {
         socket = nn_socket(AF_SP, NN_PUSH);
         if (socket < 0) {
             log_api_v0.error(LOG_WHERE,
-                                 "Could not create nanomsg socket: %s",
-                                 nn_strerror(errno));
+                             "Could not create nanomsg socket: %s",
+                             nn_strerror(errno));
             return;// 0;
         }
 
@@ -180,8 +180,8 @@ static void _init(struct api_v0 *api) {
 
         if (nn_connect(socket, addr) < 0) {
             log_api_v0.error(LOG_WHERE, "Could not bind socket to '%s': %s",
-                                 addr,
-                                 nn_strerror(errno));
+                             addr,
+                             nn_strerror(errno));
             return;// 0;
         }
         _G.push_socket = socket;
@@ -192,7 +192,7 @@ static void _init(struct api_v0 *api) {
     socket = nn_socket(AF_SP, NN_PUB);
     if (socket < 0) {
         log_api_v0.error(LOG_WHERE, "Could not create nanomsg socket: %s",
-                             nn_strerror(errno));
+                         nn_strerror(errno));
         return;// 0;
     }
 
@@ -202,8 +202,8 @@ static void _init(struct api_v0 *api) {
 
     if (nn_bind(socket, addr) < 0) {
         log_api_v0.error(LOG_WHERE, "Could not bind socket to '%s': %s",
-                             addr,
-                             nn_strerror(errno));
+                         addr,
+                         nn_strerror(errno));
         return;// 0;
     }
     _G.log_socket = socket;
@@ -217,9 +217,13 @@ static void _init_cvar(struct config_api_v0 config) {
     _G = (struct G) {0};
 
     _G.cv_rpc_addr = config.new_str("develop.rpc.addr",
-                                    "Console server rpc addr", "ws://*:4444");
+                                    "Console server rpc addr",
+                                    "ws://*:4444");
+
     _G.cv_log_addr = config.new_str("develop.log.addr",
-                                    "Console server log addr", "ws://*:4445");
+                                    "Console server log addr",
+                                    "ws://*:4445");
+
     _G.cv_push_addr = config.new_str("develop.push.addr", "Push addr", "");
 }
 

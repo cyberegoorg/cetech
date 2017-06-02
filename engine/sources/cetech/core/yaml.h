@@ -1,6 +1,9 @@
 #ifndef CETECH_YAML_H
 #define CETECH_YAML_H
 
+#include <stddef.h>
+#include <stdint.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -122,12 +125,13 @@ YAML_NODE_AS_DEF(mat44f_t);
 
 YAML_NODE_AS_DEF(mat33f_t);
 
+#undef YAML_NODE_AS_DEF
+#undef YAML_NODE_AS_DEFN
+
 int yaml_as_string(yaml_node_t node,
                    char *output,
                    size_t max_len);
 
-#undef YAML_NODE_AS_DEF
-#undef YAML_NODE_AS_DEFN
 
 #ifdef __cplusplus
 }

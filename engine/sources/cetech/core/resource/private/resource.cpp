@@ -11,7 +11,6 @@
 #include "include/mpack/mpack.h"
 
 
-extern "C" {
 //#include <cetech/core/container/map.inl>
 #include <cetech/core/hash.h>
 #include <cetech/core/application.h>
@@ -24,8 +23,12 @@ extern "C" {
 #include <cetech/core/resource/resource.h>
 #include <cetech/core/develop_system/develop.h>
 #include <cetech/core/filesystem/filesystem.h>
+
 #include "resource.h"
-}
+
+void resource_register_type(uint64_t type,
+                            resource_callbacks_t callbacks);
+
 
 using namespace cetech;
 
@@ -146,12 +149,6 @@ static const resource_callbacks_t package_resource_callback = {
         .reloader = package_resource_reloader
 };
 
-extern "C" int package_init(struct api_v0 *api);
-extern "C" void package_shutdown();
-
-void resource_register_type(uint64_t type,
-                            resource_callbacks_t callbacks);
-
 static void _init_api(struct api_v0 *api) {
 
     static struct resource_api_v0 resource_api = {0};
@@ -210,9 +207,9 @@ static void _init(struct api_v0 *api) {
 
     char build_dir_full[4096] = {0};
     path_v0.join(build_dir_full,
-                      CETECH_ARRAY_LEN(build_dir_full),
-                      config_api_v0.get_string(_G.config.build_dir),
-                      app_api_v0.platform());
+                 CETECH_ARRAY_LEN(build_dir_full),
+                 config_api_v0.get_string(_G.config.build_dir),
+                 app_api_v0.platform());
 
     filesystem_api_v0.map_root_dir(
             hash_api_v0.id64_from_str("build"),
@@ -360,7 +357,7 @@ void resource_load(void **loaded_data,
 
     if (idx == UINT32_MAX) {
         log_api_v0.error(LOG_WHERE,
-                             "Loader for resource is not is not registred");
+                         "Loader for resource is not is not registred");
         memset(loaded_data, sizeof(void *), count);
         return;
     }
@@ -373,7 +370,7 @@ void resource_load(void **loaded_data,
 
 
     for (int i = 0; i < count; ++i) {
-        resource_item_t item = map::get(*resource_map,names[i], null_item);
+        resource_item_t item = map::get(*resource_map, names[i], null_item);
 
         if (!force && (item.ref_count > 0)) {
             ++item.ref_count;
@@ -396,14 +393,14 @@ void resource_load(void **loaded_data,
         char *filename = build_name;
 #endif
         log_api_v0.debug("resource", "Loading resource %s from %s/%s",
-                             filename,
-                             filesystem_api_v0.root_dir(
-                                     root_name),
-                             build_name);
+                         filename,
+                         filesystem_api_v0.root_dir(
+                                 root_name),
+                         build_name);
 
         struct vio *resource_file = filesystem_api_v0.open(root_name,
-                                                                      build_name,
-                                                                      VIO_OPEN_READ);
+                                                           build_name,
+                                                           VIO_OPEN_READ);
 
         if (resource_file != NULL) {
             loaded_data[i] = type_clb.loader(resource_file,
@@ -483,7 +480,7 @@ void *resource_get(uint64_t type,
             char *filename = build_name;
 #endif
             log_api_v0.warning(LOG_WHERE, "Autoloading resource %s",
-                                   filename);
+                               filename);
             resource_load_now(type, &names, 1);
             item = map::get(*resource_map, names, null_item);
         } else {

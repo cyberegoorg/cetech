@@ -68,7 +68,7 @@ static void _update() {
 static void _reload_end( struct api_v0* api,
                         void *data) {
     _init_api(api);
-    _init(api);
+    init(api);
 }
 
 void *get_module_api(int api,

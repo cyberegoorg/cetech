@@ -34,12 +34,12 @@ static struct G {
     void *module_handler[MAX_PLUGINS];
     char used[MAX_PLUGINS];
     char path[MAX_PLUGINS][MAX_PATH_LEN];
-    struct api_v0 *api_v0;
 } PluginSystemGlobals = {0};
 
 IMPORT_API(memory_api_v0);
 IMPORT_API(path_v0);
 IMPORT_API(log_api_v0);
+IMPORT_API(api_v0);
 
 //==============================================================================
 // Private
@@ -60,7 +60,7 @@ void _callm_init(get_api_fce_t fce) {
 
     if (api) {
         CETECH_ASSERT("module", api->init != NULL);
-        api->init(_G.api_v0);
+        api->init(&api_v0);
     }
 }
 
@@ -130,7 +130,7 @@ void module_reload(const char *path) {
         void *data = NULL;
         struct module_api_v0 *api = _G.module_api[i];
         if (api != NULL && api->reload_begin) {
-            data = api->reload_begin(_G.api_v0);
+            data = api->reload_begin(&api_v0);
         }
 
         unload_object(_G.module_handler[i]);
@@ -147,7 +147,7 @@ void module_reload(const char *path) {
 
         _G.module_api[i] = api = ((get_api_fce_t) fce)(PLUGIN_EXPORT_API_ID);
         if (api != NULL && api->reload_end) {
-            api->reload_end(_G.api_v0, data);
+            api->reload_end(&api_v0, data);
         }
     }
 }
@@ -161,7 +161,7 @@ void module_reload_all() {
         void *data = NULL;
         struct module_api_v0 *api = _G.module_api[i];
         if (api != NULL && api->reload_begin) {
-            data = api->reload_begin(_G.api_v0);
+            data = api->reload_begin(&api_v0);
         }
 
         unload_object(_G.module_handler[i]);
@@ -178,7 +178,7 @@ void module_reload_all() {
 
         _G.module_api[i] = api = ((get_api_fce_t) fce)(PLUGIN_EXPORT_API_ID);
         if (api != NULL && api->reload_end) {
-            api->reload_end(_G.api_v0, data);
+            api->reload_end(&api_v0, data);
         }
     }
 }
@@ -222,13 +222,13 @@ void module_call_init() {
             continue;
         }
 
-        _G.module_api[i]->init(_G.api_v0);
+        _G.module_api[i]->init(&api_v0);
     }
 }
 
 void module_call_init_cvar() {
-    struct config_api_v0 ConfigApiV0 = *(struct config_api_v0 *) _G.api_v0->first(
-            "config_api_v0");
+    struct config_api_v0 ConfigApiV0 = *(struct config_api_v0 *) api_v0.first(
+            "config_api_v0").api;
 
     for (size_t i = 0; i < MAX_PLUGINS; ++i) {
         if (!_G.used[i] || !_G.module_api[i]->init_cvar) {
@@ -265,7 +265,7 @@ void module_call_init_api() {
             continue;
         }
 
-        _G.module_api[i]->init_api(_G.api_v0);
+        _G.module_api[i]->init_api(&api_v0);
     }
 }
 
@@ -287,7 +287,7 @@ void module_init(struct allocator *allocator,
     GET_API(api, path_v0);
     GET_API(api, log_api_v0);
 
-    _G.api_v0 = api;
+    api_v0 = *api;
 }
 
 void module_shutdown() {

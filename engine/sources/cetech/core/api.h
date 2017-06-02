@@ -11,19 +11,26 @@ extern "C" {
 // Defines
 //==============================================================================
 
-#define IMPORT_API(name) static struct name name;
-#define GET_API(api, name) name = *(struct name*) (api)->first(#name)
+#define IMPORT_API(name) static struct name name = {0};
+#define GET_API(_api, name) name = *(struct name*) (_api)->first(#name).api
 
 //==============================================================================
 // Api
 //==============================================================================
+
+
+struct api_entry {
+    void* entry;
+    void* api;
+};
 
 //! Plugin expot api struct V0
 struct api_v0 {
     void (*register_api)(const char *name,
                          void *api);
 
-    void *(*first)(const char *name);
+    struct api_entry (*first)(const char *name);
+    struct api_entry (*next)(struct api_entry* entry);
 };
 
 #ifdef __cplusplus

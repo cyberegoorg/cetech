@@ -7,6 +7,7 @@
 
 #include "include/SDL2/SDL.h"
 
+#include <cetech/core/container/array2.inl>
 #include <cetech/core/os/path.h>
 #include <cetech/core/hash.h>
 #include <cetech/core/task/task.h>
@@ -18,6 +19,8 @@
 #include <cetech/core/api.h>
 #include <cetech/core/os/vio.h>
 
+
+using namespace cetech;
 
 //==============================================================================
 // Defines
@@ -79,8 +82,8 @@ void _add_dependency(const char *who_filename,
 
     char path[1024] = {0};
     path_v0.join(path, CETECH_ARRAY_LEN(path),
-                      resource_api_v0.compiler_get_source_dir(),
-                      depend_on_filename);
+                 resource_api_v0.compiler_get_source_dir(),
+                 depend_on_filename);
 
     builddb_set_file(depend_on_filename, path_v0.file_mtime(path));
 }
@@ -91,11 +94,11 @@ static struct compilator_api _compilator_api = {
 
 
 static void _compile_task(void *data) {
-    struct compile_task_data *tdata = data;
+    struct compile_task_data *tdata = (compile_task_data *) data;
 
     log_api_v0.info("resource_compiler.task",
-                        "Compile resource \"%s\" to \"" "%" SDL_PRIX64 "%" SDL_PRIX64 "\"",
-                        tdata->source_filename, tdata->type, tdata->name);
+                    "Compile resource \"%s\" to \"" "%" SDL_PRIX64 "%" SDL_PRIX64 "\"",
+                    tdata->source_filename, tdata->type, tdata->name);
 
 
     if (tdata->compilator(tdata->source_filename, tdata->source, tdata->build,
@@ -104,11 +107,11 @@ static void _compile_task(void *data) {
         builddb_set_file_depend(tdata->source_filename, tdata->source_filename);
 
         log_api_v0.info("resource_compiler.task",
-                            "Resource \"%s\" compiled", tdata->source_filename);
+                        "Resource \"%s\" compiled", tdata->source_filename);
     } else {
         log_api_v0.error("resource_compiler.task",
-                             "Resource \"%s\" compilation fail",
-                             tdata->source_filename);
+                         "Resource \"%s\" compilation fail",
+                         tdata->source_filename);
     }
 
     CETECH_DEALLOCATE(memory_api_v0.main_scratch_allocator(),
@@ -131,13 +134,13 @@ resource_compilator_t _find_compilator(uint64_t type) {
     return NULL;
 }
 
-void _compile_dir(ARRAY_T(task_item) *tasks,
+void _compile_dir(Array<task_item> &tasks,
                   struct array_pchar *files,
                   const char *source_dir,
                   const char *build_dir_full) {
 
     path_v0.list(source_dir, 1, files,
-                     memory_api_v0.main_scratch_allocator());
+                 memory_api_v0.main_scratch_allocator());
 
     for (int i = 0; i < ARRAY_SIZE(files); ++i) {
         const char *source_filename_full = ARRAY_AT(files, i);
@@ -181,8 +184,8 @@ void _compile_dir(ARRAY_T(task_item) *tasks,
 
         char build_path[4096] = {0};
         path_v0.join(build_path, CETECH_ARRAY_LEN(build_path),
-                          build_dir_full,
-                          build_name);
+                     build_dir_full,
+                     build_name);
 
         struct vio *build_vio = vio_api_v0.from_file(build_path, VIO_OPEN_WRITE,
                                                      memory_api_v0.main_scratch_allocator());
@@ -192,8 +195,9 @@ void _compile_dir(ARRAY_T(task_item) *tasks,
         }
 
         struct compile_task_data *data =
-        CETECH_ALLOCATE(
-                memory_api_v0.main_allocator(), struct compile_task_data, 1);
+                CETECH_ALLOCATE(
+                        memory_api_v0.main_allocator(),
+                        struct compile_task_data, 1);
 
         *data = (struct compile_task_data) {
                 .name = name_id,
@@ -214,7 +218,7 @@ void _compile_dir(ARRAY_T(task_item) *tasks,
                 .affinity = TASK_AFFINITY_NONE
         };
 
-        ARRAY_PUSH_BACK(task_item, tasks, item);
+        array::push_back(tasks, item);
     }
     path_v0.list_free(files, memory_api_v0.main_scratch_allocator());
 }
@@ -254,29 +258,13 @@ static void _init(struct api_v0 *api) {
 
     char tmp_dir_full[1024] = {0};
     path_v0.join(tmp_dir_full, CETECH_ARRAY_LEN(tmp_dir_full),
-                      build_dir_full,
-                      "tmp");
+                 build_dir_full,
+                 "tmp");
     path_v0.make_path(tmp_dir_full);
 }
 
 static void _shutdown() {
     _G = (struct G) {0};
-}
-
-void *resourcecompiler_get_module_api(int api) {
-
-    if (api == PLUGIN_EXPORT_API_ID) {
-        static struct module_api_v0 module = {0};
-
-        module.init = _init;
-        module.init_cvar = _init_cvar;
-        module.shutdown = _shutdown;
-
-        return &module;
-
-    }
-
-    return 0;
 }
 
 
@@ -317,27 +305,24 @@ void resource_compiler_compile_all() {
     struct array_pchar files;
     array_init_pchar(&files, memory_api_v0.main_scratch_allocator());
 
-    ARRAY_T(task_item) tasks;
-    ARRAY_INIT(task_item, &tasks, memory_api_v0.main_allocator());
+    Array<task_item> tasks(memory_api_v0.main_allocator());
 
     const char *dirs[] = {source_dir, core_dir};
     for (int i = 0; i < CETECH_ARRAY_LEN(dirs); ++i) {
         array_resize_pchar(&files, 0);
-        _compile_dir(&tasks, &files, dirs[i], build_dir_full);
+        _compile_dir(tasks, &files, dirs[i], build_dir_full);
     }
 
     array_destroy_pchar(&files);
 
-    task_api_v0.add(tasks.data, tasks.size);
+    task_api_v0.add(tasks._data, tasks._size);
 
-    for (int i = 0; i < ARRAY_SIZE(&tasks); ++i) {
-        struct compile_task_data *data = ARRAY_AT(&tasks, i).data;
+    for (int i = 0; i < array::size(tasks); ++i) {
+        compile_task_data *data = (compile_task_data *) tasks[i].data;
 
         task_api_v0.wait_atomic(&data->completed, 0);
         CETECH_DEALLOCATE(memory_api_v0.main_allocator(), data);
     }
-
-    ARRAY_DESTROY(task_item, &tasks);
 }
 
 int resource_compiler_get_filename(char *filename,
@@ -377,12 +362,30 @@ int resource_compiler_external_join(char *output,
 
     const char *external_dir_str = config_api_v0.get_string(_G.cv_external_dir);
     path_v0.join(tmp_dir, CETECH_ARRAY_LEN(tmp_dir), external_dir_str,
-                      app_api_v0.native_platform());
+                 app_api_v0.native_platform());
     strncat(tmp_dir, "64", CETECH_ARRAY_LEN(tmp_dir));
     path_v0.join(tmp_dir2, CETECH_ARRAY_LEN(tmp_dir2), tmp_dir,
-                      "release/bin");
+                 "release/bin");
 
     return path_v0.join(output, max_len, tmp_dir2, name);
+}
+
+extern "C" {
+void *resourcecompiler_get_module_api(int api) {
+
+    if (api == PLUGIN_EXPORT_API_ID) {
+        static struct module_api_v0 module = {0};
+
+        module.init = _init;
+        module.init_cvar = _init_cvar;
+        module.shutdown = _shutdown;
+
+        return &module;
+
+    }
+
+    return 0;
+}
 }
 
 #endif
