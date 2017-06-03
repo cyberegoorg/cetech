@@ -22,7 +22,7 @@ void unload_object(void *so) {
 
 void *load_function(void *so,
                     const char *name) {
-    void *fce = SDL_LoadFunction(so, "get_plugin_api");
+    void *fce = SDL_LoadFunction(so, "get_module_api");
     CETECH_ASSERT("cebase", fce != NULL);
 
     if (fce == NULL) {

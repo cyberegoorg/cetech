@@ -243,6 +243,6 @@ target_include_directories(cetech_develop PUBLIC externals/build/${PLATFORM_ID}/
 
 #set_target_properties(plugin_example PROPERTIES PREFIX "")
 
-add_library(plugin_example SHARED engine/sources/plugin_example/plugin_example.c)
-set_target_properties(plugin_example PROPERTIES PREFIX "")
+add_library(module_example SHARED engine/sources/plugin_example/plugin_example.c)
+set_target_properties(module_example PROPERTIES PREFIX "")
 

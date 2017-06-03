@@ -262,9 +262,12 @@ int application_init(int argc,
 
     _init_core_modules();
     _init_static_modules();
+
     module_call_init_api();
     _init_api(api);
+
     module_load_dirs("./bin");
+
     module_call_init_cvar();
 
     if (!_init_config(api)) {

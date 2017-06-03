@@ -193,8 +193,7 @@ namespace mouse_module {
 
                     _G.last_pos.x = move_event->pos.x;
                     _G.last_pos.y = move_event->pos.y;
-                    log_api_v0.debug(LOG_WHERE, "mouse: %f %f",
-                                     _G.last_delta_pos.x, _G.last_delta_pos.y);
+
                     break;
 
                 default:

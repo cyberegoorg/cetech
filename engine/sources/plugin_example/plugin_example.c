@@ -1,7 +1,6 @@
 #include <stdio.h>
 #include <cetech/core/api.h>
 
-#include "cetech/core/application.h"
 #include "cetech/core/config.h"
 #include "cetech/core/module.h"
 #include "cetech/modules/input/input.h"
@@ -28,7 +27,7 @@ IMPORT_API(keyboard_api_v0)
 //}
 //
 
-static void _init_api(struct api_v0* api) {
+void _init_api(struct api_v0 *api) {
     GET_API(api, keyboard_api_v0);
 
 //    log = get_engine_api(LOG_API_ID, 0);
@@ -36,7 +35,7 @@ static void _init_api(struct api_v0* api) {
 //    lua = get_engine_api(LUA_API_ID, 0);
 }
 
-static void _init( struct api_v0* api) {
+void init(struct api_v0 *api) {
     _init_api(api);
 
     printf("FOOOOO: %d", 11561651);
@@ -49,35 +48,34 @@ static void _init( struct api_v0* api) {
 //    lua->execute_string("engine.example.foo()");
 }
 
-static void _shutdown() {
+void _shutdown() {
     //mem->destroy_module_allocator(alloc);
 }
 
-static void *_reload_begin( struct api_v0* api_v0) {
+void *_reload_begin(struct api_v0 *api_v0) {
     //log->info("module_example", "Reload begin");
 
     return NULL;
 }
 
-static void _update() {
+void _update() {
     if (keyboard_api_v0.button_state(0, keyboard_api_v0.button_index("v"))) {
-        printf("dddddddddddddddddddddddddddddddddds 5  5 5 \n");
+        printf("dddddddddddddddddddddddddddddddddds\n");
     }
 }
 
-static void _reload_end( struct api_v0* api,
-                        void *data) {
+void _reload_end(struct api_v0 *api,
+                 void *data) {
     _init_api(api);
-    _init(api);
+    init(api);
 }
 
-void *get_module_api(int api,
-                     int version) {
+void *get_module_api(int api) {
 
-    if (api == PLUGIN_EXPORT_API_ID && version == 0) {
+    if (api == PLUGIN_EXPORT_API_ID) {
         static struct module_api_v0 module = {0};
 
-        module.init = _init;
+        module.init = init;
         module.shutdown = _shutdown;
         module.reload_begin = _reload_begin;
         module.reload_end = _reload_end;

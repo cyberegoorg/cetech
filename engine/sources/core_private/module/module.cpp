@@ -28,13 +28,13 @@
 
 #define _G PluginSystemGlobals
 
-static struct G {
+static struct PluginSystemGlobals {
     get_api_fce_t get_module_api[MAX_PLUGINS];
     struct module_api_v0 *module_api[MAX_PLUGINS];
     void *module_handler[MAX_PLUGINS];
     char used[MAX_PLUGINS];
     char path[MAX_PLUGINS][MAX_PATH_LEN];
-} PluginSystemGlobals = {0};
+} _G = {0};
 
 IMPORT_API(memory_api_v0);
 IMPORT_API(path_v0);
@@ -84,7 +84,9 @@ void _add(const char *path,
 
         memcpy(_G.path[i], path, strlen(path));
 
-        _G.module_api[i] = (module_api_v0 *) fce(PLUGIN_EXPORT_API_ID);
+        module_api_v0 *api = (module_api_v0 *) fce(PLUGIN_EXPORT_API_ID);
+
+        _G.module_api[i] = api;
         _G.get_module_api[i] = fce;
         _G.module_handler[i] = handler;
         _G.used[i] = 1;
@@ -145,7 +147,8 @@ void module_reload(const char *path) {
             return;
         }
 
-        _G.module_api[i] = api = (module_api_v0 *) ((get_api_fce_t) fce)(PLUGIN_EXPORT_API_ID);
+        _G.module_api[i] = api = (module_api_v0 *) ((get_api_fce_t) fce)(
+                PLUGIN_EXPORT_API_ID);
         if (api != NULL && api->reload_end) {
             api->reload_end(&api_v0, data);
         }
@@ -176,7 +179,8 @@ void module_reload_all() {
             return;
         }
 
-        _G.module_api[i] = api = (module_api_v0 *) ((get_api_fce_t) fce)(PLUGIN_EXPORT_API_ID);
+        _G.module_api[i] = api = (module_api_v0 *) ((get_api_fce_t) fce)(
+                PLUGIN_EXPORT_API_ID);
         if (api != NULL && api->reload_end) {
             api->reload_end(&api_v0, data);
         }
@@ -231,10 +235,13 @@ void module_call_init_cvar() {
             "config_api_v0").api;
 
     for (size_t i = 0; i < MAX_PLUGINS; ++i) {
-        if (!_G.used[i] || !_G.module_api[i]->init_cvar) {
+        if (!_G.used[i]){
             continue;
         }
 
+        if(!_G.module_api[i]->init_cvar) {
+            continue;
+        }
         _G.module_api[i]->init_cvar(ConfigApiV0);
     }
 }
@@ -281,15 +288,15 @@ void module_call_after_update(float dt) {
 
 void module_init(struct allocator *allocator,
                  struct api_v0 *api) {
-    _G = (struct G) {0};
-
     GET_API(api, memory_api_v0);
     GET_API(api, path_v0);
     GET_API(api, log_api_v0);
-
     api_v0 = *api;
+
+    _G = {0};
+
 }
 
 void module_shutdown() {
-    _G = (struct G) {0};
+    _G = {0};
 }
