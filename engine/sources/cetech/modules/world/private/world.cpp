@@ -2,11 +2,11 @@
 // Includes
 //==============================================================================
 
-#include <cetech/core/container/array2.inl>
-#include <cetech/core/handler.inl>
-#include <cetech/core/memory/memory.h>
+#include <cetech/celib/array2.inl>
+#include <cetech/celib/handler.inl>
+#include <cetech/core/memory.h>
 #include <cetech/core/config.h>
-#include <cetech/core/resource/resource.h>
+#include <cetech/modules/resource/resource.h>
 #include <cetech/core/module.h>
 #include <cetech/core/api.h>
 

@@ -2,12 +2,12 @@
 // Includes
 //==============================================================================
 
-#include <cetech/core/container/map.inl>
-#include <cetech/core/container/map2.inl>
+#include <cetech/celib/map.inl>
+#include <cetech/celib/map2.inl>
 
-#include <cetech/core/memory/memory.h>
+#include <cetech/core/memory.h>
 #include <cetech/core/config.h>
-#include <cetech/core/resource/resource.h>
+#include <cetech/modules/resource/resource.h>
 
 #include <cetech/core/module.h>
 

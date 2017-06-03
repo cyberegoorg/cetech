@@ -15,7 +15,7 @@ extern "C" {
 #include <stddef.h>
 #include <stdint.h>
 
-#include <cetech/core/math/math_types.h>
+#include <cetech/celib/math_types.h>
 
 typedef struct lua_State lua_State;
 

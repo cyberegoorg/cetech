@@ -11,7 +11,7 @@
 #include "include/luajit/lauxlib.h"
 #include "include/luajit/lualib.h"
 
-#include <cetech/core/math/math_types.h>
+#include <cetech/celib/math_types.h>
 #include <cetech/core/hash.h>
 
 #include <stdint.h>

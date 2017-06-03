@@ -69,21 +69,21 @@ set(SOURCE_FILES
         ########################################################################
         # CETECH
         ########################################################################
-        engine/sources/cetech/core/private/log/log_system.c
+        engine/sources/core_private/log/log_system.c
 
 
-        engine/sources/cetech/core/os/private/stacktrace.c
-        engine/sources/cetech/core/private/api.cpp
-        engine/sources/cetech/core/private/log/log_system.c
-        engine/sources/cetech/core/private/yaml.cc
+        engine/sources/core_private/os/stacktrace.c
+        engine/sources/core_private/api/api.cpp
+        engine/sources/core_private/log/log_system.c
+        engine/sources/core_private/yaml/yaml.cc
 
 
         ########################################################################
         # CETECH
         ########################################################################
-        engine/sources/cetech/core/private/module.c
-        engine/sources/cetech/core/private/config.c
-        engine/sources/cetech/core/memory/private/memory.c
+        engine/sources/core_private/module/module.c
+        engine/sources/core_private/config/config.c
+        engine/sources/core_private/memory/memory.c
 
         engine/sources/cetech/modules/luasys/private/luasys.c
         engine/sources/cetech/modules/luasys/private/api/api_plugin.c
@@ -109,51 +109,50 @@ set(SOURCE_FILES
         engine/sources/cetech/modules/luasys/private/api/api_level.c
         engine/sources/cetech/modules/luasys/private/api/api_scenegraph.c
 
-        engine/sources/cetech/core/develop_system/private/console_server.cpp
-        engine/sources/cetech/core/develop_system/private/develop_system.cpp
+        engine/sources/cetech/modules/develop_system/private/console_server.cpp
+        engine/sources/cetech/modules/develop_system/private/develop_system.cpp
 
-        engine/sources/cetech/core/private/app/_app.c
-        engine/sources/cetech/core/task/private/task.c
+        engine/sources/cetech/modules/task/private/task.c
 
-        engine/sources/cetech/core/resource/private/resource.cpp
-        engine/sources/cetech/core/resource/private/resource_package.cpp
-        engine/sources/cetech/core/resource/private/resource_compiler.cpp
-        engine/sources/cetech/core/filesystem/private/filesystem.cpp
+        engine/sources/cetech/modules/resource/private/resource.cpp
+        engine/sources/cetech/modules/resource/private/resource_package.cpp
+        engine/sources/cetech/modules/resource/private/resource_compiler.cpp
+        engine/sources/cetech/modules/filesystem/private/filesystem.cpp
         engine/sources/cetech/modules/component/private/component.cpp
         engine/sources/cetech/modules/entity/private/entity.cpp
         engine/sources/cetech/modules/world/private/world.cpp
         engine/sources/cetech/modules/level/private/level.c
 
-        engine/sources/cetech/core/private/machine.c
-        engine/sources/cetech/core/private/machine_sdl2/sdl_mouse.c
-        engine/sources/cetech/core/private/machine_sdl2/sdl_keyboard.c
-        engine/sources/cetech/core/private/machine_sdl2/sdl_gamepad.c
-        engine/sources/cetech/core/private/machine_sdl2/sdl_machine.c
+        engine/sources/core_private/machine/machine.c
+        engine/sources/core_private/machine_sdl2/sdl_mouse.c
+        engine/sources/core_private/machine_sdl2/sdl_keyboard.c
+        engine/sources/core_private/machine_sdl2/sdl_gamepad.c
+        engine/sources/core_private/machine_sdl2/sdl_machine.c
 
         engine/sources/cetech/modules/input/private/keyboard.cpp
         engine/sources/cetech/modules/input/private/mouse.cpp
         engine/sources/cetech/modules/input/private/gamepad.cpp
 
 
-        engine/sources/cetech/modules/renderer/private/renderer.cpp
-        engine/sources/cetech/modules/renderer/private/texture/texture.cpp
-        engine/sources/cetech/modules/renderer/private/shader/shader.cpp
-        engine/sources/cetech/modules/renderer/private/material/material.cpp
-        engine/sources/cetech/modules/renderer/private/scene/scene.cpp
-        engine/sources/cetech/modules/renderer/private/mesh/mesh_renderer.cpp
+        engine/sources/cetech/modules/renderer_bgfx/private/renderer.cpp
+        engine/sources/cetech/modules/renderer_bgfx/private/texture.cpp
+        engine/sources/cetech/modules/renderer_bgfx/private/shader.cpp
+        engine/sources/cetech/modules/renderer_bgfx/private/material.cpp
+        engine/sources/cetech/modules/renderer_bgfx/private/scene.cpp
+        engine/sources/cetech/modules/renderer_bgfx/private/mesh_renderer.cpp
 
         engine/sources/cetech/modules/transform/private/transform.cpp
         engine/sources/cetech/modules/scenegraph/private/scenegraph.cpp
         engine/sources/cetech/modules/camera/private/camera.cpp
 
-        engine/sources/cetech/core/os/private/os.c)
+        engine/sources/core_private/os/os.c)
 
 ################################################################################
 # Main sources
 ################################################################################
 set(MAIN_SOURCE_FILES
         ${SOURCE_FILES}
-        engine/sources/cetech/core/private/main.c)
+        engine/sources/core_private/app/application.c)
 
 ################################################################################
 # Release sources

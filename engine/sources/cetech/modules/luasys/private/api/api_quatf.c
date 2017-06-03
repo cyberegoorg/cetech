@@ -1,5 +1,5 @@
 
-#include <cetech/core/math/quatf.inl>
+#include <cetech/celib/quatf.inl>
 #include <cetech/modules/luasys/luasys.h>
 
 #include <cetech/core/module.h>

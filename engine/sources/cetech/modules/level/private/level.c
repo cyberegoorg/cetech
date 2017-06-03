@@ -2,19 +2,19 @@
 // Includes
 //==============================================================================
 
-#include <cetech/core/memory/allocator.h>
+#include <cetech/celib/allocator.h>
 #include <cetech/modules/world/world.h>
 #include <cetech/core/config.h>
-#include <cetech/core/resource/resource.h>
-#include <cetech/core/os/vio.h>
+#include <cetech/modules/resource/resource.h>
+#include <cetech/core/vio.h>
 #include <cetech/modules/entity/entity.h>
 #include <cetech/modules/transform/transform.h>
-#include <cetech/core/math/quatf.inl>
-#include <cetech/core/memory/memory.h>
+#include <cetech/celib/quatf.inl>
+#include <cetech/core/memory.h>
 #include <cetech/core/module.h>
 
 #include "../level.h"
-#include <cetech/core/container/map.inl>
+#include <cetech/celib/map.inl>
 #include <cetech/core/yaml.h>
 #include "level_blob.h"
 #include <cetech/core/hash.h>

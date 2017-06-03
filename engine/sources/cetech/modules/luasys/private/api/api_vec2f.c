@@ -1,5 +1,5 @@
 
-#include <cetech/core/math/vec2f.inl>
+#include <cetech/celib/vec2f.inl>
 #include <cetech/core/module.h>
 
 #include <cetech/modules/luasys/luasys.h>

@@ -1,13 +1,13 @@
-#include <cetech/core/container/array.inl>
+#include <cetech/celib/array.inl>
 
-#include <cetech/core/container/map2.inl>
+#include <cetech/celib/map2.inl>
 
-#include <cetech/core/math/mat44f.inl>
+#include <cetech/celib/mat44f.inl>
 #include <cetech/core/yaml.h>
 #include <cetech/core/hash.h>
 #include <cetech/core/config.h>
-#include <cetech/core/resource/resource.h>
-#include <cetech/core/memory/memory.h>
+#include <cetech/modules/resource/resource.h>
+#include <cetech/core/memory.h>
 #include <cetech/core/module.h>
 #include <cetech/core/api.h>
 

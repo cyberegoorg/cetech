@@ -5,19 +5,19 @@
 #include <include/luajit/lualib.h>
 #include <include/luajit/lauxlib.h>
 
-#include <cetech/core/memory/allocator.h>
-#include <cetech/core/math/math_types.h>
-#include <cetech/core/math/vec2f.inl>
+#include <cetech/celib/allocator.h>
+#include <cetech/celib/math_types.h>
+#include <cetech/celib/vec2f.inl>
 
 #include <cetech/core/api.h>
-#include <cetech/core/os/vio.h>
+#include <cetech/core/vio.h>
 #include <cetech/core/config.h>
 #include <cetech/core/hash.h>
 #include <cetech/core/module.h>
 #include <cetech/core/application.h>
 
-#include <cetech/core/develop_system/develop.h>
-#include <cetech/core/resource/resource.h>
+#include <cetech/modules/develop_system/develop.h>
+#include <cetech/modules/resource/resource.h>
 #include <cetech/modules/luasys/luasys.h>
 #include <include/mpack/mpack.h>
 

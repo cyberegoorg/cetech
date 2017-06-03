@@ -4,17 +4,17 @@
 
 #include <stdio.h>
 
-#include <cetech/core/container/map.inl>
+#include <cetech/celib/map.inl>
 #include <cetech/core/module.h>
-#include <cetech/core/memory/memory.h>
+#include <cetech/core/memory.h>
 #include <cetech/core/yaml.h>
 #include <cetech/core/hash.h>
-#include <cetech/core/handler.inl>
-#include <cetech/core/os/path.h>
-#include <cetech/core/os/vio.h>
+#include <cetech/celib/handler.inl>
+#include <cetech/core/path.h>
+#include <cetech/core/vio.h>
 
 #include <cetech/core/config.h>
-#include <cetech/core/resource/resource.h>
+#include <cetech/modules/resource/resource.h>
 #include <cetech/modules/world/world.h>
 #include <cetech/modules/entity/entity.h>
 #include <cetech/modules/component/component.h>
@@ -167,9 +167,6 @@ namespace entity_resource_compiler {
             vio_api_v0.close(prefab_vio);
         }
     }
-
-
-
 
     struct foreach_children_data {
         int parent_ent;

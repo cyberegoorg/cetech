@@ -1,14 +1,14 @@
 #include <cetech/core/yaml.h>
-#include <cetech/core/math/quatf.inl>
-#include <cetech/core/math/mat44f.inl>
+#include <cetech/celib/quatf.inl>
+#include <cetech/celib/mat44f.inl>
 #include <cetech/core/config.h>
-#include <cetech/core/resource/resource.h>
-#include <cetech/core/memory/memory.h>
+#include <cetech/modules/resource/resource.h>
+#include <cetech/core/memory.h>
 #include <cetech/core/module.h>
 #include <cetech/core/api.h>
-#include <cetech/core/container/array.inl>
-#include <cetech/core/container/array2.inl>
-#include <cetech/core/container/map2.inl>
+#include <cetech/celib/array.inl>
+#include <cetech/celib/array2.inl>
+#include <cetech/celib/map2.inl>
 
 #include <cetech/modules/world/world.h>
 #include <cetech/modules/entity/entity.h>

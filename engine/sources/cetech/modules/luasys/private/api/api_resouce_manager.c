@@ -3,7 +3,8 @@
 #include <cetech/core/module.h>
 #include <cetech/modules/luasys/luasys.h>
 
-#include <cetech/core/resource/resource.h>
+#include <cetech/modules/resource/resource.h>
+
 #include <cetech/core/api.h>
 
 #define API_NAME "ResourceManager"

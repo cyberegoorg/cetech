@@ -12,7 +12,7 @@ extern "C" {
 // Includes
 //==============================================================================
 
-#include <cetech/core/container/array.inl>
+#include <cetech/celib/array.inl>
 
 typedef struct yaml_node_s yaml_node_t;
 typedef struct world_s world_t;
