@@ -110,7 +110,7 @@ set(SOURCE_FILES
         engine/sources/cetech/modules/luasys/private/api/api_level.c
         engine/sources/cetech/modules/luasys/private/api/api_scenegraph.c
 
-        engine/sources/cetech/core/develop_system/private/console_server.c
+        engine/sources/cetech/core/develop_system/private/console_server.cpp
         engine/sources/cetech/core/develop_system/private/develop_system.cpp
 
         engine/sources/cetech/core/private/app/_app.c
@@ -119,7 +119,7 @@ set(SOURCE_FILES
         engine/sources/cetech/core/resource/private/resource.cpp
         engine/sources/cetech/core/resource/private/resource_package.cpp
         engine/sources/cetech/core/resource/private/resource_compiler.cpp
-        engine/sources/cetech/core/filesystem/private/filesystem.c
+        engine/sources/cetech/core/filesystem/private/filesystem.cpp
         engine/sources/cetech/modules/component/private/component.cpp
         engine/sources/cetech/modules/entity/private/entity.c
         engine/sources/cetech/modules/world/private/world.c
@@ -131,9 +131,9 @@ set(SOURCE_FILES
         engine/sources/cetech/core/private/machine_sdl2/sdl_gamepad.c
         engine/sources/cetech/core/private/machine_sdl2/sdl_machine.c
 
-        engine/sources/cetech/modules/input/private/keyboard.c
-        engine/sources/cetech/modules/input/private/mouse.c
-        engine/sources/cetech/modules/input/private/input.c
+        engine/sources/cetech/modules/input/private/keyboard.cpp
+        engine/sources/cetech/modules/input/private/mouse.cpp
+        engine/sources/cetech/modules/input/private/gamepad.cpp
 
 
         engine/sources/cetech/modules/renderer/private/renderer.c

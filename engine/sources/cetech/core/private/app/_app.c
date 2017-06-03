@@ -4,29 +4,27 @@
 
 #include <unistd.h>
 
-#include <cetech/core/memory/allocator.h>
-
-#include <cetech/core/os/window.h>
+#include <cetech/core/api.h>
 #include <cetech/core/hash.h>
-#include <cetech/core/container/eventstream.inl>
-
-#include "_app.h"
 #include <cetech/core/config.h>
 #include <cetech/core/application.h>
+#include <cetech/core/memory/allocator.h>
+#include <cetech/core/task/task.h>
+#include <cetech/core/os/window.h>
+#include <cetech/core/os/path.h>
+#include <cetech/core/os/time.h>
+#include <cetech/core/container/eventstream.inl>
 #include <cetech/core/resource/resource.h>
 #include <cetech/core/develop_system/develop.h>
-#include <cetech/core/task/task.h>
-
-#include "cetech/core/private/static_systems.h"
 
 #include <cetech/modules/luasys/luasys.h>
 #include <cetech/modules/renderer/renderer.h>
-#include <cetech/core/os/path.h>
-#include <cetech/core/api.h>
-#include <cetech/core/os/time.h>
 
-#define LOG_WHERE "application"
+#include "cetech/core/private/static_systems.h"
 
+#include "_app.h"
+
+#include <include/mpack/mpack.h>
 
 IMPORT_API(cnsole_srv_api_v0);
 IMPORT_API(develop_api_v0);
@@ -46,8 +44,7 @@ IMPORT_API(hash_api_v0);
 // Definess
 //==============================================================================
 
-#define _G ApplicationGlobals
-
+#define LOG_WHERE "application"
 
 //==============================================================================
 // Globals
@@ -72,7 +69,7 @@ struct GConfig {
     cvar_t wid;
 };
 
-struct G {
+static struct ApplicationGlobals {
     struct GConfig config;
 
     const struct game_callbacks *game;
@@ -222,7 +219,7 @@ extern void error_init(struct api_v0 *api);
 
 int application_init(int argc,
                      const char **argv) {
-    _G = (struct G) {0};
+    _G = (struct ApplicationGlobals){0};
     _G.args = (struct args) {.argc = argc, .argv = argv};
 
     log_init();
@@ -241,7 +238,6 @@ int application_init(int argc,
 
     logdb_init_db(".", api_get_v0());
 
-    ADD_STATIC_PLUGIN(memsys);
     ADD_STATIC_PLUGIN(config);
     ADD_STATIC_PLUGIN(handler);
     ADD_STATIC_PLUGIN(application);
@@ -265,16 +261,11 @@ int application_init(int argc,
     module_load_dirs("./bin");
     module_call_init_cvar();
 
-    //module_call_init();
-//
-//    module_call_init_cvar();
-
     if (!_init_config(api_get_v0())) {
         return 0;
     };
 
     module_call_init();
-
 
     log_api_v0.set_wid_clb(task_api_v0.worker_id);
 

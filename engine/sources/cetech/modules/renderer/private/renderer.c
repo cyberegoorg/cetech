@@ -14,6 +14,7 @@
 #include <cetech/modules/world/world.h>
 #include <cetech/core/os/window.h>
 #include <cetech/core/api.h>
+#include <include/mpack/mpack.h>
 
 #include "bgfx/c99/platform.h"
 #include "texture/texture.h"

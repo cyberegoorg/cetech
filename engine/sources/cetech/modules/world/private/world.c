@@ -76,9 +76,6 @@ static void _init_api(struct api_v0 *api) {
     _api.create = world_create;
     _api.destroy = world_destroy;
     _api.update = world_update;
-//                    api.load_level = world_load_level;
-//                    api.entity_by_id = level_entity_by_id;
-//                    api.entity = level_entity ;
 
     api->register_api("world_api_v0", &_api);
 }

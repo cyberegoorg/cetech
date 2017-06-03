@@ -14,7 +14,10 @@ extern "C" {
 
 #include <stdint.h>
 
-enum vio_open_mode;
+enum fs_open_mode {
+    FS_OPEN_READ,
+    FS_OPEN_WRITE,
+};
 
 //==============================================================================
 // Api
@@ -34,7 +37,7 @@ struct filesystem_api_v0 {
     //! \return File or NULL
     struct vio *(*open)(uint64_t root,
                         const char *path,
-                        enum vio_open_mode mode);
+                        enum fs_open_mode mode);
 
     //! Map path for root
     //! \param root Root

@@ -12,11 +12,11 @@ extern "C" {
 // Includes
 //==============================================================================
 
-#include "include/mpack/mpack.h"
-
 #include <cetech/core/types.h>
 #include <cetech/core/container/eventstream.inl>
 
+typedef struct mpack_node_t mpack_node_t;
+typedef struct mpack_writer_t mpack_writer_t;
 
 //==============================================================================
 // Typedefs

@@ -400,7 +400,7 @@ void resource_load(void **loaded_data,
 
         struct vio *resource_file = filesystem_api_v0.open(root_name,
                                                            build_name,
-                                                           VIO_OPEN_READ);
+                                                           FS_OPEN_READ);
 
         if (resource_file != NULL) {
             loaded_data[i] = type_clb.loader(resource_file,
