@@ -19,7 +19,7 @@ int64_t vio_sdl_seek(struct vio *file,
                      enum vio_seek whence) {
     CETECH_ASSERT(LOG_WHERE, file != NULL);
 
-    static enum vio_seek _whence[3] = {
+    static int _whence[3] = {
             [VIO_SEEK_SET] = RW_SEEK_SET,
             [VIO_SEEK_CUR] = RW_SEEK_CUR,
             [VIO_SEEK_END] = RW_SEEK_END

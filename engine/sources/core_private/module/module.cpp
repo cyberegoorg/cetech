@@ -51,12 +51,12 @@ void *load_object(const char *path);
 void unload_object(void *so);
 
 void *load_function(void *so,
-                    void *name);
+                    const char *name);
 
 void *module_get_engine_api(int api);
 
 void _callm_init(get_api_fce_t fce) {
-    struct module_api_v0 *api = fce(PLUGIN_EXPORT_API_ID);
+    struct module_api_v0 *api = (module_api_v0 *) fce(PLUGIN_EXPORT_API_ID);
 
     if (api) {
         CETECH_ASSERT("module", api->init != NULL);
@@ -65,7 +65,7 @@ void _callm_init(get_api_fce_t fce) {
 }
 
 void _callm_shutdown(get_api_fce_t fce) {
-    struct module_api_v0 *api = fce(PLUGIN_EXPORT_API_ID);
+    struct module_api_v0 *api = (module_api_v0 *) fce(PLUGIN_EXPORT_API_ID);
 
     if (api) {
         CETECH_ASSERT("module", api->shutdown != NULL);
@@ -84,7 +84,7 @@ void _add(const char *path,
 
         memcpy(_G.path[i], path, strlen(path));
 
-        _G.module_api[i] = fce(PLUGIN_EXPORT_API_ID);
+        _G.module_api[i] = (module_api_v0 *) fce(PLUGIN_EXPORT_API_ID);
         _G.get_module_api[i] = fce;
         _G.module_handler[i] = handler;
         _G.used[i] = 1;
@@ -116,7 +116,7 @@ void module_load(const char *path) {
         return;
     }
 
-    _add(path, fce, obj);
+    _add(path, (get_api_fce_t) fce, obj);
 //    _callm_init(fce);
 }
 
@@ -145,7 +145,7 @@ void module_reload(const char *path) {
             return;
         }
 
-        _G.module_api[i] = api = ((get_api_fce_t) fce)(PLUGIN_EXPORT_API_ID);
+        _G.module_api[i] = api = (module_api_v0 *) ((get_api_fce_t) fce)(PLUGIN_EXPORT_API_ID);
         if (api != NULL && api->reload_end) {
             api->reload_end(&api_v0, data);
         }
@@ -176,7 +176,7 @@ void module_reload_all() {
             return;
         }
 
-        _G.module_api[i] = api = ((get_api_fce_t) fce)(PLUGIN_EXPORT_API_ID);
+        _G.module_api[i] = api = (module_api_v0 *) ((get_api_fce_t) fce)(PLUGIN_EXPORT_API_ID);
         if (api != NULL && api->reload_end) {
             api->reload_end(&api_v0, data);
         }

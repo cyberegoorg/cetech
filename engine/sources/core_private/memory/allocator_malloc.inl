@@ -65,7 +65,7 @@ uint32_t malloc_allocator_total_allocated(struct allocator *allocator) {
 }
 
 struct allocator *malloc_allocator_create() {
-    struct allocator_malloc *m = memory_malloc(sizeof(struct allocator_malloc));
+    struct allocator_malloc *m = (allocator_malloc *) memory_malloc(sizeof(struct allocator_malloc));
 
     m->base = (struct allocator) {
             .allocate = malloc_allocator_allocate,

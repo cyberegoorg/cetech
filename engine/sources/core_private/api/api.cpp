@@ -64,16 +64,14 @@ namespace api {
 
         return {.api = next->value, .entry  = (void *) entry};
     }
-}
 
-namespace api_module {
     static struct api_v0 api_v0 = {
             .register_api = api::register_api,
             .first = api::first,
             .next = api::next
     };
 
-    extern "C" void api_init(struct allocator *allocator) {
+    void api_init(struct allocator *allocator) {
         _G = {0};
 
         _G.api_map.init(allocator);
@@ -81,11 +79,11 @@ namespace api_module {
         api::register_api("api_v0", &api_v0);
     }
 
-    extern "C" void api_shutdown() {
+    void api_shutdown() {
         _G = {0};
     }
 
-    extern "C" struct api_v0 *api_get_v0() {
+    struct api_v0 *api_get_v0() {
         return &api_v0;
     }
 }

@@ -124,7 +124,7 @@ void logdb_log(enum log_level level,
 
 int logdb_init_db(const char *log_dir,
                   struct api_v0 *api) {
-    struct path_v0 *path = api->first("path_v0").api;
+    struct path_v0 *path = (path_v0 *) api->first("path_v0").api;
 
     path->join(_logdb_path, CETECH_ARRAY_LEN(_logdb_path), log_dir,
                     "log.db");

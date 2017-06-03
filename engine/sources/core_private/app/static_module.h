@@ -3,7 +3,7 @@
 //==============================================================================
 #include <cetech/core/module.h>
 
-static void _init_static_modules() {
+extern "C" void _init_static_modules() {
     ADD_STATIC_PLUGIN(entity);
     ADD_STATIC_PLUGIN(component);
     ADD_STATIC_PLUGIN(world);

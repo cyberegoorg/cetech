@@ -69,21 +69,21 @@ set(SOURCE_FILES
         ########################################################################
         # CETECH
         ########################################################################
-        engine/sources/core_private/log/log_system.c
+        engine/sources/core_private/log/log_system.cpp
 
 
-        engine/sources/core_private/os/stacktrace.c
+        engine/sources/core_private/os/stacktrace.cpp
         engine/sources/core_private/api/api.cpp
-        engine/sources/core_private/log/log_system.c
-        engine/sources/core_private/yaml/yaml.cc
+        engine/sources/core_private/log/log_system.cpp
+        engine/sources/core_private/yaml/yaml.cpp
 
 
         ########################################################################
         # CETECH
         ########################################################################
-        engine/sources/core_private/module/module.c
-        engine/sources/core_private/config/config.c
-        engine/sources/core_private/memory/memory.c
+        engine/sources/core_private/module/module.cpp
+        engine/sources/core_private/config/config.cpp
+        engine/sources/core_private/memory/memory.cpp
 
         engine/sources/cetech/modules/luasys/private/luasys.c
         engine/sources/cetech/modules/luasys/private/api/api_plugin.c
@@ -112,7 +112,7 @@ set(SOURCE_FILES
         engine/sources/cetech/modules/develop_system/private/console_server.cpp
         engine/sources/cetech/modules/develop_system/private/develop_system.cpp
 
-        engine/sources/cetech/modules/task/private/task.c
+        engine/sources/cetech/modules/task/private/task.cpp
 
         engine/sources/cetech/modules/resource/private/resource.cpp
         engine/sources/cetech/modules/resource/private/resource_package.cpp
@@ -121,13 +121,13 @@ set(SOURCE_FILES
         engine/sources/cetech/modules/component/private/component.cpp
         engine/sources/cetech/modules/entity/private/entity.cpp
         engine/sources/cetech/modules/world/private/world.cpp
-        engine/sources/cetech/modules/level/private/level.c
+        engine/sources/cetech/modules/level/private/level.cpp
 
-        engine/sources/core_private/machine/machine.c
-        engine/sources/core_private/machine_sdl2/sdl_mouse.c
-        engine/sources/core_private/machine_sdl2/sdl_keyboard.c
-        engine/sources/core_private/machine_sdl2/sdl_gamepad.c
-        engine/sources/core_private/machine_sdl2/sdl_machine.c
+        engine/sources/core_private/machine/machine.cpp
+        engine/sources/core_private/machine_sdl2/sdl_mouse.cpp
+        engine/sources/core_private/machine_sdl2/sdl_keyboard.cpp
+        engine/sources/core_private/machine_sdl2/sdl_gamepad.cpp
+        engine/sources/core_private/machine_sdl2/sdl_machine.cpp
 
         engine/sources/cetech/modules/input/private/keyboard.cpp
         engine/sources/cetech/modules/input/private/mouse.cpp
@@ -145,14 +145,14 @@ set(SOURCE_FILES
         engine/sources/cetech/modules/scenegraph/private/scenegraph.cpp
         engine/sources/cetech/modules/camera/private/camera.cpp
 
-        engine/sources/core_private/os/os.c)
+        engine/sources/core_private/os/os.cpp)
 
 ################################################################################
 # Main sources
 ################################################################################
 set(MAIN_SOURCE_FILES
         ${SOURCE_FILES}
-        engine/sources/core_private/app/application.c)
+        engine/sources/core_private/app/application.cpp)
 
 ################################################################################
 # Release sources

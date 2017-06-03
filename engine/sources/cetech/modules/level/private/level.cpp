@@ -40,52 +40,52 @@ MAP_PROTOTYPE(entity_t);
 // Globals
 //==============================================================================
 
+namespace {
+    struct level_instance {
+        entity_t level_entity;
+        MAP_T(entity_t) spawned_entity_map;
+        ARRAY_T(entity_t) *spawned_entity;
+    };
+
+    ARRAY_PROTOTYPE_N(struct level_instance, level_instance);
+    MAP_PROTOTYPE_N(struct level_instance, level_instance);
+
+    static struct LevelGlobals {
+        uint64_t level_type;
+
+        ARRAY_T(level_instance) level_instance;
+    } _G = {0};
+
+    void _init_level_instance(struct level_instance *instance,
+                              entity_t level_entity) {
+        instance->level_entity = level_entity;
+        MAP_INIT(entity_t, &instance->spawned_entity_map,
+                 memory_api_v0.main_allocator());
+    }
+
+    void _destroy_level_instance(struct level_instance *instance) {
+        MAP_DESTROY(entity_t, &instance->spawned_entity_map);
+    }
 
 
-struct level_instance {
-    entity_t level_entity;
-    MAP_T(entity_t) spawned_entity_map;
-    ARRAY_T(entity_t) *spawned_entity;
+    level_t _new_level(entity_t level_entity) {
+        uint32_t idx = ARRAY_SIZE(&_G.level_instance);
+
+        ARRAY_PUSH_BACK(level_instance, &_G.level_instance,
+                        (struct level_instance) {0});
+
+        struct level_instance *instance = &ARRAY_AT(&_G.level_instance, idx);
+
+        _init_level_instance(instance, level_entity);
+
+        return (level_t) {.idx = idx};
+    }
+
+    struct level_instance *_level_instance(level_t level) {
+        return &ARRAY_AT(&_G.level_instance, level.idx);
+    }
+
 };
-
-ARRAY_PROTOTYPE_N(struct level_instance, level_instance);
-MAP_PROTOTYPE_N(struct level_instance, level_instance);
-
-#define _G WorldGlobals
-static struct G {
-    uint64_t level_type;
-
-    ARRAY_T(level_instance) level_instance;
-} _G = {0};
-
-void _init_level_instance(struct level_instance *instance,
-                          entity_t level_entity) {
-    instance->level_entity = level_entity;
-    MAP_INIT(entity_t, &instance->spawned_entity_map,
-             memory_api_v0.main_allocator());
-}
-
-void _destroy_level_instance(struct level_instance *instance) {
-    MAP_DESTROY(entity_t, &instance->spawned_entity_map);
-}
-
-
-level_t _new_level(entity_t level_entity) {
-    uint32_t idx = ARRAY_SIZE(&_G.level_instance);
-
-    ARRAY_PUSH_BACK(level_instance, &_G.level_instance,
-                    (struct level_instance) {0});
-
-    struct level_instance *instance = &ARRAY_AT(&_G.level_instance, idx);
-
-    _init_level_instance(instance, level_entity);
-
-    return (level_t) {.idx = idx};
-}
-
-struct level_instance *_level_instance(level_t level) {
-    return &ARRAY_AT(&_G.level_instance, level.idx);
-}
 
 //==============================================================================
 // Resource
@@ -146,7 +146,7 @@ struct foreach_entities_data {
 void forach_entities_clb(yaml_node_t key,
                          yaml_node_t value,
                          void *_data) {
-    struct foreach_entities_data *data = _data;
+    struct foreach_entities_data *data = (foreach_entities_data *) _data;
 
     char name[128] = {0};
     yaml_as_string(key, name, CETECH_ARRAY_LEN(name));
@@ -196,7 +196,7 @@ int _level_resource_compiler(const char *filename,
     yaml_node_foreach_dict(entities, forach_entities_clb, &entity_data);
 
     struct level_blob res = {
-            .entities_count = ARRAY_SIZE(&id)
+            .entities_count = (uint32_t) ARRAY_SIZE(&id)
     };
 
     entity_api_v0.compiler_write_to_build(output, entity_data.data);
@@ -224,114 +224,123 @@ int _level_resource_compiler(const char *filename,
 // Public interface
 //==============================================================================
 
+namespace level {
 
+    level_t load(world_t world,
+                 uint64_t name) {
+        struct level_blob *res = (level_blob *) resource_api_v0.get(
+                _G.level_type,
+                name);
 
-level_t world_load_level(world_t world,
-                         uint64_t name) {
-    struct level_blob *res = resource_api_v0.get(_G.level_type, name);
+        uint64_t *id = level_blob_names(res);
+        uint32_t *offset = level_blob_offset(res);
+        uint8_t *data = level_blob_data(res);
 
-    uint64_t *id = level_blob_names(res);
-    uint32_t *offset = level_blob_offset(res);
-    uint8_t *data = level_blob_data(res);
+        entity_t level_ent = entity_api_v0.create();
+        transform_t t = transform_api_v0.create(world, level_ent,
+                                                (entity_t) {UINT32_MAX},
+                                                (vec3f_t) {0}, QUATF_IDENTITY,
+                                                (vec3f_t) {{1.0f, 1.0f, 1.0f}});
 
-    entity_t level_ent = entity_api_v0.create();
-    transform_t t = transform_api_v0.create(world, level_ent,
-                                            (entity_t) {UINT32_MAX},
-                                            (vec3f_t) {0}, QUATF_IDENTITY,
-                                            (vec3f_t) {{1.0f, 1.0f, 1.0f}});
+        level_t level = _new_level(level_ent);
+        struct level_instance *instance = _level_instance(level);
 
-    level_t level = _new_level(level_ent);
-    struct level_instance *instance = _level_instance(level);
+        ARRAY_T(entity_t) *spawned = entity_api_v0.spawn_from_resource(world,
+                                                                       data);
+        instance->spawned_entity = spawned;
 
-    ARRAY_T(entity_t) *spawned = entity_api_v0.spawn_from_resource(world, data);
-    instance->spawned_entity = spawned;
+        for (int i = 0; i < res->entities_count; ++i) {
+            entity_t e = ARRAY_AT(spawned, offset[i]);
+            MAP_SET(entity_t, &instance->spawned_entity_map, id[i], e);
 
-    for (int i = 0; i < res->entities_count; ++i) {
-        entity_t e = ARRAY_AT(spawned, offset[i]);
-        MAP_SET(entity_t, &instance->spawned_entity_map, id[i], e);
-
-        if (transform_api_v0.has(world, e)) {
-            transform_api_v0.link(world, level_ent, e);
+            if (transform_api_v0.has(world, e)) {
+                transform_api_v0.link(world, level_ent, e);
+            }
         }
+
+        return level;
     }
 
-    return level;
+    void destroy(world_t world,
+                 level_t level) {
+        struct level_instance *instance = _level_instance(level);
+
+        entity_api_v0.destroy(world, &instance->spawned_entity->data[0], 1);
+        entity_api_v0.destroy(world, &instance->level_entity, 1);
+    }
+
+    entity_t entity_by_id(level_t level,
+                          uint64_t id) {
+        struct level_instance *instance = _level_instance(level);
+        return MAP_GET(entity_t, &instance->spawned_entity_map, id,
+                       (entity_t) {0});
+    }
+
+    entity_t entity(level_t level) {
+        struct level_instance *instance = _level_instance(level);
+        return instance->level_entity;
+    }
 }
 
-void level_destroy(world_t world,
-                   level_t level) {
-    struct level_instance *instance = _level_instance(level);
+namespace level_module {
+    static struct level_api_v0 _api = {
+            .load_level = level::load,
+            .destroy = level::destroy,
+            .entity_by_id = level::entity_by_id,
+            .entity = level::entity
+    };
 
-    entity_api_v0.destroy(world, &instance->spawned_entity->data[0], 1);
-    entity_api_v0.destroy(world, &instance->level_entity, 1);
-}
-
-entity_t level_entity_by_id(level_t level,
-                            uint64_t id) {
-    struct level_instance *instance = _level_instance(level);
-    return MAP_GET(entity_t, &instance->spawned_entity_map, id,
-                   (entity_t) {0});
-}
-
-entity_t level_entity(level_t level) {
-    struct level_instance *instance = _level_instance(level);
-    return instance->level_entity;
-}
-
-static void _init_api(struct api_v0 *api) {
-    static struct level_api_v0 _api = {0};
-
-    _api.load_level = world_load_level;
-    _api.destroy = level_destroy;
-    _api.entity_by_id = level_entity_by_id;
-    _api.entity = level_entity;
-
-    api->register_api("level_api_v0", &_api);
-}
+    void _init_api(struct api_v0 *api) {
+        api->register_api("level_api_v0", &_api);
+    }
 
 
-static void _init(struct api_v0 *api) {
-    GET_API(api, entity_api_v0);
-    GET_API(api, memory_api_v0);
-    GET_API(api, resource_api_v0);
-    GET_API(api, transform_api_v0);
-    GET_API(api, vio_api_v0);
-    GET_API(api, hash_api_v0);
+    void _init(struct api_v0 *api) {
+        GET_API(api, entity_api_v0);
+        GET_API(api, memory_api_v0);
+        GET_API(api, resource_api_v0);
+        GET_API(api, transform_api_v0);
+        GET_API(api, vio_api_v0);
+        GET_API(api, hash_api_v0);
 
-    _G = (struct G) {0};
-    _G.level_type = hash_api_v0.id64_from_str("level");
+        _G = {0};
 
-    ARRAY_INIT(level_instance, &_G.level_instance,
-               memory_api_v0.main_allocator());
+        _G.level_type = hash_api_v0.id64_from_str("level");
 
-    resource_api_v0.register_type(_G.level_type, _level_resource_defs);
+        ARRAY_INIT(level_instance, &_G.level_instance,
+                   memory_api_v0.main_allocator());
+
+        resource_api_v0.register_type(_G.level_type, _level_resource_defs);
 
 #ifdef CETECH_CAN_COMPILE
-    resource_api_v0.compiler_register(_G.level_type, _level_resource_compiler);
+        resource_api_v0.compiler_register(_G.level_type,
+                                          _level_resource_compiler);
 #endif
 
-}
+    }
 
-static void _shutdown() {
-    ARRAY_DESTROY(level_instance, &_G.level_instance);
-    _G = (struct G) {0};
-}
+    void _shutdown() {
+        ARRAY_DESTROY(level_instance, &_G.level_instance);
+
+        _G = {0};
+    }
 
 
-void *level_get_module_api(int api) {
+    extern "C" void *level_get_module_api(int api) {
 
-    switch (api) {
-        case PLUGIN_EXPORT_API_ID: {
-            static struct module_api_v0 module = {0};
+        switch (api) {
+            case PLUGIN_EXPORT_API_ID: {
+                static struct module_api_v0 module = {0};
 
-            module.init = _init;
-            module.init_api = _init_api;
-            module.shutdown = _shutdown;
+                module.init = _init;
+                module.init_api = _init_api;
+                module.shutdown = _shutdown;
 
-            return &module;
+                return &module;
+            }
+
+            default:
+                return NULL;
         }
-
-        default:
-            return NULL;
     }
 }

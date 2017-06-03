@@ -25,7 +25,7 @@ thread_t thread_create(thread_fce_t fce,
 //! Kill thread
 //! \param thread thread
 void thread_kill(thread_t thread) {
-    SDL_DetachThread(thread.t);
+    SDL_DetachThread((SDL_Thread *) thread.t);
 }
 
 //! Wait for thread
@@ -33,14 +33,14 @@ void thread_kill(thread_t thread) {
 //! \param status Thread exit status
 void thread_wait(thread_t thread,
                  int *status) {
-    SDL_WaitThread(thread.t, status);
+    SDL_WaitThread((SDL_Thread *) thread.t, status);
 }
 
 //! Get id for thread
 //! \param thread Thread
 //! \return ID
 uint64_t thread_get_id(thread_t thread) {
-    return SDL_GetThreadID(thread.t);
+    return SDL_GetThreadID((SDL_Thread *) thread.t);
 }
 
 //! Get actual thread id

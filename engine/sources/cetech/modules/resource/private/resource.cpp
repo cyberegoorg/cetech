@@ -562,8 +562,7 @@ void resource_reload_all() {
     }
 }
 
-extern "C" {
-void *resourcesystem_get_module_api(int api) {
+extern "C" void *resourcesystem_get_module_api(int api) {
     switch (api) {
         case PLUGIN_EXPORT_API_ID: {
             static struct module_api_v0 module = {0};
@@ -581,5 +580,4 @@ void *resourcesystem_get_module_api(int api) {
             return NULL;
     }
 
-}
 }

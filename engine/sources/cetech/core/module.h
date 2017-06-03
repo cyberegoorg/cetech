@@ -18,7 +18,7 @@ extern "C" {
 //! Add static module
 //! \param name Plugin name
 #define ADD_STATIC_PLUGIN(name)                \
-    void* name ## _get_module_api(int);        \
+    extern void* name ## _get_module_api(int);        \
     module_add_static(name ## _get_module_api)
 
 //==============================================================================

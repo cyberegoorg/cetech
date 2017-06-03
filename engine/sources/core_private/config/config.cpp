@@ -69,8 +69,6 @@ IMPORT_API(vio_api_v0);
 IMPORT_API(log_api_v0);
 IMPORT_API(hash_api_v0);
 
-void cvar_load_global();
-
 void cvar_compile_global(struct app_api_v0 *app_api);
 
 int cvar_parse_core_args(int argc,
@@ -82,7 +80,7 @@ int cvar_parse_args(int argc,
 cvar_t cvar_find(const char *name);
 
 cvar_t cvar_find_or_create(const char *name,
-                           int *new);
+                           int *new_);
 
 cvar_t cvar_new_float(const char *name,
                       const char *desc,
@@ -141,7 +139,7 @@ cvar_t _find_first_free() {
         return make_cvar(i);
     }
 
-    log_api_v0.error(LOG_WHERE, "Could not create new config variable");
+    log_api_v0.error(LOG_WHERE, "Could not create _new config variable");
 
     return make_cvar(0);
 }
@@ -171,51 +169,6 @@ static void _reload_end(
 //==============================================================================
 // Interface
 //==============================================================================
-
-int cvar_init(struct api_v0 *api) {
-
-    GET_API(api, memory_api_v0);
-    GET_API(api, path_v0);
-    GET_API(api, vio_api_v0);
-    GET_API(api, log_api_v0);
-    GET_API(api, hash_api_v0);
-
-    log_api_v0.debug(LOG_WHERE, "Init");
-
-    static struct config_api_v0 api_v1 = {
-            .load_global = cvar_load_global,
-#ifdef CETECH_CAN_COMPILE
-            .compile_global = cvar_compile_global,
-#endif
-            .parse_core_args = cvar_parse_core_args,
-            .parse_args = cvar_parse_args,
-            .find = cvar_find,
-            .find_or_create = cvar_find_or_create,
-            .new_float = cvar_new_float,
-            .new_int = cvar_new_int,
-            .new_str = cvar_new_str,
-            .get_float = cvar_get_float,
-            .get_int = cvar_get_int,
-            .get_string = cvar_get_string,
-            .get_type  = cvar_get_type,
-            .set_float = cvar_set_float,
-            .set_int = cvar_set_int,
-            .set_string = cvar_set_string,
-            .log_all = cvar_log_all,
-    };
-
-    api->register_api("config_api_v0", &api_v1);
-
-    _G.type = hash_api_v0.id64_from_str("config");
-
-    return 1;
-}
-
-void cvar_shutdown() {
-    log_api_v0.debug(LOG_WHERE, "Shutdown");
-
-    _dealloc_allm_string();
-}
 
 #ifdef CETECH_CAN_COMPILE
 
@@ -280,7 +233,7 @@ struct foreach_config_data {
 void foreach_config_clb(yaml_node_t key,
                         yaml_node_t value,
                         void *_data) {
-    struct foreach_config_data *output = _data;
+    struct foreach_config_data *output = (foreach_config_data *) _data;
 
     char key_str[128] = {0};
     yaml_as_string(key, key_str, CETECH_ARRAY_LEN(key_str));
@@ -469,8 +422,8 @@ int cvar_parse_core_args(int argc,
 
 
 cvar_t cvar_find_or_create(const char *name,
-                           int *new) {
-    if (new) *new = 0;
+                           int *_new) {
+    if (_new) *_new = 0;
 
     for (uint64_t i = 1; i < MAX_VARIABLES; ++i) {
         if (_G.name[i][0] == '\0') {
@@ -489,7 +442,7 @@ cvar_t cvar_find_or_create(const char *name,
     if (var.idx != 0) {
         str_set(_G.name[var.idx], name);
 
-        if (new) *new = 1;
+        if (_new) *_new = 1;
         return var;
     }
 
@@ -499,10 +452,10 @@ cvar_t cvar_find_or_create(const char *name,
 cvar_t cvar_new_float(const char *name,
                       const char *desc,
                       float f) {
-    int new;
-    cvar_t find = cvar_find_or_create(name, &new);
+    int _new;
+    cvar_t find = cvar_find_or_create(name, &_new);
 
-    if (new) {
+    if (_new) {
         str_set(_G.name[find.idx], name);
         _G.types[find.idx] = CV_FLOAT;
         _G.values[find.idx].f = f;
@@ -516,10 +469,10 @@ cvar_t cvar_new_float(const char *name,
 cvar_t cvar_new_int(const char *name,
                     const char *desc,
                     int i) {
-    int new;
-    cvar_t find = cvar_find_or_create(name, &new);
+    int _new;
+    cvar_t find = cvar_find_or_create(name, &_new);
 
-    if (new) {
+    if (_new) {
         str_set(_G.name[find.idx], name);
         _G.types[find.idx] = CV_INT;
         _G.values[find.idx].i = i;
@@ -533,10 +486,10 @@ cvar_t cvar_new_int(const char *name,
 cvar_t cvar_new_str(const char *name,
                     const char *desc,
                     const char *s) {
-    int new;
-    cvar_t find = cvar_find_or_create(name, &new);
+    int _new;
+    cvar_t find = cvar_find_or_create(name, &_new);
 
-    if (new) {
+    if (_new) {
         str_set(_G.name[find.idx], name);
         _G.types[find.idx] = CV_STRING;
         _G.values[find.idx].s = memory_api_v0.str_dup(s,
@@ -610,7 +563,52 @@ void cvar_log_all() {
     }
 }
 
-void *config_get_module_api(int api) {
+int cvar_init(struct api_v0 *api) {
+
+    GET_API(api, memory_api_v0);
+    GET_API(api, path_v0);
+    GET_API(api, vio_api_v0);
+    GET_API(api, log_api_v0);
+    GET_API(api, hash_api_v0);
+
+    log_api_v0.debug(LOG_WHERE, "Init");
+
+    static struct config_api_v0 api_v1 = {
+            .load_global = cvar_load_global,
+#ifdef CETECH_CAN_COMPILE
+            .compile_global = cvar_compile_global,
+#endif
+            .parse_core_args = cvar_parse_core_args,
+            .parse_args = cvar_parse_args,
+            .find = cvar_find,
+            .find_or_create = cvar_find_or_create,
+            .new_float = cvar_new_float,
+            .new_int = cvar_new_int,
+            .new_str = cvar_new_str,
+            .get_float = cvar_get_float,
+            .get_int = cvar_get_int,
+            .get_string = cvar_get_string,
+            .get_type  = cvar_get_type,
+            .set_float = cvar_set_float,
+            .set_int = cvar_set_int,
+            .set_string = cvar_set_string,
+            .log_all = cvar_log_all,
+    };
+
+    api->register_api("config_api_v0", &api_v1);
+
+    _G.type = hash_api_v0.id64_from_str("config");
+
+    return 1;
+}
+
+void cvar_shutdown() {
+    log_api_v0.debug(LOG_WHERE, "Shutdown");
+
+    _dealloc_allm_string();
+}
+
+extern "C" void *config_get_module_api(int api) {
 
     if (api == PLUGIN_EXPORT_API_ID) {
         static struct module_api_v0 module = {0};

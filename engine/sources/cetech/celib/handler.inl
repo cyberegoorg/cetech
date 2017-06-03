@@ -88,6 +88,8 @@ namespace cetech {
     void Handler<T>::init(allocator *allocator) {
         _generation.init(allocator);
         _freeIdx.init(allocator);
+
+        handler::create(*this);
     }
 
     template<typename T>

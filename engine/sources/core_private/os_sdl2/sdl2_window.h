@@ -69,26 +69,26 @@ window_t window_new_from(void *hndl) {
 }
 
 void window_destroy(window_t w) {
-    SDL_DestroyWindow(w.w);
+    SDL_DestroyWindow((SDL_Window *) w.w);
 }
 
 void window_set_title(window_t w,
                       const char *title) {
-    SDL_SetWindowTitle(w.w, title);
+    SDL_SetWindowTitle((SDL_Window *) w.w, title);
 }
 
 const char *window_get_title(window_t w) {
-    return SDL_GetWindowTitle(w.w);
+    return SDL_GetWindowTitle((SDL_Window *) w.w);
 }
 
 void window_update(window_t w) {
-    SDL_UpdateWindowSurface(w.w);
+    SDL_UpdateWindowSurface((SDL_Window *) w.w);
 }
 
 void window_resize(window_t w,
                    uint32_t width,
                    uint32_t height) {
-    SDL_SetWindowSize(w.w, width, height);
+    SDL_SetWindowSize((SDL_Window *) w.w, width, height);
 }
 
 void window_get_size(window_t window,
@@ -97,7 +97,7 @@ void window_get_size(window_t window,
     int w, h;
     w = h = 0;
 
-    SDL_GetWindowSize(window.w, &w, &h);
+    SDL_GetWindowSize((SDL_Window *) window.w, &w, &h);
 
     *width = (uint32_t) w;
     *height = (uint32_t) h;
@@ -108,7 +108,7 @@ void *window_native_window_ptr(window_t w) {
 
     SDL_VERSION(&wmi.version);
 
-    if (!SDL_GetWindowWMInfo(w.w, &wmi)) {
+    if (!SDL_GetWindowWMInfo((SDL_Window *) w.w, &wmi)) {
         return 0;
     }
 
@@ -126,7 +126,7 @@ void *window_native_display_ptr(window_t w) {
 
     SDL_VERSION(&wmi.version);
 
-    if (!SDL_GetWindowWMInfo(w.w, &wmi)) {
+    if (!SDL_GetWindowWMInfo((SDL_Window *) w.w, &wmi)) {
         return 0;
     }
 

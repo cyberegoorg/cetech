@@ -74,7 +74,7 @@ static task_t _new_task() {
         idx = atomic_fetch_add(&_G._task_pool_idx, 1);
     }
 
-    return make_task(idx & (MAX_TASK - 1));
+    return make_task((uint32_t)(idx & (MAX_TASK - 1)));
 }
 
 static void _push_task(task_t t) {
@@ -143,7 +143,7 @@ static int _task_worker(void *o) {
     while (!_G._Run) {
     }
 
-    _worker_id = (char) o;
+    _worker_id = (char) (uint64_t) o;
 
     log_api_v0.debug("task_worker", "Worker %d init", _worker_id);
 
@@ -281,7 +281,7 @@ static void _shutdown() {
     _G = (struct G) {0};
 }
 
-void *task_get_module_api(int api) {
+extern "C" void *task_get_module_api(int api) {
 
 
     switch (api) {

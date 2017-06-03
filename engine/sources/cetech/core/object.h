@@ -13,7 +13,7 @@ struct object_api_v0 {
     void (*unload)(void *so);
 
     void *(*load_function)(void *so,
-                           void *name);
+                           const char *name);
 };
 
 #ifdef __cplusplus

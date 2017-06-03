@@ -11,7 +11,7 @@ class AssetPreviewView(CETechWiget):
     def __init__(self, frontend, parent=None):
         self.frontend = frontend
 
-        self.rpc = rpc.Client(url="ws://localhost:8888", recv_timeout=10 * 1000)
+        self.rpc = rpc.Client(url="ws://localhost:8888")
         self.rpc.connect()
 
         self.frontend.subscribe_service("asset_service", self._subcribe_asset_browser)

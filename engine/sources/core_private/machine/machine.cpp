@@ -97,7 +97,7 @@ void _update() {
     _machine_process_impl(&_G.eventstream);
 }
 
-void *machine_get_module_api(int api) {
+extern "C" void *machine_get_module_api(int api) {
 
     if (api == PLUGIN_EXPORT_API_ID) {
         static struct module_api_v0 module = {0};

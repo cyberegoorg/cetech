@@ -93,44 +93,46 @@ static int _cmd_wait(mpack_node_t args,
 // Interface
 //==============================================================================
 
-extern const char *application_platform();
+const char *application_platform();
 
-extern const char *application_native_platform();
+const char *application_native_platform();
 
-extern window_t application_get_main_window();
+window_t application_get_main_window();
 
-extern int cvar_init(struct api_v0 *api);
+int cvar_init(struct api_v0 *api);
 
-extern void cvar_shutdown();
+void cvar_shutdown();
 
-extern void memsys_init(int scratch_buffer_size);
+void memsys_init(int scratch_buffer_size);
 
-extern void memsys_init_api(struct api_v0 *api);
+void memsys_init_api(struct api_v0 *api);
 
-extern void memsys_shutdown();
+void memsys_shutdown();
 
-extern struct allocator *_memsys_main_allocator();
+struct allocator *_memsys_main_allocator();
 
-extern struct allocator *_memsys_main_scratch_allocator();
+struct allocator *_memsys_main_scratch_allocator();
 
-extern void api_init(struct allocator *allocator);
+namespace api {
+    void api_init(struct allocator *allocator);
 
-extern void api_shutdown();
+    void api_shutdown();
 
-extern struct api_v0 *api_get_v0();
+    struct api_v0 *api_get_v0();
+};
 
-extern void os_register_api(struct api_v0 *api);
+void os_register_api(struct api_v0 *api);
 
-extern void log_register_api(struct api_v0 *api);
+void log_register_api(struct api_v0 *api);
 
-extern int logdb_init_db(const char *log_dir,
-                         struct api_v0 *api);
+int logdb_init_db(const char *log_dir,
+                  struct api_v0 *api);
 
-extern void log_init();
+void log_init();
 
-extern void log_shutdown();
+void log_shutdown();
 
-extern void log_register_api(struct api_v0 *api);
+void log_register_api(struct api_v0 *api);
 
 
 void application_quit() {
@@ -196,7 +198,7 @@ int _init_config(struct api_v0 *api) {
 
         const char *build_dir_str = config.get_string(bd);
         path_v0.join(build_dir_full, 1024, build_dir_str,
-                          application_platform());
+                     application_platform());
         path_v0.make_path(build_dir_full);
         config.compile_global(&api_v1);
     }
@@ -215,27 +217,7 @@ int _init_config(struct api_v0 *api) {
 
 extern void error_init(struct api_v0 *api);
 
-int application_init(int argc,
-                     const char **argv) {
-    _G = (struct ApplicationGlobals){0};
-    _G.args = (struct args) {.argc = argc, .argv = argv};
-
-    log_init();
-    memsys_init(4 * 1024 * 1024);
-    api_init(_memsys_main_allocator());
-    log_register_api(api_get_v0());
-    error_init(api_get_v0());
-
-    api_get_v0()->register_api("app_api_v0", &api_v1);
-
-    memsys_init_api(api_get_v0());
-    os_register_api(api_get_v0());
-
-    module_init(_memsys_main_allocator(), api_get_v0());
-    cvar_init(api_get_v0());
-
-    logdb_init_db(".", api_get_v0());
-
+extern "C" void _init_core_modules() {
     ADD_STATIC_PLUGIN(config);
     ADD_STATIC_PLUGIN(application);
     ADD_STATIC_PLUGIN(sdl);
@@ -252,13 +234,40 @@ int application_init(int argc,
     ADD_STATIC_PLUGIN(resourcecompiler);
 #endif
 
+}
+
+int application_init(int argc,
+                     const char **argv) {
+    _G = {0};
+    _G.args = (struct args) {.argc = argc, .argv = argv};
+
+    log_init();
+    memsys_init(4 * 1024 * 1024);
+    api::api_init(_memsys_main_allocator());
+
+    api_v0 *api = api::api_get_v0();
+
+    log_register_api(api);
+    error_init(api);
+
+    api->register_api("app_api_v0", &api_v1);
+
+    memsys_init_api(api);
+    os_register_api(api);
+
+    module_init(_memsys_main_allocator(), api);
+    cvar_init(api);
+
+    logdb_init_db(".", api);
+
+    _init_core_modules();
     _init_static_modules();
     module_call_init_api();
-    _init_api(api_get_v0());
+    _init_api(api);
     module_load_dirs("./bin");
     module_call_init_cvar();
 
-    if (!_init_config(api_get_v0())) {
+    if (!_init_config(api)) {
         return 0;
     };
 
@@ -277,7 +286,7 @@ int application_shutdown() {
     module_call_shutdown();
     cvar_shutdown();
     module_shutdown();
-    api_shutdown();
+    api::api_shutdown();
     memsys_shutdown();
     log_shutdown();
 

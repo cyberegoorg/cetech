@@ -115,7 +115,7 @@ static void _init(struct api_v0 *api) {
     GET_API(api, log_api_v0);
 }
 
-void *sdl_get_module_api(int api) {
+extern "C" void *sdl_get_module_api(int api) {
     switch (api) {
         case PLUGIN_EXPORT_API_ID: {
             static struct module_api_v0 module = {0};

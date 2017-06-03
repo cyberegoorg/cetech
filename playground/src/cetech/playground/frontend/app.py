@@ -6,7 +6,7 @@ from .gui_qt import QtFrontendGui
 
 class FrontendApp(object):
     def __init__(self, modules_dir, name, dir, core_dir):
-        self.rpc = rpc.Client(url="ws://localhost:8888", recv_timeout=10 * 1000)
+        self.rpc = rpc.Client(url="ws://localhost:8888")
         self.rpc.connect()
 
         self.rpc.call_service("project_service", "open_project", name=name, project_dir=dir, core_dir=core_dir)

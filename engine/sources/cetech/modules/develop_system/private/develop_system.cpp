@@ -324,7 +324,7 @@ static void _init(struct api_v0 *api) {
     GET_API(api, time_api_v0);
     GET_API(api, log_api_v0);
 
-    _G = (G){0};
+//    _G = (G){0};
 
     _G.to_mpack.init(memory_api_v0.main_allocator());
 
@@ -366,8 +366,7 @@ static void _shutdown() {
     _G = (G){0};
 }
 
-extern "C" {
-void *developsystem_get_module_api(int api) {
+extern "C" void *developsystem_get_module_api(int api) {
     switch (api) {
         case PLUGIN_EXPORT_API_ID: {
             static struct module_api_v0 module = {0};
@@ -387,5 +386,4 @@ void *developsystem_get_module_api(int api) {
     }
 
     return 0;
-}
 }

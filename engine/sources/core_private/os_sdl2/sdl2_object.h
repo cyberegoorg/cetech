@@ -21,7 +21,7 @@ void unload_object(void *so) {
 }
 
 void *load_function(void *so,
-                    void *name) {
+                    const char *name) {
     void *fce = SDL_LoadFunction(so, "get_plugin_api");
     CETECH_ASSERT("cebase", fce != NULL);
 

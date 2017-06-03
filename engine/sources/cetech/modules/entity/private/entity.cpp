@@ -49,8 +49,7 @@ MAP_PROTOTYPE_N(struct array_yaml_node_t, array_yaml_node_t)
 MAP_PROTOTYPE_N(struct array_uint32_t, array_uint32_t)
 
 
-#define _G EntityMaagerGlobals
-static struct G {
+static struct EntityMaagerGlobals {
     Handler<uint32_t> entity_handler;
 
     MAP_T(uint32_t) spawned_map;
@@ -103,6 +102,11 @@ ARRAY_T(entity_t) *_get_spawned_array_by_idx(uint32_t idx) {
 
 ARRAY_T(entity_t) *_get_spawned_array(entity_t entity) {
     uint32_t idx = MAP_GET(uint32_t, &_G.spawned_map, entity.h, UINT32_MAX);
+
+    if(idx == UINT32_MAX) {
+        return nullptr;
+    }
+
     return &ARRAY_AT(&_G.spawned_array, idx);
 }
 
@@ -280,7 +284,7 @@ namespace entity_resource_compiler {
     }
 
 
-    struct entity_compile_output *entity_compiler_create_output() {
+    struct entity_compile_output *create_output() {
         struct allocator *a = memory_api_v0.main_allocator();
 
         struct entity_compile_output *output =
@@ -296,7 +300,7 @@ namespace entity_resource_compiler {
         return output;
     }
 
-    void entity_compiler_destroy_output(struct entity_compile_output *output) {
+    void destroy_output(struct entity_compile_output *output) {
         ARRAY_DESTROY(uint64_t, &output->component_type);
         MAP_DESTROY(uint32_t, &output->entity_parent);
 
@@ -329,21 +333,21 @@ namespace entity_resource_compiler {
         CETECH_DEALLOCATE(a, output);
     }
 
-    void entity_compiler_compile_entity(struct entity_compile_output *output,
-                                        yaml_node_t root,
-                                        const char *filename,
-                                        struct compilator_api *compilator_api) {
+    void compile_entity(struct entity_compile_output *output,
+                        yaml_node_t root,
+                        const char *filename,
+                        struct compilator_api *compilator_api) {
 
         preprocess(filename, root, compilator_api);
         compile_entitity(root, UINT32_MAX, output);
     }
 
-    uint32_t entity_compiler_ent_counter(struct entity_compile_output *output) {
+    uint32_t ent_counter(struct entity_compile_output *output) {
         return output->ent_counter;
     }
 
-    void entity_compiler_write_to_build(struct entity_compile_output *output,
-                                        ARRAY_T(uint8_t) *build) {
+    void write_to_build(struct entity_compile_output *output,
+                        ARRAY_T(uint8_t) *build) {
         struct entity_resource res = {0};
         res.ent_count = (uint32_t) (output->ent_counter);
         res.comp_type_count = (uint32_t) ARRAY_SIZE(&output->component_type);
@@ -400,15 +404,15 @@ namespace entity_resource_compiler {
         }
     }
 
-    void entity_resource_compiler(yaml_node_t root,
-                                  const char *filename,
-                                  ARRAY_T(uint8_t) *build,
-                                  struct compilator_api *compilator_api) {
-        struct entity_compile_output *output = entity_compiler_create_output();
-        entity_compiler_compile_entity(output, root, filename, compilator_api);
-        entity_compiler_write_to_build(output, build);
+    void compiler(yaml_node_t root,
+                  const char *filename,
+                  ARRAY_T(uint8_t) *build,
+                  struct compilator_api *compilator_api) {
+        struct entity_compile_output *output = create_output();
+        compile_entity(output, root, filename, compilator_api);
+        write_to_build(output, build);
 
-        entity_compiler_destroy_output(output);
+        destroy_output(output);
     }
 
     int _entity_resource_compiler(const char *filename,
@@ -426,7 +430,7 @@ namespace entity_resource_compiler {
         ARRAY_T(uint8_t) entity_data;
         ARRAY_INIT(uint8_t, &entity_data, memory_api_v0.main_allocator());
 
-        entity_resource_compiler(root, filename, &entity_data, compilator_api);
+        compiler(root, filename, &entity_data, compilator_api);
 
         vio_api_v0.write(build_vio, &ARRAY_AT(&entity_data, 0), sizeof(uint8_t),
                          ARRAY_SIZE(&entity_data));
@@ -561,10 +565,12 @@ namespace entity {
         for (int i = 0; i < count; ++i) {
             ARRAY_T(entity_t) *spawned = _get_spawned_array(entity[i]);
 
-            component_api_v0.destroy(world, spawned->data,
-                                     spawned->size);
-
-            _destroy_spawned_array(entity[i]);
+            if (spawned) {
+                component_api_v0.destroy(world, spawned->data, spawned->size);
+                _destroy_spawned_array(entity[i]);
+            } else {
+                component_api_v0.destroy(world, &entity[i], 1);
+            }
         }
 
     }
@@ -580,12 +586,12 @@ namespace entity_module {
             .spawn = entity::spawn,
 
 #ifdef CETECH_CAN_COMPILE
-            .compiler_create_output = entity_resource_compiler::entity_compiler_create_output,
-            .compiler_destroy_output = entity_resource_compiler::entity_compiler_destroy_output,
-            .compiler_compile_entity = entity_resource_compiler::entity_compiler_compile_entity,
-            .compiler_ent_counter = entity_resource_compiler::entity_compiler_ent_counter,
-            .compiler_write_to_build = entity_resource_compiler::entity_compiler_write_to_build,
-            .resource_compiler = entity_resource_compiler::entity_resource_compiler
+            .compiler_create_output = entity_resource_compiler::create_output,
+            .compiler_destroy_output = entity_resource_compiler::destroy_output,
+            .compiler_compile_entity = entity_resource_compiler::compile_entity,
+            .compiler_ent_counter = entity_resource_compiler::ent_counter,
+            .compiler_write_to_build = entity_resource_compiler::write_to_build,
+            .resource_compiler = entity_resource_compiler::compiler
 #endif
     };
 
