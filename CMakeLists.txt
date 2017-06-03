@@ -8,8 +8,7 @@ set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=gnu11 -Werror")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -Werror")
 set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -rdynamic")
 
-
-include_directories(engine/sources)
+include_directories(engine/include)
 
 add_definitions(-DCETECH_STATIC_PLUGINS)
 add_definitions(-DCETECH_USE_SDL)
@@ -67,92 +66,88 @@ set(SOURCE_FILES
         ${EXTERNAL_SOURCE_FILES}
 
         ########################################################################
-        # CETECH
+        # Core
         ########################################################################
-        engine/sources/core_private/log/log_system.cpp
-
-
-        engine/sources/core_private/os/stacktrace.cpp
-        engine/sources/core_private/api/api.cpp
-        engine/sources/core_private/log/log_system.cpp
-        engine/sources/core_private/yaml/yaml.cpp
+        engine/sources/core/api/api.cpp
+        engine/sources/core/log/log_system.cpp
+        engine/sources/core/os/os.cpp
+        engine/sources/core/os/stacktrace.cpp
+        engine/sources/core/yaml/yaml.cpp
+        engine/sources/core/module/module.cpp
+        engine/sources/core/config/config.cpp
+        engine/sources/core/memory/memory.cpp
+        engine/sources/core/machine/machine.cpp
+        engine/sources/core/machine_sdl2/sdl_mouse.cpp
+        engine/sources/core/machine_sdl2/sdl_keyboard.cpp
+        engine/sources/core/machine_sdl2/sdl_gamepad.cpp
+        engine/sources/core/machine_sdl2/sdl_machine.cpp
 
 
         ########################################################################
-        # CETECH
+        # Modules
         ########################################################################
-        engine/sources/core_private/module/module.cpp
-        engine/sources/core_private/config/config.cpp
-        engine/sources/core_private/memory/memory.cpp
 
-        engine/sources/cetech/modules/luasys/private/luasys.c
-        engine/sources/cetech/modules/luasys/private/api/api_plugin.c
-        engine/sources/cetech/modules/luasys/private/api/api_keyboard.c
-        engine/sources/cetech/modules/luasys/private/api/api_log.c
-        engine/sources/cetech/modules/luasys/private/api/api_mouse.c
-        engine/sources/cetech/modules/luasys/private/api/api_gamepad.c
-        engine/sources/cetech/modules/luasys/private/api/api_application.c
-        engine/sources/cetech/modules/luasys/private/api/api_resouce_manager.c
-        engine/sources/cetech/modules/luasys/private/api/api_renderer.c
-        engine/sources/cetech/modules/luasys/private/api/api_world.c
-        engine/sources/cetech/modules/luasys/private/api/api_entity.c
-        engine/sources/cetech/modules/luasys/private/api/api_component.c
-        engine/sources/cetech/modules/luasys/private/api/api_transform.c
-        engine/sources/cetech/modules/luasys/private/api/api_vec2f.c
-        engine/sources/cetech/modules/luasys/private/api/api_vec3f.c
-        engine/sources/cetech/modules/luasys/private/api/api_vec4f.c
-        engine/sources/cetech/modules/luasys/private/api/api_quatf.c
-        engine/sources/cetech/modules/luasys/private/api/api_mat44f.c
-        engine/sources/cetech/modules/luasys/private/api/api_mesh.c
-        engine/sources/cetech/modules/luasys/private/api/api_material.c
-        engine/sources/cetech/modules/luasys/private/api/api_package.c
-        engine/sources/cetech/modules/luasys/private/api/api_level.c
-        engine/sources/cetech/modules/luasys/private/api/api_scenegraph.c
+        engine/sources/modules/luasys/luasys.c
+        engine/sources/modules/luasys/api/api_plugin.c
+        engine/sources/modules/luasys/api/api_keyboard.c
+        engine/sources/modules/luasys/api/api_log.c
+        engine/sources/modules/luasys/api/api_mouse.c
+        engine/sources/modules/luasys/api/api_gamepad.c
+        engine/sources/modules/luasys/api/api_application.c
+        engine/sources/modules/luasys/api/api_resouce_manager.c
+        engine/sources/modules/luasys/api/api_renderer.c
+        engine/sources/modules/luasys/api/api_world.c
+        engine/sources/modules/luasys/api/api_entity.c
+        engine/sources/modules/luasys/api/api_component.c
+        engine/sources/modules/luasys/api/api_transform.c
+        engine/sources/modules/luasys/api/api_vec2f.c
+        engine/sources/modules/luasys/api/api_vec3f.c
+        engine/sources/modules/luasys/api/api_vec4f.c
+        engine/sources/modules/luasys/api/api_quatf.c
+        engine/sources/modules/luasys/api/api_mat44f.c
+        engine/sources/modules/luasys/api/api_mesh.c
+        engine/sources/modules/luasys/api/api_material.c
+        engine/sources/modules/luasys/api/api_package.c
+        engine/sources/modules/luasys/api/api_level.c
+        engine/sources/modules/luasys/api/api_scenegraph.c
 
-        engine/sources/cetech/modules/develop_system/private/console_server.cpp
-        engine/sources/cetech/modules/develop_system/private/develop_system.cpp
-
-        engine/sources/cetech/modules/task/private/task.cpp
-
-        engine/sources/cetech/modules/resource/private/resource.cpp
-        engine/sources/cetech/modules/resource/private/resource_package.cpp
-        engine/sources/cetech/modules/resource/private/resource_compiler.cpp
-        engine/sources/cetech/modules/filesystem/private/filesystem.cpp
-        engine/sources/cetech/modules/component/private/component.cpp
-        engine/sources/cetech/modules/entity/private/entity.cpp
-        engine/sources/cetech/modules/world/private/world.cpp
-        engine/sources/cetech/modules/level/private/level.cpp
-
-        engine/sources/core_private/machine/machine.cpp
-        engine/sources/core_private/machine_sdl2/sdl_mouse.cpp
-        engine/sources/core_private/machine_sdl2/sdl_keyboard.cpp
-        engine/sources/core_private/machine_sdl2/sdl_gamepad.cpp
-        engine/sources/core_private/machine_sdl2/sdl_machine.cpp
-
-        engine/sources/cetech/modules/input/private/keyboard.cpp
-        engine/sources/cetech/modules/input/private/mouse.cpp
-        engine/sources/cetech/modules/input/private/gamepad.cpp
+        engine/sources/modules/develop_system/console_server.cpp
+        engine/sources/modules/develop_system/develop_system.cpp
 
 
-        engine/sources/cetech/modules/renderer_bgfx/private/renderer.cpp
-        engine/sources/cetech/modules/renderer_bgfx/private/texture.cpp
-        engine/sources/cetech/modules/renderer_bgfx/private/shader.cpp
-        engine/sources/cetech/modules/renderer_bgfx/private/material.cpp
-        engine/sources/cetech/modules/renderer_bgfx/private/scene.cpp
-        engine/sources/cetech/modules/renderer_bgfx/private/mesh_renderer.cpp
+        engine/sources/modules/resource/resource.cpp
+        engine/sources/modules/resource/resource_package.cpp
+        engine/sources/modules/resource/resource_compiler.cpp
 
-        engine/sources/cetech/modules/transform/private/transform.cpp
-        engine/sources/cetech/modules/scenegraph/private/scenegraph.cpp
-        engine/sources/cetech/modules/camera/private/camera.cpp
+        engine/sources/modules/filesystem/filesystem.cpp
+        engine/sources/modules/component/component.cpp
+        engine/sources/modules/entity/entity.cpp
+        engine/sources/modules/world/world.cpp
+        engine/sources/modules/task/task.cpp
+        engine/sources/modules/level/level.cpp
 
-        engine/sources/core_private/os/os.cpp)
+        engine/sources/modules/input/keyboard.cpp
+        engine/sources/modules/input/mouse.cpp
+        engine/sources/modules/input/gamepad.cpp
+
+        engine/sources/modules/renderer_bgfx/renderer.cpp
+        engine/sources/modules/renderer_bgfx/texture.cpp
+        engine/sources/modules/renderer_bgfx/shader.cpp
+        engine/sources/modules/renderer_bgfx/material.cpp
+        engine/sources/modules/renderer_bgfx/scene.cpp
+        engine/sources/modules/renderer_bgfx/mesh_renderer.cpp
+
+        engine/sources/modules/transform/transform.cpp
+        engine/sources/modules/scenegraph/scenegraph.cpp
+        engine/sources/modules/camera/camera.cpp
+        )
 
 ################################################################################
 # Main sources
 ################################################################################
 set(MAIN_SOURCE_FILES
         ${SOURCE_FILES}
-        engine/sources/core_private/app/application.cpp)
+        engine/sources/core/app/application.cpp)
 
 ################################################################################
 # Release sources
@@ -243,6 +238,6 @@ target_include_directories(cetech_develop PUBLIC externals/build/${PLATFORM_ID}/
 
 #set_target_properties(module_example PROPERTIES PREFIX "")
 
-add_library(module_example SHARED engine/sources/module_example/example.c)
+add_library(module_example SHARED engine/examples/module_example/example.c)
 set_target_properties(module_example PROPERTIES PREFIX "")
 
