@@ -52,6 +52,27 @@ namespace cetech {
         Array<uint32_t> _hash;
         Array<Entry> _data;
     };
+
+    /***************************************************************************
+    **** A double-ended queue/ring buffer
+    ***************************************************************************/
+    template<typename T>
+    struct Queue {
+        Queue();
+        explicit Queue(allocator *a);
+
+        T &operator[](const uint32_t i);
+
+        const T &operator[](const uint32_t i) const;
+
+        void init(allocator *a);
+        void destroy();
+
+        Array<T> _data; // Data
+        uint32_t _size;    // Size
+        uint32_t _offset;  // Offset
+    };
+
 }
 
 #endif //CETECH_CONTAINER_TYPES_H

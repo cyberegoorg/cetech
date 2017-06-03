@@ -23,7 +23,7 @@ void _scene_resource_unloader(void *new_data,
 
 void _scene_resource_online(uint64_t name,
                             void *data) {
-    struct scene_blob *resource = data;
+    struct scene_blob *resource = (scene_blob *) data;
 
     uint64_t *geom_name = scene_blob_geom_name(resource);
     uint32_t *ib_offset = scene_blob_ib_offset(resource);

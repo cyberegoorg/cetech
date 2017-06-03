@@ -23,7 +23,7 @@ void _shader_resource_unloader(void *new_data,
 
 void _shader_resource_online(uint64_t name,
                              void *data) {
-    struct shader *resource = data;
+    struct shader *resource = (shader *) data;
 
     const bgfx_memory_t *vs_mem = bgfx_alloc(resource->vs_size);
     const bgfx_memory_t *fs_mem = bgfx_alloc(resource->fs_size);

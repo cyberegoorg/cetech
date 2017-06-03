@@ -53,7 +53,7 @@ static void _preprocess(const char *filename,
 static void _forach_texture_clb(yaml_node_t key,
                                 yaml_node_t value,
                                 void *_data) {
-    struct material_compile_output *output = _data;
+    struct material_compile_output *output = (material_compile_output *) _data;
 
     output->texture_count += 1;
 
@@ -74,7 +74,7 @@ static void _forach_texture_clb(yaml_node_t key,
 static void _forach_vec4fs_clb(yaml_node_t key,
                                yaml_node_t value,
                                void *_data) {
-    struct material_compile_output *output = _data;
+    struct material_compile_output *output = (material_compile_output *) _data;
 
     output->vec4f_count += 1;
 
@@ -91,7 +91,7 @@ static void _forach_vec4fs_clb(yaml_node_t key,
 static void _forach_mat44f_clb(yaml_node_t key,
                                yaml_node_t value,
                                void *_data) {
-    struct material_compile_output *output = _data;
+    struct material_compile_output *output = (material_compile_output *) _data;
 
     output->mat44f_count += 1;
 
@@ -108,7 +108,7 @@ static void _forach_mat44f_clb(yaml_node_t key,
 static void _forach_mat33f_clb(yaml_node_t key,
                                yaml_node_t value,
                                void *_data) {
-    struct material_compile_output *output = _data;
+    struct material_compile_output *output = (material_compile_output *) _data;
 
     output->mat33f_count += 1;
 
@@ -174,7 +174,7 @@ static int _material_resource_compiler(const char *filename,
             .shader_name = hash_api_v0.id64_from_str(tmp_buffer),
             .texture_count =output.texture_count,
             .vec4f_count = output.vec4f_count,
-            .uniforms_count = ARRAY_SIZE(&output.uniform_names) / 32,
+            .uniforms_count = (uint32_t) (ARRAY_SIZE(&output.uniform_names) / 32),
     };
 
     vio_api_v0.write(build_vio, &resource, sizeof(resource), 1);

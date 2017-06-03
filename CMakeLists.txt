@@ -76,7 +76,6 @@ set(SOURCE_FILES
         engine/sources/cetech/core/private/api.cpp
         engine/sources/cetech/core/private/log/log_system.c
         engine/sources/cetech/core/private/yaml.cc
-        engine/sources/cetech/core/private/handler.c
 
 
         ########################################################################
@@ -121,8 +120,8 @@ set(SOURCE_FILES
         engine/sources/cetech/core/resource/private/resource_compiler.cpp
         engine/sources/cetech/core/filesystem/private/filesystem.cpp
         engine/sources/cetech/modules/component/private/component.cpp
-        engine/sources/cetech/modules/entity/private/entity.c
-        engine/sources/cetech/modules/world/private/world.c
+        engine/sources/cetech/modules/entity/private/entity.cpp
+        engine/sources/cetech/modules/world/private/world.cpp
         engine/sources/cetech/modules/level/private/level.c
 
         engine/sources/cetech/core/private/machine.c
@@ -136,12 +135,12 @@ set(SOURCE_FILES
         engine/sources/cetech/modules/input/private/gamepad.cpp
 
 
-        engine/sources/cetech/modules/renderer/private/renderer.c
-        engine/sources/cetech/modules/renderer/private/texture/texture.c
-        engine/sources/cetech/modules/renderer/private/shader/shader.c
-        engine/sources/cetech/modules/renderer/private/material/material.c
-        engine/sources/cetech/modules/renderer/private/scene/scene.c
-        engine/sources/cetech/modules/renderer/private/mesh/mesh_renderer.c
+        engine/sources/cetech/modules/renderer/private/renderer.cpp
+        engine/sources/cetech/modules/renderer/private/texture/texture.cpp
+        engine/sources/cetech/modules/renderer/private/shader/shader.cpp
+        engine/sources/cetech/modules/renderer/private/material/material.cpp
+        engine/sources/cetech/modules/renderer/private/scene/scene.cpp
+        engine/sources/cetech/modules/renderer/private/mesh/mesh_renderer.cpp
 
         engine/sources/cetech/modules/transform/private/transform.cpp
         engine/sources/cetech/modules/scenegraph/private/scenegraph.cpp

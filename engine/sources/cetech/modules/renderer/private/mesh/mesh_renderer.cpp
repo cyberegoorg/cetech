@@ -159,7 +159,7 @@ static void _spawner(world_t world,
                      uint32_t *ents_parent,
                      size_t ent_count,
                      void *data) {
-    struct mesh_data *tdata = data;
+    struct mesh_data *tdata = (mesh_data *) data;
 
     for (int i = 0; i < ent_count; ++i) {
         mesh_renderer_api_v0.create(world,
@@ -233,7 +233,7 @@ void mesh_render_all(world_t world) {
 
         material_api_v0.use(material);
 
-        entity_t ent = {.h = ce_it->key};
+        entity_t ent = {.h = (uint32_t) ce_it->key};
 
         transform_t t = transform_api_v0.get(world, ent);
         mat44f_t t_w = *transform_api_v0.get_world_matrix(world, t);
@@ -399,7 +399,7 @@ static void _shutdown() {
     _G = (struct G) {0};
 }
 
-void *mesh_get_module_api(int api) {
+extern "C" void *mesh_get_module_api(int api) {
 
     switch (api) {
         case PLUGIN_EXPORT_API_ID: {

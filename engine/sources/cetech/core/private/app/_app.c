@@ -239,7 +239,6 @@ int application_init(int argc,
     logdb_init_db(".", api_get_v0());
 
     ADD_STATIC_PLUGIN(config);
-    ADD_STATIC_PLUGIN(handler);
     ADD_STATIC_PLUGIN(application);
     ADD_STATIC_PLUGIN(sdl);
     ADD_STATIC_PLUGIN(machine);

@@ -22,7 +22,7 @@ void _texture_resource_unloader(void *new_data,
 
 void _texture_resource_online(uint64_t name,
                               void *data) {
-    struct texture *resource = data;
+    struct texture *resource = (texture *) data;
 
     const bgfx_memory_t *mem = bgfx_copy((resource + 1), resource->size);
     bgfx_texture_handle_t texture = bgfx_create_texture(mem, BGFX_TEXTURE_NONE,

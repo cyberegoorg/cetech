@@ -153,7 +153,7 @@ void scene_submit(uint64_t scene,
 void scene_create_graph(world_t world,
                         entity_t entity,
                         uint64_t scene) {
-    struct scene_blob *res = resource_api_v0.get(_G.type, scene);
+    struct scene_blob *res = (scene_blob *) resource_api_v0.get(_G.type, scene);
 
     uint64_t *node_name = scene_blob_node_name(res);
     uint32_t *node_parent = scene_blob_node_parent(res);
@@ -165,7 +165,7 @@ void scene_create_graph(world_t world,
 
 uint64_t scene_get_mesh_node(uint64_t scene,
                              uint64_t mesh) {
-    struct scene_blob *res = resource_api_v0.get(_G.type, scene);
+    struct scene_blob *res = (scene_blob *) resource_api_v0.get(_G.type, scene);
 
     uint64_t *geom_node = scene_blob_geom_node(res);
     uint64_t *geom_name = scene_blob_geom_name(res);

@@ -106,7 +106,7 @@ static int _texture_resource_compiler(const char *filename,
                     vio_api_v0.size(tmp_file));
 
     struct texture resource = {
-            .size = vio_api_v0.size(tmp_file)
+            .size = (uint64_t) vio_api_v0.size(tmp_file)
     };
 
     vio_api_v0.write(build_vio, &resource, sizeof(resource), 1);

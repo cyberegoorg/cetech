@@ -6,7 +6,7 @@
 
 #include <cetech/core/memory/allocator.h>
 #include <cetech/core/container/map.inl>
-#include <cetech/core/handler.h>
+#include <cetech/core/handler.inl>
 
 #include <cetech/core/hash.h>
 #include <cetech/core/memory/memory.h>
@@ -22,6 +22,8 @@
 #include "../shader/shader.h"
 
 #include "material_blob.h"
+
+using namespace cetech;
 
 //==============================================================================
 // Structs
@@ -52,13 +54,12 @@ struct G {
     ARRAY_T(uint8_t) material_instance_data;
     ARRAY_T(uint32_t) material_instance_uniform_data;
 
-    struct handler32gen *material_handler;
+    Handler<uint32_t> material_handler;
     uint64_t type;
 } _G = {0};
 
 IMPORT_API(memory_api_v0);
 IMPORT_API(resource_api_v0);
-IMPORT_API(handler_api_v0);
 IMPORT_API(path_v0);
 IMPORT_API(vio_api_v0);
 IMPORT_API(hash_api_v0);
@@ -88,15 +89,13 @@ int material_init(struct api_v0 *api) {
 
     GET_API(api, memory_api_v0);
     GET_API(api, resource_api_v0);
-    GET_API(api, handler_api_v0);
     GET_API(api, path_v0);
     GET_API(api, vio_api_v0);
     GET_API(api, hash_api_v0);
 
     _G.type = hash_api_v0.id64_from_str("material");
 
-    _G.material_handler = handler_api_v0.handler32gen_create(
-            memory_api_v0.main_allocator());
+    _G.material_handler.init(memory_api_v0.main_allocator());
 
     MAP_INIT(uint32_t, &_G.material_instace_map,
              memory_api_v0.main_allocator());
@@ -113,19 +112,17 @@ int material_init(struct api_v0 *api) {
 }
 
 void material_shutdown() {
-    handler_api_v0.handler32gen_destroy(_G.material_handler);
-
     MAP_DESTROY(uint32_t, &_G.material_instace_map);
     ARRAY_DESTROY(uint32_t, &_G.material_instance_offset);
     ARRAY_DESTROY(uint8_t, &_G.material_instance_data);
 
-    _G = (struct G) {0};
+    _G = {0};
 }
 
 static const material_t null_material = {0};
 
 material_t material_create(uint64_t name) {
-    struct material_blob *resource = resource_api_v0.get(_G.type, name);
+    struct material_blob *resource = (material_blob *) resource_api_v0.get(_G.type, name);
 
     uint32_t size = sizeof(struct material_blob) +
                     (resource->uniforms_count * sizeof(char) * 32) +
@@ -134,7 +131,7 @@ material_t material_create(uint64_t name) {
                     (resource->mat44f_count * sizeof(mat44f_t)) +
                     (resource->mat33f_count * sizeof(mat33f_t));
 
-    uint32_t h = handler_api_v0.handler32_create(_G.material_handler);
+    uint32_t h = handler::create(_G.material_handler);
 
     uint32_t idx = (uint32_t) ARRAY_SIZE(&_G.material_instance_offset);
 

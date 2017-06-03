@@ -103,7 +103,7 @@ void shader_shutdown() {
 }
 
 bgfx_program_handle_t shader_get(uint64_t name) {
-    struct shader *resource = resource_api_v0.get(_G.type, name);
+    struct shader *resource = (shader *) resource_api_v0.get(_G.type, name);
     return MAP_GET(bgfx_program_handle_t, &_G.handler_map, name,
                    null_program);
 }

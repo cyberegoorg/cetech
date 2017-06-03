@@ -209,7 +209,7 @@ void _write_chanel(yaml_node_t node,
 void foreach_geometries_clb(yaml_node_t key,
                             yaml_node_t value,
                             void *_data) {
-    struct compile_output *output = _data;
+    struct compile_output *output = (compile_output *) _data;
 
     char name_str[64] = {0};
     yaml_as_string(key, name_str, CETECH_ARRAY_LEN(name_str));
@@ -267,7 +267,7 @@ void foreach_graph_clb(yaml_node_t key,
                        yaml_node_t value,
                        void *_data) {
     char buffer[128] = {0};
-    struct foreach_graph_data *output = _data;
+    struct foreach_graph_data *output = (foreach_graph_data *) _data;
 
     yaml_as_string(key, buffer, CETECH_ARRAY_LEN(buffer));
     uint64_t node_name = hash_api_v0.id64_from_str(buffer);

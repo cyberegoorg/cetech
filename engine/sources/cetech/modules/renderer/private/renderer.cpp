@@ -135,6 +135,7 @@ vec2f_t renderer_get_size() {
     return result;
 }
 
+namespace renderer_module {
 static void _init_api(struct api_v0 *api) {
     static struct renderer_api_v0 rendderer_api = {0};
 
@@ -196,7 +197,7 @@ static void _shutdown() {
 }
 
 
-void *renderer_get_module_api(int api) {
+extern "C" void *renderer_get_module_api(int api) {
 
     switch (api) {
         case PLUGIN_EXPORT_API_ID: {
@@ -213,4 +214,5 @@ void *renderer_get_module_api(int api) {
         default:
             return NULL;
     }
+}
 }
