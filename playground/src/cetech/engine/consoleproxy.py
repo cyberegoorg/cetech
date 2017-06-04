@@ -120,7 +120,12 @@ class NanoReq(object):
             raise ValueError(unpack_msg['error'])
 
         except NanoMsgAPIError as e:
-            self.logger.error("Recive error: %s", e.msg.decode("utf-8"))
+            if isinstance(e.msg, str):
+                msg = e.msg
+            else:
+                msg = e.msg.decode("utf-8")
+
+            self.logger.error("Recive error: %s", msg)
 
 
 class ConsoleProxy(NanoReq):

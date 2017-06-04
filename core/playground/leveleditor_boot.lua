@@ -19,6 +19,8 @@ function Editor:init()
 
     self.level = nil
 
+    --self:load_level("level1")
+
     --Renderer.SetDebug(true)
 end
 
