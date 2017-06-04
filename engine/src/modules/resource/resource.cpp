@@ -429,7 +429,7 @@ namespace resource {
                                            names[i]);
 #else
             char build_name[33] = {0};
-            resource_type_name_string(build_name, CETECH_ARRAY_LEN(build_name),
+            resource::type_name_string(build_name, CETECH_ARRAY_LEN(build_name),
                                       type, names[i]);
 
             char *filename = build_name;
