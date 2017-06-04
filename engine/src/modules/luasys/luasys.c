@@ -129,6 +129,7 @@ quatf_t *_new_tmp_quat() {
 // Lua resource
 //==============================================================================
 #include "lua_resource.h"
+//#include "../../core/module/_module.h"
 
 //==============================================================================
 // Game
@@ -194,12 +195,12 @@ static void _register_all_api(struct api_v0 *api) {
     REGISTER_LUA_API(scenegraph, api);
 }
 
-static int _reload_module(lua_State *l) {
-    size_t len;
-    const char *name = luasys_to_string_l(l, 1, &len);
-    module_reload(name);
-    return 0;
-}
+//static int _reload_module(lua_State *l) {
+//    size_t len;
+//    const char *name = luasys_to_string_l(l, 1, &len);
+//    reload(name);
+//    return 0;
+//}
 
 void _to_mpack(lua_State *_L,
                const int i,
@@ -910,7 +911,7 @@ static void _init(struct api_v0 *api_v0) {
 
     _register_all_api(api_v0);
 
-    luasys_add_module_function("module", "reload", _reload_module);
+//    luasys_add_module_function("module", "reload", _reload_module);
     cnsole_srv_api_v0.consolesrv_register_command("lua_system.execute",
                                                   _cmd_execute_string);
 
@@ -985,7 +986,7 @@ void luasys_call_global(const char *func,
 void *luasys_get_module_api(int api) {
     switch (api) {
         case PLUGIN_EXPORT_API_ID: {
-            static struct module_api_v0 module = {0};
+            static struct module_export_api_v0 module = {0};
 
             module.init = _init;
             module.init_api = _init_api;

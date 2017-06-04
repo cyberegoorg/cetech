@@ -71,7 +71,7 @@ namespace api {
             .next = api::next
     };
 
-    void api_init(struct allocator *allocator) {
+    void init(struct allocator *allocator) {
         _G = {0};
 
         _G.api_map.init(allocator);
@@ -79,11 +79,11 @@ namespace api {
         api::register_api("api_v0", &api_v0);
     }
 
-    void api_shutdown() {
+    void shutdown() {
         _G = {0};
     }
 
-    struct api_v0 *api_get_v0() {
+    struct api_v0 *v0() {
         return &api_v0;
     }
 }

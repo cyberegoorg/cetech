@@ -454,7 +454,7 @@ namespace scenegraph_module {
 
         switch (api) {
             case PLUGIN_EXPORT_API_ID: {
-                static struct module_api_v0 module = {0};
+                static struct module_export_api_v0 module = {0};
 
                 module.init = scenegraph_module::init;
                 module.init_api = scenegraph_module::_init_api;

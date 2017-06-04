@@ -1,8 +1,6 @@
 
 #include <string.h>
 
-#include "../memory/_allocator.h"
-
 #if defined(CETECH_LINUX)
 
 #include <execinfo.h>
@@ -11,12 +9,13 @@
 #include <cetech/core/api.h>
 #include <cetech/core/errors.h>
 #include <cetech/core/log.h>
+#include "../memory/_memory.h"
 
 #endif
 
 char *stacktrace(int skip) {
 #if defined(CETECH_LINUX)
-    char *return_str = (char *) memory_malloc(4096);
+    char *return_str = (char *) memory::malloc(4096);
     return_str[0] = '\0';
 
     void *array[50];
@@ -61,13 +60,13 @@ char *stacktrace(int skip) {
         }
     }
 
-    memory_free(messages);
+    memory::free(messages);
     return return_str;
 #endif
 }
 
 void stacktrace_free(char *st) {
-    memory_free(st);
+    memory::free(st);
 }
 
 IMPORT_API(log_api_v0);

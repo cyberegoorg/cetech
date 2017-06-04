@@ -1,12 +1,13 @@
 
 #include <time.h>
 
-#include "include/sqlite3/sqlite3.h"
 
 #include <cetech/core/log.h>
 #include <cetech/core/errors.h>
 #include <cetech/core/path.h>
 #include <cetech/core/api.h>
+
+#include "include/sqlite3/sqlite3.h"
 
 static int _step(sqlite3 *db,
                  sqlite3_stmt *stmt) {
@@ -31,7 +32,7 @@ static int _step(sqlite3 *db,
                 break;
 
             default:
-                log_api_v0.error("builddb", "SQL error '%s' (%d): %s",
+                log_error("builddb", "SQL error '%s' (%d): %s",
                                      sqlite3_sql(stmt), rc, sqlite3_errmsg(db));
 
                 run = 0;
@@ -122,6 +123,7 @@ void logdb_log(enum log_level level,
     //sqlite3_closeq_v2(_db);
 }
 
+namespace log {
 int logdb_init_db(const char *log_dir,
                   struct api_v0 *api) {
     struct path_v0 *path = (path_v0 *) api->first("path_v0").api;
@@ -146,4 +148,6 @@ int logdb_init_db(const char *log_dir,
     log_register_handler(logdb_log, NULL);
 
     return 1;
+}
+
 }

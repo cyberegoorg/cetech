@@ -24,6 +24,13 @@
 #include <cetech/modules/package.h>
 #include <cetech/modules/console_server.h>
 
+#include "../os/_os.h"
+#include "../api/_api.h"
+#include "../module/_module.h"
+#include "../memory/_memory.h"
+#include "../config/_config.h"
+#include "../log/_log_system.h"
+
 #include "static_module.h"
 
 #include <include/mpack/mpack.h>
@@ -102,41 +109,6 @@ const char *application_platform();
 const char *application_native_platform();
 
 window_t application_get_main_window();
-
-int cvar_init(struct api_v0 *api);
-
-void cvar_shutdown();
-
-void memsys_init(int scratch_buffer_size);
-
-void memsys_init_api(struct api_v0 *api);
-
-void memsys_shutdown();
-
-struct allocator *_memsys_main_allocator();
-
-struct allocator *_memsys_main_scratch_allocator();
-
-namespace api {
-    void api_init(struct allocator *allocator);
-
-    void api_shutdown();
-
-    struct api_v0 *api_get_v0();
-};
-
-void os_register_api(struct api_v0 *api);
-
-void log_register_api(struct api_v0 *api);
-
-int logdb_init_db(const char *log_dir,
-                  struct api_v0 *api);
-
-void log_init();
-
-void log_shutdown();
-
-void log_register_api(struct api_v0 *api);
 
 
 void application_quit() {
@@ -222,22 +194,18 @@ int _init_config(struct api_v0 *api) {
 extern void error_init(struct api_v0 *api);
 
 extern "C" void _init_core_modules() {
-    ADD_STATIC_PLUGIN(config);
-    ADD_STATIC_PLUGIN(application);
-    ADD_STATIC_PLUGIN(sdl);
+    ADD_STATIC_PLUGIN(os);
     ADD_STATIC_PLUGIN(machine);
-    ADD_STATIC_PLUGIN(developsystem);
     ADD_STATIC_PLUGIN(task);
+    ADD_STATIC_PLUGIN(developsystem);
     ADD_STATIC_PLUGIN(consoleserver);
 
     ADD_STATIC_PLUGIN(filesystem);
-
     ADD_STATIC_PLUGIN(resourcesystem);
 
 #ifdef CETECH_CAN_COMPILE
     ADD_STATIC_PLUGIN(resourcecompiler);
 #endif
-
 }
 
 int application_init(int argc,
@@ -245,40 +213,40 @@ int application_init(int argc,
     _G = {0};
     _G.args = (struct args) {.argc = argc, .argv = argv};
 
-    log_init();
-    memsys_init(4 * 1024 * 1024);
-    api::api_init(_memsys_main_allocator());
+    log::init();
+    memory::memsys_init(4 * 1024 * 1024);
+    api::init(memory::_memsys_main_allocator());
 
-    api_v0 *api = api::api_get_v0();
+    api_v0 *api = api::v0();
 
-    log_register_api(api);
+    log::register_api(api);
     error_init(api);
 
     api->register_api("app_api_v0", &api_v1);
 
-    memsys_init_api(api);
-    os_register_api(api);
+    memory::memsys_init_api(api);
+    os::init(api);
 
-    module_init(_memsys_main_allocator(), api);
-    cvar_init(api);
+    module::init(memory::_memsys_main_allocator(), api);
+    config::init(api);
 
-    logdb_init_db(".", api);
+    log::logdb_init_db(".", api);
 
     _init_core_modules();
     _init_static_modules();
 
-    module_call_init_api();
+    module::call_init_api();
     _init_api(api);
 
-    module_load_dirs("./bin");
+    module::load_dirs("./bin");
 
-    module_call_init_cvar();
+    module::call_init_cvar();
 
     if (!_init_config(api)) {
         return 0;
     };
 
-    module_call_init();
+    module::call_init();
 
     log_api_v0.set_wid_clb(task_api_v0.worker_id);
 
@@ -290,12 +258,13 @@ int application_init(int argc,
 int application_shutdown() {
     log_api_v0.debug(LOG_WHERE, "Shutdown");
 
-    module_call_shutdown();
-    cvar_shutdown();
-    module_shutdown();
-    api::api_shutdown();
-    memsys_shutdown();
-    log_shutdown();
+    module::call_shutdown();
+
+    config::shutdown();
+    module::shutdown();
+    api::shutdown();
+    memory::memsys_shutdown();
+    log::shutdown();
 
     return !_G.init_error;
 }
@@ -407,7 +376,7 @@ void application_start() {
         last_tick = now_ticks;
         frame_time_accum += dt;
 
-        module_call_update();
+        module::call_update();
         _G.game->update(dt);
 
         if (frame_time_accum >= frame_time) {
@@ -424,7 +393,7 @@ void application_start() {
         develop_api_v0.leave_scope(application_sd);
         develop_api_v0.push_record_float("engine.delta_time", dt);
 
-        module_call_after_update(dt);
+        module::call_after_update(dt);
         //thread_yield();
     }
 
@@ -450,17 +419,6 @@ const char *application_platform() {
 
 window_t application_get_main_window() {
     return _G.main_window;
-}
-
-
-void *application_get_module_api(int api) {
-
-    if (api == PLUGIN_EXPORT_API_ID) {
-        static struct module_api_v0 module = {0};
-        return &module;
-    }
-
-    return 0;
 }
 
 int main(int argc,

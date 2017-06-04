@@ -28,7 +28,7 @@ void *malloc_allocator_allocate(struct allocator *allocator,
     struct allocator_malloc *a = (struct allocator_malloc *) allocator;
 
     const uint32_t ts = size_with_padding(size, align);
-    struct Header *h = (struct Header *) memory_malloc(ts);
+    struct Header *h = (struct Header *) memory::malloc(ts);
 
     void *p = data_pointer(h, align);
     fill(h, p, ts);
@@ -49,9 +49,9 @@ void malloc_allocator_deallocate(struct allocator *allocator,
     struct Header *h = header(p);
     a->total_allocated -= h->size;
 
-    allocator_stop_trace_pointer(a->trace, MAX_MEM_TRACE, p);
+    memory::allocator_stop_trace_pointer(a->trace, MAX_MEM_TRACE, p);
 
-    memory_free(h);
+    memory::free(h);
 }
 
 uint32_t malloc_allocator_allocated_size(void *p) {
@@ -65,7 +65,7 @@ uint32_t malloc_allocator_total_allocated(struct allocator *allocator) {
 }
 
 struct allocator *malloc_allocator_create() {
-    struct allocator_malloc *m = (allocator_malloc *) memory_malloc(sizeof(struct allocator_malloc));
+    struct allocator_malloc *m = (allocator_malloc *) memory::malloc(sizeof(struct allocator_malloc));
 
     m->base = (struct allocator) {
             .allocate = malloc_allocator_allocate,
@@ -82,10 +82,10 @@ struct allocator *malloc_allocator_create() {
 void malloc_allocator_destroy(struct allocator *a) {
     struct allocator_malloc *m = (struct allocator_malloc *) a;
 
-    allocator_check_trace(m->trace, MAX_MEM_TRACE);
+    memory::allocator_check_trace(m->trace, MAX_MEM_TRACE);
 
     //CETECH_ASSERT_MSG("memory.malloc", m->total_allocated == 0, "%d bytes is not deallocate", m->total_allocated);
-    memory_free(m);
+    memory::free(m);
 }
 
 #endif //CETECH_ALLOCATOR_MALLOC_H

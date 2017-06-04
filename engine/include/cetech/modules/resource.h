@@ -92,6 +92,10 @@ typedef struct {
 
 //! Compilator api
 struct compilator_api {
+    const char* source_dir;
+    const char* build_dir;
+    const char* tmp_dir;
+
     //! Add dependency
     //! \param who_filname Source filename
     //! \param depend_on_filename Depend on this file

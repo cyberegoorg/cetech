@@ -100,7 +100,7 @@ void _update() {
 extern "C" void *machine_get_module_api(int api) {
 
     if (api == PLUGIN_EXPORT_API_ID) {
-        static struct module_api_v0 module = {0};
+        static struct module_export_api_v0 module = {0};
 
         module.init = _init;
         module.init_api = _init_api;

@@ -8,18 +8,14 @@ extern "C" {
 #endif
 
 //==============================================================================
-// Includes
-//==============================================================================
-
-//==============================================================================
 // Defines
 //==============================================================================
 
 //! Add static module
 //! \param name Plugin name
-#define ADD_STATIC_PLUGIN(name)                \
-    extern void* name ## _get_module_api(int);        \
-    module_add_static(name ## _get_module_api)
+#define ADD_STATIC_PLUGIN(name)                 \
+    extern void* name ## _get_module_api(int);  \
+    module::add_static(name ## _get_module_api)
 
 //==============================================================================
 // Enums
@@ -45,7 +41,7 @@ typedef void *(*get_api_fce_t)(int api);
 //==============================================================================
 
 //! Plugin expot api struct V0
-struct module_api_v0 {
+struct module_export_api_v0 {
 
     //! Init cvars
     //! \param Init cvars
@@ -81,46 +77,13 @@ struct module_api_v0 {
 // Interface
 //==============================================================================
 
-void module_init(struct allocator *allocator,
-                 struct api_v0 *api_v0);
+struct module_api_v0 {
+    //! Reload module by path
+    void (*module_reload)(const char *path);
 
-void module_shutdown();
-
-//! Add static modules
-//! \param fce get api module fce
-void module_add_static(get_api_fce_t fce);
-
-//! Load module from path
-//! \param path Plugin path
-void module_load(const char *path);
-
-//! Load module from dir
-//! \param path Plugin dir path
-void module_load_dirs(const char *path);
-
-//! Reload module by path
-void module_reload(const char *path);
-
-//! Reload all loaded modules
-void module_reload_all();
-
-//! Call update
-void module_call_update();
-
-//! Call init cvar
-void module_call_init_cvar();
-
-//! Call init api
-void module_call_init_api();
-
-//! Call init
-void module_call_init();
-
-//! Call shutdown
-void module_call_shutdown();
-
-//! Call after update
-void module_call_after_update(float dt);
+    //! Reload all loaded modules
+    void (*module_reload_all)();
+};
 
 #ifdef __cplusplus
 }

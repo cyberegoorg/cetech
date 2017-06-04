@@ -1,3 +1,6 @@
+#pragma clang diagnostic push
+#pragma ide diagnostic ignored "UnusedImportStatement"
+
 #include <stdio.h>
 #include <stdint.h>
 
@@ -38,28 +41,6 @@ void vlog(const enum log_level level,
         _G.handlers[i](level, tm, _G.get_wid_clb != NULL ? _G.get_wid_clb() : 0,
                        where, msg, _G.handlers_data[i]);
     }
-}
-
-void log_register_handler(log_handler_t handler,
-                          void *data) {
-    const char idx = _G.handlers_count++;
-
-    _G.handlers[idx] = handler;
-    _G.handlers_data[idx] = data;
-}
-
-void log_init() {
-    _G = (struct global) G_INIT;
-    log_register_handler(log_stdout_handler, NULL);
-}
-
-void log_shutdown() {
-    _G = (struct global) G_INIT;
-}
-
-
-void log_set_wid_clb(log_get_wid_clb_t get_wid_clb) {
-    _G.get_wid_clb = get_wid_clb;
 }
 
 
@@ -129,23 +110,52 @@ void log_debug(const char *where,
     va_end(args);
 }
 
-static struct log_api_v0 log_api_v0 = {
-        .set_wid_clb = log_set_wid_clb,
-        .register_handler = log_register_handler,
-        .info_va = log_info_va,
-        .info = log_info,
-        .warning_va = log_warning_va,
-        .warning = log_warning,
-        .error_va = log_error_va,
-        .error = log_error,
-        .debug_va = log_debug_va,
-        .debug = log_debug
-};
 
-#include "log_stdout_handler.inl"
+namespace log {
+    void log_register_handler(log_handler_t handler,
+                              void *data) {
+        const char idx = _G.handlers_count++;
+
+        _G.handlers[idx] = handler;
+        _G.handlers_data[idx] = data;
+    }
+
+    void init() {
+        _G = (struct global) G_INIT;
+        log_register_handler(log_stdout_handler, NULL);
+    }
+
+    void shutdown() {
+        _G = (struct global) G_INIT;
+    }
+
+
+    void set_wid_clb(log_get_wid_clb_t get_wid_clb) {
+        _G.get_wid_clb = get_wid_clb;
+    }
+
+    static struct log_api_v0 log_api_v0 = {
+            .set_wid_clb = log::set_wid_clb,
+            .register_handler = log::log_register_handler,
+            .info_va = log_info_va,
+            .info = log_info,
+            .warning_va = log_warning_va,
+            .warning = log_warning,
+            .error_va = log_error_va,
+            .error = log_error,
+            .debug_va = log_debug_va,
+            .debug = log_debug
+    };
+
+
+    void register_api(struct api_v0 *api) {
+        api->register_api("log_api_v0", &log_api_v0);
+    }
+
+}
+
 #include "log_db_handler.inl"
+#include "log_stdout_handler.inl"
 #include "log_nanomsg_handler.inl"
 
-void log_register_api(struct api_v0 *api) {
-    api->register_api("log_api_v0", &log_api_v0);
-}
+#pragma clang diagnostic pop

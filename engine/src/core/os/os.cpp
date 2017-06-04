@@ -99,26 +99,30 @@ struct hash_api_v0 hash_api = {
         .hash_murmur2_64 = hash_murmur2_64
 };
 
-void os_register_api(struct api_v0 *api) {
-    api->register_api("thread_api_v0", &thread_api);
-    api->register_api("window_api_v0", &window_api);
-    api->register_api("cpu_api_v0", &cpu_api);
-    api->register_api("object_api_v0", &object_api);
-    api->register_api("time_api_v0", &time_api);
-    api->register_api("path_v0", &path_api);
-    api->register_api("vio_api_v0", &vio_api);
-    api->register_api("process_api_v0", &process_api);
-    api->register_api("hash_api_v0", &hash_api);
+namespace os {
+
+    void init(struct api_v0 *api) {
+        api->register_api("thread_api_v0", &thread_api);
+        api->register_api("window_api_v0", &window_api);
+        api->register_api("cpu_api_v0", &cpu_api);
+        api->register_api("object_api_v0", &object_api);
+        api->register_api("time_api_v0", &time_api);
+        api->register_api("path_v0", &path_api);
+        api->register_api("vio_api_v0", &vio_api);
+        api->register_api("process_api_v0", &process_api);
+        api->register_api("hash_api_v0", &hash_api);
+    }
+
 }
 
 static void _init(struct api_v0 *api) {
     GET_API(api, log_api_v0);
 }
 
-extern "C" void *sdl_get_module_api(int api) {
+extern "C" void *os_get_module_api(int api) {
     switch (api) {
         case PLUGIN_EXPORT_API_ID: {
-            static struct module_api_v0 module = {0};
+            static struct module_export_api_v0 module = {0};
             module.init = _init;
             //module.init_api = _init_api;
             return &module;

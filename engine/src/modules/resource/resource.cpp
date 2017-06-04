@@ -25,6 +25,7 @@
 #include "include/mpack/mpack.h"
 
 #include "resource.h"
+#include "../../core/module/_module.h"
 
 
 IMPORT_API(memory_api_v0);
@@ -410,7 +411,7 @@ namespace resource {
     void reload(uint64_t type,
                 uint64_t *names,
                 size_t count) {
-        module_reload_all();
+//        reload_all();
 
         void *loaded_data[count];
         Map<resource_item_t> *resource_map = _get_resource_map(type);
@@ -582,7 +583,7 @@ namespace resource_module {
     extern "C" void *resourcesystem_get_module_api(int api) {
         switch (api) {
             case PLUGIN_EXPORT_API_ID: {
-                static struct module_api_v0 module = {0};
+                static struct module_export_api_v0 module = {0};
 
                 module.init = _init;
                 module.init_api = _init_api;

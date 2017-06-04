@@ -19,6 +19,7 @@
 
 #define MAX_PLUGINS 256
 #define MAX_PATH_LEN 256
+
 #define PLUGIN_PREFIX "module_"
 #define LOG_WHERE "module_system"
 
@@ -26,11 +27,9 @@
 // Globals
 //==============================================================================
 
-#define _G PluginSystemGlobals
-
-static struct PluginSystemGlobals {
+static struct ModuleSystemGlobals {
     get_api_fce_t get_module_api[MAX_PLUGINS];
-    struct module_api_v0 *module_api[MAX_PLUGINS];
+    struct module_export_api_v0 *module_api[MAX_PLUGINS];
     void *module_handler[MAX_PLUGINS];
     char used[MAX_PLUGINS];
     char path[MAX_PLUGINS][MAX_PATH_LEN];
@@ -53,25 +52,6 @@ void unload_object(void *so);
 void *load_function(void *so,
                     const char *name);
 
-void *module_get_engine_api(int api);
-
-void _callm_init(get_api_fce_t fce) {
-    struct module_api_v0 *api = (module_api_v0 *) fce(PLUGIN_EXPORT_API_ID);
-
-    if (api) {
-        CETECH_ASSERT("module", api->init != NULL);
-        api->init(&api_v0);
-    }
-}
-
-void _callm_shutdown(get_api_fce_t fce) {
-    struct module_api_v0 *api = (module_api_v0 *) fce(PLUGIN_EXPORT_API_ID);
-
-    if (api) {
-        CETECH_ASSERT("module", api->shutdown != NULL);
-        api->shutdown();
-    }
-}
 
 void _add(const char *path,
           get_api_fce_t fce,
@@ -84,7 +64,7 @@ void _add(const char *path,
 
         memcpy(_G.path[i], path, strlen(path));
 
-        module_api_v0 *api = (module_api_v0 *) fce(PLUGIN_EXPORT_API_ID);
+        module_export_api_v0 *api = (module_export_api_v0 *) fce(PLUGIN_EXPORT_API_ID);
 
         _G.module_api[i] = api;
         _G.get_module_api[i] = fce;
@@ -100,42 +80,15 @@ void _add(const char *path,
 // Interface
 //==============================================================================
 
-void module_add_static(get_api_fce_t fce) {
-    _add("__STATIC__", fce, NULL);
+namespace module {
+
+    void add_static(get_api_fce_t fce) {
+        _add("__STATIC__", fce, NULL);
 //    _callm_init(fce);
-}
-
-void module_load(const char *path) {
-    log_api_v0.info(LOG_WHERE, "Loading module %s", path);
-
-    void *obj = load_object(path);
-    if (obj == NULL) {
-        return;
     }
 
-    void *fce = load_function(obj, "get_module_api");
-    if (fce == NULL) {
-        return;
-    }
-
-    _add(path, (get_api_fce_t) fce, obj);
-//    _callm_init(fce);
-}
-
-void module_reload(const char *path) {
-    for (size_t i = 0; i < MAX_PLUGINS; ++i) {
-        if ((_G.module_handler[i] == NULL) ||
-            (strcmp(_G.path[i], path)) != 0) {
-            continue;
-        }
-
-        void *data = NULL;
-        struct module_api_v0 *api = _G.module_api[i];
-        if (api != NULL && api->reload_begin) {
-            data = api->reload_begin(&api_v0);
-        }
-
-        unload_object(_G.module_handler[i]);
+    void load(const char *path) {
+        log_api_v0.info(LOG_WHERE, "Loading module %s", path);
 
         void *obj = load_object(path);
         if (obj == NULL) {
@@ -147,156 +100,194 @@ void module_reload(const char *path) {
             return;
         }
 
-        _G.module_api[i] = api = (module_api_v0 *) ((get_api_fce_t) fce)(
-                PLUGIN_EXPORT_API_ID);
-        if (api != NULL && api->reload_end) {
-            api->reload_end(&api_v0, data);
-        }
+        _add(path, (get_api_fce_t) fce, obj);
+//    _callm_init(fce);
     }
-}
 
-void module_reload_all() {
-    for (size_t i = 0; i < MAX_PLUGINS; ++i) {
-        if (_G.module_handler[i] == NULL) {
-            continue;
-        }
+    void reload(const char *path) {
+        for (size_t i = 0; i < MAX_PLUGINS; ++i) {
+            if ((_G.module_handler[i] == NULL) ||
+                (strcmp(_G.path[i], path)) != 0) {
+                continue;
+            }
 
-        void *data = NULL;
-        struct module_api_v0 *api = _G.module_api[i];
-        if (api != NULL && api->reload_begin) {
-            data = api->reload_begin(&api_v0);
-        }
+            void *data = NULL;
+            struct module_export_api_v0 *api = _G.module_api[i];
+            if (api != NULL && api->reload_begin) {
+                data = api->reload_begin(&api_v0);
+            }
 
-        unload_object(_G.module_handler[i]);
+            unload_object(_G.module_handler[i]);
 
-        void *obj = load_object(_G.path[i]);
-        if (obj == NULL) {
-            return;
-        }
+            void *obj = load_object(path);
+            if (obj == NULL) {
+                return;
+            }
 
-        void *fce = load_function(obj, "get_module_api");
-        if (fce == NULL) {
-            return;
-        }
+            void *fce = load_function(obj, "get_module_api");
+            if (fce == NULL) {
+                return;
+            }
 
-        _G.module_api[i] = api = (module_api_v0 *) ((get_api_fce_t) fce)(
-                PLUGIN_EXPORT_API_ID);
-        if (api != NULL && api->reload_end) {
-            api->reload_end(&api_v0, data);
-        }
-    }
-}
-
-void *module_get_engine_api(int api) {
-    for (size_t i = 0; i < MAX_PLUGINS; ++i) {
-        if (!_G.used[i]) {
-            continue;
-        }
-
-        void *p_api = _G.get_module_api[i](api);
-        if (p_api != NULL) {
-            return p_api;
+            _G.module_api[i] = api = (module_export_api_v0 *) ((get_api_fce_t) fce)(
+                    PLUGIN_EXPORT_API_ID);
+            if (api != NULL && api->reload_end) {
+                api->reload_end(&api_v0, data);
+            }
         }
     }
 
-    return NULL;
-}
+    void reload_all() {
+        for (size_t i = 0; i < MAX_PLUGINS; ++i) {
+            if (_G.module_handler[i] == NULL) {
+                continue;
+            }
 
-void module_load_dirs(const char *path) {
-    ARRAY_T(pchar) files;
-    ARRAY_INIT(pchar, &files, memory_api_v0.main_scratch_allocator());
+            void *data = NULL;
+            struct module_export_api_v0 *api = _G.module_api[i];
+            if (api != NULL && api->reload_begin) {
+                data = api->reload_begin(&api_v0);
+            }
 
-    path_v0.list(path, 1, &files, memory_api_v0.main_scratch_allocator());
+            unload_object(_G.module_handler[i]);
 
-    for (int k = 0; k < ARRAY_SIZE(&files); ++k) {
-        const char *filename = path_v0.filename(ARRAY_AT(&files, k));
+            void *obj = load_object(_G.path[i]);
+            if (obj == NULL) {
+                return;
+            }
 
-        if (!strncmp(filename, PLUGIN_PREFIX, strlen(PLUGIN_PREFIX))) {
-            module_load(ARRAY_AT(&files, k));
+            void *fce = load_function(obj, "get_module_api");
+            if (fce == NULL) {
+                return;
+            }
+
+            _G.module_api[i] = api = (module_export_api_v0 *) ((get_api_fce_t) fce)(
+                    PLUGIN_EXPORT_API_ID);
+            if (api != NULL && api->reload_end) {
+                api->reload_end(&api_v0, data);
+            }
         }
     }
 
-    path_v0.list_free(&files, memory_api_v0.main_scratch_allocator());
-    ARRAY_DESTROY(pchar, &files);
-}
+    void *module_get_engine_api(int api) {
+        for (size_t i = 0; i < MAX_PLUGINS; ++i) {
+            if (!_G.used[i]) {
+                continue;
+            }
 
-void module_call_init() {
-    for (size_t i = 0; i < MAX_PLUGINS; ++i) {
-        if (!_G.used[i] || !_G.module_api[i]->init) {
-            continue;
+            void *p_api = _G.get_module_api[i](api);
+            if (p_api != NULL) {
+                return p_api;
+            }
         }
 
-        _G.module_api[i]->init(&api_v0);
+        return NULL;
     }
-}
 
-void module_call_init_cvar() {
-    struct config_api_v0 ConfigApiV0 = *(struct config_api_v0 *) api_v0.first(
-            "config_api_v0").api;
+    void load_dirs(const char *path) {
+        ARRAY_T(pchar) files;
+        ARRAY_INIT(pchar, &files, memory_api_v0.main_scratch_allocator());
 
-    for (size_t i = 0; i < MAX_PLUGINS; ++i) {
-        if (!_G.used[i]){
-            continue;
+        path_v0.list(path, 1, &files, memory_api_v0.main_scratch_allocator());
+
+        for (int k = 0; k < ARRAY_SIZE(&files); ++k) {
+            const char *filename = path_v0.filename(ARRAY_AT(&files, k));
+
+            if (!strncmp(filename, PLUGIN_PREFIX, strlen(PLUGIN_PREFIX))) {
+                load(ARRAY_AT(&files, k));
+            }
         }
 
-        if(!_G.module_api[i]->init_cvar) {
-            continue;
-        }
-        _G.module_api[i]->init_cvar(ConfigApiV0);
+        path_v0.list_free(&files, memory_api_v0.main_scratch_allocator());
+        ARRAY_DESTROY(pchar, &files);
     }
-}
 
-void module_call_shutdown() {
-    for (int i = MAX_PLUGINS - 1; i >= 0; --i) {
-        if (!_G.used[i] || !_G.module_api[i]->shutdown) {
-            continue;
+    void call_init() {
+        for (size_t i = 0; i < MAX_PLUGINS; ++i) {
+            if (!_G.used[i] || !_G.module_api[i]->init) {
+                continue;
+            }
+
+            _G.module_api[i]->init(&api_v0);
         }
-
-        _G.module_api[i]->shutdown();
     }
-}
 
-void module_call_update() {
-    for (size_t i = 0; i < MAX_PLUGINS; ++i) {
-        if (!_G.used[i] || !_G.module_api[i]->update) {
-            continue;
+    void call_init_cvar() {
+        struct config_api_v0 ConfigApiV0 = *(struct config_api_v0 *) api_v0.first(
+                "config_api_v0").api;
+
+        for (size_t i = 0; i < MAX_PLUGINS; ++i) {
+            if (!_G.used[i]) {
+                continue;
+            }
+
+            if (!_G.module_api[i]->init_cvar) {
+                continue;
+            }
+            _G.module_api[i]->init_cvar(ConfigApiV0);
         }
-
-        _G.module_api[i]->update();
     }
-}
 
-void module_call_init_api() {
-    for (size_t i = 0; i < MAX_PLUGINS; ++i) {
-        if (!_G.used[i] || !_G.module_api[i]->init_api) {
-            continue;
+    void call_shutdown() {
+        for (int i = MAX_PLUGINS - 1; i >= 0; --i) {
+            if (!_G.used[i] || !_G.module_api[i]->shutdown) {
+                continue;
+            }
+
+            _G.module_api[i]->shutdown();
         }
-
-        _G.module_api[i]->init_api(&api_v0);
     }
-}
 
-void module_call_after_update(float dt) {
-    for (size_t i = 0; i < MAX_PLUGINS; ++i) {
-        if (!_G.used[i] || !_G.module_api[i]->after_update) {
-            continue;
+    void call_update() {
+        for (size_t i = 0; i < MAX_PLUGINS; ++i) {
+            if (!_G.used[i] || !_G.module_api[i]->update) {
+                continue;
+            }
+
+            _G.module_api[i]->update();
         }
-
-        _G.module_api[i]->after_update(dt);
     }
-}
 
-void module_init(struct allocator *allocator,
-                 struct api_v0 *api) {
-    GET_API(api, memory_api_v0);
-    GET_API(api, path_v0);
-    GET_API(api, log_api_v0);
-    api_v0 = *api;
+    void call_init_api() {
+        for (size_t i = 0; i < MAX_PLUGINS; ++i) {
+            if (!_G.used[i] || !_G.module_api[i]->init_api) {
+                continue;
+            }
 
-    _G = {0};
+            _G.module_api[i]->init_api(&api_v0);
+        }
+    }
 
-}
+    void call_after_update(float dt) {
+        for (size_t i = 0; i < MAX_PLUGINS; ++i) {
+            if (!_G.used[i] || !_G.module_api[i]->after_update) {
+                continue;
+            }
 
-void module_shutdown() {
-    _G = {0};
+            _G.module_api[i]->after_update(dt);
+        }
+    }
+
+    static module_api_v0 module_api{
+            .module_reload = reload,
+            .module_reload_all = reload_all
+    };
+
+    void init(struct allocator *allocator,
+              struct api_v0 *api) {
+        GET_API(api, memory_api_v0);
+        GET_API(api, path_v0);
+        GET_API(api, log_api_v0);
+        api_v0 = *api;
+
+        api->register_api("module_api_v0", &module_api);
+
+        _G = {0};
+
+    }
+
+    void shutdown() {
+        _G = {0};
+    }
+
 }

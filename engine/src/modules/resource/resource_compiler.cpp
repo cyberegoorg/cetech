@@ -374,7 +374,7 @@ extern "C" {
 void *resourcecompiler_get_module_api(int api) {
 
     if (api == PLUGIN_EXPORT_API_ID) {
-        static struct module_api_v0 module = {0};
+        static struct module_export_api_v0 module = {0};
 
         module.init = _init;
         module.init_cvar = _init_cvar;
