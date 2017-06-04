@@ -1,8 +1,8 @@
 //! \defgroup Resource
 //! Resource system
 //! \{
-#ifndef CETECH_RESOURCE_TYPES_H
-#define CETECH_RESOURCE_TYPES_H
+#ifndef CETECH_RESOURCE_H
+#define CETECH_RESOURCE_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -14,7 +14,6 @@ extern "C" {
 
 #include <stddef.h>
 #include <stdint.h>
-
 
 struct vio;
 struct allocator;
@@ -269,28 +268,10 @@ struct resource_api_v0 {
                                   const char *platform);
 };
 
-//! Package API V!
-struct package_api_v0 {
-    //! Load package
-    //! \param name Package name
-    void (*load)(uint64_t name);
-
-    //! Unload package
-    //! \param name Package name
-    void (*unload)(uint64_t name);
-
-    //! Is package loaded
-    //! \param name Package name
-    int (*is_loaded)(uint64_t name);
-
-    //! Wait while not package loaded.
-    //! \param name Package name
-    void (*flush)(uint64_t name);
-};
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif //CETECH_RESOURCE_TYPES_H
+#endif //CETECH_RESOURCE_H
 //! |}

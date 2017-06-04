@@ -68,78 +68,78 @@ set(SOURCE_FILES
         ########################################################################
         # Core
         ########################################################################
-        engine/sources/core/api/api.cpp
-        engine/sources/core/log/log_system.cpp
-        engine/sources/core/os/os.cpp
-        engine/sources/core/os/stacktrace.cpp
-        engine/sources/core/yaml/yaml.cpp
-        engine/sources/core/module/module.cpp
-        engine/sources/core/config/config.cpp
-        engine/sources/core/memory/memory.cpp
-        engine/sources/core/machine/machine.cpp
-        engine/sources/core/machine_sdl2/sdl_mouse.cpp
-        engine/sources/core/machine_sdl2/sdl_keyboard.cpp
-        engine/sources/core/machine_sdl2/sdl_gamepad.cpp
-        engine/sources/core/machine_sdl2/sdl_machine.cpp
+        engine/src/core/api/api.cpp
+        engine/src/core/log/log_system.cpp
+        engine/src/core/os/os.cpp
+        engine/src/core/os/stacktrace.cpp
+        engine/src/core/yaml/yaml.cpp
+        engine/src/core/module/module.cpp
+        engine/src/core/config/config.cpp
+        engine/src/core/memory/memory.cpp
+        engine/src/core/machine/machine.cpp
+        engine/src/core/machine_sdl2/sdl_mouse.cpp
+        engine/src/core/machine_sdl2/sdl_keyboard.cpp
+        engine/src/core/machine_sdl2/sdl_gamepad.cpp
+        engine/src/core/machine_sdl2/sdl_machine.cpp
 
 
         ########################################################################
         # Modules
         ########################################################################
 
-        engine/sources/modules/luasys/luasys.c
-        engine/sources/modules/luasys/api/api_plugin.c
-        engine/sources/modules/luasys/api/api_keyboard.c
-        engine/sources/modules/luasys/api/api_log.c
-        engine/sources/modules/luasys/api/api_mouse.c
-        engine/sources/modules/luasys/api/api_gamepad.c
-        engine/sources/modules/luasys/api/api_application.c
-        engine/sources/modules/luasys/api/api_resouce_manager.c
-        engine/sources/modules/luasys/api/api_renderer.c
-        engine/sources/modules/luasys/api/api_world.c
-        engine/sources/modules/luasys/api/api_entity.c
-        engine/sources/modules/luasys/api/api_component.c
-        engine/sources/modules/luasys/api/api_transform.c
-        engine/sources/modules/luasys/api/api_vec2f.c
-        engine/sources/modules/luasys/api/api_vec3f.c
-        engine/sources/modules/luasys/api/api_vec4f.c
-        engine/sources/modules/luasys/api/api_quatf.c
-        engine/sources/modules/luasys/api/api_mat44f.c
-        engine/sources/modules/luasys/api/api_mesh.c
-        engine/sources/modules/luasys/api/api_material.c
-        engine/sources/modules/luasys/api/api_package.c
-        engine/sources/modules/luasys/api/api_level.c
-        engine/sources/modules/luasys/api/api_scenegraph.c
+        engine/src/modules/luasys/luasys.c
+        engine/src/modules/luasys/api/api_plugin.c
+        engine/src/modules/luasys/api/api_keyboard.c
+        engine/src/modules/luasys/api/api_log.c
+        engine/src/modules/luasys/api/api_mouse.c
+        engine/src/modules/luasys/api/api_gamepad.c
+        engine/src/modules/luasys/api/api_application.c
+        engine/src/modules/luasys/api/api_resouce_manager.c
+        engine/src/modules/luasys/api/api_renderer.c
+        engine/src/modules/luasys/api/api_world.c
+        engine/src/modules/luasys/api/api_entity.c
+        engine/src/modules/luasys/api/api_component.c
+        engine/src/modules/luasys/api/api_transform.c
+        engine/src/modules/luasys/api/api_vec2f.c
+        engine/src/modules/luasys/api/api_vec3f.c
+        engine/src/modules/luasys/api/api_vec4f.c
+        engine/src/modules/luasys/api/api_quatf.c
+        engine/src/modules/luasys/api/api_mat44f.c
+        engine/src/modules/luasys/api/api_mesh.c
+        engine/src/modules/luasys/api/api_material.c
+        engine/src/modules/luasys/api/api_package.c
+        engine/src/modules/luasys/api/api_level.c
+        engine/src/modules/luasys/api/api_scenegraph.c
 
-        engine/sources/modules/develop_system/console_server.cpp
-        engine/sources/modules/develop_system/develop_system.cpp
+        engine/src/modules/console_server/console_server.cpp
+        engine/src/modules/develop_system/develop_system.cpp
 
 
-        engine/sources/modules/resource/resource.cpp
-        engine/sources/modules/resource/resource_package.cpp
-        engine/sources/modules/resource/resource_compiler.cpp
+        engine/src/modules/resource/resource.cpp
+        engine/src/modules/resource/resource_package.cpp
+        engine/src/modules/resource/resource_compiler.cpp
 
-        engine/sources/modules/filesystem/filesystem.cpp
-        engine/sources/modules/component/component.cpp
-        engine/sources/modules/entity/entity.cpp
-        engine/sources/modules/world/world.cpp
-        engine/sources/modules/task/task.cpp
-        engine/sources/modules/level/level.cpp
+        engine/src/modules/filesystem/filesystem.cpp
+        engine/src/modules/component/component.cpp
+        engine/src/modules/entity/entity.cpp
+        engine/src/modules/world/world.cpp
+        engine/src/modules/task/task.cpp
+        engine/src/modules/level/level.cpp
 
-        engine/sources/modules/input/keyboard.cpp
-        engine/sources/modules/input/mouse.cpp
-        engine/sources/modules/input/gamepad.cpp
+        engine/src/modules/input/keyboard.cpp
+        engine/src/modules/input/mouse.cpp
+        engine/src/modules/input/gamepad.cpp
 
-        engine/sources/modules/renderer_bgfx/renderer.cpp
-        engine/sources/modules/renderer_bgfx/texture.cpp
-        engine/sources/modules/renderer_bgfx/shader.cpp
-        engine/sources/modules/renderer_bgfx/material.cpp
-        engine/sources/modules/renderer_bgfx/scene.cpp
-        engine/sources/modules/renderer_bgfx/mesh_renderer.cpp
+        engine/src/modules/renderer_bgfx/renderer.cpp
+        engine/src/modules/renderer_bgfx/texture.cpp
+        engine/src/modules/renderer_bgfx/shader.cpp
+        engine/src/modules/renderer_bgfx/material.cpp
+        engine/src/modules/renderer_bgfx/scene.cpp
+        engine/src/modules/renderer_bgfx/mesh_renderer.cpp
 
-        engine/sources/modules/transform/transform.cpp
-        engine/sources/modules/scenegraph/scenegraph.cpp
-        engine/sources/modules/camera/camera.cpp
+        engine/src/modules/transform/transform.cpp
+        engine/src/modules/scenegraph/scenegraph.cpp
+        engine/src/modules/camera/camera.cpp
         )
 
 ################################################################################
@@ -147,7 +147,7 @@ set(SOURCE_FILES
 ################################################################################
 set(MAIN_SOURCE_FILES
         ${SOURCE_FILES}
-        engine/sources/core/app/application.cpp)
+        engine/src/core/app/application.cpp)
 
 ################################################################################
 # Release sources

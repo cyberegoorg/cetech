@@ -1,6 +1,7 @@
 //==============================================================================
 // Includes
 //==============================================================================
+
 #include <include/luajit/lua.h>
 #include <include/luajit/lualib.h>
 #include <include/luajit/lauxlib.h>
@@ -15,12 +16,14 @@
 #include <cetech/core/hash.h>
 #include <cetech/core/module.h>
 #include <cetech/core/application.h>
+#include <cetech/core/log.h>
 
 #include <cetech/modules/develop.h>
 #include <cetech/modules/resource.h>
+#include <cetech/modules/console_server.h>
 #include <cetech/modules/luasys.h>
-#include <include/mpack/mpack.h>
 
+#include <include/mpack/mpack.h>
 
 IMPORT_API(resource_api_v0);
 IMPORT_API(cnsole_srv_api_v0);
@@ -28,9 +31,9 @@ IMPORT_API(vio_api_v0);
 IMPORT_API(log_api_v0);
 IMPORT_API(hash_api_v0);
 
+#include "matrix.h"
 #include "vectors.h"
 #include "quaternion.h"
-#include "matrix.h"
 
 //==============================================================================
 // Defines

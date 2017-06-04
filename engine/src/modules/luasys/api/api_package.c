@@ -7,6 +7,7 @@
 #include <cetech/modules/luasys.h>
 #include <cetech/core/hash.h>
 #include <cetech/core/api.h>
+#include <cetech/modules/package.h>
 
 #define API_NAME "Package"
 

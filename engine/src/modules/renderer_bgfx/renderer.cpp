@@ -5,18 +5,21 @@
 #include <cetech/celib/math_types.h>
 #include <cetech/celib/allocator.h>
 
-#include <cetech/modules/camera.h>
-#include "cetech/modules/renderer.h"
-#include <cetech/modules/develop.h>
 #include <cetech/core/application.h>
 #include <cetech/core/config.h>
 #include <cetech/core/module.h>
-#include <cetech/modules/world.h>
 #include <cetech/core/window.h>
 #include <cetech/core/api.h>
-#include <include/mpack/mpack.h>
 
+#include <cetech/modules/camera.h>
+#include "cetech/modules/renderer.h"
+#include <cetech/modules/develop.h>
+#include <cetech/modules/world.h>
+#include <cetech/modules/console_server.h>
+
+#include <include/mpack/mpack.h>
 #include "bgfx/c99/platform.h"
+
 #include "texture.h"
 #include "shader.h"
 #include "scene.h"

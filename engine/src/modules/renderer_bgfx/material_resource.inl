@@ -4,7 +4,6 @@
 #include <cetech/core/path.h>
 
 namespace material_resource {
-
     static const bgfx_program_handle_t null_program = {0};
 
     void *loader(struct vio *input,

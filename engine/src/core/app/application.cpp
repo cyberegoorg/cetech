@@ -4,21 +4,25 @@
 
 #include <unistd.h>
 
+#include <cetech/celib/allocator.h>
+#include <cetech/celib/eventstream.inl>
+
 #include <cetech/core/api.h>
 #include <cetech/core/hash.h>
 #include <cetech/core/config.h>
 #include <cetech/core/application.h>
-#include <cetech/celib/allocator.h>
-#include <cetech/modules/task.h>
 #include <cetech/core/window.h>
 #include <cetech/core/path.h>
 #include <cetech/core/time.h>
-#include <cetech/celib/eventstream.inl>
+
+
+#include <cetech/modules/task.h>
 #include <cetech/modules/resource.h>
 #include <cetech/modules/develop.h>
-
 #include <cetech/modules/luasys.h>
 #include <cetech/modules/renderer.h>
+#include <cetech/modules/package.h>
+#include <cetech/modules/console_server.h>
 
 #include "static_module.h"
 

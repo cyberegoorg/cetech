@@ -1,8 +1,8 @@
 //! \defgroup Develop
 //! Console server, develop system
 
-#ifndef CETECH_CONSOLE_SERVER_API_H
-#define CETECH_CONSOLE_SERVER_API_H
+#ifndef CETECH_DEVELOP_SYSTEM_H
+#define CETECH_DEVELOP_SYSTEM_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -14,33 +14,6 @@ extern "C" {
 
 #include <cetech/core/types.h>
 #include <cetech/celib/eventstream.inl>
-
-typedef struct mpack_node_t mpack_node_t;
-typedef struct mpack_writer_t mpack_writer_t;
-
-//==============================================================================
-// Typedefs
-//==============================================================================
-
-//! Console server command function
-typedef int (*console_server_command_t)(mpack_node_t,
-                                        mpack_writer_t *);
-
-//==============================================================================
-// Api
-//==============================================================================
-
-//! Console server API V0
-struct cnsole_srv_api_v0 {
-    //! Push begin signal to clients
-    void (*consolesrv_push_begin)();
-
-    //! Register consoleserver command
-    //! \param name Command name ex.: "lua.execute"
-    //! \param command Command fce
-    void (*consolesrv_register_command)(const char *name,
-                                        console_server_command_t command);
-};
 
 
 //==============================================================================
@@ -131,5 +104,5 @@ struct develop_api_v0 {
 }
 #endif
 
-#endif //CETECH_CONSOLE_SERVER_API_H
+#endif //CETECH_DEVELOP_SYSTEM_H
 // \}

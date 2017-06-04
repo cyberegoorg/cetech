@@ -85,7 +85,7 @@ def main():
         keep_trailing_newline=False
     )
 
-    p = os.path.join(ROOT_DIR, "engine", "sources", "engine", "**", "*_blob.yml")
+    p = os.path.join(ROOT_DIR, "engine", "src", "engine", "**", "*_blob.yml")
     for filename in glob.iglob(p, recursive=True):
         with open(filename) as f:
             data = yaml.load(f.read())

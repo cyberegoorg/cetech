@@ -1,5 +1,5 @@
-#ifndef CETECH_RESOURCE_H
-#define CETECH_RESOURCE_H
+#ifndef CETECH_RESOURCE_INTERNAL_H
+#define CETECH_RESOURCE_INTERNAL_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -7,51 +7,6 @@ extern "C" {
 
 #include <cetech/core/hash.h>
 #include <cetech/modules/resource.h>
-
-void resource_set_autoload(int enable);
-
-void resource_register_type(uint64_t type,
-                            resource_callbacks_t callbacks);
-
-void resource_load(void **loaded_data,
-                   uint64_t type,
-                   uint64_t *names,
-                   size_t count,
-                   int force);
-
-void resource_add_loaded(uint64_t type,
-                         uint64_t *names,
-                         void **resource_data,
-                         size_t count);
-
-void resource_load_now(uint64_t type,
-                       uint64_t *names,
-                       size_t count);
-
-void resource_unload(uint64_t type,
-                     uint64_t *names,
-                     size_t count);
-
-void resource_reload(uint64_t type,
-                     uint64_t *names,
-                     size_t count);
-
-void resource_reload_all();
-
-int resource_can_get(uint64_t type,
-                     uint64_t names);
-
-int resource_can_get_all(uint64_t type,
-                         uint64_t *names,
-                         size_t count);
-
-void *resource_get(uint64_t type,
-                   uint64_t names);
-
-int resource_type_name_string(char *str,
-                              size_t max_len,
-                              uint64_t type,
-                              uint64_t name);
 
 #ifdef CETECH_CAN_COMPILE
 
@@ -106,4 +61,4 @@ int package_is_loaded(uint64_t name);
 
 void package_flush(uint64_t name);
 
-#endif //CETECH_RESOURCE_H
+#endif //CETECH_RESOURCE_INTERNAL_H

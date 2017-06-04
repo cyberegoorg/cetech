@@ -12,6 +12,7 @@
 #include <cetech/modules/resource.h>
 #include <cetech/modules/develop.h>
 #include <cetech/core/hash.h>
+#include <cetech/modules/console_server.h>
 
 #include "include/mpack/mpack.h"
 #include "include/nanomsg/nn.h"
@@ -31,9 +32,6 @@ using namespace cetech;
 //==============================================================================
 
 #define LOG_WHERE "console_server"
-
-#define MAX_COMMANDS 256
-#define MAX_COMMAND_NAME_LEN 128
 
 
 //==============================================================================
