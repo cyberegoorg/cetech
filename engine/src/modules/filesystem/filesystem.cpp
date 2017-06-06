@@ -108,7 +108,8 @@ namespace filesystem {
     void listdir(uint64_t root,
                  const char *path,
                  const char *filter,
-                 string_array_t *files,
+                 char ***files,
+                 uint32_t *count,
                  struct allocator *allocator) {
 
         char fullm_path[MAX_PATH_LEN] = {0};
@@ -117,12 +118,13 @@ namespace filesystem {
             return;
         }
 
-        path_v0.list(fullm_path, 1, files, allocator);
+        path_v0.list(fullm_path, 1, files, count, allocator);
     }
 
-    void listdir_free(string_array_t *files,
+    void listdir_free(char **files,
+                      uint32_t count,
                       struct allocator *allocator) {
-        path_v0.list_free(files, allocator);
+        path_v0.list_free(files, count, allocator);
     }
 
 

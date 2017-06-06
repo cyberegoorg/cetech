@@ -185,21 +185,20 @@ namespace module {
     }
 
     void load_dirs(const char *path) {
-        ARRAY_T(pchar) files;
-        ARRAY_INIT(pchar, &files, memory_api_v0.main_scratch_allocator());
+        char** files = nullptr;
+        uint32_t files_count = 0;
 
-        path_v0.list(path, 1, &files, memory_api_v0.main_scratch_allocator());
+        path_v0.list(path, 1, &files, &files_count, memory_api_v0.main_scratch_allocator());
 
-        for (int k = 0; k < ARRAY_SIZE(&files); ++k) {
-            const char *filename = path_v0.filename(ARRAY_AT(&files, k));
+        for (int k = 0; k < files_count; ++k) {
+            const char *filename = path_v0.filename(files[k]);
 
             if (!strncmp(filename, PLUGIN_PREFIX, strlen(PLUGIN_PREFIX))) {
-                load(ARRAY_AT(&files, k));
+                load(files[k]);
             }
         }
 
-        path_v0.list_free(&files, memory_api_v0.main_scratch_allocator());
-        ARRAY_DESTROY(pchar, &files);
+        path_v0.list_free(files, files_count, memory_api_v0.main_scratch_allocator());
     }
 
     void call_init() {

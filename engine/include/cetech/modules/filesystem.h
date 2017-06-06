@@ -57,13 +57,15 @@ struct filesystem_api_v0 {
     void (*listdir)(uint64_t root,
                     const char *path,
                     const char *filter,
-                    string_array_t *files,
+                    char ***files,
+                    uint32_t *count,
                     struct allocator *allocator);
 
     //! Free list directory array
     //! \param files File array
     //! \param allocator Allocator
-    void (*listdir_free)(string_array_t *files,
+    void (*listdir_free)(char **files,
+                         uint32_t count,
                          struct allocator *allocator);
 
     //! Create directory in root

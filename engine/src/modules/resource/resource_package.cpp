@@ -211,10 +211,15 @@ void package_unload(uint64_t name) {
 
 int package_is_loaded(uint64_t name) {
     const uint64_t package_type = hash_api_v0.id64_from_str("package");
-    struct package_resource *package = (package_resource *) resource_api_v0.get(
+    package_resource *package = (package_resource *) resource_api_v0.get(
             package_type, name);
 
+    if( package == NULL) {
+        return 0;
+    }
+
     const uint32_t task_count = package->type_count;
+
     for (int i = 0; i < task_count; ++i) {
         if (!resource_api_v0.can_get_all(package_type(package)[i],
                                          &package_name(package)[package_offset(
