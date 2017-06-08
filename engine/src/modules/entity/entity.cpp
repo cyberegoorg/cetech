@@ -385,23 +385,23 @@ namespace entity_resource_compiler {
             ARRAY_T(yaml_node_t) *body = MAP_GET_PTR(array_yaml_node_t,
                                                      &output->component_body,
                                                      cid);
-            ARRAY_T(uint8_t) comp_data = {0};
-            ARRAY_INIT(uint8_t, &comp_data, memory_api_v0.main_allocator());
+
+            blob_v0* blob = blob_api_v0.create(memory_api_v0.main_allocator());
 
             for (int i = 0; i < cdata.ent_count; ++i) {
-                component_api_v0.compile(id, ARRAY_AT(body, i),
-                                         &comp_data);
+                component_api_v0.compile(id, ARRAY_AT(body, i), blob);
             }
 
-            cdata.size = ARRAY_SIZE(&comp_data);
+            cdata.size = blob->size(blob->inst);
 
             build->push(build->inst, (uint8_t *) &cdata, sizeof(cdata));
             build->push(build->inst, (uint8_t *) ARRAY_BEGIN(ent_arr),
                         sizeof(uint32_t) * cdata.ent_count);
-            build->push(build->inst, ARRAY_BEGIN(&comp_data),
-                        sizeof(uint8_t) * ARRAY_SIZE(&comp_data));
 
-            ARRAY_DESTROY(uint8_t, &comp_data);
+            build->push(build->inst, blob->data(blob->inst),
+                        sizeof(uint8_t) * blob->size(blob->inst));
+
+            blob_api_v0.destroy(blob);
         }
     }
 
@@ -510,8 +510,10 @@ namespace entity {
         return handler::alive(_G.entity_handler, entity.h);
     }
 
-    ARRAY_T(entity_t) *spawn_from_resource(world_t world,
-                                           void *resource) {
+    void spawn_from_resource(world_t world,
+                                           void *resource,
+                                           entity_t **entities,
+                                           uint32_t *entities_count) {
         struct entity_resource *res = (entity_resource *) resource;
 
         uint32_t idx = _new_spawned_array();
@@ -542,7 +544,8 @@ namespace entity {
 
         _map_spawned_array(root, idx);
 
-        return spawned;
+        *entities = ARRAY_BEGIN(spawned);
+        *entities_count = ARRAY_SIZE(spawned);
     }
 
     entity_t spawn(world_t world,
@@ -554,9 +557,12 @@ namespace entity {
             return (entity_t) {.h = 0};
         }
 
-        ARRAY_T(entity_t) *spawned = spawn_from_resource(world, res);
+        entity_t* entities = nullptr;
+        uint32_t entities_count = 0;
 
-        return spawned->data[0];
+        spawn_from_resource(world, res, &entities, &entities_count);
+
+        return entities[0];
     }
 
     void destroy(world_t world,

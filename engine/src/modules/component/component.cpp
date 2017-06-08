@@ -50,7 +50,7 @@ namespace component {
 
     int compile(uint64_t type,
                 yaml_node_t body,
-                ARRAY_T(uint8_t) *data) {
+                blob_v0 *data) {
 
         component_compiler_t compiler = map::get<component_compiler_t>(
                 _G.compiler_map, type, nullptr);

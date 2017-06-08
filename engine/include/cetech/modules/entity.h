@@ -59,9 +59,10 @@ struct entity_api_v0 {
     //! Spawn entity from resource data
     //! \param world World
     //! \param resource Resource data
-    //! \return Spawne entity array
-    ARRAY_T(entity_t) *(*spawn_from_resource)(world_t world,
-                                              void *resource);
+    void (*spawn_from_resource)(world_t world,
+                                void *resource,
+                                entity_t **entities,
+                                uint32_t *entities_count);
 
     //! Spawn entity
     //! \param world World

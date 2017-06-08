@@ -45,7 +45,8 @@ namespace {
     struct level_instance {
         entity_t level_entity;
         MAP_T(entity_t) spawned_entity_map;
-        ARRAY_T(entity_t) *spawned_entity;
+        entity_t *spawned_entity;
+        uint32_t spawned_entity_count;
     };
 
     ARRAY_PROTOTYPE_N(struct level_instance, level_instance);
@@ -175,7 +176,7 @@ int _level_resource_compiler(const char *filename,
 
     ARRAY_T(uint64_t) id;
     ARRAY_T(uint32_t) offset;
-    blob_v0* data = blob_api_v0.create(memory_api_v0.main_allocator());
+    blob_v0 *data = blob_api_v0.create(memory_api_v0.main_allocator());
 
     ARRAY_INIT(uint64_t, &id, memory_api_v0.main_allocator());
     ARRAY_INIT(uint32_t, &offset, memory_api_v0.main_allocator());
@@ -243,12 +244,10 @@ namespace level {
         level_t level = _new_level(level_ent);
         struct level_instance *instance = _level_instance(level);
 
-        ARRAY_T(entity_t) *spawned = entity_api_v0.spawn_from_resource(world,
-                                                                       data);
-        instance->spawned_entity = spawned;
+        entity_api_v0.spawn_from_resource(world, data, &instance->spawned_entity, &instance->spawned_entity_count);
 
         for (int i = 0; i < res->entities_count; ++i) {
-            entity_t e = ARRAY_AT(spawned, offset[i]);
+            entity_t e = instance->spawned_entity[offset[i]];
             MAP_SET(entity_t, &instance->spawned_entity_map, id[i], e);
 
             if (transform_api_v0.has(world, e)) {
@@ -263,7 +262,7 @@ namespace level {
                  level_t level) {
         struct level_instance *instance = _level_instance(level);
 
-        entity_api_v0.destroy(world, &instance->spawned_entity->data[0], 1);
+        entity_api_v0.destroy(world, &instance->spawned_entity[0], 1);
         entity_api_v0.destroy(world, &instance->level_entity, 1);
     }
 

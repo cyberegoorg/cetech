@@ -14,13 +14,14 @@ extern "C" {
 //==============================================================================
 
 #include <cetech/celib/math_types.h>
-#include <cetech/core/yaml.h>
 
 struct stringid64_s;
 
 typedef struct world_s world_t;
 typedef struct entity_s entity_t;
 typedef struct yaml_node_s yaml_node_t;
+
+struct blob_v0;
 
 enum property_type {
     PROPERTY_INVALID = 0,
@@ -54,7 +55,7 @@ struct property_value {
 //! \param body Component body yaml
 //! \param data Compiled compoent data
 typedef int (*component_compiler_t)(yaml_node_t body,
-                                    ARRAY_T(uint8_t) *data);
+                                    struct blob_v0* data);
 
 //! Component destoryer
 //! \param world World where is component
@@ -123,7 +124,7 @@ struct component_api_v0 {
     //! \return 1 if compile is ok else 0
     int (*compile)(uint64_t type,
                              yaml_node_t body,
-                             ARRAY_T(uint8_t) *data);
+                             struct blob_v0* data);
 
     //! Get component spawn order
     //! \param type Component type

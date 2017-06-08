@@ -173,7 +173,7 @@ static void _destroy_world(world_t world) {
 }
 
 int _transform_component_compiler(yaml_node_t body,
-                                  ARRAY_T(uint8_t) *data) {
+                                  blob_v0* data) {
 
     struct transform_data t_data;
 
@@ -194,8 +194,7 @@ int _transform_component_compiler(yaml_node_t body,
         yaml_node_free(rotation);
     };
 
-
-    ARRAY_PUSH(uint8_t, data, (uint8_t *) &t_data, sizeof(t_data));
+    data->push(data->inst, (uint8_t *) &t_data, sizeof(t_data));
 
     return 1;
 }

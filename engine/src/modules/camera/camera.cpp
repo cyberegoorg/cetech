@@ -124,7 +124,7 @@ namespace {
     }
 
     int _camera_component_compiler(yaml_node_t body,
-                                   ARRAY_T(uint8_t) *data) {
+                                  blob_v0 *data) {
 
         struct camera_data t_data;
 
@@ -132,7 +132,7 @@ namespace {
         YAML_NODE_SCOPE(far, body, "far", t_data.far = yaml_as_float(far););
         YAML_NODE_SCOPE(fov, body, "fov", t_data.fov = yaml_as_float(fov););
 
-        ARRAY_PUSH(uint8_t, data, (uint8_t *) &t_data, sizeof(t_data));
+        data->push(data->inst, (uint8_t *) &t_data, sizeof(t_data));
 
         return 1;
     }
