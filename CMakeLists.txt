@@ -87,7 +87,7 @@ set(SOURCE_FILES
         # Modules
         ########################################################################
 
-        engine/src/modules/luasys/luasys.c
+        engine/src/modules/luasys/luasys.cpp
         engine/src/modules/luasys/api/api_plugin.c
         engine/src/modules/luasys/api/api_keyboard.c
         engine/src/modules/luasys/api/api_log.c
@@ -140,7 +140,7 @@ set(SOURCE_FILES
         engine/src/modules/transform/transform.cpp
         engine/src/modules/scenegraph/scenegraph.cpp
         engine/src/modules/camera/camera.cpp
-        )
+        engine/src/core/blob/blob.cpp)
 
 ################################################################################
 # Main sources

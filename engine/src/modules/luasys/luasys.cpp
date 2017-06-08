@@ -2,9 +2,11 @@
 // Includes
 //==============================================================================
 
+extern "C" {
 #include <include/luajit/lua.h>
 #include <include/luajit/lualib.h>
 #include <include/luajit/lauxlib.h>
+}
 
 #include <cetech/celib/allocator.h>
 #include <cetech/celib/math_types.h>
@@ -18,12 +20,12 @@
 #include <cetech/core/application.h>
 #include <cetech/core/log.h>
 
-#include <cetech/modules/develop.h>
 #include <cetech/modules/resource.h>
 #include <cetech/modules/console_server.h>
 #include <cetech/modules/luasys.h>
 
 #include <include/mpack/mpack.h>
+#include <cetech/core/errors.h>
 
 IMPORT_API(resource_api_v0);
 IMPORT_API(cnsole_srv_api_v0);
@@ -81,7 +83,8 @@ static int require(lua_State *L) {
     const char *name = lua_tostring(L, 1);
     uint64_t name_hash = hash_api_v0.id64_from_str(name);
 
-    struct lua_resource *resource = resource_api_v0.get(_G.type_id, name_hash);
+    lua_resource *resource = (lua_resource *) resource_api_v0.get(_G.type_id,
+                                                                  name_hash);
 
     if (resource == NULL) {
         return 0;
@@ -167,10 +170,10 @@ static const struct game_callbacks _GameCallbacks = {
 };
 
 #define REGISTER_LUA_API(name, api) \
-    void _register_lua_##name##_api();\
+    void _register_lua_##name##_api(struct api_v0 *api);\
     _register_lua_##name##_api(api);
 
-static void _register_all_api(struct api_v0 *api) {
+extern "C" void _register_all_api(struct api_v0 *api) {
     REGISTER_LUA_API(log, api);
     REGISTER_LUA_API(module, api);
     REGISTER_LUA_API(keyboard, api);
@@ -361,7 +364,7 @@ int _lua_compiler(const char *filename,
 
         struct lua_resource resource = {
                 .version = 0,
-                .size = bc_len,
+                .size = (uint32_t) bc_len,
         };
 
         vio_api_v0.write(build_vio, &resource, sizeof(struct lua_resource), 1);
@@ -565,7 +568,8 @@ int luasys_execute_string(const char *str) {
 }
 
 void luasys_execute_resource(uint64_t name) {
-    struct lua_resource *resource = resource_api_v0.get(_G.type_id, name);
+    struct lua_resource *resource = (lua_resource *) resource_api_v0.get(
+            _G.type_id, name);
     char *data = (char *) (resource + 1);
 
     luaL_loadbuffer(_G.L, data, resource->size, "<unknown>");
@@ -612,7 +616,7 @@ void luasys_add_module_function(const char *module,
 
 static int _is_vec2f(lua_State *L,
                      int idx) {
-    vec2f_t *p = lua_touserdata(L, idx);
+    vec2f_t *p = (vec2f_t *) lua_touserdata(L, idx);
 
     return (p >= _G._temp_vec2f_buffer) &&
            (p < (_G._temp_vec2f_buffer + 1024));
@@ -620,27 +624,27 @@ static int _is_vec2f(lua_State *L,
 
 static int _is_vec3f(lua_State *L,
                      int idx) {
-    vec3f_t *p = lua_touserdata(L, idx);
+    vec3f_t *p = (vec3f_t *) lua_touserdata(L, idx);
     return (p >= _G._temp_vec3f_buffer) &&
            (p < (_G._temp_vec3f_buffer + 1024));
 }
 
 static int _is_vec4f(lua_State *L,
                      int idx) {
-    vec4f_t *p = lua_touserdata(L, idx);
+    vec4f_t *p = (vec4f_t *) lua_touserdata(L, idx);
     return (p >= _G._temp_vec4f_buffer) &&
            (p < (_G._temp_vec4f_buffer + 1024));
 }
 
 static int _is_quat(lua_State *L,
                     int idx) {
-    quatf_t *p = lua_touserdata(L, idx);
+    quatf_t *p = (quatf_t *) lua_touserdata(L, idx);
     return (p >= _G._temp_quat_buffer) && (p < (_G._temp_quat_buffer + 1024));
 }
 
 static int _is_mat44f(lua_State *L,
                       int idx) {
-    mat44f_t *p = lua_touserdata(L, idx);
+    mat44f_t *p = (mat44f_t *) lua_touserdata(L, idx);
     return (p >= _G._temp_mat44f_buffer) &&
            (p < (_G._temp_mat44f_buffer + 1024));
 }
@@ -983,7 +987,7 @@ void luasys_call_global(const char *func,
     lua_pop(_state, -1);
 }
 
-void *luasys_get_module_api(int api) {
+extern "C" void *luasys_get_module_api(int api) {
     switch (api) {
         case PLUGIN_EXPORT_API_ID: {
             static struct module_export_api_v0 module = {0};

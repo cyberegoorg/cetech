@@ -8,6 +8,7 @@
 #include "include/SDL2/SDL.h"
 
 #include <cetech/celib/array2.inl>
+#include <cetech/celib/array.inl>
 #include <cetech/core/path.h>
 #include <cetech/core/hash.h>
 #include <cetech/modules/task.h>

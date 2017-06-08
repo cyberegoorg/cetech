@@ -8,6 +8,9 @@
 #include <cetech/core/module.h>
 
 #include <cetech/core/machine.h>
+
+using namespace cetech;
+
 //==============================================================================
 // Defines
 //==============================================================================
@@ -39,18 +42,18 @@ void sdl_keyboard_shutdown() {
     _G = (struct G) {0};
 }
 
-void sdl_keyboard_process(struct eventstream *stream) {
+void sdl_keyboard_process(EventStream& stream) {
     const uint8_t *state = SDL_GetKeyboardState(NULL);
     struct keyboard_event keyboard_ev;
 
     for (uint32_t i = 0; i < KEY_MAX; ++i) {
         if (is_button_down(state[i], _G.state[i])) {
             keyboard_ev.keycode = i;
-            event_stream_push(stream, EVENT_KEYBOARD_DOWN, keyboard_ev);
+            eventstream::push(stream, EVENT_KEYBOARD_DOWN, keyboard_ev);
 
         } else if (is_button_up(state[i], _G.state[i])) {
             keyboard_ev.keycode = i;
-            event_stream_push(stream, EVENT_KEYBOARD_UP, keyboard_ev);
+            eventstream::push(stream, EVENT_KEYBOARD_UP, keyboard_ev);
 
         }
 

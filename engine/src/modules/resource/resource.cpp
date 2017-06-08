@@ -26,7 +26,8 @@
 
 #include "resource.h"
 #include "../../core/module/_module.h"
-
+#include <cetech/core/log.h>
+#include <cetech/core/errors.h>
 
 IMPORT_API(memory_api_v0);
 IMPORT_API(cnsole_srv_api_v0);

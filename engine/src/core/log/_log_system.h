@@ -2,6 +2,8 @@
 #define CETECH__LOG_SYSTEM_H
 
 
+#include <cetech/core/log.h>
+
 namespace log {
     void init();
 

@@ -7,6 +7,7 @@
 
 #include <cetech/celib/array2.inl>
 #include <cetech/core/path.h>
+#include <cetech/core/errors.h>
 
 using namespace cetech;
 

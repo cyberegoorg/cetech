@@ -5,7 +5,8 @@
 extern "C" {
 #endif
 
-#include "cetech/celib/array.inl"
+#include <stdint.h>
+#include <stddef.h>
 
 //==============================================================================
 // File Interface

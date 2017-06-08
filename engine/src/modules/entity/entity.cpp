@@ -27,6 +27,7 @@ IMPORT_API(path_v0);
 IMPORT_API(log_api_v0);
 IMPORT_API(vio_api_v0);
 IMPORT_API(hash_api_v0);
+IMPORT_API(blob_api_v0);
 
 using namespace cetech;
 
@@ -103,7 +104,7 @@ ARRAY_T(entity_t) *_get_spawned_array_by_idx(uint32_t idx) {
 ARRAY_T(entity_t) *_get_spawned_array(entity_t entity) {
     uint32_t idx = MAP_GET(uint32_t, &_G.spawned_map, entity.h, UINT32_MAX);
 
-    if(idx == UINT32_MAX) {
+    if (idx == UINT32_MAX) {
         return nullptr;
     }
 
@@ -251,8 +252,8 @@ namespace entity_resource_compiler {
     }
 
     void compile_entitity(yaml_node_t rootNode,
-                                 int parent,
-                                 struct entity_compile_output *output) {
+                          int parent,
+                          struct entity_compile_output *output) {
 
         uint32_t ent_id = output->ent_counter++;
 
@@ -347,26 +348,26 @@ namespace entity_resource_compiler {
     }
 
     void write_to_build(struct entity_compile_output *output,
-                        ARRAY_T(uint8_t) *build) {
+                        blob_v0 *build) {
         struct entity_resource res = {0};
         res.ent_count = (uint32_t) (output->ent_counter);
         res.comp_type_count = (uint32_t) ARRAY_SIZE(&output->component_type);
 
-        ARRAY_PUSH(uint8_t, build, (uint8_t *) &res,
-                   sizeof(struct entity_resource));
+        build->push(build->inst, &res, sizeof(struct entity_resource));
 
         //write parents
         for (int i = 0; i < res.ent_count; ++i) {
             uint32_t id = MAP_GET(uint32_t, &output->entity_parent, i,
                                   UINT32_MAX);
 
-            ARRAY_PUSH(uint8_t, build, (uint8_t *) &id, sizeof(id));
+            build->push(build->inst, &id, sizeof(id));
         }
 
         //write comp types
-        ARRAY_PUSH(uint8_t, build,
-                   (uint8_t *) ARRAY_BEGIN(&output->component_type),
-                   sizeof(uint64_t) * ARRAY_SIZE(&output->component_type));
+        build->push(build->inst,
+                    (uint8_t *) ARRAY_BEGIN(&output->component_type),
+                    sizeof(uint64_t) *
+                           ARRAY_SIZE(&output->component_type));
 
         //write comp data
         for (int j = 0; j < res.comp_type_count; ++j) {
@@ -394,11 +395,11 @@ namespace entity_resource_compiler {
 
             cdata.size = ARRAY_SIZE(&comp_data);
 
-            ARRAY_PUSH(uint8_t, build, (uint8_t *) &cdata, sizeof(cdata));
-            ARRAY_PUSH(uint8_t, build, (uint8_t *) ARRAY_BEGIN(ent_arr),
-                       sizeof(uint32_t) * cdata.ent_count);
-            ARRAY_PUSH(uint8_t, build, ARRAY_BEGIN(&comp_data),
-                       sizeof(uint8_t) * ARRAY_SIZE(&comp_data));
+            build->push(build->inst, (uint8_t *) &cdata, sizeof(cdata));
+            build->push(build->inst, (uint8_t *) ARRAY_BEGIN(ent_arr),
+                        sizeof(uint32_t) * cdata.ent_count);
+            build->push(build->inst, ARRAY_BEGIN(&comp_data),
+                        sizeof(uint8_t) * ARRAY_SIZE(&comp_data));
 
             ARRAY_DESTROY(uint8_t, &comp_data);
         }
@@ -406,7 +407,7 @@ namespace entity_resource_compiler {
 
     void compiler(yaml_node_t root,
                   const char *filename,
-                  ARRAY_T(uint8_t) *build,
+                  blob_v0 *build,
                   struct compilator_api *compilator_api) {
         struct entity_compile_output *output = create_output();
         compile_entity(output, root, filename, compilator_api);
@@ -427,16 +428,16 @@ namespace entity_resource_compiler {
         yaml_document_t h;
         yaml_node_t root = yaml_load_str(source_data, &h);
 
-        ARRAY_T(uint8_t) entity_data;
-        ARRAY_INIT(uint8_t, &entity_data, memory_api_v0.main_allocator());
 
-        compiler(root, filename, &entity_data, compilator_api);
+        blob_v0 *entity_data = blob_api_v0.create(memory_api_v0.main_allocator());
 
-        vio_api_v0.write(build_vio, &ARRAY_AT(&entity_data, 0), sizeof(uint8_t),
-                         ARRAY_SIZE(&entity_data));
+        compiler(root, filename, entity_data, compilator_api);
+
+        vio_api_v0.write(build_vio, entity_data->data(entity_data->inst), sizeof(uint8_t),
+                         entity_data->size(entity_data->inst));
 
 
-        ARRAY_DESTROY(uint8_t, &entity_data);
+        blob_api_v0.destroy(entity_data);
         return 1;
     }
 }
@@ -608,6 +609,7 @@ namespace entity_module {
         GET_API(api, path_v0);
         GET_API(api, vio_api_v0);
         GET_API(api, hash_api_v0);
+        GET_API(api, blob_api_v0);
 
 
         _G = {0};
@@ -621,7 +623,8 @@ namespace entity_module {
         resource_api_v0.register_type(_G.type, entity_resorce::callback);
 
 #ifdef CETECH_CAN_COMPILE
-        resource_api_v0.compiler_register(_G.type, entity_resource_compiler::_entity_resource_compiler);
+        resource_api_v0.compiler_register(_G.type,
+                                          entity_resource_compiler::_entity_resource_compiler);
 #endif
 
 

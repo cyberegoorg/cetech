@@ -4,12 +4,14 @@
 
 #include <include/SDL2/SDL.h>
 
-#include <cetech/celib/array.inl>
 #include <cetech/celib/eventstream.inl>
-#include <cetech/core/module.h>
 
+#include <cetech/core/module.h>
+#include <cetech/core/log.h>
 #include <cetech/core/application.h>
 #include <cetech/core/api.h>
+
+using namespace cetech;
 
 //==============================================================================
 // Keyboard part
@@ -19,7 +21,7 @@ extern int sdl_keyboard_init(struct api_v0 *api);
 
 extern void sdl_keyboard_shutdown();
 
-extern void sdl_keyboard_process(struct eventstream *stream);
+extern void sdl_keyboard_process(EventStream& stream);
 
 
 //==============================================================================
@@ -30,7 +32,7 @@ extern int sdl_mouse_init(struct api_v0 *api);
 
 extern void sdl_mouse_shutdown();
 
-extern void sdl_mouse_process(struct eventstream *stream);
+extern void sdl_mouse_process(EventStream& stream);
 
 //==============================================================================
 // Gamepad part
@@ -40,10 +42,10 @@ extern int sdl_gamepad_init(struct api_v0 *api);
 
 extern void sdl_gamepad_shutdown();
 
-extern void sdl_gamepad_process(struct eventstream *stream);
+extern void sdl_gamepad_process(EventStream& stream);
 
 extern void sdl_gamepad_process_event(SDL_Event *event,
-                                      struct eventstream *stream);
+                                      EventStream& stream);
 
 //==============================================================================
 // Defines
@@ -97,7 +99,7 @@ void _machine_shutdown_impl() {
     _G = (struct G) {0};
 }
 
-void _machine_process_impl(struct eventstream *stream) {
+void _machine_process_impl(EventStream& stream) {
     SDL_Event e;
 
     while (SDL_PollEvent(&e) > 0) {

@@ -4,7 +4,6 @@
 #include <memory.h>
 
 #include <cetech/core/errors.h>
-#include <cetech/celib/array.inl>
 #include <cetech/celib/array2.inl>
 
 #include <cetech/core/path.h>

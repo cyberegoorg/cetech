@@ -13,6 +13,7 @@
 #include <cetech/core/machine.h>
 #include <cetech/core/api.h>
 
+using namespace cetech;
 
 //==============================================================================
 // Defines
@@ -52,7 +53,7 @@ void sdl_mouse_shutdown() {
     _G = (struct G) {0};
 }
 
-void sdl_mouse_process(struct eventstream *stream) {
+void sdl_mouse_process(EventStream& stream) {
     int pos[2] = {0};
 
     uint32_t state = SDL_GetMouseState(&pos[0], &pos[1]);
@@ -76,7 +77,7 @@ void sdl_mouse_process(struct eventstream *stream) {
         event.pos.x = pos[0];
         event.pos.y = window_size[1] - pos[1];
 
-        event_stream_push(stream, EVENT_MOUSE_MOVE, event);
+        eventstream::push(stream, EVENT_MOUSE_MOVE, event);
     }
 
     for (uint32_t i = 0; i < MOUSE_BTN_MAX; ++i) {
@@ -84,10 +85,10 @@ void sdl_mouse_process(struct eventstream *stream) {
         event.button = i;
 
         if (is_button_down(curent_state[i], _G.state[i]))
-            event_stream_push(stream, EVENT_MOUSE_DOWN, event);
+            eventstream::push(stream, EVENT_MOUSE_DOWN, event);
 
         else if (is_button_up(curent_state[i], _G.state[i]))
-            event_stream_push(stream, EVENT_MOUSE_UP, event);
+            eventstream::push(stream, EVENT_MOUSE_UP, event);
 
         _G.state[i] = curent_state[i];
     }

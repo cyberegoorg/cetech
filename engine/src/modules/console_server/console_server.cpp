@@ -8,11 +8,13 @@
 #include <cetech/core/config.h>
 #include <cetech/core/module.h>
 #include <cetech/core/memory.h>
+#include <cetech/core/log.h>
 #include <cetech/celib/map2.inl>
 #include <cetech/modules/resource.h>
 #include <cetech/modules/develop.h>
 #include <cetech/core/hash.h>
 #include <cetech/modules/console_server.h>
+#include <cetech/core/errors.h>
 
 #include "include/mpack/mpack.h"
 #include "include/nanomsg/nn.h"

@@ -13,7 +13,6 @@ extern "C" {
 //==============================================================================
 
 #include <cetech/core/types.h>
-#include <cetech/celib/eventstream.inl>
 
 typedef struct mpack_node_t mpack_node_t;
 typedef struct mpack_writer_t mpack_writer_t;

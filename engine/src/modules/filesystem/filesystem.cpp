@@ -7,6 +7,7 @@
 #include <cetech/core/memory.h>
 #include <cetech/modules/filesystem.h>
 #include <cetech/core/config.h>
+#include <cetech/core/log.h>
 #include <cetech/modules/resource.h>
 #include <cetech/core/module.h>
 #include <cetech/core/api.h>

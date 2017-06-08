@@ -1,5 +1,3 @@
-
-
 #include <cetech/celib/allocator.h>
 #include <cetech/core/hash.h>
 #include <cetech/modules/world.h>

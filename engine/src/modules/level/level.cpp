@@ -26,6 +26,7 @@ IMPORT_API(transform_api_v0);
 IMPORT_API(memory_api_v0);
 IMPORT_API(vio_api_v0);
 IMPORT_API(hash_api_v0);
+IMPORT_API(blob_api_v0);
 
 //==============================================================================
 // Typedefs
@@ -96,7 +97,6 @@ void *level_resource_loader(struct vio *input,
     const int64_t size = vio_api_v0.size(input);
     char *data = CETECH_ALLOCATE(allocator, char, size);
     vio_api_v0.read(input, data, 1, size);
-
     return data;
 }
 
@@ -139,7 +139,7 @@ struct foreach_entities_data {
     struct compilator_api *capi;
     ARRAY_T(uint64_t) *id;
     ARRAY_T(uint32_t) *offset;
-    ARRAY_T(uint8_t) *data;
+    blob_v0 *data;
     struct entity_compile_output *output;
 };
 
@@ -175,19 +175,16 @@ int _level_resource_compiler(const char *filename,
 
     ARRAY_T(uint64_t) id;
     ARRAY_T(uint32_t) offset;
-    ARRAY_T(uint8_t) data;
+    blob_v0* data = blob_api_v0.create(memory_api_v0.main_allocator());
 
     ARRAY_INIT(uint64_t, &id, memory_api_v0.main_allocator());
     ARRAY_INIT(uint32_t, &offset, memory_api_v0.main_allocator());
-    ARRAY_INIT(uint8_t, &data, memory_api_v0.main_allocator());
 
     struct entity_compile_output *output = entity_api_v0.compiler_create_output();
-
-
     struct foreach_entities_data entity_data = {
             .id = &id,
             .offset = &offset,
-            .data = &data,
+            .data = data,
             .capi = compilator_api,
             .filename = filename,
             .output = output
@@ -206,13 +203,14 @@ int _level_resource_compiler(const char *filename,
                      ARRAY_SIZE(&id));
     vio_api_v0.write(build_vio, &ARRAY_AT(&offset, 0), sizeof(uint32_t),
                      ARRAY_SIZE(&offset));
-    vio_api_v0.write(build_vio, &ARRAY_AT(&data, 0), sizeof(uint8_t),
-                     ARRAY_SIZE(&data));
+
+    vio_api_v0.write(build_vio, data->data(data->inst), sizeof(uint8_t),
+                     data->size(data->inst));
 
     ARRAY_DESTROY(uint64_t, &id);
     ARRAY_DESTROY(uint32_t, &offset);
-    ARRAY_DESTROY(uint8_t, &data);
 
+    blob_api_v0.destroy(data);
     entity_api_v0.compiler_destroy_output(output);
 
     return 1;
@@ -302,6 +300,8 @@ namespace level_module {
         GET_API(api, transform_api_v0);
         GET_API(api, vio_api_v0);
         GET_API(api, hash_api_v0);
+        GET_API(api, blob_api_v0);
+
 
         _G = {0};
 

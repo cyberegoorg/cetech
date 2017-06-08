@@ -4,6 +4,7 @@
 #ifndef CETECH_COMPONENT_MANAGER_H
 #define CETECH_COMPONENT_MANAGER_H
 
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -13,6 +14,7 @@ extern "C" {
 //==============================================================================
 
 #include <cetech/celib/math_types.h>
+#include <cetech/core/yaml.h>
 
 struct stringid64_s;
 

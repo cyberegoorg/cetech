@@ -8,9 +8,9 @@
 #include <cetech/core/path.h>
 #include <cetech/core/memory.h>
 #include <cetech/core/module.h>
-
 #include <cetech/core/config.h>
 #include <cetech/core/api.h>
+#include <cetech/core/log.h>
 
 
 //==============================================================================

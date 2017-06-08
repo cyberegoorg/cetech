@@ -4,6 +4,8 @@
 #ifndef CETECH_ENTITY_MANAGER_H
 #define CETECH_ENTITY_MANAGER_H
 
+#include <cetech/core/blob.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -97,7 +99,7 @@ struct entity_api_v0 {
     //! \param output Output
     //! \param build Build
     void (*compiler_write_to_build)(struct entity_compile_output *output,
-                                    ARRAY_T(uint8_t) *build);
+                                    struct blob_v0 *build);
 
     //! Resource compile
     //! \param root Root yaml node
@@ -106,7 +108,7 @@ struct entity_api_v0 {
     //! \param compilator_api Compilator api
     void (*resource_compiler)(yaml_node_t root,
                               const char *filename,
-                              ARRAY_T(uint8_t) *build,
+                              struct blob_v0 *build,
                               struct compilator_api *compilator_api);
 
 #endif

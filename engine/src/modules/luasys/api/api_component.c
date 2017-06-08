@@ -1,5 +1,7 @@
 
 #include <cetech/celib/allocator.h>
+#include <cetech/celib/array.inl>
+
 #include <cetech/core/hash.h>
 #include <cetech/core/module.h>
 

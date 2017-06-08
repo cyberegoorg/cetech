@@ -15,6 +15,7 @@
 #include <cetech/core/cpu.h>
 
 #include "task_queue.h"
+#include <cetech/core/log.h>
 
 //==============================================================================
 // Defines
