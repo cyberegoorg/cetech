@@ -17,6 +17,7 @@
 #include <cetech/core/path.h>
 
 #include <cetech/modules/resource.h>
+#include <cetech/core/errors.h>
 
 #include "cetech/modules/renderer.h"
 #include "texture.h"
