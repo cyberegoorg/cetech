@@ -16,6 +16,10 @@
 
 #include "cetech/modules/transform.h"
 
+IMPORT_API(memory_api_v0);
+IMPORT_API(hash_api_v0);
+IMPORT_API(component_api_v0);
+
 using namespace cetech;
 
 struct transform_data {
@@ -52,8 +56,7 @@ static struct _G {
     Map<uint32_t> ent_map;
 } _G;
 
-IMPORT_API(memory_api_v0);
-IMPORT_API(hash_api_v0);
+
 
 #define hash_combine(a, b) ((a * 11)^(b))
 
@@ -174,8 +177,7 @@ static void _destroy_world(world_t world) {
 
 int _transform_component_compiler(yaml_node_t body,
                                   blob_v0* data) {
-
-    struct transform_data t_data;
+    transform_data t_data;
 
     YAML_NODE_SCOPE(scale, body, "scale",
                     t_data.scale = yaml_as_vec3f_t(scale););
@@ -222,7 +224,7 @@ static void _spawner(world_t world,
                      uint32_t *ents_parent,
                      size_t ent_count,
                      void *data) {
-    struct transform_data *tdata = (transform_data *) data;
+    transform_data *tdata = (transform_data *) data;
 
     for (int i = 0; i < ent_count; ++i) {
         transform_create(world,
@@ -306,8 +308,6 @@ struct property_value _get_property(world_t world,
 
     return (struct property_value) {.type= PROPERTY_INVALID};
 }
-
-IMPORT_API(component_api_v0);
 
 static void _init_api(struct api_v0 *api) {
     static struct transform_api_v0 _api = {0};

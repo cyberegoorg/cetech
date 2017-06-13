@@ -222,7 +222,10 @@ namespace cetech {
     template<typename T>
     inline
     void Array<T>::init(allocator *a) {
+        _data = nullptr;
         _allocator = a;
+        _size = 0;
+        _capacity = 0;
     }
 
     template<typename T>
@@ -231,6 +234,8 @@ namespace cetech {
         if (_data) {
             CETECH_DEALLOCATE(_allocator, _data);
             _data = nullptr;
+            _size = 0;
+            _capacity = 0;
         }
     }
 
