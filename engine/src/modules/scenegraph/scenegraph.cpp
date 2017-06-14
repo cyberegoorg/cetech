@@ -6,8 +6,8 @@
 #include <cetech/core/memory.h>
 #include <cetech/core/module.h>
 #include <cetech/core/api.h>
-#include <cetech/celib/array2.inl>
-#include <cetech/celib/map2.inl>
+#include <cetech/celib/array.inl>
+#include <cetech/celib/map.inl>
 
 #include <cetech/modules/world.h>
 #include <cetech/modules/entity.h>

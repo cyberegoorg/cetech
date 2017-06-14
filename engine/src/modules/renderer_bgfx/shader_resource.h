@@ -38,15 +38,13 @@ void _shader_resource_online(uint64_t name,
     bgfx_program_handle_t program = bgfx_create_program(vs_shader, fs_shader,
                                                         1);
 
-    MAP_SET(bgfx_program_handle_t, &_G.handler_map, name, program);
+    map::set(_G.handler_map, name, program);
 }
 
 void _shader_resource_offline(uint64_t name,
                               void *data) {
 
-    bgfx_program_handle_t program = MAP_GET(bgfx_program_handle_t,
-                                            &_G.handler_map, name,
-                                            null_program);
+    bgfx_program_handle_t program = map::get(_G.handler_map, name, null_program);
 
     if (program.idx == null_program.idx) {
         return;
@@ -54,7 +52,7 @@ void _shader_resource_offline(uint64_t name,
 
     bgfx_destroy_program(program);
 
-    MAP_REMOVE(bgfx_program_handle_t, &_G.handler_map, name);
+    map::remove(_G.handler_map, name);
 }
 
 void *_shader_resource_reloader(uint64_t name,

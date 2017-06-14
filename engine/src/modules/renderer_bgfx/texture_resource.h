@@ -28,15 +28,13 @@ void _texture_resource_online(uint64_t name,
     bgfx_texture_handle_t texture = bgfx_create_texture(mem, BGFX_TEXTURE_NONE,
                                                         0, NULL);
 
-    MAP_SET(bgfx_texture_handle_t, &_G.handler_map, name, texture);
+    map::set(_G.handler_map, name, texture);
 }
 
 
 void _texture_resource_offline(uint64_t name,
                                void *data) {
-    bgfx_texture_handle_t texture = MAP_GET(bgfx_texture_handle_t,
-                                            &_G.handler_map, name,
-                                            null_texture);
+    bgfx_texture_handle_t texture = map::get(_G.handler_map, name, null_texture);
 
     if (texture.idx == null_texture.idx) {
         return;

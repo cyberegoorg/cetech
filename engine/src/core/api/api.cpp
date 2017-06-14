@@ -2,7 +2,7 @@
 // Includes
 //==============================================================================
 
-#include <cetech/celib/map2.inl>
+#include <cetech/celib/map.inl>
 
 #include <cetech/core/path.h>
 #include <cetech/core/hash.h>
@@ -80,6 +80,7 @@ namespace api {
     }
 
     void shutdown() {
+        _G.api_map.destroy();
         _G = {0};
     }
 

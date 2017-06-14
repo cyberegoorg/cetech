@@ -5,8 +5,8 @@
 #include <bgfx/c99/bgfx.h>
 
 #include <cetech/celib/allocator.h>
-#include <cetech/celib/array2.inl>
-#include <cetech/celib/map2.inl>
+#include <cetech/celib/array.inl>
+#include <cetech/celib/map.inl>
 #include <cetech/celib/handler.inl>
 
 #include <cetech/core/hash.h>

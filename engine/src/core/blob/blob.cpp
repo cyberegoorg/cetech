@@ -1,6 +1,6 @@
 
 
-#include <cetech/celib/array2.inl>
+#include <cetech/celib/array.inl>
 
 #include <cetech/core/api.h>
 #include <cetech/core/module.h>

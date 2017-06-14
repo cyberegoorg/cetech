@@ -10,7 +10,7 @@
 #include <cetech/celib/container_types.inl>
 #include <cetech/celib/handler_types.inl>
 #include <cetech/celib/allocator.h>
-#include <cetech/celib/queue2.inl>
+#include <cetech/celib/queue.inl>
 
 struct allocator;
 

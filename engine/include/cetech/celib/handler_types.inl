@@ -7,8 +7,8 @@
 
 #include <stdint.h>
 
-#include <cetech/celib/queue2.inl>
-#include <cetech/celib/array2.inl>
+#include <cetech/celib/queue.inl>
+#include <cetech/celib/array.inl>
 #include <cetech/celib/allocator.h>
 #include <cetech/celib/container_types.inl>
 

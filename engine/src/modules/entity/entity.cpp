@@ -5,7 +5,7 @@
 #include <stdio.h>
 
 #include <cetech/celib/handler.inl>
-#include <cetech/celib/map2.inl>
+#include <cetech/celib/map.inl>
 
 #include <cetech/core/api.h>
 #include <cetech/core/module.h>
@@ -13,6 +13,7 @@
 #include <cetech/core/yaml.h>
 #include <cetech/core/hash.h>
 #include <cetech/core/path.h>
+#include <cetech/core/log.h>
 #include <cetech/core/vio.h>
 #include <cetech/core/config.h>
 
@@ -20,6 +21,7 @@
 #include <cetech/modules/world.h>
 #include <cetech/modules/entity.h>
 #include <cetech/modules/component.h>
+#include <cetech/core/errors.h>
 
 IMPORT_API(memory_api_v0);
 IMPORT_API(component_api_v0);

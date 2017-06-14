@@ -14,14 +14,13 @@
 #include <cetech/core/module.h>
 
 #include "cetech/modules/level.h"
-#include <cetech/celib/map.inl>
 #include <cetech/core/yaml.h>
 #include "level_blob.h"
 #include <cetech/core/hash.h>
 #include <cetech/core/api.h>
 #include <cetech/celib/container_types.inl>
-#include <cetech/celib/array2.inl>
-#include <cetech/celib/map2.inl>
+#include <cetech/celib/array.inl>
+#include <cetech/celib/map.inl>
 
 using namespace cetech;
 

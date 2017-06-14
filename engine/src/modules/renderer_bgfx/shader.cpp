@@ -14,18 +14,17 @@
 #include <cetech/core/path.h>
 #include <cetech/core/module.h>
 #include <cetech/core/api.h>
+#include <cetech/core/log.h>
 #include <cetech/core/vio.h>
 
 #include <cetech/modules/resource.h>
 #include <cetech/core/process.h>
 
+using namespace cetech;
+
 //==============================================================================
 // Structs
 //==============================================================================
-
-ARRAY_PROTOTYPE(bgfx_program_handle_t)
-
-MAP_PROTOTYPE(bgfx_program_handle_t)
 
 struct shader {
     uint64_t vs_size;
@@ -40,7 +39,7 @@ struct shader {
 
 #define _G ShaderResourceGlobals
 struct G {
-    MAP_T(bgfx_program_handle_t) handler_map;
+    Map<bgfx_program_handle_t> handler_map;
     uint64_t type;
 } _G = {0};
 
@@ -87,8 +86,7 @@ int shader_init(struct api_v0 *api) {
 
     _G.type = hash_api_v0.id64_from_str("shader");
 
-    MAP_INIT(bgfx_program_handle_t, &_G.handler_map,
-             memory_api_v0.main_allocator());
+    _G.handler_map.init(memory_api_v0.main_allocator());
 
     resource_api_v0.register_type(_G.type, shader_resource_callback);
 #ifdef CETECH_CAN_COMPILE
@@ -98,12 +96,10 @@ int shader_init(struct api_v0 *api) {
 }
 
 void shader_shutdown() {
-    MAP_DESTROY(bgfx_program_handle_t, &_G.handler_map);
-    _G = (struct G) {0};
+    _G = {0};
 }
 
 bgfx_program_handle_t shader_get(uint64_t name) {
     struct shader *resource = (shader *) resource_api_v0.get(_G.type, name);
-    return MAP_GET(bgfx_program_handle_t, &_G.handler_map, name,
-                   null_program);
+    return map::get(_G.handler_map, name, null_program);
 }

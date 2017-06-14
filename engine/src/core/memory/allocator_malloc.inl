@@ -5,6 +5,7 @@
 
 #include <cetech/core/log.h>
 #include <cetech/celib/allocator.h>
+#include <cetech/core/errors.h>
 
 #include "header.h"
 
@@ -84,7 +85,7 @@ void malloc_allocator_destroy(struct allocator *a) {
 
     memory::allocator_check_trace(m->trace, MAX_MEM_TRACE);
 
-    //CETECH_ASSERT_MSG("memory.malloc", m->total_allocated == 0, "%d bytes is not deallocate", m->total_allocated);
+    //CETECH_ASSERT("memory.malloc", m->total_allocated == 0);
     memory::free(m);
 }
 

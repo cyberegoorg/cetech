@@ -1,5 +1,5 @@
-#include <cetech/celib/array2.inl>
-#include <cetech/celib/map2.inl>
+#include <cetech/celib/array.inl>
+#include <cetech/celib/map.inl>
 #include <cetech/celib/mat44f.inl>
 
 #include <cetech/core/yaml.h>
@@ -33,8 +33,6 @@ using namespace cetech;
 
 #define LOG_WHERE "mesh_renderer"
 #define hash_combine(a, b) ((a * 11)^(b))
-
-ARRAY_PROTOTYPE(material_t)
 
 struct mesh_data {
     uint64_t scene;

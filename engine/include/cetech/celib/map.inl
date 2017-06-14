@@ -3,376 +3,446 @@
 // git+web: https://bitbucket.org/bitsquid/foundation
 //==============================================================================
 
-#ifndef CETECH_CONTAINERS_MAP_H
-#define CETECH_CONTAINERS_MAP_H
+#ifndef CETECH_MAP2_H
+#define CETECH_MAP2_H
 
-//==============================================================================
-// Includes
-//==============================================================================
-
+#include "container_types.inl"
 #include "array.inl"
 
-//==============================================================================
-// defines
-//==============================================================================
+namespace cetech {
 
-#define _MAP_END_OF_LIST 0xffffffffu
+    /// The map function stores its data in a "list-in-an-array" where
+    /// indices are used instead of pointers.
+    ///
+    /// When items are removed, the array-list is repacked to always keep
+    /// it tightly ordered.
 
-//==============================================================================
-// Shared macros
-//==============================================================================
+    namespace map {
+        /// Returns true if the specified key exists in the map.
+        template<typename T>
+        bool has(const Map<T> &h,
+                 uint64_t key);
 
-#define MAP_T(N) struct map_##N
-#define MAP_ENTRY_T(N) struct map_entry_##N
+        /// Returns the value stored for the specified key, or deffault if the key
+        /// does not exist in the map.
+        template<typename T>
+        const T &get(const Map<T> &h,
+                     uint64_t key,
+                     const T &deffault);
 
-#define MAP_INIT(N, h, a) map_init_##N(h, a)
-#define MAP_DESTROY(N, h) map_destroy_##N(h)
+        template<typename T>
+        T *get_ptr(Map<T> &h,
+                   uint64_t key);
 
-//==============================================================================
-// Map interface macros
-//==============================================================================
+        /// Sets the value for the key.
+        template<typename T>
+        void set(Map<T> &h,
+                 uint64_t key,
+                 const T &value);
 
-#define MAP_HAS(N, h, key)                map_has_##N(h, key)
-#define MAP_GET(N, h, key, deffault)      map_get_##N(h, key, deffault)
-#define MAP_GET_PTR(N, h, key)            map_get_ptr##N(h, key)
-#define MAP_SET(N, h, key, value)         map_set_##N(h, key, (value))
-#define MAP_REMOVE(N, h, key)             map_remove_##N(h, key)
-#define MAP_RESERVE(N, h, size)           map_reserve_##N(h, size)
-#define MAP_CLEAR(N, h)                   map_clear_##N(h)
-#define MAP_BEGIN(N, h)                   map_begin_##N(h)
-#define MAP_END(N, h)                     map_end_##N(h)
+        /// Removes the key from the map if it exists.
+        template<typename T>
+        void remove(Map<T> &h,
+                    uint64_t key);
 
-//==============================================================================
-// Multi-Map interface macros
-//==============================================================================
+        /// Resizes the map lookup table to the specified size.
+        /// (The table will grow automatically when 70 % full.)
+        template<typename T>
+        void reserve(Map<T> &h,
+                     uint32_t size);
 
-#define MULTIMAP_FIND_FIRST(N, h, key)    multimap_find_first_##N(h, key)
-#define MULTIMAP_FIND_NEXT(N, h, e)       multimap_find_next_##N(h, e)
-#define MULTIMAP_COUNT(N, h, key)         multimap_count_##N(h, key)
-#define MULTIMAP_GET(N, h, key, items)    multimap_get_##N(h, key, items)
-#define MULTIMAP_INSERT(N, h, key, value) multimap_insert_##N(h, key, value)
-#define MULTIMAP_REMOVE(N, h, key, e)     multimap_remove_##N(h, e)
-#define MULTIMAP_REMOVE_ALL(N, h, key)    multimap_remove_all_##N(h, key)
+        /// Remove all elements from the map.
+        template<typename T>
+        void clear(Map<T> &h);
 
-//==============================================================================
-// Structs
-//==============================================================================
+        /// Returns a pointer to the first entry in the map table, can be used to
+        /// efficiently iterate over the elements (in random order).
+        template<typename T>
+        const typename Map<T>::Entry *begin(const Map<T> &h);
 
-struct map_find_result {
-    uint32_t map_i;
-    uint32_t data_prev;
-    uint32_t data_i;
-};
+        template<typename T>
+        const typename Map<T>::Entry *end(const Map<T> &h);
+    }
 
-#define MAP_PROTOTYPE(T) MAP_PROTOTYPE_N(T, T)
-#define MAP_PROTOTYPE_N(T, N)                                                  \
-                                                                               \
-struct map_entry_##N {                                                         \
-    uint64_t key;                                                                   \
-    uint32_t next;                                                                  \
-    T value;                                                                   \
-};                                                                             \
-                                                                               \
-typedef struct map_entry_##N map_entry_t_##N;                                  \
-ARRAY_PROTOTYPE(map_entry_t_##N);                                              \
-struct map_##N {                                                               \
-    ARRAY_T(uint32_t) _hash;                                                        \
-    ARRAY_T(map_entry_t_##N) _data;                                            \
-};                                                                             \
-                                                                               \
-static void map_init_##N(MAP_T(N) *h, struct allocator *allocator) {       \
-    ARRAY_INIT(uint32_t, &h->_hash, allocator);                                     \
-    ARRAY_INIT(map_entry_t_##N, &h->_data, allocator);                         \
-}                                                                              \
-                                                                               \
-static void map_destroy_##N(MAP_T(N) *h) {                                     \
-    ARRAY_DESTROY(uint32_t, &h->_hash);                                             \
-    ARRAY_DESTROY(map_entry_t_##N, &h->_data);                                 \
-}                                                                              \
-                                                                               \
-                                                                               \
-static uint32_t _map_add_entry_##N(MAP_T(N) *h, uint64_t key) {                \
-    map_entry_t_##N e;                                                         \
-    e.key = key;                                                               \
-    e.next = _MAP_END_OF_LIST;                                                 \
-                                                                               \
-    uint32_t ei = ARRAY_SIZE(&h->_data);                                       \
-    ARRAY_PUSH_BACK(map_entry_t_##N, &h->_data, e);                            \
-                                                                               \
-    return ei;                                                                 \
-}                                                                              \
-                                                                               \
-static struct map_find_result _map_find_key_##N(MAP_T(N) *h, uint64_t key) {   \
-    struct map_find_result fr;                                                 \
-    fr.map_i = _MAP_END_OF_LIST;                                               \
-    fr.data_prev = _MAP_END_OF_LIST;                                           \
-    fr.data_i = _MAP_END_OF_LIST;                                              \
-                                                                               \
-    if (ARRAY_SIZE(&h->_hash) == 0)                                            \
-        return fr;                                                             \
-                                                                               \
-    fr.map_i = key % ARRAY_SIZE(&h->_hash);                                    \
-    fr.data_i = ARRAY_AT(&h->_hash, fr.map_i);                                 \
-    while (fr.data_i != _MAP_END_OF_LIST) {                                    \
-        if (ARRAY_AT(&h->_data, fr.data_i).key == key)                         \
-            return fr;                                                         \
-                                                                               \
-        fr.data_prev = fr.data_i;                                              \
-        fr.data_i = ARRAY_AT(&h->_data, fr.data_i).next;                       \
-    }                                                                          \
-                                                                               \
-    return fr;                                                                 \
-}                                                                              \
-                                                                               \
-static void _map_erase_##N(MAP_T(N) *h, const struct map_find_result *fr) {    \
-    if (fr->data_prev == _MAP_END_OF_LIST)                                     \
-        ARRAY_AT(&h->_hash, fr->map_i) = ARRAY_AT(&h->_data, fr->data_i).next; \
-    else                                                                       \
-        ARRAY_AT(&h->_data, fr->data_prev).next = ARRAY_AT(&h->_data,          \
-                                                           fr->data_i).next;   \
-                                                                               \
-    if (fr->data_i == ARRAY_SIZE(&h->_data) - 1) {                             \
-        ARRAY_POP_BACK(map_entry_t_##N, &h->_data);                            \
-        return;                                                                \
-    }                                                                          \
-                                                                               \
-    ARRAY_AT(&h->_data, fr->data_i) = ARRAY_AT(&h->_data,                      \
-                                               ARRAY_SIZE(&h->_data) - 1);     \
-                                                                               \
-    struct map_find_result last = _map_find_key_##N(h, ARRAY_AT(&h->_data, fr->data_i).key);\
-                                                                               \
-    if (last.data_prev != _MAP_END_OF_LIST)                                    \
-        ARRAY_AT(&h->_data, last.data_prev).next = fr->data_i;                 \
-    else                                                                       \
-        ARRAY_AT(&h->_hash, last.map_i) = fr->data_i;                          \
-    ARRAY_RESIZE(map_entry_t_##N, &h->_data, ARRAY_SIZE(&h->_data) - 1);       \
-}                                                                              \
-                                                                               \
-static struct map_find_result _map_find_entry_##N(                             \
-    MAP_T(N) *h,                                                               \
-    const map_entry_t_##N *e                                                   \
-) {                                                                            \
-    struct map_find_result fr;                                                 \
-    fr.map_i = _MAP_END_OF_LIST;                                               \
-    fr.data_prev = _MAP_END_OF_LIST;                                           \
-    fr.data_i = _MAP_END_OF_LIST;                                              \
-                                                                               \
-    if (ARRAY_SIZE(&h->_hash) == 0)                                            \
-        return fr;                                                             \
-                                                                               \
-    fr.map_i = e->key % ARRAY_SIZE(&h->_hash);                                 \
-    fr.data_i = ARRAY_AT(&h->_hash, fr.map_i);                                 \
-    while (fr.data_i != _MAP_END_OF_LIST) {                                    \
-        if (&ARRAY_AT(&h->_data, fr.data_i) == e)                              \
-            return fr;                                                         \
-                                                                               \
-        fr.data_prev = fr.data_i;                                              \
-        fr.data_i = ARRAY_AT(&h->_data, fr.data_i).next;                       \
-    }                                                                          \
-    return fr;                                                                 \
-}                                                                              \
-                                                                               \
-static uint32_t _map_find_or_fail_##N(MAP_T(N) *h, uint64_t key) {             \
-    return _map_find_key_##N(h, key).data_i;                                   \
-}                                                                              \
-                                                                               \
-static uint32_t _map_find_or_make_##N(MAP_T(N) *h, uint64_t key) {             \
-    const struct map_find_result fr = _map_find_key_##N(h, key);               \
-    if (fr.data_i != _MAP_END_OF_LIST)                                         \
-        return fr.data_i;                                                      \
-                                                                               \
-    uint32_t i = _map_add_entry_##N(h, key);                                   \
-    if (fr.data_prev == _MAP_END_OF_LIST)                                      \
-        ARRAY_AT(&h->_hash, fr.map_i) = i;                                     \
-    else                                                                       \
-        ARRAY_AT(&h->_data, fr.data_prev).next = i;                            \
-                                                                               \
-    return i;                                                                  \
-}                                                                              \
-                                                                               \
-static uint32_t _map_make_##N(MAP_T(N) *h, uint64_t key) {                     \
-    const struct map_find_result fr = _map_find_key_##N(h, key);               \
-    const uint32_t i = _map_add_entry_##N(h, key);                             \
-                                                                               \
-    if (fr.data_prev == _MAP_END_OF_LIST)                                      \
-        ARRAY_AT(&h->_hash, fr.map_i) = i;                                     \
-                                                                               \
-    else                                                                       \
-        ARRAY_AT(&h->_data, fr.data_prev).next = i;                            \
-                                                                               \
-    ARRAY_AT(&h->_data, i).next = fr.data_i;                                   \
-                                                                               \
-    return i;                                                                  \
-}                                                                              \
-                                                                               \
-static void _map_find_and_erase_##N(MAP_T(N) *h, uint64_t key) {               \
-    const struct map_find_result fr = _map_find_key_##N(h, key);               \
-    if (fr.data_i != _MAP_END_OF_LIST)                                         \
-        _map_erase_##N(h, &fr);                                                \
-}                                                                              \
-                                                                               \
-static void multimap_insert_##N(MAP_T(N) *h, uint64_t key, T value);           \
-                                                                               \
-static void _map_remap_##N(MAP_T(N) *h, uint32_t new_size) {                   \
-    MAP_T(N) nh;                                                               \
-    map_init_##N(&nh, h->_hash.allocator);                                     \
-                                                                               \
-    ARRAY_RESIZE(uint32_t, &nh._hash, new_size);                                    \
-    ARRAY_RESERVE(map_entry_t_##N, &nh._data, ARRAY_SIZE(&h->_data));          \
-                                                                               \
-    for (uint32_t i = 0; i < new_size; ++i)                                    \
-        ARRAY_AT(&nh._hash, i) = _MAP_END_OF_LIST;                             \
-                                                                               \
-    for (uint32_t i = 0; i < ARRAY_SIZE(&h->_data); ++i) {                     \
-        const map_entry_t_##N e = ARRAY_AT(&h->_data, i);                      \
-                                                                               \
-        multimap_insert_##N(&nh, e.key, e.value);                              \
-    }                                                                          \
-                                                                               \
-    MAP_T(N) empty;                                                            \
-    map_init_##N(&empty, h->_hash.allocator);                                  \
-                                                                               \
-    map_destroy_##N(h);                                                        \
-    memcpy(h, &nh, sizeof(MAP_T(N)));                                     \
-    memcpy(&nh, &empty, sizeof(MAP_T(N)));                                \
-}                                                                              \
-                                                                               \
-static int _map_full_##N(MAP_T(N) *h) {                                        \
-    const float max_load_factor = 0.7f;                                        \
-    return ARRAY_SIZE(&h->_data) >= ARRAY_SIZE(&h->_hash) * max_load_factor;   \
-}                                                                              \
-                                                                               \
-static void _map_grow_##N(MAP_T(N) *h) {                                       \
-    const uint32_t new_size = ARRAY_SIZE(&h->_data) * 2 + 10;                  \
-    _map_remap_##N(h, new_size);                                               \
-}                                                                              \
-                                                                               \
-static int map_has_##N(MAP_T(N) *h, uint64_t key) {                            \
-    return _map_find_or_fail_##N(h, key) != _MAP_END_OF_LIST;                  \
-}                                                                              \
-                                                                               \
-static T map_get_##N(MAP_T(N) *h, uint64_t key, T deffault) {                  \
-    const uint32_t i = _map_find_or_fail_##N(h, key);                          \
-    return i == _MAP_END_OF_LIST ? deffault : ARRAY_AT(&h->_data, i).value;    \
-}                                                                              \
-static T* map_get_ptr##N(MAP_T(N) *h, uint64_t key) {                          \
-    const uint32_t i = _map_find_or_fail_##N(h, key);                          \
-    return i == _MAP_END_OF_LIST ? NULL : &(ARRAY_AT(&h->_data, i).value);     \
-}                                                                              \
-                                                                               \
-static void map_set_##N(MAP_T(N) *h, uint64_t key, T value) {                  \
-    if (ARRAY_SIZE(&h->_hash) == 0)                                            \
-        _map_grow_##N(h);                                                      \
-                                                                               \
-    const uint32_t i = _map_find_or_make_##N(h, key);                          \
-    ARRAY_AT(&h->_data, i).value = value;                                      \
-                                                                               \
-    if (_map_full_##N(h))                                                      \
-        _map_grow_##N(h);                                                      \
-}                                                                              \
-                                                                               \
-static void map_remove_##N(MAP_T(N) *h, uint64_t key) {                        \
-    _map_find_and_erase_##N(h, key);                                           \
-}                                                                              \
-                                                                               \
-static void map_reserve_##N(MAP_T(N) *h, uint32_t size) {                      \
-    _map_remap_##N(h, size);                                                   \
-}                                                                              \
-                                                                               \
-static void map_clear_##N(MAP_T(N) *h) {                                       \
-    ARRAY_RESIZE(uint32_t, &h->_hash, 0);                                           \
-    ARRAY_RESIZE(map_entry_t_##N, &h->_data, 0);                               \
-}                                                                              \
-                                                                               \
-static const map_entry_t_##N *map_begin_##N(MAP_T(N) *h) {                     \
-    return ARRAY_BEGIN(&h->_data);                                             \
-}                                                                              \
-                                                                               \
-static const map_entry_t_##N *map_end_##N(MAP_T(N) *h) {                       \
-    return ARRAY_END(&h->_data);                                               \
-}                                                                              \
-                                                                               \
-static const map_entry_t_##N *multimap_find_first_##N(MAP_T(N) *h, uint64_t key) {\
-    const uint32_t i = _map_find_or_fail_##N(h, key);                          \
-    return i == _MAP_END_OF_LIST ? 0 : &ARRAY_AT(&h->_data, i);                \
-}                                                                              \
-                                                                               \
-static const map_entry_t_##N *multimap_find_next_##N(                          \
-    MAP_T(N) *h,                                                               \
-    const map_entry_t_##N *e                                                   \
-) {                                                                            \
-    uint32_t i = e->next;                                                      \
-    while (i != _MAP_END_OF_LIST) {                                            \
-        if (ARRAY_AT(&h->_data, i).key == e->key)                              \
-            return &ARRAY_AT(&h->_data, i);                                    \
-                                                                               \
-        i = ARRAY_AT(&h->_data, i).next;                                       \
-    }                                                                          \
-    return 0;                                                                  \
-}                                                                              \
-                                                                               \
-static uint32_t multimap_count_##N(MAP_T(N) *h, uint64_t key) {                \
-    uint32_t i = 0;                                                            \
-    const map_entry_t_##N *e = multimap_find_first_##N(h, key);                \
-    while (e) {                                                                \
-        ++i;                                                                   \
-        e = multimap_find_next_##N(h, e);                                      \
-    }                                                                          \
-    return i;                                                                  \
-}                                                                              \
-                                                                               \
-static void multimap_get_##N(MAP_T(N) *h, uint64_t key, ARRAY_T(N) *items) {   \
-    const map_entry_t_##N *e = multimap_find_first_##N(h, key);                \
-    while (e) {                                                                \
-        ARRAY_PUSH_BACK(N, items, e->value);                                   \
-        e = multimap_find_next_##N(h, e);                                      \
-    }                                                                          \
-}                                                                              \
-                                                                               \
-static void multimap_insert_##N(MAP_T(N) *h, uint64_t key, T value) {          \
-    if (ARRAY_SIZE(&h->_hash) == 0)                                            \
-        _map_grow_##N(h);                                                      \
-                                                                               \
-    const uint32_t i = _map_make_##N(h, key);                                  \
-    ARRAY_AT(&h->_data, i).value = value;                                      \
-                                                                               \
-    if (_map_full_##N(h))                                                      \
-        _map_grow_##N(h);                                                      \
-}                                                                              \
-                                                                               \
-static void multimap_remove_##N(MAP_T(N) *h, const map_entry_t_##N *e) {       \
-    const struct map_find_result fr = _map_find_entry_##N(h, e);               \
-    if (fr.data_i != _MAP_END_OF_LIST)                                         \
-        _map_erase_##N(h, &fr);                                                \
-}                                                                              \
-                                                                               \
-static void multimap_remove_all_##N(MAP_T(N) *h, uint64_t key) {               \
-    while (map_has_##N(h, key))                                                \
-        map_remove_##N(h, key);                                                \
-}                                                                              \
+    namespace multi_map {
+        /// Finds the first entry with the specified key.
+        template<typename T>
+        const typename Map<T>::Entry *find_first(const Map<T> &h,
+                                                 uint64_t key);
 
-MAP_PROTOTYPE_N(char*, pchar)
+        /// Finds the next entry with the same key as e.
+        template<typename T>
+        const typename Map<T>::Entry *find_next(const Map<T> &h,
+                                                const typename Map<T>::Entry *e);
 
-MAP_PROTOTYPE_N(void*, void)
+        /// Returns the number of entries with the key.
+        template<typename T>
+        uint32_t count(const Map<T> &h,
+                       uint64_t key);
 
-MAP_PROTOTYPE(char)
+        /// Returns all the entries with the specified key.
+        /// Use a TempAllocator for the array to avoid allocating memory.
+        template<typename T>
+        void get(const Map<T> &h,
+                 uint64_t key,
+                 Array<T> &items);
 
-MAP_PROTOTYPE(int)
+        /// Inserts the value as an aditional value for the key.
+        template<typename T>
+        void insert(Map<T> &h,
+                    uint64_t key,
+                    const T &value);
 
-MAP_PROTOTYPE(uint8_t)
+        /// Removes the specified entry.
+        template<typename T>
+        void remove(Map<T> &h,
+                    const typename Map<T>::Entry *e);
 
-MAP_PROTOTYPE(uint16_t)
+        /// Removes all entries with the specified key.
+        template<typename T>
+        void remove_all(Map<T> &h,
+                        uint64_t key);
+    }
 
-MAP_PROTOTYPE(uint32_t)
+    namespace map_internal {
+        const uint32_t END_OF_LIST = 0xffffffffu;
 
-MAP_PROTOTYPE(uint64_t)
+        struct FindResult {
+            uint32_t map_i;
+            uint32_t data_prev;
+            uint32_t data_i;
+        };
 
-MAP_PROTOTYPE(int8_t)
+        template<typename T>
+        uint32_t add_entry(Map<T> &h,
+                           uint64_t key) {
+            typename Map<T>::Entry e;
+            e.key = key;
+            e.next = END_OF_LIST;
+            uint32_t ei = array::size(h._data);
+            array::push_back(h._data, e);
+            return ei;
+        }
 
-MAP_PROTOTYPE(int16_t)
+        template<typename T>
+        FindResult find(const Map<T> &h,
+                        uint64_t key) {
 
-MAP_PROTOTYPE(int32_t)
+            FindResult fr;
+            fr.map_i = END_OF_LIST;
+            fr.data_prev = END_OF_LIST;
+            fr.data_i = END_OF_LIST;
 
-MAP_PROTOTYPE(int64_t)
+            if (array::size(h._hash) == 0)
+                return fr;
 
-#endif //CETECH_CONTAINERS_MAP_H
+            fr.map_i = key % array::size(h._hash);
+            fr.data_i = h._hash[fr.map_i];
+            while (fr.data_i != END_OF_LIST) {
+                if (h._data[fr.data_i].key == key)
+                    return fr;
+                fr.data_prev = fr.data_i;
+                fr.data_i = h._data[fr.data_i].next;
+            }
+            return fr;
+        }
+
+        template<typename T>
+        FindResult find(const Map<T> &h,
+                        const typename Map<T>::Entry *e) {
+            FindResult fr;
+            fr.map_i = END_OF_LIST;
+            fr.data_prev = END_OF_LIST;
+            fr.data_i = END_OF_LIST;
+
+            if (array::size(h._hash) == 0)
+                return fr;
+
+            fr.map_i = e->key % array::size(h._hash);
+            fr.data_i = h._hash[fr.map_i];
+            while (fr.data_i != END_OF_LIST) {
+                if (&h._data[fr.data_i] == e)
+                    return fr;
+                fr.data_prev = fr.data_i;
+                fr.data_i = h._data[fr.data_i].next;
+            }
+            return fr;
+        }
+
+        template<typename T>
+        uint32_t find_or_fail(const Map<T> &h,
+                              uint64_t key) {
+            return find(h, key).data_i;
+        }
+
+        template<typename T>
+        uint32_t find_or_make(Map<T> &h,
+                              uint64_t key) {
+            const FindResult fr = find(h, key);
+            if (fr.data_i != END_OF_LIST)
+                return fr.data_i;
+
+            uint32_t i = add_entry(h, key);
+            if (fr.data_prev == END_OF_LIST)
+                h._hash[fr.map_i] = i;
+            else
+                h._data[fr.data_prev].next = i;
+            return i;
+        }
+
+        template<typename T>
+        uint32_t make(Map<T> &h,
+                      uint64_t key) {
+            const FindResult fr = find(h, key);
+            const uint32_t i = add_entry(h, key);
+
+            if (fr.data_prev == END_OF_LIST)
+                h._hash[fr.map_i] = i;
+            else
+                h._data[fr.data_prev].next = i;
+
+            h._data[i].next = fr.data_i;
+            return i;
+        }
+
+        template<typename T>
+        void erase(Map<T> &h,
+                   const FindResult &fr) {
+            if (fr.data_prev == END_OF_LIST)
+                h._hash[fr.map_i] = h._data[fr.data_i].next;
+            else
+                h._data[fr.data_prev].next = h._data[fr.data_i].next;
+
+            if (fr.data_i == array::size(h._data) - 1) {
+                array::pop_back(h._data);
+                return;
+            }
+
+            h._data[fr.data_i] = h._data[array::size(h._data) - 1];
+            FindResult last = find(h, h._data[fr.data_i].key);
+
+            if (last.data_prev != END_OF_LIST)
+                h._data[last.data_prev].next = fr.data_i;
+            else
+                h._hash[last.map_i] = fr.data_i;
+        }
+
+
+        template<typename T>
+        void find_and_erase(Map<T> &h,
+                            uint64_t key) {
+            const FindResult fr = find(h, key);
+            if (fr.data_i != END_OF_LIST)
+                erase(h, fr);
+        }
+
+        template<typename T>
+        void rehash(Map<T> &h,
+                    uint32_t new_size) {
+            Map<T> nh(h._hash._allocator);
+            array::resize(nh._hash, new_size);
+            array::reserve(nh._data, array::size(h._data));
+            for (uint32_t i = 0; i < new_size; ++i)
+                nh._hash[i] = END_OF_LIST;
+            for (uint32_t i = 0; i < array::size(h._data); ++i) {
+                const typename Map<T>::Entry &e = h._data[i];
+                multi_map::insert(nh, e.key, e.value);
+            }
+
+            Map<T> empty(h._hash._allocator);
+            h.~Map<T>();
+            memcpy(&h, &nh, sizeof(Map<T>));
+            memcpy(&nh, &empty, sizeof(Map<T>));
+        }
+
+        template<typename T>
+        bool full(const Map<T> &h) {
+            const float max_load_factor = 0.7f;
+            return array::size(h._data) >=
+                   array::size(h._hash) * max_load_factor;
+        }
+
+        template<typename T>
+        void grow(Map<T> &h) {
+            const uint32_t new_size = array::size(h._data) * 2 + 10;
+            rehash(h, new_size);
+        }
+    }
+
+    namespace map {
+        template<typename T>
+        bool has(const Map<T> &h,
+                 uint64_t key) {
+            return map_internal::find_or_fail(h, key) !=
+                   map_internal::END_OF_LIST;
+        }
+
+        template<typename T>
+        const T &get(const Map<T> &h,
+                     uint64_t key,
+                     const T &deffault) {
+            const uint32_t i = map_internal::find_or_fail(h, key);
+            return i == map_internal::END_OF_LIST ? deffault
+                                                  : h._data[i].value;
+        }
+
+        template<typename T>
+        T *get_ptr(Map<T> &h,
+                   uint64_t key) {
+            const uint32_t i = map_internal::find_or_fail(h, key);
+            return i == map_internal::END_OF_LIST ? nullptr : &(h._data[i].value);
+        }
+
+        template<typename T>
+        void set(Map<T> &h,
+                 uint64_t key,
+                 const T &value) {
+            if (array::size(h._hash) == 0)
+                map_internal::grow(h);
+
+            const uint32_t i = map_internal::find_or_make(h, key);
+            h._data[i].value = value;
+            if (map_internal::full(h))
+                map_internal::grow(h);
+        }
+
+        template<typename T>
+        void remove(Map<T> &h,
+                    uint64_t key) {
+            map_internal::find_and_erase(h, key);
+        }
+
+        template<typename T>
+        void reserve(Map<T> &h,
+                     uint32_t size) {
+            map_internal::rehash(h, size);
+        }
+
+        template<typename T>
+        void clear(Map<T> &h) {
+            array::clear(h._data);
+            array::clear(h._hash);
+        }
+
+        template<typename T>
+        const typename Map<T>::Entry *begin(const Map<T> &h) {
+            return array::begin(h._data);
+        }
+
+        template<typename T>
+        const typename Map<T>::Entry *end(const Map<T> &h) {
+            return array::end(h._data);
+        }
+    }
+
+    namespace multi_map {
+        template<typename T>
+        const typename Map<T>::Entry *find_first(const Map<T> &h,
+                                                 uint64_t key) {
+            const uint32_t i = map_internal::find_or_fail(h, key);
+            return i == map_internal::END_OF_LIST ? 0 : &h._data[i];
+        }
+
+        template<typename T>
+        const typename Map<T>::Entry *find_next(const Map<T> &h,
+                                                const typename Map<T>::Entry *e) {
+            uint32_t i = e->next;
+            while (i != map_internal::END_OF_LIST) {
+                if (h._data[i].key == e->key)
+                    return &h._data[i];
+                i = h._data[i].next;
+            }
+            return 0;
+        }
+
+        template<typename T>
+        uint32_t count(const Map<T> &h,
+                       uint64_t key) {
+            uint32_t i = 0;
+            const typename Map<T>::Entry *e = find_first(h, key);
+            while (e) {
+                ++i;
+                e = find_next(h, e);
+            }
+            return i;
+        }
+
+        template<typename T>
+        void get(const Map<T> &h,
+                 uint64_t key,
+                 Array<T> &items) {
+            const typename Map<T>::Entry *e = find_first(h, key);
+            while (e) {
+                array::push_back(items, e->value);
+                e = find_next(h, e);
+            }
+        }
+
+        template<typename T>
+        void insert(Map<T> &h,
+                    uint64_t key,
+                    const T &value) {
+            if (array::size(h._hash) == 0)
+                map_internal::grow(h);
+
+            const uint32_t i = map_internal::make(h, key);
+            h._data[i].value = value;
+            if (map_internal::full(h))
+                map_internal::grow(h);
+        }
+
+        template<typename T>
+        void remove(Map<T> &h,
+                    const typename Map<T>::Entry *e) {
+            const map_internal::FindResult fr = map_internal::find(h, e);
+            if (fr.data_i != map_internal::END_OF_LIST)
+                map_internal::erase(h, fr);
+        }
+
+        template<typename T>
+        void remove_all(Map<T> &h,
+                        uint64_t key) {
+            while (map::has(h, key))
+                map::remove(h, key);
+        }
+    }
+
+    template<typename T>
+    Map<T>::Map() {}
+
+//    template<typename T>
+//    Map<T>::Map(const Map<T> &other) {
+//        _data = other._data;
+//        _hash = other._hash;
+//    }
+//
+//    template<typename T>
+//    Map<T> &Map<T>::operator=(const Map<T> &other) {
+//        _data = other._data;
+//        _hash = other._hash;
+//
+//        return *this;
+//    }
+
+
+    template<typename T>
+    Map<T>::Map(allocator *a) :
+            _hash(a), _data(a) {}
+
+    template<typename T>
+    void Map<T>::init(allocator *a) {
+        _hash.init(a);
+        _data.init(a);
+    }
+
+    template<typename T>
+    void Map<T>::destroy() {
+        _hash.destroy();
+        _data.destroy();
+    }
+
+}
+
+
+
+#endif //CETECH_MAP2_H

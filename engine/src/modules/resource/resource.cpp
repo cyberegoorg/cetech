@@ -4,8 +4,8 @@
 
 
 #include <cetech/celib/container_types.inl>
-#include <cetech/celib/array2.inl>
-#include <cetech/celib/map2.inl>
+#include <cetech/celib/array.inl>
+#include <cetech/celib/map.inl>
 
 #include <cetech/core/hash.h>
 #include <cetech/core/application.h>

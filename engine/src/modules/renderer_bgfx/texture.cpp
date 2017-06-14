@@ -12,20 +12,18 @@
 #include <cetech/core/application.h>
 #include <cetech/core/module.h>
 #include <cetech/core/api.h>
+#include <cetech/core/log.h>
 #include <cetech/core/path.h>
 #include <cetech/core/vio.h>
 
 #include <cetech/modules/resource.h>
 #include <cetech/core/process.h>
 
+using namespace cetech;
 
 //==============================================================================
 // Structs
 //==============================================================================
-
-ARRAY_PROTOTYPE(bgfx_texture_handle_t)
-
-MAP_PROTOTYPE(bgfx_texture_handle_t)
 
 struct texture {
     uint64_t size;
@@ -38,7 +36,7 @@ struct texture {
 
 #define _G TextureResourceGlobals
 struct G {
-    MAP_T(bgfx_texture_handle_t) handler_map;
+    Map<bgfx_texture_handle_t> handler_map;
     uint64_t type;
 } _G = {0};
 
@@ -84,8 +82,7 @@ int texture_init(struct api_v0 *api) {
 
     _G.type = hash_api_v0.id64_from_str("texture");
 
-    MAP_INIT(bgfx_texture_handle_t, &_G.handler_map,
-             memory_api_v0.main_allocator());
+    _G.handler_map.init(memory_api_v0.main_allocator());
 
 #ifdef CETECH_CAN_COMPILE
     resource_api_v0.compiler_register(_G.type, _texture_resource_compiler);
@@ -97,14 +94,11 @@ int texture_init(struct api_v0 *api) {
 }
 
 void texture_shutdown() {
-    MAP_DESTROY(bgfx_texture_handle_t, &_G.handler_map);
-
-    _G = (struct G) {0};
+    _G = {0};
 }
 
 bgfx_texture_handle_t texture_get(uint64_t name) {
     resource_api_v0.get(_G.type, name); // TODO: only for autoload
 
-    return MAP_GET(bgfx_texture_handle_t, &_G.handler_map, name,
-                   null_texture);
+    return map::get(_G.handler_map, name, null_texture);
 }

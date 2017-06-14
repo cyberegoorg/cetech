@@ -7,7 +7,6 @@
 
 #include "include/SDL2/SDL.h"
 
-#include <cetech/celib/array2.inl>
 #include <cetech/celib/array.inl>
 #include <cetech/core/path.h>
 #include <cetech/core/hash.h>
@@ -17,6 +16,7 @@
 #include <cetech/modules/resource.h>
 #include <cetech/core/memory.h>
 #include <cetech/core/module.h>
+#include <cetech/core/log.h>
 #include <cetech/core/api.h>
 #include <cetech/core/vio.h>
 
@@ -45,8 +45,6 @@ struct compile_task_data {
     resource_compilator_t compilator;
     atomic_int completed;
 };
-
-ARRAY_PROTOTYPE_N(struct task_item, task_item);
 
 struct G {
     uint64_t compilator_map_type[MAX_TYPES]; // TODO: MAP

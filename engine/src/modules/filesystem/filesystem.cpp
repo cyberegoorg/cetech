@@ -11,7 +11,7 @@
 #include <cetech/modules/resource.h>
 #include <cetech/core/module.h>
 #include <cetech/core/api.h>
-#include <cetech/celib/map2.inl>
+#include <cetech/celib/map.inl>
 #include <cetech/core/vio.h>
 
 IMPORT_API(memory_api_v0);

@@ -5,7 +5,7 @@
 // Includes
 //==============================================================================
 
-#include "array2.inl"
+#include "array.inl"
 #include "cetech/core/types.h"
 
 struct event_header {

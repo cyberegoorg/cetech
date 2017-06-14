@@ -107,7 +107,6 @@ namespace memory {
     #include "allocator_malloc.inl"
 
 
-
     void memsys_init_api(struct api_v0 *api) {
         GET_API(api, log_api_v0);
 
@@ -134,8 +133,6 @@ namespace memory {
         scratch_allocator_destroy(_G.default_scratch_allocator);
         malloc_allocator_destroy(_G.default_allocator);
     }
-
-
 }
 
 

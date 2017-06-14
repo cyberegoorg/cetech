@@ -8,7 +8,7 @@
 #include "include/nanomsg/nn.h"
 #include "include/nanomsg/pubsub.h"
 
-#include <cetech/celib/map2.inl>
+#include <cetech/celib/map.inl>
 
 #include <cetech/core/thread.h>
 #include <cetech/celib/eventstream.inl>

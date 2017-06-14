@@ -6,7 +6,6 @@
 
 #include <cetech/celib/allocator.h>
 #include <cetech/core/yaml.h>
-#include <cetech/celib/array.inl>
 
 #include <cetech/core/hash.h>
 #include <cetech/core/thread.h>
@@ -14,7 +13,7 @@
 #include <cetech/core/module.h>
 #include <cetech/core/vio.h>
 #include <cetech/core/api.h>
-#include <cetech/celib/array2.inl>
+#include <cetech/celib/array.inl>
 
 #include <cetech/modules/task.h>
 #include <cetech/modules/resource.h>

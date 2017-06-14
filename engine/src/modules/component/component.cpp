@@ -3,7 +3,6 @@
 //==============================================================================
 
 #include <cetech/celib/map.inl>
-#include <cetech/celib/map2.inl>
 
 #include <cetech/core/memory.h>
 #include <cetech/core/config.h>
