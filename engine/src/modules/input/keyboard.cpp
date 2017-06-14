@@ -12,6 +12,8 @@
 #include <cetech/core/api.h>
 
 #include "keystr.h"
+#include <cetech/core/log.h>
+#include <cetech/core/errors.h>
 
 IMPORT_API(machine_api_v0);
 IMPORT_API(log_api_v0);

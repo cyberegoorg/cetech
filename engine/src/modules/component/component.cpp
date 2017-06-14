@@ -3,7 +3,6 @@
 //==============================================================================
 
 #include <cetech/celib/map.inl>
-#include <cetech/celib/map2.inl>
 
 #include <cetech/core/memory.h>
 #include <cetech/core/config.h>
@@ -50,7 +49,7 @@ namespace component {
 
     int compile(uint64_t type,
                 yaml_node_t body,
-                ARRAY_T(uint8_t) *data) {
+                blob_v0 *data) {
 
         component_compiler_t compiler = map::get<component_compiler_t>(
                 _G.compiler_map, type, nullptr);
@@ -111,10 +110,10 @@ namespace component {
     }
 
     void set_property(uint64_t type,
-                             world_t world,
-                             entity_t entity,
-                             uint64_t key,
-                             struct property_value value) {
+                      world_t world,
+                      entity_t entity,
+                      uint64_t key,
+                      struct property_value value) {
 
         struct component_clb clb = map::get(_G.component_clb,
                                             type, component_clb_null);
@@ -127,9 +126,9 @@ namespace component {
     }
 
     property_value get_property(uint64_t type,
-                                              world_t world,
-                                              entity_t entity,
-                                              uint64_t key) {
+                                world_t world,
+                                entity_t entity,
+                                uint64_t key) {
 
         struct property_value value = {PROPERTY_INVALID};
 
@@ -165,7 +164,7 @@ namespace component_module {
         GET_API(api_v0, world_api_v0);
 
 
-        _G =  {0};
+        _G = {0};
 
         _G.compiler_map.init(memory_api_v0.main_allocator());
         _G.spawn_order_map.init(memory_api_v0.main_allocator());

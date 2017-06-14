@@ -4,6 +4,7 @@
 #ifndef CETECH_COMPONENT_MANAGER_H
 #define CETECH_COMPONENT_MANAGER_H
 
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -19,6 +20,8 @@ struct stringid64_s;
 typedef struct world_s world_t;
 typedef struct entity_s entity_t;
 typedef struct yaml_node_s yaml_node_t;
+
+struct blob_v0;
 
 enum property_type {
     PROPERTY_INVALID = 0,
@@ -52,7 +55,7 @@ struct property_value {
 //! \param body Component body yaml
 //! \param data Compiled compoent data
 typedef int (*component_compiler_t)(yaml_node_t body,
-                                    ARRAY_T(uint8_t) *data);
+                                    struct blob_v0 *data);
 
 //! Component destoryer
 //! \param world World where is component
@@ -111,8 +114,8 @@ struct component_api_v0 {
     //! \param compiler Compiler fce
     //! \param spawn_order Spawn order number
     void (*register_compiler)(uint64_t type,
-                                        component_compiler_t compiler,
-                                        uint32_t spawn_order);
+                              component_compiler_t compiler,
+                              uint32_t spawn_order);
 
     //! Compile component
     //! \param type Component type
@@ -120,8 +123,8 @@ struct component_api_v0 {
     //! \param data Compiled data
     //! \return 1 if compile is ok else 0
     int (*compile)(uint64_t type,
-                             yaml_node_t body,
-                             ARRAY_T(uint8_t) *data);
+                   yaml_node_t body,
+                   struct blob_v0 *data);
 
     //! Get component spawn order
     //! \param type Component type
@@ -132,7 +135,7 @@ struct component_api_v0 {
     //! \param type Component type
     //! \param clb Callbacks
     void (*register_type)(uint64_t type,
-                                    struct component_clb clb);
+                          struct component_clb clb);
 
     //! Spawn components
     //! \param world World where component live
@@ -143,20 +146,20 @@ struct component_api_v0 {
     //! \param ent_count Entity count
     //! \param data Component data
     void (*spawn)(world_t world,
-                            uint64_t type,
-                            entity_t *ent_ids,
-                            uint32_t *cent,
-                            uint32_t *ents_parent,
-                            uint32_t ent_count,
-                            void *data);
+                  uint64_t type,
+                  entity_t *ent_ids,
+                  uint32_t *cent,
+                  uint32_t *ents_parent,
+                  uint32_t ent_count,
+                  void *data);
 
     //! Destroy components
     //! \param world World where component live
     //! \param ent Destroy component for this entities
     //! \param count Entities count
     void (*destroy)(world_t world,
-                              entity_t *ent,
-                              uint32_t count);
+                    entity_t *ent,
+                    uint32_t count);
 
     void (*set_property)(uint64_t type,
                          world_t world,

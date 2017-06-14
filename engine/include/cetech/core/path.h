@@ -5,7 +5,8 @@
 extern "C" {
 #endif
 
-#include "cetech/celib/array.inl"
+#include <stdint.h>
+#include <stddef.h>
 
 //==============================================================================
 // File Interface
@@ -24,13 +25,15 @@ struct path_v0 {
     //! \param allocator Allocator
     void (*list)(const char *path,
                  int recursive,
-                 struct array_pchar *files,
+                 char ***files,
+                 uint32_t *count,
                  struct allocator *allocator);
 
     //! Free list dir array
     //! \param files Files array
     //! \param allocator Allocator
-    void (*list_free)(struct array_pchar *files,
+    void (*list_free)(char **files,
+                      uint32_t count,
                       struct allocator *allocator);
 
     //! Create dir path

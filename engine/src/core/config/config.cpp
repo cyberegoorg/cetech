@@ -17,6 +17,7 @@
 #include <cetech/core/api.h>
 
 #include <cetech/modules/resource.h>
+#include <cstring>
 
 #include "_config.h"
 

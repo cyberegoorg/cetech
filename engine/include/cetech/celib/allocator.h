@@ -4,13 +4,19 @@
 #include <stdint.h>
 #include <stddef.h>
 
+#ifdef __cplusplus
+
+#include <new>
+
+#endif
+
 //==============================================================================
 // Defines
 //==============================================================================
 
 #define CETECH_SIZE_NOT_TRACKED 0xffffffffu
 
-#define allocator_allocate(a, s, align) (a)->allocate(a, s, align)
+#define allocator_allocate(a, s, align) ((a)->allocate(a, s, align))
 #define allocator_deallocate(a, p) (a)->deallocate(a, p)
 #define allocator_total_allocated(a) (a)->total_allocated(a)
 #define allocator_allocated_size(a, p) (a)->allocated_size(a, p)
@@ -18,6 +24,9 @@
 #define CETECH_ALLOCATE(a, T, size) (T*) allocator_allocate((a), sizeof(T) * size, CETECH_ALIGNOF(T))
 #define CETECH_ALLOCATE_ALIGN(a, T, size, align) (T*) allocator_allocate((a), size, align)
 #define CETECH_DEALLOCATE(a, p) allocator_deallocate((a), p)
+
+#define CETECH_NEW(a, T, ...)        (new ((char*)allocator_allocate((a), sizeof(T), CETECH_ALIGNOF(T))) T(__VA_ARGS__))
+#define CETECH_DELETE(a, T, p)    do {if (p) {(p)->~T(); CETECH_DEALLOCATE(a,p);}} while (0)
 
 //==============================================================================
 // Defines

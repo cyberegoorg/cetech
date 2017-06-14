@@ -2,7 +2,7 @@
 // Includes
 //==============================================================================
 
-#include <cetech/celib/array2.inl>
+#include <cetech/celib/array.inl>
 #include <cetech/celib/handler.inl>
 #include <cetech/core/memory.h>
 #include <cetech/core/config.h>

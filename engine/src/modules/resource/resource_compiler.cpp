@@ -7,7 +7,7 @@
 
 #include "include/SDL2/SDL.h"
 
-#include <cetech/celib/array2.inl>
+#include <cetech/celib/array.inl>
 #include <cetech/core/path.h>
 #include <cetech/core/hash.h>
 #include <cetech/modules/task.h>
@@ -16,6 +16,7 @@
 #include <cetech/modules/resource.h>
 #include <cetech/core/memory.h>
 #include <cetech/core/module.h>
+#include <cetech/core/log.h>
 #include <cetech/core/api.h>
 #include <cetech/core/vio.h>
 
@@ -44,8 +45,6 @@ struct compile_task_data {
     resource_compilator_t compilator;
     atomic_int completed;
 };
-
-ARRAY_PROTOTYPE_N(struct task_item, task_item);
 
 struct G {
     uint64_t compilator_map_type[MAX_TYPES]; // TODO: MAP
@@ -135,17 +134,18 @@ resource_compilator_t _find_compilator(uint64_t type) {
 }
 
 void _compile_dir(Array<task_item> &tasks,
-                  struct array_pchar *files,
                   const char *source_dir,
                   const char *build_dir_full) {
 
-    path_v0.list(source_dir, 1, files,
+    char **files = nullptr;
+    uint32_t files_count = 0;
+
+    path_v0.list(source_dir, 1, &files, &files_count,
                  memory_api_v0.main_scratch_allocator());
 
-    for (int i = 0; i < ARRAY_SIZE(files); ++i) {
-        const char *source_filename_full = ARRAY_AT(files, i);
-        const char *source_filename_short =
-                ARRAY_AT(files, i) + strlen(source_dir) + 1;
+    for (int i = 0; i < files_count; ++i) {
+        const char *source_filename_full = files[i];
+        const char *source_filename_short = files[i] + strlen(source_dir) + 1;
         const char *resource_type = path_v0.extension(
                 source_filename_short);
 
@@ -220,7 +220,9 @@ void _compile_dir(Array<task_item> &tasks,
 
         array::push_back(tasks, item);
     }
-    path_v0.list_free(files, memory_api_v0.main_scratch_allocator());
+
+    path_v0.list_free(files, files_count,
+                      memory_api_v0.main_scratch_allocator());
 }
 
 
@@ -302,18 +304,12 @@ void resource_compiler_compile_all() {
                                            CETECH_ARRAY_LEN(build_dir_full),
                                            app_api_v0.platform());
 
-    struct array_pchar files;
-    array_init_pchar(&files, memory_api_v0.main_scratch_allocator());
-
     Array<task_item> tasks(memory_api_v0.main_allocator());
 
     const char *dirs[] = {source_dir, core_dir};
     for (int i = 0; i < CETECH_ARRAY_LEN(dirs); ++i) {
-        array_resize_pchar(&files, 0);
-        _compile_dir(tasks, &files, dirs[i], build_dir_full);
+        _compile_dir(tasks, dirs[i], build_dir_full);
     }
-
-    array_destroy_pchar(&files);
 
     task_api_v0.add(tasks._data, tasks._size);
 

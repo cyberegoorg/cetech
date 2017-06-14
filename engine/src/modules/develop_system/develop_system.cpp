@@ -8,19 +8,21 @@
 #include "include/nanomsg/nn.h"
 #include "include/nanomsg/pubsub.h"
 
-#include <cetech/celib/map2.inl>
+#include <cetech/celib/map.inl>
 
 #include <cetech/core/thread.h>
 #include <cetech/celib/eventstream.inl>
 #include <cetech/core/memory.h>
 #include <cetech/core/config.h>
 #include <cetech/core/module.h>
+#include <cetech/core/log.h>
 
 #include <cetech/modules/task.h>
 #include <cetech/modules/develop.h>
 
 #include <cetech/core/api.h>
 #include <cetech/core/time.h>
+#include <cetech/core/errors.h>
 
 using namespace cetech;
 
@@ -35,13 +37,14 @@ using namespace cetech;
 //==============================================================================
 
 #define _G DevelopSystemGlobals
-#define developsys_push(type, event) _developsys_push((struct event_header*)(&event), type, sizeof(event))
+#define developsys_push(type, event) _developsys_push((struct develop_event_header*)(&event), type, sizeof(event))
 
-typedef void (*to_mpack_fce_t)(const struct event_header *event,
+typedef void (*to_mpack_fce_t)(const struct develop_event_header *event,
                                mpack_writer_t *writer);
 
+
 static struct G {
-    struct eventstream eventstream;
+    EventStream eventstream;
     Map<to_mpack_fce_t> to_mpack;
 
     cvar_t cv_pub_addr;
@@ -70,8 +73,7 @@ static void _flush_stream_buffer() {
 
     thread_api_v0.spin_lock(&_G.flush_lock);
 
-    array_push_uint8_t(&_G.eventstream.stream, _stream_buffer,
-                       _stream_buffer_size);
+    array::push(_G.eventstream, _stream_buffer, _stream_buffer_size);
     _stream_buffer_size = 0;
 
     thread_api_v0.spin_unlock(&_G.flush_lock);
@@ -111,7 +113,7 @@ static void _flush_all_streams() {
     }
 }
 
-void _developsys_push(struct event_header *header,
+void _developsys_push(struct develop_event_header *header,
                       uint32_t type,
                       uint64_t size) {
 
@@ -133,7 +135,7 @@ void _register_to_mpack(uint64_t type,
     map::set(_G.to_mpack, type, fce);
 }
 
-static void _scopeevent_to_mpack(const struct event_header *event,
+static void _scopeevent_to_mpack(const struct develop_event_header *event,
                                  mpack_writer_t *writer) {
     const struct scope_event *e = (const struct scope_event *) event;
 
@@ -160,7 +162,7 @@ static void _scopeevent_to_mpack(const struct event_header *event,
     mpack_finish_map(writer);
 }
 
-static void _recordfloat_to_mpack(const struct event_header *event,
+static void _recordfloat_to_mpack(const struct develop_event_header *event,
                                   mpack_writer_t *writer) {
     const struct record_float_event *e = (const struct record_float_event *) event;
 
@@ -178,7 +180,7 @@ static void _recordfloat_to_mpack(const struct event_header *event,
     mpack_finish_map(writer);
 }
 
-static void _recordint_to_mpack(const struct event_header *event,
+static void _recordint_to_mpack(const struct develop_event_header *event,
                                 mpack_writer_t *writer) {
     const struct record_int_event *e = (const struct record_int_event *) event;
 
@@ -199,10 +201,10 @@ static void _recordint_to_mpack(const struct event_header *event,
 void _send_events() {
     uint32_t event_num = 0;
 
-    struct event_header *event = eventstream_begin(&_G.eventstream);
-    while (event != eventstream_end(&_G.eventstream)) {
+    struct event_header *event = eventstream::begin(_G.eventstream);
+    while (event != eventstream::end(_G.eventstream)) {
         ++event_num;
-        event = eventstream_next(event);
+        event = eventstream::next(_G.eventstream, event);
     }
 
     char *data;
@@ -212,15 +214,17 @@ void _send_events() {
 
     mpack_start_array(&writer, event_num);
 
-    event = eventstream_begin(&_G.eventstream);
-    while (event != eventstream_end(&_G.eventstream)) {
-        to_mpack_fce_t to_mpack_fce = map::get<to_mpack_fce_t>(_G.to_mpack, event->type, NULL);
+    event = eventstream::begin(_G.eventstream);
+    while (event != eventstream::end(_G.eventstream)) {
+        to_mpack_fce_t to_mpack_fce = map::get<to_mpack_fce_t>(_G.to_mpack,
+                                                               event->type,
+                                                               NULL);
 
         if (to_mpack_fce != NULL) {
-            to_mpack_fce(event, &writer);
+            to_mpack_fce((const develop_event_header *) event, &writer);
         }
 
-        event = eventstream_next(event);
+        event = eventstream::next(_G.eventstream, event);
     }
 
     mpack_finish_array(&writer);
@@ -253,7 +257,7 @@ static void _after_update(float dt) {
         _G.time_accum = 0.0f;
     }
 
-    eventstream_clear(&_G.eventstream);
+    eventstream::clear(_G.eventstream);
 }
 
 void developsys_push_record_float(const char *name,
@@ -328,7 +332,7 @@ static void _init(struct api_v0 *api) {
 
     _G.to_mpack.init(memory_api_v0.main_allocator());
 
-    eventstream_create(&_G.eventstream, memory_api_v0.main_allocator());
+    _G.eventstream.init(memory_api_v0.main_allocator());
 
     _register_to_mpack(EVENT_SCOPE, _scopeevent_to_mpack);
     _register_to_mpack(EVENT_RECORD_FLOAT, _recordfloat_to_mpack);
@@ -341,7 +345,7 @@ static void _init(struct api_v0 *api) {
     int socket = nn_socket(AF_SP, NN_PUB);
     if (socket < 0) {
         log_api_v0.error(LOG_WHERE, "Could not create nanomsg socket: %s",
-                             nn_strerror(errno));
+                         nn_strerror(errno));
         //return 0;
     }
     addr = config_api_v0.get_string(_G.cv_pub_addr);
@@ -350,8 +354,8 @@ static void _init(struct api_v0 *api) {
 
     if (nn_bind(socket, addr) < 0) {
         log_api_v0.error(LOG_WHERE, "Could not bind socket to '%s': %s",
-                             addr,
-                             nn_strerror(errno));
+                         addr,
+                         nn_strerror(errno));
         //return 0;
     }
 
@@ -360,10 +364,10 @@ static void _init(struct api_v0 *api) {
 
 static void _shutdown() {
     log_api_v0.debug(LOG_WHERE, "Shutdown");
-    eventstream_destroy(&_G.eventstream);
+
     nn_close(_G.pub_socket);
 
-    _G = (G){0};
+    _G = (G) {0};
 }
 
 extern "C" void *developsystem_get_module_api(int api) {

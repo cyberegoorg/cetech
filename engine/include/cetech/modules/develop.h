@@ -4,6 +4,7 @@
 #ifndef CETECH_DEVELOP_SYSTEM_H
 #define CETECH_DEVELOP_SYSTEM_H
 
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -12,9 +13,13 @@ extern "C" {
 // Includes
 //==============================================================================
 
+#include <time.h>
 #include <cetech/core/types.h>
-#include <cetech/celib/eventstream.inl>
 
+struct develop_event_header {
+    uint32_t type;
+    uint64_t size;
+};
 
 //==============================================================================
 // Enums
@@ -34,21 +39,21 @@ enum {
 
 //! Record float event struct
 struct record_float_event {
-    struct event_header header; //!< Event header
+    struct develop_event_header header; //!< Event header
     char name[64];              //!< Entry name
     float value;                //!< Entry value
 };
 
 //! Record int event struct
 struct record_int_event {
-    struct event_header header; //!< Event header
+    struct develop_event_header header; //!< Event header
     char name[64];              //!< Entry name
     int32_t value;                  //!< Entry value
 };
 
 //! Scope event struct
 struct scope_event {
-    struct event_header header; //!< Event header
+    struct develop_event_header header; //!< Event header
     char name[64];              //!< Scope name
     time_t start;               //!< Scope create time
     float duration;             //!< Scope duration
@@ -74,7 +79,7 @@ struct develop_api_v0 {
     //! \param header Header
     //! \param type Event type
     //! \param size Event size
-    void (*push)(struct event_header *header,
+    void (*push)(struct develop_event_header *header,
                  uint32_t type,
                  uint64_t size);
 

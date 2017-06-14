@@ -195,6 +195,7 @@ extern void error_init(struct api_v0 *api);
 
 extern "C" void _init_core_modules() {
     ADD_STATIC_PLUGIN(os);
+    ADD_STATIC_PLUGIN(blob);
     ADD_STATIC_PLUGIN(machine);
     ADD_STATIC_PLUGIN(task);
     ADD_STATIC_PLUGIN(developsystem);

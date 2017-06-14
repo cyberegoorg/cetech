@@ -21,6 +21,8 @@
 #define DIR_DELIM_STR "/"
 #endif
 
+using namespace cetech;
+
 //==============================================================================
 // File Interface
 //==============================================================================
@@ -40,15 +42,10 @@ uint32_t file_mtime(const char *path) {
 // Path Interface
 //==============================================================================
 
-//! List dir
-//! \param path Dir path
-//! \param recursive Resucrsive list?
-//! \param files Result files
-//! \param allocator Allocator
-void dir_list(const char *path,
-              int recursive,
-              struct array_pchar *files,
-              struct allocator *allocator) {
+void _dir_list(const char *path,
+               int recursive,
+               Array<char *> &tmp_files,
+               struct allocator *allocator) {
 #if defined(CETECH_LINUX)
     DIR *dir;
     struct dirent *entry;
@@ -80,12 +77,12 @@ void dir_list(const char *path,
                                entry->d_name);
             }
 
-            dir_list(tmp_path, 1, files, allocator);
+            _dir_list(tmp_path, 1, tmp_files, allocator);
         } else {
             size_t size = strlen(path) + strlen(entry->d_name) + 3;
             char *new_path =
-            CETECH_ALLOCATE(allocator, char,
-                            sizeof(char) * size);
+                    CETECH_ALLOCATE(allocator, char,
+                                    sizeof(char) * size);
 
             if (path[strlen(path) - 1] != '/') {
                 snprintf(new_path, size - 1, "%s/%s", path, entry->d_name);
@@ -93,24 +90,37 @@ void dir_list(const char *path,
                 snprintf(new_path, size - 1, "%s%s", path, entry->d_name);
             }
 
-            ARRAY_PUSH_BACK(pchar, files, new_path);
+            array::push_back(tmp_files, new_path);
         }
     } while ((entry = readdir(dir)));
-
     closedir(dir);
 #endif
 }
 
-//! Free list dir array
-//! \param files Files array
-//! \param allocator Allocator
-void dir_list_free(struct array_pchar *files,
+void dir_list(const char *path,
+              int recursive,
+              char ***files,
+              uint32_t *count,
+              struct allocator *allocator) {
+    Array<char *> tmp_files(allocator);
+    _dir_list(path, recursive, tmp_files, allocator);
+    char **new_files = CETECH_ALLOCATE(allocator, char*,
+                                       sizeof(char *) * array::size(tmp_files));
+    memcpy(new_files, array::begin(tmp_files),
+           sizeof(char *) * array::size(tmp_files));
+
+    *files = new_files;
+    *count = array::size(tmp_files);
+}
+
+void dir_list_free(char **files,
+                   uint32_t count,
                    struct allocator *allocator) {
-#if defined(CETECH_LINUX)
-    for (int i = 0; i < ARRAY_SIZE(files); ++i) {
-        CETECH_DEALLOCATE(allocator, ARRAY_AT(files, i));
+    for (int i = 0; i < count; ++i) {
+        CETECH_DEALLOCATE(allocator, files[i]);
     }
-#endif
+
+    CETECH_DEALLOCATE(allocator, files);
 }
 
 

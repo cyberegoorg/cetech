@@ -4,6 +4,8 @@
 #ifndef CETECH_ENTITY_MANAGER_H
 #define CETECH_ENTITY_MANAGER_H
 
+#include <cetech/core/blob.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -11,8 +13,6 @@ extern "C" {
 //==============================================================================
 // Includes
 //==============================================================================
-
-#include <cetech/celib/array.inl>
 
 typedef struct yaml_node_s yaml_node_t;
 typedef struct world_s world_t;
@@ -57,9 +57,10 @@ struct entity_api_v0 {
     //! Spawn entity from resource data
     //! \param world World
     //! \param resource Resource data
-    //! \return Spawne entity array
-    ARRAY_T(entity_t) *(*spawn_from_resource)(world_t world,
-                                              void *resource);
+    void (*spawn_from_resource)(world_t world,
+                                void *resource,
+                                entity_t **entities,
+                                uint32_t *entities_count);
 
     //! Spawn entity
     //! \param world World
@@ -97,7 +98,7 @@ struct entity_api_v0 {
     //! \param output Output
     //! \param build Build
     void (*compiler_write_to_build)(struct entity_compile_output *output,
-                                    ARRAY_T(uint8_t) *build);
+                                    struct blob_v0 *build);
 
     //! Resource compile
     //! \param root Root yaml node
@@ -106,7 +107,7 @@ struct entity_api_v0 {
     //! \param compilator_api Compilator api
     void (*resource_compiler)(yaml_node_t root,
                               const char *filename,
-                              ARRAY_T(uint8_t) *build,
+                              struct blob_v0 *build,
                               struct compilator_api *compilator_api);
 
 #endif

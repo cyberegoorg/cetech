@@ -15,6 +15,7 @@
 #include <cetech/core/cpu.h>
 
 #include "task_queue.h"
+#include <cetech/core/log.h>
 
 //==============================================================================
 // Defines
@@ -74,7 +75,7 @@ static task_t _new_task() {
         idx = atomic_fetch_add(&_G._task_pool_idx, 1);
     }
 
-    return make_task((uint32_t)(idx & (MAX_TASK - 1)));
+    return make_task((uint32_t) (idx & (MAX_TASK - 1)));
 }
 
 static void _push_task(task_t t) {
@@ -242,7 +243,7 @@ static void _init(struct api_v0 *api) {
     const uint32_t worker_count = core_count - main_threads_count;
 
     log_api_v0.info("task", "Core/Main/Worker: %d, %d, %d", core_count,
-                        main_threads_count, worker_count);
+                    main_threads_count, worker_count);
 
     _G._workers_count = worker_count;
 

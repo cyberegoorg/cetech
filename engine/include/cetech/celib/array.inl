@@ -3,195 +3,280 @@
 // git+web: https://bitbucket.org/bitsquid/foundation
 //==============================================================================
 
-#ifndef CETECH_ARRAY_H
-#define CETECH_ARRAY_H
 
-//==============================================================================
-// Includes
-//==============================================================================
+#ifndef CETECH_ARRAY2_INL_H
+#define CETECH_ARRAY2_INL_H
 
+#include <cstring>
 
-#include <stdint.h>
-#include <stddef.h>
-#include <memory.h>
+#include <cetech/celib/allocator.h>
+#include <cetech/core/types.h>
 
-#include "cetech/core/log.h"
-#include "cetech/core/errors.h"
-#include "allocator.h"
+#include "container_types.inl"
 
-//==============================================================================
-// Interface macros
-//==============================================================================
+namespace cetech {
+    namespace array {
+        /// The number of elements in the array.
+        template<typename T>
+        uint32_t size(const Array <T> &a);
 
-#define ARRAY_T(N)                 struct array_##N
+        /// Returns true if there are any elements in the array.
+        template<typename T>
+        bool any(const Array <T> &a);
 
-#define ARRAY_INIT(N, a, alloc)    array_init_##N(a, alloc)
-#define ARRAY_DESTROY(N, a)        array_destroy_##N(a)
+        /// Returns true if the array is empty.
+        template<typename T>
+        bool empty(const Array <T> &a);
 
-#define ARRAY_SIZE(a)              (a)->size
-#define ARRAY_CAPACITY(a)          (a)->capacity
-#define ARRAY_BEGIN(a)             (a)->data
-#define ARRAY_END(a)               ((a)->data + (a)->size)
-#define ARRAY_AT(a, i)             (a)->data[i]
+        /// Used to iterate over the array.
+        template<typename T>
+        T *begin(Array <T> &a);
 
-#define ARRAY_RESIZE(N, a, s)       array_resize_##N(a, s)
-#define ARRAY_RESERVE(N, a, s)      array_reserve_##N(a, s)
+        template<typename T>
+        const T *begin(const Array <T> &a);
 
-#define ARRAY_PUSH_BACK(N, a, i)   array_push_back_##N(a, i)
-#define ARRAY_PUSH(N, a, i, c)     array_push_##N(a, i, c)
-#define ARRAY_POP_BACK(N, a)       array_pop_back_##N(a)
+        template<typename T>
+        T *end(Array <T> &a);
 
+        template<typename T>
+        const T *end(const Array <T> &a);
 
-//==============================================================================
-// Prototypes macro
-//==============================================================================
+        /// Returns the first/last element of the array. Don't use these on an
+        /// empty array.
+        template<typename T>
+        T &front(Array <T> &a);
 
-#define ARRAY_PROTOTYPE(T)  ARRAY_PROTOTYPE_N(T, T)
-#define ARRAY_PROTOTYPE_N(T, N)                                                  \
-    struct array_##N {                                                           \
-        struct allocator* allocator;                                         \
-        T *data;                                                                 \
-        size_t size;                                                             \
-        size_t capacity;                                                         \
-    };                                                                           \
-                                                                                 \
-    static inline void array_init_##N(struct array_##N *array,                   \
-                                      struct allocator* allocator) {         \
-        CETECH_ASSERT("array_"#T, array != NULL);                                   \
-        CETECH_ASSERT("array_"#T, allocator != NULL);                               \
-        array->data = NULL;                                                      \
-        array->size = 0;                                                         \
-        array->capacity = 0;                                                     \
-        array->allocator = allocator;                                            \
-    }                                                                            \
-                                                                                 \
-    static inline  void array_destroy_##N(struct array_##N *a) {                 \
-        CETECH_ASSERT("array_"#T, a != NULL);                                       \
-        CETECH_ASSERT("array_"#T, a->allocator != NULL);                            \
-        allocator_deallocate(a->allocator, a->data);                             \
-        a->data = NULL;                                                          \
-        a->size = 0;                                                             \
-        a->capacity = 0;                                                         \
-        a->allocator = NULL;                                                     \
-    }                                                                            \
-                                                                                 \
-    static inline  void array_resize_##N(struct array_##N *a, size_t newsize);   \
-    static inline  void array_grow_##N(struct array_##N *a, size_t mincapacity); \
-                                                                                 \
-    static inline  void array_setcapacity_##N(struct array_##N *a,               \
-                                              size_t  newcapacity) {             \
-        CETECH_ASSERT("array_"#T, a != NULL);                                       \
-        CETECH_ASSERT("array_"#T, a->allocator != NULL);                            \
-                                                                                 \
-        if (newcapacity == a->capacity) {                                        \
-            return;                                                              \
-        }                                                                        \
-                                                                                 \
-        if (newcapacity < a->size) {                                             \
-            array_resize_##N(a, newcapacity);                                    \
-        }                                                                        \
-                                                                                 \
-        T* newdata = 0;                                                          \
-        if (newcapacity > 0) {                                                   \
-            newdata = (T*) CETECH_ALLOCATE(a->allocator, T,                         \
-                                       sizeof(T) * newcapacity);                 \
-            CETECH_ASSERT("array_"#T, newdata !=NULL);                              \
-            memcpy(newdata, a->data, sizeof(T) * a->size);                  \
-        }                                                                        \
-                                                                                 \
-        allocator_deallocate(a->allocator, a->data);                             \
-                                                                                 \
-        a->data = newdata;                                                       \
-        a->capacity = newcapacity;                                               \
-    }                                                                            \
-                                                                                 \
-    static inline  void array_grow_##N(struct array_##N *a,                      \
-                                       size_t mincapacity) {                     \
-        CETECH_ASSERT("array_"#T, a != NULL);                                       \
-        size_t newcapacity = a->capacity * 2 + 8;                                \
-                                                                                 \
-        if (newcapacity < mincapacity) {                                         \
-            newcapacity = mincapacity;                                           \
-        }                                                                        \
-                                                                                 \
-        array_setcapacity_##N(a, newcapacity);                                   \
-    }                                                                            \
-                                                                                 \
-    static inline  void array_resize_##N(struct array_##N *a, size_t newsize) {  \
-        CETECH_ASSERT("array_"#T, a != NULL);                                       \
-        if (newsize > a->capacity) {                                             \
-            array_grow_##N(a, newsize);                                          \
-        }                                                                        \
-                                                                                 \
-        a->size = newsize;                                                       \
-    }                                                                            \
-                                                                                 \
-    static inline  void array_reserve_##N(struct array_##N *a,                   \
-                                          size_t new_capacity) {                 \
-        CETECH_ASSERT("array_"#T, a != NULL);                                       \
-        if (new_capacity > a->capacity) {                                        \
-            array_setcapacity_##N(a, new_capacity);                              \
-        }                                                                        \
-    }                                                                            \
-                                                                                 \
-    static inline  void array_push_back_##N(struct array_##N *a, T item) {       \
-        CETECH_ASSERT("array_"#T, a != NULL);                                       \
-        if (a->size + 1 > a->capacity) {                                         \
-            array_grow_##N(a, 0);                                                \
-        }                                                                        \
-        a->data[a->size++] = item;                                               \
-    }                                                                            \
-                                                                                 \
-    static inline  void array_push_##N(struct array_##N *a,                      \
-                                       T* items,                                 \
-                                       size_t count) {                           \
-        CETECH_ASSERT("array_"#T, a != NULL);                                       \
-        if (a->capacity <= a->size + count) {                                    \
-            array_grow_##N(a, a->size + count);                                  \
-        }                                                                        \
-                                                                                 \
-        memcpy(&a->data[a->size], items, sizeof(T) * count);                \
-        a->size += count;                                                        \
-    }                                                                            \
-                                                                                 \
-    static inline  void array_pop_back_##N(struct array_##N *a) {                \
-        CETECH_ASSERT("array_"#T, a != NULL);                                       \
-        CETECH_ASSERT("array_"#T, a->size != 0);                                    \
-                                                                                 \
-        --a->size;                                                               \
-    }                                                                            \
+        template<typename T>
+        const T &front(const Array <T> &a);
+
+        template<typename T>
+        T &back(Array <T> &a);
+
+        template<typename T>
+        const T &back(const Array <T> &a);
+
+        /// Changes the size of the array (does not reallocate memory unless necessary).
+        template<typename T>
+        void resize(Array <T> &a,
+                    uint32_t new_size);
+
+        /// Removes all items in the array (does not free memory).
+        template<typename T>
+        void clear(Array <T> &a);
+
+        /// Reallocates the array to the specified capacity.
+        template<typename T>
+        void set_capacity(Array <T> &a,
+                          uint32_t new_capacity);
+
+        /// Makes sure that the array has at least the specified capacity.
+        /// (If not, the array is grown.)
+        template<typename T>
+        void reserve(Array <T> &a,
+                     uint32_t new_capacity);
+
+        /// Grows the array using a geometric progression formula, so that the ammortized
+        /// cost of push_back() is O(1). If a min_capacity is specified, the array will
+        /// grow to at least that capacity.
+        template<typename T>
+        void grow(Array <T> &a,
+                  uint32_t min_capacity = 0);
+
+        /// Trims the array so that its capacity matches its size.
+        template<typename T>
+        void trim(Array <T> &a);
+
+        /// Pushes the item to the end of the array.
+        template<typename T>
+        void push_back(Array <T> &a,
+                       const T &item);
+
+        template<typename T>
+        void push(Array <T> &a,
+                  const T *item,
+                  uint32_t count);
 
 
-//==============================================================================
-// Predefined array for prim types
-//==============================================================================
+        /// Pops the last item from the array. The array cannot be empty.
+        template<typename T>
+        void pop_back(Array <T> &a);
+    }
 
-ARRAY_PROTOTYPE_N(void*, void)
+    namespace array {
+        template<typename T>
+        inline uint32_t size(const Array <T> &a) { return a._size; }
 
-ARRAY_PROTOTYPE_N(char*, pchar)
+        template<typename T>
+        inline bool any(const Array <T> &a) { return a._size != 0; }
 
-ARRAY_PROTOTYPE(char)
+        template<typename T>
+        inline bool empty(const Array <T> &a) { return a._size == 0; }
 
-ARRAY_PROTOTYPE(int)
+        template<typename T>
+        inline T *begin(Array <T> &a) { return a._data; }
 
-ARRAY_PROTOTYPE(uint8_t)
+        template<typename T>
+        inline const T *begin(const Array <T> &a) { return a._data; }
 
-ARRAY_PROTOTYPE(uint16_t)
+        template<typename T>
+        inline T *end(Array <T> &a) { return a._data + a._size; }
 
-ARRAY_PROTOTYPE(uint32_t)
+        template<typename T>
+        inline const T *end(const Array <T> &a) { return a._data + a._size; }
 
-ARRAY_PROTOTYPE(uint64_t)
+        template<typename T>
+        inline T &front(Array <T> &a) { return a._data[0]; }
 
-ARRAY_PROTOTYPE(int8_t)
+        template<typename T>
+        inline const T &front(const Array <T> &a) { return a._data[0]; }
 
-ARRAY_PROTOTYPE(int16_t)
+        template<typename T>
+        inline T &back(Array <T> &a) { return a._data[a._size - 1]; }
 
-ARRAY_PROTOTYPE(int32_t)
+        template<typename T>
+        inline const T &back(const Array <T> &a) {
+            return a._data[a._size - 1];
+        }
 
-ARRAY_PROTOTYPE(int64_t)
+        template<typename T>
+        inline void clear(Array <T> &a) { resize(a, 0); }
 
-ARRAY_PROTOTYPE(float)
+        template<typename T>
+        inline void trim(Array <T> &a) { set_capacity(a, a._size); }
 
-typedef ARRAY_T(pchar) string_array_t;
+        template<typename T>
+        void resize(Array <T> &a,
+                    uint32_t new_size) {
+            if (new_size > a._capacity)
+                grow(a, new_size);
+            a._size = new_size;
+        }
 
-#endif //CETECH_ARRAY_H
+        template<typename T>
+        inline void reserve(Array <T> &a,
+                            uint32_t new_capacity) {
+            if (new_capacity > a._capacity)
+                set_capacity(a, new_capacity);
+        }
+
+        template<typename T>
+        void set_capacity(Array <T> &a,
+                          uint32_t new_capacity) {
+            if (new_capacity == a._capacity)
+                return;
+
+            if (new_capacity < a._size)
+                resize(a, new_capacity);
+
+            T *new_data = 0;
+            if (new_capacity > 0) {
+                new_data = CETECH_ALLOCATE(a._allocator, T, new_capacity);
+                memcpy(new_data, a._data, sizeof(T) * a._size);
+            }
+
+            CETECH_DEALLOCATE(a._allocator, a._data);
+
+            a._data = new_data;
+            a._capacity = new_capacity;
+        }
+
+        template<typename T>
+        void grow(Array <T> &a,
+                  uint32_t min_capacity) {
+            uint32_t new_capacity = a._capacity * 2 + 8;
+            if (new_capacity < min_capacity)
+                new_capacity = min_capacity;
+            set_capacity(a, new_capacity);
+        }
+
+        template<typename T>
+        inline void push_back(Array <T> &a,
+                              const T &item) {
+            if (a._size + 1 > a._capacity)
+                grow(a);
+            a._data[a._size++] = item;
+        }
+
+        template<typename T>
+        void push(Array <T> &a,
+                  const T *items,
+                  uint32_t count) {
+            if (a._capacity <= a._size + count) {
+                grow(a, a._size + count);
+            }
+
+            memcpy(&a._data[a._size], items, sizeof(T) * count);
+            a._size += count;
+        }
+
+        template<typename T>
+        inline void pop_back(Array <T> &a) {
+            a._size--;
+        }
+    }
+
+    template<typename T>
+    inline
+    Array<T>::Array() : _allocator(nullptr), _size(0),
+                        _capacity(0), _data(0) {}
+
+    template<typename T>
+    inline
+    Array<T>::Array(struct allocator *a) : _allocator(a), _size(0),
+                                           _capacity(0), _data(0) {}
+
+    template<typename T>
+    inline
+    void Array<T>::init(allocator *a) {
+        _data = nullptr;
+        _allocator = a;
+        _size = 0;
+        _capacity = 0;
+    }
+
+    template<typename T>
+    inline
+    void Array<T>::destroy() {
+        if (_data) {
+            CETECH_DEALLOCATE(_allocator, _data);
+            _data = nullptr;
+            _size = 0;
+            _capacity = 0;
+        }
+    }
+
+
+    template<typename T>
+    inline Array<T>::~Array() {
+
+    }
+
+    template<typename T>
+    Array<T>::Array(const Array <T> &other) : _allocator(other._allocator),
+                                              _size(0), _capacity(0), _data(0) {
+        const uint32_t n = other._size;
+        array::set_capacity(*this, n);
+        memcpy(_data, other._data, sizeof(T) * n);
+        _size = n;
+    }
+
+    template<typename T>
+    Array <T> &Array<T>::operator=(const Array <T> &other) {
+        const uint32_t n = other._size;
+        _allocator = other._allocator;
+        array::resize(*this, n);
+        memcpy(_data, other._data, sizeof(T) * n);
+        return *this;
+    }
+
+    template<typename T>
+    inline T &Array<T>::operator[](uint32_t i) {
+        return _data[i];
+    }
+
+    template<typename T>
+    inline const T &Array<T>::operator[](uint32_t i) const {
+        return _data[i];
+    }
+}
+#endif //CETECH_ARRAY2_INL_H

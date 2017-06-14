@@ -13,6 +13,8 @@
 #include <cetech/core/api.h>
 
 #include "gamepadstr.h"
+#include <cetech/core/log.h>
+#include <cetech/core/errors.h>
 
 IMPORT_API(log_api_v0)
 IMPORT_API(machine_api_v0);
@@ -29,12 +31,12 @@ IMPORT_API(machine_api_v0);
 //==============================================================================
 
 namespace {
-static struct GamepadGlobals {
-    int active[GAMEPAD_MAX];
-    vec2f_t position[GAMEPAD_MAX][GAMEPAD_AXIX_MAX];
-    int state[GAMEPAD_MAX][GAMEPAD_BTN_MAX];
-    int last_state[GAMEPAD_MAX][GAMEPAD_BTN_MAX];
-} _G = {0};
+    static struct GamepadGlobals {
+        int active[GAMEPAD_MAX];
+        vec2f_t position[GAMEPAD_MAX][GAMEPAD_AXIX_MAX];
+        int state[GAMEPAD_MAX][GAMEPAD_BTN_MAX];
+        int last_state[GAMEPAD_MAX][GAMEPAD_BTN_MAX];
+    } _G = {0};
 }
 
 

@@ -6,8 +6,8 @@
 #include <cetech/core/memory.h>
 #include <cetech/core/module.h>
 #include <cetech/core/api.h>
-#include <cetech/celib/array2.inl>
-#include <cetech/celib/map2.inl>
+#include <cetech/celib/array.inl>
+#include <cetech/celib/map.inl>
 #include <cetech/core/yaml.h>
 
 #include <cetech/modules/entity.h>
@@ -15,6 +15,10 @@
 #include <cetech/modules/component.h>
 
 #include "cetech/modules/transform.h"
+
+IMPORT_API(memory_api_v0);
+IMPORT_API(hash_api_v0);
+IMPORT_API(component_api_v0);
 
 using namespace cetech;
 
@@ -52,8 +56,6 @@ static struct _G {
     Map<uint32_t> ent_map;
 } _G;
 
-IMPORT_API(memory_api_v0);
-IMPORT_API(hash_api_v0);
 
 #define hash_combine(a, b) ((a * 11)^(b))
 
@@ -173,9 +175,8 @@ static void _destroy_world(world_t world) {
 }
 
 int _transform_component_compiler(yaml_node_t body,
-                                  ARRAY_T(uint8_t) *data) {
-
-    struct transform_data t_data;
+                                  blob_v0 *data) {
+    transform_data t_data;
 
     YAML_NODE_SCOPE(scale, body, "scale",
                     t_data.scale = yaml_as_vec3f_t(scale););
@@ -194,8 +195,7 @@ int _transform_component_compiler(yaml_node_t body,
         yaml_node_free(rotation);
     };
 
-
-    ARRAY_PUSH(uint8_t, data, (uint8_t *) &t_data, sizeof(t_data));
+    data->push(data->inst, (uint8_t *) &t_data, sizeof(t_data));
 
     return 1;
 }
@@ -223,7 +223,7 @@ static void _spawner(world_t world,
                      uint32_t *ents_parent,
                      size_t ent_count,
                      void *data) {
-    struct transform_data *tdata = (transform_data *) data;
+    transform_data *tdata = (transform_data *) data;
 
     for (int i = 0; i < ent_count; ++i) {
         transform_create(world,
@@ -307,8 +307,6 @@ struct property_value _get_property(world_t world,
 
     return (struct property_value) {.type= PROPERTY_INVALID};
 }
-
-IMPORT_API(component_api_v0);
 
 static void _init_api(struct api_v0 *api) {
     static struct transform_api_v0 _api = {0};
@@ -546,7 +544,8 @@ transform_t transform_create(world_t world,
     map::set(_G.ent_map, hash_combine(world.h, entity.h), idx);
 
     if (parent.h != UINT32_MAX) {
-        uint32_t parent_idx = map::get(_G.ent_map, hash_combine(world.h, parent.h),
+        uint32_t parent_idx = map::get(_G.ent_map,
+                                       hash_combine(world.h, parent.h),
                                        UINT32_MAX);
 
         data->parent[idx] = parent_idx;
@@ -598,8 +597,8 @@ void transform_link(world_t world,
 
 extern "C" void *transform_get_module_api(int api) {
     switch (api) {
-    case PLUGIN_EXPORT_API_ID: {
-        static struct module_export_api_v0 module = {0};
+        case PLUGIN_EXPORT_API_ID: {
+            static struct module_export_api_v0 module = {0};
 
             module.init = _init;
             module.init_api = _init_api;

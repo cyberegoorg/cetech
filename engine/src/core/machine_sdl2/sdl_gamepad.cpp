@@ -10,6 +10,7 @@
 
 #include <cetech/core/machine.h>
 #include <cetech/core/api.h>
+#include <cetech/core/log.h>
 
 //==============================================================================
 // Defines
@@ -18,6 +19,7 @@
 #define is_button_down(now, last) ((now) && !(last))
 #define is_button_up(now, last)   (!(now) && (last))
 
+using namespace cetech;
 
 //==============================================================================
 // Globals
@@ -71,7 +73,7 @@ int _create_controler(int i) {
         _G.haptic[idx] = haptic;
 
         log_api_v0.info("input.gamepad", "Gamepad %d has haptic support",
-                            i);
+                        i);
     } else {
         _G.haptic[idx] = NULL;
     }
@@ -134,7 +136,7 @@ static SDL_GameControllerAxis _axis_to_sdl[GAMEPAD_AXIX_MAX][2] = {
                                  SDL_CONTROLLER_AXIS_TRIGGERRIGHT},
 };
 
-void sdl_gamepad_process(struct eventstream *stream) {
+void sdl_gamepad_process(EventStream &stream) {
     int curent_state[GAMEPAD_MAX][GAMEPAD_AXIX_MAX] = {0};
     vec2f_t curent_pos[GAMEPAD_MAX][GAMEPAD_BTN_MAX] = {0};
 
@@ -176,10 +178,10 @@ void sdl_gamepad_process(struct eventstream *stream) {
             event.button = j;
 
             if (is_button_down(curent_state[i][j], _G.state[i][j]))
-                event_stream_push(stream, EVENT_GAMEPAD_DOWN, event);
+                eventstream::push(stream, EVENT_GAMEPAD_DOWN, event);
 
             else if (is_button_up(curent_state[i][j], _G.state[i][j]))
-                event_stream_push(stream, EVENT_GAMEPAD_UP, event);
+                eventstream::push(stream, EVENT_GAMEPAD_UP, event);
 
             _G.state[i][j] = curent_state[i][j];
         }
@@ -200,21 +202,21 @@ void sdl_gamepad_process(struct eventstream *stream) {
 
                 event.position = pos;
 
-                event_stream_push(stream, EVENT_GAMEPAD_MOVE, event);
+                eventstream::push(stream, EVENT_GAMEPAD_MOVE, event);
             }
         }
     }
 }
 
 void sdl_gamepad_process_event(SDL_Event *event,
-                               struct eventstream *stream) {
+                               EventStream &stream) {
     switch (event->type) {
         case SDL_CONTROLLERDEVICEADDED: {
             int idx = _create_controler(event->cdevice.which);
             struct gamepad_device_event ev;
             ev.gamepad_id = idx;
 
-            event_stream_push(stream, EVENT_GAMEPAD_CONNECT, ev);
+            eventstream::push(stream, EVENT_GAMEPAD_CONNECT, ev);
         }
             break;
 
@@ -231,7 +233,7 @@ void sdl_gamepad_process_event(SDL_Event *event,
                 _remove_controler(i);
 
                 ev.gamepad_id = i;
-                event_stream_push(stream, EVENT_GAMEPAD_DISCONNECT, ev);
+                eventstream::push(stream, EVENT_GAMEPAD_DISCONNECT, ev);
 
                 break;
             }

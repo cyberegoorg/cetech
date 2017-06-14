@@ -8,9 +8,9 @@
 #include <cetech/core/path.h>
 #include <cetech/core/memory.h>
 #include <cetech/core/module.h>
-
 #include <cetech/core/config.h>
 #include <cetech/core/api.h>
+#include <cetech/core/log.h>
 
 
 //==============================================================================
@@ -64,7 +64,8 @@ void _add(const char *path,
 
         memcpy(_G.path[i], path, strlen(path));
 
-        module_export_api_v0 *api = (module_export_api_v0 *) fce(PLUGIN_EXPORT_API_ID);
+        module_export_api_v0 *api = (module_export_api_v0 *) fce(
+                PLUGIN_EXPORT_API_ID);
 
         _G.module_api[i] = api;
         _G.get_module_api[i] = fce;
@@ -185,21 +186,22 @@ namespace module {
     }
 
     void load_dirs(const char *path) {
-        ARRAY_T(pchar) files;
-        ARRAY_INIT(pchar, &files, memory_api_v0.main_scratch_allocator());
+        char **files = nullptr;
+        uint32_t files_count = 0;
 
-        path_v0.list(path, 1, &files, memory_api_v0.main_scratch_allocator());
+        path_v0.list(path, 1, &files, &files_count,
+                     memory_api_v0.main_scratch_allocator());
 
-        for (int k = 0; k < ARRAY_SIZE(&files); ++k) {
-            const char *filename = path_v0.filename(ARRAY_AT(&files, k));
+        for (int k = 0; k < files_count; ++k) {
+            const char *filename = path_v0.filename(files[k]);
 
             if (!strncmp(filename, PLUGIN_PREFIX, strlen(PLUGIN_PREFIX))) {
-                load(ARRAY_AT(&files, k));
+                load(files[k]);
             }
         }
 
-        path_v0.list_free(&files, memory_api_v0.main_scratch_allocator());
-        ARRAY_DESTROY(pchar, &files);
+        path_v0.list_free(files, files_count,
+                          memory_api_v0.main_scratch_allocator());
     }
 
     void call_init() {

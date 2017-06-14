@@ -73,8 +73,8 @@ struct vio *vio_from_file(const char *path,
                           enum vio_open_mode mode,
                           struct allocator *allocator) {
     struct sdl_vio *vf =
-    CETECH_ALLOCATE(allocator, struct sdl_vio,
-                    sizeof(struct sdl_vio));
+            CETECH_ALLOCATE(allocator, struct sdl_vio,
+                            sizeof(struct sdl_vio));
     CETECH_ASSERT(LOG_WHERE, vf != NULL);
 
     if (!vf) {

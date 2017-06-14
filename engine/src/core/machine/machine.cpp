@@ -2,7 +2,6 @@
 // Includes
 //==============================================================================
 
-#include <cetech/celib/array.inl>
 #include <cetech/celib/eventstream.inl>
 #include <cetech/core/module.h>
 #include <cetech/core/memory.h>
@@ -12,6 +11,9 @@
 #include <cetech/modules/resource.h>
 #include <cetech/core/api.h>
 
+
+using namespace cetech;
+
 //==============================================================================
 // Extern functions
 //==============================================================================
@@ -20,7 +22,7 @@ extern int _machine_init_impl(struct api_v0 *api);
 
 extern void _machine_shutdown_impl();
 
-extern void _machine_process_impl(struct eventstream *stream);
+extern void _machine_process_impl(EventStream &stream);
 
 extern int _machine_gamepad_is_active(int idx);
 
@@ -40,7 +42,7 @@ extern void _machine_gamepad_play_rumble(int gamepad,
 //==============================================================================
 
 static struct G {
-    struct eventstream eventstream;
+    EventStream eventstream;
 } _G = {0};
 
 IMPORT_API(memory_api_v0);
@@ -50,16 +52,16 @@ IMPORT_API(memory_api_v0);
 //==============================================================================
 
 struct event_header *machine_event_begin() {
-    return eventstream_begin(&_G.eventstream);
+    return eventstream::begin(_G.eventstream);
 }
 
 
 struct event_header *machine_event_end() {
-    return eventstream_end(&_G.eventstream);
+    return eventstream::end(_G.eventstream);
 }
 
 struct event_header *machine_event_next(struct event_header *header) {
-    return eventstream_next(header);
+    return eventstream::next(_G.eventstream, header);
 }
 
 static void _init_api(struct api_v0 *api) {
@@ -77,24 +79,22 @@ static void _init_api(struct api_v0 *api) {
 static void _init(struct api_v0 *api) {
     GET_API(api, memory_api_v0);
 
-    _G = (struct G) {0};
+    _G = {0};
 
-    eventstream_create(&_G.eventstream, memory_api_v0.main_allocator());
+    _G.eventstream.init(memory_api_v0.main_allocator());
 
     _machine_init_impl(api);
 }
 
 static void _shutdown() {
-    eventstream_destroy(&_G.eventstream);
-
     _machine_shutdown_impl();
 
-    _G = (struct G) {0};
+    _G = {0};
 }
 
 void _update() {
-    eventstream_clear(&_G.eventstream);
-    _machine_process_impl(&_G.eventstream);
+    eventstream::clear(_G.eventstream);
+    _machine_process_impl(_G.eventstream);
 }
 
 extern "C" void *machine_get_module_api(int api) {

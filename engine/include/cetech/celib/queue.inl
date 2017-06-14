@@ -3,178 +3,281 @@
 // git+web: https://bitbucket.org/bitsquid/foundation
 //==============================================================================
 
-#ifndef CETECH_QUEUE_H
-#define CETECH_QUEUE_H
+#ifndef CETECH_QUEUE2_INL
+#define CETECH_QUEUE2_INL
 
-#include <memory.h>
+#include <cstdint>
+
 #include "array.inl"
+#include "container_types.inl"
 
-//==============================================================================
-// Interface macros
-//==============================================================================
+#include "allocator.h"
 
-#define QUEUE_T(N)                 struct queue_##N
+namespace cetech {
 
-#define QUEUE_INIT(N, a, alloc)    queue_init_##N(a, alloc)
-#define QUEUE_DESTROY(N, a)        queue_destroy_##N(a)
+    /***************************************************************************
+    **** Queue interface
+    ***************************************************************************/
+    namespace queue {
 
-#define QUEUE_SIZE(N, q)                queue_size_##N(q)
-#define QUEUE_SPACE(N, q)               queue_space_##N( q)
-#define QUEUE_RESERVE(N, q, size)       queue_reserve_##N(q)
-#define QUEUE_PUSH_BACK(N, q, item)     queue_push_back_##N( q, item)
-#define QUEUE_POP_BACK(N, q)            queue_pop_back_##N(q)
-#define QUEUE_PUSH_FRONT(N, q, item)    queue_push_front_##N( q, item)
-#define QUEUE_POP_FRONT(N, q)           queue_pop_front_##N(q)
-#define QUEUE_CONSUME(N, q)             queue_consume_##N( q, n)
-#define QUEUE_PUSH(N, q, items, n)      queue_push_##N(q, items, n)
-#define QUEUE_BEGIN_FRONT(N, q)         queue_begin_front_##N(q)
-#define QUEUE_END_FRONT(N, q)           queue_end_front_##N(q)
+        /***********************************************************************
+        **** Returns the number of items in the queue.
+        ***********************************************************************/
+        template<typename T>
+        uint32_t size(const Queue<T> &q);
 
-#define QUEUE_AT(q, i) ARRAY_AT(&(q)->_data, (i + (q)->_offset) % ARRAY_SIZE(&(q)->_data))
+        /***********************************************************************
+        **** Returns the ammount of free space in the queue/ring buffer.
+        ***********************************************************************/
+        template<typename T>
+        uint32_t space(const Queue<T> &q);
 
-//==============================================================================
-// Prototypes macro
-//==============================================================================
 
-#define QUEUE_PROTOTYPE(T) QUEUE_PROTOTYPE_N(T, T)
-#define QUEUE_PROTOTYPE_N(T, N)                                                                             \
-    struct queue_##N {                                                                                      \
-        ARRAY_T(N) _data;                                                                                   \
-        uint32_t _size;                                                                                          \
-        uint32_t _offset;                                                                                        \
-    };                                                                                                      \
-    static inline void queue_init_##N(QUEUE_T(N) *q,                                                        \
-                                      struct allocator* allocator) {                                        \
-        CETECH_ASSERT("queue_"#T, q != NULL);                                                                   \
-        CETECH_ASSERT("queue_"#T, allocator != NULL);                                                           \
-        ARRAY_INIT(N, &q->_data, allocator);                                                                \
-        q->_size = 0;                                                                                       \
-        q->_offset = 0;                                                                                     \
-    }                                                                                                       \
-                                                                                                            \
-    static inline uint32_t queue_size_##N(const  QUEUE_T(N) *q) {                                           \
-        return q->_size;                                                                                    \
-    }                                                                                                       \
-                                                                                                            \
-                                                                                                            \
-    static inline  void queue_destroy_##N(QUEUE_T(N) *q) {                                                  \
-        CETECH_ASSERT("queue_"#T, q != NULL);                                                                   \
-        ARRAY_DESTROY(N, &q->_data);                                                                        \
-        q->_size = 0;                                                                                       \
-        q->_offset = 0;                                                                                     \
-    }                                                                                                       \
-                                                                                                            \
-    static inline void queue_increase_capacity_##N( QUEUE_T(N) *q, uint32_t new_capacity) {                      \
-        uint32_t end = ARRAY_SIZE(&q->_data);                                                               \
-                                                                                                            \
-        ARRAY_RESIZE(N, &q->_data, new_capacity);                                                           \
-        if (q->_offset + q->_size > end) {                                                                  \
-            uint32_t end_items = end - q->_offset;                                                          \
-            memmove(ARRAY_BEGIN(&q->_data) + new_capacity - end_items, ARRAY_BEGIN(&q->_data) + q->_offset, \
-                    end_items * sizeof(T));                                                                 \
-            q->_offset += new_capacity - end;                                                               \
-        }                                                                                                   \
-    }                                                                                                       \
-                                                                                                            \
-    static inline void queue_grow_##N( QUEUE_T(N) *q, uint32_t min_capacity) {                              \
-        uint32_t new_capacity = ARRAY_SIZE(&q->_data) * 2 + 8;                                              \
-        if (new_capacity < min_capacity)                                                                    \
-            new_capacity = min_capacity;                                                                    \
-        queue_increase_capacity_##N(q, new_capacity);                                                       \
-    }                                                                                                       \
-                                                                                                            \
-                                                                                                            \
-                                                                                                            \
-    static inline uint32_t queue_space_##N(const  QUEUE_T(N) *q) {                                          \
-        return ARRAY_SIZE(&q->_data) - q->_size;                                                            \
-    }                                                                                                       \
-                                                                                                            \
-    static inline void queue_reserve_##N( QUEUE_T(N) *q, uint32_t size) {                                   \
-        if (size > q->_size)                                                                                \
-            queue_increase_capacity_##N(q, size);                                                           \
-    }                                                                                                       \
-                                                                                                            \
-    static inline void queue_push_back_##N( QUEUE_T(N) *q, T item) {                                        \
-        if (!queue_space_##N(q))                                                                            \
-            queue_grow_##N(q, 0);                                                                           \
-        q->_data.data[q->_size++] = item;                                                                   \
-    }                                                                                                       \
-                                                                                                            \
-    static inline void queue_pop_back_##N( QUEUE_T(N) *q) {                                                 \
-        --q->_size;                                                                                         \
-    }                                                                                                       \
-                                                                                                            \
-    static inline void queue_push_front_##N( QUEUE_T(N) *q, T item) {                                       \
-        if (!queue_space_##N(q))                                                                            \
-            queue_grow_##N(q, 0);                                                                           \
-        q->_offset = (q->_offset - 1 + ARRAY_SIZE(&q->_data)) % ARRAY_SIZE(&q->_data);                      \
-        ++q->_size;                                                                                         \
-        q->_data.data[0] = item;                                                                            \
-    }                                                                                                       \
-                                                                                                            \
-    static inline void queue_pop_front_##N( QUEUE_T(N) *q) {                                                \
-        q->_offset = (q->_offset + 1) % ARRAY_SIZE(&q->_data);                                              \
-        --q->_size;                                                                                         \
-    }                                                                                                       \
-                                                                                                            \
-    inline void queue_consume_##N( QUEUE_T(N) *q, uint32_t n) {                                             \
-        q->_offset = (q->_offset + n) % ARRAY_SIZE(&q->_data);                                              \
-        q->_size -= n;                                                                                      \
-    }                                                                                                       \
-                                                                                                            \
-    static inline void queue_push_##N( QUEUE_T(N) *q, T *items, uint32_t n) {                               \
-        if (queue_space_##N(q) < n) {                                                                       \
-            queue_grow_##N(q, ARRAY_SIZE(&q->_data) + n);                                                   \
-        }                                                                                                   \
-                                                                                                            \
-        const uint32_t size = ARRAY_SIZE(&q->_data);                                                        \
-        const uint32_t insert = (q->_offset + q->_size) % size;                                             \
-                                                                                                            \
-        uint32_t to_insert = n;                                                                             \
-        if (insert + to_insert > size) {                                                                    \
-            to_insert = size - insert;                                                                      \
-        }                                                                                                   \
-                                                                                                            \
-        memcpy(ARRAY_BEGIN(& q->_data) + insert, items, to_insert * sizeof(T));                             \
-        q->_size += to_insert;                                                                              \
-        items += to_insert;                                                                                 \
-        n -= to_insert;                                                                                     \
-                                                                                                            \
-        memcpy(ARRAY_BEGIN(& q->_data), items, n * sizeof(T));                                              \
-        q->_size += n;                                                                                      \
-    }                                                                                                       \
-                                                                                                            \
-    static inline T *queue_begin_front_##N( QUEUE_T(N) *q) {                                                \
-        return ARRAY_BEGIN(& q->_data) + q->_offset;                                                        \
-    }                                                                                                       \
-                                                                                                            \
-    static inline T *queue_end_front_##N( QUEUE_T(N) *q) {                                                  \
-        uint32_t end = q->_offset + q->_size;                                                               \
-        return end > ARRAY_SIZE(&q->_data) ? ARRAY_END(&q->_data) : ARRAY_BEGIN(& q->_data) + end;          \
-    }                                                                                                       \
+        /***********************************************************************
+        **** Makes sure the queue has room for at least the specified number of items.
+        ***********************************************************************/
+        template<typename T>
+        void reserve(Queue<T> &q,
+                     uint32_t const size);
 
-QUEUE_PROTOTYPE_N(void*, void)
+        /***********************************************************************
+        **** Pushes the item to the end of the queue.
+        ***********************************************************************/
+        template<typename T>
+        void push_back(Queue<T> &q,
+                       const T &item);
 
-QUEUE_PROTOTYPE_N(char*, pchar)
+        /***********************************************************************
+        **** Pops the last item from the queue.
+        ***********************************************************************/
+        template<typename T>
+        void pop_back(Queue<T> &q);
 
-QUEUE_PROTOTYPE(char)
+        /***********************************************************************
+        **** Pushes the item to the front of the queue.
+        ***********************************************************************/
+        template<typename T>
+        void push_front(Queue<T> &q,
+                        const T &item);
 
-QUEUE_PROTOTYPE(int)
+        /***********************************************************************
+        **** Pops the first item from the queue.
+        ***********************************************************************/
+        template<typename T>
+        void pop_front(Queue<T> &q);
 
-QUEUE_PROTOTYPE(uint8_t)
+        /***********************************************************************
+        **** Consumes n items from the front of the queue.
+        ***********************************************************************/
+        template<typename T>
+        void consume(Queue<T> &q,
+                     const uint32_t n);
 
-QUEUE_PROTOTYPE(uint16_t)
+        /***********************************************************************
+        **** Pushes n items to the back of the queue.
+        ***********************************************************************/
+        template<typename T>
+        void push(Queue<T> &q,
+                  const T *items,
+                  const uint32_t n);
 
-QUEUE_PROTOTYPE(uint32_t)
+        /***********************************************************************
+        **** Returns the begin and end of the continuous chunk of elements at
+        **** the start of the queue. (Note that this chunk does not necessarily
+        **** contain all the elements in the queue (if the queue wraps around
+        **** the array).
+        ****
+        **** This is useful for when you want to process many queue elements at
+        **** once.
+        ***********************************************************************/
+        template<typename T>
+        T *begin_front(Queue<T> &q);
 
-QUEUE_PROTOTYPE(uint64_t)
+        template<typename T>
+        const T *begin_front(const Queue<T> &q);
 
-QUEUE_PROTOTYPE(int8_t)
+        template<typename T>
+        T *end_front(Queue<T> &q);
 
-QUEUE_PROTOTYPE(int16_t)
+        template<typename T>
+        const T *end_front(const Queue<T> &q);
+    }
 
-QUEUE_PROTOTYPE(int32_t)
+    /***************************************************************************
+    **** Queue internals
+    ***************************************************************************/
+    namespace queue_internal {
+        // Can only be used to increase the capacity.
+        template<typename T>
+        void increase_capacity(Queue<T> &q,
+                               const uint32_t new_capacity) {
+            uint32_t end = array::size(q._data);
+            array::resize(q._data, new_capacity);
+            if (q._offset + q._size > end) {
+                uint32_t end_items = end - q._offset;
+                memmove(array::begin(q._data) + new_capacity - end_items,
+                        array::begin(
+                                q._data) + q._offset,
+                        end_items * sizeof(T));
+                q._offset += new_capacity - end;
+            }
+        }
 
-QUEUE_PROTOTYPE(int64_t)
+        template<typename T>
+        void grow(Queue<T> &q,
+                  const uint32_t min_capacity = 0) {
+            uint32_t new_capacity = array::size(q._data) * 2 + 8;
+            if (new_capacity < min_capacity) {
+                new_capacity = min_capacity;
+            }
 
-#endif //CETECH_QUEUE_H
+            increase_capacity(q, new_capacity);
+        }
+    }
+
+    /***************************************************************************
+    **** Queue implementation
+    ***************************************************************************/
+    namespace queue {
+        template<typename T>
+        inline uint32_t size(const Queue<T> &q) {
+            return q._size;
+        }
+
+        template<typename T>
+        inline uint32_t space(const Queue<T> &q) {
+            return array::size(q._data) - q._size;
+        }
+
+        template<typename T>
+        void reserve(Queue<T> &q,
+                     const uint32_t size) {
+            if (size > q._size) {
+                queue_internal::increase_capacity(q, size);
+            }
+        }
+
+        template<typename T>
+        inline void push_back(Queue<T> &q,
+                              const T &item) {
+            if (!space(q)) {
+                queue_internal::grow(q);
+            }
+
+            q[q._size++] = item;
+        }
+
+        template<typename T>
+        inline void pop_back(Queue<T> &q) {
+            --q._size;
+        }
+
+        template<typename T>
+        inline void push_front(Queue<T> &q,
+                               const T &item) {
+            if (!space(q)) {
+                queue_internal::grow(q);
+            }
+
+            q._offset = (q._offset - 1 + array::size(q._data)) %
+                        array::size(q._data);
+            ++q._size;
+            q[0] = item;
+        }
+
+        template<typename T>
+        inline void pop_front(Queue<T> &q) {
+            q._offset = (q._offset + 1) % array::size(q._data);
+            --q._size;
+        }
+
+        template<typename T>
+        inline void consume(Queue<T> &q,
+                            const uint32_t n) {
+            q._offset = (q._offset + n) % array::size(q._data);
+            q._size -= n;
+        }
+
+        template<typename T>
+        void push(Queue<T> &q,
+                  const T *items,
+                  uint32_t n) {
+            if (space(q) < n) {
+                queue_internal::grow(q, size(q) + n);
+            }
+
+            const uint32_t size = array::size(q._data);
+            const uint32_t insert = (q._offset + q._size) % size;
+            uint32_t to_insert = n;
+            if (insert + to_insert > size) {
+                to_insert = size - insert;
+            }
+
+            memcpy(array::begin(q._data) + insert, items,
+                   to_insert * sizeof(T));
+            q._size += to_insert;
+            items += to_insert;
+            n -= to_insert;
+            memcpy(array::begin(q._data), items, n * sizeof(T));
+            q._size += n;
+        }
+
+        template<typename T>
+        inline T *begin_front(Queue<T> &q) {
+            return array::begin(q._data) + q._offset;
+        }
+
+        template<typename T>
+        inline const T *begin_front(const Queue<T> &q) {
+            return array::begin(q._data) + q._offset;
+        }
+
+        template<typename T>
+        T *end_front(Queue<T> &q) {
+            uint32_t end = q._offset + q._size;
+            return end > array::size(q._data) ? array::end(q._data) :
+                   array::begin(q._data) + end;
+        }
+
+        template<typename T>
+        const T *end_front(const Queue<T> &q) {
+            uint32_t end = q._offset + q._size;
+            return end > array::size(q._data) ? array::end(q._data) :
+                   array::begin(q._data) + end;
+        }
+    }
+
+    /***************************************************************************
+    **** Queue implementation
+    ***************************************************************************/
+    template<typename T>
+    inline Queue<T>::Queue() : _size(0),
+                               _offset(0) {}
+
+    template<typename T>
+    inline Queue<T>::Queue(allocator *allocator) : _data(allocator),
+                                                   _size(0),
+                                                   _offset(0) {}
+
+    template<typename T>
+    inline T &Queue<T>::operator[](const uint32_t i) {
+        return _data[(i + _offset) % array::size(_data)];
+    }
+
+    template<typename T>
+    inline const T &Queue<T>::operator[](const uint32_t i) const {
+        return _data[(i + _offset) % array::size(_data)];
+    }
+
+    template<typename T>
+    inline void Queue<T>::init(allocator *a) {
+        _data.init(a);
+    }
+
+    template<typename T>
+    inline void Queue<T>::destroy() {
+        _data.destroy();
+    }
+}
+
+#endif //CETECH_QUEUE2_INL

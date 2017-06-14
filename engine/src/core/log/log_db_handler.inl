@@ -33,7 +33,7 @@ static int _step(sqlite3 *db,
 
             default:
                 log_error("builddb", "SQL error '%s' (%d): %s",
-                                     sqlite3_sql(stmt), rc, sqlite3_errmsg(db));
+                          sqlite3_sql(stmt), rc, sqlite3_errmsg(db));
 
                 run = 0;
                 break;
@@ -124,30 +124,30 @@ void logdb_log(enum log_level level,
 }
 
 namespace log {
-int logdb_init_db(const char *log_dir,
-                  struct api_v0 *api) {
-    struct path_v0 *path = (path_v0 *) api->first("path_v0").api;
+    int logdb_init_db(const char *log_dir,
+                      struct api_v0 *api) {
+        struct path_v0 *path = (path_v0 *) api->first("path_v0").api;
 
-    path->join(_logdb_path, CETECH_ARRAY_LEN(_logdb_path), log_dir,
-                    "log.db");
+        path->join(_logdb_path, CETECH_ARRAY_LEN(_logdb_path), log_dir,
+                   "log.db");
 
-    _session_id = time(NULL);
+        _session_id = time(NULL);
 
-    if (!_do_sql(0, "CREATE TABLE IF NOT EXISTS log (\n"
-            "id         INTEGER PRIMARY KEY    AUTOINCREMENT   NOT NULL,\n"
-            "session_id INTEGER                                NOT NULL,\n"
-            "time       INTEGER                                NOT NULL,\n"
-            "level      TEXT                                   NOT NULL,\n"
-            "wheree     TEXT                                   NOT NULL,\n"
-            "worker     INTEGER                                NOT NULL,\n"
-            "msg        TEXT                                   NOT NULL\n"
-            ");")) {
-        return 0;
+        if (!_do_sql(0, "CREATE TABLE IF NOT EXISTS log (\n"
+                "id         INTEGER PRIMARY KEY    AUTOINCREMENT   NOT NULL,\n"
+                "session_id INTEGER                                NOT NULL,\n"
+                "time       INTEGER                                NOT NULL,\n"
+                "level      TEXT                                   NOT NULL,\n"
+                "wheree     TEXT                                   NOT NULL,\n"
+                "worker     INTEGER                                NOT NULL,\n"
+                "msg        TEXT                                   NOT NULL\n"
+                ");")) {
+            return 0;
+        }
+
+        log_register_handler(logdb_log, NULL);
+
+        return 1;
     }
-
-    log_register_handler(logdb_log, NULL);
-
-    return 1;
-}
 
 }

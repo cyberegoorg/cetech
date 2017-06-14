@@ -1,7 +1,6 @@
 
 
 #include "cetech/modules/renderer.h"
-#include <cetech/modules/resource.h>
 
 #include <cetech/core/module.h>
 #include <cetech/modules/luasys.h>

@@ -20,8 +20,8 @@ extern "C" {
 
 
 struct api_entry {
-    void* entry;
-    void* api;
+    void *entry;
+    void *api;
 };
 
 //! Plugin expot api struct V0
@@ -30,7 +30,8 @@ struct api_v0 {
                          void *api);
 
     struct api_entry (*first)(const char *name);
-    struct api_entry (*next)(struct api_entry* entry);
+
+    struct api_entry (*next)(struct api_entry *entry);
 };
 
 #ifdef __cplusplus

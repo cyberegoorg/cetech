@@ -33,7 +33,7 @@ void *lua_resource_reloader(uint64_t name,
                             struct allocator *allocator) {
     CETECH_DEALLOCATE(allocator, old_data);
 
-    struct lua_resource *resource = new_data;
+    struct lua_resource *resource = (lua_resource *) new_data;
     char *data = (char *) (resource + 1);
 
     luaL_loadbuffer(_G.L, data, resource->size, "<unknown>");

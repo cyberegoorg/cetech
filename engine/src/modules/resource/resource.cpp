@@ -4,8 +4,8 @@
 
 
 #include <cetech/celib/container_types.inl>
-#include <cetech/celib/array2.inl>
-#include <cetech/celib/map2.inl>
+#include <cetech/celib/array.inl>
+#include <cetech/celib/map.inl>
 
 #include <cetech/core/hash.h>
 #include <cetech/core/application.h>
@@ -25,8 +25,8 @@
 #include "include/mpack/mpack.h"
 
 #include "resource.h"
-#include "../../core/module/_module.h"
-
+#include <cetech/core/log.h>
+#include <cetech/core/errors.h>
 
 IMPORT_API(memory_api_v0);
 IMPORT_API(cnsole_srv_api_v0);
