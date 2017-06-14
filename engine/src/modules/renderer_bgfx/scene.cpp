@@ -37,6 +37,7 @@ IMPORT_API(hash_api_v0);
 
 
 struct scene_instance {
+    uint64_t scene;
     Map<uint8_t> geom_map;
     Array<uint32_t> size;
     Array<bgfx_vertex_buffer_handle_t> vb;
@@ -60,6 +61,7 @@ struct scene_instance *_init_scene_instance(uint64_t scene) {
     array::push_back(_G.scene_instance_array, {0});
 
     scene_instance *instance = &_G.scene_instance_array[idx];
+    instance->scene = scene;
 
     instance->geom_map.init(memory_api_v0.main_allocator());
     instance->size.init(memory_api_v0.main_allocator());
@@ -75,15 +77,18 @@ void _destroy_scene_instance(uint64_t scene) {
     uint32_t idx = map::get(_G.scene_instance_map, scene, UINT32_MAX);
     scene_instance *instance = &_G.scene_instance_array[idx];
 
+
     instance->geom_map.destroy();
     instance->size.destroy();
     instance->vb.destroy();
     instance->ib.destroy();
 
     uint32_t size = array::size(_G.scene_instance_array);
+    scene_instance *last_instance = &_G.scene_instance_array[size - 1];
 
-    _G.scene_instance_array[idx] = _G.scene_instance_array[size - 1];
+    _G.scene_instance_array[idx] = *last_instance;
     array::pop_back(_G.scene_instance_array);
+    map::set(_G.scene_instance_map, last_instance->scene, idx);
     map::remove(_G.scene_instance_map, scene);
 }
 
