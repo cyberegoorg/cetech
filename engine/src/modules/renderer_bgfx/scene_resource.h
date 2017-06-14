@@ -34,8 +34,7 @@ void _scene_resource_online(uint64_t name,
     uint32_t *ib = scene_blob_ib(resource);
     uint8_t *vb = scene_blob_vb(resource);
 
-    struct scene_instance instance = {0};
-    _init_scene_instance(&instance);
+    struct scene_instance *instance = _init_scene_instance(name);
 
     for (int i = 0; i < resource->geom_count; ++i) {
         bgfx_vertex_buffer_handle_t bvb = bgfx_create_vertex_buffer(
@@ -47,24 +46,18 @@ void _scene_resource_online(uint64_t name,
                               sizeof(uint32_t) * ib_size[i]),
                 BGFX_BUFFER_INDEX32);
 
-        uint32_t idx = ARRAY_SIZE(&instance.vb);
-        MAP_SET(uint8_t, &instance.geom_map, geom_name[i], idx);
+        uint8_t idx = (uint8_t) array::size(instance->vb);
+        map::set(instance->geom_map, geom_name[i], idx);
 
-        ARRAY_PUSH_BACK(uint32_t, &instance.size, ib_size[i]);
-        ARRAY_PUSH_BACK(bgfx_vertex_buffer_handle_t, &instance.vb, bvb);
-        ARRAY_PUSH_BACK(bgfx_index_buffer_handle_t, &instance.ib, bib);
+        array::push_back(instance->size, ib_size[i]);
+        array::push_back(instance->vb, bvb);
+        array::push_back(instance->ib, bib);
     }
-
-    MAP_SET(scene_instance, &_G.scene_instance, name, instance);
 }
 
 void _scene_resource_offline(uint64_t name,
                              void *data) {
-    struct scene_instance instance = MAP_GET(scene_instance, &_G.scene_instance,
-                                             name,
-                                             (struct scene_instance) {0});
-    _destroy_scene_instance(&instance);
-    MAP_REMOVE(scene_instance, &_G.scene_instance, name);
+    _destroy_scene_instance(name);
 }
 
 void *_scene_resource_reloader(uint64_t name,
