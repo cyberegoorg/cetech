@@ -290,7 +290,8 @@ namespace cetech {
         T *get_ptr(Map<T> &h,
                    uint64_t key) {
             const uint32_t i = map_internal::find_or_fail(h, key);
-            return i == map_internal::END_OF_LIST ? nullptr : &(h._data[i].value);
+            return i == map_internal::END_OF_LIST ? nullptr
+                                                  : &(h._data[i].value);
         }
 
         template<typename T>
@@ -442,7 +443,6 @@ namespace cetech {
     }
 
 }
-
 
 
 #endif //CETECH_MAP2_H

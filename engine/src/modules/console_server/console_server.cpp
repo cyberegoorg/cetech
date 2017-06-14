@@ -11,7 +11,6 @@
 #include <cetech/core/log.h>
 #include <cetech/celib/map.inl>
 #include <cetech/modules/resource.h>
-#include <cetech/modules/develop.h>
 #include <cetech/core/hash.h>
 #include <cetech/modules/console_server.h>
 #include <cetech/core/errors.h>
@@ -250,7 +249,6 @@ namespace consoleserver_module {
 
         consoleserver::register_command("console_server.ready", cmd_ready);
     }
-
 
 
     static void _shutdown() {

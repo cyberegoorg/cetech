@@ -59,6 +59,7 @@ namespace cetech {
     template<typename T>
     struct Queue {
         Queue();
+
         explicit Queue(allocator *a);
 
         T &operator[](const uint32_t i);
@@ -66,6 +67,7 @@ namespace cetech {
         const T &operator[](const uint32_t i) const;
 
         void init(allocator *a);
+
         void destroy();
 
         Array<T> _data; // Data

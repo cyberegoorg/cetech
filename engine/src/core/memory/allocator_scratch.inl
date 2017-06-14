@@ -108,7 +108,7 @@ uint32_t scratch_allocator_total_allocated(struct allocator *allocator) {
 struct allocator *scratch_allocator_create(struct allocator *backing,
                                            int size) {
     struct allocator_scratch *m = (allocator_scratch *) memory::malloc(
-                sizeof(struct allocator_scratch));
+            sizeof(struct allocator_scratch));
 
     m->base = (struct allocator) {
             .allocate = scratch_allocator_allocate,

@@ -21,7 +21,7 @@ extern int sdl_keyboard_init(struct api_v0 *api);
 
 extern void sdl_keyboard_shutdown();
 
-extern void sdl_keyboard_process(EventStream& stream);
+extern void sdl_keyboard_process(EventStream &stream);
 
 
 //==============================================================================
@@ -32,7 +32,7 @@ extern int sdl_mouse_init(struct api_v0 *api);
 
 extern void sdl_mouse_shutdown();
 
-extern void sdl_mouse_process(EventStream& stream);
+extern void sdl_mouse_process(EventStream &stream);
 
 //==============================================================================
 // Gamepad part
@@ -42,10 +42,10 @@ extern int sdl_gamepad_init(struct api_v0 *api);
 
 extern void sdl_gamepad_shutdown();
 
-extern void sdl_gamepad_process(EventStream& stream);
+extern void sdl_gamepad_process(EventStream &stream);
 
 extern void sdl_gamepad_process_event(SDL_Event *event,
-                                      EventStream& stream);
+                                      EventStream &stream);
 
 //==============================================================================
 // Defines
@@ -78,7 +78,7 @@ int _machine_init_impl(struct api_v0 *api) {
 
     if (SDL_Init(SDL_INIT_EVERYTHING) != 0) {
         log_api_v0.error(LOG_WHERE, "Could not init sdl - %s",
-                             SDL_GetError());
+                         SDL_GetError());
         return 0;
     }
 
@@ -99,7 +99,7 @@ void _machine_shutdown_impl() {
     _G = (struct G) {0};
 }
 
-void _machine_process_impl(EventStream& stream) {
+void _machine_process_impl(EventStream &stream) {
     SDL_Event e;
 
     while (SDL_PollEvent(&e) > 0) {

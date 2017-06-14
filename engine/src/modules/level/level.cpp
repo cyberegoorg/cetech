@@ -2,25 +2,25 @@
 // Includes
 //==============================================================================
 
-#include <cetech/celib/allocator.h>
-#include <cetech/modules/world.h>
-#include <cetech/core/config.h>
-#include <cetech/modules/resource.h>
-#include <cetech/core/vio.h>
-#include <cetech/modules/entity.h>
-#include <cetech/modules/transform.h>
+#include <cetech/celib/array.inl>
+#include <cetech/celib/map.inl>
 #include <cetech/celib/quatf.inl>
+
+#include <cetech/core/config.h>
+#include <cetech/core/vio.h>
+#include <cetech/core/yaml.h>
+#include <cetech/core/hash.h>
+#include <cetech/core/api.h>
 #include <cetech/core/memory.h>
 #include <cetech/core/module.h>
 
+#include <cetech/modules/entity.h>
+#include <cetech/modules/world.h>
+#include <cetech/modules/resource.h>
+#include <cetech/modules/transform.h>
 #include "cetech/modules/level.h"
-#include <cetech/core/yaml.h>
+
 #include "level_blob.h"
-#include <cetech/core/hash.h>
-#include <cetech/core/api.h>
-#include <cetech/celib/container_types.inl>
-#include <cetech/celib/array.inl>
-#include <cetech/celib/map.inl>
 
 using namespace cetech;
 
@@ -31,6 +31,7 @@ IMPORT_API(memory_api_v0);
 IMPORT_API(vio_api_v0);
 IMPORT_API(hash_api_v0);
 IMPORT_API(blob_api_v0);
+IMPORT_API(world_api_v0);
 
 //==============================================================================
 // Globals
@@ -64,7 +65,7 @@ namespace {
         uint32_t idx = array::size(_G.level_instance);
         array::push_back(_G.level_instance, {0});
 
-        struct level_instance *instance = &_G.level_instance[idx];
+        level_instance *instance = &_G.level_instance[idx];
 
         _init_level_instance(instance, level_entity);
 
@@ -187,8 +188,10 @@ int _level_resource_compiler(const char *filename,
     entity_api_v0.compiler_write_to_build(output, entity_data.data);
 
     vio_api_v0.write(build_vio, &res, sizeof(struct level_blob), 1);
-    vio_api_v0.write(build_vio, array::begin(id), sizeof(uint64_t), array::size(id));
-    vio_api_v0.write(build_vio, array::begin(offset), sizeof(uint32_t), array::size(offset));
+    vio_api_v0.write(build_vio, array::begin(id), sizeof(uint64_t),
+                     array::size(id));
+    vio_api_v0.write(build_vio, array::begin(offset), sizeof(uint32_t),
+                     array::size(offset));
     vio_api_v0.write(build_vio, data->data(data->inst), sizeof(uint8_t),
                      data->size(data->inst));
 
@@ -218,9 +221,9 @@ namespace level {
 
         entity_t level_ent = entity_api_v0.create();
         transform_t t = transform_api_v0.create(world, level_ent,
-                                                (entity_t) {UINT32_MAX},
-                                                (vec3f_t) {0}, QUATF_IDENTITY,
-                                                (vec3f_t) {{1.0f, 1.0f, 1.0f}});
+                                                {UINT32_MAX},
+                                                {0}, QUATF_IDENTITY,
+                                                {{1.0f, 1.0f, 1.0f}});
 
         level_t level = _new_level(level_ent);
         struct level_instance *instance = _level_instance(level);
@@ -247,6 +250,7 @@ namespace level {
 
         entity_api_v0.destroy(world, &instance->spawned_entity[0], 1);
         entity_api_v0.destroy(world, &instance->level_entity, 1);
+        _destroy_level_instance(instance);
     }
 
     entity_t entity_by_id(level_t level,
@@ -260,6 +264,11 @@ namespace level {
         return instance->level_entity;
     }
 }
+
+
+//==============================================================================
+// Module interface
+//==============================================================================
 
 namespace level_module {
     static struct level_api_v0 _api = {
@@ -282,6 +291,7 @@ namespace level_module {
         GET_API(api, vio_api_v0);
         GET_API(api, hash_api_v0);
         GET_API(api, blob_api_v0);
+        GET_API(api, world_api_v0);
 
 
         _G = {0};

@@ -198,7 +198,8 @@ namespace entity_resource_compiler {
 
         yaml_as_string(key, uid_str, CETECH_ARRAY_LEN(uid_str));
 
-        yaml_node_t component_type_node = yaml_get_node(value, "component_type");
+        yaml_node_t component_type_node = yaml_get_node(value,
+                                                        "component_type");
         yaml_as_string(component_type_node, component_type_str,
                        CETECH_ARRAY_LEN(component_type_str));
 
@@ -218,7 +219,8 @@ namespace entity_resource_compiler {
             uint32_t idx = array::size(output->component_ent_array);
             //Array<uint32_t> tmp_a(memory_api_v0.main_allocator());
             array::push_back(output->component_ent_array, {0});
-            output->component_ent_array[idx].init(memory_api_v0.main_allocator());
+            output->component_ent_array[idx].init(
+                    memory_api_v0.main_allocator());
 
             map::set(output->component_ent, cid, idx);
         }
@@ -227,7 +229,8 @@ namespace entity_resource_compiler {
             uint32_t idx = array::size(output->component_body_array);
             //Array<yaml_node_t> tmp_a(memory_api_v0.main_allocator());
             array::push_back(output->component_body_array, {0});
-            output->component_body_array[idx].init(memory_api_v0.main_allocator());
+            output->component_body_array[idx].init(
+                    memory_api_v0.main_allocator());
 
             map::set(output->component_body, cid, idx);
         }
@@ -237,7 +240,7 @@ namespace entity_resource_compiler {
         array::push_back(tmp_a, data->ent_id);
 
         idx = map::get(output->component_body, cid, UINT32_MAX);
-        Array<yaml_node_t>& tmp_b = output->component_body_array[idx];
+        Array<yaml_node_t> &tmp_b = output->component_body_array[idx];
         array::push_back(tmp_b, value);
     }
 
@@ -371,7 +374,7 @@ namespace entity_resource_compiler {
             };
 
             idx = map::get(output->component_body, cid, UINT32_MAX);
-            Array<yaml_node_t>& body = output->component_body_array[idx];
+            Array<yaml_node_t> &body = output->component_body_array[idx];
 
             blob_v0 *blob = blob_api_v0.create(memory_api_v0.main_allocator());
 
@@ -558,7 +561,6 @@ namespace entity {
                  uint32_t count) {
 
         for (int i = 0; i < count; ++i) {
-
             if (map::has(_G.spawned_map, entity[i].h)) {
                 Array<entity_t> &spawned = _get_spawned_array(entity[i]);
                 component_api_v0.destroy(world, array::begin(spawned),
@@ -568,7 +570,6 @@ namespace entity {
                 component_api_v0.destroy(world, &entity[i], 1);
             }
         }
-
     }
 }
 

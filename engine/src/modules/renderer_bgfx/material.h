@@ -3,6 +3,7 @@
 
 namespace material {
     int init(struct api_v0 *api);
+
     void shutdown();
 
     material_t create(uint64_t name);

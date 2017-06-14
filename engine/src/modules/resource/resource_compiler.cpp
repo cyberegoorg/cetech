@@ -137,7 +137,7 @@ void _compile_dir(Array<task_item> &tasks,
                   const char *source_dir,
                   const char *build_dir_full) {
 
-    char** files = nullptr;
+    char **files = nullptr;
     uint32_t files_count = 0;
 
     path_v0.list(source_dir, 1, &files, &files_count,
@@ -145,7 +145,7 @@ void _compile_dir(Array<task_item> &tasks,
 
     for (int i = 0; i < files_count; ++i) {
         const char *source_filename_full = files[i];
-        const char *source_filename_short = files[i]  + strlen(source_dir) + 1;
+        const char *source_filename_short = files[i] + strlen(source_dir) + 1;
         const char *resource_type = path_v0.extension(
                 source_filename_short);
 
@@ -221,7 +221,8 @@ void _compile_dir(Array<task_item> &tasks,
         array::push_back(tasks, item);
     }
 
-    path_v0.list_free(files, files_count, memory_api_v0.main_scratch_allocator());
+    path_v0.list_free(files, files_count,
+                      memory_api_v0.main_scratch_allocator());
 }
 
 

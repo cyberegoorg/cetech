@@ -43,9 +43,9 @@ uint32_t file_mtime(const char *path) {
 //==============================================================================
 
 void _dir_list(const char *path,
-              int recursive,
-              Array<char*>& tmp_files,
-              struct allocator *allocator) {
+               int recursive,
+               Array<char *> &tmp_files,
+               struct allocator *allocator) {
 #if defined(CETECH_LINUX)
     DIR *dir;
     struct dirent *entry;
@@ -96,21 +96,24 @@ void _dir_list(const char *path,
     closedir(dir);
 #endif
 }
+
 void dir_list(const char *path,
               int recursive,
-              char*** files,
-              uint32_t* count,
+              char ***files,
+              uint32_t *count,
               struct allocator *allocator) {
-    Array<char*> tmp_files(allocator);
+    Array<char *> tmp_files(allocator);
     _dir_list(path, recursive, tmp_files, allocator);
-    char** new_files = CETECH_ALLOCATE(allocator, char*, sizeof(char*) * array::size(tmp_files));
-    memcpy(new_files, array::begin(tmp_files), sizeof(char*) * array::size(tmp_files));
+    char **new_files = CETECH_ALLOCATE(allocator, char*,
+                                       sizeof(char *) * array::size(tmp_files));
+    memcpy(new_files, array::begin(tmp_files),
+           sizeof(char *) * array::size(tmp_files));
 
     *files = new_files;
-    *count =  array::size(tmp_files);
+    *count = array::size(tmp_files);
 }
 
-void dir_list_free(char** files,
+void dir_list_free(char **files,
                    uint32_t count,
                    struct allocator *allocator) {
     for (int i = 0; i < count; ++i) {

@@ -53,7 +53,7 @@ void sdl_mouse_shutdown() {
     _G = (struct G) {0};
 }
 
-void sdl_mouse_process(EventStream& stream) {
+void sdl_mouse_process(EventStream &stream) {
     int pos[2] = {0};
 
     uint32_t state = SDL_GetMouseState(&pos[0], &pos[1]);
@@ -68,7 +68,7 @@ void sdl_mouse_process(EventStream& stream) {
         window_t main_window = app_api_v0.main_window();
         uint32_t window_size[2] = {0};
         window_api_v0.size(main_window, &window_size[0],
-                               &window_size[1]);
+                           &window_size[1]);
 
         _G.position[0] = pos[0];
         _G.position[1] = window_size[1] - pos[1];

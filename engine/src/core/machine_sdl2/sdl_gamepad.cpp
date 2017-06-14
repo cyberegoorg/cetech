@@ -73,7 +73,7 @@ int _create_controler(int i) {
         _G.haptic[idx] = haptic;
 
         log_api_v0.info("input.gamepad", "Gamepad %d has haptic support",
-                            i);
+                        i);
     } else {
         _G.haptic[idx] = NULL;
     }
@@ -136,7 +136,7 @@ static SDL_GameControllerAxis _axis_to_sdl[GAMEPAD_AXIX_MAX][2] = {
                                  SDL_CONTROLLER_AXIS_TRIGGERRIGHT},
 };
 
-void sdl_gamepad_process(EventStream& stream) {
+void sdl_gamepad_process(EventStream &stream) {
     int curent_state[GAMEPAD_MAX][GAMEPAD_AXIX_MAX] = {0};
     vec2f_t curent_pos[GAMEPAD_MAX][GAMEPAD_BTN_MAX] = {0};
 
@@ -209,7 +209,7 @@ void sdl_gamepad_process(EventStream& stream) {
 }
 
 void sdl_gamepad_process_event(SDL_Event *event,
-                               EventStream& stream) {
+                               EventStream &stream) {
     switch (event->type) {
         case SDL_CONTROLLERDEVICEADDED: {
             int idx = _create_controler(event->cdevice.which);

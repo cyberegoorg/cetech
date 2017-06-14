@@ -34,6 +34,7 @@ namespace cetech {
         template<typename T>
         void destroy(Handler<T> &handler,
                      const T &h);
+
         template<typename T>
         bool alive(Handler<T> &handler,
                    const T &h);
@@ -51,7 +52,7 @@ namespace cetech {
                 idx = handler._freeIdx[0];
                 queue::pop_front(handler._freeIdx);
             } else {
-                array::push_back(handler._generation, (uint32_t)0);
+                array::push_back(handler._generation, (uint32_t) 0);
 
                 idx = array::size(handler._generation) - 1;
             }

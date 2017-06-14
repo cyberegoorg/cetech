@@ -213,7 +213,7 @@ int package_is_loaded(uint64_t name) {
     package_resource *package = (package_resource *) resource_api_v0.get(
             package_type, name);
 
-    if( package == NULL) {
+    if (package == NULL) {
         return 0;
     }
 

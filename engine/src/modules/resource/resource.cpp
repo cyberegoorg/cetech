@@ -25,7 +25,6 @@
 #include "include/mpack/mpack.h"
 
 #include "resource.h"
-#include "../../core/module/_module.h"
 #include <cetech/core/log.h>
 #include <cetech/core/errors.h>
 

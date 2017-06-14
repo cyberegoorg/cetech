@@ -18,7 +18,7 @@ IMPORT_API(hash_api_v0);
 static int _scenegraph_node_by_name(lua_State *l) {
     world_t w = {.h = luasys_to_handler(l, 1)};
     entity_t ent = {.h = luasys_to_handler(l, 2)};
-    const char* name_str = luasys_to_string(l, 3);
+    const char *name_str = luasys_to_string(l, 3);
 
     uint64_t name = hash_api_v0.id64_from_str(name_str);
     scene_node_t node = scenegprah_api_v0.node_by_name(w, ent, name);

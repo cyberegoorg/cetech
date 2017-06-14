@@ -57,7 +57,6 @@ static struct _G {
 } _G;
 
 
-
 #define hash_combine(a, b) ((a * 11)^(b))
 
 static void allocate(WorldInstance &_data,
@@ -176,7 +175,7 @@ static void _destroy_world(world_t world) {
 }
 
 int _transform_component_compiler(yaml_node_t body,
-                                  blob_v0* data) {
+                                  blob_v0 *data) {
     transform_data t_data;
 
     YAML_NODE_SCOPE(scale, body, "scale",
@@ -545,7 +544,8 @@ transform_t transform_create(world_t world,
     map::set(_G.ent_map, hash_combine(world.h, entity.h), idx);
 
     if (parent.h != UINT32_MAX) {
-        uint32_t parent_idx = map::get(_G.ent_map, hash_combine(world.h, parent.h),
+        uint32_t parent_idx = map::get(_G.ent_map,
+                                       hash_combine(world.h, parent.h),
                                        UINT32_MAX);
 
         data->parent[idx] = parent_idx;
@@ -597,8 +597,8 @@ void transform_link(world_t world,
 
 extern "C" void *transform_get_module_api(int api) {
     switch (api) {
-    case PLUGIN_EXPORT_API_ID: {
-        static struct module_export_api_v0 module = {0};
+        case PLUGIN_EXPORT_API_ID: {
+            static struct module_export_api_v0 module = {0};
 
             module.init = _init;
             module.init_api = _init_api;

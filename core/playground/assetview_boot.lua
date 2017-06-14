@@ -65,9 +65,8 @@ function AssetView:init()
     self.actual_asset_entity = nil
     self.level = nil
 
-
-    self:show_asset("level1", "level")
-    self:show_asset("level2", "level")
+--    self:show_asset("level1", "level")
+--    self:show_asset("level2", "level")
 end
 
 function AssetView:shutdown()

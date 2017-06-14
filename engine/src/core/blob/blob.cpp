@@ -53,9 +53,9 @@ namespace blob {
     }
 }
 
-static  blob_api_v0 blob_api {
-    .create = blob::create,
-    .destroy = blob::destroy,
+static blob_api_v0 blob_api{
+        .create = blob::create,
+        .destroy = blob::destroy,
 };
 
 static void _init(struct api_v0 *api) {

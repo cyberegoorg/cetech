@@ -51,7 +51,7 @@ window_t window_new(const char *title,
 
     if (w == NULL) {
         log_api_v0.error("sys", "Could not create window: %s",
-                             SDL_GetError());
+                         SDL_GetError());
     }
 
     return (window_t) {.w = w};
@@ -62,7 +62,7 @@ window_t window_new_from(void *hndl) {
 
     if (w == NULL) {
         log_api_v0.error("sys", "Could not create window: %s",
-                             SDL_GetError());
+                         SDL_GetError());
     }
 
     return (window_t) {.w = w};

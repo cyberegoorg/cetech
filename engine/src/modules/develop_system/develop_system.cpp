@@ -216,7 +216,9 @@ void _send_events() {
 
     event = eventstream::begin(_G.eventstream);
     while (event != eventstream::end(_G.eventstream)) {
-        to_mpack_fce_t to_mpack_fce = map::get<to_mpack_fce_t>(_G.to_mpack, event->type, NULL);
+        to_mpack_fce_t to_mpack_fce = map::get<to_mpack_fce_t>(_G.to_mpack,
+                                                               event->type,
+                                                               NULL);
 
         if (to_mpack_fce != NULL) {
             to_mpack_fce((const develop_event_header *) event, &writer);
@@ -343,7 +345,7 @@ static void _init(struct api_v0 *api) {
     int socket = nn_socket(AF_SP, NN_PUB);
     if (socket < 0) {
         log_api_v0.error(LOG_WHERE, "Could not create nanomsg socket: %s",
-                             nn_strerror(errno));
+                         nn_strerror(errno));
         //return 0;
     }
     addr = config_api_v0.get_string(_G.cv_pub_addr);
@@ -352,8 +354,8 @@ static void _init(struct api_v0 *api) {
 
     if (nn_bind(socket, addr) < 0) {
         log_api_v0.error(LOG_WHERE, "Could not bind socket to '%s': %s",
-                             addr,
-                             nn_strerror(errno));
+                         addr,
+                         nn_strerror(errno));
         //return 0;
     }
 
@@ -365,7 +367,7 @@ static void _shutdown() {
 
     nn_close(_G.pub_socket);
 
-    _G = (G){0};
+    _G = (G) {0};
 }
 
 extern "C" void *developsystem_get_module_api(int api) {

@@ -22,7 +22,7 @@ extern int _machine_init_impl(struct api_v0 *api);
 
 extern void _machine_shutdown_impl();
 
-extern void _machine_process_impl(EventStream& stream);
+extern void _machine_process_impl(EventStream &stream);
 
 extern int _machine_gamepad_is_active(int idx);
 

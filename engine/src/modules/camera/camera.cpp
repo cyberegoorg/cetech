@@ -122,7 +122,7 @@ namespace {
     }
 
     int _camera_component_compiler(yaml_node_t body,
-                                  blob_v0 *data) {
+                                   blob_v0 *data) {
 
         struct camera_data t_data;
 

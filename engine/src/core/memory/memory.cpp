@@ -20,6 +20,7 @@ struct MemorySystemGlobals {
 
 
 extern char *stacktrace(int);
+
 extern void stacktrace_free(char *);
 
 namespace memory {
@@ -103,8 +104,8 @@ namespace memory {
         return d;
     }
 
-    #include "allocator_scratch.inl"
-    #include "allocator_malloc.inl"
+#include "allocator_scratch.inl"
+#include "allocator_malloc.inl"
 
 
     void memsys_init_api(struct api_v0 *api) {
@@ -120,7 +121,7 @@ namespace memory {
     }
 
     void memsys_init(int scratch_buffer_size) {
-        _G =  {0};
+        _G = {0};
 
         _G.default_allocator = malloc_allocator_create();
 

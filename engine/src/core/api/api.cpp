@@ -4,7 +4,6 @@
 
 #include <cetech/celib/map.inl>
 
-#include <cetech/core/path.h>
 #include <cetech/core/hash.h>
 #include <cetech/core/module.h>
 #include <cetech/core/api.h>

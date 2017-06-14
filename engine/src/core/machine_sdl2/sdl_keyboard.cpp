@@ -42,7 +42,7 @@ void sdl_keyboard_shutdown() {
     _G = (struct G) {0};
 }
 
-void sdl_keyboard_process(EventStream& stream) {
+void sdl_keyboard_process(EventStream &stream) {
     const uint8_t *state = SDL_GetKeyboardState(NULL);
     struct keyboard_event keyboard_ev;
 

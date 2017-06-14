@@ -3,7 +3,9 @@
 
 namespace api {
     void init(struct allocator *allocator);
+
     void shutdown();
+
     struct api_v0 *v0();
 };
 

@@ -95,12 +95,6 @@ namespace {
         _data = new_data;
     }
 
-    static void _new_world(world_t world) {
-        uint32_t idx = array::size(_G.world_instances);
-        array::push_back(_G.world_instances, WorldInstance());
-        map::set(_G.world_map, world.h, idx);
-    }
-
     WorldInstance *_get_world_instance(world_t world) {
         uint32_t idx = map::get(_G.world_map, world.h, UINT32_MAX);
 
@@ -110,6 +104,41 @@ namespace {
 
         return nullptr;
     }
+
+
+    void destroy(world_t world,
+                 entity_t ent) {
+        WorldInstance &_data = *_get_world_instance(world);
+
+        uint32_t id = hash_combine(world.h, ent.h);
+        uint32_t i = map::get(_G.ent_map, id, UINT32_MAX);
+
+        if (i == UINT32_MAX) {
+            return;
+        }
+
+        unsigned last = _data.n - 1;
+        entity_t e = _data.entity[i];
+        entity_t last_e = _data.entity[last];
+
+        _data.entity[i] = _data.entity[last];
+        _data.scene[i] = _data.scene[last];
+        _data.mesh[i] = _data.mesh[last];
+        _data.node[i] = _data.node[last];
+        _data.material[i] = _data.material[last];
+
+        map::set(_G.ent_map, hash_combine(world.h, last_e.h), i);
+        map::remove(_G.ent_map, hash_combine(world.h, e.h));
+
+        --_data.n;
+    }
+
+    static void _new_world(world_t world) {
+        uint32_t idx = array::size(_G.world_instances);
+        array::push_back(_G.world_instances, WorldInstance());
+        map::set(_G.world_map, world.h, idx);
+    }
+
 
     static void _destroy_world(world_t world) {
         // TODO: impl
@@ -167,9 +196,8 @@ namespace {
     static void _destroyer(world_t world,
                            entity_t *ents,
                            size_t ent_count) {
-        // TODO: remove from arrays, swap idx -> last AND change size
         for (int i = 0; i < ent_count; i++) {
-            map::remove(_G.world_map, ents[i].h);
+            destroy(world, ents[i]);
         }
     }
 

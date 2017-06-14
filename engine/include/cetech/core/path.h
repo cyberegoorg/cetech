@@ -25,14 +25,14 @@ struct path_v0 {
     //! \param allocator Allocator
     void (*list)(const char *path,
                  int recursive,
-                 char*** files,
-                 uint32_t* count,
+                 char ***files,
+                 uint32_t *count,
                  struct allocator *allocator);
 
     //! Free list dir array
     //! \param files Files array
     //! \param allocator Allocator
-    void (*list_free)(char** files,
+    void (*list_free)(char **files,
                       uint32_t count,
                       struct allocator *allocator);
 
