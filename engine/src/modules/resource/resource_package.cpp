@@ -172,6 +172,8 @@ void package_task(void *data) {
                                          package)[j]],
                                  package_name_count(package)[j]);
     }
+
+    CETECH_DEALLOCATE(memory_api_v0.main_allocator(), task_data);
 }
 
 void package_load(uint64_t name) {

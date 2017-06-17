@@ -425,10 +425,10 @@ namespace resource {
     }
 
     void *get(uint64_t type,
-              uint64_t names) {
-        thread_api_v0.spin_lock(&_G.add_lock);
+              uint64_t name) {
+        //thread_api_v0.spin_lock(&_G.add_lock);
 
-        uint64_t id = hash_combine(type, names);
+        uint64_t id = hash_combine(type, name);
         uint32_t idx = map::get(_G.resource_map, id, UINT32_MAX);
         resource_item_t item = {0};
         if (idx != UINT32_MAX) {
@@ -439,7 +439,7 @@ namespace resource {
             char build_name[33] = {0};
             type_name_string(build_name, CETECH_ARRAY_LEN(build_name),
                              type,
-                             names);
+                             name);
 
             if (_G.autoload_enabled) {
 #ifdef CETECH_CAN_COMPILE
@@ -447,15 +447,15 @@ namespace resource {
                 resource_compiler_get_filename(filename,
                                                CETECH_ARRAY_LEN(filename),
                                                type,
-                                               names);
+                                               name);
 #else
                 char *filename = build_name;
 #endif
                 log_api_v0.warning(LOG_WHERE, "Autoloading resource %s",
                                    filename);
-                load_now(type, &names, 1);
+                load_now(type, &name, 1);
 
-                uint64_t id = hash_combine(type, names);
+                uint64_t id = hash_combine(type, name);
                 uint32_t idx = map::get(_G.resource_map, id, UINT32_MAX);
                 item = {0};
                 if (idx != UINT32_MAX) {
@@ -468,7 +468,7 @@ namespace resource {
             }
         }
 
-        thread_api_v0.spin_unlock(&_G.add_lock);
+        //thread_api_v0.spin_unlock(&_G.add_lock);
 
         return item.data;
     }

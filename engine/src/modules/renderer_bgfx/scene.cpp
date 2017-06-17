@@ -77,7 +77,6 @@ void _destroy_scene_instance(uint64_t scene) {
     uint32_t idx = map::get(_G.scene_instance_map, scene, UINT32_MAX);
     scene_instance *instance = &_G.scene_instance_array[idx];
 
-
     instance->geom_map.destroy();
     instance->size.destroy();
     instance->vb.destroy();

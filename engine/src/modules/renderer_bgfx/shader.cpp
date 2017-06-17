@@ -148,12 +148,12 @@ namespace shader_resource_compiler {
         struct shader resource = {0};
 
         // TODO: temp allocator?
-        char build_dir[4096] = {0};
-        char tmp_dir[4096] = {0};
+        char build_dir[1024] = {0};
+        char tmp_dir[1024] = {0};
         char input_str[1024] = {0};
         char input_path[1024] = {0};
-        char output_path[4096] = {0};
-        char tmp_filename[4096] = {0};
+        char output_path[1024] = {0};
+        char tmp_filename[1024] = {0};
 
         resource_api_v0.compiler_get_build_dir(build_dir,
                                                CETECH_ARRAY_LEN(build_dir),

@@ -108,12 +108,12 @@ namespace texture_resource_compiler {
                                           struct vio *build_vio,
                                           struct compilator_api *compilator_api) {
         // TODO: temp allocator?
-        char build_dir[4096] = {0};
-        char tmp_dir[4096] = {0};
+        char build_dir[1024] = {0};
+        char tmp_dir[1024] = {0};
         char input_str[1024] = {0};
         char input_path[1024] = {0};
-        char output_path[4096] = {0};
-        char tmp_filename[4096] = {0};
+        char output_path[1024] = {0};
+        char tmp_filename[1024] = {0};
 
         char source_data[vio_api_v0.size(source_vio) + 1];
         memset(source_data, 0, vio_api_v0.size(source_vio) + 1);
