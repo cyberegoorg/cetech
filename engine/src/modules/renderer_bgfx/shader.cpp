@@ -39,10 +39,10 @@ struct shader {
 //==============================================================================
 
 #define _G ShaderResourceGlobals
-struct G {
+struct ShaderResourceGlobals {
     Map<bgfx_program_handle_t> handler_map;
     uint64_t type;
-} _G = {0};
+} ShaderResourceGlobals;
 
 
 IMPORT_API(memory_api_v0)
@@ -122,10 +122,10 @@ namespace shader_resource_compiler {
     const char* fs_profile = "ps_4_0";
 #endif
 
-    static int _shader_resource_compiler(const char *filename,
-                                         struct vio *source_vio,
-                                         struct vio *build_vio,
-                                         struct compilator_api *compilator_api) {
+    static int compiler(const char *filename,
+                        struct vio *source_vio,
+                        struct vio *build_vio,
+                        struct compilator_api *compilator_api) {
 
         char source_data[vio_api_v0.size(source_vio) + 1];
         memset(source_data, 0, vio_api_v0.size(source_vio) + 1);
@@ -238,8 +238,8 @@ namespace shader_resource {
     static const bgfx_program_handle_t null_program = {0};
 
 
-    void *_shader_resource_loader(struct vio *input,
-                                  struct allocator *allocator) {
+    void *loader(struct vio *input,
+                 struct allocator *allocator) {
         const int64_t size = vio_api_v0.size(input);
         char *data = CETECH_ALLOCATE(allocator, char, size);
         vio_api_v0.read(input, data, 1, size);
@@ -247,13 +247,13 @@ namespace shader_resource {
         return data;
     }
 
-    void _shader_resource_unloader(void *new_data,
-                                   struct allocator *allocator) {
+    void unloader(void *new_data,
+                  struct allocator *allocator) {
         CETECH_DEALLOCATE(allocator, new_data);
     }
 
-    void _shader_resource_online(uint64_t name,
-                                 void *data) {
+    void online(uint64_t name,
+                void *data) {
         struct shader *resource = (shader *) data;
 
         const bgfx_memory_t *vs_mem = bgfx_alloc(resource->vs_size);
@@ -273,8 +273,8 @@ namespace shader_resource {
         map::set(_G.handler_map, name, program);
     }
 
-    void _shader_resource_offline(uint64_t name,
-                                  void *data) {
+    void offline(uint64_t name,
+                 void *data) {
 
         bgfx_program_handle_t program = map::get(_G.handler_map, name,
                                                  null_program);
@@ -288,24 +288,24 @@ namespace shader_resource {
         map::remove(_G.handler_map, name);
     }
 
-    void *_shader_resource_reloader(uint64_t name,
-                                    void *old_data,
-                                    void *new_data,
-                                    struct allocator *allocator) {
-        _shader_resource_offline(name, old_data);
-        _shader_resource_online(name, new_data);
+    void *reloader(uint64_t name,
+                   void *old_data,
+                   void *new_data,
+                   struct allocator *allocator) {
+        offline(name, old_data);
+        online(name, new_data);
 
         CETECH_DEALLOCATE(allocator, old_data);
 
         return new_data;
     }
 
-    static const resource_callbacks_t shader_resource_callback = {
-            .loader = _shader_resource_loader,
-            .unloader =_shader_resource_unloader,
-            .online =_shader_resource_online,
-            .offline =_shader_resource_offline,
-            .reloader = _shader_resource_reloader
+    static const resource_callbacks_t callback = {
+            .loader = loader,
+            .unloader =unloader,
+            .online = online,
+            .offline = offline,
+            .reloader = reloader
     };
 
 }
@@ -315,7 +315,6 @@ namespace shader_resource {
 //==============================================================================
 
 int shader_init(struct api_v0 *api) {
-    _G = (struct G) {0};
 
     GET_API(api, memory_api_v0);
     GET_API(api, resource_api_v0);
@@ -326,22 +325,23 @@ int shader_init(struct api_v0 *api) {
     GET_API(api, log_api_v0);
     GET_API(api, hash_api_v0);
 
+    _G = {0};
 
     _G.type = hash_api_v0.id64_from_str("shader");
 
     _G.handler_map.init(memory_api_v0.main_allocator());
 
     resource_api_v0.register_type(_G.type,
-                                  shader_resource::shader_resource_callback);
+                                  shader_resource::callback);
 #ifdef CETECH_CAN_COMPILE
     resource_api_v0.compiler_register(_G.type,
-                                      shader_resource_compiler::_shader_resource_compiler);
+                                      shader_resource_compiler::compiler);
 #endif
     return 1;
 }
 
 void shader_shutdown() {
-    _G = {0};
+    _G.handler_map.destroy();
 }
 
 bgfx_program_handle_t shader_get(uint64_t name) {

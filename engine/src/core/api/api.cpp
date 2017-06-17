@@ -28,7 +28,7 @@ using namespace cetech;
 
 static struct ApiSystemGlobals {
     Map<void *> api_map;
-} _G = {0};
+} _G;
 
 
 //==============================================================================
@@ -80,7 +80,6 @@ namespace api {
 
     void shutdown() {
         _G.api_map.destroy();
-        _G = {0};
     }
 
     struct api_v0 *v0() {

@@ -50,7 +50,7 @@ namespace {
         cvar_t cv_rpc_addr;
         cvar_t cv_log_addr;
         cvar_t cv_push_addr;
-    } _G = {0};
+    } _G;
 
     static console_server_command_t find_command(const char *name) {
         uint64_t key = hash_api_v0.id64_from_str(name);
@@ -148,8 +148,8 @@ namespace consoleserver {
 
 namespace consoleserver_module {
     static struct cnsole_srv_api_v0 console_api = {
-            .consolesrv_push_begin = consoleserver::push_begin,
-            .consolesrv_register_command = consoleserver::register_command
+            .push_begin = consoleserver::push_begin,
+            .register_command = consoleserver::register_command
     };
 
     static void _init_cvar(struct config_api_v0 config) {
@@ -257,6 +257,8 @@ namespace consoleserver_module {
         nn_close(_G.push_socket);
         //nn_close(_G.log_socket);
         nn_close(_G.rpc_socket);
+
+        _G.commands.destroy();
     }
 
     static void _update() {

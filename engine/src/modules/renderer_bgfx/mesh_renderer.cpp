@@ -60,7 +60,7 @@ namespace {
         Map<uint32_t> world_map;
         Array<WorldInstance> world_instances;
         Map<uint32_t> ent_map;
-    } _G = {0};
+    } _G;
 
     void allocate(WorldInstance &_data,
                   allocator *_allocator,
@@ -445,7 +445,9 @@ static void _init(struct api_v0 *api) {
 }
 
 static void _shutdown() {
-    _G = {0};
+    _G.world_map.destroy();
+    _G.world_instances.destroy();
+    _G.ent_map.destroy();
 }
 
 extern "C" void *mesh_get_module_api(int api) {

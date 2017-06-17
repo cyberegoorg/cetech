@@ -45,10 +45,12 @@ namespace {
         uint32_t spawned_entity_count;
     };
 
+
+    #define _G LevelGlobals
     static struct LevelGlobals {
         uint64_t level_type;
         Array<struct level_instance> level_instance;
-    } _G = {0};
+    } LevelGlobals;
 
     void _init_level_instance(struct level_instance *instance,
                               entity_t level_entity) {
@@ -82,125 +84,131 @@ namespace {
 // Resource
 //==============================================================================
 
-void *level_resource_loader(struct vio *input,
+namespace level_resource {
+
+    void *loader(struct vio *input,
+                 struct allocator *allocator) {
+        const int64_t size = vio_api_v0.size(input);
+        char *data = CETECH_ALLOCATE(allocator, char, size);
+        vio_api_v0.read(input, data, 1, size);
+        return data;
+    }
+
+    void unloader(void *new_data,
+                  struct allocator *allocator) {
+        CETECH_DEALLOCATE(allocator, new_data);
+    }
+
+    void online(uint64_t name,
+                void *data) {
+    }
+
+    void resource_offline(uint64_t name,
+                          void *data) {
+    }
+
+    void *resource_reloader(uint64_t name,
+                            void *old_data,
+                            void *new_data,
                             struct allocator *allocator) {
-    const int64_t size = vio_api_v0.size(input);
-    char *data = CETECH_ALLOCATE(allocator, char, size);
-    vio_api_v0.read(input, data, 1, size);
-    return data;
+        resource_offline(name, old_data);
+        online(name, new_data);
+
+        CETECH_DEALLOCATE(allocator, old_data);
+
+        return new_data;
+    }
+
+    static const resource_callbacks_t callback = {
+            .loader = loader,
+            .unloader = unloader,
+            .online = online,
+            .offline = resource_offline,
+            .reloader = resource_reloader
+    };
+
 }
-
-void level_resource_unloader(void *new_data,
-                             struct allocator *allocator) {
-    CETECH_DEALLOCATE(allocator, new_data);
-}
-
-void level_resource_online(uint64_t name,
-                           void *data) {
-}
-
-void level_resource_offline(uint64_t name,
-                            void *data) {
-}
-
-void *level_resource_reloader(uint64_t name,
-                              void *old_data,
-                              void *new_data,
-                              struct allocator *allocator) {
-    level_resource_offline(name, old_data);
-    level_resource_online(name, new_data);
-
-    CETECH_DEALLOCATE(allocator, old_data);
-
-    return new_data;
-}
-
-static const resource_callbacks_t _level_resource_defs = {
-        .loader = level_resource_loader,
-        .unloader = level_resource_unloader,
-        .online = level_resource_online,
-        .offline = level_resource_offline,
-        .reloader = level_resource_reloader
-};
 
 #ifdef CETECH_CAN_COMPILE
-struct foreach_entities_data {
-    const char *filename;
-    struct compilator_api *capi;
-    Array<uint64_t> *id;
-    Array<uint32_t> *offset;
-    blob_v0 *data;
-    struct entity_compile_output *output;
-};
-
-void forach_entities_clb(yaml_node_t key,
-                         yaml_node_t value,
-                         void *_data) {
-    struct foreach_entities_data *data = (foreach_entities_data *) _data;
-
-
-    char name[128] = {0};
-    yaml_as_string(key, name, CETECH_ARRAY_LEN(name));
-
-    array::push_back(*data->id, hash_api_v0.id64_from_str(name));
-    array::push_back(*data->offset,
-                     entity_api_v0.compiler_ent_counter(data->output));
-
-    entity_api_v0.compiler_compile_entity(data->output, value, data->filename,
-                                          data->capi);
-}
-
-int _level_resource_compiler(const char *filename,
-                             struct vio *source_vio,
-                             struct vio *build_vio,
-                             struct compilator_api *compilator_api) {
-
-    char source_data[vio_api_v0.size(source_vio) + 1];
-    memset(source_data, 0, vio_api_v0.size(source_vio) + 1);
-    vio_api_v0.read(source_vio, source_data, sizeof(char),
-                    vio_api_v0.size(source_vio));
-
-    yaml_document_t h;
-    yaml_node_t root = yaml_load_str(source_data, &h);
-
-    yaml_node_t entities = yaml_get_node(root, "entities");
-
-    Array<uint64_t> id(memory_api_v0.main_allocator());
-    Array<uint32_t> offset(memory_api_v0.main_allocator());
-    blob_v0 *data = blob_api_v0.create(memory_api_v0.main_allocator());
-
-    entity_compile_output *output = entity_api_v0.compiler_create_output();
-    foreach_entities_data entity_data = {
-            .id = &id,
-            .offset = &offset,
-            .data = data,
-            .capi = compilator_api,
-            .filename = filename,
-            .output = output
+namespace level_resource_compiler {
+    struct foreach_entities_data {
+        const char *filename;
+        struct compilator_api *capi;
+        Array<uint64_t> *id;
+        Array<uint32_t> *offset;
+        blob_v0 *data;
+        struct entity_compile_output *output;
     };
 
-    yaml_node_foreach_dict(entities, forach_entities_clb, &entity_data);
+    void forach_entities_clb(yaml_node_t key,
+                             yaml_node_t value,
+                             void *_data) {
+        struct foreach_entities_data *data = (foreach_entities_data *) _data;
 
-    struct level_blob res = {
-            .entities_count = (uint32_t) array::size(id)
-    };
 
-    entity_api_v0.compiler_write_to_build(output, entity_data.data);
+        char name[128] = {0};
+        yaml_as_string(key, name, CETECH_ARRAY_LEN(name));
 
-    vio_api_v0.write(build_vio, &res, sizeof(struct level_blob), 1);
-    vio_api_v0.write(build_vio, array::begin(id), sizeof(uint64_t),
-                     array::size(id));
-    vio_api_v0.write(build_vio, array::begin(offset), sizeof(uint32_t),
-                     array::size(offset));
-    vio_api_v0.write(build_vio, data->data(data->inst), sizeof(uint8_t),
-                     data->size(data->inst));
+        array::push_back(*data->id, hash_api_v0.id64_from_str(name));
+        array::push_back(*data->offset,
+                         entity_api_v0.compiler_ent_counter(data->output));
 
-    blob_api_v0.destroy(data);
-    entity_api_v0.compiler_destroy_output(output);
+        entity_api_v0.compiler_compile_entity(data->output, value,
+                                              data->filename,
+                                              data->capi);
+    }
 
-    return 1;
+    int compiler(const char *filename,
+                 struct vio *source_vio,
+                 struct vio *build_vio,
+                 struct compilator_api *compilator_api) {
+
+        char source_data[vio_api_v0.size(source_vio) + 1];
+        memset(source_data, 0, vio_api_v0.size(source_vio) + 1);
+        vio_api_v0.read(source_vio, source_data, sizeof(char),
+                        vio_api_v0.size(source_vio));
+
+        yaml_document_t h;
+        yaml_node_t root = yaml_load_str(source_data, &h);
+
+        yaml_node_t entities = yaml_get_node(root, "entities");
+
+        Array<uint64_t> id(memory_api_v0.main_allocator());
+        Array<uint32_t> offset(memory_api_v0.main_allocator());
+        blob_v0 *data = blob_api_v0.create(memory_api_v0.main_allocator());
+
+        entity_compile_output *output = entity_api_v0.compiler_create_output();
+        foreach_entities_data entity_data = {
+                .id = &id,
+                .offset = &offset,
+                .data = data,
+                .capi = compilator_api,
+                .filename = filename,
+                .output = output
+        };
+
+        yaml_node_foreach_dict(entities, forach_entities_clb, &entity_data);
+
+        struct level_blob res = {
+                .entities_count = (uint32_t) array::size(id)
+        };
+
+        entity_api_v0.compiler_write_to_build(output, entity_data.data);
+
+        vio_api_v0.write(build_vio, &res, sizeof(struct level_blob), 1);
+        vio_api_v0.write(build_vio, array::begin(id), sizeof(uint64_t),
+                         array::size(id));
+        vio_api_v0.write(build_vio, array::begin(offset), sizeof(uint32_t),
+                         array::size(offset));
+        vio_api_v0.write(build_vio, data->data(data->inst), sizeof(uint8_t),
+                         data->size(data->inst));
+
+        blob_api_v0.destroy(data);
+        entity_api_v0.compiler_destroy_output(output);
+
+        return 1;
+    }
 }
-
 #endif
 
 //==============================================================================
@@ -300,19 +308,18 @@ namespace level_module {
 
         _G.level_instance.init(memory_api_v0.main_allocator());
 
-        resource_api_v0.register_type(_G.level_type, _level_resource_defs);
+        resource_api_v0.register_type(_G.level_type, level_resource::callback);
 
 #ifdef CETECH_CAN_COMPILE
         resource_api_v0.compiler_register(_G.level_type,
-                                          _level_resource_compiler);
+                                          level_resource_compiler::compiler);
 #endif
 
     }
 
     void _shutdown() {
-        _G = {0};
+        _G.level_instance.destroy();
     }
-
 
     extern "C" void *level_get_module_api(int api) {
 

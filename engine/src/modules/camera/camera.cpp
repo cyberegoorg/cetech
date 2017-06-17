@@ -46,15 +46,14 @@ namespace {
         float *fov;
     };
 
-
 #define _G CameraGlobal
-    static struct _G {
+    static struct CameraGlobal {
         uint64_t type;
 
         Map<uint32_t> world_map;
         Array<WorldInstance> world_instances;
         Map<uint32_t> ent_map;
-    } _G = {0};
+    } CameraGlobal;
 
 
     static void allocate(WorldInstance &_data,
@@ -266,14 +265,19 @@ namespace camera_module {
         component_api_v0.register_compiler(_G.type,
                                            _camera_component_compiler,
                                            10);
-        component_api_v0.register_type(_G.type, (struct component_clb) {
-                .spawner=_spawner, .destroyer=_destroyer,
-                .on_world_create=_on_world_create, .on_world_destroy=_on_world_destroy
+
+        component_api_v0.register_type(_G.type, {
+                .spawner=_spawner,
+                .destroyer=_destroyer,
+                .on_world_create=_on_world_create,
+                .on_world_destroy=_on_world_destroy
         });
     }
 
     static void _shutdown() {
-        _G = {0};
+       _G.ent_map.destroy();
+       _G.world_instances.destroy();
+       _G.world_map.destroy();
     }
 
 

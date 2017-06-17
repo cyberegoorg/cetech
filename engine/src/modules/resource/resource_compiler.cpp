@@ -182,7 +182,7 @@ void _compile_dir(Array<task_item> &tasks,
             continue;
         }
 
-        char build_path[4096] = {0};
+        char build_path[1024] = {0};
         path_v0.join(build_path, CETECH_ARRAY_LEN(build_path),
                      build_dir_full,
                      build_name);

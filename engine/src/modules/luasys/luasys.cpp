@@ -916,10 +916,10 @@ static void _init(struct api_v0 *api_v0) {
     _register_all_api(api_v0);
 
 //    luasys_add_module_function("module", "reload", _reload_module);
-    cnsole_srv_api_v0.consolesrv_register_command("lua_system.execute",
+    cnsole_srv_api_v0.register_command("lua_system.execute",
                                                   _cmd_execute_string);
 
-    resource_api_v0.register_type(_G.type_id, lua_resource_callback);
+    resource_api_v0.register_type(_G.type_id, resource_lua::callback);
 #ifdef CETECH_CAN_COMPILE
     resource_api_v0.compiler_register(_G.type_id, _lua_compiler);
 #endif

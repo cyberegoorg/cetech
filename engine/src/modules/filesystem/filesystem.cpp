@@ -35,9 +35,10 @@ using namespace cetech;
 //==============================================================================
 
 
+#define _G FilesystemGlobals
 static struct FilesystemGlobals {
     Map<char *> root_map;
-} _G = {0};
+} FilesystemGlobals;
 
 
 
@@ -183,7 +184,7 @@ namespace filesystem_module {
             ++it;
         }
 
-        _G = {0};
+        _G.root_map.destroy();
     }
 
     extern "C" void *filesystem_get_module_api(int api) {

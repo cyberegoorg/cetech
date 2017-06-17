@@ -55,7 +55,7 @@ namespace {
 
         Handler<uint32_t> material_handler;
         uint64_t type;
-    } _G = {0};
+    } _G;
 }
 
 #define material_blob_uniform_bgfx(r)    ((bgfx_uniform_handle_t*) ((material_blob_vec4f_value(r)+((r)->vec4f_count))))
@@ -347,7 +347,11 @@ namespace material {
     }
 
     void shutdown() {
-        _G = {0};
+        _G.material_handler.destroy();
+
+        _G.material_instace_map.destroy();
+        _G.material_instance_offset.destroy();
+        _G.material_instance_data.destroy();
     }
 
     static const material_t null_material = {0};

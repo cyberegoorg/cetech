@@ -38,6 +38,8 @@ using namespace cetech;
 // Globals
 //==============================================================================
 
+#define _G EntityMaagerGlobals
+
 static struct EntityMaagerGlobals {
     Handler<uint32_t> entity_handler;
 
@@ -45,7 +47,7 @@ static struct EntityMaagerGlobals {
     Array<Array<entity_t>> spawned_array;
 
     uint64_t type;
-} _G = {0};
+} EntityMaagerGlobals;
 
 struct entity_resource {
     uint32_t ent_count;
@@ -627,7 +629,9 @@ namespace entity_module {
     }
 
     static void _shutdown() {
-        _G = {0};
+        _G.spawned_map.destroy();
+        _G.spawned_array.destroy();
+        _G.entity_handler.destroy();
     }
 
 

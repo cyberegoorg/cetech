@@ -334,7 +334,7 @@ static void _init(struct api_v0 *api) {
     GET_API(api, hash_api_v0);
 
 
-    _G = (struct _G) {0};
+    _G = {0};
 
     _G.world_map.init(memory_api_v0.main_allocator());
     _G.world_instances.init(memory_api_v0.main_allocator());
@@ -361,7 +361,9 @@ static void _init(struct api_v0 *api) {
 }
 
 static void _shutdown() {
-    _G = (struct _G) {0};
+    _G.world_map.destroy();
+    _G.world_instances.destroy();
+    _G.ent_map.destroy();
 }
 
 

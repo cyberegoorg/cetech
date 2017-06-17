@@ -87,7 +87,7 @@ static struct ApplicationGlobals {
     int is_running;
     int init_error;
     float dt;
-} _G = {0};
+} _G;
 
 
 //==============================================================================
@@ -212,6 +212,7 @@ extern "C" void _init_core_modules() {
 int application_init(int argc,
                      const char **argv) {
     _G = {0};
+
     _G.args = (struct args) {.argc = argc, .argv = argv};
 
     log::init();
@@ -251,7 +252,7 @@ int application_init(int argc,
 
     log_api_v0.set_wid_clb(task_api_v0.worker_id);
 
-    cnsole_srv_api_v0.consolesrv_register_command("wait", _cmd_wait);
+    cnsole_srv_api_v0.register_command("wait", _cmd_wait);
 
     return 1;
 }
@@ -280,11 +281,11 @@ static void _boot_stage() {
 
     resource_api_v0.load_now(pkg, resources, 2);
 
-    package_api_v0.load(core_pkg);
-    package_api_v0.flush(core_pkg);
     package_api_v0.load(boot_pkg);
     package_api_v0.flush(boot_pkg);
 
+    package_api_v0.load(core_pkg);
+    package_api_v0.flush(core_pkg);
 
     uint64_t boot_script = hash_api_v0.id64_from_str(
             config_api_v0.get_string(_G.config.boot_script));
@@ -364,7 +365,7 @@ void application_start() {
     float frame_time = (1.0f / frame_limit);
     float frame_time_accum = 0.0f;
 
-    cnsole_srv_api_v0.consolesrv_push_begin();
+    cnsole_srv_api_v0.push_begin();
     while (_G.is_running) {
         struct scope_data application_sd = develop_api_v0.enter_scope(
                 "Application:update()");

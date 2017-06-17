@@ -446,7 +446,9 @@ namespace scenegraph_module {
     }
 
     void shutdown() {
-        _G = {0};
+        _G.world_map.destroy();
+        _G.world_instances.destroy();
+        _G.ent_map.destroy();
     }
 
     extern "C" void *scenegraph_get_module_api(int api) {

@@ -37,10 +37,10 @@ struct texture {
 //==============================================================================
 
 #define _G TextureResourceGlobals
-struct G {
+struct TextureResourceGlobals {
     Map<bgfx_texture_handle_t> handler_map;
     uint64_t type;
-} _G = {0};
+} TextureResourceGlobals;
 
 
 IMPORT_API(memory_api_v0);
@@ -259,7 +259,6 @@ namespace texture_resource {
 //==============================================================================
 
 int texture_init(struct api_v0 *api) {
-    _G = (struct G) {0};
 
     GET_API(api, memory_api_v0);
     GET_API(api, resource_api_v0);
@@ -269,6 +268,8 @@ int texture_init(struct api_v0 *api) {
     GET_API(api, process_api_v0);
     GET_API(api, log_api_v0);
     GET_API(api, hash_api_v0);
+
+    _G = {0};
 
     _G.type = hash_api_v0.id64_from_str("texture");
 
@@ -286,7 +287,7 @@ int texture_init(struct api_v0 *api) {
 }
 
 void texture_shutdown() {
-    _G = {0};
+    _G.handler_map.destroy();
 }
 
 bgfx_texture_handle_t texture_get(uint64_t name) {
