@@ -27,6 +27,7 @@
 #include "resource.h"
 #include <cetech/core/log.h>
 #include <cetech/core/errors.h>
+#include <cetech/core/thread.h>
 
 IMPORT_API(memory_api_v0);
 IMPORT_API(cnsole_srv_api_v0);
@@ -37,6 +38,7 @@ IMPORT_API(path_v0);
 IMPORT_API(vio_api_v0);
 IMPORT_API(log_api_v0);
 IMPORT_API(hash_api_v0);
+IMPORT_API(thread_api_v0);
 
 
 void resource_register_type(uint64_t type,
@@ -57,6 +59,13 @@ namespace resource {
 #define LOG_WHERE "resource_manager"
 #define is_item_null(item) (item.data == null_item.data)
 
+//#define hash_combine(a, b) ((a * 11)^(b))
+
+uint64_t  hash_combine( uint64_t  lhs, uint64_t  rhs ) {
+    lhs^= rhs + 0x9e3779b9 + (lhs << 6) + (lhs >> 2);
+    return lhs;
+}
+
 //==============================================================================
 // Gloals
 //==============================================================================
@@ -65,26 +74,30 @@ namespace resource {
 
 namespace {
     typedef struct {
+        uint64_t type;
+        uint64_t name;
         void *data;
         uint8_t ref_count;
     } resource_item_t;
 
-    static const resource_item_t null_item = {.data=NULL, .ref_count=0};
-
-
+    static const resource_item_t null_item = {0};
+#define _G ResourceManagerGlobals
     struct ResourceManagerGlobals {
         Map<uint32_t> type_map;
-
-        Array<Map<resource_item_t>> resource_data;
         Array<resource_callbacks_t> resource_callbacks;
 
+        Map<uint32_t> resource_map;
+        Array<resource_item_t> resource_data;
+
         int autoload_enabled;
+
+        spinlock_t add_lock;
 
         struct {
             cvar_t build_dir;
         } config;
 
-    } _G = {0};
+    } ResourceManagerGlobals = {0};
 
 
     int _cmd_reload_all(mpack_node_t args,
@@ -93,15 +106,15 @@ namespace {
         return 0;
     }
 
-    Map<resource_item_t> *_get_resource_map(uint64_t type) {
-        const uint32_t idx = map::get(_G.type_map, type, UINT32_MAX);
-
-        if (idx == UINT32_MAX) {
-            return NULL;
-        }
-
-        return &_G.resource_data[idx];
-    }
+//    Map<resource_item_t> *_get_resource_map(uint64_t type) {
+//        const uint32_t idx = map::get(_G.type_map, type, UINT32_MAX);
+//
+//        if (idx == UINT32_MAX) {
+//            return NULL;
+//        }
+//
+//        return &_G.resource_data[idx];
+//    }
 
 }
 
@@ -180,14 +193,9 @@ namespace resource {
     void resource_register_type(uint64_t type,
                                 resource_callbacks_t callbacks) {
 
-        const uint32_t idx = array::size(_G.resource_data);
+        const uint32_t idx = array::size(_G.resource_callbacks);
 
-
-        array::push_back(_G.resource_data, Map<resource_item_t>());
         array::push_back(_G.resource_callbacks, callbacks);
-
-        _G.resource_data[idx].init(memory_api_v0.main_allocator());
-
         map::set(_G.type_map, type, idx);
     }
 
@@ -195,26 +203,46 @@ namespace resource {
                     uint64_t *names,
                     void **resource_data,
                     size_t count) {
-        const uint32_t idx = map::get(_G.type_map, type, UINT32_MAX);
+        thread_api_v0.spin_lock(&_G.add_lock);
 
-        if (idx == UINT32_MAX) {
+
+        const uint32_t type_idx = map::get(_G.type_map, type, UINT32_MAX);
+
+        if (type_idx == UINT32_MAX) {
+            thread_api_v0.spin_unlock(&_G.add_lock);
             return;
         }
 
-        Map<resource_item_t> *resource_map = &_G.resource_data[idx];
 
-        resource_item_t item = {.ref_count=1};
         for (size_t i = 0; i < count; i++) {
-            item.data = resource_data[i];
-            map::set(*resource_map, names[i], item);
 
             if (resource_data[i] == 0) {
                 continue;
             }
 
-            _G.resource_callbacks[idx].online(names[i],
-                                              resource_data[i]);
+            resource_item_t item = {
+                    .ref_count=1,
+                    .name = names[i],
+                    .type = type,
+                    .data=resource_data[i]
+            };
+
+            uint64_t id = hash_combine(type, names[i]);
+
+            if( !map::has(_G.resource_map, id) ) {
+                uint32_t idx = array::size(_G.resource_data);
+                array::push_back(_G.resource_data, item);
+                map::set(_G.resource_map, id, idx);
+            } else {
+                uint32_t idx = map::get(_G.resource_map, id, UINT32_MAX);
+                _G.resource_data[idx] = item;
+            }
+
+
+            _G.resource_callbacks[type_idx].online(names[i], resource_data[i]);
         }
+
+        thread_api_v0.spin_unlock(&_G.add_lock);
     }
 
     void load(void **loaded_data,
@@ -233,30 +261,36 @@ namespace resource {
     }
 
     int can_get(uint64_t type,
-                uint64_t names) {
-        Map<resource_item_t> *resource_map = _get_resource_map(type);
+                uint64_t name) {
 
-        if (resource_map == NULL) {
+        if(!map::has(_G.type_map, type)) {
             return 1;
         }
 
-        return map::has(*resource_map, names);
+        thread_api_v0.spin_lock(&_G.add_lock);
+
+        uint64_t id = hash_combine(type, name);
+        int h = map::has(_G.resource_map, id);
+
+        thread_api_v0.spin_unlock(&_G.add_lock);
+
+        return h;
     }
 
     int can_get_all(uint64_t type,
                     uint64_t *names,
                     size_t count) {
-        Map<resource_item_t> *resource_map = _get_resource_map(type);
 
-        if (resource_map == NULL) {
-            return 1;
-        }
+//        thread_api_v0.spin_lock(&_G.add_lock);
 
         for (size_t i = 0; i < count; ++i) {
-            if (!map::has(*resource_map, names[i])) {
+            if (!can_get(type, names[i])) {
+                //thread_api_v0.spin_unlock(&_G.add_lock);
                 return 0;
             }
         }
+
+//        thread_api_v0.spin_unlock(&_G.add_lock);
 
         return 1;
     }
@@ -266,28 +300,34 @@ namespace resource {
               uint64_t *names,
               size_t count,
               int force) {
+
+        thread_api_v0.spin_lock(&_G.add_lock);
+
         const uint32_t idx = map::get(_G.type_map, type, UINT32_MAX);
 
         if (idx == UINT32_MAX) {
             log_api_v0.error(LOG_WHERE,
                              "Loader for resource is not is not registred");
             memset(loaded_data, sizeof(void *), count);
+            thread_api_v0.spin_unlock(&_G.add_lock);
             return;
         }
 
         const uint64_t root_name = hash_api_v0.id64_from_str("build");
-
-        Map<resource_item_t> *resource_map = &_G.resource_data[idx];
-
         resource_callbacks_t type_clb = _G.resource_callbacks[idx];
 
 
         for (int i = 0; i < count; ++i) {
-            resource_item_t item = map::get(*resource_map, names[i], null_item);
+            uint64_t id = hash_combine(type, names[i]);
+            uint32_t idx = map::get(_G.resource_map, id, UINT32_MAX);
+            resource_item_t item = {0};
+            if (idx != UINT32_MAX) {
+                item = _G.resource_data[idx];
+            }
 
             if (!force && (item.ref_count > 0)) {
                 ++item.ref_count;
-                map::set(*resource_map, names[i], item);
+                _G.resource_data[idx] = item;
                 loaded_data[i] = 0;
                 continue;
             }
@@ -298,7 +338,7 @@ namespace resource {
                              names[i]);
 
 #ifdef CETECH_CAN_COMPILE
-            char filename[4096] = {0};
+            char filename[1024] = {0};
             resource_compiler_get_filename(filename, CETECH_ARRAY_LEN(filename),
                                            type,
                                            names[i]);
@@ -323,23 +363,33 @@ namespace resource {
                 loaded_data[i] = 0;
             }
         }
+
+        thread_api_v0.spin_unlock(&_G.add_lock);
     }
 
     void unload(uint64_t type,
                 uint64_t *names,
                 size_t count) {
+        thread_api_v0.spin_lock(&_G.add_lock);
+
         const uint32_t idx = map::get(_G.type_map, type, UINT32_MAX);
 
         if (idx == UINT32_MAX) {
+            thread_api_v0.spin_unlock(&_G.add_lock);
             return;
         }
-
-        Map<resource_item_t> *resource_map = _get_resource_map(type);
 
         resource_callbacks_t type_clb = _G.resource_callbacks[idx];
 
         for (int i = 0; i < count; ++i) {
-            resource_item_t item = map::get(*resource_map, names[i], null_item);
+            uint64_t id = hash_combine(type, names[i]);
+            uint32_t idx = map::get(_G.resource_map, id, UINT32_MAX);
+
+            if (idx == UINT32_MAX) {
+                continue;
+            }
+
+            resource_item_t &item = _G.resource_data[idx];
 
             if (item.ref_count == 0) {
                 continue;
@@ -352,7 +402,7 @@ namespace resource {
                                  type, names[i]);
 
 #ifdef CETECH_CAN_COMPILE
-                char filename[4096] = {0};
+                char filename[1024] = {0};
                 resource_compiler_get_filename(filename,
                                                CETECH_ARRAY_LEN(filename),
                                                type,
@@ -366,44 +416,59 @@ namespace resource {
                 type_clb.offline(names[i], item.data);
                 type_clb.unloader(item.data, memory_api_v0.main_allocator());
 
-                map::remove(*resource_map, names[i]);
+                map::remove(_G.resource_map, hash_combine(type, names[i]));
             }
 
-            map::set(*resource_map, names[i], item);
+            //_G.resource_data[idx] = item;
         }
+        thread_api_v0.spin_unlock(&_G.add_lock);
     }
 
     void *get(uint64_t type,
-              uint64_t names) {
+              uint64_t name) {
+        //thread_api_v0.spin_lock(&_G.add_lock);
 
-        Map<resource_item_t> *resource_map = _get_resource_map(type);
+        uint64_t id = hash_combine(type, name);
+        uint32_t idx = map::get(_G.resource_map, id, UINT32_MAX);
+        resource_item_t item = {0};
+        if (idx != UINT32_MAX) {
+            item = _G.resource_data[idx];
+        }
 
-        resource_item_t item = map::get(*resource_map, names, null_item);
         if (is_item_null(item)) {
             char build_name[33] = {0};
             type_name_string(build_name, CETECH_ARRAY_LEN(build_name),
                              type,
-                             names);
+                             name);
 
             if (_G.autoload_enabled) {
 #ifdef CETECH_CAN_COMPILE
-                char filename[4096] = {0};
+                char filename[1024] = {0};
                 resource_compiler_get_filename(filename,
                                                CETECH_ARRAY_LEN(filename),
                                                type,
-                                               names);
+                                               name);
 #else
                 char *filename = build_name;
 #endif
                 log_api_v0.warning(LOG_WHERE, "Autoloading resource %s",
                                    filename);
-                load_now(type, &names, 1);
-                item = map::get(*resource_map, names, null_item);
+                load_now(type, &name, 1);
+
+                uint64_t id = hash_combine(type, name);
+                uint32_t idx = map::get(_G.resource_map, id, UINT32_MAX);
+                item = {0};
+                if (idx != UINT32_MAX) {
+                    item = _G.resource_data[idx];
+                }
+
             } else {
                 // TODO: fallback resource #205
                 CETECH_ASSERT(LOG_WHERE, false);
             }
         }
+
+        //thread_api_v0.spin_unlock(&_G.add_lock);
 
         return item.data;
     }
@@ -414,7 +479,6 @@ namespace resource {
 //        reload_all();
 
         void *loaded_data[count];
-        Map<resource_item_t> *resource_map = _get_resource_map(type);
 
         const uint32_t idx = map::get<uint32_t>(_G.type_map, type, 0);
 
@@ -423,7 +487,7 @@ namespace resource {
         load(loaded_data, type, names, count, 1);
         for (int i = 0; i < count; ++i) {
 #ifdef CETECH_CAN_COMPILE
-            char filename[4096] = {0};
+            char filename[1024] = {0};
             resource_compiler_get_filename(filename, CETECH_ARRAY_LEN(filename),
                                            type,
                                            names[i]);
@@ -442,11 +506,16 @@ namespace resource {
                                                loaded_data[i],
                                                memory_api_v0.main_allocator());
 
-            resource_item_t item = map::get(*resource_map, names[i], null_item);
+            uint64_t id = hash_combine(type, names[i]);
+            uint32_t idx = map::get(_G.resource_map, id, UINT32_MAX);
+            resource_item_t item = {0};
+            if (idx != UINT32_MAX) {
+                item = _G.resource_data[idx];
+            }
 
             item.data = new_data;
             //--item.ref_count; // Load call increase item.ref_count, because is loaded
-            map::set(*resource_map, names[i], item);
+            _G.resource_data[idx] = item;
         }
     }
 
@@ -459,20 +528,14 @@ namespace resource {
         while (type_it != type_end) {
             uint64_t type_id = type_it->key;
 
-            Map<resource_item_t> *resource_map = _get_resource_map(type_id);
-
-            const Map<resource_item_t>::Entry *name_it = map::begin(
-                    *resource_map);
-            const Map<resource_item_t>::Entry *name_end = map::end(
-                    *resource_map);
-
             array::resize(name_array, 0);
-            while (name_it != name_end) {
-                uint64_t name_id = name_it->key;
 
-                array::push_back(name_array, name_id);
+            for (int i = 0; i < array::size(_G.resource_data); ++i) {
+                resource_item_t item = _G.resource_data[i];
 
-                ++name_it;
+                if (item.type == type_id) {
+                    array::push_back(name_array, item.name);
+                }
             }
 
             reload(type_id, &name_array[0], array::size(name_array));
@@ -535,12 +598,14 @@ namespace resource_module {
         GET_API(api, vio_api_v0);
         GET_API(api, log_api_v0);
         GET_API(api, hash_api_v0);
+        GET_API(api, thread_api_v0);
 
         _G.type_map.init(memory_api_v0.main_allocator());
         _G.resource_data.init(memory_api_v0.main_allocator());
         _G.resource_callbacks.init(memory_api_v0.main_allocator());
+        _G.resource_map.init(memory_api_v0.main_allocator());
 
-        char build_dir_full[4096] = {0};
+        char build_dir_full[1024] = {0};
         path_v0.join(build_dir_full,
                      CETECH_ARRAY_LEN(build_dir_full),
                      config_api_v0.get_string(_G.config.build_dir),
@@ -553,7 +618,7 @@ namespace resource_module {
         resource::resource_register_type(hash_api_v0.id64_from_str("package"),
                                          package_resource::package_resource_callback);
 
-        cnsole_srv_api_v0.consolesrv_register_command("resource.reload_all",
+        cnsole_srv_api_v0.register_command("resource.reload_all",
                                                       _cmd_reload_all);
 
         package_init(api);
@@ -570,13 +635,12 @@ namespace resource_module {
     }
 
     void _shutdown() {
-        for (int i = 0; i < array::size(_G.resource_data); ++i) {
-            _G.resource_data[i].destroy();
-        }
-
         package_shutdown();
 
-        _G = {0};
+        _G.type_map.destroy();
+        _G.resource_data.destroy();
+        _G.resource_callbacks.destroy();
+        _G.resource_map.destroy();
     }
 
 

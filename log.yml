@@ -1,0 +1,288 @@
+[31m---
+level: error
+where: develop_system
+time: Sat Jun 17 10:59:06 2017
+worker: 0
+msg: |
+  Could not bind socket to '(null)': Invalid argument
+[0m[31m---
+level: error
+where: resource_manager
+time: Sat Jun 17 10:59:06 2017
+worker: 2
+msg: |
+  Loader for resource is not is not registred
+[0m[31m---
+level: error
+where: boot.lua
+time: Sat Jun 17 10:59:06 2017
+worker: 0
+msg: |
+  error
+[0m[31m---
+level: error
+where: allocator
+time: Sat Jun 17 10:59:07 2017
+worker: 0
+msg: |
+  memory_leak: 0x7f3092019184
+  stacktrace:
+    - bin/linux64/cetech_develop: _ZN6cetech5array12set_capacityIjEEvRNS_5ArrayIT_EEj() +0x75  [0x573085]
+    - bin/linux64/cetech_develop: _ZN6cetech5array4growIjEEvRNS_5ArrayIT_EEj() +0x3d  [0x572ffd]
+    - bin/linux64/cetech_develop: _ZN6cetech5array6resizeIjEEvRNS_5ArrayIT_EEj() +0x2b  [0x572fab]
+    - bin/linux64/cetech_develop: _ZN6cetech12map_internal6rehashIhEEvRNS_3MapIT_EEj() +0x38  [0x5b7bd8]
+    - bin/linux64/cetech_develop: _ZN6cetech12map_internal4growIhEEvRNS_3MapIT_EE() +0x2e  [0x5b7a1e]
+    - bin/linux64/cetech_develop: _ZN6cetech3map3setIhEEvRNS_3MapIT_EEmRKS3_() +0x2f  [0x5b69cf]
+    - bin/linux64/cetech_develop: _ZN14scene_resource6onlineEmPv() +0x307  [0x5b5817]
+    - bin/linux64/cetech_develop: _ZN8resource10add_loadedEmPmPPvm() +0x209  [0x5983f9]
+    - bin/linux64/cetech_develop: _ZN8resource8load_nowEmPmm() +0x6f  [0x59856f]
+    - bin/linux64/cetech_develop: _Z12package_taskPv() +0xcc  [0x59c4ec]
+    - bin/linux64/cetech_develop: _Z19taskmanager_do_workv() +0x7c  [0x5a6f6c]
+    - bin/linux64/cetech_develop() [0x5a78f3]
+    - bin/linux64/cetech_develop() [0x7c78bc]
+    - bin/linux64/cetech_develop() [0x7df299]
+    - /usr/lib/libpthread.so.0: () +0x7297  [0x7f30afde2297]
+    - /usr/lib/libc.so.6: clone() +0x3f  [0x7f30ae68825f]
+
+
+[0m[31m---
+level: error
+where: allocator
+time: Sat Jun 17 10:59:07 2017
+worker: 0
+msg: |
+  memory_leak: 0x7f3092059288
+  stacktrace:
+    - bin/linux64/cetech_develop: _ZN6cetech5array12set_capacityINS_3MapIhE5EntryEEEvRNS_5ArrayIT_EEj() +0x75  [0x5b7125]
+    - bin/linux64/cetech_develop: _ZN6cetech5array4growINS_3MapIhE5EntryEEEvRNS_5ArrayIT_EEj() +0x3d  [0x5b709d]
+    - bin/linux64/cetech_develop: _ZN6cetech5array9push_backINS_3MapIhE5EntryEEEvRNS_5ArrayIT_EERKS6_() +0x32  [0x5b8182]
+    - bin/linux64/cetech_develop: _ZN6cetech12map_internal9add_entryIhEEjRNS_3MapIT_EEm() +0x43  [0x5b8113]
+    - bin/linux64/cetech_develop: _ZN6cetech12map_internal12find_or_makeIhEEjRNS_3MapIT_EEm() +0x54  [0x5b7a84]
+    - bin/linux64/cetech_develop: _ZN6cetech3map3setIhEEvRNS_3MapIT_EEmRKS3_() +0x3c  [0x5b69dc]
+    - bin/linux64/cetech_develop: _ZN14scene_resource6onlineEmPv() +0x307  [0x5b5817]
+    - bin/linux64/cetech_develop: _ZN8resource10add_loadedEmPmPPvm() +0x209  [0x5983f9]
+    - bin/linux64/cetech_develop: _ZN8resource8load_nowEmPmm() +0x6f  [0x59856f]
+    - bin/linux64/cetech_develop: _Z12package_taskPv() +0xcc  [0x59c4ec]
+    - bin/linux64/cetech_develop: _Z19taskmanager_do_workv() +0x7c  [0x5a6f6c]
+    - bin/linux64/cetech_develop() [0x5a78f3]
+    - bin/linux64/cetech_develop() [0x7c78bc]
+    - bin/linux64/cetech_develop() [0x7df299]
+    - /usr/lib/libpthread.so.0: () +0x7297  [0x7f30afde2297]
+    - /usr/lib/libc.so.6: clone() +0x3f  [0x7f30ae68825f]
+
+
+[0m[31m---
+level: error
+where: allocator
+time: Sat Jun 17 10:59:07 2017
+worker: 0
+msg: |
+  memory_leak: 0x7f30920191b4
+  stacktrace:
+    - bin/linux64/cetech_develop: _ZN6cetech5array12set_capacityIjEEvRNS_5ArrayIT_EEj() +0x75  [0x573085]
+    - bin/linux64/cetech_develop: _ZN6cetech5array4growIjEEvRNS_5ArrayIT_EEj() +0x3d  [0x572ffd]
+    - bin/linux64/cetech_develop: _ZN6cetech5array9push_backIjEEvRNS_5ArrayIT_EERKS3_() +0x32  [0x59c842]
+    - bin/linux64/cetech_develop: _ZN14scene_resource6onlineEmPv() +0x329  [0x5b5839]
+    - bin/linux64/cetech_develop: _ZN8resource10add_loadedEmPmPPvm() +0x209  [0x5983f9]
+    - bin/linux64/cetech_develop: _ZN8resource8load_nowEmPmm() +0x6f  [0x59856f]
+    - bin/linux64/cetech_develop: _Z12package_taskPv() +0xcc  [0x59c4ec]
+    - bin/linux64/cetech_develop: _Z19taskmanager_do_workv() +0x7c  [0x5a6f6c]
+    - bin/linux64/cetech_develop() [0x5a78f3]
+    - bin/linux64/cetech_develop() [0x7c78bc]
+    - bin/linux64/cetech_develop() [0x7df299]
+    - /usr/lib/libpthread.so.0: () +0x7297  [0x7f30afde2297]
+    - /usr/lib/libc.so.6: clone() +0x3f  [0x7f30ae68825f]
+
+
+[0m[31m---
+level: error
+where: allocator
+time: Sat Jun 17 10:59:07 2017
+worker: 0
+msg: |
+  memory_leak: 0x7f309200d2e4
+  stacktrace:
+    - bin/linux64/cetech_develop: _ZN6cetech5array12set_capacityI25bgfx_vertex_buffer_handleEEvRNS_5ArrayIT_EEj() +0x75  [0x5b7295]
+    - bin/linux64/cetech_develop: _ZN6cetech5array4growI25bgfx_vertex_buffer_handleEEvRNS_5ArrayIT_EEj() +0x3d  [0x5b720d]
+    - bin/linux64/cetech_develop: _ZN6cetech5array9push_backI25bgfx_vertex_buffer_handleEEvRNS_5ArrayIT_EERKS4_() +0x32  [0x5b6a62]
+    - bin/linux64/cetech_develop: _ZN14scene_resource6onlineEmPv() +0x33d  [0x5b584d]
+    - bin/linux64/cetech_develop: _ZN8resource10add_loadedEmPmPPvm() +0x209  [0x5983f9]
+    - bin/linux64/cetech_develop: _ZN8resource8load_nowEmPmm() +0x6f  [0x59856f]
+    - bin/linux64/cetech_develop: _Z12package_taskPv() +0xcc  [0x59c4ec]
+    - bin/linux64/cetech_develop: _Z19taskmanager_do_workv() +0x7c  [0x5a6f6c]
+    - bin/linux64/cetech_develop() [0x5a78f3]
+    - bin/linux64/cetech_develop() [0x7c78bc]
+    - bin/linux64/cetech_develop() [0x7df299]
+    - /usr/lib/libpthread.so.0: () +0x7297  [0x7f30afde2297]
+    - /usr/lib/libc.so.6: clone() +0x3f  [0x7f30ae68825f]
+
+
+[0m[31m---
+level: error
+where: allocator
+time: Sat Jun 17 10:59:07 2017
+worker: 0
+msg: |
+  memory_leak: 0x7f309200d304
+  stacktrace:
+    - bin/linux64/cetech_develop: _ZN6cetech5array12set_capacityI24bgfx_index_buffer_handleEEvRNS_5ArrayIT_EEj() +0x75  [0x5b7405]
+    - bin/linux64/cetech_develop: _ZN6cetech5array4growI24bgfx_index_buffer_handleEEvRNS_5ArrayIT_EEj() +0x3d  [0x5b737d]
+    - bin/linux64/cetech_develop: _ZN6cetech5array9push_backI24bgfx_index_buffer_handleEEvRNS_5ArrayIT_EERKS4_() +0x32  [0x5b6ac2]
+    - bin/linux64/cetech_develop: _ZN14scene_resource6onlineEmPv() +0x351  [0x5b5861]
+    - bin/linux64/cetech_develop: _ZN8resource10add_loadedEmPmPPvm() +0x209  [0x5983f9]
+    - bin/linux64/cetech_develop: _ZN8resource8load_nowEmPmm() +0x6f  [0x59856f]
+    - bin/linux64/cetech_develop: _Z12package_taskPv() +0xcc  [0x59c4ec]
+    - bin/linux64/cetech_develop: _Z19taskmanager_do_workv() +0x7c  [0x5a6f6c]
+    - bin/linux64/cetech_develop() [0x5a78f3]
+    - bin/linux64/cetech_develop() [0x7c78bc]
+    - bin/linux64/cetech_develop() [0x7df299]
+    - /usr/lib/libpthread.so.0: () +0x7297  [0x7f30afde2297]
+    - /usr/lib/libc.so.6: clone() +0x3f  [0x7f30ae68825f]
+
+
+[0m[31m---
+level: error
+where: allocator
+time: Sat Jun 17 10:59:07 2017
+worker: 0
+msg: |
+  memory_leak: 0x7f3092219034
+  stacktrace:
+    - bin/linux64/cetech_develop: _ZN6cetech5array12set_capacityIjEEvRNS_5ArrayIT_EEj() +0x75  [0x573085]
+    - bin/linux64/cetech_develop: _ZN6cetech5array4growIjEEvRNS_5ArrayIT_EEj() +0x3d  [0x572ffd]
+    - bin/linux64/cetech_develop: _ZN6cetech5array6resizeIjEEvRNS_5ArrayIT_EEj() +0x2b  [0x572fab]
+    - bin/linux64/cetech_develop: _ZN6cetech12map_internal6rehashIhEEvRNS_3MapIT_EEj() +0x38  [0x5b7bd8]
+    - bin/linux64/cetech_develop: _ZN6cetech12map_internal4growIhEEvRNS_3MapIT_EE() +0x2e  [0x5b7a1e]
+    - bin/linux64/cetech_develop: _ZN6cetech3map3setIhEEvRNS_3MapIT_EEmRKS3_() +0x2f  [0x5b69cf]
+    - bin/linux64/cetech_develop: _ZN14scene_resource6onlineEmPv() +0x307  [0x5b5817]
+    - bin/linux64/cetech_develop: _ZN8resource10add_loadedEmPmPPvm() +0x209  [0x5983f9]
+    - bin/linux64/cetech_develop: _ZN8resource8load_nowEmPmm() +0x6f  [0x59856f]
+    - bin/linux64/cetech_develop: _Z12package_taskPv() +0xcc  [0x59c4ec]
+    - bin/linux64/cetech_develop: _Z19taskmanager_do_workv() +0x7c  [0x5a6f6c]
+    - bin/linux64/cetech_develop() [0x5a78f3]
+    - bin/linux64/cetech_develop() [0x7c78bc]
+    - bin/linux64/cetech_develop() [0x7df299]
+    - /usr/lib/libpthread.so.0: () +0x7297  [0x7f30afde2297]
+    - /usr/lib/libc.so.6: clone() +0x3f  [0x7f30ae68825f]
+
+
+[0m[31m---
+level: error
+where: allocator
+time: Sat Jun 17 10:59:07 2017
+worker: 0
+msg: |
+  memory_leak: 0x7f3092259008
+  stacktrace:
+    - bin/linux64/cetech_develop: _ZN6cetech5array12set_capacityINS_3MapIhE5EntryEEEvRNS_5ArrayIT_EEj() +0x75  [0x5b7125]
+    - bin/linux64/cetech_develop: _ZN6cetech5array4growINS_3MapIhE5EntryEEEvRNS_5ArrayIT_EEj() +0x3d  [0x5b709d]
+    - bin/linux64/cetech_develop: _ZN6cetech5array9push_backINS_3MapIhE5EntryEEEvRNS_5ArrayIT_EERKS6_() +0x32  [0x5b8182]
+    - bin/linux64/cetech_develop: _ZN6cetech12map_internal9add_entryIhEEjRNS_3MapIT_EEm() +0x43  [0x5b8113]
+    - bin/linux64/cetech_develop: _ZN6cetech12map_internal12find_or_makeIhEEjRNS_3MapIT_EEm() +0x54  [0x5b7a84]
+    - bin/linux64/cetech_develop: _ZN6cetech3map3setIhEEvRNS_3MapIT_EEmRKS3_() +0x3c  [0x5b69dc]
+    - bin/linux64/cetech_develop: _ZN14scene_resource6onlineEmPv() +0x307  [0x5b5817]
+    - bin/linux64/cetech_develop: _ZN8resource10add_loadedEmPmPPvm() +0x209  [0x5983f9]
+    - bin/linux64/cetech_develop: _ZN8resource8load_nowEmPmm() +0x6f  [0x59856f]
+    - bin/linux64/cetech_develop: _Z12package_taskPv() +0xcc  [0x59c4ec]
+    - bin/linux64/cetech_develop: _Z19taskmanager_do_workv() +0x7c  [0x5a6f6c]
+    - bin/linux64/cetech_develop() [0x5a78f3]
+    - bin/linux64/cetech_develop() [0x7c78bc]
+    - bin/linux64/cetech_develop() [0x7df299]
+    - /usr/lib/libpthread.so.0: () +0x7297  [0x7f30afde2297]
+    - /usr/lib/libc.so.6: clone() +0x3f  [0x7f30ae68825f]
+
+
+[0m[31m---
+level: error
+where: allocator
+time: Sat Jun 17 10:59:07 2017
+worker: 0
+msg: |
+  memory_leak: 0x7f3092219064
+  stacktrace:
+    - bin/linux64/cetech_develop: _ZN6cetech5array12set_capacityIjEEvRNS_5ArrayIT_EEj() +0x75  [0x573085]
+    - bin/linux64/cetech_develop: _ZN6cetech5array4growIjEEvRNS_5ArrayIT_EEj() +0x3d  [0x572ffd]
+    - bin/linux64/cetech_develop: _ZN6cetech5array9push_backIjEEvRNS_5ArrayIT_EERKS3_() +0x32  [0x59c842]
+    - bin/linux64/cetech_develop: _ZN14scene_resource6onlineEmPv() +0x329  [0x5b5839]
+    - bin/linux64/cetech_develop: _ZN8resource10add_loadedEmPmPPvm() +0x209  [0x5983f9]
+    - bin/linux64/cetech_develop: _ZN8resource8load_nowEmPmm() +0x6f  [0x59856f]
+    - bin/linux64/cetech_develop: _Z12package_taskPv() +0xcc  [0x59c4ec]
+    - bin/linux64/cetech_develop: _Z19taskmanager_do_workv() +0x7c  [0x5a6f6c]
+    - bin/linux64/cetech_develop() [0x5a78f3]
+    - bin/linux64/cetech_develop() [0x7c78bc]
+    - bin/linux64/cetech_develop() [0x7df299]
+    - /usr/lib/libpthread.so.0: () +0x7297  [0x7f30afde2297]
+    - /usr/lib/libc.so.6: clone() +0x3f  [0x7f30ae68825f]
+
+
+[0m[31m---
+level: error
+where: allocator
+time: Sat Jun 17 10:59:07 2017
+worker: 0
+msg: |
+  memory_leak: 0x7f309220d124
+  stacktrace:
+    - bin/linux64/cetech_develop: _ZN6cetech5array12set_capacityI25bgfx_vertex_buffer_handleEEvRNS_5ArrayIT_EEj() +0x75  [0x5b7295]
+    - bin/linux64/cetech_develop: _ZN6cetech5array4growI25bgfx_vertex_buffer_handleEEvRNS_5ArrayIT_EEj() +0x3d  [0x5b720d]
+    - bin/linux64/cetech_develop: _ZN6cetech5array9push_backI25bgfx_vertex_buffer_handleEEvRNS_5ArrayIT_EERKS4_() +0x32  [0x5b6a62]
+    - bin/linux64/cetech_develop: _ZN14scene_resource6onlineEmPv() +0x33d  [0x5b584d]
+    - bin/linux64/cetech_develop: _ZN8resource10add_loadedEmPmPPvm() +0x209  [0x5983f9]
+    - bin/linux64/cetech_develop: _ZN8resource8load_nowEmPmm() +0x6f  [0x59856f]
+    - bin/linux64/cetech_develop: _Z12package_taskPv() +0xcc  [0x59c4ec]
+    - bin/linux64/cetech_develop: _Z19taskmanager_do_workv() +0x7c  [0x5a6f6c]
+    - bin/linux64/cetech_develop() [0x5a78f3]
+    - bin/linux64/cetech_develop() [0x7c78bc]
+    - bin/linux64/cetech_develop() [0x7df299]
+    - /usr/lib/libpthread.so.0: () +0x7297  [0x7f30afde2297]
+    - /usr/lib/libc.so.6: clone() +0x3f  [0x7f30ae68825f]
+
+
+[0m[31m---
+level: error
+where: allocator
+time: Sat Jun 17 10:59:07 2017
+worker: 0
+msg: |
+  memory_leak: 0x7f309220d144
+  stacktrace:
+    - bin/linux64/cetech_develop: _ZN6cetech5array12set_capacityI24bgfx_index_buffer_handleEEvRNS_5ArrayIT_EEj() +0x75  [0x5b7405]
+    - bin/linux64/cetech_develop: _ZN6cetech5array4growI24bgfx_index_buffer_handleEEvRNS_5ArrayIT_EEj() +0x3d  [0x5b737d]
+    - bin/linux64/cetech_develop: _ZN6cetech5array9push_backI24bgfx_index_buffer_handleEEvRNS_5ArrayIT_EERKS4_() +0x32  [0x5b6ac2]
+    - bin/linux64/cetech_develop: _ZN14scene_resource6onlineEmPv() +0x351  [0x5b5861]
+    - bin/linux64/cetech_develop: _ZN8resource10add_loadedEmPmPPvm() +0x209  [0x5983f9]
+    - bin/linux64/cetech_develop: _ZN8resource8load_nowEmPmm() +0x6f  [0x59856f]
+    - bin/linux64/cetech_develop: _Z12package_taskPv() +0xcc  [0x59c4ec]
+    - bin/linux64/cetech_develop: _Z19taskmanager_do_workv() +0x7c  [0x5a6f6c]
+    - bin/linux64/cetech_develop() [0x5a78f3]
+    - bin/linux64/cetech_develop() [0x7c78bc]
+    - bin/linux64/cetech_develop() [0x7df299]
+    - /usr/lib/libpthread.so.0: () +0x7297  [0x7f30afde2297]
+    - /usr/lib/libc.so.6: clone() +0x3f  [0x7f30ae68825f]
+
+
+[0m[31m---
+level: error
+where: allocator
+time: Sat Jun 17 10:59:07 2017
+worker: 0
+msg: |
+  memory_leak: 0x7f30ad57a884
+  stacktrace:
+    - bin/linux64/cetech_develop: _ZN6cetech5array12set_capacityI8entity_sEEvRNS_5ArrayIT_EEj() +0x75  [0x5a5725]
+    - bin/linux64/cetech_develop: _ZN6cetech5array4growI8entity_sEEvRNS_5ArrayIT_EEj() +0x3d  [0x5a569d]
+    - bin/linux64/cetech_develop: _ZN6cetech5array9push_backI8entity_sEEvRNS_5ArrayIT_EERKS4_() +0x32  [0x5a4e02]
+    - bin/linux64/cetech_develop: _ZN6entity19spawn_from_resourceE7world_sPvPP8entity_sPj() +0x6f  [0x5a3bdf]
+    - bin/linux64/cetech_develop: _ZN6entity5spawnE7world_sm() +0x91  [0x5a3e01]
+    - bin/linux64/cetech_develop() [0x58e7fc]
+    - bin/linux64/cetech_develop() [0x6d42a6]
+    - bin/linux64/cetech_develop: lua_pcall() +0x30  [0x6c3d00]
+    - bin/linux64/cetech_develop: luasys_call_global() +0x32b  [0x587a7b]
+    - bin/linux64/cetech_develop: _Z14_game_init_clbv() +0x19  [0x587749]
+    - bin/linux64/cetech_develop: _Z17application_startv() +0x286  [0x5c4f66]
+    - bin/linux64/cetech_develop: main() +0x30  [0x5c54e0]
+    - /usr/lib/libc.so.6: __libc_start_main() +0xea  [0x7f30ae5bb43a]
+    - bin/linux64/cetech_develop: _start() +0x2a  [0x5638ca]
+
+
+[0m

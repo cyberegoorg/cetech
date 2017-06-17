@@ -41,9 +41,10 @@ extern void _machine_gamepad_play_rumble(int gamepad,
 // Globals
 //==============================================================================
 
-static struct G {
+#define _G MachineGlobals
+static struct MachineGlobals {
     EventStream eventstream;
-} _G = {0};
+} MachineGlobals;
 
 IMPORT_API(memory_api_v0);
 
@@ -89,7 +90,7 @@ static void _init(struct api_v0 *api) {
 static void _shutdown() {
     _machine_shutdown_impl();
 
-    _G = {0};
+    _G.eventstream.destroy();
 }
 
 void _update() {

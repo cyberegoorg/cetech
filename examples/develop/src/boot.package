@@ -12,8 +12,8 @@ texture:
   - "content/scene/solider/head01"
   - "content/scene/solider/m4tex"
 
-package:
-  - "core"
+#package:
+#  - "core"
 
 entity:
   - "camera"

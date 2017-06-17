@@ -176,7 +176,7 @@ namespace renderer_module {
             material::init(api);
             scene_init(api);
 
-            cnsole_srv_api_v0.consolesrv_register_command("renderer.resize",
+            cnsole_srv_api_v0.register_command("renderer.resize",
                                                           _cmd_resize);
         }
     }

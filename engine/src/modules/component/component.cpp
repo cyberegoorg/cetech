@@ -26,11 +26,12 @@ using namespace cetech;
 //==============================================================================
 
 namespace {
+#define _G ComponentMaagerGlobals
     static struct ComponentMaagerGlobals {
         Map<component_compiler_t> compiler_map;
         Map<uint32_t> spawn_order_map;
         Map<component_clb> component_clb;
-    } _G = {0};
+    } ComponentMaagerGlobals;
 }
 
 
@@ -163,7 +164,6 @@ namespace component_module {
         GET_API(api_v0, memory_api_v0);
         GET_API(api_v0, world_api_v0);
 
-
         _G = {0};
 
         _G.compiler_map.init(memory_api_v0.main_allocator());
@@ -172,7 +172,9 @@ namespace component_module {
     }
 
     void _shutdown() {
-        _G = {0};
+        _G.compiler_map.destroy();
+        _G.spawn_order_map.destroy();
+        _G.component_clb.destroy();
     }
 
     extern "C" void *component_get_module_api(int api) {
