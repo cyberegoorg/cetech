@@ -49,11 +49,12 @@ struct scene_instance {
 // GLobals
 //==============================================================================
 
+#define  _G SceneResourceGlobals
 static struct SceneResourceGlobals {
     uint64_t type;
     Map<uint32_t> scene_instance_map;
     Array<scene_instance> scene_instance_array;
-} _G;
+} SceneResourceGlobals;
 
 struct scene_instance *_init_scene_instance(uint64_t scene) {
 
