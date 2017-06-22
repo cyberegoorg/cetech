@@ -74,7 +74,7 @@ namespace {
         return (level_t) {.idx = idx};
     }
 
-    struct level_instance *_level_instance(level_t level) {
+    struct level_instance *get_level_instance(level_t level) {
         return &_G.level_instance[level.idx];
     }
 
@@ -234,7 +234,7 @@ namespace level {
                                                 {{1.0f, 1.0f, 1.0f}});
 
         level_t level = _new_level(level_ent);
-        struct level_instance *instance = _level_instance(level);
+        struct level_instance *instance = get_level_instance(level);
 
         entity_api_v0.spawn_from_resource(world, data,
                                           &instance->spawned_entity,
@@ -254,21 +254,24 @@ namespace level {
 
     void destroy(world_t world,
                  level_t level) {
-        struct level_instance *instance = _level_instance(level);
+        struct level_instance *instance = get_level_instance(level);
 
-        entity_api_v0.destroy(world, &instance->spawned_entity[0], 1);
+        entity_api_v0.destroy(world, instance->spawned_entity, instance->spawned_entity_count);
         entity_api_v0.destroy(world, &instance->level_entity, 1);
+
+        CETECH_DEALLOCATE(memory_api_v0.main_allocator(), instance->spawned_entity);
+
         _destroy_level_instance(instance);
     }
 
     entity_t entity_by_id(level_t level,
                           uint64_t id) {
-        struct level_instance *instance = _level_instance(level);
+        struct level_instance *instance = get_level_instance(level);
         return map::get(instance->spawned_entity_map, id, {0});
     }
 
     entity_t entity(level_t level) {
-        struct level_instance *instance = _level_instance(level);
+        struct level_instance *instance = get_level_instance(level);
         return instance->level_entity;
     }
 }

@@ -57,7 +57,6 @@ static struct SceneResourceGlobals {
 } SceneResourceGlobals;
 
 struct scene_instance *_init_scene_instance(uint64_t scene) {
-
     uint32_t idx = array::size(_G.scene_instance_array);
     array::push_back(_G.scene_instance_array, {0});
 
@@ -84,11 +83,14 @@ void _destroy_scene_instance(uint64_t scene) {
     instance->ib.destroy();
 
     uint32_t size = array::size(_G.scene_instance_array);
-    scene_instance *last_instance = &_G.scene_instance_array[size - 1];
 
-    _G.scene_instance_array[idx] = *last_instance;
+    if (size > 1) {
+        scene_instance *last_instance = &_G.scene_instance_array[size - 1];
+        _G.scene_instance_array[idx] = *last_instance;
+        map::set(_G.scene_instance_map, last_instance->scene, idx);
+    }
+
     array::pop_back(_G.scene_instance_array);
-    map::set(_G.scene_instance_map, last_instance->scene, idx);
     map::remove(_G.scene_instance_map, scene);
 }
 
@@ -677,18 +679,33 @@ namespace scene_resource {
 
     void online(uint64_t name,
                 void *data) {
-        struct scene_blob *resource = (scene_blob *) data;
+        scene_blob *resource = (scene_blob *) data;
 
+        bgfx_vertex_decl_t *vb_decl = scene_blob_vb_decl(resource);
         uint64_t *geom_name = scene_blob_geom_name(resource);
         uint32_t *ib_offset = scene_blob_ib_offset(resource);
         uint32_t *vb_offset = scene_blob_vb_offset(resource);
-        bgfx_vertex_decl_t *vb_decl = scene_blob_vb_decl(resource);
         uint32_t *ib_size = scene_blob_ib_size(resource);
         uint32_t *vb_size = scene_blob_vb_size(resource);
         uint32_t *ib = scene_blob_ib(resource);
         uint8_t *vb = scene_blob_vb(resource);
 
-        struct scene_instance *instance = _init_scene_instance(name);
+        uint32_t scene_idx = map::get(_G.scene_instance_map, name, UINT32_MAX);
+
+        scene_instance *instance = NULL;
+
+        if(scene_idx != UINT32_MAX) {
+            instance = &_G.scene_instance_array[scene_idx];
+
+            map::clear(instance->geom_map);
+            array::clear(instance->size);
+            array::clear(instance->vb);
+            array::clear(instance->ib);
+
+        } else {
+            instance = _init_scene_instance(name);
+        }
+
 
         for (int i = 0; i < resource->geom_count; ++i) {
             bgfx_vertex_buffer_handle_t bvb = bgfx_create_vertex_buffer(
