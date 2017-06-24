@@ -176,10 +176,10 @@ set(RELEASE_LIBS
         ${RELEASE_LIBS_WINDOWS}
 
         nanomsg.a
-        bgfxRelease.a
+        yaml-cpp.a
+
         bgfxRelease.a
         bxRelease.a
-        yaml-cpp.a
 
         luajit.a
         sqlite3.a
@@ -232,7 +232,7 @@ target_include_directories(cetech_develop PUBLIC externals/build/${PLATFORM_ID}/
 
 #add_library(cetech_develop_lib SHARED ${SOURCE_FILES})
 #target_link_libraries(cetech_develop_lib ${RELEASE_LIBS2})
-#target_compile_definitions(cetech_develop_lib PUBLIC -DCETECH_DEVELOP)
+#target_compile_definitions(cetech_develop_lib PUBLIC -DCETECH_DEVELOP -DCETECH_CAN_COMPILE=1)
 #target_include_directories(cetech_develop_lib PUBLIC externals/build/${PLATFORM_ID}/${CONFIGURATION}/)
 #target_include_directories(cetech_develop_lib PUBLIC externals/build/${PLATFORM_ID}/${CONFIGURATION}/include)
 

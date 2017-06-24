@@ -43,8 +43,8 @@ using namespace cetech;
 static struct EntityMaagerGlobals {
     Handler<uint32_t> entity_handler;
 
-    Map<uint32_t> spawned_map;
-    Array<Array<entity_t>> spawned_array;
+//    Map<uint32_t> spawned_map;
+//    Array<Array<entity_t>> spawned_array;
 
     uint64_t type;
 } EntityMaagerGlobals;
@@ -71,42 +71,42 @@ struct component_data {
 #define component_data_ent(cd) ((uint32_t*)((cd) + 1))
 #define component_data_data(cd) ((char*)((component_data_ent(cd) + ((cd)->ent_count))))
 
-uint32_t _new_spawned_array() {
-    uint32_t idx = array::size(_G.spawned_array);
-
-
-    array::push_back(_G.spawned_array, {0});
-
-    Array<entity_t> *array = &_G.spawned_array[idx];
-    array->init(memory_api_v0.main_allocator());
-
-    return idx;
-}
-
-void _map_spawned_array(entity_t root,
-                        uint32_t idx) {
-
-    map::set(_G.spawned_map, root.h, idx);
-}
-
-Array<entity_t> &_get_spawned_array_by_idx(uint32_t idx) {
-    return _G.spawned_array[idx];
-}
-
-Array<entity_t> &_get_spawned_array(entity_t entity) {
-    uint32_t idx = map::get(_G.spawned_map, entity.h, UINT32_MAX);
-
-    return _G.spawned_array[idx];
-}
-
-
-void _destroy_spawned_array(entity_t entity) {
-    uint32_t idx = map::get(_G.spawned_map, entity.h, UINT32_MAX);
-    map::remove(_G.spawned_map, entity.h);
-
-    Array<entity_t> *array = &_G.spawned_array[idx];
-    array->destroy();
-}
+//uint32_t _new_spawned_array() {
+//    uint32_t idx = array::size(_G.spawned_array);
+//
+//
+//    array::push_back(_G.spawned_array, {0});
+//
+//    Array<entity_t> *array = &_G.spawned_array[idx];
+//    array->init(memory_api_v0.main_allocator());
+//
+//    return idx;
+//}
+//
+//void _map_spawned_array(entity_t root,
+//                        uint32_t idx) {
+//
+//    map::set(_G.spawned_map, root.h, idx);
+//}
+//
+//Array<entity_t> &_get_spawned_array_by_idx(uint32_t idx) {
+//    return _G.spawned_array[idx];
+//}
+//
+//Array<entity_t> &_get_spawned_array(entity_t entity) {
+//    uint32_t idx = map::get(_G.spawned_map, entity.h, UINT32_MAX);
+//
+//    return _G.spawned_array[idx];
+//}
+//
+//
+//void _destroy_spawned_array(entity_t entity) {
+//    uint32_t idx = map::get(_G.spawned_map, entity.h, UINT32_MAX);
+//    map::remove(_G.spawned_map, entity.h);
+//
+//    Array<entity_t> *array = &_G.spawned_array[idx];
+//    array->destroy();
+//}
 
 //==============================================================================
 // Compiler private
@@ -510,11 +510,11 @@ namespace entity {
                              uint32_t *entities_count) {
         struct entity_resource *res = (entity_resource *) resource;
 
-        uint32_t idx = _new_spawned_array();
-        Array<entity_t> &spawned = _get_spawned_array_by_idx(idx);
+        entity_t *spawned = CETECH_ALLOCATE(memory_api_v0.main_allocator(),
+                                            entity_t, res->ent_count);
 
         for (int j = 0; j < res->ent_count; ++j) {
-            array::push_back(spawned, create());
+            spawned[j] = create();
         }
 
         entity_t root = spawned[0];
@@ -528,6 +528,7 @@ namespace entity {
 
             uint32_t *c_ent = component_data_ent(comp_data);
             char *c_data = component_data_data(comp_data);
+
             component_api_v0.spawn(world, type, &spawned[0],
                                    c_ent, parents, comp_data->ent_count,
                                    c_data);
@@ -535,10 +536,8 @@ namespace entity {
             comp_data = (struct component_data *) (c_data + comp_data->size);
         }
 
-        _map_spawned_array(root, idx);
-
-        *entities = array::begin(spawned);
-        *entities_count = array::size(spawned);
+        *entities = spawned;
+        *entities_count = res->ent_count;
     }
 
     entity_t spawn(world_t world,
@@ -554,7 +553,7 @@ namespace entity {
         uint32_t entities_count = 0;
 
         spawn_from_resource(world, res, &entities, &entities_count);
-
+        CETECH_DEALLOCATE(memory_api_v0.main_allocator(), entities);
         return entities[0];
     }
 
@@ -562,15 +561,10 @@ namespace entity {
                  entity_t *entity,
                  uint32_t count) {
 
+        component_api_v0.destroy(world, entity, count);
+
         for (int i = 0; i < count; ++i) {
-            if (map::has(_G.spawned_map, entity[i].h)) {
-                Array<entity_t> &spawned = _get_spawned_array(entity[i]);
-                component_api_v0.destroy(world, array::begin(spawned),
-                                         array::size(spawned));
-                _destroy_spawned_array(entity[i]);
-            } else {
-                component_api_v0.destroy(world, &entity[i], 1);
-            }
+            handler::destroy(_G.entity_handler, entity[i].h);
         }
     }
 }
@@ -614,8 +608,8 @@ namespace entity_module {
 
         _G.type = hash_api_v0.id64_from_str("entity");
 
-        _G.spawned_map.init(memory_api_v0.main_allocator());
-        _G.spawned_array.init(memory_api_v0.main_allocator());
+//        _G.spawned_map.init(memory_api_v0.main_allocator());
+//        _G.spawned_array.init(memory_api_v0.main_allocator());
 
         resource_api_v0.register_type(_G.type, entity_resorce::callback);
 
@@ -629,8 +623,8 @@ namespace entity_module {
     }
 
     static void _shutdown() {
-        _G.spawned_map.destroy();
-        _G.spawned_array.destroy();
+//        _G.spawned_map.destroy();
+//        _G.spawned_array.destroy();
         _G.entity_handler.destroy();
     }
 
