@@ -169,14 +169,7 @@ int _init_config(struct api_v0 *api) {
 
 #ifdef CETECH_CAN_COMPILE
     if (config.get_int(_G.config.compile)) {
-        char build_dir_full[1024] = {0};
-        cvar_t bd = config.find("build");
-
-        const char *build_dir_str = config.get_string(bd);
-        path_v0.join(build_dir_full, 1024, build_dir_str,
-                     application_platform());
-        path_v0.make_path(build_dir_full);
-        config.compile_global(&api_v1);
+       config.compile_global(&api_v1);
     }
 #endif
 

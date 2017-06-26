@@ -456,6 +456,8 @@ namespace scene_resource_compiler {
                         yaml_node_t root,
                         struct compile_output *output,
                         struct compilator_api *capi) {
+        auto a  = memory_api_v0.main_allocator();
+
         yaml_node_t import_n = yaml_get_node(root, "import");
         yaml_node_t input_n = yaml_get_node(import_n, "input");
 
@@ -465,10 +467,8 @@ namespace scene_resource_compiler {
         yaml_as_string(input_n, input_str, CETECH_ARRAY_LEN(input_str));
         capi->add_dependency(filename, input_str);
 
-        char input_path[128] = {0};
         const char *source_dir = resource_api_v0.compiler_get_source_dir();
-        path_v0.join(input_path, CETECH_ARRAY_LEN(input_path), source_dir,
-                     input_str);
+        char* input_path = path_v0.join(a, 2, source_dir, input_str);
 
         uint32_t postprocess_flag = aiProcessPreset_TargetRealtime_MaxQuality;
 

@@ -8,6 +8,8 @@ extern "C" {
 #include <stdint.h>
 #include <stddef.h>
 
+struct allocator;
+
 //==============================================================================
 // File Interface
 //==============================================================================
@@ -63,16 +65,13 @@ struct path_v0 {
     //! \return file extension
     const char *(*extension)(const char *path);
 
-    //! Join path
-    //! \param result Output path
-    //! \param maxlen Result len
-    //! \param base_path Base path
-    //! \param path Path
-    //! \return Result path len
-    int64_t (*join)(char *result,
-                    uint64_t maxlen,
-                    const char *base_path,
-                    const char *path);
+    //! Join paths
+    //! \param allocator Allocator
+    //! \param count Path count.
+    //! \return Result path len.
+    char* (*join)(struct allocator* allocator,
+                    uint32_t count,
+                    ...);
 };
 
 

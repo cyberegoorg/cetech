@@ -80,6 +80,8 @@ namespace material_resource_compiler {
         void _preprocess(const char *filename,
                          yaml_node_t root,
                          struct compilator_api *capi) {
+            auto a = memory_api_v0.main_allocator();
+
             yaml_node_t parent_node = yaml_get_node(root, "parent");
 
             if (yaml_is_valid(parent_node)) {
@@ -93,14 +95,14 @@ namespace material_resource_compiler {
 
                 capi->add_dependency(filename, prefab_file);
 
-                char full_path[256] = {0};
                 const char *source_dir = resource_api_v0.compiler_get_source_dir();
-                path_v0.join(full_path, CETECH_ARRAY_LEN(full_path), source_dir,
-                             prefab_file);
+                char* full_path = path_v0.join(a, 2, source_dir, prefab_file);
 
                 struct vio *prefab_vio = vio_api_v0.from_file(full_path,
                                                               VIO_OPEN_READ,
                                                               memory_api_v0.main_allocator());
+
+                CETECH_DEALLOCATE(a, full_path);
 
                 char prefab_data[vio_api_v0.size(prefab_vio) + 1];
                 memset(prefab_data, 0, vio_api_v0.size(prefab_vio) + 1);

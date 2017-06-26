@@ -20,8 +20,10 @@
 #include <cetech/core/process.h>
 
 #include <cetech/modules/resource.h>
+#include <cetech/celib/string_stream.h>
 
 using namespace cetech;
+using namespace string_stream;
 
 //==============================================================================
 // Structs
@@ -67,13 +69,17 @@ namespace shader_resource_compiler {
                         const char *type,
                         const char *platform,
                         const char *profile) {
-        char cmd_line[4096] = {0};
 
-        int s = resource_api_v0.compiler_external_join(cmd_line,
-                                                       CETECH_ARRAY_LEN(
-                                                               cmd_line),
-                                                       "shaderc");
-        s += snprintf(cmd_line + s, CETECH_ARRAY_LEN(cmd_line) - s,
+        string_stream::Buffer buffer(memory_api_v0.main_allocator());
+
+        char* shaderc = resource_api_v0.compiler_external_join(
+                memory_api_v0.main_allocator(),
+                "shaderc");
+
+        buffer << shaderc;
+        CETECH_DEALLOCATE(memory_api_v0.main_allocator(), shaderc);
+
+        string_stream::printf(buffer,
                       ""
                               " -f %s"
                               " -o %s"
@@ -86,7 +92,7 @@ namespace shader_resource_compiler {
 
                       input, output, include_path, type, platform, profile);
 
-        int status = process_api_v0.exec(cmd_line);
+        int status = process_api_v0.exec(string_stream::c_str(buffer));
 
         log_api_v0.debug("shaderc", "STATUS %d", status);
 
@@ -97,14 +103,21 @@ namespace shader_resource_compiler {
                              const char *tmp_dir,
                              size_t max_len,
                              const char *filename) {
+
+        auto a = memory_api_v0.main_allocator();
+
         char dir[1024] = {0};
         path_v0.dir(dir, CETECH_ARRAY_LEN(dir), filename);
 
-        path_v0.join(tmp_filename, max_len, tmp_dir, dir);
-        path_v0.make_path(tmp_filename);
+        char *tmp_dirname = path_v0.join(a, 2, tmp_dir, dir);
+        path_v0.make_path(tmp_dirname);
 
-        return snprintf(tmp_filename, max_len, "%s/%s.shaderc", tmp_dir,
-                        filename);
+        int ret = snprintf(tmp_filename, max_len, "%s/%s.shaderc", tmp_dirname,
+                           path_v0.filename(filename));
+
+        CETECH_DEALLOCATE(a, tmp_dirname);
+
+        return ret;
     }
 
 
@@ -126,6 +139,7 @@ namespace shader_resource_compiler {
                                          struct vio *source_vio,
                                          struct vio *build_vio,
                                          struct compilator_api *compilator_api) {
+        auto a = memory_api_v0.main_allocator();
 
         char source_data[vio_api_v0.size(source_vio) + 1];
         memset(source_data, 0, vio_api_v0.size(source_vio) + 1);
@@ -141,31 +155,22 @@ namespace shader_resource_compiler {
         const char *source_dir = resource_api_v0.compiler_get_source_dir();
         const char *core_dir = resource_api_v0.compiler_get_core_dir();
 
-        char include_dir[1024] = {0};
-        path_v0.join(include_dir, CETECH_ARRAY_LEN(include_dir), core_dir,
-                     "bgfxshaders");
+        char* include_dir = path_v0.join(a, 2, core_dir, "bgfxshaders");
 
         struct shader resource = {0};
 
         // TODO: temp allocator?
-        char build_dir[4096] = {0};
-        char tmp_dir[4096] = {0};
         char input_str[1024] = {0};
-        char input_path[1024] = {0};
         char output_path[4096] = {0};
         char tmp_filename[4096] = {0};
 
-        resource_api_v0.compiler_get_build_dir(build_dir,
-                                               CETECH_ARRAY_LEN(build_dir),
-                                               app_api_v0.platform());
-        resource_api_v0.compiler_get_tmp_dir(tmp_dir, CETECH_ARRAY_LEN(tmp_dir),
-                                             app_api_v0.platform());
+        char* tmp_dir= resource_api_v0.compiler_get_tmp_dir(a, app_api_v0.platform());
 
         //////// VS
         yaml_as_string(vs_input, input_str, CETECH_ARRAY_LEN(input_str));
         compilator_api->add_dependency(filename, input_str);
-        path_v0.join(input_path, CETECH_ARRAY_LEN(input_path), source_dir,
-                     input_str);
+
+        char* input_path = path_v0.join(a, 2, source_dir,  input_str);
 
         _gen_tmp_name(output_path, tmp_dir, CETECH_ARRAY_LEN(tmp_filename),
                       input_str);
@@ -173,7 +178,10 @@ namespace shader_resource_compiler {
         int result = _shaderc(input_path, output_path, include_dir, "vertex",
                               platform, vs_profile);
 
+        CETECH_DEALLOCATE(a, input_path);
+
         if (result != 0) {
+            CETECH_DEALLOCATE(a, include_dir);
             return 0;
         }
 
@@ -191,8 +199,8 @@ namespace shader_resource_compiler {
         //////// FS
         yaml_as_string(fs_input, input_str, CETECH_ARRAY_LEN(input_str));
         compilator_api->add_dependency(filename, input_str);
-        path_v0.join(input_path, CETECH_ARRAY_LEN(input_path), source_dir,
-                     input_str);
+
+        input_path = path_v0.join(a, 2, source_dir,  input_str);
 
         _gen_tmp_name(output_path, tmp_dir, CETECH_ARRAY_LEN(tmp_filename),
                       input_str);
@@ -200,7 +208,10 @@ namespace shader_resource_compiler {
         result = _shaderc(input_path, output_path, include_dir, "fragment",
                           platform, fs_profile);
 
+        CETECH_DEALLOCATE(a, input_path);
+
         if (result != 0) {
+            CETECH_DEALLOCATE(a, include_dir);
             return 0;
         }
 
@@ -219,8 +230,9 @@ namespace shader_resource_compiler {
         vio_api_v0.write(build_vio, vs_data, sizeof(char), resource.vs_size);
         vio_api_v0.write(build_vio, fs_data, sizeof(char), resource.fs_size);
 
-        CETECH_DEALLOCATE(memory_api_v0.main_allocator(), vs_data);
-        CETECH_DEALLOCATE(memory_api_v0.main_allocator(), fs_data);
+        CETECH_DEALLOCATE(a, vs_data);
+        CETECH_DEALLOCATE(a, fs_data);
+        CETECH_DEALLOCATE(a, include_dir);
 
         return 1;
     }

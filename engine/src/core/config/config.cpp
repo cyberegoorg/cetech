@@ -111,40 +111,40 @@ namespace config {
 #ifdef CETECH_CAN_COMPILE
 
     void compile_global(struct app_api_v0 *app_api) {
-        char build_dir[1024] = {0};
-        char source_path[1024] = {0};
-        char build_path[1024] = {0};
+        allocator *a = memory_api_v0.main_allocator();
 
         cvar_t bd = find("build");
         cvar_t source_dir = find("src");
 
         const char *build_dir_str = get_string(bd);
-        path_v0.join(build_dir, 1024, build_dir_str, app_api->platform());
 
-        path_v0.join(build_path, CETECH_ARRAY_LEN(build_path), build_dir,
-                     "global.config");
+        char* build_dir = path_v0.join(a, 2, build_dir_str, app_api->platform());
+        path_v0.make_path(build_dir);
 
+        char *build_path = path_v0.join(a, 3, build_dir_str,
+                                        app_api->platform(), "global.config");
 
-        path_v0.join(source_path, CETECH_ARRAY_LEN(source_path),
-                     get_string(source_dir), "global.config");
+        char *source_path = path_v0.join(a, 2, get_string(source_dir),
+                                         "global.config");
 
         struct vio *source_vio = vio_api_v0.from_file(source_path,
-                                                      VIO_OPEN_READ,
-                                                      memory_api_v0.main_allocator());
-        char *data =
-                CETECH_ALLOCATE(memory_api_v0.main_allocator(), char,
-                                vio_api_v0.size(source_vio));
+                                                      VIO_OPEN_READ, a);
+
+        char *data = CETECH_ALLOCATE(a, char, vio_api_v0.size(source_vio));
 
         size_t size = (size_t) vio_api_v0.size(source_vio);
         vio_api_v0.read(source_vio, data, sizeof(char), size);
         vio_api_v0.close(source_vio);
 
         struct vio *build_vio = vio_api_v0.from_file(build_path, VIO_OPEN_WRITE,
-                                                     memory_api_v0.main_allocator());
+                                                     a);
         vio_api_v0.write(build_vio, data, sizeof(char), size);
         vio_api_v0.close(build_vio);
 
-        CETECH_DEALLOCATE(memory_api_v0.main_allocator(), data);
+        CETECH_DEALLOCATE(a, data);
+        CETECH_DEALLOCATE(a, build_path);
+        CETECH_DEALLOCATE(a, source_path);
+        CETECH_DEALLOCATE(a, build_dir);
     }
 
 #endif
@@ -226,38 +226,37 @@ namespace config {
 
 
     void cvar_load_global(struct app_api_v0 *app_api) {
-        char build_dir[1024] = {0};
-        char source_path[1024] = {0};
-
+        allocator *a = memory_api_v0.main_allocator();
         cvar_t bd = find("build");
         cvar_t source_dir = find("src");
 
         const char *build_dir_str = get_string(bd);
-        path_v0.join(build_dir, 1024, build_dir_str, app_api->platform());
 
+        char *config_path = path_v0.join(a, 3,
+                                         build_dir_str,
+                                         app_api->platform(),
+                                         "global.config");
 
-        path_v0.join(source_path, CETECH_ARRAY_LEN(source_path), build_dir,
-                     "global.config");
-
-        struct vio *source_vio = vio_api_v0.from_file(source_path,
+        struct vio *source_vio = vio_api_v0.from_file(config_path,
                                                       VIO_OPEN_READ,
-                                                      memory_api_v0.main_allocator());
-        char *data =
-                CETECH_ALLOCATE(memory_api_v0.main_allocator(), char,
-                                vio_api_v0.size(source_vio));
+                                                      a);
+
+        char *data = CETECH_ALLOCATE(a, char, vio_api_v0.size(source_vio));
+
         vio_api_v0.read(source_vio, data, vio_api_v0.size(source_vio),
                         vio_api_v0.size(source_vio));
         vio_api_v0.close(source_vio);
 
         yaml_document_t h;
         yaml_node_t root = yaml_load_str(data, &h);
-        CETECH_DEALLOCATE(memory_api_v0.main_allocator(), data);
 
         struct foreach_config_data config_data = {
                 .root_name = NULL
         };
 
         yaml_node_foreach_dict(root, foreach_config_clb, &config_data);
+
+
     }
 
     void _cvar_from_str(const char *name,

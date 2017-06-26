@@ -57,35 +57,33 @@ namespace filesystem {
         return map::get<char *>(_G.root_map, root, nullptr);
     }
 
-    int get_fullpath(uint64_t root,
-                     char *result,
-                     uint64_t maxlen,
+    char* get_fullpath(uint64_t root,
+                     struct allocator* allocator,
                      const char *filename) {
-        const char *root_path = get_root_dir(root);
 
-        return path_v0.join(result, maxlen, root_path, filename) ==
-               (strlen(root_path) + strlen(filename) + 1);
+        const char *root_path = get_root_dir(root);
+        return path_v0.join(allocator, 2, root_path, filename);
     }
 
     struct vio *open(uint64_t root,
                      const char *path,
                      fs_open_mode mode) {
-        char fullm_path[MAX_PATH_LEN] = {0};
+        auto a = memory_api_v0.main_allocator();
 
-        if (!get_fullpath(root, fullm_path,
-                          sizeof(fullm_path) / sizeof(char), path)) {
-            return NULL;
-        }
+        char* full_path = get_fullpath(root,a, path);
 
-        struct vio *file = vio_api_v0.from_file(fullm_path,
+        struct vio *file = vio_api_v0.from_file(full_path,
                                                 (vio_open_mode) mode,
-                                                memory_api_v0.main_allocator());
+                                                a);
 
         if (!file) {
-            log_api_v0.error(LOG_WHERE, "Could not load file %s", fullm_path);
+            log_api_v0.error(LOG_WHERE, "Could not load file %s", full_path);
+            CETECH_DEALLOCATE(a, full_path);
             return NULL;
         }
 
+
+        CETECH_DEALLOCATE(a, full_path);
         return file;
     }
 
@@ -95,14 +93,14 @@ namespace filesystem {
 
     int create_directory(uint64_t root,
                          const char *path) {
-        char fullm_path[MAX_PATH_LEN] = {0};
+        auto a = memory_api_v0.main_allocator();
 
-        if (!get_fullpath(root, fullm_path,
-                          sizeof(fullm_path) / sizeof(char), path)) {
-            return 0;
-        }
+        char* full_path = get_fullpath(root,a, path);
 
-        return path_v0.make_path(fullm_path);
+        int ret = path_v0.make_path(full_path);
+        CETECH_DEALLOCATE(a, full_path);
+
+        return ret;
     }
 
 
@@ -113,13 +111,13 @@ namespace filesystem {
                  uint32_t *count,
                  struct allocator *allocator) {
 
-        char fullm_path[MAX_PATH_LEN] = {0};
-        if (!get_fullpath(root, fullm_path,
-                          sizeof(fullm_path) / sizeof(char), path)) {
-            return;
-        }
+        auto a = memory_api_v0.main_allocator();
 
-        path_v0.list(fullm_path, 1, files, count, allocator);
+        char* full_path = get_fullpath(root, a, path);
+
+        path_v0.list(full_path, 1, files, count, allocator);
+
+        CETECH_DEALLOCATE(a, full_path);
     }
 
     void listdir_free(char **files,
@@ -131,13 +129,14 @@ namespace filesystem {
 
     time_t get_file_mtime(uint64_t root,
                           const char *path) {
-        char fullm_path[MAX_PATH_LEN] = {0};
-        if (!get_fullpath(root, fullm_path,
-                          sizeof(fullm_path) / sizeof(char), path)) {
-            return 0;
-        }
+        auto a = memory_api_v0.main_allocator();
 
-        return path_v0.file_mtime(fullm_path);
+        char* full_path = get_fullpath(root, a, path);
+
+        time_t ret = path_v0.file_mtime(full_path);
+
+        CETECH_DEALLOCATE(a, full_path);
+        return ret;
     }
 }
 

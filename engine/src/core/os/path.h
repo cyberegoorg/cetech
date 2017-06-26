@@ -5,6 +5,7 @@
 
 #include <cetech/core/errors.h>
 #include <cetech/celib/array.inl>
+#include <cetech/celib/string_stream.h>
 
 #include <cetech/core/path.h>
 
@@ -22,6 +23,7 @@
 #endif
 
 using namespace cetech;
+using namespace string_stream;
 
 //==============================================================================
 // File Interface
@@ -231,17 +233,29 @@ const char *path_extension(const char *path) {
     return ch + 1;
 }
 
-//! Join path
-//! \param result Output path
-//! \param maxlen Result len
-//! \param base_path Base path
-//! \param path Path
-//! \return Result path len
-int64_t path_join(char *result,
-                  uint64_t maxlen,
-                  const char *base_path,
-                  const char *path) {
-    return snprintf(result, maxlen, "%s" DIR_DELIM_STR "%s", base_path, path);
+char* path_join(struct allocator* allocator,
+                uint32_t count,
+                ...) {
+
+    Buffer buffer(allocator);
+
+    va_list arguments;
+    va_start ( arguments, count );
+
+    buffer << va_arg ( arguments, const char* );
+
+    for(int i = 1; i < count; ++i) {
+        buffer << DIR_DELIM_STR;
+        buffer << va_arg ( arguments, const char* );
+    }
+
+    va_end ( arguments );
+
+    c_str(buffer);
+    char* data = buffer._data;
+    buffer._data = NULL;
+
+    return data;
 }
 
 //! Get file modified time
