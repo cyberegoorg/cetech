@@ -30,10 +30,6 @@ namespace cetech {
                      uint64_t key,
                      const T &deffault);
 
-        template<typename T>
-        T *get_ptr(Map<T> &h,
-                   uint64_t key);
-
         /// Sets the value for the key.
         template<typename T>
         void set(Map<T> &h,
@@ -136,7 +132,7 @@ namespace cetech {
             if (array::size(h._hash) == 0)
                 return fr;
 
-            fr.map_i = key % array::size(h._hash);
+            fr.map_i = (uint32_t) (key % array::size(h._hash));
             fr.data_i = h._hash[fr.map_i];
             while (fr.data_i != END_OF_LIST) {
                 if (h._data[fr.data_i].key == key)
@@ -286,13 +282,6 @@ namespace cetech {
                                                   : h._data[i].value;
         }
 
-        template<typename T>
-        T *get_ptr(Map<T> &h,
-                   uint64_t key) {
-            const uint32_t i = map_internal::find_or_fail(h, key);
-            return i == map_internal::END_OF_LIST ? nullptr
-                                                  : &(h._data[i].value);
-        }
 
         template<typename T>
         void set(Map<T> &h,

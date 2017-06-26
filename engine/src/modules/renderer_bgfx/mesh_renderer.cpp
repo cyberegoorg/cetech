@@ -43,6 +43,7 @@ struct mesh_data {
 
 namespace {
     struct WorldInstance {
+        world_t world;
         uint32_t n;
         uint32_t allocated;
         void *buffer;
@@ -60,7 +61,7 @@ namespace {
         Map<uint32_t> world_map;
         Array<WorldInstance> world_instances;
         Map<uint32_t> ent_map;
-    } _G = {0};
+    } _G;
 
     void allocate(WorldInstance &_data,
                   allocator *_allocator,
@@ -136,13 +137,23 @@ namespace {
     static void _new_world(world_t world) {
         uint32_t idx = array::size(_G.world_instances);
         array::push_back(_G.world_instances, WorldInstance());
+        _G.world_instances[idx].world = world;
         map::set(_G.world_map, world.h, idx);
     }
 
 
     static void _destroy_world(world_t world) {
-        // TODO: impl
+        uint32_t idx = map::get(_G.world_map, world.h, UINT32_MAX);
+        uint32_t last_idx = array::size(_G.world_instances) - 1;
 
+        world_t last_world = _G.world_instances[last_idx].world;
+
+        CETECH_DEALLOCATE(memory_api_v0.main_allocator(),
+                          _G.world_instances[idx].buffer);
+
+        _G.world_instances[idx] = _G.world_instances[last_idx];
+        map::set(_G.world_map, last_world.h, idx);
+        array::pop_back(_G.world_instances);
     }
 
     int _mesh_component_compiler(yaml_node_t body,
@@ -445,7 +456,9 @@ static void _init(struct api_v0 *api) {
 }
 
 static void _shutdown() {
-    _G = {0};
+    _G.world_map.destroy();
+    _G.world_instances.destroy();
+    _G.ent_map.destroy();
 }
 
 extern "C" void *mesh_get_module_api(int api) {

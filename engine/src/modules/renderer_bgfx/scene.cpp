@@ -49,14 +49,14 @@ struct scene_instance {
 // GLobals
 //==============================================================================
 
+#define  _G SceneResourceGlobals
 static struct SceneResourceGlobals {
     uint64_t type;
     Map<uint32_t> scene_instance_map;
     Array<scene_instance> scene_instance_array;
-} _G = {0};
+} SceneResourceGlobals;
 
 struct scene_instance *_init_scene_instance(uint64_t scene) {
-
     uint32_t idx = array::size(_G.scene_instance_array);
     array::push_back(_G.scene_instance_array, {0});
 
@@ -77,18 +77,20 @@ void _destroy_scene_instance(uint64_t scene) {
     uint32_t idx = map::get(_G.scene_instance_map, scene, UINT32_MAX);
     scene_instance *instance = &_G.scene_instance_array[idx];
 
-
     instance->geom_map.destroy();
     instance->size.destroy();
     instance->vb.destroy();
     instance->ib.destroy();
 
     uint32_t size = array::size(_G.scene_instance_array);
-    scene_instance *last_instance = &_G.scene_instance_array[size - 1];
 
-    _G.scene_instance_array[idx] = *last_instance;
+    if (size > 1) {
+        scene_instance *last_instance = &_G.scene_instance_array[size - 1];
+        _G.scene_instance_array[idx] = *last_instance;
+        map::set(_G.scene_instance_map, last_instance->scene, idx);
+    }
+
     array::pop_back(_G.scene_instance_array);
-    map::set(_G.scene_instance_map, last_instance->scene, idx);
     map::remove(_G.scene_instance_map, scene);
 }
 
@@ -571,10 +573,10 @@ namespace scene_resource_compiler {
         return 1;
     }
 
-    int _scene_resource_compiler(const char *filename,
-                                 struct vio *source_vio,
-                                 struct vio *build_vio,
-                                 struct compilator_api *compilator_api) {
+    int compiler(const char *filename,
+                 struct vio *source_vio,
+                 struct vio *build_vio,
+                 struct compilator_api *compilator_api) {
 
         char *source_data =
                 CETECH_ALLOCATE(memory_api_v0.main_allocator(), char,
@@ -661,8 +663,8 @@ namespace scene_resource {
     static const bgfx_texture_handle_t null_texture = {0};
 
 
-    void *_scene_resource_loader(struct vio *input,
-                                 struct allocator *allocator) {
+    void *loader(struct vio *input,
+                 struct allocator *allocator) {
         const int64_t size = vio_api_v0.size(input);
         char *data = CETECH_ALLOCATE(allocator, char, size);
         vio_api_v0.read(input, data, 1, size);
@@ -670,25 +672,40 @@ namespace scene_resource {
         return data;
     }
 
-    void _scene_resource_unloader(void *new_data,
-                                  struct allocator *allocator) {
+    void unloader(void *new_data,
+                  struct allocator *allocator) {
         CETECH_DEALLOCATE(allocator, new_data);
     }
 
-    void _scene_resource_online(uint64_t name,
-                                void *data) {
-        struct scene_blob *resource = (scene_blob *) data;
+    void online(uint64_t name,
+                void *data) {
+        scene_blob *resource = (scene_blob *) data;
 
+        bgfx_vertex_decl_t *vb_decl = scene_blob_vb_decl(resource);
         uint64_t *geom_name = scene_blob_geom_name(resource);
         uint32_t *ib_offset = scene_blob_ib_offset(resource);
         uint32_t *vb_offset = scene_blob_vb_offset(resource);
-        bgfx_vertex_decl_t *vb_decl = scene_blob_vb_decl(resource);
         uint32_t *ib_size = scene_blob_ib_size(resource);
         uint32_t *vb_size = scene_blob_vb_size(resource);
         uint32_t *ib = scene_blob_ib(resource);
         uint8_t *vb = scene_blob_vb(resource);
 
-        struct scene_instance *instance = _init_scene_instance(name);
+        uint32_t scene_idx = map::get(_G.scene_instance_map, name, UINT32_MAX);
+
+        scene_instance *instance = NULL;
+
+        if(scene_idx != UINT32_MAX) {
+            instance = &_G.scene_instance_array[scene_idx];
+
+            map::clear(instance->geom_map);
+            array::clear(instance->size);
+            array::clear(instance->vb);
+            array::clear(instance->ib);
+
+        } else {
+            instance = _init_scene_instance(name);
+        }
+
 
         for (int i = 0; i < resource->geom_count; ++i) {
             bgfx_vertex_buffer_handle_t bvb = bgfx_create_vertex_buffer(
@@ -709,29 +726,29 @@ namespace scene_resource {
         }
     }
 
-    void _scene_resource_offline(uint64_t name,
-                                 void *data) {
+    void offline(uint64_t name,
+                 void *data) {
         _destroy_scene_instance(name);
     }
 
-    void *_scene_resource_reloader(uint64_t name,
-                                   void *old_data,
-                                   void *new_data,
-                                   struct allocator *allocator) {
-        _scene_resource_offline(name, old_data);
-        _scene_resource_online(name, new_data);
+    void *reloader(uint64_t name,
+                   void *old_data,
+                   void *new_data,
+                   struct allocator *allocator) {
+        offline(name, old_data);
+        online(name, new_data);
 
         CETECH_DEALLOCATE(allocator, old_data);
 
         return new_data;
     }
 
-    static const resource_callbacks_t scene_resource_callback = {
-            .loader = _scene_resource_loader,
-            .unloader =_scene_resource_unloader,
-            .online =_scene_resource_online,
-            .offline =_scene_resource_offline,
-            .reloader = _scene_resource_reloader
+    static const resource_callbacks_t callback = {
+            .loader = loader,
+            .unloader = unloader,
+            .online = online,
+            .offline = offline,
+            .reloader = reloader
     };
 }
 
@@ -754,19 +771,19 @@ int scene_init(struct api_v0 *api) {
     _G.scene_instance_array.init(memory_api_v0.main_allocator());
     _G.scene_instance_map.init(memory_api_v0.main_allocator());
 
-    resource_api_v0.register_type(_G.type,
-                                  scene_resource::scene_resource_callback);
+    resource_api_v0.register_type(_G.type, scene_resource::callback);
 
 #ifdef CETECH_CAN_COMPILE
     resource_api_v0.compiler_register(_G.type,
-                                      scene_resource_compiler::_scene_resource_compiler);
+                                      scene_resource_compiler::compiler);
 #endif
 
     return 1;
 }
 
 void scene_shutdown() {
-    _G = {0};
+    _G.scene_instance_array.destroy();
+    _G.scene_instance_map.destroy();
 }
 
 void scene_submit(uint64_t scene,

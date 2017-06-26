@@ -56,6 +56,8 @@ end
 function Game:shutdown()
     Log.info("boot.lua", "shutdown")
 
+--    Entity.destroy(self.world, self.camera_entity);
+
     Level.destroy(self.world, self.level);
     World.destroy(self.world);
 end

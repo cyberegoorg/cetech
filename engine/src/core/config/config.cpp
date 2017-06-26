@@ -64,7 +64,7 @@ static struct G {
         char *s;
     } values[MAX_VARIABLES];
     uint64_t type;
-} _G = {0};
+} _G;
 
 IMPORT_API(memory_api_v0);
 IMPORT_API(path_v0);
@@ -511,6 +511,8 @@ namespace config {
         GET_API(api, vio_api_v0);
         GET_API(api, log_api_v0);
         GET_API(api, hash_api_v0);
+
+        _G = {0};
 
         log_api_v0.debug(LOG_WHERE, "Init");
 

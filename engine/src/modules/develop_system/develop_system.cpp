@@ -36,14 +36,14 @@ using namespace cetech;
 // Globals
 //==============================================================================
 
-#define _G DevelopSystemGlobals
 #define developsys_push(type, event) _developsys_push((struct develop_event_header*)(&event), type, sizeof(event))
 
 typedef void (*to_mpack_fce_t)(const struct develop_event_header *event,
                                mpack_writer_t *writer);
 
 
-static struct G {
+#define _G DevelopSystemGlobals
+static struct DevelopSystemGlobals {
     EventStream eventstream;
     Map<to_mpack_fce_t> to_mpack;
 
@@ -53,7 +53,7 @@ static struct G {
     spinlock_t flush_lock;
     atomic_int complete_flag[8]; // TODO: dynamic
     float time_accum;
-} _G = {0};
+} DevelopSystemGlobals;
 
 IMPORT_API(memory_api_v0);
 IMPORT_API(thread_api_v0);
@@ -239,7 +239,7 @@ void _send_events() {
 //==============================================================================
 
 static void _init_cvar(struct config_api_v0 config) {
-    _G = (struct G) {0};
+    _G = {0};
     _G.cv_pub_addr = config.new_str("develop.pub.addr",
                                     "Console server rpc addr", "ws://*:4447");
 
@@ -328,7 +328,7 @@ static void _init(struct api_v0 *api) {
     GET_API(api, time_api_v0);
     GET_API(api, log_api_v0);
 
-//    _G = (G){0};
+    _G = {0};
 
     _G.to_mpack.init(memory_api_v0.main_allocator());
 
@@ -367,7 +367,8 @@ static void _shutdown() {
 
     nn_close(_G.pub_socket);
 
-    _G = (G) {0};
+    _G.eventstream.destroy();
+    _G.to_mpack.destroy();
 }
 
 extern "C" void *developsystem_get_module_api(int api) {

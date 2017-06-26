@@ -26,10 +26,11 @@ using namespace cetech;
 
 
 namespace {
+    #define _G WorldGlobals
     static struct WorldGlobals {
         Array<world_callbacks_t> callbacks;
         Handler<uint32_t> world_handler;
-    } _G = {0};
+    } WorldGlobals;
 }
 
 //==============================================================================
@@ -98,7 +99,8 @@ namespace world_module {
     }
 
     void _shutdown() {
-        _G = {0};
+        _G.callbacks.destroy();
+        _G.world_handler.destroy();
     }
 
 

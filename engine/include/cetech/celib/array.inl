@@ -239,19 +239,29 @@ namespace cetech {
     void Array<T>::destroy() {
         if (_data) {
             CETECH_DEALLOCATE(_allocator, _data);
-            _data = nullptr;
-            _size = 0;
-            _capacity = 0;
         }
+
+        _allocator = nullptr;
+        _data = nullptr;
+        _size = 0;
+        _capacity = 0;
     }
 
 
     template<typename T>
     inline Array<T>::~Array() {
+        if (_data) {
+            CETECH_DEALLOCATE(_allocator, _data);
+        }
 
+        _allocator = nullptr;
+        _data = nullptr;
+        _size = 0;
+        _capacity = 0;
     }
 
     template<typename T>
+
     Array<T>::Array(const Array <T> &other) : _allocator(other._allocator),
                                               _size(0), _capacity(0), _data(0) {
         const uint32_t n = other._size;

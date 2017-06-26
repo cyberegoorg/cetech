@@ -20,6 +20,13 @@
 
 #include "resource_package.h"
 
+IMPORT_API(memory_api_v0);
+IMPORT_API(resource_api_v0);
+IMPORT_API(task_api_v0);
+IMPORT_API(thread_api_v0);
+IMPORT_API(vio_api_v0);
+IMPORT_API(hash_api_v0);
+
 using namespace cetech;
 
 //==============================================================================
@@ -34,14 +41,6 @@ struct package_task_data {
 struct G {
     uint64_t package_typel;
 } _G = {0};
-
-
-IMPORT_API(memory_api_v0);
-IMPORT_API(resource_api_v0);
-IMPORT_API(task_api_v0);
-IMPORT_API(thread_api_v0);
-IMPORT_API(vio_api_v0);
-IMPORT_API(hash_api_v0);
 
 //==============================================================================
 // Resource compiler
@@ -173,6 +172,8 @@ void package_task(void *data) {
                                          package)[j]],
                                  package_name_count(package)[j]);
     }
+
+    CETECH_DEALLOCATE(memory_api_v0.main_allocator(), task_data);
 }
 
 void package_load(uint64_t name) {
