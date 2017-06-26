@@ -127,6 +127,9 @@ namespace entity_resource_compiler {
     static void preprocess(const char *filename,
                            yaml_node_t root,
                            struct compilator_api *capi) {
+        auto a = memory_api_v0.main_allocator();
+        const char *source_dir = resource_api_v0.compiler_get_source_dir();
+
         yaml_node_t prefab_node = yaml_get_node(root, "prefab");
 
         if (yaml_is_valid(prefab_node)) {
@@ -134,19 +137,18 @@ namespace entity_resource_compiler {
             char prefab_str[256] = {0};
             yaml_as_string(prefab_node, prefab_str,
                            CETECH_ARRAY_LEN(prefab_str));
-            snprintf(prefab_file, CETECH_ARRAY_LEN(prefab_file), "%s.entity",
-                     prefab_str);
+
+            snprintf(prefab_file, CETECH_ARRAY_LEN(prefab_file),
+                     "%s.entity", prefab_str);
 
             capi->add_dependency(filename, prefab_file);
 
-            char full_path[256] = {0};
-            const char *source_dir = resource_api_v0.compiler_get_source_dir();
-            path_v0.join(full_path, CETECH_ARRAY_LEN(full_path), source_dir,
-                         prefab_file);
+
+            char* full_path = path_v0.join(a, 2, source_dir, prefab_file);
 
             struct vio *prefab_vio = vio_api_v0.from_file(full_path,
                                                           VIO_OPEN_READ,
-                                                          memory_api_v0.main_allocator());
+                                                          a);
 
             char prefab_data[vio_api_v0.size(prefab_vio) + 1];
             memset(prefab_data, 0, vio_api_v0.size(prefab_vio) + 1);
@@ -160,6 +162,8 @@ namespace entity_resource_compiler {
             yaml_merge(root, prefab_root);
 
             vio_api_v0.close(prefab_vio);
+
+            CETECH_DEALLOCATE(a, full_path);
         }
     }
 

@@ -232,18 +232,16 @@ struct resource_api_v0 {
     //! \param max_len Max build dir len
     //! \param platform Platform
     //! \return 1 if ok else 0
-    int (*compiler_get_tmp_dir)(char *tmp_dir,
-                                size_t max_len,
-                                const char *platform);
+    char *(*compiler_get_tmp_dir)(struct allocator *a,
+                                  const char *platform);
 
     //! Join tool path
     //! \param output Tmp dir
     //! \param max_len Max len
     //! \param name Tool name
     //! \return 1 if ok else 0
-    int (*compiler_external_join)(char *output,
-                                  uint32_t max_len,
-                                  const char *name);
+    char *(*compiler_external_join)(struct allocator *a,
+                                    const char *name);
 
     //! Create build dir
     //! \param config Config API
@@ -267,9 +265,8 @@ struct resource_api_v0 {
     //! \param max_len Max build dir len
     //! \param platform Platform
     //! \return 1 if ok else 0
-    int (*compiler_get_build_dir)(char *build_dir,
-                                  size_t max_len,
-                                  const char *platform);
+    char *(*compiler_get_build_dir)(struct allocator *a,
+                                    const char *platform);
 };
 
 

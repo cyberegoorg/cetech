@@ -88,9 +88,8 @@ struct filesystem_api_v0 {
     //! \param maxlen Max result len
     //! \param filename Filename
     //! \return 1 if ok else 0
-    int (*fullpath)(uint64_t root,
-                    char *result,
-                    uint64_t maxlen,
+    char *(*fullpath)(uint64_t root,
+                    struct allocator*,
                     const char *filename);
 };
 

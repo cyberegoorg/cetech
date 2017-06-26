@@ -6,6 +6,7 @@
 #include <cetech/core/errors.h>
 #include <cetech/core/path.h>
 #include <cetech/core/api.h>
+#include <cetech/core/memory.h>
 
 #include "include/sqlite3/sqlite3.h"
 
@@ -43,7 +44,7 @@ static int _step(sqlite3 *db,
     return rc;
 }
 
-static char _logdb_path[1024] = {0};
+static char* logdb_path = nullptr;
 static time_t _session_id = {0};
 static sqlite3 *db[256] = {0};
 
@@ -53,7 +54,7 @@ static sqlite3 *_opendb(char worker_id) {
     }
 
     sqlite3 *_db;
-    sqlite3_open_v2(_logdb_path,
+    sqlite3_open_v2(logdb_path,
                     &_db,
                     SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE |
                     SQLITE_OPEN_SHAREDCACHE,
@@ -127,9 +128,10 @@ namespace log {
     int logdb_init_db(const char *log_dir,
                       struct api_v0 *api) {
         struct path_v0 *path = (path_v0 *) api->first("path_v0").api;
+        struct memory_api_v0 *memory = (memory_api_v0 *) api->first("memory_api_v0").api;
 
-        path->join(_logdb_path, CETECH_ARRAY_LEN(_logdb_path), log_dir,
-                   "log.db");
+
+        logdb_path = path->join(memory->main_allocator(), 2, log_dir, "log.db");
 
         _session_id = time(NULL);
 

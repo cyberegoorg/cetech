@@ -39,7 +39,7 @@ static int _step(sqlite3 *db,
     return rc;
 }
 
-static char _logdb_path[1024] = {0};
+static char* _logdb_path = nullptr;
 
 static sqlite3 *_opendb() {
     sqlite3 *_db;
@@ -76,9 +76,10 @@ static int _do_sql(const char *sql) {
 }
 
 static int builddb_init_db(const char *build_dir,
-                           struct path_v0 *path) {
-    path->join(_logdb_path, CETECH_ARRAY_LEN(_logdb_path), build_dir,
-               "build.db");
+                           struct path_v0 *path,
+                           struct memory_api_v0 *memory) {
+
+    _logdb_path = path->join(memory->main_allocator(), 2, build_dir, "build.db");
 
 
     if (!_do_sql("CREATE TABLE IF NOT EXISTS files (\n"
@@ -205,13 +206,13 @@ static int builddb_need_compile(const char *source_dir,
 
     while (_step(_db, stmt) == SQLITE_ROW) {
         compile = 0;
-
-        char full_path[1024] = {0};
         const char *dep_file = (const char *) sqlite3_column_text(stmt, 0);
-        path->join(full_path, CETECH_ARRAY_LEN(full_path), source_dir,
-                   dep_file);
+        char* full_path = path->join(memory_api_v0.main_allocator(), 2, source_dir, dep_file);
 
         time_t actual_mtime = path->file_mtime(full_path);
+
+        CETECH_DEALLOCATE(memory_api_v0.main_allocator(), full_path);
+
         time_t last_mtime = sqlite3_column_int64(stmt, 1);
 
         if (actual_mtime != last_mtime) {

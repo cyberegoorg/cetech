@@ -121,14 +121,12 @@ namespace {
 //==============================================================================
 // Private
 //==============================================================================
-int resource_compiler_get_build_dir(char *build_dir,
-                                    size_t max_len,
-                                    const char *platform) {
-    const char *build_dir_str = config_api_v0.get_string(
-            _G.config.build_dir);
-    return path_v0.join(build_dir, max_len, build_dir_str, platform);
-}
 
+char* resource_compiler_get_build_dir(allocator* a, const char *platform) {
+
+    const char *build_dir_str = config_api_v0.get_string(_G.config.build_dir);
+    return path_v0.join(a, 2, build_dir_str, platform);
+}
 
 namespace package_resource {
 
@@ -605,9 +603,8 @@ namespace resource_module {
         _G.resource_callbacks.init(memory_api_v0.main_allocator());
         _G.resource_map.init(memory_api_v0.main_allocator());
 
-        char build_dir_full[1024] = {0};
-        path_v0.join(build_dir_full,
-                     CETECH_ARRAY_LEN(build_dir_full),
+        char* build_dir_full = path_v0.join(
+                     memory_api_v0.main_allocator(), 2,
                      config_api_v0.get_string(_G.config.build_dir),
                      app_api_v0.platform());
 
