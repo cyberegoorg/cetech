@@ -505,15 +505,15 @@ namespace resource {
                                                memory_api_v0.main_allocator());
 
             uint64_t id = hash_combine(type, names[i]);
-            uint32_t idx = map::get(_G.resource_map, id, UINT32_MAX);
-            resource_item_t item = {0};
-            if (idx != UINT32_MAX) {
-                item = _G.resource_data[idx];
+            uint32_t item_idx = map::get(_G.resource_map, id, UINT32_MAX);
+            if (item_idx == UINT32_MAX) {
+                continue;
             }
 
+            resource_item_t item = _G.resource_data[item_idx];
             item.data = new_data;
             //--item.ref_count; // Load call increase item.ref_count, because is loaded
-            _G.resource_data[idx] = item;
+            _G.resource_data[item_idx] = item;
         }
     }
 
