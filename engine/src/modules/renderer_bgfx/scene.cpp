@@ -116,7 +116,6 @@ struct scene_instance *_get_scene_instance(uint64_t scene) {
 #include <include/assimp/scene.h>
 #include <include/assimp/postprocess.h>
 #include <include/assimp/cimport.h>
-#include <cetech/core/errors.h>
 
 namespace scene_resource_compiler {
     static const struct {
@@ -696,7 +695,6 @@ namespace scene_resource {
         uint8_t *vb = scene_blob_vb(resource);
 
         uint32_t scene_idx = map::get(_G.scene_instance_map, name, UINT32_MAX);
-        CETECH_ASSERT("scene", scene_idx == UINT32_MAX);
 
         scene_instance *instance =  _init_scene_instance(name);
 
