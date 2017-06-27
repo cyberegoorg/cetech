@@ -18,6 +18,7 @@
 #include <cetech/modules/entity.h>
 #include <cetech/modules/world.h>
 #include <cetech/core/yaml.h>
+#include <cetech/core/thread.h>
 #include "cetech/modules/scenegraph.h"
 
 #include "scene_blob.h"
@@ -34,6 +35,7 @@ IMPORT_API(scenegprah_api_v0);
 IMPORT_API(path_v0);
 IMPORT_API(vio_api_v0);
 IMPORT_API(hash_api_v0);
+IMPORT_API(thread_api_v0);
 
 
 struct scene_instance {
@@ -74,31 +76,33 @@ struct scene_instance *_init_scene_instance(uint64_t scene) {
 }
 
 void _destroy_scene_instance(uint64_t scene) {
+    Map<uint32_t> map1(memory_api_v0.main_allocator());
+    map::set<uint32_t>(map1, 1111, 111);
+    map::remove(map1, 1111);
+
     uint32_t idx = map::get(_G.scene_instance_map, scene, UINT32_MAX);
+    uint32_t size = array::size(_G.scene_instance_array);
+
     scene_instance *instance = &_G.scene_instance_array[idx];
+    scene_instance *last_instance = &_G.scene_instance_array[size - 1];
 
     instance->geom_map.destroy();
     instance->size.destroy();
     instance->vb.destroy();
     instance->ib.destroy();
 
-    uint32_t size = array::size(_G.scene_instance_array);
-
-    if (size > 1) {
-        scene_instance *last_instance = &_G.scene_instance_array[size - 1];
-        _G.scene_instance_array[idx] = *last_instance;
-        map::set(_G.scene_instance_map, last_instance->scene, idx);
-    }
-
-    array::pop_back(_G.scene_instance_array);
+    *instance = *last_instance;
     map::remove(_G.scene_instance_map, scene);
+    map::set(_G.scene_instance_map, last_instance->scene, idx);
+    array::pop_back(_G.scene_instance_array);
 }
 
 struct scene_instance *_get_scene_instance(uint64_t scene) {
     uint32_t idx = map::get(_G.scene_instance_map, scene, UINT32_MAX);
 
     if (idx == UINT32_MAX) {
-        return NULL;
+        resource_api_v0.get(_G.type, scene);
+        idx = map::get(_G.scene_instance_map, scene, UINT32_MAX);
     }
 
     return &_G.scene_instance_array[idx];
@@ -692,27 +696,14 @@ namespace scene_resource {
 
         uint32_t scene_idx = map::get(_G.scene_instance_map, name, UINT32_MAX);
 
-        scene_instance *instance = NULL;
-
-        if(scene_idx != UINT32_MAX) {
-            instance = &_G.scene_instance_array[scene_idx];
-
-            map::clear(instance->geom_map);
-            array::clear(instance->size);
-            array::clear(instance->vb);
-            array::clear(instance->ib);
-
-        } else {
-            instance = _init_scene_instance(name);
-        }
-
+        scene_instance *instance =  _init_scene_instance(name);
 
         for (int i = 0; i < resource->geom_count; ++i) {
-            bgfx_vertex_buffer_handle_t bvb = bgfx_create_vertex_buffer(
+            bgfx_vertex_buffer_handle_t bv_handle = bgfx_create_vertex_buffer(
                     bgfx_make_ref((const void *) &vb[vb_offset[i]], vb_size[i]),
                     &vb_decl[i], BGFX_BUFFER_NONE);
 
-            bgfx_index_buffer_handle_t bib = bgfx_create_index_buffer(
+            bgfx_index_buffer_handle_t ib_handle = bgfx_create_index_buffer(
                     bgfx_make_ref((const void *) &ib[ib_offset[i]],
                                   sizeof(uint32_t) * ib_size[i]),
                     BGFX_BUFFER_INDEX32);
@@ -721,8 +712,8 @@ namespace scene_resource {
             map::set(instance->geom_map, geom_name[i], idx);
 
             array::push_back(instance->size, ib_size[i]);
-            array::push_back(instance->vb, bvb);
-            array::push_back(instance->ib, bib);
+            array::push_back(instance->vb, bv_handle);
+            array::push_back(instance->ib, ib_handle);
         }
     }
 
@@ -763,6 +754,7 @@ int scene_init(struct api_v0 *api) {
     GET_API(api, path_v0);
     GET_API(api, vio_api_v0);
     GET_API(api, hash_api_v0);
+    GET_API(api, thread_api_v0);
 
     _G = {0};
 
@@ -788,8 +780,6 @@ void scene_shutdown() {
 
 void scene_submit(uint64_t scene,
                   uint64_t geom_name) {
-    resource_api_v0.get(_G.type, scene);
-
     scene_instance *instance = _get_scene_instance(scene);
 
     if (instance == NULL) {

@@ -72,7 +72,7 @@ namespace shader_resource_compiler {
 
         string_stream::Buffer buffer(memory_api_v0.main_allocator());
 
-        char* shaderc = resource_api_v0.compiler_external_join(
+        char *shaderc = resource_api_v0.compiler_external_join(
                 memory_api_v0.main_allocator(),
                 "shaderc");
 
@@ -80,17 +80,18 @@ namespace shader_resource_compiler {
         CETECH_DEALLOCATE(memory_api_v0.main_allocator(), shaderc);
 
         string_stream::printf(buffer,
-                      ""
-                              " -f %s"
-                              " -o %s"
-                              " -i %s"
-                              " --type %s"
-                              " --platform %s"
-                              " --profile %s"
+                              ""
+                                      " -f %s"
+                                      " -o %s"
+                                      " -i %s"
+                                      " --type %s"
+                                      " --platform %s"
+                                      " --profile %s"
 
-                              " 2>&1",  // TODO: move to exec
+                                      " 2>&1",  // TODO: move to exec
 
-                      input, output, include_path, type, platform, profile);
+                              input, output, include_path, type, platform,
+                              profile);
 
         int status = process_api_v0.exec(string_stream::c_str(buffer));
 
@@ -155,7 +156,7 @@ namespace shader_resource_compiler {
         const char *source_dir = resource_api_v0.compiler_get_source_dir();
         const char *core_dir = resource_api_v0.compiler_get_core_dir();
 
-        char* include_dir = path_v0.join(a, 2, core_dir, "bgfxshaders");
+        char *include_dir = path_v0.join(a, 2, core_dir, "bgfxshaders");
 
         struct shader resource = {0};
 
@@ -164,13 +165,14 @@ namespace shader_resource_compiler {
         char output_path[1024] = {0};
         char tmp_filename[1024] = {0};
 
-        char* tmp_dir= resource_api_v0.compiler_get_tmp_dir(a, app_api_v0.platform());
+        char *tmp_dir = resource_api_v0.compiler_get_tmp_dir(a,
+                                                             app_api_v0.platform());
 
         //////// VS
         yaml_as_string(vs_input, input_str, CETECH_ARRAY_LEN(input_str));
         compilator_api->add_dependency(filename, input_str);
 
-        char* input_path = path_v0.join(a, 2, source_dir,  input_str);
+        char *input_path = path_v0.join(a, 2, source_dir, input_str);
 
         _gen_tmp_name(output_path, tmp_dir, CETECH_ARRAY_LEN(tmp_filename),
                       input_str);
@@ -200,7 +202,7 @@ namespace shader_resource_compiler {
         yaml_as_string(fs_input, input_str, CETECH_ARRAY_LEN(input_str));
         compilator_api->add_dependency(filename, input_str);
 
-        input_path = path_v0.join(a, 2, source_dir,  input_str);
+        input_path = path_v0.join(a, 2, source_dir, input_str);
 
         _gen_tmp_name(output_path, tmp_dir, CETECH_ARRAY_LEN(tmp_filename),
                       input_str);
@@ -279,8 +281,7 @@ namespace shader_resource {
         bgfx_shader_handle_t fs_shader = bgfx_create_shader(fs_mem);
 
         bgfx_program_handle_t program = bgfx_create_program(vs_shader,
-                                                            fs_shader,
-                                                            1);
+                                                            fs_shader, 1);
 
         map::set(_G.handler_map, name, program);
     }
