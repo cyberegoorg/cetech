@@ -361,13 +361,7 @@ namespace material {
     material_t create(uint64_t name) {
         auto resource = material_blob::get(resource_api_v0.get(_G.type, name));
 
-        uint32_t size = sizeof(material_blob::blob_t) +
-                        (resource->uniforms_count * sizeof(char) * 32) +
-                        (resource->texture_count * sizeof(uint64_t)) +
-                        (resource->vec4f_count * sizeof(vec4f_t)) +
-                        (resource->mat44f_count * sizeof(mat44f_t)) +
-                        (resource->mat33f_count * sizeof(mat33f_t));
-
+        uint32_t size = material_blob::size(resource);
         uint32_t h = handler::create(_G.material_handler);
 
         uint32_t idx = (uint32_t) array::size(_G.material_instance_offset);

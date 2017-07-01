@@ -19,22 +19,26 @@ namespace level_blob {
         return (blob_t*)(data);
     }
 
+    inline const uint32_t size(const blob_t* blob) {
+        return (
+            sizeof(blob_t) +
+            ( sizeof(uint64_t) * blob->entities_count ) +
+            ( sizeof(uint32_t) * blob->entities_count ) +
+        0);
+    }
+
     inline uint32_t entities_count(const blob_t* blob) {
         return blob->entities_count;
     }
-
     inline uint64_t* names(const blob_t* blob) {
         return (uint64_t*)((blob) + 1);
     }
-
     inline uint32_t* offset(const blob_t* blob) {
         return ((uint32_t*) (names(blob) + (blob->entities_count)));
     }
-
     inline uint8_t* data(const blob_t* blob) {
         return ((uint8_t*) (offset(blob) + (blob->entities_count)));
     }
-
 
 }
 

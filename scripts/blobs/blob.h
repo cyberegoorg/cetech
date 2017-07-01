@@ -24,6 +24,23 @@ namespace {{name}}_blob {
         return (blob_t*)(data);
     }
 
+    inline const uint32_t size(const blob_t* blob) {
+        return (
+            sizeof(blob_t) +
+{% for k, v in elements.items() %}
+    {% if v.is_array %}
+        {% if v.type_count == None %}
+            {% if v.count != "*" %}
+            ( sizeof({{v.type}}) * blob->{{v.count}} ) +
+            {% endif %}
+        {% else %}
+            ( sizeof({{v.type}}) * blob->{{v.count}} * {{v.type_count}}) +
+        {% endif %}
+    {% endif %}
+{% endfor %}
+        0);
+    }
+
 {% for k, v in elements.items() %}
     {% if v.is_array %}
         {% if v.is_first_array %}
@@ -46,7 +63,6 @@ namespace {{name}}_blob {
         return blob->{{ v.name}};
     }
     {% endif %}
-
 {% endfor %}
 
 }
