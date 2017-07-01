@@ -33,7 +33,7 @@ ARGS_PARSER.add_argument(
 
 ARGS_PARSER.add_argument(
     "--template_dir",
-    default=os.path.join(ROOT_DIR, "scripts", "templates"),
+    default=os.path.join(ROOT_DIR, "scripts", "blobs"),
     help='Blob template dir')
 
 ARGS_PARSER.add_argument(
