@@ -1,16 +1,41 @@
 #ifndef CETECH_LEVEL_BLOB_H
 #define CETECH_LEVEL_BLOB_H
 
+#include <stdint.h>
+#include <cetech/celib/math_types.h>
 
-typedef struct level_blob {
-    uint32_t entities_count;
-    // uint64_t names[entities_count];
-    // uint32_t offset[entities_count];
-    // uint8_t data[*];
-} level_blob_t;
+namespace level_blob {
 
-#define level_blob_names(r) ((uint64_t*) ((r) + 1))
-#define level_blob_offset(r) ((uint32_t*) (level_blob_names(r) + ((r)->entities_count)))
-#define level_blob_data(r) ((uint8_t*) (level_blob_offset(r) + ((r)->entities_count)))
+    typedef struct {
+        uint32_t blob_version;
+
+        uint32_t entities_count;
+        // uint64_t names[entities_count];
+        // uint32_t offset[entities_count];
+        // uint8_t data[*];
+    } blob_t;
+
+    inline const blob_t* get(void* data) {
+        return (blob_t*)(data);
+    }
+
+    inline uint32_t entities_count(const blob_t* blob) {
+        return blob->entities_count;
+    }
+
+    inline uint64_t* names(const blob_t* blob) {
+        return (uint64_t*)((blob) + 1);
+    }
+
+    inline uint32_t* offset(const blob_t* blob) {
+        return ((uint32_t*) (names(blob) + (blob->entities_count)));
+    }
+
+    inline uint8_t* data(const blob_t* blob) {
+        return ((uint8_t*) (offset(blob) + (blob->entities_count)));
+    }
+
+
+}
 
 #endif // CETECH_LEVEL_BLOB_H

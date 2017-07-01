@@ -3,10 +3,10 @@ blobs:
     - name: level
       guard_prefix: CETECH
       includes:
-        - <celib/string/stringid.h>
-        - <celib/math/types.h>
+        - <cetech/celib/math_types.h>
+
       values:
         - uint32_t entities_count
-        - stringid64_t names[entities_count]
+        - uint64_t names[entities_count]
         - uint32_t offset[entities_count]
         - uint8_t data[*]

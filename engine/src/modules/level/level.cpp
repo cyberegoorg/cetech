@@ -46,7 +46,7 @@ namespace {
     };
 
 
-    #define _G LevelGlobals
+#define _G LevelGlobals
     static struct LevelGlobals {
         uint64_t level_type;
         Array<struct level_instance> level_instance;
@@ -189,13 +189,13 @@ namespace level_resource_compiler {
 
         yaml_node_foreach_dict(entities, forach_entities_clb, &entity_data);
 
-        struct level_blob res = {
+        level_blob::blob_t res = {
                 .entities_count = (uint32_t) array::size(id)
         };
 
         entity_api_v0.compiler_write_to_build(output, entity_data.data);
 
-        vio_api_v0.write(build_vio, &res, sizeof(struct level_blob), 1);
+        vio_api_v0.write(build_vio, &res, sizeof(level_blob::blob_t), 1);
         vio_api_v0.write(build_vio, array::begin(id), sizeof(uint64_t),
                          array::size(id));
         vio_api_v0.write(build_vio, array::begin(offset), sizeof(uint32_t),
@@ -219,13 +219,12 @@ namespace level {
 
     level_t load(world_t world,
                  uint64_t name) {
-        struct level_blob *res = (level_blob *) resource_api_v0.get(
-                _G.level_type,
-                name);
 
-        uint64_t *id = level_blob_names(res);
-        uint32_t *offset = level_blob_offset(res);
-        uint8_t *data = level_blob_data(res);
+        auto res = level_blob::get(resource_api_v0.get(_G.level_type, name));
+
+        uint64_t *id = level_blob::names(res);
+        uint32_t *offset = level_blob::offset(res);
+        uint8_t *data = level_blob::data(res);
 
         entity_t level_ent = entity_api_v0.create();
         transform_t t = transform_api_v0.create(world, level_ent,
@@ -240,7 +239,7 @@ namespace level {
                                           &instance->spawned_entity,
                                           &instance->spawned_entity_count);
 
-        for (int i = 0; i < res->entities_count; ++i) {
+        for (int i = 0; i < level_blob::entities_count(res); ++i) {
             entity_t e = instance->spawned_entity[offset[i]];
             map::set(instance->spawned_entity_map, id[i], e);
 
@@ -256,10 +255,12 @@ namespace level {
                  level_t level) {
         struct level_instance *instance = get_level_instance(level);
 
-        entity_api_v0.destroy(world, instance->spawned_entity, instance->spawned_entity_count);
+        entity_api_v0.destroy(world, instance->spawned_entity,
+                              instance->spawned_entity_count);
         entity_api_v0.destroy(world, &instance->level_entity, 1);
 
-        CETECH_DEALLOCATE(memory_api_v0.main_allocator(), instance->spawned_entity);
+        CETECH_DEALLOCATE(memory_api_v0.main_allocator(),
+                          instance->spawned_entity);
 
         _destroy_level_instance(instance);
     }

@@ -58,7 +58,7 @@ namespace {
     } _G;
 }
 
-#define material_blob_uniform_bgfx(r)    ((bgfx_uniform_handle_t*) ((material_blob_vec4f_value(r)+((r)->vec4f_count))))
+#define material_blob_uniform_bgfx(r)    ((bgfx_uniform_handle_t*) ((material_blob::vec4f_value(r)+((r)->vec4f_count))))
 
 //==============================================================================
 // Compiler private
@@ -96,7 +96,7 @@ namespace material_resource_compiler {
                 capi->add_dependency(filename, prefab_file);
 
                 const char *source_dir = resource_api_v0.compiler_get_source_dir();
-                char* full_path = path_v0.join(a, 2, source_dir, prefab_file);
+                char *full_path = path_v0.join(a, 2, source_dir, prefab_file);
 
                 struct vio *prefab_vio = vio_api_v0.from_file(full_path,
                                                               VIO_OPEN_READ,
@@ -242,7 +242,7 @@ namespace material_resource_compiler {
             yaml_node_foreach_dict(mat33, _forach_mat33f_clb, &output);
         }
 
-        struct material_blob resource = {
+        material_blob::blob_t resource = {
                 .shader_name = hash_api_v0.id64_from_str(tmp_buffer),
                 .texture_count =output.texture_count,
                 .vec4f_count = output.vec4f_count,
@@ -359,10 +359,9 @@ namespace material {
     static const material_t null_material = {0};
 
     material_t create(uint64_t name) {
-        struct material_blob *resource = (material_blob *) resource_api_v0.get(
-                _G.type, name);
+        auto resource = material_blob::get(resource_api_v0.get(_G.type, name));
 
-        uint32_t size = sizeof(struct material_blob) +
+        uint32_t size = sizeof(material_blob::blob_t) +
                         (resource->uniforms_count * sizeof(char) * 32) +
                         (resource->texture_count * sizeof(uint64_t)) +
                         (resource->vec4f_count * sizeof(vec4f_t)) +
@@ -427,15 +426,15 @@ namespace material {
             return 0;
         }
 
-        struct material_blob *resource = (struct material_blob *) &_get_resorce(
-                idx);
+        auto resource = material_blob::get(&_get_resorce(idx));
 
-        return resource->texture_count;
+        return material_blob::texture_count(resource);
     }
 
-    uint32_t _material_find_slot(struct material_blob *resource,
+    uint32_t _material_find_slot(const material_blob::blob_t *resource,
                                  const char *name) {
-        const char *u_names = (const char *) (resource + 1);
+
+        const char *u_names = material_blob::uniform_names(resource);
         for (uint32_t i = 0; i < resource->uniforms_count; ++i) {
             if (strcmp(&u_names[i * 32], name) != 0) {
                 continue;
@@ -458,11 +457,9 @@ namespace material {
             return;
         }
 
-        struct material_blob *resource = (struct material_blob *) &_get_resorce(
-                idx);
+        auto resource = material_blob::get(&_get_resorce(idx));
 
-
-        uint64_t *u_texture = material_blob_texture_names(resource);
+        uint64_t *u_texture = material_blob::texture_names(resource);
 
         int slot_idx = _material_find_slot(resource, slot);
 
@@ -480,10 +477,9 @@ namespace material {
             return;
         }
 
-        struct material_blob *resource = (struct material_blob *) &_get_resorce(
-                idx);
+        auto resource = material_blob::get(&_get_resorce(idx));
 
-        vec4f_t *u_vec4f = material_blob_vec4f_value(resource);
+        vec4f_t *u_vec4f = material_blob::vec4f_value(resource);
 
         int slot_idx = _material_find_slot(resource, slot);
 
@@ -501,10 +497,9 @@ namespace material {
             return;
         }
 
-        struct material_blob *resource = (struct material_blob *) &_get_resorce(
-                idx);
+        auto resource = material_blob::get(&_get_resorce(idx));
 
-        mat33f_t *u_mat33f = material_blob_mat33f_value(resource);
+        mat33f_t *u_mat33f = material_blob::mat33f_value(resource);
 
         int slot_idx = _material_find_slot(resource, slot);
 
@@ -522,10 +517,9 @@ namespace material {
             return;
         }
 
-        struct material_blob *resource = (struct material_blob *) &_get_resorce(
-                idx);
+        auto resource = material_blob::get(&_get_resorce(idx));
 
-        mat44f_t *u_mat44f = material_blob_mat44f_value(resource);
+        mat44f_t *u_mat44f = material_blob::mat44f_value(resource);
 
         int slot_idx = _material_find_slot(resource, slot);
 
@@ -542,13 +536,12 @@ namespace material {
             return;
         }
 
-        struct material_blob *resource = (struct material_blob *) &_get_resorce(
-                idx);
+        auto resource = material_blob::get(&_get_resorce(idx));
 
-        uint64_t *u_texture = material_blob_texture_names(resource);
-        vec4f_t *u_vec4f = material_blob_vec4f_value(resource);
-        mat33f_t *u_mat33f = material_blob_mat33f_value(resource);
-        mat44f_t *u_mat44f = material_blob_mat44f_value(resource);
+        uint64_t *u_texture = material_blob::texture_names(resource);
+        vec4f_t *u_vec4f = material_blob::vec4f_value(resource);
+        mat33f_t *u_mat33f = material_blob::mat33f_value(resource);
+        mat44f_t *u_mat44f = material_blob::mat44f_value(resource);
 
         bgfx_uniform_handle_t *u_handler = material_blob_uniform_bgfx(resource);
 
@@ -596,9 +589,9 @@ namespace material {
                                 UINT32_MAX);
         CETECH_ASSERT(LOG_WHERE, idx != UINT32_MAX);
 
-        struct material_blob *resource = (struct material_blob *) &_get_resorce(
-                idx);
-        bgfx_submit(0, shader_get(resource->shader_name), 0, 0);
+        auto resource = material_blob::get(&_get_resorce(idx));
+
+        bgfx_submit(0, shader_get(material_blob::shader_name(resource)), 0, 0);
     }
 
 }

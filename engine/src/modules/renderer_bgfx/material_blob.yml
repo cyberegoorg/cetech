@@ -3,17 +3,17 @@ blobs:
     - name: material
       guard_prefix: CETECH
       includes:
-        - <celib/string/stringid.h>
-        - <celib/math/types.h>
+        - <cetech/celib/math_types.h>
+
       values:
-        - stringid64_t shader_name
+        - uint64_t shader_name
         - uint32_t uniforms_count
         - uint32_t texture_count
         - uint32_t vec4f_count
         - uint32_t mat33f_count
         - uint32_t mat44f_count
         - char[32] uniform_names[uniforms_count]
-        - stringid64_t texture_names[texture_count]
-        - cel_vec4f_t vec4f_value[vec4f_count]
-        - cel_mat44f_t mat44f_value[mat44f_count]
+        - uint64_t texture_names[texture_count]
+        - vec4f_t vec4f_value[vec4f_count]
+        - mat44f_t mat44f_value[mat44f_count]
         - mat33f_t mat33f_value[mat33f_count]
