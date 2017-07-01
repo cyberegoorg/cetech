@@ -608,7 +608,7 @@ namespace scene_resource_compiler {
             return 0;
         }
 
-        struct scene_blob res = {
+        scene_blob::blob_t res = {
                 .geom_count = (uint32_t) array::size(output->geom_name),
                 .node_count = (uint32_t) array::size(output->node_name),
                 .ib_len = (uint32_t) array::size(output->ib),
@@ -683,16 +683,17 @@ namespace scene_resource {
 
     void online(uint64_t name,
                 void *data) {
-        scene_blob *resource = (scene_blob *) data;
 
-        bgfx_vertex_decl_t *vb_decl = scene_blob_vb_decl(resource);
-        uint64_t *geom_name = scene_blob_geom_name(resource);
-        uint32_t *ib_offset = scene_blob_ib_offset(resource);
-        uint32_t *vb_offset = scene_blob_vb_offset(resource);
-        uint32_t *ib_size = scene_blob_ib_size(resource);
-        uint32_t *vb_size = scene_blob_vb_size(resource);
-        uint32_t *ib = scene_blob_ib(resource);
-        uint8_t *vb = scene_blob_vb(resource);
+        auto resource = scene_blob::get(data);
+
+        bgfx_vertex_decl_t *vb_decl = scene_blob::vb_decl(resource);
+        uint64_t *geom_name = scene_blob::geom_name(resource);
+        uint32_t *ib_offset = scene_blob::ib_offset(resource);
+        uint32_t *vb_offset = scene_blob::vb_offset(resource);
+        uint32_t *ib_size = scene_blob::ib_size(resource);
+        uint32_t *vb_size = scene_blob::vb_size(resource);
+        uint32_t *ib = scene_blob::ib(resource);
+        uint8_t *vb = scene_blob::vb(resource);
 
         uint32_t scene_idx = map::get(_G.scene_instance_map, name, UINT32_MAX);
 
@@ -799,11 +800,11 @@ void scene_submit(uint64_t scene,
 void scene_create_graph(world_t world,
                         entity_t entity,
                         uint64_t scene) {
-    struct scene_blob *res = (scene_blob *) resource_api_v0.get(_G.type, scene);
+    auto *res = scene_blob::get(resource_api_v0.get(_G.type, scene));
 
-    uint64_t *node_name = scene_blob_node_name(res);
-    uint32_t *node_parent = scene_blob_node_parent(res);
-    mat44f_t *node_pose = scene_blob_node_pose(res);
+    uint64_t *node_name = scene_blob::node_name(res);
+    uint32_t *node_parent = scene_blob::node_parent(res);
+    mat44f_t *node_pose = scene_blob::node_pose(res);
 
     scenegprah_api_v0.create(world, entity, node_name, node_parent, node_pose,
                              res->node_count);
@@ -811,10 +812,10 @@ void scene_create_graph(world_t world,
 
 uint64_t scene_get_mesh_node(uint64_t scene,
                              uint64_t mesh) {
-    struct scene_blob *res = (scene_blob *) resource_api_v0.get(_G.type, scene);
+    auto *res = scene_blob::get(resource_api_v0.get(_G.type, scene));
 
-    uint64_t *geom_node = scene_blob_geom_node(res);
-    uint64_t *geom_name = scene_blob_geom_name(res);
+    uint64_t *geom_node = scene_blob::geom_node(res);
+    uint64_t *geom_name = scene_blob::geom_name(res);
 
     for (int i = 0; i < res->geom_count; ++i) {
         if (geom_name[i] != mesh) {

@@ -3,14 +3,15 @@ blobs:
     - name: scene
       guard_prefix: CETECH
       includes:
-        - <celib/string/stringid.h>
-        - <celib/math/types.h>
+        - <cetech/core/hash.h>
+        - <cetech/celib/math_types.h>
+
       values:
         - uint32_t geom_count
         - uint32_t node_count
         - uint32_t ib_len
         - uint32_t vb_len
-        - stringid64_t geom_name[geom_count]
+        - uint64_t geom_name[geom_count]
         - uint32_t ib_offset[geom_count]
         - uint32_t vb_offset[geom_count]
         - bgfx_vertex_decl_t vb_decl[geom_count]
@@ -18,7 +19,7 @@ blobs:
         - uint32_t vb_size[geom_count]
         - uint32_t ib[ib_len]
         - uint8_t vb[vb_len]
-        - stringid64_t node_name[node_count]
+        - uint64_t node_name[node_count]
         - uint32_t node_parent[node_count]
-        - cel_mat44f_t node_pose[node_count]
-        - stringid64_t geom_node[geom_count]
+        - mat44f_t node_pose[node_count]
+        - uint64_t geom_node[geom_count]

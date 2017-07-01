@@ -1,3 +1,8 @@
+###########
+# IMPORTS #
+########################################################################################################################
+
+import argparse
 import glob
 import os
 import re
@@ -6,13 +11,38 @@ from collections import OrderedDict
 import jinja2
 import yaml
 
+###########
+# GLOBALS #
+########################################################################################################################
+
 ROOT_DIR = os.path.abspath(os.path.join(os.path.dirname(os.path.abspath(__file__)), os.pardir))
 
 ELEMENT_RE = re.compile(r"(?P<type>.*) (?P<name>\w*)(\[(?P<count>\w*|\*)\])?")
 TYPE_RE = re.compile(r"(?P<type>\w*)(\[(?P<count>\d*|\*)\])?")
 
+########
+# ARGS #
+########################################################################################################################
 
-def parse_blob(blob, jinja_env):
+ARGS_PARSER = argparse.ArgumentParser(description='Simple blob generator')
+
+ARGS_PARSER.add_argument(
+    "-d", "--dir",
+    default="./",
+    help='Blob dir')
+
+ARGS_PARSER.add_argument(
+    "--template_dir",
+    default=os.path.join(ROOT_DIR, "scripts", "blobs"),
+    help='Blob template dir')
+
+ARGS_PARSER.add_argument(
+    "-t", "--template",
+    default="blob.h",
+    help='Blob template dir')
+
+
+def render_blob(blob, jinja_env, template):
     elements = OrderedDict()
     values = blob['values']  # type: list[str]
     blob_name = blob['name']  # type: str
@@ -56,7 +86,7 @@ def parse_blob(blob, jinja_env):
             prev_item=prev_item
         )
 
-    result = jinja_env.get_template("blob.h").render(
+    result = jinja_env.get_template(template).render(
         name=blob_name,
         elements=elements,
         guard_prefix=guard_prefix,
@@ -66,30 +96,32 @@ def parse_blob(blob, jinja_env):
     return result
 
 
-def do_yaml(input_yaml, output_dir, jinja_env):
+def do_yaml(input_yaml, output_dir, jinja_env, template):
     blobs = input_yaml['blobs']  # type: list[]
 
     for blob in blobs:
         blob_name = blob['name']
-        result = parse_blob(blob, jinja_env)
+        result = render_blob(blob, jinja_env, template)
 
         with open(os.path.join(output_dir, "%s_blob.h" % blob_name), "w") as f:
             f.write(result)
 
 
-def main():
+def main(args=None):
+    args = ARGS_PARSER.parse_args(args=args)
+
     jinja_env = jinja2.Environment(
-        loader=jinja2.FileSystemLoader(os.path.join(ROOT_DIR, "scripts", "templates")),
+        loader=jinja2.FileSystemLoader(args.template_dir),
         trim_blocks=True,
         lstrip_blocks=True,
         keep_trailing_newline=False
     )
 
-    p = os.path.join(ROOT_DIR, "engine", "src", "engine", "**", "*_blob.yml")
+    p = os.path.join(args.dir, "**", "*_blob.yml")
     for filename in glob.iglob(p, recursive=True):
         with open(filename) as f:
             data = yaml.load(f.read())
-            do_yaml(data, os.path.dirname(filename), jinja_env)
+            do_yaml(data, os.path.dirname(filename), jinja_env, args.template)
 
 
 if __name__ == '__main__':
