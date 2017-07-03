@@ -25,39 +25,21 @@ void application_start();
 
 int application_shutdown();
 
-extern void error_init(struct api_v0 *api);
+extern void error_register_api(struct api_v0 *api);
 
-extern "C" void _init_core_modules(struct api_v0 *api) {
-    LOAD_STATIC_MODULE(api, os);
-    LOAD_STATIC_MODULE(api, blob);
-    LOAD_STATIC_MODULE(api, machine);
-    LOAD_STATIC_MODULE(api, task);
-    LOAD_STATIC_MODULE(api, developsystem);
-    LOAD_STATIC_MODULE(api, consoleserver);
-
-    LOAD_STATIC_MODULE(api, filesystem);
-    LOAD_STATIC_MODULE(api, resourcesystem);
-
+extern "C" void _init_core_modules() {
+    ADD_STATIC_MODULE(os);
+    ADD_STATIC_MODULE(blob);
+    ADD_STATIC_MODULE(machine);
+    ADD_STATIC_MODULE(task);
+    ADD_STATIC_MODULE(developsystem);
+    ADD_STATIC_MODULE(consoleserver);
+    ADD_STATIC_MODULE(filesystem);
+    ADD_STATIC_MODULE(resourcesystem);
 #ifdef CETECH_CAN_COMPILE
-    LOAD_STATIC_MODULE(api, resourcecompiler);
+    ADD_STATIC_MODULE(resourcecompiler);
 #endif
 }
-
-extern "C" void _shutdown_core_modules(struct api_v0 *api) {
-#ifdef CETECH_CAN_COMPILE
-    LOAD_STATIC_MODULE(api, resourcecompiler);
-#endif
-    UNLOAD_STATIC_MODULE(api, resourcesystem);
-    UNLOAD_STATIC_MODULE(api, filesystem);
-    UNLOAD_STATIC_MODULE(api, consoleserver);
-    UNLOAD_STATIC_MODULE(api, developsystem);
-    UNLOAD_STATIC_MODULE(api, task);
-    UNLOAD_STATIC_MODULE(api, machine);
-    UNLOAD_STATIC_MODULE(api, blob);
-
-    UNLOAD_STATIC_MODULE(api, os);
-}
-
 
 int init_config(int argc,
                 const char **argv) {
@@ -92,39 +74,34 @@ int cetech_kernel_init(int argc,
     log::init();
     memory::memsys_init(4 * 1024 * 1024);
 
-    allocator *a = memory::_memsys_main_allocator();
+    allocator *a = memory::memsys_main_allocator();
 
     api::init(a);
-
     api_v0 *api = api::v0();
 
     log::register_api(api);
-    error_init(api);
+    memory::register_api(api);
+    error_register_api(api);
 
-
-    memory::memsys_init_api(api);
     os::init(api);
     application_register_api(api);
+
     CETECH_GET_API(api, app_api_v0);
 
     module::init(a, api);
     config::init(api);
 
     log::logdb_init_db(".", api);
-
     init_config(argc, argv);
 
-    _init_core_modules(api);
-
+    _init_core_modules();
     CETECH_GET_API(api, log_api_v0);
     CETECH_GET_API(api, task_api_v0);
     log_api_v0.set_wid_clb(task_api_v0.worker_id);
 
-    _init_static_modules(api);
+    _init_static_modules();
 
-    //module::load_dirs("./bin");
-    //module::call_init();
-
+    module::load_dirs("./bin");
 
     return 1;
 }
@@ -135,9 +112,7 @@ int cetech_kernel_shutdown() {
 
     log_api_v0.debug(LOG_WHERE, "Shutdown");
 
-    _shutdown_static_modules(api);
-    _shutdown_core_modules(api);
-    //module::call_shutdown();
+    module::unload_all();
 
     config::shutdown();
     module::shutdown();

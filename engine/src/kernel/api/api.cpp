@@ -30,11 +30,9 @@ static struct ApiSystemGlobals {
     Map<void *> api_map;
 } _G;
 
-
 //==============================================================================
 // Private
 //==============================================================================
-
 
 namespace api {
     void register_api(const char *name,

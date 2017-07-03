@@ -28,8 +28,8 @@
 //==============================================================================
 
 static struct ModuleSystemGlobals {
-    get_api_fce_t load_module[MAX_PLUGINS];
-    struct module_export_api_v0 *module_api[MAX_PLUGINS];
+    load_module_t load_module[MAX_PLUGINS];
+    unload_module_t unload_module[MAX_PLUGINS];
     void *module_handler[MAX_PLUGINS];
     char used[MAX_PLUGINS];
     char path[MAX_PLUGINS][MAX_PATH_LEN];
@@ -53,8 +53,9 @@ void *load_function(void *so,
                     const char *name);
 
 
-void _add(const char *path,
-          get_api_fce_t fce,
+void _add(const char path[11],
+          load_module_t load_fce,
+          unload_module_t unload_fce,
           void *handler) {
 
     for (size_t i = 0; i < MAX_PLUGINS; ++i) {
@@ -64,13 +65,11 @@ void _add(const char *path,
 
         memcpy(_G.path[i], path, strlen(path));
 
-        module_export_api_v0 *api = (module_export_api_v0 *) fce(
-                PLUGIN_EXPORT_API_ID);
-
-        _G.module_api[i] = api;
-        _G.load_module[i] = fce;
-        _G.module_handler[i] = handler;
         _G.used[i] = 1;
+
+        _G.load_module[i] = load_fce;
+        _G.unload_module[i] = unload_fce;
+        _G.module_handler[i] = handler;
 
         break;
     }
@@ -83,9 +82,10 @@ void _add(const char *path,
 
 namespace module {
 
-    void add_static(get_api_fce_t fce) {
-        _add("__STATIC__", fce, NULL);
-//    _callm_init(fce);
+    void add_static(load_module_t load,
+                    unload_module_t unload) {
+        _add("__STATIC__", load, unload, NULL);
+        load(&api_v0);
     }
 
     void load(const char *path) {
@@ -96,13 +96,19 @@ namespace module {
             return;
         }
 
-        void *fce = load_function(obj, "load_module");
-        if (fce == NULL) {
+        load_module_t load_fce = (load_module_t) load_function(obj, "load_module");
+        if (load_fce == NULL) {
             return;
         }
 
-        _add(path, (get_api_fce_t) fce, obj);
-//    _callm_init(fce);
+        unload_module_t unload_fce = (unload_module_t) load_function(obj, "unload_module");
+        if (unload_fce == NULL) {
+            return;
+        }
+
+        load_fce(&api_v0);
+
+        _add(path, load_fce, unload_fce, nullptr);
     }
 
     void reload(const char *path) {
@@ -190,24 +196,13 @@ namespace module {
                           memory_api_v0.main_scratch_allocator());
     }
 
-    void call_init() {
-        for (size_t i = 0; i < MAX_PLUGINS; ++i) {
-            if (!_G.used[i] || !_G.module_api[i]->init) {
-                continue;
-            }
-
-            _G.module_api[i]->init(&api_v0);
-        }
-    }
-
-
-    void call_shutdown() {
+    void unload_all() {
         for (int i = MAX_PLUGINS - 1; i >= 0; --i) {
-            if (!_G.used[i] || !_G.module_api[i]->shutdown) {
+            if (!_G.used[i]) {
                 continue;
             }
 
-            _G.module_api[i]->shutdown();
+            _G.unload_module[i](&api_v0);
         }
     }
 

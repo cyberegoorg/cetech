@@ -100,7 +100,6 @@ struct hash_api_v0 hash_api = {
 };
 
 namespace os {
-
     void init(struct api_v0 *api) {
         api->register_api("thread_api_v0", &thread_api);
         api->register_api("window_api_v0", &window_api);
@@ -112,7 +111,6 @@ namespace os {
         api->register_api("process_api_v0", &process_api);
         api->register_api("hash_api_v0", &hash_api);
     }
-
 }
 
 static void _init(struct api_v0 *api) {
@@ -126,16 +124,4 @@ extern "C" void os_unload_module(struct api_v0 *api) {
 extern "C" void *os_load_module(struct api_v0 *api) {
     _init(api);
     return nullptr;
-
-//    switch (api) {
-//        case PLUGIN_EXPORT_API_ID: {
-//            static struct module_export_api_v0 module = {0};
-//            module.init = _init;
-//            //module.init_api = _init_api;
-//            return &module;
-//        }
-//
-//        default:
-//            return NULL;
-//    }
 }

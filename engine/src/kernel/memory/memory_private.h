@@ -5,11 +5,11 @@ namespace memory {
 
     void memsys_init(int scratch_buffer_size);
 
-    void memsys_init_api(struct api_v0 *api);
+    void register_api(struct api_v0 *api);
 
     void memsys_shutdown();
 
-    struct allocator *_memsys_main_allocator();
+    struct allocator *memsys_main_allocator();
 
     struct allocator *_memsys_main_scratch_allocator();
 

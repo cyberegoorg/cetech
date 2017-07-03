@@ -84,7 +84,7 @@ namespace memory {
         }
     }
 
-    struct allocator *_memsys_main_allocator() {
+    struct allocator *memsys_main_allocator() {
         return _G.default_allocator;
     }
 
@@ -108,12 +108,12 @@ namespace memory {
 #include "allocator_malloc.inl"
 
 
-    void memsys_init_api(struct api_v0 *api) {
+    void register_api(struct api_v0 *api) {
         CETECH_GET_API(api, log_api_v0);
 
         static struct memory_api_v0 _api = {0};
 
-        _api.main_allocator = _memsys_main_allocator;
+        _api.main_allocator = memsys_main_allocator;
         _api.main_scratch_allocator = _memsys_main_scratch_allocator;
         _api.str_dup = str_dup;
 

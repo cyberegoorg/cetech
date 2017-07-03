@@ -257,7 +257,6 @@ namespace config {
 
         yaml_node_foreach_dict(root, foreach_config_clb, &config_data);
 
-
     }
 
     void _cvar_from_str(const char *name,

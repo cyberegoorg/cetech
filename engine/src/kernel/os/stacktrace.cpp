@@ -92,7 +92,7 @@ static struct error_api_v0 error_api = {
         .assert = error_assert
 };
 
-void error_init(struct api_v0 *api) {
+void error_register_api(struct api_v0 *api) {
     CETECH_GET_API(api, log_api_v0);
 
     api->register_api("error_api_v0", &error_api);
