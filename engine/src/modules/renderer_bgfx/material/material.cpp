@@ -99,6 +99,7 @@ namespace material_resource {
 
     void online(uint64_t name,
                 void *data) {
+
     }
 
     void offline(uint64_t name,
@@ -130,6 +131,7 @@ namespace material_resource {
 //==============================================================================
 // Interface
 //==============================================================================
+
 
 namespace material {
     int init(struct api_v0 *api) {

@@ -53,12 +53,14 @@ static int _mesh_set_material(lua_State *l) {
 }
 
 void _register_lua_mesh_api(struct api_v0 *api) {
-    CETECH_GET_API(api, mesh_renderer_api_v0);
-    CETECH_GET_API(api, hash_api_v0);
+    if(api->exist("mesh_renderer_api_v0")) {
+        CETECH_GET_API(api, mesh_renderer_api_v0);
+        CETECH_GET_API(api, hash_api_v0);
 
-    luasys_add_module_function(API_NAME, "get", _mesh_get);
-    luasys_add_module_function(API_NAME, "has", _mesh_has);
+        luasys_add_module_function(API_NAME, "get", _mesh_get);
+        luasys_add_module_function(API_NAME, "has", _mesh_has);
 
-    luasys_add_module_function(API_NAME, "get_material", _mesh_get_material);
-    luasys_add_module_function(API_NAME, "set_material", _mesh_set_material);
+        luasys_add_module_function(API_NAME, "get_material", _mesh_get_material);
+        luasys_add_module_function(API_NAME, "set_material", _mesh_set_material);
+    }
 }

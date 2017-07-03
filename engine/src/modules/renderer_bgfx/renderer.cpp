@@ -181,12 +181,12 @@ namespace renderer_module {
             scene::init(api);
             mesh::init(api);
 
+            CETECH_GET_API(api, mesh_renderer_api_v0);
 
             cnsole_srv_api_v0.register_command("renderer.resize",
                                                _cmd_resize);
         }
 
-        CETECH_GET_API(api, mesh_renderer_api_v0);
         CETECH_GET_API(api, app_api_v0);
         CETECH_GET_API(api, window_api_v0);
     }

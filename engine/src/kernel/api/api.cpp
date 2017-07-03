@@ -41,8 +41,13 @@ namespace api {
                       void *api) {
         uint64_t name_id = stringid64_from_string(name);
 
-
         multi_map::insert(_G.api_map, name_id, api);
+    }
+
+    int exist(const char *name) {
+        uint64_t name_id = stringid64_from_string(name);
+
+        return map::has(_G.api_map, name_id);
     }
 
     api_entry first(const char *name) {
@@ -71,7 +76,8 @@ namespace api {
     static struct api_v0 api_v0 = {
             .register_api = api::register_api,
             .first = api::first,
-            .next = api::next
+            .next = api::next,
+            .exist = api::exist
     };
 
     void init(struct allocator *allocator) {
