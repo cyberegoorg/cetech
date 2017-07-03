@@ -7,14 +7,14 @@
 #include <cetech/celib/array.inl>
 #include <cetech/celib/map.inl>
 
-#include <cetech/core/hash.h>
-#include <cetech/core/application.h>
-#include <cetech/core/config.h>
-#include <cetech/core/memory.h>
-#include <cetech/core/module.h>
-#include <cetech/core/path.h>
-#include <cetech/core/vio.h>
-#include <cetech/core/api.h>
+#include <cetech/kernel/hash.h>
+#include <cetech/kernel/application.h>
+#include <cetech/kernel/config.h>
+#include <cetech/kernel/memory.h>
+#include <cetech/kernel/module.h>
+#include <cetech/kernel/path.h>
+#include <cetech/kernel/vio.h>
+#include <cetech/kernel/api.h>
 
 #include <cetech/modules/resource.h>
 #include <cetech/modules/console_server.h>
@@ -25,20 +25,20 @@
 #include "include/mpack/mpack.h"
 
 #include "resource.h"
-#include <cetech/core/log.h>
-#include <cetech/core/errors.h>
-#include <cetech/core/thread.h>
+#include <cetech/kernel/log.h>
+#include <cetech/kernel/errors.h>
+#include <cetech/kernel/thread.h>
 
-IMPORT_API(memory_api_v0);
-IMPORT_API(cnsole_srv_api_v0);
-IMPORT_API(filesystem_api_v0);
-IMPORT_API(config_api_v0);
-IMPORT_API(app_api_v0);
-IMPORT_API(path_v0);
-IMPORT_API(vio_api_v0);
-IMPORT_API(log_api_v0);
-IMPORT_API(hash_api_v0);
-IMPORT_API(thread_api_v0);
+CETECH_DECL_API(memory_api_v0);
+CETECH_DECL_API(cnsole_srv_api_v0);
+CETECH_DECL_API(filesystem_api_v0);
+CETECH_DECL_API(config_api_v0);
+CETECH_DECL_API(app_api_v0);
+CETECH_DECL_API(path_v0);
+CETECH_DECL_API(vio_api_v0);
+CETECH_DECL_API(log_api_v0);
+CETECH_DECL_API(hash_api_v0);
+CETECH_DECL_API(thread_api_v0);
 
 
 void resource_register_type(uint64_t type,
@@ -61,8 +61,9 @@ namespace resource {
 
 //#define hash_combine(a, b) ((a * 11)^(b))
 
-uint64_t  hash_combine( uint64_t  lhs, uint64_t  rhs ) {
-    lhs^= rhs + 0x9e3779b9 + (lhs << 6) + (lhs >> 2);
+uint64_t hash_combine(uint64_t lhs,
+                      uint64_t rhs) {
+    lhs ^= rhs + 0x9e3779b9 + (lhs << 6) + (lhs >> 2);
     return lhs;
 }
 
@@ -122,7 +123,8 @@ namespace {
 // Private
 //==============================================================================
 
-char* resource_compiler_get_build_dir(allocator* a, const char *platform) {
+char *resource_compiler_get_build_dir(allocator *a,
+                                      const char *platform) {
 
     const char *build_dir_str = config_api_v0.get_string(_G.config.build_dir);
     return path_v0.join(a, 2, build_dir_str, platform);
@@ -227,7 +229,7 @@ namespace resource {
 
             uint64_t id = hash_combine(type, names[i]);
 
-            if( !map::has(_G.resource_map, id) ) {
+            if (!map::has(_G.resource_map, id)) {
                 uint32_t idx = array::size(_G.resource_data);
                 array::push_back(_G.resource_data, item);
                 map::set(_G.resource_map, id, idx);
@@ -261,7 +263,7 @@ namespace resource {
     int can_get(uint64_t type,
                 uint64_t name) {
 
-        if(!map::has(_G.type_map, type)) {
+        if (!map::has(_G.type_map, type)) {
             return 1;
         }
 
@@ -492,7 +494,7 @@ namespace resource {
 #else
             char build_name[33] = {0};
             resource::type_name_string(build_name, CETECH_ARRAY_LEN(build_name),
-                                      type, names[i]);
+                                       type, names[i]);
 
             char *filename = build_name;
 #endif
@@ -561,14 +563,14 @@ namespace resource_module {
             .compiler_get_build_dir = ::resource_compiler_get_build_dir,
 
 #ifdef CETECH_CAN_COMPILE
-            .compiler_get_core_dir = resource_compiler_get_core_dir,
-            .compiler_register = resource_compiler_register,
-            .compiler_compile_all = resource_compiler_compile_all,
-            .compiler_get_filename = resource_compiler_get_filename,
-            .compiler_get_tmp_dir = resource_compiler_get_tmp_dir,
-            .compiler_external_join = resource_compiler_external_join,
-            .compiler_create_build_dir = resource_compiler_create_build_dir,
-            .compiler_get_source_dir = resource_compiler_get_source_dir,
+    .compiler_get_core_dir = resource_compiler_get_core_dir,
+    .compiler_register = resource_compiler_register,
+    .compiler_compile_all = resource_compiler_compile_all,
+    .compiler_get_filename = resource_compiler_get_filename,
+    .compiler_get_tmp_dir = resource_compiler_get_tmp_dir,
+    .compiler_external_join = resource_compiler_external_join,
+    .compiler_create_build_dir = resource_compiler_create_build_dir,
+    .compiler_get_source_dir = resource_compiler_get_source_dir,
 #endif
 
     };
@@ -586,27 +588,42 @@ namespace resource_module {
         api->register_api("package_api_v0", &package_api);
     }
 
+
+    void _init_cvar(struct config_api_v0 config) {
+        _G = {0};
+
+        config_api_v0 = config;
+
+        _G.config.build_dir = config.new_str("build", "Resource build dir",
+                                             "data/build");
+    }
+
+
     void _init(struct api_v0 *api) {
-        GET_API(api, cnsole_srv_api_v0);
-        GET_API(api, memory_api_v0);
-        GET_API(api, filesystem_api_v0);
-        GET_API(api, config_api_v0);
-        GET_API(api, app_api_v0);
-        GET_API(api, path_v0);
-        GET_API(api, vio_api_v0);
-        GET_API(api, log_api_v0);
-        GET_API(api, hash_api_v0);
-        GET_API(api, thread_api_v0);
+        _init_api(api);
+
+        CETECH_GET_API(api, cnsole_srv_api_v0);
+        CETECH_GET_API(api, memory_api_v0);
+        CETECH_GET_API(api, filesystem_api_v0);
+        CETECH_GET_API(api, config_api_v0);
+        CETECH_GET_API(api, app_api_v0);
+        CETECH_GET_API(api, path_v0);
+        CETECH_GET_API(api, vio_api_v0);
+        CETECH_GET_API(api, log_api_v0);
+        CETECH_GET_API(api, hash_api_v0);
+        CETECH_GET_API(api, thread_api_v0);
+
+        _init_cvar(config_api_v0);
 
         _G.type_map.init(memory_api_v0.main_allocator());
         _G.resource_data.init(memory_api_v0.main_allocator());
         _G.resource_callbacks.init(memory_api_v0.main_allocator());
         _G.resource_map.init(memory_api_v0.main_allocator());
 
-        char* build_dir_full = path_v0.join(
-                     memory_api_v0.main_allocator(), 2,
-                     config_api_v0.get_string(_G.config.build_dir),
-                     app_api_v0.platform());
+        char *build_dir_full = path_v0.join(
+                memory_api_v0.main_allocator(), 2,
+                config_api_v0.get_string(_G.config.build_dir),
+                app_api_v0.platform());
 
         filesystem_api_v0.map_root_dir(
                 hash_api_v0.id64_from_str("build"),
@@ -616,19 +633,10 @@ namespace resource_module {
                                          package_resource::package_resource_callback);
 
         cnsole_srv_api_v0.register_command("resource.reload_all",
-                                                      _cmd_reload_all);
+                                           _cmd_reload_all);
 
         package_init(api);
 
-    }
-
-    void _init_cvar(struct config_api_v0 config) {
-        _G = {0};
-
-        config_api_v0 = config;
-
-        _G.config.build_dir = config.new_str("build", "Resource build dir",
-                                             "data/build");
     }
 
     void _shutdown() {
@@ -640,24 +648,28 @@ namespace resource_module {
         _G.resource_map.destroy();
     }
 
+    extern "C" void resourcesystem_unload_module(struct api_v0 *api) {
+        _shutdown();
+    }
 
-    extern "C" void *resourcesystem_get_module_api(int api) {
-        switch (api) {
-            case PLUGIN_EXPORT_API_ID: {
-                static struct module_export_api_v0 module = {0};
+    extern "C" void *resourcesystem_load_module(struct api_v0 *api) {
+        _init(api);
+        return nullptr;
 
-                module.init = _init;
-                module.init_api = _init_api;
-                module.shutdown = _shutdown;
-                module.init_cvar = _init_cvar;
-
-                return &module;
-            }
-
-
-            default:
-                return NULL;
-        }
+//        switch (api) {
+//            case PLUGIN_EXPORT_API_ID: {
+//                static struct module_export_api_v0 module = {0};
+//
+//                module.init = _init;
+//                module.shutdown = _shutdown;
+//
+//                return &module;
+//            }
+//
+//
+//            default:
+//                return NULL;
+//        }
 
     }
 }

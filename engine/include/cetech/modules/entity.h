@@ -4,7 +4,7 @@
 #ifndef CETECH_ENTITY_MANAGER_H
 #define CETECH_ENTITY_MANAGER_H
 
-#include <cetech/core/blob.h>
+#include <cetech/kernel/blob.h>
 
 #ifdef __cplusplus
 extern "C" {

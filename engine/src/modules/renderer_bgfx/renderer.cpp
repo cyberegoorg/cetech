@@ -5,33 +5,34 @@
 #include <cetech/celib/math_types.h>
 #include <cetech/celib/allocator.h>
 
-#include <cetech/core/application.h>
-#include <cetech/core/config.h>
-#include <cetech/core/module.h>
-#include <cetech/core/window.h>
-#include <cetech/core/api.h>
+#include <cetech/kernel/application.h>
+#include <cetech/kernel/config.h>
+#include <cetech/kernel/module.h>
+#include <cetech/kernel/window.h>
+#include <cetech/kernel/api.h>
 
 #include <cetech/modules/camera.h>
 #include "cetech/modules/renderer.h"
-#include <cetech/modules/develop.h>
+#include <cetech/kernel/develop.h>
 #include <cetech/modules/world.h>
 #include <cetech/modules/console_server.h>
 
 #include <include/mpack/mpack.h>
-#include "bgfx/c99/platform.h"
+#include "bgfx/platform.h"
 
-#include "texture.h"
-#include "shader.h"
-#include "scene.h"
-#include "material.h"
+#include "texture/texture.h"
+#include "shader/shader.h"
+#include "scene/scene.h"
+#include "material/material.h"
+#include "mesh_renderer/mesh_renderer_private.h"
 
 
-IMPORT_API(cnsole_srv_api_v0);
-IMPORT_API(mesh_renderer_api_v0);
-IMPORT_API(camera_api_v0);
-IMPORT_API(config_api_v0);
-IMPORT_API(app_api_v0);
-IMPORT_API(window_api_v0);
+CETECH_DECL_API(cnsole_srv_api_v0);
+CETECH_DECL_API(mesh_renderer_api_v0);
+CETECH_DECL_API(config_api_v0);
+CETECH_DECL_API(app_api_v0);
+CETECH_DECL_API(window_api_v0);
+CETECH_DECL_API(api_v0);
 
 //==============================================================================
 // GLobals
@@ -75,13 +76,13 @@ static int _cmd_resize(mpack_node_t args,
 
 
 void renderer_create(window_t window) {
-    bgfx_platform_data_t pd = {0};
+    bgfx::PlatformData pd = {0};
     pd.nwh = window_api_v0.native_window_ptr(window);
     pd.ndt = window_api_v0.native_display_ptr(window);
-    bgfx_set_platform_data(&pd);
+    bgfx::setPlatformData(pd);
 
     // TODO: from config
-    bgfx_init(BGFX_RENDERER_TYPE_OPENGL, 0, 0, NULL, NULL);
+    bgfx::init(bgfx::RendererType::OpenGL, 0, 0, NULL, NULL);
 
     window_api_v0.size(window, &_G.size_width, &_G.size_height);
 
@@ -90,37 +91,40 @@ void renderer_create(window_t window) {
 
 void renderer_set_debug(int debug) {
     if (debug) {
-        bgfx_set_debug(BGFX_DEBUG_STATS);
+        bgfx::setDebug(BGFX_DEBUG_STATS);
     } else {
-        bgfx_set_debug(BGFX_DEBUG_NONE);
+        bgfx::setDebug(BGFX_DEBUG_NONE);
     }
 }
 
 void renderer_render_world(world_t world,
                            camera_t camera,
                            viewport_t viewport) {
+    camera_api_v0 *camera_api = (camera_api_v0 *) api_v0.first(
+            "camera_api_v0").api; // TODO: SHIT !!!!
+
     if (CETECH_UNLIKELY(_G.need_reset)) {
-        bgfx_reset(_G.size_width, _G.size_height, _get_reset_flags());
+        bgfx::reset(_G.size_width, _G.size_height, _get_reset_flags());
     }
 
-    bgfx_set_view_clear(0, BGFX_CLEAR_COLOR | BGFX_CLEAR_DEPTH, 0x66CCFFff,
-                        1.0f, 0);
+    bgfx::setViewClear(0, BGFX_CLEAR_COLOR | BGFX_CLEAR_DEPTH, 0x66CCFFff, 1.0f,
+                       0);
 
     mat44f_t view_matrix;
     mat44f_t proj_matrix;
 
-    camera_api_v0.get_project_view(world, camera, &proj_matrix, &view_matrix);
-    bgfx_set_view_transform(0, view_matrix.f, proj_matrix.f);
+    camera_api->get_project_view(world, camera, &proj_matrix, &view_matrix);
+    bgfx::setViewTransform(0, view_matrix.f, proj_matrix.f);
 
-    bgfx_set_view_rect(0, 0, 0, (uint16_t) _G.size_width,
-                       (uint16_t) _G.size_height);
+    bgfx::setViewRect(0, 0, 0, (uint16_t) _G.size_width,
+                      (uint16_t) _G.size_height);
 
-    bgfx_touch(0);
-    bgfx_dbg_text_clear(0, 0);
+    bgfx::touch(0);
+    bgfx::dbgTextClear(0, 0);
 
     mesh_renderer_api_v0.render_all(world);
 
-    bgfx_frame(0);
+    bgfx::frame(0);
 
     window_api_v0.update(app_api_v0.main_window());
 }
@@ -160,58 +164,70 @@ namespace renderer_module {
 
 
     void _init(struct api_v0 *api) {
-        GET_API(api, cnsole_srv_api_v0);
-        GET_API(api, mesh_renderer_api_v0);
-        GET_API(api, camera_api_v0);
-        GET_API(api, config_api_v0);
-        GET_API(api, app_api_v0);
-        GET_API(api, window_api_v0);
+        _init_api(api);
+
+        api_v0 = *api;
+        CETECH_GET_API(api, config_api_v0);
+        CETECH_GET_API(api, config_api_v0);
+        CETECH_GET_API(api, cnsole_srv_api_v0);
 
         _G = (struct G) {0};
 
         cvar_t daemon = config_api_v0.find("daemon");
         if (!config_api_v0.get_int(daemon)) {
-            texture_init(api);
-            shader_init(api);
+            texture::texture_init(api);
+            shader::shader_init(api);
             material::init(api);
-            scene_init(api);
+            scene::init(api);
+            mesh::init(api);
+
 
             cnsole_srv_api_v0.register_command("renderer.resize",
-                                                          _cmd_resize);
+                                               _cmd_resize);
         }
+
+        CETECH_GET_API(api, mesh_renderer_api_v0);
+        CETECH_GET_API(api, app_api_v0);
+        CETECH_GET_API(api, window_api_v0);
     }
 
     void _shutdown() {
         cvar_t daemon = config_api_v0.find("daemon");
         if (!config_api_v0.get_int(daemon)) {
-            texture_shutdown();
-            shader_shutdown();
+            texture::texture_shutdown();
+            shader::shader_shutdown();
             material::shutdown();
-            scene_shutdown();
+            scene::shutdown();
+            mesh::shutdown();
 
-            bgfx_shutdown();
+            bgfx::shutdown();
         }
 
         _G = (struct G) {0};
     }
 
 
-    extern "C" void *renderer_get_module_api(int api) {
+    extern "C" void *renderer_load_module(struct api_v0 *api) {
+        _init(api);
+        return nullptr;
 
-        switch (api) {
-            case PLUGIN_EXPORT_API_ID: {
-                static struct module_export_api_v0 module = {0};
+//        switch (api) {
+//            case PLUGIN_EXPORT_API_ID: {
+//                static struct module_export_api_v0 module = {0};
+//
+//                module.init = _init;
+//                module.shutdown = _shutdown;
+//
+//                return &module;
+//            }
+//
+//
+//            default:
+//                return NULL;
+//        }
+    }
 
-                module.init = _init;
-                module.init_api = _init_api;
-                module.shutdown = _shutdown;
-
-                return &module;
-            }
-
-
-            default:
-                return NULL;
-        }
+    extern "C" void renderer_unload_module(struct api_v0 *api) {
+        _shutdown();
     }
 }

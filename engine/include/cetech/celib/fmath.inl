@@ -8,7 +8,7 @@
 #include <math.h>
 #include <float.h>
 
-#include "cetech/core/types.h"
+#include "cetech/kernel/types.h"
 
 //==============================================================================
 // Constants

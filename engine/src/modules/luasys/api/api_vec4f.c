@@ -1,7 +1,7 @@
 
 #include "cetech/modules/transform.h"
 #include <cetech/celib/vec4f.inl>
-#include <cetech/core/module.h>
+#include <cetech/kernel/module.h>
 
 #include <cetech/modules/luasys.h>
 

@@ -8,17 +8,17 @@
 #include "include/SDL2/SDL.h"
 
 #include <cetech/celib/array.inl>
-#include <cetech/core/path.h>
-#include <cetech/core/hash.h>
-#include <cetech/modules/task.h>
-#include <cetech/core/application.h>
-#include <cetech/core/config.h>
+#include <cetech/kernel/path.h>
+#include <cetech/kernel/hash.h>
+#include <cetech/kernel/task.h>
+#include <cetech/kernel/application.h>
+#include <cetech/kernel/config.h>
 #include <cetech/modules/resource.h>
-#include <cetech/core/memory.h>
-#include <cetech/core/module.h>
-#include <cetech/core/log.h>
-#include <cetech/core/api.h>
-#include <cetech/core/vio.h>
+#include <cetech/kernel/memory.h>
+#include <cetech/kernel/module.h>
+#include <cetech/kernel/log.h>
+#include <cetech/kernel/api.h>
+#include <cetech/kernel/vio.h>
 #include <cetech/celib/string_stream.h>
 
 
@@ -57,15 +57,15 @@ struct G {
     cvar_t cv_external_dir;
 } ResourceCompilerGlobal = {0};
 
-IMPORT_API(memory_api_v0);
-IMPORT_API(resource_api_v0);
-IMPORT_API(task_api_v0);
-IMPORT_API(config_api_v0);
-IMPORT_API(app_api_v0);
-IMPORT_API(path_v0);
-IMPORT_API(vio_api_v0);
-IMPORT_API(log_api_v0);
-IMPORT_API(hash_api_v0);
+CETECH_DECL_API(memory_api_v0);
+CETECH_DECL_API(resource_api_v0);
+CETECH_DECL_API(task_api_v0);
+CETECH_DECL_API(config_api_v0);
+CETECH_DECL_API(app_api_v0);
+CETECH_DECL_API(path_v0);
+CETECH_DECL_API(vio_api_v0);
+CETECH_DECL_API(log_api_v0);
+CETECH_DECL_API(hash_api_v0);
 
 #include "builddb.h"
 #include "resource.h"
@@ -248,14 +248,17 @@ static void _init_cvar(struct config_api_v0 config) {
 }
 
 static void _init(struct api_v0 *api) {
-    GET_API(api, memory_api_v0);
-    GET_API(api, resource_api_v0);
-    GET_API(api, task_api_v0);
-    GET_API(api, app_api_v0);
-    GET_API(api, path_v0);
-    GET_API(api, vio_api_v0);
-    GET_API(api, log_api_v0);
-    GET_API(api, hash_api_v0);
+    CETECH_GET_API(api, memory_api_v0);
+    CETECH_GET_API(api, resource_api_v0);
+    CETECH_GET_API(api, task_api_v0);
+    CETECH_GET_API(api, app_api_v0);
+    CETECH_GET_API(api, path_v0);
+    CETECH_GET_API(api, vio_api_v0);
+    CETECH_GET_API(api, log_api_v0);
+    CETECH_GET_API(api, hash_api_v0);
+    CETECH_GET_API(api, config_api_v0);
+
+    _init_cvar(config_api_v0);
 
     char *build_dir_full = resource_api_v0.compiler_get_build_dir(
             memory_api_v0.main_allocator(), app_api_v0.platform());
@@ -281,7 +284,8 @@ void resource_compiler_create_build_dir(struct config_api_v0 config,
                                         struct app_api_v0 app) {
 
     const char *platform = app_api_v0.platform();
-    char* build_dir_full = resource_compiler_get_build_dir(memory_api_v0.main_allocator(), platform);
+    char *build_dir_full = resource_compiler_get_build_dir(
+            memory_api_v0.main_allocator(), platform);
 
     path_v0.make_path(build_dir_full);
 
@@ -349,44 +353,49 @@ const char *resource_compiler_get_core_dir() {
     return config_api_v0.get_string(_G.cv_core_dir);
 }
 
-char* resource_compiler_get_tmp_dir(allocator* alocator,
-                                  const char *platform) {
+char *resource_compiler_get_tmp_dir(allocator *alocator,
+                                    const char *platform) {
 
     char *build_dir = resource_compiler_get_build_dir(alocator, platform);
 
     return path_v0.join(alocator, 2, build_dir, "tmp");
 }
 
-char* resource_compiler_external_join(allocator *alocator,
-                                    const char *name) {
+char *resource_compiler_external_join(allocator *alocator,
+                                      const char *name) {
     const char *external_dir_str = config_api_v0.get_string(_G.cv_external_dir);
 
-    char* tmp_dir = path_v0.join(alocator, 2,external_dir_str, app_api_v0.native_platform());
+    char *tmp_dir = path_v0.join(alocator, 2, external_dir_str,
+                                 app_api_v0.native_platform());
 
     string_stream::Buffer buffer(alocator);
     string_stream::printf(buffer, "%s64", tmp_dir);
     CETECH_DEALLOCATE(alocator, tmp_dir);
 
     string_stream::c_str(buffer);
-    return path_v0.join(alocator, 4, string_stream::c_str(buffer), "release", "bin", name);
+    return path_v0.join(alocator, 4, string_stream::c_str(buffer), "release",
+                        "bin", name);
 }
 
-extern "C" {
-void *resourcecompiler_get_module_api(int api) {
+extern "C" void *resourcecompiler_load_module(struct api_v0 *api) {
+    _init(api);
+    return nullptr;
 
-    if (api == PLUGIN_EXPORT_API_ID) {
-        static struct module_export_api_v0 module = {0};
-
-        module.init = _init;
-        module.init_cvar = _init_cvar;
-        module.shutdown = _shutdown;
-
-        return &module;
-
-    }
-
-    return 0;
+//    if (api == PLUGIN_EXPORT_API_ID) {
+//        static struct module_export_api_v0 module = {0};
+//
+//        module.init = _init;
+//        module.shutdown = _shutdown;
+//
+//        return &module;
+//
+//    }
+//
+//    return 0;
 }
+
+extern "C" void resourcecompiler_unload_module(struct api_v0* api) {
+    _shutdown();
 }
 
 #endif

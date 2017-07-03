@@ -10,7 +10,7 @@
 #include <cstring>
 
 #include <cetech/celib/allocator.h>
-#include <cetech/core/types.h>
+#include <cetech/kernel/types.h>
 
 #include "container_types.inl"
 

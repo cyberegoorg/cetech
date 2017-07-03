@@ -2,13 +2,13 @@
 #include <cetech/celib/allocator.h>
 
 #include <cetech/modules/world.h>
-#include <cetech/core/module.h>
+#include <cetech/kernel/module.h>
 #include <cetech/modules/luasys.h>
-#include <cetech/core/api.h>
+#include <cetech/kernel/api.h>
 
 #define API_NAME "World"
 
-IMPORT_API(world_api_v0);
+CETECH_DECL_API(world_api_v0);
 
 static int _world_create(lua_State *l) {
     world_t world = world_api_v0.create();
@@ -31,7 +31,7 @@ static int _world_update(lua_State *l) {
 
 
 void _register_lua_world_api(struct api_v0 *api) {
-    GET_API(api, world_api_v0);
+    CETECH_GET_API(api, world_api_v0);
 
     luasys_add_module_function(API_NAME, "create", _world_create);
     luasys_add_module_function(API_NAME, "destroy", _world_destroy);

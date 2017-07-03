@@ -12,7 +12,7 @@ extern "C" {
 // Includes
 //==============================================================================
 
-#include <cetech/core/types.h>
+#include <cetech/kernel/types.h>
 
 typedef struct mpack_node_t mpack_node_t;
 typedef struct mpack_writer_t mpack_writer_t;
@@ -39,6 +39,8 @@ struct cnsole_srv_api_v0 {
     //! \param command Command fce
     void (*register_command)(const char *name,
                              console_server_command_t command);
+
+    void (*update)();
 };
 
 

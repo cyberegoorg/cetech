@@ -1,14 +1,14 @@
-#include <cetech/core/config.h>
+#include <cetech/kernel/config.h>
 #include <cetech/modules/resource.h>
-#include <cetech/core/hash.h>
+#include <cetech/kernel/hash.h>
 #include <cetech/celib/quatf.inl>
 #include <cetech/celib/mat44f.inl>
-#include <cetech/core/memory.h>
-#include <cetech/core/module.h>
-#include <cetech/core/api.h>
+#include <cetech/kernel/memory.h>
+#include <cetech/kernel/module.h>
+#include <cetech/kernel/api.h>
 #include <cetech/celib/array.inl>
 #include <cetech/celib/map.inl>
-#include <cetech/core/yaml.h>
+#include <cetech/kernel/yaml.h>
 
 #include <cetech/modules/entity.h>
 #include <cetech/modules/world.h>
@@ -16,9 +16,9 @@
 
 #include "cetech/modules/transform.h"
 
-IMPORT_API(memory_api_v0);
-IMPORT_API(hash_api_v0);
-IMPORT_API(component_api_v0);
+CETECH_DECL_API(memory_api_v0);
+CETECH_DECL_API(hash_api_v0);
+CETECH_DECL_API(component_api_v0);
 
 using namespace cetech;
 
@@ -341,9 +341,11 @@ static void _init_api(struct api_v0 *api) {
 }
 
 static void _init(struct api_v0 *api) {
-    GET_API(api, component_api_v0);
-    GET_API(api, memory_api_v0);
-    GET_API(api, hash_api_v0);
+    _init_api(api);
+
+    CETECH_GET_API(api, component_api_v0);
+    CETECH_GET_API(api, memory_api_v0);
+    CETECH_GET_API(api, hash_api_v0);
 
 
     _G = {0};
@@ -609,19 +611,25 @@ void transform_link(world_t world,
                                                                             parent)));
 }
 
-extern "C" void *transform_get_module_api(int api) {
-    switch (api) {
-        case PLUGIN_EXPORT_API_ID: {
-            static struct module_export_api_v0 module = {0};
+extern "C" void *transform_load_module(struct api_v0 *api) {
+    _init(api);
+    return nullptr;
 
-            module.init = _init;
-            module.init_api = _init_api;
-            module.shutdown = _shutdown;
+//    switch (api) {
+//        case PLUGIN_EXPORT_API_ID: {
+//            static struct module_export_api_v0 module = {0};
+//
+//            module.init = _init;
+//            module.shutdown = _shutdown;
+//
+//            return &module;
+//        }
+//
+//        default:
+//            return NULL;
+//    }
+}
 
-            return &module;
-        }
-
-        default:
-            return NULL;
-    }
+extern "C" void transform_unload_module(struct api_v0 *api) {
+    _shutdown();
 }

@@ -5,27 +5,27 @@
 #include <stddef.h>
 
 #include <cetech/celib/allocator.h>
-#include <cetech/core/yaml.h>
+#include <cetech/kernel/yaml.h>
 
-#include <cetech/core/hash.h>
-#include <cetech/core/thread.h>
-#include <cetech/core/memory.h>
-#include <cetech/core/module.h>
-#include <cetech/core/vio.h>
-#include <cetech/core/api.h>
+#include <cetech/kernel/hash.h>
+#include <cetech/kernel/thread.h>
+#include <cetech/kernel/memory.h>
+#include <cetech/kernel/module.h>
+#include <cetech/kernel/vio.h>
+#include <cetech/kernel/api.h>
 #include <cetech/celib/array.inl>
 
-#include <cetech/modules/task.h>
+#include <cetech/kernel/task.h>
 #include <cetech/modules/resource.h>
 
 #include "resource_package.h"
 
-IMPORT_API(memory_api_v0);
-IMPORT_API(resource_api_v0);
-IMPORT_API(task_api_v0);
-IMPORT_API(thread_api_v0);
-IMPORT_API(vio_api_v0);
-IMPORT_API(hash_api_v0);
+CETECH_DECL_API(memory_api_v0);
+CETECH_DECL_API(resource_api_v0);
+CETECH_DECL_API(task_api_v0);
+CETECH_DECL_API(thread_api_v0);
+CETECH_DECL_API(vio_api_v0);
+CETECH_DECL_API(hash_api_v0);
 
 using namespace cetech;
 
@@ -136,12 +136,12 @@ int _package_compiler(const char *filename,
 }
 
 int package_init(struct api_v0 *api) {
-    GET_API(api, memory_api_v0);
-    GET_API(api, resource_api_v0);
-    GET_API(api, task_api_v0);
-    GET_API(api, thread_api_v0);
-    GET_API(api, vio_api_v0);
-    GET_API(api, hash_api_v0);
+    CETECH_GET_API(api, memory_api_v0);
+    CETECH_GET_API(api, resource_api_v0);
+    CETECH_GET_API(api, task_api_v0);
+    CETECH_GET_API(api, thread_api_v0);
+    CETECH_GET_API(api, vio_api_v0);
+    CETECH_GET_API(api, hash_api_v0);
 
     _G = (struct G) {0};
 

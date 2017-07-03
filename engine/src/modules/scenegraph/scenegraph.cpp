@@ -1,11 +1,11 @@
-#include <cetech/core/yaml.h>
+#include <cetech/kernel/yaml.h>
 #include <cetech/celib/quatf.inl>
 #include <cetech/celib/mat44f.inl>
-#include <cetech/core/config.h>
+#include <cetech/kernel/config.h>
 #include <cetech/modules/resource.h>
-#include <cetech/core/memory.h>
-#include <cetech/core/module.h>
-#include <cetech/core/api.h>
+#include <cetech/kernel/memory.h>
+#include <cetech/kernel/module.h>
+#include <cetech/kernel/api.h>
 #include <cetech/celib/array.inl>
 #include <cetech/celib/map.inl>
 
@@ -14,8 +14,8 @@
 #include <cetech/modules/scenegraph.h>
 
 
-IMPORT_API(memory_api_v0);
-IMPORT_API(world_api_v0);
+CETECH_DECL_API(memory_api_v0);
+CETECH_DECL_API(world_api_v0);
 
 #define hash_combine(a, b) ((a)^(b))
 
@@ -445,8 +445,10 @@ namespace scenegraph_module {
 
 
     void init(struct api_v0 *api) {
-        GET_API(api, world_api_v0);
-        GET_API(api, memory_api_v0);
+        _init_api(api);
+
+        CETECH_GET_API(api, world_api_v0);
+        CETECH_GET_API(api, memory_api_v0);
 
         _G = {0};
 
@@ -463,22 +465,27 @@ namespace scenegraph_module {
         _G.ent_map.destroy();
     }
 
-    extern "C" void *scenegraph_get_module_api(int api) {
+    extern "C" void *scenegraph_load_module(struct api_v0 *api) {
+        scenegraph_module::init(api);
+        return nullptr;
 
-        switch (api) {
-            case PLUGIN_EXPORT_API_ID: {
-                static struct module_export_api_v0 module = {0};
+//        switch (api) {
+//            case PLUGIN_EXPORT_API_ID: {
+//                static struct module_export_api_v0 module = {0};
+//
+//                module.init = scenegraph_module::init;
+//                module.shutdown = scenegraph_module::shutdown;
+//
+//                return &module;
+//            }
+//
+//            default:
+//                return NULL;
+//        }
+    }
 
-                module.init = scenegraph_module::init;
-                module.init_api = scenegraph_module::_init_api;
-                module.shutdown = scenegraph_module::shutdown;
-
-                return &module;
-            }
-
-            default:
-                return NULL;
-        }
+    extern "C" void scenegraph_unload_module(struct api_v0 *api) {
+        scenegraph_module::shutdown();
     }
 }
 

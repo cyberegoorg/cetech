@@ -1,20 +1,20 @@
 
 #include <cetech/celib/allocator.h>
-#include <cetech/core/module.h>
+#include <cetech/kernel/module.h>
 
 #include <cetech/modules/world.h>
 #include <cetech/modules/entity.h>
 
 #include <cetech/modules/luasys.h>
-#include <cetech/core/hash.h>
-#include <cetech/core/api.h>
+#include <cetech/kernel/hash.h>
+#include <cetech/kernel/api.h>
 
 #include "cetech/modules/renderer.h"
 
 #define API_NAME "Mesh"
 
-IMPORT_API(mesh_renderer_api_v0);
-IMPORT_API(hash_api_v0);
+CETECH_DECL_API(mesh_renderer_api_v0);
+CETECH_DECL_API(hash_api_v0);
 
 static int _mesh_get(lua_State *l) {
     world_t w = {.h = luasys_to_handler(l, 1)};
@@ -53,8 +53,8 @@ static int _mesh_set_material(lua_State *l) {
 }
 
 void _register_lua_mesh_api(struct api_v0 *api) {
-    GET_API(api, mesh_renderer_api_v0);
-    GET_API(api, hash_api_v0);
+    CETECH_GET_API(api, mesh_renderer_api_v0);
+    CETECH_GET_API(api, hash_api_v0);
 
     luasys_add_module_function(API_NAME, "get", _mesh_get);
     luasys_add_module_function(API_NAME, "has", _mesh_has);

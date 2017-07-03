@@ -3,18 +3,18 @@
 #include <cetech/celib/allocator.h>
 #include <cetech/modules/world.h>
 #include <cetech/modules/entity.h>
-#include <cetech/core/module.h>
+#include <cetech/kernel/module.h>
 
 #include <cetech/modules/luasys.h>
-#include <cetech/core/hash.h>
-#include <cetech/core/api.h>
+#include <cetech/kernel/hash.h>
+#include <cetech/kernel/api.h>
 
 #include "cetech/modules/level.h"
 
 #define API_NAME "Level"
 
-IMPORT_API(level_api_v0);
-IMPORT_API(hash_api_v0);
+CETECH_DECL_API(level_api_v0);
+CETECH_DECL_API(hash_api_v0);
 
 static int _load_level(lua_State *l) {
     world_t world = {.h = luasys_to_handler(l, 1)};
@@ -55,8 +55,8 @@ static int _level_entity(lua_State *l) {
 }
 
 void _register_lua_level_api(struct api_v0 *api) {
-    GET_API(api, level_api_v0);
-    GET_API(api, hash_api_v0);
+    CETECH_GET_API(api, level_api_v0);
+    CETECH_GET_API(api, hash_api_v0);
 
     luasys_add_module_function(API_NAME, "load_level", _load_level);
     luasys_add_module_function(API_NAME, "destroy", _destroy_level);

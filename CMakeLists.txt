@@ -68,19 +68,19 @@ set(SOURCE_FILES
         ########################################################################
         # Core
         ########################################################################
-        engine/src/core/api/api.cpp
-        engine/src/core/log/log_system.cpp
-        engine/src/core/os/os.cpp
-        engine/src/core/os/stacktrace.cpp
-        engine/src/core/yaml/yaml.cpp
-        engine/src/core/module/module.cpp
-        engine/src/core/config/config.cpp
-        engine/src/core/memory/memory.cpp
-        engine/src/core/machine/machine.cpp
-        engine/src/core/machine_sdl2/sdl_mouse.cpp
-        engine/src/core/machine_sdl2/sdl_keyboard.cpp
-        engine/src/core/machine_sdl2/sdl_gamepad.cpp
-        engine/src/core/machine_sdl2/sdl_machine.cpp
+        engine/src/kernel/api/api.cpp
+        engine/src/kernel/log/log_system.cpp
+        engine/src/kernel/os/os.cpp
+        engine/src/kernel/os/stacktrace.cpp
+        engine/src/kernel/yaml/yaml.cpp
+        engine/src/kernel/module/module.cpp
+        engine/src/kernel/config/config.cpp
+        engine/src/kernel/memory/memory.cpp
+        engine/src/kernel/machine/machine.cpp
+        engine/src/kernel/machine_sdl2/sdl_mouse.cpp
+        engine/src/kernel/machine_sdl2/sdl_keyboard.cpp
+        engine/src/kernel/machine_sdl2/sdl_gamepad.cpp
+        engine/src/kernel/machine_sdl2/sdl_machine.cpp
 
 
         ########################################################################
@@ -112,7 +112,7 @@ set(SOURCE_FILES
         engine/src/modules/luasys/api/api_scenegraph.c
 
         engine/src/modules/console_server/console_server.cpp
-        engine/src/modules/develop_system/develop_system.cpp
+        engine/src/kernel/develop_system/develop_system.cpp
 
 
         engine/src/modules/resource/resource.cpp
@@ -120,10 +120,10 @@ set(SOURCE_FILES
         engine/src/modules/resource/resource_compiler.cpp
 
         engine/src/modules/filesystem/filesystem.cpp
-        engine/src/modules/component/component.cpp
+        engine/src/modules/entity/component.cpp
         engine/src/modules/entity/entity.cpp
-        engine/src/modules/world/world.cpp
-        engine/src/modules/task/task.cpp
+        engine/src/modules/entity/world.cpp
+        engine/src/kernel/task/task.cpp
         engine/src/modules/level/level.cpp
 
         engine/src/modules/input/keyboard.cpp
@@ -131,23 +131,34 @@ set(SOURCE_FILES
         engine/src/modules/input/gamepad.cpp
 
         engine/src/modules/renderer_bgfx/renderer.cpp
-        engine/src/modules/renderer_bgfx/texture.cpp
-        engine/src/modules/renderer_bgfx/shader.cpp
-        engine/src/modules/renderer_bgfx/material.cpp
-        engine/src/modules/renderer_bgfx/scene.cpp
-        engine/src/modules/renderer_bgfx/mesh_renderer.cpp
+        engine/src/modules/renderer_bgfx/texture/texture.cpp
+        engine/src/modules/renderer_bgfx/shader/shader.cpp
+        engine/src/modules/renderer_bgfx/material/material.cpp
+        engine/src/modules/renderer_bgfx/scene/scene.cpp
+        engine/src/modules/renderer_bgfx/mesh_renderer/mesh_renderer.cpp
+        engine/src/modules/renderer_bgfx/mesh_renderer/mesh_renderer.cpp
 
         engine/src/modules/transform/transform.cpp
         engine/src/modules/scenegraph/scenegraph.cpp
         engine/src/modules/camera/camera.cpp
-        engine/src/core/blob/blob.cpp)
+        engine/src/kernel/blob/blob.cpp
+        engine/src/kernel/application/application.cpp
+        engine/src/modules/renderer_bgfx/scene/scene_compiler.cpp
+        engine/src/modules/renderer_bgfx/shader/shader_compiler.cpp
+        engine/src/modules/renderer_bgfx/texture/texture_compiler.cpp
+        engine/src/modules/renderer_bgfx/material/material_compiler.cpp
+        engine/src/modules/renderer_bgfx/material/material_compiler.cpp
+
+        engine/src/kernel/log/log_db_handler.cpp
+        engine/src/kernel/log/log_nanomsg_handler.cpp
+        engine/src/kernel/log/log_stdout_handler.cpp
+        engine/src/kernel/kernel.cpp)
 
 ################################################################################
 # Main sources
 ################################################################################
 set(MAIN_SOURCE_FILES
-        ${SOURCE_FILES}
-        engine/src/core/app/application.cpp)
+        ${SOURCE_FILES})
 
 ################################################################################
 # Release sources

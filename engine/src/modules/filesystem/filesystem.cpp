@@ -2,22 +2,22 @@
 // Includes
 //==============================================================================
 
-#include <cetech/core/path.h>
+#include <cetech/kernel/path.h>
 
-#include <cetech/core/memory.h>
+#include <cetech/kernel/memory.h>
 #include <cetech/modules/filesystem.h>
-#include <cetech/core/config.h>
-#include <cetech/core/log.h>
+#include <cetech/kernel/config.h>
+#include <cetech/kernel/log.h>
 #include <cetech/modules/resource.h>
-#include <cetech/core/module.h>
-#include <cetech/core/api.h>
+#include <cetech/kernel/module.h>
+#include <cetech/kernel/api.h>
 #include <cetech/celib/map.inl>
-#include <cetech/core/vio.h>
+#include <cetech/kernel/vio.h>
 
-IMPORT_API(memory_api_v0);
-IMPORT_API(path_v0);
-IMPORT_API(vio_api_v0);
-IMPORT_API(log_api_v0);
+CETECH_DECL_API(memory_api_v0);
+CETECH_DECL_API(path_v0);
+CETECH_DECL_API(vio_api_v0);
+CETECH_DECL_API(log_api_v0);
 
 using namespace cetech;
 
@@ -58,9 +58,9 @@ namespace filesystem {
         return map::get<char *>(_G.root_map, root, nullptr);
     }
 
-    char* get_fullpath(uint64_t root,
-                     struct allocator* allocator,
-                     const char *filename) {
+    char *get_fullpath(uint64_t root,
+                       struct allocator *allocator,
+                       const char *filename) {
 
         const char *root_path = get_root_dir(root);
         return path_v0.join(allocator, 2, root_path, filename);
@@ -71,7 +71,7 @@ namespace filesystem {
                      fs_open_mode mode) {
         auto a = memory_api_v0.main_allocator();
 
-        char* full_path = get_fullpath(root,a, path);
+        char *full_path = get_fullpath(root, a, path);
 
         struct vio *file = vio_api_v0.from_file(full_path,
                                                 (vio_open_mode) mode,
@@ -96,7 +96,7 @@ namespace filesystem {
                          const char *path) {
         auto a = memory_api_v0.main_allocator();
 
-        char* full_path = get_fullpath(root,a, path);
+        char *full_path = get_fullpath(root, a, path);
 
         int ret = path_v0.make_path(full_path);
         CETECH_DEALLOCATE(a, full_path);
@@ -114,7 +114,7 @@ namespace filesystem {
 
         auto a = memory_api_v0.main_allocator();
 
-        char* full_path = get_fullpath(root, a, path);
+        char *full_path = get_fullpath(root, a, path);
 
         path_v0.list(full_path, 1, files, count, allocator);
 
@@ -132,7 +132,7 @@ namespace filesystem {
                           const char *path) {
         auto a = memory_api_v0.main_allocator();
 
-        char* full_path = get_fullpath(root, a, path);
+        char *full_path = get_fullpath(root, a, path);
 
         time_t ret = path_v0.file_mtime(full_path);
 
@@ -160,10 +160,12 @@ namespace filesystem_module {
 
 
     void _init(struct api_v0 *api) {
-        GET_API(api, memory_api_v0);
-        GET_API(api, path_v0);
-        GET_API(api, vio_api_v0);
-        GET_API(api, log_api_v0);
+        _init_api(api);
+
+        CETECH_GET_API(api, memory_api_v0);
+        CETECH_GET_API(api, path_v0);
+        CETECH_GET_API(api, vio_api_v0);
+        CETECH_GET_API(api, log_api_v0);
 
         _G = {0};
 
@@ -186,23 +188,28 @@ namespace filesystem_module {
         _G.root_map.destroy();
     }
 
-    extern "C" void *filesystem_get_module_api(int api) {
+    extern "C" void *filesystem_load_module(struct api_v0 *api) {
+        _init(api);
+        return nullptr;
 
-        switch (api) {
-            case PLUGIN_EXPORT_API_ID: {
-                static struct module_export_api_v0 module = {0};
+//        switch (api) {
+//            case PLUGIN_EXPORT_API_ID: {
+//                static struct module_export_api_v0 module = {0};
+//
+//                module.init = _init;
+//                module.shutdown = _shutdown;
+//
+//                return &module;
+//            }
+//
+//            default:
+//                return NULL;
+//        }
 
-                module.init = _init;
-                module.init_api = _init_api;
-                module.shutdown = _shutdown;
+    }
 
-                return &module;
-            }
-
-            default:
-                return NULL;
-        }
-
+    extern "C" void filesystem_unload_module(struct api_v0 *api) {
+        _shutdown();
     }
 
 }

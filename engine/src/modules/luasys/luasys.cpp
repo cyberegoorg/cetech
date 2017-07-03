@@ -12,26 +12,26 @@ extern "C" {
 #include <cetech/celib/math_types.h>
 #include <cetech/celib/vec2f.inl>
 
-#include <cetech/core/api.h>
-#include <cetech/core/vio.h>
-#include <cetech/core/config.h>
-#include <cetech/core/hash.h>
-#include <cetech/core/module.h>
-#include <cetech/core/application.h>
-#include <cetech/core/log.h>
+#include <cetech/kernel/api.h>
+#include <cetech/kernel/vio.h>
+#include <cetech/kernel/config.h>
+#include <cetech/kernel/hash.h>
+#include <cetech/kernel/module.h>
+#include <cetech/kernel/application.h>
+#include <cetech/kernel/log.h>
 
 #include <cetech/modules/resource.h>
 #include <cetech/modules/console_server.h>
 #include <cetech/modules/luasys.h>
 
 #include <include/mpack/mpack.h>
-#include <cetech/core/errors.h>
+#include <cetech/kernel/errors.h>
 
-IMPORT_API(resource_api_v0);
-IMPORT_API(cnsole_srv_api_v0);
-IMPORT_API(vio_api_v0);
-IMPORT_API(log_api_v0);
-IMPORT_API(hash_api_v0);
+CETECH_DECL_API(resource_api_v0);
+CETECH_DECL_API(cnsole_srv_api_v0);
+CETECH_DECL_API(vio_api_v0);
+CETECH_DECL_API(log_api_v0);
+CETECH_DECL_API(hash_api_v0);
 
 #include "matrix.h"
 #include "vectors.h"
@@ -879,12 +879,13 @@ static void _init_api(struct api_v0 *api) {
 
 
 static void _init(struct api_v0 *api_v0) {
+    _init_api(api_v0);
 
-    GET_API(api_v0, cnsole_srv_api_v0);
-    GET_API(api_v0, resource_api_v0);
-    GET_API(api_v0, vio_api_v0);
-    GET_API(api_v0, log_api_v0);
-    GET_API(api_v0, hash_api_v0);
+    CETECH_GET_API(api_v0, cnsole_srv_api_v0);
+    CETECH_GET_API(api_v0, resource_api_v0);
+    CETECH_GET_API(api_v0, vio_api_v0);
+    CETECH_GET_API(api_v0, log_api_v0);
+    CETECH_GET_API(api_v0, hash_api_v0);
 
     log_api_v0.debug(LOG_WHERE, "Init");
 
@@ -917,7 +918,7 @@ static void _init(struct api_v0 *api_v0) {
 
 //    luasys_add_module_function("module", "reload", _reload_module);
     cnsole_srv_api_v0.register_command("lua_system.execute",
-                                                  _cmd_execute_string);
+                                       _cmd_execute_string);
 
     resource_api_v0.register_type(_G.type_id, resource_lua::callback);
 #ifdef CETECH_CAN_COMPILE
@@ -987,20 +988,26 @@ void luasys_call_global(const char *func,
     lua_pop(_state, -1);
 }
 
-extern "C" void *luasys_get_module_api(int api) {
-    switch (api) {
-        case PLUGIN_EXPORT_API_ID: {
-            static struct module_export_api_v0 module = {0};
+extern "C" void *luasys_load_module(struct api_v0 *api) {
+    _init(api);
+    return nullptr;
 
-            module.init = _init;
-            module.init_api = _init_api;
-            module.shutdown = _shutdown;
+//    switch (api) {
+//        case PLUGIN_EXPORT_API_ID: {
+//            static struct module_export_api_v0 module = {0};
+//
+//            module.init = _init;
+//            module.shutdown = _shutdown;
+//
+//            return &module;
+//        }
+//
+//
+//        default:
+//            return NULL;
+//    }
+}
 
-            return &module;
-        }
-
-
-        default:
-            return NULL;
-    }
+extern "C" void luasys_unload_module(struct api_v0 *api) {
+    _shutdown();
 }

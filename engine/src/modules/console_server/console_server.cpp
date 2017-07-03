@@ -4,16 +4,16 @@
 
 #include <stdio.h>
 
-#include <cetech/core/api.h>
-#include <cetech/core/config.h>
-#include <cetech/core/module.h>
-#include <cetech/core/memory.h>
-#include <cetech/core/log.h>
+#include <cetech/kernel/api.h>
+#include <cetech/kernel/config.h>
+#include <cetech/kernel/module.h>
+#include <cetech/kernel/memory.h>
+#include <cetech/kernel/log.h>
 #include <cetech/celib/map.inl>
 #include <cetech/modules/resource.h>
-#include <cetech/core/hash.h>
+#include <cetech/kernel/hash.h>
 #include <cetech/modules/console_server.h>
-#include <cetech/core/errors.h>
+#include <cetech/kernel/errors.h>
 
 #include "include/mpack/mpack.h"
 #include "include/nanomsg/nn.h"
@@ -21,10 +21,10 @@
 #include "include/nanomsg/pubsub.h"
 #include "include/nanomsg/pipeline.h"
 
-IMPORT_API(memory_api_v0);
-IMPORT_API(config_api_v0);
-IMPORT_API(log_api_v0);
-IMPORT_API(hash_api_v0);
+CETECH_DECL_API(memory_api_v0);
+CETECH_DECL_API(config_api_v0);
+CETECH_DECL_API(log_api_v0);
+CETECH_DECL_API(hash_api_v0);
 
 using namespace cetech;
 
@@ -144,12 +144,30 @@ namespace consoleserver {
         }
     }
 
+    static void update() {
+        char *buf = NULL;
+
+        int max_iteration = 100;
+        int bytes = 0;
+        while (--max_iteration) {
+            bytes = nn_recv(_G.rpc_socket, &buf, NN_MSG, NN_DONTWAIT);
+
+            if (bytes <= 0) {
+                break;
+            }
+
+            serve_command(buf, bytes);
+            nn_freemsg(buf);
+        }
+    }
+
 }
 
 namespace consoleserver_module {
     static struct cnsole_srv_api_v0 console_api = {
             .push_begin = consoleserver::push_begin,
-            .register_command = consoleserver::register_command
+            .register_command = consoleserver::register_command,
+            .update = consoleserver::update
     };
 
     static void _init_cvar(struct config_api_v0 config) {
@@ -171,10 +189,13 @@ namespace consoleserver_module {
     }
 
     static void _init(struct api_v0 *api) {
-        GET_API(api, memory_api_v0);
-        GET_API(api, config_api_v0);
-        GET_API(api, log_api_v0);
-        GET_API(api, hash_api_v0);
+        _init_api(api);
+        CETECH_GET_API(api, memory_api_v0);
+        CETECH_GET_API(api, config_api_v0);
+        CETECH_GET_API(api, log_api_v0);
+        CETECH_GET_API(api, hash_api_v0);
+
+        _init_cvar(config_api_v0);
 
         _G.commands.init(memory_api_v0.main_allocator());
 
@@ -261,41 +282,26 @@ namespace consoleserver_module {
         _G.commands.destroy();
     }
 
-    static void _update() {
-        char *buf = NULL;
+    extern "C" void *consoleserver_load_module(struct api_v0 *api) {
+        _init(api);
+        return nullptr;
 
-        int max_iteration = 100;
-        int bytes = 0;
-        while (--max_iteration) {
-            bytes = nn_recv(_G.rpc_socket, &buf, NN_MSG, NN_DONTWAIT);
-
-            if (bytes <= 0) {
-                break;
-            }
-
-            serve_command(buf, bytes);
-            nn_freemsg(buf);
-        }
+//        switch (api) {
+//            case PLUGIN_EXPORT_API_ID: {
+//                static struct module_export_api_v0 module = {0};
+//
+//                module.init = _init;
+//                module.shutdown = _shutdown;
+//
+//                return &module;
+//            }
+//
+//            default:
+//                return NULL;
+//        }
     }
 
-
-    extern "C" void *consoleserver_get_module_api(int api) {
-        switch (api) {
-            case PLUGIN_EXPORT_API_ID: {
-                static struct module_export_api_v0 module = {0};
-
-                module.init = _init;
-                module.init_api = _init_api;
-                module.shutdown = _shutdown;
-                module.init_cvar = _init_cvar;
-                module.update = _update;
-
-                return &module;
-            }
-
-            default:
-                return NULL;
-        }
+    extern "C" void consoleserver_unload_module(struct api_v0 *api) {
+        _shutdown();
     }
-
 }

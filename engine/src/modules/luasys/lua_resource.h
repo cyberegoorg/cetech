@@ -2,7 +2,7 @@
 #define CETECH_LUA_RESOURCE_H
 
 
-#include <cetech/core/path.h>
+#include <cetech/kernel/path.h>
 
 namespace resource_lua {
     void *loader(struct vio *input,

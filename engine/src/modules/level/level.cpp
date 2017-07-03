@@ -6,13 +6,13 @@
 #include <cetech/celib/map.inl>
 #include <cetech/celib/quatf.inl>
 
-#include <cetech/core/config.h>
-#include <cetech/core/vio.h>
-#include <cetech/core/yaml.h>
-#include <cetech/core/hash.h>
-#include <cetech/core/api.h>
-#include <cetech/core/memory.h>
-#include <cetech/core/module.h>
+#include <cetech/kernel/config.h>
+#include <cetech/kernel/vio.h>
+#include <cetech/kernel/yaml.h>
+#include <cetech/kernel/hash.h>
+#include <cetech/kernel/api.h>
+#include <cetech/kernel/memory.h>
+#include <cetech/kernel/module.h>
 
 #include <cetech/modules/entity.h>
 #include <cetech/modules/world.h>
@@ -24,14 +24,14 @@
 
 using namespace cetech;
 
-IMPORT_API(entity_api_v0);
-IMPORT_API(resource_api_v0);
-IMPORT_API(transform_api_v0);
-IMPORT_API(memory_api_v0);
-IMPORT_API(vio_api_v0);
-IMPORT_API(hash_api_v0);
-IMPORT_API(blob_api_v0);
-IMPORT_API(world_api_v0);
+CETECH_DECL_API(entity_api_v0);
+CETECH_DECL_API(resource_api_v0);
+CETECH_DECL_API(transform_api_v0);
+CETECH_DECL_API(memory_api_v0);
+CETECH_DECL_API(vio_api_v0);
+CETECH_DECL_API(hash_api_v0);
+CETECH_DECL_API(blob_api_v0);
+CETECH_DECL_API(world_api_v0);
 
 //==============================================================================
 // Globals
@@ -296,14 +296,16 @@ namespace level_module {
 
 
     void _init(struct api_v0 *api) {
-        GET_API(api, entity_api_v0);
-        GET_API(api, memory_api_v0);
-        GET_API(api, resource_api_v0);
-        GET_API(api, transform_api_v0);
-        GET_API(api, vio_api_v0);
-        GET_API(api, hash_api_v0);
-        GET_API(api, blob_api_v0);
-        GET_API(api, world_api_v0);
+        _init_api(api);
+
+        CETECH_GET_API(api, entity_api_v0);
+        CETECH_GET_API(api, memory_api_v0);
+        CETECH_GET_API(api, resource_api_v0);
+        CETECH_GET_API(api, transform_api_v0);
+        CETECH_GET_API(api, vio_api_v0);
+        CETECH_GET_API(api, hash_api_v0);
+        CETECH_GET_API(api, blob_api_v0);
+        CETECH_GET_API(api, world_api_v0);
 
 
         _G = {0};
@@ -325,21 +327,26 @@ namespace level_module {
         _G.level_instance.destroy();
     }
 
-    extern "C" void *level_get_module_api(int api) {
+    extern "C" void level_unload_module(struct api_v0 *api) {
+        _shutdown();
+    }
 
-        switch (api) {
-            case PLUGIN_EXPORT_API_ID: {
-                static struct module_export_api_v0 module = {0};
+    extern "C" void *level_load_module(struct api_v0 *api) {
+        _init(api);
+        return nullptr;
 
-                module.init = _init;
-                module.init_api = _init_api;
-                module.shutdown = _shutdown;
-
-                return &module;
-            }
-
-            default:
-                return NULL;
-        }
+//        switch (api) {
+//            case PLUGIN_EXPORT_API_ID: {
+//                static struct module_export_api_v0 module = {0};
+//
+//                module.init = _init;
+//                module.shutdown = _shutdown;
+//
+//                return &module;
+//            }
+//
+//            default:
+//                return NULL;
+//        }
     }
 }

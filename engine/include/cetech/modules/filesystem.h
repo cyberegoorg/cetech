@@ -89,8 +89,8 @@ struct filesystem_api_v0 {
     //! \param filename Filename
     //! \return 1 if ok else 0
     char *(*fullpath)(uint64_t root,
-                    struct allocator*,
-                    const char *filename);
+                      struct allocator *,
+                      const char *filename);
 };
 
 #ifdef __cplusplus

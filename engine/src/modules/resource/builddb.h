@@ -2,7 +2,7 @@
 #define CETECH_BUILDDB_H
 
 #include <time.h>
-#include <cetech/core/types.h>
+#include <cetech/kernel/types.h>
 #include "include/sqlite3/sqlite3.h"
 
 static int _step(sqlite3 *db,
@@ -39,7 +39,7 @@ static int _step(sqlite3 *db,
     return rc;
 }
 
-static char* _logdb_path = nullptr;
+static char *_logdb_path = nullptr;
 
 static sqlite3 *_opendb() {
     sqlite3 *_db;
@@ -79,7 +79,8 @@ static int builddb_init_db(const char *build_dir,
                            struct path_v0 *path,
                            struct memory_api_v0 *memory) {
 
-    _logdb_path = path->join(memory->main_allocator(), 2, build_dir, "build.db");
+    _logdb_path = path->join(memory->main_allocator(), 2, build_dir,
+                             "build.db");
 
 
     if (!_do_sql("CREATE TABLE IF NOT EXISTS files (\n"
@@ -207,7 +208,8 @@ static int builddb_need_compile(const char *source_dir,
     while (_step(_db, stmt) == SQLITE_ROW) {
         compile = 0;
         const char *dep_file = (const char *) sqlite3_column_text(stmt, 0);
-        char* full_path = path->join(memory_api_v0.main_allocator(), 2, source_dir, dep_file);
+        char *full_path = path->join(memory_api_v0.main_allocator(), 2,
+                                     source_dir, dep_file);
 
         time_t actual_mtime = path->file_mtime(full_path);
 

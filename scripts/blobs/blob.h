@@ -24,7 +24,7 @@ namespace {{name}}_blob {
         return (blob_t*)(data);
     }
 
-    inline const uint32_t size(const blob_t* blob) {
+    inline const uint32_t blob_size(const blob_t* blob) {
         return (
             sizeof(blob_t) +
 {% for k, v in elements.items() %}
