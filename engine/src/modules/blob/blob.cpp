@@ -2,9 +2,9 @@
 
 #include <cetech/celib/array.inl>
 
-#include <cetech/kernel/api.h>
+#include <cetech/kernel/api_system.h>
 #include <cetech/kernel/module.h>
-#include <cetech/kernel/blob.h>
+#include <cetech/modules/blob.h>
 
 
 using namespace cetech;
@@ -60,13 +60,8 @@ namespace blob {
 
 
 namespace blob_module {
-    static void _init(struct api_v0 *api) {
+    extern "C" void blob_load_module(struct api_v0 *api) {
         api->register_api("blob_api_v0", &blob::api);
-    }
-
-    extern "C" void *blob_load_module(struct api_v0 *api) {
-        _init(api);
-        return nullptr;
     }
 
     extern "C" void blob_unload_module(struct api_v0 *api) {

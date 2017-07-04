@@ -14,14 +14,12 @@
 #include <cetech/kernel/hash.h>
 #include <cetech/kernel/memory.h>
 #include <cetech/kernel/module.h>
-#include <cetech/kernel/api.h>
-#include <cetech/kernel/path.h>
-#include <cetech/kernel/vio.h>
+#include <cetech/kernel/api_system.h>
+#include <cetech/kernel/sdl2_os.h>
 
 #include <cetech/modules/resource.h>
 #include <cetech/modules/entity.h>
 #include <cetech/kernel/yaml.h>
-#include <cetech/kernel/thread.h>
 #include "cetech/modules/scenegraph.h"
 
 #include "scene_blob.h"
@@ -31,10 +29,10 @@ using namespace cetech;
 CETECH_DECL_API(memory_api_v0);
 CETECH_DECL_API(resource_api_v0);
 CETECH_DECL_API(scenegprah_api_v0);
-CETECH_DECL_API(path_v0);
-CETECH_DECL_API(vio_api_v0);
+CETECH_DECL_API(os_path_v0);
+CETECH_DECL_API(os_vio_api_v0);
 CETECH_DECL_API(hash_api_v0);
-CETECH_DECL_API(thread_api_v0);
+CETECH_DECL_API(os_thread_api_v0);
 
 
 namespace scene_resource_compiler {
@@ -194,7 +192,7 @@ namespace scene_resource_compiler {
                        yaml_node_t chanels_n,
                        struct compile_output *output) {
         char tmp_buff[64] = {0};
-        bgfx::AttribType::Enum  attrib_type;
+        bgfx::AttribType::Enum attrib_type;
         size_t v_size;
 
         yaml_node_t idx_n = yaml_get_seq_node(node, i);
@@ -394,7 +392,7 @@ namespace scene_resource_compiler {
         capi->add_dependency(filename, input_str);
 
         const char *source_dir = resource_api_v0.compiler_get_source_dir();
-        char *input_path = path_v0.join(a, 2, source_dir, input_str);
+        char *input_path = os_path_v0.join(a, 2, source_dir, input_str);
 
         uint32_t postprocess_flag = aiProcessPreset_TargetRealtime_MaxQuality;
 
@@ -498,16 +496,16 @@ namespace scene_resource_compiler {
     }
 
     int compiler(const char *filename,
-                 struct vio *source_vio,
-                 struct vio *build_vio,
+                 struct os_vio *source_vio,
+                 struct os_vio *build_vio,
                  struct compilator_api *compilator_api) {
 
         char *source_data =
                 CETECH_ALLOCATE(memory_api_v0.main_allocator(), char,
-                                vio_api_v0.size(source_vio) + 1);
-        memset(source_data, 0, vio_api_v0.size(source_vio) + 1);
-        vio_api_v0.read(source_vio, source_data, sizeof(char),
-                        vio_api_v0.size(source_vio));
+                                os_vio_api_v0.size(source_vio) + 1);
+        memset(source_data, 0, os_vio_api_v0.size(source_vio) + 1);
+        os_vio_api_v0.read(source_vio, source_data, sizeof(char),
+                           os_vio_api_v0.size(source_vio));
 
         yaml_document_t h;
         yaml_node_t root = yaml_load_str(source_data, &h);
@@ -535,41 +533,43 @@ namespace scene_resource_compiler {
                 .vb_len = (uint32_t) array::size(output->vb),
         };
 
-        vio_api_v0.write(build_vio, &res, sizeof(res), 1);
-        vio_api_v0.write(build_vio, array::begin(output->geom_name),
-                         sizeof(uint64_t),
-                         array::size(output->geom_name));
-        vio_api_v0.write(build_vio, array::begin(output->ib_offset),
-                         sizeof(uint32_t),
-                         array::size(output->ib_offset));
-        vio_api_v0.write(build_vio, array::begin(output->vb_offset),
-                         sizeof(uint32_t),
-                         array::size(output->vb_offset));
-        vio_api_v0.write(build_vio, array::begin(output->vb_decl),
-                         sizeof(bgfx::VertexDecl),
-                         array::size(output->vb_decl));
-        vio_api_v0.write(build_vio, array::begin(output->ib_size),
-                         sizeof(uint32_t),
-                         array::size(output->ib_size));
-        vio_api_v0.write(build_vio, array::begin(output->vb_size),
-                         sizeof(uint32_t),
-                         array::size(output->vb_size));
-        vio_api_v0.write(build_vio, array::begin(output->ib), sizeof(uint32_t),
-                         array::size(output->ib));
-        vio_api_v0.write(build_vio, array::begin(output->vb), sizeof(uint8_t),
-                         array::size(output->vb));
-        vio_api_v0.write(build_vio, array::begin(output->node_name),
-                         sizeof(uint64_t),
-                         array::size(output->node_name));
-        vio_api_v0.write(build_vio, array::begin(output->node_parent),
-                         sizeof(uint32_t),
-                         array::size(output->node_parent));
-        vio_api_v0.write(build_vio, array::begin(output->node_pose),
-                         sizeof(mat44f_t),
-                         array::size(output->node_pose));
-        vio_api_v0.write(build_vio, array::begin(output->geom_node),
-                         sizeof(uint64_t),
-                         array::size(output->geom_name));
+        os_vio_api_v0.write(build_vio, &res, sizeof(res), 1);
+        os_vio_api_v0.write(build_vio, array::begin(output->geom_name),
+                            sizeof(uint64_t),
+                            array::size(output->geom_name));
+        os_vio_api_v0.write(build_vio, array::begin(output->ib_offset),
+                            sizeof(uint32_t),
+                            array::size(output->ib_offset));
+        os_vio_api_v0.write(build_vio, array::begin(output->vb_offset),
+                            sizeof(uint32_t),
+                            array::size(output->vb_offset));
+        os_vio_api_v0.write(build_vio, array::begin(output->vb_decl),
+                            sizeof(bgfx::VertexDecl),
+                            array::size(output->vb_decl));
+        os_vio_api_v0.write(build_vio, array::begin(output->ib_size),
+                            sizeof(uint32_t),
+                            array::size(output->ib_size));
+        os_vio_api_v0.write(build_vio, array::begin(output->vb_size),
+                            sizeof(uint32_t),
+                            array::size(output->vb_size));
+        os_vio_api_v0.write(build_vio, array::begin(output->ib),
+                            sizeof(uint32_t),
+                            array::size(output->ib));
+        os_vio_api_v0.write(build_vio, array::begin(output->vb),
+                            sizeof(uint8_t),
+                            array::size(output->vb));
+        os_vio_api_v0.write(build_vio, array::begin(output->node_name),
+                            sizeof(uint64_t),
+                            array::size(output->node_name));
+        os_vio_api_v0.write(build_vio, array::begin(output->node_parent),
+                            sizeof(uint32_t),
+                            array::size(output->node_parent));
+        os_vio_api_v0.write(build_vio, array::begin(output->node_pose),
+                            sizeof(mat44f_t),
+                            array::size(output->node_pose));
+        os_vio_api_v0.write(build_vio, array::begin(output->geom_node),
+                            sizeof(uint64_t),
+                            array::size(output->geom_name));
 
         _destroy_compile_output(output);
         CETECH_DEALLOCATE(memory_api_v0.main_allocator(), source_data);
@@ -580,10 +580,10 @@ namespace scene_resource_compiler {
         CETECH_GET_API(api, memory_api_v0);
         CETECH_GET_API(api, resource_api_v0);
         CETECH_GET_API(api, scenegprah_api_v0);
-        CETECH_GET_API(api, path_v0);
-        CETECH_GET_API(api, vio_api_v0);
+        CETECH_GET_API(api, os_path_v0);
+        CETECH_GET_API(api, os_vio_api_v0);
         CETECH_GET_API(api, hash_api_v0);
-        CETECH_GET_API(api, thread_api_v0);
+        CETECH_GET_API(api, os_thread_api_v0);
 
         resource_api_v0.compiler_register(hash_api_v0.id64_from_str("scene"),
                                           compiler);

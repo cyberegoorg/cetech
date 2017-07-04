@@ -10,7 +10,7 @@
 
 #include <cetech/celib/map.inl>
 
-#include <cetech/kernel/thread.h>
+#include <cetech/kernel/sdl2_os.h>
 #include <cetech/celib/eventstream.inl>
 #include <cetech/kernel/memory.h>
 #include <cetech/kernel/config.h>
@@ -20,17 +20,16 @@
 #include <cetech/kernel/task.h>
 #include <cetech/kernel/develop.h>
 
-#include <cetech/kernel/api.h>
-#include <cetech/kernel/time.h>
+#include <cetech/kernel/api_system.h>
 #include <cetech/kernel/errors.h>
 
 using namespace cetech;
 
 CETECH_DECL_API(memory_api_v0);
-CETECH_DECL_API(thread_api_v0);
+CETECH_DECL_API(os_thread_api_v0);
 CETECH_DECL_API(task_api_v0);
 CETECH_DECL_API(config_api_v0);
-CETECH_DECL_API(time_api_v0);
+CETECH_DECL_API(os_time_api_v0);
 CETECH_DECL_API(log_api_v0);
 
 
@@ -62,7 +61,7 @@ static struct DevelopSystemGlobals {
     cvar_t cv_pub_addr;
     int pub_socket;
 
-    spinlock_t flush_lock;
+    os_spinlock_t flush_lock;
     atomic_int complete_flag[8]; // TODO: dynamic
     float time_accum;
 
@@ -94,12 +93,12 @@ namespace {
             return;
         }
 
-        thread_api_v0.spin_lock(&_G.flush_lock);
+        os_thread_api_v0.spin_lock(&_G.flush_lock);
 
         array::push(_G.eventstream, _stream_buffer, _stream_buffer_size);
         _stream_buffer_size = 0;
 
-        thread_api_v0.spin_unlock(&_G.flush_lock);
+        os_thread_api_v0.spin_unlock(&_G.flush_lock);
     }
 
     static void _flush_job(void *data) {
@@ -311,8 +310,8 @@ namespace develop_system {
 
         return (struct scope_data) {
                 .name = name,
-                .start = time_api_v0.ticks(),
-                .start_timer = time_api_v0.perf_counter()
+                .start = os_time_api_v0.ticks(),
+                .start_timer = os_time_api_v0.perf_counter()
         };
     }
 
@@ -325,8 +324,9 @@ namespace develop_system {
                 .worker_id = (uint32_t) task_api_v0.worker_id(),
                 .start = scope_data.start,
                 .duration =
-                ((float) (time_api_v0.perf_counter() - scope_data.start_timer) /
-                 time_api_v0.perf_freq()) * 1000.0f,
+                ((float) (os_time_api_v0.perf_counter() -
+                          scope_data.start_timer) /
+                 os_time_api_v0.perf_freq()) * 1000.0f,
                 .depth = _scope_depth,
         };
 
@@ -356,8 +356,8 @@ namespace develop_system_module {
         CETECH_GET_API(api, memory_api_v0);
         CETECH_GET_API(api, task_api_v0);
         CETECH_GET_API(api, config_api_v0);
-        CETECH_GET_API(api, thread_api_v0);
-        CETECH_GET_API(api, time_api_v0);
+        CETECH_GET_API(api, os_thread_api_v0);
+        CETECH_GET_API(api, os_time_api_v0);
         CETECH_GET_API(api, log_api_v0);
 
         _init_cvar(config_api_v0);
@@ -400,23 +400,8 @@ namespace develop_system_module {
         _G.shutdown();
     }
 
-    extern "C" void *developsystem_load_module(struct api_v0 *api) {
+    extern "C" void developsystem_load_module(struct api_v0 *api) {
         _init(api);
-        return nullptr;
-//
-//        switch (api) {
-//            case PLUGIN_EXPORT_API_ID: {
-//                static struct module_export_api_v0 module = {0};
-//
-//                module.init = _init;
-//                module.shutdown = _shutdown;
-//
-//                return &module;
-//            }
-//
-//            default:
-//                return NULL;
-//        }
     }
 
     extern "C" void developsystem_unload_module(struct api_v0 *api) {

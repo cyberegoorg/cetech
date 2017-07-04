@@ -12,13 +12,11 @@
 #include <cetech/kernel/hash.h>
 #include <cetech/kernel/application.h>
 #include <cetech/kernel/memory.h>
-#include <cetech/kernel/path.h>
+#include <cetech/kernel/sdl2_os.h>
 #include <cetech/kernel/module.h>
-#include <cetech/kernel/api.h>
+#include <cetech/kernel/api_system.h>
 #include <cetech/kernel/log.h>
-#include <cetech/kernel/vio.h>
 #include <cetech/kernel/yaml.h>
-#include <cetech/kernel/process.h>
 
 #include <cetech/modules/resource.h>
 #include <cetech/celib/string_stream.h>
@@ -30,9 +28,9 @@ using namespace string_stream;
 CETECH_DECL_API(memory_api_v0)
 CETECH_DECL_API(resource_api_v0)
 CETECH_DECL_API(app_api_v0)
-CETECH_DECL_API(path_v0)
-CETECH_DECL_API(vio_api_v0)
-CETECH_DECL_API(process_api_v0)
+CETECH_DECL_API(os_path_v0)
+CETECH_DECL_API(os_vio_api_v0)
+CETECH_DECL_API(os_process_api_v0)
 CETECH_DECL_API(log_api_v0)
 CETECH_DECL_API(hash_api_v0)
 
@@ -69,7 +67,7 @@ namespace shader_compiler {
                               input, output, include_path, type, platform,
                               profile);
 
-        int status = process_api_v0.exec(string_stream::c_str(buffer));
+        int status = os_process_api_v0.exec(string_stream::c_str(buffer));
 
         log_api_v0.debug("shaderc", "STATUS %d", status);
 
@@ -84,13 +82,13 @@ namespace shader_compiler {
         auto a = memory_api_v0.main_allocator();
 
         char dir[1024] = {0};
-        path_v0.dir(dir, CETECH_ARRAY_LEN(dir), filename);
+        os_path_v0.dir(dir, CETECH_ARRAY_LEN(dir), filename);
 
-        char *tmp_dirname = path_v0.join(a, 2, tmp_dir, dir);
-        path_v0.make_path(tmp_dirname);
+        char *tmp_dirname = os_path_v0.join(a, 2, tmp_dir, dir);
+        os_path_v0.make_path(tmp_dirname);
 
         int ret = snprintf(tmp_filename, max_len, "%s/%s.shaderc", tmp_dirname,
-                           path_v0.filename(filename));
+                           os_path_v0.filename(filename));
 
         CETECH_DEALLOCATE(a, tmp_dirname);
 
@@ -113,15 +111,15 @@ namespace shader_compiler {
 #endif
 
     static int compiler(const char *filename,
-                        struct vio *source_vio,
-                        struct vio *build_vio,
+                        struct os_vio *source_vio,
+                        struct os_vio *build_vio,
                         struct compilator_api *compilator_api) {
         auto a = memory_api_v0.main_allocator();
 
-        char source_data[vio_api_v0.size(source_vio) + 1];
-        memset(source_data, 0, vio_api_v0.size(source_vio) + 1);
-        vio_api_v0.read(source_vio, source_data, sizeof(char),
-                        vio_api_v0.size(source_vio));
+        char source_data[os_vio_api_v0.size(source_vio) + 1];
+        memset(source_data, 0, os_vio_api_v0.size(source_vio) + 1);
+        os_vio_api_v0.read(source_vio, source_data, sizeof(char),
+                           os_vio_api_v0.size(source_vio));
 
         yaml_document_t h;
         yaml_node_t root = yaml_load_str(source_data, &h);
@@ -132,7 +130,7 @@ namespace shader_compiler {
         const char *source_dir = resource_api_v0.compiler_get_source_dir();
         const char *core_dir = resource_api_v0.compiler_get_core_dir();
 
-        char *include_dir = path_v0.join(a, 2, core_dir, "bgfxshaders");
+        char *include_dir = os_path_v0.join(a, 2, core_dir, "bgfxshaders");
 
         shader_blob::blob_t resource = {0};
 
@@ -148,7 +146,7 @@ namespace shader_compiler {
         yaml_as_string(vs_input, input_str, CETECH_ARRAY_LEN(input_str));
         compilator_api->add_dependency(filename, input_str);
 
-        char *input_path = path_v0.join(a, 2, source_dir, input_str);
+        char *input_path = os_path_v0.join(a, 2, source_dir, input_str);
 
         _gen_tmp_name(output_path, tmp_dir, CETECH_ARRAY_LEN(tmp_filename),
                       input_str);
@@ -163,22 +161,23 @@ namespace shader_compiler {
             return 0;
         }
 
-        struct vio *tmp_file = vio_api_v0.from_file(output_path, VIO_OPEN_READ,
-                                                    memory_api_v0.main_allocator());
+        struct os_vio *tmp_file = os_vio_api_v0.from_file(output_path,
+                                                          VIO_OPEN_READ,
+                                                          memory_api_v0.main_allocator());
         char *vs_data =
                 CETECH_ALLOCATE(memory_api_v0.main_allocator(), char,
-                                vio_api_v0.size(tmp_file) + 1);
-        vio_api_v0.read(tmp_file, vs_data, sizeof(char),
-                        vio_api_v0.size(tmp_file));
-        resource.vs_size = vio_api_v0.size(tmp_file);
-        vio_api_v0.close(tmp_file);
+                                os_vio_api_v0.size(tmp_file) + 1);
+        os_vio_api_v0.read(tmp_file, vs_data, sizeof(char),
+                           os_vio_api_v0.size(tmp_file));
+        resource.vs_size = os_vio_api_v0.size(tmp_file);
+        os_vio_api_v0.close(tmp_file);
         ///////
 
         //////// FS
         yaml_as_string(fs_input, input_str, CETECH_ARRAY_LEN(input_str));
         compilator_api->add_dependency(filename, input_str);
 
-        input_path = path_v0.join(a, 2, source_dir, input_str);
+        input_path = os_path_v0.join(a, 2, source_dir, input_str);
 
         _gen_tmp_name(output_path, tmp_dir, CETECH_ARRAY_LEN(tmp_filename),
                       input_str);
@@ -193,20 +192,20 @@ namespace shader_compiler {
             return 0;
         }
 
-        tmp_file = vio_api_v0.from_file(output_path, VIO_OPEN_READ,
-                                        memory_api_v0.main_allocator());
+        tmp_file = os_vio_api_v0.from_file(output_path, VIO_OPEN_READ,
+                                           memory_api_v0.main_allocator());
         char *fs_data =
                 CETECH_ALLOCATE(memory_api_v0.main_allocator(), char,
-                                vio_api_v0.size(tmp_file) + 1);
-        vio_api_v0.read(tmp_file, fs_data, sizeof(char),
-                        vio_api_v0.size(tmp_file));
-        resource.fs_size = vio_api_v0.size(tmp_file);
-        vio_api_v0.close(tmp_file);
+                                os_vio_api_v0.size(tmp_file) + 1);
+        os_vio_api_v0.read(tmp_file, fs_data, sizeof(char),
+                           os_vio_api_v0.size(tmp_file));
+        resource.fs_size = os_vio_api_v0.size(tmp_file);
+        os_vio_api_v0.close(tmp_file);
 
-        vio_api_v0.write(build_vio, &resource, sizeof(resource), 1);
+        os_vio_api_v0.write(build_vio, &resource, sizeof(resource), 1);
 
-        vio_api_v0.write(build_vio, vs_data, sizeof(char), resource.vs_size);
-        vio_api_v0.write(build_vio, fs_data, sizeof(char), resource.fs_size);
+        os_vio_api_v0.write(build_vio, vs_data, sizeof(char), resource.vs_size);
+        os_vio_api_v0.write(build_vio, fs_data, sizeof(char), resource.fs_size);
 
         CETECH_DEALLOCATE(a, vs_data);
         CETECH_DEALLOCATE(a, fs_data);
@@ -219,9 +218,9 @@ namespace shader_compiler {
         CETECH_GET_API(api, memory_api_v0);
         CETECH_GET_API(api, resource_api_v0);
         CETECH_GET_API(api, app_api_v0);
-        CETECH_GET_API(api, path_v0);
-        CETECH_GET_API(api, vio_api_v0);
-        CETECH_GET_API(api, process_api_v0);
+        CETECH_GET_API(api, os_path_v0);
+        CETECH_GET_API(api, os_vio_api_v0);
+        CETECH_GET_API(api, os_process_api_v0);
         CETECH_GET_API(api, log_api_v0);
         CETECH_GET_API(api, hash_api_v0);
 

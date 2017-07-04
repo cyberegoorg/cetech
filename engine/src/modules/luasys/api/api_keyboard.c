@@ -3,7 +3,7 @@
 #include <cetech/kernel/module.h>
 
 #include <cetech/modules/input.h>
-#include <cetech/kernel/api.h>
+#include <cetech/kernel/api_system.h>
 #include "cetech/modules/luasys.h"
 
 #define API_NAME "Keyboard"

@@ -7,11 +7,11 @@
 #include <cetech/modules/resource.h>
 #include <cetech/kernel/memory.h>
 #include <cetech/kernel/module.h>
-#include <cetech/kernel/api.h>
+#include <cetech/kernel/api_system.h>
 
 #include <cetech/modules/entity.h>
-#include <cetech/modules/world.h>
-#include <cetech/modules/component.h>
+
+
 #include <cetech/modules/renderer.h>
 #include <cetech/modules/transform.h>
 
@@ -301,23 +301,8 @@ namespace camera_module {
     }
 
 
-    extern "C" void *camera_load_module(struct api_v0 *api) {
+    extern "C" void camera_load_module(struct api_v0 *api) {
         _init(api);
-        return nullptr;
-
-//        switch (api) {
-//            case PLUGIN_EXPORT_API_ID: {
-//                static struct module_export_api_v0 module = {0};
-//
-//                module.init = _init;
-//                module.shutdown = _shutdown;
-//
-//                return &module;
-//            }
-//
-//            default:
-//                return NULL;
-//        }
     }
 
     extern "C" void camera_unload_module(struct api_v0 *api) {

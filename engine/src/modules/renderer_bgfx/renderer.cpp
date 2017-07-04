@@ -8,16 +8,17 @@
 #include <cetech/kernel/application.h>
 #include <cetech/kernel/config.h>
 #include <cetech/kernel/module.h>
-#include <cetech/kernel/window.h>
-#include <cetech/kernel/api.h>
+#include <cetech/kernel/sdl2_os.h>
+#include <cetech/kernel/api_system.h>
 
 #include <cetech/modules/camera.h>
 #include "cetech/modules/renderer.h"
 #include <cetech/kernel/develop.h>
-#include <cetech/modules/world.h>
+
 #include <cetech/modules/console_server.h>
 
 #include <include/mpack/mpack.h>
+#include <cetech/modules/entity.h>
 #include "bgfx/platform.h"
 
 #include "texture/texture.h"
@@ -31,7 +32,7 @@ CETECH_DECL_API(cnsole_srv_api_v0);
 CETECH_DECL_API(mesh_renderer_api_v0);
 CETECH_DECL_API(config_api_v0);
 CETECH_DECL_API(app_api_v0);
-CETECH_DECL_API(window_api_v0);
+CETECH_DECL_API(os_window_api_v0);
 CETECH_DECL_API(api_v0);
 
 //==============================================================================
@@ -75,16 +76,16 @@ static int _cmd_resize(mpack_node_t args,
 }
 
 
-void renderer_create(window_t window) {
+void renderer_create(os_window_t *window) {
     bgfx::PlatformData pd = {0};
-    pd.nwh = window_api_v0.native_window_ptr(window);
-    pd.ndt = window_api_v0.native_display_ptr(window);
+    pd.nwh = os_window_api_v0.native_window_ptr(window);
+    pd.ndt = os_window_api_v0.native_display_ptr(window);
     bgfx::setPlatformData(pd);
 
     // TODO: from config
     bgfx::init(bgfx::RendererType::OpenGL, 0, 0, NULL, NULL);
 
-    window_api_v0.size(window, &_G.size_width, &_G.size_height);
+    os_window_api_v0.size(window, &_G.size_width, &_G.size_height);
 
     _G.need_reset = 1;
 }
@@ -126,7 +127,7 @@ void renderer_render_world(world_t world,
 
     bgfx::frame(0);
 
-    window_api_v0.update(app_api_v0.main_window());
+    os_window_api_v0.update(app_api_v0.main_window());
 }
 
 vec2f_t renderer_get_size() {
@@ -188,7 +189,7 @@ namespace renderer_module {
         }
 
         CETECH_GET_API(api, app_api_v0);
-        CETECH_GET_API(api, window_api_v0);
+        CETECH_GET_API(api, os_window_api_v0);
     }
 
     void _shutdown() {
@@ -207,24 +208,8 @@ namespace renderer_module {
     }
 
 
-    extern "C" void *renderer_load_module(struct api_v0 *api) {
+    extern "C" void renderer_load_module(struct api_v0 *api) {
         _init(api);
-        return nullptr;
-
-//        switch (api) {
-//            case PLUGIN_EXPORT_API_ID: {
-//                static struct module_export_api_v0 module = {0};
-//
-//                module.init = _init;
-//                module.shutdown = _shutdown;
-//
-//                return &module;
-//            }
-//
-//
-//            default:
-//                return NULL;
-//        }
     }
 
     extern "C" void renderer_unload_module(struct api_v0 *api) {

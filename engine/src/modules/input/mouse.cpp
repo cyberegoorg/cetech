@@ -7,10 +7,10 @@
 #include <cetech/kernel/config.h>
 #include <cetech/kernel/module.h>
 #include <cetech/celib/eventstream.inl>
-#include <cetech/kernel/machine.h>
+#include <cetech/kernel/sdl2_machine.h>
 
 #include <cetech/modules/input.h>
-#include <cetech/kernel/api.h>
+#include <cetech/kernel/api_system.h>
 
 #include "mousebtnstr.h"
 #include <cetech/kernel/log.h>
@@ -208,22 +208,8 @@ namespace mouse_module {
     }
 
 
-    extern "C" void *mouse_load_module(struct api_v0 *api) {
+    extern "C" void mouse_load_module(struct api_v0 *api) {
         _init(api);
-        return nullptr;
-
-//
-//        if (api == PLUGIN_EXPORT_API_ID) {
-//            static struct module_export_api_v0 module = {0};
-//
-//            module.init = _init;
-//            module.shutdown = _shutdown;
-//
-//            return &module;
-//
-//        }
-//
-//        return 0;
     }
 
     extern "C" void mouse_unload_module(struct api_v0 *api) {

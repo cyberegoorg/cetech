@@ -8,11 +8,10 @@
 #include <cetech/kernel/yaml.h>
 
 #include <cetech/kernel/hash.h>
-#include <cetech/kernel/thread.h>
+#include <cetech/kernel/sdl2_os.h>
 #include <cetech/kernel/memory.h>
 #include <cetech/kernel/module.h>
-#include <cetech/kernel/vio.h>
-#include <cetech/kernel/api.h>
+#include <cetech/kernel/api_system.h>
 #include <cetech/celib/array.inl>
 
 #include <cetech/kernel/task.h>
@@ -23,8 +22,8 @@
 CETECH_DECL_API(memory_api_v0);
 CETECH_DECL_API(resource_api_v0);
 CETECH_DECL_API(task_api_v0);
-CETECH_DECL_API(thread_api_v0);
-CETECH_DECL_API(vio_api_v0);
+CETECH_DECL_API(os_thread_api_v0);
+CETECH_DECL_API(os_vio_api_v0);
 CETECH_DECL_API(hash_api_v0);
 
 using namespace cetech;
@@ -81,14 +80,14 @@ void forach_clb(yaml_node_t key,
 }
 
 int _package_compiler(const char *filename,
-                      struct vio *source_vio,
-                      struct vio *build_vio,
+                      struct os_vio *source_vio,
+                      struct os_vio *build_vio,
                       struct compilator_api *compilator_api) {
 
-    char source_data[vio_api_v0.size(source_vio) + 1];
-    memset(source_data, 0, vio_api_v0.size(source_vio) + 1);
-    vio_api_v0.read(source_vio, source_data, sizeof(char),
-                    vio_api_v0.size(source_vio));
+    char source_data[os_vio_api_v0.size(source_vio) + 1];
+    memset(source_data, 0, os_vio_api_v0.size(source_vio) + 1);
+    os_vio_api_v0.read(source_vio, source_data, sizeof(char),
+                       os_vio_api_v0.size(source_vio));
 
     yaml_document_t h;
     yaml_node_t root = yaml_load_str(source_data, &h);
@@ -118,19 +117,19 @@ int _package_compiler(const char *filename,
                              (array::size(compile_data.name) *
                               sizeof(uint64_t));
 
-    vio_api_v0.write(build_vio, &resource, sizeof(resource), 1);
+    os_vio_api_v0.write(build_vio, &resource, sizeof(resource), 1);
 
-    vio_api_v0.write(build_vio, array::begin(compile_data.types),
-                     sizeof(uint64_t), array::size(compile_data.types));
+    os_vio_api_v0.write(build_vio, array::begin(compile_data.types),
+                        sizeof(uint64_t), array::size(compile_data.types));
 
-    vio_api_v0.write(build_vio, array::begin(compile_data.name_count),
-                     sizeof(uint32_t), array::size(compile_data.name_count));
+    os_vio_api_v0.write(build_vio, array::begin(compile_data.name_count),
+                        sizeof(uint32_t), array::size(compile_data.name_count));
 
-    vio_api_v0.write(build_vio, array::begin(compile_data.name),
-                     sizeof(uint64_t), array::size(compile_data.name));
+    os_vio_api_v0.write(build_vio, array::begin(compile_data.name),
+                        sizeof(uint64_t), array::size(compile_data.name));
 
-    vio_api_v0.write(build_vio, array::begin(compile_data.offset),
-                     sizeof(uint32_t), array::size(compile_data.offset));
+    os_vio_api_v0.write(build_vio, array::begin(compile_data.offset),
+                        sizeof(uint32_t), array::size(compile_data.offset));
 
     return 1;
 }
@@ -139,8 +138,8 @@ int package_init(struct api_v0 *api) {
     CETECH_GET_API(api, memory_api_v0);
     CETECH_GET_API(api, resource_api_v0);
     CETECH_GET_API(api, task_api_v0);
-    CETECH_GET_API(api, thread_api_v0);
-    CETECH_GET_API(api, vio_api_v0);
+    CETECH_GET_API(api, os_thread_api_v0);
+    CETECH_GET_API(api, os_vio_api_v0);
     CETECH_GET_API(api, hash_api_v0);
 
     _G = (struct G) {0};
@@ -235,7 +234,7 @@ int package_is_loaded(uint64_t name) {
 void package_flush(uint64_t name) {
     while (!package_is_loaded(name)) {
         if (!task_api_v0.do_work()) {
-            thread_api_v0.yield();
+            os_thread_api_v0.yield();
         }
     }
 }

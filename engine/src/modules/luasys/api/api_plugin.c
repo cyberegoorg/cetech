@@ -2,7 +2,7 @@
 
 #include <cetech/kernel/module.h>
 #include <cetech/modules/luasys.h>
-#include <cetech/kernel/api.h>
+#include <cetech/kernel/api_system.h>
 
 #define API_NAME "Module"
 

@@ -4,7 +4,7 @@
 #include <cetech/kernel/errors.h>
 #include <cetech/kernel/module.h>
 #include <cetech/kernel/memory.h>
-#include <cetech/kernel/api.h>
+#include <cetech/kernel/api_system.h>
 #include <cetech/kernel/log.h>
 
 #include "memory_private.h"

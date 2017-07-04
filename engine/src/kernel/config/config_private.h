@@ -9,6 +9,7 @@ namespace config {
     void shutdown();
 
     void compile_global(struct app_api_v0 *app_api);
+
     void load_global(struct app_api_v0 *app_api);
 
     int parse_args(int argc,

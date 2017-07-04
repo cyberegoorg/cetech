@@ -10,11 +10,11 @@
 
 #include <cetech/kernel/module.h>
 
-#include <cetech/modules/world.h>
+
 #include <cetech/modules/entity.h>
-#include <cetech/modules/component.h>
+
 #include <cetech/kernel/yaml.h>
-#include <cetech/kernel/api.h>
+#include <cetech/kernel/api_system.h>
 
 CETECH_DECL_API(memory_api_v0);
 CETECH_DECL_API(world_api_v0);
@@ -179,24 +179,8 @@ namespace component_module {
         _G.component_clb.destroy();
     }
 
-    extern "C" void *component_load_module(struct api_v0 *api) {
+    extern "C" void component_load_module(struct api_v0 *api) {
         _init(api);
-        return nullptr;
-
-//        switch (api) {
-//            case PLUGIN_EXPORT_API_ID: {
-//                static struct module_export_api_v0 module = {0};
-//
-//                module.init = _init;
-//                module.shutdown = _shutdown;
-//
-//
-//                return &module;
-//            }
-//
-//            default:
-//                return NULL;
-//        }
     }
 
     extern "C" void component_unload_module(struct api_v0 *api) {

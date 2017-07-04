@@ -12,8 +12,8 @@ extern "C" {
 #include <cetech/celib/math_types.h>
 #include <cetech/celib/vec2f.inl>
 
-#include <cetech/kernel/api.h>
-#include <cetech/kernel/vio.h>
+#include <cetech/kernel/api_system.h>
+#include <cetech/kernel/sdl2_os.h>
 #include <cetech/kernel/config.h>
 #include <cetech/kernel/hash.h>
 #include <cetech/kernel/module.h>
@@ -29,7 +29,7 @@ extern "C" {
 
 CETECH_DECL_API(resource_api_v0);
 CETECH_DECL_API(cnsole_srv_api_v0);
-CETECH_DECL_API(vio_api_v0);
+CETECH_DECL_API(os_vio_api_v0);
 CETECH_DECL_API(log_api_v0);
 CETECH_DECL_API(hash_api_v0);
 
@@ -318,14 +318,15 @@ static int _execute_string(lua_State *_L,
 //==============================================================================
 
 int _lua_compiler(const char *filename,
-                  struct vio *source_vio,
-                  struct vio *build_vio,
+                  struct os_vio *source_vio,
+                  struct os_vio *build_vio,
                   struct compilator_api *compilator_api) {
 
-    char tmp[vio_api_v0.size(source_vio) + 1];
-    memset(tmp, 0, vio_api_v0.size(source_vio) + 1);
+    char tmp[os_vio_api_v0.size(source_vio) + 1];
+    memset(tmp, 0, os_vio_api_v0.size(source_vio) + 1);
 
-    vio_api_v0.read(source_vio, tmp, sizeof(char), vio_api_v0.size(source_vio));
+    os_vio_api_v0.read(source_vio, tmp, sizeof(char),
+                       os_vio_api_v0.size(source_vio));
 
     lua_State *state = luaL_newstate();
     luaL_openlibs(state);
@@ -367,8 +368,9 @@ int _lua_compiler(const char *filename,
                 .size = (uint32_t) bc_len,
         };
 
-        vio_api_v0.write(build_vio, &resource, sizeof(struct lua_resource), 1);
-        vio_api_v0.write(build_vio, bc, sizeof(char), bc_len);
+        os_vio_api_v0.write(build_vio, &resource, sizeof(struct lua_resource),
+                            1);
+        os_vio_api_v0.write(build_vio, bc, sizeof(char), bc_len);
     }
 
     lua_close(state);
@@ -883,7 +885,7 @@ static void _init(struct api_v0 *api_v0) {
 
     CETECH_GET_API(api_v0, cnsole_srv_api_v0);
     CETECH_GET_API(api_v0, resource_api_v0);
-    CETECH_GET_API(api_v0, vio_api_v0);
+    CETECH_GET_API(api_v0, os_vio_api_v0);
     CETECH_GET_API(api_v0, log_api_v0);
     CETECH_GET_API(api_v0, hash_api_v0);
 
@@ -988,24 +990,8 @@ void luasys_call_global(const char *func,
     lua_pop(_state, -1);
 }
 
-extern "C" void *luasys_load_module(struct api_v0 *api) {
+extern "C" void luasys_load_module(struct api_v0 *api) {
     _init(api);
-    return nullptr;
-
-//    switch (api) {
-//        case PLUGIN_EXPORT_API_ID: {
-//            static struct module_export_api_v0 module = {0};
-//
-//            module.init = _init;
-//            module.shutdown = _shutdown;
-//
-//            return &module;
-//        }
-//
-//
-//        default:
-//            return NULL;
-//    }
 }
 
 extern "C" void luasys_unload_module(struct api_v0 *api) {

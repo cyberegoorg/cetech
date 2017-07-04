@@ -49,7 +49,9 @@ struct config_api_v0 {
     void (*load_global)(struct app_api_v0 *app_api);
 
 #ifdef CETECH_CAN_COMPILE
+
     void (*compile_global)(struct app_api_v0 *app_api);
+
 #endif
 
     //! Parse commandline arguments.

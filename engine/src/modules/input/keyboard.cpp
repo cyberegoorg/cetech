@@ -6,9 +6,9 @@
 #include <cetech/kernel/config.h>
 #include <cetech/kernel/module.h>
 #include <cetech/celib/eventstream.inl>
-#include <cetech/kernel/machine.h>
+#include <cetech/kernel/sdl2_machine.h>
 #include <cetech/modules/input.h>
-#include <cetech/kernel/api.h>
+#include <cetech/kernel/api_system.h>
 
 #include "keystr.h"
 #include <cetech/kernel/log.h>
@@ -150,21 +150,8 @@ namespace keyboard_module {
     }
 
 
-    extern "C" void *keyboard_load_module(struct api_v0 *api) {
+    extern "C" void keyboard_load_module(struct api_v0 *api) {
         _init(api);
-        return nullptr;
-
-//        if (api == PLUGIN_EXPORT_API_ID) {
-//            static struct module_export_api_v0 module = {0};
-//
-//            module.init = _init;
-//            module.shutdown = _shutdown;
-//
-//            return &module;
-//
-//        }
-//
-//        return 0;
     }
 
 }

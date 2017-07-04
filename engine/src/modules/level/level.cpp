@@ -7,15 +7,15 @@
 #include <cetech/celib/quatf.inl>
 
 #include <cetech/kernel/config.h>
-#include <cetech/kernel/vio.h>
+#include <cetech/kernel/sdl2_os.h>
 #include <cetech/kernel/yaml.h>
 #include <cetech/kernel/hash.h>
-#include <cetech/kernel/api.h>
+#include <cetech/kernel/api_system.h>
 #include <cetech/kernel/memory.h>
 #include <cetech/kernel/module.h>
 
 #include <cetech/modules/entity.h>
-#include <cetech/modules/world.h>
+
 #include <cetech/modules/resource.h>
 #include <cetech/modules/transform.h>
 #include "cetech/modules/level.h"
@@ -28,7 +28,7 @@ CETECH_DECL_API(entity_api_v0);
 CETECH_DECL_API(resource_api_v0);
 CETECH_DECL_API(transform_api_v0);
 CETECH_DECL_API(memory_api_v0);
-CETECH_DECL_API(vio_api_v0);
+CETECH_DECL_API(os_vio_api_v0);
 CETECH_DECL_API(hash_api_v0);
 CETECH_DECL_API(blob_api_v0);
 CETECH_DECL_API(world_api_v0);
@@ -86,11 +86,11 @@ namespace {
 
 namespace level_resource {
 
-    void *loader(struct vio *input,
+    void *loader(struct os_vio *input,
                  struct allocator *allocator) {
-        const int64_t size = vio_api_v0.size(input);
+        const int64_t size = os_vio_api_v0.size(input);
         char *data = CETECH_ALLOCATE(allocator, char, size);
-        vio_api_v0.read(input, data, 1, size);
+        os_vio_api_v0.read(input, data, 1, size);
         return data;
     }
 
@@ -159,14 +159,14 @@ namespace level_resource_compiler {
     }
 
     int compiler(const char *filename,
-                 struct vio *source_vio,
-                 struct vio *build_vio,
+                 struct os_vio *source_vio,
+                 struct os_vio *build_vio,
                  struct compilator_api *compilator_api) {
 
-        char source_data[vio_api_v0.size(source_vio) + 1];
-        memset(source_data, 0, vio_api_v0.size(source_vio) + 1);
-        vio_api_v0.read(source_vio, source_data, sizeof(char),
-                        vio_api_v0.size(source_vio));
+        char source_data[os_vio_api_v0.size(source_vio) + 1];
+        memset(source_data, 0, os_vio_api_v0.size(source_vio) + 1);
+        os_vio_api_v0.read(source_vio, source_data, sizeof(char),
+                           os_vio_api_v0.size(source_vio));
 
         yaml_document_t h;
         yaml_node_t root = yaml_load_str(source_data, &h);
@@ -195,13 +195,13 @@ namespace level_resource_compiler {
 
         entity_api_v0.compiler_write_to_build(output, entity_data.data);
 
-        vio_api_v0.write(build_vio, &res, sizeof(level_blob::blob_t), 1);
-        vio_api_v0.write(build_vio, array::begin(id), sizeof(uint64_t),
-                         array::size(id));
-        vio_api_v0.write(build_vio, array::begin(offset), sizeof(uint32_t),
-                         array::size(offset));
-        vio_api_v0.write(build_vio, data->data(data->inst), sizeof(uint8_t),
-                         data->size(data->inst));
+        os_vio_api_v0.write(build_vio, &res, sizeof(level_blob::blob_t), 1);
+        os_vio_api_v0.write(build_vio, array::begin(id), sizeof(uint64_t),
+                            array::size(id));
+        os_vio_api_v0.write(build_vio, array::begin(offset), sizeof(uint32_t),
+                            array::size(offset));
+        os_vio_api_v0.write(build_vio, data->data(data->inst), sizeof(uint8_t),
+                            data->size(data->inst));
 
         blob_api_v0.destroy(data);
         entity_api_v0.compiler_destroy_output(output);
@@ -302,7 +302,7 @@ namespace level_module {
         CETECH_GET_API(api, memory_api_v0);
         CETECH_GET_API(api, resource_api_v0);
         CETECH_GET_API(api, transform_api_v0);
-        CETECH_GET_API(api, vio_api_v0);
+        CETECH_GET_API(api, os_vio_api_v0);
         CETECH_GET_API(api, hash_api_v0);
         CETECH_GET_API(api, blob_api_v0);
         CETECH_GET_API(api, world_api_v0);
@@ -331,22 +331,8 @@ namespace level_module {
         _shutdown();
     }
 
-    extern "C" void *level_load_module(struct api_v0 *api) {
+    extern "C" void level_load_module(struct api_v0 *api) {
         _init(api);
-        return nullptr;
 
-//        switch (api) {
-//            case PLUGIN_EXPORT_API_ID: {
-//                static struct module_export_api_v0 module = {0};
-//
-//                module.init = _init;
-//                module.shutdown = _shutdown;
-//
-//                return &module;
-//            }
-//
-//            default:
-//                return NULL;
-//        }
     }
 }

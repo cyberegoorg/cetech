@@ -4,8 +4,8 @@
 
 #include <cetech/kernel/log.h>
 #include <cetech/kernel/errors.h>
-#include <cetech/kernel/path.h>
-#include <cetech/kernel/api.h>
+#include <cetech/kernel/sdl2_os.h>
+#include <cetech/kernel/api_system.h>
 #include <cetech/kernel/memory.h>
 
 #include "include/sqlite3/sqlite3.h"
@@ -131,7 +131,7 @@ namespace log {
                       struct api_v0 *api) {
         CETECH_GET_API(api, log_api_v0);
 
-        struct path_v0 *path = (path_v0 *) api->first("path_v0").api;
+        struct os_path_v0 *path = (os_path_v0 *) api->first("os_path_v0").api;
         struct memory_api_v0 *memory = (memory_api_v0 *) api->first(
                 "memory_api_v0").api;
 

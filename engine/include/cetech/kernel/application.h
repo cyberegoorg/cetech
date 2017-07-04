@@ -12,7 +12,7 @@ extern "C" {
 // Include
 //==============================================================================
 
-typedef struct window_s window_t;
+typedef void os_window_t;
 
 //==============================================================================
 // Struct
@@ -48,7 +48,7 @@ struct app_api_v0 {
 
     //! Get main window
     //! \return Main window
-    window_t (*main_window)();
+    os_window_t *(*main_window)();
 };
 
 #ifdef __cplusplus

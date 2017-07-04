@@ -28,7 +28,8 @@ struct api_v0 {
     void (*register_api)(const char *name,
                          void *api);
 
-    int (*exist)(const char* name);
+    int (*exist)(const char *name);
+
     struct api_entry (*first)(const char *name);
 
     struct api_entry (*next)(struct api_entry *entry);

@@ -5,14 +5,13 @@
 #include <cetech/celib/mat44f.inl>
 #include <cetech/kernel/memory.h>
 #include <cetech/kernel/module.h>
-#include <cetech/kernel/api.h>
+#include <cetech/kernel/api_system.h>
 #include <cetech/celib/array.inl>
 #include <cetech/celib/map.inl>
 #include <cetech/kernel/yaml.h>
 
 #include <cetech/modules/entity.h>
-#include <cetech/modules/world.h>
-#include <cetech/modules/component.h>
+
 
 #include "cetech/modules/transform.h"
 
@@ -611,23 +610,8 @@ void transform_link(world_t world,
                                                                             parent)));
 }
 
-extern "C" void *transform_load_module(struct api_v0 *api) {
+extern "C" void transform_load_module(struct api_v0 *api) {
     _init(api);
-    return nullptr;
-
-//    switch (api) {
-//        case PLUGIN_EXPORT_API_ID: {
-//            static struct module_export_api_v0 module = {0};
-//
-//            module.init = _init;
-//            module.shutdown = _shutdown;
-//
-//            return &module;
-//        }
-//
-//        default:
-//            return NULL;
-//    }
 }
 
 extern "C" void transform_unload_module(struct api_v0 *api) {

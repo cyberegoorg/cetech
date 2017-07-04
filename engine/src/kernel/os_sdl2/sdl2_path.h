@@ -7,7 +7,7 @@
 #include <cetech/celib/array.inl>
 #include <cetech/celib/string_stream.h>
 
-#include <cetech/kernel/path.h>
+#include <cetech/kernel/sdl2_os.h>
 
 
 #if defined(CETECH_LINUX)
@@ -261,8 +261,3 @@ char *path_join(struct allocator *allocator,
 
     return data;
 }
-
-//! Get file modified time
-//! \param path File path
-//! \return Modified time
-uint32_t file_mtime(const char *path);

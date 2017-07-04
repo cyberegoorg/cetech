@@ -3,7 +3,7 @@
 
 #include <cetech/kernel/log.h>
 #include <cetech/kernel/errors.h>
-#include <cetech/kernel/api.h>
+#include <cetech/kernel/api_system.h>
 
 #define LOG_WHERE "log_system"
 

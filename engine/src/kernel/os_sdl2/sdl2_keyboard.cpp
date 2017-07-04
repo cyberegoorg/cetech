@@ -7,7 +7,7 @@
 #include <cetech/celib/eventstream.inl>
 #include <cetech/kernel/module.h>
 
-#include <cetech/kernel/machine.h>
+#include <cetech/kernel/sdl2_machine.h>
 
 using namespace cetech;
 

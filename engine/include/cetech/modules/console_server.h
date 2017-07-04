@@ -12,7 +12,7 @@ extern "C" {
 // Includes
 //==============================================================================
 
-#include <cetech/kernel/types.h>
+#include <cetech/kernel/macros.h>
 
 typedef struct mpack_node_t mpack_node_t;
 typedef struct mpack_writer_t mpack_writer_t;

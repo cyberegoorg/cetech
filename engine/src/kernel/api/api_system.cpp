@@ -6,11 +6,8 @@
 
 #include <cetech/kernel/hash.h>
 #include <cetech/kernel/module.h>
-#include <cetech/kernel/api.h>
+#include <cetech/kernel/api_system.h>
 #include <cetech/kernel/config.h>
-
-
-#include "../os/hash.inl"
 
 CETECH_DECL_API(hash_api_v0)
 
@@ -33,6 +30,8 @@ static struct ApiSystemGlobals {
 //==============================================================================
 // Private
 //==============================================================================
+
+uint64_t stringid64_from_string(const char *);
 
 namespace api {
     void register_api(const char *name,

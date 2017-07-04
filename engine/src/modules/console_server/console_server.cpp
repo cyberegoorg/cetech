@@ -4,7 +4,7 @@
 
 #include <stdio.h>
 
-#include <cetech/kernel/api.h>
+#include <cetech/kernel/api_system.h>
 #include <cetech/kernel/config.h>
 #include <cetech/kernel/module.h>
 #include <cetech/kernel/memory.h>
@@ -282,23 +282,8 @@ namespace consoleserver_module {
         _G.commands.destroy();
     }
 
-    extern "C" void *consoleserver_load_module(struct api_v0 *api) {
+    extern "C" void consoleserver_load_module(struct api_v0 *api) {
         _init(api);
-        return nullptr;
-
-//        switch (api) {
-//            case PLUGIN_EXPORT_API_ID: {
-//                static struct module_export_api_v0 module = {0};
-//
-//                module.init = _init;
-//                module.shutdown = _shutdown;
-//
-//                return &module;
-//            }
-//
-//            default:
-//                return NULL;
-//        }
     }
 
     extern "C" void consoleserver_unload_module(struct api_v0 *api) {

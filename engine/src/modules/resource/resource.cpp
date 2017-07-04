@@ -12,9 +12,8 @@
 #include <cetech/kernel/config.h>
 #include <cetech/kernel/memory.h>
 #include <cetech/kernel/module.h>
-#include <cetech/kernel/path.h>
-#include <cetech/kernel/vio.h>
-#include <cetech/kernel/api.h>
+#include <cetech/kernel/sdl2_os.h>
+#include <cetech/kernel/api_system.h>
 
 #include <cetech/modules/resource.h>
 #include <cetech/modules/console_server.h>
@@ -27,18 +26,17 @@
 #include "resource.h"
 #include <cetech/kernel/log.h>
 #include <cetech/kernel/errors.h>
-#include <cetech/kernel/thread.h>
 
 CETECH_DECL_API(memory_api_v0);
 CETECH_DECL_API(cnsole_srv_api_v0);
 CETECH_DECL_API(filesystem_api_v0);
 CETECH_DECL_API(config_api_v0);
 CETECH_DECL_API(app_api_v0);
-CETECH_DECL_API(path_v0);
-CETECH_DECL_API(vio_api_v0);
+CETECH_DECL_API(os_path_v0);
+CETECH_DECL_API(os_vio_api_v0);
 CETECH_DECL_API(log_api_v0);
 CETECH_DECL_API(hash_api_v0);
-CETECH_DECL_API(thread_api_v0);
+CETECH_DECL_API(os_thread_api_v0);
 
 
 void resource_register_type(uint64_t type,
@@ -92,7 +90,7 @@ namespace {
 
         int autoload_enabled;
 
-        spinlock_t add_lock;
+        os_spinlock_t add_lock;
 
         struct {
             cvar_t build_dir;
@@ -127,16 +125,16 @@ char *resource_compiler_get_build_dir(allocator *a,
                                       const char *platform) {
 
     const char *build_dir_str = config_api_v0.get_string(_G.config.build_dir);
-    return path_v0.join(a, 2, build_dir_str, platform);
+    return os_path_v0.join(a, 2, build_dir_str, platform);
 }
 
 namespace package_resource {
 
-    void *loader(struct vio *input,
+    void *loader(struct os_vio *input,
                  struct allocator *allocator) {
-        const int64_t size = vio_api_v0.size(input);
+        const int64_t size = os_vio_api_v0.size(input);
         char *data = CETECH_ALLOCATE(allocator, char, size);
-        vio_api_v0.read(input, data, 1, size);
+        os_vio_api_v0.read(input, data, 1, size);
 
         return data;
     }
@@ -203,13 +201,13 @@ namespace resource {
                     uint64_t *names,
                     void **resource_data,
                     size_t count) {
-        thread_api_v0.spin_lock(&_G.add_lock);
+        os_thread_api_v0.spin_lock(&_G.add_lock);
 
 
         const uint32_t type_idx = map::get(_G.type_map, type, UINT32_MAX);
 
         if (type_idx == UINT32_MAX) {
-            thread_api_v0.spin_unlock(&_G.add_lock);
+            os_thread_api_v0.spin_unlock(&_G.add_lock);
             return;
         }
 
@@ -242,7 +240,7 @@ namespace resource {
             _G.resource_callbacks[type_idx].online(names[i], resource_data[i]);
         }
 
-        thread_api_v0.spin_unlock(&_G.add_lock);
+        os_thread_api_v0.spin_unlock(&_G.add_lock);
     }
 
     void load(void **loaded_data,
@@ -267,12 +265,12 @@ namespace resource {
             return 1;
         }
 
-        thread_api_v0.spin_lock(&_G.add_lock);
+        os_thread_api_v0.spin_lock(&_G.add_lock);
 
         uint64_t id = hash_combine(type, name);
         int h = map::has(_G.resource_map, id);
 
-        thread_api_v0.spin_unlock(&_G.add_lock);
+        os_thread_api_v0.spin_unlock(&_G.add_lock);
 
         return h;
     }
@@ -281,16 +279,16 @@ namespace resource {
                     uint64_t *names,
                     size_t count) {
 
-//        thread_api_v0.spin_lock(&_G.add_lock);
+//        os_thread_api_v0.spin_lock(&_G.add_lock);
 
         for (size_t i = 0; i < count; ++i) {
             if (!can_get(type, names[i])) {
-                //thread_api_v0.spin_unlock(&_G.add_lock);
+                //os_thread_api_v0.spin_unlock(&_G.add_lock);
                 return 0;
             }
         }
 
-//        thread_api_v0.spin_unlock(&_G.add_lock);
+//        os_thread_api_v0.spin_unlock(&_G.add_lock);
 
         return 1;
     }
@@ -301,7 +299,7 @@ namespace resource {
               size_t count,
               int force) {
 
-        thread_api_v0.spin_lock(&_G.add_lock);
+        os_thread_api_v0.spin_lock(&_G.add_lock);
 
         const uint32_t idx = map::get(_G.type_map, type, UINT32_MAX);
 
@@ -309,7 +307,7 @@ namespace resource {
             log_api_v0.error(LOG_WHERE,
                              "Loader for resource is not is not registred");
             memset(loaded_data, sizeof(void *), count);
-            thread_api_v0.spin_unlock(&_G.add_lock);
+            os_thread_api_v0.spin_unlock(&_G.add_lock);
             return;
         }
 
@@ -351,9 +349,9 @@ namespace resource {
                                      root_name),
                              build_name);
 
-            struct vio *resource_file = filesystem_api_v0.open(root_name,
-                                                               build_name,
-                                                               FS_OPEN_READ);
+            struct os_vio *resource_file = filesystem_api_v0.open(root_name,
+                                                                  build_name,
+                                                                  FS_OPEN_READ);
 
             if (resource_file != NULL) {
                 loaded_data[i] = type_clb.loader(resource_file,
@@ -364,18 +362,18 @@ namespace resource {
             }
         }
 
-        thread_api_v0.spin_unlock(&_G.add_lock);
+        os_thread_api_v0.spin_unlock(&_G.add_lock);
     }
 
     void unload(uint64_t type,
                 uint64_t *names,
                 size_t count) {
-        thread_api_v0.spin_lock(&_G.add_lock);
+        os_thread_api_v0.spin_lock(&_G.add_lock);
 
         const uint32_t idx = map::get(_G.type_map, type, UINT32_MAX);
 
         if (idx == UINT32_MAX) {
-            thread_api_v0.spin_unlock(&_G.add_lock);
+            os_thread_api_v0.spin_unlock(&_G.add_lock);
             return;
         }
 
@@ -421,12 +419,12 @@ namespace resource {
 
             //_G.resource_data[idx] = item;
         }
-        thread_api_v0.spin_unlock(&_G.add_lock);
+        os_thread_api_v0.spin_unlock(&_G.add_lock);
     }
 
     void *get(uint64_t type,
               uint64_t name) {
-        //thread_api_v0.spin_lock(&_G.add_lock);
+        //os_thread_api_v0.spin_lock(&_G.add_lock);
 
         uint64_t id = hash_combine(type, name);
         uint32_t idx = map::get(_G.resource_map, id, UINT32_MAX);
@@ -468,7 +466,7 @@ namespace resource {
             }
         }
 
-        //thread_api_v0.spin_unlock(&_G.add_lock);
+        //os_thread_api_v0.spin_unlock(&_G.add_lock);
 
         return item.data;
     }
@@ -563,14 +561,14 @@ namespace resource_module {
             .compiler_get_build_dir = ::resource_compiler_get_build_dir,
 
 #ifdef CETECH_CAN_COMPILE
-    .compiler_get_core_dir = resource_compiler_get_core_dir,
-    .compiler_register = resource_compiler_register,
-    .compiler_compile_all = resource_compiler_compile_all,
-    .compiler_get_filename = resource_compiler_get_filename,
-    .compiler_get_tmp_dir = resource_compiler_get_tmp_dir,
-    .compiler_external_join = resource_compiler_external_join,
-    .compiler_create_build_dir = resource_compiler_create_build_dir,
-    .compiler_get_source_dir = resource_compiler_get_source_dir,
+            .compiler_get_core_dir = resource_compiler_get_core_dir,
+            .compiler_register = resource_compiler_register,
+            .compiler_compile_all = resource_compiler_compile_all,
+            .compiler_get_filename = resource_compiler_get_filename,
+            .compiler_get_tmp_dir = resource_compiler_get_tmp_dir,
+            .compiler_external_join = resource_compiler_external_join,
+            .compiler_create_build_dir = resource_compiler_create_build_dir,
+            .compiler_get_source_dir = resource_compiler_get_source_dir,
 #endif
 
     };
@@ -607,11 +605,11 @@ namespace resource_module {
         CETECH_GET_API(api, filesystem_api_v0);
         CETECH_GET_API(api, config_api_v0);
         CETECH_GET_API(api, app_api_v0);
-        CETECH_GET_API(api, path_v0);
-        CETECH_GET_API(api, vio_api_v0);
+        CETECH_GET_API(api, os_path_v0);
+        CETECH_GET_API(api, os_vio_api_v0);
         CETECH_GET_API(api, log_api_v0);
         CETECH_GET_API(api, hash_api_v0);
-        CETECH_GET_API(api, thread_api_v0);
+        CETECH_GET_API(api, os_thread_api_v0);
 
         _init_cvar(config_api_v0);
 
@@ -620,7 +618,7 @@ namespace resource_module {
         _G.resource_callbacks.init(memory_api_v0.main_allocator());
         _G.resource_map.init(memory_api_v0.main_allocator());
 
-        char *build_dir_full = path_v0.join(
+        char *build_dir_full = os_path_v0.join(
                 memory_api_v0.main_allocator(), 2,
                 config_api_v0.get_string(_G.config.build_dir),
                 app_api_v0.platform());
@@ -648,28 +646,12 @@ namespace resource_module {
         _G.resource_map.destroy();
     }
 
-    extern "C" void resourcesystem_unload_module(struct api_v0 *api) {
-        _shutdown();
+
+    extern "C" void resourcesystem_load_module(struct api_v0 *api) {
+        _init(api);
     }
 
-    extern "C" void *resourcesystem_load_module(struct api_v0 *api) {
-        _init(api);
-        return nullptr;
-
-//        switch (api) {
-//            case PLUGIN_EXPORT_API_ID: {
-//                static struct module_export_api_v0 module = {0};
-//
-//                module.init = _init;
-//                module.shutdown = _shutdown;
-//
-//                return &module;
-//            }
-//
-//
-//            default:
-//                return NULL;
-//        }
-
+    extern "C" void resourcesystem_unload_module(struct api_v0 *api) {
+        _shutdown();
     }
 }

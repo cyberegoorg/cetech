@@ -2,10 +2,11 @@
 
 #include <cetech/kernel/hash.h>
 #include <memory.h>
+#include <cetech/kernel/api_system.h>
 
-static uint64_t hash_murmur2_64(const void *key,
-                                uint64_t len,
-                                uint64_t seed) {
+uint64_t hash_murmur2_64(const void *key,
+                         uint64_t len,
+                         uint64_t seed) {
 
     static const uint64_t m = 0xc6a4a7935bd1e995ULL;
     static const uint32_t r = 47;
@@ -70,6 +71,19 @@ static uint64_t hash_murmur2_64(const void *key,
 // Interface
 //==============================================================================
 
-static uint64_t stringid64_from_string(const char *str) {
+uint64_t stringid64_from_string(const char *str) {
     return hash_murmur2_64(str, strlen(str), STRINGID64_SEED);
+}
+
+static struct hash_api_v0 hash_api = {
+        .id64_from_str = stringid64_from_string,
+        .hash_murmur2_64 = hash_murmur2_64
+};
+
+extern "C" void hashlib_load_module(struct api_v0 *api) {
+    api->register_api("hash_api_v0", &hash_api);
+}
+
+extern "C" void hashlib_unload_module(struct api_v0 *api) {
+
 }

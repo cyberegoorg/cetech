@@ -12,7 +12,7 @@ extern "C" {
 #include <time.h>
 #include <stdarg.h>
 
-#include "types.h"
+#include "macros.h"
 
 struct api_v0;
 

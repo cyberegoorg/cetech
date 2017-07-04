@@ -8,8 +8,8 @@
 #include <cetech/kernel/module.h>
 #include <cetech/celib/eventstream.inl>
 
-#include <cetech/kernel/machine.h>
-#include <cetech/kernel/api.h>
+#include <cetech/kernel/sdl2_machine.h>
+#include <cetech/kernel/api_system.h>
 #include <cetech/kernel/log.h>
 
 //==============================================================================
@@ -246,13 +246,14 @@ void sdl_gamepad_process_event(SDL_Event *event,
     }
 }
 
-int _machine_gamepad_is_active(int idx) {
+int sdl_gamepad_is_active(int idx) {
     return _G.controller[idx] != NULL;
 }
 
-void _machine_gamepad_play_rumble(int gamepad,
-                                  float strength,
-                                  uint32_t length) {
+void sdl_gamepad_play_rumble(int gamepad,
+                             float strength,
+                             uint32_t length) {
+
     SDL_Haptic *h = _G.haptic[gamepad];
 
     SDL_HapticRumblePlay(h, strength, length);

@@ -5,11 +5,11 @@
 #include <stdlib.h>
 #include <memory.h>
 
-#include <cetech/kernel/path.h>
+#include <cetech/kernel/sdl2_os.h>
 #include <cetech/kernel/memory.h>
 #include <cetech/kernel/module.h>
 #include <cetech/kernel/config.h>
-#include <cetech/kernel/api.h>
+#include <cetech/kernel/api_system.h>
 #include <cetech/kernel/log.h>
 
 
@@ -36,7 +36,7 @@ static struct ModuleSystemGlobals {
 } _G = {0};
 
 CETECH_DECL_API(memory_api_v0);
-CETECH_DECL_API(path_v0);
+CETECH_DECL_API(os_path_v0);
 CETECH_DECL_API(log_api_v0);
 CETECH_DECL_API(api_v0);
 
@@ -96,12 +96,14 @@ namespace module {
             return;
         }
 
-        load_module_t load_fce = (load_module_t) load_function(obj, "load_module");
+        load_module_t load_fce = (load_module_t) load_function(obj,
+                                                               "load_module");
         if (load_fce == NULL) {
             return;
         }
 
-        unload_module_t unload_fce = (unload_module_t) load_function(obj, "unload_module");
+        unload_module_t unload_fce = (unload_module_t) load_function(obj,
+                                                                     "unload_module");
         if (unload_fce == NULL) {
             return;
         }
@@ -181,19 +183,19 @@ namespace module {
         char **files = nullptr;
         uint32_t files_count = 0;
 
-        path_v0.list(path, 1, &files, &files_count,
-                     memory_api_v0.main_scratch_allocator());
+        os_path_v0.list(path, 1, &files, &files_count,
+                        memory_api_v0.main_scratch_allocator());
 
         for (int k = 0; k < files_count; ++k) {
-            const char *filename = path_v0.filename(files[k]);
+            const char *filename = os_path_v0.filename(files[k]);
 
             if (!strncmp(filename, PLUGIN_PREFIX, strlen(PLUGIN_PREFIX))) {
                 load(files[k]);
             }
         }
 
-        path_v0.list_free(files, files_count,
-                          memory_api_v0.main_scratch_allocator());
+        os_path_v0.list_free(files, files_count,
+                             memory_api_v0.main_scratch_allocator());
     }
 
     void unload_all() {
@@ -215,7 +217,7 @@ namespace module {
     void init(struct allocator *allocator,
               struct api_v0 *api) {
         CETECH_GET_API(api, memory_api_v0);
-        CETECH_GET_API(api, path_v0);
+        CETECH_GET_API(api, os_path_v0);
         CETECH_GET_API(api, log_api_v0);
         api_v0 = *api;
 

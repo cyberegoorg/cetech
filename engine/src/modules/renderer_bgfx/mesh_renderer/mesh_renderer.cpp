@@ -7,12 +7,12 @@
 #include <cetech/kernel/config.h>
 #include <cetech/kernel/memory.h>
 #include <cetech/kernel/module.h>
-#include <cetech/kernel/api.h>
+#include <cetech/kernel/api_system.h>
 
 #include <cetech/modules/resource.h>
-#include <cetech/modules/world.h>
+
 #include <cetech/modules/entity.h>
-#include <cetech/modules/component.h>
+
 #include "cetech/modules/renderer.h"
 #include "cetech/modules/transform.h"
 #include "cetech/modules/scenegraph.h"
@@ -470,7 +470,7 @@ namespace mesh {
     }
 }
 
-//extern "C" void *mesh_load_module(struct api_v0* api) {
+//extern "C" void mesh_load_module(struct api_v0* api) {
 //    _init(api);
 //    return nullptr;
 //

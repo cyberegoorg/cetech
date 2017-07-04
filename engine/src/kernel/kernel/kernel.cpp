@@ -1,14 +1,14 @@
 #include <cetech/celib/allocator.h>
-#include <cetech/kernel/api.h>
+#include <cetech/kernel/api_system.h>
 #include <cetech/kernel/application.h>
 #include <cetech/kernel/task.h>
 
-#include "log/log_system_private.h"
-#include "memory/memory_private.h"
-#include "api/_api.h"
-#include "os/os_private.h"
-#include "module/module_private.h"
-#include "config/config_private.h"
+#include "../log/log_system_private.h"
+#include "../memory/memory_private.h"
+#include "../api/api_private.h"
+#include "../os_sdl2/sdl2_os_private.h"
+#include "../module/module_private.h"
+#include "../config/config_private.h"
 #include "static_module.h"
 
 CETECH_DECL_API(app_api_v0);
@@ -28,9 +28,8 @@ int application_shutdown();
 extern void error_register_api(struct api_v0 *api);
 
 extern "C" void _init_core_modules() {
-    ADD_STATIC_MODULE(os);
     ADD_STATIC_MODULE(blob);
-    ADD_STATIC_MODULE(machine);
+    ADD_STATIC_MODULE(os);
     ADD_STATIC_MODULE(task);
     ADD_STATIC_MODULE(developsystem);
     ADD_STATIC_MODULE(consoleserver);
@@ -68,6 +67,10 @@ int init_config(int argc,
 
 void application_register_api(struct api_v0 *api);
 
+extern "C" void init_hashlib(struct api_v0 *api) {
+    LOAD_STATIC_MODULE(api, hashlib);
+}
+
 int cetech_kernel_init(int argc,
                        const char **argv) {
 
@@ -83,12 +86,13 @@ int cetech_kernel_init(int argc,
     memory::register_api(api);
     error_register_api(api);
 
-    os::init(api);
+    init_hashlib(api);
     application_register_api(api);
 
-    CETECH_GET_API(api, app_api_v0);
-
+    os::register_api(api);
     module::init(a, api);
+
+    CETECH_GET_API(api, app_api_v0);
     config::init(api);
 
     log::logdb_init_db(".", api);

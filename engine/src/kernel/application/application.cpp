@@ -7,16 +7,14 @@
 #include <cetech/celib/allocator.h>
 #include <cetech/celib/eventstream.inl>
 
-#include <cetech/kernel/api.h>
+#include <cetech/kernel/api_system.h>
 #include <cetech/kernel/hash.h>
 #include <cetech/kernel/config.h>
 #include <cetech/kernel/application.h>
-#include <cetech/kernel/window.h>
-#include <cetech/kernel/path.h>
-#include <cetech/kernel/time.h>
+#include <cetech/kernel/sdl2_os.h>
 #include <cetech/kernel/task.h>
 #include <cetech/kernel/develop.h>
-#include <cetech/kernel/machine.h>
+#include <cetech/kernel/sdl2_machine.h>
 
 #include <cetech/modules/resource.h>
 #include <cetech/modules/luasys.h>
@@ -24,7 +22,7 @@
 #include <cetech/modules/package.h>
 #include <cetech/modules/console_server.h>
 
-#include "../api/_api.h"
+#include "../api/api_private.h"
 #include "../module/module_private.h"
 #include "../log/log_system_private.h"
 
@@ -40,9 +38,9 @@ CETECH_DECL_API(package_api_v0);
 CETECH_DECL_API(task_api_v0);
 CETECH_DECL_API(lua_api_v0);
 CETECH_DECL_API(config_api_v0);
-CETECH_DECL_API(window_api_v0);
-CETECH_DECL_API(time_api_v0);
-CETECH_DECL_API(path_v0);
+CETECH_DECL_API(os_window_api_v0);
+CETECH_DECL_API(os_time_api_v0);
+CETECH_DECL_API(os_path_v0);
 CETECH_DECL_API(log_api_v0);
 CETECH_DECL_API(hash_api_v0);
 CETECH_DECL_API(api_v0);
@@ -83,7 +81,7 @@ static struct ApplicationGlobals {
     struct GConfig config;
 
     const struct game_callbacks *game;
-    window_t main_window;
+    os_window_t *main_window;
     int is_running;
     int init_error;
     float dt;
@@ -108,7 +106,7 @@ const char *application_platform();
 
 const char *application_native_platform();
 
-window_t application_get_main_window();
+os_window_t *application_get_main_window();
 
 
 void application_quit() {
@@ -125,8 +123,8 @@ static struct app_api_v0 api_v1 = {
 
 void _init_api(struct api_v0 *api) {
     CETECH_GET_API(api, config_api_v0);
-    CETECH_GET_API(api, time_api_v0);
-    CETECH_GET_API(api, path_v0);
+    CETECH_GET_API(api, os_time_api_v0);
+    CETECH_GET_API(api, os_path_v0);
     CETECH_GET_API(api, log_api_v0);
     CETECH_GET_API(api, hash_api_v0);
 
@@ -137,7 +135,7 @@ void _init_api(struct api_v0 *api) {
     CETECH_GET_API(api, package_api_v0);
     CETECH_GET_API(api, task_api_v0);
     CETECH_GET_API(api, lua_api_v0);
-    CETECH_GET_API(api, window_api_v0);
+    CETECH_GET_API(api, os_window_api_v0);
     CETECH_GET_API(api, machine_api_v0);
 
     CETECH_GET_API(api, keyboard_api_v0);
@@ -239,7 +237,7 @@ void application_start() {
                  config_api_v0.get_string(_G.config.boot_script));
 
         if (wid == 0) {
-            _G.main_window = window_api_v0.create(
+            _G.main_window = os_window_api_v0.create(
                     title,
                     WINDOWPOS_UNDEFINED,
                     WINDOWPOS_UNDEFINED,
@@ -249,7 +247,7 @@ void application_start() {
                     ? WINDOW_FULLSCREEN : WINDOW_NOFLAG
             );
         } else {
-            _G.main_window = window_api_v0.create_from((void *) wid);
+            _G.main_window = os_window_api_v0.create_from((void *) wid);
         }
 
         renderer_api_v0.create(_G.main_window);
@@ -257,7 +255,7 @@ void application_start() {
 
     _boot_stage();
 
-    uint64_t last_tick = time_api_v0.perf_counter();
+    uint64_t last_tick = os_time_api_v0.perf_counter();
     _G.game = lua_api_v0.get_game_callbacks();
 
     if (!_G.game->init()) {
@@ -278,9 +276,9 @@ void application_start() {
         auto application_sd = develop_api_v0.enter_scope(
                 "Application:update()");
 
-        uint64_t now_ticks = time_api_v0.perf_counter();
+        uint64_t now_ticks = os_time_api_v0.perf_counter();
         float dt =
-                ((float) (now_ticks - last_tick)) / time_api_v0.perf_freq();
+                ((float) (now_ticks - last_tick)) / os_time_api_v0.perf_freq();
 
         _G.dt = dt;
         last_tick = now_ticks;
@@ -333,6 +331,6 @@ const char *application_platform() {
     return application_native_platform();
 }
 
-window_t application_get_main_window() {
+os_window_t *application_get_main_window() {
     return _G.main_window;
 }

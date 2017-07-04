@@ -2,14 +2,14 @@
 #define CETECH_LUA_RESOURCE_H
 
 
-#include <cetech/kernel/path.h>
+#include <cetech/kernel/sdl2_os.h>
 
 namespace resource_lua {
-    void *loader(struct vio *input,
+    void *loader(struct os_vio *input,
                  struct allocator *allocator) {
-        const int64_t size = vio_api_v0.size(input);
+        const int64_t size = os_vio_api_v0.size(input);
         char *data = CETECH_ALLOCATE(allocator, char, size);
-        vio_api_v0.read(input, data, 1, size);
+        os_vio_api_v0.read(input, data, 1, size);
 
         return data;
     }

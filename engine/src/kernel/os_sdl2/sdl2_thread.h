@@ -1,4 +1,4 @@
-#include <cetech/kernel/thread.h>
+#include <cetech/kernel/sdl2_os.h>
 
 #include "include/SDL2/SDL.h"
 
@@ -14,33 +14,31 @@
 //! \param name Thread name
 //! \param data Thread data
 //! \return new thread
-thread_t thread_create(thread_fce_t fce,
-                       const char *name,
-                       void *data) {
-    return (thread_t) {
-            .t = (void *) SDL_CreateThread(fce, name, data)
-    };
+os_thread_t *thread_create(thread_fce_t fce,
+                           const char *name,
+                           void *data) {
+    return (os_thread_t *) SDL_CreateThread(fce, name, data);
 }
 
 //! Kill thread
 //! \param thread thread
-void thread_kill(thread_t thread) {
-    SDL_DetachThread((SDL_Thread *) thread.t);
+void thread_kill(os_thread_t *thread) {
+    SDL_DetachThread((SDL_Thread *) thread);
 }
 
 //! Wait for thread
 //! \param thread Thread
 //! \param status Thread exit status
-void thread_wait(thread_t thread,
+void thread_wait(os_thread_t *thread,
                  int *status) {
-    SDL_WaitThread((SDL_Thread *) thread.t, status);
+    SDL_WaitThread((SDL_Thread *) thread, status);
 }
 
 //! Get id for thread
 //! \param thread Thread
 //! \return ID
-uint64_t thread_get_id(thread_t thread) {
-    return SDL_GetThreadID((SDL_Thread *) thread.t);
+uint64_t thread_get_id(os_thread_t *thread) {
+    return SDL_GetThreadID((SDL_Thread *) thread);
 }
 
 //! Get actual thread id
@@ -57,10 +55,10 @@ void thread_yield() {
 #endif
 }
 
-void thread_spin_lock(spinlock_t *lock) {
+void thread_spin_lock(os_spinlock_t *lock) {
     SDL_AtomicLock((SDL_SpinLock *) lock);
 }
 
-void thread_spin_unlock(spinlock_t *lock) {
+void thread_spin_unlock(os_spinlock_t *lock) {
     SDL_AtomicUnlock((SDL_SpinLock *) lock);
 }

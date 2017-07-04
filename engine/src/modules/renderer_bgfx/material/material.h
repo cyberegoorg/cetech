@@ -34,8 +34,8 @@ namespace material {
 
 namespace material_compiler {
     int compiler(const char *filename,
-                 struct vio *source_vio,
-                 struct vio *build_vio,
+                 struct os_vio *source_vio,
+                 struct os_vio *build_vio,
                  struct compilator_api *compilator_api);
 }
 

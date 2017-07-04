@@ -1,6 +1,6 @@
 #include <string>
 #include <cstring>
-#include <cetech/kernel/types.h>
+#include <cetech/kernel/macros.h>
 
 extern "C" {
 #include <cetech/kernel/yaml.h>

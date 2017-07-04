@@ -6,7 +6,7 @@
 //==============================================================================
 
 #include "array.inl"
-#include "cetech/kernel/types.h"
+#include "cetech/kernel/macros.h"
 
 struct event_header {
     uint32_t type;

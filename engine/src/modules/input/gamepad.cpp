@@ -8,8 +8,8 @@
 #include <cetech/celib/eventstream.inl>
 #include <cetech/modules/input.h>
 #include <cetech/kernel/module.h>
-#include <cetech/kernel/machine.h>
-#include <cetech/kernel/api.h>
+#include <cetech/kernel/sdl2_machine.h>
+#include <cetech/kernel/api_system.h>
 
 #include "gamepadstr.h"
 #include <cetech/kernel/log.h>
@@ -217,21 +217,8 @@ namespace gamepad_module {
         _G = {0};
     }
 
-    extern "C" void *gamepad_load_module(struct api_v0 *api) {
+    extern "C" void gamepad_load_module(struct api_v0 *api) {
         _init(api);
-        return nullptr;
-
-//        if (api == PLUGIN_EXPORT_API_ID) {
-//            static struct module_export_api_v0 module = {0};
-//
-//            module.init = _init;
-//            module.shutdown = _shutdown;
-//            //module.update = _update;
-//
-//            return &module;
-//
-//        }
-//        return 0;
     }
 
     extern "C" void gamepad_unload_module(struct api_v0 *api) {

@@ -9,11 +9,9 @@
 #include <cetech/kernel/memory.h>
 #include <cetech/kernel/application.h>
 #include <cetech/kernel/module.h>
-#include <cetech/kernel/api.h>
+#include <cetech/kernel/api_system.h>
 #include <cetech/kernel/log.h>
-#include <cetech/kernel/path.h>
-#include <cetech/kernel/vio.h>
-#include <cetech/kernel/process.h>
+#include <cetech/kernel/sdl2_os.h>
 
 #include <cetech/modules/resource.h>
 #include <cetech/celib/string_stream.h>
@@ -44,9 +42,9 @@ struct TextureResourceGlobals {
 CETECH_DECL_API(memory_api_v0);
 CETECH_DECL_API(resource_api_v0);
 CETECH_DECL_API(app_api_v0);
-CETECH_DECL_API(path_v0);
-CETECH_DECL_API(vio_api_v0);
-CETECH_DECL_API(process_api_v0);
+CETECH_DECL_API(os_path_v0);
+CETECH_DECL_API(os_vio_api_v0);
+CETECH_DECL_API(os_process_api_v0);
 CETECH_DECL_API(log_api_v0);
 CETECH_DECL_API(hash_api_v0);
 
@@ -64,11 +62,11 @@ namespace texture_resource {
     static const bgfx::TextureHandle null_texture = {0};
 
 
-    void *_texture_resource_loader(struct vio *input,
+    void *_texture_resource_loader(struct os_vio *input,
                                    struct allocator *allocator) {
-        const int64_t size = vio_api_v0.size(input);
+        const int64_t size = os_vio_api_v0.size(input);
         char *data = CETECH_ALLOCATE(allocator, char, size);
-        vio_api_v0.read(input, data, 1, size);
+        os_vio_api_v0.read(input, data, 1, size);
 
         return data;
     }
@@ -133,9 +131,9 @@ namespace texture {
         CETECH_GET_API(api, memory_api_v0);
         CETECH_GET_API(api, resource_api_v0);
         CETECH_GET_API(api, app_api_v0);
-        CETECH_GET_API(api, path_v0);
-        CETECH_GET_API(api, vio_api_v0);
-        CETECH_GET_API(api, process_api_v0);
+        CETECH_GET_API(api, os_path_v0);
+        CETECH_GET_API(api, os_vio_api_v0);
+        CETECH_GET_API(api, os_process_api_v0);
         CETECH_GET_API(api, log_api_v0);
         CETECH_GET_API(api, hash_api_v0);
 

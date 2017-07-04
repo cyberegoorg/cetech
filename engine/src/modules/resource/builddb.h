@@ -2,7 +2,7 @@
 #define CETECH_BUILDDB_H
 
 #include <time.h>
-#include <cetech/kernel/types.h>
+#include <cetech/kernel/macros.h>
 #include "include/sqlite3/sqlite3.h"
 
 static int _step(sqlite3 *db,
@@ -76,7 +76,7 @@ static int _do_sql(const char *sql) {
 }
 
 static int builddb_init_db(const char *build_dir,
-                           struct path_v0 *path,
+                           struct os_path_v0 *path,
                            struct memory_api_v0 *memory) {
 
     _logdb_path = path->join(memory->main_allocator(), 2, build_dir,
@@ -187,7 +187,7 @@ static int builddb_get_filename_by_hash(char *filename,
 
 static int builddb_need_compile(const char *source_dir,
                                 const char *filename,
-                                struct path_v0 *path) {
+                                struct os_path_v0 *path) {
     static const char *sql = "SELECT\n"
             "    file_dependency.depend_on, files.mtime\n"
             "FROM\n"

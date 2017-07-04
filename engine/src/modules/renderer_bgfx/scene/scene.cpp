@@ -8,20 +8,16 @@
 #include <cetech/kernel/hash.h>
 #include <cetech/kernel/memory.h>
 #include <cetech/kernel/module.h>
-#include <cetech/kernel/api.h>
-#include <cetech/kernel/path.h>
-#include <cetech/kernel/vio.h>
+#include <cetech/kernel/api_system.h>
+#include <cetech/kernel/sdl2_os.h>
 
 #include <cetech/modules/resource.h>
 #include <cetech/modules/entity.h>
-#include <cetech/modules/world.h>
+
 #include <cetech/kernel/yaml.h>
-#include <cetech/kernel/thread.h>
-#include <bgfx/bgfx.h>
-#include "cetech/modules/scenegraph.h"
+#include <cetech/modules/scenegraph.h>
 
 #include "scene_blob.h"
-
 
 using namespace cetech;
 
@@ -36,10 +32,10 @@ namespace scene_resource_compiler {
 CETECH_DECL_API(memory_api_v0);
 CETECH_DECL_API(resource_api_v0);
 CETECH_DECL_API(scenegprah_api_v0);
-CETECH_DECL_API(path_v0);
-CETECH_DECL_API(vio_api_v0);
+CETECH_DECL_API(os_path_v0);
+CETECH_DECL_API(os_vio_api_v0);
 CETECH_DECL_API(hash_api_v0);
-CETECH_DECL_API(thread_api_v0);
+CETECH_DECL_API(os_thread_api_v0);
 
 
 struct scene_instance {
@@ -125,11 +121,11 @@ namespace scene_resource {
     static const bgfx::TextureHandle null_texture = {0};
 
 
-    void *loader(struct vio *input,
+    void *loader(struct os_vio *input,
                  struct allocator *allocator) {
-        const int64_t size = vio_api_v0.size(input);
+        const int64_t size = os_vio_api_v0.size(input);
         char *data = CETECH_ALLOCATE(allocator, char, size);
-        vio_api_v0.read(input, data, 1, size);
+        os_vio_api_v0.read(input, data, 1, size);
 
         return data;
     }
@@ -211,10 +207,10 @@ namespace scene {
         CETECH_GET_API(api, memory_api_v0);
         CETECH_GET_API(api, resource_api_v0);
         CETECH_GET_API(api, scenegprah_api_v0);
-        CETECH_GET_API(api, path_v0);
-        CETECH_GET_API(api, vio_api_v0);
+        CETECH_GET_API(api, os_path_v0);
+        CETECH_GET_API(api, os_vio_api_v0);
         CETECH_GET_API(api, hash_api_v0);
-        CETECH_GET_API(api, thread_api_v0);
+        CETECH_GET_API(api, os_thread_api_v0);
 
         _G = {0};
 

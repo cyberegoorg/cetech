@@ -6,12 +6,12 @@
 
 #include <cetech/kernel/module.h>
 #include <cetech/celib/eventstream.inl>
-#include <cetech/kernel/window.h>
+#include <cetech/kernel/sdl2_os.h>
 
 #include <cetech/kernel/application.h>
 #include <cetech/modules/resource.h>
-#include <cetech/kernel/machine.h>
-#include <cetech/kernel/api.h>
+#include <cetech/kernel/sdl2_machine.h>
+#include <cetech/kernel/api_system.h>
 
 using namespace cetech;
 
@@ -34,7 +34,7 @@ static struct G {
 
 
 CETECH_DECL_API(app_api_v0);
-CETECH_DECL_API(window_api_v0);
+CETECH_DECL_API(os_window_api_v0);
 
 //==============================================================================
 // Interface
@@ -44,7 +44,7 @@ int sdl_mouse_init(struct api_v0 *api) {
     _G = (struct G) {0};
 
     CETECH_GET_API(api, app_api_v0);
-    CETECH_GET_API(api, window_api_v0);
+    CETECH_GET_API(api, os_window_api_v0);
 
     return 1;
 }
@@ -65,10 +65,11 @@ void sdl_mouse_process(EventStream &stream) {
     curent_state[MOUSE_BTN_MIDLE] = (uint8_t) (state & SDL_BUTTON_MMASK);
 
     if ((pos[0] != _G.position[0]) || (pos[1] != _G.position[1])) {
-        window_t main_window = app_api_v0.main_window();
+        auto *main_window = app_api_v0.main_window();
+
         uint32_t window_size[2] = {0};
-        window_api_v0.size(main_window, &window_size[0],
-                           &window_size[1]);
+        os_window_api_v0.size(main_window, &window_size[0],
+                              &window_size[1]);
 
         _G.position[0] = pos[0];
         _G.position[1] = window_size[1] - pos[1];

@@ -4,7 +4,7 @@
 #include <cetech/kernel/module.h>
 #include <cetech/modules/luasys.h>
 #include <cetech/modules/input.h>
-#include <cetech/kernel/api.h>
+#include <cetech/kernel/api_system.h>
 
 CETECH_DECL_API(mouse_api_v0);
 

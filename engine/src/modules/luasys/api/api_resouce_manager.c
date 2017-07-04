@@ -5,7 +5,7 @@
 
 #include <cetech/modules/resource.h>
 
-#include <cetech/kernel/api.h>
+#include <cetech/kernel/api_system.h>
 
 #define API_NAME "ResourceManager"
 

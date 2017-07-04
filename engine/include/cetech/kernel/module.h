@@ -13,8 +13,8 @@ struct api_v0;
 // Typedefs
 //==============================================================================
 
-typedef void (*load_module_t)(struct api_v0* api);
-typedef void (*unload_module_t)(struct api_v0* api);
+typedef void (*load_module_t)(struct api_v0 *api);
+typedef void (*unload_module_t)(struct api_v0 *api);
 
 //==============================================================================
 // Interface

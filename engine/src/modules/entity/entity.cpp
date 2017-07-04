@@ -7,28 +7,27 @@
 #include <cetech/celib/handler.inl>
 #include <cetech/celib/map.inl>
 
-#include <cetech/kernel/api.h>
+#include <cetech/kernel/api_system.h>
 #include <cetech/kernel/module.h>
 #include <cetech/kernel/memory.h>
 #include <cetech/kernel/yaml.h>
 #include <cetech/kernel/hash.h>
-#include <cetech/kernel/path.h>
+#include <cetech/kernel/sdl2_os.h>
 #include <cetech/kernel/log.h>
-#include <cetech/kernel/vio.h>
 #include <cetech/kernel/config.h>
 
 #include <cetech/modules/resource.h>
-#include <cetech/modules/world.h>
+
 #include <cetech/modules/entity.h>
-#include <cetech/modules/component.h>
+
 #include <cetech/kernel/errors.h>
 
 CETECH_DECL_API(memory_api_v0);
 CETECH_DECL_API(component_api_v0);
 CETECH_DECL_API(resource_api_v0);
-CETECH_DECL_API(path_v0);
+CETECH_DECL_API(os_path_v0);
 CETECH_DECL_API(log_api_v0);
-CETECH_DECL_API(vio_api_v0);
+CETECH_DECL_API(os_vio_api_v0);
 CETECH_DECL_API(hash_api_v0);
 CETECH_DECL_API(blob_api_v0);
 
@@ -144,16 +143,16 @@ namespace entity_resource_compiler {
             capi->add_dependency(filename, prefab_file);
 
 
-            char* full_path = path_v0.join(a, 2, source_dir, prefab_file);
+            char *full_path = os_path_v0.join(a, 2, source_dir, prefab_file);
 
-            struct vio *prefab_vio = vio_api_v0.from_file(full_path,
-                                                          VIO_OPEN_READ,
-                                                          a);
+            struct os_vio *prefab_vio = os_vio_api_v0.from_file(full_path,
+                                                                VIO_OPEN_READ,
+                                                                a);
 
-            char prefab_data[vio_api_v0.size(prefab_vio) + 1];
-            memset(prefab_data, 0, vio_api_v0.size(prefab_vio) + 1);
-            vio_api_v0.read(prefab_vio, prefab_data, sizeof(char),
-                            vio_api_v0.size(prefab_vio));
+            char prefab_data[os_vio_api_v0.size(prefab_vio) + 1];
+            memset(prefab_data, 0, os_vio_api_v0.size(prefab_vio) + 1);
+            os_vio_api_v0.read(prefab_vio, prefab_data, sizeof(char),
+                               os_vio_api_v0.size(prefab_vio));
 
             yaml_document_t h;
             yaml_node_t prefab_root = yaml_load_str(prefab_data, &h);
@@ -161,7 +160,7 @@ namespace entity_resource_compiler {
             preprocess(filename, prefab_root, capi);
             yaml_merge(root, prefab_root);
 
-            vio_api_v0.close(prefab_vio);
+            os_vio_api_v0.close(prefab_vio);
 
             CETECH_DEALLOCATE(a, full_path);
         }
@@ -413,13 +412,13 @@ namespace entity_resource_compiler {
     }
 
     int _entity_resource_compiler(const char *filename,
-                                  struct vio *source_vio,
-                                  struct vio *build_vio,
+                                  struct os_vio *source_vio,
+                                  struct os_vio *build_vio,
                                   struct compilator_api *compilator_api) {
-        char source_data[vio_api_v0.size(source_vio) + 1];
-        memset(source_data, 0, vio_api_v0.size(source_vio) + 1);
-        vio_api_v0.read(source_vio, source_data, sizeof(char),
-                        vio_api_v0.size(source_vio));
+        char source_data[os_vio_api_v0.size(source_vio) + 1];
+        memset(source_data, 0, os_vio_api_v0.size(source_vio) + 1);
+        os_vio_api_v0.read(source_vio, source_data, sizeof(char),
+                           os_vio_api_v0.size(source_vio));
 
         yaml_document_t h;
         yaml_node_t root = yaml_load_str(source_data, &h);
@@ -430,9 +429,9 @@ namespace entity_resource_compiler {
 
         compiler(root, filename, entity_data, compilator_api);
 
-        vio_api_v0.write(build_vio, entity_data->data(entity_data->inst),
-                         sizeof(uint8_t),
-                         entity_data->size(entity_data->inst));
+        os_vio_api_v0.write(build_vio, entity_data->data(entity_data->inst),
+                            sizeof(uint8_t),
+                            entity_data->size(entity_data->inst));
 
 
         blob_api_v0.destroy(entity_data);
@@ -447,11 +446,11 @@ namespace entity_resource_compiler {
 
 namespace entity_resorce {
 
-    void *loader(struct vio *input,
+    void *loader(struct os_vio *input,
                  struct allocator *allocator) {
-        const int64_t size = vio_api_v0.size(input);
+        const int64_t size = os_vio_api_v0.size(input);
         char *data = CETECH_ALLOCATE(allocator, char, size);
-        vio_api_v0.read(input, data, 1, size);
+        os_vio_api_v0.read(input, data, 1, size);
 
         return data;
     }
@@ -604,8 +603,8 @@ namespace entity_module {
         CETECH_GET_API(api, component_api_v0);
         CETECH_GET_API(api, memory_api_v0);
         CETECH_GET_API(api, resource_api_v0);
-        CETECH_GET_API(api, path_v0);
-        CETECH_GET_API(api, vio_api_v0);
+        CETECH_GET_API(api, os_path_v0);
+        CETECH_GET_API(api, os_vio_api_v0);
         CETECH_GET_API(api, hash_api_v0);
         CETECH_GET_API(api, blob_api_v0);
 
@@ -634,27 +633,11 @@ namespace entity_module {
     }
 
 
-    extern "C" void *entity_load_module(struct api_v0* api) {
+    extern "C" void entity_load_module(struct api_v0 *api) {
         _init(api);
-        return nullptr;
-
-//        switch (api) {
-//            case PLUGIN_EXPORT_API_ID: {
-//                static struct module_export_api_v0 module = {0};
-//
-//                module.init = _init;
-//                module.shutdown = _shutdown;
-//
-//
-//                return &module;
-//            }
-//
-//            default:
-//                return NULL;
-//        }
     }
 
-    extern "C" void entity_unload_module(struct api_v0* api) {
+    extern "C" void entity_unload_module(struct api_v0 *api) {
         _shutdown();
     }
 }

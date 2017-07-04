@@ -68,20 +68,26 @@ set(SOURCE_FILES
         ########################################################################
         # Core
         ########################################################################
-        engine/src/kernel/api/api.cpp
+        engine/src/kernel/api/api_system.cpp
         engine/src/kernel/log/log_system.cpp
-        engine/src/kernel/os/os.cpp
-        engine/src/kernel/os/stacktrace.cpp
+        engine/src/kernel/os_sdl2/sdl2_os.cpp
+        engine/src/kernel/os_sdl2/sdl2_stacktrace.cpp
         engine/src/kernel/yaml/yaml.cpp
         engine/src/kernel/module/module.cpp
         engine/src/kernel/config/config.cpp
         engine/src/kernel/memory/memory.cpp
-        engine/src/kernel/machine/machine.cpp
-        engine/src/kernel/machine_sdl2/sdl_mouse.cpp
-        engine/src/kernel/machine_sdl2/sdl_keyboard.cpp
-        engine/src/kernel/machine_sdl2/sdl_gamepad.cpp
-        engine/src/kernel/machine_sdl2/sdl_machine.cpp
-
+        engine/src/kernel/os_sdl2/sdl2_machine.cpp
+        engine/src/kernel/os_sdl2/sdl2_mouse.cpp
+        engine/src/kernel/os_sdl2/sdl2_keyboard.cpp
+        engine/src/kernel/os_sdl2/sdl2_gamepad.cpp
+        engine/src/kernel/application/application.cpp
+        engine/src/kernel/task/task.cpp
+        engine/src/kernel/develop_system/develop_system.cpp
+        engine/src/kernel/log/log_db_handler.cpp
+        engine/src/kernel/log/log_nanomsg_handler.cpp
+        engine/src/kernel/log/log_stdout_handler.cpp
+        engine/src/kernel/kernel/kernel.cpp
+        engine/src/kernel/hash/hashlib.cpp
 
         ########################################################################
         # Modules
@@ -112,7 +118,6 @@ set(SOURCE_FILES
         engine/src/modules/luasys/api/api_scenegraph.c
 
         engine/src/modules/console_server/console_server.cpp
-        engine/src/kernel/develop_system/develop_system.cpp
 
 
         engine/src/modules/resource/resource.cpp
@@ -123,7 +128,6 @@ set(SOURCE_FILES
         engine/src/modules/entity/component.cpp
         engine/src/modules/entity/entity.cpp
         engine/src/modules/entity/world.cpp
-        engine/src/kernel/task/task.cpp
         engine/src/modules/level/level.cpp
 
         engine/src/modules/input/keyboard.cpp
@@ -141,18 +145,14 @@ set(SOURCE_FILES
         engine/src/modules/transform/transform.cpp
         engine/src/modules/scenegraph/scenegraph.cpp
         engine/src/modules/camera/camera.cpp
-        engine/src/kernel/blob/blob.cpp
-        engine/src/kernel/application/application.cpp
+        engine/src/modules/blob/blob.cpp
         engine/src/modules/renderer_bgfx/scene/scene_compiler.cpp
         engine/src/modules/renderer_bgfx/shader/shader_compiler.cpp
         engine/src/modules/renderer_bgfx/texture/texture_compiler.cpp
         engine/src/modules/renderer_bgfx/material/material_compiler.cpp
         engine/src/modules/renderer_bgfx/material/material_compiler.cpp
 
-        engine/src/kernel/log/log_db_handler.cpp
-        engine/src/kernel/log/log_nanomsg_handler.cpp
-        engine/src/kernel/log/log_stdout_handler.cpp
-        engine/src/kernel/kernel.cpp)
+)
 
 ################################################################################
 # Main sources

@@ -12,9 +12,8 @@
 #include <cetech/kernel/module.h>
 #include <cetech/kernel/log.h>
 #include <cetech/kernel/hash.h>
-#include <cetech/kernel/path.h>
-#include <cetech/kernel/vio.h>
-#include <cetech/kernel/api.h>
+#include <cetech/kernel/sdl2_os.h>
+#include <cetech/kernel/api_system.h>
 
 #include <cetech/modules/resource.h>
 #include <cstring>
@@ -22,8 +21,8 @@
 #include "config_private.h"
 
 CETECH_DECL_API(memory_api_v0);
-CETECH_DECL_API(path_v0);
-CETECH_DECL_API(vio_api_v0);
+CETECH_DECL_API(os_path_v0);
+CETECH_DECL_API(os_vio_api_v0);
 CETECH_DECL_API(log_api_v0);
 CETECH_DECL_API(hash_api_v0);
 
@@ -119,28 +118,31 @@ namespace config {
 
         const char *build_dir_str = get_string(bd);
 
-        char* build_dir = path_v0.join(a, 2, build_dir_str, app_api->platform());
-        path_v0.make_path(build_dir);
+        char *build_dir = os_path_v0.join(a, 2, build_dir_str,
+                                          app_api->platform());
+        os_path_v0.make_path(build_dir);
 
-        char *build_path = path_v0.join(a, 3, build_dir_str,
-                                        app_api->platform(), "global.config");
+        char *build_path = os_path_v0.join(a, 3, build_dir_str,
+                                           app_api->platform(),
+                                           "global.config");
 
-        char *source_path = path_v0.join(a, 2, get_string(source_dir),
-                                         "global.config");
+        char *source_path = os_path_v0.join(a, 2, get_string(source_dir),
+                                            "global.config");
 
-        struct vio *source_vio = vio_api_v0.from_file(source_path,
-                                                      VIO_OPEN_READ, a);
+        struct os_vio *source_vio = os_vio_api_v0.from_file(source_path,
+                                                            VIO_OPEN_READ, a);
 
-        char *data = CETECH_ALLOCATE(a, char, vio_api_v0.size(source_vio));
+        char *data = CETECH_ALLOCATE(a, char, os_vio_api_v0.size(source_vio));
 
-        size_t size = (size_t) vio_api_v0.size(source_vio);
-        vio_api_v0.read(source_vio, data, sizeof(char), size);
-        vio_api_v0.close(source_vio);
+        size_t size = (size_t) os_vio_api_v0.size(source_vio);
+        os_vio_api_v0.read(source_vio, data, sizeof(char), size);
+        os_vio_api_v0.close(source_vio);
 
-        struct vio *build_vio = vio_api_v0.from_file(build_path, VIO_OPEN_WRITE,
-                                                     a);
-        vio_api_v0.write(build_vio, data, sizeof(char), size);
-        vio_api_v0.close(build_vio);
+        struct os_vio *build_vio = os_vio_api_v0.from_file(build_path,
+                                                           VIO_OPEN_WRITE,
+                                                           a);
+        os_vio_api_v0.write(build_vio, data, sizeof(char), size);
+        os_vio_api_v0.close(build_vio);
 
         CETECH_DEALLOCATE(a, data);
         CETECH_DEALLOCATE(a, build_path);
@@ -233,20 +235,20 @@ namespace config {
 
         const char *build_dir_str = get_string(bd);
 
-        char *config_path = path_v0.join(a, 3,
-                                         build_dir_str,
-                                         app_api->platform(),
-                                         "global.config");
+        char *config_path = os_path_v0.join(a, 3,
+                                            build_dir_str,
+                                            app_api->platform(),
+                                            "global.config");
 
-        struct vio *source_vio = vio_api_v0.from_file(config_path,
-                                                      VIO_OPEN_READ,
-                                                      a);
+        struct os_vio *source_vio = os_vio_api_v0.from_file(config_path,
+                                                            VIO_OPEN_READ,
+                                                            a);
 
-        char *data = CETECH_ALLOCATE(a, char, vio_api_v0.size(source_vio));
+        char *data = CETECH_ALLOCATE(a, char, os_vio_api_v0.size(source_vio));
 
-        vio_api_v0.read(source_vio, data, vio_api_v0.size(source_vio),
-                        vio_api_v0.size(source_vio));
-        vio_api_v0.close(source_vio);
+        os_vio_api_v0.read(source_vio, data, os_vio_api_v0.size(source_vio),
+                           os_vio_api_v0.size(source_vio));
+        os_vio_api_v0.close(source_vio);
 
         yaml_document_t h;
         yaml_node_t root = yaml_load_str(data, &h);
@@ -505,8 +507,8 @@ namespace config {
 
     int init(struct api_v0 *api) {
         CETECH_GET_API(api, memory_api_v0);
-        CETECH_GET_API(api, path_v0);
-        CETECH_GET_API(api, vio_api_v0);
+        CETECH_GET_API(api, os_path_v0);
+        CETECH_GET_API(api, os_vio_api_v0);
         CETECH_GET_API(api, log_api_v0);
         CETECH_GET_API(api, hash_api_v0);
 

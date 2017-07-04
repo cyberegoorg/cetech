@@ -1,7 +1,7 @@
 #ifndef CETECH_PACKAGE_H
 #define CETECH_PACKAGE_H
 
-#include <cetech/kernel/types.h>
+#include <cetech/kernel/macros.h>
 
 struct package_resource {
     uint32_t type_count;

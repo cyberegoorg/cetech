@@ -2,6 +2,6 @@
 #define CETECH__OS_H
 
 namespace os {
-    void init(struct api_v0 *api);
+    void register_api(struct api_v0 *api);
 }
 #endif //CETECH__OS_H

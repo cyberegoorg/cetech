@@ -1,7 +1,7 @@
 #include "include/SDL2/SDL.h"
 #include "include/SDL2/SDL_syswm.h"
 
-#include <cetech/kernel/window.h>
+#include <cetech/kernel/sdl2_os.h>
 #include <cetech/kernel/log.h>
 
 //==============================================================================
@@ -35,12 +35,12 @@ static uint32_t _sdl_flags(enum window_flags flags) {
 // Interface
 //==============================================================================
 
-window_t window_new(const char *title,
-                    enum window_pos x,
-                    enum window_pos y,
-                    const int32_t width,
-                    const int32_t height,
-                    enum window_flags flags) {
+os_window_t *window_new(const char *title,
+                        enum window_pos x,
+                        enum window_pos y,
+                        const int32_t width,
+                        const int32_t height,
+                        enum window_flags flags) {
 
     SDL_Window *w = SDL_CreateWindow(
             title,
@@ -54,10 +54,10 @@ window_t window_new(const char *title,
                          SDL_GetError());
     }
 
-    return (window_t) {.w = w};
+    return (os_window_t *) w;
 }
 
-window_t window_new_from(void *hndl) {
+os_window_t *window_new_from(void *hndl) {
     SDL_Window *w = SDL_CreateWindowFrom(hndl);
 
     if (w == NULL) {
@@ -65,50 +65,50 @@ window_t window_new_from(void *hndl) {
                          SDL_GetError());
     }
 
-    return (window_t) {.w = w};
+    return (os_window_t *) w;
 }
 
-void window_destroy(window_t w) {
-    SDL_DestroyWindow((SDL_Window *) w.w);
+void window_destroy(os_window_t *w) {
+    SDL_DestroyWindow((SDL_Window *) w);
 }
 
-void window_set_title(window_t w,
+void window_set_title(os_window_t *w,
                       const char *title) {
-    SDL_SetWindowTitle((SDL_Window *) w.w, title);
+    SDL_SetWindowTitle((SDL_Window *) w, title);
 }
 
-const char *window_get_title(window_t w) {
-    return SDL_GetWindowTitle((SDL_Window *) w.w);
+const char *window_get_title(os_window_t *w) {
+    return SDL_GetWindowTitle((SDL_Window *) w);
 }
 
-void window_update(window_t w) {
-    SDL_UpdateWindowSurface((SDL_Window *) w.w);
+void window_update(os_window_t *w) {
+    SDL_UpdateWindowSurface((SDL_Window *) w);
 }
 
-void window_resize(window_t w,
+void window_resize(os_window_t *w,
                    uint32_t width,
                    uint32_t height) {
-    SDL_SetWindowSize((SDL_Window *) w.w, width, height);
+    SDL_SetWindowSize((SDL_Window *) w, width, height);
 }
 
-void window_get_size(window_t window,
+void window_get_size(os_window_t *window,
                      uint32_t *width,
                      uint32_t *height) {
     int w, h;
     w = h = 0;
 
-    SDL_GetWindowSize((SDL_Window *) window.w, &w, &h);
+    SDL_GetWindowSize((SDL_Window *) window, &w, &h);
 
     *width = (uint32_t) w;
     *height = (uint32_t) h;
 }
 
-void *window_native_window_ptr(window_t w) {
+void *window_native_window_ptr(os_window_t *w) {
     SDL_SysWMinfo wmi;
 
     SDL_VERSION(&wmi.version);
 
-    if (!SDL_GetWindowWMInfo((SDL_Window *) w.w, &wmi)) {
+    if (!SDL_GetWindowWMInfo((SDL_Window *) w, &wmi)) {
         return 0;
     }
 
@@ -121,12 +121,12 @@ void *window_native_window_ptr(window_t w) {
 #endif
 }
 
-void *window_native_display_ptr(window_t w) {
+void *window_native_display_ptr(os_window_t *w) {
     SDL_SysWMinfo wmi;
 
     SDL_VERSION(&wmi.version);
 
-    if (!SDL_GetWindowWMInfo((SDL_Window *) w.w, &wmi)) {
+    if (!SDL_GetWindowWMInfo((SDL_Window *) w, &wmi)) {
         return 0;
     }
 

@@ -11,9 +11,8 @@
 #include <cetech/kernel/hash.h>
 #include <cetech/kernel/memory.h>
 #include <cetech/kernel/module.h>
-#include <cetech/kernel/vio.h>
-#include <cetech/kernel/api.h>
-#include <cetech/kernel/path.h>
+#include <cetech/kernel/sdl2_os.h>
+#include <cetech/kernel/api_system.h>
 
 #include <cetech/modules/resource.h>
 #include <cetech/kernel/errors.h>
@@ -25,8 +24,8 @@
 
 CETECH_DECL_API(memory_api_v0);
 CETECH_DECL_API(resource_api_v0);
-CETECH_DECL_API(path_v0);
-CETECH_DECL_API(vio_api_v0);
+CETECH_DECL_API(os_path_v0);
+CETECH_DECL_API(os_vio_api_v0);
 CETECH_DECL_API(hash_api_v0);
 
 using namespace cetech;
@@ -62,19 +61,20 @@ namespace material_compiler {
                 capi->add_dependency(filename, prefab_file);
 
                 const char *source_dir = resource_api_v0.compiler_get_source_dir();
-                char *full_path = path_v0.join(a, 2, source_dir, prefab_file);
+                char *full_path = os_path_v0.join(a, 2, source_dir,
+                                                  prefab_file);
 
-                struct vio *prefab_vio = vio_api_v0.from_file(full_path,
-                                                              VIO_OPEN_READ,
-                                                              memory_api_v0.main_allocator());
+                struct os_vio *prefab_vio = os_vio_api_v0.from_file(full_path,
+                                                                    VIO_OPEN_READ,
+                                                                    memory_api_v0.main_allocator());
 
                 CETECH_DEALLOCATE(a, full_path);
 
-                char prefab_data[vio_api_v0.size(prefab_vio) + 1];
-                memset(prefab_data, 0, vio_api_v0.size(prefab_vio) + 1);
-                vio_api_v0.read(prefab_vio, prefab_data, sizeof(char),
-                                vio_api_v0.size(prefab_vio));
-                vio_api_v0.close(prefab_vio);
+                char prefab_data[os_vio_api_v0.size(prefab_vio) + 1];
+                memset(prefab_data, 0, os_vio_api_v0.size(prefab_vio) + 1);
+                os_vio_api_v0.read(prefab_vio, prefab_data, sizeof(char),
+                                   os_vio_api_v0.size(prefab_vio));
+                os_vio_api_v0.close(prefab_vio);
 
                 yaml_document_t h;
                 yaml_node_t prefab_root = yaml_load_str(prefab_data, &h);
@@ -162,16 +162,16 @@ namespace material_compiler {
     }
 
     int compiler(const char *filename,
-                 struct vio *source_vio,
-                 struct vio *build_vio,
+                 struct os_vio *source_vio,
+                 struct os_vio *build_vio,
                  struct compilator_api *compilator_api) {
         char *source_data =
                 CETECH_ALLOCATE(memory_api_v0.main_allocator(), char,
-                                vio_api_v0.size(source_vio) + 1);
-        memset(source_data, 0, vio_api_v0.size(source_vio) + 1);
+                                os_vio_api_v0.size(source_vio) + 1);
+        memset(source_data, 0, os_vio_api_v0.size(source_vio) + 1);
 
-        vio_api_v0.read(source_vio, source_data, sizeof(char),
-                        vio_api_v0.size(source_vio));
+        os_vio_api_v0.read(source_vio, source_data, sizeof(char),
+                           os_vio_api_v0.size(source_vio));
 
         yaml_document_t h;
         yaml_node_t root = yaml_load_str(source_data, &h);
@@ -216,11 +216,11 @@ namespace material_compiler {
                         array::size(output.uniform_names) / 32),
         };
 
-        vio_api_v0.write(build_vio, &resource, sizeof(resource), 1);
-        vio_api_v0.write(build_vio, output.uniform_names._data, sizeof(char),
-                         array::size(output.uniform_names));
-        vio_api_v0.write(build_vio, output.data._data, sizeof(uint8_t),
-                         array::size(output.data));
+        os_vio_api_v0.write(build_vio, &resource, sizeof(resource), 1);
+        os_vio_api_v0.write(build_vio, output.uniform_names._data, sizeof(char),
+                            array::size(output.uniform_names));
+        os_vio_api_v0.write(build_vio, output.data._data, sizeof(uint8_t),
+                            array::size(output.data));
 
         output.uniform_names.destroy();
         output.data.destroy();
@@ -232,8 +232,8 @@ namespace material_compiler {
     int init(api_v0 *api) {
         CETECH_GET_API(api, memory_api_v0);
         CETECH_GET_API(api, resource_api_v0);
-        CETECH_GET_API(api, path_v0);
-        CETECH_GET_API(api, vio_api_v0);
+        CETECH_GET_API(api, os_path_v0);
+        CETECH_GET_API(api, os_vio_api_v0);
         CETECH_GET_API(api, hash_api_v0);
 
         resource_api_v0.compiler_register(hash_api_v0.id64_from_str("material"),
