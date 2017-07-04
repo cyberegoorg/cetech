@@ -10,7 +10,7 @@
 
 #include <cetech/celib/map.inl>
 
-#include <cetech/kernel/sdl2_os.h>
+#include <cetech/kernel/os.h>
 #include <cetech/celib/eventstream.inl>
 #include <cetech/kernel/memory.h>
 #include <cetech/kernel/config.h>

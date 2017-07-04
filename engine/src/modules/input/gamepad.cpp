@@ -8,7 +8,7 @@
 #include <cetech/celib/eventstream.inl>
 #include <cetech/modules/input.h>
 #include <cetech/kernel/module.h>
-#include <cetech/kernel/sdl2_machine.h>
+#include <cetech/kernel/machine.h>
 #include <cetech/kernel/api_system.h>
 
 #include "gamepadstr.h"

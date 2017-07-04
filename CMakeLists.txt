@@ -70,13 +70,13 @@ set(SOURCE_FILES
         ########################################################################
         engine/src/kernel/api/api_system.cpp
         engine/src/kernel/log/log_system.cpp
-        engine/src/kernel/os_sdl2/sdl2_os.cpp
+        engine/src/kernel/os_sdl2/os.cpp
         engine/src/kernel/os_sdl2/sdl2_stacktrace.cpp
         engine/src/kernel/yaml/yaml.cpp
         engine/src/kernel/module/module.cpp
         engine/src/kernel/config/config.cpp
         engine/src/kernel/memory/memory.cpp
-        engine/src/kernel/os_sdl2/sdl2_machine.cpp
+        engine/src/kernel/os_sdl2/machine.cpp
         engine/src/kernel/os_sdl2/sdl2_mouse.cpp
         engine/src/kernel/os_sdl2/sdl2_keyboard.cpp
         engine/src/kernel/os_sdl2/sdl2_gamepad.cpp

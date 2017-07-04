@@ -8,7 +8,7 @@
 #include <cetech/kernel/application.h>
 #include <cetech/kernel/config.h>
 #include <cetech/kernel/module.h>
-#include <cetech/kernel/sdl2_os.h>
+#include <cetech/kernel/os.h>
 #include <cetech/kernel/api_system.h>
 
 #include <cetech/modules/camera.h>

@@ -15,7 +15,7 @@
 #include <cetech/kernel/log.h>
 
 #include <cetech/kernel/hash.h>
-#include <cetech/kernel/sdl2_os.h>
+#include <cetech/kernel/os.h>
 #include <cetech/modules/resource.h>
 
 #include <bgfx/bgfx.h>

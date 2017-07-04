@@ -7,7 +7,7 @@
 #include <cetech/celib/quatf.inl>
 
 #include <cetech/kernel/config.h>
-#include <cetech/kernel/sdl2_os.h>
+#include <cetech/kernel/os.h>
 #include <cetech/kernel/yaml.h>
 #include <cetech/kernel/hash.h>
 #include <cetech/kernel/api_system.h>

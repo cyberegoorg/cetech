@@ -7,7 +7,7 @@
 #include <cetech/celib/array.inl>
 #include <cetech/celib/string_stream.h>
 
-#include <cetech/kernel/sdl2_os.h>
+#include <cetech/kernel/os.h>
 
 
 #if defined(CETECH_LINUX)

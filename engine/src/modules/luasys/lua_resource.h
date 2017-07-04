@@ -2,7 +2,7 @@
 #define CETECH_LUA_RESOURCE_H
 
 
-#include <cetech/kernel/sdl2_os.h>
+#include <cetech/kernel/os.h>
 
 namespace resource_lua {
     void *loader(struct os_vio *input,

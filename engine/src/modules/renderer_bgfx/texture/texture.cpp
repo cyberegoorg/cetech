@@ -11,7 +11,7 @@
 #include <cetech/kernel/module.h>
 #include <cetech/kernel/api_system.h>
 #include <cetech/kernel/log.h>
-#include <cetech/kernel/sdl2_os.h>
+#include <cetech/kernel/os.h>
 
 #include <cetech/modules/resource.h>
 #include <cetech/celib/string_stream.h>

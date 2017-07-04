@@ -1,7 +1,7 @@
 #include "include/SDL2/SDL.h"
 #include "include/SDL2/SDL_syswm.h"
 
-#include <cetech/kernel/sdl2_os.h>
+#include <cetech/kernel/os.h>
 #include <cetech/kernel/log.h>
 
 //==============================================================================

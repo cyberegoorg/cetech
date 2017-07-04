@@ -6,10 +6,14 @@
 #include "../log/log_system_private.h"
 #include "../memory/memory_private.h"
 #include "../api/api_private.h"
-#include "../os_sdl2/sdl2_os_private.h"
 #include "../module/module_private.h"
 #include "../config/config_private.h"
+
 #include "static_module.h"
+
+namespace os {
+    void register_api(struct api_v0 *api);
+}
 
 CETECH_DECL_API(app_api_v0);
 CETECH_DECL_API(log_api_v0);

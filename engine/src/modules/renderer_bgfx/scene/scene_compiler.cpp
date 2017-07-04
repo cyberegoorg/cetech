@@ -15,7 +15,7 @@
 #include <cetech/kernel/memory.h>
 #include <cetech/kernel/module.h>
 #include <cetech/kernel/api_system.h>
-#include <cetech/kernel/sdl2_os.h>
+#include <cetech/kernel/os.h>
 
 #include <cetech/modules/resource.h>
 #include <cetech/modules/entity.h>

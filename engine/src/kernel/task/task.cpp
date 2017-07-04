@@ -2,7 +2,7 @@
 // Includes
 //==============================================================================
 
-#include <cetech/kernel/sdl2_os.h>
+#include <cetech/kernel/os.h>
 #include <cetech/kernel/memory.h>
 
 #include <cetech/kernel/develop.h>

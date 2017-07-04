@@ -4,7 +4,7 @@
 #include <cetech/kernel/log.h>
 #include <cetech/kernel/errors.h>
 #include <cetech/celib/allocator.h>
-#include <cetech/kernel/sdl2_os.h>
+#include <cetech/kernel/os.h>
 
 #define LOG_WHERE "vio_sdl"
 

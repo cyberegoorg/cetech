@@ -6,7 +6,7 @@
 #include <cetech/kernel/module.h>
 #include <cetech/kernel/memory.h>
 
-#include <cetech/kernel/sdl2_machine.h>
+#include <cetech/kernel/machine.h>
 #include <cetech/kernel/config.h>
 #include <cetech/modules/resource.h>
 #include <cetech/kernel/api_system.h>

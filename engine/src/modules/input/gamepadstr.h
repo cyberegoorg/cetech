@@ -2,7 +2,7 @@
 // Includes
 //==============================================================================
 
-#include <cetech/kernel/sdl2_machine.h>
+#include <cetech/kernel/machine.h>
 
 static const char *_btn_to_str[GAMEPAD_BTN_MAX] = {
         [GAMEPAD_BTN_INVALID] = "invalid",

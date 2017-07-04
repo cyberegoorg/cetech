@@ -1,4 +1,4 @@
-#include <cetech/kernel/sdl2_os.h>
+#include <cetech/kernel/os.h>
 
 #include "include/SDL2/SDL.h"
 
