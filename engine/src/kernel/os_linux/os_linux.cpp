@@ -8,22 +8,8 @@
 CETECH_DECL_API(log_api_v0);
 
 #include "path_linux.h"
-#include "vio_linux.h"
 #include "object_linux.h"
 #include "process_linux.h"
-
-
-static struct os_vio_api_v0 vio_api = {
-        .from_file = vio_from_file,
-        .close = vio_close,
-        .seek = vio_seek,
-        .seek_to_end = vio_seek_to_end,
-        .skip = vio_skip,
-        .position = vio_position,
-        .size = vio_size,
-        .read = vio_read,
-        .write = vio_write
-};
 
 static struct os_path_v0 path_api = {
         .list = dir_list,
@@ -55,7 +41,6 @@ namespace os {
         CETECH_GET_API(api, log_api_v0);
 
         api->register_api("os_path_v0", &path_api);
-        api->register_api("os_vio_api_v0", &vio_api);
         api->register_api("os_process_api_v0", &process_api);
         api->register_api("os_object_api_v0", &object_api);
         error_register_api(api);

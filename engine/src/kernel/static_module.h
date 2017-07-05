@@ -4,7 +4,6 @@
 #include <cetech/kernel/module.h>
 
 extern "C" void init_static_modules() {
-    ADD_STATIC_MODULE(os);
     ADD_STATIC_MODULE(blob);
     ADD_STATIC_MODULE(task);
     ADD_STATIC_MODULE(developsystem);

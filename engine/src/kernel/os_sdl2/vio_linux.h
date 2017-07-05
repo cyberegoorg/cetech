@@ -9,7 +9,6 @@
 
 #define LOG_WHERE "vio_sdl"
 
-
 int vio_close(struct os_vio *file) {
     CETECH_ASSERT("vio", file != NULL);
 

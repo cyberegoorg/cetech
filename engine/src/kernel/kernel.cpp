@@ -70,8 +70,11 @@ extern "C" void init_core(struct api_v0 *api) {
     log::register_api(api);
     core_allocator::register_api(api);
     memory::register_api(api);
-    os::register_api(api);
     application_register_api(api);
+
+    os::register_api(api);
+    LOAD_STATIC_MODULE(api, os);
+
     module::init(core_alloc, api);
 }
 

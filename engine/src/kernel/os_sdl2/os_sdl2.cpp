@@ -9,13 +9,11 @@ CETECH_DECL_API(log_api_v0);
 #include "window_sdl2.h"
 #include "thread_sdl2.h"
 #include "sdl2_time.h"
+#include "vio_linux.h"
 
-namespace machine {
+namespace machine_sdl {
     void init(struct api_v0 *api);
-
     void shutdown();
-
-    void register_api(struct api_v0 *api);
 }
 
 static struct os_thread_api_v0 thread_api = {
@@ -54,6 +52,17 @@ static struct os_time_api_v0 time_api = {
         .perf_freq =get_perf_freq
 };
 
+static struct os_vio_api_v0 vio_api = {
+        .from_file = vio_from_file,
+        .close = vio_close,
+        .seek = vio_seek,
+        .seek_to_end = vio_seek_to_end,
+        .skip = vio_skip,
+        .position = vio_position,
+        .size = vio_size,
+        .read = vio_read,
+        .write = vio_write
+};
 
 
 extern "C" void os_load_module(struct api_v0 *api) {
@@ -64,15 +73,14 @@ extern "C" void os_load_module(struct api_v0 *api) {
 
     api->register_api("os_thread_api_v0", &thread_api);
     api->register_api("os_window_api_v0", &window_api);
+    api->register_api("os_vio_api_v0", &vio_api);
 
 
-    machine::register_api(api);
-
-    machine::init(api);
+    machine_sdl::init(api);
 }
 
 extern "C" void os_unload_module(struct api_v0 *api) {
-    machine::shutdown();
+    machine_sdl::shutdown();
 }
 
 

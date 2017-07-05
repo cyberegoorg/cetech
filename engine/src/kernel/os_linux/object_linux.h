@@ -5,10 +5,10 @@
 void *load_object(const char *path) {
     void *obj = dlopen(path, RTLD_NOW|RTLD_LOCAL);
 
-    CETECH_ASSERT("cebase", obj != NULL);
+    CETECH_ASSERT("os_object", obj != NULL);
 
     if (obj == NULL) {
-        log_api_v0.error("cebase", "%s", SDL_GetError());
+        log_api_v0.error("os_object", "%s", dlerror());
         return NULL;
     }
 
@@ -16,7 +16,7 @@ void *load_object(const char *path) {
 }
 
 void unload_object(void *so) {
-    CETECH_ASSERT("cebase", so != NULL);
+    CETECH_ASSERT("os_object", so != NULL);
 
     dlclose(so);
 }
@@ -24,10 +24,10 @@ void unload_object(void *so) {
 void *load_function(void *so,
                     const char *name) {
     void *fce = dlsym(so, "load_module");
-    CETECH_ASSERT("cebase", fce != NULL);
+    CETECH_ASSERT("os_object", fce != NULL);
 
     if (fce == NULL) {
-        log_api_v0.error("cebase", "%s", SDL_GetError());
+        log_api_v0.error("os_object", "%s", dlerror());
         return NULL;
     }
 
