@@ -1,6 +1,6 @@
 name: lib
 description: |
-  Basic js libs
+  Basic playground js libs
 
 extensions:
   statics:

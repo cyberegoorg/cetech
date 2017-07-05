@@ -35,9 +35,9 @@ struct filesystem_api_v0 {
     //! \param path File path
     //! \param mode Open mode
     //! \return File or NULL
-    struct vio *(*open)(uint64_t root,
-                        const char *path,
-                        enum fs_open_mode mode);
+    struct os_vio *(*open)(uint64_t root,
+                           const char *path,
+                           enum fs_open_mode mode);
 
     //! Map path for root
     //! \param root Root
@@ -47,7 +47,7 @@ struct filesystem_api_v0 {
 
     //! Close file
     //! \param file file
-    void (*close)(struct vio *file);
+    void (*close)(struct os_vio *file);
 
     //! List directory
     //! \param root Root
@@ -89,8 +89,8 @@ struct filesystem_api_v0 {
     //! \param filename Filename
     //! \return 1 if ok else 0
     char *(*fullpath)(uint64_t root,
-                    struct allocator*,
-                    const char *filename);
+                      struct allocator *,
+                      const char *filename);
 };
 
 #ifdef __cplusplus

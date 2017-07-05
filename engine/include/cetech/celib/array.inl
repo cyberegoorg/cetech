@@ -10,7 +10,7 @@
 #include <cstring>
 
 #include <cetech/celib/allocator.h>
-#include <cetech/core/types.h>
+#include <cetech/kernel/macros.h>
 
 #include "container_types.inl"
 
@@ -170,11 +170,11 @@ namespace cetech {
 
             T *new_data = 0;
             if (new_capacity > 0) {
-                new_data = CETECH_ALLOCATE(a._allocator, T, new_capacity);
+                new_data = CETECH_ALLOCATE(a._allocator, T, sizeof(T) * new_capacity);
                 memcpy(new_data, a._data, sizeof(T) * a._size);
             }
 
-            CETECH_DEALLOCATE(a._allocator, a._data);
+            CETECH_FREE(a._allocator, a._data);
 
             a._data = new_data;
             a._capacity = new_capacity;
@@ -238,7 +238,7 @@ namespace cetech {
     inline
     void Array<T>::destroy() {
         if (_data) {
-            CETECH_DEALLOCATE(_allocator, _data);
+            CETECH_FREE(_allocator, _data);
         }
 
         _allocator = nullptr;
@@ -251,7 +251,7 @@ namespace cetech {
     template<typename T>
     inline Array<T>::~Array() {
         if (_data) {
-            CETECH_DEALLOCATE(_allocator, _data);
+            CETECH_FREE(_allocator, _data);
         }
 
         _allocator = nullptr;

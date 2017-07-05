@@ -26,7 +26,8 @@ typedef struct camera_s camera_t;
 typedef struct vec2f_s vec2f_t;
 typedef struct vec3f_s vec3f_t;
 typedef struct vec4f_s vec4f_t;
-typedef struct window_s window_t;
+
+typedef void os_window_t;
 
 //! Material typedef
 typedef struct material_s {
@@ -178,7 +179,7 @@ typedef int viewport_t;
 struct renderer_api_v0 {
     //! Create renderer.
     //! \param window Window
-    void (*create)(window_t window);
+    void (*create)(os_window_t *window);
 
     //! Set debug mode on/off
     //! \param debug True/False

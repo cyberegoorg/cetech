@@ -2,7 +2,7 @@
 // Includes
 //==============================================================================
 
-#include <cetech/core/machine.h>
+#include <cetech/kernel/os.h>
 
 //TODO: string
 static const char *_key_to_str[512] = {

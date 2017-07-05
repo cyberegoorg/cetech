@@ -18,7 +18,7 @@ import yaml
 ROOT_DIR = os.path.abspath(os.path.join(os.path.dirname(os.path.abspath(__file__)), os.pardir))
 
 ELEMENT_RE = re.compile(r"(?P<type>.*) (?P<name>\w*)(\[(?P<count>\w*|\*)\])?")
-TYPE_RE = re.compile(r"(?P<type>\w*)(\[(?P<count>\d*|\*)\])?")
+TYPE_RE = re.compile(r"(?P<type>[\w:]*)(\[(?P<count>\d*|\*)\])?")
 
 ########
 # ARGS #
@@ -47,7 +47,7 @@ def render_blob(blob, jinja_env, template):
     values = blob['values']  # type: list[str]
     blob_name = blob['name']  # type: str
     guard_prefix = blob['guard_prefix']  # type: str
-    includes = blob['includes']  # type: str
+    includes = blob['includes'] if 'includes' in blob else []  # type: str
 
     prev_item_name = None
     first_array_idx = None

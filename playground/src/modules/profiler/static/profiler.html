@@ -5,11 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>CETech - console</title>
 
-    <script src="/modules/lib/static/msgpack.min.js"></script>
-    <script src="/modules/lib/static/jquery.min.js"></script>
+    <script src="/modules/externals/static/msgpack.min.js"></script>
+    <script src="/modules/externals/static/jquery.min.js"></script>
 
-    <link href="/modules/lib/static/bootstrap/css/bootstrap.min.css" rel="stylesheet">
-    <link href="/modules/lib/static/vis.min.css" rel="stylesheet">
+    <link href="/modules/externals/static/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/modules/externals/static/vis.min.css" rel="stylesheet">
 </head>
 <body>
 
@@ -47,15 +47,15 @@
     </div>
 </div>
 
-<script src="/modules/lib/static/bootstrap/js/bootstrap.min.js"></script>
-<script src="/modules/lib/static/system-polyfills.js"></script>
-<script src="/modules/lib/static/system.js"></script>
+<script src="/modules/externals/static/bootstrap/js/bootstrap.min.js"></script>
+<script src="/modules/externals/static/system-polyfills.js"></script>
+<script src="/modules/externals/static/system.js"></script>
 <script>
     SystemJS.defaultJSExtensions = true;
     SystemJS.config({
         baseURL: '/',
         map: {
-            vis: 'modules/lib/static/vis.js'
+            vis: 'modules/externals/static/vis.js'
         }
     });
 

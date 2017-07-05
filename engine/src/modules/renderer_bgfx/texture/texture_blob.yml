@@ -1,0 +1,7 @@
+version: 0
+blobs:
+    - name: texture
+      guard_prefix: CETECH
+
+      values:
+        - uint32_t size

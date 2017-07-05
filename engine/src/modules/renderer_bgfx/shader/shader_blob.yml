@@ -1,0 +1,10 @@
+version: 0
+blobs:
+    - name: shader
+      guard_prefix: CETECH
+
+      values:
+        - uint32_t vs_size
+        - uint32_t fs_size
+        - uint8_t vs[vs_size]
+        - uint8_t fs[fs_size]

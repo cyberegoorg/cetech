@@ -14,8 +14,6 @@ extern "C" {
 
 #include <cetech/celib/math_types.h>
 
-
-
 //==============================================================================
 // Api
 //==============================================================================
@@ -78,6 +76,8 @@ struct gamepad_api_v0 {
     void (*play_rumble)(uint32_t idx,
                         float strength,
                         uint32_t length);
+
+    void (*update)();
 };
 
 //==============================================================================
@@ -113,6 +113,8 @@ struct keyboard_api_v0 {
     //! \return 1 if button is in current frame released else 0
     int (*button_released)(uint32_t idx,
                            const uint32_t button_index);
+
+    void (*update)();
 };
 
 //==============================================================================
@@ -164,6 +166,8 @@ struct mouse_api_v0 {
     //! \return Axis value
     vec2f_t (*axis)(uint32_t idx,
                     const uint32_t axis_index);
+
+    void (*update)();
 };
 
 #ifdef __cplusplus
