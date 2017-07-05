@@ -8,9 +8,9 @@ namespace config {
 
     void shutdown();
 
-    void compile_global(struct app_api_v0 *app_api);
+    void compile_global(const char* platform);
 
-    void load_global(struct app_api_v0 *app_api);
+    void load_global(const char* platform);
 
     int parse_args(int argc,
                    const char **argv);

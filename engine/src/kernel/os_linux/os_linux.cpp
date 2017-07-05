@@ -9,8 +9,8 @@ CETECH_DECL_API(log_api_v0);
 
 #include "path_linux.h"
 #include "vio_linux.h"
-#include "sdl2_object.h"
-#include "sdl2_process.h"
+#include "object_linux.h"
+#include "process_linux.h"
 
 
 static struct os_vio_api_v0 vio_api = {
@@ -50,7 +50,7 @@ static struct os_object_api_v0 object_api = {
 
 extern void error_register_api(struct api_v0 *api);
 
-namespace os_linux {
+namespace os {
     void register_api(struct api_v0 *api) {
         CETECH_GET_API(api, log_api_v0);
 

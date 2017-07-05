@@ -237,6 +237,7 @@ namespace taskmanager_module {
         CETECH_GET_API(api, log_api_v0);
         CETECH_GET_API(api, os_cpu_api_v0);
 
+        log_api_v0.set_wid_clb(taskmanager::worker_id);
 
         _G = (struct G) {0};
 

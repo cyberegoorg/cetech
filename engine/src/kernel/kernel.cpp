@@ -12,26 +12,30 @@
 #include "static_module.h"
 #include "allocator_core_private.h"
 
-namespace os_linux {
-    void register_api(struct api_v0 *api);
-}
-
-CETECH_DECL_API(app_api_v0);
 CETECH_DECL_API(log_api_v0);
 CETECH_DECL_API(task_api_v0);
 
+#define LOG_WHERE "kernel"
 
-#define LOG_WHERE "application"
 
-int application_init(int argc,
-                     const char **argv);
+namespace os {
+    void register_api(struct api_v0 *api);
+}
 
 void application_start();
 
-int application_shutdown();
+const char* _platform() {
+#if defined(CETECH_LINUX)
+    return "linux";
+#elif defined(CETECH_WINDOWS)
+    return "windows";
+#elif defined(CETECH_DARWIN)
+    return "darwin";
+#endif
+    return NULL;
+}
 
-
-int init_config(int argc,
+int load_config(int argc,
                 const char **argv) {
 
 #ifdef CETECH_CAN_COMPILE
@@ -41,11 +45,11 @@ int init_config(int argc,
 
     cvar_t compile = config::find("compile");
     if (config::get_int(compile)) {
-        config::compile_global(&app_api_v0);
+        config::compile_global(_platform());
     }
 #endif
 
-    config::load_global(&app_api_v0);
+    config::load_global(_platform());
 
     if (!config::parse_args(argc, argv)) {
         return 0;
@@ -58,14 +62,17 @@ int init_config(int argc,
 
 void application_register_api(struct api_v0 *api);
 
-extern "C" void init_hashlib(struct api_v0 *api) {
+extern "C" void init_core(struct api_v0 *api) {
+    auto *core_alloc = core_allocator::get();
+
     LOAD_STATIC_MODULE(api, hashlib);
 
     log::register_api(api);
     core_allocator::register_api(api);
     memory::register_api(api);
-    os_linux::register_api(api);
+    os::register_api(api);
     application_register_api(api);
+    module::init(core_alloc, api);
 }
 
 
@@ -79,32 +86,22 @@ int cetech_kernel_init(int argc,
 
     memory::init(4 * 1024 * 1024);
 
-    init_hashlib(api);
-
-    module::init(core_alloc, api);
-
-    CETECH_GET_API(api, app_api_v0);
+    init_core(api);
     config::init(api);
 
     log::logdb_init_db(".", api);
-    init_config(argc, argv);
+    load_config(argc, argv);
 
-
-    _init_static_modules();
-
-    CETECH_GET_API(api, log_api_v0);
-    CETECH_GET_API(api, task_api_v0);
-    log_api_v0.set_wid_clb(task_api_v0.worker_id);
+    init_static_modules();
 
     module::load_dirs("./bin");
 
+    CETECH_GET_API(api, log_api_v0);
     return 1;
 }
 
 
 int cetech_kernel_shutdown() {
-    api_v0 *api = api::v0();
-
     log_api_v0.debug(LOG_WHERE, "Shutdown");
 
     module::unload_all();

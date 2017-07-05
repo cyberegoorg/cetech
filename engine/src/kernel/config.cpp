@@ -111,7 +111,7 @@ namespace config {
 
 #ifdef CETECH_CAN_COMPILE
 
-    void compile_global(struct app_api_v0 *app_api) {
+    void compile_global(const char * platform) {
         allocator *a = memory_api_v0.main_allocator();
 
         cvar_t bd = find("build");
@@ -120,11 +120,11 @@ namespace config {
         const char *build_dir_str = get_string(bd);
 
         char *build_dir = os_path_v0.join(a, 2, build_dir_str,
-                                          app_api->platform());
+                                          platform);
         os_path_v0.make_path(build_dir);
 
         char *build_path = os_path_v0.join(a, 3, build_dir_str,
-                                           app_api->platform(),
+                                           platform,
                                            "global.config");
 
         char *source_path = os_path_v0.join(a, 2, get_string(source_dir),
@@ -229,7 +229,7 @@ namespace config {
     }
 
 
-    void load_global(struct app_api_v0 *app_api) {
+    void load_global(const char *platform) {
         allocator *a = memory_api_v0.main_allocator();
         cvar_t bd = find("build");
         cvar_t source_dir = find("src");
@@ -238,7 +238,7 @@ namespace config {
 
         char *config_path = os_path_v0.join(a, 3,
                                             build_dir_str,
-                                            app_api->platform(),
+                                            platform,
                                             "global.config");
 
         struct os_vio *source_vio = os_vio_api_v0.from_file(config_path,
@@ -486,10 +486,6 @@ namespace config {
     }
 
     static struct config_api_v0 api_v1 = {
-            .load_global = load_global,
-#ifdef CETECH_CAN_COMPILE
-            .compile_global = compile_global,
-#endif
             .parse_args = parse_args,
             .find = find,
             .find_or_create = find_or_create,
