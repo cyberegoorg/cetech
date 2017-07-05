@@ -1,6 +1,6 @@
 #include <cetech/celib/allocator.h>
 #include <cetech/kernel/api_system.h>
-#include <cetech/kernel/application.h>
+#include <cetech/modules/application.h>
 #include <cetech/kernel/task.h>
 
 #include "log_system_private.h"
@@ -9,7 +9,7 @@
 #include "module_private.h"
 #include "config_private.h"
 
-#include "static_module.h"
+#include "../modules/static_module.h"
 #include "allocator_core_private.h"
 
 CETECH_DECL_API(log_api_v0);
@@ -78,6 +78,11 @@ extern "C" void init_core(struct api_v0 *api) {
     module::init(core_alloc, api);
 }
 
+extern "C" void load_core() {
+    ADD_STATIC_MODULE(task);
+    ADD_STATIC_MODULE(developsystem);
+    ADD_STATIC_MODULE(consoleserver);
+}
 
 int cetech_kernel_init(int argc,
                        const char **argv) {
@@ -95,6 +100,7 @@ int cetech_kernel_init(int argc,
     log::logdb_init_db(".", api);
     load_config(argc, argv);
 
+    load_core();
     init_static_modules();
 
     module::load_dirs("./bin");

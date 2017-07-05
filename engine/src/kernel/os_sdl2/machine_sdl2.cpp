@@ -11,7 +11,7 @@
 #include <cetech/kernel/api_system.h>
 
 #include <cetech/kernel/log.h>
-#include <cetech/kernel/application.h>
+#include <cetech/modules/application.h>
 #include <cetech/kernel/os.h>
 
 #include <include/SDL2/SDL.h>

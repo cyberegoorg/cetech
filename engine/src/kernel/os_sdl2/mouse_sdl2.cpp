@@ -8,7 +8,7 @@
 #include <cetech/celib/eventstream.inl>
 #include <cetech/kernel/os.h>
 
-#include <cetech/kernel/application.h>
+#include <cetech/modules/application.h>
 #include <cetech/modules/resource.h>
 #include <cetech/kernel/api_system.h>
 

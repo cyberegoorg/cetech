@@ -10,7 +10,7 @@
 #include <cetech/kernel/api_system.h>
 #include <cetech/kernel/hash.h>
 #include <cetech/kernel/config.h>
-#include <cetech/kernel/application.h>
+#include <cetech/modules/application.h>
 #include <cetech/kernel/os.h>
 #include <cetech/kernel/task.h>
 #include <cetech/kernel/develop.h>
@@ -21,9 +21,9 @@
 #include <cetech/modules/package.h>
 #include <cetech/kernel/console_server.h>
 
-#include "api_private.h"
-#include "module_private.h"
-#include "log_system_private.h"
+#include "../../kernel/api_private.h"
+#include "../../kernel/module_private.h"
+#include "../../kernel/log_system_private.h"
 
 
 #include <include/mpack/mpack.h>
