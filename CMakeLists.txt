@@ -86,7 +86,7 @@ set(SOURCE_FILES
         engine/src/kernel/memory.cpp
         engine/src/kernel/allocator_malloc.cpp
         engine/src/kernel/allocator_scratch.cpp
-        engine/src/kernel/application.cpp
+        engine/src/modules/application/application.cpp
         engine/src/kernel/task.cpp
         engine/src/kernel/develop_system.cpp
         engine/src/kernel/log_db_handler.cpp

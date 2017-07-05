@@ -8,7 +8,7 @@
 #include <cetech/celib/map.inl>
 
 #include <cetech/kernel/hash.h>
-#include <cetech/kernel/application.h>
+#include <cetech/modules/application.h>
 #include <cetech/kernel/config.h>
 #include <cetech/kernel/memory.h>
 #include <cetech/kernel/module.h>

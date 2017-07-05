@@ -11,7 +11,7 @@
 #include <cetech/kernel/os.h>
 #include <cetech/kernel/hash.h>
 #include <cetech/kernel/task.h>
-#include <cetech/kernel/application.h>
+#include <cetech/modules/application.h>
 #include <cetech/kernel/config.h>
 #include <cetech/modules/resource.h>
 #include <cetech/kernel/memory.h>

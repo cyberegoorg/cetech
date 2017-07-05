@@ -8,7 +8,7 @@
 #include <cetech/celib/map.inl>
 #include <cetech/celib/string_stream.h>
 
-#include <cetech/kernel/application.h>
+#include <cetech/modules/application.h>
 #include <cetech/kernel/memory.h>
 #include <cetech/kernel/module.h>
 #include <cetech/kernel/api_system.h>
