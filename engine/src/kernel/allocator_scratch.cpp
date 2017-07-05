@@ -9,12 +9,12 @@
 
 #include <cetech/kernel/errors.h>
 #include <cetech/celib/allocator.h>
+#include <cetech/kernel/macros.h>
 
-#include "header.h"
 #include "memory_private.h"
-#include "core_allocator_private.h"
+#include "allocator_core_private.h"
 
-struct scratch_allocator {
+struct allocator_scratch {
     struct allocator *backing;
     char *begin;
     char *end;
@@ -22,7 +22,7 @@ struct scratch_allocator {
     char *free;
 };
 
-int in_use(struct scratch_allocator *a,
+int in_use(struct allocator_scratch *a,
            void *p) {
     if (a->free == a->allocate)
         return 0;
@@ -37,7 +37,7 @@ void *scratch_allocator_allocate(allocator_instance_v0 *allocator,
                                  void *ptr,
                                  uint32_t size,
                                  uint32_t align) {
-    struct scratch_allocator *a = (struct scratch_allocator *) allocator;
+    struct allocator_scratch *a = (struct allocator_scratch *) allocator;
 
     if (size) {
         //CE_ASSERT("scratch", align % 4 == 0);
@@ -101,7 +101,7 @@ uint32_t scratch_allocator_allocated_size(void *p) {
 }
 
 uint32_t scratch_allocator_total_allocated(struct allocator *allocator) {
-    struct scratch_allocator *a = (struct scratch_allocator *) allocator->inst;
+    struct allocator_scratch *a = (struct allocator_scratch *) allocator->inst;
 
     return a->end - a->begin;
 
@@ -113,8 +113,8 @@ namespace memory {
         auto *core_alloc = core_allocator::get();
         auto *a = CETECH_ALLOCATE(core_alloc, allocator, sizeof(allocator));
 
-        scratch_allocator *m = CETECH_ALLOCATE(core_alloc, scratch_allocator,
-                                               sizeof(scratch_allocator));
+        allocator_scratch *m = CETECH_ALLOCATE(core_alloc, allocator_scratch,
+                                               sizeof(allocator_scratch));
 
         m->backing = backing;
         m->begin = CETECH_ALLOCATE(backing, char, size);
@@ -135,7 +135,7 @@ namespace memory {
 
     void scratch_allocator_destroy(struct allocator *a) {
         auto *core_alloc = core_allocator::get();
-        struct scratch_allocator *m = (struct scratch_allocator *) a;
+        struct allocator_scratch *m = (struct allocator_scratch *) a->inst;
 
         CETECH_FREE(m->backing, m->begin);
         CETECH_FREE(core_alloc, m);

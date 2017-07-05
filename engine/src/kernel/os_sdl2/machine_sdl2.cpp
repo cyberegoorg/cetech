@@ -6,13 +6,13 @@
 #include <cetech/kernel/module.h>
 #include <cetech/kernel/memory.h>
 
-#include <cetech/kernel/machine.h>
 #include <cetech/kernel/config.h>
 #include <cetech/modules/resource.h>
 #include <cetech/kernel/api_system.h>
 
 #include <cetech/kernel/log.h>
 #include <cetech/kernel/application.h>
+#include <cetech/kernel/os.h>
 
 #include <include/SDL2/SDL.h>
 
@@ -87,16 +87,17 @@ CETECH_DECL_API(memory_api_v0);
 //==============================================================================
 namespace machine {
     struct event_header *machine_event_begin() {
-        return eventstream::begin(_G.eventstream);
+        return (event_header *) eventstream::begin(_G.eventstream);
     }
 
 
     struct event_header *machine_event_end() {
-        return eventstream::end(_G.eventstream);
+        return (event_header *) eventstream::end(_G.eventstream);
     }
 
     struct event_header *machine_event_next(struct event_header *header) {
-        return eventstream::next(_G.eventstream, header);
+        return (event_header *) eventstream::next(_G.eventstream,
+                                                  (eventstream::event_header *) header);
     }
 
     void _update() {

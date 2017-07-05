@@ -1,9 +1,11 @@
 #ifndef CETECH_OS_H
 #define CETECH_OS_H
 
+
 #ifdef __cplusplus
 extern "C" {
 #endif
+
 
 //==============================================================================
 // Includes
@@ -11,6 +13,10 @@ extern "C" {
 
 #include <stdint.h>
 #include <stddef.h>
+
+#include <cetech/celib/math_types.h>
+
+#include "_machine_enums.h"
 
 struct allocator;
 
@@ -75,6 +81,49 @@ struct os_vio {
                     size_t num);
 
     int (*close)(struct os_vio *vio);
+};
+
+struct event_header {
+    uint32_t type;
+    uint64_t size;
+};
+
+//! Mouse button status
+struct mouse_event {
+    struct event_header h; //!< Event header
+    uint32_t button;            //!< Button state
+};
+
+struct mouse_move_event {
+    struct event_header h; //!< Event header
+    vec2f_t pos;       //!< Actual position
+};
+
+//! Keyboard event
+struct keyboard_event {
+    struct event_header h; //!< Event header
+    uint32_t keycode; //!< Key code
+};
+
+//! Gamepad move event
+struct gamepad_move_event {
+    struct event_header h; //!< Event header
+    uint8_t gamepad_id;         //!< Gamepad id
+    uint32_t axis;              //!< Axis id
+    vec2f_t position;  //!< Position
+};
+
+//! Gamepad button event
+struct gamepad_btn_event {
+    struct event_header h; //!< Event header
+    uint8_t gamepad_id;         //!< Gamepad id
+    uint32_t button;            //!< Button state
+};
+
+//! Gamepad device event
+struct gamepad_device_event {
+    struct event_header h; //!< Event header
+    uint8_t gamepad_id;         //!< Gamepad id
 };
 
 //==============================================================================
@@ -267,6 +316,37 @@ struct os_window_api_v0 {
     void *(*native_display_ptr)(os_window_t *w);
 };
 
+//! Machine API V0
+struct machine_api_v0 {
+
+    //! Get eventstream begin
+    //! \return Begin
+    struct event_header *(*event_begin)();
+
+    //! Get eventstream end
+    //! \return End
+    struct event_header *(*event_end)();
+
+    //! Next event
+    //! \param header Actual event header
+    //! \return Next event header
+    struct event_header *(*event_next)(struct event_header *header);
+
+    //! Is gamepad active?
+    //! \param gamepad Gamepad ID
+    //! \return 1 if is active else 0
+    int (*gamepad_is_active)(int gamepad);
+
+    //!
+    //! \param gamepad
+    //! \param strength
+    //! \param length
+    void (*gamepad_play_rumble)(int gamepad,
+                                float strength,
+                                uint32_t length);
+
+    void (*update)();
+};
 
 #ifdef __cplusplus
 }

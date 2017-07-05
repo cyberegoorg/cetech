@@ -2,10 +2,11 @@
 // Includes
 //==============================================================================
 #include <stdio.h>
+#include <string.h>
 
 #include <cetech/celib/allocator.h>
-#include <cetech/kernel/yaml.h>
 
+#include <cetech/kernel/yaml.h>
 #include <cetech/kernel/application.h>
 #include <cetech/kernel/memory.h>
 #include <cetech/kernel/config.h>
@@ -15,8 +16,8 @@
 #include <cetech/kernel/os.h>
 #include <cetech/kernel/api_system.h>
 
+
 #include <cetech/modules/resource.h>
-#include <cstring>
 
 #include "config_private.h"
 

@@ -11,5 +11,4 @@ namespace api {
     struct api_v0 *v0();
 };
 
-
 #endif //CETECH__API_H

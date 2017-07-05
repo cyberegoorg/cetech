@@ -6,7 +6,7 @@
 
 #include <cetech/celib/eventstream.inl>
 #include <cetech/kernel/module.h>
-#include <cetech/kernel/machine.h>
+#include <cetech/kernel/os.h>
 
 using namespace cetech;
 

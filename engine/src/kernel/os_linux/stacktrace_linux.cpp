@@ -10,10 +10,11 @@
 #include <cetech/kernel/api_system.h>
 #include <cetech/kernel/errors.h>
 #include <cetech/kernel/log.h>
+#include <cetech/celib/carray.inl>
 
-#include "../memory/memory_private.h"
+#include "../memory_private.h"
 
-#include "../memory/core_allocator_private.h"
+#include "../allocator_core_private.h"
 
 #endif
 
@@ -21,7 +22,7 @@ char *stacktrace(int skip) {
     auto* a = core_allocator::get();
 
 #if defined(CETECH_LINUX)
-    char *return_str = CETECH_ALLOCATE(a, char, 2048);
+    char *return_str = CETECH_ALLOCATE(a, char, 4096);
     return_str[0] = '\0';
 
     void *array[50];

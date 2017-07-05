@@ -205,7 +205,7 @@ namespace {
     void _send_events() {
         uint32_t event_num = 0;
 
-        struct event_header *event = eventstream::begin(_G.eventstream);
+        auto *event = eventstream::begin(_G.eventstream);
         while (event != eventstream::end(_G.eventstream)) {
             ++event_num;
             event = eventstream::next(_G.eventstream, event);

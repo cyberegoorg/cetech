@@ -33,11 +33,9 @@ using namespace string_stream;
 //! \param path File path
 //! \return Modified time
 uint32_t file_mtime(const char *path) {
-#if defined(CETECH_LINUX)
     struct stat st;
     stat(path, &st);
     return st.st_mtime;
-#endif
 }
 
 //==============================================================================
@@ -48,7 +46,6 @@ void _dir_list(const char *path,
                int recursive,
                Array<char *> &tmp_files,
                struct allocator *allocator) {
-#if defined(CETECH_LINUX)
     DIR *dir;
     struct dirent *entry;
 
@@ -96,7 +93,6 @@ void _dir_list(const char *path,
         }
     } while ((entry = readdir(dir)));
     closedir(dir);
-#endif
 }
 
 void dir_list(const char *path,
@@ -130,11 +126,7 @@ void dir_list_free(char **files,
 }
 
 
-//! Create dir
-//! \param path Dir path
-//! \return 1 of ok else 0
 int dir_make(const char *path) {
-#if defined(CETECH_LINUX)
     struct stat st;
     const int mode = 0775;
 
@@ -148,14 +140,9 @@ int dir_make(const char *path) {
     }
 
     return 1;
-#endif
 }
 
-//! Create dir path
-//! \param path Path
-//! \return 1 of ok else 0
 int dir_make_path(const char *path) {
-#if defined(CETECH_LINUX)
     char *pp;
     char *sp;
     int status = 1;
@@ -178,22 +165,13 @@ int dir_make_path(const char *path) {
 
     free(copypath);
     return status;
-#endif
 }
 
-
-//! Get filename from path
-//! \param path Path
-//! \return Filename
 const char *path_filename(const char *path) {
     char *ch = strrchr(path, DIR_DELIM_CH);
     return ch != NULL ? ch + 1 : path;
 }
 
-//! Get file basename (filename without extension)
-//! \param path Path
-//! \param out Out basename
-//! \param size
 void path_basename(const char *path,
                    char *out,
                    size_t size) {
@@ -212,7 +190,6 @@ void path_basename(const char *path,
 void path_dir(char *out,
               size_t size,
               const char *path) {
-#if defined(CETECH_LINUX)
     char *ch = strrchr(path, DIR_DELIM_CH);
 
     if (ch != NULL) {
@@ -220,12 +197,8 @@ void path_dir(char *out,
         memcpy(out, path, len);
         out[len] = '\0';
     }
-#endif
 }
 
-//! Get file extension
-//! \param path Path
-//! \return file extension
 const char *path_extension(const char *path) {
     const char *filename = path_filename(path);
     const char *ch = strrchr(filename, '.');

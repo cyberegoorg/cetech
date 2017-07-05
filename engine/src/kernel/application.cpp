@@ -14,7 +14,6 @@
 #include <cetech/kernel/os.h>
 #include <cetech/kernel/task.h>
 #include <cetech/kernel/develop.h>
-#include <cetech/kernel/machine.h>
 
 #include <cetech/modules/resource.h>
 #include <cetech/modules/luasys.h>
@@ -22,9 +21,9 @@
 #include <cetech/modules/package.h>
 #include <cetech/kernel/console_server.h>
 
-#include "../api/api_private.h"
-#include "../module/module_private.h"
-#include "../log/log_system_private.h"
+#include "api_private.h"
+#include "module_private.h"
+#include "log_system_private.h"
 
 
 #include <include/mpack/mpack.h>
@@ -45,13 +44,9 @@ CETECH_DECL_API(log_api_v0);
 CETECH_DECL_API(hash_api_v0);
 CETECH_DECL_API(api_v0);
 CETECH_DECL_API(machine_api_v0);
-
-
 CETECH_DECL_API(keyboard_api_v0);
 CETECH_DECL_API(mouse_api_v0);
 CETECH_DECL_API(gamepad_api_v0);
-
-
 
 //==============================================================================
 // Definess

@@ -9,7 +9,8 @@
 #include <cetech/kernel/config.h>
 #include <cetech/kernel/log.h>
 #include <cetech/modules/resource.h>
-#include <cetech/kernel/module.h>
+#include <cetech/modules/resource.h>
+
 #include <cetech/kernel/api_system.h>
 #include <cetech/celib/map.inl>
 

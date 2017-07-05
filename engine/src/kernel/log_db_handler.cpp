@@ -6,6 +6,7 @@
 #include <cetech/kernel/errors.h>
 #include <cetech/kernel/os.h>
 #include <cetech/kernel/api_system.h>
+
 #include <cetech/kernel/memory.h>
 
 #include "include/sqlite3/sqlite3.h"

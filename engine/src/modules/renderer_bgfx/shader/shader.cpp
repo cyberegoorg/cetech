@@ -16,6 +16,7 @@
 
 #include <cetech/kernel/hash.h>
 #include <cetech/kernel/os.h>
+
 #include <cetech/modules/resource.h>
 
 #include <bgfx/bgfx.h>

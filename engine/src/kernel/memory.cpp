@@ -8,7 +8,7 @@
 #include <cetech/kernel/log.h>
 
 #include "memory_private.h"
-#include "core_allocator_private.h"
+#include "allocator_core_private.h"
 
 CETECH_DECL_API(log_api_v0);
 
@@ -105,7 +105,7 @@ namespace memory {
         api->register_api("memory_api_v0", &_api);
     }
 
-    void memsys_init(int scratch_buffer_size) {
+    void init(int scratch_buffer_size) {
         _G = {0};
 
         _G.default_allocator = malloc_allocator_create();

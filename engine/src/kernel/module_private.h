@@ -5,15 +5,15 @@
 
 //! Add static module and load it
 //! \param name Module name
-#define ADD_STATIC_MODULE(name)                                      \
-    extern void name ## _load_module(struct api_v0* api);            \
-    extern void name ## _unload_module(struct api_v0* api);          \
+#define ADD_STATIC_MODULE(name)                                     \
+    extern void name ## _load_module(struct api_v0*);               \
+    extern void name ## _unload_module(struct api_v0*);             \
     module::add_static(name ## _load_module, name ## _unload_module)
 
 //! Load static module
 //! \param name Module name
-#define LOAD_STATIC_MODULE(api, name)                     \
-    extern void name ## _load_module(struct api_v0* api); \
+#define LOAD_STATIC_MODULE(api, name)                 \
+    extern void name ## _load_module(struct api_v0*); \
     name ## _load_module(api)
 
 //! Unload static module
@@ -21,7 +21,6 @@
 #define UNLOAD_STATIC_MODULE(api, name)                     \
     extern void name ## _unload_module(struct api_v0* api); \
     name ## _unload_module(api)
-
 
 namespace module {
     void init(struct allocator *allocator,

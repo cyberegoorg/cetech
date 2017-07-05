@@ -15,17 +15,17 @@
 //==============================================================================
 
 enum {
-    CETECH_SIZE_NOT_TRACKED =0xffffffffu
+    CETECH_SIZE_NOT_TRACKED = 0xffffffffu
 };
 
-#define CETECH_ALLOCATE(a, T, size) (T*)((a)->reallocate((a)->inst,         \
+#define CETECH_ALLOCATE(a, T, size) (T*)((a)->reallocate((a)->inst,          \
                                                           NULL,              \
-                                                          size,  \
+                                                          size,              \
                                                           CETECH_ALIGNOF(T)))
 
-#define CETECH_ALLOCATE_ALIGN(a, T, size, align) (T*)((a)->reallocate((a)->inst,         \
-                                                          NULL,              \
-                                                          size,  \
+#define CETECH_ALLOCATE_ALIGN(a, T, size, align) (T*)((a)->reallocate((a)->inst, \
+                                                          NULL,                  \
+                                                          size,                  \
                                                           align))
 
 #define CETECH_FREE(a, p) ((a)->reallocate((a)->inst,p,0,0))
@@ -56,11 +56,15 @@ enum {
 typedef void allocator_instance_v0;
 
 struct allocator {
-    allocator_instance_v0* inst;
+    allocator_instance_v0 *inst;
 
-    void* (*reallocate)(allocator_instance_v0* a, void *ptr, uint32_t size, uint32_t align);
+    void *(*reallocate)(allocator_instance_v0 *a,
+                        void *ptr,
+                        uint32_t size,
+                        uint32_t align);
 
     uint32_t (*total_allocated)(struct allocator *allocator);
+
     uint32_t (*allocated_size)(void *p);
 };
 

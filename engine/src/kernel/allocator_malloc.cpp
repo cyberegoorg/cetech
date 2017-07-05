@@ -7,9 +7,8 @@
 #include <cetech/celib/allocator.h>
 #include <cetech/kernel/errors.h>
 
-#include "header.h"
-
-#include "core_allocator_private.h"
+#include "allocator_core_private.h"
+#include "memory_private.h"
 
 
 #define MAX_MEM_TRACE 1024
@@ -19,7 +18,7 @@ static uint32_t size_with_padding(uint32_t size,
     return size + align + sizeof(struct Header);
 }
 
-struct malloc_allocator {
+struct allocator_malloc {
     uint32_t total_allocated;
     memory::allocator_trace_entry trace[MAX_MEM_TRACE];
 };
@@ -30,7 +29,7 @@ void *malloc_allocator_allocate(allocator_instance_v0 *allocator,
                                 uint32_t align) {
 
     auto *core_alloc = core_allocator::get();
-    auto *a = (struct malloc_allocator *) allocator;
+    auto *a = (struct allocator_malloc *) allocator;
 
     if (size) {
         const uint32_t ts = size_with_padding(size, align);
@@ -64,7 +63,7 @@ uint32_t malloc_allocator_allocated_size(void *p) {
 }
 
 uint32_t malloc_allocator_total_allocated(struct allocator *allocator) {
-    struct malloc_allocator *a = (struct malloc_allocator *) allocator->inst;
+    struct allocator_malloc *a = (struct allocator_malloc *) allocator->inst;
 
     return a->total_allocated;
 }
@@ -75,9 +74,9 @@ namespace memory {
 
         auto *a = CETECH_ALLOCATE(core_alloc, allocator, sizeof(allocator));
 
-        struct malloc_allocator *m = CETECH_ALLOCATE(core_alloc,
-                                                     malloc_allocator,
-                                                     sizeof(malloc_allocator));
+        struct allocator_malloc *m = CETECH_ALLOCATE(core_alloc,
+                                                     allocator_malloc,
+                                                     sizeof(allocator_malloc));
         m->total_allocated = 0;
 
         *a = (struct allocator) {
@@ -92,7 +91,7 @@ namespace memory {
 
     void malloc_allocator_destroy(struct allocator *a) {
         auto *core_alloc = core_allocator::get();
-        struct malloc_allocator *m = (struct malloc_allocator *) a->inst;
+        struct allocator_malloc *m = (struct allocator_malloc *) a->inst;
 
         memory::allocator_check_trace(m->trace, MAX_MEM_TRACE);
 

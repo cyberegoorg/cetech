@@ -68,28 +68,29 @@ set(SOURCE_FILES
         ########################################################################
         # Core
         ########################################################################
-        engine/src/kernel/api/api_system.cpp
-        engine/src/kernel/log/log_system.cpp
-        engine/src/kernel/os_sdl2/os.cpp
-        engine/src/kernel/os_sdl2/sdl2_stacktrace.cpp
-        engine/src/kernel/yaml/yaml.cpp
-        engine/src/kernel/module/module.cpp
-        engine/src/kernel/config/config.cpp
-        engine/src/kernel/memory/memory.cpp
-        engine/src/kernel/memory/malloc_allocator.cpp
-        engine/src/kernel/memory/scratch_allocator.cpp
-        engine/src/kernel/os_sdl2/machine.cpp
+        engine/src/kernel/api_system.cpp
+        engine/src/kernel/log_system.cpp
+        engine/src/kernel/os_sdl2/os_sdl2.cpp
+        engine/src/kernel/os_linux/stacktrace_linux.cpp
+        engine/src/kernel/os_linux/os_linux.cpp
+        engine/src/kernel/yaml.cpp
+        engine/src/kernel/module.cpp
+        engine/src/kernel/config.cpp
+        engine/src/kernel/memory.cpp
+        engine/src/kernel/allocator_malloc.cpp
+        engine/src/kernel/allocator_scratch.cpp
+        engine/src/kernel/os_sdl2/machine_sdl2.cpp
         engine/src/kernel/os_sdl2/sdl2_mouse.cpp
         engine/src/kernel/os_sdl2/sdl2_keyboard.cpp
         engine/src/kernel/os_sdl2/sdl2_gamepad.cpp
-        engine/src/kernel/application/application.cpp
-        engine/src/kernel/task/task.cpp
-        engine/src/kernel/develop_system/develop_system.cpp
-        engine/src/kernel/log/log_db_handler.cpp
-        engine/src/kernel/log/log_nanomsg_handler.cpp
-        engine/src/kernel/log/log_stdout_handler.cpp
-        engine/src/kernel/kernel/kernel.cpp
-        engine/src/kernel/hash/hashlib.cpp
+        engine/src/kernel/application.cpp
+        engine/src/kernel/task.cpp
+        engine/src/kernel/develop_system.cpp
+        engine/src/kernel/log_db_handler.cpp
+        engine/src/kernel/log_nanomsg_handler.cpp
+        engine/src/kernel/log_stdout_handler.cpp
+        engine/src/kernel/kernel.cpp
+        engine/src/kernel/hashlib.cpp
 
         ########################################################################
         # Modules
@@ -119,7 +120,7 @@ set(SOURCE_FILES
         engine/src/modules/luasys/api/api_level.c
         engine/src/modules/luasys/api/api_scenegraph.c
 
-        engine/src/kernel/console_server/console_server.cpp
+        engine/src/kernel/console_server.cpp
 
 
         engine/src/modules/resource/resource.cpp
@@ -154,7 +155,7 @@ set(SOURCE_FILES
         engine/src/modules/renderer_bgfx/material/material_compiler.cpp
         engine/src/modules/renderer_bgfx/material/material_compiler.cpp
 
-        engine/src/kernel/memory/core_allocator.cpp
+        engine/src/kernel/allocator_core.cpp
 
 
         )

@@ -10,7 +10,6 @@
 
 #include <cetech/kernel/application.h>
 #include <cetech/modules/resource.h>
-#include <cetech/kernel/machine.h>
 #include <cetech/kernel/api_system.h>
 
 using namespace cetech;

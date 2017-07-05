@@ -4,11 +4,11 @@
 
 #include <include/SDL2/SDL.h>
 
-#include <cetech/celib/math_types.h>
+#include <cetech/kernel/os.h>
 #include <cetech/kernel/module.h>
+#include <cetech/celib/math_types.h>
 #include <cetech/celib/eventstream.inl>
 
-#include <cetech/kernel/machine.h>
 #include <cetech/kernel/api_system.h>
 #include <cetech/kernel/log.h>
 
