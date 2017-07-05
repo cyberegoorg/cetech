@@ -131,7 +131,7 @@ namespace config {
                                             "global.config");
 
         struct os_vio *source_vio = os_vio_api_v0.from_file(source_path,
-                                                            VIO_OPEN_READ, a);
+                                                            VIO_OPEN_READ);
 
         char *data = CETECH_ALLOCATE(a, char, os_vio_api_v0.size(source_vio));
 
@@ -140,8 +140,7 @@ namespace config {
         os_vio_api_v0.close(source_vio);
 
         struct os_vio *build_vio = os_vio_api_v0.from_file(build_path,
-                                                           VIO_OPEN_WRITE,
-                                                           a);
+                                                           VIO_OPEN_WRITE);
         os_vio_api_v0.write(build_vio, data, sizeof(char), size);
         os_vio_api_v0.close(build_vio);
 
@@ -242,8 +241,7 @@ namespace config {
                                             "global.config");
 
         struct os_vio *source_vio = os_vio_api_v0.from_file(config_path,
-                                                            VIO_OPEN_READ,
-                                                            a);
+                                                            VIO_OPEN_READ);
 
         char *data = CETECH_ALLOCATE(a, char, os_vio_api_v0.size(source_vio));
 

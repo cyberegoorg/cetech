@@ -147,8 +147,7 @@ namespace entity_resource_compiler {
             char *full_path = os_path_v0.join(a, 2, source_dir, prefab_file);
 
             struct os_vio *prefab_vio = os_vio_api_v0.from_file(full_path,
-                                                                VIO_OPEN_READ,
-                                                                a);
+                                                                VIO_OPEN_READ);
 
             char prefab_data[os_vio_api_v0.size(prefab_vio) + 1];
             memset(prefab_data, 0, os_vio_api_v0.size(prefab_vio) + 1);

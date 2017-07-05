@@ -184,8 +184,7 @@ void _compile_dir(Array<task_item> &tasks,
 
         struct os_vio *source_vio = os_vio_api_v0.from_file(
                 source_filename_full,
-                VIO_OPEN_READ,
-                memory_api_v0.main_scratch_allocator());
+                VIO_OPEN_READ);
         if (source_vio == NULL) {
             os_vio_api_v0.close(source_vio);
             continue;
@@ -194,8 +193,7 @@ void _compile_dir(Array<task_item> &tasks,
         char *build_path = os_path_v0.join(a, 2, build_dir_full, build_name);
 
         struct os_vio *build_vio = os_vio_api_v0.from_file(build_path,
-                                                           VIO_OPEN_WRITE,
-                                                           memory_api_v0.main_scratch_allocator());
+                                                           VIO_OPEN_WRITE);
 
         CETECH_FREE(a, build_path);
 

@@ -74,8 +74,7 @@ namespace filesystem {
         char *full_path = get_fullpath(root, a, path);
 
         struct os_vio *file = os_vio_api_v0.from_file(full_path,
-                                                      (vio_open_mode) mode,
-                                                      a);
+                                                      (vio_open_mode) mode);
 
         if (!file) {
             log_api_v0.error(LOG_WHERE, "Could not load file %s", full_path);

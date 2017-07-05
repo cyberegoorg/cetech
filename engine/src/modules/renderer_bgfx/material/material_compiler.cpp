@@ -66,8 +66,7 @@ namespace material_compiler {
                                                   prefab_file);
 
                 struct os_vio *prefab_vio = os_vio_api_v0.from_file(full_path,
-                                                                    VIO_OPEN_READ,
-                                                                    memory_api_v0.main_allocator());
+                                                                    VIO_OPEN_READ);
 
                 CETECH_FREE(a, full_path);
 
@@ -88,6 +87,7 @@ namespace material_compiler {
         void _forach_texture_clb(yaml_node_t key,
                                  yaml_node_t value,
                                  void *_data) {
+
             struct material_compile_output *output = (material_compile_output *) _data;
 
             output->texture_count += 1;

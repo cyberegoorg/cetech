@@ -1,4 +1,5 @@
 #include "include/SDL2/SDL.h"
+#include "../allocator_core_private.h"
 
 
 #include <cetech/kernel/log.h>
@@ -8,15 +9,14 @@
 
 #define LOG_WHERE "vio_sdl"
 
-struct sdl_vio {
-    struct allocator *allocator;
-    SDL_RWops *rw;
-};
 
 int vio_close(struct os_vio *file) {
     CETECH_ASSERT("vio", file != NULL);
 
-    return file->close(file->inst);
+    int ret = file->close(file->inst);
+
+    CETECH_FREE(core_allocator::get(), file);
+    return ret;
 }
 
 int64_t vio_seek(struct os_vio *file,
@@ -73,11 +73,10 @@ size_t vio_write(struct os_vio *file,
 };
 
 
-int64_t vio_sdl_seek( os_vio_instance_v0 *file,
+int64_t vio_sdl_seek(os_vio_instance_v0 *file,
                      int64_t offset,
                      enum vio_seek whence) {
     CETECH_ASSERT(LOG_WHERE, file != NULL);
-    struct sdl_vio *vf = (struct sdl_vio *) file;
 
     static int _whence[3] = {
             [VIO_SEEK_SET] = RW_SEEK_SET,
@@ -85,58 +84,49 @@ int64_t vio_sdl_seek( os_vio_instance_v0 *file,
             [VIO_SEEK_END] = RW_SEEK_END
     };
 
-    return SDL_RWseek(vf->rw, offset, -_whence[whence]);
+    return SDL_RWseek((SDL_RWops*)file, offset, -_whence[whence]);
 }
 
-size_t vio_sdl_read( os_vio_instance_v0 *file,
+size_t vio_sdl_read(os_vio_instance_v0 *file,
                     void *buffer,
                     size_t size,
                     size_t maxnum) {
     CETECH_ASSERT(LOG_WHERE, file != NULL);
-    struct sdl_vio *vf = (struct sdl_vio *) file;
 
-    return SDL_RWread(vf->rw, buffer, size, maxnum);
+    return SDL_RWread((SDL_RWops*) file, buffer, size, maxnum);
 };
 
-size_t vio_sdl_write( os_vio_instance_v0 *file,
+size_t vio_sdl_write(os_vio_instance_v0 *file,
                      const void *buffer,
                      size_t size,
                      size_t maxnum) {
     CETECH_ASSERT(LOG_WHERE, file != NULL);
-    struct sdl_vio *vf = (struct sdl_vio *) file;
 
-    return SDL_RWwrite(vf->rw, buffer, size, maxnum);
+    return SDL_RWwrite((SDL_RWops*) file, buffer, size, maxnum);
 };
 
 int64_t vio_sdl_size(os_vio_instance_v0 *file) {
     CETECH_ASSERT(LOG_WHERE, file != NULL);
-    struct sdl_vio *vf = (struct sdl_vio *) file;
 
-    return SDL_RWsize(vf->rw);
+    return SDL_RWsize((SDL_RWops*) file);
 };
 
 int vio_sdl_close(os_vio_instance_v0 *file) {
     CETECH_ASSERT(LOG_WHERE, file != NULL);
-    struct sdl_vio *vf = (struct sdl_vio *) file;
 
-    SDL_RWclose(vf->rw);
-
-//    CETECH_FREE(vf->allocator, vf);
-
+    SDL_RWclose((SDL_RWops*) file);
     return 1;
 }
 
 
 struct os_vio *vio_from_file(const char *path,
-                             enum vio_open_mode mode,
-                             struct allocator *allocator) {
+                             enum vio_open_mode mode) {
 
-    os_vio *vio = CETECH_ALLOCATE(allocator, os_vio, sizeof(os_vio));
-    sdl_vio *vf = CETECH_ALLOCATE(allocator, sdl_vio, sizeof(struct sdl_vio));
+    os_vio *vio = CETECH_ALLOCATE(core_allocator::get(), os_vio, sizeof(os_vio));
 
-    CETECH_ASSERT(LOG_WHERE, vf != NULL);
+    CETECH_ASSERT(LOG_WHERE, vio != NULL);
 
-    if (!vf) {
+    if (!vio) {
         return NULL;
     }
 
@@ -146,10 +136,7 @@ struct os_vio *vio_from_file(const char *path,
         return NULL;
     }
 
-    vf->allocator = allocator;
-    vf->rw = rwops;
-
-    vio->inst = vf;
+    vio->inst = rwops;
     vio->write = vio_sdl_write;
     vio->read = vio_sdl_read;
     vio->seek = vio_sdl_seek;

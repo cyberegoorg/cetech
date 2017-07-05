@@ -257,8 +257,7 @@ struct os_time_api_v0 {
 
 struct os_vio_api_v0 {
     struct os_vio *(*from_file)(const char *path,
-                                enum vio_open_mode mode,
-                                struct allocator *allocator);
+                                enum vio_open_mode mode);
 
     int (*close)(struct os_vio *file);
 

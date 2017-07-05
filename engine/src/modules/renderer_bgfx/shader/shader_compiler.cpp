@@ -163,8 +163,7 @@ namespace shader_compiler {
         }
 
         struct os_vio *tmp_file = os_vio_api_v0.from_file(output_path,
-                                                          VIO_OPEN_READ,
-                                                          memory_api_v0.main_allocator());
+                                                          VIO_OPEN_READ);
         char *vs_data =
                 CETECH_ALLOCATE(memory_api_v0.main_allocator(), char,
                                 os_vio_api_v0.size(tmp_file) + 1);
@@ -193,8 +192,7 @@ namespace shader_compiler {
             return 0;
         }
 
-        tmp_file = os_vio_api_v0.from_file(output_path, VIO_OPEN_READ,
-                                           memory_api_v0.main_allocator());
+        tmp_file = os_vio_api_v0.from_file(output_path, VIO_OPEN_READ);
         char *fs_data =
                 CETECH_ALLOCATE(memory_api_v0.main_allocator(), char,
                                 os_vio_api_v0.size(tmp_file) + 1);
