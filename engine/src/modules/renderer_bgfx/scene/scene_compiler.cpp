@@ -504,10 +504,11 @@ namespace scene_resource_compiler {
 
         char *source_data =
                 CETECH_ALLOCATE(memory_api_v0.main_allocator(), char,
-                                os_vio_api_v0.size(source_vio) + 1);
-        memset(source_data, 0, os_vio_api_v0.size(source_vio) + 1);
-        os_vio_api_v0.read(source_vio, source_data, sizeof(char),
-                           os_vio_api_v0.size(source_vio));
+                                source_vio->size(source_vio->inst) + 1);
+        memset(source_data, 0, source_vio->size(source_vio->inst) + 1);
+
+        source_vio->read(source_vio->inst, source_data, sizeof(char),
+                         source_vio->size(source_vio->inst));
 
         yaml_document_t h;
         yaml_node_t root = yaml_load_str(source_data, &h);
@@ -535,41 +536,41 @@ namespace scene_resource_compiler {
                 .vb_len = (uint32_t) array::size(output->vb),
         };
 
-        os_vio_api_v0.write(build_vio, &res, sizeof(res), 1);
-        os_vio_api_v0.write(build_vio, array::begin(output->geom_name),
+        build_vio->write(build_vio->inst, &res, sizeof(res), 1);
+        build_vio->write(build_vio->inst, array::begin(output->geom_name),
                             sizeof(uint64_t),
                             array::size(output->geom_name));
-        os_vio_api_v0.write(build_vio, array::begin(output->ib_offset),
+        build_vio->write(build_vio->inst, array::begin(output->ib_offset),
                             sizeof(uint32_t),
                             array::size(output->ib_offset));
-        os_vio_api_v0.write(build_vio, array::begin(output->vb_offset),
+        build_vio->write(build_vio->inst, array::begin(output->vb_offset),
                             sizeof(uint32_t),
                             array::size(output->vb_offset));
-        os_vio_api_v0.write(build_vio, array::begin(output->vb_decl),
+        build_vio->write(build_vio->inst, array::begin(output->vb_decl),
                             sizeof(bgfx::VertexDecl),
                             array::size(output->vb_decl));
-        os_vio_api_v0.write(build_vio, array::begin(output->ib_size),
+        build_vio->write(build_vio->inst, array::begin(output->ib_size),
                             sizeof(uint32_t),
                             array::size(output->ib_size));
-        os_vio_api_v0.write(build_vio, array::begin(output->vb_size),
+        build_vio->write(build_vio->inst, array::begin(output->vb_size),
                             sizeof(uint32_t),
                             array::size(output->vb_size));
-        os_vio_api_v0.write(build_vio, array::begin(output->ib),
+        build_vio->write(build_vio->inst, array::begin(output->ib),
                             sizeof(uint32_t),
                             array::size(output->ib));
-        os_vio_api_v0.write(build_vio, array::begin(output->vb),
+        build_vio->write(build_vio->inst, array::begin(output->vb),
                             sizeof(uint8_t),
                             array::size(output->vb));
-        os_vio_api_v0.write(build_vio, array::begin(output->node_name),
+        build_vio->write(build_vio->inst, array::begin(output->node_name),
                             sizeof(uint64_t),
                             array::size(output->node_name));
-        os_vio_api_v0.write(build_vio, array::begin(output->node_parent),
+        build_vio->write(build_vio->inst, array::begin(output->node_parent),
                             sizeof(uint32_t),
                             array::size(output->node_parent));
-        os_vio_api_v0.write(build_vio, array::begin(output->node_pose),
+        build_vio->write(build_vio->inst, array::begin(output->node_pose),
                             sizeof(mat44f_t),
                             array::size(output->node_pose));
-        os_vio_api_v0.write(build_vio, array::begin(output->geom_node),
+        build_vio->write(build_vio->inst, array::begin(output->geom_node),
                             sizeof(uint64_t),
                             array::size(output->geom_name));
 

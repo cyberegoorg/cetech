@@ -121,8 +121,9 @@ static void _compile_task(void *data) {
 
     CETECH_FREE(memory_api_v0.main_scratch_allocator(),
                       tdata->source_filename);
-    os_vio_api_v0.close(tdata->source);
-    os_vio_api_v0.close(tdata->build);
+
+    tdata->source->close(tdata->source->inst);
+    tdata->build->close(tdata->build->inst);
 
     atomic_store_explicit(&tdata->completed, 1, memory_order_release);
 }
@@ -185,8 +186,9 @@ void _compile_dir(Array<task_item> &tasks,
         struct os_vio *source_vio = os_vio_api_v0.from_file(
                 source_filename_full,
                 VIO_OPEN_READ);
+
         if (source_vio == NULL) {
-            os_vio_api_v0.close(source_vio);
+
             continue;
         }
 
@@ -198,7 +200,6 @@ void _compile_dir(Array<task_item> &tasks,
         CETECH_FREE(a, build_path);
 
         if (build_vio == NULL) {
-            os_vio_api_v0.close(build_vio);
             continue;
         }
 

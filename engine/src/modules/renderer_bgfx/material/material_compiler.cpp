@@ -70,11 +70,11 @@ namespace material_compiler {
 
                 CETECH_FREE(a, full_path);
 
-                char prefab_data[os_vio_api_v0.size(prefab_vio) + 1];
-                memset(prefab_data, 0, os_vio_api_v0.size(prefab_vio) + 1);
-                os_vio_api_v0.read(prefab_vio, prefab_data, sizeof(char),
-                                   os_vio_api_v0.size(prefab_vio));
-                os_vio_api_v0.close(prefab_vio);
+                char prefab_data[prefab_vio->size(prefab_vio->inst) + 1];
+                memset(prefab_data, 0, prefab_vio->size(prefab_vio->inst) + 1);
+                prefab_vio->read(prefab_vio->inst, prefab_data, sizeof(char),
+                                   prefab_vio->size(prefab_vio->inst));
+                prefab_vio->close(prefab_vio->inst);
 
                 yaml_document_t h;
                 yaml_node_t prefab_root = yaml_load_str(prefab_data, &h);
@@ -166,13 +166,14 @@ namespace material_compiler {
                  struct os_vio *source_vio,
                  struct os_vio *build_vio,
                  struct compilator_api *compilator_api) {
+
         char *source_data =
                 CETECH_ALLOCATE(memory_api_v0.main_allocator(), char,
-                                os_vio_api_v0.size(source_vio) + 1);
-        memset(source_data, 0, os_vio_api_v0.size(source_vio) + 1);
+                                source_vio->size(source_vio->inst) + 1);
+        memset(source_data, 0, source_vio->size(source_vio->inst) + 1);
 
-        os_vio_api_v0.read(source_vio, source_data, sizeof(char),
-                           os_vio_api_v0.size(source_vio));
+        source_vio->read(source_vio->inst, source_data, sizeof(char),
+                           source_vio->size(source_vio->inst));
 
         yaml_document_t h;
         yaml_node_t root = yaml_load_str(source_data, &h);
@@ -217,10 +218,10 @@ namespace material_compiler {
                         array::size(output.uniform_names) / 32),
         };
 
-        os_vio_api_v0.write(build_vio, &resource, sizeof(resource), 1);
-        os_vio_api_v0.write(build_vio, output.uniform_names._data, sizeof(char),
+        build_vio->write(build_vio->inst, &resource, sizeof(resource), 1);
+        build_vio->write(build_vio->inst, output.uniform_names._data, sizeof(char),
                             array::size(output.uniform_names));
-        os_vio_api_v0.write(build_vio, output.data._data, sizeof(uint8_t),
+        build_vio->write(build_vio->inst, output.data._data, sizeof(uint8_t),
                             array::size(output.data));
 
         output.uniform_names.destroy();

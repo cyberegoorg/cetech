@@ -9,69 +9,6 @@
 
 #define LOG_WHERE "vio_sdl"
 
-int vio_close(struct os_vio *file) {
-    CETECH_ASSERT("vio", file != NULL);
-
-    int ret = file->close(file->inst);
-
-    CETECH_FREE(core_allocator::get(), file);
-    return ret;
-}
-
-int64_t vio_seek(struct os_vio *file,
-                 int64_t offset,
-                 enum vio_seek whence) {
-    CETECH_ASSERT("vio", file != NULL);
-
-    return file->seek(file->inst, offset, whence);
-}
-
-void vio_seek_to_end(struct os_vio *file) {
-    CETECH_ASSERT("vio", file != NULL);
-
-    vio_seek(file, 0, VIO_SEEK_END);
-}
-
-int64_t vio_skip(struct os_vio *file,
-                 int64_t bytes) {
-    CETECH_ASSERT("vio", file != NULL);
-
-    return vio_seek(file, bytes, VIO_SEEK_CUR);
-}
-
-int64_t vio_position(struct os_vio *file) {
-    CETECH_ASSERT("vio", file != NULL);
-
-    return vio_skip(file, 0);
-}
-
-int64_t vio_size(struct os_vio *file) {
-    CETECH_ASSERT("vio", file != NULL);
-
-    return file->size(file->inst);
-};
-
-size_t vio_read(struct os_vio *file,
-                void *buffer,
-                size_t size,
-                size_t maxnum) {
-
-    CETECH_ASSERT("vio", file != NULL);
-
-    return file->read(file->inst, buffer, size, maxnum);
-};
-
-size_t vio_write(struct os_vio *file,
-                 const void *buffer,
-                 size_t size,
-                 size_t num) {
-
-    CETECH_ASSERT("vio", file != NULL);
-
-    return file->write(file->inst, buffer, size, num);
-};
-
-
 int64_t vio_sdl_seek(os_vio_instance_v0 *file,
                      int64_t offset,
                      enum vio_seek whence) {
@@ -141,7 +78,6 @@ struct os_vio *vio_from_file(const char *path,
     vio->seek = vio_sdl_seek;
     vio->size = vio_sdl_size;
     vio->close = vio_sdl_close;
-
 
     return vio;
 }

@@ -84,10 +84,10 @@ int _package_compiler(const char *filename,
                       struct os_vio *build_vio,
                       struct compilator_api *compilator_api) {
 
-    char source_data[os_vio_api_v0.size(source_vio) + 1];
-    memset(source_data, 0, os_vio_api_v0.size(source_vio) + 1);
-    os_vio_api_v0.read(source_vio, source_data, sizeof(char),
-                       os_vio_api_v0.size(source_vio));
+    char source_data[source_vio->size(source_vio->inst) + 1];
+    memset(source_data, 0, source_vio->size(source_vio->inst) + 1);
+    source_vio->read(source_vio->inst, source_data, sizeof(char),
+                     source_vio->size(source_vio->inst));
 
     yaml_document_t h;
     yaml_node_t root = yaml_load_str(source_data, &h);
@@ -117,18 +117,18 @@ int _package_compiler(const char *filename,
                              (array::size(compile_data.name) *
                               sizeof(uint64_t));
 
-    os_vio_api_v0.write(build_vio, &resource, sizeof(resource), 1);
+    build_vio->write(build_vio->inst, &resource, sizeof(resource), 1);
 
-    os_vio_api_v0.write(build_vio, array::begin(compile_data.types),
+    build_vio->write(build_vio->inst, array::begin(compile_data.types),
                         sizeof(uint64_t), array::size(compile_data.types));
 
-    os_vio_api_v0.write(build_vio, array::begin(compile_data.name_count),
+    build_vio->write(build_vio->inst, array::begin(compile_data.name_count),
                         sizeof(uint32_t), array::size(compile_data.name_count));
 
-    os_vio_api_v0.write(build_vio, array::begin(compile_data.name),
+    build_vio->write(build_vio->inst, array::begin(compile_data.name),
                         sizeof(uint64_t), array::size(compile_data.name));
 
-    os_vio_api_v0.write(build_vio, array::begin(compile_data.offset),
+    build_vio->write(build_vio->inst, array::begin(compile_data.offset),
                         sizeof(uint32_t), array::size(compile_data.offset));
 
     return 1;

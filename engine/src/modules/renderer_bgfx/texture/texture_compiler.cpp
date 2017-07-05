@@ -99,10 +99,10 @@ namespace texture_compiler {
         char output_path[1024] = {0};
         char tmp_filename[1024] = {0};
 
-        char source_data[os_vio_api_v0.size(source_vio) + 1];
-        memset(source_data, 0, os_vio_api_v0.size(source_vio) + 1);
-        os_vio_api_v0.read(source_vio, source_data, sizeof(char),
-                           os_vio_api_v0.size(source_vio));
+        char source_data[source_vio->size(source_vio->inst) + 1];
+        memset(source_data, 0, source_vio->size(source_vio->inst) + 1);
+        source_vio->read(source_vio->inst, source_data, sizeof(char),
+                         source_vio->size(source_vio->inst));
 
         yaml_document_t h;
         yaml_node_t root = yaml_load_str(source_data, &h);
@@ -141,18 +141,19 @@ namespace texture_compiler {
                                                           VIO_OPEN_READ);
         char *tmp_data =
                 CETECH_ALLOCATE(memory_api_v0.main_allocator(), char,
-                                os_vio_api_v0.size(tmp_file) + 1);
-        os_vio_api_v0.read(tmp_file, tmp_data, sizeof(char),
-                           os_vio_api_v0.size(tmp_file));
+                                tmp_file->size(tmp_file->inst) + 1);
+        tmp_file->read(tmp_file->inst, tmp_data, sizeof(char),
+                       tmp_file->size(tmp_file->inst));
 
         texture_blob::blob_t resource = {
-                .size = (uint32_t) os_vio_api_v0.size(tmp_file)
+                .size = (uint32_t) tmp_file->size(tmp_file->inst)
         };
 
-        os_vio_api_v0.write(build_vio, &resource, sizeof(resource), 1);
-        os_vio_api_v0.write(build_vio, tmp_data, sizeof(char), resource.size);
+        build_vio->write(build_vio->inst, &resource, sizeof(resource), 1);
+        build_vio->write(build_vio->inst, tmp_data, sizeof(char),
+                         resource.size);
 
-        os_vio_api_v0.close(tmp_file);
+        tmp_file->close(tmp_file->inst);
 
         compilator_api->add_dependency(filename, input_str);
 

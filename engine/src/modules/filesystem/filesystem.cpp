@@ -88,7 +88,7 @@ namespace filesystem {
     }
 
     void close(struct os_vio *file) {
-        os_vio_api_v0.close(file);
+        file->close(file->inst);
     }
 
     int create_directory(uint64_t root,
@@ -194,5 +194,4 @@ namespace filesystem_module {
     extern "C" void filesystem_unload_module(struct api_v0 *api) {
         _shutdown();
     }
-
 }

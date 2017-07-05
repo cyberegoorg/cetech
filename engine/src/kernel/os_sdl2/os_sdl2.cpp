@@ -9,7 +9,7 @@ CETECH_DECL_API(log_api_v0);
 #include "window_sdl2.h"
 #include "thread_sdl2.h"
 #include "sdl2_time.h"
-#include "vio_linux.h"
+#include "vio_sdl2.h"
 
 namespace machine_sdl {
     void init(struct api_v0 *api);
@@ -54,14 +54,6 @@ static struct os_time_api_v0 time_api = {
 
 static struct os_vio_api_v0 vio_api = {
         .from_file = vio_from_file,
-        .close = vio_close,
-        .seek = vio_seek,
-        .seek_to_end = vio_seek_to_end,
-        .skip = vio_skip,
-        .position = vio_position,
-        .size = vio_size,
-        .read = vio_read,
-        .write = vio_write
 };
 
 
