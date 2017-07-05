@@ -77,6 +77,7 @@ int64_t vio_sdl_seek( os_vio_instance_v0 *file,
                      int64_t offset,
                      enum vio_seek whence) {
     CETECH_ASSERT(LOG_WHERE, file != NULL);
+    struct sdl_vio *vf = (struct sdl_vio *) file;
 
     static int _whence[3] = {
             [VIO_SEEK_SET] = RW_SEEK_SET,
@@ -84,7 +85,7 @@ int64_t vio_sdl_seek( os_vio_instance_v0 *file,
             [VIO_SEEK_END] = RW_SEEK_END
     };
 
-    return SDL_RWseek((SDL_RWops*)file, offset, -_whence[whence]);
+    return SDL_RWseek(vf->rw, offset, -_whence[whence]);
 }
 
 size_t vio_sdl_read( os_vio_instance_v0 *file,
@@ -94,7 +95,7 @@ size_t vio_sdl_read( os_vio_instance_v0 *file,
     CETECH_ASSERT(LOG_WHERE, file != NULL);
     struct sdl_vio *vf = (struct sdl_vio *) file;
 
-    return SDL_RWread((SDL_RWops*)file, buffer, size, maxnum);
+    return SDL_RWread(vf->rw, buffer, size, maxnum);
 };
 
 size_t vio_sdl_write( os_vio_instance_v0 *file,
@@ -104,21 +105,21 @@ size_t vio_sdl_write( os_vio_instance_v0 *file,
     CETECH_ASSERT(LOG_WHERE, file != NULL);
     struct sdl_vio *vf = (struct sdl_vio *) file;
 
-    return SDL_RWwrite((SDL_RWops*)file, buffer, size, maxnum);
+    return SDL_RWwrite(vf->rw, buffer, size, maxnum);
 };
 
-int64_t vio_sdl_size( os_vio_instance_v0 *file) {
+int64_t vio_sdl_size(os_vio_instance_v0 *file) {
     CETECH_ASSERT(LOG_WHERE, file != NULL);
     struct sdl_vio *vf = (struct sdl_vio *) file;
 
-    return SDL_RWsize((SDL_RWops*)file);
+    return SDL_RWsize(vf->rw);
 };
 
 int vio_sdl_close(os_vio_instance_v0 *file) {
     CETECH_ASSERT(LOG_WHERE, file != NULL);
     struct sdl_vio *vf = (struct sdl_vio *) file;
 
-    SDL_RWclose((SDL_RWops*)file);
+    SDL_RWclose(vf->rw);
 
 //    CETECH_FREE(vf->allocator, vf);
 
