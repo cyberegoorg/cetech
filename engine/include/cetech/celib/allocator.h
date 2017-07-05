@@ -30,8 +30,10 @@ enum {
 
 #define CETECH_FREE(a, p) ((a)->reallocate((a)->inst,p,0,0))
 
-#define CETECH_NEW(a, T, ...)        (new (CETECH_ALLOCATE_ALIGN(a, T, sizeof(T), CETECH_ALIGNOF(T))) T(__VA_ARGS__))
-#define CETECH_DELETE(a, T, p)    do {if (p) {(p)->~T(); CETECH_FREE(a,p);}} while (0)
+#define CETECH_NEW(a, T, ...) (new (CETECH_ALLOCATE_ALIGN(a, T, sizeof(T), \
+                                    CETECH_ALIGNOF(T))) T(__VA_ARGS__))
+
+#define CETECH_DELETE(a, T, p) do { if (p) {(p)->~T(); CETECH_FREE(a,p);}} while (0)
 
 //==============================================================================
 // Defines

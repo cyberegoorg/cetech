@@ -5,9 +5,9 @@
 
 CETECH_DECL_API(log_api_v0);
 
-#include "sdl2_cpu.h"
-#include "sdl2_window.h"
-#include "sdl2_thread.h"
+#include "cpu_sdl2.h"
+#include "window_sdl2.h"
+#include "thread_sdl2.h"
 #include "sdl2_time.h"
 
 namespace machine {

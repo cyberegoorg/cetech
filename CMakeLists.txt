@@ -68,21 +68,24 @@ set(SOURCE_FILES
         ########################################################################
         # Core
         ########################################################################
-        engine/src/kernel/api_system.cpp
-        engine/src/kernel/log_system.cpp
         engine/src/kernel/os_sdl2/os_sdl2.cpp
         engine/src/kernel/os_linux/stacktrace_linux.cpp
         engine/src/kernel/os_linux/os_linux.cpp
+        engine/src/kernel/os_sdl2/machine_sdl2.cpp
+        engine/src/kernel/os_sdl2/mouse_sdl2.cpp
+        engine/src/kernel/os_sdl2/keyboard_sdl2.cpp
+        engine/src/kernel/os_sdl2/gamepad_sdl2.cpp
+
+        engine/src/kernel/console_server.cpp
+        engine/src/kernel/allocator_core.cpp
+        engine/src/kernel/api_system.cpp
+        engine/src/kernel/log_system.cpp
         engine/src/kernel/yaml.cpp
         engine/src/kernel/module.cpp
         engine/src/kernel/config.cpp
         engine/src/kernel/memory.cpp
         engine/src/kernel/allocator_malloc.cpp
         engine/src/kernel/allocator_scratch.cpp
-        engine/src/kernel/os_sdl2/machine_sdl2.cpp
-        engine/src/kernel/os_sdl2/sdl2_mouse.cpp
-        engine/src/kernel/os_sdl2/sdl2_keyboard.cpp
-        engine/src/kernel/os_sdl2/sdl2_gamepad.cpp
         engine/src/kernel/application.cpp
         engine/src/kernel/task.cpp
         engine/src/kernel/develop_system.cpp
@@ -120,9 +123,6 @@ set(SOURCE_FILES
         engine/src/modules/luasys/api/api_level.c
         engine/src/modules/luasys/api/api_scenegraph.c
 
-        engine/src/kernel/console_server.cpp
-
-
         engine/src/modules/resource/resource.cpp
         engine/src/modules/resource/resource_package.cpp
         engine/src/modules/resource/resource_compiler.cpp
@@ -154,9 +154,6 @@ set(SOURCE_FILES
         engine/src/modules/renderer_bgfx/texture/texture_compiler.cpp
         engine/src/modules/renderer_bgfx/material/material_compiler.cpp
         engine/src/modules/renderer_bgfx/material/material_compiler.cpp
-
-        engine/src/kernel/allocator_core.cpp
-
 
         )
 
