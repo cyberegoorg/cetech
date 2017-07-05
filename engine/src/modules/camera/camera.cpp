@@ -1,28 +1,28 @@
 #include <cetech/celib/map.inl>
 
 #include <cetech/celib/mat44f.inl>
-#include <cetech/core/yaml.h>
-#include <cetech/core/hash.h>
-#include <cetech/core/config.h>
+#include <cetech/kernel/yaml.h>
+#include <cetech/kernel/hash.h>
+#include <cetech/kernel/config.h>
 #include <cetech/modules/resource.h>
-#include <cetech/core/memory.h>
-#include <cetech/core/module.h>
-#include <cetech/core/api.h>
+#include <cetech/kernel/memory.h>
+#include <cetech/kernel/module.h>
+#include <cetech/kernel/api_system.h>
 
 #include <cetech/modules/entity.h>
-#include <cetech/modules/world.h>
-#include <cetech/modules/component.h>
+
+
 #include <cetech/modules/renderer.h>
 #include <cetech/modules/transform.h>
 
 #include "cetech/modules/camera.h"
 
 
-IMPORT_API(memory_api_v0);
-IMPORT_API(component_api_v0);
-IMPORT_API(renderer_api_v0);
-IMPORT_API(transform_api_v0);
-IMPORT_API(hash_api_v0);
+CETECH_DECL_API(memory_api_v0);
+CETECH_DECL_API(component_api_v0);
+CETECH_DECL_API(renderer_api_v0);
+CETECH_DECL_API(transform_api_v0);
+CETECH_DECL_API(hash_api_v0);
 
 using namespace cetech;
 
@@ -78,7 +78,7 @@ namespace {
         memcpy(new_data.far, _data.far, _data.n * sizeof(float));
         memcpy(new_data.fov, _data.fov, _data.n * sizeof(float));
 
-        CETECH_DEALLOCATE(_allocator, _data.buffer);
+        CETECH_FREE(_allocator, _data.buffer);
 
         _data = new_data;
     }
@@ -114,7 +114,7 @@ namespace {
 
         world_t last_world = _G.world_instances[last_idx].world;
 
-        CETECH_DEALLOCATE(memory_api_v0.main_allocator(),
+        CETECH_FREE(memory_api_v0.main_allocator(),
                           _G.world_instances[idx].buffer);
 
         _G.world_instances[idx] = _G.world_instances[last_idx];
@@ -259,12 +259,20 @@ namespace camera_module {
         }
     }
 
+
+    static void _init_api(struct api_v0 *api) {
+        api->register_api("camera_api_v0", &camera_api);
+    }
+
+
     static void _init(struct api_v0 *api_v0) {
-        GET_API(api_v0, memory_api_v0);
-        GET_API(api_v0, component_api_v0);
-        GET_API(api_v0, renderer_api_v0);
-        GET_API(api_v0, transform_api_v0);
-        GET_API(api_v0, hash_api_v0);
+        _init_api(api_v0);
+
+        CETECH_GET_API(api_v0, memory_api_v0);
+        CETECH_GET_API(api_v0, component_api_v0);
+        CETECH_GET_API(api_v0, renderer_api_v0);
+        CETECH_GET_API(api_v0, transform_api_v0);
+        CETECH_GET_API(api_v0, hash_api_v0);
 
         _G = {0};
 
@@ -293,26 +301,12 @@ namespace camera_module {
     }
 
 
-    static void _init_api(struct api_v0 *api) {
-        api->register_api("camera_api_v0", &camera_api);
+    extern "C" void camera_load_module(struct api_v0 *api) {
+        _init(api);
     }
 
-
-    extern "C" void *camera_get_module_api(int api) {
-        switch (api) {
-            case PLUGIN_EXPORT_API_ID: {
-                static struct module_export_api_v0 module = {0};
-
-                module.init = _init;
-                module.init_api = _init_api;
-                module.shutdown = _shutdown;
-
-                return &module;
-            }
-
-            default:
-                return NULL;
-        }
+    extern "C" void camera_unload_module(struct api_v0 *api) {
+        _shutdown();
     }
 
 }

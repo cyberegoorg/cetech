@@ -6,16 +6,16 @@
 #include <cetech/celib/map.inl>
 #include <cetech/celib/quatf.inl>
 
-#include <cetech/core/config.h>
-#include <cetech/core/vio.h>
-#include <cetech/core/yaml.h>
-#include <cetech/core/hash.h>
-#include <cetech/core/api.h>
-#include <cetech/core/memory.h>
-#include <cetech/core/module.h>
+#include <cetech/kernel/config.h>
+#include <cetech/kernel/os.h>
+#include <cetech/kernel/yaml.h>
+#include <cetech/kernel/hash.h>
+#include <cetech/kernel/api_system.h>
+#include <cetech/kernel/memory.h>
+#include <cetech/kernel/module.h>
 
 #include <cetech/modules/entity.h>
-#include <cetech/modules/world.h>
+
 #include <cetech/modules/resource.h>
 #include <cetech/modules/transform.h>
 #include "cetech/modules/level.h"
@@ -24,14 +24,14 @@
 
 using namespace cetech;
 
-IMPORT_API(entity_api_v0);
-IMPORT_API(resource_api_v0);
-IMPORT_API(transform_api_v0);
-IMPORT_API(memory_api_v0);
-IMPORT_API(vio_api_v0);
-IMPORT_API(hash_api_v0);
-IMPORT_API(blob_api_v0);
-IMPORT_API(world_api_v0);
+CETECH_DECL_API(entity_api_v0);
+CETECH_DECL_API(resource_api_v0);
+CETECH_DECL_API(transform_api_v0);
+CETECH_DECL_API(memory_api_v0);
+CETECH_DECL_API(os_vio_api_v0);
+CETECH_DECL_API(hash_api_v0);
+CETECH_DECL_API(blob_api_v0);
+CETECH_DECL_API(world_api_v0);
 
 //==============================================================================
 // Globals
@@ -86,17 +86,17 @@ namespace {
 
 namespace level_resource {
 
-    void *loader(struct vio *input,
+    void *loader(struct os_vio *input,
                  struct allocator *allocator) {
-        const int64_t size = vio_api_v0.size(input);
+        const int64_t size = os_vio_api_v0.size(input);
         char *data = CETECH_ALLOCATE(allocator, char, size);
-        vio_api_v0.read(input, data, 1, size);
+        os_vio_api_v0.read(input, data, 1, size);
         return data;
     }
 
     void unloader(void *new_data,
                   struct allocator *allocator) {
-        CETECH_DEALLOCATE(allocator, new_data);
+        CETECH_FREE(allocator, new_data);
     }
 
     void online(uint64_t name,
@@ -114,7 +114,7 @@ namespace level_resource {
         resource_offline(name, old_data);
         online(name, new_data);
 
-        CETECH_DEALLOCATE(allocator, old_data);
+        CETECH_FREE(allocator, old_data);
 
         return new_data;
     }
@@ -159,14 +159,14 @@ namespace level_resource_compiler {
     }
 
     int compiler(const char *filename,
-                 struct vio *source_vio,
-                 struct vio *build_vio,
+                 struct os_vio *source_vio,
+                 struct os_vio *build_vio,
                  struct compilator_api *compilator_api) {
 
-        char source_data[vio_api_v0.size(source_vio) + 1];
-        memset(source_data, 0, vio_api_v0.size(source_vio) + 1);
-        vio_api_v0.read(source_vio, source_data, sizeof(char),
-                        vio_api_v0.size(source_vio));
+        char source_data[os_vio_api_v0.size(source_vio) + 1];
+        memset(source_data, 0, os_vio_api_v0.size(source_vio) + 1);
+        os_vio_api_v0.read(source_vio, source_data, sizeof(char),
+                           os_vio_api_v0.size(source_vio));
 
         yaml_document_t h;
         yaml_node_t root = yaml_load_str(source_data, &h);
@@ -195,13 +195,13 @@ namespace level_resource_compiler {
 
         entity_api_v0.compiler_write_to_build(output, entity_data.data);
 
-        vio_api_v0.write(build_vio, &res, sizeof(level_blob::blob_t), 1);
-        vio_api_v0.write(build_vio, array::begin(id), sizeof(uint64_t),
-                         array::size(id));
-        vio_api_v0.write(build_vio, array::begin(offset), sizeof(uint32_t),
-                         array::size(offset));
-        vio_api_v0.write(build_vio, data->data(data->inst), sizeof(uint8_t),
-                         data->size(data->inst));
+        os_vio_api_v0.write(build_vio, &res, sizeof(level_blob::blob_t), 1);
+        os_vio_api_v0.write(build_vio, array::begin(id), sizeof(uint64_t),
+                            array::size(id));
+        os_vio_api_v0.write(build_vio, array::begin(offset), sizeof(uint32_t),
+                            array::size(offset));
+        os_vio_api_v0.write(build_vio, data->data(data->inst), sizeof(uint8_t),
+                            data->size(data->inst));
 
         blob_api_v0.destroy(data);
         entity_api_v0.compiler_destroy_output(output);
@@ -259,7 +259,7 @@ namespace level {
                               instance->spawned_entity_count);
         entity_api_v0.destroy(world, &instance->level_entity, 1);
 
-        CETECH_DEALLOCATE(memory_api_v0.main_allocator(),
+        CETECH_FREE(memory_api_v0.main_allocator(),
                           instance->spawned_entity);
 
         _destroy_level_instance(instance);
@@ -296,14 +296,16 @@ namespace level_module {
 
 
     void _init(struct api_v0 *api) {
-        GET_API(api, entity_api_v0);
-        GET_API(api, memory_api_v0);
-        GET_API(api, resource_api_v0);
-        GET_API(api, transform_api_v0);
-        GET_API(api, vio_api_v0);
-        GET_API(api, hash_api_v0);
-        GET_API(api, blob_api_v0);
-        GET_API(api, world_api_v0);
+        _init_api(api);
+
+        CETECH_GET_API(api, entity_api_v0);
+        CETECH_GET_API(api, memory_api_v0);
+        CETECH_GET_API(api, resource_api_v0);
+        CETECH_GET_API(api, transform_api_v0);
+        CETECH_GET_API(api, os_vio_api_v0);
+        CETECH_GET_API(api, hash_api_v0);
+        CETECH_GET_API(api, blob_api_v0);
+        CETECH_GET_API(api, world_api_v0);
 
 
         _G = {0};
@@ -325,21 +327,12 @@ namespace level_module {
         _G.level_instance.destroy();
     }
 
-    extern "C" void *level_get_module_api(int api) {
+    extern "C" void level_unload_module(struct api_v0 *api) {
+        _shutdown();
+    }
 
-        switch (api) {
-            case PLUGIN_EXPORT_API_ID: {
-                static struct module_export_api_v0 module = {0};
+    extern "C" void level_load_module(struct api_v0 *api) {
+        _init(api);
 
-                module.init = _init;
-                module.init_api = _init_api;
-                module.shutdown = _shutdown;
-
-                return &module;
-            }
-
-            default:
-                return NULL;
-        }
     }
 }

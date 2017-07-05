@@ -2,7 +2,7 @@
 // Includes
 //==============================================================================
 
-#include <cetech/core/machine.h>
+#include <cetech/kernel/os.h>
 
 static const char *_btn_to_str[MOUSE_BTN_MAX] = {
         [MOUSE_BTN_UNKNOWN] = "",

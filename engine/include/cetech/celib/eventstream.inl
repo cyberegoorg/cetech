@@ -6,17 +6,19 @@
 //==============================================================================
 
 #include "array.inl"
-#include "cetech/core/types.h"
+#include "cetech/kernel/macros.h"
 
-struct event_header {
-    uint32_t type;
-    uint64_t size;
-};
 
 namespace cetech {
+
     typedef Array<uint8_t> EventStream;
 
     namespace eventstream {
+        struct event_header {
+            uint32_t type;
+            uint64_t size;
+        };
+
         template<typename T>
         inline void push(EventStream &stream,
                          uint32_t type,

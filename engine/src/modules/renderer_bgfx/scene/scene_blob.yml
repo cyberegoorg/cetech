@@ -1,0 +1,26 @@
+version: 0
+blobs:
+    - name: scene
+      guard_prefix: CETECH
+      includes:
+        - <cetech/core/hash.h>
+        - <cetech/celib/math_types.h>
+        - <bgfx/bgfx.h>
+
+      values:
+        - uint32_t geom_count
+        - uint32_t node_count
+        - uint32_t ib_len
+        - uint32_t vb_len
+        - uint64_t geom_name[geom_count]
+        - uint32_t ib_offset[geom_count]
+        - uint32_t vb_offset[geom_count]
+        - bgfx::VertexDecl vb_decl[geom_count]
+        - uint32_t ib_size[geom_count]
+        - uint32_t vb_size[geom_count]
+        - uint32_t ib[ib_len]
+        - uint8_t vb[vb_len]
+        - uint64_t node_name[node_count]
+        - uint32_t node_parent[node_count]
+        - mat44f_t node_pose[node_count]
+        - uint64_t geom_node[geom_count]

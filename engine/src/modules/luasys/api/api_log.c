@@ -3,15 +3,15 @@
 
 #include <cetech/celib/allocator.h>
 
-#include <cetech/core/module.h>
-#include <cetech/core/log.h>
+#include <cetech/kernel/module.h>
+#include <cetech/kernel/log.h>
 
 #include <cetech/modules/luasys.h>
-#include <cetech/core/api.h>
+#include <cetech/kernel/api_system.h>
 
 #define API_NAME "Log"
 
-IMPORT_API(log_api_v0);
+CETECH_DECL_API(log_api_v0);
 
 static int _log_format(lua_State *l,
                        char *buffer,
@@ -106,7 +106,7 @@ static int _log_debug(lua_State *l) {
 }
 
 void _register_lua_log_api(struct api_v0 *api) {
-    GET_API(api, log_api_v0);
+    CETECH_GET_API(api, log_api_v0);
 
     luasys_add_module_function(API_NAME, "info", _log_info);
     luasys_add_module_function(API_NAME, "warning", _log_warning);

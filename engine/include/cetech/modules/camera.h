@@ -21,11 +21,16 @@ typedef struct world_s world_t;
 typedef struct entity_s entity_t;
 typedef struct mat44f_s mat44f_t;
 
+
+//==============================================================================
+// Structs
+//==============================================================================
+
+
 //! Camera struct
 typedef struct camera_s {
     uint32_t idx;
 } camera_t;
-
 
 
 //==============================================================================

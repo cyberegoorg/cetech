@@ -2,7 +2,7 @@
 #include <cetech/celib/quatf.inl>
 #include <cetech/modules/luasys.h>
 
-#include <cetech/core/module.h>
+#include <cetech/kernel/module.h>
 
 #define API_NAME "Quatf"
 

@@ -15,7 +15,7 @@ extern "C" {
 #include <stddef.h>
 #include <stdint.h>
 
-struct vio;
+struct os_vio;
 struct allocator;
 struct compilator_api;
 
@@ -30,7 +30,7 @@ struct app_api_v0;
 //! \param input Input vio
 //! \param allocator Allocator
 //! \return Resource data
-typedef void *(*resource_loader_t)(struct vio *input,
+typedef void *(*resource_loader_t)(struct os_vio *input,
                                    struct allocator *allocator);
 
 //! Resource online callback
@@ -71,8 +71,8 @@ struct compilator_api;
 //! \param compilator_api Compilator api
 typedef int (*resource_compilator_t)(
         const char *filename,
-        struct vio *source_vio,
-        struct vio *build_vio,
+        struct os_vio *source_vio,
+        struct os_vio *build_vio,
         struct compilator_api *compilator_api);
 
 

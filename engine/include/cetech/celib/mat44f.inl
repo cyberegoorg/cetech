@@ -8,7 +8,7 @@
 
 #include <string.h>
 
-#include "cetech/core/types.h"
+#include "cetech/kernel/macros.h"
 #include "fmath.inl"
 #include "vec4f.inl"
 #include "math_types.h"

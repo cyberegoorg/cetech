@@ -2,21 +2,21 @@
 #define CETECH_LUA_RESOURCE_H
 
 
-#include <cetech/core/path.h>
+#include <cetech/kernel/os.h>
 
 namespace resource_lua {
-    void *loader(struct vio *input,
+    void *loader(struct os_vio *input,
                  struct allocator *allocator) {
-        const int64_t size = vio_api_v0.size(input);
+        const int64_t size = os_vio_api_v0.size(input);
         char *data = CETECH_ALLOCATE(allocator, char, size);
-        vio_api_v0.read(input, data, 1, size);
+        os_vio_api_v0.read(input, data, 1, size);
 
         return data;
     }
 
     void unloader(void *new_data,
                   struct allocator *allocator) {
-        CETECH_DEALLOCATE(allocator, new_data);
+        CETECH_FREE(allocator, new_data);
     }
 
     void online(uint64_t name,
@@ -32,7 +32,7 @@ namespace resource_lua {
                    void *old_data,
                    void *new_data,
                    struct allocator *allocator) {
-        CETECH_DEALLOCATE(allocator, old_data);
+        CETECH_FREE(allocator, old_data);
 
         struct lua_resource *resource = (lua_resource *) new_data;
         char *data = (char *) (resource + 1);

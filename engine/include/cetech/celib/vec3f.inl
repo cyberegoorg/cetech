@@ -6,7 +6,7 @@
 // Includes
 //==============================================================================
 
-#include "cetech/core/types.h"
+#include "cetech/kernel/macros.h"
 #include "fmath.inl"
 #include "math_types.h"
 

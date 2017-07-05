@@ -1,22 +1,20 @@
 
 #include <cetech/celib/allocator.h>
 
-#include <cetech/core/hash.h>
-#include <cetech/core/module.h>
+#include <cetech/kernel/hash.h>
+#include <cetech/kernel/module.h>
 
-#include <cetech/modules/world.h>
 #include <cetech/modules/entity.h>
-#include <cetech/modules/component.h>
 
 #include <cetech/modules/luasys.h>
 #include <include/luajit/lua.h>
-#include <cetech/core/api.h>
+#include <cetech/kernel/api_system.h>
 
 #define API_NAME "Component"
 
-IMPORT_API(component_api_v0)
-IMPORT_API(lua_api_v0)
-IMPORT_API(hash_api_v0)
+CETECH_DECL_API(component_api_v0)
+CETECH_DECL_API(lua_api_v0)
+CETECH_DECL_API(hash_api_v0)
 
 static int _set_property(lua_State *l) {
     world_t w = {.h = luasys_to_handler(l, 1)};
@@ -127,9 +125,9 @@ static int _get_property(lua_State *l) {
 
 
 void _register_lua_component_api(struct api_v0 *api) {
-    GET_API(api, component_api_v0);
-    GET_API(api, lua_api_v0);
-    GET_API(api, hash_api_v0);
+    CETECH_GET_API(api, component_api_v0);
+    CETECH_GET_API(api, lua_api_v0);
+    CETECH_GET_API(api, hash_api_v0);
 
     luasys_add_module_function(API_NAME, "set_property", _set_property);
     luasys_add_module_function(API_NAME, "get_property", _get_property);

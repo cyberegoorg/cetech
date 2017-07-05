@@ -7,30 +7,30 @@
 #include <cetech/celib/handler.inl>
 #include <cetech/celib/map.inl>
 
-#include <cetech/core/api.h>
-#include <cetech/core/module.h>
-#include <cetech/core/memory.h>
-#include <cetech/core/yaml.h>
-#include <cetech/core/hash.h>
-#include <cetech/core/path.h>
-#include <cetech/core/log.h>
-#include <cetech/core/vio.h>
-#include <cetech/core/config.h>
+#include <cetech/kernel/api_system.h>
+#include <cetech/kernel/module.h>
+#include <cetech/kernel/memory.h>
+#include <cetech/kernel/yaml.h>
+#include <cetech/kernel/hash.h>
+#include <cetech/kernel/os.h>
+#include <cetech/kernel/log.h>
+#include <cetech/kernel/config.h>
+
 
 #include <cetech/modules/resource.h>
-#include <cetech/modules/world.h>
-#include <cetech/modules/entity.h>
-#include <cetech/modules/component.h>
-#include <cetech/core/errors.h>
 
-IMPORT_API(memory_api_v0);
-IMPORT_API(component_api_v0);
-IMPORT_API(resource_api_v0);
-IMPORT_API(path_v0);
-IMPORT_API(log_api_v0);
-IMPORT_API(vio_api_v0);
-IMPORT_API(hash_api_v0);
-IMPORT_API(blob_api_v0);
+#include <cetech/modules/entity.h>
+
+#include <cetech/kernel/errors.h>
+
+CETECH_DECL_API(memory_api_v0);
+CETECH_DECL_API(component_api_v0);
+CETECH_DECL_API(resource_api_v0);
+CETECH_DECL_API(os_path_v0);
+CETECH_DECL_API(log_api_v0);
+CETECH_DECL_API(os_vio_api_v0);
+CETECH_DECL_API(hash_api_v0);
+CETECH_DECL_API(blob_api_v0);
 
 using namespace cetech;
 
@@ -144,16 +144,15 @@ namespace entity_resource_compiler {
             capi->add_dependency(filename, prefab_file);
 
 
-            char* full_path = path_v0.join(a, 2, source_dir, prefab_file);
+            char *full_path = os_path_v0.join(a, 2, source_dir, prefab_file);
 
-            struct vio *prefab_vio = vio_api_v0.from_file(full_path,
-                                                          VIO_OPEN_READ,
-                                                          a);
+            struct os_vio *prefab_vio = os_vio_api_v0.from_file(full_path,
+                                                                VIO_OPEN_READ);
 
-            char prefab_data[vio_api_v0.size(prefab_vio) + 1];
-            memset(prefab_data, 0, vio_api_v0.size(prefab_vio) + 1);
-            vio_api_v0.read(prefab_vio, prefab_data, sizeof(char),
-                            vio_api_v0.size(prefab_vio));
+            char prefab_data[os_vio_api_v0.size(prefab_vio) + 1];
+            memset(prefab_data, 0, os_vio_api_v0.size(prefab_vio) + 1);
+            os_vio_api_v0.read(prefab_vio, prefab_data, sizeof(char),
+                               os_vio_api_v0.size(prefab_vio));
 
             yaml_document_t h;
             yaml_node_t prefab_root = yaml_load_str(prefab_data, &h);
@@ -161,9 +160,9 @@ namespace entity_resource_compiler {
             preprocess(filename, prefab_root, capi);
             yaml_merge(root, prefab_root);
 
-            vio_api_v0.close(prefab_vio);
+            os_vio_api_v0.close(prefab_vio);
 
-            CETECH_DEALLOCATE(a, full_path);
+            CETECH_FREE(a, full_path);
         }
     }
 
@@ -288,7 +287,7 @@ namespace entity_resource_compiler {
 
         entity_compile_output *output = CETECH_ALLOCATE(a,
                                                         entity_compile_output,
-                                                        1);
+                                                        sizeof(entity_compile_output));
 
         output->ent_counter = 0;
 
@@ -330,7 +329,7 @@ namespace entity_resource_compiler {
         output->component_body_array.destroy();
 
         allocator *a = memory_api_v0.main_allocator();
-        CETECH_DEALLOCATE(a, output);
+        CETECH_FREE(a, output);
     }
 
     void compile_entity(struct entity_compile_output *output,
@@ -413,13 +412,13 @@ namespace entity_resource_compiler {
     }
 
     int _entity_resource_compiler(const char *filename,
-                                  struct vio *source_vio,
-                                  struct vio *build_vio,
+                                  struct os_vio *source_vio,
+                                  struct os_vio *build_vio,
                                   struct compilator_api *compilator_api) {
-        char source_data[vio_api_v0.size(source_vio) + 1];
-        memset(source_data, 0, vio_api_v0.size(source_vio) + 1);
-        vio_api_v0.read(source_vio, source_data, sizeof(char),
-                        vio_api_v0.size(source_vio));
+        char source_data[os_vio_api_v0.size(source_vio) + 1];
+        memset(source_data, 0, os_vio_api_v0.size(source_vio) + 1);
+        os_vio_api_v0.read(source_vio, source_data, sizeof(char),
+                           os_vio_api_v0.size(source_vio));
 
         yaml_document_t h;
         yaml_node_t root = yaml_load_str(source_data, &h);
@@ -430,9 +429,9 @@ namespace entity_resource_compiler {
 
         compiler(root, filename, entity_data, compilator_api);
 
-        vio_api_v0.write(build_vio, entity_data->data(entity_data->inst),
-                         sizeof(uint8_t),
-                         entity_data->size(entity_data->inst));
+        os_vio_api_v0.write(build_vio, entity_data->data(entity_data->inst),
+                            sizeof(uint8_t),
+                            entity_data->size(entity_data->inst));
 
 
         blob_api_v0.destroy(entity_data);
@@ -447,18 +446,18 @@ namespace entity_resource_compiler {
 
 namespace entity_resorce {
 
-    void *loader(struct vio *input,
+    void *loader(struct os_vio *input,
                  struct allocator *allocator) {
-        const int64_t size = vio_api_v0.size(input);
+        const int64_t size = os_vio_api_v0.size(input);
         char *data = CETECH_ALLOCATE(allocator, char, size);
-        vio_api_v0.read(input, data, 1, size);
+        os_vio_api_v0.read(input, data, 1, size);
 
         return data;
     }
 
     void unloader(void *new_data,
                   struct allocator *allocator) {
-        CETECH_DEALLOCATE(allocator, new_data);
+        CETECH_FREE(allocator, new_data);
     }
 
 
@@ -477,7 +476,7 @@ namespace entity_resorce {
         offline(name, old_data);
         online(name, new_data);
 
-        CETECH_DEALLOCATE(allocator, old_data);
+        CETECH_FREE(allocator, old_data);
 
         return new_data;
     }
@@ -515,7 +514,7 @@ namespace entity {
         struct entity_resource *res = (entity_resource *) resource;
 
         entity_t *spawned = CETECH_ALLOCATE(memory_api_v0.main_allocator(),
-                                            entity_t, res->ent_count);
+                                            entity_t, sizeof(entity_t) * res->ent_count);
 
         for (int j = 0; j < res->ent_count; ++j) {
             spawned[j] = create();
@@ -557,7 +556,7 @@ namespace entity {
         uint32_t entities_count = 0;
 
         spawn_from_resource(world, res, &entities, &entities_count);
-        CETECH_DEALLOCATE(memory_api_v0.main_allocator(), entities);
+        CETECH_FREE(memory_api_v0.main_allocator(), entities);
         return entities[0];
     }
 
@@ -598,15 +597,16 @@ namespace entity_module {
     }
 
     static void _init(struct api_v0 *api) {
-        GET_API(api, memory_api_v0);
-        GET_API(api, component_api_v0);
-        GET_API(api, memory_api_v0);
-        GET_API(api, resource_api_v0);
-        GET_API(api, path_v0);
-        GET_API(api, vio_api_v0);
-        GET_API(api, hash_api_v0);
-        GET_API(api, blob_api_v0);
+        _init_api(api);
 
+        CETECH_GET_API(api, memory_api_v0);
+        CETECH_GET_API(api, component_api_v0);
+        CETECH_GET_API(api, memory_api_v0);
+        CETECH_GET_API(api, resource_api_v0);
+        CETECH_GET_API(api, os_path_v0);
+        CETECH_GET_API(api, os_vio_api_v0);
+        CETECH_GET_API(api, hash_api_v0);
+        CETECH_GET_API(api, blob_api_v0);
 
         _G = {0};
 
@@ -633,22 +633,11 @@ namespace entity_module {
     }
 
 
-    extern "C" void *entity_get_module_api(int api) {
-        switch (api) {
-            case PLUGIN_EXPORT_API_ID: {
-                static struct module_export_api_v0 module = {0};
-
-                module.init = _init;
-                module.init_api = _init_api;
-                module.shutdown = _shutdown;
-
-
-                return &module;
-            }
-
-            default:
-                return NULL;
-        }
+    extern "C" void entity_load_module(struct api_v0 *api) {
+        _init(api);
     }
 
+    extern "C" void entity_unload_module(struct api_v0 *api) {
+        _shutdown();
+    }
 }

@@ -1,5 +1,6 @@
-///<reference path="../../lib/static/ace/ace.d.ts"/>
-///<reference path="../../lib/static/vs.d.ts"/>
+///<reference path="../../externals/static/ace/ace.d.ts"/>
+///<reference path="../../externals/static/vs.d.ts"/>
+
 import {PlaygroundSubscriber} from "../../lib/static/playground/playground_rpc";
 import * as vis from "vis";
 

@@ -3,20 +3,19 @@
 //==============================================================================
 
 #include <cetech/celib/allocator.h>
-#include <cetech/core/config.h>
-#include <cetech/modules/resource.h>
-#include <cetech/core/module.h>
+#include <cetech/kernel/config.h>
+#include <cetech/kernel/module.h>
 #include <cetech/celib/eventstream.inl>
-#include <cetech/core/machine.h>
 #include <cetech/modules/input.h>
-#include <cetech/core/api.h>
+#include <cetech/kernel/os.h>
+#include <cetech/kernel/api_system.h>
 
 #include "keystr.h"
-#include <cetech/core/log.h>
-#include <cetech/core/errors.h>
+#include <cetech/kernel/log.h>
+#include <cetech/kernel/errors.h>
 
-IMPORT_API(machine_api_v0);
-IMPORT_API(log_api_v0);
+CETECH_DECL_API(machine_api_v0);
+CETECH_DECL_API(log_api_v0);
 
 //==============================================================================
 // Defines
@@ -86,36 +85,6 @@ namespace keyboard {
 
         return !_G.state[button_index] && _G.last_state[button_index];
     }
-}
-
-namespace keyboard_module {
-    static struct keyboard_api_v0 api_v1 = {
-            .button_index = keyboard::button_index,
-            .button_name = keyboard::button_name,
-            .button_state = keyboard::button_state,
-            .button_pressed = keyboard::button_pressed,
-            .button_released = keyboard::button_released,
-    };
-
-    void _init_api(struct api_v0 *api) {
-        api->register_api("keyboard_api_v0", &api_v1);
-    }
-
-    void _init(struct api_v0 *api) {
-        GET_API(api, machine_api_v0);
-        GET_API(api, log_api_v0);
-
-        _G = (struct G) {0};
-
-        log_api_v0.debug(LOG_WHERE, "Init");
-    }
-
-    void _shutdown() {
-        log_api_v0.debug(LOG_WHERE, "Shutdown");
-
-        _G = (struct G) {0};
-    }
-
 
     void _update() {
         struct event_header *event = machine_api_v0.event_begin();
@@ -142,23 +111,47 @@ namespace keyboard_module {
             event = machine_api_v0.event_next(event);
         }
     }
+}
+
+namespace keyboard_module {
+    static struct keyboard_api_v0 api_v1 = {
+            .button_index = keyboard::button_index,
+            .button_name = keyboard::button_name,
+            .button_state = keyboard::button_state,
+            .button_pressed = keyboard::button_pressed,
+            .button_released = keyboard::button_released,
+            .update = keyboard::_update
+    };
+
+    void _init_api(struct api_v0 *api) {
+        api->register_api("keyboard_api_v0", &api_v1);
+    }
+
+    void _init(struct api_v0 *api) {
+        _init_api(api);
+
+        CETECH_GET_API(api, machine_api_v0);
+        CETECH_GET_API(api, log_api_v0);
+
+        _G = (struct G) {0};
+
+        log_api_v0.debug(LOG_WHERE, "Init");
+    }
+
+    void _shutdown() {
+        log_api_v0.debug(LOG_WHERE, "Shutdown");
+
+        _G = (struct G) {0};
+    }
 
 
-    extern "C" void *keyboard_get_module_api(int api) {
+    extern "C" void keyboard_unload_module(struct api_v0 *api) {
+        _shutdown();
+    }
 
-        if (api == PLUGIN_EXPORT_API_ID) {
-            static struct module_export_api_v0 module = {0};
 
-            module.init = _init;
-            module.init_api = _init_api;
-            module.shutdown = _shutdown;
-            module.update = _update;
-
-            return &module;
-
-        }
-
-        return 0;
+    extern "C" void keyboard_load_module(struct api_v0 *api) {
+        _init(api);
     }
 
 }

@@ -4,20 +4,19 @@
 
 #include <cetech/celib/math_types.h>
 #include <cetech/celib/allocator.h>
-#include <cetech/core/config.h>
-#include <cetech/modules/resource.h>
+#include <cetech/kernel/config.h>
 #include <cetech/celib/eventstream.inl>
 #include <cetech/modules/input.h>
-#include <cetech/core/module.h>
-#include <cetech/core/machine.h>
-#include <cetech/core/api.h>
+#include <cetech/kernel/module.h>
+#include <cetech/kernel/os.h>
+#include <cetech/kernel/api_system.h>
 
 #include "gamepadstr.h"
-#include <cetech/core/log.h>
-#include <cetech/core/errors.h>
+#include <cetech/kernel/log.h>
+#include <cetech/kernel/errors.h>
 
-IMPORT_API(log_api_v0)
-IMPORT_API(machine_api_v0);
+CETECH_DECL_API(log_api_v0)
+CETECH_DECL_API(machine_api_v0);
 
 //==============================================================================
 // Defines
@@ -134,49 +133,7 @@ namespace gamepad {
         machine_api_v0.gamepad_play_rumble(idx, strength, length);
     }
 
-}
-
-namespace gamepad_module {
-
-    static struct gamepad_api_v0 api_v1 = {
-            .is_active = gamepad::is_active,
-            .button_index = gamepad::button_index,
-            .button_name = gamepad::button_name,
-            .button_state = gamepad::button_state,
-            .button_pressed = gamepad::button_pressed,
-            .button_released = gamepad::button_released,
-            .axis_index = gamepad::axis_index,
-            .axis_name = gamepad::axis_name,
-            .axis = gamepad::axis,
-            .play_rumble = gamepad::play_rumble,
-    };
-
-    static void _init_api(struct api_v0 *api) {
-        api->register_api("gamepad_api_v0", &api_v1);
-    }
-
-    static void _init(struct api_v0 *api) {
-        GET_API(api, machine_api_v0);
-        GET_API(api, log_api_v0);
-
-
-        _G = {0};
-
-        log_api_v0.debug(LOG_WHERE, "Init");
-
-        for (int i = 0; i < GAMEPAD_MAX; ++i) {
-            _G.active[i] = machine_api_v0.gamepad_is_active(i);
-        }
-    }
-
-    static void _shutdown() {
-        log_api_v0.debug(LOG_WHERE, "Shutdown");
-
-        _G = {0};
-    }
-
-
-    static void _update() {
+    static void update() {
         struct event_header *event = machine_api_v0.event_begin();
 
         memcpy(_G.last_state, _G.state,
@@ -217,19 +174,54 @@ namespace gamepad_module {
         }
     }
 
-    extern "C" void *gamepad_get_module_api(int api) {
+}
 
-        if (api == PLUGIN_EXPORT_API_ID) {
-            static struct module_export_api_v0 module = {0};
+namespace gamepad_module {
 
-            module.init = _init;
-            module.init_api = _init_api;
-            module.shutdown = _shutdown;
-            module.update = _update;
+    static struct gamepad_api_v0 api_v1 = {
+            .is_active = gamepad::is_active,
+            .button_index = gamepad::button_index,
+            .button_name = gamepad::button_name,
+            .button_state = gamepad::button_state,
+            .button_pressed = gamepad::button_pressed,
+            .button_released = gamepad::button_released,
+            .axis_index = gamepad::axis_index,
+            .axis_name = gamepad::axis_name,
+            .axis = gamepad::axis,
+            .play_rumble = gamepad::play_rumble,
+            .update = gamepad::update
+    };
 
-            return &module;
+    static void _init_api(struct api_v0 *api) {
+        api->register_api("gamepad_api_v0", &api_v1);
+    }
 
+    static void _init(struct api_v0 *api) {
+        _init_api(api);
+
+        CETECH_GET_API(api, machine_api_v0);
+        CETECH_GET_API(api, log_api_v0);
+
+        _G = {0};
+
+        log_api_v0.debug(LOG_WHERE, "Init");
+
+        for (int i = 0; i < GAMEPAD_MAX; ++i) {
+            _G.active[i] = machine_api_v0.gamepad_is_active(i);
         }
-        return 0;
+    }
+
+    static void _shutdown() {
+        log_api_v0.debug(LOG_WHERE, "Shutdown");
+
+        _G = {0};
+    }
+
+    extern "C" void gamepad_load_module(struct api_v0 *api) {
+        _init(api);
+    }
+
+    extern "C" void gamepad_unload_module(struct api_v0 *api) {
+        _shutdown();
     }
 };

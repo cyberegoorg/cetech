@@ -15,8 +15,8 @@
 #include <stddef.h>
 #include <memory.h>
 
-#include "cetech/core/log.h"
-#include "cetech/core/errors.h"
+#include "cetech/kernel/log.h"
+#include "cetech/kernel/errors.h"
 #include "allocator.h"
 
 //==============================================================================

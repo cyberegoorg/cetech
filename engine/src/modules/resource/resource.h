@@ -5,7 +5,7 @@
 extern "C" {
 #endif
 
-#include <cetech/core/hash.h>
+#include <cetech/kernel/hash.h>
 #include <cetech/modules/resource.h>
 
 #ifdef CETECH_CAN_COMPILE
