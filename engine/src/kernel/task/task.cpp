@@ -188,7 +188,7 @@ namespace taskmanager {
             return 0;
         }
 
-        //struct scope_data sd = develop_api_v0.enter_scope(_G._task_pool[t.id].name);
+        //auto sd = develop_api_v0.enter_scope(_G._task_pool[t.id].name);
 
         _G._task_pool[t.id].task_work(_G._task_pool[t.id].data);
 

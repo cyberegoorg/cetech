@@ -89,7 +89,7 @@ void _add_dependency(const char *who_filename,
 
     builddb_set_file(depend_on_filename, os_path_v0.file_mtime(path));
 
-    CETECH_DEALLOCATE(a, path);
+    CETECH_FREE(a, path);
 }
 
 static struct compilator_api _compilator_api = {
@@ -118,7 +118,7 @@ static void _compile_task(void *data) {
                          tdata->source_filename);
     }
 
-    CETECH_DEALLOCATE(memory_api_v0.main_scratch_allocator(),
+    CETECH_FREE(memory_api_v0.main_scratch_allocator(),
                       tdata->source_filename);
     os_vio_api_v0.close(tdata->source);
     os_vio_api_v0.close(tdata->build);
@@ -196,7 +196,7 @@ void _compile_dir(Array<task_item> &tasks,
                                                            VIO_OPEN_WRITE,
                                                            memory_api_v0.main_scratch_allocator());
 
-        CETECH_DEALLOCATE(a, build_path);
+        CETECH_FREE(a, build_path);
 
         if (build_vio == NULL) {
             os_vio_api_v0.close(build_vio);
@@ -206,7 +206,7 @@ void _compile_dir(Array<task_item> &tasks,
         struct compile_task_data *data =
                 CETECH_ALLOCATE(
                         memory_api_v0.main_allocator(),
-                        struct compile_task_data, 1);
+                        struct compile_task_data, sizeof(struct compile_task_data));
 
         *data = (struct compile_task_data) {
                 .name = name_id,
@@ -273,8 +273,8 @@ static void _init(struct api_v0 *api) {
 
     os_path_v0.make_path(tmp_dir_full);
 
-    CETECH_DEALLOCATE(memory_api_v0.main_allocator(), tmp_dir_full);
-    CETECH_DEALLOCATE(memory_api_v0.main_allocator(), build_dir_full);
+    CETECH_FREE(memory_api_v0.main_allocator(), tmp_dir_full);
+    CETECH_FREE(memory_api_v0.main_allocator(), build_dir_full);
 }
 
 static void _shutdown() {
@@ -291,7 +291,7 @@ void resource_compiler_create_build_dir(struct config_api_v0 config,
 
     os_path_v0.make_path(build_dir_full);
 
-    CETECH_DEALLOCATE(memory_api_v0.main_allocator(), build_dir_full);
+    CETECH_FREE(memory_api_v0.main_allocator(), build_dir_full);
 }
 
 void resource_compiler_register(uint64_t type,
@@ -330,10 +330,10 @@ void resource_compiler_compile_all() {
         compile_task_data *data = (compile_task_data *) tasks[i].data;
 
         task_api_v0.wait_atomic(&data->completed, 0);
-        CETECH_DEALLOCATE(memory_api_v0.main_allocator(), data);
+        CETECH_FREE(memory_api_v0.main_allocator(), data);
     }
 
-    CETECH_DEALLOCATE(memory_api_v0.main_allocator(), build_dir_full);
+    CETECH_FREE(memory_api_v0.main_allocator(), build_dir_full);
 }
 
 int resource_compiler_get_filename(char *filename,
@@ -372,7 +372,7 @@ char *resource_compiler_external_join(allocator *alocator,
 
     string_stream::Buffer buffer(alocator);
     string_stream::printf(buffer, "%s64", tmp_dir);
-    CETECH_DEALLOCATE(alocator, tmp_dir);
+    CETECH_FREE(alocator, tmp_dir);
 
     string_stream::c_str(buffer);
     return os_path_v0.join(alocator, 4, string_stream::c_str(buffer), "release",

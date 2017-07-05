@@ -78,12 +78,12 @@ namespace filesystem {
 
         if (!file) {
             log_api_v0.error(LOG_WHERE, "Could not load file %s", full_path);
-            CETECH_DEALLOCATE(a, full_path);
+            CETECH_FREE(a, full_path);
             return NULL;
         }
 
 
-        CETECH_DEALLOCATE(a, full_path);
+        CETECH_FREE(a, full_path);
         return file;
     }
 
@@ -98,7 +98,7 @@ namespace filesystem {
         char *full_path = get_fullpath(root, a, path);
 
         int ret = os_path_v0.make_path(full_path);
-        CETECH_DEALLOCATE(a, full_path);
+        CETECH_FREE(a, full_path);
 
         return ret;
     }
@@ -117,7 +117,7 @@ namespace filesystem {
 
         os_path_v0.list(full_path, 1, files, count, allocator);
 
-        CETECH_DEALLOCATE(a, full_path);
+        CETECH_FREE(a, full_path);
     }
 
     void listdir_free(char **files,
@@ -135,7 +135,7 @@ namespace filesystem {
 
         time_t ret = os_path_v0.file_mtime(full_path);
 
-        CETECH_DEALLOCATE(a, full_path);
+        CETECH_FREE(a, full_path);
         return ret;
     }
 }
@@ -180,7 +180,7 @@ namespace filesystem_module {
         auto end_it = map::end(_G.root_map);
 
         while (it != end_it) {
-            CETECH_DEALLOCATE(memory_api_v0.main_allocator(), it->value);
+            CETECH_FREE(memory_api_v0.main_allocator(), it->value);
             ++it;
         }
 

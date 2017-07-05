@@ -21,7 +21,7 @@ extern "C" {
 #include <cetech/kernel/log.h>
 
 #include <cetech/modules/resource.h>
-#include <cetech/modules/console_server.h>
+#include <cetech/kernel/console_server.h>
 #include <cetech/modules/luasys.h>
 
 #include <include/mpack/mpack.h>

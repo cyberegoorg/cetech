@@ -95,7 +95,7 @@ static void allocate(WorldInstance &_data,
     memcpy(new_data.world_matrix, _data.world_matrix,
            _data.n * sizeof(mat44f_t));
 
-    CETECH_DEALLOCATE(_allocator, _data.buffer);
+    CETECH_FREE(_allocator, _data.buffer);
 
     _data = new_data;
 }
@@ -177,7 +177,7 @@ static void _destroy_world(world_t world) {
 
     world_t last_world = _G.world_instances[last_idx].world;
 
-    CETECH_DEALLOCATE(memory_api_v0.main_allocator(),
+    CETECH_FREE(memory_api_v0.main_allocator(),
                       _G.world_instances[idx].buffer);
 
     _G.world_instances[idx] = _G.world_instances[last_idx];

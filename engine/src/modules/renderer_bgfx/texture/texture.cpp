@@ -73,7 +73,7 @@ namespace texture_resource {
 
     void _texture_resource_unloader(void *new_data,
                                     struct allocator *allocator) {
-        CETECH_DEALLOCATE(allocator, new_data);
+        CETECH_FREE(allocator, new_data);
     }
 
     void _texture_resource_online(uint64_t name,
@@ -107,7 +107,7 @@ namespace texture_resource {
         _texture_resource_offline(name, old_data);
         _texture_resource_online(name, new_data);
 
-        CETECH_DEALLOCATE(allocator, old_data);
+        CETECH_FREE(allocator, old_data);
 
         return new_data;
     }

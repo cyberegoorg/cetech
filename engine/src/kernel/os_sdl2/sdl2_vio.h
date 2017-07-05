@@ -122,7 +122,7 @@ int vio_sdl_close(struct os_vio *file) {
 
     SDL_RWclose(vf->rw);
 
-    allocator_deallocate(vf->allocator, vf);
+    CETECH_FREE(vf->allocator, vf);
 
     return 1;
 }

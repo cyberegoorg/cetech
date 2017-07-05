@@ -68,7 +68,7 @@ namespace material_compiler {
                                                                     VIO_OPEN_READ,
                                                                     memory_api_v0.main_allocator());
 
-                CETECH_DEALLOCATE(a, full_path);
+                CETECH_FREE(a, full_path);
 
                 char prefab_data[os_vio_api_v0.size(prefab_vio) + 1];
                 memset(prefab_data, 0, os_vio_api_v0.size(prefab_vio) + 1);
@@ -225,7 +225,7 @@ namespace material_compiler {
         output.uniform_names.destroy();
         output.data.destroy();
 
-        CETECH_DEALLOCATE(memory_api_v0.main_allocator(), source_data);
+        CETECH_FREE(memory_api_v0.main_allocator(), source_data);
         return 1;
     }
 

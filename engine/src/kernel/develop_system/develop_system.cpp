@@ -81,7 +81,6 @@ static __thread uint8_t _stream_buffer[64 * 1024] = {0};
 static __thread uint32_t _stream_buffer_size = 0;
 static __thread uint32_t _scope_depth = 0;
 
-
 //==============================================================================
 // Internals
 //==============================================================================
@@ -354,11 +353,12 @@ namespace develop_system_module {
         _init_api(api);
 
         CETECH_GET_API(api, memory_api_v0);
+        CETECH_GET_API(api, log_api_v0);
         CETECH_GET_API(api, task_api_v0);
         CETECH_GET_API(api, config_api_v0);
+
         CETECH_GET_API(api, os_thread_api_v0);
         CETECH_GET_API(api, os_time_api_v0);
-        CETECH_GET_API(api, log_api_v0);
 
         _init_cvar(config_api_v0);
 
@@ -402,6 +402,7 @@ namespace develop_system_module {
 
     extern "C" void developsystem_load_module(struct api_v0 *api) {
         _init(api);
+
     }
 
     extern "C" void developsystem_unload_module(struct api_v0 *api) {

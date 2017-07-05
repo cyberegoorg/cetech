@@ -15,7 +15,7 @@
 #include "cetech/modules/renderer.h"
 #include <cetech/kernel/develop.h>
 
-#include <cetech/modules/console_server.h>
+#include <cetech/kernel/console_server.h>
 
 #include <include/mpack/mpack.h>
 #include <cetech/modules/entity.h>

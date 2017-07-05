@@ -16,7 +16,7 @@
 #include <cetech/kernel/api_system.h>
 
 #include <cetech/modules/resource.h>
-#include <cetech/modules/console_server.h>
+#include <cetech/kernel/console_server.h>
 #include <cetech/modules/filesystem.h>
 #include <cetech/modules/package.h>
 
@@ -141,7 +141,7 @@ namespace package_resource {
 
     void unloader(void *new_data,
                   struct allocator *allocator) {
-        CETECH_DEALLOCATE(allocator, new_data);
+        CETECH_FREE(allocator, new_data);
     }
 
     void online(uint64_t name,
@@ -156,7 +156,7 @@ namespace package_resource {
                    void *old_data,
                    void *new_data,
                    struct allocator *allocator) {
-        CETECH_DEALLOCATE(allocator, old_data);
+        CETECH_FREE(allocator, old_data);
         return new_data;
     }
 

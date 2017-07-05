@@ -90,7 +90,7 @@ namespace {
         memcpy(new_data.node, _data.node, _data.n * sizeof(uint64_t));
         memcpy(new_data.material, _data.material, _data.n * sizeof(material_t));
 
-        CETECH_DEALLOCATE(_allocator, _data.buffer);
+        CETECH_FREE(_allocator, _data.buffer);
 
         _data = new_data;
     }
@@ -147,7 +147,7 @@ namespace {
 
         world_t last_world = _G.world_instances[last_idx].world;
 
-        CETECH_DEALLOCATE(memory_api_v0.main_allocator(),
+        CETECH_FREE(memory_api_v0.main_allocator(),
                           _G.world_instances[idx].buffer);
 
         _G.world_instances[idx] = _G.world_instances[last_idx];

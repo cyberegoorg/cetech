@@ -96,7 +96,7 @@ namespace level_resource {
 
     void unloader(void *new_data,
                   struct allocator *allocator) {
-        CETECH_DEALLOCATE(allocator, new_data);
+        CETECH_FREE(allocator, new_data);
     }
 
     void online(uint64_t name,
@@ -114,7 +114,7 @@ namespace level_resource {
         resource_offline(name, old_data);
         online(name, new_data);
 
-        CETECH_DEALLOCATE(allocator, old_data);
+        CETECH_FREE(allocator, old_data);
 
         return new_data;
     }
@@ -259,7 +259,7 @@ namespace level {
                               instance->spawned_entity_count);
         entity_api_v0.destroy(world, &instance->level_entity, 1);
 
-        CETECH_DEALLOCATE(memory_api_v0.main_allocator(),
+        CETECH_FREE(memory_api_v0.main_allocator(),
                           instance->spawned_entity);
 
         _destroy_level_instance(instance);

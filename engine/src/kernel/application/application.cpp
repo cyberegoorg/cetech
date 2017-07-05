@@ -20,7 +20,7 @@
 #include <cetech/modules/luasys.h>
 #include <cetech/modules/renderer.h>
 #include <cetech/modules/package.h>
-#include <cetech/modules/console_server.h>
+#include <cetech/kernel/console_server.h>
 
 #include "../api/api_private.h"
 #include "../module/module_private.h"

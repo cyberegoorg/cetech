@@ -10,6 +10,7 @@
 #include "../config/config_private.h"
 
 #include "static_module.h"
+#include "../memory/core_allocator_private.h"
 
 namespace os {
     void register_api(struct api_v0 *api);
@@ -75,18 +76,19 @@ extern "C" void init_hashlib(struct api_v0 *api) {
     LOAD_STATIC_MODULE(api, hashlib);
 }
 
+
 int cetech_kernel_init(int argc,
                        const char **argv) {
+    auto *core_alloc = core_allocator::get();
 
     log::init();
     memory::memsys_init(4 * 1024 * 1024);
 
-    allocator *a = memory::memsys_main_allocator();
-
-    api::init(a);
+    api::init(core_alloc);
     api_v0 *api = api::v0();
 
     log::register_api(api);
+    core_allocator::register_api(api);
     memory::register_api(api);
     error_register_api(api);
 
@@ -94,7 +96,7 @@ int cetech_kernel_init(int argc,
     application_register_api(api);
 
     os::register_api(api);
-    module::init(a, api);
+    module::init(core_alloc, api);
 
     CETECH_GET_API(api, app_api_v0);
     config::init(api);

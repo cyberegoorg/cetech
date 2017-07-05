@@ -132,7 +132,7 @@ namespace scene_resource {
 
     void unloader(void *new_data,
                   struct allocator *allocator) {
-        CETECH_DEALLOCATE(allocator, new_data);
+        CETECH_FREE(allocator, new_data);
     }
 
     void online(uint64_t name,
@@ -185,7 +185,7 @@ namespace scene_resource {
         offline(name, old_data);
         online(name, new_data);
 
-        CETECH_DEALLOCATE(allocator, old_data);
+        CETECH_FREE(allocator, old_data);
 
         return new_data;
     }

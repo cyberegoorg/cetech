@@ -162,7 +162,7 @@ namespace entity_resource_compiler {
 
             os_vio_api_v0.close(prefab_vio);
 
-            CETECH_DEALLOCATE(a, full_path);
+            CETECH_FREE(a, full_path);
         }
     }
 
@@ -287,7 +287,7 @@ namespace entity_resource_compiler {
 
         entity_compile_output *output = CETECH_ALLOCATE(a,
                                                         entity_compile_output,
-                                                        1);
+                                                        sizeof(entity_compile_output));
 
         output->ent_counter = 0;
 
@@ -329,7 +329,7 @@ namespace entity_resource_compiler {
         output->component_body_array.destroy();
 
         allocator *a = memory_api_v0.main_allocator();
-        CETECH_DEALLOCATE(a, output);
+        CETECH_FREE(a, output);
     }
 
     void compile_entity(struct entity_compile_output *output,
@@ -457,7 +457,7 @@ namespace entity_resorce {
 
     void unloader(void *new_data,
                   struct allocator *allocator) {
-        CETECH_DEALLOCATE(allocator, new_data);
+        CETECH_FREE(allocator, new_data);
     }
 
 
@@ -476,7 +476,7 @@ namespace entity_resorce {
         offline(name, old_data);
         online(name, new_data);
 
-        CETECH_DEALLOCATE(allocator, old_data);
+        CETECH_FREE(allocator, old_data);
 
         return new_data;
     }
@@ -514,7 +514,7 @@ namespace entity {
         struct entity_resource *res = (entity_resource *) resource;
 
         entity_t *spawned = CETECH_ALLOCATE(memory_api_v0.main_allocator(),
-                                            entity_t, res->ent_count);
+                                            entity_t, sizeof(entity_t) * res->ent_count);
 
         for (int j = 0; j < res->ent_count; ++j) {
             spawned[j] = create();
@@ -556,7 +556,7 @@ namespace entity {
         uint32_t entities_count = 0;
 
         spawn_from_resource(world, res, &entities, &entities_count);
-        CETECH_DEALLOCATE(memory_api_v0.main_allocator(), entities);
+        CETECH_FREE(memory_api_v0.main_allocator(), entities);
         return entities[0];
     }
 

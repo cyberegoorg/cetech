@@ -172,7 +172,7 @@ void package_task(void *data) {
                                  package_name_count(package)[j]);
     }
 
-    CETECH_DEALLOCATE(memory_api_v0.main_allocator(), task_data);
+    CETECH_FREE(memory_api_v0.main_allocator(), task_data);
 }
 
 void package_load(uint64_t name) {
@@ -180,7 +180,7 @@ void package_load(uint64_t name) {
     struct package_task_data *task_data =
             CETECH_ALLOCATE(memory_api_v0.main_allocator(),
                             struct package_task_data,
-                            1);
+                            sizeof(struct package_task_data));
 
     task_data->name = name;
 

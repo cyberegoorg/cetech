@@ -51,7 +51,7 @@ namespace shader_compiler {
                 "shaderc");
 
         buffer << shaderc;
-        CETECH_DEALLOCATE(memory_api_v0.main_allocator(), shaderc);
+        CETECH_FREE(memory_api_v0.main_allocator(), shaderc);
 
         string_stream::printf(buffer,
                               ""
@@ -90,7 +90,7 @@ namespace shader_compiler {
         int ret = snprintf(tmp_filename, max_len, "%s/%s.shaderc", tmp_dirname,
                            os_path_v0.filename(filename));
 
-        CETECH_DEALLOCATE(a, tmp_dirname);
+        CETECH_FREE(a, tmp_dirname);
 
         return ret;
     }
@@ -154,10 +154,10 @@ namespace shader_compiler {
         int result = _shaderc(input_path, output_path, include_dir, "vertex",
                               platform, vs_profile);
 
-        CETECH_DEALLOCATE(a, input_path);
+        CETECH_FREE(a, input_path);
 
         if (result != 0) {
-            CETECH_DEALLOCATE(a, include_dir);
+            CETECH_FREE(a, include_dir);
             return 0;
         }
 
@@ -185,10 +185,10 @@ namespace shader_compiler {
         result = _shaderc(input_path, output_path, include_dir, "fragment",
                           platform, fs_profile);
 
-        CETECH_DEALLOCATE(a, input_path);
+        CETECH_FREE(a, input_path);
 
         if (result != 0) {
-            CETECH_DEALLOCATE(a, include_dir);
+            CETECH_FREE(a, include_dir);
             return 0;
         }
 
@@ -207,9 +207,9 @@ namespace shader_compiler {
         os_vio_api_v0.write(build_vio, vs_data, sizeof(char), resource.vs_size);
         os_vio_api_v0.write(build_vio, fs_data, sizeof(char), resource.fs_size);
 
-        CETECH_DEALLOCATE(a, vs_data);
-        CETECH_DEALLOCATE(a, fs_data);
-        CETECH_DEALLOCATE(a, include_dir);
+        CETECH_FREE(a, vs_data);
+        CETECH_FREE(a, fs_data);
+        CETECH_FREE(a, include_dir);
 
         return 1;
     }

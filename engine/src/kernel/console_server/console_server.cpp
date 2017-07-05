@@ -12,7 +12,7 @@
 #include <cetech/celib/map.inl>
 #include <cetech/modules/resource.h>
 #include <cetech/kernel/hash.h>
-#include <cetech/modules/console_server.h>
+#include <cetech/kernel/console_server.h>
 #include <cetech/kernel/errors.h>
 
 #include "include/mpack/mpack.h"

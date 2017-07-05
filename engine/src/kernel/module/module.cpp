@@ -184,7 +184,7 @@ namespace module {
         uint32_t files_count = 0;
 
         os_path_v0.list(path, 1, &files, &files_count,
-                        memory_api_v0.main_scratch_allocator());
+                        memory_api_v0.main_allocator());
 
         for (int k = 0; k < files_count; ++k) {
             const char *filename = os_path_v0.filename(files[k]);
@@ -195,7 +195,7 @@ namespace module {
         }
 
         os_path_v0.list_free(files, files_count,
-                             memory_api_v0.main_scratch_allocator());
+                             memory_api_v0.main_allocator());
     }
 
     void unload_all() {

@@ -16,7 +16,7 @@ namespace resource_lua {
 
     void unloader(void *new_data,
                   struct allocator *allocator) {
-        CETECH_DEALLOCATE(allocator, new_data);
+        CETECH_FREE(allocator, new_data);
     }
 
     void online(uint64_t name,
@@ -32,7 +32,7 @@ namespace resource_lua {
                    void *old_data,
                    void *new_data,
                    struct allocator *allocator) {
-        CETECH_DEALLOCATE(allocator, old_data);
+        CETECH_FREE(allocator, old_data);
 
         struct lua_resource *resource = (lua_resource *) new_data;
         char *data = (char *) (resource + 1);

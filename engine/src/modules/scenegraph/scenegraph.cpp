@@ -94,7 +94,7 @@ namespace {
         memcpy(new_data.world_matrix, _data.world_matrix,
                _data.n * sizeof(mat44f_t));
 
-        CETECH_DEALLOCATE(_allocator, _data.buffer);
+        CETECH_FREE(_allocator, _data.buffer);
 
         _data = new_data;
     }
@@ -112,7 +112,7 @@ namespace {
 
         world_t last_world = _G.world_instances[last_idx].world;
 
-        CETECH_DEALLOCATE(memory_api_v0.main_allocator(),
+        CETECH_FREE(memory_api_v0.main_allocator(),
                           _G.world_instances[idx].buffer);
 
         _G.world_instances[idx] = _G.world_instances[last_idx];
@@ -299,7 +299,7 @@ namespace scenegraph {
         data->n += count;
 
         scene_node_t *nodes = CETECH_ALLOCATE(memory_api_v0.main_allocator(),
-                                              scene_node_t, count);
+                                              scene_node_t, sizeof(scene_node_t) * count);
 
         for (int i = 0; i < count; ++i) {
             uint32_t idx = first_idx + i;
@@ -356,7 +356,7 @@ namespace scenegraph {
         uint64_t hash = hash_combine(world.h, entity.h);
 
         map::set(_G.ent_map, hash, root.idx);
-        CETECH_DEALLOCATE(memory_api_v0.main_allocator(), nodes);
+        CETECH_FREE(memory_api_v0.main_allocator(), nodes);
 
         return root;
     }

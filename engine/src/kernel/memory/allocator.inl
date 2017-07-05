@@ -3,4 +3,5 @@
 #include <cetech/kernel/log.h>
 #include <cetech/kernel/errors.h>
 #include <cetech/celib/allocator.h>
-#include "_allocator.h"
+
+#include "memory_private.h"

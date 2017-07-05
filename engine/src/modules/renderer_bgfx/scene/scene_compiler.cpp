@@ -89,7 +89,7 @@ namespace scene_resource_compiler {
     struct compile_output *_crete_compile_output() {
         struct allocator *a = memory_api_v0.main_allocator();
         struct compile_output *output =
-                CETECH_ALLOCATE(a, struct compile_output, 1);
+                CETECH_ALLOCATE(a, struct compile_output, sizeof(struct compile_output));
 
         output->geom_name.init(a);
         output->ib_offset.init(a);
@@ -126,7 +126,7 @@ namespace scene_resource_compiler {
         output->node_parent.destroy();
         output->node_pose.destroy();
 
-        CETECH_DEALLOCATE(a, output);
+        CETECH_FREE(a, output);
     }
 
     static void _type_to_attr_type(const char *name,
@@ -522,7 +522,7 @@ namespace scene_resource_compiler {
 
         if (!ret) {
             _destroy_compile_output(output);
-            CETECH_DEALLOCATE(memory_api_v0.main_allocator(), source_data);
+            CETECH_FREE(memory_api_v0.main_allocator(), source_data);
             return 0;
         }
 
@@ -572,7 +572,7 @@ namespace scene_resource_compiler {
                             array::size(output->geom_name));
 
         _destroy_compile_output(output);
-        CETECH_DEALLOCATE(memory_api_v0.main_allocator(), source_data);
+        CETECH_FREE(memory_api_v0.main_allocator(), source_data);
         return 1;
     }
 

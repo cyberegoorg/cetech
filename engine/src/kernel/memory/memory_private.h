@@ -11,7 +11,7 @@ namespace memory {
 
     struct allocator *memsys_main_allocator();
 
-    struct allocator *_memsys_main_scratch_allocator();
+    struct allocator * memsys_main_scratch_allocator();
 
 
     struct allocator_trace_entry {
@@ -20,13 +20,6 @@ namespace memory {
         char used;
     };
 
-//==============================================================================
-// Malloc
-//==============================================================================
-
-    void *malloc(size_t size);
-
-    void free(void *ptr);
 
 //==============================================================================
 // Allocator
@@ -61,7 +54,6 @@ namespace memory {
                                                int size);
 
     void scratch_allocator_destroy(struct allocator *a);
-
 }
 
 

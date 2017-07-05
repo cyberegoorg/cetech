@@ -13,11 +13,15 @@
 
 #include "../memory/memory_private.h"
 
+#include "../memory/core_allocator_private.h"
+
 #endif
 
 char *stacktrace(int skip) {
+    auto* a = core_allocator::get();
+
 #if defined(CETECH_LINUX)
-    char *return_str = (char *) memory::malloc(4096);
+    char *return_str = CETECH_ALLOCATE(a, char, 2048);
     return_str[0] = '\0';
 
     void *array[50];
@@ -25,7 +29,7 @@ char *stacktrace(int skip) {
 
     char **messages = backtrace_symbols(array, size);
 
-    char buffer[4096];
+    char buffer[1024];
     for (int i = skip; i < size && messages != NULL; ++i) {
         buffer[0] = '\0';
         char *mangled_name = 0, *offset_begin = 0, *offset_end = 0;
@@ -62,13 +66,14 @@ char *stacktrace(int skip) {
         }
     }
 
-    memory::free(messages);
+    CETECH_FREE(a, messages);
     return return_str;
 #endif
 }
 
 void stacktrace_free(char *st) {
-    memory::free(st);
+    auto* a = core_allocator::get();
+    CETECH_FREE(a, st);
 }
 
 CETECH_DECL_API(log_api_v0);

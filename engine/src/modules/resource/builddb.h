@@ -213,7 +213,7 @@ static int builddb_need_compile(const char *source_dir,
 
         time_t actual_mtime = path->file_mtime(full_path);
 
-        CETECH_DEALLOCATE(memory_api_v0.main_allocator(), full_path);
+        CETECH_FREE(memory_api_v0.main_allocator(), full_path);
 
         time_t last_mtime = sqlite3_column_int64(stmt, 1);
 

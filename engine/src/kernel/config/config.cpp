@@ -83,7 +83,7 @@ void _deallocate_all_string() {
             continue;
         }
 
-        CETECH_DEALLOCATE(memory_api_v0.main_allocator(), _G.values[i].s);
+        CETECH_FREE(memory_api_v0.main_allocator(), _G.values[i].s);
     }
 }
 
@@ -144,10 +144,10 @@ namespace config {
         os_vio_api_v0.write(build_vio, data, sizeof(char), size);
         os_vio_api_v0.close(build_vio);
 
-        CETECH_DEALLOCATE(a, data);
-        CETECH_DEALLOCATE(a, build_path);
-        CETECH_DEALLOCATE(a, source_path);
-        CETECH_DEALLOCATE(a, build_dir);
+        CETECH_FREE(a, data);
+        CETECH_FREE(a, build_path);
+        CETECH_FREE(a, source_path);
+        CETECH_FREE(a, build_dir);
     }
 
 #endif
@@ -453,7 +453,7 @@ namespace config {
         char *_s = _G.values[var.idx].s;
 
         if (_s != NULL) {
-            allocator_deallocate(memory_api_v0.main_allocator(), _s);
+            CETECH_FREE(memory_api_v0.main_allocator(), _s);
         }
 
         _G.values[var.idx].s = memory_api_v0.str_dup(s,

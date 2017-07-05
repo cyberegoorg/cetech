@@ -76,6 +76,8 @@ set(SOURCE_FILES
         engine/src/kernel/module/module.cpp
         engine/src/kernel/config/config.cpp
         engine/src/kernel/memory/memory.cpp
+        engine/src/kernel/memory/malloc_allocator.cpp
+        engine/src/kernel/memory/scratch_allocator.cpp
         engine/src/kernel/os_sdl2/machine.cpp
         engine/src/kernel/os_sdl2/sdl2_mouse.cpp
         engine/src/kernel/os_sdl2/sdl2_keyboard.cpp
@@ -117,7 +119,7 @@ set(SOURCE_FILES
         engine/src/modules/luasys/api/api_level.c
         engine/src/modules/luasys/api/api_scenegraph.c
 
-        engine/src/modules/console_server/console_server.cpp
+        engine/src/kernel/console_server/console_server.cpp
 
 
         engine/src/modules/resource/resource.cpp
@@ -152,7 +154,10 @@ set(SOURCE_FILES
         engine/src/modules/renderer_bgfx/material/material_compiler.cpp
         engine/src/modules/renderer_bgfx/material/material_compiler.cpp
 
-)
+        engine/src/kernel/memory/core_allocator.cpp
+
+
+        )
 
 ################################################################################
 # Main sources

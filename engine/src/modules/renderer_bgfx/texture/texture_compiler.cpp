@@ -46,7 +46,7 @@ namespace texture_compiler {
                 "texturec");
 
         buffer << texturec;
-        CETECH_DEALLOCATE(memory_api_v0.main_allocator(), texturec);
+        CETECH_FREE(memory_api_v0.main_allocator(), texturec);
 
         printf(buffer, " -f %s -o %s", input, output);
 
@@ -81,7 +81,7 @@ namespace texture_compiler {
         int ret = snprintf(tmp_filename, max_len, "%s/%s.ktx", tmp_dirname,
                            os_path_v0.filename(filename));
 
-        CETECH_DEALLOCATE(a, tmp_dirname);
+        CETECH_FREE(a, tmp_dirname);
 
         return ret;
     }
@@ -156,9 +156,9 @@ namespace texture_compiler {
 
         compilator_api->add_dependency(filename, input_str);
 
-        CETECH_DEALLOCATE(a, tmp_data);
-        CETECH_DEALLOCATE(a, input_path);
-        CETECH_DEALLOCATE(a, tmp_dir);
+        CETECH_FREE(a, tmp_data);
+        CETECH_FREE(a, input_path);
+        CETECH_FREE(a, tmp_dir);
 
         return 1;
     }

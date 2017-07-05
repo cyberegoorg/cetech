@@ -123,10 +123,10 @@ void dir_list_free(char **files,
                    uint32_t count,
                    struct allocator *allocator) {
     for (int i = 0; i < count; ++i) {
-        CETECH_DEALLOCATE(allocator, files[i]);
+        CETECH_FREE(allocator, files[i]);
     }
 
-    CETECH_DEALLOCATE(allocator, files);
+    CETECH_FREE(allocator, files);
 }
 
 
