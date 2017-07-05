@@ -11,7 +11,7 @@
 #include <cetech/kernel/api_system.h>
 
 #include <cetech/kernel/log.h>
-#include <cetech/kernel/application.h>
+#include <cetech/modules/application.h>
 #include <cetech/kernel/os.h>
 
 #include <include/SDL2/SDL.h>
@@ -85,7 +85,7 @@ CETECH_DECL_API(memory_api_v0);
 //==============================================================================
 // Interface
 //==============================================================================
-namespace machine {
+namespace machine_sdl {
     struct event_header *machine_event_begin() {
         return (event_header *) eventstream::begin(_G.eventstream);
     }
@@ -126,19 +126,17 @@ namespace machine {
     }
 
     static struct machine_api_v0 api_v1 = {
-            .event_begin = machine::machine_event_begin,
-            .event_end = machine::machine_event_end,
-            .event_next = machine::machine_event_next,
+            .event_begin = machine_sdl::machine_event_begin,
+            .event_end = machine_sdl::machine_event_end,
+            .event_next = machine_sdl::machine_event_next,
             .gamepad_is_active = sdl_gamepad_is_active,
             .gamepad_play_rumble = sdl_gamepad_play_rumble,
-            .update = machine::_update,
+            .update = machine_sdl::_update,
     };
 
-    void register_api(struct api_v0 *api) {
-        api->register_api("machine_api_v0", &api_v1);
-    }
-
     void init(struct api_v0 *api) {
+        api->register_api("machine_api_v0", &api_v1);
+
         CETECH_GET_API(api, memory_api_v0);
         CETECH_GET_API(api, app_api_v0);
         CETECH_GET_API(api, log_api_v0);

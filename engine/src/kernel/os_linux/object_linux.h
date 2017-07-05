@@ -1,13 +1,14 @@
-#include "include/SDL2/SDL.h"
+#include <dlfcn.h>
 
 #include <cetech/kernel/errors.h>
 
 void *load_object(const char *path) {
-    void *obj = SDL_LoadObject(path);
-    CETECH_ASSERT("cebase", obj != NULL);
+    void *obj = dlopen(path, RTLD_NOW|RTLD_LOCAL);
+
+    CETECH_ASSERT("os_object", obj != NULL);
 
     if (obj == NULL) {
-        log_api_v0.error("cebase", "%s", SDL_GetError());
+        log_api_v0.error("os_object", "%s", dlerror());
         return NULL;
     }
 
@@ -15,18 +16,18 @@ void *load_object(const char *path) {
 }
 
 void unload_object(void *so) {
-    CETECH_ASSERT("cebase", so != NULL);
+    CETECH_ASSERT("os_object", so != NULL);
 
-    SDL_UnloadObject(so);
+    dlclose(so);
 }
 
 void *load_function(void *so,
                     const char *name) {
-    void *fce = SDL_LoadFunction(so, "load_module");
-    CETECH_ASSERT("cebase", fce != NULL);
+    void *fce = dlsym(so, "load_module");
+    CETECH_ASSERT("os_object", fce != NULL);
 
     if (fce == NULL) {
-        log_api_v0.error("cebase", "%s", SDL_GetError());
+        log_api_v0.error("os_object", "%s", dlerror());
         return NULL;
     }
 
