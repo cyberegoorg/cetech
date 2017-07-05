@@ -1,9 +1,10 @@
-#include "include/SDL2/SDL.h"
+#include <dlfcn.h>
 
 #include <cetech/kernel/errors.h>
 
 void *load_object(const char *path) {
-    void *obj = SDL_LoadObject(path);
+    void *obj = dlopen(path, RTLD_NOW|RTLD_LOCAL);
+
     CETECH_ASSERT("cebase", obj != NULL);
 
     if (obj == NULL) {
@@ -17,12 +18,12 @@ void *load_object(const char *path) {
 void unload_object(void *so) {
     CETECH_ASSERT("cebase", so != NULL);
 
-    SDL_UnloadObject(so);
+    dlclose(so);
 }
 
 void *load_function(void *so,
                     const char *name) {
-    void *fce = SDL_LoadFunction(so, "load_module");
+    void *fce = dlsym(so, "load_module");
     CETECH_ASSERT("cebase", fce != NULL);
 
     if (fce == NULL) {
