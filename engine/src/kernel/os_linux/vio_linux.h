@@ -9,7 +9,6 @@
 #define LOG_WHERE "vio_sdl"
 
 struct sdl_vio {
-    struct os_vio interface;
     struct allocator *allocator;
     SDL_RWops *rw;
 };
@@ -17,7 +16,7 @@ struct sdl_vio {
 int vio_close(struct os_vio *file) {
     CETECH_ASSERT("vio", file != NULL);
 
-    return file->close(file);
+    return file->close(file->inst);
 }
 
 int64_t vio_seek(struct os_vio *file,
@@ -25,7 +24,7 @@ int64_t vio_seek(struct os_vio *file,
                  enum vio_seek whence) {
     CETECH_ASSERT("vio", file != NULL);
 
-    return file->seek(file, offset, whence);
+    return file->seek(file->inst, offset, whence);
 }
 
 void vio_seek_to_end(struct os_vio *file) {
@@ -50,7 +49,7 @@ int64_t vio_position(struct os_vio *file) {
 int64_t vio_size(struct os_vio *file) {
     CETECH_ASSERT("vio", file != NULL);
 
-    return file->size(file);
+    return file->size(file->inst);
 };
 
 size_t vio_read(struct os_vio *file,
@@ -60,7 +59,7 @@ size_t vio_read(struct os_vio *file,
 
     CETECH_ASSERT("vio", file != NULL);
 
-    return file->read(file, buffer, size, maxnum);
+    return file->read(file->inst, buffer, size, maxnum);
 };
 
 size_t vio_write(struct os_vio *file,
@@ -70,10 +69,11 @@ size_t vio_write(struct os_vio *file,
 
     CETECH_ASSERT("vio", file != NULL);
 
-    return file->write(file, buffer, size, num);
+    return file->write(file->inst, buffer, size, num);
 };
 
-int64_t vio_sdl_seek(struct os_vio *file,
+
+int64_t vio_sdl_seek( os_vio_instance_v0 *file,
                      int64_t offset,
                      enum vio_seek whence) {
     CETECH_ASSERT(LOG_WHERE, file != NULL);
@@ -84,45 +84,43 @@ int64_t vio_sdl_seek(struct os_vio *file,
             [VIO_SEEK_END] = RW_SEEK_END
     };
 
-    struct sdl_vio *vf = (struct sdl_vio *) file;
-
-    return SDL_RWseek(vf->rw, offset, -_whence[whence]);
+    return SDL_RWseek((SDL_RWops*)file, offset, -_whence[whence]);
 }
 
-size_t vio_sdl_read(struct os_vio *file,
+size_t vio_sdl_read( os_vio_instance_v0 *file,
                     void *buffer,
                     size_t size,
                     size_t maxnum) {
     CETECH_ASSERT(LOG_WHERE, file != NULL);
     struct sdl_vio *vf = (struct sdl_vio *) file;
 
-    return SDL_RWread(vf->rw, buffer, size, maxnum);
+    return SDL_RWread((SDL_RWops*)file, buffer, size, maxnum);
 };
 
-size_t vio_sdl_write(struct os_vio *file,
+size_t vio_sdl_write( os_vio_instance_v0 *file,
                      const void *buffer,
                      size_t size,
                      size_t maxnum) {
     CETECH_ASSERT(LOG_WHERE, file != NULL);
     struct sdl_vio *vf = (struct sdl_vio *) file;
 
-    return SDL_RWwrite(vf->rw, buffer, size, maxnum);
+    return SDL_RWwrite((SDL_RWops*)file, buffer, size, maxnum);
 };
 
-int64_t vio_sdl_size(struct os_vio *file) {
+int64_t vio_sdl_size( os_vio_instance_v0 *file) {
     CETECH_ASSERT(LOG_WHERE, file != NULL);
     struct sdl_vio *vf = (struct sdl_vio *) file;
 
-    return SDL_RWsize(vf->rw);
+    return SDL_RWsize((SDL_RWops*)file);
 };
 
-int vio_sdl_close(struct os_vio *file) {
+int vio_sdl_close(os_vio_instance_v0 *file) {
     CETECH_ASSERT(LOG_WHERE, file != NULL);
     struct sdl_vio *vf = (struct sdl_vio *) file;
 
-    SDL_RWclose(vf->rw);
+    SDL_RWclose((SDL_RWops*)file);
 
-    CETECH_FREE(vf->allocator, vf);
+//    CETECH_FREE(vf->allocator, vf);
 
     return 1;
 }
@@ -131,9 +129,10 @@ int vio_sdl_close(struct os_vio *file) {
 struct os_vio *vio_from_file(const char *path,
                              enum vio_open_mode mode,
                              struct allocator *allocator) {
-    struct sdl_vio *vf =
-            CETECH_ALLOCATE(allocator, struct sdl_vio,
-                            sizeof(struct sdl_vio));
+
+    os_vio *vio = CETECH_ALLOCATE(allocator, os_vio, sizeof(os_vio));
+    sdl_vio *vf = CETECH_ALLOCATE(allocator, sdl_vio, sizeof(struct sdl_vio));
+
     CETECH_ASSERT(LOG_WHERE, vf != NULL);
 
     if (!vf) {
@@ -146,13 +145,16 @@ struct os_vio *vio_from_file(const char *path,
         return NULL;
     }
 
-    vf->interface.write = vio_sdl_write;
-    vf->interface.read = vio_sdl_read;
-    vf->interface.seek = vio_sdl_seek;
-    vf->interface.size = vio_sdl_size;
-    vf->interface.close = vio_sdl_close;
     vf->allocator = allocator;
     vf->rw = rwops;
 
-    return (struct os_vio *) vf;
+    vio->inst = vf;
+    vio->write = vio_sdl_write;
+    vio->read = vio_sdl_read;
+    vio->seek = vio_sdl_seek;
+    vio->size = vio_sdl_size;
+    vio->close = vio_sdl_close;
+
+
+    return vio;
 }

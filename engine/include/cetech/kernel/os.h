@@ -63,24 +63,28 @@ typedef struct {
 
 typedef void os_window_t;
 
-struct os_vio {
-    int64_t (*size)(struct os_vio *vio);
+typedef void os_vio_instance_v0;
 
-    int64_t (*seek)(struct os_vio *vio,
+struct os_vio  {
+    os_vio_instance_v0* inst;
+
+    int64_t (*size)(os_vio_instance_v0 *vio);
+
+    int64_t (*seek)(os_vio_instance_v0 *vio,
                     int64_t offset,
                     enum vio_seek whence);
 
-    size_t (*read)(struct os_vio *vio,
+    size_t (*read)(os_vio_instance_v0 *vio,
                    void *ptr,
                    size_t size,
                    size_t maxnum);
 
-    size_t (*write)(struct os_vio *vio,
+    size_t (*write)(os_vio_instance_v0 *vio,
                     const void *ptr,
                     size_t size,
                     size_t num);
 
-    int (*close)(struct os_vio *vio);
+    int (*close)(os_vio_instance_v0 *vio);
 };
 
 struct event_header {
@@ -257,7 +261,6 @@ struct os_vio_api_v0 {
                                 struct allocator *allocator);
 
     int (*close)(struct os_vio *file);
-
 
     int64_t (*seek)(struct os_vio *file,
                     int64_t offset,
