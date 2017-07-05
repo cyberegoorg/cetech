@@ -117,10 +117,10 @@ namespace shader_compiler {
                         struct compilator_api *compilator_api) {
         auto a = memory_api_v0.main_allocator();
 
-        char source_data[os_vio_api_v0.size(source_vio) + 1];
-        memset(source_data, 0, os_vio_api_v0.size(source_vio) + 1);
-        os_vio_api_v0.read(source_vio, source_data, sizeof(char),
-                           os_vio_api_v0.size(source_vio));
+        char source_data[source_vio->size(source_vio->inst) + 1];
+        memset(source_data, 0, source_vio->size(source_vio->inst) + 1);
+        source_vio->read(source_vio->inst, source_data, sizeof(char),
+                         source_vio->size(source_vio->inst));
 
         yaml_document_t h;
         yaml_node_t root = yaml_load_str(source_data, &h);
@@ -166,11 +166,11 @@ namespace shader_compiler {
                                                           VIO_OPEN_READ);
         char *vs_data =
                 CETECH_ALLOCATE(memory_api_v0.main_allocator(), char,
-                                os_vio_api_v0.size(tmp_file) + 1);
-        os_vio_api_v0.read(tmp_file, vs_data, sizeof(char),
-                           os_vio_api_v0.size(tmp_file));
-        resource.vs_size = os_vio_api_v0.size(tmp_file);
-        os_vio_api_v0.close(tmp_file);
+                                tmp_file->size(tmp_file->inst) + 1);
+        tmp_file->read(tmp_file->inst, vs_data, sizeof(char),
+                       tmp_file->size(tmp_file->inst));
+        resource.vs_size = tmp_file->size(tmp_file->inst);
+        tmp_file->close(tmp_file->inst);
         ///////
 
         //////// FS
@@ -195,16 +195,17 @@ namespace shader_compiler {
         tmp_file = os_vio_api_v0.from_file(output_path, VIO_OPEN_READ);
         char *fs_data =
                 CETECH_ALLOCATE(memory_api_v0.main_allocator(), char,
-                                os_vio_api_v0.size(tmp_file) + 1);
-        os_vio_api_v0.read(tmp_file, fs_data, sizeof(char),
-                           os_vio_api_v0.size(tmp_file));
-        resource.fs_size = os_vio_api_v0.size(tmp_file);
-        os_vio_api_v0.close(tmp_file);
+                                tmp_file->size(tmp_file->inst) + 1);
+        tmp_file->read(tmp_file->inst, fs_data, sizeof(char),
+                       tmp_file->size(tmp_file->inst));
 
-        os_vio_api_v0.write(build_vio, &resource, sizeof(resource), 1);
+        resource.fs_size = tmp_file->size(tmp_file->inst);
 
-        os_vio_api_v0.write(build_vio, vs_data, sizeof(char), resource.vs_size);
-        os_vio_api_v0.write(build_vio, fs_data, sizeof(char), resource.fs_size);
+        tmp_file->close(tmp_file->inst);
+
+        build_vio->write(build_vio->inst, &resource, sizeof(resource), 1);
+        build_vio->write(build_vio->inst, vs_data, sizeof(char), resource.vs_size);
+        build_vio->write(build_vio->inst, fs_data, sizeof(char), resource.fs_size);
 
         CETECH_FREE(a, vs_data);
         CETECH_FREE(a, fs_data);

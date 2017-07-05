@@ -133,16 +133,16 @@ namespace config {
         struct os_vio *source_vio = os_vio_api_v0.from_file(source_path,
                                                             VIO_OPEN_READ);
 
-        char *data = CETECH_ALLOCATE(a, char, os_vio_api_v0.size(source_vio));
+        char *data = CETECH_ALLOCATE(a, char, source_vio->size(source_vio->inst));
 
-        size_t size = (size_t) os_vio_api_v0.size(source_vio);
-        os_vio_api_v0.read(source_vio, data, sizeof(char), size);
-        os_vio_api_v0.close(source_vio);
+        size_t size = (size_t) source_vio->size(source_vio->inst);
+        source_vio->read(source_vio->inst, data, sizeof(char), size);
+        source_vio->close(source_vio->inst);
 
         struct os_vio *build_vio = os_vio_api_v0.from_file(build_path,
                                                            VIO_OPEN_WRITE);
-        os_vio_api_v0.write(build_vio, data, sizeof(char), size);
-        os_vio_api_v0.close(build_vio);
+        build_vio->write(build_vio->inst, data, sizeof(char), size);
+        build_vio->close(build_vio->inst);
 
         CETECH_FREE(a, data);
         CETECH_FREE(a, build_path);
@@ -243,11 +243,11 @@ namespace config {
         struct os_vio *source_vio = os_vio_api_v0.from_file(config_path,
                                                             VIO_OPEN_READ);
 
-        char *data = CETECH_ALLOCATE(a, char, os_vio_api_v0.size(source_vio));
+        char *data = CETECH_ALLOCATE(a, char, source_vio->size(source_vio->inst));
 
-        os_vio_api_v0.read(source_vio, data, os_vio_api_v0.size(source_vio),
-                           os_vio_api_v0.size(source_vio));
-        os_vio_api_v0.close(source_vio);
+        source_vio->read(source_vio->inst, data, source_vio->size(source_vio->inst),
+                         source_vio->size(source_vio->inst));
+        source_vio->close(source_vio->inst);
 
         yaml_document_t h;
         yaml_node_t root = yaml_load_str(data, &h);

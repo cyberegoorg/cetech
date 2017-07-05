@@ -88,9 +88,9 @@ namespace level_resource {
 
     void *loader(struct os_vio *input,
                  struct allocator *allocator) {
-        const int64_t size = os_vio_api_v0.size(input);
+        const int64_t size = input->size(input->inst);
         char *data = CETECH_ALLOCATE(allocator, char, size);
-        os_vio_api_v0.read(input, data, 1, size);
+        input->read(input->inst, data, 1, size);
         return data;
     }
 
@@ -163,10 +163,10 @@ namespace level_resource_compiler {
                  struct os_vio *build_vio,
                  struct compilator_api *compilator_api) {
 
-        char source_data[os_vio_api_v0.size(source_vio) + 1];
-        memset(source_data, 0, os_vio_api_v0.size(source_vio) + 1);
-        os_vio_api_v0.read(source_vio, source_data, sizeof(char),
-                           os_vio_api_v0.size(source_vio));
+        char source_data[source_vio->size(source_vio->inst) + 1];
+        memset(source_data, 0, source_vio->size(source_vio->inst) + 1);
+        source_vio->read(source_vio->inst, source_data, sizeof(char),
+                           source_vio->size(source_vio->inst));
 
         yaml_document_t h;
         yaml_node_t root = yaml_load_str(source_data, &h);
@@ -195,12 +195,12 @@ namespace level_resource_compiler {
 
         entity_api_v0.compiler_write_to_build(output, entity_data.data);
 
-        os_vio_api_v0.write(build_vio, &res, sizeof(level_blob::blob_t), 1);
-        os_vio_api_v0.write(build_vio, array::begin(id), sizeof(uint64_t),
+        build_vio->write(build_vio->inst, &res, sizeof(level_blob::blob_t), 1);
+        build_vio->write(build_vio->inst, array::begin(id), sizeof(uint64_t),
                             array::size(id));
-        os_vio_api_v0.write(build_vio, array::begin(offset), sizeof(uint32_t),
+        build_vio->write(build_vio->inst, array::begin(offset), sizeof(uint32_t),
                             array::size(offset));
-        os_vio_api_v0.write(build_vio, data->data(data->inst), sizeof(uint8_t),
+        build_vio->write(build_vio->inst, data->data(data->inst), sizeof(uint8_t),
                             data->size(data->inst));
 
         blob_api_v0.destroy(data);

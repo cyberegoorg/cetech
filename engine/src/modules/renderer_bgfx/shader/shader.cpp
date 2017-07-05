@@ -62,10 +62,10 @@ namespace shader_resource {
 
     void *loader(struct os_vio *input,
                  struct allocator *allocator) {
-        const int64_t size = os_vio_api_v0.size(input);
-        char *data = CETECH_ALLOCATE(allocator, char, size);
-        os_vio_api_v0.read(input, data, 1, size);
 
+        const int64_t size = input->size(input->inst);
+        char *data = CETECH_ALLOCATE(allocator, char, size);
+        input->read(input->inst, data, 1, size);
         return data;
     }
 

@@ -322,11 +322,11 @@ int _lua_compiler(const char *filename,
                   struct os_vio *build_vio,
                   struct compilator_api *compilator_api) {
 
-    char tmp[os_vio_api_v0.size(source_vio) + 1];
-    memset(tmp, 0, os_vio_api_v0.size(source_vio) + 1);
+    char tmp[source_vio->size(source_vio->inst) + 1];
+    memset(tmp, 0, source_vio->size(source_vio->inst) + 1);
 
-    os_vio_api_v0.read(source_vio, tmp, sizeof(char),
-                       os_vio_api_v0.size(source_vio));
+    source_vio->read(source_vio->inst, tmp, sizeof(char),
+                     source_vio->size(source_vio->inst));
 
     lua_State *state = luaL_newstate();
     luaL_openlibs(state);
@@ -368,9 +368,9 @@ int _lua_compiler(const char *filename,
                 .size = (uint32_t) bc_len,
         };
 
-        os_vio_api_v0.write(build_vio, &resource, sizeof(struct lua_resource),
+        build_vio->write(build_vio->inst, &resource, sizeof(struct lua_resource),
                             1);
-        os_vio_api_v0.write(build_vio, bc, sizeof(char), bc_len);
+        build_vio->write(build_vio->inst, bc, sizeof(char), bc_len);
     }
 
     lua_close(state);

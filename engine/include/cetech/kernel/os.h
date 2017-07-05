@@ -258,32 +258,6 @@ struct os_time_api_v0 {
 struct os_vio_api_v0 {
     struct os_vio *(*from_file)(const char *path,
                                 enum vio_open_mode mode);
-
-    int (*close)(struct os_vio *file);
-
-    int64_t (*seek)(struct os_vio *file,
-                    int64_t offset,
-                    enum vio_seek whence);
-
-    void (*seek_to_end)(struct os_vio *file);
-
-    int64_t (*skip)(struct os_vio *file,
-                    int64_t bytes);
-
-    int64_t (*position)(struct os_vio *file);
-
-    int64_t (*size)(struct os_vio *file);
-
-    size_t (*read)(struct os_vio *file,
-                   void *buffer,
-                   size_t size,
-                   size_t maxnum);
-
-    size_t (*write)(struct os_vio *file,
-                    const void *buffer,
-                    size_t size,
-                    size_t num);
-
 };
 
 struct os_window_api_v0 {
