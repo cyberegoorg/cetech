@@ -77,14 +77,14 @@ void stacktrace_free(char *st) {
     CETECH_FREE(a, st);
 }
 
-CETECH_DECL_API(log_api_v0);
+CETECH_DECL_API(ct_log_api_v0);
 
-void error_assert(const char *where,
-                  const char *condition,
-                  const char *filename,
-                  int line) {
+void ct_error_assert(const char *where,
+                     const char *condition,
+                     const char *filename,
+                     int line) {
     char *st = stacktrace(1);
-    log_api_v0.error(where,
+    ct_log_api_v0.error(where,
                      "msg: \"%s\n  file: %s:%d\n  stacktrace:\n%s",
                      condition,
                      filename,
@@ -94,12 +94,12 @@ void error_assert(const char *where,
     abort();
 }
 
-static struct error_api_v0 error_api = {
-        .assert = error_assert
+static struct ct_error_api_v0 error_api = {
+        .assert = ct_error_assert
 };
 
-void error_register_api(struct api_v0 *api) {
-    CETECH_GET_API(api, log_api_v0);
+void error_register_api(struct ct_api_v0 *api) {
+    CETECH_GET_API(api, ct_log_api_v0);
 
-    api->register_api("error_api_v0", &error_api);
+    api->register_api("ct_error_api_v0", &error_api);
 }

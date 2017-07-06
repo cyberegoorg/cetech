@@ -18,7 +18,7 @@ typedef void os_window_t;
 // Struct
 //==============================================================================
 
-struct game_callbacks {
+struct ct_game_callbacks {
     int (*init)();
 
     void (*shutdown)();
@@ -34,7 +34,7 @@ struct game_callbacks {
 //==============================================================================
 
 //! Application API V0
-struct app_api_v0 {
+struct ct_app_api_v0 {
     //! Stop main loop and quit.
     void (*quit)();
 

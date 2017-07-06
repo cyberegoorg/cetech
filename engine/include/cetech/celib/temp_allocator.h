@@ -97,7 +97,7 @@ static uint32_t _temp_allocator_allocated_size(void *p) {
 }
 
 //==============================================================================
-// Predifend allocator size
+// Predifend ct_allocator size
 //==============================================================================
 
 TEMP_ALLOCATOR_DEF(64)

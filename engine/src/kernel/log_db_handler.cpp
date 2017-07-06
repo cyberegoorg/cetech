@@ -11,7 +11,7 @@
 
 #include "include/sqlite3/sqlite3.h"
 
-CETECH_DECL_API(log_api_v0);
+CETECH_DECL_API(ct_log_api_v0);
 
 static int _step(sqlite3 *db,
                  sqlite3_stmt *stmt) {
@@ -36,7 +36,7 @@ static int _step(sqlite3 *db,
                 break;
 
             default:
-                log_api_v0.error("builddb", "SQL error '%s' (%d): %s",
+                ct_log_api_v0.error("builddb", "SQL error '%s' (%d): %s",
                                  sqlite3_sql(stmt), rc, sqlite3_errmsg(db));
 
                 run = 0;
@@ -93,7 +93,7 @@ static int _do_sql(char worker_id,
 }
 
 
-void logdb_log(enum log_level level,
+void logdb_log(enum ct_log_level level,
                time_t time,
                char worker_id,
                const char *where,
@@ -129,12 +129,12 @@ void logdb_log(enum log_level level,
 
 namespace log {
     int logdb_init_db(const char *log_dir,
-                      struct api_v0 *api) {
-        CETECH_GET_API(api, log_api_v0);
+                      struct ct_api_v0 *api) {
+        CETECH_GET_API(api, ct_log_api_v0);
 
-        struct os_path_v0 *path = (os_path_v0 *) api->first("os_path_v0").api;
-        struct memory_api_v0 *memory = (memory_api_v0 *) api->first(
-                "memory_api_v0").api;
+        struct ct_path_v0 *path = (ct_path_v0 *) api->first("ct_path_v0").api;
+        struct ct_memory_api_v0 *memory = (ct_memory_api_v0 *) api->first(
+                "ct_memory_api_v0").api;
 
         logdb_path = path->join(memory->main_allocator(), 2, log_dir, "log.db");
 
@@ -152,7 +152,7 @@ namespace log {
             return 0;
         }
 
-        log_api_v0.register_handler(logdb_log, NULL);
+        ct_log_api_v0.register_handler(logdb_log, NULL);
         return 1;
     }
 }

@@ -33,28 +33,28 @@ enum {
 // Structs
 //==============================================================================
 
-struct develop_event_header {
+struct ct_develop_event_header {
     uint32_t type;
     uint64_t size;
 };
 
 //! Record float event struct
-struct record_float_event {
-    struct develop_event_header header; //!< Event header
+struct ct_record_float_event {
+    struct ct_develop_event_header header; //!< Event header
     char name[64];              //!< Entry name
     float value;                //!< Entry value
 };
 
 //! Record int event struct
-struct record_int_event {
-    struct develop_event_header header; //!< Event header
+struct ct_record_int_event {
+    struct ct_develop_event_header header; //!< Event header
     char name[64];              //!< Entry name
     int32_t value;                  //!< Entry value
 };
 
 //! Scope event struct
-struct scope_event {
-    struct develop_event_header header; //!< Event header
+struct ct_scope_event {
+    struct ct_develop_event_header header; //!< Event header
     char name[64];              //!< Scope name
     time_t start;               //!< Scope create time
     float duration;             //!< Scope duration
@@ -63,7 +63,7 @@ struct scope_event {
 };
 
 //! Scope data struct
-struct scope_data {
+struct ct_scope_data {
     const char *name; //!< Scope name
     time_t start;     //!< Start time
     uint64_t start_timer;  //!< Timer
@@ -74,13 +74,13 @@ struct scope_data {
 //==============================================================================
 
 //! Develop system API V0
-struct develop_api_v0 {
+struct ct_develop_api_v0 {
 
     //! Push event
     //! \param header Header
     //! \param type Event type
     //! \param size Event size
-    void (*push)(struct develop_event_header *header,
+    void (*push)(struct ct_develop_event_header *header,
                  uint32_t type,
                  uint64_t size);
 
@@ -99,11 +99,11 @@ struct develop_api_v0 {
     //! Enter scope
     //! \param name Scope name
     //! \return Scope data
-    struct scope_data (*enter_scope)(const char *name);
+    struct ct_scope_data (*enter_scope)(const char *name);
 
     //! Leave scope
     //! \param scope_data Scope data
-    void (*leave_scope)(struct scope_data scope_data);
+    void (*leave_scope)(struct ct_scope_data scope_data);
 
     void (*after_update)(float dt);
 };

@@ -18,11 +18,12 @@ extern "C" {
 // Typedefs
 //==============================================================================
 
+struct ct_camera;
+
 typedef struct world_s world_t;
 typedef struct entity_s entity_t;
 typedef struct mat33f_s mat33f_t;
 typedef struct mat44f_s mat44f_t;
-typedef struct camera_s camera_t;
 typedef struct vec2f_s vec2f_t;
 typedef struct vec3f_s vec3f_t;
 typedef struct vec4f_s vec4f_t;
@@ -41,7 +42,7 @@ typedef struct material_s {
 //==============================================================================
 
 //! Material API V0
-struct material_api_v0 {
+struct ct_material_api_v0 {
 
     //! Create new material
     //! \param name Material resource name
@@ -107,7 +108,7 @@ typedef struct {
 //==============================================================================
 
 //! Mesh API V0
-struct mesh_renderer_api_v0 {
+struct ct_mesh_renderer_api_v0 {
 
     //! Is mesh valid
     //! \param mesh Mesh
@@ -170,13 +171,12 @@ struct mesh_renderer_api_v0 {
 
 typedef int viewport_t;
 
-
 //==============================================================================
 // Api
 //==============================================================================
 
 //! Render API V0
-struct renderer_api_v0 {
+struct ct_renderer_api_v0 {
     //! Create renderer.
     //! \param window Window
     void (*create)(os_window_t *window);
@@ -194,7 +194,7 @@ struct renderer_api_v0 {
     //! \param camera Camera
     //! \param viewport Viewport
     void (*render_world)(world_t world,
-                         camera_t camera,
+                         struct ct_camera camera,
                          viewport_t viewport);
 };
 

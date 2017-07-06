@@ -57,7 +57,7 @@ enum {
 
 typedef void allocator_instance_v0;
 
-struct allocator {
+struct ct_allocator{
     allocator_instance_v0 *inst;
 
     void *(*reallocate)(allocator_instance_v0 *a,
@@ -65,7 +65,7 @@ struct allocator {
                         uint32_t size,
                         uint32_t align);
 
-    uint32_t (*total_allocated)(struct allocator *allocator);
+    uint32_t (*total_allocated)(struct ct_allocator *allocator);
 
     uint32_t (*allocated_size)(void *p);
 };

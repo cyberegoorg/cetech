@@ -37,7 +37,7 @@ static struct G {
 } _G = {0};
 
 
-CETECH_DECL_API(log_api_v0)
+CETECH_DECL_API(ct_log_api_v0)
 
 
 int _new_controler() {
@@ -72,7 +72,7 @@ int _create_controler(int i) {
         SDL_HapticRumbleInit(haptic);
         _G.haptic[idx] = haptic;
 
-        log_api_v0.info("input.gamepad", "Gamepad %d has haptic support",
+        ct_log_api_v0.info("input.gamepad", "Gamepad %d has haptic support",
                         i);
     } else {
         _G.haptic[idx] = NULL;
@@ -85,8 +85,8 @@ int _create_controler(int i) {
 // Interface
 //==============================================================================
 
-int sdl_gamepad_init(struct api_v0 *api) {
-    CETECH_GET_API(api, log_api_v0);
+int sdl_gamepad_init(struct ct_api_v0 *api) {
+    CETECH_GET_API(api, ct_log_api_v0);
 
     _G = (struct G) {0};
 
@@ -187,7 +187,7 @@ void sdl_gamepad_process(EventStream &stream) {
         }
 
         for (int j = 0; j < GAMEPAD_AXIX_MAX; ++j) {
-            struct gamepad_move_event event;
+            struct ct_gamepad_move_event event;
             event.gamepad_id = i;
             event.axis = j;
 
@@ -213,7 +213,7 @@ void sdl_gamepad_process_event(SDL_Event *event,
     switch (event->type) {
         case SDL_CONTROLLERDEVICEADDED: {
             int idx = _create_controler(event->cdevice.which);
-            struct gamepad_device_event ev;
+            struct ct_gamepad_device_event ev;
             ev.gamepad_id = idx;
 
             eventstream::push(stream, EVENT_GAMEPAD_CONNECT, ev);
@@ -221,7 +221,7 @@ void sdl_gamepad_process_event(SDL_Event *event,
             break;
 
         case SDL_CONTROLLERDEVICEREMOVED: {
-            struct gamepad_device_event ev;
+            struct ct_gamepad_device_event ev;
 
             for (int i = 0; i < GAMEPAD_MAX; ++i) {
                 SDL_GameController *controller = SDL_GameControllerFromInstanceID(

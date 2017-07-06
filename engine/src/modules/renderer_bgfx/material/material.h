@@ -2,7 +2,7 @@
 #define CETECH_MATERIAL_H
 
 namespace material {
-    int init(struct api_v0 *api);
+    int init(struct ct_api_v0 *api);
 
     void shutdown();
 
@@ -34,9 +34,9 @@ namespace material {
 
 namespace material_compiler {
     int compiler(const char *filename,
-                 struct os_vio *source_vio,
-                 struct os_vio *build_vio,
-                 struct compilator_api *compilator_api);
+                 struct ct_vio *source_vio,
+                 struct ct_vio *build_vio,
+                 struct ct_compilator_api *compilator_api);
 }
 
 #endif //CETECH_MATERIAL_H

@@ -28,20 +28,20 @@
 #include <cetech/kernel/log.h>
 #include <cetech/kernel/errors.h>
 
-CETECH_DECL_API(memory_api_v0);
-CETECH_DECL_API(cnsole_srv_api_v0);
-CETECH_DECL_API(filesystem_api_v0);
-CETECH_DECL_API(config_api_v0);
-CETECH_DECL_API(app_api_v0);
-CETECH_DECL_API(os_path_v0);
-CETECH_DECL_API(os_vio_api_v0);
-CETECH_DECL_API(log_api_v0);
-CETECH_DECL_API(hash_api_v0);
-CETECH_DECL_API(os_thread_api_v0);
+CETECH_DECL_API(ct_memory_api_v0);
+CETECH_DECL_API(ct_console_srv_api_v0);
+CETECH_DECL_API(ct_filesystem_api_v0);
+CETECH_DECL_API(ct_config_api_v0);
+CETECH_DECL_API(ct_app_api_v0);
+CETECH_DECL_API(ct_path_v0);
+CETECH_DECL_API(ct_vio_api_v0);
+CETECH_DECL_API(ct_log_api_v0);
+CETECH_DECL_API(ct_hash_api_v0);
+CETECH_DECL_API(ct_thread_api_v0);
 
 
 void resource_register_type(uint64_t type,
-                            resource_callbacks_t callbacks);
+                            ct_resource_callbacks_t callbacks);
 
 
 using namespace cetech;
@@ -84,17 +84,17 @@ namespace {
 #define _G ResourceManagerGlobals
     struct ResourceManagerGlobals {
         Map<uint32_t> type_map;
-        Array<resource_callbacks_t> resource_callbacks;
+        Array<ct_resource_callbacks_t> resource_callbacks;
 
         Map<uint32_t> resource_map;
         Array<resource_item_t> resource_data;
 
         int autoload_enabled;
 
-        os_spinlock_t add_lock;
+        ct_spinlock_t add_lock;
 
         struct {
-            cvar_t build_dir;
+            ct_cvar_t build_dir;
         } config;
 
     } ResourceManagerGlobals = {0};
@@ -122,17 +122,17 @@ namespace {
 // Private
 //==============================================================================
 
-char *resource_compiler_get_build_dir(allocator *a,
+char *resource_compiler_get_build_dir(ct_allocator *a,
                                       const char *platform) {
 
-    const char *build_dir_str = config_api_v0.get_string(_G.config.build_dir);
-    return os_path_v0.join(a, 2, build_dir_str, platform);
+    const char *build_dir_str = ct_config_api_v0.get_string(_G.config.build_dir);
+    return ct_path_v0.join(a, 2, build_dir_str, platform);
 }
 
 namespace package_resource {
 
-    void *loader(struct os_vio *input,
-                 struct allocator *allocator) {
+    void *loader(struct ct_vio *input,
+                 struct ct_allocator *allocator) {
 
         const int64_t size = input->size(input->inst);
         char *data = CETECH_ALLOCATE(allocator, char, size);
@@ -142,7 +142,7 @@ namespace package_resource {
     }
 
     void unloader(void *new_data,
-                  struct allocator *allocator) {
+                  struct ct_allocator *allocator) {
         CETECH_FREE(allocator, new_data);
     }
 
@@ -157,12 +157,12 @@ namespace package_resource {
     void *reloader(uint64_t name,
                    void *old_data,
                    void *new_data,
-                   struct allocator *allocator) {
+                   struct ct_allocator *allocator) {
         CETECH_FREE(allocator, old_data);
         return new_data;
     }
 
-    static const resource_callbacks_t package_resource_callback = {
+    static const ct_resource_callbacks_t package_resource_callback = {
             .loader = loader,
             .unloader =unloader,
             .online =online,
@@ -191,7 +191,7 @@ namespace resource {
     }
 
     void resource_register_type(uint64_t type,
-                                resource_callbacks_t callbacks) {
+                                ct_resource_callbacks_t callbacks) {
 
         const uint32_t idx = array::size(_G.resource_callbacks);
 
@@ -203,13 +203,13 @@ namespace resource {
                     uint64_t *names,
                     void **resource_data,
                     size_t count) {
-        os_thread_api_v0.spin_lock(&_G.add_lock);
+        ct_thread_api_v0.spin_lock(&_G.add_lock);
 
 
         const uint32_t type_idx = map::get(_G.type_map, type, UINT32_MAX);
 
         if (type_idx == UINT32_MAX) {
-            os_thread_api_v0.spin_unlock(&_G.add_lock);
+            ct_thread_api_v0.spin_unlock(&_G.add_lock);
             return;
         }
 
@@ -242,7 +242,7 @@ namespace resource {
             _G.resource_callbacks[type_idx].online(names[i], resource_data[i]);
         }
 
-        os_thread_api_v0.spin_unlock(&_G.add_lock);
+        ct_thread_api_v0.spin_unlock(&_G.add_lock);
     }
 
     void load(void **loaded_data,
@@ -267,12 +267,12 @@ namespace resource {
             return 1;
         }
 
-        os_thread_api_v0.spin_lock(&_G.add_lock);
+        ct_thread_api_v0.spin_lock(&_G.add_lock);
 
         uint64_t id = hash_combine(type, name);
         int h = map::has(_G.resource_map, id);
 
-        os_thread_api_v0.spin_unlock(&_G.add_lock);
+        ct_thread_api_v0.spin_unlock(&_G.add_lock);
 
         return h;
     }
@@ -281,16 +281,16 @@ namespace resource {
                     uint64_t *names,
                     size_t count) {
 
-//        os_thread_api_v0.spin_lock(&_G.add_lock);
+//        ct_thread_api_v0.spin_lock(&_G.add_lock);
 
         for (size_t i = 0; i < count; ++i) {
             if (!can_get(type, names[i])) {
-                //os_thread_api_v0.spin_unlock(&_G.add_lock);
+                //ce_thread_api_v0.spin_unlock(&_G.add_lock);
                 return 0;
             }
         }
 
-//        os_thread_api_v0.spin_unlock(&_G.add_lock);
+//        ct_thread_api_v0.spin_unlock(&_G.add_lock);
 
         return 1;
     }
@@ -301,20 +301,20 @@ namespace resource {
               size_t count,
               int force) {
 
-        os_thread_api_v0.spin_lock(&_G.add_lock);
+        ct_thread_api_v0.spin_lock(&_G.add_lock);
 
         const uint32_t idx = map::get(_G.type_map, type, UINT32_MAX);
 
         if (idx == UINT32_MAX) {
-            log_api_v0.error(LOG_WHERE,
+            ct_log_api_v0.error(LOG_WHERE,
                              "Loader for resource is not is not registred");
             memset(loaded_data, sizeof(void *), count);
-            os_thread_api_v0.spin_unlock(&_G.add_lock);
+            ct_thread_api_v0.spin_unlock(&_G.add_lock);
             return;
         }
 
-        const uint64_t root_name = hash_api_v0.id64_from_str("build");
-        resource_callbacks_t type_clb = _G.resource_callbacks[idx];
+        const uint64_t root_name = ct_hash_api_v0.id64_from_str("build");
+        ct_resource_callbacks_t type_clb = _G.resource_callbacks[idx];
 
 
         for (int i = 0; i < count; ++i) {
@@ -345,41 +345,41 @@ namespace resource {
 #else
             char *filename = build_name;
 #endif
-            log_api_v0.debug("resource", "Loading resource %s from %s/%s",
+            ct_log_api_v0.debug("resource", "Loading resource %s from %s/%s",
                              filename,
-                             filesystem_api_v0.root_dir(
+                             ct_filesystem_api_v0.root_dir(
                                      root_name),
                              build_name);
 
-            struct os_vio *resource_file = filesystem_api_v0.open(root_name,
+            struct ct_vio *resource_file = ct_filesystem_api_v0.open(root_name,
                                                                   build_name,
                                                                   FS_OPEN_READ);
 
             if (resource_file != NULL) {
                 loaded_data[i] = type_clb.loader(resource_file,
-                                                 memory_api_v0.main_allocator());
-                filesystem_api_v0.close(resource_file);
+                                                 ct_memory_api_v0.main_allocator());
+                ct_filesystem_api_v0.close(resource_file);
             } else {
                 loaded_data[i] = 0;
             }
         }
 
-        os_thread_api_v0.spin_unlock(&_G.add_lock);
+        ct_thread_api_v0.spin_unlock(&_G.add_lock);
     }
 
     void unload(uint64_t type,
                 uint64_t *names,
                 size_t count) {
-        os_thread_api_v0.spin_lock(&_G.add_lock);
+        ct_thread_api_v0.spin_lock(&_G.add_lock);
 
         const uint32_t idx = map::get(_G.type_map, type, UINT32_MAX);
 
         if (idx == UINT32_MAX) {
-            os_thread_api_v0.spin_unlock(&_G.add_lock);
+            ct_thread_api_v0.spin_unlock(&_G.add_lock);
             return;
         }
 
-        resource_callbacks_t type_clb = _G.resource_callbacks[idx];
+        ct_resource_callbacks_t type_clb = _G.resource_callbacks[idx];
 
         for (int i = 0; i < count; ++i) {
             uint64_t id = hash_combine(type, names[i]);
@@ -411,22 +411,22 @@ namespace resource {
                 char *filename = build_name;
 #endif
 
-                log_api_v0.debug("resource", "Unload resource %s ", filename);
+                ct_log_api_v0.debug("resource", "Unload resource %s ", filename);
 
                 type_clb.offline(names[i], item.data);
-                type_clb.unloader(item.data, memory_api_v0.main_allocator());
+                type_clb.unloader(item.data, ct_memory_api_v0.main_allocator());
 
                 map::remove(_G.resource_map, hash_combine(type, names[i]));
             }
 
             //_G.resource_data[idx] = item;
         }
-        os_thread_api_v0.spin_unlock(&_G.add_lock);
+        ct_thread_api_v0.spin_unlock(&_G.add_lock);
     }
 
     void *get(uint64_t type,
               uint64_t name) {
-        //os_thread_api_v0.spin_lock(&_G.add_lock);
+        //ce_thread_api_v0.spin_lock(&_G.add_lock);
 
         uint64_t id = hash_combine(type, name);
         uint32_t idx = map::get(_G.resource_map, id, UINT32_MAX);
@@ -451,7 +451,7 @@ namespace resource {
 #else
                 char *filename = build_name;
 #endif
-                log_api_v0.warning(LOG_WHERE, "Autoloading resource %s",
+                ct_log_api_v0.warning(LOG_WHERE, "Autoloading resource %s",
                                    filename);
                 load_now(type, &name, 1);
 
@@ -468,7 +468,7 @@ namespace resource {
             }
         }
 
-        //os_thread_api_v0.spin_unlock(&_G.add_lock);
+        //ce_thread_api_v0.spin_unlock(&_G.add_lock);
 
         return item.data;
     }
@@ -482,7 +482,7 @@ namespace resource {
 
         const uint32_t idx = map::get<uint32_t>(_G.type_map, type, 0);
 
-        resource_callbacks_t type_clb = _G.resource_callbacks[idx];
+        ct_resource_callbacks_t type_clb = _G.resource_callbacks[idx];
 
         load(loaded_data, type, names, count, 1);
         for (int i = 0; i < count; ++i) {
@@ -498,13 +498,13 @@ namespace resource {
 
             char *filename = build_name;
 #endif
-            log_api_v0.debug("resource", "Reload resource %s ", filename);
+            ct_log_api_v0.debug("resource", "Reload resource %s ", filename);
 
             void *old_data = get(type, names[i]);
 
             void *new_data = type_clb.reloader(names[i], old_data,
                                                loaded_data[i],
-                                               memory_api_v0.main_allocator());
+                                               ct_memory_api_v0.main_allocator());
 
             uint64_t id = hash_combine(type, names[i]);
             uint32_t item_idx = map::get(_G.resource_map, id, UINT32_MAX);
@@ -523,7 +523,7 @@ namespace resource {
         const Map<uint32_t>::Entry *type_it = map::begin(_G.type_map);
         const Map<uint32_t>::Entry *type_end = map::end(_G.type_map);
 
-        Array<uint64_t> name_array(memory_api_v0.main_allocator());
+        Array<uint64_t> name_array(ct_memory_api_v0.main_allocator());
 
         while (type_it != type_end) {
             uint64_t type_id = type_it->key;
@@ -546,7 +546,7 @@ namespace resource {
 }
 
 namespace resource_module {
-    static struct resource_api_v0 resource_api = {
+    static struct ct_resource_api_v0 resource_api = {
             .set_autoload = resource::set_autoload,
             .register_type = resource::resource_register_type,
             .load = resource::load,
@@ -575,7 +575,7 @@ namespace resource_module {
 
     };
 
-    static struct package_api_v0 package_api = {
+    static struct ct_package_api_v0 package_api = {
             .load = package_load,
             .unload = package_unload,
             .is_loaded = package_is_loaded,
@@ -583,56 +583,56 @@ namespace resource_module {
     };
 
 
-    void _init_api(struct api_v0 *api) {
-        api->register_api("resource_api_v0", &resource_api);
-        api->register_api("package_api_v0", &package_api);
+    void _init_api(struct ct_api_v0 *api) {
+        api->register_api("ct_resource_api_v0", &resource_api);
+        api->register_api("ct_package_api_v0", &package_api);
     }
 
 
-    void _init_cvar(struct config_api_v0 config) {
+    void _init_cvar(struct ct_config_api_v0 config) {
         _G = {0};
 
-        config_api_v0 = config;
+        ct_config_api_v0 = config;
 
         _G.config.build_dir = config.new_str("build", "Resource build dir",
                                              "data/build");
     }
 
 
-    void _init(struct api_v0 *api) {
+    void _init(struct ct_api_v0 *api) {
         _init_api(api);
 
-        CETECH_GET_API(api, cnsole_srv_api_v0);
-        CETECH_GET_API(api, memory_api_v0);
-        CETECH_GET_API(api, filesystem_api_v0);
-        CETECH_GET_API(api, config_api_v0);
-        CETECH_GET_API(api, app_api_v0);
-        CETECH_GET_API(api, os_path_v0);
-        CETECH_GET_API(api, os_vio_api_v0);
-        CETECH_GET_API(api, log_api_v0);
-        CETECH_GET_API(api, hash_api_v0);
-        CETECH_GET_API(api, os_thread_api_v0);
+        CETECH_GET_API(api, ct_console_srv_api_v0);
+        CETECH_GET_API(api, ct_memory_api_v0);
+        CETECH_GET_API(api, ct_filesystem_api_v0);
+        CETECH_GET_API(api, ct_config_api_v0);
+        CETECH_GET_API(api, ct_app_api_v0);
+        CETECH_GET_API(api, ct_path_v0);
+        CETECH_GET_API(api, ct_vio_api_v0);
+        CETECH_GET_API(api, ct_log_api_v0);
+        CETECH_GET_API(api, ct_hash_api_v0);
+        CETECH_GET_API(api, ct_thread_api_v0);
 
-        _init_cvar(config_api_v0);
+        _init_cvar(ct_config_api_v0);
 
-        _G.type_map.init(memory_api_v0.main_allocator());
-        _G.resource_data.init(memory_api_v0.main_allocator());
-        _G.resource_callbacks.init(memory_api_v0.main_allocator());
-        _G.resource_map.init(memory_api_v0.main_allocator());
+        _G.type_map.init(ct_memory_api_v0.main_allocator());
+        _G.resource_data.init(ct_memory_api_v0.main_allocator());
+        _G.resource_callbacks.init(ct_memory_api_v0.main_allocator());
+        _G.resource_map.init(ct_memory_api_v0.main_allocator());
 
-        char *build_dir_full = os_path_v0.join(
-                memory_api_v0.main_allocator(), 2,
-                config_api_v0.get_string(_G.config.build_dir),
-                app_api_v0.platform());
+        char *build_dir_full = ct_path_v0.join(
+                ct_memory_api_v0.main_allocator(), 2,
+                ct_config_api_v0.get_string(_G.config.build_dir),
+                ct_app_api_v0.platform());
 
-        filesystem_api_v0.map_root_dir(
-                hash_api_v0.id64_from_str("build"),
+        ct_filesystem_api_v0.map_root_dir(
+                ct_hash_api_v0.id64_from_str("build"),
                 build_dir_full);
 
-        resource::resource_register_type(hash_api_v0.id64_from_str("package"),
+        resource::resource_register_type(ct_hash_api_v0.id64_from_str("package"),
                                          package_resource::package_resource_callback);
 
-        cnsole_srv_api_v0.register_command("resource.reload_all",
+        ct_console_srv_api_v0.register_command("resource.reload_all",
                                            _cmd_reload_all);
 
         package_init(api);
@@ -649,11 +649,11 @@ namespace resource_module {
     }
 
 
-    extern "C" void resourcesystem_load_module(struct api_v0 *api) {
+    extern "C" void resourcesystem_load_module(struct ct_api_v0 *api) {
         _init(api);
     }
 
-    extern "C" void resourcesystem_unload_module(struct api_v0 *api) {
+    extern "C" void resourcesystem_unload_module(struct ct_api_v0 *api) {
         _shutdown();
     }
 }

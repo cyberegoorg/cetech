@@ -25,7 +25,7 @@ typedef struct entity_s entity_t;
 //! Transform component
 typedef struct {
     uint32_t idx;
-} transform_t;
+} ct_transform_t;
 
 
 //==============================================================================
@@ -33,19 +33,19 @@ typedef struct {
 //==============================================================================
 
 //! Transform API V0
-struct transform_api_v0 {
+struct ct_transform_api_v0 {
 
     //! Is transform valid?
     //! \param transform transform
     //! \return 1 if is oK else 0
-    int (*is_valid)(transform_t transform);
+    int (*is_valid)(ct_transform_t transform);
 
     //! Calc world matrix
     //! \param world World
     //! \param transform Transform
     //! \param parent Parent matrix
     void (*transform)(world_t world,
-                      transform_t transform,
+                      ct_transform_t transform,
                       mat44f_t *parent);
 
     //! Get transform position
@@ -53,35 +53,35 @@ struct transform_api_v0 {
     //! \param transform transform
     //! \return Position
     vec3f_t (*get_position)(world_t world,
-                            transform_t transform);
+                            ct_transform_t transform);
 
     //! Get transform rotation
     //! \param world World
     //! \param transform transform
     //! \return Rotation
     quatf_t (*get_rotation)(world_t world,
-                            transform_t transform);
+                            ct_transform_t transform);
 
     //! Get transform scale
     //! \param world World
     //! \param transform transform
     //! \return Scale
     vec3f_t (*get_scale)(world_t world,
-                         transform_t transform);
+                         ct_transform_t transform);
 
     //! Get world matrix
     //! \param world World
     //! \param transform transform
     //! \return World matrix
     mat44f_t *(*get_world_matrix)(world_t world,
-                                  transform_t transform);
+                                  ct_transform_t transform);
 
     //! Set position
     //! \param world World
     //! \param transform transform
     //! \param pos Position
     void (*set_position)(world_t world,
-                         transform_t transform,
+                         ct_transform_t transform,
                          vec3f_t pos);
 
     //! Set rotation
@@ -89,7 +89,7 @@ struct transform_api_v0 {
     //! \param transform transform
     //! \param rot Rotation
     void (*set_rotation)(world_t world,
-                         transform_t transform,
+                         ct_transform_t transform,
                          quatf_t rot);
 
     //! Set scale
@@ -97,7 +97,7 @@ struct transform_api_v0 {
     //! \param transform transform
     //! \param scale Scale
     void (*set_scale)(world_t world,
-                      transform_t transform,
+                      ct_transform_t transform,
                       vec3f_t scale);
 
     //! Has entity scene-graph component?
@@ -111,7 +111,7 @@ struct transform_api_v0 {
     //! \param world World
     //! \param entity Entity
     //! \return Transformation
-    transform_t (*get)(world_t world,
+    ct_transform_t (*get)(world_t world,
                        entity_t entity);
 
     //! Create transforms
@@ -122,7 +122,7 @@ struct transform_api_v0 {
     //! \param pose Pose map
     //! \param count transform count
     //! \return Root scene transform
-    transform_t (*create)(world_t world,
+    ct_transform_t (*create)(world_t world,
                           entity_t entity,
                           entity_t parent,
                           vec3f_t position,

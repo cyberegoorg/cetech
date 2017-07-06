@@ -31,7 +31,7 @@ extern "C" {
 //==============================================================================
 
 //! Worker enum
-enum workers {
+enum ct_workers {
     TASK_WORKER_MAIN = 0, //!< Main worker
     TASK_WORKER1 = 1,     //!< Worker 1
     TASK_WORKER2 = 2,     //!< Worker 2
@@ -44,7 +44,7 @@ enum workers {
 };
 
 //! Task affinity enum
-enum task_affinity {
+enum ct_task_affinity {
     TASK_AFFINITY_NONE = 0,     //!< No affinity
     TASK_AFFINITY_MAIN = 1,     //!< Main worker
     TASK_AFFINITY_WORKER1 = 2,  //!< Worker 1
@@ -65,7 +65,7 @@ enum task_affinity {
 //==============================================================================
 
 //! Task work
-typedef void (*task_work_t)(void *data);
+typedef void (*ct_task_work_t)(void *data);
 
 
 //==============================================================================
@@ -73,11 +73,11 @@ typedef void (*task_work_t)(void *data);
 //==============================================================================
 
 //! Task item struct
-struct task_item {
+struct ct_task_item {
     const char *name;            //!< Task name
-    task_work_t work;            //!< Task work
+    ct_task_work_t work;            //!< Task work
     void *data;                  //!< Worker data
-    enum task_affinity affinity; //!< Worker affinity
+    enum ct_task_affinity affinity; //!< Worker affinity
 };
 
 //==============================================================================
@@ -85,7 +85,7 @@ struct task_item {
 //==============================================================================
 
 //! Task API V0
-struct task_api_v0 {
+struct ct_task_api_v0 {
     //! Workers count
     //! \return Workers count
     int (*worker_count)();
@@ -93,7 +93,7 @@ struct task_api_v0 {
     //! Add new task
     //! \param items Task item array
     //! \param count Task item count
-    void (*add)(struct task_item *items,
+    void (*add)(struct ct_task_item *items,
                 uint32_t count);
 
     //! Do work for task system.

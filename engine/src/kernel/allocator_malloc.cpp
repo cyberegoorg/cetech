@@ -62,24 +62,24 @@ uint32_t malloc_allocator_allocated_size(void *p) {
     return header(p)->size;
 }
 
-uint32_t malloc_allocator_total_allocated(struct allocator *allocator) {
+uint32_t malloc_allocator_total_allocated(struct ct_allocator *allocator) {
     struct allocator_malloc *a = (struct allocator_malloc *) allocator->inst;
 
     return a->total_allocated;
 }
 
 namespace memory {
-    struct allocator *malloc_allocator_create() {
+    struct ct_allocator *malloc_allocator_create() {
         auto *core_alloc = core_allocator::get();
 
-        auto *a = CETECH_ALLOCATE(core_alloc, allocator, sizeof(allocator));
+        auto *a = CETECH_ALLOCATE(core_alloc, ct_allocator, sizeof(ct_allocator));
 
         struct allocator_malloc *m = CETECH_ALLOCATE(core_alloc,
                                                      allocator_malloc,
                                                      sizeof(allocator_malloc));
         m->total_allocated = 0;
 
-        *a = (struct allocator) {
+        *a = (struct ct_allocator) {
                 .inst = m,
                 .reallocate = malloc_allocator_allocate,
                 .total_allocated = malloc_allocator_total_allocated,
@@ -89,7 +89,7 @@ namespace memory {
         return a;
     }
 
-    void malloc_allocator_destroy(struct allocator *a) {
+    void malloc_allocator_destroy(struct ct_allocator *a) {
         auto *core_alloc = core_allocator::get();
         struct allocator_malloc *m = (struct allocator_malloc *) a->inst;
 

@@ -12,14 +12,14 @@
 #include "../modules/static_module.h"
 #include "allocator_core_private.h"
 
-CETECH_DECL_API(log_api_v0);
-CETECH_DECL_API(task_api_v0);
+CETECH_DECL_API(ct_log_api_v0);
+CETECH_DECL_API(ct_task_api_v0);
 
 #define LOG_WHERE "kernel"
 
 
 namespace os {
-    void register_api(struct api_v0 *api);
+    void register_api(struct ct_api_v0 *api);
 }
 
 void application_start();
@@ -43,7 +43,7 @@ int load_config(int argc,
         return 0;
     }
 
-    cvar_t compile = config::find("compile");
+    ct_cvar_t compile = config::find("compile");
     if (config::get_int(compile)) {
         config::compile_global(_platform());
     }
@@ -60,9 +60,9 @@ int load_config(int argc,
     return 1;
 }
 
-void application_register_api(struct api_v0 *api);
+void application_register_api(struct ct_api_v0 *api);
 
-extern "C" void init_core(struct api_v0 *api) {
+extern "C" void init_core(struct ct_api_v0 *api) {
     auto *core_alloc = core_allocator::get();
 
     LOAD_STATIC_MODULE(api, hashlib);
@@ -90,7 +90,7 @@ int cetech_kernel_init(int argc,
 
     log::init();
     api::init(core_alloc);
-    api_v0 *api = api::v0();
+    ct_api_v0 *api = api::v0();
 
     memory::init(4 * 1024 * 1024);
 
@@ -105,13 +105,13 @@ int cetech_kernel_init(int argc,
 
     module::load_dirs("./bin");
 
-    CETECH_GET_API(api, log_api_v0);
+    CETECH_GET_API(api, ct_log_api_v0);
     return 1;
 }
 
 
 int cetech_kernel_shutdown() {
-    log_api_v0.debug(LOG_WHERE, "Shutdown");
+    ct_log_api_v0.debug(LOG_WHERE, "Shutdown");
 
     module::unload_all();
 

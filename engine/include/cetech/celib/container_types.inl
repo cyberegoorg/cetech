@@ -3,14 +3,14 @@
 
 #include <cstdint>
 
-struct allocator;
+struct ct_allocator;
 
 namespace cetech {
     template<typename T>
     struct Array {
         Array();
 
-        Array(allocator *a);
+        Array(ct_allocator *a);
 
         ~Array();
 
@@ -22,11 +22,11 @@ namespace cetech {
 
         const T &operator[](uint32_t i) const;
 
-        void init(allocator *a);
+        void init(ct_allocator *a);
 
         void destroy();
 
-        allocator *_allocator;
+        ct_allocator *_allocator;
         uint32_t _size;
         uint32_t _capacity;
         T *_data;
@@ -37,9 +37,9 @@ namespace cetech {
     public:
         Map();
 
-        Map(allocator *a);
+        Map(ct_allocator *a);
 
-        void init(allocator *a);
+        void init(ct_allocator *a);
 
         void destroy();
 
@@ -60,13 +60,13 @@ namespace cetech {
     struct Queue {
         Queue();
 
-        explicit Queue(allocator *a);
+        explicit Queue(ct_allocator *a);
 
         T &operator[](const uint32_t i);
 
         const T &operator[](const uint32_t i) const;
 
-        void init(allocator *a);
+        void init(ct_allocator *a);
 
         void destroy();
 

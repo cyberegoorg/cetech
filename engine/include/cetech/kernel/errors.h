@@ -20,7 +20,7 @@ extern "C" {
 #define CETECH_ASSERT(where, condition)                                        \
     do {                                                                       \
         if (!(condition)) {                                                    \
-            error_assert(where, #condition, __FILE__, __LINE__);               \
+            ct_error_assert(where, #condition, __FILE__, __LINE__);               \
         }                                                                      \
     } while (0)
 #else
@@ -28,17 +28,17 @@ extern "C" {
 #endif
 
 
-struct error_api_v0 {
+struct ct_error_api_v0 {
     void (*assert)(const char *where,
                    const char *condition,
                    const char *filename,
                    int line);
 };
 
-void error_assert(const char *where,
-                  const char *condition,
-                  const char *filename,
-                  int line);
+void ct_error_assert(const char *where,
+                     const char *condition,
+                     const char *filename,
+                     int line);
 
 #ifdef __cplusplus
 }

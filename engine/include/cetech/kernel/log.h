@@ -14,13 +14,13 @@ extern "C" {
 
 #include "macros.h"
 
-struct api_v0;
+struct ct_api_v0;
 
 //==============================================================================
 // Enums
 //==============================================================================
 
-enum log_level {
+enum ct_log_level {
     LOG_INFO = 0,
     LOG_DBG = 1,
     LOG_WARNING = 2,
@@ -32,21 +32,21 @@ enum log_level {
 //==============================================================================
 
 //! Stdout handler
-void log_stdout_handler(enum log_level level,
-                        time_t time,
-                        char worker_id,
-                        const char *where,
-                        const char *msg,
-                        void *data);
+void ct_log_stdout_handler(enum ct_log_level level,
+                           time_t time,
+                           char worker_id,
+                           const char *where,
+                           const char *msg,
+                           void *data);
 
 
 //! Nanomsg/mapack handler
-void nano_log_handler(enum log_level level,
-                      time_t time,
-                      char worker_id,
-                      const char *where,
-                      const char *msg,
-                      void *data);
+void ct_nano_log_handler(enum ct_log_level level,
+                         time_t time,
+                         char worker_id,
+                         const char *where,
+                         const char *msg,
+                         void *data);
 
 
 //==============================================================================
@@ -54,7 +54,7 @@ void nano_log_handler(enum log_level level,
 //==============================================================================
 
 //! Log handler callback
-typedef void (*log_handler_t)(enum log_level level,
+typedef void (*ct_log_handler_t)(enum ct_log_level level,
                               time_t time,
                               char worker_id,
                               const char *where,
@@ -62,19 +62,19 @@ typedef void (*log_handler_t)(enum log_level level,
                               void *data);
 
 //! Worker id callback
-typedef char (*log_get_wid_clb_t)();
+typedef char (*ct_log_get_wid_clb_t)();
 
 //==============================================================================
 // Api
 //==============================================================================
 
-struct log_api_v0 {
-    void (*set_wid_clb)(log_get_wid_clb_t get_wid_clb);
+struct ct_log_api_v0 {
+    void (*set_wid_clb)(ct_log_get_wid_clb_t get_wid_clb);
 
     //! Register log handler
     //! \param handler Handler
     //! \param data Handler data
-    void (*register_handler)(log_handler_t handler,
+    void (*register_handler)(ct_log_handler_t handler,
                              void *data);
 
     //! Log info
@@ -90,7 +90,7 @@ struct log_api_v0 {
     //! \param format Format
     void (*info)(const char *where,
                  const char *format,
-                 ...) ATTR_FORMAT(2, 3);
+                 ...) CTECH_ATTR_FORMAT(2, 3);
 
     //! Log warnig
     //! \param where Where
@@ -105,7 +105,7 @@ struct log_api_v0 {
     //! \param format Format
     void (*warning)(const char *where,
                     const char *format,
-                    ...) ATTR_FORMAT(2, 3);
+                    ...) CTECH_ATTR_FORMAT(2, 3);
 
     //! Log error
     //! \param where Where
@@ -120,7 +120,7 @@ struct log_api_v0 {
     //! \param format Format
     void (*error)(const char *where,
                   const char *format,
-                  ...) ATTR_FORMAT(2, 3);
+                  ...) CTECH_ATTR_FORMAT(2, 3);
 
     //! Log debug
     //! \param where Where
@@ -135,7 +135,7 @@ struct log_api_v0 {
     //! \param format Format
     void (*debug)(const char *where,
                   const char *format,
-                  ...) ATTR_FORMAT(2, 3);
+                  ...) CTECH_ATTR_FORMAT(2, 3);
 
 };
 

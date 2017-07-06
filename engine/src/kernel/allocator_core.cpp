@@ -21,23 +21,23 @@ static void *_reallocate(allocator_instance_v0 *a,
 }
 
 
-static allocator _allocator = {
+static ct_allocator _allocator = {
         .inst = NULL,
         .reallocate= _reallocate
 };
 
 
 namespace core_allocator {
-    allocator *get() {
+    ct_allocator *get() {
         return &_allocator;
     }
 
-    struct core_allocator_api_v0 core_allocator_api = {
+    ct_core_allocator_api_v0 core_allocator_api = {
         .get_allocator = core_allocator::get
     };
 
-    void register_api(api_v0 *api) {
-        api->register_api("core_allocator_api_v0", &core_allocator_api);
+    void register_api(ct_api_v0 *api) {
+        api->register_api("ct_core_allocator_api_v0", &core_allocator_api);
     }
 }
 

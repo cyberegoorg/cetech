@@ -75,15 +75,15 @@ uint64_t stringid64_from_string(const char *str) {
     return hash_murmur2_64(str, strlen(str), STRINGID64_SEED);
 }
 
-static struct hash_api_v0 hash_api = {
+static struct ct_hash_api_v0 hash_api = {
         .id64_from_str = stringid64_from_string,
         .hash_murmur2_64 = hash_murmur2_64
 };
 
-extern "C" void hashlib_load_module(struct api_v0 *api) {
-    api->register_api("hash_api_v0", &hash_api);
+extern "C" void hashlib_load_module(struct ct_api_v0 *api) {
+    api->register_api("ct_hash_api_v0", &hash_api);
 }
 
-extern "C" void hashlib_unload_module(struct api_v0 *api) {
+extern "C" void hashlib_unload_module(struct ct_api_v0 *api) {
 
 }

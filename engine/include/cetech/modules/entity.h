@@ -20,13 +20,13 @@ extern "C" {
 typedef struct yaml_node_s yaml_node_t;
 
 struct entity_compile_output;
-struct compilator_api;
+struct ct_compilator_api;
 
 //==============================================================================
 // Enums
 //==============================================================================
 
-enum property_type {
+enum ct_property_type {
     PROPERTY_INVALID = 0,
     PROPERTY_BOOL,
     PROPERTY_FLOAT,
@@ -49,21 +49,21 @@ typedef struct world_s {
 //! Component compiler
 //! \param body Component body yaml
 //! \param data Compiled compoent data
-typedef int (*component_compiler_t)(yaml_node_t body,
-                                    struct blob_v0 *data);
+typedef int (*ct_component_compiler_t)(yaml_node_t body,
+                                    struct ct_blob_v0 *data);
 
 //! On world create callback
 //! \param world World
-typedef void (*world_on_created_t)(struct world_s world);
+typedef void (*ct_world_on_created_t)(struct world_s world);
 
 //! On world destroy callback
 //! \param world World
-typedef void (*world_on_destroy_t)(struct world_s world);
+typedef void (*ct_world_on_destroy_t)(struct world_s world);
 
 //! On world update callback
 //! \param world World
 //! \param dt Delta time
-typedef void (*world_on_update_t)(struct world_s world,
+typedef void (*ct_world_on_update_t)(struct world_s world,
                                   float dt);
 
 //==============================================================================
@@ -78,14 +78,15 @@ typedef struct entity_s {
 
 //! World callbacks
 typedef struct {
-    world_on_created_t on_created;  //!< On create
-    world_on_destroy_t on_destroy;  //!< On destroy
-    world_on_update_t on_update;    //!< On update
-} world_callbacks_t;
+    ct_world_on_created_t on_created;  //!< On create
+    ct_world_on_destroy_t on_destroy;  //!< On destroy
+    ct_world_on_update_t on_update;    //!< On update
+} ct_world_callbacks_t;
 
 
-struct property_value {
-    enum property_type type;
+struct ct_property_value {
+    enum ct_property_type type;
+
     union {
         int b;
         float f;
@@ -97,7 +98,7 @@ struct property_value {
 };
 
 //! Component callbacks
-static struct component_clb {
+static struct ct_component_clb {
 
 
     //! Component destoryer
@@ -125,16 +126,16 @@ static struct component_clb {
     void (*set_property)(world_t world,
                          entity_t entity,
                          uint64_t key,
-                         struct property_value value);
+                         struct ct_property_value value);
 
-    struct property_value (*get_property)(world_t world,
+    struct ct_property_value (*get_property)(world_t world,
                                           entity_t entity,
                                           uint64_t key);
 
-    world_on_created_t on_world_create;  //!< On world create
-    world_on_destroy_t on_world_destroy; //!< On world destroy
-    world_on_update_t on_world_update;   //!< On world update
-} component_clb_null = {0};
+    ct_world_on_created_t on_world_create;  //!< On world create
+    ct_world_on_destroy_t on_world_destroy; //!< On world destroy
+    ct_world_on_update_t on_world_update;   //!< On world update
+} ct_component_clb_null = {0};
 
 
 //==============================================================================
@@ -142,7 +143,7 @@ static struct component_clb {
 //==============================================================================
 
 //! Entity system API V0
-struct entity_api_v0 {
+struct ct_entity_api_v0 {
     //! Create new entity
     //! \return New entity
     entity_t (*create)();
@@ -194,7 +195,7 @@ struct entity_api_v0 {
     void (*compiler_compile_entity)(struct entity_compile_output *output,
                                     yaml_node_t root,
                                     const char *filename,
-                                    struct compilator_api *compilator_api);
+                                    struct ct_compilator_api *compilator_api);
 
     //! Get entity counter from output
     //! \param output Compiler output
@@ -205,7 +206,7 @@ struct entity_api_v0 {
     //! \param output Output
     //! \param build Build
     void (*compiler_write_to_build)(struct entity_compile_output *output,
-                                    struct blob_v0 *build);
+                                    struct ct_blob_v0 *build);
 
     //! Resource compile
     //! \param root Root yaml node
@@ -214,21 +215,21 @@ struct entity_api_v0 {
     //! \param compilator_api Compilator api
     void (*resource_compiler)(yaml_node_t root,
                               const char *filename,
-                              struct blob_v0 *build,
-                              struct compilator_api *compilator_api);
+                              struct ct_blob_v0 *build,
+                              struct ct_compilator_api *compilator_api);
 
 #endif
 };
 
 
 //! Component system API V0
-struct component_api_v0 {
+struct ct_component_api_v0 {
     //! Register component compiler
     //! \param type Component type
     //! \param compiler Compiler fce
     //! \param spawn_order Spawn order number
     void (*register_compiler)(uint64_t type,
-                              component_compiler_t compiler,
+                              ct_component_compiler_t compiler,
                               uint32_t spawn_order);
 
     //! Compile component
@@ -238,7 +239,7 @@ struct component_api_v0 {
     //! \return 1 if compile is ok else 0
     int (*compile)(uint64_t type,
                    yaml_node_t body,
-                   struct blob_v0 *data);
+                   struct ct_blob_v0 *data);
 
     //! Get component spawn order
     //! \param type Component type
@@ -249,7 +250,7 @@ struct component_api_v0 {
     //! \param type Component type
     //! \param clb Callbacks
     void (*register_type)(uint64_t type,
-                          struct component_clb clb);
+                          struct ct_component_clb clb);
 
     //! Spawn components
     //! \param world World where component live
@@ -279,20 +280,20 @@ struct component_api_v0 {
                          world_t world,
                          entity_t entity,
                          uint64_t key,
-                         struct property_value value);
+                         struct ct_property_value value);
 
-    struct property_value (*get_property)(uint64_t type,
+    struct ct_property_value (*get_property)(uint64_t type,
                                           world_t world,
                                           entity_t entity,
                                           uint64_t key);
 };
 
 //! World API V0
-struct world_api_v0 {
+struct ct_world_api_v0 {
 
     //! Register world calbacks
     //! \param clb Callbacks
-    void (*register_callback)(world_callbacks_t clb);
+    void (*register_callback)(ct_world_callbacks_t clb);
 
     //! Create new world
     //! \return New world

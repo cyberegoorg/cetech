@@ -31,7 +31,7 @@ static struct G {
 // Interface
 //==============================================================================
 
-int sdl_keyboard_init(struct api_v0 *api) {
+int sdl_keyboard_init(struct ct_api_v0 *api) {
     _G = (struct G) {0};
 
     return 1;
@@ -43,7 +43,7 @@ void sdl_keyboard_shutdown() {
 
 void sdl_keyboard_process(EventStream &stream) {
     const uint8_t *state = SDL_GetKeyboardState(NULL);
-    struct keyboard_event keyboard_ev;
+    struct ct_keyboard_event keyboard_ev;
 
     for (uint32_t i = 0; i < KEY_MAX; ++i) {
         if (is_button_down(state[i], _G.state[i])) {

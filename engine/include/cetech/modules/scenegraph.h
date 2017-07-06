@@ -25,7 +25,7 @@ typedef struct entity_s entity_t;
 //! Scene node struct
 typedef struct {
     uint32_t idx;
-} scene_node_t;
+} ct_scene_node_t;
 
 
 //==============================================================================
@@ -33,47 +33,47 @@ typedef struct {
 //==============================================================================
 
 //! Scene-graph API V0
-struct scenegprah_api_v0 {
+struct ct_scenegprah_api_v0 {
 
     //! Is node valid?
     //! \param node Node
     //! \return 1 if is oK else 0
-    int (*is_valid)(scene_node_t node);
+    int (*is_valid)(ct_scene_node_t node);
 
     //! Get node position
     //! \param world World
     //! \param node Node
     //! \return Position
     vec3f_t (*get_position)(world_t world,
-                            scene_node_t node);
+                            ct_scene_node_t node);
 
     //! Get node rotation
     //! \param world World
     //! \param node Node
     //! \return Rotation
     quatf_t (*get_rotation)(world_t world,
-                            scene_node_t node);
+                            ct_scene_node_t node);
 
     //! Get node scale
     //! \param world World
     //! \param node Node
     //! \return Scale
     vec3f_t (*get_scale)(world_t world,
-                         scene_node_t node);
+                         ct_scene_node_t node);
 
     //! Get world matrix
     //! \param world World
     //! \param node Node
     //! \return World matrix
     mat44f_t *(*get_world_matrix)(world_t world,
-                                  scene_node_t node);
+                                  ct_scene_node_t node);
 
     //! Set position
     //! \param world World
     //! \param node Node
     //! \param pos Position
     void (*set_position)(world_t world,
-                         scene_node_t node,
+                         ct_scene_node_t node,
                          vec3f_t pos);
 
     //! Set rotation
@@ -81,7 +81,7 @@ struct scenegprah_api_v0 {
     //! \param node Node
     //! \param rot Rotation
     void (*set_rotation)(world_t world,
-                         scene_node_t node,
+                         ct_scene_node_t node,
                          quatf_t rot);
 
     //! Set scale
@@ -89,7 +89,7 @@ struct scenegprah_api_v0 {
     //! \param node Node
     //! \param scale Scale
     void (*set_scale)(world_t world,
-                      scene_node_t node,
+                      ct_scene_node_t node,
                       vec3f_t scale);
 
     //! Has entity scene-graph component?
@@ -103,7 +103,7 @@ struct scenegprah_api_v0 {
     //! \param world World
     //! \param entity Entity
     //! \return Root node
-    scene_node_t (*get_root)(world_t world,
+    ct_scene_node_t (*get_root)(world_t world,
                              entity_t entity);
 
     //! Create nodes
@@ -114,7 +114,7 @@ struct scenegprah_api_v0 {
     //! \param pose Pose map
     //! \param count Node count
     //! \return Root scene node
-    scene_node_t (*create)(world_t world,
+    ct_scene_node_t (*create)(world_t world,
                            entity_t entity,
                            uint64_t *names,
                            uint32_t *parent,
@@ -126,15 +126,15 @@ struct scenegprah_api_v0 {
     //! \param parent Parent node
     //! \param child Child node
     void (*link)(world_t world,
-                 scene_node_t parent,
-                 scene_node_t child);
+                 ct_scene_node_t parent,
+                 ct_scene_node_t child);
 
     //! Get node by name
     //! \param world World
     //! \param entity Entity
     //! \param name Name
     //! \return Node
-    scene_node_t (*node_by_name)(world_t world,
+    ct_scene_node_t (*node_by_name)(world_t world,
                                  entity_t entity,
                                  uint64_t name);
 };

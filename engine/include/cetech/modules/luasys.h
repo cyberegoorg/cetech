@@ -18,7 +18,6 @@ extern "C" {
 #include <cetech/celib/math_types.h>
 
 typedef struct lua_State lua_State;
-
 typedef int (*lua_CFunction)(lua_State *L);
 
 //==============================================================================
@@ -26,7 +25,7 @@ typedef int (*lua_CFunction)(lua_State *L);
 //==============================================================================
 
 //! Lua system api V0
-struct lua_api_v0 {
+struct ct_lua_api_v0 {
 
     //! Return number of elements in the stack, which is also the index of the top element.
     //! Notice that a negative index -x is equivalent to the positive index gettop - x + 1.
@@ -257,7 +256,7 @@ struct lua_api_v0 {
 
     //! Get game callbacks
     //! \return Lua game callbacks
-    const struct game_callbacks *(*get_game_callbacks)();
+    const struct ct_game_callbacks *(*get_game_callbacks)();
 
     //! Execute boot script
     //! \param Boot script name
@@ -380,7 +379,7 @@ void luasys_add_module_constructor(const char *module,
 
 void luasys_execute_resource(uint64_t name);
 
-const struct game_callbacks *luasys_get_game_callbacks();
+const struct ct_game_callbacks *luasys_get_game_callbacks();
 
 void luasys_execute_boot_script(uint64_t name);
 

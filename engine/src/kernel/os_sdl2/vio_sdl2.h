@@ -9,9 +9,9 @@
 
 #define LOG_WHERE "vio_sdl"
 
-int64_t vio_sdl_seek(os_vio_instance_v0 *file,
+int64_t vio_sdl_seek(ct_vio_instance_v0 *file,
                      int64_t offset,
-                     enum vio_seek whence) {
+                     enum ct_vio_seek whence) {
     CETECH_ASSERT(LOG_WHERE, file != NULL);
 
     static int _whence[3] = {
@@ -23,7 +23,7 @@ int64_t vio_sdl_seek(os_vio_instance_v0 *file,
     return SDL_RWseek((SDL_RWops*)file, offset, -_whence[whence]);
 }
 
-size_t vio_sdl_read(os_vio_instance_v0 *file,
+size_t vio_sdl_read(ct_vio_instance_v0 *file,
                     void *buffer,
                     size_t size,
                     size_t maxnum) {
@@ -32,7 +32,7 @@ size_t vio_sdl_read(os_vio_instance_v0 *file,
     return SDL_RWread((SDL_RWops*) file, buffer, size, maxnum);
 };
 
-size_t vio_sdl_write(os_vio_instance_v0 *file,
+size_t vio_sdl_write(ct_vio_instance_v0 *file,
                      const void *buffer,
                      size_t size,
                      size_t maxnum) {
@@ -41,13 +41,13 @@ size_t vio_sdl_write(os_vio_instance_v0 *file,
     return SDL_RWwrite((SDL_RWops*) file, buffer, size, maxnum);
 };
 
-int64_t vio_sdl_size(os_vio_instance_v0 *file) {
+int64_t vio_sdl_size(ct_vio_instance_v0 *file) {
     CETECH_ASSERT(LOG_WHERE, file != NULL);
 
     return SDL_RWsize((SDL_RWops*) file);
 };
 
-int vio_sdl_close(os_vio_instance_v0 *file) {
+int vio_sdl_close(ct_vio_instance_v0 *file) {
     CETECH_ASSERT(LOG_WHERE, file != NULL);
 
     SDL_RWclose((SDL_RWops*) file);
@@ -55,10 +55,10 @@ int vio_sdl_close(os_vio_instance_v0 *file) {
 }
 
 
-struct os_vio *vio_from_file(const char *path,
-                             enum vio_open_mode mode) {
+struct ct_vio *vio_from_file(const char *path,
+                             enum ct_vio_open_mode mode) {
 
-    os_vio *vio = CETECH_ALLOCATE(core_allocator::get(), os_vio, sizeof(os_vio));
+    ct_vio *vio = CETECH_ALLOCATE(core_allocator::get(), ct_vio, sizeof(ct_vio));
 
     CETECH_ASSERT(LOG_WHERE, vio != NULL);
 

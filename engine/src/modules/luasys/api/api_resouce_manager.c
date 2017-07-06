@@ -9,25 +9,25 @@
 
 #define API_NAME "ResourceManager"
 
-CETECH_DECL_API(resource_api_v0);
+CETECH_DECL_API(ct_resource_api_v0);
 
 static int _reload_all(lua_State *l) {
 
-    resource_api_v0.reload_all();
+    ct_resource_api_v0.reload_all();
     return 0;
 }
 
 #ifdef CETECH_CAN_COMPILE
 
 static int _compile_all(lua_State *l) {
-    resource_api_v0.compiler_compile_all();
+    ct_resource_api_v0.compiler_compile_all();
     return 0;
 }
 
 #endif
 
-void _register_lua_resource_manager_api(struct api_v0 *api) {
-    CETECH_GET_API(api, resource_api_v0);
+void _register_lua_resource_manager_api(struct ct_api_v0 *api) {
+    CETECH_GET_API(api, ct_resource_api_v0);
 
     luasys_add_module_function(API_NAME, "reload_all", _reload_all);
 

@@ -21,7 +21,7 @@ static uint32_t _sdl_pos(const uint32_t pos) {
     }
 }
 
-static uint32_t _sdl_flags(enum window_flags flags) {
+static uint32_t _sdl_flags(enum ct_window_flags flags) {
     uint32_t sdl_flags = 0;
 
     if (flags & WINDOW_FULLSCREEN) {
@@ -36,11 +36,11 @@ static uint32_t _sdl_flags(enum window_flags flags) {
 //==============================================================================
 
 os_window_t *window_new(const char *title,
-                        enum window_pos x,
-                        enum window_pos y,
+                        enum ct_window_pos x,
+                        enum ct_window_pos y,
                         const int32_t width,
                         const int32_t height,
-                        enum window_flags flags) {
+                        enum ct_window_flags flags) {
 
     SDL_Window *w = SDL_CreateWindow(
             title,
@@ -50,7 +50,7 @@ os_window_t *window_new(const char *title,
     );
 
     if (w == NULL) {
-        log_api_v0.error("sys", "Could not create window: %s",
+        ct_log_api_v0.error("sys", "Could not create window: %s",
                          SDL_GetError());
     }
 
@@ -61,7 +61,7 @@ os_window_t *window_new_from(void *hndl) {
     SDL_Window *w = SDL_CreateWindowFrom(hndl);
 
     if (w == NULL) {
-        log_api_v0.error("sys", "Could not create window: %s",
+        ct_log_api_v0.error("sys", "Could not create window: %s",
                          SDL_GetError());
     }
 

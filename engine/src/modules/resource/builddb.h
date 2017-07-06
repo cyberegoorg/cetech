@@ -28,7 +28,7 @@ static int _step(sqlite3 *db,
                 break;
 
             default:
-                log_api_v0.error("builddb", "SQL error '%s' (%d): %s",
+                ct_log_api_v0.error("builddb", "SQL error '%s' (%d): %s",
                                  sqlite3_sql(stmt), rc, sqlite3_errmsg(db));
 
                 run = 0;
@@ -76,8 +76,8 @@ static int _do_sql(const char *sql) {
 }
 
 static int builddb_init_db(const char *build_dir,
-                           struct os_path_v0 *path,
-                           struct memory_api_v0 *memory) {
+                           struct ct_path_v0 *path,
+                           struct ct_memory_api_v0 *memory) {
 
     _logdb_path = path->join(memory->main_allocator(), 2, build_dir,
                              "build.db");
@@ -187,7 +187,7 @@ static int builddb_get_filename_by_hash(char *filename,
 
 static int builddb_need_compile(const char *source_dir,
                                 const char *filename,
-                                struct os_path_v0 *path) {
+                                struct ct_path_v0 *path) {
     static const char *sql = "SELECT\n"
             "    file_dependency.depend_on, files.mtime\n"
             "FROM\n"
@@ -208,12 +208,12 @@ static int builddb_need_compile(const char *source_dir,
     while (_step(_db, stmt) == SQLITE_ROW) {
         compile = 0;
         const char *dep_file = (const char *) sqlite3_column_text(stmt, 0);
-        char *full_path = path->join(memory_api_v0.main_allocator(), 2,
+        char *full_path = path->join(ct_memory_api_v0.main_allocator(), 2,
                                      source_dir, dep_file);
 
         time_t actual_mtime = path->file_mtime(full_path);
 
-        CETECH_FREE(memory_api_v0.main_allocator(), full_path);
+        CETECH_FREE(ct_memory_api_v0.main_allocator(), full_path);
 
         time_t last_mtime = sqlite3_column_int64(stmt, 1);
 

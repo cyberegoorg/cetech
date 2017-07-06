@@ -16,11 +16,11 @@
 
 #include "task_queue.h"
 
-CETECH_DECL_API(develop_api_v0);
-CETECH_DECL_API(memory_api_v0);
-CETECH_DECL_API(os_thread_api_v0);
-CETECH_DECL_API(os_cpu_api_v0);
-CETECH_DECL_API(log_api_v0);
+CETECH_DECL_API(ct_develop_api_v0);
+CETECH_DECL_API(ct_memory_api_v0);
+CETECH_DECL_API(ct_thread_api_v0);
+CETECH_DECL_API(ct_cpu_api_v0);
+CETECH_DECL_API(ct_log_api_v0);
 
 namespace taskmanager {
     int do_work();
@@ -40,9 +40,9 @@ namespace taskmanager {
 
 struct task {
     void *data;
-    task_work_t task_work;
+    ct_task_work_t task_work;
     const char *name;
-    enum task_affinity affinity;
+    enum ct_task_affinity affinity;
 };
 
 static __thread char _worker_id = 0;
@@ -51,7 +51,7 @@ static __thread char _worker_id = 0;
 static struct G {
     struct task _task_pool[MAX_TASK];
     struct task_queue _workers_queue[TASK_MAX_WORKERS];
-    os_thread_t *_workers[TASK_MAX_WORKERS - 1];
+    ct_thread_t *_workers[TASK_MAX_WORKERS - 1];
     struct task_queue _gloalQueue;
     atomic_int _task_pool_idx;
     int _workers_count;
@@ -146,15 +146,15 @@ static int _task_worker(void *o) {
 
     _worker_id = (char) (uint64_t) o;
 
-    log_api_v0.debug("task_worker", "Worker %d init", _worker_id);
+    ct_log_api_v0.debug("task_worker", "Worker %d init", _worker_id);
 
     while (_G._Run) {
         if (!taskmanager::do_work()) {
-            os_thread_api_v0.yield();
+            ct_thread_api_v0.yield();
         }
     }
 
-    log_api_v0.debug("task_worker", "Worker %d shutdown", _worker_id);
+    ct_log_api_v0.debug("task_worker", "Worker %d shutdown", _worker_id);
     return 1;
 }
 
@@ -165,7 +165,7 @@ static int _task_worker(void *o) {
 //==============================================================================
 
 namespace taskmanager {
-    void add(struct task_item *items,
+    void add(struct ct_task_item *items,
              uint32_t count) {
         for (uint32_t i = 0; i < count; ++i) {
             task_t task = _new_task();
@@ -188,11 +188,11 @@ namespace taskmanager {
             return 0;
         }
 
-        //auto sd = develop_api_v0.enter_scope(_G._task_pool[t.id].name);
+        //auto sd = ct_develop_api_v0.enter_scope(_G._task_pool[t.id].name);
 
         _G._task_pool[t.id].task_work(_G._task_pool[t.id].data);
 
-        //develop_api_v0.leave_scope(sd);
+        //ce_develop_api_v0.leave_scope(sd);
 
         _mark_task_job_done(t);
 
@@ -216,8 +216,8 @@ namespace taskmanager {
 }
 
 namespace taskmanager_module {
-    static void _init_api(struct api_v0 *api) {
-        static struct task_api_v0 _api = {
+    static void _init_api(struct ct_api_v0 *api) {
+        static struct ct_task_api_v0 _api = {
                 .worker_id = taskmanager::worker_id,
                 .worker_count = taskmanager::worker_count,
                 .add = taskmanager::add,
@@ -225,43 +225,43 @@ namespace taskmanager_module {
                 .wait_atomic = taskmanager::wait_atomic
         };
 
-        api->register_api("task_api_v0", &_api);
+        api->register_api("ct_task_api_v0", &_api);
     }
 
-    static void _init(struct api_v0 *api) {
+    static void _init(struct ct_api_v0 *api) {
         _init_api(api);
 
-//        CETECH_GET_API(api, develop_api_v0);
-        CETECH_GET_API(api, memory_api_v0);
-        CETECH_GET_API(api, os_thread_api_v0);
-        CETECH_GET_API(api, log_api_v0);
-        CETECH_GET_API(api, os_cpu_api_v0);
+//        CETECH_GET_API(api, ct_develop_api_v0);
+        CETECH_GET_API(api, ct_memory_api_v0);
+        CETECH_GET_API(api, ct_thread_api_v0);
+        CETECH_GET_API(api, ct_log_api_v0);
+        CETECH_GET_API(api, ct_cpu_api_v0);
 
-        log_api_v0.set_wid_clb(taskmanager::worker_id);
+        ct_log_api_v0.set_wid_clb(taskmanager::worker_id);
 
         _G = (struct G) {0};
 
-        int core_count = os_cpu_api_v0.count();
+        int core_count = ct_cpu_api_v0.count();
 
         static const uint32_t main_threads_count = 1;
         const uint32_t worker_count = core_count - main_threads_count;
 
-        log_api_v0.info("task", "Core/Main/Worker: %d, %d, %d", core_count,
+        ct_log_api_v0.info("task", "Core/Main/Worker: %d, %d, %d", core_count,
                         main_threads_count, worker_count);
 
         _G._workers_count = worker_count;
 
         queue_task_init(&_G._gloalQueue, MAX_TASK,
-                        memory_api_v0.main_allocator());
+                        ct_memory_api_v0.main_allocator());
 
         for (int i = 0; i < worker_count + 1; ++i) {
             queue_task_init(&_G._workers_queue[i], MAX_TASK,
-                            memory_api_v0.main_allocator());
+                            ct_memory_api_v0.main_allocator());
         }
 
         for (int j = 0; j < worker_count; ++j) {
-            _G._workers[j] = os_thread_api_v0.create(
-                    (thread_fce_t) _task_worker,
+            _G._workers[j] = ct_thread_api_v0.create(
+                    (ct_thread_fce_t) _task_worker,
                     "worker",
                     (void *) ((intptr_t) (j +
                                           1)));
@@ -277,7 +277,7 @@ namespace taskmanager_module {
 
         for (uint32_t i = 0; i < _G._workers_count; ++i) {
             //thread_kill(_G._workers[i]);
-            os_thread_api_v0.wait(_G._workers[i], &status);
+            ct_thread_api_v0.wait(_G._workers[i], &status);
         }
 
         queue_task_destroy(&_G._gloalQueue);
@@ -289,11 +289,11 @@ namespace taskmanager_module {
         _G = (struct G) {0};
     }
 
-    extern "C" void task_load_module(struct api_v0 *api) {
+    extern "C" void task_load_module(struct ct_api_v0 *api) {
         _init(api);
     }
 
-    extern "C" void task_unload_module(struct api_v0 *api) {
+    extern "C" void task_unload_module(struct ct_api_v0 *api) {
         _shutdown();
     }
 }

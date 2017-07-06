@@ -3,7 +3,7 @@
 #include <cetech/kernel/os.h>
 #include <cetech/kernel/log.h>
 
-CETECH_DECL_API(log_api_v0);
+CETECH_DECL_API(ct_log_api_v0);
 
 #include "cpu_sdl2.h"
 #include "window_sdl2.h"
@@ -12,11 +12,11 @@ CETECH_DECL_API(log_api_v0);
 #include "vio_sdl2.h"
 
 namespace machine_sdl {
-    void init(struct api_v0 *api);
+    void init(struct ct_api_v0 *api);
     void shutdown();
 }
 
-static struct os_thread_api_v0 thread_api = {
+static struct ct_thread_api_v0 thread_api = {
         .create = thread_create,
         .kill = thread_kill,
         .wait = thread_wait,
@@ -27,7 +27,7 @@ static struct os_thread_api_v0 thread_api = {
         .spin_unlock = thread_spin_unlock
 };
 
-static struct os_window_api_v0 window_api = {
+static struct ct_window_api_v0 window_api = {
         .create = window_new,
         .create_from = window_new_from,
         .destroy = window_destroy,
@@ -40,38 +40,38 @@ static struct os_window_api_v0 window_api = {
         .native_display_ptr = window_native_display_ptr
 };
 
-static struct os_cpu_api_v0 cpu_api = {
+static struct ct_cpu_api_v0 cpu_api = {
         .count = cpu_count
 };
 
 
 
-static struct os_time_api_v0 time_api = {
+static struct ct_time_api_v0 time_api = {
         .ticks =get_ticks,
         .perf_counter =get_perf_counter,
         .perf_freq =get_perf_freq
 };
 
-static struct os_vio_api_v0 vio_api = {
+static struct ct_vio_api_v0 vio_api = {
         .from_file = vio_from_file,
 };
 
 
-extern "C" void os_load_module(struct api_v0 *api) {
-    CETECH_GET_API(api, log_api_v0);
+extern "C" void os_load_module(struct ct_api_v0 *api) {
+    CETECH_GET_API(api, ct_log_api_v0);
 
-    api->register_api("os_cpu_api_v0", &cpu_api);
-    api->register_api("os_time_api_v0", &time_api);
+    api->register_api("ct_cpu_api_v0", &cpu_api);
+    api->register_api("ct_time_api_v0", &time_api);
 
-    api->register_api("os_thread_api_v0", &thread_api);
-    api->register_api("os_window_api_v0", &window_api);
-    api->register_api("os_vio_api_v0", &vio_api);
+    api->register_api("ct_thread_api_v0", &thread_api);
+    api->register_api("ct_window_api_v0", &window_api);
+    api->register_api("ct_vio_api_v0", &vio_api);
 
 
     machine_sdl::init(api);
 }
 
-extern "C" void os_unload_module(struct api_v0 *api) {
+extern "C" void os_unload_module(struct ct_api_v0 *api) {
     machine_sdl::shutdown();
 }
 

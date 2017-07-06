@@ -53,12 +53,12 @@ static char *_time_to_str(struct tm *gmtm) {
 **** Interface implementation
 ***********************************************************************/
 
-void log_stdout_handler(enum log_level level,
-                        time_t time,
-                        char worker_id,
-                        const char *where,
-                        const char *msg,
-                        void *data) {
+void ct_log_stdout_handler(enum ct_log_level level,
+                           time_t time,
+                           char worker_id,
+                           const char *where,
+                           const char *msg,
+                           void *data) {
 
     static const char *_level_to_str[4] = {
             [LOG_INFO]    = "info",

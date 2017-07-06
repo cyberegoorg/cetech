@@ -11,7 +11,7 @@ extern "C" {
 #ifdef CETECH_CAN_COMPILE
 
 void resource_compiler_register(uint64_t type,
-                                resource_compilator_t compilator);
+                                ct_resource_compilator_t compilator);
 
 void resource_compiler_compile_all();
 
@@ -23,28 +23,28 @@ int resource_compiler_get_filename(char *filename,
 const char *resource_compiler_get_source_dir();
 
 
-char *resource_compiler_get_tmp_dir(allocator *alocator,
+char *resource_compiler_get_tmp_dir(ct_allocator *alocator,
                                     const char *platform);
 
-char *resource_compiler_external_join(allocator *alocator,
+char *resource_compiler_external_join(ct_allocator *alocator,
                                       const char *name);
 
-void resource_compiler_create_build_dir(struct config_api_v0 config,
-                                        struct app_api_v0 app);
+void resource_compiler_create_build_dir(struct ct_config_api_v0 config,
+                                        struct ct_app_api_v0 app);
 
 const char *resource_compiler_get_core_dir();
 
 #endif
 
 
-char *resource_compiler_get_build_dir(allocator *a,
+char *resource_compiler_get_build_dir(ct_allocator *a,
                                       const char *platform);
 
 #ifdef __cplusplus
 }
 #endif
 
-int package_init(struct api_v0 *api);
+int package_init(struct ct_api_v0 *api);
 
 void package_shutdown();
 

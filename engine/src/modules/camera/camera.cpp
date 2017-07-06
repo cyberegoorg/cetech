@@ -18,11 +18,11 @@
 #include "cetech/modules/camera.h"
 
 
-CETECH_DECL_API(memory_api_v0);
-CETECH_DECL_API(component_api_v0);
-CETECH_DECL_API(renderer_api_v0);
-CETECH_DECL_API(transform_api_v0);
-CETECH_DECL_API(hash_api_v0);
+CETECH_DECL_API(ct_memory_api_v0);
+CETECH_DECL_API(ct_component_api_v0);
+CETECH_DECL_API(ct_renderer_api_v0);
+CETECH_DECL_API(ct_transform_api_v0);
+CETECH_DECL_API(ct_hash_api_v0);
 
 using namespace cetech;
 
@@ -58,7 +58,7 @@ namespace {
 
 
     static void allocate(WorldInstance &_data,
-                         allocator *_allocator,
+                         ct_allocator *_allocator,
                          uint32_t sz) {
         //assert(sz > _data.n);
 
@@ -114,7 +114,7 @@ namespace {
 
         world_t last_world = _G.world_instances[last_idx].world;
 
-        CETECH_FREE(memory_api_v0.main_allocator(),
+        CETECH_FREE(ct_memory_api_v0.main_allocator(),
                           _G.world_instances[idx].buffer);
 
         _G.world_instances[idx] = _G.world_instances[last_idx];
@@ -133,7 +133,7 @@ namespace {
     }
 
     int _camera_component_compiler(yaml_node_t body,
-                                   blob_v0 *data) {
+                                   ct_blob_v0 *data) {
 
         struct camera_data t_data;
 
@@ -148,20 +148,20 @@ namespace {
 }
 
 namespace camera {
-    int is_valid(camera_t camera) {
+    int is_valid(struct ct_camera camera) {
         return camera.idx != UINT32_MAX;
     }
 
     void get_project_view(world_t world,
-                          camera_t camera,
+                          struct ct_camera camera,
                           mat44f_t *proj,
                           mat44f_t *view) {
 
         WorldInstance *world_inst = _get_world_instance(world);
 
-        vec2f_t size = renderer_api_v0.get_size(); // TODO, to arg... or viewport?
+        vec2f_t size = ct_renderer_api_v0.get_size(); // TODO, to arg... or viewport?
         entity_t e = world_inst->entity[camera.idx];
-        transform_t t = transform_api_v0.get(world, e);
+        ct_transform_t t = ct_transform_api_v0.get(world, e);
 
         float fov = world_inst->fov[camera.idx];
         float near = world_inst->near[camera.idx];
@@ -169,7 +169,7 @@ namespace camera {
 
         mat44f_set_perspective_fov(proj, fov, size.x / size.y, near, far);
 
-        mat44f_t *w = transform_api_v0.get_world_matrix(world, t);
+        mat44f_t *w = ct_transform_api_v0.get_world_matrix(world, t);
         mat44f_inverse(view, w);
     }
 
@@ -181,17 +181,17 @@ namespace camera {
         return map::has(_G.ent_map, idx);
     }
 
-    camera_t get(world_t world,
+    ct_camera get(world_t world,
                  entity_t entity) {
 
         uint32_t idx = world.h ^entity.h;
 
         uint32_t component_idx = map::get(_G.ent_map, idx, UINT32_MAX);
 
-        return (camera_t) {.idx = component_idx};
+        return (ct_camera) {.idx = component_idx};
     }
 
-    camera_t create(world_t world,
+    ct_camera create(world_t world,
                     entity_t entity,
                     float near,
                     float far,
@@ -200,7 +200,7 @@ namespace camera {
         WorldInstance *data = _get_world_instance(world);
 
         uint32_t idx = data->n;
-        allocate(*data, memory_api_v0.main_allocator(), data->n + 1);
+        allocate(*data, ct_memory_api_v0.main_allocator(), data->n + 1);
         ++data->n;
 
         data->entity[idx] = entity;
@@ -210,14 +210,14 @@ namespace camera {
 
         map::set(_G.ent_map, world.h ^ entity.h, idx);
 
-        return (camera_t) {.idx = idx};
+        return (ct_camera) {.idx = idx};
     }
 
 }
 
 namespace camera_module {
 
-    static struct camera_api_v0 camera_api = {
+    static struct ct_camera_api_v0 camera_api = {
             .is_valid = camera::is_valid,
             .get_project_view = camera::get_project_view,
             .has = camera::has,
@@ -259,34 +259,28 @@ namespace camera_module {
         }
     }
 
+    static void _init(struct ct_api_v0 *api) {
+        api->register_api("ct_camera_api_v0", &camera_api);
 
-    static void _init_api(struct api_v0 *api) {
-        api->register_api("camera_api_v0", &camera_api);
-    }
-
-
-    static void _init(struct api_v0 *api_v0) {
-        _init_api(api_v0);
-
-        CETECH_GET_API(api_v0, memory_api_v0);
-        CETECH_GET_API(api_v0, component_api_v0);
-        CETECH_GET_API(api_v0, renderer_api_v0);
-        CETECH_GET_API(api_v0, transform_api_v0);
-        CETECH_GET_API(api_v0, hash_api_v0);
+        CETECH_GET_API(api, ct_memory_api_v0);
+        CETECH_GET_API(api, ct_component_api_v0);
+        CETECH_GET_API(api, ct_renderer_api_v0);
+        CETECH_GET_API(api, ct_transform_api_v0);
+        CETECH_GET_API(api, ct_hash_api_v0);
 
         _G = {0};
 
-        _G.world_map.init(memory_api_v0.main_allocator());
-        _G.world_instances.init(memory_api_v0.main_allocator());
-        _G.ent_map.init(memory_api_v0.main_allocator());
+        _G.world_map.init(ct_memory_api_v0.main_allocator());
+        _G.world_instances.init(ct_memory_api_v0.main_allocator());
+        _G.ent_map.init(ct_memory_api_v0.main_allocator());
 
-        _G.type = hash_api_v0.id64_from_str("camera");
+        _G.type = ct_hash_api_v0.id64_from_str("camera");
 
-        component_api_v0.register_compiler(_G.type,
+        ct_component_api_v0.register_compiler(_G.type,
                                            _camera_component_compiler,
                                            10);
 
-        component_api_v0.register_type(_G.type, {
+        ct_component_api_v0.register_type(_G.type, {
                 .spawner=_spawner,
                 .destroyer=_destroyer,
                 .on_world_create=_on_world_create,
@@ -301,11 +295,11 @@ namespace camera_module {
     }
 
 
-    extern "C" void camera_load_module(struct api_v0 *api) {
+    extern "C" void camera_load_module(struct ct_api_v0 *api) {
         _init(api);
     }
 
-    extern "C" void camera_unload_module(struct api_v0 *api) {
+    extern "C" void camera_unload_module(struct ct_api_v0 *api) {
         _shutdown();
     }
 

@@ -7,20 +7,20 @@
 extern "C" {
 #endif
 
-struct api_v0;
+struct ct_api_v0;
 
 //==============================================================================
 // Typedefs
 //==============================================================================
 
-typedef void (*load_module_t)(struct api_v0 *api);
-typedef void (*unload_module_t)(struct api_v0 *api);
+typedef void (*ct_load_module_t)(struct ct_api_v0 *api);
+typedef void (*ct_unload_module_t)(struct ct_api_v0 *api);
 
 //==============================================================================
 // Interface
 //==============================================================================
 
-struct module_api_v0 {
+struct ct_module_api_v0 {
     //! Reload module by path
     void (*module_reload)(const char *path);
 

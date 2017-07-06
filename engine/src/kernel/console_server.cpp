@@ -21,10 +21,10 @@
 #include "include/nanomsg/pubsub.h"
 #include "include/nanomsg/pipeline.h"
 
-CETECH_DECL_API(memory_api_v0);
-CETECH_DECL_API(config_api_v0);
-CETECH_DECL_API(log_api_v0);
-CETECH_DECL_API(hash_api_v0);
+CETECH_DECL_API(ct_memory_api_v0);
+CETECH_DECL_API(ct_config_api_v0);
+CETECH_DECL_API(ct_log_api_v0);
+CETECH_DECL_API(ct_hash_api_v0);
 
 using namespace cetech;
 
@@ -41,25 +41,25 @@ using namespace cetech;
 
 namespace {
     static struct ConsoleServerGlobals {
-        Map<console_server_command_t> commands;
+        Map<ct_console_srv_command_t> commands;
 
         int rpc_socket;
         int log_socket;
         int push_socket;
 
-        cvar_t cv_rpc_addr;
-        cvar_t cv_log_addr;
-        cvar_t cv_push_addr;
+        ct_cvar_t cv_rpc_addr;
+        ct_cvar_t cv_log_addr;
+        ct_cvar_t cv_push_addr;
     } _G;
 
-    static console_server_command_t find_command(const char *name) {
-        uint64_t key = hash_api_v0.id64_from_str(name);
+    static ct_console_srv_command_t find_command(const char *name) {
+        uint64_t key = ct_hash_api_v0.id64_from_str(name);
 
-        auto command = map::get<console_server_command_t>(_G.commands, key,
+        auto command = map::get<ct_console_srv_command_t>(_G.commands, key,
                                                           nullptr);
 
         if (!command) {
-            log_api_v0.error(LOG_WHERE, "Invalid command \"%s\"", name);
+            ct_log_api_v0.error(LOG_WHERE, "Invalid command \"%s\"", name);
         }
 
         return command;
@@ -73,7 +73,7 @@ namespace {
         mpack_error_t errort = mpack_tree_error(&tree);
 
         if (errort != mpack_ok) {
-            log_api_v0.error(LOG_WHERE, "%s", mpack_error_to_string(errort));
+            ct_log_api_v0.error(LOG_WHERE, "%s", mpack_error_to_string(errort));
             return;
         }
 
@@ -84,7 +84,7 @@ namespace {
         mpack_node_t name_node = mpack_node_map_cstr(root, "name");
         mpack_node_copy_cstr(name_node, cmd_name, 256);
 
-        console_server_command_t rpc_command = find_command(cmd_name);
+        ct_console_srv_command_t rpc_command = find_command(cmd_name);
 
         mpack_node_t id_node = mpack_node_map_cstr(root, "id");
         double id = mpack_node_double(id_node);
@@ -132,9 +132,9 @@ namespace {
 namespace consoleserver {
 
     void register_command(const char *name,
-                          console_server_command_t cmd) {
+                          ct_console_srv_command_t cmd) {
 
-        uint64_t key = hash_api_v0.id64_from_str(name);
+        uint64_t key = ct_hash_api_v0.id64_from_str(name);
         map::set(_G.commands, key, cmd);
     }
 
@@ -164,13 +164,13 @@ namespace consoleserver {
 }
 
 namespace consoleserver_module {
-    static struct cnsole_srv_api_v0 console_api = {
+    static struct ct_console_srv_api_v0 console_api = {
             .push_begin = consoleserver::push_begin,
             .register_command = consoleserver::register_command,
             .update = consoleserver::update
     };
 
-    static void _init_cvar(struct config_api_v0 config) {
+    static void _init_cvar(struct ct_config_api_v0 config) {
         _G = {0};
 
         _G.cv_rpc_addr = config.new_str("develop.rpc.addr",
@@ -184,37 +184,37 @@ namespace consoleserver_module {
         _G.cv_push_addr = config.new_str("develop.push.addr", "Push addr", "");
     }
 
-    static void _init_api(struct api_v0 *api) {
-        api->register_api("cnsole_srv_api_v0", &console_api);
+    static void _init_api(struct ct_api_v0 *api) {
+        api->register_api("ct_console_srv_api_v0", &console_api);
     }
 
-    static void _init(struct api_v0 *api) {
+    static void _init(struct ct_api_v0 *api) {
         _init_api(api);
-        CETECH_GET_API(api, memory_api_v0);
-        CETECH_GET_API(api, config_api_v0);
-        CETECH_GET_API(api, log_api_v0);
-        CETECH_GET_API(api, hash_api_v0);
+        CETECH_GET_API(api, ct_memory_api_v0);
+        CETECH_GET_API(api, ct_config_api_v0);
+        CETECH_GET_API(api, ct_log_api_v0);
+        CETECH_GET_API(api, ct_hash_api_v0);
 
-        _init_cvar(config_api_v0);
+        _init_cvar(ct_config_api_v0);
 
-        _G.commands.init(memory_api_v0.main_allocator());
+        _G.commands.init(ct_memory_api_v0.main_allocator());
 
         const char *addr = 0;
 
-        log_api_v0.debug(LOG_WHERE, "Init");
+        ct_log_api_v0.debug(LOG_WHERE, "Init");
 
         int socket = nn_socket(AF_SP, NN_REP);
         if (socket < 0) {
-            log_api_v0.error(LOG_WHERE, "Could not create nanomsg socket: %s",
+            ct_log_api_v0.error(LOG_WHERE, "Could not create nanomsg socket: %s",
                              nn_strerror(errno));
             return;// 0;
         }
-        addr = config_api_v0.get_string(_G.cv_rpc_addr);
+        addr = ct_config_api_v0.get_string(_G.cv_rpc_addr);
 
-        log_api_v0.debug(LOG_WHERE, "RPC address: %s", addr);
+        ct_log_api_v0.debug(LOG_WHERE, "RPC address: %s", addr);
 
         if (nn_bind(socket, addr) < 0) {
-            log_api_v0.error(LOG_WHERE, "Could not bind socket to '%s': %s",
+            ct_log_api_v0.error(LOG_WHERE, "Could not bind socket to '%s': %s",
                              addr,
                              nn_strerror(errno));
             return;// 0;
@@ -223,21 +223,21 @@ namespace consoleserver_module {
         _G.rpc_socket = socket;
 ////
 
-        if (config_api_v0.get_string(_G.cv_push_addr)[0] != '\0') {
+        if (ct_config_api_v0.get_string(_G.cv_push_addr)[0] != '\0') {
             socket = nn_socket(AF_SP, NN_PUSH);
             if (socket < 0) {
-                log_api_v0.error(LOG_WHERE,
+                ct_log_api_v0.error(LOG_WHERE,
                                  "Could not create nanomsg socket: %s",
                                  nn_strerror(errno));
                 return;// 0;
             }
 
-            addr = config_api_v0.get_string(_G.cv_push_addr);
+            addr = ct_config_api_v0.get_string(_G.cv_push_addr);
 
-            log_api_v0.debug(LOG_WHERE, "Push address: %s", addr);
+            ct_log_api_v0.debug(LOG_WHERE, "Push address: %s", addr);
 
             if (nn_connect(socket, addr) < 0) {
-                log_api_v0.error(LOG_WHERE, "Could not bind socket to '%s': %s",
+                ct_log_api_v0.error(LOG_WHERE, "Could not bind socket to '%s': %s",
                                  addr,
                                  nn_strerror(errno));
                 return;// 0;
@@ -249,31 +249,31 @@ namespace consoleserver_module {
 ////
         socket = nn_socket(AF_SP, NN_PUB);
         if (socket < 0) {
-            log_api_v0.error(LOG_WHERE, "Could not create nanomsg socket: %s",
+            ct_log_api_v0.error(LOG_WHERE, "Could not create nanomsg socket: %s",
                              nn_strerror(errno));
             return;// 0;
         }
 
-        addr = config_api_v0.get_string(_G.cv_log_addr);
+        addr = ct_config_api_v0.get_string(_G.cv_log_addr);
 
-        log_api_v0.debug(LOG_WHERE, "LOG address: %s", addr);
+        ct_log_api_v0.debug(LOG_WHERE, "LOG address: %s", addr);
 
         if (nn_bind(socket, addr) < 0) {
-            log_api_v0.error(LOG_WHERE, "Could not bind socket to '%s': %s",
+            ct_log_api_v0.error(LOG_WHERE, "Could not bind socket to '%s': %s",
                              addr,
                              nn_strerror(errno));
             return;// 0;
         }
         _G.log_socket = socket;
 
-        log_api_v0.register_handler(nano_log_handler, &_G.log_socket);
+        ct_log_api_v0.register_handler(ct_nano_log_handler, &_G.log_socket);
 
         consoleserver::register_command("console_server.ready", cmd_ready);
     }
 
 
     static void _shutdown() {
-        log_api_v0.debug(LOG_WHERE, "Shutdown");
+        ct_log_api_v0.debug(LOG_WHERE, "Shutdown");
 
         nn_close(_G.push_socket);
         //nn_close(_G.log_socket);
@@ -282,11 +282,11 @@ namespace consoleserver_module {
         _G.commands.destroy();
     }
 
-    extern "C" void consoleserver_load_module(struct api_v0 *api) {
+    extern "C" void consoleserver_load_module(struct ct_api_v0 *api) {
         _init(api);
     }
 
-    extern "C" void consoleserver_unload_module(struct api_v0 *api) {
+    extern "C" void consoleserver_unload_module(struct ct_api_v0 *api) {
         _shutdown();
     }
 }

@@ -14,8 +14,8 @@
 #include <cetech/kernel/log.h>
 #include <cetech/kernel/errors.h>
 
-CETECH_DECL_API(machine_api_v0);
-CETECH_DECL_API(log_api_v0);
+CETECH_DECL_API(ct_machine_api_v0);
+CETECH_DECL_API(ct_log_api_v0);
 
 //==============================================================================
 // Defines
@@ -87,34 +87,34 @@ namespace keyboard {
     }
 
     void _update() {
-        struct event_header *event = machine_api_v0.event_begin();
+        struct ct_event_header *event = ct_machine_api_v0.event_begin();
 
         memcpy(_G.last_state, _G.state, 512);
 
         uint32_t size = 0;
-        while (event != machine_api_v0.event_end()) {
+        while (event != ct_machine_api_v0.event_end()) {
             size = size + 1;
 
             switch (event->type) {
                 case EVENT_KEYBOARD_DOWN:
-                    _G.state[((struct keyboard_event *) event)->keycode] = 1;
+                    _G.state[((struct ct_keyboard_event *) event)->keycode] = 1;
                     break;
 
                 case EVENT_KEYBOARD_UP:
-                    _G.state[((struct keyboard_event *) event)->keycode] = 0;
+                    _G.state[((struct ct_keyboard_event *) event)->keycode] = 0;
                     break;
 
                 default:
                     break;
             }
 
-            event = machine_api_v0.event_next(event);
+            event = ct_machine_api_v0.event_next(event);
         }
     }
 }
 
 namespace keyboard_module {
-    static struct keyboard_api_v0 api_v1 = {
+    static struct ct_keyboard_api_v0 api_v1 = {
             .button_index = keyboard::button_index,
             .button_name = keyboard::button_name,
             .button_state = keyboard::button_state,
@@ -123,34 +123,34 @@ namespace keyboard_module {
             .update = keyboard::_update
     };
 
-    void _init_api(struct api_v0 *api) {
-        api->register_api("keyboard_api_v0", &api_v1);
+    void _init_api(struct ct_api_v0 *api) {
+        api->register_api("ct_keyboard_api_v0", &api_v1);
     }
 
-    void _init(struct api_v0 *api) {
+    void _init(struct ct_api_v0 *api) {
         _init_api(api);
 
-        CETECH_GET_API(api, machine_api_v0);
-        CETECH_GET_API(api, log_api_v0);
+        CETECH_GET_API(api, ct_machine_api_v0);
+        CETECH_GET_API(api, ct_log_api_v0);
 
         _G = (struct G) {0};
 
-        log_api_v0.debug(LOG_WHERE, "Init");
+        ct_log_api_v0.debug(LOG_WHERE, "Init");
     }
 
     void _shutdown() {
-        log_api_v0.debug(LOG_WHERE, "Shutdown");
+        ct_log_api_v0.debug(LOG_WHERE, "Shutdown");
 
         _G = (struct G) {0};
     }
 
 
-    extern "C" void keyboard_unload_module(struct api_v0 *api) {
+    extern "C" void keyboard_unload_module(struct ct_api_v0 *api) {
         _shutdown();
     }
 
 
-    extern "C" void keyboard_load_module(struct api_v0 *api) {
+    extern "C" void keyboard_load_module(struct ct_api_v0 *api) {
         _init(api);
     }
 

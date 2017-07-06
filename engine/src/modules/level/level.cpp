@@ -24,14 +24,14 @@
 
 using namespace cetech;
 
-CETECH_DECL_API(entity_api_v0);
-CETECH_DECL_API(resource_api_v0);
-CETECH_DECL_API(transform_api_v0);
-CETECH_DECL_API(memory_api_v0);
-CETECH_DECL_API(os_vio_api_v0);
-CETECH_DECL_API(hash_api_v0);
-CETECH_DECL_API(blob_api_v0);
-CETECH_DECL_API(world_api_v0);
+CETECH_DECL_API(ct_entity_api_v0);
+CETECH_DECL_API(ct_resource_api_v0);
+CETECH_DECL_API(ct_transform_api_v0);
+CETECH_DECL_API(ct_memory_api_v0);
+CETECH_DECL_API(ct_vio_api_v0);
+CETECH_DECL_API(ct_hash_api_v0);
+CETECH_DECL_API(ct_blob_api_v0);
+CETECH_DECL_API(ct_world_api_v0);
 
 //==============================================================================
 // Globals
@@ -55,7 +55,7 @@ namespace {
     void _init_level_instance(struct level_instance *instance,
                               entity_t level_entity) {
         instance->level_entity = level_entity;
-        instance->spawned_entity_map.init(memory_api_v0.main_allocator());
+        instance->spawned_entity_map.init(ct_memory_api_v0.main_allocator());
     }
 
     void _destroy_level_instance(struct level_instance *instance) {
@@ -86,8 +86,8 @@ namespace {
 
 namespace level_resource {
 
-    void *loader(struct os_vio *input,
-                 struct allocator *allocator) {
+    void *loader(struct ct_vio *input,
+                 struct ct_allocator *allocator) {
         const int64_t size = input->size(input->inst);
         char *data = CETECH_ALLOCATE(allocator, char, size);
         input->read(input->inst, data, 1, size);
@@ -95,7 +95,7 @@ namespace level_resource {
     }
 
     void unloader(void *new_data,
-                  struct allocator *allocator) {
+                  struct ct_allocator *allocator) {
         CETECH_FREE(allocator, new_data);
     }
 
@@ -110,7 +110,7 @@ namespace level_resource {
     void *resource_reloader(uint64_t name,
                             void *old_data,
                             void *new_data,
-                            struct allocator *allocator) {
+                            struct ct_allocator *allocator) {
         resource_offline(name, old_data);
         online(name, new_data);
 
@@ -119,7 +119,7 @@ namespace level_resource {
         return new_data;
     }
 
-    static const resource_callbacks_t callback = {
+    static const ct_resource_callbacks_t callback = {
             .loader = loader,
             .unloader = unloader,
             .online = online,
@@ -133,10 +133,10 @@ namespace level_resource {
 namespace level_resource_compiler {
     struct foreach_entities_data {
         const char *filename;
-        struct compilator_api *capi;
+        struct ct_compilator_api *capi;
         Array<uint64_t> *id;
         Array<uint32_t> *offset;
-        blob_v0 *data;
+        ct_blob_v0 *data;
         struct entity_compile_output *output;
     };
 
@@ -149,19 +149,19 @@ namespace level_resource_compiler {
         char name[128] = {0};
         yaml_as_string(key, name, CETECH_ARRAY_LEN(name));
 
-        array::push_back(*data->id, hash_api_v0.id64_from_str(name));
+        array::push_back(*data->id, ct_hash_api_v0.id64_from_str(name));
         array::push_back(*data->offset,
-                         entity_api_v0.compiler_ent_counter(data->output));
+                         ct_entity_api_v0.compiler_ent_counter(data->output));
 
-        entity_api_v0.compiler_compile_entity(data->output, value,
+        ct_entity_api_v0.compiler_compile_entity(data->output, value,
                                               data->filename,
                                               data->capi);
     }
 
     int compiler(const char *filename,
-                 struct os_vio *source_vio,
-                 struct os_vio *build_vio,
-                 struct compilator_api *compilator_api) {
+                 struct ct_vio *source_vio,
+                 struct ct_vio *build_vio,
+                 struct ct_compilator_api *compilator_api) {
 
         char source_data[source_vio->size(source_vio->inst) + 1];
         memset(source_data, 0, source_vio->size(source_vio->inst) + 1);
@@ -173,11 +173,11 @@ namespace level_resource_compiler {
 
         yaml_node_t entities = yaml_get_node(root, "entities");
 
-        Array<uint64_t> id(memory_api_v0.main_allocator());
-        Array<uint32_t> offset(memory_api_v0.main_allocator());
-        blob_v0 *data = blob_api_v0.create(memory_api_v0.main_allocator());
+        Array<uint64_t> id(ct_memory_api_v0.main_allocator());
+        Array<uint32_t> offset(ct_memory_api_v0.main_allocator());
+        ct_blob_v0 *data = ct_blob_api_v0.create(ct_memory_api_v0.main_allocator());
 
-        entity_compile_output *output = entity_api_v0.compiler_create_output();
+        entity_compile_output *output = ct_entity_api_v0.compiler_create_output();
         foreach_entities_data entity_data = {
                 .id = &id,
                 .offset = &offset,
@@ -193,7 +193,7 @@ namespace level_resource_compiler {
                 .entities_count = (uint32_t) array::size(id)
         };
 
-        entity_api_v0.compiler_write_to_build(output, entity_data.data);
+        ct_entity_api_v0.compiler_write_to_build(output, entity_data.data);
 
         build_vio->write(build_vio->inst, &res, sizeof(level_blob::blob_t), 1);
         build_vio->write(build_vio->inst, array::begin(id), sizeof(uint64_t),
@@ -203,8 +203,8 @@ namespace level_resource_compiler {
         build_vio->write(build_vio->inst, data->data(data->inst), sizeof(uint8_t),
                             data->size(data->inst));
 
-        blob_api_v0.destroy(data);
-        entity_api_v0.compiler_destroy_output(output);
+        ct_blob_api_v0.destroy(data);
+        ct_entity_api_v0.compiler_destroy_output(output);
 
         return 1;
     }
@@ -220,14 +220,14 @@ namespace level {
     level_t load(world_t world,
                  uint64_t name) {
 
-        auto res = level_blob::get(resource_api_v0.get(_G.level_type, name));
+        auto res = level_blob::get(ct_resource_api_v0.get(_G.level_type, name));
 
         uint64_t *id = level_blob::names(res);
         uint32_t *offset = level_blob::offset(res);
         uint8_t *data = level_blob::data(res);
 
-        entity_t level_ent = entity_api_v0.create();
-        transform_t t = transform_api_v0.create(world, level_ent,
+        entity_t level_ent = ct_entity_api_v0.create();
+        ct_transform_t t = ct_transform_api_v0.create(world, level_ent,
                                                 {UINT32_MAX},
                                                 {0}, QUATF_IDENTITY,
                                                 {{1.0f, 1.0f, 1.0f}});
@@ -235,7 +235,7 @@ namespace level {
         level_t level = _new_level(level_ent);
         struct level_instance *instance = get_level_instance(level);
 
-        entity_api_v0.spawn_from_resource(world, data,
+        ct_entity_api_v0.spawn_from_resource(world, data,
                                           &instance->spawned_entity,
                                           &instance->spawned_entity_count);
 
@@ -243,8 +243,8 @@ namespace level {
             entity_t e = instance->spawned_entity[offset[i]];
             map::set(instance->spawned_entity_map, id[i], e);
 
-            if (transform_api_v0.has(world, e)) {
-                transform_api_v0.link(world, level_ent, e);
+            if (ct_transform_api_v0.has(world, e)) {
+                ct_transform_api_v0.link(world, level_ent, e);
             }
         }
 
@@ -255,11 +255,11 @@ namespace level {
                  level_t level) {
         struct level_instance *instance = get_level_instance(level);
 
-        entity_api_v0.destroy(world, instance->spawned_entity,
+        ct_entity_api_v0.destroy(world, instance->spawned_entity,
                               instance->spawned_entity_count);
-        entity_api_v0.destroy(world, &instance->level_entity, 1);
+        ct_entity_api_v0.destroy(world, &instance->level_entity, 1);
 
-        CETECH_FREE(memory_api_v0.main_allocator(),
+        CETECH_FREE(ct_memory_api_v0.main_allocator(),
                           instance->spawned_entity);
 
         _destroy_level_instance(instance);
@@ -283,41 +283,41 @@ namespace level {
 //==============================================================================
 
 namespace level_module {
-    static struct level_api_v0 _api = {
+    static struct ct_level_api_v0 _api = {
             .load_level = level::load,
             .destroy = level::destroy,
             .entity_by_id = level::entity_by_id,
             .entity = level::entity
     };
 
-    void _init_api(struct api_v0 *api) {
-        api->register_api("level_api_v0", &_api);
+    void _init_api(struct ct_api_v0 *api) {
+        api->register_api("ct_level_api_v0", &_api);
     }
 
 
-    void _init(struct api_v0 *api) {
+    void _init(struct ct_api_v0 *api) {
         _init_api(api);
 
-        CETECH_GET_API(api, entity_api_v0);
-        CETECH_GET_API(api, memory_api_v0);
-        CETECH_GET_API(api, resource_api_v0);
-        CETECH_GET_API(api, transform_api_v0);
-        CETECH_GET_API(api, os_vio_api_v0);
-        CETECH_GET_API(api, hash_api_v0);
-        CETECH_GET_API(api, blob_api_v0);
-        CETECH_GET_API(api, world_api_v0);
+        CETECH_GET_API(api, ct_entity_api_v0);
+        CETECH_GET_API(api, ct_memory_api_v0);
+        CETECH_GET_API(api, ct_resource_api_v0);
+        CETECH_GET_API(api, ct_transform_api_v0);
+        CETECH_GET_API(api, ct_vio_api_v0);
+        CETECH_GET_API(api, ct_hash_api_v0);
+        CETECH_GET_API(api, ct_blob_api_v0);
+        CETECH_GET_API(api, ct_world_api_v0);
 
 
         _G = {0};
 
-        _G.level_type = hash_api_v0.id64_from_str("level");
+        _G.level_type = ct_hash_api_v0.id64_from_str("level");
 
-        _G.level_instance.init(memory_api_v0.main_allocator());
+        _G.level_instance.init(ct_memory_api_v0.main_allocator());
 
-        resource_api_v0.register_type(_G.level_type, level_resource::callback);
+        ct_resource_api_v0.register_type(_G.level_type, level_resource::callback);
 
 #ifdef CETECH_CAN_COMPILE
-        resource_api_v0.compiler_register(_G.level_type,
+        ct_resource_api_v0.compiler_register(_G.level_type,
                                           level_resource_compiler::compiler);
 #endif
 
@@ -327,11 +327,11 @@ namespace level_module {
         _G.level_instance.destroy();
     }
 
-    extern "C" void level_unload_module(struct api_v0 *api) {
+    extern "C" void level_unload_module(struct ct_api_v0 *api) {
         _shutdown();
     }
 
-    extern "C" void level_load_module(struct api_v0 *api) {
+    extern "C" void level_load_module(struct ct_api_v0 *api) {
         _init(api);
 
     }

@@ -23,14 +23,14 @@
 
 #include <cetech/kernel/errors.h>
 
-CETECH_DECL_API(memory_api_v0);
-CETECH_DECL_API(component_api_v0);
-CETECH_DECL_API(resource_api_v0);
-CETECH_DECL_API(os_path_v0);
-CETECH_DECL_API(log_api_v0);
-CETECH_DECL_API(os_vio_api_v0);
-CETECH_DECL_API(hash_api_v0);
-CETECH_DECL_API(blob_api_v0);
+CETECH_DECL_API(ct_memory_api_v0);
+CETECH_DECL_API(ct_component_api_v0);
+CETECH_DECL_API(ct_resource_api_v0);
+CETECH_DECL_API(ct_path_v0);
+CETECH_DECL_API(ct_log_api_v0);
+CETECH_DECL_API(ct_vio_api_v0);
+CETECH_DECL_API(ct_hash_api_v0);
+CETECH_DECL_API(ct_blob_api_v0);
 
 using namespace cetech;
 
@@ -78,7 +78,7 @@ struct component_data {
 //    array::push_back(_G.spawned_array, {0});
 //
 //    Array<entity_t> *array = &_G.spawned_array[idx];
-//    array->init(memory_api_v0.main_allocator());
+//    array->init(ct_memory_api_v0.main_allocator());
 //
 //    return idx;
 //}
@@ -126,9 +126,9 @@ struct entity_compile_output {
 namespace entity_resource_compiler {
     static void preprocess(const char *filename,
                            yaml_node_t root,
-                           struct compilator_api *capi) {
-        auto a = memory_api_v0.main_allocator();
-        const char *source_dir = resource_api_v0.compiler_get_source_dir();
+                           struct ct_compilator_api *capi) {
+        auto a = ct_memory_api_v0.main_allocator();
+        const char *source_dir = ct_resource_api_v0.compiler_get_source_dir();
 
         yaml_node_t prefab_node = yaml_get_node(root, "prefab");
 
@@ -144,9 +144,9 @@ namespace entity_resource_compiler {
             capi->add_dependency(filename, prefab_file);
 
 
-            char *full_path = os_path_v0.join(a, 2, source_dir, prefab_file);
+            char *full_path = ct_path_v0.join(a, 2, source_dir, prefab_file);
 
-            struct os_vio *prefab_vio = os_vio_api_v0.from_file(full_path,
+            struct ct_vio *prefab_vio = ct_vio_api_v0.from_file(full_path,
                                                                 VIO_OPEN_READ);
 
             char prefab_data[prefab_vio->size(prefab_vio->inst) + 1];
@@ -208,7 +208,7 @@ namespace entity_resource_compiler {
         yaml_as_string(component_type_node, component_type_str,
                        CETECH_ARRAY_LEN(component_type_str));
 
-        cid = hash_api_v0.id64_from_str(component_type_str);
+        cid = ct_hash_api_v0.id64_from_str(component_type_str);
 
         for (int i = 0; i < array::size(output->component_type); ++i) {
             if (output->component_type[i] != cid) {
@@ -222,20 +222,20 @@ namespace entity_resource_compiler {
             array::push_back(output->component_type, cid);
 
             uint32_t idx = array::size(output->component_ent_array);
-            //Array<uint32_t> tmp_a(memory_api_v0.main_allocator());
+            //Array<uint32_t> tmp_a(ct_memory_api_v0.main_allocator());
             array::push_back(output->component_ent_array, {0});
             output->component_ent_array[idx].init(
-                    memory_api_v0.main_allocator());
+                    ct_memory_api_v0.main_allocator());
 
             map::set(output->component_ent, cid, idx);
         }
 
         if (!map::has(output->component_body, cid)) {
             uint32_t idx = array::size(output->component_body_array);
-            //Array<yaml_node_t> tmp_a(memory_api_v0.main_allocator());
+            //Array<yaml_node_t> tmp_a(ct_memory_api_v0.main_allocator());
             array::push_back(output->component_body_array, {0});
             output->component_body_array[idx].init(
-                    memory_api_v0.main_allocator());
+                    ct_memory_api_v0.main_allocator());
 
             map::set(output->component_body, cid, idx);
         }
@@ -283,7 +283,7 @@ namespace entity_resource_compiler {
 
 
     struct entity_compile_output *create_output() {
-        allocator *a = memory_api_v0.main_allocator();
+        ct_allocator *a = ct_memory_api_v0.main_allocator();
 
         entity_compile_output *output = CETECH_ALLOCATE(a,
                                                         entity_compile_output,
@@ -306,11 +306,11 @@ namespace entity_resource_compiler {
         output->entity_parent.destroy();
 
         // clean inner array
-        auto ce_it = array::begin(output->component_ent_array);
-        auto ce_end = array::end(output->component_ent_array);
-        while (ce_it != ce_end) {
-            ce_it->destroy();
-            ++ce_it;
+        auto ct_it = array::begin(output->component_ent_array);
+        auto ct_end = array::end(output->component_ent_array);
+        while (ct_it != ct_end) {
+            ct_it->destroy();
+            ++ct_it;
         }
 
         output->component_ent.destroy();
@@ -328,14 +328,14 @@ namespace entity_resource_compiler {
         output->component_body.destroy();
         output->component_body_array.destroy();
 
-        allocator *a = memory_api_v0.main_allocator();
+        ct_allocator *a = ct_memory_api_v0.main_allocator();
         CETECH_FREE(a, output);
     }
 
     void compile_entity(struct entity_compile_output *output,
                         yaml_node_t root,
                         const char *filename,
-                        struct compilator_api *compilator_api) {
+                        struct ct_compilator_api *compilator_api) {
 
         preprocess(filename, root, compilator_api);
         compile_entitity(root, UINT32_MAX, output);
@@ -346,7 +346,7 @@ namespace entity_resource_compiler {
     }
 
     void write_to_build(struct entity_compile_output *output,
-                        blob_v0 *build) {
+                        ct_blob_v0 *build) {
         struct entity_resource res = {0};
         res.ent_count = (uint32_t) (output->ent_counter);
         res.comp_type_count = (uint32_t) array::size(output->component_type);
@@ -381,10 +381,10 @@ namespace entity_resource_compiler {
             idx = map::get(output->component_body, cid, UINT32_MAX);
             Array<yaml_node_t> &body = output->component_body_array[idx];
 
-            blob_v0 *blob = blob_api_v0.create(memory_api_v0.main_allocator());
+            ct_blob_v0 *blob = ct_blob_api_v0.create(ct_memory_api_v0.main_allocator());
 
             for (int i = 0; i < cdata.ent_count; ++i) {
-                component_api_v0.compile(id, body[i], blob);
+                ct_component_api_v0.compile(id, body[i], blob);
             }
 
             cdata.size = blob->size(blob->inst);
@@ -396,14 +396,14 @@ namespace entity_resource_compiler {
             build->push(build->inst, blob->data(blob->inst),
                         sizeof(uint8_t) * blob->size(blob->inst));
 
-            blob_api_v0.destroy(blob);
+            ct_blob_api_v0.destroy(blob);
         }
     }
 
     void compiler(yaml_node_t root,
                   const char *filename,
-                  blob_v0 *build,
-                  struct compilator_api *compilator_api) {
+                  ct_blob_v0 *build,
+                  struct ct_compilator_api *compilator_api) {
         entity_compile_output *output = create_output();
         compile_entity(output, root, filename, compilator_api);
         write_to_build(output, build);
@@ -412,9 +412,9 @@ namespace entity_resource_compiler {
     }
 
     int _entity_resource_compiler(const char *filename,
-                                  struct os_vio *source_vio,
-                                  struct os_vio *build_vio,
-                                  struct compilator_api *compilator_api) {
+                                  struct ct_vio *source_vio,
+                                  struct ct_vio *build_vio,
+                                  struct ct_compilator_api *compilator_api) {
 
         char source_data[source_vio->size(source_vio->inst) + 1];
         memset(source_data, 0, source_vio->size(source_vio->inst) + 1);
@@ -425,8 +425,8 @@ namespace entity_resource_compiler {
         yaml_node_t root = yaml_load_str(source_data, &h);
 
 
-        blob_v0 *entity_data = blob_api_v0.create(
-                memory_api_v0.main_allocator());
+        ct_blob_v0 *entity_data = ct_blob_api_v0.create(
+                ct_memory_api_v0.main_allocator());
 
         compiler(root, filename, entity_data, compilator_api);
 
@@ -435,7 +435,7 @@ namespace entity_resource_compiler {
                             entity_data->size(entity_data->inst));
 
 
-        blob_api_v0.destroy(entity_data);
+        ct_blob_api_v0.destroy(entity_data);
         return 1;
     }
 }
@@ -447,8 +447,8 @@ namespace entity_resource_compiler {
 
 namespace entity_resorce {
 
-    void *loader(struct os_vio *input,
-                 struct allocator *allocator) {
+    void *loader(struct ct_vio *input,
+                 struct ct_allocator *allocator) {
         const int64_t size = input->size(input->inst);
         char *data = CETECH_ALLOCATE(allocator, char, size);
         input->read(input->inst, data, 1, size);
@@ -457,7 +457,7 @@ namespace entity_resorce {
     }
 
     void unloader(void *new_data,
-                  struct allocator *allocator) {
+                  struct ct_allocator *allocator) {
         CETECH_FREE(allocator, new_data);
     }
 
@@ -473,7 +473,7 @@ namespace entity_resorce {
     void *reloader(uint64_t name,
                    void *old_data,
                    void *new_data,
-                   struct allocator *allocator) {
+                   struct ct_allocator *allocator) {
         offline(name, old_data);
         online(name, new_data);
 
@@ -482,7 +482,7 @@ namespace entity_resorce {
         return new_data;
     }
 
-    static const resource_callbacks_t callback = {
+    static const ct_resource_callbacks_t callback = {
             .loader = loader,
             .unloader = unloader,
             .online = online,
@@ -514,7 +514,7 @@ namespace entity {
                              uint32_t *entities_count) {
         struct entity_resource *res = (entity_resource *) resource;
 
-        entity_t *spawned = CETECH_ALLOCATE(memory_api_v0.main_allocator(),
+        entity_t *spawned = CETECH_ALLOCATE(ct_memory_api_v0.main_allocator(),
                                             entity_t, sizeof(entity_t) * res->ent_count);
 
         for (int j = 0; j < res->ent_count; ++j) {
@@ -533,7 +533,7 @@ namespace entity {
             uint32_t *c_ent = component_data_ent(comp_data);
             char *c_data = component_data_data(comp_data);
 
-            component_api_v0.spawn(world, type, &spawned[0],
+            ct_component_api_v0.spawn(world, type, &spawned[0],
                                    c_ent, parents, comp_data->ent_count,
                                    c_data);
 
@@ -546,10 +546,10 @@ namespace entity {
 
     entity_t spawn(world_t world,
                    uint64_t name) {
-        void *res = resource_api_v0.get(_G.type, name);
+        void *res = ct_resource_api_v0.get(_G.type, name);
 
         if (res == NULL) {
-            log_api_v0.error("entity", "Could not spawn entity.");
+            ct_log_api_v0.error("entity", "Could not spawn entity.");
             return (entity_t) {.h = 0};
         }
 
@@ -557,7 +557,7 @@ namespace entity {
         uint32_t entities_count = 0;
 
         spawn_from_resource(world, res, &entities, &entities_count);
-        CETECH_FREE(memory_api_v0.main_allocator(), entities);
+        CETECH_FREE(ct_memory_api_v0.main_allocator(), entities);
         return entities[0];
     }
 
@@ -565,7 +565,7 @@ namespace entity {
                  entity_t *entity,
                  uint32_t count) {
 
-        component_api_v0.destroy(world, entity, count);
+        ct_component_api_v0.destroy(world, entity, count);
 
         for (int i = 0; i < count; ++i) {
             handler::destroy(_G.entity_handler, entity[i].h);
@@ -574,7 +574,7 @@ namespace entity {
 }
 
 namespace entity_module {
-    static struct entity_api_v0 _api = {
+    static struct ct_entity_api_v0 _api = {
 
             .create = entity::create,
             .destroy = entity::destroy,
@@ -592,39 +592,39 @@ namespace entity_module {
 #endif
     };
 
-    static void _init_api(struct api_v0 *api) {
-        api->register_api("entity_api_v0", &_api);
+    static void _init_api(struct ct_api_v0 *api) {
+        api->register_api("ct_entity_api_v0", &_api);
 
     }
 
-    static void _init(struct api_v0 *api) {
+    static void _init(struct ct_api_v0 *api) {
         _init_api(api);
 
-        CETECH_GET_API(api, memory_api_v0);
-        CETECH_GET_API(api, component_api_v0);
-        CETECH_GET_API(api, memory_api_v0);
-        CETECH_GET_API(api, resource_api_v0);
-        CETECH_GET_API(api, os_path_v0);
-        CETECH_GET_API(api, os_vio_api_v0);
-        CETECH_GET_API(api, hash_api_v0);
-        CETECH_GET_API(api, blob_api_v0);
+        CETECH_GET_API(api, ct_memory_api_v0);
+        CETECH_GET_API(api, ct_component_api_v0);
+        CETECH_GET_API(api, ct_memory_api_v0);
+        CETECH_GET_API(api, ct_resource_api_v0);
+        CETECH_GET_API(api, ct_path_v0);
+        CETECH_GET_API(api, ct_vio_api_v0);
+        CETECH_GET_API(api, ct_hash_api_v0);
+        CETECH_GET_API(api, ct_blob_api_v0);
 
         _G = {0};
 
-        _G.type = hash_api_v0.id64_from_str("entity");
+        _G.type = ct_hash_api_v0.id64_from_str("entity");
 
-//        _G.spawned_map.init(memory_api_v0.main_allocator());
-//        _G.spawned_array.init(memory_api_v0.main_allocator());
+//        _G.spawned_map.init(ct_memory_api_v0.main_allocator());
+//        _G.spawned_array.init(ct_memory_api_v0.main_allocator());
 
-        resource_api_v0.register_type(_G.type, entity_resorce::callback);
+        ct_resource_api_v0.register_type(_G.type, entity_resorce::callback);
 
 #ifdef CETECH_CAN_COMPILE
-        resource_api_v0.compiler_register(_G.type,
+        ct_resource_api_v0.compiler_register(_G.type,
                                           entity_resource_compiler::_entity_resource_compiler);
 #endif
 
 
-        _G.entity_handler.init(memory_api_v0.main_allocator());
+        _G.entity_handler.init(ct_memory_api_v0.main_allocator());
     }
 
     static void _shutdown() {
@@ -634,11 +634,11 @@ namespace entity_module {
     }
 
 
-    extern "C" void entity_load_module(struct api_v0 *api) {
+    extern "C" void entity_load_module(struct ct_api_v0 *api) {
         _init(api);
     }
 
-    extern "C" void entity_unload_module(struct api_v0 *api) {
+    extern "C" void entity_unload_module(struct ct_api_v0 *api) {
         _shutdown();
     }
 }

@@ -45,7 +45,7 @@ uint32_t file_mtime(const char *path) {
 void _dir_list(const char *path,
                int recursive,
                Array<char *> &tmp_files,
-               struct allocator *allocator) {
+               struct ct_allocator *allocator) {
     DIR *dir;
     struct dirent *entry;
 
@@ -99,7 +99,7 @@ void dir_list(const char *path,
               int recursive,
               char ***files,
               uint32_t *count,
-              struct allocator *allocator) {
+              struct ct_allocator *allocator) {
     Array<char *> tmp_files(allocator);
 
     _dir_list(path, recursive, tmp_files, allocator);
@@ -117,7 +117,7 @@ void dir_list(const char *path,
 
 void dir_list_free(char **files,
                    uint32_t count,
-                   struct allocator *allocator) {
+                   struct ct_allocator *allocator) {
     for (int i = 0; i < count; ++i) {
         CETECH_FREE(allocator, files[i]);
     }
@@ -210,7 +210,7 @@ const char *path_extension(const char *path) {
     return ch + 1;
 }
 
-char *path_join(struct allocator *allocator,
+char *path_join(struct ct_allocator *allocator,
                 uint32_t count,
                 ...) {
 

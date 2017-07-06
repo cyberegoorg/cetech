@@ -19,7 +19,7 @@ extern "C" {
 //==============================================================================
 
 //! Package API V!
-struct package_api_v0 {
+struct ct_package_api_v0 {
     //! Load package
     //! \param name Package name
     void (*load)(uint64_t name);

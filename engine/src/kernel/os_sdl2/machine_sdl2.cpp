@@ -16,8 +16,8 @@
 
 #include <include/SDL2/SDL.h>
 
-CETECH_DECL_API(app_api_v0);
-CETECH_DECL_API(log_api_v0);
+CETECH_DECL_API(ct_app_api_v0);
+CETECH_DECL_API(ct_log_api_v0);
 
 using namespace cetech;
 
@@ -28,7 +28,7 @@ using namespace cetech;
 // Keyboard part
 //==============================================================================
 
-extern int sdl_keyboard_init(struct api_v0 *api);
+extern int sdl_keyboard_init(struct ct_api_v0 *api);
 
 extern void sdl_keyboard_shutdown();
 
@@ -39,7 +39,7 @@ extern void sdl_keyboard_process(EventStream &stream);
 // Mouse part
 //==============================================================================
 
-extern int sdl_mouse_init(struct api_v0 *api);
+extern int sdl_mouse_init(struct ct_api_v0 *api);
 
 extern void sdl_mouse_shutdown();
 
@@ -49,7 +49,7 @@ extern void sdl_mouse_process(EventStream &stream);
 // Gamepad part
 //==============================================================================
 
-extern int sdl_gamepad_init(struct api_v0 *api);
+extern int sdl_gamepad_init(struct ct_api_v0 *api);
 
 extern void sdl_gamepad_shutdown();
 
@@ -80,23 +80,23 @@ static struct MachineGlobals {
     EventStream eventstream;
 } MachineGlobals;
 
-CETECH_DECL_API(memory_api_v0);
+CETECH_DECL_API(ct_memory_api_v0);
 
 //==============================================================================
 // Interface
 //==============================================================================
 namespace machine_sdl {
-    struct event_header *machine_event_begin() {
-        return (event_header *) eventstream::begin(_G.eventstream);
+    struct ct_event_header *machine_event_begin() {
+        return (ct_event_header *) eventstream::begin(_G.eventstream);
     }
 
 
-    struct event_header *machine_event_end() {
-        return (event_header *) eventstream::end(_G.eventstream);
+    struct ct_event_header *machine_event_end() {
+        return (ct_event_header *) eventstream::end(_G.eventstream);
     }
 
-    struct event_header *machine_event_next(struct event_header *header) {
-        return (event_header *) eventstream::next(_G.eventstream,
+    struct ct_event_header *machine_event_next(struct ct_event_header *header) {
+        return (ct_event_header *) eventstream::next(_G.eventstream,
                                                   (eventstream::event_header *) header);
     }
 
@@ -107,7 +107,7 @@ namespace machine_sdl {
         while (SDL_PollEvent(&e) > 0) {
             switch (e.type) {
                 case SDL_QUIT:
-                    app_api_v0.quit();
+                    ct_app_api_v0.quit();
                     break;
 
                 case SDL_CONTROLLERDEVICEADDED:
@@ -125,7 +125,7 @@ namespace machine_sdl {
 
     }
 
-    static struct machine_api_v0 api_v1 = {
+    static struct ct_machine_api_v0 api_v1 = {
             .event_begin = machine_sdl::machine_event_begin,
             .event_end = machine_sdl::machine_event_end,
             .event_next = machine_sdl::machine_event_next,
@@ -134,17 +134,17 @@ namespace machine_sdl {
             .update = machine_sdl::_update,
     };
 
-    void init(struct api_v0 *api) {
-        api->register_api("machine_api_v0", &api_v1);
+    void init(struct ct_api_v0 *api) {
+        api->register_api("ct_machine_api_v0", &api_v1);
 
-        CETECH_GET_API(api, memory_api_v0);
-        CETECH_GET_API(api, app_api_v0);
-        CETECH_GET_API(api, log_api_v0);
+        CETECH_GET_API(api, ct_memory_api_v0);
+        CETECH_GET_API(api, ct_app_api_v0);
+        CETECH_GET_API(api, ct_log_api_v0);
 
-        _G.eventstream.init(memory_api_v0.main_allocator());
+        _G.eventstream.init(ct_memory_api_v0.main_allocator());
 
         if (SDL_Init(SDL_INIT_EVERYTHING) != 0) {
-            log_api_v0.error(LOG_WHERE, "Could not init sdl - %s",
+            ct_log_api_v0.error(LOG_WHERE, "Could not init sdl - %s",
                              SDL_GetError());
             return; // TODO: dksandasdnask FUCK init without return type?????
         }

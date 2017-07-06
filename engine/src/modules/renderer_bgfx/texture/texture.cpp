@@ -26,7 +26,7 @@ using namespace string_stream;
 
 
 namespace texture_compiler {
-    int init(api_v0 *api);
+    int init(ct_api_v0 *api);
 }
 
 //==============================================================================
@@ -40,14 +40,14 @@ struct TextureResourceGlobals {
 } TextureResourceGlobals;
 
 
-CETECH_DECL_API(memory_api_v0);
-CETECH_DECL_API(resource_api_v0);
-CETECH_DECL_API(app_api_v0);
-CETECH_DECL_API(os_path_v0);
-CETECH_DECL_API(os_vio_api_v0);
-CETECH_DECL_API(os_process_api_v0);
-CETECH_DECL_API(log_api_v0);
-CETECH_DECL_API(hash_api_v0);
+CETECH_DECL_API(ct_memory_api_v0);
+CETECH_DECL_API(ct_resource_api_v0);
+CETECH_DECL_API(ct_app_api_v0);
+CETECH_DECL_API(ct_path_v0);
+CETECH_DECL_API(ct_vio_api_v0);
+CETECH_DECL_API(ct_process_api_v0);
+CETECH_DECL_API(ct_log_api_v0);
+CETECH_DECL_API(ct_hash_api_v0);
 
 //==============================================================================
 // Compiler private
@@ -63,8 +63,8 @@ namespace texture_resource {
     static const bgfx::TextureHandle null_texture = {0};
 
 
-    void *_texture_resource_loader(struct os_vio *input,
-                                   struct allocator *allocator) {
+    void *_texture_resource_loader(struct ct_vio *input,
+                                   struct ct_allocator *allocator) {
 
         const int64_t size = input->size(input->inst);
         char *data = CETECH_ALLOCATE(allocator, char, size);
@@ -74,7 +74,7 @@ namespace texture_resource {
     }
 
     void _texture_resource_unloader(void *new_data,
-                                    struct allocator *allocator) {
+                                    struct ct_allocator *allocator) {
         CETECH_FREE(allocator, new_data);
     }
 
@@ -105,7 +105,7 @@ namespace texture_resource {
     void *_texture_resource_reloader(uint64_t name,
                                      void *old_data,
                                      void *new_data,
-                                     struct allocator *allocator) {
+                                     struct ct_allocator *allocator) {
         _texture_resource_offline(name, old_data);
         _texture_resource_online(name, new_data);
 
@@ -114,7 +114,7 @@ namespace texture_resource {
         return new_data;
     }
 
-    static const resource_callbacks_t texture_resource_callback = {
+    static const ct_resource_callbacks_t texture_resource_callback = {
             .loader = _texture_resource_loader,
             .unloader =_texture_resource_unloader,
             .online =_texture_resource_online,
@@ -128,28 +128,28 @@ namespace texture_resource {
 // Interface
 //==============================================================================
 namespace texture {
-    int texture_init(struct api_v0 *api) {
+    int texture_init(struct ct_api_v0 *api) {
 
-        CETECH_GET_API(api, memory_api_v0);
-        CETECH_GET_API(api, resource_api_v0);
-        CETECH_GET_API(api, app_api_v0);
-        CETECH_GET_API(api, os_path_v0);
-        CETECH_GET_API(api, os_vio_api_v0);
-        CETECH_GET_API(api, os_process_api_v0);
-        CETECH_GET_API(api, log_api_v0);
-        CETECH_GET_API(api, hash_api_v0);
+        CETECH_GET_API(api, ct_memory_api_v0);
+        CETECH_GET_API(api, ct_resource_api_v0);
+        CETECH_GET_API(api, ct_app_api_v0);
+        CETECH_GET_API(api, ct_path_v0);
+        CETECH_GET_API(api, ct_vio_api_v0);
+        CETECH_GET_API(api, ct_process_api_v0);
+        CETECH_GET_API(api, ct_log_api_v0);
+        CETECH_GET_API(api, ct_hash_api_v0);
 
         _G = {0};
 
-        _G.type = hash_api_v0.id64_from_str("texture");
+        _G.type = ct_hash_api_v0.id64_from_str("texture");
 
-        _G.handler_map.init(memory_api_v0.main_allocator());
+        _G.handler_map.init(ct_memory_api_v0.main_allocator());
 
 #ifdef CETECH_CAN_COMPILE
         texture_compiler::init(api);
 #endif
 
-        resource_api_v0.register_type(_G.type,
+        ct_resource_api_v0.register_type(_G.type,
                                       texture_resource::texture_resource_callback);
 
         return 1;
@@ -160,7 +160,7 @@ namespace texture {
     }
 
     bgfx::TextureHandle texture_get(uint64_t name) {
-        resource_api_v0.get(_G.type, name); // TODO: only for autoload
+        ct_resource_api_v0.get(_G.type, name); // TODO: only for autoload
 
         return map::get(_G.handler_map, name, texture_resource::null_texture);
     }

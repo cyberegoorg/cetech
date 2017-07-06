@@ -15,27 +15,32 @@ extern "C" {
 #define CETECH_GET_API(_api, name) name = *(struct name*) (_api)->first(#name).api
 
 //==============================================================================
-// Api
+// Structs
 //==============================================================================
 
-struct api_entry {
+struct ct_api_entry_v0 {
     void *entry;
     void *api;
 };
 
+
+//==============================================================================
+// Api
+//==============================================================================
+
 //! Plugin expot api struct V0
-struct api_v0 {
+struct ct_api_v0 {
     void (*register_api)(const char *name,
                          void *api);
 
     int (*exist)(const char *name);
 
-    struct api_entry (*first)(const char *name);
+    struct ct_api_entry_v0 (*first)(const char *name);
 
-    struct api_entry (*next)(struct api_entry *entry);
+    struct ct_api_entry_v0 (*next)(struct ct_api_entry_v0 *entry);
 };
 
-struct api_v0 *cetech_api_v0();
+struct ct_api_v0 *ct_api_get_v0();
 
 #ifdef __cplusplus
 }

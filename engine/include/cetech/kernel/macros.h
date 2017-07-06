@@ -1,5 +1,5 @@
-#ifndef CETECH_TYPES_H
-#define CETECH_TYPES_H
+#ifndef CETECH_MACROS_H
+#define CETECH_MACROS_H
 
 //==============================================================================
 // Includes
@@ -32,10 +32,10 @@
 
 #define CETECH_ARRAY_LEN(_name) (sizeof(_name) / sizeof(_name[0]))
 
-#define ATTR_FORMAT(fmt, args) __attribute__ ((format(printf, fmt, args)))
+#define CTECH_ATTR_FORMAT(fmt, args) __attribute__ ((format(printf, fmt, args)))
 
 #define CETECH_STATIC_ASSERT_MSG(expr, msg) _Static_assert(expr, msg)
 #define CETECH_STATIC_ASSERT(expr) CETECH_STATIC_ASSERT_MSG(expr, #expr)
 
 
-#endif //CETECH_TYPES_H
+#endif //CETECH_MACROS_H

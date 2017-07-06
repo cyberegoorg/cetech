@@ -14,7 +14,7 @@ extern "C" {
 
 #include <stdint.h>
 
-enum fs_open_mode {
+enum ct_fs_open_mode {
     FS_OPEN_READ,
     FS_OPEN_WRITE,
 };
@@ -24,7 +24,7 @@ enum fs_open_mode {
 //==============================================================================
 
 //! Filesystem API V0
-struct filesystem_api_v0 {
+struct ct_filesystem_api_v0 {
     //! Return root dir
     //! \param root Root
     //! \return Root dir or NULL if root is invalid.
@@ -35,9 +35,9 @@ struct filesystem_api_v0 {
     //! \param path File path
     //! \param mode Open mode
     //! \return File or NULL
-    struct os_vio *(*open)(uint64_t root,
+    struct ct_vio *(*open)(uint64_t root,
                            const char *path,
-                           enum fs_open_mode mode);
+                           enum ct_fs_open_mode mode);
 
     //! Map path for root
     //! \param root Root
@@ -47,7 +47,7 @@ struct filesystem_api_v0 {
 
     //! Close file
     //! \param file file
-    void (*close)(struct os_vio *file);
+    void (*close)(struct ct_vio *file);
 
     //! List directory
     //! \param root Root
@@ -59,14 +59,14 @@ struct filesystem_api_v0 {
                     const char *filter,
                     char ***files,
                     uint32_t *count,
-                    struct allocator *allocator);
+                    struct ct_allocator *allocator);
 
     //! Free list directory array
     //! \param files File array
     //! \param allocator Allocator
     void (*listdir_free)(char **files,
                          uint32_t count,
-                         struct allocator *allocator);
+                         struct ct_allocator *allocator);
 
     //! Create directory in root
     //! \param root Root
@@ -89,7 +89,7 @@ struct filesystem_api_v0 {
     //! \param filename Filename
     //! \return 1 if ok else 0
     char *(*fullpath)(uint64_t root,
-                      struct allocator *,
+                      struct ct_allocator *,
                       const char *filename);
 };
 

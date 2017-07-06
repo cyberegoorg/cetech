@@ -8,30 +8,30 @@
 
 #define API_NAME "World"
 
-CETECH_DECL_API(world_api_v0);
+CETECH_DECL_API(ct_world_api_v0);
 
 static int _world_create(lua_State *l) {
-    world_t world = world_api_v0.create();
+    world_t world = ct_world_api_v0.create();
     luasys_push_handler(l, world.h);
     return 1;
 }
 
 static int _world_destroy(lua_State *l) {
     world_t world = {.h = luasys_to_handler(l, 1)};
-    world_api_v0.destroy(world);
+    ct_world_api_v0.destroy(world);
     return 0;
 }
 
 static int _world_update(lua_State *l) {
     world_t world = {.h = luasys_to_handler(l, 1)};
     float dt = luasys_to_float(l, 2);
-    world_api_v0.update(world, dt);
+    ct_world_api_v0.update(world, dt);
     return 0;
 }
 
 
-void _register_lua_world_api(struct api_v0 *api) {
-    CETECH_GET_API(api, world_api_v0);
+void _register_lua_world_api(struct ct_api_v0 *api) {
+    CETECH_GET_API(api, ct_world_api_v0);
 
     luasys_add_module_function(API_NAME, "create", _world_create);
     luasys_add_module_function(API_NAME, "destroy", _world_destroy);

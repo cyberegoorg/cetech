@@ -23,11 +23,11 @@
 
 #include "material_blob.h"
 
-CETECH_DECL_API(memory_api_v0);
-CETECH_DECL_API(resource_api_v0);
-CETECH_DECL_API(os_path_v0);
-CETECH_DECL_API(os_vio_api_v0);
-CETECH_DECL_API(hash_api_v0);
+CETECH_DECL_API(ct_memory_api_v0);
+CETECH_DECL_API(ct_resource_api_v0);
+CETECH_DECL_API(ct_path_v0);
+CETECH_DECL_API(ct_vio_api_v0);
+CETECH_DECL_API(ct_hash_api_v0);
 
 using namespace cetech;
 
@@ -45,8 +45,8 @@ namespace material_compiler {
 
         void _preprocess(const char *filename,
                          yaml_node_t root,
-                         struct compilator_api *capi) {
-            auto a = memory_api_v0.main_allocator();
+                         struct ct_compilator_api *capi) {
+            auto a = ct_memory_api_v0.main_allocator();
 
             yaml_node_t parent_node = yaml_get_node(root, "parent");
 
@@ -61,11 +61,11 @@ namespace material_compiler {
 
                 capi->add_dependency(filename, prefab_file);
 
-                const char *source_dir = resource_api_v0.compiler_get_source_dir();
-                char *full_path = os_path_v0.join(a, 2, source_dir,
+                const char *source_dir = ct_resource_api_v0.compiler_get_source_dir();
+                char *full_path = ct_path_v0.join(a, 2, source_dir,
                                                   prefab_file);
 
-                struct os_vio *prefab_vio = os_vio_api_v0.from_file(full_path,
+                struct ct_vio *prefab_vio = ct_vio_api_v0.from_file(full_path,
                                                                     VIO_OPEN_READ);
 
                 CETECH_FREE(a, full_path);
@@ -99,7 +99,7 @@ namespace material_compiler {
                            CETECH_ARRAY_LEN(uniform_name) - 1);
 
             yaml_as_string(value, tmp_buffer, CETECH_ARRAY_LEN(tmp_buffer));
-            uint64_t texture_name = hash_api_v0.id64_from_str(tmp_buffer);
+            uint64_t texture_name = ct_hash_api_v0.id64_from_str(tmp_buffer);
 
             array::push(output->uniform_names, uniform_name,
                         CETECH_ARRAY_LEN(uniform_name));
@@ -163,12 +163,12 @@ namespace material_compiler {
     }
 
     int compiler(const char *filename,
-                 struct os_vio *source_vio,
-                 struct os_vio *build_vio,
-                 struct compilator_api *compilator_api) {
+                 struct ct_vio *source_vio,
+                 struct ct_vio *build_vio,
+                 struct ct_compilator_api *compilator_api) {
 
         char *source_data =
-                CETECH_ALLOCATE(memory_api_v0.main_allocator(), char,
+                CETECH_ALLOCATE(ct_memory_api_v0.main_allocator(), char,
                                 source_vio->size(source_vio->inst) + 1);
         memset(source_data, 0, source_vio->size(source_vio->inst) + 1);
 
@@ -187,8 +187,8 @@ namespace material_compiler {
         yaml_as_string(shader_node, tmp_buffer, CETECH_ARRAY_LEN(tmp_buffer));
 
         struct material_compile_output output = {0};
-        output.uniform_names.init(memory_api_v0.main_allocator());
-        output.data.init(memory_api_v0.main_allocator());
+        output.uniform_names.init(ct_memory_api_v0.main_allocator());
+        output.data.init(ct_memory_api_v0.main_allocator());
 
         yaml_node_t textures = yaml_get_node(root, "textures");
         if (yaml_is_valid(textures)) {
@@ -211,7 +211,7 @@ namespace material_compiler {
         }
 
         material_blob::blob_t resource = {
-                .shader_name = hash_api_v0.id64_from_str(tmp_buffer),
+                .shader_name = ct_hash_api_v0.id64_from_str(tmp_buffer),
                 .texture_count =output.texture_count,
                 .vec4f_count = output.vec4f_count,
                 .uniforms_count = (uint32_t) (
@@ -227,18 +227,18 @@ namespace material_compiler {
         output.uniform_names.destroy();
         output.data.destroy();
 
-        CETECH_FREE(memory_api_v0.main_allocator(), source_data);
+        CETECH_FREE(ct_memory_api_v0.main_allocator(), source_data);
         return 1;
     }
 
-    int init(api_v0 *api) {
-        CETECH_GET_API(api, memory_api_v0);
-        CETECH_GET_API(api, resource_api_v0);
-        CETECH_GET_API(api, os_path_v0);
-        CETECH_GET_API(api, os_vio_api_v0);
-        CETECH_GET_API(api, hash_api_v0);
+    int init(ct_api_v0 *api) {
+        CETECH_GET_API(api, ct_memory_api_v0);
+        CETECH_GET_API(api, ct_resource_api_v0);
+        CETECH_GET_API(api, ct_path_v0);
+        CETECH_GET_API(api, ct_vio_api_v0);
+        CETECH_GET_API(api, ct_hash_api_v0);
 
-        resource_api_v0.compiler_register(hash_api_v0.id64_from_str("material"),
+        ct_resource_api_v0.compiler_register(ct_hash_api_v0.id64_from_str("material"),
                                           compiler);
 
         return 1;

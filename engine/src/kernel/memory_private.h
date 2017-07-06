@@ -5,13 +5,13 @@ namespace memory {
 
     void init(int scratch_buffer_size);
 
-    void register_api(struct api_v0 *api);
+    void register_api(struct ct_api_v0 *api);
 
     void memsys_shutdown();
 
-    struct allocator *memsys_main_allocator();
+    struct ct_allocator *memsys_main_allocator();
 
-    struct allocator *memsys_main_scratch_allocator();
+    struct ct_allocator *memsys_main_scratch_allocator();
 
 
     struct allocator_trace_entry {
@@ -37,23 +37,23 @@ namespace memory {
                                uint64_t max_entries);
 
 //==============================================================================
-// Malloc allocator
+// Malloc ct_allocator
 //==============================================================================
 
 
-    struct allocator *malloc_allocator_create();
+    struct ct_allocator *malloc_allocator_create();
 
-    void malloc_allocator_destroy(struct allocator *a);
+    void malloc_allocator_destroy(struct ct_allocator *a);
 
 
 //==============================================================================
-// Scratch allocator
+// Scratch ct_allocator
 //==============================================================================
 
-    struct allocator *scratch_allocator_create(struct allocator *backing,
+    struct ct_allocator *scratch_allocator_create(struct ct_allocator *backing,
                                                int size);
 
-    void scratch_allocator_destroy(struct allocator *a);
+    void scratch_allocator_destroy(struct ct_allocator *a);
 }
 
 static const void *pointer_align_forward(const void *p,
