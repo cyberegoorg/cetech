@@ -4,7 +4,6 @@
 #include <cetech/celib/quatf.inl>
 #include <cetech/celib/mat44f.inl>
 #include <cetech/kernel/memory.h>
-#include <cetech/kernel/module.h>
 #include <cetech/kernel/api_system.h>
 #include <cetech/celib/array.inl>
 #include <cetech/celib/map.inl>
@@ -139,14 +138,14 @@ int transform_has(ct_world world,
                   ct_entity entity);
 
 ct_transform transform_get(ct_world world,
-                          ct_entity entity);
+                           ct_entity entity);
 
 ct_transform transform_create(ct_world world,
-                             ct_entity entity,
-                             ct_entity parent,
-                             vec3f_t position,
-                             quatf_t rotation,
-                             vec3f_t scale);
+                              ct_entity entity,
+                              ct_entity parent,
+                              vec3f_t position,
+                              quatf_t rotation,
+                              vec3f_t scale);
 
 
 void transform_link(ct_world world,
@@ -178,7 +177,7 @@ static void _destroy_world(ct_world world) {
     ct_world last_world = _G.world_instances[last_idx].world;
 
     CETECH_FREE(ct_memory_a0.main_allocator(),
-                      _G.world_instances[idx].buffer);
+                _G.world_instances[idx].buffer);
 
     _G.world_instances[idx] = _G.world_instances[last_idx];
     map::set(_G.world_map, last_world.h, idx);
@@ -285,8 +284,8 @@ void _set_property(ct_world world,
 }
 
 ct_property_value _get_property(ct_world world,
-                                    ct_entity entity,
-                                    uint64_t key) {
+                                ct_entity entity,
+                                uint64_t key) {
     uint64_t position = ct_hash_a0.id64_from_str("position");
     uint64_t rotation = ct_hash_a0.id64_from_str("rotation");
     uint64_t scale = ct_hash_a0.id64_from_str("scale");
@@ -370,7 +369,7 @@ static void _init(ct_api_a0 *api) {
     );
 
     ct_component_a0.register_compiler(_G.type,
-                                       _transform_component_compiler, 10);
+                                      _transform_component_compiler, 10);
 }
 
 static void _shutdown() {
@@ -515,7 +514,7 @@ int transform_has(ct_world world,
 }
 
 ct_transform transform_get(ct_world world,
-                          ct_entity entity) {
+                           ct_entity entity) {
 
     uint32_t idx = hash_combine(world.h, entity.h);
 
@@ -525,11 +524,11 @@ ct_transform transform_get(ct_world world,
 }
 
 ct_transform transform_create(ct_world world,
-                             ct_entity entity,
-                             ct_entity parent,
-                             vec3f_t position,
-                             quatf_t rotation,
-                             vec3f_t scale) {
+                              ct_entity entity,
+                              ct_entity parent,
+                              vec3f_t position,
+                              quatf_t rotation,
+                              vec3f_t scale) {
 
     WorldInstance *data = _get_world_instance(world);
 

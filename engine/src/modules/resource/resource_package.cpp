@@ -10,7 +10,6 @@
 #include <cetech/kernel/hash.h>
 #include <cetech/kernel/os.h>
 #include <cetech/kernel/memory.h>
-#include <cetech/kernel/module.h>
 #include <cetech/kernel/api_system.h>
 #include <cetech/celib/array.inl>
 
@@ -120,16 +119,16 @@ int _package_compiler(const char *filename,
     build_vio->write(build_vio->inst, &resource, sizeof(resource), 1);
 
     build_vio->write(build_vio->inst, array::begin(compile_data.types),
-                        sizeof(uint64_t), array::size(compile_data.types));
+                     sizeof(uint64_t), array::size(compile_data.types));
 
     build_vio->write(build_vio->inst, array::begin(compile_data.name_count),
-                        sizeof(uint32_t), array::size(compile_data.name_count));
+                     sizeof(uint32_t), array::size(compile_data.name_count));
 
     build_vio->write(build_vio->inst, array::begin(compile_data.name),
-                        sizeof(uint64_t), array::size(compile_data.name));
+                     sizeof(uint64_t), array::size(compile_data.name));
 
     build_vio->write(build_vio->inst, array::begin(compile_data.offset),
-                        sizeof(uint32_t), array::size(compile_data.offset));
+                     sizeof(uint32_t), array::size(compile_data.offset));
 
     return 1;
 }
@@ -167,9 +166,9 @@ void package_task(void *data) {
     const uint32_t task_count = package->type_count;
     for (int j = 0; j < task_count; ++j) {
         ct_resource_a0.load_now(package_type(package)[j],
-                                 &package_name(package)[package_offset(
-                                         package)[j]],
-                                 package_name_count(package)[j]);
+                                &package_name(package)[package_offset(
+                                        package)[j]],
+                                package_name_count(package)[j]);
     }
 
     CETECH_FREE(ct_memory_a0.main_allocator(), task_data);
@@ -202,9 +201,9 @@ void package_unload(uint64_t name) {
     const uint32_t task_count = package->type_count;
     for (int j = 0; j < task_count; ++j) {
         ct_resource_a0.unload(package_type(package)[j],
-                               &package_name(package)[package_offset(
-                                       package)[j]],
-                               package_name_count(package)[j]);
+                              &package_name(package)[package_offset(
+                                      package)[j]],
+                              package_name_count(package)[j]);
     }
 }
 
@@ -221,9 +220,9 @@ int package_is_loaded(uint64_t name) {
 
     for (int i = 0; i < task_count; ++i) {
         if (!ct_resource_a0.can_get_all(package_type(package)[i],
-                                         &package_name(package)[package_offset(
-                                                 package)[i]],
-                                         package_name_count(package)[i])) {
+                                        &package_name(package)[package_offset(
+                                                package)[i]],
+                                        package_name_count(package)[i])) {
             return 0;
         }
     }

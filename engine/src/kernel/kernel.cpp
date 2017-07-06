@@ -1,6 +1,5 @@
 #include <cetech/celib/allocator.h>
 #include <cetech/kernel/api_system.h>
-#include <cetech/modules/application.h>
 #include <cetech/kernel/task.h>
 
 #include "log_system_private.h"
@@ -24,7 +23,7 @@ namespace os {
 
 void application_start();
 
-const char* _platform() {
+const char *_platform() {
 #if defined(CETECH_LINUX)
     return "linux";
 #elif defined(CETECH_WINDOWS)

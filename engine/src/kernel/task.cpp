@@ -7,7 +7,6 @@
 
 #include <cetech/kernel/develop.h>
 #include <cetech/kernel/config.h>
-#include <cetech/kernel/module.h>
 #include <cetech/kernel/log.h>
 #include <cetech/kernel/task.h>
 #include <cetech/kernel/api_system.h>
@@ -40,7 +39,9 @@ namespace taskmanager {
 
 struct task {
     void *data;
+
     void (*task_work)(void *data);
+
     const char *name;
     enum ct_task_affinity affinity;
 };
@@ -247,7 +248,7 @@ namespace taskmanager_module {
         const uint32_t worker_count = core_count - main_threads_count;
 
         ct_log_a0.info("task", "Core/Main/Worker: %d, %d, %d", core_count,
-                        main_threads_count, worker_count);
+                       main_threads_count, worker_count);
 
         _G._workers_count = worker_count;
 

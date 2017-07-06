@@ -5,8 +5,6 @@
 #include <include/SDL2/SDL.h>
 
 #include <cetech/kernel/os.h>
-#include <cetech/kernel/module.h>
-#include <cetech/celib/math_types.h>
 #include <cetech/celib/eventstream.inl>
 
 #include <cetech/kernel/api_system.h>
@@ -73,7 +71,7 @@ int _create_controler(int i) {
         _G.haptic[idx] = haptic;
 
         ct_log_a0.info("input.gamepad", "Gamepad %d has haptic support",
-                        i);
+                       i);
     } else {
         _G.haptic[idx] = NULL;
     }

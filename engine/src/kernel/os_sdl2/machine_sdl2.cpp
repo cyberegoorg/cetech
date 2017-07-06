@@ -3,7 +3,6 @@
 //==============================================================================
 
 #include <cetech/celib/eventstream.inl>
-#include <cetech/kernel/module.h>
 #include <cetech/kernel/memory.h>
 
 #include <cetech/kernel/config.h>
@@ -97,7 +96,7 @@ namespace machine_sdl {
 
     ct_event_header *machine_event_next(ct_event_header *header) {
         return (ct_event_header *) eventstream::next(_G.eventstream,
-                                                  (eventstream::event_header *) header);
+                                                     (eventstream::event_header *) header);
     }
 
     void _update() {
@@ -145,7 +144,7 @@ namespace machine_sdl {
 
         if (SDL_Init(SDL_INIT_EVERYTHING) != 0) {
             ct_log_a0.error(LOG_WHERE, "Could not init sdl - %s",
-                             SDL_GetError());
+                            SDL_GetError());
             return; // TODO: dksandasdnask FUCK init without return type?????
         }
 

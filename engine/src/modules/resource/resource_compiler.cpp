@@ -15,7 +15,6 @@
 #include <cetech/kernel/config.h>
 #include <cetech/modules/resource.h>
 #include <cetech/kernel/memory.h>
-#include <cetech/kernel/module.h>
 #include <cetech/kernel/log.h>
 #include <cetech/kernel/api_system.h>
 
@@ -102,8 +101,8 @@ static void _compile_task(void *data) {
     struct compile_task_data *tdata = (compile_task_data *) data;
 
     ct_log_a0.info("resource_compiler.task",
-                    "Compile resource \"%s\" to \"" "%" SDL_PRIX64 "%" SDL_PRIX64 "\"",
-                    tdata->source_filename, tdata->type, tdata->name);
+                   "Compile resource \"%s\" to \"" "%" SDL_PRIX64 "%" SDL_PRIX64 "\"",
+                   tdata->source_filename, tdata->type, tdata->name);
 
 
     if (tdata->compilator(tdata->source_filename, tdata->source, tdata->build,
@@ -112,15 +111,15 @@ static void _compile_task(void *data) {
         builddb_set_file_depend(tdata->source_filename, tdata->source_filename);
 
         ct_log_a0.info("resource_compiler.task",
-                        "Resource \"%s\" compiled", tdata->source_filename);
+                       "Resource \"%s\" compiled", tdata->source_filename);
     } else {
         ct_log_a0.error("resource_compiler.task",
-                         "Resource \"%s\" compilation fail",
-                         tdata->source_filename);
+                        "Resource \"%s\" compilation fail",
+                        tdata->source_filename);
     }
 
     CETECH_FREE(ct_memory_a0.main_scratch_allocator(),
-                      tdata->source_filename);
+                tdata->source_filename);
 
     tdata->source->close(tdata->source->inst);
     tdata->build->close(tdata->build->inst);
@@ -195,7 +194,7 @@ void _compile_dir(Array<ct_task_item> &tasks,
         char *build_path = ct_path_a0.join(a, 2, build_dir_full, build_name);
 
         ct_vio *build_vio = ct_vio_a0.from_file(build_path,
-                                                           VIO_OPEN_WRITE);
+                                                VIO_OPEN_WRITE);
 
         CETECH_FREE(a, build_path);
 
@@ -206,7 +205,8 @@ void _compile_dir(Array<ct_task_item> &tasks,
         struct compile_task_data *data =
                 CETECH_ALLOCATE(
                         ct_memory_a0.main_allocator(),
-                        struct compile_task_data, sizeof(struct compile_task_data));
+                        struct compile_task_data,
+                        sizeof(struct compile_task_data));
 
         *data = (struct compile_task_data) {
                 .name = name_id,
@@ -215,7 +215,7 @@ void _compile_dir(Array<ct_task_item> &tasks,
                 .source = source_vio,
                 .compilator = compilator,
                 .source_filename = ct_memory_a0.str_dup(source_filename_short,
-                                                         ct_memory_a0.main_scratch_allocator()),
+                                                        ct_memory_a0.main_scratch_allocator()),
                 .mtime = ct_path_a0.file_mtime(source_filename_full),
                 .completed = 0
         };
@@ -342,8 +342,8 @@ int resource_compiler_get_filename(char *filename,
                                    uint64_t name) {
     char build_name[33] = {0};
     ct_resource_a0.type_name_string(build_name, CETECH_ARRAY_LEN(build_name),
-                                     type,
-                                     name);
+                                    type,
+                                    name);
     return builddb_get_filename_by_hash(filename, max_ken, build_name);
 }
 

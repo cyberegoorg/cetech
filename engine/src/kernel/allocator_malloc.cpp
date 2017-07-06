@@ -72,7 +72,8 @@ namespace memory {
     ct_allocator *malloc_allocator_create() {
         auto *core_alloc = core_allocator::get();
 
-        auto *a = CETECH_ALLOCATE(core_alloc, ct_allocator, sizeof(ct_allocator));
+        auto *a = CETECH_ALLOCATE(core_alloc, ct_allocator,
+                                  sizeof(ct_allocator));
 
         struct allocator_malloc *m = CETECH_ALLOCATE(core_alloc,
                                                      allocator_malloc,

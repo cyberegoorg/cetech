@@ -12,14 +12,12 @@
 #include <cetech/kernel/log.h>
 #include <cetech/celib/carray.inl>
 
-#include "../memory_private.h"
-
 #include "../allocator_core_private.h"
 
 #endif
 
 char *stacktrace(int skip) {
-    auto* a = core_allocator::get();
+    auto *a = core_allocator::get();
 
 #if defined(CETECH_LINUX)
     char *return_str = CETECH_ALLOCATE(a, char, 4096);
@@ -73,7 +71,7 @@ char *stacktrace(int skip) {
 }
 
 void stacktrace_free(char *st) {
-    auto* a = core_allocator::get();
+    auto *a = core_allocator::get();
     CETECH_FREE(a, st);
 }
 
@@ -85,11 +83,11 @@ void ct_error_assert(const char *where,
                      int line) {
     char *st = stacktrace(1);
     ct_log_a0.error(where,
-                     "msg: \"%s\n  file: %s:%d\n  stacktrace:\n%s",
-                     condition,
-                     filename,
-                     line,
-                     st);
+                    "msg: \"%s\n  file: %s:%d\n  stacktrace:\n%s",
+                    condition,
+                    filename,
+                    line,
+                    st);
     stacktrace_free(st);
     abort();
 }

@@ -3,7 +3,6 @@
 #include <cetech/celib/array.inl>
 
 #include <cetech/kernel/api_system.h>
-#include <cetech/kernel/module.h>
 #include <cetech/modules/blob.h>
 
 
@@ -35,7 +34,7 @@ namespace blob {
                                       allocator);
 
         ct_blob *blob = CETECH_NEW(allocator,
-                                      ct_blob);
+                                   ct_blob);
         blob->inst = inst;
         blob->push = push;
         blob->size = size;

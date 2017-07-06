@@ -8,6 +8,7 @@
 //==============================================================================
 
 typedef void (*ct_load_module_t)(struct ct_api_a0 *api);
+
 typedef void (*ct_unload_module_t)(struct ct_api_a0 *api);
 
 

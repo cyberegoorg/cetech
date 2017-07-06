@@ -82,7 +82,7 @@ namespace cetech {
 
     template<typename T>
     Handler<T>::Handler(ct_allocator *allocator) : _generation(allocator),
-                                                _freeIdx(allocator) {
+                                                   _freeIdx(allocator) {
     }
 
     template<typename T>

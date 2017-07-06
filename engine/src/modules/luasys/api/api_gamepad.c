@@ -1,7 +1,6 @@
 
 #include <cetech/celib/allocator.h>
 #include <cetech/celib/math_types.h>
-#include <cetech/kernel/module.h>
 
 #include <cetech/modules/luasys.h>
 #include <cetech/modules/input.h>

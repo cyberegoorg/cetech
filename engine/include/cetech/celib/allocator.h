@@ -57,7 +57,7 @@ enum {
 
 typedef void allocator_instance;
 
-struct ct_allocator{
+struct ct_allocator {
     allocator_instance *inst;
 
     void *(*reallocate)(allocator_instance *a,

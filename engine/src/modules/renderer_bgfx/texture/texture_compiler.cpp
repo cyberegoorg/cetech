@@ -9,7 +9,6 @@
 #include <cetech/kernel/hash.h>
 #include <cetech/kernel/memory.h>
 #include <cetech/modules/application.h>
-#include <cetech/kernel/module.h>
 #include <cetech/kernel/api_system.h>
 #include <cetech/kernel/log.h>
 #include <cetech/kernel/os.h>
@@ -121,7 +120,7 @@ namespace texture_compiler {
 
 
         char *tmp_dir = ct_resource_a0.compiler_get_tmp_dir(a,
-                                                             ct_app_a0.platform());
+                                                            ct_app_a0.platform());
 
         yaml_as_string(input, input_str, CETECH_ARRAY_LEN(input_str));
 
@@ -138,7 +137,7 @@ namespace texture_compiler {
         }
 
         ct_vio *tmp_file = ct_vio_a0.from_file(output_path,
-                                                          VIO_OPEN_READ);
+                                               VIO_OPEN_READ);
         char *tmp_data =
                 CETECH_ALLOCATE(ct_memory_a0.main_allocator(), char,
                                 tmp_file->size(tmp_file->inst) + 1);
@@ -175,7 +174,7 @@ namespace texture_compiler {
         CETECH_GET_API(api, ct_hash_a0);
 
         ct_resource_a0.compiler_register(ct_hash_a0.id64_from_str("texture"),
-                                          compiler);
+                                         compiler);
 
         return 1;
     }

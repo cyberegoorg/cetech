@@ -2,7 +2,6 @@
 
 #include <cetech/celib/allocator.h>
 #include <cetech/kernel/errors.h>
-#include <cetech/kernel/module.h>
 #include <cetech/kernel/memory.h>
 #include <cetech/kernel/api_system.h>
 #include <cetech/kernel/log.h>
@@ -64,8 +63,8 @@ namespace memory {
             }
 
             ct_log_a0.error(ALLOCATOR_WHERE,
-                             "memory_leak: %p\n  stacktrace:\n%s\n",
-                             entries[i].ptr, entries[i].stacktrace);
+                            "memory_leak: %p\n  stacktrace:\n%s\n",
+                            entries[i].ptr, entries[i].stacktrace);
 
             //allocator_free(ct_allocator, entries[i].ptr); // TODO: need this?
 

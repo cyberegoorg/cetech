@@ -1,5 +1,4 @@
 #include <cetech/kernel/api_system.h>
-#include <cetech/kernel/module.h>
 #include <cetech/kernel/os.h>
 #include <cetech/kernel/log.h>
 
@@ -13,6 +12,7 @@ CETECH_DECL_API(ct_log_a0);
 
 namespace machine_sdl {
     void init(ct_api_a0 *api);
+
     void shutdown();
 }
 
@@ -43,7 +43,6 @@ static ct_window_a0 window_api = {
 static ct_cpu_a0 cpu_api = {
         .count = cpu_count
 };
-
 
 
 static ct_time_a0 time_api = {

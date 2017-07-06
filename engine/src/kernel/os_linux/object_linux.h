@@ -3,7 +3,7 @@
 #include <cetech/kernel/errors.h>
 
 void *load_object(const char *path) {
-    void *obj = dlopen(path, RTLD_NOW|RTLD_LOCAL);
+    void *obj = dlopen(path, RTLD_NOW | RTLD_LOCAL);
 
     CETECH_ASSERT("os_object", obj != NULL);
 

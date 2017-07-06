@@ -8,8 +8,6 @@
 #include <cetech/kernel/config.h>
 #include <cetech/modules/resource.h>
 
-#include <cetech/kernel/module.h>
-
 
 #include <cetech/modules/entity.h>
 
@@ -88,7 +86,7 @@ namespace component {
                void *data) {
 
         ct_component_clb clb = map::get(_G.component_clb, type,
-                                            ct_component_clb_null);
+                                        ct_component_clb_null);
 
         if (!clb.spawner) {
             return;
@@ -117,7 +115,7 @@ namespace component {
                       ct_property_value value) {
 
         ct_component_clb clb = map::get(_G.component_clb,
-                                            type, ct_component_clb_null);
+                                        type, ct_component_clb_null);
 
         if (!clb.set_property) {
             return;
@@ -127,14 +125,14 @@ namespace component {
     }
 
     ct_property_value get_property(uint64_t type,
-                                ct_world world,
-                                ct_entity entity,
-                                uint64_t key) {
+                                   ct_world world,
+                                   ct_entity entity,
+                                   uint64_t key) {
 
         ct_property_value value = {PROPERTY_INVALID};
 
         ct_component_clb clb = map::get(_G.component_clb,
-                                            type, ct_component_clb_null);
+                                        type, ct_component_clb_null);
 
         if (!clb.get_property) {
             return (ct_property_value) {PROPERTY_INVALID};

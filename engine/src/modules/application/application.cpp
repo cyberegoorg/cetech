@@ -22,7 +22,6 @@
 #include <cetech/kernel/console_server.h>
 
 #include "../../kernel/api_private.h"
-#include "../../kernel/module_private.h"
 #include "../../kernel/log_system_private.h"
 
 
@@ -141,20 +140,20 @@ void _init_api(struct ct_api_a0 *api) {
 void _init_config() {
     _G.config = (struct GConfig) {
             .boot_pkg = ct_config_a0.new_str("core.boot_pkg", "Boot package",
-                                              "boot"),
+                                             "boot"),
 
             .boot_script = ct_config_a0.new_str("core.boot_script",
-                                                 "Boot script", "lua/boot"),
+                                                "Boot script", "lua/boot"),
 
             .screen_x = ct_config_a0.new_int("screen.x", "Screen width", 1024),
             .screen_y = ct_config_a0.new_int("screen.y", "Screen height", 768),
             .fullscreen = ct_config_a0.new_int("screen.fullscreen",
-                                                "Fullscreen", 0),
+                                               "Fullscreen", 0),
 
             .daemon = ct_config_a0.new_int("daemon", "Daemon mode", 0),
             .compile = ct_config_a0.new_int("compile", "Comple", 0),
             .continue_ = ct_config_a0.new_int("continue",
-                                               "Continue after compile", 0),
+                                              "Continue after compile", 0),
             .wait = ct_config_a0.new_int("wait", "Wait for client", 0),
             .wid = ct_config_a0.new_int("wid", "Wid", 0)
     };

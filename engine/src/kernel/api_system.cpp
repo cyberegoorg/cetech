@@ -5,7 +5,6 @@
 #include <cetech/celib/map.inl>
 
 #include <cetech/kernel/hash.h>
-#include <cetech/kernel/module.h>
 #include <cetech/kernel/api_system.h>
 #include <cetech/kernel/config.h>
 

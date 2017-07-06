@@ -113,7 +113,7 @@ struct ct_transform_a0 {
     //! \param entity Entity
     //! \return Transformation
     struct ct_transform (*get)(struct ct_world world,
-                       struct ct_entity entity);
+                               struct ct_entity entity);
 
     //! Create transforms
     //! \param world World
@@ -124,11 +124,11 @@ struct ct_transform_a0 {
     //! \param count transform count
     //! \return Root scene transform
     struct ct_transform (*create)(struct ct_world world,
-                          struct ct_entity entity,
-                          struct ct_entity parent,
-                          vec3f_t position,
-                          quatf_t rotation,
-                          vec3f_t scale);
+                                  struct ct_entity entity,
+                                  struct ct_entity parent,
+                                  vec3f_t position,
+                                  quatf_t rotation,
+                                  vec3f_t scale);
 
     //! Link two transform
     //! \param world World

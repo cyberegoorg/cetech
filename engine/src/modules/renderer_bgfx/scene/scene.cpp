@@ -7,7 +7,6 @@
 
 #include <cetech/kernel/hash.h>
 #include <cetech/kernel/memory.h>
-#include <cetech/kernel/module.h>
 #include <cetech/kernel/api_system.h>
 #include <cetech/kernel/os.h>
 
@@ -262,11 +261,11 @@ namespace scene {
         mat44f_t *node_pose = scene_blob::node_pose(res);
 
         ct_scenegprah_a0.create(world,
-                                 entity,
-                                 node_name,
-                                 node_parent,
-                                 node_pose,
-                                 res->node_count);
+                                entity,
+                                node_name,
+                                node_parent,
+                                node_pose,
+                                res->node_count);
     }
 
     uint64_t get_mesh_node(uint64_t scene,

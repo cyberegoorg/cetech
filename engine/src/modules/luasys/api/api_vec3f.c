@@ -4,8 +4,6 @@
 #include <cetech/celib/vec3f.inl>
 #include <cetech/kernel/api_system.h>
 
-#include <cetech/modules/luasys.h>
-
 #define API_NAME "Vec3f"
 
 static int _ctor(lua_State *l) {

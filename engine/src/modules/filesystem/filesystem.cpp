@@ -9,7 +9,6 @@
 #include <cetech/kernel/config.h>
 #include <cetech/kernel/log.h>
 #include <cetech/modules/resource.h>
-#include <cetech/modules/resource.h>
 
 #include <cetech/kernel/api_system.h>
 #include <cetech/celib/map.inl>
@@ -51,7 +50,7 @@ namespace filesystem {
                       const char *base_path) {
         map::set(_G.root_map, root,
                  ct_memory_a0.str_dup(base_path,
-                                       ct_memory_a0.main_allocator()));
+                                      ct_memory_a0.main_allocator()));
     }
 
     const char *get_root_dir(uint64_t root) {
@@ -67,14 +66,14 @@ namespace filesystem {
     }
 
     ct_vio *open(uint64_t root,
-                        const char *path,
-                        ct_fs_open_mode mode) {
+                 const char *path,
+                 ct_fs_open_mode mode) {
         auto a = ct_memory_a0.main_allocator();
 
         char *full_path = get_fullpath(root, a, path);
 
         ct_vio *file = ct_vio_a0.from_file(full_path,
-                                                      (ct_vio_open_mode) mode);
+                                           (ct_vio_open_mode) mode);
 
         if (!file) {
             ct_log_a0.error(LOG_WHERE, "Could not load file %s", full_path);

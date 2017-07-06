@@ -7,10 +7,8 @@
 #include <cetech/celib/allocator.h>
 
 #include <cetech/kernel/yaml.h>
-#include <cetech/modules/application.h>
 #include <cetech/kernel/memory.h>
 #include <cetech/kernel/config.h>
-#include <cetech/kernel/module.h>
 #include <cetech/kernel/log.h>
 #include <cetech/kernel/hash.h>
 #include <cetech/kernel/os.h>
@@ -111,7 +109,7 @@ namespace config {
 
 #ifdef CETECH_CAN_COMPILE
 
-    void compile_global(const char * platform) {
+    void compile_global(const char *platform) {
         ct_allocator *a = ct_memory_a0.main_allocator();
 
         ct_cvar bd = find("build");
@@ -131,16 +129,17 @@ namespace config {
                                             "global.config");
 
         ct_vio *source_vio = ct_vio_a0.from_file(source_path,
-                                                            VIO_OPEN_READ);
+                                                 VIO_OPEN_READ);
 
-        char *data = CETECH_ALLOCATE(a, char, source_vio->size(source_vio->inst));
+        char *data = CETECH_ALLOCATE(a, char,
+                                     source_vio->size(source_vio->inst));
 
         size_t size = (size_t) source_vio->size(source_vio->inst);
         source_vio->read(source_vio->inst, data, sizeof(char), size);
         source_vio->close(source_vio->inst);
 
         ct_vio *build_vio = ct_vio_a0.from_file(build_path,
-                                                           VIO_OPEN_WRITE);
+                                                VIO_OPEN_WRITE);
         build_vio->write(build_vio->inst, data, sizeof(char), size);
         build_vio->close(build_vio->inst);
 
@@ -241,11 +240,13 @@ namespace config {
                                             "global.config");
 
         ct_vio *source_vio = ct_vio_a0.from_file(config_path,
-                                                            VIO_OPEN_READ);
+                                                 VIO_OPEN_READ);
 
-        char *data = CETECH_ALLOCATE(a, char, source_vio->size(source_vio->inst));
+        char *data = CETECH_ALLOCATE(a, char,
+                                     source_vio->size(source_vio->inst));
 
-        source_vio->read(source_vio->inst, data, source_vio->size(source_vio->inst),
+        source_vio->read(source_vio->inst, data,
+                         source_vio->size(source_vio->inst),
                          source_vio->size(source_vio->inst));
         source_vio->close(source_vio->inst);
 
@@ -293,7 +294,7 @@ namespace config {
 
                 default:
                     ct_log_a0.error(LOG_WHERE, "Invalid type for cvar \"%s\"",
-                                     name);
+                                    name);
                     break;
             }
 
@@ -342,7 +343,7 @@ namespace config {
     }
 
     ct_cvar find_or_create(const char *name,
-                          int *_new) {
+                           int *_new) {
         if (_new) *_new = 0;
 
         for (uint64_t i = 1; i < MAX_VARIABLES; ++i) {
@@ -370,8 +371,8 @@ namespace config {
     }
 
     ct_cvar new_float(const char *name,
-                     const char *desc,
-                     float f) {
+                      const char *desc,
+                      float f) {
         int _new;
         ct_cvar find = find_or_create(name, &_new);
 
@@ -387,8 +388,8 @@ namespace config {
     }
 
     ct_cvar new_int(const char *name,
-                   const char *desc,
-                   int i) {
+                    const char *desc,
+                    int i) {
         int _new;
         ct_cvar find = find_or_create(name, &_new);
 
@@ -404,8 +405,8 @@ namespace config {
     }
 
     ct_cvar new_str(const char *name,
-                   const char *desc,
-                   const char *s) {
+                    const char *desc,
+                    const char *s) {
         int _new;
         ct_cvar find = find_or_create(name, &_new);
 
@@ -413,7 +414,7 @@ namespace config {
             str_set(_G.name[find.idx], name);
             _G.types[find.idx] = CV_STRING;
             _G.values[find.idx].s = ct_memory_a0.str_dup(s,
-                                                          ct_memory_a0.main_allocator());
+                                                         ct_memory_a0.main_allocator());
         }
 
         str_set(_G.desc[find.idx], desc);
@@ -456,7 +457,7 @@ namespace config {
         }
 
         _G.values[var.idx].s = ct_memory_a0.str_dup(s,
-                                                     ct_memory_a0.main_allocator());
+                                                    ct_memory_a0.main_allocator());
     }
 
     void log_all() {

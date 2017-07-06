@@ -8,7 +8,6 @@
 #include <cetech/celib/map.inl>
 
 #include <cetech/kernel/api_system.h>
-#include <cetech/kernel/module.h>
 #include <cetech/kernel/memory.h>
 #include <cetech/kernel/yaml.h>
 #include <cetech/kernel/hash.h>
@@ -147,7 +146,7 @@ namespace entity_resource_compiler {
             char *full_path = ct_path_a0.join(a, 2, source_dir, prefab_file);
 
             ct_vio *prefab_vio = ct_vio_a0.from_file(full_path,
-                                                                VIO_OPEN_READ);
+                                                     VIO_OPEN_READ);
 
             char prefab_data[prefab_vio->size(prefab_vio->inst) + 1];
             memset(prefab_data, 0, prefab_vio->size(prefab_vio->inst) + 1);
@@ -287,7 +286,7 @@ namespace entity_resource_compiler {
 
         ct_entity_compile_output *output = CETECH_ALLOCATE(a,
                                                            ct_entity_compile_output,
-                                                        sizeof(ct_entity_compile_output));
+                                                           sizeof(ct_entity_compile_output));
 
         output->ent_counter = 0;
 
@@ -431,8 +430,8 @@ namespace entity_resource_compiler {
         compiler(root, filename, entity_data, compilator_api);
 
         build_vio->write(build_vio->inst, entity_data->data(entity_data->inst),
-                            sizeof(uint8_t),
-                            entity_data->size(entity_data->inst));
+                         sizeof(uint8_t),
+                         entity_data->size(entity_data->inst));
 
 
         ct_blob_a0.destroy(entity_data);
@@ -515,7 +514,8 @@ namespace entity {
         struct entity_resource *res = (entity_resource *) resource;
 
         ct_entity *spawned = CETECH_ALLOCATE(ct_memory_a0.main_allocator(),
-                                            ct_entity, sizeof(ct_entity) * res->ent_count);
+                                             ct_entity, sizeof(ct_entity) *
+                                                        res->ent_count);
 
         for (int j = 0; j < res->ent_count; ++j) {
             spawned[j] = create();
@@ -534,8 +534,8 @@ namespace entity {
             char *c_data = component_data_data(comp_data);
 
             ct_component_a0.spawn(world, type, &spawned[0],
-                                   c_ent, parents, comp_data->ent_count,
-                                   c_data);
+                                  c_ent, parents, comp_data->ent_count,
+                                  c_data);
 
             comp_data = (struct component_data *) (c_data + comp_data->size);
         }
@@ -545,7 +545,7 @@ namespace entity {
     }
 
     ct_entity spawn(ct_world world,
-                   uint64_t name) {
+                    uint64_t name) {
         void *res = ct_resource_a0.get(_G.type, name);
 
         if (res == NULL) {
@@ -620,7 +620,7 @@ namespace entity_module {
 
 #ifdef CETECH_CAN_COMPILE
         ct_resource_a0.compiler_register(_G.type,
-                                          entity_resource_compiler::_entity_resource_compiler);
+                                         entity_resource_compiler::_entity_resource_compiler);
 #endif
 
 

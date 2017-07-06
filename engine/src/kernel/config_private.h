@@ -8,9 +8,9 @@ namespace config {
 
     void shutdown();
 
-    void compile_global(const char* platform);
+    void compile_global(const char *platform);
 
-    void load_global(const char* platform);
+    void load_global(const char *platform);
 
     int parse_args(int argc,
                    const char **argv);
@@ -18,19 +18,19 @@ namespace config {
     struct ct_cvar find(const char *name);
 
     struct ct_cvar find_or_create(const char *name,
-                          int *new_);
+                                  int *new_);
 
     struct ct_cvar new_float(const char *name,
-                     const char *desc,
-                     float f);
+                             const char *desc,
+                             float f);
 
     struct ct_cvar new_int(const char *name,
-                   const char *desc,
-                   int i);
+                           const char *desc,
+                           int i);
 
     struct ct_cvar new_str(const char *name,
-                   const char *desc,
-                   const char *s);
+                           const char *desc,
+                           const char *s);
 
     float get_float(struct ct_cvar var);
 

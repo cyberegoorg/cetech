@@ -33,7 +33,7 @@ namespace core_allocator {
     }
 
     ct_core_allocator_a0 core_allocator_api = {
-        .get_allocator = core_allocator::get
+            .get_allocator = core_allocator::get
     };
 
     void register_api(ct_api_a0 *api) {

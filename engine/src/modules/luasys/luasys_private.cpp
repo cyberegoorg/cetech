@@ -16,7 +16,6 @@ extern "C" {
 #include <cetech/kernel/os.h>
 #include <cetech/kernel/config.h>
 #include <cetech/kernel/hash.h>
-#include <cetech/kernel/module.h>
 #include <cetech/modules/application.h>
 #include <cetech/kernel/log.h>
 
@@ -84,7 +83,7 @@ static int require(lua_State *L) {
     uint64_t name_hash = ct_hash_a0.id64_from_str(name);
 
     lua_resource *resource = (lua_resource *) ct_resource_a0.get(_G.type_id,
-                                                                  name_hash);
+                                                                 name_hash);
 
     if (resource == NULL) {
         return 0;
@@ -368,8 +367,9 @@ int _lua_compiler(const char *filename,
                 .size = (uint32_t) bc_len,
         };
 
-        build_vio->write(build_vio->inst, &resource, sizeof(struct lua_resource),
-                            1);
+        build_vio->write(build_vio->inst, &resource,
+                         sizeof(struct lua_resource),
+                         1);
         build_vio->write(build_vio->inst, bc, sizeof(char), bc_len);
     }
 

@@ -4,7 +4,6 @@
 
 #include <cetech/celib/allocator.h>
 #include <cetech/kernel/config.h>
-#include <cetech/kernel/module.h>
 #include <cetech/celib/eventstream.inl>
 #include <cetech/modules/input.h>
 #include <cetech/kernel/os.h>

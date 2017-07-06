@@ -6,7 +6,6 @@
 #include <cetech/kernel/hash.h>
 #include <cetech/kernel/config.h>
 #include <cetech/kernel/memory.h>
-#include <cetech/kernel/module.h>
 #include <cetech/kernel/api_system.h>
 
 #include <cetech/modules/resource.h>
@@ -88,7 +87,8 @@ namespace {
         memcpy(new_data.scene, _data.scene, _data.n * sizeof(uint64_t));
         memcpy(new_data.mesh, _data.mesh, _data.n * sizeof(uint64_t));
         memcpy(new_data.node, _data.node, _data.n * sizeof(uint64_t));
-        memcpy(new_data.material, _data.material, _data.n * sizeof(ct_material));
+        memcpy(new_data.material, _data.material,
+               _data.n * sizeof(ct_material));
 
         CETECH_FREE(_allocator, _data.buffer);
 
@@ -148,7 +148,7 @@ namespace {
         ct_world last_world = _G.world_instances[last_idx].world;
 
         CETECH_FREE(ct_memory_a0.main_allocator(),
-                          _G.world_instances[idx].buffer);
+                    _G.world_instances[idx].buffer);
 
         _G.world_instances[idx] = _G.world_instances[last_idx];
         map::set(_G.world_map, last_world.h, idx);
@@ -222,11 +222,11 @@ namespace {
 
         for (int i = 0; i < ent_count; ++i) {
             ct_mesh_renderer_a0.create(world,
-                                        ents[cents[i]],
-                                        tdata[i].scene,
-                                        tdata[i].mesh,
-                                        tdata[i].node,
-                                        tdata[i].material);
+                                       ents[cents[i]],
+                                       tdata[i].scene,
+                                       tdata[i].mesh,
+                                       tdata[i].node,
+                                       tdata[i].material);
         }
     }
 }
@@ -244,7 +244,7 @@ int mesh_has(ct_world world,
 }
 
 ct_mesh_renderer mesh_get(ct_world world,
-                         ct_entity entity) {
+                          ct_entity entity) {
 
     uint32_t idx = hash_combine(world.h, entity.h);
 
@@ -254,11 +254,11 @@ ct_mesh_renderer mesh_get(ct_world world,
 }
 
 ct_mesh_renderer mesh_create(ct_world world,
-                            ct_entity entity,
-                            uint64_t scene,
-                            uint64_t mesh,
-                            uint64_t node,
-                            uint64_t material) {
+                             ct_entity entity,
+                             uint64_t scene,
+                             uint64_t mesh,
+                             uint64_t node,
+                             uint64_t material) {
 
     WorldInstance *data = _get_world_instance(world);
 
@@ -325,7 +325,7 @@ void mesh_render_all(ct_world world) {
 }
 
 ct_material mesh_get_material(ct_world world,
-                             ct_mesh_renderer mesh) {
+                              ct_mesh_renderer mesh) {
     WorldInstance *data = _get_world_instance(world);
     return data->material[mesh.idx];
 
@@ -360,8 +360,8 @@ static void _set_property(ct_world world,
 }
 
 static ct_property_value _get_property(ct_world world,
-                                           ct_entity entity,
-                                           uint64_t key) {
+                                       ct_entity entity,
+                                       uint64_t key) {
     uint64_t scene = ct_hash_a0.id64_from_str("scene");
     uint64_t mesh = ct_hash_a0.id64_from_str("mesh");
     uint64_t node = ct_hash_a0.id64_from_str("node");

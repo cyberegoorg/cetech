@@ -2,7 +2,6 @@
 #include <cetech/celib/allocator.h>
 
 #include <cetech/modules/entity.h>
-#include <cetech/kernel/module.h>
 #include <cetech/modules/luasys.h>
 #include <cetech/kernel/api_system.h>
 #include "../luasys_private.h"

@@ -36,7 +36,7 @@ struct ct_level_a0 {
     //! \param name Resource name
     //! \return New level
     struct ct_level (*load_level)(struct ct_world world,
-                          uint64_t name);
+                                  uint64_t name);
 
     //! Destroy level
     //! \param world World
@@ -49,7 +49,7 @@ struct ct_level_a0 {
     //! \param name Name
     //! \return Entity
     struct ct_entity (*entity_by_id)(struct ct_level level,
-                             uint64_t name);
+                                     uint64_t name);
 
     //! Get level entity
     //! \param level Level

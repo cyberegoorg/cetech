@@ -8,7 +8,6 @@
 #include <cetech/kernel/hash.h>
 #include <cetech/kernel/memory.h>
 #include <cetech/modules/application.h>
-#include <cetech/kernel/module.h>
 #include <cetech/kernel/api_system.h>
 #include <cetech/kernel/log.h>
 #include <cetech/kernel/os.h>
@@ -150,7 +149,7 @@ namespace texture {
 #endif
 
         ct_resource_a0.register_type(_G.type,
-                                      texture_resource::texture_resource_callback);
+                                     texture_resource::texture_resource_callback);
 
         return 1;
     }

@@ -51,7 +51,7 @@ ct_window_t *window_new(const char *title,
 
     if (w == NULL) {
         ct_log_a0.error("sys", "Could not create window: %s",
-                         SDL_GetError());
+                        SDL_GetError());
     }
 
     return (ct_window_t *) w;
@@ -62,7 +62,7 @@ ct_window_t *window_new_from(void *hndl) {
 
     if (w == NULL) {
         ct_log_a0.error("sys", "Could not create window: %s",
-                         SDL_GetError());
+                        SDL_GetError());
     }
 
     return (ct_window_t *) w;

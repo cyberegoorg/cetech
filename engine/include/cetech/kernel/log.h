@@ -55,11 +55,11 @@ void ct_nano_log_handler(enum ct_log_level level,
 
 //! Log handler callback
 typedef void (*ct_log_handler_t)(enum ct_log_level level,
-                              time_t time,
-                              char worker_id,
-                              const char *where,
-                              const char *msg,
-                              void *data);
+                                 time_t time,
+                                 char worker_id,
+                                 const char *where,
+                                 const char *msg,
+                                 void *data);
 
 //! Worker id callback
 typedef char (*ct_log_get_wid_clb_t)();

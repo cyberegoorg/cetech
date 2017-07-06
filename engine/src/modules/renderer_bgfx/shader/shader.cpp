@@ -10,7 +10,6 @@
 
 #include <cetech/modules/application.h>
 #include <cetech/kernel/memory.h>
-#include <cetech/kernel/module.h>
 #include <cetech/kernel/api_system.h>
 #include <cetech/kernel/log.h>
 
@@ -150,7 +149,7 @@ namespace shader {
         _G.handler_map.init(ct_memory_a0.main_allocator());
 
         ct_resource_a0.register_type(_G.type,
-                                      shader_resource::callback);
+                                     shader_resource::callback);
 #ifdef CETECH_CAN_COMPILE
         shader_compiler::init(api);
 #endif

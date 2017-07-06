@@ -6,7 +6,6 @@
 #include <cetech/kernel/config.h>
 #include <cetech/modules/resource.h>
 #include <cetech/kernel/memory.h>
-#include <cetech/kernel/module.h>
 #include <cetech/kernel/api_system.h>
 
 #include <cetech/modules/entity.h>
@@ -115,7 +114,7 @@ namespace {
         ct_world last_world = _G.world_instances[last_idx].world;
 
         CETECH_FREE(ct_memory_a0.main_allocator(),
-                          _G.world_instances[idx].buffer);
+                    _G.world_instances[idx].buffer);
 
         _G.world_instances[idx] = _G.world_instances[last_idx];
         map::set(_G.world_map, last_world.h, idx);
@@ -182,7 +181,7 @@ namespace camera {
     }
 
     ct_camera get(ct_world world,
-                 ct_entity entity) {
+                  ct_entity entity) {
 
         uint32_t idx = world.h ^entity.h;
 
@@ -192,10 +191,10 @@ namespace camera {
     }
 
     ct_camera create(ct_world world,
-                    ct_entity entity,
-                    float near,
-                    float far,
-                    float fov) {
+                     ct_entity entity,
+                     float near,
+                     float far,
+                     float fov) {
 
         WorldInstance *data = _get_world_instance(world);
 
@@ -277,8 +276,8 @@ namespace camera_module {
         _G.type = ct_hash_a0.id64_from_str("camera");
 
         ct_component_a0.register_compiler(_G.type,
-                                           _camera_component_compiler,
-                                           10);
+                                          _camera_component_compiler,
+                                          10);
 
         ct_component_a0.register_type(_G.type, {
                 .spawner=_spawner,

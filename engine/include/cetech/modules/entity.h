@@ -49,7 +49,7 @@ struct ct_world {
 //! \param body Component body yaml
 //! \param data Compiled compoent data
 typedef int (*ct_component_compiler_t)(yaml_node_t body,
-                                    struct ct_blob *data);
+                                       struct ct_blob *data);
 
 //! On world create callback
 //! \param world World
@@ -63,7 +63,7 @@ typedef void (*ct_world_on_destroy_t)(struct ct_world world);
 //! \param world World
 //! \param dt Delta time
 typedef void (*ct_world_on_update_t)(struct ct_world world,
-                                  float dt);
+                                     float dt);
 
 //==============================================================================
 // Structs
@@ -128,8 +128,8 @@ static struct ct_component_clb {
                          struct ct_property_value value);
 
     struct ct_property_value (*get_property)(struct ct_world world,
-                                          struct ct_entity entity,
-                                          uint64_t key);
+                                             struct ct_entity entity,
+                                             uint64_t key);
 
     ct_world_on_created_t on_world_create;  //!< On world create
     ct_world_on_destroy_t on_world_destroy; //!< On world destroy
@@ -174,7 +174,7 @@ struct ct_entity_a0 {
     //! \param name Resource name
     //! \return New entity
     struct ct_entity (*spawn)(struct ct_world world,
-                      uint64_t name);
+                              uint64_t name);
 
 #ifdef CETECH_CAN_COMPILE
 
@@ -282,9 +282,9 @@ struct ct_component_a0 {
                          struct ct_property_value value);
 
     struct ct_property_value (*get_property)(uint64_t type,
-                                          struct ct_world world,
-                                          struct ct_entity entity,
-                                          uint64_t key);
+                                             struct ct_world world,
+                                             struct ct_entity entity,
+                                             uint64_t key);
 };
 
 //! World API V0

@@ -10,7 +10,6 @@
 
 #include <cetech/kernel/hash.h>
 #include <cetech/kernel/memory.h>
-#include <cetech/kernel/module.h>
 
 #include <cetech/kernel/os.h>
 #include <cetech/kernel/api_system.h>
@@ -66,14 +65,14 @@ namespace material_compiler {
                                                   prefab_file);
 
                 ct_vio *prefab_vio = ct_vio_a0.from_file(full_path,
-                                                                    VIO_OPEN_READ);
+                                                         VIO_OPEN_READ);
 
                 CETECH_FREE(a, full_path);
 
                 char prefab_data[prefab_vio->size(prefab_vio->inst) + 1];
                 memset(prefab_data, 0, prefab_vio->size(prefab_vio->inst) + 1);
                 prefab_vio->read(prefab_vio->inst, prefab_data, sizeof(char),
-                                   prefab_vio->size(prefab_vio->inst));
+                                 prefab_vio->size(prefab_vio->inst));
                 prefab_vio->close(prefab_vio->inst);
 
                 yaml_document_t h;
@@ -173,7 +172,7 @@ namespace material_compiler {
         memset(source_data, 0, source_vio->size(source_vio->inst) + 1);
 
         source_vio->read(source_vio->inst, source_data, sizeof(char),
-                           source_vio->size(source_vio->inst));
+                         source_vio->size(source_vio->inst));
 
         yaml_document_t h;
         yaml_node_t root = yaml_load_str(source_data, &h);
@@ -219,10 +218,11 @@ namespace material_compiler {
         };
 
         build_vio->write(build_vio->inst, &resource, sizeof(resource), 1);
-        build_vio->write(build_vio->inst, output.uniform_names._data, sizeof(char),
-                            array::size(output.uniform_names));
+        build_vio->write(build_vio->inst, output.uniform_names._data,
+                         sizeof(char),
+                         array::size(output.uniform_names));
         build_vio->write(build_vio->inst, output.data._data, sizeof(uint8_t),
-                            array::size(output.data));
+                         array::size(output.data));
 
         output.uniform_names.destroy();
         output.data.destroy();
@@ -239,7 +239,7 @@ namespace material_compiler {
         CETECH_GET_API(api, ct_hash_a0);
 
         ct_resource_a0.compiler_register(ct_hash_a0.id64_from_str("material"),
-                                          compiler);
+                                         compiler);
 
         return 1;
     }

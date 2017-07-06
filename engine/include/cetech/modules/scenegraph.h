@@ -105,7 +105,7 @@ struct ct_scenegprah_a0 {
     //! \param entity Entity
     //! \return Root node
     struct ct_scene_node (*get_root)(struct ct_world world,
-                             struct ct_entity entity);
+                                     struct ct_entity entity);
 
     //! Create nodes
     //! \param world World
@@ -116,11 +116,11 @@ struct ct_scenegprah_a0 {
     //! \param count Node count
     //! \return Root scene node
     struct ct_scene_node (*create)(struct ct_world world,
-                           struct ct_entity entity,
-                           uint64_t *names,
-                           uint32_t *parent,
-                           mat44f_t *pose,
-                           uint32_t count);
+                                   struct ct_entity entity,
+                                   uint64_t *names,
+                                   uint32_t *parent,
+                                   mat44f_t *pose,
+                                   uint32_t count);
 
     //! Link two node
     //! \param world World
@@ -136,8 +136,8 @@ struct ct_scenegprah_a0 {
     //! \param name Name
     //! \return Node
     struct ct_scene_node (*node_by_name)(struct ct_world world,
-                                 struct ct_entity entity,
-                                 uint64_t name);
+                                         struct ct_entity entity,
+                                         uint64_t name);
 };
 
 #ifdef __cplusplus

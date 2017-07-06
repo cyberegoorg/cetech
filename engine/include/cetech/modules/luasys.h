@@ -18,6 +18,7 @@ extern "C" {
 #include <cetech/celib/math_types.h>
 
 typedef struct lua_State lua_State;
+
 typedef int (*lua_CFunction)(lua_State *L);
 
 //==============================================================================

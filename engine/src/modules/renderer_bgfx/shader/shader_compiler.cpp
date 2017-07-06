@@ -13,7 +13,6 @@
 #include <cetech/modules/application.h>
 #include <cetech/kernel/memory.h>
 #include <cetech/kernel/os.h>
-#include <cetech/kernel/module.h>
 #include <cetech/kernel/api_system.h>
 #include <cetech/kernel/log.h>
 #include <cetech/kernel/yaml.h>
@@ -141,7 +140,7 @@ namespace shader_compiler {
         char tmp_filename[1024] = {0};
 
         char *tmp_dir = ct_resource_a0.compiler_get_tmp_dir(a,
-                                                             ct_app_a0.platform());
+                                                            ct_app_a0.platform());
 
         //////// VS
         yaml_as_string(vs_input, input_str, CETECH_ARRAY_LEN(input_str));
@@ -163,7 +162,7 @@ namespace shader_compiler {
         }
 
         ct_vio *tmp_file = ct_vio_a0.from_file(output_path,
-                                                          VIO_OPEN_READ);
+                                               VIO_OPEN_READ);
         char *vs_data =
                 CETECH_ALLOCATE(ct_memory_a0.main_allocator(), char,
                                 tmp_file->size(tmp_file->inst) + 1);
@@ -204,8 +203,10 @@ namespace shader_compiler {
         tmp_file->close(tmp_file->inst);
 
         build_vio->write(build_vio->inst, &resource, sizeof(resource), 1);
-        build_vio->write(build_vio->inst, vs_data, sizeof(char), resource.vs_size);
-        build_vio->write(build_vio->inst, fs_data, sizeof(char), resource.fs_size);
+        build_vio->write(build_vio->inst, vs_data, sizeof(char),
+                         resource.vs_size);
+        build_vio->write(build_vio->inst, fs_data, sizeof(char),
+                         resource.fs_size);
 
         CETECH_FREE(a, vs_data);
         CETECH_FREE(a, fs_data);
@@ -225,7 +226,7 @@ namespace shader_compiler {
         CETECH_GET_API(api, ct_hash_a0);
 
         ct_resource_a0.compiler_register(ct_hash_a0.id64_from_str("shader"),
-                                          compiler);
+                                         compiler);
 
         return 1;
     }

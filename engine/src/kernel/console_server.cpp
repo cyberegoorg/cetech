@@ -6,7 +6,6 @@
 
 #include <cetech/kernel/api_system.h>
 #include <cetech/kernel/config.h>
-#include <cetech/kernel/module.h>
 #include <cetech/kernel/memory.h>
 #include <cetech/kernel/log.h>
 #include <cetech/celib/map.inl>
@@ -206,7 +205,7 @@ namespace consoleserver_module {
         int socket = nn_socket(AF_SP, NN_REP);
         if (socket < 0) {
             ct_log_a0.error(LOG_WHERE, "Could not create nanomsg socket: %s",
-                             nn_strerror(errno));
+                            nn_strerror(errno));
             return;// 0;
         }
         addr = ct_config_a0.get_string(_G.cv_rpc_addr);
@@ -215,8 +214,8 @@ namespace consoleserver_module {
 
         if (nn_bind(socket, addr) < 0) {
             ct_log_a0.error(LOG_WHERE, "Could not bind socket to '%s': %s",
-                             addr,
-                             nn_strerror(errno));
+                            addr,
+                            nn_strerror(errno));
             return;// 0;
         }
 
@@ -227,8 +226,8 @@ namespace consoleserver_module {
             socket = nn_socket(AF_SP, NN_PUSH);
             if (socket < 0) {
                 ct_log_a0.error(LOG_WHERE,
-                                 "Could not create nanomsg socket: %s",
-                                 nn_strerror(errno));
+                                "Could not create nanomsg socket: %s",
+                                nn_strerror(errno));
                 return;// 0;
             }
 
@@ -238,8 +237,8 @@ namespace consoleserver_module {
 
             if (nn_connect(socket, addr) < 0) {
                 ct_log_a0.error(LOG_WHERE, "Could not bind socket to '%s': %s",
-                                 addr,
-                                 nn_strerror(errno));
+                                addr,
+                                nn_strerror(errno));
                 return;// 0;
             }
             _G.push_socket = socket;
@@ -250,7 +249,7 @@ namespace consoleserver_module {
         socket = nn_socket(AF_SP, NN_PUB);
         if (socket < 0) {
             ct_log_a0.error(LOG_WHERE, "Could not create nanomsg socket: %s",
-                             nn_strerror(errno));
+                            nn_strerror(errno));
             return;// 0;
         }
 
@@ -260,8 +259,8 @@ namespace consoleserver_module {
 
         if (nn_bind(socket, addr) < 0) {
             ct_log_a0.error(LOG_WHERE, "Could not bind socket to '%s': %s",
-                             addr,
-                             nn_strerror(errno));
+                            addr,
+                            nn_strerror(errno));
             return;// 0;
         }
         _G.log_socket = socket;

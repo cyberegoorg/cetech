@@ -14,7 +14,6 @@
 #include <cetech/celib/eventstream.inl>
 #include <cetech/kernel/memory.h>
 #include <cetech/kernel/config.h>
-#include <cetech/kernel/module.h>
 #include <cetech/kernel/log.h>
 
 #include <cetech/kernel/task.h>
@@ -375,7 +374,7 @@ namespace develop_system_module {
         int socket = nn_socket(AF_SP, NN_PUB);
         if (socket < 0) {
             ct_log_a0.error(LOG_WHERE, "Could not create nanomsg socket: %s",
-                             nn_strerror(errno));
+                            nn_strerror(errno));
             //return 0;
         }
         addr = ct_config_a0.get_string(_G.cv_pub_addr);
@@ -384,8 +383,8 @@ namespace develop_system_module {
 
         if (nn_bind(socket, addr) < 0) {
             ct_log_a0.error(LOG_WHERE, "Could not bind socket to '%s': %s",
-                             addr,
-                             nn_strerror(errno));
+                            addr,
+                            nn_strerror(errno));
             //return 0;
         }
 

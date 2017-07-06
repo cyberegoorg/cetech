@@ -13,7 +13,6 @@
 
 #include <cetech/kernel/hash.h>
 #include <cetech/kernel/memory.h>
-#include <cetech/kernel/module.h>
 #include <cetech/kernel/api_system.h>
 #include <cetech/kernel/os.h>
 
@@ -91,7 +90,8 @@ namespace scene_resource_compiler {
     struct compile_output *_crete_compile_output() {
         ct_allocator *a = ct_memory_a0.main_allocator();
         struct compile_output *output =
-                CETECH_ALLOCATE(a, struct compile_output, sizeof(struct compile_output));
+                CETECH_ALLOCATE(a, struct compile_output,
+                                sizeof(struct compile_output));
 
         output->geom_name.init(a);
         output->ib_offset.init(a);
@@ -538,41 +538,41 @@ namespace scene_resource_compiler {
 
         build_vio->write(build_vio->inst, &res, sizeof(res), 1);
         build_vio->write(build_vio->inst, array::begin(output->geom_name),
-                            sizeof(uint64_t),
-                            array::size(output->geom_name));
+                         sizeof(uint64_t),
+                         array::size(output->geom_name));
         build_vio->write(build_vio->inst, array::begin(output->ib_offset),
-                            sizeof(uint32_t),
-                            array::size(output->ib_offset));
+                         sizeof(uint32_t),
+                         array::size(output->ib_offset));
         build_vio->write(build_vio->inst, array::begin(output->vb_offset),
-                            sizeof(uint32_t),
-                            array::size(output->vb_offset));
+                         sizeof(uint32_t),
+                         array::size(output->vb_offset));
         build_vio->write(build_vio->inst, array::begin(output->vb_decl),
-                            sizeof(bgfx::VertexDecl),
-                            array::size(output->vb_decl));
+                         sizeof(bgfx::VertexDecl),
+                         array::size(output->vb_decl));
         build_vio->write(build_vio->inst, array::begin(output->ib_size),
-                            sizeof(uint32_t),
-                            array::size(output->ib_size));
+                         sizeof(uint32_t),
+                         array::size(output->ib_size));
         build_vio->write(build_vio->inst, array::begin(output->vb_size),
-                            sizeof(uint32_t),
-                            array::size(output->vb_size));
+                         sizeof(uint32_t),
+                         array::size(output->vb_size));
         build_vio->write(build_vio->inst, array::begin(output->ib),
-                            sizeof(uint32_t),
-                            array::size(output->ib));
+                         sizeof(uint32_t),
+                         array::size(output->ib));
         build_vio->write(build_vio->inst, array::begin(output->vb),
-                            sizeof(uint8_t),
-                            array::size(output->vb));
+                         sizeof(uint8_t),
+                         array::size(output->vb));
         build_vio->write(build_vio->inst, array::begin(output->node_name),
-                            sizeof(uint64_t),
-                            array::size(output->node_name));
+                         sizeof(uint64_t),
+                         array::size(output->node_name));
         build_vio->write(build_vio->inst, array::begin(output->node_parent),
-                            sizeof(uint32_t),
-                            array::size(output->node_parent));
+                         sizeof(uint32_t),
+                         array::size(output->node_parent));
         build_vio->write(build_vio->inst, array::begin(output->node_pose),
-                            sizeof(mat44f_t),
-                            array::size(output->node_pose));
+                         sizeof(mat44f_t),
+                         array::size(output->node_pose));
         build_vio->write(build_vio->inst, array::begin(output->geom_node),
-                            sizeof(uint64_t),
-                            array::size(output->geom_name));
+                         sizeof(uint64_t),
+                         array::size(output->geom_name));
 
         _destroy_compile_output(output);
         CETECH_FREE(ct_memory_a0.main_allocator(), source_data);
@@ -589,7 +589,7 @@ namespace scene_resource_compiler {
         CETECH_GET_API(api, ct_thread_a0);
 
         ct_resource_a0.compiler_register(ct_hash_a0.id64_from_str("scene"),
-                                          compiler);
+                                         compiler);
 
         return 1;
     }

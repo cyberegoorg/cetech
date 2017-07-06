@@ -1,6 +1,5 @@
 
 
-#include <cetech/kernel/module.h>
 #include <cetech/modules/luasys.h>
 
 #include <cetech/modules/resource.h>

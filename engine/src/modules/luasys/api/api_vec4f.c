@@ -4,8 +4,6 @@
 #include <cetech/celib/vec4f.inl>
 #include <cetech/kernel/api_system.h>
 
-#include <cetech/modules/luasys.h>
-
 
 #define API_NAME "Vec4f"
 

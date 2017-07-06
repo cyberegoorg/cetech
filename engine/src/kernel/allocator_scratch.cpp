@@ -109,9 +109,10 @@ uint32_t scratch_allocator_total_allocated(ct_allocator *allocator) {
 
 namespace memory {
     ct_allocator *scratch_allocator_create(ct_allocator *backing,
-                                               int size) {
+                                           int size) {
         auto *core_alloc = core_allocator::get();
-        auto *a = CETECH_ALLOCATE(core_alloc, ct_allocator, sizeof(ct_allocator));
+        auto *a = CETECH_ALLOCATE(core_alloc, ct_allocator,
+                                  sizeof(ct_allocator));
 
         allocator_scratch *m = CETECH_ALLOCATE(core_alloc, allocator_scratch,
                                                sizeof(allocator_scratch));

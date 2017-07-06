@@ -1,6 +1,5 @@
 
 #include <cetech/celib/allocator.h>
-#include <cetech/kernel/module.h>
 #include <cetech/modules/entity.h>
 
 #include <cetech/modules/luasys.h>

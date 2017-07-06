@@ -1,7 +1,5 @@
 #include "cetech/modules/transform.h"
 #include "../luasys_private.h"
-#include <cetech/kernel/module.h>
-#include <cetech/modules/luasys.h>
 
 #include <cetech/modules/entity.h>
 #include <cetech/kernel/api_system.h>

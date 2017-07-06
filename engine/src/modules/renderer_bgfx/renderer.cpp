@@ -7,7 +7,6 @@
 
 #include <cetech/modules/application.h>
 #include <cetech/kernel/config.h>
-#include <cetech/kernel/module.h>
 #include <cetech/kernel/os.h>
 #include <cetech/kernel/api_system.h>
 

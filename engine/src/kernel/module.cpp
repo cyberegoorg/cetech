@@ -99,13 +99,13 @@ namespace module {
         }
 
         ct_load_module_t load_fce = (ct_load_module_t) load_function(obj,
-                                                               "load_module");
+                                                                     "load_module");
         if (load_fce == NULL) {
             return;
         }
 
         ct_unload_module_t unload_fce = (ct_unload_module_t) load_function(obj,
-                                                                     "unload_module");
+                                                                           "unload_module");
         if (unload_fce == NULL) {
             return;
         }

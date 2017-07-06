@@ -13,7 +13,6 @@ extern "C" void init_static_modules() {
 #endif
 
 
-
     ADD_STATIC_MODULE(world);
     ADD_STATIC_MODULE(component);
     ADD_STATIC_MODULE(entity);

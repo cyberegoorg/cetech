@@ -1,12 +1,10 @@
 
 #include <cetech/celib/allocator.h>
-#include <cetech/kernel/module.h>
 
 #include "cetech/modules/transform.h"
 #include "cetech/modules/renderer.h"
 #include "../luasys_private.h"
 
-#include <cetech/modules/luasys.h>
 #include <cetech/kernel/hash.h>
 #include <cetech/kernel/api_system.h>
 
@@ -21,7 +19,7 @@ static int _set_texture(lua_State *l) {
     const char *texture_name = luasys_to_string(l, 3);
 
     ct_material_a0.set_texture(m, slot_name,
-                                ct_hash_a0.id64_from_str(texture_name));
+                               ct_hash_a0.id64_from_str(texture_name));
     return 0;
 }
 

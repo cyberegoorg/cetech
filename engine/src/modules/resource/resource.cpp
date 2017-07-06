@@ -11,7 +11,6 @@
 #include <cetech/modules/application.h>
 #include <cetech/kernel/config.h>
 #include <cetech/kernel/memory.h>
-#include <cetech/kernel/module.h>
 #include <cetech/kernel/os.h>
 
 #include <cetech/kernel/api_system.h>
@@ -307,7 +306,7 @@ namespace resource {
 
         if (idx == UINT32_MAX) {
             ct_log_a0.error(LOG_WHERE,
-                             "Loader for resource is not is not registred");
+                            "Loader for resource is not is not registred");
             memset(loaded_data, sizeof(void *), count);
             ct_thread_a0.spin_unlock(&_G.add_lock);
             return;
@@ -346,14 +345,14 @@ namespace resource {
             char *filename = build_name;
 #endif
             ct_log_a0.debug("resource", "Loading resource %s from %s/%s",
-                             filename,
-                             ct_filesystem_a0.root_dir(
-                                     root_name),
-                             build_name);
+                            filename,
+                            ct_filesystem_a0.root_dir(
+                                    root_name),
+                            build_name);
 
             ct_vio *resource_file = ct_filesystem_a0.open(root_name,
-                                                                  build_name,
-                                                                  FS_OPEN_READ);
+                                                          build_name,
+                                                          FS_OPEN_READ);
 
             if (resource_file != NULL) {
                 loaded_data[i] = type_clb.loader(resource_file,
@@ -452,7 +451,7 @@ namespace resource {
                 char *filename = build_name;
 #endif
                 ct_log_a0.warning(LOG_WHERE, "Autoloading resource %s",
-                                   filename);
+                                  filename);
                 load_now(type, &name, 1);
 
                 uint64_t id = hash_combine(type, name);

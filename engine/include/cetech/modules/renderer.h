@@ -125,7 +125,7 @@ struct ct_mesh_renderer_a0 {
     //! \param entity Entity
     //! \return Mesh renderer
     struct ct_mesh_renderer (*get)(struct ct_world world,
-                           struct ct_entity entity);
+                                   struct ct_entity entity);
 
     //! Create new mesh render
     //! \param world World
@@ -136,18 +136,18 @@ struct ct_mesh_renderer_a0 {
     //! \param material Material
     //! \return Mesh renderer
     struct ct_mesh_renderer (*create)(struct ct_world world,
-                              struct ct_entity entity,
-                              uint64_t scene,
-                              uint64_t mesh,
-                              uint64_t node,
-                              uint64_t material);
+                                      struct ct_entity entity,
+                                      uint64_t scene,
+                                      uint64_t mesh,
+                                      uint64_t node,
+                                      uint64_t material);
 
     //! Get mesh renderer material
     //! \param world World
     //! \param mesh Mesh
     //! \return Material
     struct ct_material (*get_material)(struct ct_world world,
-                               struct ct_mesh_renderer mesh);
+                                       struct ct_mesh_renderer mesh);
 
     //! Set material
     //! \param world World

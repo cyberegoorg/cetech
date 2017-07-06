@@ -51,7 +51,7 @@ namespace memory {
 //==============================================================================
 
     struct ct_allocator *scratch_allocator_create(struct ct_allocator *backing,
-                                               int size);
+                                                  int size);
 
     void scratch_allocator_destroy(struct ct_allocator *a);
 }

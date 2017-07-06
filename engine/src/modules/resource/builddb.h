@@ -29,7 +29,7 @@ static int _step(sqlite3 *db,
 
             default:
                 ct_log_a0.error("builddb", "SQL error '%s' (%d): %s",
-                                 sqlite3_sql(stmt), rc, sqlite3_errmsg(db));
+                                sqlite3_sql(stmt), rc, sqlite3_errmsg(db));
 
                 run = 0;
                 break;

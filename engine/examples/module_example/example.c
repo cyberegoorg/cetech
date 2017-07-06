@@ -2,7 +2,6 @@
 #include <cetech/kernel/log.h>
 
 #include "cetech/kernel/config.h"
-#include "cetech/kernel/module.h"
 #include "cetech/modules/input.h"
 
 CETECH_DECL_API(ct_keyboard_a0)

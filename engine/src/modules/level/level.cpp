@@ -12,7 +12,6 @@
 #include <cetech/kernel/hash.h>
 #include <cetech/kernel/api_system.h>
 #include <cetech/kernel/memory.h>
-#include <cetech/kernel/module.h>
 
 #include <cetech/modules/entity.h>
 
@@ -154,8 +153,8 @@ namespace level_resource_compiler {
                          ct_entity_a0.compiler_ent_counter(data->output));
 
         ct_entity_a0.compiler_compile_entity(data->output, value,
-                                              data->filename,
-                                              data->capi);
+                                             data->filename,
+                                             data->capi);
     }
 
     int compiler(const char *filename,
@@ -166,7 +165,7 @@ namespace level_resource_compiler {
         char source_data[source_vio->size(source_vio->inst) + 1];
         memset(source_data, 0, source_vio->size(source_vio->inst) + 1);
         source_vio->read(source_vio->inst, source_data, sizeof(char),
-                           source_vio->size(source_vio->inst));
+                         source_vio->size(source_vio->inst));
 
         yaml_document_t h;
         yaml_node_t root = yaml_load_str(source_data, &h);
@@ -197,11 +196,13 @@ namespace level_resource_compiler {
 
         build_vio->write(build_vio->inst, &res, sizeof(level_blob::blob_t), 1);
         build_vio->write(build_vio->inst, array::begin(id), sizeof(uint64_t),
-                            array::size(id));
-        build_vio->write(build_vio->inst, array::begin(offset), sizeof(uint32_t),
-                            array::size(offset));
-        build_vio->write(build_vio->inst, data->data(data->inst), sizeof(uint8_t),
-                            data->size(data->inst));
+                         array::size(id));
+        build_vio->write(build_vio->inst, array::begin(offset),
+                         sizeof(uint32_t),
+                         array::size(offset));
+        build_vio->write(build_vio->inst, data->data(data->inst),
+                         sizeof(uint8_t),
+                         data->size(data->inst));
 
         ct_blob_a0.destroy(data);
         ct_entity_a0.compiler_destroy_output(output);
@@ -218,7 +219,7 @@ namespace level_resource_compiler {
 namespace level {
 
     ct_level load(ct_world world,
-                 uint64_t name) {
+                  uint64_t name) {
 
         auto res = level_blob::get(ct_resource_a0.get(_G.level_type, name));
 
@@ -236,8 +237,8 @@ namespace level {
         struct level_instance *instance = get_level_instance(level);
 
         ct_entity_a0.spawn_from_resource(world, data,
-                                          &instance->spawned_entity,
-                                          &instance->spawned_entity_count);
+                                         &instance->spawned_entity,
+                                         &instance->spawned_entity_count);
 
         for (int i = 0; i < level_blob::entities_count(res); ++i) {
             ct_entity e = instance->spawned_entity[offset[i]];
@@ -256,17 +257,17 @@ namespace level {
         struct level_instance *instance = get_level_instance(level);
 
         ct_entity_a0.destroy(world, instance->spawned_entity,
-                              instance->spawned_entity_count);
+                             instance->spawned_entity_count);
         ct_entity_a0.destroy(world, &instance->level_entity, 1);
 
         CETECH_FREE(ct_memory_a0.main_allocator(),
-                          instance->spawned_entity);
+                    instance->spawned_entity);
 
         _destroy_level_instance(instance);
     }
 
     ct_entity entity_by_id(ct_level level,
-                          uint64_t id) {
+                           uint64_t id) {
         struct level_instance *instance = get_level_instance(level);
         return map::get(instance->spawned_entity_map, id, {0});
     }
@@ -318,7 +319,7 @@ namespace level_module {
 
 #ifdef CETECH_CAN_COMPILE
         ct_resource_a0.compiler_register(_G.level_type,
-                                          level_resource_compiler::compiler);
+                                         level_resource_compiler::compiler);
 #endif
 
     }

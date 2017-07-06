@@ -4,7 +4,6 @@
 #include <cetech/kernel/config.h>
 #include <cetech/modules/resource.h>
 #include <cetech/kernel/memory.h>
-#include <cetech/kernel/module.h>
 #include <cetech/kernel/api_system.h>
 #include <cetech/celib/array.inl>
 #include <cetech/celib/map.inl>
@@ -113,7 +112,7 @@ namespace {
         ct_world last_world = _G.world_instances[last_idx].world;
 
         CETECH_FREE(ct_memory_a0.main_allocator(),
-                          _G.world_instances[idx].buffer);
+                    _G.world_instances[idx].buffer);
 
         _G.world_instances[idx] = _G.world_instances[last_idx];
         map::set(_G.world_map, last_world.h, idx);
@@ -277,7 +276,7 @@ namespace scenegraph {
     }
 
     ct_scene_node get_root(ct_world world,
-                          ct_entity entity) {
+                           ct_entity entity) {
 
         uint32_t idx = hash_combine(world.h, entity.h);
 
@@ -287,11 +286,11 @@ namespace scenegraph {
     }
 
     ct_scene_node create(ct_world world,
-                        ct_entity entity,
-                        uint64_t *names,
-                        uint32_t *parent,
-                        mat44f_t *pose,
-                        uint32_t count) {
+                         ct_entity entity,
+                         uint64_t *names,
+                         uint32_t *parent,
+                         mat44f_t *pose,
+                         uint32_t count) {
         WorldInstance *data = _get_world_instance(world);
 
         uint32_t first_idx = data->n;
@@ -299,7 +298,8 @@ namespace scenegraph {
         data->n += count;
 
         ct_scene_node *nodes = CETECH_ALLOCATE(ct_memory_a0.main_allocator(),
-                                                 ct_scene_node, sizeof(ct_scene_node) * count);
+                                               ct_scene_node,
+                                               sizeof(ct_scene_node) * count);
 
         for (int i = 0; i < count; ++i) {
             uint32_t idx = first_idx + i;
@@ -386,8 +386,8 @@ namespace scenegraph {
     }
 
     ct_scene_node _node_by_name(WorldInstance *data,
-                               ct_scene_node root,
-                               uint64_t name) {
+                                ct_scene_node root,
+                                uint64_t name) {
         if (data->name[root.idx] == name) {
             return root;
         }
@@ -406,8 +406,8 @@ namespace scenegraph {
     }
 
     ct_scene_node node_by_name(ct_world world,
-                              ct_entity entity,
-                              uint64_t name) {
+                               ct_entity entity,
+                               uint64_t name) {
         WorldInstance *data = _get_world_instance(world);
         ct_scene_node root = get_root(world, entity);
 
