@@ -38,14 +38,14 @@ CETECH_DECL_API(ct_log_a0);
 //==============================================================================
 
 #define LOG_WHERE "develop_system"
-#define developsys_push(type, event) _developsys_push((struct ct_develop_event_header*)(&event), type, sizeof(event))
+#define developsys_push(type, event) _developsys_push((ct_develop_event_header*)(&event), type, sizeof(event))
 
 
 //==============================================================================
 // Typedefs
 //==============================================================================
 
-typedef void (*to_mpack_fce_t)(const struct ct_develop_event_header *event,
+typedef void (*to_mpack_fce_t)(const ct_develop_event_header *event,
                                mpack_writer_t *writer);
 
 //==============================================================================
@@ -58,10 +58,10 @@ static struct DevelopSystemGlobals {
     EventStream eventstream;
     Map<to_mpack_fce_t> to_mpack;
 
-    ct_cvar_t cv_pub_addr;
+    ct_cvar cv_pub_addr;
     int pub_socket;
 
-    ct_spinlock_t flush_lock;
+    ct_spinlock flush_lock;
     atomic_int complete_flag[8]; // TODO: dynamic
     float time_accum;
 
@@ -116,10 +116,10 @@ namespace {
 
         _flush_stream_buffer();
 
-        struct ct_task_item items[wc];
+        ct_task_item items[wc];
 
         for (int i = 0; i < wc; ++i) {
-            items[i] = (struct ct_task_item) {
+            items[i] = (ct_task_item) {
                     .name = "flush_worker",
                     .work = _flush_job,
                     .data = NULL,
@@ -139,7 +139,7 @@ namespace {
         map::set(_G.to_mpack, type, fce);
     }
 
-    static void _scopeevent_to_mpack(const struct ct_develop_event_header *event,
+    static void _scopeevent_to_mpack(const ct_develop_event_header *event,
                                      mpack_writer_t *writer) {
         const ct_scope_event *e = (const ct_scope_event *) event;
 
@@ -166,9 +166,9 @@ namespace {
         mpack_finish_map(writer);
     }
 
-    static void _recordfloat_to_mpack(const struct ct_develop_event_header *event,
+    static void _recordfloat_to_mpack(const ct_develop_event_header *event,
                                       mpack_writer_t *writer) {
-        const struct ct_record_float_event *e = (const struct ct_record_float_event *) event;
+        const ct_record_float_event *e = (const ct_record_float_event *) event;
 
         mpack_start_map(writer, 3);
 
@@ -184,9 +184,9 @@ namespace {
         mpack_finish_map(writer);
     }
 
-    static void _recordint_to_mpack(const struct ct_develop_event_header *event,
+    static void _recordint_to_mpack(const ct_develop_event_header *event,
                                     mpack_writer_t *writer) {
-        const struct ct_record_int_event *e = (const struct ct_record_int_event *) event;
+        const ct_record_int_event *e = (const ct_record_int_event *) event;
 
         mpack_start_map(writer, 3);
 
@@ -268,7 +268,7 @@ namespace develop_system {
         eventstream::clear(_G.eventstream);
     }
 
-    void _developsys_push(struct ct_develop_event_header *header,
+    void _developsys_push(ct_develop_event_header *header,
                           uint32_t type,
                           uint64_t size) {
 
@@ -287,7 +287,7 @@ namespace develop_system {
 
     void developsys_push_record_float(const char *name,
                                       float value) {
-        struct ct_record_float_event ev = {0};
+        ct_record_float_event ev = {0};
 
         ev.value = value;
         memcpy(ev.name, name, strlen(name));
@@ -297,24 +297,24 @@ namespace develop_system {
 
     void developsys_push_record_int(const char *name,
                                     int value) {
-        struct ct_record_int_event ev = {0};
+        ct_record_int_event ev = {0};
         ev.value = value;
         memcpy(ev.name, name, strlen(name));
 
         developsys_push(EVENT_RECORD_INT, ev);
     }
 
-    struct ct_scope_data developsys_enter_scope(const char *name) {
+    ct_scope_data developsys_enter_scope(const char *name) {
         ++_scope_depth;
 
-        return (struct ct_scope_data) {
+        return (ct_scope_data) {
                 .name = name,
                 .start = ct_time_a0.ticks(),
                 .start_timer = ct_time_a0.perf_counter()
         };
     }
 
-    void developsys_leave_scope(struct ct_scope_data scope_data) {
+    void developsys_leave_scope(ct_scope_data scope_data) {
         CETECH_ASSERT(LOG_WHERE, _scope_depth > 0);
         --_scope_depth;
 
@@ -336,7 +336,7 @@ namespace develop_system {
 }
 
 namespace develop_system_module {
-    static struct ct_develop_a0 _api = {
+    static ct_develop_a0 _api = {
             .push = develop_system::_developsys_push,
             .push_record_float = develop_system::developsys_push_record_float,
             .push_record_int = develop_system::developsys_push_record_int,
@@ -345,11 +345,11 @@ namespace develop_system_module {
             .after_update = develop_system::_after_update
     };
 
-    void _init_api(struct ct_api_a0 *api) {
+    void _init_api(ct_api_a0 *api) {
         api->register_api("ct_develop_a0", &_api);
     }
 
-    void _init(struct ct_api_a0 *api) {
+    void _init(ct_api_a0 *api) {
         _init_api(api);
 
         CETECH_GET_API(api, ct_memory_a0);
@@ -400,12 +400,12 @@ namespace develop_system_module {
         _G.shutdown();
     }
 
-    extern "C" void developsystem_load_module(struct ct_api_a0 *api) {
+    extern "C" void developsystem_load_module(ct_api_a0 *api) {
         _init(api);
 
     }
 
-    extern "C" void developsystem_unload_module(struct ct_api_a0 *api) {
+    extern "C" void developsystem_unload_module(ct_api_a0 *api) {
         _shutdown();
     }
 }

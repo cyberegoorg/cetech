@@ -76,7 +76,7 @@ static int _cmd_resize(mpack_node_t args,
 }
 
 
-void renderer_create(os_window_t *window) {
+void renderer_create(ct_window_t *window) {
     bgfx::PlatformData pd = {0};
     pd.nwh = ct_window_a0.native_window_ptr(window);
     pd.ndt = ct_window_a0.native_display_ptr(window);
@@ -98,8 +98,8 @@ void renderer_set_debug(int debug) {
     }
 }
 
-void renderer_render_world(world_t world,
-                           struct ct_camera camera,
+void renderer_render_world(ct_world world,
+                           ct_camera camera,
                            viewport_t viewport) {
     ct_camera_a0 *camera_api = (ct_camera_a0 *) ct_api_a0.first(
             "ct_camera_a0").api; // TODO: SHIT !!!!
@@ -140,14 +140,14 @@ vec2f_t renderer_get_size() {
 }
 
 namespace renderer_module {
-    static struct ct_renderer_a0 rendderer_api = {
+    static ct_renderer_a0 rendderer_api = {
             .create = renderer_create,
             .set_debug = renderer_set_debug,
             .get_size = renderer_get_size,
             .render_world = renderer_render_world
     };
 
-    static struct ct_material_a0 material_api = {
+    static ct_material_a0 material_api = {
             .resource_create = material::create,
             .get_texture_count = material::get_texture_count,
             .set_texture = material::set_texture,
@@ -174,7 +174,7 @@ namespace renderer_module {
 
         _G = (struct G) {0};
 
-        ct_cvar_t daemon = ct_config_a0.find("daemon");
+        ct_cvar daemon = ct_config_a0.find("daemon");
         if (!ct_config_a0.get_int(daemon)) {
             texture::texture_init(api);
             shader::shader_init(api);
@@ -193,7 +193,7 @@ namespace renderer_module {
     }
 
     void _shutdown() {
-        ct_cvar_t daemon = ct_config_a0.find("daemon");
+        ct_cvar daemon = ct_config_a0.find("daemon");
         if (!ct_config_a0.get_int(daemon)) {
             texture::texture_shutdown();
             shader::shader_shutdown();

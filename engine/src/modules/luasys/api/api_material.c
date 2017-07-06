@@ -4,6 +4,7 @@
 
 #include "cetech/modules/transform.h"
 #include "cetech/modules/renderer.h"
+#include "../luasys_private.h"
 
 #include <cetech/modules/luasys.h>
 #include <cetech/kernel/hash.h>
@@ -15,7 +16,7 @@ CETECH_DECL_API(ct_material_a0);
 CETECH_DECL_API(ct_hash_a0);
 
 static int _set_texture(lua_State *l) {
-    material_t m = {.idx = luasys_to_handler(l, 1)};
+    struct ct_material m = {.idx = luasys_to_handler(l, 1)};
     const char *slot_name = luasys_to_string(l, 2);
     const char *texture_name = luasys_to_string(l, 3);
 
@@ -26,7 +27,7 @@ static int _set_texture(lua_State *l) {
 
 
 static int _set_vec4f(lua_State *l) {
-    material_t m = {.idx = luasys_to_handler(l, 1)};
+    struct ct_material m = {.idx = luasys_to_handler(l, 1)};
     const char *slot_name = luasys_to_string(l, 2);
     vec4f_t *v = luasys_to_vec4f(l, 3);
 

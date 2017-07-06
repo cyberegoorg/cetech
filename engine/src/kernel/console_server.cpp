@@ -47,9 +47,9 @@ namespace {
         int log_socket;
         int push_socket;
 
-        ct_cvar_t cv_rpc_addr;
-        ct_cvar_t cv_log_addr;
-        ct_cvar_t cv_push_addr;
+        ct_cvar cv_rpc_addr;
+        ct_cvar cv_log_addr;
+        ct_cvar cv_push_addr;
     } _G;
 
     static ct_console_srv_command_t find_command(const char *name) {
@@ -164,7 +164,7 @@ namespace consoleserver {
 }
 
 namespace consoleserver_module {
-    static struct ct_console_srv_a0 console_api = {
+    static ct_console_srv_a0 console_api = {
             .push_begin = consoleserver::push_begin,
             .register_command = consoleserver::register_command,
             .update = consoleserver::update
@@ -184,11 +184,11 @@ namespace consoleserver_module {
         _G.cv_push_addr = config.new_str("develop.push.addr", "Push addr", "");
     }
 
-    static void _init_api(struct ct_api_a0 *api) {
+    static void _init_api(ct_api_a0 *api) {
         api->register_api("ct_console_srv_a0", &console_api);
     }
 
-    static void _init(struct ct_api_a0 *api) {
+    static void _init(ct_api_a0 *api) {
         _init_api(api);
         CETECH_GET_API(api, ct_memory_a0);
         CETECH_GET_API(api, ct_config_a0);
@@ -282,11 +282,11 @@ namespace consoleserver_module {
         _G.commands.destroy();
     }
 
-    extern "C" void consoleserver_load_module(struct ct_api_a0 *api) {
+    extern "C" void consoleserver_load_module(ct_api_a0 *api) {
         _init(api);
     }
 
-    extern "C" void consoleserver_unload_module(struct ct_api_a0 *api) {
+    extern "C" void consoleserver_unload_module(ct_api_a0 *api) {
         _shutdown();
     }
 }

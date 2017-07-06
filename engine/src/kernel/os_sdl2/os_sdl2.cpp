@@ -12,11 +12,11 @@ CETECH_DECL_API(ct_log_a0);
 #include "vio_sdl2.h"
 
 namespace machine_sdl {
-    void init(struct ct_api_a0 *api);
+    void init(ct_api_a0 *api);
     void shutdown();
 }
 
-static struct ct_thread_a0 thread_api = {
+static ct_thread_a0 thread_api = {
         .create = thread_create,
         .kill = thread_kill,
         .wait = thread_wait,
@@ -27,7 +27,7 @@ static struct ct_thread_a0 thread_api = {
         .spin_unlock = thread_spin_unlock
 };
 
-static struct ct_window_a0 window_api = {
+static ct_window_a0 window_api = {
         .create = window_new,
         .create_from = window_new_from,
         .destroy = window_destroy,
@@ -40,24 +40,24 @@ static struct ct_window_a0 window_api = {
         .native_display_ptr = window_native_display_ptr
 };
 
-static struct ct_cpu_a0 cpu_api = {
+static ct_cpu_a0 cpu_api = {
         .count = cpu_count
 };
 
 
 
-static struct ct_time_a0 time_api = {
+static ct_time_a0 time_api = {
         .ticks =get_ticks,
         .perf_counter =get_perf_counter,
         .perf_freq =get_perf_freq
 };
 
-static struct ct_vio_a0 vio_api = {
+static ct_vio_a0 vio_api = {
         .from_file = vio_from_file,
 };
 
 
-extern "C" void os_load_module(struct ct_api_a0 *api) {
+extern "C" void os_load_module(ct_api_a0 *api) {
     CETECH_GET_API(api, ct_log_a0);
 
     api->register_api("ct_cpu_a0", &cpu_api);
@@ -71,7 +71,7 @@ extern "C" void os_load_module(struct ct_api_a0 *api) {
     machine_sdl::init(api);
 }
 
-extern "C" void os_unload_module(struct ct_api_a0 *api) {
+extern "C" void os_unload_module(ct_api_a0 *api) {
     machine_sdl::shutdown();
 }
 

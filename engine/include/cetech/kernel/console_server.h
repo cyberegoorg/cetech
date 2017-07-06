@@ -12,8 +12,6 @@ extern "C" {
 // Includes
 //==============================================================================
 
-#include <cetech/kernel/macros.h>
-
 typedef struct mpack_node_t mpack_node_t;
 typedef struct mpack_writer_t mpack_writer_t;
 
@@ -31,6 +29,7 @@ typedef int (*ct_console_srv_command_t)(mpack_node_t,
 
 //! Console server API V0
 struct ct_console_srv_a0 {
+
     //! Push begin signal to clients
     void (*push_begin)();
 

@@ -67,7 +67,7 @@ namespace component {
     }
 
     void register_type(uint64_t type,
-                       struct ct_component_clb clb) {
+                       ct_component_clb clb) {
         map::set(_G.component_clb, type, clb);
 
         ct_world_callbacks_t wclb = {
@@ -79,15 +79,15 @@ namespace component {
         ct_world_a0.register_callback(wclb);
     }
 
-    void spawn(world_t world,
+    void spawn(ct_world world,
                uint64_t type,
-               entity_t *ent_ids,
+               ct_entity *ent_ids,
                uint32_t *cent,
                uint32_t *ents_parent,
                uint32_t ent_count,
                void *data) {
 
-        struct ct_component_clb clb = map::get(_G.component_clb, type,
+        ct_component_clb clb = map::get(_G.component_clb, type,
                                             ct_component_clb_null);
 
         if (!clb.spawner) {
@@ -97,8 +97,8 @@ namespace component {
         clb.spawner(world, ent_ids, cent, ents_parent, ent_count, data);
     }
 
-    void destroy(world_t world,
-                 entity_t *ent,
+    void destroy(ct_world world,
+                 ct_entity *ent,
                  uint32_t count) {
 
         auto ct_it = map::begin(_G.component_clb);
@@ -111,12 +111,12 @@ namespace component {
     }
 
     void set_property(uint64_t type,
-                      world_t world,
-                      entity_t entity,
+                      ct_world world,
+                      ct_entity entity,
                       uint64_t key,
-                      struct ct_property_value value) {
+                      ct_property_value value) {
 
-        struct ct_component_clb clb = map::get(_G.component_clb,
+        ct_component_clb clb = map::get(_G.component_clb,
                                             type, ct_component_clb_null);
 
         if (!clb.set_property) {
@@ -127,17 +127,17 @@ namespace component {
     }
 
     ct_property_value get_property(uint64_t type,
-                                world_t world,
-                                entity_t entity,
+                                ct_world world,
+                                ct_entity entity,
                                 uint64_t key) {
 
-        struct ct_property_value value = {PROPERTY_INVALID};
+        ct_property_value value = {PROPERTY_INVALID};
 
-        struct ct_component_clb clb = map::get(_G.component_clb,
+        ct_component_clb clb = map::get(_G.component_clb,
                                             type, ct_component_clb_null);
 
         if (!clb.get_property) {
-            return (struct ct_property_value) {PROPERTY_INVALID};
+            return (ct_property_value) {PROPERTY_INVALID};
         }
 
         return clb.get_property(world, entity, key);
@@ -145,7 +145,7 @@ namespace component {
 }
 
 namespace component_module {
-    static struct ct_component_a0 api = {
+    static ct_component_a0 api = {
             .register_compiler = component::register_compiler,
             .compile = component::compile,
             .spawn_order = component::get_spawn_order,
@@ -156,11 +156,11 @@ namespace component_module {
             .get_property = component::get_property
     };
 
-    void _init_api(struct ct_api_a0 *a0) {
+    void _init_api(ct_api_a0 *a0) {
         a0->register_api("ct_component_a0", &api);
     }
 
-    void _init(struct ct_api_a0 *a0) {
+    void _init(ct_api_a0 *a0) {
         _init_api(a0);
 
         CETECH_GET_API(a0, ct_memory_a0);
@@ -179,11 +179,11 @@ namespace component_module {
         _G.component_clb.destroy();
     }
 
-    extern "C" void component_load_module(struct ct_api_a0 *api) {
+    extern "C" void component_load_module(ct_api_a0 *api) {
         _init(api);
     }
 
-    extern "C" void component_unload_module(struct ct_api_a0 *api) {
+    extern "C" void component_unload_module(ct_api_a0 *api) {
         _shutdown();
     }
 

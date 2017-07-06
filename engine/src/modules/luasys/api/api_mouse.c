@@ -5,6 +5,7 @@
 #include <cetech/modules/luasys.h>
 #include <cetech/modules/input.h>
 #include <cetech/kernel/api_system.h>
+#include "../luasys_private.h"
 
 CETECH_DECL_API(ct_mouse_a0);
 

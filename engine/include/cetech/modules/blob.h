@@ -17,20 +17,20 @@ struct ct_allocator;
 // Typedefs
 //==============================================================================
 
-typedef void ct_blob_instance;
+typedef void ct_blob_instance_t;
 
 //==============================================================================
 // Api
 //==============================================================================
 
 struct ct_blob {
-    ct_blob_instance *inst;
+    ct_blob_instance_t *inst;
 
-    uint8_t *(*data)(ct_blob_instance *inst);
+    uint8_t *(*data)(ct_blob_instance_t *inst);
 
-    uint64_t (*size)(ct_blob_instance *inst);
+    uint64_t (*size)(ct_blob_instance_t *inst);
 
-    void (*push)(ct_blob_instance *inst,
+    void (*push)(ct_blob_instance_t *inst,
                  void *data,
                  uint64_t size);
 };

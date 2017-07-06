@@ -91,10 +91,10 @@ namespace {
 
         int autoload_enabled;
 
-        ct_spinlock_t add_lock;
+        ct_spinlock add_lock;
 
         struct {
-            ct_cvar_t build_dir;
+            ct_cvar build_dir;
         } config;
 
     } ResourceManagerGlobals = {0};
@@ -131,8 +131,8 @@ char *resource_compiler_get_build_dir(ct_allocator *a,
 
 namespace package_resource {
 
-    void *loader(struct ct_vio *input,
-                 struct ct_allocator *allocator) {
+    void *loader(ct_vio *input,
+                 ct_allocator *allocator) {
 
         const int64_t size = input->size(input->inst);
         char *data = CETECH_ALLOCATE(allocator, char, size);
@@ -142,7 +142,7 @@ namespace package_resource {
     }
 
     void unloader(void *new_data,
-                  struct ct_allocator *allocator) {
+                  ct_allocator *allocator) {
         CETECH_FREE(allocator, new_data);
     }
 
@@ -157,7 +157,7 @@ namespace package_resource {
     void *reloader(uint64_t name,
                    void *old_data,
                    void *new_data,
-                   struct ct_allocator *allocator) {
+                   ct_allocator *allocator) {
         CETECH_FREE(allocator, old_data);
         return new_data;
     }
@@ -351,7 +351,7 @@ namespace resource {
                                      root_name),
                              build_name);
 
-            struct ct_vio *resource_file = ct_filesystem_a0.open(root_name,
+            ct_vio *resource_file = ct_filesystem_a0.open(root_name,
                                                                   build_name,
                                                                   FS_OPEN_READ);
 
@@ -546,7 +546,7 @@ namespace resource {
 }
 
 namespace resource_module {
-    static struct ct_resource_a0 resource_api = {
+    static ct_resource_a0 resource_api = {
             .set_autoload = resource::set_autoload,
             .register_type = resource::resource_register_type,
             .load = resource::load,
@@ -575,7 +575,7 @@ namespace resource_module {
 
     };
 
-    static struct ct_package_a0 package_api = {
+    static ct_package_a0 package_api = {
             .load = package_load,
             .unload = package_unload,
             .is_loaded = package_is_loaded,
@@ -583,7 +583,7 @@ namespace resource_module {
     };
 
 
-    void _init_api(struct ct_api_a0 *api) {
+    void _init_api(ct_api_a0 *api) {
         api->register_api("ct_resource_a0", &resource_api);
         api->register_api("ct_package_a0", &package_api);
     }
@@ -599,7 +599,7 @@ namespace resource_module {
     }
 
 
-    void _init(struct ct_api_a0 *api) {
+    void _init(ct_api_a0 *api) {
         _init_api(api);
 
         CETECH_GET_API(api, ct_console_srv_a0);
@@ -649,11 +649,11 @@ namespace resource_module {
     }
 
 
-    extern "C" void resourcesystem_load_module(struct ct_api_a0 *api) {
+    extern "C" void resourcesystem_load_module(ct_api_a0 *api) {
         _init(api);
     }
 
-    extern "C" void resourcesystem_unload_module(struct ct_api_a0 *api) {
+    extern "C" void resourcesystem_unload_module(ct_api_a0 *api) {
         _shutdown();
     }
 }

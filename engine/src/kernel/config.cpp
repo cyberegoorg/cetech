@@ -36,7 +36,7 @@ CETECH_DECL_API(ct_hash_a0);
 #define MAX_DESC_LEN 256
 #define LOG_WHERE "cvar"
 
-#define make_cvar(i) (ct_cvar_t){.idx = i}
+#define make_cvar(i) (ct_cvar){.idx = i}
 
 #define str_set(result, str) memcpy(result, str, strlen(str))
 
@@ -88,7 +88,7 @@ void _deallocate_all_string() {
     }
 }
 
-ct_cvar_t _find_first_free() {
+ct_cvar _find_first_free() {
 
     for (uint64_t i = 1; i < MAX_VARIABLES; ++i) {
         if (_G.name[i][0] != '\0') {
@@ -114,8 +114,8 @@ namespace config {
     void compile_global(const char * platform) {
         ct_allocator *a = ct_memory_a0.main_allocator();
 
-        ct_cvar_t bd = find("build");
-        ct_cvar_t source_dir = find("src");
+        ct_cvar bd = find("build");
+        ct_cvar source_dir = find("src");
 
         const char *build_dir_str = get_string(bd);
 
@@ -130,7 +130,7 @@ namespace config {
         char *source_path = ct_path_a0.join(a, 2, get_string(source_dir),
                                             "global.config");
 
-        struct ct_vio *source_vio = ct_vio_a0.from_file(source_path,
+        ct_vio *source_vio = ct_vio_a0.from_file(source_path,
                                                             VIO_OPEN_READ);
 
         char *data = CETECH_ALLOCATE(a, char, source_vio->size(source_vio->inst));
@@ -139,7 +139,7 @@ namespace config {
         source_vio->read(source_vio->inst, data, sizeof(char), size);
         source_vio->close(source_vio->inst);
 
-        struct ct_vio *build_vio = ct_vio_a0.from_file(build_path,
+        ct_vio *build_vio = ct_vio_a0.from_file(build_path,
                                                            VIO_OPEN_WRITE);
         build_vio->write(build_vio->inst, data, sizeof(char), size);
         build_vio->close(build_vio->inst);
@@ -152,7 +152,7 @@ namespace config {
 
 #endif
 
-    ct_cvar_t find(const char *name) {
+    ct_cvar find(const char *name) {
         for (uint64_t i = 1; i < MAX_VARIABLES; ++i) {
             if (_G.name[i][0] == '\0') {
                 continue;
@@ -203,7 +203,7 @@ namespace config {
             int tmp_int;
             char tmp_str[128];
 
-            ct_cvar_t cvar = find(name);
+            ct_cvar cvar = find(name);
             if (cvar.idx != 0) {
                 enum cvar_type t = get_type(cvar);
                 switch (t) {
@@ -230,8 +230,8 @@ namespace config {
 
     void load_global(const char *platform) {
         ct_allocator *a = ct_memory_a0.main_allocator();
-        ct_cvar_t bd = find("build");
-        ct_cvar_t source_dir = find("src");
+        ct_cvar bd = find("build");
+        ct_cvar source_dir = find("src");
 
         const char *build_dir_str = get_string(bd);
 
@@ -240,7 +240,7 @@ namespace config {
                                             platform,
                                             "global.config");
 
-        struct ct_vio *source_vio = ct_vio_a0.from_file(config_path,
+        ct_vio *source_vio = ct_vio_a0.from_file(config_path,
                                                             VIO_OPEN_READ);
 
         char *data = CETECH_ALLOCATE(a, char, source_vio->size(source_vio->inst));
@@ -268,7 +268,7 @@ namespace config {
             const char *s;
         } tmp_var;
 
-        ct_cvar_t cvar = find(name);
+        ct_cvar cvar = find(name);
         if (cvar.idx != 0) {
             enum cvar_type type = _G.types[cvar.idx];
             switch (type) {
@@ -341,7 +341,7 @@ namespace config {
         return 1;
     }
 
-    ct_cvar_t find_or_create(const char *name,
+    ct_cvar find_or_create(const char *name,
                           int *_new) {
         if (_new) *_new = 0;
 
@@ -357,7 +357,7 @@ namespace config {
             return make_cvar(i);
         }
 
-        const ct_cvar_t var = _find_first_free();
+        const ct_cvar var = _find_first_free();
 
         if (var.idx != 0) {
             str_set(_G.name[var.idx], name);
@@ -369,11 +369,11 @@ namespace config {
         return make_cvar(0);
     }
 
-    ct_cvar_t new_float(const char *name,
+    ct_cvar new_float(const char *name,
                      const char *desc,
                      float f) {
         int _new;
-        ct_cvar_t find = find_or_create(name, &_new);
+        ct_cvar find = find_or_create(name, &_new);
 
         if (_new) {
             str_set(_G.name[find.idx], name);
@@ -386,11 +386,11 @@ namespace config {
         return find;
     }
 
-    ct_cvar_t new_int(const char *name,
+    ct_cvar new_int(const char *name,
                    const char *desc,
                    int i) {
         int _new;
-        ct_cvar_t find = find_or_create(name, &_new);
+        ct_cvar find = find_or_create(name, &_new);
 
         if (_new) {
             str_set(_G.name[find.idx], name);
@@ -403,11 +403,11 @@ namespace config {
         return find;
     }
 
-    ct_cvar_t new_str(const char *name,
+    ct_cvar new_str(const char *name,
                    const char *desc,
                    const char *s) {
         int _new;
-        ct_cvar_t find = find_or_create(name, &_new);
+        ct_cvar find = find_or_create(name, &_new);
 
         if (_new) {
             str_set(_G.name[find.idx], name);
@@ -421,33 +421,33 @@ namespace config {
         return find;
     }
 
-    float get_float(ct_cvar_t var) {
+    float get_float(ct_cvar var) {
         return _G.values[var.idx].f;
     }
 
-    int get_int(ct_cvar_t var) {
+    int get_int(ct_cvar var) {
         return _G.values[var.idx].i;
     }
 
-    const char *get_string(ct_cvar_t var) {
+    const char *get_string(ct_cvar var) {
         return _G.values[var.idx].s;
     }
 
-    enum cvar_type get_type(ct_cvar_t var) {
+    enum cvar_type get_type(ct_cvar var) {
         return _G.types[var.idx];
     }
 
-    void set_float(ct_cvar_t var,
+    void set_float(ct_cvar var,
                    float f) {
         _G.values[var.idx].f = f;
     }
 
-    void set_int(ct_cvar_t var,
+    void set_int(ct_cvar var,
                  int i) {
         _G.values[var.idx].i = i;
     }
 
-    void set_string(ct_cvar_t var,
+    void set_string(ct_cvar var,
                     const char *s) {
         char *_s = _G.values[var.idx].s;
 
@@ -483,7 +483,7 @@ namespace config {
         }
     }
 
-    static struct ct_config_a0 a0 = {
+    static ct_config_a0 a0 = {
             .parse_args = parse_args,
             .find = find,
             .find_or_create = find_or_create,
@@ -500,7 +500,7 @@ namespace config {
             .log_all = log_all,
     };
 
-    int init(struct ct_api_a0 *api) {
+    int init(ct_api_a0 *api) {
         CETECH_GET_API(api, ct_memory_a0);
         CETECH_GET_API(api, ct_path_a0);
         CETECH_GET_API(api, ct_vio_a0);

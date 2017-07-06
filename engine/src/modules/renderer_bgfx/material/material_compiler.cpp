@@ -45,7 +45,7 @@ namespace material_compiler {
 
         void _preprocess(const char *filename,
                          yaml_node_t root,
-                         struct ct_compilator_api *capi) {
+                         ct_compilator_api *capi) {
             auto a = ct_memory_a0.main_allocator();
 
             yaml_node_t parent_node = yaml_get_node(root, "parent");
@@ -65,7 +65,7 @@ namespace material_compiler {
                 char *full_path = ct_path_a0.join(a, 2, source_dir,
                                                   prefab_file);
 
-                struct ct_vio *prefab_vio = ct_vio_a0.from_file(full_path,
+                ct_vio *prefab_vio = ct_vio_a0.from_file(full_path,
                                                                     VIO_OPEN_READ);
 
                 CETECH_FREE(a, full_path);
@@ -163,9 +163,9 @@ namespace material_compiler {
     }
 
     int compiler(const char *filename,
-                 struct ct_vio *source_vio,
-                 struct ct_vio *build_vio,
-                 struct ct_compilator_api *compilator_api) {
+                 ct_vio *source_vio,
+                 ct_vio *build_vio,
+                 ct_compilator_api *compilator_api) {
 
         char *source_data =
                 CETECH_ALLOCATE(ct_memory_a0.main_allocator(), char,

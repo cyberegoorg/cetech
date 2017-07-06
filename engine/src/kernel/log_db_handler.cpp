@@ -129,11 +129,11 @@ void logdb_log(enum ct_log_level level,
 
 namespace log {
     int logdb_init_db(const char *log_dir,
-                      struct ct_api_a0 *api) {
+                      ct_api_a0 *api) {
         CETECH_GET_API(api, ct_log_a0);
 
-        struct ct_path_a0 *path = (ct_path_a0 *) api->first("ct_path_a0").api;
-        struct ct_memory_a0 *memory = (ct_memory_a0 *) api->first(
+        ct_path_a0 *path = (ct_path_a0 *) api->first("ct_path_a0").api;
+        ct_memory_a0 *memory = (ct_memory_a0 *) api->first(
                 "ct_memory_a0").api;
 
         logdb_path = path->join(memory->main_allocator(), 2, log_dir, "log.db");

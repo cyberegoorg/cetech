@@ -19,22 +19,21 @@ extern "C" {
 //==============================================================================
 
 struct ct_camera;
+struct ct_world;
+struct ct_entity;
 
-typedef struct world_s world_t;
-typedef struct entity_s entity_t;
 typedef struct mat33f_s mat33f_t;
 typedef struct mat44f_s mat44f_t;
 typedef struct vec2f_s vec2f_t;
 typedef struct vec3f_s vec3f_t;
 typedef struct vec4f_s vec4f_t;
 
-typedef void os_window_t;
+typedef void ct_window_t;
 
 //! Material typedef
-typedef struct material_s {
+struct ct_material {
     uint32_t idx;
-} material_t;
-
+};
 
 
 //==============================================================================
@@ -47,18 +46,18 @@ struct ct_material_a0 {
     //! Create new material
     //! \param name Material resource name
     //! \return Material
-    material_t (*resource_create)(uint64_t name);
+    struct ct_material (*resource_create)(uint64_t name);
 
     //! Get texture count in material
     //! \param material Material
     //! \return Texture count
-    uint32_t (*get_texture_count)(material_t material);
+    uint32_t (*get_texture_count)(struct ct_material material);
 
     //! Set texture value
     //! \param material Material
     //! \param slot Slot Name
     //! \param texture Texture name
-    void (*set_texture)(material_t material,
+    void (*set_texture)(struct ct_material material,
                         const char *slot,
                         uint64_t texture);
 
@@ -66,7 +65,7 @@ struct ct_material_a0 {
     //! \param material Material
     //! \param slot Variable name
     //! \param v Value
-    void (*set_vec4f)(material_t material,
+    void (*set_vec4f)(struct ct_material material,
                       const char *slot,
                       vec4f_t v);
 
@@ -74,7 +73,7 @@ struct ct_material_a0 {
     //! \param material Material
     //! \param slot Variable name
     //! \param v Value
-    void (*set_mat33f)(material_t material,
+    void (*set_mat33f)(struct ct_material material,
                        const char *slot,
                        mat33f_t v);
 
@@ -82,15 +81,15 @@ struct ct_material_a0 {
     //! \param material Material
     //! \param slot Variable name
     //! \param v Value
-    void (*set_mat44f)(material_t material,
+    void (*set_mat44f)(struct ct_material material,
                        const char *slot,
                        mat44f_t v);
 
     //! Use material for actual render
-    void (*use)(material_t material);
+    void (*use)(struct ct_material material);
 
     //! Submit material for actual render
-    void (*submit)(material_t material);
+    void (*submit)(struct ct_material material);
 };
 
 //==============================================================================
@@ -98,10 +97,9 @@ struct ct_material_a0 {
 //==============================================================================
 
 //! Mesh typedef
-typedef struct {
+struct ct_mesh_renderer {
     uint32_t idx;
-} mesh_renderer_t;
-
+};
 
 //==============================================================================
 // Api
@@ -113,21 +111,21 @@ struct ct_mesh_renderer_a0 {
     //! Is mesh valid
     //! \param mesh Mesh
     //! \return 1 if is valid else 0
-    int (*is_valid)(mesh_renderer_t mesh);
+    int (*is_valid)(struct ct_mesh_renderer mesh);
 
     //! Has entity mesh renderer?
     //! \param world World
     //! \param entity Entity
     //! \return 1 if entity has mesh rendere else 0
-    int (*has)(world_t world,
-               entity_t entity);
+    int (*has)(struct ct_world world,
+               struct ct_entity entity);
 
     //! Get mesh render for entity
     //! \param world World
     //! \param entity Entity
     //! \return Mesh renderer
-    mesh_renderer_t (*get)(world_t world,
-                           entity_t entity);
+    struct ct_mesh_renderer (*get)(struct ct_world world,
+                           struct ct_entity entity);
 
     //! Create new mesh render
     //! \param world World
@@ -137,8 +135,8 @@ struct ct_mesh_renderer_a0 {
     //! \param node Node
     //! \param material Material
     //! \return Mesh renderer
-    mesh_renderer_t (*create)(world_t world,
-                              entity_t entity,
+    struct ct_mesh_renderer (*create)(struct ct_world world,
+                              struct ct_entity entity,
                               uint64_t scene,
                               uint64_t mesh,
                               uint64_t node,
@@ -148,20 +146,20 @@ struct ct_mesh_renderer_a0 {
     //! \param world World
     //! \param mesh Mesh
     //! \return Material
-    material_t (*get_material)(world_t world,
-                               mesh_renderer_t mesh);
+    struct ct_material (*get_material)(struct ct_world world,
+                               struct ct_mesh_renderer mesh);
 
     //! Set material
     //! \param world World
     //! \param mesh Mesh
     //! \param material Material
-    void (*set_material)(world_t world,
-                         mesh_renderer_t mesh,
+    void (*set_material)(struct ct_world world,
+                         struct ct_mesh_renderer mesh,
                          uint64_t material);
 
     //! Render all mesh in world
     //! \param world Word
-    void (*render_all)(world_t world);
+    void (*render_all)(struct ct_world world);
 };
 
 
@@ -179,7 +177,7 @@ typedef int viewport_t;
 struct ct_renderer_a0 {
     //! Create renderer.
     //! \param window Window
-    void (*create)(os_window_t *window);
+    void (*create)(ct_window_t *window);
 
     //! Set debug mode on/off
     //! \param debug True/False
@@ -193,7 +191,7 @@ struct ct_renderer_a0 {
     //! \param world World
     //! \param camera Camera
     //! \param viewport Viewport
-    void (*render_world)(world_t world,
+    void (*render_world)(struct ct_world world,
                          struct ct_camera camera,
                          viewport_t viewport);
 };

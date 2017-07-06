@@ -88,9 +88,9 @@ namespace texture_compiler {
     }
 
     static int compiler(const char *filename,
-                        struct ct_vio *source_vio,
-                        struct ct_vio *build_vio,
-                        struct ct_compilator_api *compilator_api) {
+                        ct_vio *source_vio,
+                        ct_vio *build_vio,
+                        ct_compilator_api *compilator_api) {
 
         auto a = ct_memory_a0.main_allocator();
 
@@ -137,7 +137,7 @@ namespace texture_compiler {
             return 0;
         }
 
-        struct ct_vio *tmp_file = ct_vio_a0.from_file(output_path,
+        ct_vio *tmp_file = ct_vio_a0.from_file(output_path,
                                                           VIO_OPEN_READ);
         char *tmp_data =
                 CETECH_ALLOCATE(ct_memory_a0.main_allocator(), char,

@@ -17,52 +17,13 @@ extern "C" {
 
 struct ct_vio;
 struct ct_allocator;
-struct ct_compilator_api;
-
 struct ct_config_a0;
 struct ct_app_a0;
+struct ct_compilator_api;
 
 //==============================================================================
 // Typedefs
 //==============================================================================
-
-//! Resource loader
-//! \param input Input vio
-//! \param allocator Allocator
-//! \return Resource data
-typedef void *(*ct_resource_loader_t)(struct ct_vio *input,
-                                   struct ct_allocator *allocator);
-
-//! Resource online callback
-//! \param name Resource name
-//! \param data Resource data
-typedef void  (*ct_resource_online_t)(uint64_t name,
-                                   void *data);
-
-//! Resource offline callback
-//! \param name Resource name
-//! \param data Resource data
-typedef void  (*ct_resource_offline_t)(uint64_t name,
-                                    void *data);
-
-//! Resource unload callback
-//! \param new_data Resource data
-//! \param allocator Allocator
-typedef void  (*ct_resource_unloader_t)(void *new_data,
-                                     struct ct_allocator *allocator);
-
-//! Resource reloader
-//! \param name Resource name
-//! \param old_data Resource old data
-//! \param new_data Resource new data
-//! \param allocator Allocator
-typedef void *(*resource_reloader_t)(uint64_t name,
-                                     void *old_data,
-                                     void *new_data,
-                                     struct ct_allocator *allocator);
-
-
-struct ct_compilator_api;
 
 //! Resource compilator fce
 //! \param filename Source filename
@@ -82,11 +43,39 @@ typedef int (*ct_resource_compilator_t)(
 
 //! Resource callbacks
 typedef struct {
-    ct_resource_loader_t loader;     //!< Loader
-    ct_resource_unloader_t unloader; //!< Unloader
-    ct_resource_online_t online;     //!< Online
-    ct_resource_offline_t offline;   //!< Offline
-    resource_reloader_t reloader; //!< Reloader
+    //! \param input Input vio
+    //! \param allocator Allocator
+    //! \return Resource data
+    void *(*loader)(struct ct_vio *input,
+                    struct ct_allocator *allocator);
+
+    //! Resource online callback
+    //! \param name Resource name
+    //! \param data Resource data
+    void (*online)(uint64_t name,
+                   void *data);
+
+    //! Resource offline callback
+    //! \param name Resource name
+    //! \param data Resource data
+    void (*offline)(uint64_t name,
+                    void *data);
+
+    //! Resource unload callback
+    //! \param new_data Resource data
+    //! \param allocator Allocator
+    void (*unloader)(void *new_data,
+                     struct ct_allocator *allocator);
+
+    //! Resource reloader
+    //! \param name Resource name
+    //! \param old_data Resource old data
+    //! \param new_data Resource new data
+    //! \param allocator Allocator
+    void *(*reloader)(uint64_t name,
+                      void *old_data,
+                      void *new_data,
+                      struct ct_allocator *allocator);
 } ct_resource_callbacks_t;
 
 

@@ -60,8 +60,8 @@ namespace shader_resource {
     static const bgfx::ProgramHandle null_program = {0};
 
 
-    void *loader(struct ct_vio *input,
-                 struct ct_allocator *allocator) {
+    void *loader(ct_vio *input,
+                 ct_allocator *allocator) {
 
         const int64_t size = input->size(input->inst);
         char *data = CETECH_ALLOCATE(allocator, char, size);
@@ -70,7 +70,7 @@ namespace shader_resource {
     }
 
     void unloader(void *new_data,
-                  struct ct_allocator *allocator) {
+                  ct_allocator *allocator) {
         CETECH_FREE(allocator, new_data);
     }
 
@@ -109,7 +109,7 @@ namespace shader_resource {
     void *reloader(uint64_t name,
                    void *old_data,
                    void *new_data,
-                   struct ct_allocator *allocator) {
+                   ct_allocator *allocator) {
         offline(name, old_data);
         online(name, new_data);
 
@@ -133,7 +133,7 @@ namespace shader_resource {
 //==============================================================================
 
 namespace shader {
-    int shader_init(struct ct_api_a0 *api) {
+    int shader_init(ct_api_a0 *api) {
         CETECH_GET_API(api, ct_memory_a0);
         CETECH_GET_API(api, ct_resource_a0);
         CETECH_GET_API(api, ct_app_a0);

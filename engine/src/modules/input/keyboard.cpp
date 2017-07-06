@@ -87,7 +87,7 @@ namespace keyboard {
     }
 
     void _update() {
-        struct ct_event_header *event = ct_machine_a0.event_begin();
+        ct_event_header *event = ct_machine_a0.event_begin();
 
         memcpy(_G.last_state, _G.state, 512);
 
@@ -97,11 +97,11 @@ namespace keyboard {
 
             switch (event->type) {
                 case EVENT_KEYBOARD_DOWN:
-                    _G.state[((struct ct_keyboard_event *) event)->keycode] = 1;
+                    _G.state[((ct_keyboard_event *) event)->keycode] = 1;
                     break;
 
                 case EVENT_KEYBOARD_UP:
-                    _G.state[((struct ct_keyboard_event *) event)->keycode] = 0;
+                    _G.state[((ct_keyboard_event *) event)->keycode] = 0;
                     break;
 
                 default:
@@ -114,7 +114,7 @@ namespace keyboard {
 }
 
 namespace keyboard_module {
-    static struct ct_keyboard_a0 a0 = {
+    static ct_keyboard_a0 a0 = {
             .button_index = keyboard::button_index,
             .button_name = keyboard::button_name,
             .button_state = keyboard::button_state,
@@ -123,11 +123,11 @@ namespace keyboard_module {
             .update = keyboard::_update
     };
 
-    void _init_api(struct ct_api_a0 *api) {
+    void _init_api(ct_api_a0 *api) {
         api->register_api("ct_keyboard_a0", &a0);
     }
 
-    void _init(struct ct_api_a0 *api) {
+    void _init(ct_api_a0 *api) {
         _init_api(api);
 
         CETECH_GET_API(api, ct_machine_a0);
@@ -145,12 +145,12 @@ namespace keyboard_module {
     }
 
 
-    extern "C" void keyboard_unload_module(struct ct_api_a0 *api) {
+    extern "C" void keyboard_unload_module(ct_api_a0 *api) {
         _shutdown();
     }
 
 
-    extern "C" void keyboard_load_module(struct ct_api_a0 *api) {
+    extern "C" void keyboard_load_module(ct_api_a0 *api) {
         _init(api);
     }
 

@@ -36,12 +36,12 @@ namespace {
 
 
     struct WorldInstance {
-        world_t world;
+        ct_world world;
         uint32_t n;
         uint32_t allocated;
         void *buffer;
 
-        entity_t *entity;
+        ct_entity *entity;
         float *near;
         float *far;
         float *fov;
@@ -63,17 +63,17 @@ namespace {
         //assert(sz > _data.n);
 
         WorldInstance new_data;
-        const unsigned bytes = sz * (sizeof(entity_t) + (3 * sizeof(float)));
+        const unsigned bytes = sz * (sizeof(ct_entity) + (3 * sizeof(float)));
         new_data.buffer = CETECH_ALLOCATE(_allocator, char, bytes);
         new_data.n = _data.n;
         new_data.allocated = sz;
 
-        new_data.entity = (entity_t *) (new_data.buffer);
+        new_data.entity = (ct_entity *) (new_data.buffer);
         new_data.near = (float *) (new_data.entity + sz);
         new_data.far = (float *) (new_data.near + sz);
         new_data.fov = (float *) (new_data.far + sz);
 
-        memcpy(new_data.entity, _data.entity, _data.n * sizeof(entity_t));
+        memcpy(new_data.entity, _data.entity, _data.n * sizeof(ct_entity));
         memcpy(new_data.near, _data.near, _data.n * sizeof(float));
         memcpy(new_data.far, _data.far, _data.n * sizeof(float));
         memcpy(new_data.fov, _data.fov, _data.n * sizeof(float));
@@ -87,8 +87,8 @@ namespace {
                  unsigned i) {
 
         unsigned last = _data.n - 1;
-        entity_t e = _data.entity[i];
-        entity_t last_e = _data.entity[last];
+        ct_entity e = _data.entity[i];
+        ct_entity last_e = _data.entity[last];
 
         _data.entity[i] = _data.entity[last];
         _data.near[i] = _data.near[last];
@@ -101,18 +101,18 @@ namespace {
         --_data.n;
     }
 
-    static void _new_world(world_t world) {
+    static void _new_world(ct_world world) {
         uint32_t idx = array::size(_G.world_instances);
         array::push_back(_G.world_instances, WorldInstance());
         _G.world_instances[idx].world = world;
         map::set(_G.world_map, world.h, idx);
     }
 
-    static void _destroy_world(world_t world) {
+    static void _destroy_world(ct_world world) {
         uint32_t idx = map::get(_G.world_map, world.h, UINT32_MAX);
         uint32_t last_idx = array::size(_G.world_instances) - 1;
 
-        world_t last_world = _G.world_instances[last_idx].world;
+        ct_world last_world = _G.world_instances[last_idx].world;
 
         CETECH_FREE(ct_memory_a0.main_allocator(),
                           _G.world_instances[idx].buffer);
@@ -122,7 +122,7 @@ namespace {
         array::pop_back(_G.world_instances);
     }
 
-    static WorldInstance *_get_world_instance(world_t world) {
+    static WorldInstance *_get_world_instance(ct_world world) {
         uint32_t idx = map::get(_G.world_map, world.h, UINT32_MAX);
 
         if (idx != UINT32_MAX) {
@@ -148,20 +148,20 @@ namespace {
 }
 
 namespace camera {
-    int is_valid(struct ct_camera camera) {
+    int is_valid(ct_camera camera) {
         return camera.idx != UINT32_MAX;
     }
 
-    void get_project_view(world_t world,
-                          struct ct_camera camera,
+    void get_project_view(ct_world world,
+                          ct_camera camera,
                           mat44f_t *proj,
                           mat44f_t *view) {
 
         WorldInstance *world_inst = _get_world_instance(world);
 
         vec2f_t size = ct_renderer_a0.get_size(); // TODO, to arg... or viewport?
-        entity_t e = world_inst->entity[camera.idx];
-        ct_transform_t t = ct_transform_a0.get(world, e);
+        ct_entity e = world_inst->entity[camera.idx];
+        ct_transform t = ct_transform_a0.get(world, e);
 
         float fov = world_inst->fov[camera.idx];
         float near = world_inst->near[camera.idx];
@@ -173,16 +173,16 @@ namespace camera {
         mat44f_inverse(view, w);
     }
 
-    int has(world_t world,
-            entity_t entity) {
+    int has(ct_world world,
+            ct_entity entity) {
 
         uint32_t idx = world.h ^entity.h;
 
         return map::has(_G.ent_map, idx);
     }
 
-    ct_camera get(world_t world,
-                 entity_t entity) {
+    ct_camera get(ct_world world,
+                 ct_entity entity) {
 
         uint32_t idx = world.h ^entity.h;
 
@@ -191,8 +191,8 @@ namespace camera {
         return (ct_camera) {.idx = component_idx};
     }
 
-    ct_camera create(world_t world,
-                    entity_t entity,
+    ct_camera create(ct_world world,
+                    ct_entity entity,
                     float near,
                     float far,
                     float fov) {
@@ -217,7 +217,7 @@ namespace camera {
 
 namespace camera_module {
 
-    static struct ct_camera_a0 camera_api = {
+    static ct_camera_a0 camera_api = {
             .is_valid = camera::is_valid,
             .get_project_view = camera::get_project_view,
             .has = camera::has,
@@ -225,16 +225,16 @@ namespace camera_module {
             .create = camera::create
     };
 
-    void _on_world_create(world_t world) {
+    void _on_world_create(ct_world world) {
         _new_world(world);
     }
 
-    void _on_world_destroy(world_t world) {
+    void _on_world_destroy(ct_world world) {
         _destroy_world(world);
     }
 
-    void _destroyer(world_t world,
-                    entity_t *ents,
+    void _destroyer(ct_world world,
+                    ct_entity *ents,
                     size_t ent_count) {
         // TODO: remove from arrays, swap idx -> last AND change size
         for (int i = 0; i < ent_count; i++) {
@@ -242,8 +242,8 @@ namespace camera_module {
         }
     }
 
-    void _spawner(world_t world,
-                  entity_t *ents,
+    void _spawner(ct_world world,
+                  ct_entity *ents,
                   uint32_t *cents,
                   uint32_t *ents_parent,
                   size_t ent_count,
@@ -259,7 +259,7 @@ namespace camera_module {
         }
     }
 
-    static void _init(struct ct_api_a0 *api) {
+    static void _init(ct_api_a0 *api) {
         api->register_api("ct_camera_a0", &camera_api);
 
         CETECH_GET_API(api, ct_memory_a0);
@@ -295,11 +295,11 @@ namespace camera_module {
     }
 
 
-    extern "C" void camera_load_module(struct ct_api_a0 *api) {
+    extern "C" void camera_load_module(ct_api_a0 *api) {
         _init(api);
     }
 
-    extern "C" void camera_unload_module(struct ct_api_a0 *api) {
+    extern "C" void camera_unload_module(ct_api_a0 *api) {
         _shutdown();
     }
 

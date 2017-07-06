@@ -16,10 +16,9 @@ extern "C" {
 
 #include <cetech/celib/math_types.h>
 
-
 typedef struct yaml_node_s yaml_node_t;
 
-struct entity_compile_output;
+struct ct_entity_compile_output;
 struct ct_compilator_api;
 
 //==============================================================================
@@ -41,9 +40,9 @@ enum ct_property_type {
 //==============================================================================
 
 //! World handler
-typedef struct world_s {
+struct ct_world {
     uint32_t h;
-} world_t;
+};
 
 
 //! Component compiler
@@ -54,16 +53,16 @@ typedef int (*ct_component_compiler_t)(yaml_node_t body,
 
 //! On world create callback
 //! \param world World
-typedef void (*ct_world_on_created_t)(struct world_s world);
+typedef void (*ct_world_on_created_t)(struct ct_world world);
 
 //! On world destroy callback
 //! \param world World
-typedef void (*ct_world_on_destroy_t)(struct world_s world);
+typedef void (*ct_world_on_destroy_t)(struct ct_world world);
 
 //! On world update callback
 //! \param world World
 //! \param dt Delta time
-typedef void (*ct_world_on_update_t)(struct world_s world,
+typedef void (*ct_world_on_update_t)(struct ct_world world,
                                   float dt);
 
 //==============================================================================
@@ -71,9 +70,9 @@ typedef void (*ct_world_on_update_t)(struct world_s world,
 //==============================================================================
 
 //! Entity typedef
-typedef struct entity_s {
+struct ct_entity {
     uint32_t h;
-} entity_t;
+};
 
 
 //! World callbacks
@@ -105,8 +104,8 @@ static struct ct_component_clb {
     //! \param world World where is component
     //! \param ents Destroy component for this entity
     //! \param ent_count Entity count
-    void (*destroyer)(world_t world,
-                      entity_t *ents,
+    void (*destroyer)(struct ct_world world,
+                      struct ct_entity *ents,
                       size_t ent_count);
 
     //! Component spawner
@@ -116,20 +115,20 @@ static struct ct_component_clb {
     //! \param ents_parent Parent map
     //! \param ent_count Entity count
     //! \param data Component data
-    void (*spawner)(world_t world,
-                    entity_t *ents,
+    void (*spawner)(struct ct_world world,
+                    struct ct_entity *ents,
                     uint32_t *cent,
                     uint32_t *ents_parent,
                     size_t ent_count,
                     void *data);
 
-    void (*set_property)(world_t world,
-                         entity_t entity,
+    void (*set_property)(struct ct_world world,
+                         struct ct_entity entity,
                          uint64_t key,
                          struct ct_property_value value);
 
-    struct ct_property_value (*get_property)(world_t world,
-                                          entity_t entity,
+    struct ct_property_value (*get_property)(struct ct_world world,
+                                          struct ct_entity entity,
                                           uint64_t key);
 
     ct_world_on_created_t on_world_create;  //!< On world create
@@ -146,53 +145,53 @@ static struct ct_component_clb {
 struct ct_entity_a0 {
     //! Create new entity
     //! \return New entity
-    entity_t (*create)();
+    struct ct_entity (*create)();
 
     //! Destroy entities
     //! \param world World
     //! \param entity entities
     //! \param count entity count
-    void (*destroy)(world_t world,
-                    entity_t *entity,
+    void (*destroy)(struct ct_world world,
+                    struct ct_entity *entity,
                     uint32_t count);
 
     //! Is entity alive?
     //! \param entity Entity
     //! \return 1 if entity is alive else 0
-    int (*alive)(entity_t entity);
+    int (*alive)(struct ct_entity entity);
 
 
     //! Spawn entity from resource data
     //! \param world World
     //! \param resource Resource data
-    void (*spawn_from_resource)(world_t world,
+    void (*spawn_from_resource)(struct ct_world world,
                                 void *resource,
-                                entity_t **entities,
+                                struct ct_entity **entities,
                                 uint32_t *entities_count);
 
     //! Spawn entity
     //! \param world World
     //! \param name Resource name
     //! \return New entity
-    entity_t (*spawn)(world_t world,
+    struct ct_entity (*spawn)(struct ct_world world,
                       uint64_t name);
 
 #ifdef CETECH_CAN_COMPILE
 
     //! Create compiler output structure
     //! \return New compiler output structure
-    struct entity_compile_output *(*compiler_create_output)();
+    struct ct_entity_compile_output *(*compiler_create_output)();
 
     //! Destroy compiler output structure
     //! \param output Compiler output
-    void (*compiler_destroy_output)(struct entity_compile_output *output);
+    void (*compiler_destroy_output)(struct ct_entity_compile_output *output);
 
     //! Compile entity
     //! \param output Compile output
     //! \param root Yaml root node
     //! \param filename Resource filename
     //! \param compilator_api Compilator api
-    void (*compiler_compile_entity)(struct entity_compile_output *output,
+    void (*compiler_compile_entity)(struct ct_entity_compile_output *output,
                                     yaml_node_t root,
                                     const char *filename,
                                     struct ct_compilator_api *compilator_api);
@@ -200,12 +199,12 @@ struct ct_entity_a0 {
     //! Get entity counter from output
     //! \param output Compiler output
     //! \return Entity counter
-    uint32_t (*compiler_ent_counter)(struct entity_compile_output *output);
+    uint32_t (*compiler_ent_counter)(struct ct_entity_compile_output *output);
 
     //! Write output to build
     //! \param output Output
     //! \param build Build
-    void (*compiler_write_to_build)(struct entity_compile_output *output,
+    void (*compiler_write_to_build)(struct ct_entity_compile_output *output,
                                     struct ct_blob *build);
 
     //! Resource compile
@@ -260,9 +259,9 @@ struct ct_component_a0 {
     //! \param ents_parent Parent map
     //! \param ent_count Entity count
     //! \param data Component data
-    void (*spawn)(world_t world,
+    void (*spawn)(struct ct_world world,
                   uint64_t type,
-                  entity_t *ent_ids,
+                  struct ct_entity *ent_ids,
                   uint32_t *cent,
                   uint32_t *ents_parent,
                   uint32_t ent_count,
@@ -272,19 +271,19 @@ struct ct_component_a0 {
     //! \param world World where component live
     //! \param ent Destroy component for this entities
     //! \param count Entities count
-    void (*destroy)(world_t world,
-                    entity_t *ent,
+    void (*destroy)(struct ct_world world,
+                    struct ct_entity *ent,
                     uint32_t count);
 
     void (*set_property)(uint64_t type,
-                         world_t world,
-                         entity_t entity,
+                         struct ct_world world,
+                         struct ct_entity entity,
                          uint64_t key,
                          struct ct_property_value value);
 
     struct ct_property_value (*get_property)(uint64_t type,
-                                          world_t world,
-                                          entity_t entity,
+                                          struct ct_world world,
+                                          struct ct_entity entity,
                                           uint64_t key);
 };
 
@@ -297,16 +296,16 @@ struct ct_world_a0 {
 
     //! Create new world
     //! \return New world
-    world_t (*create)();
+    struct ct_world (*create)();
 
     //! Destroy world
     //! \param world World
-    void (*destroy)(world_t world);
+    void (*destroy)(struct ct_world world);
 
     //! Update world
     //! \param world World
     //! \param dt Delta time
-    void (*update)(world_t world,
+    void (*update)(struct ct_world world,
                    float dt);
 };
 

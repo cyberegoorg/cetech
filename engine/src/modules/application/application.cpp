@@ -59,24 +59,24 @@ CETECH_DECL_API(ct_gamepad_a0);
 //==============================================================================
 
 struct GConfig {
-    ct_cvar_t boot_pkg;
-    ct_cvar_t boot_script;
-    ct_cvar_t screen_x;
-    ct_cvar_t screen_y;
-    ct_cvar_t fullscreen;
+    ct_cvar boot_pkg;
+    ct_cvar boot_script;
+    ct_cvar screen_x;
+    ct_cvar screen_y;
+    ct_cvar fullscreen;
 
-    ct_cvar_t daemon;
-    ct_cvar_t compile;
-    ct_cvar_t continue_;
-    ct_cvar_t wait;
-    ct_cvar_t wid;
+    ct_cvar daemon;
+    ct_cvar compile;
+    ct_cvar continue_;
+    ct_cvar wait;
+    ct_cvar wid;
 };
 
 static struct ApplicationGlobals {
     struct GConfig config;
 
-    const struct ct_game_callbacks *game;
-    os_window_t *main_window;
+    const ct_game_callbacks *game;
+    ct_window_t *main_window;
     int is_running;
     int init_error;
     float dt;
@@ -101,7 +101,7 @@ const char *application_platform();
 
 const char *application_native_platform();
 
-os_window_t *application_get_main_window();
+ct_window_t *application_get_main_window();
 
 
 void application_quit() {
@@ -109,7 +109,7 @@ void application_quit() {
     _G.init_error = 0;
 }
 
-static struct ct_app_a0 a0 = {
+static ct_app_a0 a0 = {
         .quit = application_quit,
         .platform =  application_platform,
         .native_platform =  application_native_platform,
@@ -289,7 +289,7 @@ void application_start() {
 
         if (frame_time_accum >= frame_time) {
             if (!ct_config_a0.get_int(_G.config.daemon)) {
-                struct ct_scope_data render_sd = ct_develop_a0.enter_scope(
+                ct_scope_data render_sd = ct_develop_a0.enter_scope(
                         "Game:render()");
                 _G.game->render();
                 ct_develop_a0.leave_scope(render_sd);
@@ -326,6 +326,6 @@ const char *application_platform() {
     return application_native_platform();
 }
 
-os_window_t *application_get_main_window() {
+ct_window_t *application_get_main_window() {
     return _G.main_window;
 }

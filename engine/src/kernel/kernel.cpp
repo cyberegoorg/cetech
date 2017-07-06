@@ -19,7 +19,7 @@ CETECH_DECL_API(ct_task_a0);
 
 
 namespace os {
-    void register_api(struct ct_api_a0 *api);
+    void register_api(ct_api_a0 *api);
 }
 
 void application_start();
@@ -43,7 +43,7 @@ int load_config(int argc,
         return 0;
     }
 
-    ct_cvar_t compile = config::find("compile");
+    ct_cvar compile = config::find("compile");
     if (config::get_int(compile)) {
         config::compile_global(_platform());
     }
@@ -60,9 +60,9 @@ int load_config(int argc,
     return 1;
 }
 
-void application_register_api(struct ct_api_a0 *api);
+void application_register_api(ct_api_a0 *api);
 
-extern "C" void init_core(struct ct_api_a0 *api) {
+extern "C" void init_core(ct_api_a0 *api) {
     auto *core_alloc = core_allocator::get();
 
     LOAD_STATIC_MODULE(api, hashlib);

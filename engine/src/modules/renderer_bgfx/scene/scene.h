@@ -9,8 +9,8 @@ namespace scene {
     void submit(uint64_t scene,
                 uint64_t geom_name);
 
-    void create_graph(world_t world,
-                      entity_t entity,
+    void create_graph(struct ct_world world,
+                      struct ct_entity entity,
                       uint64_t scene);
 
     uint64_t get_mesh_node(uint64_t scene,

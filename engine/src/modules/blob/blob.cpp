@@ -12,17 +12,17 @@ using namespace cetech;
 typedef cetech::Array<uint8_t> blob_array;
 
 namespace blob {
-    uint8_t *data(ct_blob_instance *inst) {
+    uint8_t *data(ct_blob_instance_t *inst) {
         blob_array *array = (blob_array *) inst;
         return array::begin(*array);
     }
 
-    uint64_t size(ct_blob_instance *inst) {
+    uint64_t size(ct_blob_instance_t *inst) {
         blob_array *array = (blob_array *) inst;
         return array::size(*array);
     }
 
-    void push(ct_blob_instance *inst,
+    void push(ct_blob_instance_t *inst,
               void *data,
               uint64_t size) {
         blob_array *array = (blob_array *) inst;
@@ -60,10 +60,10 @@ namespace blob {
 
 
 namespace blob_module {
-    extern "C" void blob_load_module(struct ct_api_a0 *api) {
+    extern "C" void blob_load_module(ct_api_a0 *api) {
         api->register_api("ct_blob_a0", &blob::api);
     }
 
-    extern "C" void blob_unload_module(struct ct_api_a0 *api) {
+    extern "C" void blob_unload_module(ct_api_a0 *api) {
     }
 }

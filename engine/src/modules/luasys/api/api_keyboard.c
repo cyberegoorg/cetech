@@ -5,6 +5,7 @@
 #include <cetech/modules/input.h>
 #include <cetech/kernel/api_system.h>
 #include "cetech/modules/luasys.h"
+#include "../luasys_private.h"
 
 #define API_NAME "Keyboard"
 

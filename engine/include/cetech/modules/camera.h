@@ -17,14 +17,15 @@ extern "C" {
 // Typedefs
 //==============================================================================
 
-typedef struct world_s world_t;
-typedef struct entity_s entity_t;
+struct ce_world;
+struct ce_entity;
+
+
 typedef struct mat44f_s mat44f_t;
 
 //==============================================================================
 // Structs
 //==============================================================================
-
 
 //! Camera struct
 struct ct_camera {
@@ -43,8 +44,8 @@ struct ct_camera_a0 {
     //! \param world World
     //! \param entity Entity
     //! \return 1 if has else 0
-    int (*has)(world_t world,
-               entity_t entity);
+    int (*has)(struct ct_world world,
+               struct ct_entity entity);
 
     //! Is camera valid?
     //! \param camera Camera
@@ -57,7 +58,7 @@ struct ct_camera_a0 {
     //! \param camera Camera
     //! \param proj Project matrix
     //! \param view View Matrix
-    void (*get_project_view)(world_t world,
+    void (*get_project_view)(struct ct_world world,
                              struct ct_camera camera,
                              mat44f_t *proj,
                              mat44f_t *view);
@@ -67,8 +68,8 @@ struct ct_camera_a0 {
     //! \param world World
     //! \param entity Entity
     //! \return Camera component
-    struct ct_camera (*get)(world_t world,
-                            entity_t entity);
+    struct ct_camera (*get)(struct ct_world world,
+                            struct ct_entity entity);
 
     //! Create camera
     //! \param world World
@@ -77,8 +78,8 @@ struct ct_camera_a0 {
     //! \param far Far
     //! \param fov Fov
     //! \return New camera
-    struct ct_camera (*create)(world_t world,
-                               entity_t entity,
+    struct ct_camera (*create)(struct ct_world world,
+                               struct ct_entity entity,
                                float near,
                                float far,
                                float fov);

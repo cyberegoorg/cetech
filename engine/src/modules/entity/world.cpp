@@ -42,8 +42,8 @@ namespace world {
         array::push_back(_G.callbacks, clb);
     }
 
-    world_t create() {
-        world_t w = {.h = handler::create(_G.world_handler)};
+    ct_world create() {
+        ct_world w = {.h = handler::create(_G.world_handler)};
 
         for (int i = 0; i < array::size(_G.callbacks); ++i) {
             _G.callbacks[i].on_created(w);
@@ -52,7 +52,7 @@ namespace world {
         return w;
     }
 
-    void destroy(world_t world) {
+    void destroy(ct_world world) {
         for (int i = 0; i < array::size(_G.callbacks); ++i) {
             _G.callbacks[i].on_destroy(world);
         }
@@ -60,7 +60,7 @@ namespace world {
         handler::destroy(_G.world_handler, world.h);
     }
 
-    void update(world_t world,
+    void update(ct_world world,
                 float dt) {
         for (int i = 0; i < array::size(_G.callbacks); ++i) {
             if (_G.callbacks[i].on_update != NULL) {
@@ -75,7 +75,7 @@ namespace world {
 //==============================================================================
 
 namespace world_module {
-    static struct ct_world_a0 _api = {
+    static ct_world_a0 _api = {
             .register_callback = world::register_callback,
             .create = world::create,
             .destroy = world::destroy,
@@ -83,12 +83,12 @@ namespace world_module {
     };
 
 
-    static void _init_api(struct ct_api_a0 *api) {
+    static void _init_api(ct_api_a0 *api) {
         api->register_api("ct_world_a0", &_api);
     }
 
 
-    void _init(struct ct_api_a0 *api) {
+    void _init(ct_api_a0 *api) {
         _init_api(api);
 
         CETECH_GET_API(api, ct_memory_a0);
@@ -106,11 +106,11 @@ namespace world_module {
     }
 
 
-    extern "C" void world_load_module(struct ct_api_a0 *api) {
+    extern "C" void world_load_module(ct_api_a0 *api) {
         _init(api);
     }
 
-    extern "C" void world_unload_module(struct ct_api_a0 *api) {
+    extern "C" void world_unload_module(ct_api_a0 *api) {
         _shutdown();
     }
 }

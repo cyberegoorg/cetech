@@ -134,15 +134,15 @@ namespace gamepad {
     }
 
     static void update() {
-        struct ct_event_header *event = ct_machine_a0.event_begin();
+        ct_event_header *event = ct_machine_a0.event_begin();
 
         memcpy(_G.last_state, _G.state,
                sizeof(int) * GAMEPAD_BTN_MAX * GAMEPAD_MAX);
 
         while (event != ct_machine_a0.event_end()) {
-            struct ct_gamepad_move_event *move_event = (struct ct_gamepad_move_event *) event;
-            struct gamepad_btn_event *btn_event = (struct gamepad_btn_event *) event;
-            struct ct_gamepad_device_event *device_event = (struct ct_gamepad_device_event *) event;
+            ct_gamepad_move_event *move_event = (ct_gamepad_move_event *) event;
+            ct_gamepad_btn_event *btn_event = (ct_gamepad_btn_event *) event;
+            ct_gamepad_device_event *device_event = (ct_gamepad_device_event *) event;
 
             switch (event->type) {
                 case EVENT_GAMEPAD_DOWN:
@@ -178,7 +178,7 @@ namespace gamepad {
 
 namespace gamepad_module {
 
-    static struct ct_gamepad_a0 a0 = {
+    static ct_gamepad_a0 a0 = {
             .is_active = gamepad::is_active,
             .button_index = gamepad::button_index,
             .button_name = gamepad::button_name,
@@ -192,11 +192,11 @@ namespace gamepad_module {
             .update = gamepad::update
     };
 
-    static void _init_api(struct ct_api_a0 *api) {
+    static void _init_api(ct_api_a0 *api) {
         api->register_api("ct_gamepad_a0", &a0);
     }
 
-    static void _init(struct ct_api_a0 *api) {
+    static void _init(ct_api_a0 *api) {
         _init_api(api);
 
         CETECH_GET_API(api, ct_machine_a0);
@@ -217,11 +217,11 @@ namespace gamepad_module {
         _G = {0};
     }
 
-    extern "C" void gamepad_load_module(struct ct_api_a0 *api) {
+    extern "C" void gamepad_load_module(ct_api_a0 *api) {
         _init(api);
     }
 
-    extern "C" void gamepad_unload_module(struct ct_api_a0 *api) {
+    extern "C" void gamepad_unload_module(ct_api_a0 *api) {
         _shutdown();
     }
 };

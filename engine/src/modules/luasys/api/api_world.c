@@ -5,25 +5,26 @@
 #include <cetech/kernel/module.h>
 #include <cetech/modules/luasys.h>
 #include <cetech/kernel/api_system.h>
+#include "../luasys_private.h"
 
 #define API_NAME "World"
 
 CETECH_DECL_API(ct_world_a0);
 
 static int _world_create(lua_State *l) {
-    world_t world = ct_world_a0.create();
+    struct ct_world world = ct_world_a0.create();
     luasys_push_handler(l, world.h);
     return 1;
 }
 
 static int _world_destroy(lua_State *l) {
-    world_t world = {.h = luasys_to_handler(l, 1)};
+    struct ct_world world = {.h = luasys_to_handler(l, 1)};
     ct_world_a0.destroy(world);
     return 0;
 }
 
 static int _world_update(lua_State *l) {
-    world_t world = {.h = luasys_to_handler(l, 1)};
+    struct ct_world world = {.h = luasys_to_handler(l, 1)};
     float dt = luasys_to_float(l, 2);
     ct_world_a0.update(world, dt);
     return 0;

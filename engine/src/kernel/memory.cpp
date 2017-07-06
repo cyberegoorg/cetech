@@ -16,8 +16,8 @@ CETECH_DECL_API(ct_log_a0);
 #define ALLOCATOR_WHERE "allocator"
 
 struct MemorySystemGlobals {
-    struct ct_allocator *default_allocator;
-    struct ct_allocator *default_scratch_allocator;
+    ct_allocator *default_allocator;
+    ct_allocator *default_scratch_allocator;
 } _G = {0};
 
 
@@ -73,16 +73,16 @@ namespace memory {
         }
     }
 
-    struct ct_allocator *memsys_main_allocator() {
+    ct_allocator *memsys_main_allocator() {
         return _G.default_allocator;
     }
 
-    struct ct_allocator *memsys_main_scratch_allocator() {
+    ct_allocator *memsys_main_scratch_allocator() {
         return _G.default_scratch_allocator;
     }
 
     char *str_dup(const char *s,
-                  struct ct_allocator *allocator) {
+                  ct_allocator *allocator) {
         char *d = (char *) CETECH_ALLOCATE(allocator, char, strlen(s) + 1);
         CETECH_ASSERT("string", d != NULL);
 
@@ -93,10 +93,10 @@ namespace memory {
         return d;
     }
 
-    void register_api(struct ct_api_a0 *api) {
+    void register_api(ct_api_a0 *api) {
         CETECH_GET_API(api, ct_log_a0);
 
-        static struct ct_memory_a0 _api = {0};
+        static ct_memory_a0 _api = {0};
 
         _api.main_allocator = memsys_main_allocator;
         _api.main_scratch_allocator = memsys_main_scratch_allocator;

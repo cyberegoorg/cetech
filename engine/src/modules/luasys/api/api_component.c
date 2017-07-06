@@ -9,6 +9,7 @@
 #include <cetech/modules/luasys.h>
 #include <include/luajit/lua.h>
 #include <cetech/kernel/api_system.h>
+#include "../luasys_private.h"
 
 #define API_NAME "Component"
 
@@ -17,8 +18,8 @@ CETECH_DECL_API(ct_lua_a0)
 CETECH_DECL_API(ct_hash_a0)
 
 static int _set_property(lua_State *l) {
-    world_t w = {.h = luasys_to_handler(l, 1)};
-    entity_t entity = {.h = luasys_to_handler(l, 2)};
+    struct ct_world w = {.h = luasys_to_handler(l, 1)};
+    struct ct_entity entity = {.h = luasys_to_handler(l, 2)};
     const char *type = luasys_to_string(l, 3);
     const char *key = luasys_to_string(l, 4);
 
@@ -84,8 +85,8 @@ static int _set_property(lua_State *l) {
 }
 
 static int _get_property(lua_State *l) {
-    world_t w = {.h = luasys_to_handler(l, 1)};
-    entity_t entity = {.h = luasys_to_handler(l, 2)};
+    struct ct_world w = {.h = luasys_to_handler(l, 1)};
+    struct ct_entity entity = {.h = luasys_to_handler(l, 2)};
     const char *type = luasys_to_string(l, 3);
     const char *key = luasys_to_string(l, 4);
 

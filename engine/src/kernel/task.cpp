@@ -40,7 +40,7 @@ namespace taskmanager {
 
 struct task {
     void *data;
-    ct_task_work_t task_work;
+    void (*task_work)(void *data);
     const char *name;
     enum ct_task_affinity affinity;
 };
@@ -165,7 +165,7 @@ static int _task_worker(void *o) {
 //==============================================================================
 
 namespace taskmanager {
-    void add(struct ct_task_item *items,
+    void add(ct_task_item *items,
              uint32_t count) {
         for (uint32_t i = 0; i < count; ++i) {
             task_t task = _new_task();
@@ -216,8 +216,8 @@ namespace taskmanager {
 }
 
 namespace taskmanager_module {
-    static void _init_api(struct ct_api_a0 *api) {
-        static struct ct_task_a0 _api = {
+    static void _init_api(ct_api_a0 *api) {
+        static ct_task_a0 _api = {
                 .worker_id = taskmanager::worker_id,
                 .worker_count = taskmanager::worker_count,
                 .add = taskmanager::add,
@@ -228,7 +228,7 @@ namespace taskmanager_module {
         api->register_api("ct_task_a0", &_api);
     }
 
-    static void _init(struct ct_api_a0 *api) {
+    static void _init(ct_api_a0 *api) {
         _init_api(api);
 
 //        CETECH_GET_API(api, ct_develop_a0);
@@ -289,11 +289,11 @@ namespace taskmanager_module {
         _G = (struct G) {0};
     }
 
-    extern "C" void task_load_module(struct ct_api_a0 *api) {
+    extern "C" void task_load_module(ct_api_a0 *api) {
         _init(api);
     }
 
-    extern "C" void task_unload_module(struct ct_api_a0 *api) {
+    extern "C" void task_unload_module(ct_api_a0 *api) {
         _shutdown();
     }
 }

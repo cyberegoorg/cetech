@@ -28,7 +28,7 @@ using namespace cetech;
 // Keyboard part
 //==============================================================================
 
-extern int sdl_keyboard_init(struct ct_api_a0 *api);
+extern int sdl_keyboard_init(ct_api_a0 *api);
 
 extern void sdl_keyboard_shutdown();
 
@@ -39,7 +39,7 @@ extern void sdl_keyboard_process(EventStream &stream);
 // Mouse part
 //==============================================================================
 
-extern int sdl_mouse_init(struct ct_api_a0 *api);
+extern int sdl_mouse_init(ct_api_a0 *api);
 
 extern void sdl_mouse_shutdown();
 
@@ -49,7 +49,7 @@ extern void sdl_mouse_process(EventStream &stream);
 // Gamepad part
 //==============================================================================
 
-extern int sdl_gamepad_init(struct ct_api_a0 *api);
+extern int sdl_gamepad_init(ct_api_a0 *api);
 
 extern void sdl_gamepad_shutdown();
 
@@ -86,16 +86,16 @@ CETECH_DECL_API(ct_memory_a0);
 // Interface
 //==============================================================================
 namespace machine_sdl {
-    struct ct_event_header *machine_event_begin() {
+    ct_event_header *machine_event_begin() {
         return (ct_event_header *) eventstream::begin(_G.eventstream);
     }
 
 
-    struct ct_event_header *machine_event_end() {
+    ct_event_header *machine_event_end() {
         return (ct_event_header *) eventstream::end(_G.eventstream);
     }
 
-    struct ct_event_header *machine_event_next(struct ct_event_header *header) {
+    ct_event_header *machine_event_next(ct_event_header *header) {
         return (ct_event_header *) eventstream::next(_G.eventstream,
                                                   (eventstream::event_header *) header);
     }
@@ -125,7 +125,7 @@ namespace machine_sdl {
 
     }
 
-    static struct ct_machine_a0 a0 = {
+    static ct_machine_a0 a0 = {
             .event_begin = machine_sdl::machine_event_begin,
             .event_end = machine_sdl::machine_event_end,
             .event_next = machine_sdl::machine_event_next,
@@ -134,7 +134,7 @@ namespace machine_sdl {
             .update = machine_sdl::_update,
     };
 
-    void init(struct ct_api_a0 *api) {
+    void init(ct_api_a0 *api) {
         api->register_api("ct_machine_a0", &a0);
 
         CETECH_GET_API(api, ct_memory_a0);

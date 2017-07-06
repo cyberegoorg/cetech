@@ -94,11 +94,11 @@ void ct_error_assert(const char *where,
     abort();
 }
 
-static struct ct_error_a0 error_api = {
+static ct_error_a0 error_api = {
         .assert = ct_error_assert
 };
 
-void error_register_api(struct ct_api_a0 *api) {
+void error_register_api(ct_api_a0 *api) {
     CETECH_GET_API(api, ct_log_a0);
 
     api->register_api("ct_error_a0", &error_api);

@@ -12,7 +12,7 @@
 #include <cetech/kernel/api_system.h>
 #include <cetech/kernel/log.h>
 
-
+#include "module_private.h"
 
 //==============================================================================
 // Defines
@@ -23,6 +23,7 @@
 
 #define PLUGIN_PREFIX "module_"
 #define LOG_WHERE "module_system"
+
 
 //==============================================================================
 // Globals
@@ -215,7 +216,7 @@ namespace module {
             .module_reload_all = reload_all
     };
 
-    void init(struct ct_allocator *allocator,
+    void init(ct_allocator *allocator,
               struct ct_api_a0 *api) {
         CETECH_GET_API(api, ct_memory_a0);
         CETECH_GET_API(api, ct_path_a0);

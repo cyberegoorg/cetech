@@ -44,7 +44,7 @@ static struct EntityMaagerGlobals {
     Handler<uint32_t> entity_handler;
 
 //    Map<uint32_t> spawned_map;
-//    Array<Array<entity_t>> spawned_array;
+//    Array<Array<ct_entity>> spawned_array;
 
     uint64_t type;
 } EntityMaagerGlobals;
@@ -77,41 +77,41 @@ struct component_data {
 //
 //    array::push_back(_G.spawned_array, {0});
 //
-//    Array<entity_t> *array = &_G.spawned_array[idx];
+//    Array<ct_entity> *array = &_G.spawned_array[idx];
 //    array->init(ct_memory_a0.main_allocator());
 //
 //    return idx;
 //}
 //
-//void _map_spawned_array(entity_t root,
+//void _map_spawned_array(ct_entity root,
 //                        uint32_t idx) {
 //
 //    map::set(_G.spawned_map, root.h, idx);
 //}
 //
-//Array<entity_t> &_get_spawned_array_by_idx(uint32_t idx) {
+//Array<ct_entity> &_get_spawned_array_by_idx(uint32_t idx) {
 //    return _G.spawned_array[idx];
 //}
 //
-//Array<entity_t> &_get_spawned_array(entity_t entity) {
+//Array<ct_entity> &_get_spawned_array(ct_entity entity) {
 //    uint32_t idx = map::get(_G.spawned_map, entity.h, UINT32_MAX);
 //
 //    return _G.spawned_array[idx];
 //}
 //
 //
-//void _destroy_spawned_array(entity_t entity) {
+//void _destroy_spawned_array(ct_entity entity) {
 //    uint32_t idx = map::get(_G.spawned_map, entity.h, UINT32_MAX);
 //    map::remove(_G.spawned_map, entity.h);
 //
-//    Array<entity_t> *array = &_G.spawned_array[idx];
+//    Array<ct_entity> *array = &_G.spawned_array[idx];
 //    array->destroy();
 //}
 
 //==============================================================================
 // Compiler private
 //==============================================================================
-struct entity_compile_output {
+struct ct_entity_compile_output {
     Map<uint32_t> component_ent;
     Array<Array<uint32_t>> component_ent_array;
     Map<uint32_t> entity_parent;
@@ -126,7 +126,7 @@ struct entity_compile_output {
 namespace entity_resource_compiler {
     static void preprocess(const char *filename,
                            yaml_node_t root,
-                           struct ct_compilator_api *capi) {
+                           ct_compilator_api *capi) {
         auto a = ct_memory_a0.main_allocator();
         const char *source_dir = ct_resource_a0.compiler_get_source_dir();
 
@@ -146,7 +146,7 @@ namespace entity_resource_compiler {
 
             char *full_path = ct_path_a0.join(a, 2, source_dir, prefab_file);
 
-            struct ct_vio *prefab_vio = ct_vio_a0.from_file(full_path,
+            ct_vio *prefab_vio = ct_vio_a0.from_file(full_path,
                                                                 VIO_OPEN_READ);
 
             char prefab_data[prefab_vio->size(prefab_vio->inst) + 1];
@@ -168,13 +168,13 @@ namespace entity_resource_compiler {
 
     struct foreach_children_data {
         int parent_ent;
-        struct entity_compile_output *output;
+        ct_entity_compile_output *output;
     };
 
 
     static void compile_entitity(yaml_node_t rootNode,
                                  int parent,
-                                 struct entity_compile_output *output);
+                                 ct_entity_compile_output *output);
 
     void forach_children_clb(yaml_node_t key,
                              yaml_node_t value,
@@ -186,7 +186,7 @@ namespace entity_resource_compiler {
 
 
     struct foreach_componets_data {
-        struct entity_compile_output *output;
+        ct_entity_compile_output *output;
         uint32_t ent_id;
     };
 
@@ -199,7 +199,7 @@ namespace entity_resource_compiler {
         int contain_cid = 0;
 
         struct foreach_componets_data *data = (foreach_componets_data *) _data;
-        struct entity_compile_output *output = data->output;
+        ct_entity_compile_output *output = data->output;
 
         yaml_as_string(key, uid_str, CETECH_ARRAY_LEN(uid_str));
 
@@ -251,7 +251,7 @@ namespace entity_resource_compiler {
 
     void compile_entitity(yaml_node_t rootNode,
                           int parent,
-                          struct entity_compile_output *output) {
+                          ct_entity_compile_output *output) {
 
         uint32_t ent_id = output->ent_counter++;
 
@@ -282,12 +282,12 @@ namespace entity_resource_compiler {
     }
 
 
-    struct entity_compile_output *create_output() {
+    ct_entity_compile_output *create_output() {
         ct_allocator *a = ct_memory_a0.main_allocator();
 
-        entity_compile_output *output = CETECH_ALLOCATE(a,
-                                                        entity_compile_output,
-                                                        sizeof(entity_compile_output));
+        ct_entity_compile_output *output = CETECH_ALLOCATE(a,
+                                                           ct_entity_compile_output,
+                                                        sizeof(ct_entity_compile_output));
 
         output->ent_counter = 0;
 
@@ -301,7 +301,7 @@ namespace entity_resource_compiler {
         return output;
     }
 
-    void destroy_output(struct entity_compile_output *output) {
+    void destroy_output(ct_entity_compile_output *output) {
         output->component_type.destroy();
         output->entity_parent.destroy();
 
@@ -332,20 +332,20 @@ namespace entity_resource_compiler {
         CETECH_FREE(a, output);
     }
 
-    void compile_entity(struct entity_compile_output *output,
+    void compile_entity(ct_entity_compile_output *output,
                         yaml_node_t root,
                         const char *filename,
-                        struct ct_compilator_api *compilator_api) {
+                        ct_compilator_api *compilator_api) {
 
         preprocess(filename, root, compilator_api);
         compile_entitity(root, UINT32_MAX, output);
     }
 
-    uint32_t ent_counter(struct entity_compile_output *output) {
+    uint32_t ent_counter(ct_entity_compile_output *output) {
         return output->ent_counter;
     }
 
-    void write_to_build(struct entity_compile_output *output,
+    void write_to_build(ct_entity_compile_output *output,
                         ct_blob *build) {
         struct entity_resource res = {0};
         res.ent_count = (uint32_t) (output->ent_counter);
@@ -403,8 +403,8 @@ namespace entity_resource_compiler {
     void compiler(yaml_node_t root,
                   const char *filename,
                   ct_blob *build,
-                  struct ct_compilator_api *compilator_api) {
-        entity_compile_output *output = create_output();
+                  ct_compilator_api *compilator_api) {
+        ct_entity_compile_output *output = create_output();
         compile_entity(output, root, filename, compilator_api);
         write_to_build(output, build);
 
@@ -412,9 +412,9 @@ namespace entity_resource_compiler {
     }
 
     int _entity_resource_compiler(const char *filename,
-                                  struct ct_vio *source_vio,
-                                  struct ct_vio *build_vio,
-                                  struct ct_compilator_api *compilator_api) {
+                                  ct_vio *source_vio,
+                                  ct_vio *build_vio,
+                                  ct_compilator_api *compilator_api) {
 
         char source_data[source_vio->size(source_vio->inst) + 1];
         memset(source_data, 0, source_vio->size(source_vio->inst) + 1);
@@ -447,8 +447,8 @@ namespace entity_resource_compiler {
 
 namespace entity_resorce {
 
-    void *loader(struct ct_vio *input,
-                 struct ct_allocator *allocator) {
+    void *loader(ct_vio *input,
+                 ct_allocator *allocator) {
         const int64_t size = input->size(input->inst);
         char *data = CETECH_ALLOCATE(allocator, char, size);
         input->read(input->inst, data, 1, size);
@@ -457,7 +457,7 @@ namespace entity_resorce {
     }
 
     void unloader(void *new_data,
-                  struct ct_allocator *allocator) {
+                  ct_allocator *allocator) {
         CETECH_FREE(allocator, new_data);
     }
 
@@ -473,7 +473,7 @@ namespace entity_resorce {
     void *reloader(uint64_t name,
                    void *old_data,
                    void *new_data,
-                   struct ct_allocator *allocator) {
+                   ct_allocator *allocator) {
         offline(name, old_data);
         online(name, new_data);
 
@@ -496,32 +496,32 @@ namespace entity_resorce {
 // Public interface
 //==============================================================================
 namespace entity {
-    entity_t create() {
-        return (entity_t) {.h = handler::create(_G.entity_handler)};
+    ct_entity create() {
+        return (ct_entity) {.h = handler::create(_G.entity_handler)};
     }
 
-    void entity_manager_destroy(entity_t entity) {
+    void entity_manager_destroy(ct_entity entity) {
         handler::destroy(_G.entity_handler, entity.h);
     }
 
-    int alive(entity_t entity) {
+    int alive(ct_entity entity) {
         return handler::alive(_G.entity_handler, entity.h);
     }
 
-    void spawn_from_resource(world_t world,
+    void spawn_from_resource(ct_world world,
                              void *resource,
-                             entity_t **entities,
+                             ct_entity **entities,
                              uint32_t *entities_count) {
         struct entity_resource *res = (entity_resource *) resource;
 
-        entity_t *spawned = CETECH_ALLOCATE(ct_memory_a0.main_allocator(),
-                                            entity_t, sizeof(entity_t) * res->ent_count);
+        ct_entity *spawned = CETECH_ALLOCATE(ct_memory_a0.main_allocator(),
+                                            ct_entity, sizeof(ct_entity) * res->ent_count);
 
         for (int j = 0; j < res->ent_count; ++j) {
             spawned[j] = create();
         }
 
-        entity_t root = spawned[0];
+        ct_entity root = spawned[0];
 
         uint32_t *parents = entity_resource_parents(res);
         uint64_t *comp_types = entity_resource_comp_types(res);
@@ -544,16 +544,16 @@ namespace entity {
         *entities_count = res->ent_count;
     }
 
-    entity_t spawn(world_t world,
+    ct_entity spawn(ct_world world,
                    uint64_t name) {
         void *res = ct_resource_a0.get(_G.type, name);
 
         if (res == NULL) {
             ct_log_a0.error("entity", "Could not spawn entity.");
-            return (entity_t) {.h = 0};
+            return (ct_entity) {.h = 0};
         }
 
-        entity_t *entities = nullptr;
+        ct_entity *entities = nullptr;
         uint32_t entities_count = 0;
 
         spawn_from_resource(world, res, &entities, &entities_count);
@@ -561,8 +561,8 @@ namespace entity {
         return entities[0];
     }
 
-    void destroy(world_t world,
-                 entity_t *entity,
+    void destroy(ct_world world,
+                 ct_entity *entity,
                  uint32_t count) {
 
         ct_component_a0.destroy(world, entity, count);
@@ -574,7 +574,7 @@ namespace entity {
 }
 
 namespace entity_module {
-    static struct ct_entity_a0 _api = {
+    static ct_entity_a0 _api = {
 
             .create = entity::create,
             .destroy = entity::destroy,
@@ -592,12 +592,12 @@ namespace entity_module {
 #endif
     };
 
-    static void _init_api(struct ct_api_a0 *api) {
+    static void _init_api(ct_api_a0 *api) {
         api->register_api("ct_entity_a0", &_api);
 
     }
 
-    static void _init(struct ct_api_a0 *api) {
+    static void _init(ct_api_a0 *api) {
         _init_api(api);
 
         CETECH_GET_API(api, ct_memory_a0);
@@ -634,11 +634,11 @@ namespace entity_module {
     }
 
 
-    extern "C" void entity_load_module(struct ct_api_a0 *api) {
+    extern "C" void entity_load_module(ct_api_a0 *api) {
         _init(api);
     }
 
-    extern "C" void entity_unload_module(struct ct_api_a0 *api) {
+    extern "C" void entity_unload_module(ct_api_a0 *api) {
         _shutdown();
     }
 }

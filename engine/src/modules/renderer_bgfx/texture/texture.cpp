@@ -63,8 +63,8 @@ namespace texture_resource {
     static const bgfx::TextureHandle null_texture = {0};
 
 
-    void *_texture_resource_loader(struct ct_vio *input,
-                                   struct ct_allocator *allocator) {
+    void *_texture_resource_loader(ct_vio *input,
+                                   ct_allocator *allocator) {
 
         const int64_t size = input->size(input->inst);
         char *data = CETECH_ALLOCATE(allocator, char, size);
@@ -74,7 +74,7 @@ namespace texture_resource {
     }
 
     void _texture_resource_unloader(void *new_data,
-                                    struct ct_allocator *allocator) {
+                                    ct_allocator *allocator) {
         CETECH_FREE(allocator, new_data);
     }
 
@@ -105,7 +105,7 @@ namespace texture_resource {
     void *_texture_resource_reloader(uint64_t name,
                                      void *old_data,
                                      void *new_data,
-                                     struct ct_allocator *allocator) {
+                                     ct_allocator *allocator) {
         _texture_resource_offline(name, old_data);
         _texture_resource_online(name, new_data);
 
@@ -128,7 +128,7 @@ namespace texture_resource {
 // Interface
 //==============================================================================
 namespace texture {
-    int texture_init(struct ct_api_a0 *api) {
+    int texture_init(ct_api_a0 *api) {
 
         CETECH_GET_API(api, ct_memory_a0);
         CETECH_GET_API(api, ct_resource_a0);

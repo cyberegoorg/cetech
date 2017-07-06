@@ -11,7 +11,7 @@ CETECH_DECL_API(ct_log_a0);
 #include "object_linux.h"
 #include "process_linux.h"
 
-static struct ct_path_a0 path_api = {
+static ct_path_a0 path_api = {
         .list = dir_list,
         .list_free = dir_list_free,
         .make_path = dir_make_path,
@@ -23,21 +23,21 @@ static struct ct_path_a0 path_api = {
         .file_mtime = file_mtime
 };
 
-static struct ct_process_a0 process_api = {
+static ct_process_a0 process_api = {
         .exec = exec
 };
 
-static struct ct_object_a0 object_api = {
+static ct_object_a0 object_api = {
         .load  = load_object,
         .unload  = unload_object,
         .load_function  = load_function
 };
 
 
-extern void error_register_api(struct ct_api_a0 *api);
+extern void error_register_api(ct_api_a0 *api);
 
 namespace os {
-    void register_api(struct ct_api_a0 *api) {
+    void register_api(ct_api_a0 *api) {
         CETECH_GET_API(api, ct_log_a0);
 
         api->register_api("ct_path_a0", &path_api);

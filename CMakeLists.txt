@@ -99,7 +99,7 @@ set(SOURCE_FILES
         # Modules
         ########################################################################
 
-        engine/src/modules/luasys/luasys.cpp
+        engine/src/modules/luasys/luasys_private.cpp
         engine/src/modules/luasys/api/api_plugin.c
         engine/src/modules/luasys/api/api_keyboard.c
         engine/src/modules/luasys/api/api_log.c

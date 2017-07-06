@@ -162,7 +162,7 @@ void _game_render_clb() {
     luasys_call_global("render", NULL);
 }
 
-static const struct ct_game_callbacks _GameCallbacks = {
+static const ct_game_callbacks _GameCallbacks = {
         .init = _game_init_clb,
         .shutdown = _game_shutdown_clb,
         .update = _game_update_clb,
@@ -170,10 +170,10 @@ static const struct ct_game_callbacks _GameCallbacks = {
 };
 
 #define REGISTER_LUA_API(name, api) \
-    void _register_lua_##name##_api(struct ct_api_a0 *api);\
+    void _register_lua_##name##_api(ct_api_a0 *api);\
     _register_lua_##name##_api(api);
 
-extern "C" void _register_all_api(struct ct_api_a0 *api) {
+extern "C" void _register_all_api(ct_api_a0 *api) {
     REGISTER_LUA_API(log, api);
     REGISTER_LUA_API(module, api);
     REGISTER_LUA_API(keyboard, api);
@@ -318,9 +318,9 @@ static int _execute_string(lua_State *_L,
 //==============================================================================
 
 int _lua_compiler(const char *filename,
-                  struct ct_vio *source_vio,
-                  struct ct_vio *build_vio,
-                  struct ct_compilator_api *compilator_api) {
+                  ct_vio *source_vio,
+                  ct_vio *build_vio,
+                  ct_compilator_api *compilator_api) {
 
     char tmp[source_vio->size(source_vio->inst) + 1];
     memset(tmp, 0, source_vio->size(source_vio->inst) + 1);
@@ -830,8 +830,8 @@ void _create_lightuserdata() {
     lua_pop(_G.L, 1);
 }
 
-static void _init_api(struct ct_api_a0 *api) {
-    static struct ct_lua_a0 _api = {0};
+static void _init_api(ct_api_a0 *api) {
+    static ct_lua_a0 _api = {0};
 
     //api.get_top = luasys_get_top;
     _api.remove = luasys_remove;
@@ -880,7 +880,7 @@ static void _init_api(struct ct_api_a0 *api) {
 }
 
 
-static void _init(struct ct_api_a0 *a0) {
+static void _init(ct_api_a0 *a0) {
     _init_api(a0);
 
     CETECH_GET_API(a0, ct_console_srv_a0);
@@ -936,7 +936,7 @@ static void _shutdown() {
     _G = (struct G) {0};
 }
 
-const struct ct_game_callbacks *luasys_get_game_callbacks() {
+const ct_game_callbacks *luasys_get_game_callbacks() {
     return &_GameCallbacks;
 }
 
@@ -990,10 +990,10 @@ void luasys_call_global(const char *func,
     lua_pop(_state, -1);
 }
 
-extern "C" void luasys_load_module(struct ct_api_a0 *api) {
+extern "C" void luasys_load_module(ct_api_a0 *api) {
     _init(api);
 }
 
-extern "C" void luasys_unload_module(struct ct_api_a0 *api) {
+extern "C" void luasys_unload_module(ct_api_a0 *api) {
     _shutdown();
 }

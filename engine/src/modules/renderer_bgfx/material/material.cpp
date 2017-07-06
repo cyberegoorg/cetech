@@ -83,8 +83,8 @@ namespace {
 namespace material_resource {
     static const bgfx::ProgramHandle null_program = {0};
 
-    void *loader(struct ct_vio *input,
-                 struct ct_allocator *allocator) {
+    void *loader(ct_vio *input,
+                 ct_allocator *allocator) {
         const int64_t size = input->size(input->inst);
         char *data = CETECH_ALLOCATE(allocator, char, size);
         input->read(input->inst, data, 1, size);
@@ -92,7 +92,7 @@ namespace material_resource {
     }
 
     void unloader(void *new_data,
-                  struct ct_allocator *allocator) {
+                  ct_allocator *allocator) {
         CETECH_FREE(allocator, new_data);
     }
 
@@ -108,7 +108,7 @@ namespace material_resource {
     void *reloader(uint64_t name,
                    void *old_data,
                    void *new_data,
-                   struct ct_allocator *allocator) {
+                   ct_allocator *allocator) {
         offline(name, old_data);
         online(name, new_data);
 
@@ -133,7 +133,7 @@ namespace material_resource {
 
 
 namespace material {
-    int init(struct ct_api_a0 *api) {
+    int init(ct_api_a0 *api) {
         CETECH_GET_API(api, ct_memory_a0);
         CETECH_GET_API(api, ct_resource_a0);
         CETECH_GET_API(api, ct_path_a0);
@@ -154,9 +154,9 @@ namespace material {
         _G.shutdown();
     }
 
-    static const material_t null_material = {0};
+    static const ct_material null_material = {0};
 
-    material_t create(uint64_t name) {
+    ct_material create(uint64_t name) {
         auto resource = material_blob::get(ct_resource_a0.get(_G.type, name));
 
         uint32_t size = material_blob::blob_size(resource);
@@ -206,11 +206,11 @@ namespace material {
         array::push(_G.instance_data, (uint8_t *) bgfx_uniforms,
                     sizeof(bgfx::UniformHandle) * resource->uniforms_count);
 
-        return (material_t) {.idx=h};
+        return (ct_material) {.idx=h};
     }
 
 
-    uint32_t get_texture_count(material_t material) {
+    uint32_t get_texture_count(ct_material material) {
         uint32_t idx = map::get(_G.instace_map, material.idx,
                                 UINT32_MAX);
 
@@ -238,7 +238,7 @@ namespace material {
         return UINT32_MAX;
     }
 
-    void set_texture(material_t material,
+    void set_texture(ct_material material,
                      const char *slot,
                      uint64_t texture) {
 
@@ -258,7 +258,7 @@ namespace material {
         u_texture[slot_idx] = texture;
     }
 
-    void set_vec4f(material_t material,
+    void set_vec4f(ct_material material,
                    const char *slot,
                    vec4f_t v) {
 
@@ -278,7 +278,7 @@ namespace material {
         u_vec4f[slot_idx - (resource->texture_count)] = v;
     }
 
-    void set_mat33f(material_t material,
+    void set_mat33f(ct_material material,
                     const char *slot,
                     mat33f_t v) {
 
@@ -299,7 +299,7 @@ namespace material {
                  (resource->texture_count + resource->vec4f_count)] = v;
     }
 
-    void set_mat44f(material_t material,
+    void set_mat44f(ct_material material,
                     const char *slot,
                     mat44f_t v) {
         uint32_t idx = map::get(_G.instace_map, material.idx,
@@ -320,7 +320,7 @@ namespace material {
     }
 
 
-    void use(material_t material) {
+    void use(ct_material material) {
         uint32_t idx = map::get(_G.instace_map, material.idx,
                                 UINT32_MAX);
 
@@ -376,7 +376,7 @@ namespace material {
         bgfx::setState(state, 0);
     }
 
-    void submit(material_t material) {
+    void submit(ct_material material) {
         uint32_t idx = map::get(_G.instace_map, material.idx,
                                 UINT32_MAX);
         CETECH_ASSERT(LOG_WHERE, idx != UINT32_MAX);

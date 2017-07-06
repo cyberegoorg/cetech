@@ -131,7 +131,7 @@ namespace log {
         _G.get_wid_clb = get_wid_clb;
     }
 
-    static struct ct_log_a0 log_a0 = {
+    static ct_log_a0 log_a0 = {
             .set_wid_clb = log::set_wid_clb,
             .register_handler = log::log_register_handler,
             .info_va = log_info_va,
@@ -145,7 +145,7 @@ namespace log {
     };
 
 
-    void register_api(struct ct_api_a0 *api) {
+    void register_api(ct_api_a0 *api) {
         api->register_api("ct_log_a0", &log_a0);
     }
 

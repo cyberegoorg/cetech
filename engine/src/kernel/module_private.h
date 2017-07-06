@@ -3,6 +3,18 @@
 
 #include <cetech/kernel/module.h>
 
+//==============================================================================
+// Typedefs
+//==============================================================================
+
+typedef void (*ct_load_module_t)(struct ct_api_a0 *api);
+typedef void (*ct_unload_module_t)(struct ct_api_a0 *api);
+
+
+//==============================================================================
+// Defines
+//==============================================================================
+
 //! Add static module and load it
 //! \param name Module name
 #define ADD_STATIC_MODULE(name)                                     \

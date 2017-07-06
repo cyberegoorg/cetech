@@ -2,6 +2,7 @@
 #define CETECH_MATRIX_H
 
 #include "include/luajit/luajit.h"
+#include "luasys_private.h"
 
 #include <cetech/celib/mat44f.inl>
 

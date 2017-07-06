@@ -55,10 +55,10 @@ void thread_yield() {
 #endif
 }
 
-void thread_spin_lock(ct_spinlock_t *lock) {
+void thread_spin_lock(ct_spinlock *lock) {
     SDL_AtomicLock((SDL_SpinLock *) lock);
 }
 
-void thread_spin_unlock(ct_spinlock_t *lock) {
+void thread_spin_unlock(ct_spinlock *lock) {
     SDL_AtomicUnlock((SDL_SpinLock *) lock);
 }

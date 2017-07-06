@@ -51,8 +51,8 @@ struct compile_task_data {
     char *source_filename;
     uint64_t type;
     uint64_t name;
-    struct ct_vio *source;
-    struct ct_vio *build;
+    ct_vio *source;
+    ct_vio *build;
     time_t mtime;
     ct_resource_compilator_t compilator;
     atomic_int completed;
@@ -62,9 +62,9 @@ struct G {
     uint64_t compilator_map_type[MAX_TYPES]; // TODO: MAP
     ct_resource_compilator_t compilator_map_compilator[MAX_TYPES]; // TODO: MAP
 
-    ct_cvar_t cv_source_dir;
-    ct_cvar_t cv_core_dir;
-    ct_cvar_t cv_external_dir;
+    ct_cvar cv_source_dir;
+    ct_cvar cv_core_dir;
+    ct_cvar cv_external_dir;
 } ResourceCompilerGlobal = {0};
 
 
@@ -93,7 +93,7 @@ void _add_dependency(const char *who_filename,
     CETECH_FREE(a, path);
 }
 
-static struct ct_compilator_api _compilator_api = {
+static ct_compilator_api _compilator_api = {
         .add_dependency = _add_dependency
 };
 
@@ -183,7 +183,7 @@ void _compile_dir(Array<ct_task_item> &tasks,
 
         builddb_set_file_hash(source_filename_short, build_name);
 
-        struct ct_vio *source_vio = ct_vio_a0.from_file(
+        ct_vio *source_vio = ct_vio_a0.from_file(
                 source_filename_full,
                 VIO_OPEN_READ);
 
@@ -194,7 +194,7 @@ void _compile_dir(Array<ct_task_item> &tasks,
 
         char *build_path = ct_path_a0.join(a, 2, build_dir_full, build_name);
 
-        struct ct_vio *build_vio = ct_vio_a0.from_file(build_path,
+        ct_vio *build_vio = ct_vio_a0.from_file(build_path,
                                                            VIO_OPEN_WRITE);
 
         CETECH_FREE(a, build_path);
@@ -220,7 +220,7 @@ void _compile_dir(Array<ct_task_item> &tasks,
                 .completed = 0
         };
 
-        struct ct_task_item item = {
+        ct_task_item item = {
                 .name = "compiler_task",
                 .work = _compile_task,
                 .data = data,
@@ -249,7 +249,7 @@ static void _init_cvar(struct ct_config_a0 config) {
                                         "externals/build");
 }
 
-static void _init(struct ct_api_a0 *api) {
+static void _init(ct_api_a0 *api) {
     CETECH_GET_API(api, ct_memory_a0);
     CETECH_GET_API(api, ct_resource_a0);
     CETECH_GET_API(api, ct_task_a0);
@@ -379,11 +379,11 @@ char *resource_compiler_external_join(ct_allocator *alocator,
                            "bin", name);
 }
 
-extern "C" void resourcecompiler_load_module(struct ct_api_a0 *api) {
+extern "C" void resourcecompiler_load_module(ct_api_a0 *api) {
     _init(api);
 }
 
-extern "C" void resourcecompiler_unload_module(struct ct_api_a0 *api) {
+extern "C" void resourcecompiler_unload_module(ct_api_a0 *api) {
     _shutdown();
 }
 

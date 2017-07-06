@@ -15,17 +15,6 @@ extern "C" {
 
 #include <stdatomic.h>
 
-
-//==============================================================================
-// Defines
-//==============================================================================
-
-#define CETECH_ASSERT_IS_WORKER(where, worker_id)                  \
-    CETECH_ASSERT_MSG(where,                                       \
-                   TaskApiV0.worker_id() == worker_id,          \
-                   "Current worker: %d", TaskApiV0.worker_id())
-
-
 //==============================================================================
 // Enums
 //==============================================================================
@@ -59,24 +48,15 @@ enum ct_task_affinity {
 
 //CETECH_STATIC_ASSERT(TASK_AFFINITY_MAX == TASK_MAX_WORKERS + 1);
 
-
-//==============================================================================
-// Typedefs
-//==============================================================================
-
-//! Task work
-typedef void (*ct_task_work_t)(void *data);
-
-
 //==============================================================================
 // Structs
 //==============================================================================
 
 //! Task item struct
 struct ct_task_item {
-    const char *name;            //!< Task name
-    ct_task_work_t work;            //!< Task work
-    void *data;                  //!< Worker data
+    const char *name;               //!< Task name
+    void (*work)(void *data);       //!< Task work
+    void *data;                     //!< Worker data
     enum ct_task_affinity affinity; //!< Worker affinity
 };
 

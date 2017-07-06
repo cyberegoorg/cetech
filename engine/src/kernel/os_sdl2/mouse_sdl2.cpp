@@ -39,7 +39,7 @@ CETECH_DECL_API(ct_window_a0);
 // Interface
 //==============================================================================
 
-int sdl_mouse_init(struct ct_api_a0 *api) {
+int sdl_mouse_init(ct_api_a0 *api) {
     _G = (struct G) {0};
 
     CETECH_GET_API(api, ct_app_a0);
@@ -73,7 +73,7 @@ void sdl_mouse_process(EventStream &stream) {
         _G.position[0] = pos[0];
         _G.position[1] = window_size[1] - pos[1];
 
-        struct ct_mouse_move_event event;
+        ct_mouse_move_event event;
         event.pos.x = pos[0];
         event.pos.y = window_size[1] - pos[1];
 
@@ -81,7 +81,7 @@ void sdl_mouse_process(EventStream &stream) {
     }
 
     for (uint32_t i = 0; i < MOUSE_BTN_MAX; ++i) {
-        struct ct_mouse_event event;
+        ct_mouse_event event;
         event.button = i;
 
         if (is_button_down(curent_state[i], _G.state[i]))

@@ -89,7 +89,7 @@ namespace scene_resource_compiler {
     };
 
     struct compile_output *_crete_compile_output() {
-        struct ct_allocator *a = ct_memory_a0.main_allocator();
+        ct_allocator *a = ct_memory_a0.main_allocator();
         struct compile_output *output =
                 CETECH_ALLOCATE(a, struct compile_output, sizeof(struct compile_output));
 
@@ -112,7 +112,7 @@ namespace scene_resource_compiler {
     }
 
     void _destroy_compile_output(struct compile_output *output) {
-        struct ct_allocator *a = ct_memory_a0.main_allocator();
+        ct_allocator *a = ct_memory_a0.main_allocator();
 
         output->geom_name.destroy();
         output->ib_offset.destroy();
@@ -381,7 +381,7 @@ namespace scene_resource_compiler {
     int _compile_assimp(const char *filename,
                         yaml_node_t root,
                         struct compile_output *output,
-                        struct ct_compilator_api *capi) {
+                        ct_compilator_api *capi) {
         auto a = ct_memory_a0.main_allocator();
 
         yaml_node_t import_n = yaml_get_node(root, "import");
@@ -498,9 +498,9 @@ namespace scene_resource_compiler {
     }
 
     int compiler(const char *filename,
-                 struct ct_vio *source_vio,
-                 struct ct_vio *build_vio,
-                 struct ct_compilator_api *compilator_api) {
+                 ct_vio *source_vio,
+                 ct_vio *build_vio,
+                 ct_compilator_api *compilator_api) {
 
         char *source_data =
                 CETECH_ALLOCATE(ct_memory_a0.main_allocator(), char,

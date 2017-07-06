@@ -122,8 +122,8 @@ namespace scene_resource {
     static const bgfx::TextureHandle null_texture = {0};
 
 
-    void *loader(struct ct_vio *input,
-                 struct ct_allocator *allocator) {
+    void *loader(ct_vio *input,
+                 ct_allocator *allocator) {
         const int64_t size = input->size(input->inst);
         char *data = CETECH_ALLOCATE(allocator, char, size);
         input->read(input->inst, data, 1, size);
@@ -131,7 +131,7 @@ namespace scene_resource {
     }
 
     void unloader(void *new_data,
-                  struct ct_allocator *allocator) {
+                  ct_allocator *allocator) {
         CETECH_FREE(allocator, new_data);
     }
 
@@ -181,7 +181,7 @@ namespace scene_resource {
     void *reloader(uint64_t name,
                    void *old_data,
                    void *new_data,
-                   struct ct_allocator *allocator) {
+                   ct_allocator *allocator) {
         offline(name, old_data);
         online(name, new_data);
 
@@ -203,7 +203,7 @@ namespace scene_resource {
 // Interface
 //==============================================================================
 namespace scene {
-    int init(struct ct_api_a0 *api) {
+    int init(ct_api_a0 *api) {
         CETECH_GET_API(api, ct_memory_a0);
         CETECH_GET_API(api, ct_resource_a0);
         CETECH_GET_API(api, ct_scenegprah_a0);
@@ -252,8 +252,8 @@ namespace scene {
         bgfx::setIndexBuffer(instance->ib[idx], 0, instance->size[idx]);
     }
 
-    void create_graph(world_t world,
-                      entity_t entity,
+    void create_graph(ct_world world,
+                      ct_entity entity,
                       uint64_t scene) {
         auto *res = scene_blob::get(ct_resource_a0.get(_G.type, scene));
 

@@ -134,26 +134,26 @@ namespace mouse {
     }
 
     void update() {
-        struct ct_event_header *event = ct_machine_a0.event_begin();
+        ct_event_header *event = ct_machine_a0.event_begin();
 
         memcpy(_G.last_state, _G.state, MOUSE_BTN_MAX);
         _G.last_delta_pos.x = 0;
         _G.last_delta_pos.y = 0;
 
         while (event != ct_machine_a0.event_end()) {
-            struct ct_mouse_move_event *move_event;
+            ct_mouse_move_event *move_event;
 
             switch (event->type) {
                 case EVENT_MOUSE_DOWN:
-                    _G.state[((struct ct_mouse_event *) event)->button] = 1;
+                    _G.state[((ct_mouse_event *) event)->button] = 1;
                     break;
 
                 case EVENT_MOUSE_UP:
-                    _G.state[((struct ct_mouse_event *) event)->button] = 0;
+                    _G.state[((ct_mouse_event *) event)->button] = 0;
                     break;
 
                 case EVENT_MOUSE_MOVE:
-                    move_event = ((struct ct_mouse_move_event *) event);
+                    move_event = ((ct_mouse_move_event *) event);
 
                     _G.last_delta_pos.x = move_event->pos.x - _G.last_pos.x;
                     _G.last_delta_pos.y = move_event->pos.y - _G.last_pos.y;
@@ -173,7 +173,7 @@ namespace mouse {
 }
 
 namespace mouse_module {
-    static struct ct_mouse_a0 a0 = {
+    static ct_mouse_a0 a0 = {
             .button_index = mouse::button_index,
             .button_name = mouse::button_name,
             .button_state = mouse::button_state,
@@ -185,11 +185,11 @@ namespace mouse_module {
             .update = mouse::update
     };
 
-    void _init_api(struct ct_api_a0 *api) {
+    void _init_api(ct_api_a0 *api) {
         api->register_api("ct_mouse_a0", &a0);
     }
 
-    void _init(struct ct_api_a0 *api) {
+    void _init(ct_api_a0 *api) {
         _init_api(api);
 
         CETECH_GET_API(api, ct_machine_a0);
@@ -207,11 +207,11 @@ namespace mouse_module {
     }
 
 
-    extern "C" void mouse_load_module(struct ct_api_a0 *api) {
+    extern "C" void mouse_load_module(ct_api_a0 *api) {
         _init(api);
     }
 
-    extern "C" void mouse_unload_module(struct ct_api_a0 *api) {
+    extern "C" void mouse_unload_module(ct_api_a0 *api) {
         _shutdown();
     }
 }

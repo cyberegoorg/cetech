@@ -35,7 +35,7 @@ static uint32_t _sdl_flags(enum ct_window_flags flags) {
 // Interface
 //==============================================================================
 
-os_window_t *window_new(const char *title,
+ct_window_t *window_new(const char *title,
                         enum ct_window_pos x,
                         enum ct_window_pos y,
                         const int32_t width,
@@ -54,10 +54,10 @@ os_window_t *window_new(const char *title,
                          SDL_GetError());
     }
 
-    return (os_window_t *) w;
+    return (ct_window_t *) w;
 }
 
-os_window_t *window_new_from(void *hndl) {
+ct_window_t *window_new_from(void *hndl) {
     SDL_Window *w = SDL_CreateWindowFrom(hndl);
 
     if (w == NULL) {
@@ -65,33 +65,33 @@ os_window_t *window_new_from(void *hndl) {
                          SDL_GetError());
     }
 
-    return (os_window_t *) w;
+    return (ct_window_t *) w;
 }
 
-void window_destroy(os_window_t *w) {
+void window_destroy(ct_window_t *w) {
     SDL_DestroyWindow((SDL_Window *) w);
 }
 
-void window_set_title(os_window_t *w,
+void window_set_title(ct_window_t *w,
                       const char *title) {
     SDL_SetWindowTitle((SDL_Window *) w, title);
 }
 
-const char *window_get_title(os_window_t *w) {
+const char *window_get_title(ct_window_t *w) {
     return SDL_GetWindowTitle((SDL_Window *) w);
 }
 
-void window_update(os_window_t *w) {
+void window_update(ct_window_t *w) {
     SDL_UpdateWindowSurface((SDL_Window *) w);
 }
 
-void window_resize(os_window_t *w,
+void window_resize(ct_window_t *w,
                    uint32_t width,
                    uint32_t height) {
     SDL_SetWindowSize((SDL_Window *) w, width, height);
 }
 
-void window_get_size(os_window_t *window,
+void window_get_size(ct_window_t *window,
                      uint32_t *width,
                      uint32_t *height) {
     int w, h;
@@ -103,7 +103,7 @@ void window_get_size(os_window_t *window,
     *height = (uint32_t) h;
 }
 
-void *window_native_window_ptr(os_window_t *w) {
+void *window_native_window_ptr(ct_window_t *w) {
     SDL_SysWMinfo wmi;
 
     SDL_VERSION(&wmi.version);
@@ -121,7 +121,7 @@ void *window_native_window_ptr(os_window_t *w) {
 #endif
 }
 
-void *window_native_display_ptr(os_window_t *w) {
+void *window_native_display_ptr(ct_window_t *w) {
     SDL_SysWMinfo wmi;
 
     SDL_VERSION(&wmi.version);

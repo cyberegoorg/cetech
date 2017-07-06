@@ -19,6 +19,7 @@ struct ct_core_allocator_a0 {
 
 //! Memory system API V0
 struct ct_memory_a0 {
+
     //! Main allcator
     //! \return Main alocator
     struct ct_allocator *(*main_allocator)();

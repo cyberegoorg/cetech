@@ -59,7 +59,7 @@ namespace api {
         return {.api = first->value, .entry  = (void *) first};
     }
 
-    ct_api_entry next(struct ct_api_entry *entry) {
+    ct_api_entry next(ct_api_entry *entry) {
         auto map_entry = (const Map<void *>::Entry *) entry->entry;
         auto next = multi_map::find_next(_G.api_map, map_entry);
 
@@ -70,14 +70,14 @@ namespace api {
         return {.api = next->value, .entry  = (void *) entry};
     }
 
-    static struct ct_api_a0 a0 = {
+    static ct_api_a0 a0 = {
             .register_api = api::register_api,
             .first = api::first,
             .next = api::next,
             .exist = api::exist
     };
 
-    void init(struct ct_allocator *allocator) {
+    void init(ct_allocator *allocator) {
         _G = {0};
 
         _G.api_map.init(allocator);
@@ -89,11 +89,11 @@ namespace api {
         _G.api_map.destroy();
     }
 
-    struct ct_api_a0 *v0() {
+    ct_api_a0 *v0() {
         return &a0;
     }
 }
 
-extern "C" struct ct_api_a0 *ce_api_get() {
+extern "C" ct_api_a0 *ce_api_get() {
     return &api::a0;
 }

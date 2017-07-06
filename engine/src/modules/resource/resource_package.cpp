@@ -80,9 +80,9 @@ void forach_clb(yaml_node_t key,
 }
 
 int _package_compiler(const char *filename,
-                      struct ct_vio *source_vio,
-                      struct ct_vio *build_vio,
-                      struct ct_compilator_api *compilator_api) {
+                      ct_vio *source_vio,
+                      ct_vio *build_vio,
+                      ct_compilator_api *compilator_api) {
 
     char source_data[source_vio->size(source_vio->inst) + 1];
     memset(source_data, 0, source_vio->size(source_vio->inst) + 1);
@@ -134,7 +134,7 @@ int _package_compiler(const char *filename,
     return 1;
 }
 
-int package_init(struct ct_api_a0 *api) {
+int package_init(ct_api_a0 *api) {
     CETECH_GET_API(api, ct_memory_a0);
     CETECH_GET_API(api, ct_resource_a0);
     CETECH_GET_API(api, ct_task_a0);
@@ -184,7 +184,7 @@ void package_load(uint64_t name) {
 
     task_data->name = name;
 
-    struct ct_task_item item = {
+    ct_task_item item = {
             .name = "package_task",
             .work = package_task,
             .data = task_data,

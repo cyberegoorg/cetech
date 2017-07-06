@@ -85,7 +85,7 @@ int _create_controler(int i) {
 // Interface
 //==============================================================================
 
-int sdl_gamepad_init(struct ct_api_a0 *api) {
+int sdl_gamepad_init(ct_api_a0 *api) {
     CETECH_GET_API(api, ct_log_a0);
 
     _G = (struct G) {0};
@@ -173,7 +173,7 @@ void sdl_gamepad_process(EventStream &stream) {
         }
 
         for (int j = 0; j < GAMEPAD_BTN_MAX; ++j) {
-            struct gamepad_btn_event event;
+            ct_gamepad_btn_event event;
             event.gamepad_id = i;
             event.button = j;
 
@@ -187,7 +187,7 @@ void sdl_gamepad_process(EventStream &stream) {
         }
 
         for (int j = 0; j < GAMEPAD_AXIX_MAX; ++j) {
-            struct ct_gamepad_move_event event;
+            ct_gamepad_move_event event;
             event.gamepad_id = i;
             event.axis = j;
 
@@ -213,7 +213,7 @@ void sdl_gamepad_process_event(SDL_Event *event,
     switch (event->type) {
         case SDL_CONTROLLERDEVICEADDED: {
             int idx = _create_controler(event->cdevice.which);
-            struct ct_gamepad_device_event ev;
+            ct_gamepad_device_event ev;
             ev.gamepad_id = idx;
 
             eventstream::push(stream, EVENT_GAMEPAD_CONNECT, ev);
@@ -221,7 +221,7 @@ void sdl_gamepad_process_event(SDL_Event *event,
             break;
 
         case SDL_CONTROLLERDEVICEREMOVED: {
-            struct ct_gamepad_device_event ev;
+            ct_gamepad_device_event ev;
 
             for (int i = 0; i < GAMEPAD_MAX; ++i) {
                 SDL_GameController *controller = SDL_GameControllerFromInstanceID(

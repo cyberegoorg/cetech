@@ -7,6 +7,7 @@
 #include <cetech/celib/eventstream.inl>
 #include <cetech/kernel/module.h>
 #include <cetech/kernel/os.h>
+#include <cetech/kernel/api_system.h>
 
 using namespace cetech;
 
@@ -31,7 +32,7 @@ static struct G {
 // Interface
 //==============================================================================
 
-int sdl_keyboard_init(struct ct_api_a0 *api) {
+int sdl_keyboard_init(ct_api_a0 *api) {
     _G = (struct G) {0};
 
     return 1;
@@ -43,7 +44,7 @@ void sdl_keyboard_shutdown() {
 
 void sdl_keyboard_process(EventStream &stream) {
     const uint8_t *state = SDL_GetKeyboardState(NULL);
-    struct ct_keyboard_event keyboard_ev;
+    ct_keyboard_event keyboard_ev;
 
     for (uint32_t i = 0; i < KEY_MAX; ++i) {
         if (is_button_down(state[i], _G.state[i])) {
