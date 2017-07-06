@@ -33,7 +33,7 @@ typedef struct {
 //==============================================================================
 
 //! Scene-graph API V0
-struct ct_scenegprah_api_v0 {
+struct ct_scenegprah_a0 {
 
     //! Is node valid?
     //! \param node Node

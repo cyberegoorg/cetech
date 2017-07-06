@@ -50,7 +50,7 @@ typedef struct world_s {
 //! \param body Component body yaml
 //! \param data Compiled compoent data
 typedef int (*ct_component_compiler_t)(yaml_node_t body,
-                                    struct ct_blob_v0 *data);
+                                    struct ct_blob *data);
 
 //! On world create callback
 //! \param world World
@@ -143,7 +143,7 @@ static struct ct_component_clb {
 //==============================================================================
 
 //! Entity system API V0
-struct ct_entity_api_v0 {
+struct ct_entity_a0 {
     //! Create new entity
     //! \return New entity
     entity_t (*create)();
@@ -206,7 +206,7 @@ struct ct_entity_api_v0 {
     //! \param output Output
     //! \param build Build
     void (*compiler_write_to_build)(struct entity_compile_output *output,
-                                    struct ct_blob_v0 *build);
+                                    struct ct_blob *build);
 
     //! Resource compile
     //! \param root Root yaml node
@@ -215,7 +215,7 @@ struct ct_entity_api_v0 {
     //! \param compilator_api Compilator api
     void (*resource_compiler)(yaml_node_t root,
                               const char *filename,
-                              struct ct_blob_v0 *build,
+                              struct ct_blob *build,
                               struct ct_compilator_api *compilator_api);
 
 #endif
@@ -223,7 +223,7 @@ struct ct_entity_api_v0 {
 
 
 //! Component system API V0
-struct ct_component_api_v0 {
+struct ct_component_a0 {
     //! Register component compiler
     //! \param type Component type
     //! \param compiler Compiler fce
@@ -239,7 +239,7 @@ struct ct_component_api_v0 {
     //! \return 1 if compile is ok else 0
     int (*compile)(uint64_t type,
                    yaml_node_t body,
-                   struct ct_blob_v0 *data);
+                   struct ct_blob *data);
 
     //! Get component spawn order
     //! \param type Component type
@@ -289,7 +289,7 @@ struct ct_component_api_v0 {
 };
 
 //! World API V0
-struct ct_world_api_v0 {
+struct ct_world_a0 {
 
     //! Register world calbacks
     //! \param clb Callbacks

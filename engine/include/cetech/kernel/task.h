@@ -85,7 +85,7 @@ struct ct_task_item {
 //==============================================================================
 
 //! Task API V0
-struct ct_task_api_v0 {
+struct ct_task_a0 {
     //! Workers count
     //! \return Workers count
     int (*worker_count)();

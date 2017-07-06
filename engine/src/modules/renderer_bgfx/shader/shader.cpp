@@ -27,7 +27,7 @@ using namespace cetech;
 using namespace string_stream;
 
 namespace shader_compiler {
-    int init(ct_api_v0 *api);
+    int init(ct_api_a0 *api);
 }
 
 //==============================================================================
@@ -41,14 +41,14 @@ struct shader_blobResourceGlobals {
 } ShaderResourceGlobals;
 
 
-CETECH_DECL_API(ct_memory_api_v0)
-CETECH_DECL_API(ct_resource_api_v0)
-CETECH_DECL_API(ct_app_api_v0)
-CETECH_DECL_API(ct_path_v0)
-CETECH_DECL_API(ct_vio_api_v0)
-CETECH_DECL_API(ct_process_api_v0)
-CETECH_DECL_API(ct_log_api_v0)
-CETECH_DECL_API(ct_hash_api_v0)
+CETECH_DECL_API(ct_memory_a0)
+CETECH_DECL_API(ct_resource_a0)
+CETECH_DECL_API(ct_app_a0)
+CETECH_DECL_API(ct_path_a0)
+CETECH_DECL_API(ct_vio_a0)
+CETECH_DECL_API(ct_process_a0)
+CETECH_DECL_API(ct_log_a0)
+CETECH_DECL_API(ct_hash_a0)
 
 
 //==============================================================================
@@ -133,23 +133,23 @@ namespace shader_resource {
 //==============================================================================
 
 namespace shader {
-    int shader_init(struct ct_api_v0 *api) {
-        CETECH_GET_API(api, ct_memory_api_v0);
-        CETECH_GET_API(api, ct_resource_api_v0);
-        CETECH_GET_API(api, ct_app_api_v0);
-        CETECH_GET_API(api, ct_path_v0);
-        CETECH_GET_API(api, ct_vio_api_v0);
-        CETECH_GET_API(api, ct_process_api_v0);
-        CETECH_GET_API(api, ct_log_api_v0);
-        CETECH_GET_API(api, ct_hash_api_v0);
+    int shader_init(struct ct_api_a0 *api) {
+        CETECH_GET_API(api, ct_memory_a0);
+        CETECH_GET_API(api, ct_resource_a0);
+        CETECH_GET_API(api, ct_app_a0);
+        CETECH_GET_API(api, ct_path_a0);
+        CETECH_GET_API(api, ct_vio_a0);
+        CETECH_GET_API(api, ct_process_a0);
+        CETECH_GET_API(api, ct_log_a0);
+        CETECH_GET_API(api, ct_hash_a0);
 
         _G = {0};
 
-        _G.type = ct_hash_api_v0.id64_from_str("shader");
+        _G.type = ct_hash_a0.id64_from_str("shader");
 
-        _G.handler_map.init(ct_memory_api_v0.main_allocator());
+        _G.handler_map.init(ct_memory_a0.main_allocator());
 
-        ct_resource_api_v0.register_type(_G.type,
+        ct_resource_a0.register_type(_G.type,
                                       shader_resource::callback);
 #ifdef CETECH_CAN_COMPILE
         shader_compiler::init(api);
@@ -163,7 +163,7 @@ namespace shader {
     }
 
     bgfx::ProgramHandle shader_get(uint64_t name) {
-        auto resource = shader_blob::get(ct_resource_api_v0.get(_G.type, name));
+        auto resource = shader_blob::get(ct_resource_a0.get(_G.type, name));
         return map::get(_G.handler_map, name, shader_resource::null_program);
     }
 }

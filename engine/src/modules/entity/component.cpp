@@ -16,8 +16,8 @@
 #include <cetech/kernel/yaml.h>
 #include <cetech/kernel/api_system.h>
 
-CETECH_DECL_API(ct_memory_api_v0);
-CETECH_DECL_API(ct_world_api_v0);
+CETECH_DECL_API(ct_memory_a0);
+CETECH_DECL_API(ct_world_a0);
 
 using namespace cetech;
 
@@ -50,7 +50,7 @@ namespace component {
 
     int compile(uint64_t type,
                 yaml_node_t body,
-                ct_blob_v0 *data) {
+                ct_blob *data) {
 
         ct_component_compiler_t compiler = map::get<ct_component_compiler_t>(
                 _G.compiler_map, type, nullptr);
@@ -76,7 +76,7 @@ namespace component {
                 .on_update = clb.on_world_update,
         };
 
-        ct_world_api_v0.register_callback(wclb);
+        ct_world_a0.register_callback(wclb);
     }
 
     void spawn(world_t world,
@@ -145,7 +145,7 @@ namespace component {
 }
 
 namespace component_module {
-    static struct ct_component_api_v0 api = {
+    static struct ct_component_a0 api = {
             .register_compiler = component::register_compiler,
             .compile = component::compile,
             .spawn_order = component::get_spawn_order,
@@ -156,21 +156,21 @@ namespace component_module {
             .get_property = component::get_property
     };
 
-    void _init_api(struct ct_api_v0 *api_v0) {
-        api_v0->register_api("ct_component_api_v0", &api);
+    void _init_api(struct ct_api_a0 *a0) {
+        a0->register_api("ct_component_a0", &api);
     }
 
-    void _init(struct ct_api_v0 *api_v0) {
-        _init_api(api_v0);
+    void _init(struct ct_api_a0 *a0) {
+        _init_api(a0);
 
-        CETECH_GET_API(api_v0, ct_memory_api_v0);
-        CETECH_GET_API(api_v0, ct_world_api_v0);
+        CETECH_GET_API(a0, ct_memory_a0);
+        CETECH_GET_API(a0, ct_world_a0);
 
         _G = {0};
 
-        _G.compiler_map.init(ct_memory_api_v0.main_allocator());
-        _G.spawn_order_map.init(ct_memory_api_v0.main_allocator());
-        _G.component_clb.init(ct_memory_api_v0.main_allocator());
+        _G.compiler_map.init(ct_memory_a0.main_allocator());
+        _G.spawn_order_map.init(ct_memory_a0.main_allocator());
+        _G.component_clb.init(ct_memory_a0.main_allocator());
     }
 
     void _shutdown() {
@@ -179,11 +179,11 @@ namespace component_module {
         _G.component_clb.destroy();
     }
 
-    extern "C" void component_load_module(struct ct_api_v0 *api) {
+    extern "C" void component_load_module(struct ct_api_a0 *api) {
         _init(api);
     }
 
-    extern "C" void component_unload_module(struct ct_api_v0 *api) {
+    extern "C" void component_unload_module(struct ct_api_a0 *api) {
         _shutdown();
     }
 

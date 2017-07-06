@@ -42,7 +42,7 @@ typedef struct material_s {
 //==============================================================================
 
 //! Material API V0
-struct ct_material_api_v0 {
+struct ct_material_a0 {
 
     //! Create new material
     //! \param name Material resource name
@@ -108,7 +108,7 @@ typedef struct {
 //==============================================================================
 
 //! Mesh API V0
-struct ct_mesh_renderer_api_v0 {
+struct ct_mesh_renderer_a0 {
 
     //! Is mesh valid
     //! \param mesh Mesh
@@ -176,7 +176,7 @@ typedef int viewport_t;
 //==============================================================================
 
 //! Render API V0
-struct ct_renderer_api_v0 {
+struct ct_renderer_a0 {
     //! Create renderer.
     //! \param window Window
     void (*create)(os_window_t *window);

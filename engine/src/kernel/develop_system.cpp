@@ -25,12 +25,12 @@
 
 using namespace cetech;
 
-CETECH_DECL_API(ct_memory_api_v0);
-CETECH_DECL_API(ct_thread_api_v0);
-CETECH_DECL_API(ct_task_api_v0);
-CETECH_DECL_API(ct_config_api_v0);
-CETECH_DECL_API(ct_time_api_v0);
-CETECH_DECL_API(ct_log_api_v0);
+CETECH_DECL_API(ct_memory_a0);
+CETECH_DECL_API(ct_thread_a0);
+CETECH_DECL_API(ct_task_a0);
+CETECH_DECL_API(ct_config_a0);
+CETECH_DECL_API(ct_time_a0);
+CETECH_DECL_API(ct_log_a0);
 
 
 //==============================================================================
@@ -92,23 +92,23 @@ namespace {
             return;
         }
 
-        ct_thread_api_v0.spin_lock(&_G.flush_lock);
+        ct_thread_a0.spin_lock(&_G.flush_lock);
 
         array::push(_G.eventstream, _stream_buffer, _stream_buffer_size);
         _stream_buffer_size = 0;
 
-        ct_thread_api_v0.spin_unlock(&_G.flush_lock);
+        ct_thread_a0.spin_unlock(&_G.flush_lock);
     }
 
     static void _flush_job(void *data) {
         _flush_stream_buffer();
 
-        atomic_store_explicit(&_G.complete_flag[ct_task_api_v0.worker_id()], 1,
+        atomic_store_explicit(&_G.complete_flag[ct_task_a0.worker_id()], 1,
                               memory_order_release);
     }
 
     static void _flush_all_streams() {
-        const int wc = ct_task_api_v0.worker_count();
+        const int wc = ct_task_a0.worker_count();
 
         for (int i = 1; i < wc; ++i) {
             atomic_init(&_G.complete_flag[i], 0);
@@ -127,10 +127,10 @@ namespace {
             };
         }
 
-        ct_task_api_v0.add(items, wc);
+        ct_task_a0.add(items, wc);
 
         for (int i = 1; i < wc; ++i) {
-            ct_task_api_v0.wait_atomic(&_G.complete_flag[i], 0);
+            ct_task_a0.wait_atomic(&_G.complete_flag[i], 0);
         }
     }
 
@@ -239,7 +239,7 @@ namespace {
         free(data);
     }
 
-    static void _init_cvar(struct ct_config_api_v0 config) {
+    static void _init_cvar(struct ct_config_a0 config) {
         _G = {0};
         _G.cv_pub_addr = config.new_str("develop.pub.addr",
                                         "Console server rpc addr",
@@ -309,8 +309,8 @@ namespace develop_system {
 
         return (struct ct_scope_data) {
                 .name = name,
-                .start = ct_time_api_v0.ticks(),
-                .start_timer = ct_time_api_v0.perf_counter()
+                .start = ct_time_a0.ticks(),
+                .start_timer = ct_time_a0.perf_counter()
         };
     }
 
@@ -320,12 +320,12 @@ namespace develop_system {
 
         ct_scope_event ev = {
                 .name = {0},
-                .worker_id = (uint32_t) ct_task_api_v0.worker_id(),
+                .worker_id = (uint32_t) ct_task_a0.worker_id(),
                 .start = scope_data.start,
                 .duration =
-                ((float) (ct_time_api_v0.perf_counter() -
+                ((float) (ct_time_a0.perf_counter() -
                           scope_data.start_timer) /
-                 ct_time_api_v0.perf_freq()) * 1000.0f,
+                 ct_time_a0.perf_freq()) * 1000.0f,
                 .depth = _scope_depth,
         };
 
@@ -336,7 +336,7 @@ namespace develop_system {
 }
 
 namespace develop_system_module {
-    static struct ct_develop_api_v0 _api = {
+    static struct ct_develop_a0 _api = {
             .push = develop_system::_developsys_push,
             .push_record_float = develop_system::developsys_push_record_float,
             .push_record_int = develop_system::developsys_push_record_int,
@@ -345,24 +345,24 @@ namespace develop_system_module {
             .after_update = develop_system::_after_update
     };
 
-    void _init_api(struct ct_api_v0 *api) {
-        api->register_api("ct_develop_api_v0", &_api);
+    void _init_api(struct ct_api_a0 *api) {
+        api->register_api("ct_develop_a0", &_api);
     }
 
-    void _init(struct ct_api_v0 *api) {
+    void _init(struct ct_api_a0 *api) {
         _init_api(api);
 
-        CETECH_GET_API(api, ct_memory_api_v0);
-        CETECH_GET_API(api, ct_log_api_v0);
-        CETECH_GET_API(api, ct_task_api_v0);
-        CETECH_GET_API(api, ct_config_api_v0);
+        CETECH_GET_API(api, ct_memory_a0);
+        CETECH_GET_API(api, ct_log_a0);
+        CETECH_GET_API(api, ct_task_a0);
+        CETECH_GET_API(api, ct_config_a0);
 
-        CETECH_GET_API(api, ct_thread_api_v0);
-        CETECH_GET_API(api, ct_time_api_v0);
+        CETECH_GET_API(api, ct_thread_a0);
+        CETECH_GET_API(api, ct_time_a0);
 
-        _init_cvar(ct_config_api_v0);
+        _init_cvar(ct_config_a0);
 
-        _G.init(ct_memory_api_v0.main_allocator());
+        _G.init(ct_memory_a0.main_allocator());
 
         _register_to_mpack(EVENT_SCOPE, _scopeevent_to_mpack);
         _register_to_mpack(EVENT_RECORD_FLOAT, _recordfloat_to_mpack);
@@ -370,20 +370,20 @@ namespace develop_system_module {
 
         const char *addr = 0;
 
-        ct_log_api_v0.debug(LOG_WHERE, "Init");
+        ct_log_a0.debug(LOG_WHERE, "Init");
 
         int socket = nn_socket(AF_SP, NN_PUB);
         if (socket < 0) {
-            ct_log_api_v0.error(LOG_WHERE, "Could not create nanomsg socket: %s",
+            ct_log_a0.error(LOG_WHERE, "Could not create nanomsg socket: %s",
                              nn_strerror(errno));
             //return 0;
         }
-        addr = ct_config_api_v0.get_string(_G.cv_pub_addr);
+        addr = ct_config_a0.get_string(_G.cv_pub_addr);
 
-        ct_log_api_v0.debug(LOG_WHERE, "PUB address: %s", addr);
+        ct_log_a0.debug(LOG_WHERE, "PUB address: %s", addr);
 
         if (nn_bind(socket, addr) < 0) {
-            ct_log_api_v0.error(LOG_WHERE, "Could not bind socket to '%s': %s",
+            ct_log_a0.error(LOG_WHERE, "Could not bind socket to '%s': %s",
                              addr,
                              nn_strerror(errno));
             //return 0;
@@ -393,19 +393,19 @@ namespace develop_system_module {
     }
 
     void _shutdown() {
-        ct_log_api_v0.debug(LOG_WHERE, "Shutdown");
+        ct_log_a0.debug(LOG_WHERE, "Shutdown");
 
         nn_close(_G.pub_socket);
 
         _G.shutdown();
     }
 
-    extern "C" void developsystem_load_module(struct ct_api_v0 *api) {
+    extern "C" void developsystem_load_module(struct ct_api_a0 *api) {
         _init(api);
 
     }
 
-    extern "C" void developsystem_unload_module(struct ct_api_v0 *api) {
+    extern "C" void developsystem_unload_module(struct ct_api_a0 *api) {
         _shutdown();
     }
 }

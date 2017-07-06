@@ -23,7 +23,7 @@ struct allocator_malloc {
     memory::allocator_trace_entry trace[MAX_MEM_TRACE];
 };
 
-void *malloc_allocator_allocate(allocator_instance_v0 *allocator,
+void *malloc_allocator_allocate(allocator_instance *allocator,
                                 void *ptr,
                                 uint32_t size,
                                 uint32_t align) {

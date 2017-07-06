@@ -11,16 +11,16 @@
 
 #define API_NAME "SceneGraph"
 
-CETECH_DECL_API(ct_scenegprah_api_v0);
-CETECH_DECL_API(ct_hash_api_v0);
+CETECH_DECL_API(ct_scenegprah_a0);
+CETECH_DECL_API(ct_hash_a0);
 
 static int _scenegraph_node_by_name(lua_State *l) {
     world_t w = {.h = luasys_to_handler(l, 1)};
     entity_t ent = {.h = luasys_to_handler(l, 2)};
     const char *name_str = luasys_to_string(l, 3);
 
-    uint64_t name = ct_hash_api_v0.id64_from_str(name_str);
-    ct_scene_node_t node = ct_scenegprah_api_v0.node_by_name(w, ent, name);
+    uint64_t name = ct_hash_a0.id64_from_str(name_str);
+    ct_scene_node_t node = ct_scenegprah_a0.node_by_name(w, ent, name);
 
     luasys_push_int(l, node.idx);
     return 1;
@@ -30,7 +30,7 @@ static int _scenegraph_has(lua_State *l) {
     world_t w = {.h = luasys_to_handler(l, 1)};
     entity_t ent = {.h = luasys_to_handler(l, 2)};
 
-    luasys_push_bool(l, ct_scenegprah_api_v0.has(w, ent));
+    luasys_push_bool(l, ct_scenegprah_a0.has(w, ent));
     return 1;
 }
 
@@ -39,7 +39,7 @@ static int _scenegraph_get_position(lua_State *l) {
     world_t w = {.h = luasys_to_handler(l, 1)};
     ct_scene_node_t t = {.idx = luasys_to_int(l, 2)};
 
-    luasys_push_vec3f(l, ct_scenegprah_api_v0.get_position(w, t));
+    luasys_push_vec3f(l, ct_scenegprah_a0.get_position(w, t));
     return 1;
 }
 
@@ -47,7 +47,7 @@ static int _scenegraph_get_rotation(lua_State *l) {
     world_t w = {.h = luasys_to_handler(l, 1)};
     ct_scene_node_t t = {.idx = luasys_to_int(l, 2)};
 
-    luasys_push_quat(l, ct_scenegprah_api_v0.get_rotation(w, t));
+    luasys_push_quat(l, ct_scenegprah_a0.get_rotation(w, t));
     return 1;
 }
 
@@ -55,7 +55,7 @@ static int _scenegraph_get_scale(lua_State *l) {
     world_t w = {.h = luasys_to_handler(l, 1)};
     ct_scene_node_t t = {.idx = luasys_to_int(l, 2)};
 
-    luasys_push_vec3f(l, ct_scenegprah_api_v0.get_scale(w, t));
+    luasys_push_vec3f(l, ct_scenegprah_a0.get_scale(w, t));
     return 1;
 }
 
@@ -64,7 +64,7 @@ static int _scenegraph_set_position(lua_State *l) {
     ct_scene_node_t t = {.idx = luasys_to_int(l, 2)};
     vec3f_t *pos = luasys_to_vec3f(l, 3);
 
-    ct_scenegprah_api_v0.set_position(w, t, *pos);
+    ct_scenegprah_a0.set_position(w, t, *pos);
     return 0;
 }
 
@@ -73,7 +73,7 @@ static int _scenegraph_set_scale(lua_State *l) {
     ct_scene_node_t t = {.idx = luasys_to_int(l, 2)};
     vec3f_t *pos = luasys_to_vec3f(l, 3);
 
-    ct_scenegprah_api_v0.set_scale(w, t, *pos);
+    ct_scenegprah_a0.set_scale(w, t, *pos);
     return 0;
 }
 
@@ -82,7 +82,7 @@ static int _scenegraph_set_rotation(lua_State *l) {
     ct_scene_node_t t = {.idx = luasys_to_int(l, 2)};
     quatf_t *rot = luasys_to_quat(l, 3);
 
-    ct_scenegprah_api_v0.set_rotation(w, t, *rot);
+    ct_scenegprah_a0.set_rotation(w, t, *rot);
     return 0;
 }
 
@@ -90,7 +90,7 @@ static int _scenegraph_get_world_matrix(lua_State *l) {
     world_t w = {.h = luasys_to_handler(l, 1)};
     ct_scene_node_t t = {.idx = luasys_to_int(l, 2)};
 
-    mat44f_t *wm = ct_scenegprah_api_v0.get_world_matrix(w, t);
+    mat44f_t *wm = ct_scenegprah_a0.get_world_matrix(w, t);
 
     luasys_push_mat44f(l, *wm);
     return 1;
@@ -101,13 +101,13 @@ static int _scenegraph_link(lua_State *l) {
     ct_scene_node_t root = {.idx = luasys_to_int(l, 2)};
     ct_scene_node_t child = {.idx = luasys_to_int(l, 3)};
 
-    ct_scenegprah_api_v0.link(w, root, child);
+    ct_scenegprah_a0.link(w, root, child);
     return 0;
 }
 
-void _register_lua_scenegraph_api(struct ct_api_v0 *api) {
-    CETECH_GET_API(api, ct_scenegprah_api_v0);
-    CETECH_GET_API(api, ct_hash_api_v0);
+void _register_lua_scenegraph_api(struct ct_api_a0 *api) {
+    CETECH_GET_API(api, ct_scenegprah_a0);
+    CETECH_GET_API(api, ct_hash_a0);
 
     luasys_add_module_function(API_NAME, "has", _scenegraph_has);
     luasys_add_module_function(API_NAME, "node_by_name",

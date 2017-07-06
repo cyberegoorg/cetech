@@ -15,9 +15,9 @@
 
 #include "cetech/modules/transform.h"
 
-CETECH_DECL_API(ct_memory_api_v0);
-CETECH_DECL_API(ct_hash_api_v0);
-CETECH_DECL_API(ct_component_api_v0);
+CETECH_DECL_API(ct_memory_a0);
+CETECH_DECL_API(ct_hash_a0);
+CETECH_DECL_API(ct_component_a0);
 
 using namespace cetech;
 
@@ -177,7 +177,7 @@ static void _destroy_world(world_t world) {
 
     world_t last_world = _G.world_instances[last_idx].world;
 
-    CETECH_FREE(ct_memory_api_v0.main_allocator(),
+    CETECH_FREE(ct_memory_a0.main_allocator(),
                       _G.world_instances[idx].buffer);
 
     _G.world_instances[idx] = _G.world_instances[last_idx];
@@ -186,7 +186,7 @@ static void _destroy_world(world_t world) {
 }
 
 int _transform_component_compiler(yaml_node_t body,
-                                  ct_blob_v0 *data) {
+                                  ct_blob *data) {
     transform_data t_data;
 
     YAML_NODE_SCOPE(scale, body, "scale",
@@ -258,9 +258,9 @@ void _set_property(world_t world,
                    uint64_t key,
                    struct ct_property_value value) {
 
-    uint64_t position = ct_hash_api_v0.id64_from_str("position");
-    uint64_t rotation = ct_hash_api_v0.id64_from_str("rotation");
-    uint64_t scale = ct_hash_api_v0.id64_from_str("scale");
+    uint64_t position = ct_hash_a0.id64_from_str("position");
+    uint64_t rotation = ct_hash_a0.id64_from_str("rotation");
+    uint64_t scale = ct_hash_a0.id64_from_str("scale");
 
     ct_transform_t transform = transform_get(world, entity);
 
@@ -287,9 +287,9 @@ void _set_property(world_t world,
 struct ct_property_value _get_property(world_t world,
                                     entity_t entity,
                                     uint64_t key) {
-    uint64_t position = ct_hash_api_v0.id64_from_str("position");
-    uint64_t rotation = ct_hash_api_v0.id64_from_str("rotation");
-    uint64_t scale = ct_hash_api_v0.id64_from_str("scale");
+    uint64_t position = ct_hash_a0.id64_from_str("position");
+    uint64_t rotation = ct_hash_a0.id64_from_str("rotation");
+    uint64_t scale = ct_hash_a0.id64_from_str("scale");
 
     ct_transform_t transform = transform_get(world, entity);
 
@@ -319,8 +319,8 @@ struct ct_property_value _get_property(world_t world,
     return (struct ct_property_value) {.type= PROPERTY_INVALID};
 }
 
-static void _init_api(struct ct_api_v0 *api) {
-    static struct ct_transform_api_v0 _api = {0};
+static void _init_api(struct ct_api_a0 *api) {
+    static struct ct_transform_a0 _api = {0};
 
     _api.is_valid = transform_is_valid;
     _api.transform = transform_transform;
@@ -336,26 +336,26 @@ static void _init_api(struct ct_api_v0 *api) {
     _api.create = transform_create;
     _api.link = transform_link;
 
-    api->register_api("ct_transform_api_v0", &_api);
+    api->register_api("ct_transform_a0", &_api);
 }
 
-static void _init(struct ct_api_v0 *api) {
+static void _init(struct ct_api_a0 *api) {
     _init_api(api);
 
-    CETECH_GET_API(api, ct_component_api_v0);
-    CETECH_GET_API(api, ct_memory_api_v0);
-    CETECH_GET_API(api, ct_hash_api_v0);
+    CETECH_GET_API(api, ct_component_a0);
+    CETECH_GET_API(api, ct_memory_a0);
+    CETECH_GET_API(api, ct_hash_a0);
 
 
     _G = {0};
 
-    _G.world_map.init(ct_memory_api_v0.main_allocator());
-    _G.world_instances.init(ct_memory_api_v0.main_allocator());
-    _G.ent_map.init(ct_memory_api_v0.main_allocator());
+    _G.world_map.init(ct_memory_a0.main_allocator());
+    _G.world_instances.init(ct_memory_a0.main_allocator());
+    _G.ent_map.init(ct_memory_a0.main_allocator());
 
-    _G.type = ct_hash_api_v0.id64_from_str("transform");
+    _G.type = ct_hash_a0.id64_from_str("transform");
 
-    ct_component_api_v0.register_type(
+    ct_component_a0.register_type(
             _G.type,
             (struct ct_component_clb) {
                     .spawner=_spawner,
@@ -369,7 +369,7 @@ static void _init(struct ct_api_v0 *api) {
             }
     );
 
-    ct_component_api_v0.register_compiler(_G.type,
+    ct_component_a0.register_compiler(_G.type,
                                        _transform_component_compiler, 10);
 }
 
@@ -534,7 +534,7 @@ ct_transform_t transform_create(world_t world,
     WorldInstance *data = _get_world_instance(world);
 
     uint32_t idx = data->n;
-    allocate(*data, ct_memory_api_v0.main_allocator(), data->n + 1);
+    allocate(*data, ct_memory_a0.main_allocator(), data->n + 1);
     ++data->n;
 
     data->entity[idx] = entity;
@@ -610,10 +610,10 @@ void transform_link(world_t world,
                                                                             parent)));
 }
 
-extern "C" void transform_load_module(struct ct_api_v0 *api) {
+extern "C" void transform_load_module(struct ct_api_a0 *api) {
     _init(api);
 }
 
-extern "C" void transform_unload_module(struct ct_api_v0 *api) {
+extern "C" void transform_unload_module(struct ct_api_a0 *api) {
     _shutdown();
 }

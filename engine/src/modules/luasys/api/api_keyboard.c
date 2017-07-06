@@ -8,12 +8,12 @@
 
 #define API_NAME "Keyboard"
 
-CETECH_DECL_API(ct_keyboard_api_v0);
+CETECH_DECL_API(ct_keyboard_a0);
 
 static int _keyboard_button_index(lua_State *l) {
     const char *name = luasys_to_string(l, 1);
 
-    uint32_t idx = ct_keyboard_api_v0.button_index(name);
+    uint32_t idx = ct_keyboard_a0.button_index(name);
     luasys_push_float(l, idx);
 
     return 1;
@@ -22,7 +22,7 @@ static int _keyboard_button_index(lua_State *l) {
 static int _keyboard_button_name(lua_State *l) {
     uint32_t idx = (uint32_t) (luasys_to_float(l, 1));
 
-    luasys_push_string(l, ct_keyboard_api_v0.button_name(idx));
+    luasys_push_string(l, ct_keyboard_a0.button_name(idx));
 
     return 1;
 
@@ -31,7 +31,7 @@ static int _keyboard_button_name(lua_State *l) {
 static int _keyboard_button_state(lua_State *l) {
     uint32_t idx = (uint32_t) (luasys_to_float(l, 1));
 
-    luasys_push_bool(l, ct_keyboard_api_v0.button_state(0, idx));
+    luasys_push_bool(l, ct_keyboard_a0.button_state(0, idx));
 
     return 1;
 }
@@ -39,7 +39,7 @@ static int _keyboard_button_state(lua_State *l) {
 static int _keyboard_button_pressed(lua_State *l) {
     uint32_t idx = (uint32_t) (luasys_to_float(l, 1));
 
-    luasys_push_bool(l, ct_keyboard_api_v0.button_pressed(0, idx));
+    luasys_push_bool(l, ct_keyboard_a0.button_pressed(0, idx));
 
     return 1;
 
@@ -48,15 +48,15 @@ static int _keyboard_button_pressed(lua_State *l) {
 static int _keyboard_button_released(lua_State *l) {
     uint32_t idx = (uint32_t) (luasys_to_float(l, 1));
 
-    luasys_push_bool(l, ct_keyboard_api_v0.button_released(0, idx));
+    luasys_push_bool(l, ct_keyboard_a0.button_released(0, idx));
 
     return 1;
 
 }
 
 
-void _register_lua_keyboard_api(struct ct_api_v0 *api) {
-    CETECH_GET_API(api, ct_keyboard_api_v0);
+void _register_lua_keyboard_api(struct ct_api_a0 *api) {
+    CETECH_GET_API(api, ct_keyboard_a0);
 
     luasys_add_module_function(API_NAME, "button_index",
                                _keyboard_button_index);

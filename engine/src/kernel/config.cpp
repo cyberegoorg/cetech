@@ -21,11 +21,11 @@
 
 #include "config_private.h"
 
-CETECH_DECL_API(ct_memory_api_v0);
-CETECH_DECL_API(ct_path_v0);
-CETECH_DECL_API(ct_vio_api_v0);
-CETECH_DECL_API(ct_log_api_v0);
-CETECH_DECL_API(ct_hash_api_v0);
+CETECH_DECL_API(ct_memory_a0);
+CETECH_DECL_API(ct_path_a0);
+CETECH_DECL_API(ct_vio_a0);
+CETECH_DECL_API(ct_log_a0);
+CETECH_DECL_API(ct_hash_a0);
 
 //==============================================================================
 // Defines
@@ -84,7 +84,7 @@ void _deallocate_all_string() {
             continue;
         }
 
-        CETECH_FREE(ct_memory_api_v0.main_allocator(), _G.values[i].s);
+        CETECH_FREE(ct_memory_a0.main_allocator(), _G.values[i].s);
     }
 }
 
@@ -98,7 +98,7 @@ ct_cvar_t _find_first_free() {
         return make_cvar(i);
     }
 
-    ct_log_api_v0.error(LOG_WHERE, "Could not create _new config variable");
+    ct_log_a0.error(LOG_WHERE, "Could not create _new config variable");
 
     return make_cvar(0);
 }
@@ -112,25 +112,25 @@ namespace config {
 #ifdef CETECH_CAN_COMPILE
 
     void compile_global(const char * platform) {
-        ct_allocator *a = ct_memory_api_v0.main_allocator();
+        ct_allocator *a = ct_memory_a0.main_allocator();
 
         ct_cvar_t bd = find("build");
         ct_cvar_t source_dir = find("src");
 
         const char *build_dir_str = get_string(bd);
 
-        char *build_dir = ct_path_v0.join(a, 2, build_dir_str,
+        char *build_dir = ct_path_a0.join(a, 2, build_dir_str,
                                           platform);
-        ct_path_v0.make_path(build_dir);
+        ct_path_a0.make_path(build_dir);
 
-        char *build_path = ct_path_v0.join(a, 3, build_dir_str,
+        char *build_path = ct_path_a0.join(a, 3, build_dir_str,
                                            platform,
                                            "global.config");
 
-        char *source_path = ct_path_v0.join(a, 2, get_string(source_dir),
+        char *source_path = ct_path_a0.join(a, 2, get_string(source_dir),
                                             "global.config");
 
-        struct ct_vio *source_vio = ct_vio_api_v0.from_file(source_path,
+        struct ct_vio *source_vio = ct_vio_a0.from_file(source_path,
                                                             VIO_OPEN_READ);
 
         char *data = CETECH_ALLOCATE(a, char, source_vio->size(source_vio->inst));
@@ -139,7 +139,7 @@ namespace config {
         source_vio->read(source_vio->inst, data, sizeof(char), size);
         source_vio->close(source_vio->inst);
 
-        struct ct_vio *build_vio = ct_vio_api_v0.from_file(build_path,
+        struct ct_vio *build_vio = ct_vio_a0.from_file(build_path,
                                                            VIO_OPEN_WRITE);
         build_vio->write(build_vio->inst, data, sizeof(char), size);
         build_vio->close(build_vio->inst);
@@ -229,18 +229,18 @@ namespace config {
 
 
     void load_global(const char *platform) {
-        ct_allocator *a = ct_memory_api_v0.main_allocator();
+        ct_allocator *a = ct_memory_a0.main_allocator();
         ct_cvar_t bd = find("build");
         ct_cvar_t source_dir = find("src");
 
         const char *build_dir_str = get_string(bd);
 
-        char *config_path = ct_path_v0.join(a, 3,
+        char *config_path = ct_path_a0.join(a, 3,
                                             build_dir_str,
                                             platform,
                                             "global.config");
 
-        struct ct_vio *source_vio = ct_vio_api_v0.from_file(config_path,
+        struct ct_vio *source_vio = ct_vio_a0.from_file(config_path,
                                                             VIO_OPEN_READ);
 
         char *data = CETECH_ALLOCATE(a, char, source_vio->size(source_vio->inst));
@@ -292,7 +292,7 @@ namespace config {
                     break;
 
                 default:
-                    ct_log_api_v0.error(LOG_WHERE, "Invalid type for cvar \"%s\"",
+                    ct_log_a0.error(LOG_WHERE, "Invalid type for cvar \"%s\"",
                                      name);
                     break;
             }
@@ -315,7 +315,7 @@ namespace config {
             }
 
             new_str(name, "", value);
-            //ct_log_api_v0.error(LOG_WHERE, "Invalid cvar \"%s\"", name);
+            //ct_log_a0.error(LOG_WHERE, "Invalid cvar \"%s\"", name);
         }
     }
 
@@ -412,8 +412,8 @@ namespace config {
         if (_new) {
             str_set(_G.name[find.idx], name);
             _G.types[find.idx] = CV_STRING;
-            _G.values[find.idx].s = ct_memory_api_v0.str_dup(s,
-                                                          ct_memory_api_v0.main_allocator());
+            _G.values[find.idx].s = ct_memory_a0.str_dup(s,
+                                                          ct_memory_a0.main_allocator());
         }
 
         str_set(_G.desc[find.idx], desc);
@@ -452,11 +452,11 @@ namespace config {
         char *_s = _G.values[var.idx].s;
 
         if (_s != NULL) {
-            CETECH_FREE(ct_memory_api_v0.main_allocator(), _s);
+            CETECH_FREE(ct_memory_a0.main_allocator(), _s);
         }
 
-        _G.values[var.idx].s = ct_memory_api_v0.str_dup(s,
-                                                     ct_memory_api_v0.main_allocator());
+        _G.values[var.idx].s = ct_memory_a0.str_dup(s,
+                                                     ct_memory_a0.main_allocator());
     }
 
     void log_all() {
@@ -469,13 +469,13 @@ namespace config {
 
             switch (_G.types[i]) {
                 case CV_FLOAT:
-                    ct_log_api_v0.info(LOG_WHERE, "%s = %f", name, _G.values[i].f);
+                    ct_log_a0.info(LOG_WHERE, "%s = %f", name, _G.values[i].f);
                     break;
                 case CV_INT:
-                    ct_log_api_v0.info(LOG_WHERE, "%s = %d", name, _G.values[i].i);
+                    ct_log_a0.info(LOG_WHERE, "%s = %d", name, _G.values[i].i);
                     break;
                 case CV_STRING:
-                    ct_log_api_v0.info(LOG_WHERE, "%s = %s", name, _G.values[i].s);
+                    ct_log_a0.info(LOG_WHERE, "%s = %s", name, _G.values[i].s);
                     break;
                 default:
                     break;
@@ -483,7 +483,7 @@ namespace config {
         }
     }
 
-    static struct ct_config_api_v0 api_v1 = {
+    static struct ct_config_a0 a0 = {
             .parse_args = parse_args,
             .find = find,
             .find_or_create = find_or_create,
@@ -500,26 +500,26 @@ namespace config {
             .log_all = log_all,
     };
 
-    int init(struct ct_api_v0 *api) {
-        CETECH_GET_API(api, ct_memory_api_v0);
-        CETECH_GET_API(api, ct_path_v0);
-        CETECH_GET_API(api, ct_vio_api_v0);
-        CETECH_GET_API(api, ct_log_api_v0);
-        CETECH_GET_API(api, ct_hash_api_v0);
+    int init(struct ct_api_a0 *api) {
+        CETECH_GET_API(api, ct_memory_a0);
+        CETECH_GET_API(api, ct_path_a0);
+        CETECH_GET_API(api, ct_vio_a0);
+        CETECH_GET_API(api, ct_log_a0);
+        CETECH_GET_API(api, ct_hash_a0);
 
         _G = {0};
 
-        ct_log_api_v0.debug(LOG_WHERE, "Init");
+        ct_log_a0.debug(LOG_WHERE, "Init");
 
-        api->register_api("ct_config_api_v0", &api_v1);
+        api->register_api("ct_config_a0", &a0);
 
-        _G.type = ct_hash_api_v0.id64_from_str("config");
+        _G.type = ct_hash_a0.id64_from_str("config");
 
         return 1;
     }
 
     void shutdown() {
-        ct_log_api_v0.debug(LOG_WHERE, "Shutdown");
+        ct_log_a0.debug(LOG_WHERE, "Shutdown");
 
         _deallocate_all_string();
     }

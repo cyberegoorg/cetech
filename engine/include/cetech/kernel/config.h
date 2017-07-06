@@ -14,9 +14,9 @@ extern "C" {
 
 #include <stdint.h>
 
-struct ct_api_v0;
-struct ct_memory_api_v0;
-struct ct_app_api_v0;
+struct ct_api_a0;
+struct ct_memory_a0;
+struct ct_app_a0;
 
 //==============================================================================
 // Typedefs
@@ -45,7 +45,7 @@ enum cvar_type {
 //==============================================================================
 
 //! Config API V0
-struct ct_config_api_v0 {
+struct ct_config_a0 {
     //! Parse commandline arguments.
     //! \param args Arguments
     //! \return 1 if ok else 0

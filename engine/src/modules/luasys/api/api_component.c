@@ -12,9 +12,9 @@
 
 #define API_NAME "Component"
 
-CETECH_DECL_API(ct_component_api_v0)
-CETECH_DECL_API(ct_lua_api_v0)
-CETECH_DECL_API(ct_hash_api_v0)
+CETECH_DECL_API(ct_component_a0)
+CETECH_DECL_API(ct_lua_a0)
+CETECH_DECL_API(ct_hash_a0)
 
 static int _set_property(lua_State *l) {
     world_t w = {.h = luasys_to_handler(l, 1)};
@@ -22,8 +22,8 @@ static int _set_property(lua_State *l) {
     const char *type = luasys_to_string(l, 3);
     const char *key = luasys_to_string(l, 4);
 
-    uint64_t component_type = ct_hash_api_v0.id64_from_str(type);
-    uint64_t key_id = ct_hash_api_v0.id64_from_str(key);
+    uint64_t component_type = ct_hash_a0.id64_from_str(type);
+    uint64_t key_id = ct_hash_a0.id64_from_str(key);
 
     int val_type = luasys_value_type(l, 5);
 
@@ -58,15 +58,15 @@ static int _set_property(lua_State *l) {
 
 
         default:
-            if (ct_lua_api_v0.is_vec3f(l, 5)) {
-                vec3f_t *v = ct_lua_api_v0.to_vec3f(l, 5);
+            if (ct_lua_a0.is_vec3f(l, 5)) {
+                vec3f_t *v = ct_lua_a0.to_vec3f(l, 5);
 
                 value = (struct ct_property_value) {
                         .type = PROPERTY_VEC3,
                         .value.vec3f = *v
                 };
-            } else if (ct_lua_api_v0.is_quat(l, 5)) {
-                quatf_t *q = ct_lua_api_v0.to_quat(l, 5);
+            } else if (ct_lua_a0.is_quat(l, 5)) {
+                quatf_t *q = ct_lua_a0.to_quat(l, 5);
 
                 value = (struct ct_property_value) {
                         .type = PROPERTY_VEC3,
@@ -78,7 +78,7 @@ static int _set_property(lua_State *l) {
             }
     }
 
-    ct_component_api_v0.set_property(component_type, w, entity, key_id, value);
+    ct_component_a0.set_property(component_type, w, entity, key_id, value);
 
     return 0;
 }
@@ -89,10 +89,10 @@ static int _get_property(lua_State *l) {
     const char *type = luasys_to_string(l, 3);
     const char *key = luasys_to_string(l, 4);
 
-    uint64_t component_type = ct_hash_api_v0.id64_from_str(type);
-    uint64_t key_id = ct_hash_api_v0.id64_from_str(key);
+    uint64_t component_type = ct_hash_a0.id64_from_str(type);
+    uint64_t key_id = ct_hash_a0.id64_from_str(key);
 
-    struct ct_property_value value = ct_component_api_v0.get_property(
+    struct ct_property_value value = ct_component_a0.get_property(
             component_type, w, entity, key_id);
 
     switch (value.type) {
@@ -124,10 +124,10 @@ static int _get_property(lua_State *l) {
 }
 
 
-void _register_lua_component_api(struct ct_api_v0 *api) {
-    CETECH_GET_API(api, ct_component_api_v0);
-    CETECH_GET_API(api, ct_lua_api_v0);
-    CETECH_GET_API(api, ct_hash_api_v0);
+void _register_lua_component_api(struct ct_api_a0 *api) {
+    CETECH_GET_API(api, ct_component_a0);
+    CETECH_GET_API(api, ct_lua_a0);
+    CETECH_GET_API(api, ct_hash_a0);
 
     luasys_add_module_function(API_NAME, "set_property", _set_property);
     luasys_add_module_function(API_NAME, "get_property", _get_property);

@@ -14,8 +14,8 @@
 #include <cetech/modules/scenegraph.h>
 
 
-CETECH_DECL_API(ct_memory_api_v0);
-CETECH_DECL_API(ct_world_api_v0);
+CETECH_DECL_API(ct_memory_a0);
+CETECH_DECL_API(ct_world_a0);
 
 #define hash_combine(a, b) ((a)^(b))
 
@@ -112,7 +112,7 @@ namespace {
 
         world_t last_world = _G.world_instances[last_idx].world;
 
-        CETECH_FREE(ct_memory_api_v0.main_allocator(),
+        CETECH_FREE(ct_memory_a0.main_allocator(),
                           _G.world_instances[idx].buffer);
 
         _G.world_instances[idx] = _G.world_instances[last_idx];
@@ -295,10 +295,10 @@ namespace scenegraph {
         WorldInstance *data = _get_world_instance(world);
 
         uint32_t first_idx = data->n;
-        allocate(*data, ct_memory_api_v0.main_allocator(), data->n + count);
+        allocate(*data, ct_memory_a0.main_allocator(), data->n + count);
         data->n += count;
 
-        ct_scene_node_t *nodes = CETECH_ALLOCATE(ct_memory_api_v0.main_allocator(),
+        ct_scene_node_t *nodes = CETECH_ALLOCATE(ct_memory_a0.main_allocator(),
                                                  ct_scene_node_t, sizeof(ct_scene_node_t) * count);
 
         for (int i = 0; i < count; ++i) {
@@ -356,7 +356,7 @@ namespace scenegraph {
         uint64_t hash = hash_combine(world.h, entity.h);
 
         map::set(_G.ent_map, hash, root.idx);
-        CETECH_FREE(ct_memory_api_v0.main_allocator(), nodes);
+        CETECH_FREE(ct_memory_a0.main_allocator(), nodes);
 
         return root;
     }
@@ -417,7 +417,7 @@ namespace scenegraph {
 }
 
 namespace scenegraph_module {
-    static struct ct_scenegprah_api_v0 scenegraph_api = {
+    static struct ct_scenegprah_a0 scenegraph_api = {
             .is_valid = scenegraph::is_valid,
             .get_position = scenegraph::get_position,
             .get_rotation = scenegraph::get_rotation,
@@ -439,24 +439,24 @@ namespace scenegraph_module {
             .on_destroy=_on_world_destroy
     };
 
-    void _init_api(struct ct_api_v0 *api) {
-        api->register_api("ct_scenegprah_api_v0", &scenegraph_api);
+    void _init_api(struct ct_api_a0 *api) {
+        api->register_api("ct_scenegprah_a0", &scenegraph_api);
     }
 
 
-    void init(struct ct_api_v0 *api) {
+    void init(struct ct_api_a0 *api) {
         _init_api(api);
 
-        CETECH_GET_API(api, ct_world_api_v0);
-        CETECH_GET_API(api, ct_memory_api_v0);
+        CETECH_GET_API(api, ct_world_a0);
+        CETECH_GET_API(api, ct_memory_a0);
 
         _G = {0};
 
-        _G.world_map.init(ct_memory_api_v0.main_allocator());
-        _G.world_instances.init(ct_memory_api_v0.main_allocator());
-        _G.ent_map.init(ct_memory_api_v0.main_allocator());
+        _G.world_map.init(ct_memory_a0.main_allocator());
+        _G.world_instances.init(ct_memory_a0.main_allocator());
+        _G.ent_map.init(ct_memory_a0.main_allocator());
 
-        ct_world_api_v0.register_callback(world_callbacks);
+        ct_world_a0.register_callback(world_callbacks);
     }
 
     void shutdown() {
@@ -465,12 +465,12 @@ namespace scenegraph_module {
         _G.ent_map.destroy();
     }
 
-    extern "C" void scenegraph_load_module(struct ct_api_v0 *api) {
+    extern "C" void scenegraph_load_module(struct ct_api_a0 *api) {
         scenegraph_module::init(api);
 
     }
 
-    extern "C" void scenegraph_unload_module(struct ct_api_v0 *api) {
+    extern "C" void scenegraph_unload_module(struct ct_api_a0 *api) {
         scenegraph_module::shutdown();
     }
 }

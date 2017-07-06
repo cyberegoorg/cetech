@@ -24,14 +24,14 @@
 using namespace cetech;
 using namespace string_stream;
 
-CETECH_DECL_API(ct_memory_api_v0);
-CETECH_DECL_API(ct_resource_api_v0);
-CETECH_DECL_API(ct_app_api_v0);
-CETECH_DECL_API(ct_path_v0);
-CETECH_DECL_API(ct_vio_api_v0);
-CETECH_DECL_API(ct_process_api_v0);
-CETECH_DECL_API(ct_log_api_v0);
-CETECH_DECL_API(ct_hash_api_v0);
+CETECH_DECL_API(ct_memory_a0);
+CETECH_DECL_API(ct_resource_a0);
+CETECH_DECL_API(ct_app_a0);
+CETECH_DECL_API(ct_path_a0);
+CETECH_DECL_API(ct_vio_a0);
+CETECH_DECL_API(ct_process_a0);
+CETECH_DECL_API(ct_log_a0);
+CETECH_DECL_API(ct_hash_a0);
 
 namespace texture_compiler {
 
@@ -40,14 +40,14 @@ namespace texture_compiler {
                          int gen_mipmaps,
                          int is_normalmap) {
 
-        string_stream::Buffer buffer(ct_memory_api_v0.main_allocator());
+        string_stream::Buffer buffer(ct_memory_a0.main_allocator());
 
-        char *texturec = ct_resource_api_v0.compiler_external_join(
-                ct_memory_api_v0.main_allocator(),
+        char *texturec = ct_resource_a0.compiler_external_join(
+                ct_memory_a0.main_allocator(),
                 "texturec");
 
         buffer << texturec;
-        CETECH_FREE(ct_memory_api_v0.main_allocator(), texturec);
+        CETECH_FREE(ct_memory_a0.main_allocator(), texturec);
 
         printf(buffer, " -f %s -o %s", input, output);
 
@@ -59,9 +59,9 @@ namespace texture_compiler {
             buffer << " --normalmap";
         }
 
-        int status = ct_process_api_v0.exec(c_str(buffer));
+        int status = ct_process_a0.exec(c_str(buffer));
 
-        ct_log_api_v0.info("application", "STATUS %d", status);
+        ct_log_a0.info("application", "STATUS %d", status);
 
         return status;
     }
@@ -71,16 +71,16 @@ namespace texture_compiler {
                              size_t max_len,
                              const char *filename) {
 
-        auto a = ct_memory_api_v0.main_allocator();
+        auto a = ct_memory_a0.main_allocator();
 
         char dir[1024] = {0};
-        ct_path_v0.dir(dir, CETECH_ARRAY_LEN(dir), filename);
+        ct_path_a0.dir(dir, CETECH_ARRAY_LEN(dir), filename);
 
-        char *tmp_dirname = ct_path_v0.join(a, 2, tmp_dir, dir);
-        ct_path_v0.make_path(tmp_dirname);
+        char *tmp_dirname = ct_path_a0.join(a, 2, tmp_dir, dir);
+        ct_path_a0.make_path(tmp_dirname);
 
         int ret = snprintf(tmp_filename, max_len, "%s/%s.ktx", tmp_dirname,
-                           ct_path_v0.filename(filename));
+                           ct_path_a0.filename(filename));
 
         CETECH_FREE(a, tmp_dirname);
 
@@ -92,7 +92,7 @@ namespace texture_compiler {
                         struct ct_vio *build_vio,
                         struct ct_compilator_api *compilator_api) {
 
-        auto a = ct_memory_api_v0.main_allocator();
+        auto a = ct_memory_a0.main_allocator();
 
         // TODO: temp ct_allocator?
         char input_str[1024] = {0};
@@ -117,15 +117,15 @@ namespace texture_compiler {
         int is_normalmap = yaml_is_valid(n_is_normalmap) ? yaml_as_bool(
                 n_is_normalmap) : 0;
 
-        const char *source_dir = ct_resource_api_v0.compiler_get_source_dir();
+        const char *source_dir = ct_resource_a0.compiler_get_source_dir();
 
 
-        char *tmp_dir = ct_resource_api_v0.compiler_get_tmp_dir(a,
-                                                             ct_app_api_v0.platform());
+        char *tmp_dir = ct_resource_a0.compiler_get_tmp_dir(a,
+                                                             ct_app_a0.platform());
 
         yaml_as_string(input, input_str, CETECH_ARRAY_LEN(input_str));
 
-        char *input_path = ct_path_v0.join(a, 2, source_dir, input_str);
+        char *input_path = ct_path_a0.join(a, 2, source_dir, input_str);
 
         _gen_tmp_name(output_path, tmp_dir, CETECH_ARRAY_LEN(tmp_filename),
                       input_str);
@@ -137,10 +137,10 @@ namespace texture_compiler {
             return 0;
         }
 
-        struct ct_vio *tmp_file = ct_vio_api_v0.from_file(output_path,
+        struct ct_vio *tmp_file = ct_vio_a0.from_file(output_path,
                                                           VIO_OPEN_READ);
         char *tmp_data =
-                CETECH_ALLOCATE(ct_memory_api_v0.main_allocator(), char,
+                CETECH_ALLOCATE(ct_memory_a0.main_allocator(), char,
                                 tmp_file->size(tmp_file->inst) + 1);
         tmp_file->read(tmp_file->inst, tmp_data, sizeof(char),
                        tmp_file->size(tmp_file->inst));
@@ -164,17 +164,17 @@ namespace texture_compiler {
         return 1;
     }
 
-    int init(ct_api_v0 *api) {
-        CETECH_GET_API(api, ct_memory_api_v0);
-        CETECH_GET_API(api, ct_resource_api_v0);
-        CETECH_GET_API(api, ct_app_api_v0);
-        CETECH_GET_API(api, ct_path_v0);
-        CETECH_GET_API(api, ct_vio_api_v0);
-        CETECH_GET_API(api, ct_process_api_v0);
-        CETECH_GET_API(api, ct_log_api_v0);
-        CETECH_GET_API(api, ct_hash_api_v0);
+    int init(ct_api_a0 *api) {
+        CETECH_GET_API(api, ct_memory_a0);
+        CETECH_GET_API(api, ct_resource_a0);
+        CETECH_GET_API(api, ct_app_a0);
+        CETECH_GET_API(api, ct_path_a0);
+        CETECH_GET_API(api, ct_vio_a0);
+        CETECH_GET_API(api, ct_process_a0);
+        CETECH_GET_API(api, ct_log_a0);
+        CETECH_GET_API(api, ct_hash_a0);
 
-        ct_resource_api_v0.compiler_register(ct_hash_api_v0.id64_from_str("texture"),
+        ct_resource_a0.compiler_register(ct_hash_a0.id64_from_str("texture"),
                                           compiler);
 
         return 1;

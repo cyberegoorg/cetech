@@ -33,7 +33,7 @@ typedef struct {
 //==============================================================================
 
 //! Transform API V0
-struct ct_transform_api_v0 {
+struct ct_transform_a0 {
 
     //! Is transform valid?
     //! \param transform transform

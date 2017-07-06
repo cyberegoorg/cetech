@@ -74,7 +74,7 @@ struct ct_scope_data {
 //==============================================================================
 
 //! Develop system API V0
-struct ct_develop_api_v0 {
+struct ct_develop_a0 {
 
     //! Push event
     //! \param header Header

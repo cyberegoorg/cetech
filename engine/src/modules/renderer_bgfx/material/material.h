@@ -2,7 +2,7 @@
 #define CETECH_MATERIAL_H
 
 namespace material {
-    int init(struct ct_api_v0 *api);
+    int init(struct ct_api_a0 *api);
 
     void shutdown();
 

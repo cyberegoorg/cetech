@@ -33,7 +33,7 @@ int in_use(struct allocator_scratch *a,
     return ((char *) p >= a->free) || ((char *) p < a->allocate);
 }
 
-void *scratch_allocator_allocate(allocator_instance_v0 *allocator,
+void *scratch_allocator_allocate(allocator_instance *allocator,
                                  void *ptr,
                                  uint32_t size,
                                  uint32_t align) {

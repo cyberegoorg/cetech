@@ -55,12 +55,12 @@ enum {
 // Allocator
 //==============================================================================
 
-typedef void allocator_instance_v0;
+typedef void allocator_instance;
 
 struct ct_allocator{
-    allocator_instance_v0 *inst;
+    allocator_instance *inst;
 
-    void *(*reallocate)(allocator_instance_v0 *a,
+    void *(*reallocate)(allocator_instance *a,
                         void *ptr,
                         uint32_t size,
                         uint32_t align);

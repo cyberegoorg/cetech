@@ -10,7 +10,7 @@
 #include "memory_private.h"
 #include "allocator_core_private.h"
 
-CETECH_DECL_API(ct_log_api_v0);
+CETECH_DECL_API(ct_log_a0);
 
 #define LOG_WHERE "memory"
 #define ALLOCATOR_WHERE "allocator"
@@ -63,7 +63,7 @@ namespace memory {
                 continue;
             }
 
-            ct_log_api_v0.error(ALLOCATOR_WHERE,
+            ct_log_a0.error(ALLOCATOR_WHERE,
                              "memory_leak: %p\n  stacktrace:\n%s\n",
                              entries[i].ptr, entries[i].stacktrace);
 
@@ -93,16 +93,16 @@ namespace memory {
         return d;
     }
 
-    void register_api(struct ct_api_v0 *api) {
-        CETECH_GET_API(api, ct_log_api_v0);
+    void register_api(struct ct_api_a0 *api) {
+        CETECH_GET_API(api, ct_log_a0);
 
-        static struct ct_memory_api_v0 _api = {0};
+        static struct ct_memory_a0 _api = {0};
 
         _api.main_allocator = memsys_main_allocator;
         _api.main_scratch_allocator = memsys_main_scratch_allocator;
         _api.str_dup = str_dup;
 
-        api->register_api("ct_memory_api_v0", &_api);
+        api->register_api("ct_memory_a0", &_api);
     }
 
     void init(int scratch_buffer_size) {

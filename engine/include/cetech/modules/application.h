@@ -34,7 +34,7 @@ struct ct_game_callbacks {
 //==============================================================================
 
 //! Application API V0
-struct ct_app_api_v0 {
+struct ct_app_a0 {
     //! Stop main loop and quit.
     void (*quit)();
 

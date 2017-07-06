@@ -63,28 +63,28 @@ typedef struct {
 
 typedef void os_window_t;
 
-typedef void ct_vio_instance_v0;
+typedef void ct_vio_instance;
 
 struct ct_vio  {
-    ct_vio_instance_v0* inst;
+    ct_vio_instance* inst;
 
-    int64_t (*size)(ct_vio_instance_v0 *vio);
+    int64_t (*size)(ct_vio_instance *vio);
 
-    int64_t (*seek)(ct_vio_instance_v0 *vio,
+    int64_t (*seek)(ct_vio_instance *vio,
                     int64_t offset,
                     enum ct_vio_seek whence);
 
-    size_t (*read)(ct_vio_instance_v0 *vio,
+    size_t (*read)(ct_vio_instance *vio,
                    void *ptr,
                    size_t size,
                    size_t maxnum);
 
-    size_t (*write)(ct_vio_instance_v0 *vio,
+    size_t (*write)(ct_vio_instance *vio,
                     const void *ptr,
                     size_t size,
                     size_t num);
 
-    int (*close)(ct_vio_instance_v0 *vio);
+    int (*close)(ct_vio_instance *vio);
 };
 
 struct ct_event_header {
@@ -134,11 +134,11 @@ struct ct_gamepad_device_event {
 // Api
 //==============================================================================
 
-struct ct_cpu_api_v0 {
+struct ct_cpu_a0 {
     int (*count)();
 };
 
-struct ct_object_api_v0 {
+struct ct_object_a0 {
     void *(*load)(const char *path);
 
     void (*unload)(void *so);
@@ -147,7 +147,7 @@ struct ct_object_api_v0 {
                            const char *name);
 };
 
-struct ct_path_v0 {
+struct ct_path_a0 {
     //! Get file modified time
     //! \param path File path
     //! \return Modified time
@@ -207,11 +207,11 @@ struct ct_path_v0 {
                   ...);
 };
 
-struct ct_process_api_v0 {
+struct ct_process_a0 {
     int (*exec)(const char *argv);
 };
 
-struct ct_thread_api_v0 {
+struct ct_thread_a0 {
     //! Create new thread
     //! \param fce Thread fce
     //! \param name Thread name
@@ -247,7 +247,7 @@ struct ct_thread_api_v0 {
     void (*spin_unlock)(ct_spinlock_t *lock);
 };
 
-struct ct_time_api_v0 {
+struct ct_time_a0 {
     uint32_t (*ticks)();
 
     uint64_t (*perf_counter)();
@@ -255,12 +255,12 @@ struct ct_time_api_v0 {
     uint64_t (*perf_freq)();
 };
 
-struct ct_vio_api_v0 {
+struct ct_vio_a0 {
     struct ct_vio *(*from_file)(const char *path,
                                 enum ct_vio_open_mode mode);
 };
 
-struct ct_window_api_v0 {
+struct ct_window_a0 {
     os_window_t *(*create)(const char *title,
                            enum ct_window_pos x,
                            enum ct_window_pos y,
@@ -293,7 +293,7 @@ struct ct_window_api_v0 {
 };
 
 //! Machine API V0
-struct ct_machine_api_v0 {
+struct ct_machine_a0 {
 
     //! Get eventstream begin
     //! \return Begin

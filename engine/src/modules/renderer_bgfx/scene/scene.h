@@ -2,7 +2,7 @@
 #define CETECH_BGFX_SCENE_RESOURCE_H
 
 namespace scene {
-    int init(struct ct_api_v0 *api);
+    int init(struct ct_api_a0 *api);
 
     void shutdown();
 

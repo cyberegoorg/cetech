@@ -37,7 +37,7 @@ struct ct_camera {
 //==============================================================================
 
 //! Camera API V0
-struct ct_camera_api_v0 {
+struct ct_camera_a0 {
 
     //! Has entity camera component?
     //! \param world World

@@ -5,7 +5,7 @@ namespace memory {
 
     void init(int scratch_buffer_size);
 
-    void register_api(struct ct_api_v0 *api);
+    void register_api(struct ct_api_a0 *api);
 
     void memsys_shutdown();
 

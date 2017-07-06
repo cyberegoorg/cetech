@@ -18,7 +18,7 @@ extern "C" {
 // Structs
 //==============================================================================
 
-struct ct_api_entry_v0 {
+struct ct_api_entry {
     void *entry;
     void *api;
 };
@@ -28,19 +28,18 @@ struct ct_api_entry_v0 {
 // Api
 //==============================================================================
 
-//! Plugin expot api struct V0
-struct ct_api_v0 {
+struct ct_api_a0 {
     void (*register_api)(const char *name,
                          void *api);
 
     int (*exist)(const char *name);
 
-    struct ct_api_entry_v0 (*first)(const char *name);
+    struct ct_api_entry (*first)(const char *name);
 
-    struct ct_api_entry_v0 (*next)(struct ct_api_entry_v0 *entry);
+    struct ct_api_entry (*next)(struct ct_api_entry *entry);
 };
 
-struct ct_api_v0 *ct_api_get_v0();
+struct ct_api_a0 *ct_api_get();
 
 #ifdef __cplusplus
 }

@@ -24,7 +24,7 @@ enum ct_fs_open_mode {
 //==============================================================================
 
 //! Filesystem API V0
-struct ct_filesystem_api_v0 {
+struct ct_filesystem_a0 {
     //! Return root dir
     //! \param root Root
     //! \return Root dir or NULL if root is invalid.

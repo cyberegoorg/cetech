@@ -15,8 +15,8 @@
 #include <cetech/kernel/log.h>
 #include <cetech/kernel/errors.h>
 
-CETECH_DECL_API(ct_machine_api_v0);
-CETECH_DECL_API(ct_log_api_v0);
+CETECH_DECL_API(ct_machine_a0);
+CETECH_DECL_API(ct_log_a0);
 
 
 //==============================================================================
@@ -134,13 +134,13 @@ namespace mouse {
     }
 
     void update() {
-        struct ct_event_header *event = ct_machine_api_v0.event_begin();
+        struct ct_event_header *event = ct_machine_a0.event_begin();
 
         memcpy(_G.last_state, _G.state, MOUSE_BTN_MAX);
         _G.last_delta_pos.x = 0;
         _G.last_delta_pos.y = 0;
 
-        while (event != ct_machine_api_v0.event_end()) {
+        while (event != ct_machine_a0.event_end()) {
             struct ct_mouse_move_event *move_event;
 
             switch (event->type) {
@@ -167,13 +167,13 @@ namespace mouse {
                     break;
             }
 
-            event = ct_machine_api_v0.event_next(event);
+            event = ct_machine_a0.event_next(event);
         }
     }
 }
 
 namespace mouse_module {
-    static struct ct_mouse_api_v0 api_v1 = {
+    static struct ct_mouse_a0 a0 = {
             .button_index = mouse::button_index,
             .button_name = mouse::button_name,
             .button_state = mouse::button_state,
@@ -185,33 +185,33 @@ namespace mouse_module {
             .update = mouse::update
     };
 
-    void _init_api(struct ct_api_v0 *api) {
-        api->register_api("ct_mouse_api_v0", &api_v1);
+    void _init_api(struct ct_api_a0 *api) {
+        api->register_api("ct_mouse_a0", &a0);
     }
 
-    void _init(struct ct_api_v0 *api) {
+    void _init(struct ct_api_a0 *api) {
         _init_api(api);
 
-        CETECH_GET_API(api, ct_machine_api_v0);
-        CETECH_GET_API(api, ct_log_api_v0);
+        CETECH_GET_API(api, ct_machine_a0);
+        CETECH_GET_API(api, ct_log_a0);
 
         _G = {0};
 
-        ct_log_api_v0.debug(LOG_WHERE, "Init");
+        ct_log_a0.debug(LOG_WHERE, "Init");
     }
 
     void _shutdown() {
-        ct_log_api_v0.debug(LOG_WHERE, "Shutdown");
+        ct_log_a0.debug(LOG_WHERE, "Shutdown");
 
         _G = {0};
     }
 
 
-    extern "C" void mouse_load_module(struct ct_api_v0 *api) {
+    extern "C" void mouse_load_module(struct ct_api_a0 *api) {
         _init(api);
     }
 
-    extern "C" void mouse_unload_module(struct ct_api_v0 *api) {
+    extern "C" void mouse_unload_module(struct ct_api_a0 *api) {
         _shutdown();
     }
 }

@@ -2,10 +2,10 @@
 #define CETECH_CORE_ALLOCATOR_PRIVATE_H
 
 struct ct_allocator;
-struct ct_api_v0;
+struct ct_api_a0;
 
 namespace core_allocator {
-    void register_api(ct_api_v0 *api);
+    void register_api(ct_api_a0 *api);
     ct_allocator* get();
 }
 

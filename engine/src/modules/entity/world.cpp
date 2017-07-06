@@ -12,7 +12,7 @@
 
 #include <cetech/modules/entity.h>
 
-CETECH_DECL_API(ct_memory_api_v0);
+CETECH_DECL_API(ct_memory_a0);
 
 using namespace cetech;
 
@@ -75,7 +75,7 @@ namespace world {
 //==============================================================================
 
 namespace world_module {
-    static struct ct_world_api_v0 _api = {
+    static struct ct_world_a0 _api = {
             .register_callback = world::register_callback,
             .create = world::create,
             .destroy = world::destroy,
@@ -83,20 +83,20 @@ namespace world_module {
     };
 
 
-    static void _init_api(struct ct_api_v0 *api) {
-        api->register_api("ct_world_api_v0", &_api);
+    static void _init_api(struct ct_api_a0 *api) {
+        api->register_api("ct_world_a0", &_api);
     }
 
 
-    void _init(struct ct_api_v0 *api) {
+    void _init(struct ct_api_a0 *api) {
         _init_api(api);
 
-        CETECH_GET_API(api, ct_memory_api_v0);
+        CETECH_GET_API(api, ct_memory_a0);
 
         _G = {0};
 
-        _G.callbacks.init(ct_memory_api_v0.main_allocator());
-        _G.world_handler.init(ct_memory_api_v0.main_allocator());
+        _G.callbacks.init(ct_memory_a0.main_allocator());
+        _G.world_handler.init(ct_memory_a0.main_allocator());
 
     }
 
@@ -106,11 +106,11 @@ namespace world_module {
     }
 
 
-    extern "C" void world_load_module(struct ct_api_v0 *api) {
+    extern "C" void world_load_module(struct ct_api_a0 *api) {
         _init(api);
     }
 
-    extern "C" void world_unload_module(struct ct_api_v0 *api) {
+    extern "C" void world_unload_module(struct ct_api_a0 *api) {
         _shutdown();
     }
 }

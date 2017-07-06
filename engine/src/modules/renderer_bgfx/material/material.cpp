@@ -26,16 +26,16 @@
 #include "../texture/texture.h"
 #include "../shader/shader.h"
 
-CETECH_DECL_API(ct_memory_api_v0);
-CETECH_DECL_API(ct_resource_api_v0);
-CETECH_DECL_API(ct_path_v0);
-CETECH_DECL_API(ct_vio_api_v0);
-CETECH_DECL_API(ct_hash_api_v0);
+CETECH_DECL_API(ct_memory_a0);
+CETECH_DECL_API(ct_resource_a0);
+CETECH_DECL_API(ct_path_a0);
+CETECH_DECL_API(ct_vio_a0);
+CETECH_DECL_API(ct_hash_a0);
 
 using namespace cetech;
 
 namespace material_compiler {
-    int init(ct_api_v0 *api);
+    int init(ct_api_a0 *api);
 }
 
 //==============================================================================
@@ -60,11 +60,11 @@ namespace {
         uint64_t type;
 
         void init(ct_allocator *allocator) {
-            this->type = ct_hash_api_v0.id64_from_str("material");
-            this->material_handler.init(ct_memory_api_v0.main_allocator());
-            this->instace_map.init(ct_memory_api_v0.main_allocator());
-            this->instance_offset.init(ct_memory_api_v0.main_allocator());
-            this->instance_data.init(ct_memory_api_v0.main_allocator());
+            this->type = ct_hash_a0.id64_from_str("material");
+            this->material_handler.init(ct_memory_a0.main_allocator());
+            this->instace_map.init(ct_memory_a0.main_allocator());
+            this->instance_offset.init(ct_memory_a0.main_allocator());
+            this->instance_data.init(ct_memory_a0.main_allocator());
         }
 
         void shutdown() {
@@ -133,16 +133,16 @@ namespace material_resource {
 
 
 namespace material {
-    int init(struct ct_api_v0 *api) {
-        CETECH_GET_API(api, ct_memory_api_v0);
-        CETECH_GET_API(api, ct_resource_api_v0);
-        CETECH_GET_API(api, ct_path_v0);
-        CETECH_GET_API(api, ct_vio_api_v0);
-        CETECH_GET_API(api, ct_hash_api_v0);
+    int init(struct ct_api_a0 *api) {
+        CETECH_GET_API(api, ct_memory_a0);
+        CETECH_GET_API(api, ct_resource_a0);
+        CETECH_GET_API(api, ct_path_a0);
+        CETECH_GET_API(api, ct_vio_a0);
+        CETECH_GET_API(api, ct_hash_a0);
 
-        _G.init(ct_memory_api_v0.main_allocator());
+        _G.init(ct_memory_a0.main_allocator());
 
-        ct_resource_api_v0.register_type(_G.type, material_resource::callback);
+        ct_resource_a0.register_type(_G.type, material_resource::callback);
 
 #ifdef CETECH_CAN_COMPILE
         material_compiler::init(api);
@@ -157,7 +157,7 @@ namespace material {
     static const material_t null_material = {0};
 
     material_t create(uint64_t name) {
-        auto resource = material_blob::get(ct_resource_api_v0.get(_G.type, name));
+        auto resource = material_blob::get(ct_resource_a0.get(_G.type, name));
 
         uint32_t size = material_blob::blob_size(resource);
         uint32_t h = handler::create(_G.material_handler);

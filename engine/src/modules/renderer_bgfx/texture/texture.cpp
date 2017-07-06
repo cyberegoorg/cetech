@@ -26,7 +26,7 @@ using namespace string_stream;
 
 
 namespace texture_compiler {
-    int init(ct_api_v0 *api);
+    int init(ct_api_a0 *api);
 }
 
 //==============================================================================
@@ -40,14 +40,14 @@ struct TextureResourceGlobals {
 } TextureResourceGlobals;
 
 
-CETECH_DECL_API(ct_memory_api_v0);
-CETECH_DECL_API(ct_resource_api_v0);
-CETECH_DECL_API(ct_app_api_v0);
-CETECH_DECL_API(ct_path_v0);
-CETECH_DECL_API(ct_vio_api_v0);
-CETECH_DECL_API(ct_process_api_v0);
-CETECH_DECL_API(ct_log_api_v0);
-CETECH_DECL_API(ct_hash_api_v0);
+CETECH_DECL_API(ct_memory_a0);
+CETECH_DECL_API(ct_resource_a0);
+CETECH_DECL_API(ct_app_a0);
+CETECH_DECL_API(ct_path_a0);
+CETECH_DECL_API(ct_vio_a0);
+CETECH_DECL_API(ct_process_a0);
+CETECH_DECL_API(ct_log_a0);
+CETECH_DECL_API(ct_hash_a0);
 
 //==============================================================================
 // Compiler private
@@ -128,28 +128,28 @@ namespace texture_resource {
 // Interface
 //==============================================================================
 namespace texture {
-    int texture_init(struct ct_api_v0 *api) {
+    int texture_init(struct ct_api_a0 *api) {
 
-        CETECH_GET_API(api, ct_memory_api_v0);
-        CETECH_GET_API(api, ct_resource_api_v0);
-        CETECH_GET_API(api, ct_app_api_v0);
-        CETECH_GET_API(api, ct_path_v0);
-        CETECH_GET_API(api, ct_vio_api_v0);
-        CETECH_GET_API(api, ct_process_api_v0);
-        CETECH_GET_API(api, ct_log_api_v0);
-        CETECH_GET_API(api, ct_hash_api_v0);
+        CETECH_GET_API(api, ct_memory_a0);
+        CETECH_GET_API(api, ct_resource_a0);
+        CETECH_GET_API(api, ct_app_a0);
+        CETECH_GET_API(api, ct_path_a0);
+        CETECH_GET_API(api, ct_vio_a0);
+        CETECH_GET_API(api, ct_process_a0);
+        CETECH_GET_API(api, ct_log_a0);
+        CETECH_GET_API(api, ct_hash_a0);
 
         _G = {0};
 
-        _G.type = ct_hash_api_v0.id64_from_str("texture");
+        _G.type = ct_hash_a0.id64_from_str("texture");
 
-        _G.handler_map.init(ct_memory_api_v0.main_allocator());
+        _G.handler_map.init(ct_memory_a0.main_allocator());
 
 #ifdef CETECH_CAN_COMPILE
         texture_compiler::init(api);
 #endif
 
-        ct_resource_api_v0.register_type(_G.type,
+        ct_resource_a0.register_type(_G.type,
                                       texture_resource::texture_resource_callback);
 
         return 1;
@@ -160,7 +160,7 @@ namespace texture {
     }
 
     bgfx::TextureHandle texture_get(uint64_t name) {
-        ct_resource_api_v0.get(_G.type, name); // TODO: only for autoload
+        ct_resource_a0.get(_G.type, name); // TODO: only for autoload
 
         return map::get(_G.handler_map, name, texture_resource::null_texture);
     }

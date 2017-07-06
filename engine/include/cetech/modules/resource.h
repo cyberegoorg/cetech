@@ -19,8 +19,8 @@ struct ct_vio;
 struct ct_allocator;
 struct ct_compilator_api;
 
-struct ct_config_api_v0;
-struct ct_app_api_v0;
+struct ct_config_a0;
+struct ct_app_a0;
 
 //==============================================================================
 // Typedefs
@@ -109,7 +109,7 @@ struct ct_compilator_api {
 //==============================================================================
 
 //! Resource API V0
-struct ct_resource_api_v0 {
+struct ct_resource_a0 {
     //! Enable autoload feature
     //! \param enable Enable
     void (*set_autoload)(int enable);
@@ -246,8 +246,8 @@ struct ct_resource_api_v0 {
     //! Create build dir
     //! \param config Config API
     //! \param app Application API
-    void (*compiler_create_build_dir)(struct ct_config_api_v0 config,
-                                      struct ct_app_api_v0 app);
+    void (*compiler_create_build_dir)(struct ct_config_a0 config,
+                                      struct ct_app_a0 app);
 
 
     //! Get source dir

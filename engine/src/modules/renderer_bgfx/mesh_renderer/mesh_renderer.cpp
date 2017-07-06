@@ -21,13 +21,13 @@
 
 #include <bgfx/bgfx.h>
 
-CETECH_DECL_API(ct_memory_api_v0);
-CETECH_DECL_API(ct_scenegprah_api_v0);
-CETECH_DECL_API(ct_transform_api_v0);
-CETECH_DECL_API(ct_component_api_v0);
-CETECH_DECL_API(ct_material_api_v0);
-CETECH_DECL_API(ct_mesh_renderer_api_v0);
-CETECH_DECL_API(ct_hash_api_v0);
+CETECH_DECL_API(ct_memory_a0);
+CETECH_DECL_API(ct_scenegprah_a0);
+CETECH_DECL_API(ct_transform_a0);
+CETECH_DECL_API(ct_component_a0);
+CETECH_DECL_API(ct_material_a0);
+CETECH_DECL_API(ct_mesh_renderer_a0);
+CETECH_DECL_API(ct_hash_a0);
 
 using namespace cetech;
 
@@ -147,7 +147,7 @@ namespace {
 
         world_t last_world = _G.world_instances[last_idx].world;
 
-        CETECH_FREE(ct_memory_api_v0.main_allocator(),
+        CETECH_FREE(ct_memory_a0.main_allocator(),
                           _G.world_instances[idx].buffer);
 
         _G.world_instances[idx] = _G.world_instances[last_idx];
@@ -156,7 +156,7 @@ namespace {
     }
 
     int _mesh_component_compiler(yaml_node_t body,
-                                 ct_blob_v0 *data) {
+                                 ct_blob *data) {
 
         struct mesh_data t_data;
 
@@ -165,20 +165,20 @@ namespace {
         YAML_NODE_SCOPE(scene, body, "scene",
                         yaml_as_string(scene, tmp_buffer,
                                        CETECH_ARRAY_LEN(tmp_buffer));
-                                t_data.scene = ct_hash_api_v0.id64_from_str(
+                                t_data.scene = ct_hash_a0.id64_from_str(
                                         tmp_buffer);
         );
         YAML_NODE_SCOPE(mesh, body, "mesh",
                         yaml_as_string(mesh, tmp_buffer,
                                        CETECH_ARRAY_LEN(tmp_buffer));
-                                t_data.mesh = ct_hash_api_v0.id64_from_str(
+                                t_data.mesh = ct_hash_a0.id64_from_str(
                                         tmp_buffer);
         );
 
         YAML_NODE_SCOPE(material, body, "material",
                         yaml_as_string(material, tmp_buffer,
                                        CETECH_ARRAY_LEN(tmp_buffer));
-                                t_data.material = ct_hash_api_v0.id64_from_str(
+                                t_data.material = ct_hash_a0.id64_from_str(
                                         tmp_buffer);
         );
 
@@ -186,7 +186,7 @@ namespace {
                         if (yaml_is_valid(node)) {
                             yaml_as_string(node, tmp_buffer,
                                            CETECH_ARRAY_LEN(tmp_buffer));
-                            t_data.node = ct_hash_api_v0.id64_from_str(tmp_buffer);
+                            t_data.node = ct_hash_a0.id64_from_str(tmp_buffer);
                         }
         );
 
@@ -221,7 +221,7 @@ namespace {
         struct mesh_data *tdata = (mesh_data *) data;
 
         for (int i = 0; i < ent_count; ++i) {
-            ct_mesh_renderer_api_v0.create(world,
+            ct_mesh_renderer_a0.create(world,
                                         ents[cents[i]],
                                         tdata[i].scene,
                                         tdata[i].mesh,
@@ -263,12 +263,12 @@ mesh_renderer_t mesh_create(world_t world,
     WorldInstance *data = _get_world_instance(world);
 
     uint32_t idx = data->n;
-    allocate(*data, ct_memory_api_v0.main_allocator(), data->n + 1);
+    allocate(*data, ct_memory_a0.main_allocator(), data->n + 1);
     ++data->n;
 
     scene::create_graph(world, entity, scene);
 
-    material_t material_instance = ct_material_api_v0.resource_create(material);
+    material_t material_instance = ct_material_a0.resource_create(material);
 
     map::set(_G.ent_map, hash_combine(world.h, entity.h), idx);
 
@@ -295,22 +295,22 @@ void mesh_render_all(world_t world) {
         uint64_t scene = data->scene[i];
         uint64_t geom = data->mesh[i];
 
-        ct_material_api_v0.use(material);
+        ct_material_a0.use(material);
 
         entity_t ent = data->entity[i];
 
-        ct_transform_t t = ct_transform_api_v0.get(world, ent);
-        mat44f_t t_w = *ct_transform_api_v0.get_world_matrix(world, t);
+        ct_transform_t t = ct_transform_a0.get(world, ent);
+        mat44f_t t_w = *ct_transform_a0.get_world_matrix(world, t);
         //mat44f_t t_w = MAT44F_INIT_IDENTITY;//*transform_get_world_matrix(world, t);
         mat44f_t node_w = MAT44F_INIT_IDENTITY;
         mat44f_t final_w = MAT44F_INIT_IDENTITY;
 
-        if (ct_scenegprah_api_v0.has(world, ent)) {
+        if (ct_scenegprah_a0.has(world, ent)) {
             uint64_t name = scene::get_mesh_node(scene, geom);
             if (name != 0) {
-                ct_scene_node_t n = ct_scenegprah_api_v0.node_by_name(world, ent,
+                ct_scene_node_t n = ct_scenegprah_a0.node_by_name(world, ent,
                                                                 name);
-                node_w = *ct_scenegprah_api_v0.get_world_matrix(world, n);
+                node_w = *ct_scenegprah_a0.get_world_matrix(world, n);
             }
         }
 
@@ -320,7 +320,7 @@ void mesh_render_all(world_t world) {
 
         scene::submit(scene, geom);
 
-        ct_material_api_v0.submit(material);
+        ct_material_a0.submit(material);
     }
 }
 
@@ -335,7 +335,7 @@ void mesh_set_material(world_t world,
                        mesh_renderer_t mesh,
                        uint64_t material) {
     WorldInstance *data = _get_world_instance(world);
-    material_t material_instance = ct_material_api_v0.resource_create(material);
+    material_t material_instance = ct_material_a0.resource_create(material);
 
     data->material[mesh.idx] = material_instance;
 }
@@ -346,26 +346,26 @@ static void _set_property(world_t world,
                           uint64_t key,
                           struct ct_property_value value) {
 
-    uint64_t scene = ct_hash_api_v0.id64_from_str("scene");
-    uint64_t mesh = ct_hash_api_v0.id64_from_str("mesh");
-    uint64_t node = ct_hash_api_v0.id64_from_str("node");
-    uint64_t material = ct_hash_api_v0.id64_from_str("material");
+    uint64_t scene = ct_hash_a0.id64_from_str("scene");
+    uint64_t mesh = ct_hash_a0.id64_from_str("mesh");
+    uint64_t node = ct_hash_a0.id64_from_str("node");
+    uint64_t material = ct_hash_a0.id64_from_str("material");
 
     mesh_renderer_t mesh_renderer = mesh_get(world, entity);
 
     if (key == material) {
         mesh_set_material(world, mesh_renderer,
-                          ct_hash_api_v0.id64_from_str(value.value.str));
+                          ct_hash_a0.id64_from_str(value.value.str));
     }
 }
 
 static struct ct_property_value _get_property(world_t world,
                                            entity_t entity,
                                            uint64_t key) {
-    uint64_t scene = ct_hash_api_v0.id64_from_str("scene");
-    uint64_t mesh = ct_hash_api_v0.id64_from_str("mesh");
-    uint64_t node = ct_hash_api_v0.id64_from_str("node");
-    uint64_t material = ct_hash_api_v0.id64_from_str("material");
+    uint64_t scene = ct_hash_a0.id64_from_str("scene");
+    uint64_t mesh = ct_hash_a0.id64_from_str("mesh");
+    uint64_t node = ct_hash_a0.id64_from_str("node");
+    uint64_t material = ct_hash_a0.id64_from_str("material");
 
     mesh_renderer_t mesh_r = mesh_get(world, entity);
     WorldInstance *data = _get_world_instance(world);
@@ -410,8 +410,8 @@ static struct ct_property_value _get_property(world_t world,
 }
 
 
-static void _init_api(struct ct_api_v0 *api) {
-    static struct ct_mesh_renderer_api_v0 _api = {0};
+static void _init_api(struct ct_api_a0 *api) {
+    static struct ct_mesh_renderer_a0 _api = {0};
 
     _api.is_valid = mesh_is_valid;
     _api.has = mesh_has;
@@ -421,31 +421,31 @@ static void _init_api(struct ct_api_v0 *api) {
     _api.set_material = mesh_set_material;
     _api.render_all = mesh_render_all;
 
-    api->register_api("ct_mesh_renderer_api_v0", &_api);
+    api->register_api("ct_mesh_renderer_a0", &_api);
 }
 
 
-static void _init(struct ct_api_v0 *api) {
+static void _init(struct ct_api_a0 *api) {
     _init_api(api);
 
-    CETECH_GET_API(api, ct_component_api_v0);
-    CETECH_GET_API(api, ct_memory_api_v0);
-    CETECH_GET_API(api, ct_material_api_v0);
-    CETECH_GET_API(api, ct_mesh_renderer_api_v0);
-    CETECH_GET_API(api, ct_scenegprah_api_v0);
-    CETECH_GET_API(api, ct_transform_api_v0);
-    CETECH_GET_API(api, ct_hash_api_v0);
+    CETECH_GET_API(api, ct_component_a0);
+    CETECH_GET_API(api, ct_memory_a0);
+    CETECH_GET_API(api, ct_material_a0);
+    CETECH_GET_API(api, ct_mesh_renderer_a0);
+    CETECH_GET_API(api, ct_scenegprah_a0);
+    CETECH_GET_API(api, ct_transform_a0);
+    CETECH_GET_API(api, ct_hash_a0);
 
     _G = {0};
 
-    _G.world_map.init(ct_memory_api_v0.main_allocator());
-    _G.world_instances.init(ct_memory_api_v0.main_allocator());
-    _G.ent_map.init(ct_memory_api_v0.main_allocator());
-    _G.type = ct_hash_api_v0.id64_from_str("mesh_renderer");
+    _G.world_map.init(ct_memory_a0.main_allocator());
+    _G.world_instances.init(ct_memory_a0.main_allocator());
+    _G.ent_map.init(ct_memory_a0.main_allocator());
+    _G.type = ct_hash_a0.id64_from_str("mesh_renderer");
 
-    ct_component_api_v0.register_compiler(_G.type, _mesh_component_compiler, 10);
+    ct_component_a0.register_compiler(_G.type, _mesh_component_compiler, 10);
 
-    ct_component_api_v0.register_type(_G.type, {
+    ct_component_a0.register_type(_G.type, {
             .spawner=_spawner,
             .destroyer=_destroyer,
             .on_world_create=_on_world_create,
@@ -461,7 +461,7 @@ static void _shutdown() {
 }
 
 namespace mesh {
-    void init(struct ct_api_v0 *api) {
+    void init(struct ct_api_a0 *api) {
         _init(api);
     }
 
@@ -470,13 +470,13 @@ namespace mesh {
     }
 }
 
-//extern "C" void mesh_load_module(struct ct_api_v0* api) {
+//extern "C" void mesh_load_module(struct ct_api_a0* api) {
 //    _init(api);
 //    return nullptr;
 //
 ////    switch (api) {
 ////        case PLUGIN_EXPORT_API_ID: {
-////            static struct module_export_api_v0 module = {0};
+////            static struct module_export_a0 module = {0};
 ////
 ////            module.init = _init;
 ////            module.shutdown = _shutdown;

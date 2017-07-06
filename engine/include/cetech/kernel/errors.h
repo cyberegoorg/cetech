@@ -28,7 +28,7 @@ extern "C" {
 #endif
 
 
-struct ct_error_api_v0 {
+struct ct_error_a0 {
     void (*assert)(const char *where,
                    const char *condition,
                    const char *filename,

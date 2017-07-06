@@ -37,7 +37,7 @@ static struct G {
 } _G = {0};
 
 
-CETECH_DECL_API(ct_log_api_v0)
+CETECH_DECL_API(ct_log_a0)
 
 
 int _new_controler() {
@@ -72,7 +72,7 @@ int _create_controler(int i) {
         SDL_HapticRumbleInit(haptic);
         _G.haptic[idx] = haptic;
 
-        ct_log_api_v0.info("input.gamepad", "Gamepad %d has haptic support",
+        ct_log_a0.info("input.gamepad", "Gamepad %d has haptic support",
                         i);
     } else {
         _G.haptic[idx] = NULL;
@@ -85,8 +85,8 @@ int _create_controler(int i) {
 // Interface
 //==============================================================================
 
-int sdl_gamepad_init(struct ct_api_v0 *api) {
-    CETECH_GET_API(api, ct_log_api_v0);
+int sdl_gamepad_init(struct ct_api_a0 *api) {
+    CETECH_GET_API(api, ct_log_a0);
 
     _G = (struct G) {0};
 

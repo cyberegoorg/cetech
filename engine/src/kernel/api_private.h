@@ -8,7 +8,7 @@ namespace api {
 
     void shutdown();
 
-    struct ct_api_v0 *v0();
+    struct ct_api_a0 *v0();
 };
 
 #endif //CETECH__API_H

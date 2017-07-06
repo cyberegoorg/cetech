@@ -25,7 +25,7 @@ typedef int (*lua_CFunction)(lua_State *L);
 //==============================================================================
 
 //! Lua system api V0
-struct ct_lua_api_v0 {
+struct ct_lua_a0 {
 
     //! Return number of elements in the stack, which is also the index of the top element.
     //! Notice that a negative index -x is equivalent to the positive index gettop - x + 1.
@@ -263,7 +263,7 @@ struct ct_lua_api_v0 {
     void (*execute_boot_script)(uint64_t name);
 
     //! Call global function
-    //! \example lua_api_v0.call_global("print", "if", 1, 2.0f);
+    //! \example lua_a0.call_global("print", "if", 1, 2.0f);
     //! \param func Function name
     //! \param args Function args format string ('i' = int, 'f' = float)
     //! \param ... Args value

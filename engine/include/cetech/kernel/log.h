@@ -14,7 +14,7 @@ extern "C" {
 
 #include "macros.h"
 
-struct ct_api_v0;
+struct ct_api_a0;
 
 //==============================================================================
 // Enums
@@ -68,7 +68,7 @@ typedef char (*ct_log_get_wid_clb_t)();
 // Api
 //==============================================================================
 
-struct ct_log_api_v0 {
+struct ct_log_a0 {
     void (*set_wid_clb)(ct_log_get_wid_clb_t get_wid_clb);
 
     //! Register log handler

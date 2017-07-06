@@ -28,13 +28,13 @@
 
 using namespace cetech;
 
-CETECH_DECL_API(ct_memory_api_v0);
-CETECH_DECL_API(ct_resource_api_v0);
-CETECH_DECL_API(ct_scenegprah_api_v0);
-CETECH_DECL_API(ct_path_v0);
-CETECH_DECL_API(ct_vio_api_v0);
-CETECH_DECL_API(ct_hash_api_v0);
-CETECH_DECL_API(ct_thread_api_v0);
+CETECH_DECL_API(ct_memory_a0);
+CETECH_DECL_API(ct_resource_a0);
+CETECH_DECL_API(ct_scenegprah_a0);
+CETECH_DECL_API(ct_path_a0);
+CETECH_DECL_API(ct_vio_a0);
+CETECH_DECL_API(ct_hash_a0);
+CETECH_DECL_API(ct_thread_a0);
 
 
 namespace scene_resource_compiler {
@@ -89,7 +89,7 @@ namespace scene_resource_compiler {
     };
 
     struct compile_output *_crete_compile_output() {
-        struct ct_allocator *a = ct_memory_api_v0.main_allocator();
+        struct ct_allocator *a = ct_memory_a0.main_allocator();
         struct compile_output *output =
                 CETECH_ALLOCATE(a, struct compile_output, sizeof(struct compile_output));
 
@@ -112,7 +112,7 @@ namespace scene_resource_compiler {
     }
 
     void _destroy_compile_output(struct compile_output *output) {
-        struct ct_allocator *a = ct_memory_api_v0.main_allocator();
+        struct ct_allocator *a = ct_memory_a0.main_allocator();
 
         output->geom_name.destroy();
         output->ib_offset.destroy();
@@ -241,7 +241,7 @@ namespace scene_resource_compiler {
         char name_str[64] = {0};
         yaml_as_string(key, name_str, CETECH_ARRAY_LEN(name_str));
 
-        uint64_t name = ct_hash_api_v0.id64_from_str(name_str);
+        uint64_t name = ct_hash_a0.id64_from_str(name_str);
 
         array::push_back(output->geom_name, name);
         array::push_back<uint64_t>(output->geom_node, 0);
@@ -297,7 +297,7 @@ namespace scene_resource_compiler {
         struct foreach_graph_data *output = (foreach_graph_data *) _data;
 
         yaml_as_string(key, buffer, CETECH_ARRAY_LEN(buffer));
-        uint64_t node_name = ct_hash_api_v0.id64_from_str(buffer);
+        uint64_t node_name = ct_hash_a0.id64_from_str(buffer);
 
         yaml_node_t local_pose = yaml_get_node(value, "local");
         mat44f_t pose = yaml_as_mat44f_t(local_pose);
@@ -316,7 +316,7 @@ namespace scene_resource_compiler {
                 yaml_as_string(name_node, buffer, CETECH_ARRAY_LEN(buffer));
                 yaml_node_free(name_node);
 
-                uint64_t geom_name = ct_hash_api_v0.id64_from_str(buffer);
+                uint64_t geom_name = ct_hash_a0.id64_from_str(buffer);
                 for (int j = 0;
                      j < array::size(output->output->geom_name); ++j) {
                     if (geom_name != output->output->geom_name[j]) {
@@ -360,7 +360,7 @@ namespace scene_resource_compiler {
     void _compile_assimp_node(struct aiNode *root,
                               uint32_t parent,
                               struct compile_output *output) {
-        uint64_t name = ct_hash_api_v0.id64_from_str(root->mName.data);
+        uint64_t name = ct_hash_a0.id64_from_str(root->mName.data);
 
         uint32_t idx = array::size(output->node_name);
 
@@ -382,7 +382,7 @@ namespace scene_resource_compiler {
                         yaml_node_t root,
                         struct compile_output *output,
                         struct ct_compilator_api *capi) {
-        auto a = ct_memory_api_v0.main_allocator();
+        auto a = ct_memory_a0.main_allocator();
 
         yaml_node_t import_n = yaml_get_node(root, "import");
         yaml_node_t input_n = yaml_get_node(import_n, "input");
@@ -393,8 +393,8 @@ namespace scene_resource_compiler {
         yaml_as_string(input_n, input_str, CETECH_ARRAY_LEN(input_str));
         capi->add_dependency(filename, input_str);
 
-        const char *source_dir = ct_resource_api_v0.compiler_get_source_dir();
-        char *input_path = ct_path_v0.join(a, 2, source_dir, input_str);
+        const char *source_dir = ct_resource_a0.compiler_get_source_dir();
+        char *input_path = ct_path_a0.join(a, 2, source_dir, input_str);
 
         uint32_t postprocess_flag = aiProcessPreset_TargetRealtime_MaxQuality;
 
@@ -422,7 +422,7 @@ namespace scene_resource_compiler {
                 memcpy(tmp_buffer, mesh->mName.data, mesh->mName.length);
             }
 
-            uint64_t name_id = ct_hash_api_v0.id64_from_str(tmp_buffer);
+            uint64_t name_id = ct_hash_a0.id64_from_str(tmp_buffer);
             for (int k = 0; k < array::size(output->geom_name); ++k) {
                 if (name_id == output->geom_name[k]) {
                     snprintf(tmp_buffer2, CETECH_ARRAY_LEN(tmp_buffer2), "%s%d",
@@ -434,7 +434,7 @@ namespace scene_resource_compiler {
             }
 
             array::push_back(output->geom_name,
-                             ct_hash_api_v0.id64_from_str(tmp_buffer));
+                             ct_hash_a0.id64_from_str(tmp_buffer));
             array::push_back<uint64_t>(output->geom_node, 0);
             array::push_back(output->ib_offset, array::size(output->ib));
             array::push_back(output->vb_offset, array::size(output->vb));
@@ -503,7 +503,7 @@ namespace scene_resource_compiler {
                  struct ct_compilator_api *compilator_api) {
 
         char *source_data =
-                CETECH_ALLOCATE(ct_memory_api_v0.main_allocator(), char,
+                CETECH_ALLOCATE(ct_memory_a0.main_allocator(), char,
                                 source_vio->size(source_vio->inst) + 1);
         memset(source_data, 0, source_vio->size(source_vio->inst) + 1);
 
@@ -525,7 +525,7 @@ namespace scene_resource_compiler {
 
         if (!ret) {
             _destroy_compile_output(output);
-            CETECH_FREE(ct_memory_api_v0.main_allocator(), source_data);
+            CETECH_FREE(ct_memory_a0.main_allocator(), source_data);
             return 0;
         }
 
@@ -575,20 +575,20 @@ namespace scene_resource_compiler {
                             array::size(output->geom_name));
 
         _destroy_compile_output(output);
-        CETECH_FREE(ct_memory_api_v0.main_allocator(), source_data);
+        CETECH_FREE(ct_memory_a0.main_allocator(), source_data);
         return 1;
     }
 
-    int init(ct_api_v0 *api) {
-        CETECH_GET_API(api, ct_memory_api_v0);
-        CETECH_GET_API(api, ct_resource_api_v0);
-        CETECH_GET_API(api, ct_scenegprah_api_v0);
-        CETECH_GET_API(api, ct_path_v0);
-        CETECH_GET_API(api, ct_vio_api_v0);
-        CETECH_GET_API(api, ct_hash_api_v0);
-        CETECH_GET_API(api, ct_thread_api_v0);
+    int init(ct_api_a0 *api) {
+        CETECH_GET_API(api, ct_memory_a0);
+        CETECH_GET_API(api, ct_resource_a0);
+        CETECH_GET_API(api, ct_scenegprah_a0);
+        CETECH_GET_API(api, ct_path_a0);
+        CETECH_GET_API(api, ct_vio_a0);
+        CETECH_GET_API(api, ct_hash_a0);
+        CETECH_GET_API(api, ct_thread_a0);
 
-        ct_resource_api_v0.compiler_register(ct_hash_api_v0.id64_from_str("scene"),
+        ct_resource_a0.compiler_register(ct_hash_a0.id64_from_str("scene"),
                                           compiler);
 
         return 1;

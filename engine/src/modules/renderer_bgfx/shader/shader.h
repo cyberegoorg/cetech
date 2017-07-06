@@ -3,7 +3,7 @@
 
 
 namespace shader {
-    int shader_init(struct ct_api_v0 *api);
+    int shader_init(struct ct_api_a0 *api);
 
     void shader_shutdown();
 
