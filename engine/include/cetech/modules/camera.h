@@ -17,20 +17,20 @@ extern "C" {
 // Typedefs
 //==============================================================================
 
-typedef struct world_s world_t;
-typedef struct entity_s entity_t;
-typedef struct mat44f_s mat44f_t;
+struct ce_world;
+struct ce_entity;
 
+
+typedef struct mat44f_s mat44f_t;
 
 //==============================================================================
 // Structs
 //==============================================================================
 
-
 //! Camera struct
-typedef struct camera_s {
+struct ct_camera {
     uint32_t idx;
-} camera_t;
+};
 
 
 //==============================================================================
@@ -38,19 +38,19 @@ typedef struct camera_s {
 //==============================================================================
 
 //! Camera API V0
-struct camera_api_v0 {
+struct ct_camera_a0 {
 
     //! Has entity camera component?
     //! \param world World
     //! \param entity Entity
     //! \return 1 if has else 0
-    int (*has)(world_t world,
-               entity_t entity);
+    int (*has)(struct ct_world world,
+               struct ct_entity entity);
 
     //! Is camera valid?
     //! \param camera Camera
     //! \return 1 if is oK else 0
-    int (*is_valid)(camera_t camera);
+    int (*is_valid)(struct ct_camera camera);
 
 
     //! Get camera project and view matrix
@@ -58,8 +58,8 @@ struct camera_api_v0 {
     //! \param camera Camera
     //! \param proj Project matrix
     //! \param view View Matrix
-    void (*get_project_view)(world_t world,
-                             camera_t camera,
+    void (*get_project_view)(struct ct_world world,
+                             struct ct_camera camera,
                              mat44f_t *proj,
                              mat44f_t *view);
 
@@ -68,8 +68,8 @@ struct camera_api_v0 {
     //! \param world World
     //! \param entity Entity
     //! \return Camera component
-    camera_t (*get)(world_t world,
-                    entity_t entity);
+    struct ct_camera (*get)(struct ct_world world,
+                            struct ct_entity entity);
 
     //! Create camera
     //! \param world World
@@ -78,11 +78,11 @@ struct camera_api_v0 {
     //! \param far Far
     //! \param fov Fov
     //! \return New camera
-    camera_t (*create)(world_t world,
-                       entity_t entity,
-                       float near,
-                       float far,
-                       float fov);
+    struct ct_camera (*create)(struct ct_world world,
+                               struct ct_entity entity,
+                               float near,
+                               float far,
+                               float fov);
 };
 
 #ifdef __cplusplus

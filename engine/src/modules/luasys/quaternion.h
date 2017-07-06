@@ -82,7 +82,7 @@ static int _quat_index(lua_State *L) {
             luasys_push_float(L, a->w);
             return 1;
         default:
-            log_api_v0.error("lua", "Quat bad index '%c'", s[0]);
+            ct_log_a0.error("lua", "Quat bad index '%c'", s[0]);
             break;
     }
 
@@ -109,7 +109,7 @@ static int _quat_newindex(lua_State *L) {
             a->w = value;
             break;
         default:
-            log_api_v0.error("lua", "Quat bad index '%c'", s[0]);
+            ct_log_a0.error("lua", "Quat bad index '%c'", s[0]);
             break;
     }
 

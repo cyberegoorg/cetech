@@ -14,22 +14,22 @@
 //! \param name Thread name
 //! \param data Thread data
 //! \return new thread
-os_thread_t *thread_create(thread_fce_t fce,
+ct_thread_t *thread_create(ct_thread_fce_t fce,
                            const char *name,
                            void *data) {
-    return (os_thread_t *) SDL_CreateThread(fce, name, data);
+    return (ct_thread_t *) SDL_CreateThread(fce, name, data);
 }
 
 //! Kill thread
 //! \param thread thread
-void thread_kill(os_thread_t *thread) {
+void thread_kill(ct_thread_t *thread) {
     SDL_DetachThread((SDL_Thread *) thread);
 }
 
 //! Wait for thread
 //! \param thread Thread
 //! \param status Thread exit status
-void thread_wait(os_thread_t *thread,
+void thread_wait(ct_thread_t *thread,
                  int *status) {
     SDL_WaitThread((SDL_Thread *) thread, status);
 }
@@ -37,7 +37,7 @@ void thread_wait(os_thread_t *thread,
 //! Get id for thread
 //! \param thread Thread
 //! \return ID
-uint64_t thread_get_id(os_thread_t *thread) {
+uint64_t thread_get_id(ct_thread_t *thread) {
     return SDL_GetThreadID((SDL_Thread *) thread);
 }
 
@@ -55,10 +55,10 @@ void thread_yield() {
 #endif
 }
 
-void thread_spin_lock(os_spinlock_t *lock) {
+void thread_spin_lock(ct_spinlock *lock) {
     SDL_AtomicLock((SDL_SpinLock *) lock);
 }
 
-void thread_spin_unlock(os_spinlock_t *lock) {
+void thread_spin_unlock(ct_spinlock *lock) {
     SDL_AtomicUnlock((SDL_SpinLock *) lock);
 }

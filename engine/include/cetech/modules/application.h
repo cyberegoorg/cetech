@@ -12,13 +12,13 @@ extern "C" {
 // Include
 //==============================================================================
 
-typedef void os_window_t;
+typedef void ct_window_t;
 
 //==============================================================================
 // Struct
 //==============================================================================
 
-struct game_callbacks {
+struct ct_game_callbacks {
     int (*init)();
 
     void (*shutdown)();
@@ -34,7 +34,7 @@ struct game_callbacks {
 //==============================================================================
 
 //! Application API V0
-struct app_api_v0 {
+struct ct_app_a0 {
     //! Stop main loop and quit.
     void (*quit)();
 
@@ -48,7 +48,7 @@ struct app_api_v0 {
 
     //! Get main window
     //! \return Main window
-    os_window_t *(*main_window)();
+    ct_window_t *(*main_window)();
 };
 
 #ifdef __cplusplus

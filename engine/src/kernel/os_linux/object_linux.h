@@ -3,12 +3,12 @@
 #include <cetech/kernel/errors.h>
 
 void *load_object(const char *path) {
-    void *obj = dlopen(path, RTLD_NOW|RTLD_LOCAL);
+    void *obj = dlopen(path, RTLD_NOW | RTLD_LOCAL);
 
     CETECH_ASSERT("os_object", obj != NULL);
 
     if (obj == NULL) {
-        log_api_v0.error("os_object", "%s", dlerror());
+        ct_log_a0.error("os_object", "%s", dlerror());
         return NULL;
     }
 
@@ -27,7 +27,7 @@ void *load_function(void *so,
     CETECH_ASSERT("os_object", fce != NULL);
 
     if (fce == NULL) {
-        log_api_v0.error("os_object", "%s", dlerror());
+        ct_log_a0.error("os_object", "%s", dlerror());
         return NULL;
     }
 

@@ -2,7 +2,7 @@
 #define MESH_RENDERER_PRIVATE_H
 
 namespace mesh {
-    void init(struct api_v0 *api);
+    void init(struct ct_api_a0 *api);
 
     void shutdown();
 }

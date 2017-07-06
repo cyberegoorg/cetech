@@ -12,8 +12,6 @@ extern "C" {
 // Includes
 //==============================================================================
 
-#include <cetech/kernel/macros.h>
-
 typedef struct mpack_node_t mpack_node_t;
 typedef struct mpack_writer_t mpack_writer_t;
 
@@ -22,7 +20,7 @@ typedef struct mpack_writer_t mpack_writer_t;
 //==============================================================================
 
 //! Console server command function
-typedef int (*console_server_command_t)(mpack_node_t,
+typedef int (*ct_console_srv_command_t)(mpack_node_t,
                                         mpack_writer_t *);
 
 //==============================================================================
@@ -30,7 +28,8 @@ typedef int (*console_server_command_t)(mpack_node_t,
 //==============================================================================
 
 //! Console server API V0
-struct cnsole_srv_api_v0 {
+struct ct_console_srv_a0 {
+
     //! Push begin signal to clients
     void (*push_begin)();
 
@@ -38,7 +37,7 @@ struct cnsole_srv_api_v0 {
     //! \param name Command name ex.: "lua.execute"
     //! \param command Command fce
     void (*register_command)(const char *name,
-                             console_server_command_t command);
+                             ct_console_srv_command_t command);
 
     void (*update)();
 };

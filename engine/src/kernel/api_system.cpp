@@ -5,11 +5,10 @@
 #include <cetech/celib/map.inl>
 
 #include <cetech/kernel/hash.h>
-#include <cetech/kernel/module.h>
 #include <cetech/kernel/api_system.h>
 #include <cetech/kernel/config.h>
 
-CETECH_DECL_API(hash_api_v0)
+CETECH_DECL_API(ct_hash_a0)
 
 using namespace cetech;
 
@@ -47,7 +46,7 @@ namespace api {
         return map::has(_G.api_map, name_id);
     }
 
-    api_entry first(const char *name) {
+    ct_api_entry first(const char *name) {
         uint64_t name_id = stringid64_from_string(name);
 
         auto first = multi_map::find_first(_G.api_map, name_id);
@@ -59,7 +58,7 @@ namespace api {
         return {.api = first->value, .entry  = (void *) first};
     }
 
-    api_entry next(struct api_entry *entry) {
+    ct_api_entry next(ct_api_entry *entry) {
         auto map_entry = (const Map<void *>::Entry *) entry->entry;
         auto next = multi_map::find_next(_G.api_map, map_entry);
 
@@ -70,30 +69,30 @@ namespace api {
         return {.api = next->value, .entry  = (void *) entry};
     }
 
-    static struct api_v0 api_v0 = {
+    static ct_api_a0 a0 = {
             .register_api = api::register_api,
             .first = api::first,
             .next = api::next,
             .exist = api::exist
     };
 
-    void init(struct allocator *allocator) {
+    void init(ct_allocator *allocator) {
         _G = {0};
 
         _G.api_map.init(allocator);
 
-        api::register_api("api_v0", &api_v0);
+        api::register_api("ct_api_a0", &a0);
     }
 
     void shutdown() {
         _G.api_map.destroy();
     }
 
-    struct api_v0 *v0() {
-        return &api_v0;
+    ct_api_a0 *v0() {
+        return &a0;
     }
 }
 
-extern "C" struct api_v0 *cetech_api_v0() {
-    return &api::api_v0;
+extern "C" ct_api_a0 *ce_api_get() {
+    return &api::a0;
 }

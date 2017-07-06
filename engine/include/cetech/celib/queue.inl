@@ -255,9 +255,9 @@ namespace cetech {
                                _offset(0) {}
 
     template<typename T>
-    inline Queue<T>::Queue(allocator *allocator) : _data(allocator),
-                                                   _size(0),
-                                                   _offset(0) {}
+    inline Queue<T>::Queue(ct_allocator *allocator) : _data(allocator),
+                                                      _size(0),
+                                                      _offset(0) {}
 
     template<typename T>
     inline T &Queue<T>::operator[](const uint32_t i) {
@@ -270,7 +270,7 @@ namespace cetech {
     }
 
     template<typename T>
-    inline void Queue<T>::init(allocator *a) {
+    inline void Queue<T>::init(ct_allocator *a) {
         _data.init(a);
     }
 

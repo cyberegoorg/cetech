@@ -4,7 +4,6 @@
 #include <cetech/celib/quatf.inl>
 #include <cetech/celib/mat44f.inl>
 #include <cetech/kernel/memory.h>
-#include <cetech/kernel/module.h>
 #include <cetech/kernel/api_system.h>
 #include <cetech/celib/array.inl>
 #include <cetech/celib/map.inl>
@@ -15,9 +14,9 @@
 
 #include "cetech/modules/transform.h"
 
-CETECH_DECL_API(memory_api_v0);
-CETECH_DECL_API(hash_api_v0);
-CETECH_DECL_API(component_api_v0);
+CETECH_DECL_API(ct_memory_a0);
+CETECH_DECL_API(ct_hash_a0);
+CETECH_DECL_API(ct_component_a0);
 
 using namespace cetech;
 
@@ -28,12 +27,12 @@ struct transform_data {
 };
 
 struct WorldInstance {
-    world_t world;
+    ct_world world;
     uint32_t n;
     uint32_t allocated;
     void *buffer;
 
-    entity_t *entity;
+    ct_entity *entity;
 
     uint32_t *first_child;
     uint32_t *next_sibling;
@@ -60,19 +59,19 @@ static struct _G {
 #define hash_combine(a, b) ((a * 11)^(b))
 
 static void allocate(WorldInstance &_data,
-                     allocator *_allocator,
+                     ct_allocator *_allocator,
                      uint32_t sz) {
     //assert(sz > _data.n);
 
     WorldInstance new_data;
-    const unsigned bytes = sz * (sizeof(entity_t) + (3 * sizeof(uint32_t)) +
+    const unsigned bytes = sz * (sizeof(ct_entity) + (3 * sizeof(uint32_t)) +
                                  (2 * sizeof(vec3f_t)) + sizeof(quatf_t) +
                                  sizeof(mat44f_s));
     new_data.buffer = CETECH_ALLOCATE(_allocator, char, bytes);
     new_data.n = _data.n;
     new_data.allocated = sz;
 
-    new_data.entity = (entity_t *) (new_data.buffer);
+    new_data.entity = (ct_entity *) (new_data.buffer);
     new_data.first_child = (uint32_t *) (new_data.entity + sz);
     new_data.next_sibling = (uint32_t *) (new_data.first_child + sz);
     new_data.parent = (uint32_t *) (new_data.next_sibling + sz);
@@ -81,7 +80,7 @@ static void allocate(WorldInstance &_data,
     new_data.scale = (vec3f_t *) (new_data.rotation + sz);
     new_data.world_matrix = (mat44f_t *) (new_data.scale + sz);
 
-    memcpy(new_data.entity, _data.entity, _data.n * sizeof(entity_t));
+    memcpy(new_data.entity, _data.entity, _data.n * sizeof(ct_entity));
 
     memcpy(new_data.first_child, _data.first_child, _data.n * sizeof(uint32_t));
     memcpy(new_data.next_sibling, _data.next_sibling,
@@ -100,60 +99,60 @@ static void allocate(WorldInstance &_data,
     _data = new_data;
 }
 
-int transform_is_valid(transform_t transform);
+int transform_is_valid(ct_transform transform);
 
-void transform_transform(world_t world,
-                         transform_t transform,
+void transform_transform(ct_world world,
+                         ct_transform transform,
                          mat44f_t *parent);
 
-vec3f_t transform_get_position(world_t world,
-                               transform_t transform);
+vec3f_t transform_get_position(ct_world world,
+                               ct_transform transform);
 
-quatf_t transform_get_rotation(world_t world,
-                               transform_t transform);
-
-
-vec3f_t transform_get_scale(world_t world,
-                            transform_t transform);
+quatf_t transform_get_rotation(ct_world world,
+                               ct_transform transform);
 
 
-mat44f_t *transform_get_world_matrix(world_t world,
-                                     transform_t transform);
+vec3f_t transform_get_scale(ct_world world,
+                            ct_transform transform);
 
 
-void transform_set_position(world_t world,
-                            transform_t transform,
+mat44f_t *transform_get_world_matrix(ct_world world,
+                                     ct_transform transform);
+
+
+void transform_set_position(ct_world world,
+                            ct_transform transform,
                             vec3f_t pos);
 
 
-void transform_set_rotation(world_t world,
-                            transform_t transform,
+void transform_set_rotation(ct_world world,
+                            ct_transform transform,
                             quatf_t rot);
 
 
-void transform_set_scale(world_t world,
-                         transform_t transform,
+void transform_set_scale(ct_world world,
+                         ct_transform transform,
                          vec3f_t scale);
 
-int transform_has(world_t world,
-                  entity_t entity);
+int transform_has(ct_world world,
+                  ct_entity entity);
 
-transform_t transform_get(world_t world,
-                          entity_t entity);
+ct_transform transform_get(ct_world world,
+                           ct_entity entity);
 
-transform_t transform_create(world_t world,
-                             entity_t entity,
-                             entity_t parent,
-                             vec3f_t position,
-                             quatf_t rotation,
-                             vec3f_t scale);
+ct_transform transform_create(ct_world world,
+                              ct_entity entity,
+                              ct_entity parent,
+                              vec3f_t position,
+                              quatf_t rotation,
+                              vec3f_t scale);
 
 
-void transform_link(world_t world,
-                    entity_t parent,
-                    entity_t child);
+void transform_link(ct_world world,
+                    ct_entity parent,
+                    ct_entity child);
 
-static void _new_world(world_t world) {
+static void _new_world(ct_world world) {
     uint32_t idx = array::size(_G.world_instances);
     array::push_back(_G.world_instances, WorldInstance());
     _G.world_instances[idx].world = world;
@@ -161,7 +160,7 @@ static void _new_world(world_t world) {
 }
 
 
-static WorldInstance *_get_world_instance(world_t world) {
+static WorldInstance *_get_world_instance(ct_world world) {
     uint32_t idx = map::get(_G.world_map, world.h, UINT32_MAX);
 
     if (idx != UINT32_MAX) {
@@ -171,14 +170,14 @@ static WorldInstance *_get_world_instance(world_t world) {
     return nullptr;
 }
 
-static void _destroy_world(world_t world) {
+static void _destroy_world(ct_world world) {
     uint32_t idx = map::get(_G.world_map, world.h, UINT32_MAX);
     uint32_t last_idx = array::size(_G.world_instances) - 1;
 
-    world_t last_world = _G.world_instances[last_idx].world;
+    ct_world last_world = _G.world_instances[last_idx].world;
 
-    CETECH_FREE(memory_api_v0.main_allocator(),
-                      _G.world_instances[idx].buffer);
+    CETECH_FREE(ct_memory_a0.main_allocator(),
+                _G.world_instances[idx].buffer);
 
     _G.world_instances[idx] = _G.world_instances[last_idx];
     map::set(_G.world_map, last_world.h, idx);
@@ -186,7 +185,7 @@ static void _destroy_world(world_t world) {
 }
 
 int _transform_component_compiler(yaml_node_t body,
-                                  blob_v0 *data) {
+                                  ct_blob *data) {
     transform_data t_data;
 
     YAML_NODE_SCOPE(scale, body, "scale",
@@ -211,16 +210,16 @@ int _transform_component_compiler(yaml_node_t body,
     return 1;
 }
 
-static void _on_world_create(world_t world) {
+static void _on_world_create(ct_world world) {
     _new_world(world);
 }
 
-static void _on_world_destroy(world_t world) {
+static void _on_world_destroy(ct_world world) {
     _destroy_world(world);
 }
 
-static void _destroyer(world_t world,
-                       entity_t *ents,
+static void _destroyer(ct_world world,
+                       ct_entity *ents,
                        size_t ent_count) {
     // TODO: remove from arrays, swap idx -> last AND change size
     for (int i = 0; i < ent_count; i++) {
@@ -228,8 +227,8 @@ static void _destroyer(world_t world,
     }
 }
 
-static void _spawner(world_t world,
-                     entity_t *ents,
+static void _spawner(ct_world world,
+                     ct_entity *ents,
                      uint32_t *cents,
                      uint32_t *ents_parent,
                      size_t ent_count,
@@ -241,7 +240,7 @@ static void _spawner(world_t world,
                          ents[cents[i]],
                          ents_parent[cents[i]] != UINT32_MAX
                          ? ents[ents_parent[cents[i]]]
-                         : (entity_t) {.h = UINT32_MAX},
+                         : (ct_entity) {.h = UINT32_MAX},
                          tdata[i].position,
                          tdata[i].rotation,
                          tdata[i].scale);
@@ -253,16 +252,16 @@ static void _spawner(world_t world,
     }
 }
 
-void _set_property(world_t world,
-                   entity_t entity,
+void _set_property(ct_world world,
+                   ct_entity entity,
                    uint64_t key,
-                   struct property_value value) {
+                   ct_property_value value) {
 
-    uint64_t position = hash_api_v0.id64_from_str("position");
-    uint64_t rotation = hash_api_v0.id64_from_str("rotation");
-    uint64_t scale = hash_api_v0.id64_from_str("scale");
+    uint64_t position = ct_hash_a0.id64_from_str("position");
+    uint64_t rotation = ct_hash_a0.id64_from_str("rotation");
+    uint64_t scale = ct_hash_a0.id64_from_str("scale");
 
-    transform_t transform = transform_get(world, entity);
+    ct_transform transform = transform_get(world, entity);
 
     if (key == position) {
         transform_set_position(world, transform, value.value.vec3f);
@@ -284,17 +283,17 @@ void _set_property(world_t world,
 
 }
 
-struct property_value _get_property(world_t world,
-                                    entity_t entity,
-                                    uint64_t key) {
-    uint64_t position = hash_api_v0.id64_from_str("position");
-    uint64_t rotation = hash_api_v0.id64_from_str("rotation");
-    uint64_t scale = hash_api_v0.id64_from_str("scale");
+ct_property_value _get_property(ct_world world,
+                                ct_entity entity,
+                                uint64_t key) {
+    uint64_t position = ct_hash_a0.id64_from_str("position");
+    uint64_t rotation = ct_hash_a0.id64_from_str("rotation");
+    uint64_t scale = ct_hash_a0.id64_from_str("scale");
 
-    transform_t transform = transform_get(world, entity);
+    ct_transform transform = transform_get(world, entity);
 
     if (key == position) {
-        return (struct property_value) {
+        return (ct_property_value) {
                 .type= PROPERTY_VEC3,
                 .value.vec3f = transform_get_position(world, transform)
         };
@@ -305,22 +304,22 @@ struct property_value _get_property(world_t world,
         quatf_to_eurel_angle(&euler_rot_rad, &rot);
         vec3f_mul(&euler_rot, &euler_rot_rad, CETECH_float_TODEG);
 
-        return (struct property_value) {
+        return (ct_property_value) {
                 .type= PROPERTY_VEC3,
                 .value.vec3f = euler_rot
         };
     } else if (key == scale) {
-        return (struct property_value) {
+        return (ct_property_value) {
                 .type= PROPERTY_VEC3,
                 .value.vec3f = transform_get_scale(world, transform)
         };
     }
 
-    return (struct property_value) {.type= PROPERTY_INVALID};
+    return (ct_property_value) {.type= PROPERTY_INVALID};
 }
 
-static void _init_api(struct api_v0 *api) {
-    static struct transform_api_v0 _api = {0};
+static void _init_api(ct_api_a0 *api) {
+    static ct_transform_a0 _api = {0};
 
     _api.is_valid = transform_is_valid;
     _api.transform = transform_transform;
@@ -336,28 +335,28 @@ static void _init_api(struct api_v0 *api) {
     _api.create = transform_create;
     _api.link = transform_link;
 
-    api->register_api("transform_api_v0", &_api);
+    api->register_api("ct_transform_a0", &_api);
 }
 
-static void _init(struct api_v0 *api) {
+static void _init(ct_api_a0 *api) {
     _init_api(api);
 
-    CETECH_GET_API(api, component_api_v0);
-    CETECH_GET_API(api, memory_api_v0);
-    CETECH_GET_API(api, hash_api_v0);
+    CETECH_GET_API(api, ct_component_a0);
+    CETECH_GET_API(api, ct_memory_a0);
+    CETECH_GET_API(api, ct_hash_a0);
 
 
     _G = {0};
 
-    _G.world_map.init(memory_api_v0.main_allocator());
-    _G.world_instances.init(memory_api_v0.main_allocator());
-    _G.ent_map.init(memory_api_v0.main_allocator());
+    _G.world_map.init(ct_memory_a0.main_allocator());
+    _G.world_instances.init(ct_memory_a0.main_allocator());
+    _G.ent_map.init(ct_memory_a0.main_allocator());
 
-    _G.type = hash_api_v0.id64_from_str("transform");
+    _G.type = ct_hash_a0.id64_from_str("transform");
 
-    component_api_v0.register_type(
+    ct_component_a0.register_type(
             _G.type,
-            (struct component_clb) {
+            (ct_component_clb) {
                     .spawner=_spawner,
                     .destroyer=_destroyer,
 
@@ -369,8 +368,8 @@ static void _init(struct api_v0 *api) {
             }
     );
 
-    component_api_v0.register_compiler(_G.type,
-                                       _transform_component_compiler, 10);
+    ct_component_a0.register_compiler(_G.type,
+                                      _transform_component_compiler, 10);
 }
 
 static void _shutdown() {
@@ -380,12 +379,12 @@ static void _shutdown() {
 }
 
 
-int transform_is_valid(transform_t transform) {
+int transform_is_valid(ct_transform transform) {
     return transform.idx != UINT32_MAX;
 }
 
-void transform_transform(world_t world,
-                         transform_t transform,
+void transform_transform(ct_world world,
+                         ct_transform transform,
                          mat44f_t *parent) {
     WorldInstance *world_inst = _get_world_instance(world);
 
@@ -409,7 +408,7 @@ void transform_transform(world_t world,
 
     uint32_t child = world_inst->first_child[transform.idx];
 
-    transform_t child_transform = {.idx = child};
+    ct_transform child_transform = {.idx = child};
 
     while (transform_is_valid(child_transform)) {
         transform_transform(world, child_transform,
@@ -419,42 +418,42 @@ void transform_transform(world_t world,
     }
 }
 
-vec3f_t transform_get_position(world_t world,
-                               transform_t transform) {
+vec3f_t transform_get_position(ct_world world,
+                               ct_transform transform) {
 
     WorldInstance *world_inst = _get_world_instance(world);
     return world_inst->position[transform.idx];
 }
 
-quatf_t transform_get_rotation(world_t world,
-                               transform_t transform) {
+quatf_t transform_get_rotation(ct_world world,
+                               ct_transform transform) {
 
     WorldInstance *world_inst = _get_world_instance(world);
     return world_inst->rotation[transform.idx];
 }
 
-vec3f_t transform_get_scale(world_t world,
-                            transform_t transform) {
+vec3f_t transform_get_scale(ct_world world,
+                            ct_transform transform) {
 
     WorldInstance *world_inst = _get_world_instance(world);
     return world_inst->scale[transform.idx];
 }
 
-mat44f_t *transform_get_world_matrix(world_t world,
-                                     transform_t transform) {
+mat44f_t *transform_get_world_matrix(ct_world world,
+                                     ct_transform transform) {
 
     WorldInstance *world_inst = _get_world_instance(world);
     return &world_inst->world_matrix[transform.idx];
 }
 
-void transform_set_position(world_t world,
-                            transform_t transform,
+void transform_set_position(ct_world world,
+                            ct_transform transform,
                             vec3f_t pos) {
     WorldInstance *world_inst = _get_world_instance(world);
 
     uint32_t parent_idx = world_inst->parent[transform.idx];
 
-    transform_t pt = {.idx = parent_idx};
+    ct_transform pt = {.idx = parent_idx};
 
     mat44f_t m = MAT44F_INIT_IDENTITY;
     mat44f_t *p =
@@ -466,14 +465,14 @@ void transform_set_position(world_t world,
     transform_transform(world, transform, p);
 }
 
-void transform_set_rotation(world_t world,
-                            transform_t transform,
+void transform_set_rotation(ct_world world,
+                            ct_transform transform,
                             quatf_t rot) {
     WorldInstance *world_inst = _get_world_instance(world);
 
     uint32_t parent_idx = world_inst->parent[transform.idx];
 
-    transform_t pt = {.idx = parent_idx};
+    ct_transform pt = {.idx = parent_idx};
 
     mat44f_t m = MAT44F_INIT_IDENTITY;
     mat44f_t *p =
@@ -488,14 +487,14 @@ void transform_set_rotation(world_t world,
     transform_transform(world, transform, p);
 }
 
-void transform_set_scale(world_t world,
-                         transform_t transform,
+void transform_set_scale(ct_world world,
+                         ct_transform transform,
                          vec3f_t scale) {
     WorldInstance *world_inst = _get_world_instance(world);
 
     uint32_t parent_idx = world_inst->parent[transform.idx];
 
-    transform_t pt = {.idx = parent_idx};
+    ct_transform pt = {.idx = parent_idx};
 
     mat44f_t m = MAT44F_INIT_IDENTITY;
     mat44f_t *p =
@@ -507,34 +506,34 @@ void transform_set_scale(world_t world,
     transform_transform(world, transform, p);
 }
 
-int transform_has(world_t world,
-                  entity_t entity) {
+int transform_has(ct_world world,
+                  ct_entity entity) {
     uint32_t idx = hash_combine(world.h, entity.h);
 
     return map::has(_G.ent_map, idx);
 }
 
-transform_t transform_get(world_t world,
-                          entity_t entity) {
+ct_transform transform_get(ct_world world,
+                           ct_entity entity) {
 
     uint32_t idx = hash_combine(world.h, entity.h);
 
     uint32_t component_idx = map::get(_G.ent_map, idx, UINT32_MAX);
 
-    return (transform_t) {.idx = component_idx};
+    return (ct_transform) {.idx = component_idx};
 }
 
-transform_t transform_create(world_t world,
-                             entity_t entity,
-                             entity_t parent,
-                             vec3f_t position,
-                             quatf_t rotation,
-                             vec3f_t scale) {
+ct_transform transform_create(ct_world world,
+                              ct_entity entity,
+                              ct_entity parent,
+                              vec3f_t position,
+                              quatf_t rotation,
+                              vec3f_t scale) {
 
     WorldInstance *data = _get_world_instance(world);
 
     uint32_t idx = data->n;
-    allocate(*data, memory_api_v0.main_allocator(), data->n + 1);
+    allocate(*data, ct_memory_a0.main_allocator(), data->n + 1);
     ++data->n;
 
     data->entity[idx] = entity;
@@ -550,7 +549,7 @@ transform_t transform_create(world_t world,
     mat44f_t m = MAT44F_INIT_IDENTITY;
     memcpy(data->world_matrix[idx].f, m.f, sizeof(m));
 
-    transform_t t = {.idx = idx};
+    ct_transform t = {.idx = idx};
     transform_transform(world, t,
                         parent.h != UINT32_MAX ? transform_get_world_matrix(
                                 world, transform_get(world, parent))
@@ -577,17 +576,17 @@ transform_t transform_create(world_t world,
     }
 
 
-    return (transform_t) {.idx = idx};
+    return (ct_transform) {.idx = idx};
 }
 
-void transform_link(world_t world,
-                    entity_t parent,
-                    entity_t child) {
+void transform_link(ct_world world,
+                    ct_entity parent,
+                    ct_entity child) {
 
     WorldInstance *data = _get_world_instance(world);
 
-    transform_t parent_tr = transform_get(world, parent);
-    transform_t child_tr = transform_get(world, child);
+    ct_transform parent_tr = transform_get(world, parent);
+    ct_transform child_tr = transform_get(world, child);
 
     data->parent[child_tr.idx] = parent_tr.idx;
 
@@ -610,10 +609,10 @@ void transform_link(world_t world,
                                                                             parent)));
 }
 
-extern "C" void transform_load_module(struct api_v0 *api) {
+extern "C" void transform_load_module(ct_api_a0 *api) {
     _init(api);
 }
 
-extern "C" void transform_unload_module(struct api_v0 *api) {
+extern "C" void transform_unload_module(ct_api_a0 *api) {
     _shutdown();
 }

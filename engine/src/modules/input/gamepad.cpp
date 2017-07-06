@@ -7,7 +7,6 @@
 #include <cetech/kernel/config.h>
 #include <cetech/celib/eventstream.inl>
 #include <cetech/modules/input.h>
-#include <cetech/kernel/module.h>
 #include <cetech/kernel/os.h>
 #include <cetech/kernel/api_system.h>
 
@@ -15,8 +14,8 @@
 #include <cetech/kernel/log.h>
 #include <cetech/kernel/errors.h>
 
-CETECH_DECL_API(log_api_v0)
-CETECH_DECL_API(machine_api_v0);
+CETECH_DECL_API(ct_log_a0)
+CETECH_DECL_API(ct_machine_a0);
 
 //==============================================================================
 // Defines
@@ -130,19 +129,19 @@ namespace gamepad {
     void play_rumble(uint32_t idx,
                      float strength,
                      uint32_t length) {
-        machine_api_v0.gamepad_play_rumble(idx, strength, length);
+        ct_machine_a0.gamepad_play_rumble(idx, strength, length);
     }
 
     static void update() {
-        struct event_header *event = machine_api_v0.event_begin();
+        ct_event_header *event = ct_machine_a0.event_begin();
 
         memcpy(_G.last_state, _G.state,
                sizeof(int) * GAMEPAD_BTN_MAX * GAMEPAD_MAX);
 
-        while (event != machine_api_v0.event_end()) {
-            struct gamepad_move_event *move_event = (struct gamepad_move_event *) event;
-            struct gamepad_btn_event *btn_event = (struct gamepad_btn_event *) event;
-            struct gamepad_device_event *device_event = (struct gamepad_device_event *) event;
+        while (event != ct_machine_a0.event_end()) {
+            ct_gamepad_move_event *move_event = (ct_gamepad_move_event *) event;
+            ct_gamepad_btn_event *btn_event = (ct_gamepad_btn_event *) event;
+            ct_gamepad_device_event *device_event = (ct_gamepad_device_event *) event;
 
             switch (event->type) {
                 case EVENT_GAMEPAD_DOWN:
@@ -170,7 +169,7 @@ namespace gamepad {
                     break;
             }
 
-            event = machine_api_v0.event_next(event);
+            event = ct_machine_a0.event_next(event);
         }
     }
 
@@ -178,7 +177,7 @@ namespace gamepad {
 
 namespace gamepad_module {
 
-    static struct gamepad_api_v0 api_v1 = {
+    static ct_gamepad_a0 a0 = {
             .is_active = gamepad::is_active,
             .button_index = gamepad::button_index,
             .button_name = gamepad::button_name,
@@ -192,36 +191,36 @@ namespace gamepad_module {
             .update = gamepad::update
     };
 
-    static void _init_api(struct api_v0 *api) {
-        api->register_api("gamepad_api_v0", &api_v1);
+    static void _init_api(ct_api_a0 *api) {
+        api->register_api("ct_gamepad_a0", &a0);
     }
 
-    static void _init(struct api_v0 *api) {
+    static void _init(ct_api_a0 *api) {
         _init_api(api);
 
-        CETECH_GET_API(api, machine_api_v0);
-        CETECH_GET_API(api, log_api_v0);
+        CETECH_GET_API(api, ct_machine_a0);
+        CETECH_GET_API(api, ct_log_a0);
 
         _G = {0};
 
-        log_api_v0.debug(LOG_WHERE, "Init");
+        ct_log_a0.debug(LOG_WHERE, "Init");
 
         for (int i = 0; i < GAMEPAD_MAX; ++i) {
-            _G.active[i] = machine_api_v0.gamepad_is_active(i);
+            _G.active[i] = ct_machine_a0.gamepad_is_active(i);
         }
     }
 
     static void _shutdown() {
-        log_api_v0.debug(LOG_WHERE, "Shutdown");
+        ct_log_a0.debug(LOG_WHERE, "Shutdown");
 
         _G = {0};
     }
 
-    extern "C" void gamepad_load_module(struct api_v0 *api) {
+    extern "C" void gamepad_load_module(ct_api_a0 *api) {
         _init(api);
     }
 
-    extern "C" void gamepad_unload_module(struct api_v0 *api) {
+    extern "C" void gamepad_unload_module(ct_api_a0 *api) {
         _shutdown();
     }
 };

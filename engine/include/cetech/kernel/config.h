@@ -14,19 +14,18 @@ extern "C" {
 
 #include <stdint.h>
 
-struct api_v0;
-struct memory_api_v0;
-struct app_api_v0;
+struct ct_api_a0;
+struct ct_memory_a0;
+struct ct_app_a0;
 
 //==============================================================================
 // Typedefs
 //==============================================================================
 
 //! Cvar type
-typedef struct {
+struct ct_cvar {
     uint64_t idx; //!< Idx
-} cvar_t;
-
+};
 
 //==============================================================================
 // Enums
@@ -45,7 +44,7 @@ enum cvar_type {
 //==============================================================================
 
 //! Config API V0
-struct config_api_v0 {
+struct ct_config_a0 {
     //! Parse commandline arguments.
     //! \param args Arguments
     //! \return 1 if ok else 0
@@ -55,78 +54,78 @@ struct config_api_v0 {
     //! Find cvar
     //! \param name Cvar name
     //! \return Cvar or null cvar if name not found.
-    cvar_t (*find)(const char *name);
+    struct ct_cvar (*find)(const char *name);
 
     //! Find cvar if exist else create new
     //! \param name Cvar name
     //! \param is_new Write 1 if cvar is new
     //! \return Cvar
-    cvar_t (*find_or_create)(const char *name,
-                             int *is_new);
+    struct ct_cvar (*find_or_create)(const char *name,
+                                     int *is_new);
 
     //! Create new float cvar
     //! \param name Name
     //! \param desc Description
     //! \param f Value
     //! \return Cvar
-    cvar_t (*new_float)(const char *name,
-                        const char *desc,
-                        float f);
+    struct ct_cvar (*new_float)(const char *name,
+                                const char *desc,
+                                float f);
 
     //! Create new intcvar
     //! \param name Name
     //! \param desc Description
     //! \param i Value
     //! \return Cvar
-    cvar_t (*new_int)(const char *name,
-                      const char *desc,
-                      int i);
+    struct ct_cvar (*new_int)(const char *name,
+                              const char *desc,
+                              int i);
 
     //! Create new string cvar
     //! \param name Name
     //! \param desc Description
     //! \param s Value
     //! \return Cvar
-    cvar_t (*new_str)(const char *name,
-                      const char *desc,
-                      const char *s);
+    struct ct_cvar (*new_str)(const char *name,
+                              const char *desc,
+                              const char *s);
 
     //! Get float value
     //! \param var Cvar
     //! \return Float value
-    float (*get_float)(cvar_t var);
+    float (*get_float)(struct ct_cvar var);
 
     //! Get int value
     //! \param var Cvar
     //! \return Int value
-    int (*get_int)(cvar_t var);
+    int (*get_int)(struct ct_cvar var);
 
     //! Get string value
     //! \param var Cvar
     //! \return String value
-    const char *(*get_string)(cvar_t var);
+    const char *(*get_string)(struct ct_cvar var);
 
     //! Get cvar type
     //! \param var Cvar
     //! \return Cvart type
-    enum cvar_type (*get_type)(cvar_t var);
+    enum cvar_type (*get_type)(struct ct_cvar var);
 
     //! Set float value
     //! \param var Cvar
     //! \param f Value
-    void (*set_float)(cvar_t var,
+    void (*set_float)(struct ct_cvar var,
                       float f);
 
     //! Set int value
     //! \param var Cvar
     //! \param i Value
-    void (*set_int)(cvar_t var,
+    void (*set_int)(struct ct_cvar var,
                     int i);
 
     //! Set string value
     //! \param var Cvar
     //! \param s Value
-    void (*set_string)(cvar_t var,
+    void (*set_string)(struct ct_cvar var,
                        const char *s);
 
     //! Dump all variables to log

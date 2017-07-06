@@ -2,26 +2,25 @@
 #include <cetech/kernel/log.h>
 
 #include "cetech/kernel/config.h"
-#include "cetech/kernel/module.h"
 #include "cetech/modules/input.h"
 
-CETECH_DECL_API(keyboard_api_v0)
-CETECH_DECL_API(log_api_v0)
+CETECH_DECL_API(ct_keyboard_a0)
+CETECH_DECL_API(ct_log_a0)
 
 void update() {
-//    if (keyboard_api_v0.button_state(0, keyboard_api_v0.button_index("v"))) {
-//        log_api_v0.warning("example", "V");
+//    if (ce_keyboard_api.button_state(0, ce_keyboard_api.button_index("v"))) {
+//        ce_log_api.warning("example", "V");
 //    }
 }
 
 
-void load_module(struct api_v0 *api) {
-    CETECH_GET_API(api, keyboard_api_v0);
-    CETECH_GET_API(api, log_api_v0);
+void load_module(struct ct_api_a0 *api) {
+    CETECH_GET_API(api, ct_keyboard_a0);
+    CETECH_GET_API(api, ct_log_a0);
 
-    log_api_v0.info("example", "Init");
+    ct_log_a0.info("example", "Init");
 }
 
-void unload_module(struct api_v0 *api) {
-    log_api_v0.info("example", "Shutdown");
+void unload_module(struct ct_api_a0 *api) {
+    ct_log_a0.info("example", "Shutdown");
 }

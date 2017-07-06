@@ -19,7 +19,7 @@ extern "C" {
 //==============================================================================
 
 //! Gamepad API V0
-struct gamepad_api_v0 {
+struct ct_gamepad_a0 {
     //! Is gamepad active?
     //! \param gamepad Gamepad
     //! \return 1 if active else 0
@@ -85,7 +85,7 @@ struct gamepad_api_v0 {
 //==============================================================================
 
 //! Keyboard API V0
-struct keyboard_api_v0 {
+struct ct_keyboard_a0 {
     //! Return button index
     //! \param button_name Button name
     //! \return Button index
@@ -122,7 +122,7 @@ struct keyboard_api_v0 {
 //==============================================================================
 
 //! Mouse API V0
-struct mouse_api_v0 {
+struct ct_mouse_a0 {
     //! Return button index
     //! \param button_name Button name
     //! \return Button index

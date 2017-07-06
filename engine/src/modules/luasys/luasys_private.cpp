@@ -16,7 +16,6 @@ extern "C" {
 #include <cetech/kernel/os.h>
 #include <cetech/kernel/config.h>
 #include <cetech/kernel/hash.h>
-#include <cetech/kernel/module.h>
 #include <cetech/modules/application.h>
 #include <cetech/kernel/log.h>
 
@@ -27,11 +26,11 @@ extern "C" {
 #include <include/mpack/mpack.h>
 #include <cetech/kernel/errors.h>
 
-CETECH_DECL_API(resource_api_v0);
-CETECH_DECL_API(cnsole_srv_api_v0);
-CETECH_DECL_API(os_vio_api_v0);
-CETECH_DECL_API(log_api_v0);
-CETECH_DECL_API(hash_api_v0);
+CETECH_DECL_API(ct_resource_a0);
+CETECH_DECL_API(ct_console_srv_a0);
+CETECH_DECL_API(ct_vio_a0);
+CETECH_DECL_API(ct_log_a0);
+CETECH_DECL_API(ct_hash_a0);
 
 #include "matrix.h"
 #include "vectors.h"
@@ -81,10 +80,10 @@ static struct G {
 
 static int require(lua_State *L) {
     const char *name = lua_tostring(L, 1);
-    uint64_t name_hash = hash_api_v0.id64_from_str(name);
+    uint64_t name_hash = ct_hash_a0.id64_from_str(name);
 
-    lua_resource *resource = (lua_resource *) resource_api_v0.get(_G.type_id,
-                                                                  name_hash);
+    lua_resource *resource = (lua_resource *) ct_resource_a0.get(_G.type_id,
+                                                                 name_hash);
 
     if (resource == NULL) {
         return 0;
@@ -162,7 +161,7 @@ void _game_render_clb() {
     luasys_call_global("render", NULL);
 }
 
-static const struct game_callbacks _GameCallbacks = {
+static const ct_game_callbacks _GameCallbacks = {
         .init = _game_init_clb,
         .shutdown = _game_shutdown_clb,
         .update = _game_update_clb,
@@ -170,10 +169,10 @@ static const struct game_callbacks _GameCallbacks = {
 };
 
 #define REGISTER_LUA_API(name, api) \
-    void _register_lua_##name##_api(struct api_v0 *api);\
+    void _register_lua_##name##_api(ct_api_a0 *api);\
     _register_lua_##name##_api(api);
 
-extern "C" void _register_all_api(struct api_v0 *api) {
+extern "C" void _register_all_api(ct_api_a0 *api) {
     REGISTER_LUA_API(log, api);
     REGISTER_LUA_API(module, api);
     REGISTER_LUA_API(keyboard, api);
@@ -279,7 +278,7 @@ static int _cmd_execute_string(mpack_node_t args,
 
         const char *last_error = lua_tostring(_G.L, -1);
         lua_pop(_G.L, 1);
-        log_api_v0.error(LOG_WHERE, "%s", last_error);
+        ct_log_a0.error(LOG_WHERE, "%s", last_error);
 
         mpack_start_map(writer, 1);
         mpack_write_cstr(writer, "error_msg");
@@ -304,7 +303,7 @@ static int _execute_string(lua_State *_L,
     if (luaL_dostring(_L, str)) {
         const char *last_error = lua_tostring(_L, -1);
         lua_pop(_L, 1);
-        log_api_v0.error(LOG_WHERE, "%s", last_error);
+        ct_log_a0.error(LOG_WHERE, "%s", last_error);
         return 0;
     }
 
@@ -318,9 +317,9 @@ static int _execute_string(lua_State *_L,
 //==============================================================================
 
 int _lua_compiler(const char *filename,
-                  struct os_vio *source_vio,
-                  struct os_vio *build_vio,
-                  struct compilator_api *compilator_api) {
+                  ct_vio *source_vio,
+                  ct_vio *build_vio,
+                  ct_compilator_api *compilator_api) {
 
     char tmp[source_vio->size(source_vio->inst) + 1];
     memset(tmp, 0, source_vio->size(source_vio->inst) + 1);
@@ -354,7 +353,7 @@ int _lua_compiler(const char *filename,
     lua_pcall(state, 3, 2, 0);
     if (lua_isnil(state, 1)) {
         const char *err = luasys_to_string(state, 2);
-        log_api_v0.error("resource_compiler.lua", "[%s] %s", filename, err);
+        ct_log_a0.error("resource_compiler.lua", "[%s] %s", filename, err);
 
         lua_close(state);
         return 0;
@@ -368,8 +367,9 @@ int _lua_compiler(const char *filename,
                 .size = (uint32_t) bc_len,
         };
 
-        build_vio->write(build_vio->inst, &resource, sizeof(struct lua_resource),
-                            1);
+        build_vio->write(build_vio->inst, &resource,
+                         sizeof(struct lua_resource),
+                         1);
         build_vio->write(build_vio->inst, bc, sizeof(char), bc_len);
     }
 
@@ -570,7 +570,7 @@ int luasys_execute_string(const char *str) {
 }
 
 void luasys_execute_resource(uint64_t name) {
-    struct lua_resource *resource = (lua_resource *) resource_api_v0.get(
+    struct lua_resource *resource = (lua_resource *) ct_resource_a0.get(
             _G.type_id, name);
     char *data = (char *) (resource + 1);
 
@@ -579,7 +579,7 @@ void luasys_execute_resource(uint64_t name) {
     if (lua_pcall(_G.L, 0, 0, 0)) {
         const char *last_error = lua_tostring(_G.L, -1);
         lua_pop(_G.L, 1);
-        log_api_v0.error(LOG_WHERE, "%s", last_error);
+        ct_log_a0.error(LOG_WHERE, "%s", last_error);
     }
 }
 
@@ -830,8 +830,8 @@ void _create_lightuserdata() {
     lua_pop(_G.L, 1);
 }
 
-static void _init_api(struct api_v0 *api) {
-    static struct lua_api_v0 _api = {0};
+static void _init_api(ct_api_a0 *api) {
+    static ct_lua_a0 _api = {0};
 
     //api.get_top = luasys_get_top;
     _api.remove = luasys_remove;
@@ -876,25 +876,25 @@ static void _init_api(struct api_v0 *api) {
     _api.is_quat = _is_quat;
     _api.is_mat44f = _is_mat44f;
 
-    api->register_api("lua_api_v0", &_api);
+    api->register_api("ct_lua_a0", &_api);
 }
 
 
-static void _init(struct api_v0 *api_v0) {
-    _init_api(api_v0);
+static void _init(ct_api_a0 *a0) {
+    _init_api(a0);
 
-    CETECH_GET_API(api_v0, cnsole_srv_api_v0);
-    CETECH_GET_API(api_v0, resource_api_v0);
-    CETECH_GET_API(api_v0, os_vio_api_v0);
-    CETECH_GET_API(api_v0, log_api_v0);
-    CETECH_GET_API(api_v0, hash_api_v0);
+    CETECH_GET_API(a0, ct_console_srv_a0);
+    CETECH_GET_API(a0, ct_resource_a0);
+    CETECH_GET_API(a0, ct_vio_a0);
+    CETECH_GET_API(a0, ct_log_a0);
+    CETECH_GET_API(a0, ct_hash_a0);
 
-    log_api_v0.debug(LOG_WHERE, "Init");
+    ct_log_a0.debug(LOG_WHERE, "Init");
 
     _G.L = luaL_newstate();
     CETECH_ASSERT(LOG_WHERE, _G.L != NULL);
 
-    _G.type_id = hash_api_v0.id64_from_str("lua");
+    _G.type_id = ct_hash_a0.id64_from_str("lua");
 
     luaL_openlibs(_G.L);
 
@@ -916,27 +916,27 @@ static void _init(struct api_v0 *api_v0) {
 
     _create_lightuserdata();
 
-    _register_all_api(api_v0);
+    _register_all_api(a0);
 
 //    luasys_add_module_function("module", "reload", _reload_module);
-    cnsole_srv_api_v0.register_command("lua_system.execute",
+    ct_console_srv_a0.register_command("lua_system.execute",
                                        _cmd_execute_string);
 
-    resource_api_v0.register_type(_G.type_id, resource_lua::callback);
+    ct_resource_a0.register_type(_G.type_id, resource_lua::callback);
 #ifdef CETECH_CAN_COMPILE
-    resource_api_v0.compiler_register(_G.type_id, _lua_compiler);
+    ct_resource_a0.compiler_register(_G.type_id, _lua_compiler);
 #endif
 }
 
 static void _shutdown() {
-    log_api_v0.debug(LOG_WHERE, "Shutdown");
+    ct_log_a0.debug(LOG_WHERE, "Shutdown");
 
     lua_close(_G.L);
 
     _G = (struct G) {0};
 }
 
-const struct game_callbacks *luasys_get_game_callbacks() {
+const ct_game_callbacks *luasys_get_game_callbacks() {
     return &_GameCallbacks;
 }
 
@@ -984,16 +984,16 @@ void luasys_call_global(const char *func,
     if (lua_pcall(_G.L, argc, 0, 0)) {
         const char *last_error = lua_tostring(_G.L, -1);
         lua_pop(_G.L, 1);
-        log_api_v0.error(LOG_WHERE, "%s", last_error);
+        ct_log_a0.error(LOG_WHERE, "%s", last_error);
     }
 
     lua_pop(_state, -1);
 }
 
-extern "C" void luasys_load_module(struct api_v0 *api) {
+extern "C" void luasys_load_module(ct_api_a0 *api) {
     _init(api);
 }
 
-extern "C" void luasys_unload_module(struct api_v0 *api) {
+extern "C" void luasys_unload_module(ct_api_a0 *api) {
     _shutdown();
 }

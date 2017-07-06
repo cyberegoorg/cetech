@@ -10,7 +10,6 @@
 
 #include <cetech/modules/application.h>
 #include <cetech/kernel/memory.h>
-#include <cetech/kernel/module.h>
 #include <cetech/kernel/api_system.h>
 #include <cetech/kernel/log.h>
 
@@ -27,7 +26,7 @@ using namespace cetech;
 using namespace string_stream;
 
 namespace shader_compiler {
-    int init(api_v0 *api);
+    int init(ct_api_a0 *api);
 }
 
 //==============================================================================
@@ -41,14 +40,14 @@ struct shader_blobResourceGlobals {
 } ShaderResourceGlobals;
 
 
-CETECH_DECL_API(memory_api_v0)
-CETECH_DECL_API(resource_api_v0)
-CETECH_DECL_API(app_api_v0)
-CETECH_DECL_API(os_path_v0)
-CETECH_DECL_API(os_vio_api_v0)
-CETECH_DECL_API(os_process_api_v0)
-CETECH_DECL_API(log_api_v0)
-CETECH_DECL_API(hash_api_v0)
+CETECH_DECL_API(ct_memory_a0)
+CETECH_DECL_API(ct_resource_a0)
+CETECH_DECL_API(ct_app_a0)
+CETECH_DECL_API(ct_path_a0)
+CETECH_DECL_API(ct_vio_a0)
+CETECH_DECL_API(ct_process_a0)
+CETECH_DECL_API(ct_log_a0)
+CETECH_DECL_API(ct_hash_a0)
 
 
 //==============================================================================
@@ -60,8 +59,8 @@ namespace shader_resource {
     static const bgfx::ProgramHandle null_program = {0};
 
 
-    void *loader(struct os_vio *input,
-                 struct allocator *allocator) {
+    void *loader(ct_vio *input,
+                 ct_allocator *allocator) {
 
         const int64_t size = input->size(input->inst);
         char *data = CETECH_ALLOCATE(allocator, char, size);
@@ -70,7 +69,7 @@ namespace shader_resource {
     }
 
     void unloader(void *new_data,
-                  struct allocator *allocator) {
+                  ct_allocator *allocator) {
         CETECH_FREE(allocator, new_data);
     }
 
@@ -109,7 +108,7 @@ namespace shader_resource {
     void *reloader(uint64_t name,
                    void *old_data,
                    void *new_data,
-                   struct allocator *allocator) {
+                   ct_allocator *allocator) {
         offline(name, old_data);
         online(name, new_data);
 
@@ -118,7 +117,7 @@ namespace shader_resource {
         return new_data;
     }
 
-    static const resource_callbacks_t callback = {
+    static const ct_resource_callbacks_t callback = {
             .loader = loader,
             .unloader =unloader,
             .online = online,
@@ -133,24 +132,24 @@ namespace shader_resource {
 //==============================================================================
 
 namespace shader {
-    int shader_init(struct api_v0 *api) {
-        CETECH_GET_API(api, memory_api_v0);
-        CETECH_GET_API(api, resource_api_v0);
-        CETECH_GET_API(api, app_api_v0);
-        CETECH_GET_API(api, os_path_v0);
-        CETECH_GET_API(api, os_vio_api_v0);
-        CETECH_GET_API(api, os_process_api_v0);
-        CETECH_GET_API(api, log_api_v0);
-        CETECH_GET_API(api, hash_api_v0);
+    int shader_init(ct_api_a0 *api) {
+        CETECH_GET_API(api, ct_memory_a0);
+        CETECH_GET_API(api, ct_resource_a0);
+        CETECH_GET_API(api, ct_app_a0);
+        CETECH_GET_API(api, ct_path_a0);
+        CETECH_GET_API(api, ct_vio_a0);
+        CETECH_GET_API(api, ct_process_a0);
+        CETECH_GET_API(api, ct_log_a0);
+        CETECH_GET_API(api, ct_hash_a0);
 
         _G = {0};
 
-        _G.type = hash_api_v0.id64_from_str("shader");
+        _G.type = ct_hash_a0.id64_from_str("shader");
 
-        _G.handler_map.init(memory_api_v0.main_allocator());
+        _G.handler_map.init(ct_memory_a0.main_allocator());
 
-        resource_api_v0.register_type(_G.type,
-                                      shader_resource::callback);
+        ct_resource_a0.register_type(_G.type,
+                                     shader_resource::callback);
 #ifdef CETECH_CAN_COMPILE
         shader_compiler::init(api);
 #endif
@@ -163,7 +162,7 @@ namespace shader {
     }
 
     bgfx::ProgramHandle shader_get(uint64_t name) {
-        auto resource = shader_blob::get(resource_api_v0.get(_G.type, name));
+        auto resource = shader_blob::get(ct_resource_a0.get(_G.type, name));
         return map::get(_G.handler_map, name, shader_resource::null_program);
     }
 }

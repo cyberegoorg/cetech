@@ -15,7 +15,7 @@
 #include "allocator_core_private.h"
 
 struct allocator_scratch {
-    struct allocator *backing;
+    ct_allocator *backing;
     char *begin;
     char *end;
     char *allocate;
@@ -33,7 +33,7 @@ int in_use(struct allocator_scratch *a,
     return ((char *) p >= a->free) || ((char *) p < a->allocate);
 }
 
-void *scratch_allocator_allocate(allocator_instance_v0 *allocator,
+void *scratch_allocator_allocate(allocator_instance *allocator,
                                  void *ptr,
                                  uint32_t size,
                                  uint32_t align) {
@@ -58,7 +58,7 @@ void *scratch_allocator_allocate(allocator_instance_v0 *allocator,
             p = data + size;
         }
 
-        // If the buffer is exhausted use the backing allocator instead.
+        // If the buffer is exhausted use the backing ct_allocator instead.
         if (in_use(a, p))
             return CETECH_ALLOCATE_ALIGN(a->backing, void, size, align);
 
@@ -100,7 +100,7 @@ uint32_t scratch_allocator_allocated_size(void *p) {
     return h->size - ((char *) p - (char *) h);
 }
 
-uint32_t scratch_allocator_total_allocated(struct allocator *allocator) {
+uint32_t scratch_allocator_total_allocated(ct_allocator *allocator) {
     struct allocator_scratch *a = (struct allocator_scratch *) allocator->inst;
 
     return a->end - a->begin;
@@ -108,10 +108,11 @@ uint32_t scratch_allocator_total_allocated(struct allocator *allocator) {
 }
 
 namespace memory {
-    struct allocator *scratch_allocator_create(struct allocator *backing,
-                                               int size) {
+    ct_allocator *scratch_allocator_create(ct_allocator *backing,
+                                           int size) {
         auto *core_alloc = core_allocator::get();
-        auto *a = CETECH_ALLOCATE(core_alloc, allocator, sizeof(allocator));
+        auto *a = CETECH_ALLOCATE(core_alloc, ct_allocator,
+                                  sizeof(ct_allocator));
 
         allocator_scratch *m = CETECH_ALLOCATE(core_alloc, allocator_scratch,
                                                sizeof(allocator_scratch));
@@ -122,7 +123,7 @@ namespace memory {
         m->allocate = m->begin;
         m->free = m->begin;
 
-        *a = (struct allocator) {
+        *a = (ct_allocator) {
                 .inst = m,
                 .reallocate = scratch_allocator_allocate,
                 .total_allocated = scratch_allocator_total_allocated,
@@ -133,7 +134,7 @@ namespace memory {
         return a;
     }
 
-    void scratch_allocator_destroy(struct allocator *a) {
+    void scratch_allocator_destroy(ct_allocator *a) {
         auto *core_alloc = core_allocator::get();
         struct allocator_scratch *m = (struct allocator_scratch *) a->inst;
 

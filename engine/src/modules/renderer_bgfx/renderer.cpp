@@ -7,7 +7,6 @@
 
 #include <cetech/modules/application.h>
 #include <cetech/kernel/config.h>
-#include <cetech/kernel/module.h>
 #include <cetech/kernel/os.h>
 #include <cetech/kernel/api_system.h>
 
@@ -28,12 +27,12 @@
 #include "mesh_renderer/mesh_renderer_private.h"
 
 
-CETECH_DECL_API(cnsole_srv_api_v0);
-CETECH_DECL_API(mesh_renderer_api_v0);
-CETECH_DECL_API(config_api_v0);
-CETECH_DECL_API(app_api_v0);
-CETECH_DECL_API(os_window_api_v0);
-CETECH_DECL_API(api_v0);
+CETECH_DECL_API(ct_console_srv_a0);
+CETECH_DECL_API(ct_mesh_renderer_a0);
+CETECH_DECL_API(ct_config_a0);
+CETECH_DECL_API(ct_app_a0);
+CETECH_DECL_API(ct_window_a0);
+CETECH_DECL_API(ct_api_a0);
 
 //==============================================================================
 // GLobals
@@ -76,16 +75,16 @@ static int _cmd_resize(mpack_node_t args,
 }
 
 
-void renderer_create(os_window_t *window) {
+void renderer_create(ct_window_t *window) {
     bgfx::PlatformData pd = {0};
-    pd.nwh = os_window_api_v0.native_window_ptr(window);
-    pd.ndt = os_window_api_v0.native_display_ptr(window);
+    pd.nwh = ct_window_a0.native_window_ptr(window);
+    pd.ndt = ct_window_a0.native_display_ptr(window);
     bgfx::setPlatformData(pd);
 
     // TODO: from config
     bgfx::init(bgfx::RendererType::OpenGL, 0, 0, NULL, NULL);
 
-    os_window_api_v0.size(window, &_G.size_width, &_G.size_height);
+    ct_window_a0.size(window, &_G.size_width, &_G.size_height);
 
     _G.need_reset = 1;
 }
@@ -98,11 +97,11 @@ void renderer_set_debug(int debug) {
     }
 }
 
-void renderer_render_world(world_t world,
-                           camera_t camera,
+void renderer_render_world(ct_world world,
+                           ct_camera camera,
                            viewport_t viewport) {
-    camera_api_v0 *camera_api = (camera_api_v0 *) api_v0.first(
-            "camera_api_v0").api; // TODO: SHIT !!!!
+    ct_camera_a0 *camera_api = (ct_camera_a0 *) ct_api_a0.first(
+            "ct_camera_a0").api; // TODO: SHIT !!!!
 
     if (CETECH_UNLIKELY(_G.need_reset)) {
         bgfx::reset(_G.size_width, _G.size_height, _get_reset_flags());
@@ -123,11 +122,11 @@ void renderer_render_world(world_t world,
     bgfx::touch(0);
     bgfx::dbgTextClear(0, 0);
 
-    mesh_renderer_api_v0.render_all(world);
+    ct_mesh_renderer_a0.render_all(world);
 
     bgfx::frame(0);
 
-    os_window_api_v0.update(app_api_v0.main_window());
+    ct_window_a0.update(ct_app_a0.main_window());
 }
 
 vec2f_t renderer_get_size() {
@@ -140,14 +139,14 @@ vec2f_t renderer_get_size() {
 }
 
 namespace renderer_module {
-    static struct renderer_api_v0 rendderer_api = {
+    static ct_renderer_a0 rendderer_api = {
             .create = renderer_create,
             .set_debug = renderer_set_debug,
             .get_size = renderer_get_size,
             .render_world = renderer_render_world
     };
 
-    static struct material_api_v0 material_api = {
+    static ct_material_a0 material_api = {
             .resource_create = material::create,
             .get_texture_count = material::get_texture_count,
             .set_texture = material::set_texture,
@@ -158,43 +157,43 @@ namespace renderer_module {
             .submit = material::submit
     };
 
-    void _init_api(struct api_v0 *api) {
-        api->register_api("renderer_api_v0", &rendderer_api);
-        api->register_api("material_api_v0", &material_api);
+    void _init_api(struct ct_api_a0 *api) {
+        api->register_api("ct_renderer_a0", &rendderer_api);
+        api->register_api("ct_material_a0", &material_api);
     }
 
 
-    void _init(struct api_v0 *api) {
+    void _init(struct ct_api_a0 *api) {
         _init_api(api);
 
-        api_v0 = *api;
-        CETECH_GET_API(api, config_api_v0);
-        CETECH_GET_API(api, config_api_v0);
-        CETECH_GET_API(api, cnsole_srv_api_v0);
+        ct_api_a0 = *api;
+        CETECH_GET_API(api, ct_config_a0);
+        CETECH_GET_API(api, ct_config_a0);
+        CETECH_GET_API(api, ct_console_srv_a0);
 
         _G = (struct G) {0};
 
-        cvar_t daemon = config_api_v0.find("daemon");
-        if (!config_api_v0.get_int(daemon)) {
+        ct_cvar daemon = ct_config_a0.find("daemon");
+        if (!ct_config_a0.get_int(daemon)) {
             texture::texture_init(api);
             shader::shader_init(api);
             material::init(api);
             scene::init(api);
             mesh::init(api);
 
-            CETECH_GET_API(api, mesh_renderer_api_v0);
+            CETECH_GET_API(api, ct_mesh_renderer_a0);
 
-            cnsole_srv_api_v0.register_command("renderer.resize",
+            ct_console_srv_a0.register_command("renderer.resize",
                                                _cmd_resize);
         }
 
-        CETECH_GET_API(api, app_api_v0);
-        CETECH_GET_API(api, os_window_api_v0);
+        CETECH_GET_API(api, ct_app_a0);
+        CETECH_GET_API(api, ct_window_a0);
     }
 
     void _shutdown() {
-        cvar_t daemon = config_api_v0.find("daemon");
-        if (!config_api_v0.get_int(daemon)) {
+        ct_cvar daemon = ct_config_a0.find("daemon");
+        if (!ct_config_a0.get_int(daemon)) {
             texture::texture_shutdown();
             shader::shader_shutdown();
             material::shutdown();
@@ -208,11 +207,11 @@ namespace renderer_module {
     }
 
 
-    extern "C" void renderer_load_module(struct api_v0 *api) {
+    extern "C" void renderer_load_module(struct ct_api_a0 *api) {
         _init(api);
     }
 
-    extern "C" void renderer_unload_module(struct api_v0 *api) {
+    extern "C" void renderer_unload_module(struct ct_api_a0 *api) {
         _shutdown();
     }
 }

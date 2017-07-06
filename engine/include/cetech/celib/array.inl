@@ -170,7 +170,8 @@ namespace cetech {
 
             T *new_data = 0;
             if (new_capacity > 0) {
-                new_data = CETECH_ALLOCATE(a._allocator, T, sizeof(T) * new_capacity);
+                new_data = CETECH_ALLOCATE(a._allocator, T,
+                                           sizeof(T) * new_capacity);
                 memcpy(new_data, a._data, sizeof(T) * a._size);
             }
 
@@ -222,12 +223,12 @@ namespace cetech {
 
     template<typename T>
     inline
-    Array<T>::Array(struct allocator *a) : _allocator(a), _size(0),
-                                           _capacity(0), _data(0) {}
+    Array<T>::Array(struct ct_allocator *a) : _allocator(a), _size(0),
+                                              _capacity(0), _data(0) {}
 
     template<typename T>
     inline
-    void Array<T>::init(allocator *a) {
+    void Array<T>::init(ct_allocator *a) {
         _data = nullptr;
         _allocator = a;
         _size = 0;

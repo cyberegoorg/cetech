@@ -417,11 +417,11 @@ namespace cetech {
 
 
     template<typename T>
-    Map<T>::Map(allocator *a) :
+    Map<T>::Map(ct_allocator *a) :
             _hash(a), _data(a) {}
 
     template<typename T>
-    void Map<T>::init(allocator *a) {
+    void Map<T>::init(ct_allocator *a) {
         _hash.init(a);
         _data.init(a);
     }

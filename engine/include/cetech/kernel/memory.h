@@ -9,8 +9,8 @@
 extern "C" {
 #endif
 
-struct core_allocator_api_v0 {
-    struct allocator* (*get_allocator)();
+struct ct_core_allocator_a0 {
+    struct ct_allocator *(*get_allocator)();
 };
 
 //==============================================================================
@@ -18,17 +18,18 @@ struct core_allocator_api_v0 {
 //==============================================================================
 
 //! Memory system API V0
-struct memory_api_v0 {
+struct ct_memory_a0 {
+
     //! Main allcator
     //! \return Main alocator
-    struct allocator *(*main_allocator)();
+    struct ct_allocator *(*main_allocator)();
 
     //! Main scratch allocator
     //! \return Main scratch alocator
-    struct allocator *(*main_scratch_allocator)();
+    struct ct_allocator *(*main_scratch_allocator)();
 
     char *(*str_dup)(const char *s,
-                     struct allocator *allocator);
+                     struct ct_allocator *allocator);
 };
 
 #ifdef __cplusplus

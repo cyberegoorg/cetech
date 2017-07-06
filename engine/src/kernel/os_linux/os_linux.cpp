@@ -1,17 +1,16 @@
 #include <cetech/kernel/api_system.h>
-#include <cetech/kernel/module.h>
 
 
 #include <cetech/kernel/os.h>
 #include <cetech/kernel/log.h>
 
-CETECH_DECL_API(log_api_v0);
+CETECH_DECL_API(ct_log_a0);
 
 #include "path_linux.h"
 #include "object_linux.h"
 #include "process_linux.h"
 
-static struct os_path_v0 path_api = {
+static ct_path_a0 path_api = {
         .list = dir_list,
         .list_free = dir_list_free,
         .make_path = dir_make_path,
@@ -23,26 +22,26 @@ static struct os_path_v0 path_api = {
         .file_mtime = file_mtime
 };
 
-static struct os_process_api_v0 process_api = {
+static ct_process_a0 process_api = {
         .exec = exec
 };
 
-static struct os_object_api_v0 object_api = {
+static ct_object_a0 object_api = {
         .load  = load_object,
         .unload  = unload_object,
         .load_function  = load_function
 };
 
 
-extern void error_register_api(struct api_v0 *api);
+extern void error_register_api(ct_api_a0 *api);
 
 namespace os {
-    void register_api(struct api_v0 *api) {
-        CETECH_GET_API(api, log_api_v0);
+    void register_api(ct_api_a0 *api) {
+        CETECH_GET_API(api, ct_log_a0);
 
-        api->register_api("os_path_v0", &path_api);
-        api->register_api("os_process_api_v0", &process_api);
-        api->register_api("os_object_api_v0", &object_api);
+        api->register_api("ct_path_a0", &path_api);
+        api->register_api("ct_process_a0", &process_api);
+        api->register_api("ct_object_a0", &object_api);
         error_register_api(api);
     }
 }

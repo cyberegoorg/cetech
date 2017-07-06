@@ -18,127 +18,21 @@ extern "C" {
 
 #include "_machine_enums.h"
 
-struct allocator;
+struct ct_allocator;
 
 //==============================================================================
-// Typedefs
+// CPU
 //==============================================================================
 
-typedef int (*thread_fce_t)(void *data);
-
-//==============================================================================
-// Enums
-//==============================================================================
-
-enum vio_open_mode {
-    VIO_OPEN_READ,
-    VIO_OPEN_WRITE,
-};
-
-enum vio_seek {
-    VIO_SEEK_SET,
-    VIO_SEEK_CUR,
-    VIO_SEEK_END
-};
-
-enum window_flags {
-    WINDOW_NOFLAG = 0,
-    WINDOW_FULLSCREEN = 1,
-};
-
-enum window_pos {
-    WINDOWPOS_CENTERED = 1,
-    WINDOWPOS_UNDEFINED = 2
-};
-
-//==============================================================================
-// Structs
-//==============================================================================
-
-typedef void os_thread_t;
-
-typedef struct {
-    int lock;
-} os_spinlock_t;
-
-typedef void os_window_t;
-
-typedef void os_vio_instance_v0;
-
-struct os_vio  {
-    os_vio_instance_v0* inst;
-
-    int64_t (*size)(os_vio_instance_v0 *vio);
-
-    int64_t (*seek)(os_vio_instance_v0 *vio,
-                    int64_t offset,
-                    enum vio_seek whence);
-
-    size_t (*read)(os_vio_instance_v0 *vio,
-                   void *ptr,
-                   size_t size,
-                   size_t maxnum);
-
-    size_t (*write)(os_vio_instance_v0 *vio,
-                    const void *ptr,
-                    size_t size,
-                    size_t num);
-
-    int (*close)(os_vio_instance_v0 *vio);
-};
-
-struct event_header {
-    uint32_t type;
-    uint64_t size;
-};
-
-//! Mouse button status
-struct mouse_event {
-    struct event_header h; //!< Event header
-    uint32_t button;            //!< Button state
-};
-
-struct mouse_move_event {
-    struct event_header h; //!< Event header
-    vec2f_t pos;       //!< Actual position
-};
-
-//! Keyboard event
-struct keyboard_event {
-    struct event_header h; //!< Event header
-    uint32_t keycode; //!< Key code
-};
-
-//! Gamepad move event
-struct gamepad_move_event {
-    struct event_header h; //!< Event header
-    uint8_t gamepad_id;         //!< Gamepad id
-    uint32_t axis;              //!< Axis id
-    vec2f_t position;  //!< Position
-};
-
-//! Gamepad button event
-struct gamepad_btn_event {
-    struct event_header h; //!< Event header
-    uint8_t gamepad_id;         //!< Gamepad id
-    uint32_t button;            //!< Button state
-};
-
-//! Gamepad device event
-struct gamepad_device_event {
-    struct event_header h; //!< Event header
-    uint8_t gamepad_id;         //!< Gamepad id
-};
-
-//==============================================================================
-// Api
-//==============================================================================
-
-struct os_cpu_api_v0 {
+struct ct_cpu_a0 {
     int (*count)();
 };
 
-struct os_object_api_v0 {
+//==============================================================================
+// Object
+//==============================================================================
+
+struct ct_object_a0 {
     void *(*load)(const char *path);
 
     void (*unload)(void *so);
@@ -147,7 +41,12 @@ struct os_object_api_v0 {
                            const char *name);
 };
 
-struct os_path_v0 {
+//==============================================================================
+// Path
+//==============================================================================
+
+
+struct ct_path_a0 {
     //! Get file modified time
     //! \param path File path
     //! \return Modified time
@@ -162,14 +61,14 @@ struct os_path_v0 {
                  int recursive,
                  char ***files,
                  uint32_t *count,
-                 struct allocator *allocator);
+                 struct ct_allocator *allocator);
 
     //! Free list dir array
     //! \param files Files array
     //! \param allocator Allocator
     void (*list_free)(char **files,
                       uint32_t count,
-                      struct allocator *allocator);
+                      struct ct_allocator *allocator);
 
     //! Create dir path
     //! \param path Path
@@ -202,39 +101,56 @@ struct os_path_v0 {
     //! \param allocator Allocator
     //! \param count Path count.
     //! \return Result path len.
-    char *(*join)(struct allocator *allocator,
+    char *(*join)(struct ct_allocator *allocator,
                   uint32_t count,
                   ...);
 };
 
-struct os_process_api_v0 {
+//==============================================================================
+// Process
+//==============================================================================
+
+struct ct_process_a0 {
     int (*exec)(const char *argv);
 };
 
-struct os_thread_api_v0 {
+
+//==============================================================================
+// Thread
+//==============================================================================
+
+typedef void ct_thread_t;
+
+typedef int (*ct_thread_fce_t)(void *data);
+
+struct ct_spinlock {
+    int lock;
+};
+
+struct ct_thread_a0 {
     //! Create new thread
     //! \param fce Thread fce
     //! \param name Thread name
     //! \param data Thread data
     //! \return new thread
-    os_thread_t *(*create)(thread_fce_t fce,
+    ct_thread_t *(*create)(ct_thread_fce_t fce,
                            const char *name,
                            void *data);
 
     //! Kill thread
     //! \param thread thread
-    void (*kill)(os_thread_t *thread);
+    void (*kill)(ct_thread_t *thread);
 
     //! Wait for thread
     //! \param thread Thread
     //! \param status Thread exit status
-    void (*wait)(os_thread_t *thread,
+    void (*wait)(ct_thread_t *thread,
                  int *status);
 
     //! Get id for thread
     //! \param thread Thread
     //! \return ID
-    uint64_t (*get_id)(os_thread_t *thread);
+    uint64_t (*get_id)(ct_thread_t *thread);
 
     //! Get actual thread id
     //! \return Thread id
@@ -242,12 +158,18 @@ struct os_thread_api_v0 {
 
     void (*yield)();
 
-    void (*spin_lock)(os_spinlock_t *lock);
+    void (*spin_lock)(ct_spinlock *lock);
 
-    void (*spin_unlock)(os_spinlock_t *lock);
+    void (*spin_unlock)(ct_spinlock *lock);
 };
 
-struct os_time_api_v0 {
+
+//==============================================================================
+// Time
+//==============================================================================
+
+
+struct ct_time_a0 {
     uint32_t (*ticks)();
 
     uint64_t (*perf_counter)();
@@ -255,58 +177,160 @@ struct os_time_api_v0 {
     uint64_t (*perf_freq)();
 };
 
-struct os_vio_api_v0 {
-    struct os_vio *(*from_file)(const char *path,
-                                enum vio_open_mode mode);
+//==============================================================================
+// VIO
+//==============================================================================
+
+enum ct_vio_open_mode {
+    VIO_OPEN_READ,
+    VIO_OPEN_WRITE,
 };
 
-struct os_window_api_v0 {
-    os_window_t *(*create)(const char *title,
-                           enum window_pos x,
-                           enum window_pos y,
+enum ct_vio_seek {
+    VIO_SEEK_SET,
+    VIO_SEEK_CUR,
+    VIO_SEEK_END
+};
+
+typedef void ct_vio_instance_t;
+
+struct ct_vio {
+    ct_vio_instance_t *inst;
+
+    int64_t (*size)(ct_vio_instance_t *vio);
+
+    int64_t (*seek)(ct_vio_instance_t *vio,
+                    int64_t offset,
+                    enum ct_vio_seek whence);
+
+    size_t (*read)(ct_vio_instance_t *vio,
+                   void *ptr,
+                   size_t size,
+                   size_t maxnum);
+
+    size_t (*write)(ct_vio_instance_t *vio,
+                    const void *ptr,
+                    size_t size,
+                    size_t num);
+
+    int (*close)(ct_vio_instance_t *vio);
+};
+
+struct ct_vio_a0 {
+    struct ct_vio *(*from_file)(const char *path,
+                                enum ct_vio_open_mode mode);
+};
+
+//==============================================================================
+// Window
+//==============================================================================
+
+enum ct_window_flags {
+    WINDOW_NOFLAG = 0,
+    WINDOW_FULLSCREEN = 1,
+};
+
+enum ct_window_pos {
+    WINDOWPOS_CENTERED = 1,
+    WINDOWPOS_UNDEFINED = 2
+};
+
+typedef void ct_window_t;
+
+struct ct_window_a0 {
+    ct_window_t *(*create)(const char *title,
+                           enum ct_window_pos x,
+                           enum ct_window_pos y,
                            const int32_t width,
                            const int32_t height,
-                           enum window_flags flags);
+                           enum ct_window_flags flags);
 
-    os_window_t *(*create_from)(void *hndl);
+    ct_window_t *(*create_from)(void *hndl);
 
-    void (*destroy)(os_window_t *w);
+    void (*destroy)(ct_window_t *w);
 
-    void (*set_title)(os_window_t *w,
+    void (*set_title)(ct_window_t *w,
                       const char *title);
 
-    const char *(*get_title)(os_window_t *w);
+    const char *(*get_title)(ct_window_t *w);
 
-    void (*update)(os_window_t *w);
+    void (*update)(ct_window_t *w);
 
-    void (*resize)(os_window_t *w,
+    void (*resize)(ct_window_t *w,
                    uint32_t width,
                    uint32_t height);
 
-    void (*size)(os_window_t *window,
+    void (*size)(ct_window_t *window,
                  uint32_t *width,
                  uint32_t *height);
 
-    void *(*native_window_ptr)(os_window_t *w);
+    void *(*native_window_ptr)(ct_window_t *w);
 
-    void *(*native_display_ptr)(os_window_t *w);
+    void *(*native_display_ptr)(ct_window_t *w);
+};
+
+//==============================================================================
+// Machine
+//==============================================================================
+
+struct ct_event_header {
+    uint32_t type;
+    uint64_t size;
+};
+
+//! Mouse button status
+struct ct_mouse_event {
+    struct ct_event_header h; //!< Event header
+    uint32_t button;            //!< Button state
+};
+
+struct ct_mouse_move_event {
+    struct ct_event_header h; //!< Event header
+    vec2f_t pos;       //!< Actual position
+};
+
+//! Keyboard event
+struct ct_keyboard_event {
+    struct ct_event_header h; //!< Event header
+    uint32_t keycode; //!< Key code
+};
+
+//! Gamepad move event
+struct ct_gamepad_move_event {
+    struct ct_event_header h; //!< Event header
+    uint8_t gamepad_id;         //!< Gamepad id
+    uint32_t axis;              //!< Axis id
+    vec2f_t position;  //!< Position
+};
+
+//! Gamepad button event
+struct ct_gamepad_btn_event {
+    struct ct_event_header h; //!< Event header
+    uint8_t gamepad_id;         //!< Gamepad id
+    uint32_t button;            //!< Button state
+};
+
+//! Gamepad device event
+struct ct_gamepad_device_event {
+    struct ct_event_header h; //!< Event header
+    uint8_t gamepad_id;         //!< Gamepad id
 };
 
 //! Machine API V0
-struct machine_api_v0 {
+struct ct_machine_a0 {
 
     //! Get eventstream begin
     //! \return Begin
-    struct event_header *(*event_begin)();
+    struct ct_event_header *(*event_begin)();
 
     //! Get eventstream end
     //! \return End
-    struct event_header *(*event_end)();
+    struct ct_event_header *(*event_end)();
 
     //! Next event
     //! \param header Actual event header
     //! \return Next event header
-    struct event_header *(*event_next)(struct event_header *header);
+    struct ct_event_header *(*event_next)(struct ct_event_header *header);
 
     //! Is gamepad active?
     //! \param gamepad Gamepad ID

@@ -14,15 +14,15 @@ enum {
 #define G_INIT {0}
 
 static struct global {
-    log_handler_t handlers[MAX_HANDLERS];
+    ct_log_handler_t handlers[MAX_HANDLERS];
     void *handlers_data[MAX_HANDLERS];
 
-    log_get_wid_clb_t get_wid_clb;
+    ct_log_get_wid_clb_t get_wid_clb;
     char handlers_count;
 } _G = G_INIT;
 
 
-void vlog(const enum log_level level,
+void vlog(const enum ct_log_level level,
           const char *where,
           const char *format,
           va_list va) {
@@ -109,7 +109,7 @@ namespace log {
     }
 
 
-    void log_register_handler(log_handler_t handler,
+    void log_register_handler(ct_log_handler_t handler,
                               void *data) {
         const char idx = _G.handlers_count++;
 
@@ -119,7 +119,7 @@ namespace log {
 
     void init() {
         _G = (struct global) G_INIT;
-        log_register_handler(log_stdout_handler, NULL);
+        log_register_handler(ct_log_stdout_handler, NULL);
     }
 
     void shutdown() {
@@ -127,11 +127,11 @@ namespace log {
     }
 
 
-    void set_wid_clb(log_get_wid_clb_t get_wid_clb) {
+    void set_wid_clb(ct_log_get_wid_clb_t get_wid_clb) {
         _G.get_wid_clb = get_wid_clb;
     }
 
-    static struct log_api_v0 log_api_v0 = {
+    static ct_log_a0 log_a0 = {
             .set_wid_clb = log::set_wid_clb,
             .register_handler = log::log_register_handler,
             .info_va = log_info_va,
@@ -145,8 +145,8 @@ namespace log {
     };
 
 
-    void register_api(struct api_v0 *api) {
-        api->register_api("log_api_v0", &log_api_v0);
+    void register_api(ct_api_a0 *api) {
+        api->register_api("ct_log_a0", &log_a0);
     }
 
 }

@@ -15,65 +15,26 @@ extern "C" {
 #include <stddef.h>
 #include <stdint.h>
 
-struct os_vio;
-struct allocator;
-struct compilator_api;
-
-struct config_api_v0;
-struct app_api_v0;
+struct ct_vio;
+struct ct_allocator;
+struct ct_config_a0;
+struct ct_app_a0;
+struct ct_compilator_api;
 
 //==============================================================================
 // Typedefs
 //==============================================================================
-
-//! Resource loader
-//! \param input Input vio
-//! \param allocator Allocator
-//! \return Resource data
-typedef void *(*resource_loader_t)(struct os_vio *input,
-                                   struct allocator *allocator);
-
-//! Resource online callback
-//! \param name Resource name
-//! \param data Resource data
-typedef void  (*resource_online_t)(uint64_t name,
-                                   void *data);
-
-//! Resource offline callback
-//! \param name Resource name
-//! \param data Resource data
-typedef void  (*resource_offline_t)(uint64_t name,
-                                    void *data);
-
-//! Resource unload callback
-//! \param new_data Resource data
-//! \param allocator Allocator
-typedef void  (*resource_unloader_t)(void *new_data,
-                                     struct allocator *allocator);
-
-//! Resource reloader
-//! \param name Resource name
-//! \param old_data Resource old data
-//! \param new_data Resource new data
-//! \param allocator Allocator
-typedef void *(*resource_reloader_t)(uint64_t name,
-                                     void *old_data,
-                                     void *new_data,
-                                     struct allocator *allocator);
-
-
-struct compilator_api;
 
 //! Resource compilator fce
 //! \param filename Source filename
 //! \param source_vio Source vio
 //! \param build_vio Build vio
 //! \param compilator_api Compilator api
-typedef int (*resource_compilator_t)(
+typedef int (*ct_resource_compilator_t)(
         const char *filename,
-        struct os_vio *source_vio,
-        struct os_vio *build_vio,
-        struct compilator_api *compilator_api);
+        struct ct_vio *source_vio,
+        struct ct_vio *build_vio,
+        struct ct_compilator_api *compilator_api);
 
 
 //==============================================================================
@@ -82,16 +43,44 @@ typedef int (*resource_compilator_t)(
 
 //! Resource callbacks
 typedef struct {
-    resource_loader_t loader;     //!< Loader
-    resource_unloader_t unloader; //!< Unloader
-    resource_online_t online;     //!< Online
-    resource_offline_t offline;   //!< Offline
-    resource_reloader_t reloader; //!< Reloader
-} resource_callbacks_t;
+    //! \param input Input vio
+    //! \param allocator Allocator
+    //! \return Resource data
+    void *(*loader)(struct ct_vio *input,
+                    struct ct_allocator *allocator);
+
+    //! Resource online callback
+    //! \param name Resource name
+    //! \param data Resource data
+    void (*online)(uint64_t name,
+                   void *data);
+
+    //! Resource offline callback
+    //! \param name Resource name
+    //! \param data Resource data
+    void (*offline)(uint64_t name,
+                    void *data);
+
+    //! Resource unload callback
+    //! \param new_data Resource data
+    //! \param allocator Allocator
+    void (*unloader)(void *new_data,
+                     struct ct_allocator *allocator);
+
+    //! Resource reloader
+    //! \param name Resource name
+    //! \param old_data Resource old data
+    //! \param new_data Resource new data
+    //! \param allocator Allocator
+    void *(*reloader)(uint64_t name,
+                      void *old_data,
+                      void *new_data,
+                      struct ct_allocator *allocator);
+} ct_resource_callbacks_t;
 
 
 //! Compilator api
-struct compilator_api {
+struct ct_compilator_api {
     const char *source_dir;
     const char *build_dir;
     const char *tmp_dir;
@@ -109,7 +98,7 @@ struct compilator_api {
 //==============================================================================
 
 //! Resource API V0
-struct resource_api_v0 {
+struct ct_resource_a0 {
     //! Enable autoload feature
     //! \param enable Enable
     void (*set_autoload)(int enable);
@@ -118,7 +107,7 @@ struct resource_api_v0 {
     //! \param type Type
     //! \param callbacks Callbacks
     void (*register_type)(uint64_t type,
-                          resource_callbacks_t callbacks);
+                          ct_resource_callbacks_t callbacks);
 
     //! Load resources
     //! \param loaded_data Loaded data array
@@ -210,7 +199,7 @@ struct resource_api_v0 {
     //! \param type Type
     //! \param compilator Compilator fce
     void (*compiler_register)(uint64_t type,
-                              resource_compilator_t compilator);
+                              ct_resource_compilator_t compilator);
 
     //! Compile all resource in source dir
     void (*compiler_compile_all)();
@@ -232,7 +221,7 @@ struct resource_api_v0 {
     //! \param max_len Max build dir len
     //! \param platform Platform
     //! \return 1 if ok else 0
-    char *(*compiler_get_tmp_dir)(struct allocator *a,
+    char *(*compiler_get_tmp_dir)(struct ct_allocator *a,
                                   const char *platform);
 
     //! Join tool path
@@ -240,14 +229,14 @@ struct resource_api_v0 {
     //! \param max_len Max len
     //! \param name Tool name
     //! \return 1 if ok else 0
-    char *(*compiler_external_join)(struct allocator *a,
+    char *(*compiler_external_join)(struct ct_allocator *a,
                                     const char *name);
 
     //! Create build dir
     //! \param config Config API
     //! \param app Application API
-    void (*compiler_create_build_dir)(struct config_api_v0 config,
-                                      struct app_api_v0 app);
+    void (*compiler_create_build_dir)(struct ct_config_a0 config,
+                                      struct ct_app_a0 app);
 
 
     //! Get source dir
@@ -265,7 +254,7 @@ struct resource_api_v0 {
     //! \param max_len Max build dir len
     //! \param platform Platform
     //! \return 1 if ok else 0
-    char *(*compiler_get_build_dir)(struct allocator *a,
+    char *(*compiler_get_build_dir)(struct ct_allocator *a,
                                     const char *platform);
 };
 

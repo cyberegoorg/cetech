@@ -1,88 +1,87 @@
 #include "cetech/modules/transform.h"
-#include <cetech/kernel/module.h>
-#include <cetech/modules/luasys.h>
+#include "../luasys_private.h"
 
 #include <cetech/modules/entity.h>
 #include <cetech/kernel/api_system.h>
 
 #define API_NAME "Transform"
 
-CETECH_DECL_API(transform_api_v0);
+CETECH_DECL_API(ct_transform_a0);
 
 static int _transform_get(lua_State *l) {
-    world_t w = {.h = luasys_to_handler(l, 1)};
-    entity_t ent = {.h = luasys_to_handler(l, 2)};
+    struct ct_world w = {.h = luasys_to_handler(l, 1)};
+    struct ct_entity ent = {.h = luasys_to_handler(l, 2)};
 
-    luasys_push_int(l, transform_api_v0.get(w, ent).idx);
+    luasys_push_int(l, ct_transform_a0.get(w, ent).idx);
     return 1;
 }
 
 
 static int _transform_has(lua_State *l) {
-    world_t w = {.h = luasys_to_handler(l, 1)};
-    entity_t ent = {.h = luasys_to_handler(l, 2)};
+    struct ct_world w = {.h = luasys_to_handler(l, 1)};
+    struct ct_entity ent = {.h = luasys_to_handler(l, 2)};
 
-    luasys_push_bool(l, transform_api_v0.has(w, ent));
+    luasys_push_bool(l, ct_transform_a0.has(w, ent));
     return 1;
 }
 
 
 static int _transform_get_position(lua_State *l) {
-    world_t w = {.h = luasys_to_handler(l, 1)};
-    transform_t t = {.idx = luasys_to_int(l, 2)};
+    struct ct_world w = {.h = luasys_to_handler(l, 1)};
+    struct ct_transform t = {.idx = luasys_to_int(l, 2)};
 
-    luasys_push_vec3f(l, transform_api_v0.get_position(w, t));
+    luasys_push_vec3f(l, ct_transform_a0.get_position(w, t));
     return 1;
 }
 
 static int _transform_get_rotation(lua_State *l) {
-    world_t w = {.h = luasys_to_handler(l, 1)};
-    transform_t t = {.idx = luasys_to_int(l, 2)};
+    struct ct_world w = {.h = luasys_to_handler(l, 1)};
+    struct ct_transform t = {.idx = luasys_to_int(l, 2)};
 
-    luasys_push_quat(l, transform_api_v0.get_rotation(w, t));
+    luasys_push_quat(l, ct_transform_a0.get_rotation(w, t));
     return 1;
 }
 
 static int _transform_get_scale(lua_State *l) {
-    world_t w = {.h = luasys_to_handler(l, 1)};
-    transform_t t = {.idx = luasys_to_int(l, 2)};
+    struct ct_world w = {.h = luasys_to_handler(l, 1)};
+    struct ct_transform t = {.idx = luasys_to_int(l, 2)};
 
-    luasys_push_vec3f(l, transform_api_v0.get_scale(w, t));
+    luasys_push_vec3f(l, ct_transform_a0.get_scale(w, t));
     return 1;
 }
 
 static int _transform_set_position(lua_State *l) {
-    world_t w = {.h = luasys_to_handler(l, 1)};
-    transform_t t = {.idx = luasys_to_int(l, 2)};
+    struct ct_world w = {.h = luasys_to_handler(l, 1)};
+    struct ct_transform t = {.idx = luasys_to_int(l, 2)};
     vec3f_t *pos = luasys_to_vec3f(l, 3);
 
-    transform_api_v0.set_position(w, t, *pos);
+    ct_transform_a0.set_position(w, t, *pos);
     return 0;
 }
 
 static int _transform_set_scale(lua_State *l) {
-    world_t w = {.h = luasys_to_handler(l, 1)};
-    transform_t t = {.idx = luasys_to_int(l, 2)};
+    struct ct_world w = {.h = luasys_to_handler(l, 1)};
+    struct ct_transform t = {.idx = luasys_to_int(l, 2)};
     vec3f_t *pos = luasys_to_vec3f(l, 3);
 
-    transform_api_v0.set_scale(w, t, *pos);
+    ct_transform_a0.set_scale(w, t, *pos);
     return 0;
 }
 
 static int _transform_set_rotation(lua_State *l) {
-    world_t w = {.h = luasys_to_handler(l, 1)};
-    transform_t t = {.idx = luasys_to_int(l, 2)};
+    struct ct_world w = {.h = luasys_to_handler(l, 1)};
+    struct ct_transform t = {.idx = luasys_to_int(l, 2)};
     quatf_t *rot = luasys_to_quat(l, 3);
 
-    transform_api_v0.set_rotation(w, t, *rot);
+    ct_transform_a0.set_rotation(w, t, *rot);
     return 0;
 }
 
 static int _transform_get_world_matrix(lua_State *l) {
-    world_t w = {.h = luasys_to_handler(l, 1)};
-    transform_t t = {.idx = luasys_to_int(l, 2)};
+    struct ct_world w = {.h = luasys_to_handler(l, 1)};
+    struct ct_transform t = {.idx = luasys_to_int(l, 2)};
 
-    mat44f_t *wm = transform_api_v0.get_world_matrix(w, t);
+    mat44f_t *wm = ct_transform_a0.get_world_matrix(w, t);
 
     luasys_push_mat44f(l, *wm);
     return 1;
@@ -90,16 +89,16 @@ static int _transform_get_world_matrix(lua_State *l) {
 
 
 static int _transform_link(lua_State *l) {
-    world_t w = {.h = luasys_to_handler(l, 1)};
-    entity_t root = {.h = luasys_to_handler(l, 2)};
-    entity_t child = {.h = luasys_to_handler(l, 3)};
+    struct ct_world w = {.h = luasys_to_handler(l, 1)};
+    struct ct_entity root = {.h = luasys_to_handler(l, 2)};
+    struct ct_entity child = {.h = luasys_to_handler(l, 3)};
 
-    transform_api_v0.link(w, root, child);
+    ct_transform_a0.link(w, root, child);
     return 0;
 }
 
-void _register_lua_transform_api(struct api_v0 *api) {
-    CETECH_GET_API(api, transform_api_v0);
+void _register_lua_transform_api(struct ct_api_a0 *api) {
+    CETECH_GET_API(api, ct_transform_a0);
 
     luasys_add_module_function(API_NAME, "get", _transform_get);
     luasys_add_module_function(API_NAME, "has", _transform_has);

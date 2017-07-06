@@ -11,7 +11,6 @@
 
 #include <cetech/kernel/hash.h>
 #include <cetech/kernel/memory.h>
-#include <cetech/kernel/module.h>
 #include <cetech/kernel/os.h>
 #include <cetech/kernel/api_system.h>
 #include <cetech/kernel/errors.h>
@@ -26,16 +25,16 @@
 #include "../texture/texture.h"
 #include "../shader/shader.h"
 
-CETECH_DECL_API(memory_api_v0);
-CETECH_DECL_API(resource_api_v0);
-CETECH_DECL_API(os_path_v0);
-CETECH_DECL_API(os_vio_api_v0);
-CETECH_DECL_API(hash_api_v0);
+CETECH_DECL_API(ct_memory_a0);
+CETECH_DECL_API(ct_resource_a0);
+CETECH_DECL_API(ct_path_a0);
+CETECH_DECL_API(ct_vio_a0);
+CETECH_DECL_API(ct_hash_a0);
 
 using namespace cetech;
 
 namespace material_compiler {
-    int init(api_v0 *api);
+    int init(ct_api_a0 *api);
 }
 
 //==============================================================================
@@ -59,12 +58,12 @@ namespace {
         Handler<uint32_t> material_handler;
         uint64_t type;
 
-        void init(allocator *allocator) {
-            this->type = hash_api_v0.id64_from_str("material");
-            this->material_handler.init(memory_api_v0.main_allocator());
-            this->instace_map.init(memory_api_v0.main_allocator());
-            this->instance_offset.init(memory_api_v0.main_allocator());
-            this->instance_data.init(memory_api_v0.main_allocator());
+        void init(ct_allocator *allocator) {
+            this->type = ct_hash_a0.id64_from_str("material");
+            this->material_handler.init(ct_memory_a0.main_allocator());
+            this->instace_map.init(ct_memory_a0.main_allocator());
+            this->instance_offset.init(ct_memory_a0.main_allocator());
+            this->instance_data.init(ct_memory_a0.main_allocator());
         }
 
         void shutdown() {
@@ -83,8 +82,8 @@ namespace {
 namespace material_resource {
     static const bgfx::ProgramHandle null_program = {0};
 
-    void *loader(struct os_vio *input,
-                 struct allocator *allocator) {
+    void *loader(ct_vio *input,
+                 ct_allocator *allocator) {
         const int64_t size = input->size(input->inst);
         char *data = CETECH_ALLOCATE(allocator, char, size);
         input->read(input->inst, data, 1, size);
@@ -92,7 +91,7 @@ namespace material_resource {
     }
 
     void unloader(void *new_data,
-                  struct allocator *allocator) {
+                  ct_allocator *allocator) {
         CETECH_FREE(allocator, new_data);
     }
 
@@ -108,7 +107,7 @@ namespace material_resource {
     void *reloader(uint64_t name,
                    void *old_data,
                    void *new_data,
-                   struct allocator *allocator) {
+                   ct_allocator *allocator) {
         offline(name, old_data);
         online(name, new_data);
 
@@ -116,7 +115,7 @@ namespace material_resource {
         return new_data;
     }
 
-    static const resource_callbacks_t callback = {
+    static const ct_resource_callbacks_t callback = {
             .loader = material_resource::loader,
             .unloader = material_resource::unloader,
             .online = material_resource::online,
@@ -133,16 +132,16 @@ namespace material_resource {
 
 
 namespace material {
-    int init(struct api_v0 *api) {
-        CETECH_GET_API(api, memory_api_v0);
-        CETECH_GET_API(api, resource_api_v0);
-        CETECH_GET_API(api, os_path_v0);
-        CETECH_GET_API(api, os_vio_api_v0);
-        CETECH_GET_API(api, hash_api_v0);
+    int init(ct_api_a0 *api) {
+        CETECH_GET_API(api, ct_memory_a0);
+        CETECH_GET_API(api, ct_resource_a0);
+        CETECH_GET_API(api, ct_path_a0);
+        CETECH_GET_API(api, ct_vio_a0);
+        CETECH_GET_API(api, ct_hash_a0);
 
-        _G.init(memory_api_v0.main_allocator());
+        _G.init(ct_memory_a0.main_allocator());
 
-        resource_api_v0.register_type(_G.type, material_resource::callback);
+        ct_resource_a0.register_type(_G.type, material_resource::callback);
 
 #ifdef CETECH_CAN_COMPILE
         material_compiler::init(api);
@@ -154,10 +153,10 @@ namespace material {
         _G.shutdown();
     }
 
-    static const material_t null_material = {0};
+    static const ct_material null_material = {0};
 
-    material_t create(uint64_t name) {
-        auto resource = material_blob::get(resource_api_v0.get(_G.type, name));
+    ct_material create(uint64_t name) {
+        auto resource = material_blob::get(ct_resource_a0.get(_G.type, name));
 
         uint32_t size = material_blob::blob_size(resource);
         uint32_t h = handler::create(_G.material_handler);
@@ -206,11 +205,11 @@ namespace material {
         array::push(_G.instance_data, (uint8_t *) bgfx_uniforms,
                     sizeof(bgfx::UniformHandle) * resource->uniforms_count);
 
-        return (material_t) {.idx=h};
+        return (ct_material) {.idx=h};
     }
 
 
-    uint32_t get_texture_count(material_t material) {
+    uint32_t get_texture_count(ct_material material) {
         uint32_t idx = map::get(_G.instace_map, material.idx,
                                 UINT32_MAX);
 
@@ -238,7 +237,7 @@ namespace material {
         return UINT32_MAX;
     }
 
-    void set_texture(material_t material,
+    void set_texture(ct_material material,
                      const char *slot,
                      uint64_t texture) {
 
@@ -258,7 +257,7 @@ namespace material {
         u_texture[slot_idx] = texture;
     }
 
-    void set_vec4f(material_t material,
+    void set_vec4f(ct_material material,
                    const char *slot,
                    vec4f_t v) {
 
@@ -278,7 +277,7 @@ namespace material {
         u_vec4f[slot_idx - (resource->texture_count)] = v;
     }
 
-    void set_mat33f(material_t material,
+    void set_mat33f(ct_material material,
                     const char *slot,
                     mat33f_t v) {
 
@@ -299,7 +298,7 @@ namespace material {
                  (resource->texture_count + resource->vec4f_count)] = v;
     }
 
-    void set_mat44f(material_t material,
+    void set_mat44f(ct_material material,
                     const char *slot,
                     mat44f_t v) {
         uint32_t idx = map::get(_G.instace_map, material.idx,
@@ -320,7 +319,7 @@ namespace material {
     }
 
 
-    void use(material_t material) {
+    void use(ct_material material) {
         uint32_t idx = map::get(_G.instace_map, material.idx,
                                 UINT32_MAX);
 
@@ -376,7 +375,7 @@ namespace material {
         bgfx::setState(state, 0);
     }
 
-    void submit(material_t material) {
+    void submit(ct_material material) {
         uint32_t idx = map::get(_G.instace_map, material.idx,
                                 UINT32_MAX);
         CETECH_ASSERT(LOG_WHERE, idx != UINT32_MAX);

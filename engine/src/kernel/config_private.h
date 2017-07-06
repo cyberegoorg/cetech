@@ -4,49 +4,49 @@
 #include <cetech/kernel/config.h>
 
 namespace config {
-    int init(struct api_v0 *api);
+    int init(struct ct_api_a0 *api);
 
     void shutdown();
 
-    void compile_global(const char* platform);
+    void compile_global(const char *platform);
 
-    void load_global(const char* platform);
+    void load_global(const char *platform);
 
     int parse_args(int argc,
                    const char **argv);
 
-    cvar_t find(const char *name);
+    struct ct_cvar find(const char *name);
 
-    cvar_t find_or_create(const char *name,
-                          int *new_);
+    struct ct_cvar find_or_create(const char *name,
+                                  int *new_);
 
-    cvar_t new_float(const char *name,
-                     const char *desc,
-                     float f);
+    struct ct_cvar new_float(const char *name,
+                             const char *desc,
+                             float f);
 
-    cvar_t new_int(const char *name,
-                   const char *desc,
-                   int i);
+    struct ct_cvar new_int(const char *name,
+                           const char *desc,
+                           int i);
 
-    cvar_t new_str(const char *name,
-                   const char *desc,
-                   const char *s);
+    struct ct_cvar new_str(const char *name,
+                           const char *desc,
+                           const char *s);
 
-    float get_float(cvar_t var);
+    float get_float(struct ct_cvar var);
 
-    int get_int(cvar_t var);
+    int get_int(struct ct_cvar var);
 
-    const char *get_string(cvar_t var);
+    const char *get_string(struct ct_cvar var);
 
-    enum cvar_type get_type(cvar_t var);
+    enum cvar_type get_type(struct ct_cvar var);
 
-    void set_float(cvar_t var,
+    void set_float(struct ct_cvar var,
                    float f);
 
-    void set_int(cvar_t var,
+    void set_int(struct ct_cvar var,
                  int i);
 
-    void set_string(cvar_t var,
+    void set_string(struct ct_cvar var,
                     const char *s);
 
     void log_all();

@@ -3,7 +3,8 @@
 
 #include <cetech/modules/luasys.h>
 
-#include <cetech/kernel/module.h>
+#include <cetech/kernel/api_system.h>
+#include "../luasys_private.h"
 
 #define API_NAME "Mat44f"
 
@@ -132,7 +133,7 @@ static int _perspective_fov(lua_State *l) {
     return 1;
 }
 
-void _register_lua_mat44f_api(struct api_v0 *api) {
+void _register_lua_mat44f_api(struct ct_api_a0 *api) {
     luasys_add_module_function(API_NAME, "identity", _identity);
 
     luasys_add_module_function(API_NAME, "make", _ctor);

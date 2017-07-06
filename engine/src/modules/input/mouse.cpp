@@ -5,7 +5,6 @@
 #include <cetech/celib/math_types.h>
 #include <cetech/celib/allocator.h>
 #include <cetech/kernel/config.h>
-#include <cetech/kernel/module.h>
 #include <cetech/celib/eventstream.inl>
 
 #include <cetech/modules/input.h>
@@ -15,8 +14,8 @@
 #include <cetech/kernel/log.h>
 #include <cetech/kernel/errors.h>
 
-CETECH_DECL_API(machine_api_v0);
-CETECH_DECL_API(log_api_v0);
+CETECH_DECL_API(ct_machine_a0);
+CETECH_DECL_API(ct_log_a0);
 
 
 //==============================================================================
@@ -134,26 +133,26 @@ namespace mouse {
     }
 
     void update() {
-        struct event_header *event = machine_api_v0.event_begin();
+        ct_event_header *event = ct_machine_a0.event_begin();
 
         memcpy(_G.last_state, _G.state, MOUSE_BTN_MAX);
         _G.last_delta_pos.x = 0;
         _G.last_delta_pos.y = 0;
 
-        while (event != machine_api_v0.event_end()) {
-            struct mouse_move_event *move_event;
+        while (event != ct_machine_a0.event_end()) {
+            ct_mouse_move_event *move_event;
 
             switch (event->type) {
                 case EVENT_MOUSE_DOWN:
-                    _G.state[((struct mouse_event *) event)->button] = 1;
+                    _G.state[((ct_mouse_event *) event)->button] = 1;
                     break;
 
                 case EVENT_MOUSE_UP:
-                    _G.state[((struct mouse_event *) event)->button] = 0;
+                    _G.state[((ct_mouse_event *) event)->button] = 0;
                     break;
 
                 case EVENT_MOUSE_MOVE:
-                    move_event = ((struct mouse_move_event *) event);
+                    move_event = ((ct_mouse_move_event *) event);
 
                     _G.last_delta_pos.x = move_event->pos.x - _G.last_pos.x;
                     _G.last_delta_pos.y = move_event->pos.y - _G.last_pos.y;
@@ -167,13 +166,13 @@ namespace mouse {
                     break;
             }
 
-            event = machine_api_v0.event_next(event);
+            event = ct_machine_a0.event_next(event);
         }
     }
 }
 
 namespace mouse_module {
-    static struct mouse_api_v0 api_v1 = {
+    static ct_mouse_a0 a0 = {
             .button_index = mouse::button_index,
             .button_name = mouse::button_name,
             .button_state = mouse::button_state,
@@ -185,33 +184,33 @@ namespace mouse_module {
             .update = mouse::update
     };
 
-    void _init_api(struct api_v0 *api) {
-        api->register_api("mouse_api_v0", &api_v1);
+    void _init_api(ct_api_a0 *api) {
+        api->register_api("ct_mouse_a0", &a0);
     }
 
-    void _init(struct api_v0 *api) {
+    void _init(ct_api_a0 *api) {
         _init_api(api);
 
-        CETECH_GET_API(api, machine_api_v0);
-        CETECH_GET_API(api, log_api_v0);
+        CETECH_GET_API(api, ct_machine_a0);
+        CETECH_GET_API(api, ct_log_a0);
 
         _G = {0};
 
-        log_api_v0.debug(LOG_WHERE, "Init");
+        ct_log_a0.debug(LOG_WHERE, "Init");
     }
 
     void _shutdown() {
-        log_api_v0.debug(LOG_WHERE, "Shutdown");
+        ct_log_a0.debug(LOG_WHERE, "Shutdown");
 
         _G = {0};
     }
 
 
-    extern "C" void mouse_load_module(struct api_v0 *api) {
+    extern "C" void mouse_load_module(ct_api_a0 *api) {
         _init(api);
     }
 
-    extern "C" void mouse_unload_module(struct api_v0 *api) {
+    extern "C" void mouse_unload_module(ct_api_a0 *api) {
         _shutdown();
     }
 }

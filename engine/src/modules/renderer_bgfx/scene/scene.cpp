@@ -7,7 +7,6 @@
 
 #include <cetech/kernel/hash.h>
 #include <cetech/kernel/memory.h>
-#include <cetech/kernel/module.h>
 #include <cetech/kernel/api_system.h>
 #include <cetech/kernel/os.h>
 
@@ -23,20 +22,20 @@
 using namespace cetech;
 
 namespace scene_resource_compiler {
-    int init(api_v0 *api);
+    int init(ct_api_a0 *api);
 }
 
 //==============================================================================
 // Structs
 //==============================================================================
 
-CETECH_DECL_API(memory_api_v0);
-CETECH_DECL_API(resource_api_v0);
-CETECH_DECL_API(scenegprah_api_v0);
-CETECH_DECL_API(os_path_v0);
-CETECH_DECL_API(os_vio_api_v0);
-CETECH_DECL_API(hash_api_v0);
-CETECH_DECL_API(os_thread_api_v0);
+CETECH_DECL_API(ct_memory_a0);
+CETECH_DECL_API(ct_resource_a0);
+CETECH_DECL_API(ct_scenegprah_a0);
+CETECH_DECL_API(ct_path_a0);
+CETECH_DECL_API(ct_vio_a0);
+CETECH_DECL_API(ct_hash_a0);
+CETECH_DECL_API(ct_thread_a0);
 
 
 struct scene_instance {
@@ -66,10 +65,10 @@ struct scene_instance *_init_scene_instance(uint64_t scene) {
     scene_instance *instance = &_G.scene_instance_array[idx];
     instance->scene = scene;
 
-    instance->geom_map.init(memory_api_v0.main_allocator());
-    instance->size.init(memory_api_v0.main_allocator());
-    instance->vb.init(memory_api_v0.main_allocator());
-    instance->ib.init(memory_api_v0.main_allocator());
+    instance->geom_map.init(ct_memory_a0.main_allocator());
+    instance->size.init(ct_memory_a0.main_allocator());
+    instance->vb.init(ct_memory_a0.main_allocator());
+    instance->ib.init(ct_memory_a0.main_allocator());
 
     map::set(_G.scene_instance_map, scene, idx);
 
@@ -77,7 +76,7 @@ struct scene_instance *_init_scene_instance(uint64_t scene) {
 }
 
 void _destroy_scene_instance(uint64_t scene) {
-    Map<uint32_t> map1(memory_api_v0.main_allocator());
+    Map<uint32_t> map1(ct_memory_a0.main_allocator());
     map::set<uint32_t>(map1, 1111, 111);
     map::remove(map1, 1111);
 
@@ -102,7 +101,7 @@ struct scene_instance *_get_scene_instance(uint64_t scene) {
     uint32_t idx = map::get(_G.scene_instance_map, scene, UINT32_MAX);
 
     if (idx == UINT32_MAX) {
-        resource_api_v0.get(_G.type, scene);
+        ct_resource_a0.get(_G.type, scene);
         idx = map::get(_G.scene_instance_map, scene, UINT32_MAX);
     }
 
@@ -122,8 +121,8 @@ namespace scene_resource {
     static const bgfx::TextureHandle null_texture = {0};
 
 
-    void *loader(struct os_vio *input,
-                 struct allocator *allocator) {
+    void *loader(ct_vio *input,
+                 ct_allocator *allocator) {
         const int64_t size = input->size(input->inst);
         char *data = CETECH_ALLOCATE(allocator, char, size);
         input->read(input->inst, data, 1, size);
@@ -131,7 +130,7 @@ namespace scene_resource {
     }
 
     void unloader(void *new_data,
-                  struct allocator *allocator) {
+                  ct_allocator *allocator) {
         CETECH_FREE(allocator, new_data);
     }
 
@@ -181,7 +180,7 @@ namespace scene_resource {
     void *reloader(uint64_t name,
                    void *old_data,
                    void *new_data,
-                   struct allocator *allocator) {
+                   ct_allocator *allocator) {
         offline(name, old_data);
         online(name, new_data);
 
@@ -190,7 +189,7 @@ namespace scene_resource {
         return new_data;
     }
 
-    static const resource_callbacks_t callback = {
+    static const ct_resource_callbacks_t callback = {
             .loader = loader,
             .unloader = unloader,
             .online = online,
@@ -203,23 +202,23 @@ namespace scene_resource {
 // Interface
 //==============================================================================
 namespace scene {
-    int init(struct api_v0 *api) {
-        CETECH_GET_API(api, memory_api_v0);
-        CETECH_GET_API(api, resource_api_v0);
-        CETECH_GET_API(api, scenegprah_api_v0);
-        CETECH_GET_API(api, os_path_v0);
-        CETECH_GET_API(api, os_vio_api_v0);
-        CETECH_GET_API(api, hash_api_v0);
-        CETECH_GET_API(api, os_thread_api_v0);
+    int init(ct_api_a0 *api) {
+        CETECH_GET_API(api, ct_memory_a0);
+        CETECH_GET_API(api, ct_resource_a0);
+        CETECH_GET_API(api, ct_scenegprah_a0);
+        CETECH_GET_API(api, ct_path_a0);
+        CETECH_GET_API(api, ct_vio_a0);
+        CETECH_GET_API(api, ct_hash_a0);
+        CETECH_GET_API(api, ct_thread_a0);
 
         _G = {0};
 
-        _G.type = hash_api_v0.id64_from_str("scene");
+        _G.type = ct_hash_a0.id64_from_str("scene");
 
-        _G.scene_instance_array.init(memory_api_v0.main_allocator());
-        _G.scene_instance_map.init(memory_api_v0.main_allocator());
+        _G.scene_instance_array.init(ct_memory_a0.main_allocator());
+        _G.scene_instance_map.init(ct_memory_a0.main_allocator());
 
-        resource_api_v0.register_type(_G.type, scene_resource::callback);
+        ct_resource_a0.register_type(_G.type, scene_resource::callback);
 
 #ifdef CETECH_CAN_COMPILE
         scene_resource_compiler::init(api);
@@ -252,26 +251,26 @@ namespace scene {
         bgfx::setIndexBuffer(instance->ib[idx], 0, instance->size[idx]);
     }
 
-    void create_graph(world_t world,
-                      entity_t entity,
+    void create_graph(ct_world world,
+                      ct_entity entity,
                       uint64_t scene) {
-        auto *res = scene_blob::get(resource_api_v0.get(_G.type, scene));
+        auto *res = scene_blob::get(ct_resource_a0.get(_G.type, scene));
 
         uint64_t *node_name = scene_blob::node_name(res);
         uint32_t *node_parent = scene_blob::node_parent(res);
         mat44f_t *node_pose = scene_blob::node_pose(res);
 
-        scenegprah_api_v0.create(world,
-                                 entity,
-                                 node_name,
-                                 node_parent,
-                                 node_pose,
-                                 res->node_count);
+        ct_scenegprah_a0.create(world,
+                                entity,
+                                node_name,
+                                node_parent,
+                                node_pose,
+                                res->node_count);
     }
 
     uint64_t get_mesh_node(uint64_t scene,
                            uint64_t mesh) {
-        auto *res = scene_blob::get(resource_api_v0.get(_G.type, scene));
+        auto *res = scene_blob::get(ct_resource_a0.get(_G.type, scene));
 
         uint64_t *geom_node = scene_blob::geom_node(res);
         uint64_t *geom_name = scene_blob::geom_name(res);

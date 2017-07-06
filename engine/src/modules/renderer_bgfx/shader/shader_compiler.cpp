@@ -13,7 +13,6 @@
 #include <cetech/modules/application.h>
 #include <cetech/kernel/memory.h>
 #include <cetech/kernel/os.h>
-#include <cetech/kernel/module.h>
 #include <cetech/kernel/api_system.h>
 #include <cetech/kernel/log.h>
 #include <cetech/kernel/yaml.h>
@@ -26,14 +25,14 @@
 using namespace cetech;
 using namespace string_stream;
 
-CETECH_DECL_API(memory_api_v0)
-CETECH_DECL_API(resource_api_v0)
-CETECH_DECL_API(app_api_v0)
-CETECH_DECL_API(os_path_v0)
-CETECH_DECL_API(os_vio_api_v0)
-CETECH_DECL_API(os_process_api_v0)
-CETECH_DECL_API(log_api_v0)
-CETECH_DECL_API(hash_api_v0)
+CETECH_DECL_API(ct_memory_a0)
+CETECH_DECL_API(ct_resource_a0)
+CETECH_DECL_API(ct_app_a0)
+CETECH_DECL_API(ct_path_a0)
+CETECH_DECL_API(ct_vio_a0)
+CETECH_DECL_API(ct_process_a0)
+CETECH_DECL_API(ct_log_a0)
+CETECH_DECL_API(ct_hash_a0)
 
 
 namespace shader_compiler {
@@ -45,14 +44,14 @@ namespace shader_compiler {
                         const char *platform,
                         const char *profile) {
 
-        string_stream::Buffer buffer(memory_api_v0.main_allocator());
+        string_stream::Buffer buffer(ct_memory_a0.main_allocator());
 
-        char *shaderc = resource_api_v0.compiler_external_join(
-                memory_api_v0.main_allocator(),
+        char *shaderc = ct_resource_a0.compiler_external_join(
+                ct_memory_a0.main_allocator(),
                 "shaderc");
 
         buffer << shaderc;
-        CETECH_FREE(memory_api_v0.main_allocator(), shaderc);
+        CETECH_FREE(ct_memory_a0.main_allocator(), shaderc);
 
         string_stream::printf(buffer,
                               ""
@@ -68,9 +67,9 @@ namespace shader_compiler {
                               input, output, include_path, type, platform,
                               profile);
 
-        int status = os_process_api_v0.exec(string_stream::c_str(buffer));
+        int status = ct_process_a0.exec(string_stream::c_str(buffer));
 
-        log_api_v0.debug("shaderc", "STATUS %d", status);
+        ct_log_a0.debug("shaderc", "STATUS %d", status);
 
         return status;
     }
@@ -80,16 +79,16 @@ namespace shader_compiler {
                              size_t max_len,
                              const char *filename) {
 
-        auto a = memory_api_v0.main_allocator();
+        auto a = ct_memory_a0.main_allocator();
 
         char dir[1024] = {0};
-        os_path_v0.dir(dir, CETECH_ARRAY_LEN(dir), filename);
+        ct_path_a0.dir(dir, CETECH_ARRAY_LEN(dir), filename);
 
-        char *tmp_dirname = os_path_v0.join(a, 2, tmp_dir, dir);
-        os_path_v0.make_path(tmp_dirname);
+        char *tmp_dirname = ct_path_a0.join(a, 2, tmp_dir, dir);
+        ct_path_a0.make_path(tmp_dirname);
 
         int ret = snprintf(tmp_filename, max_len, "%s/%s.shaderc", tmp_dirname,
-                           os_path_v0.filename(filename));
+                           ct_path_a0.filename(filename));
 
         CETECH_FREE(a, tmp_dirname);
 
@@ -112,10 +111,10 @@ namespace shader_compiler {
 #endif
 
     static int compiler(const char *filename,
-                        struct os_vio *source_vio,
-                        struct os_vio *build_vio,
-                        struct compilator_api *compilator_api) {
-        auto a = memory_api_v0.main_allocator();
+                        ct_vio *source_vio,
+                        ct_vio *build_vio,
+                        ct_compilator_api *compilator_api) {
+        auto a = ct_memory_a0.main_allocator();
 
         char source_data[source_vio->size(source_vio->inst) + 1];
         memset(source_data, 0, source_vio->size(source_vio->inst) + 1);
@@ -128,26 +127,26 @@ namespace shader_compiler {
         yaml_node_t vs_input = yaml_get_node(root, "vs_input");
         yaml_node_t fs_input = yaml_get_node(root, "fs_input");
 
-        const char *source_dir = resource_api_v0.compiler_get_source_dir();
-        const char *core_dir = resource_api_v0.compiler_get_core_dir();
+        const char *source_dir = ct_resource_a0.compiler_get_source_dir();
+        const char *core_dir = ct_resource_a0.compiler_get_core_dir();
 
-        char *include_dir = os_path_v0.join(a, 2, core_dir, "bgfxshaders");
+        char *include_dir = ct_path_a0.join(a, 2, core_dir, "bgfxshaders");
 
         shader_blob::blob_t resource = {0};
 
-        // TODO: temp allocator?
+        // TODO: temp ct_allocator?
         char input_str[1024] = {0};
         char output_path[1024] = {0};
         char tmp_filename[1024] = {0};
 
-        char *tmp_dir = resource_api_v0.compiler_get_tmp_dir(a,
-                                                             app_api_v0.platform());
+        char *tmp_dir = ct_resource_a0.compiler_get_tmp_dir(a,
+                                                            ct_app_a0.platform());
 
         //////// VS
         yaml_as_string(vs_input, input_str, CETECH_ARRAY_LEN(input_str));
         compilator_api->add_dependency(filename, input_str);
 
-        char *input_path = os_path_v0.join(a, 2, source_dir, input_str);
+        char *input_path = ct_path_a0.join(a, 2, source_dir, input_str);
 
         _gen_tmp_name(output_path, tmp_dir, CETECH_ARRAY_LEN(tmp_filename),
                       input_str);
@@ -162,10 +161,10 @@ namespace shader_compiler {
             return 0;
         }
 
-        struct os_vio *tmp_file = os_vio_api_v0.from_file(output_path,
-                                                          VIO_OPEN_READ);
+        ct_vio *tmp_file = ct_vio_a0.from_file(output_path,
+                                               VIO_OPEN_READ);
         char *vs_data =
-                CETECH_ALLOCATE(memory_api_v0.main_allocator(), char,
+                CETECH_ALLOCATE(ct_memory_a0.main_allocator(), char,
                                 tmp_file->size(tmp_file->inst) + 1);
         tmp_file->read(tmp_file->inst, vs_data, sizeof(char),
                        tmp_file->size(tmp_file->inst));
@@ -177,7 +176,7 @@ namespace shader_compiler {
         yaml_as_string(fs_input, input_str, CETECH_ARRAY_LEN(input_str));
         compilator_api->add_dependency(filename, input_str);
 
-        input_path = os_path_v0.join(a, 2, source_dir, input_str);
+        input_path = ct_path_a0.join(a, 2, source_dir, input_str);
 
         _gen_tmp_name(output_path, tmp_dir, CETECH_ARRAY_LEN(tmp_filename),
                       input_str);
@@ -192,9 +191,9 @@ namespace shader_compiler {
             return 0;
         }
 
-        tmp_file = os_vio_api_v0.from_file(output_path, VIO_OPEN_READ);
+        tmp_file = ct_vio_a0.from_file(output_path, VIO_OPEN_READ);
         char *fs_data =
-                CETECH_ALLOCATE(memory_api_v0.main_allocator(), char,
+                CETECH_ALLOCATE(ct_memory_a0.main_allocator(), char,
                                 tmp_file->size(tmp_file->inst) + 1);
         tmp_file->read(tmp_file->inst, fs_data, sizeof(char),
                        tmp_file->size(tmp_file->inst));
@@ -204,8 +203,10 @@ namespace shader_compiler {
         tmp_file->close(tmp_file->inst);
 
         build_vio->write(build_vio->inst, &resource, sizeof(resource), 1);
-        build_vio->write(build_vio->inst, vs_data, sizeof(char), resource.vs_size);
-        build_vio->write(build_vio->inst, fs_data, sizeof(char), resource.fs_size);
+        build_vio->write(build_vio->inst, vs_data, sizeof(char),
+                         resource.vs_size);
+        build_vio->write(build_vio->inst, fs_data, sizeof(char),
+                         resource.fs_size);
 
         CETECH_FREE(a, vs_data);
         CETECH_FREE(a, fs_data);
@@ -214,18 +215,18 @@ namespace shader_compiler {
         return 1;
     }
 
-    int init(api_v0 *api) {
-        CETECH_GET_API(api, memory_api_v0);
-        CETECH_GET_API(api, resource_api_v0);
-        CETECH_GET_API(api, app_api_v0);
-        CETECH_GET_API(api, os_path_v0);
-        CETECH_GET_API(api, os_vio_api_v0);
-        CETECH_GET_API(api, os_process_api_v0);
-        CETECH_GET_API(api, log_api_v0);
-        CETECH_GET_API(api, hash_api_v0);
+    int init(ct_api_a0 *api) {
+        CETECH_GET_API(api, ct_memory_a0);
+        CETECH_GET_API(api, ct_resource_a0);
+        CETECH_GET_API(api, ct_app_a0);
+        CETECH_GET_API(api, ct_path_a0);
+        CETECH_GET_API(api, ct_vio_a0);
+        CETECH_GET_API(api, ct_process_a0);
+        CETECH_GET_API(api, ct_log_a0);
+        CETECH_GET_API(api, ct_hash_a0);
 
-        resource_api_v0.compiler_register(hash_api_v0.id64_from_str("shader"),
-                                          compiler);
+        ct_resource_a0.compiler_register(ct_hash_a0.id64_from_str("shader"),
+                                         compiler);
 
         return 1;
     }

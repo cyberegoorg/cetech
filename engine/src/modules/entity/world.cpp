@@ -7,12 +7,11 @@
 #include <cetech/kernel/memory.h>
 #include <cetech/kernel/config.h>
 #include <cetech/modules/resource.h>
-#include <cetech/kernel/module.h>
 #include <cetech/kernel/api_system.h>
 
 #include <cetech/modules/entity.h>
 
-CETECH_DECL_API(memory_api_v0);
+CETECH_DECL_API(ct_memory_a0);
 
 using namespace cetech;
 
@@ -28,7 +27,7 @@ using namespace cetech;
 namespace {
 #define _G WorldGlobals
     static struct WorldGlobals {
-        Array<world_callbacks_t> callbacks;
+        Array<ct_world_callbacks_t> callbacks;
         Handler<uint32_t> world_handler;
     } WorldGlobals;
 }
@@ -38,12 +37,12 @@ namespace {
 //==============================================================================
 
 namespace world {
-    void register_callback(world_callbacks_t clb) {
+    void register_callback(ct_world_callbacks_t clb) {
         array::push_back(_G.callbacks, clb);
     }
 
-    world_t create() {
-        world_t w = {.h = handler::create(_G.world_handler)};
+    ct_world create() {
+        ct_world w = {.h = handler::create(_G.world_handler)};
 
         for (int i = 0; i < array::size(_G.callbacks); ++i) {
             _G.callbacks[i].on_created(w);
@@ -52,7 +51,7 @@ namespace world {
         return w;
     }
 
-    void destroy(world_t world) {
+    void destroy(ct_world world) {
         for (int i = 0; i < array::size(_G.callbacks); ++i) {
             _G.callbacks[i].on_destroy(world);
         }
@@ -60,7 +59,7 @@ namespace world {
         handler::destroy(_G.world_handler, world.h);
     }
 
-    void update(world_t world,
+    void update(ct_world world,
                 float dt) {
         for (int i = 0; i < array::size(_G.callbacks); ++i) {
             if (_G.callbacks[i].on_update != NULL) {
@@ -75,7 +74,7 @@ namespace world {
 //==============================================================================
 
 namespace world_module {
-    static struct world_api_v0 _api = {
+    static ct_world_a0 _api = {
             .register_callback = world::register_callback,
             .create = world::create,
             .destroy = world::destroy,
@@ -83,20 +82,20 @@ namespace world_module {
     };
 
 
-    static void _init_api(struct api_v0 *api) {
-        api->register_api("world_api_v0", &_api);
+    static void _init_api(ct_api_a0 *api) {
+        api->register_api("ct_world_a0", &_api);
     }
 
 
-    void _init(struct api_v0 *api) {
+    void _init(ct_api_a0 *api) {
         _init_api(api);
 
-        CETECH_GET_API(api, memory_api_v0);
+        CETECH_GET_API(api, ct_memory_a0);
 
         _G = {0};
 
-        _G.callbacks.init(memory_api_v0.main_allocator());
-        _G.world_handler.init(memory_api_v0.main_allocator());
+        _G.callbacks.init(ct_memory_a0.main_allocator());
+        _G.world_handler.init(ct_memory_a0.main_allocator());
 
     }
 
@@ -106,11 +105,11 @@ namespace world_module {
     }
 
 
-    extern "C" void world_load_module(struct api_v0 *api) {
+    extern "C" void world_load_module(ct_api_a0 *api) {
         _init(api);
     }
 
-    extern "C" void world_unload_module(struct api_v0 *api) {
+    extern "C" void world_unload_module(ct_api_a0 *api) {
         _shutdown();
     }
 }

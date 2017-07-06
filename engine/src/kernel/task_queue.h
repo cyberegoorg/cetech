@@ -28,13 +28,13 @@ struct task_queue {
     cacheline_pad_t _pad5;
     int _capacityMask;
     cacheline_pad_t _pad6;
-    struct allocator *allocator;
+    struct ct_allocator *allocator;
 };
 
 
 void queue_task_init(struct task_queue *q,
                      uint32_t capacity,
-                     struct allocator *allocator) {
+                     struct ct_allocator *allocator) {
     *q = (struct task_queue) {0};
 
     q->_capacityMask = capacity - 1;
@@ -44,9 +44,11 @@ void queue_task_init(struct task_queue *q,
     CETECH_ASSERT("QUEUEMPC", 0 == (capacity & q->_capacityMask));
 
     q->_capacity = capacity;
-    q->_data = CETECH_ALLOCATE(allocator, uint32_t, sizeof(uint32_t) * capacity);
+    q->_data = CETECH_ALLOCATE(allocator, uint32_t,
+                               sizeof(uint32_t) * capacity);
 
-    q->_sequences = CETECH_ALLOCATE(allocator, atomic_int, sizeof(atomic_int) * capacity);
+    q->_sequences = CETECH_ALLOCATE(allocator, atomic_int,
+                                    sizeof(atomic_int) * capacity);
 
     for (uint32_t i = 0; i < capacity; ++i) {
         atomic_init(q->_sequences + i, i);

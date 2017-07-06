@@ -16,7 +16,8 @@ extern "C" {
 // Api
 //==============================================================================
 
-struct hash_api_v0 {
+struct ct_hash_a0 {
+
     //! 64bit murmur 2 hash
     //! \param key Key
     //! \param seed Seed
