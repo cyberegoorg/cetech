@@ -1,6 +1,4 @@
 
-
-#include "cetech/modules/renderer.h"
 #include "../luasys_private.h"
 
 #include <cetech/kernel/hash.h>

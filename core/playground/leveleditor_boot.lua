@@ -15,7 +15,7 @@ function Editor:init()
     self.camera_transform = Transform.get(self.world, self.camera_entity)
     self.fps_camera = FPSCamera(self.world, self.camera_entity, true)
 
-    Transform.set_position(self.world, self.camera_transform, Vec3f.make(0.0, 0.0, 10))
+    Transform.set_position(self.camera_transform, Vec3f.make(0.0, 0.0, 10))
 
     self.level = nil
 

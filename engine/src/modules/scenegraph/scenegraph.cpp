@@ -146,10 +146,9 @@ namespace scenegraph {
         return node.idx != UINT32_MAX;
     }
 
-    void transform(ct_world world,
-                   ct_scene_node node,
+    void transform(ct_scene_node node,
                    mat44f_t *parent) {
-        WorldInstance *world_inst = _get_world_instance(world);
+        WorldInstance *world_inst = _get_world_instance(node.world);
 
         vec3f_t pos = world_inst->position[node.idx];
         quatf_t rot = world_inst->rotation[node.idx];
@@ -171,101 +170,88 @@ namespace scenegraph {
 
         uint32_t child = world_inst->first_child[node.idx];
 
-        ct_scene_node child_transform = {.idx = child};
+        ct_scene_node child_transform = {.idx = child, .world = node.world};
 
         while (is_valid(child_transform)) {
-            transform(world, child_transform,
-                      &world_inst->world_matrix[node.idx]);
+            transform(child_transform, &world_inst->world_matrix[node.idx]);
 
             child_transform.idx = world_inst->next_sibling[child_transform.idx];
         }
     }
 
-    vec3f_t get_position(ct_world world,
-                         ct_scene_node node) {
+    vec3f_t get_position(ct_scene_node node) {
 
-        WorldInstance *world_inst = _get_world_instance(world);
+        WorldInstance *world_inst = _get_world_instance(node.world);
         return world_inst->position[node.idx];
     }
 
-    quatf_t get_rotation(ct_world world,
-                         ct_scene_node node) {
+    quatf_t get_rotation(ct_scene_node node) {
 
-        WorldInstance *world_inst = _get_world_instance(world);
+        WorldInstance *world_inst = _get_world_instance(node.world);
         return world_inst->rotation[node.idx];
     }
 
-    vec3f_t get_scale(ct_world world,
-                      ct_scene_node node) {
+    vec3f_t get_scale(ct_scene_node node) {
 
-        WorldInstance *world_inst = _get_world_instance(world);
+        WorldInstance *world_inst = _get_world_instance(node.world);
         return world_inst->scale[node.idx];
     }
 
-    mat44f_t *get_world_matrix(ct_world world,
-                               ct_scene_node node) {
-        WorldInstance *world_inst = _get_world_instance(world);
+    mat44f_t *get_world_matrix(ct_scene_node node) {
+        WorldInstance *world_inst = _get_world_instance(node.world);
         return &world_inst->world_matrix[node.idx];
     }
 
-    void set_position(ct_world world,
-                      ct_scene_node node,
+    void set_position(ct_scene_node node,
                       vec3f_t pos) {
-        WorldInstance *world_inst = _get_world_instance(world);
+
+        WorldInstance *world_inst = _get_world_instance(node.world);
 
         uint32_t parent_idx = world_inst->parent[node.idx];
 
-        ct_scene_node pt = {.idx = parent_idx};
+        ct_scene_node pt = {.idx = parent_idx, .world = node.world};
 
         mat44f_t m = MAT44F_INIT_IDENTITY;
-        mat44f_t *p =
-                parent_idx != UINT32_MAX ? get_world_matrix(world, pt)
-                                         : &m;
+        mat44f_t *p = parent_idx != UINT32_MAX ? get_world_matrix(pt) : &m;
 
         world_inst->position[node.idx] = pos;
 
-        transform(world, node, p);
+        transform(node, p);
     }
 
-    void set_rotation(ct_world world,
-                      ct_scene_node node,
+    void set_rotation(ct_scene_node node,
                       quatf_t rot) {
-        WorldInstance *world_inst = _get_world_instance(world);
+        WorldInstance *world_inst = _get_world_instance(node.world);
 
         uint32_t parent_idx = world_inst->parent[node.idx];
 
-        ct_scene_node pt = {.idx = parent_idx};
+        ct_scene_node pt = {.idx = parent_idx, .world = node.world};
 
         mat44f_t m = MAT44F_INIT_IDENTITY;
-        mat44f_t *p =
-                parent_idx != UINT32_MAX ? get_world_matrix(world, pt)
-                                         : &m;
+        mat44f_t *p = parent_idx != UINT32_MAX ? get_world_matrix(pt) : &m;
 
         quatf_t nq = {0};
         quatf_normalized(&nq, &rot);
 
         world_inst->rotation[node.idx] = nq;
 
-        transform(world, node, p);
+        transform(node, p);
     }
 
-    void set_scale(ct_world world,
-                   ct_scene_node node,
+    void set_scale(ct_scene_node node,
                    vec3f_t scale) {
-        WorldInstance *world_inst = _get_world_instance(world);
+        WorldInstance *world_inst = _get_world_instance(node.world);
 
         uint32_t parent_idx = world_inst->parent[node.idx];
 
-        ct_scene_node pt = {.idx = parent_idx};
+        ct_scene_node pt = {.idx = parent_idx, .world = node.world};
 
         mat44f_t m = MAT44F_INIT_IDENTITY;
-        mat44f_t *p =
-                parent_idx != UINT32_MAX ? get_world_matrix(world, pt)
-                                         : &m;
+        mat44f_t *p = parent_idx != UINT32_MAX ? get_world_matrix(pt) : &m;
 
         world_inst->scale[node.idx] = scale;
 
-        transform(world, node, p);
+        transform(node, p);
     }
 
     int has(ct_world world,
@@ -282,7 +268,7 @@ namespace scenegraph {
 
         uint32_t component_idx = map::get(_G.ent_map, idx, UINT32_MAX);
 
-        return (ct_scene_node) {.idx = component_idx};
+        return (ct_scene_node) {.idx = component_idx, .world = world};
     }
 
     ct_scene_node create(ct_world world,
@@ -304,7 +290,7 @@ namespace scenegraph {
         for (int i = 0; i < count; ++i) {
             uint32_t idx = first_idx + i;
 
-            nodes[i] = (ct_scene_node) {.idx = idx};
+            nodes[i] = (ct_scene_node) {.idx = idx, .world = world};
 
             mat44f_t local_pose = pose[i];
 
@@ -326,12 +312,10 @@ namespace scenegraph {
             mat44f_t m = MAT44F_INIT_IDENTITY;
             memcpy(data->world_matrix[idx].f, m.f, sizeof(m));
 
-            ct_scene_node t = {.idx = idx};
-            transform(world, t,
-                      parent[i] != UINT32_MAX
-                      ? get_world_matrix(world,
-                                         nodes[parent[i]])
-                      : &m);
+            ct_scene_node t = {.idx = idx, .world = world};
+            transform(t, parent[i] != UINT32_MAX
+                         ? get_world_matrix(nodes[parent[i]])
+                         : &m);
 
             if (parent[i] != UINT32_MAX) {
                 uint32_t parent_idx = nodes[parent[i]].idx;
@@ -361,10 +345,9 @@ namespace scenegraph {
         return root;
     }
 
-    void link(ct_world world,
-              ct_scene_node parent,
+    void link(ct_scene_node parent,
               ct_scene_node child) {
-        WorldInstance *data = _get_world_instance(world);
+        WorldInstance *data = _get_world_instance(parent.world);
 
         data->parent[child.idx] = parent.idx;
 
@@ -375,14 +358,10 @@ namespace scenegraph {
 
         mat44f_t m = MAT44F_INIT_IDENTITY;
 
-        mat44f_t *p =
-                parent.idx != UINT32_MAX ? get_world_matrix(world,
-                                                            parent)
-                                         : &m;
+        mat44f_t *p = parent.idx != UINT32_MAX ? get_world_matrix(parent) : &m;
 
-        transform(world, parent, p);
-        transform(world, child, get_world_matrix(world,
-                                                 parent));
+        transform(parent, p);
+        transform(child, get_world_matrix(parent));
     }
 
     ct_scene_node _node_by_name(WorldInstance *data,
@@ -392,7 +371,7 @@ namespace scenegraph {
             return root;
         }
 
-        ct_scene_node node_it = {.idx = data->first_child[root.idx]};
+        ct_scene_node node_it = {.idx = data->first_child[root.idx], .world = root.world};
         while (is_valid(node_it)) {
             ct_scene_node ret = _node_by_name(data, node_it, name);
             if (ret.idx != UINT32_MAX) {
@@ -402,7 +381,7 @@ namespace scenegraph {
             node_it.idx = data->next_sibling[node_it.idx];
         }
 
-        return (ct_scene_node) {.idx=UINT32_MAX};
+        return (ct_scene_node) {.idx = UINT32_MAX, .world.h = UINT32_MAX};
     }
 
     ct_scene_node node_by_name(ct_world world,

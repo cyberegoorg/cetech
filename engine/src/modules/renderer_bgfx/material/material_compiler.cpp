@@ -18,6 +18,7 @@
 #include <cetech/kernel/errors.h>
 #include <cetech/kernel/yaml.h>
 
+#include <cetech/modules/entity.h>
 #include <cetech/modules/renderer.h>
 
 #include "material_blob.h"

@@ -17,9 +17,8 @@ extern "C" {
 // Typedefs
 //==============================================================================
 
-struct ce_world;
-struct ce_entity;
-
+struct ct_world;
+struct ct_entity;
 
 typedef struct mat44f_s mat44f_t;
 
@@ -29,6 +28,7 @@ typedef struct mat44f_s mat44f_t;
 
 //! Camera struct
 struct ct_camera {
+    struct ct_world world;
     uint32_t idx;
 };
 
@@ -58,8 +58,7 @@ struct ct_camera_a0 {
     //! \param camera Camera
     //! \param proj Project matrix
     //! \param view View Matrix
-    void (*get_project_view)(struct ct_world world,
-                             struct ct_camera camera,
+    void (*get_project_view)(struct ct_camera camera,
                              mat44f_t *proj,
                              mat44f_t *view);
 

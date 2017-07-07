@@ -12,7 +12,7 @@ ASSET_CREATOR = {
 
         if Transform.has(self.world, self.actual_asset_entity) then
             local transform = Transform.get(self.world, self.actual_asset_entity)
-            Transform.set_position(self.world, transform, Vec3f.make(0.0, 0.0, 0.0))
+            Transform.set_position(transform, Vec3f.make(0.0, 0.0, 0.0))
         end
     end,
 
@@ -20,7 +20,7 @@ ASSET_CREATOR = {
     -- MATERIAL
     -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
     material = function(self, asset_name, type)
-        Transform.set_position(self.world, self.camera_transform, Vec3f.make(0.0, 0.0, 20.0))
+        Transform.set_position(self.camera_transform, Vec3f.make(0.0, 0.0, 20.0))
 
         self.actual_asset_entity = Entity.spawn(self.world, "playground/cube")
 
@@ -32,7 +32,7 @@ ASSET_CREATOR = {
     -- TEXTURE
     -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
     texture = function(self, asset_name, type)
-        Transform.set_position(self.world, self.camera_transform, Vec3f.make(0.0, 0.0, 20.0))
+        Transform.set_position(self.camera_transform, Vec3f.make(0.0, 0.0, 20.0))
 
         self.actual_asset_entity = Entity.spawn(self.world, "playground/cube")
 
@@ -60,7 +60,7 @@ function AssetView:init()
 
     self.camera_transform = Transform.get(self.world, self.camera_entity)
 
-    Transform.set_position(self.world, self.camera_transform, Vec3f.make(0.0, 0.0, 20.0))
+    Transform.set_position(self.camera_transform, Vec3f.make(0.0, 0.0, 20.0))
 
     self.actual_asset_entity = nil
     self.level = nil
@@ -79,22 +79,22 @@ function AssetView:update(dt)
             -- Transform
             local transform = Transform.get(self.world, self.actual_asset_entity) -- self.camera_transform
             -- local transform = self.camera_transform
-            local rot = Transform.get_rotation(self.world, transform)
-            local m_world = Transform.get_world_matrix(self.world, transform)
+            local rot = Transform.get_rotation(transform)
+            local m_world = Transform.get_world_matrix(transform)
             local x_dir = m_world.x
 
             -- Rotation
             local rotation_around_world_up = Quatf.from_axis_angle(Vec3f.unit_y(), EditorInput.mouse.dx * -0.1)
             local rotation_around_camera_right = Quatf.from_axis_angle(x_dir, EditorInput.mouse.dy * 0.1)
             local rotation = rotation_around_world_up * rotation_around_camera_right
-            Transform.set_rotation(self.world, transform, rot * rotation)
+            Transform.set_rotation(transform, rot * rotation)
         end
 
         if EditorInput.mouse.right then
-            local pos = Transform.get_position(self.world, self.camera_transform)
+            local pos = Transform.get_position(self.camera_transform)
 
             pos.z = pos.z + EditorInput.mouse.dy * -0.9
-            Transform.set_position(self.world, self.camera_transform, pos)
+            Transform.set_position(self.camera_transform, pos)
         end
 
         EditorInput:ResetButtons()
@@ -109,7 +109,7 @@ end
 
 
 function AssetView:show_asset(asset, type)
-    Transform.set_position(self.world, self.camera_transform, Vec3f.make(0.0, 0.0, 20.0))
+    Transform.set_position(self.camera_transform, Vec3f.make(0.0, 0.0, 20.0))
 
     self:destroy_actual_asset()
     if ASSET_CREATOR[type] ~= nil then

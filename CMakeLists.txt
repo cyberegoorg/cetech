@@ -122,6 +122,7 @@ set(SOURCE_FILES
         engine/src/modules/luasys/api/api_package.c
         engine/src/modules/luasys/api/api_level.c
         engine/src/modules/luasys/api/api_scenegraph.c
+        engine/src/modules/luasys/api/api_camera.c
 
         engine/src/modules/resource/resource.cpp
         engine/src/modules/resource/resource_package.cpp

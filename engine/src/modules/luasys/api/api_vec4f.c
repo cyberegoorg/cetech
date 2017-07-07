@@ -1,9 +1,10 @@
-
+#include "cetech/modules/entity.h"
 #include "cetech/modules/transform.h"
-#include "../luasys_private.h"
+
 #include <cetech/celib/vec4f.inl>
 #include <cetech/kernel/api_system.h>
 
+#include "../luasys_private.h"
 
 #define API_NAME "Vec4f"
 

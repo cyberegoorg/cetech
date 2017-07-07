@@ -1,4 +1,4 @@
-
+#include "cetech/modules/entity.h"
 #include <cetech/celib/allocator.h>
 
 #include "cetech/modules/transform.h"

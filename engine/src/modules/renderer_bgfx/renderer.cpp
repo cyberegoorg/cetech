@@ -10,14 +10,15 @@
 #include <cetech/kernel/os.h>
 #include <cetech/kernel/api_system.h>
 
+#include <cetech/modules/entity.h>
 #include <cetech/modules/camera.h>
-#include "cetech/modules/renderer.h"
+#include <cetech/modules/renderer.h>
 #include <cetech/kernel/develop.h>
 
 #include <cetech/kernel/console_server.h>
 
 #include <include/mpack/mpack.h>
-#include <cetech/modules/entity.h>
+
 #include "bgfx/platform.h"
 
 #include "texture/texture.h"
@@ -113,7 +114,7 @@ void renderer_render_world(ct_world world,
     mat44f_t view_matrix;
     mat44f_t proj_matrix;
 
-    camera_api->get_project_view(world, camera, &proj_matrix, &view_matrix);
+    camera_api->get_project_view(camera, &proj_matrix, &view_matrix);
     bgfx::setViewTransform(0, view_matrix.f, proj_matrix.f);
 
     bgfx::setViewRect(0, 0, 0, (uint16_t) _G.size_width,

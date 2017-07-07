@@ -25,9 +25,9 @@ struct ct_entity;
 
 //! Scene node struct
 struct ct_scene_node {
+    struct ct_world world;
     uint32_t idx;
 };
-
 
 //==============================================================================
 // Api
@@ -45,52 +45,45 @@ struct ct_scenegprah_a0 {
     //! \param world World
     //! \param node Node
     //! \return Position
-    vec3f_t (*get_position)(struct ct_world world,
-                            struct ct_scene_node node);
+    vec3f_t (*get_position)(struct ct_scene_node node);
 
     //! Get node rotation
     //! \param world World
     //! \param node Node
     //! \return Rotation
-    quatf_t (*get_rotation)(struct ct_world world,
-                            struct ct_scene_node node);
+    quatf_t (*get_rotation)(struct ct_scene_node node);
 
     //! Get node scale
     //! \param world World
     //! \param node Node
     //! \return Scale
-    vec3f_t (*get_scale)(struct ct_world world,
-                         struct ct_scene_node node);
+    vec3f_t (*get_scale)(struct ct_scene_node node);
 
     //! Get world matrix
     //! \param world World
     //! \param node Node
     //! \return World matrix
-    mat44f_t *(*get_world_matrix)(struct ct_world world,
-                                  struct ct_scene_node node);
+    mat44f_t *(*get_world_matrix)(struct ct_scene_node node);
 
     //! Set position
     //! \param world World
     //! \param node Node
     //! \param pos Position
-    void (*set_position)(struct ct_world world,
-                         struct ct_scene_node node,
+    void (*set_position)(struct ct_scene_node node,
                          vec3f_t pos);
 
     //! Set rotation
     //! \param world World
     //! \param node Node
     //! \param rot Rotation
-    void (*set_rotation)(struct ct_world world,
-                         struct ct_scene_node node,
+    void (*set_rotation)(struct ct_scene_node node,
                          quatf_t rot);
 
     //! Set scale
     //! \param world World
     //! \param node Node
     //! \param scale Scale
-    void (*set_scale)(struct ct_world world,
-                      struct ct_scene_node node,
+    void (*set_scale)(struct ct_scene_node node,
                       vec3f_t scale);
 
     //! Has entity scene-graph component?
@@ -126,8 +119,7 @@ struct ct_scenegprah_a0 {
     //! \param world World
     //! \param parent Parent node
     //! \param child Child node
-    void (*link)(struct ct_world world,
-                 struct ct_scene_node parent,
+    void (*link)(struct ct_scene_node parent,
                  struct ct_scene_node child);
 
     //! Get node by name

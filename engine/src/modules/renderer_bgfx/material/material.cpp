@@ -18,6 +18,7 @@
 
 
 #include <cetech/modules/resource.h>
+#include <cetech/modules/entity.h>
 #include <cetech/modules/renderer.h>
 
 #include "material_blob.h"

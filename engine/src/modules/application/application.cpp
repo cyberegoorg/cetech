@@ -15,6 +15,7 @@
 #include <cetech/kernel/task.h>
 #include <cetech/kernel/develop.h>
 
+#include <cetech/modules/entity.h>
 #include <cetech/modules/resource.h>
 #include <cetech/modules/luasys.h>
 #include <cetech/modules/renderer.h>
