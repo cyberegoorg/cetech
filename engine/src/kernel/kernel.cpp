@@ -78,8 +78,9 @@ extern "C" void init_core(ct_api_a0 *api) {
 }
 
 extern "C" void load_core() {
-    ADD_STATIC_MODULE(task);
     ADD_STATIC_MODULE(developsystem);
+
+    ADD_STATIC_MODULE(task);
     ADD_STATIC_MODULE(consoleserver);
 }
 

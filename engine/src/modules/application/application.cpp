@@ -267,8 +267,8 @@ void application_start() {
 
     ct_console_srv_a0.push_begin();
     while (_G.is_running) {
-        auto application_sd = ct_develop_a0.enter_scope(
-                "Application:update()");
+        auto application_sd = ct_develop_a0.enter_scope("Application:update()",
+                                                        ct_task_a0.worker_id());
 
         uint64_t now_ticks = ct_time_a0.perf_counter();
         float dt =
@@ -288,8 +288,8 @@ void application_start() {
 
         if (frame_time_accum >= frame_time) {
             if (!ct_config_a0.get_int(_G.config.daemon)) {
-                ct_scope_data render_sd = ct_develop_a0.enter_scope(
-                        "Game:render()");
+                auto render_sd = ct_develop_a0.enter_scope("Game:render()",
+                                                           ct_task_a0.worker_id());
                 _G.game->render();
                 ct_develop_a0.leave_scope(render_sd);
             }
