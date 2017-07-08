@@ -120,6 +120,20 @@ void luasys_call_global(const char *func,
                         const char *args,
                         ...);
 
+int _is_vec2f(lua_State *L,
+              int idx);
+
+int _is_vec3f(lua_State *L,
+              int idx);
+
+int _is_vec4f(lua_State *L,
+              int idx);
+int _is_quat(lua_State *L,
+             int idx);
+int _is_mat44f(lua_State *L,
+               int idx);
+
 #ifdef __cplusplus
+
 }
 #endif

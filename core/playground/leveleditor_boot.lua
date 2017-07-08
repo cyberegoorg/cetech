@@ -1,5 +1,20 @@
 for k, v in pairs(cetech) do _G[k] = v end
 
+require 'cetech/world'
+require 'cetech/entity'
+require 'cetech/transform'
+require 'cetech/scenegraph'
+require 'cetech/keyboard'
+require 'cetech/mouse'
+require 'cetech/gamepad'
+require 'cetech/mesh'
+require 'cetech/material'
+require 'cetech/renderer'
+require 'cetech/level'
+require 'cetech/application'
+require 'cetech/resource'
+require 'cetech/component'
+
 require "playground/editor_input"
 require 'core/fpscamera'
 

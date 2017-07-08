@@ -52,20 +52,6 @@ struct ct_world {
 typedef int (*ct_component_compiler_t)(yaml_node_t body,
                                        struct ct_blob *data);
 
-//! On world create callback
-//! \param world World
-typedef void (*ct_world_on_created_t)(struct ct_world world);
-
-//! On world destroy callback
-//! \param world World
-typedef void (*ct_world_on_destroy_t)(struct ct_world world);
-
-//! On world update callback
-//! \param world World
-//! \param dt Delta time
-typedef void (*ct_world_on_update_t)(struct ct_world world,
-                                     float dt);
-
 //==============================================================================
 // Structs
 //==============================================================================
@@ -78,9 +64,19 @@ struct ct_entity {
 
 //! World callbacks
 typedef struct {
-    ct_world_on_created_t on_created;  //!< On create
-    ct_world_on_destroy_t on_destroy;  //!< On destroy
-    ct_world_on_update_t on_update;    //!< On update
+    //! On world create callback
+    //! \param world World
+    void (*on_created)(struct ct_world world);
+
+    //! On world destroy callback
+    //! \param world World
+    void (*on_destroy)(struct ct_world world);
+
+    //! On world update callback
+    //! \param world World
+    //! \param dt Delta time
+    void (*on_update)(struct ct_world world,
+                                         float dt);
 } ct_world_callbacks_t;
 
 
@@ -131,10 +127,7 @@ static struct ct_component_clb {
     struct ct_property_value (*get_property)(struct ct_world world,
                                              struct ct_entity entity,
                                              uint64_t key);
-
-    ct_world_on_created_t on_world_create;  //!< On world create
-    ct_world_on_destroy_t on_world_destroy; //!< On world destroy
-    ct_world_on_update_t on_world_update;   //!< On world update
+    ct_world_callbacks_t world_clb;
 } ct_component_clb_null = {0};
 
 

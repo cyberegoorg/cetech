@@ -7,6 +7,21 @@
 
 #define API_NAME "Quatf"
 
+static int _ctor(lua_State *l) {
+    float x = luasys_to_float(l, 1);
+    float y = luasys_to_float(l, 2);
+    float z = luasys_to_float(l, 3);
+    float w = luasys_to_float(l, 4);
+
+    luasys_push_quat(l, (quatf_t) {.x=x, .y=y, .z=z, .w=w});
+    return 1;
+}
+
+static int _is(lua_State *l) {
+    luasys_push_bool(l, _is_quat(l, 1));
+    return 1;
+}
+
 static int _from_axis_angle(lua_State *l) {
     quatf_t result = {0};
 
@@ -75,6 +90,8 @@ static int _normalized(lua_State *l) {
 }
 
 void _register_lua_quatf_api(struct ct_api_a0 *api) {
+    luasys_add_module_function(API_NAME, "make", _ctor);
+    luasys_add_module_function(API_NAME, "is", _is);
     luasys_add_module_function(API_NAME, "from_axis_angle", _from_axis_angle);
     luasys_add_module_function(API_NAME, "from_euler", _from_euler);
 

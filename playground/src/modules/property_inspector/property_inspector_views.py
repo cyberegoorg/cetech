@@ -67,7 +67,7 @@ class TypeConstructor(object):
     def _buid_has(self, component_type):
         fce_body = """
             return (function (world, uid)
-                local ent = cetech.Level.entity_by_id(Editor.level, uid)
+                local ent = Level.entity_by_id(Editor.level, uid)
                 return %s.has(world, ent)
             end)(Editor.world, '%%s')
             """ % component_type
@@ -82,8 +82,8 @@ class TypeConstructor(object):
     def _buid_set_vec3(self, component_type, prop_name):
         fce_body = """
             return (function (world, uid, key, x, y, z)
-                local ent = cetech.Level.entity_by_id(Editor.level, uid)
-                cetech.Component.set_property(world, ent, "%s", key, Vec3f.make(x, y, z))
+                local ent = Level.entity_by_id(Editor.level, uid)
+                Component.set_property(world, ent, "%s", key, Vec3f.make(x, y, z))
             end)(Editor.world, '%%s', '%s', %%f, %%f, %%f)
             """ % (component_type, prop_name)
 
@@ -99,8 +99,8 @@ class TypeConstructor(object):
     def _buid_get_vec3(self, component_type, prop_name):
         fce_body = """
             return (function (world, uid, key)
-                local ent = cetech.Level.entity_by_id(Editor.level, uid)
-                local v = cetech.Component.get_property(world, ent, "%s", key)
+                local ent = Level.entity_by_id(Editor.level, uid)
+                local v = Component.get_property(world, ent, "%s", key)
                 return {x=v.x, y=v.y, z=v.z}
             end)(Editor.world, '%%s', '%s')
             """ % (component_type, prop_name)
@@ -116,8 +116,8 @@ class TypeConstructor(object):
     def _buid_set_string(self, component_type, prop_name):
         fce_body = """
             return (function (world, uid, key, value)
-                local ent = cetech.Level.entity_by_id(Editor.level, uid)
-                cetech.Component.set_property(world, ent, "%s", key, value)
+                local ent = Level.entity_by_id(Editor.level, uid)
+                Component.set_property(world, ent, "%s", key, value)
             end)(Editor.world, '%%s', '%s', '%%s')
             """ % (component_type, prop_name)
 
@@ -134,8 +134,8 @@ class TypeConstructor(object):
     def _buid_get_string(self, component_type, prop_name):
         fce_body = """
             return (function (world, uid, key)
-                local ent = cetech.Level.entity_by_id(Editor.level, uid)
-                local v = cetech.Component.get_property(world, ent, "%s", key)
+                local ent = Level.entity_by_id(Editor.level, uid)
+                local v = Component.get_property(world, ent, "%s", key)
                 return v
             end)(Editor.world, '%%s', '%s')
             """ % (component_type, prop_name)

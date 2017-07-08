@@ -100,29 +100,12 @@ set(SOURCE_FILES
         ########################################################################
 
         engine/src/modules/luasys/luasys_private.cpp
-        engine/src/modules/luasys/api/api_plugin.c
-        engine/src/modules/luasys/api/api_keyboard.c
         engine/src/modules/luasys/api/api_log.c
-        engine/src/modules/luasys/api/api_mouse.c
-        engine/src/modules/luasys/api/api_gamepad.c
-        engine/src/modules/luasys/api/api_application.c
-        engine/src/modules/luasys/api/api_resouce_manager.c
-        engine/src/modules/luasys/api/api_renderer.c
-        engine/src/modules/luasys/api/api_world.c
-        engine/src/modules/luasys/api/api_entity.c
-        engine/src/modules/luasys/api/api_component.c
-        engine/src/modules/luasys/api/api_transform.c
         engine/src/modules/luasys/api/api_vec2f.c
         engine/src/modules/luasys/api/api_vec3f.c
         engine/src/modules/luasys/api/api_vec4f.c
         engine/src/modules/luasys/api/api_quatf.c
         engine/src/modules/luasys/api/api_mat44f.c
-        engine/src/modules/luasys/api/api_mesh.c
-        engine/src/modules/luasys/api/api_material.c
-        engine/src/modules/luasys/api/api_package.c
-        engine/src/modules/luasys/api/api_level.c
-        engine/src/modules/luasys/api/api_scenegraph.c
-        engine/src/modules/luasys/api/api_camera.c
 
         engine/src/modules/resource/resource.cpp
         engine/src/modules/resource/resource_package.cpp

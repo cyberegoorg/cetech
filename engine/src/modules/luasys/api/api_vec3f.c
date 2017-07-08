@@ -17,6 +17,11 @@ static int _ctor(lua_State *l) {
     return 1;
 }
 
+static int _is(lua_State *l) {
+    luasys_push_bool(l, _is_vec3f(l, 1));
+    return 1;
+}
+
 static int _unit_x(lua_State *l) {
     luasys_push_vec3f(l, VEC3F_UNIT_X);
     return 1;
@@ -89,6 +94,7 @@ static int _dot(lua_State *l) {
 
 void _register_lua_vec3f_api(struct ct_api_a0 *api) {
     luasys_add_module_function(API_NAME, "make", _ctor);
+    luasys_add_module_function(API_NAME, "is", _is);
 
     luasys_add_module_function(API_NAME, "unit_x", _unit_x);
     luasys_add_module_function(API_NAME, "unit_y", _unit_y);

@@ -173,29 +173,12 @@ static const ct_game_callbacks _GameCallbacks = {
     _register_lua_##name##_api(api);
 
 extern "C" void _register_all_api(ct_api_a0 *api) {
-    REGISTER_LUA_API(log, api);
-    REGISTER_LUA_API(module, api);
-    REGISTER_LUA_API(keyboard, api);
-    REGISTER_LUA_API(mouse, api);
-    REGISTER_LUA_API(gamepad, api);
-    REGISTER_LUA_API(application, api);
-    REGISTER_LUA_API(resource_manager, api);
-    REGISTER_LUA_API(renderer, api);
-    REGISTER_LUA_API(world, api);
-    REGISTER_LUA_API(entity, api);
-    REGISTER_LUA_API(component, api);
-    REGISTER_LUA_API(transform, api);
     REGISTER_LUA_API(vec2f, api);
     REGISTER_LUA_API(vec3f, api);
     REGISTER_LUA_API(vec4f, api);
     REGISTER_LUA_API(mat44f, api);
     REGISTER_LUA_API(quatf, api);
-    REGISTER_LUA_API(mesh, api);
-    REGISTER_LUA_API(material, api);
-    REGISTER_LUA_API(package, api);
-    REGISTER_LUA_API(level, api);
-    REGISTER_LUA_API(scenegraph, api);
-    REGISTER_LUA_API(camera, api);
+    REGISTER_LUA_API(log, api);
 }
 
 //static int _reload_module(lua_State *l) {
@@ -617,7 +600,7 @@ void luasys_add_module_function(const char *module,
 //}
 
 
-static int _is_vec2f(lua_State *L,
+int _is_vec2f(lua_State *L,
                      int idx) {
     vec2f_t *p = (vec2f_t *) lua_touserdata(L, idx);
 
@@ -625,27 +608,27 @@ static int _is_vec2f(lua_State *L,
            (p < (_G._temp_vec2f_buffer + 1024));
 }
 
-static int _is_vec3f(lua_State *L,
+int _is_vec3f(lua_State *L,
                      int idx) {
     vec3f_t *p = (vec3f_t *) lua_touserdata(L, idx);
     return (p >= _G._temp_vec3f_buffer) &&
            (p < (_G._temp_vec3f_buffer + 1024));
 }
 
-static int _is_vec4f(lua_State *L,
+int _is_vec4f(lua_State *L,
                      int idx) {
     vec4f_t *p = (vec4f_t *) lua_touserdata(L, idx);
     return (p >= _G._temp_vec4f_buffer) &&
            (p < (_G._temp_vec4f_buffer + 1024));
 }
 
-static int _is_quat(lua_State *L,
+int _is_quat(lua_State *L,
                     int idx) {
     quatf_t *p = (quatf_t *) lua_touserdata(L, idx);
     return (p >= _G._temp_quat_buffer) && (p < (_G._temp_quat_buffer + 1024));
 }
 
-static int _is_mat44f(lua_State *L,
+int _is_mat44f(lua_State *L,
                       int idx) {
     mat44f_t *p = (mat44f_t *) lua_touserdata(L, idx);
     return (p >= _G._temp_mat44f_buffer) &&

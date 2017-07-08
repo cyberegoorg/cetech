@@ -69,9 +69,9 @@ namespace component {
         map::set(_G.component_clb, type, clb);
 
         ct_world_callbacks_t wclb = {
-                .on_created = clb.on_world_create,
-                .on_destroy = clb.on_world_destroy,
-                .on_update = clb.on_world_update,
+                .on_created = clb.world_clb.on_created,
+                .on_destroy = clb.world_clb.on_destroy,
+                .on_update = clb.world_clb.on_update,
         };
 
         ct_world_a0.register_callback(wclb);
