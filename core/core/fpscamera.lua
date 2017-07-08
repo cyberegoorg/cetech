@@ -1,7 +1,9 @@
 require 'core/class'
 
-local Transform, Mat4f, Vec3f, Quatf, Log, Camera = cetech.Transform, cetech.Mat4f, cetech.Vec3f, cetech.Quatf, cetech.Log, cetech.Camera
---local Camera = cetech.Camera
+require 'cetech/transform'
+require 'cetech/camera'
+
+local Mat4f, Vec3f, Quatf, Log = cetech.Mat4f, cetech.Vec3f, cetech.Quatf, cetech.Log
 
 FPSCamera = class(FPSCamera)
 

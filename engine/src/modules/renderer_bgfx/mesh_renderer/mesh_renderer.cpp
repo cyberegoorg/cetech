@@ -446,8 +446,10 @@ static void _init(ct_api_a0 *api) {
     ct_component_a0.register_type(_G.type, {
             .spawner=_spawner,
             .destroyer=_destroyer,
-            .on_world_create=_on_world_create,
-            .on_world_destroy=_on_world_destroy,
+
+            .world_clb.on_created = _on_world_create,
+            .world_clb.on_destroy = _on_world_destroy,
+
             .set_property=_set_property, .get_property=_get_property
     });
 }

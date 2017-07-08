@@ -1,5 +1,20 @@
 for k, v in pairs(cetech) do _G[k] = v end
 
+require 'cetech/world'
+require 'cetech/entity'
+require 'cetech/transform'
+require 'cetech/scenegraph'
+require 'cetech/keyboard'
+require 'cetech/mouse'
+require 'cetech/gamepad'
+require 'cetech/mesh'
+require 'cetech/material'
+require 'cetech/renderer'
+require 'cetech/level'
+require 'cetech/application'
+require 'cetech/resource'
+require 'cetech/component'
+
 require 'core/fpscamera'
 
 Game = Game or {}
@@ -40,6 +55,10 @@ function Game:init()
     --    self.entity = self.entity1
 
     self.camera_entity = Entity.spawn(self.world, "camera");
+
+--    a =  Transform.get(self.world, self.camera_entity)
+--    Log.info("game", "%s", tostring(a))
+
     self.camera = 0; --Camera.GetCamera(self.world, self.camera_entity);
     self.fps_camera = FPSCamera(self.world, self.camera_entity)
     --Entity.spawn(self.world, "entity11");
@@ -50,6 +69,12 @@ function Game:init()
 
     self.level = Level.load_level(self.world, "level1")
     self.entity = Level.entity_by_id(self.level, "55643423443313252");
+
+--    Component.set_property(self.world, self.entity, "transform", "position", Vec3f.make(33.0, 22.0, 10.0))
+--    local v = Component.get_property(self.world, self.entity, "transform", "position")
+--
+--    Log.info("dsadsadsadsa", "%f %f %f", v.x, v.y, v.z)
+
     --Entity.destroy(self.world, self.entity)
 end
 
@@ -84,8 +109,8 @@ L = 2
 function Game:update(dt)
     -- Application.quit()
 
-        local mesh = Mesh.get(self.world, self.entity)
-        local material = Mesh.get_material(mesh)
+    local mesh = Mesh.get(self.world, self.entity)
+    local material = Mesh.get_material(mesh)
 
 --    L = L + dt * 0.1
 --    if (L >= 1.0) then L = 0; end
