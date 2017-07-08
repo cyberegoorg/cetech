@@ -169,15 +169,23 @@ class PropertyInspectorView(QMainWindow, Ui_MainWindow):
         self.tc = TypeConstructor(self.rpc)
 
     def _create_string(self, parent, guid, component_type, prop_name, prop_body, value):
+        get_fce = self.tc.properties_get[component_type][prop_name]
+        v = get_fce(guid)
+        print(v)
+
         line_edit = QLineEdit()
-        line_edit.setText(value)
+        line_edit.setText(value if v is None else v)
         self.property_tree.setItemWidget(parent, 1, line_edit)
 
     def _create_asset(self, parent, guid, component_type, prop_name, prop_body, value):
         asset_type = prop_body["asset_type"]
 
+        get_fce = self.tc.properties_get[component_type][prop_name]
+        v = get_fce(guid)
+        print(v)
+
         btn = QPushButton()
-        btn.setText(value)
+        btn.setText(value if v is None else v)
 
         def _open_select_asset_dialog():
             dialog = SelectAssetDialog(btn.text(), asset_type, self.rpc)
@@ -222,9 +230,12 @@ class PropertyInspectorView(QMainWindow, Ui_MainWindow):
 
         # v = get_fce(guid)
 
-        x_spin.setValue(value[0])
-        y_spin.setValue(value[1])
-        z_spin.setValue(value[2])
+        get_fce = self.tc.properties_get[component_type][prop_name]
+        v = get_fce(guid)
+
+        x_spin.setValue(v[0])
+        y_spin.setValue(v[1])
+        z_spin.setValue(v[2])
 
         set_fce = self.tc.properties_set[component_type][prop_name]
 

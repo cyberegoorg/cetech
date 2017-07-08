@@ -1,4 +1,6 @@
 
+#include <cetech/modules/entity.h>
+
 #include "cetech/modules/transform.h"
 #include "../luasys_private.h"
 #include <cetech/celib/vec3f.inl>

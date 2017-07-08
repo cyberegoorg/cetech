@@ -30,7 +30,7 @@ OS_ARCH = 64 if sys.maxsize > 2 ** 32 else 32
 
 SCRIPTS_DIR = os.path.abspath(os.path.join(os.path.dirname(os.path.abspath(__file__))))
 
-ROOT_DIR = os.path.abspath(SCRIPTS_DIR, os.path.pardir)
+ROOT_DIR = os.path.abspath(os.path.join(SCRIPTS_DIR, os.path.pardir))
 EXTERNAL_DIR = os.path.join(ROOT_DIR, 'externals')
 EXTERNAL_BUILD_DIR = os.path.join(EXTERNAL_DIR, 'build')
 EXTERNAL_SRC_DIR = os.path.join(EXTERNAL_DIR, 'src')
@@ -154,6 +154,8 @@ def build(name, body, platform_, job_count_str, verbose):
 
     os.chdir(clone_dir)
 
+    my_env = {**os.environ, 'CFLAGS': '-fPIC', 'CXXFLAGS': '-fPIC'}
+
     for cmd in commands:
         cmd_lst = cmd.split(' ')
 
@@ -168,6 +170,7 @@ def build(name, body, platform_, job_count_str, verbose):
 
             cmd_lst.append('-DCMAKE_INCLUDE_PATH=%s' % os.path.join(EXTERNAL_BUILD_DIR, platform_, 'release', 'include'))
             cmd_lst.append('-DCMAKE_LIBRARY_PATH=%s' % os.path.join(EXTERNAL_BUILD_DIR, platform_, 'release', 'lib'))
+
             cmd_lst.append(clone_dir)
 
         elif cmd_lst[0] == 'devenv':
@@ -182,7 +185,7 @@ def build(name, body, platform_, job_count_str, verbose):
             print("Build cmd: %s" % ' '.join(cmd_lst))
 
         _stdout = subprocess.DEVNULL if not verbose else None
-        subprocess.check_call(cmd_lst, stdout=_stdout, stderr=subprocess.STDOUT, universal_newlines=True)
+        subprocess.check_call(cmd_lst, stdout=_stdout, stderr=subprocess.STDOUT, universal_newlines=True, env=my_env)
 
     os.chdir(ROOT_DIR)
 
@@ -335,18 +338,23 @@ def do_job(name, body, job_list, config, platform_, external, only_clone, job_co
 
     if 'depend' in body:
         depend = body['depend']
+
+        if isinstance(depend, str):
+            depend = [depend]
+
         print(depend)
-        if depend in job_list:
-            do_job(name=depend,
-                   body=EXTERNALS[depend],
-                   job_list=job_list,
-                   config=config,
-                   platform_=platform_,
-                   external=external,
-                   only_clone=only_clone,
-                   job_count=job_count,
-                   verbose=verbose)
-            job_list.remove(depend)
+        for d in depend:
+            if d in job_list:
+                do_job(name=d,
+                       body=EXTERNALS[d],
+                       job_list=job_list,
+                       config=config,
+                       platform_=platform_,
+                       external=external,
+                       only_clone=only_clone,
+                       job_count=job_count,
+                       verbose=verbose)
+                job_list.remove(d)
 
     if 'build' in body:
         build(name=name,

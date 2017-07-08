@@ -14,18 +14,28 @@
 CETECH_DECL_API(ct_mesh_renderer_a0);
 CETECH_DECL_API(ct_hash_a0);
 
+struct ct_mesh_renderer _get_mesh(lua_State *l, int idx) {
+    uint64_t t = luasys_to_u64(l, idx);
+    return *((struct ct_mesh_renderer*) &t);
+}
+
+void _push_mesh(lua_State *l, struct ct_mesh_renderer mesh) {
+    uint64_t t = *((uint64_t*)&mesh);
+    luasys_push_uint64_t(l, t);
+}
+
 static int _mesh_get(lua_State *l) {
     struct ct_world w = {.h = luasys_to_handler(l, 1)};
-    struct ct_entity ent = {.h = luasys_to_uin32_t(l, 2)};
+    struct ct_entity ent = {.h = luasys_to_u32(l, 2)};
 
-    luasys_push_int(l, ct_mesh_renderer_a0.get(w, ent).idx);
+    _push_mesh(l, ct_mesh_renderer_a0.get(w, ent));
     return 1;
 }
 
 
 static int _mesh_has(lua_State *l) {
     struct ct_world w = {.h = luasys_to_handler(l, 1)};
-    struct ct_entity ent = {.h = luasys_to_uin32_t(l, 2)};
+    struct ct_entity ent = {.h = luasys_to_u32(l, 2)};
 
     luasys_push_bool(l, ct_mesh_renderer_a0.has(w, ent));
     return 1;
@@ -33,19 +43,18 @@ static int _mesh_has(lua_State *l) {
 
 
 static int _mesh_get_material(lua_State *l) {
-    struct ct_world w = {.h = luasys_to_handler(l, 1)};
-    struct ct_mesh_renderer m = {.idx = luasys_to_int(l, 2)};
+    struct ct_mesh_renderer m =_get_mesh(l, 1);
 
-    luasys_push_handler(l, ct_mesh_renderer_a0.get_material(w, m).idx);
+    luasys_push_handler(l, ct_mesh_renderer_a0.get_material(m).idx);
     return 1;
 }
 
 static int _mesh_set_material(lua_State *l) {
-    struct ct_world w = {.h = luasys_to_handler(l, 1)};
-    struct ct_mesh_renderer m = {.idx = luasys_to_int(l, 2)};
+    struct ct_mesh_renderer m = _get_mesh(l, 1);
+
     uint64_t material = ct_hash_a0.id64_from_str(luasys_to_string(l, 3));
 
-    ct_mesh_renderer_a0.set_material(w, m, material);
+    ct_mesh_renderer_a0.set_material(m, material);
 
     return 0;
 }

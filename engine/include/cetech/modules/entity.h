@@ -4,7 +4,6 @@
 #ifndef CETECH_ENTITY_MANAGER_H
 #define CETECH_ENTITY_MANAGER_H
 
-#include <cetech/modules/blob.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -14,7 +13,9 @@ extern "C" {
 // Includes
 //==============================================================================
 
+#include <stddef.h>
 #include <cetech/celib/math_types.h>
+#include <cetech/modules/blob.h>
 
 typedef struct yaml_node_s yaml_node_t;
 

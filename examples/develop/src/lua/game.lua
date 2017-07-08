@@ -26,7 +26,7 @@ function Game:init()
     --    self.entity = Entity.
     -- -- (self.world, "entity1");
     --    local t = Transform.get(self.world, self.entity)
-    --    local p = Transform.get_scale(self.world, t)
+    --    local p = Transform.get_scale(t)
     --    Log.debug("lua", "%f %f %f", p.x, p.y, p.z)
 
     --    self.level = World.LoadLevel(self.world, "level1");
@@ -64,17 +64,17 @@ end
 
 function rotator(world, entity, node_name, delta_rot)
     local node = SceneGraph.node_by_name(world, entity, node_name)
-    local rot = SceneGraph.get_rotation(world, node)
+    local rot = SceneGraph.get_rotation(node)
     rot = rot * delta_rot
-    SceneGraph.set_rotation(world, node, rot)
+    SceneGraph.set_rotation(node, rot)
 end
 
 function transform_rotator(world, entity, delta_rot)
     local lt = Transform.get(world, entity)
-    local rot = Transform.get_rotation(world, lt)
+    local rot = Transform.get_rotation(lt)
     rot = rot * delta_rot
 
-    Transform.set_rotation(world, lt, rot)
+    Transform.set_rotation(lt, rot)
 end
 
 TEXTURE_CYCLE = { "content/scene/m4a1/m4_diff", "content/uv_checker", "content/texture1" }
@@ -82,8 +82,10 @@ TEXTURE_CYCLE_IT = 1
 
 L = 2
 function Game:update(dt)
+    -- Application.quit()
+
         local mesh = Mesh.get(self.world, self.entity)
-        local material = Mesh.get_material(self.world, mesh)
+        local material = Mesh.get_material(mesh)
 
 --    L = L + dt * 0.1
 --    if (L >= 1.0) then L = 0; end
@@ -203,7 +205,7 @@ function Game:update(dt)
 end
 
 function Game:render()
-    Renderer.render_world(self.world, self.camera, self.viewport)
+    Renderer.render_world(self.world, self.fps_camera.camera, self.viewport)
 end
 
 function foo(value)

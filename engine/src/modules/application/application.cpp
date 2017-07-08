@@ -15,6 +15,7 @@
 #include <cetech/kernel/task.h>
 #include <cetech/kernel/develop.h>
 
+#include <cetech/modules/entity.h>
 #include <cetech/modules/resource.h>
 #include <cetech/modules/luasys.h>
 #include <cetech/modules/renderer.h>
@@ -199,7 +200,8 @@ static void _boot_unload() {
     ct_resource_a0.unload(pkg, resources, 2);
 }
 
-void application_start() {
+
+extern "C" void application_start() {
     _G = {0};
 
     _init_api(api::v0());
@@ -267,8 +269,8 @@ void application_start() {
 
     ct_console_srv_a0.push_begin();
     while (_G.is_running) {
-        auto application_sd = ct_develop_a0.enter_scope(
-                "Application:update()");
+        auto application_sd = ct_develop_a0.enter_scope("Application:update()",
+                                                        ct_task_a0.worker_id());
 
         uint64_t now_ticks = ct_time_a0.perf_counter();
         float dt =
@@ -288,8 +290,8 @@ void application_start() {
 
         if (frame_time_accum >= frame_time) {
             if (!ct_config_a0.get_int(_G.config.daemon)) {
-                ct_scope_data render_sd = ct_develop_a0.enter_scope(
-                        "Game:render()");
+                auto render_sd = ct_develop_a0.enter_scope("Game:render()",
+                                                           ct_task_a0.worker_id());
                 _G.game->render();
                 ct_develop_a0.leave_scope(render_sd);
             }

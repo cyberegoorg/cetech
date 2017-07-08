@@ -98,6 +98,7 @@ struct ct_material_a0 {
 
 //! Mesh typedef
 struct ct_mesh_renderer {
+    struct ct_world world;
     uint32_t idx;
 };
 
@@ -146,15 +147,13 @@ struct ct_mesh_renderer_a0 {
     //! \param world World
     //! \param mesh Mesh
     //! \return Material
-    struct ct_material (*get_material)(struct ct_world world,
-                                       struct ct_mesh_renderer mesh);
+    struct ct_material (*get_material)(struct ct_mesh_renderer mesh);
 
     //! Set material
     //! \param world World
     //! \param mesh Mesh
     //! \param material Material
-    void (*set_material)(struct ct_world world,
-                         struct ct_mesh_renderer mesh,
+    void (*set_material)(struct ct_mesh_renderer mesh,
                          uint64_t material);
 
     //! Render all mesh in world

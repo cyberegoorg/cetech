@@ -195,6 +195,7 @@ extern "C" void _register_all_api(ct_api_a0 *api) {
     REGISTER_LUA_API(package, api);
     REGISTER_LUA_API(level, api);
     REGISTER_LUA_API(scenegraph, api);
+    REGISTER_LUA_API(camera, api);
 }
 
 //static int _reload_module(lua_State *l) {
@@ -462,8 +463,8 @@ int luasys_to_int(lua_State *_L,
 }
 
 
-uint32_t luasys_to_uin32_t(lua_State *_L,
-                           int i) {
+uint32_t luasys_to_u32(lua_State *_L,
+                       int i) {
     return (uint32_t) lua_tointeger(_L, i);
 }
 

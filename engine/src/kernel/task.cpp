@@ -189,11 +189,11 @@ namespace taskmanager {
             return 0;
         }
 
-        //auto sd = ct_develop_a0.enter_scope(_G._task_pool[t.id].name);
+        auto sd = ct_develop_a0.enter_scope(_G._task_pool[t.id].name, _worker_id);
 
         _G._task_pool[t.id].task_work(_G._task_pool[t.id].data);
 
-        //ce_develop_a0.leave_scope(sd);
+        ct_develop_a0.leave_scope(sd);
 
         _mark_task_job_done(t);
 
@@ -232,7 +232,7 @@ namespace taskmanager_module {
     static void _init(ct_api_a0 *api) {
         _init_api(api);
 
-//        CETECH_GET_API(api, ct_develop_a0);
+        CETECH_GET_API(api, ct_develop_a0);
         CETECH_GET_API(api, ct_memory_a0);
         CETECH_GET_API(api, ct_thread_a0);
         CETECH_GET_API(api, ct_log_a0);
@@ -273,11 +273,9 @@ namespace taskmanager_module {
 
     static void _shutdown() {
         _G._Run = 0;
-
         int status = 0;
 
         for (uint32_t i = 0; i < _G._workers_count; ++i) {
-            //thread_kill(_G._workers[i]);
             ct_thread_a0.wait(_G._workers[i], &status);
         }
 

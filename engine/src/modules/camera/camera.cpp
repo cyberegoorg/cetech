@@ -151,16 +151,15 @@ namespace camera {
         return camera.idx != UINT32_MAX;
     }
 
-    void get_project_view(ct_world world,
-                          ct_camera camera,
+    void get_project_view(ct_camera camera,
                           mat44f_t *proj,
                           mat44f_t *view) {
 
-        WorldInstance *world_inst = _get_world_instance(world);
+        WorldInstance *world_inst = _get_world_instance(camera.world);
 
         vec2f_t size = ct_renderer_a0.get_size(); // TODO, to arg... or viewport?
         ct_entity e = world_inst->entity[camera.idx];
-        ct_transform t = ct_transform_a0.get(world, e);
+        ct_transform t = ct_transform_a0.get(camera.world, e);
 
         float fov = world_inst->fov[camera.idx];
         float near = world_inst->near[camera.idx];
@@ -168,7 +167,7 @@ namespace camera {
 
         mat44f_set_perspective_fov(proj, fov, size.x / size.y, near, far);
 
-        mat44f_t *w = ct_transform_a0.get_world_matrix(world, t);
+        mat44f_t *w = ct_transform_a0.get_world_matrix(t);
         mat44f_inverse(view, w);
     }
 
@@ -187,7 +186,7 @@ namespace camera {
 
         uint32_t component_idx = map::get(_G.ent_map, idx, UINT32_MAX);
 
-        return (ct_camera) {.idx = component_idx};
+        return (ct_camera) {.idx = component_idx, .world = world};
     }
 
     ct_camera create(ct_world world,
@@ -209,7 +208,7 @@ namespace camera {
 
         map::set(_G.ent_map, world.h ^ entity.h, idx);
 
-        return (ct_camera) {.idx = idx};
+        return (ct_camera) {.idx = idx, .world = world};
     }
 
 }

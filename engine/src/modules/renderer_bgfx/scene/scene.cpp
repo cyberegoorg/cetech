@@ -247,7 +247,7 @@ namespace scene {
             return;
         }
 
-        bgfx::setVertexBuffer(instance->vb[idx], 0, instance->size[idx]);
+        bgfx::setVertexBuffer(0, instance->vb[idx], 0, instance->size[idx]);
         bgfx::setIndexBuffer(instance->ib[idx], 0, instance->size[idx]);
     }
 

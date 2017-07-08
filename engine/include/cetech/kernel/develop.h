@@ -67,6 +67,7 @@ struct ct_scope_data {
     const char *name; //!< Scope name
     time_t start;     //!< Start time
     uint64_t start_timer;  //!< Timer
+    uint32_t worker_id;
 };
 
 //==============================================================================
@@ -99,7 +100,7 @@ struct ct_develop_a0 {
     //! Enter scope
     //! \param name Scope name
     //! \return Scope data
-    struct ct_scope_data (*enter_scope)(const char *name);
+    struct ct_scope_data (*enter_scope)(const char *name, uint32_t worker_id);
 
     //! Leave scope
     //! \param scope_data Scope data

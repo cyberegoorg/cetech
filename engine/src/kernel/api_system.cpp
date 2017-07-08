@@ -93,6 +93,6 @@ namespace api {
     }
 }
 
-extern "C" ct_api_a0 *ce_api_get() {
+extern "C" ct_api_a0 *ct_api_get() {
     return &api::a0;
 }

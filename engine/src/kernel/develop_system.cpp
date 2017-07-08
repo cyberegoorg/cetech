@@ -26,7 +26,6 @@ using namespace cetech;
 
 CETECH_DECL_API(ct_memory_a0);
 CETECH_DECL_API(ct_thread_a0);
-CETECH_DECL_API(ct_task_a0);
 CETECH_DECL_API(ct_config_a0);
 CETECH_DECL_API(ct_time_a0);
 CETECH_DECL_API(ct_log_a0);
@@ -38,7 +37,6 @@ CETECH_DECL_API(ct_log_a0);
 
 #define LOG_WHERE "develop_system"
 #define developsys_push(type, event) _developsys_push((ct_develop_event_header*)(&event), type, sizeof(event))
-
 
 //==============================================================================
 // Typedefs
@@ -75,9 +73,9 @@ static struct DevelopSystemGlobals {
     }
 } _G;
 
+//static __thread uint8_t _stream_buffer[64 * 1024] = {0};
+//static __thread uint32_t _stream_buffer_size = 0;
 
-static __thread uint8_t _stream_buffer[64 * 1024] = {0};
-static __thread uint32_t _stream_buffer_size = 0;
 static __thread uint32_t _scope_depth = 0;
 
 //==============================================================================
@@ -85,54 +83,6 @@ static __thread uint32_t _scope_depth = 0;
 //==============================================================================
 
 namespace {
-
-    static void _flush_stream_buffer() {
-        if (_stream_buffer_size == 0) {
-            return;
-        }
-
-        ct_thread_a0.spin_lock(&_G.flush_lock);
-
-        array::push(_G.eventstream, _stream_buffer, _stream_buffer_size);
-        _stream_buffer_size = 0;
-
-        ct_thread_a0.spin_unlock(&_G.flush_lock);
-    }
-
-    static void _flush_job(void *data) {
-        _flush_stream_buffer();
-
-        atomic_store_explicit(&_G.complete_flag[ct_task_a0.worker_id()], 1,
-                              memory_order_release);
-    }
-
-    static void _flush_all_streams() {
-        const int wc = ct_task_a0.worker_count();
-
-        for (int i = 1; i < wc; ++i) {
-            atomic_init(&_G.complete_flag[i], 0);
-        }
-
-        _flush_stream_buffer();
-
-        ct_task_item items[wc];
-
-        for (int i = 0; i < wc; ++i) {
-            items[i] = (ct_task_item) {
-                    .name = "flush_worker",
-                    .work = _flush_job,
-                    .data = NULL,
-                    .affinity = ct_task_affinity(TASK_AFFINITY_WORKER1 + i)
-            };
-        }
-
-        ct_task_a0.add(items, wc);
-
-        for (int i = 1; i < wc; ++i) {
-            ct_task_a0.wait_atomic(&_G.complete_flag[i], 0);
-        }
-    }
-
     void _register_to_mpack(uint64_t type,
                             to_mpack_fce_t fce) {
         map::set(_G.to_mpack, type, fce);
@@ -255,8 +205,6 @@ namespace {
 namespace develop_system {
 
     static void _after_update(float dt) {
-        _flush_all_streams();
-
         _G.time_accum += dt;
         if (_G.time_accum >= 10.0f / 1000.0f) {
             _send_events();
@@ -271,17 +219,14 @@ namespace develop_system {
                           uint32_t type,
                           uint64_t size) {
 
-        if ((_stream_buffer_size + size) >= CETECH_ARRAY_LEN(_stream_buffer)) {
-            _flush_stream_buffer();
-        }
-
-        uint8_t *p = _stream_buffer + _stream_buffer_size;
-
         header->type = type;
         header->size = size;
 
-        memcpy(p, header, size);
-        _stream_buffer_size += size;
+        ct_thread_a0.spin_lock(&_G.flush_lock);
+
+        array::push(_G.eventstream, (const uint8_t *) header, size);
+
+        ct_thread_a0.spin_unlock(&_G.flush_lock);
     }
 
     void developsys_push_record_float(const char *name,
@@ -303,13 +248,14 @@ namespace develop_system {
         developsys_push(EVENT_RECORD_INT, ev);
     }
 
-    ct_scope_data developsys_enter_scope(const char *name) {
+    ct_scope_data developsys_enter_scope(const char *name, uint32_t worker_id) {
         ++_scope_depth;
 
         return (ct_scope_data) {
                 .name = name,
                 .start = ct_time_a0.ticks(),
-                .start_timer = ct_time_a0.perf_counter()
+                .start_timer = ct_time_a0.perf_counter(),
+                .worker_id = worker_id
         };
     }
 
@@ -319,7 +265,7 @@ namespace develop_system {
 
         ct_scope_event ev = {
                 .name = {0},
-                .worker_id = (uint32_t) ct_task_a0.worker_id(),
+                .worker_id = scope_data.worker_id,
                 .start = scope_data.start,
                 .duration =
                 ((float) (ct_time_a0.perf_counter() -
@@ -353,7 +299,6 @@ namespace develop_system_module {
 
         CETECH_GET_API(api, ct_memory_a0);
         CETECH_GET_API(api, ct_log_a0);
-        CETECH_GET_API(api, ct_task_a0);
         CETECH_GET_API(api, ct_config_a0);
 
         CETECH_GET_API(api, ct_thread_a0);

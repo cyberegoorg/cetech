@@ -18,16 +18,15 @@ struct ct_world;
 struct ct_entity;
 
 
-
 //==============================================================================
 // Typedefs
 //==============================================================================
 
 //! Transform component
 struct ct_transform {
+    struct ct_world world;
     uint32_t idx;
 };
-
 
 //==============================================================================
 // Api
@@ -45,60 +44,52 @@ struct ct_transform_a0 {
     //! \param world World
     //! \param transform Transform
     //! \param parent Parent matrix
-    void (*transform)(struct ct_world world,
-                      struct ct_transform transform,
+    void (*transform)(struct ct_transform transform,
                       mat44f_t *parent);
 
     //! Get transform position
     //! \param world World
     //! \param transform transform
     //! \return Position
-    vec3f_t (*get_position)(struct ct_world world,
-                            struct ct_transform transform);
+    vec3f_t (*get_position)(struct ct_transform transform);
 
     //! Get transform rotation
     //! \param world World
     //! \param transform transform
     //! \return Rotation
-    quatf_t (*get_rotation)(struct ct_world world,
-                            struct ct_transform transform);
+    quatf_t (*get_rotation)(struct ct_transform transform);
 
     //! Get transform scale
     //! \param world World
     //! \param transform transform
     //! \return Scale
-    vec3f_t (*get_scale)(struct ct_world world,
-                         struct ct_transform transform);
+    vec3f_t (*get_scale)(struct ct_transform transform);
 
     //! Get world matrix
     //! \param world World
     //! \param transform transform
     //! \return World matrix
-    mat44f_t *(*get_world_matrix)(struct ct_world world,
-                                  struct ct_transform transform);
+    mat44f_t *(*get_world_matrix)(struct ct_transform transform);
 
     //! Set position
     //! \param world World
     //! \param transform transform
     //! \param pos Position
-    void (*set_position)(struct ct_world world,
-                         struct ct_transform transform,
+    void (*set_position)(struct ct_transform transform,
                          vec3f_t pos);
 
     //! Set rotation
     //! \param world World
     //! \param transform transform
     //! \param rot Rotation
-    void (*set_rotation)(struct ct_world world,
-                         struct ct_transform transform,
+    void (*set_rotation)(struct ct_transform transform,
                          quatf_t rot);
 
     //! Set scale
     //! \param world World
     //! \param transform transform
     //! \param scale Scale
-    void (*set_scale)(struct ct_world world,
-                      struct ct_transform transform,
+    void (*set_scale)(struct ct_transform transform,
                       vec3f_t scale);
 
     //! Has entity scene-graph component?

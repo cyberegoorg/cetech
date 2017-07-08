@@ -1,6 +1,6 @@
 require 'core/class'
 
-local Transform, Mat4f, Vec3f, Quatf, Log = cetech.Transform, cetech.Mat4f, cetech.Vec3f, cetech.Quatf, cetech.Log
+local Transform, Mat4f, Vec3f, Quatf, Log, Camera = cetech.Transform, cetech.Mat4f, cetech.Vec3f, cetech.Quatf, cetech.Log, cetech.Camera
 --local Camera = cetech.Camera
 
 FPSCamera = class(FPSCamera)
@@ -8,7 +8,7 @@ FPSCamera = class(FPSCamera)
 function FPSCamera:init(world, camera_entity, fly_mode)
     self.world = world
     self.entity = camera_entity
-    --  self.camera = Camera.get(world, camera_entity)
+    self.camera = Camera.get(world, camera_entity)
     self.transform = Transform.get(world, camera_entity)
 
     self.fly_mode = fly_mode or false
@@ -19,10 +19,10 @@ function FPSCamera:setFlyMode(enable)
 end
 
 function FPSCamera:update(dt, dx, dy, updown, leftright)
-    local pos = Transform.get_position(self.world, self.transform)
-    local rot = Transform.get_rotation(self.world, self.transform)
+    local pos = Transform.get_position(self.transform)
+    local rot = Transform.get_rotation(self.transform)
 
-    local m_world = Transform.get_world_matrix(self.world, self.transform)
+    local m_world = Transform.get_world_matrix(self.transform)
 
     local x_dir = m_world.x
     local z_dir = -m_world.z
@@ -40,6 +40,6 @@ function FPSCamera:update(dt, dx, dy, updown, leftright)
     local rotation_around_camera_right = Quatf.from_axis_angle(x_dir, dy * dt * 100)
     local rotation = rotation_around_world_up * rotation_around_camera_right
 
-    Transform.set_position(self.world, self.transform, pos)
-    Transform.set_rotation(self.world, self.transform, rotation * rot)
+    Transform.set_position(self.transform, pos)
+    Transform.set_rotation(self.transform, rotation * rot)
 end

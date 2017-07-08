@@ -250,7 +250,7 @@ ct_mesh_renderer mesh_get(ct_world world,
 
     uint32_t component_idx = map::get(_G.ent_map, idx, UINT32_MAX);
 
-    return {.idx = component_idx};
+    return {.idx = component_idx, .world = world};
 }
 
 ct_mesh_renderer mesh_create(ct_world world,
@@ -283,7 +283,7 @@ ct_mesh_renderer mesh_create(ct_world world,
     data->node[idx] = node;
     data->material[idx] = material_instance;
 
-    return (ct_mesh_renderer) {.idx = idx};
+    return (ct_mesh_renderer) {.idx = idx, .world = world};
 }
 
 void mesh_render_all(ct_world world) {
@@ -300,7 +300,7 @@ void mesh_render_all(ct_world world) {
         ct_entity ent = data->entity[i];
 
         ct_transform t = ct_transform_a0.get(world, ent);
-        mat44f_t t_w = *ct_transform_a0.get_world_matrix(world, t);
+        mat44f_t t_w = *ct_transform_a0.get_world_matrix(t);
         //mat44f_t t_w = MAT44F_INIT_IDENTITY;//*transform_get_world_matrix(world, t);
         mat44f_t node_w = MAT44F_INIT_IDENTITY;
         mat44f_t final_w = MAT44F_INIT_IDENTITY;
@@ -310,7 +310,7 @@ void mesh_render_all(ct_world world) {
             if (name != 0) {
                 ct_scene_node n = ct_scenegprah_a0.node_by_name(world, ent,
                                                                 name);
-                node_w = *ct_scenegprah_a0.get_world_matrix(world, n);
+                node_w = *ct_scenegprah_a0.get_world_matrix(n);
             }
         }
 
@@ -324,17 +324,15 @@ void mesh_render_all(ct_world world) {
     }
 }
 
-ct_material mesh_get_material(ct_world world,
-                              ct_mesh_renderer mesh) {
-    WorldInstance *data = _get_world_instance(world);
+ct_material mesh_get_material(ct_mesh_renderer mesh) {
+    WorldInstance *data = _get_world_instance(mesh.world);
     return data->material[mesh.idx];
 
 }
 
-void mesh_set_material(ct_world world,
-                       ct_mesh_renderer mesh,
+void mesh_set_material(ct_mesh_renderer mesh,
                        uint64_t material) {
-    WorldInstance *data = _get_world_instance(world);
+    WorldInstance *data = _get_world_instance(mesh.world);
     ct_material material_instance = ct_material_a0.resource_create(material);
 
     data->material[mesh.idx] = material_instance;
@@ -354,7 +352,7 @@ static void _set_property(ct_world world,
     ct_mesh_renderer mesh_renderer = mesh_get(world, entity);
 
     if (key == material) {
-        mesh_set_material(world, mesh_renderer,
+        mesh_set_material(mesh_renderer,
                           ct_hash_a0.id64_from_str(value.value.str));
     }
 }
