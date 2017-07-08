@@ -57,7 +57,7 @@ function AssetView:init()
     self.viewport = 0 --Renderer.GetViewport("default")
     self.world = World.create()
     self.camera_entity = Entity.spawn(self.world, "playground/camera")
-
+    self.camera = Camera.get(self.world, self.camera_entity)
     self.camera_transform = Transform.get(self.world, self.camera_entity)
 
     Transform.set_position(self.camera_transform, Vec3f.make(0.0, 0.0, 20.0))

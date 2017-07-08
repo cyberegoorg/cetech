@@ -51,7 +51,7 @@ function Editor:update(dt)
 end
 
 function Editor:render()
-    Renderer.render_world(self.world, self.camera, self.viewport)
+    Renderer.render_world(self.world, self.fps_camera.camera, self.viewport)
 end
 
 function Editor:load_level(level)
