@@ -21,7 +21,7 @@ namespace os {
     void register_api(ct_api_a0 *api);
 }
 
-void application_start();
+extern "C" void application_start();
 
 const char *_platform() {
 #if defined(CETECH_LINUX)
@@ -84,7 +84,7 @@ extern "C" void load_core() {
     ADD_STATIC_MODULE(consoleserver);
 }
 
-int cetech_kernel_init(int argc,
+extern "C" int cetech_kernel_init(int argc,
                        const char **argv) {
     auto *core_alloc = core_allocator::get();
 
@@ -110,10 +110,14 @@ int cetech_kernel_init(int argc,
 }
 
 
-int cetech_kernel_shutdown() {
+extern "C" int cetech_kernel_shutdown() {
     ct_log_a0.debug(LOG_WHERE, "Shutdown");
 
     module::unload_all();
+
+    auto* api = api::v0();
+
+    UNLOAD_STATIC_MODULE(api, os);
 
     config::shutdown();
     module::shutdown();

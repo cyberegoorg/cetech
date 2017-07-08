@@ -200,7 +200,8 @@ static void _boot_unload() {
     ct_resource_a0.unload(pkg, resources, 2);
 }
 
-void application_start() {
+
+extern "C" void application_start() {
     _G = {0};
 
     _init_api(api::v0());

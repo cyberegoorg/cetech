@@ -170,7 +170,7 @@ set(MAIN_SOURCE_FILES
 
 if (UNIX)
     set(RELEASE_LIBS_LINUX
-            jemalloc_pic.a
+            #jemalloc_pic.a
             pthread
             anl # NANOMSG
             dl
@@ -194,12 +194,15 @@ set(RELEASE_LIBS
         yaml-cpp.a
 
         bgfxRelease.a
+        bimgRelease.a
         bxRelease.a
 
         luajit.a
         sqlite3.a
         SDL2.a
+
         assimp.a
+        IrrXML.a
         minizip.a
         aes.a
         )
@@ -245,13 +248,11 @@ target_link_libraries(cetech_develop ${DEVELOP_LIBS})
 target_include_directories(cetech_develop PUBLIC externals/build/${PLATFORM_ID}/${CONFIGURATION}/)
 target_include_directories(cetech_develop PUBLIC externals/build/${PLATFORM_ID}/${CONFIGURATION}/include)
 
-#add_library(cetech_develop_lib SHARED ${SOURCE_FILES})
-#target_link_libraries(cetech_develop_lib ${RELEASE_LIBS2})
-#target_compile_definitions(cetech_develop_lib PUBLIC -DCETECH_DEVELOP -DCETECH_CAN_COMPILE=1)
-#target_include_directories(cetech_develop_lib PUBLIC externals/build/${PLATFORM_ID}/${CONFIGURATION}/)
-#target_include_directories(cetech_develop_lib PUBLIC externals/build/${PLATFORM_ID}/${CONFIGURATION}/include)
-
-#set_target_properties(module_example PROPERTIES PREFIX "")
+add_library(cetech_develop_lib SHARED ${SOURCE_FILES})
+target_link_libraries(cetech_develop_lib ${RELEASE_LIBS})
+target_compile_definitions(cetech_develop_lib PUBLIC -DCETECH_DEVELOP -DCETECH_CAN_COMPILE=1)
+target_include_directories(cetech_develop_lib PUBLIC externals/build/${PLATFORM_ID}/${CONFIGURATION}/)
+target_include_directories(cetech_develop_lib PUBLIC externals/build/${PLATFORM_ID}/${CONFIGURATION}/include)
 
 add_library(module_example SHARED engine/examples/module_example/example.c)
 set_target_properties(module_example PROPERTIES PREFIX "")

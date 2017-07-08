@@ -32,7 +32,7 @@ typedef void (*ct_unload_module_t)(struct ct_api_a0 *api);
 //! Unload static module
 //! \param name Module name
 #define UNLOAD_STATIC_MODULE(api, name)                     \
-    extern void name ## _unload_module(struct a0* api); \
+    extern void name ## _unload_module(struct ct_api_a0* api); \
     name ## _unload_module(api)
 
 namespace module {

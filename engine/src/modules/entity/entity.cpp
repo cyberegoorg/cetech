@@ -557,8 +557,12 @@ namespace entity {
         uint32_t entities_count = 0;
 
         spawn_from_resource(world, res, &entities, &entities_count);
+
+        ct_entity root = entities[0];
+
         CETECH_FREE(ct_memory_a0.main_allocator(), entities);
-        return entities[0];
+
+        return root;
     }
 
     void destroy(ct_world world,
