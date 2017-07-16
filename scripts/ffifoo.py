@@ -179,5 +179,4 @@ log_void = C.ct_api_get().first(b"ct_log_a0").api
 log_api = ffi.cast("struct ct_log_a0*", log_void)
 log_api.info(b"python", b"python %d", ffi.cast("int", 5555))
 
-
 #C.cetech_kernel_shutdown()

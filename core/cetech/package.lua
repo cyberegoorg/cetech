@@ -25,6 +25,13 @@ function Package.load(name)
     return api.load(id)
 end
 
+--! Load all resource that are in the package. If one is already loaded will not reload.
+--!
+--! !!! important
+--!
+--!     The function does not wait to finish loading.
+--!     For querying whether the package is already loaded use method [**IsLoaded**](#Packageisloaded)
+--!     or you can wait to load using method [**Flush**](#Packageflush)
 function Package.load(name)
     local id = hash_lib.id64_from_str(name)
 

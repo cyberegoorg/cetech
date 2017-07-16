@@ -36,6 +36,33 @@ struct ct_gamepad_a0 {
 local C = ffi.C
 local api = api_system.load("ct_gamepad_a0")
 
+--! #### Example
+--!
+--! ```lua
+--! local right_a = Gamepad.axis(0, Gamepad.axis_index("right"))
+--! local left_a = Gamepad.axis(0, Gamepad.axis_index("left"))
+--!
+--! move_camera(dt, right_a.x, right_a.x, left_a.x, left_a.x)
+--!
+--! if Gamepad.button_state(0, Gamepad.button_index("right_shoulder")) then
+--!     fire()
+--! end
+--! ```
+--!
+--! #### Axis name
+--!
+--! * ` ` - Invlaid axis
+--! * `left` - Left stick
+--! * `right` - Right stick
+--! * `triger` - Trigers
+--!
+--! #### Button name
+--!
+--! * `a`, `b`, `x`, `y`
+--! * `back`, `guide`, `start`
+--! * `left_stick`, `right_stick`
+--! * `left_shoulder`, `right_shoulder`
+--! * `dpad_up`, `dpad_down`, `dpad_left`, `dpad_right`
 Gamepad = {}
 
 
