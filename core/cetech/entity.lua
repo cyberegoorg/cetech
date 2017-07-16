@@ -4,7 +4,6 @@ local api_system  = require("cetech/api_system")
 local hash_lib  = require("cetech/hashlib")
 
 ffi.cdef[[
-
 struct ct_entity {
     uint32_t h;
 };
@@ -33,10 +32,6 @@ local C = ffi.C
 local api = api_system.load("ct_entity_a0")
 
 Entity = {}
-
-function Entity.create()
-    return api.create()
-end
 
 function Entity.destroy(entity)
     return api.destroy(entity)

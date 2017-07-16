@@ -30,6 +30,32 @@ struct ct_mouse_a0 {
 local C = ffi.C
 local api = api_system.load("ct_mouse_a0")
 
+--! #### Example
+--!
+--! ```lua
+--! local left_btn = cetech.Mouse.button_index 'left'
+--!
+--! function Game:update(dt)
+--!     local m_axis = Mouse.axis(Mouse.axis_index('absolute'))
+--!
+--!     if Mouse.state(left_btn) then
+--!         print("%f, %f", m_axis.x, m_axis.y)
+--!     end
+--! end
+--! ```
+--!
+--! #### Axis name
+--!
+--! * ` ` - Invlaid axis
+--! * `absolute` - Abosilute position
+--! * `relative` - Relative position since last frame
+--!
+--! #### Button name
+--!
+--! * ` ` - Invalid buton
+--! * `left` - Left button
+--! * `midle` - Midle button
+--! * `right` - Right buton
 Mouse = {}
 
 function Mouse.button_index(name)

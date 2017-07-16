@@ -31,6 +31,7 @@ struct ct_camera_a0 {
 local C = ffi.C
 local api = api_system.load("ct_camera_a0")
 
+--| Camera component
 Camera = {}
 
 function Camera.get(world, entity)

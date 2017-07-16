@@ -92,8 +92,12 @@ typedef struct mat44f_s {
 local C = ffi.C
 local api = C.ct_api_get()
 
+--! Api system
 ApiSystem = {}
 
+--! Get api
+--! \param name string Api name
+--! \return lightuserdata Api pointer
 function ApiSystem.load(name)
     entry = api.first(name)
     return ffi.cast("struct " .. name .. "*", entry.api)

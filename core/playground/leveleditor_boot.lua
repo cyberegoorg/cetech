@@ -54,6 +54,7 @@ function Editor:update(dt)
 
     local leftdown = 0.0
     local updown = 0.0
+
     if EditorInput.keyboard.left then leftdown = -10.0 end
     if EditorInput.keyboard.right then leftdown = 10.0 end
     if EditorInput.keyboard.up then updown = 10.0 end
